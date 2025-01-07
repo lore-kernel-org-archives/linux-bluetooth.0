@@ -1,151 +1,323 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F2B7081E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jan 2025 09:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B22F14AD2D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jan 2025 11:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736243770; cv=none; b=sX1tMiVkjioi0RDsE1wiAEDWzVa3+ja6zYL8G0fh1yzw4E2rQuxsHdY7BRdz+/cRrxUKiHbLweDR1+eWswpvH9fJkMPnznKAwa15d088W9LcZE+HhM0j59zLmJGD5+iZX/y9A5c/177dB7v5A+cUyXcS/psV1iwWjS/St+gq5Ic=
+	t=1736250275; cv=none; b=O0EdTKNV7c3qos6d42Fj0PqNiWul3jjGZ37EIesXjCVve/sf1CFEzrd9RyD/8dqaY0EQOLGjqPkV5ul12Cacd5vAxmyJ2cztT/+9jlrxnM/gCg2O3EKr4oLE+lF8sYiz108iAgmR+VsxrLq0GPygTcG5SuAPYyQmMcZmYbOG4ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736243770; c=relaxed/simple;
-	bh=RbQPwZdvpAEeciNFXn9MrE2dOFaLLQp0JrhCAAvv1wY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=cTvRgR4NuJco+eV7c8248hX/MUnZ5Fhokw7ac70fyBFHsNPd6puaOuaBaAlFw7gk08Zj1oT1OpjQ0SGkvJylL/W4Q2iAhHwprnpZDZdtodccSdyhtcPAf5XPNLQHy3gKnXr5Xh/wI0G39JHng/RPEvc/9hpasI2sAmvJ7pl9M+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l9iRfcI8; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736250275; c=relaxed/simple;
+	bh=+2muwJq5MrLajAqyB1eGJ5qU8SfjnzLlD7wvmpi8z+c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rMgp8oOe75MMuMIygsW/SsULLvLGMtPgxvYlP6Y3ztrGbdp3A879qiBLtcAKjG0Aenoq1rK8kAXIPwfqCJdO2LWojBs0r/GSsN7z6RwTPdwhzyyVxolf6bl7XwmeKJytOjBQvqb0cJTJfmV8dy2E9tFZd3gmmpBXIou+UVCkQyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JIp842Pv; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9iRfcI8"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-467a6ecaa54so112283921cf.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2025 01:56:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736243765; x=1736848565; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1RjUn/pVxNwdWI6uw/Tyrkc8wnHTKF0k0c/XHOO6ZeA=;
-        b=l9iRfcI8XhFDXNI/Z79TLMb/dMtsOfNU3wMwK59Yv2zyd5hccets5Y0UH4PWxA3+Bt
-         7Btw4NoEGvt3VF1Y3MxDU9jKkpijBDdYDT+VIca3RuzexL39Ps3vBZAtAYpsiuADH9Iz
-         PmQMm9MBTkVkIpedTm54OchKbTnz8LLjpBGZBkQgsxXxSF/ztEDobWh5fFN7cQ3IJPMI
-         hSORrIkkuRkt8NMaprkVGebuq/1fqWWrGCl5QS+LrEO0hz2vvxKm2tZy8VnHlZjipCuE
-         LdXwDcFCogVLSeHhiOYxU3ES3DeDN1SJcjVxZb/sEUFserNIZLVmcRVe9A6XxX4mbxUR
-         39mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736243765; x=1736848565;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1RjUn/pVxNwdWI6uw/Tyrkc8wnHTKF0k0c/XHOO6ZeA=;
-        b=hXDSc3tVXOW2VNsQQ4gb0CGU0KqhspqwgsFvNyMeg6LaWUJnnGdr6NleQ32rF+gV27
-         QxQk6lpUoOtZVWS18+7FY4/Ccmoxyq+Zy527oRrRIOcRYzxmh5YfqAmNuRe7xB72UfrM
-         C27hH3oy3kNMQvJMeuGi979xQOlMC0ixQrg4VNPkN46oPvfs7iwnVMeeq3c0++1MiRmV
-         gwtjV0B7BZa3z4m9mN9o9F8VWrUyyN9K1EJMv4TUPoDvBk4SygQkX7LbTI4BYWW85jLT
-         IpT2QHy3rAxtzqqUF57ifU8t1s8gqw54/2EN+u/fer0OkGrteFdmuGGaePo1xrghWeUG
-         MRnw==
-X-Gm-Message-State: AOJu0YxflAgikT24C7WzAAyAl0TAJDxv3Ksw/QLbh5KaGD6r+dqcUxJm
-	Lq3xP0W039p94MChKY7xauqNgx19l9qIkXVGKS0d9ddzvQjoHMxY2IzwEQ==
-X-Gm-Gg: ASbGnct8jJwUWxm3Ng9klw4JOrhsT49fhh/JEI+fjR2hz3UkiyxHehdP68ICEPzAC1w
-	T/HM7kOiWB47MdyzhQZpGPFkg3iI3peB8DG3nabp1Uky/fxvUuOfREC0ro1kI6WIDlpzH9ke+v4
-	onRkC5iLMyfB4kGMFiPXg0A8XYqZ8tdKUeJ6Lq+y5VeBrSBEEbfW+tu15yMMtI/Vqe42A5Sjq8/
-	m6gxfbjGCLG8Ui82VC7PtQ510woHGotnaQD2qXx+pP5jVCNrvObA+BfEed425g=
-X-Google-Smtp-Source: AGHT+IHn5m+jGcYewA5FQKmd86Q+gy2wQ0+YeJVkVLTK5oEa0IF2EXWTcTObj7j7aJenrlMJj1RYMQ==
-X-Received: by 2002:a05:622a:245:b0:467:7cda:936d with SMTP id d75a77b69052e-46a4a8e0baamr893755651cf.14.1736243765271;
-        Tue, 07 Jan 2025 01:56:05 -0800 (PST)
-Received: from [172.17.0.2] ([20.161.78.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181d6374sm179251626d6.103.2025.01.07.01.56.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 01:56:04 -0800 (PST)
-Message-ID: <677cfa34.050a0220.4339c.92fb@mx.google.com>
-Date: Tue, 07 Jan 2025 01:56:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1680403203297501181=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JIp842Pv"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5079oUFY002526
+	for <linux-bluetooth@vger.kernel.org>; Tue, 7 Jan 2025 11:44:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=nj37RD3nNBlxposqnjz1ny
+	N+IINTwVrnrc/3LRoBCLY=; b=JIp842PvIP+MRLyer0TbXjuI8t+ULOr06UA5zm
+	YQXnanLgb9Mt8CyCr3t77R+e5WDZoV2sTVDJV8DWhBkA0327eyVHT9gjfirng0FO
+	8P6pgk7+Gi7bwXeUvnWzyQfSwoS5MFcJ0OGHi26DOPUQeqCQTPERJ9xGPIOSkXD8
+	IlKDV0ETcty7/UZ3CEQxxZVpwFeHBE4X3UW+lYB5O2WAvKaYemVUvNpIKhp1zdz9
+	BFigJB5zTW/ar7wdGtQyZxsiutPak85B18fapTqNEB5ws2URxHYo4tDZO4iX8OqQ
+	8yD+wZWd01k4YNoYqYHpcVxJe6G4EDVzQT9Is/G0QI26qq1g==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44120909ee-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2025 11:44:32 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 507BiV9f009822
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 7 Jan 2025 11:44:31 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 7 Jan 2025 03:44:29 -0800
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v1] obex: Implement support for message listing format version 1.1 for MCE
+Date: Tue, 7 Jan 2025 17:14:05 +0530
+Message-ID: <20250107114405.3593680-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_chejiang@quicinc.com
-Subject: RE: Expand firmware-name property to load specific
-In-Reply-To: <20250107092650.498154-2-quic_chejiang@quicinc.com>
-References: <20250107092650.498154-2-quic_chejiang@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: JiYg1rG3BJMtSHzTYlUPMsVMI8FI-4YL
+X-Proofpoint-ORIG-GUID: JiYg1rG3BJMtSHzTYlUPMsVMI8FI-4YL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ spamscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0 malwarescore=0
+ mlxscore=0 suspectscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501070097
 
---===============1680403203297501181==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+As per spec, Messages-Listing Format Version 1.1 is being marked
+mandatory feature to be supported in MAP 1.3 & above versions.
+This change is added for MAP client role.
 
-This is automated email and please do not reply to this email!
+This change is required for passing below testcases-
+1) MAP/MCE/MFB/BV-01-C
+Verify that the MCE correctly advertises the correct feature bits
+in the MNS SDP record.
+2) MAP/MCE/MFB/BV-03-C
+Verify that the MCE correctly advertises the correct MapSupportedFeatures
+bits in the MNS SDP record during MAS connection.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=922834
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.21 seconds
-SubjectPrefix                 FAIL      0.57 seconds
-BuildKernel                   PASS      25.76 seconds
-CheckAllWarning               PASS      27.54 seconds
-CheckSparse                   PASS      31.11 seconds
-BuildKernel32                 PASS      24.84 seconds
-TestRunnerSetup               PASS      435.99 seconds
-TestRunner_l2cap-tester       PASS      22.59 seconds
-TestRunner_iso-tester         PASS      36.10 seconds
-TestRunner_bnep-tester        PASS      4.81 seconds
-TestRunner_mgmt-tester        FAIL      121.09 seconds
-TestRunner_rfcomm-tester      PASS      7.53 seconds
-TestRunner_sco-tester         PASS      9.35 seconds
-TestRunner_ioctl-tester       PASS      8.12 seconds
-TestRunner_mesh-tester        PASS      6.07 seconds
-TestRunner_smp-tester         FAIL      9.27 seconds
-TestRunner_userchan-tester    PASS      5.08 seconds
-IncrementalBuild              PENDING   0.44 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.183 seconds
-##############################
-Test: TestRunner_smp-tester - FAIL
-Desc: Run smp-tester with test-runner
-Output:
-WARNING: CPU: 0 PID: 42 at net/bluetooth/hci_conn.c:567 hci_conn_timeout+0x14e/0x190
-Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+Also add the Messages-Listing Format Version 1.1 as supported
+in mns sdp record.
 
 ---
-Regards,
-Linux Bluetooth
+ obexd/client/map.c | 169 +++++++++++++++++++++++++++++++++++++++++++++
+ src/profile.c      |   2 +-
+ 2 files changed, 170 insertions(+), 1 deletion(-)
 
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 29b0ed96e..c6f3dd342 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -123,6 +123,11 @@ struct map_msg {
+ 	uint64_t attachment_size;
+ 	uint8_t flags;
+ 	char *folder;
++	char *delivery_status;
++	uint64_t conversation_id;
++	char *conversation_name;
++	char *direction;
++	char *attachment_mime_types;
+ 	GDBusPendingPropertySet pending;
+ };
+ 
+@@ -418,6 +423,10 @@ static void map_msg_free(void *data)
+ 	g_free(msg->recipient_address);
+ 	g_free(msg->type);
+ 	g_free(msg->status);
++	g_free(msg->delivery_status);
++	g_free(msg->conversation_name);
++	g_free(msg->direction);
++	g_free(msg->attachment_mime_types);
+ 	g_free(msg);
+ }
+ 
+@@ -778,6 +787,93 @@ static void set_deleted(const GDBusPropertyTable *property,
+ 	set_status(property, iter, id, STATUS_DELETE, data);
+ }
+ 
++static gboolean delivery_status_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct map_msg *msg = data;
++
++	return msg->delivery_status != NULL;
++}
++
++static gboolean get_delivery_status(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct map_msg *msg = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++						&msg->delivery_status);
++
++	return TRUE;
++}
++
++static gboolean get_conversation_id(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct map_msg *msg = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64,
++						&msg->conversation_id);
++
++	return TRUE;
++}
++
++static gboolean conversation_name_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct map_msg *msg = data;
++
++	return msg->conversation_name != NULL;
++}
++
++static gboolean get_conversation_name(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct map_msg *msg = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++						&msg->conversation_name);
++
++	return TRUE;
++}
++
++static gboolean direction_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct map_msg *msg = data;
++
++	return msg->direction != NULL;
++}
++
++static gboolean get_direction(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct map_msg *msg = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++							&msg->direction);
++
++	return TRUE;
++}
++
++static gboolean attachment_mime_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct map_msg *msg = data;
++
++	return msg->attachment_mime_types != NULL;
++}
++
++static gboolean get_attachment_mime_types(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct map_msg *msg = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++						&msg->attachment_mime_types);
++
++	return TRUE;
++}
++
+ static const GDBusMethodTable map_msg_methods[] = {
+ 	{ GDBUS_METHOD("Get",
+ 			GDBUS_ARGS({ "targetfile", "s" },
+@@ -809,6 +905,13 @@ static const GDBusPropertyTable map_msg_properties[] = {
+ 	{ "Sent", "b", get_sent },
+ 	{ "Protected", "b", get_protected },
+ 	{ "Deleted", "b", NULL, set_deleted },
++	{ "DeliveryStatus", "s", get_delivery_status, NULL, delivery_status_exists },
++	{ "ConversationId", "t", get_conversation_id },
++	{ "ConversationName", "s", get_conversation_name, NULL,
++						conversation_name_exists },
++	{ "Direction", "s", get_direction, NULL, direction_exists },
++	{ "AttachmentMimeTypes", "s", get_attachment_mime_types, NULL,
++							attachment_mime_exists },
+ 	{ }
+ };
+ 
+@@ -1061,6 +1164,67 @@ static void parse_protected(struct map_msg *msg, const char *value)
+ 						MAP_MSG_INTERFACE, "Protected");
+ }
+ 
++static void parse_delivery_status(struct map_msg *msg, const char *value)
++{
++	if (g_strcmp0(msg->delivery_status, value) == 0)
++		return;
++
++	g_free(msg->delivery_status);
++	msg->delivery_status = g_strdup(value);
++
++	g_dbus_emit_property_changed(conn, msg->path,
++					MAP_MSG_INTERFACE, "DeliveryStatus");
++}
++
++static void parse_conversation_id(struct map_msg *msg, const char *value)
++{
++	uint64_t conversation_id = strtoull(value, NULL, 16);
++
++	if (msg->conversation_id == conversation_id)
++		return;
++
++	msg->conversation_id = conversation_id;
++
++	g_dbus_emit_property_changed(conn, msg->path,
++					MAP_MSG_INTERFACE, "ConversationId");
++}
++
++static void parse_conversation_name(struct map_msg *msg, const char *value)
++{
++	if (g_strcmp0(msg->conversation_name, value) == 0)
++		return;
++
++	g_free(msg->conversation_name);
++	msg->conversation_name = g_strdup(value);
++
++	g_dbus_emit_property_changed(conn, msg->path,
++						MAP_MSG_INTERFACE, "ConversationName");
++}
++
++static void parse_direction(struct map_msg *msg, const char *value)
++{
++	if (g_strcmp0(msg->direction, value) == 0)
++		return;
++
++	g_free(msg->direction);
++	msg->direction = g_strdup(value);
++
++	g_dbus_emit_property_changed(conn, msg->path,
++						MAP_MSG_INTERFACE, "Direction");
++}
++
++static void parse_mime_types(struct map_msg *msg, const char *value)
++{
++	if (g_strcmp0(msg->attachment_mime_types, value) == 0)
++		return;
++
++	g_free(msg->attachment_mime_types);
++	msg->attachment_mime_types = g_strdup(value);
++
++	g_dbus_emit_property_changed(conn, msg->path,
++						MAP_MSG_INTERFACE, "AttachmentMimeTypes");
++}
++
+ static const struct map_msg_parser {
+ 	const char *name;
+ 	void (*func) (struct map_msg *msg, const char *value);
+@@ -1081,6 +1245,11 @@ static const struct map_msg_parser {
+ 		{ "read", parse_read },
+ 		{ "sent", parse_sent },
+ 		{ "protected", parse_protected },
++		{ "delivery_status", parse_delivery_status},
++		{ "conversation_id", parse_conversation_id},
++		{ "conversation_name", parse_conversation_name},
++		{ "direction", parse_direction},
++		{ "attachment_mime_types", parse_mime_types},
+ 		{ }
+ };
+ 
+diff --git a/src/profile.c b/src/profile.c
+index 6bc6778de..70ac058f4 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -563,7 +563,7 @@
+ 			<text value=\"%s\"/>				\
+ 		</attribute>						\
+ 		<attribute id=\"0x0317\">				\
+-			<uint32 value=\"0x0000007f\"/>			\
++			<uint32 value=\"0x0000027f\"/>			\
+ 		</attribute>						\
+ 		<attribute id=\"0x0200\">				\
+ 			<uint16 value=\"%u\" name=\"psm\"/>		\
+-- 
+2.34.1
 
---===============1680403203297501181==--
