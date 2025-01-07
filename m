@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F581F37BA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jan 2025 15:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EEB1F2397
+	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jan 2025 15:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736262616; cv=none; b=A+FLiFjl+623XsvEK6Hbq6flcKbkjxYu9o3gnkeTeXow8isxyNQe4HHvaW1NRiL+7Z4yDdXdW3Yn2hNlZ8cbCsvsMq48GDEcRK4sMV/gFKbnTst/Fhc5nJ3qHqCl5bO887pS40Eo/kc7/bT2VcKeknipe3Y24TJedEhdiV6dOEU=
+	t=1736262617; cv=none; b=Csb6jVypIueazZ0JS53S0yFXAv/tc2YIjC/U8Eiin6NM4MKzB+jJ72uM3CdR18lkZy4L51zHGJ+w+gtBjAptUl6xHQXMzcOkJcG8xJBpfGVC6oIP4XIkuA2k/YgqXM5kQpkl5uDhDB7nB6pdJxXoWFdHsLxFVX/nwIUz8OhwoRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736262616; c=relaxed/simple;
-	bh=aLw/dJYjcytTUn8vsibOV3wtH1Wk9ebZY86wQ7TcODw=;
+	s=arc-20240116; t=1736262617; c=relaxed/simple;
+	bh=aMW1QrosF00gyotiE76IYFjUIrFiD+bxAIFaOnxEt/w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fFTFd27edlEUs+pz8m0MpnYUAvbjQsvZYoUHVg01jqGqCxWtY7nMACpzzVRR+3EgcbuyyZeyUWAtuHrnh3wV99hefhqC5To5T3lnHiLHGt4nUPywD3YTxR6Kf8hSXEaZ7qRN0lHCi1XQ2MgFSmJOqhWboVGdZB5X1aE4RWnsIzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LOgf2zQj; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Z4JZnAWm+UkFkhhHmxoWIwSgkf1maoQkK8ePw2NvCUu3/Y0AJcic2KWmQ3tk4L30dEnaaWamhVC9qid+FrXNrINDjy3BUXPk99GsyHaEkCg4iNW//0CNgoL9E3nYonmHrT7ZC2x4y8FUX/wNgJuBpYGGB3fEcSamA6FxDJIRMKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a60US9fI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LOgf2zQj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C732C4CED6;
-	Tue,  7 Jan 2025 15:10:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a60US9fI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E95B2C4CED6;
+	Tue,  7 Jan 2025 15:10:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736262615;
-	bh=aLw/dJYjcytTUn8vsibOV3wtH1Wk9ebZY86wQ7TcODw=;
+	s=k20201202; t=1736262617;
+	bh=aMW1QrosF00gyotiE76IYFjUIrFiD+bxAIFaOnxEt/w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LOgf2zQjgRKS40fC64mloHNR21wxY4NgDfW/RlgqqGc7J9l9ngmgzFZtMyCMt9s6/
-	 qVAEAwiXBKBbwnXMpcJNlBMY7zxC3qSBjfl5f081qAiBcxr3dTVIL3jSdNDHb9ULNG
-	 6te9y3hS4D8HeiqO9T/F9EXQyhDYp8cn4VF7mhQEUQg6B+O2ZKovMDx/DueBl5GtAB
-	 gqCnSK1nqiktjkck30KNXbE5N67BgA2GWBbjdb/XuhitY5kZVjCksxSei1gEGZSp2y
-	 kljDqEFoqo3VmUdhjJQcdBq49yItDQ2Xz0LaNs9c82kjlPWu2LnXJmA8lb6+su1upZ
-	 iiVJpagASrT5A==
+	b=a60US9fIx48wAaaJqBcqZnCiCU4PWF+HmlDFmykkW4ASEQtOpt/N1OEWrDZj7XjNz
+	 X7/0eUknF8iPY23sGhf+HslxNxukcyjOpoSGi80grobRm1iZs78toaQw4CCkKtQlRm
+	 EnFzuyUsfD5B77fqxM1oNROeEbGlZjQalPrm6EJS/2YREun22NOQQAsUQ6mcMxQXaQ
+	 x3tJuL4oxg0zanqVzS/ag+YYnxbtHwH4l7bTMIquE2AefbuHez1P2NgeB0ws2BS9Ag
+	 U/2h845M3QZ1jtVaGFdyCl3cZY77lL3Y9sfWcjxXbgf0Aryq00XuzKH5Mp2K1008Xa
+	 tL3GtV0isA+zQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF7E380A97E;
-	Tue,  7 Jan 2025 15:10:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C63380A97E;
+	Tue,  7 Jan 2025 15:10:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,14 +37,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] client/player: Rework transport select for
- encrypted streams
+Subject: Re: [PATCH BlueZ 0/6] bass: Handle Modify Source opcode
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173626263676.4189790.10237155935534580861.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Jan 2025 15:10:36 +0000
-References: <20241220144458.27739-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20241220144458.27739-1-iulia.tanasescu@nxp.com>
+ <173626263799.4189790.4768212693346713784.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Jan 2025 15:10:37 +0000
+References: <20241220143106.27443-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20241220143106.27443-1-iulia.tanasescu@nxp.com>
 To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
  mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com,
@@ -52,31 +51,33 @@ Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 20 Dec 2024 16:44:57 +0200 you wrote:
-> This fixes the transport select flow in bluetoothctl: If the user tries
-> to select multiple encrypted transports, the prompts for the Broadcast
-> Code overlap, causing the UI to be distorted:
+On Fri, 20 Dec 2024 16:31:00 +0200 you wrote:
+> A BAP Broadcast Assistant (BASS Client) can write the Modify Source opcode
+> to the Broacast Audio Scan Control Point characteristic on a BAP Scan
+> Delegator (BASS Server), to update information about a Broadcaster, such
+> as metadata or PA/BIG sync requirements.
 > 
-> [11-AE-0A-C1-F4-30]# transport.select
->                      /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd0
->                      /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd1
-> [] Enter brocast code[value/no]: Successfully linked transport
->                      /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd1
-> [] Enter brocast code[value/no]: Borne House
-> (null)Setting broadcast code succeeded
-> (null)[CHG] Transport /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd0
->                      State: broadcasting
-> (null)Select successful
-> (null)
+> This patch adds support for handling the Modify Source opcode on the Scan
+> Delegator.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/1] client/player: Rework transport select for encrypted streams
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d3018fe2dc58
+  - [BlueZ,1/6] shared/bass: Fix clearing BIS sync index
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9b094c56fcf2
+  - [BlueZ,2/6] shared/bass: Add API to set sync state
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=86081a10bdbf
+  - [BlueZ,3/6] shared/bass: Add handler for Modify Source opcode
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=547b00910735
+  - [BlueZ,4/6] bass: Create setups for all BISes in BASE
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ac06953bc200
+  - [BlueZ,5/6] bass: Pass delegator reference to connect_cb
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=614f2fc800f5
+  - [BlueZ,6/6] bass: Handle Modify Source opcode
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e83d3021e130
 
 You are awesome, thank you!
 -- 
