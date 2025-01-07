@@ -1,44 +1,46 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159131E491C;
-	Tue,  7 Jan 2025 13:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6266F1F03EC;
+	Tue,  7 Jan 2025 13:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736257345; cv=none; b=MD6Oyj0jqaMgvcbFBZYqF83yihAZRvSJN5WpDt2gbldCzrhDpBOKhcDZZzhW7mcXXRnlZdJRU+uVXy7qmSOPOsGElLxJ6venCSQcluqkyQ4YbgW6/Ai8ncY0YsPLbvCPOaU1SSbsxURFfofUHVwDYPDVXhSlEsW4JgeFg8V+u7U=
+	t=1736257352; cv=none; b=ZDnQHZpVZebHXcDdUD92/me1eh6CMTPZzxOkEZUCn3Al6d6qyX+siv6EjMOC+m1wYnU2wVYGNnmpVPfCAXaJi5iqFvgLLI3oBWObwpjz/2H79or6j5UYa/KlBAJOxT0gQ7UaN8Ie2JYNgFkj9LeJCy2UOwbJZDrn9mzErXmvEoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736257345; c=relaxed/simple;
-	bh=uPoKlVZYDAkinjqoexFJhWfGtZOf00BaIn/eoke/VdE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FZH+3+wrHweqPA1ij+AiKlqvV7kLE9LCXz3YUYEPOMZrqOG2M60vwAl8iTutGlyE8QngMTNoEc14siWWMgoOM1yc7RApTJo4mikYkHO4FMYTVTTnM+bNUhYJpYXB2DUHPY/K2L99FtZ7d6IVsYpu0G4Vf9Hj+Cozq5U5ofwshmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Z9fmv01q; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1736257352; c=relaxed/simple;
+	bh=DxBCBG3KHLbNWZya8dTZl+4N8KLDj6TlqP3KG2ooCWA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mg4aizTDJxXoAYMcP7Q7cvfgzl/Q/jEmsvMkY3A1PZ8YVyHkMimIgqhc//pqthBnBE/bGplvISJqjw64yhi66nMkrpSaRmq77/axhdCzGs0RFuMMKltfOzI5MQmzNx41/VX/avsOfqkB/ARgT1Rj1wLdk9dzlT3Xrux4Nfa1kds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=e1o7maD7; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Z9fmv01q"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5073xbe7008686;
-	Tue, 7 Jan 2025 13:42:18 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="e1o7maD7"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507Ah80c028463;
+	Tue, 7 Jan 2025 13:42:22 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=YU0qbJEoyX4rkk20rg1DAy
-	6EOPXGEbBx6c4ZKDhGeso=; b=Z9fmv01qrGGUwMzByCPM74Z40WGY4GkOKRmQP5
-	NB66PIqNVgUBHn8EqzN0p4zL6bfyIBJY7oqb1VrZd1VWD/ZMEjkrjgItzTpmltbG
-	y/k3TJLPZug9iveh0JAvsac3CM9z/e0f8+306pVYgSnhVzMoCmwN40WtfOKGKJoh
-	r/5j6O5sK6yd+odyA3Eo/MDrMEvkAcpQM6ALe6hECEoRu64fiHVbGebmo/eWd/Vt
-	MwRoDXQXy9Gv1+St+0AAyXY5NcVKhEZsRvRUmgmehL0MUQQdfBygzVF0UBUV8UKD
-	H6nE+3/CNHWOkaTE66dDRv23S33wb3qDS1toXxiDyAMWHgsA==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 440vuq9agn-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	QaeC6FcQb3CQQaHW/YVddDakWjrKK8InYEjT/kI0u+g=; b=e1o7maD7IQXOVwAt
+	BOjpMZKw+MkA6k4C5KVC+Bt0sSOQpo0Kmv7AE6BPl75eu9RHsxym5E89LQggfmP7
+	0Sz5vgWzRoayuMYub0DYarOauxryqTbByC0Gl45KAu2MzVE4xOzVeNnyktjz3Tbj
+	LSlmoShvQhPIrBqBlbF4qlGsW3AvVWeodUVAYOuR50SnOHtkKQPpNhIanBKXeUTn
+	0P2LDOgXPNY96iIKX5G5aFggZ444wZNCNzOL2ZJ4k4ogv5fDtOxAQlqdQhomAPm9
+	Q6fUVyAYN77aP7ghiNaitrolqGfrzF3Nd1NgZ8KbhzOJA51PTUGh5KVnUTj46kjp
+	NhEvqg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4412r78dw9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 13:42:18 +0000 (GMT)
+	Tue, 07 Jan 2025 13:42:22 +0000 (GMT)
 Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 507DgHol001185
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 507DgLHU025013
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 7 Jan 2025 13:42:17 GMT
+	Tue, 7 Jan 2025 13:42:21 GMT
 Received: from hu-janathot-hyd.qualcomm.com (10.80.80.8) by
  nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 7 Jan 2025 05:42:13 -0800
+ 15.2.1544.9; Tue, 7 Jan 2025 05:42:17 -0800
 From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
         Luiz Augusto von Dentz
@@ -53,10 +55,12 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
         <quic_anubhavg@quicinc.com>, <linux-bluetooth@vger.kernel.org>,
         <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v7 0/1] Enable Bluetooth on qcs6490-rb3gen2 board
-Date: Tue, 7 Jan 2025 19:11:56 +0530
-Message-ID: <20250107134157.211702-1-quic_janathot@quicinc.com>
+Subject: [PATCH v7 1/1] dt-bindings: bluetooth: Utilize PMU abstraction for WCN6750
+Date: Tue, 7 Jan 2025 19:11:57 +0530
+Message-ID: <20250107134157.211702-2-quic_janathot@quicinc.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250107134157.211702-1-quic_janathot@quicinc.com>
+References: <20250107134157.211702-1-quic_janathot@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -69,57 +73,51 @@ X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nalasex01a.na.qualcomm.com (10.47.209.196)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: fJAnLQBOABaViP9xvp7altckSeaoZurn
-X-Proofpoint-GUID: fJAnLQBOABaViP9xvp7altckSeaoZurn
+X-Proofpoint-GUID: gOwSANQoEyrXjoMXLUv0QlWhAttSYLtk
+X-Proofpoint-ORIG-GUID: gOwSANQoEyrXjoMXLUv0QlWhAttSYLtk
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- mlxscore=0 mlxlogscore=865 lowpriorityscore=0 clxscore=1015 malwarescore=0
- phishscore=0 suspectscore=0 adultscore=0 spamscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501070115
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=862 malwarescore=0 mlxscore=0 clxscore=1015 spamscore=0
+ suspectscore=0 phishscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501070115
 
-- Patch 1/1 Utilize the PMU abstraction for the WCN6750 and update the bindings accordingly.
+We are now using the on-chip PMU node for power sequencing to manage the
+enable/disable functionality of Bluetooth. Consequently, the inputs
+previously marked as required under the Bluetooth node can be removed.
 
-----
-Changes from v6:
-* Elaborated the commit message with more information.
-* Link to v6: https://lore.kernel.org/lkml/20241223135700.22660-1-quic_janathot@quicinc.com/
+For instance, the enable GPIO is now managed by the PMU node with the
+property bt-enable-gpios.
 
-Changes from v5:
-* Update the wcn6750 required properties in bindings.
-* Link to v5: https://lore.kernel.org/linux-arm-msm/20241209103455.9675-1-quic_janathot@quicinc.com/
-
-Changes from v4:
-* Added reviewed tag by Krzysztof in p1
-* Updated the p2 commit message with sw_ctrl and wifi-enable are
-  handled in wifi FW.
-* Added blank line between the nodes in p2
-* Placed the structures in proper order in p4
-* Link to v4: https://lore.kernel.org/all/20241204131706.20791-1-quic_janathot@quicinc.com/
-
-Changes from v3:
-* Defined the PMU node and used the its output to power up BT
-* Used power sequencer for wcn wcn6750 module
-* Split the patch to multiple as per subtree
-* Add description of the PMU of the WCN6750 module
-* Include separate UART state node for sleep pin configuarion
-* Link to v3: https://lore.kernel.org/linux-arm-msm/20241022104600.3228-1-quic_janathot@quicinc.com/
-
-Changes from v2:
-* Sorted nodes alphabetically
-* Link to v2: https://lore.kernel.org/linux-arm-msm/20241010105107.30118-1-quic_janathot@quicinc.com/
-
-Changes from v1:
-* Corrected the board name in subject
-* Link to v1: https://lore.kernel.org/linux-arm-msm/20241009111436.23473-1-quic_janathot@quicinc.com/
-Janaki Ramaiah Thota (1):
-  dt-bindings: bluetooth: Utilize PMU abstraction for WCN6750
-
+Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+---
  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml           | 5 -----
  1 file changed, 5 deletions(-)
 
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 7bb68311c609..6906e1742d6c 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -154,16 +154,11 @@ allOf:
+               - qcom,wcn6750-bt
+     then:
+       required:
+-        - enable-gpios
+-        - swctrl-gpios
+-        - vddio-supply
+         - vddaon-supply
+-        - vddbtcxmx-supply
+         - vddrfacmn-supply
+         - vddrfa0p8-supply
+         - vddrfa1p7-supply
+         - vddrfa1p2-supply
+-        - vddasd-supply
+   - if:
+       properties:
+         compatible:
 -- 
-
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
