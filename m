@@ -1,236 +1,236 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE241537C3
-	for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jan 2025 15:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6BE1EC014;
+	Tue,  7 Jan 2025 16:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736264538; cv=none; b=t/y7ySZFJNdnZDGwWpp31DeT06f5FJ2E1RfPemhKg0Of+689GERy7KXNXqbtXfV8eVA9Rp7i+iX1TOtY1LUH3Py1diPMkkDVknP7D5K7ma8LN+jEs2NZL4Wzbyh5jJdrrxPLCiZeosb2f1UxlWNXvsGsXZeWV9fXa5aA+QH4fZk=
+	t=1736268712; cv=none; b=lj5M2HJaJrKSoUryI6eX6khi8rm6m7fwqewo6K/A/peizSkagrHL2xekebIsftBYmeCptHFY5AkkrIJ2f7edzDTYXMZWAbCuJkYme7ljHgj22+DMJID7bfRhu8/I+B1hiOYdE7zGw8jUWwO/K+octqFA81je0hHnSncb45zDBcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736264538; c=relaxed/simple;
-	bh=W5NZK7KIy+Inplry4B0UXBadMl222NitGabsNH8E8+s=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K9mEDmwiRu3sy+iGEA2NVP6ppJ8bZchWVw5W9bfOdHKACCV2DFwXp6fmiN4GZLIb7hCcJB03ymbBRx5FjXNuRaJQXmbGBGj7GrxHw4mHi9wy9Ie/WvnRuiskmNQWbZcgB9ErEsAOyie6GVgWix7lH5dq1CMDT0Y//ytjdbBplz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MYJBLq+G; arc=none smtp.client-ip=209.85.221.178
+	s=arc-20240116; t=1736268712; c=relaxed/simple;
+	bh=2D1Zu25zVj4Un4NODSaxTUJ2BYBx6OcMZnw01MDbvKA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FInjS+Zi3F2+mcLWYteCrZ45IBJ2jJr9Yw1GPMyF/ysaG0P7Bdu1eiikqYZAR524t7YRpiDAvLLx6jWROeRmqpgbb9eC2T+bCPcxyrJfQLbMmA2bAEKnQxrAvjIbt42yJJkl+JftDa76eAJ40mc5pJlB8F00LEyRt0NT8nStMNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NfEnaiSM; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYJBLq+G"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-518a861612eso6909639e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2025 07:42:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfEnaiSM"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-3003943288bso179376511fa.0;
+        Tue, 07 Jan 2025 08:51:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736264534; x=1736869334; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cQwsgiFMkdpdDQj+PmEbQreX5JhLkcN9gZBCLQQcqmE=;
-        b=MYJBLq+GvOQrIkurlNsy4hG6OYhk5GFuhrCpG8yGuT6NyOaAz94brBs+mDJeIFbujs
-         RZ/qA9gqQ0SLS+h/fdc7z4haFHQcY5ZXpbVD2r13GuhFtG8sog3JWI4jzLcuzmRdOsVK
-         Wfqpvs9+rzHspswp8x83sGuQA1kcMc77ckxlK8gnd7oMpbyYHNHl2fm1sitF/cVf8jPl
-         ULWKOnoH9jHmowEzhl2Uoo9Zt/yH3xLc6+qt/Go37whu+NDD7R0TeZ4kQGpAAYKIHRi8
-         s9ze4l85qPa8UdWLJhIz8hhznjZyXH5MFgr/K/c45nys9r8hHddBJ92uqR+vKae5mpQi
-         GmRg==
+        d=gmail.com; s=20230601; t=1736268707; x=1736873507; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ju7NwoFmWefwWuXenVWv/0xSbHi9EYHcYNWBb6aZOYE=;
+        b=NfEnaiSM5e5N//3fdni9Eo/WZNrCb2TL5a82YqX2yEk9GJDI9bxh6CYJXA09cbQohD
+         JKCwMP0Jn0zD4Ub1EfbTejuSsDg2NZebyb1dxdSc3VP5XRjjQvLxfuU9uITTTiLrTh06
+         BaZDFS1dfRlqT+zvSMWd7LdqQ0zF9gv5iFFdAjQGA9WoripY2GbFtm6ItT0bUVjUzu6e
+         iXnfeY02u1DO2wieFVpnSujXB/PBueKTruKYTaYhQNP16JBjVbtQ4yxflQVKrTVqOG5H
+         UEatudB4yjfdeuPA3B3cn6MQNhOWtbN/FoFCAuAbMkhVvgoEblYwxRQpSVAwyaOh0ssd
+         t1nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736264534; x=1736869334;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1736268707; x=1736873507;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cQwsgiFMkdpdDQj+PmEbQreX5JhLkcN9gZBCLQQcqmE=;
-        b=ctAatAUMk5FqpG1qufrXPpBAIFhQ7Bp+MEPaFIfTQH8Bw9raE02wxMVXM2p0x6Gu7T
-         rYfV8RxVgy5CdKCWb/Mxz/4azBFMHVdY3PPFx7F8ZrNHu4+uzcsMCI6CDxpcQvw9dnvO
-         7/Jz/PSQYkP4FoCFdMbl6lsxQ41u6UDrsL4xL8SPJgdxN+Yj3O6xvQkUeRfaswNMeWpU
-         tK+iwnDBjXVrmF3LP8SE1b0p/yJRDDgDwjJDIB72+jTIrCkNnlXHAxbHYUBLfEPLz09K
-         5Fq/87GAPRSpzkyrx+LDxQl2q/mRw/H0cRW8CM3C9ZaYzJPADzcZyGuRi+4+Tx3YwEmt
-         EY4A==
-X-Gm-Message-State: AOJu0YzJNPrjHGwvTpdeKz3qAUEyQOzBnY1Z/XlNvuWW4EWv1jCNjm6x
-	9B8Sbkai6yfaQ/mVYtVUaNPYTWMQG6nLGYuRhcDQwYDUIGhjCrqjgRBfpQ==
-X-Gm-Gg: ASbGncs2oWPQxinuiQs3i3R24lNdMgkQnpi0AGxsDIMsXz6Hk/L3OpRxAe+CSkhkprh
-	L5hdwz4mZkc31OoFTO7m65pqFpXXtm51PiqclPWicYtBprHlFdoroRP3bRxnbKtYfbA+V0nEt7a
-	C6I1XAK7VouE3Ea4alDzuHiVwJivV5BTS6mavJANHGwubmrJAvnusapGbDr4jTpav8NAs0deKSA
-	Ak+tI/gBKtDtSJ1vcCZXufnikbWw+Ll69RA8u0j6HqiVSQQU1Q1xEKZli2lvY+UUg5pdElN6Ugd
-	fSP086bGjbk+A6euSw4EP5DyfUJ6
-X-Google-Smtp-Source: AGHT+IH/J5y9unzzZG2GjPBih9vbv8TfKd41UHf1jzGStwFbhguNR5Lu9WsUP+lS/m9O4gy6PlIAGA==
-X-Received: by 2002:a05:6122:488e:b0:515:1fde:1cb1 with SMTP id 71dfb90a1353d-51c5e5e1bedmr2367676e0c.3.1736264533720;
-        Tue, 07 Jan 2025 07:42:13 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8610ad5a3fesm7999762241.33.2025.01.07.07.42.11
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 07:42:12 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/2] build: Remove wiimote plugin
-Date: Tue,  7 Jan 2025 10:42:08 -0500
-Message-ID: <20250107154208.1414463-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250107154208.1414463-1-luiz.dentz@gmail.com>
-References: <20250107154208.1414463-1-luiz.dentz@gmail.com>
+        bh=ju7NwoFmWefwWuXenVWv/0xSbHi9EYHcYNWBb6aZOYE=;
+        b=ut+V79OHTRgPoFdgCfl99egIT0eczY9DXBzuCQhsuI3Rlzx+RQUZMtGX1ZoXWFJ6mz
+         p+eHqyV28WDCSCkP0h7dwpED9rBIry3wXZgZNUu6BJDq66qnupcmTxQhmPxl2qZzN87Y
+         fkdc4emy05SjcuJVkfg/+hPs5Xb78GW3+UlXu4WwMDZcX1ofhSfHEFZWJdescCXFl4NR
+         K9IHkm1NDhevSpMOic3Vb51fOwglRW6l461d2BD6x0GgfNjMM3Tnt13z2fR7Og88C1jc
+         Q21dJjhkfY9NmKD7UM7zj6mpDVXV/Mpm1t7aK7NNepFbGAl1tD7uP6ZX5nLFtoOKJMKF
+         uWuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwZY6JaoUQ2LVNiFqW+8KmkGNDdiKj0mvI7DfouLrWV6bIzlSte2LSijmrjQ9fnWtyq08JdTTYGCy9NvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytizSS5BCW49RYNZoyk+lvw2e72mCqwG4fvQyc2IcWgQCQMh55
+	o+GmoIlWtS/zfhoR+2pMn1lMCd6ahVL81XAoq/CREhPMJ9Zh3G4YP0J7ffqXsOFIu2PLXxZA0/+
+	JxHLNRA4QlmT41beQC4+aZoc3DYMgog==
+X-Gm-Gg: ASbGnctUG1bh9IhlkEcR7DVge/Lg0UN3tjUIA8hWd8CrV/jH7y3zBThZw+NSMNfZDlV
+	4Z4hljGXl6YuApXT4hPrsM0rTr59KM1hs3v9izEs=
+X-Google-Smtp-Source: AGHT+IH1njKqOefDd9mztk5voWKtI9qQ2zk75hADht949ZAghRRIzOYOvRFvbSwoXGiQyE7C/7gFDuSwrpke4GAklhU=
+X-Received: by 2002:a05:651c:b0a:b0:300:360b:bc3f with SMTP id
+ 38308e7fff4ca-304685527edmr164018371fa.15.1736268706615; Tue, 07 Jan 2025
+ 08:51:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250103112019.1.I8342291b757b20cd4cdbbfe658dc58ed5df46565@changeid>
+ <CABBYNZKDRm7vf1RewwW-+0fBwHTS0RXKqxNME_HpyB-q-mNLYQ@mail.gmail.com> <CAG=_-8cMgr_NqtX_zEV_7K1hunmOzQB4mgGDAiBPaX-vd9E=4A@mail.gmail.com>
+In-Reply-To: <CAG=_-8cMgr_NqtX_zEV_7K1hunmOzQB4mgGDAiBPaX-vd9E=4A@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 7 Jan 2025 11:51:34 -0500
+X-Gm-Features: AbW1kvYmIFyGoIU5XVgHoRq9IynyLVlsr1OjzSfWZAUsDQv_xmSK162nWMIrUM8
+Message-ID: <CABBYNZJrtvPDW-Mn_qRxcC=rVR8z3Kt8K_o+ACce3yNv39v_-w@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Allow reset via sysfs
+To: Hsin-chen Chuang <chharry@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Hsin-chen,
 
----
- Makefile.plugins  |   3 --
- plugins/wiimote.c | 130 ----------------------------------------------
- 2 files changed, 133 deletions(-)
- delete mode 100644 plugins/wiimote.c
+On Tue, Jan 7, 2025 at 2:21=E2=80=AFAM Hsin-chen Chuang <chharry@chromium.o=
+rg> wrote:
+>
+> Hi Luiz,
+>
+> This is not btusb specific, and is not limited to USB reset.
+>
+> The cmd_timeout handler can also be found in the QCA uart and the MTK
+> sdio controller drivers. It's up to the vendors to implement a reliable
+> reset mechanism, and we welcome - or prefer - an OOB solution such as
+> reset over GPIO.
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 9da29a3ce43a..7644041b3b6d 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -2,9 +2,6 @@
- builtin_modules += hostname
- builtin_sources += plugins/hostname.c
- 
--builtin_modules += wiimote
--builtin_sources += plugins/wiimote.c
--
- builtin_modules += autopair
- builtin_sources += plugins/autopair.c
- 
-diff --git a/plugins/wiimote.c b/plugins/wiimote.c
-deleted file mode 100644
-index 9c4e0a58b0c8..000000000000
---- a/plugins/wiimote.c
-+++ /dev/null
-@@ -1,130 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2012 David Herrmann <dh.herrmann@googlemail.com>
-- *
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdbool.h>
--
--#include <glib.h>
--
--#include "bluetooth/bluetooth.h"
--#include "bluetooth/sdp.h"
--
--#include "src/plugin.h"
--#include "src/adapter.h"
--#include "src/device.h"
--#include "src/log.h"
--#include "src/storage.h"
--
--/*
-- * Nintendo Wii Remote devices require the bdaddr of the host as pin input for
-- * authentication. This plugin registers a pin-callback and forces this pin
-- * to be used for authentication.
-- *
-- * There are two ways to place the wiimote into discoverable mode.
-- *  - Pressing the red-sync button on the back of the wiimote. This module
-- *    supports pairing via this method. Auto-reconnect should be possible after
-- *    the device was paired once.
-- *  - Pressing the 1+2 buttons on the front of the wiimote. This module does
-- *    not support this method since this method never enables auto-reconnect.
-- *    Hence, pairing is not needed. Use it without pairing if you want.
-- * After connecting the wiimote you should immediately connect to the input
-- * service of the wiimote. If you don't, the wiimote will close the connection.
-- * The wiimote waits about 5 seconds until it turns off again.
-- * Auto-reconnect is only enabled when pairing with the wiimote via the red
-- * sync-button and then connecting to the input service. If you do not connect
-- * to the input service, then auto-reconnect is not enabled.
-- * If enabled, the wiimote connects to the host automatically when any button
-- * is pressed.
-- */
--
--static uint16_t wii_ids[][2] = {
--	{ 0x057e, 0x0306 },		/* 1st gen */
--	{ 0x054c, 0x0306 },		/* LEGO wiimote */
--	{ 0x057e, 0x0330 },		/* 2nd gen */
--};
--
--static const char *wii_names[] = {
--	"Nintendo RVL-CNT-01",		/* 1st gen */
--	"Nintendo RVL-CNT-01-TR",	/* 2nd gen */
--	"Nintendo RVL-CNT-01-UC",	/* Wii U Pro Controller */
--	"Nintendo RVL-WBC-01",		/* Balance Board */
--};
--
--static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
--						char *pinbuf, bool *display,
--						unsigned int attempt)
--{
--	uint16_t vendor, product;
--	char addr[18], name[25];
--	unsigned int i;
--
--	/* Only try the pin code once per device. If it's not correct then it's
--	 * an unknown device. */
--	if (attempt > 1)
--		return 0;
--
--	ba2str(device_get_address(device), addr);
--
--	vendor = btd_device_get_vendor(device);
--	product = btd_device_get_product(device);
--
--	device_get_name(device, name, sizeof(name));
--
--	for (i = 0; i < G_N_ELEMENTS(wii_ids); ++i) {
--		if (vendor == wii_ids[i][0] && product == wii_ids[i][1])
--			goto found;
--	}
--
--	for (i = 0; i < G_N_ELEMENTS(wii_names); ++i) {
--		if (g_str_equal(name, wii_names[i]))
--			goto found;
--	}
--
--	return 0;
--
--found:
--	DBG("Forcing fixed pin on detected wiimote %s", addr);
--	memcpy(pinbuf, btd_adapter_get_address(adapter), 6);
--	return 6;
--}
--
--static int wii_probe(struct btd_adapter *adapter)
--{
--	btd_adapter_register_pin_cb(adapter, wii_pincb);
--
--	return 0;
--}
--
--static void wii_remove(struct btd_adapter *adapter)
--{
--	btd_adapter_unregister_pin_cb(adapter, wii_pincb);
--}
--
--static struct btd_adapter_driver wii_driver = {
--	.name	= "wiimote",
--	.probe	= wii_probe,
--	.remove	= wii_remove,
--};
--
--static int wii_init(void)
--{
--	return btd_register_adapter_driver(&wii_driver);
--}
--
--static void wii_exit(void)
--{
--	btd_unregister_adapter_driver(&wii_driver);
--}
--
--BLUETOOTH_PLUGIN_DEFINE(wiimote, VERSION,
--		BLUETOOTH_PLUGIN_PRIORITY_LOW, wii_init, wii_exit)
--- 
-2.47.1
+My bad, I didn't realize it was under hci_sysfs, which makes sense,
+that said I do wonder if it wouldn't be better to name the callback as
+reset rather than cmd_timeout and we should probably move them from
+btusb if there are not usb specific, in fact there is already a reset
+callback but it doesn't seem to be used which I think it is a mistake
+and we should actually make the vendor reset the callback o
+hdev->reset not have hdev->cmd_timeout -> vendor_cmd_timeout ->
+btusb_reset -> hdev->reset but rather btusb_reset -> hdev->reset ->
+vendor_reset then we can get rid of cmd_timeout.
 
+> This patch involves some btusb changes because the handlers in btusb
+> can only do something after being called 5 times, while the other
+> handlers don't.
+
+Ok, then please have these changes splitted since they have different purpo=
+ses.
+
+>
+>
+> On Tue, Jan 7, 2025 at 12:29=E2=80=AFAM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Hsin-chen,
+> >
+> > On Thu, Jan 2, 2025 at 10:21=E2=80=AFPM Hsin-chen Chuang <chharry@chrom=
+ium.org> wrote:
+> > >
+> > > Allow sysfs to trigger reset via the cmd_timeout function in hci devi=
+ce.
+> > > This is required to recover devices that are not responsive from
+> > > userspace.
+> >
+> > Don't we have a similar control over USB to reset the device? I think
+> > that would be better than introducing something btusb specific.
+> >
+> > > Also remove the cmd timeout count in btusb since we only ever allow o=
+ne
+> > > command in flight at a time. We should always reset after a single
+> > > command times out.
+> > >
+> > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > > ---
+> > > This commit has been tested on a Chromebook by running
+> > > `echo 1 > /sys/class/bluetooth/hci0/reset`
+> > >
+> > >  drivers/bluetooth/btusb.c | 10 ----------
+> > >  net/bluetooth/hci_sysfs.c | 19 +++++++++++++++++++
+> > >  2 files changed, 19 insertions(+), 10 deletions(-)
+> > >
+> > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > > index 279fe6c115fac..a4810c77fa0da 100644
+> > > --- a/drivers/bluetooth/btusb.c
+> > > +++ b/drivers/bluetooth/btusb.c
+> > > @@ -879,7 +879,6 @@ struct btusb_data {
+> > >         int (*disconnect)(struct hci_dev *hdev);
+> > >
+> > >         int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+> > > -       unsigned cmd_timeout_cnt;
+> > >
+> > >         struct qca_dump_info qca_dump;
+> > >  };
+> > > @@ -912,9 +911,6 @@ static void btusb_intel_cmd_timeout(struct hci_de=
+v *hdev)
+> > >         struct gpio_desc *reset_gpio =3D data->reset_gpio;
+> > >         struct btintel_data *intel_data =3D hci_get_priv(hdev);
+> > >
+> > > -       if (++data->cmd_timeout_cnt < 5)
+> > > -               return;
+> > > -
+> > >         if (intel_data->acpi_reset_method) {
+> > >                 if (test_and_set_bit(INTEL_ACPI_RESET_ACTIVE, intel_d=
+ata->flags)) {
+> > >                         bt_dev_err(hdev, "acpi: last reset failed ? N=
+ot resetting again");
+> > > @@ -997,9 +993,6 @@ static void btusb_rtl_cmd_timeout(struct hci_dev =
+*hdev)
+> > >
+> > >         btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0);
+> > >
+> > > -       if (++data->cmd_timeout_cnt < 5)
+> > > -               return;
+> > > -
+> > >         if (!reset_gpio) {
+> > >                 btusb_reset(hdev);
+> > >                 return;
+> > > @@ -1044,9 +1037,6 @@ static void btusb_qca_cmd_timeout(struct hci_de=
+v *hdev)
+> > >                 return;
+> > >         }
+> > >
+> > > -       if (++data->cmd_timeout_cnt < 5)
+> > > -               return;
+> > > -
+> > >         if (reset_gpio) {
+> > >                 bt_dev_err(hdev, "Reset qca device via bt_en gpio");
+> > >
+> > > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> > > index 4b54dbbf0729a..7bf2b10b0a7cf 100644
+> > > --- a/net/bluetooth/hci_sysfs.c
+> > > +++ b/net/bluetooth/hci_sysfs.c
+> > > @@ -90,9 +90,28 @@ static void bt_host_release(struct device *dev)
+> > >         module_put(THIS_MODULE);
+> > >  }
+> > >
+> > > +static ssize_t reset_store(struct device *dev, struct device_attribu=
+te *attr,
+> > > +                          const char *buf, size_t count)
+> > > +{
+> > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> > > +
+> > > +       if (hdev->cmd_timeout)
+> > > +               hdev->cmd_timeout(hdev);
+> > > +
+> > > +       return count;
+> > > +}
+> > > +static DEVICE_ATTR_WO(reset);
+> > > +
+> > > +static struct attribute *bt_host_attrs[] =3D {
+> > > +       &dev_attr_reset.attr,
+> > > +       NULL,
+> > > +};
+> > > +ATTRIBUTE_GROUPS(bt_host);
+> > > +
+> > >  static const struct device_type bt_host =3D {
+> > >         .name    =3D "host",
+> > >         .release =3D bt_host_release,
+> > > +       .groups =3D bt_host_groups,
+> > >  };
+> > >
+> > >  void hci_init_sysfs(struct hci_dev *hdev)
+> > > --
+> > > 2.47.1.613.gc27f4b7a9f-goog
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+> --
+> Best Regards,
+> Hsin-chen
+
+
+
+--=20
+Luiz Augusto von Dentz
