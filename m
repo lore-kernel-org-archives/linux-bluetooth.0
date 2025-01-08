@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39021FF1AC;
-	Wed,  8 Jan 2025 16:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08C91FF5E3;
+	Wed,  8 Jan 2025 16:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736352615; cv=none; b=UULCHxrM2dD2llTMI7vlh+L2E4H5z+/6P2/8QnoQ1M91D6atFW5DhvY8B/gLvRI8aFel1ovd6o9kySmQDkeyHmDCWT1B/vw7lpmTam0LIeG/SnEoD4DmpuKmcUZdUlNDVi7NYdoWlKY1OfK4cHxr4PHZGAE76/6p9o2xaJJfems=
+	t=1736352617; cv=none; b=OtpPC8NiaPOBclZGLIVNl8ms/nbw9+pxWy2bsqgX07A6irFywOXhWpMJACgiw7S2zSyvJjHmuuLNIJWDYfoHjJJgeXNz10gRzAJlNm6T4UxzNLnQL+J31ZAHk8DdJ26SbUb8Ao1VCScRZ6U+K91ma89Z7bMImClqNnede6Oy8rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736352615; c=relaxed/simple;
-	bh=6asiGBuEpRAem8Tr2mFt3guSmqHe3/2V2m68uF1082I=;
+	s=arc-20240116; t=1736352617; c=relaxed/simple;
+	bh=sIXYrLDh4aKsTXlsI3p99yuWRTuR2cFlH0iw5Y/uikY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eBucNfLaUKLeD1gYwDNKQP8iPR9mBQ4VluqbVxA1vrwWmURWqt8BKi720nCBPIuewkaoEh6j26cM9Dt/ProB4xbIHivvZWgZa+uWftdapXCOYVD3cst95MqiVjE5P6ITPAjU86uQjPPdsK6+1T4rJF1gD35kSU/frRN5GfZecjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VKSAYFOI; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=DdBgbkUwWD5Mi0mlU8G1Q1B0HK1BkFnrAWTY5VVhodwXSgF8QCagl4X0KszORk8WCRsGXQj4LO5BDyygTlqO6i5H8/FINI4sjeTwOlOt/7g1ABWDrl8YM7qcIQg9HCSdElSjLgYFgWYCU0/aPYRMu7mbYAlv0d/xIS2hyTeUSJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pmK3jqfY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VKSAYFOI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CCE3C4CED3;
-	Wed,  8 Jan 2025 16:10:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmK3jqfY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFE3CC4CED3;
+	Wed,  8 Jan 2025 16:10:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736352615;
-	bh=6asiGBuEpRAem8Tr2mFt3guSmqHe3/2V2m68uF1082I=;
+	s=k20201202; t=1736352616;
+	bh=sIXYrLDh4aKsTXlsI3p99yuWRTuR2cFlH0iw5Y/uikY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VKSAYFOInAIhZVsxmkPX2g8Se8mMI6tujY9DplaAOQ+4m6tLBi8bWzCdMiH+sgY8/
-	 eWQngFWYVLSe3rENqShXxU9fdpKt2JIFpLjHNMHHcwzaqEeDGbKkAOUpahxC1hPfNZ
-	 bkQdhhBlKrDkyIrHcqXOPVTCXTu9tFxnJvTYRKT99GoqRu9QkBdG114qw/RvmBi4GR
-	 mnkv7So5pQj0QQZe7rg3XUHXcXmChDyMTi9xavFyh0gqOQadTrsEyomDFZBE9+Ignu
-	 B/x7nhofFfiG7cg4virY8+c4sNAPqrraGaLhGRhZjG/V4VpG3+ZyNOIt54JCD2wcV2
-	 V4JYPCN8rq0Nw==
+	b=pmK3jqfY0+MoixMACScjpa034KgcRc+lVtHcTm1q9NCdH7Altklqg32kngEq56eba
+	 G9xDkiFLC7GSEsVOA2wXXCzJzdxQsqsGdJq7DbU8TpZo9CDiuX5WRJLPavhO0zTj7M
+	 WsO1MRlQ5dtWZx/2Vfgv9H79Q6N39eblnjw0G2/awVtW/Qp2W2ggD/tSIuabYUKEEE
+	 TJ+IUQqvunjyUgpwMu7GtjAQzTe22ENSNWGrEI8tULRcZYYXoId3aXQJnwWirHbozd
+	 uPysCE/RDCbQARzMNwupNTnqChARZykoXPrtCGZKYUlFPPJZHtR3VP/P5RDhykgTqE
+	 7xAl+KAIZ8Epg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F32380A965;
-	Wed,  8 Jan 2025 16:10:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714C7380A965;
+	Wed,  8 Jan 2025 16:10:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,73 +37,44 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btusb: Add new VID/PID 13d3/3628 for MT7925
+Subject: Re: [PATCH v6 RESEND 0/3] Expand firmware-name property to load specific
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173635263698.697160.15088028616752528689.git-patchwork-notify@kernel.org>
-Date: Wed, 08 Jan 2025 16:10:36 +0000
-References: <20241224063522.82004-1-en-wei.wu@canonical.com>
-In-Reply-To: <20241224063522.82004-1-en-wei.wu@canonical.com>
-To: En-Wei Wu <en-wei.wu@canonical.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+ <173635263823.697160.13231849851313043929.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Jan 2025 16:10:38 +0000
+References: <20250107092650.498154-1-quic_chejiang@quicinc.com>
+In-Reply-To: <20250107092650.498154-1-quic_chejiang@quicinc.com>
+To: Cheng Jiang <quic_chejiang@quicinc.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, quic_bgodavar@quicinc.com,
+ quic_rjliao@quicinc.com, linux-bluetooth@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_jiaymao@quicinc.com, quic_shuaz@quicinc.com, quic_zijuhu@quicinc.com,
+ quic_mohamull@quicinc.com
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 24 Dec 2024 14:35:22 +0800 you wrote:
-> Add VID 13d3 & PID 3628 for MediaTek MT7925 USB Bluetooth chip.
+On Tue,  7 Jan 2025 17:26:47 +0800 you wrote:
+> Expand the firmware-name property to specify the names of NVM and
+> rampatch firmware to load.
 > 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3628 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> This update will support loading specific firmware (nvm and rampatch)
+> for certain chips, like the QCA6698 Bluetooth chip, which shares the
+> same IP core as the WCN6855 but has different RF components and RAM
+> sizes, requiring new firmware files.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: btusb: Add new VID/PID 13d3/3628 for MT7925
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f597b8982d51
+  - [v6,RESEND,1/3] dt-bindings: net: bluetooth: qca: Expand firmware-name property
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8c6fb157eb03
+  - [v6,RESEND,2/3] Bluetooth: qca: Update firmware-name to support board specific nvm
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ad3f4635a796
+  - [v6,RESEND,3/3] Bluetooth: qca: Expand firmware-name to load specific rampatch
+    https://git.kernel.org/bluetooth/bluetooth-next/c/be6ff38d6852
 
 You are awesome, thank you!
 -- 
