@@ -1,132 +1,125 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B431A0726
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jan 2025 10:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D713E1F63DF
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jan 2025 10:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736332370; cv=none; b=YB5pHY3r0EbhR+U8JrSbRYx9a1UH2XnLYhuoTNsloOErqk4jXpVwVq0X+7/bUhHUopveSQzs4ZXuyLgbKFFebgg9/qQUTHlIlpKD7xK511TfEAHqboxy49fjqTPqOht0WkDtkfseSEi36uUct8oXSAm2LIITpguuvYUFEgipSko=
+	t=1736333311; cv=none; b=ObSbcUifLEfq7RWyV6iMzI0vgmSw3XPzDAAdjlrGQ0tBACPU4yUrRLW0ypOgnGG73LVAEq38C6plTA6w62bN9MaJWpsWpe+5FUevspN16cONEUi9z3kAk2mKVjFp+5BWiKdNzdCBrHaL3f2at9kYbsFON+PckKN4wRZElLpO3f4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736332370; c=relaxed/simple;
-	bh=DHIUGTm21FXxnseBCEZtIIYntPWO/LB9lhcTpS7aPsk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=WRMnb1CbCanPFIEUovQonAznpUx6NERSw0faNEevSkugZ/3K9aotA/c+YMZf8qwrkJpgBqDUZxoThP2OB5580VtuHB4VCYi21/smpaQDcj2LBVGVsWXzNHo0AbEbVxV8dtxKeJ3kFc7GNX7u9A1agl3CmouEsjkYQWaVRNqp1NU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aEWca5zL; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736333311; c=relaxed/simple;
+	bh=sL4PiDoeSKmCsRsIVH0hxi3F/3kO7logYC7qPb8s5iY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=g1ppoXYOwEY6gl/bgeklWq2tYJBtskQFCX2eP1z2x0VIyJGragjO1BRZTMCpCAnTyJ17G6TvwgoOsF4Au1JMt5OyRbk6IBT9FVsqlx+QA/xHhK9hMaABXVbb7CTiTxTxbJQe8ooMxjBiVXFLa6IKazVT+YV1I9XO/7XDBBA+xsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=otSUZkCe; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aEWca5zL"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-216401de828so231836945ad.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2025 02:32:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="otSUZkCe"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2164861e1feso241208405ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2025 02:48:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736332368; x=1736937168; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=lO0jdbwUUkZoC3oV9lerw4/pXF9KffY8XWPqxvmLD3w=;
-        b=aEWca5zLwC85ShIf2DsjsgFSQ/rZbSfMeKN/E06nJwyJsqxl8ih5WIB9+RWO/FgHC1
-         7MXHvfx/jy5HHnW4dbL6MZ99trIIuc91tzC3fxZJVAwfwscbjRJ7sLmY3RvHtHy/GXFt
-         9rQ+RDn026FZQTqVEfQuwEj+mdAIo58sA2lwnq424jjnsfeyKIGoqfGQE1DBlv4M+KK4
-         sqqojQgNpMkQuoHW4q/JWdIu/iQAneyoftO9+qH6CveK/GAxcFeg2j/fv2X6KaXRjpEd
-         bz5erQe4GTIKCzQICCxi4hiQYbBNKjVISmp4NI4vJHz7eouSmOCcYOxhUPIdzN2AJPfv
-         0wOw==
+        d=google.com; s=20230601; t=1736333309; x=1736938109; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZNwf8P+j8EnGQl24maUdTNciXnMv1elXkFSPAxdl8WE=;
+        b=otSUZkCeUqLvGLwgcodzcj2TqfQQY4lHN73RsdSALgT5pSj88al0stgA4MD+NGvVzN
+         fDswCXZ121xZvJbA64fDGg240wPDpfv0+2BzAlb62n97c69roip7XyJVcWX4Lh2YHNLd
+         CxSVV7SfbNUTSY3Lgbra4YYe3mU6yShhdUL2gIeUaNt1yjPeKqyP5IW0xu+oWbvFv/GI
+         dg3EjCx9vuBw8P6431ERPesjsdRdR392ksIdHRArzTGKSXIvH9FPM0xtRNEQ8xtKYNSV
+         Ldr5/SuvQR2hrZicHkFyvHzDqmbGR4cDvOh4wDuDS2wfuzGVtygha+ODdpu0GYM0yTcC
+         +oZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736332368; x=1736937168;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lO0jdbwUUkZoC3oV9lerw4/pXF9KffY8XWPqxvmLD3w=;
-        b=QE+/oYNyvvaLRoibABsAGwIk6O+wEKKHodK2Knjzxm5s72U5qB7940dGnaVsbFnc5G
-         mxnuiDDqi1aBK+Wed3OBH/80aZpSrpEgii8Vj/HEzXkPeZ+W0tlmHrxCmBJuUmT8tKNj
-         ZGBWzQX/GyzQPkifcNe6ocpr9Xi6+AoqQ8VuFsCu4+WhzkK94wOlkSvSdBQDZ+4jfemD
-         l4mLvvZXsXmumLAzkC0pDcL/kgIWvuC5+EKQEg1i9rW0pKj6pAl2bQo80/eK5ES5uu3P
-         K8RMoHHSA5DMEmPYYlI6vfkoIyYmD4MCLV0TuqlpqwCiFFrvT07lNlHpyvJbY8CwkNTl
-         pCHg==
-X-Gm-Message-State: AOJu0YwntwvvLojLHWRee5LRe1WRMeVvPQLjmZpG5LP7WYxbrrmH8jPI
-	3LgAKknQIFakWcbIbLvYS7SUuy+oSei1+zH5smsG6hFJ+XuyQlmtEtsvTA==
-X-Gm-Gg: ASbGncuS/51g3ySXbjMdJf7kPAEhrLSHlY+vMLEnDPieZ6cfmHbFNXDVwnP+cC7oGw6
-	XW8GqoeRDprAAMCQLA4eRfWtHy4RSs8uM4TVVRg+wl4ecVsWizm7XQKDvW+7m2BVw2mihO84Bgq
-	flRMXeXqOKHX9UB01ZMMcIp3sIFdb+dQvO9BhvXVy4Bab8ReJ5qmtfgQAk4nTGC/Tid91kGZntq
-	tSeMbDveCNxYZ0PpLdcNwdL6tyIMYvVPCCku3X1ATP9Wf3KW4lXZQXtRAZsfteZ
-X-Google-Smtp-Source: AGHT+IEyglsHDTbB/uFo2PmgQm35Lb3GNlm4wutkaCJ9/LIbi3Grfz0DdR7uPylXR7HCdUMzppZAcw==
-X-Received: by 2002:a17:902:f54e:b0:216:5448:22a4 with SMTP id d9443c01a7336-21a83f36ec3mr31588325ad.10.1736332367585;
-        Wed, 08 Jan 2025 02:32:47 -0800 (PST)
-Received: from [172.17.0.2] ([52.159.142.192])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc962d5fsm324535725ad.38.2025.01.08.02.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 02:32:47 -0800 (PST)
-Message-ID: <677e544f.170a0220.3bfddf.4a05@mx.google.com>
-Date: Wed, 08 Jan 2025 02:32:47 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4481121542275570490=="
+        d=1e100.net; s=20230601; t=1736333309; x=1736938109;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZNwf8P+j8EnGQl24maUdTNciXnMv1elXkFSPAxdl8WE=;
+        b=KHt0bXHKIeHJCYMBwI3Z3VhAJ4XHYDNuj9Hnv6IbpTceGPpsdrOqLDGJSYFBc8fOOH
+         otr9nNaVvhAWaz7/nR5h7OCD/A6Bxuc+dFKsuk5o5OOwgmqxb9fGDcgVTIGR9shq2kDV
+         URWbqm0We8oMfe0f4pLOynw6mCzTf+d65j/h5CdDiowDvbJNDaJRPa3vWbNrOKbgpqhn
+         kRVIQvIxNm7gLXqdTgLIW/5/2D4N3h7qZmCtcAGp/+y4ziOsK631lEJHWJzHKTKDUHce
+         YkAHPWMnY1OLo/2QFibEGriFNkwjMkmnIXTq+Iiz4ex4Mf8ryC35CH7s6U7HY4A4aFll
+         aXjw==
+X-Gm-Message-State: AOJu0YyUVnIgL/tbwAzUxosBulRYIL43DU4J+iNAWkrCGiAe5ilKsxri
+	dYO1OwqcVE86RnwhE2Oy10wtlWOjJHwcbon6j/76tZxPklu03isB8NCq/ZYf5y1xRfR3mH5imq7
+	KGfIQVnxZ7wXAJihLbmHtHksdVFO4+ljhYoS2bPMNZ8cmUwBjjys9G0eeNHQvhrrfK3UypwxwiL
+	8wufHNYo3qlpM1KcCdTFbpfzZXyUvgRYsIVTZdQPIJil3ZHJtunA==
+X-Google-Smtp-Source: AGHT+IEWritjAKWRbI0zLVsfSRw2VfhN2MoiZb/KiQPztnJv+dJcsazZLvls0uWIfpuWIbkUYmKi/yCfv0vd
+X-Received: from plbkp7.prod.google.com ([2002:a17:903:2807:b0:215:6f59:ff5f])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf0e:b0:216:7c33:8994
+ with SMTP id d9443c01a7336-21a84002cf3mr39440535ad.53.1736333308926; Wed, 08
+ Jan 2025 02:48:28 -0800 (PST)
+Date: Wed,  8 Jan 2025 18:48:11 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: [v2] Bluetooth: btmtk: Fix failed to send func ctrl for MediaTek devices.
-In-Reply-To: <20250108095028.2299510-1-chris.lu@mediatek.com>
-References: <20250108095028.2299510-1-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20250108184811.v2.1.I66a83f84dce50455c9f7cc7b7ba8fc9d1d465db9@changeid>
+Subject: [PATCH v2 1/3] Bluetooth: Remove the cmd timeout count in btusb
+From: Hsin-chen Chuang <chharry@google.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc: chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---===============4481121542275570490==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Hsin-chen Chuang <chharry@chromium.org>
 
-This is automated email and please do not reply to this email!
+Remove the cmd timeout count in btusb since we only ever allow one
+command in flight at a time. We should always reset after a single
+command times out.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=923305
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.49 seconds
-GitLint                       PENDING   0.31 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.54 seconds
-CheckAllWarning               PASS      27.30 seconds
-CheckSparse                   PASS      30.50 seconds
-BuildKernel32                 PASS      24.49 seconds
-TestRunnerSetup               PASS      438.58 seconds
-TestRunner_l2cap-tester       PASS      20.68 seconds
-TestRunner_iso-tester         PASS      29.61 seconds
-TestRunner_bnep-tester        PASS      4.79 seconds
-TestRunner_mgmt-tester        PASS      123.57 seconds
-TestRunner_rfcomm-tester      PASS      7.56 seconds
-TestRunner_sco-tester         PASS      9.32 seconds
-TestRunner_ioctl-tester       PASS      10.93 seconds
-TestRunner_mesh-tester        PASS      5.94 seconds
-TestRunner_smp-tester         PASS      6.93 seconds
-TestRunner_userchan-tester    PASS      4.97 seconds
-IncrementalBuild              PENDING   0.78 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
+(no changes since v1)
 
---===============4481121542275570490==--
+ drivers/bluetooth/btusb.c | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index de0b4d99fcbf..916e9ec7bc85 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -881,7 +881,6 @@ struct btusb_data {
+ 	int (*disconnect)(struct hci_dev *hdev);
+ 
+ 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+-	unsigned cmd_timeout_cnt;
+ 
+ 	struct qca_dump_info qca_dump;
+ };
+@@ -914,9 +913,6 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+ 	struct gpio_desc *reset_gpio = data->reset_gpio;
+ 	struct btintel_data *intel_data = hci_get_priv(hdev);
+ 
+-	if (++data->cmd_timeout_cnt < 5)
+-		return;
+-
+ 	if (intel_data->acpi_reset_method) {
+ 		if (test_and_set_bit(INTEL_ACPI_RESET_ACTIVE, intel_data->flags)) {
+ 			bt_dev_err(hdev, "acpi: last reset failed ? Not resetting again");
+@@ -999,9 +995,6 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
+ 
+ 	btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0);
+ 
+-	if (++data->cmd_timeout_cnt < 5)
+-		return;
+-
+ 	if (!reset_gpio) {
+ 		btusb_reset(hdev);
+ 		return;
+@@ -1046,9 +1039,6 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
+ 		return;
+ 	}
+ 
+-	if (++data->cmd_timeout_cnt < 5)
+-		return;
+-
+ 	if (reset_gpio) {
+ 		bt_dev_err(hdev, "Reset qca device via bt_en gpio");
+ 
+-- 
+2.47.1.613.gc27f4b7a9f-goog
+
