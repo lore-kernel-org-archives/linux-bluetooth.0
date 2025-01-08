@@ -1,91 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493E01FE45D;
-	Wed,  8 Jan 2025 16:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D76E1FE475;
+	Wed,  8 Jan 2025 16:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736352794; cv=none; b=saAmcEM+HQw8RWtBeDcLGLvqbxju9PTezj/sMlQeU40f/yulDTzHgQnpW2//pVPwpxn9h0TFWXaaciJUYmUwbPxYcBV2A/Kj6O0Mv504dsvoNSjjVUnwT4I0QGShlsxLnQIBqbnryYpJSy4nYO+OHPJm9n36CQxtd9rHeQMNFIc=
+	t=1736353593; cv=none; b=TSNzADimrMOmN4KKSXjiKadRghKtzwXkimmI87/a7e0jncCKsBJ1GzXA325PRJhilv0PZdR1FYoJ3D1d0sCm3It2yrX27DjiWn2gWI90yFOjObwQoot4pjo2vdRCOgjNAtGtJQwGQp/bWgecTjAjSyvME5CmcZz3hewC1FKefmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736352794; c=relaxed/simple;
-	bh=T96IMoznZjXFrZDvY9AXecT/DDpr21PpFL281ZimX2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TzrqqUq2ImUV7I9FEoPlBMurm9RGcZ48Bu+oyE/pjyR3dwsMcsJuKpPYQFGQHqm1xceFvcDsQuoqNvm2m1DhkhqSzAS5Wdz9GMB7BcsiAtVohLQv/vkGkdzW3VPrzm4085qDSPSZT9ABPNsMfxIhtoAPLjwPrqTh7HhS8njglNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Fdny44/7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736353593; c=relaxed/simple;
+	bh=PC/tWXwk6YdUlv0k9NMQFCtuVWZNi8ajMilaFyCJsv8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DSRYTjQGeqobomCzyP6t0DicN3v9WPxKQYJGgGEsgoiXHWZ2WF2S19mnd9Gn9P9G+wZhqU74vz214Vna2jbbF45hNvIvRHw7F0ubHH0YuVicYaBYGdQExZU+zkE25k2L4W+MZpqP1ZbIzLdYuLpI8UA7nIteMx1ixxlFfBkvJAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CkH68pNE; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Fdny44/7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DDA4C4CED3;
-	Wed,  8 Jan 2025 16:13:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1736352793;
-	bh=T96IMoznZjXFrZDvY9AXecT/DDpr21PpFL281ZimX2I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fdny44/7N6FGzLWmlANxIOZDg5yBQE/zrmgDN8rvvtF9EnMceVJSnonX1WQDsWNVI
-	 IC/hasWlN+HWjFsl+FB1P6VNYbWHacDpFRGHsOi2Y8U3RrI/1Y/G3O7lyBoRJE6Lt8
-	 08YnTERfZvEXWyYVoRAz05npvGuoTy4uCeTGG6a8=
-Date: Wed, 8 Jan 2025 17:13:10 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Hsin-chen Chuang <chharry@chromium.org>,
-	linux-bluetooth@vger.kernel.org,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Allow reset via sysfs
-Message-ID: <2025010859-finlike-reprise-1f7a@gregkh>
-References: <20250103112019.1.I8342291b757b20cd4cdbbfe658dc58ed5df46565@changeid>
- <2025010829-used-halves-7342@gregkh>
- <CABBYNZLEG4rQBM6WYyRNJwOYWQU2ajyCTxWwe3+6aCYm=Gk4dQ@mail.gmail.com>
- <2025010853-stalemate-upheld-10f4@gregkh>
- <CABBYNZKM9BsNFq=uFiOws6Tvtc-NQGTnVrD8-AJb=N6-EQk3bA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CkH68pNE"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-85bad7be09dso8757857241.0;
+        Wed, 08 Jan 2025 08:26:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736353590; x=1736958390; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4VgGsE8CkYldjuaaPZ0lEWAgGeZarAzuGgsEmYnO42c=;
+        b=CkH68pNEKW4g1RG1O28Fw+0htEsTs3+P5jwICl8Kl03Amx2gPDZXexyy8gJ7uVA6+8
+         LF+cs6M8NLq8zy57GIVwUpA6U8KtjvRFbb/gUCO3Sj81LrltvdZoSWdaLEUkTKRLE5vI
+         UL9bZR7GBFYhQcRKB2O0sBDw8Lr2yC84kEPBxRCQwEF181G14dV5o797DKTi+vnlM8SC
+         B4RB8EgUzbrX0y1U4kiCKgJIV96YhXdJac3C9sCqbHugSL+I97MT8CxoQHk7KbAI68Cf
+         FVd5r4/28CJ+gvUNYTeTuPEPEZAqtk4fe+qLDCqTK9reSoAaB6zC8hoPzj0z1ARRdzby
+         UwaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736353590; x=1736958390;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4VgGsE8CkYldjuaaPZ0lEWAgGeZarAzuGgsEmYnO42c=;
+        b=DeyCq+YwMY6xWqEEf4zmw+1WgXY3o8zgmoXyoWgPcjLuEpA7vH69HfV4GT11zZ8AsK
+         x82okuxjDbtMb2ThceR1H5s+q4RNrLXDivY/56eaSOgUtbXyzAJ3FbM6wUS2sT+D3a74
+         C97aGp6DZbwOVJRlyos10iLab4cjfyo2jcVta/+Jl8hzy0GebufaHMF3SRsjff02CdlN
+         r+r/E4sdorWGmIEu4ppieGKTxP2gUKOHJ+3ONrmz5g7cxjkF9N24MkxmVlKXuTgddA/X
+         5FPGEbtx2iGKqZIPNZzJyy9jqimaUntagmhENvhW/pYrHzcEh1vlpv4+aP75hsOz4LC9
+         lX2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX5RUGrO+Xzrjy0eNpbNP5w5IK119N5DtoWis7Rn5FBSob7cQ2rrQ6ppm9Tfg1rMXFjLFSK5gw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyU+1npqc5tWhfZ4KpXHVZCM+OMr8JqukHksjVyDwmhB29l0llE
+	ROa+nWuEhuq60JLfygoMhXwcse9Sg2SQiR8+8uwt59t0Ni44+nEUNeICRaL/fDw=
+X-Gm-Gg: ASbGncuHZyps2SQu0l6a7ir1whyFQdAORutENNmlRjCu/YqmOHffNb+/Nu9CU1AlvJK
+	HIWMTCbFQKYNQ1CQ4ovuLSi3yG0WePFpvvmtkeewXJ3wsADkpBoWLq+DzIQjp3hdcO98znFc6Iw
+	ofz2fgs+RpaiWzap5AI3OTr82uWci9SZQZP7PkGsM0SnwfI7q/CnsVDIztEEShbJfU8ErGUaYHG
+	ABu6d+bHgUSZpYr32kaxQ/lSZTcTW+WGTc6MDdWUNldcMH5g7ScXLKLmO4Gw9LIF5R0pqEKWEJ8
+	Rv3i4MIm5e3v+MIuhzxYWELEBc2N
+X-Google-Smtp-Source: AGHT+IFGomLi5Ipkt+8OT5P1G3bBAg7wIkun5lGksQ0gdiVhfb5M5QtwAXoa1f4Mou/xTgQaSqfE0A==
+X-Received: by 2002:a05:6102:509f:b0:4b1:1b41:ff5f with SMTP id ada2fe7eead31-4b3d0da4c1bmr2728054137.1.1736353590365;
+        Wed, 08 Jan 2025 08:26:30 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b2bfa8d590sm8561846137.26.2025.01.08.08.26.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2025 08:26:28 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2025-01-08
+Date: Wed,  8 Jan 2025 11:26:27 -0500
+Message-ID: <20250108162627.1623760-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZKM9BsNFq=uFiOws6Tvtc-NQGTnVrD8-AJb=N6-EQk3bA@mail.gmail.com>
 
-On Wed, Jan 08, 2025 at 10:33:01AM -0500, Luiz Augusto von Dentz wrote:
-> Hi Greg,
-> 
-> On Wed, Jan 8, 2025 at 10:11 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Wed, Jan 08, 2025 at 10:06:34AM -0500, Luiz Augusto von Dentz wrote:
-> > > Hi Greg,
-> > >
-> > > On Wed, Jan 8, 2025 at 7:34 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > >
-> > > > On Fri, Jan 03, 2025 at 11:20:20AM +0800, Hsin-chen Chuang wrote:
-> > > > > Allow sysfs to trigger reset via the cmd_timeout function in hci device.
-> > > > > This is required to recover devices that are not responsive from
-> > > > > userspace.
-> > > > >
-> > > > > Also remove the cmd timeout count in btusb since we only ever allow one
-> > > > > command in flight at a time. We should always reset after a single
-> > > > > command times out.
-> > > > >
-> > > > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > > > > ---
-> > > > > This commit has been tested on a Chromebook by running
-> > > > > `echo 1 > /sys/class/bluetooth/hci0/reset`
-> > > >
-> > > > You forgot the required Documentation/ABI/ update for your new sysfs
-> > > > file :(
-> > >
-> > > Looks like I've missed that when reviewing these changes, anyway no
-> > > pull-request has been made, I assume we should follow what is
-> > > documentation on Documentation/ABI/README?
-> >
-> > Yes, all sysfs entries must be documented that way.  We have a script in
-> > the tree that you can run to verify that all entries are documented, but
-> > I don't think anyone runs it very often :(
-> 
-> Do you recall which script it is? I'd like to include that in my hooks
-> and in our CI so I don't miss it next time.
+The following changes since commit db78475ba0d3c66d430f7ded2388cc041078a542:
 
-It's scripts/get_abi.pl
+  eth: gve: use appropriate helper to set xdp_features (2025-01-07 18:07:14 -0800)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-01-08
+
+for you to fetch changes up to 67dba2c28fe0af7e25ea1aeade677162ed05310a:
+
+  Bluetooth: btmtk: Fix failed to send func ctrl for MediaTek devices. (2025-01-08 11:14:03 -0500)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - btmtk: Fix failed to send func ctrl for MediaTek devices.
+ - hci_sync: Fix not setting Random Address when required
+ - MGMT: Fix Add Device to responding before completing
+ - btnxpuart: Fix driver sending truncated data
+
+----------------------------------------------------------------
+Chris Lu (1):
+      Bluetooth: btmtk: Fix failed to send func ctrl for MediaTek devices.
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_sync: Fix not setting Random Address when required
+      Bluetooth: MGMT: Fix Add Device to responding before completing
+
+Neeraj Sanjay Kale (1):
+      Bluetooth: btnxpuart: Fix driver sending truncated data
+
+ drivers/bluetooth/btmtk.c     |  7 +++++++
+ drivers/bluetooth/btnxpuart.c |  1 +
+ net/bluetooth/hci_sync.c      | 11 ++++++-----
+ net/bluetooth/mgmt.c          | 38 ++++++++++++++++++++++++++++++++++++--
+ net/bluetooth/rfcomm/tty.c    |  4 ++--
+ 5 files changed, 52 insertions(+), 9 deletions(-)
