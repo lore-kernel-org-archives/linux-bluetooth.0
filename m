@@ -1,55 +1,55 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234901F8930
-	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jan 2025 10:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BD31F8AF0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jan 2025 10:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736333316; cv=none; b=QoqgGo8Ixwz6fMfUVPLVkJLvImR+eSqEwcO7++sdriA1ratp+lSxUpQ+RFD0yfsNpOc/OGi1o7WTm2gsS0rgJi9mQGfyY+dmMxUFXY86uW0MgfRTXSbjHvRmyAQG+JSinrv4IiZpq+X7xzSXfxFbs1ZERxM8PAx+1c0bIOzFCe8=
+	t=1736333321; cv=none; b=cNn7CTKyug/NLeqC2whfqzZ1CVoSgcEJ3oUi5tuBpLwk31woUzX+w/Zmju8v6DHcfijCACwnQfJmD6YEddTXIMuSGhzDFe00VorpwAl62lTdYq+RF1hOmL2VD0UZqDxsJmayEjrmNA24izZjb9kk103M56V+luRjmekU/xBw3HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736333316; c=relaxed/simple;
-	bh=30niDkZX2VnpWuCkBMMQwiZcmEeqXer4m0XVR7b8Elo=;
+	s=arc-20240116; t=1736333321; c=relaxed/simple;
+	bh=18OVqyScu1altG2OPAE65a+CYyw/ZsoyTKeqF6DAre0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OaAlcrkcdU6Jmxz6I2k4C0zyn3CE2CKuu3o427l8RVXg7Bd58yHrdgDAo+AUpjF4zqz2pSMKVbX4fEG4yxHNi4nbsKuQOPtRULCKZiTDiClrV5CO/BNimj8z0CNL+qDJfNuIPo0HgAHFM+eoW3IpISxHWbvTAWpRE94YEFNy3Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JOxZWnHR; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=SPlae+s9Z1bjGGNYLBea1TkBvWVQ0uEvKc4BTcuG47+iO59MX7hUnFHP3zpk81K45K8HXkfp8Tu1odKVifoluzHenJPJgEbF9IRDmoo0u2B/7frddJjgcJIENBNCivPhue2LonPq3tI8DEBMXlVNMAFB5jAPmIUdreLPTNy7kLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jOhQ0LLn; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JOxZWnHR"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2162259a5dcso47773565ad.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2025 02:48:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jOhQ0LLn"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2163dc0f689so113085595ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2025 02:48:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736333314; x=1736938114; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736333319; x=1736938119; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nf5n3fvOdCFzPePcys9PQIDnTcq3K0L56wNYb00CE7g=;
-        b=JOxZWnHRUaQnz2t9HCg8IsVC1J8XzXQ9jQ0Tx05ABAR0PBDRIrLjAHnQoSMtjlffsh
-         FfPcbtW2/dTQWHHWyoSjQeMC/KkQOE5sfGMbk0SAzRWE2YgEf2twZX+vhQtvmEul8TgC
-         +EdWOgVqdhHztKgHMQvboNLxLs+K2bEOE89DshT7jfniTY8Kjg4ttklGvinsb9bcRHoE
-         esJFez8FHnYmYcyKRWqezqtlGGnrRHguSI4VpXzEC+/q7vWHYgeFnw1aWQqpwFmbVgSz
-         GsyIBQPb0pZeHFI+CC5EBT55GWHUavnqSQ987TW/EcJ7uwqxxws71IzGOnaSN7cjuwwA
-         JZ8w==
+        bh=bONEd4CMjkOeeBOPhPOC+iA+IYq5PNR8x+RM9R2jxco=;
+        b=jOhQ0LLnd4iRQ/nayvMWhCkNIf3xGUegES9B4DDCo2/x+ThmoRwKmDy3P76UQw+Jn/
+         0/GNZpCXb0MrD4ujYP2fEP6lXgXpg2tJ4jjl2nPQa6FoWXBkS4/BBkZsw44PcjZH4Xdm
+         DUn+HlmK6JQLdxL6vGTPpEfh8P7V8jzcVYeKrk6isdwZSOXzAIpRzWNxFyh3uUYGDqv9
+         XzTOeHt+6viIxAN8WXjBteyq2nepRE8zjZaecIuUlpvQZ1bP+z/FyQJjMWUQD/pDfPWW
+         CyGjuS0wzSJsWm8Fu2yK/iVMElMP+EYXvF3AuIEoDN6P98j8ax/Gz4BQk/Q0xHmbRhQ0
+         wcMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736333314; x=1736938114;
+        d=1e100.net; s=20230601; t=1736333319; x=1736938119;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nf5n3fvOdCFzPePcys9PQIDnTcq3K0L56wNYb00CE7g=;
-        b=Ph6iriNYmYvBecIX4i5skPNb0dyVaumtB2+EZQo1Vd07H8ZOyqUfTDEVj6WbQ8Fd3B
-         +aP6nwFTb1IyRaV23VW6avFl7B/ibgxaAUkriCbg/hp80J4lBH12GS/+gqmiWTpC7/QA
-         LQ81j9JgtUJH0nDxNUe5VeCFTL0UMsTl4u70YvjFvwvc96LNMFg/TftcGEchCvIv1UVb
-         cs2DHsusCGlWwntcT/VG3vRQPgIb4z2yYDmSqE0txAPjXLvUoUtNbHOK86T2iUnu/3Tr
-         EEsAa6JuhQVzihX5NhoOPs6kKYTtviBbYHoWaCF2ou7cPVS9+GPId6zWqtUi56yInN69
-         8jeA==
-X-Gm-Message-State: AOJu0Yx8PO1s9X9YChtf162AEYgOLkxPpqJCLIqhQLfq7y1IVhIzjC5E
-	i4BlAfkn6jXp7hgNmDHrwWCdAcBU/ZrzifxgT0cCnutZ51t0G6t4lf1Osgsz/pL80QOyHCkQ9Va
-	PUloBsiRYDTHc7cLCMVJ1at+obW3ovqVMavhI6Fde4AR43PfYUSnnNAeI291ndKQRlSkvhnXopZ
-	D1Dcx9VHOonFdA+L/F+phN1ZxqpEi9PfwzpehhY57KB6BzOM8Fdg==
-X-Google-Smtp-Source: AGHT+IEpZFlHqKumrq0hCJ2Zb7jCn4vyAtOz66XaXruH3R4KORwpFkEongE7FqoB8phFgSrUYPseeLW610sx
-X-Received: from pglr12.prod.google.com ([2002:a63:514c:0:b0:7fd:4c8f:e6a1])
- (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:c89b:b0:1e1:aef4:9cd0
- with SMTP id adf61e73a8af0-1e88d139b44mr4156324637.3.1736333314283; Wed, 08
- Jan 2025 02:48:34 -0800 (PST)
-Date: Wed,  8 Jan 2025 18:48:12 +0800
+        bh=bONEd4CMjkOeeBOPhPOC+iA+IYq5PNR8x+RM9R2jxco=;
+        b=DnYL/jWF13aVLNEw+62fL+Y9hnJZjPC0D+FcGgwOssT2zQk3ATN29rdhdo8O1JkU4W
+         tCuTZqbrq1A4Ru1zlYqqU69B5BdQkDV2nyFrHCFNuE+RTs1tU8+G5adSjfNHC6CQ4nM9
+         bwFqxlzjqektqmCJyyV5jHEfnEH2MjG5SgI048b/53msEpEWGisvCMqkJKX2PiYC8h0Q
+         0Vmi4KQlU9MJx+sZBsvi565F0mm6gXU4y2LZxRznFgfLD31N2WGaWSU3QEBLbiEE8YUC
+         zM40mkS5PwxA5YY7vrmx3MHje89K/k2dmVIqdIabJFWaYwsH2eZ5M7NMjopV735gh6Zw
+         SIMA==
+X-Gm-Message-State: AOJu0YzJTl++MoNrNUbuTRKu7Y2AhS536UtrQI9wz4YTCNaNWkuawOwt
+	ih0mtG26lUqOabkzVxjmls2V0dHq1PekZt4eJqcJwcyjtlcwtlrs1Fp0qAMKJ4LYn8uf4PPLwkV
+	fYDzVmvGA6KdoG4PY8jXCBzR6w3N644NWS6uB/4AuGGEhsf1cMk62v3xPyCujHpqbnGdhsNTiqd
+	a2YvDGCi2UBViTIsDGEsRyAcVcFXX61SBaBrNBMCXllFwRsn0u0g==
+X-Google-Smtp-Source: AGHT+IGgjQdIPwYIYudGgRpSw8K/yuq90upMFqA78b4lAmqx9o4zdLkbPBz0794mYwUrT9dCUQKZxwE26wkT
+X-Received: from plbje15.prod.google.com ([2002:a17:903:264f:b0:21a:7e04:7006])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:186:b0:216:42fd:79d2
+ with SMTP id d9443c01a7336-21a8401271fmr31317245ad.49.1736333319406; Wed, 08
+ Jan 2025 02:48:39 -0800 (PST)
+Date: Wed,  8 Jan 2025 18:48:13 +0800
 In-Reply-To: <20250108184811.v2.1.I66a83f84dce50455c9f7cc7b7ba8fc9d1d465db9@changeid>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -59,199 +59,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250108184811.v2.1.I66a83f84dce50455c9f7cc7b7ba8fc9d1d465db9@changeid>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250108184811.v2.2.Icd16ca64a5d7e212c2801b3b39f65a895fb3e9b4@changeid>
-Subject: [PATCH v2 2/3] Bluetooth: Get rid of cmd_timeout and use the reset callback
+Message-ID: <20250108184811.v2.3.I8342291b757b20cd4cdbbfe658dc58ed5df46565@changeid>
+Subject: [PATCH v2 3/3] Bluetooth: Allow reset via sysfs
 From: Hsin-chen Chuang <chharry@google.com>
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc: chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+	Hsin-chen Chuang <chharry@chromium.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
 From: Hsin-chen Chuang <chharry@chromium.org>
 
-The hdev->reset is never used now and the hdev->cmd_timeout actually
-does reset. This patch changes the call path from
-  hdev->cmd_timeout -> vendor_cmd_timeout -> btusb_reset -> hdev->reset
-, to
-  hdev->reset -> vendor_reset -> btusb_reset
-Which makes it clear when we export the hdev->reset to a wider usage
-e.g. allowing reset from sysfs.
-
-This patch doesn't introduce any behavior change.
+Allow sysfs to trigger hdev reset. This is required to recover devices
+that are not responsive from userspace.
 
 Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
 ---
+This commit has been tested on a Chromebook by running
+`echo 1 > /sys/class/bluetooth/hci0/reset`
 
-(no changes since v1)
+Changes in v2:
+- Splitted out the btusb change
 
- drivers/bluetooth/btmtksdio.c    |  4 ++--
- drivers/bluetooth/btusb.c        | 16 ++++++++--------
- drivers/bluetooth/hci_qca.c      |  6 +++---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_core.c         |  4 ++--
- 5 files changed, 15 insertions(+), 16 deletions(-)
+ net/bluetooth/hci_sysfs.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index a1dfcfe43d3a..bd5464bde174 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1249,7 +1249,7 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 4b54dbbf0729..041ce9adc378 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -90,9 +90,28 @@ static void bt_host_release(struct device *dev)
+ 	module_put(THIS_MODULE);
  }
  
--static void btmtksdio_cmd_timeout(struct hci_dev *hdev)
-+static void btmtksdio_reset(struct hci_dev *hdev)
- {
- 	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
- 	u32 status;
-@@ -1360,7 +1360,7 @@ static int btmtksdio_probe(struct sdio_func *func,
- 
- 	hdev->open     = btmtksdio_open;
- 	hdev->close    = btmtksdio_close;
--	hdev->cmd_timeout = btmtksdio_cmd_timeout;
-+	hdev->reset    = btmtksdio_reset;
- 	hdev->flush    = btmtksdio_flush;
- 	hdev->setup    = btmtksdio_setup;
- 	hdev->shutdown = btmtksdio_shutdown;
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 916e9ec7bc85..b53d0099a1cb 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -907,7 +907,7 @@ static void btusb_reset(struct hci_dev *hdev)
- 	usb_queue_reset_device(data->intf);
- }
- 
--static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
-+static void btusb_intel_reset(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct gpio_desc *reset_gpio = data->reset_gpio;
-@@ -985,7 +985,7 @@ static inline void btusb_rtl_alloc_devcoredump(struct hci_dev *hdev,
- 	}
- }
- 
--static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
-+static void btusb_rtl_reset(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct gpio_desc *reset_gpio = data->reset_gpio;
-@@ -1029,13 +1029,13 @@ static void btusb_rtl_hw_error(struct hci_dev *hdev, u8 code)
- 	btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0);
- }
- 
--static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
-+static void btusb_qca_reset(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct gpio_desc *reset_gpio = data->reset_gpio;
- 
- 	if (test_bit(BTUSB_HW_SSR_ACTIVE, &data->flags)) {
--		bt_dev_info(hdev, "Ramdump in progress, defer cmd_timeout");
-+		bt_dev_info(hdev, "Ramdump in progress, defer reset");
- 		return;
- 	}
- 
-@@ -3859,7 +3859,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 		/* Transport specific configuration */
- 		hdev->send = btusb_send_frame_intel;
--		hdev->cmd_timeout = btusb_intel_cmd_timeout;
-+		hdev->cmd_timeout = btusb_intel_reset;
- 
- 		if (id->driver_info & BTUSB_INTEL_NO_WBS_SUPPORT)
- 			btintel_set_flag(hdev, INTEL_ROM_LEGACY_NO_WBS_SUPPORT);
-@@ -3911,7 +3911,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		data->setup_on_usb = btusb_setup_qca;
- 		hdev->shutdown = btusb_shutdown_qca;
- 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
--		hdev->cmd_timeout = btusb_qca_cmd_timeout;
-+		hdev->cmd_timeout = btusb_qca_reset;
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		btusb_check_needs_reset_resume(intf);
- 	}
-@@ -3925,7 +3925,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		data->setup_on_usb = btusb_setup_qca;
- 		hdev->shutdown = btusb_shutdown_qca;
- 		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
--		hdev->cmd_timeout = btusb_qca_cmd_timeout;
-+		hdev->cmd_timeout = btusb_qca_reset;
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		hci_set_msft_opcode(hdev, 0xFD70);
- 	}
-@@ -3944,7 +3944,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		btrtl_set_driver_name(hdev, btusb_driver.name);
- 		hdev->setup = btusb_setup_realtek;
- 		hdev->shutdown = btrtl_shutdown_realtek;
--		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
-+		hdev->cmd_timeout = btusb_rtl_reset;
- 		hdev->hw_error = btusb_rtl_hw_error;
- 
- 		/* Realtek devices need to set remote wakeup on auto-suspend */
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 37129e6cb0eb..c7ef38fd5e8e 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1638,7 +1638,7 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- }
- 
--static void qca_cmd_timeout(struct hci_dev *hdev)
-+static void qca_reset(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
-@@ -1968,7 +1968,7 @@ static int qca_setup(struct hci_uart *hu)
- 		clear_bit(QCA_IBS_DISABLED, &qca->flags);
- 		qca_debugfs_init(hdev);
- 		hu->hdev->hw_error = qca_hw_error;
--		hu->hdev->cmd_timeout = qca_cmd_timeout;
-+		hu->hdev->reset = qca_reset;
- 		if (hu->serdev) {
- 			if (device_can_wakeup(hu->serdev->ctrl->dev.parent))
- 				hu->hdev->wakeup = qca_wakeup;
-@@ -2202,7 +2202,7 @@ static int qca_power_off(struct hci_dev *hdev)
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 
- 	hu->hdev->hw_error = NULL;
--	hu->hdev->cmd_timeout = NULL;
-+	hu->hdev->reset = NULL;
- 
- 	del_timer_sync(&qca->wake_retrans_timer);
- 	del_timer_sync(&qca->tx_idle_timer);
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 84b522a10019..f756fac95488 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -633,7 +633,6 @@ struct hci_dev {
- 	int (*post_init)(struct hci_dev *hdev);
- 	int (*set_diag)(struct hci_dev *hdev, bool enable);
- 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
--	void (*cmd_timeout)(struct hci_dev *hdev);
- 	void (*reset)(struct hci_dev *hdev);
- 	bool (*wakeup)(struct hci_dev *hdev);
- 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 899b6f81966a..67032d21540c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1457,8 +1457,8 @@ static void hci_cmd_timeout(struct work_struct *work)
- 		bt_dev_err(hdev, "command tx timeout");
- 	}
- 
--	if (hdev->cmd_timeout)
--		hdev->cmd_timeout(hdev);
++static ssize_t reset_store(struct device *dev, struct device_attribute *attr,
++			   const char *buf, size_t count)
++{
++	struct hci_dev *hdev = to_hci_dev(dev);
++
 +	if (hdev->reset)
 +		hdev->reset(hdev);
++
++	return count;
++}
++static DEVICE_ATTR_WO(reset);
++
++static struct attribute *bt_host_attrs[] = {
++	&dev_attr_reset.attr,
++	NULL,
++};
++ATTRIBUTE_GROUPS(bt_host);
++
+ static const struct device_type bt_host = {
+ 	.name    = "host",
+ 	.release = bt_host_release,
++	.groups = bt_host_groups,
+ };
  
- 	atomic_set(&hdev->cmd_cnt, 1);
- 	queue_work(hdev->workqueue, &hdev->cmd_work);
+ void hci_init_sysfs(struct hci_dev *hdev)
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
