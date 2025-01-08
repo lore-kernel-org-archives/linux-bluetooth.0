@@ -1,68 +1,81 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D76E1FE475;
-	Wed,  8 Jan 2025 16:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F7118D
+	for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jan 2025 17:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736353593; cv=none; b=TSNzADimrMOmN4KKSXjiKadRghKtzwXkimmI87/a7e0jncCKsBJ1GzXA325PRJhilv0PZdR1FYoJ3D1d0sCm3It2yrX27DjiWn2gWI90yFOjObwQoot4pjo2vdRCOgjNAtGtJQwGQp/bWgecTjAjSyvME5CmcZz3hewC1FKefmg=
+	t=1736355700; cv=none; b=FWf7c8u+mHL9SNalLZk7pY2QI5lHkD92ILb7tuLcYC4RLOWURkXA2loCygKVIU9WWFEq2OmCcFoXEjujHnPGcLiMdZXM3+cruTJIg9s1kVSD8BJmN7Q1ympBibX/czpHt8CtidMTkRptaV6/OA2QBiElTfcELMtH0QXj2WCbkxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736353593; c=relaxed/simple;
-	bh=PC/tWXwk6YdUlv0k9NMQFCtuVWZNi8ajMilaFyCJsv8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DSRYTjQGeqobomCzyP6t0DicN3v9WPxKQYJGgGEsgoiXHWZ2WF2S19mnd9Gn9P9G+wZhqU74vz214Vna2jbbF45hNvIvRHw7F0ubHH0YuVicYaBYGdQExZU+zkE25k2L4W+MZpqP1ZbIzLdYuLpI8UA7nIteMx1ixxlFfBkvJAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CkH68pNE; arc=none smtp.client-ip=209.85.222.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736355700; c=relaxed/simple;
+	bh=JrqGrZ4NHYUvADCc43JNJ+Uwso2BlGQdgK+JQGUjfDY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AUZuAvwT9CnKXxVPzfDq34YTw9vUaD6rM0nTnOGErhNXd3mq6Ovofl3EY9rvKHtUzHU/dDfIFrw9vNidArJFPPMC2cArqDrwuSv8heiFFWXpW8tMtmvHWYZzDNNywPKSYy0rnvJFVx0Hv/hfMMHHHuz/RnJBQPGIZIZE7DL9ceI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=system76.com; spf=pass smtp.mailfrom=system76.com; dkim=pass (2048-bit key) header.d=system76.com header.i=@system76.com header.b=WAjvW3/u; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=obxn67lf; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=system76.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=system76.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CkH68pNE"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-85bad7be09dso8757857241.0;
-        Wed, 08 Jan 2025 08:26:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736353590; x=1736958390; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4VgGsE8CkYldjuaaPZ0lEWAgGeZarAzuGgsEmYnO42c=;
-        b=CkH68pNEKW4g1RG1O28Fw+0htEsTs3+P5jwICl8Kl03Amx2gPDZXexyy8gJ7uVA6+8
-         LF+cs6M8NLq8zy57GIVwUpA6U8KtjvRFbb/gUCO3Sj81LrltvdZoSWdaLEUkTKRLE5vI
-         UL9bZR7GBFYhQcRKB2O0sBDw8Lr2yC84kEPBxRCQwEF181G14dV5o797DKTi+vnlM8SC
-         B4RB8EgUzbrX0y1U4kiCKgJIV96YhXdJac3C9sCqbHugSL+I97MT8CxoQHk7KbAI68Cf
-         FVd5r4/28CJ+gvUNYTeTuPEPEZAqtk4fe+qLDCqTK9reSoAaB6zC8hoPzj0z1ARRdzby
-         UwaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736353590; x=1736958390;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4VgGsE8CkYldjuaaPZ0lEWAgGeZarAzuGgsEmYnO42c=;
-        b=DeyCq+YwMY6xWqEEf4zmw+1WgXY3o8zgmoXyoWgPcjLuEpA7vH69HfV4GT11zZ8AsK
-         x82okuxjDbtMb2ThceR1H5s+q4RNrLXDivY/56eaSOgUtbXyzAJ3FbM6wUS2sT+D3a74
-         C97aGp6DZbwOVJRlyos10iLab4cjfyo2jcVta/+Jl8hzy0GebufaHMF3SRsjff02CdlN
-         r+r/E4sdorWGmIEu4ppieGKTxP2gUKOHJ+3ONrmz5g7cxjkF9N24MkxmVlKXuTgddA/X
-         5FPGEbtx2iGKqZIPNZzJyy9jqimaUntagmhENvhW/pYrHzcEh1vlpv4+aP75hsOz4LC9
-         lX2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX5RUGrO+Xzrjy0eNpbNP5w5IK119N5DtoWis7Rn5FBSob7cQ2rrQ6ppm9Tfg1rMXFjLFSK5gw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU+1npqc5tWhfZ4KpXHVZCM+OMr8JqukHksjVyDwmhB29l0llE
-	ROa+nWuEhuq60JLfygoMhXwcse9Sg2SQiR8+8uwt59t0Ni44+nEUNeICRaL/fDw=
-X-Gm-Gg: ASbGncuHZyps2SQu0l6a7ir1whyFQdAORutENNmlRjCu/YqmOHffNb+/Nu9CU1AlvJK
-	HIWMTCbFQKYNQ1CQ4ovuLSi3yG0WePFpvvmtkeewXJ3wsADkpBoWLq+DzIQjp3hdcO98znFc6Iw
-	ofz2fgs+RpaiWzap5AI3OTr82uWci9SZQZP7PkGsM0SnwfI7q/CnsVDIztEEShbJfU8ErGUaYHG
-	ABu6d+bHgUSZpYr32kaxQ/lSZTcTW+WGTc6MDdWUNldcMH5g7ScXLKLmO4Gw9LIF5R0pqEKWEJ8
-	Rv3i4MIm5e3v+MIuhzxYWELEBc2N
-X-Google-Smtp-Source: AGHT+IFGomLi5Ipkt+8OT5P1G3bBAg7wIkun5lGksQ0gdiVhfb5M5QtwAXoa1f4Mou/xTgQaSqfE0A==
-X-Received: by 2002:a05:6102:509f:b0:4b1:1b41:ff5f with SMTP id ada2fe7eead31-4b3d0da4c1bmr2728054137.1.1736353590365;
-        Wed, 08 Jan 2025 08:26:30 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b2bfa8d590sm8561846137.26.2025.01.08.08.26.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 08:26:28 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2025-01-08
-Date: Wed,  8 Jan 2025 11:26:27 -0500
-Message-ID: <20250108162627.1623760-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=system76.com header.i=@system76.com header.b="WAjvW3/u";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="obxn67lf"
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 308531140256;
+	Wed,  8 Jan 2025 12:01:37 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 08 Jan 2025 12:01:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=system76.com; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1736355697; x=1736442097; bh=LLm2s04Bi1ZJ64J2eSOlE
+	x9k31qBpNw8MKRxyj22X1M=; b=WAjvW3/utD49hQZdAOVgmYngs9mjWZJzdDVp/
+	q1jSGejNQD68wtNAuq19cLlNqFrdzty6m/7wAvf2lrznkyq6r3/BUpMZ0D2o4lwg
+	WQUM7R6zVG+4Xu5b2pHrDQm/SCC6rnllei5tVdSQpsfsr34zTSYBaAyX7vva4e0N
+	Ec6D8yQaFzeCEilRQJtHJ6pVOWlvnTCw5wRsK7To9Ii7ZvdidAJJFBPJQair0g9J
+	jZ7odB6yLshoM3j9xa5yYfMLF0F1M6grd2GpRR8/f7Daao4uLQdfU1AQLJGXvVkw
+	spbHs68nC0x1cRwFOGnWTLE92IFE/3i7icZqy34J7ZxLNK/5g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1736355697; x=1736442097; bh=LLm2s04Bi1ZJ64J2eSOlEx9k31qBpNw8MKR
+	xyj22X1M=; b=obxn67lf8BFjphqLYwhMNeeF/yIeY700kQXJPZYAAqC6CzZel0r
+	kNmxpKWHBDGo1N4mwXapqyaqytRO+7O9jozinTHViYfBzi21mhLF9X/AsCEbUB5a
+	Vsgq5Z44aJ2h7z7bWciERgPfIkdX2wBU6mHIzJs4CjtmfYfjBL8tEsD8zmb96331
+	nJx/IkHJY99paDveqPXsifv9Pck0eMiiQPh0cZLg8hkGEaBKedzQsHk9q20gyNnf
+	qwcSDPXn1B5nvy1VQ64hcd8OhiTfLuaR+maOtN1UHk8+Q57VWjdMvdVHR1mqNx0a
+	RIcAMCCYlBgp0RLznlGsIb51F1U1ZiS1+dA==
+X-ME-Sender: <xms:cK9-ZwmIMfuocmMLF08adAT07vPwKOT3n8yi9LgqMpnQfXqZcAcgLQ>
+    <xme:cK9-Z_0dkfJSxU9zZ9Y8xDqDtGigQ-M5cvnx1OxNNk24s_K9d8IWOCwXB86zc1Cbv
+    -uZmJ4vvbEPndiCBQ>
+X-ME-Received: <xmr:cK9-Z-pqV6uLimFYvz4MQbsUVv8uv9zf-omCGtGUKHIcOqI_Vtl8Aw3cTkZejeO1jOZlnYlMVCRvu2r0YshbSpMpxn9WkvSbBT3b>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeggedgleehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfh
+    rhhomhepvfhimhcuvehrrgiffhhorhguuceothgtrhgrfihfohhrugesshihshhtvghmje
+    eirdgtohhmqeenucggtffrrghtthgvrhhnpeekgfetfedviedvhffftdffgfeifffhteeg
+    uddukeeifeeuuedtleeftdevueehfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehttghrrgiffhhorhgusehshihsthgvmhejiedrtghomhdp
+    nhgspghrtghpthhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhinh
+    hugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehprhhoughutghtuggvvhesshihshhtvghmjeeirdgtohhmpdhrtghpthhtohepghgrrh
+    hrvghtthesshihshhtvghmjeeirdgtohhmpdhrtghpthhtohepthgtrhgrfihfohhruges
+    shihshhtvghmjeeirdgtohhm
+X-ME-Proxy: <xmx:cK9-Z8kt4j7PgGpLkX1UcIZWGTOCNETWzMzgYW6k3ydMAGTz3A15fQ>
+    <xmx:cK9-Z-3Y_7pu9zwk7NZgSEHYsu4hWu54UBhbAUlUAuJOFyODNKoPRw>
+    <xmx:cK9-ZzvnNn0Dpc9jTUGSBWnHrhWVSlG5_g7ptUmkRMXpFOnB8rGggg>
+    <xmx:cK9-Z6UHIWvbblu__hCKPfDUvnIyWnMoGCvGw3Y8r17hOrKExo2PpA>
+    <xmx:ca9-Z3khIiKe-Z27BrODQQQw46Eu4ESSQqik7WOwK6ufkk0a8W1FV7zk>
+Feedback-ID: i1761444e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 8 Jan 2025 12:01:36 -0500 (EST)
+From: Tim Crawford <tcrawford@system76.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: productdev@system76.com,
+	Garrett Wilke <garrett@system76.com>,
+	Tim Crawford <tcrawford@system76.com>
+Subject: [PATCH] Bluetooth: btusb: Add RTL8851BE device 13d3:3600
+Date: Wed,  8 Jan 2025 10:01:11 -0700
+Message-ID: <20250108170111.16824-1-tcrawford@system76.com>
 X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -72,40 +85,28 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit db78475ba0d3c66d430f7ded2388cc041078a542:
+From: Garrett Wilke <garrett@system76.com>
 
-  eth: gve: use appropriate helper to set xdp_features (2025-01-07 18:07:14 -0800)
+Signed-off-by: Garrett Wilke <garrett@system76.com>
+Signed-off-by: Tim Crawford <tcrawford@system76.com>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-are available in the Git repository at:
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ab0506148e84..71caf297aa70 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -483,6 +483,9 @@ static const struct usb_device_id quirks_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3549), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
++	/* Realtek 8851BE Bluetooth devices */
++	{ USB_DEVICE(0x13d3, 0x3600), .driver_info = BTUSB_REALTEK },
++
+ 	/* Realtek 8852AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+-- 
+2.47.1
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-01-08
-
-for you to fetch changes up to 67dba2c28fe0af7e25ea1aeade677162ed05310a:
-
-  Bluetooth: btmtk: Fix failed to send func ctrl for MediaTek devices. (2025-01-08 11:14:03 -0500)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - btmtk: Fix failed to send func ctrl for MediaTek devices.
- - hci_sync: Fix not setting Random Address when required
- - MGMT: Fix Add Device to responding before completing
- - btnxpuart: Fix driver sending truncated data
-
-----------------------------------------------------------------
-Chris Lu (1):
-      Bluetooth: btmtk: Fix failed to send func ctrl for MediaTek devices.
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_sync: Fix not setting Random Address when required
-      Bluetooth: MGMT: Fix Add Device to responding before completing
-
-Neeraj Sanjay Kale (1):
-      Bluetooth: btnxpuart: Fix driver sending truncated data
-
- drivers/bluetooth/btmtk.c     |  7 +++++++
- drivers/bluetooth/btnxpuart.c |  1 +
- net/bluetooth/hci_sync.c      | 11 ++++++-----
- net/bluetooth/mgmt.c          | 38 ++++++++++++++++++++++++++++++++++++--
- net/bluetooth/rfcomm/tty.c    |  4 ++--
- 5 files changed, 52 insertions(+), 9 deletions(-)
