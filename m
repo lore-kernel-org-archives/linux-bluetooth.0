@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D25221D9F;
-	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE22224AFC
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jan 2025 16:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736439398; cv=none; b=B8p2Sp7s1jeAJGznJZMJgD/xIDKKCP5LmJwACLbWHOMWOunFs9S/WsfENPpWUFHgBinMgNTVD0paw/UdHJqgHaHdcfF4Uh6FAkFob5i82/82+Butl3Wyc/QaDf+k1swfeOf0ScD8VKG1jsSsUfaSP3twsxKv2scA9ccuMRZgCh4=
+	t=1736439400; cv=none; b=e5jxnyQomvG1hrARcu2Unq2DrDA0QVFCpnorD3udp19fk9IzV9skHanegz3XVF5+Sw69qWZyQPnp4WCNBrs41MOaY/TOXv68fEovmnRb54MDBHcOGju7GoHDGs8WL7tXwoXSIIBymPS5Vec4YxJkHIqY6TGCB5f4ZSm9xvVCCkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736439398; c=relaxed/simple;
-	bh=IWttuhlwlQnX1EnSOFdjIOs03ZVqS9WprcVW6tKzbqc=;
+	s=arc-20240116; t=1736439400; c=relaxed/simple;
+	bh=VjEA4Ec4to+aazVoeIE0b7tsZmvFFPOShG3djaCtS4k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bpbrpk2w1LR1+9xdw6zD4Lnxgc3/LAOaH6jv4isOiUYmJa0/bmy6qU9L+ZU3C+urW+mLWuKj60UjX0SMedx81p41mGIy5LUoKbt9zYBAAbKOAvl3EGS0tLXwCwUsmd3AIS2b+LDiP6xuyN8KB4HCnrqHZK4q3Ww190o/RJaz+Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAvCBxtp; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=GylYUR+Qu/TGNSIj+99Oe2UZzJ4scmve6LLqXP6JOGQFJ+gu45ZrDQHOKLzbgdIDxTW6Pg1i4Ur1eM+BHwHBMJwzNVIKJSuW5ZyiEri7qDDbwLu+/rM7xSCiGZakH01ZaO9FTk+/BqpVkO9928ksFDhn79OfEe7CHC8PD+5NdMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+8u25jc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAvCBxtp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46BB3C4CED2;
-	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+8u25jc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C50DAC4CED2;
+	Thu,  9 Jan 2025 16:16:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736439398;
-	bh=IWttuhlwlQnX1EnSOFdjIOs03ZVqS9WprcVW6tKzbqc=;
+	s=k20201202; t=1736439399;
+	bh=VjEA4Ec4to+aazVoeIE0b7tsZmvFFPOShG3djaCtS4k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QAvCBxtpMEmCV8rfm31Hjt9C8Jv5CA0NcO3Fl7h9SMjoyokYwtwTp0R0yGYYQbfx3
-	 Nrb2Iv0MNZm3prceGAO4+BzqaI1Kh10aJqM2XbTA+grAcoWEcmlos9X3Y9B9Ne22VE
-	 j0UHhxsemVz7AXJtU4KxX7hFEuYsxxkn1QINhmy2JB4TBGlPtOexugIaLB87MjKdUT
-	 qlra4KvQP5Azy20UfM1wZ9I9kK7DOhBnsozsL66ntYk2q9pOXPJWUaA8k/ZuhsrpSD
-	 Mnb210XYWdqd85xETumxiWC83aLB7+2fjZML1h9D36NVIbFPJ8tRcUns86OCL2gf8f
-	 rs7DTXYSLSCww==
+	b=s+8u25jcF7585XmpwnbepDq7wU1JJ/V1sM594SO/IvN0qvuuHm2SN504ohv+vQoBu
+	 VhSEdgbo3A3tDMyMEeXGZ563mdajhxhVtZccKy5fNTozCYDFPvQ3yK7Uxk8KYabNRV
+	 yISH7p6Rsm6GCzujnklwDHobCYu9wv2dI7TFGJENKfeCOftMJ8i7giPQkdVtTYWLos
+	 Vu4t4Zyd7tW0lIC0BKHZP67VKTxMVuOPUghcbQafOEwitftVNzTZ7NpGQTf/k1KIeO
+	 SUAJ6RiSmBkrG0u2QRSdWVjZ1e2xl22nzXVqM+4eS7s3C7vwxioGQ4R+uQxnx8crp5
+	 JnsXuGatGHn7g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B95380A97D;
-	Thu,  9 Jan 2025 16:17:01 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE100380A97D;
+	Thu,  9 Jan 2025 16:17:02 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,44 +37,73 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in
- l2cap_sock_alloc
+Subject: Re: [PATCH] Bluetooth: btusb: Add MT7921e device 13d3:3576
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173643941974.1375203.8976214892409778601.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 16:16:59 +0000
-References: <20241217211959.279881-1-pchelkin@ispras.ru>
-In-Reply-To: <20241217211959.279881-1-pchelkin@ispras.ru>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: luiz.dentz@gmail.com, kuba@kernel.org, johan.hedberg@gmail.com,
- marcel@holtmann.org, ignat@cloudflare.com, kuniyu@amazon.com,
- edumazet@google.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- netdev@vger.kernel.org, stable@vger.kernel.org
+ <173643942124.1375203.6642647476579278683.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 16:17:01 +0000
+References: <20250108200140.29719-1-tcrawford@system76.com>
+In-Reply-To: <20250108200140.29719-1-tcrawford@system76.com>
+To: Tim Crawford <tcrawford@system76.com>
+Cc: linux-bluetooth@vger.kernel.org, productdev@system76.com,
+ garrett@system76.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 18 Dec 2024 00:19:59 +0300 you wrote:
-> A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
-> from l2cap_sock_new_connection_cb() and the error handling paths should
-> also be aware of it.
+On Wed,  8 Jan 2025 13:01:40 -0700 you wrote:
+> From: Garrett Wilke <garrett@system76.com>
 > 
-> Seemingly a more elegant solution would be to swap bt_sock_alloc() and
-> l2cap_chan_create() calls since they are not interdependent to that moment
-> but then l2cap_chan_create() adds the soon to be deallocated and still
-> dummy-initialized channel to the global list accessible by many L2CAP
-> paths. The channel would be removed from the list in short period of time
-> but be a bit more straight-forward here and just check for NULL instead of
-> changing the order of function calls.
+> The information in /sys/kernel/debug/usb/devices about the Bluetooth
+> device is listed as the below.
+> 
+> T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=13d3 ProdID=3576 Rev= 1.00
+> S:  Manufacturer=MediaTek Inc.
+> S:  Product=Wireless_Device
+> S:  SerialNumber=000000000
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a5d2ee08adc1
+  - Bluetooth: btusb: Add MT7921e device 13d3:3576
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2c925c3ae55b
 
 You are awesome, thank you!
 -- 
