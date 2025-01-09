@@ -1,77 +1,102 @@
-Received: from qs51p00im-qukt01071901.me.com (qs51p00im-qukt01071901.me.com [17.57.155.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EA819CC14
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jan 2025 06:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAF1215062;
+	Thu,  9 Jan 2025 07:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736404584; cv=none; b=ZVP1DRBQeWe+PSY7/Jhz+6oXWNMNi4JELAQCAluYiCsxB3sencB8OhIJa9omiEzfXrsQ6UNZHk8TUd+a1XdkEgDwINC00TV2lvTUEB9R+11KctI7nKEkwy0JsCMpjE9kxXEpN+k53aM8IUSmHF04w7bOWSd1XL/y5eU7aKY8slQ=
+	t=1736409272; cv=none; b=nbBd6d/koGlNijioC37CvkukhVD9sMAeYMnpO8zxPVROGC25yfYkP/SqqOmPPUJq2cIhFXsmNnVShhhEdV2VNAWnm27e8J4lo3iLIwmOWNxFx11mbgt+N2JKPAxbi7rBTr6jSdVoeJWO0eHerOele7ENFMczKJ8/2Vb3W/l2+dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736404584; c=relaxed/simple;
-	bh=Iviifxl9Ai3uMy0C3x/wc3DRdLl1gwTcV109Vxjwlzk=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=K9RwFFnoKASRobLQYK8roFx++v1DYBkgZtvaXgH4IdJlCVHU7lwLTcnsq6alXyGbP9aksaxdHgZS25Xdce4VN25XonQorq2k1yOb0Ov/xtC9PKIbXFO+9I/XAcwvjPNXuJLilX0l7otvxqOVkTrFuq/zICa3UCSnw5TiTKgrgtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=yRmhjLx1; arc=none smtp.client-ip=17.57.155.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1736409272; c=relaxed/simple;
+	bh=mmJmJ6JAz9YIssksstd+v3lMHGHxtGiOwH0/0URMdf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHkjTbcGTw97yo9gkLLo0OjQ3T0fJrYgBkVenI02dkRvooknKPau47Esru2+WV7QBxDh/pThvXbkPT+JIPfF7fZNi3Cpf9Iwwe+1CiYifrt8U4xMCQH8ADUxAWEvxcDY6haSTFl9mV8QBdsOJ/AjVeKS4KUMKtXMKIwFCEyB8kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=AW6NGAGu; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="yRmhjLx1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1736404582;
-	bh=DecwZB3rQj5tzRSiij8skl3A0AWQofuqeEUwolwApbA=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type:
-	 x-icloud-hme;
-	b=yRmhjLx11btnLMKOQoM7CQAVnnX+ZpR0jZ9NpBkSgoxQjdxmp6z7a2ktLy0AjsT4n
-	 6swfKLekaf9y2E3qWWyBuyOm1AU2cdjZIV/b/O9pKexPKtrUqC/RqMZCHoeYyd+lIT
-	 v4u0/z8co+bjR/POO6wxP28rrboZyGpCyePlmoD04MCHHPoat8gHR8s0gNL4wNtb5S
-	 YVOBiZb3dfH8KqmJ/LzHWm/KAGPwey5hVUc6ahetD3NkNZatwLmQkzicONjgqC+OcL
-	 d5I7rW+5l7u7v6f0eVllpfO+/ej3VYxdeSycDxOu245V3yjfKRupv4Agtkat/CISQ1
-	 VcdzZdQBxL6Jw==
-Received: from [192.168.86.109] (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01071901.me.com (Postfix) with ESMTPSA id 84BB7628012C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jan 2025 06:36:21 +0000 (UTC)
-Message-ID: <87589eb5-a6ae-4987-88e1-dc4bc67b085d@icloud.com>
-Date: Thu, 9 Jan 2025 01:36:20 -0500
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="AW6NGAGu"
+Received: from fpc (unknown [10.10.165.9])
+	by mail.ispras.ru (Postfix) with ESMTPSA id C5404518E771;
+	Thu,  9 Jan 2025 07:47:17 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru C5404518E771
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1736408837;
+	bh=Az+6jP8MDfErUyWOlmvn0SscA94IxS3v4GF6Z/31+20=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AW6NGAGu9rjGITuPyvR1LZvYTnvSU1nCyWseMYP4MeQUu2OigXCT/Bno6C3A15YdL
+	 Lj6LYwL8QK8claIPQMxIC81IRP8coEbswFzDw4z3KACbsQCd1yDn9iPIRQ0pO92Hnd
+	 SaaYFDBcTcG5k+ZyV8j9CJD9LtozMakLlP7TrnTg=
+Date: Thu, 9 Jan 2025 10:47:12 +0300
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in
+ l2cap_sock_alloc
+Message-ID: <20250109-fbd0cb9fa9036bc76ea9b003-pchelkin@ispras.ru>
+References: <20241217211959.279881-1-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Icedove Daily
-Content-Language: en-US
-From: Andrew Wong <wongandj@icloud.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: BUG: Undocumented "Enable" Config Variable
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: nhgKiaaJ8bw57sHvTkwWl4sqQIuZgoeq
-X-Proofpoint-GUID: nhgKiaaJ8bw57sHvTkwWl4sqQIuZgoeq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-09_02,2025-01-09_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
- suspectscore=0 clxscore=1011 malwarescore=0 phishscore=0 spamscore=0
- mlxlogscore=459 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2501090052
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241217211959.279881-1-pchelkin@ispras.ru>
 
-Hello,
+On Wed, 18. Dec 00:19, Fedor Pchelkin wrote:
+> A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
+> from l2cap_sock_new_connection_cb() and the error handling paths should
+> also be aware of it.
+> 
+> Seemingly a more elegant solution would be to swap bt_sock_alloc() and
+> l2cap_chan_create() calls since they are not interdependent to that moment
+> but then l2cap_chan_create() adds the soon to be deallocated and still
+> dummy-initialized channel to the global list accessible by many L2CAP
+> paths. The channel would be removed from the list in short period of time
+> but be a bit more straight-forward here and just check for NULL instead of
+> changing the order of function calls.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE static
+> analysis tool.
+> 
+> Fixes: 7c4f78cdb8e7 ("Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> ---
 
-I hope this is the right place for bug reports--I think I've found an 
-undocumented config option. I've been adding the line 
-"Enable=Control,Gateway,Headset,Media,Sink,Socket,Source" to my 
-/etc/Bluetooth/main.conf file as suggested by the Arch Wiki[1] in order 
-to get my Bluetooth headset* to work--and it indeed does as the wiki 
-described. However, in trying to find the provenance of this config 
-option, I've turned up nothing. I've tried grepping the source code of 
-the latest git, the version my system* uses, even the version from 
-around 2014, when the Wiki's cited Gentoo forums post was 
-made--unfortunately, it seems that I don't have the "developer 
-intuition" to figure it out. Could anyone advise?
+Urgh.. a bit confused about which tree the patch should go to - net or
+bluetooth.
 
-Andrew
+I've now noticed the Fixes commit went directly via net-next as part of a
+series (despite "Bluetooth: L2CAP:" patches usually go through bluetooth
+tree first). So what about this patch?
 
-*My system is the latest GNU Guix, with blueZ 5.72.
-
-[1] 
-https://wiki.archlinux.org/title/Bluetooth_headset#Connecting_works,_but_the_device_does_not_show_up_in_PulseAudio_sinks
-
+>  net/bluetooth/l2cap_sock.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 3d2553dcdb1b..49f97d4138ea 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1888,7 +1888,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+>  	chan = l2cap_chan_create();
+>  	if (!chan) {
+>  		sk_free(sk);
+> -		sock->sk = NULL;
+> +		if (sock)
+> +			sock->sk = NULL;
+>  		return NULL;
+>  	}
+>  
+> -- 
+> 2.39.5
+>
