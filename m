@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72CD224AF6
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jan 2025 16:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C65E224B1B;
+	Thu,  9 Jan 2025 16:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736439402; cv=none; b=I/j0wQrs4I6AP02LywWIMHkKYZ505q2kNEwiTyGA7cXXT095cSfjQp9vpbtOG53luc1TZ38k5mtATNCBKXcCpx5OOW4myOyaDOev1rd/BjvdKCFXLHkW77jfHq/2QN8Exr4nbrUcqOto1IL9W9hsPwOP4wKOvsMeMXhYJLSj7p4=
+	t=1736439404; cv=none; b=WT2cEIjVQTWK0D+csmxZDVMjc/Dojmj6X2PZvZWUflS9EIvC3IwVEXw1ck7FtXFzpQVonjiA4OIrnJLtD0aV6FaWxfWCRH3tMvxfIvRT/cyH9r8XYum+E3KcqMXpEkU7HpR1TLHY0dwDzzl+RjYerVDbFFjYvPHf4MedtGFwqDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736439402; c=relaxed/simple;
-	bh=JbIAz6PpeduGJqIcwW4ejAAg4Hxn8RhzSrtUNQb8zws=;
+	s=arc-20240116; t=1736439404; c=relaxed/simple;
+	bh=4hc2K5oa767CzV0XtDnimnCvFSAM18t5dEIktugozqs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uulKwksDb6BfnQVhx3Lc12wTDsiaylQbdfnRQK+5fbt6NTw1+JPrOdlOx2cMZQ2WdHgIqXz+HTUk3JhB1VeE1oplEGAF5nhXUadKeUG4NBevbXTblNTiMZCAzyVhoX3C4S2he8fLV++FlUCb3cnr9uXazGzaXD/FUBWmu+zP+sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/Nxy12Y; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=DdNxFwVspnoMx+OUaD9hc0kZaUTS5XCI8qkEx/YJlrxYNrMfqM5s0sX8IH+HquhCHXZYaq+GAXXtLGG6SVQ56967HbrXEGAW9eAvmkUfvNj1MFZOvKtqzK+HaIxOV+d3aRlr6nMWBepbDjs4jr6RaW1r4yEXewU/jY0mCPkBiBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZGz4Do37; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/Nxy12Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C6A0C4CED3;
-	Thu,  9 Jan 2025 16:16:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZGz4Do37"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D492C4CED6;
+	Thu,  9 Jan 2025 16:16:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736439401;
-	bh=JbIAz6PpeduGJqIcwW4ejAAg4Hxn8RhzSrtUNQb8zws=;
+	s=k20201202; t=1736439404;
+	bh=4hc2K5oa767CzV0XtDnimnCvFSAM18t5dEIktugozqs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B/Nxy12YX2YBHl+VtcFpHLx3yz6kvuNVd0fPyq6ecrBU0uY2I2MVjrkg2Dk1an5Xq
-	 2866sk23wMm2Iral1Z40MEm5ZUTZTWLqoAQ+Pmo2nvEPj04TFOnarxzpm0HpQtYO/Y
-	 hbtwTNiXDEKJ4t323JEeO+whMS6+pNeE8WtuS/xEZfZEnxQFO9oRILGE/9fSmtecGV
-	 aBrXcK0lLyJUCvDjR8xPzGTvtXRgn1gyDPJDyCszlug91mvXLRoH4GzBn7sRtDr/2/
-	 70T3JxusTnjEoVP5nm0x8UVLgRgz/0EygiXjHAaubQmPjRVxOUzyJhPhmwLYKQBboS
-	 QaVkPSiuejBjA==
+	b=ZGz4Do37L7YCYQjeK1kszKDs/uMMIzsxtaQqsrZDwKd2QXKFf5CbRfnQ9WrwzMY7e
+	 joYfZrk3P9SiAoCKzjvLqhYbbpYxmxpzgOyGSe3wxJ/VbUaoqKQwY/iYQvmt3J4IUs
+	 VXgYj3IljDhBOy9J4qhdkgS8z8KEZWoqD5otH56j7X7qH5WJND3mAvUyBC59/g2Ovg
+	 lvvO9NCG6dTNmRxbb5B/xrGsjEN3gSgsTjPbbKp8jfgTObNdBTzNT+csaVI2vBfQmT
+	 E7B4V1F1steXdJFeSgHekyTx8+kb3nH6Lu7y7IFFyNiVRpEpSIE2AOKkBH0InMZj1f
+	 3qlT/lkoo4Npw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E8B380A97D;
-	Thu,  9 Jan 2025 16:17:04 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFBA380A97D;
+	Thu,  9 Jan 2025 16:17:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,66 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add RTL8851BE device 13d3:3600
+Subject: Re: [PATCH] Bluetooth: btrtl: check for NULL in btrtl_setup_realtek()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173643942274.1375203.8928448996857563714.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 16:17:02 +0000
-References: <20250108182213.23326-1-tcrawford@system76.com>
-In-Reply-To: <20250108182213.23326-1-tcrawford@system76.com>
-To: Tim Crawford <tcrawford@system76.com>
-Cc: linux-bluetooth@vger.kernel.org, productdev@system76.com,
- garrett@system76.com
+ <173643942549.1375203.10645168595674308073.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 16:17:05 +0000
+References: <20241231065719.4840-1-max.chou@realtek.com>
+In-Reply-To: <20241231065719.4840-1-max.chou@realtek.com>
+To: Max Chou <max.chou@realtek.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ hildawu@realtek.com, alex_lu@realsil.com.cn
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  8 Jan 2025 11:22:13 -0700 you wrote:
-> From: Garrett Wilke <garrett@system76.com>
+On Tue, 31 Dec 2024 14:57:19 +0800 you wrote:
+> From: Max Chou <max.chou@realtek.com>
 > 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
+> If insert an USB dongle which chip is not maintained in ic_id_table, it
+> will hit the NULL point accessed. Add a null point check to avoid the
+> Kernel Oops.
 > 
-> T:  Bus=07 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3600 Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> S:  SerialNumber=00e04c000001
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> Fixes: b39910bb54d9 ("Bluetooth: Populate hci_set_hw_info for Intel and Realtek")
+> Reviewed-by: Alex Lu <alex_lu@realsil.com.cn>
+> Signed-off-by: Max Chou <max.chou@realtek.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btusb: Add RTL8851BE device 13d3:3600
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4801a84ea658
+  - Bluetooth: btrtl: check for NULL in btrtl_setup_realtek()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/402e07c75d07
 
 You are awesome, thank you!
 -- 
