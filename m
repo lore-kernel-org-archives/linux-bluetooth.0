@@ -1,123 +1,124 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EF8204C39
-	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jan 2025 21:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4CE1EBA0C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jan 2025 22:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736459369; cv=none; b=jT9T/HYNFNW1OhOGzPm+i7IcsXKrpE6qzkzOkwJt/kgaSNY00RpPTCJ0o5zR7dTKCYhFrYs/cesuuLYTnKq33/FL8RbdXj8rtb2RMbMvvmkTdsjgsYR5FxhHcImTAIO3/EFFmJTnTWqsARvxTyaIC9Lpj178P8J9p3QOL/yxppI=
+	t=1736460668; cv=none; b=nBTC5lUXAXnfvbgRrc9uekgz4YFy0jO5BN3EGVLV/dHmK9nPZUDIUO1M1wAM34JYUE8csCL8dSXCNQ1p1htAF0cfOj72RHUj/iED7whFW6OzN1uJ1UX5NvKBIJlasSEXHI0fyDGESiPo4PCirkDEVam7pUTqIQT2ix0TX83VKUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736459369; c=relaxed/simple;
-	bh=lzmIzp15rqpbqUvRfX4xeqxPtuZK0HAQPnNDbvBK+I0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=XLsgHiU01UMm/i9bR2kjKihdmOmn2Bw8hlHegbeDLQWGxY6d6UWIZiuYvo2jWRXySWf3vQX2vNQRz660ww8Vdp2g+W67qND+1CGtsejGGskdeAtvIcOxGUbNB1sUc3t834c9PbYfXuWufeHNZl5KvQBr0owvOBU1bSS6hTrwhak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FIHhGwPx; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1736460668; c=relaxed/simple;
+	bh=n2S3P40xzOwTXZP5jx7WocSkkbqS5Qaa9dkQZzHGt8k=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=UOW/XOCyZgY+1NQToPlhMEEa/GqB36LE5fGpep/kvUrNZBjAydej1xe28CTRjF/SidN1H2oYzO6erqZWF9ECl4sWigTuBkWbmlgYJNkmE/s9gX9nYMIkpXKnTEvzdG6l2oTfjp//39LCDFNPuPcLuAlp2Nr/ijBND7Q1MEZ4OTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCRwQl7i; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FIHhGwPx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736459368; x=1767995368;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=lzmIzp15rqpbqUvRfX4xeqxPtuZK0HAQPnNDbvBK+I0=;
-  b=FIHhGwPxzbN7gj8FpFk877wueI+VAhV7NHAPrOEEI0dz89bdaMKUf+Ds
-   fB/U+CV90fEfF8ZSPQK5jjIfbQVlYfYXBEn4Gq89KQQW5czrARMItv5AM
-   5IiiDSPNTLnGy/dRY9G9yMrBUwKKBbEFSFJH7GjcMU9HoG89VRC1K1cmM
-   SdWuLNL0G8w85DDWLYfQ+1bzVm8Tk0ATdqcpaeN14AVTNeWIYveoCBJXM
-   P7OzOjWj54Wi4c9FSlY3YsDP3BFmgdhVCDydyIo2hfesXHfbrj5OZwSq7
-   FLH5Qa3QvUjIkBAXmUW/DO5U7yaYVD8dGrRePMuZc7JllKTX2tU0vxoeg
-   A==;
-X-CSE-ConnectionGUID: HNxwfGDHQCCejdaF14u0Ig==
-X-CSE-MsgGUID: fuyXtVxtSAee0k6GwMCoFg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="40423011"
-X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
-   d="scan'208";a="40423011"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 13:49:28 -0800
-X-CSE-ConnectionGUID: n5wy8IETQm2eoaXz7hPvzw==
-X-CSE-MsgGUID: y9qK0aaCTwmDXhdXw/au6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
-   d="scan'208";a="103338833"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 09 Jan 2025 13:49:26 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tW0P5-000IAt-2g;
-	Thu, 09 Jan 2025 21:49:23 +0000
-Date: Fri, 10 Jan 2025 05:48:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Charles Han <hanchunchao@inspur.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [bluetooth-next:master 78/83] drivers/bluetooth/btbcm.c:557:24:
- error: returning 'int' from a function with return type 'const char *' makes
- pointer from integer without a cast
-Message-ID: <202501100509.YVUpfNCG-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCRwQl7i"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6df83fd01cbso6307226d6.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jan 2025 14:11:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736460665; x=1737065465; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UXrBJMSpDKuRx51Z4+tCQN+euECXlB9paD2GPS+1ihc=;
+        b=KCRwQl7iRB4T+LlX5TxIRKhdg/xqqm/ykI6nO9AedUkIr5vqrDtF5ojUpbf4xTXsbK
+         kS+NgDAXA3z+8HJ5WGNPUQCySNPXwuC3hOZNh8xrKdqDV+3RNYGJ/cwNbYFMEmy/1DXg
+         f3mVrMFnt3h5iWv6efVHgh+4wKy81n5qPSINYCk/6JeyIqdZvguoO18enzDxK4NGvbGf
+         86I6kl2q03wVKtDO0iklCZFMFOBut6SUgwT4muMxVszf1XxrvOlVDWph0w7i0uZV6ZnA
+         w7nlAFtRzBS4QiIWiO07vXcKbKJQclcA9YpRrTKQUvYP3LVn5cIJ54md4S2irO7aezgi
+         pqNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736460665; x=1737065465;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UXrBJMSpDKuRx51Z4+tCQN+euECXlB9paD2GPS+1ihc=;
+        b=HxXN6ztwe6oKO2UkknWKMAJ756VcdY4pGO2QQ/15hwn2VnYcuycnfggzJlY7Z2JSEK
+         xNXyOWdUGWRB6h9oi+GImaNy4GcHGYQl1j1mR6bOy2Lwx1TtNdve8t3i4qm7CmldpMSn
+         FL2zCn7o9jYLgMC2Ig6lNSOHW3I9zaAQfRYAPEiWqbInJ3nZkfA36dXi67nFrF+UWfIF
+         WvxQfE0NGmTOginR9hAWHDMH8QZQcwUemBB+jXK+U6hHxXXpnE8WtT2iu5U3Uj0iswV0
+         YOaGeTwLVT8xkKn344YkU1fazqUMWUDFJZJiXfaM6OHY1GVQQQ4iPuYQBIcN/1ymlsRT
+         ui0A==
+X-Gm-Message-State: AOJu0YxuYCDfDdmASbICfhzrLxF3tbjd+so2XPuTNXYDVvUYPW8p4iLV
+	pWtpfm9uDjLV286MjADuudwO4jBf75G/P3AHg6FhKzbzf12obNRN/uPL2g==
+X-Gm-Gg: ASbGnctImckAXlD2jcg5VkcATvbqn+nd7dTlAYwefuUDROyNeDypR2s8yT6LAuFNjcU
+	BK83yUYVWru5G8kF6Kx+eTWP6bcLCUn2AxX0U404BXHxmUMdgsSF2cd/auagqN/xrsufazDPieF
+	ebvDLQbtKbG52DnOD/7TTkP8Tqdr7cEPiN2qBSup93I2ibTcStFJvP4DR1uqvRwf1htRHl7d2S1
+	TRUsf5APRBw/NqsCk2T72r3RBRWqQf58joWBhk4oBRUjS0+fpvALg/M7xpt3dJt
+X-Google-Smtp-Source: AGHT+IGY4xYh+LhO17BcTjgqCSBZ6a7nWM3Bg8pMz62y81B0zhGjV3kgfDTtOXiHtt2wiYAJoeHVHA==
+X-Received: by 2002:a05:6214:dcb:b0:6da:dc79:a3c9 with SMTP id 6a1803df08f44-6df9b1d220amr153472236d6.9.1736460665235;
+        Thu, 09 Jan 2025 14:11:05 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.155.68])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfade8ac96sm2676896d6.114.2025.01.09.14.11.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 14:11:04 -0800 (PST)
+Message-ID: <67804978.050a0220.0733.1876@mx.google.com>
+Date: Thu, 09 Jan 2025 14:11:04 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3771187211160579142=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/2] build: Fix --disable-avrcp
+In-Reply-To: <20250109210500.2324501-1-luiz.dentz@gmail.com>
+References: <20250109210500.2324501-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-head:   a5d2ee08adc1d98647679c4e4c73223464d5d936
-commit: 52d2af10759262ab95162ddc1a56faa8fe3aabde [78/83] Bluetooth: btbcm: Fix NULL deref in btbcm_get_board_name()
-config: sparc-randconfig-001-20250110 (https://download.01.org/0day-ci/archive/20250110/202501100509.YVUpfNCG-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501100509.YVUpfNCG-lkp@intel.com/reproduce)
+--===============3771187211160579142==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501100509.YVUpfNCG-lkp@intel.com/
+This is automated email and please do not reply to this email!
 
-All errors (new ones prefixed by >>):
+Dear submitter,
 
-   drivers/bluetooth/btbcm.c: In function 'btbcm_get_board_name':
->> drivers/bluetooth/btbcm.c:557:24: error: returning 'int' from a function with return type 'const char *' makes pointer from integer without a cast [-Wint-conversion]
-     557 |                 return -ENOMEM;
-         |                        ^
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=923917
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.19 seconds
+GitLint                       PENDING   0.24 seconds
+BuildEll                      PASS      20.68 seconds
+BluezMake                     PASS      1674.84 seconds
+MakeCheck                     PASS      13.49 seconds
+MakeDistcheck                 PASS      160.75 seconds
+CheckValgrind                 PASS      216.12 seconds
+CheckSmatch                   PASS      273.86 seconds
+bluezmakeextell               PASS      100.11 seconds
+IncrementalBuild              PENDING   0.28 seconds
+ScanBuild                     PASS      853.30 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-vim +557 drivers/bluetooth/btbcm.c
 
-   536	
-   537	/*
-   538	 * This currently only looks up the device tree board appendix,
-   539	 * but can be expanded to other mechanisms.
-   540	 */
-   541	static const char *btbcm_get_board_name(struct device *dev)
-   542	{
-   543	#ifdef CONFIG_OF
-   544		struct device_node *root __free(device_node) = of_find_node_by_path("/");
-   545		char *board_type;
-   546		const char *tmp;
-   547	
-   548		if (!root)
-   549			return NULL;
-   550	
-   551		if (of_property_read_string_index(root, "compatible", 0, &tmp))
-   552			return NULL;
-   553	
-   554		/* get rid of any '/' in the compatible string */
-   555		board_type = devm_kstrdup(dev, tmp, GFP_KERNEL);
-   556		if (!board_type)
- > 557			return -ENOMEM;
-   558	
-   559		strreplace(board_type, '/', '-');
-   560	
-   561		return board_type;
-   562	#else
-   563		return NULL;
-   564	#endif
-   565	}
-   566	
+---
+Regards,
+Linux Bluetooth
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+--===============3771187211160579142==--
