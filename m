@@ -1,107 +1,124 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA33C1E507
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 06:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DB533987
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 08:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736492093; cv=none; b=NhpoNOGR38Uh6qE3NenDsZ7920uOfw/qhMzN6uUOcMfwW/aLaHooT/1UWuPgb4i8mc36RPus10CHLQBNBP7ZjRhh30G3AIFlvZuJD/xhJCydjE63wskfhrlKIY39/uUCIuJ86nyOB4nt/BGW7qHKe/chOytbVH+A2yv4EjlPNnw=
+	t=1736496528; cv=none; b=YDu7nvZWKrCbEh1EMyNen3v9FvGSeuRdi6h69THHgvTpZXjLvXANyI3btK9n81WWzFnLC/54K4SYbh3J5JUDtqNIdjG9oMY/O1DNyBQVfbf+pBv0wll+YIIbsY62QjaTZbmI/m1At3rEcMlANVJgPmJPsXf1YKcS/yvwof7zTj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736492093; c=relaxed/simple;
-	bh=+mR9PqnR4JalrXACEzMNXj+jGs5ccon2ffMEfWnkKHg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SvipkKQr+CZwhr5m84uMl+79DqGouwNJ7tjv2mLnjbRvnwe8Yv/2mVQbTZSjLtW42lO8fh8SfzQOvBEFGWbpU42i+pCtF5P3g4UxCHGg7AQ0HXTFpRVOlqyjszUitsOBXW/bIbSbo3TdEkl7Px68n6JOIv0BPYFkjJ7iJ6PmDlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=XO6b54Z3; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1736496528; c=relaxed/simple;
+	bh=93ey2kCHSGifZ6zGb0ISiofbQp0yhSy9asAU1th2S84=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Kgctrz59gGN0qGA1nEWh5lg8mFIG7EO5NM5IlneoaVgP0nM6imTXV8mXk38ehwNgtvEEttN83PAbh0GPzbKOo3eHXcQ8wYb8wltkJ6DjZXUJqNgFxy4hh8nSfwGt4m6MjqlrNyQRX/QHpQdsSw+7wl4Nd+d5UpWZN6LdRsCGdsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BmeYd85J; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XO6b54Z3"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50A1Va70023070
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 06:54:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=/U8+DP9qP/wjxxlo9MjxDs1JmrYUWTT1Ec0
-	jSy8z1n8=; b=XO6b54Z3EQeB9YqylqV79v26u8oFFy753mKFdZKAJ9qsD2Dodrt
-	0MMNJNQFbXpbCe8oaHXIHAzb6cWX62G2m3jb9Ymmlvqf/5YV5E4d8XqLwGH5VM0Z
-	bHtTcImKj/LDjPymgOmg8eTMwFoUgXWao8DJizMaONdlKYzwtyI124neypyCvV2+
-	VrmwZWXgjf62pnJyuvGU4cSbQktQgavAQrqMl2hfLs9u/RvE6s2H8rU6/7HYzQEL
-	Tgu+RJzvf9vm8eiV3pOFjKA0W8Ad44nXznPxBV+3s77bxowdObdMq0CtS/CSfcRP
-	6O7Y8Ehw+XTVh3Hc2jvpyUmh/5BFvzeC4BQ==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 442syc0n9h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 06:54:50 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 50A6slwr015325
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 06:54:47 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 43xx2m2mbq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 06:54:47 +0000
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 50A6slGx015320
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 06:54:47 GMT
-Received: from bt-iot-sh01-lnx.qualcomm.com ([10.253.136.182])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 50A6sluS015317
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 06:54:47 +0000
-Received: by bt-iot-sh01-lnx.qualcomm.com (Postfix, from userid 4467449)
-	id 4A19A245F2; Fri, 10 Jan 2025 14:54:46 +0800 (CST)
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: quic_shuaz@quicinc.com, quic_chejiang@quicinc.com,
-        quic_jiaymao@quicinc.com, quic_zijuhu@quicinc.com,
-        quic_mohamull@quicinc.com
-Subject: [PATCH v1] BNEP: Fix the BNEP Unknown Control Message in PTS testing:
-Date: Fri, 10 Jan 2025 14:54:44 +0800
-Message-Id: <20250110065444.3192525-1-quic_shuaz@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmeYd85J"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b6fc3e9e4aso144185485a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 00:08:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736496526; x=1737101326; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0fZ3RGKt/rkE3nrCclWOQBg0ww+XJSH5i1YeTbyO7IM=;
+        b=BmeYd85J9ZCOKS7UhWDrknUyjOWpiKMofb9QII7ve0dZEFDBxtn1Lle1ciyxDxIQ4v
+         y6wlv3Uz8HBdGpGoVN/rCUzU4+9X8800qw2GjSOyCnpw55utvD/AiZ7Ahg5QxrQbC0qp
+         40/oYj8/PSILMEZqNRIs+wXu8BluvDq+L5wQ9PpCV131hlXrjMI4znpn8hlsjmIZYhqQ
+         2hJoObQlhgkseXGahojlF5MCWxayqUaBOzzjV/iVYM+OGEat5asWm3cUEDnKRJjjestO
+         UfLcT8Zw3Lwg/DJffY0U1FsYFEwvbs6om6n01eS+kkufY9S4KrWJIHrwmjA55VKmZTYs
+         1Eng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736496526; x=1737101326;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0fZ3RGKt/rkE3nrCclWOQBg0ww+XJSH5i1YeTbyO7IM=;
+        b=AdWLxE8Hv1/l2Weg8t44ZI1Xap1ThUObvikGASFRh3mXFhNOtmcQjP+t2voCXG2OHC
+         5/NfMSiAMomx4SZSIwx7FDX+Czv8NvCl7PlAOR1OaypMn9C8hUjZNhNy95iHqvW+aE07
+         0e1iqTUWle+Cp1ePg+pkYpf3bC9eMDT/2Ekh2mIqPpFQMLXj35DhRNB+LT2jJYjndwpq
+         e/aRsb2ZMLjqeP/4Pjbo18cSBYI0LRzpDhSE2j6GvTmbcffi01VCLIPKnBnKO6nfFD7A
+         IDU2ZypDjUPFSMuSY9G2LB9uBdHKPJ7rhoW16woyiaVd4yu6ygT+FpRPpx/FlN+W8zx4
+         Fa5A==
+X-Gm-Message-State: AOJu0Yx1Sg6ohwuPT4kx/byf+yIdN9EU2U2fQhCLGRAj2IU68LmJFiMk
+	TtKMpMOP3s1f4kn0Dsq+EWoUrN7nzbD+L0I9KIYOLKDEeLjRk8iR0rYwPCC8
+X-Gm-Gg: ASbGncv17aDJYlUKentiYGHavVmvmBTDsjZbPoGfDaPO0RIJy58BJwFvIOS+mMAKylK
+	TlmL7QMQfZMbbrq/wWCdqnh6mPwoY/0uxGYDZ9dVvhtP0sYPJOmU87oMTvAV6kkaCM/NEocNZQ0
+	EaN7NY4bUo8TMltgfLS8Z/hFo3fQ/EWS4AYYv/0s/mFoXYHeS43Dgyibt6tn1onuUaNf6Yw+c+C
+	ncfNHOnMH2Me3idDll7jwbQMMqfiX6NO2ThO/Z/O8K+acFXaS7+Kbt8x3NVHoVO
+X-Google-Smtp-Source: AGHT+IFCTwgoPbr/NRlv1kFhdkVmKBIT9zlHHNNmo4OOdBhIPnyxfRtKOvVlycLIn4RmZa0uS0QUuA==
+X-Received: by 2002:a05:620a:2684:b0:7a9:a883:e22b with SMTP id af79cd13be357-7bcd96e5806mr1548805385a.7.1736496525649;
+        Fri, 10 Jan 2025 00:08:45 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.229.85])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce3248304sm150438685a.31.2025.01.10.00.08.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 00:08:45 -0800 (PST)
+Message-ID: <6780d58d.050a0220.a6314.67c0@mx.google.com>
+Date: Fri, 10 Jan 2025 00:08:45 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2022935190767534721=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Ok47NWZttlcS-AX7BpcukomNxg6dBQ_V
-X-Proofpoint-ORIG-GUID: Ok47NWZttlcS-AX7BpcukomNxg6dBQ_V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=262
- malwarescore=0 phishscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- clxscore=1015 mlxscore=0 suspectscore=0 priorityscore=1501 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501100055
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
+Subject: RE: [v1] BNEP: Fix the BNEP Unknown Control Message in PTS testing:
+In-Reply-To: <20250110065444.3192525-1-quic_shuaz@quicinc.com>
+References: <20250110065444.3192525-1-quic_shuaz@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This change is required for passing below PTS testcase:
-1. BNEP/CTRL/BV-01-C
+--===============2022935190767534721==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix the flag judgment issue, it should check type
-instead of ctrl.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=924035
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.21 seconds
+BuildEll                      PASS      20.60 seconds
+BluezMake                     PASS      1480.81 seconds
+MakeCheck                     PASS      13.08 seconds
+MakeDistcheck                 PASS      158.69 seconds
+CheckValgrind                 PASS      214.87 seconds
+CheckSmatch                   PASS      271.32 seconds
+bluezmakeextell               PASS      97.94 seconds
+IncrementalBuild              PENDING   0.33 seconds
+ScanBuild                     PASS      872.10 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- profiles/network/server.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 36a1136f6..ad2cd55bd 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -336,7 +336,7 @@ static gboolean bnep_setup(GIOChannel *chan,
- 		 * This packet reply to any control message received,
- 		 * which contains an unknown BNEP control type value.
- 		 */
--		if (req->ctrl == BNEP_CONTROL)
-+		if (req->type == BNEP_CONTROL)
- 			bnep_send_unkown_rsp(sk, req->ctrl);
- 
- 		error("To few setup connection request data received");
--- 
-2.25.1
 
+--===============2022935190767534721==--
