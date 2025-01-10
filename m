@@ -1,141 +1,142 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC56212D6B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 16:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6330212D7F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 16:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736525422; cv=none; b=dfK6+Cf0LzCRMaIDLTSIU1TuQDbTtghCseYeqOn1ucX05Ttsgn31/e9MeFIgB0rXwQ0DewQt9DsYfI2L3f3ICZjEbqEtZGoo7TMJME0evFhoCWUoCTybwE+ziTZY6kiqgqHEa6t8E2K7PElFa7vj+QDerbHOtPITIBSs2+B3XgE=
+	t=1736525670; cv=none; b=sT+CJkthTO37CA5AXvcv2cuQIiZhVXpocce5EBZWIgHoHEpnk8d1p64oe2nY2+nH7tAjMsCa0sC+s2D86IXjioc+SU5qNTAl7NPdG+0wpUQMxQ4oe4wT5lQ6fHhehdnuFW118LHNRlwOSGZsxClnnOWd67R9M8WeSbjiZJ/k6XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736525422; c=relaxed/simple;
-	bh=bszQNVC0kSqrONmv/8JjXNcWb1kHeIESva3CnBu8VOc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=u5uTU6K0q2EcSp96EDg6jpXdEdm6v2tBZoee95Xhg1nliEmehdkm0GfVOr0hnxqKREk7uigJgkuTeJS6ekapkGMMFPl798RVsQkNM0RJZKQSxictHW1Fkz+swERFbFe3wQYTV6LlMVMF1wVHXmu2JZzROmxdvg6Xd9AaCclGyVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QJA6EJVk; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736525670; c=relaxed/simple;
+	bh=QP3IS2vYlWKkUdFKHkINl8SZ8pXF87dtsTstAIZ4O9w=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GyFsADQOES2eoM3eB0lnQW8Z+pLDoG/gsWhSP7K44+bItQSrdKFHiuheb6Vx5ArwZMeGlH5cFgEkME9h3UryFM1X1RLPWc9e7yWDMaXHB0176rYl/dZhCWZQRCHj34JYoAp9MgQ3kDH+odDOyx5+i4ZY6P8y29eUe1OP1BV/6UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FyBvbZud; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJA6EJVk"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b6ed9ed5b9so294152185a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 08:10:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736525419; x=1737130219; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7J3U3INayL9D0Cj4Qh1YSprC25NP/tYyM7h6OyqENRM=;
-        b=QJA6EJVk2uUbggHAcDe2xrqvLETKzMCYPQgnUPWPzVFOwubr5+80O2qtkPgXdYB+lB
-         gLLMOvf6yPEY7JOs4owNzgSNsIGQOxdDfN2Fwx2IllGtPGxVqIOhRVQVIxVCNRqkLw4i
-         3DU395ZmaPTPDEfdZskl3FSQ1PIOSygAZAnsfI3+NmL0cvXHPnlZmHdCFDmCd4aGv5ST
-         kwhqJuxFBGlWTSbbFB9r8qemnsMckzbFpovb3xybiQt+mR9zDHRF7NuI917jJHpdXFEU
-         f+tTC7a1iJCuobycJYMBgLlQKzQQ8CxTrHJX7YN/Y90RALP5p8JscywqMscULHEdO2QI
-         ogPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736525419; x=1737130219;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7J3U3INayL9D0Cj4Qh1YSprC25NP/tYyM7h6OyqENRM=;
-        b=w8wwXEgYWtLZJ+gdWBKkuJMq7plu9KRXgZM+FYRQ/Wc+mr1oD9Zdh3+SWyggAY/Go3
-         GF1BBrSm/x4heT+jwEqDUoog3VZ56yYM6P8AmJCeAPQlunY76zMLf6cchU28WXfOInGz
-         lgz27NOHCOxbjvbqPmYfpdDxF4QdRaUli6Ym2ED5boBg0AuwP8ZrPd3DojLtr4gOruwF
-         Jb8RQXOv3Shj1ZAB8qMD0cnYHSyKDA72G81sEAuOGlpTV4X2b8zxOScuioIV+x7QNPUK
-         wFZlA8CnSwpjUi7RJA5X9BnpBPVGiElAA0dV++lEVzIr0G5SwN9e3wMZbCv1EBKeCrJP
-         H9sA==
-X-Gm-Message-State: AOJu0Yydp4p84lggWcCa53hJzx6goDm4jEqbE/WK7ZoE9sgW8+2SpFSY
-	3OwIjZcISmukyqxbS2GtlSG+cHMQJp7nGNlnuxDaDNVNssI/IHyuVV2rCXNX
-X-Gm-Gg: ASbGncuqAbJGaw/Z+mGHU1OLriUjQ1p5VflJVW3o1v6kjn38rZFj2g6Kqpz3KfFNtTc
-	HbJxZsKA684Jq0GC+1M0uoCeCVkhN79tdKuB9T4F3mGTkRrjTw4BbrgHYpo0SjwJUNMueSzE5O6
-	/ROj4j7xOdwIng7CMPYBjie1phAJqs9IxOSOwQ4ckRPbXT4IsPwnqg8GkVLu5aYZ/tG9D6m8dsM
-	VXCtQlLeAjXxFy6KaycwRQadIY6CDGviSgCLfGITH9r1OZPu1GA+oVhL1wGcH4v
-X-Google-Smtp-Source: AGHT+IF+usdEwwlJ7ah7JYbt0GoyNNwKBbpXcK0SRl/ZBiq1C0dAAogjzSqslIhqB5KjlZl1RKafgA==
-X-Received: by 2002:a05:620a:25cf:b0:7b6:e931:4608 with SMTP id af79cd13be357-7bcd9729aa8mr1794323485a.6.1736525419361;
-        Fri, 10 Jan 2025 08:10:19 -0800 (PST)
-Received: from [172.17.0.2] ([172.210.84.224])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfad880dffsm10546196d6.38.2025.01.10.08.10.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 08:10:18 -0800 (PST)
-Message-ID: <6781466a.0c0a0220.1542b6.5241@mx.google.com>
-Date: Fri, 10 Jan 2025 08:10:18 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1251607018995854082=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FyBvbZud"
+Received: from github.com (hubbernetes-node-c43a1b9.ash1-iad.github.net [10.56.150.23])
+	by smtp.github.com (Postfix) with ESMTPA id B48AD9210D7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 08:14:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1736525667;
+	bh=gu1wdIxrLjezj84rEezYOTo4EgfJSb6PfXRrMmRA1+A=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FyBvbZud1I9j7PDPP3PZmi7K+CqwOcl6UjufNnglKCbH44FR4an3flpWUJG2AMgrL
+	 cfwXAPunk4iErKyv+M01AOeXanpBUus6g0i9NlYM38CM0ZZcD936Zl7TvQrDIthegi
+	 C1Mfq/mJXkIUPeL1Tznr6AWS2Zu5G0dEOgFp6B24=
+Date: Fri, 10 Jan 2025 08:14:27 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/036041-2762df@github.com>
+Subject: [bluez/bluez] 1e1c31: build: Fix --disable-avrcp
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, michal.dzik@streamunlimited.com
-Subject: RE: connect VCP profile to MediaTransport volume
-In-Reply-To: <20250110145019.2380299-2-michal.dzik@streamunlimited.com>
-References: <20250110145019.2380299-2-michal.dzik@streamunlimited.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============1251607018995854082==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 1e1c311243b190586b5a7ee93bec711b163de7de
+      https://github.com/bluez/bluez/commit/1e1c311243b190586b5a7ee93bec711b163de7de
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-01-09 (Thu, 09 Jan 2025)
 
-Dear submitter,
+  Changed paths:
+    M Makefile.plugins
+    M configure.ac
+    M profiles/audio/media.c
+    M profiles/audio/transport.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=924286
+  Log Message:
+  -----------
+  build: Fix --disable-avrcp
 
----Test result---
+This fixes --disable-avrcp causing build errors.
 
-Test Summary:
-CheckPatch                    PENDING   0.23 seconds
-GitLint                       PENDING   0.25 seconds
-BuildEll                      PASS      21.20 seconds
-BluezMake                     PASS      1621.39 seconds
-MakeCheck                     PASS      13.70 seconds
-MakeDistcheck                 FAIL      52.21 seconds
-CheckValgrind                 PASS      218.94 seconds
-CheckSmatch                   PASS      277.22 seconds
-bluezmakeextell               PASS      106.74 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      884.10 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-Package cups was not found in the pkg-config search path.
-Perhaps you should add the directory containing `cups.pc'
-to the PKG_CONFIG_PATH environment variable
-No package 'cups' found
-../../profiles/audio/vcp.c:54:10: fatal error: vcp.h: No such file or directory
-   54 | #include "vcp.h"
-      |          ^~~~~~~
-compilation terminated.
-make[2]: *** [Makefile:10727: profiles/audio/bluetoothd-vcp.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [Makefile:4693: all] Error 2
-make: *** [Makefile:12265: distcheck] Error 1
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Fixes: https://github.com/bluez/bluez/issues/1061
 
 
+  Commit: 4f288bd961fcda569875e335406386e571327b20
+      https://github.com/bluez/bluez/commit/4f288bd961fcda569875e335406386e571327b20
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-01-09 (Thu, 09 Jan 2025)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M configure.ac
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  build: Fix --disable-a2dp
+
+This fixes --disable-a2dp causing build errors:
+
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_snk_init':
+/bluez/profiles/audio/transport.c:1742:(.text.transport_a2dp_snk_init+0x49): undefined reference to `source_add_state_cb'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_destroy':
+/bluez/profiles/audio/transport.c:1578:(.text.transport_a2dp_src_destroy+0x14): undefined reference to `avdtp_unref'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_src_destroy':
+/bluez/profiles/audio/transport.c:1588:(.text.transport_a2dp_src_destroy+0x29): undefined reference to `sink_remove_state_cb'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_get_stream':
+/bluez/profiles/audio/transport.c:397:(.text.transport_a2dp_get_stream+0x1a): undefined reference to `a2dp_sep_get_stream'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_cancel':
+/bluez/profiles/audio/transport.c:586:(.text.transport_a2dp_cancel+0xc): undefined reference to `a2dp_cancel'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_remove_owner':
+/bluez/profiles/audio/transport.c:602:(.text.transport_a2dp_remove_owner+0x34): undefined reference to `a2dp_cancel'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_src_init':
+/bluez/profiles/audio/transport.c:1725:(.text.transport_a2dp_src_init+0x49): undefined reference to `sink_add_state_cb'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_destroy':
+/bluez/profiles/audio/transport.c:1578:(.text.transport_a2dp_snk_destroy+0x14): undefined reference to `avdtp_unref'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_snk_destroy':
+/bluez/profiles/audio/transport.c:1598:(.text.transport_a2dp_snk_destroy+0x29): undefined reference to `source_remove_state_cb'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_suspend':
+/bluez/profiles/audio/transport.c:438:(.text.transport_a2dp_suspend+0x79): undefined reference to `a2dp_sep_unlock'
+/usr/bin/ld: /bluez/profiles/audio/transport.c:433:(.text.transport_a2dp_suspend+0x5a): undefined reference to `a2dp_suspend'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `a2dp_suspend_complete':
+/bluez/profiles/audio/transport.c:415:(.text.a2dp_suspend_complete+0x47): undefined reference to `a2dp_sep_unlock'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_resume':
+/bluez/profiles/audio/transport.c:555:(.text.transport_a2dp_resume+0x4d): undefined reference to `a2dp_sep_lock'
+/usr/bin/ld: /bluez/profiles/audio/transport.c:550:(.text.transport_a2dp_resume+0x76): undefined reference to `a2dp_resume'
+/usr/bin/ld: /bluez/profiles/audio/transport.c:558:(.text.transport_a2dp_resume+0xa2): undefined reference to `a2dp_resume'
+/usr/bin/ld: /bluez/profiles/audio/transport.c:544:(.text.transport_a2dp_resume+0xd5): undefined reference to `a2dp_avdtp_get'
+/usr/bin/ld: /bluez/profiles/audio/transport.c:561:(.text.transport_a2dp_resume+0xf8): undefined reference to `a2dp_sep_unlock'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_get_stream':
+/bluez/profiles/audio/transport.c:397:(.text.a2dp_resume_complete+0x82): undefined reference to `a2dp_sep_get_stream'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `a2dp_resume_complete':
+/bluez/profiles/audio/transport.c:508:(.text.a2dp_resume_complete+0xcc): undefined reference to `avdtp_stream_get_transport'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_a2dp_snk_set_delay':
+/bluez/profiles/audio/transport.c:659:(.text.transport_a2dp_snk_set_delay+0x95): undefined reference to `a2dp_avdtp_get'
+/usr/bin/ld: /bluez/profiles/audio/transport.c:676:(.text.transport_a2dp_snk_set_delay+0x52): undefined reference to `avdtp_delay_report'
+/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `delay_reporting_exists':
+/bluez/profiles/audio/transport.c:1000:(.text.delay_reporting_exists+0x19): undefined reference to `avdtp_stream_has_delay_reporting'
+collect2: error: ld returned 1 exit status
+make[1]: *** [Makefile:6378: src/bluetoothd] Error 1
+make: *** [Makefile:4696: all] Error 2
 
 
---===============1251607018995854082==--
+  Commit: 2762dffb062e7c73e94f9655b36ad9c078aebd29
+      https://github.com/bluez/bluez/commit/2762dffb062e7c73e94f9655b36ad9c078aebd29
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-01-10 (Fri, 10 Jan 2025)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  audio/transport: Make include of avrcp.h conditional
+
+This makes the include of avrcp.h conditional to HAVE_AVRCP.
+
+
+Compare: https://github.com/bluez/bluez/compare/036041136f10...2762dffb062e
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
