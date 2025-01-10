@@ -1,179 +1,141 @@
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DFD2063E3
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 15:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC56212D6B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 16:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736524299; cv=none; b=oXEOn8DQqFc6+iWT6dRBsu/jUKBV+x669a3igabwWyWClntfQf7xpjsxfsgB4ZX6m/gJnHL2dQevCcTSt/TEvYca0XEe2vO4bhm/X7vQNCK1hSviWaVqrsr1x5HPciZDy4e/Bx8l+m3odYBwkMevzR+bw7ed/budt5QlnkZOilg=
+	t=1736525422; cv=none; b=dfK6+Cf0LzCRMaIDLTSIU1TuQDbTtghCseYeqOn1ucX05Ttsgn31/e9MeFIgB0rXwQ0DewQt9DsYfI2L3f3ICZjEbqEtZGoo7TMJME0evFhoCWUoCTybwE+ziTZY6kiqgqHEa6t8E2K7PElFa7vj+QDerbHOtPITIBSs2+B3XgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736524299; c=relaxed/simple;
-	bh=5OQR+EX0KhVwFV0HzlJFKWmVijB6WNp4k4IlXD9owLI=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Hc2T6k1gM2gN4I5e80dNC4NuIbAcrLYXNGOhhMRDH2AZ5uRC9me5j7SitjqIQ6VnfS/XerU5O+9iXDXDtSpKlkE9Mm3WPA1j2eu45/T9+U3b6rrCpV7KHnMTtBgHsO0tXe9faJ75gR3yX8OvvZO/2/0Q9g8NS960SqmkpPpo7Fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j1HGkKG+; arc=none smtp.client-ip=209.85.221.170
+	s=arc-20240116; t=1736525422; c=relaxed/simple;
+	bh=bszQNVC0kSqrONmv/8JjXNcWb1kHeIESva3CnBu8VOc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=u5uTU6K0q2EcSp96EDg6jpXdEdm6v2tBZoee95Xhg1nliEmehdkm0GfVOr0hnxqKREk7uigJgkuTeJS6ekapkGMMFPl798RVsQkNM0RJZKQSxictHW1Fkz+swERFbFe3wQYTV6LlMVMF1wVHXmu2JZzROmxdvg6Xd9AaCclGyVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QJA6EJVk; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j1HGkKG+"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-518c46cc6e4so644288e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 07:51:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJA6EJVk"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b6ed9ed5b9so294152185a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 08:10:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736524295; x=1737129095; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0AWKmm6xf7TFu+ToPDoIQVCEShJ7ZzVdTIXVA1sA5QU=;
-        b=j1HGkKG+fIJNxmgMI+rrNa7+PQ5XWwFEyGfY07kJ3MRiju0tKI3RPQtWteTCpUWUf+
-         ru3Ozj8NC9d12XIJXpWhL5bT+vhJHaUfyaAmbj9n5BnnXMWlbH+YrxzmtTTgG8puHY6n
-         H2gww9FEVjnDSG0O4KD6PmrJ7M+C3KAJCyAgrTvdJG72DqBG2Wh6M3/ep1rCOBnn+ofh
-         o5uMqOJYda9ZWK4veeirdbMjFul8rr+SmMVCFNpqA7NocJgviRux8p1ir6QxCIFyJ6GW
-         BOg+lULKbRLjkgWmjwlSK7oA/H/wnhK+6nzUNLlDNU83uS6+UAJSrAd+U6+aCKDVV/3c
-         ow1A==
+        d=gmail.com; s=20230601; t=1736525419; x=1737130219; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7J3U3INayL9D0Cj4Qh1YSprC25NP/tYyM7h6OyqENRM=;
+        b=QJA6EJVk2uUbggHAcDe2xrqvLETKzMCYPQgnUPWPzVFOwubr5+80O2qtkPgXdYB+lB
+         gLLMOvf6yPEY7JOs4owNzgSNsIGQOxdDfN2Fwx2IllGtPGxVqIOhRVQVIxVCNRqkLw4i
+         3DU395ZmaPTPDEfdZskl3FSQ1PIOSygAZAnsfI3+NmL0cvXHPnlZmHdCFDmCd4aGv5ST
+         kwhqJuxFBGlWTSbbFB9r8qemnsMckzbFpovb3xybiQt+mR9zDHRF7NuI917jJHpdXFEU
+         f+tTC7a1iJCuobycJYMBgLlQKzQQ8CxTrHJX7YN/Y90RALP5p8JscywqMscULHEdO2QI
+         ogPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736524296; x=1737129096;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0AWKmm6xf7TFu+ToPDoIQVCEShJ7ZzVdTIXVA1sA5QU=;
-        b=Z7ycHI45Qu/r/+VkZAf0IaPaC6xWki0L3eY1sVI1X6Ydiq7BUQ2cV/sq4Db6TgKP3M
-         C8rBpHGlDu7oeVb88SSpCI08ugRSx9wfAC/c1HBwZTGwD7c+VITtHLpzJ/8tIsYLrCf4
-         wlL00WjAShI1HblkVvFE7+4BJiJTbqnhKgZzMmFUIhYZCjl5EXuEsHv4JVc57Sg4LIWg
-         jGxQrWE4QEk3cM6iGyQiZuEpyeeIXgpRCMIa/fax8fCwWWZu5aiwseECPcwJl9YogmO9
-         +mr4dGPbxUalso2RhW68Y/g7dF7y3l3u/Lw9ikRmQkQDKUXEwm9Y+B7qiPRBUxIxA+hK
-         +A7w==
-X-Gm-Message-State: AOJu0YyYl9gofSfoJZU3B+VMB17/O4O4CORptjsSjBvwCVM1JKdUfpQf
-	Om/SxdJgt0y1l718uqQkVJc1G0aj2JkvzxsdhDFsZyIIzvRcosws+zeQRpfL
-X-Gm-Gg: ASbGncstNMAjb2DUl8aFBaoAHk5eelqAYWhTWLCIrG6ryn/B8nXeqy5mWdnvD/6YEJD
-	NSunANZkx8SCELAsqa63mxOXYsrOsEz1oiBTW74YPV9dBXOHDU6tQxa7mJHFTxOdO5CJDXF8xeA
-	VAh+TYsmjTxbO5QbmZ+cKEjUQr0Lb+vqlIgNAiVXX+zJk0kHU5MGZagqiCsFGTUfJX5DpqkEiaH
-	+AmiKdTwIQHcN516ModxpZanEnDOEVyQDV2VAmMAoPlXR72/ne+imaYZ7FhPt2COhg8AchQyecP
-	xtPW+bl4+8p8xvoDozVPye3CO9bm
-X-Google-Smtp-Source: AGHT+IHfJOxwNKjiSuxBcqi7iDwOqSKagNVKkHDIr+2hYMmBaMRhvTEyerzL3eKpPiw14+l76QYfQg==
-X-Received: by 2002:a05:6122:50b:b0:518:773b:39f with SMTP id 71dfb90a1353d-51c6c46d0dbmr9658878e0c.4.1736524295586;
-        Fri, 10 Jan 2025 07:51:35 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-51c7fd03b23sm2273811e0c.40.2025.01.10.07.51.34
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1736525419; x=1737130219;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7J3U3INayL9D0Cj4Qh1YSprC25NP/tYyM7h6OyqENRM=;
+        b=w8wwXEgYWtLZJ+gdWBKkuJMq7plu9KRXgZM+FYRQ/Wc+mr1oD9Zdh3+SWyggAY/Go3
+         GF1BBrSm/x4heT+jwEqDUoog3VZ56yYM6P8AmJCeAPQlunY76zMLf6cchU28WXfOInGz
+         lgz27NOHCOxbjvbqPmYfpdDxF4QdRaUli6Ym2ED5boBg0AuwP8ZrPd3DojLtr4gOruwF
+         Jb8RQXOv3Shj1ZAB8qMD0cnYHSyKDA72G81sEAuOGlpTV4X2b8zxOScuioIV+x7QNPUK
+         wFZlA8CnSwpjUi7RJA5X9BnpBPVGiElAA0dV++lEVzIr0G5SwN9e3wMZbCv1EBKeCrJP
+         H9sA==
+X-Gm-Message-State: AOJu0Yydp4p84lggWcCa53hJzx6goDm4jEqbE/WK7ZoE9sgW8+2SpFSY
+	3OwIjZcISmukyqxbS2GtlSG+cHMQJp7nGNlnuxDaDNVNssI/IHyuVV2rCXNX
+X-Gm-Gg: ASbGncuqAbJGaw/Z+mGHU1OLriUjQ1p5VflJVW3o1v6kjn38rZFj2g6Kqpz3KfFNtTc
+	HbJxZsKA684Jq0GC+1M0uoCeCVkhN79tdKuB9T4F3mGTkRrjTw4BbrgHYpo0SjwJUNMueSzE5O6
+	/ROj4j7xOdwIng7CMPYBjie1phAJqs9IxOSOwQ4ckRPbXT4IsPwnqg8GkVLu5aYZ/tG9D6m8dsM
+	VXCtQlLeAjXxFy6KaycwRQadIY6CDGviSgCLfGITH9r1OZPu1GA+oVhL1wGcH4v
+X-Google-Smtp-Source: AGHT+IF+usdEwwlJ7ah7JYbt0GoyNNwKBbpXcK0SRl/ZBiq1C0dAAogjzSqslIhqB5KjlZl1RKafgA==
+X-Received: by 2002:a05:620a:25cf:b0:7b6:e931:4608 with SMTP id af79cd13be357-7bcd9729aa8mr1794323485a.6.1736525419361;
+        Fri, 10 Jan 2025 08:10:19 -0800 (PST)
+Received: from [172.17.0.2] ([172.210.84.224])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfad880dffsm10546196d6.38.2025.01.10.08.10.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 07:51:34 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] build: Fix --disable-asha
-Date: Fri, 10 Jan 2025 10:51:32 -0500
-Message-ID: <20250110155132.2647060-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.1
+        Fri, 10 Jan 2025 08:10:18 -0800 (PST)
+Message-ID: <6781466a.0c0a0220.1542b6.5241@mx.google.com>
+Date: Fri, 10 Jan 2025 08:10:18 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1251607018995854082=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, michal.dzik@streamunlimited.com
+Subject: RE: connect VCP profile to MediaTransport volume
+In-Reply-To: <20250110145019.2380299-2-michal.dzik@streamunlimited.com>
+References: <20250110145019.2380299-2-michal.dzik@streamunlimited.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1251607018995854082==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This fixes --disable-asha causing build errors:
+This is automated email and please do not reply to this email!
 
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_asha_set_volume':
-/bluez/profiles/audio/transport.c:2362:(.text.transport_asha_set_volume+0x2f): undefined reference to `bt_asha_device_set_volume'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_asha_get_volume':
-/bluez/profiles/audio/transport.c:2345:(.text.transport_asha_get_volume+0x9): undefined reference to `bt_asha_device_get_volume'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `get_asha_delay':
-/bluez/profiles/audio/transport.c:1566:(.text.get_asha_delay+0xd): undefined reference to `bt_asha_device_get_render_delay'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `asha_transport_sync_state':
-/bluez/profiles/audio/transport.c:2216:(.text.asha_transport_sync_state+0x8): undefined reference to `bt_asha_device_get_state'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `asha_transport_state_cb':
-/bluez/profiles/audio/transport.c:2245:(.text.asha_transport_state_cb+0x1d): undefined reference to `bt_asha_device_get_state'
-/usr/bin/ld: /bluez/profiles/audio/transport.c:2252:(.text.asha_transport_state_cb+0x94): undefined reference to `bt_asha_device_get_fd'
-/usr/bin/ld: /bluez/profiles/audio/transport.c:2253:(.text.asha_transport_state_cb+0xa0): undefined reference to `bt_asha_device_get_imtu'
-/usr/bin/ld: /bluez/profiles/audio/transport.c:2254:(.text.asha_transport_state_cb+0xad): undefined reference to `bt_asha_device_get_omtu'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_asha_resume':
-/bluez/profiles/audio/transport.c:2290:(.text.transport_asha_resume+0x19): undefined reference to `bt_asha_device_start'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_asha_suspend':
-/bluez/profiles/audio/transport.c:2303:(.text.transport_asha_suspend+0x1e): undefined reference to `bt_asha_device_stop'
-/usr/bin/ld: /bluez/profiles/audio/transport.c:2307:(.text.transport_asha_suspend+0x48): undefined reference to `bt_asha_device_stop'
-/usr/bin/ld: profiles/audio/bluetoothd-transport.o: in function `transport_asha_cancel':
-/bluez/profiles/audio/transport.c:2318:(.text.transport_asha_cancel+0x17): undefined reference to `bt_asha_device_get_state'
-/usr/bin/ld: /bluez/profiles/audio/transport.c:2320:(.text.transport_asha_cancel+0x22): undefined reference to `bt_asha_device_device_get_resume_id'
-/usr/bin/ld: /bluez/profiles/audio/transport.c:2334:(.text.transport_asha_cancel+0x61): undefined reference to `bt_asha_device_state_reset'
-/usr/bin/ld: /bluez/profiles/audio/transport.c:2328:(.text.transport_asha_cancel+0x81): undefined reference to `bt_asha_device_stop'
-collect2: error: ld returned 1 exit status
-make[1]: *** [Makefile:6378: src/bluetoothd] Error 1
-make: *** [Makefile:4696: all] Error 2
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=924286
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.23 seconds
+GitLint                       PENDING   0.25 seconds
+BuildEll                      PASS      21.20 seconds
+BluezMake                     PASS      1621.39 seconds
+MakeCheck                     PASS      13.70 seconds
+MakeDistcheck                 FAIL      52.21 seconds
+CheckValgrind                 PASS      218.94 seconds
+CheckSmatch                   PASS      277.22 seconds
+bluezmakeextell               PASS      106.74 seconds
+IncrementalBuild              PENDING   0.27 seconds
+ScanBuild                     PASS      884.10 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: MakeDistcheck - FAIL
+Desc: Run Bluez Make Distcheck
+Output:
+
+Package cups was not found in the pkg-config search path.
+Perhaps you should add the directory containing `cups.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'cups' found
+../../profiles/audio/vcp.c:54:10: fatal error: vcp.h: No such file or directory
+   54 | #include "vcp.h"
+      |          ^~~~~~~
+compilation terminated.
+make[2]: *** [Makefile:10727: profiles/audio/bluetoothd-vcp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [Makefile:4693: all] Error 2
+make: *** [Makefile:12265: distcheck] Error 1
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- configure.ac               | 3 +++
- profiles/audio/transport.c | 9 +++++++++
- 2 files changed, 12 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/configure.ac b/configure.ac
-index 69a54ae586d7..6a19487f622a 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -234,6 +234,9 @@ AM_CONDITIONAL(CSIP, test "${enable_csip}" != "no")
- AC_ARG_ENABLE(asha, AS_HELP_STRING([--disable-asha],
- 		[disable ASHA support]), [enable_asha=${enableval}])
- AM_CONDITIONAL(ASHA, test "${enable_asha}" != "no")
-+if test "${enable_asha}" != "no"; then
-+	AC_DEFINE(HAVE_ASHA, 1, [Define to 1 if you have ASHA support.])
-+fi
- 
- AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
- 		[disable Bluetooth tools]), [enable_tools=${enableval}])
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 38051e64d617..a4198d23a390 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -48,7 +48,10 @@
- #endif
- #endif
- 
-+#ifdef HAVE_ASHA
- #include "asha.h"
-+#endif
-+
- #include "media.h"
- #include "transport.h"
- #include "bass.h"
-@@ -1555,6 +1558,7 @@ static const GDBusPropertyTable transport_bap_bc_properties[] = {
- 	{ }
- };
- 
-+#ifdef HAVE_ASHA
- static gboolean get_asha_delay(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -1580,6 +1584,7 @@ static const GDBusPropertyTable transport_asha_properties[] = {
- 	{ "Volume", "q", get_volume, set_volume, volume_exists },
- 	{ }
- };
-+#endif /* HAVE_ASHA */
- 
- #ifdef HAVE_A2DP
- static void transport_a2dp_destroy(void *data)
-@@ -2210,6 +2215,7 @@ static void *transport_bap_init(struct media_transport *transport, void *stream)
- 	return bap;
- }
- 
-+#ifdef HAVE_ASHA
- static void asha_transport_sync_state(struct media_transport *transport,
- 						struct bt_asha_device *asha_dev)
- {
-@@ -2367,6 +2373,7 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 	/* We just store the struct asha_device on the transport */
- 	return data;
- }
-+#endif /* HAVE_ASHA */
- 
- #define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
- 		      _resume, _suspend, _cancel, _set_state, _get_stream, \
-@@ -2447,7 +2454,9 @@ static const struct media_transport_ops transport_ops[] = {
- 	BAP_UC_OPS(PAC_SINK_UUID),
- 	BAP_BC_OPS(BCAA_SERVICE_UUID),
- 	BAP_BC_OPS(BAA_SERVICE_UUID),
-+#ifdef HAVE_ASHA
- 	ASHA_OPS(ASHA_PROFILE_UUID),
-+#endif /* HAVE_ASHA */
- };
- 
- static const struct media_transport_ops *
--- 
-2.47.1
 
+--===============1251607018995854082==--
