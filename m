@@ -1,371 +1,79 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D56D19AA63
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 15:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548092066E5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 15:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736523299; cv=none; b=LfIYYJkLKG1qo4fjMq1vVXZ0U0cVbV1dma9Oe9QAA1Z2JC5jhfTF1wtXgG7AJ67nzT1sCmJLAqRIO4nVOWs+Z5mN6n1fDTODqr8xnG8m61k3FFyHTyrcLsmRR8gBJ4Lt7RoTbV2H4IbcWIYyTo8r/FIc40ZvNV0rmBn5frAET9k=
+	t=1736523616; cv=none; b=QTanQanOKQ35UREVVsDnCqcGCghzYnuB0TRZxrDJuCd0KG22EwJTw07Sp4FjS5qewsyxvdMgfPM9WLqfrWRtlYGt5QCy5uYkpL0fKYnx/8EtD0QuoZ4rCZ8kvsarSjErAm7K+v6lw7kNfDGEJRu79YiL9t8jSc6KU8oXHr/+IK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736523299; c=relaxed/simple;
-	bh=T02L6oeYaw1viFrkN6oG7SdvjeKqlgUgMv55MjJ++4s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uxk6IH8HXXh9ve8Az8Ifh5FQk36YUgLrJlGCQ+JG7B974DPHJ9YGRm1vW3swiIYy+m6pJl0HUH7CCBF0SuO4TW22Vw9Wnnn9viYPuRN8I41wGsX2YF4fsJ0X3+g1Dyptfu/oKVZr4BnEdEV4pjB9MhZCN7tBbeiY7R8KpHN9LNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O+RjQAZU; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736523616; c=relaxed/simple;
+	bh=Ltzn3wo2rbcBAk1uR9fzZWw0xAPXkSy2bh+3AIJ+xzY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CESRd5m2Qq3gRNpxYWvgu6FLmyCYPOrcRg2vvafiagwqCzI/A495R75NfhVNLGXPXcGx+CXQDtWNWlLCOK9YWkjNv6sXhpMtcM4et0YfbB21yn+heBy0NY7f0Tfp2+MpCT617EnJAqxFIdsEBi4JD/A+c9/TUqLX058kMp+J8IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4sih5d/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+RjQAZU"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-306007227d3so15695811fa.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 07:34:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736523295; x=1737128095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UpJIQH4+CEgzWuWnicbWpbAwk9Szd2tpSuyTh1rL0Ng=;
-        b=O+RjQAZUVta8slvG5fHa6O6qVv7wvTIE+wT64oqmnrPSosnf0hytljMF519KjV+trl
-         wuH3r7NxlMqAWHrO6u7mg6XhM+v2QGm1gosVSsPwVJwoscXt8t0TsS1ScNZlLtbo+WIF
-         18vAWQRWiUrkH7kM4JQipVLAj2faLyRDzX5/Ig6G2MD68OGuGX30IcL7lYmH4xeUaIn/
-         i6y4XDOZfyRHhirUsPAf6i8fXe/Pia0sgAk4OGUWa7Me5sAOjcAO5vCsTXmAyLuD9EMq
-         Cj2Ub38dxxZre8H9Ka4ClELDrsIAxxxn9FnrC5rEzoXs9R3fsA9S05RnmtDmA87mZeKE
-         eROg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736523295; x=1737128095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UpJIQH4+CEgzWuWnicbWpbAwk9Szd2tpSuyTh1rL0Ng=;
-        b=xHuAtrcIm9HF9UpFAQiN0mKqfHFBPz/MsZ6QF8H96twIp6n4jznL1aPvUTe/JlG975
-         JcTii31+TBQZNNSDO50UnN6EVN3JEJjYZC7njxuCszbHTu/kvn8KVwyWo9Qpkr/c8pmE
-         n2RJtIXec05WTvd2BfqKm8pgc22/cJpk2yJ+xwHpntKKS7KeSaSqWO65GcNoKzg7nh5n
-         rtS6txth1CmaSQIlj1qdwgSdipGSuT347aI2JTchdaNix1JDIaovKxqfigl1S4H842NJ
-         Nl+ysBlvNDFqZ/e8FdwhZoiJz/Tl2EPqkOTuO4KgSbdFjLrkmnFmm/RXhkfcBd5RTdYT
-         nRHg==
-X-Gm-Message-State: AOJu0YyyXTJvokzn9YG0LgPuxEDfNsIDb9EFetnWruFUBSgw+2C3ygmI
-	keq3mznnzxCmjgS3lKB2L44A0ET+mcheLNlXVMGyRJTB7nVVVcv91+4Dp0jOTu4yFGv255+wo0R
-	8bydaH5nC80L1nLqrT3spA9dG0C8=
-X-Gm-Gg: ASbGncv8CJE2G91PVKTPyVuCU43Q7VQx0kPqG/7eeKgdchKD6MAB0u2DXkMVNLwU+z7
-	FcNlNQuT++fBUvpCt2iMqzXigF+beUR/igtLv9Bc=
-X-Google-Smtp-Source: AGHT+IGwZn7n4jcKc7a3e4oz/FcoWYDkvS3QFpBy1F4j1xmeU9UU1zvTmTEl2b1SX81ey+7kT+Pa41MyZgZO/iWFHnU=
-X-Received: by 2002:a2e:a7ca:0:b0:302:3508:f4ab with SMTP id
- 38308e7fff4ca-305f4594134mr38253511fa.21.1736523295125; Fri, 10 Jan 2025
- 07:34:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4sih5d/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB73C4CED6;
+	Fri, 10 Jan 2025 15:40:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736523615;
+	bh=Ltzn3wo2rbcBAk1uR9fzZWw0xAPXkSy2bh+3AIJ+xzY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=m4sih5d/aBBerUcdp+EgKY1UPr8nyn8qKhKyOQ9RpbwZkqwxq9y7hsjwLNaBTj8pm
+	 2yoIVpbyE9iPggBCCNeIZewCkrtoNFw9wZHs9u0ZT7BP9T7okE5izoK6wWG74Sd7FO
+	 O8xMx+1pc3soGxhaSIfqcCdnBtTvD5ehsDrL+BYDU5kesUSG6sqKcwNiIB8U6u1yDd
+	 qwS5gBksIBrtGYQjKx5Gilv0l7a30/820tZYd4aGn7yAcQWcsVsu7y2coNAF8oHGdM
+	 45IDSgDI/IaNsMZsqqgomvqaY0b9JrM8F4CZ7E/udWB0LDwVO86MFaw7iPRAzST8Uk
+	 vnN1tVF/n6inw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB98B380AA53;
+	Fri, 10 Jan 2025 15:40:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250110145019.2380299-1-michal.dzik@streamunlimited.com> <20250110145019.2380299-4-michal.dzik@streamunlimited.com>
-In-Reply-To: <20250110145019.2380299-4-michal.dzik@streamunlimited.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 10 Jan 2025 10:34:43 -0500
-X-Gm-Features: AbW1kvaeo96ZRNNaFEdp3Uu-9ZWDuI02UxnQF6EZ9N8cJIikel3PBdqeidQVykI
-Message-ID: <CABBYNZ++V+qYpiBiNJdqjGouuo22RWiuv1qXgUvei6bzzDYpeA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/3] vcp: allow volume control when acting as a server
-To: Michal Dzik <michal.dzik@streamunlimited.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 1/2] build: Fix --disable-avrcp
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173652363777.2106346.6113301150872891393.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Jan 2025 15:40:37 +0000
+References: <20250109210500.2324501-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250109210500.2324501-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Michal,
+Hello:
 
-On Fri, Jan 10, 2025 at 9:54=E2=80=AFAM Michal Dzik
-<michal.dzik@streamunlimited.com> wrote:
->
-> Local VCP chatacteristics are now connected to transport properties.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu,  9 Jan 2025 16:04:59 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This fixes --disable-avrcp causing build errors.
+> 
+> Fixes: https://github.com/bluez/bluez/issues/1061
 > ---
->  profiles/audio/vcp.c |   7 +--
->  src/shared/vcp.c     | 109 ++++++++++++++++++++++++++++++++-----------
->  2 files changed, 86 insertions(+), 30 deletions(-)
->
-> diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-> index 0203673bf..07b227107 100644
-> --- a/profiles/audio/vcp.c
-> +++ b/profiles/audio/vcp.c
-> @@ -186,7 +186,7 @@ bool bt_audio_vcp_set_volume(struct btd_device *devic=
-e, int8_t volume)
->         return FALSE;
->  }
->
-> -static void vcp_detached(struct bt_vcp *vcp, void *user_data)
-> +static void vcp_remote_client_detached(struct bt_vcp *vcp, void *user_da=
-ta)
->  {
->         struct vcp_data *data;
->
-> @@ -201,7 +201,7 @@ static void vcp_detached(struct bt_vcp *vcp, void *us=
-er_data)
->         vcp_data_remove(data);
->  }
->
-> -static void vcp_attached(struct bt_vcp *vcp, void *user_data)
-> +static void vcp_remote_client_attached(struct bt_vcp *vcp, void *user_da=
-ta)
->  {
->         struct vcp_data *data;
->         struct bt_att *att;
-> @@ -352,7 +352,8 @@ static int vcp_init(void)
->         if (err)
->                 return err;
->
-> -       vcp_id =3D bt_vcp_register(vcp_attached, vcp_detached, NULL);
-> +       vcp_id =3D bt_vcp_register(vcp_remote_client_attached,
-> +                                           vcp_remote_client_detached, N=
-ULL);
->
->         return 0;
->  }
-> diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+>  Makefile.plugins           |  9 +++++----
+>  configure.ac               |  3 +++
+>  profiles/audio/media.c     | 38 +++++++++++++++++++++++++++++++++++++-
+>  profiles/audio/transport.c | 10 ++++++++++
+>  4 files changed, 55 insertions(+), 5 deletions(-)
 
-Don't mix the changes of shared and plugins, they should be changed
-independently since they may affect different parts e.g. shared can be
-used for unit testing, tools, etc.
+Here is the summary with links:
+  - [BlueZ,v1,1/2] build: Fix --disable-avrcp
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1e1c311243b1
+  - [BlueZ,v1,2/2] build: Fix --disable-a2dp
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4f288bd961fc
 
-> index c92eb00d4..45d0f4485 100644
-> --- a/src/shared/vcp.c
-> +++ b/src/shared/vcp.c
-> @@ -379,7 +379,15 @@ static struct bt_aics *vcp_get_aics(struct bt_vcp *v=
-cp)
->         return vcp->rdb->aics;
->  }
->
-> -static void vcp_detached(void *data, void *user_data)
-> +static void vcp_remote_client_attached(void *data, void *user_data)
-> +{
-> +       struct bt_vcp_cb *cb =3D data;
-> +       struct bt_vcp *vcp =3D user_data;
-> +
-> +       cb->attached(vcp, cb->user_data);
-> +}
-> +
-> +static void vcp_remote_client_detached(void *data, void *user_data)
->  {
->         struct bt_vcp_cb *cb =3D data;
->         struct bt_vcp *vcp =3D user_data;
-> @@ -389,7 +397,6 @@ static void vcp_detached(void *data, void *user_data)
->
->  void bt_vcp_detach(struct bt_vcp *vcp)
->  {
-> -       struct bt_vcs *vcs;
->         if (!queue_remove(sessions, vcp))
->                 return;
->
-> @@ -399,7 +406,7 @@ void bt_vcp_detach(struct bt_vcp *vcp)
->         }
->
->         if (vcp->rdb) {
-> -               vcs =3D vcp_get_vcs(vcp);
-> +               struct bt_vcs *vcs =3D vcp_get_vcs(vcp);
->                 vcs->service =3D NULL;
->                 vcs->vs =3D NULL;
->                 vcs->vs_ccc =3D NULL;
-> @@ -506,6 +513,7 @@ static void vcp_disconnected(int err, void *user_data=
-)
->         DBG(vcp, "vcp %p disconnected err %d", vcp, err);
->
->         bt_vcp_detach(vcp);
-> +       queue_foreach(vcp_cbs, vcp_remote_client_detached, vcp);
->  }
->
->  static struct bt_vcp *vcp_get_session(struct bt_att *att, struct gatt_db=
- *db)
-> @@ -524,6 +532,8 @@ static struct bt_vcp *vcp_get_session(struct bt_att *=
-att, struct gatt_db *db)
->         vcp =3D bt_vcp_new(db, NULL);
->         vcp->att =3D att;
->
-> +       queue_foreach(vcp_cbs, vcp_remote_client_attached, vcp);
-> +
->         bt_att_register_disconnect(att, vcp_disconnected, vcp, NULL);
->
->         if (!sessions)
-> @@ -566,6 +576,10 @@ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, =
-struct bt_vcp *vcp,
->
->         vstate->vol_set =3D MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
->         vstate->counter =3D -~vstate->counter; /*Increment Change Counter=
-*/
-> +       vcp->volume =3D vstate->vol_set;
-> +
-> +       if (vcp->volume_changed)
-> +               vcp->volume_changed(vcp, vcp->volume / 2);
-
-What is this division by 2 for? If this is by the spec then Id suggest
-adding a define, otherwise Id just store the actual value.
-
->
->         gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
->                                  sizeof(struct vol_state),
-> @@ -605,6 +619,10 @@ static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, st=
-ruct bt_vcp *vcp,
->
->         vstate->vol_set =3D MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
->         vstate->counter =3D -~vstate->counter; /*Increment Change Counter=
-*/
-> +       vcp->volume =3D vstate->vol_set;
-> +
-> +       if (vcp->volume_changed)
-> +               vcp->volume_changed(vcp, vcp->volume / 2);
->
->         gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
->                                  sizeof(struct vol_state),
-> @@ -645,6 +663,10 @@ static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs=
- *vcs, struct bt_vcp *vcp,
->         vstate->mute =3D 0x00;
->         vstate->vol_set =3D MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
->         vstate->counter =3D -~vstate->counter; /*Increment Change Counter=
-*/
-> +       vcp->volume =3D vstate->vol_set;
-> +
-> +       if (vcp->volume_changed)
-> +               vcp->volume_changed(vcp, vcp->volume / 2);
->
->         gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
->                                  sizeof(struct vol_state),
-> @@ -685,6 +707,10 @@ static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *=
-vcs, struct bt_vcp *vcp,
->         vstate->mute =3D 0x00;
->         vstate->vol_set =3D MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
->         vstate->counter =3D -~vstate->counter; /*Increment Change Counter=
-*/
-> +       vcp->volume =3D vstate->vol_set;
-> +
-> +       if (vcp->volume_changed)
-> +               vcp->volume_changed(vcp, vcp->volume / 2);
->
->         gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
->                                  sizeof(struct vol_state),
-> @@ -724,6 +750,10 @@ static uint8_t vcs_set_absolute_vol(struct bt_vcs *v=
-cs, struct bt_vcp *vcp,
->
->         vstate->vol_set =3D req->vol_set;
->         vstate->counter =3D -~vstate->counter; /*Increment Change Counter=
-*/
-> +       vcp->volume =3D vstate->vol_set;
-> +
-> +       if (vcp->volume_changed)
-> +               vcp->volume_changed(vcp, vcp->volume / 2);
->
->         gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
->                                  sizeof(struct vol_state),
-> @@ -2023,34 +2053,59 @@ bool bt_vcp_set_volume(struct bt_vcp *vcp, int8_t=
- volume)
->  {
->         struct bt_vcs_client_ab_vol req;
->         uint16_t value_handle;
-> -       struct bt_vcs *vcs =3D vcp_get_vcs(vcp);
->
-> -       if (!vcs) {
-> -               DBG(vcp, "error: vcs not available");
-> -               return false;
-> -       }
-> +       vcp->volume =3D volume * 2;
-
-Ditto, very odd to have to multiply by 2 and then divide when sending,
-and I'm afraid we may have overflow problems as well.
-
->
-> -       if (!vcs->vol_cp) {
-> -               DBG(vcp, "error: vol_cp characteristics not available");
-> -               return false;
-> -       }
-> +       if (vcp->rdb) {
-> +               /* local gatt client */
-
-Note that the fact that there is an rdb does _not_ guarantee we are
-acting as a client, since the remote may support both roles e.g. bluez
-vs bluez, instead you should really be checking if vcp->client has
-been set.
-
-> +               struct bt_vcs *vcs =3D vcp_get_vcs(vcp);
->
-> -       if (!gatt_db_attribute_get_char_data(vcs->vol_cp, NULL, &value_ha=
-ndle,
-> -                                                       NULL, NULL, NULL)=
-) {
-> -               DBG(vcp, "error: vol_cp characteristics not available");
-> -               return false;
-> -       }
-> +               if (!vcs) {
-> +                       DBG(vcp, "error: vcs not available");
-> +                       return false;
-> +               }
->
-> -       vcp->volume =3D volume * 2;
-> -       req.op =3D BT_VCS_SET_ABSOLUTE_VOL;
-> -       req.vol_set =3D vcp->volume;
-> -       req.change_counter =3D vcp->volume_counter;
-> -
-> -       if (!bt_gatt_client_write_value(vcp->client, value_handle, (void =
-*) &req,
-> -               sizeof(struct bt_vcs_client_ab_vol), vcp_volume_cp_sent, =
-vcp,
-> -                                                                       N=
-ULL)) {
-> -               DBG(vcp, "error writing volume");
-> -               return false;
-> +               if (!vcs->vol_cp) {
-> +                       DBG(vcp, "error: vol_cp characteristics not avail=
-able");
-> +                       return false;
-> +               }
-> +
-> +               if (!gatt_db_attribute_get_char_data(vcs->vol_cp, NULL,
-> +                                       &value_handle, NULL, NULL, NULL))=
- {
-> +                       DBG(vcp, "error: vol_cp characteristics not avail=
-able");
-> +                       return false;
-> +               }
-> +
-> +               req.op =3D BT_VCS_SET_ABSOLUTE_VOL;
-> +               req.vol_set =3D vcp->volume;
-> +               req.change_counter =3D vcp->volume_counter;
-> +
-> +               if (!bt_gatt_client_write_value(vcp->client, value_handle=
-,
-> +                       (void *) &req, sizeof(struct bt_vcs_client_ab_vol=
-),
-> +                                       vcp_volume_cp_sent, vcp, NULL)) {
-> +                       DBG(vcp, "error writing volume");
-> +                       return false;
-> +               }
-> +       } else {
-> +               // local gatt server
-> +               struct bt_vcp_db *vdb =3D vcp_get_vdb(vcp);
-> +               struct vol_state *vstate;
-> +
-> +               if (!vdb) {
-> +                       DBG(vcp, "error: VDB not available");
-> +                       return false;
-> +               }
-> +
-> +               vstate =3D vdb_get_vstate(vdb);
-> +               if (!vstate) {
-> +                       DBG(vcp, "error: VSTATE not available");
-> +                       return false;
-> +               }
-> +
-> +               vstate->vol_set =3D vcp->volume;
-> +               vstate->counter =3D -~vstate->counter; /*Increment Change=
- Counter*/
-> +               gatt_db_attribute_notify(vdb->vcs->vs, (void *) vstate,
-> +                               sizeof(struct vol_state), bt_vcp_get_att(=
-vcp));
-
-I'd recommend splitting these into their own functions to make it more
-readable and you can name it according to the role as well.
-
->         }
->         return true;
->  }
-> --
-> 2.34.1
->
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
