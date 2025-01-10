@@ -1,132 +1,124 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5217F18FC80
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 10:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD5720ADE9
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 14:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736505165; cv=none; b=k9MPpnpb7Fj3lCOBnN8soi5DXT/KOjWIP0ybFmOPfTJHBSj9dxTKrjmOHFFQJmn16IOW7B+Rm6hMRSWjaG7m4YFP3X8+PUnZuYNF8Bmbj/ycmmTVtpFHRq5AWmDZnUNmgPnkROfyvg5CTCwx1gjQ9JPzKadK9XnJWcTOPyxjyMk=
+	t=1736518773; cv=none; b=UcCHL/08vU3xqBYRkeJnL9cQkB7HHop/vf+2PBTYXw02NJZ+9iRJxLjqZmvfUFlgguUKW7PWxMt3kX1M0TnnNa97H0ayur7DIhX1s3G9RYg7lTyiH3ht5/VMP/cRNsAduuaKuUQJkQeB0H3wO0BV9Vpq3T8Y3gZjLaAiIIHIFQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736505165; c=relaxed/simple;
-	bh=flGtGDQ5AIt4lor2KMlMJbA90kjde4fcnguUMs/qIiY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=JF/i1Tiv0OCQxmFAmGcGjQEGI5/kIanI9ByiiXfFUH6fs2T+NrObjbK6tkpjtRTAP8uZP+dS7wKldJXBsBDy9vE6XInEbgVjhxJvQ52n9b9J1JTjDGdHcKYc7m7Wg+1dkuZYSIjVk+Hf8CgnGqaAUy6Ct+KigOtK/t307cB7nGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJX8j32E; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736518773; c=relaxed/simple;
+	bh=O+/fUgorR4ralt72sR1rLQz5c9YDH4R8PLzV21B4ZQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=pLql7kdyDBBmOaDdNxNgjzTM+faB3JrQBas6cgXVUHroIV1uRMl0cWypnxaYWYAmWTj2hNjEE5Lqtg+53Bt6aHxOUxLIEpNZk+XBUe2XFszJQsNF18ESIXPXYhqISCFcCbL8opG6MOyLkugc1/nSml51zIN+drWqslIHOkGLOLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JByV1v1f; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJX8j32E"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6df83fd01cbso7938966d6.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2025 02:32:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736505163; x=1737109963; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cQ2NwmU7+IV2GeDs79LzuloXVNz6snGmCBRQIzB45Ic=;
-        b=YJX8j32EvhVJnKNMwlkhctnrVTR+J/s0Yy0hajIhSub4ixTBNC8ep1eTFSlPQJTOry
-         avHcg2CRWRLFpEP7rS8R53hR0OxCW5Bd87zNCEQvJ5KNVpxE11QSbuTC17sLO0oMEA+9
-         1l468oPpu/y4q6o9VgvYSEnAHVdCvYNzNK8Qgb8h4ZuUW8XYAnyr0EPEEnT7Hpx4ioKD
-         6CXkzDTJuOWfnbscul8neRM9XGN+MNqBjnq+VAtPctDz1EKv2vgV2eLAcp5HTFq4RyjG
-         4PInY0DuiOn+BUGNmPMRB48MDC8OWpl9w0V9U+L/c3eZ4v+dAKfpB6wBoC7t8IcD8HF0
-         5pYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736505163; x=1737109963;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cQ2NwmU7+IV2GeDs79LzuloXVNz6snGmCBRQIzB45Ic=;
-        b=YrocawXCFoGA3bJkp2EIjEKsPHvdVoRCCt5n5MLfTr87E089KwSxVNCs2mVs3O9tUS
-         n2teisS6zZdTRcJJwxS1eRbzuo9MvbJdoHVEKOf8tiRFkCwDcfLj0NmRh55jEhqlV0Pc
-         q31GNZ3ITegbo+6JWtKtIkFWW8RhOsoShGhqMpNBuZDBbJAFapClob07WB75RQ+SWBh3
-         PWN1TZabMVGyVHu/OHdeNcKwREfLaH7vNw+344LYIOZMzdpGd5sTQv/ZID3Wl52Xbb+v
-         Ps5Zr4qhzQUTblJFo042oTweQkjT7l1HPBrSmeg+vi9GYq62CwRZUx616m0HALZXSUiS
-         44tw==
-X-Gm-Message-State: AOJu0Ywc5duzLzrc6nQ/zHcAn31WPy+04gRzXE9HT3pEIF+Z6CNF7fSN
-	Rx7DFmexmdHecItEfSVY2p9JmazoGI/0GEurqm4O4jKlgpRmHseyyQaK/w==
-X-Gm-Gg: ASbGncvlZkgNX1AV18q+dwnjgJb0CPbKvNugZC0wwFqhn7Z6Vp/4fAOPPRL+lTf+4yz
-	sHm4dnlc3CIOUoLWCbrszg0/+cmefFfXTtHOgfnBanR9vjCMGCulxuAAKtik152Yr9K0dFT034k
-	+jpA/+tXGZ/NEbQiJKAHTg3cqKlZ7SkzoNtsGgUgC5jp7DSy8yZbT1emyb7Q8NgsmR9gehWuw26
-	H5u4azcDXfTm7maFpXIFyuWL01NtTxHb+EIrp4XD/NznSEUO//ktwJ6ngC4o2c=
-X-Google-Smtp-Source: AGHT+IHgjb2ROEpYATC4aMAlIAMI3ZUYHVJvX9G4C8n+txCYqameFGC8R/RYR/W4wOnppGOgV+KbKA==
-X-Received: by 2002:a05:6214:48b:b0:6d8:aba8:8380 with SMTP id 6a1803df08f44-6df9b2e56cfmr180552276d6.42.1736505162829;
-        Fri, 10 Jan 2025 02:32:42 -0800 (PST)
-Received: from [172.17.0.2] ([68.154.31.199])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfad880c97sm7874126d6.36.2025.01.10.02.32.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 02:32:42 -0800 (PST)
-Message-ID: <6780f74a.050a0220.24a354.288d@mx.google.com>
-Date: Fri, 10 Jan 2025 02:32:42 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5810802490136465998=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JByV1v1f"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736518772; x=1768054772;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=O+/fUgorR4ralt72sR1rLQz5c9YDH4R8PLzV21B4ZQE=;
+  b=JByV1v1fmes4jf8HSYZ5Q+x5UetoCUlgCwH6qKSllIUW74/nj63Me4wa
+   2FFXqbWDXY2C3Hz27R2AOxAXqZqFOeJR8/blfMvn13pA6IJYftxVr0+WK
+   DOb23xepN5SenL/uGBHbPevJyvU9b30g6JiqaaLOgS8UYqma/IuZ8OV0D
+   zO+3/EXnfg5TEEwQjlECQZ/rTX3vrnvuzRQc8Q/AZL/GkowmgiZVGQUQD
+   q1XwLzAmztN6+1NkhzaW7d494jcPN2Zp5yACb3lPY68OqdVKyMBOlIODL
+   /UXr+UcLhb2afTsiXoGgKM9ltyeFbFkqR2i1LYizbkm9cUVWdI3WjoShL
+   g==;
+X-CSE-ConnectionGUID: RspfNtVLS/S2mFgY5SxwGg==
+X-CSE-MsgGUID: ukKHh+QTSv6KvZuyj0WmDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="62184245"
+X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
+   d="scan'208";a="62184245"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 06:19:19 -0800
+X-CSE-ConnectionGUID: Q4QAwxSBQeCZM1WThWQW8A==
+X-CSE-MsgGUID: ZMg2kWveT56ZFv+rwsdsKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="108786324"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 10 Jan 2025 06:19:18 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tWFr0-000JLv-1Y;
+	Fri, 10 Jan 2025 14:19:14 +0000
+Date: Fri, 10 Jan 2025 22:19:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Charles Han <hanchunchao@inspur.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [bluetooth-next:master 78/83] drivers/bluetooth/btbcm.c:557:10:
+ error: incompatible integer to pointer conversion returning 'int' from a
+ function with result type 'const char *'
+Message-ID: <202501102245.kuCKXaOP-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hao.qin@mediatek.com
-Subject: RE: Bluetooth: btmtk: Remove resetting mt7921 before downloading the fw
-In-Reply-To: <20250110095548.12761-1-hao.qin@mediatek.com>
-References: <20250110095548.12761-1-hao.qin@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
---===============5810802490136465998==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   a5d2ee08adc1d98647679c4e4c73223464d5d936
+commit: 52d2af10759262ab95162ddc1a56faa8fe3aabde [78/83] Bluetooth: btbcm: Fix NULL deref in btbcm_get_board_name()
+config: powerpc-allyesconfig (https://download.01.org/0day-ci/archive/20250110/202501102245.kuCKXaOP-lkp@intel.com/config)
+compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501102245.kuCKXaOP-lkp@intel.com/reproduce)
 
-This is automated email and please do not reply to this email!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501102245.kuCKXaOP-lkp@intel.com/
 
-Dear submitter,
+All errors (new ones prefixed by >>):
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=924104
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.25 seconds
-GitLint                       PENDING   0.20 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      23.90 seconds
-CheckAllWarning               PASS      26.62 seconds
-CheckSparse                   PASS      29.88 seconds
-BuildKernel32                 PASS      23.82 seconds
-TestRunnerSetup               PASS      423.49 seconds
-TestRunner_l2cap-tester       PASS      20.77 seconds
-TestRunner_iso-tester         PASS      34.21 seconds
-TestRunner_bnep-tester        PASS      4.89 seconds
-TestRunner_mgmt-tester        PASS      119.53 seconds
-TestRunner_rfcomm-tester      PASS      47.98 seconds
-TestRunner_sco-tester         PASS      9.47 seconds
-TestRunner_ioctl-tester       PASS      8.18 seconds
-TestRunner_mesh-tester        PASS      6.10 seconds
-TestRunner_smp-tester         PASS      7.10 seconds
-TestRunner_userchan-tester    PASS      5.08 seconds
-IncrementalBuild              PENDING   0.58 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+>> drivers/bluetooth/btbcm.c:557:10: error: incompatible integer to pointer conversion returning 'int' from a function with result type 'const char *' [-Wint-conversion]
+                   return -ENOMEM;
+                          ^~~~~~~
+   1 error generated.
 
 
+vim +557 drivers/bluetooth/btbcm.c
 
----
-Regards,
-Linux Bluetooth
+   536	
+   537	/*
+   538	 * This currently only looks up the device tree board appendix,
+   539	 * but can be expanded to other mechanisms.
+   540	 */
+   541	static const char *btbcm_get_board_name(struct device *dev)
+   542	{
+   543	#ifdef CONFIG_OF
+   544		struct device_node *root __free(device_node) = of_find_node_by_path("/");
+   545		char *board_type;
+   546		const char *tmp;
+   547	
+   548		if (!root)
+   549			return NULL;
+   550	
+   551		if (of_property_read_string_index(root, "compatible", 0, &tmp))
+   552			return NULL;
+   553	
+   554		/* get rid of any '/' in the compatible string */
+   555		board_type = devm_kstrdup(dev, tmp, GFP_KERNEL);
+   556		if (!board_type)
+ > 557			return -ENOMEM;
+   558	
+   559		strreplace(board_type, '/', '-');
+   560	
+   561		return board_type;
+   562	#else
+   563		return NULL;
+   564	#endif
+   565	}
+   566	
 
-
---===============5810802490136465998==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
