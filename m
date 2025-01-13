@@ -1,120 +1,101 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B92233159;
-	Mon, 13 Jan 2025 07:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D0113AD0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2025 07:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736753477; cv=none; b=OaIKTjWsZzc7BSAYixKvkl6CmvYLVbMx+9zJQHjDfiLpFz+OtvFBOblQI8v77OnBo+KdPQQYab3zZ1Ma3sKbK4X927Ig5Tyl5Ipl1OLctrsp+1JovKONP08/7LuoN+oR91EevdFHtitqk3Kn85IoKvXD3WNGjQ16BjnJupOS78E=
+	t=1736753830; cv=none; b=LK+8C99YQQ/tClmNRgLyM+nXf1KLr2ekdEmbtnAJ9kfY6cXc9tfy7aAy539D7JNCPKDF73vUn+HmE18eqb8vaigQzcP6EvlCBYNYUjZElbjxWEXEUnn813/I0/I/HBaRQDHnhhRHfGVL3IjZ2so+KasNDmlfSRwGnN+Il/Juqzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736753477; c=relaxed/simple;
-	bh=KJwKmwzr8Nr0Q+7RoTpPudrZ2dBk7d3ZB7mPHkxavaM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oTVZq9B69dS68k3jAccdL3ZHT9HC7idumrvvC1odL6UbLQJqNucu1RtHHhXT1LgQmMA58mLc7JvPPtvc5i4o0IV6nYQ0ksJ5CeBTL77ntTZx8W+Sr5dttVHh0PUTaPaepmKuBJUd4HyBk0SllBziNUgMX75bycYIC4TPUDZOM9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (188.234.32.57) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 13 Jan
- 2025 10:31:04 +0300
-From: d.privalov <d.privalov@omp.ru>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Luiz Augusto von
- Dentz <luiz.von.dentz@intel.com>, <linux-bluetooth@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, <stable@vger.kernel.org>, Dmitriy Privalov
-	<d.privalov@omp.ru>
-Subject: [PATCH 5.10 2/2] Bluetooth: hci_core: Fix calling mgmt_device_connected
-Date: Mon, 13 Jan 2025 10:31:00 +0300
-Message-ID: <20250113073100.34744-2-d.privalov@omp.ru>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250113073100.34744-1-d.privalov@omp.ru>
-References: <20241226093539.44806-1-d.privalov@omp.ru>
- <20250113073100.34744-1-d.privalov@omp.ru>
+	s=arc-20240116; t=1736753830; c=relaxed/simple;
+	bh=1z08WWJLx/YD6El7MsQDRZHftYXjycmhExqxvpwHBtw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VMnOv1IZFVut2z3IrP7+RQyi2sjXU+dkSuBbruOhrvuVsce65HGpSp6ENfXT5qHkpBhhS678mNeEXnlcovEr1sNCiI7GVSXm0qsS8GFwjiC/F3Xqo8BdSYKKVDgFrHEt1u3gpXwLKkdugE+vOZMwk2+y+OER4MpWJFEJq/CjIio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a5MKGaSG; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a5MKGaSG"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-46677ef6910so41341331cf.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jan 2025 23:37:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736753828; x=1737358628; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1z08WWJLx/YD6El7MsQDRZHftYXjycmhExqxvpwHBtw=;
+        b=a5MKGaSGEh6CupTS4IaEUEhCJy1qP8sqt/7/1g7ODr2d4CzgLRsb9bc4SeTNAMkpUY
+         bIkZmc0v0tD91eTRSnMKYo4IIw+dBTC74OLEWa56UkNwvwR1k7TWcpFn+fG8usubwMsO
+         Mk55CYKp+C1ES3poylbQ7LCqhGx0GOgdUr0a38ATXvw27H18JGxiAliHLoFjsmdhPMpY
+         xIxhkoU3eKIuq7i6htbLTN6UNUx0hSGd5SrMsht3lebhgm9wP+cFKFciz78Aw252Mr8W
+         luOL0UlxL3upujPDIXrCH5+k2qZP9VXgplmq+iSRqVqnyDjaPs9jUO7yPJplPtPZ/CnN
+         sjug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736753828; x=1737358628;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1z08WWJLx/YD6El7MsQDRZHftYXjycmhExqxvpwHBtw=;
+        b=Fh95wApljDdgCe2iA4vSTAnUB5tjYyBJF/WSeRiBMORQTEtp0hyNPyv6tNCzOEbEVK
+         6c2HcYDOaZFPTclSzz09GfNpH8LNoXI0V1swTr7iHYosDL9XdyoptRRfjuGKsWLUVTBU
+         YQMM4lhcmnkLVwusgawVIHXpN2ZaNYu1ICS4GollKx7maYqOaSHapngovRjEDpQK0pLR
+         VlRjHK1fPs9UvusPE877Jj5Jk782BktxmXPZl4/jFMsspY08SHDpYsKyfxEWweJQ3qGn
+         MyU6Zze8FZV0SySzVw9y1LkkeXqKye4Dk/86A2/4lbNuO6ngt8GxN+x2d0NCrX7pJhyL
+         TsWw==
+X-Gm-Message-State: AOJu0Yx93lOt26C7nBsEiZhR+dI1TZOpOjhixbrIg1dbfOoaUdB7CfEc
+	PaZeRxVBlWiBuvJvLQb2MQhyRVWLrLK0kHPs5I7yuTLwHPHIhNpSxwu9qQ==
+X-Gm-Gg: ASbGncsmcy0yvxCuTtBYxEPz7x/VpP4n51MVwcU88HtJS3EYxT8WMHomYUX8fxCfOki
+	rZR5T/9fSSHezdJc2r20c4QM22tHGjSCWAnOL5AgT/CIhKQb7J+F6CGcR25t0fpM0b9pTMAJyJA
+	ZzS/UlUWhn8qXWmhAHBCno5U2cmDdwXq9h+GBLXDnjaMPZqVrDOjmoVZw3vZZha58X85ZzTejG6
+	Cvpc03XmGM4pg8iUADWLcQjs5L9enRXVywN3QN3E9RFhUzBEFp/xyVXMkcHFg==
+X-Google-Smtp-Source: AGHT+IF1vKCvm7xc8FzBK7H9Zk44aNHm/ReyUz7EZCqwLbdmTlKQVe/zOe+Pxh0xXEVKJqIJMRAE0Q==
+X-Received: by 2002:ac8:5ac5:0:b0:467:43c1:f0ea with SMTP id d75a77b69052e-46c70ff7391mr329674011cf.16.1736753828071;
+        Sun, 12 Jan 2025 23:37:08 -0800 (PST)
+Received: from [172.17.0.2] ([20.75.92.153])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c873dbf16sm38443931cf.67.2025.01.12.23.37.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jan 2025 23:37:07 -0800 (PST)
+Message-ID: <6784c2a3.050a0220.12bce2.cbbe@mx.google.com>
+Date: Sun, 12 Jan 2025 23:37:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7256293771722551876=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 01/13/2025 06:54:52
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 190284 [Jan 13 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.7
-X-KSE-AntiSpam-Info: Envelope from: d.privalov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 49 0.3.49
- 28b3b64a43732373258a371bd1554adb2caa23cb
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_phishing_log_reg_60_70}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {Tracking_repetitive_subdir_in_url}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 188.234.32.57 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 188.234.32.57 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	bugzilla.kernel.org:7.1.1;127.0.0.199:7.1.2;github.com:7.1.1;omp.ru:7.1.1;188.234.32.57:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 188.234.32.57
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/13/2025 06:56:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/13/2025 3:31:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, d.privalov@omp.ru
+Subject: RE: [5.10,1/2] Bluetooth: L2CAP: Fix uaf in l2cap_connect
+In-Reply-To: <20250113073100.34744-1-d.privalov@omp.ru>
+References: <20250113073100.34744-1-d.privalov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============7256293771722551876==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-commit 55abbd148dfb604ebf3f72d6c3dd2a8063d40718 upstream.
+This is an automated email and please do not reply to this email.
 
-Since 61a939c68ee0 ("Bluetooth: Queue incoming ACL data until
-BT_CONNECTED state is reached") there is no long the need to call
-mgmt_device_connected as ACL data will be queued until BT_CONNECTED
-state.
+Dear Submitter,
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=219458
-Link: https://github.com/bluez/bluez/issues/1014
-Fixes: 333b4fd11e89 ("Bluetooth: L2CAP: Fix uaf in l2cap_connect")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Dmitriy Privalov <d.privalov@omp.ru>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: net/bluetooth/hci_event.c:3245
+error: net/bluetooth/hci_event.c: patch does not apply
+error: patch failed: net/bluetooth/l2cap_core.c:4272
+error: net/bluetooth/l2cap_core.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- net/bluetooth/hci_core.c | 2 --
- 1 file changed, 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f6cff34a85421c..f9e19f9cb5a386 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3792,8 +3792,6 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_dev_lock(hdev);
- 	conn = hci_conn_hash_lookup_handle(hdev, handle);
--	if (conn && hci_dev_test_flag(hdev, HCI_MGMT))
--		mgmt_device_connected(hdev, conn, 0, NULL, 0);
- 	hci_dev_unlock(hdev);
- 
- 	if (conn) {
--- 
-2.34.1
 
+--===============7256293771722551876==--
