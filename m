@@ -1,103 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9753EA83;
-	Mon, 13 Jan 2025 15:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246701FBBC0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2025 15:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736781742; cv=none; b=tbaklpe3QYwmgnze0XyE2N/U0YuSI4WETEp4CwdEMPrqXR7eGAZUFtH7a8NVPiisJAp8eyMfJ80Prabs74cya++RgOmQ1YKHzMLvZpRYfS6ghqFhLmN0S/dpPrsfBPTtdzGq6jAfvgIYORzhTCynO6B3waf3UQLJpuWFvGvXEWg=
+	t=1736782384; cv=none; b=jYP9jewZrbOji4f028Aago+f7b/+Mz6Nhyvj9m2EtMlRaeaLkdRJ+v2GD8Ofb5COBzXtU/PqkdZwV31Ich5JmBOdMU567j92ukKCxn2Bw69upPRpzTO/J33bgCnx9JN+G+n8fXxdZ1qdnuVLDl/7e8Z4jaztlsqZrzFbRBXlFBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736781742; c=relaxed/simple;
-	bh=uH0qJOGgN0jlMNY2ZtVPIgOLwgQbAiU+6/qlWtHeptQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YCK+KkmCte8ZlBY50HkQW25JGVFdE+rTNtdLwDCJFzBSA62PBAFD53kn4ToFtfG4A2H7JAtISQ+xRUid27cxnUNTBqGO/cCnTlxtYGRCwKxnkAagdjIM/c82HiLOjPUIPaRmKall/eup7FJU2+nhRgbsptbIzh8E08jK7YIPRp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yhhgnmt3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736782384; c=relaxed/simple;
+	bh=jHHqfQwV0DpzksvNvGiuKWEb2zZ9W/8Uk64W4kQkWz8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jHzNNvvZviVmDlNTXd0I96KE5iC7Sv8w1KJNINFpni5lTwGGIEQeUXRWrR0EOI+Lbc5uZDFFO5GbihV4ehmcpY3M0QgPLfLWgzoWRP98ykC6Wu2smCj0BAqemufkhC8w+Wchs+eM302K1fk1g+f9jViE8nWbhESfDHRwGWjiMVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTv8aizY; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yhhgnmt3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08ECDC4CED6;
-	Mon, 13 Jan 2025 15:22:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736781742;
-	bh=uH0qJOGgN0jlMNY2ZtVPIgOLwgQbAiU+6/qlWtHeptQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Yhhgnmt3S+qvGAd3zoUkVPpA6jzqpEzQ93pwLN1EPAQ+/uApFFTXyCHS0kQ6gd/ls
-	 lQbTpWFzeDX39gmKPEWUroOfBVf1aC/+b0CScR5CIXYlZYZIDMx9sWRyrcZo7uhzVO
-	 bPKdAOIPiy7UcTQqeGvyuXNnNHTMc2i6CN9FT92vd2mEAQjjjgf/zODLMFYIpfwLNc
-	 zSLnp/TW7dGy4pq44EJJSJaou1yshXCyzg28bjIKBba15TQYt6sxs5xpIP2K4w45Nq
-	 qtyLpApP3wijAqAnSg2WIpCC4Y1H3VnBSTEtjCZsCZt0QG3zoaxlfwO7DgakfLmkmC
-	 ZWukg7F9PGXgA==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1tXMGl-000000008Dl-0ZVV;
-	Mon, 13 Jan 2025 16:22:23 +0100
-Date: Mon, 13 Jan 2025 16:22:23 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Steev Klimaszewski <steev@kali.org>,
-	Bjorn Andersson <bjorande@quicinc.com>,
-	"Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>,
-	Cheng Jiang <quic_chejiang@quicinc.com>,
-	Jens Glathe <jens.glathe@oldschoolsolutions.biz>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Zijun Hu <quic_zijuhu@quicinc.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: qca: Fix poor RF performance for WCN6855
-Message-ID: <Z4Uvr3-FSvfILA7H@hovoldconsulting.com>
-References: <20250113-wcn6855_fix-v3-1-eeb8b0e19ef4@quicinc.com>
- <Z4UrYZgYqlTfFc7M@hovoldconsulting.com>
- <dcc54536-87c0-49d4-ad6f-c47abf102136@icloud.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTv8aizY"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7b6f7d7e128so484332585a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2025 07:33:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736782382; x=1737387182; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VzDlQ89/zKnA1ZWtdEl3OBI9l+RbhHch2OFZMkPI0v0=;
+        b=VTv8aizYFBsNYs4IVeWouIvHSFbVLWn5XpNpTaeyT/Lzc7fm5kmIwGcE6IXD+/E3G4
+         RZsfN+LAYLohOAZlq+r18a65QjxjuLa3TwY/xW3QmnEkfzYTwLQioYkg2XUocy6j6LKo
+         9cAHByoI2oTEirxy2cKdHuVjpTEUEjfxgU1Ra/9EpVsVD9USiM3VybF3yVvOSA7lgeJq
+         JqB1UBDx1jKKMKBIfZsIky8LsX3ak1vxtrP4QgqgdxoS2U0yVKzXzKdAfKylQ27CspKa
+         6SHMcIa2uiQ6o7bkrgFvWXuFaTDLQPUyaAKpDjaR8jDZ64PUY7hB+NduMnBpjMsgS2ZZ
+         GUaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736782382; x=1737387182;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VzDlQ89/zKnA1ZWtdEl3OBI9l+RbhHch2OFZMkPI0v0=;
+        b=hrJFu7hIXDIH7S1mTZ+YSSYTtxMAmow1HXorQLCZn/c0AVoWvxYU3le1p77Nc17I/2
+         ow+5+PBhzWy/oXZJ4mga5l5+Xqmvt5GxRujQqV8q62E6rwSe9slKg27qpqGzjtS6uenP
+         l2elZ7i8AnviIY7kw6wTFvH20PagoWncJohj94ENrTzMvB49C4M2JivNlfkBGxVba0b9
+         P27ilu1lHawoIQepUuduIuSt8YQWHwRu1GS69FZVfF/uE1lDIdzJAPt/gEX3XwzMWsNF
+         YwN1tdLk3XewVV3xd+62X2UVkU5xsroPN4C2PC1LmluqPYn+dNzRGitKPA/z1el+8pLM
+         cVJQ==
+X-Gm-Message-State: AOJu0Yyt6komvz+Gn7Dwa0539Q8amhYJTo7E6LzJT/hM7UtjAVnc0saB
+	IKkNGA9QoYa2kZA3IbdBa7pqQQygjz1v+3n9mkJWyaX2puirBUolKkw0jA==
+X-Gm-Gg: ASbGncvvyH4KhPgvZtJCgWpb8lJuqkxwR6DuWR918qwuazEkGRDwAaUPnQydf8GLKOV
+	NWOaLZ0FstBr4pzX35F8GVq1Wcm+aRoxxYUfKQWq9rshE3Gv65C23YXidwfMfZ2zbVUrLUq84NP
+	/+E60q1ZVNXP19gVHcuLqsHTIgLCsVnfdYbKdloRmmPhy4Ef/UIAdlCQ9e0ls51VgIzVz9ULOve
+	tIHeVMVPyzlGo+TuylvVuCodDwNnWw0GBC9Ad4yakRmkVMOWOoXx7XqbhdZacI=
+X-Google-Smtp-Source: AGHT+IGt65FGWSGHTsE56zOUMGkjy12MnJLPmiknkevGEUw33Osx+D1+oOsHsWqK4vIL+Ujux9g9uA==
+X-Received: by 2002:a05:620a:1b94:b0:7b6:d312:c5c6 with SMTP id af79cd13be357-7bcf3655ea7mr1711208285a.9.1736782381790;
+        Mon, 13 Jan 2025 07:33:01 -0800 (PST)
+Received: from [172.17.0.2] ([20.102.199.82])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce35160bbsm497708285a.112.2025.01.13.07.33.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 07:33:01 -0800 (PST)
+Message-ID: <6785322d.050a0220.81c7f.30da@mx.google.com>
+Date: Mon, 13 Jan 2025 07:33:01 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0599350886249445350=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dcc54536-87c0-49d4-ad6f-c47abf102136@icloud.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun_hu@icloud.com
+Subject: RE: [v3] Bluetooth: qca: Fix poor RF performance for WCN6855
+In-Reply-To: <20250113-wcn6855_fix-v3-1-eeb8b0e19ef4@quicinc.com>
+References: <20250113-wcn6855_fix-v3-1-eeb8b0e19ef4@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, Jan 13, 2025 at 11:15:13PM +0800, Zijun Hu wrote:
-> On 2025/1/13 23:04, Johan Hovold wrote:
-> >>  		case QCA_WCN6855:
-> >> -			snprintf(config.fwname, sizeof(config.fwname),
-> >> -				 "qca/hpnv%02x.bin", rom_ver);
-> >> +			qca_read_fw_board_id(hdev, &boardid);
-> > For consistency, this should probably have been handled by amending the
-> > conditional above the switch:
-> > 
-> > 	if (soc_type == QCA_QCA2066 || soc_type == QCA_WCN7850)
-> > 		qca_read_fw_board_id(hdev, &boardid);
+--===============0599350886249445350==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> qca_read_fw_board_id() may be invoked twice if adding reading board ID here
-> 
-> see below branch:
-> 
-> 	config.type = TLV_TYPE_NVM;
-> 	if (firmware_name) {
-> 		/* The firmware name has an extension, use it directly */
-> 		if (qca_filename_has_extension(firmware_name)) {
-> 			snprintf(config.fwname, sizeof(config.fwname), "qca/%s", firmware_name);
-> 		} else {
-> 			*qca_read_fw_board_id(hdev, &boardid);*
-> 			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
-> 				 firmware_name, soc_type, ver, 0, boardid);
-> 		}
+This is automated email and please do not reply to this email!
 
-Fair enough (but I guess that would be the case also for
-QCA2066/WCN7850 currently).
+Dear submitter,
 
-But either way, this is not something that should block this fix.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=924924
 
-> > but long term that should probably be moved into
-> > qca_get_nvm_name_by_board() to avoid sprinkling conditionals all over
-> > the driver.
-> > 
-> > I'm fine with this as a stop gap unless you want to move the call to the
-> > QCA2066/WCN7850 conditional:
-> > 
-> > Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+---Test result---
 
-Johan
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.89 seconds
+BuildKernel                   PASS      23.92 seconds
+CheckAllWarning               PASS      26.06 seconds
+CheckSparse                   PASS      29.51 seconds
+BuildKernel32                 PASS      23.70 seconds
+TestRunnerSetup               PASS      428.03 seconds
+TestRunner_l2cap-tester       PASS      21.28 seconds
+TestRunner_iso-tester         PASS      36.48 seconds
+TestRunner_bnep-tester        PASS      4.98 seconds
+TestRunner_mgmt-tester        FAIL      124.64 seconds
+TestRunner_rfcomm-tester      PASS      7.80 seconds
+TestRunner_sco-tester         PASS      9.61 seconds
+TestRunner_ioctl-tester       PASS      8.44 seconds
+TestRunner_mesh-tester        PASS      6.25 seconds
+TestRunner_smp-tester         PASS      7.18 seconds
+TestRunner_userchan-tester    PASS      7.27 seconds
+IncrementalBuild              PENDING   0.69 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.184 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0599350886249445350==--
