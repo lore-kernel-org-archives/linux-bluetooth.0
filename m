@@ -1,101 +1,115 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D0113AD0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2025 07:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57C1188906;
+	Mon, 13 Jan 2025 09:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736753830; cv=none; b=LK+8C99YQQ/tClmNRgLyM+nXf1KLr2ekdEmbtnAJ9kfY6cXc9tfy7aAy539D7JNCPKDF73vUn+HmE18eqb8vaigQzcP6EvlCBYNYUjZElbjxWEXEUnn813/I0/I/HBaRQDHnhhRHfGVL3IjZ2so+KasNDmlfSRwGnN+Il/Juqzk=
+	t=1736760264; cv=none; b=DEgmdccZelcdtQDlTr/MerM6GHOfq1b9mutgVPW2TkNguAVQFNc9KaRX0U+BWdmVM8SPwoeo5yM6HSblImRcz78+PLEtl0/eqNmkdndIDp3tw2/gXboNsN+0EFWWLpadgKItFNfEZfr63Z8y7qcVkKKYVeNj+a5jbDJhpcImxtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736753830; c=relaxed/simple;
-	bh=1z08WWJLx/YD6El7MsQDRZHftYXjycmhExqxvpwHBtw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VMnOv1IZFVut2z3IrP7+RQyi2sjXU+dkSuBbruOhrvuVsce65HGpSp6ENfXT5qHkpBhhS678mNeEXnlcovEr1sNCiI7GVSXm0qsS8GFwjiC/F3Xqo8BdSYKKVDgFrHEt1u3gpXwLKkdugE+vOZMwk2+y+OER4MpWJFEJq/CjIio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a5MKGaSG; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736760264; c=relaxed/simple;
+	bh=O8ogNUi16IzOoAKmrNzGLQ/V2vo+Dds9Q28JEu9S4G0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q80GjMo9bm+EHz4ljhP90FZy17CZsjKB4eKctJQ/v4QDHGk4YnE5iHxGi26EgIONJjZGLU6yVAUqUqobNoS10AuO49dPsqoxoIbc3CJ6iKgiY+YuKIRHjSCzr5JaNSn/T6/ES5sBz4JvDMFMICe5pcid9uEiE1z1tq8vyJEW2ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SXu/XkJG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a5MKGaSG"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-46677ef6910so41341331cf.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Jan 2025 23:37:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736753828; x=1737358628; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1z08WWJLx/YD6El7MsQDRZHftYXjycmhExqxvpwHBtw=;
-        b=a5MKGaSGEh6CupTS4IaEUEhCJy1qP8sqt/7/1g7ODr2d4CzgLRsb9bc4SeTNAMkpUY
-         bIkZmc0v0tD91eTRSnMKYo4IIw+dBTC74OLEWa56UkNwvwR1k7TWcpFn+fG8usubwMsO
-         Mk55CYKp+C1ES3poylbQ7LCqhGx0GOgdUr0a38ATXvw27H18JGxiAliHLoFjsmdhPMpY
-         xIxhkoU3eKIuq7i6htbLTN6UNUx0hSGd5SrMsht3lebhgm9wP+cFKFciz78Aw252Mr8W
-         luOL0UlxL3upujPDIXrCH5+k2qZP9VXgplmq+iSRqVqnyDjaPs9jUO7yPJplPtPZ/CnN
-         sjug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736753828; x=1737358628;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1z08WWJLx/YD6El7MsQDRZHftYXjycmhExqxvpwHBtw=;
-        b=Fh95wApljDdgCe2iA4vSTAnUB5tjYyBJF/WSeRiBMORQTEtp0hyNPyv6tNCzOEbEVK
-         6c2HcYDOaZFPTclSzz09GfNpH8LNoXI0V1swTr7iHYosDL9XdyoptRRfjuGKsWLUVTBU
-         YQMM4lhcmnkLVwusgawVIHXpN2ZaNYu1ICS4GollKx7maYqOaSHapngovRjEDpQK0pLR
-         VlRjHK1fPs9UvusPE877Jj5Jk782BktxmXPZl4/jFMsspY08SHDpYsKyfxEWweJQ3qGn
-         MyU6Zze8FZV0SySzVw9y1LkkeXqKye4Dk/86A2/4lbNuO6ngt8GxN+x2d0NCrX7pJhyL
-         TsWw==
-X-Gm-Message-State: AOJu0Yx93lOt26C7nBsEiZhR+dI1TZOpOjhixbrIg1dbfOoaUdB7CfEc
-	PaZeRxVBlWiBuvJvLQb2MQhyRVWLrLK0kHPs5I7yuTLwHPHIhNpSxwu9qQ==
-X-Gm-Gg: ASbGncsmcy0yvxCuTtBYxEPz7x/VpP4n51MVwcU88HtJS3EYxT8WMHomYUX8fxCfOki
-	rZR5T/9fSSHezdJc2r20c4QM22tHGjSCWAnOL5AgT/CIhKQb7J+F6CGcR25t0fpM0b9pTMAJyJA
-	ZzS/UlUWhn8qXWmhAHBCno5U2cmDdwXq9h+GBLXDnjaMPZqVrDOjmoVZw3vZZha58X85ZzTejG6
-	Cvpc03XmGM4pg8iUADWLcQjs5L9enRXVywN3QN3E9RFhUzBEFp/xyVXMkcHFg==
-X-Google-Smtp-Source: AGHT+IF1vKCvm7xc8FzBK7H9Zk44aNHm/ReyUz7EZCqwLbdmTlKQVe/zOe+Pxh0xXEVKJqIJMRAE0Q==
-X-Received: by 2002:ac8:5ac5:0:b0:467:43c1:f0ea with SMTP id d75a77b69052e-46c70ff7391mr329674011cf.16.1736753828071;
-        Sun, 12 Jan 2025 23:37:08 -0800 (PST)
-Received: from [172.17.0.2] ([20.75.92.153])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c873dbf16sm38443931cf.67.2025.01.12.23.37.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jan 2025 23:37:07 -0800 (PST)
-Message-ID: <6784c2a3.050a0220.12bce2.cbbe@mx.google.com>
-Date: Sun, 12 Jan 2025 23:37:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7256293771722551876=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SXu/XkJG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B2B2C4CED6;
+	Mon, 13 Jan 2025 09:24:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736760264;
+	bh=O8ogNUi16IzOoAKmrNzGLQ/V2vo+Dds9Q28JEu9S4G0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SXu/XkJGzu45wBlW3MJDvuGnlOv69IDD9OWaVob3zI34ULXVuJeVlxgPCV0UkySUB
+	 VWiHTSTyF0MHH0/ZhQv8uT592YGp8o72PEwK5CpfhQB5X269MUJoEUnwhyBvcFVC7+
+	 +oiwNeF602ZA1UqfgAUHTaG75pGtnRrBw+x2c4N+9YxhKq2PJG2RPfYtIu4AIdV/Gt
+	 +T4mb7gE8Ob87w5YWw/q4DzBsI3S+6WyhgUJKSQxagckg5gbc7TsqyVCydWuuSuXSC
+	 2ONtmVnWFOjfna56GLuhe/M8ZuFNdZPvXBg7U7cOhdymiAPNuljQzj7SXo3AfY2l2r
+	 giEVJ+E1zwylQ==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1tXGgK-000000006ce-0PzK;
+	Mon, 13 Jan 2025 10:24:24 +0100
+Date: Mon, 13 Jan 2025 10:24:24 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Zijun Hu <quic_zijuhu@quicinc.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Steev Klimaszewski <steev@kali.org>,
+	Paul Menzel <pmenzel@molgen.mpg.de>, Zijun Hu <zijun_hu@icloud.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Bjorn Andersson <bjorande@quicinc.com>,
+	"Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>,
+	Cheng Jiang <quic_chejiang@quicinc.com>,
+	Jens Glathe <jens.glathe@oldschoolsolutions.biz>,
+	stable@vger.kernel.org, Johan Hovold <johan+linaro@kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: qca: Support downloading board ID specific
+ NVM for WCN6855
+Message-ID: <Z4TbyIfVJL85oVXs@hovoldconsulting.com>
+References: <20241116-x13s_wcn6855_fix-v2-1-c08c298d5fbf@quicinc.com>
+ <Z1v8vLWH7TmwwzQl@hovoldconsulting.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, d.privalov@omp.ru
-Subject: RE: [5.10,1/2] Bluetooth: L2CAP: Fix uaf in l2cap_connect
-In-Reply-To: <20250113073100.34744-1-d.privalov@omp.ru>
-References: <20250113073100.34744-1-d.privalov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z1v8vLWH7TmwwzQl@hovoldconsulting.com>
 
---===============7256293771722551876==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is an automated email and please do not reply to this email.
+On Fri, Dec 13, 2024 at 10:22:05AM +0100, Johan Hovold wrote:
+> On Sat, Nov 16, 2024 at 07:49:23AM -0800, Zijun Hu wrote:
+> > For WCN6855, board ID specific NVM needs to be downloaded once board ID
+> > is available, but the default NVM is always downloaded currently, and
+> > the wrong NVM causes poor RF performance which effects user experience.
+> > 
+> > Fix by downloading board ID specific NVM if board ID is available.
 
-Dear Submitter,
+> > Fixes: 095327fede00 ("Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855")
+> > Cc: stable@vger.kernel.org # 6.4
+> > Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+> > Tested-by: Johan Hovold <johan+linaro@kernel.org>
+> > Tested-by: Steev Klimaszewski <steev@kali.org>
+> > Tested-by: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
+> > Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> > I will help to backport it to LTS kernels ASAP once this commit
+> > is mainlined.
+> > ---
+> > Changes in v2:
+> > - Correct subject and commit message
+> > - Temporarily add nvm fallback logic to speed up backport.
+> > — Add fix/stable tags as suggested by Luiz and Johan
+> > - Link to v1: https://lore.kernel.org/r/20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com
+> 
+> The board-specific NVM configuration files have now been included in the
+> linux-firmware-20241210 release and are making their way into the
+> distros (e.g. Arch Linux ARM and Fedora now ship them).
+> 
+> Could we get this merged for 6.13-rc (and backported) so that Lenovo
+> ThinkPad X13s users can finally enjoy excellent Bluetooth range? :)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+This fix is still pending in your queue (I hope) and I was hoping you
+would be able to get it into 6.13-rc. The reason, apart from this being
+a crucial fix for users of this chipset, was also to avoid any conflicts
+with the new "rampatch" firmware name feature (which will also
+complicate backporting somewhat).
 
------ Output -----
+Those patches were resent on January 7 and have now been merged for 6.14
+(presumably):
 
-error: patch failed: net/bluetooth/hci_event.c:3245
-error: net/bluetooth/hci_event.c: patch does not apply
-error: patch failed: net/bluetooth/l2cap_core.c:4272
-error: net/bluetooth/l2cap_core.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+	https://lore.kernel.org/all/20250107092650.498154-1-quic_chejiang@quicinc.com/
 
-Please resolve the issue and submit the patches again.
+How do we handle this? Can you still get this fix into 6.13 or is it
+now, as I assume, too late for that?
 
+Zijun, depending on Luiz' reply, can you look into rebasing on top of the
+patches now queued for linux-next?
 
----
-Regards,
-Linux Bluetooth
-
-
---===============7256293771722551876==--
+Johan
