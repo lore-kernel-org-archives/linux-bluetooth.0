@@ -1,155 +1,115 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243D4224B07
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2025 11:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F952361DF;
+	Tue, 14 Jan 2025 11:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736854142; cv=none; b=At9YNEenPrNDhmXckAYPf6tSiV9TRvV0TbRODoVjuU+wSa4+6qa5gZYnqXIDPKaYYFRiiO5pRJkehPw9UarAFKBtGaxYWAhl+zftbuUveIo7kIK34jjVGDRRHol4UIXS2ofRl7jYqy6PLfV83tP2NOKc1YTMqC1/yPJZTZV8rws=
+	t=1736855824; cv=none; b=qDy/VoSU9cDtK8Iwa7zKNqfvAfNnJkXLhdrYFGIfN7/ECqUfiNaYGUC1501+y5I1Zx3UL3Y9YpJEubMEYPs6r5qh73QmPPj4q2gnFiMGtfgWbAktg2X9cxzDcpokDAgLct25NHd2yjR7EbtaA14sAzpwDHphd//jlFWIMc7aL2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736854142; c=relaxed/simple;
-	bh=6ZFmGSYqlxUWnC1/gKOkeuI5g54WJ8zWsqfxeHvpQ9c=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=XhXZ0f57OPyYv/4wNO/13zUS9lqNzmU2CcDGBIzrv/sNsJ7QvAtz3BliGPHFu9qtpcurBq8aohCt8Zzmg3ItKa33Ei7p3BZ1vROmJiRT6PgMadJiUyNzRWnu5WXtvX+cnCq0IrnJwM3Y71/k7YwAriMToAbVw2ZCsfBwIoXYM3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SV8OUpB1; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736855824; c=relaxed/simple;
+	bh=gEGR8MRokPia2nvtzq2dhpCodYQQ24YcVeUiUIQoKes=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qZtKQnb9b2LAiAWffLM0EUYQQO716ccqWgG3RiZCyg/wFs+plncsRC1gOtSx2aq2sbhJBlX/d0r6KbBcYC4BzLRbwJbnLsbZM7DZ898ulxf79AB+eRJW5ZSkHsy3fakR2YGR6BjOqwkmwdh/T94Myf7+OFbzGdRp8J+VYX5RSuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvvHYPNi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SV8OUpB1"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2167141dfa1so93520795ad.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2025 03:29:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736854140; x=1737458940; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NvOJMPIkvyU9d/tnmu4HPJFUMOvFIPXlyxLvolkAkOQ=;
-        b=SV8OUpB1iwGdht5t1RcmpucofsyAOPFsPJqRQQMjjle62vx0LR+0vR6XsuCjyL58rb
-         IKOgA9Ep7ZXaJPEjjIJuadUE3ITAVFgUnz/FoNvX2Wl8Jlsy/1MeFStlJykh8l4fOgbk
-         rj8v4MsR66NgN9jQA5i+YhrGlsgARgBWI3yYo1zCc0+vZfiuoOWXVN4K/1dKsFGIEKL3
-         nD3cMjOK+yAK16ZIJ0KHsScFxzGqD9YSkZKmuLaZV5BUonbiIw0NxkNH09ODFdnGusHp
-         ZK/AV/sSr1ajD84sH79UiCsGFQKBwh/lmCvOKuV4KA4Fak3GHqhCsROOC95j5rFgaoa9
-         eEmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736854140; x=1737458940;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NvOJMPIkvyU9d/tnmu4HPJFUMOvFIPXlyxLvolkAkOQ=;
-        b=oqCmHPg4QQwC7xRYtpju/cYC9tXyUxsVvlAjbuIwzyfJ8vkeGiFrkGj7wvmos9kGaw
-         27pr6iXvlhcQybKEbG1tz7ce3NHjndrzsoDr8acckmpjYUhf1mzxurx8BbQzN67Z59kp
-         w7U22FV3R6A0uSxyWDATKAlpqzAzx4kplE53STfGiL6Rc4ceUdgv0qcP5m+3IyyuG2so
-         JW8mv/21PW32qcmfNWWONwdw/5dStzZvlEqJLOP+jfOEqfiIczxRg1SgRoQfeQ7ulq0w
-         7Kcu2RVq+E214v0ERV6grrn2EWLu8U0fkvcCFy07gI1u9LUxFRSwUPgMxOP6tQbmYj4R
-         pSow==
-X-Gm-Message-State: AOJu0YwiuFzD2f5Kyt1DPmUBBUM8RF7ABqKn5qPtLt2moOoiWFA2z0Hb
-	iQEP1swQcsBmK6we2XaimCuxpqXx3IqlAnEREERAuvpHFDBd61iy+CdNpA==
-X-Gm-Gg: ASbGnctwfsGOb59+69aPUG+T2En7HrMYnhxbhINr4ci3xPI9FG/Ut9knS4s9tq6hrGk
-	CeS6RZQl++2wP0XpjOhFuzMljllBtGvCBVWoKTSEqeRdh8wYYMmalId1kVubCI2iznZOkTB23Rk
-	qa9c7/ytn502KesLskdNiGo3R+TSzZ5mqlqB5FYRfKpMqaVLD/bhCV/sN/hSX20fgR22KQ9/8dz
-	H6Ixfky9QkdY9VMeep8Ki9ACu9uSfxXPSZSST0EDTARYy7GUBSbxuvrCOJKFAU=
-X-Google-Smtp-Source: AGHT+IE4uDlAyTGM5dcKOjlI9YrTJxlccbmf6IFlgUNqXC1QNsGFj/yxYpcsoodtWLMJaX8EuEC/TQ==
-X-Received: by 2002:a17:902:d50d:b0:216:6284:8a00 with SMTP id d9443c01a7336-21a8d6335d2mr286119825ad.2.1736854140053;
-        Tue, 14 Jan 2025 03:29:00 -0800 (PST)
-Received: from [172.17.0.2] ([52.234.38.114])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f21c3ecsm66406615ad.111.2025.01.14.03.28.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 03:28:59 -0800 (PST)
-Message-ID: <67864a7b.170a0220.250715.0f8d@mx.google.com>
-Date: Tue, 14 Jan 2025 03:28:59 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6018214976158886752=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvvHYPNi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14722C4CEDD;
+	Tue, 14 Jan 2025 11:57:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736855824;
+	bh=gEGR8MRokPia2nvtzq2dhpCodYQQ24YcVeUiUIQoKes=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uvvHYPNiE3+4StSzt6UzMk7qIndi35ySphFZLtQNtUkIPeht2Om3dFvNupKuVVLT5
+	 Io5lhZiE7ULQhpSlWIK4HQciVV8hHzbiQPWwneVo+D1Js5oAFMkAigHG7FTobHrxkE
+	 7JBgJfT5W9se64f/z7pP/YlkZB0yECLtJTMpTM53VLL129afo1z4dv3zX+PeXbzNo0
+	 2M6MNU+zKDq9eTZkWH0k+kHPYd+N1eQAylctphF4lvScLI+w3/NuneHu8odSJPW7Sj
+	 SHOS66pnKsxrSnH8WIJwGpZEDsMxpZHA3aPHoB66DMscOA179H+YS2dnSxv0SFJ5vJ
+	 R4veLIg8MgWZw==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1tXfXd-000000002J2-1ckK;
+	Tue, 14 Jan 2025 12:57:06 +0100
+Date: Tue, 14 Jan 2025 12:57:05 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Andreas Kemnade <andreas@kemnade.info>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, pmenzel@molgen.mpg.de,
+	jirislaby@kernel.org, gregkh@linuxfoundation.org,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Adam Ford <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>,
+	tomi.valkeinen@ideasonboard.com,
+	=?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@gmail.com>,
+	robh@kernel.org, hns@goldelico.com,
+	Sebastian Reichel <sre@kernel.org>
+Subject: Re: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
+Message-ID: <Z4ZREdC3aPkkxB2l@hovoldconsulting.com>
+References: <20240606183032.684481-1-andreas@kemnade.info>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v1,1/2] dt-bindings: net: bluetooth: nxp: Add support to set BD address
-In-Reply-To: <20250114104033.2324297-1-neeraj.sanjaykale@nxp.com>
-References: <20250114104033.2324297-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240606183032.684481-1-andreas@kemnade.info>
 
---===============6018214976158886752==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+[ +CC: Sebastian ]
 
-This is automated email and please do not reply to this email!
+Hi Andreas,
 
-Dear submitter,
+and sorry about the late reply on this.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=925213
+On Thu, Jun 06, 2024 at 08:30:28PM +0200, Andreas Kemnade wrote:
+> Some of these chips have GNSS support. In some vendor kernels
+> a driver on top of misc/ti-st can be found providing a /dev/tigps
+> device which speaks the secretive Air Independent Interface (AI2) protocol.
 
----Test result---
+Please expand the cover letter and commit messages with more details on
+the protocols and backstory here. I spent hours over the Christmas break
+digging through drivers, git logs and mail archives for information that
+should have been part of the series.
 
-Test Summary:
-CheckPatch                    PENDING   0.41 seconds
-GitLint                       PENDING   0.33 seconds
-SubjectPrefix                 FAIL      0.37 seconds
-BuildKernel                   PASS      24.86 seconds
-CheckAllWarning               PASS      27.25 seconds
-CheckSparse                   PASS      30.62 seconds
-BuildKernel32                 PASS      24.29 seconds
-TestRunnerSetup               PASS      429.66 seconds
-TestRunner_l2cap-tester       PASS      20.97 seconds
-TestRunner_iso-tester         PASS      32.71 seconds
-TestRunner_bnep-tester        PASS      4.86 seconds
-TestRunner_mgmt-tester        FAIL      124.86 seconds
-TestRunner_rfcomm-tester      PASS      7.66 seconds
-TestRunner_sco-tester         PASS      9.61 seconds
-TestRunner_ioctl-tester       PASS      8.22 seconds
-TestRunner_mesh-tester        FAIL      6.46 seconds
-TestRunner_smp-tester         PASS      7.09 seconds
-TestRunner_userchan-tester    PASS      5.19 seconds
-IncrementalBuild              PENDING   0.94 seconds
+Specifically, give a better description of these chips which are WiFi
+controllers with Bluetooth primarily and then some have (optional?) FM
+radio and GPS support as well. Some even seem to support NFC too (also
+over HCI?).
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+Provide some background on the ti-st driver, which have now been
+removed; the fact that we already had two drivers for these chips with
+one only supporting the Bluetooth (and later some PM) bits; say
+something about the FM driver which someone also recently decided to
+remove on questionable grounds.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Please also refer to the prior attempts at adding support for the
+various subfunctions to the driver (e.g. Sebastian's discussion with
+Marcel on how to possibly abstract this in Bluetooth core), such as:
 
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+	https://lore.kernel.org/lkml/0C9AD246-B511-4E59-888F-47EAB034D4BF@holtmann.org/
 
-Failed Test Cases
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.148 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in run_timer_softirq+0x76c/0x7d0
-WARNING: CPU: 0 PID: 65 at kernel/workqueue.c:2257 __queue_work+0x687/0xb40
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+> To be more compatible with userspace send out NMEA by default but
+> allow a more raw mode by using a module parameter.
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Failed       0.114 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+I'm very hesitant about adding a module parameters for such
+configuration. There's very little detail about the AI2 protocol in this
+series, but I'm inclined to just say expose it to user space and let it
+deal with it. Or you can argue that we'll never be able to reverse
+engineer the protocol enough, but that enabling NMEA and exposing that
+is straight-forward enough (and safe) to be done in the kernel.
 
+At the least, please provide an overview of the protocol (and also
+include an example such as the one you provided in a previous thread),
+what functionality it appears to provide, and how it can be used to
+generate NMEA (e.g. so we can have a discussion about this).
 
+Do all the WiLink devices use AI2? Or could some be exposing raw NMEA?
 
----
-Regards,
-Linux Bluetooth
+(And how does "TiWi" relate to "WiLink"?)
+ 
+> This was tested on the Epson Moverio BT-200.
+> 
+> Who will take this series (1-3)? GNSS with ack from Bluetooth?
 
+I can take the whole series once we've figured out how to model this.
 
---===============6018214976158886752==--
+Johan
