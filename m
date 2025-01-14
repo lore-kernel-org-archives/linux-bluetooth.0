@@ -1,189 +1,118 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3957220F968
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2025 10:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA831ADC98;
+	Tue, 14 Jan 2025 11:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736852208; cv=none; b=ua14e0SWH1eDFRp4Uj8+gcMxDDOiC8ZiguEVa1jTW3+wdrKHce8bSBw98ULsxHTIwDfCA5qaZ+91jzjrAGE3AZt5+HS6VDvN6bVEEZy+iBiANj8jLE2/EvoO8VMobrO1ESoRR/aekc4VcDFx9/3lsBNtuMK7tqB5ChQRHBu6Arg=
+	t=1736852611; cv=none; b=gi4A1LJWns+YNbcs02OHcv1iE8up3LkcF5J44z8GxiTbTfF6K+v9/jw5TayPL2CMnJyOZFAReSS7ETYePfEHmg2R/o+QR4j8JDHoZFT7AWY6UaJUvsHmLg/fZILmAv+SiZSRUipYqd4IoAhLNVfzP95FZ6okZ7VJyntVB6R9row=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736852208; c=relaxed/simple;
-	bh=TG/8seqngn40G/0uo2/TuAvyW9NOt6h4rq97t0K+y2Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hAE0niLRRyk4Y5ybhRbQfvVrfOU6Ipa5w89VF0Ll1LfmGRGg8Z/LRYpHvWbw0pRgBjtNB/uM5HwyxB3s11gpVAyBJ1fzFK56kNRS4LAZXRSSEjke60cIdmeRZ2HqE/auMfGJoiTwk2Gi2kzkITxq67lAmNrsRTCs0nVAcitlgYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gjt14f6i; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1736852611; c=relaxed/simple;
+	bh=Z0chIMChmT/j56Rf8fFtJoTWJhED1beAbKQpEiG6j4g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YX+CLCp2cjJup9+hNI6f6nTdFMKDK2EYczesYxQcVV0EfTo+MzR+jApy2J1YaTcZbgtJ1YbFWtX9Pp1zSdox6FMpEzOotndjimiZm6c9iLV/uR2uw0lzc0Q2uTea/VTm9ReUxV/3q8Duk0+hkuJhVFXrFWPb2E82gibKP4u2NQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sjPZs2TT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gjt14f6i"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aa676e4f36cso66853866b.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2025 02:56:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736852205; x=1737457005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dv8xOrPcHkPlaXmRS2RH96AOxuG34frapdG0yNHUuJY=;
-        b=gjt14f6iO76qj3IS0/0/w4uAWeA18V6BmPFgmyG2RWVnD+RTk5ivE6Bb1kzymQfgO3
-         WJ16lsjNoUJCD/Eemp5aP+0EZL7niN5tVABOFsUOZYUSNartS4qvnJAQyKRcWLzhR3nD
-         CjgHwsuf1di+ii+lDPbJJT8pPF4t2eqTAufHUZYm8CM+saN8rdifYH2njw+UlOnQEvGs
-         7oimhoBtQrvyK4B35/ajGcPDtPnuTGy/BnO+Xenz1I/Grs0vbLRlBO+KqisGvL636hXM
-         Ica+1iO+GbES8d4yjzlI4cNrN/teMx0/xnbSlC7YlVCgAG4+26x9Zuoe3iFy9aHAVF6U
-         P6oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736852205; x=1737457005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dv8xOrPcHkPlaXmRS2RH96AOxuG34frapdG0yNHUuJY=;
-        b=lQCsmcF9bpk3Dm2ogmWZE5XdcLU9l0VlfgK2LBy8YWMfaLHEX6Bd/OG0U9asC/BwrB
-         3nw7UMngIqBDGJME8QXa+0xA8Lma2UDIH9MYhAJjyoHLuoigBg5QEXfzjNt8thtpGiBq
-         Pq7rgGnZ2Dl3/hC4cbynrirbb0K3M4jvXXzjD0JGwWu+Flg18xzB4XZpvTvJCITCjwSq
-         wVGnVuZVBtOOvq9L899Ojfmz/QLq1Li/QIY4jUzlrpfw4bWm72iPIPxQown1cj76O9IJ
-         DlmQB5mHKNQfXGzws4l8EI1QN74XWqTxsjI2wUkA3PCnaYmBLncZU7febOIuofue8rJK
-         fMCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWZT3nP4aUJzFX19mQw6GKzqk9uUbKszAa/op6D/+yw5bSXtRB3zo06PQIYTd8yGyO8Nw6ttKFmaM2gTW4ore8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP7X+Iod+U2YXhEEoohV4EZHyB+jXheXTbrl+oQtT0T72b+oZM
-	e04yadxGrOkqdo8NCu6Seqjwwt+HuKDXkBTuERY0Kczvm2EC+R1w/KO5YsvOvmc=
-X-Gm-Gg: ASbGncsJJ+HcgMPU4gWbWXZPER0S52OP3erxP06MIJ0H+E+drpGYayXIF2Fiq6uo/V6
-	APJTV3Au002rb7rgAq2aOv2tEU+hml7NsKVz8L68ljbY8Wd+FkvJRrIlEhAPkRTxS56Rw5R8B6/
-	XVZ1V2+ckIduEBYLmm0U8HNMNpiaVsBV5Ft5hkstJkDvKE0FyxK6CNYhKwyF/Uco4hycqbJDtex
-	DeIWf6+yv7+//Yyi31XUWqpasqAbqceNwLE6OWyA7E38SM2Mdh0JEHekbf0tL9s535SmKs=
-X-Google-Smtp-Source: AGHT+IFDYSZs2EgXOxOs0j3TmkpApoppsmbQrtPhAy21A4L/1ijy2TMTCPfDFzQkImZHkPV0ZUNLKw==
-X-Received: by 2002:a17:907:d1b:b0:a9a:1a17:e1cc with SMTP id a640c23a62f3a-ab2aa7d1518mr822062866b.0.1736852204563;
-        Tue, 14 Jan 2025 02:56:44 -0800 (PST)
-Received: from krzk-bin.. ([178.197.223.165])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c95aede8sm616837166b.136.2025.01.14.02.56.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 02:56:44 -0800 (PST)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH] Bluetooth: Use str_enable_disable-like helpers
-Date: Tue, 14 Jan 2025 11:56:41 +0100
-Message-ID: <20250114105641.273451-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sjPZs2TT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A32AC4CEDD;
+	Tue, 14 Jan 2025 11:03:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736852610;
+	bh=Z0chIMChmT/j56Rf8fFtJoTWJhED1beAbKQpEiG6j4g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sjPZs2TT4Ccq4xK8DVyOpeIxnEqyOgWp6REeyOA8xu7AuS/5Qr0/u2m2cxG5Shrvj
+	 1G6DECej356unReQauoBspZC4t9+ycuaX0AAPMzDAJMU9S2AmiWHq53blhYyFb5Iez
+	 KuHjrDzkiu6DVU2l3UjdYoPThZW1ODW3u61guJHU2U//yQmO1DAzn5lEWKK+Y5jtST
+	 dnc7+sfDqF7ajBm5b/W20wgq7tqUtNWx/QCm9Vx8AsZmfphLyEFiM3wKr1PJOmQIZA
+	 3Dnx7QfLjEz7UNzwoXQBAmwbyNV+epQptY/D+QcXRb0Xeg/U4CtY84GP/kL9D9LbW+
+	 Bv4UGyARxZ+vw==
+Message-ID: <758ba08e-fc4c-4b89-bbee-d3595afd7a88@kernel.org>
+Date: Tue, 14 Jan 2025 12:03:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/2] dt-bindings: net: bluetooth: nxp: Add support to
+ set BD address
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, marcel@holtmann.org,
+ luiz.dentz@gmail.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, amitkumar.karwar@nxp.com, sherry.sun@nxp.com,
+ ziniu.wang_1@nxp.com, johan.korsnes@remarkable.no,
+ kristian.krohn@remarkable.no, manjeet.gupta@nxp.com
+References: <20250114104033.2324297-1-neeraj.sanjaykale@nxp.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250114104033.2324297-1-neeraj.sanjaykale@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Replace ternary (condition ? "enable" : "disable") syntax with helpers
-from string_choices.h because:
-1. Simple function call with one argument is easier to read.  Ternary
-   operator has three arguments and with wrapping might lead to quite
-   long code.
-2. Is slightly shorter thus also easier to read.
-3. It brings uniformity in the text - same string.
-4. Allows deduping by the linker, which results in a smaller binary
-   file.
+On 14/01/2025 11:40, Neeraj Sanjay Kale wrote:
+> This adds a new optional device tree property local-bd-address to allow
+> user to set custom BD address for NXP chipsets.
+> 
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+>  .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml      | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> index 0a2d7baf5db3..beae21c3758a 100644
+> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> @@ -40,6 +40,8 @@ properties:
+>        Host-To-Chip power save mechanism is driven by this GPIO
+>        connected to BT_WAKE_IN pin of the NXP chipset.
+>  
+> +  local-bd-address: true
+You miss bluetooth ref with unevaluatedProperties: false. See mediatek.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- drivers/bluetooth/btintel.c     | 17 +++++++++--------
- drivers/bluetooth/btmrvl_main.c |  3 ++-
- drivers/bluetooth/hci_qca.c     |  5 +++--
- 3 files changed, 14 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index d496cf2c3411..d2540b28bc7a 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -9,6 +9,7 @@
- #include <linux/module.h>
- #include <linux/firmware.h>
- #include <linux/regmap.h>
-+#include <linux/string_choices.h>
- #include <linux/acpi.h>
- #include <acpi/acpi_bus.h>
- #include <linux/unaligned.h>
-@@ -506,13 +507,13 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
- 
- 		bt_dev_info(hdev, "Device revision is %u", version->dev_rev_id);
- 		bt_dev_info(hdev, "Secure boot is %s",
--			    version->secure_boot ? "enabled" : "disabled");
-+			    str_enabled_disabled(version->secure_boot));
- 		bt_dev_info(hdev, "OTP lock is %s",
--			    version->otp_lock ? "enabled" : "disabled");
-+			    str_enabled_disabled(version->otp_lock));
- 		bt_dev_info(hdev, "API lock is %s",
--			    version->api_lock ? "enabled" : "disabled");
-+			    str_enabled_disabled(version->api_lock));
- 		bt_dev_info(hdev, "Debug lock is %s",
--			    version->debug_lock ? "enabled" : "disabled");
-+			    str_enabled_disabled(version->debug_lock));
- 		bt_dev_info(hdev, "Minimum firmware build %u week %u %u",
- 			    version->min_fw_build_nn, version->min_fw_build_cw,
- 			    2000 + version->min_fw_build_yy);
-@@ -927,16 +928,16 @@ int btintel_read_boot_params(struct hci_dev *hdev,
- 		    le16_to_cpu(params->dev_revid));
- 
- 	bt_dev_info(hdev, "Secure boot is %s",
--		    params->secure_boot ? "enabled" : "disabled");
-+		    str_enabled_disabled(params->secure_boot));
- 
- 	bt_dev_info(hdev, "OTP lock is %s",
--		    params->otp_lock ? "enabled" : "disabled");
-+		    str_enabled_disabled(params->otp_lock));
- 
- 	bt_dev_info(hdev, "API lock is %s",
--		    params->api_lock ? "enabled" : "disabled");
-+		    str_enabled_disabled(params->api_lock));
- 
- 	bt_dev_info(hdev, "Debug lock is %s",
--		    params->debug_lock ? "enabled" : "disabled");
-+		    str_enabled_disabled(params->debug_lock));
- 
- 	bt_dev_info(hdev, "Minimum firmware build %u week %u %u",
- 		    params->min_fw_build_nn, params->min_fw_build_cw,
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 18f34998a120..e26b07a9387d 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -7,6 +7,7 @@
- 
- #include <linux/module.h>
- #include <linux/of.h>
-+#include <linux/string_choices.h>
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- #include <linux/mmc/sdio_func.h>
-@@ -88,7 +89,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 			else
- 				adapter->psmode = 0;
- 			BT_DBG("PS Mode:%s",
--				(adapter->psmode) ? "Enable" : "Disable");
-+			       str_enable_disable(adapter->psmode));
- 		} else {
- 			BT_DBG("PS Mode command failed");
- 		}
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 5d75087cca99..0cfe40393600 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -31,6 +31,7 @@
- #include <linux/pwrseq/consumer.h>
- #include <linux/regulator/consumer.h>
- #include <linux/serdev.h>
-+#include <linux/string_choices.h>
- #include <linux/mutex.h>
- #include <linux/unaligned.h>
- 
-@@ -343,8 +344,8 @@ static void serial_clock_vote(unsigned long vote, struct hci_uart *hu)
- 		else
- 			__serial_clock_off(hu->tty);
- 
--		BT_DBG("Vote serial clock %s(%s)", new_vote ? "true" : "false",
--		       vote ? "true" : "false");
-+		BT_DBG("Vote serial clock %s(%s)", str_true_false(new_vote),
-+		       str_true_false(vote));
- 
- 		diff = jiffies_to_msecs(jiffies - qca->vote_last_jif);
- 
--- 
-2.43.0
-
+Best regards,
+Krzysztof
