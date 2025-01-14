@@ -1,145 +1,111 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C679514B955
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2025 14:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84E923242C;
+	Tue, 14 Jan 2025 15:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736866570; cv=none; b=LwK6T3Be0Ym39EkY6phxbzXSo/4wIpptHVjRg7x+B4D+CXu1wgDLmRphNkSyw1cyZOjI3DniSX+GZn7yzwH6N8CLn8OV6IvesUFFzUUjocWxFD0u8vlSyh77jJ3iOni7rjqtvq1ksyZJjSkDal4VSAEhhI1NZXC61m7pEFpw9Es=
+	t=1736868413; cv=none; b=ZdaaMRzlg4h0+PStY3kYjKQ/hso29focrdByb88tHKeZR1KcU6FkGDEGepx9tpTx3bs8Y8gN5d2ugpN9PI6dMdQGvDkSlQ4UvbKEvfsh8I1tVtgMD7jQw235smbtnHf48stnnm15Q1V6SFnRuVSGWRr1q7RUSXwD5ZMzKtgpxBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736866570; c=relaxed/simple;
-	bh=aHnZEI2s26ty1jJOW45PsU/9v7ev4qL8GqJjPlJYYiQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=l8qXsD7RbnJ8AItAWrNbumHFeVW6fhFJbrshq/wDYWQ2IMO9BJEcu1XP12qh6aUzSqZuyXS3ckkYxGNnJAzslXdWPwLOF8Ge0ICoqYhDB6m6ytaonikEkPmBaTtsUHOxDiLHhuQyl847oO63UVIZBVXHT7VsQ/yyy17gsGenYMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQRsPWtO; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736868413; c=relaxed/simple;
+	bh=kgvis2tHLwbch3v1GLHliYeKtxfGAjT6Jgn8TYKUPtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UyP7BWtLJjDOuZSwwK7i7TTSbqT6gfcn2J9ZkC9vXpkSyJq43iBqxPS/oSv7CtFoEsRmY47X5SmxPsBNTCvooDJhFNF7O+3sUXmGxs1TwqrzgvTXWGxIbsNfypOmW8bOYcZteoK3t6gvpJ03oqHhBS7nX91Ia/LwGpj6b1jx8HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aQq8BgNl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQRsPWtO"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-467b74a1754so70748131cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2025 06:56:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736866567; x=1737471367; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LUWpWmV9/saXVZPFEv9LyCZUThyZYzkqcPgNVLTJc0Q=;
-        b=FQRsPWtOfOkNN2YYhs3QamiBXp5fWhkRVQNOjuOe/WeK0QNOYfDksC24yMZHf5Dx+o
-         xON7GOQSrgBISb1ZwV4gZ7QFb8zmaHkEfkXLOalC/6BFRb4cSz2rnAw7YgAUTFcvkWLM
-         8NN6rzWRnAujwAQ9xvDkGAGcRqr4esSNF/25blTGki5tUn+4GTAY7cZOcmogSz0LfN+G
-         x5HlvMVJswHayB36N3Ls5IAk9VDDBdq1TQJsNOmctaQTRy3J8bLVIoeSRdF1PL8i6W5r
-         OdJsc52Kt+USbzoIXza++WaFkLnMGOaR09KKvqfarikXfZeU1tepDH06J7I2ONZygyd/
-         it+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736866567; x=1737471367;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LUWpWmV9/saXVZPFEv9LyCZUThyZYzkqcPgNVLTJc0Q=;
-        b=dlHsJRuVX6xupH5acbNHqVBg9TQ6wU7KlcbFvDFitqpRz0mwdO0emAyahvLxqKuYe/
-         4JgJg9nhwKH99Bny6429zAhSHqQqMbg7HXW09QcnCDeCwvm7CLtar7wa6s/BFofVDwsp
-         WY3oiiZXb2K+q70LaulIWOjHAWXrMpTrDWy18ejd+QF46J3dxqbXgRiVUKEswNeclY0R
-         rv4XjnydhleyqPc8SM9BkZveAFOdkBF6ElfNbYV20D+YNObAau1t1o2QA/VSMVLZsgtQ
-         2ZTMEx5tdqvmt5cHDFLONB0IFH6+E//WrQYpJMjvzwYglG2z4qL+0GpM3o2o0bGhFlhZ
-         B0Tg==
-X-Gm-Message-State: AOJu0YwfeDESMU3qy5EBDSeMduhWMSs+XzACAx8vN0ApL5ozWPGMDOIs
-	zSWSvV1Il3a2UwGGcFcIDWMkQhfez32L3j2Pz8ItXi4tnQchR2zb0e0Eqg==
-X-Gm-Gg: ASbGnctG1lohuZlFZ2F1y6Faqr1z7TeLzLD0tRT22fFcVxYkSxf1bio8qhFznyIKfsN
-	eksI8Zll1Fmc7QCpoaTBkT2lpxcl4U/VEExsj+PWkUdO+WxxfCglkfAIhSkbIXsTPGWTZ4lJE7E
-	2txoSuQdoMX1JKwsa0ejQIxAFNnde4KQqJ330C0rdpCtoxyL3w8iNwyHR2TB/UJCOqepEtsn+zg
-	quy8x6tAebUsMNDUrHvx7mzSIhVFWJ8kDsY8IgzT08y8jOJfybjPoJZ66m9
-X-Google-Smtp-Source: AGHT+IGwNerW/WyGz5u7ft85OCSvdjjVVN8kH/HqxosCLrK3h09RPNk8qlk+yHUxKmh2EmWJM8YArQ==
-X-Received: by 2002:a05:622a:1889:b0:467:5e56:8677 with SMTP id d75a77b69052e-46c7102fc61mr462158531cf.30.1736866567388;
-        Tue, 14 Jan 2025 06:56:07 -0800 (PST)
-Received: from [172.17.0.2] ([20.57.79.74])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c87330a2asm53837731cf.22.2025.01.14.06.56.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 06:56:07 -0800 (PST)
-Message-ID: <67867b07.c80a0220.18a3dd.3c09@mx.google.com>
-Date: Tue, 14 Jan 2025 06:56:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4299737024800432549=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aQq8BgNl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 624CCC4CEDD;
+	Tue, 14 Jan 2025 15:26:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736868413;
+	bh=kgvis2tHLwbch3v1GLHliYeKtxfGAjT6Jgn8TYKUPtQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aQq8BgNlElZyTY/FjvADwoSo0FYWTeO5psqmiyYKttS/MKw1P176F1HjIXwcJ0Ew+
+	 G8y9/NwzqO3UCIewr+tJPg/U45xPha4Luru18fuRNC2pgMTTsNeNl5Dnrk61BNk0+H
+	 ZBDvAmjPHs0Mzidr6rOkqe3YxU0BtZ5fxGvjt+OrlKpuMPLJPe8BMGS+ty8ObrBzTv
+	 2i2IoHJft26Yu3Vb1ZKoNGv6vD+jr9SwX/xw2oUjEad6PI06y7TSp5PlugQl3p1A1H
+	 9zHgd8G0Owcq8D9jk89aDOBdUSgdO73x9qI4I3KVQm3y1AG4pFkR7NtQzTc26bDU0B
+	 ZT+nq4+i1T/NA==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1tXioh-000000007cR-1HRp;
+	Tue, 14 Jan 2025 16:26:56 +0100
+Date: Tue, 14 Jan 2025 16:26:55 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Andreas Kemnade <andreas@kemnade.info>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, pmenzel@molgen.mpg.de,
+	jirislaby@kernel.org, gregkh@linuxfoundation.org,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Adam Ford <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>,
+	tomi.valkeinen@ideasonboard.com,
+	=?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@gmail.com>,
+	robh@kernel.org, hns@goldelico.com
+Subject: Re: [PATCH v4 2/4] Bluetooth: ti-st: Add GNSS subdevice for TI
+ Wilink chips
+Message-ID: <Z4aCP-r-IUTmyizm@hovoldconsulting.com>
+References: <20240606183032.684481-1-andreas@kemnade.info>
+ <20240606183032.684481-3-andreas@kemnade.info>
+ <Z4ZVNU0PdCDpMaNY@hovoldconsulting.com>
+ <20250114140525.763b4c33@akair>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v3,1/2] dt-bindings: net: bluetooth: nxp: Add support to set BD address
-In-Reply-To: <20250114141912.2363131-1-neeraj.sanjaykale@nxp.com>
-References: <20250114141912.2363131-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250114140525.763b4c33@akair>
 
---===============4299737024800432549==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Jan 14, 2025 at 02:05:25PM +0100, Andreas Kemnade wrote:
+> Am Tue, 14 Jan 2025 13:14:45 +0100
+> schrieb Johan Hovold <johan@kernel.org>:
+> 
+> > > GNSS support is available through
+> > > channel 9 whilst FM is through channel 8. Add a platform subdevice for
+> > > GNSS so that a driver for that functionality can be build.  
+> > 
+> > > To avoid having
+> > > useless GNSS devices, do it only when the devicetree node name contains
+> > > gnss.  
+> > 
+> > That's seems like an unorthodox use of device tree. These devices are
+> > primarily (WiFi and) Bluetooth controllers so should probably not have
+> > gone about and updated the node names to 'bluetooth-gnss' as you did,
+> > for example, here:
+> 
+> yes, the matching of the node name is a bit unorthodox. How do you
+> define primary? The old design with ti-st driver and bluetooth and
+> other functions on top does not look like anything primary. If you look
+> at the current situation with the GNSS stuff sitting on to of
+> bluetooth, the picture is different, but that is implementation.
 
-This is automated email and please do not reply to this email!
+I call it primary based on (my understanding of) the architecture,
+protocol and chip family. It look to me like the FM, GPS and NFC
+functionality is bolted on top of the Bluetooth one for which a protocol
+already existed (and which is also used by standalone non-wilink
+Bluetooth controllers).
 
-Dear submitter,
+> As the
+> devicetree is describing hardware, having the nodenames describe things
+> seems like the right way to do.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=925280
+We have serial controllers which also implements a gpio controller, but
+no one would expect those to be named 'serial-gpio' for example. But we
+can still describe that with a 'gpio-controller' property (and the
+compatible string indicates what the device is capable of).
 
----Test result---
+Since these chips do not come without Bluetooth (e.g. only wifi + gps)
+and the Bluetooth protocol is used to access the GPS function I think
+it makes perfect sense to just leave them named 'bluetooth'. That also
+avoids having to add all the permutations of
 
-Test Summary:
-CheckPatch                    PENDING   0.24 seconds
-GitLint                       PENDING   0.25 seconds
-SubjectPrefix                 FAIL      0.66 seconds
-BuildKernel                   PASS      24.20 seconds
-CheckAllWarning               PASS      26.43 seconds
-CheckSparse                   PASS      30.14 seconds
-BuildKernel32                 PASS      23.96 seconds
-TestRunnerSetup               PASS      420.77 seconds
-TestRunner_l2cap-tester       PASS      20.67 seconds
-TestRunner_iso-tester         PASS      33.79 seconds
-TestRunner_bnep-tester        PASS      4.87 seconds
-TestRunner_mgmt-tester        FAIL      123.54 seconds
-TestRunner_rfcomm-tester      PASS      7.70 seconds
-TestRunner_sco-tester         PASS      9.43 seconds
-TestRunner_ioctl-tester       PASS      8.17 seconds
-TestRunner_mesh-tester        PASS      6.06 seconds
-TestRunner_smp-tester         PASS      7.00 seconds
-TestRunner_userchan-tester    PASS      5.04 seconds
-IncrementalBuild              PENDING   0.83 seconds
+	bluetooth-gnss-fmradio-nfc
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+etc. (and having to name them such also when there is no gnss antenna
+connected).
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+> But I agree with you that the driver should not care about the node
+> name, but use a boolean property.
 
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Pairing Acceptor - SMP over BR/EDR 2                 Timed out    2.039 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4299737024800432549==--
+Johan
