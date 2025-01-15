@@ -1,137 +1,139 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2643820CCD1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2025 11:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D022459BF;
+	Wed, 15 Jan 2025 13:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736940577; cv=none; b=SNTK+ZrqkQ8FFHxjJ43XNXUXgdI5Fl1VTALNh8TvvlJcq8BZa9pyRKfSon5b7XoL3KuK/XvnpkOo4Zq7m9YRRvtqis6lBQN4vbYr9padVwpRv81naRlUMQYMXfglRY7STHE16W5TsrNZffaKF+xQIRlfIwqjPiTrJ0CAWRzRpd8=
+	t=1736948060; cv=none; b=ZRQN4MNYSvuYDVLsS04bm6C2MxVXpIE3iYrFBG+97XJJFbeYpFLcT/PDtSR6xC5DkKoClw6C0rUGJRbufqiFQ99R1lXE8JvD7lcsDlBrtT+D4w27xdXfvYJ/atXsnMWOaMlMDBv1k2zA9fvYR/qg8JCUhph957IESi8YOBELE18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736940577; c=relaxed/simple;
-	bh=4HcPghJ5b+71lvlfQ/d+zP1p3G7IcXUJfc0gIcm0O0g=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QGL8kuLeFmDv27AAKEHvLb7QAIUZYqJ6goCqUqJ51ziAITL60tK+Bw2o9E0nE3fQqa16WyeGlaDK5pxgvcb72qSDktZC+7C8cQ3JZ8gFlh94SxmPn+FzyGalSpAoqXj8qoWjVloueNai/T2Gt+8Sj528JRjF5EYa+MQt5yAi12E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A49G9dBn; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736948060; c=relaxed/simple;
+	bh=FjBXeE/zuyBr+q28ue/5ZT3hlGKj7j3hYaspkx0o5eI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=ZQtpO1Jh6jSIo6qfwSPqdZfeRjyr5gyL5BERy72n7hgHcfvajRrXJdAWg+i8JzM/d8dXVuFtT6+OYyZDi1NvAU1uh41Fuq0z17zWNFU/RlveYEOc1OALmsqFgp3L/846QEunkvBUixgeLXV7Jk2F5Rk7/aQ+u/ICpRUsmEJSSFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UdmscCWt; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A49G9dBn"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2167141dfa1so13258095ad.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2025 03:29:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736940575; x=1737545375; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UW1+ruCvcf5oKTaS2CBfy1cPZFz4sb7+gong27ICaC4=;
-        b=A49G9dBnh8sOcYUKafCcomnuj+wfq/goOY0oF8IuxLvoNT8PsB5i80RpsWpYlY4ZxG
-         on2z633Lahr2M15dFRBM4TSy9a6KUIYaT1LVswppwrTCCrq4T5VjS2teo2ZwdJjaWjwh
-         nZ8rQB0I8p/QRE0msc93JyPiIYXGhGwMCKbX8JK5Wr0hVReDmCjjxERFg2JgJ0kRPEDT
-         adct8vRTEK7JZj6f2L5EGJJ416LWMBVivnGMQcAXQAqe6QK/tFHA23Ce8DVKDsCSp1ev
-         XlnbMlGs2Kqa6O8fl4qrO/OyxveRuuMvtnddtgDb9UXwe5e0bg3pnQjGHsUeFoKMIgxw
-         VDlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736940575; x=1737545375;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UW1+ruCvcf5oKTaS2CBfy1cPZFz4sb7+gong27ICaC4=;
-        b=jkhylo8bSQPU2NnVCHMmPR400HCg3HBaE4WJKhHjAuLd6fB0MgBWqWz98aSSBka28o
-         BPX8EtJ+zZpmQBV8Yci+g4DDA+XcsHf/Kc/4qUGbevnAOoAouWhMf2iCqS5c4w0xQe7i
-         buC+kYAjs9D3kHN+x/GDnM0ED5hivIRXrzT3njKWbJkt1BMLFUPGsM/YYwokQmiKlvYm
-         /t9RH6wqsO3vq7KEW0GJbnqObKMoZMDuUwJYUfqhkclQqE6Rx/LkCn2Jg2Bl5myf5m8w
-         Cza4JNUgMPiXwNKOt9mEQZC4A73LKpJXtvM9dGBzlRaQpqL/WD4EUd1miOUOh6m9QdhS
-         e14A==
-X-Gm-Message-State: AOJu0YyT5VGSVX+1EsDPa5WDKL3FAsC+a33cDgKmC0eyPtclPFGind6Q
-	MEGL4R1UTa+Ckk44b0DMPk85ruMm/I8Bm7Imh0cjCyJBwjS0xgdKGRLhqA==
-X-Gm-Gg: ASbGncv4odsxg4izPNWv9e+92r/rtEo0AtAtzdUtuLb/OPqN03CqefE8wFmYmvsNpXA
-	GriiJgEZ8D+AlUO2pya9Du6ehDVpoANs+3DalqJ5BrpVJqFPQt2tc4GU+Iy9FRYxleR/iJ1SKeD
-	zVC1yEHxcM5nEXUVzOSyCVuo6356m8Ex2Gu8aXk7yJlFtyuT3GAMflZw7TGBBjlChOrCnuP7hBs
-	eBfhoPqTUlRBVFnNWIHtEsh0/xkJzBQhrF8WdvvEOianQMOu+nCZycnQh7p6V9h
-X-Google-Smtp-Source: AGHT+IGGhEuNg4tiJVJSalP84Wm7ZR101uVPRqv91CJcbKJrSLGJ4jXFxYu6a6r8vEii6NbF6F3gmw==
-X-Received: by 2002:a17:902:e943:b0:216:6be9:fd48 with SMTP id d9443c01a7336-21bf029dd40mr43376895ad.3.1736940575054;
-        Wed, 15 Jan 2025 03:29:35 -0800 (PST)
-Received: from [172.17.0.2] ([20.171.103.247])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f219e38sm79864115ad.136.2025.01.15.03.29.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 03:29:34 -0800 (PST)
-Message-ID: <67879c1e.170a0220.306f8e.bdab@mx.google.com>
-Date: Wed, 15 Jan 2025 03:29:34 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2457590575499853394=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UdmscCWt"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50F7GCqR031075;
+	Wed, 15 Jan 2025 13:34:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=Orzhyf4NdEnesO098a2o3/
+	NWT0Fn85yPcrVi/6lMu0Q=; b=UdmscCWtLlvV9nW1Ea3aDBcH9gdDz0K82tkmVB
+	i/t9JnvM9FN6tjmtgQoFDGYs4SI2JPS+5JNwlNGU3Xg27stGZ2h/aIoOCs8i+/Ic
+	fEHYDk+36iH2q+JHQQGaK2plq9SB0fovDqPJV+CSdXZG5MHyHR7C86jmNrmJbUpm
+	DtIyErd+sVblKjaYvMSSFIVTQNbDPb7coJFEZL3ZK/cfMDhL925swc/dLzFgo6AP
+	hT4GoFsufGkpMs/8ZzNeemCeAvfShMQsQuheCnXzy8gOdmuF9E/RKPCI2Rh6wdzq
+	V7NTpsD1cSnl0FYayY8JqchilyZTDPKjvdrDtpgcKQILX5Dg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4468fs0xhd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 13:34:11 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50FDYALE007918
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 13:34:10 GMT
+Received: from hu-zijuhu-lv.qualcomm.com (10.49.16.6) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 15 Jan 2025 05:34:09 -0800
+From: Zijun Hu <quic_zijuhu@quicinc.com>
+Date: Wed, 15 Jan 2025 05:33:40 -0800
+Subject: [PATCH] Bluetooth: btusb: Add 14 USB device IDs for Qualcomm
+ WCN785x
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v4,1/2] dt-bindings: net: bluetooth: nxp: Add support to set BD address
-In-Reply-To: <20250115104614.2381674-1-neeraj.sanjaykale@nxp.com>
-References: <20250115104614.2381674-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2457590575499853394==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-ID: <20250115-qc_wos_btusb-v1-1-811664ce5d64@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIADO5h2cC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDQ0NT3cLk+PL84vikktLiJF2zRBMj42RDcwtjYyMloJaCotS0zAqwcdG
+ xtbUAhc7YkF4AAAA=
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: Zijun Hu <zijun_hu@icloud.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+X-Mailer: b4 0.14.1
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: I6lPic9rhe2Ssnyl3BDQGQSwXnAtkbAz
+X-Proofpoint-ORIG-GUID: I6lPic9rhe2Ssnyl3BDQGQSwXnAtkbAz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-15_05,2025-01-15_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 mlxlogscore=932 impostorscore=0 priorityscore=1501
+ mlxscore=0 spamscore=0 phishscore=0 clxscore=1015 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501150103
 
-This is automated email and please do not reply to this email!
+Add 14 USB device IDs for Qualcomm WCN785x, and these IDs are extracted
+from driver inf file within various types of WoS(Windows on Snapdragon)
+laptop.
 
-Dear submitter,
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ drivers/bluetooth/btusb.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=925659
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.26 seconds
-SubjectPrefix                 FAIL      0.43 seconds
-BuildKernel                   PASS      24.30 seconds
-CheckAllWarning               PASS      26.13 seconds
-CheckSparse                   PASS      29.59 seconds
-BuildKernel32                 PASS      25.06 seconds
-TestRunnerSetup               PASS      419.74 seconds
-TestRunner_l2cap-tester       PASS      21.05 seconds
-TestRunner_iso-tester         PASS      38.26 seconds
-TestRunner_bnep-tester        PASS      5.92 seconds
-TestRunner_mgmt-tester        PASS      121.42 seconds
-TestRunner_rfcomm-tester      PASS      7.63 seconds
-TestRunner_sco-tester         PASS      9.44 seconds
-TestRunner_ioctl-tester       PASS      8.37 seconds
-TestRunner_mesh-tester        PASS      5.98 seconds
-TestRunner_smp-tester         PASS      10.51 seconds
-TestRunner_userchan-tester    PASS      8.25 seconds
-IncrementalBuild              PENDING   0.56 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9aa018d4f6f5..633a0d11474d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -375,10 +375,38 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0f3), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe100), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe103), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe10a), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe10d), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe11b), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe11c), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe11f), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe141), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe14a), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe14b), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe14d), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3623), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3624), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x2c7c, 0x0130), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2c7c, 0x0131), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2c7c, 0x0132), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 1f2ae3fb1cdc552b38e625fa807800ffbb858ce3
+change-id: 20250115-qc_wos_btusb-6a423c178332
 
+Best regards,
+-- 
+Zijun Hu <quic_zijuhu@quicinc.com>
 
---===============2457590575499853394==--
