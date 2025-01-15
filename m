@@ -1,267 +1,152 @@
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2068.outbound.protection.outlook.com [40.107.104.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BD6194A54;
-	Wed, 15 Jan 2025 16:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736959064; cv=fail; b=bXiGLSxSyZ5TyyHqmbaVf6FXc2cvjrNbmZjzNL34WPQf3oS5OPF1TYh0vj3y0Zj+IC+BtqIMS5bxfTdS6FAk98FmprUtygbtrmeGM1X/fXjBc10ips6jQWG3Y8aRgtHA7NvnImMaXnwBGGEEkwEM7D7HRMRCXaXM51hqxN3flEE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736959064; c=relaxed/simple;
-	bh=wtpNaREMXoeKvZyK2KJIhERJ8JA2vNi/7MLQlh7aSvE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=f3heXlp8rDLNT2aLbEUL9/LQKUqeXfeKacu92XmraR6ctJ5IbL1ksB2bnjQcx3B/n42wm35/CVoK/bM4AaVkD6vgVtlNLbu11asBh4tFWx3S1noqIhyC4QaK1xGraiANvFBaov9GQvISJeV8Dmw1tIeO2k6P8P43tikR8XAhSfc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=n2AXkztY; arc=fail smtp.client-ip=40.107.104.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C1519645C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2025 16:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736960374; cv=none; b=SxQUXd6BbwfG3IyTr6erVrPlWhHeUgJC0ST9sFr7iYbmbHriDcxA/sdrqQPbuXC99O06Iarwsm+s/kiHrjAS6WHa8i1cYc9JiYZkDSNOe5h4xygOhicfCKzKtoRubNDbXdKmmJlUpm4oZfcsi68oenTTF6/LJBRcBXq7vaehuZg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736960374; c=relaxed/simple;
+	bh=IWu8o/cE2W7BPiVHay3poIesrTSGtaw/zTB/tB2Xnuk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=HzL6wR+ITHyDpWbfGuQePYyUN6yZYeTKRCjqnc636i9y99VNvtxNJYJc0Tkupe8A4s67HjgoHzc1jBzGg1z7IYfWqPH95eK5VRSw8JKCEv6+TX8PYT52AjLqNaCtXYxEYTCONRk9HIaHxBQ49HwV5XJYumqGYnOHMvLHPMluDsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GK8IvuNm; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="n2AXkztY"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DIWW8d99U8MCY5xFWjol2N8p4Md1b4pYanS4tmtkiCrdhibNcf582NJz5HwJFO7+mSjc48TGxovNGhhPjizxOr5RIUJ2Hw4lFEwTI5+lkBUvRw1J69RRzvTztyLccgKjlixPKEDjOWC+BS0NNO6SG/t1o8xUff5DHJ0Xzs+C34ojK0zszApYcqlqCIgUFlqOwAGWU82DhBDF0iCL0vM/sykDlO8ZDdqYYjxbKEOZqswQOMypt9Aq5QF2pdvc+/fEASjwwKEZlMNWKHGiIuTIvzYSezvtjjyTfUzhGfFNdmFwi9YM7n7aITM/1D/2wtN++69VJAfLzW2Paosu3H6VXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jRe9+lZM2I1aLDz7V8EYgNMomijvzqACZ8+BxPNAUmg=;
- b=LXrQw2gFpkHOMBpHeSbkrj3d9UzGgO7uIZ0UE/Ki7lkoteqBHJDRx63L+y2+tFXuyIqPL0eP/VOPo5ZRn2NuGBBiuOaOPN3cisGtmu+vL1F9OWEOUye2N5ouIbT4VEkM+1mgFer1WDi0E4EiVkczlX6iACs+gW71Wzp5UH5ySfGFU+OSR0+7Soco157tKwr+mhh+pxC9v6XQxNsv2+OTXkuStNhfSH2TqatfKqkV5pwikomC5cPQq3XVSQK5pB89QzyO4QFnyxYjGcH2sRTqbEmyg+Otjgw4H9Zv81r/NnHqwjUrJEK60oTV+fnFKkr0fE8Sioxj39G9wq8+/SZb9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jRe9+lZM2I1aLDz7V8EYgNMomijvzqACZ8+BxPNAUmg=;
- b=n2AXkztYa8CO87imZm09bH3Qmu/P+RabmZbRbgwpVfPNGdCGlbZTK9Lw/CpEawO+yIUtUP/QdBR0h0PTMXzqTfCwWvXqCB80pzODrgcfTX5Z4GeztsNVonjmJJut999GBin33PCAu3oKJP8G8gx7UiS1WjMrgWXRMBhCn3WEumk+IDPEn9Rpw4rjqyytGAy0Qw1QGb9vcDHBni6EzwHd1esvYJX0CmRIR1sIHFKzpM4PgyHED8qlrINaAXwnRB/5JGn6ARscWSgNlYzNkg+pCVdIW0a5TppLHu2OHo7L3HVtKrvTLJPZLUXYUJFAm7yBIDu7qhDLYgLpFzY5Hh5cgg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
- by AS8PR04MB9079.eurprd04.prod.outlook.com (2603:10a6:20b:446::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Wed, 15 Jan
- 2025 16:37:40 +0000
-Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
- ([fe80::a2bf:4199:6415:f299%3]) with mapi id 15.20.8356.010; Wed, 15 Jan 2025
- 16:37:38 +0000
-From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	amitkumar.karwar@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	sherry.sun@nxp.com,
-	ziniu.wang_1@nxp.com,
-	johan.korsnes@remarkable.no,
-	kristian.krohn@remarkable.no,
-	manjeet.gupta@nxp.com
-Subject: [PATCH v5 2/2] Bluetooth: btnxpuart: Add support for set BD address
-Date: Wed, 15 Jan 2025 22:08:46 +0530
-Message-Id: <20250115163846.2385345-2-neeraj.sanjaykale@nxp.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250115163846.2385345-1-neeraj.sanjaykale@nxp.com>
-References: <20250115163846.2385345-1-neeraj.sanjaykale@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2P153CA0010.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::13) To AS4PR04MB9692.eurprd04.prod.outlook.com
- (2603:10a6:20b:4fe::20)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GK8IvuNm"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-467a1ee7ff2so83201cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2025 08:59:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736960370; x=1737565170; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=poEvv3/+3zCezi4q8adpm2JQyFopRsVlC3QX7jdmbyg=;
+        b=GK8IvuNmGr2H0H1I0oMB0xNz3ezaLsxaDwMGzQPdc/B3riPHQsCHLRBXzRi4qx5Kjt
+         sNFR63Lq+Rx4Qsd4H0e2WB3bK6BNyRR7IyoPfQm38I6Desau/EMB/BOJyAEX2zgjpjrx
+         XbO5F6GORIuia6n/QvwLH6cZ23s8vfVvHbqUeIfrzZMGymUC77/XJqp60Ow3KbkUfzJL
+         0nRMUNk15YhXEqlfxB27+drWNfDKG2SK6BuEYaBxqjT6bKTP+VhZeYeZlbrydIsQI2Sl
+         FHinNO4282eZiiERSzSdXETzOchS5spJdeKcHNhAlJDpLYvKepkfaUTL4oh4c0nFcBlX
+         roYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736960370; x=1737565170;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=poEvv3/+3zCezi4q8adpm2JQyFopRsVlC3QX7jdmbyg=;
+        b=hs0d3KJxTV6RUoX+d+Cb7vkcLLF4vnU+WAF7SrmU10kQBdbnd3lM8JfVIZ6vGJl9hn
+         Y5VhgkIQew7XIQPsd/VrT3FPPrBAq/KXX/L4Tm+aSqMhOP3QyX9V/9Im+NKuaxi0Q2Tk
+         dXoKv4M9cW1jNjt5ewlZxjIddqwZPtg3RXe1lSLIo2FAnZA94Ee15+l+ZAnUA2mX4J/z
+         taKVfooej+APstv/EpAraqfHUIdchP6EiG2j+Q2lODt1HlVtOTk3ZDHRSp89rdH08a5Y
+         AOENE2UpTID4GU86kAdpW4VeS3KAI9y6vqiK0Imq8hp1tnTRwpga9+Z4xkCfBGVj3rHv
+         uioQ==
+X-Gm-Message-State: AOJu0Yy0dqqjgCwUcp/hp1Df802pydQuvHvOmBA3Ta8BYjX4C+3nh/J2
+	NvOpCjbt3oRCuhEiCAAUoUIebw1jQLY+/ROz9xbHhKeYGPIqjlzHjrSt+CCi
+X-Gm-Gg: ASbGncuc2ucUGXPIk0GolPeY2MwnCFjGxyFVBWdnAGANPMBeAM8HbaYgmVeNB/o3cnt
+	UY/FaLa7BF1j0CyS8QQ4HuzPojQVmntBiYFi1U8+WSi5WvJ5RKCb+W0YXaWD5cH6Uf7ytluGhDe
+	/azIwFuOLJf0G6K4a2K0bobz4CDgIvLDP8E1ilHSHaQG0UZ5t1Lz6HDz9nAHAssK7iPL05M9fzC
+	x/OLJiHpV9gI6/H6pwK/usOgmO7Vy+zjWwpgMHli/G9OQBY1IxMNWNDElkFexjSmQ==
+X-Google-Smtp-Source: AGHT+IEoZdlmXjUYQ7t5/AWJ46ztqg2m+IbYX1Sjj2gbQGmUdu74i5/8sT/sBMZj5Cp2OwXuFhRUjw==
+X-Received: by 2002:a05:622a:214:b0:467:5eb6:5153 with SMTP id d75a77b69052e-46c70ff77f9mr385345531cf.19.1736960370038;
+        Wed, 15 Jan 2025 08:59:30 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.133.165])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c873ce201sm66321561cf.55.2025.01.15.08.59.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 08:59:29 -0800 (PST)
+Message-ID: <6787e971.c80a0220.29185a.9bb3@mx.google.com>
+Date: Wed, 15 Jan 2025 08:59:29 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0853466387175988330=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS4PR04MB9692:EE_|AS8PR04MB9079:EE_
-X-MS-Office365-Filtering-Correlation-Id: cb67833b-8e1d-4717-448a-08dd3582ec24
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|52116014|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q2VxOWRqcC8zQlJlZGc0QUk1QlRwOTJjdUFCMnJJV2JWMEY1cHNrdVpCVCtR?=
- =?utf-8?B?aVBuaEJHQnp1L3hkamtoYU9wWUNja0VWZE5wSytiNGU5eEl1dXAvbXVGK1dX?=
- =?utf-8?B?NVRYdkFwSUxhczh6WDZJbWVqbmQ2YklpaGRzWDdVa2IrTzh4emNUZVFPWGM0?=
- =?utf-8?B?aE83RGxiSW04dU1XU0xURzB0SzBTTC9LcEh3UG5qeTlRMFVvZ09SQ3hIR0k0?=
- =?utf-8?B?M1FnejFkSWQzY0EveEErN01RTnh0WHAxNC9qT0Q4UWlpdHBsV2pDU2x3M0xP?=
- =?utf-8?B?RlZnWE5hVzhZYmM2THVTbVYxVnFsUzJTWmNxQUdPOHFSaytBSGlPc1duZXlB?=
- =?utf-8?B?bVVYRXhHVWxRWGJEUFhEeVk0cWRzTkZITjBSSUl1TU1qZ1ZKRXFMajVGMDY1?=
- =?utf-8?B?N3ZSZXY0SWpITWFxa2haZDdUNTZkVm1xYnpyQzQxUFEwY2xiUjNOUmg4Zjlj?=
- =?utf-8?B?UVB1bm1PMXFML00vL1lWaFZwekNkNlpoOW5PcE5QQSsyVm1ZcU9kV0EvWjU1?=
- =?utf-8?B?aDdyYnkrOVBDajkvZHFrNS9yOGZNTnlpakFKbnVCMDdBeU43UVc0NGthelJR?=
- =?utf-8?B?aU85UVpuVkxna2dJdFNkb2lOZFFMcWpINnZNNFd1cUNPYjE3U3hIUjZIbVFq?=
- =?utf-8?B?UHdHV2lmN01rR2plQjNXdDM0bG1KbUczTUpvUHBJbi81NXdqa1U2TzJFUmF6?=
- =?utf-8?B?eHBDemtkcXdTN3htVjkxUzRvUGhZMFBMTXIvdFQ3K01YK0FmZ0ZEblBydHR1?=
- =?utf-8?B?WjBYb09sZ29TZlR1YlhJbUl2Y0gxN2l1WE53SUVOSkFrUGgwUUZjdklpeGpY?=
- =?utf-8?B?RnJzQVBQa0ZXY2pUOCsvdzdEanA0eFpXRUZEamd3aml5MWJRRXkzOXN0VHpL?=
- =?utf-8?B?TSt0ZEdZMldXdm52bGlkR2swTVBPZkk0b0NqYWkxZU51U2VxQjBSRGZ0N0Mz?=
- =?utf-8?B?bEY0cTFBMHZ5d3BQQTAvWWtlMGlwYis5WENyRTAzcFZEeFNGc09WN1I4dVM4?=
- =?utf-8?B?QXdCMVFheSthRjcyYk1tWUVBSW5haXYzM2gvajNUS0xGUmdrNXVDcHM0cnZI?=
- =?utf-8?B?bDJpb1RKeDh4emtBTEhnN01EMHlYU1MyYUtXVm54OFhRNGdUUjBVSmg3anhp?=
- =?utf-8?B?VmNYeUlVTEt6dWVXVFBhY0tGZWpQRUtUU3Jtc3htQ3huNnp4ZG12SEZjOHJC?=
- =?utf-8?B?RDBqV1l3RTBKRjFtMFdRSVVmQXBNVnR5ZzhMZEJBV0lmRGUwdE9XMEJHUkZw?=
- =?utf-8?B?aHNzVmxvbmV6SU5pSTJlY3RMK0lLcnNmRkVmNmI3VEZkYkVnVisza251QkJx?=
- =?utf-8?B?bGROL2szQWdIOE1VOU5RUm5JNzdoQlpWbVlIVllnM3FaNzdXWVRHeFd1TkpD?=
- =?utf-8?B?UEsrRVFyY2IxWHUxREkwdlpVYWFxSFJKRmVKc2NLMjk4eFUrMXkyVXpNK1F5?=
- =?utf-8?B?UzhRSW8ybk0reVZKRUNUSjk5dVFzemlPT1p2N1ZRSHVKNHJrQkZSeGc3Smt5?=
- =?utf-8?B?QUJJSnhKNzRHb2dUSjJTK2hiVWxlbU0xTWdmQzdSaW45Sk5VenpBN0NuU1Z2?=
- =?utf-8?B?NHplLzRyYjlGOC96OHJzWnd3ZGVIVVBneThjbm9Ed0pFTzRFN3BleHJJeHk3?=
- =?utf-8?B?cWFwS2pzaFR5TFNjMDJGRFMzL3hORXNnN0RMQjREN3pmdGhMaUFKS1N2NWw2?=
- =?utf-8?B?MXEvNFhrcEhnYWZmRG1wdmtQY0xnS05FTGFHcHMxZ1JXTXgxNTRGRmFtbkZo?=
- =?utf-8?B?dmtEYWNuaHVPTUVRSWJNdC9KZERHVjhGOTAyTkFGZFBYVmUvNU1zbFcxVmdG?=
- =?utf-8?B?Y0c0TnE4QjRKUEJleno2V085cXF4cDJNdTBlWGFxTU5WaStlU3ZNcjAveWlP?=
- =?utf-8?B?Z0U1ZnByL09iWXZ2dktxNnZaUGF4dWl4WkR5MXdWOGVNT1pUY3JhUlVCQ0R4?=
- =?utf-8?Q?EQ+++6qCEf3kivNo6ZK97VH0e/o5NMlH?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(52116014)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ODVOSEYzZXdZT25kY3RXM0paVEpFYVozOVBtaCtScTM3dzdNemlQZkRBTWwr?=
- =?utf-8?B?QUhuS3c5TzZLWkFRK0VhL2laamNIaFAxTnRHeFlGVGlTazlZR3pQTmpKSFZw?=
- =?utf-8?B?RW0yT2ZyNXlka3dMTWVsS2ZQdk1DSXBjMUR2MDhrcWJjK2xQVWl6N3N4Z2NV?=
- =?utf-8?B?dFJ0RWVVZmROZHNuMklNRFFMUC9kMXpCd2RGZEh6cG13SW1SMDJDNVM1c1NQ?=
- =?utf-8?B?LzlOeHBOQk5WMW5zTjJOSm5VR2RySmI3YVNPWGg0UFR6V0JJVzFFNWQvb01O?=
- =?utf-8?B?clQrRVl0aFRVVFZ2bHcxSmVnNWNtZFg4d0N0MVJJVkkxNXNKZk9MTGJhY3JV?=
- =?utf-8?B?bnltSUl2bE1ROFl3WkhEZzJEMWprNE91TmlacjhXR1BWblpMNUVkU0VSc2h3?=
- =?utf-8?B?YnJFSzZmVUJEY2lkWE5tU2ZXMlBmREt3Q3o1WjE5SFA5UjFqeG9rVXpvRDgr?=
- =?utf-8?B?R0JYYlB3TGlJUlNKV2ZxL0g0OFlKUm5qK1dOQTNRWVgzTHlUZmg1VWVTaUhR?=
- =?utf-8?B?aHFUczRXb0N2V09wMlhRR2tRNWEzOU53cVdCOUtDZFdhdU9MTVN3dCsvNkJ5?=
- =?utf-8?B?WG1VVFNhY0pqK1lseHJzS3d3Vld6b09tREkzN3B0VVhsV0dGMlFvYWk1MFI1?=
- =?utf-8?B?Q00yNytGc2k1elJaUlZxT283UTVteHFYS2s4NGowTmFCNUZSVDNQREp1dUZm?=
- =?utf-8?B?WW0wdkxVK0xtOGcybXo1OHJ3SDY5QmRtVzIrUjFhNmFUNWxwU1JoS1FCQS9j?=
- =?utf-8?B?K2hRZVVKeWNUNTZFU0xOQWo3OU9WdVB0ZWk5NTZEajgwSG8yL2NhKy96aWVm?=
- =?utf-8?B?L2U5NGcyMzF4dUJ1Tll1cEMrQ1IrRTdxSjJneWhyQmVVSHV4WE9TblF0VmM3?=
- =?utf-8?B?U09zQ3BadkZIUTNNS3pURFlRc2NVUzRsbjJkeGlyQTBEQkdtNTRWblZpZGFz?=
- =?utf-8?B?aWpxS0hiUXBncit1VHJQN3hvcDZWVEdHZm9QRTJHUjQxd2p0eTNobmNPSlJ3?=
- =?utf-8?B?MWV5a3JFUk5BY3NhQ0tJL2hSZnluQnd1R2paQWUvMG1YZmt2Q1NIVDh3WjNY?=
- =?utf-8?B?bU9ZdTFHRk01R29MWEh0UVRKUm5naUp6R3dWNHNZc3Jjelp6NE1ER21udmQz?=
- =?utf-8?B?VG4yeE80elZFWmNiRTN6UjNRNDc5NFhVSjhtNytyd2NoM1BjTURGTHFpSks5?=
- =?utf-8?B?VGFyTGZMTHdRbENNSGxUVTRYR1E0WURWZDhlR2ttbFpVNHhMTEZrRnFMYmlG?=
- =?utf-8?B?ZXh4QnZDNmJGYmt5anhldjJJNjlIcHhGeGNwMmxpZFJ4d2FabTMxMlpWMm1a?=
- =?utf-8?B?aWYyS1o1Y0VDWHFHNFB0Tm9WZ1JlSUVBWjZCZ20xVjNnalFOTHRVWW1rcjZQ?=
- =?utf-8?B?bFg5VG5yNlpvemNDTnJyWFBZdVdDU1lvQzNVeEUxYWxQeGp2R1pGOVJWSWFY?=
- =?utf-8?B?RWdpSnJuSTJSSVM5UUw5M3p6SXRyeUtxQXZ3bCtQY0J6MXBka0U1SnVTZG9O?=
- =?utf-8?B?MjlSTUlNWWZvYTcxcnVDUjAxSG1rcVhhK1VsWThRRi96enIvdzNiYXlWSERX?=
- =?utf-8?B?YmswdWdsR3hKZmNNVnBrcitKTXVDMHZHSTg2NGhQclcxcnhveERQV001REF0?=
- =?utf-8?B?eEhCR25wUXRFa0FzZzF3SmtXNEgzNVd6NWJHN09MZVBPRzJGcEFtT1lJTUdB?=
- =?utf-8?B?TXFDMUNGN1FFS2dBTHFQV3JwTmNvRExNVkh3V2pGKzUrWUt2YXVhZWdIZllL?=
- =?utf-8?B?NVgzT0cwZ0FxTC9HTjhPeWxwWXVDeitNNHFIOUlTQnRXVjVaeHM0cHU1T0Js?=
- =?utf-8?B?alNTM0l1a041WnZnczEzY3FSaWlrdkdiUnF5RW9BSUxzY3FSYndGb1ovWWQz?=
- =?utf-8?B?a24zTEZJYkp0dVFRT0VUMzBJZDk4Z3BxQjZITXRlTUdRL1lkNGlIVFM0RlY5?=
- =?utf-8?B?WTg2OFF1eTVZM0w0S3FMSWdlWWlVd3JBNGcxZUlMV013WktvVldUTTRHd1Ix?=
- =?utf-8?B?MzYzMXU4RkNDQk9WVEhxVDRXT2d3RlV4VGQyTnpENXB3NWI2b2p6S29sN1Zw?=
- =?utf-8?B?RGJOLzVXb0VuS2daQjF6WlJsUWtQN2V6S2ZWM2dqZEVEczl4WlRKSEswTDRV?=
- =?utf-8?B?ZUdKeGd3aW1sRlQ5N1h4R1ZXM2FwcEx4eUR3ZUVDbWsrZWl4NEI3bjNERTQw?=
- =?utf-8?B?V0E9PQ==?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb67833b-8e1d-4717-448a-08dd3582ec24
-X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2025 16:37:38.1924
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EBrllZDiVRiebvS13w4LasYLwQMX08w6H/ZvTpkn+u7NP5FbenUzNItI9NdYBGsqJq2JLiS1uf6fD1bxgvoju5pqe8lLgegM4zkDc4IzbqM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9079
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kees@kernel.org
+Subject: RE: net: Convert proto_ops::getname to sockaddr_storage
+In-Reply-To: <20241217023417.work.145-kees@kernel.org>
+References: <20241217023417.work.145-kees@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This adds support for setting BD address during hci registration. NXP
-FW does not allow vendor commands unless it receives a reset command
-after FW download and initialization done.
-As a workaround, the .set_bdaddr callback function will first send the
-HCI reset command, followed by the actual vendor command to set BD
-address.
+--===============0853466387175988330==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
-Signed-off-by: Johan Korsnes <johan.korsnes@remarkable.no>
-Signed-off-by: Kristian HusevÃ¥g Krohn <kristian.krohn@remarkable.no>
-Tested-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=918455
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.32 seconds
+GitLint                       PENDING   0.22 seconds
+SubjectPrefix                 FAIL      0.43 seconds
+BuildKernel                   PASS      25.32 seconds
+CheckAllWarning               PASS      27.13 seconds
+CheckSparse                   WARNING   30.30 seconds
+BuildKernel32                 PASS      25.53 seconds
+TestRunnerSetup               PASS      443.82 seconds
+TestRunner_l2cap-tester       PASS      21.15 seconds
+TestRunner_iso-tester         PASS      39.91 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        FAIL      119.42 seconds
+TestRunner_rfcomm-tester      PASS      7.62 seconds
+TestRunner_sco-tester         PASS      9.29 seconds
+TestRunner_ioctl-tester       PASS      8.03 seconds
+TestRunner_mesh-tester        PASS      6.04 seconds
+TestRunner_smp-tester         PASS      7.03 seconds
+TestRunner_userchan-tester    PASS      4.99 seconds
+IncrementalBuild              PENDING   0.49 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:147:35: warning: array of flexible structures
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.146 seconds
+LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.165 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.186 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
-v4: hci0 interface shows RAW mode if 'local-bd-address' not defined and
-    HCI_QUIRK_USE_BDADDR_PROPERTY is set. Add Quirk only if device tree
-    property 'local-bd-address' found. (Neeraj)
-v5: Initialize local variable ba, update Copywrite year. (Kristian)
----
- drivers/bluetooth/btnxpuart.c | 39 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 1230045d78a5..dd9161bfd52c 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *  NXP Bluetooth driver
-- *  Copyright 2023 NXP
-+ *  Copyright 2023-2025 NXP
-  */
- 
- #include <linux/module.h>
-@@ -1197,6 +1197,34 @@ static int nxp_set_ind_reset(struct hci_dev *hdev, void *data)
- 	return hci_recv_frame(hdev, skb);
- }
- 
-+static int nxp_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	u8 data[8] = { 0xfe, 0x06, 0, 0, 0, 0, 0, 0 };
-+	struct sk_buff *skb;
-+	int err;
-+
-+	memcpy(data + 2, bdaddr, 6);
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "Reset before setting local-bd-addr failed (%ld)",
-+			   PTR_ERR(skb));
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc22, sizeof(data), data, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "Changing device address failed (%d)", err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- /* NXP protocol */
- static int nxp_setup(struct hci_dev *hdev)
- {
-@@ -1500,6 +1528,7 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
- {
- 	struct hci_dev *hdev;
- 	struct btnxpuart_dev *nxpdev;
-+	bdaddr_t ba = {0};
- 
- 	nxpdev = devm_kzalloc(&serdev->dev, sizeof(*nxpdev), GFP_KERNEL);
- 	if (!nxpdev)
-@@ -1547,8 +1576,16 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
- 	hdev->send  = nxp_enqueue;
- 	hdev->hw_error = nxp_hw_err;
- 	hdev->shutdown = nxp_shutdown;
-+	hdev->set_bdaddr = nxp_set_bdaddr;
-+
- 	SET_HCIDEV_DEV(hdev, &serdev->dev);
- 
-+	device_property_read_u8_array(&nxpdev->serdev->dev,
-+				      "local-bd-address",
-+				      (u8 *)&ba, sizeof(ba));
-+	if (bacmp(&ba, BDADDR_ANY))
-+		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-+
- 	if (hci_register_dev(hdev) < 0) {
- 		dev_err(&serdev->dev, "Can't register HCI device\n");
- 		goto probe_fail;
--- 
-2.25.1
 
+--===============0853466387175988330==--
