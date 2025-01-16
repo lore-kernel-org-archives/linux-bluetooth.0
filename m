@@ -1,129 +1,98 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail115-100.sinamail.sina.com.cn (mail115-100.sinamail.sina.com.cn [218.30.115.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5A7155756
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jan 2025 22:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4050922BAC9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jan 2025 22:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737065450; cv=none; b=UULmg+rGi/JdpMfP7v0KjkJcv8qs5lsRkuTqxHMF7/UNCHz8q1xc+FbraOlmdNm3W6DTtdlfO8mJKqZlf6cet9mrav/tCyLpULHbA6o4LSnz6nf6KXiziXs/KaJWwoqN9EVarBUgOfTl9y3X+cvfIZbhuZ58cTl93wxMpFZNDMQ=
+	t=1737067506; cv=none; b=A6kQwxz5LKAh4epeu6zZfccS3DnTbWPAM57YiZyelJH294sYci4hrofnlVYUfQ0q1fQWU+k/PDMHU1kHzmcm8qD9C+iefEeaWv5fIVw8D0wrQ4PdK7T+znSYaqh8clFMZK2ZnUQagwydOSsR8BqeGnrVuhg4o2AJ4c3n6vCrCIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737065450; c=relaxed/simple;
-	bh=X6WvnW54JlfpI+SClAVLS2smC2BMmmjJSrvPNCsCwV8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=PcWSGvEEiIZCfyNxpj2rpJupHV6BHQEZCM3bcncjA+ugevinnn+nO3JY5JnjoHDBiBku1owaozrhF+xVsCoXp/G4cd87L81n5Ivr14ENBwsommKYXCo93W/e3iCJX6sn4Nq+Daph066khKmiq6VQ42JtiGqPkTkNmBl/8TimqDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZT9M9ROD; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZT9M9ROD"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7be3d681e74so120126785a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jan 2025 14:10:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737065447; x=1737670247; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zOdkrk1KXIyTaCibgrl1CZBbVhSD0X9PEbOIAckWTA4=;
-        b=ZT9M9RODWd906ApZOrF7TeWFLJ5809+evuXcCgPfc0mzFvfShsJKToA1rgKOnDA9KL
-         Z2jwUuvWnnltuzwYVhKy4HilQhIHQoEZX/FChUFoXmC+zFHhLeHDwn3oJhfUWFdI61Js
-         nAMDX36a3FRs+cAy26cnwa7SLfhe6nr1dy5j8Kjs2KgwSY4xQa91ULgzsmFQAWUQ7qoj
-         +4+JKUjvT9ZcyioKNudG1yKfFscSBA2jajEF6+oJDTKM0SOj133CIGLOs63CF2ZqwpjI
-         SGRwn0capf3hD7p3aqG8th+3oLi1O+oQaQ7rZFrxAWG+AxjOWKbr1/FZURo10ASJ37P1
-         nbtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737065447; x=1737670247;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zOdkrk1KXIyTaCibgrl1CZBbVhSD0X9PEbOIAckWTA4=;
-        b=dCKvOSz/yYAZEk2aoq+pck+oA0nAn/4K8wgTHNUachSE6503MAj3wqzSeAuLVNTlLZ
-         yMIsdTpitK/c0pxg4VK38v2y0acD0Jd/9ntzZoz9mI3HGCmtPG7JQJC31suCL9c6Kpwd
-         DWmEEKrpftQkmDNyOY3fhfgO7mC+uOmhGpG2Ms0y7vQJdenORSB921r6TXEaMlUuoxrd
-         PyOXXaRvuhRHnkWGUqnfI5cCHFvvQ97flDzTQNIXkZqdyqvwL3b2BhokLr8kOo3N/R73
-         Hk+1d6EEfhQBoegWmOj/rrs6zcYLRhtcjIm6eTO6lfLN1nQyly1K3UBX+2c7+vpWWOCb
-         j1yg==
-X-Gm-Message-State: AOJu0YxNdTwDu9z63v+igdL6nZ6fq/kVgXsC64r5Kp/N5BAioBiLAxmQ
-	zk3tqWMrV1uWYSjYRCh/uyDuzYoVr/bqJoP4ey7ewVtICl7+UGqRA6PNPA==
-X-Gm-Gg: ASbGncsb+o4FEkkCqi70A5HCADYUluikPCy4BMfHLwH2XDIKuLbkYCXQqPfGcpFBsd8
-	f40ikPHswxbaoMW1IaFKtqGm6RgxbgN7HxCyP/3/Zvc4IhJR0bd/Pg3OMecvpbgFqEWktAnCnwZ
-	lcYhbZ3DDGJ51HsBeXk4/g3eJSGSAB3C5T2OOR2xTmxi8jd+sQZxBjjdhcn62qByDYXy2jtlPLe
-	8zZyKJgFod5kHm4mj5hEFS9DEw3HRkmUOCdmIhNfTvL0Vh/YoSyJl6G5/bf8MQ=
-X-Google-Smtp-Source: AGHT+IEv5BoYbajg1HKwvPm+QM3EQnwXcEVXN8nqwtfMq+76HY04rVKA4XZ5/ksEVtO/NQ/bG+3ISA==
-X-Received: by 2002:a05:620a:17aa:b0:7b6:c92e:2e6d with SMTP id af79cd13be357-7be63288b8dmr70708185a.52.1737065447254;
-        Thu, 16 Jan 2025 14:10:47 -0800 (PST)
-Received: from [172.17.0.2] ([20.25.192.106])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afc22e9fsm4700116d6.51.2025.01.16.14.10.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 14:10:46 -0800 (PST)
-Message-ID: <678983e6.050a0220.cb25b.36d5@mx.google.com>
-Date: Thu, 16 Jan 2025 14:10:46 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8998915110973789728=="
+	s=arc-20240116; t=1737067506; c=relaxed/simple;
+	bh=pgym8+JZ7YkXXKQfkrE4/rBEyVR5PC0LFtkPgF7ojC8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LQvM8M6dJgqqXdklYhKsXJL7X4egV2JAgOxjKOWGQUMlsUUtyrRN9Qfw0kNCNQPav7voCktwfPtMz664u+Rwq9s8ItsvLq2DCZEQo9ho1NuOnd183kY3xjd3K09TLBornDmw5QhKpfyeXd+74mOR4AiW/GrMzIa0Q1ESIzpR3ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.67.62])
+	by sina.com (10.185.250.23) with ESMTP
+	id 67898BE800006B30; Thu, 17 Jan 2025 06:44:59 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 2537328913369
+X-SMAIL-UIID: 52293ADD92A543DD8F5004813059B7ED-20250117-064459-1
+From: Hillf Danton <hdanton@sina.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Edward Adam Davis <eadavis@qq.com>,
+	syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] Bluetooth: hci_core: sync hci rx and cmd sync work
+Date: Fri, 17 Jan 2025 06:44:46 +0800
+Message-ID: <20250116224448.1933-1-hdanton@sina.com>
+In-Reply-To: <CABBYNZ+99rvMrDs_j8niLtef537t7VFrEVY4NHdymW8wgnBNdQ@mail.gmail.com>
+References: <677b9c97.050a0220.a40f5.0003.GAE@google.com> <tencent_E7941CEA8AEEA2CC0879BA6C2C2C956E2C0A@qq.com> <CABBYNZK8M9RAh3jeXLs1+=s4rYW=EzJnt1HXD0XNjKCQmMjPeA@mail.gmail.com> <20250116104240.1898-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/shell: Always set stdout to be line buffered
-In-Reply-To: <20250116203900.3722253-1-luiz.dentz@gmail.com>
-References: <20250116203900.3722253-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============8998915110973789728==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=926226
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.27 seconds
-BuildEll                      PASS      21.43 seconds
-BluezMake                     PASS      1612.86 seconds
-MakeCheck                     PASS      13.21 seconds
-MakeDistcheck                 PASS      164.85 seconds
-CheckValgrind                 PASS      226.76 seconds
-CheckSmatch                   WARNING   287.83 seconds
-bluezmakeextell               PASS      101.21 seconds
-IncrementalBuild              PENDING   0.25 seconds
-ScanBuild                     PASS      900.68 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8998915110973789728==--
+On Thu, 16 Jan 2025 10:31:03 -0500 Luiz Augusto von Dentz
+> On Thu, Jan 16, 2025 at 5:42 AM Hillf Danton <hdanton@sina.com> wrote:
+> >
+> > This does not work because conn can be freed before bumping refcnt up,
+> > and bumpup alone does not help l2cap_send_cmd() in case conn->hchan has been
+> > cleared in l2cap_conn_del().
+> 
+> Well then perhaps we can use hdev lock just to protect l2cap_data:
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 27b4c4a2ba1f..00ef61609d49 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -7466,14 +7466,33 @@ static void l2cap_recv_reset(struct l2cap_conn *conn)
+>         conn->rx_len = 0;
+>  }
+> 
+> +static struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
+> +{
+> +       BT_DBG("conn %p orig refcnt %u", c, kref_read(&c->ref));
+> +
+> +       if (!kref_get_unless_zero(&c->ref))
+> +               return NULL;
+> +
+> +       return c;
+> +}
+> +
+>  void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>  {
+> -       struct l2cap_conn *conn = hcon->l2cap_data;
+> +       struct l2cap_conn *conn;
+>         int len;
+> 
+> +       /* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
+> +       hci_dev_lock(hcon->hdev);
+> +
+> +       conn = hcon->l2cap_data;
+> +
+>         if (!conn)
+>                 conn = l2cap_conn_add(hcon);
+> 
+> +       conn = l2cap_conn_hold_unless_zero(conn);
+> +
+> +       hci_dev_unlock(hcon->hdev);
+> +
+This does not work either because after releasing lock bumpup alone can
+not prevent conn->hchan from being cleared.
