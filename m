@@ -1,184 +1,158 @@
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55961AAA1A;
-	Fri, 17 Jan 2025 21:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AE41DD879
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 22:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737149530; cv=none; b=DRZBdcIAmlEMkQghdSLysk6TF204GYXVVNi0rSgm5onH2Hyptp9CjWJnVw/QT5QLoUFrc++NxvkuIIEJCNOkXO/oC4joqkGRStKQ8GiQ2KBBVI1K4m1K8gDE8ZLVrnnuMP1PITa6T2WemrZWygZi4k+LpYHdDU8ftbnI+m62KvY=
+	t=1737153864; cv=none; b=VSWYXodjdgs59mGW8e04N3tbJsigXSE7fCihSXANCR2XhQahoUvFZZUntXJKWm+v42bl6h2KRu/SbueE3FHj9yduH9eAUJqivPyMF/0J1rRuecazY6JncmV17se8OKUDL9vNx23ALm8atMF7TJSPlDEeILSBaYwS2sDcUCd0y7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737149530; c=relaxed/simple;
-	bh=RT5KFYi9rjDBfUSmWxVyHhs9joAIfzlu7Cq3Vfea9rM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DrGuebXjNZshWsNpXQD1m9XhCn05dS7YbzhofPQYjXR/yx9HTeRtipGs5M6SUz3pxv3ft7uLvimVQzCoNf7NwW2Oeib77CDVhLMHkcgH8KrhjWF6ZP6TCVYn8PmPAMylibHkOo5eFGNOQolVt1VwR8LyrjSIGOoXCM+pKgTSXv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pmvjg57z; arc=none smtp.client-ip=209.85.217.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pmvjg57z"
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4afe4f1ce18so694796137.3;
-        Fri, 17 Jan 2025 13:32:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737149527; x=1737754327; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rji6jECYg9vqAK27wpja8rPr0seyPgDoXVWjax/UQ6k=;
-        b=Pmvjg57zNFcMfMEj9v2VZfuWA2SNxryumksEZ+tyF5HRr0OSGiiSpO1zE2QJUEzpJA
-         JCvEfs1FWBBQ+JCTaRoKB65Ojx+We+t7OuaD5HDRiFezulTbq+cm0W70b1NDVNGawybm
-         8KcutmA7zR78WDDBdzIzDCWJwDB2SE3wUD/rGdKZy8wYdkJKFWdlxrj7vRB0J7vHMAlm
-         5C/qxzenn+A7F2vt1NGiyL3C1LUzdR3WQ0lus+5tsApJ5EmMAhXD7HFsC2HHMKsvYIxL
-         lhiVJZvklNudvSjSYRq+Cb3Ffo2NOKt1QQoeI5rU8Ukf5Pnc0yeiZrYxLP/47mynXbmb
-         jUaw==
+	s=arc-20240116; t=1737153864; c=relaxed/simple;
+	bh=sHlR9V1r6jP9xFsceVsELkCDS3kR96/2CujWA8btVsg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IW8T0+04pEUJIH4IhscftrB+6trU+G8nLY0WIUzQsEFvaG7sh2BCVmml6wZx400b+YW1CDJItJTEaEWPYxibcCso+lpIOg4pVRwpVjD25WrQSfINTrsY/ALDSpUypHBNeJnGz9uNJ0fVUzAMYIv9cyGUupfsHqbn3wVI+MiwLm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ce7e5d651aso22185315ab.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 14:44:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737149527; x=1737754327;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Rji6jECYg9vqAK27wpja8rPr0seyPgDoXVWjax/UQ6k=;
-        b=Ex4a8RfeOVocF+9FOyDSobF9IEfysGgDM4nq5U+Ecaxg4nb6CPGTiTXlWPJRzDyuFT
-         aNiAnCAE+avjZBSf1t/mSbE6lDhfmx40GJKcepHuJ7kBwKSrj9hueyr+QTCiv4du8lMi
-         xjp+TpuIGei6Pv+mHISN0M0m5XdqIt9TU53nulZAEhfPW+GHc3tFyUAADlunELmXbkj5
-         RNliDt+UgRSPDbFWAaCpFGJ1gpj6oc5MvFXLqT5IDRXFU+gpKdRJLIMrykyy84kUeJu7
-         JU7CrYUS3gNAppw0Z+3a/Z3n69mTubPym8dJ+IO4jxkty1SOx8o/Pr42UUmt5JDQsTOV
-         YxXw==
-X-Forwarded-Encrypted: i=1; AJvYcCW59pRVand60v9KwrV9x+A3gC54eiWud9l8HrFM3+2kf5RdGCBqdPhNeHzLtB4lfI10TC+rYGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOig9x98lfrFQgxUg+U/asPUlrYUfVqPXbHtoTI32R/LkA0dhO
-	VzFyzOV/h4CT6ca6tValYvnRLeysyKZGjt6zWiZOYZqXCCNWDJoDfT6XIe3C
-X-Gm-Gg: ASbGncuSljidTJ9z3DA8JdkjkqTtGurToSYYKFqp+r43ZEy04yeB/RMLZ2MSeNw2/d6
-	1Q8MT5BlMzRZF6FySmPLX6H+crwmkKAuVxWk17LSnxclPkLbyXxaSiSiwcPKqWVjs6QXi7ECENZ
-	PrRA0yyX7+EaXTGnpwtgrsrxYHgT8rtDZS/kU5NGneBGR1ts2BKWJLIJ5l/D6D8HnwVW0BX9eoi
-	oBJZLhTv/kmAKHk+HoDCBQZHLWAiFNGT+T8mE8ULY5W+1KAJ92MqV/rZP0ntku1EU1uCHTQatQH
-	dt6payhu1lUvnEswpy1KkZSGoQna
-X-Google-Smtp-Source: AGHT+IHBPsSt8tMKnV0kxsNkGjS0QLi3kVmdXYfsBJOXganYv9d3wXIzSnsKwN9pNtIpTjR/qk3/TA==
-X-Received: by 2002:a05:6102:f0d:b0:4b4:e5c6:4c66 with SMTP id ada2fe7eead31-4b690bb56c4mr4838769137.6.1737149527461;
-        Fri, 17 Jan 2025 13:32:07 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8642cc7f77esm697390241.24.2025.01.17.13.32.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2025 13:32:05 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2025-01-15
-Date: Fri, 17 Jan 2025 16:32:03 -0500
-Message-ID: <20250117213203.3921910-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.1
+        d=1e100.net; s=20230601; t=1737153859; x=1737758659;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A7RrhgjZYtvPZcYAN5b0RCSWkhBjOlEmR5OPIQjnKXQ=;
+        b=t8qm3xctSKhrY0R2ZH4wOz3x2N0Q3m+S/DPVdEiQj7x7JSYiXyoJyQEdm7LYjYNC5e
+         lCCJkQIuyeHdNuUrJTshvzj3FCpw8zwRixi+yGJb/K00QfF/p0bI8LAcldEhkbeiY1Pz
+         BaSbOXErP7qtAKp5d+dbzYIWKUMtLaw1EVYWwR9R9tkgLykF5/YF7V7D4ye3iGHAKEzc
+         Hy2k38z/EjY1/boJayhby58sqH0eSQI++xKXohrUGrIxaablsFMGA1+6Pv/R3lXwRBlY
+         Ct3Q4CL7NDZDE0MkhQRdEBBtMjlTeY81YlobPhKK71Ch4PVC043X7ru6zoB/Ce9cq1mB
+         ylAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVA/3CvMkIEoq+2Yrfxk9uonDpQA9jnKiJUv4ByIoe/x1amXI7/7jDQhvlHv2rkkckIFFrnDGkm4bklIyvH6P4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3/PCPv4CSkGvpMTMFbldGxDfFh/W8NZV7NjpThNfr5e+an/OL
+	NsLHjCpbMXc304clrZEqa1QowML43itE+m8HvbbtAcv9vskesW+UF9o/eIyk1528332zotTa/Ya
+	g1ykXIBuzOdh6J1h2hADEhLBHeLfCBx/5xgPudGht0GUrwQZ1cVx2KZY=
+X-Google-Smtp-Source: AGHT+IGUrxAw+btpJ1VSdv/ZGL704SgMRa0RjYKrpW1c1Z8LRmA4x5q+qM+/tHdULQK3jI0lRxW5K2oMVn4ZjnXkkqHqLyY3xtzw
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:c26b:0:b0:3ce:7ac0:64ce with SMTP id
+ e9e14a558f8ab-3cf74495f72mr41048905ab.18.1737153859687; Fri, 17 Jan 2025
+ 14:44:19 -0800 (PST)
+Date: Fri, 17 Jan 2025 14:44:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <678add43.050a0220.303755.0016.GAE@google.com>
+Subject: [syzbot] [bluetooth?] [wireless?] WARNING in free_netdev (2)
+From: syzbot <syzbot+85ff1051228a04613a32@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The following changes since commit d90e36f8364d99c737fe73b0c49a51dd5e749d86:
+Hello,
 
-  Merge branch 'mlx5-next' of git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux (2025-01-14 11:13:35 -0800)
+syzbot found the following issue on:
 
-are available in the Git repository at:
+HEAD commit:    8d20dcda404d selftests: drv-net-hw: inject pp_alloc_fail e..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15ffc2b0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c30f048a4f12891
+dashboard link: https://syzkaller.appspot.com/bug?extid=85ff1051228a04613a32
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13ffc2b0580000
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-01-15
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5ce07c743ced/disk-8d20dcda.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/66f2a9a35d5e/vmlinux-8d20dcda.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4c790c086a46/bzImage-8d20dcda.xz
 
-for you to fetch changes up to 26fbd3494a7dd26269cb0817c289267dbcfdec06:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+85ff1051228a04613a32@syzkaller.appspotmail.com
 
-  Bluetooth: MGMT: Fix slab-use-after-free Read in mgmt_remove_adv_monitor_sync (2025-01-15 10:37:38 -0500)
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(lock->magic != lock)
+WARNING: CPU: 1 PID: 5961 at kernel/locking/mutex.c:564 __mutex_lock_common kernel/locking/mutex.c:564 [inline]
+WARNING: CPU: 1 PID: 5961 at kernel/locking/mutex.c:564 __mutex_lock+0xdac/0xee0 kernel/locking/mutex.c:735
+Modules linked in:
+CPU: 1 UID: 0 PID: 5961 Comm: syz-executor Not tainted 6.13.0-rc7-syzkaller-01131-g8d20dcda404d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:564 [inline]
+RIP: 0010:__mutex_lock+0xdac/0xee0 kernel/locking/mutex.c:735
+Code: 0f b6 04 38 84 c0 0f 85 1a 01 00 00 83 3d 6f 40 4c 04 00 75 19 90 48 c7 c7 60 84 0a 8c 48 c7 c6 00 85 0a 8c e8 f5 dc 91 f5 90 <0f> 0b 90 90 90 e9 c7 f3 ff ff 90 0f 0b 90 e9 29 f8 ff ff 90 0f 0b
+RSP: 0018:ffffc90003987580 EFLAGS: 00010246
+RAX: ef7de89246652d00 RBX: ffff888029dc0cb0 RCX: ffff888025ad3c00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc90003987710 R08: ffffffff81602ac2 R09: 1ffff110170e519a
+R10: dffffc0000000000 R11: ffffed10170e519b R12: 0000000000000000
+R13: 0000000000000000 R14: 1ffff92000730ec4 R15: dffffc0000000000
+FS:  000055558b849500(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fffad944418 CR3: 00000000336ec000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ netdev_lock include/linux/netdevice.h:2691 [inline]
+ __netif_napi_del include/linux/netdevice.h:2829 [inline]
+ netif_napi_del include/linux/netdevice.h:2848 [inline]
+ free_netdev+0x2d9/0x610 net/core/dev.c:11621
+ netdev_run_todo+0xf21/0x10d0 net/core/dev.c:11189
+ nsim_destroy+0x3c3/0x620 drivers/net/netdevsim/netdev.c:1028
+ __nsim_dev_port_del+0x14b/0x1b0 drivers/net/netdevsim/dev.c:1428
+ nsim_dev_port_del_all drivers/net/netdevsim/dev.c:1440 [inline]
+ nsim_dev_reload_destroy+0x28a/0x490 drivers/net/netdevsim/dev.c:1661
+ nsim_drv_remove+0x58/0x160 drivers/net/netdevsim/dev.c:1676
+ device_remove drivers/base/dd.c:567 [inline]
+ __device_release_driver drivers/base/dd.c:1273 [inline]
+ device_release_driver_internal+0x4a9/0x7c0 drivers/base/dd.c:1296
+ bus_remove_device+0x34f/0x420 drivers/base/bus.c:576
+ device_del+0x57a/0x9b0 drivers/base/core.c:3854
+ device_unregister+0x20/0xc0 drivers/base/core.c:3895
+ nsim_bus_dev_del drivers/net/netdevsim/bus.c:462 [inline]
+ del_device_store+0x363/0x480 drivers/net/netdevsim/bus.c:226
+ kernfs_fop_write_iter+0x3a0/0x500 fs/kernfs/file.c:334
+ new_sync_write fs/read_write.c:586 [inline]
+ vfs_write+0xaeb/0xd30 fs/read_write.c:679
+ ksys_write+0x18f/0x2b0 fs/read_write.c:731
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f44ce1847df
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
+RSP: 002b:00007ffde8b7b2a0 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f44ce1847df
+RDX: 0000000000000001 RSI: 00007ffde8b7b2f0 RDI: 0000000000000005
+RBP: 00007f44ce202d15 R08: 0000000000000000 R09: 00007ffde8b7b0f7
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000001
+R13: 00007ffde8b7b2f0 R14: 00007f44ceea4620 R15: 0000000000000003
+ </TASK>
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
 
- - btusb: Add new VID/PID 13d3/3610 for MT7922
- - btusb: Add new VID/PID 13d3/3628 for MT7925
- - btusb: Add MT7921e device 13d3:3576
- - btusb: Add RTL8851BE device 13d3:3600
- - btusb: Add ID 0x2c7c:0x0130 for Qualcomm WCN785x
- - btusb: add sysfs attribute to control USB alt setting
- - qca: Expand firmware-name property
- - qca: Fix poor RF performance for WCN6855
- - L2CAP: handle NULL sock pointer in l2cap_sock_alloc
- - Allow reset via sysfs
- - ISO: Allow BIG re-sync
- - dt-bindings: Utilize PMU abstraction for WCN6750
- - MGMT: Mark LL Privacy as stable
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-----------------------------------------------------------------
-Andrew Halaney (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3610 for MT7922
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Charles Han (1):
-      Bluetooth: btbcm: Fix NULL deref in btbcm_get_board_name()
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Cheng Jiang (3):
-      dt-bindings: net: bluetooth: qca: Expand firmware-name property
-      Bluetooth: qca: Update firmware-name to support board specific nvm
-      Bluetooth: qca: Expand firmware-name to load specific rampatch
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-Dr. David Alan Gilbert (1):
-      Bluetooth: hci: Remove deadcode
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-En-Wei Wu (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3628 for MT7925
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Fedor Pchelkin (1):
-      Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
-
-Garrett Wilke (2):
-      Bluetooth: btusb: Add MT7921e device 13d3:3576
-      Bluetooth: btusb: Add RTL8851BE device 13d3:3600
-
-Hao Qin (1):
-      Bluetooth: btmtk: Remove resetting mt7921 before downloading the fw
-
-Hsin-chen Chuang (3):
-      Bluetooth: Remove the cmd timeout count in btusb
-      Bluetooth: Get rid of cmd_timeout and use the reset callback
-      Bluetooth: Allow reset via sysfs
-
-Iulia Tanasescu (1):
-      Bluetooth: iso: Allow BIG re-sync
-
-Janaki Ramaiah Thota (1):
-      dt-bindings: bluetooth: Utilize PMU abstraction for WCN6750
-
-Krzysztof Kozlowski (1):
-      Bluetooth: Use str_enable_disable-like helpers
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: MGMT: Mark LL Privacy as stable
-
-Mark Dietzer (1):
-      Bluetooth: btusb: Add ID 0x2c7c:0x0130 for Qualcomm WCN785x
-
-Max Chou (1):
-      Bluetooth: btrtl: check for NULL in btrtl_setup_realtek()
-
-Mazin Al Haddad (1):
-      Bluetooth: MGMT: Fix slab-use-after-free Read in mgmt_remove_adv_monitor_sync
-
-Ying Hsu (1):
-      Bluetooth: btusb: add sysfs attribute to control USB alt setting
-
-Zijun Hu (1):
-      Bluetooth: qca: Fix poor RF performance for WCN6855
-
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  10 +-
- drivers/bluetooth/btbcm.c                          |   3 +
- drivers/bluetooth/btintel.c                        |  17 +-
- drivers/bluetooth/btmrvl_main.c                    |   3 +-
- drivers/bluetooth/btmtk.c                          |   4 +-
- drivers/bluetooth/btmtksdio.c                      |   4 +-
- drivers/bluetooth/btqca.c                          | 200 ++++++++++++++-------
- drivers/bluetooth/btqca.h                          |   5 +-
- drivers/bluetooth/btrtl.c                          |   4 +-
- drivers/bluetooth/btusb.c                          |  73 +++++---
- drivers/bluetooth/hci_qca.c                        |  33 ++--
- include/net/bluetooth/hci.h                        |   1 -
- include/net/bluetooth/hci_core.h                   |  14 +-
- include/net/bluetooth/hci_sync.h                   |   1 -
- net/bluetooth/hci_core.c                           |  24 +--
- net/bluetooth/hci_sync.c                           |  76 ++++----
- net/bluetooth/hci_sysfs.c                          |  19 ++
- net/bluetooth/iso.c                                |  36 ++++
- net/bluetooth/l2cap_sock.c                         |   3 +-
- net/bluetooth/mgmt.c                               | 145 ++-------------
- 20 files changed, 340 insertions(+), 335 deletions(-)
+If you want to undo deduplication, reply with:
+#syz undup
