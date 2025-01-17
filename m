@@ -1,71 +1,53 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCF01AB51B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 21:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2607E1A83F1;
+	Fri, 17 Jan 2025 21:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737148508; cv=none; b=N+6ii3+2hO0C3amiS/boz2PasHo877o5n6J3IEPFENElqI51ZZvDjdbgQDDpwVMMsGw7TRFUGgz+kwtzyrKgr66Yk6HDYQ4VJ309oIsBYbreLT0tqs/efb6UR9lA9mOxge3X4mrm63GyTzFbOEOz/YKEMEUfbQVK9I4fNgk9sjw=
+	t=1737148633; cv=none; b=DiJ1lOj6UJByy+6UFB0UKpm/mWFtm84Ob5HuJYT/RAHvXg6PF1q7wEn5LJ9W+cL0zSGAawU9kwFzlPkpNZBliWU7LrsCMZeAtbRt4o0Kt9IdFA+5Zlfyy6OXDRDpj/xoo1Ol6HvGuXdFAEM2P+RBIoWYLTOYpFsM5I5euxt7WCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737148508; c=relaxed/simple;
-	bh=teWO9Csv9Qkjd4mGWo9Z5zsq2bSUSbpjKG59mlbJkQ8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=TIxvIvZwRVxkRi8Rq/cO7JSX7se6Me+cqdBtoBh225k3kFwR/ME0Xpd9E4r3j9eOsqtQS5o9zR3YocDeJfbSr94EqlRqJAQ+bocfxA+FS6vFUEk5qAS/89N3cvwK760HANXtnxdwjdJx6dkg+jS54dGXZWmeKDBY71z/JC65JOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a9d075bdc3so48860335ab.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 13:15:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737148505; x=1737753305;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UcMAFza9W5gqBw9cppUDWatQ1brFv/F8m84x9kx4cfw=;
-        b=uHOTlcFXk5HXM6z+c2dybJXYpFAs6SupZGvOEDCw5aWGi3QRyZgB/KJG8r+dMy58Rv
-         ePhKB/4uJHT5TiSZaHT2wjM9EX3PIrNU2/M1sihdDkzHc6p6CCKoHT/8PEsRAKvVpi37
-         rQb64IAqXApT99KP+aw19IP8lnkVxSvYzUEwlxaikfmISkSdCVIFFUvMXT27g0LPgMmA
-         9Q61c7SZR0n9zRm0HCBK+eeP5SNSvsbk3NtQqNSEcY25v/p03igwULBhB1MUpS9eoVCE
-         dGDm2JvqdjPktE9xRksgnY6TmkW7/rZBwXgvQCGUjCow08xOeox6PnGOGctjhiBXjuZ7
-         +Rwg==
-X-Gm-Message-State: AOJu0Yx0Jp7hERqSs2DzCPoWCzUsumzAoXW/aVkI0tQiSwN4bj46t/Fb
-	9UfUle3ajeknqDPHKwv99Q/nGc6gmbKNG41tk8Rpxk/mxrbxUryNmAT4lOIaaRG5wo2GDCcCnI5
-	lnXbIrvkDTlrlNU7XSooycLWOjXQqOHfRzZhJd+nPm02KnQ9Z3SgAxqY=
-X-Google-Smtp-Source: AGHT+IHd3fF/yFtc4ierj0bBP/yHitKriub2CAWV75/6jhY8hARwzTEtrtXdFYa/LqBq6Ag2HG/73EfLhep1okTxC9PNK3ZbetTS
+	s=arc-20240116; t=1737148633; c=relaxed/simple;
+	bh=jqUxzDsh4oIjs8UiUgCohjXIwK0VU1y3e7GK6AqP+Mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hurgILHnuTwncJLIDaXRDKKB8Nuvw80UTeQp836JweC0UrkD/TmW7YOVV8oxgeqlLuS95v8iwLw5xYU2tShVeKxZcIKca9Lr8qEODapaMA++mgRXMMbLuyIlWTIRFUhyt74seqCyJ7KTTaGwOm47Lw+oZmUUYF4obOrZBzeHHOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhlQR1g5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhlQR1g5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE23C4CEDD;
+	Fri, 17 Jan 2025 21:17:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737148632;
+	bh=jqUxzDsh4oIjs8UiUgCohjXIwK0VU1y3e7GK6AqP+Mo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EhlQR1g5U1silNCe0o8dVYdpNr2fT7v2yJmtL/XNsg1HwcSoLVIWHDSuOAOFrLVkZ
+	 EEgZORolzfbct0Ni2hx7k+RoxeEYWpGegLVnN475NFVfYRhRzNNdWPlV0UQvVA8uKE
+	 dwBmAZGOVYx2JMj41JpSJ5w8WHhWyWtSxxY/DwezP5fOSPVyeFJJ9Au8xmUIPEvpc3
+	 2PgNdMeRE8uVq7bkjmWe5FLa4ks/8FsnWybpBR0PmVVW+3tdx4nB4tUBAM+w5SuZV5
+	 NhL0c2fK+jenwViZ0JU9pam5UVMDBeQ4MvWLmPB018/dCRAaT0VFzhzLQujTERlI08
+	 HwPtJMGwPjsFA==
+Date: Fri, 17 Jan 2025 13:17:11 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: David Miller <davem@davemloft.net>, "linux-bluetooth@vger.kernel.org"
+ <linux-bluetooth@vger.kernel.org>, "open list:NETWORKING [GENERAL]"
+ <netdev@vger.kernel.org>
+Subject: Re: pull request: bluetooth-next 2025-01-15
+Message-ID: <20250117131711.2b687441@kernel.org>
+In-Reply-To: <CABBYNZJ_LfmEzZaZjxwY7uG8Bx1=+-QE5B07emtz5sios9XZ0A@mail.gmail.com>
+References: <20250115210606.3582241-1-luiz.dentz@gmail.com>
+	<CABBYNZJ_LfmEzZaZjxwY7uG8Bx1=+-QE5B07emtz5sios9XZ0A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12cd:b0:3ce:7ac0:64d0 with SMTP id
- e9e14a558f8ab-3cf743c4a65mr35732895ab.2.1737148503949; Fri, 17 Jan 2025
- 13:15:03 -0800 (PST)
-Date: Fri, 17 Jan 2025 13:15:03 -0800
-In-Reply-To: <CABBYNZKWo_+EuoOWTYUyAFQ2RuA1F4s3hgdeSHuy2v9A5d9XCg@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <678ac857.050a0220.303755.0015.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in l2cap_send_cmd
-From: syzbot <syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Fri, 17 Jan 2025 11:17:36 -0500 Luiz Augusto von Dentz wrote:
+> Looks like Ive only send this to linux-bluetooth by mistake:
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
-
-Reported-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
-Tested-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         ad26fc09 Merge tag 'mm-hotfixes-stable-2025-01-16-21-1..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17ec5fc4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aadf89e2f6db86cc
-dashboard link: https://syzkaller.appspot.com/bug?extid=31c2f641b850a348a734
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=122bc2b0580000
-
-Note: testing is done by a robot and is best-effort only.
+Could you do a fresh repost? patchwork will not gobble it up from 
+a quoted email :(
