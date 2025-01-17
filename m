@@ -1,108 +1,275 @@
-Received: from send288.i.mail.ru (send288.i.mail.ru [95.163.59.127])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37712166F3D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 18:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.163.59.127
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FE21ACECD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 18:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737138457; cv=none; b=gA/TrnzvNOn8VidPcYX18ANzrHIEhx6OPtjsz0mq5TRvWzpciRwUzGShXWIkXlnEI3+8tCiLL3er9t5yHxCxU+jf2nzqQ0lzP0LV3rLIYyQMrjIqMcbijOPrHRI4IzbhvWwSiDq+t+kEPz4E2gUOCSCNDVf2bSDdyx3ZcRMUNpY=
+	t=1737139331; cv=none; b=r2NH+mfVES6bvQxUFjpXoN1+oG/AjweQnahJHBriuSUo3sLJhzo7ESn8vtwoThxNP3gJAK/zKA1Eex0FnHG6V9QCC8saH39vCsXqpDHhlPUdAY9+8wuvAhKoSgLpxbOXPinEGQBlOAYhZdXNOTXr1XerRT0YersA9CQjtDEtXVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737138457; c=relaxed/simple;
-	bh=fe5O1zuxzy5em28pufCQzth7ZkvmYs5vMrKpUwLeiFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TKrW7NpvSjDgqQ6LeXPso27Kh0yi4EDKffQf9SAmAdPE0+9TeTpXIz8BJP+k//FzU5j9TNt5PTr1nXbNx0FvZSjBPTx3yYHrP6dfv84IshdZzSxTylwkihIMae2dLIwx1swAkbj9ssk2gwTVtOt/SK5dWKaq0dSjMzt38o9I5AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mail.ru; spf=pass smtp.mailfrom=mail.ru; dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b=QmkeWk3L; dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b=TAePP9h+; arc=none smtp.client-ip=95.163.59.127
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mail.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.ru
+	s=arc-20240116; t=1737139331; c=relaxed/simple;
+	bh=4pspWkv/HBiayRH0cE4C7ypXWqic3OGRe7DlIFuZkdI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=I0T5N7tkKJNs2zIbKQAxDDZpXcbD1zBOvb7LAfEGMRLi+hYUc1BnfCIT9te8cah8Tva7XXgi+MjbyE6waU+SMLP8vzYJATJ0Dq5yzSr2ix/rzhb6GQAaNGwDWb/8U+sK+FwClQM/btzWwYBlDAmCDOUaLY3zUx+l3RVOsg9JZNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LL8H3Cnr; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b="QmkeWk3L";
-	dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b="TAePP9h+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru;
-	s=mail4; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive:X-Cloud-Ids;
-	bh=Mfs+/Bjq3qalVgzQf3qcTV9eu3COEjBS+5J70KdCdZg=; t=1737138453; x=1737228453; 
-	b=QmkeWk3LFJxlhiVsT4Mr46Ou9Ak2MTSOcaA+fRR33s6G0Ast2Gtx4lR1T8P9i+sSGNGxc4Dio0c
-	0XSvg9kEmumMCuNQ7bx7tjzOJqvVVAHtNvEmaQ4lt63xP38bAvyybsfht3ADwGKa78RQahf8/R95Q
-	PsdaHLefapmRZJ0vB9ppRG0HI6SNn1LXt/svKp9HbLHCoiNITAa97fPhFDKvl1o15GJEt7mWLIR8b
-	nJ1N012G0hUAuhzG3vN3sVp0b2x8nrWhrPFnEFz9LtdJ9QZf61Whyw8h7UsT5XsMHSr+8U9wBOE64
-	SwvPHZt+CYDgT+oUljM2OSh1fsZSmauAafwQ==;
-Received: from [10.113.142.48] (port=52786 helo=send57.i.mail.ru)
-	by exim-fallback-55f48b6675-qd9zc with esmtp (envelope-from <hitechshell@mail.ru>)
-	id 1tYr46-000000007ha-3Cu2
-	for linux-bluetooth@vger.kernel.org; Fri, 17 Jan 2025 21:27:30 +0300
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru;
-	s=mail4; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:To:Cc:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:
-	List-Archive:X-Cloud-Ids:Disposition-Notification-To;
-	bh=Mfs+/Bjq3qalVgzQf3qcTV9eu3COEjBS+5J70KdCdZg=; t=1737138450; x=1737228450; 
-	b=TAePP9h+peyk2KZ3EG54ta5FXcXQyA8dzOrDuW6VlGUHh9ntMrNtFAkOC0YRHc0NaTZOdMuicse
-	Hdx8QKXD+hyBKywr4/PYlk8eVy9HdgUn4KAJWbzVtMrj+ecrllvVondw6PHGVomxjxuVcpPcQtr3E
-	o6VotKw1b91JzcMXGfhjyfJZDyC948aAf3oxhapCPUn2duFkFSs9a8EAo5rtm8L9b65aLPk8wcZVM
-	KMSjRjr3XMQm6pnM1EScPRM0PB9OQYG2D+jYZ4BoH3GoqYY8iw++d5RdeCHuWV9MNnHjrana2NluO
-	UqrEb8er/Q6YJlrQiZP3x/1IAckG1u+VPsFA==;
-Received: by exim-smtp-6758d5575c-cqk4c with esmtpa (envelope-from <hitechshell@mail.ru>)
-	id 1tYr3y-000000002I7-1XyV; Fri, 17 Jan 2025 21:27:22 +0300
-Date: Fri, 17 Jan 2025 23:25:09 +0500
-From: Denis Burkov <hitechshell@mail.ru>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] shared/shell: add proper line clean to
- bt_shell_printf
-Message-ID: <3aawgbxiytnne7qpbx3pmcsrwsnnetm7aznn6fjxygboui55il@62zkwgjqnmpw>
-References: <20250117180611.14869-1-hitechshell@mail.ru>
- <CABBYNZLK4hAmUXp-yZVDXUJ6M8_faDYPN2i6kccdbvc945f0fA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LL8H3Cnr"
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4afefc876c6so651147137.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 10:42:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737139325; x=1737744125; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0umhs9EU7ywfeaCCWU2pxl+l1Vf86Hj5Rh4Caplwt44=;
+        b=LL8H3CnrPXoQhQLlTS65pE4UZT944U1buW59AHenNISriLJit0hAKnKRAXc3ARiRMi
+         qBFf1JKq9kPJ050yl2hC32a6lQGUrPY7LfEAq85A4gJ2ufbu7Oj6OawULDsfFwWHIogj
+         3vtnEsyeKYVHSmpHLt0SXUzXj5K2tQ8c0nYXd1qq2LgV2YqsfUjKTbANorjgyK0CFjqP
+         sp55+frCi6Rd/3c8l7/vv0JTsgsbLdonBdqYglOmPmsmIW0Ezttn0oxqtqEFwp2M0TYf
+         LW9PrbAniiKAhiszb580p545nkQ5olkoZm8IDyNwL+p8K+A1t3Heu60wqWPZ6Wfuff7w
+         dHOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737139325; x=1737744125;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0umhs9EU7ywfeaCCWU2pxl+l1Vf86Hj5Rh4Caplwt44=;
+        b=l/MmpZh9VhU4Py49ty8CLZvlcM+1Nm2W+GlHdKRgxmG2U4KSTr07piReb65LloyCbP
+         HDrvWjhLxxkM1qiyf1MHTLr5RPvqIrCqX8FWX9Ua7Rl9ZgUrRDR4alG+/JYQnBb9jEbj
+         hwd95mGsTrQT9Ryvoj4R3fLj1z1eIqDASNrJsr1oNc40LgRJV8Td6/rHQm322fJcDMK9
+         KgNsux6gCaBTJ4KrTS2zQfwtkCl2GEgv7xnB96+W0G0Jo7e5DYh82sGG43mRuSRDG4MK
+         TQZd12JE3jxdKHN8N8uAk3AL9CKQ+8bmM5zqSY4Ua6Ge4cVlZDhdbTmuFjoyTNLrfbgV
+         1qaA==
+X-Gm-Message-State: AOJu0YyCVjCQAnI0DNJVPmcX8wSW022BEp40cLlnjI8q6Ta2lKk2hGwj
+	tcbGXPXJhaIP04J0/sDbvlDaNemtvO6MuuCV8cZFr+m4Vv2JJw47IgPOPikJ
+X-Gm-Gg: ASbGnctcbjE74qSu8NoSc62lvU6uXMYskm0hy6K1tcYrLnf7gduLH7din608R6PE6df
+	nsfOPP2vItTqU7Nw5Jll1nRW/A+QQv2pcPSB9VLbPyiWcnMHSLhcYLKTIjM/VQRktaD0hZKWxly
+	lW0cmIlaNkhXcGZT4h7RhlvJcQot0whbJ+Ev803aNlOFK+KM50Hg9FxmjsYhIa3E52QgG0Lj3Kh
+	mlBzzfAPWeDdqfsXmFZSNMn9bQcMvvOBOpswiOGIfElAjE0qUOtgDzI1AkWgebNzdtkLNLYYeLg
+	aOlnP/wInYlCIYIi7s7/G3CSk5ap
+X-Google-Smtp-Source: AGHT+IEBsMRwO6dIiueQBFr5i3iDZjjvJmU4kH45sba12q61T53JQR4MJziR+JhgdFDRdJM94s0G/A==
+X-Received: by 2002:a05:6102:3fa2:b0:4af:deaf:f891 with SMTP id ada2fe7eead31-4b690b5e789mr4193258137.4.1737139325428;
+        Fri, 17 Jan 2025 10:42:05 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b68a33f4dfsm573185137.29.2025.01.17.10.42.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 10:42:03 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
+Date: Fri, 17 Jan 2025 13:42:02 -0500
+Message-ID: <20250117184202.3895460-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZLK4hAmUXp-yZVDXUJ6M8_faDYPN2i6kccdbvc945f0fA@mail.gmail.com>
-X-Mailru-Src: smtp
-X-7564579A: B8F34718100C35BD
-X-77F55803: 4F1203BC0FB41BD9F92BE5667526BA91E395D7587768BB3AAAAB6B6460CC5D35182A05F538085040B5B83C71B15609E23DE06ABAFEAF6705FD30066D1CE69D8ACFFF059546F94A01115177133B14DDE9
-X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7FCFCB92DA8654BB0EA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F790063764345650F0BBEB0B8638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D850E6E47FBC4EC2223E933ED8B512B146920081AA8502838520879F7C8C5043D14489FFFB0AA5F4BF176DF2183F8FC7C0B27420F9988F54058941B15DA834481FA18204E546F3947CD2DCF9CF1F528DBCF6B57BC7E64490618DEB871D839B7333395957E7521B51C2DFABB839C843B9C08941B15DA834481F8AA50765F7900637F924B32C592EA89F389733CBF5DBD5E9B5C8C57E37DE458BD9DD9810294C998ED8FC6C240DEA76428AA50765F7900637A3640AA7557C1107D81D268191BDAD3DBD4B6F7A4D31EC0BE2F48590F00D11D6D81D268191BDAD3D78DA827A17800CE788447B539030F878EC76A7562686271ED91E3A1F190DE8FD2E808ACE2090B5E14AD6D5ED66289B5259CC434672EE63711DD303D21008E298D5E8D9A59859A8B6B372FE9A2E580EFC725E5C173C3A84C381C471718626405235872C767BF85DA2F004C90652538430E4A6367B16DE6309
-X-C1DE0DAB: 0D63561A33F958A569D2FCF6602DC1755002B1117B3ED6968F3E3B1FDAB9B9D65B6221DB6D7A72AD823CB91A9FED034534781492E4B8EEADA2D5570B22232E1EBDAD6C7F3747799A
-X-C8649E89: 1C3962B70DF3F0ADBF74143AD284FC7177DD89D51EBB7742DC8270968E61249B1004E42C50DC4CA955A7F0CF078B5EC49A30900B95165D346E67BC984B8ABCB5769C9033EB7DE606E8F37DF638B4F98AA7C988E835427F9545AA70EB5DF0E78A1D7E09C32AA3244C89BD8B751F85CC9D77DD89D51EBB77429E558B41E7A8845CEA455F16B58544A2E30DDF7C44BCB90DB8B5179048F486F0F8ED7FEBB3D2F69ABF0F826D30A442AE37E69C174A41D00C
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojWtbQUE8gyFzjhA2/5RAbBg==
-X-Mailru-Sender: 7219FA8B682B638D72A16E3FD9953F63A8FA772DD64F6EBC670A377E8A0BFD00F9248E00AD136191DD7143E30D734E3D46315093CA775BF3554C0F224C5326CDBE1FA5EEA7DC04A0851DE5097B8401C6C89D8AF824B716EB5DB38D7CCF7198FF1D0BEC28C16373053DDE9B364B0DF289AE208404248635DF
-X-Mras: Ok
-X-Mailru-Src: fallback
-X-7564579A: 78E4E2B564C1792B
-X-77F55803: 6242723A09DB00B4E321808EBFEFE579B5B131811C2E9C301A1561FB40BF213E049FFFDB7839CE9ED5E581D7620AC4EB30E786A5533DD27CDAA97B8DC78E0D1202524F04F559E7E1C4A21D9B223F9646
-X-7FA49CB5: 0D63561A33F958A51D58CCE65FD2F90D5002B1117B3ED696D3A0C743B0C5660CB99A9B79129B760402ED4CEA229C1FA827C277FBC8AE2E8B54F520D093A0DF28
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5+wYjsrrSY/u6NqYXWMR0/V85CnFjCYTu9APdQH0PvpnP5qz8aO2mjTJzjHGC4ogvVuzB3zfVUBtENeZ6b5av1fnCBE34JUDkWdM6QxE+Ga5d8voMtmXfSoLFDCXEUyEibJdENjvzQK2
-X-Mailru-MI: 20000000000000800
-X-Mras: Ok
 
-On Fri, Jan 17, 2025 at 01:17:31PM -0500, Luiz Augusto von Dentz wrote:
-> Hi Denis,
-> 
-> On Fri, Jan 17, 2025 at 1:08 PM Denis Burkov <hitechshell@mail.ru> wrote:
-> 
-> We normally expect some description of why this change is required,
-> for instance what is the output with and without your changes here,
-> are there artifacts if we don't use rl_clear_visible_line?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-in some terminals (or all?) the line is not cleared before a new one is output
-(for example, if you turn on scanning and then try to write something to the terminal,
-the output will be mixed - you will get something like this
+After the hci sync command releases l2cap_conn, the hci receive data work
+queue references the released l2cap_conn when sending to the upper layer.
+Add hci dev lock to the hci receive data work queue to synchronize the two.
 
-[JBL T450BT]# h[NEW] Device ****
-[JBL T450BT]# he[NEW] Device ****
-[JBL T450BT]# hell[NEW] Device ****
-[JBL T450BT]# hello[NEW] Device ****
-[JBL T450BT]# hello[NEW] Device ****
+[1]
+BUG: KASAN: slab-use-after-free in l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
+Read of size 8 at addr ffff8880271a4000 by task kworker/u9:2/5837
 
-where "Device ****" is the line that was actually fed to bt_shell_printf
+CPU: 0 UID: 0 PID: 5837 Comm: kworker/u9:2 Not tainted 6.13.0-rc5-syzkaller-00163-gab75170520d4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: hci1 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:489
+ kasan_report+0x143/0x180 mm/kasan/report.c:602
+ l2cap_build_cmd net/bluetooth/l2cap_core.c:2964 [inline]
+ l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
+ l2cap_sig_send_rej net/bluetooth/l2cap_core.c:5502 [inline]
+ l2cap_sig_channel net/bluetooth/l2cap_core.c:5538 [inline]
+ l2cap_recv_frame+0x221f/0x10db0 net/bluetooth/l2cap_core.c:6817
+ hci_acldata_packet net/bluetooth/hci_core.c:3797 [inline]
+ hci_rx_work+0x508/0xdb0 net/bluetooth/hci_core.c:4040
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
-this was reproduced at least on simple terminal and alacritty (on gentoo)
+Allocated by task 5837:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
+ kasan_kmalloc include/linux/kasan.h:260 [inline]
+ __kmalloc_cache_noprof+0x243/0x390 mm/slub.c:4329
+ kmalloc_noprof include/linux/slab.h:901 [inline]
+ kzalloc_noprof include/linux/slab.h:1037 [inline]
+ l2cap_conn_add+0xa9/0x8e0 net/bluetooth/l2cap_core.c:6860
+ l2cap_connect_cfm+0x115/0x1090 net/bluetooth/l2cap_core.c:7239
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
+ hci_remote_features_evt+0x68e/0xac0 net/bluetooth/hci_event.c:3726
+ hci_event_func net/bluetooth/hci_event.c:7473 [inline]
+ hci_event_packet+0xac2/0x1540 net/bluetooth/hci_event.c:7525
+ hci_rx_work+0x3f3/0xdb0 net/bluetooth/hci_core.c:4035
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Freed by task 54:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2353 [inline]
+ slab_free mm/slub.c:4613 [inline]
+ kfree+0x196/0x430 mm/slub.c:4761
+ l2cap_connect_cfm+0xcc/0x1090 net/bluetooth/l2cap_core.c:7235
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
+ hci_conn_failed+0x287/0x400 net/bluetooth/hci_conn.c:1266
+ hci_abort_conn_sync+0x56c/0x11f0 net/bluetooth/hci_sync.c:5603
+ hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Reported-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=31c2f641b850a348a734
+Tested-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 45 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 41 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 27b4c4a2ba1f..cc730135e5d9 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -951,11 +951,18 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
+ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
+ 			   void *data)
+ {
+-	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
++	struct sk_buff *skb;
+ 	u8 flags;
+ 
++	/* Check if hchan has been dropped since it means hci_chan_del has
++	 * been called.
++	 */
++	if (!conn->hchan)
++		return;
++
+ 	BT_DBG("code 0x%2.2x", code);
+ 
++	skb = l2cap_build_cmd(conn, code, ident, len, data);
+ 	if (!skb)
+ 		return;
+ 
+@@ -1751,12 +1758,16 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ {
+ 	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	struct l2cap_chan *chan, *l;
++	struct hci_chan *hchan;
+ 
+ 	if (!conn)
+ 		return;
+ 
+ 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 
++	hchan = conn->hchan;
++	conn->hchan = NULL;
++
+ 	kfree_skb(conn->rx_skb);
+ 
+ 	skb_queue_purge(&conn->pending_rx);
+@@ -1792,13 +1803,12 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	mutex_unlock(&conn->chan_lock);
+ 
+-	hci_chan_del(conn->hchan);
++	hci_chan_del(hchan);
+ 
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+ 		cancel_delayed_work_sync(&conn->info_timer);
+ 
+ 	hcon->l2cap_data = NULL;
+-	conn->hchan = NULL;
+ 	l2cap_conn_put(conn);
+ }
+ 
+@@ -6785,6 +6795,12 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	u16 cid, len;
+ 	__le16 psm;
+ 
++	/* Check if hchan has been dropped then drop any packets as well */
++	if (!conn->hchan) {
++		kfree_skb(skb);
++		return;
++	}
++
+ 	if (hcon->state != BT_CONNECTED) {
+ 		BT_DBG("queueing pending rx skb");
+ 		skb_queue_tail(&conn->pending_rx, skb);
+@@ -7466,14 +7482,33 @@ static void l2cap_recv_reset(struct l2cap_conn *conn)
+ 	conn->rx_len = 0;
+ }
+ 
++static struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
++{
++	BT_DBG("conn %p orig refcnt %u", c, kref_read(&c->ref));
++
++	if (!kref_get_unless_zero(&c->ref))
++		return NULL;
++
++	return c;
++}
++
+ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ {
+-	struct l2cap_conn *conn = hcon->l2cap_data;
++	struct l2cap_conn *conn;
+ 	int len;
+ 
++	/* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
++	hci_dev_lock(hcon->hdev);
++
++	conn = hcon->l2cap_data;
++
+ 	if (!conn)
+ 		conn = l2cap_conn_add(hcon);
+ 
++	conn = l2cap_conn_hold_unless_zero(conn);
++
++	hci_dev_unlock(hcon->hdev);
++
+ 	if (!conn)
+ 		goto drop;
+ 
+@@ -7565,6 +7600,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 		break;
+ 	}
+ 
++	l2cap_conn_put(conn);
++
+ drop:
+ 	kfree_skb(skb);
+ }
+-- 
+2.47.1
+
