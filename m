@@ -1,109 +1,141 @@
-Received: from fallback13.i.mail.ru (fallback13.i.mail.ru [79.137.243.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4B725A62F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 19:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.137.243.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043821A76BC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 19:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737142061; cv=none; b=GWsMWyjf4OqfY1hHLWyKjCn3jn1gTBlqjuCC+50uoVr/o09Ii+Y4OGt2+aY0wxzlXFNWUvlvNPv7VIXzoOnPHsBSrUYdmlUGUPdVz4OMGeBGagJDfqGkZlNiiNCK62/cnKTeYCF5DEzlTnM/tuNbArqmMTkRhBhYtxWw63IXuww=
+	t=1737142198; cv=none; b=lYT4VI+27GhNNYdAjMj4LZgm3+KXUsX/RSexcrovARqCrR4U2ZGDJmFuzvpjcuBqWNh9aDRm554tYO8hQ25gHiZ1dnX8sReY5xSPS9Eb7Gz+nDZza0WPWGi9snBqfSvmsSqxNw9pJabIibQ+L7UQ1Fu1eIMheboo8wjo4uyhYCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737142061; c=relaxed/simple;
-	bh=Ymas41G9AUQM/3md0dB8ILMIv520vkq2KGRUUufRruI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hoWZJ/ZwEMXo+3E3i6ZRV58ZMSaXO9Pg1dXkrdq6usvxrEBWVueSE915qBD/3rPkThInTd57dNVytvsLis8vkAyEfoPq0jqNWy/SP1rOEh8iKE9kqPpdoYdvBPv8xh+p3mURiWWuwG9ZDzOXrI9EnHkTysVM6iu4zWv62HefFN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mail.ru; spf=pass smtp.mailfrom=mail.ru; dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b=lUIkzahV; dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b=sqcaqaoV; dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b=CmJ1hZmo; arc=none smtp.client-ip=79.137.243.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mail.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.ru
+	s=arc-20240116; t=1737142198; c=relaxed/simple;
+	bh=W0rsocIQgPZ/PHxjTt4jGdmsmz3eL7+0SJlSjaMPtUg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=B0znVxAWzLF/JB+ONskzSRz8fF7hpMcqlsVJCLJoZUd3HPaxw8xJYJge85Fl+Vc9ML+AoufXJjHZB3ThZtGBq4BU4h3E9GWfHsP4VOKLrREHGoStflQuNntHPj9JSeEH7V9pMKR5gTSwaJaVt/hJIS56zMhCxddyjfAOhwxMNKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXMOfMXz; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b="lUIkzahV";
-	dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b="sqcaqaoV";
-	dkim=pass (2048-bit key) header.d=mail.ru header.i=@mail.ru header.b="CmJ1hZmo"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail4;
-	h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=Ymas41G9AUQM/3md0dB8ILMIv520vkq2KGRUUufRruI=;
-	t=1737142057;x=1737232057; 
-	b=lUIkzahVMuJyunJjSzcunlLGwwa2zX9lIbuQLj6JSUA7cOl/dFaiZF1jOyQrUGEDZeOAhfVfG/0B0EET0ECOjkfzIeEPjSv/LVe0DJxcDFYoweyPl/shy75b4Z0N6ePvRT0yCWY2PlR0Ouc0ZQOWIZZYF/Y1qEPWbP5vQ858v2VFMHIFb+PkivxVD0kCRqEO/ul8KkO5AfqzSVm3dNt/mdt2GihJ4PoegvmAkJSJKqpJRhtsWds2jtyTobuTW+qrQ2zk+ch2b4lEnBTwhI+3Jh2/Dkj+ITZdMtkwjUCrh0jvsYmq/oCk/+vBF4zvmi/C3GxXRPt5Fi6+qTh8rf3xbA==;
-Received: from [10.113.252.125] (port=55478 helo=send239.i.mail.ru)
-	by fallback13.i.mail.ru with esmtp (envelope-from <hitechshell@mail.ru>)
-	id 1tYqwT-001KXd-QL
-	for linux-bluetooth@vger.kernel.org; Fri, 17 Jan 2025 21:19:37 +0300
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru;
-	s=mail4; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive:X-Cloud-Ids;
-	bh=Ymas41G9AUQM/3md0dB8ILMIv520vkq2KGRUUufRruI=; t=1737137977; x=1737227977; 
-	b=sqcaqaoVAHAxyUqbuQMpQRnS9HuU7hXhlDUAg7X3CSwH6uaEKER3xwsVmRniGc47GAl+u5yBVVf
-	+cfwQvWOjCPTwWyB7fhicyZIYBE5dNEeunMhu9ihL8KmCCKNU/EuJ5e8Iz/GpXxQsa1wTNpu00yiM
-	ENlayfIXCxiFN/Yk+AJPuK+Etu6co0L61tcx99onLPlagLVTWxUkXrCRz9YWaJpK7xrwCI+pfHmxg
-	dVL59eUIA+Et+YMIAPBz3wZeD/D1K/kugWY16dHb61ec12qFxzqCXpcRPzMWipsoRrqHJbCE6/7ar
-	wTrLTMdO/Su97lLafc+xVVi7UizOyg0D6o+A==;
-Received: from [10.113.61.27] (port=43362 helo=send106.i.mail.ru)
-	by exim-fallback-55f48b6675-spn75 with esmtp (envelope-from <hitechshell@mail.ru>)
-	id 1tYqwL-000000001yf-1R71
-	for linux-bluetooth@vger.kernel.org; Fri, 17 Jan 2025 21:19:29 +0300
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru;
-	s=mail4; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:From:Sender:Reply-To:To:Cc:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
-	X-Cloud-Ids:Disposition-Notification-To;
-	bh=Ymas41G9AUQM/3md0dB8ILMIv520vkq2KGRUUufRruI=; t=1737137969; x=1737227969; 
-	b=CmJ1hZmokOF4F48Oc2rZ91kNa7746uT0GCZFz6OsefgWPfyv7HekgqGczgiHxKBTM8DMgfPU6S+
-	EM4qOnQff6usCzD5aANAZwxjngUQ7SRS5buuS6wFEsWCOsN1gaILLMAi41mcpD3nJNZiKv1hdgiQU
-	gxr2A6iA6w9Bpswz3NLsH5NHg8wjq+okng0F5vPaKTy6FIi4smc55JSaiMQZ4LUd10wEqlmDIznRT
-	F4aMd9DvPAOzH9bxFAotyx8fHUkSkkawtZ+ks8S7Z2Z+cb1E1XHDEDHqRuWj0Bc12/JDoZ0/OKdqM
-	gL22jn0xq4FYf0WB9GhsdbVGl2L96gq8r/7g==;
-Received: by exim-smtp-6758d5575c-g2tp8 with esmtpa (envelope-from <hitechshell@mail.ru>)
-	id 1tYqwC-000000008wC-27zj; Fri, 17 Jan 2025 21:19:20 +0300
-Date: Fri, 17 Jan 2025 23:17:07 +0500
-From: Denis Burkov <hitechshell@mail.ru>
-To: linux-bluetooth@vger.kernel.org
-Cc: Denis Burkov <hitechshell@mail.ru>
-Subject: Re: [PATCH BlueZ] shared/shell: add proper line clean to
- bt_shell_printf
-Message-ID: <jjjs76es4fmqn4mrvo2u5hwjwvrg5nqi4xczh5rmr73pqzfrk6@m236ffom7olo>
-References: <20250117180611.14869-1-hitechshell@mail.ru>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXMOfMXz"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-216426b0865so45629765ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2025 11:29:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737142196; x=1737746996; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LU+/yFSMOoakSfm/b7NQcPzkuhZc3lg/L2nWCAiEMVk=;
+        b=QXMOfMXzvQr7RDsYU1aBBT7KOfz+ai4T512HOxIQI5s20qqx9x+YM4b+gqIpu4pjtu
+         EZOg+C4WkbZwkgZXBvM7amRFLaNvu3IEdTfeK15B2+26RWY4BVWtn834PZrU8IjjRdBW
+         HjQlyoVeSq/g3Wk/jwpRntStEYEZ8w6qeKsFfZ91bsYLM4lZgfW6Z7+s5WiAuwYJh/6w
+         25wy/okkq+kK+VNLPtVsGXUPjpfn+b61fNJyqeZhPQmhT6WKNilK3L81VIMynKEkUY1S
+         AikUFGk0ogH2aNmi7mhksZA2NraNdb93hWfH70QN9/Jl0ykWMKIgtKS77UXLcfT4uj1Z
+         R16g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737142196; x=1737746996;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LU+/yFSMOoakSfm/b7NQcPzkuhZc3lg/L2nWCAiEMVk=;
+        b=Pp4KJ9wBi0kZ9docgKsGoK++oQ9FzcVT+RIktM6RqUuueZqXQrQLUy6Oo+J9/ynlG+
+         BvtzvGJKHtIBnvHI2ueMmftdozbhMIPJ+bzjd8E3Bur4wiP/q5s8tpkceT9iZ2IhOBYl
+         zFP0o0QeN2F+i+1g5unq1jqF+p0ve03qy68bwTSBxZxy4+hpamKpcCw8MkA9ojVnd1V1
+         BJUolwV+IhCOXOtV1CnVNx5o78Phym3S89t4sEdGl8H79sWkeAX2wOUkbK3MMISztDVj
+         MkO45L0EeBpYeIsHmPZ+76yjf/qTieEDyw2VNx7KskZrZOPiGMGseU5bWC/OIH6CwS56
+         wPzw==
+X-Gm-Message-State: AOJu0YwKQeavr5pXmCfynHbPF3YE18BaQhTIU07TdCR0R59KQ0kuvtGt
+	h8YZOkloNE+S2jBBwLtlw7fsTuFxrLZZxTTG6uVSSML1JIQEi5xe+fDB9g==
+X-Gm-Gg: ASbGncst3q8pZX1DtB+Pr5RNrSfx0Zhficll5v+S9W6mthsd0kuT3gwYe0xgDA/3WQO
+	Z8Wt6c3wWrPyLV43ITpF3R9bFw0NDIiwpaic+hHDg0NVvgj4zwsKMRjDyAGxmokWGZNowF1U6nA
+	eXk5Bz08wfZA4IDcjCJEzR2cN97WjvcQl6OdTy3YeQkHsRkA/3cwseRCGw4PR72M4AlKhJD2BGi
+	vcdt6Bct7woUhFx25SQrjOrXq6/zmDPHwbjxFr4LoRi3x/lgpk7/gisPDFHeCwW
+X-Google-Smtp-Source: AGHT+IEkFB5HafHzRzay5Eyc8XHstF7NdgO/j8huMyKMGeQoLLy1u8uuuJXMkagPHAFAO1iV9Zd25w==
+X-Received: by 2002:a17:90b:2c85:b0:2ee:4b8f:a5b1 with SMTP id 98e67ed59e1d1-2f782d30ecamr5956601a91.24.1737142194470;
+        Fri, 17 Jan 2025 11:29:54 -0800 (PST)
+Received: from [172.17.0.2] ([52.160.165.201])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f77629ac0dsm2686601a91.34.2025.01.17.11.29.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 11:29:53 -0800 (PST)
+Message-ID: <678aafb1.170a0220.38fb32.c123@mx.google.com>
+Date: Fri, 17 Jan 2025 11:29:53 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4434078456579711513=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250117180611.14869-1-hitechshell@mail.ru>
-X-Mailru-Src: smtp
-X-7564579A: 646B95376F6C166E
-X-77F55803: 4F1203BC0FB41BD9F92BE5667526BA91E9F58B327A747C8346DFDDD45EE0D99E182A05F538085040C43F47A63428F1ED3DE06ABAFEAF6705C37DF09158E22B51A955C7343EF89551DE81258B7D5E2227
-X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7BF6702EC5472AA0FEA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F7900637040380BD28C1B15C8638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D8818068BBA4A79AD489D5074AA622005776FCD2144A08941220879F7C8C5043D14489FFFB0AA5F4BFA417C69337E82CC2CC7F00164DA146DAFE8445B8C89999728AA50765F7900637F3E38EE449E3E2AE389733CBF5DBD5E9C8A9BA7A39EFB766F5D81C698A659EA7CC7F00164DA146DA9985D098DBDEAEC8D2DCF9CF1F528DBCF6B57BC7E6449061A352F6E88A58FB86F5D81C698A659EA73AA81AA40904B5D9A18204E546F3947C1B3F1E879BC1E2F1BA3038C0950A5D36C8A9BA7A39EFB766D91E3A1F190DE8FDBA3038C0950A5D36D5E8D9A59859A8B61E7D461CEF46D5073AA81AA40904B5D99C9F4D5AE37F343AD1F44FA8B9022EA23BBE47FD9DD3FB595F5C1EE8F4F765FCF1175FABE1C0F9B6E2021AF6380DFAD18AA50765F7900637F09814068C508CC822CA9DD8327EE4931C1080093C09B8365705F49E3A860CEDC4224003CC83647689D4C264860C145E
-X-C1DE0DAB: 0D63561A33F958A59BE7E5DE4C55A3F35002B1117B3ED696385E734DBBE67A09108A05421C070DB8823CB91A9FED034534781492E4B8EEAD69BF13FED57427F1BDAD6C7F3747799A
-X-C8649E89: 1C3962B70DF3F0ADBF74143AD284FC7177DD89D51EBB7742DC8270968E61249B1004E42C50DC4CA955A7F0CF078B5EC49A30900B95165D3454E98140CCACB5B3629796C2CF4167A02DF39A04C776757F46C56E40C29C94FF2F751139C303B5EF1D7E09C32AA3244C309506BFF8927DA177DD89D51EBB77429EDA331B464AAF02EA455F16B58544A2E30DDF7C44BCB90DB8B5179048F486F0F8ED7FEBB3D2F69ABF0F826D30A442AE37E69C174A41D00C
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojWtbQUE8gyFwJo38aqui/PQ==
-X-Mailru-Sender: 7219FA8B682B638D72A16E3FD9953F635D999836DCA614E367744F1CEDD0CF3F4753C85A0B364B32DD7143E30D734E3D46315093CA775BF3554C0F224C5326CDBE1FA5EEA7DC04A0851DE5097B8401C6C89D8AF824B716EB5DB38D7CCF7198FF1D0BEC28C16373053DDE9B364B0DF289AE208404248635DF
-X-Mras: Ok
-X-Mailru-Src: fallback
-X-7564579A: 646B95376F6C166E
-X-77F55803: 6242723A09DB00B4E321808EBFEFE579B5B131811C2E9C30BA4E4D1D460E1F5A049FFFDB7839CE9ED5E581D7620AC4EBACE62DF9C0DD901B26ABD077F9082D60FB8ED4A9343E79D893E7A0542FC327DD
-X-7FA49CB5: 0D63561A33F958A5AA5C202C57A778745002B1117B3ED6962F9F548F9364EBD73E359E1F9564EB4B02ED4CEA229C1FA827C277FBC8AE2E8B54F520D093A0DF28
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5+wYjsrrSY/u6NqYXWMR0/V85CnFjCYTu9APdQH0PvpnP5qz8aO2mjTJzjHGC4ogvVuzB3zfVUBtENeZ6b5av1fnCBE34JUDkWdM6QxE+Ga5d8voMtmXfSpdsWEEWWYWWTqYQ0PEDyTA
-X-Mras: Ok
-X-7564579A: B8F34718100C35BD
-X-77F55803: 6242723A09DB00B4E321808EBFEFE579B5B131811C2E9C30FFAA9B46F1D56B4C049FFFDB7839CE9ED5E581D7620AC4EB777D6865313A48243CB72750B23DDC8326198D05A65908B4
-X-7FA49CB5: 0D63561A33F958A54543C52088F2DD9EB3F086E263CAEC0DCB382660EECF292BCACD7DF95DA8FC8BD5E8D9A59859A8B6A096F61ED9298604
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5+wYjsrrSY/u6NqYXWMR0/V85CnFjCYTu9APdQH0PvpnP5qz8aO2mjTJzjHGC4ogvVuzB3zfVUBtENeZ6b5av1fnCBE34JUDkWdM6QxE+Ga5d8voMtmXfSqf5aW7er5knZzUdJfQ/bjz
-X-Mailru-MI: 20000000000000800
-X-Mras: Ok
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v4] Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
+In-Reply-To: <20250117184202.3895460-1-luiz.dentz@gmail.com>
+References: <20250117184202.3895460-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-in some terminals (or all?) the line is not cleared before a new one is output
-(for example, if you turn on scanning and then try to write something to the terminal,
-the output will be mixed - you will get something like this
+--===============4434078456579711513==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-[JBL T450BT]# h[NEW] Device ****
-[JBL T450BT]# he[NEW] Device ****
-[JBL T450BT]# hell[NEW] Device ****
-[JBL T450BT]# hello[NEW] Device ****
-[JBL T450BT]# hello[NEW] Device ****
+This is automated email and please do not reply to this email!
 
-where "Device ****" is the line that was actually fed to bt_shell_printf
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=926566
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.35 seconds
+GitLint                       PENDING   0.37 seconds
+SubjectPrefix                 PASS      0.40 seconds
+BuildKernel                   PASS      24.99 seconds
+CheckAllWarning               PASS      27.40 seconds
+CheckSparse                   PASS      30.47 seconds
+BuildKernel32                 PASS      24.53 seconds
+TestRunnerSetup               PASS      435.76 seconds
+TestRunner_l2cap-tester       PASS      21.04 seconds
+TestRunner_iso-tester         PASS      30.19 seconds
+TestRunner_bnep-tester        PASS      4.86 seconds
+TestRunner_mgmt-tester        FAIL      118.99 seconds
+TestRunner_rfcomm-tester      PASS      7.59 seconds
+TestRunner_sco-tester         PASS      9.44 seconds
+TestRunner_ioctl-tester       PASS      8.04 seconds
+TestRunner_mesh-tester        PASS      6.00 seconds
+TestRunner_smp-tester         PASS      7.00 seconds
+TestRunner_userchan-tester    PASS      5.01 seconds
+IncrementalBuild              PENDING   0.65 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.210 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.179 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4434078456579711513==--
