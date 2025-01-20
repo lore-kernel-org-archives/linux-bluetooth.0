@@ -1,154 +1,140 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4152C7E1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2025 08:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BF019AA58
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2025 09:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737362975; cv=none; b=SAt9/0FvCfUbjJpMvscH6dBXv0TZs6qxrEbMt0srNQ8oQk/SplkogSljZVtj0FGhB/pZZI49nn1xmQ3vncLWRuRDx7MUzSAK7dqZFDGMvpgLgi5oiS2RsUAWqNPxs9Kw0o1spKWAmktT99bC2vy2THd4mih+IAjecC9UEoLyFbY=
+	t=1737363607; cv=none; b=CnoAXwQcqKDvzRBi5siskxt6etci9rbVDwIoNnoGxXHeRhNryQbA7gONGCczxOc7+33i/qiEsdc7yI8c9FSj+cSTEVi91MPKhq0mS9u2s7qctEmEh5jROSQmNO09rZQ+dxEmdhmpPUGab7hF0WsgqGf8Q4H6ncP/JDJeppaNsAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737362975; c=relaxed/simple;
-	bh=QZReFX1cK9W7jNnFJd7EJeGwqzMmvu9g08Vf3KEyAGI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OgdYO7Me0RCXgfHX4OV7xKLGIlHO13TJJ8HXIBKvTqn/t2IDmw3upyNfgGIaBmkWL8vbvK+2whJ+iDxA9OUkusmYQz+sqopB8sh7iN5NKTX+JADrLkvqYBr1kQzeNNjFUnh8rnYnK9D4rgfvREkuEiaK3WH5Jq/uS0ypE9t0qfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VI9T6b3N; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1737363607; c=relaxed/simple;
+	bh=ryrIhLEhZVdq9yT3h1xm7saC82NGQV8gcti5ObnWDLc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jv2f1acT8Je2DzFhgTw28BBEWl4au7kBEw7fM0MjLqdRM6X/LegZ6PJXjDcP6gYPSi9GQzV04PRfFbwrnEOvRm9Z7DfUfNT0uazc04GhC/bMoMhXfhZ4hcQ+jNe95R3sLJ4HCUseHbmqIKAzKJz8s34/U+LSrgKpxwKGA/S00gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdSisLeh; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VI9T6b3N"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e4930eca0d4so6324309276.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2025 00:49:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdSisLeh"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6d92e457230so42492546d6.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2025 01:00:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737362973; x=1737967773; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4YiK6Kfuudtbwvi3s3oPbXeHhqsN4fI2a9MZKoJavfc=;
-        b=VI9T6b3No2JmW4XOtGP5merzo0dR3+vHxtmy6iSYtDsdp4Py7zXGeIAYwte9OPJv4o
-         25Zm+T21tld1VgStxdg2w2javGtX+mHlVPMyyEbmLYpIDMa8amO02QPY8+eWama7iiMn
-         3j3bIQeX7+8gkbWXK3edYYOpLljcdHBwAFmaaN8rFxod9WYnROxZjMwrwrARPDyeT+0Q
-         xRTLFw9zIKtRN5vTHbLRETjhAL+HrCB3oVqEhkl2bdm9MZZkZR/AT+LdAw/ACTs5j5/X
-         BsMsawsiY5D3hyRMt24XjOaVIkkvMrtmqTK3C7DOWHQbIXyU9WmC0Dz4fVN+4BX0GOqJ
-         II+Q==
+        d=gmail.com; s=20230601; t=1737363605; x=1737968405; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ud0h5JoEyMfjyDtEqsmd/Fyw0EFsBlkc3z74eYijNk8=;
+        b=bdSisLehUhbXQKBfro/28Zn9M0uva6f2xY/K/MyM7Ub97Gjv2a+/hpHjqONeFCie1E
+         dHfzPH7J/uy0EWhy61PTc51cXSybc/bxBKMkQkhTsnkT/bIJVAHUkFJXyxXEKhlDQblQ
+         IGPSvK34sOAtbyXcuov7KWHDL4N6wD71Dmei7omYsOr0ZDQ0EXAIE1vLk3brRPlAfYjv
+         la1z3rEWVfcguDmCPfWpQkwCe4FS8RjqnTS/IyspLHcI0QiOchJ8phMVeVTcwzvpTIKk
+         h6wNhHAg9X22CUZGm2gBVuT5SNmJHEk2MCTmkVihmJxo+nols/Cn1JCg7ErVv/z+dj2i
+         tajQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737362973; x=1737967773;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4YiK6Kfuudtbwvi3s3oPbXeHhqsN4fI2a9MZKoJavfc=;
-        b=tKOYnN0dRBzngqG+9ohaa9TX9CyNXzCpGGnSlNEca1TpL5gemqSW6dpSQzQLbIcIRs
-         U5deECw1MO18SSqfelZG8tuQKNAsyVhIU2IF9HG+a+RyBSVOgUoewpkSE/MvmVe8fyKR
-         yCUK/Y1klxh5XCJmsFBO2czSVcXATKjmXZzQgcPWfK+C6fiTLDY5DABwuA0c52tM1y7r
-         6VPGFKD0jQcbiKzZr67l8iyfIaFOA4cuYhK3+QJKveNrJUBL2bI5CWZcpv9tKAtsSxbI
-         drITT2ZCYUjtzrwahYitqok8nRaixvBEdeqJhO9eOnSXln1qIA40JaNoh99rjTpnj9Tq
-         z1Ww==
-X-Gm-Message-State: AOJu0YwLnGCo1kuJ/s2p4bE9YXZyU10AvN6fj0k2QOiFRRLMc03SkS5E
-	i5OWyvQJfO4kYDdiLru1OZavxPetQ9BBXh5hwv2DeoRju4EZb6cghZbAC2zstAklcB2XfyPebeZ
-	AIznV/rYo960qsis+h1X9/YXxKEgMiqrv4jbC
-X-Gm-Gg: ASbGncsknKyJSqVDDJEWWLfhUzHAWrpwshkAzvazOmQ/XJYsqawoT008BouWw6MvTSY
-	tNRG4CnIkqjgBF9szpNOhKOdQAWTBC90HCjKXait8dMPK3s9KXFHOxsTr6l3nM90=
-X-Google-Smtp-Source: AGHT+IHcoblwxqBRfjIv0Q4aPxQRu6LXqAfaCFMjBRWtirRIYNxpOErSdlv8bHousCcHd6Qnkus/0LDpWDtKVO5o+B8=
-X-Received: by 2002:a05:6902:20c4:b0:e56:c350:5973 with SMTP id
- 3f1490d57ef6-e57b1349f96mr7956459276.45.1737362973080; Mon, 20 Jan 2025
- 00:49:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737363605; x=1737968405;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ud0h5JoEyMfjyDtEqsmd/Fyw0EFsBlkc3z74eYijNk8=;
+        b=WAu4Nwm7eWNLPRupd937GYEjJPqQZIfOEwncVpU12P/xsAQyDwH9XG8aIF/KXLZ45G
+         mVEf4fu94uJokm5gYitC3q6JlVT34YhwkjSRvD5sROLFUhiwKO4eMpQeITHLdpDJd44P
+         JzbK7aZsVmVXiGOvphhSwSnDxG7dDQyzfSe5GPogo2W6FaSEpr7dJLV4pNEW7WOJy/pT
+         /j+Plek42jrzOZZRo/WE9FU4VqXp9aDhuD2eI70wpJfdyEDsYtf8Q9e6AGLAB0laFYfS
+         B7S4YPrtuJplq3UiySJ8lfCqNxBWgxTF3oE+bqq/cnm02BPP0xkB8buipJfx0JkvQKxe
+         f0gA==
+X-Gm-Message-State: AOJu0YxDvjMV9dDfziPe1gA7azh5e/VWHPE/L0S8nx/mbAaJFwJcPIWn
+	rvPX7t0NWcPibSchYsUp6lkaa0e390aaTxu5POjXGtv515zbyQwT8bRx8A==
+X-Gm-Gg: ASbGncvNsWM1XFIQOkK8Kf7Tu++NPUrW3HZYZnbEI22EGmt0tRTL+qvT63PuAcvv6E+
+	vxMYF3k0yfypaKNMHWrQS+soWZ/xMvDhqrbrpCEInpFo7AUlOtDCJs290ea6OwwLZqott/UHRS1
+	Me4auNopzaoxr8bFQ3A44yWJAycmcxxh7jNHHXgQ2mz6fg2mCIeOufFlHsZaneCr3UtCRqQBPqT
+	PAuQxl4cB7qfgMwulGugMMEWbjw2w1aRewvVddb/IFbHHvYi0GGN63zQLKILilVAdcxJrHfy1U=
+X-Google-Smtp-Source: AGHT+IGuCPL5VYcfVN+jvmYbSyiYTy1aGK+LExoNNKD3rst/91u6qfDtOFQN9v1spdgUQDKKMvW/Ag==
+X-Received: by 2002:a05:6214:3d0a:b0:6d8:9124:8799 with SMTP id 6a1803df08f44-6e1b2134485mr191972946d6.5.1737363604814;
+        Mon, 20 Jan 2025 01:00:04 -0800 (PST)
+Received: from [172.17.0.2] ([20.42.50.234])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1bf056fb8sm25007116d6.34.2025.01.20.01.00.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2025 01:00:04 -0800 (PST)
+Message-ID: <678e1094.0c0a0220.98f3f.6eab@mx.google.com>
+Date: Mon, 20 Jan 2025 01:00:04 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4548384039187672371=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chharry@google.com
+Subject: RE: Bluetooth: Add ABI doc for sysfs reset
+In-Reply-To: <20250120162456.1.I2524c9a7d322be04b38b29bde3d7d1e578229cca@changeid>
 References: <20250120162456.1.I2524c9a7d322be04b38b29bde3d7d1e578229cca@changeid>
- <0ad410cf-f4f1-4519-96fe-9a2a07865963@molgen.mpg.de>
-In-Reply-To: <0ad410cf-f4f1-4519-96fe-9a2a07865963@molgen.mpg.de>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Mon, 20 Jan 2025 16:49:06 +0800
-X-Gm-Features: AbW1kvZjdTGzWdf64o_OXrufLq5M5mhxi6Q1_gnX2Hh9NpLTWiyLTTOZ-h46TmA
-Message-ID: <CADg1FFdre243fQ595vkFVRxKUsK9L9NmK_EqZ6kCQS5jSQJQ2w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add ABI doc for sysfs reset
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Paul,
+--===============4548384039187672371==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thanks for the quick response. I have uploaded the v2 patch, thanks.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=926859
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.23 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      24.39 seconds
+CheckAllWarning               PASS      26.45 seconds
+CheckSparse                   PASS      30.28 seconds
+BuildKernel32                 PASS      23.90 seconds
+TestRunnerSetup               PASS      429.76 seconds
+TestRunner_l2cap-tester       PASS      22.56 seconds
+TestRunner_iso-tester         PASS      30.42 seconds
+TestRunner_bnep-tester        PASS      5.16 seconds
+TestRunner_mgmt-tester        FAIL      121.67 seconds
+TestRunner_rfcomm-tester      PASS      7.59 seconds
+TestRunner_sco-tester         PASS      9.36 seconds
+TestRunner_ioctl-tester       PASS      8.06 seconds
+TestRunner_mesh-tester        PASS      6.12 seconds
+TestRunner_smp-tester         PASS      7.02 seconds
+TestRunner_userchan-tester    PASS      5.12 seconds
+IncrementalBuild              PENDING   0.82 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.161 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-On Mon, Jan 20, 2025 at 4:32=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
- wrote:
->
-> Dear Hsin-chen,
->
->
-> Thank you for your patch.
->
->
-> Am 20.01.25 um 09:24 schrieb Hsin-chen Chuang:
-> > From: Hsin-chen Chuang <chharry@chromium.org>
-> >
-> > The functionality was implemented in commit 0f8a00137411 ("Bluetooth:
-> > Allow reset via sysfs")
->
-> Add a Fixes: tag?
->
-> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > ---
-> >
-> >   Documentation/ABI/stable/sysfs-class-bluetooth | 9 +++++++++
-> >   MAINTAINERS                                    | 1 +
-> >   2 files changed, 10 insertions(+)
-> >   create mode 100644 Documentation/ABI/stable/sysfs-class-bluetooth
-> >
-> > diff --git a/Documentation/ABI/stable/sysfs-class-bluetooth b/Documenta=
-tion/ABI/stable/sysfs-class-bluetooth
-> > new file mode 100644
-> > index 000000000000..e794ce706582
-> > --- /dev/null
-> > +++ b/Documentation/ABI/stable/sysfs-class-bluetooth
-> > @@ -0,0 +1,9 @@
-> > +What:                /sys/class/bluetooth/hci<index>/reset
-> > +Date:                14-Jan-2025
-> > +KernelVersion:       6.13
-> > +Contact:     linux-bluetooth@vger.kernel.org
-> > +Description:         This write-only attribute allows users to trigger=
- the vendor reset
-> > +             method on the Bluetooth device when an arbitrary data is =
-written.
->
-> *data* is plural, so =E2=80=9Cwhen arbitrary data is written=E2=80=9D?
->
-> > +             The reset may or may not be done through the device trans=
-port
-> > +             (e.g., UART/USB), and can through an out-of-band approach=
- such as
->
-> =E2=80=A6, and can *also be done* through =E2=80=A6
->
-> > +             GPIO.
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 797e94ba74f7..e949c3ac7846 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -4058,6 +4058,7 @@ S:      Supported
-> >   W:  http://www.bluez.org/
-> >   T:  git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluet=
-ooth.git
-> >   T:  git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluet=
-ooth-next.git
-> > +F:   Documentation/ABI/stable/sysfs-class-bluetooth
-> >   F:  include/net/bluetooth/
-> >   F:  net/bluetooth/
-> >
->
->
-> Kind regards,
->
-> Paul
 
---=20
-Best Regards,
-Hsin-chen
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4548384039187672371==--
