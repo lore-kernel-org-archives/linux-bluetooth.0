@@ -1,110 +1,113 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737D41B4220
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 07:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650571B87C2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 10:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737443849; cv=none; b=YfScxq0HOvFp34c8LzMCPujbBe6fwzIgAAPrmrls3i9oK/KfRYEj9+KJJL1bHcDx9ifHugJzcglIfRf3SNhLAQVUw4Pp5DwCe5fYib1OZgl32FI/WBRJ6vqJr5Wevy41tl+H9GFaKLOd89bAj+DIKt0WNM7WCNi0MVY3S9ey53M=
+	t=1737453908; cv=none; b=l5r2hZ01Lrz/L+tWE5ofNHKAhI9eR4v2HVt0Fu4Xy/HGkAYJYlWt5ZK0Oz85tWgK9mjOnv2FNUxcEuyJPDf7zIZx5w4Gt9ouyhHDDVRAGEpqvo2pR70kulU2JrnnONcblg+wPyakxkTvtxcp9rY8ks4zVR/820lqFejEnuPMous=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737443849; c=relaxed/simple;
-	bh=jQ87CgRVzDyOp9dueh8NPmWwYJLHFrM1gHXGzPnzSPw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jbvkxm4x9shbNgai/1vG512ygiGOJs80gEgAvBdhJoMgFyIjq6wvvD969z5cKQh2c+j7ekQnQj6lZ6U5DjwAj3gWffMT2OOtRRoCntwBqe6M6oaOOZ+z8X/IzbU8aU7RSA0LwS+HkMmchYdVz9sVXUE250lLu9gGfL7cteuWn+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r6cFvBvI; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
+	s=arc-20240116; t=1737453908; c=relaxed/simple;
+	bh=OYjv1AWH0gWhrAkVHJDjuAGy1OfogNbmTEm1/B7CtYg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fhhx91g6n34yEeTmb4I6pk+XRsjWLCgCjcijA0ct4vNTyjeSJBm5CGyjgMzJCv1bBFhx3rgz1aZRggnZPbMnEn5VkKsM1VpUdFmkiwDb4LbIC74297Y2eAyWHjOStwDlKUaP1ItMqDA6NKJkHbE5NMj+ebuDkwUVZppTQ0qR02o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXKQYO1K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r6cFvBvI"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef728e36d5so9955585a91.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2025 23:17:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737443847; x=1738048647; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A2exPbSO3ubIytjnK4kQUXO5XUU9Tw5TLkZu6eEM4fY=;
-        b=r6cFvBvIlG7fRJjpJDlAcOa8a2RQjV8zGJAxZU0vS90j3mBJsmM7Fq8+A89frZktYB
-         f21VgKrljUzfBRcC+xH0FmOomlyQtOYLvz/zzlXYk3ktyh8vaOXmrNetYsfPpF4yaaIS
-         AQC4dW5VzbcC1Y5Rt+4USK4NL1dZkoffzc160JmXdxwmwXrExFdnOoLS7o9EqfUn93IO
-         80CZVmyAbjWU8HfhiZkFEGfpJKaQHN4Q4PxC6A0T1cmbLghnorPZ+qSll3cE4L4OOzVl
-         e9knDWPoKqeo0bvmO3d88L00JFrAXNam4DyZ4g+hyQZ92Ww16/L19Vd9xfsdN0kFNxbX
-         wvZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737443847; x=1738048647;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A2exPbSO3ubIytjnK4kQUXO5XUU9Tw5TLkZu6eEM4fY=;
-        b=US06A15tZpnk5axSpSHY7uqu5QiK7C7WB46kll6FytV6JXlu0y++r6oVcK77K5cpKb
-         m+CZoDc2f5wBwZdCg9iY1d8AZQNnLG5njvATkZxdZxxObvsN9Q6nRy3AfFhFvTrQ+Xp/
-         uI06T0UGXCMbKPE0pAM64hdJSj5Biy2wxftYOQuQ16d/C5ZCYG+zhqu8R3yIkYP7v4R/
-         Vk5iTTTFc2oqq70P/iiji6xUgjxiPFTySPQtRS7Fik/v7oYaUtAI5QWidqpJEGaRFgDO
-         rgZQTwzxepuIpUuk5YKc3oJZFmSXbKWqhoDBFgVNy9C7ilud2dFX4Vz4Clun6BeTLEZH
-         GpiA==
-X-Gm-Message-State: AOJu0Yworq6Un3bOztej/Ai2wRjpixtNQTO2miCJ69yxGAD/x26iaD9u
-	AASmpGbU8/6/Z/8pxXgojjH9i1D06QrNM8SibXX5Pus1cod4E43XQoEsqT/FyxkUYwGKfiiOW8V
-	XBVJJeO6GScLdgvKYnLtdRqnb29ub68KuwNqYcQSy/H0Ah4yhTs7Vu0ZuvaozIzUhKkWQQc7Pjj
-	WAeXuiRupDPRfTo4g71a5N6TgcWbK8dJD1Vhbm13880WHRGshGtA==
-X-Google-Smtp-Source: AGHT+IFgel7XKiHU3limKY/2zQzAzUIGlLvav66/T9760wE/2W8XZ+b97u3YoVFfXBy/rZj+GtxxGjWpOYha
-X-Received: from pjyw12.prod.google.com ([2002:a17:90a:ea0c:b0:2ef:8eb8:e4eb])
- (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51c1:b0:2ee:b2fe:eeeb
- with SMTP id 98e67ed59e1d1-2f782d2ea80mr19742158a91.22.1737443846702; Mon, 20
- Jan 2025 23:17:26 -0800 (PST)
-Date: Tue, 21 Jan 2025 15:15:34 +0800
-In-Reply-To: <20250121151532.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXKQYO1K"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C6450C4CEDF;
+	Tue, 21 Jan 2025 10:05:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737453907;
+	bh=OYjv1AWH0gWhrAkVHJDjuAGy1OfogNbmTEm1/B7CtYg=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=AXKQYO1Ka49khj5P5AaOWHlhnt1L3tI5UwesySMnZF9b9fdOK309YSywnv1I56uWT
+	 pST1t/04eVdKwoC9TJDVHDubKSElC4kIGrmrxJ1VbsrigbkqWtUJejfXIBv9k/2bEV
+	 x3grH8kvZmd0nJsL1PZRhRSAAYjqQP4IyaDvzF82cRdRPzPAc7uziIRxrfQQTUQqIl
+	 jTk+14ZPwo8v86rrXMm++7DnOFM1Y5NC3gXplPOvhb6g6k+uLZkaKDHF//x5koTBBy
+	 Ox6Ow3DwrfqfFCv2I0t55vEpEE/kqlJPoF/SXqixNAxw++UKxwD/5Y3DK9g3PzS+e5
+	 IplOMJG2LcYFQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE15DC02182;
+	Tue, 21 Jan 2025 10:05:07 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Tue, 21 Jan 2025 18:04:57 +0800
+Subject: [PATCH BlueZ bluez] gatt: expand the max GATT Channels
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250121151532.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
-X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250121151532.2.I6e9e94dcded65e4a9ed42ad23ca8a5d81f680382@changeid>
-Subject: [PATCH 2/2] Bluetooth: Allow SCO packets regardless of hci_conn_num
-From: Hsin-chen Chuang <chharry@google.com>
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc: chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20250121-upstream-v1-1-7b6e450747f7@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAEhxj2cC/x3MQQqAIBBA0avErBPUkKCrRIupphooC6ciEu+et
+ Hzw+RGEApNAU0QIdLPw7jNMWcCwoJ9J8ZgNVlunjTXqOuQMhJuasNe1rpzBsYKcH4Emfv5VC/1
+ 60QtdSh9UKOYYYQAAAA==
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1737453905; l=1410;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=2whhUph12UWbt4IQDLgB95XDZYci4SGZ4RN/aFjNA2M=;
+ b=1rtdRJBFOV6QCrr1IYnyjOf5XQxxkKr28ZxFFMvYLbaGoq52vYS6xyStxBHaED7uYT7j+FqEj
+ Ip7vLASbNSPDWqAG9RwbR4KGFDQets5LQtnmbLetL/7BqBzs2bbxdbS
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-From: Hsin-chen Chuang <chharry@chromium.org>
+From: Yang Li <yang.li@amlogic.com>
 
-The SCO packets from Bluetooth raw socket are now rejected because
-hci_conn_num is left 0. This patch allows such the usecase to enable
-the userspace SCO support.
+Fixed the problem that Xiaomi K70 mobile phone takes too long to
+connect to CIS.
 
-Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+L2CAP CB Connection (PSM=0x0027, MTU=517 bytes, MPS=251 bytes,
+ Credits=255, Src=0x0056 › All Connections Refused –
+ Insufficient Authorization)
+
+Ref https://github.com/bluez/bluez/issues/1033
+
+Signed-off-by: Yang Li <yang.li@amlogic.com>
 ---
+ src/main.c    | 2 +-
+ src/main.conf | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
- drivers/bluetooth/btusb.c | 6 ------
- 1 file changed, 6 deletions(-)
+diff --git a/src/main.c b/src/main.c
+index d13ada2af..e2243c824 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -1119,7 +1119,7 @@ static void parse_gatt(GKeyFile *config)
+ 	parse_config_u16(config, "GATT", "ExchangeMTU", &btd_opts.gatt_mtu,
+ 				BT_ATT_DEFAULT_LE_MTU, BT_ATT_MAX_LE_MTU);
+ 	parse_config_u8(config, "GATT", "Channels", &btd_opts.gatt_channels,
+-				1, 5);
++				1, 10);
+ 	parse_config_bool(config, "GATT", "Client", &btd_opts.gatt_client);
+ 	parse_gatt_export(config);
+ }
+diff --git a/src/main.conf b/src/main.conf
+index 60ab60edc..95de56003 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -264,7 +264,7 @@
+ #ExchangeMTU = 517
+ 
+ # Number of ATT channels
+-# Possible values: 1-5 (1 disables EATT)
++# Possible values: 1-10 (1 disables EATT)
+ # Default to 1
+ #Channels = 1
+ 
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f419d0827ee4..3e2d7ea6de5c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2107,9 +2107,6 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 		return submit_or_queue_tx_urb(hdev, urb);
- 
- 	case HCI_SCODATA_PKT:
--		if (hci_conn_num(hdev, SCO_LINK) < 1)
--			return -ENODEV;
--
- 		urb = alloc_isoc_urb(hdev, skb);
- 		if (IS_ERR(urb))
- 			return PTR_ERR(urb);
-@@ -2588,9 +2585,6 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 		return submit_or_queue_tx_urb(hdev, urb);
- 
- 	case HCI_SCODATA_PKT:
--		if (hci_conn_num(hdev, SCO_LINK) < 1)
--			return -ENODEV;
--
- 		urb = alloc_isoc_urb(hdev, skb);
- 		if (IS_ERR(urb))
- 			return PTR_ERR(urb);
+---
+base-commit: 2ee08ffd4d469781dc627fa50b4a015d9ad68007
+change-id: 20250121-upstream-fab070351ad3
+
+Best regards,
 -- 
-2.48.0.rc2.279.g1de40edade-goog
+Yang Li <yang.li@amlogic.com>
+
 
