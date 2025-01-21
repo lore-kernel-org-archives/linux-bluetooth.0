@@ -1,211 +1,222 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DBA1AF0A7;
-	Tue, 21 Jan 2025 06:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259BE1B218B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 07:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737442520; cv=none; b=bMXhE1HzG+oCHwGmZxBTqUyi3NokE/jaT0Ceh+T5tgcwkHUd2rvbAgvQ84JOo46Vj+x/szRfejd0gbcwBhw42Pi1K4+PwliP6aEADjos5JEZSia5h5syVWSYB8NmJBUeKU6igXwzf8vHqu4e+78y77wqAojC7mecRyeMTJcEXD4=
+	t=1737443842; cv=none; b=dQNWMrFUCJIVik/ynweR5Y/E28bTdltBnj7etH9jRwPkTtn+vn1O83MQA8IGbs+WuvOHeH0W6vJN0lURCBfA/+5jdClrC0vc4U8VnBk5lzyuPzEH5VMfk5wtzApEgByvdNvja5rl8j8ifvVNRwhLYqn5EPS+3UIOVJf2mZukgek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737442520; c=relaxed/simple;
-	bh=pkm8XGAE9tgDnBm+3SLaqQ3Ut6liX6OdENqYFA4t+OA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bOxygVs9qgEUyiICG/OOdYpKXT4DF7WpzpV6MT60tNvGRxdc266fv4I4TxbjIUusvwTg/7KjzWKmX8Tcek1+n1YUIMx2PNtgcXN2eyO10KvyLZcNj7FtmwrM5yxxllV1Nupw3zr288Jdxjmg0aT0ExMNbAuhRVbeSD7srEWqzZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jpXFYLMN; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1737443842; c=relaxed/simple;
+	bh=Dwx4RRUwHaqDwEUOrrQiQe9EvqOqneBkX4MudSge/o0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uuPFWyU3sYsDzdY73Vp4a9sQw43BNm3ZFjvur0tNdsiecRIrWK349Pf02SmLSKSgpOv6vvpu9cGWQ+RTxeV+Xk9tVQVEF2kbbtIjzOnBRLcckfuJHUt+pedPkwl0AiNSRjNHt/9VL7FeZe63weSVUE4FMdNZqgcTCSQqCoQs3a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZIuqSaka; arc=none smtp.client-ip=209.85.160.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jpXFYLMN"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50L1t5aa005855;
-	Tue, 21 Jan 2025 06:55:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	6Ogw/b8W6GWVghoCfvFWx9TFai7WFTa13iUYA0aGUl4=; b=jpXFYLMNc/oRS1bZ
-	UtaaqxFevPVdQ1w1PYFKNp6E3hOIXruqJpwr5YRZKinbd2MxtnzNahH6BpierdEM
-	5c/l7b11NdCmMh43MsYEFYkfwT6G0/1haqDfiOFB28ChYRgID3xK1LXlrzApcZFe
-	cEjWspQCe+NqM6ehZU6LwOL1q4XKU3beOVa2HA6JyCzH+rT4pHnenb5J5cCiXPpg
-	2DpOGDwoxyxEtscNfyZmxQXeKpZN79/mOXgMSZG5zhvpgpFBwCwLGeJD2V3Pt4Bv
-	vMf2cz9pqgDAXSM0wo0w+wsU8mrk0AC9FPEcLQgigtN0L6NIKs5ur2CqiQlw7/ky
-	RPB+jQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44a2b80kdt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 06:55:11 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50L6tALO016455
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 06:55:10 GMT
-Received: from [10.219.0.139] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 20 Jan
- 2025 22:55:04 -0800
-Message-ID: <7dedc018-b705-44c3-a1d4-e1414cc91b10@quicinc.com>
-Date: Tue, 21 Jan 2025 12:25:01 +0530
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZIuqSaka"
+Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-29fd1868bc4so5905607fac.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2025 23:17:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737443840; x=1738048640; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6POgZu70+PjVYcuU/158CQRyYRKdbK+Oy5JVkfz8x2Q=;
+        b=ZIuqSakawIDhYUeC6qAIrofqPqduVd6B3i4auzPah10+Bfc66JMGtjR9HoDxHaN6aV
+         xK8rpVAUjCG+dBO8EtYdaSqHd3dOZOIuBci8pvlDMxQ/xKgzybkvDErXyUAcwlHXTryg
+         +JRfshzImht+jKbdu9MyLlR5V/27C3b87IQTPjFRP/8tQo1hMU7cFNj/zg+5snWbdsKA
+         lF1nExi1pX/ti/r3jKu3xR8hHXhBu+XBDuPrThSzj7EREQZxJJJ3I9MjFqqOeTXS6D3S
+         30R46O53NbWmC2xmPl8x1zd8XtNO5o5yofBy8cmWNBKzlmIY5QibdOeWNu6huB86MdM8
+         N0pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737443840; x=1738048640;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6POgZu70+PjVYcuU/158CQRyYRKdbK+Oy5JVkfz8x2Q=;
+        b=WNze2VnJS8CHzUQqmwRaNw9mBLktZ68pSH51qk3FkPwnsuGhPdjiEi2MCHN3BUH6Ce
+         XFEHXdNzXRfcOb+ar37ncLqydGeEczeXeO9RSJwQaZUYvbtiG5dOVN8icYsaDcXmDmTe
+         GWa25itTJ0q1GzxwRQNYIsyb7QhOw/Vay3lVZz8a6oFqmVLv8oIJ81nalAVMUo6OH3CU
+         8KX/LMH4eWVyDthp6x2Me7D9JjBVe5UwINDK8yuHVWjAOPL4Tsn3398GyrE8s139/fpo
+         V+zAWlN+P7x1uSCctCmDdrkpoa0c4nCkh66USoL2yE/walwpL+kMjc0/0pBU4mmphXrw
+         PeCQ==
+X-Gm-Message-State: AOJu0YykSVSQyEsJA3yyND1HUVw2NYa4QneMnRYrFoIobluDWaEDwh4K
+	VKrmnCQN7F+6pIQHM64BUaYUYq7WJO7qXJccH73q+NTqdO/+fAolN14rk1lrJtbJF3xSBpx1JwR
+	Rv7ndImSoDxRGIGyH67ZlvZsnHkVPihvW5iknkV+NktV+Hn9k0ES5juqQOrgsf+ILdkYbJeBs3m
+	Mm3TkUwaOeYR9jNTafj0ptDKGNNUcMLUk//ugir0pQ0rWYqDkIpA==
+X-Google-Smtp-Source: AGHT+IFM5tQbg1m5rXt6opXiz/QXmmzdu7N9SXAzDLFxdpUEPI/hJNCN2+XN/hDQZTjODt53IgRP6SkBcDmJ
+X-Received: from oacpv10.prod.google.com ([2002:a05:6871:3a8a:b0:29d:cb27:3f14])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6870:ff84:b0:29f:b1d4:7710
+ with SMTP id 586e51a60fabf-2b1c0c52266mr8855302fac.24.1737443840160; Mon, 20
+ Jan 2025 23:17:20 -0800 (PST)
+Date: Tue, 21 Jan 2025 15:15:33 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/4] Enable Bluetooth on qcs6490-rb3gen2 board
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        "Rob Herring (Arm)"
-	<robh@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        "Bjorn
- Andersson" <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, <quic_anubhavg@quicinc.com>,
-        Mark Brown <broonie@kernel.org>,
-        "Bartosz
- Golaszewski" <bartosz.golaszewski@linaro.org>,
-        <linux-pm@vger.kernel.org>, <quic_mohamull@quicinc.com>,
-        <quic_hbandi@quicinc.com>, <devicetree@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "Luiz
- Augusto von Dentz" <luiz.dentz@gmail.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>, <linux-kernel@vger.kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>
-References: <20241209103455.9675-1-quic_janathot@quicinc.com>
- <173386568587.497565.1413799827375300987.robh@kernel.org>
- <3c313557-ca99-4e6f-9d71-641e8c256126@quicinc.com>
- <efab0b18-f1f0-457a-b1d5-8734f178141d@oss.qualcomm.com>
-Content-Language: en-US
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <efab0b18-f1f0-457a-b1d5-8734f178141d@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 7lYv6jjFdR3G11e4kPHn4ELiuyg33dax
-X-Proofpoint-ORIG-GUID: 7lYv6jjFdR3G11e4kPHn4ELiuyg33dax
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-21_03,2025-01-21_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 phishscore=0
- clxscore=1011 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501210055
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
+Message-ID: <20250121151532.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+Subject: [PATCH 1/2] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+From: Hsin-chen Chuang <chharry@google.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc: chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+From: Hsin-chen Chuang <chharry@chromium.org>
 
+Use device group to avoid the racing. To reuse the group defined in
+hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
+read_usb_alt_setting which are only registered in btusb.
 
-On 12/12/2024 11:12 PM, Konrad Dybcio wrote:
-> On 12.12.2024 11:46 AM, Janaki Ramaiah Thota wrote:
->>
->>
->> On 12/11/2024 3:12 AM, Rob Herring (Arm) wrote:
->>>
->>> On Mon, 09 Dec 2024 16:04:51 +0530, Janaki Ramaiah Thota wrote:
->>>> - Patch 1/4 Add description of the PMU of the WCN6750 module.
->>>> - Patch 2/4 add and enable BT node for qcs6490-rb3gen board.
->>>> - Patch 3/4 use the power sequencer for wcn6750.
->>>> - Patch 4/4 add support for the WCN6750 PMU.
->>>>
->>>> ----
->>>> Changes from v4:
->>>> * Added reviewed tag by Krzysztof in p1
->>>> * Updated the p2 commit message with sw_ctrl and wifi-enable are
->>>>     handled in wifi FW.
->>>> * Added blank line between the nodes in p2
->>>> * Placed the structures in proper order in p4
->>>> * Link to v4: https://lore.kernel.org/all/20241204131706.20791-1-quic_janathot@quicinc.com/
->>>>
->>>> Changes from v3:
->>>> * Defined the PMU node and used the its output to power up BT
->>>> * Used power sequencer for wcn wcn6750 module
->>>> * Split the patch to multiple as per subtree
->>>> * Add description of the PMU of the WCN6750 module
->>>> * Include separate UART state node for sleep pin configuarion
->>>> * Link to v3: https://lore.kernel.org/linux-arm-msm/20241022104600.3228-1-quic_janathot@quicinc.com/
->>>>
->>>> Changes from v2:
->>>> * Sorted nodes alphabetically
->>>> * Link to v2: https://lore.kernel.org/linux-arm-msm/20241010105107.30118-1-quic_janathot@quicinc.com/
->>>>
->>>> Changes from v1:
->>>> * Corrected the board name in subject
->>>> * Link to v1: https://lore.kernel.org/linux-arm-msm/20241009111436.23473-1-quic_janathot@quicinc.com/
->>>>
->>>> Janaki Ramaiah Thota (4):
->>>>     regulator:·dt-bindings:·qcom,qca6390-pmu:·document wcn6750-pmu
->>>>     arm64: dts: qcom: qcs6490-rb3gen: add and enable BT node
->>>>     Bluetooth: hci_qca: use the power sequencer for wcn6750
->>>>     power: sequencing: qcom-wcn: add support for the WCN6750 PMU
->>>>
->>>>    .../bindings/regulator/qcom,qca6390-pmu.yaml  |  27 +++
->>>>    arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts  | 168 +++++++++++++++++-
->>>>    drivers/bluetooth/hci_qca.c                   |   2 +-
->>>>    drivers/power/sequencing/pwrseq-qcom-wcn.c    |  22 +++
->>>>    4 files changed, 217 insertions(+), 2 deletions(-)
->>>>
->>>> -- 
->>>>
->>>>
->>>>
->>>
->>>
->>> My bot found new DTB warnings on the .dts files added or changed in this
->>> series.
->>>
->>> Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
->>> are fixed by another series. Ultimately, it is up to the platform
->>> maintainer whether these warnings are acceptable or not. No need to reply
->>> unless the platform maintainer has comments.
->>>
->>> If you already ran DT checks and didn't see these error(s), then
->>> make sure dt-schema is up to date:
->>>
->>>     pip3 install dtschema --upgrade
->>>
->>>
->>> New warnings running 'make CHECK_DTBS=y qcom/qcs6490-rb3gen2.dtb' for 20241209103455.9675-1-quic_janathot@quicinc.com:
->>>
->>> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'enable-gpios' is a required property
->>>      from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
->>> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'swctrl-gpios' is a required property
->>>      from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
->>> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'vddio-supply' is a required property
->>>      from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
->>> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'vddbtcxmx-supply' is a required property
->>>      from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
->>> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'vddasd-supply' is a required property
->>>      from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
->>> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: pinctrl@f100000: Unevaluated properties are not allowed ('qup_uart7_sleep' was unexpected)
->>>      from schema $id: http://devicetree.org/schemas/pinctrl/qcom,sc7280-pinctrl.yaml#
->>>
->>
->> Since the DTS files for all boards using the WCN6750 BT chip are not updated according to the PMU node, updating the bluetooth/qualcomm-bluetooth.yaml file will result in similar warnings for other boards.
-> 
-> Oh I didn't forsee this.. You must fix up any bindings errors that
-> result from your changes (i.e. binding errors are the same as compilation
-> errors).
-> 
-> That means patch 2 can't be merged unless the bluetooth dt-bindings
-> are adjusted. And for the bindings to be adjusted, you'll have to also
-> add the PMU node to all boards implementing wcn6750.
-> 
-> Fortunately, they are all based on some variants of the same SoC, so
-> they should all have the same power plumbing.
-> 
-> Konrad
+Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+---
 
-We adjusted the dt-bindings to fix the bindings errors and it is merged 
-to 
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=cca4fe34979a77d9df5c0acf935e9cc939fe5cd6
+ drivers/bluetooth/btusb.c        | 42 ++++++++------------------------
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_sysfs.c        | 33 +++++++++++++++++++++++++
+ 3 files changed, 45 insertions(+), 32 deletions(-)
 
-Please merge below pending patches:
-  - Patch 2/4 add and enable BT node for qcs6490-rb3gen board.
-  - Patch 3/4 use the power sequencer for wcn6750.
-
-
-Thanks,
-Janakiram
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9aa018d4f6f5..f419d0827ee4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2224,6 +2224,13 @@ static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts)
+ 	return 0;
+ }
+ 
++static int btusb_read_alt_setting(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	return data->isoc_altsetting;
++}
++
+ static struct usb_host_interface *btusb_find_altsetting(struct btusb_data *data,
+ 							int alt)
+ {
+@@ -3646,32 +3653,6 @@ static const struct file_operations force_poll_sync_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
+-static ssize_t isoc_alt_show(struct device *dev,
+-			     struct device_attribute *attr,
+-			     char *buf)
+-{
+-	struct btusb_data *data = dev_get_drvdata(dev);
+-
+-	return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
+-}
+-
+-static ssize_t isoc_alt_store(struct device *dev,
+-			      struct device_attribute *attr,
+-			      const char *buf, size_t count)
+-{
+-	struct btusb_data *data = dev_get_drvdata(dev);
+-	int alt;
+-	int ret;
+-
+-	if (kstrtoint(buf, 10, &alt))
+-		return -EINVAL;
+-
+-	ret = btusb_switch_alt_setting(data->hdev, alt);
+-	return ret < 0 ? ret : count;
+-}
+-
+-static DEVICE_ATTR_RW(isoc_alt);
+-
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -4036,9 +4017,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		if (err < 0)
+ 			goto out_free_dev;
+ 
+-		err = device_create_file(&intf->dev, &dev_attr_isoc_alt);
+-		if (err)
+-			goto out_free_dev;
++		hdev->switch_usb_alt_setting = btusb_switch_alt_setting;
++		hdev->read_usb_alt_setting = btusb_read_alt_setting;
+ 	}
+ 
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+@@ -4085,10 +4065,8 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	hdev = data->hdev;
+ 	usb_set_intfdata(data->intf, NULL);
+ 
+-	if (data->isoc) {
+-		device_remove_file(&intf->dev, &dev_attr_isoc_alt);
++	if (data->isoc)
+ 		usb_set_intfdata(data->isoc, NULL);
+-	}
+ 
+ 	if (data->diag)
+ 		usb_set_intfdata(data->diag, NULL);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f756fac95488..5d3ec5ff5adb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -641,6 +641,8 @@ struct hci_dev {
+ 				     struct bt_codec *codec, __u8 *vnd_len,
+ 				     __u8 **vnd_data);
+ 	u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff *skb);
++	int (*switch_usb_alt_setting)(struct hci_dev *hdev, int new_alts);
++	int (*read_usb_alt_setting)(struct hci_dev *hdev);
+ };
+ 
+ #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 041ce9adc378..887aa1935b1e 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *dev, struct device_attribute *attr,
+ }
+ static DEVICE_ATTR_WO(reset);
+ 
++static ssize_t isoc_alt_show(struct device *dev,
++			     struct device_attribute *attr,
++			     char *buf)
++{
++	struct hci_dev *hdev = to_hci_dev(dev);
++
++	if (hdev->read_usb_alt_setting)
++		return sysfs_emit(buf, "%d\n", hdev->read_usb_alt_setting(hdev));
++
++	return -ENODEV;
++}
++
++static ssize_t isoc_alt_store(struct device *dev,
++			      struct device_attribute *attr,
++			      const char *buf, size_t count)
++{
++	struct hci_dev *hdev = to_hci_dev(dev);
++	int alt;
++	int ret;
++
++	if (kstrtoint(buf, 10, &alt))
++		return -EINVAL;
++
++	if (hdev->switch_usb_alt_setting) {
++		ret = hdev->switch_usb_alt_setting(hdev, alt);
++		return ret < 0 ? ret : count;
++	}
++
++	return -ENODEV;
++}
++static DEVICE_ATTR_RW(isoc_alt);
++
+ static struct attribute *bt_host_attrs[] = {
+ 	&dev_attr_reset.attr,
++	&dev_attr_isoc_alt.attr,
+ 	NULL,
+ };
+ ATTRIBUTE_GROUPS(bt_host);
+-- 
+2.48.0.rc2.279.g1de40edade-goog
 
