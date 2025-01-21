@@ -1,65 +1,65 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D9049641
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 14:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429FC1F3D3B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 14:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737470671; cv=none; b=BzX0/T0h0b6ShnNM/qEbU4fqDqo5hMHeiQ+YRNpjBeBAVrW9nV6muVV6h7Shz7Ai2ODkZFlLHp1CZpGm7dFmOHXV2WgFz5bKXbpSY00mo2cQDbzGta4QzdkiH5+QEf2eVZEIHMX25Cf8S20AV/jdoHuuzbe+5QBvjuCrKMJSBYs=
+	t=1737470672; cv=none; b=SJY/GWj642muCAc52t5z82AC3z9kqowi+33ZZSdOnf6gnhejdU0wbGKfrZbTPWD8UpjPtwRIcn8K8G4rS2I8W//lg8WsoycQepWKPpx2u8BV7QY4NG/Gh83CBBKt+LdPq+THxeweRrFMCr+dprbRxZKsvjw+NCue/yf8aJ55h7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737470671; c=relaxed/simple;
-	bh=BNkubpVSm10suv+o6ql/8MFhA4pk6I5o78eI9o+qmUw=;
+	s=arc-20240116; t=1737470672; c=relaxed/simple;
+	bh=wn1B9Gx/4YVsA26SoKfQOvl6b31fvWHtAVoKIIQCEWo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e4kzqKdqbyF4nNIJZv8DnYndV5JD468PY29yhyfsCNeaMyAyU3tI+YY0UW5Cnidpkr8MML9MsETWTeFOPpte4v6rBjHrGPtPAy5apvxnSpubg903vrC5RMfC89VOn8sdTb5BQ/75/qYZsP2R4+XsaIr1yAMYdFLALVDS4k0I8w8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=ssSfVEHW; arc=none smtp.client-ip=209.85.167.51
+	 MIME-Version; b=kZgmDexPfAYBhuYxknY9tv6WP9xwWvVg7EGvHvy3E1HQBdhRW+l0nJBGPFWzELnLoSTrJSI6mCZu2RpwBDA/oBW8nB8V4z7sgWM5MltGaR9ioqoPEfiOY2X5t7eQeKBue3E60nx0yb3C9EKDX/moFB08mdtJKVzf11tK7e1qRwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=g0SkRuWo; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="ssSfVEHW"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-540215984f0so6143970e87.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 06:44:28 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="g0SkRuWo"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5401c52000dso6062851e87.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 06:44:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1737470667; x=1738075467; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1737470668; x=1738075468; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=erG11dIqQwlizbPs8opfHOp1y57ZM2gmol7QUTaAt48=;
-        b=ssSfVEHW1gYWoDIbPKzW4qz54BkejDr5TUaDk3qnGFqXH6sFmZQd9EO8QVzQPcy31n
-         R8fa9tAJGg+/6GHoQmxSO/TpwH9eQWlhUeGi29ynnCeNI9LVqhPb4eYVqGc4lEVYs++R
-         q7tQl7Ea9KkMVSIljQcoTPM0oZMAmlJ74XV4Q=
+        bh=cXwEOTqnAwGpLdBgRoFBLXm/lX+EzmxiYp2YjB18kHo=;
+        b=g0SkRuWok9W0AHGWypZ9J1Rf7JjDZQHtgx5Gk7a7HlhHXKLqt9aQf4BXquICRBY6le
+         tr/tVXPNS9Y414HgtB+QFR0eiJIqKra/Ulc/91RvaVvVCNtrUNPCzYK3zG1w3Glq8JHf
+         JNe7KP697xkh68EBX6/qedoIWidpmJkYn/Mfs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737470667; x=1738075467;
+        d=1e100.net; s=20230601; t=1737470668; x=1738075468;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=erG11dIqQwlizbPs8opfHOp1y57ZM2gmol7QUTaAt48=;
-        b=AImdvCZez/rFrsU0vn5eEOAhpqdTOmepm27jTrn3O8TPg3bwXjsX+nJDnIQHCCRB37
-         pCGUW0QmW2EBh64hpfmkdUV+nErgUrZi0q+DhhiiMAy/CPEvD6adynltcV1vyPpdHZst
-         H7hkzz+mDmAE1XbOPLgL0Yf7/RT4txVGCCuttUgs6BqvIjuIEZrbbDf4rrPqOHoNGQWp
-         DM+imYuLFFaQ7yRIYYkpyg3d0kqALPkzKIviz0bhiWRiwE1B/9FuRMPnOxb+waW3CszM
-         gaA+sOWbFkIo5vtA7e9EES5aAVeJFz+rfja+KvkTUMCKzQgLfYzXaxm3/bHnO4pJYXj8
-         EopA==
-X-Gm-Message-State: AOJu0YxgkAPhCBE4OJwEV9l9swMrsjRq6VQKmnFPJ7Xiv02YO4QYlsYB
-	6esreL1uXPa/5QThPul0xPSvLyyJwrdoII+egCnIM5d8uRSlgfRFxJ5FxvZckrI6VXqjt/xy3LQ
+        bh=cXwEOTqnAwGpLdBgRoFBLXm/lX+EzmxiYp2YjB18kHo=;
+        b=nJPc78EVUqYGZ3KM832t3iDS3+NzARgzlsXxgQQEJNhn3mD7xlKUArpubRPfB49nt6
+         /9Qj1FbzWvVCmr4seZWucdBgyjTaoOtg3DGeEF5VczjXEbj6sL/x652KFIGNPS37yp2z
+         jxDp+O23lnQ/F/gscPk4h0NsPPgDw2wW18WXxTMtFCBULINtRIWxOfT8TJ0FEK17e8yj
+         Ep0wrbj8FbIbUXg9TNSlfeQQiI6vmz5E2L94vGT+qoTftQq/WcCCn7JOuMVrNyewF7e9
+         dFACfy88US9NnrxzVco3QGErRb8F6bgYyDbAyPKej+fJPaaq2ZKFssjvYAdk5xVotQMW
+         VfZg==
+X-Gm-Message-State: AOJu0Yy1xbMkByoons5nKtSzIzsJ8HnvS5W/QEPr3yFM6pMqxgloemBY
+	ieJgF0+FpQiLXzwtaSYtoaD6EN4ePQ8Rf4O/rcpcBMysCo0wEP8f7IA5D3kieKYSikQGFnp9eC4
 	=
-X-Gm-Gg: ASbGncu6a0dmfYmNWXl3weMbOyft0RSW6YAbyUwlvWY+FOQwGZqzWMJb9Q6+C4B20zS
-	qXH4uAyzORsnRLQE9W/2k65J2Ioy92Mi0KsKKkYncccdigOdyH+nAWpso0rDFDBR+6MTMQBM2nv
-	6wcoAgRj0Lz4K9oIe9gWY4qeYks9kgz74XyLvd9c7Wyz8i0evJYZFShK8Fr6uxYU4scsqGXkdS3
-	2XStUUTczm71guTfP8CLeMT3a2XWKhOAG/XqTQ/2if4XRRmFPSyEvkKdx62mgiF0Fo26MrlllLJ
-	bU0PhgRBeZXMSLPlxZRD1WVy7YDclq61FH1Y8D5DJZzg
-X-Google-Smtp-Source: AGHT+IFhtpSAfIXZ+g6gdTp+54oM4L8oJbLAtE62uv//FT0/X757UXG7mu92gnTdRzBtvMWAI/3PGw==
-X-Received: by 2002:a05:6512:32ca:b0:540:2d64:4ef4 with SMTP id 2adb3069b0e04-5439c1c8879mr7487795e87.0.1737470666786;
-        Tue, 21 Jan 2025 06:44:26 -0800 (PST)
+X-Gm-Gg: ASbGncvm1UtMgGX7JJaR0BDatytkBBcTyvHWhJu4oJa7AC/tAA+Y2uB9E1hsd0qiPzL
+	t4udKkZLUl9GHnwiqqNOPo4c76KpOAJEKoU4qzzAQuI+OnQ6/EpeCf4/sOMviudPGW1a+0FWk+2
+	dizJp0eZnUdRb5dG7A0H7FZpYbe/hbyS2jT+K1HvDAJJCk0E1nw3wiKf/mh1qPaKg5ZLBjCecMU
+	vcnxN4WFTuS0h0JPR0fBUvhUS/uQfsbc3lHH84FQlx/UiNm7HFKhdxpNiGMsv++KxfHaOYEtR3t
+	4zIfU6BtmgoE+ncMBLqWL5uFCn8OJR/wuTAg4K4vPOOL
+X-Google-Smtp-Source: AGHT+IGAig0CdqlDz2NwCGIVvajpDD1zM3X+IfSAU6P3qzb3QhUUUwrLjwDcArG+NzV7pSWS8YyVWQ==
+X-Received: by 2002:ac2:4294:0:b0:540:1f7d:8bc4 with SMTP id 2adb3069b0e04-5439c281105mr5956838e87.48.1737470668035;
+        Tue, 21 Jan 2025 06:44:28 -0800 (PST)
 Received: from great-eastern.. (public-gprs172205.centertel.pl. [46.134.11.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5439af733fdsm1866237e87.174.2025.01.21.06.44.25
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5439af733fdsm1866237e87.174.2025.01.21.06.44.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 06:44:26 -0800 (PST)
+        Tue, 21 Jan 2025 06:44:27 -0800 (PST)
 From: Michal Dzik <michal.dzik@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michal Dzik <michal.dzik@streamunlimited.com>
-Subject: [PATCH BlueZ v3 4/5] audio: fix VCP connection management
-Date: Tue, 21 Jan 2025 15:44:03 +0100
-Message-Id: <20250121144404.4087658-5-michal.dzik@streamunlimited.com>
+Subject: [PATCH BlueZ v3 5/5] shared/vcp: control volume when acting as a server
+Date: Tue, 21 Jan 2025 15:44:04 +0100
+Message-Id: <20250121144404.4087658-6-michal.dzik@streamunlimited.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250121144404.4087658-1-michal.dzik@streamunlimited.com>
 References: <20250121144404.4087658-1-michal.dzik@streamunlimited.com>
@@ -71,64 +71,153 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Those changes are mandatory to be able to connect to the same VCP
-renderer more than once without need to restart bluez.
-- use vcp_disconnect() to close client connection and reset vcs members
-- call bt_vcp_detach() the same way as bt_vcp_attach - from btd_profile
-  callback
+Local VCP chatacteristics are now connected to transport properties.
 ---
- profiles/audio/vcp.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ src/shared/vcp.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 66 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-index cc6f352c1..d3723515a 100644
---- a/profiles/audio/vcp.c
-+++ b/profiles/audio/vcp.c
-@@ -72,7 +72,16 @@ static void vcp_debug(const char *str, void *user_data)
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 683650f31..898303e05 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -379,7 +379,15 @@ static struct bt_aics *vcp_get_aics(struct bt_vcp *vcp)
+ 	return vcp->rdb->aics;
+ }
  
- static int vcp_disconnect(struct btd_service *service)
- {
-+	struct vcp_data *data = btd_service_get_user_data(service);
- 	DBG("");
+-static void vcp_detached(void *data, void *user_data)
++static void vcp_remote_client_attached(void *data, void *user_data)
++{
++	struct bt_vcp_cb *cb = data;
++	struct bt_vcp *vcp = user_data;
 +
-+	if (!data) {
-+		error("VCP service not handled by profile");
-+		return -EINVAL;
++	cb->attached(vcp, cb->user_data);
++}
++
++static void vcp_remote_client_detached(void *data, void *user_data)
+ {
+ 	struct bt_vcp_cb *cb = data;
+ 	struct bt_vcp *vcp = user_data;
+@@ -495,6 +503,7 @@ static void vcp_disconnected(int err, void *user_data)
+ 	DBG(vcp, "vcp %p disconnected err %d", vcp, err);
+ 
+ 	bt_vcp_detach(vcp);
++	queue_foreach(vcp_cbs, vcp_remote_client_detached, vcp);
+ }
+ 
+ static struct bt_vcp *vcp_get_session(struct bt_att *att, struct gatt_db *db)
+@@ -513,6 +522,8 @@ static struct bt_vcp *vcp_get_session(struct bt_att *att, struct gatt_db *db)
+ 	vcp = bt_vcp_new(db, NULL);
+ 	vcp->att = att;
+ 
++	queue_foreach(vcp_cbs, vcp_remote_client_attached, vcp);
++
+ 	bt_att_register_disconnect(att, vcp_disconnected, vcp, NULL);
+ 
+ 	if (!sessions)
+@@ -555,6 +566,10 @@ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 
+ 	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
++	vcp->volume = vstate->vol_set;
++
++	if (vcp->volume_changed)
++		vcp->volume_changed(vcp, vcp->volume);
+ 
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+@@ -594,6 +609,10 @@ static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 
+ 	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
++	vcp->volume = vstate->vol_set;
++
++	if (vcp->volume_changed)
++		vcp->volume_changed(vcp, vcp->volume);
+ 
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+@@ -634,6 +653,10 @@ static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->mute = 0x00;
+ 	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
++	vcp->volume = vstate->vol_set;
++
++	if (vcp->volume_changed)
++		vcp->volume_changed(vcp, vcp->volume);
+ 
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+@@ -674,6 +697,10 @@ static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->mute = 0x00;
+ 	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
++	vcp->volume = vstate->vol_set;
++
++	if (vcp->volume_changed)
++		vcp->volume_changed(vcp, vcp->volume);
+ 
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+@@ -713,6 +740,10 @@ static uint8_t vcs_set_absolute_vol(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 
+ 	vstate->vol_set = req->vol_set;
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
++	vcp->volume = vstate->vol_set;
++
++	if (vcp->volume_changed)
++		vcp->volume_changed(vcp, vcp->volume);
+ 
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+@@ -2008,7 +2039,7 @@ uint8_t bt_vcp_get_volume(struct bt_vcp *vcp)
+ 	return vcp->volume;
+ }
+ 
+-bool bt_vcp_set_volume(struct bt_vcp *vcp, uint8_t volume)
++static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ {
+ 	struct bt_vcs_client_ab_vol req;
+ 	uint16_t value_handle;
+@@ -2044,6 +2075,39 @@ bool bt_vcp_set_volume(struct bt_vcp *vcp, uint8_t volume)
+ 	return true;
+ }
+ 
++static bool vcp_set_volume_server(struct bt_vcp *vcp, uint8_t volume)
++{
++	struct bt_vcp_db *vdb = vcp_get_vdb(vcp);
++	struct vol_state *vstate;
++
++	vcp->volume = volume;
++
++	if (!vdb) {
++		DBG(vcp, "error: VDB not available");
++		return false;
 +	}
-+	bt_vcp_detach(data->vcp);
 +
-+	btd_service_disconnecting_complete(service, 0);
- 	return 0;
- }
- 
-@@ -188,7 +197,7 @@ bool bt_audio_vcp_set_volume(struct btd_device *device, int8_t volume)
- 	return FALSE;
- }
- 
--static void vcp_detached(struct bt_vcp *vcp, void *user_data)
-+static void vcp_remote_client_detached(struct bt_vcp *vcp, void *user_data)
- {
- 	struct vcp_data *data;
- 
-@@ -203,7 +212,7 @@ static void vcp_detached(struct bt_vcp *vcp, void *user_data)
- 	vcp_data_remove(data);
- }
- 
--static void vcp_attached(struct bt_vcp *vcp, void *user_data)
-+static void vcp_remote_client_attached(struct bt_vcp *vcp, void *user_data)
- {
- 	struct vcp_data *data;
- 	struct bt_att *att;
-@@ -354,7 +363,8 @@ static int vcp_init(void)
- 	if (err)
- 		return err;
- 
--	vcp_id = bt_vcp_register(vcp_attached, vcp_detached, NULL);
-+	vcp_id = bt_vcp_register(vcp_remote_client_attached,
-+					    vcp_remote_client_detached, NULL);
- 
- 	return 0;
- }
++	vstate = vdb_get_vstate(vdb);
++	if (!vstate) {
++		DBG(vcp, "error: VSTATE not available");
++		return false;
++	}
++
++	vstate->vol_set = vcp->volume;
++	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
++	gatt_db_attribute_notify(vdb->vcs->vs, (void *) vstate,
++			sizeof(struct vol_state), bt_vcp_get_att(vcp));
++	return true;
++}
++
++bool bt_vcp_set_volume(struct bt_vcp *vcp, uint8_t volume)
++{
++	if (vcp->client)
++		return vcp_set_volume_client(vcp, volume);
++	else
++		return vcp_set_volume_server(vcp, volume);
++}
++
+ static void vcp_voffset_state_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 				const uint8_t *value, uint16_t length,
+ 				void *user_data)
 -- 
 2.34.1
 
