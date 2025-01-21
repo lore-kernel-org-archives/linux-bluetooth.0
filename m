@@ -1,129 +1,146 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F001F2C57;
-	Tue, 21 Jan 2025 15:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E43B1C36
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 16:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737475132; cv=none; b=RRvNR8wiQ0k5L+sej5DqJwoSep1KWb5+Kg7X3Cx+mamowilRVtpIC+V9RUHReb+Jv3ZEcc3RkGoxc0f/Fc/hKpTpMrn5f82C/v63SbfV+vo/W7sV5x21hLXNze+/QBxbq+TWMbMc5/JCPlm4polkJtdUK4nQCBQAyc50yLDjjQw=
+	t=1737475545; cv=none; b=QBYJ4kiYjK0rIu0EmuFAPi3126YraF0IT3WnebWDLzpjNM2lJp8z+pqEm2JyGY3v/QSvJGI0+lCx4wmvReh6/n7kFDJV+wHt/qTtuyrSpHkEK5Km5uCj116iZEzBtFHPPVOJg3RrSQEMmfvTYedfsHoqJnHIf/bfA/8VN+JUVmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737475132; c=relaxed/simple;
-	bh=BeK5sGxoxqXeaKLJNCa8Ce/GUWz9adAvQqpelT86ZfU=;
+	s=arc-20240116; t=1737475545; c=relaxed/simple;
+	bh=lvcN0NyMjYlNZp/Ia/V6K6vF83DLxyckNNO5MhwZS3o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ck9lDaH+QsRvqTdN3WDSu30lCa+EDCHctixBdcApHjNtoF5zLn+JWH/glunOIdbXJellZgPW1TTSjCB1EJt3QuHJfKudUmGA7EAv+nO2E4UkJ+yKGnDBldk2+27b+2fwAFOZZgl+HzNdfRbAIgE5ZeiynxORYJnnBJl2FH3N3j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lqbeuh+w; arc=none smtp.client-ip=209.85.208.174
+	 To:Cc:Content-Type; b=ciNfWC2RV6H3h8/NUyGhSmwxlIsiaDLVp1Evfc1GnGgkHJEgCe1iRGCY0pizYx88WM19LilHyMeqcmTh1czQ2O997Mh2HqXNLtd3RPh04R1jZqV/ycSF+AgVpniEijMbvZb5Gq7dbXg5mY26BtvEj4c/Vy4m5O3UOlKKj6z/xiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZKlQ3tz; arc=none smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lqbeuh+w"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30613037309so58151561fa.3;
-        Tue, 21 Jan 2025 07:58:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZKlQ3tz"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-303548a933aso51558401fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 08:05:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737475128; x=1738079928; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737475540; x=1738080340; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M5KHWwgcFdIA67jNB7pNMfK6Szvrf5G/qL/ON4cLx8A=;
-        b=lqbeuh+w/LkKlSo4e0DNqS+z0oCkj9nHr2U/C1sk1CGanhn9B2fr4iVJxFFwvDou6K
-         4XEuW7wpCNjX8jAuYib1z23AHHPUqNN79cmj8dVeYUsojxrx8asxsiD56Wp8qHPHI4lu
-         dqVnwZ3GhIT2qWyncVEjKPGP8ouA0d6EjDoprQtagw6ZtfdbA0SgAmywMrDtNHjSD1GI
-         SIDK27EmIq5cJIjbjqqUxyn7+zFi2lPRTOmQh2lIpV/mljdLa4etD6qkjJDnQVv6fNvf
-         D18/AmUsETShzl+Q2D4ETDNjSr7CAvhtQOO3YS5jtX6gdkk+eiPL1sRNDADllpnWBqJf
-         0rkg==
+        bh=XAo54IHfG8OFoLpyOJ7dfi1/XUsuV17gwJsS82XhdVU=;
+        b=DZKlQ3tzNCZwP86DCcATAtAVddUm8wKuIHI4f1OQri7NsWs16C+CqA3tWiu0o9epPd
+         2gqbCSBnWVJyvMTDN4XuuVGV5iatD25ZEwO0D4/cwYnlx1+uEsf6StLQtgko5wfdtc0m
+         EJMmK4/Mjwt/9IQGk+PpfAWFgawsDCxWBEnLOzyKhA4cy0TRsJWgX+5CW9QQ951KB+9H
+         jI20XndgqGH1jzqDy6RjMX68nXA6XVA95qOxyG7h74Ni7mVA5cFldN49QtoSdExpV7Te
+         eu0M4kwzW8TdTSnXO8bM/Mt/iPoC/qEEDx5NbB5tg3Np1cHKfiz61T0m1+IvnAMVktGP
+         NLmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737475128; x=1738079928;
+        d=1e100.net; s=20230601; t=1737475540; x=1738080340;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M5KHWwgcFdIA67jNB7pNMfK6Szvrf5G/qL/ON4cLx8A=;
-        b=lWL/UADzrVoUydAwZhNNmAooSfZbDAXXtYMZIKpiQg1BER6CE90JMVkb/HyUiCvjKd
-         m/QfEuq+8tVeRa/73TVRHBVwRh8VPLhKD5ltjgIiIySsqSTxe77/dfMgd9nxULkTeAJr
-         Ov0XW6OyA5ek52hjiUWLsKrKs2ZwhZe5AObt/5dznTN8cbUpTfcc5NiMntc4uKqLdylk
-         jThgo8FBV2Z+GtGccdVMJmF43h3vcedf7cG3oQRBJnRPgXXj2+eW05BibO8L1172EW7I
-         KgRKbhm6jGwW0vknwEFR0vR9AKeoB87zilJ+n9FIsK/as+fOyvmNlaJfvXH8LA7wJ8KY
-         SxAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUnx1WtS9QdMZD3KeL7uqi+JZBMlwfWcNMlzR+FaW2O2sH7GY9r7n/nXOIJ3k/pZVVlLK7eHhk3Ig6H3FQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVuUsxG+xyAgAof889HJvF3gIX6EroPL/+mg/HeXpOIDyBh4EW
-	LTVJYGv+fuCUvVExV4eolk7lJhMfP5lwwFAt1l0q3uzTJe1ckO1BLwH3nsT4T5hnyiyFod/soS+
-	Peo5a5jIFb5W71XXdPkSbdTTMUcNAyQ+N
-X-Gm-Gg: ASbGncscIe/x40u/o3wAXBLa6HHZlx4SuzddJJjWqX80AcW0w3rxh+Yl1fqNDkY9LEa
-	2RfZXVQCPQjPpyt19i5i0u1Ic9t40n6Y633whXdI2prJtohD/l8bR
-X-Google-Smtp-Source: AGHT+IF6HSshVr9F2ct6Bn542GAiKDL+wajvltBAko5UhDirjDK15gfVTM1WWIJtsPQDKPA9qscZHhrxUMDKq1+7l9o=
-X-Received: by 2002:a2e:b8cd:0:b0:300:4362:40 with SMTP id 38308e7fff4ca-3072cb28501mr65597991fa.36.1737475128084;
- Tue, 21 Jan 2025 07:58:48 -0800 (PST)
+        bh=XAo54IHfG8OFoLpyOJ7dfi1/XUsuV17gwJsS82XhdVU=;
+        b=ZM0LN1W7OLX98i0wRMkgJMSTh1IymOkizVLhXehgS/ABZUxmaEZSsg1dfnvyFCTvNk
+         3RQe9s2/jP9CtAUNt9I9mjsAWfj4F+IRFJEB/QFTUQIsQ+6FQ49JvIR0TbqVzRrTZWt0
+         +y+3yl0yA6XM6iIefPJj1OV0ZYtrdxH6JDLdYL3vXZdFgPcwrsFtALioY2RzahxwLEs/
+         nuDKGZjy2FxAWwI+nwdwD9M8Os0WROIrRrstwTgKwNv2s4R3pcl/EoKZzIwHSsZtzdtA
+         GS0iqC8WkKCnR5SGpKJkidk2IFYizrhGvHa2InvYJso1L9Kc9yLo2WrODDn5jbbM8/Nt
+         bB4g==
+X-Gm-Message-State: AOJu0YxgAothvs0nH0kC36kc7S1lSiA7P6NPQFYndBviEUn+Kt2gc5Pi
+	lVO7ApIYCpzWkuokcaAiihps8P50weZOpnIGOb51AQuMw71IbhoIXTvb8ZreTiwmR8WOSeDOdu/
+	VuHkeiTlP76m5WbvYs0NA+LKvv2v+VAqMn4U=
+X-Gm-Gg: ASbGncvQB7WNnxjMREQPAGqpLjYdhA6TAPhQaGD4Y0d9UkR3PTJ2gotnu62y+x/9AMo
+	6VWiTNXHmJ5lpUAnkxGo6XJY9PqBaNpcSIpedvPTOQC2zfdPdYmogDTApNpB9CXc=
+X-Google-Smtp-Source: AGHT+IGziQqZ72swkKLTCixVjNRVGAWxsHm0J4CPWEzmMpuUiaAGIERGSMauuuNFAmIhZGYcsdrgll8zYRPmfpPvCM8=
+X-Received: by 2002:a05:651c:1987:b0:302:4115:acd with SMTP id
+ 38308e7fff4ca-3072ca99a3fmr65708101fa.22.1737475538253; Tue, 21 Jan 2025
+ 08:05:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121151532.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <20250121151532.2.I6e9e94dcded65e4a9ed42ad23ca8a5d81f680382@changeid>
-In-Reply-To: <20250121151532.2.I6e9e94dcded65e4a9ed42ad23ca8a5d81f680382@changeid>
+References: <20250121-upstream-v1-1-7b6e450747f7@amlogic.com>
+In-Reply-To: <20250121-upstream-v1-1-7b6e450747f7@amlogic.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 21 Jan 2025 10:58:35 -0500
-X-Gm-Features: AbW1kvaDr0eBVTpAHSKQVaJrDhO88zV70Hfz_1xrTJAD6uGZ5xOdMw6u83HtlCs
-Message-ID: <CABBYNZ+esphP5CqCnazjyhHmgBLSRMVieaMBOwryorLO4oaGfQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Allow SCO packets regardless of hci_conn_num
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org
+Date: Tue, 21 Jan 2025 11:05:24 -0500
+X-Gm-Features: AbW1kvYsWWZPb448I9jTE_LvNln_UT0TX1URFPaCsUxqKYihZ11zfyS6ehtE19A
+Message-ID: <CABBYNZKoszd-3MxmFW9MjMpuVdDsA_mtz8MSVtwMOLcLWt4baw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ bluez] gatt: expand the max GATT Channels
+To: yang.li@amlogic.com
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-HI Hsin-chen,
+Hi,
 
-On Tue, Jan 21, 2025 at 2:17=E2=80=AFAM Hsin-chen Chuang <chharry@google.co=
-m> wrote:
+On Tue, Jan 21, 2025 at 5:05=E2=80=AFAM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
 >
-> From: Hsin-chen Chuang <chharry@chromium.org>
+> From: Yang Li <yang.li@amlogic.com>
 >
-> The SCO packets from Bluetooth raw socket are now rejected because
-> hci_conn_num is left 0. This patch allows such the usecase to enable
-> the userspace SCO support.
+> Fixed the problem that Xiaomi K70 mobile phone takes too long to
+> connect to CIS.
 >
-> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control US=
-B alt setting")
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> L2CAP CB Connection (PSM=3D0x0027, MTU=3D517 bytes, MPS=3D251 bytes,
+>  Credits=3D255, Src=3D0x0056 =E2=80=BA All Connections Refused =E2=80=93
+>  Insufficient Authorization)
+>
+> Ref https://github.com/bluez/bluez/issues/1033
+>
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
 > ---
+>  src/main.c    | 2 +-
+>  src/main.conf | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
->  drivers/bluetooth/btusb.c | 6 ------
->  1 file changed, 6 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f419d0827ee4..3e2d7ea6de5c 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2107,9 +2107,6 @@ static int btusb_send_frame(struct hci_dev *hdev, s=
-truct sk_buff *skb)
->                 return submit_or_queue_tx_urb(hdev, urb);
->
->         case HCI_SCODATA_PKT:
-> -               if (hci_conn_num(hdev, SCO_LINK) < 1)
-> -                       return -ENODEV;
+> diff --git a/src/main.c b/src/main.c
+> index d13ada2af..e2243c824 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -1119,7 +1119,7 @@ static void parse_gatt(GKeyFile *config)
+>         parse_config_u16(config, "GATT", "ExchangeMTU", &btd_opts.gatt_mt=
+u,
+>                                 BT_ATT_DEFAULT_LE_MTU, BT_ATT_MAX_LE_MTU)=
+;
+>         parse_config_u8(config, "GATT", "Channels", &btd_opts.gatt_channe=
+ls,
+> -                               1, 5);
+> +                               1, 10);
 
-Hmm, we probably need to check if USER_CHANNEL has been opened instead
-of simply removing the check.
+Afaik if we set it to 5 because that is the maximum one could request:
 
-> -
->                 urb =3D alloc_isoc_urb(hdev, skb);
->                 if (IS_ERR(urb))
->                         return PTR_ERR(urb);
-> @@ -2588,9 +2585,6 @@ static int btusb_send_frame_intel(struct hci_dev *h=
-dev, struct sk_buff *skb)
->                 return submit_or_queue_tx_urb(hdev, urb);
+BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 3, Part A
+page 1067
+Destination CID =E2=80=93 (2 to 10 octets)
+The Destination CID is an array of up to 5 two-octet values and represents
+the channel endpoints on the device sending the
+L2CAP_CREDIT_BASED_CONNECTION_RSP packet.
+
+>         parse_config_bool(config, "GATT", "Client", &btd_opts.gatt_client=
+);
+>         parse_gatt_export(config);
+>  }
+> diff --git a/src/main.conf b/src/main.conf
+> index 60ab60edc..95de56003 100644
+> --- a/src/main.conf
+> +++ b/src/main.conf
+> @@ -264,7 +264,7 @@
+>  #ExchangeMTU =3D 517
 >
->         case HCI_SCODATA_PKT:
-> -               if (hci_conn_num(hdev, SCO_LINK) < 1)
-> -                       return -ENODEV;
-> -
->                 urb =3D alloc_isoc_urb(hdev, skb);
->                 if (IS_ERR(urb))
->                         return PTR_ERR(urb);
+>  # Number of ATT channels
+> -# Possible values: 1-5 (1 disables EATT)
+> +# Possible values: 1-10 (1 disables EATT)
+>  # Default to 1
+>  #Channels =3D 1
+>
+>
+> ---
+> base-commit: 2ee08ffd4d469781dc627fa50b4a015d9ad68007
+> change-id: 20250121-upstream-fab070351ad3
+>
+> Best regards,
 > --
-> 2.48.0.rc2.279.g1de40edade-goog
+> Yang Li <yang.li@amlogic.com>
+>
+>
 >
 
 
