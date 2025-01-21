@@ -1,184 +1,91 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B021F2C34
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 13:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B718B49641
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 14:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737466887; cv=none; b=Lh/fOYGz4o3N7H6+ZDHhPCk3xUZsSL8LMV7c4S2vlSg/otJgh/Kux5CdSreeVoAjQfYrJc5XSbV0YwPYxGg+532AkOBj/1hUCdGzonoQvqUqQeekcWfes3CWNpSq10d1yKZ5aAyj828B+XuY1PYX09WNmgK1iH/OXKHeOIPCPcM=
+	t=1737470668; cv=none; b=M2bsHsM8O9j+QX6J9O2ymSD2IZy0jiI/EmVMzWJbGHRPOIpyhnGgbpEALSHrDkgdEez9S7iNAEtMNpjGOAeg73RWMA5J5qMr6X46PCNsvz4FRP9Rd1SCNo1ENsWk5+TXEXQEHpZjdWlmPhdY+BeyMmj1I7QKoEU57KNs4gw5680=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737466887; c=relaxed/simple;
-	bh=fiK4CVk5aqEYO2cZpuNY+C/0Ksy2pYJfcGH65OU1wlY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=oLkncw/4NNq3/NuExvS0kMHONe5pSZEm0gGy47QSqqRIlblDxPI6HM67pcAXN7ZI2Xje8Ziu6DJZqlh6f3ZG/SjxkGo4CJqymqjM/uYHSryl/Xdt7h+lETenmk8enJO6Hp47nTUN3ZqzsReCXG8CcCyT11ddbTS0jkMLmHwYsa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0iBW2zc; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1737470668; c=relaxed/simple;
+	bh=HtKdF4kx2xozLT8iB8BNpJfFF548fMV5UnsN3tiz85k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A6jzEuuxVVy1NZu0k4wFdfXus5FmsTGdsMLk9c3wSZ/YpPwkJ33wcAulEPLAhMiX5O8VlVXgLvlklMkWRTpAgAd70wkU6/ESGebdx97aNSMTjqGWEEpoBIGfhRiEpFDBKJLw94aXYLrY/JjfBr2HtYopBJw/UltChc/yqY+X4eE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=o6oVLvFF; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0iBW2zc"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e1a41935c3so78622406d6.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 05:41:24 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="o6oVLvFF"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5401c52000fso5519935e87.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 06:44:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737466884; x=1738071684; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fiK4CVk5aqEYO2cZpuNY+C/0Ksy2pYJfcGH65OU1wlY=;
-        b=e0iBW2zc0IROd9OjrL58BvHI//3y+JUv9CwabmJmBnHwKhPUMojyzGzH3khbh6Ux+L
-         DE9BHGud07ynUXNAPUmFN6xNhiRmJA+KwR8/F1EIYOv9+btLPaEcrZtCaCozyoq37d01
-         D1OVhHIbEvYIeTHNZzryLQqah0LumM0fOTGA5Fin9V+ybyJH4HeCcmGF24giDxi21fGt
-         kastnIwqoRjhAULexZ4vGmj7xjQSlx/vifeULlLytCAuEZ/3BCa0idEwo75IzRQF+I9w
-         Z0B80GedYfo32U67YOxxXxCv7lJRpwSrTNzFo3FfOiVLFR1pmG7OfdARECwkL8+mvsIu
-         2F9g==
+        d=streamunlimited.com; s=google; t=1737470662; x=1738075462; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sqEBy0LsaXfAOX0nqZGI/AeJfDkQw2v8JOqvZ+VKql0=;
+        b=o6oVLvFF98ZC2hzGGhPLPJek2DWypCjs6Xlg2UGTHTPSi0XN0iSWIg2rjkgmj3r5VL
+         rw/bkaE3EngfJf6+9D14I6ObQyqCpMQkGwLFxqxoFBaRcGsSRR0MOOiKr3jaiu7QAhw+
+         4QalfnIHmW0tB6IHIq/e/s0LaHKgeVgjiF+ls=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737466884; x=1738071684;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1737470662; x=1738075462;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fiK4CVk5aqEYO2cZpuNY+C/0Ksy2pYJfcGH65OU1wlY=;
-        b=TjoLuaBbYM9B6RUbIHpYUb1P5kYNVlepoiWNgDZlfhDpsok5H2nmXubhk8Kkeoonw3
-         aBO89HTx1iwcvcn9rpVbcrpbc1+MbV593EzLCAifRY1RAmNO1+AMoPIO8XIukuD8DvnU
-         Ov/vxvgTDh0Ql4fg0CB/N3dvj89aCp/EZ49Lu0eSbkUuhHIK4fQyQRgMoeDzXfKu94pI
-         20SwFWwNvv4FHv0QtY0paqHev+WXJdSvkApCgRX3OYkEdi9Bx/u7Ks1fthyWWLBvLAX5
-         vXWT/IN1Xmx+5A3bGY5sK1W0as+YotWMMQHJRlsoqNSS/K7nhzLN0qCRy7bM4bIf/kHv
-         C1Pg==
-X-Gm-Message-State: AOJu0Yw8aVqKfETsBF7UgKAAPO80IrUouSyO1BW7R3ObmXMykz2RIUg5
-	4+gbOk2FcyTLECiEl6MCsPJenGgyZK+uIRTe7l6qUamGN/DUljktmpxdsA==
-X-Gm-Gg: ASbGncsD29elUpOixNLCEdx/K1eA+FKYvjRgtSNvwQp20etT179tTHlxBlmbUEG267T
-	hYhcv+aov6O9rDb+G2l024hWQaiBoXjxXsab4E042Pj2XVThOQnhTiupMixZ6gmZdOwaRupEZvd
-	JeFqZ4wWjHRCz9kdYMWB3MUsLbBC3ZqppiQR8gX+exzhiyaHX7YSUf34OWYNjtZptaQ/1IvyRw0
-	l6+tD/B4Q8v7vFxREUg0IKC7kj1fvgWB/qMmfR7wSCgBt+RGUPlr50kPHkfL2UBDBbsCUHbCKRK
-	+bk=
-X-Google-Smtp-Source: AGHT+IGgdXAQvpuUXke453D+6+QITEkoZGAhkGzyrkRn+0fb1by+GAvkurILeQocK8/YEUlBXfUBow==
-X-Received: by 2002:a05:6214:2aa8:b0:6d4:1ea3:981d with SMTP id 6a1803df08f44-6e1b223031emr267041136d6.43.1737466883679;
-        Tue, 21 Jan 2025 05:41:23 -0800 (PST)
-Received: from [172.17.0.2] ([172.200.199.217])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afbf381bsm51023406d6.10.2025.01.21.05.41.23
+        bh=sqEBy0LsaXfAOX0nqZGI/AeJfDkQw2v8JOqvZ+VKql0=;
+        b=URISnaoEIWHNiPIQfm5jrBNch4/jPaBlDcppVA1PrQ0FwwqpFioGsFpnmBQyC+ZDJn
+         9prPH+ZUoXKUEBtljXdNKNxJzzs1T+a5ZnOL2FFWxiLX4njgApJmMWO/WDA3OEZsqG2S
+         o/CLDuZGJorWU7BjYYLErIx8qy549Wsbdr23dv8UGlkYlZRs/ve30r78+vQ6Rh357X6S
+         Hsp35jWWPaodevXi1Vt9blwS8n6+YbW7+oCIHceUkKRmkdEU30ogz/oeVtzAQsAYFN2k
+         DfK3EiEWyzNx24FN4DGXqcUDV3RAsbV8C9Xlgftrg6MT1MzLW0EEsYXnT79mOX+GVxHC
+         7VLw==
+X-Gm-Message-State: AOJu0YwgFNNeJ7C/NIpW0DjrUFbZdU5Tz6yfqE/g36FnsMywmnbeprh1
+	xYTwfOevledr6PpJmidncH6QmGZ7SzL9ikgeqJLIlZWXM1gJz5rB8vf6ZL/0gsEbyBYy/19RVV4
+	=
+X-Gm-Gg: ASbGncsvc4tIHTAHZy/1qhnnAwe2vBY3ZeBMVQrJ/hkoSXi65+zsMwgxaT4u7cO/97m
+	H5AdBN8e5TQjVkUQQw51NdZyWLhTduw8CtYJhes6g1OVPFp0dgDtg9V307x8r4ll9jiceQhd97l
+	gX9Y8yf+RCIm5u2bHFWz/787rYhoqDghb5JS1r+fxk49Umv9qXS/Z5xeFoMyI2PcxZsesDxjFlY
+	B926b+FhAXj/wsfIMuzSS/QHnrgrG5ZYdE6MZ0zujy7z4JU4LFbviE2z4eaXDPQrW0wt5NErJYK
+	dyKO6JGuvxjcSmYmkJrt+KRh1a3JyuivQSDlwRGOGDB/
+X-Google-Smtp-Source: AGHT+IHx2E73Urdug7JztYM0hJZGHlcQipUapne1ztgnqT1lNlYL3BkroGVb8fq+yCQdpAGTPxrR+w==
+X-Received: by 2002:ac2:5de4:0:b0:542:2990:5d61 with SMTP id 2adb3069b0e04-5439c2539a3mr4165007e87.25.1737470662310;
+        Tue, 21 Jan 2025 06:44:22 -0800 (PST)
+Received: from great-eastern.. (public-gprs172205.centertel.pl. [46.134.11.238])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5439af733fdsm1866237e87.174.2025.01.21.06.44.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 05:41:23 -0800 (PST)
-Message-ID: <678fa403.0c0a0220.3d2921.39a5@mx.google.com>
-Date: Tue, 21 Jan 2025 05:41:23 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2141329570822126841=="
+        Tue, 21 Jan 2025 06:44:22 -0800 (PST)
+From: Michal Dzik <michal.dzik@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michal Dzik <michal.dzik@streamunlimited.com>
+Subject: [PATCH BlueZ v3 0/5] connect VCP profile to MediaTransport volume
+Date: Tue, 21 Jan 2025 15:43:59 +0100
+Message-Id: <20250121144404.4087658-1-michal.dzik@streamunlimited.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, michal.dzik@streamunlimited.com
-Subject: RE: connect VCP profile to MediaTransport volume
-In-Reply-To: <20250121124718.3995904-2-michal.dzik@streamunlimited.com>
-References: <20250121124718.3995904-2-michal.dzik@streamunlimited.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2141329570822126841==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+I'm already resubmitting, fixing the problems found by test bot.
+Sorry for spam.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTI3MjI2CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQRU5ESU5HICAgMC4yMSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
-TkRJTkcgICAwLjIxIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDIwLjMwIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
-IDE3LjkyIHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDM1
-LjIwIHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE1OS4z
-OCBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNS4wMCBz
-ZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyMC4wOSBzZWNv
-bmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICAxMy4zNCBzZWNvbmRz
-CkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBFTkRJTkcgICAwLjI1IHNlY29uZHMKU2Nh
-bkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDg2MS43MyBzZWNvbmRzCgpEZXRh
-aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVO
-RElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRs
-aW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1h
-a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvdmNwLmM6MjA0
-Mjo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9s
-dW1lX2NsaWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNDIgfCBib29s
-IGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9s
-dW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvdmNw
-LmM6MjA3ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9z
-ZXRfdm9sdW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNzgg
-fCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4
-X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxs
-IHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6
-ODY3Njogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtdmNwLmxvXSBFcnJvciAxCm1h
-a2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFr
-ZWZpbGU6NDY5MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
-ZXN0OiBNYWtlQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoK
-CnNyYy9zaGFyZWQvdmNwLmM6MjA0Mjo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24g
-Zm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xh
-cmF0aW9uc10KIDIwNDIgfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRf
-dmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+CnNyYy9zaGFyZWQvdmNwLmM6MjA3ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFy
-YXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5n
-LWRlY2xhcmF0aW9uc10KIDIwNzggfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1
-Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
-a2VbMV06ICoqKiBbTWFrZWZpbGU6ODQzMTogc3JjL3NoYXJlZC9saWJzaGFyZWRfZ2xpYl9sYS12
-Y3AubG9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZToxMjM0NDogY2hlY2tdIEVycm9yIDIK
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlM
-CkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKc3JjL3No
-YXJlZC92Y3AuYzoyMDQyOjY6IGVycm9yOiBubyBwcmV2aW91cyBkZWNsYXJhdGlvbiBmb3Ig4oCY
-YnRfdmNwX3NldF92b2x1bWVfY2xpZW504oCZIFstV2Vycm9yPW1pc3NpbmctZGVjbGFyYXRpb25z
-XQogMjA0MiB8IGJvb2wgYnRfdmNwX3NldF92b2x1bWVfY2xpZW50KHN0cnVjdCBidF92Y3AgKnZj
-cCwgdWludDhfdCB2b2x1bWUpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4K
-c3JjL3NoYXJlZC92Y3AuYzoyMDc4OjY6IGVycm9yOiBubyBwcmV2aW91cyBkZWNsYXJhdGlvbiBm
-b3Ig4oCYYnRfdmNwX3NldF92b2x1bWVfc2VydmVy4oCZIFstV2Vycm9yPW1pc3NpbmctZGVjbGFy
-YXRpb25zXQogMjA3OCB8IGJvb2wgYnRfdmNwX3NldF92b2x1bWVfc2VydmVyKHN0cnVjdCBidF92
-Y3AgKnZjcCwgdWludDhfdCB2b2x1bWUpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTog
-KioqIFtNYWtlZmlsZTo4Njc2OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS12Y3Au
-bG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
-bWFrZTogKioqIFtNYWtlZmlsZToxMjM0NDogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNoIC0gRkFJTApEZXNjOiBSdW4gc21hdGNo
-IHRvb2wgd2l0aCBzb3VyY2UKT3V0cHV0OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdh
-cm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5j
-OjI3MjoyMzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFy
-ZWQvZ2F0dC1oZWxwZXJzLmM6NzY4OjMxOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkg
-aXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo4MzA6MzE6IHdhcm5pbmc6IFZhcmlh
-YmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjEzMjM6
-MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dh
-dHQtaGVscGVycy5jOjEzNTQ6MjM6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1
-c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2VydmVyLmM6Mjc4OjI1OiB3YXJuaW5nOiBWYXJpYWJsZSBs
-ZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LXNlcnZlci5jOjYxODoyNTogd2Fy
-bmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1zZXJ2
-ZXIuYzo3MTY6MjU6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMv
-c2hhcmVkL2JhcC5jOjI5NjoyNTogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJl
-cwpzcmMvc2hhcmVkL2JhcC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlOgouL3NyYy9zaGFyZWQv
-YXNjcy5oOjg4OjI1OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCnNyYy9z
-aGFyZWQvdmNwLmM6MjA0Mjo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKA
-mGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9u
-c10KIDIwNDIgfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRfdmNwICp2
-Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-CnNyYy9zaGFyZWQvdmNwLmM6MjA3ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24g
-Zm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xh
-cmF0aW9uc10KIDIwNzggfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1Y3QgYnRf
-dmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06
-ICoqKiBbTWFrZWZpbGU6ODY3Njogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtdmNw
-LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
-Cm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY5MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIwpUZXN0OiBibHVlem1ha2VleHRlbGwgLSBGQUlMCkRlc2M6IEJ1aWxkIEJs
-dWV6IHdpdGggRXh0ZXJuYWwgRUxMCk91dHB1dDoKCnNyYy9zaGFyZWQvdmNwLmM6MjA0Mjo2OiBl
-cnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX2Ns
-aWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNDIgfCBib29sIGJ0X3Zj
-cF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQog
-ICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvdmNwLmM6MjA3
-ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9s
-dW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNzggfCBib29s
-IGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9s
-dW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5p
-bmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODY3Njog
-c3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtdmNwLmxvXSBFcnJvciAxCm1ha2VbMV06
-ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6
-NDY5MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJ
-bmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRo
-ZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1
-ZXRvb3RoCgo=
+Michal Dzik (5):
+  shared/vcp: add API to control volume on VCP client
+  audio: connect VCP profile client to MediaTransport
+  shared/vcp: fix memory & connection management
+  audio: fix VCP connection management
+  shared/vcp: control volume when acting as a server
 
---===============2141329570822126841==--
+ Makefile.plugins           |   2 +-
+ profiles/audio/transport.c |  37 ++++++--
+ profiles/audio/vcp.c       |  73 ++++++++++++++--
+ profiles/audio/vcp.h       |  12 +++
+ src/shared/vcp.c           | 169 ++++++++++++++++++++++++++++++++++---
+ src/shared/vcp.h           |   7 ++
+ 6 files changed, 274 insertions(+), 26 deletions(-)
+ create mode 100644 profiles/audio/vcp.h
+
+-- 
+2.34.1
+
