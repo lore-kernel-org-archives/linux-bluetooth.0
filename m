@@ -1,223 +1,184 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8628B1EF0AF
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 12:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B021F2C34
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 13:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737463666; cv=none; b=Ox03wcoR8KSx/m2C+08QBtyuxK161ETDqUgFjzD9idgSgajUAWFGfxAj5C4g+dgLXqRYK6NMNW//Bry8Qpq7WV1GO8NRYbLXo6T2r1RXLgl3ooD5v/fuAewmO06h4sTgaNbD/qQiLdeZ5Yjq0dcWf9KEmTNjye4HPRChkYGeD5E=
+	t=1737466887; cv=none; b=Lh/fOYGz4o3N7H6+ZDHhPCk3xUZsSL8LMV7c4S2vlSg/otJgh/Kux5CdSreeVoAjQfYrJc5XSbV0YwPYxGg+532AkOBj/1hUCdGzonoQvqUqQeekcWfes3CWNpSq10d1yKZ5aAyj828B+XuY1PYX09WNmgK1iH/OXKHeOIPCPcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737463666; c=relaxed/simple;
-	bh=us7BX9z3JbNUm1iwU4gbVF2qCYXv2kzA2cq2Zi/POMM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nZd6tStGfaw4bdEIwWJ0uF2eLcYu8ESlnGove8tC1/ywBooOwv39bIqDhrpaNyO2f51uaduOiRQGhPv4oXx5vNFz8D0tqx1Dv5SBQEmPDjpgVXA1nYJ0C+fIP2feTC8mkaxxlIGfAipmNbKAfwApK7uzKAPIwEAxL+Ez1X6OFL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com; spf=pass smtp.mailfrom=streamunlimited.com; dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b=Rmw83k0c; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	s=arc-20240116; t=1737466887; c=relaxed/simple;
+	bh=fiK4CVk5aqEYO2cZpuNY+C/0Ksy2pYJfcGH65OU1wlY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=oLkncw/4NNq3/NuExvS0kMHONe5pSZEm0gGy47QSqqRIlblDxPI6HM67pcAXN7ZI2Xje8Ziu6DJZqlh6f3ZG/SjxkGo4CJqymqjM/uYHSryl/Xdt7h+lETenmk8enJO6Hp47nTUN3ZqzsReCXG8CcCyT11ddbTS0jkMLmHwYsa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0iBW2zc; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.b="Rmw83k0c"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3d0205bd5so8987240a12.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 04:47:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0iBW2zc"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e1a41935c3so78622406d6.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 05:41:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1737463662; x=1738068462; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0EBgcxkfUJPQfZObbMHq5EhfZB/o0AHpwA81k4Z0yUo=;
-        b=Rmw83k0cI81/yruSQjPxShv83MQLJmZCOciLyRkZYPrMb4dnWaa+bp7EcyIvNfGR7Z
-         AaOi85Wt0HbAaM2u46yjjdWFEuAQJguZozsIXXjwRkiP4XclPFd+9vbOoqnIYm5oN2dH
-         sdE7U6XCw5DjPrGUgrQLz/Qdm5tOmEMYkUg/g=
+        d=gmail.com; s=20230601; t=1737466884; x=1738071684; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fiK4CVk5aqEYO2cZpuNY+C/0Ksy2pYJfcGH65OU1wlY=;
+        b=e0iBW2zc0IROd9OjrL58BvHI//3y+JUv9CwabmJmBnHwKhPUMojyzGzH3khbh6Ux+L
+         DE9BHGud07ynUXNAPUmFN6xNhiRmJA+KwR8/F1EIYOv9+btLPaEcrZtCaCozyoq37d01
+         D1OVhHIbEvYIeTHNZzryLQqah0LumM0fOTGA5Fin9V+ybyJH4HeCcmGF24giDxi21fGt
+         kastnIwqoRjhAULexZ4vGmj7xjQSlx/vifeULlLytCAuEZ/3BCa0idEwo75IzRQF+I9w
+         Z0B80GedYfo32U67YOxxXxCv7lJRpwSrTNzFo3FfOiVLFR1pmG7OfdARECwkL8+mvsIu
+         2F9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737463662; x=1738068462;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0EBgcxkfUJPQfZObbMHq5EhfZB/o0AHpwA81k4Z0yUo=;
-        b=nupJaYEhpm8wkYHBMpm0wqzTdjHHFyyfzs3tLcvkjXGSqXVDyIgdxHJMD+kUt1iXcH
-         dmpuEvokH13W+pzBSVQsO/LH3aLtPjLgc32WWFuqRWc0WnrmijwBGpdPz+F2CxazOdzf
-         PPvKbHz6WEt/W/oMNyUlgYi46PypPt4Z/kPrbuEYo3+geRgLwJdRB5a+aQzTkahJf3ef
-         cbn1HbuPij5U9wffiVymPC1SIlGJ/6YeOalJI5YNX9lAthgrRHUC9CwAi354FyYg77Jm
-         OcGH5bINC6xl1iXh4fwn8lEgrDizDK+dvu+4BfomORmaoxt/HFj1y/SBjDzZ7q+GZyke
-         FElQ==
-X-Gm-Message-State: AOJu0YyoS2JqC63FAOVS0bZSB+U7mSzYa5HVkSvn4Ls7WYwrbVQD+MM2
-	+MHseyxwm6v3cnJSW7aj6o2giBrl6u9mwT0dgPscn83yih/7tURw5YFHbDjuhFgDLZftNGasZYg
-	=
-X-Gm-Gg: ASbGncv6Ku7UVSQy1CMXAuN2hNcoJGMT8hgIQ2GaMh/r7/0zPMCHPKVWCIF8ikS+dOX
-	p9pj6fU/smFN+jwdPHvhc3bJC0/31yvURY7tFlrm9oZttLjS/vnjb8dnn2iTObXLmeaYkeDoG+d
-	6mKauXQHO5YfRjG7xbSfe2OeyfjLNuvg6kgCCxIp2r2azfXKml84QgmYJpq6Ch1ACN3W9Y2Pu8K
-	qaO6PDODFLiFPQvbIV89C3UK3AjZeA7ON+VsLyWMcPscHCVLULYctAI2Qzsj0AN4kLMlbl/Zwof
-	t5il7C5JztzKftVDW9YHR80/1OXUxQ5D26TPZM0H3niJ
-X-Google-Smtp-Source: AGHT+IG8wPa2N92av6SDmNSCWM6TqStZMdnUEcO9sWp2HuU7/ym25JUm88P51r+Wc8egDUTbE3EvAw==
-X-Received: by 2002:a05:6402:278f:b0:5d2:7346:3ecb with SMTP id 4fb4d7f45d1cf-5db7d2f8066mr16803487a12.12.1737463662150;
-        Tue, 21 Jan 2025 04:47:42 -0800 (PST)
-Received: from great-eastern.. (public-gprs172205.centertel.pl. [46.134.11.238])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5db73670cf8sm7153591a12.19.2025.01.21.04.47.41
+        d=1e100.net; s=20230601; t=1737466884; x=1738071684;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fiK4CVk5aqEYO2cZpuNY+C/0Ksy2pYJfcGH65OU1wlY=;
+        b=TjoLuaBbYM9B6RUbIHpYUb1P5kYNVlepoiWNgDZlfhDpsok5H2nmXubhk8Kkeoonw3
+         aBO89HTx1iwcvcn9rpVbcrpbc1+MbV593EzLCAifRY1RAmNO1+AMoPIO8XIukuD8DvnU
+         Ov/vxvgTDh0Ql4fg0CB/N3dvj89aCp/EZ49Lu0eSbkUuhHIK4fQyQRgMoeDzXfKu94pI
+         20SwFWwNvv4FHv0QtY0paqHev+WXJdSvkApCgRX3OYkEdi9Bx/u7Ks1fthyWWLBvLAX5
+         vXWT/IN1Xmx+5A3bGY5sK1W0as+YotWMMQHJRlsoqNSS/K7nhzLN0qCRy7bM4bIf/kHv
+         C1Pg==
+X-Gm-Message-State: AOJu0Yw8aVqKfETsBF7UgKAAPO80IrUouSyO1BW7R3ObmXMykz2RIUg5
+	4+gbOk2FcyTLECiEl6MCsPJenGgyZK+uIRTe7l6qUamGN/DUljktmpxdsA==
+X-Gm-Gg: ASbGncsD29elUpOixNLCEdx/K1eA+FKYvjRgtSNvwQp20etT179tTHlxBlmbUEG267T
+	hYhcv+aov6O9rDb+G2l024hWQaiBoXjxXsab4E042Pj2XVThOQnhTiupMixZ6gmZdOwaRupEZvd
+	JeFqZ4wWjHRCz9kdYMWB3MUsLbBC3ZqppiQR8gX+exzhiyaHX7YSUf34OWYNjtZptaQ/1IvyRw0
+	l6+tD/B4Q8v7vFxREUg0IKC7kj1fvgWB/qMmfR7wSCgBt+RGUPlr50kPHkfL2UBDBbsCUHbCKRK
+	+bk=
+X-Google-Smtp-Source: AGHT+IGgdXAQvpuUXke453D+6+QITEkoZGAhkGzyrkRn+0fb1by+GAvkurILeQocK8/YEUlBXfUBow==
+X-Received: by 2002:a05:6214:2aa8:b0:6d4:1ea3:981d with SMTP id 6a1803df08f44-6e1b223031emr267041136d6.43.1737466883679;
+        Tue, 21 Jan 2025 05:41:23 -0800 (PST)
+Received: from [172.17.0.2] ([172.200.199.217])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afbf381bsm51023406d6.10.2025.01.21.05.41.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 04:47:41 -0800 (PST)
-From: Michal Dzik <michal.dzik@streamunlimited.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michal Dzik <michal.dzik@streamunlimited.com>
-Subject: [PATCH BlueZ v2 5/5] shared/vcp: control volume when acting as a server
-Date: Tue, 21 Jan 2025 13:47:18 +0100
-Message-Id: <20250121124718.3995904-6-michal.dzik@streamunlimited.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250121124718.3995904-1-michal.dzik@streamunlimited.com>
-References: <20250121124718.3995904-1-michal.dzik@streamunlimited.com>
+        Tue, 21 Jan 2025 05:41:23 -0800 (PST)
+Message-ID: <678fa403.0c0a0220.3d2921.39a5@mx.google.com>
+Date: Tue, 21 Jan 2025 05:41:23 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2141329570822126841=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, michal.dzik@streamunlimited.com
+Subject: RE: connect VCP profile to MediaTransport volume
+In-Reply-To: <20250121124718.3995904-2-michal.dzik@streamunlimited.com>
+References: <20250121124718.3995904-2-michal.dzik@streamunlimited.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Local VCP chatacteristics are now connected to transport properties.
----
- src/shared/vcp.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 66 insertions(+), 2 deletions(-)
+--===============2141329570822126841==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index 683650f31..7ce6d576a 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -379,7 +379,15 @@ static struct bt_aics *vcp_get_aics(struct bt_vcp *vcp)
- 	return vcp->rdb->aics;
- }
- 
--static void vcp_detached(void *data, void *user_data)
-+static void vcp_remote_client_attached(void *data, void *user_data)
-+{
-+	struct bt_vcp_cb *cb = data;
-+	struct bt_vcp *vcp = user_data;
-+
-+	cb->attached(vcp, cb->user_data);
-+}
-+
-+static void vcp_remote_client_detached(void *data, void *user_data)
- {
- 	struct bt_vcp_cb *cb = data;
- 	struct bt_vcp *vcp = user_data;
-@@ -495,6 +503,7 @@ static void vcp_disconnected(int err, void *user_data)
- 	DBG(vcp, "vcp %p disconnected err %d", vcp, err);
- 
- 	bt_vcp_detach(vcp);
-+	queue_foreach(vcp_cbs, vcp_remote_client_detached, vcp);
- }
- 
- static struct bt_vcp *vcp_get_session(struct bt_att *att, struct gatt_db *db)
-@@ -513,6 +522,8 @@ static struct bt_vcp *vcp_get_session(struct bt_att *att, struct gatt_db *db)
- 	vcp = bt_vcp_new(db, NULL);
- 	vcp->att = att;
- 
-+	queue_foreach(vcp_cbs, vcp_remote_client_attached, vcp);
-+
- 	bt_att_register_disconnect(att, vcp_disconnected, vcp, NULL);
- 
- 	if (!sessions)
-@@ -555,6 +566,10 @@ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 
- 	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
- 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+	vcp->volume = vstate->vol_set;
-+
-+	if (vcp->volume_changed)
-+		vcp->volume_changed(vcp, vcp->volume);
- 
- 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
- 				 sizeof(struct vol_state),
-@@ -594,6 +609,10 @@ static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 
- 	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
- 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+	vcp->volume = vstate->vol_set;
-+
-+	if (vcp->volume_changed)
-+		vcp->volume_changed(vcp, vcp->volume);
- 
- 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
- 				 sizeof(struct vol_state),
-@@ -634,6 +653,10 @@ static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	vstate->mute = 0x00;
- 	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
- 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+	vcp->volume = vstate->vol_set;
-+
-+	if (vcp->volume_changed)
-+		vcp->volume_changed(vcp, vcp->volume);
- 
- 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
- 				 sizeof(struct vol_state),
-@@ -674,6 +697,10 @@ static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	vstate->mute = 0x00;
- 	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
- 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+	vcp->volume = vstate->vol_set;
-+
-+	if (vcp->volume_changed)
-+		vcp->volume_changed(vcp, vcp->volume);
- 
- 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
- 				 sizeof(struct vol_state),
-@@ -713,6 +740,10 @@ static uint8_t vcs_set_absolute_vol(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 
- 	vstate->vol_set = req->vol_set;
- 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+	vcp->volume = vstate->vol_set;
-+
-+	if (vcp->volume_changed)
-+		vcp->volume_changed(vcp, vcp->volume);
- 
- 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
- 				 sizeof(struct vol_state),
-@@ -2008,7 +2039,7 @@ uint8_t bt_vcp_get_volume(struct bt_vcp *vcp)
- 	return vcp->volume;
- }
- 
--bool bt_vcp_set_volume(struct bt_vcp *vcp, uint8_t volume)
-+bool bt_vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
- {
- 	struct bt_vcs_client_ab_vol req;
- 	uint16_t value_handle;
-@@ -2044,6 +2075,39 @@ bool bt_vcp_set_volume(struct bt_vcp *vcp, uint8_t volume)
- 	return true;
- }
- 
-+bool bt_vcp_set_volume_server(struct bt_vcp *vcp, uint8_t volume)
-+{
-+	struct bt_vcp_db *vdb = vcp_get_vdb(vcp);
-+	struct vol_state *vstate;
-+
-+	vcp->volume = volume;
-+
-+	if (!vdb) {
-+		DBG(vcp, "error: VDB not available");
-+		return false;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG(vcp, "error: VSTATE not available");
-+		return false;
-+	}
-+
-+	vstate->vol_set = vcp->volume;
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *) vstate,
-+			sizeof(struct vol_state), bt_vcp_get_att(vcp));
-+	return true;
-+}
-+
-+bool bt_vcp_set_volume(struct bt_vcp *vcp, uint8_t volume)
-+{
-+	if (vcp->client)
-+		return bt_vcp_set_volume_client(vcp, volume);
-+	else
-+		return bt_vcp_set_volume_server(vcp, volume);
-+}
-+
- static void vcp_voffset_state_notify(struct bt_vcp *vcp, uint16_t value_handle,
- 				const uint8_t *value, uint16_t length,
- 				void *user_data)
--- 
-2.34.1
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTI3MjI2CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQRU5ESU5HICAgMC4yMSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
+TkRJTkcgICAwLjIxIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDIwLjMwIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDE3LjkyIHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDM1
+LjIwIHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE1OS4z
+OCBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNS4wMCBz
+ZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyMC4wOSBzZWNv
+bmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICAxMy4zNCBzZWNvbmRz
+CkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBFTkRJTkcgICAwLjI1IHNlY29uZHMKU2Nh
+bkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDg2MS43MyBzZWNvbmRzCgpEZXRh
+aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVO
+RElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRs
+aW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1h
+a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvdmNwLmM6MjA0
+Mjo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9s
+dW1lX2NsaWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNDIgfCBib29s
+IGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9s
+dW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvdmNw
+LmM6MjA3ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9z
+ZXRfdm9sdW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNzgg
+fCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4
+X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxs
+IHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6
+ODY3Njogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtdmNwLmxvXSBFcnJvciAxCm1h
+a2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFr
+ZWZpbGU6NDY5MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
+ZXN0OiBNYWtlQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoK
+CnNyYy9zaGFyZWQvdmNwLmM6MjA0Mjo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24g
+Zm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xh
+cmF0aW9uc10KIDIwNDIgfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRf
+dmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+CnNyYy9zaGFyZWQvdmNwLmM6MjA3ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFy
+YXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5n
+LWRlY2xhcmF0aW9uc10KIDIwNzggfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1
+Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
+a2VbMV06ICoqKiBbTWFrZWZpbGU6ODQzMTogc3JjL3NoYXJlZC9saWJzaGFyZWRfZ2xpYl9sYS12
+Y3AubG9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZToxMjM0NDogY2hlY2tdIEVycm9yIDIK
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlM
+CkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKc3JjL3No
+YXJlZC92Y3AuYzoyMDQyOjY6IGVycm9yOiBubyBwcmV2aW91cyBkZWNsYXJhdGlvbiBmb3Ig4oCY
+YnRfdmNwX3NldF92b2x1bWVfY2xpZW504oCZIFstV2Vycm9yPW1pc3NpbmctZGVjbGFyYXRpb25z
+XQogMjA0MiB8IGJvb2wgYnRfdmNwX3NldF92b2x1bWVfY2xpZW50KHN0cnVjdCBidF92Y3AgKnZj
+cCwgdWludDhfdCB2b2x1bWUpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4K
+c3JjL3NoYXJlZC92Y3AuYzoyMDc4OjY6IGVycm9yOiBubyBwcmV2aW91cyBkZWNsYXJhdGlvbiBm
+b3Ig4oCYYnRfdmNwX3NldF92b2x1bWVfc2VydmVy4oCZIFstV2Vycm9yPW1pc3NpbmctZGVjbGFy
+YXRpb25zXQogMjA3OCB8IGJvb2wgYnRfdmNwX3NldF92b2x1bWVfc2VydmVyKHN0cnVjdCBidF92
+Y3AgKnZjcCwgdWludDhfdCB2b2x1bWUpCiAgICAgIHwgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTog
+KioqIFtNYWtlZmlsZTo4Njc2OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS12Y3Au
+bG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
+bWFrZTogKioqIFtNYWtlZmlsZToxMjM0NDogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNoIC0gRkFJTApEZXNjOiBSdW4gc21hdGNo
+IHRvb2wgd2l0aCBzb3VyY2UKT3V0cHV0OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdh
+cm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5j
+OjI3MjoyMzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFy
+ZWQvZ2F0dC1oZWxwZXJzLmM6NzY4OjMxOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkg
+aXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo4MzA6MzE6IHdhcm5pbmc6IFZhcmlh
+YmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjEzMjM6
+MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dh
+dHQtaGVscGVycy5jOjEzNTQ6MjM6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1
+c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2VydmVyLmM6Mjc4OjI1OiB3YXJuaW5nOiBWYXJpYWJsZSBs
+ZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LXNlcnZlci5jOjYxODoyNTogd2Fy
+bmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1zZXJ2
+ZXIuYzo3MTY6MjU6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMv
+c2hhcmVkL2JhcC5jOjI5NjoyNTogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJl
+cwpzcmMvc2hhcmVkL2JhcC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlOgouL3NyYy9zaGFyZWQv
+YXNjcy5oOjg4OjI1OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCnNyYy9z
+aGFyZWQvdmNwLmM6MjA0Mjo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKA
+mGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9u
+c10KIDIwNDIgfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRfdmNwICp2
+Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+CnNyYy9zaGFyZWQvdmNwLmM6MjA3ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24g
+Zm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xh
+cmF0aW9uc10KIDIwNzggfCBib29sIGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1Y3QgYnRf
+dmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06
+ICoqKiBbTWFrZWZpbGU6ODY3Njogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtdmNw
+LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY5MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBibHVlem1ha2VleHRlbGwgLSBGQUlMCkRlc2M6IEJ1aWxkIEJs
+dWV6IHdpdGggRXh0ZXJuYWwgRUxMCk91dHB1dDoKCnNyYy9zaGFyZWQvdmNwLmM6MjA0Mjo2OiBl
+cnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9sdW1lX2Ns
+aWVudOKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNDIgfCBib29sIGJ0X3Zj
+cF9zZXRfdm9sdW1lX2NsaWVudChzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9sdW1lKQog
+ICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvdmNwLmM6MjA3
+ODo2OiBlcnJvcjogbm8gcHJldmlvdXMgZGVjbGFyYXRpb24gZm9yIOKAmGJ0X3ZjcF9zZXRfdm9s
+dW1lX3NlcnZlcuKAmSBbLVdlcnJvcj1taXNzaW5nLWRlY2xhcmF0aW9uc10KIDIwNzggfCBib29s
+IGJ0X3ZjcF9zZXRfdm9sdW1lX3NlcnZlcihzdHJ1Y3QgYnRfdmNwICp2Y3AsIHVpbnQ4X3Qgdm9s
+dW1lKQogICAgICB8ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5p
+bmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODY3Njog
+c3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtdmNwLmxvXSBFcnJvciAxCm1ha2VbMV06
+ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6
+NDY5MzogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJ
+bmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpEZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRo
+ZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1
+ZXRvb3RoCgo=
 
+--===============2141329570822126841==--
