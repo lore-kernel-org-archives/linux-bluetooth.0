@@ -1,140 +1,224 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B8D170A0A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 04:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223A010E0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 05:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737520434; cv=none; b=MRsP+t+0rJqms3SCET3VquuluCaZbZ+Ko6iXVzdq84YZbVM450ZfuNfJOZqlVC8rwZqdUpzbcghLMfTqwxCZGg7SNlf14gK8Wmp+zUe5aQ/dlJHqOuz3FjZ6zbKUWw6tQjajkYHfHwnPFioxoRCRHTIooPuwFYZNFafels74t8Y=
+	t=1737523257; cv=none; b=WKDOgyR7NFKNAE0nsaupT4kM7jb88Xi5hkensT2fIRPHZFU7FVIMKBHR2NuTuXZcwckv3L0OSzkDW8LywcZ+yE6yDNg32aKVTN+YOsl/4nuD0MPwXiT0xjKp/5l2rFTkXoMwERcC7M4Ama2Ief+ObcXMQCp2OV8lcYR4G1hfWa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737520434; c=relaxed/simple;
-	bh=rO17zDrh1QENnYDvlr7+Z/8p+G7QidKB4C19f8EqmBo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gapi7XP/o2V5d0M1SmjLuW41AeAIBRKczxCd2t96N43Z2fU2UB7ay1xL742qYgn4feDb2isDwRAyF94SYNpdb5JgpcoXtKEPEtqLe3z8pUsJVynyRvYAu6BtM2fXwvQtxYRPUULIuFiuy9D0hkU2y4T27wSDoclYH9wniaptM24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MjeGdTY0; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1737523257; c=relaxed/simple;
+	bh=YhUqF6C+/xOQj2Y/ypEUT9skanylg7/3QRjlJh14Puo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=H9LDqERDAnrVC/TV2hPRCVyNrTE1mwgt79N+riaKsu5dEATBljHjQB3cCf5gw2p6kNsRDQaEWCOdAUkMkQ/7NMEnF9hZxBl4eMSYUe4UV84xaCMyPmnkblpiIaZrNED3Dx4/YmEEVsuMmqniwOyss7cPSfz/PYBlrAmSxJvGH0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ezljAe9Z; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjeGdTY0"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-467a6ecaa54so58179841cf.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 20:33:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ezljAe9Z"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21648ddd461so133589795ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2025 21:20:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737520431; x=1738125231; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ryAfxJg2jpEsnOV6LHJ70yeJOOKT7xx1PPSpUEXD7jw=;
-        b=MjeGdTY0ZATYaLq7H1sYqRsac59UciNPSJDK3G53CyBzf7QfnJXlxZYqS6ItFJ0gJZ
-         aDLNS5J74Ah64QWYgDjYsyKX0oxPP0y8IEvUHYcaiWNLEgubkhpgvGcnRFkFLD8CAkzs
-         MVnVuBu3bqyG1l+uo31bLIYdblJASAcbQAd23Is+/eMs/VPQhrYbROlGxZU3bewYl5bz
-         4J46gQsCTeCAspwz/fyA5h9bjpMJ1wI0FWxpZm08L983bd1wzKNIm4drmb0THqRKb/f/
-         +8uQsI1hfjsMoqvzJgfbhF1s+C7khqzk2WWgIGxwt7BkO+FO6cGQb6BFNtK81CjGWgut
-         k74Q==
+        d=google.com; s=20230601; t=1737523255; x=1738128055; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zpKj/vRFh/GcMVyUYHVbJYejAl25i2NKFWrMBBi6KOk=;
+        b=ezljAe9ZO/qdVhHyYbkcnOe0I+XVkiReXZYP97+MUZXycrwXooyOGiv27M50zpDmmp
+         03pydlyV4ETfuioUeRKuqgjLSfTF1m5cmaIxbaYDEInJ3JrJlC10ZbHn92NUn56+RH+X
+         F623HddXBYrKJcKKKMRnhANcljBfbD467VRCH3m8hKzqdMlKl8VN7QC2PbBekS+/Mi7e
+         HjTTa0gEwGUzjxPksSwgrbkU2eyv8OH6nOnh+G/PdPICdRVWvfrozHhysBFARaBMniTi
+         k1cdmv75wpTWW1OknXyVcFtHnQqyxl/5UsqOmCv70w+iohkGBYZibNrXJWOoTlqiWBpD
+         YFPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737520431; x=1738125231;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ryAfxJg2jpEsnOV6LHJ70yeJOOKT7xx1PPSpUEXD7jw=;
-        b=L/5TAR0etW0FYzD2XgMoqLMJRzJ0YJtEYSMA0apccUeclijUoqZPEfbgikYvEKN5pd
-         Bp56twkQLkTfGB8/NxK4T7rkn3OdUqYQdF02pOsnFHbB9/4zWydr/3/ADXYanuRuel71
-         7Ad5u7r5PCqM9LsiY8LPLqJSmjw9KIKiEQdpJV7HnY3CPiu/tSq9U8ZfkOqyk/p3T6OV
-         4go5fEz6OYy+vbsZ1El2f6YUz+0NCFfW6M5ohGQ5p96u6341vMMy4RbvQGaaVEOkKBlc
-         +Go0xBR6DTzEaJmuAPmfMeBneR8XPIeHB2ArMtw6DXroKNK2yjnJE9dz/aPxB8VNMHOr
-         HIEQ==
-X-Gm-Message-State: AOJu0YxhBM3kp5qd0vtfzLyHdLspmPPpvMpxN7ZGjY9SMzEcbK7ByOgd
-	1mPqWfNPohby3Ck0f0HMVn652B+al6+l6+YIKOuYtDi/0ye8r/cgq+B3NjI+
-X-Gm-Gg: ASbGncsgSxcRoRqJkLu3bPAc9sJMRpzQTLUEHLyAuljm29zV2Vwj667wv5tpj/rXqgh
-	lTbAC0w1Sy0avC5YNjYauQgoeEF9gMaliHq9fDgJYTD6mYYaSkzpFhUQLE5453LY+kwmvj3HNOk
-	Z7vgA4NY7Q/hxvt9z1aDIA/L6cB/z56oLq2bxrQUdyhIMFa/lnucd6C/Zasb5KwhDM8lXbT6gB8
-	91Dx9J2KRQ8EMJjexUUGkqC9JhPN5G66PDF6pQ+3+yYx/pf10dqsUSRCKMZREHfkyPbCQ8HE5g=
-X-Google-Smtp-Source: AGHT+IGNq2C7G2lzfm5jnvsu8TWhu9gaiRfiiCsHwdp6wPrjWJcK7xp61VpYOGizZqERVCExDgiesw==
-X-Received: by 2002:a05:6214:1c4e:b0:6d8:b189:5412 with SMTP id 6a1803df08f44-6e1b21bca37mr337734416d6.31.1737520431651;
-        Tue, 21 Jan 2025 20:33:51 -0800 (PST)
-Received: from [172.17.0.2] ([20.57.47.246])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afc22eadsm57711146d6.53.2025.01.21.20.33.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 20:33:51 -0800 (PST)
-Message-ID: <6790752f.0c0a0220.22960b.752e@mx.google.com>
-Date: Tue, 21 Jan 2025 20:33:51 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1289506809517166353=="
+        d=1e100.net; s=20230601; t=1737523255; x=1738128055;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zpKj/vRFh/GcMVyUYHVbJYejAl25i2NKFWrMBBi6KOk=;
+        b=fx4KOZLpEkzqojxs3KzqH6sTNnzAYQpnQzorKwn1YgcL9AM/cUk2X1/XBBbx4OVnGG
+         vh36jjYq3qBg7c2ITsx7jVYAzaYoas8ceimypSPXXStyUHPyxISGdKv4va0k2fZVbaVI
+         KrNHcIT56aiOLxWP1ZiXJDC3bqeBn4U1NTzQFVrfmDj9IyPmNXrtjQNLAMXYspMyzn/4
+         IuLAvdR3j8HD03ajqooZM6TUAtf4jscm/2qdH+N895VbPgHLBxD3/2M52kfQHV1f/s50
+         2eWyIDFCA+JoIiuVr+DV6sSN4+7+gusGwfq58Eg1Haf6vSwJOXZg4qPDiWY9UW1MhkV7
+         TgiA==
+X-Gm-Message-State: AOJu0YwTA6fZcmcq+3x/2BbXZcfh7fJf49wz21eVfyH+dOAI/5NIf4hW
+	xQBHfnBIZkt1tncXP/vo8dscV27z18ZOErzO77y5btMT3/nfm19I5UUcoY6p3rPtaaJIRZiL8zF
+	I41oAyWOpiif+8LDIUtMYFqIn1NHbs1A8Ug0Wqeimqz9qOFU1dvwp/XaPzTdaCROtDiWq0WE49R
+	ICrMGwBlS8es9PEeyvZ77uIJ6Uag55UJ/0+D27IqNZ0U6iTsPjvA==
+X-Google-Smtp-Source: AGHT+IH4xhaj9nNDf+i1lGfmdriydIO8H2hCafDs9TDl1139kXi+me1rarwesfsxsbaZvZMJbhDgOHfzv/FX
+X-Received: from pgbbe2.prod.google.com ([2002:a65:6e42:0:b0:9a1:7139:ff84])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e615:b0:1eb:3623:59fd
+ with SMTP id adf61e73a8af0-1eb36235ae1mr22932415637.4.1737523255341; Tue, 21
+ Jan 2025 21:20:55 -0800 (PST)
+Date: Wed, 22 Jan 2025 13:19:25 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
-Subject: RE: [v2] Bluetooth: btusb: Add 13 USB device IDs for Qualcomm WCN785x
-In-Reply-To: <20250121-qc_wos_btusb-v2-1-377b3dc2a706@quicinc.com>
-References: <20250121-qc_wos_btusb-v2-1-377b3dc2a706@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
+Message-ID: <20250122131925.v2.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+Subject: [PATCH v2 1/3] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+From: Hsin-chen Chuang <chharry@google.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc: chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---===============1289506809517166353==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Hsin-chen Chuang <chharry@chromium.org>
 
-This is automated email and please do not reply to this email!
+Use device group to avoid the racing. To reuse the group defined in
+hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
+read_usb_alt_setting which are only registered in btusb.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=927389
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.27 seconds
-GitLint                       PENDING   0.23 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      24.32 seconds
-CheckAllWarning               PASS      26.99 seconds
-CheckSparse                   PASS      30.08 seconds
-BuildKernel32                 PASS      24.44 seconds
-TestRunnerSetup               PASS      427.25 seconds
-TestRunner_l2cap-tester       PASS      20.32 seconds
-TestRunner_iso-tester         PASS      29.63 seconds
-TestRunner_bnep-tester        PASS      4.87 seconds
-TestRunner_mgmt-tester        FAIL      121.34 seconds
-TestRunner_rfcomm-tester      PASS      7.58 seconds
-TestRunner_sco-tester         PASS      9.41 seconds
-TestRunner_ioctl-tester       PASS      8.09 seconds
-TestRunner_mesh-tester        PASS      6.00 seconds
-TestRunner_smp-tester         PASS      6.97 seconds
-TestRunner_userchan-tester    PASS      5.04 seconds
-IncrementalBuild              PENDING   0.94 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.170 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
+(no changes since v1)
 
---===============1289506809517166353==--
+ drivers/bluetooth/btusb.c        | 42 ++++++++------------------------
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_sysfs.c        | 33 +++++++++++++++++++++++++
+ 3 files changed, 45 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 75a0f15819c4..bf210275e5b7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2221,6 +2221,13 @@ static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts)
+ 	return 0;
+ }
+ 
++static int btusb_read_alt_setting(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	return data->isoc_altsetting;
++}
++
+ static struct usb_host_interface *btusb_find_altsetting(struct btusb_data *data,
+ 							int alt)
+ {
+@@ -3650,32 +3657,6 @@ static const struct file_operations force_poll_sync_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
+-static ssize_t isoc_alt_show(struct device *dev,
+-			     struct device_attribute *attr,
+-			     char *buf)
+-{
+-	struct btusb_data *data = dev_get_drvdata(dev);
+-
+-	return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
+-}
+-
+-static ssize_t isoc_alt_store(struct device *dev,
+-			      struct device_attribute *attr,
+-			      const char *buf, size_t count)
+-{
+-	struct btusb_data *data = dev_get_drvdata(dev);
+-	int alt;
+-	int ret;
+-
+-	if (kstrtoint(buf, 10, &alt))
+-		return -EINVAL;
+-
+-	ret = btusb_switch_alt_setting(data->hdev, alt);
+-	return ret < 0 ? ret : count;
+-}
+-
+-static DEVICE_ATTR_RW(isoc_alt);
+-
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -4040,9 +4021,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		if (err < 0)
+ 			goto out_free_dev;
+ 
+-		err = device_create_file(&intf->dev, &dev_attr_isoc_alt);
+-		if (err)
+-			goto out_free_dev;
++		hdev->switch_usb_alt_setting = btusb_switch_alt_setting;
++		hdev->read_usb_alt_setting = btusb_read_alt_setting;
+ 	}
+ 
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+@@ -4089,10 +4069,8 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	hdev = data->hdev;
+ 	usb_set_intfdata(data->intf, NULL);
+ 
+-	if (data->isoc) {
+-		device_remove_file(&intf->dev, &dev_attr_isoc_alt);
++	if (data->isoc)
+ 		usb_set_intfdata(data->isoc, NULL);
+-	}
+ 
+ 	if (data->diag)
+ 		usb_set_intfdata(data->diag, NULL);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f756fac95488..5d3ec5ff5adb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -641,6 +641,8 @@ struct hci_dev {
+ 				     struct bt_codec *codec, __u8 *vnd_len,
+ 				     __u8 **vnd_data);
+ 	u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff *skb);
++	int (*switch_usb_alt_setting)(struct hci_dev *hdev, int new_alts);
++	int (*read_usb_alt_setting)(struct hci_dev *hdev);
+ };
+ 
+ #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 041ce9adc378..887aa1935b1e 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *dev, struct device_attribute *attr,
+ }
+ static DEVICE_ATTR_WO(reset);
+ 
++static ssize_t isoc_alt_show(struct device *dev,
++			     struct device_attribute *attr,
++			     char *buf)
++{
++	struct hci_dev *hdev = to_hci_dev(dev);
++
++	if (hdev->read_usb_alt_setting)
++		return sysfs_emit(buf, "%d\n", hdev->read_usb_alt_setting(hdev));
++
++	return -ENODEV;
++}
++
++static ssize_t isoc_alt_store(struct device *dev,
++			      struct device_attribute *attr,
++			      const char *buf, size_t count)
++{
++	struct hci_dev *hdev = to_hci_dev(dev);
++	int alt;
++	int ret;
++
++	if (kstrtoint(buf, 10, &alt))
++		return -EINVAL;
++
++	if (hdev->switch_usb_alt_setting) {
++		ret = hdev->switch_usb_alt_setting(hdev, alt);
++		return ret < 0 ? ret : count;
++	}
++
++	return -ENODEV;
++}
++static DEVICE_ATTR_RW(isoc_alt);
++
+ static struct attribute *bt_host_attrs[] = {
+ 	&dev_attr_reset.attr,
++	&dev_attr_isoc_alt.attr,
+ 	NULL,
+ };
+ ATTRIBUTE_GROUPS(bt_host);
+-- 
+2.48.1.262.g85cc9f2d1e-goog
+
