@@ -1,70 +1,65 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB5F1B3948
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 21:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCBD1B6CE0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 21:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737580498; cv=none; b=BsxEXqMgnFUy3TmEVt1kgq7h+q3vynSCWyU5PKNgc8I4a9Ty6t975Rhy/CfJyc9fCuYlqMc6ohkO5abPwP3jm2fpuwghsWmFCRlXauzn4lrtzcOnNEAxVeX5LyB3G9Br7pjZVUb5ee9LzWRtQv4k2pMVl7uNekfwMHR4bwh+v6g=
+	t=1737581121; cv=none; b=AMRKmkh0Qt1nLto464rtU5zLsACptvEVddpLye46x7uJ2JRSS3S3BpPwtS3WQJxr63pgf1Xh43hOw6TZ8wlHGU/d5wqo4+ObfrFWI3ca25R78MjI8Tb30TnoXVOFYMeO7mkSidErfyd8W2RYmHoYkjjMyI2+XWAw93kMWrYP6ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737580498; c=relaxed/simple;
-	bh=Zyfn5jv0yUp4+mwXcwxOQyi+UcxZTxXUPMr+s9qeh6I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LTrEBgu9VZaYxSJlfbBqQXr58Q0FacPpJOEYqYN5XH2tZyqoNP/FyaugrkuVY0ZpgnsOdlCfNdLaAFJ+jVRa5RYs3xqKgoCiLdMfNLyKfW09lVzaJ3ikUNueYTK++0GWOdCCGsKxct5ERcbNf8UJfeJTisc/MNUAw22bALQ5DIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NmS1V/Hi; arc=none smtp.client-ip=209.85.222.45
+	s=arc-20240116; t=1737581121; c=relaxed/simple;
+	bh=SsTdFK0coFir2J98JyRTdLKuk77tkiQnuIzsLtPrVIY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=VJSNgAdOwrR2DsBAmHfON1o14w9ok+Ywa0rCl30RkLK8Gyq7UrVG4htLqDiUgOLhwPglXjJmyPg52L7VgkZKjZEMnCAgDl23NZ5nBGgnfoaYEd+sIwqVZP51dwJnywYtN+h5BxnfBMlkvae7yOpof9dOYcQCnBwp0NTkkco5Iyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QLoofAsK; arc=none smtp.client-ip=209.85.222.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NmS1V/Hi"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-85ba92b3acfso97748241.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 13:14:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLoofAsK"
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-85c4d855fafso53090241.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 13:25:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737580494; x=1738185294; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PvSlDHMO9b366TEvAtz8uAV4nGTzzKAQx1FybK7hu+k=;
-        b=NmS1V/HiXtqCP7aRgncZJ3FoPlsqKXmj2LoTQDjQ6miYWGUwH7xtjzfxr6uT5oWPTe
-         EfHecJvYv1iBVrZW6uspzs6dfM7U9S0ell8bkJl+g8+icRqppV1OV1WJ5ahegIA4vGQ9
-         lNxqB2ge6TWO+y3YgcIge8jHp8XFizwDr6wi2A2ZuhbmyJjVNUc4XGju2KghInGEHNJf
-         QjRZacV+koMRAWG+xMt9v5f3mBuhP3KKV0zUBUGuBvu/95bc1FLiZpv/opPj5FQZ3lbh
-         K9wGtCUrJbPpjZ+BelIzgXkzp5lbXx1mcAg2RHXb829k2Fj5Bja1wTMjV4WEG/7msGGj
-         aGvg==
+        d=gmail.com; s=20230601; t=1737581117; x=1738185917; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=piMvb575ojhM3TN0/6uwo2lfJPy1mTnbFERpR3FXtKA=;
+        b=QLoofAsKLIG8JSw0GnXpnrWbRqGPuFco1LJ9pL4TXVTBVmMJS8KIjtTOg2oBWthETt
+         vsYSYoNNSNs1pPCl+K7pNRXoqEXqZOZN2FVAFI1Pf+/UzRjM8sgFPCieZOKifRMCLw9S
+         auu2p4cQG/9jQrJlldicH/96UVy3SijafzdHD1+kVSIMAJOq/EIFQ0g4y3UvbCDCXOIy
+         v5F5JWlIgdOX3TZvIrSLL8SsrFhxfibiFSEJoZfPAlWwbMvRu8E5u3OMorKN+a3m9ZCV
+         1pON+mZyhLIKUK/g6hPktxWuIL+RwmyN7+8oDA5bCmiU/iIPqHcgdQC0Pf3u1+bLEJDg
+         A2dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737580494; x=1738185294;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PvSlDHMO9b366TEvAtz8uAV4nGTzzKAQx1FybK7hu+k=;
-        b=BRPLU1onZoAQvwodA43iMFYqzZFhp4bchTIFNGZueAHAxSaBkTfgXitkRMq9xOssDU
-         XjTgj+qhEI6oH9aP3O4Hb22TlXf/0akpCm/ZVuQx9wqBXu7AhmNO9LOgoqMQeSG8aT2s
-         xeF45grugrR9uV8yqBUEAsbNnJwD7bbLB9YSktIijrhJt5wjoduL9Rg0uXdZRqf5KnX8
-         iVBriEOyqcjoaDF+gsRV2D+HDQeUrT3FFMMQlZOLaWj4XqJZZ/FaVHWmYYBe0Bp4vlrU
-         50CTLP79qzqWkWuTl8me0L0X/ztQnR/s+7v2NIvjgQNSzceIxujPYPvCkEupLpyhj1Sx
-         vuBQ==
-X-Gm-Message-State: AOJu0YxRpmoEN7YYSH6lnhEQLTAqq7pbnPjqga0eoXiERcgECrc6F6U8
-	WA3N50mtyuVwrJhgvWGO/u8gk4AjvhR1f70xXvzCB9mmn9kHnCmFcPQyJ+g6
-X-Gm-Gg: ASbGncuJIE5fFpdeGX5wvrv5bN5U1/QhRvBygMhsVD8IZPglYNfmWHRD818Y2KfeXhf
-	YWtbgo6UoC7IfZ4wwPm4dNEy+PRrp8hCJf31nkMfCCPzfQ2YoN+vcPB/k0TD6gMdshX55m28NwU
-	noHIE1oajyPYUgdnKKs3U/H4Agst6qrD93kWShk4HEv5H9BramD54CNQiowD0sPo8W+bo9A6Jqe
-	2zfYCSRQrpnhoTKH3tMi+TMCg8725k9zHYyOQJ5YK9vqW3OLDiZrYLNoUVggdOOuIPb8kzzsTjE
-	UdHTiMDeMiYzElmFZbZIAKuW+nCTvdtBcRP9d/v6Mw==
-X-Google-Smtp-Source: AGHT+IEC1W0xFUIPVRoZ604ltgoelZBJSoAxq5vGTO6JcA/Lm5bB6y9+jfPie+AVvso6KRy6tjR4cA==
-X-Received: by 2002:a05:6102:3f41:b0:4b2:5ca3:f82a with SMTP id ada2fe7eead31-4b690bb6273mr20769431137.7.1737580493401;
-        Wed, 22 Jan 2025 13:14:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737581117; x=1738185917;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=piMvb575ojhM3TN0/6uwo2lfJPy1mTnbFERpR3FXtKA=;
+        b=M8Tl9YXaYiU039+ZDnWvA1IKNUJ2ACBsuXO74X+0evqejDQlE+e7QanxjukOeXRWLB
+         OTY9H1f5dT8iPUsAqkDK+9euhNCWhvVcEv6I8ijYzMUOxXzCovuRzc/Fwq4+NPfhkLvK
+         k7LDkbKYu3Yh2gzfP7QmkwdwDUFH1XBKgotpDpNd3RJTGuaVmYkbe3O9YCO6R5Nnpe+1
+         mqP4OkW6ixyHWYHcWfQcI3lj4DnzyohoiWlQXCd3w2rKxoep6xfYSVJ9InCALtk5VcXT
+         BAkeAXu4r9XcUpbszasg8DmWPdRR+rCKGFAzb1gq+3pMiqkAV7ulnGk80ZLRbnVowbWi
+         5Btw==
+X-Gm-Message-State: AOJu0YxWITA8nRA1llX2iHU+JVYoPPLpgrc3iHvRUrIqTeB914NVQxCN
+	0sE6UXAUwE7K8CxBUZ5AK08jh+7Vik6VjS/e0h6nAM5pWF1/yjGdqLak9xhj
+X-Gm-Gg: ASbGncsOXFxY16AhC8e1OD/562QgCnpO9uAZIWrUdHZogwCvhtcFIcu2LLcVbaFX+ar
+	At1JD7A7gcmwzRJpwCHa5eNZHziPL9tNWWOo/he6T50C5K7Fhdy7E5vgf7aOYrnvLao8JbcNrJZ
+	kEZgSW124AbiG4+gxCzlZ6EW18zCqR7RFHNaYX7LbSDfMnVj304m7nm/HAC6Tajw7Pg5KMOy6oq
+	YKYw4soVcg+pW/7YamYUm/JJe92HNxOrJHZiBnMM20MMuqtYHgj18IGRyWI8Pn715Zzhikb7yDZ
+	ct+7mdoDbAQGzWEic99k2Y0uR5LkUuU9xuKlJsMgCA==
+X-Google-Smtp-Source: AGHT+IHI2u/g2hHN9mMtFtnnDKhtKGwCzWJGMSBLWUPLr3C85ajSivB3360KEg+IYHG4jhaZJeMRNQ==
+X-Received: by 2002:a05:6102:162b:b0:4b2:75a3:2267 with SMTP id ada2fe7eead31-4b690bb50f1mr18489548137.10.1737581117619;
+        Wed, 22 Jan 2025 13:25:17 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b68a21dae2sm2840665137.13.2025.01.22.13.14.50
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b68a207ddasm3068851137.7.2025.01.22.13.25.14
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 13:14:51 -0800 (PST)
+        Wed, 22 Jan 2025 13:25:16 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/2] vcp: Fix using scaled values for volume
-Date: Wed, 22 Jan 2025 16:14:46 -0500
-Message-ID: <20250122211446.142626-2-luiz.dentz@gmail.com>
+Subject: [PATCH v6] Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
+Date: Wed, 22 Jan 2025 16:25:14 -0500
+Message-ID: <20250122212514.164262-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250122211446.142626-1-luiz.dentz@gmail.com>
-References: <20250122211446.142626-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,142 +70,189 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes the volume range 0-255 as per VCP spec rather than scaling it
-to fit 0-127.
----
- profiles/audio/transport.c | 14 +++++++-------
- profiles/audio/vcp.c       | 23 +++++------------------
- profiles/audio/vcp.h       |  4 ++--
- 3 files changed, 14 insertions(+), 27 deletions(-)
+After the hci sync command releases l2cap_conn, the hci receive data work
+queue references the released l2cap_conn when sending to the upper layer.
+Add hci dev lock to the hci receive data work queue to synchronize the two.
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index eff95a7c2655..4635c978bd80 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -126,8 +126,8 @@ struct media_transport_ops {
- 	void (*set_state)(struct media_transport *transport,
- 				transport_state_t state);
- 	void *(*get_stream)(struct media_transport *transport);
--	int8_t (*get_volume)(struct media_transport *transport);
--	int (*set_volume)(struct media_transport *transport, int8_t level);
-+	uint8_t (*get_volume)(struct media_transport *transport);
-+	int (*set_volume)(struct media_transport *transport, uint8_t level);
- 	int (*set_delay)(struct media_transport *transport, uint16_t delay);
- 	void (*update_links)(const struct media_transport *transport);
- 	GDestroyNotify destroy;
-@@ -616,7 +616,7 @@ static void transport_a2dp_remove_owner(struct media_transport *transport,
- 	a2dp->cancel_resume = FALSE;
+[1]
+BUG: KASAN: slab-use-after-free in l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
+Read of size 8 at addr ffff8880271a4000 by task kworker/u9:2/5837
+
+CPU: 0 UID: 0 PID: 5837 Comm: kworker/u9:2 Not tainted 6.13.0-rc5-syzkaller-00163-gab75170520d4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: hci1 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:489
+ kasan_report+0x143/0x180 mm/kasan/report.c:602
+ l2cap_build_cmd net/bluetooth/l2cap_core.c:2964 [inline]
+ l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
+ l2cap_sig_send_rej net/bluetooth/l2cap_core.c:5502 [inline]
+ l2cap_sig_channel net/bluetooth/l2cap_core.c:5538 [inline]
+ l2cap_recv_frame+0x221f/0x10db0 net/bluetooth/l2cap_core.c:6817
+ hci_acldata_packet net/bluetooth/hci_core.c:3797 [inline]
+ hci_rx_work+0x508/0xdb0 net/bluetooth/hci_core.c:4040
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Allocated by task 5837:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
+ kasan_kmalloc include/linux/kasan.h:260 [inline]
+ __kmalloc_cache_noprof+0x243/0x390 mm/slub.c:4329
+ kmalloc_noprof include/linux/slab.h:901 [inline]
+ kzalloc_noprof include/linux/slab.h:1037 [inline]
+ l2cap_conn_add+0xa9/0x8e0 net/bluetooth/l2cap_core.c:6860
+ l2cap_connect_cfm+0x115/0x1090 net/bluetooth/l2cap_core.c:7239
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
+ hci_remote_features_evt+0x68e/0xac0 net/bluetooth/hci_event.c:3726
+ hci_event_func net/bluetooth/hci_event.c:7473 [inline]
+ hci_event_packet+0xac2/0x1540 net/bluetooth/hci_event.c:7525
+ hci_rx_work+0x3f3/0xdb0 net/bluetooth/hci_core.c:4035
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Freed by task 54:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2353 [inline]
+ slab_free mm/slub.c:4613 [inline]
+ kfree+0x196/0x430 mm/slub.c:4761
+ l2cap_connect_cfm+0xcc/0x1090 net/bluetooth/l2cap_core.c:7235
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
+ hci_conn_failed+0x287/0x400 net/bluetooth/hci_conn.c:1266
+ hci_abort_conn_sync+0x56c/0x11f0 net/bluetooth/hci_sync.c:5603
+ hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Reported-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=31c2f641b850a348a734
+Tested-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 39 +++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 27b4c4a2ba1f..adb8c33ac595 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -948,6 +948,16 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
+ 	return id;
  }
  
--static int8_t transport_a2dp_get_volume(struct media_transport *transport)
-+static uint8_t transport_a2dp_get_volume(struct media_transport *transport)
++static void l2cap_send_acl(struct l2cap_conn *conn, struct sk_buff *skb,
++			   u8 flags)
++{
++	/* Check if the hcon still valid before attempting to send */
++	if (hci_conn_valid(conn->hcon->hdev, conn->hcon))
++		hci_send_acl(conn->hchan, skb, flags);
++	else
++		kfree_skb(skb);
++}
++
+ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
+ 			   void *data)
  {
- 	struct a2dp_transport *a2dp = transport->data;
- 	return a2dp->volume;
-@@ -624,7 +624,7 @@ static int8_t transport_a2dp_get_volume(struct media_transport *transport)
+@@ -970,7 +980,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
+ 	bt_cb(skb)->force_active = BT_POWER_FORCE_ACTIVE_ON;
+ 	skb->priority = HCI_PRIO_MAX;
  
- #ifdef HAVE_AVRCP
- static int transport_a2dp_src_set_volume(struct media_transport *transport,
--					int8_t level)
-+					uint8_t level)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 
-@@ -635,7 +635,7 @@ static int transport_a2dp_src_set_volume(struct media_transport *transport,
+-	hci_send_acl(conn->hchan, skb, flags);
++	l2cap_send_acl(conn, skb, flags);
  }
  
- static int transport_a2dp_snk_set_volume(struct media_transport *transport,
--					int8_t level)
-+					uint8_t level)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 	bool notify;
-@@ -2190,13 +2190,13 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
- 	bap_update_links(transport);
- }
+ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+@@ -1792,13 +1802,10 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
  
--static int8_t transport_bap_get_volume(struct media_transport *transport)
-+static uint8_t transport_bap_get_volume(struct media_transport *transport)
- {
- 	return bt_audio_vcp_get_volume(transport->device);
- }
+ 	mutex_unlock(&conn->chan_lock);
  
- static int transport_bap_set_volume(struct media_transport *transport,
--								int8_t volume)
-+								uint8_t volume)
- {
- 	return bt_audio_vcp_set_volume(transport->device, volume) ? 0 : -EIO;
- }
-diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-index 608496a003b6..423210b4af3b 100644
---- a/profiles/audio/vcp.c
-+++ b/profiles/audio/vcp.c
-@@ -103,25 +103,12 @@ static bool match_data(const void *data, const void *match_data)
- 	return vdata->vcp == vcp;
- }
- 
--static int8_t scale_volume(uint8_t volume)
--{
--	/* Convert 0-255 to 0-127. */
--	return volume / 2;
--}
+-	hci_chan_del(conn->hchan);
 -
--static uint8_t unscale_volume(int8_t volume)
--{
--	/* Convert 0-127 to 0-255. */
--	return volume * 2;
--}
--
- static void vcp_volume_changed(struct bt_vcp *vcp, uint8_t volume)
- {
- 	struct vcp_data *data = queue_find(sessions, match_data, vcp);
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+ 		cancel_delayed_work_sync(&conn->info_timer);
  
- 	if (data)
--		media_transport_update_device_volume(data->device,
--						      scale_volume(volume));
-+		media_transport_update_device_volume(data->device, volume);
+ 	hcon->l2cap_data = NULL;
+-	conn->hchan = NULL;
+ 	l2cap_conn_put(conn);
  }
  
- static void vcp_data_add(struct vcp_data *data)
-@@ -179,22 +166,22 @@ static void vcp_data_remove(struct vcp_data *data)
+@@ -1806,6 +1813,7 @@ static void l2cap_conn_free(struct kref *ref)
+ {
+ 	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
+ 
++	hci_chan_del(conn->hchan);
+ 	hci_conn_put(conn->hcon);
+ 	kfree(conn);
+ }
+@@ -7466,14 +7474,33 @@ static void l2cap_recv_reset(struct l2cap_conn *conn)
+ 	conn->rx_len = 0;
+ }
+ 
++static struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
++{
++	BT_DBG("conn %p orig refcnt %u", c, kref_read(&c->ref));
++
++	if (!kref_get_unless_zero(&c->ref))
++		return NULL;
++
++	return c;
++}
++
+ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ {
+-	struct l2cap_conn *conn = hcon->l2cap_data;
++	struct l2cap_conn *conn;
+ 	int len;
+ 
++	/* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
++	hci_dev_lock(hcon->hdev);
++
++	conn = hcon->l2cap_data;
++
+ 	if (!conn)
+ 		conn = l2cap_conn_add(hcon);
+ 
++	conn = l2cap_conn_hold_unless_zero(conn);
++
++	hci_dev_unlock(hcon->hdev);
++
+ 	if (!conn)
+ 		goto drop;
+ 
+@@ -7565,6 +7592,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 		break;
  	}
+ 
++	l2cap_conn_put(conn);
++
+ drop:
+ 	kfree_skb(skb);
  }
- 
--int8_t bt_audio_vcp_get_volume(struct btd_device *device)
-+uint8_t bt_audio_vcp_get_volume(struct btd_device *device)
- {
- 	struct vcp_data *data = queue_find(sessions, match_device, device);
- 
- 	if (data)
--		return scale_volume(bt_vcp_get_volume(data->vcp));
-+		return bt_vcp_get_volume(data->vcp);
- 
- 	return 0;
- }
- 
--bool bt_audio_vcp_set_volume(struct btd_device *device, int8_t volume)
-+bool bt_audio_vcp_set_volume(struct btd_device *device, uint8_t volume)
- {
- 	struct vcp_data *data = queue_find(sessions, match_device, device);
- 
- 	if (data)
--		return bt_vcp_set_volume(data->vcp, unscale_volume(volume));
-+		return bt_vcp_set_volume(data->vcp, volume);
- 
- 	return FALSE;
- }
-diff --git a/profiles/audio/vcp.h b/profiles/audio/vcp.h
-index f313cd96a5fc..cf7935d1a4ea 100644
---- a/profiles/audio/vcp.h
-+++ b/profiles/audio/vcp.h
-@@ -8,5 +8,5 @@
-  *
-  */
- 
--int8_t bt_audio_vcp_get_volume(struct btd_device *device);
--bool bt_audio_vcp_set_volume(struct btd_device *device, int8_t volume);
-+uint8_t bt_audio_vcp_get_volume(struct btd_device *device);
-+bool bt_audio_vcp_set_volume(struct btd_device *device, uint8_t volume);
 -- 
 2.48.1
 
