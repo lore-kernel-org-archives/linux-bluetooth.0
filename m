@@ -1,254 +1,340 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DFD215769
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 19:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CEB6215F44
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 20:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737575857; cv=none; b=h/xt+XMPLp90URpRDdETuCRhN3c7Fh4j8LIgvIibhPWUgbTiJWUMBg9ZD0LMbK4s5Z5M0MRhtZ+VJGGJ4V1lNfTBCKGyZOq5V3pBfpiTBlyLuOb6UZu/p3qPJ5CIB3AEOdNaFT+QZv/UlrJDf/SIqQWLt+tdJGriG6y4JL2vXII=
+	t=1737576864; cv=none; b=lrzVXmXjhiDbmnWnC5hqkeS96Y8NeQLzkYC9WxarxpCxomi+5ZDl9a+IbMsLCJ2AcmlpY+VvtRjytXlbfHUYEzAc15acjY23zXDwud1GfAHxgdWTqdjpVLavWtk1NjNbGlTaKC30zQcnP8JtLEVF8oEtxRN9AHnOa0VVxE4Okl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737575857; c=relaxed/simple;
-	bh=1VrYE63pR+b8JA0MrKvI7B0K5YSgqev+bGegbi+D76Q=;
+	s=arc-20240116; t=1737576864; c=relaxed/simple;
+	bh=heKOZduncDrivxmnxoATbyBfoQAk4NQObYIZttpxHtE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lVFaL0M9l7g3WdWJ935VZGnWicH68zde7jkPNFF7Mj0+SREIqHYePvjyNfKRH3RbOdT4w4VGQvdNGXIvw9487Tpib7BPiXoBaQIHTDPjTMqog20CqWy4K3xkQb135sT+IEwwugy7TqjhsyVvoDzSDJ1qDKyNqx9Foc7WzNY1FDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLzuP7tX; arc=none smtp.client-ip=209.85.208.173
+	 To:Cc:Content-Type; b=X7CgtIgj7RgeeJ3D0GYvIGPzhDDKPJ0ujZRHRvp7sKttFZFqVAFyU+EbfkcNeLzBErZKDQLs/NgewE3ujkf3cC04P45rIs7/IBDYLBUVeFWAFWNQTNRFk+jjVicCT6s6Nhcv0Vs9N23G5Zt0Nshe5PIxcxbgrEe7wuh5eNA5iGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IZuYrjoM; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLzuP7tX"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-3002c324e7eso627921fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 11:57:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZuYrjoM"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-3076262bfc6so966421fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 12:14:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737575853; x=1738180653; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737576860; x=1738181660; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w6zYMcaS8i502LCk96rNNil09spb3Inog0Ko3CIM0zQ=;
-        b=XLzuP7tXZCDzi64SGAvFH1RFloZ7wqCscpudyQgEJXyM98xu9pN3uIrowFwdPyDsB0
-         ikpWJySKou2POSlAIRVhUiTZT3CZGqoeebGyR1l2S4VKHRzT91O0jUR4zm1A7f7NkS8E
-         raABtfnkszabJBHA8Gfao9u8wMXxiDaYaXpzf/RBncKOPrBjNmk2JPoXWJgRJ19Ddtrs
-         NfanW3QLVVEj1lfP3p64r6NAkuWLcq1pRy3d6q1MqcXX8qADj9N4+caI+CrNAfSv+KEM
-         aCrwZ2M7+EIhEpVqTarBi6rFQseCLkhlheZYPxgJv4zfIde++HUo/BKd0wVsf95Sp9gQ
-         wEVw==
+        bh=YdbOtzT1Ri3+z78zvSKjm2PGpGJCle4DMkCtr6BSEmE=;
+        b=IZuYrjoMSIrUvlUsW0l67Xktz5xuObLmzCq/k0PchuPOGzrQtPpgRvF6j6OWb4+ORV
+         XQFdpcqN5eyXWWAkNPAws8MNuplzmhsvrcYvM+Fe3wnERQOc/vjBUERrC7cntQ8oJDxD
+         AQbkP0wiMALl+WMwzxMNnCjTzygPaReKyhegTsjx8JZ3JNsfvyBQbzRM0xkzH4J01Jab
+         XcV0eoz8SYNm+sb8p55xlpF00fq0uvs/yeeI6deKb8ZbzsBc6iSx8gCE5nKutbtlUIjq
+         Zjr/WgDcQjxKmbpkWc4ymBaKoObs1b905j4KxEEHykvWR+H/FoC6Qu/MVGuBdhF1nCIj
+         BPlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737575853; x=1738180653;
+        d=1e100.net; s=20230601; t=1737576860; x=1738181660;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w6zYMcaS8i502LCk96rNNil09spb3Inog0Ko3CIM0zQ=;
-        b=HUzVa1ZYD9ab99r1FBg+xREUWp7CB8vUJWl8giI3zFy+gLiAQ4QQLRd5OaUsHtuBju
-         AyFK44eEM1coZasDxWasndXBiutNj9FcM0hy0WqpCJjl0foPFBbOXUt0GgSe7KHWnh/5
-         o3YdwcLhOh7oHhz4Lg1RIGPc6fyGzEEcBCo5emV+9Up2E0EhOBiIWdZqVKTjBnj/rYz1
-         UUeQN7eBsdHX6Z9hAgnekz+zovMvVfwSi8sEKYd62ulUvAEle8IWPOcT06aT10pbjoo1
-         LmWXSXAtH0GICKQX0a+jJ7Sg1KjkjAGkA51k/hu1hr2lUbBVQerEFdaKT+wq/b53TVIS
-         Fhsw==
-X-Gm-Message-State: AOJu0Yy8e55iD5T7Ptqi3gGfutMfAl5BrBd39QIKxB37gx2cXc+i2UKk
-	/Eehnjj+hbvnZrNbj7J+N3j+EMOZiRXpLjX5US2eaA0bv3SK1tA0Kb+qd6AqZa/TxXSDCBxKeys
-	GkbuXGKPfVxLBbuFgCBRmwW6uDJ3y23Kd3g0=
-X-Gm-Gg: ASbGncsoZA+RyzJvg86CkQo+oBJ3m+iw0VN3QDTkqpai6KEOehyjnd7zbdY+dQtRq7e
-	+plcO9hjpZJ1k4btvHJ+Xzw+PeYI7Uxo37GStp27CIdYRWw6NKaff
-X-Google-Smtp-Source: AGHT+IFCVARL0z0+oCMW1cK5k7FOmG3gU42b327LC674jJnNUiiksNyIqAwjNQswc+8AiFHRxg6w0xw006ien9+usKM=
-X-Received: by 2002:a05:651c:11cf:b0:300:360b:bc3f with SMTP id
- 38308e7fff4ca-3072ca69448mr59559851fa.15.1737575853095; Wed, 22 Jan 2025
- 11:57:33 -0800 (PST)
+        bh=YdbOtzT1Ri3+z78zvSKjm2PGpGJCle4DMkCtr6BSEmE=;
+        b=Rdw9gUo0nWXVWwZlW/mpdgBKc1vJTJ0XGQ2h5UbxwCz2DIM1YFeoilivSrLvQ1eY+W
+         cR/MoqHhTFImdROg8OWYpAbtLUoEXHwIViW3Z8pIWz9ini8ZhWEutOGUBo5NXqgEGVBV
+         WFUVlyW2iJ/RD8efEKEuoBkyzt3AgMspJP2Dux3smHotO0sfSHm/4+P671lskBzhiyCM
+         YfO12SCfLEupRbyPXTQfJSTz89rCg0YSQ6gfAn2p7O00IUcM322rqnoO9uUxtk4+aexd
+         sHopR+pJ2ln7sSTQoo5CeDlrWZx6k7AadkUpxr+//pU7WJ6bb8ZgsDozE9P5vhJyYmyt
+         NrCQ==
+X-Gm-Message-State: AOJu0YzxH5Xw+5krSZUZIaPPf9UixRdVNCNEuoZmzBhmw7BrX9BQu9eE
+	JXPnbEHhQ1XMtA+jdIMBAWHGsBcrbks1YT2dIcx20HiT4SrWJ49BAQTMeNNVOBoCKDO/Rte02xa
+	JPks/b/NHqxkV6hxjoys/dLkdpgCC/DL5
+X-Gm-Gg: ASbGncuR98ACT12Gq+MznwJvGxNADdkEQZA+iRS+IRX+iE++ynVDInnD6gR/sPjY8j5
+	8vCSenf7KCI+Fblc6Zu+7UDTc1d8VjTP9I6FW+5CDHkZ30nlPC+I/
+X-Google-Smtp-Source: AGHT+IHQPMwuxwhn0JVTOqBgO7RQgklRu18q8fFjSSKmPyeZSabu5eqBg5N22it56OsH+YVHaGkUBEVzp3/M9jBKIW0=
+X-Received: by 2002:a05:651c:19a8:b0:306:1500:3ec1 with SMTP id
+ 38308e7fff4ca-3072ca9cd5amr92171121fa.21.1737576859969; Wed, 22 Jan 2025
+ 12:14:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250122113256.1107629-1-hadess@hadess.net> <20250122113256.1107629-3-hadess@hadess.net>
-In-Reply-To: <20250122113256.1107629-3-hadess@hadess.net>
+References: <20250121144404.4087658-1-michal.dzik@streamunlimited.com> <20250121144404.4087658-3-michal.dzik@streamunlimited.com>
+In-Reply-To: <20250121144404.4087658-3-michal.dzik@streamunlimited.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 22 Jan 2025 14:57:21 -0500
-X-Gm-Features: AbW1kvYcGSpHpUt4NwqL3ZAOwlVmggV7_lhnvxAH5MJDpP6oc-wLEj8HBfMjv5c
-Message-ID: <CABBYNZLP-n25ZYVvJz2E8+kbkS5ah23tqZmeVkYLwt1xCAWamA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 2/2] device: Better "Connect" debug
-To: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 22 Jan 2025 15:14:06 -0500
+X-Gm-Features: AbW1kvaOgxAumFBnNtEqWWkRHhs4s3uUKtyDcXg3O62puT-rh4J2Y1dqWX5Pu4E
+Message-ID: <CABBYNZJJ08oyKJRk4az+d+1Sv4L0r08LJCy_g4jj6AmPFP1d1Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 2/5] audio: connect VCP profile client to MediaTransport
+To: Michal Dzik <michal.dzik@streamunlimited.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Bastien,
+Hi Michal,
 
-On Wed, Jan 22, 2025 at 6:33=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
-wrote:
+On Tue, Jan 21, 2025 at 9:44=E2=80=AFAM Michal Dzik
+<michal.dzik@streamunlimited.com> wrote:
 >
-> Output clearer debug information so that it's possible to follow the
-> decisions made by the bluetoothd daemon when a client such as
-> bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
-> device.
+> It is now possible to control absolute volume of remote volume renderer
+> device via dbus and also get notifications if the volume changes.
 > ---
->  client/error.c |  1 +
->  client/main.c  |  5 +++--
->  src/device.c   | 36 +++++++++++++++++++++++++++++-------
->  3 files changed, 33 insertions(+), 9 deletions(-)
+>  Makefile.plugins           |  2 +-
+>  profiles/audio/transport.c | 37 +++++++++++++++++++------
+>  profiles/audio/vcp.c       | 57 ++++++++++++++++++++++++++++++++++++--
+>  profiles/audio/vcp.h       | 12 ++++++++
+>  4 files changed, 95 insertions(+), 13 deletions(-)
+>  create mode 100644 profiles/audio/vcp.h
 >
-> diff --git a/client/error.c b/client/error.c
-> index 975e4030dfc0..aa8a058cce98 100644
-> --- a/client/error.c
-> +++ b/client/error.c
-> @@ -19,6 +19,7 @@ struct {
->         { "br-connection-profile-unavailable", "Exhausted the list of BR/=
-EDR profiles to connect to" },
->         { "br-connection-busy", "Cannot connect, connection busy" },
->         { "br-connection-adapter-not-powered", "Cannot connect, adapter i=
-s not powered" },
-> +       { "br-connection-page-timeout", "Device is unpowered or not in ra=
-nge" },
-
-Not really following why do you want to translate the error message in
-bluetoothctl and not directly on bluetoothd side? Well perhaps there
-could be application expecting these strings to be sort of errors code
-really, in that case perhaps this is valid but I'd rather have it
-output both error.message and its description, but I would begin by
-defining them in the documentation:
-
-https://github.com/bluez/bluez/blob/master/doc/org.bluez.Device.rst#void-co=
-nnect
-
-Right now we only document the error.code not the error.message
-
+> diff --git a/Makefile.plugins b/Makefile.plugins
+> index 97335d643..81cf3155a 100644
+> --- a/Makefile.plugins
+> +++ b/Makefile.plugins
+> @@ -128,7 +128,7 @@ endif
+>
+>  if VCP
+>  builtin_modules +=3D vcp
+> -builtin_sources +=3D profiles/audio/vcp.c
+> +builtin_sources +=3D profiles/audio/vcp.h profiles/audio/vcp.c
+>  endif
+>
+>  if MICP
+> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> index a4198d23a..eff95a7c2 100644
+> --- a/profiles/audio/transport.c
+> +++ b/profiles/audio/transport.c
+> @@ -55,6 +55,7 @@
+>  #include "media.h"
+>  #include "transport.h"
+>  #include "bass.h"
+> +#include "vcp.h"
+>
+>  #define MEDIA_TRANSPORT_INTERFACE "org.bluez.MediaTransport1"
+>
+> @@ -1420,6 +1421,7 @@ static const GDBusPropertyTable transport_bap_uc_pr=
+operties[] =3D {
+>         { "Location", "u", get_location },
+>         { "Metadata", "ay", get_metadata },
+>         { "Links", "ao", get_links, NULL, links_exists },
+> +       { "Volume", "q", get_volume, set_volume, volume_exists },
+>         { }
 >  };
 >
->  const char *error_code_to_str(const char *error_code)
-> diff --git a/client/main.c b/client/main.c
-> index 322326ab9b80..0c39e8795762 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -30,6 +30,7 @@
->  #include "gdbus/gdbus.h"
->  #include "print.h"
->  #include "agent.h"
-> +#include "error.h"
->  #include "gatt.h"
->  #include "advertising.h"
->  #include "adv_monitor.h"
-> @@ -1977,8 +1978,8 @@ static void connect_reply(DBusMessage *message, voi=
-d *user_data)
->         dbus_error_init(&error);
->
->         if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
-> -               bt_shell_printf("Failed to connect: %s %s\n", error.name,
-> -                               error.message);
-> +               bt_shell_printf("Failed to connect: %s: %s\n", error.name=
-,
-> +                               error_code_to_str(error.message));
->                 dbus_error_free(&error);
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
-> diff --git a/src/device.c b/src/device.c
-> index e8bff718c201..9ec6b4d4bd2e 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -2477,8 +2477,9 @@ static DBusMessage *connect_profiles(struct btd_dev=
-ice *dev, uint8_t bdaddr_type
->         DBG("%s %s, client %s", dev->path, uuid ? uuid : "(all)",
->                                                 dbus_message_get_sender(m=
-sg));
->
-> -       if (dev->pending || dev->connect || dev->browse)
-> +       if (dev->pending || dev->connect || dev->browse) {
->                 return btd_error_in_progress_str(msg, ERR_BREDR_CONN_BUSY=
-);
-> +       }
->
->         if (!btd_adapter_get_powered(dev->adapter)) {
->                 return btd_error_not_ready_str(msg,
-> @@ -2497,6 +2498,7 @@ static DBusMessage *connect_profiles(struct btd_dev=
-ice *dev, uint8_t bdaddr_type
->                                                         "Connect") &&
->                                 find_service_with_state(dev->services,
->                                                 BTD_SERVICE_STATE_CONNECT=
-ED)) {
-> +                               DBG("Already connected to services");
->                                 return dbus_message_new_method_return(msg=
-);
->                         } else {
->                                 return btd_error_not_available_str(msg,
-> @@ -2509,8 +2511,10 @@ static DBusMessage *connect_profiles(struct btd_de=
-vice *dev, uint8_t bdaddr_type
->
->         err =3D connect_next(dev);
->         if (err < 0) {
-> -               if (err =3D=3D -EALREADY)
-> +               if (err =3D=3D -EALREADY) {
-> +                       DBG("Already connected");
->                         return dbus_message_new_method_return(msg);
-> +               }
->                 return btd_error_failed(msg,
->                                         btd_error_bredr_conn_from_errno(e=
-rr));
->         }
-> @@ -2583,12 +2587,20 @@ static uint8_t select_conn_bearer(struct btd_devi=
-ce *dev)
->         return dev->bdaddr_type;
+> @@ -2188,6 +2190,17 @@ static void bap_connecting(struct bt_bap_stream *s=
+tream, bool state, int fd,
+>         bap_update_links(transport);
 >  }
 >
-> +static const char *bdaddr_type_strs[] =3D {
-> +       "BR/EDR",
-> +       "LE public",
-> +       "LE random"
-> +};
+> +static int8_t transport_bap_get_volume(struct media_transport *transport=
+)
+> +{
+> +       return bt_audio_vcp_get_volume(transport->device);
+> +}
 > +
->  static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
->                                                         void *user_data)
+> +static int transport_bap_set_volume(struct media_transport *transport,
+> +                                                               int8_t vo=
+lume)
+> +{
+> +       return bt_audio_vcp_set_volume(transport->device, volume) ? 0 : -=
+EIO;
+> +}
+> +
+>  static void transport_bap_destroy(void *data)
 >  {
->         struct btd_device *dev =3D user_data;
->         uint8_t bdaddr_type;
+>         struct bap_transport *bap =3D data;
+> @@ -2411,7 +2424,8 @@ static void *transport_asha_init(struct media_trans=
+port *transport, void *data)
+>                         transport_bap_init, \
+>                         transport_bap_resume, transport_bap_suspend, \
+>                         transport_bap_cancel, _set_state, \
+> -                       transport_bap_get_stream, NULL, NULL, NULL, \
+> +                       transport_bap_get_stream, transport_bap_get_volum=
+e, \
+> +                       transport_bap_set_volume, NULL, \
+>                         _update_links, transport_bap_destroy)
 >
-> +       DBG("Calling \"Connect\" for device %s", dev->path);
-> +
->         if (dev->bredr_state.connected) {
->                 /*
->                  * Check if services have been resolved and there is at l=
-east
-> @@ -2596,20 +2608,30 @@ static DBusMessage *dev_connect(DBusConnection *c=
-onn, DBusMessage *msg,
->                  */
->                 if (dev->bredr_state.svc_resolved &&
->                         find_service_with_state(dev->services,
-> -                                               BTD_SERVICE_STATE_CONNECT=
-ED))
-> +                                               BTD_SERVICE_STATE_CONNECT=
-ED)) {
->                         bdaddr_type =3D dev->bdaddr_type;
-> -               else
-> +                       DBG("Selecting address type %s, as BR/EDR service=
-s are resolved "
-> +                           " and connected", bdaddr_type_strs[dev->bdadd=
-r_type]);
-> +               } else {
->                         bdaddr_type =3D BDADDR_BREDR;
-> -       } else if (dev->le_state.connected && dev->bredr)
-> +                       DBG("Selecting address type BR/EDR, as services n=
-ot resolved "
-> +                           "or not connected");
-> +               }
-> +       } else if (dev->le_state.connected && dev->bredr) {
->                 bdaddr_type =3D BDADDR_BREDR;
-> -       else
-> +               DBG("Selecting address type BR/EDR, as LE already connect=
-ed");
-> +       } else {
->                 bdaddr_type =3D select_conn_bearer(dev);
-> +               DBG("Selecting address type %s", bdaddr_type_strs[dev->bd=
-addr_type]);
+>  #define BAP_UC_OPS(_uuid) \
+> @@ -2573,17 +2587,18 @@ struct btd_device *media_transport_get_dev(struct=
+ media_transport *transport)
+>  void media_transport_update_volume(struct media_transport *transport,
+>                                                                 int8_t vo=
+lume)
+>  {
+> -       struct a2dp_transport *a2dp =3D transport->data;
+> -
+>         if (volume < 0)
+>                 return;
+>
+> -       /* Check if volume really changed */
+> -       if (a2dp->volume =3D=3D volume)
+> -               return;
+> +       if (media_endpoint_get_sep(transport->endpoint)) {
+> +               struct a2dp_transport *a2dp =3D transport->data;
+>
+> -       a2dp->volume =3D volume;
+> +               /* Check if volume really changed */
+> +               if (a2dp->volume =3D=3D volume)
+> +                       return;
+>
+> +               a2dp->volume =3D volume;
 > +       }
+>         g_dbus_emit_property_changed(btd_get_dbus_connection(),
+>                                         transport->path,
+>                                         MEDIA_TRANSPORT_INTERFACE, "Volum=
+e");
+> @@ -2628,11 +2643,15 @@ void media_transport_update_device_volume(struct =
+btd_device *dev,
+>         /* Attempt to locate the transport to set its volume */
+>         for (l =3D transports; l; l =3D l->next) {
+>                 struct media_transport *transport =3D l->data;
+> +               const char *uuid =3D media_endpoint_get_uuid(transport->e=
+ndpoint);
+>                 if (transport->device !=3D dev)
+>                         continue;
 >
->         if (bdaddr_type !=3D BDADDR_BREDR) {
->                 int err;
+> -               /* Volume is A2DP only */
+> -               if (media_endpoint_get_sep(transport->endpoint)) {
+> +               /* Volume is A2DP and BAP only */
+> +               if (media_endpoint_get_sep(transport->endpoint) ||
+> +                               strcasecmp(uuid, PAC_SINK_UUID) ||
+> +                               strcasecmp(uuid, PAC_SOURCE_UUID) ||
+> +                               strcasecmp(uuid, BAA_SERVICE_UUID)) {
+>                         media_transport_update_volume(transport, volume);
+>                         break;
+>                 }
+> diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
+> index 175275f2e..cc6f352c1 100644
+> --- a/profiles/audio/vcp.c
+> +++ b/profiles/audio/vcp.c
+> @@ -51,6 +51,9 @@
+>  #include "src/log.h"
+>  #include "src/error.h"
 >
-> -               if (dev->le_state.connected)
-> +               if (dev->le_state.connected) {
-> +                       DBG("Device already connected through LE");
->                         return dbus_message_new_method_return(msg);
-> +               }
+> +#include "vcp.h"
+> +#include "transport.h"
+> +
+>  #define VCS_UUID_STR "00001844-0000-1000-8000-00805f9b34fb"
+>  #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
 >
->                 btd_device_set_temporary(dev, false);
+> @@ -83,6 +86,33 @@ static struct vcp_data *vcp_data_new(struct btd_device=
+ *device)
+>         return data;
+>  }
 >
+> +static bool match_data(const void *data, const void *match_data)
+> +{
+> +       const struct vcp_data *vdata =3D data;
+> +       const struct bt_vcp *vcp =3D match_data;
+> +
+> +       return vdata->vcp =3D=3D vcp;
+> +}
+> +
+> +static int8_t scale_volume_vcp2transport(uint8_t volume)
+> +{
+> +       /* Transport has volume range 0-127, VCP has range 0-255 */
+> +       return volume / 2;
+> +}
+> +
+> +static uint8_t scale_volume_transport2vcp(int8_t volume)
+> +{
+> +       return volume * 2;
+> +}
+
+Now I understand why you are doing this, it seems there is an
+assumption that we should stick to 0-127 range from A2DP, but perhaps
+we document that Transport.Volume range is dependent on the
+Transport.UUID so for VCP we can use 0-255, in case you were looking
+into how ASHA was implemented that has a different problem because
+Volume is returning uint16 we can't really use negative numbers thus
+why that uses scaling. Anyway for now let go this way but if you have
+time please just update the document so we can remove this scaling and
+leave it for the clients to interpret based on the Transport.UUID.
+
+> +static void vcp_volume_changed(struct bt_vcp *vcp, uint8_t volume)
+> +{
+> +       struct vcp_data *data =3D queue_find(sessions, match_data, vcp);
+> +
+> +       if (data)
+> +               media_transport_update_device_volume(data->device, scale_=
+volume_vcp2transport(volume));
+> +}
+> +
+>  static void vcp_data_add(struct vcp_data *data)
+>  {
+>         DBG("data %p", data);
+> @@ -93,6 +123,7 @@ static void vcp_data_add(struct vcp_data *data)
+>         }
+>
+>         bt_vcp_set_debug(data->vcp, vcp_debug, NULL, NULL);
+> +       bt_vcp_set_volume_callback(data->vcp, vcp_volume_changed);
+>
+>         if (!sessions)
+>                 sessions =3D queue_new();
+> @@ -103,12 +134,12 @@ static void vcp_data_add(struct vcp_data *data)
+>                 btd_service_set_user_data(data->service, data);
+>  }
+>
+> -static bool match_data(const void *data, const void *match_data)
+> +static bool match_device(const void *data, const void *match_data)
+>  {
+>         const struct vcp_data *vdata =3D data;
+> -       const struct bt_vcp *vcp =3D match_data;
+> +       const struct btd_device *device =3D match_data;
+>
+> -       return vdata->vcp =3D=3D vcp;
+> +       return vdata->device =3D=3D device;
+>  }
+>
+>  static void vcp_data_free(struct vcp_data *data)
+> @@ -137,6 +168,26 @@ static void vcp_data_remove(struct vcp_data *data)
+>         }
+>  }
+>
+> +int8_t bt_audio_vcp_get_volume(struct btd_device *device)
+> +{
+> +       struct vcp_data *data =3D queue_find(sessions, match_device, devi=
+ce);
+> +
+> +       if (data)
+> +               return scale_volume_vcp2transport(bt_vcp_get_volume(data-=
+>vcp));
+> +
+> +       return 0;
+> +}
+> +
+> +bool bt_audio_vcp_set_volume(struct btd_device *device, int8_t volume)
+> +{
+> +       struct vcp_data *data =3D queue_find(sessions, match_device, devi=
+ce);
+> +
+> +       if (data)
+> +               return bt_vcp_set_volume(data->vcp, scale_volume_transpor=
+t2vcp(volume));
+> +
+> +       return FALSE;
+> +}
+> +
+>  static void vcp_detached(struct bt_vcp *vcp, void *user_data)
+>  {
+>         struct vcp_data *data;
+> diff --git a/profiles/audio/vcp.h b/profiles/audio/vcp.h
+> new file mode 100644
+> index 000000000..f313cd96a
+> --- /dev/null
+> +++ b/profiles/audio/vcp.h
+> @@ -0,0 +1,12 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024 StreamUnlimited Engineering GmbH
+> + *
+> + *
+> + */
+> +
+> +int8_t bt_audio_vcp_get_volume(struct btd_device *device);
+> +bool bt_audio_vcp_set_volume(struct btd_device *device, int8_t volume);
 > --
-> 2.47.1
+> 2.34.1
 >
 >
 
