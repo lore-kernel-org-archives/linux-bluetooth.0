@@ -1,234 +1,125 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FD615A843
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2025 20:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF7F1C5F26
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2025 22:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737665661; cv=none; b=Xq1hrH4Idq3i5Zk2B+Qpb1Xhq5ErghgoUCuqv6VhK/JbqWMLBXG31pPaY+1/OfaFgqTDZOhqnkjNbW1hSjK7CT2I2taJBLPzlWgrpMrJqLQWxUBM3TG1gqZQA04u/AM0DKPuLldR5xDwuk2tT2OTrVti8LD9quMUidWgBrzlSII=
+	t=1737670032; cv=none; b=jC7ZbTb9jvtRzgX0gol7g43rR8HiLL9ScncFw3JEfubXsGPCOWj/pcTZ1JrfPXIikWDvS4Er3y+ocbAIhDyeSRNALWllNRGL3m8jg00Bbm77Mv/Fj6EZYTYL0CJ0V2JeUcJ9zvBg0R0KXLQrgahcXZVXKRTppJgplh3iWnhrPq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737665661; c=relaxed/simple;
-	bh=xks9dU4Ws5ivr6AAqJoFfOeCQoK6jUiylHXld01x8DQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HVti+DfxtnEFszRpjvSCxPIR3OfIETQia/iuYYOJ0IByNFd4A0ecD9qsS7wN0USNFc0UMZtZqlEjjEMA8rz9u+AL2Ng4cxBDpyg3fZERV7XaRvpKxO3pqfHxxHf9wKJolnnqz28X+KnXHmZadz/cajA8pGE9ttK5QzpCzEMyR30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CnohRlWQ; arc=none smtp.client-ip=209.85.222.41
+	s=arc-20240116; t=1737670032; c=relaxed/simple;
+	bh=mLN8bBkzbh+PaplZzhlq67hg6xx9a4bvj+AFCy30V/E=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bysbtlYUcr6VeYj56DUyCvsPj1QHa/81NFcscAJ4RT+sCozTFGRzYYB4C2sKcYBodcpySEiDX2iFcHFPeV5AFGxrtZs+FhP57UhDVCloQpzSXDcAwxTGMv4EluCKZJqluk3+jELhlOUJ02mF5GKDR10L1TnVMj6qc+SEEiRWDo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZWVpAET; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CnohRlWQ"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-85c5a91374cso676289241.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2025 12:54:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZWVpAET"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-218c8aca5f1so33181185ad.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2025 14:07:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737665658; x=1738270458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4o18U4c6mryZ2s1oVZh+Hi0T1U0ebN1hM9+Dx57hL+A=;
-        b=CnohRlWQJ6ljcm0CIGEUWaMwXxdLgAE7wqyg8fPXMrnAC/9iBcVmN0DnDkUAbfimT4
-         +Wf1mOpWsavD9tZOX37mXPP/+ksLUl4BCK7BJi/Xc5F3w0fzVgbR5rVoKFpeybZ3QkeO
-         JvR/czq5jZMesgHIXW1SvMtjIObmbd8WWvMJn5TMik6e5uSEbFcwjCI5lEOceCxC359y
-         eJWqZmdRjDsKU0W0dbNztM9n0NewrHvcLl/bQOS5HKXYl2cHpGJg+3jmxPyEfBZZJCMu
-         y82qJYkoLgyDu5osKVUOFWYp19JIbvTAxBBVgypVHwThbWkaI6LkDCuW278axI+MLgpR
-         mXIw==
+        d=gmail.com; s=20230601; t=1737670030; x=1738274830; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=bE+OPA2FHa3VB732guH85WTrlOJ7CKqqQcC9g7O6K0M=;
+        b=mZWVpAET12VAqgyA6Wv35gQMdndZcAs30Da7/mNcy5vRoCM0QEO3vI5/twHDsNtn9x
+         12xkz68ULoDJ8Obv77Se/gY8VgscpfLy/jQ+3F4NqaMWhe3MffjrZzq60Mhy4dYIYK7y
+         /i15QzB55tA2w2dmsjHGn9ODTEsZntgvQaCKyDlvRCtF4myDEo0W7+g0Gm0oWQV43Ea1
+         TpvCmVtAiy2zMH/MZxqWQlrt8Islnd5G/D3+PRY5YeBtHV2pTJfWAb71GPbEl4VDZn+u
+         gK1l4N2TmkKaptNl6u/J+Oojsf08c1AOLt3lq3p5EvOjPFeKXFUVH1RBfwAo0PMFe/vt
+         +04w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737665658; x=1738270458;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4o18U4c6mryZ2s1oVZh+Hi0T1U0ebN1hM9+Dx57hL+A=;
-        b=db7wnzduAwtGqlUNN+rMG3fPmACloNK1GwHg7NU8OcePvZ8QSA3zaVQXcF+6vT3wZW
-         kbrerr4O5capTZEBtmRXYYZXVHBBrw2fAAehLinfCfovqsAK9zs/gYhY6Wv/85abGbdj
-         QzddaRw5VMuZPOOHW7Cc16Hp3pHD05K6YZ8TtFCUkl0CqqHC1n42/XDov8IVPHSsRo3W
-         GXxEaD81BhP/2GT0MQP57o6fMH4qaD0hAfgB/5utosOT2uFY4WaS6zWzuR051qkpAKad
-         jWGQu00cs6peJzuB0OlSHfM/Jpp/WjMFA6zVaGj6TcOC8RhKsJsDX7sud19WL5Rg9+3M
-         dOGQ==
-X-Gm-Message-State: AOJu0YwzttsJprbM+gPkEBcO1WZbBbCIueY3x4SU32jFQ9NgoQPV4Dkv
-	qNMTiM5dBOwhZFgzgz+EEGpX5Ql6Pzk9tLik7BKd5Kt25yAzqKaWV+TI8sms
-X-Gm-Gg: ASbGncu7SS0PcCH/Rp5IgsPkjDMbpNADQp+X+OVCQwBbvFNKMXDhHvs15atkQAkIpiB
-	khtj0Jtki+o0pc4MlKNLIiwnoCWpgyD2vR34tUijLmHLJ3UnhhO7FyY0aNrGiLxOwtdDRFaTCn0
-	8JMrr6mlzTF9YajvwNpuQnYSzedbwXiPw449gAx7ubfFbiHk9jKAvkC4U7Djc4Y5p4d7Un7ZxvN
-	CyEXLXrvLu5Kd2zI51LIJgeJQpiqipzmOuunEkNdRbMWVVyQOH469kPTD4VGq0wAPGfXysDamqM
-	bwxvNKc8qhcFoaWE8IKqB1+8HZwoPgxBqLGHNJ2EuBA8Aexd66gW
-X-Google-Smtp-Source: AGHT+IGmzimd38N3N0oG8NbL6+KRUGgQr1Ir0WwO2v3egWPAJLqh9SeYYgE4Pt79BI4xFdH/zpRLwA==
-X-Received: by 2002:a05:6102:2923:b0:4b6:1a64:1c95 with SMTP id ada2fe7eead31-4b690cf1487mr24307379137.22.1737665658172;
-        Thu, 23 Jan 2025 12:54:18 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-864a9c3e360sm66240241.28.2025.01.23.12.54.15
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1737670030; x=1738274830;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bE+OPA2FHa3VB732guH85WTrlOJ7CKqqQcC9g7O6K0M=;
+        b=INh8pTcPD1TzBxXTCR+OffBBZi+nO0SPiO1uwi2VGucdQRV8fVKk41lXv1V9ZXqNL3
+         xhftUGGONui2StPTh2QbpWRE3gj+vkR4uOTNScK4z5mKbUmZ/ySra8eH2TsU1LW4oc6j
+         31WpLpDn6qBRC8mdo9ZyiAcqa3Be4/BoMmSWATOhPJj55wHhHDxmAOvAnnx8ZQzhXqTS
+         n0J4bklxNNLUbe+kUrYTfELRek9TUl4i9JZsSYUdHTm7p/sAPXGR2Dst4jOLh7yn7/lz
+         pSf/JjP1hWaQ00FNmTT9L9seG6RTtuwsG2hU4U0Q8pMpw3AGo+ZOefhUItnCDXXsCqXW
+         Unew==
+X-Gm-Message-State: AOJu0YzTdcWAd/1jo4u2EaGCFBbfeDCzbgFTpn/Letu7js5olmJLlwZp
+	PKwmK3naJX+OzblhEHG4L0MCoYRf6ShmF4kncycxWkJ7tL/60fWoDjyb1g==
+X-Gm-Gg: ASbGncuS1iWI+y8IsV54So76wmX3tRFsgFgYLJb0B8SVxLyRyXwnXm0cseJBWz+vfNk
+	kubcqWtVZiUMB0X3JUDpNZc8Rp5XAUZZydYoXx+zfzFGr9/irKc2t2tGwaKptXz7zReCMc33Bl2
+	cq/dNNB+Vc1g+1xbJIeuWAwPLaEEe4jZwbm090J4lGBihW+RoGWjz6VFLsEVSMfich24hQWvq5Y
+	jyk0KvhT4Df8adpNJEbJCWBlW6KJg+tooOX16MQ8OCoqdSA6xLhYj16ZXwDPCX3ytyNW0YVUzQH
+	6EeGDt6gzQ==
+X-Google-Smtp-Source: AGHT+IHMuhPyytl0SjUCvYRIBQVKh4eStqeViwMDbJkzEO05IUIlI4tH+2TsfCUMnBf1mKOO8KiYLw==
+X-Received: by 2002:a05:6a20:7f96:b0:1d9:c78f:4207 with SMTP id adf61e73a8af0-1eb2147d3f9mr41008413637.11.1737670030009;
+        Thu, 23 Jan 2025 14:07:10 -0800 (PST)
+Received: from [172.17.0.2] ([52.234.42.83])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ac48f897f33sm376881a12.23.2025.01.23.14.07.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 12:54:16 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/2] vcp: Fix using scaled values for volume
-Date: Thu, 23 Jan 2025 15:54:11 -0500
-Message-ID: <20250123205411.369041-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250123205411.369041-1-luiz.dentz@gmail.com>
-References: <20250123205411.369041-1-luiz.dentz@gmail.com>
+        Thu, 23 Jan 2025 14:07:09 -0800 (PST)
+Message-ID: <6792bd8d.630a0220.0250.2ee7@mx.google.com>
+Date: Thu, 23 Jan 2025 14:07:09 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1808606194000052842=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/2] org.bluez.MediaTransport: Allow Volume property to follow profile range
+In-Reply-To: <20250123205411.369041-1-luiz.dentz@gmail.com>
+References: <20250123205411.369041-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1808606194000052842==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes the volume range 0-255 as per VCP spec rather than scaling it
-to fit 0-127.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=927943
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.31 seconds
+GitLint                       PENDING   0.26 seconds
+BuildEll                      PASS      20.26 seconds
+BluezMake                     PASS      1460.19 seconds
+MakeCheck                     PASS      13.52 seconds
+MakeDistcheck                 PASS      158.25 seconds
+CheckValgrind                 PASS      213.51 seconds
+CheckSmatch                   PASS      269.96 seconds
+bluezmakeextell               PASS      97.75 seconds
+IncrementalBuild              PENDING   0.35 seconds
+ScanBuild                     PASS      867.48 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- profiles/audio/transport.c | 18 +++++++++---------
- profiles/audio/vcp.c       | 23 +++++------------------
- profiles/audio/vcp.h       |  4 ++--
- 3 files changed, 16 insertions(+), 29 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index eff95a7c2655..5fd20910f745 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -126,8 +126,8 @@ struct media_transport_ops {
- 	void (*set_state)(struct media_transport *transport,
- 				transport_state_t state);
- 	void *(*get_stream)(struct media_transport *transport);
--	int8_t (*get_volume)(struct media_transport *transport);
--	int (*set_volume)(struct media_transport *transport, int8_t level);
-+	uint8_t (*get_volume)(struct media_transport *transport);
-+	int (*set_volume)(struct media_transport *transport, uint8_t level);
- 	int (*set_delay)(struct media_transport *transport, uint16_t delay);
- 	void (*update_links)(const struct media_transport *transport);
- 	GDestroyNotify destroy;
-@@ -616,7 +616,7 @@ static void transport_a2dp_remove_owner(struct media_transport *transport,
- 	a2dp->cancel_resume = FALSE;
- }
- 
--static int8_t transport_a2dp_get_volume(struct media_transport *transport)
-+static uint8_t transport_a2dp_get_volume(struct media_transport *transport)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 	return a2dp->volume;
-@@ -624,7 +624,7 @@ static int8_t transport_a2dp_get_volume(struct media_transport *transport)
- 
- #ifdef HAVE_AVRCP
- static int transport_a2dp_src_set_volume(struct media_transport *transport,
--					int8_t level)
-+					uint8_t level)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 
-@@ -635,7 +635,7 @@ static int transport_a2dp_src_set_volume(struct media_transport *transport,
- }
- 
- static int transport_a2dp_snk_set_volume(struct media_transport *transport,
--					int8_t level)
-+					uint8_t level)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 	bool notify;
-@@ -2190,13 +2190,13 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
- 	bap_update_links(transport);
- }
- 
--static int8_t transport_bap_get_volume(struct media_transport *transport)
-+static uint8_t transport_bap_get_volume(struct media_transport *transport)
- {
- 	return bt_audio_vcp_get_volume(transport->device);
- }
- 
- static int transport_bap_set_volume(struct media_transport *transport,
--								int8_t volume)
-+								uint8_t volume)
- {
- 	return bt_audio_vcp_set_volume(transport->device, volume) ? 0 : -EIO;
- }
-@@ -2355,7 +2355,7 @@ static void transport_asha_cancel(struct media_transport *transport, guint id)
- 	}
- }
- 
--static int8_t transport_asha_get_volume(struct media_transport *transport)
-+static uint8_t transport_asha_get_volume(struct media_transport *transport)
- {
- 	struct bt_asha_device *asha_dev = transport->data;
- 	int8_t volume;
-@@ -2370,7 +2370,7 @@ static int8_t transport_asha_get_volume(struct media_transport *transport)
- }
- 
- static int transport_asha_set_volume(struct media_transport *transport,
--								int8_t volume)
-+							uint8_t volume)
- {
- 	struct bt_asha_device *asha_dev = transport->data;
- 	int scaled_volume;
-diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-index 608496a003b6..423210b4af3b 100644
---- a/profiles/audio/vcp.c
-+++ b/profiles/audio/vcp.c
-@@ -103,25 +103,12 @@ static bool match_data(const void *data, const void *match_data)
- 	return vdata->vcp == vcp;
- }
- 
--static int8_t scale_volume(uint8_t volume)
--{
--	/* Convert 0-255 to 0-127. */
--	return volume / 2;
--}
--
--static uint8_t unscale_volume(int8_t volume)
--{
--	/* Convert 0-127 to 0-255. */
--	return volume * 2;
--}
--
- static void vcp_volume_changed(struct bt_vcp *vcp, uint8_t volume)
- {
- 	struct vcp_data *data = queue_find(sessions, match_data, vcp);
- 
- 	if (data)
--		media_transport_update_device_volume(data->device,
--						      scale_volume(volume));
-+		media_transport_update_device_volume(data->device, volume);
- }
- 
- static void vcp_data_add(struct vcp_data *data)
-@@ -179,22 +166,22 @@ static void vcp_data_remove(struct vcp_data *data)
- 	}
- }
- 
--int8_t bt_audio_vcp_get_volume(struct btd_device *device)
-+uint8_t bt_audio_vcp_get_volume(struct btd_device *device)
- {
- 	struct vcp_data *data = queue_find(sessions, match_device, device);
- 
- 	if (data)
--		return scale_volume(bt_vcp_get_volume(data->vcp));
-+		return bt_vcp_get_volume(data->vcp);
- 
- 	return 0;
- }
- 
--bool bt_audio_vcp_set_volume(struct btd_device *device, int8_t volume)
-+bool bt_audio_vcp_set_volume(struct btd_device *device, uint8_t volume)
- {
- 	struct vcp_data *data = queue_find(sessions, match_device, device);
- 
- 	if (data)
--		return bt_vcp_set_volume(data->vcp, unscale_volume(volume));
-+		return bt_vcp_set_volume(data->vcp, volume);
- 
- 	return FALSE;
- }
-diff --git a/profiles/audio/vcp.h b/profiles/audio/vcp.h
-index f313cd96a5fc..cf7935d1a4ea 100644
---- a/profiles/audio/vcp.h
-+++ b/profiles/audio/vcp.h
-@@ -8,5 +8,5 @@
-  *
-  */
- 
--int8_t bt_audio_vcp_get_volume(struct btd_device *device);
--bool bt_audio_vcp_set_volume(struct btd_device *device, int8_t volume);
-+uint8_t bt_audio_vcp_get_volume(struct btd_device *device);
-+bool bt_audio_vcp_set_volume(struct btd_device *device, uint8_t volume);
--- 
-2.48.1
 
+--===============1808606194000052842==--
