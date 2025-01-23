@@ -1,273 +1,164 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-242.mail.qq.com (out203-205-221-242.mail.qq.com [203.205.221.242])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B171ADC6E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2025 04:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C71720C023
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2025 08:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.242
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737608267; cv=none; b=vGZuDVgzLPNqObH+ja4cTr8WuhlE7u36FfEA8emDX0v51x/qZ0P+hqQaa96DRr/rcEtAKvQHM6wHyF8Mli8AKXXTqAcUPIttEJtuQMzLubylcP4NR7mAEBRza5p7+tlWynT+AiJMcFR96FAzL+MvXdplVXXBtyiFDVyYvX8Obsg=
+	t=1737621985; cv=none; b=NRGPzr4d2P357bHnCHUo9No0ub+FuLO/ezlagR7q8HARrcUekLrwiC6gYdnUpi82JVMb3E+LVsep56KGHxkHSl7HCRh4B8ww6OXX3E2a8iVi82x+tezrvgp4Orm/G2sI5RhrHQzs5uQrSh2qznD9wWp93F0cdIdtlRkpBmVazqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737608267; c=relaxed/simple;
-	bh=gXGST6/fJwV5Do5lFRM2gwK3r63i8h21UsR/WokvCsc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gLubSghLd5js+mI7e76sSs2C5clZ2AbSGu+ZdA4G1nAPupBMOgCb4IqyVgkX2KtAJPZVasF1mm+La+mxnHXCulmbmJ23fjfWvHO5xwIOg4BeTMpJTZ7uI/GHHaw1GfVS7XhLW288As38akK00XwsRcd19/eehv7lZMX4r0qomZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XzMUweKU; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1737621985; c=relaxed/simple;
+	bh=S1cuY1QiI69uNpHDTQU5vyvhGR9idlGLh4JmCWoa24g=;
+	h=From:To:Subject:Mime-Version:Content-Type:Date:Message-ID; b=Bxo7yYB0cON7F02oVsB+8JTxMe7MFMHo1hnoTT25UtOj3ZVgiRJrEWUs4iypWiwGlghwAkfN1+heT+sf//60cPBqivpc7gxriyYXfQlKBGSaogVRS8275LHSie3CuXYt/eqvQhGeTV0no+CER7lICYx7Ng3JDsP+qcaoYZq+i0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=JnezRw5M; arc=none smtp.client-ip=203.205.221.242
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XzMUweKU"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e3978c00a5aso784453276.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2025 20:57:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737608264; x=1738213064; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2iLrSrrpPpe4BqQ40aqwnxmgvffYQ/EZQy8IbB10yas=;
-        b=XzMUweKUuSR4HSPIw4abx+rgXGFdYW/J996lweTQTK591xZkMXZme5cXiPg3mh5kU6
-         FlJfUoGYBicTXxcnmLxQ3Gig2XyFGyjcGR8UULbIdUhk1hYr5vGAcVIlQOlG9Uuc051X
-         gIF5zVT0om/1Uc44Ms4CKQaOUkX0ZvCRGWODawv1TUWbgN3HIM7gDXnDF5aupTBm5MPq
-         KAg2b8sPPlvHP+iiv8SvNQBFMewLUMbin5ARU/sP+bIWKMC8Fp3nLnDyK9WDRMLSiBgn
-         DdnQUqgjVCfHDq/HsdtzgVA55n6PE0zRegWRHq7E4mxTlFacqX+JjSgpgyyFLP5QzDA2
-         iFWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737608264; x=1738213064;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2iLrSrrpPpe4BqQ40aqwnxmgvffYQ/EZQy8IbB10yas=;
-        b=M1ikgbLMtpsAX7BMUszor5OdY8qYniBFkLOf7ZQdU9vDlvTbXc0GbVOwmRg9MjMKYZ
-         nZaH5YM5dym7YEsHk63dlrg9GRu6eTy74Cr/hhdObISGEhhU3Knaj9BhbkdAXqdBuIFd
-         TYfS0quuewFEPgAfwR7ubHT1o/9ofCNzEH6/MyDfwjhvw2uv6YGd0j3u5DDXS+4v/yZy
-         KkrKmRdw9TjtUrRvu7iI51AYF6pRo/ZB9/Vg+Z44BWsYoj7jlPc/V7wB6V0peS9MkDnQ
-         arAON2iixN7+VX20mVZF5xyC24vTStgssg5Nt2T1Vw4uw5BxFzsRUZgqjyegq5ALepXG
-         V9GQ==
-X-Gm-Message-State: AOJu0YwDvzxXC1tGlDLB1aH95plTHdcaGqC5Vl4pseRe1z3+1RZbq9Kx
-	cTMrUNcB9T8UZuPw5WKRaiQX+g82l3qgLLUhXbs8LY9JkaUXICrkFDEPQLgUJJ15A1j6KEmrEZ1
-	ikAj7hWkH+gu+JwnUPIXOsTVTjDe5yzE7Q4RL
-X-Gm-Gg: ASbGnctt7ZpsYHKyAIQqofukXjU4bgK0viNhFZoSDRWkUAgIqMJihoU2JmFUg/yWCNl
-	5OElKIuWB5+4jfcu7Nytw5T2nWYtFzJ1B2yidmCtMyLusOiiZ/j4+220cCqnURG8mksthhQ==
-X-Google-Smtp-Source: AGHT+IHw30UHsHJMDbPUuK8hZBKTwSVtpKrIowAAcEbatGnNkbAkvD1p/2ygh9YC8YFN9vpyDnwchG1tI5ye+jHjemA=
-X-Received: by 2002:a05:6902:2089:b0:e57:8bbb:b911 with SMTP id
- 3f1490d57ef6-e57b106410emr16615739276.19.1737608264015; Wed, 22 Jan 2025
- 20:57:44 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="JnezRw5M"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1737621977; bh=us0DGlAaIE2XO19LmQoodprQlI/G/nlkhmCsyj9/WOw=;
+	h=From:To:Subject:Date;
+	b=JnezRw5MtpGB0GbagS8aqkgphLwMAXUizQEgmxWIAVf5RSCFoek7ix4YkqORRi2Do
+	 fUzMIWP+nUQsrn8UzsbpKyq0Tnjv959qGVgzv0Mhlf584OEPBpe9ernH3ED7qMpPVa
+	 +OyoZifDCiySbO/WI/L5iyuFECW2KkvIvpbVcK1A=
+X-QQ-FEAT: oHWrrGTW1dCni6VLWI7Xi3lwP5c1dnPf
+X-QQ-SSF: 00000000000000F0000000000000
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-XMAILINFO: NtHA4HazRbSIBUcDiCg5tKRbuTH3pYqlrhO1UHJB9cC6Nt7DQ792ZwFUlC+ZYG
+	 RMGeJcEi4cfScbR41VUPS6J2LMhlsIOpnBhQNEFwA87Rg6X1Ey5xE99TDTbumhKLrHCl2gVPYjnnQ
+	 qbL6EOQXT3o6JYi1c5Yad+tH/8vlDHL0xfSCWS/ar6MQhZzYhuvAZ2XFq48TefjqprtN071VvDUui
+	 UFT+rknsTn7NEAofuLgbWjx/lGBwLC9KgsBZLQx3Za80/56Vz6gSHFNRVOqx5qAiJhgbBEkkxxrYR
+	 iImfuJJSk71npZe9FbCzPwYHf/iYkaszA63WPyb0kDXrVywEHDQPS7lVbVNxDVbdNbs4RqapyBJEH
+	 J+fPpkSSSA2QJNN1GF3keDXJ0u6Db/j6TX8WE0IiY2SC25Z7G0sV5Bk/rUfiDfhwAHc62Gg7eCvfK
+	 pYvDL2NiRT6Ap5IgKXRsvfkSENj5LodESe6cVIg8knncEvqNbCCmoLZDILGmSaLNRAVtZU5rtU6hI
+	 n+Fc3/1E4rv7mppcfziZQX+H+mWcNszfwvX/zSKmrzBtnAaP5dheeAQvGj7+uI+sJU+x+yeBmQU3q
+	 c3SnFDOORS3hdHve3lQ7IZeVMP0qa1v6mVoay2ZuT5gktRD33mLQzrOjKYnniYwyHaJFnybocf/7g
+	 USLH/YTDc291uszFD6t5lb+sumIBgPk76egC6B/a8n2g0EX31FsewkC0syq1gATigDSnca4BRAvsd
+	 BQPI5sIZBibrOl+NiOo4G4MhrGvJiyLdPBSyOe6MPsCO458BSmJ9nxgjTS2DMf6WuxJ24Cc8B7emL
+	 Rj4P+Jxuqs9IQ2X2fqyvZwM727fS2KRotnjMFyRGTMqlmULOjbcLsOxDbFZ7aFOqsfbS6jHuh0+i2
+	 Iz8LNPbNYXOE7i707zCsOxJqtdui8u+sOQjlHxgoRyM/3fkSr4vihAg9iH9A6WfzHRm1Aa045hXNM
+	 +Ma8PAS8RMf+VwFZvSCPDTztYb9c+8SrM+v2yyxg==
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-STYLE: 
+X-QQ-mid: webmail441t1737621976t5837590
+From: "=?gb18030?B?Li4uwLTByw==?=" <294305068@qq.com>
+To: "=?gb18030?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>
+Subject: PATCH BlueZ
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250122131925.v2.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com>
-In-Reply-To: <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Thu, 23 Jan 2025 12:57:17 +0800
-X-Gm-Features: AbW1kvbTxTtlZSbyA9ivfrSgLdev-buUmaUqiyJmWXFScjR17gRUJCehKfNPqW8
-Message-ID: <CADg1FFdt2mQsN4YjLTn=zp_+MahopN371EDiXQEbp+GTSaNtBg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_679201D8_17189D58_6978AC68"
+Content-Transfer-Encoding: 8Bit
+Date: Thu, 23 Jan 2025 16:46:16 +0800
+X-Priority: 3
+Message-ID: <tencent_D3EFB613EA09E81587F45C8C80CEEDAF8D07@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
 
-Hi Luiz,
+This is a multi-part message in MIME format.
 
-On Thu, Jan 23, 2025 at 3:35=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Hsin-chen,
->
-> On Wed, Jan 22, 2025 at 12:20=E2=80=AFAM Hsin-chen Chuang <chharry@google=
-.com> wrote:
-> >
-> > From: Hsin-chen Chuang <chharry@chromium.org>
-> >
-> > Use device group to avoid the racing. To reuse the group defined in
-> > hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
-> > read_usb_alt_setting which are only registered in btusb.
-> >
-> > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control =
-USB alt setting")
-> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > ---
-> >
-> > (no changes since v1)
-> >
-> >  drivers/bluetooth/btusb.c        | 42 ++++++++------------------------
-> >  include/net/bluetooth/hci_core.h |  2 ++
-> >  net/bluetooth/hci_sysfs.c        | 33 +++++++++++++++++++++++++
-> >  3 files changed, 45 insertions(+), 32 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 75a0f15819c4..bf210275e5b7 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -2221,6 +2221,13 @@ static int btusb_switch_alt_setting(struct hci_d=
-ev *hdev, int new_alts)
-> >         return 0;
-> >  }
-> >
-> > +static int btusb_read_alt_setting(struct hci_dev *hdev)
-> > +{
-> > +       struct btusb_data *data =3D hci_get_drvdata(hdev);
-> > +
-> > +       return data->isoc_altsetting;
-> > +}
-> > +
-> >  static struct usb_host_interface *btusb_find_altsetting(struct btusb_d=
-ata *data,
-> >                                                         int alt)
-> >  {
-> > @@ -3650,32 +3657,6 @@ static const struct file_operations force_poll_s=
-ync_fops =3D {
-> >         .llseek         =3D default_llseek,
-> >  };
-> >
-> > -static ssize_t isoc_alt_show(struct device *dev,
-> > -                            struct device_attribute *attr,
-> > -                            char *buf)
-> > -{
-> > -       struct btusb_data *data =3D dev_get_drvdata(dev);
-> > -
-> > -       return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
-> > -}
-> > -
-> > -static ssize_t isoc_alt_store(struct device *dev,
-> > -                             struct device_attribute *attr,
-> > -                             const char *buf, size_t count)
-> > -{
-> > -       struct btusb_data *data =3D dev_get_drvdata(dev);
-> > -       int alt;
-> > -       int ret;
-> > -
-> > -       if (kstrtoint(buf, 10, &alt))
-> > -               return -EINVAL;
-> > -
-> > -       ret =3D btusb_switch_alt_setting(data->hdev, alt);
-> > -       return ret < 0 ? ret : count;
-> > -}
-> > -
-> > -static DEVICE_ATTR_RW(isoc_alt);
-> > -
-> >  static int btusb_probe(struct usb_interface *intf,
-> >                        const struct usb_device_id *id)
-> >  {
-> > @@ -4040,9 +4021,8 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >                 if (err < 0)
-> >                         goto out_free_dev;
-> >
-> > -               err =3D device_create_file(&intf->dev, &dev_attr_isoc_a=
-lt);
-> > -               if (err)
-> > -                       goto out_free_dev;
-> > +               hdev->switch_usb_alt_setting =3D btusb_switch_alt_setti=
-ng;
-> > +               hdev->read_usb_alt_setting =3D btusb_read_alt_setting;
-> >         }
-> >
-> >         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
-> > @@ -4089,10 +4069,8 @@ static void btusb_disconnect(struct usb_interfac=
-e *intf)
-> >         hdev =3D data->hdev;
-> >         usb_set_intfdata(data->intf, NULL);
-> >
-> > -       if (data->isoc) {
-> > -               device_remove_file(&intf->dev, &dev_attr_isoc_alt);
-> > +       if (data->isoc)
-> >                 usb_set_intfdata(data->isoc, NULL);
-> > -       }
-> >
-> >         if (data->diag)
-> >                 usb_set_intfdata(data->diag, NULL);
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
-ci_core.h
-> > index f756fac95488..5d3ec5ff5adb 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -641,6 +641,8 @@ struct hci_dev {
-> >                                      struct bt_codec *codec, __u8 *vnd_=
-len,
-> >                                      __u8 **vnd_data);
-> >         u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff *s=
-kb);
-> > +       int (*switch_usb_alt_setting)(struct hci_dev *hdev, int new_alt=
-s);
-> > +       int (*read_usb_alt_setting)(struct hci_dev *hdev);
-> >  };
-> >
-> >  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
-> > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> > index 041ce9adc378..887aa1935b1e 100644
-> > --- a/net/bluetooth/hci_sysfs.c
-> > +++ b/net/bluetooth/hci_sysfs.c
-> > @@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *dev, str=
-uct device_attribute *attr,
-> >  }
-> >  static DEVICE_ATTR_WO(reset);
-> >
-> > +static ssize_t isoc_alt_show(struct device *dev,
-> > +                            struct device_attribute *attr,
-> > +                            char *buf)
-> > +{
-> > +       struct hci_dev *hdev =3D to_hci_dev(dev);
-> > +
-> > +       if (hdev->read_usb_alt_setting)
-> > +               return sysfs_emit(buf, "%d\n", hdev->read_usb_alt_setti=
-ng(hdev));
-> > +
-> > +       return -ENODEV;
-> > +}
-> > +
-> > +static ssize_t isoc_alt_store(struct device *dev,
-> > +                             struct device_attribute *attr,
-> > +                             const char *buf, size_t count)
-> > +{
-> > +       struct hci_dev *hdev =3D to_hci_dev(dev);
-> > +       int alt;
-> > +       int ret;
-> > +
-> > +       if (kstrtoint(buf, 10, &alt))
-> > +               return -EINVAL;
-> > +
-> > +       if (hdev->switch_usb_alt_setting) {
-> > +               ret =3D hdev->switch_usb_alt_setting(hdev, alt);
-> > +               return ret < 0 ? ret : count;
-> > +       }
-> > +
-> > +       return -ENODEV;
-> > +}
-> > +static DEVICE_ATTR_RW(isoc_alt);
-> > +
-> >  static struct attribute *bt_host_attrs[] =3D {
-> >         &dev_attr_reset.attr,
-> > +       &dev_attr_isoc_alt.attr,
-> >         NULL,
-> >  };
-> >  ATTRIBUTE_GROUPS(bt_host);
->
-> While this fixes the race it also forces the inclusion of an attribute
-> that is driver specific, so I wonder if we should introduce some
-> internal interface to register driver specific entries like this.
+------=_NextPart_679201D8_17189D58_6978AC68
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_679201D8_17189D58_1A88647E";
 
-Do you mean you prefer the original interface that only exports the
-attribute when isoc_altsetting is supported?
-Agree it makes more sense but I hit the obstacle: hci_init_sysfs is
-called earlier than data->isoc is determined. I need some time to
-verify whether changing the order won't break anything.
+------=_NextPart_679201D8_17189D58_1A88647E
+Content-Type: text/plain;
+	charset="gb18030"
+Content-Transfer-Encoding: base64
 
->
-> > --
-> > 2.48.1.262.g85cc9f2d1e-goog
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+RnJvbSA4OTk3MTM5NjRlMmE2ZTFlY2UwOGE4NDM5OGI4N2Q5MjNiYTEwODJlIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQ0KIEZyb206IGNhaXRhbyA8Y2FpdGFvQGt5bGlub3MuY24mZ3Q7
+DQogRGF0ZTogVGh1LCAyMyBKYW4gMjAyNSAxNjozMjo1NyArMDgwMA0KIFN1YmplY3Q6IFtQ
+QVRDSCBCbHVlWiAwLzFdICoqKiBTVUJKRUNUIEhFUkUgKioqDQogDQogKioqIEJMVVJCIEhF
+UkUgKioqDQogDQogY2FpdGFvICgxKToNCiAgYmF0dGVyeS5jOiBUaGUgYmF0dGVyeSBpcyBu
+b3QgaW5pdGlhbGl6ZWQsIGFuZCBpbml0aWFsaXplIHRoZSBiYXR0ZXJ5DQogDQogIHByb2Zp
+bGVzL2JhdHRlcnkvYmF0dGVyeS5jIHwgMiArKw0KICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNl
+cnRpb25zKCspDQogDQogLS0gDQogMi4yNS4x
+
+------=_NextPart_679201D8_17189D58_1A88647E
+Content-Type: text/html;
+	charset="gb18030"
+Content-Transfer-Encoding: base64
+
+PG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNo
+YXJzZXQ9R0IxODAzMCI+PGRpdiBzdHlsZT0iY29sb3I6IHJnYig1MSwgNTEsIDUxKTsgZm9u
+dC1mYW1pbHk6ICZxdW90O0Ryb2lkIFNhbnMgTW9ubyZxdW90OywgJnF1b3Q7bW9ub3NwYWNl
+JnF1b3Q7LCBtb25vc3BhY2U7IHdoaXRlLXNwYWNlOiBwcmU7Ij48ZGl2PkZyb20gODk5NzEz
+OTY0ZTJhNmUxZWNlMDhhODQzOThiODdkOTIzYmExMDgyZSBNb24gU2VwIDE3IDAwOjAwOjAw
+IDIwMDE8L2Rpdj48c3BhbiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogcmdiKDI0NSwgMjQ1
+LCAyNDUpOyI+Cjwvc3Bhbj48ZGl2PkZyb206IGNhaXRhbyAmbHQ7Y2FpdGFvQGt5bGlub3Mu
+Y24mZ3Q7PC9kaXY+PHNwYW4gc3R5bGU9ImJhY2tncm91bmQtY29sb3I6IHJnYigyNDUsIDI0
+NSwgMjQ1KTsiPgo8L3NwYW4+PGRpdj5EYXRlOiBUaHUsIDIzIEphbiAyMDI1IDE2OjMyOjU3
+ICswODAwPC9kaXY+PHNwYW4gc3R5bGU9ImJhY2tncm91bmQtY29sb3I6IHJnYigyNDUsIDI0
+NSwgMjQ1KTsiPgo8L3NwYW4+PGRpdj5TdWJqZWN0OiBbUEFUQ0ggQmx1ZVogMC8xXSAqKiog
+U1VCSkVDVCBIRVJFICoqKjwvZGl2PjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiBy
+Z2IoMjQ1LCAyNDUsIDI0NSk7Ij4KPC9zcGFuPjxicj48c3BhbiBzdHlsZT0iYmFja2dyb3Vu
+ZC1jb2xvcjogcmdiKDI0NSwgMjQ1LCAyNDUpOyI+Cjwvc3Bhbj48ZGl2PjxzcGFuIHN0eWxl
+PSJjb2xvcjogcmdiKDc1LCAxMDUsIDE5OCk7Ij4qKiogQkxVUkIgSEVSRSAqKio8L3NwYW4+
+PC9kaXY+PHNwYW4gc3R5bGU9ImJhY2tncm91bmQtY29sb3I6IHJnYigyNDUsIDI0NSwgMjQ1
+KTsiPgo8L3NwYW4+PGJyPjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjQ1
+LCAyNDUsIDI0NSk7Ij4KPC9zcGFuPjxkaXY+Y2FpdGFvICgxKTo8L2Rpdj48c3BhbiBzdHls
+ZT0iYmFja2dyb3VuZC1jb2xvcjogcmdiKDI0NSwgMjQ1LCAyNDUpOyI+Cjwvc3Bhbj48ZGl2
+PiBiYXR0ZXJ5LmM6IFRoZSBiYXR0ZXJ5IGlzIG5vdCBpbml0aWFsaXplZCwgYW5kIGluaXRp
+YWxpemUgdGhlIGJhdHRlcnk8L2Rpdj48c3BhbiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjog
+cmdiKDI0NSwgMjQ1LCAyNDUpOyI+Cjwvc3Bhbj48YnI+PHNwYW4gc3R5bGU9ImJhY2tncm91
+bmQtY29sb3I6IHJnYigyNDUsIDI0NSwgMjQ1KTsiPgo8L3NwYW4+PGRpdj4gcHJvZmlsZXMv
+YmF0dGVyeS9iYXR0ZXJ5LmMgfCAyICsrPC9kaXY+PHNwYW4gc3R5bGU9ImJhY2tncm91bmQt
+Y29sb3I6IHJnYigyNDUsIDI0NSwgMjQ1KTsiPgo8L3NwYW4+PGRpdj4gMSBmaWxlIGNoYW5n
+ZWQsIDIgaW5zZXJ0aW9ucygrKTwvZGl2PjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9y
+OiByZ2IoMjQ1LCAyNDUsIDI0NSk7Ij4KPC9zcGFuPjxicj48c3BhbiBzdHlsZT0iYmFja2dy
+b3VuZC1jb2xvcjogcmdiKDI0NSwgMjQ1LCAyNDUpOyI+Cjwvc3Bhbj48ZGl2PjxzcGFuIHN0
+eWxlPSJjb2xvcjogcmdiKDExOSwgMTE5LCAxMTkpOyI+LTwvc3Bhbj48c3BhbiBzdHlsZT0i
+Y29sb3I6IHJnYigxOTksIDYxLCAzMik7Ij4tIDwvc3Bhbj48L2Rpdj48c3BhbiBzdHlsZT0i
+YmFja2dyb3VuZC1jb2xvcjogcmdiKDI0NSwgMjQ1LCAyNDUpOyI+Cjwvc3Bhbj48ZGl2PjIu
+MjUuMTwvZGl2PjxkaXY+PGJyPjwvZGl2PjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9y
+OiByZ2IoMjQ1LCAyNDUsIDI0NSk7Ij48L3NwYW4+PC9kaXY+
+
+------=_NextPart_679201D8_17189D58_1A88647E--
+
+------=_NextPart_679201D8_17189D58_6978AC68
+Content-Type: application/octet-stream;
+	charset="gb18030";
+	name="0000-cover-letter.patch"
+Content-Disposition: attachment; filename="0000-cover-letter.patch"
+Content-Transfer-Encoding: base64
+
+RnJvbSA4OTk3MTM5NjRlMmE2ZTFlY2UwOGE4NDM5OGI4N2Q5MjNiYTEwODJlIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBjYWl0YW8gPGNhaXRhb0BreWxpbm9zLmNuPgpEYXRl
+OiBUaHUsIDIzIEphbiAyMDI1IDE2OjMyOjU3ICswODAwClN1YmplY3Q6IFtQQVRDSCBCbHVl
+WiAwLzFdICoqKiBTVUJKRUNUIEhFUkUgKioqCgoqKiogQkxVUkIgSEVSRSAqKioKCmNhaXRh
+byAoMSk6CiAgYmF0dGVyeS5jOiBUaGUgYmF0dGVyeSBpcyBub3QgaW5pdGlhbGl6ZWQsIGFu
+ZCBpbml0aWFsaXplIHRoZSBiYXR0ZXJ5CgogcHJvZmlsZXMvYmF0dGVyeS9iYXR0ZXJ5LmMg
+fCAyICsrCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspCgotLSAKMi4yNS4xCgo=
+
+------=_NextPart_679201D8_17189D58_6978AC68
+Content-Type: application/octet-stream;
+	charset="gb18030";
+	name="0001-battery.c-The-battery-is-not-initialized-and-initial.patch"
+Content-Disposition: attachment; filename="0001-battery.c-The-battery-is-not-initialized-and-initial.patch"
+Content-Transfer-Encoding: base64
+
+RnJvbSA4OTk3MTM5NjRlMmE2ZTFlY2UwOGE4NDM5OGI4N2Q5MjNiYTEwODJlIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBjYWl0YW8gPGNhaXRhb0BreWxpbm9zLmNuPgpEYXRl
+OiBUaHUsIDIzIEphbiAyMDI1IDE2OjMyOjI1ICswODAwClN1YmplY3Q6IFtQQVRDSCBCbHVl
+WiAxLzFdIGJhdHRlcnkuYzogVGhlIGJhdHRlcnkgaXMgbm90IGluaXRpYWxpemVkLCBhbmQK
+IGluaXRpYWxpemUgdGhlIGJhdHRlcnkKCmZpeDogaHR0cHM6Ly9naXRodWIuY29tL2JsdWV6
+L2JsdWV6L2lzc3Vlcy8xMDQyCi0tLQogcHJvZmlsZXMvYmF0dGVyeS9iYXR0ZXJ5LmMgfCAy
+ICsrCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvcHJv
+ZmlsZXMvYmF0dGVyeS9iYXR0ZXJ5LmMgYi9wcm9maWxlcy9iYXR0ZXJ5L2JhdHRlcnkuYwpp
+bmRleCA1MzE4ZDQwZDEuLmEzMTRmM2E0NCAxMDA2NDQKLS0tIGEvcHJvZmlsZXMvYmF0dGVy
+eS9iYXR0ZXJ5LmMKKysrIGIvcHJvZmlsZXMvYmF0dGVyeS9iYXR0ZXJ5LmMKQEAgLTEzOSw2
+ICsxMzksOCBAQCBzdGF0aWMgdm9pZCBiYXR0X2lvX2NjY193cml0dGVuX2NiKHVpbnQxNl90
+IGF0dF9lY29kZSwgdm9pZCAqdXNlcl9kYXRhKQogCWdfZnJlZSAoYmF0dC0+aW5pdGlhbF92
+YWx1ZSk7CiAJYmF0dC0+aW5pdGlhbF92YWx1ZSA9IE5VTEw7CiAKKwlidGRfYmF0dGVyeV91
+cGRhdGUoYmF0dC0+YmF0dGVyeSwgYmF0dC0+cGVyY2VudGFnZSk7CisKIAlEQkcoIkJhdHRl
+cnkgTGV2ZWw6IG5vdGlmaWNhdGlvbiBlbmFibGVkIik7CiB9CiAKLS0gCjIuMjUuMQoK
+
+------=_NextPart_679201D8_17189D58_6978AC68--
+
