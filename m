@@ -1,103 +1,232 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F1241CD1F6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 11:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815261B3948
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 12:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737716620; cv=none; b=gIys7gmVBNrguODz4LcsBxIL8a2jG2T81e93frTfCKcQ7j2Gmg2b36C1JcereC8h1MEeu8ZjTllPcvUxO3Lir0cK3DMF1YP0gU8lZrVpl/+PV2A7UNqYwOi6HLLR+zl/D9W/wNGhDwmQGKWzKeLf/8yY3r/5LFocJ2Vljiq0sTE=
+	t=1737720340; cv=none; b=jx0MkFBGRswIyAYxQmhDdhww9caRa/9ZmqYQ/HwEosKjVIMmP11Ooi8EfJdGxFPTyP3ZWnvmK79Gw3nuFOpgjmlLFqqRN/AGjgmGyseG78GGeyO2fXCpaW0SrD5LghBZ8/bW1i8tz+jy+05WoCuH5wiQkL60xeqEnR4aM2Laz4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737716620; c=relaxed/simple;
-	bh=6PGmypZtbWxf5cYs+2F4Q49IvRDwDsll3XiW/Nnvmug=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tR6yCriLgYkxNaeAwKDvPs5T+85xKGWy7n9PRqwmYNW2HuAoUToO8W8NxNzxCZtRlji5+VqICJGe7dydrhf0XVjgDBd/ZEKtRcsDJT7mDkXDI1Xq7XIyWDymhHTxFESeOXLoHVucbpeW+xYoLtGnjsu/49pbV1Mda9/HhFKM4fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=dpLTSW0Y; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1737720340; c=relaxed/simple;
+	bh=pjyDaftLXDvL+bLowGu2eJSKojuU5+RA3TvMzM2uW4E=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=WQ6Ug6M7u9tsXi7slk1zbsvg9W2pARYFovjokVLAVqvcpm2qdTQKk8jS2STo4cb6hbMH1NraGPSKu7A4NRTaQcQjTAxqd40jttWhGp49xT8j4gqlt2NumxA4YumvXfGP/drKk+YfMbWPRnyD39NVqLR6h0F4Mh2P+Mfa3iF90vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e4qCr1DN; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="dpLTSW0Y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1737716616;
-	bh=6PGmypZtbWxf5cYs+2F4Q49IvRDwDsll3XiW/Nnvmug=;
-	h=From:To:Subject:Date:From;
-	b=dpLTSW0YHsgEzIp20yUwEuORJraucD+pizh6u/RZnIMHKiPE5FgghhTxCK3VuXXul
-	 9DN82alySxOtcZDi0UWJrcJo5k7tPSJZSgv/LCdWB3Wdf+JCFXZyDtOSR4B+Y8Qkjq
-	 2vD7vbtyN7w05jDs2ryO7e8mGGcfZ3O5H+0jOw9xwCSgakAfcnRUjFY1SjY1vBWYIZ
-	 402VdfkymIGTNQ5ZBVGRUIHST5lacU9n0Lm480jx4bro5zxKdDqhc9wf2k5k59IEyQ
-	 Wt068Dq7HR4irdNe/BuhUeyYNxdDs2mJ9TEstYs2dq7fLLDTPVClL43UoCwR7PxRPi
-	 tTDBG1lP4rAvg==
-Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 7C23017E0237
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 12:03:36 +0100 (CET)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] avrcp: Fix crash on remote player changed
-Date: Fri, 24 Jan 2025 12:03:31 +0100
-Message-ID: <20250124110331.1003810-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e4qCr1DN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737720339; x=1769256339;
+  h=date:from:to:cc:subject:message-id;
+  bh=pjyDaftLXDvL+bLowGu2eJSKojuU5+RA3TvMzM2uW4E=;
+  b=e4qCr1DNiecIQ+XX+YeEts08TgBC+QlvqFLhts4EuAhvHLxqyac9Ai4B
+   LLcrM/W8hEmzmoReTs8wIIl4e1COSwygoGVEhquvIIF0ZwnQWRo1Motc4
+   xpk0yyFpqnPPsEnaNt5JjRfN9y53aCcCu+GvYBNFq5ht5o+RezLb66Dt4
+   FMGHkTI817adCH7bRnRfu1l1Nr/jJ11YPTeuNVHcGaVbGir9/3MD44pST
+   zsLLpM+zwMoa+LQ6JO5TFowffwV+v5S0skwFYBs+mA3Ylhv1FkN+0wJ8N
+   4+Ue5AN+TCdAtSe+JLrU7qeeh7CT8k5G5TZ8RpMr50BDMKbN3sElPjZd8
+   w==;
+X-CSE-ConnectionGUID: HfAVBudmT32H9Aoenlu1xA==
+X-CSE-MsgGUID: WFtEQlELSj+Rov8+q5Wt/A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="38351711"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="38351711"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 04:05:38 -0800
+X-CSE-ConnectionGUID: p7k6jbjVTCyck6Bx87rMKw==
+X-CSE-MsgGUID: LPRFYYjdR323g0h79mhBpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="138629470"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 24 Jan 2025 04:05:36 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tbIRK-000ceV-0R;
+	Fri, 24 Jan 2025 12:05:34 +0000
+Date: Fri, 24 Jan 2025 20:04:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 02a3ad5b3506968b9bd56b2b4bfa9c278bb9505c
+Message-ID: <202501242051.7nqXsGpr-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 
-bluetoothd crashes when the remote player changes while bluetoothd
-is waiting for avrcp_list_items reply.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 02a3ad5b3506968b9bd56b2b4bfa9c278bb9505c  Bluetooth: btusb: Add 13 USB device IDs for Qualcomm WCN785x
 
-profiles/audio/player.c:1597:9: runtime error: member access within null pointer of type 'struct media_folder'
-AddressSanitizer:DEADLYSIGNAL
-=================================================================
-==825871==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000020 (pc 0x602bb0fffabc bp 0x000000000020 sp 0x7ffef88216d0 T0)
-==825871==The signal is caused by a READ memory access.
-==825871==Hint: address points to the zero page.
-    #0 0x602bb0fffabc in media_folder_find_item profiles/audio/player.c:1597
-    #1 0x602bb100cd3b in media_folder_create_item profiles/audio/player.c:1877
-    #2 0x602bb100cd3b in media_player_create_item profiles/audio/player.c:1928
-    #3 0x602bb107eae6 in parse_media_element profiles/audio/avrcp.c:2605
-    #4 0x602bb107eae6 in avrcp_list_items_rsp profiles/audio/avrcp.c:2706
-    #5 0x602bb106892f in browsing_response profiles/audio/avctp.c:987
-    #6 0x602bb106892f in session_browsing_cb profiles/audio/avctp.c:1028
-    #7 0x73de85b1448d  (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x5d48d) (BuildId: 461eff2b4df472ba9c32b2358ae9ba018a59a8c5)
-    #8 0x73de85b73716  (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0xbc716) (BuildId: 461eff2b4df472ba9c32b2358ae9ba018a59a8c5)
-    #9 0x73de85b14f76 in g_main_loop_run (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x5df76) (BuildId: 461eff2b4df472ba9c32b2358ae9ba018a59a8c5)
-    #10 0x602bb13a22a8 in mainloop_run src/shared/mainloop-glib.c:66
-    #11 0x602bb13a2bb6 in mainloop_run_with_signal src/shared/mainloop-notify.c:189
-    #12 0x602bb0fd0257 in main src/main.c:1544
-    #13 0x73de84e2a1c9 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
-    #14 0x73de84e2a28a in __libc_start_main_impl ../csu/libc-start.c:360
-    #15 0x602bb0fd3124 in _start (/home/fdanis/src/bluez/src/bluetoothd+0x5c8124) (BuildId: 367892bd0501d74713dd7341977abfac1b2c5d6a)
+elapsed time: 1012m
 
-This can be reproduced using bluetoothctl and doing "player.list-items"
-just before switching music player on the remote device.
+configs tested: 155
+configs skipped: 2
 
-This commit discards the item list parsing if the current player has
-not created a pending_list_items, i.e. it doesn't start this request.
----
- profiles/audio/avrcp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 9fe8f55e5..6378b7a6e 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2661,6 +2661,11 @@ static gboolean avrcp_list_items_rsp(struct avctp *conn, uint8_t *operands,
- 	size_t i;
- 	int err = 0;
- 
-+	if (player->p == NULL) {
-+		media_player_list_complete(player->user_data, NULL, -EINVAL);
-+		return FALSE;
-+	}
-+
- 	if (pdu == NULL) {
- 		err = -ETIMEDOUT;
- 		goto done;
--- 
-2.43.0
+tested configs:
+alpha                             allnoconfig    gcc-14.2.0
+alpha                            allyesconfig    gcc-14.2.0
+arc                              allmodconfig    gcc-13.2.0
+arc                               allnoconfig    gcc-13.2.0
+arc                               allnoconfig    gcc-14.2.0
+arc                              allyesconfig    gcc-13.2.0
+arc                   randconfig-001-20250124    gcc-13.2.0
+arc                   randconfig-002-20250124    gcc-13.2.0
+arm                              allmodconfig    gcc-14.2.0
+arm                               allnoconfig    clang-17
+arm                               allnoconfig    gcc-14.2.0
+arm                              allyesconfig    gcc-14.2.0
+arm                   randconfig-001-20250124    clang-17
+arm                   randconfig-002-20250124    gcc-14.2.0
+arm                   randconfig-003-20250124    gcc-14.2.0
+arm                   randconfig-004-20250124    clang-19
+arm64                            allmodconfig    clang-18
+arm64                             allnoconfig    gcc-14.2.0
+arm64                 randconfig-001-20250124    clang-20
+arm64                 randconfig-002-20250124    clang-20
+arm64                 randconfig-003-20250124    clang-19
+arm64                 randconfig-004-20250124    clang-20
+csky                              allnoconfig    gcc-14.2.0
+csky                  randconfig-001-20250124    gcc-14.2.0
+csky                  randconfig-002-20250124    gcc-14.2.0
+hexagon                          allmodconfig    clang-20
+hexagon                           allnoconfig    clang-20
+hexagon                           allnoconfig    gcc-14.2.0
+hexagon                          allyesconfig    clang-18
+hexagon               randconfig-001-20250124    clang-20
+hexagon               randconfig-002-20250124    clang-14
+i386                             allmodconfig    gcc-12
+i386                              allnoconfig    gcc-12
+i386                             allyesconfig    gcc-12
+i386        buildonly-randconfig-001-20250124    clang-19
+i386        buildonly-randconfig-002-20250124    clang-19
+i386        buildonly-randconfig-003-20250124    clang-19
+i386        buildonly-randconfig-003-20250124    gcc-12
+i386        buildonly-randconfig-004-20250124    clang-19
+i386        buildonly-randconfig-004-20250124    gcc-12
+i386        buildonly-randconfig-005-20250124    clang-19
+i386        buildonly-randconfig-005-20250124    gcc-12
+i386        buildonly-randconfig-006-20250124    clang-19
+i386        buildonly-randconfig-006-20250124    gcc-12
+i386                                defconfig    clang-19
+i386                  randconfig-001-20250124    clang-19
+i386                  randconfig-002-20250124    clang-19
+i386                  randconfig-003-20250124    clang-19
+i386                  randconfig-004-20250124    clang-19
+i386                  randconfig-005-20250124    clang-19
+i386                  randconfig-006-20250124    clang-19
+i386                  randconfig-007-20250124    clang-19
+i386                  randconfig-011-20250124    gcc-12
+i386                  randconfig-012-20250124    gcc-12
+i386                  randconfig-013-20250124    gcc-12
+i386                  randconfig-014-20250124    gcc-12
+i386                  randconfig-015-20250124    gcc-12
+i386                  randconfig-016-20250124    gcc-12
+i386                  randconfig-017-20250124    gcc-12
+loongarch                        allmodconfig    gcc-14.2.0
+loongarch                         allnoconfig    gcc-14.2.0
+loongarch             randconfig-001-20250124    gcc-14.2.0
+loongarch             randconfig-002-20250124    gcc-14.2.0
+m68k                             allmodconfig    gcc-14.2.0
+m68k                              allnoconfig    gcc-14.2.0
+m68k                             allyesconfig    gcc-14.2.0
+microblaze                       allmodconfig    gcc-14.2.0
+microblaze                        allnoconfig    gcc-14.2.0
+microblaze                       allyesconfig    gcc-14.2.0
+mips                              allnoconfig    gcc-14.2.0
+nios2                             allnoconfig    gcc-14.2.0
+nios2                 randconfig-001-20250124    gcc-14.2.0
+nios2                 randconfig-002-20250124    gcc-14.2.0
+openrisc                          allnoconfig    clang-20
+openrisc                          allnoconfig    gcc-14.2.0
+openrisc                         allyesconfig    gcc-14.2.0
+openrisc                            defconfig    gcc-12
+parisc                           allmodconfig    gcc-14.2.0
+parisc                            allnoconfig    clang-20
+parisc                            allnoconfig    gcc-14.2.0
+parisc                           allyesconfig    gcc-14.2.0
+parisc                              defconfig    gcc-12
+parisc                randconfig-001-20250124    gcc-14.2.0
+parisc                randconfig-002-20250124    gcc-14.2.0
+powerpc                          allmodconfig    gcc-14.2.0
+powerpc                           allnoconfig    clang-20
+powerpc                           allnoconfig    gcc-14.2.0
+powerpc                          allyesconfig    clang-16
+powerpc               randconfig-001-20250124    gcc-14.2.0
+powerpc               randconfig-002-20250124    gcc-14.2.0
+powerpc               randconfig-003-20250124    clang-20
+powerpc64             randconfig-001-20250124    gcc-14.2.0
+powerpc64             randconfig-002-20250124    clang-20
+powerpc64             randconfig-003-20250124    clang-19
+riscv                            allmodconfig    clang-20
+riscv                             allnoconfig    clang-20
+riscv                             allnoconfig    gcc-14.2.0
+riscv                            allyesconfig    clang-20
+riscv                               defconfig    gcc-12
+riscv                 randconfig-001-20250124    clang-19
+riscv                 randconfig-001-20250124    gcc-14.2.0
+riscv                 randconfig-002-20250124    gcc-14.2.0
+s390                             allmodconfig    clang-19
+s390                              allnoconfig    clang-20
+s390                             allyesconfig    gcc-14.2.0
+s390                                defconfig    gcc-12
+s390                  randconfig-001-20250124    gcc-14.2.0
+s390                  randconfig-002-20250124    clang-20
+s390                  randconfig-002-20250124    gcc-14.2.0
+sh                               allmodconfig    gcc-14.2.0
+sh                                allnoconfig    gcc-14.2.0
+sh                               allyesconfig    gcc-14.2.0
+sh                                  defconfig    gcc-12
+sh                    randconfig-001-20250124    gcc-14.2.0
+sh                    randconfig-002-20250124    gcc-14.2.0
+sparc                            allmodconfig    gcc-14.2.0
+sparc                             allnoconfig    gcc-14.2.0
+sparc                 randconfig-001-20250124    gcc-14.2.0
+sparc                 randconfig-002-20250124    gcc-14.2.0
+sparc64                             defconfig    gcc-12
+sparc64               randconfig-001-20250124    gcc-14.2.0
+sparc64               randconfig-002-20250124    gcc-14.2.0
+um                               allmodconfig    clang-20
+um                                allnoconfig    clang-18
+um                                allnoconfig    clang-20
+um                               allyesconfig    gcc-12
+um                                  defconfig    gcc-12
+um                             i386_defconfig    gcc-12
+um                    randconfig-001-20250124    gcc-12
+um                    randconfig-001-20250124    gcc-14.2.0
+um                    randconfig-002-20250124    clang-20
+um                    randconfig-002-20250124    gcc-14.2.0
+um                           x86_64_defconfig    gcc-12
+x86_64                            allnoconfig    clang-19
+x86_64                           allyesconfig    clang-19
+x86_64      buildonly-randconfig-001-20250124    gcc-12
+x86_64      buildonly-randconfig-002-20250124    gcc-12
+x86_64      buildonly-randconfig-003-20250124    clang-19
+x86_64      buildonly-randconfig-004-20250124    clang-19
+x86_64      buildonly-randconfig-005-20250124    clang-19
+x86_64      buildonly-randconfig-006-20250124    clang-19
+x86_64                              defconfig    gcc-11
+x86_64                                  kexec    clang-19
+x86_64                randconfig-071-20250124    gcc-12
+x86_64                randconfig-072-20250124    gcc-12
+x86_64                randconfig-073-20250124    gcc-12
+x86_64                randconfig-074-20250124    gcc-12
+x86_64                randconfig-075-20250124    gcc-12
+x86_64                randconfig-076-20250124    gcc-12
+x86_64                randconfig-077-20250124    gcc-12
+x86_64                randconfig-078-20250124    gcc-12
+x86_64                               rhel-9.4    clang-19
+xtensa                            allnoconfig    gcc-14.2.0
+xtensa                randconfig-001-20250124    gcc-14.2.0
+xtensa                randconfig-002-20250124    gcc-14.2.0
 
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
