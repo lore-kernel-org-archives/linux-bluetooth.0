@@ -1,51 +1,51 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937781D6DC8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB4F1D6DC8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737700887; cv=none; b=OHIMmGSMykzJTJsoXRF1mHU7g2MEuqgOlvb7l01jEpG4sD44JfxoDz8gZLpKR6vl+4hyGkImH3gmNppUV39l0UTwcqV5sWYL/0mh4H8K36MfiipNY1BKxEsWm8k/07Bzb+oZjFyXEt8Mp/Bvil9rbxX38MzElAdLfATz+yUsfDo=
+	t=1737700917; cv=none; b=hMqpvCcMKP4huUe4zsaG4H0VAaiTUdm5f5dSgAme4xoiAzQx8PkBQrPrinh8Dp9glDtocLktoupCgZUElvm9EiaJafVVQl3nOamv8AFpLbS7wbVrb/qZdDVGrHKFKPpsTj1NoV+OXxUfemjZcSlHSBi+3Z5zYwOqR+eglPLkKco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737700887; c=relaxed/simple;
-	bh=YwswkQBuX10d8PhsrRKXnLWEL5OdxlGpp8WFyRYJKDs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B7Z3GtLIVd+iFC16hC5KXBXB+H4sC8Oep1TKLN8OCaYBPtkljQWci5NZs0GgSz16rU1iZbEKLoJdOpnlGVHfu5AB/IPi7ayRdGf6D9xOU9S3TS+joVbp3IO2U2/vG596erpVN/EQIDNlYobGnH1S+t9qANIevMcZnRX3X2nEKkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Z8XpoLBl; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1737700917; c=relaxed/simple;
+	bh=joZnUU8i0fCfRaIAEKqlLfDmlCF7N7D8mkmwzrWLEaA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k1sPTCdeszNm0ktpoDiFC8Ns9tzxBXD/tAfDirMQ9rxop42OZgvAp0rom6HoW0xJuxImqAkTShYu+DsF3TX6Ra/VvCSINjxbJrKRJggkGNpG10oix5/p42N5A5U2bk5pEWrLdn+g2IKAgS4GcC8ZoC0unTEuaMlQWMpbLu6sKwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YPWWnP1H; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Z8XpoLBl"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50NK1gMU025117
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:24 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YPWWnP1H"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50O3Ib6W026503
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=zqTKXqkgsWh0ec4bqFvYwn
-	Z5tgPTJ0+BTdYIdnLBJG8=; b=Z8XpoLBlw9dTwZJLXILZujZAFuJGBExaQ30Cmh
-	JzndsXnj8hS5npDdK1q6y+PvS7CGm8K1pi0uV3z3AEcXSCMpWr02+TcTwhzWzvLo
-	PBf9ZDguJ//KJg2rol6joEP94B9V7d5HF1eFS8bIZCRXvIfz6EIgsD8OR8rmP4BE
-	l7CMUSh+P4xSvcHIokOMzbd+651EVWn+x7F2i7202INZWXJZ5u53wVanPL8pY2eL
-	ONm43sCxE+Q7q/HGy2PLMBGjkRFnHe2gq9gHbLEZa6zav5tEtZbNvEXxn9kAe5qv
-	0sgX1ynyT/Cmi4K6wEKgp2pX/iTKtjNcEHK1yBhGwlkitaGQ==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44bvenh39f-1
+	:mime-version:subject:to; s=qcppdkim1; bh=D3wtnnrMGB/7yMz7EPUCJq
+	NUifkTT+fj3hzFfmaODmA=; b=YPWWnP1HBfFXVi0EuyjN2YEvjrh6/dslmO1LBW
+	aDNSBi6RbCoNQdRoEzvnkyuDkvUw/JeamkAXdQ3XP9mSPdpf9pWG2mJ5beMBwM1z
+	V1m8IGGeBe5Pm4fuV01ZDPSZ1wHOcnADsDwUR6BZHzH5VH6uSok/JpMJH8uJePd9
+	174PXSwAveRZuQBZNOQmYeTaFd6aJ1xWqgWVasLSb3mY7qT0P10U9rseXSjh3COb
+	Y0rIOokDFC3i9AiN3UlmZcMqh0MtmwLGzrPCNfXyCJXwOMAbmAPt0fpinTFaNDWD
+	YmTTE2xFuFHqp6JDQJ0J9/wJ+UFtcPFQneriojiUutNPz6Ig==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44c2uj8c7s-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:24 +0000 (GMT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:55 +0000 (GMT)
 Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50O6fOXs016021
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50O6fsCE008179
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:24 GMT
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 06:41:54 GMT
 Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
  nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 23 Jan 2025 22:41:22 -0800
+ 15.2.1544.9; Thu, 23 Jan 2025 22:41:52 -0800
 From: Amisha Jain <quic_amisjain@quicinc.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
         <quic_anubhavg@quicinc.com>
-Subject: [PATCH v1] obex: Update the MAP Client version to 1.4 in SDP record
-Date: Fri, 24 Jan 2025 12:11:05 +0530
-Message-ID: <20250124064105.1071400-1-quic_amisjain@quicinc.com>
+Subject: [PATCH v1] obex: Add supported features tag in MAP Client Connect Request
+Date: Fri, 24 Jan 2025 12:11:40 +0530
+Message-ID: <20250124064140.1071458-1-quic_amisjain@quicinc.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -55,62 +55,81 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nasanex01c.na.qualcomm.com (10.45.79.139)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: gXREcq6_HOtGsAhpM64RxMtUvktRg0zo
-X-Proofpoint-ORIG-GUID: gXREcq6_HOtGsAhpM64RxMtUvktRg0zo
+X-Proofpoint-ORIG-GUID: fuy9uMBEFwHov5lGRdnpemPfShjPNevL
+X-Proofpoint-GUID: fuy9uMBEFwHov5lGRdnpemPfShjPNevL
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-24_02,2025-01-23_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=889
- suspectscore=0 adultscore=0 spamscore=0 priorityscore=1501 impostorscore=0
- mlxscore=0 bulkscore=0 clxscore=1015 malwarescore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501240047
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 impostorscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 bulkscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501240046
 
-This change is required in below PTS testcase:
-1. MAP/MCE/SGSIT/ATTR/BV-10-C
-Attribute GSIT - Bluetooth Profile Descriptor List, MAP 1.4
+This change is required for below PTS testcase -
 
-Current MAP Client version 1.2 is being deprecated and withdrawn
-from BT Sig, so it is mandatory to update the version.
+1. MAP/MCE/MFB/BV-06-C
+Verify that the MCE sends its MapSupportedFeatures in the
+OBEX Connect request if the MSE declares support for the
+feature MapSupportedFeatures in Connect Request in
+its SDP record.
 
-No additional changes are needed for supporting the new version.
+If Server's SDP record contains the field 'MapSupportedFeatures in
+Connect Request' as supported then include the supported features tag in
+obex connect request.
 
 ---
- doc/supported-features.txt | 3 ++-
- src/profile.c              | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ obexd/client/map.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/doc/supported-features.txt b/doc/supported-features.txt
-index 8b71bfe17..5318dc68d 100644
---- a/doc/supported-features.txt
-+++ b/doc/supported-features.txt
-@@ -40,7 +40,8 @@ FTP			1.3		Client, Server
- OPP			1.2		Client, Server
- SYNCH			1.1		Client
- PBAP			1.1		Client, Server
--MAP			1.0		Client, Server
-+MAP			1.0		Server
-+MAP			1.4		Client
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index b8820335b..2fd0f74ec 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -39,6 +39,7 @@
+ #define OBEX_MAS_UUID \
+ 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
+ #define OBEX_MAS_UUID_LEN 16
++#define SUPPORTED_FEATURES_TAG  0x29
  
- HID			1.1		Host
+ #define MAP_INTERFACE "org.bluez.obex.MessageAccess1"
+ #define MAP_MSG_INTERFACE "org.bluez.obex.Message1"
+@@ -2179,6 +2180,23 @@ static void parse_service_record(struct map_data *map)
+ 		map->supported_features = 0x0000001f;
+ }
  
-diff --git a/src/profile.c b/src/profile.c
-index 70ac058f4..af32dbd9f 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -2167,7 +2167,7 @@ static struct default_settings {
- 		.mode		= BT_IO_MODE_ERTM,
- 		.authorize	= true,
- 		.get_record	= get_mns_record,
--		.version	= 0x0102
-+		.version	= 0x0104
- 	},
++static void *map_supported_features(struct obc_session *session)
++{
++	const void *data;
++
++	/* Supported Feature Bits */
++	data = obc_session_get_attribute(session,
++					SDP_ATTR_MAP_SUPPORTED_FEATURES);
++	if (!data)
++		return NULL;
++
++	if(*(uint32_t *)data & 0x00080000)
++		return g_obex_apparam_set_uint32(NULL, SUPPORTED_FEATURES_TAG,
++				0x0000027f);
++
++	return NULL;
++}
++
+ static int map_probe(struct obc_session *session)
+ {
+ 	struct map_data *map;
+@@ -2224,6 +2242,7 @@ static struct obc_driver map = {
+ 	.uuid = MAS_UUID,
+ 	.target = OBEX_MAS_UUID,
+ 	.target_len = OBEX_MAS_UUID_LEN,
++	.supported_features = map_supported_features,
+ 	.probe = map_probe,
+ 	.remove = map_remove
  };
- 
 -- 
 2.34.1
 
