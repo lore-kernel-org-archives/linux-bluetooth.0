@@ -1,35 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BADD219EAD
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 18:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64FE1DC04A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 20:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737744014; cv=none; b=V23XlkJz6VknqG8y/1jvKlrxu1fsIIgE2FmPACjmrHBI8X0SdD4O71x0eduadea1IEtMArhvSsy6+06wmGwAfKShf40NyZWDNmL2kde4A2W6UlZmQjIj3aoAhCV4Op3xfCDKXq4xk1pjOeFzHRWn2kzE/QwFL171mk/E3XRiH98=
+	t=1737752227; cv=none; b=F6b/QCHCNV3kh1uWCFB3QQELKrRUXYfDT37KORoQl1lHT95jvAZ/RE93TzyrsJwJeNEFkWQnA/kF475m7ZDd6jJ7q960vA5c/rjtD8T4urqDb0xRAOHVekDGTdBXzd6pm8tGN1+3Q0SDFIaj3FQnzWllS85CY8j+oeGKG835wa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737744014; c=relaxed/simple;
-	bh=jUNkiBE7EPO6KP7+7/HBL7PIEmK4YMYTZYYhG91W0fg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EOoOjVCoQ27SurSGUuL2VeKOV+Sc+Gnj0VRxxM8izyGCEFYvNZ2Bil/I8C/+fVUHQxuYgpqR8N64quztsztQL8ZmVLh43t9jaaaE7TSsxPhsstX07Vp2zqZbRWuvtZaG1oUb9xlmkpcRi5A0Xd+zbtWzC8tWASSb09jEcTTJ5To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VeS6A1ZS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737752227; c=relaxed/simple;
+	bh=In+dG3k+ZSqAGF5gMXwx0VrTsam9aE6QEuReBL3wJH8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=l/DvrQ96852y+55AI2cTg3cBmuq22HY4XXfV58FWDJsOOBcR8KSaNUdB5KWV+vMfUvvtq2GeP1Jr6DxqaHrNypgSIclSrVkG/EiEcjCCOvbS/MUo5SdISRVdUJXMjgwSJQRQzvczYkkT5OuSagNZvOwfDnD4huiSuvCIml+1GQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VZSPQoOO; arc=none smtp.client-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VeS6A1ZS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F4CC4CED2;
-	Fri, 24 Jan 2025 18:40:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737744013;
-	bh=jUNkiBE7EPO6KP7+7/HBL7PIEmK4YMYTZYYhG91W0fg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VeS6A1ZSuAT0VkCD26frJhAK61OHgSz30W99guJ1AcbnAaiHJEpiQmsH4YvlZp0kp
-	 zsza9WiJnFiQ/PTq+xvQaUv3t7VDWgdLifUznKmyxjnFipfaOT3WE+KYrlTKeCfdIf
-	 micH7bD4Qu6qQhQi+CH5qx3STzDOCZB2xpVnCRAkhxKkheLltJeVxVb30goXhI5rc6
-	 cZHdBt+9Wrz6WgZL0O37y6TOrVBqxGacZWJHaHSY4O/lCo9zSiIFqGoaApgkKqUlo8
-	 zgptRdlc7dcKKAqMPOjeaVKt0QewMEVJ7WdvonBmLG6TrKHi2h8jrJupLC9uazn10x
-	 8mjj6ZiS9tGEA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0B7380AA79;
-	Fri, 24 Jan 2025 18:40:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VZSPQoOO"
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4afe2f6cecdso1714322137.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 12:57:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737752224; x=1738357024; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QiZiHdQ9avJIcbpVWAj9KtipKt/pwvvp9K5NEXMhHh0=;
+        b=VZSPQoOOYKZ31SUF7c9xR8nxrO1PBTyrFtIK/Xr7bIY/Y33Ak/Zm9Vi2F1OJQQMxal
+         C5MVdrz0SE+EAfBRFuI0TfqLgreeBGCROfnZH4DoVTwvcNeU3YM7t/56OysWnzdoLgNH
+         rmDTDWsuj4Z+T2txj5UR6Eig4XvJBEUgERRpzTwIVrtkThWsh836AdF/KeCSVwHiv/mV
+         jLt91B+rypCP4pp6MG5RwN9eUeyQqpk1DYYmHvsszAJEh9Xod/4h0KNcDk9+lkUhxyi4
+         +lqfrtDjmISwayC87QSyVX0ODl9Yvi46KepjVDOtYll4P31cM0jDC3ahL1mGgSgNRFm8
+         jnVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737752224; x=1738357024;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QiZiHdQ9avJIcbpVWAj9KtipKt/pwvvp9K5NEXMhHh0=;
+        b=DTs8SDGXFwAsxLWkpyu1PLB4Galxi2x35BUcY6LK6tbI2a8ero52ePmZtSGHUAO4yd
+         wprCGZST8SAwReiueObG5w2N/MckcpcyDeJFPAVxqIieMKepoXCYPbynEeDCr4bt54zN
+         fuO00MWWlJ0yxwUGDFuGeMoCH4zJvuFIiqy13xjYcEEgOA4tsnBEQkmOPvtrv5JH3ffo
+         /0ZStMOyBZkm8/f/dmsLynZzHirxWL8+lCYNUHwEOmv3T6AOBgWgjMhxfgTGCaSyOSGi
+         jMlzvoncFCwpH/uhJ4elFvS6DA0kIbRBWxDP5dVmd5pyrCaDb/mubPfUxk59bPfobv3r
+         xQiA==
+X-Gm-Message-State: AOJu0YzLN0NHGX5J6trVL8nKZnwjDMJemVVjZ03a4bvCg5Ng2l+afhqk
+	m/6wW7cE+3UBCe0vAahEQNl+aXJBw/38WxnS3oYy5BAH+GKD37pyxH5byQ==
+X-Gm-Gg: ASbGncsT4tw0AWU307V8I7I66ICMTM7nFQBc774u9uVmW3CmuiovRkYlfYXYqlNA8YW
+	IAn9V2G5HaLHc0H74r9xBa+3T6wlf2P8MTwHrVxR/3XZysCo2+TvGolH3uaXlZhxJ43R2EZJMsT
+	2ZKbOJBxb0xre0F+qs0dKPjcyMjK93n3ZkDpieifo4orO66fm5r2l7Mzs6n+Uc8dLFZilS7bsv0
+	+QtrcKyvVFf65z96rC06pXw3Ldt6QlFOPw1xZPJabU3yxuZG1fjWh+3tnfsnrpEiNjOhx2Zwd2h
+	Yaq1jxdDjQJHUm6IUZR/beBr6rMmVz0B9E2vY9nXsj/cbCljOID6
+X-Google-Smtp-Source: AGHT+IHNQQFXOnCgw02M1hte1IhNnxkSiwPU41/3X9BZ2k8FnjedpNzx1wpzLgqrCofnHIkWRGB7yw==
+X-Received: by 2002:a05:6102:5043:b0:4b6:377e:5653 with SMTP id ada2fe7eead31-4b6f79f15e7mr8048646137.2.1737752223823;
+        Fri, 24 Jan 2025 12:57:03 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b7097ab10csm652477137.7.2025.01.24.12.57.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jan 2025 12:57:02 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] gatt-client: Fix warnings when reconnecting
+Date: Fri, 24 Jan 2025 15:57:00 -0500
+Message-ID: <20250124205700.511446-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,39 +67,69 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/2] org.bluez.MediaTransport: Allow Volume property
- to follow profile range
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173774403824.2131600.5693404094007308977.git-patchwork-notify@kernel.org>
-Date: Fri, 24 Jan 2025 18:40:38 +0000
-References: <20250123205411.369041-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250123205411.369041-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+When reconnecting warnings could be seen due to services already
+existing which is a new behavior introduced by dbd6591bd1d0
+("main.conf: Add GATT.ExportClaimedServices").
+---
+ src/gatt-client.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
-On Thu, 23 Jan 2025 15:54:10 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This makes the Volume property to follow the profile defined range.
-> ---
->  doc/org.bluez.MediaTransport.rst | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-
-Here is the summary with links:
-  - [BlueZ,v2,1/2] org.bluez.MediaTransport: Allow Volume property to follow profile range
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9daadc32e807
-  - [BlueZ,v2,2/2] vcp: Fix using scaled values for volume
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0aac6883b3a3
-
-You are awesome, thank you!
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 6f22bbb490a7..da7c16fc14af 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1968,12 +1968,33 @@ static void service_free(void *data)
+ 	free(service);
+ }
+ 
++static bool match_service_handle(const void *a, const void *b)
++{
++	const struct service *service = a;
++	uint16_t start_handle = PTR_TO_UINT(b);
++
++	return service->start_handle == start_handle;
++}
++
+ static struct service *service_create(struct gatt_db_attribute *attr,
+ 						struct btd_gatt_client *client)
+ {
+ 	struct service *service;
+ 	const char *device_path = device_get_path(client->device);
+ 	bt_uuid_t uuid;
++	uint16_t start_handle, end_handle;
++	bool primary;
++
++	gatt_db_attribute_get_service_data(attr, &start_handle,
++							&end_handle,
++							&primary,
++							&uuid);
++
++	/* Check if service is already on list then return NULL to skip it */
++	service = queue_find(client->services, match_service_handle,
++						UINT_TO_PTR(start_handle));
++	if (service)
++		return NULL;
+ 
+ 	service = new0(struct service, 1);
+ 	service->chrcs = queue_new();
+@@ -2146,14 +2167,6 @@ static void export_service(struct gatt_db_attribute *attr, void *user_data)
+ 	queue_push_tail(client->services, service);
+ }
+ 
+-static bool match_service_handle(const void *a, const void *b)
+-{
+-	const struct service *service = a;
+-	uint16_t start_handle = PTR_TO_UINT(b);
+-
+-	return service->start_handle == start_handle;
+-}
+-
+ struct update_incl_data {
+ 	struct service *service;
+ 	bool changed;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.48.1
 
