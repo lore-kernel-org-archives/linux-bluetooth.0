@@ -1,59 +1,69 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic308-2.consmr.mail.bf2.yahoo.com (sonic308-2.consmr.mail.bf2.yahoo.com [74.6.130.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3419925A65C
-	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jan 2025 16:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737823330; cv=pass; b=Hw0b7mQYqrTeaNI19NxgYcgsqIRdMPuFkb8xs558nB+j3DYHcKlUkuC3qXZuQvD9DDz4r8vVrFl/zM0skw9s82BFkudRFneijGcy4kthB7uu8fk+VCP8g69U3NTdEtWjQjyTy0+Czr/MhqGVriZH9XUPCZWunSIVPU8NFw8WLas=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737823330; c=relaxed/simple;
-	bh=YSHGftoFB3W2ayh22gJy70Jox0CNg592YS4zrqYX8+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GKwoPjpB1N8XKIL9Ji8Ocbi2j6rxpSMNfH048C6j0i4+onuWElKXZVMo8Ov48q3p7EASw2xqxaqFUIw0p0IJQsAufcS54PBiFLht0AiUcUoa5I5QXBspBN+DaDpvfDsoQyYPJbiwEH2yMDVAE00TqKkAZxQQZ6q95XSjfoOOsVk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=cgV+FRBA; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821A043172
+	for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jan 2025 17:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.130.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737826730; cv=none; b=Mcx4L4DsojfI7svSUFbY5+TKAZhb3X/BV5jFcpklMrrR8EC3PguILLqxklpoLUdKv6LSaDpPaI02hceqfD4u0iw9JoILFAP9ndR2v3kgUsAhrXB1KIhU2FD5jYcoENdseDiwKy8ZsJhasGkSKb6DuSXMqZ/A1LQGTlE0sSAiPus=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737826730; c=relaxed/simple;
+	bh=+mGt21xKgA/AbPYIBFBdQkN+CekZ4uEEYPDkYbsebgo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=M2kaNed3E6AX/fyUSAPUOjbEy0dBocx/hAz85TXT2BZ2dQ5RwDpZp5IOtCBnVod7nx1PO92zKUI+gP0dQWwMXxIigzI5vvqjvx2NSdKZqBGl6uLwfoYgbwufjaZMQoTzesXpAtIkEOrTO/x8liFfW0AQ3sZKGXVBkRAPpE1t6iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=LfyJE6Q5; arc=none smtp.client-ip=74.6.130.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="cgV+FRBA"
-Received: from monolith.lan (unknown [193.138.7.178])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4YgL7B2CLmzyQT;
-	Sat, 25 Jan 2025 18:41:58 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1737823319;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=v5OVA8qHEoluRV9dBhQPirps1KhRfKKRpIYVms1fs8Y=;
-	b=cgV+FRBAm2TfDVeDTG0RtddGwOT0n6lYYQV7cin+spxgBMECtEMDjXpqXTBJnh5NCk+ndS
-	zGHuMZbM1S0XLfbNpsxK2RpLTPcSaDYEubTyeG1ukRZRqpW3tYq+0m6em3EZGJbgs6bvQg
-	oLL8DyF+B5k8NMzjpgd84zuHxBz8NXE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1737823319;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=v5OVA8qHEoluRV9dBhQPirps1KhRfKKRpIYVms1fs8Y=;
-	b=sClLY0pv+m1uy4E2ih00mGDaG6ReK1lBlGXikM3WY+D21m8+f2+jzLgHAZe+V7BSmYdzjr
-	lGtE5DnIUy2ABjkwff4c6nOhKtvAPxxsSPtULrDxfd/0M1OKtToNRwmtNJFYH6UZH92dfX
-	vKVJYgj0SRmRZc6QpNJd8xHPtWHWfAs=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1737823319; a=rsa-sha256; cv=none;
-	b=epP7agEBBjdRdy4epgWJ/j700x3MoTqCLq+UPpAuth8Gi3Hc2fQBOOCDiZO3OrHrHdPILl
-	xvbFJ0f43zsRsWj74knwznohpCFcY+PEnjnVlwwn7fv3kOUUa65gu4oJUfo5qrNX9cg2LX
-	JEIpCEnxBGyUrrfs2yU0br9HVciW5Ho=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] transport: fix issues with BAP volumes > 127
-Date: Sat, 25 Jan 2025 18:41:51 +0200
-Message-ID: <45ff22ec472a18bf3d83355f7e4af24a2b39d68b.1737823112.git.pav@iki.fi>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="LfyJE6Q5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1737826727; bh=3vbq/VcoG34d06AHZPQTCFW34TWTfaPtNJ26zRCMNDo=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=LfyJE6Q5NUo6UpM+Ftq4bDpZh59FF61ZFYtiSLyiLx8QeSYfSiwD3hXCnoe4a15ouiuyhtla1POG2R0uqoPHdE1gFoJR3bSv1boyroPulJVjxtZHvVuk5Tm3FnOz0AMKHxjZbOHpZwmEDK2V6Pz1oyYK2d4J9lMIRlaJ6Of2ASc1vkNu8ZlZumH2f90vD+fj5LP59WUtzKZI0nSJ3j30cd2h6h22cAxqF2AVzmxM5xjKbvlgQl/dTGF2INXEDAgtANuO8Ducr8pIXjrjh+aF3xhnHzFAusLlufpxoO4Q87JAxLZCJ9yk7OOICZvAzXtueCTlrvdJzO0hTNoMyEFh9w==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1737826727; bh=+2/d6X8PaHsC5rWc9/s4cyCF4d6TGHYAPTkwzuBAcZB=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=W8XgA35X5IvITh3q2l3O6T3TRHp8iOYvCTQcQm+QOpeIjn78d2wxO17wISo+26E2220DFFXKzp/8T40WzDjGzSr6L9e3gSul1ZMm+S+WwsjYniUxoz+FBLxmYCDvwroW5AQeV6fIIL7zaf0Fcwntkh22bi/mrKvs/EFNzLrYWJ+C6zkYLH2fAdklJzFqqcuPIZ8AhEKsUgkJ5ONL35pwfOzTGNe/AXwpo5un+cEmaK2UOmlNKv7cJPI9gLnCbbgLdQcXq553bT1veCJENMnbmYeDtXlulq6fuhEmOm1WICxIjg9i738L4Hj23MkrOM8sE0iy1P819pYwWCfnn/ZQdw==
+X-YMail-OSG: JU.65wAVM1mCjkDBGHbWiN9sva7xlMk3VDiMz6sS82sVZMYpdiCu_p10XL8Qkvy
+ p6QGbufqWSHlEP3CiIXHTYfzvnH59fF16V31OrcvRjOeVfPls11b0XkdEgx0jEITKDIp_KPe9QAi
+ QgBNTtOCkqx0gj0LYQNdmYFs4C3BPg9hZPeqM7a_tOkfSxpGY5XWrZ1jFkjc99qK6sT.olG2WnvR
+ s1PNx4yjgL88Zoajx4mUuvgAkoHkk0_LrSuifSfug5NwVPaip63NMypQI7uxi._C9rSzCdxylDsR
+ ouKOCo9nv2PWCImxBjGEUmsSy7RasKeEF0yMxWkyjiVOIDflPjuqwcDaL07pGxxT8D30XmsFkz2g
+ M8WqGauH0D_tzioaJXB2lb.noOS.QoG872WI7OUTmU4ZKc7kGQnqf3At2EHEnrhKpf4yfCKq7bm9
+ nTtHN03KMjVWirI_VlTuuV1q7qmvD84Vwon9YT9jkFmMiTjpo.JIDDQm3rEfp_3SXDpO5K8RLApr
+ KaAjsVaWOtMCyLXXdZBmd1T9BanILd4sufwCHP_XytdUTW7XFvgaxpTmDFMY2Tsj3BvMmOKJmzuS
+ mk.aYFvRyWJnph2PKVUuSh6WdvA3qJI7Iv2beGdgPh2H__U0ppBkQ0uTz4GehaJHRIJtUk1vFPqm
+ z9QkZD2y9DM0DZdfF4zGjowbQiny6tAzud3Pgatzame.uOmd8Fm7kdF56.693n5WxxMjJpvuq055
+ Mh41S48Fb3zrOvkwrNhTm.YAma90klx97DganeQKvpkNukWSxZDKdY25xlA.mFHvI3S8rkkfIaWX
+ HT8lfWyFC7YCLHBWpERroU9GAjZY4GChPS3Lsk2AuyZR13W5qNAcLnC4_FNmQ9rlkG_TLAqI58Vo
+ cv4VLbLaPLa7vwH.Pxgmh5.jxG1d9QKN.0nm4tJzaY9AYncflUgihi.mVwFMjSKV_uu6A6CtwKwR
+ ifK425w9STalnojMHHpqpB.jzOVGfOdhLG9SH4pT8vxpSFxdgEhtqycZ5b5gUtZCL2nBSQ2wHTN4
+ 4Pla3iGNKuaRDc0VLsCWkux7tbdVL.yOuAkCsE6J1eWoTdx1m6omr2i6zkk_G9IKqhPPfvKc7rsf
+ uNJvRTo5kAHakNRaIXGrnzUI2CJXaAO7F9pew8HHkveZ5l4MSEjDRZW_O1Ng7IrIJlmOxv1KYHLz
+ c7xSjXD1TVizkkWFlPM2EjbVsuViRU2vKYqegQGz6EobsKB9p4bp3HGKIsu3owTxZraQ7xQoIpup
+ saWyoxB5uh0C9_dwVOtpNnAZNBZDNQXfxdUiBgWEzUng.2foRRtspMg1SbpdY5JC19H3_PlU0xaQ
+ i8VRVL80qAwvJvuzDWliE.b9BF97KmHNi9emeaGZ.tRQgtxYLycJPA212wSqI9PJV9n.o2WOmIH4
+ CgrDBBKxWmroEnTtgST_9P6AEWSxLlz7nXjhfxJoRFLkjMPxp0h.OiIM2WAd5vDPZE8eUgaqKSh.
+ ovDXyhbRdm7xqF8n_p01WXJ6zuJiOhQ0m3bWhO1TU75BddcRvREJEynO9XHaqfbjJdIoxH9.H360
+ rPbvoBdnPI5sIlj8JFDmqj8Ij7U_F38oKlbs3Xyy2wwH9J9ihT9mC02UDxq_cnBDSGVsIJgcFAgc
+ h_S3fs3wxkZ_4bF5HR.3YL_NfD0vpr3CuISOjCwA0qW0LIi6ifc0UIm8rEOsrIJl1Dtsi1gjROGa
+ xEslU95J6Sc6pWHQ_0k29OQZwbrlHkNqvZEVhp_p3y9BCptH9xBbPEWjaxmJtqZXCMGH6IlhpX34
+ DINlbbfdCedxg55Ngr_SRwQldYeWrwM2T8rfBF3M57dcchQZLnKg.WhK3zmKkdOZ_eyucmkVGmKk
+ NJ06Hpmx9ro72Chn_4NhpDpYmnIlrmBIG6ZePHc_P1eoe7fnp7ZeM39FTcCdQAB9c.vplLYOSDSm
+ OLV3IFHCChznyZwGqN61QvNOFKHNTj8Am51GxA8ROLUDldxXl28BJC.5AM.sxyZInF8zlfyo7C2Z
+ bxoeyCSLABXzoDnEHBDUL_Y24TvSmtx7.OwplHhCnFVICGfCCKTMawTkmmYUpGZUMFG5Y_9Nd7XA
+ Fd9tApiyieqr.U7qQMwJ41t0iDWGpddIj_9o8fd4toLjq0pqkkHHqUpJ2FtATtnlXAKep5pk.Iie
+ .LhhCmVq40yZec5DityLTGUtdg7sWQZpNAKbNVejAJ2ZVe00MPAwJW0wLrYTmVOqHPFaa6Ls9lYs
+ AEUTaYHoxuHQZrqtFPvx90iMB8PbXkch9jK7nE.81osFNAAY-
+X-Sonic-MF: <deaner92@yahoo.com>
+X-Sonic-ID: a2443f0e-771a-4b30-852f-a580f4c0d1eb
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.bf2.yahoo.com with HTTP; Sat, 25 Jan 2025 17:38:47 +0000
+Received: by hermes--production-ir2-c694d79d9-mr45v (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 6801542b8adb9651ca86d5c6ff7510a2;
+          Sat, 25 Jan 2025 16:58:15 +0000 (UTC)
+From: deaner92@yahoo.com
+To: 
+Cc: deaner92@yahoo.com,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: Unnecessary braces around single line statment.
+Date: Sat, 25 Jan 2025 17:58:02 +0100
+Message-ID: <20250125165804.11486-1-deaner92@yahoo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,244 +71,32 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+References: <20250125165804.11486-1-deaner92.ref@yahoo.com>
 
-Change types used for volumes to int, for BAP volumes > 127 and to
-allow -1 as it is used to mean no volume.
+From: Jeremy Clifton <deaner92@yahoo.com>
 
-Fix BAP max volume check in transport.
+Warning found with checkpatch.pl script. Removed unnecessary braces.
 
-Fixes setting BAP volumes.
+Signed-off-by: Jeremy Clifton <deaner92@yahoo.com>
 ---
- profiles/audio/transport.c | 60 +++++++++++++++++++++++---------------
- profiles/audio/transport.h |  8 ++---
- 2 files changed, 40 insertions(+), 28 deletions(-)
+ drivers/bluetooth/bfusb.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 5fd20910f..f3ac1a251 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -126,8 +126,8 @@ struct media_transport_ops {
- 	void (*set_state)(struct media_transport *transport,
- 				transport_state_t state);
- 	void *(*get_stream)(struct media_transport *transport);
--	uint8_t (*get_volume)(struct media_transport *transport);
--	int (*set_volume)(struct media_transport *transport, uint8_t level);
-+	int (*get_volume)(struct media_transport *transport);
-+	int (*set_volume)(struct media_transport *transport, int level);
- 	int (*set_delay)(struct media_transport *transport, uint16_t delay);
- 	void (*update_links)(const struct media_transport *transport);
- 	GDestroyNotify destroy;
-@@ -616,7 +616,7 @@ static void transport_a2dp_remove_owner(struct media_transport *transport,
- 	a2dp->cancel_resume = FALSE;
- }
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index cab93935cc7f..0d6ad50da046 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -365,9 +365,8 @@ static void bfusb_rx_complete(struct urb *urb)
+ 			buf   += 3;
+ 		}
  
--static uint8_t transport_a2dp_get_volume(struct media_transport *transport)
-+static int transport_a2dp_get_volume(struct media_transport *transport)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 	return a2dp->volume;
-@@ -624,10 +624,13 @@ static uint8_t transport_a2dp_get_volume(struct media_transport *transport)
+-		if (count < len) {
++		if (count < len)
+ 			bt_dev_err(data->hdev, "block extends over URB buffer ranges");
+-		}
  
- #ifdef HAVE_AVRCP
- static int transport_a2dp_src_set_volume(struct media_transport *transport,
--					uint8_t level)
-+					int level)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 
-+	if (level < 0 || level > 127)
-+		return -EINVAL;
-+
- 	if (a2dp->volume == level)
- 		return 0;
- 
-@@ -635,11 +638,14 @@ static int transport_a2dp_src_set_volume(struct media_transport *transport,
- }
- 
- static int transport_a2dp_snk_set_volume(struct media_transport *transport,
--					uint8_t level)
-+					int level)
- {
- 	struct a2dp_transport *a2dp = transport->data;
- 	bool notify;
- 
-+	if (level < 0 || level > 127)
-+		return -EINVAL;
-+
- 	if (a2dp->volume == level)
- 		return 0;
- 
-@@ -1084,7 +1090,7 @@ static void set_delay_report(const GDBusPropertyTable *property,
- static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
- {
- 	struct media_transport *transport = data;
--	int8_t volume;
-+	int volume;
- 
- 	if (media_transport_get_volume(transport, &volume))
- 		return FALSE;
-@@ -1092,8 +1098,7 @@ static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
- 	return volume >= 0;
- }
- 
--int media_transport_get_volume(struct media_transport *transport,
--					int8_t *volume)
-+int media_transport_get_volume(struct media_transport *transport, int *volume)
- {
- 	if (transport->ops && transport->ops->get_volume) {
- 		*volume = transport->ops->get_volume(transport);
-@@ -1107,7 +1112,7 @@ static gboolean get_volume(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
- 	struct media_transport *transport = data;
--	int8_t level;
-+	int level;
- 	uint16_t volume;
- 
- 	if (media_transport_get_volume(transport, &level))
-@@ -1121,7 +1126,7 @@ static gboolean get_volume(const GDBusPropertyTable *property,
- }
- 
- static int media_transport_set_volume(struct media_transport *transport,
--					int8_t level)
-+					int level)
- {
- 	DBG("Transport %s level %d", transport->path, level);
- 
-@@ -1147,15 +1152,13 @@ static void set_volume(const GDBusPropertyTable *property,
- 	}
- 
- 	dbus_message_iter_get_basic(iter, &arg);
--	if (arg > INT8_MAX) {
-+	err = media_transport_set_volume(transport, arg);
-+	if (err == -EINVAL) {
- 		g_dbus_pending_property_error(id,
- 				ERROR_INTERFACE ".InvalidArguments",
--				"Volume must not be larger than 127");
-+				"Invalid volume value");
- 		return;
--	}
--
--	err = media_transport_set_volume(transport, arg);
--	if (err) {
-+	} else if (err) {
- 		error("Unable to set volume: %s (%d)", strerror(-err), err);
- 		g_dbus_pending_property_error(id,
- 						ERROR_INTERFACE ".Failed",
-@@ -2190,14 +2193,17 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
- 	bap_update_links(transport);
- }
- 
--static uint8_t transport_bap_get_volume(struct media_transport *transport)
-+static int transport_bap_get_volume(struct media_transport *transport)
- {
- 	return bt_audio_vcp_get_volume(transport->device);
- }
- 
- static int transport_bap_set_volume(struct media_transport *transport,
--								uint8_t volume)
-+								int volume)
- {
-+	if (volume < 0 || volume > 255)
-+		return -EINVAL;
-+
- 	return bt_audio_vcp_set_volume(transport->device, volume) ? 0 : -EIO;
- }
- 
-@@ -2355,7 +2361,7 @@ static void transport_asha_cancel(struct media_transport *transport, guint id)
- 	}
- }
- 
--static uint8_t transport_asha_get_volume(struct media_transport *transport)
-+static int transport_asha_get_volume(struct media_transport *transport)
- {
- 	struct bt_asha_device *asha_dev = transport->data;
- 	int8_t volume;
-@@ -2370,11 +2376,14 @@ static uint8_t transport_asha_get_volume(struct media_transport *transport)
- }
- 
- static int transport_asha_set_volume(struct media_transport *transport,
--							uint8_t volume)
-+							int volume)
- {
- 	struct bt_asha_device *asha_dev = transport->data;
- 	int scaled_volume;
- 
-+	if (volume < 0 || volume > 127)
-+		return -EINVAL;
-+
- 	/* Convert 0-127 to -128-0 */
- 	scaled_volume = ((((int) volume) * 128) / 127) - 128;
- 
-@@ -2585,7 +2594,7 @@ struct btd_device *media_transport_get_dev(struct media_transport *transport)
- }
- 
- void media_transport_update_volume(struct media_transport *transport,
--								int8_t volume)
-+								int volume)
- {
- 	if (volume < 0)
- 		return;
-@@ -2593,6 +2602,9 @@ void media_transport_update_volume(struct media_transport *transport,
- 	if (media_endpoint_get_sep(transport->endpoint)) {
- 		struct a2dp_transport *a2dp = transport->data;
- 
-+		if (volume > 127)
-+			return;
-+
- 		/* Check if volume really changed */
- 		if (a2dp->volume == volume)
- 			return;
-@@ -2604,7 +2616,7 @@ void media_transport_update_volume(struct media_transport *transport,
- 					MEDIA_TRANSPORT_INTERFACE, "Volume");
- }
- 
--int8_t media_transport_get_device_volume(struct btd_device *dev)
-+int media_transport_get_device_volume(struct btd_device *dev)
- {
- 	GSList *l;
- 
-@@ -2619,7 +2631,7 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
- 
- 		/* Volume is A2DP only */
- 		if (media_endpoint_get_sep(transport->endpoint)) {
--			int8_t volume;
-+			int volume;
- 
- 			if (!media_transport_get_volume(transport, &volume))
- 				return volume;
-@@ -2633,7 +2645,7 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
- }
- 
- void media_transport_update_device_volume(struct btd_device *dev,
--								int8_t volume)
-+								int volume)
- {
- 	GSList *l;
- 
-diff --git a/profiles/audio/transport.h b/profiles/audio/transport.h
-index b46bc8025..808e1a193 100644
---- a/profiles/audio/transport.h
-+++ b/profiles/audio/transport.h
-@@ -22,14 +22,14 @@ const char *media_transport_get_path(struct media_transport *transport);
- void *media_transport_get_stream(struct media_transport *transport);
- struct btd_device *media_transport_get_dev(struct media_transport *transport);
- int media_transport_get_volume(struct media_transport *transport,
--					int8_t *volume);
-+					int *volume);
- void media_transport_update_delay(struct media_transport *transport,
- 							uint16_t delay);
- void media_transport_update_volume(struct media_transport *transport,
--								int8_t volume);
-+								int volume);
- void transport_get_properties(struct media_transport *transport,
- 							DBusMessageIter *iter);
- 
--int8_t media_transport_get_device_volume(struct btd_device *dev);
-+int media_transport_get_device_volume(struct btd_device *dev);
- void media_transport_update_device_volume(struct btd_device *dev,
--								int8_t volume);
-+								int volume);
+ 		if ((hdr & 0xe1) == 0xc1)
+ 			bfusb_recv_block(data, hdr, buf, len);
 -- 
-2.48.1
+2.43.0
 
