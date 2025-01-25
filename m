@@ -1,125 +1,130 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC955FBF6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 22:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148C618E2A;
+	Sat, 25 Jan 2025 16:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737756541; cv=none; b=Pz7KaYfAgmIIyMsA8NELLBDeYTtTvPxFq89f0Dya2aBS5rDONvemi63z0dnVJbFgDF00IZ9Zy7DPlAJE3WblFfpjXdWBEdwGhDIlsHjgq7wBtQGg0HP9ktb508ctINoN9iZSB2ld+oXwwgWBBJhmPtclwv6ZOWzOrWb9rGnxjsg=
+	t=1737822934; cv=none; b=BVegWqEo39M2UCDBsSlCpQTmt+tAnXtgTazfIVe0Pj+S9iqKWPy2o55RU0UuOW+0Lr0YNqy+WB10YqIEtf2CTmH5TxD9n2G5Un0Jj0tqZjmybXtc6whEB4Fvh8spT3IF4xeA+v+KpBNbuhxj+Jt+Hh7FO9d0SEwqym9g8lJiXEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737756541; c=relaxed/simple;
-	bh=VngpqmAeRc6c0nKMVBgAe52gMoHwl9J8La+vwLTlntU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ijx2WXfV5XQPJDfRIhO8H+HNwuBTXZYudaUIHGQER5d2CA8Em7ntZeExiPQfoN+0N+kFW6BbDZIeRDL5YmxvVLRNCeN+BZFnOEBxSG4S3M/MImA/fUVhgCQPbjVj7ArG+RsT/HE8wdcKRXvOJHAGw9YBDkXARjxcyOEd0a+XQ+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sv3/XndK; arc=none smtp.client-ip=209.85.222.172
+	s=arc-20240116; t=1737822934; c=relaxed/simple;
+	bh=p5EJWKD8ak23bp+HeUIufdIj3xy/+4mUn8kIYLXg3zQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KBPOrqxDzNGNPlXrGi09//9Vyk9nnsirnNsT5LLQihygP/Ir9FktmHhPaN5wxDGtIGYxm5+3Exh6R1kAuKMIStJ6MJUUi7CCSRraBiTjQaQKyEEjPKmYI5hy/AwZpjzDFJWrgoSRlYGz8pVrGKcOn/0xPedjTrnGzG5J9SogGcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q1hVWOaM; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sv3/XndK"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7b6eb531e13so147262485a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jan 2025 14:08:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1hVWOaM"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3f65844deso5551365a12.0;
+        Sat, 25 Jan 2025 08:35:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737756538; x=1738361338; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wXeDXs1XhbZza41f0hG9xB2/b0bHIAlv2LCpxGCTKTw=;
-        b=Sv3/XndK73j8Et7S1mgvvRQQ7/0BNDR/3MP5WKVkUsj/3kVid6JT8hiuMo8T64WHkJ
-         PlQ8LJ8Wj2HgfCLrWQQIH2T88M4j8Nxy+Qt34D48HG87URwxATTrfA2K1mpe7fOBxSLe
-         i55/bBOZgJmLb3o1IVedEI+RcawQ3/NiPTLeo/mjKCGTgBWo5jjItGW7AdGUuQ67poNb
-         CetP2Z3YCON2cA1aJnfNDZikNMk9rKhu8ZWiqLFBe+N5KwxayiTrX+XvoDJ1VrN6/F/2
-         ms+bHWneaqJNy0m8pC1bGPUMM8p89e/eUsXlvVkyRt2IvlwEr5Vi1XRWz06vhpKy33wa
-         AxKw==
+        d=gmail.com; s=20230601; t=1737822931; x=1738427731; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x/FahYzXHFws6E83YCURwB1y9+tA8pq2I3CNEAgyGM0=;
+        b=Q1hVWOaMYhE7zFg7mpbv+DQ7ef+Q40AhYwP3iyomjuriszVy8PfhRE6mrjG4CHie2S
+         er8ddxN6Pgp04zgQ3aERg6FYQ1/miXxsg4jVDv7QTOlpU4BCEJJ26zNUQiDCtdEfBFgs
+         XtoI9NjFfJa0uD0wVJU1k4gtHYQN2Jxo6IxyOiy+TwiT8FDHBjjzfBbfNfEjdd9oP6RL
+         vaELV6cnXQghbWfKX8/lFN2rVCudPgaJXuxd9pOu083/VzCYW7VtQ+3X2dgMvzkv8SCK
+         yayumpZLwKwo3QLbVHzFP/JjV/Jb3fRWKyZ99v8UM2/20bMkAdf6Mz/5LXNHLjDmsKC3
+         aSBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737756538; x=1738361338;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wXeDXs1XhbZza41f0hG9xB2/b0bHIAlv2LCpxGCTKTw=;
-        b=ppbM2c0h8zq2yChCPl2DN/DlvkEf3iOGvbJ+vZ7Naxc+RbEzNGDMNDKPdPd8xs433b
-         BHeySx3dNgqhJYTcZGda4Bdq8TkYRWkJE74fhtUiPFwO6wvC3peTauYAu+yADb8u3NSI
-         eUk4wlmqbuFaBiO5e4s4hOlRiv0djEG50AB+Iwg8mGj1WsqjS3W1GGcMN09BsfeO0xv8
-         SDTD7L4N0B7cMmNwKSIOV5L6TgG1Y2UHr3SeUWW5230lpn+Oxv4oqxwWDS1wl4s84PdV
-         mrOzy7b9EGQe00mMT1iiUNAqja3NoyoZtfKYzSW3aXJ5S5zPHCVHr+n16s5RclXCqrFn
-         u6Iw==
-X-Gm-Message-State: AOJu0YxHweQYl57Mum0Zg4NeI/GvwFGr51JZjdYwDYHhVg1Oic2flV9+
-	PpyT3DIHGPn2MJ7z9OWNLAB19UCVcohaaUU0QQk/hdS1mgG6Wc1I6tdAOg==
-X-Gm-Gg: ASbGncvtbe4QHNgoD1ihHzOgXv3JYQ/bi3cqD/CvWitIJZbKS3USzZhj1QQeoCh8v7M
-	+KpMbR5MRvsATypGr7x0m1G9hsT7cT79TkYdsz6OXLCCrP4wI1AYS7wh+BoNaCPibKnMsmlcny2
-	ATSuGBnnxJdqmVISQvFYzz/yYrTglvOPb9MySw+ZEH0qpEo1Am5VkZsNXiRkBKfzKyhvmc0ibMc
-	cLYLDXpbHRT06M4EkUEFai5lHc52s9tLzdce+GwU93lCW6VWHaVhSti+ViRlO4BWUqWbJiek0Q3
-	pLb06vunF5k=
-X-Google-Smtp-Source: AGHT+IGarlPO8xvt9W8mbizVvQ0pYjhx3iCoxrkHucydM/2NF1ASpKDtdaVY8vP/fIcOXTU/vM1CNg==
-X-Received: by 2002:a05:620a:1990:b0:7b7:28c:dcd9 with SMTP id af79cd13be357-7be6320cf9bmr4614849885a.29.1737756538416;
-        Fri, 24 Jan 2025 14:08:58 -0800 (PST)
-Received: from [172.17.0.2] ([20.25.192.172])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be9ae8aa00sm137708785a.41.2025.01.24.14.08.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jan 2025 14:08:57 -0800 (PST)
-Message-ID: <67940f79.050a0220.1f51c3.650c@mx.google.com>
-Date: Fri, 24 Jan 2025 14:08:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3273538376656450151=="
+        d=1e100.net; s=20230601; t=1737822931; x=1738427731;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x/FahYzXHFws6E83YCURwB1y9+tA8pq2I3CNEAgyGM0=;
+        b=eboz/zAVIoWolzVp8kU/RvT4lbbGy0DtnxMmhCDbuKpMSmVYOsMRE2KBGdyBVJQXwu
+         kvyXEVYvbrhzLqEIiZaDueMEs7ysXC2tqWaB3KFrnRXxn5czKAoOn/i7t5ZaQPdaQ9xd
+         A1A2eJ1PeygyLZ9LeM7xBLnN99O/VxszRn+H0riCcsW6mHeCZ6BtqgmKL0VdqLCJfUfe
+         dgmo7o3p8V44VtNGt+qeTd9TH/tJ+6omSF7N2kkW/2+szqZw4sVa1kNjGZ6heCgkv6ws
+         N2Qvb0PGZJGaXwPItSg9uIQWQItaofqezRQWsUkqbz45uO3KQO/Ds5rf6GQi4qTbMHwA
+         sswA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBYGvS3mkMSflWgxUdk+mmFAUDTK/0dUS57X2+HBWgZfkxyGVFo0WqjYu5oLr8eRY6Ms2pj9msQWkiXvPy@vger.kernel.org, AJvYcCVojk90mcwxVyDc3vRDHoC6ArY6YJsyl/crb+ezbNRkmWOMsQsZmr+0uTIflwWJW7NvEGyusCwnCvL6JQHOtio=@vger.kernel.org, AJvYcCW+ZXf1EjnSsHPOS27wRWlvPGO4BuFADwhwjd9YvMS+ecukKDns/qD0vS2U5MoMtlFRIWeagxcdJSP3@vger.kernel.org, AJvYcCWTHWGrijxzxoiqcuZSZ2orSxyMphUiLXPWMzOVr1NZFfsUXLycnhjZvLUT40HotaAASHYZbavFgCjmz/A=@vger.kernel.org, AJvYcCWjOQew5cqBkpZFFLBgUOjghK/tIha4wyI/mCc5SqFx0yYHQlxRQDt9647hQHVzB1mTu4r0QryTgJB1aSaTsKKcm7PW2A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxT5IKMH6iHtuPlFWeFtnkSaJRKcI9nyQiQEFHvpgRjEznebiJr
+	fKc1sNtqHPVTONjJYRlWu+A+522xk7qlF4YLh1KalH7ZAFBNRAZE
+X-Gm-Gg: ASbGnctrZR+/LSKWca3Lw7cQZ8g5RDCYkJw819gAivOObW6nzMfig7UAFN9xZKul/NK
+	YBCUNJWSrO+21hYlVcjJ++wkoyATGDzpGYs7jr9H/Lt6tVVzUuZ8pAdYPxCxRpaasvqXhUMS4Wr
+	/WvNHsxtelDXR1dzbiwC3KAkcuZN/11WS4crLa/FksTOaarafw8RZeg1qsF+pYCRh/wfscHfa2z
+	3AXWPaZYufl48rPraNdoVE0ycJWPV/M1stVwkyiHWg4Jccg6U5mUXWQ1f/3jbGUFRVfRdr9KRaO
+	ThoyiE6hSag9S3o1+TKCHcik0YtlG6xeOjYBqdtEqZDBykr3ZZn9Rzq47Q==
+X-Google-Smtp-Source: AGHT+IE0l33AfoHI66TN6iSEh6cHfV4bv5YbU8j+wngbD0FHIOg4JI0vW9q/O3d+Vi7EpMsol14qpg==
+X-Received: by 2002:a17:906:c1b:b0:ab6:99b2:ad0c with SMTP id a640c23a62f3a-ab699b2b46fmr9989366b.50.1737822931039;
+        Sat, 25 Jan 2025 08:35:31 -0800 (PST)
+Received: from ?IPV6:2a02:8071:b783:140:927c:82ba:d32d:99c1? ([2a02:8071:b783:140:927c:82ba:d32d:99c1])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab676116b23sm310984466b.178.2025.01.25.08.35.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Jan 2025 08:35:30 -0800 (PST)
+Message-ID: <e95456ba-6407-4e75-9cb1-a27bdb806b78@gmail.com>
+Date: Sat, 25 Jan 2025 17:35:28 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] gatt-client: Fix warnings when reconnecting
-In-Reply-To: <20250124205700.511446-1-luiz.dentz@gmail.com>
-References: <20250124205700.511446-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============3273538376656450151==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] hid: intel-thc: fix CONFIG_HID dependency
+To: Arnd Bergmann <arnd@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Mark Pearson <mpearson-lenovo@squebb.ca>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+ Basavaraj Natikar <basavaraj.natikar@amd.com>, Even Xu <even.xu@intel.com>,
+ Xinpeng Sun <xinpeng.sun@intel.com>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
+References: <20250123134908.805346-1-arnd@kernel.org>
+Content-Language: en-US
+From: Maximilian Luz <luzmaximilian@gmail.com>
+In-Reply-To: <20250123134908.805346-1-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 1/23/25 2:48 PM, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> In drivers/hid/, most drivers depend on CONFIG_HID, while a couple of the
+> drivers in subdirectories instead depend on CONFIG_HID_SUPPORT and use
+> 'select HID'. With the newly added INTEL_THC_HID, this causes a build
+> warning for a circular dependency:
+> 
+> WARNING: unmet direct dependencies detected for HID
+>    Depends on [m]: HID_SUPPORT [=y] && INPUT [=m]
+>    Selected by [y]:
+>    - INTEL_THC_HID [=y] && HID_SUPPORT [=y] && X86_64 [=y] && PCI [=y] && ACPI [=y]
+> 
+> WARNING: unmet direct dependencies detected for INPUT_FF_MEMLESS
+>    Depends on [m]: INPUT [=m]
+>    Selected by [y]:
+>    - HID_MICROSOFT [=y] && HID_SUPPORT [=y] && HID [=y]
+>    - GREENASIA_FF [=y] && HID_SUPPORT [=y] && HID [=y] && HID_GREENASIA [=y]
+>    - HID_WIIMOTE [=y] && HID_SUPPORT [=y] && HID [=y] && LEDS_CLASS [=y]
+>    - ZEROPLUS_FF [=y] && HID_SUPPORT [=y] && HID [=y] && HID_ZEROPLUS [=y]
+>    Selected by [m]:
+>    - HID_ACRUX_FF [=y] && HID_SUPPORT [=y] && HID [=y] && HID_ACRUX [=m]
+>    - HID_EMS_FF [=m] && HID_SUPPORT [=y] && HID [=y]
+>    - HID_GOOGLE_STADIA_FF [=m] && HID_SUPPORT [=y] && HID [=y]
+>    - PANTHERLORD_FF [=y] && HID_SUPPORT [=y] && HID [=y] && HID_PANTHERLORD [=m]
+> 
+> It's better to be consistent and always use 'depends on HID' for HID
+> drivers. The notable exception here is USB_KBD/USB_MOUSE, which are
+> alternative implementations that do not depend on the HID subsystem.
+> 
+> Do this by extending the "if HID" section below, which means that a few
+> of the duplicate "depends on HID" and "depends on INPUT" statements
+> can be removed in the process.
+> 
+> Fixes: 1b2d05384c29 ("HID: intel-thc-hid: Add basic THC driver skeleton")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
 
-Dear submitter,
+For hid/surface-hid:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=928239
+Reviewed-by: Maximilian Luz <luzmaximilian@gmail.com>
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.20 seconds
-GitLint                       PENDING   0.20 seconds
-BuildEll                      PASS      20.54 seconds
-BluezMake                     PASS      1569.00 seconds
-MakeCheck                     PASS      13.66 seconds
-MakeDistcheck                 PASS      163.18 seconds
-CheckValgrind                 PASS      217.77 seconds
-CheckSmatch                   PASS      273.84 seconds
-bluezmakeextell               PASS      99.39 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      869.53 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3273538376656450151==--
