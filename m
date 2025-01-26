@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0C52144CB;
-	Sun, 26 Jan 2025 15:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6547921E086;
+	Sun, 26 Jan 2025 15:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737903778; cv=none; b=azZgc+zPpTxRtz+jvTk0cZYxgWpbaVd224fI3FSmpHjGpNQ7tZmrJoTwOaGW1KTQYUQPqD+z5NMKCjWPAAFfCuUMKPHP6yxm4PvJCvhijZ8N1FPGqNU+56zOV7ysL0uF054lSmR5/F6a5FO+s537S5d2sYK8cy1Qsxu4KwwvVGg=
+	t=1737903826; cv=none; b=eBTVmo5G7xkc3oHpj9Uyy5FV57Q1p4Cqruar/mq2ihhKYo6BAHxglYkliQz+iNFh5Ox3d1q8ugSKzcTCJc6HVcEl2Pl9apSyIm4QwX+p5kxSucoZ/zDzgaWY+oyQW8koQGMWB58+z/vWFFRbaxp8rlBeGtZ0sBqwkkYng/3SWYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737903778; c=relaxed/simple;
-	bh=2t4o4NmR5f0xekmbuossu7s8yJtKD6C0DPBlXezvGs0=;
+	s=arc-20240116; t=1737903826; c=relaxed/simple;
+	bh=1Q47DR+yGNk8Fccc6ki38inGBV3TIeDToroqLH4JMoU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tcCq7gtSC2N87uqJtIiHsmYFxx5ewtByYvzKNvh15c0vcgZD+uWerbkRbfpAaOZsvXjsxD06qNqj4qS+o4fr10zM05MaJ8wfkaEsBgs4f3gMv5XoGOD9CDVhKMXjgRx/Eo8qR+UVDtihNpNvvbcCmS6NP4MdfovYynoMvC4u2Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j9MVoeHp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=hIbD0dzTVstv+eW934BmDz3u/QPoCC728VkxBYUxuj+G+4f34nRz11lDKCjsxpBRN2GBzxwR+i2EnmxzKrSLEPt/4Pw7XDoonmsfTGAWKlqADIoopu0d82Y+JUTSOaE/f7Az56cbrqE8p3GyHiECisrduPxSPrIpiiGRkPQ4Rro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SBC2qJOR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j9MVoeHp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F1FBC4CEE2;
-	Sun, 26 Jan 2025 15:02:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SBC2qJOR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24793C4CEE4;
+	Sun, 26 Jan 2025 15:03:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737903777;
-	bh=2t4o4NmR5f0xekmbuossu7s8yJtKD6C0DPBlXezvGs0=;
+	s=k20201202; t=1737903826;
+	bh=1Q47DR+yGNk8Fccc6ki38inGBV3TIeDToroqLH4JMoU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=j9MVoeHpz+O7GeO/ipORsiuFsmdXoMFItTGrnsOU30oRnEZDqR4IgeX4VUvjncxho
-	 +Y4Qe7Sb7TxP3TAP4q6BpOkLdAjqxitO1wsV2DDwQHedEOvmnd7Yx5/TokhrA8c2Jf
-	 fs0nKcJWsxsukcq7WME7Wk8igcDQ8inyOENGXe9tiCvCOLw4mxlO+FhDF9hHcNLT0/
-	 Azl4W7HMBkR4mvrbRuZsH+GXxQpleEBd9MTku1C5od8Vgfag5TxtOOM/zB+GClPRfO
-	 DmbFXC8wfDCNAFSRFWPUWXhOKe4GuZW+rIQCrnlijP6RQ3a3Ha7ow2hEKQ0ZPW6NCQ
-	 6uPC5+9Kfu6TQ==
+	b=SBC2qJORrr7T1tvX3QXsZenBIc2e12mMkq9wBfIGPU+R0piu/ujxFFfZ233fqnyTQ
+	 kvEk0kwqwOipppX2ms3QoRaXYAz1DOhUVOanSPe7as1PrP3ut6J2yE7NNVzO4dAu2r
+	 5nh+9/DfaxzNQTDNsqm0VJRcSMwrTvV7mRUuXG0NjpK7GUD1HBQ0c16N4cisQg4aaa
+	 refdBXVYUYDjOo1HlPvaUjAUW/Bv4Hdj8ET0ALrIIsMgkziR+gqyJ95idIjB1/e9Ox
+	 Yw6xfIceGPVzbirAoQI1tU9H0gqUNy8Yj4vNYmgBWV8ccjppVmhJ9MTO8vOBX62VhM
+	 Ut8GHJ2pk4GAw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -37,12 +37,12 @@ Cc: Mazin Al Haddad <mazin@getstate.dev>,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 21/29] Bluetooth: MGMT: Fix slab-use-after-free Read in mgmt_remove_adv_monitor_sync
-Date: Sun, 26 Jan 2025 10:02:02 -0500
-Message-Id: <20250126150210.955385-21-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 15/19] Bluetooth: MGMT: Fix slab-use-after-free Read in mgmt_remove_adv_monitor_sync
+Date: Sun, 26 Jan 2025 10:03:10 -0500
+Message-Id: <20250126150315.956795-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250126150210.955385-1-sashal@kernel.org>
-References: <20250126150210.955385-1-sashal@kernel.org>
+In-Reply-To: <20250126150315.956795-1-sashal@kernel.org>
+References: <20250126150315.956795-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.11
+X-stable-base: Linux 6.6.74
 Content-Transfer-Encoding: 8bit
 
 From: Mazin Al Haddad <mazin@getstate.dev>
@@ -143,10 +143,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7dc315c1658e7..90c21b3edcd80 100644
+index e3440f0d7d9d9..b36254107ef57 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -5460,10 +5460,16 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+@@ -5453,10 +5453,16 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
  {
  	struct mgmt_rp_remove_adv_monitor rp;
  	struct mgmt_pending_cmd *cmd = data;
@@ -164,7 +164,7 @@ index 7dc315c1658e7..90c21b3edcd80 100644
  	rp.monitor_handle = cp->monitor_handle;
  
  	if (!status)
-@@ -5481,6 +5487,10 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+@@ -5474,6 +5480,10 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
  static int mgmt_remove_adv_monitor_sync(struct hci_dev *hdev, void *data)
  {
  	struct mgmt_pending_cmd *cmd = data;
