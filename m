@@ -1,180 +1,283 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from steward.aerusso.net (steward.aerusso.net [208.87.133.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D24226177;
-	Sun, 26 Jan 2025 15:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDDB18C332
+	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 15:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.87.133.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737903863; cv=none; b=TdXjk1w3rxJWSMmznGnlleKAKyAAjnhvi86hWmL1qnaUpQA0oTeY0holTvKckeax6OIM+ua9++Lgs47RN6tOy1qjRNUU5rqORdHkMzSpooGD0oExWX9baQgdS0EBMudzPmjV8VI5bMh/z9E2koYIYB3Q2eUwaDzSMN5mxRQd4Ko=
+	t=1737904359; cv=none; b=jYnSrV6XzqJz69cB2BUjAsg0c/RVWN95lOjOC3zWDMPofwf+KszlPczvV866AXLyaRdT0Mp2i6yHrs6zAG4PGDgvQehBCbKQFwFoz8Uv+h/VSHLJR8z2FyGDEarinaTR0VJ3FgqLclApKMY82Sp4Q8hHSyWnlKuIPztF9shWl94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737903863; c=relaxed/simple;
-	bh=dQeHzHZYoPYSdvlxHY9o0oJh29V4ES8rRkTY4JTZiX8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m3Ri2gE8wvACxF1ioTNFU6a2XJHNPPMWJKPZKGLZkXqGM07gqKaf2LvhFLv0bZlfT+NHjdxcfdDPu6G+T/4Dhux7N0wN7FGhMe1amqlKCVNVRivJuiS7WtpOdRGJA+WtWoaa4aqXyKB1zlOLwx9fi4hzHUkRmMyif6FGDweaDNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8JS+dyO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737904359; c=relaxed/simple;
+	bh=S6sw+z55hQ8wiNGXJExdf7R+rDQ0pf7gYhiOLgF6oHY=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=dEoj7sh/ljyfbj5Yr2eRDjy1oCkG+o3Yu9JDMRWacwsYDXO9Hv6dwJqgvvwV9UxInnynrAW0VmmrBIql99Rn5iDY0TyuQzGzIJvXP1f8yQmn66sCzKlGtaGI3LUqctW6WgjhyHP+ineRsxGlxDjQ3kXDZfAMQoWZqPEYiffyVNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aerusso.net; spf=pass smtp.mailfrom=aerusso.net; dkim=pass (2048-bit key) header.d=aerusso.net header.i=@aerusso.net header.b=GEYrMXvP; arc=none smtp.client-ip=208.87.133.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aerusso.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aerusso.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8JS+dyO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC5AC4CED3;
-	Sun, 26 Jan 2025 15:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737903862;
-	bh=dQeHzHZYoPYSdvlxHY9o0oJh29V4ES8rRkTY4JTZiX8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M8JS+dyOzsfUVDYmQda8jEYnzV9AIrgflwS6ahCXFy6+ciqn7ATgf1Vd1TQ0HpsT4
-	 cb310MnxQmySzzsaIVKDI7igJ16vcZeEt755zUWBzb1IYnTSOWlzK7WLXjJW3ubNor
-	 7MmYI5Fyt3+Q9xY8im3+siL+ZVNwiNOSI+p5qjLzW/jUrrHTOMZPIYSbuNbxi2NIZn
-	 io506zxf8ABzZHqogfWhk4O0vWTuh60ZZryPjxLYl5fN3ph6LQrZrGEpyvWzZnqxUT
-	 V6XIWpBcaWGBxbe0n4VWwgbfK/vldOHfen9k1ZJSWqVY6/b6nHq8Y9fT6t1HKcDi8o
-	 1QTZoSPRcKwxw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Mazin Al Haddad <mazin@getstate.dev>,
-	syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 13/17] Bluetooth: MGMT: Fix slab-use-after-free Read in mgmt_remove_adv_monitor_sync
-Date: Sun, 26 Jan 2025 10:03:49 -0500
-Message-Id: <20250126150353.957794-13-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250126150353.957794-1-sashal@kernel.org>
-References: <20250126150353.957794-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=aerusso.net header.i=@aerusso.net header.b="GEYrMXvP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aerusso.net; s=default;
+	t=1737903890;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	to:to:cc:mime-version:mime-version:content-type:content-type:autocrypt:autocrypt;
+	bh=S6sw+z55hQ8wiNGXJExdf7R+rDQ0pf7gYhiOLgF6oHY=;
+	b=GEYrMXvPS1f9F+6yeK+Nue2/6MQbKMD1l4JLSMjnyixefZq9lea0IOz5jwRJ0KSg56nfBg
+	TpOPp1/BUu7u1EBFeSWnEboiUwSrrwl8viSYbAN2wnv4Ic7jnSukeEPajeVfiD7ozbzjY4
+	q9l2Qi+l4sPVU5qu7bu0IZxolsu9mFOYO9aDX87+9bCF2EIOzm8OdfM5beX/4ynT7P9rob
+	ERVp3M8Cl3gOW2cyA0zdTmpZ3Z40awnbMO/tcmCRaKZMFJS4sfCVMqBzgDt7AWnbup2Vje
+	02GnZGDgkyhZf0Y3otJJKEsd04c8kVs4TDis9h+YJN06M6ucSxTdeqSc2ZOOyA==
+Message-ID: <a15e6919-9000-4628-baec-a2d2cc327903@aerusso.net>
+Date: Sun, 26 Jan 2025 08:04:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.127
-Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+To: linux-bluetooth@vger.kernel.org
+From: Antonio Russo <aerusso@aerusso.net>
+Subject: Do not start mpris-proxy for root user
+Autocrypt: addr=aerusso@aerusso.net; keydata=
+ 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
+ 83d/owu8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------YyeAY0goL0esW02f0yxtGuzu"
 
-From: Mazin Al Haddad <mazin@getstate.dev>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------YyeAY0goL0esW02f0yxtGuzu
+Content-Type: multipart/mixed; boundary="------------Dl5LSjd0RkLJPi4wVEZTnKr1";
+ protected-headers="v1"
+From: Antonio Russo <aerusso@aerusso.net>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <a15e6919-9000-4628-baec-a2d2cc327903@aerusso.net>
+Subject: Do not start mpris-proxy for root user
 
-[ Upstream commit 26fbd3494a7dd26269cb0817c289267dbcfdec06 ]
+--------------Dl5LSjd0RkLJPi4wVEZTnKr1
+Content-Type: multipart/mixed; boundary="------------3S1Gq0mMt9JSxWbV9JexjLBP"
 
-This fixes the following crash:
+--------------3S1Gq0mMt9JSxWbV9JexjLBP
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-==================================================================
-BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5543
-Read of size 8 at addr ffff88814128f898 by task kworker/u9:4/5961
+SGVsbG8sDQoNCkEgZGVmYXVsdCBpbnN0YWxsYXRpb24gb2YgYmx1ZXogcmVzdWx0cyBpbiB0
+aGUgc3lzdGVtZCB1c2VyIHVuaXQNCm1wcmlzLXByb3h5LnNlcnZpY2UgYmVpbmcgc3RhcnRl
+ZCBmb3IgYWxsIHVzZXJzLS0taW5jbHVkaW5nIHJvb3QuDQpUaGlzIHVubmVjZXNzYXJpbHkg
+ZXhwb3NlcyByb290IHRvIGFueSBzZWN1cml0eSB2dWxuZXJhYmlsaXR5IGluDQptcHJpcy1w
+cm94eS4NCg0KUGxlYXNlIGNvbnNpZGVyIHRoZSBmb2xsb3dpbmcgdHJpdmlhbCBwYXRjaCB0
+aGF0IGNoYW5nZXMgdGhpcw0KZGVmYXVsdCBiZWhhdmlvci4NCg0KQmVzdCwNCkFudG9uaW8g
+UnVzc28NCg0KDQogRnJvbSBkOWUwMjQ5NGU2NjExMDk2MDdjMDczOTY4ZmEzNTJjMTM5N2Ex
+ZmZiIE1vbiBTZXAgMTcgMDA6MDA6MDAgMjAwMQ0KRnJvbTogQW50b25pbyBFbnJpY28gUnVz
+c28gPGFlcnVzc29AYWVydXNzby5uZXQ+DQpEYXRlOiBTdW4sIDI2IEphbiAyMDI1IDA4OjAw
+OjI2IC0wNzAwDQpTdWJqZWN0OiBbUEFUQ0hdIERvIG5vdCBzdGFydCBtcHJpcy1wcm94eSBm
+b3Igcm9vdCB1c2VyDQoNCkEgZGVmYXVsdCBpbnN0YWxsYXRpb24gb2YgYmx1ZXogcmVzdWx0
+cyBpbiB0aGUgc3lzdGVtZCB1c2VyIHVuaXQNCm1wcmlzLXByb3h5LnNlcnZpY2UgYmVpbmcg
+c3RhcnRlZCBmb3IgYWxsIHVzZXJzLS0taW5jbHVkaW5nIHJvb3QuDQpUaGlzIHVubmVjZXNz
+YXJpbHkgZXhwb3NlcyByb290IHRvIGFueSBzZWN1cml0eSB2dWxuZXJhYmlsaXR5IGluDQpt
+cHJpcy1wcm94eS4NCg0KSW5oaWJpdCB0aGlzIGRlZmF1bHQgYmVoYXZpb3IgYnkgdXNpbmcg
+Q29uZGl0aW9uVXNlcj0hcm9vdC4NCg0KU2lnbmVkLW9mZi1ieTogQW50b25pbyBFbnJpY28g
+UnVzc28gPGFlcnVzc29AYWVydXNzby5uZXQ+DQotLS0NCiAgdG9vbHMvbXByaXMtcHJveHku
+c2VydmljZS5pbiB8IDEgKw0KICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykNCg0K
+ZGlmZiAtLWdpdCBhL3Rvb2xzL21wcmlzLXByb3h5LnNlcnZpY2UuaW4gYi90b29scy9tcHJp
+cy1wcm94eS5zZXJ2aWNlLmluDQppbmRleCA1MzA3NDkwLi4xMThlZDZlIDEwMDY0NA0KLS0t
+IGEvdG9vbHMvbXByaXMtcHJveHkuc2VydmljZS5pbg0KKysrIGIvdG9vbHMvbXByaXMtcHJv
+eHkuc2VydmljZS5pbg0KQEAgLTQsNiArNCw3IEBAIERvY3VtZW50YXRpb249bWFuOm1wcmlz
+LXByb3h5KDEpDQogIA0KICBXYW50cz1kYnVzLnNvY2tldA0KICBBZnRlcj1kYnVzLnNvY2tl
+dA0KK0NvbmRpdGlvblVzZXI9IXJvb3QNCiAgDQogIFtTZXJ2aWNlXQ0KICBUeXBlPXNpbXBs
+ZQ0KLS0gDQoyLjQ4LjENCg0K
+--------------3S1Gq0mMt9JSxWbV9JexjLBP
+Content-Type: application/pgp-keys; name="OpenPGP_0x72DB026E04C1C768.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x72DB026E04C1C768.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-CPU: 1 UID: 0 PID: 5961 Comm: kworker/u9:4 Not tainted 6.12.0-syzkaller-10684-gf1cd565ce577 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: hci0 hci_cmd_sync_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:489
- kasan_report+0x143/0x180 mm/kasan/report.c:602
- mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5543
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-Allocated by task 16026:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __kmalloc_cache_noprof+0x243/0x390 mm/slub.c:4314
- kmalloc_noprof include/linux/slab.h:901 [inline]
- kzalloc_noprof include/linux/slab.h:1037 [inline]
- mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
- mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
- remove_adv_monitor+0x102/0x1b0 net/bluetooth/mgmt.c:5568
- hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
- hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- sock_write_iter+0x2d7/0x3f0 net/socket.c:1147
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0xaeb/0xd30 fs/read_write.c:679
- ksys_write+0x18f/0x2b0 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+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3D
+=3DphB8
+-----END PGP PUBLIC KEY BLOCK-----
 
-Freed by task 16022:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2338 [inline]
- slab_free mm/slub.c:4598 [inline]
- kfree+0x196/0x420 mm/slub.c:4746
- mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
- __mgmt_power_off+0x183/0x430 net/bluetooth/mgmt.c:9550
- hci_dev_close_sync+0x6c4/0x11c0 net/bluetooth/hci_sync.c:5208
- hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
- hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
- sock_do_ioctl+0x158/0x460 net/socket.c:1209
- sock_ioctl+0x626/0x8e0 net/socket.c:1328
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+--------------3S1Gq0mMt9JSxWbV9JexjLBP--
 
-Reported-by: syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=479aff51bb361ef5aa18
-Tested-by: syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
-Signed-off-by: Mazin Al Haddad <mazin@getstate.dev>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/mgmt.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+--------------Dl5LSjd0RkLJPi4wVEZTnKr1--
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index dc3921269a5ab..4f116e8c84a00 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5524,10 +5524,16 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
- {
- 	struct mgmt_rp_remove_adv_monitor rp;
- 	struct mgmt_pending_cmd *cmd = data;
--	struct mgmt_cp_remove_adv_monitor *cp = cmd->param;
-+	struct mgmt_cp_remove_adv_monitor *cp;
-+
-+	if (status == -ECANCELED ||
-+	    cmd != pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
-+		return;
- 
- 	hci_dev_lock(hdev);
- 
-+	cp = cmd->param;
-+
- 	rp.monitor_handle = cp->monitor_handle;
- 
- 	if (!status)
-@@ -5545,6 +5551,10 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
- static int mgmt_remove_adv_monitor_sync(struct hci_dev *hdev, void *data)
- {
- 	struct mgmt_pending_cmd *cmd = data;
-+
-+	if (cmd != pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
-+		return -ECANCELED;
-+
- 	struct mgmt_cp_remove_adv_monitor *cp = cmd->param;
- 	u16 handle = __le16_to_cpu(cp->monitor_handle);
- 
--- 
-2.39.5
+--------------YyeAY0goL0esW02f0yxtGuzu
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvyzDzvCabwLKnB4/P0Tzureq3MEFAmeWTvwACgkQP0Tzureq
+3MEPIw/+PRl7CLN+XBOHGiiUNxfxu9w3Qsvmm5zvX5165sL2v62ApmvS/JP0FkZA
+DjjTejeFgMHSUD61ABRM09dnKSUjlMbbPuiatSwjYiqPunyEDfDEkvmiBHhgHq/U
+ILc9Ijv7aoplJ7/7fj1JDMS/YKRBewhykn01eD6ilUZA5E1tryLkH28uPAsKuzeI
+/OY3vltTRPfIGac/XY84eRW1JXyHT/7ucwOmGZoyEyy6AgoIzPv3J7n82j+R+acU
+UdLv4tNI1sk+mEiOBXgbvFlTy059rwOsI/5qTdj3fLulprMjhGoa4t11nm8WYp6b
+drtd7xj1/nSbN58cx/Y94djJW2xEEO5TSBuq+r+stG2af9zmWR+6dPVUbMlZHiz2
++H2+CzDrOnPtIps/MkhlY3vAu71hzLXzsiOrnqRwObRAuumyC1zUA5fKFienZsxU
+/LGdIkJuA9XueZFEhW31SQCmWz+P1Fwc6y7xX1Q7LFYs76DJwKNnTb9basVf5fqe
+2Jqk8O+ZPI/K60FjqgqnJLE/DkfsWVNf8qtzIYKvMpDlAoE2MhsrgYoHzLcNqKTD
+Bbr+GcqSw+n5QDrF+Sx0AgXPqZOrDePTaw1tEzbp4mIMMAN6t/gp7nUrbDBj4SyV
+kyAlX3ZdYROvLBoeHglICxBAzEXj6zsKP9x0oRQc2O4cRhpIBLY=
+=f1fE
+-----END PGP SIGNATURE-----
+
+--------------YyeAY0goL0esW02f0yxtGuzu--
