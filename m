@@ -1,130 +1,179 @@
-Received: from sonic304-10.consmr.mail.bf2.yahoo.com (sonic304-10.consmr.mail.bf2.yahoo.com [74.6.128.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7F0156C74
-	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 19:58:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.128.33
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737921493; cv=none; b=d0kATi9WNAAZqjqzRKORDmwnsytmSV7jbcOc7/ZbIbgYFI3pTpfk6ub6sY8VMimaUUFtQCXjrUikl0LW0vYzqgLRvXNmM/OSR6fdUfC1P0TgkG71ip2JnXQItJzehsg3rVEsdSMHCKoZ7Tenrrcob5dn5UaXIr3Vq7XcNRybUQU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737921493; c=relaxed/simple;
-	bh=uVcpo1bk2yEzaWZpSDhxgFEK5nb/IUwNcZSGVlz8Zrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qp240R5JGDdMgbwdcX22O/4ibBFJ/lq71CEcXr/F8v05KJL8vzW+TmXyK5E7Q+dQxSLCOmZWq1eBC1iYvTAWIDG6I73FpUi0whznCE8U0oqxiL49tSv5C8bPYiLRZaCVyDlf2rCRcsYQfbrbktc6MhtYjtdCgTC+KqxjhJGsai4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=NOlRXOJ9; arc=none smtp.client-ip=74.6.128.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C107D2AD22
+	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 20:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737922149; cv=pass; b=FnscJ9OU7zzS5LSpDcKMC0sItX/wb/McrMJo/UAmW7FGzV2JhmN9Mdex1VdFmhMb+SM2GHK7ZD5JREc2l2YmGmQFkDS8FFjbCBN4Mujl2pK4uuQd2kptimMwRUaNkSBjWu/vWzaNSRd90fmr54zkWE+n3p9QSSAIfQz6HO3zVSs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737922149; c=relaxed/simple;
+	bh=rAHxPyKvXdE90/C/+XEmCIMYHVpBfKBUJQT9MFf16iI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZUwkeGKO7VpZO2/3s7fR6W//65PqCvjxIH1pDA0NsXaUJ625+8SPHaB+n/SzWqAOfEJYhFTttOOuwbvj6y+ci8bOhwXwDrwf336c1cytgkO/BYGhNQOX0aaFhBIMHMqkq2Q2RmdwaLO6eZwYuDJcYlg9T9uPNlgZ+GZkvjZ26W8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=dvXXHwtY; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="NOlRXOJ9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1737921490; bh=esnEHYbr+tA6Hk36266Ao3jle9+dwUmdzcUBmbXjGoA=; h=Date:From:To:Cc:Subject:References:In-Reply-To:From:Subject:Reply-To; b=NOlRXOJ9h0AwqxUIc/wfQYuCtoMnOzOz0I5Mo+a3+76qeKhO5ODnA96644h+/xUOZe7o1liIzpSA2yqwLxiFsggZm7CWRm77iiFFQ1jsvJoJRBESXhP1NLPeOLNTXFrn8qQFPQnnmeqmaIO0Dw8cCVamduZw4FdEURIxX/2vU9yByvr47dvxe+0gIpbm5Hoh9LzWE9X2ABid1CvHbqtWwc8QZqmOY352e0PWyU/OgMRcqaHiGCjwYiEQQP54s2lqk/N1wsKOk2XS1Cw7Ad8QZnMLH1mQ5njbYVH4+wqBVllq5SAoGnpFzwVEAIF5R1M79wC5VwsmD/1BCmpv9c7AjA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1737921490; bh=zcqo8a7DlklIGWB26F2DVsetRoLVByb6RSKx/rorUIl=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=k61/MkcVcBh1wRQxJbv7GozsJtDGQEflYrwa8rLqE+jhmuyvD0z4PF+cqclyP0DxTmXX+CM2kd1JfKmUePhAo3W+4Czji4Blo9wA8REqLWMBvohbwvlylWUS2HIIwOCmuwMDUkKskQQJaX/WH6X2z+lHCcUuEsKXXtJGx3xh10dPxHG5lZt2He922ZAnooKO4ReA6b7AMjEYfYexdwbN4OpX84spVIBPMoyvz7qigTE4mVaQpPpwNKyf+HPsS+8CDX2wiMiSapfNVnPl23MSDP6bMLelW02/oP7WaGoBYstA0+6NUtHOkhSMFgmYxMcYN2swRwafZ6QBexTcQh0zZg==
-X-YMail-OSG: 60mDLPUVM1kyH6hLI7tOY5VXYJe300OZNwB6p0pH22pbFWcx6qxp3.QeuI4yC8e
- vI.J9bsr7E0W6EKOSUuXqCQFZtdjQ_Ez.rsj4f15emMIWStJdBrZ32puTXXd82GaPRqy9vsHFKi9
- vsS2g2BlWQiapBjC7U25zE6gFgi2NdJFOuXNUuBEDRuhTAX1Vphl2XGphIEVaoOfAFIAj2JG7Org
- sPE_qVDfl9bYQabUu6BcgNw9_vw_q.O6DI3B..IrEOKtUNps.M9QwDYUrKbqwIFVUOs4jGNgJYL6
- 321izCbtBsMyWUn8yqGC.6HElZ1BUjI.B93k8a0B_OceCZrnf19oRYwxA5jC5y1m42JgbFMywXfK
- z.zMLbIhzpv3EkA0VntmKgKkZ_KEHFQ4aGWlolW4CFnACFZfx1uPbXuuCagRXBuDjdKaHgIwHMnT
- Lxcyo_bK8DKPH78XokorDAHvlOC1zVwq1TSGBWNIxcD1rqEd6_N209Df8m_gv_1_BVqJ2h6dJvvq
- .CcYnwqB4azyxn22Oo6YoHjS2DHOlVKtNzh.Hgn4p7AvN5kXMBWYj6qyyLyWsEv9uAxQbh.8t9f7
- L4SyYrP55sCCSMOADhtQGQ062rtVwitZn0jAuFYL46ayd48DY3AjoHj65gRhcZFeJF.7ag9d4.Tv
- aARcwQ6lUOEBYpac2ZNU4C2Nr22V4Tu5x3ibI_CYjEihJqCAhLNLyTE8XCCUtg8juLrOlF8wnHLH
- x4o_vEqoNLdSsmu50QTmf8TuGX1ZAEPija67D2utJ4fbaNdHuaj0LfODdbNdDaqU.Ep6HvAen8C.
- Eiu0pisMUNsGbl4PdJv7cCf10tRbzrFuKkAEDS85_QqHeZbU196x0mG8Zj9NMzIMcdpyRYJlvxuL
- iJH48SI8rJ9vZWo70XnlJzLx_bo1BTNdR63fXgPxTc.qEK_RrNUSjeEvxdj8frAChiMoPKHI1PTV
- MmoUX4Y83C1Fgfyzmhq6AxYjpjcd50X2Uxd7kDka4JM4z16XySllmhq22E.nKxQDvkvq8W_C9kPD
- svAQbG5.l8_UmT7uKFALQNR0P_gF9rs4rShNq0E4Bi0wxIKBYE6PrdRc9a9zQurX4ISNMgHkFc8I
- xE0Vx3lEWqOwd7I3yPsCe1je3DCQIshunbzQJFPQh02Vvp5oIrG2fYfop5TMPiSXlwnt1L7v_Vpb
- c_0KHB43kQJI5t46vY35KoLrWvHQmifrPlFIXtXWk8M5YISm7W6S7ax6pJB8QFy4mjmjmo6l9tmu
- kQIpyElwG7fj4kekMfFsbPJishLck9maDMvv27HLvtG9oMyqGbJ9PfLGQ7uQWJqixdMu.aiyp_6W
- YiB31ygkEv.oyX1ZAFF.CbaZFJaTjWDpIqTEr47XRceWA1QF1RLLl5i5WS1ty8HtBUiNTpKUIpMv
- KDg7jXpSsoOiHqnXasqOz4hzqVZEve_twVtnnmCsn2.7UtBoDAX8p6.NKJcY9weUHAgs7XfMl.I_
- xWwg5xTLHDmUlZMVEuGy_.X9ArJr8d.1XsA123QSOi3qHgAzwEagCMDKJK.naV9ELJ9H0CM76_8x
- nlgRsFTJvrm152q0FVs7omnhxEz4o5w_99qImg4I7HtS_b8hJcXWArmc50pS0dJp6aLe8u2WKM15
- dP3CbdvegAG9q8C1Y9o9Fv_mciRquwnm9KocrAphxkZuOLeo0V.yqU1nfJOjpFbsKUrf1g3QM5WK
- Ogl.xh8Z5RpqbVXEJ.LwkmtogayWKQgGBkrbT4CWXuB1UNRZzmKobz.CGVFgBWXIYfbOb_ENmUq2
- pi.rAVExX2odEE6r.SsbDeufxHVJANlWL2Od03VdJymMtdVf6MyUqzvh.urOa24uTzoy05pJ5F5D
- PDbOQVRQVE2baU0mM._gm6hr5RHshTS_X3OGQ7bprt.C8Hs9PQFr67rh4nLYfp2MmbGxrFkhhbQZ
- La6f0rucxEnLTDHFu4wcdZDWkGboUCpONi4lUCpdaGfoWScobiGzjQqy8W8rlZSMmLkUDT5zsLXS
- x2nBJ7xURud3nl2VCz7frHCM8KgT_a0PNFT.h3MeZ7kgKpGh13hQ3hsZVk6Ds8rbuO9J.mlDkHos
- XSJxjK92HAAR2LYAjG9tmqGTB9ZxIbh_tWz15an7IaOXsKpcZbSgI1zo3ziE08zHKeC_0G8VmdAn
- I3_SvQ8FEZXa9Jh1dlllYYFquWGpzXFugic7Jf4G7v1On3VZgOZfLrHazgXzpF1a3M59vUqkCgxV
- wdFOXWw2IryWG_tPooT5_IfSPzpHuQggWyhir3Fmd4DB1XPkehahFm3h9
-X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: fe6c9231-8238-4bb7-81e4-337ae316a0ef
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.bf2.yahoo.com with HTTP; Sun, 26 Jan 2025 19:58:10 +0000
-Received: by hermes--production-ir2-c694d79d9-5hgbf (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 121b8431dc09d07e9bd18937baffc388;
-          Sun, 26 Jan 2025 19:27:44 +0000 (UTC)
-Date: Sun, 26 Jan 2025 20:27:41 +0100
-From: Jeremy Dean <deaner92@yahoo.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove unnecessary braces around single line
- statement
-Message-ID: <Z5aMrXwnmEXxKWkC@vmi2410184.contaboserver.net>
-References: <20250125165804.11486-1-deaner92.ref@yahoo.com>
- <20250125165804.11486-1-deaner92@yahoo.com>
- <62d9db39-5d2b-4980-99e5-f15c4555b57f@molgen.mpg.de>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="dvXXHwtY"
+Received: from monolith.lan (unknown [193.138.7.158])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Yh2gZ1mkBzyQx;
+	Sun, 26 Jan 2025 22:08:58 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1737922138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NBrauUgkMRZa9Yd2m3DRZGSVkTgzhfv1Fatbt4xVvc8=;
+	b=dvXXHwtYP6aECUCCkgCdtoJ9HXjRtY26nU1hIKx5dU8rkOUyPOi3zFzIWyZaS8G2J8bUJg
+	em3otZUTBIrAOJw3rnByQYII766Tj/+6IRQ89+p1o/Kggl0fm8fF9NvHNhC5MyTVc7OyF1
+	b0fvrb+kpKahxGjZHsi+Bok2oqUQIyw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1737922138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NBrauUgkMRZa9Yd2m3DRZGSVkTgzhfv1Fatbt4xVvc8=;
+	b=F61nyQdEa3za61serwoJHqRUEKE15hJff0zfis6MFwRt03M4COaiPP96SYENB5357Ql2RD
+	gxSE+VVtuGs+UscA0bB2LIgZTkV/uxomy0rE6gvA6fLY+3LovkpafPW0Q2ozbg88y5Vdg0
+	pLrEjK9V69yJwn0O9wQ7HY0bBBjJf7c=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1737922138; a=rsa-sha256; cv=none;
+	b=AsQQdocWUpCwTJRERiqSm6e9ajj+uStztRjdBK+i4b9Cu9Og1jrcm1yS9aWmPnSBFPyt1T
+	Gdn5kjKg2kd1XmjdCWztyExeLFrwLQq47Qs2WwZMP/WraoTId+Nc1XGz0v2Aha7iENn+HC
+	eVel0Ui1/0y/Cph+z5VJ5RoSi5l5LBI=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2] shared/vcp: have only one volume change in flight at a time
+Date: Sun, 26 Jan 2025 22:08:54 +0200
+Message-ID: <06f0a1ed2fc2726b8dd46eef113e07ad742048c1.1737921917.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <62d9db39-5d2b-4980-99e5-f15c4555b57f@molgen.mpg.de>
-X-Mailer: WebService/1.1.23187 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-Dear Paul,
+If bt_vcp_set_volume() is called again before the previous operation has
+completed, the requests get the same change counter, and all except the
+first one fail.
 
-I have changed the subject. 
+Fix by sending another volume set request only after the previous has
+either failed or generated a volume notification.
 
-Fixes: Coding style, unnecessary braces
+Send only volume requests that change the value to a different one than
+last notification we have seen: in this case the request either fails,
+or succeeds and generates a new notification.  In all these cases, we
+exit the wait state correctly.
+---
 
-On Sun, Jan 26, 2025 at 09:02:04AM +0100, Paul Menzel wrote:
-> Dear Jeremy,
-> 
-> 
-> Thank you for your patch. Could you please make the summary/title a
-> statement, and remove the dot/period at the end:
-> 
-> Bluetooth: Remove unnecessary braces around single line statement
-> 
-> Am 25.01.25 um 17:58 schrieb deaner92@yahoo.com:
-> > From: Jeremy Clifton <deaner92@yahoo.com>
-> > 
-> > Warning found with checkpatch.pl script. Removed unnecessary braces.
-> 
-> I’d use imperative mood for the second sentence:
-> 
-> Remove unnecessary braces.
-> 
-> Also please add a Fixes: tag.
-> 
-> > Signed-off-by: Jeremy Clifton <deaner92@yahoo.com>
-> > ---
-> >   drivers/bluetooth/bfusb.c | 3 +--
-> >   1 file changed, 1 insertion(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-> > index cab93935cc7f..0d6ad50da046 100644
-> > --- a/drivers/bluetooth/bfusb.c
-> > +++ b/drivers/bluetooth/bfusb.c
-> > @@ -365,9 +365,8 @@ static void bfusb_rx_complete(struct urb *urb)
-> >   			buf   += 3;
-> >   		}
-> > -		if (count < len) {
-> > +		if (count < len)
-> >   			bt_dev_err(data->hdev, "block extends over URB buffer ranges");
-> > -		}
-> >   		if ((hdr & 0xe1) == 0xc1)
-> >   			bfusb_recv_block(data, hdr, buf, len);
-> 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> 
-> Kind regards,
-> 
-> Paul
+Notes:
+    v2: reset pending_ops when attaching, needs to be cleared on reconnect
+
+ src/shared/vcp.c | 39 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
+
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 6b0f2f9db..2b5d186b8 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -203,6 +203,9 @@ struct bt_vcp {
+ 	uint8_t volume;
+ 	uint8_t volume_counter;
+ 
++	uint8_t pending_volume;
++	unsigned int pending_ops;
++
+ 	void *debug_data;
+ 	void *user_data;
+ };
+@@ -2003,6 +2006,19 @@ done:
+ 	return vcp;
+ }
+ 
++static void vcp_set_pending_volume(struct bt_vcp *vcp)
++{
++	/* Send pending request if any */
++	if (vcp->pending_ops <= 1) {
++		vcp->pending_ops = 0;
++		return;
++	}
++	vcp->pending_ops = 0;
++
++	DBG(vcp, "set pending volume 0x%x", vcp->pending_volume);
++	bt_vcp_set_volume(vcp, vcp->pending_volume);
++}
++
+ static void vcp_vstate_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 				const uint8_t *value, uint16_t length,
+ 				void *user_data)
+@@ -2020,6 +2036,8 @@ static void vcp_vstate_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 
+ 	if (vcp->volume_changed)
+ 		vcp->volume_changed(vcp, vcp->volume);
++
++	vcp_set_pending_volume(vcp);
+ }
+ 
+ static void vcp_volume_cp_sent(bool success, uint8_t err, void *user_data)
+@@ -2031,6 +2049,8 @@ static void vcp_volume_cp_sent(bool success, uint8_t err, void *user_data)
+ 			DBG(vcp, "setting volume failed: invalid counter");
+ 		else
+ 			DBG(vcp, "setting volume failed: error 0x%x", err);
++
++		vcp_set_pending_volume(vcp);
+ 	}
+ }
+ 
+@@ -2061,9 +2081,20 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ 		return false;
+ 	}
+ 
+-	vcp->volume = volume;
++	vcp->pending_volume = volume;
++	if (vcp->pending_ops) {
++		/* Wait for current operation to complete */
++		vcp->pending_ops++;
++		return true;
++	} else if (vcp->volume == vcp->pending_volume) {
++		/* Do not set to current value, as that doesn't generate
++		 * a notification
++		 */
++		return true;
++	}
++
+ 	req.op = BT_VCS_SET_ABSOLUTE_VOL;
+-	req.vol_set = vcp->volume;
++	req.vol_set = vcp->pending_volume;
+ 	req.change_counter = vcp->volume_counter;
+ 
+ 	if (!bt_gatt_client_write_value(vcp->client, value_handle, (void *)&req,
+@@ -2072,6 +2103,8 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ 		DBG(vcp, "error writing volume");
+ 		return false;
+ 	}
++
++	vcp->pending_ops++;
+ 	return true;
+ }
+ 
+@@ -2896,6 +2929,8 @@ bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client)
+ 	if (!vcp->client)
+ 		return false;
+ 
++	vcp->pending_ops = 0;
++
+ 	bt_uuid16_create(&uuid, VCS_UUID);
+ 	gatt_db_foreach_service(vcp->rdb->db, &uuid, foreach_vcs_service, vcp);
+ 
+-- 
+2.48.1
+
