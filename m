@@ -1,115 +1,125 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEEB7603F
-	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 10:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737886980; cv=pass; b=i1410brxa+JOFsNi8DZtmnaINmG1NKv9EA2+hvgLsv0z87Ye5DRn3Lu7wt2aiAfos2lFtyNcrDNcnib5EiRWUsmAXKOjskBZvL8dWPnvjH2Ttbn5sz8kQ08bhMgCb6jic4KlyvcSC1WnW5qfkVHb42ib0UTCA8ntDU5/vIZQ6b0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737886980; c=relaxed/simple;
-	bh=UmDTgapJuEq6/nLyW2GWw+qTePqoio9rqIgSsGhlZKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=up6844aFO3raD0xUKJsjzkLTDpJAw+bvoqJfNHLswttUs2Gh4zAngOpKg8yBM/Qscd1Zu1f7b5mpOdGgfiTwv2eJJ2PpKFHtaO4REIJvNDgP8GXwRLd3TH10lIHhxkktl4J9UOIusYpKdUx4/iIKb4QCBkNNQcX6o7XjhKX2E88=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=FKo86FXA; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6304DF5C
+	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 11:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737891085; cv=none; b=JoZMeqAorMDKNtOKz/ZjgIGaLgZxVhoFmDBJ6PzyyL3MztQALZ08uyygvDAc07ImbmLkaunOWKE3jnCw3NkAjT5DFGSoroj5vtgcejy07jNpD6rqZMpon5bG0PDFtiPrYEXlHOsm4syun5F/x31HgZerSORcgpfXL6VgNnj4RM8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737891085; c=relaxed/simple;
+	bh=bpyXfLMhj8Iqec80MGCg4Y3v3PP1i+5qwG4AzBFSgd0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=P5d/CbuwOUsnAa4swMoiEzrMdo1Bj5tK9R6c+7c60oxYoy0YWMITTOa0X6AWVEiQMb0j/PGT7YUYA09Lm2M+En7ty8xOOFKfc5isNsgcF857uUd4NKeh4PDFZqdt0dXcg9yYd9dda/BvHO81aiE+XsfcIxhDQa+aPL4R1EM2VMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LivsS0mm; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="FKo86FXA"
-Received: from monolith.lan (unknown [193.138.7.158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YgngD0L2Vz49Pyv;
-	Sun, 26 Jan 2025 12:22:47 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1737886968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=W7npGcTa8LKmJ2YkAFdTZL7RJ3lMHF7fdVvGixu9EM8=;
-	b=FKo86FXA4f73KSQ6/1jurX8lfciDl7y3d82qGggxSWjNnqppPS5ZNHsmBQu0fbyW4D8P2J
-	jsIxE11a0C8cbTVDtoVAVOTY217Sj4uyoh84SQ/JwX6wARx7Ne4wCzRAaP11857tiH2Fb/
-	bOPDwd5sUMTTWKYylB1Gm+44/M8lRPtB8IqtOtrsPwWtSZyH3whMlbwo7y4IAbPPJoD02x
-	0NY61Qp5xrCcihzpO1BfZWRFJRA872YUetkxWuhAUP1mWJ/qNyoG7YcX+NO/fhJPZtCBff
-	FdamAJIydFAJLjmlk7aBqCJeGfWXZYge7DlSKVbrrjirRaX1p+1Nn9LRxlTCPQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1737886968; a=rsa-sha256;
-	cv=none;
-	b=jFMDCm7GoCwPS6lXpfON5TChbi8cj6blTvUyoDNv76WGl/aMIoTZhZ7RJgpj/mHEl+qNt8
-	iWZ+NKXOnmkBUgGAdAs5Cl4ieawqMYqBrmq8Y23XqUvq94K4CjIdCozjR0HHKpcSbpHNkU
-	ThVS3QKEGOCxxh5y950aiLuK27c/kG8ecnG9yn6/6QQv1TUNO8YQfUGVry2kjlsklMi9vs
-	5HPqSyLvy0r5nA1kkDg7/ics44KmDokHFNf/GqW8Uyd4nLSaC4n0C6GHHBsrrNtUe9jY6u
-	fARGTR2BBAvzOXsceTq1rNM3JczqMUZBtdsoZqbi/hxSW52u3yJaebIT+LiurQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1737886968;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=W7npGcTa8LKmJ2YkAFdTZL7RJ3lMHF7fdVvGixu9EM8=;
-	b=GcNIBLue74fX65sKjeq2wmJ/X8gy6nBtCA4AA4VCtSW3BX7iLB3xiYgGvzHRczhPEYGXko
-	znlGJ0w9gqnKHYzrGGWhpJ8bP2DsYFjQgoroENU0UoUYFw3SQqhOLs5wVQoAk1BvGeI2Ew
-	qSbktyOWmJzsJg3/DycioSkf/H1S5TrOEvLSDTgegS6Cs3Pt/di800IbI8k5XEJ140U5ii
-	ExyFSI/iFYtSKbWL6OnjY2ka+ASHe7o0RRnP1+dW3K6+7arJlUT1INWnJiOgOWGGP7qjH1
-	lpn/fs1V1h+51b6pUHzm2mQ7ta/vWVLOrfSpOJHyn8bpUIs8QUrv5bJOXlMNBA==
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] shared/gatt-db: fix crash on bad attribute index
-Date: Sun, 26 Jan 2025 12:22:44 +0200
-Message-ID: <efe1351374fceccbe4f1392fddab0d75e128a510.1737886528.git.pav@iki.fi>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LivsS0mm"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-467a3c85e11so26184311cf.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 03:31:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737891082; x=1738495882; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=iMU5+JRn4DEdRB+NMe6eQGZHm7VY9fRC5lXO6jNFIT4=;
+        b=LivsS0mmIEHyw5lBbCj3JnhYczoYcBuh8oduh2D9ZD8WlblnsX2qA/Bc5oMY+b9iV4
+         wpCMjSW5Lgtqzt4CJqd6w1QT+5+6VQUM81ZWE90dWrFH97+IzdDL2MwkQg2gSHtBS8or
+         2M5gmDwiW4EYmy6XvX1x4CIT33klloFVQR0fMArtdneRZHkS2vual2xgJq0EAJQepF+j
+         SQmIhaeNm4n+wE7CQ3ElaUJ9MDJOUlMVyTgajJHPOxmOyA+cbj45WVYYRE5OkiKmcLzf
+         6l2IDrfnEIOggvPTGnP4b9tH/aNcALR+EnsuxmmDnAsN/uYSUOCU0iUchtTBjGjvkugh
+         q1pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737891082; x=1738495882;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iMU5+JRn4DEdRB+NMe6eQGZHm7VY9fRC5lXO6jNFIT4=;
+        b=jzZCp6O5v6NIV77BQSeLBKjzMqQ4MM75INcKKqo9sOMm4h9mGJiEYE/1B0eNDXAYTU
+         dNqjr7LGbom+8eTtE6S5a++gWjmsNLFceQWae0x5ySrHg/C0ZeIxRimPrxBf6q365R08
+         ZEf246teuBYI1jVzMfqr5Qcx4rCddER99g3k/afMGW99R2pfrUcPPF/cHKycXU31pGnM
+         aAmQ84IpvzjHuvcbACBUeqHxfhHdCCXUA6kP+CuLpOsmxHfylkIAZ0AKh511kEvrujSC
+         skfxZlmmwbOBJtjXlelUhyxn/pWT/wYP7blW0ZaQPHOy2oguZfx1TKv9SxyLPT19/0mP
+         hLtw==
+X-Gm-Message-State: AOJu0YxpMNtfMrdM2b2+1qZTZ4t4skov9dTcFwewvBBpbCM9d5aa6aUE
+	fTFD59FYkeAuTh2QShjdr3jmLdC124EiEzL76A0NxzkjkSYlTP6EKCmmazLF
+X-Gm-Gg: ASbGnctLjoJEpX4O1AqleE58azEqApOU9kVKgUK0OklE9WFjBOGfGafSYT+exPCNp9x
+	78fEmEJqK+SAGTB79RwH04oSKdBYAcmZNS9N8JRgvN/+U7CB8FuE52B371++ikGnmAP9V/LTyIH
+	w656MZsYJCy/xhSw8/W98qKr4BbYanUlz6pgu5Lb/t6He5a/+1zC7Fr0WMxfreUXOXPILy0kYOl
+	OTchbNz84ZAcakTczb5BEMjUP9Jc1VWmi6G195pxF5rFoCdTeqoTJkyhYLoqODar3AIiY3SgneM
+	eTzUz3jW0g==
+X-Google-Smtp-Source: AGHT+IG8+6OHim94muj+zLomrMvy+DLplRjv9+IwT0PL2EePfcJ1zICE9IrfsUPXH5xLw46cVEawnQ==
+X-Received: by 2002:a05:622a:94:b0:467:6505:e3c with SMTP id d75a77b69052e-46e12a96f42mr454091861cf.24.1737891082064;
+        Sun, 26 Jan 2025 03:31:22 -0800 (PST)
+Received: from [172.17.0.2] ([20.57.71.210])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e66b88f10sm28660011cf.80.2025.01.26.03.31.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Jan 2025 03:31:21 -0800 (PST)
+Message-ID: <67961d09.050a0220.206c36.b379@mx.google.com>
+Date: Sun, 26 Jan 2025 03:31:21 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4959009123215382135=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] shared/gatt-db: fix crash on bad attribute index
+In-Reply-To: <efe1351374fceccbe4f1392fddab0d75e128a510.1737886528.git.pav@iki.fi>
+References: <efe1351374fceccbe4f1392fddab0d75e128a510.1737886528.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-In gatt_db_attribute_get_value(), avoid NULL pointer deref if attribute
-or db is in unexpected state and attrib at index-1 is missing.
+--===============4959009123215382135==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes btmon -r crash, on a packet capture obtained with btmon -w after
-clearing BlueZ attributes & cache for the device:
+This is automated email and please do not reply to this email!
 
-==208213==ERROR: AddressSanitizer: SEGV on unknown address 0x00000000000c
-==208213==The signal is caused by a READ memory access.
-==208213==Hint: address points to the zero page.
-    #0 0x5af4a6 in bt_uuid_to_uuid128 lib/uuid.c:65
-    #1 0x5afd54 in bt_uuid_cmp lib/uuid.c:118
-    #2 0x5d0dd2 in gatt_db_attribute_get_value src/shared/gatt-db.c:1663
-    #3 0x56aeab in print_value monitor/att.c:158
-    #4 0x56b80f in print_attribute monitor/att.c:207
-    #5 0x5982f7 in print_handle monitor/att.c:4417
-    #6 0x59b1b8 in print_write monitor/att.c:4598
-    #7 0x59b796 in att_write_req monitor/att.c:4627
-    #8 0x59e91e in att_packet monitor/att.c:4918
-    #9 0x4f4847 in l2cap_frame monitor/l2cap.c:2567
-    #10 0x4f6022 in l2cap_packet monitor/l2cap.c:2708
-    #11 0x4a48f6 in packet_hci_acldata monitor/packet.c:12606
-    #12 0x43952a in packet_monitor monitor/packet.c:4247
-    #13 0x4170c9 in control_reader monitor/control.c:1517
-    #14 0x402f76 in main monitor/main.c:277
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=928379
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.21 seconds
+GitLint                       PENDING   0.18 seconds
+BuildEll                      PASS      20.30 seconds
+BluezMake                     PASS      1556.24 seconds
+MakeCheck                     PASS      13.13 seconds
+MakeDistcheck                 PASS      157.99 seconds
+CheckValgrind                 PASS      212.64 seconds
+CheckSmatch                   PASS      269.75 seconds
+bluezmakeextell               PASS      98.00 seconds
+IncrementalBuild              PENDING   0.25 seconds
+ScanBuild                     PASS      850.99 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- src/shared/gatt-db.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 72254c7e4..fe272de34 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1660,6 +1660,8 @@ gatt_db_attribute_get_value(struct gatt_db_attribute *attrib)
- 
- 	if (!bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
- 		return service->attributes[index + 1];
-+	else if (service->attributes[index - 1] == NULL)
-+		return NULL;
- 	else if (!bt_uuid_cmp(&characteristic_uuid,
- 				&service->attributes[index - 1]->uuid))
- 		return service->attributes[index];
--- 
-2.48.1
 
+--===============4959009123215382135==--
