@@ -1,283 +1,173 @@
-Received: from steward.aerusso.net (steward.aerusso.net [208.87.133.46])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDDB18C332
-	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 15:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.87.133.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737904359; cv=none; b=jYnSrV6XzqJz69cB2BUjAsg0c/RVWN95lOjOC3zWDMPofwf+KszlPczvV866AXLyaRdT0Mp2i6yHrs6zAG4PGDgvQehBCbKQFwFoz8Uv+h/VSHLJR8z2FyGDEarinaTR0VJ3FgqLclApKMY82Sp4Q8hHSyWnlKuIPztF9shWl94=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737904359; c=relaxed/simple;
-	bh=S6sw+z55hQ8wiNGXJExdf7R+rDQ0pf7gYhiOLgF6oHY=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=dEoj7sh/ljyfbj5Yr2eRDjy1oCkG+o3Yu9JDMRWacwsYDXO9Hv6dwJqgvvwV9UxInnynrAW0VmmrBIql99Rn5iDY0TyuQzGzIJvXP1f8yQmn66sCzKlGtaGI3LUqctW6WgjhyHP+ineRsxGlxDjQ3kXDZfAMQoWZqPEYiffyVNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aerusso.net; spf=pass smtp.mailfrom=aerusso.net; dkim=pass (2048-bit key) header.d=aerusso.net header.i=@aerusso.net header.b=GEYrMXvP; arc=none smtp.client-ip=208.87.133.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aerusso.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aerusso.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A0C9476
+	for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jan 2025 17:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737913662; cv=pass; b=f5wF1tP8nPonBEY3mPJsyVJu9iAAVotfY9KGB0S2nCOpmJIWPc+gkDIL9BaXxhdQ9mSIGEg2Kh14cjm+T/CDC8MaXLzOh9x4Fp4CnZVuCoijbGpNrz+EpvIEdr6wpwX74W/AdOsuSEdVn8XoXiNzbg+TJNm2rWLCqBq/FGy11zE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737913662; c=relaxed/simple;
+	bh=ErLrVbqJfud247PspLKOC5lSuqFndWToFzyF3mG0dps=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bFLh32R4hZRZZrEntJPsGA/YQh31CHjhMUEVfRxCJOlrFzjbCdU4Dawh5elpbdNqrkCc7JLma/wTJudmdc1HrnV4b288JpDSi2xqzX3AzKg2v4g1SePfPrRbTCwiANlPeK2RykrXK75iiQMMubAaLSiGoMnMR4CmsCpesCleAVQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=GOspFOt9; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aerusso.net header.i=@aerusso.net header.b="GEYrMXvP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aerusso.net; s=default;
-	t=1737903890;
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="GOspFOt9"
+Received: from monolith.lan (unknown [193.138.7.158])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YgzXR3NtLz49Q47;
+	Sun, 26 Jan 2025 19:47:35 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1737913656;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	to:to:cc:mime-version:mime-version:content-type:content-type:autocrypt:autocrypt;
-	bh=S6sw+z55hQ8wiNGXJExdf7R+rDQ0pf7gYhiOLgF6oHY=;
-	b=GEYrMXvPS1f9F+6yeK+Nue2/6MQbKMD1l4JLSMjnyixefZq9lea0IOz5jwRJ0KSg56nfBg
-	TpOPp1/BUu7u1EBFeSWnEboiUwSrrwl8viSYbAN2wnv4Ic7jnSukeEPajeVfiD7ozbzjY4
-	q9l2Qi+l4sPVU5qu7bu0IZxolsu9mFOYO9aDX87+9bCF2EIOzm8OdfM5beX/4ynT7P9rob
-	ERVp3M8Cl3gOW2cyA0zdTmpZ3Z40awnbMO/tcmCRaKZMFJS4sfCVMqBzgDt7AWnbup2Vje
-	02GnZGDgkyhZf0Y3otJJKEsd04c8kVs4TDis9h+YJN06M6ucSxTdeqSc2ZOOyA==
-Message-ID: <a15e6919-9000-4628-baec-a2d2cc327903@aerusso.net>
-Date: Sun, 26 Jan 2025 08:04:27 -0700
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iZKtgyBqgaiNFYCQsKpe9ne2jVCyTj4wxB5qgIY//NY=;
+	b=GOspFOt9q7+MnCHkQhqt+YVB0+703m0pW8RHPLUqrrBQHHm5sl9iM8LVoikUsMhCE2qLk+
+	GfuZ6SEnCBveszNjoDbI/KnLn2GD4XcoW244BP9pSOwrHgsmUnn1UQR7i9exAy88s1jZAx
+	UI+M2c6KGAj02BLJYnA/iU2zWjDUkJYyS+c9dJFVQ77EP+vYfacbIQE+b0/v9DxeJP2Uau
+	lGKQUVeFWPg3jsI/Nq8pi6flpvnfSxZRYVY6DWVEjvrJw18lcyRLHjoMDHoXcmsbZDOQkl
+	x79njkPE2mjot3Gg18+K3Sd6LyDbpGWOqJj5YLfytpKY6P5QfaVCU3l+06Omsg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1737913656; a=rsa-sha256;
+	cv=none;
+	b=oJC3DwuBa8w++Tsuy3z7WuWBQQlhAkHxvzaVitFwCjzjnAWZnAGcaJe+qTfnbUKprnIxTA
+	nKMJxSnqxelaR7a3K0d4nt1p40dSCEuUbxP4KXoJMxfzmKeM04aW15L3Byg4ILiVNNulam
+	fNRhtkoIzkLY2hRZU+86Fv/JSbWiGpgSJ/8yhrHkOuU02/cKxiTRJ2s/ATlv4aNNSafY+3
+	+EdwoTwj0fvwsGd0cige5/BM7nDH4CwC7bgz1tzcfiTL/mNi1LhHh2wuxIB7BYY0Y7b8Sq
+	nBtnn4lZzaGrE4PulxrgNYp2NCOmjn7wVG25j0Nl0bRWWe1xKjdOvigRNCrIRQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1737913656;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iZKtgyBqgaiNFYCQsKpe9ne2jVCyTj4wxB5qgIY//NY=;
+	b=aT+TVQfPvcxhSfaWGE+xywIJi6rBC0ihyz/ZRaAHHAAzpcB2dRXRpxSX8Fr2L08qFSxODL
+	khngdBWbQo+dkcNmSsi4Y5iYgFbCXoXcPgvYL2+BgJxXIM4k1QrjIXma3U/7FWA3zbDcC6
+	MzuD9M6jtReNZDi48ho/31vAZknQPTqu8OrW+40lGtDiKi1/pjO4IozKLg4zaUAV8ikwMs
+	ggcfHVWr9qFbz9XRUJ2D7zMd+X3T0fMmlybO2r1uTibLf8ER23xSKOYMGuEns3rmGig5jO
+	XstiqxE/U8ivn7GvwPL66orqtYdHC4K2opP9AUc/2nOQAiftanIXV6Ai3rA9Sw==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] shared/vcp: have only one volume change in flight at a time
+Date: Sun, 26 Jan 2025 19:47:30 +0200
+Message-ID: <5b7315d16822f8ec8b21ec124f82a1b90ab66ae8.1737913576.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Language: en-US
-To: linux-bluetooth@vger.kernel.org
-From: Antonio Russo <aerusso@aerusso.net>
-Subject: Do not start mpris-proxy for root user
-Autocrypt: addr=aerusso@aerusso.net; keydata=
- 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
- 83d/owu8
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------YyeAY0goL0esW02f0yxtGuzu"
+Content-Transfer-Encoding: 8bit
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------YyeAY0goL0esW02f0yxtGuzu
-Content-Type: multipart/mixed; boundary="------------Dl5LSjd0RkLJPi4wVEZTnKr1";
- protected-headers="v1"
-From: Antonio Russo <aerusso@aerusso.net>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <a15e6919-9000-4628-baec-a2d2cc327903@aerusso.net>
-Subject: Do not start mpris-proxy for root user
+If bt_vcp_set_volume() is called again before the previous operation has
+completed, the requests get the same change counter, and all except the
+first one fail.
 
---------------Dl5LSjd0RkLJPi4wVEZTnKr1
-Content-Type: multipart/mixed; boundary="------------3S1Gq0mMt9JSxWbV9JexjLBP"
+Fix by sending another volume set request only after the previous has
+either failed or generated a volume notification.
 
---------------3S1Gq0mMt9JSxWbV9JexjLBP
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Send only volume requests that change the value to a different one than
+last notification we have seen: in this case the request either fails,
+or succeeds and generates a new notification.  In all these cases, we
+exit the wait state correctly.
+---
+ src/shared/vcp.c | 37 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 2 deletions(-)
 
-SGVsbG8sDQoNCkEgZGVmYXVsdCBpbnN0YWxsYXRpb24gb2YgYmx1ZXogcmVzdWx0cyBpbiB0
-aGUgc3lzdGVtZCB1c2VyIHVuaXQNCm1wcmlzLXByb3h5LnNlcnZpY2UgYmVpbmcgc3RhcnRl
-ZCBmb3IgYWxsIHVzZXJzLS0taW5jbHVkaW5nIHJvb3QuDQpUaGlzIHVubmVjZXNzYXJpbHkg
-ZXhwb3NlcyByb290IHRvIGFueSBzZWN1cml0eSB2dWxuZXJhYmlsaXR5IGluDQptcHJpcy1w
-cm94eS4NCg0KUGxlYXNlIGNvbnNpZGVyIHRoZSBmb2xsb3dpbmcgdHJpdmlhbCBwYXRjaCB0
-aGF0IGNoYW5nZXMgdGhpcw0KZGVmYXVsdCBiZWhhdmlvci4NCg0KQmVzdCwNCkFudG9uaW8g
-UnVzc28NCg0KDQogRnJvbSBkOWUwMjQ5NGU2NjExMDk2MDdjMDczOTY4ZmEzNTJjMTM5N2Ex
-ZmZiIE1vbiBTZXAgMTcgMDA6MDA6MDAgMjAwMQ0KRnJvbTogQW50b25pbyBFbnJpY28gUnVz
-c28gPGFlcnVzc29AYWVydXNzby5uZXQ+DQpEYXRlOiBTdW4sIDI2IEphbiAyMDI1IDA4OjAw
-OjI2IC0wNzAwDQpTdWJqZWN0OiBbUEFUQ0hdIERvIG5vdCBzdGFydCBtcHJpcy1wcm94eSBm
-b3Igcm9vdCB1c2VyDQoNCkEgZGVmYXVsdCBpbnN0YWxsYXRpb24gb2YgYmx1ZXogcmVzdWx0
-cyBpbiB0aGUgc3lzdGVtZCB1c2VyIHVuaXQNCm1wcmlzLXByb3h5LnNlcnZpY2UgYmVpbmcg
-c3RhcnRlZCBmb3IgYWxsIHVzZXJzLS0taW5jbHVkaW5nIHJvb3QuDQpUaGlzIHVubmVjZXNz
-YXJpbHkgZXhwb3NlcyByb290IHRvIGFueSBzZWN1cml0eSB2dWxuZXJhYmlsaXR5IGluDQpt
-cHJpcy1wcm94eS4NCg0KSW5oaWJpdCB0aGlzIGRlZmF1bHQgYmVoYXZpb3IgYnkgdXNpbmcg
-Q29uZGl0aW9uVXNlcj0hcm9vdC4NCg0KU2lnbmVkLW9mZi1ieTogQW50b25pbyBFbnJpY28g
-UnVzc28gPGFlcnVzc29AYWVydXNzby5uZXQ+DQotLS0NCiAgdG9vbHMvbXByaXMtcHJveHku
-c2VydmljZS5pbiB8IDEgKw0KICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykNCg0K
-ZGlmZiAtLWdpdCBhL3Rvb2xzL21wcmlzLXByb3h5LnNlcnZpY2UuaW4gYi90b29scy9tcHJp
-cy1wcm94eS5zZXJ2aWNlLmluDQppbmRleCA1MzA3NDkwLi4xMThlZDZlIDEwMDY0NA0KLS0t
-IGEvdG9vbHMvbXByaXMtcHJveHkuc2VydmljZS5pbg0KKysrIGIvdG9vbHMvbXByaXMtcHJv
-eHkuc2VydmljZS5pbg0KQEAgLTQsNiArNCw3IEBAIERvY3VtZW50YXRpb249bWFuOm1wcmlz
-LXByb3h5KDEpDQogIA0KICBXYW50cz1kYnVzLnNvY2tldA0KICBBZnRlcj1kYnVzLnNvY2tl
-dA0KK0NvbmRpdGlvblVzZXI9IXJvb3QNCiAgDQogIFtTZXJ2aWNlXQ0KICBUeXBlPXNpbXBs
-ZQ0KLS0gDQoyLjQ4LjENCg0K
---------------3S1Gq0mMt9JSxWbV9JexjLBP
-Content-Type: application/pgp-keys; name="OpenPGP_0x72DB026E04C1C768.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x72DB026E04C1C768.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 6b0f2f9db..f781b7b2b 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -203,6 +203,9 @@ struct bt_vcp {
+ 	uint8_t volume;
+ 	uint8_t volume_counter;
+ 
++	uint8_t pending_volume;
++	unsigned int pending_ops;
++
+ 	void *debug_data;
+ 	void *user_data;
+ };
+@@ -2003,6 +2006,19 @@ done:
+ 	return vcp;
+ }
+ 
++static void vcp_set_pending_volume(struct bt_vcp *vcp)
++{
++	/* Send pending request if any */
++	if (vcp->pending_ops <= 1) {
++		vcp->pending_ops = 0;
++		return;
++	}
++	vcp->pending_ops = 0;
++
++	DBG(vcp, "set pending volume 0x%x", vcp->pending_volume);
++	bt_vcp_set_volume(vcp, vcp->pending_volume);
++}
++
+ static void vcp_vstate_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 				const uint8_t *value, uint16_t length,
+ 				void *user_data)
+@@ -2020,6 +2036,8 @@ static void vcp_vstate_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 
+ 	if (vcp->volume_changed)
+ 		vcp->volume_changed(vcp, vcp->volume);
++
++	vcp_set_pending_volume(vcp);
+ }
+ 
+ static void vcp_volume_cp_sent(bool success, uint8_t err, void *user_data)
+@@ -2031,6 +2049,8 @@ static void vcp_volume_cp_sent(bool success, uint8_t err, void *user_data)
+ 			DBG(vcp, "setting volume failed: invalid counter");
+ 		else
+ 			DBG(vcp, "setting volume failed: error 0x%x", err);
++
++		vcp_set_pending_volume(vcp);
+ 	}
+ }
+ 
+@@ -2061,9 +2081,20 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ 		return false;
+ 	}
+ 
+-	vcp->volume = volume;
++	vcp->pending_volume = volume;
++	if (vcp->pending_ops) {
++		/* Wait for current operation to complete */
++		vcp->pending_ops++;
++		return true;
++	} else if (vcp->volume == vcp->pending_volume) {
++		/* Do not set to current value, as that doesn't generate
++		 * a notification
++		 */
++		return true;
++	}
++
+ 	req.op = BT_VCS_SET_ABSOLUTE_VOL;
+-	req.vol_set = vcp->volume;
++	req.vol_set = vcp->pending_volume;
+ 	req.change_counter = vcp->volume_counter;
+ 
+ 	if (!bt_gatt_client_write_value(vcp->client, value_handle, (void *)&req,
+@@ -2072,6 +2103,8 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ 		DBG(vcp, "error writing volume");
+ 		return false;
+ 	}
++
++	vcp->pending_ops++;
+ 	return true;
+ }
+ 
+-- 
+2.48.1
 
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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3D
-=3DphB8
------END PGP PUBLIC KEY BLOCK-----
-
---------------3S1Gq0mMt9JSxWbV9JexjLBP--
-
---------------Dl5LSjd0RkLJPi4wVEZTnKr1--
-
---------------YyeAY0goL0esW02f0yxtGuzu
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvyzDzvCabwLKnB4/P0Tzureq3MEFAmeWTvwACgkQP0Tzureq
-3MEPIw/+PRl7CLN+XBOHGiiUNxfxu9w3Qsvmm5zvX5165sL2v62ApmvS/JP0FkZA
-DjjTejeFgMHSUD61ABRM09dnKSUjlMbbPuiatSwjYiqPunyEDfDEkvmiBHhgHq/U
-ILc9Ijv7aoplJ7/7fj1JDMS/YKRBewhykn01eD6ilUZA5E1tryLkH28uPAsKuzeI
-/OY3vltTRPfIGac/XY84eRW1JXyHT/7ucwOmGZoyEyy6AgoIzPv3J7n82j+R+acU
-UdLv4tNI1sk+mEiOBXgbvFlTy059rwOsI/5qTdj3fLulprMjhGoa4t11nm8WYp6b
-drtd7xj1/nSbN58cx/Y94djJW2xEEO5TSBuq+r+stG2af9zmWR+6dPVUbMlZHiz2
-+H2+CzDrOnPtIps/MkhlY3vAu71hzLXzsiOrnqRwObRAuumyC1zUA5fKFienZsxU
-/LGdIkJuA9XueZFEhW31SQCmWz+P1Fwc6y7xX1Q7LFYs76DJwKNnTb9basVf5fqe
-2Jqk8O+ZPI/K60FjqgqnJLE/DkfsWVNf8qtzIYKvMpDlAoE2MhsrgYoHzLcNqKTD
-Bbr+GcqSw+n5QDrF+Sx0AgXPqZOrDePTaw1tEzbp4mIMMAN6t/gp7nUrbDBj4SyV
-kyAlX3ZdYROvLBoeHglICxBAzEXj6zsKP9x0oRQc2O4cRhpIBLY=
-=f1fE
------END PGP SIGNATURE-----
-
---------------YyeAY0goL0esW02f0yxtGuzu--
