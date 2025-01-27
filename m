@@ -1,65 +1,70 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BEB77CF16
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 16:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DF015B99E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 16:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737997120; cv=none; b=J+Lr8t1GzGGUzkeIUFbmlX8sE46xvtrAFCrfxv1IXrZpyao020z/OE4iwX63yXAWBWyzt6xteJNdB61Jj5xfASHF6kHfscm7PQRTwZDzqLTWXMy3mMzg9adlOWL6GHFAJ1i7IKZcwLWH086zUKXj0562w0VQCHTfQ8hD4LG8qig=
+	t=1737997122; cv=none; b=SaaQI2NTL2u1npbr79+ZMyeA0jeiPbdy1q0Y4MelO1vjBnZAoc8Hdf8ErJmgEHBXdBn4vEM4IpZ9Mq7oq+UC3SwDXPA7ErpUAeKzGVZ6eGgplMsJSAZCKR9vOVZ7GNMDjA7gNJC8e+Jum/0YO65GYhOsCz3FmoJCpeel9J0rpB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737997120; c=relaxed/simple;
-	bh=fKBYIomqh/ymmxcJUfw/H9OhVdZ7ALTdXjCOjK/l8cA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=sG6EWpqSiZCvPKdWmuybSUdnxplhzYbAKU0jV7o/Z5/TGTLRZGS6F5nHg6/3BpY8I+NCLK3zIURo65e7PL5hcefBSIP7CqBsfQWr6bz2RhZDF2dIjpqZF4vNjz1lJdlmXwcD0A8y8+cajKfMuZNiZSa+ClL6kUB5858Q0BYe28w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVEx70+5; arc=none smtp.client-ip=209.85.210.52
+	s=arc-20240116; t=1737997122; c=relaxed/simple;
+	bh=qsvefXJsOjNPK/FiYhgY00NP0b0IxxpSWOZ3jAE8Qa4=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=H/F+od5mGvLIe8FvOMptnaXy1/tB3sK3WBBE++vrIIftS+ub+LuejUaW4k9vlmIkijNA7a/RXonEPzsS1Ae6jJZYzZU6EchqFn0HiqGmMPQJ10SxdZmyrCuv/sK0oHtfZum7ocXlt1lkoatUIxS+pwDMunx+dKrVlC/ZOiZP8hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R2APZ4Or; arc=none smtp.client-ip=209.85.160.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVEx70+5"
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-71e17de2816so2136821a34.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 08:58:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2APZ4Or"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-2adc2b6837eso1317159fac.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 08:58:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737997117; x=1738601917; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gZWX/17z5Hb56zPJIAljPOERJQUzXw6gPxkJcJvka6A=;
-        b=EVEx70+59NSvwA8F2dW1FY6fzVki+U8Cb+Skm/1tE3RTW1e72ObenNQVXhzRKhwvCK
-         1QXQ3qDn59IXPYrEtPJwbIYQdoOmWM/rys2HaqSC1jtUkEOkvo7Kw4vKOpcznA+Ilzeh
-         jtludBPGj62aUURiik65+Iole+FGKFWXgPd/CcbrrJ3m3W6iExwetFjBUXwkZv755+4j
-         5UsLEJFgBrWJAZ6hChjFkB7ut4CDzfIIILgYfKgILbcPtEvWf/rxkng6lK+C8lpONpMZ
-         T+7Ip2ped/9MuH8eSi3fy2YGBHvn9YbSVLBZcfmhJeEgEAEqqWvDCz2N6ON6lPTNPHeI
-         sT0Q==
+        d=gmail.com; s=20230601; t=1737997119; x=1738601919; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7tJPu5shhntk9vUea5NwO8hZYCbmNWjhdH5Ho2rBRQY=;
+        b=R2APZ4Or8eoUj1qCAUvPf+p6Tybb3xN4Bu7JXKdKJbnGKcmKiP6LKwt2FAo7Ojy6G2
+         dmhBltbNXZoj8fx+NcRlcA2jgGxcOQvjhKi4SiftkgtVA1pOSDcCih5shq9qtZXsP4aR
+         nv/Kn4ASaa1cahruf+6QGYrbO0/7K4Cmiqn5eCelPlJw2IEbxn/SN+7GPMW1vi1y8FgD
+         Jv1vd2CLCDGoobMtxYaUvbmN4hwTV8896X7osKACmqDF+EZOgIcx9YG7107MEFDuvXrK
+         ZZqnjxlDmVvpDw7w0u2B4QktbYxzt7uBeHj8f5V+Lpv8omRTnNhhZj11ZcjflkWJUN8j
+         9WPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737997117; x=1738601917;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gZWX/17z5Hb56zPJIAljPOERJQUzXw6gPxkJcJvka6A=;
-        b=QdJMxUgdren5JhqS9FZNWTamhwZkn2HtK1AVQfBf21JdDbKE84A9xjiXsT3Rf378uG
-         14spOzK6pm2JO4tTMKozqR6W3dVni/1O0/zSw/TL5X5Lw0Rah2Vlazwlr9MgPTDseuxO
-         SzkQ9TE9ZAJiWs8bAlDvcq51TzOt853RALB3CkO+RUO1bLqxaH79cjrHK/mm9eLabrbA
-         yZxYKUIP6bf7zOOsooIzuYG1+YfNKjEUAW7r+fKudSo8OYO4GZIZbV54VZ7Zr6YRHi9U
-         zFrP/tWTRYPCYgPkhzeRUqc4v54ZtEyUfP/X/b04XuejVnwCtWtUyW6pJVDMcFhF/o0p
-         8Wzw==
-X-Gm-Message-State: AOJu0YwrM7vfGzuTq/MXab7L6XAdd1tY8WlE7rYGlkFT5AqQCyuK6v6i
-	8tbEyduEO/d504jRrFrUR3iXEvoqVuH5LZPaaPCVrsWT5IWtHE1R9555hjmV
-X-Gm-Gg: ASbGncv+DMdmRgxi9YFqO1yKzu5r+6FVbnvcpvYso6+jq4SBV5I2RFk1JoOUI7b2KWu
-	E8LEP1qQW7EqnygCISc2p+BW+ciIHdgsBeWyrhdUyCREiSMXlABcwLYQ7HIkiJM4sxMV6i4Y6MC
-	7pu8EENFenXv7YzhXUaifi20VtjjVM4Iwy7g60U1hfrtm28VRYs99hr7kQzVXMYg748xOz4vpU/
-	c7WHPKqJiaEWRDoaZ9YzUA5y7uTLmvgBh128fSJNr8AsoB7XWOWn97003qIc/NOEBpX7jT0tVKl
-	KhCDJDwE5UWw2rtST+uH8v1SAnghIjs3qYjY178ybU1x/s27S+ab
-X-Google-Smtp-Source: AGHT+IEWn6Pe7ZVhW6AAeYFcWByrds9v+4SkGStEuEmW1EJO6+0jCaKsTVZ/jcvFzU6+uIfsSef8EQ==
-X-Received: by 2002:a05:6830:6887:b0:71d:62ad:5262 with SMTP id 46e09a7af769-7249da7d75bmr25330928a34.10.1737997116680;
-        Mon, 27 Jan 2025 08:58:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737997119; x=1738601919;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7tJPu5shhntk9vUea5NwO8hZYCbmNWjhdH5Ho2rBRQY=;
+        b=BeN0p4onCqbSHAoro/4CupKIX25qv+6732co300EyG73otFzPrMK+oi19D88OmZIkD
+         VKm6+Rm2b22w3ILvPqAfaue2HrWjknF+RjG6vtNEIZFVeZQjVUKh+kT6130aS4ptMrMw
+         aFNIwA7LMcRlzYmbzotSmuUxk4PQ/fU/BwgymztQvr3YlqCElegZsOHOYDePEJFyp5kI
+         WrkSw4zYu82UwLZBdhjFClD2b6sJXyu/+18Ph4M9h+u27f5/11srKjbaF1B4Q1znyH+f
+         KQn/ZdDHBgjeJYBNybt/xsxdaGK2RAX+35m/OlDTvT0A+q08I/YAjv5xeDisJHlR4krs
+         JF/w==
+X-Gm-Message-State: AOJu0Yyfct/oBCobFjkuBNiZzCY7IvSKrivxIjVpE7tAT7uzZ6BVbuNC
+	83BA9wYferz3Hugv3Hfq/nu3ArkxXBgKLINinUCjqhs36v4YwwgDKOgo9cI+
+X-Gm-Gg: ASbGncuQSJseEZUKx2A8jh88lTq0+HHRb6iYKyugkhAYp0Uf+ryUQJ1exQlXlBZk17e
+	OwFwznrGzdjY7U2ELgrdaCLL88HL28YggwGCSHPp980voT3Eps3BcRYCVdkegU2rXwkNeg2BckS
+	FXc9yoSSaNuoT9/5UMn7hldhHv8z/xxqw1enfes0Ondvjoox2mguUZ8P/fIhIGpaYggVK76xZNd
+	Oxw2I+qupDeWyS7o6oGI7hNOOIWf+XwGL9QK0KeynWia92dyi39SNrWyb6sGrDToEVElw56BJ1W
+	/xQ5VWxlpPQxaNTRgqGBr40F3vIFHwZzvYrHzqD7YXH2B+UexbkD
+X-Google-Smtp-Source: AGHT+IGs8vsgIW1XOw10in8psCVvJZeNOF+tX5vaxwm9ZUuQrr9UQ/z64WSUjeCsc+uipkEnATARCQ==
+X-Received: by 2002:a05:6871:880c:b0:29e:67cd:1a8f with SMTP id 586e51a60fabf-2b1c0cdc000mr23151349fac.37.1737997119021;
+        Mon, 27 Jan 2025 08:58:39 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-724ecf88fd0sm2294827a34.47.2025.01.27.08.58.35
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-724ecf88fd0sm2294827a34.47.2025.01.27.08.58.36
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 08:58:35 -0800 (PST)
+        Mon, 27 Jan 2025 08:58:37 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/3] org.bluez.LEAdvertisement: Add dedicated Scan Response field
-Date: Mon, 27 Jan 2025 11:58:31 -0500
-Message-ID: <20250127165833.866133-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/3] advertising: Add scan response properties to LEAdvertisement1
+Date: Mon, 27 Jan 2025 11:58:32 -0500
+Message-ID: <20250127165833.866133-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250127165833.866133-1-luiz.dentz@gmail.com>
+References: <20250127165833.866133-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,203 +75,348 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds Scan Response fields as experimental so we can evaluate if
-this should be made into a stable API.
----
- doc/org.bluez.LEAdvertisement.rst | 101 +++++++++++++++++++-----------
- 1 file changed, 66 insertions(+), 35 deletions(-)
+This update introduces a few properties to org.bluez.LEAdvertisement1
+for manipulating Scan Response Data, similar to the existing properties
+for Advertising Data.
 
-diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvertisement.rst
-index d3f9cc480470..bab507439355 100644
---- a/doc/org.bluez.LEAdvertisement.rst
-+++ b/doc/org.bluez.LEAdvertisement.rst
-@@ -60,31 +60,32 @@ string Type [readonly]
- 	:"broadcast":
- 	:"peripheral":
+Fixes: https://github.com/bluez/bluez/issues/667
+---
+ src/advertising.c | 140 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 104 insertions(+), 36 deletions(-)
+
+diff --git a/src/advertising.c b/src/advertising.c
+index 2fc6f917dd12..4476d7cd53a5 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -255,13 +255,12 @@ static bool parse_type(DBusMessageIter *iter, struct btd_adv_client *client)
+ 	return false;
+ }
  
--array{string} ServiceUUIDs
--``````````````````````````
-+array{string} ServiceUUIDs [readonly, optional]
-+```````````````````````````````````````````````
+-static bool parse_service_uuids(DBusMessageIter *iter,
+-					struct btd_adv_client *client)
++static bool parse_service_uuids(DBusMessageIter *iter, struct bt_ad *ad)
+ {
+ 	DBusMessageIter ariter;
  
- 	List of UUIDs to include in the "Service UUID" field of the Advertising
- 	Data.
+ 	if (!iter) {
+-		bt_ad_clear_service_uuid(client->data);
++		bt_ad_clear_service_uuid(ad);
+ 		return true;
+ 	}
  
--dict ManufacturerData
--`````````````````````
-+dict ManufacturerData [readonly, optional]
-+``````````````````````````````````````````
+@@ -270,7 +269,7 @@ static bool parse_service_uuids(DBusMessageIter *iter,
  
- 	Manufacturer Data fields to include in the Advertising Data.  Keys are
- 	the Manufacturer ID to associate with the data.
+ 	dbus_message_iter_recurse(iter, &ariter);
  
--array{string} SolicitUUIDs
--``````````````````````````
-+array{string} SolicitUUIDs [readonly, optional]
-+```````````````````````````````````````````````
+-	bt_ad_clear_service_uuid(client->data);
++	bt_ad_clear_service_uuid(ad);
  
--	Array of UUIDs to include in "Service Solicitation" Advertisement Data.
-+	List of UUIDs to include in the "Service Solicitation" field of the
-+	Advertising Data.
+ 	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
+ 		const char *uuid_str;
+@@ -283,7 +282,7 @@ static bool parse_service_uuids(DBusMessageIter *iter,
+ 		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
+ 			goto fail;
  
--dict ServiceData
--````````````````
-+dict ServiceData [readonly, optional]
-+`````````````````````````````````````
+-		if (!bt_ad_add_service_uuid(client->data, &uuid))
++		if (!bt_ad_add_service_uuid(ad, &uuid))
+ 			goto fail;
  
--	Service Data elements to include. The keys are the UUID to associate
--	with the data.
-+	Service Data elements to include in the Advertising Data. The keys
-+	are the UUID to associate with the data.
+ 		dbus_message_iter_next(&ariter);
+@@ -292,17 +291,28 @@ static bool parse_service_uuids(DBusMessageIter *iter,
+ 	return true;
  
--dict Data
--`````````
-+dict Data [readonly, optional]
-+``````````````````````````````
+ fail:
+-	bt_ad_clear_service_uuid(client->data);
++	bt_ad_clear_service_uuid(ad);
+ 	return false;
+ }
  
- 	Advertising Data to include. Key is the advertising type and value is
- 	the data as byte array.
-@@ -101,8 +102,38 @@ dict Data
- 		<Transport Discovery> <Organization Flags...>
- 		0x26                   0x01         0x01...
- 
--bool Discoverable
--`````````````````
-+array{string} ScanResponseServiceUUIDs [readonly, optional, experimental]
-+`````````````````````````````````````````````````````````````````````````
+-static bool parse_solicit_uuids(DBusMessageIter *iter,
++static bool parse_service_uuids_ad(DBusMessageIter *iter,
+ 					struct btd_adv_client *client)
++{
++	return parse_service_uuids(iter, client->data);
++}
 +
-+	List of UUIDs to include in the "Service UUID" field of the Scan
-+	Response Data.
++static bool parse_service_uuids_sr(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	return parse_service_uuids(iter, client->scan);
++}
 +
-+dict ScanResponseManufacturerData [readonly, optional, experimental]
-+````````````````````````````````````````````````````````````````````
++static bool parse_solicit_uuids(DBusMessageIter *iter, struct bt_ad *ad)
+ {
+ 	DBusMessageIter ariter;
+ 
+ 	if (!iter) {
+-		bt_ad_clear_solicit_uuid(client->data);
++		bt_ad_clear_solicit_uuid(ad);
+ 		return true;
+ 	}
+ 
+@@ -311,7 +321,7 @@ static bool parse_solicit_uuids(DBusMessageIter *iter,
+ 
+ 	dbus_message_iter_recurse(iter, &ariter);
+ 
+-	bt_ad_clear_solicit_uuid(client->data);
++	bt_ad_clear_solicit_uuid(ad);
+ 
+ 	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
+ 		const char *uuid_str;
+@@ -324,7 +334,7 @@ static bool parse_solicit_uuids(DBusMessageIter *iter,
+ 		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
+ 			goto fail;
+ 
+-		if (!bt_ad_add_solicit_uuid(client->data, &uuid))
++		if (!bt_ad_add_solicit_uuid(ad, &uuid))
+ 			goto fail;
+ 
+ 		dbus_message_iter_next(&ariter);
+@@ -333,17 +343,28 @@ static bool parse_solicit_uuids(DBusMessageIter *iter,
+ 	return true;
+ 
+ fail:
+-	bt_ad_clear_solicit_uuid(client->data);
++	bt_ad_clear_solicit_uuid(ad);
+ 	return false;
+ }
+ 
+-static bool parse_manufacturer_data(DBusMessageIter *iter,
++static bool parse_solicit_uuids_ad(DBusMessageIter *iter,
+ 					struct btd_adv_client *client)
++{
++	return parse_solicit_uuids(iter, client->data);
++}
 +
-+	Manufacturer Data fields to include in the Scan Response Data. Keys
-+	are the Manufacturer ID to associate with the data.
++static bool parse_solicit_uuids_sr(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	return parse_solicit_uuids(iter, client->scan);
++}
 +
-+array{string} ScanResponseSolicitUUIDs [readonly, optional, experimental]
-+`````````````````````````````````````````````````````````````````````````
++static bool parse_manufacturer_data(DBusMessageIter *iter, struct bt_ad *ad)
+ {
+ 	DBusMessageIter entries;
+ 
+ 	if (!iter) {
+-		bt_ad_clear_manufacturer_data(client->data);
++		bt_ad_clear_manufacturer_data(ad);
+ 		return true;
+ 	}
+ 
+@@ -352,7 +373,7 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
+ 
+ 	dbus_message_iter_recurse(iter, &entries);
+ 
+-	bt_ad_clear_manufacturer_data(client->data);
++	bt_ad_clear_manufacturer_data(ad);
+ 
+ 	while (dbus_message_iter_get_arg_type(&entries)
+ 						== DBUS_TYPE_DICT_ENTRY) {
+@@ -383,7 +404,7 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
+ 
+ 		DBG("Adding ManufacturerData for %04x", manuf_id);
+ 
+-		if (!bt_ad_add_manufacturer_data(client->data, manuf_id,
++		if (!bt_ad_add_manufacturer_data(ad, manuf_id,
+ 							manuf_data, len))
+ 			goto fail;
+ 
+@@ -393,17 +414,28 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
+ 	return true;
+ 
+ fail:
+-	bt_ad_clear_manufacturer_data(client->data);
++	bt_ad_clear_manufacturer_data(ad);
+ 	return false;
+ }
+ 
+-static bool parse_service_data(DBusMessageIter *iter,
++static bool parse_manufacturer_data_ad(DBusMessageIter *iter,
+ 					struct btd_adv_client *client)
++{
++	return parse_manufacturer_data(iter, client->data);
++}
 +
-+	List of UUIDs to include in the "Service Solicitation" field of the
-+	Scan Response Data.
++static bool parse_manufacturer_data_sr(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	return parse_manufacturer_data(iter, client->scan);
++}
 +
-+dict ScanResponseServiceData [readonly, optional, experimental]
-+```````````````````````````````````````````````````````````````
++static bool parse_service_data(DBusMessageIter *iter, struct bt_ad *ad)
+ {
+ 	DBusMessageIter entries;
+ 
+ 	if (!iter) {
+-		bt_ad_clear_service_data(client->data);
++		bt_ad_clear_service_data(ad);
+ 		return true;
+ 	}
+ 
+@@ -412,7 +444,7 @@ static bool parse_service_data(DBusMessageIter *iter,
+ 
+ 	dbus_message_iter_recurse(iter, &entries);
+ 
+-	bt_ad_clear_service_data(client->data);
++	bt_ad_clear_service_data(ad);
+ 
+ 	while (dbus_message_iter_get_arg_type(&entries)
+ 						== DBUS_TYPE_DICT_ENTRY) {
+@@ -447,7 +479,7 @@ static bool parse_service_data(DBusMessageIter *iter,
+ 
+ 		DBG("Adding ServiceData for %s", uuid_str);
+ 
+-		if (!bt_ad_add_service_data(client->data, &uuid, service_data,
++		if (!bt_ad_add_service_data(ad, &uuid, service_data,
+ 									len))
+ 			goto fail;
+ 
+@@ -457,10 +489,22 @@ static bool parse_service_data(DBusMessageIter *iter,
+ 	return true;
+ 
+ fail:
+-	bt_ad_clear_service_data(client->data);
++	bt_ad_clear_service_data(ad);
+ 	return false;
+ }
+ 
++static bool parse_service_data_ad(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	return parse_service_data(iter, client->data);
++}
 +
-+	Service Data elements to include in the Scan Response Data. The keys
-+	are the UUID to associate with the data.
++static bool parse_service_data_sr(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	return parse_service_data(iter, client->scan);
++}
 +
-+dict ScanResponseData [readonly, optional, experimental]
-+````````````````````````````````````````````````````````
+ static bool set_rsi(struct btd_adv_client *client)
+ {
+ 	struct bt_crypto *crypto;
+@@ -667,12 +711,12 @@ static bool parse_timeout(DBusMessageIter *iter,
+ 	return true;
+ }
+ 
+-static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *client)
++static bool parse_data(DBusMessageIter *iter, struct bt_ad *ad)
+ {
+ 	DBusMessageIter entries;
+ 
+ 	if (!iter) {
+-		bt_ad_clear_data(client->data);
++		bt_ad_clear_data(ad);
+ 		return true;
+ 	}
+ 
+@@ -681,7 +725,7 @@ static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *client)
+ 
+ 	dbus_message_iter_recurse(iter, &entries);
+ 
+-	bt_ad_clear_data(client->data);
++	bt_ad_clear_data(ad);
+ 
+ 	while (dbus_message_iter_get_arg_type(&entries)
+ 						== DBUS_TYPE_DICT_ENTRY) {
+@@ -712,7 +756,7 @@ static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *client)
+ 
+ 		DBG("Adding Data for type 0x%02x len %u", type, len);
+ 
+-		if (!bt_ad_add_data(client->data, type, data, len))
++		if (!bt_ad_add_data(ad, type, data, len))
+ 			goto fail;
+ 
+ 		dbus_message_iter_next(&entries);
+@@ -721,10 +765,22 @@ static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *client)
+ 	return true;
+ 
+ fail:
+-	bt_ad_clear_data(client->data);
++	bt_ad_clear_data(ad);
+ 	return false;
+ }
+ 
++static bool parse_data_ad(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	return parse_data(iter, client->data);
++}
 +
-+	Scan Response Data to include. Key is the advertising type and value is
-+	the data as byte array.
++static bool parse_data_sr(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	return parse_data(iter, client->scan);
++}
 +
-+bool Discoverable [readonly, optional]
-+``````````````````````````````````````
+ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
+ {
+ 	/* Set BR/EDR Not Supported for LE only */
+@@ -837,15 +893,14 @@ static uint8_t *generate_adv_data(struct btd_adv_client *client,
+ static uint8_t *generate_scan_rsp(struct btd_adv_client *client,
+ 						uint32_t *flags, size_t *len)
+ {
+-	if (!client->name) {
++	if (client->name) {
++		*flags &= ~MGMT_ADV_FLAG_LOCAL_NAME;
++		bt_ad_add_name(client->scan, client->name);
++	} else if (bt_ad_is_empty(client->scan)) {
+ 		*len = 0;
+ 		return NULL;
+ 	}
  
- 	Advertise as general discoverable. When present this will override
- 	adapter Discoverable property.
-@@ -110,8 +141,8 @@ bool Discoverable
- 	Note: This property shall not be set when **Type** is set to
- 	"broadcast".
+-	*flags &= ~MGMT_ADV_FLAG_LOCAL_NAME;
+-
+-	bt_ad_add_name(client->scan, client->name);
+-
+ 	return bt_ad_generate(client->scan, len);
+ }
  
--uint16 DiscoverableTimeout
--``````````````````````````
-+uint16 DiscoverableTimeout [readonly, optional]
-+```````````````````````````````````````````````
+@@ -1215,18 +1270,24 @@ static bool parse_tx_power(DBusMessageIter *iter,
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
++	bool experimental;
+ } parsers[] = {
+ 	{ "Type", parse_type },
+-	{ "ServiceUUIDs", parse_service_uuids },
+-	{ "SolicitUUIDs", parse_solicit_uuids },
+-	{ "ManufacturerData", parse_manufacturer_data },
+-	{ "ServiceData", parse_service_data },
++	{ "ServiceUUIDs", parse_service_uuids_ad },
++	{ "ScanResponseServiceUUIDs", parse_service_uuids_sr, true },
++	{ "SolicitUUIDs", parse_solicit_uuids_ad },
++	{ "ScanResponseSolicitUUIDs", parse_solicit_uuids_sr, true },
++	{ "ManufacturerData", parse_manufacturer_data_ad },
++	{ "ScanResponseManufacturerData", parse_manufacturer_data_sr, true },
++	{ "ServiceData", parse_service_data_ad },
++	{ "ScanResponseServiceData", parse_service_data_sr, true },
+ 	{ "Includes", parse_includes },
+ 	{ "LocalName", parse_local_name },
+ 	{ "Appearance", parse_appearance },
+ 	{ "Duration", parse_duration },
+ 	{ "Timeout", parse_timeout },
+-	{ "Data", parse_data },
++	{ "Data", parse_data_ad },
++	{ "ScanResponseData", parse_data_sr },
+ 	{ "Discoverable", parse_discoverable },
+ 	{ "DiscoverableTimeout", parse_discoverable_timeout },
+ 	{ "SecondaryChannel", parse_secondary },
+@@ -1246,6 +1307,13 @@ static void properties_changed(GDBusProxy *proxy, const char *name,
+ 		if (strcmp(parser->name, name))
+ 			continue;
  
- 	The discoverable timeout in seconds. A value of zero means that the
- 	timeout is disabled and it will stay in discoverable/limited mode
-@@ -120,8 +151,8 @@ uint16 DiscoverableTimeout
- 	Note: This property shall not be set when **Type** is set to
- 	"broadcast".
++		/* Ignore experimental parsers if the experimental flag is not
++		 * set.
++		 */
++		if (parser->experimental && !(g_dbus_get_flags() &
++					G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
++			continue;
++
+ 		if (parser->func(iter, client)) {
+ 			refresh_advertisement(client, NULL);
  
--array{string} Includes
--``````````````````````
-+array{string} Includes [readonly, optional]
-+```````````````````````````````````````````
- 
- 	List of features to be included in the advertising packet.
- 
-@@ -130,8 +161,8 @@ array{string} Includes
- 	See **org.bluez.LEAdvertisingManager(5)** **SupportedIncludes**
- 	property.
- 
--string LocalName
--````````````````
-+string LocalName [readonly, optional]
-+`````````````````````````````````````
- 
- 	Local name to be used in the advertising report. If the string is too
- 	big to fit into the packet it will be truncated.
-@@ -139,27 +170,27 @@ string LocalName
- 	If this property is available 'local-name' cannot be present in the
- 	**Includes**.
- 
--uint16 Appearance
--`````````````````
-+uint16 Appearance [readonly, optional]
-+``````````````````````````````````````
- 
- 	Appearance to be used in the advertising report.
- 
- 	Possible values: as found on GAP Service.
- 
--uint16_t Duration
--`````````````````
-+uint16_t Duration [readonly, optional]
-+``````````````````````````````````````
- 
- 	Rotation duration of the advertisement in seconds. If there are other
- 	applications advertising no duration is set the default is 2 seconds.
- 
--uint16_t Timeout
--````````````````
-+uint16_t Timeout [readonly, optional]
-+`````````````````````````````````````
- 
- 	Timeout of the advertisement in seconds. This defines the lifetime of
- 	the advertisement.
- 
--string SecondaryChannel
--```````````````````````
-+string SecondaryChannel [readonly, optional]
-+````````````````````````````````````````````
- 
- 	Secondary channel to be used. Primary channel is always set to "1M"
- 	except when "Coded" is set.
-@@ -170,24 +201,24 @@ string SecondaryChannel
- 	:"2M":
- 	:"Coded":
- 
--uint32 MinInterval
--``````````````````
-+uint32 MinInterval [readonly, optional]
-+```````````````````````````````````````
- 
- 	Minimum advertising interval to be used by the advertising set, in
- 	milliseconds. Acceptable values are in the range [20ms, 10,485s].
- 	If the provided MinInterval is larger than the provided MaxInterval,
- 	the registration will return failure.
- 
--uint32 MaxInterval
--``````````````````
-+uint32 MaxInterval [readonly, optional]
-+```````````````````````````````````````
- 
- 	Maximum advertising interval to be used by the advertising set, in
- 	milliseconds. Acceptable values are in the range [20ms, 10,485s]. If the
- 	provided MinInterval is larger than the provided MaxInterval, the
- 	registration will return failure.
- 
--int16 TxPower
--`````````````
-+int16 TxPower [readonly, optional]
-+``````````````````````````````````
- 
- 	Requested transmission power of this advertising set. The provided value
- 	is used only if the "CanSetTxPower" feature is enabled on the
 -- 
 2.48.1
 
