@@ -1,103 +1,88 @@
-Received: from sonic317-27.consmr.mail.bf2.yahoo.com (sonic317-27.consmr.mail.bf2.yahoo.com [74.6.129.82])
+Received: from sonic308-2.consmr.mail.bf2.yahoo.com (sonic308-2.consmr.mail.bf2.yahoo.com [74.6.130.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D081B4F0C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 22:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.129.82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441A41B4F0C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 22:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.130.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738015891; cv=none; b=m2u8jFjqgvovZhxJjWuY/3mShHgzUeCptRq+ZrRACM0P/2Fs81N8fM7d1ZIVsbIJFL0toIU6YZZuB9r+psnPXTUOAitHz9qxtl7G7avyi+jbRc/CAmsZDg6zAsgRgTR88J1C50vT5JrJ1G4JHpWmJeWnpx0HZocpWEcA9vlTZaw=
+	t=1738015978; cv=none; b=RUmGiIajVQ44uDgkI2Xv0PGst8JPGU7CJmc6MgrD43O4Ow8dJkfEwNyPOjRo6ZQ55hhtZ50h3rf0jdsbXhvAdG5O5pQJ4VrENZokH6OEo1GdYnZ5UGD1Y0SnfU+Gxi1YBt4WYbJoZV8sRg48kCk84TgbO8hWpCIi5BP0MsdJSy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738015891; c=relaxed/simple;
-	bh=CBOHhSyFqzQd8/OpQEQo6urg2FsWsjl3H7Ft1+T5+Lg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=KftP7eX8R5bcntYbu/D6e5yGhylH3k1hv/vqSK7clGKTbF4mfgcsu4ppzS3Kq3C9omJFQnHwlcrjrt29ZCplDmrA9/zGoEYTEtsxofcNWnU5j/5TeswvyFUIkdiHJ6TYsuOx2nsMiXa0z5yuBxXAb75QJiGtwswrZMEnn+tlHhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=JVQwXayB; arc=none smtp.client-ip=74.6.129.82
+	s=arc-20240116; t=1738015978; c=relaxed/simple;
+	bh=9DX6gHNh1jUxz43LTsiTJ2dcvuCXJphH0wO8tPfQZUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KiFtb8Cc/efriW1+t2YrVSTNQb58L2j03LWpj4j2Cp+kVOi/jtJxITsSeCve05XakRaohS173UcLOOKQdGrVkX4Lp07ewjFwDpzFjk4K77qeIhCp7nQo7R5PWGpcFtG/dOYDbtLP34yqXg+3n9GJx9vIyorVUiyj0z8/E221AxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=t8fQFgKR; arc=none smtp.client-ip=74.6.130.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="JVQwXayB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1738015889; bh=Il6HVX7bFBftH1cuTeC6ivhLQHYS8wHuABBCTP5CJAE=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=JVQwXayBDILxVYQ3TX6ucxlGhxFQQk8Q3oL6HhTLHzMoUK4QM9U+DS6yArOMuDXBedQ9EW+cJ79kjK9x85yzeXAVj4PqZwwdnanpfmF3FB6PnnKsLpGY0w1LslntEn5a7BB/5knHjuosIfZ2TB5IlFkElIPmRAlI+4Fbv0fkLt5wruOYVHD/OPkbezCq/Mk7+6hUEmyGTF+xovgIb2T2E7iDqBU+pX1qtRe7gB0C5DwdQcg8IUFM7qwlC/lzx+tmPK+azYJ0ST32Ec3UdxyHasoHrZPL4kUyF0m7vjb2jYPbTUDF7D71508If47Fu2NTBo6UciC2bn9RJEYaMr5Q0A==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1738015889; bh=yZ8/8LZo9Lvu8aE8Cv4oKfIhlsOXmde/FyFYdOf84DD=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=mm/dNFcOMWZkOLmnYfSEK+vwRxZY3SthM6w5/A0AFdqDUSr0ADcPjsJ7uwDhqOi97xM0Wc2t9cm//WHI6eLGwL9fLcYx5/iIsQOK9siHxJfXtmEu5StUk/7mLicdObU4nPf0/LVNu5iFduh3884Wk5YpXaDG+qd/1vpjCyT40Yf0lsVxpNBIhUfGS5yVks1javKHzHFav7BNyA4sg/1jbZR/mzIbfHbYlktj5kya2zv6W8z976J61y28IVBgg13gAo6n2OtolIffYB+5hakJyP2EEkFnvhNQoA0V/LvCeLWBskLP2whUip83m/9kh4cdxOOefw8k5LhZpTf5rwZSDQ==
-X-YMail-OSG: RhkY734VM1nMS62CT0qhyInlwuXKzIKCW1u.P5dn4sa3C.TO9mglDvINMFgz9pG
- vcuIQKLMC_xiMzsSspzB.SDf0CilUJZt8m4.I_F9A98VNCI0kkD68bq_Nis7xHXwr1taLzv0NHCb
- zDVcp_Cwz_TKMgtMy8iU9kURtJW5j4kUoE7Mt.HFuqhaPD9b6H53Ob1IXB667jI4GXetOv7P_059
- CvWKDC44Ia6RRFmosVYnuR_8QgKxWi9misEe_6CK6TiHzQpHr3JGWJtU2yjj_HJA3zBltR314hC6
- BELhCJ3z9NIROJ6yDBxArgK6zIyWHm_NBMJr5Y4_DB4uk8BumRszy0J2p4OOMiVV2Vv4sR5x0ACd
- 2yVPagCABCiZyQ345U39phq_sgSv3rKA6t0uFranwUamMhFENL4n35nOGRMiK57kImFlWg7tc_aP
- 7MZp3sNULTKt.IdJFGlW4sF7g0_eui1fOJwfCo1aPiDmKF3swm7W.pn.wT2xaWy_7AiimzCDPtb.
- LLftFUYit6ZPQTkEZNXr86OsdjKyFCAZnZOtVatb7qNUsMH2Od5229iVm14nLmGU7pV4KOk6X4pP
- m9kHXfvJ1CwCekHc25gWTPdkxuFzTj5JflhmxKR5AAIYxAxe5vN_ZkJ0nfa0WtWnzb3_EMuaC577
- 3NWL0bNkuhlyTWQHNFOD7zHGezSmX0vkINqAw6n2SQa8dEBWejj3qa64S5FEM5k3B6d2ua9md1ga
- SnRNc1YYBMLm5n_HZ640T0wx3ITkKEBi_aLWGNLDTHDbkZdgq6Vexzj.7mj_qtxkoTCBeSTaoxB5
- rC47OvVi015TQ3neuK2Q9R.hyuC3ui4.fz9lJ9EHophUH1.wwUE6bcL3YSpkBvClwvkeI_2cwF6S
- 96XEcRIJI7WX2cFZO0Q973JRQdSUabDhsRsQYTAeUtPg46DIiEv3zHkQnWNTvowOMPgFWufhmZAz
- dQ6HC6YVVzLjhJhBU6fX7WqmOU36Ms0U2TgBJr8tq.Rr8r6a801Be.1iOypItVaRlLRXxWZdil58
- TykYT9x3IwVwPGn.vHqEGjLeqWwDgB9Q2v9d2eQThjIxWg.HSDtLa4usUUjOxiiUAr3jJX.ckRZO
- IDnqONL0l7h3vM6aUUd6m.LNRjORv5hxVUYp4rgxPSEuOUZ6LjGQaXttmD9608mepvDlefHjAgpc
- ogjX7msiK0PfwjolFhAUCPps0MGijL9Efb0p3hoNxXy1f5YFpHl5eL0wAKe6ebBtxVeuFeauhMbK
- 3R6iFGdetUfWchxQULeCFNoCLkELVkCjqTKIsdMWrStAsdy_g6PFGGnRVcBjKR7AyTEOU4KcxRSl
- G3g8T6WN_zCD6ixFJ3mL1nFJcycAzKVygDyJf6JFfdiSbeshc7b3Q72e2FC3O23NnoQ_Q0FsXObb
- wds_Gb3_xUTVRqnIZps.EOsmNcHMfuyfTcE25JBPesvLCK11tiMR0XF_qz4FIjwrKSwJ_Tb4lHDJ
- PoJ7VQzRSnSoPWSnLe5RpfpsOlipqPlDWwmsdp_9GMDF5IPtElxGlO6r0e0fouwyZie45rY235ah
- yxTr1iCRfaTJiqgQun4ickaAQNEVTAJly7szaI8FXuGhHC0xB0B6NOCRY4KNX9muloDu.IEVduLz
- e25B6SU62hvGRJ5Otn5.oCAnqY_YfPzw7qiUbKlrzxmdLnR6kMg2cJ3bt2vtyG2m5ZS22Ijsky99
- Upr3Rm_c9K6h4wYvxPZVHQfhx4sz8cBWFu_p7zwAgQhRRqrJGG1vPhm2ob6_2qPTPj9PX7L3wtG5
- SE.I6k4m__0GayDCGnrwaXEEZ39RjFecZFxqbYN71yDmJtFDB8v1erPILA06YLi_zKnDZQxjgdY.
- tIlMu9xi.isCzeMOFx5EeDPIpzb1QdTI7Cm2B9F2lpBFgYicF3fnvc9e.b9..cYuYSPEstapy6MS
- vRxzwbPr2w30xNvrI2ndsrZeoDvVN12X.zXRGoVkS9fAGiNQHnj25OcauU92ZfOYoVlI8rQbJ1nb
- _SB2ldJytYvOGPS9aAHqI85_RW_QhejtcKWuvywGBy04CAxhZKyGfCpzi4iv2XyHmU2FRrH4aU2D
- 7I0iSV0NVi0TEpXllNMWRvNWe.TLXdvP2jRvQcsYSypqjCxy.WDj_3aaMi_RkygoE7rzJF.G99ia
- yyxz7ANTHiPZUg9lDWLVpPqMtYkOJJzYrumxT5wLtOyloCJLCgCpmeranelGODwXpNBRE1KjWIol
- HS8qmeFt1DOZtLXxRP36v9v.IrUIZscpFWWou
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="t8fQFgKR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1738015975; bh=9DX6gHNh1jUxz43LTsiTJ2dcvuCXJphH0wO8tPfQZUs=; h=Date:From:To:Cc:Subject:References:In-Reply-To:From:Subject:Reply-To; b=t8fQFgKRzLhSBFncGco+2cYTsTK/MwWKC9UO0VSMOL43dVqpT23qmY15aBw+oO72U/boWklXVRKOtivckq/qsjd5lfgXaL79lUJZOOBJLdxA8nfeAsaefE54hQo9cQxq9tdLVuBRorHuSoi3p0FPtfBkhxHGwqSC44CKLHwLW+p2066TSjArGeYjnLSvjjmYoX3MKIoLT0avsFeI+BnpwURxa6vlvdQa/TVN6NzSMEC8LXd3H4zRDsUzQRS4Ksqt58+mdsUtV8kTAZWKJRo2aA6OgVbzMQLrocQoWL86fKs1htr6gTbGp1nm3ykGdJlnlWllZjFihdV+DKcqzV6pmw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1738015975; bh=hKKz0PMF/c6OupbBVxpTcuLzS3X5U2FPOZMZxuXzg6i=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=NhGTG//aF6vbmVdIxtCGH4jFiUelSCmLsZuFIc0+QsB4yV2dfAVEjq6SG39L8PLT+XsDWTpdgasYwMK1J1Tf9EUWDFyyzeF0jFqd22RY2pv/PXH2syNyQoji0fobqlpPiSyQr/MzE+QCPwrgqoBRv++zBhnNJoE+huflfOFYW9xPffVgEMsBcjMVkDtHdUfhX6kbUsaB1LFzxn1mJt0aoFOmsoS4QJtoeofNA5cYzsaImgdUCYxYoadSfnKZPD3hsFoYMCNDkdRvZsKozhFwqven7Bf0uwsOtOqun9o5a/y4/klygGJtw75OaM++MKcG8OdAqJl0wG6wYb/yfBiE5w==
+X-YMail-OSG: y5OgX.UVM1nDFG_z8_cAV.8O__tGE5Wns3CP91GWa83BxD4Fjv20VTbO1_I3fPr
+ tkf4XppDvMBicPQH2Q8MJHXf8UuM_pOXyN6j40keh6FgXAkjG4l8IyU_E7GZ.fR19GmAhMuESats
+ hzijLYtekj6Rha5fm5cKOvkR1GDDmIDNma.ZOCpeeYb_YNx6M7_ipwSdEhJBaHunAzNbLXr80Aba
+ vBRrdZwlrMlCxl9mUbxeLozu99GEstbx6kF4X5lDklIDsM9QOoXbkOpZM48swxpDAbn5Iu0eaGij
+ tlFPJ1sI8d6j4r0LkztcIJXgG1qCZi4cJHyydleurC1_u4FGmeERn59pweBxmxUzEDIHiscBsVI3
+ z8crHllK3l0Ca90xIczBs3QzfQYZ9SpCipYQUiAopfGvT_NRfOSFKASlFyu5U9xFUJXNysfxoS7_
+ YimAwQWR2jFSaKI0mLyBnLH8.fc7jRLkExGqMySdx_lLIZPjL1XYIuMfw0mGrXbQXsOuXzUemjJ_
+ TnntgDH1yG6YGePEpqvkwd2MBbwLUK0NfrWDXGTQfVo2wj.HXiBNRzn5EJ8t68B5e8dV6a2ghVIs
+ qV9gHhXQlOhz8fkw7ow3gopoeSgLVGhIvG2xQnGo6eE3D.NBTP05I.ms.y3wNOjSDALwPiYobV.U
+ mxxuOnK6yLygOZ9xtZOCwizAZPKF7_HOaeKv96Y47rC2tLn._L6ajYk6dbzHQBSCzFKKgwm5v6eA
+ 5Sxp.vXeL0ZrWEO1atzD3Ma8T1IiOPyfqL2WArVKVlWKsf9M5JHGKYW1d51FdNjlZVffmTcUr5Ew
+ jwXGiqlDwq6uY0eZZngnLfCLD9xM00XqYhLGqbisu5Yc.kjVEWEKW3W5BF58Ee1jBZ7GyHl5Qm1p
+ VbwNskhdtD9b1SjGukOmZlC8i3HrVTFbb8jIr0gLK.NfwsxeH6sWZ5eW0AoeRAULgZg0WxiQHiRR
+ wNMRddklTQBfRaszrqTtVTHczNhklhHlKdUppsE.doszm9u.UeRMLuzlVHQiiDYpfodVxhENnP1R
+ f5ebtfV52uZUp3L8Q8jWAl9ykxILTKfOE2cWYiwe2yj3ozDuG5P0xuliki5GFl1_zX8BByP5NcJE
+ LeD0JSPcb4hl69WEkYYPULsZLmDUvu1LkB2uI56kBIRfSF2vk7jxlJ_LSG.kJgL_H4kJYK2q7ANM
+ aeuD5GRa6x_TEME768CZLyfPMl_oveDnqPVTXDMKMDYLdHaZprW3UCGGemirLqj1W7z2MXadbiMd
+ 3QM0oftFBa0z6ihggiU7t3vsMx1lHrNLOZNkNZVOXJoEfQG80pePm..wM1A1Sfc7BPjITKlshLMx
+ RLnttwc1h5nam04pM7jdNqJgP7k.MUotELx3008fIO5pjrQdmrzCeH8CI048vdxhbC8iT3e6D8YL
+ oYPF8yDMoTzVMe4P8Wcof3tQvK8UYqB7M80255LsX0WRjo6Iw3DPlGf1CHg4kSIMldXN7l959l8T
+ E03fGjESGWBR_flMx0hZ1f.1hjdWDAAZttRTcDZ3ROQ.n9U4ZfIGW.af20gd_QZwXHp_PSX.pLOn
+ wbIsGX.B1GeVb0YwqgbNJqUGRHZSapwkd_Wx8KbrW3ufBrNGBLoKUv6XbD6G0PKdH.CC0C9js1Br
+ tfK0CIhQX9VUMzYbhziybI2Jzgx4Bx3bK3PvyFpvoIMlDw8.JgcBpSijb1SiAgcCWkmWdDQKUyrA
+ dMRbWtc9f0J9Sw5U8Mwg04DP_OeG8UKDTw2X.QHuDthYCyRgflIRBrSaYQmu2qSHke0AhcvLY3Mg
+ GsGYUFK9etXN4.9I9Ob8AqpCdALRcn9bwpJaBfEQZJcRk9YRRdBV8G1OowaCto.u6qCv36cvWTF4
+ Uvk2dubeFhFW6SZhkDiknnFohz4k9Ojp6zcI7lnu9eFhtMTk0w9MxoOwiraPilo.NZX2eBFqF6u0
+ dZcPLyVyb_f.DaZ_QFmWU9JHkvzk5V1i2Vb_ZDElxxxvAy7KgKRvqUXJVK_4T6T_xnzMZPOqeFUQ
+ 6Ic3249jJ8uvN7yQF4AEXrSvz98jlot_8LEeYQr_y.Uv5Ui0xDtXJI9vKZuooMb5VG5idqC10baP
+ ssSLPVqhRwms.kEkx7Be.QU3kqEbu_PJGiK5E85.2ytSZZ.wAvUw7kVGv.DXlyz916Sk7h5rKmZh
+ y5Mp9L_z.So5n6xCLgZWkDRuCz_ljJupfyHbVIIA7zUVcUVjtU5XWgsyFXm.L5KCjsGzL_JMggaB
+ lipc71yIw53iNmF.joUosxIPvDeRJO3oWz.7ZfWwRJjPoByDnmRU3yw--
 X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: d41b19b2-7aff-48b5-8b4e-6c9b9f3efd8b
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic317.consmr.mail.bf2.yahoo.com with HTTP; Mon, 27 Jan 2025 22:11:29 +0000
-Received: by hermes--production-ir2-c694d79d9-d879w (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ed331bd1b501c76ea5c16f45057da5f0;
-          Mon, 27 Jan 2025 22:11:26 +0000 (UTC)
-From: deaner92@yahoo.com
-To: 
-Cc: luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org,
-	markus.elfring@web.de,
-	patchwork-bot@kernel.org,
-	Jeremy Clifton <deaner92@yahoo.com>
-Subject: [PATCH] Bluetooth: Remove unnecessary braces around single line statement
-Date: Mon, 27 Jan 2025 23:10:37 +0100
-Message-ID: <20250127221052.197899-2-deaner92@yahoo.com>
-X-Mailer: git-send-email 2.43.0
+X-Sonic-ID: c44999c9-2a2a-40fa-8bb8-72653ad7c6a3
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.bf2.yahoo.com with HTTP; Mon, 27 Jan 2025 22:12:55 +0000
+Received: by hermes--production-ir2-c694d79d9-mr45v (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 6a4cbe09f41ba2e327cf52594d733ec8;
+          Mon, 27 Jan 2025 21:52:39 +0000 (UTC)
+Date: Mon, 27 Jan 2025 22:52:37 +0100
+From: Jeremy Dean <deaner92@yahoo.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: markus.elfring@web.de, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Bluetooth: Remove unnecessary braces around single line statement
+Message-ID: <Z5gAJboUiYtDWdSr@vmi2410184.contaboserver.net>
+References: <Z5aMrXwnmEXxKWkC@vmi2410184.contaboserver.net>
+ <452f118f-2a0d-4b54-9285-063ccbe6e5ab@web.de>
+ <Z5f7BcSERmImx0_H@vmi2410184.contaboserver.net>
+ <CABBYNZKxhq33FXEb_8LMLV4whhX0jc100tUPYCAs9t1q9_5MBA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-References: <20250127221052.197899-2-deaner92.ref@yahoo.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABBYNZKxhq33FXEb_8LMLV4whhX0jc100tUPYCAs9t1q9_5MBA@mail.gmail.com>
+X-Mailer: WebService/1.1.23187 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-From: Jeremy Clifton <deaner92@yahoo.com>
+On Mon, Jan 27, 2025 at 04:38:22PM -0500, Luiz Augusto von Dentz wrote:
+Luiz,
 
-Warning found with checkpatch.pl script. Remove unnecessary braces.
+> I normally don't require Fixes tag for coding style adjustments
+> submitted to bluetooth-next, these are not typically backported since
+> there is no change on the logic or final binary.
 
-Signed-off-by: Jeremy Clifton <deaner92@yahoo.com>
----
- drivers/bluetooth/bfusb.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+And so the only thing you need is the subject/title rewritten?
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index cab93935cc7f..0d6ad50da046 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -365,9 +365,8 @@ static void bfusb_rx_complete(struct urb *urb)
- 			buf   += 3;
- 		}
- 
--		if (count < len) {
-+		if (count < len)
- 			bt_dev_err(data->hdev, "block extends over URB buffer ranges");
--		}
- 
- 		if ((hdr & 0xe1) == 0xc1)
- 			bfusb_recv_block(data, hdr, buf, len);
--- 
-2.43.0
-
+Regards, Jeremy
