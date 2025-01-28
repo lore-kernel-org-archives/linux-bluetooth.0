@@ -1,143 +1,173 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9331B532F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 22:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95994366;
+	Tue, 28 Jan 2025 00:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738017069; cv=none; b=dasmioa3YvBYA4BdlCeOTtoP52zkdY7Zge++HPERFdCLLBfvcpJum/EYhlKdGq6NoWeFqxWrzFBdz9b1du5GXdu/KnnYmAETs6U5/02gR3mS2HWSahWDu5oY+miZkgjiQgmfOyT/8NMyQVziv7vTB1j27ZCnvb+z7Ev49SI/+Qo=
+	t=1738022688; cv=none; b=iZWfA3yuS/1DpX/UxPHejZL0GZj32OqpicgdbIoQmhPuGTiCwpD23mu0Jx8ZSivSkmmfO7ylFlIQh477REcGr1F096iyXrK/gc8fLmK10L29h/m+LkWel3ypUFhJp2Wv0fsh/zBhlBYAQy8CpomNL0HW1ta5PEpdGEtNXEEN03U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738017069; c=relaxed/simple;
-	bh=HpYc16YS2aG3fe8WhuffJJgxt6iXiP2SJyLu9D1q3oA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MU/Mi6xxFHHWF0hqY/iQbQJYcmhaiv95rBXTFBzakAcUQ23kEbfkecPXK/Mv8WI2A1aStAsrxACo8JNCcSuAGw94Wt2eJRRcly5VD4BgEhFxgLcGRUYL2PFHC5RMwSldT5xXgajiO5cdQf+15DynDw+55dPiGQJt3ujkmznFMU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qc3LmnU4; arc=none smtp.client-ip=209.85.216.42
+	s=arc-20240116; t=1738022688; c=relaxed/simple;
+	bh=KAoXkSlt8feMSrltKDXWXOGB2MEJXpz7rGCHgc2mJfw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KMik6PU6MdfT86NPyozHD1JcSCjWxovdcjXrhnkrttncYPwcYASCylEZQ/LY62q5y0qJ3/dL2cw90Fjy2vyxR9vabn9aKOoN6Z5059/ISPNJXGDzIn8aXmg+MGeZxSlhpOUsdR/5/XThPedNfi9Gj7wm9HJuRMOiH8ohL885BQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FVKRIFlc; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qc3LmnU4"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2ef87d24c2dso6591405a91.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2025 14:31:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVKRIFlc"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43618283dedso53564185e9.3;
+        Mon, 27 Jan 2025 16:04:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738017067; x=1738621867; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5nVEXPFONH8LY4WAtU/Keaikn87uotZev1TqIOnV0HE=;
-        b=Qc3LmnU4P5gGwWAmQry3bH4UvfrcGKYapqBZnniQ1rIYwnRDNpoQ35+7ASmnTI4RgG
-         5r9xz+f1VAvbAqxXQhkBKigbBr+mJtCDqnj5F6M1WYYpabMVbcDg6rWxYJpGbTTZBWUe
-         OKrmGKEJiAGt4vA4UJjeLJVblpra0TtQbCwVRg4ZRpO8WSzQXclTgrmsJ0eUP7gj+vjW
-         ePZQL7wssSmWLl96hccrd/Y/CwTEkBbmu8N6qxXHZClbz+RLvJ+IVgv/913d5rtRWBLu
-         ziDjXSxFAP1rWhANodZP6Yb5/yPpHBnuyT6dHUMzSnv7FnoaaJJb7J0sL73RqnuPNcDy
-         EtmA==
+        d=gmail.com; s=20230601; t=1738022685; x=1738627485; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eemsbZ6okcf087qLiLh0gj3mgI7cIF5l0GwYOpi1ILo=;
+        b=FVKRIFlcNbYXaolprrb+r/bKptZHwIFBKfbwRWvBiiySBMeA/DcwCtyqBmroRLZUn9
+         tPzptfF5BbfSCnI+wrJylkBLjc5LNjfpiE+CeDIH8+ZFnkt6q6VUK+29NE9LAfj5XztI
+         mr8ghLyguj59wS6aD4KA5YOGPKQ7SV8mUUWb/yMjNJaViJ7uCdtwm94DmzjV/FAIa/Xp
+         p8negCUDU+ZeFCEPuaVFw88Pn8+tVkgziV44A9pExrcRV/wK47lLdt+nYfnDNVsFtU7O
+         bhzAZkf8J0AuAkTeH4tz8VQRnV1CREbo2pCW509YJDqN64mNaJLQa3S9v5Et7Kc/y0d1
+         W75g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738017067; x=1738621867;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5nVEXPFONH8LY4WAtU/Keaikn87uotZev1TqIOnV0HE=;
-        b=kfB6klCHpICEsJZVsHSMU35FPYNDhCXAxgloDEN05iCWRqJaLuHNs3oYKvubAtE6te
-         n0GOnQ5LaCmE0GVnuvfle/y3d5djjigDhpyy2ZFl5AAlIHHGPNMYtLF0wgmwGHgLu3V8
-         bdiwoEDk8uSkBdHlF7Y47mYLTG/HcivlQcygElLhfsqD0aps9/Yybra8XrkH3siC00u4
-         WamdEXoH9DL8TiaYuetkOUNGBn2lte8ttJf8ZaZsCjBkXPQJKSL5hghGX1EC9o214dPn
-         /j7MGweoOVrVchnW0CLt4Wx+8CGSjZiPdwG1tmCSfqG8DoQYp5BQsktDw/Y1i5b/zZcX
-         bhag==
-X-Gm-Message-State: AOJu0Yy9a9YoQxB+fSDnM8mVSuR8paKOykDAmcGkIoqt34TV77/QOnT2
-	u2HMZNbxelFpFKeerHYEArddQFI4SCQREH4fVdumzvsrD8NoKpBJXY+ITw==
-X-Gm-Gg: ASbGncsggH+bt7CIKwPK9cVkE2TYvYozYf/xGekYX6TQnGQcxF1zJkSzgtJ2xzz69/R
-	+RClJ810YIjek41kI9qMAc6NdO6Jmf5FTt6ceEjTqkPR2O0DLSjOeQ7ooPRIVg+1SLw4YMq5kWF
-	nyLY/3ikUgwW2ROOTSCrJuButqF5kS3ylsjS92+xBw66xlewxVfxajdHLnyl8MQjXeCwW1F73Rb
-	A8R5vPSi9AX8/ko8o+DZkM2VMGNP/DWjKZ76H3YDV+FCMFQWzv86RDvgLSJ+bahHF30TQPP2ptx
-	+CLkuWoQ
-X-Google-Smtp-Source: AGHT+IGznFZO9oW0Yb8T4I0WtNAOdEY2nyXK+bJWB31d6ZDhF3omNsHpEiR3aqbYUBD+UBPDfjJNrw==
-X-Received: by 2002:a17:90a:c890:b0:2ee:cd83:8fe7 with SMTP id 98e67ed59e1d1-2f782d9ee9amr59262720a91.35.1738017066855;
-        Mon, 27 Jan 2025 14:31:06 -0800 (PST)
-Received: from [172.17.0.2] ([20.169.14.9])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa76ebdsm7811381a91.34.2025.01.27.14.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 14:31:06 -0800 (PST)
-Message-ID: <6798092a.170a0220.f56db.7782@mx.google.com>
-Date: Mon, 27 Jan 2025 14:31:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7225595468895568655=="
+        d=1e100.net; s=20230601; t=1738022685; x=1738627485;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eemsbZ6okcf087qLiLh0gj3mgI7cIF5l0GwYOpi1ILo=;
+        b=UTJCWlV0LbP/4mmQ9zVaDQJm5tzXr5uncBCCq+BLLgAkECTt64/M5oCASNXkEAtbAN
+         XV4MdvsBrDVrdGkjRlCzGscQXrlA2qoJIi8wDa/IwlzJXiyU7Vx1dCETGqqEYw5jiJ2u
+         kqAxne2sAdJZ6BYIm0M6UtsN1xe++VMdo0daiLO92a+80lfdYfXJoMlH8OtSqwUzZJOt
+         HXRiQF9DnaNtREMKRIEAdCGlas60dBG6FvLmj6bLUGp2EFG5XEkWaXKOIywnAyhbo1yA
+         XQkokG7FIF4qCX8J0lHHFegCziqy6t1OXol3/4JDayL4vQJoE7oOPo84UH4HmqvqDVt4
+         uDPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+GT/u4qmsJfk/SzN57d9l8z0glGFtpvzIpN2XTY7U1Ea2D+aQzqfzC/PuJ0NGaOVQOPnYQ2JFjLxspi4mIfY=@vger.kernel.org, AJvYcCXA8rlHjD5BQxxSxTKv4Bjr9tosl5U1n9GmAv/3K7yfT4cl46UkVS7a5Qp27ukxRaMLUHooy2RwmgOA9vr3@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqOf1dMhcwx9q89RmEv5IOsU3T9jyoUH2JdPF21kRpfuSGKcxo
+	LOtpyeiGH/lXW6X4VYCXbLqcIPl5OhOESMTFfZPpYwRU4QzV1sUz
+X-Gm-Gg: ASbGncuhGGYfNXAi2HKX4x1MMJnijIGJiG9rHyTl93bmVyNG/3welqwRPdd0JLLLIxO
+	lSGscFD5ppgW538T9K1RYBfjoUsPg/oKobnVQ/xReEWaUOXJoufbODjFLGz/Ct01SJ8+ZUq4Eq+
+	xvXxx6pU0Xo9fxpqCgpJyvlMwcmAvO5tpmQhqbcYR0ugqoM74/0x1ozE7bOULqH4Hw/U+s1YqHv
+	hcyllrsL+s3wcFhFGdAWP5DNQcTxSCHsr8ziHMMnx8gxFcpBj2Vxsj6q8AwklvDj5aXCy1gKHL+
+	G1uJJd+uBxKy
+X-Google-Smtp-Source: AGHT+IG3Clop1tgKlMpwwSYZCqVDTcwopkBm9/c1BM3OKVdp95GghBpZ6D2AUX9Zc6zxF8d2aoHbaA==
+X-Received: by 2002:a05:600c:4e12:b0:42c:b9c8:2bb0 with SMTP id 5b1f17b1804b1-438913bdcd2mr351880695e9.4.1738022684533;
+        Mon, 27 Jan 2025 16:04:44 -0800 (PST)
+Received: from [192.168.0.50] ([79.119.240.80])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd48a2f1sm148410705e9.17.2025.01.27.16.04.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Jan 2025 16:04:43 -0800 (PST)
+Message-ID: <585f1075-a662-489b-bd5c-cf9f24291804@gmail.com>
+Date: Tue, 28 Jan 2025 02:04:37 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, deaner92@yahoo.com
-Subject: RE: Bluetooth: Remove unnecessary braces around single line statement
-In-Reply-To: <20250127221052.197899-2-deaner92@yahoo.com>
-References: <20250127221052.197899-2-deaner92@yahoo.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7225595468895568655==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btmtk: Remove resetting mt7921 before
+ downloading the fw
+To: John Glotzer <jglotzer@gmail.com>, sergio.callegari@unibo.it
+Cc: Aaron.Hou@mediatek.com, Chris.Lu@mediatek.com, Deren.Wu@mediatek.com,
+ Hao.Qin@mediatek.com, Sean.Wang@mediatek.com, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, luiz.dentz@gmail.com,
+ marc.payne@mdpsys.co.uk, marcel@holtmann.org, regressions@lists.linux.dev,
+ steve.lee@mediatek.com, tiwai@suse.de
+References: <9ae25475-e8f4-4ee1-8022-7621fbe8ebc6@unibo.it>
+ <20250118165840.73110-1-jglotzer@gmail.com>
+Content-Language: en-US
+From: Bitterblue Smith <rtl8821cerfe2@gmail.com>
+In-Reply-To: <20250118165840.73110-1-jglotzer@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 18/01/2025 18:58, John Glotzer wrote:
+> (Note: additional discussion has taken place under
+> Re: [REGRESSION] bluetooth: mt7921: Crash on Resume From Suspend And Hibernate)
+> 
+> Hi,
+> 
+> I have dug further into this issue and I think I have a root cause analysis that
+> makes sense (at least it does for me :) ).
+> The TLDR is that the root cause is the following commit that was introduced with the 6.11 kernel.
+> 
+> https://github.com/torvalds/linux/commit/d53ab629cff57
+> 
+> Furthermore, the problem must be the call to usleep_range() in
+> drivers/net/wireless/mediatek/mt76/mt792x_core.c as this is the only behavioral change.
+> 
+> Notice that this commit first shows up in v6.11-rc1 and is present for all subsequent releases,
+> which matches perfectly the breakage pattern seen by the user community.
+> 
+> What, then, is the evidence for this?
+> 
+> First of all the entire community has been unanimous in the observation that the issue
+> started with the 6.11 kernel. The universal experience has been that any kernel prior
+> to that had no issues, and all kernels starting with 6.11 were affected. Also no attempts
+> to mitigate the issue in code by attacking the problem via the firmware download code paths have
+> been fruitful.
+> 
+> The next piece of solid data is outlined here:
+> 
+> https://github.com/alimert-t/suspend-freeze-fix-for-mt7921e
+> 
+> Here the lead paragraph states:
+> "A suspend/resume issue occurs on systems with the MediaTek MT7921 Wi-Fi adapter when
+> running on Kernel 6.11.-. After suspending, the system fails to resume / freezes and requires a hard
+> reset."
+> 
+> The mitigation for this issue has consisted of one of two approches:
+> 
+> - rfkill bluetooth and wifi on sleep and reverse the process on wake
+> - add the parameter mt7921e.disable_aspm=y to the kernel command line
+> (anecdotally I have seen reports of people doing things like turning off bluetooth
+>  and/or wifi before suspending or for that matter rmmod mt7921e before suspending).
+> 
+> I personally have used both of these methods with a sucess rate of 100%.
+> 
+> The way to unlock the puzzle is to examine the 6.11 code with an eye towards
+> - what changed between v6.10 and v6.11?
+> - what is the intersection between this changeset and the disable_aspm paramter?
+> 
+> To cut to the chase the answer to both these questions is just the contents of
+> https://github.com/torvalds/linux/commit/d53ab629cff57. I confirmed this by
+> diffing v6.10 and v6.11 and then going through the diff looking for disable_aspm.
+> 
+> The following lines were added to drivers/net/wireless/mediatek/mt76/mt7921/pci.c
+> 
+> 	if (!mt7921_disable_aspm && mt76_pci_aspm_supported(pdev))
+> 		dev->aspm_supported = true;
+> 
+> The bitfield aspm_supported was added to the struct mt792x_dev in drivers/net/wireless/mediatek/mt76/mt792x.h
+> 
+> and if this bitfield is true then the call to usleep_range is made in  __mt792xe_mcu_drv_pmctrl()
+> in drivers/net/wireless/mediatek/mt76/mt792x_core.c.
+> 
+> 		if (dev->aspm_supported)
+> 			usleep_range(2000, 3000);
+> 
+> By setting mt7921e.disable_aspm=y on the kernel command line, this code pathway is avoided
+> and no crash or lockup happens when the device is woken back up.
+> 
+> Disclaimers:
+> 
+> - I don't claim to know the root cause for why the call to usleep_range() leads to a crash or a
+>   freeze.
+> 
+> - I don't know the details of the specific issue the code for commit d53ab629cff57 was designed
+>   to fix, hence I don't know the consequences of removing the call to usleep_range(). However,
+>   I do know that the user experience has been significantly impacted negatively by the introduction
+>   of d53ab629cff57 into the 6.11 kernel.
+> 
+> Thanks for your attention,
+> 
+> John Glotzer
+> 
+> 
 
-Dear submitter,
+John and Sergio, have y'all tried kernel 6.12.8 or newer?
+People say the suspend problem is fixed:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=928654
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.24 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      24.21 seconds
-CheckAllWarning               PASS      27.14 seconds
-CheckSparse                   PASS      30.24 seconds
-BuildKernel32                 PASS      27.66 seconds
-TestRunnerSetup               PASS      424.07 seconds
-TestRunner_l2cap-tester       PASS      20.29 seconds
-TestRunner_iso-tester         PASS      27.05 seconds
-TestRunner_bnep-tester        PASS      4.75 seconds
-TestRunner_mgmt-tester        FAIL      121.36 seconds
-TestRunner_rfcomm-tester      PASS      7.54 seconds
-TestRunner_sco-tester         PASS      9.38 seconds
-TestRunner_ioctl-tester       PASS      14.45 seconds
-TestRunner_mesh-tester        PASS      5.93 seconds
-TestRunner_smp-tester         PASS      6.93 seconds
-TestRunner_userchan-tester    PASS      4.92 seconds
-IncrementalBuild              PENDING   0.51 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 3 (AL is full)               Failed       0.186 seconds
-LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.148 seconds
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.165 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7225595468895568655==--
+https://bugzilla.kernel.org/show_bug.cgi?id=219514#c11
