@@ -1,132 +1,88 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C671E521
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 09:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2CD19CC29
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 10:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738056201; cv=none; b=evklH9YaxMo/g1BT3Dg2HZs7XuE6TB+LSIUbrKRpq8nBebvZph8qtfjl6RZTvj9dxCbAihMAnYrWcTCuemm2uCRDt0a5AnLeYsx7ixuTLkRJYzJOkMUGAZOd4xaPet/eoQ9SKp6ZiacaJF1qsDXYMdBKWpr6gmUOkLpjG0TthF0=
+	t=1738060153; cv=none; b=SQt1EsBBxltmvOQcEliewNnM88IEOyhAKxutqPcyB8wpL5js3WpnPah8WVUZTdcixAgBsHROBeCJ/mh69ogjQeIbD8MNk30NBSPpAQ69Z2Wb5OhRw7dXg0BLlF9lZZ36cE6bLP8Z18Z8nGX/SKfd7I4/wEOi6+kD5UdiFu75cvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738056201; c=relaxed/simple;
-	bh=DnDEz+GW0Zk/oTo/aTIblUcYo37QIm2lNijNBeTlCbo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=K0Gta2vUJF0OD0tIHS44DQuYhWqcBRn4GqRJuBDgGqGE6r/8vCecj985rMuh1PM7Krf6Ha8poEk13UYQ5z0GKh3fN4HcwJbOFBnzzUTryVL1sQHFkopPG7jEJTF97r3YibNv1g9pvYa2PgxRIIf3gBnzgHGdcUbOW3q2ZOMN2Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ac005db65eso44384945ab.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 01:23:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738056199; x=1738660999;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lnikXfM5QULiaNgL95zpXZA4mm+I/t43JGdmFYhkTls=;
-        b=MA5sEhKkmYCgF3FwMRuWVlwqF9w4KE7jZDdeD5K5Lq6iOUvFqEZ/IphPp04aiVLx6X
-         9t5ZduSY44VZNXNr5nZGGvnge2NIci1HWnYNeq1uw3Cy4zd2wOK5qtWnOO3ZC59XjNtg
-         aftqm6cdcCxo2TcWVpdPX60bM7nqYu0vu2GvVh7TDSN+AXNnx0UdBJUKUABGSRO17wF8
-         EBVD+mAHF9KLzApWP9pNcMTF15DTRyzCJ/NsWeYp/CGASNPqdNBwaALA+d0/slJxrKT7
-         9qlbFte/YOxcrUQp3l9O93ClqLgu+wHWItIY5v220m9FIcuDI8g1G2TZr2MsLjtx67kI
-         5umw==
-X-Forwarded-Encrypted: i=1; AJvYcCXiKDyFdTBbHZemqMC6Vn3gXjcDY19s+2MLQRo7km6draBNgPQcfALr7/0qg0sVvVLDYKAi+WZ0K8UqlXluHyY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwuSY0wZ5CDxa/85KmOkD1oqC8ARJwUFlo7PoqGRvFv/U7agfX
-	+4dsrrCfkD/+6P1w5XqSV5UbAzCmty6IpehqkjkgJi6rWCP8BtIlOOTDQAAjV/ykOQ4O6ClrmVA
-	sIYGCNma1dHe9MH18OHPs8/CnS6xcs0Tb0OFYD8oKB15sr3hdK4Ib9VQ=
-X-Google-Smtp-Source: AGHT+IGBdjvNXrsRgxGovcM6aWf4GcjqQTn1nJ/iDLLohTYJGXbOT4wgwPKVrtwf5juitd27aI4D6VTNhGSDo0Xkq3jTTFSCXuGH
+	s=arc-20240116; t=1738060153; c=relaxed/simple;
+	bh=sKufb+KLgZy6lfiel8Nub/Uj6KAIZtZspgc8r5D8p3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SFoVEaQF9FJnkjrAaMRhsxlTIVIPPsvqVtu7pJ0ZoQEGHlZgwQgMwvR79s3cS+Zmg7e7Lca/2BdeuQSdneBPFjOWVX5AcJ0Y7xThjvB8MkLKuqrick9Y7ogUzjBl3jDzlXuEFpeErFWSXEA432nSPXWWZy6S6AtZoHeoVHKQ0yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=oswZPgGF; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="oswZPgGF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1738060144;
+	bh=sKufb+KLgZy6lfiel8Nub/Uj6KAIZtZspgc8r5D8p3A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oswZPgGFozeDiyfl0TTVnXX/aJGTKMn2CThz1MvZU4JE1gkuhEIt1dplUGj/R3xCy
+	 ijN9ZnWWIXvaXBkZZD1tWKbQBCZKg2mmK1Z7/PkkWbt1vaalKKWnn16OP6nNrvfCYR
+	 DhM81YjOXwgnZOS9qOqVKUkrHjFMJaMPrCgTYtdXqMSklyH7X4XIJMmqux547hkr0r
+	 L8x9BEyejM4YGedCf3xbt8FtUH0iubmPIaNR/thDVO6jL+LTP7oTTmfTXfJTRilKJR
+	 4dUAHTcN/AuknDWZlyiZILXWnKFx7fO1Q7gLktcvQa0BvNQAjimNV2kVH7PTLCl3hw
+	 BA8mpKPiQEFEA==
+Received: from localhost.localdomain (unknown [81.56.123.156])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: denittis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4438717E0FCA;
+	Tue, 28 Jan 2025 11:29:04 +0100 (CET)
+From: Ludovico de Nittis <ludovico.denittis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Subject: [PATCH BlueZ] device: Clear pending_flags on error
+Date: Tue, 28 Jan 2025 11:28:28 +0100
+Message-ID: <20250128102828.16087-1-ludovico.denittis@collabora.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca4d:0:b0:3ce:7852:129b with SMTP id
- e9e14a558f8ab-3cf7449ddc3mr367307805ab.20.1738056199193; Tue, 28 Jan 2025
- 01:23:19 -0800 (PST)
-Date: Tue, 28 Jan 2025 01:23:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6798a207.050a0220.ac840.0245.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: null-ptr-deref Write in
- l2cap_sock_resume_cb (3)
-From: syzbot <syzbot+fe280ff30bb95df1577c@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+If setting WakeAllowed, or the device privacy, fails, we may end up in a
+situation where `pending_flags` is still set to some `DEVICE_FLAG_*`
+values, for example from `device_set_wake_allowed()` or
+`adapter_set_device_flags()`.
 
-syzbot found the following issue on:
-
-HEAD commit:    8883957b3c9d Merge tag 'fsnotify_hsm_for_v6.14-rc1' of git..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13862564580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=77593a73383cac88
-dashboard link: https://syzkaller.appspot.com/bug?extid=fe280ff30bb95df1577c
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-8883957b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/df6d282e0e7d/vmlinux-8883957b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9a6f61832d52/bzImage-8883957b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fe280ff30bb95df1577c@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_write include/linux/instrumented.h:82 [inline]
-BUG: KASAN: null-ptr-deref in clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
-BUG: KASAN: null-ptr-deref in l2cap_sock_resume_cb+0xd0/0x130 net/bluetooth/l2cap_sock.c:1699
-Write of size 8 at addr 0000000000000568 by task kworker/u33:4/5957
-
-CPU: 3 UID: 0 PID: 5957 Comm: kworker/u33:4 Not tainted 6.13.0-syzkaller-05154-g8883957b3c9d #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: hci3 hci_rx_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- kasan_report+0xd9/0x110 mm/kasan/report.c:602
- check_region_inline mm/kasan/generic.c:183 [inline]
- kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
- instrument_atomic_write include/linux/instrumented.h:82 [inline]
- clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
- l2cap_sock_resume_cb+0xd0/0x130 net/bluetooth/l2cap_sock.c:1699
- l2cap_security_cfm+0x795/0x11d0 net/bluetooth/l2cap_core.c:7346
- hci_security_cfm include/net/bluetooth/hci_core.h:2088 [inline]
- hci_encrypt_cfm+0x1f2/0x7d0 include/net/bluetooth/hci_core.h:2136
- hci_encrypt_change_evt+0x3f3/0x1130 net/bluetooth/hci_event.c:3655
- hci_event_func net/bluetooth/hci_event.c:7473 [inline]
- hci_event_packet+0x9eb/0x1190 net/bluetooth/hci_event.c:7525
- hci_rx_work+0x2c5/0x16b0 net/bluetooth/hci_core.c:4015
- process_one_work+0x958/0x1b30 kernel/workqueue.c:3236
- process_scheduled_works kernel/workqueue.c:3317 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3398
- kthread+0x3af/0x750 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-==================================================================
-
-
+This can confuse further requests because they'll assume that there is
+still a pending request in progress.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ src/adapter.c | 1 +
+ src/device.c  | 1 +
+ 2 files changed, 2 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/src/adapter.c b/src/adapter.c
+index 5d4117a49..749662586 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5580,6 +5580,7 @@ static void set_device_privacy_complete(uint8_t status, uint16_t length,
+ 	if (status != MGMT_STATUS_SUCCESS) {
+ 		error("Set device flags return status: %s",
+ 					mgmt_errstr(status));
++		dev->pending_flags = 0;
+ 		return;
+ 	}
+ 
+diff --git a/src/device.c b/src/device.c
+index e8bff718c..3c2337198 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1575,6 +1575,7 @@ static void set_wake_allowed_complete(uint8_t status, uint16_t length,
+ 			dev->wake_id = -1U;
+ 		}
+ 		dev->pending_wake_allowed = FALSE;
++		dev->pending_flags = 0;
+ 		return;
+ 	}
+ 
+-- 
+2.48.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
