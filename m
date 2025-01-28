@@ -1,88 +1,125 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EFA199E8D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 11:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E39A25A641
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 13:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738065444; cv=none; b=EFUmrpCUKDO+hVflf5JDU7Ewm8iHfU0YVKeLXg5uvuL8q9gtzmndeHK8w2D/okDjuxIFHKMjXU8jPbT2pJmaC/5D0Kpx2SDS1bEpDJ0r9WEakkU/cSZ/TduJd/WnT9d3IdnzqANGsjPwcDdUNZWdNMUI4FnA5WKgvSrI3nitImg=
+	t=1738070608; cv=none; b=qT+06pTKJ1wczhdR8CLfIiPSnHSPtBMYQ5xhbFV6co9LYNKtU9rEhXhshIWqVBOIyLBic6TVuXLqHc/7shUeqUiQtekf2RA61LAzUZb6r9sQz2V8g0VmS3jGIEcvOG0Jo+cgNQoptD8I5oBvjUxcDqHItCc0+6jiV89F06TR7qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738065444; c=relaxed/simple;
-	bh=G03+MBAwS+Mrqq7oG7OqFT3gUEL7uxFUmiiaCzHvccc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GUQhLg8tZv8TD03Xg75BiTQ43ZhC0D28a8+uNv6j4x10r74DUKjtmaQxckixq6VJzLdlmRD8rDUSegCNVTXq694OaVjg26os8FrfaRjcXMK/iE/QtvM6IMF6qA/FFbsbjj585mQCcMOqGxhU5q2eYaIGCOBJnI4vylPKLQIpYxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qwGpPdk0; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1738070608; c=relaxed/simple;
+	bh=3+FN/4HhBUaDJvI+IQPVCDl2kQzSARBis2pNz00b/7Y=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=S1loHTQbg3UwwwOqSLyjAXgavUfGWlZS9visInGGIC4qIsSTZ0cPofCGoy0MvpLvW5tXDv9zzWZYJ8L51KxVoWECFNK1k/G4/N7uiUkjJ8aoT32EfHucY+egX9R8iCaWXUEqrG9h9tMAh5Zu9mNBO8gM6n+cmWci2S1FivqNM88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fi8yqCgs; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qwGpPdk0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1738065440;
-	bh=G03+MBAwS+Mrqq7oG7OqFT3gUEL7uxFUmiiaCzHvccc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=qwGpPdk0s2M24FliiOotMfo3vz1gMOjNNy/UfTLMEjMgwwx/umRbesk4fckIYGMD1
-	 ND0V6QNE40BrDRgGIDh8Kw/X3DO2SUwtP3B6UGlSLfQo+8LUFAaIuOA9H9QH1y1f2l
-	 e2aJW1qxfzaF1CoEKKAstjm7/0Jfq+UAo1sBs9uWTV0BFvJJYnYZxwAvgd0fswBm3D
-	 XUuJHiqVTBxPx/JFXx+m8W3YfQSLpohwFBWp4IMBNOkFuSZCKUNkJa9EbrVFbNdz2/
-	 Bac50oscmb85HoMB1+wB3mIimQpMH4YKnAijuzLd/HPhSwiElGfI4nB338xfoVv/NI
-	 bAa7qDzx4S3Ng==
-Received: from localhost.localdomain (unknown [81.56.123.156])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4F0E617E0801;
-	Tue, 28 Jan 2025 12:57:20 +0100 (CET)
-From: Ludovico de Nittis <ludovico.denittis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ v2] device: Clear pending_flags on error
-Date: Tue, 28 Jan 2025 12:56:59 +0100
-Message-ID: <20250128115659.23655-1-ludovico.denittis@collabora.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fi8yqCgs"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-216426b0865so92347525ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 05:23:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738070606; x=1738675406; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WSljmPKgXPYeKGQhcbVdXIKsEilfZJnbqXWAPTqepQ8=;
+        b=Fi8yqCgsYDJV6MWUJJ1HizEpyqnMXGouj2vjfxW4GZai/WQv/AnWdosJVz7AiNmvAc
+         3l+iOCo8HWx5Kk9tXCCQQl1kTXxAYGWASGertfa1FB32NFYIIm+a28ZLP5DXRg5f+7zv
+         52eWRFdtmRhGuuQU7M0bFpLY74169rWapOdSWft1Wt7pdPWaI+ZItwJwpvCmpm0OgLP4
+         MOK4klD/FWO+GNj0Tq2gt/K5I7myA7PlGky4TxaPIHVrvjjDys0+YMDdzsM8awGebK/o
+         yuH1r3lpNPaPdH9aXR5tFPCJB+Ka77+t5+Z8W43cqBX1wbpLc9j+hQKQy7ITvjXsxv/W
+         uNlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738070606; x=1738675406;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WSljmPKgXPYeKGQhcbVdXIKsEilfZJnbqXWAPTqepQ8=;
+        b=B1JCw1Ffk0jyRuQcgq+iIXmwABArN5nrD3zWJG67MXGtbwZCnLmSSeDsNDQsVD/R/W
+         PgEiTedoMxaq/QoIm92JZWkNiCY5slZqnNexVpJa51TrmpWf9aFsrJAEEiotDvHcbhvz
+         81OH7LmsH2M7LhDw3HZpycE7uYo2RsE32CbkQkkBLLPN+72WWkrYVAEFxCjtrMKTVS9A
+         VSEQqZKDphRSiBCPw2tvG2/X421AFHqzKKxTkLpMMtDAnEVOgd3/neFnTlxL2/7KXr8E
+         gZXhNIXvKNjHEyXvpb6cpb+RiFSxuN35Il03qYT9kHiDPz68Zt5gI2b+2HvxMsxut4uh
+         qFzA==
+X-Gm-Message-State: AOJu0YwXlo9OR581qxGqeLPraeGFjY0Z0HPWJZBG+/Fctb9EaErxedyF
+	yUTM8wYu/5n02i1eob9QwrX+vSnL3GH/AXMnefcp4qiA8JPG9jut9yXTzVuu
+X-Gm-Gg: ASbGncuG2gcpCeS0OU9/J/+YF/gJnhrgXhameRpSwYHRk0khlkdicCuhJlkBGb3WLLu
+	w5hom2zhSedstsf6P5PerQPqZrUn4LqcVZyWp4qH8xIsw7deaVjn9M5bqsdInhYRDDm22x5UNqI
+	pS+cav5uwynjAcmHbRVz7IPETMqF4bglP6uqtBRJsQ71n4hwqORAwVyXdivKEYNsn36zLd1ILXS
+	ID5CeqbSOclFjRT0hnyY37TWzv0oKQgEKcIyB5qdek4K1Cz9xNTipyhpXUpsw0PTFXOA1q0YLlU
+	T1++FJPSsyJuCTdzn+RaHA==
+X-Google-Smtp-Source: AGHT+IHBSP3pD7dyiuoA3OzKqUi8crKymD/07uoOmVI+1FCyFYCyaLHjYCUbFcbDBj7OcmOG2fYJIg==
+X-Received: by 2002:a17:902:f791:b0:216:5294:619b with SMTP id d9443c01a7336-21c355f6c65mr609713705ad.47.1738070605954;
+        Tue, 28 Jan 2025 05:23:25 -0800 (PST)
+Received: from [172.17.0.2] ([52.234.41.121])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da424d562sm79868015ad.230.2025.01.28.05.23.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jan 2025 05:23:25 -0800 (PST)
+Message-ID: <6798da4d.170a0220.2dbc9b.8e2e@mx.google.com>
+Date: Tue, 28 Jan 2025 05:23:25 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0298136615615383322=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ludovico.denittis@collabora.com
+Subject: RE: [BlueZ,v2] device: Clear pending_flags on error
+In-Reply-To: <20250128115659.23655-1-ludovico.denittis@collabora.com>
+References: <20250128115659.23655-1-ludovico.denittis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-If setting WakeAllowed, or the device privacy, fails, we may end up in a
-situation where `pending_flags` is still set to some `DEVICE_FLAG_*`
-values, for example from `device_set_wake_allowed()` or
-`adapter_set_device_flags()`.
+--===============0298136615615383322==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This can confuse further requests because they'll assume that there is
-still a pending request in progress.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=928815
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.31 seconds
+GitLint                       PENDING   0.39 seconds
+BuildEll                      PASS      20.10 seconds
+BluezMake                     PASS      1497.09 seconds
+MakeCheck                     PASS      12.96 seconds
+MakeDistcheck                 PASS      157.10 seconds
+CheckValgrind                 PASS      211.54 seconds
+CheckSmatch                   PASS      269.38 seconds
+bluezmakeextell               PASS      97.18 seconds
+IncrementalBuild              PENDING   0.41 seconds
+ScanBuild                     PASS      853.18 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- src/adapter.c | 1 +
- src/device.c  | 1 +
- 2 files changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 5d4117a49..3eb343cbc 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5580,6 +5580,7 @@ static void set_device_privacy_complete(uint8_t status, uint16_t length,
- 	if (status != MGMT_STATUS_SUCCESS) {
- 		error("Set device flags return status: %s",
- 					mgmt_errstr(status));
-+		btd_device_set_pending_flags(dev, 0);
- 		return;
- 	}
- 
-diff --git a/src/device.c b/src/device.c
-index e8bff718c..3c2337198 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1575,6 +1575,7 @@ static void set_wake_allowed_complete(uint8_t status, uint16_t length,
- 			dev->wake_id = -1U;
- 		}
- 		dev->pending_wake_allowed = FALSE;
-+		dev->pending_flags = 0;
- 		return;
- 	}
- 
--- 
-2.48.1
 
+--===============0298136615615383322==--
