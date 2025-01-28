@@ -1,97 +1,80 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2534313632B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 20:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C808C1DE2C3;
+	Tue, 28 Jan 2025 20:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738095671; cv=none; b=N1B7pwenovZD6RHjkTc3k9QVVLUeRxqk7OOe1Z+eLpXEoIRQABJMml1V1vMXt+V+oK5lyod4x1q4xWceGHzjCSCAdRiplnn+kgiYzMI8dvU1FsLNA1dWE77rZ0ToK/asEWSlwcJi10cu26wN0yjPLPIkb//jMLgxQA6WVBo+7v0=
+	t=1738096207; cv=none; b=UtV1goSI9oojvf6NmjgBhF3o2Q83MUyCe4RR8OsBzp0pnW1E5kaLQFaWKdf0lKLTGJRIqgeVqcg2UkjzXKx/2isv56716sr3Jrjk+hz+UzzjtondSxAJLRstsulxJBW9yJEnIQaAR/s7LAE/ub8F+ilgdrGW/4bqxU65+Wf0hNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738095671; c=relaxed/simple;
-	bh=wTMGcI3EAdWS/ljw+43/zNMInB5v9EZGxJ9eFqCrohE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ml00cKSlTkrLGnESh8D2xaK8fy95XY41b7EHYkcy2H4cOFWmLpxbSRVd5gk64D4QvQPvIlG+rmHqQq1lNL1WK3qqwDXvNKY5K5x5RtdRPWcdq9CAWD/Phs9PowTugBxuSwCiEK9xMuWROyeVFDe2kelCYf5joWJdfsLuh7ZfvqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C/fLj+S/; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738096207; c=relaxed/simple;
+	bh=MhLQhkH2iTv4pZiXNhY7bLzBF5m5NLcz07Y9mN16uXM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TjsgOx2RwgS/3dJsgw71XbqyIZbxOIcsM5UKC20LRyNZPi//2FIJFZwOM1RFYkGSCK9TR6OPFuWOTDYoKRVqp4L2AAmKMLeaK9RbFwQqTHtc4VQ+FqRE2ZhBwhCFcuYHSHeZzEPnuBO1Yy116R4Xg88kuOEqfJ0OG8TiRphQPuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qMAVSXuZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C/fLj+S/"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-543e49a10f5so236057e87.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 12:21:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738095668; x=1738700468; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wTMGcI3EAdWS/ljw+43/zNMInB5v9EZGxJ9eFqCrohE=;
-        b=C/fLj+S/gxXY0a9axyKb6PKQ1/tMBMnGbcEtK0ayzWyp4FSfmwXuxszNXEj7ne0PDy
-         ta+WxFej9E5knoJ3xOOzI7iqQP4BriuwjcBUtMXq+V9ert9fgbrmKs7PA7C+02alxbj1
-         Sqi5+Rw0vQMk0pwHAlznBvombU3mf43TjH2UjKpuhPrwU4QOcsvZddisUgJy/Nz9HWo+
-         cwKCSYv01xAo/NBKE2dZI+xN1Eni5fpqYwVBrV9Sf/Be4VDMKD7F5iGW4uTVbJ2Z2uxE
-         GxJNa2xNRmrwBo2v80vCBPiWdpUk7G6QMCyDt+pG9YXXt62dKjiuf+clHYaHUXyw13X2
-         u5oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738095668; x=1738700468;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wTMGcI3EAdWS/ljw+43/zNMInB5v9EZGxJ9eFqCrohE=;
-        b=vnm9zspTgEFssujrPro4DUGY+rlZpRH2TQ+p52rVPt6xQPro2a7LX0V8ZM57C3YZpu
-         YpoEgWM8Hyf/2YuLETdgq11JOM7reQOebT8yI62VIiH3M7vm38HMx2YlYnezaoaMUjeX
-         tfzQdZBtuhyU2Kd4CVK4DhQuEvmwe/z6VsEATENexftUSLZSoaiISDMmKKgDlBHel5/1
-         FNPU3wxytgayPoCXuYbd/1GlpwlgUyPYWIlL+MyRACltOxzrZL1v4O0v23tLvR8CX9se
-         AeFxNCc9UEbcs8eU5RzMjh/swFpf0S1gJoLGnnD+mTYbOTPRkCTOsRyT372AqbBsfWVI
-         CxqA==
-X-Gm-Message-State: AOJu0YwbHDgZon/XS9un6ammNC1o27g1OwijKLnIg+Hc+n1Iq3pzuGet
-	t7dV1993aoEZBiPh/WfFEijt5KFFbXByb37QR7zaVczpugO9unFxf54ApKMF3XPDReXc/Rfxjo7
-	UadtBKj7/oJwwq2zoWFGA8oyjFm4=
-X-Gm-Gg: ASbGnctFd5lVzOO0Xlf7NG6YoLiEbCQmjhUge/cfpFORjkf0HCf5d/9uPyEqhy+zT+u
-	Nb0I3gWW3RnErUxcTwfMm76JFqg+/qXHKvvY9LhwCnJNVK4ihKcZh0U/T2RHQCx8NCr9+J4gIng
-	==
-X-Google-Smtp-Source: AGHT+IEDkUhs1pOWXbJxM5OjizQQ77313JRYNUTdjO18OQFTu4yhkiQbIRYLU3r6vjLbreEd+9b0IDdxRKEnbdIjXXk=
-X-Received: by 2002:ac2:5d2d:0:b0:540:1be6:f15f with SMTP id
- 2adb3069b0e04-543e4ba6bf7mr106939e87.0.1738095667855; Tue, 28 Jan 2025
- 12:21:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMAVSXuZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28DCBC4CED3;
+	Tue, 28 Jan 2025 20:30:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738096207;
+	bh=MhLQhkH2iTv4pZiXNhY7bLzBF5m5NLcz07Y9mN16uXM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qMAVSXuZXeIcLhN385+X6uNWYptut8BS0i2booUzU/Hrpv+YmY1oS/YZhh1MnO0oC
+	 56RjkVA+zbu7uTlhvXIbrHllCuvfKyGBTkZ7oX1bm0w/Imix+AIyer1aPwvwYC2EYU
+	 Sb9ktO3sdZPlag3yU8MKwfni3Gj4UMdB7L48Px2onJQrEB0CduxD5sLv3FBTtqALqm
+	 3DA1l+OfoNjwujsH3UhaK2MemAsldYaE2jOViTx8Xx7xQRAEny8+6b0rCxMR75wdMJ
+	 8GFO1Iqglr4koQkEtzKX+japg2pjG+q9L72ZCcJuRiYnBrRhz4Vm2ruI2Najnlf9QT
+	 A7oeqXybMzDAw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 349E9380AA66;
+	Tue, 28 Jan 2025 20:30:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250127221052.197899-2-deaner92.ref@yahoo.com>
- <20250127221052.197899-2-deaner92@yahoo.com> <Z5h5b-YkINKqd01l@vmi2410184.contaboserver.net>
-In-Reply-To: <Z5h5b-YkINKqd01l@vmi2410184.contaboserver.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 28 Jan 2025 15:20:54 -0500
-X-Gm-Features: AWEUYZkL7uGp-qRsWlZC04zSNOh-ynm46ILmDAKhZ7xjMj0zs1gJogBmdiNBsr4
-Message-ID: <CABBYNZJP0XGzcMRFNiUH5_BOn1jiWnmAseUHhmbrYdLdmsc83Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Remove unnecessary braces around single line statement
-To: Jeremy Dean <deaner92@yahoo.com>
-Cc: linux-bluetooth@vger.kernel.org, markus.elfring@web.de, 
-	marcel@holtmann.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/2] Bluetooth: MGMT: Deadcode cleanup
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173809623301.3912505.5958977606230134366.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Jan 2025 20:30:33 +0000
+References: <20250127213716.232551-1-linux@treblig.org>
+In-Reply-To: <20250127213716.232551-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Hi Jeremy,
+Hello:
 
-On Tue, Jan 28, 2025 at 1:30=E2=80=AFAM Jeremy Dean <deaner92@yahoo.com> wr=
-ote:
->
-> It looks like this is failing a test case at
-> tedd_an/TestRunner_mgmt-tester.
->
-> Is this test failing because of the test itself?
-> How can test or description of the test be obtained so that
-> the necessary modifications can be made?
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-That is some race with mgmt-tester it seems, not related to the
-problem, that said you didn't include the output of checkpatch.pl that
-you are trying to fix. You can use git commit --amend and git
-format-patch -v2 + git send-email to send the v2.
+On Mon, 27 Jan 2025 21:37:14 +0000 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> Hi,
+>   A couple of deadcode removal patches.
+> 
+> They're both strictly function removals, no internal changes
+> to a function.
+> 
+> [...]
 
-> Jeremy
->
+Here is the summary with links:
+  - [1/2] Bluetooth: MGMT: Remove unused mgmt_pending_find_data
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f694e720fddd
+  - [2/2] Bluetooth: MGMT: Remove unused mgmt_*_discovery_complete
+    https://git.kernel.org/bluetooth/bluetooth-next/c/55b8d4c01dde
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
