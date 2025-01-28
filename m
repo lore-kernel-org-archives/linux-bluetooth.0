@@ -1,85 +1,125 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A804619C554
-	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 10:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6FF199FA2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 11:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738060199; cv=none; b=TcEtyA38PTkgj29t0QCj2HhuSW+j6P5UuIlwcdOrKoHjpOFHxBY8yhxbwV4Z+x18hXw6+cACHrhhz0WFqHqSuXh4mfL3Ox1hmiVoEuvNqio8CfO1qIj+D4VWqcJ6P6yfNSReL4ti+kJ4UT/obEV+3vIIbAvZVGlofuNZrzjOfFA=
+	t=1738063946; cv=none; b=JZ0y3VQsQcj6goEp3KFPsDc0WVygUg5yzN9C7TKnpMpE4WnManpSl/US0x93/fdQEsFcicMm5lQKf7uB1syTN7L0hJJ0gcBTUXDFlog6Ztw/5logsCUemkblFoNB12F6R6N4DqhjmcTE9LpeKP+2OZcsw61uLv45gqrRWlHVWmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738060199; c=relaxed/simple;
-	bh=23LhEh1cNzHvOgp3Xt5pg/+YDaJ3C/aFyV7/UUkygk8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OvtXUOOGzErtCOfCgtKAY4ce5DLqH1Ix3Lpi67CPjqbv+I1bXPnR2fRaB5AqYUXv4Usn3x36gCbOBiylE5OSsKaycppCAKRrfFJ5U1urdm0p+pkhFIR4ix+dEF9ZfUo4Wz3abo0JBO1ZisXMaL3dz8RMprIvFZBnSsQh1rCsAhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=nh0GusIK; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1738063946; c=relaxed/simple;
+	bh=rtoGhUIHckXAbNrVuZ1PrhlEqE1dQ8MAQaebRoOYJ9M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=UgAn/iipLekWs+dSe2Lw8Lgu+Jbwuo4YKcBUDuoE+41MAwFXYm5to7Vx9HlVXy9lQli5y6LvGrMNwuMQmRyhCWwWvvJg2gt7YRbofN+IvGplrysvUL1DTRMlcavEuDbZhd0Xaw1O5+yNLD0dxxl7vspu2dO7y5f4OaQNcYI6fQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ju639XXB; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="nh0GusIK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1738060195;
-	bh=23LhEh1cNzHvOgp3Xt5pg/+YDaJ3C/aFyV7/UUkygk8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=nh0GusIK8HdqZszVcfcROhf6SR95ACPv8e3ywTOuuFohd8Yr4D3CZMjO9yUs1NEyv
-	 +he2/uE/OwT/etzcbOCjQuFrIwkAIjpkg71a+W8FfVHsjX+7HMmSPi+mDmlfG0TUVl
-	 XzXojtnaN3yHkzR4iNhkHEFbDPXcxE/IRYoOgGNPvuKvLzPKM1DxqrnLNw/6se9Vdm
-	 lOJkZp8v6iWkMzrJx2lci2GLsiCZXn04BGkb7spQOQ9Qt4UhcsHbdqIpfGfddBRgFP
-	 3u3XlzzcaOAP5DaEmvcdp3Jtmw/8d0BwJvPQ33ptxpIieXcALQTPqFrodm0cgABdpG
-	 EVHSYE0q2SYcw==
-Received: from localhost.localdomain (unknown [81.56.123.156])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8816C17E0CD5;
-	Tue, 28 Jan 2025 11:29:55 +0100 (CET)
-From: Ludovico de Nittis <ludovico.denittis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ] adapter: Include pending flags in device_flags_changed_callback
-Date: Tue, 28 Jan 2025 11:29:37 +0100
-Message-ID: <20250128102937.16215-1-ludovico.denittis@collabora.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ju639XXB"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7b98a2e3b3eso291257885a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2025 03:32:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738063943; x=1738668743; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YN9wdLJuvmyu6xaF00wZhgKHMv8xlXPgoUtQDTpED3Y=;
+        b=ju639XXB947kpdcCNB+xWZ7qkXE4FtbCENxIbQmEGW7NVHyEd22O911sngo7eHJo5p
+         S3osYDxPdkdyvoPhRkoXJvRPaD6M2WFhSRowqUuf6FM7/tVo/tPksextX3qkETmxVHKX
+         riX8CZMzgJSNawnI7ILvATr/SpeswxMDWREXT91i0KJXdWousgUxvsu0zfPneF+2XYQe
+         ZonSPI40UzbZVV6dx01+bgeu6m3VAamZ8Tf7wxBKJs/tUXdHtethYVeysvEl5wj3D6kW
+         9UDXTmXAIgGrlS6Ru59BvaU26LUtHNyTj6Z1mEjIR9a/sWjYYyZgC6QLhg1bqAOAQqEA
+         NUvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738063943; x=1738668743;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YN9wdLJuvmyu6xaF00wZhgKHMv8xlXPgoUtQDTpED3Y=;
+        b=RRnrbDWKE1KyxFcWtoFh+kyxrRiF9qAytlr7uDqpor29Dy3BDzluJnXvsSxjdoUUdx
+         q11xCwVLeRS3bA0rhZnNLMaon2hF4EefKjZCsHwMwcd8/WwTB9a15rvBr8Y436juqokd
+         SMmFAXXCUHBH33xjgEyNlyq8paG5fW4SUqRMFM+UYxDcpJrc+OK3UaAmD+1oJ5KWXjjw
+         9lUKgYMIcew635omC2WALirfuCAmOgb/0e8NqF8u5AxfatKom+Tnw1wYYeI5r90GZYmq
+         VCLjbvhwG/CRtnQs5NylnLqoJ1DrTlyoWlxjvKHxT9mtykoUOL3lO/AmC3jibcEKXyb+
+         K9MQ==
+X-Gm-Message-State: AOJu0YxYGNTzlx5I+2Rr2jObBPsrpp4O57yscMAXTzt7d4Co1HgVe31i
+	ACd52TdlGmEWkWdRWemqUeQqMD2MkJzKbFZKVWJzO40eWjHo0Y5KbGGcHA==
+X-Gm-Gg: ASbGncv7HcAEKA3zcNeV9NqfV/h8qO9yN1wokTnnu6/Z5kfOLA2Uj/qeVBjXaszmC/7
+	eurIz6iMUwiOkvpD0aprg0wGqfkZPjsOvG0QLQfo+fAVHvMoWwAJugi5OrUciETTT83riSddrAO
+	GVOB1i0+9FGTYPLyOrcWUCyxry62nTZC7Nm5XPgRjsdtGFIf14eXZW7VZ7UqYMZIKHzlgkxfFBB
+	9PRYAOYDYg5MKLI/j1ypHWrxBbmaB6nY7+11378UqL+Shm3VoYpD/ITF1W3raTSWo5RIv8qHfZD
+	bu0kvmwge9g8LQi35Hw/fOcL
+X-Google-Smtp-Source: AGHT+IHbjJXVliiAlkJEKzzwhErcNIcNSvZiXjYZ9nxtl0o6F9zY+KWdl88B9J6uvknS3terSTkuJg==
+X-Received: by 2002:a05:620a:2699:b0:7b6:d273:9b44 with SMTP id af79cd13be357-7be63202359mr7734718985a.18.1738063943094;
+        Tue, 28 Jan 2025 03:32:23 -0800 (PST)
+Received: from [172.17.0.2] ([172.200.181.131])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be9ae7fe2bsm498101085a.20.2025.01.28.03.32.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jan 2025 03:32:22 -0800 (PST)
+Message-ID: <6798c046.050a0220.105ccc.3000@mx.google.com>
+Date: Tue, 28 Jan 2025 03:32:22 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2876595795102552298=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ludovico.denittis@collabora.com
+Subject: RE: [BlueZ] adapter: Include pending flags in device_flags_changed_callback
+In-Reply-To: <20250128102937.16215-1-ludovico.denittis@collabora.com>
+References: <20250128102937.16215-1-ludovico.denittis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When signalling the new device flags, we need to include the pending
-ones. Otherwise, the eventual non-zero `pending_flags` will be wiped out
-in `btd_device_flags_changed()`, and we'll lose the pending changed
-flags.
+--===============2876595795102552298==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes https://github.com/bluez/bluez/issues/1076
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=928792
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.20 seconds
+GitLint                       PENDING   0.17 seconds
+BuildEll                      PASS      20.12 seconds
+BluezMake                     PASS      1456.52 seconds
+MakeCheck                     PASS      13.66 seconds
+MakeDistcheck                 PASS      156.54 seconds
+CheckValgrind                 PASS      217.32 seconds
+CheckSmatch                   PASS      271.38 seconds
+bluezmakeextell               PASS      98.09 seconds
+IncrementalBuild              PENDING   0.25 seconds
+ScanBuild                     PASS      850.71 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- src/adapter.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 5d4117a49..cbc0f678f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5727,6 +5727,7 @@ static void device_flags_changed_callback(uint16_t index, uint16_t length,
- 	struct btd_adapter *adapter = user_data;
- 	struct btd_device *dev;
- 	char addr[18];
-+	uint32_t changed_flags = 0;
- 
- 	if (length < sizeof(*ev)) {
- 		btd_error(adapter->dev_id,
-@@ -5744,7 +5745,9 @@ static void device_flags_changed_callback(uint16_t index, uint16_t length,
- 		return;
- 	}
- 
--	btd_device_flags_changed(dev, ev->supported_flags, ev->current_flags);
-+	changed_flags = ev->current_flags | btd_device_get_pending_flags(dev);
-+
-+	btd_device_flags_changed(dev, ev->supported_flags, changed_flags);
- }
- 
- 
--- 
-2.48.1
 
+--===============2876595795102552298==--
