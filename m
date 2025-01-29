@@ -1,141 +1,143 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E7D481B6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 13:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FC2481CD;
+	Wed, 29 Jan 2025 13:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738156440; cv=none; b=OAjqcazumtPJOgfkfytL0rLrHbfR94jesQPoGlox88huK9k/rPfAnTqLl8msvwXv+RRB+RpkdcBg69HnwmAZaePAKm3e5FG3cFo79p+xqfAn58z81FdnP+jcZOY5czwbWvaEKxRzw56VgovVxazQTB8sMb7/4sVSNPwJlhjKjAE=
+	t=1738157224; cv=none; b=WMKoFQ/Z49CyIh5HxTQ0ZUqo0JpdNNkiqx9m7I29K69jtsCdvxSHCavueTABIghZ01Ai99fSZJbcl6fohUmqf6d8WGFx/bbjaq0DwZKMjzDQMhSmHpMc9jFuxNb793QFcd/zQGjphE7fR9DJ5DDCy7N0gcg71fzhlNP1jmDxKW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738156440; c=relaxed/simple;
-	bh=WqUmlQOkDHJzOpNHwj/bqbwYMvwcWB+pA5Zt/UgcHIY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bqoQQsaxYSlpRAvPN/V4YsC7gHcwJclGlZZEg00fGmYa9YIfXLklJH4yH7Zj/BLWf1QBHTLXf2Th1vfWnWc3LfqVsx8WZhwGwN/SiT/rCAHhwluLdGhadEBytRgKFvhHda7UwoVHDzvcdzPBc7/zoGBcJNFqP9JVRSam8njwLuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SahE8LyP; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738157224; c=relaxed/simple;
+	bh=Mfa12/3dagFXIQxteRwucVkVBHF3oQe15nLtcgIC8A8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Qba9EtD3bDg0DEHnAOprOWfMGl2AVkgmIYgSC8JvbfMxVdJr+VKJrNUzAUxbtPH/AigAxDGBfzcYyiUfHGMaVUF3vVQAaxjW0SpMDPgW+ZXSxOMtc+pFdSlFzdmTNu88NHE6yq+tHsQxbTkwUWjK/koDiwyIbkoMnOce7ZJErfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=khVPXUQU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SahE8LyP"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6d92cd1e811so5807296d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 05:13:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738156437; x=1738761237; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jbgF1G5mx1K2mBMy/AMoi6NUuqholcHZv1/5CmwImd0=;
-        b=SahE8LyPw/TuLUb3ZPGEvJenDneZCzNRJr+aPsPeE6g01oy1gQ9xV1AfSXP8STXCbH
-         yl6F/fMYV5OravHpXTvMe/C2l89WHgjaH5qrAeJttB2yEs3tTpV7IlBrOp9Wfiy5/inq
-         X7CXibwN9jaZUx4KpYvSZMqm7kT8qKpmBtia4hzuT0/Zop7XDI8x71EJtxxfwHEICwD1
-         iAF/8Pz1UszpQ7sZaEmv/NGQ72Hh5rqSQaXKCUN8IpWhiMn4oco2WGHk6B1nEUkCh8dw
-         7ULyYRqFYOMSGAmQJFpSN/Z8BO5LKrkhlepUtetdgb1DhjNCnHwCUp3Q8JuKQeIQXLW6
-         8Wjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738156437; x=1738761237;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jbgF1G5mx1K2mBMy/AMoi6NUuqholcHZv1/5CmwImd0=;
-        b=k2kf18gWlYMR+gaO1l7qWjwTrqRVk79U3wI7NWJaCHw/nqD5lzgViqxmclp9esVgWo
-         CpfmHUxt2rkR8LeuBWfIPt+Ypdy/o2/WclcHaMcV7FSH7gs/sr6bpFhypFIEELzSSM2n
-         wB97b3pKb7sPDe0FjeSfXt/vxhaqlIXj8dCnluIjopm44RGmiCc5DHCZAV9/ABP8wMZx
-         VhMXl30cBYH7yFXnLk0OPSD1dj5+6L1nkP1uc/JO3PmTrwdnDJCHmoY8N1Kr4Pxiyais
-         wqxfMXcqCPWHv69flCu5mXQuDnVC9i16mpNY3kgaYV+5F9T/Mj/ZOZ5gX1CttL6vTjLc
-         /UJA==
-X-Gm-Message-State: AOJu0YztU3sLurLsrf85suB1IR4t1Gc4d9S/JGg5ojI8WFAvLJhim+97
-	nSxh4pecdhqpNqZVBAAcPve6O4DqG30jc4dxa4ceATv/nobQCblHGwulGg==
-X-Gm-Gg: ASbGncs+BzFMc6NbDVL7PrJqCQ/CNaZgxmFwk1AN2GOJd/qqe/fTJNrAP1sIEUureQg
-	94PGcR41hYi6IQPPdrFw5Pra2G1MiLhqLSNbZji4+vPCRHVw3ywtYUShEeYScMcNF/QVtC3c32+
-	UwAa4XhnRkRSgJFJ5zop56XvlQJ6H4DUBbsUS1OcfTA+IRenF0DqAGvFcTxeHDRRK3wkM0675Ax
-	wgCWJQVUL7P6ceCobtKbNEou82yEG+fF8eo5IsSR7Wyzb1qRwMs9jdQxEjslxVYIL0ByzpgMr23
-	4Ccoxs8NIismAdGKAk+m
-X-Google-Smtp-Source: AGHT+IFVdlZQ1oC3JpLIy1uhRFMVjnoiWrb1dDvjgaAiNGG+o8d8jmPfOwyceB3dwDQnbBOxSCPExA==
-X-Received: by 2002:a05:6214:5f03:b0:6e2:383f:4acd with SMTP id 6a1803df08f44-6e243a4486cmr52317866d6.7.1738156437111;
-        Wed, 29 Jan 2025 05:13:57 -0800 (PST)
-Received: from [172.17.0.2] ([20.57.71.204])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e20514f426sm55172746d6.38.2025.01.29.05.13.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 05:13:56 -0800 (PST)
-Message-ID: <679a2994.050a0220.215e2e.5eb6@mx.google.com>
-Date: Wed, 29 Jan 2025 05:13:56 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2575245141049649148=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="khVPXUQU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC823C4CEE1;
+	Wed, 29 Jan 2025 13:27:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738157223;
+	bh=Mfa12/3dagFXIQxteRwucVkVBHF3oQe15nLtcgIC8A8=;
+	h=From:Date:Subject:To:Cc:From;
+	b=khVPXUQUlfZnMM6lWe4W8g38X7Hyh2LanI5TyAuf0mIlM5cVfTqnniwyifmR0Y57G
+	 b3WD9C/BSm2tGOxWlg3O+bUEHdS18uCdy7kjXwo2MW61RnKD1nMTP6UUwg1vgwjmLD
+	 bLbvV7rIGYtrMiDb4JNVQjErFUTCyi+1Ba8bWW1859DpribNfLLVlAiucDi35OQblr
+	 BcSd9VUu7YfR6jDSedFJaU4pDwE+nRHeV6nr48culReg3C8WNOzdn8nRGj4sYZ/TsG
+	 LoIndqsjMETzVbpSIq7FhYRT0EfRvTP7skvynLjfT7qCOMhQ63aY1NgMLT/1k+y4Bo
+	 JD9rvXrXcYY6w==
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-467b086e0easo37522641cf.1;
+        Wed, 29 Jan 2025 05:27:03 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVb0Ds6XTWl1LLxKXcrEccbUcvC2FjBZGi0EXo2gv/6zrLoSSSuke7bSOTTQYsEFf8mwKtsZH3b5xqxbkeC@vger.kernel.org, AJvYcCXpeq1w4h3nKqmUuxL7Jotblmc6C0PMSG6gbNE8VRJsQzXDJWLCkDuJPTxeyGsmw5sZCsOMH7l8O2kcumfUu/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA3qw48KIHRnsjzP7kf316Jf+C4BmOpyCK9jbMTWo5PPpMgv1Y
+	imvDTeeFsTgMK+kKwmQ+ElzRM3nvUCq+3QByzEDuDFDZQ2lxXBL2asBEdDOwytgzqFo6VALsA2T
+	4qD3C5RbpZXT1nLGgRp4El44zLu8=
+X-Google-Smtp-Source: AGHT+IF3V7pM2KPee3yamrKIEOQ80b0zyd5llLfBZYhtv36o50dOFjY/3cn1Hu5CUiMEsdWQuZM16IX1FTiLcwrsJKk=
+X-Received: by 2002:a05:6214:3007:b0:6e1:69ba:346 with SMTP id
+ 6a1803df08f44-6e243bb8251mr53436316d6.10.1738157222765; Wed, 29 Jan 2025
+ 05:27:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, deaner92@yahoo.com
-Subject: RE: Bluetooth: Fix code style warning
-In-Reply-To: <20250129123330.391567-2-deaner92@yahoo.com>
-References: <20250129123330.391567-2-deaner92@yahoo.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Date: Wed, 29 Jan 2025 14:26:51 +0100
+X-Gmail-Original-Message-ID: <CAJ+HfNj0i_gxiuZFFY=87s+h4GV43u+ORiTi0CHOxe-R3eGrQg@mail.gmail.com>
+X-Gm-Features: AWEUYZnw9SGuU_33W5iHB0as5Z81p9h24noU0-XoMxGpZkxFiqwh8rH5CpVCeDw
+Message-ID: <CAJ+HfNj0i_gxiuZFFY=87s+h4GV43u+ORiTi0CHOxe-R3eGrQg@mail.gmail.com>
+Subject: Linux RISC-V Patchwork CI updates
+To: linux-riscv <linux-riscv@lists.infradead.org>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Conor Dooley <mail@conchuod.ie>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Charlie Jenkins <charlie@rivosinc.com>, Tedd An <tedd.an@intel.com>, 
+	Alexandre Ghiti <alex@ghiti.fr>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2575245141049649148==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi!
 
-This is automated email and please do not reply to this email!
+I just deployed a new, and hopefully improved, version of the Linux
+RISC-V Patchwork CI.
 
-Dear submitter,
+The PW CI is the thing that posts the "check stoplights" to the Linux
+RISC-V Patchwork instance [1]. IOW, a pre-commit CI.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=929064
+Changes
+-------
 
----Test result---
+* The test framework is now using Python, instead of a pile of Bash. A
+  lot of the code is heavily based on bzcafe [2]. Bash only takes you
+  that far. ;-)
 
-Test Summary:
-CheckPatch                    PENDING   0.24 seconds
-GitLint                       PENDING   0.22 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      23.83 seconds
-CheckAllWarning               PASS      26.66 seconds
-CheckSparse                   PASS      29.69 seconds
-BuildKernel32                 PASS      23.59 seconds
-TestRunnerSetup               PASS      423.37 seconds
-TestRunner_l2cap-tester       PASS      20.23 seconds
-TestRunner_iso-tester         PASS      27.40 seconds
-TestRunner_bnep-tester        PASS      4.82 seconds
-TestRunner_mgmt-tester        FAIL      119.55 seconds
-TestRunner_rfcomm-tester      PASS      7.49 seconds
-TestRunner_sco-tester         PASS      9.28 seconds
-TestRunner_ioctl-tester       PASS      8.07 seconds
-TestRunner_mesh-tester        PASS      5.93 seconds
-TestRunner_smp-tester         PASS      6.91 seconds
-TestRunner_userchan-tester    PASS      5.00 seconds
-IncrementalBuild              PENDING   0.41 seconds
+* Email support; The framework will mail the submitter(s) with the CI
+  results, for better visibility. Currently, I'm the only recipient of
+  mails to make sure that the framework doesn't spam too much. I'll
+  flip the switch sometime this week.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+* Failed tests will have the details in a Github Gist page, linked
+  from the Patchwork patch view.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+* The framework will post updates/results as comments to the pull
+  request corresponding to the Patchwork series, e.g. [3]. This is in
+  addition to the Gist links above.
 
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+* Moved from Meta's KDP daemon (external Python daemon that
+  synchronizes the mailing list with Github), in favor of the
+  Bluetooth folks bzcafe scripts [2]. This change makes the whole PW CI
+  self-contained as a set of Github Action set of files, and hopefully
+  open up for other folks to hack the CI (nudge, nudge).
 
-Failed Test Cases
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.161 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Details (for those who care, or would like to push PRs)
+-------------------------------------------------------
+
+The CI code resides in linux-riscv/github-ci [4]. Additions to this
+repo will automatically be picked up the linux-riscv/linux [5] where
+the CI is run.
+
+Currently, there are 6 branches:
+  master, workflow
+  {master,workflow}__riscv__fixes
+  {master,workflow}__riscv__for-next
+
+master is a mirror of Linus' master [6], and fixes/for-next is the
+RISC-V tree [7]. The "workflow" is the master, but with the PW CI [4]
+applied as one commit on top.
+
+The branches above are synched by a Github cronjob, run by sync.yml
+[8]. The sync.yml action synchronizes all the branches, and then
+fetches the latest "New" patches from Patchwork in the last 7 days.
+
+The script then tries to apply the series in the following order:
+  1. workflow__riscv__fixes
+  2. workflow__riscv__for-next
+  3. workflow
+
+If all three fail, the submitter will be notified. If any of them
+succeeds, a Github PR is created for the series. IOW, all the ongoing
+tests for patches can be found here [9].
+
+The test for a series will be run in the context of a PR, and all
+information can be found there. The code for the Patchwork tests can be
+followed from the workflow [10].
+
+RISE is continuing to sponsor the self hosted Github Runners, and soon
+we'll move from 4 to 8 instances, which will allow for more tests.
 
 
+Cheers,
+Bj=C3=B6rn
 
----
-Regards,
-Linux Bluetooth
-
-
---===============2575245141049649148==--
+[1] https://patchwork.kernel.org/project/linux-riscv/list/
+[2] https://github.com/tedd-an/bzcafe
+[3] https://github.com/linux-riscv/linux/pull/2
+[4] https://github.com/linux-riscv/github-ci/
+[5] https://github.com/linux-riscv/linux/
+[6] git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+[7] git://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux.git
+[8] https://github.com/linux-riscv/github-ci/blob/main/.github/workflows/sy=
+nc.yml
+[9] https://github.com/linux-riscv/linux/pulls
+[10] https://github.com/linux-riscv/github-ci/blob/main/.github/workflows/p=
+atchwork.yml
