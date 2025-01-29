@@ -1,93 +1,150 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA5E1E0E0D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 17:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738171416; cv=none; b=JiS1HuvNASHZYlNIay86OrGQcFHaU1lqvXSzwksWb4LMsfErTvlp0uhq/A5HHGl3oMCMi9+/U8Wg7T0IlHKKTekCkvWY0xCuevk4Qni+0chCyHYb8OadPSLT98NNjoUhYA2xlomkeYI1RGbK1UZOD3b6iwB/Dj1xrGm2ZJYgFKY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738171416; c=relaxed/simple;
-	bh=/eniqgg76+QBo/3Pj0Ylm952ITUtt97hW9HdwDmHVcs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fYE9CBNH1hJGdresAw/FvPdhfkiru8e1E7pocdiugtKypMqOpC3qKFmwAJ6ESvY3Om40S+2oYX01lNPOEtcsZ5WU3GHBjOavopU4WhjKKbJTD8DB3OwWyg8dfFXClZVpymqxXSj4bzaBOrNpWL1Kj0i2GHCHZdIYKM/XB0FrXeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=X9sAlhbc; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868DA1DF248
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 17:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738171563; cv=pass; b=MMJANhM8zTlQWBAUsFcEmL8Hez/9kStXLRTEl5JgZP0Eyy9gqJBlzz3Wgk3foYDAlj0YPQSKWu/6nG0Cx63GA0V6p5Y8tiltVNl11bFbc6XrhD2jcyVNzUjB34rzL8NnVed9AcLEFRZAkQQQp0xgsi0e4KtGzezm/khfoRaL9OY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738171563; c=relaxed/simple;
+	bh=Q9IHyheuaY+odaYi9mb4xUAwAr20qJR6br9GhVfeNbQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vo4jHEj+ImfzYb3Tl+3R58oIjZAYnNKNopeEAkUg6Tv4ZeOnZNhFPOzqUKr9ma2ygMTYdRom7Ie2j/Hs+XrRoE+zGM7vCWU3G2U83ucKxIex3l5YUZ4gBxNzIMwYn81pf2wor84Acm9FGT0LijsibwSa1rFDLmxf6EmlUZo4qsk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b=HqjGgibr; arc=pass smtp.client-ip=136.143.188.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="X9sAlhbc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1738171412;
-	bh=/eniqgg76+QBo/3Pj0Ylm952ITUtt97hW9HdwDmHVcs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=X9sAlhbc2yHBu8htkujjAP5fiDEvDnWXDufkOYHnhgIKjjhbys6Y/LWWNcmDcnzXr
-	 t48TFgNOvEu1BQ4zJTOEJIls6RPHESLHqP2qB1ruWts7yshB059mp3gS4Iuh5G3pTR
-	 baYVYY0wmrOikzMqtufOLhjokSSTNSUlVxbQWugDcUADSXvESEJQuQLvjFb3tN9I/h
-	 ry+i2lDKlHxN7Geu7ROpEUl0rYRwp6ESf9AOSZYBL5E/5DlH/JOk2u1rtY4gHlIODl
-	 zrjROec9wucoEHZsjnbeTRYYae9LG9K7GmYOFicRsc8YrUISVu40IEJdPGRbuFz7Qt
-	 vsRzzkbc/NMhQ==
-Received: from localhost.localdomain (unknown [81.56.123.156])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 89C1F17E0848;
-	Wed, 29 Jan 2025 18:23:32 +0100 (CET)
-From: Ludovico de Nittis <ludovico.denittis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ] adapter: Fix the pending changing flags check
-Date: Wed, 29 Jan 2025 18:23:16 +0100
-Message-ID: <20250129172316.329330-1-ludovico.denittis@collabora.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b="HqjGgibr"
+ARC-Seal: i=1; a=rsa-sha256; t=1738171558; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=MmTXSYAw23Wj+xeaYVJMO9E1X4WUtJtGwWqyJKfmQv1yOIX9f55zRgQnlSXD/iIkJCiobrXtR9GDMNseUXSE/kGRfnEW6qWABrnXGyGS1UBQqXD7I0li/eDQXmypZiTY3RMuY0FA2BoiftXSQbAqaBF9B8D7UnXZcn8fp4Sea4Q=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1738171558; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=mLBgyA2XoNsL0iGPHBH/Jrw6naqHiNn3PLh+ZETcT4I=; 
+	b=S46Biys4+wFHeerckw4w54JsyWNQ8wKGK5XIHOo4ogPealxr9dLSVow+XmkIkv3tyAdCCF33VnKKJa75HXE6rXzBrbz+0aL/1FtrqlfIAEscwaZllRkkCpT8uL3Zu61/4na0M/viKwV6Zvi0p8g0ozZlcTk1/kHP4ac5ooxddr8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ludovico.denittis@collabora.com;
+	dmarc=pass header.from=<ludovico.denittis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1738171558;
+	s=zohomail; d=collabora.com; i=ludovico.denittis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=mLBgyA2XoNsL0iGPHBH/Jrw6naqHiNn3PLh+ZETcT4I=;
+	b=HqjGgibrW20n0Vtfw+smfU9OssktqM2PyB89ttDQErPyLIe3NTTc2SHIiQl40a2r
+	AMGZ0oew72KrrH+J/NFVUDKOTknfSa2DbyPA4EN+9W7ipDotkfL2hodhZHRjt4+MyP0
+	Oj3J/m8lQJkd6s6lNS6FIj5cTU6eltYVAomVP9uk=
+Received: by mx.zohomail.com with SMTPS id 1738171554251341.3780549230744;
+	Wed, 29 Jan 2025 09:25:54 -0800 (PST)
+Message-ID: <736b35d1-bb10-4132-b662-37707f0065c1@collabora.com>
+Date: Wed, 29 Jan 2025 18:25:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ] adapter: Include pending flags in
+ device_flags_changed_callback
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20250128102937.16215-1-ludovico.denittis@collabora.com>
+ <CABBYNZJ8NUAGpmmaezy=4KJD4uM8f7J1pkMgZnDoOoFkdRSRqA@mail.gmail.com>
+Content-Language: en-US
+From: Ludovico de Nittis <ludovico.denittis@collabora.com>
+In-Reply-To: <CABBYNZJ8NUAGpmmaezy=4KJD4uM8f7J1pkMgZnDoOoFkdRSRqA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-When checking if the new desired device flags are already pending, we
-should compare them against the XOR of current flags and desired flags,
-i.e. the flags that are going to change.
+Right, makes sense. I did something similar to what you suggested in 
+"[PATCH BlueZ] device: Clear only the pending flags that have been applied".
 
-For example, let's assume the following situation:
-- We have a device with `current_flags == DEVICE_FLAG_REMOTE_WAKEUP`
-(i.e. 1)
-- We want to disable the `wake_allowed` property
-- `device_set_wake_allowed()` will call `adapter_set_device_flags()`
-with `flags == 0`
-- When in `adapter_set_device_flags()`, we'll have:
-  - current == 1
-  - pending == 0
-  - flags == 0
-In this situation `flags == (flags & pending)` would not return what
-we'd expect.
----
- src/adapter.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+However, I changed it to `dev->pending_flags &= ~current_flags`, because 
+otherwise we could have left `pending_flags` to some unexpected value.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 5d4117a49..e55fb7f3b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5684,6 +5684,7 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
- 				mgmt_request_func_t func, void *user_data)
- {
- 	struct mgmt_cp_set_device_flags cp;
-+	uint32_t current = btd_device_get_current_flags(device);
- 	uint32_t supported = btd_device_get_supported_flags(device);
- 	uint32_t pending = btd_device_get_pending_flags(device);
- 	const bdaddr_t *bdaddr;
-@@ -5694,7 +5695,7 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
- 		return;
- 
- 	/* Check if changing flags are pending */
--	if (flags == (flags & pending))
-+	if ((current ^ flags) == (flags & pending))
- 		return;
- 
- 	/* Set Device Privacy Mode if it has not set the flag yet. */
--- 
-2.48.1
+For example, if we are in `device_set_wake_allowed()` and we want to 
+enable the wake allowed:
+- Assume the current flags is 2, i.e. DEVICE_FLAG_DEVICE_PRIVACY
+- It calls `adapter_set_device_flags()` with current flags plus 
+DEVICE_FLAG_REMOTE_WAKEUP (aka 3)
+- In `adapter_set_device_flags()` we have `flags == 3`, which then gets 
+assigned to `pending_flags`
+- In `btd_device_flags_changed()` we end up with `changed_flags == 1`
+
+In this situation, if we only remove the `changed_flags`, pending flags 
+will remain with a value of 2 even if there are no other pending changes.
+For this reason I remove the current_flags, instead of only changed_flags.
+
+The other two patches that I created "[PATCH BlueZ v2] device: Clear 
+pending_flags on error" and "[PATCH BlueZ] adapter: Fix the pending 
+changing flags check", are kinda related to this one, but I sent them 
+separately because they don't really depend on one another.
+
+
+On 1/28/25 9:33 PM, Luiz Augusto von Dentz wrote:
+> Hi Ludovico,
+>
+> On Tue, Jan 28, 2025 at 5:30 AM Ludovico de Nittis
+> <ludovico.denittis@collabora.com> wrote:
+>> When signalling the new device flags, we need to include the pending
+>> ones. Otherwise, the eventual non-zero `pending_flags` will be wiped out
+>> in `btd_device_flags_changed()`, and we'll lose the pending changed
+>> flags.
+>>
+>> Fixes https://github.com/bluez/bluez/issues/1076
+>> ---
+>>   src/adapter.c | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index 5d4117a49..cbc0f678f 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -5727,6 +5727,7 @@ static void device_flags_changed_callback(uint16_t index, uint16_t length,
+>>          struct btd_adapter *adapter = user_data;
+>>          struct btd_device *dev;
+>>          char addr[18];
+>> +       uint32_t changed_flags = 0;
+>>
+>>          if (length < sizeof(*ev)) {
+>>                  btd_error(adapter->dev_id,
+>> @@ -5744,7 +5745,9 @@ static void device_flags_changed_callback(uint16_t index, uint16_t length,
+>>                  return;
+>>          }
+>>
+>> -       btd_device_flags_changed(dev, ev->supported_flags, ev->current_flags);
+>> +       changed_flags = ev->current_flags | btd_device_get_pending_flags(dev);
+>> +
+>> +       btd_device_flags_changed(dev, ev->supported_flags, changed_flags);
+> This doesn't sound right, it would be as if the pending flags always
+> succeed which I don't think it is always the case, perhaps we should
+> something like the following:
+>
+> diff --git a/src/device.c b/src/device.c
+> index e8bff718c201..4959f36542fb 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -7413,7 +7413,7 @@ void btd_device_flags_changed(struct btd_device
+> *dev, uint32_t supported_flags,
+>
+>          dev->supported_flags = supported_flags;
+>          dev->current_flags = current_flags;
+> -       dev->pending_flags = 0;
+> +       dev->pending_flags &= ~changed_flags;
+>
+>          if (!changed_flags)
+>                  return;
+>
+> That way we clear pending_flags based on the changed_flags.
+>
+>>   }
+>>
+>>
+>> --
+>> 2.48.1
+>>
+>>
+>
 
