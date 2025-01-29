@@ -1,35 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3E71E4937
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 20:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5381E9B26;
+	Wed, 29 Jan 2025 21:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738182011; cv=none; b=Ck6an86keeViNyXc4rNL6WzhnvEGNfOU3+mt4WZ6XJamv9/DuIouilXAEfsiowCC8os2IWqrpHa8Mx+QIq2mHXmRtCv5bo5IuVFoA2UgER08dL3PYGmACmYmrA8hqanApv6FQyayQs6t0JWhrP+nXBTbuULuktDmjDFqFz0G/Xs=
+	t=1738184463; cv=none; b=YAnvIDNjPp5jaZ/NdQHZrKa6kniWXdcLalfh0ZHXQdfh8tPxGfgc1Xb9TrFkC1K25xdd2i1gsgf1bP2hfMepySHA78zZ7z3RTbr0k50E2qFG22sJU8u3rBDRti4F5opGmczkwpy5ZItoQq4dCxzj7B0wLf0MUBMbLSG0muQZ/oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738182011; c=relaxed/simple;
-	bh=kkG5ZKf7tzgq1NjGVj2blFgnW7PEPrsDWFOteDZ9Lc4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UatXSQ3hb5UtiGMqZg1fxor9AVGrIppPaxzdgolHqoIRKbl5C3PF0+R9s7QPxUVuEQA0K5gp5kx6KqkxXIZj2gdhpb/prGSYZh/S+X3K5wKKCOha0FmhNm1S2KJ6hhqJjIQ2CGKTXkZUTzNcxkrr4sIg4ek4FgpC05REyVjpjZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2fMq3sW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738184463; c=relaxed/simple;
+	bh=3918yyY/rmiIB8dZr2zN4aDK7nWlHPADetn5LSMjFQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CGhiHJEk4SaryvdDirXz/tA5oeBdBVq4/LWDAjjop7q3cySsU8hxQQJ0v/eIEepsYxzRLVR6VvfS163aJ/pC/C6dEsYXrHWQq0Z5CIc2lXPBtyROJ0/E+Zl+E8SWSr+2H6h9BQMnvDDTRTl+6pwV46QllDWVf67ZLFH9UiATPGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WvLf88tf; arc=none smtp.client-ip=209.85.222.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2fMq3sW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E896C4CEE4;
-	Wed, 29 Jan 2025 20:20:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738182011;
-	bh=kkG5ZKf7tzgq1NjGVj2blFgnW7PEPrsDWFOteDZ9Lc4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p2fMq3sWGcJrl+TgwIqCv63KXMBf5nIF1f7cEBDFXUqfHwkbmOs8x4JPpWVCP+0mz
-	 a2dm7ItdqfpyYxWH8JddQ64VDSXb8fFge7L0ciVw0HEIOQUGdltIkS2qJL6NBxOqgQ
-	 FDBLR/92RReSkLiLPjem2xo25QuucpYNhMYURk14aUKsKi05ph1HPALdFPcCCtg5j2
-	 UfWmDYIWSAjXUQf56JZMyO351GbK4oya6k/6v0pdqIrhoocY4ajzEmezU9rypWdxMn
-	 lRhHKO0tJtyoURyQfA0i4zq4/udSEEPiVyu02HwP1MK8xcSfZP/SsjnxqSbHElGg0K
-	 0a18U1wWYvMPg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71882380AA66;
-	Wed, 29 Jan 2025 20:20:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WvLf88tf"
+Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-85ba8b1c7b9so21165241.1;
+        Wed, 29 Jan 2025 13:01:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738184461; x=1738789261; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ochc5UOkCdW3bUFvqMywnHFt76blntsb/2IqZqQT3fc=;
+        b=WvLf88tfjxCvNuFU6WYmqHxlHSPn5v5UxCdObpKtHzbfkR2oHTglCOTUFfdLeCuy52
+         937elKQ5vbniGj/M3xiu/l1TAddGy+wkhZlRhn2zyuSPor0w0urk/fbkkAbsu44Pt27T
+         pZQ6+bGoMUmxctpuVA9s3QlV7OI9NfPjmsusgxpK6bNATaxL+I5yc3boDbTpmf57PDgj
+         4R2vdz9hRLICuGGul1GCUkeggLQFElhLyUyvw/uSvurrreEnpU7ixsqXgl9rduXD9Nkp
+         FgpXZf+alqANQcbFyys5dbmv1B8eRPkGthBmRyfJripzlvf4XOXYPG+ufFI/SiwhQjgH
+         l4Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738184461; x=1738789261;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ochc5UOkCdW3bUFvqMywnHFt76blntsb/2IqZqQT3fc=;
+        b=jtxpUAxKuezWeMgfCDIG7u3z3G66GHNXqZPygUsTY1GDTB4wvKz0GDVV93hHBxrb0+
+         phXj7BJnnAZI7SdTHQegzr04cWHn3oGNT1EC17c7gIFPE7h3dQi7l3uHP3ImJiuNezRw
+         wcC4/FYKW48QRD6D0zGRhAArnKHlFUn8HPTZ86XdI0mq57iGJ/48769c3K7lcd3SOlZr
+         DFQZIM9YRSfaifEvYw7wzSm7lqM0c7zZVI+4uw54uzl+ShhbKD8Bx7jIFTUfPNziX4cK
+         5taV0yKtI1/9Evoxu5+ZewncSbmvaRmBBiUvAWm/YwFaskojd9gNXzjAxepJjXV6hVDs
+         81Cw==
+X-Forwarded-Encrypted: i=1; AJvYcCWY959gUK9RqweLO0++XMaXHl6/nxUikRp3nWh+K1sj4hCvVDJoIXi5OWuIqr8L0S8mR4C1UMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrOyVNJskX7yBW+zbdo25WY0q3Wz89NVUNO859UDaWHjdoAZKW
+	StpIdNkQdva4HiPLGib++OsT+7h5MiWTDmnWWWL3sPDGXa28XB/l
+X-Gm-Gg: ASbGncuBz4RKh/TujXXgeoVOXJWIo64W3S2eST8tVzukar8qNbcw6f3GdziVP3u2M1+
+	T8GfkIeCOvWwESQUpgpVz/+FeY2A4qf7dSZgrDK2wuyZX7F97xLL9ypy4vfebcsDBmWMmHrDb/h
+	s69zHXU28fc8fodIS+0yQ1WheYQc6Y7gxvjMCvSeaZaZEU9OBWl/XMhChN1LOWHJx4/EVM0M6lG
+	jhdIUXYLxmPDx2XRpce830q5y00G4hegTL0oIvetcdXCL+QQOpyaqrJJLwFSapl915xZDkveNMg
+	Q/5W7AwjwKiKvYQpR5jqahK1avgQeuuAIVOsBQ2XNStPZgMEdwnVLUfxipZfyNg=
+X-Google-Smtp-Source: AGHT+IG7o4TSaXqi/NhAyLNQgLpFwufuG91cYViGvbIoStH86vNB0GmJuKk4cDOM7gYh4by7dj1TNw==
+X-Received: by 2002:a05:6102:4647:b0:4b6:8cf4:9a23 with SMTP id ada2fe7eead31-4b9b6e55634mr1052977137.0.1738184460800;
+        Wed, 29 Jan 2025 13:01:00 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b7097ab10csm2857516137.7.2025.01.29.13.00.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jan 2025 13:00:59 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2025-01-29
+Date: Wed, 29 Jan 2025 16:00:57 -0500
+Message-ID: <20250129210057.1318963-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,40 +71,46 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btintel: Add DSBR support for ScP
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173818203723.417583.3423789804982645705.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Jan 2025 20:20:37 +0000
-References: <20250129025817.65224-1-kiran.k@intel.com>
-In-Reply-To: <20250129025817.65224-1-kiran.k@intel.com>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
- vijay.satija@intel.com
 
-Hello:
+The following changes since commit 9e6c4e6b605c1fa3e24f74ee0b641e95f090188a:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  bonding: Correctly support GSO ESP offload (2025-01-28 13:20:48 +0100)
 
-On Wed, 29 Jan 2025 08:28:17 +0530 you wrote:
-> Add DSBR support for Scorpious Peak cores.
-> 
-> Refer commit eb9e749c0182 ("Bluetooth: btintel: Allow configuring drive
-> strength of BRI") for details about DSBR.
-> 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - [v2] Bluetooth: btintel: Add DSBR support for ScP
-    https://git.kernel.org/bluetooth/bluetooth-next/c/dba215063a95
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-01-29
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to 5c61419e02033eaf01733d66e2fcd4044808f482:
 
+  Bluetooth: L2CAP: accept zero as a special value for MTU auto-selection (2025-01-29 15:29:41 -0500)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - btusb: mediatek: Add locks for usb_driver_claim_interface()
+ - L2CAP: accept zero as a special value for MTU auto-selection
+ - btusb: Fix possible infinite recursion of btusb_reset
+ - Add ABI doc for sysfs reset
+ - btnxpuart: Fix glitches seen in dual A2DP streaming
+
+----------------------------------------------------------------
+Douglas Anderson (1):
+      Bluetooth: btusb: mediatek: Add locks for usb_driver_claim_interface()
+
+Fedor Pchelkin (1):
+      Bluetooth: L2CAP: accept zero as a special value for MTU auto-selection
+
+Hsin-chen Chuang (2):
+      Bluetooth: Fix possible infinite recursion of btusb_reset
+      Bluetooth: Add ABI doc for sysfs reset
+
+Neeraj Sanjay Kale (1):
+      Bluetooth: btnxpuart: Fix glitches seen in dual A2DP streaming
+
+ Documentation/ABI/stable/sysfs-class-bluetooth |  9 +++++++++
+ MAINTAINERS                                    |  1 +
+ drivers/bluetooth/btnxpuart.c                  |  3 +--
+ drivers/bluetooth/btusb.c                      | 12 +++++++-----
+ net/bluetooth/l2cap_sock.c                     |  4 ++--
+ 5 files changed, 20 insertions(+), 9 deletions(-)
+ create mode 100644 Documentation/ABI/stable/sysfs-class-bluetooth
