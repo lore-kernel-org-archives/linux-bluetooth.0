@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21D21B4141
-	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 17:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA5E1E0E0D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 17:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738171381; cv=none; b=I34d4a/zpz7xkmar5bzLUEBU1TpxdeN85+P5yqlW68pOCoZqy4GXvP6jOZcGHvb5rOGYagieu8/O1L/nPBdQHsHTXM3xRTPMVP4ubvjn6CS56s6IDUl2BFVXh6Zuyg7Tf1i31g5PblYRyX/9jSvki4ZHRy/DzNFFSUY3VzjdLQc=
+	t=1738171416; cv=none; b=JiS1HuvNASHZYlNIay86OrGQcFHaU1lqvXSzwksWb4LMsfErTvlp0uhq/A5HHGl3oMCMi9+/U8Wg7T0IlHKKTekCkvWY0xCuevk4Qni+0chCyHYb8OadPSLT98NNjoUhYA2xlomkeYI1RGbK1UZOD3b6iwB/Dj1xrGm2ZJYgFKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738171381; c=relaxed/simple;
-	bh=1MIdMBkmbPH9cM8IPwQvhSxh2vjMG54lwKeW1s/jXsI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MfAEI2YkOoWxS2Ecws8GSImHHt6M62AOZ8B0ZfpfzSc0iDJ9tKt5lCpq9hbLND94NTDZjq9WlEURBqxn81wu7fvPGUpJq+b98xBvZHrgbiIFRf5o9eqnP7iW7/81273IhA41lkYpwNFc6EYabMH81yTNao4Qyl9oHouSkcI0FDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=l3g3WvCM; arc=none smtp.client-ip=148.251.105.195
+	s=arc-20240116; t=1738171416; c=relaxed/simple;
+	bh=/eniqgg76+QBo/3Pj0Ylm952ITUtt97hW9HdwDmHVcs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fYE9CBNH1hJGdresAw/FvPdhfkiru8e1E7pocdiugtKypMqOpC3qKFmwAJ6ESvY3Om40S+2oYX01lNPOEtcsZ5WU3GHBjOavopU4WhjKKbJTD8DB3OwWyg8dfFXClZVpymqxXSj4bzaBOrNpWL1Kj0i2GHCHZdIYKM/XB0FrXeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=X9sAlhbc; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="l3g3WvCM"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="X9sAlhbc"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1738171371;
-	bh=1MIdMBkmbPH9cM8IPwQvhSxh2vjMG54lwKeW1s/jXsI=;
+	s=mail; t=1738171412;
+	bh=/eniqgg76+QBo/3Pj0Ylm952ITUtt97hW9HdwDmHVcs=;
 	h=From:To:Cc:Subject:Date:From;
-	b=l3g3WvCMfRbM4Go0WwoHEPwoJ9gxWoY/dNlBGcnGM9/MScDlz1l36H0Bz9nb9uEBe
-	 HJ5cBBUXnDUFGcSyOd4xvzBSPkJ/KUbqe13SsrB1aCbxg0uzw+UNYknd3ugiLJbR28
-	 wJIoxiauJS066f+jW74Ps2g0bqTKHCVNzQJzJmJvjGhAkfd7XwEDbsFbPx4KZgiqu2
-	 jIWQhlWIYHOTMOor6ArG8O3xCXRtvKzsQSvy/hciKiG2gQ1HhIK9+yeUOSDh6acYdT
-	 t482PwrtdzIxwNDMC+8Afy+Rq3MxYwaBOj1onaoE7aiF3Xvv9FB5iveCEqPibmvnnX
-	 fIi1pWjfZQZ+g==
+	b=X9sAlhbc2yHBu8htkujjAP5fiDEvDnWXDufkOYHnhgIKjjhbys6Y/LWWNcmDcnzXr
+	 t48TFgNOvEu1BQ4zJTOEJIls6RPHESLHqP2qB1ruWts7yshB059mp3gS4Iuh5G3pTR
+	 baYVYY0wmrOikzMqtufOLhjokSSTNSUlVxbQWugDcUADSXvESEJQuQLvjFb3tN9I/h
+	 ry+i2lDKlHxN7Geu7ROpEUl0rYRwp6ESf9AOSZYBL5E/5DlH/JOk2u1rtY4gHlIODl
+	 zrjROec9wucoEHZsjnbeTRYYae9LG9K7GmYOFicRsc8YrUISVu40IEJdPGRbuFz7Qt
+	 vsRzzkbc/NMhQ==
 Received: from localhost.localdomain (unknown [81.56.123.156])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 699B117E0848;
-	Wed, 29 Jan 2025 18:22:51 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 89C1F17E0848;
+	Wed, 29 Jan 2025 18:23:32 +0100 (CET)
 From: Ludovico de Nittis <ludovico.denittis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ] device: Clear only the pending flags that have been applied
-Date: Wed, 29 Jan 2025 18:22:31 +0100
-Message-ID: <20250129172231.329172-1-ludovico.denittis@collabora.com>
+Subject: [PATCH BlueZ] adapter: Fix the pending changing flags check
+Date: Wed, 29 Jan 2025 18:23:16 +0100
+Message-ID: <20250129172316.329330-1-ludovico.denittis@collabora.com>
 X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -47,29 +47,47 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When executing `btd_device_flags_changed()`, `dev->pending_flags` may
-hold additional queued flag changes.
+When checking if the new desired device flags are already pending, we
+should compare them against the XOR of current flags and desired flags,
+i.e. the flags that are going to change.
 
-Instead of completely clearing out `dev->pending_flags`, we should only
-remove the bits that have been actually applied and leaving the rest as
-pending.
+For example, let's assume the following situation:
+- We have a device with `current_flags == DEVICE_FLAG_REMOTE_WAKEUP`
+(i.e. 1)
+- We want to disable the `wake_allowed` property
+- `device_set_wake_allowed()` will call `adapter_set_device_flags()`
+with `flags == 0`
+- When in `adapter_set_device_flags()`, we'll have:
+  - current == 1
+  - pending == 0
+  - flags == 0
+In this situation `flags == (flags & pending)` would not return what
+we'd expect.
 ---
- src/device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/adapter.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/device.c b/src/device.c
-index e8bff718c..17d023a61 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -7413,7 +7413,7 @@ void btd_device_flags_changed(struct btd_device *dev, uint32_t supported_flags,
- 
- 	dev->supported_flags = supported_flags;
- 	dev->current_flags = current_flags;
--	dev->pending_flags = 0;
-+	dev->pending_flags &= ~current_flags;
- 
- 	if (!changed_flags)
+diff --git a/src/adapter.c b/src/adapter.c
+index 5d4117a49..e55fb7f3b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5684,6 +5684,7 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
+ 				mgmt_request_func_t func, void *user_data)
+ {
+ 	struct mgmt_cp_set_device_flags cp;
++	uint32_t current = btd_device_get_current_flags(device);
+ 	uint32_t supported = btd_device_get_supported_flags(device);
+ 	uint32_t pending = btd_device_get_pending_flags(device);
+ 	const bdaddr_t *bdaddr;
+@@ -5694,7 +5695,7 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
  		return;
+ 
+ 	/* Check if changing flags are pending */
+-	if (flags == (flags & pending))
++	if ((current ^ flags) == (flags & pending))
+ 		return;
+ 
+ 	/* Set Device Privacy Mode if it has not set the flag yet. */
 -- 
 2.48.1
 
