@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7744D1E47C4;
-	Wed, 29 Jan 2025 20:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3E71E4937
+	for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2025 20:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738182010; cv=none; b=j5c5F5+N361ujFfoR0+0jUO1biAdgt30T6bkKSae/Gy8Q4CIVmMdWTcYj2/Trel60VpFIpt9YyQxs0+gEmeNa5n4df9K/f0dwUisn3PlKSI9jamHyW50cPR+ZzAt/lVdb5NR58CL3k9/7GVqAdZ/W7vbb3bWGU/jXp+cizSjNY8=
+	t=1738182011; cv=none; b=Ck6an86keeViNyXc4rNL6WzhnvEGNfOU3+mt4WZ6XJamv9/DuIouilXAEfsiowCC8os2IWqrpHa8Mx+QIq2mHXmRtCv5bo5IuVFoA2UgER08dL3PYGmACmYmrA8hqanApv6FQyayQs6t0JWhrP+nXBTbuULuktDmjDFqFz0G/Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738182010; c=relaxed/simple;
-	bh=D2as7KYtaK/0+gMotkf55EdhN4rLOM9KpAEEmZqApxM=;
+	s=arc-20240116; t=1738182011; c=relaxed/simple;
+	bh=kkG5ZKf7tzgq1NjGVj2blFgnW7PEPrsDWFOteDZ9Lc4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qv5kPjXgfQdCSeXFOIRIBBaLtlNf9X57Il5/JxtW2rBZRYKfy1Hef0MV/ugFZKDysXURuRYSYgU5OZ4zrTHT2Klqcmq0Rq/LqNvUHn80mYq01pqa42e3M1CJ1346N8oWtR2kIOXZOt8jObOFVelwk+5PphPN9NOSXd8quXZAHa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I1fh2TxD; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=UatXSQ3hb5UtiGMqZg1fxor9AVGrIppPaxzdgolHqoIRKbl5C3PF0+R9s7QPxUVuEQA0K5gp5kx6KqkxXIZj2gdhpb/prGSYZh/S+X3K5wKKCOha0FmhNm1S2KJ6hhqJjIQ2CGKTXkZUTzNcxkrr4sIg4ek4FgpC05REyVjpjZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2fMq3sW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1fh2TxD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F39C4CED1;
-	Wed, 29 Jan 2025 20:20:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2fMq3sW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E896C4CEE4;
+	Wed, 29 Jan 2025 20:20:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738182009;
-	bh=D2as7KYtaK/0+gMotkf55EdhN4rLOM9KpAEEmZqApxM=;
+	s=k20201202; t=1738182011;
+	bh=kkG5ZKf7tzgq1NjGVj2blFgnW7PEPrsDWFOteDZ9Lc4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=I1fh2TxDU1nguy4QDMQOtH+2ospJDuXNLf/BRAW8y1ngkFX67zugAUUzBgE8FCaFz
-	 3yVB96aTBMOdbv6/PHRSWsKA/dMOk5JQuw4vsQiYnae6ULu9Znjw9G7boRL9FwlEPE
-	 Yo41h10dn1niCoOzAtmqogHqigI0CgCLuu4N03m8x2+ZC/nI2vymrx+r+437K6lc/q
-	 VA7Ae0BO3iJKfrPvnNbPgzSzLPWFsukjaywQrSKsQW/Gkg65RxRbBVxRYexQcCni8V
-	 J0oaH3ElmH+hbs1/tYUpOIzsdFcD8wEIvKvpKgK7fgSlGK0EYMHJLu6HJ7LmNOkF5p
-	 EhDKwAZPOzUkQ==
+	b=p2fMq3sWGcJrl+TgwIqCv63KXMBf5nIF1f7cEBDFXUqfHwkbmOs8x4JPpWVCP+0mz
+	 a2dm7ItdqfpyYxWH8JddQ64VDSXb8fFge7L0ciVw0HEIOQUGdltIkS2qJL6NBxOqgQ
+	 FDBLR/92RReSkLiLPjem2xo25QuucpYNhMYURk14aUKsKi05ph1HPALdFPcCCtg5j2
+	 UfWmDYIWSAjXUQf56JZMyO351GbK4oya6k/6v0pdqIrhoocY4ajzEmezU9rypWdxMn
+	 lRhHKO0tJtyoURyQfA0i4zq4/udSEEPiVyu02HwP1MK8xcSfZP/SsjnxqSbHElGg0K
+	 0a18U1wWYvMPg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A71380AA66;
-	Wed, 29 Jan 2025 20:20:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71882380AA66;
+	Wed, 29 Jan 2025 20:20:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,37 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: Fix code style warning
+Subject: Re: [PATCH v2] Bluetooth: btintel: Add DSBR support for ScP
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173818203600.417583.6021608947109289550.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Jan 2025 20:20:36 +0000
-References: <20250129123330.391567-2-deaner92@yahoo.com>
-In-Reply-To: <20250129123330.391567-2-deaner92@yahoo.com>
-To: Jeremy Dean <deaner92@yahoo.com>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- markus.elfring@web.de
+ <173818203723.417583.3423789804982645705.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Jan 2025 20:20:37 +0000
+References: <20250129025817.65224-1-kiran.k@intel.com>
+In-Reply-To: <20250129025817.65224-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
+ vijay.satija@intel.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 29 Jan 2025 13:33:30 +0100 you wrote:
-> From: Jeremy Clifton <deaner92@yahoo.com>
+On Wed, 29 Jan 2025 08:28:17 +0530 you wrote:
+> Add DSBR support for Scorpious Peak cores.
 > 
-> Output of checkpatch shows warning:
-> drivers/bluetooth/bfusb.c:368: WARNING: braces {} are not necessary
-> for single statement blocks
+> Refer commit eb9e749c0182 ("Bluetooth: btintel: Allow configuring drive
+> strength of BRI") for details about DSBR.
 > 
-> Remove braces for single line statement.
+> Signed-off-by: Kiran K <kiran.k@intel.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: Fix code style warning
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a2a245849af8
+  - [v2] Bluetooth: btintel: Add DSBR support for ScP
+    https://git.kernel.org/bluetooth/bluetooth-next/c/dba215063a95
 
 You are awesome, thank you!
 -- 
