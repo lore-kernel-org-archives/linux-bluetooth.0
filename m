@@ -1,42 +1,42 @@
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8894143888;
-	Thu, 30 Jan 2025 18:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09701482E1;
+	Thu, 30 Jan 2025 18:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738262111; cv=none; b=Mk9A3oJh1m+MG1zgVAHJPJpfZ2eSKpuJeYvSTqJVi64vR7KB5v59X9z3+EItEV15Ep4tbTsoW47RCOMsnTx09435J+oXZ00IjOVWM0h9lfF5Ef63QoKeysVh3+UMyhV2R27qqn8Q02c1VC2KvfHG8kJFUDSyEp4pifmRy5a3Sxo=
+	t=1738262115; cv=none; b=r7P/d3oy5pLG1nSSveIgfFVsTSIQqe3n5wfzirdpV3oJTZuHcA1g+7x24rCfJrZ9RPftHsV/Mie22tyh8rx5weTFgqOjnVmxVQM97UFDN9BFQgDXCFD8PIJhS1fPwIZ79CyGXycpjJnTTX7JNxrwWQ+krM9a9czM20vb0nIRIns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738262111; c=relaxed/simple;
+	s=arc-20240116; t=1738262115; c=relaxed/simple;
 	bh=TwAAoJer/FPnpvBQxGFZ60k7H5CAyYtl65JkhxpM9DA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=MNFISf7acDTWJgE505sxzIIPMuRJ/c+sJFEjbeWNuy1rXaaxlUT/5XI6MUheP5T9fhow5ZMK88dRIDOtqh/zK4CUhueiBiG/7TcWGRIorFgfzVVEt+KQpEeswG6VB7MvaS1xqLbcAEag3tZ2cKEcVhk2zMiiswJjBN7IxCcmf70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=sETlovPp; arc=none smtp.client-ip=37.18.73.165
+	 In-Reply-To:Content-Type; b=KsxekG9viljW8KNClK396iMgfGslVjFxJnGK1Q80e0LOpyWXfLUsHAjMHTPuHqckZG/p6VcDtcztuLsszrLNYVidAzbVVM6BDckR5Tj4JyuYd/lpfeBk3kdPE+c8uM+CA0AH25yf0WEu/hS5uq5CnxoZERx8hF5dnSc+rzZ5sQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=tSHLTJPX; arc=none smtp.client-ip=45.89.224.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="sETlovPp"
-Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 8C324100008;
-	Thu, 30 Jan 2025 21:34:44 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 8C324100008
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="tSHLTJPX"
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 4D9AB120006;
+	Thu, 30 Jan 2025 21:34:55 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4D9AB120006
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1738262084;
+	s=mail; t=1738262095;
 	bh=pDRf5BLR0/0IYmafaREu9IPC4OM9eMc7Mv+ojVZWcio=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
-	b=sETlovPpIqS03YA2OgcvnYW9DVy09MRRVlzVny5ZEMlxaxwXDzCrD8l5FTHFFFRWf
-	 /I8SCn0LyJ0yHI/humocKOHQ3xXVqgsRIXTP5ebkirkjMLDekq9XPET/5cmX9ICgOo
-	 KN/1HxKq71k4Cj2fc7SWp1llpydpHRVWFgyBt6k55k6bj4JKnE5BwkR7ubmhRqtUQj
-	 HCDRvvpY947Dlv78vQnb8Dkg7GlLNU4UJ6dkSlz2X/Gn1IgTspRzDFHRTpdjYf0QIY
-	 vkNyOWCgmc3gyTlwNT1dL1g07HM8K3SJg/5GHkOmd4Q1+XkFqmbfDHYF2Kc59qe/IU
-	 i5iEE4aA2nYMA==
+	b=tSHLTJPXbbJ2xABGU65bbxvB48O+kwGMCL5OJs1D+1r77mgxpB5ZTGaImZM57n3B7
+	 wu9H3RSsqbLaIBa5h/awhMXClDcgxAKDMLQbCCrZQI8vWGsp7G8lz/gJ5CAjl2PnYp
+	 qBuwSNVBscCa3YExK622Dt9eKGczmTrRjqWl2hDdyft0jJXSCFUf/X8tLZZeSfNgUk
+	 yj2uvuAkawxE2fXb63PlFBqLYm41sQeRMh7egziUyLPZBxuHn0OSLVdZn2/DbFTCfb
+	 WmZviYDflcQrWeBKa5C/PA3X/7hThnJU2tISCM5GHpzI7pZcaz9nZTqJcEucnGx1DQ
+	 133LI6Q+jCCNw==
 Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 30 Jan 2025 21:34:44 +0300 (MSK)
-Message-ID: <64dafad8-c4f1-d8bb-368a-239caa09a32c@salutedevices.com>
-Date: Thu, 30 Jan 2025 21:34:43 +0300
+	Thu, 30 Jan 2025 21:34:55 +0300 (MSK)
+Message-ID: <95904850-fe5c-4866-3da6-3e021c6becf8@salutedevices.com>
+Date: Thu, 30 Jan 2025 21:34:10 +0300
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -59,7 +59,7 @@ Content-Language: en-US
 In-Reply-To: <a2a239f1-5697-cb09-5e4f-83c024fd5ea6@salutedevices.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-i-exch-a-m1.sberdevices.ru (172.24.196.116) To
+X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
  p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
 X-KSMG-Rule-ID: 1
 X-KSMG-Message-Action: clean
@@ -70,7 +70,7 @@ X-KSMG-AntiSpam-Rate: 0
 X-KSMG-AntiSpam-Status: not_detected
 X-KSMG-AntiSpam-Method: none
 X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 50 0.3.50 df4aeb250ed63fd3baa80a493fa6caee5dd9e10f, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
+X-KSMG-AntiSpam-Info: LuaCore: 50 0.3.50 df4aeb250ed63fd3baa80a493fa6caee5dd9e10f, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2, FromAlignment: s
 X-MS-Exchange-Organization-SCL: -1
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiPhishing: Clean
