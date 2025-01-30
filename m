@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14861EF0B7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 17:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A008E26289
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 17:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738258208; cv=none; b=HyD7IhqI3X/SbwIaRibIzcMDfa5CY3NUWHEd2TqoONSLFxwC0Qb83bDiNP8eIxIPfAUX5OYYVf91q4zL+AnTimtH0uu3I9fXYq+Z8haU7lb11urpnDMa9mWoyWeSwOUOGrkvlBb8WHXQlfseSu6mSC+eIpeyR/N6dAKV8ztH2gI=
+	t=1738258209; cv=none; b=qA9OT6tbP0FSv63IOgBcnwltfVDnhdqJpmVuA1xca3Pg8HaH54YRqVZRWTihqCN3OcjwevtagIOmGQzBKTgSknv2JhlPJCYQZxA2Meb+soHzfMaAA0U6AAX1CQNbJdTYnenburdbT3n/DROUVrxYypKsSVfwhC6jPkwBkuISA1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738258208; c=relaxed/simple;
-	bh=9N14ICPN+RQIei3ZAkvEhYFjWwzsDgc1nabpFJuMswg=;
+	s=arc-20240116; t=1738258209; c=relaxed/simple;
+	bh=uOBc8kvEazesDsscvx/9X0gL81m8ZmNNZSAE8+KlUQE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VqrH+XVaskBdQex6qadKvHUV3Ny1IAObu+CVZtBIZafUzxx4AuAfObAc5shjZe3c2XAiT6XOnct1n25xqIwO2EJruO9X69S69eJP419sqy3lSyQraCGnEgj7JzTmyBOcF58XqcipzVeTc6mLlIXZjABxvNBJJNr28Ij14RmXJVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P2Fp4Oab; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Iff0p50gCBkB0DA5IwGZ+58g1JKJOSXt2Pq3aOCH1YTXdXgC/DwSKS8pX9HL2az9EEcEG71GAftV5DJY6HvZ4f0gQDMdNmZYA7DlfM7NcAoTUTX8bQi4veNjobsXYV0jVK5SCqYOhA9331DD2dSXmZ19zUNjMcPVT99S2ImOzcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eppWZYGD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P2Fp4Oab"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 381A6C4CED2;
-	Thu, 30 Jan 2025 17:30:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eppWZYGD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 734FEC4CEE0;
+	Thu, 30 Jan 2025 17:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738258208;
-	bh=9N14ICPN+RQIei3ZAkvEhYFjWwzsDgc1nabpFJuMswg=;
+	s=k20201202; t=1738258209;
+	bh=uOBc8kvEazesDsscvx/9X0gL81m8ZmNNZSAE8+KlUQE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=P2Fp4Oabwi+KtBHHNb+z1DJcvKsJQIUV1BtYu6X5Y8tKAc+rY8WTCrI+hFgkPzNLW
-	 uKK7fFIkOOswtK+XCfAgYDUkl/aWWzy7LAwIgwAH0ra1jL3ensJ2PI7sEOR+V2EB6/
-	 lmaNn6XI3cQK/zo9gT/UkNbp05fRlQQBMP0tF/VImYrZz6g6mxHP8KGvpsGYJCGAHo
-	 IZ6zWLuq3OMptzkkdKg1pzsPf341OJZ79r9ePY6WGoD1IS6e1KVJ0Y2/Li9FWFJhVb
-	 9D/y9RPzr1uXuNwYxuREgjhQbhiYKWsUdPkFwdRam44xDw1UgcKlvj3AyluIMtWVuw
-	 tNNKuvzWFRoEw==
+	b=eppWZYGDhtQyKPxHoh8tFFaxAk+zFYYCmfh1gPm/QMyHtDCLwM0g9h2J6wVoVRF8x
+	 ObnVRwsfpROwn6WFhe5jO/6pQk7v/3h3xitaBKXWWwhY1RZVKaq/sVq77rNtQaQopm
+	 6No3sUpLVCRXRhWW178p4mKIcClFdP1luF5nS93DfxO5nblh8fLtuTUY5A9UVeiOJ1
+	 jVWxqUJNBWrvJGN90YhNGM5XNOAPKQyJ6qcvzxQVVQXyIHTHNIQ90iTOr9HTXfEl+D
+	 wjdt42WSXZqZY5HsLJyh74yBwZGTDXQY6w5gMeH/9z6TtOXIeqwypMe/ZybDVjB+mD
+	 IloCC+fpwNAKA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE448380AA66;
-	Thu, 30 Jan 2025 17:30:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB01F380AA66;
+	Thu, 30 Jan 2025 17:30:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,44 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/2] audio: actually try to enable MTU auto-tuning
+Subject: Re: [PATCH BlueZ] adapter: Fix the pending changing flags check
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173825823449.1027237.5797702882442522177.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Jan 2025 17:30:34 +0000
-References: <20250129084950.41987-1-pchelkin@ispras.ru>
-In-Reply-To: <20250129084950.41987-1-pchelkin@ispras.ru>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: linux-bluetooth@vger.kernel.org, lvc-project@linuxtesting.org
+ <173825823574.1027237.7527692382563822043.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Jan 2025 17:30:35 +0000
+References: <20250129172316.329330-1-ludovico.denittis@collabora.com>
+In-Reply-To: <20250129172316.329330-1-ludovico.denittis@collabora.com>
+To: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 29 Jan 2025 11:49:49 +0300 you wrote:
-> A "0" for the input MTU passed to the underlying socket is supposed to
-> indicate that its value should be determined by the L2CAP layer.
-> However, the current code treats a zero imtu just as if there is
-> nothing to change.
+On Wed, 29 Jan 2025 18:23:16 +0100 you wrote:
+> When checking if the new desired device flags are already pending, we
+> should compare them against the XOR of current flags and desired flags,
+> i.e. the flags that are going to change.
 > 
-> Introduce an additional flag to indicate that the zero imtu is
-> explicitly requested by the caller for the purpose of auto-tuning.
-> Otherwise, the similar behavior remains.
+> For example, let's assume the following situation:
+> - We have a device with `current_flags == DEVICE_FLAG_REMOTE_WAKEUP`
+> (i.e. 1)
+> - We want to disable the `wake_allowed` property
+> - `device_set_wake_allowed()` will call `adapter_set_device_flags()`
+> with `flags == 0`
+> - When in `adapter_set_device_flags()`, we'll have:
+>   - current == 1
+>   - pending == 0
+>   - flags == 0
+> In this situation `flags == (flags & pending)` would not return what
+> we'd expect.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v2,1/2] audio: actually try to enable MTU auto-tuning
-    (no matching commit)
-  - [BlueZ,v2,2/2] a2dp: enable input MTU auto-tuning for the server
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=252a32ac0b3f
+  - [BlueZ] adapter: Fix the pending changing flags check
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0acdf186fcde
 
 You are awesome, thank you!
 -- 
