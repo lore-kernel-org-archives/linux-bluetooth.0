@@ -1,164 +1,137 @@
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09701482E1;
-	Thu, 30 Jan 2025 18:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4231EB9F8;
+	Thu, 30 Jan 2025 18:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738262115; cv=none; b=r7P/d3oy5pLG1nSSveIgfFVsTSIQqe3n5wfzirdpV3oJTZuHcA1g+7x24rCfJrZ9RPftHsV/Mie22tyh8rx5weTFgqOjnVmxVQM97UFDN9BFQgDXCFD8PIJhS1fPwIZ79CyGXycpjJnTTX7JNxrwWQ+krM9a9czM20vb0nIRIns=
+	t=1738262127; cv=none; b=TtyAgY1lepUDSYM/ZR4MhP8z9GqnTYfUy9+QDrH9JhjIp49Hr0iU4kCIXxm0e5bdElTfgLGDq0vhX2eBBZEhpIMJX2ts1EHQIE3VXTmiO8LJ9kphUQt63cdiK/NdmTXYWJrG6tY0sbGfjgbNSlhUaaIgRsbRrqOe4vc5bNcmRrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738262115; c=relaxed/simple;
-	bh=TwAAoJer/FPnpvBQxGFZ60k7H5CAyYtl65JkhxpM9DA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=KsxekG9viljW8KNClK396iMgfGslVjFxJnGK1Q80e0LOpyWXfLUsHAjMHTPuHqckZG/p6VcDtcztuLsszrLNYVidAzbVVM6BDckR5Tj4JyuYd/lpfeBk3kdPE+c8uM+CA0AH25yf0WEu/hS5uq5CnxoZERx8hF5dnSc+rzZ5sQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=tSHLTJPX; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1738262127; c=relaxed/simple;
+	bh=GlABbLQNdlEWm8DmN6/oAlkh9Ch4kaIssmUYP35PdPI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=R+uC9JDHoJJNmriXb/Q1EVrX6MlGNsWzkt4dClbEg/wtNfUN57n1VWrFmBjwmZMHXY9HRPN9qM7G+T+bTWsEJdxly8dTU+Z33HQ36rb3jQTFqjb4LBsSpdYNPtRm4qCOXLNgh+y+/DcDyaj9Hq1HzjdNLhUmaAOcx6sCz2u7yt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Xij4tm7p; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="tSHLTJPX"
-Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 4D9AB120006;
-	Thu, 30 Jan 2025 21:34:55 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4D9AB120006
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1738262095;
-	bh=pDRf5BLR0/0IYmafaREu9IPC4OM9eMc7Mv+ojVZWcio=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
-	b=tSHLTJPXbbJ2xABGU65bbxvB48O+kwGMCL5OJs1D+1r77mgxpB5ZTGaImZM57n3B7
-	 wu9H3RSsqbLaIBa5h/awhMXClDcgxAKDMLQbCCrZQI8vWGsp7G8lz/gJ5CAjl2PnYp
-	 qBuwSNVBscCa3YExK622Dt9eKGczmTrRjqWl2hDdyft0jJXSCFUf/X8tLZZeSfNgUk
-	 yj2uvuAkawxE2fXb63PlFBqLYm41sQeRMh7egziUyLPZBxuHn0OSLVdZn2/DbFTCfb
-	 WmZviYDflcQrWeBKa5C/PA3X/7hThnJU2tISCM5GHpzI7pZcaz9nZTqJcEucnGx1DQ
-	 133LI6Q+jCCNw==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 30 Jan 2025 21:34:55 +0300 (MSK)
-Message-ID: <95904850-fe5c-4866-3da6-3e021c6becf8@salutedevices.com>
-Date: Thu, 30 Jan 2025 21:34:10 +0300
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Xij4tm7p"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50UD45UZ012012;
+	Thu, 30 Jan 2025 18:35:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=599FXlmZ3EgyEUHHKK5D1A
+	8GuodYRYwTvseL6b1+1ag=; b=Xij4tm7pC0i+sqJTSVX+/iaOIiRw71vJECyVD8
+	JakvwonwwMqxJm3Gs0BE+sAriS4mtFTIgxTyuBBR7QIqGPpm8gOnmyHJFqPYLqDB
+	EMc8aTsQPN87/LthnC85yTtoJC+gZj8B85hEjTWz4dKNCokAjYHAR2p8J2J8NnrO
+	nZE4iLRzuYoA2wRXLhhPqoT93VYowG1SdTgKbVMAwAmvNettyEVsL2LP2v6O5ptj
+	xsYRAV8NHxElhjTbskbUkOALJ0QHX0coOm8kPSLiBsTWGk+HYn4UEy8qsDF/jw0V
+	x8N197UAqF05Lnuq9hKYBt4uLZUB96o+dCZpetLZqKG0QMCw==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44g9ys0ux8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Jan 2025 18:35:18 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50UIZH1D002264
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Jan 2025 18:35:17 GMT
+Received: from hu-janathot-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 30 Jan 2025 10:35:13 -0800
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Marcel Holtmann
+	<marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v9 0/2] Enable Bluetooth on qcs6490-rb3gen2 board
+Date: Fri, 31 Jan 2025 00:04:32 +0530
+Message-ID: <20250130183434.2394058-1-quic_janathot@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v2] Bluetooth: hci_uart: fix race during initialization
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, <oxffffaa@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@salutedevices.com>
-References: <d159c57f-8490-4c26-79da-6ad3612c4a14@salutedevices.com>
- <CABBYNZLa9amkcQzqRyiCK7acKeXiPLkfX8thMonQhXN+5PnmmQ@mail.gmail.com>
- <e0b77a36-2d2b-735c-7a23-bbaab5adeba7@salutedevices.com>
- <a2a239f1-5697-cb09-5e4f-83c024fd5ea6@salutedevices.com>
-Content-Language: en-US
-In-Reply-To: <a2a239f1-5697-cb09-5e4f-83c024fd5ea6@salutedevices.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 190694 [Jan 30 2025]
-X-KSMG-AntiSpam-Version: 6.1.1.7
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 50 0.3.50 df4aeb250ed63fd3baa80a493fa6caee5dd9e10f, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2025/01/30 12:39:00 #27158825
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 4eO3I_pjnoOgNmnmE_iNX6F0SlBirign
+X-Proofpoint-ORIG-GUID: 4eO3I_pjnoOgNmnmE_iNX6F0SlBirign
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-30_08,2025-01-30_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 suspectscore=0 priorityscore=1501 mlxscore=0 malwarescore=0
+ adultscore=0 spamscore=0 mlxlogscore=744 phishscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501300140
 
-Hi, sorry ping
+Patch 1/2
+  The new state node qup_uart7_sleep is causing a dt-check warning because the 
+  base DTSI (sc7280.dtsi) is defined with individual pin configurations
 
-Thanks
+----
+Changes from v8:
+* Fixed the dtb-check warning  in P1 and removed tag: Reviewed-by
+* Link to v8: https://lore.kernel.org/linux-arm-msm/20250127064940.1360404-1-quic_janathot@quicinc.com/
 
-On 08.01.2025 15:39, Arseniy Krasnov wrote:
-> 
-> 
-> On 19.12.2024 23:07, Arseniy Krasnov wrote:
->>
->>
->> On 19.12.2024 22:18, Luiz Augusto von Dentz wrote:
->>> Hi Arseniy,
->>>
->>> On Tue, Dec 17, 2024 at 3:12 AM Arseniy Krasnov
->>> <avkrasnov@salutedevices.com> wrote:
->>>>
->>>> 'hci_register_dev()' calls power up function, which is executed by
->>>> kworker - 'hci_power_on()'. This function does access to bluetooth chip
->>>> using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'.
->>>> Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
->>>> if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
->>>> 'hci_register_dev()', and there is tiny chance that 'hci_power_on()' will
->>>> be executed before setting this bit. In that case HCI init logic fails.
->>>>
->>>> Patch moves setting of 'HCI_UART_PROTO_READY' before calling function
->>>> 'hci_uart_register_dev()'.
->>>>
->>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->>>> ---
->>>>  Changelog v1->v2:
->>>>  * Move 'set_bit()' before 'hci_uart_register_dev()' instead of
->>>>    adding new bit 'HCI_UART_PROTO_INIT'.
->>>
->>> What drivers/controllers this was tested with? I want to make sure
->>> this doesn't cause regressions to other drivers if there are perhaps
->>> some drivers assuming HCI_UART_PROTO_READY was set in a certain order.
->>
->> Hi,
->>
->> I tested this on:
->>
->> CONFIG_BT=y
->> CONFIG_BT_HCIUART=y
->> CONFIG_BT_HCIUART_H4=y
-> 
-> Hi, sorry, but is this enough info about my test env ?
-> 
-> Thanks
-> 
->>
->> Yes, my v1 patchset with extra INIT bit was targeted to keep
->> original behaviour - e.g. PROTO_READY bit usage still the same,
->> just adding extra bit to handle this specific case.
->>
->> Thanks
->>
->>>
->>>>  drivers/bluetooth/hci_ldisc.c | 3 ++-
->>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
->>>> index 30192bb083549..07b9aa09bbe2e 100644
->>>> --- a/drivers/bluetooth/hci_ldisc.c
->>>> +++ b/drivers/bluetooth/hci_ldisc.c
->>>> @@ -704,12 +704,13 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
->>>>
->>>>         hu->proto = p;
->>>>
->>>> +       set_bit(HCI_UART_PROTO_READY, &hu->flags);
->>>> +
->>>>         err = hci_uart_register_dev(hu);
->>>>         if (err) {
->>>>                 return err;
->>>>         }
->>>>
->>>> -       set_bit(HCI_UART_PROTO_READY, &hu->flags);
->>>>         return 0;
->>>>  }
->>>>
->>>> --
->>>> 2.30.1
->>>
->>>
->>>
+Changes from v7:
+* updated P1 & P2 with tag: Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org> 
+* Link to v7: https://lore.kernel.org/lkml/20250107134157.211702-1-quic_janathot@quicinc.com/#t
+
+Changes from v6:
+* Elaborated the commit message with more information.
+* Link to v6: https://lore.kernel.org/lkml/20241223135700.22660-1-quic_janathot@quicinc.com/
+
+Changes from v5:
+* Update the wcn6750 required properties in bindings.
+* Link to v5: https://lore.kernel.org/linux-arm-msm/20241209103455.9675-1-quic_janathot@quicinc.com/
+
+Changes from v4:
+* Added reviewed tag by Krzysztof in p1
+* Updated the p2 commit message with sw_ctrl and wifi-enable are
+  handled in wifi FW.
+* Added blank line between the nodes in p2
+* Placed the structures in proper order in p4
+* Link to v4: https://lore.kernel.org/all/20241204131706.20791-1-quic_janathot@quicinc.com/
+
+Changes from v3:
+* Defined the PMU node and used the its output to power up BT
+* Used power sequencer for wcn wcn6750 module
+* Split the patch to multiple as per subtree
+* Add description of the PMU of the WCN6750 module
+* Include separate UART state node for sleep pin configuarion
+* Link to v3: https://lore.kernel.org/linux-arm-msm/20241022104600.3228-1-quic_janathot@quicinc.com/
+
+Changes from v2:
+* Sorted nodes alphabetically
+* Link to v2: https://lore.kernel.org/linux-arm-msm/20241010105107.30118-1-quic_janathot@quicinc.com/
+
+Changes from v1:
+* Corrected the board name in subject
+* Link to v1: https://lore.kernel.org/linux-arm-msm/20241009111436.23473-1-quic_janathot@quicinc.com/
+Janaki Ramaiah Thota (2):
+  arm64: dts: qcom: qcs6490-rb3gen: add and enable BT node
+  Bluetooth: hci_qca: use the power sequencer for wcn6750
+
+ arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts | 167 ++++++++++++++++++-
+ drivers/bluetooth/hci_qca.c                  |   2 +-
+ 2 files changed, 167 insertions(+), 2 deletions(-)
+
+-- 
+
+
