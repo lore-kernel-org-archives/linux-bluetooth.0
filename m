@@ -1,458 +1,241 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6149E25634
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 09:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE12D3E499
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 10:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738227735; cv=none; b=Y8SY8DWShiY1kOuZrKCM2/d5UMf4YlhPi5tOgWsRFV4Nw3JZ4Qghfzx2hEZq/on8w57JixeNCAfcoLPVHfL9Zrkki2DoDCyDUSIZAvFNcBzQnDLk6pCk2RbIidUQXDwmD8Vp8lfv44nnfWPYz6cTcFXP/gZ/+uCX5YMsTmB/XKg=
+	t=1738232000; cv=none; b=FRD6Wp0KrMu0gVDZ6PFGoBry8eUStZi0b9c5d0lWBQOX83YYm9UvUvMvohYSdRnsvnuKTS1G9QyNthWotzc1SiYz+LDpATxKfMiGoNskIStgLa4omOEhRCsazRxRdElO29Ms9xeFFUJFlRXeGChMmHF47lng/lbuEr2J+3zyoPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738227735; c=relaxed/simple;
-	bh=4WROyHJmyXJKglrRRQzVk4n9BNYr0xzaGCJIqOlkNUY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TfOmXdJid4gj07GIXOZ4l68crI4sWBJ7jGtS0an6KHBkzhoCfHGhJZqPxv+omVIxTVN6N+XCrX8gYo16ku/RkDgYoADoP0dke4NldVbS+X/SjxDQOi3y79Bw6WbtPDOkG1SqCo804TourUcvfu22PjHuqM4XoG9n6PjSlRRU6rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=f767hWKM; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	s=arc-20240116; t=1738232000; c=relaxed/simple;
+	bh=X5gOvKrjl6JKkYnSpvdvQXqf36gDrCcf2yqUaGGRg80=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Kl5UYfZksJl+PZ5DT1xi4+A/ttlVPe9+PhkU9rMpHC47ByCekA/1CVdW8vdS3fsXarX6+bLmXxc2nBTAH1pPP+yCakypTzzYvXseZgXUhtc/h1/y6P9qbvUBZMzRCHB6f5JHxMnRs6w6uFkLOz7Ao9hc14lfV3/lAsbHXo7vPYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dWvoiRpL; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="f767hWKM"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21654fdd5daso7948165ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 01:02:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dWvoiRpL"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6dd0d09215aso4713376d6.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 02:13:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1738227732; x=1738832532; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fqzAKqQD3RkD2QBicC0izo5rCHNBLTAGqEMuGzK2x40=;
-        b=f767hWKMRJ25gTjSmIyE6yzLEw7TqC4zlAPUeV+Lu0md3oJANmEipVj/83OD3vldRn
-         YMOlU3kh4dox9HLTRE3Xal69fgN836FYmmRh5HBdwb4vvkX+ZNkIDmS7UbNjQKmDMwQ7
-         PBchOdSIVLU2OJsVivv1CWdUfjSp/8I5/McMrzh0/TRgqM6amFOG9ZC2rNEaZ/Y7XJlY
-         6g8ajl7kSqEHgi2JiQ5/j51zIUkz+SNWBJXnNy+kxH0WXfn0ZiGHLCjC64E3RLegDERd
-         TyJNDZUddcTDWMUXooxk32t8oVMnWtZa4rHJIHMxG7JFeUy9fTKpUmx19CgI7PqWjeaS
-         2a5g==
+        d=gmail.com; s=20230601; t=1738231997; x=1738836797; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=X5gOvKrjl6JKkYnSpvdvQXqf36gDrCcf2yqUaGGRg80=;
+        b=dWvoiRpLfsM+8kHgbCN+mvVOi+NeoDUKsmLUBMYkBEyfMt7sZIWQfiOgM75ogyJiQN
+         Lyf5JyyjaFkKrVhNjBBZt2ytkvxJF9w5qzsvqkpfVYNz4hyzna8Dg01Igtx0g7XHhvbV
+         TNMHknyHgLTE625VdbcdV3cqU/mz1feHSddb9Fc0It2sixew4Bx86cbl08f2kETLQObe
+         te2znh+4xe9HYl04gKi9MYfwvFHKDDrQVk4Ek+99MIBg+U09q5duhx/iP7aSSOcwShbD
+         OfKKZ3kSpXqDfT16YICNCzvD3HLPuPrkkja02tTMlJmy4Nw81wbfMwvxeytCuZiA/Pg+
+         4PMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738227732; x=1738832532;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1738231997; x=1738836797;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fqzAKqQD3RkD2QBicC0izo5rCHNBLTAGqEMuGzK2x40=;
-        b=jb4s1CetGVLRAXY5N5mfPSM3Isemzt+yowRheWKEHY8TSFMjDVqYFTFHzL9pmduQ9l
-         a5sYN6ujipr9SfYx2oTwEjEYAEfsDOEv0ac0d9/m8CQsN7JCHX4MLTtGYOYKBKLgbt79
-         lPRcBrITnz6eogqOKkeHUFUxMV/DKUtxbV201vGxgm0J0JQv4HchXdcMigM7uocqjHpg
-         hAn9lcgDPG9kU2K0MwP6LUIWLyTd2pzHdnZLegWolmmibHrO2wzLOYERtG8sLCrC1/lu
-         EjhfsXcMXUvUyBhYrNAAoRu9/QcVUmZ6prffx3IuMeJPJO9lKExCURkZn1EWjQNMf18U
-         CcVw==
-X-Gm-Message-State: AOJu0Yy4Q214fKNTg3DAFEJRADwKus3lx2do7EeRoSuT39nSvgMAaNZd
-	SkBdZsNnBzmKWtSIIS5d8n/OV9AP1KKmS+3tobU5O6zFoveJK11Se2V/J2eiQmO8qAYPlnsJBbG
-	5
-X-Gm-Gg: ASbGncu8MxDtoDpNTg3tGLFvqUc9rlmC76W0JRV+mOl0JuL5dj0izYA3kvz0kZBaXq6
-	MaP+IeTumzVSjAYpNkRyMU6UUDLImgRGUUzLu2mZKKRfmmt3McQYe29Ir5zQ8ZplILCsZkDA1r0
-	YMSczKaYHNgH8GDQIOu79uwsqxkx1uWGwqy/GDKOnYLuIFFcjUKYMh1INfFuWwdK0nnQ6sll6TA
-	qzB5DBU0IT0RB8hXMBgX8CZ3BhWNXY6YNhPbT+AUQtQ4wd2bKXL08eijw3/VchmzSIQ9LrqZvsA
-	A/picPp7J9mQ00r5WB8vRA==
-X-Google-Smtp-Source: AGHT+IGhzVi9OirCrCIQSnfd9vbee0Jilsy8qaxOzfl08kK4D7PSatI1OZOIVzscdrZyYrQoPdLaKA==
-X-Received: by 2002:a17:90b:4ecb:b0:2f6:dc00:3af with SMTP id 98e67ed59e1d1-2f83ac8adedmr7639937a91.34.1738227732083;
-        Thu, 30 Jan 2025 01:02:12 -0800 (PST)
-Received: from localhost ([2401:4900:8838:6d28:6067:cc51:1124:aabf])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2f83bcd0ddbsm3628884a91.11.2025.01.30.01.02.11
+        bh=X5gOvKrjl6JKkYnSpvdvQXqf36gDrCcf2yqUaGGRg80=;
+        b=VeTxWpck/fCg6WpPqWhGI3FUzC/P7eSzUe364qgH0jVEz2JaSGCXsYQJRW3ys2bPrq
+         abvqQ71Brwo69723USdDI0gWocPpsCl42eXsv1TTpDnO5UMxJpqqn7VZMggjxVMv5y/3
+         Pg+OBOmf3xxuXxLLrW9oMbwkhw7ge4IxZZjD5XXSyuq4qjIzd0zgtfQz9M2sbKrh/aom
+         Yb6oLxjnkk64+bCZlwYAkZOG81bGl9xT/qKlM406NhL4B22QdqDAnuB1oY+66uk5LBY7
+         R3uFGgx+dDs2XN1MPPUCQiXXsyNFuZj6gIrcTI0wpdoIxv61wE6v2Cu6/FOw4AYMCikq
+         YQeQ==
+X-Gm-Message-State: AOJu0Yz/ZH2U0DReeYxUoA+TKLZPlPQ6Fik31g1WMRp/34gXcaZKag9V
+	qTIq0DXUa+dOZ7SYZwpdJWy1BIdbsqfK/gqPK9C45UMJF+lKFPXwF5wR1A==
+X-Gm-Gg: ASbGncvIV9INj4gWVCYlJuEOs+dfU9hJ4twLC7HMtRkcn+SueRObjKWoA6Tf+9sbhts
+	71S2EyZFlOQG5gmZ26uAEtPTwo0+2P+MRIjcS0cgDcojFUO2sbHZv5Zroj7E3WuCYUA+5rT+5cm
+	dmw6ftfjjggSXr5B52eNdX2+HVI1YRPG4jgY+/RnkWw/MJnJnU9mEapZMWyOhv/EMYoHkx+hK42
+	kO1VjsMJq6bCkVqdujdFtjTsooYjvLkdW88ujKmL5UueC4WB5/wF+KADgFNhGGhWgpnaJxsabD5
+	uxEPcntQZrf+hDRgkH/znNWU
+X-Google-Smtp-Source: AGHT+IEr0LFZ7j/uQ5cuC6K4HeAIMhbe4BDq5r9EBZq2TI69Veqc72ODemV4mOeRJPtzne4U3qlfKg==
+X-Received: by 2002:a05:6214:411c:b0:6d8:7fe2:8b31 with SMTP id 6a1803df08f44-6e243bf7fabmr118771756d6.23.1738231997273;
+        Thu, 30 Jan 2025 02:13:17 -0800 (PST)
+Received: from [172.17.0.2] ([172.200.183.157])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e2548357b3sm4649676d6.67.2025.01.30.02.13.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 01:02:11 -0800 (PST)
-From: Sanchayan Maity <sanchayan@asymptotic.io>
-To: linux-bluetooth@vger.kernel.org
-Cc: arun@asymptotic.io
-Subject: [PATCH BlueZ] shared/asha: Add support for other side update
-Date: Thu, 30 Jan 2025 14:31:58 +0530
-Message-ID: <20250130090158.266044-1-sanchayan@asymptotic.io>
-X-Mailer: git-send-email 2.48.1
+        Thu, 30 Jan 2025 02:13:16 -0800 (PST)
+Message-ID: <679b50bc.050a0220.daf41.1084@mx.google.com>
+Date: Thu, 30 Jan 2025 02:13:16 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0097031394861420450=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, sanchayan@asymptotic.io
+Subject: RE: [BlueZ] shared/asha: Add support for other side update
+In-Reply-To: <20250130090158.266044-1-sanchayan@asymptotic.io>
+References: <20250130090158.266044-1-sanchayan@asymptotic.io>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-ASHA specification requires that the status of the other side be
-communicated with the start command. The status is also updated
-if one of the device in the pair is connected/disconnected after
-the other.
+--===============0097031394861420450==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-https://source.android.com/docs/core/connect/bluetooth/asha#audiocontrolpoint
----
- src/shared/asha.c | 163 +++++++++++++++++++++++++++++++++++++++++++++-
- src/shared/asha.h |   8 +++
- 2 files changed, 168 insertions(+), 3 deletions(-)
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTI5MjE1CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQRU5ESU5HICAgMC4xOCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
+TkRJTkcgICAwLjMyIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDIwLjUxIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDc2LjExIHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE5
+ODIuNzQgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTU4
+LjE2IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDU1LjQy
+IHNlY29uZHMKQ2hlY2tTbWF0Y2ggICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE0MC4yNiBz
+ZWNvbmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICA2Ni4yNyBzZWNv
+bmRzCkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBFTkRJTkcgICAwLjI4IHNlY29uZHMK
+U2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDg1NS45OSBzZWNvbmRzCgpE
+ZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0g
+UEVORElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBn
+aXRsaW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVl
+ek1ha2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnRvb2xzL21nbXQtdGVzdGVy
+LmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI4OTM6NTog
+bm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFy
+LXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyODkzIHwgaW50IG1h
+aW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgpJbiBmaWxlIGluY2x1
+ZGVkIGZyb20gLi9wcm9maWxlcy9hdWRpby9hc2hhLmg6MTYsCiAgICAgICAgICAgICAgICAgZnJv
+bSBwcm9maWxlcy9hdWRpby9hc2hhLmM6NDM6Ci4vc3JjL3NoYXJlZC9hc2hhLmg6NTY6MjI6IGVy
+cm9yOiDigJhhc2hhX2RldmljZXPigJkgZGVmaW5lZCBidXQgbm90IHVzZWQgWy1XZXJyb3I9dW51
+c2VkLXZhcmlhYmxlXQogICA1NiB8IHN0YXRpYyBzdHJ1Y3QgcXVldWUgKmFzaGFfZGV2aWNlczsK
+ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn4KY2MxOiBhbGwgd2Fybmlu
+Z3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMDc4Mzog
+cHJvZmlsZXMvYXVkaW8vYmx1ZXRvb3RoZC1hc2hhLm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdh
+aXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0NjkzOiBh
+bGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVj
+ayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKdW5pdC90ZXN0LWF2
+ZHRwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1OiBu
+b3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXIt
+dHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQgbWFp
+bihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdnJj
+cC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTogbm90
+ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRy
+YWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1haW4o
+aW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgpJbiBmaWxlIGluY2x1ZGVk
+IGZyb20gcHJvZmlsZXMvYXVkaW8vbWVkaWEuYzo0MToKLi9zcmMvc2hhcmVkL2FzaGEuaDo1Njoy
+MjogZXJyb3I6IOKAmGFzaGFfZGV2aWNlc+KAmSBkZWZpbmVkIGJ1dCBub3QgdXNlZCBbLVdlcnJv
+cj11bnVzZWQtdmFyaWFibGVdCiAgIDU2IHwgc3RhdGljIHN0cnVjdCBxdWV1ZSAqYXNoYV9kZXZp
+Y2VzOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3
+YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEw
+MTExOiBwcm9maWxlcy9hdWRpby9ibHVldG9vdGhkLW1lZGlhLm9dIEVycm9yIDEKbWFrZTogKioq
+IFtNYWtlZmlsZToxMjM0NDogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENo
+ZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rp
+b24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjg5Mzo1OiBub3RlOiB2YXJpYWJs
+ZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNz
+aWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTI4OTMgfCBpbnQgbWFpbihpbnQgYXJnYywg
+Y2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL3By
+b2ZpbGVzL2F1ZGlvL2FzaGEuaDoxNiwKICAgICAgICAgICAgICAgICBmcm9tIHByb2ZpbGVzL2F1
+ZGlvL2FzaGEuYzo0MzoKLi9zcmMvc2hhcmVkL2FzaGEuaDo1NjoyMjogZXJyb3I6IOKAmGFzaGFf
+ZGV2aWNlc+KAmSBkZWZpbmVkIGJ1dCBub3QgdXNlZCBbLVdlcnJvcj11bnVzZWQtdmFyaWFibGVd
+CiAgIDU2IHwgc3RhdGljIHN0cnVjdCBxdWV1ZSAqYXNoYV9kZXZpY2VzOwogICAgICB8ICAgICAg
+ICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVh
+dGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEwNzgzOiBwcm9maWxlcy9hdWRp
+by9ibHVldG9vdGhkLWFzaGEub10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5m
+aW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2VmaWxlOjEyMzQ0OiBjaGVja10gRXJyb3Ig
+MgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tTbWF0Y2ggLSBGQUlM
+CkRlc2M6IFJ1biBzbWF0Y2ggdG9vbCB3aXRoIHNvdXJjZQpPdXRwdXQ6CgpzcmMvc2hhcmVkL2Ny
+eXB0by5jOjI3MToyMTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNy
+Yy9zaGFyZWQvY3J5cHRvLmM6MjcyOjIzOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkg
+aXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo3Njg6MzE6IHdhcm5pbmc6IFZhcmlh
+YmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjgzMDoz
+MTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0
+dC1oZWxwZXJzLmM6MTMyMzozMTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVz
+ZWQuCnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6MTM1NDoyMzogd2FybmluZzogVmFyaWFibGUg
+bGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1zZXJ2ZXIuYzoyNzg6MjU6IHdh
+cm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2Vy
+dmVyLmM6NjE4OjI1OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3Jj
+L3NoYXJlZC9nYXR0LXNlcnZlci5jOjcxNjoyNTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFy
+cmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvYmFwLmM6Mjk2OjI1OiB3YXJuaW5nOiBhcnJheSBvZiBm
+bGV4aWJsZSBzdHJ1Y3R1cmVzCnNyYy9zaGFyZWQvYmFwLmM6IG5vdGU6IGluIGluY2x1ZGVkIGZp
+bGU6Ci4vc3JjL3NoYXJlZC9hc2NzLmg6ODg6MjU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxl
+IHN0cnVjdHVyZXMKc3JjL3NoYXJlZC9zaGVsbC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlICh0
+aHJvdWdoIC91c3IvaW5jbHVkZS9yZWFkbGluZS9yZWFkbGluZS5oKToKL3Vzci9pbmNsdWRlL3Jl
+YWRsaW5lL3JsdHlwZWRlZnMuaDozNToyMzogd2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVj
+bGFyYXRpb24gb2YgZnVuY3Rpb24gJ0Z1bmN0aW9uJwovdXNyL2luY2x1ZGUvcmVhZGxpbmUvcmx0
+eXBlZGVmcy5oOjM2OjI1OiB3YXJuaW5nOiBub24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlvbiBv
+ZiBmdW5jdGlvbiAnVkZ1bmN0aW9uJwovdXNyL2luY2x1ZGUvcmVhZGxpbmUvcmx0eXBlZGVmcy5o
+OjM3OjI3OiB3YXJuaW5nOiBub24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlvbiBvZiBmdW5jdGlv
+biAnQ1BGdW5jdGlvbicKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMuaDozODoyOTog
+d2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ0NQUEZ1
+bmN0aW9uJwpzcmMvc2hhcmVkL2NyeXB0by5jOjI3MToyMTogd2FybmluZzogVmFyaWFibGUgbGVu
+Z3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvY3J5cHRvLmM6MjcyOjIzOiB3YXJuaW5nOiBW
+YXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo3
+Njg6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVk
+L2dhdHQtaGVscGVycy5jOjgzMDozMTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlz
+IHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6MTMyMzozMTogd2FybmluZzogVmFyaWFi
+bGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6MTM1NDoy
+Mzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0
+dC1zZXJ2ZXIuYzoyNzg6MjU6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2Vk
+LgpzcmMvc2hhcmVkL2dhdHQtc2VydmVyLmM6NjE4OjI1OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5n
+dGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LXNlcnZlci5jOjcxNjoyNTogd2Fybmlu
+ZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvYmFwLmM6Mjk2OjI1
+OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCnNyYy9zaGFyZWQvYmFwLmM6
+IG5vdGU6IGluIGluY2x1ZGVkIGZpbGU6Ci4vc3JjL3NoYXJlZC9hc2NzLmg6ODg6MjU6IHdhcm5p
+bmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMKc3JjL3NoYXJlZC9zaGVsbC5jOiBub3Rl
+OiBpbiBpbmNsdWRlZCBmaWxlICh0aHJvdWdoIC91c3IvaW5jbHVkZS9yZWFkbGluZS9yZWFkbGlu
+ZS5oKToKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMuaDozNToyMzogd2FybmluZzog
+bm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ0Z1bmN0aW9uJwovdXNy
+L2luY2x1ZGUvcmVhZGxpbmUvcmx0eXBlZGVmcy5oOjM2OjI1OiB3YXJuaW5nOiBub24tQU5TSSBm
+dW5jdGlvbiBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnVkZ1bmN0aW9uJwovdXNyL2luY2x1ZGUv
+cmVhZGxpbmUvcmx0eXBlZGVmcy5oOjM3OjI3OiB3YXJuaW5nOiBub24tQU5TSSBmdW5jdGlvbiBk
+ZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnQ1BGdW5jdGlvbicKL3Vzci9pbmNsdWRlL3JlYWRsaW5l
+L3JsdHlwZWRlZnMuaDozODoyOTogd2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRp
+b24gb2YgZnVuY3Rpb24gJ0NQUEZ1bmN0aW9uJwp0b29scy9tZXNoLWNmZ3Rlc3QuYzoxNDUzOjE3
+OiB3YXJuaW5nOiB1bmtub3duIGVzY2FwZSBzZXF1ZW5jZTogJ1wlJwp0b29scy9zY28tdGVzdGVy
+LmM6IG5vdGU6IGluIGluY2x1ZGVkIGZpbGU6Ci4vbGliL2JsdWV0b290aC5oOjIzMjoxNTogd2Fy
+bmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlcwouL2xpYi9ibHVldG9vdGguaDoyMzc6
+MzE6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMKdG9vbHMvYm5lcHRlc3Qu
+Yzo2MzQ6Mzk6IHdhcm5pbmc6IHVua25vd24gZXNjYXBlIHNlcXVlbmNlOiAnXCUnCnRvb2xzL3Nl
+cTJic2VxLmM6NTc6MjY6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgp0
+b29scy9vYmV4LWNsaWVudC10b29sLmM6IG5vdGU6IGluIGluY2x1ZGVkIGZpbGUgKHRocm91Z2gg
+L3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JlYWRsaW5lLmgpOgovdXNyL2luY2x1ZGUvcmVhZGxpbmUv
+cmx0eXBlZGVmcy5oOjM1OjIzOiB3YXJuaW5nOiBub24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlv
+biBvZiBmdW5jdGlvbiAnRnVuY3Rpb24nCi91c3IvaW5jbHVkZS9yZWFkbGluZS9ybHR5cGVkZWZz
+Lmg6MzY6MjU6IHdhcm5pbmc6IG5vbi1BTlNJIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIG9mIGZ1bmN0
+aW9uICdWRnVuY3Rpb24nCi91c3IvaW5jbHVkZS9yZWFkbGluZS9ybHR5cGVkZWZzLmg6Mzc6Mjc6
+IHdhcm5pbmc6IG5vbi1BTlNJIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdDUEZ1
+bmN0aW9uJwovdXNyL2luY2x1ZGUvcmVhZGxpbmUvcmx0eXBlZGVmcy5oOjM4OjI5OiB3YXJuaW5n
+OiBub24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnQ1BQRnVuY3Rpb24n
+CmFuZHJvaWQvYXZjdHAuYzo1MDU6MzQ6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBp
+cyB1c2VkLgphbmRyb2lkL2F2Y3RwLmM6NTU2OjM0OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGgg
+YXJyYXkgaXMgdXNlZC4KdW5pdC90ZXN0LWF2cmNwLmM6MzczOjI2OiB3YXJuaW5nOiBWYXJpYWJs
+ZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4KdW5pdC90ZXN0LWF2cmNwLmM6Mzk4OjI2OiB3YXJuaW5n
+OiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4KdW5pdC90ZXN0LWF2cmNwLmM6NDE0OjI0
+OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4KYW5kcm9pZC9hdnJjcC1s
+aWIuYzoxMDg1OjM0OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4KYW5k
+cm9pZC9hdnJjcC1saWIuYzoxNTgzOjM0OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkg
+aXMgdXNlZC4KYW5kcm9pZC9hdnJjcC1saWIuYzoxNjEyOjM0OiB3YXJuaW5nOiBWYXJpYWJsZSBs
+ZW5ndGggYXJyYXkgaXMgdXNlZC4KYW5kcm9pZC9hdnJjcC1saWIuYzoxNjM4OjM0OiB3YXJuaW5n
+OiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4v
+cHJvZmlsZXMvYXVkaW8vYXNoYS5oOjE2LAogICAgICAgICAgICAgICAgIGZyb20gcHJvZmlsZXMv
+YXVkaW8vYXNoYS5jOjQzOgouL3NyYy9zaGFyZWQvYXNoYS5oOjU2OjIyOiBlcnJvcjog4oCYYXNo
+YV9kZXZpY2Vz4oCZIGRlZmluZWQgYnV0IG5vdCB1c2VkIFstV2Vycm9yPXVudXNlZC12YXJpYWJs
+ZV0KICAgNTYgfCBzdGF0aWMgc3RydWN0IHF1ZXVlICphc2hhX2RldmljZXM7CiAgICAgIHwgICAg
+ICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRy
+ZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTA3ODM6IHByb2ZpbGVzL2F1
+ZGlvL2JsdWV0b290aGQtYXNoYS5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1
+bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY5MzogYWxsXSBFcnJvciAy
+CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBibHVlem1ha2VleHRlbGwgLSBG
+QUlMCkRlc2M6IEJ1aWxkIEJsdWV6IHdpdGggRXh0ZXJuYWwgRUxMCk91dHB1dDoKCkluIGZpbGUg
+aW5jbHVkZWQgZnJvbSAuL3Byb2ZpbGVzL2F1ZGlvL2FzaGEuaDoxNiwKICAgICAgICAgICAgICAg
+ICBmcm9tIHByb2ZpbGVzL2F1ZGlvL2FzaGEuYzo0MzoKLi9zcmMvc2hhcmVkL2FzaGEuaDo1Njoy
+MjogZXJyb3I6IOKAmGFzaGFfZGV2aWNlc+KAmSBkZWZpbmVkIGJ1dCBub3QgdXNlZCBbLVdlcnJv
+cj11bnVzZWQtdmFyaWFibGVdCiAgIDU2IHwgc3RhdGljIHN0cnVjdCBxdWV1ZSAqYXNoYV9kZXZp
+Y2VzOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3
+YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEw
+NzgzOiBwcm9maWxlcy9hdWRpby9ibHVldG9vdGhkLWFzaGEub10gRXJyb3IgMQptYWtlWzFdOiAq
+KiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2VmaWxlOjQ2
+OTM6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogSW5j
+cmVtZW50YWxCdWlsZCAtIFBFTkRJTkcKRGVzYzogSW5jcmVtZW50YWwgYnVpbGQgd2l0aCB0aGUg
+cGF0Y2hlcyBpbiB0aGUgc2VyaWVzCk91dHB1dDoKCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0
+b290aAoK
 
-diff --git a/src/shared/asha.c b/src/shared/asha.c
-index 67f2631cd..f2170d758 100644
---- a/src/shared/asha.c
-+++ b/src/shared/asha.c
-@@ -32,55 +32,166 @@
- 
- #include "asha.h"
- 
- /* We use strings instead of uint128_t to maintain readability */
- #define ASHA_CHRC_READ_ONLY_PROPERTIES_UUID "6333651e-c481-4a3e-9169-7c902aad37bb"
- #define ASHA_CHRC_AUDIO_CONTROL_POINT_UUID "f0d4de7e-4a88-476c-9d9f-1937b0996cc0"
- #define ASHA_CHRC_AUDIO_STATUS_UUID "38663f1a-e711-4cac-b641-326b56404837"
- #define ASHA_CHRC_VOLUME_UUID "00e4ca9e-ab14-41e4-8823-f9e70c7e91df"
- #define ASHA_CHRC_LE_PSM_OUT_UUID "2d410339-82b6-42aa-b34e-e2e01df8cc1a"
- 
-+unsigned int bt_asha_status(struct bt_asha *asha, bool connected);
-+
-+static bool match_hisyncid(const void *data, const void *user_data)
-+{
-+	const struct bt_asha_set *set = data;
-+	const struct bt_asha *asha = user_data;
-+
-+	return (memcmp(set->hisyncid, asha->hisyncid, 8) == 0);
-+}
-+
-+static struct bt_asha_set *find_asha_set(struct bt_asha *asha)
-+{
-+	return queue_find(asha_devices, match_hisyncid, asha);
-+}
-+
-+static uint8_t is_other_connected(struct bt_asha *asha)
-+{
-+	struct bt_asha_set *set = find_asha_set(asha);
-+
-+	if (set) {
-+		if (asha->right_side && set->left) {
-+			DBG("ASHA right and left side connected");
-+			return 1;
-+		}
-+		if (!asha->right_side && set->right) {
-+			DBG("ASHA left and right side connected");
-+			return 1;
-+		}
-+	}
-+
-+	if (asha->right_side)
-+		DBG("ASHA right side connected");
-+	else
-+		DBG("ASHA left side connected");
-+
-+	return 0;
-+}
-+
-+static void update_asha_set(struct bt_asha *asha, bool connected)
-+{
-+	struct bt_asha_set *set;
-+	set = queue_find(asha_devices, match_hisyncid, asha);
-+
-+	if (connected) {
-+		if (!set) {
-+			set = new0(struct bt_asha_set, 1);
-+			memcpy(set->hisyncid, asha->hisyncid, 8);
-+			queue_push_tail(asha_devices, set);
-+			DBG("Created ASHA set");
-+		}
-+
-+		if (asha->right_side) {
-+			set->right = asha;
-+			DBG("Right side registered for ASHA set");
-+		} else {
-+			set->left = asha;
-+			DBG("Left side registered for ASHA set");
-+		}
-+	} else {
-+		if (!set) {
-+			error("Missing ASHA set");
-+			return;
-+		}
-+
-+		if (asha->right_side && set->right) {
-+			set->right = NULL;
-+			DBG("Right side unregistered for ASHA set");
-+		} else if (!asha->right_side && set->left) {
-+			set->left = NULL;
-+			DBG("Left side unregistered for ASHA set");
-+		}
-+
-+		if (!set->right && !set->left) {
-+			if (queue_remove(asha_devices, set)) {
-+				free(set);
-+				DBG("Freeing ASHA set");
-+			}
-+
-+			if (!queue_peek_tail(asha_devices)) {
-+				queue_destroy(asha_devices, NULL);
-+				asha_devices = NULL;
-+			}
-+		}
-+	}
-+}
-+
-+static int asha_set_send_status(struct bt_asha *asha, bool other_connected)
-+{
-+	struct bt_asha_set *set;
-+	int ret = 0;
-+
-+	set = queue_find(asha_devices, match_hisyncid, asha);
-+
-+	if (set) {
-+		if (asha->right_side && set->left) {
-+			ret = bt_asha_status(set->left, other_connected);
-+			DBG("ASHA left side update: %d, ret: %d", other_connected, ret);
-+		}
-+
-+		if (!asha->right_side && set->right) {
-+			ret = bt_asha_status(set->right, other_connected);
-+			DBG("ASHA right side update: %d, ret: %d", other_connected, ret);
-+		}
-+	}
-+
-+	return ret;
-+}
-+
- struct bt_asha *bt_asha_new(void)
- {
- 	struct bt_asha *asha;
- 
- 	asha = new0(struct bt_asha, 1);
- 
- 	return asha;
- }
- 
- void bt_asha_reset(struct bt_asha *asha)
- {
- 	if (asha->status_notify_id) {
- 		bt_gatt_client_unregister_notify(asha->client,
- 						asha->status_notify_id);
- 	}
- 
- 	gatt_db_unref(asha->db);
- 	asha->db = NULL;
- 
- 	bt_gatt_client_unref(asha->client);
- 	asha->client = NULL;
- 
- 	asha->psm = 0;
-+
-+	update_asha_set(asha, false);
- }
- 
- void bt_asha_state_reset(struct bt_asha *asha)
- {
- 	asha->state = ASHA_STOPPED;
- 
- 	asha->cb = NULL;
- 	asha->cb_user_data = NULL;
- }
- 
- void bt_asha_free(struct bt_asha *asha)
- {
-+	update_asha_set(asha, false);
- 	gatt_db_unref(asha->db);
- 	bt_gatt_client_unref(asha->client);
- 	free(asha);
- }
- 
- static void asha_acp_sent(bool success, uint8_t err, void *user_data)
- {
- 	struct bt_asha *asha = user_data;
- 
- 	if (success) {
-@@ -103,61 +214,101 @@ static int asha_send_acp(struct bt_asha *asha, uint8_t *cmd,
- 		error("Error writing ACP command");
- 		return -1;
- 	}
- 
- 	asha->cb = cb;
- 	asha->cb_user_data = user_data;
- 
- 	return 0;
- }
- 
-+static int asha_send_acp_without_response(struct bt_asha *asha, uint8_t *cmd,
-+		unsigned int len)
-+{
-+	if (!bt_gatt_client_write_without_response(asha->client, asha->acp_handle,
-+				false, cmd, len)) {
-+		error("Error writing ACP command");
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_cb_t cb,
- 								void *user_data)
- {
-+	uint8_t other_connected = is_other_connected(asha);
- 	uint8_t acp_start_cmd[] = {
- 		0x01,		/* START */
- 		0x01,		/* G.722, 16 kHz */
- 		0,			/* Unknown media type */
- 		asha->volume,	/* Volume */
--		0,			/* Other disconnected */
-+		other_connected,
- 	};
- 	int ret;
- 
- 	if (asha->state != ASHA_STOPPED) {
- 		error("ASHA device start failed. Bad state %d", asha->state);
- 		return 0;
- 	}
- 
- 	ret = asha_send_acp(asha, acp_start_cmd, sizeof(acp_start_cmd), cb,
- 			user_data);
- 	if (ret < 0)
- 		return ret;
- 
- 	asha->state = ASHA_STARTING;
- 
- 	return 0;
- }
- 
- unsigned int bt_asha_stop(struct bt_asha *asha, bt_asha_cb_t cb,
- 								void *user_data)
- {
- 	uint8_t acp_stop_cmd[] = {
- 		0x02, /* STOP */
- 	};
-+	int ret;
- 
- 	if (asha->state != ASHA_STARTED)
- 		return 0;
- 
- 	asha->state = ASHA_STOPPING;
- 
--	return asha_send_acp(asha, acp_stop_cmd, sizeof(acp_stop_cmd),
--								cb, user_data);
-+	ret = asha_send_acp(asha, acp_stop_cmd, sizeof(acp_stop_cmd),
-+			cb, user_data);
-+	asha_set_send_status(asha, false);
-+
-+	return ret;
-+}
-+
-+unsigned int bt_asha_status(struct bt_asha *asha, bool other_connected)
-+{
-+	uint8_t status = other_connected ? 1 : 0;
-+	uint8_t acp_status_cmd[] = {
-+		0x03, /* STATUS */
-+		status,
-+	};
-+	int ret;
-+
-+	if (asha->state != ASHA_STARTED) {
-+		const char *side = asha->right_side ? "right" : "left";
-+		DBG("ASHA %s device not started for status update", side);
-+		return 0;
-+	}
-+
-+	ret = asha_send_acp_without_response(asha, acp_status_cmd,
-+			sizeof(acp_status_cmd));
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
- }
- 
- bool bt_asha_set_volume(struct bt_asha *asha, int8_t volume)
- {
- 	if (!bt_gatt_client_write_without_response(asha->client,
- 						asha->volume_handle, false,
- 						(const uint8_t *)&volume, 1)) {
- 		error("Error writing volume");
- 		return false;
- 	}
-@@ -231,43 +382,46 @@ static void read_rops(bool success,
- 	asha->coc_streaming_supported = (value[10] & 0x1) != 0;
- 	/* RenderDelay */
- 	asha->render_delay = get_le16(&value[11]);
- 	/* byte 13 & 14 are reserved */
- 	/* Codec IDs */
- 	asha->codec_ids = get_le16(&value[15]);
- 
- 	DBG("Got ROPS: side %u, binaural %u, csis: %u, delay %u, codecs: %u",
- 			asha->right_side, asha->binaural, asha->csis_supported,
- 			asha->render_delay, asha->codec_ids);
-+
-+	update_asha_set(asha, true);
- }
- 
- static void audio_status_register(uint16_t att_ecode, void *user_data)
- {
- 	if (att_ecode)
- 		DBG("AudioStatusPoint register failed 0x%04x", att_ecode);
- 	else
- 		DBG("AudioStatusPoint register succeeded");
- }
- 
- static void audio_status_notify(uint16_t value_handle, const uint8_t *value,
- 					uint16_t length, void *user_data)
- {
- 	struct bt_asha *asha = user_data;
- 	uint8_t status = *value;
- 	/* Back these up to survive the reset paths */
- 	bt_asha_cb_t cb = asha->cb;
- 	bt_asha_cb_t cb_user_data = asha->cb_user_data;
- 
- 	if (asha->state == ASHA_STARTING) {
- 		if (status == 0) {
- 			asha->state = ASHA_STARTED;
- 			DBG("ASHA start complete");
-+			asha_set_send_status(asha, true);
- 		} else {
- 			bt_asha_state_reset(asha);
- 			DBG("ASHA start failed");
- 		}
- 	} else if (asha->state == ASHA_STOPPING) {
- 		/* We reset our state, regardless */
- 		bt_asha_state_reset(asha);
- 		DBG("ASHA stop %s", status == 0 ? "complete" : "failed");
- 	}
- 
-@@ -348,12 +502,15 @@ bool bt_asha_probe(struct bt_asha *asha, struct gatt_db *db,
- 
- 	bt_uuid16_create(&asha_uuid, ASHA_SERVICE);
- 	gatt_db_foreach_service(db, &asha_uuid, foreach_asha_service, asha);
- 
- 	if (!asha->attr) {
- 		error("ASHA attribute not found");
- 		bt_asha_reset(asha);
- 		return false;
- 	}
- 
-+	if (!asha_devices)
-+		asha_devices = queue_new();
-+
- 	return true;
- }
-diff --git a/src/shared/asha.h b/src/shared/asha.h
-index c2c232fff..1a970e67a 100644
---- a/src/shared/asha.h
-+++ b/src/shared/asha.h
-@@ -40,20 +40,28 @@ struct bt_asha {
- 	uint8_t hisyncid[8];
- 	uint16_t render_delay;
- 	uint16_t codec_ids;
- 	int8_t volume;
- 
- 	enum bt_asha_state_t state;
- 	bt_asha_cb_t cb;
- 	void *cb_user_data;
- };
- 
-+struct bt_asha_set {
-+	uint8_t hisyncid[8];
-+	struct bt_asha *left;
-+	struct bt_asha *right;
-+};
-+
-+static struct queue *asha_devices;
-+
- struct bt_asha *bt_asha_new(void);
- void bt_asha_reset(struct bt_asha *asha);
- void bt_asha_state_reset(struct bt_asha *asha);
- void bt_asha_free(struct bt_asha *asha);
- 
- unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_cb_t cb,
- 							void *user_data);
- unsigned int bt_asha_stop(struct bt_asha *asha, bt_asha_cb_t cb,
- 							void *user_data);
- 
--- 
-2.48.1
-
+--===============0097031394861420450==--
