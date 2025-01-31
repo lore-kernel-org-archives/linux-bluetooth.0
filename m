@@ -1,125 +1,74 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E2F1EE7AA
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jan 2025 18:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D610B25760
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jan 2025 19:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738348188; cv=none; b=NB/ToZ3zHtSEtcxzeIfNBap39efWq+O5TchtYitm3E3tNtWY9Qd87BNWOto/CtKkgNcuSRNh9ktMucAoX3Rfi0AXyRgQQ5xVXK/0a3DSaw0FBjGGLedQLk7+3ji7UTWT4PfnDjXunnOY++3JEzou/1D9bdI6HU2cIdMC1MJ3KM0=
+	t=1738350607; cv=none; b=G+O4rttcG5THRdjSqEGkAJu0586OcQZyp8C+G7OpyfROBXDBBXzCugxhjMcgKnFc7u0pWBAWroPG9QSFETAPJFl6uOXAjLHxZ4UTNowdHao7oFM9XGNkIACbMewpUz9Eupy4WHceOq2T+gXcMKLKN5j4ZT0hwQ8YL55bQ//R6BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738348188; c=relaxed/simple;
-	bh=YBieZOI4usfor/Hwvutwqp/UUE4bvY6TEvY06vh7BR4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fKsOyqqXA+/JJGrMj9DHmjrxzBpTL2TZNFA3eCi2iMrq7zlR9hdLOyQ+s9hFIO2i413BO0FtI0Wg+Lz3inhrZ3uUqxbL/EJY30B4iAF50WDlBo3e0DSNZVc52QQeeLYJxKilXhq4V3MtbK8ldV5YIgHVLnjo363KTYlkS8WPr0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nfnHWDsT; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738350607; c=relaxed/simple;
+	bh=wJSxwfxB0/Sazf/bBsn1fmUcw6kWnZnqjHL2eVnS/Fs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZF0JDlXKXot8aYRM0otXLM5bEbwo8oFzk9ByQm0w14U0PqEk8OzAPDxmOw/jDI43flKGq8Qf6squbyv3T+fvlhv2x4E4CNeYkiaA4DcP1N00UCJNzx8wq8OmIp5WH4czzM2shixGNs5tQokdP9KkSZuaD3U7/QXlZuPkXt76IgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1vg0WPh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nfnHWDsT"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-844ce213af6so61711039f.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jan 2025 10:29:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738348185; x=1738952985; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=feRfK9lxl8hwfS4ayfaOWBstWdf8fYGjoFw3yTGzlmM=;
-        b=nfnHWDsTBeKWCi4f/me1ndmZWHvWJOOt/L2HTxoixoZNq/4fmaU4/iW7bYUS7US0ZO
-         Pfk5ezKb9/NJsNNj4Sv0DZuEERMtImX0951GpGs4M5EeFbA7/0URwQQeagAjclf1tBmm
-         Z1P1e1u7aUeuiXxDUNDP88LR7EFq/AfYYOEPrfS3xTv0P+aYypJTJOQ13gHwNdDNhHsT
-         artFV8/xybr35TMmfPvLuIRzM7NTQ2TdbpuEgDu54UP1S6uj8FeEHOEJPDFqmXxb2qnQ
-         Sa1QJV4vmhK4gK7oWTvyjrIF8Gt04EYssXqXsH4KGh/gErEPLk/zCC51EEqXYPPLKDBv
-         xAYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738348185; x=1738952985;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=feRfK9lxl8hwfS4ayfaOWBstWdf8fYGjoFw3yTGzlmM=;
-        b=Hc3tIQrmzE7Wf05jjnGb7Drlx2f2TZwMldXH0JFDweKoIPM717bbKH6ArKKgAeI4Jy
-         WmLz5LblIUgjLKNk+BbPEN5XRQMOvxb2KvHAmJcOA6rcXHZ+3BQnMp3y5hI8hJqplNFr
-         +FR+UE7iUa9obFtg2b/Z996MHF8lK7t/ZlxIZ6Xq6Zg48rMeo9BP1XRURGuWQ5qB/qqu
-         9IpL4hWikl2isAnMxkPlGx4ZwBb9Bix4aNrPdAMoqhtKImvHcmRFY2Lmyw1M4MZBxZRa
-         qfl+DkcArB4XzVqtpDAo4ovqsoNXNo+6j1uM1BKoQFUN7rw/35IJblq9+rIxU7ZDJgsF
-         wuUQ==
-X-Gm-Message-State: AOJu0Yyv1qGoeUI+7KoZ9trBTCITsoWLREovYvIPNKIrvGcgUIUYidrL
-	4PW1byPKBKxcfRtALac2Azzke+z6Uh6nNr7966TxACCyXh9EbGv7zGoutQ==
-X-Gm-Gg: ASbGncup+DYe1LZ42YC/A/Fu4I4vzURu7gda+vVkjD5zFc1XZDeIv/pczDRiU58IOGI
-	xRfDgUVfTLkrBZwpzEdJ37DtBzPaD51BlLm7T+5zhnQos6KMsWUwrSQ8oXASQph8EbdpxsNBmG2
-	yDSYB1vQPD7OG5F/G9bh9eMYiTiu9R4lRQxO449CGSy3CWstdkD3YcHv2a8p2Y2bRMz42I28CWd
-	PHjUqsYnXBuxthuapQS+F0tuY9HiKTbH2ToGjoTr2DmlaG7ukAz9V/eaB/5lud0nPsx79FjppOg
-	T7K57h07Ww6UxFfk3nBQ
-X-Google-Smtp-Source: AGHT+IFuKSTWUwsnSXOtAbIHObbpnMWK3C0Hr3pMXERlytVk1FPAbvLa/IFtDefCFvvHN7GSjD6ijw==
-X-Received: by 2002:a05:6602:6d02:b0:832:480d:6fe1 with SMTP id ca18e2360f4ac-854006e200bmr1123209039f.0.1738348185278;
-        Fri, 31 Jan 2025 10:29:45 -0800 (PST)
-Received: from [172.17.0.2] ([20.98.37.227])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ec746e3e63sm917730173.144.2025.01.31.10.29.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jan 2025 10:29:44 -0800 (PST)
-Message-ID: <679d1698.050a0220.1e8abc.1566@mx.google.com>
-Date: Fri, 31 Jan 2025 10:29:44 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5888536189251275253=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1vg0WPh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DCF8C4CED1;
+	Fri, 31 Jan 2025 19:10:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738350607;
+	bh=wJSxwfxB0/Sazf/bBsn1fmUcw6kWnZnqjHL2eVnS/Fs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=c1vg0WPhUN5QSke1iufJX5BUGklKt8reuDG9GH2zvfy94Z6Mx7ENmj1xf1qeFqy6Z
+	 I6kHSCfuUYU7/IdYtf8vX5QTIKuXIpUEkYKoC8J/flTTYpgHwtOY+CFIZweTOrUbSM
+	 heMeYKDkUlSd4oVtnNsPj20O9D3bxnqkZdBgU9y8muZU1K7v2o82pHrEIa1DQR3EBI
+	 khr0p1hKP5bHFjoMWl10jJcurRHpkt/MiNFSEfPQ3QTMF0zgzMOUUD+S56VBgRtE21
+	 9T4OOpjlgJDTL9OxsEOKjuSbLc0CbUz+rUEJ0RhdUxQ0C5C0lmPO/0WZIEc4g4O2fw
+	 hIHcOd/3s3oXg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB7E7380AA7D;
+	Fri, 31 Jan 2025 19:10:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] build: Remove AMP related functionality
-In-Reply-To: <20250131171759.1642480-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] build: Remove AMP related functionality
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173835063375.1699357.17130505305402421984.git-patchwork-notify@kernel.org>
+Date: Fri, 31 Jan 2025 19:10:33 +0000
 References: <20250131171759.1642480-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20250131171759.1642480-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
---===============5888536189251275253==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Fri, 31 Jan 2025 12:17:59 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> High Speed, Alternate MAC and PHY (AMP) extension, has been removed from
+> Bluetooth Core specification on 5.3:
+> 
+>     https://www.bluetooth.com/blog/new-core-specification-v5-3-feature-enhancements/
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=929557
+Here is the summary with links:
+  - [BlueZ,v1] build: Remove AMP related functionality
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1474c11618bc
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.19 seconds
-GitLint                       PENDING   0.23 seconds
-BuildEll                      PASS      20.30 seconds
-BluezMake                     PASS      1474.04 seconds
-MakeCheck                     PASS      13.10 seconds
-MakeDistcheck                 PASS      159.94 seconds
-CheckValgrind                 PASS      215.76 seconds
-CheckSmatch                   PASS      272.65 seconds
-bluezmakeextell               PASS      98.31 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      864.78 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5888536189251275253==--
