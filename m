@@ -1,255 +1,332 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775D81F1526
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 21:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A3E1A08A8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jan 2025 10:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738273022; cv=none; b=T41l7IG2kQEyhyRLfNQXCn0ElfXoOU0dcxZBneAuFaSFoAglyanCnWcA3UXA8Z+whtY2rEzlXHWZFF+NYtYZbFaX1VTcqXuyMxFCeukjvtTBoEpUNUsyZ6/Yk1fTW5CqIodRkAx3+Fl8sFZXS7TjhCox2nTbXamGDp6V4PsbPc4=
+	t=1738319046; cv=none; b=kdCClfcWdOGqGpz0Da/qx954nJ/AKrbb1xhTC7/FchIUgYWCH+FsLr+1SP8ebJEgiUkKhGL2GPsJOBw2cmMQKR3jT36uF6zPsBRwOFsZhlFp3uSp13fyklqjf/u5U5poaFwfsGlGFQOGbZxjJjIukLW5bEbURx889W0EXhE4VJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738273022; c=relaxed/simple;
-	bh=h1V9j9t9KmUF53R8ZNVk9Yn2fYA8mADqv41wbqdtlW4=;
+	s=arc-20240116; t=1738319046; c=relaxed/simple;
+	bh=voqM6WmLX6xk8ADXCQlYDoh/yTYHiieG52DBNCR2a90=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ELk7aWRyk7T6DiX5mrulRNgp6pjzm+nqbCNs6hZTqRXxnVybO71g68xbS/q2/DEQf5kv1+VNJge1IJZgRK6/Y0fiB3a1DNWKp+9PD/hLDjx90drMDsGA0+hsvVs11sZmZNecO+bqsUciQq9dC811KLYzxVXCC1qXpUVr+2ZuMAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jinzfxnS; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=TD2sCHn9UOsCObPD0xHF+o5A6rwrfRO2XhtsdWhC2jprPw/nXdB0WZ6FgQla65jzUao/2LjYKXCMuRbOj+zv8XdCGO2jc8qXNPriHW2bp+hCHTK5ENwgb17VNLqFpQma+2WoEzzmT6NMTpgSJDqE2Z44cvuvqKlYioI8Pj9VNy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K9HhTJ5L; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jinzfxnS"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-30761be8fcfso12764821fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2025 13:37:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K9HhTJ5L"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e5addb0eb8eso358769276.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jan 2025 02:24:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738273018; x=1738877818; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738319044; x=1738923844; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xEz1R3Azjh+kelfEv/38BRpHbGuGVYbu6BqFLa+SFFA=;
-        b=jinzfxnSwP0e+CVNIk/2BNu0UblncQQ9RAQPB+h3/u4KihSU7tt1TSpUWbmSr7ViGN
-         JBx6/o2xCgbRzm/8jOCljcYjBN5tJp8nN3exP23ZyEJbYW4GyRik4lN+qy3iSwrbaa5z
-         UoY610Z8jE9yKHXsRsLnp6Jn/rko121F7//IHhClQmAMmhbooDrEaoz9PNmY9pxnOV7L
-         EZrySCfkbaOHeqpIMnutgKqsMRp/htIIwb41nisduClYOjK9Qi9TnMvF7WfOv6S12sWh
-         Xg0B5v950WfU1mtDmXMiuCcwC3mk/KVhV9Fzt7wImScVKt9dwgpJPr8XYBh+raA5gbXA
-         OEyA==
+        bh=j8t9eayVooAqw0aTM2ypHgHw6H1UFf5cda0M6T4xZHg=;
+        b=K9HhTJ5L4Z8NlEXHEWqy9y3Q5NvX91IhHCkpf1LAaUcxgX/yDnfnU6qVSElD3211pa
+         4DG5SRa0DoiSMDYFJPP7KlzNICkE7ZYkWZuRKOrZbmtQajwomZ25tfG8lI1zg4lzxLcn
+         C+U8wy04AxVIuRAzKcXmtBJ9/HCl/va1oixfAufkznpUTxIRWQP5ZJH87OcY8WgriXou
+         GrWKrGJFEdnNELFStfDVdmy+pGFNBF1FYwrlxJ+mNyEfhr+PjMGnQK3byr/4QFOy0QxD
+         egd2QjwAUYdxCFb0YN0jZYnw1rWbEIlIt2kzxhJ5E+xuqokWBygDPp5J+Ok4/VurOyZx
+         lrQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738273018; x=1738877818;
+        d=1e100.net; s=20230601; t=1738319044; x=1738923844;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xEz1R3Azjh+kelfEv/38BRpHbGuGVYbu6BqFLa+SFFA=;
-        b=OPeuZTAA9sxO5HpDOwT2ykpDIENuA8HvjfFKeIZ6CMP2BtElbJCuVNqZ45WYH3EdMj
-         GIWDY7ICGNBSEm1swIbADNCdCZR7QUpPRLu8m7Ie+D/IdMlbq68rSj1nw0QZs2pWTDc5
-         ydPXYM00cLCyLX9armpadFLyBB0TsnQmysV3lYESfabcvrfvyNFEw9S0rcBYHX7C5M4t
-         OjoimeCeVVQQhz36ebbsiTVHDudMkS1ipDy1NYpn1G5JJ89UTobNvq1dGDxasjvIg6GG
-         03ZXjJQktJf5tbFw6kx2vlr+99z1TTr/X4x957MUWOSvqe46/DAvajNzZCkcCi6NZ5pI
-         cjDQ==
-X-Gm-Message-State: AOJu0YzluAiNPigJpNsB9S4eRus5oIixuPnopzZ+rrC6OJi5agfzLvMH
-	PEsZGV/7VaGj7MqPYhdLPMOIytsLyDuJFV7vHoOZCZw9esfLL8Vn6l6/y9tVuMHoY3qRxByDcIg
-	cIsZmOjhhppgO3SKxulq2yEy8yyHYQ/fL
-X-Gm-Gg: ASbGncv/WzhkFIxG0POGbSatadxt/bNleTP0RVDaMr3SOq349e+LH0JBvuFxkHnXbRp
-	PAiI0+oIqCZnNAltbQ2g3zlsm9qgZODYx7XdVq/6MHW2XPJdNn2jEXPDNbY1xtduSwad8M15EXw
+        bh=j8t9eayVooAqw0aTM2ypHgHw6H1UFf5cda0M6T4xZHg=;
+        b=jVK0duS3UlgAvYQttfwgIQxrDR9LpPjHMmIseWFi37JtMtmve4H3OGFCRrxkvxFJrg
+         /yrGKbL3AozcXIqaC/KCaPKwGVCCr2a75D5LyLmwPgDsmbg8m8AEJ+5w7OYfKm76Qh5h
+         rm00uZI1Nan0IG7ZnpMtp+zC7Tla2+Z1H7cECj5iw643RrOac3+j0tn88CnekgENECRN
+         +QtqupjMww8Kq2L7E3gQaTk1gIXVX+3lNvyfIl+RjBRVnMvGB9Vl7aip+E+WJGDOOYgh
+         d47h6XjknWzxBn+x+MLq00MIz4S6RDY45EcfQuJjgM1vVYOtgKGM2mWDZ3/w51XqjCJF
+         KlGA==
+X-Gm-Message-State: AOJu0YxCmn+egsMUeUn8l2IZLocMJ3wV9Ebdtn+JIcEVa/2ZC/Huo3ig
+	NaaumS0dY2wTp/pQ/GyIlpLWw2pgju2/trZhzUPX2GsSpFram7Es+W/NZ6O4p1qibWVewZxTtL7
+	XiYopLNPhFXgDiRJsDcExxrPzqBMTcj1WAgLR
+X-Gm-Gg: ASbGncuUm2UXwRoIBBEJR/0D1RE+CBEYUU+Yu3tnplpY1kbLEgrvnC5UUcujOwJMuM9
+	PhR+bpyGUVhWO/2jfetU4iSSWWW5dWlBmbi2s0QzsMSmRfGAf9K52AQXpuKiXAr+qTpOZKr5OPQ
 	==
-X-Google-Smtp-Source: AGHT+IEgeLIUWK7q9IW8APJS5C/vAidH0NNzxt0MMr30mCG7FsuWtEtA/PFVwWN2OaxbPxD/D1IU+qHQa7f87bw4REc=
-X-Received: by 2002:a05:651c:b0e:b0:300:7f87:a6a with SMTP id
- 38308e7fff4ca-307968b86f0mr31803421fa.7.1738273018157; Thu, 30 Jan 2025
- 13:36:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGNlM90eo6Ac+mrXIQPMdixVoITPynenNrrm+OHTZY6jkoKERSo/jQVF5mvN11m+hOYB8/I/nI4ILZ0BA4FNm4=
+X-Received: by 2002:a05:6902:18d5:b0:e58:148c:ea39 with SMTP id
+ 3f1490d57ef6-e58a492f78fmr8470689276.0.1738319043812; Fri, 31 Jan 2025
+ 02:24:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250128174327.1477546-1-quic_amisjain@quicinc.com>
- <CABBYNZL-26H=BuJvPbrqF8oswWiGWxiX8atNdt5ULYt5Xs3VgA@mail.gmail.com> <9c3b4bf424904d30888ec68677696cc3@quicinc.com>
-In-Reply-To: <9c3b4bf424904d30888ec68677696cc3@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 30 Jan 2025 16:36:46 -0500
-X-Gm-Features: AWEUYZlWx94IrYm_VRn0uuAVNGJ8w-pWNP6pQwJzN4prT_y3Rqh2vghOXEJL1E0
-Message-ID: <CABBYNZ+gaab9B3Yq15H4VB7M9=n6si4aM33TE-tBk++TQPDqCQ@mail.gmail.com>
-Subject: Re: [PATCH v1] obex: Add supported features tag in MAP Client Connect Request
-To: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>, "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>, 
-	"Anubhav Gupta (QUIC)" <quic_anubhavg@quicinc.com>
+References: <20250122131925.v2.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com>
+ <CADg1FFdt2mQsN4YjLTn=zp_+MahopN371EDiXQEbp+GTSaNtBg@mail.gmail.com>
+ <CABBYNZJ__OMJZtEE0BFpaUdKPQv+Ym-OnsJj-kN=i_gZCeVN5w@mail.gmail.com> <CABBYNZ+aEpJNnz1OSAeqOxFf4s2AbvoRC+FJcRS6y5+g0Mmu+g@mail.gmail.com>
+In-Reply-To: <CABBYNZ+aEpJNnz1OSAeqOxFf4s2AbvoRC+FJcRS6y5+g0Mmu+g@mail.gmail.com>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Fri, 31 Jan 2025 18:23:36 +0800
+X-Gm-Features: AWEUYZlvBhUKG1FGwUwM5DkxBWCAXF4Ltd6iMA4miIJd4zr0fe5wCm9YaaV28XE
+Message-ID: <CADg1FFfhwAFD+mthx3qw_ZUtt6=1Y6pR+jX7+etwMhQFX9Ja+w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] Bluetooth: Fix possible race with userspace of
+ sysfs isoc_alt
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Amisha,
+Hi Luiz,
 
-On Thu, Jan 30, 2025 at 2:38=E2=80=AFPM Amisha Jain (QUIC)
-<quic_amisjain@quicinc.com> wrote:
+Good point. Although the sysfs-bus-usb API only supports reading
+rather than writing the alt setting, I'll look for the opportunity to
+configure it through libusb first.
+
+Thanks
+
+On Sat, Jan 25, 2025 at 12:06=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Hi Luiz,
+> Hi Hsin-chen,
 >
-> > -----Original Message-----
-> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Sent: Tuesday, January 28, 2025 11:20 PM
-> > To: Amisha Jain (QUIC) <quic_amisjain@quicinc.com>
-> > Cc: linux-bluetooth@vger.kernel.org; Mohammed Sameer Mulla (QUIC)
-> > <quic_mohamull@quicinc.com>; Harish Bandi (QUIC)
-> > <quic_hbandi@quicinc.com>; Anubhav Gupta (QUIC)
-> > <quic_anubhavg@quicinc.com>
-> > Subject: Re: [PATCH v1] obex: Add supported features tag in MAP Client
-> > Connect Request
+> On Fri, Jan 24, 2025 at 10:54=E2=80=AFAM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
 > >
-> > Hi Amisha,
+> > Hi Hsin-chen,
 > >
-> > On Tue, Jan 28, 2025 at 12:43=E2=80=AFPM Amisha Jain <quic_amisjain@qui=
-cinc.com>
-> > wrote:
+> > On Wed, Jan 22, 2025 at 11:57=E2=80=AFPM Hsin-chen Chuang <chharry@goog=
+le.com> wrote:
 > > >
-> > > This change is required for below PTS testcase -
+> > > Hi Luiz,
 > > >
-> > > 1. MAP/MCE/MFB/BV-06-C
-> > > Verify that the MCE sends its MapSupportedFeatures in the OBEX Connec=
-t
-> > > request if the MSE declares support for the feature
-> > > MapSupportedFeatures in Connect Request in its SDP record.
+> > > On Thu, Jan 23, 2025 at 3:35=E2=80=AFAM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > Hi Hsin-chen,
+> > > >
+> > > > On Wed, Jan 22, 2025 at 12:20=E2=80=AFAM Hsin-chen Chuang <chharry@=
+google.com> wrote:
+> > > > >
+> > > > > From: Hsin-chen Chuang <chharry@chromium.org>
+> > > > >
+> > > > > Use device group to avoid the racing. To reuse the group defined =
+in
+> > > > > hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
+> > > > > read_usb_alt_setting which are only registered in btusb.
+> > > > >
+> > > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to co=
+ntrol USB alt setting")
+> > > > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > > > > ---
+> > > > >
+> > > > > (no changes since v1)
+> > > > >
+> > > > >  drivers/bluetooth/btusb.c        | 42 ++++++++------------------=
+------
+> > > > >  include/net/bluetooth/hci_core.h |  2 ++
+> > > > >  net/bluetooth/hci_sysfs.c        | 33 +++++++++++++++++++++++++
+> > > > >  3 files changed, 45 insertions(+), 32 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.=
+c
+> > > > > index 75a0f15819c4..bf210275e5b7 100644
+> > > > > --- a/drivers/bluetooth/btusb.c
+> > > > > +++ b/drivers/bluetooth/btusb.c
+> > > > > @@ -2221,6 +2221,13 @@ static int btusb_switch_alt_setting(struct=
+ hci_dev *hdev, int new_alts)
+> > > > >         return 0;
+> > > > >  }
+> > > > >
+> > > > > +static int btusb_read_alt_setting(struct hci_dev *hdev)
+> > > > > +{
+> > > > > +       struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > > > > +
+> > > > > +       return data->isoc_altsetting;
+> > > > > +}
+> > > > > +
+> > > > >  static struct usb_host_interface *btusb_find_altsetting(struct b=
+tusb_data *data,
+> > > > >                                                         int alt)
+> > > > >  {
+> > > > > @@ -3650,32 +3657,6 @@ static const struct file_operations force_=
+poll_sync_fops =3D {
+> > > > >         .llseek         =3D default_llseek,
+> > > > >  };
+> > > > >
+> > > > > -static ssize_t isoc_alt_show(struct device *dev,
+> > > > > -                            struct device_attribute *attr,
+> > > > > -                            char *buf)
+> > > > > -{
+> > > > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> > > > > -
+> > > > > -       return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
+> > > > > -}
+> > > > > -
+> > > > > -static ssize_t isoc_alt_store(struct device *dev,
+> > > > > -                             struct device_attribute *attr,
+> > > > > -                             const char *buf, size_t count)
+> > > > > -{
+> > > > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> > > > > -       int alt;
+> > > > > -       int ret;
+> > > > > -
+> > > > > -       if (kstrtoint(buf, 10, &alt))
+> > > > > -               return -EINVAL;
+> > > > > -
+> > > > > -       ret =3D btusb_switch_alt_setting(data->hdev, alt);
+> > > > > -       return ret < 0 ? ret : count;
+> > > > > -}
+> > > > > -
+> > > > > -static DEVICE_ATTR_RW(isoc_alt);
+> > > > > -
+> > > > >  static int btusb_probe(struct usb_interface *intf,
+> > > > >                        const struct usb_device_id *id)
+> > > > >  {
+> > > > > @@ -4040,9 +4021,8 @@ static int btusb_probe(struct usb_interface=
+ *intf,
+> > > > >                 if (err < 0)
+> > > > >                         goto out_free_dev;
+> > > > >
+> > > > > -               err =3D device_create_file(&intf->dev, &dev_attr_=
+isoc_alt);
+> > > > > -               if (err)
+> > > > > -                       goto out_free_dev;
+> > > > > +               hdev->switch_usb_alt_setting =3D btusb_switch_alt=
+_setting;
+> > > > > +               hdev->read_usb_alt_setting =3D btusb_read_alt_set=
+ting;
+> > > > >         }
+> > > > >
+> > > > >         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+> > > > > @@ -4089,10 +4069,8 @@ static void btusb_disconnect(struct usb_in=
+terface *intf)
+> > > > >         hdev =3D data->hdev;
+> > > > >         usb_set_intfdata(data->intf, NULL);
+> > > > >
+> > > > > -       if (data->isoc) {
+> > > > > -               device_remove_file(&intf->dev, &dev_attr_isoc_alt=
+);
+> > > > > +       if (data->isoc)
+> > > > >                 usb_set_intfdata(data->isoc, NULL);
+> > > > > -       }
+> > > > >
+> > > > >         if (data->diag)
+> > > > >                 usb_set_intfdata(data->diag, NULL);
+> > > > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluet=
+ooth/hci_core.h
+> > > > > index f756fac95488..5d3ec5ff5adb 100644
+> > > > > --- a/include/net/bluetooth/hci_core.h
+> > > > > +++ b/include/net/bluetooth/hci_core.h
+> > > > > @@ -641,6 +641,8 @@ struct hci_dev {
+> > > > >                                      struct bt_codec *codec, __u8=
+ *vnd_len,
+> > > > >                                      __u8 **vnd_data);
+> > > > >         u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_b=
+uff *skb);
+> > > > > +       int (*switch_usb_alt_setting)(struct hci_dev *hdev, int n=
+ew_alts);
+> > > > > +       int (*read_usb_alt_setting)(struct hci_dev *hdev);
+> > > > >  };
+> > > > >
+> > > > >  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
+> > > > > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.=
+c
+> > > > > index 041ce9adc378..887aa1935b1e 100644
+> > > > > --- a/net/bluetooth/hci_sysfs.c
+> > > > > +++ b/net/bluetooth/hci_sysfs.c
+> > > > > @@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *de=
+v, struct device_attribute *attr,
+> > > > >  }
+> > > > >  static DEVICE_ATTR_WO(reset);
+> > > > >
+> > > > > +static ssize_t isoc_alt_show(struct device *dev,
+> > > > > +                            struct device_attribute *attr,
+> > > > > +                            char *buf)
+> > > > > +{
+> > > > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> > > > > +
+> > > > > +       if (hdev->read_usb_alt_setting)
+> > > > > +               return sysfs_emit(buf, "%d\n", hdev->read_usb_alt=
+_setting(hdev));
+> > > > > +
+> > > > > +       return -ENODEV;
+> > > > > +}
+> > > > > +
+> > > > > +static ssize_t isoc_alt_store(struct device *dev,
+> > > > > +                             struct device_attribute *attr,
+> > > > > +                             const char *buf, size_t count)
+> > > > > +{
+> > > > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> > > > > +       int alt;
+> > > > > +       int ret;
+> > > > > +
+> > > > > +       if (kstrtoint(buf, 10, &alt))
+> > > > > +               return -EINVAL;
+> > > > > +
+> > > > > +       if (hdev->switch_usb_alt_setting) {
+> > > > > +               ret =3D hdev->switch_usb_alt_setting(hdev, alt);
+> > > > > +               return ret < 0 ? ret : count;
+> > > > > +       }
+> > > > > +
+> > > > > +       return -ENODEV;
+> > > > > +}
+> > > > > +static DEVICE_ATTR_RW(isoc_alt);
+> > > > > +
+> > > > >  static struct attribute *bt_host_attrs[] =3D {
+> > > > >         &dev_attr_reset.attr,
+> > > > > +       &dev_attr_isoc_alt.attr,
+> > > > >         NULL,
+> > > > >  };
+> > > > >  ATTRIBUTE_GROUPS(bt_host);
+> > > >
+> > > > While this fixes the race it also forces the inclusion of an attrib=
+ute
+> > > > that is driver specific, so I wonder if we should introduce some
+> > > > internal interface to register driver specific entries like this.
 > > >
-> > > If Server's SDP record contains the field 'MapSupportedFeatures in
-> > > Connect Request' as supported then include the supported features tag
-> > > in obex connect request.
+> > > Do you mean you prefer the original interface that only exports the
+> > > attribute when isoc_altsetting is supported?
+> > > Agree it makes more sense but I hit the obstacle: hci_init_sysfs is
+> > > called earlier than data->isoc is determined. I need some time to
+> > > verify whether changing the order won't break anything.
 > >
-> > Can you include the btmon output with and without?
+> > We might have to do something like the following within hci_init_sysfs:
 > >
-> btmon output does not captures obex packet so adding snoop packet -
-
-Hmm, seems you are right, we only had it for hcidump not btmon.
-
-> Obex Connect request with this change -
-> OBEX
->         Role: Central
->         Address: 0
->         Packet Status: Final Packet
->         Opcode: Connect
->         Length: 35
->         OBEX Version Number: 0x10
->         flags
->         Maximum Packet Length: 1800
->         Target
->                 Header Encoding: Byte Sequence
->                 Header ID: Target
->                 Length: 19
->                 Target: MAS
->         Application Parameters
->                 Header Encoding: Byte Sequence
->                 Header ID: Application Parameters
->                 Length: 9
->                 Parameter
->                         Tag: Map Supported Features
->                         Length: 4
->                         Value
->                                 : Messages-Listing Format Version 1.1
->                                 : Extended Event Report 1.1
->                                 : Instance Information Feature
->                                 : Delete Feature
->                                 : Uploading Feature
->                                 : Browsing Feature
->                                 : Notification Feature
->                                 : Notification Registration Feature
+> > if (hdev->isoc_alt)
+> >     dev->type =3D bt_host_isoc_alt
+> > else
+> >     dev->type =3D bt_host
+> >
+> > Now perhaps instead of adding the callbacks to hdev we add the
+> > attribute itself, btw did you check if there isn't a sysfs entry to
+> > interact with USB alternate settings? Because contrary to reset this
+> > actually operates directly on the driver bus so it sort of made more
+> > sense to me that this would be handled by USB rather than Bluetooth.
 >
-> Obex Connect request without this change -
-> OBEX
->         Role: Central
->         Address: 0
->         Packet Status: Final Packet
->         Opcode: Connect
->         Length: 26
->         OBEX Version Number: 0x10
->         flags
->         Maximum Packet Length: 1800
->         Target
->                 Header Encoding: Byte Sequence
->                 Header ID: Target
->                 Length: 19
->                 Target: MAS
-
-Please include this info as part of the patch description.
-
-> > > ---
-> > >  obexd/client/map.c | 19 +++++++++++++++++++
-> > >  1 file changed, 19 insertions(+)
-> > >
-> > > diff --git a/obexd/client/map.c b/obexd/client/map.c index
-> > > b8820335b..2fd0f74ec 100644
-> > > --- a/obexd/client/map.c
-> > > +++ b/obexd/client/map.c
-> > > @@ -39,6 +39,7 @@
-> > >  #define OBEX_MAS_UUID \
-> > >
-> > "\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
-> > >  #define OBEX_MAS_UUID_LEN 16
-> > > +#define SUPPORTED_FEATURES_TAG  0x29
-> > >
-> > >  #define MAP_INTERFACE "org.bluez.obex.MessageAccess1"
-> > >  #define MAP_MSG_INTERFACE "org.bluez.obex.Message1"
-> > > @@ -2179,6 +2180,23 @@ static void parse_service_record(struct
-> > map_data *map)
-> > >                 map->supported_features =3D 0x0000001f;  }
-> > >
-> > > +static void *map_supported_features(struct obc_session *session) {
-> > > +       const void *data;
-> > > +
-> > > +       /* Supported Feature Bits */
-> > > +       data =3D obc_session_get_attribute(session,
-> > > +                                       SDP_ATTR_MAP_SUPPORTED_FEATUR=
-ES);
-> > > +       if (!data)
-> > > +               return NULL;
-> > > +
-> > > +       if(*(uint32_t *)data & 0x00080000)
-> > > +               return g_obex_apparam_set_uint32(NULL,
-> > SUPPORTED_FEATURES_TAG,
-> > > +                               0x0000027f);
-> >
-> > Don't think it is safe to check the data like above, we don't know if f=
-ield
-> > returned is really 32 bits, perhaps it would be a good idea to introduc=
-e
-> > something like obc_session_get_attribute_le32 that would ensure the val=
-ue is
-> > really 32 bits and also check its little/big endian in the process.
-> >
+> A quick git grep shows that this exists:
 >
-> As per the BT Spec, 32 bits field is reserved for 'MapSupportedFeatures' =
-attribute in SDP record. So, it will be always 32 bits. Each bit correspond=
-s to each feature. If any feature is not supported then that bit will be ze=
-ro.
-
-First 32 bits is not a proper format without us knowing in what byte
-order it is, second we need to actually check the attribute is
-correctly formatted and properly do it matches the expected size, now
-perhaps you are saying that is our own SDP record we are talking
-about, but that doesn't change the fact that there should be checks to
-make sure we don't access invalid memory if something goes wrong.
-
+> Documentation/ABI/testing/sysfs-bus-usb:What:
+> /sys/bus/usb/devices/usbX/bAlternateSetting
 >
-> > > +
-> > > +       return NULL;
-> > > +}
-> > > +
-> > >  static int map_probe(struct obc_session *session)  {
-> > >         struct map_data *map;
-> > > @@ -2224,6 +2242,7 @@ static struct obc_driver map =3D {
-> > >         .uuid =3D MAS_UUID,
-> > >         .target =3D OBEX_MAS_UUID,
-> > >         .target_len =3D OBEX_MAS_UUID_LEN,
-> > > +       .supported_features =3D map_supported_features,
-> > >         .probe =3D map_probe,
-> > >         .remove =3D map_remove
-> > >  };
-> > > --
-> > > 2.34.1
-> > >
-> > >
+> > > >
+> > > > > --
+> > > > > 2.48.1.262.g85cc9f2d1e-goog
+> > > > >
+> > > >
+> > > >
+> > > > --
+> > > > Luiz Augusto von Dentz
+> >
 > >
 > >
 > > --
 > > Luiz Augusto von Dentz
 >
-> Thanks,
-> Amisha
-
-
-
---=20
-Luiz Augusto von Dentz
+>
+>
+> --
+> Luiz Augusto von Dentz
