@@ -1,61 +1,116 @@
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB5E1581EE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jan 2025 11:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CFA1B4145
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 Jan 2025 13:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738322191; cv=none; b=i+GadUtLSjZ2ATR9OiZpyHGHppvzT+6pKOHaJXcgvwcTCCHhR/z0y45fpknobepbFelulyXh09o93sHPWKQcLb/jzNupZcdGX023h7hzy5ERXul5K/SSjRuPTqToiE7Vcqoy42CT5gweB7t0hKR0EXjH+CIfGBwEGDkeCJoHPd0=
+	t=1738328428; cv=none; b=A4qTM4YXytoJ9GfyUjmf+wPrcielufhs6l6/wTLuhPBc3T5EVXx7zTsUNoIbD6r8f6Ea2CYMqyyGvShu4r+9ESPwdYlHrgPfTuGUfPFhj+Ei8PTuVdvWImia1JeU/vhRqsPs4Cggv5yfI2UWfANqMVW24kOqFyegpBU00GiFDag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738322191; c=relaxed/simple;
-	bh=PdZEoTRNq5jbP8lSPsBMJ8L4O5s0YHxovyiBKgkWJ1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KMA1BIVnZsg4at1c33SEPXEcaNuIi0ykTpSjRvevsTK5sUEr6seJm45ndKkSUTNmJymN2QiwMf/udZ/a/EyV8K6hhpbRQjexgF3W6V97UUEeA/qL5NPd7OuTXQ1NXwi+Lo6IvqAtCBvIUte/l2+NJAtTFSJzzohhQuajKgbFoZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=IBUegPIP; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+	s=arc-20240116; t=1738328428; c=relaxed/simple;
+	bh=CYMUD0Xj9jz4LOcpSxxXu5C9B/Bb1PhxJyI0BWN4kL4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EjeNMZxxLYXy0nohzk1zKala0OvK/ayD2iM+MMOtTttLwXgolgW1hIEClZ0wSQFqAVPcKRj9+RmwG8Ct2nYUmIKgC+9sySVsPMYrH9GyAje2kXMQbkaOK6OD/Eziz9nwU/EVSqN6H1HObDKuymc39xW4/ys0FK7fy15E1DQRnT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ER7lUCvP; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="IBUegPIP"
-Received: from fpc (unknown [5.228.116.177])
-	by mail.ispras.ru (Postfix) with ESMTPSA id A062540769D5;
-	Fri, 31 Jan 2025 11:16:24 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru A062540769D5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1738322184;
-	bh=3haojVuKmr+YPpWr0/WnmkpVRPb2fJ2PPUQ7v55yse4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IBUegPIPEwbDe2/sw4HL6j9nUEh5LqsGD+GhceXw8BhjHIk++cyYRdNRF7bVqnw5l
-	 gekfvE0YOynmjybh7/PXDOtmwl5obXFeWVcsSiIGxFRitAcwDckUI8y+rekGCOKLpx
-	 5tCAB9AWHNeXkDCgMZ5dP8j1jQiSBueruJttMOlU=
-Date: Fri, 31 Jan 2025 14:16:19 +0300
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: patchwork-bot+bluetooth@kernel.org, linux-bluetooth@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH BlueZ v2 1/2] audio: actually try to enable MTU
- auto-tuning
-Message-ID: <20250131-00ce5ea414812708056d347d-pchelkin@ispras.ru>
-References: <20250129084950.41987-1-pchelkin@ispras.ru>
- <173825823449.1027237.5797702882442522177.git-patchwork-notify@kernel.org>
- <CABBYNZKm+xj4wmuzBgCjJq4genR73a6Gj-C1uvGHW3MiNdHNSw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ER7lUCvP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738328427; x=1769864427;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CYMUD0Xj9jz4LOcpSxxXu5C9B/Bb1PhxJyI0BWN4kL4=;
+  b=ER7lUCvPz6fXT23gZ4TziDsmDIpkdF1lNRBVC0dq/43NgkCfPxveeftk
+   Jdy9e8qlgAiUN+dDQwqkWvr7d86/a3GBW7vPkC1IE2yQXim95hsWxO541
+   zTrQfv6d8IG3UEK7yCutD1oduOq75rUJa+3/h+A+tMET9dOgDuL8dprrQ
+   zpyZsEY7VKoQqrr1rSjBzu3HmfEflRjtFLUliJvh+cuCAtjvstMHKCBp6
+   hn3MbJW/GZl+97tDY70pvQpxcR3bWVu/zouFfcCheNOCVA6i7BviR1lBu
+   zUfamPaJDWoWdd7GOLtrMTjtPqEgy+Ie/rB86gTslwz5XzWVVrEq9SMQ2
+   Q==;
+X-CSE-ConnectionGUID: +h+Gh9XgQDKwVnbcsG05Yg==
+X-CSE-MsgGUID: a2kNuckGQyOQfDwM8h91Jg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11332"; a="38600201"
+X-IronPort-AV: E=Sophos;i="6.13,248,1732608000"; 
+   d="scan'208";a="38600201"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2025 05:00:26 -0800
+X-CSE-ConnectionGUID: 9En2pnjKSB+EUv0YnwhLzA==
+X-CSE-MsgGUID: RM1YXAKkQqqAt3EtOeX9jw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,248,1732608000"; 
+   d="scan'208";a="114618402"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa004.jf.intel.com with ESMTP; 31 Jan 2025 05:00:24 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>,
+	Bjorn Helgaas <helgaas@kernel.org>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Fix a potential race condition
+Date: Fri, 31 Jan 2025 18:30:19 +0530
+Message-ID: <20250131130019.1648758-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CABBYNZKm+xj4wmuzBgCjJq4genR73a6Gj-C1uvGHW3MiNdHNSw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, 30. Jan 12:51, Luiz Augusto von Dentz wrote:
-> > Here is the summary with links:
-> >   - [BlueZ,v2,1/2] audio: actually try to enable MTU auto-tuning
-> >     (no matching commit)
-> 
-> Ive done quite a few modifications to the above change, so instead of
-> using a auto_mtu it now checks if -1 for not set, Ive checked with a
-> couple headsets I have and it seem to work fine but perhaps you want
-> to check as well just to make sure I didn't screw something up.
+On HCI_OP_RESET command, firmware raises alive interrupt. Driver needs
+to wait for this before sending other command. This patch fixes the potential
+miss of alive interrupt due to which HCI_OP_RESET can timeout.
 
-It works okay for my setup, too. Thanks!
+Expected flow:
+If tx command is HCI_OP_RESET,
+  1. set data->gp0_received = false
+  2. send HCI_OP_RESET
+  3. wait for alive interrupt
+
+Actual flow having potential race:
+If tx command is HCI_OP_RESET,
+ 1. send HCI_OP_RESET
+   1a. Firmware raises alive interrupt here and in ISR
+       data->gp0_received  is set to true
+ 2. set data->gp0_received = false
+ 3. wait for alive interrupt
+
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Fixes: 05c200c8f029 ("Bluetooth: btintel_pcie: Add handshake between driver and firmware")
+Reported-by: Bjorn Helgaas <helgaas@kernel.org>
+Closes: https://patchwork.kernel.org/project/bluetooth/patch/20241001104451.626964-1-kiran.k@intel.com/
+---
+ drivers/bluetooth/btintel_pcie.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 63eca52c0e0b..b8b241a92bf9 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1321,6 +1321,10 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
+ 			if (opcode == 0xfc01)
+ 				btintel_pcie_inject_cmd_complete(hdev, opcode);
+ 		}
++		/* Firmware raises alive interrupt on HCI_OP_RESET */
++		if (opcode == HCI_OP_RESET)
++			data->gp0_received = false;
++
+ 		hdev->stat.cmd_tx++;
+ 		break;
+ 	case HCI_ACLDATA_PKT:
+@@ -1358,7 +1362,6 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
+ 			   opcode, btintel_pcie_alivectxt_state2str(old_ctxt),
+ 			   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
+ 		if (opcode == HCI_OP_RESET) {
+-			data->gp0_received = false;
+ 			ret = wait_event_timeout(data->gp0_wait_q,
+ 						 data->gp0_received,
+ 						 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+-- 
+2.43.0
+
