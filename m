@@ -1,134 +1,280 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425A314A0A4
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Feb 2025 12:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738414069; cv=none; b=hw/G6sNwmEQH8EjJxV4Wg1Xm1R3Ygynj9WmasZV2rPJlOL9+F2wxg7akFlaZnqDebNcAKPRvfaAe8y94XJJX69c0BF58vAysTWOXlEOM3eJ9icFh/Ttt/0nszROYXViWnUC3CBb6U/ktalWxpZpgxS8fT85+yf3pEdZbZFch/aY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738414069; c=relaxed/simple;
-	bh=4RZ7OWUNYW5slaMOvnaTZEv0LT0QnKX108Pvk3JR9fI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kfrJ0lxVWH1QjDVtDwVX209RhyuZ11sLWBI9e+xoTpTBuXQtMtLf0SmeKQwt20rm7uqJO0bLQXoQXId56gUvK++PvXo7CUE0BsJf/oPCs5ifDltz5BssJhl/i5USDmea5B9YgcVwAKn5skPO7A8IEyds6RHm6CG4oQsBe383/Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dR9aU7Ab; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EED81BD014
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Feb 2025 15:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738422743; cv=pass; b=In+ZmNXS06n6hG03dEgsexzMMWqu+yKcfiwclvpRyFwtWD9FOpOkJkqgg8f1K7+ArJIeKG34cWv0hsT4rgLLVNEh1xbUoql545+WhH1TJ0SB+kX5tNP9v9l8bfr5U89/p6+4Nosj1USiQfm+CPzyyXW8ZtyiGT6DAuuC+YIfzcU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738422743; c=relaxed/simple;
+	bh=X4JXgt+6NSnIJCbjp8izFSAisMuo+mB619Uze2vJlz0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jdRPnGGCz9OOqpnuevZLXsU3IzOGQ9uw+gRzylC8yP7fts6E5TSXFuIA5POLtoHWoz2NO/hgvy1KIIfGE8a6KAndFQJFTACy9f9ohGcFw3n5xbHs9wIiXh6wgsIaLFCIT+dbUEOLgBUmvDa3bIE5ecmnafUbEOH8ghqD56AbUNQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=KSdqSVeC; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dR9aU7Ab"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-543cc81ddebso3304806e87.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Feb 2025 04:47:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738414065; x=1739018865; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=E7U/QY0AwysjlkyJl/K85+VbcTx0/u5THnr6ChZjWiM=;
-        b=dR9aU7AbxafwVrprWCUJ8NE/NHf8HV50uNkOdlz+V4sapnL5kQFmO6pEk87IXsE13s
-         yc82VvDgDH8wYrR7yqJxt4R0TiLadmO6TOOGspSFN/qA343nXTnLh4qVjuapTD7v8Vzl
-         vk4X7llsCDKpsYLsQQXZn68c5eqTrcUD69pa9Ul+7n0Wq7yC+oOF2wS9QV4mkIIfTp8v
-         Soe2t8Fufd62LqavaXWA+cG0jROTGxzaKv7i7kXYV82mDQ3Yl/tuwvnfWDtmiUdUb7aO
-         nu7qoWqW19JJPaJzeC6ycfLvqWW2tLO38F2sQS5j93z63vBtHQPPuvDvoMzjiII/Lpl0
-         qPDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738414065; x=1739018865;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E7U/QY0AwysjlkyJl/K85+VbcTx0/u5THnr6ChZjWiM=;
-        b=mpSaQCgVQEv4afDvYOBlsowWrofKw/i1cZttoBkGNuouqPeU0Z79Y/Mul5iTWFGhjU
-         fhC4a3NfunpJcXvV/mNu4XhJuV4BiPZXJv01cFSbLfkAddZnHh7t8j7gILSSSb2c2is+
-         bl56FiULKaQsM0PRijl0AGvZ+kLQaTkGbn4ywn0HbWQdbqqFTTWDChj+VDSXwZBFWZ/b
-         sLY/AKihuLQuTlPlA4pc0tQRMXDWhz8EUTLpv1iADy8EgjIdcAhfYclwg682rzua6bCg
-         MaXiupEwqwvujGST8PMKnpERHfkg+aA5sA+HlxGOPxYQQojI5COV/ymu9dTrmuI4b6ej
-         mVEw==
-X-Forwarded-Encrypted: i=1; AJvYcCURq5qz1pLQVwyR6rQAhl0vtXM0jLYJQj04OxVv+0rBACUsGCYVVbXB8Yh2OovlJA6Q2lawQWvhpNYhyvPOReA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXWw0QPtuC2fiHc/R7hGH7MHHp9szhWFbhnchhzXRL40wuZyHs
-	KimD2KTGHleLMeU777CVFPIMz9BZZJEY9bwwVV3oGsyVfc7nwyuBt+cx1aGZRTE=
-X-Gm-Gg: ASbGnct99CB0daiRiOYl9fgMi0xmaev2Csu8eCKC0H8N1i4SBlJrSdYe85EKLKge5al
-	HbYJaiiB7EvB95ORuXKYiLC2k9LoCcY/tvp80XDWQaHZ/70qkIaMLrMNRXPSnFJT/hI/HSth6dC
-	r41fTNG7TP1IqhdxvFQ3bXx5iKmZ6R6PayHwRFod41vSH2AkAWNydPDOt7ZHlPrtgk//iQP2GFQ
-	aqFDc97JJVxAO5IO6PM6XwjN4Yw/9VTU3bqnJIN3th+h8ykFI6jW1EEnPHsvb+SLQN1XT+MJemO
-	QMRar+9NjJehEgk1bsc421v/y4bLM3ZarI1ORtu6iL8y85Yx6MoyfCYdvjcIVpXaNdhhNoo=
-X-Google-Smtp-Source: AGHT+IEy2qDiVDwdoHC9BRZ37NSRP2KIMWzIo3wkTY5DJjgfWOTjn3aNna7i19+0q/ldZYCNWbFmWw==
-X-Received: by 2002:a05:6512:234c:b0:542:29ec:d5be with SMTP id 2adb3069b0e04-543e4be0016mr4629444e87.10.1738414065247;
-        Sat, 01 Feb 2025 04:47:45 -0800 (PST)
-Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-543ebeb06desm741428e87.145.2025.02.01.04.47.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Feb 2025 04:47:43 -0800 (PST)
-Date: Sat, 1 Feb 2025 14:47:41 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 2/4] Bluetooth: qca: add WCN3950 support
-Message-ID: <whxrzliiyqsceodr452u7xf7zlo326vygiknpiydq67vp2le7f@kggswwh4hbef>
-References: <20250201-rb1-bt-v1-0-ae896c4923d8@linaro.org>
- <20250201-rb1-bt-v1-2-ae896c4923d8@linaro.org>
- <13d5026c-3274-4b90-b941-22f08a8ebdc4@molgen.mpg.de>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="KSdqSVeC"
+Received: from monolith.lan (unknown [193.138.7.158])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YlbpM6j6Yz49PvR;
+	Sat,  1 Feb 2025 17:12:11 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1738422732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=t+JoFc0TG/4p4Xl84B4gLEdEDxILKWi1pZADH7q7gpU=;
+	b=KSdqSVeC2SmixEE1KWgfNZdL/13GlfvHIZzH/ApPt+fhpbvYfka2ScRE3RGlgp+hrMOI1P
+	jNu3n48p7hEPocZUc2vUPIDfeqWHwY25rv3lb/3xJJiwFjLKhNDRvlxb0StVrao2Hb4+iZ
+	VbvSyJ+h8UtqHVKF36ukkT1QqgdTMbpNhvQH277Qcu7Vy47vdlTwXDwKwDzu7z3Ur1If6b
+	nRg0FaSA421xx31SSTLoFOpPGczOeXX8qvIfmHik0QM50RmZ1Nwe2vz8qy7rf/K6i7U5oE
+	228SIiTQ5Ewwh3a3fKAYUEWfLdu8qUjxjjS3ZLeeuTahr7L8sMgfCG57ft0Iqg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1738422732; a=rsa-sha256;
+	cv=none;
+	b=mMkVwJ6Wq2vbQL0GgoEQXNg+MJVKlyr6O/plxsHNazx53y5QFznaPkfPM6c+SSA19KcAS9
+	zjJR/FNyR7Kpa41Tjz/vCqTk0C8CxB73lXyErx/KUdXU6YDVmIviJ/PMT8zjGjWXfGQOYi
+	Nhmy4xuT1/ap80qwxd8wgMxgpmo0d+hCM+rfNcMj2x/h5iujQpXWH1wOl1c6hvDJLAdwLa
+	+wd5oYw2OP4SQcJClevOtai6z8kmtDjJk+KRc11Ury+yaNxoKeXMJStbrobKO3cTiLEBPG
+	uyMdD9BzZJ306iYl5YChLUTTNSHpdBCOnYFPYZcd55aZWYRpels42oslqRtKPQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1738422732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=t+JoFc0TG/4p4Xl84B4gLEdEDxILKWi1pZADH7q7gpU=;
+	b=B2YR4iwEALE2W/lkGFYiyg0dYC0AuNGWgpRxHmLk5T0TALiqTOFR+7LWyjgvI3WsIbIB9c
+	FBEHWeygJJvDB3v9hG1zKR60pMspmkRJpt/UjGwAeCTlIQFqMTdtAxXecLzQkmK7ieakwm
+	7gY4XjzIRON0O6GIOUi2NSfxMaSqI1wjdDz7PPQNgBBW8t5zhGwCXxYebqJNwDLuCGisGC
+	9Hm8H+oXu/nyTqE62aY/2FNMFRSsso8XrUsblSmxlViDiCr8WgGRE65MXBDgsgDM+OOZ26
+	nWGtCqc+hTlUOra3abdrq2KSGCklnYeTXVCK0scCFis2HeEu1/OTd18GOjwE1Q==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v3] shared/vcp: have only one volume change in flight at a time
+Date: Sat,  1 Feb 2025 17:12:09 +0200
+Message-ID: <06e82df8d3cdd52cdaf4417059638382d7443efd.1738422702.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <13d5026c-3274-4b90-b941-22f08a8ebdc4@molgen.mpg.de>
 
-On Sat, Feb 01, 2025 at 01:15:29PM +0100, Paul Menzel wrote:
-> Dear Dmitry,
-> 
-> 
-> Thank you for the patch.
-> 
-> Am 01.02.25 um 10:18 schrieb Dmitry Baryshkov:
-> > WCN3950 is another example of the WCN39xx BT/WiFI family of chips. It
-> > requires different firmware files and has different current
-> > requirements, so add it as a separate SoC type.
-> 
-> Is the firmware publicly available already? (In patch 4/4 you write, it is,
-> and I found it [1].) I find such information helpful in commit messages, and
-> also the firmware names:
-> 
-> •   qca/cmbtfw12.tlv
-> •   qca/cmbtfw13.tlv
-> •   qca/cmnv12.bin
-> •   qca/cmnv13.bin
+If bt_vcp_set_volume() is called again before the previous operation has
+completed, the requests get the same change counter, and all except the
+first one fail.
 
-Ack, I will add it.
+Fix by waiting until the current request completes, and if volume was
+set again during waiting, send a new request with the latest pending
+volume value. In this definition, bt_vcp_set_volume() will skip over
+intermediate volume updates if they are done too rapidly.
 
-> Do you also have a datasheet name to review the vregs?
+Send only volume requests that change the value to a different one than
+last notification we have seen: in this case the request either fails,
+or succeeds and generates a new notification.  In theory this guarantees
+we always exit waiting, but safeguard it with a timeout.
+---
 
-I have it, but I don't think it is public.
+Notes:
+    v3: add timeout, wait separately for reply and notify
+    
+        In theory from VCS v1.0.1 3.2.2.5 + 3.2.2 you expect that request
+        that is setting volume to different value than that of the current
+        change counter, can only either fail, or succeed and produce
+        notification. But it's probably safer to have a timeout regardless,
+        so that we're guaranteed to stop waiting.
+    
+        I also changed it to keep track of which of write response & volume
+        notify have arrived, to avoid a race condition where notify from
+        another client's volume change caused us to send another request
+        before previous completed.
+    
+    v2: reset pending_ops when attaching, needs to be cleared on reconnect
 
-> 
-> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> > ---
-> >   drivers/bluetooth/btqca.c   |  9 +++++++++
-> >   drivers/bluetooth/btqca.h   |  1 +
-> >   drivers/bluetooth/hci_qca.c | 25 +++++++++++++++++++++++++
-> >   3 files changed, 35 insertions(+)
-> 
-> […]
-> 
-> The rest looks good.
-> 
-> 
-> Kind regards,
-> 
-> Paul
-> 
-> 
-> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/?id=421017641e6a6ef389190ac3edf67885183f3de0
+ src/shared/vcp.c | 86 +++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 82 insertions(+), 4 deletions(-)
 
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 6b0f2f9db..f0887ad62 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -32,6 +32,8 @@
+ 
+ #define VCP_STEP_SIZE 1
+ 
++#define VCP_CLIENT_OP_TIMEOUT		2000
++
+ #define VOCS_VOL_OFFSET_UPPER_LIMIT	 255
+ #define VOCS_VOL_OFFSET_LOWER_LIMIT	-255
+ 
+@@ -176,6 +178,14 @@ struct bt_vcp_notify {
+ 	void *user_data;
+ };
+ 
++struct bt_vcp_client_op {
++	uint8_t volume;
++	bool resend;
++	bool wait_reply;
++	bool wait_notify;
++	unsigned int timeout_id;
++};
++
+ struct bt_vcp {
+ 	int ref_count;
+ 	struct bt_vcp_db *ldb;
+@@ -203,6 +213,8 @@ struct bt_vcp {
+ 	uint8_t volume;
+ 	uint8_t volume_counter;
+ 
++	struct bt_vcp_client_op pending_op;
++
+ 	void *debug_data;
+ 	void *user_data;
+ };
+@@ -395,6 +407,14 @@ static void vcp_remote_client_detached(void *data, void *user_data)
+ 	cb->detached(vcp, cb->user_data);
+ }
+ 
++static void vcp_client_op_clear(struct bt_vcp_client_op *op)
++{
++	if (op->timeout_id)
++		timeout_remove(op->timeout_id);
++
++	memset(op, 0, sizeof(*op));
++}
++
+ void bt_vcp_detach(struct bt_vcp *vcp)
+ {
+ 	if (!queue_remove(sessions, vcp))
+@@ -404,6 +424,8 @@ void bt_vcp_detach(struct bt_vcp *vcp)
+ 		bt_gatt_client_unref(vcp->client);
+ 		vcp->client = NULL;
+ 	}
++
++	vcp_client_op_clear(&vcp->pending_op);
+ }
+ 
+ static void vcp_db_free(void *data)
+@@ -2003,6 +2025,22 @@ done:
+ 	return vcp;
+ }
+ 
++static void vcp_set_volume_complete(struct bt_vcp *vcp)
++{
++	bool resend = vcp->pending_op.resend;
++	uint8_t volume = vcp->pending_op.volume;
++
++	vcp_client_op_clear(&vcp->pending_op);
++
++	/* If there were more volume set ops while waiting for the one that
++	 * completes, send request to set volume to the latest pending value.
++	 */
++	if (resend) {
++		DBG(vcp, "set pending volume 0x%x", volume);
++		bt_vcp_set_volume(vcp, volume);
++	}
++}
++
+ static void vcp_vstate_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 				const uint8_t *value, uint16_t length,
+ 				void *user_data)
+@@ -2020,6 +2058,10 @@ static void vcp_vstate_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 
+ 	if (vcp->volume_changed)
+ 		vcp->volume_changed(vcp, vcp->volume);
++
++	vcp->pending_op.wait_notify = false;
++	if (!vcp->pending_op.wait_reply)
++		vcp_set_volume_complete(vcp);
+ }
+ 
+ static void vcp_volume_cp_sent(bool success, uint8_t err, void *user_data)
+@@ -2031,12 +2073,23 @@ static void vcp_volume_cp_sent(bool success, uint8_t err, void *user_data)
+ 			DBG(vcp, "setting volume failed: invalid counter");
+ 		else
+ 			DBG(vcp, "setting volume failed: error 0x%x", err);
++
++		vcp_set_volume_complete(vcp);
++	} else {
++		vcp->pending_op.wait_reply = false;
++		if (!vcp->pending_op.wait_notify)
++			vcp_set_volume_complete(vcp);
+ 	}
+ }
+ 
+-uint8_t bt_vcp_get_volume(struct bt_vcp *vcp)
++static bool vcp_set_volume_timeout(void *data)
+ {
+-	return vcp->volume;
++	struct bt_vcp *vcp = data;
++
++	DBG(vcp, "setting volume: timeout");
++	vcp->pending_op.timeout_id = 0;
++	vcp_set_volume_complete(vcp);
++	return false;
+ }
+ 
+ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+@@ -2061,9 +2114,24 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ 		return false;
+ 	}
+ 
+-	vcp->volume = volume;
++	/* If there is another set volume op in flight, just update the wanted
++	 * pending volume value. Req with the latest volume value is sent after
++	 * the current one completes. This may skip over some volume changes,
++	 * as it only sends a request for the final value.
++	 */
++	if (vcp->volume == volume) {
++		/* Do not set to current value, as that doesn't generate
++		 * a notification
++		 */
++		return true;
++	} else if (vcp->pending_op.timeout_id) {
++		vcp->pending_op.volume = volume;
++		vcp->pending_op.resend = true;
++		return true;
++	}
++
+ 	req.op = BT_VCS_SET_ABSOLUTE_VOL;
+-	req.vol_set = vcp->volume;
++	req.vol_set = volume;
+ 	req.change_counter = vcp->volume_counter;
+ 
+ 	if (!bt_gatt_client_write_value(vcp->client, value_handle, (void *)&req,
+@@ -2072,6 +2140,11 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ 		DBG(vcp, "error writing volume");
+ 		return false;
+ 	}
++
++	vcp->pending_op.timeout_id = timeout_add(VCP_CLIENT_OP_TIMEOUT,
++					vcp_set_volume_timeout, vcp, NULL);
++	vcp->pending_op.wait_notify = true;
++	vcp->pending_op.wait_reply = true;
+ 	return true;
+ }
+ 
+@@ -2108,6 +2181,11 @@ bool bt_vcp_set_volume(struct bt_vcp *vcp, uint8_t volume)
+ 		return vcp_set_volume_server(vcp, volume);
+ }
+ 
++uint8_t bt_vcp_get_volume(struct bt_vcp *vcp)
++{
++	return vcp->volume;
++}
++
+ static void vcp_voffset_state_notify(struct bt_vcp *vcp, uint16_t value_handle,
+ 				const uint8_t *value, uint16_t length,
+ 				void *user_data)
 -- 
-With best wishes
-Dmitry
+2.48.1
+
