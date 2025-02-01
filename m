@@ -1,142 +1,134 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B28208A9
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Feb 2025 16:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C811C9B97
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Feb 2025 17:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738429014; cv=none; b=omSYheaQ2zWtIUlrFJkk+uRCva1Sm8MeizMV3DVcKmRrFCp7jGIbJeXjOTJGDIIId9eoLXKMbpBA8uLbGrjXCqU8ha4qPBya83TPB6DgOfaFa59UV1hNzFvYepqFBD8WYgfOj5PuZUiuxWU9EkioFKXORyXHylbu3IaDm+XeWn8=
+	t=1738430955; cv=none; b=aojXXzaQvhWa7V7L6DkZAKY45jyUJwJo24jTisSbfb2MkB8JGoPUP2wYPzRbPAT+F9H4X6zMhgjUKdRxuF6B700uYKDA6fwxAO4GAj/MC870fTnTgMfouKcw2dpWB0okzyyEbjiauoleI30VXxrSPy37tybW9y+ojQkh4MoMhIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738429014; c=relaxed/simple;
-	bh=VvzrziMbypnZqlB7JAwjGevBelgALqAgEqvbBXIV0bs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=WLuGB7sbFFaby7kzeWS2SzP2C17GEtCIktYuVipyhAvLUwW0lkzehw7tFKgP+CPLcswTXxRBccHRQXyN3frPeyPW0Bfr3r4hOuXekjDVrQONoWxXkFNlgnVK61sSxyJrDcxCWaZgHFFNh7HlPd4ZAV1t4X0CRD43CJMQT9aqYIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DBgzteHb; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738430955; c=relaxed/simple;
+	bh=bZIfvsXbEXYqzmKSTUZGNOhLXdwKlob2BoVHyug/+5E=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NlnIJH8gwIkwcOueSvOPLN4qNv8C6Do51GrAyK23MkYBuGDCVriLN0kfuyw51saZyOixlRrsNHwcUkxeyGHSQuO6pgMbbm7cVNGliZF61BJElEs/B5c1qLOWLY7DpKL3jO3cxB4SH8g5ea1h5K4QuraiEk3WmKl0QxDfDCh1SWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LFVRABjJ; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DBgzteHb"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7b6ed0de64aso257534585a.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Feb 2025 08:56:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LFVRABjJ"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-30227c56b11so31559361fa.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Feb 2025 09:29:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738429011; x=1739033811; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8abdbHHBhBa7uz1uBTPoLALgNm2yomgXs6FKhMnQIrw=;
-        b=DBgzteHbGlZLClroL5Baopl2VE93x5qlHXMmTNdy9GKxbYkrrHVlMEZHHGhyoWa9pI
-         EBYWw/enxDCfSZO1NUl1fgqZ8wUTRqyrjf5QXxG84B0boEXJiQUXYr69aHgZJwdEuMSo
-         tv2/bl/lcgHFF9xiLizbGOu0zdLHlKwWC66AyOVU6JSu94I/h8s5S1T0LqBMl+Z/67eh
-         B57bIfDiF4TRKdp5rvpp9el/6Me/xy+c5HpztvT6hxO245LBPX+ay0RsF8nul1DNdGOG
-         bVWq9dDBDdqc4a+9PqbtBEfVFvjrmvkBjyXGhfKuoqni5bgm8/P4povjWPU3g3+MV8x4
-         rORQ==
+        d=linaro.org; s=google; t=1738430952; x=1739035752; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yiAMibmCHf3AP+cOZ4VRKVm1kSHRKQ96VjG5gP5/ww0=;
+        b=LFVRABjJj9Hz+dCeedJWuS88IV8WXa7fiz7zqzxRik0JItEehQajg0FcxvkJIwMW4v
+         1QCXOxa0Ctaec+T65RVJjcaBmtbmbnXy620v6o1FWbvfr6PNHmgTkltnQ4gttWwUI9Zb
+         5a6RFrpo0O8U6VDVQihIB2ryZn2W7TkwcfrZA17NwbxOW2dqsNFya3IxLlquKVdy4n23
+         ZaZS82z+15vq0fb3FZkqBfajyYHZTTqhE/+UHnQvZKKLGl9OF1ig4WriEu1bP4Cgwbqn
+         tTwIBeGSOmAkoWkdUgOB3JTmuak6I+h4eDDY6blnHTqfjkluIV9OazaMs7Uf3dzWMtI+
+         6m7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738429011; x=1739033811;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1738430952; x=1739035752;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8abdbHHBhBa7uz1uBTPoLALgNm2yomgXs6FKhMnQIrw=;
-        b=NJ0OuSeZaMClIsWhfgRCie15BXArRHKVfNCv/7gACfaF96qZtm42mq82wtdWrc67K1
-         C0sOnDSM8NNTt3Ixya6J1zwQgYQQoWbo1b/VGaKjaAmGuagZ69hFHXhe/vwooF23Pgzi
-         Fexgd5k2C/N/UYu0/2MSUZUTQDA5ZUCZ4XYQoQmgXNrN31iM23kJWG5vJI5G5tObUW0T
-         8Z1MLCaDHmfJ40xo59XtSApnFseHNUjSfnatwwPMcJx1N8dDdNYquOuEjKv56JnRgPSA
-         cP/wTcimBJxR4Q5KH6f+0lBtVWcsTYxOYU1iaWVYq7TPjJEJa+aWOv1mLRUeZlSdkSfO
-         CM9g==
-X-Gm-Message-State: AOJu0YxyLGIRCV5yb6wmDMXqnbvL2l/Jeg4wIBvAmF+6RvFr3p6GxVyE
-	+tt3hUuYFgqIDir1TT4I15biQ8jHNrGQCMzBtIUbO5JhSZHOM05iQxht9zTD
-X-Gm-Gg: ASbGncsF/AKJ+1PXG8E+6XX8Am989W8cJrRZJSb8bgJlsrPumOv03rswfUqRpPhBXTk
-	PknKNdApptgWw/j9tYGQbUbvV6QyTgCb+Ne0ksTKkXHhu810gld8ojoBpCt/GuvjAoMZ4MUh+Q8
-	q8QLx0GjxxANAYV9pOM7RrHFTllnP8ai0TImIHmXtsPdSmHwKKpTRBL2htfK+0qXEgqaKYtgcAZ
-	Arg/r7bhBZSep8ERodiz/WFITNCfnffNocpC1W+vbgqDuYAmtQ3er7LCmoCcfPh8qyS9B/MTsKX
-	wjpdNgWgguN129wcDe3TnQ==
-X-Google-Smtp-Source: AGHT+IGsMloR1j8CZPCGP1SLctRxNZVkzCcE3xQv7vQj4zTG+ZpXKNcNG/aq7/+ZGQXcv+NZ9YLr8g==
-X-Received: by 2002:a05:620a:4415:b0:7b7:12e:48eb with SMTP id af79cd13be357-7c0097acdd1mr1901888585a.17.1738429011384;
-        Sat, 01 Feb 2025 08:56:51 -0800 (PST)
-Received: from [172.17.0.2] ([20.25.205.251])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a8bba69sm315870085a.8.2025.02.01.08.56.50
+        bh=yiAMibmCHf3AP+cOZ4VRKVm1kSHRKQ96VjG5gP5/ww0=;
+        b=UhJBCKq6vDMoqR4Jy0CcpT7DzIblvfE6oJWVR9o9RhvOn7MZeJlBWc/HF74MjsHVh0
+         dtS4N9VVTvX6jQzLyUGcko5/ZKzlz+3x/v2U+3zd2/SA3Hq+TO9ohb8BEGI8Nx0bxjbT
+         Ph1VdEKYqBaXYbRd3aqXhh24LActbWcCdjI2dFIs4UmW74ZznGcSufutii/SEbKbr3p+
+         zGnrzgugWfWqrOTsrXYbRLGRF55SC7uuKey+9GBgZpAAd+dRhE1lLQ9pUtklSVef6EBs
+         aiwb1Wb4FdqPS7N5XJFYJsOBllLx+S8kPy0P4ZNs5AudEqfqk9Q+h6rmwbjnsoW0fvD9
+         YOKQ==
+X-Gm-Message-State: AOJu0YyU5cOq46+/HZyYFzHcG/BncBcrLWzPxwNK3SmVDEuM7BX0NL4R
+	W9eg+8tcqr2WUFkf/DNopzc30w6zNo3gO40xtSn3woH0hfGM+bRmbdIJQ2KMXOQ=
+X-Gm-Gg: ASbGncsk9hwh+ww72WMKC0dfwOzqfnibJEs4c/7LQgUclfzL9yLmwSTH3MBB6tY2u2L
+	6tWjDsAgej9C4DkB71BTMXvbcAdI53AuIYKifsnoM5fjMdAz0zhNHp43eWvAXvN9ucEltEOV/vQ
+	+XohxAqCc75NBgpFun52DF5Lr/KuAXiKAXnoDACAJYfgZcAF60Fc8CVqWD1NWpvOcZ6k6tVgzXi
+	Gx9PS5GM7JVBskOPnl0/sbmcizGJt6LJtBhp45g0qFDj+lAJtTP/QjACE2/2SiUWLrJI9BwVyGF
+	AXce8kkfH4PRuKc5AhPd7RY=
+X-Google-Smtp-Source: AGHT+IHRHYSwVZnX9QQjEgdiq1EsFJNiZyKN0lsG/LCyM7xf+RanpO6j8YDb7KQGBcnEcXBWmWC0MA==
+X-Received: by 2002:a2e:a54a:0:b0:302:3c78:4e17 with SMTP id 38308e7fff4ca-3079694b76bmr44979531fa.29.1738430951586;
+        Sat, 01 Feb 2025 09:29:11 -0800 (PST)
+Received: from umbar.lan ([192.130.178.90])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-307a3099ec4sm8852161fa.48.2025.02.01.09.29.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Feb 2025 08:56:50 -0800 (PST)
-Message-ID: <679e5252.050a0220.1d8be6.c3a4@mx.google.com>
-Date: Sat, 01 Feb 2025 08:56:50 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2823840545628906192=="
+        Sat, 01 Feb 2025 09:29:11 -0800 (PST)
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Subject: [PATCH v2 0/6] Bluetooth: qca: add Qualcomm WCN3950 BT/WiFi chip
+ support
+Date: Sat, 01 Feb 2025 19:29:06 +0200
+Message-Id: <20250201-rb1-bt-v2-0-fd44011749bb@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oxffffaa@gmail.com
-Subject: RE: [RESEND,v2] Bluetooth: hci_uart: fix race during initialization
-In-Reply-To: <f5ea6c5c-1904-22a4-72f2-d4050878dd26@gmail.com>
-References: <f5ea6c5c-1904-22a4-72f2-d4050878dd26@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2823840545628906192==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAONZnmcC/2XMQQrCMBCF4auUWTuSpFUbV95DukiTsR2QRiYlK
+ CV3N3br8n88vg0SCVOCa7OBUObEcalhDg342S0TIYfaYJQ5KaM0yqhxXNGTv7hWd9bqAPX8Enr
+ we4fuQ+2Z0xrls7tZ/9Y/ImtU6Ki3Z99Z04b+9uTFSTxGmWAopXwBZSXt5p0AAAA=
+X-Change-ID: 20250201-rb1-bt-cec7a314991d
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+ Rocky Liao <quic_rjliao@quicinc.com>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1539;
+ i=dmitry.baryshkov@linaro.org; h=from:subject:message-id;
+ bh=bZIfvsXbEXYqzmKSTUZGNOhLXdwKlob2BoVHyug/+5E=;
+ b=owEBbQGS/pANAwAKAYs8ij4CKSjVAcsmYgBnnlnkrtNc3K2dMel8dFcEtGQARsWe03fuuJFDI
+ LZO0JMC2kyJATMEAAEKAB0WIQRMcISVXLJjVvC4lX+LPIo+Aiko1QUCZ55Z5AAKCRCLPIo+Aiko
+ 1bF5CACtNlWRDxOavbwPfvhT5xdLXGi0R1bx6mJShDUAIa+47UlS9kUdRSrkO+7KTG1lbj3jnbc
+ ztizE9tzen0br4qzGorx1b2mZPH2wJpqyxI4VV/1Vj+McT7kX1kMBnh3TCqZoJMEiY9qe9iLCfX
+ VadINvjcXk53cI1W4WNVRozzt72N1SLyvg3ZqGh4MGG1qdLPrXVtC+f3mrdFwWYZEZTH86mY4pS
+ /8800AyStr+se9HA9pAwO77RKrTWx2rHYo07NbQqb+WvZ0hOVCAcXcT0eg5BDuZO9/T0QNV0q+W
+ ZEhWL+NMIrGc5ok+a/7xdEWjLKGLdRX88JQAa5Asx+FB97P9
+X-Developer-Key: i=dmitry.baryshkov@linaro.org; a=openpgp;
+ fpr=8F88381DD5C873E4AE487DA5199BF1243632046A
 
-This is automated email and please do not reply to this email!
+Qualcomm Robotics RB1 platform uses a new member of the WCN39xx family
+of BT/WiFi chips. Add support for this member of the family and enable
+it to be used on the RB1 board.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=929721
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.19 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      24.53 seconds
-CheckAllWarning               PASS      27.01 seconds
-CheckSparse                   PASS      30.67 seconds
-BuildKernel32                 PASS      24.47 seconds
-TestRunnerSetup               PASS      428.20 seconds
-TestRunner_l2cap-tester       PASS      23.35 seconds
-TestRunner_iso-tester         PASS      33.47 seconds
-TestRunner_bnep-tester        PASS      4.72 seconds
-TestRunner_mgmt-tester        FAIL      118.88 seconds
-TestRunner_rfcomm-tester      PASS      7.58 seconds
-TestRunner_sco-tester         PASS      9.33 seconds
-TestRunner_ioctl-tester       PASS      7.97 seconds
-TestRunner_mesh-tester        PASS      5.85 seconds
-TestRunner_smp-tester         PASS      6.93 seconds
-TestRunner_userchan-tester    PASS      4.97 seconds
-IncrementalBuild              PENDING   0.76 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.162 seconds
-LL Privacy - Add Device 3 (AL is full)               Failed       0.193 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+---
+Changes in v2:
+- Corrected QUP interconnects (Konrad)
+- Added /delete-property/ interrupts and an empty line before status
+  (Konrad)
+- Enabled downloading of different NVMs as required for v1.3 of the chip.
+- Link to v1: https://lore.kernel.org/r/20250201-rb1-bt-v1-0-ae896c4923d8@linaro.org
 
 ---
-Regards,
-Linux Bluetooth
+Dmitry Baryshkov (6):
+      dt-bindings: net: bluetooth: qualcomm: document WCN3950
+      Bluetooth: qca: simplify WCN399x NVM loading
+      Bluetooth: qca: add WCN3950 support
+      arm64: dts: qcom: qcm2290: fix (some) of QUP interconnects
+      arm64: dts: qcom: qcm2290: add UART3 device
+      arm64: dts: qcom: qrb2210-rb1: add Bluetooth support
 
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  2 +
+ arch/arm64/boot/dts/qcom/qcm2290.dtsi              | 31 +++++---
+ arch/arm64/boot/dts/qcom/qrb2210-rb1.dts           | 82 ++++++++++++++++++++++
+ drivers/bluetooth/btqca.c                          | 27 +++++--
+ drivers/bluetooth/btqca.h                          |  4 ++
+ drivers/bluetooth/hci_qca.c                        | 25 +++++++
+ 6 files changed, 156 insertions(+), 15 deletions(-)
+---
+base-commit: a1d1e1f2fae5fcb5f2e43b81afa9596c606e683d
+change-id: 20250201-rb1-bt-cec7a314991d
 
---===============2823840545628906192==--
+Best regards,
+-- 
+Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+
