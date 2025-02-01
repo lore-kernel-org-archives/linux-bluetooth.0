@@ -1,150 +1,155 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4E71BEF8A
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Feb 2025 17:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025CE1C5D61
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Feb 2025 20:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738432397; cv=none; b=LupRzYpWWp8VsCgekQjbbsb1DXF4feAHecOw7ELfa1bt/W6z0mZuW8rqqFMYfSy337Znu2DxY9fKqBPna6ARX3ZomMN6MyXzpNNVdGaViUvPNZ23jtyYsptQMruwVANW207KKEm0cVJ4UW5kf1PNgjAVL2fuBIsnShIlgoN4SaM=
+	t=1738440442; cv=none; b=Z7XaU43KzE/Do+fQZZoVFTxw4GbmazRhDQ02wrLbZgeaTjUEfqUpLaY14heP+FHlacyq94wplwA+BSrKSE39i9Jo3x1G3sezDMWVD3MnI/cwnEkzi7329ObQq5Pz/WMu5WXKX5wy0vFOvPtRa4mjZNLqdIyKSp+Czza6FPl0rfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738432397; c=relaxed/simple;
-	bh=8fPunExvvP1eITjB2J8ZW7OWdzWUgNxOqnDdM1xmYwc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=H5/phCo5QhDBnINgkK7JavuD5bnFbOGC4tGQdGHSMZJK48Kmo5z8+anufhoJZWUwGFXMVqjumPXCDreD42VUBmEnV9iVLWpgHcVpcfXaCc/9ezJSke0DATLYwDQUzcdS2hTwNjzqguD57jNcWRsn36g8DCCrhaKTnpwkvNdNowc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LQFWTOdO; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LQFWTOdO"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-46783d44db0so28757571cf.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Feb 2025 09:53:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738432395; x=1739037195; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JI/Q5kLx7ratzwVCkQk3RGhCmFOCoV3hTPXYIH0j5/c=;
-        b=LQFWTOdO3gJDUFbVmFOjNoyg3WZaJVD5VmpNdgoh7C5McYP58d3xa06Xs1/P5SSEkO
-         5GFH44HPlj5Lj3Gu8kyH8hL1SWcLm0gbSFrym/ejfvfnLj1Vq0R/jiGr86+taFjLjntZ
-         b/ES2eVObUGVp0tTx+x+ymYg46f7c+gaNl6JNwuaRYI35359tsQlImeJ0XCbwDgrfjLP
-         YOGGAzhzRH0jJalMB0ZMAIpuhfw4//ypYHb9mqTDkS+tscCCQ7gLbafbSKLfQR1alObF
-         0cG/pPyPD4lTFjrz1gUVj/mBZLvXPUjnq4QTCAI5dNzK8rbe9uWHEp/WKwnW+E5NXLYm
-         QlyQ==
+	s=arc-20240116; t=1738440442; c=relaxed/simple;
+	bh=0TWQkdmSLts7OZYB8JmVvACAKQ+qwoQ5FA1jyXORT7M=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=R+WpmXvFf693ekOfaj7AG4hgm1zGni2akuFFMgTCpKnRkct31ecpQcYTtlzCXUWZ03/2mSt+G+BF+NqwMUfLg8Rgdpp1Q2xMwvVuZyPKECci7iwvOLem365aFBESdhEWu3qapsvDxvYkLnIIw+k73uISD2vILKTdACaZurC8Hx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d0225c44e8so13590815ab.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Feb 2025 12:07:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738432395; x=1739037195;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JI/Q5kLx7ratzwVCkQk3RGhCmFOCoV3hTPXYIH0j5/c=;
-        b=Ts9FqbmwMg/+SfrpqAJY6hMz1eUoqgdswk7F/4qiYyBmGVRZPQZoVwVF5xxn3ARYhL
-         AfYTKWdM+zmDv85uxkpcPSKHkz1xV+wtNF50uyXKNlERjCkMgpZqYCyD95oRnqiOyX+6
-         9htfLyESRqDyMXFpx4i6jHKLLwf4RjTDSNmkpAsTy2dDJzAFVPvNjpFG/HCjjGBD65V8
-         zthWemCjWDw6xlMzUZoBkIMDKD8/QDJNS5QBhTCYeA9AxxzVktVcIIOmUVjIisY6AkEU
-         hFlgC9e/uZKNlpSJi0SXgVbQb7wX/bkU6Hs7VxVcRM3o1a3DcFRzBn9jYIx+Jc5+ro1Y
-         i6uA==
-X-Gm-Message-State: AOJu0Yx2zfQ3orQFAAMAYQz1/mxHkxE+4F/JstWJpr2IKdlHngL/bZHX
-	OWcRm/HNXCtap94hdLlgkiuhTOVEnU0tb0hywIW6X0o445rZZwsKlgjfr0GH
-X-Gm-Gg: ASbGncshj8XI1hpNIpaeGbMz6+ueGRDV6KhExjYCb2j3Wwu1SSxg6q7ZFOFfoH3lQmm
-	Yb1MHkemnalMLkRqxLrxwGcCuwFde4yo9Qjjs/25YIAAVROcZO9D09mFjYCE5X6Lrmts8wNS9jO
-	vZkgax4Y20FLiFE+RsX5o518NUK1YYZnSAcJDl4y6QEVmaomBRF5xS+LBP56q7RB6ni35ZTAmgF
-	nMq9OWyRF0aftaxVe2v028FmE+Amcqy7FdtKKFnhf78tnzrEOhMlJixHroAa7ATnXLwnVxvhV/y
-	q8jgpghk52h+UfGNdnPjtQ==
-X-Google-Smtp-Source: AGHT+IHMcQX10ne5SG69PY3KAV6xFJ2SBvt95byIkx4NYr6F6SMkGOHE3oxTtkAFX/qhtwydjtGzWA==
-X-Received: by 2002:a05:622a:1454:b0:466:99a9:c354 with SMTP id d75a77b69052e-46fd0ac9e21mr206931421cf.22.1738432394989;
-        Sat, 01 Feb 2025 09:53:14 -0800 (PST)
-Received: from [172.17.0.2] ([74.249.22.149])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46fe2fe0a21sm27357361cf.32.2025.02.01.09.53.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Feb 2025 09:53:14 -0800 (PST)
-Message-ID: <679e5f8a.c80a0220.1eabf8.acae@mx.google.com>
-Date: Sat, 01 Feb 2025 09:53:14 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8540988038440659148=="
+        d=1e100.net; s=20230601; t=1738440440; x=1739045240;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mmunsVXpgq26h1vcA+xik7F3qdt3ISWM15Sf3kvt1f0=;
+        b=dQor1V9yN33mcYFpGyEXfMItV5/T5WxYxMLFgjVjhDXkaWEgFxzGjiR8tDKoG7l808
+         0tc7nHRF1R1J4B8MtssLX1acnAA/xS1U/BA3p01qoHhIaRKYjctq2FYsPXKfr5DlsOTK
+         7bg612+IOm2sr4KEIPYC11MLDKh2Q/AG53YwrrFAfFDNlQ/C6JXZ44WT3uSK43q+eVHc
+         QaQo/agEn30hDwNTSQjmKkuPYPjljjxozaa9v2fYOOAJQMtTS/h+1xVF0mqzV9+G4IYB
+         DrchMFO4RLBX1aE0WZp3vZId35+yJ36k7rSj6YoWlcP4tJrPUVQR7I+S7xmQn+gfaxcT
+         psRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWu8rUnJohBSq4Lk61S8a2GG+aFZbyBdMOahT+SwRAHJeiYxptFDh5zMevJl0wru394ZSkS8of3l0LO6F58ytQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7nTIxFBjX2slzTW3vi049+cOy91ozSizGXd1VZEH83Yv7vVXM
+	2ScJD6WkTg3JPl59eZlbJIUMVZ9eW3Npuzc3RAMpMaKAjMCgHrI02HafcGnhG2SrxEfHd6xE9Hd
+	EFSLjAhJPjuqs44cOdIZSLU0egH11enUsW5yLQjgmd5WJH4td9W6YRLI=
+X-Google-Smtp-Source: AGHT+IF7ValMb/YQnPFC8c1mTsjjphh3LXyWkH/IfsyRS5BUpAD6U2I7bt5tY/abemBu7WFEWzb0gU9jHrL6C7+h6Dv0w9YcJ4oK
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, dmitry.baryshkov@linaro.org
-Subject: RE: Bluetooth: qca: add Qualcomm WCN3950 BT/WiFi chip support
-In-Reply-To: <20250201-rb1-bt-v2-1-fd44011749bb@linaro.org>
-References: <20250201-rb1-bt-v2-1-fd44011749bb@linaro.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6e02:1563:b0:3d0:1fc4:edf0 with SMTP id
+ e9e14a558f8ab-3d01fc4f0bemr39594995ab.15.1738440440105; Sat, 01 Feb 2025
+ 12:07:20 -0800 (PST)
+Date: Sat, 01 Feb 2025 12:07:20 -0800
+In-Reply-To: <6770d05c.050a0220.2f3838.04a0.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <679e7ef8.050a0220.163cdc.0025.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in full_proxy_write
+From: syzbot <syzbot+422b07c3add2219bc947@syzkaller.appspotmail.com>
+To: dakr@kernel.org, gregkh@linuxfoundation.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, rafael@kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============8540988038440659148==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+syzbot has found a reproducer for the following issue on:
 
-This is automated email and please do not reply to this email!
+HEAD commit:    60c828cf80c0 Merge tag 'for-linus-hexagon-6.14-rc1' of git..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=147d55f8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6e51aa3d0038bbe1
+dashboard link: https://syzkaller.appspot.com/bug?extid=422b07c3add2219bc947
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16decb24580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=133f8eb0580000
 
-Dear submitter,
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/409123921db5/disk-60c828cf.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a0ca4f206436/vmlinux-60c828cf.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/643b9310a68b/bzImage-60c828cf.xz
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=929737
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+422b07c3add2219bc947@syzkaller.appspotmail.com
 
----Test result---
+=====================================================
+BUG: KMSAN: uninit-value in full_proxy_write+0x101/0x3f0 fs/debugfs/file.c:394
+ full_proxy_write+0x101/0x3f0 fs/debugfs/file.c:394
+ vfs_write+0x48a/0x1540 fs/read_write.c:677
+ ksys_write+0x240/0x4b0 fs/read_write.c:731
+ __do_sys_write fs/read_write.c:742 [inline]
+ __se_sys_write fs/read_write.c:739 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:739
+ x64_sys_call+0x3161/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.21 seconds
-SubjectPrefix                 FAIL      0.92 seconds
-BuildKernel                   PASS      23.94 seconds
-CheckAllWarning               PASS      26.56 seconds
-CheckSparse                   PASS      30.15 seconds
-BuildKernel32                 PASS      23.84 seconds
-TestRunnerSetup               PASS      426.11 seconds
-TestRunner_l2cap-tester       PASS      22.21 seconds
-TestRunner_iso-tester         PASS      27.60 seconds
-TestRunner_bnep-tester        PASS      4.82 seconds
-TestRunner_mgmt-tester        FAIL      119.89 seconds
-TestRunner_rfcomm-tester      PASS      7.60 seconds
-TestRunner_sco-tester         PASS      9.37 seconds
-TestRunner_ioctl-tester       PASS      8.01 seconds
-TestRunner_mesh-tester        PASS      6.01 seconds
-TestRunner_smp-tester         PASS      6.94 seconds
-TestRunner_userchan-tester    PASS      5.00 seconds
-IncrementalBuild              PENDING   0.73 seconds
+Uninit was stored to memory at:
+ __debugfs_file_get+0xe59/0xef0 fs/debugfs/file.c:120
+ full_proxy_open_regular+0x67/0xa00 fs/debugfs/file.c:447
+ do_dentry_open+0x1bdd/0x26b0 fs/open.c:955
+ vfs_open+0x53/0x5b0 fs/open.c:1085
+ do_open fs/namei.c:3830 [inline]
+ path_openat+0x56a1/0x6250 fs/namei.c:3989
+ do_filp_open+0x268/0x600 fs/namei.c:4016
+ do_sys_openat2+0x1bf/0x2f0 fs/open.c:1427
+ do_sys_open fs/open.c:1442 [inline]
+ __do_sys_openat fs/open.c:1458 [inline]
+ __se_sys_openat fs/open.c:1453 [inline]
+ __x64_sys_openat+0x2a1/0x310 fs/open.c:1453
+ x64_sys_call+0x36f5/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:258
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+Uninit was stored to memory at:
+ __debugfs_file_get+0xdff/0xef0 fs/debugfs/file.c:118
+ full_proxy_open_regular+0x67/0xa00 fs/debugfs/file.c:447
+ do_dentry_open+0x1bdd/0x26b0 fs/open.c:955
+ vfs_open+0x53/0x5b0 fs/open.c:1085
+ do_open fs/namei.c:3830 [inline]
+ path_openat+0x56a1/0x6250 fs/namei.c:3989
+ do_filp_open+0x268/0x600 fs/namei.c:4016
+ do_sys_openat2+0x1bf/0x2f0 fs/open.c:1427
+ do_sys_open fs/open.c:1442 [inline]
+ __do_sys_openat fs/open.c:1458 [inline]
+ __se_sys_openat fs/open.c:1453 [inline]
+ __x64_sys_openat+0x2a1/0x310 fs/open.c:1453
+ x64_sys_call+0x36f5/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:258
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4121 [inline]
+ slab_alloc_node mm/slub.c:4164 [inline]
+ __kmalloc_cache_noprof+0x8e3/0xdf0 mm/slub.c:4320
+ kmalloc_noprof include/linux/slab.h:901 [inline]
+ __debugfs_file_get+0x31d/0xef0 fs/debugfs/file.c:101
+ full_proxy_open_regular+0x67/0xa00 fs/debugfs/file.c:447
+ do_dentry_open+0x1bdd/0x26b0 fs/open.c:955
+ vfs_open+0x53/0x5b0 fs/open.c:1085
+ do_open fs/namei.c:3830 [inline]
+ path_openat+0x56a1/0x6250 fs/namei.c:3989
+ do_filp_open+0x268/0x600 fs/namei.c:4016
+ do_sys_openat2+0x1bf/0x2f0 fs/open.c:1427
+ do_sys_open fs/open.c:1442 [inline]
+ __do_sys_openat fs/open.c:1458 [inline]
+ __se_sys_openat fs/open.c:1453 [inline]
+ __x64_sys_openat+0x2a1/0x310 fs/open.c:1453
+ x64_sys_call+0x36f5/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:258
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.179 seconds
-LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.138 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
+CPU: 1 UID: 0 PID: 5782 Comm: syz-executor269 Not tainted 6.13.0-syzkaller-09950-g60c828cf80c0 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+=====================================================
 
 
 ---
-Regards,
-Linux Bluetooth
-
-
---===============8540988038440659148==--
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
