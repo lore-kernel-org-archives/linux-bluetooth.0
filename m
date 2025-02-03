@@ -1,86 +1,111 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14631209F4A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Feb 2025 15:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA2720CCC2
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Feb 2025 17:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738597277; cv=none; b=gWHf6gRu7DBCrkjsSOiCffJxhXpuSu8tnNoPIaQuqxIwZY8j+boruySVpdsX0O5uABxY0jQ4xqtMn75SsLtR+ribQFerJ4frZOj/GAT40GrHCdVzW4BalvHKmp3jfBjaw2m5F1/rgLRA56XBtHpR0Z1ewF6KmAUr9sPGJfnRb/Y=
+	t=1738605574; cv=none; b=ZCTOVAIJgSwoHkgnNbOp1wMRZkRhvr0qybNyRv5jac6zB9xjyy8yQ8V0nxFDixusoAw0x8w4nAOhJiJnHGnN5nxvAnJsLeHgq7WIe2N9ioW0GcXaBUXmA7IJySx5dWPVvUkukgQRVtWHY9jermJIRPemsrAt4d5JU8VYEsVZyMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738597277; c=relaxed/simple;
-	bh=9QA/xhLCsp9xxPb+3NdcgCkHGZNk4+BB+4Yg7W0rYiE=;
+	s=arc-20240116; t=1738605574; c=relaxed/simple;
+	bh=FH6BdqxQDWhVZCuB9/NIGX5/OCFtl+gDbIVZmmVH2Xw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ecyzBhOx2JEfB4hgXsfcI1fb3xev+QsOPYb0F16dBSoFD7W5d7kQyNW7jZ0XN0fhIpRcEnNzECOPI6RlwzlVmcRTZ0H9owQopwY6KdjFipnFCq86Ww5Ty95i00g2jB+ZrvOLWB6QI52ipqOkR21b1IltwRzZAENdsAy7eYURl9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=yNRd3RUA; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	 To:Cc:Content-Type; b=NhBQMUwz/MZ0fyhqG1ukqQHSmCmrfmFWjjmxyw66Rao4NMNFnrxYWX3+gw08ffPzYP0BYM3aqqqjN+lmkMdUM76urFV2MzwN+Vk7tK9TLtiD7difNDaH4jwvcNdj3WqbZ4t+CQC+YFOI/WlwMtWpmP3c2yK94xX/iugAHqIZUIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TVAJee6y; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="yNRd3RUA"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5401bd6cdb7so4831995e87.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Feb 2025 07:41:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVAJee6y"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-307b8e4fc25so18370321fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Feb 2025 09:59:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1738597273; x=1739202073; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0lDn/bub6zcLTsqoNtplntaYNg3dSysdJlvHXxKAXMU=;
-        b=yNRd3RUALWCo5NIdaXbuZtcdHw7yXFIOC65LGJQi+cEr7iMuEgy47G+S+tWI1lIrAp
-         qVLHNYs80v/9rzOlUcvJ7fR0lzVKruh6HaurBQdg/n01Ryal3n6EB/Wr6+uqqTe02AQS
-         c6v8eunbZN3nbcosbriYlJXVcA6de1x+wxhbRDtmP9+8IRtBJE6YXg1r7REXvqHhIgV3
-         /ira2+obsHgqhg2oypQs0TzGkQ9NRCvk6EzT9V9L4hgR+sArugQx5bXDDRHV9qMaI0hh
-         Jq5heQghQbTB96W0hmj30iBezcGo6M08odqD5rDAJbQMCbX4hb1IQGtV+H9ZTnsC4r2R
-         jtWA==
+        d=gmail.com; s=20230601; t=1738605569; x=1739210369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZEGcmq2a2QCuzn6fEuqTX0NBOrUBbKxS9ElzHHISg1w=;
+        b=TVAJee6yaMq2JbUBlScVcu0Szf8TYUpUl5Cc20jxvuoY98NB0+p+EIWrqVfHBM9BkT
+         6FbE5mSpCi46h4mTjGkeq3Z8/A07IM1z1wOGFR1XTnuhg65t9c6Zr8axr5bHAP4ri2VP
+         aAbhXnPIiglJR2KbXypJ+w/T3SV7kCEPTsSBL+U8fY1fJ2QFaApo26Prf+mxW2k7kZ6X
+         BAvl2OHPk0NLHTMq552Unmq9Ym2P++ZAgNKFG64isi3yozQiUgugHT1B4O78+XAtUSvK
+         QbuaVA02tnKpBqBkw7KRLgP+/N0xjJFX0zq8W31MO1UPW8svrzuU+jHjqC+sc2/+C7UO
+         2qCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738597273; x=1739202073;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0lDn/bub6zcLTsqoNtplntaYNg3dSysdJlvHXxKAXMU=;
-        b=gvi4KqP07W9rdpQJmfSnp76vLTUrVeVpDcLdVmP6zQ/Ooy3M4GWPgTE45jb5zmgDDk
-         rKJCBBp4oVYZnfZFLACLxCFP7G4KnuVH5/O2LqVJfJcA6gy9mO8e6bSYYUojMq/4jGre
-         gpom80zSq6co/qYLy8z0YiMW3hjg7M27xRmsqx7QXacwOVP/5kO04SYZZSVC98tvqpA6
-         E/og3FH1NgbvF84yyTeZCZksbn002Rn6mzO1eulFsM8OIJcktRHAhS1xpQGD7jJSx0oL
-         1mNWEFMiLNy+j9IBA6WYR53ToVaIzFdfvKTcD1fB6TBVK/lleUDHE/naI9Q9IqWAXun8
-         VCGQ==
-X-Gm-Message-State: AOJu0YxhVAealhjXi3Uzzku9/6ZvApiNyzjB8qpq/4LzMJbbVy9A5fv8
-	VsF87pMVeTrlSzSDE63Iq2Jl7DnYYFj/udU9U/8I82jE9nfvWzNOi7vZqgDxRWOUzRJM9uzgju+
-	plQNI3p/aUYSXIRaqkAo/7nNNPrLL/Xk4jefc/cAjRAxbfk4dR6c=
-X-Gm-Gg: ASbGncst7OvbIp+i4VJmDSDt7XJsjoxdS1VmPFpJKCRqvl9D6kAo6j2F+AS99csDc+0
-	dAE0Cv+BuySbxxWNWaVB52sMBmp5y50CZW5cS9Cytc6UXVPWef3VcbWRYXSuhjf7ZjYJU6aI=
-X-Google-Smtp-Source: AGHT+IF4bXfPKN88nME1JjaY+h6KZF6fHydpTR8FrUv/CpfDrLSzequWz41aAoVjeu2pM/uSpgKvBA5bozQlNaXBZ1c=
-X-Received: by 2002:a05:6512:480a:b0:540:228d:b8d3 with SMTP id
- 2adb3069b0e04-543e4bda7ecmr4883380e87.1.1738597273030; Mon, 03 Feb 2025
- 07:41:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738605569; x=1739210369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZEGcmq2a2QCuzn6fEuqTX0NBOrUBbKxS9ElzHHISg1w=;
+        b=PRN6tUF0vhPSWirGnvWxZoq4DvYgt8sN15sXM/pBtOx8JHEZ0vldUxWZBrJ7fs4XN8
+         Z9XbXuQCZ7Wjl9/iIfEBt7Hhw9NUSeMVr7R+5pJs0B/1bCG8YSTWdOix8jfDA04Ao4DG
+         TM03Hlnpbd8BWmyeWC2WCVVHstsd0n7hCGYuEmOU3HE3RRWsNjuwt4q3BYpvAshOB9NP
+         N9iIcrZfQnvySA9508tE8YwiZNrH5XXdDl1095g6XGhQtVJ6zeArw52jiYzUmcekIX/k
+         Vm7oVZz8AWLhfuS+Phk+pVMootl9vgry5k3gENNF8uK1zi4049xhdApeS/ujpkQXeNPG
+         YnVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQGgOO7ohJUeTjtEGie7wxpX7U+LKtwnIxZa5eYlbyE+/6mJk+Qym6re9tGwF/8AavEizEGsHK8xL7W6Q7czI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCZ4QPNYo1+VEIfNOlFtwBjw4T0tx2RwyxGm5UeSkXjHeDHuhE
+	l/CDsRVqsuD4GOI76hrs3IwbY3akERLzZZcoCIQHGErifW+47lrF9acMmZJmyfM3hnWaqVuleqm
+	3TTK9XWkRpnZ84sfXvBPd4upDbK8aRPFguLk=
+X-Gm-Gg: ASbGncuE8Cz3KPyoTg39ArGmKnCXhZSVXnMRsRIGf9rLJ1nyHummGyoWXdVJ5/UdzAX
+	dUYMmnHWeJqERxEfXB3r8CBezMchdu57t/bVpQP0dnHzJkgO9d9fZymN+3YQdhhoNsPJwr/o=
+X-Google-Smtp-Source: AGHT+IGRCNP5ji9xlpPNr85mR/o0+FSKs74WtGjCLM5L3R1m5yOA7kLfyBQEIuKfgVMsnLHlg4ENvVGYucqbhKXZwig=
+X-Received: by 2002:a2e:a909:0:b0:300:3bcd:8d05 with SMTP id
+ 38308e7fff4ca-307968da703mr85950731fa.15.1738605568947; Mon, 03 Feb 2025
+ 09:59:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250130090158.266044-1-sanchayan@asymptotic.io>
-In-Reply-To: <20250130090158.266044-1-sanchayan@asymptotic.io>
-From: Arun Raghavan <arun@asymptotic.io>
-Date: Mon, 3 Feb 2025 10:40:37 -0500
-X-Gm-Features: AWEUYZlCFIhua3029ocVVdX_eUGh7NzCHosqe8a89GqgpZM3d058TDzL750T7wA
-Message-ID: <CAN03qa8Xe+o5L5G35gXJbD1XvEc_hdsp80ZW-2UN6opP5DMLMQ@mail.gmail.com>
+References: <20250130090158.266044-1-sanchayan@asymptotic.io> <CAN03qa8Xe+o5L5G35gXJbD1XvEc_hdsp80ZW-2UN6opP5DMLMQ@mail.gmail.com>
+In-Reply-To: <CAN03qa8Xe+o5L5G35gXJbD1XvEc_hdsp80ZW-2UN6opP5DMLMQ@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 3 Feb 2025 12:59:15 -0500
+X-Gm-Features: AWEUYZliLKuPyNVxt_6XXYVo1lNBre803yVSMmcf1fpq_8XfvQERirogfqsn8wI
+Message-ID: <CABBYNZ+=VmFjRNd79GNygCEvxJ3LYeSkXV-fPGBtMetUWoSxwg@mail.gmail.com>
 Subject: Re: [PATCH BlueZ] shared/asha: Add support for other side update
-To: Sanchayan Maity <sanchayan@asymptotic.io>
-Cc: linux-bluetooth@vger.kernel.org
+To: Arun Raghavan <arun@asymptotic.io>
+Cc: Sanchayan Maity <sanchayan@asymptotic.io>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 30 Jan 2025 at 04:02, Sanchayan Maity <sanchayan@asymptotic.io> wrote:
+Hi,
+
+On Mon, Feb 3, 2025 at 10:41=E2=80=AFAM Arun Raghavan <arun@asymptotic.io> =
+wrote:
 >
-> ASHA specification requires that the status of the other side be
-> communicated with the start command. The status is also updated
-> if one of the device in the pair is connected/disconnected after
-> the other.
+> On Thu, 30 Jan 2025 at 04:02, Sanchayan Maity <sanchayan@asymptotic.io> w=
+rote:
+> >
+> > ASHA specification requires that the status of the other side be
+> > communicated with the start command. The status is also updated
+> > if one of the device in the pair is connected/disconnected after
+> > the other.
+> >
+> > https://source.android.com/docs/core/connect/bluetooth/asha#audiocontro=
+lpoint
+> > ---
+> >  src/shared/asha.c | 163 +++++++++++++++++++++++++++++++++++++++++++++-
+> >  src/shared/asha.h |   8 +++
+> >  2 files changed, 168 insertions(+), 3 deletions(-)
 >
-> https://source.android.com/docs/core/connect/bluetooth/asha#audiocontrolpoint
-> ---
->  src/shared/asha.c | 163 +++++++++++++++++++++++++++++++++++++++++++++-
->  src/shared/asha.h |   8 +++
->  2 files changed, 168 insertions(+), 3 deletions(-)
+> Reviewed-by: Arun Raghavan <arun@asymptotic.io>
 
-Reviewed-by: Arun Raghavan <arun@asymptotic.io>
+Well we still need to fix the following error:
 
-Cheers,
-Arun
+./src/shared/asha.h:56:22: error: =E2=80=98asha_devices=E2=80=99 defined bu=
+t not used
+[-Werror=3Dunused-variable]
+   56 | static struct queue *asha_devices;
+      |                      ^~~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+
+> Cheers,
+> Arun
+>
+
+
+--=20
+Luiz Augusto von Dentz
