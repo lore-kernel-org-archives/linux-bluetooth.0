@@ -1,229 +1,109 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DAF1865EE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Feb 2025 17:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06B02054EE
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Feb 2025 20:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738690384; cv=none; b=XBatsNNkQwqO55LXm9uiTEGotVM/eBmzr8fQEnI5AkZSy86JDtm/+WvSYrV8FfDO4tF8uHe+DHu7GOlDMnUQPzGF7RR8fcoXiNZA6nleSV2vSJa/RVM31s7jQygtuEvKCLlDJBsgtY3vf83f+nOmo967omrw0hoyUOR2qvvllV8=
+	t=1738700397; cv=none; b=dTtETmfz1cNoNIk6GZ9G/dr9M3kHTiqYCTpO7GQuibH+oX6x4MXMLJcgC7/B8hak+LSQRGZ3clzpjpWFCBMFrCX3uKcL3VMlHfhaKYZR0orchrBwY23D/2akg9c3N8l59O2C3SYNmLpDuNwbBHftI89RcajG40EF+lYDrk6qeRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738690384; c=relaxed/simple;
-	bh=7u3h1nwSscFDy/+nkHVsfkk9PEEku0XZ+n4uBAZEgDM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=M61eltVH33OjAuMc3OiOuorJ0gXZdBDRmKjKrr6LFq6WOzNTKyxgdBc+QpFI64ZU16eNpsR8DGDf4xZO3qF8eIlw4XXdBsAcTTm8LCmUxEXqDVdxHGljFjFAcFFIGmC5TqbEsv5TUNQpT1vajv/GUMbufGZrDYQcgCxnEAdu/ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jXRaSRFJ; arc=none smtp.client-ip=209.85.160.174
+	s=arc-20240116; t=1738700397; c=relaxed/simple;
+	bh=GpUs2bcJqJ2IhE1Vnz28cpoatD09/RXmQv2RoMTma+E=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=n4Ua0j+mzcV+d0s3OYmb5gvHvAHhZrqXGNgXQh4nglGjyrJ9E5KO+cpB8PnjaOrNCjbDYk4MUMIXCf5vihJ/zfx8KLqUJD5/lDobH/22vTeXg6BjyY0VmHfiEzKLRUk5yVnvBeIhPA681cSA8AYETvhN7xEKPXDxCV2LeHDN/H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ndhreWK8; arc=none smtp.client-ip=209.85.221.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jXRaSRFJ"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4679d366adeso27751cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Feb 2025 09:33:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ndhreWK8"
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-518957b0533so1803607e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Feb 2025 12:19:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738690381; x=1739295181; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qBkIlsZPIv6DPI12T36VJ+IE+tK26fuJlifTHO7TLWs=;
-        b=jXRaSRFJCWZuoSR1awf9QW5lBLOIXXw9dBBLi4fIzE3r79ReZNXjQyWq9131Ms25hD
-         s+FS+JjBr5k6vkKTNULCmL/zCSzanpxim7lXHZGwQpCrUsrxFCIEFvm8DrCH1P5DXaaX
-         hQGBl5eaFHX3VNNL6Fo2kV9PywBjf5DNgF779oVyJhU7915e36NEUxxCkKIaZEMG9hbT
-         lfkkLVpcFDN65JAVO75v6xYcovuMkQir1yOOHlhyYHHd8VsLVkX7rHFmXMdLPlsEbJRu
-         VIkKF9xpUrXxOj06KRxvg0T0wGzbOqOgkinKp89vdgLyzfrczqVlI700jPu3c0tKrSyP
-         XrGg==
+        d=gmail.com; s=20230601; t=1738700392; x=1739305192; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qER69FhfXielK1AIObDvfGXm21mbnYK4d/3azbQiScU=;
+        b=ndhreWK8NGlfJVufbDB45UOfv8mWXcNLWSv/seOqgqaJEC5mPGoO6LeBb7fXUgKQ3W
+         n7cZZ1A/Kw4XWJVeHhQS/xBvdkKiqNowv9qbgPdxdEObdkV1CYOfb/zaoSEg4EcIU9tg
+         o1hkHorY1fuRJMl5Iv+8H0hqVo1py3sHtZRghqsWEu9STb412gK9GkUw0oDgxF3IznD/
+         WOPO9lg8vYy3IrPAW6G8h1AwiI2ETsC8vD+OlzxlvvEow0IwUoF+NvZnq56uAPwK0QO3
+         RRaROSWVODSq9vyumfopXvg2rMNzFem8xKN+mN40nWfkQvYeHiD93vEAGrZge3WwFcBO
+         S0kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738690381; x=1739295181;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qBkIlsZPIv6DPI12T36VJ+IE+tK26fuJlifTHO7TLWs=;
-        b=HKJ2mS57/mrRuksd9E0fOAZ3ap6jgCOBE4jGk5XFyAhO7Tgoes7g/2Th+U1S3cmGvy
-         hhe5rp9epoqQPA0ouNZj3HnbNVvIyt/oaZdtfJbr02hAJnpJC62H+RWb0qwwqT/2QJoR
-         e+gNEHj8X6tuV/SNQHIXw3npCenMfON8qdyvZ1Qm0ypZcEMR4/z1blRMqgbee0J3a0mB
-         J3z3l/HbqpI277tHIsn72x3OJNwiZtlQQ32+kIGBEMrrTLkoswxmw5OC0RwdE3TNzCFQ
-         lb6gmkTfdqekLoKZKUEuuA8uWjzmuHmuYQ/J/r++gN4IHc4ZMiEXKg6sD0xipdYGrWdr
-         WH4w==
-X-Gm-Message-State: AOJu0YzJi6w7Bb7Df3XoJ//tWZhCLP5rweYAs7Oq+AOatGAkC4LV68dj
-	LpVIDlzpWLfmFbMME9bnJzRK7dbsbtxLZULnDX50PUf9cUMGrzfdo5pF9A==
-X-Gm-Gg: ASbGnctjjxkSwLTbI2FSG9gfbU/EPxqkhbjhAubFDIzdavcPLynFVRAXlSWYKJr+yn5
-	yy6CiH46MCHlsGKjLKMIpee+eCE9qsjLr2IQJLpK/bKhEH53S7Fyhz5C8NkQQA9MjO0ZuVp754D
-	b8Wy0djWyo7Yx9rz6n7Ka3h9mpoFoijZmI2N5opjhLczNXWKQYzkwjMZ7odp6Nu+ATfb9Q8pCog
-	ODp/qqhNNQsRKwwFPusKwOCPUvww75sP33Q4EPo5GQq0yFa8MlYBcheR+BP/C8lQZfctg9zftJ8
-	5CKPouSlIegPmvMP6GRDsw==
-X-Google-Smtp-Source: AGHT+IHVjQHll9S6z94aH1uxH6Yz5u9phWdVxwTF6uVYorlreWM5v1rHYhDlF3DKhRsrQQVSs65zBw==
-X-Received: by 2002:a05:622a:90:b0:46e:549b:3e66 with SMTP id d75a77b69052e-470186d2de1mr70529011cf.13.1738690381541;
-        Tue, 04 Feb 2025 09:33:01 -0800 (PST)
-Received: from [172.17.0.2] ([20.161.78.138])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46fdf1728efsm61589131cf.62.2025.02.04.09.33.00
+        d=1e100.net; s=20230601; t=1738700392; x=1739305192;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qER69FhfXielK1AIObDvfGXm21mbnYK4d/3azbQiScU=;
+        b=lytiX6Scphw7c+wnOFd3W0BBQiBsGOWVA2Aug59GUM5t4s0G775XocXAuVBTFOsaK/
+         z+PFhteCRzD/+i10CDktxu6PU/erFIdeAAdV6n2w/5dSnPLX/dbS4AH/64yZBKCNYuRc
+         XpR3o3uehvLjyKEpvu0hw+gm3zeAKqXI0TefP5yh8si53TsDIlz63HhuLDerhfdLBvvv
+         t41w3lN1NdFOE9H+aOJq+3tL4GiRCEAtm7kP+6QU+HHfWjt5DDexRL/IJeyNvyQDRE/R
+         aaPnC3B4rCIcgHqEDX5poKhBlw20GqVVZiF8pRJW5EzJJZC4s7eONCPnUp9tXUWvAjYh
+         VS6Q==
+X-Gm-Message-State: AOJu0YyjYGXGokINuK88L5EwT6yT/6pxj3Pf7Rfwv55USWYl6Ru272a2
+	Nnn8jBf5B7Zus6M46d6ipzA14F3RbE+611pBptR3iHVsIRzi4XadzmvGBh/I8FM=
+X-Gm-Gg: ASbGncvyJpfDGStIsoCVebFuIqGm2ysQn0BAh7WKd/08FoO3Z79EABv/kgoDPfBWxOV
+	Zs7F9JkNxVxsyd7f7iMLJ1BnjDucnnu+IpkMDO4QOkUsD+nEAugy1geDyKv62xECG4t9VuCoDhh
+	Xjq8eDQD4rhBzbQz8bAW1/qnMY2VfNRUoZk/6YEgpFMpNXE6rGvAzddhPb3W9jMnLZgHfDLhoki
+	oP7WToHaGw6Jx3+u/P6XkY1t5fiJ+3G/F8JjQPNaSFH6xzv+2SR0WX/0+oIyz3lYHmxNejFgKHB
+	TcZ4rEvshFK+O+enMUV1MU2om1sWj0cD7ZGBknl2QpdFK91gwnbddkv88+J9cig=
+X-Google-Smtp-Source: AGHT+IENLH+zcxvY5A1N0FUX4SZK5i9DeISOG+vwynG7LqyTys0LYqrszCq0S4MASlNmwBmc1itTsg==
+X-Received: by 2002:a05:6122:4f92:b0:51b:8949:c996 with SMTP id 71dfb90a1353d-51f0c4e50b8mr414366e0c.9.1738700391859;
+        Tue, 04 Feb 2025 12:19:51 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-51eb1be873csm1602232e0c.10.2025.02.04.12.19.49
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 09:33:01 -0800 (PST)
-Message-ID: <67a24f4d.050a0220.23b249.5533@mx.google.com>
-Date: Tue, 04 Feb 2025 09:33:01 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4306646547573336574=="
+        Tue, 04 Feb 2025 12:19:49 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/2] build: Enable -Wstringop-overflow and -D_FORTIFY_SOURCE=3
+Date: Tue,  4 Feb 2025 15:19:47 -0500
+Message-ID: <20250204201948.2883452-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] build: Enable -Wstringop-overflow and -D_FORTIFY_SOURCE=3
-In-Reply-To: <20250204164927.2839802-1-luiz.dentz@gmail.com>
-References: <20250204164927.2839802-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============4306646547573336574==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This enables -Wstringop-overflow compiler warnings:
 
-Dear submitter,
+  'Warn for calls to string manipulation functions such as "memcpy" and
+  "strcpy" that are determined to overflow the destination buffer.'
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=930511
+Along with -D_FORTIFY_SOURCE=3 so the errors like the following can be
+captured:
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.18 seconds
-BuildEll                      PASS      20.37 seconds
-BluezMake                     FAIL      9.10 seconds
-MakeCheck                     FAIL      1.23 seconds
-MakeDistcheck                 PASS      159.54 seconds
-CheckValgrind                 FAIL      8.91 seconds
-CheckSmatch                   FAIL      9.41 seconds
-bluezmakeextell               FAIL      10.21 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      858.19 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: BluezMake - FAIL
-Desc: Build BlueZ
-Output:
-
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8491: src/shared/libshared_mainloop_la-queue.lo] Error 1
-make[1]: *** Waiting for unfinished jobs....
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8498: src/shared/libshared_mainloop_la-util.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8512: src/shared/libshared_mainloop_la-crypto.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8505: src/shared/libshared_mainloop_la-mgmt.lo] Error 1
-make: *** [Makefile:4682: all] Error 2
-##############################
-Test: MakeCheck - FAIL
-Desc: Run Bluez Make Check
-Output:
-
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:7851: client/main.o] Error 1
-make: *** [Makefile:12320: check] Error 2
-##############################
-Test: CheckValgrind - FAIL
-Desc: Run Bluez Make Check with Valgrind
-Output:
-
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8491: src/shared/libshared_mainloop_la-queue.lo] Error 1
-make[1]: *** Waiting for unfinished jobs....
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8512: src/shared/libshared_mainloop_la-crypto.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8505: src/shared/libshared_mainloop_la-mgmt.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8498: src/shared/libshared_mainloop_la-util.lo] Error 1
-make: *** [Makefile:12320: check] Error 2
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-src/shared/crypto.c:271:21: warning: Variable length array is used.
-src/shared/crypto.c:272:23: warning: Variable length array is used.
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8491: src/shared/libshared_mainloop_la-queue.lo] Error 1
-make[1]: *** Waiting for unfinished jobs....
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8512: src/shared/libshared_mainloop_la-crypto.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8505: src/shared/libshared_mainloop_la-mgmt.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8498: src/shared/libshared_mainloop_la-util.lo] Error 1
-make: *** [Makefile:4682: all] Error 2
-##############################
-Test: bluezmakeextell - FAIL
-Desc: Build Bluez with External ELL
-Output:
-
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-<command-line>: error: "_FORTIFY_SOURCE" redefined [-Werror]
-<built-in>: note: this is the location of the previous definition
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8491: src/shared/libshared_mainloop_la-queue.lo] Error 1
-make[1]: *** Waiting for unfinished jobs....
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8512: src/shared/libshared_mainloop_la-crypto.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8498: src/shared/libshared_mainloop_la-util.lo] Error 1
-cc1: all warnings being treated as errors
-make[1]: *** [Makefile:8505: src/shared/libshared_mainloop_la-mgmt.lo] Error 1
-make: *** [Makefile:4682: all] Error 2
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+In function ‘read’,
+    inlined from ‘serial_read_callback’ at emulator/serial.c:90:8:
+/usr/include/bits/unistd.h:32:10: error: ‘__read_alias’ specified size between 18446744073709490177 and 18446744073709551615 exceeds maximum object size 9223372036854775807 [-Werror=stringop-overflow=]
+   32 |   return __glibc_fortify (read, __nbytes, sizeof (char),
+      |          ^~~~~~~~~~~~~~~
 ---
-Regards,
-Linux Bluetooth
+ acinclude.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/acinclude.m4 b/acinclude.m4
+index 4b73a5bfc38f..9f2dc302e7bc 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -61,9 +61,11 @@ AC_DEFUN([COMPILER_FLAGS], [
+ 		with_cflags="$with_cflags -Wcast-align"
+ 		with_cflags="$with_cflags -Wswitch-enum"
+ 		with_cflags="$with_cflags -Wformat -Wformat-security"
++		with_cflags="$with_cflags -Wstringop-overflow"
+ 		with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
+ 		with_cflags="$with_cflags -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
+ 		with_cflags="$with_cflags -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_32"
++		with_cflags="$with_cflags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3"
+ 	fi
+ 	AC_SUBST([WARNING_CFLAGS], $with_cflags)
+ ])
+-- 
+2.48.1
 
---===============4306646547573336574==--
