@@ -1,162 +1,86 @@
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5965D21323A
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Feb 2025 14:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAE82144CD
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Feb 2025 15:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738680509; cv=none; b=kXsoCRRWEBlQ28cBE9lH3gKgS6OgDx0+5ZaXVgsFGCqzgXdnKySNgaNkI4VcdgGoFkbiLN+ovb1zeR5IeLZXqykxvPYL/Vv0DTDdygdIWROKRyabvyj0jl6Sb6fMn5TKMb1/24B1da18Tsd2MKnuGG6NrrcUsUCC+AchBufhhGE=
+	t=1738683629; cv=none; b=IL1UL29TiDkWXGcSaJAE6b8PyJhbK0ol1v3TCA4lQQWacxA+OZZKPHviCfR8eVb7zB1+o7X9UB+U3BkJzAujnsO6J4a+su5AZw8CAPo+/v3fxPW+x0B/Zp9Skh9Z5XTbvGdwzltQpE77iP++Hqfxb/PJORqMcsk0qA0JTzpeWBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738680509; c=relaxed/simple;
-	bh=/HtKUDs6iG0aMvQPHsOvoq2oFUkU1E7/5Sa0Y64kFh8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=FojQxAqtq6Pqg3SniXvonJpwp9hMYydcTn4nrh8WnLGHB/Tlc8f+8V0JBUfU2VgegcTf/UzWIA7LxXOMdWULuolAGMUYEUGW3Gxybsg6rILqMlI9iJMlZvoiGfgFmHcb9M+oC1U05bJve80XCz5z5Ml7Qx69GA02cNakP2Z9TRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-84cdb5795b0so347317639f.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Feb 2025 06:48:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738680506; x=1739285306;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+J+QfVTHo3s13dpxy0P+U4UQznX8EvvHJpADa02S488=;
-        b=VsNMQ5CTg9CEOny/mgRji/YOiW7qaydSRcEVYfWUU9cb4j8xjJGOw016miLVkNnz19
-         jT+1PDs1hZpCgShK+GrEI8EQDaAr7AXyWTFAN7LeCHbHreMIBnECvKRqPoZkS33ghxNz
-         eHV7r97xtGaLPr1ypHcU/GBVCqiQIjed+vtT6xTHSoDmPDbHQOFdE32dMTUX9wIWkIV9
-         sekNwxmZqDJjuAzyDZ5uCGpTuSUj8+xKJi+F3bKpYYy4yprCkZWPa+vkFgC5ZWy/yFk2
-         mFdr69TIZt2a0pc3DESJQTEAHWlSNVFaorD8PDthK0VZZC+oWCUoCgGMbIQjDldUqhyX
-         4aHQ==
-X-Gm-Message-State: AOJu0YztJEQequ3n9Yh68lvFypltQHQ/VoVj5LX+UX/EJcBut/bQ5NoF
-	yHkZ4mkwzDAsK3UIdY8FrOm60B6ea+vwskj8yz90Ts5A68O1rQAaub0cDlin3IkvBzcRGUipEWv
-	COeOlBadlelqcjidid0QuKs3zbDxb/IECgQcJWbW2tEc8LTUhHP7K9KRS4A==
-X-Google-Smtp-Source: AGHT+IG7UBAGb6M7fqtMjN5gKkznC7Pbjp/hsRC67bjnpJIjv7aiYIaosw/Up9YHNAVwPYDJPmIXTlbD7SN1e5dHixbc7kbHy3Vx
+	s=arc-20240116; t=1738683629; c=relaxed/simple;
+	bh=XSBgSTTA5rJqqOjn6S1RsooHvS5VAWWaaqSOXGRB6dU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u+qwkM8bUueXdFVeTDcjGIl8iQscI6qKxOqI8H2DYl3rboBBqNGFzkwj0FRjfloMqrcDbv5s1aUMZbp66aFA7DF44z/C3UTCwwiCQvtsjKKKx6DYCsewSRtbhqHmo5FrDL5mrsBWuTW4Igriull1SmfEPqfBxJMx0MGHPZh8Emo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=OvpFGca1; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="OvpFGca1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1738683625;
+	bh=XSBgSTTA5rJqqOjn6S1RsooHvS5VAWWaaqSOXGRB6dU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=OvpFGca1xR3CpTTfP1rrznytpqV+XvCfUusn6E8ngpPvgmG+KQbydtd5crHfgJkD7
+	 GhXxEVnWslGIL4BahpHfZR98Sa/LcHYaazHv1cNUoJ/uxFlQ4S2cS4cQ/hqnWGmyNa
+	 ruB7qBNojJfhGJdOUwT2BJLM6prdQpRvswoysxB5JrZMZN7SykiNLg+PT0rAs/rlvx
+	 RtJg4o0IrmzGWYmMENByH01VG25PD1+at4tM2pNZV+cYmZa+6zGKGq15a7V7lhCqxI
+	 v16xnPaLINXMvgQ/r9m4B/Wxo5pl5N0K+nkfmQ59IRlZ62m6ffCYh3sFEYfl8iMGz3
+	 4BhTEBbFPHL7g==
+Received: from fdanis-XPS-13-9370.. (2A02-8428-Af44-1001-Aa7E-9220-7620-339E.rev.sfr.net [IPv6:2a02:8428:af44:1001:aa7e:9220:7620:339e])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 13DEC17E1519
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Feb 2025 16:40:25 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 2/2] mpris-proxy: Fix infinite list items reception
+Date: Tue,  4 Feb 2025 16:40:19 +0100
+Message-ID: <20250204154020.95539-2-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250204154020.95539-1-frederic.danis@collabora.com>
+References: <20250204154020.95539-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:fc3:b0:3cf:bbb4:f1e with SMTP id
- e9e14a558f8ab-3d000913316mr153323925ab.7.1738680506432; Tue, 04 Feb 2025
- 06:48:26 -0800 (PST)
-Date: Tue, 04 Feb 2025 06:48:26 -0800
-In-Reply-To: <000000000000cbc8670618a25b24@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67a228ba.050a0220.d7c5a.00b9.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in
- skb_queue_purge_reason (2)
-From: syzbot <syzbot+683f8cb11b94b1824c77@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
-
-HEAD commit:    40b8e93e17bf Add linux-next specific files for 20250204
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=113d5d18580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ec880188a87c6aad
-dashboard link: https://syzkaller.appspot.com/bug?extid=683f8cb11b94b1824c77
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b7eeb0580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12f74f64580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ccdfef06f59f/disk-40b8e93e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b339eaf8dcfd/vmlinux-40b8e93e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ae1a0f1c3c80/bzImage-40b8e93e.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+683f8cb11b94b1824c77@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 0 UID: 0 PID: 5833 Comm: syz-executor346 Not tainted 6.14.0-rc1-next-20250204-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
-RIP: 0010:skb_queue_empty_lockless include/linux/skbuff.h:1887 [inline]
-RIP: 0010:skb_queue_purge_reason+0xaa/0x500 net/core/skbuff.c:3936
-Code: 89 44 24 78 42 c6 44 30 13 f3 e8 81 76 05 f8 48 8d bc 24 b0 00 00 00 ba 48 00 00 00 31 f6 e8 0d f2 6b f8 4d 89 ef 49 c1 ef 03 <43> 80 3c 37 00 74 08 4c 89 ef e8 27 ef 6b f8 49 8b 45 00 4c 39 e8
-RSP: 0018:ffffc90003d17880 EFLAGS: 00010202
-RAX: ffffc90003d17930 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffc90003d17978
-RBP: ffffc90003d179f0 R08: ffffc90003d17977 R09: 0000000000000000
-R10: ffffc90003d17930 R11: fffff520007a2f2f R12: dffffc0000000000
-R13: 0000000000000008 R14: dffffc0000000000 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055867393d608 CR3: 000000000e738000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- skb_queue_purge include/linux/skbuff.h:3364 [inline]
- mrvl_close+0x8e/0x120 drivers/bluetooth/hci_mrvl.c:100
- hci_uart_tty_close+0x205/0x290 drivers/bluetooth/hci_ldisc.c:557
- tty_ldisc_kill+0xa3/0x1a0 drivers/tty/tty_ldisc.c:613
- tty_ldisc_release+0x1a1/0x200 drivers/tty/tty_ldisc.c:781
- tty_release_struct+0x2b/0xe0 drivers/tty/tty_io.c:1690
- tty_release+0xd06/0x12c0 drivers/tty/tty_io.c:1861
- __fput+0x3e9/0x9f0 fs/file_table.c:448
- task_work_run+0x24f/0x310 kernel/task_work.c:227
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0xa2a/0x28e0 kernel/exit.c:938
- do_group_exit+0x207/0x2c0 kernel/exit.c:1087
- __do_sys_exit_group kernel/exit.c:1098 [inline]
- __se_sys_exit_group kernel/exit.c:1096 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1096
- x64_sys_call+0x26a8/0x26b0 arch/x86/include/generated/asm/syscalls_64.h:232
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f794f6cfc79
-Code: Unable to access opcode bytes at 0x7f794f6cfc4f.
-RSP: 002b:00007fff04322488 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f794f6cfc79
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 00007f794f74a270 R08: ffffffffffffffb8 R09: 00007fff043226a8
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f794f74a270
-R13: 0000000000000000 R14: 00007f794f74acc0 R15: 00007f794f6a1a60
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:skb_queue_empty_lockless include/linux/skbuff.h:1887 [inline]
-RIP: 0010:skb_queue_purge_reason+0xaa/0x500 net/core/skbuff.c:3936
-Code: 89 44 24 78 42 c6 44 30 13 f3 e8 81 76 05 f8 48 8d bc 24 b0 00 00 00 ba 48 00 00 00 31 f6 e8 0d f2 6b f8 4d 89 ef 49 c1 ef 03 <43> 80 3c 37 00 74 08 4c 89 ef e8 27 ef 6b f8 49 8b 45 00 4c 39 e8
-RSP: 0018:ffffc90003d17880 EFLAGS: 00010202
-RAX: ffffc90003d17930 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffc90003d17978
-RBP: ffffc90003d179f0 R08: ffffc90003d17977 R09: 0000000000000000
-R10: ffffc90003d17930 R11: fffff520007a2f2f R12: dffffc0000000000
-R13: 0000000000000008 R14: dffffc0000000000 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055867393d608 CR3: 000000000e738000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	89 44 24 78          	mov    %eax,0x78(%rsp)
-   4:	42 c6 44 30 13 f3    	movb   $0xf3,0x13(%rax,%r14,1)
-   a:	e8 81 76 05 f8       	call   0xf8057690
-   f:	48 8d bc 24 b0 00 00 	lea    0xb0(%rsp),%rdi
-  16:	00
-  17:	ba 48 00 00 00       	mov    $0x48,%edx
-  1c:	31 f6                	xor    %esi,%esi
-  1e:	e8 0d f2 6b f8       	call   0xf86bf230
-  23:	4d 89 ef             	mov    %r13,%r15
-  26:	49 c1 ef 03          	shr    $0x3,%r15
-* 2a:	43 80 3c 37 00       	cmpb   $0x0,(%r15,%r14,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 ef             	mov    %r13,%rdi
-  34:	e8 27 ef 6b f8       	call   0xf86bef60
-  39:	49 8b 45 00          	mov    0x0(%r13),%rax
-  3d:	4c 39 e8             	cmp    %r13,%rax
-
-
+Samsung Music app on Android phone send play list items in loop if
+highest bit is set to 1, so limit playlist to 0x7FFFFFFF items.
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ tools/mpris-proxy.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
+index 9edd42e99..b08733314 100644
+--- a/tools/mpris-proxy.c
++++ b/tools/mpris-proxy.c
+@@ -1692,6 +1692,7 @@ static const GDBusPropertyTable tracklist_properties[] = {
+ static void list_items_setup(DBusMessageIter *iter, void *user_data)
+ {
+ 	DBusMessageIter dict;
++	uint32_t val = 0;
+ 
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ 					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+@@ -1699,6 +1700,12 @@ static void list_items_setup(DBusMessageIter *iter, void *user_data)
+ 					DBUS_TYPE_VARIANT_AS_STRING
+ 					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
+ 					&dict);
++	dict_append_entry(&dict, "Start", DBUS_TYPE_UINT32, &val);
++	/* Samsung Music app on Android phone send play list items in loop if
++	 * highest bit is set to 1, so limit playlist to 0x7FFFFFFF items
++	 */
++	val = 0x7FFFFFFF;
++	dict_append_entry(&dict, "End", DBUS_TYPE_UINT32, &val);
+ 	dbus_message_iter_close_container(iter, &dict);
+ }
+ 
+-- 
+2.43.0
+
