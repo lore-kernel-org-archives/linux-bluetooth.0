@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FA3220694
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Feb 2025 22:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A48C220694
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Feb 2025 22:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738709411; cv=none; b=Dr9uY1fBlLqZ2dA8jjseG6n2KIfCam8aqwtFyi6b2+jTbZSupoYT7fKXEwwKc7a9OR6BZdrqG7MI5DmDDrIzo2p9g+qTJD2c8uVDUfyDLInIvkcELYXSG4TJGKvBarpfSYneoQaD4RDVTHcng5eizUDIwMs931q4Irlrdx4nUP8=
+	t=1738709412; cv=none; b=bIYViplFI330Tl8aJIGpZbg/g0vqDu3UL1HJQ4nsWbd9/Gk9Bc6QIageYBuIZf3Ym4XqP57sv5ZHHTkRUOy3UNrNkkQGxDUS9GaSgJGFNWruIR0m73QH/X11cH5dN2U9mSp0a1t9xXr01O0kt4LdYt8RItOGfoKXyc8CX+l1meU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738709411; c=relaxed/simple;
-	bh=ImK0i2EqakioYxW+OTh5Mw7X2EEA98RhjrPKmVbg1aA=;
+	s=arc-20240116; t=1738709412; c=relaxed/simple;
+	bh=4s20CqM6hQWixWCzyBGoPR1EgQ9IYIvcB8StKke81ls=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bf4yRhYjMHaNNGTqFCNU6UvZJbEvudHydZFYdaBLMU0Z8dtDbsAXnYly0s7OEh1Xipgp84IVTgOWFBBiXAT2qGZO1MbSstY4CSGgeoqiRcusTGzZcPtAV+P1lZP+iyCipA/K1Dn4K7Uar7iA6RdWKNKtCAHRA/s9+7AZHfV4gno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z8aLw+JI; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=SnIc6SZ//a1xWfuAygl2/UhXfW/j4IyCy4lXfEgp/HaESUteUBdcbkgMdfkrNM9LRioicfqX/nw/mmfpNcICAQzyALRQOyfUfyIfkJYbg+LVDefhlQOFFnzq0fme7sQ2ft44vQvBrxNQA9IlGcdAC2ProeIq5GEkNZPfSFlfI2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nW7r2eZx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z8aLw+JI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A677CC4CEDF;
-	Tue,  4 Feb 2025 22:50:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nW7r2eZx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2A81C4CEDF;
+	Tue,  4 Feb 2025 22:50:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738709410;
-	bh=ImK0i2EqakioYxW+OTh5Mw7X2EEA98RhjrPKmVbg1aA=;
+	s=k20201202; t=1738709411;
+	bh=4s20CqM6hQWixWCzyBGoPR1EgQ9IYIvcB8StKke81ls=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Z8aLw+JIK3Z/hiu8v9n32PDFaBMQehWlwo8IC/erd21wI5lBFqoUmJtwPj0iR2vYN
-	 5wdAkDTLChwjTGW0M7d/Bh6pEkFsLTSBWn6TlzLalMngNn2HSK00X6ws/i166pVOJv
-	 YngV3r+e/tVjE3jlas5rbImFYsy7M/j7pPULPchDXpKulybLwA9dROqnAVTLpWAVEv
-	 x1guKGxgj6h+lysoeJAW0cDNJ92X79KpXsDjyyaSCC4Sa9OT2/1/5eoJZSXdsljUdj
-	 ED02g89O9RDg7bDKQ/LHJ2XhqXFYVwv+GqqOhyu9V6mLoC7lPc79hj0GfuowgYOeS1
-	 rx7eF6poHHVRw==
+	b=nW7r2eZx0U6DpmRtkUVHJFXHb0R4V8ojcy3O+n8yb7D3TTmU2dzpkLw7oSVmEOWBg
+	 JMSGvHigJ5pEii+imxn+Rd9DO902wX7WbRSHerU1jXRo2qJVBMWIzTu6+WY5u8z6WX
+	 8UCGZOyZur5oeY2CzextvQgkRmgU503o1n1Wqoi6eFdlgpsiwiSch7+rtTCzWlrCHi
+	 IBGcNXs9ntIFLSQaDMjiAS/AHLVthsp4Jh42GFNoOmUzCU+xgYAdod93lNNkWVfkDi
+	 peNncRuebwUhW2DgW71h6nEUc8FfTyHXJ2+5dPK1CN5CXhvUX0ayIh0wQMLjlEuMlr
+	 /tRgqipWVzhgQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D8A380AA7E;
-	Tue,  4 Feb 2025 22:50:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C87380AA7E;
+	Tue,  4 Feb 2025 22:50:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,29 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] mpris-proxy: Fix missing line returns
+Subject: Re: [PATCH BlueZ 0/2] Fix Ubuntu 24.04 build error
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173870943775.172153.3877155288225799107.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Feb 2025 22:50:37 +0000
-References: <20250204155025.96612-1-frederic.danis@collabora.com>
-In-Reply-To: <20250204155025.96612-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
+ <173870943924.172153.14276981718229191331.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Feb 2025 22:50:39 +0000
+References: <20250204101612.66823-1-pmontes@shsconsultores.es>
+In-Reply-To: <20250204101612.66823-1-pmontes@shsconsultores.es>
+To: Pablo Montes <pmontes@shsconsultores.es>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  4 Feb 2025 16:50:25 +0100 you wrote:
-> ---
->  tools/mpris-proxy.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+On Tue,  4 Feb 2025 11:16:10 +0100 you wrote:
+> On Ubuntu 24.04: build warnings for buffer read overflow are treated
+> as errors on emulator. This may be ignored with
+> CFLAGS="-Wno-error=stringop-overflow" but discarding packet if offset
+> is greater than buffer size removes the warning.
+> Could close GitHub issue #1049.
+> 
+> Also I lost some time using mesh-cfgclient on a fresh Linux with no
+> .config folder in home: mesh-cfgclient failed but did not explain the
+> error, so printing a message could be welcome for others.
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ] mpris-proxy: Fix missing line returns
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9839799b505a
+  - [BlueZ,1/2] emulator: Fix Werror=stringop-overflow
+    (no matching commit)
+  - [BlueZ,2/2] tools: print error on mkdir
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9dbc92a360b2
 
 You are awesome, thank you!
 -- 
