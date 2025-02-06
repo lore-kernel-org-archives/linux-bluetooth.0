@@ -1,125 +1,151 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58929236420
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Feb 2025 14:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F38C4C8E
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Feb 2025 16:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738852506; cv=none; b=FBRpKwfOjcSHsOBBbgFHJFYFT1qh0rxgT/x2QYlc/QmVHmBDSYhIG/NqynkEZJVNBL6+iMxJSy6WXcYnw5DuqR3un3VDHIcIFEAuDRvn9KWlQz5/PFlEamqKmOnZClWkceEYQXU7mGFhFRvpxTSrsIoOB+CL3jeILIqnxLaf3Qk=
+	t=1738860553; cv=none; b=o+adPKN2AbGPbR3F3PgFRckEB1HT9l/j5H/PMREtFU+IgeXIz+kKKzupcCzRNbMxvrzshrk+1uzAWayp/712/fQSJeFb+TgfE2o17DFm226/tIDTXME8Qf71Zm92qC7r8vMk2jgH9LtHS3de9Qoq6QK44nVcnzq7/c3SNIJaqFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738852506; c=relaxed/simple;
-	bh=ZNmh7YZuHearw8lDa4vjlAgpCc8b6WxJBj214J7baMo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=oVxBSMzYHN/DpfNqlV5qU+nhHKvQ6QxHVtt0arii9WqU2yaPiofAYDXWX7wYRLMzbsF8V/1gLX2/Mjo/jS6Q9aUuGBi4y2fOBstDfkKQhf4PudCUZkgg/VsnvHWYEd6mJtyE2LtKmOQqQdgBMPnO3opR3O991KT6vmj5Ms9IR1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BcFGCBWP; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738860553; c=relaxed/simple;
+	bh=sXhykagS+9gPiP4ubh85/FoRSWCTCrgT2xV8SGTMTDk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rnDBSJbTLdewgUVufQln6IKnfSro72tyImeUGpGUH3yOPPNWXwCUi1cMlW6jaO/aFNHxKkpjwK+ahnTP8KrrRo5Sec4i0Hke6+8kyHIU0fwSN+lAxvqN8Md+6KloFqpoVHyWEHIoQ0Qkk0/V/xIHPbx8sY82ZH8/Qtdqm6b761U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RqTz77Gk; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BcFGCBWP"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-467b086e0easo5318001cf.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Feb 2025 06:35:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738852504; x=1739457304; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jOWnP+hs+tCrbefp1Oba46A/JA3SeEvmam41cX9hsDI=;
-        b=BcFGCBWP6LP+Bw1xr2GmXTgYzenAIBjHNDwRFieQR9M0YRqU0xc3ACKyvyptAB+rQQ
-         40bPaA7DWF3w+vIGR6YKcDoLb8vwIvhw5yLFrwqnzh8D2n+YFLbVtmGFYBk5unMlpBOD
-         uaeM8RylNHY0PW608O0wS+ynu9mcF+S4Y9Q8lFeiuFTQ8XqZkn5bN1rpqv7TiZvB0ftI
-         e09PukrHnlgblTz0QirPC15FBNKB1JqiaxfyWUkVFqsvklW6NbcWQ0TY+MtU+dDvt6+1
-         8Zpgs1mgkdg13TY9pnN7S7ljRstr5E41NYrwxjHIf1qX0U7jHQ7BKPqjxyHifFFe2Kkt
-         TugA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738852504; x=1739457304;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jOWnP+hs+tCrbefp1Oba46A/JA3SeEvmam41cX9hsDI=;
-        b=RohGHtjat8PGkfWSFubOU54Q1amnRDbIWYdPXO9hzzGv+IbaybrK0FWYpYBjGlCnty
-         ZuA7JrVT7fnqcUNcpWEBKI4AmQUIR0gdBxwFf98yEH0fTwd9aoGUzgTj4fla95RcPW1L
-         NggTdxCsx6bY+YZHNm1MPkL31kaYVZEJBZEYlBCDldTFFnTwChbv6fscStAN7rTBcsgn
-         TzSKORHByV9Hv8w504xksnYO+33Bhpru/viAMq0DaSRVgNgE9YVmCZIrLCTpELie5kQS
-         7CCii0PiWmnKU5P9eZvnnyoyLOXmlHtT3O5Xzn+ouAbpdFvUfIv2715Ib2tcNoNtQkOl
-         e7XA==
-X-Gm-Message-State: AOJu0Ywa/qd+osNnEddL8o/D29aPwOI54p1v4L/qVZ3ZpkNXzBuTvCF+
-	ymGx4U1zXnrROFpRba6ZGlC23Y3myM2G7QPOdfNIFHfg0dFgll0ofaqWnQ==
-X-Gm-Gg: ASbGnctu5HWjggHQSIqX199HsOkUyAmSCeN5rb9veBhN5ZS65f7BYFPcX2y6O57VkDh
-	BKQ3yfDfDcjZeReNjYW1HUaNf18o4AOB8Zd+IxSV2eHDcdYemuqBYcrD6Qw19PDOf5/Yc6OBqVB
-	ejFtSO2kQet7NCtNKEbvUIDb6vIfrcpUg53cO2Lu/PDKfa8PEhJK1NfiPl4p59f011CsSlkIvCw
-	S+TPgTiqIq2nQe+Kfxg1NIMIaRNELMq2xb3dWd/b0ZhJl1oMMGYvTiJnbUxa7WeSgoqBImaebaz
-	ODfvxkL+dMgxJW4i9YsZ
-X-Google-Smtp-Source: AGHT+IE37xT2Si08dcy2VgZMe+eGr5qOl+3oD9VzZk5kmgJ0E65UCCNLmfjpMsRHLqrPWC7Ne3sWVw==
-X-Received: by 2002:a05:622a:1a99:b0:467:86a9:f7d4 with SMTP id d75a77b69052e-4702818750cmr94532931cf.16.1738852503854;
-        Thu, 06 Feb 2025 06:35:03 -0800 (PST)
-Received: from [172.17.0.2] ([20.25.204.46])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47153bc75aesm5772491cf.64.2025.02.06.06.35.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2025 06:35:03 -0800 (PST)
-Message-ID: <67a4c897.050a0220.2beca2.1e7a@mx.google.com>
-Date: Thu, 06 Feb 2025 06:35:03 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2593745220501406224=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RqTz77Gk"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5168bXvn014574
+	for <linux-bluetooth@vger.kernel.org>; Thu, 6 Feb 2025 16:49:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=Vs3av4FtjcKn7ApOGCFN9k
+	nzQkRxL4+DwceKPFiK6t8=; b=RqTz77GkikZdlRn/mcLDqSm20RnnfqHPgEC+CE
+	DSK3xKyuBI9TgbUM9L7a64bam5WMSX2cE3GxCVVoGzsykvkRXMDQZtIfQ9sGB1sd
+	8lwvibCWdrvDnXk9tJCq3jlU+ujPOdOGrqublPM8KzNZphhgtitC9Ykap7hVweO8
+	hwDokfXHS9n9biKvmefyXpO+f1vwuuJpNl7WqKW31HMbXOsKRhSdkEPb6UWwVEiP
+	vDiB3iOterQ67SgGCyI+9eI/P5EUD7Abm34MZt/ZbF8TE8nw1VfxA/kahVbKFny+
+	yPK+i+FtbORMT+RlIa0+JbUBRjYuCzsDVorHSoi4EE6T3y9A==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44msr118hg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 06 Feb 2025 16:49:09 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 516Gn87j005901
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 6 Feb 2025 16:49:08 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 6 Feb 2025 08:49:06 -0800
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v2] obex: Add messages_get_message() implementation for MAP plugin
+Date: Thu, 6 Feb 2025 22:18:52 +0530
+Message-ID: <20250206164852.3649751-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sanchayan@asymptotic.io
-Subject: RE: shared/asha: Add support for other side update
-In-Reply-To: <20250206132548.363559-2-sanchayan@asymptotic.io>
-References: <20250206132548.363559-2-sanchayan@asymptotic.io>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: fxNzQF0duIZpEBuN_uYEa1lTaWpbdjGQ
+X-Proofpoint-GUID: fxNzQF0duIZpEBuN_uYEa1lTaWpbdjGQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-06_05,2025-02-05_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 adultscore=1
+ lowpriorityscore=0 impostorscore=0 mlxlogscore=795 clxscore=1015
+ mlxscore=0 suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2501170000 definitions=main-2502060135
 
---===============2593745220501406224==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=931214
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.23 seconds
-GitLint                       PENDING   0.23 seconds
-BuildEll                      PASS      20.47 seconds
-BluezMake                     PASS      1585.61 seconds
-MakeCheck                     PASS      13.58 seconds
-MakeDistcheck                 PASS      163.68 seconds
-CheckValgrind                 PASS      221.51 seconds
-CheckSmatch                   PASS      300.05 seconds
-bluezmakeextell               PASS      100.56 seconds
-IncrementalBuild              PENDING   0.33 seconds
-ScanBuild                     PASS      906.62 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+GET Message() operation should be supported for passing below PTS
+testcases -
+1.MAP/MSE/MMB/BV-12-C
+Verify that the MSE can return an email message to the MCE.
+2.MAP/MSE/MMB/BV-13-C
+Verify that the MSE can return a SMS message in native format to the MCE.
+3.MAP/MSE/MMB/BV-14-C
+Verify that the MSE can return a SMS message with text trans-coded to UTF-8
+to the MCE.
 
 ---
-Regards,
-Linux Bluetooth
+ obexd/plugins/mas.c            |  4 ++--
+ obexd/plugins/messages-dummy.c | 32 +++++++++++++++++++++++++++++++-
+ 2 files changed, 33 insertions(+), 3 deletions(-)
 
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index 10b972d65..f63fcf6c6 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -612,11 +612,11 @@ static void *message_open(const char *name, int oflag, mode_t mode,
+ 		return NULL;
+ 	}
+ 
++	mas->buffer = g_string_new("");
++
+ 	*err = messages_get_message(mas->backend_data, name, 0,
+ 			get_message_cb, mas);
+ 
+-	mas->buffer = g_string_new("");
+-
+ 	if (*err < 0)
+ 		return NULL;
+ 	else
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index e313c6163..93648831a 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -516,7 +516,37 @@ int messages_get_message(void *session, const char *handle,
+ 					messages_get_message_cb callback,
+ 					void *user_data)
+ {
+-	return -ENOSYS;
++	struct session *s =  session;
++	FILE *fp;
++	char *path;
++	char buffer[1024];
++
++	DBG(" ");
++	path = g_build_filename(s->cwd_absolute, handle, NULL);
++	fp = fopen(path, "r");
++	if (fp == NULL)
++	{
++		DBG("fopen() failed");
++		return -EBADR;
++	}
++
++	/* 1024 is the maximum size of the line which is calculated to be more
++	 * sufficient*/
++	while (fgets(buffer, 1024, fp)) {
++		if (callback)
++		{
++			callback(session, 0, 0, (const char*)buffer, user_data);
++		}
++	}
++
++	if (callback)
++	{
++		callback(session, 0, 0, NULL, user_data);
++	}
++
++	g_free(path);
++	fclose(fp);
++	return 0;
+ }
+ 
+ int messages_update_inbox(void *session, messages_status_cb callback,
+-- 
+2.34.1
 
---===============2593745220501406224==--
