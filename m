@@ -1,127 +1,119 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807FB23ED75
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Feb 2025 14:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC55193429;
+	Fri,  7 Feb 2025 17:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738938693; cv=none; b=N6oCDPmHon6Uspe27hD9+4dTBIfIsQHPyjuBA+FS3ci2gv8skFmG+qW5EUJoeEfgPhgDpp+DVE0wB8vDMJQBnKAh7fchvyvbAY0r00YqJ66WbZZN94WhsxBjI5pbLjnymQ1NET5j2kJZk2okedeZC5AOeLA3PYRI+niAIBDCvDg=
+	t=1738949711; cv=none; b=U1sPfmjhNrbFh3iJOLwo77gaIWuG7z7/6+mFGnyADOLPjah8BBhOaOgIP3Rs+oQl+ceIRlqyzinzDFnj9hN8yTCAiolQxFBrFbxt6QI63qd9wSgwdCAkAMf0Kj31/jn2G4f/uJ87J8WoN886eRRpqzMvq9iBTFhfN8Qft7o43Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738938693; c=relaxed/simple;
-	bh=Rfaa7nJ36fGCR/wdumx79Neo89+6aRnxkMFnXVhkOx0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=n1IN/qarNlxzNmAp8i0/jOj7I5zweam/6WAdBa3MBHsdFmJYOiAhRKuClr0kuNPa+mpxdwLbfh85SlQsfiwSx8FljDxekSLVSMh9sqcrx7H2k+JR3tOOfXdINXjxkw+e0yJj9pdQ8Ju9tMvKoW7AQFrQ/OoE27C53gKEUVvvVfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ksWlB1FV; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1738949711; c=relaxed/simple;
+	bh=M42hvVtmSFE2OaWKBP+bq+dNVUHH0MTpDkyCkpJ4Rtc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ivhvgCNyBO83PWIrrbad2SwfCdGyhpNETQCnoUJ3DOLH39FlZ2WOttgpIAUmqZ4qprTzn8SEXeSKggcfS40hLPVw541XUV3ztZy0RXRi3Suewu2l7q5LsHZHlQEuQWaZIApr5FCbuOhJC4ns2sBFCUSea9MUcRe671hoQW1L2AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kUduQRFR; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ksWlB1FV"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2165448243fso53016925ad.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Feb 2025 06:31:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kUduQRFR"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-308a559bdf7so8363581fa.1;
+        Fri, 07 Feb 2025 09:35:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738938690; x=1739543490; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rfaa7nJ36fGCR/wdumx79Neo89+6aRnxkMFnXVhkOx0=;
-        b=ksWlB1FVNA2jBm/f0BHfiRLOfDFFdpAYbNH7U8cm93gNrD2TLTw2Rj1Mg+0+xZBX6Y
-         zrTRBik3kzxzx0ha9RP7l7PHduLXQDMGTw9ZrvsY2pZLdZsFSFMxUtF+dWpbZZ1cktxh
-         ENOU7wnzBvvOlGO1hDY06WtsQ4UUKFBxkdqBlRWgs3bv1Fzwb5iLUlh5MdvDh2lIMw5g
-         NVIBiXiywJohZTzeHmy9RnxwX+144KTN1XXw0hN79mGS5pD06EhmXmHUVfGmNig7tZiC
-         zWmUF2VuCR7oFdZTikI4e6Z1bjmVBwzOrZKXPTw4Illm6LeV9Sri/HPBVnJUuv28zv3P
-         NOMw==
+        d=gmail.com; s=20230601; t=1738949708; x=1739554508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M42hvVtmSFE2OaWKBP+bq+dNVUHH0MTpDkyCkpJ4Rtc=;
+        b=kUduQRFRM8B57YB14ilFAxSNgJuBDlj53Lt9MWPBUYTKPtkhJmWk5RMdEnTnd3dpRD
+         38lYwDMu7Bji89+nJ3thVJMqeqYVqH3l8BPbKZRtDEAKAKXb/xK4uOvj53V4bXD9wwfp
+         i/SN1VjOF+q3NJ0fDV/AUjw/fNxifsG9VnjufgL9PuYWEpHLlZN/RCrDxG5mC5KrtAHz
+         ffJd8QE3r924/yr9hrKevqQ1ZVNXtoG3nAytLtSOFyF/PAwraAu3CWJLVwUGpIBTYTDt
+         bfQCh4BPe55nSgy3qL3jwJpXqruDi55JlyyephlllrZpxf5fbdONARWwRiiaKYXUzqyy
+         Sr9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738938690; x=1739543490;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Rfaa7nJ36fGCR/wdumx79Neo89+6aRnxkMFnXVhkOx0=;
-        b=FbvwPDCKAuPy81aMOGwsjEzISb8NjiLsUZuHagxZ2WED2XVu1QrwU+2NfRHP/2+AJh
-         RS+yBElfqsoTdX1J1dy3+K2whYz8J45Vefac15s+gvffDlDRlTlsNzaE1rZu+gK5myWO
-         4pr1p02hcp9R8/WMBuL3o1wopB/lGOLZOi9AXISo+5DhaKGdxY4HYRvEze8tBrDyta34
-         nD3PQ66H/Sp0SlFazEZmS2vGBkQm1/etC+nf16qDOENfBdIslyewL5Ys425Fq0k4pLfw
-         FzOlR6WN7sB92xp0KCHNwph/B8BkQLDogDMWu/UOtGY4T3ijGrj0pEBdTTlED4uhL1v7
-         upBA==
-X-Gm-Message-State: AOJu0YxAvZ09CZ8P0Rsxgv8OTE2cut1xCk+OgqsAbAU9hekZYz18ExGE
-	Sn27bmtJcNrWQ8xchb/gIYNuGOJBwBKPF9m3T7kQ+R/g8aBjLIwxtQdfDw==
-X-Gm-Gg: ASbGncvoYx4qLCoetRp/EVm3VdPBqCi/o7Zi47s5tXwF2oKLVRt/XMPU5jLYQN4Kjgf
-	nE0Vp/m3DuZpTkzR0FcQBC4VP6zcCKq8AVo+QTUE4TlKFAcWLJPBWB8rDoU1kouMgNGuQBSodyl
-	/rcZVoqZcbGeTJVCbKdsFHeDlw5o4uW9c1jto52dQ85H79EOHugAPEqlT/bfjMH+bBNzk7oTjhf
-	+HZNRCW46ZdC1JPvUDdBg3q+708RQcSLiDDMAmPX5gVDB4ezDCQD2Q3LoZTopEzIVH2NV5mmqPl
-	ycGkkqicHxBxWNVGtF8YTQ==
-X-Google-Smtp-Source: AGHT+IFflYV6dGkKS6AQL68Hw41IEeHnX1Bzlfemrhp+AjQCSiqTJw1O3LgCeGMtvYTbWN7WoAAPIQ==
-X-Received: by 2002:a17:902:fc47:b0:215:385e:921c with SMTP id d9443c01a7336-21f4e7e2b32mr56458555ad.51.1738938690399;
-        Fri, 07 Feb 2025 06:31:30 -0800 (PST)
-Received: from [172.17.0.2] ([20.169.13.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3650cf56sm31336465ad.11.2025.02.07.06.31.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 06:31:30 -0800 (PST)
-Message-ID: <67a61942.170a0220.2def5c.6b76@mx.google.com>
-Date: Fri, 07 Feb 2025 06:31:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7921177043915643696=="
+        d=1e100.net; s=20230601; t=1738949708; x=1739554508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M42hvVtmSFE2OaWKBP+bq+dNVUHH0MTpDkyCkpJ4Rtc=;
+        b=J9hRLW5zsAno/ZXZOPWLGkevUxbmW/A4ka7LmQwxQwlTqH6NRHGsKuU+tQbv4tfLkR
+         mCYR7od/5NO2o7gFLbZ5IaLscazANtaHUcCPsBv/wqKOEpQ4L4I9B6Gt5KJirHdwgkVY
+         mtFqnGpRR9iiFpW0gj9G4W1UCWzasTVxQZVgPA+yGCJ8m09+7QrzKCrbY8qyNu0tPgrv
+         ml8XclgeP4r/Lz1F4rx0a6hPy8+T8iy3u9Fyn5BpK1Sm06SwuXc46QrU5Psu6FKTT5wb
+         gkUmHRhvjSm2ejeYR13ZRRgQ9e/uKIt3VObNUltS5La91J67kFvmqHC7h356LvL1Tc1i
+         pqPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVshou023gpUHJ4fuRcPD+YRCls0WLfdz2vMeAu+eq9CANufA/wWW399xvc+aJt1qqwV0MimgY4L2o74FQof8I=@vger.kernel.org, AJvYcCWM/HDVhcWWJm2Y3rHxsyEj6hBMnYFbJmU7G8jnmluq3vWwgWm0AmtYNMCUNE4lbtCnFay/NFn5@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlVRNKCFcP9u0MJzmks6mrw3Vz8EWBVnXhauwFDcNr2aK6bcJT
+	Im7t3NA9OyLFJRyG8RGkEXYhfPqMUqph12nbwIRHg8FHfOsbQ8jqCCsIguZHXQXWdQ+txZT1O4b
+	1Cij2LAXxtj1foUDCW+Ofkqj2ImM=
+X-Gm-Gg: ASbGncujib+rC9tarZ/W6cWZ5+OdblggqSpNWoAgbxALNdLOKE2F5+dLIRTfxHOS3ye
+	+KZoU+S9PVBCPNigd3bct/oGwgeA+leqYPVzhD8ice0teaUSfRbCxds6NFl9/T2UXur31mep4sg
+	==
+X-Google-Smtp-Source: AGHT+IECzcF0hnX0qu/PB1nu2MdSqilOgR0bktrAhxPJnIUpljwdkIVuS3UvYRG9FAMvXev7X+NI0t7hNnUcGnQMaQQ=
+X-Received: by 2002:a2e:7d1a:0:b0:306:1302:8c7a with SMTP id
+ 38308e7fff4ca-307e5a8de31mr10814781fa.36.1738949707896; Fri, 07 Feb 2025
+ 09:35:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, lizhi.xu@windriver.com
-Subject: RE: [next] Bluetooth: l2cap: protect conn refcnt under hci dev lock
-In-Reply-To: <20250207140216.3076952-1-lizhi.xu@windriver.com>
-References: <20250207140216.3076952-1-lizhi.xu@windriver.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240510211431.1728667-1-luiz.dentz@gmail.com>
+ <20240513142641.0d721b18@kernel.org> <CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
+ <20240513154332.16e4e259@kernel.org> <6642bf28469d6_203b4c294bc@willemb.c.googlers.com.notmuch>
+ <CABBYNZKJSpQcY+k8pczPgNYEoF+OE6enZFE5=Qu_HeWDkcfZEg@mail.gmail.com>
+ <6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch>
+ <7ade362f178297751e8a0846e0342d5086623edc.camel@iki.fi> <6643b02a4668e_2225c7294a0@willemb.c.googlers.com.notmuch>
+ <CABBYNZ+9D-jSyTsRvzRReHE4enfv6DP=Pr4uZCaLdY3-4D6AHg@mail.gmail.com> <0a132561e1681cd0a9b10934a1cc1f96d29dfb8a.camel@iki.fi>
+In-Reply-To: <0a132561e1681cd0a9b10934a1cc1f96d29dfb8a.camel@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 7 Feb 2025 12:34:55 -0500
+X-Gm-Features: AWEUYZmMXV2ligWMXfHgbYsVQgy4mDcEnT6FqA77EfdfqtKj0s9SZ2Tz6J3GSko
+Message-ID: <CABBYNZ+Sa1y3mvX+GpCtOUDu_0jZ9MNS69xLSHY5ShkfBuNfzA@mail.gmail.com>
+Subject: Re: pull request: bluetooth-next 2024-05-10
+To: Pauli Virtanen <pav@iki.fi>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	davem@davemloft.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============7921177043915643696==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Pauli,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTMxNjEwCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQRU5ESU5HICAgMC4zNyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
-TkRJTkcgICAwLjIyIHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDAuMzMgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
-MjQuNDMgc2Vjb25kcwpDaGVja0FsbFdhcm5pbmcgICAgICAgICAgICAgICBXQVJOSU5HICAgMjgu
-MDEgc2Vjb25kcwpDaGVja1NwYXJzZSAgICAgICAgICAgICAgICAgICBXQVJOSU5HICAgMzAuNzAg
-c2Vjb25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBQQVNTICAgICAgMjQuNTAgc2Vj
-b25kcwpUZXN0UnVubmVyU2V0dXAgICAgICAgICAgICAgICBQQVNTICAgICAgNDM2LjI3IHNlY29u
-ZHMKVGVzdFJ1bm5lcl9sMmNhcC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDIwLjM1IHNlY29uZHMK
-VGVzdFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDM1LjUwIHNlY29uZHMKVGVz
-dFJ1bm5lcl9ibmVwLXRlc3RlciAgICAgICAgUEFTUyAgICAgIDQuODEgc2Vjb25kcwpUZXN0UnVu
-bmVyX21nbXQtdGVzdGVyICAgICAgICBGQUlMICAgICAgMTIwLjY3IHNlY29uZHMKVGVzdFJ1bm5l
-cl9yZmNvbW0tdGVzdGVyICAgICAgUEFTUyAgICAgIDcuOTUgc2Vjb25kcwpUZXN0UnVubmVyX3Nj
-by10ZXN0ZXIgICAgICAgICBQQVNTICAgICAgOS44MiBzZWNvbmRzClRlc3RSdW5uZXJfaW9jdGwt
-dGVzdGVyICAgICAgIFBBU1MgICAgICA4LjE1IHNlY29uZHMKVGVzdFJ1bm5lcl9tZXNoLXRlc3Rl
-ciAgICAgICAgUEFTUyAgICAgIDYuODcgc2Vjb25kcwpUZXN0UnVubmVyX3NtcC10ZXN0ZXIgICAg
-ICAgICBQQVNTICAgICAgNy4wMSBzZWNvbmRzClRlc3RSdW5uZXJfdXNlcmNoYW4tdGVzdGVyICAg
-IFBBU1MgICAgICA1LjAyIHNlY29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEVO
-RElORyAgIDAuNzIgc2Vjb25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMKVGVzdDogQ2hlY2tQYXRjaCAtIFBFTkRJTkcKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2Ny
-aXB0Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBHaXRMaW50
-IC0gUEVORElORwpEZXNjOiBSdW4gZ2l0bGludApPdXRwdXQ6CgojIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tBbGxXYXJuaW5nIC0gV0FSTklORwpEZXNjOiBSdW4gbGlu
-dXgga2VybmVsIHdpdGggYWxsIHdhcm5pbmcgZW5hYmxlZApPdXRwdXQ6Cm5ldC9ibHVldG9vdGgv
-bDJjYXBfY29yZS5jOjc0Nzc6Mjc6IHdhcm5pbmc6IOKAmGwyY2FwX2Nvbm5faG9sZF91bmxlc3Nf
-emVyb+KAmSBkZWZpbmVkIGJ1dCBub3QgdXNlZCBbLVd1bnVzZWQtZnVuY3Rpb25dIDc0NzcgfCBz
-dGF0aWMgc3RydWN0IGwyY2FwX2Nvbm4gKmwyY2FwX2Nvbm5faG9sZF91bmxlc3NfemVybyhzdHJ1
-Y3QgbDJjYXBfY29ubiAqYykgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0
-OiBDaGVja1NwYXJzZSAtIFdBUk5JTkcKRGVzYzogUnVuIHNwYXJzZSB0b29sIHdpdGggbGludXgg
-a2VybmVsCk91dHB1dDoKbmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmM6NzQ3NzoyNzogd2Fybmlu
-Zzog4oCYbDJjYXBfY29ubl9ob2xkX3VubGVzc196ZXJv4oCZIGRlZmluZWQgYnV0IG5vdCB1c2Vk
-IFstV3VudXNlZC1mdW5jdGlvbl0KIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6
-IFRlc3RSdW5uZXJfbWdtdC10ZXN0ZXIgLSBGQUlMCkRlc2M6IFJ1biBtZ210LXRlc3RlciB3aXRo
-IHRlc3QtcnVubmVyCk91dHB1dDoKVG90YWw6IDQ5MCwgUGFzc2VkOiA0ODQgKDk4LjglKSwgRmFp
-bGVkOiAyLCBOb3QgUnVuOiA0CgpGYWlsZWQgVGVzdCBDYXNlcwpMTCBQcml2YWN5IC0gU2V0IEZs
-YWdzIDMgKDIgRGV2aWNlcyB0byBSTCkgICAgICAgICAgIEZhaWxlZCAgICAgICAwLjE5NCBzZWNv
-bmRzCkxMIFByaXZhY3kgLSBTZXQgRGV2aWNlIEZsYWcgMSAoRGV2aWNlIFByaXZhY3kpICAgICAg
-RmFpbGVkICAgICAgIDAuMTQyIHNlY29uZHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IEluY3JlbWVudGFsQnVpbGQgLSBQRU5ESU5HCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxk
-IHdpdGggdGhlIHBhdGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6CgoKCi0tLQpSZWdhcmRzLApM
-aW51eCBCbHVldG9vdGgKCg==
+On Thu, Feb 6, 2025 at 12:13=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+> AFAICS, for synchronization (only) guidance in the specification is
+> (Version 6.0 | Vol 6, Part G Page 3709)
+>
+> """When an HCI ISO Data packet sent by the Host does not contain a
+> Time_Stamp or the Time_Stamp value is not based on the Controller's
+> clock, the Controller should determine the isochronous event to be used
+> to transmit the SDU contained in that packet based on the time of
+> arrival of that packet."""
+>
+> which I'm interpreting that Host should queue synchronized packets for
+> different CIS to HCI at the same time. But since this seems
+> implementation-defined, I don't really know what Intel firmware is
+> expecting the Host to do, so maybe pull on completion works (at least
+> until user app misses a wakeup).
 
---===============7921177043915643696==--
+Yeah, I think this lack the clarity on how the Controller determine
+what packet got the what event, in theory the buffer count acts as the
+queue, the queue is then used as jitter meaning there will be some
+latency but I think that is sort of unavoidable with the way packets
+are transmitted over HCI.
+
+With this in mind I think one of the problems is that when we have
+multiple connections we probably need to load balances the usage of
+the controller buffers, each connection needs at least 2 buffers since
+with just 1 it is possible to miss events due to the transport/bus not
+being fast enough to notify number of packets complete event and then
+the stack to react in time to send the next packet, so we need to have
+at least 1 packet queued ahead of time.
+
+Once we can notify the TX complete we can perhaps use it as a trigger
+to send the next packet, instead of trying to do it time based like
+bluetoothctl is doing nowadays, which imo is simpler and should result
+in a better utilization of the controller buffers.
+
+--=20
+Luiz Augusto von Dentz
