@@ -1,142 +1,215 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EA247F4A
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Feb 2025 04:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B131353A7
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Feb 2025 05:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738902894; cv=none; b=uXEGBe/hjQuhViAwhdAhiAcE7y6cmVo9KGcI0I0ZhZ1c/oi6rLzSeG3zUjCvJ+SBC9+XPmhylOpjRciFiQahpynwkBB0xVEE/ZQdiIbXkvebxqzpbPG4hySB3U/tBHEsHYkay0YYIPLz0HB0FkvnJQJA6xZR1Z2NTCIYCHenm0g=
+	t=1738905854; cv=none; b=eDET8S4OTQJgwBVBcTx8GKeSekeCAYnETYuDwhfTov3SSbHrbukmdSV+a2XHlWzXEu+pd+LIVxOn+dxrBbB2bphpCsPSkZDBaxb35Xt6UuDY8DITU3uU6IILP7PnRNMjyGj1JQSvTtUZLgg+9CkmrFtvOqO5eWspUhqTQgrYsTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738902894; c=relaxed/simple;
-	bh=CfgGGULHR1ZmZBg/nPb+brk28FHEwj+L03ZJGd+FJ1E=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=niBKr/GuQV+zjo0LpAXwLhT/lDWoQyis2++mXvSdQIlIH60xZFUH1SpwT0G5x1kHVoh4TLebMkKRCJ0FRK4C2yU5MD9Wh0GtG4ULoapehfYXqeSBuEh++kfy4o24wQiLTxsGjx59otz+fKijDSjMZP1yRfP9RIBB9vLPp1SIHCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fPFgWJix; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738905854; c=relaxed/simple;
+	bh=j0cRb5gWfdv8QZDuATQPHfkRFREKlmUjakaMO/q50Dw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rf3MmJEI7F2djAgJRyQqlsZlsgZucCjYv63wDNx3IG2dTXs9pM/tJyblEXs3/dkERIRTTIbvSV90DRa1q4i6p61b93VtTWVwK8c9UrZuR+em5zeo2GtIX85V48xNKo2OeN2nrggejWmnZIF70OMctWVd9WVydkSwiOwI7zOTqZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie; spf=pass smtp.mailfrom=rjp.ie; dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b=Lalm9s+f; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rjp.ie
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjp.ie
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fPFgWJix"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467a6ecaa54so14366641cf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Feb 2025 20:34:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738902892; x=1739507692; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=eeDZg5Sz1w1/7UfjnQO16Rc22eJthC8mJkYKKONatJQ=;
-        b=fPFgWJixbhg/WHldq7hzmHLIL5ARloT/NG5JXeuQGQrVAWXlt+W0o0G/aV8rliRR4f
-         /D1OoQKysw9U5pw5sitShwPeNgqtxxmOjePYjrwk/2uCc3cim/nvton1xyUEwyToR1Zb
-         hR3jRdFUpACOekTKz0IU+/6YxTf/WBzJv8TgUeR1fMOUjZ7Rglb+/1tSD/dwHiEyJ8VX
-         ascdU/bniRY37LcuA+gyTkrGglGzAMko3eq0Yxl79tHVW/uSp/exDdOqSoT0neGqeznA
-         1Xptguytl8xVD+pXhMhB4R05J1ccZlsecbv3nSHV6qvckxzyPJ8LulOcH0Gy2El/Hsmm
-         gNkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738902892; x=1739507692;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eeDZg5Sz1w1/7UfjnQO16Rc22eJthC8mJkYKKONatJQ=;
-        b=n3rLuC2pAvUVM1c6KhtSbhMRWMzlF8cOKjaOdP432iPkhQkIEUuBlUkQCuguwn1O5G
-         3kM0HmYEEfS8uDSws7atcLK5POrK6xuiovgT8fnDrE1hGozYmc6qA7T5oRlt2npUBwJ4
-         NPp+XqiVqGK66xuphwEthneeAQqX6PSzNL5TNBMcY9cdYi+ezEX9HSctCB4X1C9MVO2Q
-         40KlMGZae1Jz5B1sSryErPSzurjfSurFEzTVDixQflEoisrsTfl8SHo0fgjem9v3AuZ9
-         wrwFkcmB0pbTKGfKn64ztv8/caeYwdmhfrDt3cPBf5XOmvNp7Dy7T1UWOvezfRiY7DiQ
-         628Q==
-X-Gm-Message-State: AOJu0YzrVjsspE8MQ9b3ttlxOFqpG3NMHkxd5ReeGyxWil0tVqvzCddq
-	h5tnltXo4ZSiuXtij0o5JhwoThVoar8mbDXhCA7Gj4rbic1Evgv7GFhyrA==
-X-Gm-Gg: ASbGncvfJqslZjfl02rTeiw5X6zYBszWjNN6SRocu7eDjr55Yt0gKXAvFSGo8YmIlrA
-	gdSMSDfiJzFzY+FkBzzcRKXnBGc+S+KsvkSsLqFUWBxFdZvYk0zoyzuPwSfJda1rdUhuEaLW5aA
-	kw+vV35rSvQQOazkfM1Q465nBsJlH9SNfEeR43SJ1QJbZLnKob4YM4h3vOy7a4/077MxQitORdp
-	HuVuPX7lYJtUxhH0LvtLhL3sURnlCMFfqPNOle4a7YJCdcq8ydGFKyafwsv16In9nwue1Ng2nZl
-	cMY8aBLMl1lylI5I2hhz
-X-Google-Smtp-Source: AGHT+IF5rL7kVtqNz9IAQel6ve4oy1aa1R3vF+9TOhaQmFbEThIMbIMajHl8zvpsboQeGffS6tNgTA==
-X-Received: by 2002:ac8:58cf:0:b0:46f:d693:1a99 with SMTP id d75a77b69052e-47167b18da7mr27584251cf.49.1738902892001;
-        Thu, 06 Feb 2025 20:34:52 -0800 (PST)
-Received: from [172.17.0.2] ([20.88.39.186])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47153bec3c6sm12386401cf.77.2025.02.06.20.34.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2025 20:34:51 -0800 (PST)
-Message-ID: <67a58d6b.050a0220.2e57a0.571c@mx.google.com>
-Date: Thu, 06 Feb 2025 20:34:51 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7796448572644000633=="
+	dkim=pass (1024-bit key) header.d=rjp.ie header.i=@rjp.ie header.b="Lalm9s+f"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjp.ie; s=key1;
+	t=1738905843;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5OTGBem+ySKepEObWZRsIR8pVwo/Xq3qwsKuWqxPnfw=;
+	b=Lalm9s+flVNkr3/Tg2g+L1+7ubfqW1nEMCgiNd0Zxh9xy6dy5yyvD9NoJ6DBFPlE+Orjc2
+	pdzWjVCXCMC312bTycU04uOvgPS8UicCSj9B0xtWU+RxllQ6f98DGNaHdGsLnk7gALeAn3
+	ZYMX6mHwUMlpnyVM8KCjA6rQHILv1VA=
+From: Ronan Pigott <ronan@rjp.ie>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ronan Pigott <ronan@rjp.ie>
+Subject: [PATCH BlueZ] zsh: use the correct completion return value
+Date: Thu,  6 Feb 2025 22:23:22 -0700
+Message-ID: <20250207052345.63368-1-ronan@rjp.ie>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, lizhi.xu@windriver.com
-Subject: RE: Bluetooth: hci_ldisc: Clear and shrink the ready bit
-In-Reply-To: <20250207035529.2127772-1-lizhi.xu@windriver.com>
-References: <20250207035529.2127772-1-lizhi.xu@windriver.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
---===============7796448572644000633==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The return value of a completion function is significant, if we fail to
+return success additional completers may be invoked when they otherwise
+should not be.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=931439
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.18 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      24.35 seconds
-CheckAllWarning               PASS      26.52 seconds
-CheckSparse                   PASS      31.38 seconds
-BuildKernel32                 PASS      23.75 seconds
-TestRunnerSetup               PASS      423.84 seconds
-TestRunner_l2cap-tester       PASS      20.28 seconds
-TestRunner_iso-tester         PASS      27.25 seconds
-TestRunner_bnep-tester        PASS      4.77 seconds
-TestRunner_mgmt-tester        FAIL      118.10 seconds
-TestRunner_rfcomm-tester      PASS      7.56 seconds
-TestRunner_sco-tester         PASS      9.24 seconds
-TestRunner_ioctl-tester       PASS      8.10 seconds
-TestRunner_mesh-tester        PASS      6.02 seconds
-TestRunner_smp-tester         PASS      6.98 seconds
-TestRunner_userchan-tester    PASS      4.98 seconds
-IncrementalBuild              PENDING   0.97 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.165 seconds
-LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.157 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Also cleanup up the zsh completion, removing the redundant definition of
+_bluetoothctl and using the _call_program helper where appropriate.
 ---
-Regards,
-Linux Bluetooth
+ completion/zsh/_bluetoothctl | 127 ++++++++++++++++-------------------
+ 1 file changed, 58 insertions(+), 69 deletions(-)
 
+diff --git a/completion/zsh/_bluetoothctl b/completion/zsh/_bluetoothctl
+index 610ca2b8d59c..734036e596c1 100644
+--- a/completion/zsh/_bluetoothctl
++++ b/completion/zsh/_bluetoothctl
+@@ -1,97 +1,86 @@
+ #compdef bluetoothctl
+ 
+-__bluetoothctl() {
+-	bluetoothctl "$@" 2>/dev/null
+-}
+-
+ _bluezcomp_controller() {
+ 	local -a controllers
+-	bluetoothctl list |
++	_call_program bluez-controller bluetoothctl list |
+ 	while read _ MAC NAME; do
+-		controllers+="${MAC//:/\\:}:${NAME//:/\\:}"
++		controllers+=("${MAC//:/\\:}:${NAME//:/\\:}")
+ 	done
+ 	_describe -t controllers 'controller' controllers
+ }
+ 
+ _bluezcomp_device() {
+ 	local -a devices
+-	bluetoothctl devices |
++	_call_program bluez-device bluetoothctl devices |
+ 	while read _ MAC NAME; do
+-		devices+="${MAC//:/\\:}:${NAME//:/\\:}"
++		devices+=("${MAC//:/\\:}:${NAME//:/\\:}")
+ 	done
+ 	_describe -t devices 'device' devices
+ }
+ 
+ _bluezcomp_agentcap() {
+-	local -a agent_options=(${(f)"$(__bluetoothctl agent help)"})
+-	agent_options=( "${(@)agent_options:#(on|off)}" )
+-	compadd -a agent_options
++	local -a agent_options=(${${(@f)"$(_call_program bluez-agent bluetoothctl agent help)"}:#(on|off)})
++	compadd "$@" - -a agent_options
+ }
+ 
+ _bluetoothctl_agent() {
+-	local -a agent_options=(${(f)"$(__bluetoothctl agent help)"})
+-	agent_options+=help
+-	compadd -a agent_options
++	local -a agent_options=(help ${(@f)"$(_call_program bluez-agent bluetoothctl agent help)"})
++	compadd "$@" - -a agent_options
+ }
+ 
+-_bluetoothctl_advertise() {
+-	local -a ad_options=(${(f)"$(__bluetoothctl advertise help)"})
+-	ad_options+=help
+-	compadd -a ad_options
+-}
++local -a toggle_commands=(
++	"discoverable" "pairable" "power" "scan"
++)
+ 
+-_bluetoothctl() {
+-	local -a toggle_commands=(
+-		"discoverable" "pairable" "power" "scan"
+-	)
++local -a controller_commands=(
++	"select" "show"
++)
+ 
+-	local -a controller_commands=(
+-		"select" "show"
+-	)
++local -a device_commands=(
++	"block" "connect" "disconnect" "info"
++	"pair" "remove" "trust" "unblock" "untrust"
++)
+ 
+-	local -a device_commands=(
+-		"block" "connect" "disconnect" "info"
+-		"pair" "remove" "trust" "unblock" "untrust"
+-	)
++# Other commands may be handled by _bluetoothctl_$command
++local -a all_commands=( "${(@f)$(_call_program bluetoothctl bluetoothctl --zsh-complete help)}" )
+ 
+-	# Other commands may be handled by _bluetoothctl_$command
+-	local -a all_commands=( "${(@f)$(__bluetoothctl --zsh-complete help)}" )
++local curcontext=$curcontext state line ret=1
++_arguments -C \
++	+ '(info)' \
++	{-h,--help}'[Show help message and exit]' \
++	{-v,--version}'--version[Show version info and exit]' \
++	+ 'mod' \
++	'(info)'{-a+,--agent=}'[Register agent handler]:agent:_bluezcomp_agentcap' \
++	'(info)'{-t,--timeout}'[Timeout in seconds for non-interactive mode]' \
++	'(info)'{-m,--monitor}'[Enable monitor output]' \
++	+ 'command' \
++	'(info):command:->command' \
++	'(info):: :->argument'
+ 
+-	local curcontext=$curcontext state line ret=1
+-	_arguments -C \
+-		+ '(info)' \
+-		{-h,--help}'[Show help message and exit]' \
+-		{-v,--version}'--version[Show version info and exit]' \
+-		+ 'mod' \
+-		'(info)'{-a+,--agent=}'[Register agent handler]:agent:_bluezcomp_agentcap' \
+-		'(info)'{-t,--timeout}'[Timeout in seconds for non-interactive mode]' \
+-		'(info)'{-m,--monitor}'[Enable monitor output]' \
+-		+ 'command' \
+-		'(info):command:->command' \
+-		'(info):: :->argument'
+-
+-	if [[ $state == "command" ]]; then
+-		_describe -t commands 'command' all_commands
+-	elif [[ $state == "argument" ]]; then
+-		if (( ! ${"${(@)all_commands%%:*}"[(I)${line[1]}]} )); then
+-			_message "Unknown bluetoothctl command: $line[1]"
+-			return 1;
+-		fi
+-
+-		curcontext="${curcontext%:*:*}:bluetoothctl-$line[1]:"
+-		if ! _call_function ret _bluetoothctl_$line[1]; then
+-			case $line[1] in
+-				(${(~j.|.)toggle_commands})
+-					compadd on off
+-					;;
+-				(${(~j.|.)device_commands})
+-					_bluezcomp_device
+-					;;
+-				(${(~j.|.)controller_commands})
+-					_bluezcomp_controller
+-					;;
+-			esac
+-		fi
+-		return ret
++if [[ $state == "command" ]]; then
++	_describe -t commands 'command' all_commands
++elif [[ $state == "argument" ]]; then
++	if (( ! ${"${(@)all_commands%%:*}"[(I)${line[1]}]} )); then
++		_message "Unknown bluetoothctl command: $line[1]"
++		return 1;
+ 	fi
+-} && _bluetoothctl
++
++	curcontext="${curcontext%:*:*}:bluetoothctl-$line[1]:"
++	if ! _call_function ret _bluetoothctl_$line[1]; then
++		case $line[1] in
++			(advertise)
++				compadd - help on off type && ret=0
++				;;
++			(${(~j.|.)toggle_commands})
++				compadd on off && ret=0
++				;;
++			(${(~j.|.)device_commands})
++				_bluezcomp_device && ret=0
++				;;
++			(${(~j.|.)controller_commands})
++				_bluezcomp_controller && ret=0
++				;;
++		esac
++	fi
++	return ret
++fi
+-- 
+2.48.1
 
---===============7796448572644000633==--
