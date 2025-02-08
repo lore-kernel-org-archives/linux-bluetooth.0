@@ -1,113 +1,125 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B3A1AF0B5
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 09:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739007283; cv=pass; b=ZefmbGdcdyxpLM/CUycgcs+bJF97WfeSQQHFRtfNqPfoTdeN++TggHQq2A6jtwNrZ236BHetfS8u49fTJNVILuluhathJw8ufyOJKpkv+D2BOFzsvB7IAC6I3GowOn5UMM6cKzIQXkoy89scEylN78uC4CL87P1CMOl5VKVEyHc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739007283; c=relaxed/simple;
-	bh=YSaToZoP0vyC6K8lDL94dlTR+iw8Z5PD+u6zmXj6RgM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mHJ92IjX9b4joXggdaf2NKwZ2KczLhk7rmWTFxwbGvB2ILCZkarXYWiF14uNQpc7TzbV6VgcD4XJSSbXRMdF7YuOgxVlkm+/5r1x9TRjPhj0wfckQXBDoo6uWdH6+1hpM/X+a9GlhvS59q22anhE/9O/wBz1229MbKV2oG2L+QI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=E4TFSCd5; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A40E2417E1
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 11:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739012813; cv=none; b=LPH7JOtSIFwMANBFYiOBleze8D9ZNPmiDJwMNlkxLOks6IbE6N+yg6c9OxcZaG6QDeUdfJcTXJhKpRg7oCgJON18AscuKHEgKfHbePQI+CjwtXlqGxUOpnJ8Fgx13h9Ggl8Z7DfLrCe0IDXNW+LL8KaL+oB9PE6iek821NXUPbE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739012813; c=relaxed/simple;
+	bh=pUfO9r6mCKGmeK1FzGrYXVx1z+z5XWEOdE7JwC0rAec=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=MgPZygFT6MUZ260j2mjDlqzgZoHdVNGBuiFXZCV1xFBEpRCW8ZhccbxMtEq0f3k4NFWVxV9DnVnSB3Okv/eYR2K/xQ3wf3Xc48tu1ZjWB7Rl/XY1azYlKISDrc4EtmDOH+6bROD0wAFmSQhyUaKEmEkXveQgtOJDEcddXnvKWp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8i0rvnV; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="E4TFSCd5"
-Received: from monolith.lan (unknown [193.138.7.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4YqlzW2sNNzyQx;
-	Sat,  8 Feb 2025 11:34:31 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1739007272;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PIEhqa/Nx8GaEDR8myCJtM/9E8mo9z0QKIpnDUh5Kys=;
-	b=E4TFSCd5Lw/RFtElXJAvg7kJVnos3T9fd1nx3ls6O3CnFS2QsatLJpvfgE3+S9+hwxKWoj
-	eTRvz2YGF5qE/BiH+5ec3aK+OR8O5v78+ZqrgVBewGJdxgwenZasM5gRRW+Bm9+kV5A9jd
-	Ex94S/eMdq+r965AqwNp8xliZyyKBNk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1739007272;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PIEhqa/Nx8GaEDR8myCJtM/9E8mo9z0QKIpnDUh5Kys=;
-	b=yY5rhbNIq6m4GYC6SYZRAzVozcb3+eKyaC/YtDzku+JcoJ1LFdNhMBe0KAuApkNwANOwjX
-	2HfSRVivO+KBQowstYUCS9lB985k99vTopJ2gl8NGftYwOqL1nnoAvRiFW+yeKbyOVzN4j
-	obK1WQVDsTqIx92Fl2J7OOJ4HdXnRJk=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1739007272; a=rsa-sha256; cv=none;
-	b=jYBaqhvr1z40dOvq+bEHx60L2LzFWAGlTU4+BthJmfVLR5A6wNt0lsMbx6ZJ0jfVWYcMtN
-	SIKOcubx1eucbrKqBwXAr/KH+lfMgONPj3u37EC6r2JiWJ6HzqSfId7xfuJkYiPzwN0MKF
-	PeoNdIeNLvi757mtyRWz7BVxhZrx8aA=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] build: check first before enabling -D_FORTIFY_SOURCE=3
-Date: Sat,  8 Feb 2025 11:33:55 +0200
-Message-ID: <da7a417d9b27d26393d6c9f52f675e7ae0541e8b.1739007137.git.pav@iki.fi>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8i0rvnV"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2f9d3d0f55dso4611075a91.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Feb 2025 03:06:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739012810; x=1739617610; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=afSym2qfldfy1eyOts7qc7DV6DqmKKVglnK9TC+xNUY=;
+        b=L8i0rvnVelojpbX73sVaka2lXreJtLKor7EsE60qNX1lgdA8ceegJ2WDTO/g60GY8c
+         nxQM0bCdGCMl9BkpupsdLX3i1mMwMwnFycmAGto9YiaNNjRaXEjQ8TnRl9etncpuf7SP
+         MYk5pYw8wfiQgWtUn52f75y61O4LMBjiBdKFoRTUG3PMojzpqCnPvwnXwoScTtIhBnQ8
+         JAKnDR2hDgbiSvOL/4hnosCZ/tLb36mQr4rT3zS/ZJ6eGTOVpOXkZ5QTYXKIYmBT75C2
+         tFYUigBp5UebbpnTemhcqGDtwofLyWPY+Lwci0wVCJmtGLKH1BqVnCtG1KFTc+Psf1Vo
+         b/Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739012810; x=1739617610;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=afSym2qfldfy1eyOts7qc7DV6DqmKKVglnK9TC+xNUY=;
+        b=xSJJjf0YZAXgRcF4eNary9an4Dnap0iCouuDF3HYzFOuaRymloS8+OgN/rVPyPg8g4
+         UIssKkwvxkxqVJEZ94X95MLbR5gNugqYm31LHVHvYMYL28a2YWp3SGfVz+jRpJoBrlCh
+         AsuDvAPOYSl2Fecea7AxQ/b7re3YR9cdMc6l0lNfl3fAb/4VPwL7elDFxCv+ioUQFBQJ
+         3xE8kApNCoH+9PD7Lbhn1fhmky9ETKh9u4nzhaaC2m8GZIWW5kyKpdtA+0t3fC5Hh8Go
+         epsWNF7PivJfejh1mkrtPDKp2Si3iIpMfdAuba+9THJaAdjiLZ+wOjvtiKiGLiV+3M23
+         lVog==
+X-Gm-Message-State: AOJu0Yz5ShniNnw5narKV0n4TBRjxWVmERrjN0ZcaeJ8j41GiH1AdEJC
+	fAND8jkzq3rPGiUxewdG4F8hiAnfWXLKS2Lf8ne0WBpdMOpuJxrN5vbnUQ==
+X-Gm-Gg: ASbGncveHAbHGhKZlZHlpjnjul3CZ/CllooZBLru0fLL5Q027PLkWG0tJXy4+n8WPXS
+	svEMYDURbqKyB4rf4Gwhn4L4Kb2YFLK+QIt5aqQxEaskUsEE0xcWHU76l2IQluvKo+Qb8blz/Bn
+	b7MJJWoBioTj2stZrXrLOL1zLVcNwQ0Pof0lk8IOWZNzpQWIoSeQ5hMynGd613rWVlQgXJhv1gC
+	I4HxDWKvtTjb7ueu3iD9NSIzZLO9F9Kls+ypJtvxHQKV46AVU2LLP43tKSHDOc0LAw3iCrjsSF0
+	V3uNZd3455gp57ClhGC3fg==
+X-Google-Smtp-Source: AGHT+IE5WlKr3ofM1lp3a6dlTWJjfABXmbJQfbeBvAVN56XVmVgTsH5lzcSPOBABKUZo287+mSyxUg==
+X-Received: by 2002:a17:90b:4fc6:b0:2f8:2c47:fb36 with SMTP id 98e67ed59e1d1-2fa243ee3a2mr10867741a91.33.1739012810402;
+        Sat, 08 Feb 2025 03:06:50 -0800 (PST)
+Received: from [172.17.0.2] ([20.169.15.150])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fa09b5c71csm4899957a91.47.2025.02.08.03.06.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 08 Feb 2025 03:06:49 -0800 (PST)
+Message-ID: <67a73ac9.170a0220.30335.20fa@mx.google.com>
+Date: Sat, 08 Feb 2025 03:06:49 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3385171077918390423=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] build: check first before enabling -D_FORTIFY_SOURCE=3
+In-Reply-To: <da7a417d9b27d26393d6c9f52f675e7ae0541e8b.1739007137.git.pav@iki.fi>
+References: <da7a417d9b27d26393d6c9f52f675e7ae0541e8b.1739007137.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-With --disable-optimization, _FORTIFY_SOURCE=3 produces compiler
-warnings/errors:
+--===============3385171077918390423==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-/usr/include/features.h:422:4: error: #warning _FORTIFY_SOURCE requires compiling with optimization (-O) [-Werror=cpp]
-  422 | #  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+This is automated email and please do not reply to this email!
 
-Before enabling it for --enable-maintainer-mode, check the compiler
-doesn't fail when using the flag.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=931874
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.22 seconds
+GitLint                       PENDING   0.32 seconds
+BuildEll                      PASS      20.11 seconds
+BluezMake                     PASS      1422.15 seconds
+MakeCheck                     PASS      13.93 seconds
+MakeDistcheck                 PASS      156.59 seconds
+CheckValgrind                 PASS      212.61 seconds
+CheckSmatch                   PASS      281.65 seconds
+bluezmakeextell               PASS      97.47 seconds
+IncrementalBuild              PENDING   0.30 seconds
+ScanBuild                     PASS      854.25 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- acinclude.m4 | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 9f2dc302e..168117840 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -65,7 +65,6 @@ AC_DEFUN([COMPILER_FLAGS], [
- 		with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
- 		with_cflags="$with_cflags -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
- 		with_cflags="$with_cflags -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_32"
--		with_cflags="$with_cflags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3"
- 	fi
- 	AC_SUBST([WARNING_CFLAGS], $with_cflags)
- ])
-@@ -136,6 +135,21 @@ AC_DEFUN([MISC_FLAGS], [
- 		misc_cflags="$misc_cflags --coverage"
- 		misc_ldflags="$misc_ldflags --coverage"
- 	fi
-+	if (test "$USE_MAINTAINER_MODE" = "yes"); then
-+		AC_CACHE_CHECK([whether ${CC-cc} accepts -D_FORTIFY_SOURCE=3],
-+						ac_cv_prog_cc_fortify_source_3, [
-+			echo '#include <errno.h>' > fortify.c
-+			if test -z "`${CC-cc} ${CFLAGS} ${misc_cflags} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -c fortify.c  2>&1`"; then
-+				ac_cv_prog_cc_fortify_source_3=yes
-+			else
-+				ac_cv_prog_cc_fortify_source_3=no
-+			fi
-+			rm -f fortify.c fortify.o
-+		])
-+		if test "${ac_cv_prog_cc_fortify_source_3}" = "yes"; then
-+			misc_cflags="$misc_cflags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3"
-+		fi
-+	fi
- 	misc_cflags="$misc_cflags -ffunction-sections -fdata-sections"
- 	misc_ldflags="$misc_ldflags -Wl,--gc-sections"
- 	AC_SUBST([MISC_CFLAGS], $misc_cflags)
--- 
-2.48.1
 
+--===============3385171077918390423==--
