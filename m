@@ -1,150 +1,168 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCF723C8CB
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Feb 2025 21:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C05148304
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 03:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738964494; cv=none; b=bdXEk9tYreTVIJKCmJ59SFjODoN4KOvQUXNi1GSTbYj+i0vG9C5qTdkXXZ1Y9AfsMIBjbuuUyxMocrfNS9xSXwXrQct8d8W12CQTDw4PpwnzxV8e6U+cSkCBxZVpZHHgYgiJpK3OT9uWXZ2+SuQV7FGg54+YhuHRtlKicKl+uRE=
+	t=1738983935; cv=none; b=ToU8NZMEiSzjK8AQjmMtaWADoguI+GdLgTv/q1GV7j6FSkmDEErhMYLmOC6qEfNUoqyIXQhsoLp9z11duPO7Kf3LjUTYvedo872pnEAgNlg6u8jkPlFCaBwQjEqF/io99uIBGd6w7v69YmoUM6EuN5hI/Btrr/5OxLLPm/Gt+OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738964494; c=relaxed/simple;
-	bh=0qwaUh3FX8kzjjJKoHZUa8Z2/M4yyVqRsgfLsvaVUT4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=oNKkG7oUMJI8pkWcJi1ScGfUF3b8o5Jd7y9fSYSmMtA03kh0HDF/zT5sb+bcFYLvx4FJwFO1ToyaGdeHGl7eApzAZEX+y9AhcU/JV1f6QnjrRY68sR1Ao4lL2D4aLnpfZ038uEb62F03tmmv8eyKnKRxpKSkOSp692ig1bXcRFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCU0malL; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738983935; c=relaxed/simple;
+	bh=rop+KKL6i/VvFuiwr3tNLCPfTYZJ/mtMj2yGnzbcl/E=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KRfYIYTLEw8mojJY5/YB7qvFOFiSlNMhP/oLBH8mOMblIqTLfcC/AEa2CUpZU6pu1DUEowO0AEI7fAi3wK40D7XlXI+2nJEoBdphUiBlYyXmI2KB55xXnk9UVXyy+O7no6FTflKS+IIZ4fupcszML12KYpBnBIX5GKU7uIDbzj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gJ9uQGYQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCU0malL"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21f4500a5c3so43926065ad.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Feb 2025 13:41:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738964492; x=1739569292; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=134ccd1380Q5QMWD+4IMqOEFyc+dUgt1LLuXIDbSYp4=;
-        b=TCU0malLVGeU6EsdclTSL6ign4h+Ln7eD+4Ij60oIi66Ps4CMHYeIYYD/s4oSHMVkL
-         S0kAMvcrIO2AUByORVCFfU0Vrx3gEtTQT9aCIFNMAeqBkP8mTymVFnOosufM0UI89g5D
-         unz2FdsA/NWAM/BB7wmkpGvT1zNUYOGqcJ+72220e0BI1I1+oy4m9F25xh6+DZHDJImK
-         MRgEquX4AleEaXG8GQJJbFSBKxd2pLom63JZEsULyi7rYlo+mx8hdxGOaMQGwbvdvKZg
-         YP1jxIqLQ9S8KLVleztHwogOrBmLpo8nJ9ML9e/7hyCQaSfI8sdN7XdLngovfVFukqMe
-         WZPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738964492; x=1739569292;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=134ccd1380Q5QMWD+4IMqOEFyc+dUgt1LLuXIDbSYp4=;
-        b=RSYcw+fmJAsqGtPh456k8Z0fLl07oh12sUyJxU5H35fM9YH9/WifTdThoWJykQ7tg6
-         sXfsBu7y66AaPPWiu3odU+r/hfOIJsapb5CxMWZc5mQ6RiSZJu3tE+rV9o5vJWIY+xnd
-         HyYA68QBr0gAir85gecWKHvQ2EufSDcQbrlcmbsOpeXU5znXNOqzpMhPi1Dm9p9qFdlc
-         cmfmdFf5RKLdGzwJlYqe57nMWiHqQO7ZRH1k6jDoyItAY4ZXI8zowozpzzhmAqFilQr0
-         2gpURZf2yLrIrCypuR0+zxhAy2Rp5o705SxLWY+F8nTCikwogDflEPbP9vptqu9Xrk+O
-         9OYw==
-X-Gm-Message-State: AOJu0YxWL3p2l2Niya3618zvcQQn2YKgGeHxPDaBZ2kdzMPM0KvHK5nx
-	vf3VSadeBdXu+T7Bce249Z2r50Yrhex74viT65lvGLHIp8a5O3SJLHN1nw==
-X-Gm-Gg: ASbGncvZJxskXOHZvag6xszXlvdhfH3aYzSMscB+VmMTbqt0A1ViXvVGFLolwGeR/zE
-	WVARBXQDwGnaWZ8znWIysYNvQEmRsVbpPMX9D9/yQaIel0/UTKTe1lEuyZbEWHUOrmRuVkBGC3H
-	SCRPyx4fOUvgAx1eEBNDeDi4GfZ7Oui6Enhw3C30lG/XoDOIrtvao7Hl211tHtLLKRSBA2TyXdj
-	IejZuWMexpbcJbm+8pWExs0WJRonVDOt9ia+qk52Wp1ZyV0FOiCJyLOh7XO0nb9eLyyuUAR8e2G
-	iz+s/Ne7JDhCbRk4y8XpQJY=
-X-Google-Smtp-Source: AGHT+IGUSy/mZCpyb9/9g27fz4ivZesSVTq/wQbBhBhFcRYBK7NAG0xCcQHC65BTc0xEVvGVN+y7WA==
-X-Received: by 2002:a17:902:f706:b0:21f:85a:3824 with SMTP id d9443c01a7336-21f4e6ca741mr88879035ad.4.1738964491730;
-        Fri, 07 Feb 2025 13:41:31 -0800 (PST)
-Received: from [172.17.0.2] ([52.160.161.187])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3650f087sm35669725ad.6.2025.02.07.13.41.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 13:41:31 -0800 (PST)
-Message-ID: <67a67e0b.170a0220.3dbc0.e7de@mx.google.com>
-Date: Fri, 07 Feb 2025 13:41:31 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3525576858174503177=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gJ9uQGYQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B557C4CED1;
+	Sat,  8 Feb 2025 03:05:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738983935;
+	bh=rop+KKL6i/VvFuiwr3tNLCPfTYZJ/mtMj2yGnzbcl/E=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=gJ9uQGYQxOEvf+HCi1qYG7QaZECCJ/s0rveIif3BEu/eu+Oo9ej6ph4z00jSE2BTI
+	 AFoPcFoj3hd+JC4ViSjjbF6PMqivOMivLhebBLpm1RCfVjUnl/NdGjzVq8z+D/i7kp
+	 3ItjPWH6s+G2T0Zzj4LvzTrOjXPXRgSkY/Bzvy+PI1w+eiIucJx5Fa5WHU8F9JYgoC
+	 QvTDa3ky1Uo04ItsSvMgSy6L71J7s3qcUwVvJh4wm4NpizE+MrmcngxkUGGk134ENz
+	 o2dz2JosbHPVEkuukMH5BpHFKLRyJQVCo+1UEN+07+0unWMjZ+kK+iCppah0WFZKcj
+	 UfJZrJDJTzfKg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1B7C02199;
+	Sat,  8 Feb 2025 03:05:35 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Sat, 08 Feb 2025 11:05:33 +0800
+Subject: [PATCH BlueZ bluez v2] bap: fixed issue of muting music silent
+ after pause and resume.
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, dmitry.baryshkov@linaro.org
-Subject: RE: Bluetooth: qca: add Qualcomm WCN3950 BT/WiFi chip support
-In-Reply-To: <20250207-rb1-bt-v4-1-d810fc8c94a9@linaro.org>
-References: <20250207-rb1-bt-v4-1-d810fc8c94a9@linaro.org>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============3525576858174503177==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250208-ascs_bug-v2-1-b7e062d6604d@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAPzJpmcC/0WMQQrDIBAAvxL23C1qMdqe+o9SitE1EWIMmoTSk
+ L9XeulxhmF2KJQDFbg1O2TaQglpqiBODdjBTD1hcJVBMCGZYBpNseXVrT2SslJx6S5OW6j5nMm
+ H92/1gG5c6QPPqn1OEZchk/l/OGtxnctSZcSNI0fDW62undLeu7uJY+qDPdsU4Ti+zNQw5qMAA
+ AA=
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1738983933; l=3075;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=cL1auiNbqgfFusI2hsCVHr9b6YHr78iQptggtpCsNj0=;
+ b=sncM0B4xEvur6qaE6j6Uty/1FigEo09hiM1gulf1mM6R9jjMK6c+ibG2E735dzTG8hJ7aNaxt
+ CQEOaYIVmUQBak76Tr651VjBQyPqWKfPz4G27Jy1WyInrMTgBY5dLwL
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-This is automated email and please do not reply to this email!
+From: Yang Li <yang.li@amlogic.com>
 
-Dear submitter,
+After the ASE state changes (streaming->releasing->idle),
+the Client needs to be notified. The process as follows:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=931756
+...(Sink ASE: ID=1, State=Streaming)
+ATT Write Command Packet (ASE Control Point: Op=Release)
+ATT Notification Packet (Sink ASE: ID=1, State=Releasing)
+ATT Notification Packet (Sink ASE: ID=1, State=Idle)
 
----Test result---
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ src/shared/bap.c | 31 ++++++++++++++++++++++---------
+ 1 file changed, 22 insertions(+), 9 deletions(-)
 
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.27 seconds
-SubjectPrefix                 FAIL      0.66 seconds
-BuildKernel                   PASS      23.98 seconds
-CheckAllWarning               PASS      26.67 seconds
-CheckSparse                   PASS      30.19 seconds
-BuildKernel32                 PASS      23.84 seconds
-TestRunnerSetup               PASS      430.03 seconds
-TestRunner_l2cap-tester       PASS      20.53 seconds
-TestRunner_iso-tester         PASS      31.29 seconds
-TestRunner_bnep-tester        PASS      4.81 seconds
-TestRunner_mgmt-tester        FAIL      121.48 seconds
-TestRunner_rfcomm-tester      PASS      7.68 seconds
-TestRunner_sco-tester         PASS      9.37 seconds
-TestRunner_ioctl-tester       PASS      8.07 seconds
-TestRunner_mesh-tester        PASS      6.05 seconds
-TestRunner_smp-tester         PASS      7.01 seconds
-TestRunner_userchan-tester    PASS      5.02 seconds
-IncrementalBuild              PENDING   0.48 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.175 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.185 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 167501282..1cadb682d 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -930,6 +930,18 @@ static void ascs_ase_rsp_success(struct iovec *iov, uint8_t id)
+ 					BT_ASCS_REASON_NONE);
+ }
+ 
++static void stream_notify_ase_state(struct bt_bap_stream *stream)
++{
++	struct bt_bap_endpoint *ep = stream->ep;
++	struct bt_ascs_ase_status status;
++
++	status.id = ep->id;
++	status.state = ep->state;
++
++	gatt_db_attribute_notify(ep->attr, &status, sizeof(status),
++					bt_bap_get_att(stream->bap));
++}
++
+ static void stream_notify_config(struct bt_bap_stream *stream)
+ {
+ 	struct bt_bap_endpoint *ep = stream->ep;
+@@ -1634,7 +1646,9 @@ static bool stream_notify_state(void *data)
+ 	struct bt_bap_stream *stream = data;
+ 	struct bt_bap_endpoint *ep = stream->ep;
+ 
+-	DBG(stream->bap, "stream %p", stream);
++	DBG(stream->bap, "stream %p state %s",
++			stream,
++			bt_bap_stream_statestr(ep->state));
+ 
+ 	if (stream->state_id) {
+ 		timeout_remove(stream->state_id);
+@@ -1643,6 +1657,7 @@ static bool stream_notify_state(void *data)
+ 
+ 	switch (ep->state) {
+ 	case BT_ASCS_ASE_STATE_IDLE:
++		stream_notify_ase_state(stream);
+ 		break;
+ 	case BT_ASCS_ASE_STATE_CONFIG:
+ 		stream_notify_config(stream);
+@@ -1655,6 +1670,9 @@ static bool stream_notify_state(void *data)
+ 	case BT_ASCS_ASE_STATE_DISABLING:
+ 		stream_notify_metadata(stream);
+ 		break;
++	case BT_ASCS_ASE_STATE_RELEASING:
++		stream_notify_ase_state(stream);
++		break;
+ 	}
+ 
+ 	return false;
+@@ -2068,17 +2086,11 @@ static unsigned int bap_ucast_metadata(struct bt_bap_stream *stream,
+ 
+ static uint8_t stream_release(struct bt_bap_stream *stream, struct iovec *rsp)
+ {
+-	struct bt_bap_pac *pac;
+-
+ 	DBG(stream->bap, "stream %p", stream);
+ 
+ 	ascs_ase_rsp_success(rsp, stream->ep->id);
+ 
+-	pac = stream->lpac;
+-	if (pac->ops && pac->ops->clear)
+-		pac->ops->clear(stream, pac->user_data);
+-
+-	stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
++	stream_set_state(stream, BT_BAP_STREAM_STATE_RELEASING);
+ 
+ 	return 0;
+ }
+@@ -6172,7 +6184,8 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
+ 
+ 	DBG(stream->bap, "stream %p io disconnected", stream);
+ 
+-	bt_bap_stream_set_io(stream, -1);
++	if (stream->ep->state == BT_BAP_STREAM_STATE_RELEASING)
++		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
+ 
+ 	return false;
+ }
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 2ee08ffd4d469781dc627fa50b4a015d9ad68007
+change-id: 20250208-ascs_bug-e7c5715d3d8c
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
 
---===============3525576858174503177==--
