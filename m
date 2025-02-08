@@ -1,168 +1,216 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C05148304
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 03:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C6829D05
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 03:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738983935; cv=none; b=ToU8NZMEiSzjK8AQjmMtaWADoguI+GdLgTv/q1GV7j6FSkmDEErhMYLmOC6qEfNUoqyIXQhsoLp9z11duPO7Kf3LjUTYvedo872pnEAgNlg6u8jkPlFCaBwQjEqF/io99uIBGd6w7v69YmoUM6EuN5hI/Btrr/5OxLLPm/Gt+OE=
+	t=1738986179; cv=none; b=PqQgXlyVWM3QGgn2pqjSNZLtp7UxRmf4ySwLGBAWqpTbv5MvDUrhZQTYYvXLrXIlsHN/guBwC9aMw1pMLhRGpyq+ZOtYak9QvKQdhTIRyvkgzFSOzRy0FAVrjqdtOJQSGAZcKA4BerMr1UJn4JaegVIfzzQVYpAS4NzSDDWqAi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738983935; c=relaxed/simple;
-	bh=rop+KKL6i/VvFuiwr3tNLCPfTYZJ/mtMj2yGnzbcl/E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KRfYIYTLEw8mojJY5/YB7qvFOFiSlNMhP/oLBH8mOMblIqTLfcC/AEa2CUpZU6pu1DUEowO0AEI7fAi3wK40D7XlXI+2nJEoBdphUiBlYyXmI2KB55xXnk9UVXyy+O7no6FTflKS+IIZ4fupcszML12KYpBnBIX5GKU7uIDbzj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gJ9uQGYQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738986179; c=relaxed/simple;
+	bh=ACksW+v/zjJO7P4Pjck0vqPnOfU1nQc06BssVPMsl4k=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ubmgfdG6y64SOqhcjLoNUfyAl7cRwL6xH0cgR9w4L8cP6wE0OzB2tEXsqsmJRJA8mH8ieUXrsGN26wup9bDCOWg+b3DyZuxlGrR6VUQZSuINBx3edNijc1PzqL2OTpgMfiaRnesW51OJO9Ej5R628nbJmY0qSu+fh6WW4MiG3sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MWD8vC0z; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gJ9uQGYQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B557C4CED1;
-	Sat,  8 Feb 2025 03:05:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738983935;
-	bh=rop+KKL6i/VvFuiwr3tNLCPfTYZJ/mtMj2yGnzbcl/E=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=gJ9uQGYQxOEvf+HCi1qYG7QaZECCJ/s0rveIif3BEu/eu+Oo9ej6ph4z00jSE2BTI
-	 AFoPcFoj3hd+JC4ViSjjbF6PMqivOMivLhebBLpm1RCfVjUnl/NdGjzVq8z+D/i7kp
-	 3ItjPWH6s+G2T0Zzj4LvzTrOjXPXRgSkY/Bzvy+PI1w+eiIucJx5Fa5WHU8F9JYgoC
-	 QvTDa3ky1Uo04ItsSvMgSy6L71J7s3qcUwVvJh4wm4NpizE+MrmcngxkUGGk134ENz
-	 o2dz2JosbHPVEkuukMH5BpHFKLRyJQVCo+1UEN+07+0unWMjZ+kK+iCppah0WFZKcj
-	 UfJZrJDJTzfKg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1B7C02199;
-	Sat,  8 Feb 2025 03:05:35 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Sat, 08 Feb 2025 11:05:33 +0800
-Subject: [PATCH BlueZ bluez v2] bap: fixed issue of muting music silent
- after pause and resume.
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MWD8vC0z"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7b8618be68bso262906185a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Feb 2025 19:42:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738986177; x=1739590977; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ACksW+v/zjJO7P4Pjck0vqPnOfU1nQc06BssVPMsl4k=;
+        b=MWD8vC0z2jona8390xT2qIeHUjOXYll8t1ZkOz11TaKScP/3cfUjPCglYEQaEBOMC8
+         +/Ba8tY/Qjsi61g4BBK1bUFpNqHo391CsDdODDt41vX49IEbFJYNi9qWVll7Sli6Ii6j
+         t5I6vD7YXGewbowDowF/TSdht6KIEjJwKYiKlRgvzagqx2g+8O8MYr2rCLPGrP7GOPxH
+         T0vx3w/dMGOCsP4yEFkIYEJKRSEZ53qWrzKZPVxZCFIjx/VqWeWGZTgZy5vZlsVKi0Z+
+         MskGCLKmeMzCghHAFxRN+BWUqAOOcIWzMZ3/WoEMaeyDRayLTtu8+ean1XjSAB+ITx17
+         bTmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738986177; x=1739590977;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ACksW+v/zjJO7P4Pjck0vqPnOfU1nQc06BssVPMsl4k=;
+        b=ANTk/37b40GkJG+o/iBH4XQJZ9vSllygBmo+L34cWDRl4oRJXOG5h3SFIlU8XHbKzG
+         wMLnu0mlQnbtQlU4aMu9q2zLmFHPLQKUnxTlLUvi8Srb1MPlMcjdzku9yjItIk3fjw9Q
+         r8mVa+8N3pdMLABGLVBLEBGG8uCNmOCxqIO8G5h/JdtNNGG1R22HcNCNK6LiqOZW9iDv
+         QbA80SBWd9sWsN9DC/ZgrBXylUY2EIF1pSpfsnia3lPf6CsEzuhUmwxOcQ+tLB2CNc6p
+         KT5lZsDweKTmAjps4PMeV8zz6iTyMyYQyDXQ3/k5Is7ms2kYBVOnJZwG2hNnwdt5YAAA
+         hieA==
+X-Gm-Message-State: AOJu0YwuPmDqBDDcsdtCExMc7Gq6bi+nTcy7oJQmO/yVN3vhBbwbL4YA
+	XYn/VWmROMPWIubH8mQTrCSD3Dz45JanFYkvO5KBIkOS2t8fhqyHQiTnwbXS
+X-Gm-Gg: ASbGncvLAVdc7ZXDZyHvK8FSDFNI5Ce1flRmSr6ScP/F0CWyrQVvGZTUa+4PSmoSCL2
+	RLzXJkaI0liTtkLD5oBwezdp0RStZBvrem0ou0o9JGaCeS4+qvjcoXquuZ2vjnpvYEadzUHx/gZ
+	F6GErpm51paj3fZLr8RsXFz0S4MFTZFNEe7jDFyv9hXWn6ej9p9i+1YTCXzbgvvzz9W/mxTc9+c
+	UMo1ffv/clotbUCqmEOPKQ1sZ3IYQtOnUjn7HOV/vGiKp/1E2uz/J0BMEAH9CI5TColHda364O2
+	B3ekaFVcWVF9TbLtqodo8fc=
+X-Google-Smtp-Source: AGHT+IF2ahIeh3HMpGPqnS08++gBWkeK3qCxLH+JJ3OUNOeduTKXvWLBncYCl7bsMG4+IyWgbW8FZQ==
+X-Received: by 2002:a05:620a:270c:b0:7b6:dc4f:8879 with SMTP id af79cd13be357-7c047c97716mr1075430885a.47.1738986176892;
+        Fri, 07 Feb 2025 19:42:56 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.152.29])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c041e04a07sm266050685a.48.2025.02.07.19.42.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2025 19:42:56 -0800 (PST)
+Message-ID: <67a6d2c0.050a0220.f59bc.bd07@mx.google.com>
+Date: Fri, 07 Feb 2025 19:42:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6550250809851086788=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, devnull+yang.li.amlogic.com@kernel.org
+Subject: RE: [BlueZ,bluez,v2] bap: fixed issue of muting music silent after pause and resume.
+In-Reply-To: <20250208-ascs_bug-v2-1-b7e062d6604d@amlogic.com>
+References: <20250208-ascs_bug-v2-1-b7e062d6604d@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6550250809851086788==
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250208-ascs_bug-v2-1-b7e062d6604d@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAPzJpmcC/0WMQQrDIBAAvxL23C1qMdqe+o9SitE1EWIMmoTSk
- L9XeulxhmF2KJQDFbg1O2TaQglpqiBODdjBTD1hcJVBMCGZYBpNseXVrT2SslJx6S5OW6j5nMm
- H92/1gG5c6QPPqn1OEZchk/l/OGtxnctSZcSNI0fDW62undLeu7uJY+qDPdsU4Ti+zNQw5qMAA
- AA=
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1738983933; l=3075;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=cL1auiNbqgfFusI2hsCVHr9b6YHr78iQptggtpCsNj0=;
- b=sncM0B4xEvur6qaE6j6Uty/1FigEo09hiM1gulf1mM6R9jjMK6c+ibG2E735dzTG8hJ7aNaxt
- CQEOaYIVmUQBak76Tr651VjBQyPqWKfPz4G27Jy1WyInrMTgBY5dLwL
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-From: Yang Li <yang.li@amlogic.com>
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTMxODM0CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQRU5ESU5HICAgMC4yMyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
+TkRJTkcgICAwLjE5IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDIxLjAyIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDE5Ljg2IHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDMz
+LjkzIHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE2NC4z
+MSBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNi4yMSBz
+ZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyMy40OSBzZWNv
+bmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICAxMy45NiBzZWNvbmRz
+CkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBFTkRJTkcgICAwLjIzIHNlY29uZHMKU2Nh
+bkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDkwNC43NyBzZWNvbmRzCgpEZXRh
+aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVO
+RElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRs
+aW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1h
+a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvYmFwLmM6IElu
+IGZ1bmN0aW9uIOKAmHN0cmVhbV9ub3RpZnlfYXNlX3N0YXRl4oCZOgpzcmMvc2hhcmVkL2JhcC5j
+Ojk0MTozNzogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMiBvZiDigJhnYXR0X2RiX2F0dHJpYnV0
+ZV9ub3RpZnnigJkgZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29t
+cGF0aWJsZS1wb2ludGVyLXR5cGVzXQogIDk0MSB8ICBnYXR0X2RiX2F0dHJpYnV0ZV9ub3RpZnko
+ZXAtPmF0dHIsICZzdGF0dXMsIHNpemVvZihzdGF0dXMpLAogICAgICB8ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICB8CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgc3RydWN0IGJ0X2FzY3NfYXNlX3N0YXR1cyAqCkluIGZpbGUgaW5jbHVkZWQgZnJvbSBz
+cmMvc2hhcmVkL2JhcC5jOjI3OgouL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjI5NjoyMTogbm90ZTog
+ZXhwZWN0ZWQg4oCYY29uc3QgdWludDhfdCAq4oCZIHtha2Eg4oCYY29uc3QgdW5zaWduZWQgY2hh
+ciAq4oCZfSBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSDigJhzdHJ1Y3QgYnRfYXNjc19hc2Vfc3Rh
+dHVzICrigJkKICAyOTYgfCAgICAgIGNvbnN0IHVpbnQ4X3QgKnZhbHVlLCBzaXplX3QgbGVuLAog
+ICAgICB8ICAgICAgfn5+fn5+fn5+fn5+fn5+Xn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcg
+dHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo4NjMxOiBzcmMvc2hhcmVk
+L2xpYnNoYXJlZF9tYWlubG9vcF9sYS1iYXAubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRp
+bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0NjgyOiBhbGxd
+IEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVjayAt
+IEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKc3JjL3NoYXJlZC9iYXAu
+YzogSW4gZnVuY3Rpb24g4oCYc3RyZWFtX25vdGlmeV9hc2Vfc3RhdGXigJk6CnNyYy9zaGFyZWQv
+YmFwLmM6OTQxOjM3OiBlcnJvcjogcGFzc2luZyBhcmd1bWVudCAyIG9mIOKAmGdhdHRfZGJfYXR0
+cmlidXRlX25vdGlmeeKAmSBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGUgWy1XZXJyb3I9
+aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgOTQxIHwgIGdhdHRfZGJfYXR0cmlidXRlX25v
+dGlmeShlcC0+YXR0ciwgJnN0YXR1cywgc2l6ZW9mKHN0YXR1cyksCiAgICAgIHwgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fgogICAgICB8ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBzdHJ1Y3QgYnRfYXNjc19hc2Vfc3RhdHVzICoKSW4gZmlsZSBpbmNsdWRlZCBm
+cm9tIHNyYy9zaGFyZWQvYmFwLmM6Mjc6Ci4vc3JjL3NoYXJlZC9nYXR0LWRiLmg6Mjk2OjIxOiBu
+b3RlOiBleHBlY3RlZCDigJhjb25zdCB1aW50OF90ICrigJkge2FrYSDigJhjb25zdCB1bnNpZ25l
+ZCBjaGFyICrigJl9IGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlIOKAmHN0cnVjdCBidF9hc2NzX2Fz
+ZV9zdGF0dXMgKuKAmQogIDI5NiB8ICAgICAgY29uc3QgdWludDhfdCAqdmFsdWUsIHNpemVfdCBs
+ZW4sCiAgICAgIHwgICAgICB+fn5+fn5+fn5+fn5+fn5efn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBi
+ZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjgzODY6IHNyYy9z
+aGFyZWQvbGlic2hhcmVkX2dsaWJfbGEtYmFwLmxvXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZp
+bGU6MTIzMjA6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
+ZXN0OiBDaGVja1ZhbGdyaW5kIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjayB3aXRo
+IFZhbGdyaW5kCk91dHB1dDoKCnNyYy9zaGFyZWQvYmFwLmM6IEluIGZ1bmN0aW9uIOKAmHN0cmVh
+bV9ub3RpZnlfYXNlX3N0YXRl4oCZOgpzcmMvc2hhcmVkL2JhcC5jOjk0MTozNzogZXJyb3I6IHBh
+c3NpbmcgYXJndW1lbnQgMiBvZiDigJhnYXR0X2RiX2F0dHJpYnV0ZV9ub3RpZnnigJkgZnJvbSBp
+bmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1wb2ludGVyLXR5
+cGVzXQogIDk0MSB8ICBnYXR0X2RiX2F0dHJpYnV0ZV9ub3RpZnkoZXAtPmF0dHIsICZzdGF0dXMs
+IHNpemVvZihzdGF0dXMpLAogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF5+fn5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8
+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IGJ0X2Fz
+Y3NfYXNlX3N0YXR1cyAqCkluIGZpbGUgaW5jbHVkZWQgZnJvbSBzcmMvc2hhcmVkL2JhcC5jOjI3
+OgouL3NyYy9zaGFyZWQvZ2F0dC1kYi5oOjI5NjoyMTogbm90ZTogZXhwZWN0ZWQg4oCYY29uc3Qg
+dWludDhfdCAq4oCZIHtha2Eg4oCYY29uc3QgdW5zaWduZWQgY2hhciAq4oCZfSBidXQgYXJndW1l
+bnQgaXMgb2YgdHlwZSDigJhzdHJ1Y3QgYnRfYXNjc19hc2Vfc3RhdHVzICrigJkKICAyOTYgfCAg
+ICAgIGNvbnN0IHVpbnQ4X3QgKnZhbHVlLCBzaXplX3QgbGVuLAogICAgICB8ICAgICAgfn5+fn5+
+fn5+fn5+fn5+Xn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMK
+bWFrZVsxXTogKioqIFtNYWtlZmlsZTo4NjMxOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9v
+cF9sYS1iYXAubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQg
+am9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZToxMjMyMDogY2hlY2tdIEVycm9yIDIKIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNoIC0gRkFJTApEZXNjOiBS
+dW4gc21hdGNoIHRvb2wgd2l0aCBzb3VyY2UKT3V0cHV0OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoy
+NzE6MjE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVk
+L2NyeXB0by5jOjI3MjoyMzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQu
+CnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6NzY4OjMxOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5n
+dGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo4MzA6MzE6IHdhcm5p
+bmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVy
+cy5jOjEzMjM6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMv
+c2hhcmVkL2dhdHQtaGVscGVycy5jOjEzNTQ6MjM6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBh
+cnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2VydmVyLmM6Mjc4OjI1OiB3YXJuaW5nOiBW
+YXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LXNlcnZlci5jOjYx
+ODoyNTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQv
+Z2F0dC1zZXJ2ZXIuYzo3MTY6MjU6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1
+c2VkLgpzcmMvc2hhcmVkL2JhcC5jOjI5NjoyNTogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUg
+c3RydWN0dXJlcwpzcmMvc2hhcmVkL2JhcC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlOgouL3Ny
+Yy9zaGFyZWQvYXNjcy5oOjg4OjI1OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1
+cmVzCnNyYy9zaGFyZWQvc2hlbGwuYzogbm90ZTogaW4gaW5jbHVkZWQgZmlsZSAodGhyb3VnaCAv
+dXNyL2luY2x1ZGUvcmVhZGxpbmUvcmVhZGxpbmUuaCk6Ci91c3IvaW5jbHVkZS9yZWFkbGluZS9y
+bHR5cGVkZWZzLmg6MzU6MjM6IHdhcm5pbmc6IG5vbi1BTlNJIGZ1bmN0aW9uIGRlY2xhcmF0aW9u
+IG9mIGZ1bmN0aW9uICdGdW5jdGlvbicKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMu
+aDozNjoyNTogd2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rp
+b24gJ1ZGdW5jdGlvbicKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMuaDozNzoyNzog
+d2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ0NQRnVu
+Y3Rpb24nCi91c3IvaW5jbHVkZS9yZWFkbGluZS9ybHR5cGVkZWZzLmg6Mzg6Mjk6IHdhcm5pbmc6
+IG5vbi1BTlNJIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdDUFBGdW5jdGlvbicK
+c3JjL3NoYXJlZC9iYXAuYzogSW4gZnVuY3Rpb24g4oCYc3RyZWFtX25vdGlmeV9hc2Vfc3RhdGXi
+gJk6CnNyYy9zaGFyZWQvYmFwLmM6OTQxOjM3OiBlcnJvcjogcGFzc2luZyBhcmd1bWVudCAyIG9m
+IOKAmGdhdHRfZGJfYXR0cmlidXRlX25vdGlmeeKAmSBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVy
+IHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgOTQxIHwgIGdhdHRf
+ZGJfYXR0cmlidXRlX25vdGlmeShlcC0+YXR0ciwgJnN0YXR1cywgc2l6ZW9mKHN0YXR1cyksCiAg
+ICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fgogICAgICB8
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwKICAgICAgfCAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgYnRfYXNjc19hc2Vfc3RhdHVzICoKSW4g
+ZmlsZSBpbmNsdWRlZCBmcm9tIHNyYy9zaGFyZWQvYmFwLmM6Mjc6Ci4vc3JjL3NoYXJlZC9nYXR0
+LWRiLmg6Mjk2OjIxOiBub3RlOiBleHBlY3RlZCDigJhjb25zdCB1aW50OF90ICrigJkge2FrYSDi
+gJhjb25zdCB1bnNpZ25lZCBjaGFyICrigJl9IGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlIOKAmHN0
+cnVjdCBidF9hc2NzX2FzZV9zdGF0dXMgKuKAmQogIDI5NiB8ICAgICAgY29uc3QgdWludDhfdCAq
+dmFsdWUsIHNpemVfdCBsZW4sCiAgICAgIHwgICAgICB+fn5+fn5+fn5+fn5+fn5efn5+fgpjYzE6
+IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2Vm
+aWxlOjg2MzE6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWJhcC5sb10gRXJyb3Ig
+MQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiog
+W01ha2VmaWxlOjQ2ODI6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMKVGVzdDogYmx1ZXptYWtlZXh0ZWxsIC0gRkFJTApEZXNjOiBCdWlsZCBCbHVleiB3aXRoIEV4
+dGVybmFsIEVMTApPdXRwdXQ6CgpzcmMvc2hhcmVkL2JhcC5jOiBJbiBmdW5jdGlvbiDigJhzdHJl
+YW1fbm90aWZ5X2FzZV9zdGF0ZeKAmToKc3JjL3NoYXJlZC9iYXAuYzo5NDE6Mzc6IGVycm9yOiBw
+YXNzaW5nIGFyZ3VtZW50IDIgb2Yg4oCYZ2F0dF9kYl9hdHRyaWJ1dGVfbm90aWZ54oCZIGZyb20g
+aW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10
+eXBlc10KICA5NDEgfCAgZ2F0dF9kYl9hdHRyaWJ1dGVfbm90aWZ5KGVwLT5hdHRyLCAmc3RhdHVz
+LCBzaXplb2Yoc3RhdHVzKSwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBefn5+fn5+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+fAogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBidF9h
+c2NzX2FzZV9zdGF0dXMgKgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gc3JjL3NoYXJlZC9iYXAuYzoy
+NzoKLi9zcmMvc2hhcmVkL2dhdHQtZGIuaDoyOTY6MjE6IG5vdGU6IGV4cGVjdGVkIOKAmGNvbnN0
+IHVpbnQ4X3QgKuKAmSB7YWthIOKAmGNvbnN0IHVuc2lnbmVkIGNoYXIgKuKAmX0gYnV0IGFyZ3Vt
+ZW50IGlzIG9mIHR5cGUg4oCYc3RydWN0IGJ0X2FzY3NfYXNlX3N0YXR1cyAq4oCZCiAgMjk2IHwg
+ICAgICBjb25zdCB1aW50OF90ICp2YWx1ZSwgc2l6ZV90IGxlbiwKICAgICAgfCAgICAgIH5+fn5+
+fn5+fn5+fn5+fl5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3Jz
+Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODYzMTogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxv
+b3BfbGEtYmFwLmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVk
+IGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY4MjogYWxsXSBFcnJvciAyCiMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gUEVORElORwpE
+ZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0
+cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-After the ASE state changes (streaming->releasing->idle),
-the Client needs to be notified. The process as follows:
-
-...(Sink ASE: ID=1, State=Streaming)
-ATT Write Command Packet (ASE Control Point: Op=Release)
-ATT Notification Packet (Sink ASE: ID=1, State=Releasing)
-ATT Notification Packet (Sink ASE: ID=1, State=Idle)
-
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- src/shared/bap.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
-
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 167501282..1cadb682d 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -930,6 +930,18 @@ static void ascs_ase_rsp_success(struct iovec *iov, uint8_t id)
- 					BT_ASCS_REASON_NONE);
- }
- 
-+static void stream_notify_ase_state(struct bt_bap_stream *stream)
-+{
-+	struct bt_bap_endpoint *ep = stream->ep;
-+	struct bt_ascs_ase_status status;
-+
-+	status.id = ep->id;
-+	status.state = ep->state;
-+
-+	gatt_db_attribute_notify(ep->attr, &status, sizeof(status),
-+					bt_bap_get_att(stream->bap));
-+}
-+
- static void stream_notify_config(struct bt_bap_stream *stream)
- {
- 	struct bt_bap_endpoint *ep = stream->ep;
-@@ -1634,7 +1646,9 @@ static bool stream_notify_state(void *data)
- 	struct bt_bap_stream *stream = data;
- 	struct bt_bap_endpoint *ep = stream->ep;
- 
--	DBG(stream->bap, "stream %p", stream);
-+	DBG(stream->bap, "stream %p state %s",
-+			stream,
-+			bt_bap_stream_statestr(ep->state));
- 
- 	if (stream->state_id) {
- 		timeout_remove(stream->state_id);
-@@ -1643,6 +1657,7 @@ static bool stream_notify_state(void *data)
- 
- 	switch (ep->state) {
- 	case BT_ASCS_ASE_STATE_IDLE:
-+		stream_notify_ase_state(stream);
- 		break;
- 	case BT_ASCS_ASE_STATE_CONFIG:
- 		stream_notify_config(stream);
-@@ -1655,6 +1670,9 @@ static bool stream_notify_state(void *data)
- 	case BT_ASCS_ASE_STATE_DISABLING:
- 		stream_notify_metadata(stream);
- 		break;
-+	case BT_ASCS_ASE_STATE_RELEASING:
-+		stream_notify_ase_state(stream);
-+		break;
- 	}
- 
- 	return false;
-@@ -2068,17 +2086,11 @@ static unsigned int bap_ucast_metadata(struct bt_bap_stream *stream,
- 
- static uint8_t stream_release(struct bt_bap_stream *stream, struct iovec *rsp)
- {
--	struct bt_bap_pac *pac;
--
- 	DBG(stream->bap, "stream %p", stream);
- 
- 	ascs_ase_rsp_success(rsp, stream->ep->id);
- 
--	pac = stream->lpac;
--	if (pac->ops && pac->ops->clear)
--		pac->ops->clear(stream, pac->user_data);
--
--	stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
-+	stream_set_state(stream, BT_BAP_STREAM_STATE_RELEASING);
- 
- 	return 0;
- }
-@@ -6172,7 +6184,8 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
- 
- 	DBG(stream->bap, "stream %p io disconnected", stream);
- 
--	bt_bap_stream_set_io(stream, -1);
-+	if (stream->ep->state == BT_BAP_STREAM_STATE_RELEASING)
-+		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
- 
- 	return false;
- }
-
----
-base-commit: 2ee08ffd4d469781dc627fa50b4a015d9ad68007
-change-id: 20250208-ascs_bug-e7c5715d3d8c
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
-
-
+--===============6550250809851086788==--
