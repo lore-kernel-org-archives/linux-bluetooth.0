@@ -1,153 +1,350 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F73192D8E
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 11:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BD21D8A0D
+	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 12:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739014818; cv=none; b=EAg4W14wSYHqwO/B/01tZELVdsneQ/v+J2y+H6/E2QC4+sICzqIj/UTK+4sEJUmTgYaTHWYiMsfKQD1pLp5UKIVJkSe4Gz1D7zf16TNwEMKlggzr1m64W9xzQsKJdKdSz8rX+BE01kTJZD5V3OnL4QffCpm3qPhUxzk9XQo/29I=
+	t=1739016497; cv=none; b=ApCPCcg/lZLiARa40YnzGzeW4YxodyKmRRUAAuvC3rGoEp2QgCuFlqqti4hvX7tuONfLcmTFTs6bhPoDg4lQmx1usHqasVGYQ3f83QqqtZh+gw6UPbNVfp7mv11ltVVKASZRg6oYOvfbj323CeD+LEX35Hn9X2TmTB8fDF+1DB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739014818; c=relaxed/simple;
-	bh=pN5P39cGOdv3EcERvz2XRZauCO3mZeY3IRUagCfkACQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=cKb72rtFdEjLOZToWHkMsjglEIX2x9479/0wh94BJEwS1xUrhvLlWj8+wj8l/RqwrwvF6AKl5DhXUJVEKLSh9yw3Zkd+DGHNOOwYxCleGVt3nJGo+/9l34JNxQUglA7Pxa0SeabXPnk0LDgw/dC2x4fDcr7ikmUjYaZFc/RamN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7jYyLiX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739016497; c=relaxed/simple;
+	bh=Ssnyo9VyIAM8pva2OYMvXc2B0RHjo82FxMW3rjVc928=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g2fRcLgP7HlkVLL+IyCy7zPVuwxoAUk24uek/6JIuPlELtjeReV+OLG6QMYAe9OEbg/WyRQqWOVjALXoHrszN0flQFEHNpdyR4gXnTHiVD9d1B19JFDHnqImpmh/AKR1ve4v0Q8SLD7Z8nVALfnZtgo4c6o8oexf4HslG5TY5+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SmT3KjK6; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7jYyLiX"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EFE27C4CED6;
-	Sat,  8 Feb 2025 11:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739014818;
-	bh=pN5P39cGOdv3EcERvz2XRZauCO3mZeY3IRUagCfkACQ=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=f7jYyLiX266y5h2QA6J33QB/jC2E4DxrWkBNsy/788cODJvEVeHaSNN1r/6Ltbydp
-	 nLQTFD0tZGKX1XK8PuAvqI3NwDlzcfUg9snKnh61l9tpkAIFjDgxpMToK+yhR69dsC
-	 VCuMbArIq5BmlviJo062jXVn/Nt7TkrC3Bw4cX5ZNKnE0Wa2fT2/Nkrs5p9hE/9qOo
-	 ymlqsEIK3N+i7nujgNScmr36I1GmeOOgegVRr5YVe3gvCoGE/xbJDmfHJYyTxBVyav
-	 LgfxTZBNkwK39B4fUdgSF8rfb1FcFEYfshbEiRmMJgB7NZq1so9PwwkSc3MPBokxjy
-	 9oUcbXG4tnA6g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DDDC02198;
-	Sat,  8 Feb 2025 11:40:17 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Sat, 08 Feb 2025 19:40:12 +0800
-Subject: [PATCH BlueZ bluez] client: Set the feature when initializing the
- client
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SmT3KjK6"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6f6cc13d103so22279647b3.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Feb 2025 04:08:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739016494; x=1739621294; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Zt8Zd6LBkBERA7ooFuXtkwFywenX9KvT5J9Ev7NBbY=;
+        b=SmT3KjK6n61WH8vpSRzd2AXNFvRG3uPm90XyYrfqLzyj9pVX2MhHlXn5zx79Q1MBSM
+         qzuqBhp+CiLCDPGyS3JxFycfHc6x+HuD7NsFQQ1Z1V1tRVDQDUZRc3tUt0UVvMaJJPQ2
+         AAdHNGzkq7MD0ff+i191jNzlPjRPLn+JLvqFnfoENRl124ttioaLOy5QIH8v0B5PDvMJ
+         HnMZlbjsb2rsdU7mS9HMUx86haLKO+fMUwt9qQFmfdpMrUx2ji8mz6AtR/ZjRmUn/ILh
+         BKFsp74xtvjR70w6/XqJREGkljtPZAGfDvz87KSNrZTWFM9e1aAj/WqQFY3yNlluNKa3
+         qnFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739016494; x=1739621294;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/Zt8Zd6LBkBERA7ooFuXtkwFywenX9KvT5J9Ev7NBbY=;
+        b=LLgJtLoDE//AuDM32ZrGg3BRA6ZSYTcwBlPmGe5qFgFv0vBK1h2/PBBftUPnspmYQQ
+         +m9z4yIziZ+zaRdDmOBp+RQeD3N1hXU3x+q27IND4qweLGfgnLjf0LLHFExgqUblM/K6
+         QttFi4nCYScEV8NTdfxIeMZEf5F9xnx3smfgxl1O5HlLz2GYyhZ3KTo4FgwQm0tiDAS3
+         w3ylRUv+cZaIqDw3Bm93SByXnB2ux/+gImtp5leIKA/q6nQKW/rdUf50wadGeAPVur7t
+         RbXtaaXpI+kMWI25DCYcIySG6wlSbi/efN+0lKlRUngf4yBjboN87+7ayPBj/Oivy6Ss
+         en/A==
+X-Gm-Message-State: AOJu0YwXJ4K0TJ1xQ6EPee7ONitzWgLvNj/twSMJVbvJ4A/I3C/HTS5m
+	CP+byvGt+zSgPGGBH8PKLKZPv5Rm2Ns9giRKayTssG3xH+TfCLDUxRo2xfmxFJpHXlSbjECVv9R
+	ThVoPgYhZGPwZAIbdCWoKNo+KMGTbRxQNPHSD+vFb13dPpNhGxMyT
+X-Gm-Gg: ASbGnctxuhEbcXA5SOrA/YJGPompIWeAnnVwwBNjqmmYzigR/THt/rJhAaEpzTMZqXC
+	Lzna2IH9U8q/wPTFRpAuq0a1WUAFRKfpO/cV+LntszeRcBNJVRDC6fMpXsAM6PDN4BrdxtRo=
+X-Google-Smtp-Source: AGHT+IHbc5t216DziMKA/qH4qbQlaaLaZ7//6CCbqp1bfIXzjDsCdH1m5P2aIHIqrw7iwj/5iV2+qvQ71f00ZH2+wco=
+X-Received: by 2002:a05:690c:6f83:b0:6ef:9017:3cd8 with SMTP id
+ 00721157ae682-6f9b2a1a007mr64731167b3.35.1739016493845; Sat, 08 Feb 2025
+ 04:08:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250208-client_eatt-v1-1-17932786b2cf@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAJtCp2cC/x3M0QpAMBiG4VvRf2y1TSK3Imnmw18abSORe7ccP
- gfv+1CAZwRqsoc8Tg68uQSVZ2QX42YIHpNJS11KLWthV4aLPUyMwlaqHFHUhdITpWL3mPj6by0
- N64Gbuvf9AGEVC9NkAAAA
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1739014815; l=2912;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=NjeN/W6SMOhbUw5onPZ37ZDUR1czSasHWD76p2hBMRU=;
- b=Y6dL81o54s4ApBMTKiSaGaua5LtgVWFFMFxNnwZJw1fqwLTNP55P8jYINLLQ1D5GPX9KEIeHD
- rDnJ47GnzGfBsDNwmsHqlbECniW87FBxRTYd0WHdlvIJwyDP2FsV/5K
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+References: <20250122131925.v2.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com>
+ <CADg1FFdt2mQsN4YjLTn=zp_+MahopN371EDiXQEbp+GTSaNtBg@mail.gmail.com>
+ <CABBYNZJ__OMJZtEE0BFpaUdKPQv+Ym-OnsJj-kN=i_gZCeVN5w@mail.gmail.com>
+ <CABBYNZ+aEpJNnz1OSAeqOxFf4s2AbvoRC+FJcRS6y5+g0Mmu+g@mail.gmail.com> <CADg1FFfhwAFD+mthx3qw_ZUtt6=1Y6pR+jX7+etwMhQFX9Ja+w@mail.gmail.com>
+In-Reply-To: <CADg1FFfhwAFD+mthx3qw_ZUtt6=1Y6pR+jX7+etwMhQFX9Ja+w@mail.gmail.com>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Sat, 8 Feb 2025 20:07:46 +0800
+X-Gm-Features: AWEUYZkkWZgY0WytBMUAMmTgG7Qnm_AicD8qLTXE5k2MIbtU_c1bdYcXfTl-BF8
+Message-ID: <CADg1FFeLhtU=anU0_SbcSvSYLpYj6qJDSbuABu+RwWBafYufQA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] Bluetooth: Fix possible race with userspace of
+ sysfs isoc_alt
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yang Li <yang.li@amlogic.com>
+Hi Luiz,
 
-When writing Client Features feature values, it needs
-to determine whether local eatt is enabled.
-
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- src/device.c             | 9 ++++++++-
- src/gatt-database.c      | 3 ++-
- src/shared/gatt-client.c | 8 +++++---
- 3 files changed, 15 insertions(+), 5 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index e8bff718c..dfa8b277e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5628,6 +5628,8 @@ static void gatt_debug(const char *str, void *user_data)
- 
- static void gatt_client_init(struct btd_device *device)
- {
-+	uint8_t features;
+On Fri, Jan 31, 2025 at 6:23=E2=80=AFPM Hsin-chen Chuang <chharry@google.co=
+m> wrote:
+>
+> Hi Luiz,
+>
+> Good point. Although the sysfs-bus-usb API only supports reading
+> rather than writing the alt setting, I'll look for the opportunity to
+> configure it through libusb first.
+>
+> Thanks
+>
+> On Sat, Jan 25, 2025 at 12:06=E2=80=AFAM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Hsin-chen,
+> >
+> > On Fri, Jan 24, 2025 at 10:54=E2=80=AFAM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Hsin-chen,
+> > >
+> > > On Wed, Jan 22, 2025 at 11:57=E2=80=AFPM Hsin-chen Chuang <chharry@go=
+ogle.com> wrote:
+> > > >
+> > > > Hi Luiz,
+> > > >
+> > > > On Thu, Jan 23, 2025 at 3:35=E2=80=AFAM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Hsin-chen,
+> > > > >
+> > > > > On Wed, Jan 22, 2025 at 12:20=E2=80=AFAM Hsin-chen Chuang <chharr=
+y@google.com> wrote:
+> > > > > >
+> > > > > > From: Hsin-chen Chuang <chharry@chromium.org>
+> > > > > >
+> > > > > > Use device group to avoid the racing. To reuse the group define=
+d in
+> > > > > > hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
+> > > > > > read_usb_alt_setting which are only registered in btusb.
+> > > > > >
+> > > > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to =
+control USB alt setting")
+> > > > > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > > > > > ---
+> > > > > >
+> > > > > > (no changes since v1)
+> > > > > >
+> > > > > >  drivers/bluetooth/btusb.c        | 42 ++++++++----------------=
+--------
+> > > > > >  include/net/bluetooth/hci_core.h |  2 ++
+> > > > > >  net/bluetooth/hci_sysfs.c        | 33 ++++++++++++++++++++++++=
 +
- 	gatt_client_cleanup(device);
- 
- 	if (!device->connect && !btd_opts.reverse_discovery) {
-@@ -5639,8 +5641,13 @@ static void gatt_client_init(struct btd_device *device)
- 		return;
- 	}
- 
-+	features =  BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING
-+				| BT_GATT_CHRC_CLI_FEAT_NFY_MULTI;
-+	if (btd_opts.gatt_channels > 1)
-+		features |= BT_GATT_CHRC_CLI_FEAT_EATT;
-+
- 	device->client = bt_gatt_client_new(device->db, device->att,
--							device->att_mtu, 0);
-+							device->att_mtu, features);
- 	if (!device->client) {
- 		DBG("Failed to initialize");
- 		return;
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index a5a01add4..1056b9797 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1245,7 +1245,8 @@ static void server_feat_read_cb(struct gatt_db_attribute *attrib,
- 		goto done;
- 	}
- 
--	value |= BT_GATT_CHRC_SERVER_FEAT_EATT;
-+	if (btd_opts.gatt_channels > 1)
-+		value |= BT_GATT_CHRC_SERVER_FEAT_EATT;
- 
- done:
- 	gatt_db_attribute_read_result(attrib, id, ecode, &value, sizeof(value));
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 9db3f5211..41a5c6f9c 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2043,7 +2043,7 @@ static void write_client_features(struct bt_gatt_client *client)
- 
- 	handle = gatt_db_attribute_get_handle(attr);
- 
--	client->features = BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING;
-+	client->features |= BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING;
- 
- 	bt_uuid16_create(&uuid, GATT_CHARAC_SERVER_FEAT);
- 
-@@ -2055,10 +2055,12 @@ static void write_client_features(struct bt_gatt_client *client)
- 		gatt_db_attribute_read(attr, 0, BT_ATT_OP_READ_REQ,
- 						NULL, server_feat_read_value,
- 						&feat);
--		if (feat && feat[0] & BT_GATT_CHRC_SERVER_FEAT_EATT)
--			client->features |= BT_GATT_CHRC_CLI_FEAT_EATT;
-+		if (!(feat && feat[0] & BT_GATT_CHRC_SERVER_FEAT_EATT)
-+			|| !(client->features & BT_GATT_CHRC_CLI_FEAT_EATT))
-+			client->features &= ~BT_GATT_CHRC_CLI_FEAT_EATT;
- 	}
- 
-+
- 	client->features |= BT_GATT_CHRC_CLI_FEAT_NFY_MULTI;
- 
- 	DBG(client, "Writing Client Features 0x%02x", client->features);
+> > > > > >  3 files changed, 45 insertions(+), 32 deletions(-)
+> > > > > >
+> > > > > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btus=
+b.c
+> > > > > > index 75a0f15819c4..bf210275e5b7 100644
+> > > > > > --- a/drivers/bluetooth/btusb.c
+> > > > > > +++ b/drivers/bluetooth/btusb.c
+> > > > > > @@ -2221,6 +2221,13 @@ static int btusb_switch_alt_setting(stru=
+ct hci_dev *hdev, int new_alts)
+> > > > > >         return 0;
+> > > > > >  }
+> > > > > >
+> > > > > > +static int btusb_read_alt_setting(struct hci_dev *hdev)
+> > > > > > +{
+> > > > > > +       struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > > > > > +
+> > > > > > +       return data->isoc_altsetting;
+> > > > > > +}
+> > > > > > +
+> > > > > >  static struct usb_host_interface *btusb_find_altsetting(struct=
+ btusb_data *data,
+> > > > > >                                                         int alt=
+)
+> > > > > >  {
+> > > > > > @@ -3650,32 +3657,6 @@ static const struct file_operations forc=
+e_poll_sync_fops =3D {
+> > > > > >         .llseek         =3D default_llseek,
+> > > > > >  };
+> > > > > >
+> > > > > > -static ssize_t isoc_alt_show(struct device *dev,
+> > > > > > -                            struct device_attribute *attr,
+> > > > > > -                            char *buf)
+> > > > > > -{
+> > > > > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> > > > > > -
+> > > > > > -       return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
+> > > > > > -}
+> > > > > > -
+> > > > > > -static ssize_t isoc_alt_store(struct device *dev,
+> > > > > > -                             struct device_attribute *attr,
+> > > > > > -                             const char *buf, size_t count)
+> > > > > > -{
+> > > > > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> > > > > > -       int alt;
+> > > > > > -       int ret;
+> > > > > > -
+> > > > > > -       if (kstrtoint(buf, 10, &alt))
+> > > > > > -               return -EINVAL;
+> > > > > > -
+> > > > > > -       ret =3D btusb_switch_alt_setting(data->hdev, alt);
+> > > > > > -       return ret < 0 ? ret : count;
+> > > > > > -}
+> > > > > > -
+> > > > > > -static DEVICE_ATTR_RW(isoc_alt);
+> > > > > > -
+> > > > > >  static int btusb_probe(struct usb_interface *intf,
+> > > > > >                        const struct usb_device_id *id)
+> > > > > >  {
+> > > > > > @@ -4040,9 +4021,8 @@ static int btusb_probe(struct usb_interfa=
+ce *intf,
+> > > > > >                 if (err < 0)
+> > > > > >                         goto out_free_dev;
+> > > > > >
+> > > > > > -               err =3D device_create_file(&intf->dev, &dev_att=
+r_isoc_alt);
+> > > > > > -               if (err)
+> > > > > > -                       goto out_free_dev;
+> > > > > > +               hdev->switch_usb_alt_setting =3D btusb_switch_a=
+lt_setting;
+> > > > > > +               hdev->read_usb_alt_setting =3D btusb_read_alt_s=
+etting;
+> > > > > >         }
+> > > > > >
+> > > > > >         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+> > > > > > @@ -4089,10 +4069,8 @@ static void btusb_disconnect(struct usb_=
+interface *intf)
+> > > > > >         hdev =3D data->hdev;
+> > > > > >         usb_set_intfdata(data->intf, NULL);
+> > > > > >
+> > > > > > -       if (data->isoc) {
+> > > > > > -               device_remove_file(&intf->dev, &dev_attr_isoc_a=
+lt);
+> > > > > > +       if (data->isoc)
+> > > > > >                 usb_set_intfdata(data->isoc, NULL);
+> > > > > > -       }
+> > > > > >
+> > > > > >         if (data->diag)
+> > > > > >                 usb_set_intfdata(data->diag, NULL);
+> > > > > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/blu=
+etooth/hci_core.h
+> > > > > > index f756fac95488..5d3ec5ff5adb 100644
+> > > > > > --- a/include/net/bluetooth/hci_core.h
+> > > > > > +++ b/include/net/bluetooth/hci_core.h
+> > > > > > @@ -641,6 +641,8 @@ struct hci_dev {
+> > > > > >                                      struct bt_codec *codec, __=
+u8 *vnd_len,
+> > > > > >                                      __u8 **vnd_data);
+> > > > > >         u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk=
+_buff *skb);
+> > > > > > +       int (*switch_usb_alt_setting)(struct hci_dev *hdev, int=
+ new_alts);
+> > > > > > +       int (*read_usb_alt_setting)(struct hci_dev *hdev);
+> > > > > >  };
+> > > > > >
+> > > > > >  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
+> > > > > > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysf=
+s.c
+> > > > > > index 041ce9adc378..887aa1935b1e 100644
+> > > > > > --- a/net/bluetooth/hci_sysfs.c
+> > > > > > +++ b/net/bluetooth/hci_sysfs.c
+> > > > > > @@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *=
+dev, struct device_attribute *attr,
+> > > > > >  }
+> > > > > >  static DEVICE_ATTR_WO(reset);
+> > > > > >
+> > > > > > +static ssize_t isoc_alt_show(struct device *dev,
+> > > > > > +                            struct device_attribute *attr,
+> > > > > > +                            char *buf)
+> > > > > > +{
+> > > > > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> > > > > > +
+> > > > > > +       if (hdev->read_usb_alt_setting)
+> > > > > > +               return sysfs_emit(buf, "%d\n", hdev->read_usb_a=
+lt_setting(hdev));
+> > > > > > +
+> > > > > > +       return -ENODEV;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static ssize_t isoc_alt_store(struct device *dev,
+> > > > > > +                             struct device_attribute *attr,
+> > > > > > +                             const char *buf, size_t count)
+> > > > > > +{
+> > > > > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> > > > > > +       int alt;
+> > > > > > +       int ret;
+> > > > > > +
+> > > > > > +       if (kstrtoint(buf, 10, &alt))
+> > > > > > +               return -EINVAL;
+> > > > > > +
+> > > > > > +       if (hdev->switch_usb_alt_setting) {
+> > > > > > +               ret =3D hdev->switch_usb_alt_setting(hdev, alt)=
+;
+> > > > > > +               return ret < 0 ? ret : count;
+> > > > > > +       }
+> > > > > > +
+> > > > > > +       return -ENODEV;
+> > > > > > +}
+> > > > > > +static DEVICE_ATTR_RW(isoc_alt);
+> > > > > > +
+> > > > > >  static struct attribute *bt_host_attrs[] =3D {
+> > > > > >         &dev_attr_reset.attr,
+> > > > > > +       &dev_attr_isoc_alt.attr,
+> > > > > >         NULL,
+> > > > > >  };
+> > > > > >  ATTRIBUTE_GROUPS(bt_host);
+> > > > >
+> > > > > While this fixes the race it also forces the inclusion of an attr=
+ibute
+> > > > > that is driver specific, so I wonder if we should introduce some
+> > > > > internal interface to register driver specific entries like this.
+> > > >
+> > > > Do you mean you prefer the original interface that only exports the
+> > > > attribute when isoc_altsetting is supported?
+> > > > Agree it makes more sense but I hit the obstacle: hci_init_sysfs is
+> > > > called earlier than data->isoc is determined. I need some time to
+> > > > verify whether changing the order won't break anything.
+> > >
+> > > We might have to do something like the following within hci_init_sysf=
+s:
+> > >
+> > > if (hdev->isoc_alt)
+> > >     dev->type =3D bt_host_isoc_alt
+> > > else
+> > >     dev->type =3D bt_host
+> > >
+> > > Now perhaps instead of adding the callbacks to hdev we add the
+> > > attribute itself, btw did you check if there isn't a sysfs entry to
+> > > interact with USB alternate settings? Because contrary to reset this
+> > > actually operates directly on the driver bus so it sort of made more
+> > > sense to me that this would be handled by USB rather than Bluetooth.
 
----
-base-commit: 2ee08ffd4d469781dc627fa50b4a015d9ad68007
-change-id: 20250208-client_eatt-c715de38312f
+Unfortunately I tried the libusb API and it requires detaching the
+kernel driver, which means the user channel would be broken. I'll send
+out a new version which addresses the above comments, thanks.
 
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
+> >
+> > A quick git grep shows that this exists:
+> >
+> > Documentation/ABI/testing/sysfs-bus-usb:What:
+> > /sys/bus/usb/devices/usbX/bAlternateSetting
+> >
+> > > > >
+> > > > > > --
+> > > > > > 2.48.1.262.g85cc9f2d1e-goog
+> > > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Luiz Augusto von Dentz
+> > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
 
-
+--=20
+Best Regards,
+Hsin-chen
