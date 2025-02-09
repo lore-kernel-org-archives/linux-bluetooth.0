@@ -1,160 +1,100 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370123FD4
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Feb 2025 10:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739097975; cv=pass; b=nVkfe9lWDwHHnBeYD4TkbFu+GDGYyIkCum4WzqTuHsWgecgH9K1jGOyib06q+GL+D+NpFVJLPAhDHnNx10gYeFK3JAccKgphC4ELacT1PdF+LyD52pqvg7ev6wiQ01cW214OuPJhCkCPtHOZkFb2jbnlW4M9Y4NAiGIUCtjhYlY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739097975; c=relaxed/simple;
-	bh=UKERzn7VqxK7mUEkXhWD3RABhZzsc+GIC8M4m8E97nQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ij43WSqXzv+vyG7vYzjlsbXF3Ddj2JvCLdo9nhbbTflB1pSDk/MOh/WbnT2AKbpE7I4AE03v/89NhBuuIkaDFSh94npm895/qtc1wXI3sY6yhlvoUgo97om+7v62hQ1iw1mrNUy/RD4ABMBA0HpufufAgo3IbTrZPnFjKFEmrog=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=oBTDxL0X; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D009B1898FB
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Feb 2025 11:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739099526; cv=none; b=Bl6bYgK3de0UQS1PZEzv6HgOA07Sefjja7RTsPlB60DpeeIqwW65XNuOogZGUSCz1IRXMgEtvfNF3DO0Q82OD+qMTPjMMvX+HTc5t1DDhF6IkPN9VE+Hdb3P4cbvMrxjwasq95JxlWBqSn3oSStjTs5SzlpScdLqN4sAAonBnF8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739099526; c=relaxed/simple;
+	bh=yLNddFOewHda8Agkttz+/M853J4PWadV84sLjxOVl/4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=sPOyKgFuag4GP6yn9H9xvx12rhkhOAqFlaZ+llhsJFtQWRC1PC7uC3EdkH2NRfulew0sQjDwBOq0u1YGQhoNT1zL5KKvznmI59wbTka73H5zm8/QOooHoUHVvUsShBzVKi96oDOwNRO4X/zupdk3GZxlV70gT7vaMBvGfcyogms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEocxQRC; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="oBTDxL0X"
-Received: from monolith.lan (unknown [193.138.7.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YrPWl52pKz49QC9;
-	Sun,  9 Feb 2025 12:46:11 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1739097972;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nEGU5/W8/XopXtFn6EtYW0PWvNEV0XTXVX09PRQkiSU=;
-	b=oBTDxL0XqJKVG1qMpGT5fOVS69O33DVlGievlC4udB1hA99MEwygl2hJxv/lUHlrn7FKd0
-	7vE3i+NCBX2DTqhQ1mp9n0bQW1WNNDMNVCNJiRBudNFOXoGX2BGKFGz2Uuvjm3my8mzN7p
-	xcKRieUTUzRWi+1QO97AWnma9aEltd7QzACCpQxxi4gIBlh7jauFVZm5asZ6guQSDxvqFy
-	70z4owRYbceagjUN8yHVYv3mOP/IEhBoSu6ClandG21Q3F760IQYKX5ZusDxBGD5CRbAqx
-	XszNc8JYc0oj0koq0VSk5KWcXDv7TskFJh9MSCam2e5rXcJF04yVsyXoS+eSAQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739097972; a=rsa-sha256;
-	cv=none;
-	b=oDexGiWS1JPAut8IKwG6r4hu7pTi48o+rtlH2ZZ9ibOWWz2C37FWq0aYnS980rQkra/mAn
-	mF/FNWLGJyvGSYYjnaEyqHj/TsTPVCYd0PZKghFGgVpUnCZAjO7tIYRd4SEvbz8ASNK3nf
-	hIVUNO1ZNx42TotJEntGlwyFfnSgEsAtURckuTVVb8NObhq0qhzE7gdUjTd4JNZQmTNK4L
-	inzPXTY7nZfS/QIs4siZDVxdRjMUPVdMA86CjTc7hu+/1HxcwzHlsvn5xiBRuTXrjGP/t3
-	AhvMOpWTdm03P4UDzPY3z3/4gOrek1QWaVpHVdVwiR47so78k2PHZCOJmYcwcQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1739097972;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nEGU5/W8/XopXtFn6EtYW0PWvNEV0XTXVX09PRQkiSU=;
-	b=leUb4b6TIrTeoVa1532uERqmHaHFHIVwJ6FOYZWJp924rNGDyrPYlU6/yVawZ8aZybyKpD
-	vIMrIjEegpLO/pTrZZp2HYOrpzPFBhxIRxZmeHQWnnHQ5G1PRuR6SWf/HBlriioe32ssMT
-	Uo+Qd+PlGiA/0U/NqJVDMKrIztj+LupJjTKYS2fvBQNlr8w8/tnPTbrQVIpzuVU97qhGrG
-	n1FnpTy2o6zic4K2XLO2rTXjpEDhbtE+Sk0Htlb6vaKYTKujHbQ9YSUVGdVnN9xo9mIcGi
-	2pZj/8CsMVtS7TWiwNW7l9HyX9+hIqYUotMQxv8FQtYX36fpiWfULU8Ou7+gWQ==
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 3/3] bap: don't consider TX timestamps as errors
-Date: Sun,  9 Feb 2025 12:46:04 +0200
-Message-ID: <002a6059d976c202ca7da648025bb4ada7388313.1739097949.git.pav@iki.fi>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1739097949.git.pav@iki.fi>
-References: <cover.1739097949.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEocxQRC"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21f50895565so29893715ad.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Feb 2025 03:12:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739099524; x=1739704324; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yLNddFOewHda8Agkttz+/M853J4PWadV84sLjxOVl/4=;
+        b=KEocxQRCvEElBnyVp7BfULKEuvZkkXG50qURGfG20ChBZkaYdiFSLjDvRC8ObyU43+
+         2nqxgjAA5GtyVIzBemZ/mCYdNCxq/x4cGWpGfnmYw3VXv2XQXnJy/OVl9/dwzFG5xjxM
+         fadFY1HoCO45rEaggyfBsVJVqSh6axrL6jBsg8l3mZJroSH0dB5/cZGXKfCGNzu6OQgF
+         pM/7NTfr19aSE6SWNfn7rUPsw0W3fh+ZcQFfEoSjoLE13xkars82BnW0ICC0+X8Qm8/p
+         qqt7Y/vB7+0Lu3xNd7fRR0uUmtF3SAHEIDtqwIpDegbgMVyWYK/uoG8sqD4+qBZHPDnP
+         5FXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739099524; x=1739704324;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yLNddFOewHda8Agkttz+/M853J4PWadV84sLjxOVl/4=;
+        b=W9li6JmCkHRm+O4p7IS0J7hbSkYIBqnNna4bi543ATeWBoxw6J5VrrW66QygUys4S9
+         2ruZnpRUNCkQRMP4RV+F51L07PSSZ2NCJspLveOfcn1vNxTojp9qaXANXtRtVYgnttop
+         T3kMkeqzAan4WALOxIP8yMzcXb/Euzw/JlCetizgcIrv378lDJZw/Z4dQ0dJYD0UxPs/
+         j5GWaOMHBbk6dQR6V6FHbMcUs9kstBa/4gbUGitjBMtWS9mKuPFo0Hq3ORd2glahXLb5
+         8Z31bTfTYeMEkQDwR8/eSbbCRwjF1dQIm3EqVLcMdLuyUf6VW6n6HebZkmQ64riOoHVo
+         6pIw==
+X-Gm-Message-State: AOJu0Yxxj8VEkvxVibjxRgP6TYSMbexRz76zt0OIkzH14ITWXHimkE3v
+	TK/xitqi37G2FFWt5z+fZ8jU9xG/4YnU0ov1utN8AMIsSJjv4rgpIXYKKA==
+X-Gm-Gg: ASbGncthE13+zcX2KxsHpnt5edjabUBvgkSht7WFMyHkd+ego1hi5kBQJK6R8JQCXzT
+	4vBpQqVX9s+Vt7H6v0QnLk/2KtRtTk4GwIqGjannMfb1qq3xpK0b7D9fJkOyg7QMsS5JB/cubzA
+	I1vsBy3SfVz38jRnOV60k20PY0FXZfDT4dDNJnYTJYkh6d+Zr6I0O50GB8T2PPbqFhpuyj3cDO7
+	/94z/Bl6i3sOwh1ez3bKkantDW9e4foceplnk3nM34T2sD6vgyZdlPtR0emEK0Z2byHPFukrrcf
+	SC1xh+lU5sbKTMvE632cVA==
+X-Google-Smtp-Source: AGHT+IHcJveXsscW9I5tVHN7ZQD1J/r6Iar4iplrRsL2tV0opF9XTZIG4YWr3jooDXdnbaUHAZ826A==
+X-Received: by 2002:a05:6a00:181e:b0:729:a31:892d with SMTP id d2e1a72fcca58-7305d44a7b1mr17488429b3a.8.1739099523726;
+        Sun, 09 Feb 2025 03:12:03 -0800 (PST)
+Received: from [172.17.0.2] ([52.234.47.211])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048a9d584sm5774047b3a.1.2025.02.09.03.12.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Feb 2025 03:12:03 -0800 (PST)
+Message-ID: <67a88d83.050a0220.111ded.4246@mx.google.com>
+Date: Sun, 09 Feb 2025 03:12:03 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8666692933846948762=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Add io watcher to be used with TX timestamping
+In-Reply-To: <3938636ceaafc589f6d12fa6fe50e1c6a1c76bef.1739097949.git.pav@iki.fi>
+References: <3938636ceaafc589f6d12fa6fe50e1c6a1c76bef.1739097949.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Use io_add_err_watch to avoid considering TX timestamps as errors in the
-transport io channel.
+--===============8666692933846948762==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: acinclude.m4:63
+error: acinclude.m4: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- profiles/audio/bap.c | 14 +++++++++-----
- src/shared/bap.c     |  3 +++
- 2 files changed, 12 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 77df9455a..a1947f9cd 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -39,6 +39,8 @@
- #include "src/btd.h"
- #include "src/dbus-common.h"
- #include "src/shared/util.h"
-+#include "src/shared/io.h"
-+#include "src/shared/io-glib.h"
- #include "src/shared/att.h"
- #include "src/shared/queue.h"
- #include "src/shared/gatt-db.h"
-@@ -2059,8 +2061,9 @@ static void setup_connect_io(struct bap_data *data, struct bap_setup *setup,
- 		return;
- 	}
- 
--	setup->io_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--						setup_io_disconnected, setup);
-+	setup->io_id = io_glib_add_err_watch(io,
-+					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+					setup_io_disconnected, setup);
- 
- 	setup->io = io;
- 	setup->cig_active = !defer;
-@@ -2119,7 +2122,8 @@ static void setup_connect_io_broadcast(struct bap_data *data,
- 		return;
- 	}
- 
--	setup->io_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+	setup->io_id = io_glib_add_err_watch(io,
-+					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 					setup_io_disconnected, setup);
- 
- 	setup->io = io;
-@@ -2797,7 +2801,7 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
- 
- 	if (!setup->io) {
- 		io = g_io_channel_unix_new(fd);
--		setup->io_id = g_io_add_watch(io,
-+		setup->io_id = io_glib_add_err_watch(io,
- 					      G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 					      setup_io_disconnected, setup);
- 		setup->io = io;
-@@ -2842,7 +2846,7 @@ static void bap_connecting_bcast(struct bt_bap_stream *stream, bool state,
- 
- 	if (!setup->io) {
- 		io = g_io_channel_unix_new(fd);
--		setup->io_id = g_io_add_watch(io,
-+		setup->io_id = io_glib_add_err_watch(io,
- 				G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 				setup_io_disconnected, setup);
- 		setup->io = io;
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 6ffeefa41..b24566c88 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -20,6 +20,7 @@
- #include "lib/uuid.h"
- 
- #include "src/shared/io.h"
-+#include "src/shared/io-glib.h"
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
- #include "src/shared/timeout.h"
-@@ -2652,6 +2653,8 @@ static struct bt_bap_stream_io *stream_io_new(struct bt_bap *bap, int fd)
- 
- 	DBG(bap, "fd %d", fd);
- 
-+	io_set_use_err_watch(io, true);
-+
- 	sio = new0(struct bt_bap_stream_io, 1);
- 	sio->bap = bap;
- 	sio->io = io;
--- 
-2.48.1
 
+--===============8666692933846948762==--
