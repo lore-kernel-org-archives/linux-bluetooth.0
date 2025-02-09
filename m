@@ -1,130 +1,169 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B7E243392
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Feb 2025 12:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBEA1DC9A8
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Feb 2025 15:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739102708; cv=none; b=BgJAlOHT0QRmb26KRWKKoikLDE9uadaG6GrostFKmkvN0tDG12OSkaYLSJfOT52rJPkuRnRE19Tbg4iCXPQ5fZg7NR49M0/+qUFjepEua1VBi61wGNl5SQZ7JW+lqsc8OZgACPN6LNd7LxZLhe5pgelfwbIn0okNU4hTldGanec=
+	t=1739115921; cv=none; b=ZneF8V89X/hlAiv4L0jBI6YrH9TBLZDutG9P1QwURzYcloDUAQkLvnkcfhp3hreqGzM5oFUKtdB3AucNSauiaiWXxOhhnoGdE4SmLd1V7Kv0SNGM8sYxctbQOVI5n5Wu7z+B/ayxx/megsQ7nyfoP8sdG30fZS15BCQvyM91b8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739102708; c=relaxed/simple;
-	bh=TGVPjWmobRzGOHmH0aDgpQ1GQJEX66kIxp69BJJbf7A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NXSYDd3amMDZJuGL4fAC4CmDGwfRBjS4IwmQGqEhe93dacsd8yXIp/8JVI6nPKmGi6I10cn7vDDSfKMDSatNHiBuwmDavGfkFjNQNSnbl01XyGuqlLrQpfjT+hIPnxJKs/kuTDT/92LW0q0mPUcaqwevBiELJSAlG+tYWdt0tWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZgPqdt5Y; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZgPqdt5Y"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c05b91245fso13334185a.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Feb 2025 04:05:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739102706; x=1739707506; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rmNoF7FIWjUsUE9iUpf/QUZyBrBkAll5viKi4FWhLKE=;
-        b=ZgPqdt5YuqyRr0MF7JHf8aufpSeGobtjNAaFY+TCJ6zLAEyELtg1iyoDF84csL8rAQ
-         XBCZnveM7I2T/07eL7WhgjuZeK4EikvN8POPuF/9tZte4xyLMT0HX2WtI5GwUoR2ts+I
-         wegsUobOmEpXCSe2UFvxVzoTTz7zwEe6TKexf03Z0DLsh6IGxKH9h0h1TgBWANGWT+Dq
-         FTXQCKAqrbajmGJCYPJm0ceHANEqak/spO7L2wrpjw2psB5uAey7UjbTadsSudzwLYe4
-         uI4UlsEbOo71vemYiHPxulb83+lgfu+CMTJGHPcqy04zPtGLpizxqzAA7MQ0azRx3rNS
-         xAQQ==
+	s=arc-20240116; t=1739115921; c=relaxed/simple;
+	bh=+SH0U04r0tpMMW8rQnkJLNcxI7jq3YbVkyqic8W6Mws=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=lAnHSegiFUZX5ucQ3wzNvhM3GKKUe/GdC6XP7H1KGXbZoCTZTBLuOCUL79bZOu51HQOzex0XGzTMqKeRRtMSTBneGha5Phx+28JxYPQ7uC/g0TWpC3n6Lz2gjnX5p4hpVkpk7oTxAas8VRYiU1scEOaGbWgjuSFt3fEN516wjSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ce81a40f5cso74203775ab.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Feb 2025 07:45:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739102706; x=1739707506;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rmNoF7FIWjUsUE9iUpf/QUZyBrBkAll5viKi4FWhLKE=;
-        b=KEKxBcR7/T73FQkhJ3cqez+jgWjmTQMEWRnWcjfIen/9oEh/6CZPLFZPepL+hzwkl+
-         PFRYSWolM1oO8Ur8AxUirYeZO50WRRyGEct5pnFWPpVr5Sf5zmMA59g0fY4T6F8UB5RT
-         zNfiT3OyWmUbPx2P2p38jr/E81goUDT2eShtHgSq74QRRl0x7G62TdS1o8QzDeUyGdBZ
-         MklOPbUmt4EtMXJXbPy9CXau8WvqTq+0pMgSIO7XrQ0NMlSFWNs5+9LDJa2CA170MHHg
-         bV/JveNZNWhJPju6OWXZofI9CtxyMBxLmicnQWy2dMxl/uz6oy7mFln5ZVQA4PBN1vNg
-         vORw==
-X-Gm-Message-State: AOJu0Yw4Eh+vJDTfXqBigqE2xU1HCM6I+G5P87DXMQ9A60IfjhsRMWmG
-	Q0CurcuAyiUW8Ab2TYVwWL0Rw+y4a6sWCxXFGLuktv2EzWDr5AsLI+Edxw==
-X-Gm-Gg: ASbGncsBWKThY5gF3rQIxzmOZSqGRsvNvyYQ0Bo6tP2R5rU/fA7Gk8ISvW8FBrjnQz5
-	GpMS5OTLi8AEfBOB/BX7CgsuH2XL13aP2KXQvu/mI7SKm6pvijk4rh9YKnegp0fXMO59++3q0i3
-	o+5Pbk5q1426J67BDVgX/VWU2g9+G4IPnwO7HZrDNHRfYZ2AF3iAr+SytWhMZhKmEhQNVz6+bUc
-	hjc3wy4Tdq12cIDDjQ+06+c/Y1gDtWy0yFL9ZBEIaL0af2dLnLgfbMEVD/hkmHnT/6h4kY3N9pN
-	cg9Q+zMSdY3ZBJu+JCrbpA==
-X-Google-Smtp-Source: AGHT+IGqou8qlkbrLxP779dwia2LCNaUOFw9eXXbZQStWGy3FUvdSekQkW4qsaDzGr7teV4H8ViWmA==
-X-Received: by 2002:a05:620a:319c:b0:7b1:543d:c99 with SMTP id af79cd13be357-7c047bbc966mr1386064685a.24.1739102705747;
-        Sun, 09 Feb 2025 04:05:05 -0800 (PST)
-Received: from [172.17.0.2] ([20.25.205.245])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c041ded11esm399981385a.19.2025.02.09.04.05.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Feb 2025 04:05:05 -0800 (PST)
-Message-ID: <67a899f1.050a0220.79452.f123@mx.google.com>
-Date: Sun, 09 Feb 2025 04:05:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0802097213026698798=="
+        d=1e100.net; s=20230601; t=1739115919; x=1739720719;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vLzOMWLy/MOLX9VEUQNUbF89kIoT+fmm9AVwG76J8UA=;
+        b=ZfAsqD+Oj+qkkpo2bmjBjLnVaSEwnYX16qvZ+Rrg4/oxmnzBgWYWH+ybZVPAwNonvk
+         HCptVs6jneaEBAiWdCp5fCWhsG4nakBHjh9Jh7Q7Iv7t3LRw1kz0D4cE3UDrdu3XHP0p
+         F2YrSUmfPrwGZ/MrR8zc/y4xF3qAIkvIp/gdNTZCY7p3JyyFp/7zCBmt/uOfowQaChQU
+         GvOGcVH1wrTZjwxE6DkccGWkXG4AuO1/1QR0v2FMVskV6ht6bz7hW87bBJQbGX266xwF
+         1Kv/nSo3t9Q0Jle1GZ1wL83dU+nkfajLYaHce65NyuxY3FjyufPXMnuJauf5BkzJAd15
+         NiFw==
+X-Gm-Message-State: AOJu0YzvpGiTxtldZfuh68EnfIp96ALAvP951asDlTxR7zpU8v6RzswI
+	WIcWePfMwLUqi+GBbPpplLL0poWAD+fdbOhDH8ZFiVneGRV4sPMkqCYUqFus7Z5c3sIr3hj+HYl
+	SRII+wa0W11Pe3VVgxUy2LyIcGBVnlR53AbUlkMRFufFSwAeKrg2vTv4Y5A==
+X-Google-Smtp-Source: AGHT+IHHHgELAIyLEEZ3lVkCutpyk8siwMTX3DyIpioxphCJVRcq5t91FAg7VxfGFkTsnRnsv5W+SOm03IGRSP2eyzDDWEqhuKI8
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: tools/tester: update TX timestamping tests for COMPLETION
-In-Reply-To: <4449644d9883f313fc6ad883f56fe07420815bf1.1739026302.git.pav@iki.fi>
-References: <4449644d9883f313fc6ad883f56fe07420815bf1.1739026302.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6e02:1c04:b0:3d0:11ff:a782 with SMTP id
+ e9e14a558f8ab-3d13dd447d5mr79163175ab.9.1739115919335; Sun, 09 Feb 2025
+ 07:45:19 -0800 (PST)
+Date: Sun, 09 Feb 2025 07:45:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67a8cd8f.050a0220.3d72c.003f.GAE@google.com>
+Subject: [syzbot] [bluetooth?] general protection fault in h5_recv
+From: syzbot <syzbot+b5691bb559396b262064@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============0802097213026698798==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+syzbot found the following issue on:
 
-Dear submitter,
+HEAD commit:    ed58d103e6da Add linux-next specific files for 20250207
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11d782a4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=244a34ec1429746
+dashboard link: https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=137f2bdf980000
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=931990
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ce459b7174dd/disk-ed58d103.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/60699733c0c8/vmlinux-ed58d103.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f589bce7c898/bzImage-ed58d103.xz
 
----Test result---
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b5691bb559396b262064@syzkaller.appspotmail.com
 
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.24 seconds
-BuildEll                      PASS      20.89 seconds
-BluezMake                     PASS      1465.37 seconds
-MakeCheck                     PASS      13.16 seconds
-MakeDistcheck                 PASS      159.50 seconds
-CheckValgrind                 PASS      214.74 seconds
-CheckSmatch                   WARNING   285.83 seconds
-bluezmakeextell               PASS      98.78 seconds
-IncrementalBuild              PENDING   0.25 seconds
-ScanBuild                     PASS      878.47 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/sco-tester.c: note: in included file:./lib/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth.h:237:31: warning: array of flexible structurestools/sco-tester.c: note: in included file:./lib/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth.h:237:31: warning: array of flexible structurestools/sco-tester.c: note: in included file:./lib/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth.h:237:31: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
+Oops: general protection fault, probably for non-canonical address 0xdffffc000000005f: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x00000000000002f8-0x00000000000002ff]
+CPU: 1 UID: 0 PID: 9956 Comm: syz.2.1414 Not tainted 6.14.0-rc1-next-20250207-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+RIP: 0010:h5_recv+0x153/0x940 drivers/bluetooth/hci_h5.c:572
+Code: 08 01 44 8b 64 24 04 48 8b 5c 24 08 4c 8b 74 24 18 49 ff c7 41 ff cc 45 85 e4 0f 8e 55 06 00 00 e8 e2 f5 f5 f8 48 8b 44 24 30 <42> 80 3c 28 00 74 08 48 89 df e8 be d1 5c f9 48 8b 1b 31 ff 48 89
+RSP: 0000:ffffc90004cafc60 EFLAGS: 00010202
+RAX: 000000000000005f RBX: 00000000000002f8 RCX: 0000000000000061
+RDX: ffff888033690000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc90004cafd70 R08: ffffffff88c9927e R09: 1ffff110048c0403
+R10: dffffc0000000000 R11: ffffffff88c991c0 R12: 0000000000000001
+R13: dffffc0000000000 R14: ffff888024602000 R15: ffffc90004cafe00
+FS:  00007f50a01cf6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000040000001f000 CR3: 0000000028c32000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ hci_uart_tty_receive+0x141/0x1c0 drivers/bluetooth/hci_ldisc.c:622
+ tiocsti+0x24d/0x300 drivers/tty/tty_io.c:2299
+ tty_ioctl+0x518/0xdc0 drivers/tty/tty_io.c:2716
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf1/0x160 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f509f38cde9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f50a01cf038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f509f5a6080 RCX: 00007f509f38cde9
+RDX: 0000400000000180 RSI: 0000000000005412 RDI: 0000000000000003
+RBP: 00007f509f40e2a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f509f5a6080 R15: 00007ffed807d2a8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:h5_recv+0x153/0x940 drivers/bluetooth/hci_h5.c:572
+Code: 08 01 44 8b 64 24 04 48 8b 5c 24 08 4c 8b 74 24 18 49 ff c7 41 ff cc 45 85 e4 0f 8e 55 06 00 00 e8 e2 f5 f5 f8 48 8b 44 24 30 <42> 80 3c 28 00 74 08 48 89 df e8 be d1 5c f9 48 8b 1b 31 ff 48 89
+RSP: 0000:ffffc90004cafc60 EFLAGS: 00010202
+RAX: 000000000000005f RBX: 00000000000002f8 RCX: 0000000000000061
+RDX: ffff888033690000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc90004cafd70 R08: ffffffff88c9927e R09: 1ffff110048c0403
+R10: dffffc0000000000 R11: ffffffff88c991c0 R12: 0000000000000001
+R13: dffffc0000000000 R14: ffff888024602000 R15: ffffc90004cafe00
+FS:  00007f50a01cf6c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000000028c32000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	08 01                	or     %al,(%rcx)
+   2:	44 8b 64 24 04       	mov    0x4(%rsp),%r12d
+   7:	48 8b 5c 24 08       	mov    0x8(%rsp),%rbx
+   c:	4c 8b 74 24 18       	mov    0x18(%rsp),%r14
+  11:	49 ff c7             	inc    %r15
+  14:	41 ff cc             	dec    %r12d
+  17:	45 85 e4             	test   %r12d,%r12d
+  1a:	0f 8e 55 06 00 00    	jle    0x675
+  20:	e8 e2 f5 f5 f8       	call   0xf8f5f607
+  25:	48 8b 44 24 30       	mov    0x30(%rsp),%rax
+* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	48 89 df             	mov    %rbx,%rdi
+  34:	e8 be d1 5c f9       	call   0xf95cd1f7
+  39:	48 8b 1b             	mov    (%rbx),%rbx
+  3c:	31 ff                	xor    %edi,%edi
+  3e:	48                   	rex.W
+  3f:	89                   	.byte 0x89
 
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
---===============0802097213026698798==--
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
