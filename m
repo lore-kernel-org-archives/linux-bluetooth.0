@@ -1,71 +1,66 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD69165EFC
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Feb 2025 10:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9143FD4
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Feb 2025 10:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739097609; cv=pass; b=tpJOBn5tv4ngiAsTWFyhrlA22rmrYCcAnchWMgL2iLDzTwJO+Tjh1QqDOfEE0e3QmHgB3PiedQuiSAuEtsXsI3DhJx09bZOg1YZ1to6VR0tbXdC5HLiNOgyXiJF6EvRN13Harkx1NzyfzPKCfhxBZmMdLIp8PhDM4qcguNFU/eE=
+	t=1739097972; cv=pass; b=bBhr4jIcZon6QZhxaWku1A7tvb5zE8SNGB2stZ4GYQEXh7sruHN6yxXHGvgBGRdvySgtiuOXQwMeVR5B+CRxXM8l1Z2SwiJZyNNm6MVNGpeOoZVbDW2Qd0ic4aATrQg3SzdBt6dePX8SahiIJhCVXHNtCTTwckmIRvkJLze31IA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739097609; c=relaxed/simple;
-	bh=DRXET7bl8LRxgvn86Z9hUQhMDZNj3T9bcx9ufBBOA5E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R93lL2gysyRzRLs63mSF4Sb7CLH4Q1N+yP8NJS1dq3oGavFmaR5Z2VDO7skyTVxNdThPpezSU+zt6pQgWK4Sp9o7vomydat6KyUbCPcecEX0ManqiG+pd2ryo4TVcGlppxAiXWADfD5h5Q9MUMhkknYgKRuT9h8UUTl17MheEpQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=hjJV30gJ; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1739097972; c=relaxed/simple;
+	bh=YE1Yl0FA2p08MNd4l7ez7Q2rNjjADF+B3LNgenXJlWY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y4fdjKfOj3Cg9I5CNQKhxO9N3HrdUgICAfMvmCKdwBZM8ZjzF2xKqTFIPLe0ZcFX4yaWxSOSbtV7smBkqAWpW2iRsfCHGB10jaLKvq44GzcBuYkXBctwm1/YkYNl/tzzNfYaknBp/hoChMW4QuwxOazOUiUhqEoPPmBNRoTaEX0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=De3CgOo8; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="hjJV30gJ"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="De3CgOo8"
 Received: from monolith.lan (unknown [193.138.7.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YrPNj341nz49Q5l;
-	Sun,  9 Feb 2025 12:40:05 +0200 (EET)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YrPWh1wlyz49Q3p;
+	Sun,  9 Feb 2025 12:46:08 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1739097606;
+	t=1739097968;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eqiSfjY+jmPeMy12FlPWkUB6hSk3vxE+RqatU8sN+Hc=;
-	b=hjJV30gJel6FqRSHbjRGfaX50K+2a+odF1bJ6BfsmE9Th2nrrS7ooAnNlpqRmenSzRr+me
-	Mjg12p6/jAs1WN0eoKM2ubHNGS1fSJLJM6przLsoYQvGlfcF47CTt/zPlWxl5td1gxYTeL
-	bJDBBs2ZSEaZ+6/t3TyebL/oISvQT3ut8DWhDglHItLg3OEzDkVGbd/iqEH9WfdVqX2QL6
-	OWM/Dq/OTG0nbGC7+SwoU4BIAEJgp7tU1Tf0a/DuK4kbOAIzot6j6gA6niOlJ0kRl2mCTv
-	kVb3/sidZARgNDNGSOCDRPvvUkb32abzVTeSYIlezOz2vBiTevSgWp+04VfaLg==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739097606; a=rsa-sha256;
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=weYXKKk76Y/TnQssxxQMQSjAsXplZbY1u3sUohWS8r8=;
+	b=De3CgOo8sBKLHXlc90WUMWAfcRB2MOr+Z1uZjHMt/JiGfZfDwvaC0lOkeSlcEkm2HUV5f9
+	8bYWFeqmB85KPXtMkTZUolVQIwHsz+OYOvDIEeOj7H9zQ2EUFstPI9FJoowMtbLnliZmld
+	iCZdhE/aq2mSB80h1Tuzuy/iwJo6iiSHcXkDx5Shew/jfHtsLBIMFmErcLHj/VYXKd/i4i
+	D9+OzywgI+LzA6HOtFs+2QOUzCF80iM1DuEnExoiZGc+qNRkRsC5k7Hu9bvWy5C8XFfOqv
+	HZauiciJ/264S6GID4lmLKNwAi+xhjACkXKsXUQ0tdiDOyknRbaw47QbI8fZOQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739097968; a=rsa-sha256;
 	cv=none;
-	b=A8FU+TFKnhdR7csprRzsVSwEWgswwbRMn7+DkcqPNWonug2die8G03Gpt8dz7WdLKpgXDh
-	MXEmQlpQunSvIG3fiPRvmGr6L9a3BzW/F+z3xzpNhXEWaXlUanOZeDgftobW/Jw+Lr0awy
-	GoFOD1x+aQXigi6Fxl7gUbkpkVNPJUfuXNSzvZkOJ3jaK5hvLhxO+BUiQ1QCwkoRZJJoPE
-	X2Pd35Sr4RgntSnsxV0t62IqJGWrmFefm69+eTSlDplfQVtpVzMgU/NqFB7zy4yeiWVEfc
-	LTqhUXCrdEsb16mkIWBUehl8zNwZKU/fUx7ABQSf7hygAlX+2R93Ek1FdZN6sA==
+	b=VrHOV8R9cOrvpCu+jRtZvcJRU5XvGYJtuajnVbM7AKJipgQmEUcOaU+acR12k7j0WARJz+
+	C4efP39cskWRtj0ItMw3corXVlO5C9tDUrsFfqRCyWcoRoJ+vkqm34kzN5AwOgbvlAsj/U
+	Ve0uzrEzH24OMs8Psqt22PveZx0IkgELUkjI4XPasvR2TacjmKm0h49PUoKsPhF9X1gyE6
+	uyi3e0bJDwruCAGxMcbjU8a9euqNYG0N9aQ8qzvy3f6de95uN4ViPEgeuBdUdeZ4XN1Bgl
+	S8mETkt9MOLz/dZLIyjKi0rKpkCMD7XE4JR8gzoZ8/Xy1IrLJayAOu0mwlp40Q==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1739097606;
+	s=lahtoruutu; t=1739097968;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eqiSfjY+jmPeMy12FlPWkUB6hSk3vxE+RqatU8sN+Hc=;
-	b=qIN4d8gvsPWPQXe08GAG/q7dVN5jhM9qyrIxlt4SIETWixdxRZ1RYhKtdo3drNAZcFKQAe
-	Bhi4j8hZka7rc/RabPXf+ehESUpBCpvc8xpwbWILN6ZdmWa5L3vT75kI8+r8oYZeY4vo9H
-	HZciQtTOcIk/D686YoFO7c9JVwBuh/9s4NtGNisrSjaRxg5aGCKbyOjAKUP3idi0Kq1MZn
-	XYaQoJr16/12ZeRHK79BK5agoBvsJQzCCmW3UQ1pUCrNhfvcwVPE6iCGoS5O7TEFC3rYu6
-	3KxELl13TTKR18S+ZawiEe1OJYML9MRaPC3mDesHKwNFjBX6lsotup6T2Y2Zpw==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=weYXKKk76Y/TnQssxxQMQSjAsXplZbY1u3sUohWS8r8=;
+	b=Nw6A2x+3UucS0Xv5mCQG47+aSY5Bs8z10e7fKpdW9Av//r4v3oD7Y1TYOQ7TQc/ePyynDJ
+	UptbOgoAh/JD39JTjrg2WDqvgeM/cjAsZIPtFfuTWKhOwERE3oYe7ZSy7sIC1loH11dmR1
+	vw4AhXqVtDF6qjWsMbJp5cmZiaXG2Lf2GRXPfWYC+jxwj1y0NE7fk0GykNrQ4vdgx/pNFj
+	n1Knprv8tH/CejbWDspgCOMeHnWzrQadJg3ungnBFGEkWYiqbSDy30ktEUU2fOnNW2DOe+
+	GWNYZmoZA6VnioejfF62y8yLX90IiFmxkuLIRwXUUywNgb3nOuWsN4ZpB2Tslw==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 3/3] tools/tester: enable TX timestamping tests by default
-Date: Sun,  9 Feb 2025 12:39:57 +0200
-Message-ID: <c30c8aac944bf4fb59a3d34351a859ebfc01e7bf.1739026302.git.pav@iki.fi>
+Subject: [PATCH BlueZ 0/3] Add io watcher to be used with TX timestamping
+Date: Sun,  9 Feb 2025 12:46:01 +0200
+Message-ID: <cover.1739097949.git.pav@iki.fi>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1739026302.git.pav@iki.fi>
-References: <cover.1739026302.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,59 +69,32 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- tools/iso-tester.c   | 2 +-
- tools/l2cap-tester.c | 6 ------
- tools/sco-tester.c   | 6 ------
- 3 files changed, 1 insertion(+), 13 deletions(-)
+This is rebase of a patchset sent earlier, for making BlueZ tolerate
+TX timestamps in MSG_ERRQUEUE so it does not mistake them for errors.
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index ad0738091..640692b77 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -691,7 +691,7 @@ static void test_pre_setup(const void *test_data)
- 	struct test_data *data = tester_get_data();
- 	const struct iso_client_data *isodata = test_data;
- 
--	if (isodata && isodata->so_timestamping) {
-+	if (isodata && isodata->no_poll_errqueue) {
- 		if (tester_pre_setup_skip_by_default())
- 			return;
- 	}
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 395e76dbc..e56773d13 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -221,12 +221,6 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
- static void test_pre_setup(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
--	const struct l2cap_data *l2data = test_data;
--
--	if (l2data && l2data->so_timestamping) {
--		if (tester_pre_setup_skip_by_default())
--			return;
--	}
- 
- 	data->mgmt = mgmt_new_default();
- 	if (!data->mgmt) {
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index ae76b1ddd..1c07eec2d 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -197,12 +197,6 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
- static void test_pre_setup(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
--	const struct sco_client_data *scodata = test_data;
--
--	if (scodata && scodata->so_timestamping) {
--		if (tester_pre_setup_skip_by_default())
--			return;
--	}
- 
- 	data->mgmt = mgmt_new_default();
- 	if (!data->mgmt) {
+This was one of the two ways to deal with this issue. The other one
+would add a kernel sockopt() that disables (some or all) errqueue
+wakeups.  For that, it might make sense to add it not only for
+Bluetooth, but I did not work on this, so no such patch exists.
+
+Don't know which one of these would be the preferable one.
+
+Pauli Virtanen (3):
+  shared/io-glib: add watcher to be used with TX timestamping
+  avdtp: don't consider TX timestamps as errors
+  bap: don't consider TX timestamps as errors
+
+ Makefile.am            |   1 +
+ acinclude.m4           |   3 +-
+ configure.ac           |   2 +-
+ profiles/audio/avdtp.c |   5 +-
+ profiles/audio/bap.c   |  14 ++--
+ src/shared/bap.c       |   3 +
+ src/shared/io-glib.c   | 157 ++++++++++++++++++++++++++++++++++++++++-
+ src/shared/io-glib.h   |  20 ++++++
+ 8 files changed, 195 insertions(+), 10 deletions(-)
+ create mode 100644 src/shared/io-glib.h
+
 -- 
 2.48.1
 
