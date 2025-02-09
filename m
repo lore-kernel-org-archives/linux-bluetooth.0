@@ -1,277 +1,207 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA70241108
-	for <linux-bluetooth@vger.kernel.org>; Sat,  8 Feb 2025 18:02:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739037761; cv=none; b=iUWSiV4fKpxul+z2uVC689zJNHYK7tZgEi1A3vhshbBzUxhN4jnTUWygFyDeRUs1B99UEnFM7drlwZ0qt0nm49sfQYWTITrzm5P4tZKe4kJhArbBAnT8MjgH3tLVI6kAFT9x0pGjOMvl8Atx7EkKZns15qJ/du5q8ov7G6Cjmok=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739037761; c=relaxed/simple;
-	bh=FUFtI/AXSntNLzGgpAst+Yw82P+S1ZmGXQgT+f6QErE=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=vGRm3kfZ+oGA/lMmpUpEYrzj2vp22w3j7Z8PiKrMYsn3wJrL1maVmNIDIECVDpvv+DxQ8PDJwGPEWykxUN4U0pd1FhoFqLIO3DC+KYVD1XFlujexM1O5vuEck82+SzNJxH+sLYHimrV4D5MmxvqYi5oy6NCny6liOXWFqwo7utA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VD4SA8jR; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD80243370;
+	Sun,  9 Feb 2025 10:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739097579; cv=pass; b=KIiMX8Bl1RC4zawrfuoOWEI4DXk8EtfYXJGoT2I2vQgvk+UgRh/GfP0BA8Ud14yFiBTEWNz/olxPpK/MNfO+xZoN4boQFKZzSdbKRdncf7SNfiZMZhhWdjjxIHPYZ1N6rusc0rgyBwIuqma3X5IkMIAJWr+jj3icLbTsOkfvMmM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739097579; c=relaxed/simple;
+	bh=H6wKNnTjIhUEF7jSWj/4hL8GFDsRO6mTY4TldXGHnJI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HNXGYZGGXqiUs+7Qxr04HS+JogBxhMBrLtVbvEpoga4tMZqJd0M4cdZCdKn1hpVTwoBpV8p6vZL4N0ER2zHF6sYpPVrpojmhesp0X3Hy/spzsfypDhNfbmdKwxFSwS4mdTDVwZ7GQvIoj9Q4UdoW4PRvCAfKUlZ6Pky+W31mnTo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=dzpBSrD6; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VD4SA8jR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739037759; x=1770573759;
-  h=date:from:to:cc:subject:message-id;
-  bh=FUFtI/AXSntNLzGgpAst+Yw82P+S1ZmGXQgT+f6QErE=;
-  b=VD4SA8jRAStaLgoBPTXDTM92SJjK44wWxCAxlxI0ZwSsqJI3uHv4MXqF
-   52mnG5KHrYPc6Y/gYCb5IsaIAbz/vAi2BC/WXBO5iAUPkKVVNhm9y4LJm
-   9SkrvBAg3BbxPBUlHGQDH33Avu3O28R5UeE0+Asr7+5n+gmm5/BIrHQW6
-   cTHvk5F/8ecEdTkFFGz/wNgwCm7Vbj9U0Wbg1uM1lereFRqeLHwWlnnJG
-   YZ+SEHFb6m8uBZzZunX3pBaueeLgA2vYQ0jhrOxF1rV1vdA51F1fnU+Vi
-   Ue4cgMWRx4GQofOoNCdevMI2R2kA/lyKSaKfEPOM1WYbeudKDesTiI7Gx
-   w==;
-X-CSE-ConnectionGUID: KfZiDcvrTkWS0d3HMhqnPA==
-X-CSE-MsgGUID: ROFpqPIlRVONkuv3h04Now==
-X-IronPort-AV: E=McAfee;i="6700,10204,11339"; a="39817271"
-X-IronPort-AV: E=Sophos;i="6.13,270,1732608000"; 
-   d="scan'208";a="39817271"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2025 10:02:39 -0800
-X-CSE-ConnectionGUID: o+LzATVkSMilUJuT7cCllg==
-X-CSE-MsgGUID: Rxm74RmuTFyq4BHVwHR6Ew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="116411443"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 08 Feb 2025 10:02:37 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tgpA3-0010SZ-28;
-	Sat, 08 Feb 2025 18:02:35 +0000
-Date: Sun, 09 Feb 2025 02:01:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- dd6367916d2d0ae2e4d5f485b67c5bd5b4dfa962
-Message-ID: <202502090247.W3edQquU-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="dzpBSrD6"
+Received: from monolith.lan (unknown [193.138.7.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YrPMz1kZyz49Q1R;
+	Sun,  9 Feb 2025 12:39:27 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1739097569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CxCBQczEebSRa4HuQ77EBkx39dklZvIxW1x2Y3WcJn8=;
+	b=dzpBSrD6WpCd2TyNLn9ByBtyliBLP+Yy4Zwx2nXgj2B09E+rkxnsdwV0/BtKFt66mPIoAW
+	8Pn0jvFyyvtNmZlFY/6cOdE6nxudi6TJdmDriikpb3VHvtkQfXc50zxpma6kKSIyjizV9d
+	sFPR2UByL0Rnsw6fzuh3sVwg7K1EixbxA248m1rCO1TmlWeFY7nDFsYwvmsMPW1Irgu3fi
+	wVxcI3EPJiCZ5xduzgSR1ZnAH5W5FFZW7yOdRJqPjeq1Wrj/19Jmr6S05XiHVR13hQXFGR
+	P/XE++IrTkUC/QGKZymMykK3i5NZyUmcu8YM5ZK9w95GiwrnTWYNHQV4+QC1yw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739097569; a=rsa-sha256;
+	cv=none;
+	b=VpxypeCUltmZcJWKX90D0Ya4acJx9oB/pSrSc5jHofxW/tBwrgTWO+vwvScU9A8fVWFqJ3
+	0LFgFvKlBz9w6l7zWFzWnEVXtrKrydTwLqhPh/Su8jGhrMww73uBxJfAsrxTF7JiUKhWv1
+	pNJdsPWgmDKptB0KFbPDOL9WxxtNtMy+Ac5UlUfIB9OFcrUKKyioTxGsO5CAi5WIPtouR6
+	kfFXbl9QUdRTH5vP8CQcb8JtPuIH3RQqI57n0xzh/c7KCyRYGHYqiMf9mAVKtVeJwshn+M
+	4oo/B6zJ8fqrvZPPdVMf04NBgECRtgYOsRZQSnQvqOMpmKbK3cJ+CpI3NrAIrw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1739097569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CxCBQczEebSRa4HuQ77EBkx39dklZvIxW1x2Y3WcJn8=;
+	b=cyFDRs/vD6vCiOvCjIhcCuW1KCNbiZ5c06JgwyZT2KKCrCuj7Jv5M8S/UMrADigp71UrTa
+	gM3xjvEsrQCJRwhFOvRkj0XojS2qoVnWvh1UpmqQoKWSbrEtalnieb05yUUrbGdmNsYK5C
+	SkuyXbfWyKafLTzK+/syf4q9sEHpn53jIVKwV6RJY9LeuLV+b9NUC1MrRvxoOCH8BIKKOp
+	ewtXnhkqRps8DJZUPnLUMCRsmo2GuBPj246BSeqxEBUBJueA4ORjpTYgY+94Ty/wicsvHR
+	n/7gyc4rByziXnKX5+MlZkbf4y7/syQLygiUnhl5EhOLOMHyrbBAQQL4XmRf2Q==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	willemdebruijn.kernel@gmail.com
+Subject: [PATCH v3 0/5] net: Bluetooth: add TX timestamping for ISO/L2CAP/SCO
+Date: Sun,  9 Feb 2025 12:39:12 +0200
+Message-ID: <cover.1739097311.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: dd6367916d2d0ae2e4d5f485b67c5bd5b4dfa962  Bluetooth: L2CAP: Fix corrupted list in hci_chan_del
+Add support for TX timestamping in Bluetooth ISO/L2CAP/SCO sockets.
 
-elapsed time: 1216m
+Add new COMPLETION timestamp type, to report a software timestamp when
+the hardware reports a packet completed. (Cc netdev for this)
 
-configs tested: 200
-configs skipped: 5
+Overview
+========
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+The packet flow in Bluetooth is the following. Timestamps added here
+indicated:
 
-tested configs:
-alpha                             allnoconfig    gcc-14.2.0
-alpha                            allyesconfig    clang-21
-alpha                            allyesconfig    gcc-14.2.0
-arc                              allmodconfig    clang-18
-arc                               allnoconfig    gcc-14.2.0
-arc                              allyesconfig    clang-18
-arc                   randconfig-001-20250208    gcc-13.2.0
-arc                   randconfig-001-20250209    gcc-13.2.0
-arc                   randconfig-002-20250208    gcc-13.2.0
-arc                   randconfig-002-20250209    gcc-13.2.0
-arm                              allmodconfig    clang-18
-arm                               allnoconfig    gcc-14.2.0
-arm                              allyesconfig    clang-18
-arm                         axm55xx_defconfig    clang-21
-arm                   randconfig-001-20250208    gcc-13.2.0
-arm                   randconfig-001-20250208    gcc-14.2.0
-arm                   randconfig-001-20250209    gcc-13.2.0
-arm                   randconfig-002-20250208    clang-17
-arm                   randconfig-002-20250208    gcc-13.2.0
-arm                   randconfig-002-20250209    gcc-13.2.0
-arm                   randconfig-003-20250208    clang-21
-arm                   randconfig-003-20250208    gcc-13.2.0
-arm                   randconfig-003-20250209    gcc-13.2.0
-arm                   randconfig-004-20250208    gcc-13.2.0
-arm                   randconfig-004-20250208    gcc-14.2.0
-arm                   randconfig-004-20250209    gcc-13.2.0
-arm64                            allmodconfig    clang-18
-arm64                             allnoconfig    gcc-14.2.0
-arm64                 randconfig-001-20250208    clang-21
-arm64                 randconfig-001-20250208    gcc-13.2.0
-arm64                 randconfig-001-20250209    gcc-13.2.0
-arm64                 randconfig-002-20250208    clang-21
-arm64                 randconfig-002-20250208    gcc-13.2.0
-arm64                 randconfig-002-20250209    gcc-13.2.0
-arm64                 randconfig-003-20250208    clang-21
-arm64                 randconfig-003-20250208    gcc-13.2.0
-arm64                 randconfig-003-20250209    gcc-13.2.0
-arm64                 randconfig-004-20250208    clang-15
-arm64                 randconfig-004-20250208    gcc-13.2.0
-arm64                 randconfig-004-20250209    gcc-13.2.0
-csky                              allnoconfig    gcc-14.2.0
-csky                  randconfig-001-20250208    gcc-14.2.0
-csky                  randconfig-002-20250208    gcc-14.2.0
-hexagon                          allmodconfig    clang-21
-hexagon                           allnoconfig    gcc-14.2.0
-hexagon                          allyesconfig    clang-18
-hexagon                          allyesconfig    clang-21
-hexagon               randconfig-001-20250208    clang-21
-hexagon               randconfig-002-20250208    clang-21
-i386                             allmodconfig    clang-19
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    clang-19
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    clang-19
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250208    gcc-11
-i386        buildonly-randconfig-002-20250208    clang-19
-i386        buildonly-randconfig-002-20250208    gcc-11
-i386        buildonly-randconfig-003-20250208    gcc-11
-i386        buildonly-randconfig-003-20250208    gcc-12
-i386        buildonly-randconfig-004-20250208    clang-19
-i386        buildonly-randconfig-004-20250208    gcc-11
-i386        buildonly-randconfig-005-20250208    clang-19
-i386        buildonly-randconfig-005-20250208    gcc-11
-i386        buildonly-randconfig-006-20250208    gcc-11
-i386        buildonly-randconfig-006-20250208    gcc-12
-i386                                defconfig    clang-19
-i386                  randconfig-001-20250208    clang-19
-i386                  randconfig-002-20250208    clang-19
-i386                  randconfig-003-20250208    clang-19
-i386                  randconfig-004-20250208    clang-19
-i386                  randconfig-005-20250208    clang-19
-i386                  randconfig-006-20250208    clang-19
-i386                  randconfig-007-20250208    clang-19
-i386                  randconfig-011-20250208    gcc-12
-i386                  randconfig-012-20250208    gcc-12
-i386                  randconfig-013-20250208    gcc-12
-i386                  randconfig-014-20250208    gcc-12
-i386                  randconfig-015-20250208    gcc-12
-i386                  randconfig-016-20250208    gcc-12
-i386                  randconfig-017-20250208    gcc-12
-loongarch                        allmodconfig    gcc-14.2.0
-loongarch                         allnoconfig    gcc-14.2.0
-loongarch             randconfig-001-20250208    gcc-14.2.0
-loongarch             randconfig-002-20250208    gcc-14.2.0
-m68k                             allmodconfig    gcc-14.2.0
-m68k                              allnoconfig    gcc-14.2.0
-m68k                             allyesconfig    gcc-14.2.0
-m68k                            q40_defconfig    clang-21
-microblaze                       allmodconfig    gcc-14.2.0
-microblaze                        allnoconfig    gcc-14.2.0
-microblaze                       allyesconfig    gcc-14.2.0
-mips                              allnoconfig    gcc-14.2.0
-mips                        bcm47xx_defconfig    gcc-14.2.0
-mips                      maltaaprp_defconfig    clang-21
-nios2                             allnoconfig    gcc-14.2.0
-nios2                 randconfig-001-20250208    gcc-14.2.0
-nios2                 randconfig-002-20250208    gcc-14.2.0
-openrisc                          allnoconfig    clang-21
-openrisc                         allyesconfig    gcc-14.2.0
-openrisc                            defconfig    gcc-12
-parisc                           allmodconfig    gcc-14.2.0
-parisc                            allnoconfig    clang-21
-parisc                           allyesconfig    gcc-14.2.0
-parisc                              defconfig    gcc-12
-parisc                randconfig-001-20250208    gcc-14.2.0
-parisc                randconfig-002-20250208    gcc-14.2.0
-powerpc                          allmodconfig    gcc-14.2.0
-powerpc                           allnoconfig    clang-21
-powerpc                          allyesconfig    gcc-14.2.0
-powerpc                  iss476-smp_defconfig    clang-21
-powerpc                   lite5200b_defconfig    gcc-14.2.0
-powerpc                   motionpro_defconfig    gcc-14.2.0
-powerpc                     mpc83xx_defconfig    gcc-14.2.0
-powerpc                  mpc866_ads_defconfig    clang-21
-powerpc               randconfig-001-20250208    clang-19
-powerpc               randconfig-002-20250208    clang-17
-powerpc               randconfig-003-20250208    gcc-14.2.0
-powerpc                     tqm5200_defconfig    clang-21
-powerpc                     tqm8540_defconfig    gcc-14.2.0
-powerpc                      tqm8xx_defconfig    clang-21
-powerpc64             randconfig-001-20250208    clang-21
-powerpc64             randconfig-002-20250208    gcc-14.2.0
-powerpc64             randconfig-003-20250208    clang-21
-riscv                            allmodconfig    gcc-14.2.0
-riscv                             allnoconfig    clang-21
-riscv                            allyesconfig    gcc-14.2.0
-riscv                               defconfig    gcc-12
-riscv                 randconfig-001-20250208    gcc-14.2.0
-riscv                 randconfig-002-20250208    gcc-14.2.0
-s390                             allmodconfig    clang-19
-s390                             allmodconfig    gcc-14.2.0
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-14.2.0
-s390                                defconfig    gcc-12
-s390                  randconfig-001-20250208    gcc-14.2.0
-s390                  randconfig-002-20250208    gcc-14.2.0
-sh                               allmodconfig    gcc-14.2.0
-sh                                allnoconfig    gcc-14.2.0
-sh                               allyesconfig    gcc-14.2.0
-sh                                  defconfig    gcc-12
-sh                    randconfig-001-20250208    gcc-14.2.0
-sh                    randconfig-002-20250208    gcc-14.2.0
-sh                           se7343_defconfig    gcc-14.2.0
-sh                          urquell_defconfig    clang-21
-sparc                            allmodconfig    gcc-14.2.0
-sparc                             allnoconfig    gcc-14.2.0
-sparc                 randconfig-001-20250208    gcc-14.2.0
-sparc                 randconfig-002-20250208    gcc-14.2.0
-sparc64                             defconfig    gcc-12
-sparc64               randconfig-001-20250208    gcc-14.2.0
-sparc64               randconfig-002-20250208    gcc-14.2.0
-um                               allmodconfig    clang-21
-um                                allnoconfig    clang-21
-um                               allyesconfig    clang-21
-um                               allyesconfig    gcc-12
-um                                  defconfig    gcc-12
-um                             i386_defconfig    gcc-12
-um                    randconfig-001-20250208    gcc-14.2.0
-um                    randconfig-002-20250208    gcc-14.2.0
-um                           x86_64_defconfig    gcc-12
-x86_64                            allnoconfig    clang-19
-x86_64                           allyesconfig    clang-19
-x86_64      buildonly-randconfig-001-20250208    clang-19
-x86_64      buildonly-randconfig-002-20250208    clang-19
-x86_64      buildonly-randconfig-002-20250208    gcc-12
-x86_64      buildonly-randconfig-003-20250208    clang-19
-x86_64      buildonly-randconfig-003-20250208    gcc-12
-x86_64      buildonly-randconfig-004-20250208    clang-19
-x86_64      buildonly-randconfig-005-20250208    clang-19
-x86_64      buildonly-randconfig-006-20250208    clang-19
-x86_64      buildonly-randconfig-006-20250208    gcc-12
-x86_64                              defconfig    clang-19
-x86_64                              defconfig    gcc-11
-x86_64                                  kexec    clang-19
-x86_64                randconfig-001-20250208    clang-19
-x86_64                randconfig-002-20250208    clang-19
-x86_64                randconfig-003-20250208    clang-19
-x86_64                randconfig-004-20250208    clang-19
-x86_64                randconfig-005-20250208    clang-19
-x86_64                randconfig-006-20250208    clang-19
-x86_64                randconfig-007-20250208    clang-19
-x86_64                randconfig-008-20250208    clang-19
-x86_64                randconfig-071-20250208    gcc-12
-x86_64                randconfig-072-20250208    gcc-12
-x86_64                randconfig-073-20250208    gcc-12
-x86_64                randconfig-074-20250208    gcc-12
-x86_64                randconfig-075-20250208    gcc-12
-x86_64                randconfig-076-20250208    gcc-12
-x86_64                randconfig-077-20250208    gcc-12
-x86_64                randconfig-078-20250208    gcc-12
-x86_64                               rhel-9.4    clang-19
-x86_64                           rhel-9.4-bpf    clang-19
-x86_64                         rhel-9.4-kunit    clang-19
-x86_64                           rhel-9.4-ltp    clang-19
-x86_64                          rhel-9.4-rust    clang-19
-xtensa                            allnoconfig    gcc-14.2.0
-xtensa                  audio_kc705_defconfig    gcc-14.2.0
-xtensa                randconfig-001-20250208    gcc-14.2.0
-xtensa                randconfig-002-20250208    gcc-14.2.0
+user sendmsg() generates skbs
+|
+* skb waits in net/bluetooth queue for a free HW packet slot
+|
+* orphan skb, send to driver -> TSTAMP_SND
+|
+* driver: send packet data to transport (eg. USB)
+|
+* wait for transport completion
+|
+* driver: transport tx completion, free skb (some do this immediately)
+|
+* packet waits in HW side queue
+|
+* HCI report for packet completion -> TSTAMP_COMPLETION (for non-SCO)
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+In addition, we may want to do the following in future (but not
+implemented in this series as we don't have ISO sequence number
+synchronization yet which is needed first, moreover e.g. Intel
+controllers return only zeros in timestamps):
+
+* if packet is ISO, send HCI LE Read ISO TX Sync
+|
+* HCI response -> hardware TSTAMP_SND for the packet the response
+  corresponds to if it was waiting for one, might not be possible
+  to get a tstamp for every packet
+
+Bluetooth does not have tx timestamps in the completion reports from
+hardware, and only for ISO packets there are HCI commands in
+specification for querying timestamps afterward.
+
+The drivers do not provide ways to get timestamps either, I'm also not
+aware if some devices would have vendor-specific commands to get them.
+
+Driver-side timestamps
+======================
+
+Generating SND on driver side may be slightly more accurate, but that
+requires changing the BT driver API to not orphan skbs first.  In theory
+this probably won't cause problems, but it is not done in this patchset.
+
+For some of the drivers it won't gain much. E.g. btusb immediately
+submits the URB, so if one would emit SND just before submit (as
+drivers/net/usb/usbnet.c does), it is essentially identical to emitting
+before sending to driver.  btintel_pcie looks like it does synchronous
+send, so looks the same.  hci_serdev has internal queue, iiuc flushing
+as fast as data can be transferred, but it shouldn't be waiting for
+hardware slots due to HCI flow control.
+
+Unless HW buffers are full, packets mostly wait on the HW side.  E.g.
+with btusb (non-SCO) median time from sendmsg() to URB generation is
+~0.1 ms, to USB completion ~0.5 ms, and HCI completion report at ~5 ms.
+
+The exception is SCO, for which HCI flow control is disabled, so they do
+not get completion events so it's possible to build up queues inside the
+driver. For SCO, COMPLETION needs to be generated from driver side, eg.
+for btusb maybe at URB completion.  This could be useful for SCO PCM
+modes (but which are more or less obsolete nowadays), where USB isoc
+data rate matches audio data rate, so queues on USB side may build up.
+
+Use cases
+=========
+
+In audio use cases we want to track and avoid queues building up, to
+control latency, especially in cases like ISO where the controller has a
+fixed schedule that the sending application must match.  E.g.
+application can aim to keep 1 packet in HW queue, so it has 2*7.5ms of
+slack for being woken up too late.
+
+Applications can use SND & COMPLETION timestamps to track in-kernel and
+in-HW packet queues separately.  This can matter for ISO, where the
+specification allows HW to use the timings when it gets packets to
+determine what packets are synchronized together. Applications can use
+SND to track that.
+
+Changes in v3
+=============
+
+- Add new COMPLETION timestamp type, and emit it in HCI completion.
+
+- Emit SND instead of SCHED, when sending to driver.
+
+- Do not emit SCHED timestamps.
+
+- Don't safeguard tx_q length explicitly. Now that hci_sched_acl_blk()
+  is no more, the scheduler flow control is guaranteed to keep it
+  bounded.
+
+- Fix L2CAP stream sockets to use the bytestream timestamp conventions.
+
+Pauli Virtanen (5):
+  net-timestamp: COMPLETION timestamp on packet tx completion
+  Bluetooth: add support for skb TX SND/COMPLETION timestamping
+  Bluetooth: ISO: add TX timestamping
+  Bluetooth: L2CAP: add TX timestamping
+  Bluetooth: SCO: add TX timestamping socket-level mechanism
+
+ Documentation/networking/timestamping.rst |   9 ++
+ include/linux/skbuff.h                    |   6 +-
+ include/net/bluetooth/bluetooth.h         |   1 +
+ include/net/bluetooth/hci_core.h          |  13 +++
+ include/net/bluetooth/l2cap.h             |   3 +-
+ include/uapi/linux/errqueue.h             |   1 +
+ include/uapi/linux/net_tstamp.h           |   6 +-
+ net/bluetooth/6lowpan.c                   |   2 +-
+ net/bluetooth/hci_conn.c                  | 117 ++++++++++++++++++++++
+ net/bluetooth/hci_core.c                  |  17 +++-
+ net/bluetooth/hci_event.c                 |   4 +
+ net/bluetooth/iso.c                       |  24 ++++-
+ net/bluetooth/l2cap_core.c                |  41 +++++++-
+ net/bluetooth/l2cap_sock.c                |  15 ++-
+ net/bluetooth/sco.c                       |  19 +++-
+ net/bluetooth/smp.c                       |   2 +-
+ net/ethtool/common.c                      |   1 +
+ net/socket.c                              |   3 +
+ 18 files changed, 263 insertions(+), 21 deletions(-)
+
+-- 
+2.48.1
+
