@@ -1,490 +1,337 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAC3158862
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Feb 2025 18:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCF0257AD1;
+	Mon, 10 Feb 2025 18:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739212439; cv=none; b=F5wGpd/1LDd4Fka/ezHgyQOKBOl72HbVUDmQLyg6KIBI1mX8mtoVolNRhpo56ggbCcoMCxqnhUcynTc65JfhlNC8ouXHmMM4AWsQJW9mKeo1o+hlJW1meW0vgD0KEU7V/CudFkDfOrSpO1MONebsS5FKojR7hLzezv1eRaKDLkY=
+	t=1739213034; cv=none; b=iNL3guPZdwmnADTWfNXTMcfmfJ10JwGESSR94G/J1mfSFFv5Hr7/1aG+chHYwJpu5HZ2oaFKLj02KmBwxF1LF+jkDsyYJr46x8RyHt8g8Vdil0GECPXJa0GZr/psyM3ZxN4/No2GCanqT52Na1CrVU5WciKHhgniey2bZ+7pVOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739212439; c=relaxed/simple;
-	bh=DI8VLJggXrZVj/0npZ/gqkc9v6BEqfa4AkPgFPELpug=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XlDVhb2O8vG2lMJNKFPyS5a3ehZSvZmSTiqcWngXYw/7VvF/kXZkpYCaAsNUD7t3/40TH0ypDYR+dlDmbiQro+kVMm+SjdEh8d468Ug9tyN29H/qnMS6P79e1JIiXeaCKUtN/wpOuwOXBBMFzBelXIXqMLNj7p4BdBDb8zIVjRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GBj0GowQ; arc=none smtp.client-ip=209.85.208.171
+	s=arc-20240116; t=1739213034; c=relaxed/simple;
+	bh=XhK3OLlcLWNWDA3qQSdFIe3vDR9ZGFK8sgmbAI5y7U8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=DsSHc1QcnLuetbiu7mmmcUGLH/GREompuxxYHpPwP2zFbuZN1GN4YysiA1V1RMhXqKQIC+GOzYbnJC348YWjfxBGAdM8xBb5F5KSDl7zqaFAF54G07SHwJbWZ3HRpS2iaowiTJfCb/STIj4InzI+m/Lj5JcIH0gdil8P3aJaStk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W9UBJTM7; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBj0GowQ"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-30613802a6bso51758801fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Feb 2025 10:33:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9UBJTM7"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7be8f28172dso270143185a.3;
+        Mon, 10 Feb 2025 10:43:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739212435; x=1739817235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1739213031; x=1739817831; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=45U1kw6kgh6ok7M3TfJjEYgmJe0YGZWD5j5o9AGhEQg=;
-        b=GBj0GowQUahkWYEI3l/d34yJXwgUHTkOpnHYdslatUuS+xbE/j5LPuw5t3pnLbwYpm
-         QE1YlbbcXmIZon2OvFfudRRIYUD/92LO+Fm6TvdSOEG8/JTvdu/eUkghC6HH8ZPxukIT
-         F+SGLLm5qIGVifpX0/UnY7GPC/pD7nn3Pco42JkDBesiMvFP4jK20HjiH/ZVpWVYkThb
-         1GSBtd4bFCaomF07RMhIpHZWSYEcYnM1ozLh/TVYlThomw0BAuw8QOgcBqgmM1aLgNqR
-         ToljhU7Ir+BkQO4ZhevUweuEQt9ShodUHJOEh7sQytvjjOKsx3f4gi9QUhCFvwpbHtt7
-         hbKw==
+        bh=LtlmTITvrL/HM7c4CD4TNJZiyPBgo70mv6ukMqGoTpE=;
+        b=W9UBJTM7IkhQXs+XY0FFILasIT5dS3PpNjvTt957UytzIdHGxCxkxJgbybjBbLgTIL
+         u2x/X4taWaP7x6U1+C/XENOC82SGlNYN7gQVWR9O/oZmp3OSX5KH8+so9TGXMWeOrRAl
+         CCyvkd59zcM8VEjcJ9F4imS6OnQ+9/u+0+YTu8V7uzcQDn37c5Ypb09yWvwUbg2QtGfC
+         axu74S5QPXVoJ6T+YYLbtejyfQJIt4oPRBLeOMiZGohz1YrwlGefHKmEezMtNMslo49n
+         ZDLzCUOTTwmQcq5WZqYXqD+rA2+2WeKSUZBEglhiqUR8gj9A6xwnHyI8O4xK7G8OqlHP
+         e0IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739212435; x=1739817235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=45U1kw6kgh6ok7M3TfJjEYgmJe0YGZWD5j5o9AGhEQg=;
-        b=N4U+8NOSukRfCJyMkCJxRongOtuIxNXSmPfS4fq+/afn8UpBfhUMorV/XW6BONEdvq
-         g+2vo9Qo/3nkCSNegomlvHq5F12653rJsWppNfsxgzAGI9LfwbbgcRSEr0uT+bnB0R6H
-         PQjs5LFhc0x4sgTYuxF+zpdSbRUYWeahyiNEX2mWEkWh8/5g+b6mxhhB7ykRRp4BRedb
-         FHTS7ksJVsfcOYkC585kd4okVh/jbuug3pJ1CaYTa2HuQI6cEqKIF0m5AYv2zxyaqE5B
-         uzNKpaDCNXeR5KIrZtBZmYFJeb6XAU750Ob8/VQ/mT8NvrhpehmErstBqgZkdfP62BaX
-         LkHA==
-X-Gm-Message-State: AOJu0YyYyIpQvDx9Sg+9y4llDm4OsjYPm42AJcPFnwvBUTmWiivbqAcG
-	NZAa4g8ARW4zKAYcJFltiYLfq68cieqJmAHmDwPC9H1LJeIdKRpKrJfOGRVhdUeMriFTr3Dn/JC
-	n2l42pdXj8DfXCv2RMwv8n0czxwhFF2mk
-X-Gm-Gg: ASbGncugNPEFshARPKnNvsTfLtLYd5P6WZnJ/lnTym7WPqJm4+rtE04MYskOkeUWrAA
-	zWki81/yk8y0H4QMWsiiouJQYlUekj+qBUBfmcruGYuNlV5IQw/Y9j/Ek2LnvXAbO9NE7WCI=
-X-Google-Smtp-Source: AGHT+IE/UQhq3z3p0Dwbma09ScZ27K1EtYi0nEiwmIRhIcDjClplXnWEySdNdcvb+JrYCcqcCa7k/NBoeaJURHXqkBk=
-X-Received: by 2002:a05:651c:2129:b0:308:f01f:1829 with SMTP id
- 38308e7fff4ca-308f01f1f54mr14230051fa.6.1739212434590; Mon, 10 Feb 2025
- 10:33:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739213031; x=1739817831;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LtlmTITvrL/HM7c4CD4TNJZiyPBgo70mv6ukMqGoTpE=;
+        b=onNCi30325HxkNT2qByHA9zlUScEEwEZo8FwLS4pYu3jCthh9B/i265gtwzeqYaZVr
+         y4Z4cdDg1FmWTWbhMk7jUs+0v9s6XpGTNIrwDM/ztfSehm4HolMeE8oeF8zq9FMZqrWZ
+         /AY1npXc+0NkgSYi34Rvvkw2R1vm6yHz14mGm4GUaF2csKi0T6PDMUww/QFsPwXZyDsc
+         t+LqddKfRda20Tah7KHt3hmR7IMB44V60OmJultCDbUMX3IUE3q3Is3Ug5pcTUd+/dq2
+         gXcLPY0iCFZn8h2I4kFAZh4W/cZBeAuRIojWVIKSY0CzOpTMMmomiMjtueK5fs8q8PQg
+         xfAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTi5000CjukSDMcLziv4iWgm53z6aPVPfC9zAuL3h/5X34sfC02KFCZrQxJDZfsyGfpmSdbNZI@vger.kernel.org, AJvYcCWZEBCNfk2heC4GZWq6CVMQpOXr8LzjZ92tmAHMlKXtAuXtnXkQ0lRFCFKbwLBDeS8j34s6gOwW2P5UfdG78N4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwD7n18WlIhw8dOVeoTolF6ay9JTRCfZLStB4DCGXwXgJA+pZ4I
+	W9kvkPj81U6ugVCtxZRQWMdKmBxur+OwrcyQEV2Rg0YB2WfVKAnH
+X-Gm-Gg: ASbGncuyK9XV8Y/PdBhtdUU6gIlzomyOuJQshA0szdFxZhpePBvYZpjB3R4Q7sPcFlF
+	5dOEusQPyDhDGgWWdRUHEiNbqEk3YKQ7sBwCy37IjqJFgzeV9hl6b57Ni80r9vk157IN+xEWPtU
+	hnF1LQBlDch5k6PvyBa/IygOyPHsclMM2s/nvTMhBqH/x6nrk1NT2xsTinYM2acg2rI+j0JTWy9
+	SjanD+tfRH0PXKui/Q1L1445ZOvRi4KzVSX3NKuVNheo+caPql/CFyOkLT3CZdNsKFCK4gT2z1l
+	g13KucFkN+C6fWoGwoe4VOWmC3B6z+mlGJ2V54rm+PnA2a7tx8t6a6XfY6qK1WA=
+X-Google-Smtp-Source: AGHT+IGo98d4C43aBTNjHXJB0XsvieNQhuzWoVFCaiKJUbOjDSqxbdc2sNU9OrZLrX15iE1Zavpt/Q==
+X-Received: by 2002:a05:620a:414a:b0:7c0:6139:8f78 with SMTP id af79cd13be357-7c0613992d7mr686184785a.36.1739213031046;
+        Mon, 10 Feb 2025 10:43:51 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c05ffeacbdsm139971285a.110.2025.02.10.10.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 10:43:50 -0800 (PST)
+Date: Mon, 10 Feb 2025 13:43:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pauli Virtanen <pav@iki.fi>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org
+Message-ID: <67aa48e647f87_74092294e9@willemb.c.googlers.com.notmuch>
+In-Reply-To: <0c86c0db795e1571143539ec7b3ea73d21f521a5.camel@iki.fi>
+References: <cover.1739097311.git.pav@iki.fi>
+ <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
+ <67a972a6e2704_14761294b0@willemb.c.googlers.com.notmuch>
+ <0c86c0db795e1571143539ec7b3ea73d21f521a5.camel@iki.fi>
+Subject: Re: [PATCH v3 1/5] net-timestamp: COMPLETION timestamp on packet tx
+ completion
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1739097949.git.pav@iki.fi> <3938636ceaafc589f6d12fa6fe50e1c6a1c76bef.1739097949.git.pav@iki.fi>
- <CABBYNZJccrs7n4mK1YYF+SyKG46d2mkmcem_Ayg77nm3FtJ93w@mail.gmail.com> <102f133fbd176f8c4eacc02d837c1ff075648236.camel@iki.fi>
-In-Reply-To: <102f133fbd176f8c4eacc02d837c1ff075648236.camel@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 10 Feb 2025 13:33:41 -0500
-X-Gm-Features: AWEUYZn_PWKp9qiaRcpilVtRLNdJckEb4Tw1JDTmXBCi9XiNM6FNlFedc5fN2VM
-Message-ID: <CABBYNZ+TVD7a9+OnN5UjsJHOqvurP3rh4LAYr6NuePfpZiq18g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] shared/io-glib: add watcher to be used with TX timestamping
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+Pauli Virtanen wrote:
+> Hi,
+> =
 
-On Mon, Feb 10, 2025 at 1:15=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Hi Luiz,
->
-> ma, 2025-02-10 kello 10:13 -0500, Luiz Augusto von Dentz kirjoitti:
-> > Hi Pauli,
+> su, 2025-02-09 kello 22:29 -0500, Willem de Bruijn kirjoitti:
+> > Pauli Virtanen wrote:
+> > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software times=
+tamp
+> > > when hardware reports a packet completed.
+> > > =
+
+> > > Completion tstamp is useful for Bluetooth, where hardware tx timest=
+amps
+> > > cannot be obtained except for ISO packets, and the hardware has a q=
+ueue
+> > > where packets may wait.  In this case the software SND timestamp on=
+ly
+> > > reflects the kernel-side part of the total latency (usually small) =
+and
+> > > queue length (usually 0 unless HW buffers congested), whereas the
+> > > completion report time is more informative of the true latency.
+> > > =
+
+> > > It may also be useful in other cases where HW TX timestamps cannot =
+be
+> > > obtained and user wants to estimate an upper bound to when the TX
+> > > probably happened.
+> > =
+
+> > Getting the completion timestamp may indeed be useful more broadly.
+> > =
+
+> > Alternatively, the HW timestamp is relatively imprecisely defined so
+> > you could even just use that. Ideally, a hw timestamp conforms to IEE=
+E
+> > 1588v2 PHY: first symbol on the wire IIRC. But in many cases this is
+> > not the case. It is not feasible at line rate, or the timestamp is
+> > only taken when the completion is written over PCI, which may be
+> > subject to PCI backpressure and happen after transmission on the wire=
+.
+> > As a result, the worst case hw tstamp must already be assumed not muc=
+h
+> > earlier than a completion timestamp.
+> =
+
+> For BT ISO packets, in theory hw-provided TX timestamps exist, and we
+> might want both (with separate flags for enabling them).=C2=A0I don't r=
+eally
+> know, last I looked Intel HW didn't support them, and it's not clear to=
+
+> which degree they are useful.
+
+That's reason enough to separate these measurement types.
+
+If we don't do it properly now, we won't be able to update drivers
+later once users depend on requesting hw timestamps when they mean to
+get completion timestamps.
+
+> > That said, +1 on adding explicit well defined measurement point
+> > instead.
 > >
-> > On Sun, Feb 9, 2025 at 5:46=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrot=
-e:
-> > >
-> > > Add special implementation of fd watcher GSource for audio use.
-> > >
-> > > For audio use cases, sound server may turn on TX timestamping on a
-> > > socket that we are watching.  In this case, we shall not consider the=
- TX
-> > > timestamping POLLERR as a socket error condition, nor read the TX
-> > > timestamps.
-> > >
-> > > When TX timestamps appear in errqueue, switch from fd poll wait to
-> > > polling the fd at regular intervals.  This is because unread errqueue
-> > > causes poll() to wake up immediately, so the mainloop cannot block on
-> > > that, and we have to use a timer instead with some reasonable timeout
-> > > for the use case.
-> > >
-> > > This rate limits wakeups on new TX timestamps we aren't going to read=
-,
-> > > and also avoids the busy looping if timestamping was left on but
-> > > errqueue is not flushed.
-> > >
-> > > Implement this only for io-glib; it is only needed for audio use case=
-s
-> > > that anyway are using glib.  Uses features from GLib 2.36 (from 2013)=
- so
-> > > update configure.ac also.
+> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
 > > > ---
-> > >  Makefile.am          |   1 +
-> > >  acinclude.m4         |   3 +-
-> > >  configure.ac         |   2 +-
-> > >  src/shared/io-glib.c | 157 +++++++++++++++++++++++++++++++++++++++++=
-+-
-> > >  src/shared/io-glib.h |  20 ++++++
-> > >  5 files changed, 179 insertions(+), 4 deletions(-)
-> > >  create mode 100644 src/shared/io-glib.h
-> > >
-> > > diff --git a/Makefile.am b/Makefile.am
-> > > index 0821530e6..f958e2b99 100644
-> > > --- a/Makefile.am
-> > > +++ b/Makefile.am
-> > > @@ -253,6 +253,7 @@ shared_sources +=3D src/shared/shell.c src/shared=
-/shell.h
-> > >  endif
-> > >
-> > >  src_libshared_glib_la_SOURCES =3D $(shared_sources) \
-> > > +                               src/shared/io-glib.h \
-> > >                                 src/shared/io-glib.c \
-> > >                                 src/shared/timeout-glib.c \
-> > >                                 src/shared/mainloop-glib.c \
-> > > diff --git a/acinclude.m4 b/acinclude.m4
-> > > index 168117840..598986d6e 100644
-> > > --- a/acinclude.m4
-> > > +++ b/acinclude.m4
-> > > @@ -63,8 +63,7 @@ AC_DEFUN([COMPILER_FLAGS], [
-> > >                 with_cflags=3D"$with_cflags -Wformat -Wformat-securit=
-y"
-> > >                 with_cflags=3D"$with_cflags -Wstringop-overflow"
-> > >                 with_cflags=3D"$with_cflags -DG_DISABLE_DEPRECATED"
-> > > -               with_cflags=3D"$with_cflags -DGLIB_VERSION_MIN_REQUIR=
-ED=3DGLIB_VERSION_2_28"
-> > > -               with_cflags=3D"$with_cflags -DGLIB_VERSION_MAX_ALLOWE=
-D=3DGLIB_VERSION_2_32"
-> > > +               with_cflags=3D"$with_cflags -DGLIB_VERSION_MIN_REQUIR=
-ED=3DGLIB_VERSION_2_36"
-> > >         fi
-> > >         AC_SUBST([WARNING_CFLAGS], $with_cflags)
-> > >  ])
-> > > diff --git a/configure.ac b/configure.ac
-> > > index 75841e4c9..d2b0bab2f 100644
-> > > --- a/configure.ac
-> > > +++ b/configure.ac
-> > > @@ -81,7 +81,7 @@ AC_CHECK_DECLS([basename], [],
-> > >                                  ])
-> > >
-> > >
-> > > -PKG_CHECK_MODULES(GLIB, glib-2.0 >=3D 2.28)
-> > > +PKG_CHECK_MODULES(GLIB, glib-2.0 >=3D 2.36)
-> >
-> > I hope this doesn't come with other surprises though, afaik glib had
-> > the bad habit of adding its own set of dependencies which made us
-> > stick to such old versions.
->
-> Glib 2.36 was released in 2013, I hope all BlueZ builds use something
-> newer...
->
-> We might want to keep the max version limit in maintainer mode, though,
-> to get warnings if using too new API features.
->
-> >
-> > >
-> > >  if (test "${enable_threads}" =3D "yes"); then
-> > >         AC_DEFINE(NEED_THREADS, 1, [Define if threading support is re=
-quired])
-> > > diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-> > > index 754043db1..bea9b2c32 100644
-> > > --- a/src/shared/io-glib.c
-> > > +++ b/src/shared/io-glib.c
-> > > @@ -13,10 +13,14 @@
-> > >  #endif
-> > >
-> > >  #include <errno.h>
-> > > +#include <sys/socket.h>
-> > >
-> > >  #include <glib.h>
-> > >
-> > >  #include "src/shared/io.h"
-> > > +#include "src/shared/io-glib.h"
+> > >  Documentation/networking/timestamping.rst | 9 +++++++++
+> > >  include/linux/skbuff.h                    | 6 +++++-
+> > >  include/uapi/linux/errqueue.h             | 1 +
+> > >  include/uapi/linux/net_tstamp.h           | 6 ++++--
+> > >  net/ethtool/common.c                      | 1 +
+> > >  net/socket.c                              | 3 +++
+> > >  6 files changed, 23 insertions(+), 3 deletions(-)
+> > > =
+
+> > > diff --git a/Documentation/networking/timestamping.rst b/Documentat=
+ion/networking/timestamping.rst
+> > > index 61ef9da10e28..de2afed7a516 100644
+> > > --- a/Documentation/networking/timestamping.rst
+> > > +++ b/Documentation/networking/timestamping.rst
+> > > @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
+> > >    cumulative acknowledgment. The mechanism ignores SACK and FACK.
+> > >    This flag can be enabled via both socket options and control mes=
+sages.
+> > >  =
+
+> > > +SOF_TIMESTAMPING_TX_COMPLETION:
+> > > +  Request tx timestamps on packet tx completion.  The completion
+> > > +  timestamp is generated by the kernel when it receives packet a
+> > > +  completion report from the hardware. Hardware may report multipl=
+e
+> > > +  packets at once, and completion timestamps reflect the timing of=
+ the
+> > > +  report and not actual tx time. The completion timestamps are
+> > > +  currently implemented only for: Bluetooth L2CAP and ISO.  This
+> > > +  flag can be enabled via both socket options and control messages=
+.
 > > > +
-> > > +#define        IO_ERR_WATCH_RATELIMIT          (500 * G_TIME_SPAN_MI=
-LLISECOND)
-> > >
-> > >  struct io_watch {
-> > >         struct io *io;
-> > > @@ -29,11 +33,19 @@ struct io_watch {
-> > >  struct io {
-> > >         int ref_count;
-> > >         GIOChannel *channel;
-> > > +       bool err_watch;
-> > >         struct io_watch *read_watch;
-> > >         struct io_watch *write_watch;
-> > >         struct io_watch *disconnect_watch;
+> > =
+
+> > Either we should support this uniformly, or it should be possible to
+> > query whether a driver supports this.
+> > =
+
+> > Unfortunately all completion callbacks are driver specific.
+> > =
+
+> > But drivers that support hwtstamps will call skb_tstamp_tx with
+> > nonzero hwtstamps. We could use that also to compute and queue
+> > a completion timestamp if requested. At least for existing NIC
+> > drivers.
+> =
+
+> Ok. If possible, I'd like to avoid changing the behavior of the non-
+> Bluetooth parts of net/ here, as I'm not familiar with those.
+> =
+
+> I guess a simpler solution could be that sock_set_timestamping() checks=
+
+> the type of the socket, and gives EINVAL if the flag is set for non-
+> Bluetooth sockets?
+
+Actually, I'd prefer to have this completion timestamp ability for all
+drivers. And avoid creating subsystem private mechanisms.
+
+I suppose we can punt on the get_ts_info control API if need be.
+ =
+
+> One could then postpone having to invent how to check the driver
+> support, and user would know non-supported status from setsockopt
+> failing.
+> =
+
+> > >  1.3.2 Timestamp Reporting
+> > >  ^^^^^^^^^^^^^^^^^^^^^^^^^
+> > > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > > index bb2b751d274a..3707c9075ae9 100644
+> > > --- a/include/linux/skbuff.h
+> > > +++ b/include/linux/skbuff.h
+> > > @@ -489,10 +489,14 @@ enum {
+> > >  =
+
+> > >  	/* generate software time stamp when entering packet scheduling *=
+/
+> > >  	SKBTX_SCHED_TSTAMP =3D 1 << 6,
+> > > +
+> > > +	/* generate software time stamp on packet tx completion */
+> > > +	SKBTX_COMPLETION_TSTAMP =3D 1 << 7,
 > > >  };
-> > >
-> > > +struct io_err_watch {
-> > > +       GSource                 source;
-> > > +       GIOChannel              *io;
-> > > +       GIOCondition            events;
-> > > +       gpointer                tag;
-> > > +};
-> > > +
-> > >  static struct io *io_ref(struct io *io)
-> > >  {
-> > >         if (!io)
-> > > @@ -179,10 +191,17 @@ static struct io_watch *watch_new(struct io *io=
-, GIOCondition cond,
-> > >
-> > >         prio =3D cond =3D=3D G_IO_HUP ? G_PRIORITY_DEFAULT_IDLE : G_P=
-RIORITY_DEFAULT;
-> > >
-> > > -       watch->id =3D g_io_add_watch_full(io->channel, prio,
-> > > +       if (!io->err_watch)
-> > > +               watch->id =3D g_io_add_watch_full(io->channel, prio,
-> > > +                                               cond | G_IO_ERR | G_I=
-O_NVAL,
-> > > +                                               watch_callback, watch=
-,
-> > > +                                               watch_destroy);
-> > > +       else
-> > > +               watch->id =3D io_glib_add_err_watch_full(io->channel,=
- prio,
-> > >                                                 cond | G_IO_ERR | G_I=
-O_NVAL,
-> > >                                                 watch_callback, watch=
-,
-> > >                                                 watch_destroy);
-> > > +
-> > >         if (watch->id =3D=3D 0) {
-> > >                 watch_destroy(watch);
-> > >                 return NULL;
-> > > @@ -250,6 +269,15 @@ bool io_set_disconnect_handler(struct io *io, io=
-_callback_func_t callback,
-> > >         return io_set_handler(io, G_IO_HUP, callback, user_data, dest=
-roy);
-> > >  }
-> > >
-> > > +bool io_set_use_err_watch(struct io *io, bool err_watch)
-> > > +{
-> > > +       if (!io)
-> > > +               return false;
-> > > +
-> > > +       io->err_watch =3D err_watch;
-> > > +       return true;
-> > > +}
-> > > +
-> > >  ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
-> > >  {
-> > >         int fd;
-> > > @@ -278,3 +306,130 @@ bool io_shutdown(struct io *io)
-> > >         return g_io_channel_shutdown(io->channel, TRUE, NULL)
-> > >                                                         =3D=3D G_IO_S=
-TATUS_NORMAL;
-> > >  }
-> > > +
-> > > +/*
-> > > + * GSource implementation that tolerates non-empty MSG_ERRQUEUE, wit=
-hout
-> > > + * attempting to flush it. This is intended for use with TX timestam=
-ping in
-> > > + * cases where someone else is reading the timestamps and we are onl=
-y interested
-> > > + * in POLLHUP or socket errors.
-> > > + */
-> > > +
-> > > +static gint64 io_err_watch_wakeup;
-> > > +
-> > > +static gboolean io_err_watch_dispatch(GSource *source,
-> > > +                               GSourceFunc callback, gpointer user_d=
-ata)
-> > > +{
-> > > +       struct io_err_watch *watch =3D (void *)source;
-> > > +       const GIOFunc func =3D (void *)callback;
-> > > +       const gint64 timeout =3D IO_ERR_WATCH_RATELIMIT;
-> > > +       GIOCondition cond;
-> > > +       int fd;
-> > > +
-> > > +       if (!func)
-> > > +               return FALSE;
-> > > +
-> > > +       fd =3D g_io_channel_unix_get_fd(watch->io);
-> > > +
-> > > +       /*
-> > > +        * If woken up by POLLERR only, and SO_ERROR is not set, igno=
-re this
-> > > +        * event. Also disable polling for some time so that we don't=
- consume
-> > > +        * too much CPU on events we are not interested in, or busy l=
-oop if
-> > > +        * nobody is flushing the errqueue.
-> > > +        */
-> >
-> > Not sure if I asked about this before, but have you consider disabling
-> > POLLERR completely in case we detect the errqueue is in use? Because
-> > even with rate limit I think we may still impact the system, the only
-> > problem is then if by disabling POLLERR we would get in trouble
-> > detecting disconnections? It shall result in POLLHUP though, so if we
-> > only care about it for disconnection I assume it would be sufficient.
->
-> It's not possible to disable wakeups on POLLERR & POLLHUP:
->
-> https://man.archlinux.org/man/poll.2.en
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/f=
-s/eventpoll.c?h=3Dv6.13&id=3Dffd294d346d185b70e28b1a28abe367bbfe53c04#n2391
+> > >  =
 
-Ah, so that means POLLERR and POLLHUP are always enabled together?
+> > >  #define SKBTX_ANY_SW_TSTAMP	(SKBTX_SW_TSTAMP    | \
+> > > -				 SKBTX_SCHED_TSTAMP)
+> > > +				 SKBTX_SCHED_TSTAMP | \
+> > > +				 SKBTX_COMPLETION_TSTAMP)
+> > =
 
-> You could use EPOLLET to only wake up once per event -- but bluez would
-> then still wakeup on the 7.5ms interval. Glib also doesn't use epoll(),
-> so there's more parts of GSource to reimplement, need to poll from
-> separate thread etc., so the implementation gets more complex than
-> here.
->
-> To get something better than the timer-polled version, I think you'd
-> need to add some new flag to kernel for this.
+> > These fields are used in the skb_shared_info tx_flags field.
+> > Which is a very scarce resource. This takes the last available bit.
+> > That is my only possible concern: the opportunity cost.
+> =
 
-Yeah, well I guess that would be even harder if we need to a new flag
-since that would mean we would need to update glib to understand it
-and then bump the dependency of it, or we would have to reimplement
-the whole IO handling to use the non-glib version, the glib way will
-most likely make releases adding a hard dependency for distros and
-reimplementing the whole IO will probably require a lot of work, that
-said Id welcome if we could work in that direction otherwise we need
-another way to track the disconnection of ISO and A2DP streams.
+> If doing it=C2=A0per-protocol sounds ok, it could be put in bt_skb_cb
+> instead.
+> =
 
-> > > +       if (watch->tag)
-> > > +               cond =3D g_source_query_unix_fd(&watch->source, watch=
-->tag);
-> > > +       else
-> > > +               cond =3D 0;
-> > > +
-> > > +       if (cond =3D=3D G_IO_ERR) {
-> > > +               int err, ret;
-> > > +               socklen_t len =3D sizeof(err);
-> > > +
-> > > +               ret =3D getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &l=
-en);
-> > > +               if (ret =3D=3D 0 && err =3D=3D 0) {
-> > > +                       g_source_remove_unix_fd(&watch->source, watch=
-->tag);
-> > > +                       watch->tag =3D NULL;
-> > > +
-> > > +                       /* io_err watches all wake up at the same tim=
-e */
-> > > +                       if (!io_err_watch_wakeup)
-> > > +                               io_err_watch_wakeup =3D g_get_monoton=
-ic_time()
-> > > +                                                               + tim=
-eout;
-> > > +
-> > > +                       g_source_set_ready_time(&watch->source,
-> > > +                                                       io_err_watch_=
-wakeup);
-> > > +                       return TRUE;
-> > > +               }
-> > > +       }
-> > > +
-> > > +       if (g_source_get_ready_time(&watch->source) !=3D -1) {
-> > > +               g_assert(!watch->tag);
-> > > +               io_err_watch_wakeup =3D 0;
-> > > +               watch->tag =3D g_source_add_unix_fd(&watch->source, f=
-d,
-> > > +                                                       watch->events=
-);
-> > > +               g_source_set_ready_time(&watch->source, -1);
-> > > +       }
-> > > +
-> > > +       cond &=3D watch->events;
-> > > +
-> > > +       if (cond)
-> > > +               return func(watch->io, cond, user_data);
-> > > +       else
-> > > +               return TRUE;
-> > > +}
-> > > +
-> > > +static void io_err_watch_finalize(GSource *source)
-> > > +{
-> > > +       struct io_err_watch *watch =3D (void *)source;
-> > > +
-> > > +       if (watch->tag)
-> > > +               g_source_remove_unix_fd(&watch->source, watch->tag);
-> > > +
-> > > +       g_io_channel_unref(watch->io);
-> > > +}
-> > > +
-> > > +guint io_glib_add_err_watch_full(GIOChannel *io, gint priority,
-> > > +                                       GIOCondition events,
-> > > +                                       GIOFunc func, gpointer user_d=
-ata,
-> > > +                                       GDestroyNotify notify)
-> > > +{
-> > > +       static GSourceFuncs source_funcs =3D {
-> > > +               .dispatch =3D io_err_watch_dispatch,
-> > > +               .finalize =3D io_err_watch_finalize,
-> > > +       };
-> > > +       GSourceFunc callback =3D (void *)func;
-> > > +       struct io_err_watch *watch;
-> > > +       gint fd;
-> > > +       guint id;
-> > > +
-> > > +       g_return_val_if_fail(!(events & (G_IO_IN | G_IO_OUT)), 0);
-> > > +       g_return_val_if_fail(events, 0);
-> > > +       g_return_val_if_fail(func, 0);
-> > > +
-> > > +       fd =3D g_io_channel_unix_get_fd(io);
-> > > +
-> > > +       watch =3D (void *)g_source_new(&source_funcs,
-> > > +                                       sizeof(struct io_err_watch));
-> > > +
-> > > +       watch->io =3D g_io_channel_ref(io);
-> > > +       watch->events =3D events;
-> > > +       watch->tag =3D g_source_add_unix_fd(&watch->source, fd, event=
-s);
-> > > +
-> > > +       g_source_set_name((void *)watch, "io_glib_err_watch");
-> > > +       g_source_set_callback(&watch->source, callback, user_data, no=
-tify);
-> > > +
-> > > +       if (priority !=3D G_PRIORITY_DEFAULT)
-> > > +               g_source_set_priority(&watch->source, priority);
-> > > +
-> > > +       id =3D g_source_attach(&watch->source, NULL);
-> > > +       g_source_unref(&watch->source);
-> > > +
-> > > +       return id;
-> > > +}
-> > > +
-> > > +guint io_glib_add_err_watch(GIOChannel *io, GIOCondition events, GIO=
-Func func,
-> > > +                                                       gpointer user=
-_data)
-> > > +{
-> > > +       return io_glib_add_err_watch_full(io, G_PRIORITY_DEFAULT, eve=
-nts,
-> > > +                                                       func, user_da=
-ta, NULL);
-> > > +}
-> > > diff --git a/src/shared/io-glib.h b/src/shared/io-glib.h
-> > > new file mode 100644
-> > > index 000000000..1db6fd468
-> > > --- /dev/null
-> > > +++ b/src/shared/io-glib.h
-> > > @@ -0,0 +1,20 @@
-> > > +/* SPDX-License-Identifier: LGPL-2.1-or-later */
-> > > +/*
-> > > + *
-> > > + *  BlueZ - Bluetooth protocol stack for Linux
-> > > + *
-> > > + *  Copyright (C) 2012-2014  Intel Corporation. All rights reserved.
-> > > + *
-> > > + *
-> > > + */
-> > > +
-> > > +#include <glib.h>
-> > > +
-> > > +guint io_glib_add_err_watch(GIOChannel *io, GIOCondition events,
-> > > +                               GIOFunc func, gpointer user_data);
-> > > +guint io_glib_add_err_watch_full(GIOChannel *io, gint priority,
-> > > +                               GIOCondition events, GIOFunc func,
-> > > +                               gpointer user_data,
-> > > +                               GDestroyNotify notify);
-> > > +
-> >
-> > Hmm, I think it is probably not a good idea to start using headers
-> > like this, I'd consider just making it return 0 for non-glib.
->
+> Since the completion timestamp didn't already exist, it maybe means
+> it's probably not that important for other parts of net/
+
+I can see its value especially for hardware that does not support
+hardware timestamps, or hw timestamps at line rate.
+
+This gives a reasonable estimation of transmission time and
+measure of device delay.
+
+It is device specific whether it will be an over- or under-estimation,
+depending on whether the completion is queued to the host after or
+before the data is written on the wire. But either way, it will
+include the delay in processing the tx queue, which on multi-queue
+NICs and with TSO may be substantial (even before considering HW
+rate limiting).
+
+> > >  #define SKBTX_ANY_TSTAMP	(SKBTX_HW_TSTAMP | \
+> > >  				 SKBTX_HW_TSTAMP_USE_CYCLES | \
+> > >  				 SKBTX_ANY_SW_TSTAMP)
+> > > diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/err=
+queue.h
+> > > index 3c70e8ac14b8..1ea47309d772 100644
+> > > --- a/include/uapi/linux/errqueue.h
+> > > +++ b/include/uapi/linux/errqueue.h
+> > > @@ -73,6 +73,7 @@ enum {
+> > >  	SCM_TSTAMP_SND,		/* driver passed skb to NIC, or HW */
+> > >  	SCM_TSTAMP_SCHED,	/* data entered the packet scheduler */
+> > >  	SCM_TSTAMP_ACK,		/* data acknowledged by peer */
+> > > +	SCM_TSTAMP_COMPLETION,	/* packet tx completion */
+> > >  };
+> > >  =
+
+> > >  #endif /* _UAPI_LINUX_ERRQUEUE_H */
+> > > diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/n=
+et_tstamp.h
+> > > index 55b0ab51096c..383213de612a 100644
+> > > --- a/include/uapi/linux/net_tstamp.h
+> > > +++ b/include/uapi/linux/net_tstamp.h
+> > > @@ -44,8 +44,9 @@ enum {
+> > >  	SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
+> > >  	SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
+> > >  	SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
+> > > +	SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
+> > >  =
+
+> > > -	SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
+> > > +	SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
+> > >  	SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
+> > >  				 SOF_TIMESTAMPING_LAST
+> > >  };
+> > > @@ -58,7 +59,8 @@ enum {
+> > >  #define SOF_TIMESTAMPING_TX_RECORD_MASK	(SOF_TIMESTAMPING_TX_HARDW=
+ARE | \
+> > >  					 SOF_TIMESTAMPING_TX_SOFTWARE | \
+> > >  					 SOF_TIMESTAMPING_TX_SCHED | \
+> > > -					 SOF_TIMESTAMPING_TX_ACK)
+> > > +					 SOF_TIMESTAMPING_TX_ACK | \
+> > > +					 SOF_TIMESTAMPING_TX_COMPLETION)
+> > >  =
+
+> > >  /**
+> > >   * struct so_timestamping - SO_TIMESTAMPING parameter
+> > > diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> > > index 2bd77c94f9f1..75e3b756012e 100644
+> > > --- a/net/ethtool/common.c
+> > > +++ b/net/ethtool/common.c
+> > > @@ -431,6 +431,7 @@ const char sof_timestamping_names[][ETH_GSTRING=
+_LEN] =3D {
+> > >  	[const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
+> > >  	[const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-tcp",=
+
+> > >  	[const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-filt=
+er",
+> > > +	[const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "completion-tra=
+nsmit",
+> > =
+
+> > just "tx-completion"?
+> =
+
 > Ok.
->
-> > > +bool io_set_use_err_watch(struct io *io, bool err_watch);
-> > > --
-> > > 2.48.1
->
-> --
+> =
+
+> -- =
+
 > Pauli Virtanen
 
 
-
---=20
-Luiz Augusto von Dentz
