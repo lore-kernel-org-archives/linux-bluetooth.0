@@ -1,70 +1,70 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA710EAF9;
-	Mon, 10 Feb 2025 03:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535AD8C0B;
+	Mon, 10 Feb 2025 05:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739158402; cv=none; b=oGe9z/cYGJZjxg6y6x4Za6Fr6L8dDBYNG7fwz/BBDsxZINfwPPOQh15CyCXl5vzvULqRzUgSR0TOd82p8dlC/c8lCjzfYe+qeaHBsWhHbhUBuwzFpKSdZIj2tWw6em2Qv0w+hdjYZmgpoZ7H66tyE1anxpiSfJzfEwNedtY5RWc=
+	t=1739164789; cv=none; b=QPS6cy0aEOMV3/YwxAvwwC/Gp/3BqdRxv0aRxRd+zprjKdK/QVJZaveHaPQKV2OPnFaQ84dtigEvfhFi9aBhDASWEoeD51iPr8FuBJCqw648C3G+RAZqSfNkHpguKyNfSCzgufsqvyx00M5YJ8JUsltx0O/U53/mXLc8ECSSGfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739158402; c=relaxed/simple;
-	bh=ta/pyJoXAAQC6Ud4aMfarnt7JHE9YLMSkZS+iGOk9No=;
+	s=arc-20240116; t=1739164789; c=relaxed/simple;
+	bh=fZPrwY34ra1iptt6LNSIEPmUhUV96xQP6WUmUP5ZaIo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ei6X+YWoOyZlw1YMfBORnGtaCXtG57kw8yOnhs2gn0LFmRiOt9jjF+X5E1xlaWPAvkTH6QiwUhaNMpVVWCHoXEcIzdXVIvwUSkeKXilc381IhtwVmbdLwA10DqWPeDl1lF81qZFQDI3Gsbddb+v4mHfMimO6nW2uNOf660cDyxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iIbcB828; arc=none smtp.client-ip=209.85.166.181
+	 To:Cc:Content-Type; b=o98NqZmOx+nTMlcNfOoO56KdJ6g+1fnY7GUc4A8DAtQI5QpbWA3ZgCeJYg3s6SD4kzqHP6AkxLMfcRAMP15II63+5IX1ii/lP0+seNeB/13jVIc/deDmdy7c2cz0iYUnOqCTXpkB/LPFivgYpYdtsNl8MZcPZwoS1m+6zkdjFLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hAZ3ATzN; arc=none smtp.client-ip=209.85.166.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iIbcB828"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3cf8e017abcso12950215ab.1;
-        Sun, 09 Feb 2025 19:33:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hAZ3ATzN"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3d15ce78fecso7769105ab.2;
+        Sun, 09 Feb 2025 21:19:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739158400; x=1739763200; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739164787; x=1739769587; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ytFQTKV79+LnUBY/Ldx9tZwous46247MN1TjKF2jDC8=;
-        b=iIbcB82822d1gdoW/nOhhtKQmValVA7LNapU1g8tXnboKatffIZqoNfKq99mw9CiF2
-         q4Ovrj1QhLg0/HaHN+q89vpcE49024HgJYC0hVmKMAOaL6CzTUs4aJlqT6ofuar7uIrC
-         9jiJ0W9CKESIVx0QvCLLSy52B7M/BAghAU8XYeszpB7k+gmSXNR7rl7TwR/7FXtwEuy5
-         UC29JjFiyT4nQleGx4u+T0AAFsfcoNo18LkXeO0dbvl6f8RFfVtyvDL/O+ulLhQRHoX+
-         1t66PmoGJyOoESDsZGfJxT8ihBYkVZiVqzIPdXsYGo6dnovvjlYCqMbjenX+LCDMLKAK
-         XPEA==
+        bh=d3uh2ILPMiksWEP7lEXKPKQV1OP3Pn2eNef2yeALT8k=;
+        b=hAZ3ATzNQ2l0UtWQJF2M5lYNKET3Wj9CHgmpp0V3X0QxU3iXsUQRAYIK8Pf+OfKTCQ
+         g14CchhKjF1njr7b+W8pdfABsyMkwmB2D7k0H9InNLwL+VqIyHJWqHsjv7ysqr69l6sn
+         YLnS6gPo2dwF118+TrArOBlO/KJF5AMLsaQwZ42mxeEg3ndbwkq7ew8EORB/7CTxigdU
+         onrmgE0BiaZxKgdw78Kq2i2w5DnopiddF7WdydWRdP33qE5EgIqtvjPrYnBaD5iv2k76
+         V+tWBrnX6wb1VJkFph8xo43lQNUubudLaCyPS9XC3e7GbrLAjYE1sO1CNz8u7y2/wgaS
+         f5/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739158400; x=1739763200;
+        d=1e100.net; s=20230601; t=1739164787; x=1739769587;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ytFQTKV79+LnUBY/Ldx9tZwous46247MN1TjKF2jDC8=;
-        b=ZuCtBV023p0jiVG8HIaSOzYq/B61uTcgF1eZGpjki1DHRZrPDe0sYXVORo92C3sdwk
-         LkSrY6vgXCBj/WPilaT23vKrB6Vgaf4m9DntHuA7vPSjUBMjY0tPEMeRQak+eqPg7nNr
-         C8qCrKmcEMGmBD4hkjq4vE491qJ2XjjNF6VF0HS02omMTPgQBmAFFOehU8Vlq9CdrPOo
-         DEl8w/ulDcT6oeopOv7LY5woJ6bg5iXUn9ROZwxQoDwVYdubIuyWqE/RfVXgbkHyNAS1
-         mQknZrO2c67/2qAUqPH9gz4LU5pMnItzXsIp5FnbiOAxHcge9B1QtNs24hpvhR3aRt5j
-         fciA==
-X-Forwarded-Encrypted: i=1; AJvYcCVsVNfzR8t3cYQc/O5NQGy5uBeUGs1gNM3chUi+FiN8/s80IoK4IZSFVuYMkIo3nLrp8wPV148=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL+FDuPWR5Z9oPN65AnIbabQige/ZT/lEjgYLFza7kirX6DEH7
-	Mg4fSNgV7SV3r73vrK1rdR8JG8caedFjvikE0NhmZTnW1jH0C+R9IerF//HslANHLH+0fUfXFC5
-	GBMU/I0pq1Dl4xVe1+/vVW3HlXQw=
-X-Gm-Gg: ASbGncuQIjizGCJsp6I2pMK1nAqJCNDQ+y8+LLBA+KpGp4Iy3szAmyT55ony//okQxI
-	7IqI6yCVVkY8B3vIDRGm/6MPimiCdL3gTjBg/5GCkPATDGfrVqtKZsK85RN3Xhv57/0C1UwA=
-X-Google-Smtp-Source: AGHT+IHdOhMd/hHfdVG/7qC8djsgcOKmxpczgqa/YZAvwB+yt+w1TT8QKlkRwIRgt9X4sDpJHjnIDFVZ5ANUf9h9oiM=
-X-Received: by 2002:a05:6e02:4510:b0:3d0:3fa2:ccfd with SMTP id
- e9e14a558f8ab-3d13dcde8c6mr92776865ab.5.1739158399697; Sun, 09 Feb 2025
- 19:33:19 -0800 (PST)
+        bh=d3uh2ILPMiksWEP7lEXKPKQV1OP3Pn2eNef2yeALT8k=;
+        b=JJ6HgBZsGhm2a2Y6gr/X/J7iRKb3YNt3tpNpL9ZaLUgpPDsSn5Us1HohJ01kpPzDA8
+         2o1taI35hkzkvbEOGxjUmjeMm9f+xs5tgP/4e24j8URJfDDz4fKeBthiuIJaAxQJDCT/
+         sp6xmd3ixA2lLcIKy/TWy6MCkipbMVQzcxYGDFRrYjTOCP0s1qg5ZJFTz3rNgadVJm0R
+         6rndw2RBLAg0jNLYkZxQjRbUFhJcYMXzi7W9KygMsSuGvUxlGaXP9LzgL2Tw4eqQl2r8
+         Dtwb6x+1ctKMgCBaKQ751YawIenU7ldliBk04kejwv+4FySXnjwwM15UPziP+lGJANoP
+         e4VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEqs3TIxNFDrAtYEG8Es3DpFrvEo2Fc7nFEtnFV1m7bMQga7QU/AXqR7/NsYOkUnSIWilpQAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfVyCMGLjC6jWl1HVzAZ18fTLYLe9csMIAkvOimYizq10CPpMZ
+	sJCSUDssGE3UvHxlniZLB5SnDfsnY2wylq2dyg6wHb7s+k8xk3s44VUW8rBDFuSkMjHbsNw4B0U
+	ImZlM6N/JCp1b7rFaIOJm22cSpA4=
+X-Gm-Gg: ASbGncsA4ML67ce3L/F+YzzL+zQkQ0LcgbtRcjA9O5UyxMntqJ1L8U99VFfSmlJ1YzD
+	URuCmKL4Vnz6ufi40XiGr8L7/pD+MNJt94M64f4DhQEtcwhnglcR/dk53hecuol7x+yZAhMkw
+X-Google-Smtp-Source: AGHT+IHeZPwidZPjSmPln2DK3A71NDsIsP/SOZPxKHjTs2kfhiGf9dYDtQJCuTfccwhh/v0MF87xcpkPdSF0b9/sjiA=
+X-Received: by 2002:a05:6e02:1989:b0:3d0:1fc4:edf0 with SMTP id
+ e9e14a558f8ab-3d13df22156mr102458325ab.15.1739164787322; Sun, 09 Feb 2025
+ 21:19:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1739097311.git.pav@iki.fi> <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
-In-Reply-To: <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
+References: <cover.1739097311.git.pav@iki.fi> <f3f0fa8615fbfebbf58212bd407e51579f85412a.1739097311.git.pav@iki.fi>
+In-Reply-To: <f3f0fa8615fbfebbf58212bd407e51579f85412a.1739097311.git.pav@iki.fi>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 10 Feb 2025 11:32:43 +0800
-X-Gm-Features: AWEUYZmEiJj7zdDBoOCH4EI5S6VxSSdhR9sT15afB6-tI1Zdj-uUcpv6umZ_rEI
-Message-ID: <CAL+tcoAjCYkwAzYC4jaEfsrFmNEhwnLiJCtEQ7un3wHTqnkwmw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
+Date: Mon, 10 Feb 2025 13:19:11 +0800
+X-Gm-Features: AWEUYZlWmiY1UXow62fqSoEDXBtdhaO8lH6y5xeIBpkbw3vi50_SGY4UcPtI4qE
+Message-ID: <CAL+tcoBZU8C76XTLoz9LEWR+e+x3ct_izbC0q-kKXkTxxqhoHg@mail.gmail.com>
+Subject: Re: [PATCH v3 3/5] Bluetooth: ISO: add TX timestamping
 To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org, 
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
@@ -72,192 +72,128 @@ Cc: linux-bluetooth@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
-
-On Sun, Feb 9, 2025 at 6:40=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+On Sun, Feb 9, 2025 at 6:39=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
 >
-> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
-> when hardware reports a packet completed.
+> Add BT_SCM_ERROR socket CMSG type.
 >
-> Completion tstamp is useful for Bluetooth, where hardware tx timestamps
-> cannot be obtained except for ISO packets, and the hardware has a queue
-
-Could you say more about why the hw timestamp cannot be obtained?
-
-> where packets may wait.  In this case the software SND timestamp only
-> reflects the kernel-side part of the total latency (usually small) and
-> queue length (usually 0 unless HW buffers congested), whereas the
-> completion report time is more informative of the true latency.
+> Support TX timestamping in ISO sockets.
 >
-> It may also be useful in other cases where HW TX timestamps cannot be
-> obtained and user wants to estimate an upper bound to when the TX
-> probably happened.
-
-It's worth mentioning the earlier discussion that took place last year
-in the commit log. It's hard to retrieve such an important discussion
-buried in the mailing list, which should be helpful for people to get
-to know/recall the exact background :)
-
-https://lore.kernel.org/all/6642c7f3427b5_20539c2949a@willemb.c.googlers.co=
-m.notmuch/.
-https://lore.kernel.org/all/cover.1710440392.git.pav@iki.fi/
-
-And it's also good to attach the real use case from the following link
-for readers to know the exact case :)
-
-https://lore.kernel.org/all/7ade362f178297751e8a0846e0342d5086623edc.camel@=
-iki.fi/
-Quoting here:
-"
-sendmsg() from user generates skbs to net/bluetooth side queue
-|
-* wait in net/bluetooth side queue until HW has free packet slot
-|
-* send to driver (-> SCM_TSTAMP_SCHED*)
-|
-* driver (usu. ASAP) queues to transport e.g. USB
-|
-* transport tx complete, skb freed
-|
-* packet waits in hardware-side buffers (usu. the largest delay)
-|
-* packet completion report from HW (-> SCM_TSTAMP_SND*)
-|
-* for one packet type, HW timestamp for last tx packet can queried
-The packet completion report does not imply the packet was received.
-"
-
+> Support MSG_ERRQUEUE in ISO recvmsg.
+>
+> If a packet from sendmsg() is fragmented, only the first ACL fragment is
+> timestamped.
+>
 > Signed-off-by: Pauli Virtanen <pav@iki.fi>
 > ---
->  Documentation/networking/timestamping.rst | 9 +++++++++
->  include/linux/skbuff.h                    | 6 +++++-
->  include/uapi/linux/errqueue.h             | 1 +
->  include/uapi/linux/net_tstamp.h           | 6 ++++--
->  net/ethtool/common.c                      | 1 +
->  net/socket.c                              | 3 +++
->  6 files changed, 23 insertions(+), 3 deletions(-)
+>  include/net/bluetooth/bluetooth.h |  1 +
+>  net/bluetooth/iso.c               | 24 ++++++++++++++++++++----
+>  2 files changed, 21 insertions(+), 4 deletions(-)
 >
-> diff --git a/Documentation/networking/timestamping.rst b/Documentation/ne=
-tworking/timestamping.rst
-> index 61ef9da10e28..de2afed7a516 100644
-> --- a/Documentation/networking/timestamping.rst
-> +++ b/Documentation/networking/timestamping.rst
-> @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
->    cumulative acknowledgment. The mechanism ignores SACK and FACK.
->    This flag can be enabled via both socket options and control messages.
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index 435250c72d56..bbefde319f95 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -156,6 +156,7 @@ struct bt_voice {
+>  #define BT_PKT_STATUS           16
 >
-> +SOF_TIMESTAMPING_TX_COMPLETION:
-> +  Request tx timestamps on packet tx completion.  The completion
-> +  timestamp is generated by the kernel when it receives packet a
-> +  completion report from the hardware. Hardware may report multiple
-> +  packets at once, and completion timestamps reflect the timing of the
-> +  report and not actual tx time. The completion timestamps are
-> +  currently implemented only for: Bluetooth L2CAP and ISO.  This
-> +  flag can be enabled via both socket options and control messages.
-> +
-
-I'd like to know if this flag can also be applied to NICs which have
-already implemented the hardware timestamp, like Intel i40e, no?
-
-Thanks,
-Jason
-
-
+>  #define BT_SCM_PKT_STATUS      0x03
+> +#define BT_SCM_ERROR           0x04
 >
->  1.3.2 Timestamp Reporting
->  ^^^^^^^^^^^^^^^^^^^^^^^^^
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index bb2b751d274a..3707c9075ae9 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -489,10 +489,14 @@ enum {
+>  #define BT_ISO_QOS             17
 >
->         /* generate software time stamp when entering packet scheduling *=
-/
->         SKBTX_SCHED_TSTAMP =3D 1 << 6,
-> +
-> +       /* generate software time stamp on packet tx completion */
-> +       SKBTX_COMPLETION_TSTAMP =3D 1 << 7,
->  };
->
->  #define SKBTX_ANY_SW_TSTAMP    (SKBTX_SW_TSTAMP    | \
-> -                                SKBTX_SCHED_TSTAMP)
-> +                                SKBTX_SCHED_TSTAMP | \
-> +                                SKBTX_COMPLETION_TSTAMP)
->  #define SKBTX_ANY_TSTAMP       (SKBTX_HW_TSTAMP | \
->                                  SKBTX_HW_TSTAMP_USE_CYCLES | \
->                                  SKBTX_ANY_SW_TSTAMP)
-> diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/errqueue.=
-h
-> index 3c70e8ac14b8..1ea47309d772 100644
-> --- a/include/uapi/linux/errqueue.h
-> +++ b/include/uapi/linux/errqueue.h
-> @@ -73,6 +73,7 @@ enum {
->         SCM_TSTAMP_SND,         /* driver passed skb to NIC, or HW */
->         SCM_TSTAMP_SCHED,       /* data entered the packet scheduler */
->         SCM_TSTAMP_ACK,         /* data acknowledged by peer */
-> +       SCM_TSTAMP_COMPLETION,  /* packet tx completion */
->  };
->
->  #endif /* _UAPI_LINUX_ERRQUEUE_H */
-> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tst=
-amp.h
-> index 55b0ab51096c..383213de612a 100644
-> --- a/include/uapi/linux/net_tstamp.h
-> +++ b/include/uapi/linux/net_tstamp.h
-> @@ -44,8 +44,9 @@ enum {
->         SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
->         SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
->         SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
-> +       SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
->
-> -       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
-> +       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
->         SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
->                                  SOF_TIMESTAMPING_LAST
->  };
-> @@ -58,7 +59,8 @@ enum {
->  #define SOF_TIMESTAMPING_TX_RECORD_MASK        (SOF_TIMESTAMPING_TX_HARD=
-WARE | \
->                                          SOF_TIMESTAMPING_TX_SOFTWARE | \
->                                          SOF_TIMESTAMPING_TX_SCHED | \
-> -                                        SOF_TIMESTAMPING_TX_ACK)
-> +                                        SOF_TIMESTAMPING_TX_ACK | \
-> +                                        SOF_TIMESTAMPING_TX_COMPLETION)
->
->  /**
->   * struct so_timestamping - SO_TIMESTAMPING parameter
-> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> index 2bd77c94f9f1..75e3b756012e 100644
-> --- a/net/ethtool/common.c
-> +++ b/net/ethtool/common.c
-> @@ -431,6 +431,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] =
-=3D {
->         [const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
->         [const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-tcp",
->         [const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-filt=
-er",
-> +       [const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "completion-tra=
-nsmit",
->  };
->  static_assert(ARRAY_SIZE(sof_timestamping_names) =3D=3D __SOF_TIMESTAMPI=
-NG_CNT);
->
-> diff --git a/net/socket.c b/net/socket.c
-> index 4afe31656a2b..22b7f6f50889 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -693,6 +693,9 @@ void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_flag=
-s)
->         if (tsflags & SOF_TIMESTAMPING_TX_SCHED)
->                 flags |=3D SKBTX_SCHED_TSTAMP;
->
-> +       if (tsflags & SOF_TIMESTAMPING_TX_COMPLETION)
-> +               flags |=3D SKBTX_COMPLETION_TSTAMP;
-> +
->         *tx_flags =3D flags;
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 44acddf58a0c..f497759a2af5 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -518,7 +518,8 @@ static struct bt_iso_qos *iso_sock_get_qos(struct soc=
+k *sk)
+>         return &iso_pi(sk)->qos;
 >  }
->  EXPORT_SYMBOL(__sock_tx_timestamp);
+>
+> -static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
+> +static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
+> +                         const struct sockcm_cookie *sockc)
+>  {
+>         struct iso_conn *conn =3D iso_pi(sk)->conn;
+>         struct bt_iso_qos *qos =3D iso_sock_get_qos(sk);
+> @@ -538,10 +539,12 @@ static int iso_send_frame(struct sock *sk, struct s=
+k_buff *skb)
+>         hdr->slen =3D cpu_to_le16(hci_iso_data_len_pack(len,
+>                                                       HCI_ISO_STATUS_VALI=
+D));
+>
+> -       if (sk->sk_state =3D=3D BT_CONNECTED)
+> +       if (sk->sk_state =3D=3D BT_CONNECTED) {
+> +               hci_setup_tx_timestamp(skb, 1, sockc);
+>                 hci_send_iso(conn->hcon, skb);
+> -       else
+> +       } else {
+>                 len =3D -ENOTCONN;
+> +       }
+>
+>         return len;
+>  }
+> @@ -1348,6 +1351,7 @@ static int iso_sock_sendmsg(struct socket *sock, st=
+ruct msghdr *msg,
+>  {
+>         struct sock *sk =3D sock->sk;
+>         struct sk_buff *skb, **frag;
+> +       struct sockcm_cookie sockc;
+>         size_t mtu;
+>         int err;
+>
+> @@ -1360,6 +1364,14 @@ static int iso_sock_sendmsg(struct socket *sock, s=
+truct msghdr *msg,
+>         if (msg->msg_flags & MSG_OOB)
+>                 return -EOPNOTSUPP;
+>
+> +       sockcm_init(&sockc, sk);
+
+No need to initialize other irrelevant fields since Willem started to
+clean up this kind of init phase in TCP[1].
+
+[1]: https://lore.kernel.org/all/20250206193521.2285488-2-willemdebruijn.ke=
+rnel@gmail.com/
+
+> +
+> +       if (msg->msg_controllen) {
+> +               err =3D sock_cmsg_send(sk, msg, &sockc);
+> +               if (err)
+> +                       return err;
+> +       }
+> +
+
+I'm not familiar with bluetooth, but I'm wondering if the above code
+snippet is supposed to be protected by the socket lock as below since
+I refer to TCP as an example? Is it possible that multiple threads
+call this sendmsg at the same time?
+
+>         lock_sock(sk);
+>
+>         if (sk->sk_state !=3D BT_CONNECTED) {
+> @@ -1405,7 +1417,7 @@ static int iso_sock_sendmsg(struct socket *sock, st=
+ruct msghdr *msg,
+>         lock_sock(sk);
+>
+>         if (sk->sk_state =3D=3D BT_CONNECTED)
+> -               err =3D iso_send_frame(sk, skb);
+> +               err =3D iso_send_frame(sk, skb, &sockc);
+>         else
+>                 err =3D -ENOTCONN;
+>
+> @@ -1474,6 +1486,10 @@ static int iso_sock_recvmsg(struct socket *sock, s=
+truct msghdr *msg,
+>
+>         BT_DBG("sk %p", sk);
+>
+> +       if (unlikely(flags & MSG_ERRQUEUE))
+> +               return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
+> +                                         BT_SCM_ERROR);
+> +
+>         if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+>                 sock_hold(sk);
+>                 lock_sock(sk);
 > --
 > 2.48.1
 >
