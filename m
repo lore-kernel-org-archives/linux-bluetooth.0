@@ -1,169 +1,228 @@
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBEA1DC9A8
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Feb 2025 15:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8131B6F06B;
+	Mon, 10 Feb 2025 03:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739115921; cv=none; b=ZneF8V89X/hlAiv4L0jBI6YrH9TBLZDutG9P1QwURzYcloDUAQkLvnkcfhp3hreqGzM5oFUKtdB3AucNSauiaiWXxOhhnoGdE4SmLd1V7Kv0SNGM8sYxctbQOVI5n5Wu7z+B/ayxx/megsQ7nyfoP8sdG30fZS15BCQvyM91b8E=
+	t=1739158188; cv=none; b=rApYyumUKmFVRd2rf9357lUQQBl3ntvTJf/fWoBDms63nx2BJl3vW8AMmvjUNiVyZtZLLtCeounWV3iM9G6VdU/l6BWPV+qxet5MpDNhmjRgWWl9t3yRjkbXgiR9faaXrtQxbjaG9heUyzOksCk28RLSV8BQ6KeGGFZnatv07eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739115921; c=relaxed/simple;
-	bh=+SH0U04r0tpMMW8rQnkJLNcxI7jq3YbVkyqic8W6Mws=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=lAnHSegiFUZX5ucQ3wzNvhM3GKKUe/GdC6XP7H1KGXbZoCTZTBLuOCUL79bZOu51HQOzex0XGzTMqKeRRtMSTBneGha5Phx+28JxYPQ7uC/g0TWpC3n6Lz2gjnX5p4hpVkpk7oTxAas8VRYiU1scEOaGbWgjuSFt3fEN516wjSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ce81a40f5cso74203775ab.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Feb 2025 07:45:19 -0800 (PST)
+	s=arc-20240116; t=1739158188; c=relaxed/simple;
+	bh=TiMs+0GrXPhBIQlJ+sK/2499r3p2U33LMuvdPUGAmFc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=tsWoKQVxMJmUpH+0x9h+nVpsgisCWAd5pcSene5Rh5jVM3v2hQSVKb/lHmIx+FZNFo6eXRi+rXGSb8T3c1jEHZ7otiSDIR6/f4c561tJDGbS6Ua5nZ/CufT78PHtpwBCAPuQMcshFFcaRfxSW0knHXOxEj0M+uQwJezWvxlY6ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mC9Ld4PY; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mC9Ld4PY"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c056bba58dso115070985a.0;
+        Sun, 09 Feb 2025 19:29:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739158184; x=1739762984; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s4D5SKtJkUhMyuF1JqdYDwxuISgefMnQMQ1RNK2WMIw=;
+        b=mC9Ld4PYlGMEIpw24lu0lA6sojFNp/vSweb9pUM+yeGUcpoO3tFuLSv8/5azG22Ptf
+         9pI1Aya7dLjpjLC+DDmrubgQxMZDHxNjShjrHx4ypQm7f2xiB+3jZwuVSFc7bwJHQiwb
+         /GOI4dwrB+ZKw6XdEz7oq4xxaIyVT+hL5Zd1hkP/Sfl1HIeJg0qLMozAzCGH1YikBz7S
+         kr5OOvFt//5H6IbjraehlzWeVG2u6CzjWCexGTNzC3GXA6sXpcYzDUIK+FzstcNaAA81
+         k5Mxp3cLxUfhEOPxZe3JBFbEavnaFCm5hpig2Bsml/UfGn0EjrcoghS3RZcOJsPOI2yW
+         VRXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739115919; x=1739720719;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vLzOMWLy/MOLX9VEUQNUbF89kIoT+fmm9AVwG76J8UA=;
-        b=ZfAsqD+Oj+qkkpo2bmjBjLnVaSEwnYX16qvZ+Rrg4/oxmnzBgWYWH+ybZVPAwNonvk
-         HCptVs6jneaEBAiWdCp5fCWhsG4nakBHjh9Jh7Q7Iv7t3LRw1kz0D4cE3UDrdu3XHP0p
-         F2YrSUmfPrwGZ/MrR8zc/y4xF3qAIkvIp/gdNTZCY7p3JyyFp/7zCBmt/uOfowQaChQU
-         GvOGcVH1wrTZjwxE6DkccGWkXG4AuO1/1QR0v2FMVskV6ht6bz7hW87bBJQbGX266xwF
-         1Kv/nSo3t9Q0Jle1GZ1wL83dU+nkfajLYaHce65NyuxY3FjyufPXMnuJauf5BkzJAd15
-         NiFw==
-X-Gm-Message-State: AOJu0YzvpGiTxtldZfuh68EnfIp96ALAvP951asDlTxR7zpU8v6RzswI
-	WIcWePfMwLUqi+GBbPpplLL0poWAD+fdbOhDH8ZFiVneGRV4sPMkqCYUqFus7Z5c3sIr3hj+HYl
-	SRII+wa0W11Pe3VVgxUy2LyIcGBVnlR53AbUlkMRFufFSwAeKrg2vTv4Y5A==
-X-Google-Smtp-Source: AGHT+IHHHgELAIyLEEZ3lVkCutpyk8siwMTX3DyIpioxphCJVRcq5t91FAg7VxfGFkTsnRnsv5W+SOm03IGRSP2eyzDDWEqhuKI8
+        d=1e100.net; s=20230601; t=1739158184; x=1739762984;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=s4D5SKtJkUhMyuF1JqdYDwxuISgefMnQMQ1RNK2WMIw=;
+        b=RaiM1bN5IowIgf8GSGdwUsrP+f1Q+19mCfPOxOll3i35pTzh5rrLC/pHF5J5ttD/Bp
+         PLPH/4J2FzZk8isPlUv8BNEa5J6GZMc7Hh+ToFapOm5Mc8Ebnq5uXC1d379HYJm1YRdn
+         vG332SkRtAmX/HPCM8AbGdr4R73KeYDhgVfPjnsOoHfNswj3/L+uAQ5ShXvNaZ39vD9M
+         qfAlLvJtZVCQ9zFZQ3seezeuWS2i2EaS6VwzYPeUDrhIE0BY7Fk17K7RUNDuGt5LAnQb
+         koQCcz3c9C/Dom+yKrL6+VJAHuuKi5uqHptqLFSoA4xlIeCq+iBD/FDLvBDC9CdpnwBZ
+         3boQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBmJOWHdUnk8BE1388/68fd2V0wrzr649YGmfW5Zfclkg1yD48/IikhNmDEoIobeEGXVKM4hMiVF8G4SYoIhg=@vger.kernel.org, AJvYcCXBoNlUrKgY/iGhU16NTaqdxJw/D13aDaph5ZGZ+Y9AIoN5aKrGAN/9KiEETCUDM9uVYXoSNWhF@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfnjIcGJw+NSVTFUxgtzhr1nfesMbfS/BP2XO2gYCNJOW3b5mj
+	adNxA3zTZuQNPLMAvYzACXjMYbL8H8nQ8wGpif/Z771vimyrfAGq
+X-Gm-Gg: ASbGncuct/0mDwVdEPo2sJHm7PWTDWUlfN7jfhMT5Gy6EDckc+tHkhre8Bc0d8oEB8u
+	5WpicbztGjKv6+CPxng6YrQ4dwRjAxNnyhlkpKYxJnlEEECo1zbvhP+tBgYi87dX+3hRqvE42fX
+	5KDXk5cvUSXiMIlmG7AKqy8dSKRrvXw6XoEY5lW0N6r7DL8KH9Us1OJi+0KGICzSOo4wJHhSLgP
+	qKFuqoxwXCgL7uuYm8912ArmkCXTGd/w3dJHMEKJBUJ8NYnARszK+scYhYoMNibahDMkQvBALa4
+	8nGvK49r+j+YrKz+K8BOkFFESuWl+yzT6yNA06pXewtgrnY/WE7uVWihvIGijUs=
+X-Google-Smtp-Source: AGHT+IHCyj0ldJK2CFpEeHdNhyisVpPeHuY6R9c2tretRFYcMqDQD1GjE9j4WDmHNH/+jmnfnkvtTQ==
+X-Received: by 2002:a05:620a:25d0:b0:7be:72e2:90a2 with SMTP id af79cd13be357-7c047ba4b07mr2052025385a.6.1739158184242;
+        Sun, 09 Feb 2025 19:29:44 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c041e1388asm477780885a.61.2025.02.09.19.29.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Feb 2025 19:29:43 -0800 (PST)
+Date: Sun, 09 Feb 2025 22:29:42 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pauli Virtanen <pav@iki.fi>, 
+ linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <67a972a6e2704_14761294b0@willemb.c.googlers.com.notmuch>
+In-Reply-To: <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
+References: <cover.1739097311.git.pav@iki.fi>
+ <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
+Subject: Re: [PATCH v3 1/5] net-timestamp: COMPLETION timestamp on packet tx
+ completion
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c04:b0:3d0:11ff:a782 with SMTP id
- e9e14a558f8ab-3d13dd447d5mr79163175ab.9.1739115919335; Sun, 09 Feb 2025
- 07:45:19 -0800 (PST)
-Date: Sun, 09 Feb 2025 07:45:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67a8cd8f.050a0220.3d72c.003f.GAE@google.com>
-Subject: [syzbot] [bluetooth?] general protection fault in h5_recv
-From: syzbot <syzbot+b5691bb559396b262064@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Pauli Virtanen wrote:
+> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
+> when hardware reports a packet completed.
+> 
+> Completion tstamp is useful for Bluetooth, where hardware tx timestamps
+> cannot be obtained except for ISO packets, and the hardware has a queue
+> where packets may wait.  In this case the software SND timestamp only
+> reflects the kernel-side part of the total latency (usually small) and
+> queue length (usually 0 unless HW buffers congested), whereas the
+> completion report time is more informative of the true latency.
+> 
+> It may also be useful in other cases where HW TX timestamps cannot be
+> obtained and user wants to estimate an upper bound to when the TX
+> probably happened.
 
-syzbot found the following issue on:
+Getting the completion timestamp may indeed be useful more broadly.
 
-HEAD commit:    ed58d103e6da Add linux-next specific files for 20250207
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11d782a4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=244a34ec1429746
-dashboard link: https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=137f2bdf980000
+Alternatively, the HW timestamp is relatively imprecisely defined so
+you could even just use that. Ideally, a hw timestamp conforms to IEEE
+1588v2 PHY: first symbol on the wire IIRC. But in many cases this is
+not the case. It is not feasible at line rate, or the timestamp is
+only taken when the completion is written over PCI, which may be
+subject to PCI backpressure and happen after transmission on the wire.
+As a result, the worst case hw tstamp must already be assumed not much
+earlier than a completion timestamp.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ce459b7174dd/disk-ed58d103.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/60699733c0c8/vmlinux-ed58d103.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f589bce7c898/bzImage-ed58d103.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b5691bb559396b262064@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000005f: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x00000000000002f8-0x00000000000002ff]
-CPU: 1 UID: 0 PID: 9956 Comm: syz.2.1414 Not tainted 6.14.0-rc1-next-20250207-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
-RIP: 0010:h5_recv+0x153/0x940 drivers/bluetooth/hci_h5.c:572
-Code: 08 01 44 8b 64 24 04 48 8b 5c 24 08 4c 8b 74 24 18 49 ff c7 41 ff cc 45 85 e4 0f 8e 55 06 00 00 e8 e2 f5 f5 f8 48 8b 44 24 30 <42> 80 3c 28 00 74 08 48 89 df e8 be d1 5c f9 48 8b 1b 31 ff 48 89
-RSP: 0000:ffffc90004cafc60 EFLAGS: 00010202
-RAX: 000000000000005f RBX: 00000000000002f8 RCX: 0000000000000061
-RDX: ffff888033690000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffc90004cafd70 R08: ffffffff88c9927e R09: 1ffff110048c0403
-R10: dffffc0000000000 R11: ffffffff88c991c0 R12: 0000000000000001
-R13: dffffc0000000000 R14: ffff888024602000 R15: ffffc90004cafe00
-FS:  00007f50a01cf6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000040000001f000 CR3: 0000000028c32000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- hci_uart_tty_receive+0x141/0x1c0 drivers/bluetooth/hci_ldisc.c:622
- tiocsti+0x24d/0x300 drivers/tty/tty_io.c:2299
- tty_ioctl+0x518/0xdc0 drivers/tty/tty_io.c:2716
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf1/0x160 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f509f38cde9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f50a01cf038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f509f5a6080 RCX: 00007f509f38cde9
-RDX: 0000400000000180 RSI: 0000000000005412 RDI: 0000000000000003
-RBP: 00007f509f40e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f509f5a6080 R15: 00007ffed807d2a8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:h5_recv+0x153/0x940 drivers/bluetooth/hci_h5.c:572
-Code: 08 01 44 8b 64 24 04 48 8b 5c 24 08 4c 8b 74 24 18 49 ff c7 41 ff cc 45 85 e4 0f 8e 55 06 00 00 e8 e2 f5 f5 f8 48 8b 44 24 30 <42> 80 3c 28 00 74 08 48 89 df e8 be d1 5c f9 48 8b 1b 31 ff 48 89
-RSP: 0000:ffffc90004cafc60 EFLAGS: 00010202
-RAX: 000000000000005f RBX: 00000000000002f8 RCX: 0000000000000061
-RDX: ffff888033690000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffc90004cafd70 R08: ffffffff88c9927e R09: 1ffff110048c0403
-R10: dffffc0000000000 R11: ffffffff88c991c0 R12: 0000000000000001
-R13: dffffc0000000000 R14: ffff888024602000 R15: ffffc90004cafe00
-FS:  00007f50a01cf6c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000028c32000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	08 01                	or     %al,(%rcx)
-   2:	44 8b 64 24 04       	mov    0x4(%rsp),%r12d
-   7:	48 8b 5c 24 08       	mov    0x8(%rsp),%rbx
-   c:	4c 8b 74 24 18       	mov    0x18(%rsp),%r14
-  11:	49 ff c7             	inc    %r15
-  14:	41 ff cc             	dec    %r12d
-  17:	45 85 e4             	test   %r12d,%r12d
-  1a:	0f 8e 55 06 00 00    	jle    0x675
-  20:	e8 e2 f5 f5 f8       	call   0xf8f5f607
-  25:	48 8b 44 24 30       	mov    0x30(%rsp),%rax
-* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 be d1 5c f9       	call   0xf95cd1f7
-  39:	48 8b 1b             	mov    (%rbx),%rbx
-  3c:	31 ff                	xor    %edi,%edi
-  3e:	48                   	rex.W
-  3f:	89                   	.byte 0x89
+That said, +1 on adding explicit well defined measurement point
+instead.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> ---
+>  Documentation/networking/timestamping.rst | 9 +++++++++
+>  include/linux/skbuff.h                    | 6 +++++-
+>  include/uapi/linux/errqueue.h             | 1 +
+>  include/uapi/linux/net_tstamp.h           | 6 ++++--
+>  net/ethtool/common.c                      | 1 +
+>  net/socket.c                              | 3 +++
+>  6 files changed, 23 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
+> index 61ef9da10e28..de2afed7a516 100644
+> --- a/Documentation/networking/timestamping.rst
+> +++ b/Documentation/networking/timestamping.rst
+> @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
+>    cumulative acknowledgment. The mechanism ignores SACK and FACK.
+>    This flag can be enabled via both socket options and control messages.
+>  
+> +SOF_TIMESTAMPING_TX_COMPLETION:
+> +  Request tx timestamps on packet tx completion.  The completion
+> +  timestamp is generated by the kernel when it receives packet a
+> +  completion report from the hardware. Hardware may report multiple
+> +  packets at once, and completion timestamps reflect the timing of the
+> +  report and not actual tx time. The completion timestamps are
+> +  currently implemented only for: Bluetooth L2CAP and ISO.  This
+> +  flag can be enabled via both socket options and control messages.
+> +
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Either we should support this uniformly, or it should be possible to
+query whether a driver supports this.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Unfortunately all completion callbacks are driver specific.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+But drivers that support hwtstamps will call skb_tstamp_tx with
+nonzero hwtstamps. We could use that also to compute and queue
+a completion timestamp if requested. At least for existing NIC
+drivers.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+>  1.3.2 Timestamp Reporting
+>  ^^^^^^^^^^^^^^^^^^^^^^^^^
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index bb2b751d274a..3707c9075ae9 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -489,10 +489,14 @@ enum {
+>  
+>  	/* generate software time stamp when entering packet scheduling */
+>  	SKBTX_SCHED_TSTAMP = 1 << 6,
+> +
+> +	/* generate software time stamp on packet tx completion */
+> +	SKBTX_COMPLETION_TSTAMP = 1 << 7,
+>  };
+>  
+>  #define SKBTX_ANY_SW_TSTAMP	(SKBTX_SW_TSTAMP    | \
+> -				 SKBTX_SCHED_TSTAMP)
+> +				 SKBTX_SCHED_TSTAMP | \
+> +				 SKBTX_COMPLETION_TSTAMP)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+These fields are used in the skb_shared_info tx_flags field.
+Which is a very scarce resource. This takes the last available bit.
+That is my only possible concern: the opportunity cost.
 
-If you want to undo deduplication, reply with:
-#syz undup
+>  #define SKBTX_ANY_TSTAMP	(SKBTX_HW_TSTAMP | \
+>  				 SKBTX_HW_TSTAMP_USE_CYCLES | \
+>  				 SKBTX_ANY_SW_TSTAMP)
+> diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/errqueue.h
+> index 3c70e8ac14b8..1ea47309d772 100644
+> --- a/include/uapi/linux/errqueue.h
+> +++ b/include/uapi/linux/errqueue.h
+> @@ -73,6 +73,7 @@ enum {
+>  	SCM_TSTAMP_SND,		/* driver passed skb to NIC, or HW */
+>  	SCM_TSTAMP_SCHED,	/* data entered the packet scheduler */
+>  	SCM_TSTAMP_ACK,		/* data acknowledged by peer */
+> +	SCM_TSTAMP_COMPLETION,	/* packet tx completion */
+>  };
+>  
+>  #endif /* _UAPI_LINUX_ERRQUEUE_H */
+> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
+> index 55b0ab51096c..383213de612a 100644
+> --- a/include/uapi/linux/net_tstamp.h
+> +++ b/include/uapi/linux/net_tstamp.h
+> @@ -44,8 +44,9 @@ enum {
+>  	SOF_TIMESTAMPING_BIND_PHC = (1 << 15),
+>  	SOF_TIMESTAMPING_OPT_ID_TCP = (1 << 16),
+>  	SOF_TIMESTAMPING_OPT_RX_FILTER = (1 << 17),
+> +	SOF_TIMESTAMPING_TX_COMPLETION = (1 << 18),
+>  
+> -	SOF_TIMESTAMPING_LAST = SOF_TIMESTAMPING_OPT_RX_FILTER,
+> +	SOF_TIMESTAMPING_LAST = SOF_TIMESTAMPING_TX_COMPLETION,
+>  	SOF_TIMESTAMPING_MASK = (SOF_TIMESTAMPING_LAST - 1) |
+>  				 SOF_TIMESTAMPING_LAST
+>  };
+> @@ -58,7 +59,8 @@ enum {
+>  #define SOF_TIMESTAMPING_TX_RECORD_MASK	(SOF_TIMESTAMPING_TX_HARDWARE | \
+>  					 SOF_TIMESTAMPING_TX_SOFTWARE | \
+>  					 SOF_TIMESTAMPING_TX_SCHED | \
+> -					 SOF_TIMESTAMPING_TX_ACK)
+> +					 SOF_TIMESTAMPING_TX_ACK | \
+> +					 SOF_TIMESTAMPING_TX_COMPLETION)
+>  
+>  /**
+>   * struct so_timestamping - SO_TIMESTAMPING parameter
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index 2bd77c94f9f1..75e3b756012e 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -431,6 +431,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] = {
+>  	[const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     = "bind-phc",
+>  	[const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   = "option-id-tcp",
+>  	[const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] = "option-rx-filter",
+> +	[const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] = "completion-transmit",
+
+just "tx-completion"?
