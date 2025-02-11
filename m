@@ -1,64 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F202641CA;
-	Tue, 11 Feb 2025 20:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D28266F0A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Feb 2025 21:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739307572; cv=none; b=pAFG/9b7lSw/PsSwsj7VjutkrknzZycYknw/sBrp3lDhYLJAN2ZNBMCmXiMRqb0FgzaS8N39im+3TA4/28ImJhUZhpYGTzs1nkZD26OCforK+Qe2blfF1p34zUwTrxel1bf8c4UIoxgzQukdVcQB7o0Zu6KLv3oCwFfRpJUlTlU=
+	t=1739308791; cv=none; b=X5GdNeQ8QT21MIKp215O3WSW3j+mTSQsJSHgZDTNGbIxwDRqn54H2bHw2WLW8Q8517KLtelGV6MPKOnUvlPp6ha+sQoPwAY0aIY0oJHxJ5l9sFnTVZyTTw004SxpOi9nUod7RIgicgq/q9/wuaFtNZ2jESEmynG+0BShrAfgUcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739307572; c=relaxed/simple;
-	bh=h66F2MARKJ0K3tXXMQGR25Duc5c7sPuk3UNDeq/Ou5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UfoTo8Ilrr5uaI9nUEBCaZakfvnaGS79pXF0g+0dfTiQb9JUFnTcyeAuFkPMApaiL4y6eWffbbz8CQIWz20YDK6jpiU4+XnDACNRZXkzKt1WzHNNcJfoyiJ9t29r+orm2CKEUb0W+PrrJR03+fJnKaF/1I34ZwOT8o+ayYs1OZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFSP9mMd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739308791; c=relaxed/simple;
+	bh=v+NotQmkypHRHE+nHTFJOTzrbxnNJ6Og8Bo7qTcrXqM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IG30afzUNFLJj+JUqGy9UusYadLl74tct7Qb5pDipXMoLe3XI4YkDuYt8kaiczcldI1d/hfQ1t75MD5CpYN2+/XbBdUyToBGaSr8QuOOEaKuyk0SSY6AcCBAKG6XbtP70b/cQHbSADscuiHRVUf1393U0FayPgXVGH9bO0uER7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SuTXjTZ1; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFSP9mMd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 273FBC4CEDD;
-	Tue, 11 Feb 2025 20:59:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739307571;
-	bh=h66F2MARKJ0K3tXXMQGR25Duc5c7sPuk3UNDeq/Ou5Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eFSP9mMdHCC0Y2sUcYf7y1ZEvCSndcc/DPH40qQQQTnxRICFJRta5wkMSrPg0/in8
-	 SndLBNisIGQWlGC+hqEOA40YYSHmfbDKDiVW5a4y17C7krN7UAhaNtcG+/bfVZaQKW
-	 r5tKxpq6p8IqRlLSdtJ9mjElyKEmXUWpXgW35sWJB1vO33vtU7SHpn1ohk/Lo2kFmo
-	 coGmYguJUtd3bKrZ9abgURH+h0Etism6tpMrvS5VmNd9tBf3LHisTvkJe0jr7vn6Jr
-	 wYcF+RML4QYk+098THoOYc6N5Ug7LoX+De/iYLSezd7F3DCn4QPhZaC7caNCzp16Sw
-	 imdKM+NgKx0pw==
-Date: Tue, 11 Feb 2025 10:59:30 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: syzbot <syzbot+e13e654d315d4da1277c@syzkaller.appspotmail.com>,
-	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	maz@kernel.org, mark.rutland@arm.com, richard.xnu.clark@gmail.com,
-	jiangshanlai@gmail.com, marcel@holtmann.org,
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [syzbot] [arm?] WARNING in delayed_work_timer_fn
-Message-ID: <Z6u6MgaJWMpjCn4O@slm.duckdns.org>
-References: <00000000000046efb605fec3def0@google.com>
- <675c28e0.050a0220.17d782.000d.GAE@google.com>
- <20250211111045.GA8885@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SuTXjTZ1"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e5b22d35268so5314156276.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Feb 2025 13:19:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739308789; x=1739913589; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8vMpnOzz24XlelaJjtEfRnOqqAth0NeggjrcIGJFxfY=;
+        b=SuTXjTZ19A00FUPjfW5OIYpo1Pj7eXvnzezX2PSBJxCZFMy3+xCG+hWTjB2jaEIDpp
+         r1yomxBrNYd9IoPPc573d51xwZSGdEHbMvAHDMCw7RfK13I/BObzcJIoy2n75sXqpNaM
+         rq1gakYpbMsWWRVB0K3XKyMbl18OZDuNSZgiGThJsLH63GB7eyz+7nF9ynT1GX+x96d4
+         e5Qihpk/If7a0cWz2lTQy7yHbFLmS7phf/SbiTVUlrWVReoVlWTBxmutO3hhnPVBF+6F
+         TqqFHR2art6vHV1f6BHNGY0t4rm2RVQReGSXdSkfsgB6IaXy1Z0Yd5pN0r7KmEswCkkD
+         3HKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739308789; x=1739913589;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8vMpnOzz24XlelaJjtEfRnOqqAth0NeggjrcIGJFxfY=;
+        b=HD/ZApjgJdoWh7NuGPKeAoeE634APoIK+6Mftafd0SHCz6uYCKkyJTYa5kYJwYebL0
+         cwtZNlFKq8k3vfRpqVbdVgU6pQQXw2TIpUq5eZvTaPvlsa12sNPIgZTzAPItsdV6VSex
+         +UU3VpDprtswdhFDMUISqXRJZmagf5Q9SGCnx4duninST9ygjjj3MnPaC27Ns1rSz9AW
+         q8ak4g4Dgc47iOZPVHiH2paMnhOCZ10tkUXZBgXRxeJWXTUUbkDl8VTHw2X/d4O7iQ5c
+         +wh6fKWbXJMzzoU0f6LXs5i+c9sQlLg6P45gmu0ACF51PPA+VYbMZTc1WcgEA7hITOBe
+         8U6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV8T0SfWlAMqvKbrv7DzZLrYap16uTMHjTWi/EX6YmpxqWcFNseaoCp79YhALSxbMB9QfmkFMoH5GK/lBvaqC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3ZQHzUKQm6gpmr8o8xrvdB3D7YFJYidSVZ4wDQyi84eKjTIKk
+	F9dGZ3T6tmCG0b6BkCf2VXdm0U7KkRyrI6xJSOXqNOK7vudyeLcUUb1gK0lBZIbxJSXXRiom7cs
+	yt8LXvJ07yQl7U7KIQSg6R5haxxd8S+ik7EHnkw==
+X-Gm-Gg: ASbGnctMslQoiiW9zn2E21p/qbZpH6JDlYG9ignbG3SRN5+QP0D0541W8xNfU3SLJsJ
+	RAhQsfNfz1ZtSSBI9KNoMfOWDpGe3pgPehmXeQ59E/oyxExp6UHmslRQhB+78MKVR6981Zjrrri
+	1wKnH8IxHPPwKxTxu1LsgYinxFcvsv
+X-Google-Smtp-Source: AGHT+IH9PQWCcTuU3a/WUrp8QtPQgxzfoa0eG9D03GuXuge0++Qcj4dBm/Lk+WFXHD1fsOGrWKTo04Qt3z/nEYlknZk=
+X-Received: by 2002:a05:690c:638a:b0:6f9:88ba:aa5d with SMTP id
+ 00721157ae682-6fb1f194f3dmr12585947b3.9.1739308789048; Tue, 11 Feb 2025
+ 13:19:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250211111045.GA8885@willie-the-truck>
+References: <20250207-rb1-bt-v4-0-d810fc8c94a9@linaro.org> <20250207-rb1-bt-v4-6-d810fc8c94a9@linaro.org>
+ <6e5bb2f7-a23b-4fab-914b-e67911eaf408@oss.qualcomm.com>
+In-Reply-To: <6e5bb2f7-a23b-4fab-914b-e67911eaf408@oss.qualcomm.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 11 Feb 2025 23:19:37 +0200
+X-Gm-Features: AWEUYZlP4_dHB7Swwx_XD496R58hsBttKN3cXZEWV8-yu1YbBT4qWLOogarYxpE
+Message-ID: <CAA8EJpq504V48qqSX0mzxCffUkq_xpu_UE+qubB46A7zon=0iw@mail.gmail.com>
+Subject: Re: [PATCH v4 6/6] arm64: dts: qcom: qrb2210-rb1: add Bluetooth support
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Feb 11, 2025 at 11:10:46AM +0000, Will Deacon wrote:
-> Given that this seems to explode a few times a month, I wonder if it's
-> worth adding some instrumentation to e.g. dump the name of the workqueue?
+On Tue, 11 Feb 2025 at 16:52, Konrad Dybcio
+<konrad.dybcio@oss.qualcomm.com> wrote:
+>
+> On 7.02.2025 9:41 PM, Dmitry Baryshkov wrote:
+> > Add support for the onboard WCN3950 BT/WiFi chip. Corresponding firmware
+> > has been merged to linux-firmware and should be available in the next
+> > release.
+> >
+> > Bluetooth: hci0: setting up wcn399x
+> > Bluetooth: hci0: QCA Product ID   :0x0000000f
+> > Bluetooth: hci0: QCA SOC Version  :0x40070120
+> > Bluetooth: hci0: QCA ROM Version  :0x00000102
+> > Bluetooth: hci0: QCA Patch Version:0x00000001
+> > Bluetooth: hci0: QCA controller version 0x01200102
+> > Bluetooth: hci0: QCA Downloading qca/cmbtfw12.tlv
+> > Bluetooth: hci0: QCA Downloading qca/cmnv12.bin
+> > Bluetooth: hci0: QCA setup on UART is completed
+> >
+> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> > ---
+>
+> [...]
+>
+> > +&uart3 {
+> > +     /delete-property/ interrupts;
+> > +     interrupts-extended = <&intc GIC_SPI 330 IRQ_TYPE_LEVEL_HIGH>,
+> > +                           <&tlmm 11 IRQ_TYPE_LEVEL_HIGH>;
+> > +     pinctrl-0 = <&uart3_default>;
+> > +     pinctrl-1 = <&uart3_sleep>;
+> > +     pinctrl-names = "default", "sleep";
+> > +
+> > +     status = "okay";
+> > +
+> > +     bluetooth {
+> > +             compatible = "qcom,wcn3950-bt";
+> > +
+> > +             vddio-supply = <&pm4125_l15>;
+> > +             vddxo-supply = <&pm4125_l13>;
+> > +             vddrf-supply = <&pm4125_l10>;
+> > +             vddch0-supply = <&pm4125_l22>;
+> > +             enable-gpios = <&tlmm 87 GPIO_ACTIVE_HIGH>;
+> > +             max-speed = <3200000>;
+>
+> I suppose we don't need a power sequencer for this smaller,
+> tightly-integrated-via-snoc chip?
 
-It's usually most useful to print out the work function when identifying the
-culprit. I'd be happy to take the patch.
-
-Thanks.
+We can (and should) have it in a longer term. Currently none of
+wcm39xx chips have a powerseq implementation.
 
 -- 
-tejun
+With best wishes
+Dmitry
