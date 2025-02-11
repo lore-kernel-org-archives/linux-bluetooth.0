@@ -1,103 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251B328F5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Feb 2025 00:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183991B3934
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Feb 2025 04:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739233451; cv=none; b=HuSg9Ak5SSh3vgEzCI7lTSGIcQsURnaIqsMoHmUYtoVu7txEEDJ9LI1zxeQALMmmmFZJJF/Vv59735eONaB9GzvuvVBh3PE80Lpa53TbQEQbCh8fJWWBOEHpvQcgEWbGCLEH6DvHTRUs5v45JzHBrBMgxDo18Pwey+ye1/UY/ec=
+	t=1739247803; cv=none; b=f2LMb0w8ti5AI+bvG562RDyniXK1UwUMCNvjOk8vBci+q1c4elUkB4DLjfwz52S1XjRT/BzO3IQDO/d+iLSPKAjUbHP1adRSOuayCxBP5h8exdMG/UWm+RKGWp/Pjrkj36N93ANTYEJpWzfb98qhugvl02OA0ktqPaKP/pIsBKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739233451; c=relaxed/simple;
-	bh=3ABs4tCkh1lyS3kC0u2slUZ0+lE8bBKAc0BczovVF7I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=C/D5q+SmySUoBmhUJ2yiXiWGeSSU5ij8gVgglnFHxyR2oUrcQY8Svy1Bfqf04kPUbclGoXpzzoh0oJ2z7P25jyEubZqf2ampouFLP6kTcgz0uaSnjXPwX/sq6mkBouZURm4ay7TsSVHyd6kiCSHrh1oAIZvH3qG8zs+GpTc8LJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JKdrqVMI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739247803; c=relaxed/simple;
+	bh=R0t/C1XKlZv20LTZa+7WfqHAu50Wp/qHlyPWRmFj1rg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bZxBKHKVQm7JsFGek/N4OeYM78M0aBuHJl8sulL9EpFGsgke8cmaqZE+4myZqW5KaDXYWC//iji/aEffPTmkJtb8kT267rr8Hw7oLNHY8dRuJA3u9zilM00VIluxH9I4Tzvh8vCnH7Xja/itJtxsrH1hz0/TYL/kVD8TJndhY5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZnfzKnst; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JKdrqVMI"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AB2BC4CEE9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Feb 2025 00:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739233449;
-	bh=3ABs4tCkh1lyS3kC0u2slUZ0+lE8bBKAc0BczovVF7I=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=JKdrqVMI7pSb2RYJGyeaJlCZ6wZ3jH/Kwu/WU7Iy2r4oFSEgpByNrfxBfraflpstz
-	 Rvt43VdmuaAgXtOJXaqS0sdSmFquFqblMy2i6OC3l7SiYOtozW2CLBL4e+NmXLbrSO
-	 vPIpsLpysZjGpLQRHpO7lUp0NI39sVk0mxFH8G2+sWCUQG9jC/pRGAXUR5mcIV9a7l
-	 GWWXnLApjYyVDWx/aakmgc8lb33XxklInuAy6kbQnGNGCqbix87LLNkDrSr23BNCZB
-	 CyAZAZRPg2aJyXK/0DcodbJOGr3k2QW9t3Y+13IjkkOzEv8w7jbxcmxMclH4kQh1+j
-	 qosfULFJHt2oQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 82946C41606; Tue, 11 Feb 2025 00:24:09 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 217023] [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
-Date: Tue, 11 Feb 2025 00:24:09 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: alexknoptech@protonmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217023-62941-JrrS2ibkBP@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217023-62941@https.bugzilla.kernel.org/>
-References: <bug-217023-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZnfzKnst"
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6f9b1bc594dso30247117b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Feb 2025 20:23:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739247801; x=1739852601; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l72HB9rJKeYDJipFoW423nUmM/ApGr/EuReUdhuYps8=;
+        b=ZnfzKnstmcW8Z3UuRjRSU+Pjv/cdOqG3KOUcaw1LK7g4IGHKx+YzJURGxwS90NCxOJ
+         Y2vzAbXYrn+LfMgzs7TAKF2Yr6ycH0dTaVOWJUuX9eYLkk6KjRP5aH5FiklMRyYohTaf
+         2+NMAAKNQjtMw2WZ56UGp3RUCGFv5RjnqXCDzy0bbXkQhC5oiMu9nZ3QP/I/Z5Xihkyf
+         JNyC5i8QxmkzNImnm2OFUEaX+kCGix1W920Ga/pEcygiLdknMjLc3bFvt5QqUVWWFB1v
+         cx9axX1gIcR2SwwRD8LPi05SIe/AtyOqfNn1HxTc4MDeGbpbm3SeZnG2J+CHLPrzD0wf
+         b7XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739247801; x=1739852601;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l72HB9rJKeYDJipFoW423nUmM/ApGr/EuReUdhuYps8=;
+        b=bBZGikzeZaIeYN5dO1v21w8xiVhpCcEImzIJfki8Dhubml7PZnMtfXaZeUNcNCvNhT
+         HcYnR41EF4Ku+mMDMkSRe0N9FPqjj7S1mtc7aFHHSkwF68kXbeFsEnfNAWIx5GVTcwqM
+         R1BufmT404f/NLfkjgvUqSqkqqngOxwRuK7UD7euMccHal3XwbSzMKjTLSa5zrY2pINq
+         5FULKld6zzvRtNyGUXmL+goUUdr9Pj9WztqPY4X21uzrTBPRHGFCWsJsvLQDnDbNN+TJ
+         QRgGjUhbvAVgYIZmycdQZqjxtwMJoJkjnNiQq2ulnm5nCJv6tGsEcHZvDLGhklwusY/x
+         HRDg==
+X-Gm-Message-State: AOJu0YwFrJ1P1BJVODJABVK5bOFL+qg4O5GUyyLUFOUvQb9JuFNLdTO6
+	DDxbkmU4q5Yfdbqzr0if2iaZ4+sTjx2QCXsbRTfH+sKKn8wr6DNuVJUd8oJoEMzGwcOZ5fryIjr
+	RysrD2Wgki876MmFobGehIKWLx6FHhn2OzUW+
+X-Gm-Gg: ASbGnctzFjNBigIQ424HV0oLqBlJ/VotKCabNGSH9w1ojbi3blLLIo9545L8PrTFIfL
+	cA5yZtd73fCy6bg37o8y9n+hd+uM++K3hSk/fLZslouC1oOeuDVuGnjSQWCXQnx94PlCIlLZQlw
+	==
+X-Google-Smtp-Source: AGHT+IEaHSJgcTwNMe8gtMuNNKBGW5+JvqlPIxfElKzdLCmXoQQG9xeg40ledl/Pm2YjwEfekIy/qPMn28eoO8+uYLE=
+X-Received: by 2002:a05:690c:4513:b0:6ef:7fc0:a378 with SMTP id
+ 00721157ae682-6f9b2873da5mr146546727b3.9.1739247800730; Mon, 10 Feb 2025
+ 20:23:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250210183224.v3.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <20250210103244.646150-1-chharry@google.com> <CABBYNZJ1LbN_3H1pJsZ6mH1nY7ijb9nbuPSJJwqyvJnC0=U6PQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJ1LbN_3H1pJsZ6mH1nY7ijb9nbuPSJJwqyvJnC0=U6PQ@mail.gmail.com>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Tue, 11 Feb 2025 12:22:53 +0800
+X-Gm-Features: AWEUYZlMsFS0a8TBCzZxdEjcC3RUJx4_kVp2AhxUPsPyauDsGgauUhDUrF1occM
+Message-ID: <CADg1FFe1DeDFmudxWZp3_thvTnm1N=ZOjXts0sJ7mxaUsFxE5Q@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] Bluetooth: Add ABI doc for sysfs isoc_alt
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org, 
+	Ying Hsu <yinghsu@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
+Hi Luiz,
 
---- Comment #13 from alexknoptech@protonmail.com ---
-Seeing this fixed as of kernel 6.12.11
+Thanks for the feedback.
 
+On Tue, Feb 11, 2025 at 2:17=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Hsin-chen,
+>
+> On Mon, Feb 10, 2025 at 5:32=E2=80=AFAM Hsin-chen Chuang <chharry@google.=
+com> wrote:
+> >
+> > From: Hsin-chen Chuang <chharry@chromium.org>
+> >
+> > The functionality was completed in commit 5e5c3898ef49 ("Bluetooth: Fix
+> > possible race with userspace of sysfs isoc_alt")
+> >
+> > Fixes: 5e5c3898ef49 ("Bluetooth: Fix possible race with userspace of sy=
+sfs isoc_alt")
+> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > ---
+> >
+> > (no changes since v1)
+> >
+> >  Documentation/ABI/stable/sysfs-class-bluetooth | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> >
+> > diff --git a/Documentation/ABI/stable/sysfs-class-bluetooth b/Documenta=
+tion/ABI/stable/sysfs-class-bluetooth
+> > index 36be02471174..1168e0318e35 100644
+> > --- a/Documentation/ABI/stable/sysfs-class-bluetooth
+> > +++ b/Documentation/ABI/stable/sysfs-class-bluetooth
+> > @@ -7,3 +7,15 @@ Description:   This write-only attribute allows users =
+to trigger the vendor reset
+> >                 The reset may or may not be done through the device tra=
+nsport
+> >                 (e.g., UART/USB), and can also be done through an out-o=
+f-band
+> >                 approach such as GPIO.
+> > +
+> > +What:          /sys/class/bluetooth/hci<index>/isoc_alt
+> > +Date:          10-Feb-2025
+> > +KernelVersion: 6.13
+> > +Contact:       linux-bluetooth@vger.kernel.org
+> > +Description:   This attribute allows users to configure the USB Altern=
+ate setting
+> > +               for the specific HCI device. Reading this attribute ret=
+urns the
+> > +               current setting, and writing any supported numbers woul=
+d change
+> > +               the setting. See the USB Alternate setting definition i=
+n Bluetooth
+> > +               core spec 5, vol 4, part B, table 2.1.
+> > +               If the data is not a valid number, the write fails with=
+ -EINVAL.
+> > +               The other failures are vendor specific.
+>
+> Still not really convinced this is the right way to expose it, it is
+> not an HCI attribute to begin with, not sure if we couldn't perhaps
 
-[   11.349625] Bluetooth: hci0: Device revision is 0
-[   11.349629] Bluetooth: hci0: Secure boot is enabled
-[   11.349631] Bluetooth: hci0: OTP lock is enabled
-[   11.349633] Bluetooth: hci0: API lock is enabled
-[   11.349634] Bluetooth: hci0: Debug lock is disabled
-[   11.349635] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-[   11.349637] Bluetooth: hci0: Bootloader timestamp 2019.40 buildtype 1 bu=
-ild
-38
-[   11.349703] Bluetooth: hci0: DSM reset method type: 0x00
-[   11.395507] Bluetooth: hci0: Found device firmware: intel/ibt-0040-0041.=
-sfi
-[   11.395532] Bluetooth: hci0: Boot Address: 0x100800
-[   11.395535] Bluetooth: hci0: Firmware Version: 91-33.24
-[   12.733845] Bluetooth: hci0: Waiting for firmware download to complete
-[   12.733847] Bluetooth: hci0: Firmware loaded in 1306968 usecs
-[   12.733908] Bluetooth: hci0: Waiting for device to boot
-[   12.749759] Bluetooth: hci0: Device booted in 15525 usecs
->>>Typically seen here<<<<
-[   12.759485] Bluetooth: hci0: Found Intel DDC parameters:
-intel/ibt-0040-0041.ddc
-[   12.761879] Bluetooth: hci0: Applying Intel DDC parameters completed
-[   12.764880] Bluetooth: hci0: Firmware timestamp 2024.33 buildtype 1 build
-81755
-[   12.764882] Bluetooth: hci0: Firmware SHA1: 0xd028ffe4
-[   12.768860] Bluetooth: hci0: Fseq status: Success (0x00)
-[   12.768862] Bluetooth: hci0: Fseq executed: 00.00.02.41
-[   12.768863] Bluetooth: hci0: Fseq BT Top: 00.00.02.41
+Could you tell more about why this is not an HCI attr to begin with?
+The alt setting is bonded to the USB device which is now under btusb's
+control, and btusb creates a sysfs node for this. This attr location
+decision seems natural to me.
+
+> add another node to control it or add via USB device?
+
+I feel allowing this in the USB sysfs API might be an overkill as that
+makes all USB devices' alt settings be controllable from the user
+space. Limiting this usage in the scope of BT makes more sense to me.
+
+>
+> --
+> Luiz Augusto von Dentz
 
 --=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Best Regards,
+Hsin-chen
