@@ -1,279 +1,310 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A0E25D52C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 17:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739382891; cv=none; b=JwDYUtPBTPlBsTah2nSue3KmZ121PI6GYHmIgYl40pwsynUoPfbC+SRsyDbRHSyRxmWxF3hVXKWbsgBLDGLaE3byiAquizwjNBcVgwTSpZyhpLXeLX7jAZkG3jhbvlrvZPiXj6yGY8oxXr9gEKl1b7r5EwUlZrL1NHYh5QfRer0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739382891; c=relaxed/simple;
-	bh=c9/7xde9jhjClU1ixWMvVApijX63T2TnaygOadv+8to=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AVdjhmV7V1npcZE4oEXiUQezlV/AEyUotjB/ERWkT1AZ/qQGNZJIriV+TgWgtZApOFalmHLey8fur+Bm8yZeMN7J3jBp6Px1oIiEEIn3W4IymfUSQoaDI/MhNkcDJNc8thSNCKRspMKHeb1fn2hHWq1R1siZXxoTwbWWiMw/haU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jCYKpLpl; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C12D25C6F1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 17:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739383133; cv=pass; b=k+fcnl18SNc38cAApCJuBXSldVnJzjYqPAAHLXtkYKRdGcUieB8b8meU/BRqax9JEY2zcwyBAccUJE8u2hxGw6bDmJS1xZSMyhJaa5xXQbqG4bZ9vbg9Lekqx8yZsAQvWZCOQ8QRPGv0rX95k5Rr821omAXYWf9N7RwdLEsogx8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739383133; c=relaxed/simple;
+	bh=P+vX2P8lPJdnNF9chZAbE7BbVeTgr9H4HyMe6lq/7Yw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ClNfsTpps/Yk9tn8N530RjC5MjOS2gLX/YYX4Anex/LOr/0+VPGbxP9HLmlg6OyIPi1iCHJa+b8oD8MH+1BtgOV/u7R/Vn9Defoj6+C9kk3dl/1dcl3XjVY4iCTZLBA8jmWufWmaoxomkkDmyGvMV9fvX5eUWsaLilXLXajPefg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=JOQxCTV1; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCYKpLpl"
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5deb956aa5eso834442a12.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 09:54:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739382888; x=1739987688; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bq+Ec8GvVS0HatXkMf7Y28pt8Vi5KFMnK3HW4hVGP/c=;
-        b=jCYKpLplXIpIQIs+knx5Umfj/gOgc7mTbdql1E/Ut3Z0/ALMRFUyrvscPZ2G8ljnCZ
-         /9LTcCZT9Lk0v8OlPBLPykHb+6HOY67pvNbR5xbvnvpBloJjCj0Ii93ZMRz+GvHlOT59
-         aXgc96Qnd0vICr0oZ6zn/0ZOgrXdIc2i3c5gv5q3CJgSCcPizzGYkDAiXPIt272v6aqv
-         +VwZJ7LgM9TWjilvD+WlXutS7Uj43V7ucx977JvsCfVPuBW1nTgrCf0fB9eC1DgIhOrA
-         m4qM3gLkJrDhPcsAJPt2Mp0FnUJrHX02BM2QYLJsYLIL4RcMVzo4471HML0OWO/4ioqO
-         P4dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739382888; x=1739987688;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bq+Ec8GvVS0HatXkMf7Y28pt8Vi5KFMnK3HW4hVGP/c=;
-        b=FxioV7IBmZKLH7gb1v4+0QAh4Yuk1HuSyFG6S+wBJY4Ejlct3X8fukclZU65OBpbH8
-         zRuiBcg585sITPlsDJUR9MGHXVuujLb+14c1yIi1Coz0swbtjaZ8ULoLYY/fYj/qopT3
-         oG0srnJfqmrzdSdA+v2qJjXyR4fx59TlPAahgm55w78SYnzN2o1oGrJrsJZ3D4dugnBD
-         wrHOejGe8B0KzLdiDkkes1Mac6x7TAsElD5yC7BldboXksmqeTzP29Vak9IYOsCnoKhD
-         /lm0S5eG8sJ4hvXcxflYNkLMZ7k7elO66X7XbYUGH88krIAlHVniAMEiM3upeqV79MYA
-         7SAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXe0NUxoUn2zes0fxUQfAQS+y1FWbL1u+WN8t3W9DdF2iDrkKinl/qZGGOXuJHvFmdeFNozSsf4uqnOZIg7Bw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyvWDBF2+GfcoT/rX/DGb8KP3GSP50O/pn0ObzVaXs+61FeAlt
-	z5/KRkfYrCC64YUt9mbVaHQQZPva358MDW7FZ/0gWqAiT6CgNB8+
-X-Gm-Gg: ASbGncuhAalZEpeq6jyZt9U7pGtrGg4RNiCE3fWWP1Fd70RIMXzYnl952OD92S6s+VA
-	kEX4v/x//IrZx6Z174Uoco8f0DCsV/VafvCwpsQfriO4XbgOjUZEIHce2aHNJ4bvVdQJFJlJ5uE
-	TC9LN3wdSTi/gENatw7pB6swkTWISvq3zPGjIb5zhf2u1O8NCAJCJR3hsK0st4v8DM5LGgsXiVg
-	PpQPND2djqPadKimvAfi7uMfRHR+8n5KggXAp/wyEGzu3FhIn/2qro4bqOSVkaHvt1zRpPRdYhc
-	Br0UL38UZ4a7aOijo3wruXe4zqJZGY1mRD/r8Nlcn504oF/DJ8zcA8yp7PO/ULbXFl0S2LsGL8w
-	xwrwllJfd4hY=
-X-Google-Smtp-Source: AGHT+IFv8/B5HMQQLTOM8A0avq7Qa29lNLfOxP7tcHBFXCQE76yL4PCjyBklLgqW9XfosyZ3h89y1w==
-X-Received: by 2002:a05:6402:2353:b0:5dc:71f6:9725 with SMTP id 4fb4d7f45d1cf-5dec9faa37emr143792a12.27.1739382888005;
-        Wed, 12 Feb 2025 09:54:48 -0800 (PST)
-Received: from localhost.localdomain (46.205.193.135.nat.ftth.dynamic.t-mobile.pl. [46.205.193.135])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7f779d9aesm156314566b.63.2025.02.12.09.54.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 09:54:47 -0800 (PST)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: luiz.dentz@gmail.com
-Cc: arkadiusz.bokowy@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	pmenzel@molgen.mpg.de
-Subject: [PATCH BlueZ v2] btdev: Broadcast EXT_ADV packets every 200 ms
-Date: Wed, 12 Feb 2025 18:54:27 +0100
-Message-Id: <20250212175427.131356-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <CABBYNZ+SYtZ48Rc5mife8bLV12ri4EvqL7QDJLnxuSNBmV46rg@mail.gmail.com>
-References: <CABBYNZ+SYtZ48Rc5mife8bLV12ri4EvqL7QDJLnxuSNBmV46rg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="JOQxCTV1"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YtQzP4ywqz49PsT;
+	Wed, 12 Feb 2025 19:58:41 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1739383122;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Fj4F6rNdyM/SDo1ggxnNtIWAr2K2zVNgQ0Ras0J+Yq4=;
+	b=JOQxCTV1P4Iej8jN7ZNSIqVI4Q4jZBROXL0UJ5QKAJ01g1KkmDrkfmReCDpQooqqj8UUb3
+	X44NxAtSdPc8f7nQK1giiTpp7GXXF3GCg0iRLfTZ/lhQ9DhWbuielKZbr1ZnCQFlFpjY5D
+	GDXMAkVpxTDAiLEwc+RcxBLMYYh5knVVup5r24ef41Yd1imrM9E4KEr9eB1Rkg8GXd/qYm
+	msMiIyXA/uTaIHv5r1CJa5vGQbf6hjrSoKLS/WTm8LeXq4QYbVWmxEiH/aSfb32LKIibMP
+	/XEQZP0frKOT+UtyfgP0rVuTfZUCdDAQNEQcWrqwK77WkBkAOSBknKzbOG2ZMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1739383122;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Fj4F6rNdyM/SDo1ggxnNtIWAr2K2zVNgQ0Ras0J+Yq4=;
+	b=L5+AxnTKvEdWUyIS4lPzGMv5qWR7m6gZHNV2xhUZfyqvQLm7h1uFf8PrvpLm9k0Qya6cct
+	X1sGQt2rVmTd7sB3a5vG4UVieR7pCIH5YDw47vUNZz2ZqKvAnvbk2M+x/xtSb6T1UxtCSl
+	flNfvw74muPy2X4lR7b41Ptu1OenbCGy6Wcz2dClF9R3CQXAtPLS5a3v8H1kMoPOrBChYI
+	sYk5m8In6XPtdwBdfgnl67M1HrMXlx0xsRA0Zo6dyJ6NR092lwWssGwWtAQyRelZjTPp1V
+	3FJ+R/7JF/uQUfpmiRb3x8yrfs9sltAa9QsrYN/2NrLti3fm2dk1WQAPvBAfSg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739383122; a=rsa-sha256;
+	cv=none;
+	b=LWtpgsl8dsVuk4tla69+OnjF+RNHOatuTnKFjzSEOKqvvMTSQwPe4jl9DRrXio0/x7AHYk
+	YzyqyMJXYGwZOZjleN9FpPPz51BCJUa3oiNmzyiM+D2qJeX82e37rIvMDJ/oaiE9OOi3ag
+	Io5ItOEH3VVgoy0Hv9IQBBr3AMwuizKKISfn3SXNj3HhmhWyGGjC5zW/Jq/Ao0Lipl24sZ
+	sSOmb+HmUnFWmvsg3imZ9J6EqhiCYP5LnC3wmCA3eOrbjjYVWivw4EIPIjZsgm7SEjkwx8
+	X52hIRKw7aQG7RJg0+/YCbikDMuTMHJlQJZ7JeF6QKp1lSNYofRCmK+PH3y4Hg==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <061979dbf449e194965c284ad02ad5a686bcd58f.camel@iki.fi>
+Subject: Re: [PATCH BlueZ 1/3] shared/io-glib: add watcher to be used with
+ TX timestamping
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 12 Feb 2025 19:58:41 +0200
+In-Reply-To: <CABBYNZ+TVD7a9+OnN5UjsJHOqvurP3rh4LAYr6NuePfpZiq18g@mail.gmail.com>
+References: <cover.1739097949.git.pav@iki.fi>
+	 <3938636ceaafc589f6d12fa6fe50e1c6a1c76bef.1739097949.git.pav@iki.fi>
+	 <CABBYNZJccrs7n4mK1YYF+SyKG46d2mkmcem_Ayg77nm3FtJ93w@mail.gmail.com>
+	 <102f133fbd176f8c4eacc02d837c1ff075648236.camel@iki.fi>
+	 <CABBYNZ+TVD7a9+OnN5UjsJHOqvurP3rh4LAYr6NuePfpZiq18g@mail.gmail.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Real BLE devices transmit LE advertisement report packages in given
-intervals (typically in range between 20 ms and 10.24 s). With current
-kernel module Bluetooth stack implementation it is possible that the
-first LE meta packet just after enabling scanning will be lost. It is
-not an issue for real devices, because more advertisement reports will
-be delivered later (in given interval time).
+Hi,
 
-This patch changes optimistic implementation of sending only one LE
-meta packets just after enabling scanning to sending LE meta packets
-in 200 ms intervals. Such behavior will better emulate real HCI and
-will work around the issue of dropping the very first LE meta packet
-by the kernel.
----
- emulator/btdev.c | 105 ++++++++++++++++++-----------------------------
- 1 file changed, 39 insertions(+), 66 deletions(-)
+ma, 2025-02-10 kello 13:33 -0500, Luiz Augusto von Dentz kirjoitti:
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 60901ba56..fb2f2f41d 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -102,7 +102,8 @@ struct le_ext_adv {
- 	uint8_t adv_data_len;
- 	uint8_t scan_data[252];
- 	uint8_t scan_data_len;
--	unsigned int id;
-+	unsigned int broadcast_id;
-+	unsigned int timeout_id;
- };
- 
- struct le_per_adv {
-@@ -575,8 +576,10 @@ static void le_ext_adv_free(void *data)
- 	/* Remove to queue */
- 	queue_remove(ext_adv->dev->le_ext_adv, ext_adv);
- 
--	if (ext_adv->id)
--		timeout_remove(ext_adv->id);
-+	if (ext_adv->broadcast_id)
-+		timeout_remove(ext_adv->broadcast_id);
-+	if (ext_adv->timeout_id)
-+		timeout_remove(ext_adv->timeout_id);
- 
- 	free(ext_adv);
- }
-@@ -4756,9 +4759,13 @@ static void ext_adv_disable(void *data, void *user_data)
- 	if (handle && ext_adv->handle != handle)
- 		return;
- 
--	if (ext_adv->id) {
--		timeout_remove(ext_adv->id);
--		ext_adv->id = 0;
-+	if (ext_adv->broadcast_id) {
-+		timeout_remove(ext_adv->broadcast_id);
-+		ext_adv->broadcast_id = 0;
-+	}
-+	if (ext_adv->timeout_id) {
-+		timeout_remove(ext_adv->timeout_id);
-+		ext_adv->timeout_id = 0;
- 	}
- 
- 	ext_adv->enable = 0x00;
-@@ -4975,9 +4982,10 @@ static void send_ext_adv(struct btdev *btdev, const struct btdev *remote,
- 					1 + 24 + meta_event.lear.data_len);
- }
- 
--static void le_set_ext_adv_enable_complete(struct btdev *btdev,
--						struct le_ext_adv *ext_adv)
-+static bool ext_adv_broadcast(void *user_data)
- {
-+	struct le_ext_adv *ext_adv = user_data;
-+	struct btdev *btdev = ext_adv->dev;
- 	uint16_t report_type;
- 	int i;
- 
-@@ -5013,7 +5021,10 @@ static void le_set_ext_adv_enable_complete(struct btdev *btdev,
- 							report_type, true);
- 		}
- 	}
-+
-+	return true;
- }
-+
- static void adv_set_terminate(struct btdev *dev, uint8_t status, uint8_t handle,
- 					uint16_t conn_handle, uint8_t num_evts)
- {
-@@ -5032,7 +5043,7 @@ static bool ext_adv_timeout(void *user_data)
- {
- 	struct le_ext_adv *adv = user_data;
- 
--	adv->id = 0;
-+	adv->timeout_id = 0;
- 	adv_set_terminate(adv->dev, BT_HCI_ERR_ADV_TIMEOUT, adv->handle,
- 								0x0000, 0x00);
- 	le_ext_adv_free(adv);
-@@ -5117,32 +5128,32 @@ static int cmd_set_ext_adv_enable(struct btdev *dev, const void *data,
- 
- 		if (!cmd->enable)
- 			ext_adv_disable(ext_adv, NULL);
--		else if (eas->duration)
--			ext_adv->id = timeout_add(eas->duration * 10,
--							ext_adv_timeout,
-+		else {
-+			/* Send the first advertising report right away and
-+			 * start the timer for continuous advertising. */
-+			ext_adv_broadcast(ext_adv);
-+			/* BLE advertising interval shall be between 20 ms
-+			 * and 10.24 s in 0.625 ms steps. Most devices which
-+			 * require fast advertising use an interval between
-+			 * 100 ms and 500 ms.
-+			 */
-+			ext_adv->broadcast_id = timeout_add(200 /* 200 ms */,
-+							ext_adv_broadcast,
- 							ext_adv, NULL);
-+			if (eas->duration) {
-+				unsigned int duration_ms = eas->duration * 10;
-+				ext_adv->timeout_id = timeout_add(duration_ms,
-+								ext_adv_timeout,
-+								ext_adv, NULL);
-+			}
-+		}
-+
- 	}
- 
- exit_complete:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE, &status,
- 							sizeof(status));
- 
--	if (status == BT_HCI_ERR_SUCCESS && cmd->enable) {
--		/* Go through each sets and send adv event to peer device */
--		for (i = 0; i < cmd->num_of_sets; i++) {
--			const struct bt_hci_cmd_ext_adv_set *eas;
--			struct le_ext_adv *ext_adv;
--
--			eas = data + sizeof(*cmd) + (sizeof(*eas) * i);
--
--			ext_adv = queue_find(dev->le_ext_adv,
--						match_ext_adv_handle,
--						UINT_TO_PTR(eas->handle));
--			if (ext_adv)
--				le_set_ext_adv_enable_complete(dev, ext_adv);
--		}
--	}
--
- 	return 0;
- }
- 
-@@ -5492,43 +5503,6 @@ done:
- 	return 0;
- }
- 
--static void scan_ext_adv(struct btdev *dev, struct btdev *remote)
--{
--	const struct queue_entry *entry;
--
--	for (entry = queue_get_entries(remote->le_ext_adv); entry;
--							entry = entry->next) {
--		struct le_ext_adv *ext_adv = entry->data;
--		uint16_t report_type;
--
--		if (!ext_adv->enable)
--			continue;
--
--		if (!ext_adv_match_addr(dev, ext_adv))
--			continue;
--
--		report_type = get_ext_adv_type(ext_adv->type);
--		send_ext_adv(dev, remote, ext_adv, report_type, false);
--
--		if (dev->le_scan_type != 0x01)
--			continue;
--
--		/* if scannable bit is set the send scan response */
--		if (ext_adv->type & 0x02) {
--			if (ext_adv->type == 0x13)
--				report_type = 0x1b;
--			else if (ext_adv->type == 0x12)
--				report_type = 0x1a;
--			else if (!(ext_adv->type & 0x10))
--				report_type &= 0x08;
--			else
--				continue;
--
--			send_ext_adv(dev, remote, ext_adv, report_type, true);
--		}
--	}
--}
--
- static void scan_pa(struct btdev *dev, struct btdev *remote)
- {
- 	struct le_per_adv *per_adv = queue_find(dev->le_per_adv,
-@@ -5557,7 +5531,6 @@ static int cmd_set_ext_scan_enable_complete(struct btdev *dev, const void *data,
- 		if (!btdev_list[i] || btdev_list[i] == dev)
- 			continue;
- 
--		scan_ext_adv(dev, btdev_list[i]);
- 		scan_pa(dev, btdev_list[i]);
- 	}
- 
--- 
-2.39.5
+[clip]
+> > It's not possible to disable wakeups on POLLERR & POLLHUP:
+> >=20
+> > https://man.archlinux.org/man/poll.2.en
+> >=20
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/fs/eventpoll.c?h=3Dv6.13&id=3Dffd294d346d185b70e28b1a28abe367bbfe53c04#n23=
+91
+>=20
+> Ah, so that means POLLERR and POLLHUP are always enabled together?
+
+I think the exact statement is that both POLLERR and POLLHUP are always
+enabled, no way to disable kernel issuing wakeup on either condition.
+
+> > You could use EPOLLET to only wake up once per event -- but bluez would
+> > then still wakeup on the 7.5ms interval. Glib also doesn't use epoll(),
+> > so there's more parts of GSource to reimplement, need to poll from
+> > separate thread etc., so the implementation gets more complex than
+> > here.
+> >=20
+> > To get something better than the timer-polled version, I think you'd
+> > need to add some new flag to kernel for this.
+>=20
+> Yeah, well I guess that would be even harder if we need to a new flag
+> since that would mean we would need to update glib to understand it
+> and then bump the dependency of it, or we would have to reimplement
+> the whole IO handling to use the non-glib version, the glib way will
+> most likely make releases adding a hard dependency for distros and
+> reimplementing the whole IO will probably require a lot of work, that
+> said Id welcome if we could work in that direction otherwise we need
+> another way to track the disconnection of ISO and A2DP streams.
+
+Another alternative here is to go with socket option etc., which we
+tried so that works, but maybe needs buy-in from netdev people.
+
+> > > > +       if (watch->tag)
+> > > > +               cond =3D g_source_query_unix_fd(&watch->source, wat=
+ch->tag);
+> > > > +       else
+> > > > +               cond =3D 0;
+> > > > +
+> > > > +       if (cond =3D=3D G_IO_ERR) {
+> > > > +               int err, ret;
+> > > > +               socklen_t len =3D sizeof(err);
+> > > > +
+> > > > +               ret =3D getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, =
+&len);
+> > > > +               if (ret =3D=3D 0 && err =3D=3D 0) {
+> > > > +                       g_source_remove_unix_fd(&watch->source, wat=
+ch->tag);
+> > > > +                       watch->tag =3D NULL;
+> > > > +
+> > > > +                       /* io_err watches all wake up at the same t=
+ime */
+> > > > +                       if (!io_err_watch_wakeup)
+> > > > +                               io_err_watch_wakeup =3D g_get_monot=
+onic_time()
+> > > > +                                                               + t=
+imeout;
+> > > > +
+> > > > +                       g_source_set_ready_time(&watch->source,
+> > > > +                                                       io_err_watc=
+h_wakeup);
+> > > > +                       return TRUE;
+> > > > +               }
+> > > > +       }
+> > > > +
+> > > > +       if (g_source_get_ready_time(&watch->source) !=3D -1) {
+> > > > +               g_assert(!watch->tag);
+> > > > +               io_err_watch_wakeup =3D 0;
+> > > > +               watch->tag =3D g_source_add_unix_fd(&watch->source,=
+ fd,
+> > > > +                                                       watch->even=
+ts);
+> > > > +               g_source_set_ready_time(&watch->source, -1);
+> > > > +       }
+> > > > +
+> > > > +       cond &=3D watch->events;
+> > > > +
+> > > > +       if (cond)
+> > > > +               return func(watch->io, cond, user_data);
+> > > > +       else
+> > > > +               return TRUE;
+> > > > +}
+> > > > +
+> > > > +static void io_err_watch_finalize(GSource *source)
+> > > > +{
+> > > > +       struct io_err_watch *watch =3D (void *)source;
+> > > > +
+> > > > +       if (watch->tag)
+> > > > +               g_source_remove_unix_fd(&watch->source, watch->tag)=
+;
+> > > > +
+> > > > +       g_io_channel_unref(watch->io);
+> > > > +}
+> > > > +
+> > > > +guint io_glib_add_err_watch_full(GIOChannel *io, gint priority,
+> > > > +                                       GIOCondition events,
+> > > > +                                       GIOFunc func, gpointer user=
+_data,
+> > > > +                                       GDestroyNotify notify)
+> > > > +{
+> > > > +       static GSourceFuncs source_funcs =3D {
+> > > > +               .dispatch =3D io_err_watch_dispatch,
+> > > > +               .finalize =3D io_err_watch_finalize,
+> > > > +       };
+> > > > +       GSourceFunc callback =3D (void *)func;
+> > > > +       struct io_err_watch *watch;
+> > > > +       gint fd;
+> > > > +       guint id;
+> > > > +
+> > > > +       g_return_val_if_fail(!(events & (G_IO_IN | G_IO_OUT)), 0);
+> > > > +       g_return_val_if_fail(events, 0);
+> > > > +       g_return_val_if_fail(func, 0);
+> > > > +
+> > > > +       fd =3D g_io_channel_unix_get_fd(io);
+> > > > +
+> > > > +       watch =3D (void *)g_source_new(&source_funcs,
+> > > > +                                       sizeof(struct io_err_watch)=
+);
+> > > > +
+> > > > +       watch->io =3D g_io_channel_ref(io);
+> > > > +       watch->events =3D events;
+> > > > +       watch->tag =3D g_source_add_unix_fd(&watch->source, fd, eve=
+nts);
+> > > > +
+> > > > +       g_source_set_name((void *)watch, "io_glib_err_watch");
+> > > > +       g_source_set_callback(&watch->source, callback, user_data, =
+notify);
+> > > > +
+> > > > +       if (priority !=3D G_PRIORITY_DEFAULT)
+> > > > +               g_source_set_priority(&watch->source, priority);
+> > > > +
+> > > > +       id =3D g_source_attach(&watch->source, NULL);
+> > > > +       g_source_unref(&watch->source);
+> > > > +
+> > > > +       return id;
+> > > > +}
+> > > > +
+> > > > +guint io_glib_add_err_watch(GIOChannel *io, GIOCondition events, G=
+IOFunc func,
+> > > > +                                                       gpointer us=
+er_data)
+> > > > +{
+> > > > +       return io_glib_add_err_watch_full(io, G_PRIORITY_DEFAULT, e=
+vents,
+> > > > +                                                       func, user_=
+data, NULL);
+> > > > +}
+> > > > diff --git a/src/shared/io-glib.h b/src/shared/io-glib.h
+> > > > new file mode 100644
+> > > > index 000000000..1db6fd468
+> > > > --- /dev/null
+> > > > +++ b/src/shared/io-glib.h
+> > > > @@ -0,0 +1,20 @@
+> > > > +/* SPDX-License-Identifier: LGPL-2.1-or-later */
+> > > > +/*
+> > > > + *
+> > > > + *  BlueZ - Bluetooth protocol stack for Linux
+> > > > + *
+> > > > + *  Copyright (C) 2012-2014  Intel Corporation. All rights reserve=
+d.
+> > > > + *
+> > > > + *
+> > > > + */
+> > > > +
+> > > > +#include <glib.h>
+> > > > +
+> > > > +guint io_glib_add_err_watch(GIOChannel *io, GIOCondition events,
+> > > > +                               GIOFunc func, gpointer user_data);
+> > > > +guint io_glib_add_err_watch_full(GIOChannel *io, gint priority,
+> > > > +                               GIOCondition events, GIOFunc func,
+> > > > +                               gpointer user_data,
+> > > > +                               GDestroyNotify notify);
+> > > > +
+> > >=20
+> > > Hmm, I think it is probably not a good idea to start using headers
+> > > like this, I'd consider just making it return 0 for non-glib.
+> >=20
+> > Ok.
+> >=20
+> > > > +bool io_set_use_err_watch(struct io *io, bool err_watch);
+> > > > --
+> > > > 2.48.1
+> >=20
+> > --
+> > Pauli Virtanen
+>=20
+>=20
+>=20
 
