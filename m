@@ -1,238 +1,116 @@
 Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77B6211712
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 15:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400A8271814
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 15:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739373840; cv=none; b=Psdwye0iCHGIt2myYd1rXg/dXt+nnsSWMNkrieqidJ9JLKQktIbBTiUxCtXvau6YoK29uSR3DWlhY+uTxzF0mCcAiw+vPaAODrX7oNoAX/4W+7q+oGMWXJyxbLwk+quaz8E1rzE9qcOExVRlS8sZaEwUJIk76sXoa/vDLFOvIq0=
+	t=1739375218; cv=none; b=EEA+j7n9cr8iJXwskSzsvzsaTVbyAQQLM7ZVWYDo2bkO11yofkxXZIjIcTN30NQgreCjrVxLDiqooY/qN9QQtBrhEnvpyHtln7vajZch3hmn/ZVKb1CAYcFwSv1u9Mbdz3fCsUcT5hySHUYhyrVz66m9p9hFg/4KJdEuMJ/bGKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739373840; c=relaxed/simple;
-	bh=DkWm7B5pWGxVonZzwpy19tuK3gxJhVZ+c7kxKV5lFU4=;
+	s=arc-20240116; t=1739375218; c=relaxed/simple;
+	bh=UhKQb+tB0oEd7jrDLThFIQ0BE0DDlNWTZ4GJcllf93U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dEN6crXtmHowgaCIkjC0WfIUVYboZ+p2ejvAKBeTx8aGsp21jVUHThso0vUUaB+PJF0/XxpKeHZM9TlUcZbBFuIp6O2psLgnKXvddDl6J3aHyqo9E3yBoMYhUEGTkTcqrNTlpqr3egma9txtxOFwx7aSHLIMi7AE3GQ2KUFgzA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=arzrMdsh; arc=none smtp.client-ip=209.85.208.173
+	 To:Cc:Content-Type; b=VEGx4eokG58jrmmOgHcGEBxdHgYWSTm5mmLvA9jHI/kCPFMPkdFgXjgzoDbyAQeb3Ra1D/a0xxlLFEaUy+ZgKOuFVl7z3PDxn4JfzJkHZlhfVLCh36/Jn9kNbTnBWO591F1lidMzWDfHXHn2RaOdfhMXNSbSMeyrf7usgpStIVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YEq/8cf+; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arzrMdsh"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-307325f2436so64347981fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 07:23:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YEq/8cf+"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-307d1ab59c6so64626121fa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 07:46:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739373837; x=1739978637; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739375215; x=1739980015; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mlP2slLBqEIYL7sTJwr26Ht5fhDpsz7XrW5f7Kvgpkw=;
-        b=arzrMdsh0/GzCIxytIzt9RWwPgAyxRK+OiOtZL/E+XpvzZx9apLnYysJlpz5ls6zMM
-         NEIY9wxmQf2aeFQHHb4eVADR7RJBPX0A3KGx9uqe85E7cyHSyTSIjfrZs18DLk9QVHTu
-         LDvwoFXSf1BrKOG1aRmWhSpomnBq4PAC2vQdYxcJYCPXGXGegnf9hCyHdPDn7g6yuvgh
-         Ds40hCvEvUlsJeOeK6GsEYdDMWOzESmBxkChuCulRRCEifHc65U6Z/2G2U9A8dlU2s/K
-         T1QTqrmodhOLfm8Q+bwAwuYPHUHkp7ewLiqf6ER5yUge3G/x14e6YFDn+nKA73oHkVWh
-         Kb7w==
+        bh=gcpI2szMjZih0pOkifWyYCN7nM+72u9q8LofhKSnDhk=;
+        b=YEq/8cf+SLPj7iJkiUb+OwXseUj1pw1PrI/x4ofyb97X69GVX+gQGF6iVTQvVI0ByO
+         1AlGW/VwFRz90d7NwiszR/kfEKgZ23IZ18W3eYyoaMMrBKUE1X6omj1OAn0MRjmECbKe
+         4B+1QOvwgl7RKchzpGhACZN13THRUKTBr8OiiLVEePnU/w+aoiaz/G5lFNTxjIl9uHiS
+         MIiAUqTk69V25sqtbSeqtgjSglxFtEZBB6w/Vo6TbDq621Zk7HUqD+M5kzhhxC6FAKhI
+         DeaGoqaGxGHk1dvmEVE9b8Yfy23mG3qLUc3KXjSZcZ8ywvxoC1jyZc4CqzE1k11gMo9g
+         bHWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739373837; x=1739978637;
+        d=1e100.net; s=20230601; t=1739375215; x=1739980015;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mlP2slLBqEIYL7sTJwr26Ht5fhDpsz7XrW5f7Kvgpkw=;
-        b=wss9CVaBaf4K/EWIk0V4TdgvwZ9W7SJnn2muTfqtLmY//ekwfrQGHSB7fBPtgHPXP7
-         EGDHaXoBNI0bRTxQxXRM7MKMBLeN5plnpCKb3sJJ4949UouKs5fdIxJNXNO+u5vN//Fq
-         TrvSbwa/f+D3bisbnhpY3LrOF/awJWLuxNA4NK44/Ldo1MazymkLSPzkDd8jVTr0+d94
-         nV/BpzXGLUy2gzwbwaWL81XemEa17+HFLMbmCPjSl8oAQ3e2Don2acLb2yGazPBEP/8T
-         63ajpGw09ZtvFVmtM9wcnk5Tds3wfFDfczhbVonDnc6SN0WdJiBTNOecW+kNUZnPfnjX
-         3Ufw==
-X-Forwarded-Encrypted: i=1; AJvYcCVYb09UXku95O695aWnCghJGdh1haWbJ5MHHEuaKfVUYpxFdhUk8SRTIvFlDoPjYFjd9FcpXNKb7K36zoCXItc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxpEEZOZo+HE5CaKmNVnyzYCw+Fk2hm9r8Y+QIxWUaadXH1WnK
-	zIPPL3BbXcFPLXa89NIJ7CljTtz3AOzkBgjqxg1ntO29bLkec2kn1edLA0a2kWwUjoIhGjhS3LU
-	D9ljwYKEjFZ54GtbrRWd624A3HN4=
-X-Gm-Gg: ASbGnctG9HYxVMRGQRKgp4wRuSN7cPSPUIPTwJ7hfR5VxFzhylckQmI7wqKF8Tfulz8
-	/lxqN4ewmex1LfvllFHaNqXI/XjmSpTD/SQiXHRvdTKq6/pN10oJoGsEPHupf3caXkkspjGo=
-X-Google-Smtp-Source: AGHT+IFkKiUL2fMxLlKi07FxryhG9n8DcHKlcQ4Lfu7qNNArjM0V9Ls1asIuDU17yDa/AKNKDmjd7MEGDyaYWAjbQlE=
-X-Received: by 2002:a05:651c:b0b:b0:308:eb58:6571 with SMTP id
- 38308e7fff4ca-3090373a8d9mr13543261fa.26.1739373836704; Wed, 12 Feb 2025
- 07:23:56 -0800 (PST)
+        bh=gcpI2szMjZih0pOkifWyYCN7nM+72u9q8LofhKSnDhk=;
+        b=OkRvsyBHM6VaSKPmTrbIyxZuB7RvDokuIg3lG/32JGkmU3HbIm5dwMmzn+Et/Nd86R
+         x6IRsy2TEcVrw8rEWsK8MgS4IhOcMNXAJCKQhogPa+8ikg0uSaizDfG3ny98IfQF6dI7
+         hsmDwxrttK9fEDkYXoiUHKdAR1borSAHaHlQkLIv8fUHfLpPrhJgnUTrKyT6tnsVEHrJ
+         OaLTBAOeu4brNq4v8zZ4RUBOw/uJd22OwIQnC6nnu1n4Y2C1xiACZKJt4XdiOOgvHYWz
+         7cLI150cGARIreAup82/V1xNbfOj/wH0MmzZfNgHw65KnrKFJ/H07winjUaOhdslfO/n
+         hMYw==
+X-Gm-Message-State: AOJu0YwJ6fZoFhLJsvh4PwL48h7JKr0KFyV4WoyMFOubVghhTcw1KqXs
+	ndfuEd5Njua1DhEbNKE7M5JDYxncF5RkEWQnJfqPyX0zE9KRsAW10FE4Q2pvDIeScFn3cO1kuin
+	9OHnaJ/2LUf4l1bZH1P6kIDPMPrfiIdKaXas=
+X-Gm-Gg: ASbGncvPf/7FjU0Waw2uLMMkosMZPW9AyoBDTD37AT+lgLrLhHHicBEuePWUU/NjRiD
+	9tCDgu4LTJ55DgSzJyzLHc/58feMv3AY9E4AZ3ni/4PPS/NdnapnAZuuVn3u2Im1uGvV6Lv8=
+X-Google-Smtp-Source: AGHT+IETZ0TDZNppuRBo3XGH2Irz68ajUcpZ6zstq49vBmhdrp9TlDR5flM1qkyZJ8PvRVU+lkEg6coCL3jO2vP/7Ig=
+X-Received: by 2002:a05:651c:210a:b0:307:9555:dc5e with SMTP id
+ 38308e7fff4ca-3090362f933mr14885681fa.3.1739375215054; Wed, 12 Feb 2025
+ 07:46:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4d3fd31a-7289-44d1-919d-92f1da4355ca@stanley.mountain>
-In-Reply-To: <4d3fd31a-7289-44d1-919d-92f1da4355ca@stanley.mountain>
+References: <20250212135209.129361-1-arkadiusz.bokowy@gmail.com> <20250212135209.129361-2-arkadiusz.bokowy@gmail.com>
+In-Reply-To: <20250212135209.129361-2-arkadiusz.bokowy@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 12 Feb 2025 10:23:43 -0500
-X-Gm-Features: AWEUYZnolSw4t9K_MWHgnVux9qRA6qT7MHuSoJSCzeNuU0PpdAhk-6lNnvwDF-8
-Message-ID: <CABBYNZL5B_fyij4T-Kzm_0ayzFVhWbaOYbzdD4tVz89WtmPfZg@mail.gmail.com>
-Subject: Re: [bug report] Bluetooth: L2CAP: Fix corrupted list in hci_chan_del
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org
+Date: Wed, 12 Feb 2025 10:46:42 -0500
+X-Gm-Features: AWEUYZmfY1qyc1eOSNq5ZLcFHTrtaYqNZAGb7XApZphBXvB8kXZeX3qNorkKjIQ
+Message-ID: <CABBYNZLwMEAQSP8WviAHgDSXmt-vYg4DchotpB=skx84xKv1fQ@mail.gmail.com>
+Subject: Re: [PATCH 2/4] test-runner: Remove the "-nographic" option passed to QEMU
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Dan,
+Hi Arkadiusz,
 
-On Wed, Feb 12, 2025 at 10:19=E2=80=AFAM Dan Carpenter <dan.carpenter@linar=
-o.org> wrote:
+On Wed, Feb 12, 2025 at 8:52=E2=80=AFAM Arkadiusz Bokowy
+<arkadiusz.bokowy@gmail.com> wrote:
 >
-> Hello Luiz Augusto von Dentz,
+> This option causes QEMU to redirect monitor and serial to the terminal,
+> but also it modifies the terminal settings and clears it before printing
+> anything. Such behavior might be annoying because it might clear some
+> warning messages printed before clearing the screen. Since test-runner
+> disables QEMU monitor and redirects serial to stdio in an explicit way,
+> the "-nographic" option can be dropped.
+> ---
+>  tools/test-runner.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> Commit dd6367916d2d ("Bluetooth: L2CAP: Fix corrupted list in
-> hci_chan_del") from Feb 6, 2025 (linux-next), leads to the following
-> Smatch static checker warning:
->
->         net/bluetooth/l2cap_core.c:7555 l2cap_recv_acldata()
->         error: we previously assumed 'conn' could be null (see line 7459)
->
-> net/bluetooth/l2cap_core.c
->     7442 void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *s=
-kb, u16 flags)
->     7443 {
->     7444         struct l2cap_conn *conn;
->     7445         int len;
->     7446
->     7447         /* Lock hdev to access l2cap_data to avoid race with l2c=
-ap_conn_del */
->     7448         hci_dev_lock(hcon->hdev);
->     7449
->     7450         conn =3D hcon->l2cap_data;
->     7451
->     7452         if (!conn)
->     7453                 conn =3D l2cap_conn_add(hcon);
->     7454
->     7455         conn =3D l2cap_conn_hold_unless_zero(conn);
->     7456
->     7457         hci_dev_unlock(hcon->hdev);
->     7458
->     7459         if (!conn)
->     7460                 goto drop;
->
-> Do you want to move drop after the unlock: or do you want to make this
-> a direct return?  Choices, choices...
->
->         if (!conn) {
->                 kfree_skb(skb);
->                 return;
->         }
+> diff --git a/tools/test-runner.c b/tools/test-runner.c
+> index 77c89f3f9..13a5de465 100644
+> --- a/tools/test-runner.c
+> +++ b/tools/test-runner.c
+> @@ -212,7 +212,6 @@ static char *const qemu_argv[] =3D {
+>         "-display", "none",
+>         "-machine", "type=3Dq35,accel=3Dkvm:tcg",
+>         "-m", "256M",
+> -       "-nographic",
+>         "-net", "none",
+>         "-no-reboot",
+>         "-fsdev", "local,id=3Dfsdev-root,path=3D/,readonly,security_model=
+=3Dnone,"
 
-Ouch, yeah it seems like we should be doing this instead of drop, do
-you care to spin a patch for it or shall I do it myself?
+Are you sure this won't require changes to tester.config? It seems you
+have the impression the test-runner kernel image shall be compiled
+with distros .config on top of tester.config, that is not how the
+likes of CI uses it though, usually all you have to do is:
 
->     7461
->     7462         BT_DBG("conn %p len %u flags 0x%x", conn, skb->len, flag=
-s);
->     7463
->     7464         mutex_lock(&conn->lock);
->     7465
->     7466         switch (flags) {
->     7467         case ACL_START:
->     7468         case ACL_START_NO_FLUSH:
->     7469         case ACL_COMPLETE:
->     7470                 if (conn->rx_skb) {
->     7471                         BT_ERR("Unexpected start frame (len %d)"=
-, skb->len);
->     7472                         l2cap_recv_reset(conn);
->     7473                         l2cap_conn_unreliable(conn, ECOMM);
->     7474                 }
->     7475
->     7476                 /* Start fragment may not contain the L2CAP leng=
-th so just
->     7477                  * copy the initial byte when that happens and u=
-se conn->mtu as
->     7478                  * expected length.
->     7479                  */
->     7480                 if (skb->len < L2CAP_LEN_SIZE) {
->     7481                         l2cap_recv_frag(conn, skb, conn->mtu);
->     7482                         break;
->     7483                 }
->     7484
->     7485                 len =3D get_unaligned_le16(skb->data) + L2CAP_HD=
-R_SIZE;
->     7486
->     7487                 if (len =3D=3D skb->len) {
->     7488                         /* Complete frame received */
->     7489                         l2cap_recv_frame(conn, skb);
->     7490                         goto unlock;
->     7491                 }
->     7492
->     7493                 BT_DBG("Start: total len %d, frag len %u", len, =
-skb->len);
->     7494
->     7495                 if (skb->len > len) {
->     7496                         BT_ERR("Frame is too long (len %u, expec=
-ted len %d)",
->     7497                                skb->len, len);
->     7498                         l2cap_conn_unreliable(conn, ECOMM);
->     7499                         goto drop;
->     7500                 }
->     7501
->     7502                 /* Append fragment into frame (with header) */
->     7503                 if (l2cap_recv_frag(conn, skb, len) < 0)
->     7504                         goto drop;
->     7505
->     7506                 break;
->     7507
->     7508         case ACL_CONT:
->     7509                 BT_DBG("Cont: frag len %u (expecting %u)", skb->=
-len, conn->rx_len);
->     7510
->     7511                 if (!conn->rx_skb) {
->     7512                         BT_ERR("Unexpected continuation frame (l=
-en %d)", skb->len);
->     7513                         l2cap_conn_unreliable(conn, ECOMM);
->     7514                         goto drop;
->     7515                 }
->     7516
->     7517                 /* Complete the L2CAP length if it has not been =
-read */
->     7518                 if (conn->rx_skb->len < L2CAP_LEN_SIZE) {
->     7519                         if (l2cap_recv_len(conn, skb) < 0) {
->     7520                                 l2cap_conn_unreliable(conn, ECOM=
-M);
->     7521                                 goto drop;
->     7522                         }
->     7523
->     7524                         /* Header still could not be read just c=
-ontinue */
->     7525                         if (conn->rx_skb->len < L2CAP_LEN_SIZE)
->     7526                                 break;
->     7527                 }
->     7528
->     7529                 if (skb->len > conn->rx_len) {
->     7530                         BT_ERR("Fragment is too long (len %u, ex=
-pected %u)",
->     7531                                skb->len, conn->rx_len);
->     7532                         l2cap_recv_reset(conn);
->     7533                         l2cap_conn_unreliable(conn, ECOMM);
->     7534                         goto drop;
->     7535                 }
->     7536
->     7537                 /* Append fragment into frame (with header) */
->     7538                 l2cap_recv_frag(conn, skb, skb->len);
->     7539
->     7540                 if (!conn->rx_len) {
->     7541                         /* Complete frame received. l2cap_recv_f=
-rame
->     7542                          * takes ownership of the skb so set the=
- global
->     7543                          * rx_skb pointer to NULL first.
->     7544                          */
->     7545                         struct sk_buff *rx_skb =3D conn->rx_skb;
->     7546                         conn->rx_skb =3D NULL;
->     7547                         l2cap_recv_frame(conn, rx_skb);
->     7548                 }
->     7549                 break;
->     7550         }
->     7551
->     7552 drop:
->     7553         kfree_skb(skb);
->     7554 unlock:
-> --> 7555         mutex_unlock(&conn->lock);
->     7556         l2cap_conn_put(conn);
->     7557 }
+https://github.com/bluez/bluez/blob/master/doc/test-runner.rst#kernel
+
+So we need to confirm removing -nographic doesn't end up breaking when
+build with only tester.config
+
+> --
+> 2.43.0
 >
-> regards,
-> dan carpenter
 >
 
 
