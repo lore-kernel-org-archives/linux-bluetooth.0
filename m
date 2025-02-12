@@ -1,119 +1,209 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E982557C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 13:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87C120DD7F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 15:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739368379; cv=none; b=g5qrDC96zetN3QQsJMUjCChJcBXCcYoQ0WPAjSgvTsk+nnla/DsTO/E7UhwRZusMyoNaQhEz7avaZWRwzdYGmsMJhGeG2ULcAPiDiLJ1lWNZLf7aNW/Wx47ibBkjboO8Asn3NjD0Liv21oAg5rMhpN9lp2UL53+H1FNO4SWNiiA=
+	t=1739373555; cv=none; b=a9rAQk1UEdgxVVh9xY1CVA0pFEnmk49yjefNdh6+o4TaJ1iihq3Y+ld1IosdPlomVOFy/Unbipe+WZChOI7Oot+6apCSxk9Djj6Oa212GDZKi8PEd6o5M1ly8miDxi0/lWA07mCUNa4b0sNe1A1Ybd1CxOo/npq06s9d9zDIRaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739368379; c=relaxed/simple;
-	bh=tbIX3S4X5GkceDSqbkwtmfR4ZtWze+U8rGdMFDFSyy0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rLhbnW0jY52ExhYvSMWqdrmLoRSaEyQ0FabLOIeQkJTuXZq0pnit8li3UGp5gJ7erfD9UyUKIbbgclEOUxrJ6MO72tvGi89dhGHSpIsL4Or7IR31y+nSMchchcY49goxAc/TOo23iwOxgPGv+U5Lser4TCi3GkJwnJXfI/TKjnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fKqwb2Fa; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739373555; c=relaxed/simple;
+	bh=9ttZewlov5GiUJNx42xZ/V73kXpJCFTg18wip9eYyVY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=KZx/IknoP7JOfHSQuoRe2m6NTeIp4uSDPYx3vsQr3BAJveAvZxXyZJhZhzx7Q8RtTRHIVTulXx2Cuz+zYjQDVDVWo7wWck4QD6fZ0L+HJfNFqE88tonCDdfsVsbwjaCONpNgRQdtiplJ16k1Q7grJszq2rQYbtW2SQtz67eXdsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jkLbUSd+; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fKqwb2Fa"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5deae16ab51so1521399a12.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 05:52:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jkLbUSd+"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so1291276366b.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 07:19:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739368375; x=1739973175; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JYGo/bEB2uDStepJ0jKx+iF8uJTswY4rtjzzGBu1SMo=;
-        b=fKqwb2Fau2XYqGpc3b43pNAoPZhgTXf/qAYIigcJkdG0ku3J+WLvmJj0Oo2/QYjs/z
-         xW1Ar6x+baezbvWdUMHKRwCTFPZOsa3eUEey+X+2YVLc4amVyOzvlfeIE5L6T+GAuSuT
-         o6w51t/lHcCx6l1GuaTXnDCzv/WtHyLJfVQrO9qVGuu87AVsXxxAhgsrUOcUAZN/Ytce
-         +Afbv1jLzN5zzBhrwV5vQaZKQtMW3P0WMF19P6CzBvce+QoAo0pg916BUBMeE13SGQbE
-         KhTLnQ+4xejZcmzT6lylzilmqigrTS3huQfqXrBCj5fVwm2a83gRPoveXG8SFSbgpyGL
-         y3xA==
+        d=linaro.org; s=google; t=1739373552; x=1739978352; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ScVgMitwZ57Yn8XrG/PxvlECZuTNQICzbbZ2gpuU4Dw=;
+        b=jkLbUSd+vLa2DtSr3Nkd9o8cdgR+gcAlrm4loWAqSEficXwZU3PxvgR62Ns2G7o5oK
+         Xrq+DzMO027hygzWBCS5+FcotnvCHH7AuYw/UZRpM4+yqxvX9+qYbVbq/uHE2r5dQh5Z
+         a+9EPdfebmtbvYV77Yplxnv7b+kIHhValhDXDsNlO17HlmuCbEczYmDoG0TrHIBSuUPZ
+         dF3JYGQLOQrUlofuEnrAxyCLuJ3HKhbSqZ4hOk24iQ0Zt15ugHl+Veor+6APVuDmtDkq
+         u9ZbIkb11D1nU1tkYnhAp5ZvepRid1GnfGLfKfaGfnoKwIh+01fL7IponnsdOOCiKPWN
+         /ZWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739368375; x=1739973175;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JYGo/bEB2uDStepJ0jKx+iF8uJTswY4rtjzzGBu1SMo=;
-        b=WmbfV48HwObZ+ZFFOnOinNGwhhKS4XEXMrmL+cmmRw9CM/7XAniWjCg5KMTcg1z2T5
-         PW/Qqp7efsM/UrdQw9heyJH/SyhCtZo2cbn3hNUMj+fskg/peRzLE1Nnh9SWkqq4IZpc
-         vLXF/SLpo4fdNDomRTqNZb+Xo7YUAMPzngFxWduGpk+J1xI43QnKMcOYegG+bpacnb4a
-         Kh/LmOYefB9NsGjcvt2V+CwGiXhgoD0my/j9/T45VxFQcxMzCjfWsyPodlBz0GwFAa/E
-         lX+gOh1zHnR0OOXu0UDK+jdBRRcELPAIfV2n8hg92xXjL6TnKNNW/c1xJi/mzssFelQ+
-         Gp4Q==
-X-Gm-Message-State: AOJu0Yw026CLw4SU9oSFJhOyEj5/W+e1LOINskyWf8oeW1p7bfna37JU
-	1Fj89Altd0ffu4oum3VVeUqJYHmXEj75sDYzkvPUEbELpxmAJ7ITxP2MKsKI
-X-Gm-Gg: ASbGncvE18FELcVU0eUHNHKM3zS6Lv/c63j5ZWl5ty7YqKL892TJQK6ycxDPzwQ1QfF
-	s6TAhKThIsunRm3lrJCL58Zh1Oj0qdseFHqBpqslIda6uUiTedGARUWfq6/P4kvrySyoER1GiuU
-	KJCWxOC7ZDo0qdCttMQ4JJWT3GbxljewHdiWIQXk7WrMzHqspCz8Y7Hn19p9EXhMOLuS6w//Bot
-	uBWwEINRfndcU18Nz2LReGkvGgcmHpMkH/Aj48b212OpCcOVFij15z6+BUJFj5MATkGdPI+DOGa
-	rDfaI2j2EGXZqTsiRbvkEPeKPE/tayEM73kq7lpW05iKkWMVPjlBWdYX05ksMS6/unWVZgnVHqK
-	Z2K+PWVICHSU=
-X-Google-Smtp-Source: AGHT+IHHkxXTdRMU7hrUc1Kt7J5ZiWqowPgbRE5mS9gMZcsIPH0EF0JXe9XIRuyr2BvFyIhkwCgN6w==
-X-Received: by 2002:a05:6402:51cf:b0:5dc:796f:fc86 with SMTP id 4fb4d7f45d1cf-5deadd9d31cmr8073260a12.16.1739368374450;
-        Wed, 12 Feb 2025 05:52:54 -0800 (PST)
-Received: from localhost.localdomain (46.205.193.135.nat.ftth.dynamic.t-mobile.pl. [46.205.193.135])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab786aa2c60sm1169870166b.102.2025.02.12.05.52.53
+        d=1e100.net; s=20230601; t=1739373552; x=1739978352;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ScVgMitwZ57Yn8XrG/PxvlECZuTNQICzbbZ2gpuU4Dw=;
+        b=E2e39iBDH6jlPJrsOuKqXlW4cVU1ezHo+Ufoz4LrvMtMV895CljZDuWpM/Nz/MD7jA
+         nD2NgmIR2dkyc+lYZYDgog1NrcnHi664u9GnkRYCAZ6IxazbTXto0By+K0TzvEYnHQmm
+         Wia0h0jTTc3l1mJp+7+UrZ/GHdqujCMV5kxxPX1C7kwBZH+Wbu4fH0CevsySOWyFzRXo
+         nAfbp3VLNIrnWAvP6AqkT7TM6BRKbQOpGl6s4/Mb+vO8iJRTX9h1qzk2GvfHI1Qy4Yyp
+         C5JZ1PlGuHfl3BdqSyFAsru7gArGE6Td4Da/Tt1MLsngG37fzWrkMGIDzjFB+Yq/QfBs
+         oDyQ==
+X-Gm-Message-State: AOJu0YzRANyd7vBhYwBb7inUcwVLmT/B7nzjMvEGbxidXsyWi2jSeucZ
+	N3pMKIuH0G4j9J300Jw5BjZdcZymfNm5b76CnIkp72SaUImdl+8Z/HKgER7MChY=
+X-Gm-Gg: ASbGncsGqknBYzZCQ6i55m3c8P0ToPXjuPJjhEGiFJ6Kb79RgevbyM+i1xcrj4KoUxV
+	BXaLU4ft35TX/lJ4f/r/Ak34ZQW+cXxfFYv/Rist2jR4aWsnqT209ywUi6FgWCNJK9SF6nNZxgR
+	l/TQi2k+LB8FMpJhKuhulJriKOxjxRC1vdfnWZRFYFztQNOXN2jsySLEnMJMkEciyTedlST+hit
+	tqke2IFp7BU+5vwDvZ7tQ8Zm5nnXRA/Yd5somGjal+rfw+DQtVVzpALXkDC7BxI81Bx5EypyXgJ
+	KiRwGbUCWv9PUCZiMBYF
+X-Google-Smtp-Source: AGHT+IHy0mscs+M5JMQk6GINFjY1XsmLBr3EExOW0ZXgS/wVmMaV6oMZfxvZoYVRI+eePS/G/NrXjA==
+X-Received: by 2002:a17:906:ee87:b0:ab6:d59b:614d with SMTP id a640c23a62f3a-ab7f33814aemr326572266b.23.1739373551740;
+        Wed, 12 Feb 2025 07:19:11 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ab7c5dd464asm581555866b.185.2025.02.12.07.19.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 05:52:54 -0800 (PST)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH 4/4] test-runner: Use host CPU when starting VM
-Date: Wed, 12 Feb 2025 14:52:09 +0100
-Message-Id: <20250212135209.129361-4-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250212135209.129361-1-arkadiusz.bokowy@gmail.com>
-References: <20250212135209.129361-1-arkadiusz.bokowy@gmail.com>
+        Wed, 12 Feb 2025 07:19:11 -0800 (PST)
+Date: Wed, 12 Feb 2025 18:19:08 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bug report] Bluetooth: L2CAP: Fix corrupted list in hci_chan_del
+Message-ID: <4d3fd31a-7289-44d1-919d-92f1da4355ca@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-When running test-runner on Ubuntu 24.04 with mainline kernel compiled
-from Ubuntu default configuration with applied tester.config options,
-the QEMU is not able to start the test-runner application due to illegal
-instruction. Passing '-cpu host' fixes that issue.
+Hello Luiz Augusto von Dentz,
 
-> $ tools/test-runner -k linux/arch/x86/boot/bzImage -- tools/mgmt-tester
-> Using QEMU binary /usr/bin/qemu-system-x86_64
-> Using kernel image [...]/linux/arch/x86/boot/bzImage
-> Found support for Virtual Machine eXtensions
-> [...]
-> [    0.000000] Linux version 6.14.0-rc2+ (gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0 [...]
-> [...]
-> Running command tools/mgmt-tester
-> New process 74 created
-> Illegal instruction
-> Process 74 exited with status 132
-> [    0.881239] reboot: Restarting system
-> [    0.881431] reboot: machine restart
+Commit dd6367916d2d ("Bluetooth: L2CAP: Fix corrupted list in
+hci_chan_del") from Feb 6, 2025 (linux-next), leads to the following
+Smatch static checker warning:
 
-Potential caveat:
+	net/bluetooth/l2cap_core.c:7555 l2cap_recv_acldata()
+	error: we previously assumed 'conn' could be null (see line 7459)
 
-In case when the KVM is not available on the host, the QEMU will not
-start with the warning:
-CPU model 'host' requires KVM or HVF
----
- tools/test-runner.c | 1 +
- 1 file changed, 1 insertion(+)
+net/bluetooth/l2cap_core.c
+    7442 void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+    7443 {
+    7444         struct l2cap_conn *conn;
+    7445         int len;
+    7446 
+    7447         /* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
+    7448         hci_dev_lock(hcon->hdev);
+    7449 
+    7450         conn = hcon->l2cap_data;
+    7451 
+    7452         if (!conn)
+    7453                 conn = l2cap_conn_add(hcon);
+    7454 
+    7455         conn = l2cap_conn_hold_unless_zero(conn);
+    7456 
+    7457         hci_dev_unlock(hcon->hdev);
+    7458 
+    7459         if (!conn)
+    7460                 goto drop;
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 1fc95d33f..48e114174 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -211,6 +211,7 @@ static char *const qemu_argv[] = {
- 	"-monitor", "none",
- 	"-display", "none",
- 	"-machine", "type=q35,accel=kvm:tcg",
-+	"-cpu", "host",
- 	"-m", "256M",
- 	"-net", "none",
- 	"-no-reboot",
--- 
-2.43.0
+Do you want to move drop after the unlock: or do you want to make this
+a direct return?  Choices, choices...
 
+	if (!conn) {
+		kfree_skb(skb);
+		return;
+	}
+
+    7461 
+    7462         BT_DBG("conn %p len %u flags 0x%x", conn, skb->len, flags);
+    7463 
+    7464         mutex_lock(&conn->lock);
+    7465 
+    7466         switch (flags) {
+    7467         case ACL_START:
+    7468         case ACL_START_NO_FLUSH:
+    7469         case ACL_COMPLETE:
+    7470                 if (conn->rx_skb) {
+    7471                         BT_ERR("Unexpected start frame (len %d)", skb->len);
+    7472                         l2cap_recv_reset(conn);
+    7473                         l2cap_conn_unreliable(conn, ECOMM);
+    7474                 }
+    7475 
+    7476                 /* Start fragment may not contain the L2CAP length so just
+    7477                  * copy the initial byte when that happens and use conn->mtu as
+    7478                  * expected length.
+    7479                  */
+    7480                 if (skb->len < L2CAP_LEN_SIZE) {
+    7481                         l2cap_recv_frag(conn, skb, conn->mtu);
+    7482                         break;
+    7483                 }
+    7484 
+    7485                 len = get_unaligned_le16(skb->data) + L2CAP_HDR_SIZE;
+    7486 
+    7487                 if (len == skb->len) {
+    7488                         /* Complete frame received */
+    7489                         l2cap_recv_frame(conn, skb);
+    7490                         goto unlock;
+    7491                 }
+    7492 
+    7493                 BT_DBG("Start: total len %d, frag len %u", len, skb->len);
+    7494 
+    7495                 if (skb->len > len) {
+    7496                         BT_ERR("Frame is too long (len %u, expected len %d)",
+    7497                                skb->len, len);
+    7498                         l2cap_conn_unreliable(conn, ECOMM);
+    7499                         goto drop;
+    7500                 }
+    7501 
+    7502                 /* Append fragment into frame (with header) */
+    7503                 if (l2cap_recv_frag(conn, skb, len) < 0)
+    7504                         goto drop;
+    7505 
+    7506                 break;
+    7507 
+    7508         case ACL_CONT:
+    7509                 BT_DBG("Cont: frag len %u (expecting %u)", skb->len, conn->rx_len);
+    7510 
+    7511                 if (!conn->rx_skb) {
+    7512                         BT_ERR("Unexpected continuation frame (len %d)", skb->len);
+    7513                         l2cap_conn_unreliable(conn, ECOMM);
+    7514                         goto drop;
+    7515                 }
+    7516 
+    7517                 /* Complete the L2CAP length if it has not been read */
+    7518                 if (conn->rx_skb->len < L2CAP_LEN_SIZE) {
+    7519                         if (l2cap_recv_len(conn, skb) < 0) {
+    7520                                 l2cap_conn_unreliable(conn, ECOMM);
+    7521                                 goto drop;
+    7522                         }
+    7523 
+    7524                         /* Header still could not be read just continue */
+    7525                         if (conn->rx_skb->len < L2CAP_LEN_SIZE)
+    7526                                 break;
+    7527                 }
+    7528 
+    7529                 if (skb->len > conn->rx_len) {
+    7530                         BT_ERR("Fragment is too long (len %u, expected %u)",
+    7531                                skb->len, conn->rx_len);
+    7532                         l2cap_recv_reset(conn);
+    7533                         l2cap_conn_unreliable(conn, ECOMM);
+    7534                         goto drop;
+    7535                 }
+    7536 
+    7537                 /* Append fragment into frame (with header) */
+    7538                 l2cap_recv_frag(conn, skb, skb->len);
+    7539 
+    7540                 if (!conn->rx_len) {
+    7541                         /* Complete frame received. l2cap_recv_frame
+    7542                          * takes ownership of the skb so set the global
+    7543                          * rx_skb pointer to NULL first.
+    7544                          */
+    7545                         struct sk_buff *rx_skb = conn->rx_skb;
+    7546                         conn->rx_skb = NULL;
+    7547                         l2cap_recv_frame(conn, rx_skb);
+    7548                 }
+    7549                 break;
+    7550         }
+    7551 
+    7552 drop:
+    7553         kfree_skb(skb);
+    7554 unlock:
+--> 7555         mutex_unlock(&conn->lock);
+    7556         l2cap_conn_put(conn);
+    7557 }
+
+regards,
+dan carpenter
