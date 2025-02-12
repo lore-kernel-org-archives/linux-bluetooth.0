@@ -1,372 +1,185 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA612AEE3;
-	Wed, 12 Feb 2025 01:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF797271834
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 04:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739324010; cv=none; b=Gf11JNYULntg+ceg1EOs/aDqUOtpxeknrniTviFdrrIrCXTd9uAT/r4GXU+kD9JKmSP6Z6ywgr73QgQIg4m/pl8fHPBA86xR14lv0c/t4ZxKr3D9jtHnLS1nddCxKnUhlmURbk8EqMU7SuP9McFynh5TZs3iWsaBiIJBGX61BJI=
+	t=1739335740; cv=none; b=LIsG/wqISZmC6ZhNTtyndl/vrGuP8T4IRMdwyGFsd49JBvvgLnBtabmrbEa6dacC0b/MSksFYiP7fsLKZa2OxhNT1uk0NDlcybGFMr4MC5OksrEn3Wgkpnyj30vHaQhxlCYKNFygTILf+WVlL8jVU+Hxo3UYuwiGy7dzeATWeB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739324010; c=relaxed/simple;
-	bh=bt+gsvDLxq5yFDAbBIctYDejdXEGvc9ZUACCqOiEUb0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=cUAykrTL+cBfbWz/efN3dst/hsCMuGWgmcOQ5Phb/G5ve/s02ZrvZvP34Kr4X+xyY7jAxaxKPCvLwYozSTXZno2mN8BTi42EBWQp/TV6WoFp63BUdFBaWmm4baHU4g9x6GySmrCLri8Y+92G3537L97n7+4Vpopq4PnGP+Yyvrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HUpwbLP2; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739335740; c=relaxed/simple;
+	bh=K4goNeS5jx9vOeqxSj6nPJuEvuvWZ7J5t9DWFPlyReg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G3Tt70XiGuZwEbb5fYi2vPharN+J2r585LyZl6utrnv/bPBjof+r6DH+pHW1D7FQ21XZcg1pTi7jLFWsK6hj1Lo49qy6c9Fj14HxY+Y/R8bccjAf2XsnwMg7LrtSq95yqxPQ3TqK/fwhSRa4S0w1ByGBg/PVQIVsZ0LbyHDxr34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0lMFWp1T; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUpwbLP2"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4679eacf2c5so62923831cf.0;
-        Tue, 11 Feb 2025 17:33:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0lMFWp1T"
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e461015fbd4so4960733276.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Feb 2025 20:48:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739324007; x=1739928807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1739335736; x=1739940536; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tE3GA90GrW0w6tRwYGDghmrthDfVKU/PTEoSDpTx3LI=;
-        b=HUpwbLP2qnkX4p1ghWkB18gGzSTNSILe3W2dXO9mLRh0r9vKYxHsJIhlcWTnQrII/V
-         tRKWylaTm4l6z5aozdHD/Lizv7hd9JaA7UEqMUEKCfBfeHSLC8HwjfPZcKeKTR6+9rd6
-         Wvvh2BkMUbc1joa32ATaJpqIWKQyBv6rcnIKXkMEbwfNUrASwhSHYB6xI1Nwnd9uBl3f
-         h9XGT2+FqeJf6tJalfSPyVioN8gGRV152SAjyN8O3p0s6IiSbRKJQo8BvkcQtKcpoW+D
-         yxWUjGuvUbUAYX15VSUsGJfJrXSQTnSQUQY1DQuXAGnsRCN+DdUyZowGLQAy09OBF+kx
-         l9HA==
+        bh=+4vbUZUTkpqr3rG0okFJsZLaxVBB5/ZaX+q2Q50aqnk=;
+        b=0lMFWp1TdCwacy3kz8YACkjR08+KWkzayCjpXQiLuW7PpJ2hDYLa50UZQfwraf6moE
+         rnlD7L9haNaWJhbGxgwJNxFfCvVO2TJ1vNboLSwhP+Slca/akeQHgEya9dbPIkdeA3U9
+         A0zB111syKdCiqXtcBQ20FCUkCnrTrudRzgapGoPPD6ktzrhZGAn0rU546xy/BcddT9W
+         mVaVTGQ4UAuPkaUWNO2zRlhp7lbScglv9XjSpg5fYDUHp8lyadvahiGDXhBoksdlZbna
+         eiAY7xqw/Bj25wdHIB/TZZH3sH5E2tQdx8K5jIPRdYJ3fwih749XirhQD9Wtd/mchSqv
+         le0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739324007; x=1739928807;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tE3GA90GrW0w6tRwYGDghmrthDfVKU/PTEoSDpTx3LI=;
-        b=rXQa/QIo1Nl4xhg+DJWYMqrAir2ofAU8wFcvO4vkgtnwUZVX75ocWnl8KUbgy8s2Ii
-         WYVvFtHS307cB0XlwT4i/wFLntcGCGNF0LgW8YUwN8A5yIdBXnv2KCfjIZu1ewHB+YD7
-         P+cLl3+vCTRedxK++fpf9maY3Rv4rVpQHdLdi/uz3kYd2cbmL1IQBUbbYLY2S3Kcgtwi
-         M/Aq97sBu8YQUmaEhYE0LOO7VVFRXjqt8eG1y9Og/CgwhbRD/BhUzmMOjn8QyWq9Ltpb
-         pqqyyEOl5jAbX0BXsSzzqMANwRy4l7L5oaS/8ZKJK43Ucsvp/MGiwAOtsq6IBbIwTXmd
-         2kzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUvzYDijAKkRH/lzRffpvUJDslCzyaNJb8ookDUjs9V/BZWuh0Wcu2XWNCmOHX3WRROEXSEDNnHVrtfCvO6Pac=@vger.kernel.org, AJvYcCW7f9iwmGbxijWJYqG3gjyti32Pk/ewMa3GxuVuXfFKKN1VFC3VDfTaq3dIYonvID3wPYgyOm8y@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1oY3XMnCCXC6Ghbu6cshcoeNJCjjrcBmbjQ/tljDXTOfwqRAI
-	BvUnc847kiRuhVUKGs79aTZV1hnrx2TtX3FpiC0DDVnRmzXWzhZmZTVtpg==
-X-Gm-Gg: ASbGncvOtQ+xeVt73/6MM70cC+2/8TT3nHea4q5KtM8t4hB0jgSRKxByNH/P85YGaIO
-	tfslj4p+fkqQ37dQRmsuB/6psYSYGjlf6A/sTMGvYObdswVJ51PUMxmZ5Cdt6jVa6/PE3Ktk634
-	ZzvoCf5Sjubx6/02/3OlW0sS4JWsZQZCKKNof07Jw8MTZ3zXCaWO4DwJQjFHSq9MB8TOY5k7TAH
-	IADPoqngeO/t9HrLim+MMIbQiX3Vq40fS+ZM48apn4E8yLJ8vpBmdLYUqsCYtzNyD1aIeMRhv9C
-	KzHGfj4qsoyL4HBegVDVaYesrI5t2XbLKZIElQattIfAtNAMYCADqe+q9qHBPXg=
-X-Google-Smtp-Source: AGHT+IG+bfzCvJjk9A6j0ujipKYo1yWj4wSoJmLekPiAvZd8cI3bWU37LxOZOatiXlqXaQ6Do2O2QQ==
-X-Received: by 2002:a05:6214:b6a:b0:6e1:afcf:8748 with SMTP id 6a1803df08f44-6e46eda2de1mr27857346d6.19.1739324007269;
-        Tue, 11 Feb 2025 17:33:27 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e4564086ccsm45498346d6.17.2025.02.11.17.33.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 17:33:26 -0800 (PST)
-Date: Tue, 11 Feb 2025 20:33:25 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Pauli Virtanen <pav@iki.fi>, 
- linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org
-Message-ID: <67abfa65cce76_155892294dc@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CABBYNZJvP6mZoE4L5XME=kDkDTKiFdX=36VXGDAfHyLi7tJKdw@mail.gmail.com>
-References: <cover.1739097311.git.pav@iki.fi>
- <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
- <67a972a6e2704_14761294b0@willemb.c.googlers.com.notmuch>
- <0c86c0db795e1571143539ec7b3ea73d21f521a5.camel@iki.fi>
- <67aa48e647f87_74092294e9@willemb.c.googlers.com.notmuch>
- <CABBYNZJvP6mZoE4L5XME=kDkDTKiFdX=36VXGDAfHyLi7tJKdw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/5] net-timestamp: COMPLETION timestamp on packet tx
- completion
+        d=1e100.net; s=20230601; t=1739335736; x=1739940536;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+4vbUZUTkpqr3rG0okFJsZLaxVBB5/ZaX+q2Q50aqnk=;
+        b=eRm4GheT8npaEUPQWcB+LFYHv/IhbgIMSXftsTpfkbij4jep8kN/HG09atKK9XWM4t
+         pYxHiTnbqE4afTFkQMhFl0smsR+OOslhcZXzz/cXungIl9UWZ7VtlbfBTeVA8JxEPAJ7
+         OQ9JgLDdKpDD24JrFfGrh2r3rGRqUiA0EnSYWzY4PlDwkYqRWwbAOpCnbAk3OpX40A0r
+         WFsEPC/lFS1DFtkSDnN4iAWGqCBHWlPkX+9b0Wa7WFwu8hxG5okS3/DwY9nzj9q9waMx
+         kl40zyGZ0QALVFR7bL0wr+yyCTEd8B/C+NZgXcq3ILroJY7JZrtaITTNoC2+v2rDSwJf
+         Axdw==
+X-Gm-Message-State: AOJu0YxcF5YkZPHSd3/XmqGzzJJGk8oKfU6RDMq+e5WXlmRJJEELYHxM
+	mOQqAAl1wfOpL9tQSd8/Mym4SI0NLZKyHrR8TezjCIfKVctkZu4CDn0mQy6B5mebor6527Mw5ZU
+	uZEmFJhlmqoADiBEz04f67yuLT+WrWTjLZuN0
+X-Gm-Gg: ASbGncvAKwl0jeSz30zG8Xbor+D4zjEynCKL77WoSeDkceDwjpONT1GI+kVnR2VO/rZ
+	fmWKptDdeAGywRw797A0W6X849VHVqvAPUMD3o0x0jVAM/90G7btV73FK4cyqdt8eaDicWGjGvA
+	==
+X-Google-Smtp-Source: AGHT+IE5Xh1/6K2tzqDbm+0FgeX0MVlUKWJGOy0qo7qYqOw3FVUwjaXyDF+x/vvLQfzMSijU6o6iB9CfCXWL7WTL7BE=
+X-Received: by 2002:a05:6902:2d08:b0:e58:173e:abcc with SMTP id
+ 3f1490d57ef6-e5d9f0d2103mr1847516276.8.1739335736473; Tue, 11 Feb 2025
+ 20:48:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+References: <20250210183224.v3.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <20250210103244.646150-1-chharry@google.com> <CABBYNZJ1LbN_3H1pJsZ6mH1nY7ijb9nbuPSJJwqyvJnC0=U6PQ@mail.gmail.com>
+ <CADg1FFe1DeDFmudxWZp3_thvTnm1N=ZOjXts0sJ7mxaUsFxE5Q@mail.gmail.com> <CABBYNZK8-8k5eZ8TZLM-g4KC_wt8VQ+jx_iryS9_xGxHt+u=1g@mail.gmail.com>
+In-Reply-To: <CABBYNZK8-8k5eZ8TZLM-g4KC_wt8VQ+jx_iryS9_xGxHt+u=1g@mail.gmail.com>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Wed, 12 Feb 2025 12:48:29 +0800
+X-Gm-Features: AWEUYZk8ctHJOT5ECfu-lAdE4F3G2Nsn_DGEWQAHoeAfkXDpGisSwXscNHVUMjw
+Message-ID: <CADg1FFcsYSM2SsyYULBzqmML67+4Hx9ipemACOv_oLCrwweiWg@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] Bluetooth: Add ABI doc for sysfs isoc_alt
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org, 
+	Ying Hsu <yinghsu@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Luiz Augusto von Dentz wrote:
-> Hi Willem,
-> =
+Hi Luiz,
 
-> On Mon, Feb 10, 2025 at 1:43=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
+Thanks, that makes sense to me. I'll resolve this comment in the next versi=
+on.
+
+On Wed, Feb 12, 2025 at 6:01=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Hsin-chen,
+>
+> On Mon, Feb 10, 2025 at 11:23=E2=80=AFPM Hsin-chen Chuang <chharry@google=
+.com> wrote:
 > >
-> > Pauli Virtanen wrote:
-> > > Hi,
+> > Hi Luiz,
+> >
+> > Thanks for the feedback.
+> >
+> > On Tue, Feb 11, 2025 at 2:17=E2=80=AFAM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
 > > >
-> > > su, 2025-02-09 kello 22:29 -0500, Willem de Bruijn kirjoitti:
-> > > > Pauli Virtanen wrote:
-> > > > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software t=
-imestamp
-> > > > > when hardware reports a packet completed.
-> > > > >
-> > > > > Completion tstamp is useful for Bluetooth, where hardware tx ti=
-mestamps
-> > > > > cannot be obtained except for ISO packets, and the hardware has=
- a queue
-> > > > > where packets may wait.  In this case the software SND timestam=
-p only
-> > > > > reflects the kernel-side part of the total latency (usually sma=
-ll) and
-> > > > > queue length (usually 0 unless HW buffers congested), whereas t=
-he
-> > > > > completion report time is more informative of the true latency.=
-
-> > > > >
-> > > > > It may also be useful in other cases where HW TX timestamps can=
-not be
-> > > > > obtained and user wants to estimate an upper bound to when the =
-TX
-> > > > > probably happened.
-> > > >
-> > > > Getting the completion timestamp may indeed be useful more broadl=
-y.
-> > > >
-> > > > Alternatively, the HW timestamp is relatively imprecisely defined=
- so
-> > > > you could even just use that. Ideally, a hw timestamp conforms to=
- IEEE
-> > > > 1588v2 PHY: first symbol on the wire IIRC. But in many cases this=
- is
-> > > > not the case. It is not feasible at line rate, or the timestamp i=
-s
-> > > > only taken when the completion is written over PCI, which may be
-> > > > subject to PCI backpressure and happen after transmission on the =
-wire.
-> > > > As a result, the worst case hw tstamp must already be assumed not=
- much
-> > > > earlier than a completion timestamp.
+> > > Hi Hsin-chen,
 > > >
-> > > For BT ISO packets, in theory hw-provided TX timestamps exist, and =
-we
-> > > might want both (with separate flags for enabling them). I don't re=
-ally
-> > > know, last I looked Intel HW didn't support them, and it's not clea=
-r to
-> > > which degree they are useful.
-> >
-> > That's reason enough to separate these measurement types.
-> >
-> > If we don't do it properly now, we won't be able to update drivers
-> > later once users depend on requesting hw timestamps when they mean to=
-
-> > get completion timestamps.
-> >
-> > > > That said, +1 on adding explicit well defined measurement point
-> > > > instead.
+> > > On Mon, Feb 10, 2025 at 5:32=E2=80=AFAM Hsin-chen Chuang <chharry@goo=
+gle.com> wrote:
 > > > >
-> > > > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > > > > ---
-> > > > >  Documentation/networking/timestamping.rst | 9 +++++++++
-> > > > >  include/linux/skbuff.h                    | 6 +++++-
-> > > > >  include/uapi/linux/errqueue.h             | 1 +
-> > > > >  include/uapi/linux/net_tstamp.h           | 6 ++++--
-> > > > >  net/ethtool/common.c                      | 1 +
-> > > > >  net/socket.c                              | 3 +++
-> > > > >  6 files changed, 23 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/Documentation/networking/timestamping.rst b/Docume=
-ntation/networking/timestamping.rst
-> > > > > index 61ef9da10e28..de2afed7a516 100644
-> > > > > --- a/Documentation/networking/timestamping.rst
-> > > > > +++ b/Documentation/networking/timestamping.rst
-> > > > > @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
-> > > > >    cumulative acknowledgment. The mechanism ignores SACK and FA=
-CK.
-> > > > >    This flag can be enabled via both socket options and control=
- messages.
-> > > > >
-> > > > > +SOF_TIMESTAMPING_TX_COMPLETION:
-> > > > > +  Request tx timestamps on packet tx completion.  The completi=
-on
-> > > > > +  timestamp is generated by the kernel when it receives packet=
- a
-> > > > > +  completion report from the hardware. Hardware may report mul=
-tiple
-> > > > > +  packets at once, and completion timestamps reflect the timin=
-g of the
-> > > > > +  report and not actual tx time. The completion timestamps are=
-
-> > > > > +  currently implemented only for: Bluetooth L2CAP and ISO.  Th=
-is
-> > > > > +  flag can be enabled via both socket options and control mess=
-ages.
-> > > > > +
+> > > > From: Hsin-chen Chuang <chharry@chromium.org>
 > > > >
-> > > > Either we should support this uniformly, or it should be possible=
- to
-> > > > query whether a driver supports this.
+> > > > The functionality was completed in commit 5e5c3898ef49 ("Bluetooth:=
+ Fix
+> > > > possible race with userspace of sysfs isoc_alt")
 > > > >
-> > > > Unfortunately all completion callbacks are driver specific.
+> > > > Fixes: 5e5c3898ef49 ("Bluetooth: Fix possible race with userspace o=
+f sysfs isoc_alt")
+> > > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > > > ---
 > > > >
-> > > > But drivers that support hwtstamps will call skb_tstamp_tx with
-> > > > nonzero hwtstamps. We could use that also to compute and queue
-> > > > a completion timestamp if requested. At least for existing NIC
-> > > > drivers.
-> > >
-> > > Ok. If possible, I'd like to avoid changing the behavior of the non=
--
-> > > Bluetooth parts of net/ here, as I'm not familiar with those.
-> > >
-> > > I guess a simpler solution could be that sock_set_timestamping() ch=
-ecks
-> > > the type of the socket, and gives EINVAL if the flag is set for non=
--
-> > > Bluetooth sockets?
-> >
-> > Actually, I'd prefer to have this completion timestamp ability for al=
-l
-> > drivers. And avoid creating subsystem private mechanisms.
-> >
-> > I suppose we can punt on the get_ts_info control API if need be.
-> =
-
-> I guess that it is reasonable if we don't have to do the work for
-> drivers other than Bluetooth otherwise I'd say you are probably asking
-> too much here,
-
-I was mainly agreeing to Pauli's implementation in this series.
-Not asking to do any work irrelevant to BT.
-
-> also doesn't this land on the TSN space if one needs to
-> tightly control timings? I suspect if this sort of change was not
-> necessary for TSN then perhaps it wouldn't be of much value to try to
-> generalize this.
-
-I don't fully follow. But in general SO_TIMESTAMPING is not limited to
-TSN.
-
-> =
-
-> > > One could then postpone having to invent how to check the driver
-> > > support, and user would know non-supported status from setsockopt
-> > > failing.
-> > >
-> > > > >  1.3.2 Timestamp Reporting
-> > > > >  ^^^^^^^^^^^^^^^^^^^^^^^^^
-> > > > > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > > > > index bb2b751d274a..3707c9075ae9 100644
-> > > > > --- a/include/linux/skbuff.h
-> > > > > +++ b/include/linux/skbuff.h
-> > > > > @@ -489,10 +489,14 @@ enum {
-> > > > >
-> > > > >   /* generate software time stamp when entering packet scheduli=
-ng */
-> > > > >   SKBTX_SCHED_TSTAMP =3D 1 << 6,
-> > > > > +
-> > > > > + /* generate software time stamp on packet tx completion */
-> > > > > + SKBTX_COMPLETION_TSTAMP =3D 1 << 7,
-> > > > >  };
-> > > > >
-> > > > >  #define SKBTX_ANY_SW_TSTAMP      (SKBTX_SW_TSTAMP    | \
-> > > > > -                          SKBTX_SCHED_TSTAMP)
-> > > > > +                          SKBTX_SCHED_TSTAMP | \
-> > > > > +                          SKBTX_COMPLETION_TSTAMP)
+> > > > (no changes since v1)
 > > > >
-> > > > These fields are used in the skb_shared_info tx_flags field.
-> > > > Which is a very scarce resource. This takes the last available bi=
-t.
-> > > > That is my only possible concern: the opportunity cost.
-> > >
-> > > If doing it per-protocol sounds ok, it could be put in bt_skb_cb
-> > > instead.
-> > >
-> > > Since the completion timestamp didn't already exist, it maybe means=
-
-> > > it's probably not that important for other parts of net/
-> >
-> > I can see its value especially for hardware that does not support
-> > hardware timestamps, or hw timestamps at line rate.
-> >
-> > This gives a reasonable estimation of transmission time and
-> > measure of device delay.
-> >
-> > It is device specific whether it will be an over- or under-estimation=
-,
-> > depending on whether the completion is queued to the host after or
-> > before the data is written on the wire. But either way, it will
-> > include the delay in processing the tx queue, which on multi-queue
-> > NICs and with TSO may be substantial (even before considering HW
-> > rate limiting).
-> >
-> > > > >  #define SKBTX_ANY_TSTAMP (SKBTX_HW_TSTAMP | \
-> > > > >                            SKBTX_HW_TSTAMP_USE_CYCLES | \
-> > > > >                            SKBTX_ANY_SW_TSTAMP)
-> > > > > diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux=
-/errqueue.h
-> > > > > index 3c70e8ac14b8..1ea47309d772 100644
-> > > > > --- a/include/uapi/linux/errqueue.h
-> > > > > +++ b/include/uapi/linux/errqueue.h
-> > > > > @@ -73,6 +73,7 @@ enum {
-> > > > >   SCM_TSTAMP_SND,         /* driver passed skb to NIC, or HW */=
-
-> > > > >   SCM_TSTAMP_SCHED,       /* data entered the packet scheduler =
-*/
-> > > > >   SCM_TSTAMP_ACK,         /* data acknowledged by peer */
-> > > > > + SCM_TSTAMP_COMPLETION,  /* packet tx completion */
-> > > > >  };
-> > > > >
-> > > > >  #endif /* _UAPI_LINUX_ERRQUEUE_H */
-> > > > > diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/lin=
-ux/net_tstamp.h
-> > > > > index 55b0ab51096c..383213de612a 100644
-> > > > > --- a/include/uapi/linux/net_tstamp.h
-> > > > > +++ b/include/uapi/linux/net_tstamp.h
-> > > > > @@ -44,8 +44,9 @@ enum {
-> > > > >   SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
-> > > > >   SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
-> > > > >   SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
-> > > > > + SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
-> > > > >
-> > > > > - SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
-> > > > > + SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
-> > > > >   SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
-> > > > >                            SOF_TIMESTAMPING_LAST
-> > > > >  };
-> > > > > @@ -58,7 +59,8 @@ enum {
-> > > > >  #define SOF_TIMESTAMPING_TX_RECORD_MASK  (SOF_TIMESTAMPING_TX_=
-HARDWARE | \
-> > > > >                                    SOF_TIMESTAMPING_TX_SOFTWARE=
- | \
-> > > > >                                    SOF_TIMESTAMPING_TX_SCHED | =
-\
-> > > > > -                                  SOF_TIMESTAMPING_TX_ACK)
-> > > > > +                                  SOF_TIMESTAMPING_TX_ACK | \
-> > > > > +                                  SOF_TIMESTAMPING_TX_COMPLETI=
-ON)
-> > > > >
-> > > > >  /**
-> > > > >   * struct so_timestamping - SO_TIMESTAMPING parameter
-> > > > > diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> > > > > index 2bd77c94f9f1..75e3b756012e 100644
-> > > > > --- a/net/ethtool/common.c
-> > > > > +++ b/net/ethtool/common.c
-> > > > > @@ -431,6 +431,7 @@ const char sof_timestamping_names[][ETH_GST=
-RING_LEN] =3D {
-> > > > >   [const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
-> > > > >   [const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-t=
-cp",
-> > > > >   [const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-=
-filter",
-> > > > > + [const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "completion=
--transmit",
+> > > >  Documentation/ABI/stable/sysfs-class-bluetooth | 12 ++++++++++++
+> > > >  1 file changed, 12 insertions(+)
 > > > >
-> > > > just "tx-completion"?
+> > > > diff --git a/Documentation/ABI/stable/sysfs-class-bluetooth b/Docum=
+entation/ABI/stable/sysfs-class-bluetooth
+> > > > index 36be02471174..1168e0318e35 100644
+> > > > --- a/Documentation/ABI/stable/sysfs-class-bluetooth
+> > > > +++ b/Documentation/ABI/stable/sysfs-class-bluetooth
+> > > > @@ -7,3 +7,15 @@ Description:   This write-only attribute allows us=
+ers to trigger the vendor reset
+> > > >                 The reset may or may not be done through the device=
+ transport
+> > > >                 (e.g., UART/USB), and can also be done through an o=
+ut-of-band
+> > > >                 approach such as GPIO.
+> > > > +
+> > > > +What:          /sys/class/bluetooth/hci<index>/isoc_alt
+> > > > +Date:          10-Feb-2025
+> > > > +KernelVersion: 6.13
+> > > > +Contact:       linux-bluetooth@vger.kernel.org
+> > > > +Description:   This attribute allows users to configure the USB Al=
+ternate setting
+> > > > +               for the specific HCI device. Reading this attribute=
+ returns the
+> > > > +               current setting, and writing any supported numbers =
+would change
+> > > > +               the setting. See the USB Alternate setting definiti=
+on in Bluetooth
+> > > > +               core spec 5, vol 4, part B, table 2.1.
+> > > > +               If the data is not a valid number, the write fails =
+with -EINVAL.
+> > > > +               The other failures are vendor specific.
 > > >
-> > > Ok.
+> > > Still not really convinced this is the right way to expose it, it is
+> > > not an HCI attribute to begin with, not sure if we couldn't perhaps
+> >
+> > Could you tell more about why this is not an HCI attr to begin with?
+> > The alt setting is bonded to the USB device which is now under btusb's
+> > control, and btusb creates a sysfs node for this. This attr location
+> > decision seems natural to me.
+>
+> Well alt setting is (obviously) not covered as part of HCI
+> specification, USB is one possible transport bus of HCI, but that
+> itself is already saying that we would be mixing the transport with
+> actual HCI protocol.
+>
+> > > add another node to control it or add via USB device?
+> >
+> > I feel allowing this in the USB sysfs API might be an overkill as that
+> > makes all USB devices' alt settings be controllable from the user
+> > space. Limiting this usage in the scope of BT makes more sense to me.
+>
+> Not all, just btusb ones, that said what we could add another level to
+> control transport specific attribute e.g
+> /sys/class/bluetooth/usb#/isoc_alt than that becomes the parent of
+> /sys/class/bluetooth/hci<index>
+>
 > > >
 > > > --
-> > > Pauli Virtanen
+> > > Luiz Augusto von Dentz
 > >
-> >
-> =
-
-> =
-
-> -- =
-
+> > --
+> > Best Regards,
+> > Hsin-chen
+>
+>
+>
+> --
 > Luiz Augusto von Dentz
-
-
