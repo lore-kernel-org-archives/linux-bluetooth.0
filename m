@@ -1,161 +1,177 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8131D86F2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 09:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B57420767D;
+	Wed, 12 Feb 2025 09:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739351169; cv=none; b=TnckhTGfaLY2RTLX83y42hUSzd6+WRjFMxrQdkrX4owMmiVos0PaRAuXa1CS4X3RoqD96+gpsFMWnYp58tEEg0LxU6J52q9bQuAjMxQVdxayhTMNQljZernvK+0LdLuhOkBv8DDfS+rSCNAHYwFnUqd7dxjubrM12aXh41D/xWQ=
+	t=1739353940; cv=none; b=N0OC/lucj+WogWx5m8iJpXFoAxoTPMEw3Rz7GUhFBAUaK8brrOQ3Mbn54nvBcw9gosUnvGg3qqlSQ5KHZKD+sYdAp80W0e/6qecqJvoZRRA3/rU8BMJp0y2JGgBBtWIs6BquBtrSZSEw+ZpI6cq1X8Odoe03O8yllkK7c6iwgRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739351169; c=relaxed/simple;
-	bh=6agQOk3pORJEt6URRFJCAmA1D1sdYaCLEnL4438SjVA=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=qvvP3Aksj2hiHfD2ilhiqkqDIp2GVGfPS4muNzVPPYT3sSz+yi8gEgcE/IK66PzbBS9hIfmzrHUxTIiOorv8TLyFvWo8kMOn0kAwC+zpv1Tp6XJNPnwLMnPTu2Aon3LRgG9YXMW0vAW7E7DDhcycU72I88rf8thM999hGDFu6vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cb/1BUyK; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1739353940; c=relaxed/simple;
+	bh=GYQfA97F+Re9ZSkw6o6abl4T4nrI0L3AvS4GjFqwQJY=;
+	h=Message-ID:Date:MIME-Version:To:CC:From:Subject:Content-Type; b=B22eaB8E/L3jEZ0/gcexIhBV0SM4aLvanLvDfA+Pq0N3bsmbmWCW3YjuKrzr/tzJqq1T+ttwhgU/SWUwRBbEfh8olbCgK7y2Gw+abbdGA2YdufwgQgt0jvpMzdXZ1B2JK6jal3cd5OZSJx5My31mg6HIq6849mVlOeq8cBtN4s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=EIzFg06C; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cb/1BUyK"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51C0gMBt030148
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 09:06:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:date:from:message-id:subject:to; s=qcppdkim1; bh=7wttJNCBCyq/
-	60isp69kH9ne9Dgg/J+hQfSL829+afc=; b=cb/1BUyKrwhAMBtzxdISbFc+F0LK
-	eOWt5f4Z+qJ7CaV4XFs21n09fjmwL7hzUaN4gN9X5zNxAcPLjOnVRuY3KwfBDRCB
-	Is4js+itSYCfuCrYJJ9ZRv/hJl7e2sEudpkFCO1qPoDPKCliQH83vHpSEddrGUYg
-	A0vHt/ee4Y9aezZS9d2QV2KcAqcKnpRhlJ44wPsUCj1MH3AW69j9dM1oYnpyseYz
-	jVjhE0CoKBI3z8cQr4PX8trMd/nFFcz/+fDOBRkmjKIrfYsDv301KK1km8pifcGh
-	WYHzN4/aKKLuoEkIBn+P9uVBJ4+HCT/4oJgePDzebnwrKE8h4CUPtPIJhA==
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44qxg9may7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 09:06:02 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 51C95A5T003800
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 09:05:58 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 44p0bm69k3-1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 09:05:58 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 51C95wXX004428
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 09:05:58 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-rbujala-hyd.qualcomm.com [10.213.107.103])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 51C95wr1004427;
-	Wed, 12 Feb 2025 09:05:58 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 4130939)
-	id 9F7DB5005D0; Wed, 12 Feb 2025 14:35:57 +0530 (+0530)
-From: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
-        Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
-Subject: [PATCH v1] Audio Profile version upgrade.
-Date: Wed, 12 Feb 2025 14:35:53 +0530
-Message-Id: <20250212090553.3775-1-quic_rbujala@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: DWGH4zSCi6w9WdcCtO0qmSCwGkyOmMl5
-X-Proofpoint-GUID: DWGH4zSCi6w9WdcCtO0qmSCwGkyOmMl5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-12_03,2025-02-11_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxscore=0 priorityscore=1501 malwarescore=0 spamscore=0 impostorscore=0
- mlxlogscore=962 lowpriorityscore=0 phishscore=0 clxscore=1011
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502120070
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="EIzFg06C"
+Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 52AC6100006;
+	Wed, 12 Feb 2025 12:52:05 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 52AC6100006
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1739353925;
+	bh=sW1PCcHZUuvl1DQ9fYsmBNqcActrE1fmpcmadXgurpg=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:From;
+	b=EIzFg06Cp93s+nhZ5t7GRsS+4vXPSufXqzwY2squSDJhVXqKtva5juG5A3C0hGOay
+	 OA9u0ybAZfVWwst49X7vAUN8isxFhlLXLbG7hL2QH07sUPf2Vp3HNAtZDSplrsEjv7
+	 hIIup/c0bSLPLhGjnmedZd2B/PqhEDPXlH/vHsWm4icqlIjj9TpyS9K9F61hfPXtuk
+	 ochDzRa8jl/MJ5Ak2k0h/2eCGZqKf2/oG7iznlzwIQdmXQOpsPF95VVeouEq19pgN9
+	 KjDLfsGB0HLIOB2korDkoHDyPtk95sfLfcw+Z/DuGk0h2F1kykzPhIS8YBZKwajIOh
+	 6L/9oq5AZGYYg==
+Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 12 Feb 2025 12:52:04 +0300 (MSK)
+Message-ID: <490d0026-2561-76b0-c11b-495b3e967e35@salutedevices.com>
+Date: Wed, 12 Feb 2025 12:52:04 +0300
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Content-Language: en-US
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: <oxffffaa@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>, <kernel@salutedevices.com>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Subject: [PATCH v1] Bluetooth: hci_uart: fix race during initialization
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-a-m1.sberdevices.ru (172.24.196.116) To
+ p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 190962 [Feb 12 2025]
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;lore.kernel.org:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2025/02/12 09:00:00
+X-KSMG-LinksScanning: Clean, bases: 2025/02/12 08:59:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2025/02/12 05:46:00 #27170303
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Most of the existing profile versions are withdrawn
-to make PTS successfull, need to upgrade the version
-for audio profiles and there are no mandatory feature
-changes between these versions are seen.
+Do not set 'HCI_UART_PROTO_READY' before call 'hci_uart_register_dev()'.
+Possible race is when someone calls 'hci_tty_uart_close()' after this bit
+is set, but 'hci_uart_register_dev()' wasn't done. This leads to access
+to uninitialized fields. To fix it let's set this bit after device was
+registered (as before patch c411c62cc133) and to fix previous problem let's
+add one more bit in addition to 'HCI_UART_PROTO_READY' which allows to
+perform power up without original bit set (pls see commit c411c62cc133).
 
-Version changes
-A2DP from 1.3 to 1.4
-HFP from 1.7 to 1.8
-AVRCP TG from 1.5 to 1.6
-AVCTP from 1.3 to 1.4
-
-Signed-off-by: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
+Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Reported-by: syzbot+683f8cb11b94b1824c77@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-bluetooth/d159c57f-8490-4c26-79da-6ad3612c4a14@salutedevices.com/
+Fixes: c411c62cc133 ("Bluetooth: hci_uart: fix race during initialization")
 ---
- profiles/audio/a2dp.c  | 2 +-
- profiles/audio/avrcp.c | 6 +++---
- src/profile.c          | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 20 ++++++++++++++------
+ drivers/bluetooth/hci_uart.h  |  1 +
+ 2 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index c97bd6e89..961a6e89d 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1595,7 +1595,7 @@ static sdp_record_t *a2dp_record(uint8_t type)
- 	sdp_record_t *record;
- 	sdp_data_t *psm, *version, *features;
- 	uint16_t lp = AVDTP_UUID;
--	uint16_t a2dp_ver = 0x0103, avdtp_ver = 0x0103, feat = 0x000f;
-+	uint16_t a2dp_ver = 0x0104, avdtp_ver = 0x0103, feat = 0x000f;
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 2651e2e33f2a1..2f322f890b81f 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -102,7 +102,8 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
+ 	if (!skb) {
+ 		percpu_down_read(&hu->proto_lock);
  
- 	record = sdp_record_alloc();
- 	if (!record)
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 9fe8f55e5..86b59a379 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -138,7 +138,7 @@
+-		if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		if (test_bit(HCI_UART_PROTO_READY, &hu->flags) ||
++		    test_bit(HCI_UART_PROTO_INIT, &hu->flags))
+ 			skb = hu->proto->dequeue(hu);
  
- #define AVRCP_BROWSING_TIMEOUT		1
- #define AVRCP_CT_VERSION		0x0106
--#define AVRCP_TG_VERSION		0x0105
-+#define AVRCP_TG_VERSION		0x0106
+ 		percpu_up_read(&hu->proto_lock);
+@@ -124,7 +125,8 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
+ 	if (!percpu_down_read_trylock(&hu->proto_lock))
+ 		return 0;
  
- #define AVRCP_SCOPE_MEDIA_PLAYER_LIST			0x00
- #define AVRCP_SCOPE_MEDIA_PLAYER_VFS			0x01
-@@ -414,7 +414,7 @@ static sdp_record_t *avrcp_ct_record(bool browsing)
- 	sdp_record_t *record;
- 	sdp_data_t *psm[2], *version, *features;
- 	uint16_t lp = AVCTP_CONTROL_PSM;
--	uint16_t avctp_ver = 0x0103;
-+	uint16_t avctp_ver = 0x0104;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 					AVRCP_FEATURE_CATEGORY_2 |
- 					AVRCP_FEATURE_CATEGORY_3 |
-@@ -493,7 +493,7 @@ static sdp_record_t *avrcp_tg_record(bool browsing)
- 	sdp_record_t *record;
- 	sdp_data_t *psm_control, *version, *features;
- 	uint16_t lp = AVCTP_CONTROL_PSM;
--	uint16_t avctp_ver = 0x0103;
-+	uint16_t avctp_ver = 0x0104;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 					AVRCP_FEATURE_CATEGORY_2 |
- 					AVRCP_FEATURE_CATEGORY_3 |
-diff --git a/src/profile.c b/src/profile.c
-index 70ac058f4..cb74bd819 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -2075,7 +2075,7 @@ static struct default_settings {
- 		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_hf_record,
--		.version	= 0x0107,
-+		.version	= 0x0108,
- 	}, {
- 		.uuid		= HSP_HS_UUID,
- 		.name		= "Headset unit",
-@@ -2095,7 +2095,7 @@ static struct default_settings {
- 		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_ag_record,
--		.version	= 0x0107,
-+		.version	= 0x0108,
- 		/* HFP 1.7.2: By default features bitfield is 0b001001 */
- 		.features	= 0x09,
- 	}, {
+-	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
++	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags))
+ 		goto no_schedule;
+ 
+ 	set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
+@@ -278,7 +280,8 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	percpu_down_read(&hu->proto_lock);
+ 
+-	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
++	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags)) {
+ 		percpu_up_read(&hu->proto_lock);
+ 		return -EUNATCH;
+ 	}
+@@ -585,7 +588,8 @@ static void hci_uart_tty_wakeup(struct tty_struct *tty)
+ 	if (tty != hu->tty)
+ 		return;
+ 
+-	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
++	if (test_bit(HCI_UART_PROTO_READY, &hu->flags) ||
++	    test_bit(HCI_UART_PROTO_INIT, &hu->flags))
+ 		hci_uart_tx_wakeup(hu);
+ }
+ 
+@@ -611,7 +615,8 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
+ 
+ 	percpu_down_read(&hu->proto_lock);
+ 
+-	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
++	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags)) {
+ 		percpu_up_read(&hu->proto_lock);
+ 		return;
+ 	}
+@@ -707,13 +712,16 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 
+ 	hu->proto = p;
+ 
+-	set_bit(HCI_UART_PROTO_READY, &hu->flags);
++	set_bit(HCI_UART_PROTO_INIT, &hu->flags);
+ 
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
+ 		return err;
+ 	}
+ 
++	set_bit(HCI_UART_PROTO_READY, &hu->flags);
++	clear_bit(HCI_UART_PROTO_INIT, &hu->flags);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index fbf3079b92a53..5ea5dd80e297c 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -90,6 +90,7 @@ struct hci_uart {
+ #define HCI_UART_REGISTERED		1
+ #define HCI_UART_PROTO_READY		2
+ #define HCI_UART_NO_SUSPEND_NOTIFIER	3
++#define HCI_UART_PROTO_INIT		4
+ 
+ /* TX states  */
+ #define HCI_UART_SENDING	1
 -- 
-2.17.1
-
+2.30.1
