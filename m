@@ -1,118 +1,158 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400A8271814
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 15:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781E6271814;
+	Wed, 12 Feb 2025 15:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739375218; cv=none; b=EEA+j7n9cr8iJXwskSzsvzsaTVbyAQQLM7ZVWYDo2bkO11yofkxXZIjIcTN30NQgreCjrVxLDiqooY/qN9QQtBrhEnvpyHtln7vajZch3hmn/ZVKb1CAYcFwSv1u9Mbdz3fCsUcT5hySHUYhyrVz66m9p9hFg/4KJdEuMJ/bGKE=
+	t=1739375271; cv=none; b=olGUqWVzt658od/lySWSWJZj3MmYCsWSFRLclPj9PF20z9QK6mqfyAAey7oxFc7Vt9Jb1xpDiUBSlvVuTve2Za4TyIzIR09c96OBcfP0ZPjXAVLSQUHn8kf79JhS96dFroe8mXWXWBFcPK8yRkNDS9eHB+2/E8JkO7KoAmL6+SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739375218; c=relaxed/simple;
-	bh=UhKQb+tB0oEd7jrDLThFIQ0BE0DDlNWTZ4GJcllf93U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VEGx4eokG58jrmmOgHcGEBxdHgYWSTm5mmLvA9jHI/kCPFMPkdFgXjgzoDbyAQeb3Ra1D/a0xxlLFEaUy+ZgKOuFVl7z3PDxn4JfzJkHZlhfVLCh36/Jn9kNbTnBWO591F1lidMzWDfHXHn2RaOdfhMXNSbSMeyrf7usgpStIVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YEq/8cf+; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739375271; c=relaxed/simple;
+	bh=evqjBDuFvQvZNlaBbpp360TMcXxjhw1F9NMB4b5lJuQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=KeKwzXd/MaZQpmuPg6CUDHQTQkXsetLoz7uoJV2P7xg3s67Rk0kGmFmlfXggFx/nQUzoR2B/GGF2Ry7ItrxXlq1ZbaNR3PftQvlcCPqvuQ0mIdLXU/5B2uNOnRnBfo/cewmPtDwTU2nktvC5ZjO9ULRnoWnNHnhpvKgwLl+Ru9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PLkMLkwv; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YEq/8cf+"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-307d1ab59c6so64626121fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 07:46:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739375215; x=1739980015; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gcpI2szMjZih0pOkifWyYCN7nM+72u9q8LofhKSnDhk=;
-        b=YEq/8cf+SLPj7iJkiUb+OwXseUj1pw1PrI/x4ofyb97X69GVX+gQGF6iVTQvVI0ByO
-         1AlGW/VwFRz90d7NwiszR/kfEKgZ23IZ18W3eYyoaMMrBKUE1X6omj1OAn0MRjmECbKe
-         4B+1QOvwgl7RKchzpGhACZN13THRUKTBr8OiiLVEePnU/w+aoiaz/G5lFNTxjIl9uHiS
-         MIiAUqTk69V25sqtbSeqtgjSglxFtEZBB6w/Vo6TbDq621Zk7HUqD+M5kzhhxC6FAKhI
-         DeaGoqaGxGHk1dvmEVE9b8Yfy23mG3qLUc3KXjSZcZ8ywvxoC1jyZc4CqzE1k11gMo9g
-         bHWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739375215; x=1739980015;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gcpI2szMjZih0pOkifWyYCN7nM+72u9q8LofhKSnDhk=;
-        b=OkRvsyBHM6VaSKPmTrbIyxZuB7RvDokuIg3lG/32JGkmU3HbIm5dwMmzn+Et/Nd86R
-         x6IRsy2TEcVrw8rEWsK8MgS4IhOcMNXAJCKQhogPa+8ikg0uSaizDfG3ny98IfQF6dI7
-         hsmDwxrttK9fEDkYXoiUHKdAR1borSAHaHlQkLIv8fUHfLpPrhJgnUTrKyT6tnsVEHrJ
-         OaLTBAOeu4brNq4v8zZ4RUBOw/uJd22OwIQnC6nnu1n4Y2C1xiACZKJt4XdiOOgvHYWz
-         7cLI150cGARIreAup82/V1xNbfOj/wH0MmzZfNgHw65KnrKFJ/H07winjUaOhdslfO/n
-         hMYw==
-X-Gm-Message-State: AOJu0YwJ6fZoFhLJsvh4PwL48h7JKr0KFyV4WoyMFOubVghhTcw1KqXs
-	ndfuEd5Njua1DhEbNKE7M5JDYxncF5RkEWQnJfqPyX0zE9KRsAW10FE4Q2pvDIeScFn3cO1kuin
-	9OHnaJ/2LUf4l1bZH1P6kIDPMPrfiIdKaXas=
-X-Gm-Gg: ASbGncvPf/7FjU0Waw2uLMMkosMZPW9AyoBDTD37AT+lgLrLhHHicBEuePWUU/NjRiD
-	9tCDgu4LTJ55DgSzJyzLHc/58feMv3AY9E4AZ3ni/4PPS/NdnapnAZuuVn3u2Im1uGvV6Lv8=
-X-Google-Smtp-Source: AGHT+IETZ0TDZNppuRBo3XGH2Irz68ajUcpZ6zstq49vBmhdrp9TlDR5flM1qkyZJ8PvRVU+lkEg6coCL3jO2vP/7Ig=
-X-Received: by 2002:a05:651c:210a:b0:307:9555:dc5e with SMTP id
- 38308e7fff4ca-3090362f933mr14885681fa.3.1739375215054; Wed, 12 Feb 2025
- 07:46:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PLkMLkwv"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BF86F440F3;
+	Wed, 12 Feb 2025 15:47:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739375266;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=39musMyRvQZFJGCAwDo09lJ3EVHHEkzlG1spNgpkZ4Q=;
+	b=PLkMLkwv0wm/8HRgZPKQsHL3sSziak3cusMU+bcFX6+IVkHZS6TEd3k+KrY2dIywTHU+oU
+	k5K+Pu8maSlm//NBsxq+mli1fn7ynFCbmeyrr0OVipl4XgwpYFpZ71V/Tp26rgvyeW/VtT
+	aNGFCrDp4Mqnl16E8Td75hPikhyv5T09yR9oqeNnvaN21zbx63n7R28RguxaBHArhg2815
+	Oel1IDy2h8N8RZ3QHT5Fgs+AY/odjSZySHn09TSgSRb+URe2tF0+6rKCsiewXEfGGijI3M
+	GhwVdz8aXHvMXC6DNX2aI1tobo5yil3SxE8scKqWRZZ4MU149UC2siFA9xrlAQ==
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Subject: [PATCH 00/12] bluetooth: hci_wilc: add new bluetooth driver
+Date: Wed, 12 Feb 2025 16:46:19 +0100
+Message-Id: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212135209.129361-1-arkadiusz.bokowy@gmail.com> <20250212135209.129361-2-arkadiusz.bokowy@gmail.com>
-In-Reply-To: <20250212135209.129361-2-arkadiusz.bokowy@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 12 Feb 2025 10:46:42 -0500
-X-Gm-Features: AWEUYZmfY1qyc1eOSNq5ZLcFHTrtaYqNZAGb7XApZphBXvB8kXZeX3qNorkKjIQ
-Message-ID: <CABBYNZLwMEAQSP8WviAHgDSXmt-vYg4DchotpB=skx84xKv1fQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] test-runner: Remove the "-nographic" option passed to QEMU
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAEvCrGcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDCyML3fLMnGRjAwOD+KQS3bREE1OjNKNES+PEFCWgjoKi1LTMCrBp0bG
+ 1tQDQShcmXQAAAA==
+X-Change-ID: 20240828-wilc3000_bt-fa452f2a93ad
+To: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Ajay Singh <ajay.kathat@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Kalle Valo <kvalo@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Marek Vasut <marex@denx.de>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-Mailer: b4 0.14.2
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeggedvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffufffkgggtgffvvefosehtkeertdertdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevffetudegfedukeelhffgjeefteevgeejjeffkeekudejhedvfedufeefvedtnecuffhomhgrihhnpehmihgtrhhotghhihhprdgtohhmpdhkvghrnhgvlhdrohhrghdpghhithhhuhgsrdgtohhmpdgsohhothhlihhnrdgtohhmnecukfhppedvrgdtvdemkeegvdekmehfleegtgemvgdttdemmehfkeehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddvmeekgedvkeemfhelgegtmegvtddtmeemfhekhedphhgvlhhopegludelvddrudeikedruddrudeljegnpdhmrghilhhfrhhomheprghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvgedprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrn
+ hgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopeguvghvihgtvghtrhgvvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhm
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-Hi Arkadiusz,
+Hello,
 
-On Wed, Feb 12, 2025 at 8:52=E2=80=AFAM Arkadiusz Bokowy
-<arkadiusz.bokowy@gmail.com> wrote:
->
-> This option causes QEMU to redirect monitor and serial to the terminal,
-> but also it modifies the terminal settings and clears it before printing
-> anything. Such behavior might be annoying because it might clear some
-> warning messages printed before clearing the screen. Since test-runner
-> disables QEMU monitor and redirects serial to stdio in an explicit way,
-> the "-nographic" option can be dropped.
-> ---
->  tools/test-runner.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/tools/test-runner.c b/tools/test-runner.c
-> index 77c89f3f9..13a5de465 100644
-> --- a/tools/test-runner.c
-> +++ b/tools/test-runner.c
-> @@ -212,7 +212,6 @@ static char *const qemu_argv[] =3D {
->         "-display", "none",
->         "-machine", "type=3Dq35,accel=3Dkvm:tcg",
->         "-m", "256M",
-> -       "-nographic",
->         "-net", "none",
->         "-no-reboot",
->         "-fsdev", "local,id=3Dfsdev-root,path=3D/,readonly,security_model=
-=3Dnone,"
+WILC3000 ([1]) is a combo chip exposing 802.11b/g/n and Bluetooth 5.
+Support for the wlan part has recently been integrated upstream ([2]) in
+the existing wilc1000 driver. This new series aims to bring support for
+the bluetooth side.
 
-Are you sure this won't require changes to tester.config? It seems you
-have the impression the test-runner kernel image shall be compiled
-with distros .config on top of tester.config, that is not how the
-likes of CI uses it though, usually all you have to do is:
+The WILC3000 chip is controlled through a SDIO or SPI bus for the wlan
+part (similarly to wilc1000), and uses standard HCI commands over a UART
+bus for the bluetooth operations. This work is based on the code
+available in the vendor kernel ([3]), in which bluetooth is managed
+directly in the wireless driver, and relies on user to trigger the
+hardware configuration (chardev manipulations + hciattach). The series
+brings a new dedicated bluetooth driver to support the bluetooth feature
+from the chip, without relying on the user to perform the device
+bringup. However, getting completely rid of the wlan driver dependency
+is not possible: it is still needed for early BT CPU configuration and
+BT firmware download, so the new driver still have a dependency of the
+wlan one, with an approach similar to the one used by the rsi driver.
 
-https://github.com/bluez/bluez/blob/master/doc/test-runner.rst#kernel
+- Patch 1 brings the new dt binding
+- Patch 2-9 prepares the wlan side, either by exposing the needed
+  functions to initialize BT, or by mitigating behavior which would
+  prevent BT and WLAN from runnning in parallel
+- Patch 10 brings the new bluetooth driver
+- Patch 11 updates the device tree description for sama5d27_wlsom1_ek
+  board (which I used to validate this series) to use the new driver
+- Patch 12 adds a new entry for this driver in the MAINTAINERS files
 
-So we need to confirm removing -nographic doesn't end up breaking when
-build with only tester.config
+This series has been tested with WILC3000 both in SDIO mode (with the
+chip embedded on the sama5d27_wlsom1_ek) and SPI mode (custom wiring on
+an SPI on the same eval board, with a WILC3000-SD).
 
-> --
-> 2.43.0
->
->
+Since this works needs new code in both the existing wlan driver and the
+new driver, I have included both linux-wireless and bluetooth mailing
+lists, while keeping the entire series for clarity, but let me know if
+you want to proceed differently.
 
+[1] https://www.microchip.com/en-us/product/atwilc3000
+[2] https://lore.kernel.org/linux-wireless/20241004114551.40236-1-marex@denx.de/
+[3] https://github.com/linux4microchip/linux/tree/linux-6.6-mchp/drivers/net/wireless/microchip/wilc1000
 
---=20
-Luiz Augusto von Dentz
+---
+Alexis Lothoré (12):
+      dt-bindings: bluetooth: describe wilc 3000 bluetooth chip
+      wifi: wilc1000: add a read-modify-write API for registers accesses
+      wifi: wilc1000: add lock to prevent concurrent firmware startup
+      wifi: wilc1000: allow to use acquire/release bus in other parts of driver
+      wifi: wilc1000: do not depend on power save flag to wake up chip
+      wifi: wilc1000: remove timeout parameter from set_power_mgmt
+      wifi: wilc1000: reorganize makefile objs into sorted list
+      wifi: wilc1000: add basic functions to allow bluetooth bringup
+      wifi: wilc1000: disable firmware power save if bluetooth is in use
+      bluetooth: hci_wilc: add wilc hci driver
+      ARM: dts: at91-sama5d27_wlsom1: update bluetooth chip description
+      MAINTAINERS: add entry for new wilc3000 bluetooth driver
+
+ .../net/bluetooth/microchip,wilc3000-bt.yaml       |  41 +++
+ MAINTAINERS                                        |   7 +
+ .../boot/dts/microchip/at91-sama5d27_wlsom1.dtsi   |   8 +
+ .../boot/dts/microchip/at91-sama5d27_wlsom1_ek.dts |  10 -
+ drivers/bluetooth/Kconfig                          |  13 +
+ drivers/bluetooth/Makefile                         |   3 +-
+ drivers/bluetooth/hci_uart.h                       |   1 +
+ drivers/bluetooth/hci_wilc.c                       | 333 ++++++++++++++++++++
+ drivers/net/wireless/microchip/wilc1000/Kconfig    |   3 +
+ drivers/net/wireless/microchip/wilc1000/Makefile   |  11 +-
+ drivers/net/wireless/microchip/wilc1000/bt.c       | 345 +++++++++++++++++++++
+ drivers/net/wireless/microchip/wilc1000/cfg80211.c |   7 +-
+ drivers/net/wireless/microchip/wilc1000/hif.c      |   2 +-
+ drivers/net/wireless/microchip/wilc1000/hif.h      |   2 +-
+ drivers/net/wireless/microchip/wilc1000/netdev.c   |  14 +
+ drivers/net/wireless/microchip/wilc1000/netdev.h   |   5 +
+ drivers/net/wireless/microchip/wilc1000/sdio.c     | 101 ++++--
+ drivers/net/wireless/microchip/wilc1000/spi.c      |  43 +++
+ drivers/net/wireless/microchip/wilc1000/wlan.c     | 154 ++++-----
+ drivers/net/wireless/microchip/wilc1000/wlan.h     |  23 ++
+ include/net/wilc.h                                 |  19 ++
+ 21 files changed, 996 insertions(+), 149 deletions(-)
+---
+base-commit: 95f6f2d73dc40ab53a94756689ce5cfd2f23361a
+change-id: 20240828-wilc3000_bt-fa452f2a93ad
+
+Best regards,
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
