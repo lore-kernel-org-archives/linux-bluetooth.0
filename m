@@ -1,134 +1,74 @@
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BD81411DE;
-	Thu, 13 Feb 2025 15:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AA615DBBA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 15:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739460339; cv=none; b=V9ok485DrGketHw8hI8SqNpXl8SLErCh0idzSrzXg9COF2u3sWx7U2JP3RmAV4u1+kZeQJy+XAaTidgljA5i/d24NhWUHBmNwjCgkazXuYZg5DIyiVpot/hAbmPbrHw/i/em7gihuzKIdHi2JAR+Xub1Un3SPy3WlSJGsE3cjIw=
+	t=1739460611; cv=none; b=m2vr6+6gu0e6mAt6Ub7g/vhbec4mzOQXC9JkCVolz3nCoDQiOqcIk42WhTHvzYo568G9p2r8nnmUZhwxYODIpBU5nGizKLzk9Hc3ZbQ0Ok7njQxxnX5bYYdJRpjVYcxaZ8g/TUAMasCDTPSfnSytT6u9Gt7DJ8zti4XA+w1JQqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739460339; c=relaxed/simple;
-	bh=TPjq4XjQPNfxakLg3n1C4p8+KUOyyY7/h6//Panzx9I=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RNX1TGiEWw2crqPzdVwHzYT3SsXETy95KaPXbb96mobx6cWYBSmmtNslv8urQE86QT2yFdrxc6Lr3Lc6uYfI6BBeSEAy1FUhBNCSx4ZB8RiACpF/o8L1b/S+y4Yl7mL3B2eoDe/6pyagnqLSYNjJDi9x6p3Nyo39/cffK40pugo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zlt2CV4z; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1739460611; c=relaxed/simple;
+	bh=91hZd4jD8dVQ5qCzKAQbTyr6XRovq8+AD2DXW8Ak+Lg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qbfcAokR2FjrLfJ8ihXPrIAYPYKjpY45nFBX5KZa4uAUwOaXib3+o9g9wq7oHWVdbbqwGce7zM0iaLTOYrFplDyFANeT8Gd8MHW41ji6mpyHQbNDEVDXZWjHrgpZ6VhlWPCHwCFxbmiI4AxD6h8aBEYOzlHRPg13DcvM41H6US8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XL8yFwVd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zlt2CV4z"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 09B78432B4;
-	Thu, 13 Feb 2025 15:25:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739460335;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lFuRc4vnJDC+U8vlunBJUoC5VAZxPPiCI440ctYMhMM=;
-	b=Zlt2CV4zcUYBMgVH8rk5q0w7VMbNXWZqUiByPBR1Qdrmcku9kewtaX4Fzk9SAgMH5rddsF
-	WixvDN8UgC5QEOGXUw5p+PRqfbJWjwzFG6FbnXlEI3/7TOE/Gr0oy0K896FcZwt3IVdXh6
-	e03IpWT0pHlAuodihUQTKMBMbNTcrGko5PwNzcp1InTVGKKwyc8QWr8dronU0o1m6aEUO5
-	OFWiNk02TA+bKSa5eSv3X9fSGXkXEA4GHF62aUDU3IMaa05LHhvBHxGfd3jZq9UVkIr25r
-	yipJY+cw7hVDkqCtszC5/xG+Q3q1EvJokHHpFgrh5LB0SK/ZZelOQ3kpvtD2Zw==
-Message-ID: <99247019-bb41-4fd9-bc0c-d31e5688533b@bootlin.com>
-Date: Thu, 13 Feb 2025 16:25:33 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XL8yFwVd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86647C4CEE4;
+	Thu, 13 Feb 2025 15:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739460611;
+	bh=91hZd4jD8dVQ5qCzKAQbTyr6XRovq8+AD2DXW8Ak+Lg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XL8yFwVdL+0J34738Lw/BtkBzy/YTxvWGe6Vk1RAQpBI9rW6x5pvZvK+znEAELl70
+	 q4V5TWtGMlyJLK0WuIlgDaSIQL0JCqjkeHBcNx064rdNO39OJ8nVLXcTeUOVyw9tsf
+	 z/LU33AzOLdweskdk20N4QYAO6cLLCZMfsmDTDQEHnEYdsz1MYgY0FQQ8HXJ2Hv4gT
+	 gHlfskbDky0Xpqk52MGaoPy7tmKfmC4Mc9eVQuEIIYt2qm5VwaHivIjcExZoqIxN66
+	 WThX3xgoux7rahJAIdvAhTlB1fdOQxp7U5p2eNp+KYmBcyTOIa3cfMR197w+ikkWpK
+	 q6oNlsUI4cnqQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBA9A380CEEF;
+	Thu, 13 Feb 2025 15:30:41 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Subject: Re: [PATCH 01/12] dt-bindings: bluetooth: describe wilc 3000
- bluetooth chip
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Ajay Singh <ajay.kathat@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Kalle Valo <kvalo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Nicolas Ferre
- <nicolas.ferre@microchip.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Marek Vasut <marex@denx.de>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-bluetooth@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
- <20250212-wilc3000_bt-v1-1-9609b784874e@bootlin.com>
- <20250213-chamois-of-unexpected-glory-dd3eab@krzk-bin>
-Content-Language: en-US
-In-Reply-To: <20250213-chamois-of-unexpected-glory-dd3eab@krzk-bin>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegjedufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfhffuvfevfhgjtgfgsehtkeertddtvdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepleejhfevledvgeehvdevueejgeduhfelffegkeejteejveevieejvdeifeekuedtnecuffhomhgrihhnpehmihgtrhhotghhihhprdgtohhmpdgsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegludelvddrudeikedrtddrvddungdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtohepkhhriihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhop
- ehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghjrgihrdhkrghthhgrthesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvh
-X-GND-Sasl: alexis.lothore@bootlin.com
+Subject: Re: [PATCH v4] btdev: Broadcast EXT_ADV packets based on its interval
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173946064078.1268037.4775776249401973438.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Feb 2025 15:30:40 +0000
+References: <20250213122952.138986-1-arkadiusz.bokowy@gmail.com>
+In-Reply-To: <20250213122952.138986-1-arkadiusz.bokowy@gmail.com>
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
 
-Hi Krzysztof,
+Hello:
 
-On 2/13/25 10:25, Krzysztof Kozlowski wrote:
->> +  wlan:
->> +    $ref: /schemas/types.yaml#/definitions/phandle
->> +    description:
->> +      Phandle to the wlan part of the combo chip
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu, 13 Feb 2025 13:29:52 +0100 you wrote:
+> Real BLE devices transmit LE advertisement report packages in given
+> intervals (typically in range between 20 ms and 10.24 s). With current
+> kernel module Bluetooth stack implementation it is possible that the
+> first LE meta packet just after enabling scanning will be lost. It is
+> not an issue for real devices, because more advertisement reports will
+> be delivered later (in given interval time).
 > 
-> No resources here and judging by the driver everything is part of wifi.
-> Either you wrote it to match driver or indeed hardware is like that. In
-> the first case, why this cannot be part of WiFi with phandle to serial
-> bus? In the second case, this needs to be proper hardware description
+> [...]
 
-First, I'd like to reclarify what the chip exactly is, to make sure that we are
-talking about the same thing. The wilc3000 ([1]) is a single physical device
-packaging two different discrete modules inside (one for 802.11, one for
-bluetooth). The WLAN part has its own binding integrated in upstream kernel
-([2]) and is based on a similar chip in the same family (wilc1000, which only
-have 802.11, and so only SPI/SDIO, no UART).
+Here is the summary with links:
+  - [v4] btdev: Broadcast EXT_ADV packets based on its interval
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fa4d477ab535
 
-Now that it is said, no, I did not write this binding only aiming to match the
-new driver. I tried to base this description on how similar WLAN/BT combo chips
-are usually described (based on those which have existing bindings), and they
-seem to describe distinctly the two internal parts of those chips as well. For
-those who use HCI commands over uart for the bluetooth part, they expose a
-dedicated child node of a serial controller (distinct from the wlan part,
-described as another node on PCI/SDIO/SPI/etc). The hardware architecture for
-wilc3000 is similar to those, so since the serial bus is the primary interface
-to operate the bluetooth part inside the chip, doesn't it makes sense to have it
-under a serial controller node (and then to refer to wlan for the additional
-operations needed on sdio/spi), than the other way around ?
-
-About the lack of other resources in the new node: there are indeed additional
-resources that affect bluetooth, but I am not sure how it should be handled:
-there are for example a reset input and a chip enable input exposed by this
-chip, which in fact do not only affect the WLAN part but the two parts inside
-the chip. But those are currently described and handled by the WLAN part. I
-guess that an improvement regarding this point could then be to move those out
-of the wlan binding, and find a way to describe it as shared resources between
-those two parts of the chip, but how should it be handled ? Is it ok to remove
-those from an existing binding (and if so, where to put those ? It is not
-bluetooth specific neither) ? Is the issue rather about current WILC3000 binding
-kind of mixing overall chip description and internal wlan part description ?
-
-Thanks,
-
-Alexis
-
-[1]
-https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/IEEE-802.11-b-g-n-Link-Controller-Module-with-Integrated-Bluetooth-5.0-DS70005327B.pdf
-[2]
-https://elixir.bootlin.com/linux/v6.12.6/source/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
-> Best regards,
-> Krzysztof
-> 
-
-
+You are awesome, thank you!
 -- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
