@@ -1,57 +1,56 @@
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB3821128A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 10:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A62121D3D6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 11:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739441698; cv=none; b=QSTFDMwPgLdjRLOJ5ugGDMazF/SChysWd9OBG1kzaRbmhVoi9lGPVj8/6aoZN8VgF+mQt1I+c3hpAXfE7rLvaitT8w+IydGGn5kRTJNDg0aJEizeWkt7hsgAOAdeI/UMD2FpUDlLeJr3anSliBsjTEoNGfBnqr5/moNeiytwBp8=
+	t=1739447865; cv=none; b=Z3cbdXskekXDo6bNTCNoPIKAuParnKiRNBe9XTQiOTnA5iL6XO1hQ55V6EJQwFD/PrLNPRx4U+QoL6t8LeoWWQrXzgEyN0IL+3ctzyvrzpeATP1ojZvuoS3/VHRWPvqQCWG4lKn4PgDD8p/DHikaBECyGlZgaPw+llT+SB9kowU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739441698; c=relaxed/simple;
-	bh=0JHLjjH3wN3gKoNMAITUlA/dbwq1/cIECi2PiVJ/tcA=;
+	s=arc-20240116; t=1739447865; c=relaxed/simple;
+	bh=yzqgDzTGf/8C6C+JiXBBSxWVkV9g4M2mkZZB9M3Fjgs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MNghVzS85O9Tp0tTE1lcNGfZP35D9K824yr5OiIWrPHk5re/L6jsss0rzHCFWckKlHsfG62ulJFg3w/2h0B7oL07TeBZQPdhAhoJqD1+aA6dAmQkPtAh5EIFmglVOyQjs0VJeLSdKS/zk/3npQXAD5OIuWwko+FbuhGX+7sf25M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k+ge+sL5; arc=none smtp.client-ip=209.85.219.173
+	 To:Cc:Content-Type; b=re4gE2tvZlLpYrb/sUR9wWOF1eFKUH1n8udX1V9DcnNfM0rYbQStTR8rp0SkS0d21CdaGfEBOncYe8jXxaEy/cgXrPnvn3VTuFrvl1usyS9pch+Z9tXeHgfj3r3lXmPNUDpZj4LYNe5n3ykc64Etcs2mbBwfvKXNxi0oVfII5yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BmZ8DQav; arc=none smtp.client-ip=209.85.219.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k+ge+sL5"
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e46ebe19489so492868276.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 02:14:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BmZ8DQav"
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e589c258663so916568276.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 03:57:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739441695; x=1740046495; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739447862; x=1740052662; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X1eVK89bhCPbjzPBOHZGvUXIBLjSrcJ0fLGshOR9gD0=;
-        b=k+ge+sL5s+NtgrMD78bbbpj0c5kdlf3CEXSXixkz6hFKa5mgmkKiD/gGgWOGF1UHQd
-         WM014bIJkqZ+UXdyzrCZ2E5pU5eZwChPNwYBINS4leYjTzdohJOoWrrenqVspQEJ6aAO
-         hEo43dCFlzVmG2ci61UOCexZsT6lCMBEb2OtmHpjcy9xn53JSkFyuyZnI4UqskIL0y9V
-         T8SlA8pwS/XNpf+e8iX0Z6zwTdQYZXqiCdnFlw1IZOnj1xe9L5cGcKxkdAmuroYQl9Vb
-         7KQ0KtNeLNbMn5ZGzeM/4/KARbtwN8MGe/hdTG9cMPlZv3H0CE4FMD13ADaOUQ4LX1HY
-         nLDw==
+        bh=nAeTsbP8grO1Y1/oZD12vcfULFlMlyIveKrhN6hNGEI=;
+        b=BmZ8DQavkVD9Z95BQtugJILjJHgagnK1TT4UANbdnVLI0Uvg6IMSMg5U+XGZDA6DRK
+         M8KRZ5U46ho7vaEFIyZ9PT5RskQZMrxtLcPWdOHeJ4CkiinMwKkcnGiKywy8tQxSVkAm
+         A72uCu1Yb8XphMW+usdYrwwgaPGwDK/cdku7rxYsFH3m93DUHLJvImcXSGNqca1dszkt
+         ZhvARr4EimXEmo7ZNXQXz93CeHdl0bH1ucCOcdsC5HiLt2o6y2LGwW3UmsFr5490beZ+
+         L8VvqjIKMa4wUVko9KnZFQC6pnG/3H0dauwUN3Oteih/Qo9RMY05H59It/yJ9qYgMTS+
+         XuBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739441695; x=1740046495;
+        d=1e100.net; s=20230601; t=1739447862; x=1740052662;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X1eVK89bhCPbjzPBOHZGvUXIBLjSrcJ0fLGshOR9gD0=;
-        b=fGa1nVMGuL2h9RY9409WdWn7aDumZU6FAg1vCFmxRWA6iIPY5r6Zy5wnV0mAyfdQuK
-         /gWlv3s/wPECdsziExQmbk+DTC4gSGsUZWhplMirOdxIjl/x0tsKWwjfGoYfjnYqkLqR
-         ImFCrSdxVtqk9XN/+Sg5Rk91DuGWmfpoVKw5BQTF1CFMbZDs0O97R643WTJsDJV0A6Da
-         0V18s2RgN3d60U88G8dmrS2uyzadxzIdblpnaxvMCxchNmBzThG5HUy4GP/bmI1IkHqa
-         priVNKZKE0pUOAYPy6WZ1N67S8u7QxIqKrTKqkzkOXRdsr39CZyHaQg2H0wHklRU1uRg
-         aT1Q==
-X-Gm-Message-State: AOJu0YyUABeq0oVXfug0iM5tx1E4yviO5Mg+POjDeu3chuShjPaHGMTr
-	nZk5xP69DWOvk1ZaT+nf9MYKSW0hnpJbS/J1PLSi0LrtNH+QV+8bdhmCSadne93dab9SaYTogbk
-	TEdhzgQh1KLf0pjDdLfDc/IwJZUF7yehjJkZw
-X-Gm-Gg: ASbGncvgQGMZOiaEZvuOYX2KOu+aIW/4brPq61XTfR5kP7u1f9vGe7jC9qsP8FlGFNs
-	8NrUrcZdqhdgAVCrPoe2izWTDGqjxP2M4b3LmEsHba7eDAZWftnBtx/olR6qg8KzIB97wyoEmGA
-	==
-X-Google-Smtp-Source: AGHT+IHPKl+ezhAUg4Kb41lGAKIH6dhZQultCWWIoAFnUW2zUViDxbcSm4BXT5TxbZk5VxwC8YkftKBAy5cgosM/gUE=
-X-Received: by 2002:a05:6902:11c7:b0:e48:5b35:af2e with SMTP id
- 3f1490d57ef6-e5d9f171fe3mr6630880276.33.1739441695278; Thu, 13 Feb 2025
- 02:14:55 -0800 (PST)
+        bh=nAeTsbP8grO1Y1/oZD12vcfULFlMlyIveKrhN6hNGEI=;
+        b=vF/dlOQvv6s/149/FHDHToJLFKoMMAScSq3BW39nBM+HX4DaHCKre4tdBcJMqFq3bf
+         ZNIwGurtqF3i7yWvs3T4BsUTNef85OwAMkzYYfiITVW6JZU/gSOhJ8KSO7jgP61mH8hm
+         /Oe+URmVuP8z7dNiAmxnsv2/kSrbtJcURVx8Y8oDEVrl/6UuJnpZBXcWEE3TVgyzJT9t
+         htaLCDrcrnPxwsxupgm/U9FbA/lkLTW4oN3dU/3em4HH/dfe77UJKjGzf1yDXqoj2Xr8
+         VD9tRKIHYU7/FS8zF0Ul1+cck412FfsBY5t6QI2VH2qlu3LmXfaRlRHOZTaeFSU/t9P3
+         dfmA==
+X-Gm-Message-State: AOJu0YzY9g7M5J91zY4AdjOI/4zCfMbby8ZJGSxpUb3CLYMB36JQ92ij
+	TJPnTO4kgNafEuZ3DnRnki2VNGB1Nc2iU+B+DUBlsGFSIkgXOXkNdI9fc4EXHRo3WQ+YRFPRCwK
+	IQvDLk4NxjnmsEM4j4T7W4NgzS5EbgvqK8+tF
+X-Gm-Gg: ASbGncsgCTkN67cwLKGLjsugfHCpILty5d5WuDsEnVz2p8C2WR5TK+xRuc9tviVStVj
+	mb9dUFllGdnVAM+yBvoqbQNqMY0fYBqPmdELA4GEh3bHEvZrj/uxS5AoOorAAErTkeZzmAQ==
+X-Google-Smtp-Source: AGHT+IHTHu2Wq5Nkq1URd0WoKprD88+1HOlz9mbdLilD1o4mfqGQKrXJqnLzk82cnP2aJxrlsMsgC1wNWJ75V9QJuq0=
+X-Received: by 2002:a05:6902:2102:b0:e5a:c5d6:3948 with SMTP id
+ 3f1490d57ef6-e5d9efe9db7mr6943660276.0.1739447862000; Thu, 13 Feb 2025
+ 03:57:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -59,56 +58,115 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <20250213034413.3808375-1-chharry@google.com> <2025021325-faction-upward-6395@gregkh>
- <CADg1FFc9_QH10UqxGqjf8hnJkHWjhy6EMPrfDCgvBx2OdOydLg@mail.gmail.com> <2025021328-limes-hacking-2ddc@gregkh>
-In-Reply-To: <2025021328-limes-hacking-2ddc@gregkh>
+ <2025021352-dairy-whomever-f8bd@gregkh>
+In-Reply-To: <2025021352-dairy-whomever-f8bd@gregkh>
 From: Hsin-chen Chuang <chharry@google.com>
-Date: Thu, 13 Feb 2025 18:14:27 +0800
-X-Gm-Features: AWEUYZlfSGjZxS6z-uKid1N6mQEJpV4pvRzs3n_reJDY3tni8vqfLbrjLm6V2fQ
-Message-ID: <CADg1FFc4XRc1fqYZj_J6xq0nBQFRLqyAsFhf1Pt0JNr8mizjjQ@mail.gmail.com>
-Subject: Re: [PATCH v4 3/3] Bluetooth: Add ABI doc for sysfs isoc_alt
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
+Date: Thu, 13 Feb 2025 19:57:15 +0800
+X-Gm-Features: AWEUYZlq75LIFYPIrtEvnz3TB7WFuT6LMkfSPqyFE9VT04sCMSzyEJ2iGUZu7t0
+Message-ID: <CADg1FFdez0OdNDPRFPFxNHL_JcKmHE6KNxnYvt4sK7i+Uw6opA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
+ sysfs isoc_alt
+To: Greg KH <gregkh@linuxfoundation.org>, luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, 
 	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Got it. Thanks for the feedback
+The btusb driver data is allocated by devm_kzalloc and is
+automatically freed on driver detach, so I guess we don't have
+anything to do here.
+Or perhaps we should move btusb_disconnect's content here? Luiz, what
+do you think?
 
-On Thu, Feb 13, 2025 at 6:13=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
+On Thu, Feb 13, 2025 at 6:01=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
 > wrote:
 >
-> On Thu, Feb 13, 2025 at 06:07:59PM +0800, Hsin-chen Chuang wrote:
-> > On Thu, Feb 13, 2025 at 6:01=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Thu, Feb 13, 2025 at 11:44:01AM +0800, Hsin-chen Chuang wrote:
-> > > > From: Hsin-chen Chuang <chharry@chromium.org>
-> > > >
-> > > > The functionality was completed in commit c04f2e4f4ea1 ("Bluetooth:=
- Fix
-> > > > possible race with userspace of sysfs isoc_alt")
-> > > >
-> > > > Fixes: c04f2e4f4ea1 ("Bluetooth: Fix possible race with userspace o=
-f sysfs isoc_alt")
-> > >
-> > > Where is this git id?  I don't see it in linux-next, are you sure it =
-is
-> > > correct?
+> On Thu, Feb 13, 2025 at 11:43:59AM +0800, Hsin-chen Chuang wrote:
+> > From: Hsin-chen Chuang <chharry@chromium.org>
 > >
-> > This hash is the first patch of this series.
+> > Expose the isoc_alt attr with device group to avoid the racing.
+> >
+> > Now we create a dev node for btusb. The isoc_alt attr belongs to it and
+> > it also becomes the parent device of hci dev.
+> >
+> > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control =
+USB alt setting")
+> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > ---
+> >
+> > Changes in v4:
+> > - Create a dev node for btusb. It's now hci dev's parent and the
+> >   isoc_alt now belongs to it.
+> > - Since the changes is almost limitted in btusb, no need to add the
+> >   callbacks in hdev anymore.
+> >
+> > Changes in v3:
+> > - Make the attribute exported only when the isoc_alt is available.
+> > - In btusb_probe, determine data->isoc before calling hci_alloc_dev_pri=
+v
+> >   (which calls hci_init_sysfs).
+> > - Since hci_init_sysfs is called before btusb could modify the hdev,
+> >   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs=
+.
+> >
+> >  drivers/bluetooth/btusb.c        | 98 +++++++++++++++++++++++++-------
+> >  include/net/bluetooth/hci_core.h |  1 +
+> >  net/bluetooth/hci_sysfs.c        |  3 +-
+> >  3 files changed, 79 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 1caf7a071a73..cb3db18bb72c 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -920,6 +920,8 @@ struct btusb_data {
+> >       int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+> >
+> >       struct qca_dump_info qca_dump;
+> > +
+> > +     struct device dev;
+> >  };
+> >
+> >  static void btusb_reset(struct hci_dev *hdev)
+> > @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
+> >       int alt;
+> >       int ret;
+> >
+> > +     if (!data->hdev)
+> > +             return -ENODEV;
+> > +
+> >       if (kstrtoint(buf, 10, &alt))
+> >               return -EINVAL;
+> >
+> > @@ -3702,6 +3707,34 @@ static ssize_t isoc_alt_store(struct device *dev=
+,
+> >
+> >  static DEVICE_ATTR_RW(isoc_alt);
+> >
+> > +static struct attribute *btusb_sysfs_attrs[] =3D {
+> > +     NULL,
+> > +};
+> > +ATTRIBUTE_GROUPS(btusb_sysfs);
+> > +
+> > +static void btusb_sysfs_release(struct device *dev)
+> > +{
+> > +     // Resource release is managed in btusb_disconnect
 >
-> That's not a valid git id as it only exists on your local system and no
-> where else :(
+> That is NOT how the driver model works, do NOT provide an empty
+> release() function just to silence the driver core from complaining
+> about it.
 >
-> > So I guess I should send this patch after the ancestors are all
-> > applied then.
->
-> Or better yet, include the api addition as part of the patch that
-> actually adds the new api.
+> If for some reason the code thinks it is handling devices differently
+> than it should be, fix that instead.
 >
 > thanks,
 >
 > greg k-h
+
+--=20
+Best Regards,
+Hsin-chen
