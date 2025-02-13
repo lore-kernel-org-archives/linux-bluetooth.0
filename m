@@ -1,74 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AA615DBBA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 15:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309DC26B098;
+	Thu, 13 Feb 2025 15:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739460611; cv=none; b=m2vr6+6gu0e6mAt6Ub7g/vhbec4mzOQXC9JkCVolz3nCoDQiOqcIk42WhTHvzYo568G9p2r8nnmUZhwxYODIpBU5nGizKLzk9Hc3ZbQ0Ok7njQxxnX5bYYdJRpjVYcxaZ8g/TUAMasCDTPSfnSytT6u9Gt7DJ8zti4XA+w1JQqo=
+	t=1739460653; cv=none; b=BR19uiwLzJDVIAeOTheNIpCNeSasRilc56B/qFkXY9t/LW/ftP5zynp1RL47yjBaV2rPi1afRgRnYYiRasHGz7ZvpaYrBFxb7M+tGSsl1IBMhf+Qf/+9t8r7ZYVZ4xfbwIG6Bbl4MWtDO4ruFPPnRP0gXkG+E156+orIVCAwfLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739460611; c=relaxed/simple;
-	bh=91hZd4jD8dVQ5qCzKAQbTyr6XRovq8+AD2DXW8Ak+Lg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qbfcAokR2FjrLfJ8ihXPrIAYPYKjpY45nFBX5KZa4uAUwOaXib3+o9g9wq7oHWVdbbqwGce7zM0iaLTOYrFplDyFANeT8Gd8MHW41ji6mpyHQbNDEVDXZWjHrgpZ6VhlWPCHwCFxbmiI4AxD6h8aBEYOzlHRPg13DcvM41H6US8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XL8yFwVd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739460653; c=relaxed/simple;
+	bh=wpqBdgYCrkVPe3zyeTy8Rpi1usNHYornxiirneekDh0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GTPeeXWey/NnW7RiEczx7BABfRLPi6AamnWrvJUse/kJYVzWw3R7NC65nlFRIM99pLd0cmd4ILbDgDCk0NSUICQQMh/nbk1vu2K13T/nTy9kGk7tG5maw1SZG7iNRClfhM4QmL+h+oVrotqEeBJIi0umDqaKdQZ1mcoDH83HfPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PtmoB1+K; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XL8yFwVd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86647C4CEE4;
-	Thu, 13 Feb 2025 15:30:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739460611;
-	bh=91hZd4jD8dVQ5qCzKAQbTyr6XRovq8+AD2DXW8Ak+Lg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XL8yFwVdL+0J34738Lw/BtkBzy/YTxvWGe6Vk1RAQpBI9rW6x5pvZvK+znEAELl70
-	 q4V5TWtGMlyJLK0WuIlgDaSIQL0JCqjkeHBcNx064rdNO39OJ8nVLXcTeUOVyw9tsf
-	 z/LU33AzOLdweskdk20N4QYAO6cLLCZMfsmDTDQEHnEYdsz1MYgY0FQQ8HXJ2Hv4gT
-	 gHlfskbDky0Xpqk52MGaoPy7tmKfmC4Mc9eVQuEIIYt2qm5VwaHivIjcExZoqIxN66
-	 WThX3xgoux7rahJAIdvAhTlB1fdOQxp7U5p2eNp+KYmBcyTOIa3cfMR197w+ikkWpK
-	 q6oNlsUI4cnqQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBA9A380CEEF;
-	Thu, 13 Feb 2025 15:30:41 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PtmoB1+K"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4324C4327E;
+	Thu, 13 Feb 2025 15:30:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739460649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cSPo3S4QwhCTf4yRppXnD4bxwylZMuurUQ4Zm3rpVHA=;
+	b=PtmoB1+K9ZJpqH7XU7YV+rkGa5/jQ96ghiUnt6VfxJVRxZYka5Ak+BMTqGWHQoJvheOSqD
+	qGwvjShFz7i4ntX0vUQCB+tJEbcCJ8Dm/EEh7SAYuEm/jN9yewdGbbamUQSnarpvuUU5Xv
+	jZI/Uy/kgLuzo1W0NMnqk6GTO+Orj9RtxNpsX+ilWiD8RV5pxlDVcEDdQ8QCloTBvbCTKB
+	zXL8kh1gNSDnl79NNXC8x9iE+rMVTxGRWfescZRLAULJIKnwAD/60ucr5M9gOWIkK74Bn7
+	81l4MFKwhUNtG9CzFZgvc7zyoMnlltSasP+dVZqLmyR89940UDzKcg/fqC0RMw==
+Message-ID: <8e954934-b0af-4c80-9ca0-1914b65644f3@bootlin.com>
+Date: Thu, 13 Feb 2025 16:30:48 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 10/12] bluetooth: hci_wilc: add wilc hci driver
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Ajay Singh <ajay.kathat@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Kalle Valo <kvalo@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Marek Vasut <marex@denx.de>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-bluetooth@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
+ <20250212-wilc3000_bt-v1-10-9609b784874e@bootlin.com>
+ <20250213-fine-thankful-lobster-eed3e8@krzk-bin>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20250213-fine-thankful-lobster-eed3e8@krzk-bin>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4] btdev: Broadcast EXT_ADV packets based on its interval
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173946064078.1268037.4775776249401973438.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Feb 2025 15:30:40 +0000
-References: <20250213122952.138986-1-arkadiusz.bokowy@gmail.com>
-In-Reply-To: <20250213122952.138986-1-arkadiusz.bokowy@gmail.com>
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegjedugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtkeertddtvdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvdetteektdehudelheehkeeggfejgfelveevgeevtdejudfgveetgefhtdduuedtnecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegludelvddrudeikedrtddrvddungdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtohepkhhriihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvl
+ hdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghjrgihrdhkrghthhgrthesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvh
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-Hello:
+Hi Krzysztof,
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Thu, 13 Feb 2025 13:29:52 +0100 you wrote:
-> Real BLE devices transmit LE advertisement report packages in given
-> intervals (typically in range between 20 ms and 10.24 s). With current
-> kernel module Bluetooth stack implementation it is possible that the
-> first LE meta packet just after enabling scanning will be lost. It is
-> not an issue for real devices, because more advertisement reports will
-> be delivered later (in given interval time).
+On 2/13/25 10:24, Krzysztof Kozlowski wrote:
+> On Wed, Feb 12, 2025 at 04:46:29PM +0100, Alexis Lothoré wrote:
+>> +#include "linux/bitops.h"
+>> +#include "linux/byteorder/generic.h"
+>> +#include "linux/err.h"
+>> +#include "linux/gfp_types.h"
+>> +#include "net/bluetooth/bluetooth.h"
+>> +#include "net/bluetooth/hci.h"
 > 
-> [...]
+> Keep some order here. Why some are <> some "", why net is mixed with
+> linux...
 
-Here is the summary with links:
-  - [v4] btdev: Broadcast EXT_ADV packets based on its interval
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fa4d477ab535
+[...]
 
-You are awesome, thank you!
+>> +	wilc_adapter = kzalloc(sizeof(*wilc_adapter), GFP_KERNEL);
+> 
+> Why not devm?
+
+[...]
+
+>> +	if (IS_ERR(wlan)) {
+>> +		pr_warn("Can not initialize bluetooth: %pe\n", wlan);
+> 
+> dev_warn or even dev_err_probe to handle deferral.
+
+[...]
+
+>> +	dev_info(&serdev->dev, "WILC hci interface registered");
+> 
+> Drop simple probe statuses. sysfs already provides this.
+
+[...]
+
+>> +static struct serdev_device_driver wilc_bt_serdev_driver = {
+>> +	.probe = wilc_bt_serdev_probe,
+>> +	.remove = wilc_bt_serdev_remove,
+>> +	.driver = {
+>> +		.name = "hci_uart_wilc",
+>> +		.of_match_table = of_match_ptr(wilc_bt_of_match),
+> 
+> Drop of_match_tr, you have warnings here.
+
+Thanks for the review, true for all raised points, which will be handled in next
+rev.
+
+Alexis
+> 
+> Best regards,
+> Krzysztof
+> 
+
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
