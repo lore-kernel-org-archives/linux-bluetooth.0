@@ -1,172 +1,311 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F18B2045A0
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 02:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459C7204F88
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 03:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739415476; cv=none; b=OC4DcVotWwXdMCM/ogdRh0iW1gbUFFwAUZYlU1BFG8es6Zfvxgd1l+MyrCrMEJAo8uhn7PYDhzAzWMW60FqR1i+SQzoxPDFK8jLXDiJIGgW+QJmJISc2slzheU6WYID4A4ejykfI9NpCfhFrlmz8aUvTfk257J0gVfSOg9n8mvg=
+	t=1739418252; cv=none; b=bIyPXseRklW2iQd5sCkQZMAIoV1q8wyWXKKOrt2lduL1zpgNvr5zyunQrliR3/BG1YahaXO+sW3p7HOQ/mgYV3wHs1+Sai+q1X9jt9KoMzLgq57j6VNOh9zD1etM6SKWbFY5owZ7OrA/YTAvZhSlAQmj0UjanZOJVIlGMGwRkHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739415476; c=relaxed/simple;
-	bh=B+v3Png1lHxHnjaPbiGYgxPG8jvp2c1cPzPekFopqYc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WowQ24MLu9H79phO7UdLVd9qEi9Y2Dw9r6MM5aFT9GXqrwanKYCuoNV5sOeYWFJhANxIjfQE68IKJxGo5IYk1+eJa2ASR1nV9RpQ6ygrjcXTw9X/5rRKO67WSWJaZoCnb3qzYg+cbm/hxxf4nofmaSaqG8VXwz2O8Rz+HrM1YT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjdYN3QR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739418252; c=relaxed/simple;
+	bh=0BW2M125WsliCB8ED4LdihaF0s69mMeqnQMjcrf6UQk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=niuugkGYFHclePR0eQuKXqgBQ7ki2pvcxAoHVKSTw1BVXYGF048CXu3A793oJvkYv3p0RGmRSVYo/lE64Ar5AVPvM8kZ/B8trobvr4Zz7xYA1MT01P4uaC++o8ZKoEYP/7qDadiVKoUmynk3Cw9/pFcRvoCK60z3Vp9XcF0Sisg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QYx3Rq7N; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjdYN3QR"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DEB08C4CEDF;
-	Thu, 13 Feb 2025 02:57:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739415475;
-	bh=B+v3Png1lHxHnjaPbiGYgxPG8jvp2c1cPzPekFopqYc=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=kjdYN3QRs/87QNKwB9ZIC8t3KDSgBMuETFICJ15sWRXr1dJP6v22rmbsUarLZnd0W
-	 HpO5j5Nxl5WSb8pVL9K+3zrX/x+xjfvGtIkXITU4ocAtvNOFg6rUk10ZDdWAfVG8dQ
-	 aFO+iHWma8c6glD91Mc6kWk32iCeSPzAEvHAy2S0a3bpWbIBT1uhJ0PzixCBeU5t1v
-	 wXWSKmkK1ByRC8QOa3Cw4+uGeStKE7rIozR4blqzuyZ0OjsElj3ttnuJkWl7DkOHgc
-	 LiCx4eDRxbbRoE8R67VHKpoHCjk0JlSwfRyThII0RuEzXeYRK4XM4kIADJIDyB2PVt
-	 TYCmQyFVqJ2Xw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C60AEC02198;
-	Thu, 13 Feb 2025 02:57:55 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Thu, 13 Feb 2025 10:57:52 +0800
-Subject: [PATCH BlueZ bluez v3] bap: fixed issue of muting music silent
- after pause and resume.
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QYx3Rq7N"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa1c093f12so1480949a91.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 19:44:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739418249; x=1740023049; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lsOLf4vzSChByZXaeUeGFRADTpIyzst12ye8nQJf8JM=;
+        b=QYx3Rq7NZrkvqFYMRUMVgX5/RP5kpdFjLlWZj1Afh/SoaznCeF7UZBoWbXbDjjDNoH
+         Mv8CpCQ8f23bBgyCdls+bWRV/zuzeCoT0Xa1OMCU+AXS65R+bJFbdZXsuvYqd9sK7Pjn
+         GKJoUYC2BS1AH/2rZuuwfhvQB71vfkFIC4wNzaKgYg3WaP+xc3V6xtwZ2XP/a1MQXa8h
+         1nWTybldaVfL+CknwbSWx0C0TNYQqN/pLmFLt4vBJy/5TCquNN8vTjKc4VC+ljjR18ZP
+         +eLX2T4nK2/C8AHFaGO1+wPgfnoclb4Jijaz8oVwoV39obzC8QVcBBxZSPX9MGyc3kk3
+         2XbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739418249; x=1740023049;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lsOLf4vzSChByZXaeUeGFRADTpIyzst12ye8nQJf8JM=;
+        b=gazjXkdYcE5Yc4iLRiUb6MjZZqEQC97rF1guTDsQ+Bo5Bex76cUqG1iZup70JDi+e+
+         ON5wW2QTwQoKFSXxBNwXHsRK//NuxcZKZPGL+EadLD/8o5SnJb7iE1+wjlNQhukO0cGc
+         OQEBaMU/2omZNeXLTrBWNZmubAwEvy8MjZXqr9+e+x7otvCDRZdYvEhxdSFWeA2uZhxG
+         fqpWUfM6llgEQtC99vH5P+k/8goRFrjUM0Ms6wQIEAQTMqoMG/zZzVmCH9ph0n0BBZPv
+         mtRkfkegvA7pq32PsqsJLRm8o3WWLB52LudsQ+ffH/bG9ef9f9CeEsq9kbE9lTknVzFd
+         n6gQ==
+X-Gm-Message-State: AOJu0YxsMXw/tjB1CiCvjErEnvso9LDA+8Gq90WNPA7iuU41l68edwhS
+	LF/iX2dd5xVGLnqen33eOhA7rloQGTpjqp7JEoWcgb8bukmm/PCeoSDiT+DLjCXeyaeZcjnnKbn
+	pUJCZgD6xMrfuN9GaP9RweuwW2GZGpYGQUoGNjBDydB7I/CK7mTBAJQQSBaQkaQDuP83Kd7xKgZ
+	CCuLw8jy+k3XFqrqXM6MXUvjMIblDH77dVo0odz+4KSkM4Ljin9w==
+X-Google-Smtp-Source: AGHT+IFPhIYt5Rdxe8/DSnQSNBGl29ADwD9aPL9TkbgNFB6DiQH825XmJfmTGbqIE3tcb89hKtAyOL1xkHWN
+X-Received: from pgpf9.prod.google.com ([2002:a65:4009:0:b0:ad5:4620:b05d])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:618f:b0:1e1:9fef:e960
+ with SMTP id adf61e73a8af0-1ee5c733361mr10241161637.6.1739418249528; Wed, 12
+ Feb 2025 19:44:09 -0800 (PST)
+Date: Thu, 13 Feb 2025 11:43:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250213-ascs_bug-v3-1-d5594f0f20c6@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAK9frWcC/2XO3QqCMBwF8FeRXbfYZm6rq94jJPbxVwfOyaZSi
- e/e8iaiy3M4/DgrShAdJHQpVhRhccmFIYfyUCDTqaEF7GzOiBFWEUYkVsmku55bDMJUgla2tNK
- gPB8jNO6xUzek+xleqM51E4PHUxdBfR1KOJ7HNOXS44ViihXlUpy1kE1jr8r3oXXmaIL/wJ1LU
- 4jP/eLCdv7/zcKyogUQzizn5PSr1Nu2vQGVTdJB6wAAAA==
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1739415474; l=3244;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=CzKtL0pkZRjSLQsuOWTB8/V6Ro3pLYqJB65K2qMqZO0=;
- b=PQHSDBhyLf03aVRjuMGelq/6//pXMVNnECZZYNgpe9Rn8n53ETIIdhc2jh4Im9ncHStBtZFBU
- 8Aj1+1cspB/AEIYdwhM192s7bMk1VdrTD66WGOymlU+xTCE9N1PtwDP
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
+Message-ID: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+Subject: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+From: Hsin-chen Chuang <chharry@google.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
+	gregkh@linuxfoundation.org
+Cc: chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Yang Li <yang.li@amlogic.com>
+From: Hsin-chen Chuang <chharry@chromium.org>
 
-After the ASE state changes (streaming->releasing->idle),
-the Client needs to be notified. The process as follows:
+Expose the isoc_alt attr with device group to avoid the racing.
 
-...(Sink ASE: ID=1, State=Streaming)
-ATT Write Command Packet (ASE Control Point: Op=Release)
-ATT Notification Packet (Sink ASE: ID=1, State=Releasing)
-ATT Notification Packet (Sink ASE: ID=1, State=Idle)
+Now we create a dev node for btusb. The isoc_alt attr belongs to it and
+it also becomes the parent device of hci dev.
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
+Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
 ---
+
+Changes in v4:
+- Create a dev node for btusb. It's now hci dev's parent and the
+  isoc_alt now belongs to it.
+- Since the changes is almost limitted in btusb, no need to add the
+  callbacks in hdev anymore.
+
 Changes in v3:
-- Solve the compilation error reported by test.bot
-- Link to v2: https://patch.msgid.link/20250208-ascs_bug-v2-1-b7e062d6604d@amlogic.com
----
- src/shared/bap.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+- Make the attribute exported only when the isoc_alt is available.
+- In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
+  (which calls hci_init_sysfs).
+- Since hci_init_sysfs is called before btusb could modify the hdev,
+  add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 167501282..079f7ede0 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -930,6 +930,18 @@ static void ascs_ase_rsp_success(struct iovec *iov, uint8_t id)
- 					BT_ASCS_REASON_NONE);
- }
+ drivers/bluetooth/btusb.c        | 98 +++++++++++++++++++++++++-------
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_sysfs.c        |  3 +-
+ 3 files changed, 79 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 1caf7a071a73..cb3db18bb72c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -920,6 +920,8 @@ struct btusb_data {
+ 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
  
-+static void stream_notify_ase_state(struct bt_bap_stream *stream)
+ 	struct qca_dump_info qca_dump;
++
++	struct device dev;
+ };
+ 
+ static void btusb_reset(struct hci_dev *hdev)
+@@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
+ 	int alt;
+ 	int ret;
+ 
++	if (!data->hdev)
++		return -ENODEV;
++
+ 	if (kstrtoint(buf, 10, &alt))
+ 		return -EINVAL;
+ 
+@@ -3702,6 +3707,34 @@ static ssize_t isoc_alt_store(struct device *dev,
+ 
+ static DEVICE_ATTR_RW(isoc_alt);
+ 
++static struct attribute *btusb_sysfs_attrs[] = {
++	NULL,
++};
++ATTRIBUTE_GROUPS(btusb_sysfs);
++
++static void btusb_sysfs_release(struct device *dev)
 +{
-+	struct bt_bap_endpoint *ep = stream->ep;
-+	struct bt_ascs_ase_status status;
-+
-+	status.id = ep->id;
-+	status.state = ep->state;
-+
-+	gatt_db_attribute_notify(ep->attr, (void *)&status, sizeof(status),
-+					bt_bap_get_att(stream->bap));
++	// Resource release is managed in btusb_disconnect
 +}
 +
- static void stream_notify_config(struct bt_bap_stream *stream)
++static const struct device_type btusb_sysfs = {
++	.name    = "btusb",
++	.release = btusb_sysfs_release,
++	.groups  = btusb_sysfs_groups,
++};
++
++static struct attribute *btusb_sysfs_isoc_alt_attrs[] = {
++	&dev_attr_isoc_alt.attr,
++	NULL,
++};
++ATTRIBUTE_GROUPS(btusb_sysfs_isoc_alt);
++
++static const struct device_type btusb_sysfs_isoc_alt = {
++	.name    = "btusb",
++	.release = btusb_sysfs_release,
++	.groups  = btusb_sysfs_isoc_alt_groups,
++};
++
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
  {
- 	struct bt_bap_endpoint *ep = stream->ep;
-@@ -1634,7 +1646,9 @@ static bool stream_notify_state(void *data)
- 	struct bt_bap_stream *stream = data;
- 	struct bt_bap_endpoint *ep = stream->ep;
+@@ -3821,16 +3854,47 @@ static int btusb_probe(struct usb_interface *intf,
  
--	DBG(stream->bap, "stream %p", stream);
-+	DBG(stream->bap, "stream %p state %s",
-+			stream,
-+			bt_bap_stream_statestr(ep->state));
+ 	data->recv_acl = hci_recv_frame;
  
- 	if (stream->state_id) {
- 		timeout_remove(stream->state_id);
-@@ -1643,6 +1657,7 @@ static bool stream_notify_state(void *data)
++	if (id->driver_info & BTUSB_AMP) {
++		/* AMP controllers do not support SCO packets */
++		data->isoc = NULL;
++	} else {
++		/* Interface orders are hardcoded in the specification */
++		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
++		data->isoc_ifnum = ifnum_base + 1;
++	}
++
++	if (id->driver_info & BTUSB_BROKEN_ISOC)
++		data->isoc = NULL;
++
++	/* Init a dev for btusb. The attr depends on the support of isoc. */
++	if (data->isoc)
++		data->dev.type = &btusb_sysfs_isoc_alt;
++	else
++		data->dev.type = &btusb_sysfs;
++	data->dev.class = &bt_class;
++	data->dev.parent = &intf->dev;
++
++	err = dev_set_name(&data->dev, "btusb%s", dev_name(&intf->dev));
++	if (err)
++		return err;
++
++	dev_set_drvdata(&data->dev, data);
++	err = device_register(&data->dev);
++	if (err < 0)
++		goto out_put_sysfs;
++
+ 	hdev = hci_alloc_dev_priv(priv_size);
+-	if (!hdev)
+-		return -ENOMEM;
++	if (!hdev) {
++		err = -ENOMEM;
++		goto out_free_sysfs;
++	}
  
- 	switch (ep->state) {
- 	case BT_ASCS_ASE_STATE_IDLE:
-+		stream_notify_ase_state(stream);
- 		break;
- 	case BT_ASCS_ASE_STATE_CONFIG:
- 		stream_notify_config(stream);
-@@ -1655,6 +1670,9 @@ static bool stream_notify_state(void *data)
- 	case BT_ASCS_ASE_STATE_DISABLING:
- 		stream_notify_metadata(stream);
- 		break;
-+	case BT_ASCS_ASE_STATE_RELEASING:
-+		stream_notify_ase_state(stream);
-+		break;
+ 	hdev->bus = HCI_USB;
+ 	hci_set_drvdata(hdev, data);
+ 
+ 	data->hdev = hdev;
+ 
+-	SET_HCIDEV_DEV(hdev, &intf->dev);
++	SET_HCIDEV_DEV(hdev, &data->dev);
+ 
+ 	reset_gpio = gpiod_get_optional(&data->udev->dev, "reset",
+ 					GPIOD_OUT_LOW);
+@@ -3969,15 +4033,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hci_set_msft_opcode(hdev, 0xFD70);
  	}
  
- 	return false;
-@@ -2068,17 +2086,11 @@ static unsigned int bap_ucast_metadata(struct bt_bap_stream *stream,
+-	if (id->driver_info & BTUSB_AMP) {
+-		/* AMP controllers do not support SCO packets */
+-		data->isoc = NULL;
+-	} else {
+-		/* Interface orders are hardcoded in the specification */
+-		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
+-		data->isoc_ifnum = ifnum_base + 1;
+-	}
+-
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
+ 	    (id->driver_info & BTUSB_REALTEK)) {
+ 		btrtl_set_driver_name(hdev, btusb_driver.name);
+@@ -4010,9 +4065,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 			set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirks);
+ 	}
  
- static uint8_t stream_release(struct bt_bap_stream *stream, struct iovec *rsp)
+-	if (id->driver_info & BTUSB_BROKEN_ISOC)
+-		data->isoc = NULL;
+-
+ 	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 
+@@ -4065,10 +4117,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 						 data->isoc, data);
+ 		if (err < 0)
+ 			goto out_free_dev;
+-
+-		err = device_create_file(&intf->dev, &dev_attr_isoc_alt);
+-		if (err)
+-			goto out_free_dev;
+ 	}
+ 
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+@@ -4099,6 +4147,13 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (data->reset_gpio)
+ 		gpiod_put(data->reset_gpio);
+ 	hci_free_dev(hdev);
++
++out_free_sysfs:
++	device_del(&data->dev);
++
++out_put_sysfs:
++	put_device(&data->dev);
++
+ 	return err;
+ }
+ 
+@@ -4115,10 +4170,8 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	hdev = data->hdev;
+ 	usb_set_intfdata(data->intf, NULL);
+ 
+-	if (data->isoc) {
+-		device_remove_file(&intf->dev, &dev_attr_isoc_alt);
++	if (data->isoc)
+ 		usb_set_intfdata(data->isoc, NULL);
+-	}
+ 
+ 	if (data->diag)
+ 		usb_set_intfdata(data->diag, NULL);
+@@ -4150,6 +4203,7 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 		gpiod_put(data->reset_gpio);
+ 
+ 	hci_free_dev(hdev);
++	device_unregister(&data->dev);
+ }
+ 
+ #ifdef CONFIG_PM
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 05919848ea95..776dd6183509 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1843,6 +1843,7 @@ int hci_get_adv_monitor_offload_ext(struct hci_dev *hdev);
+ 
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+ 
++extern const struct class bt_class;
+ void hci_init_sysfs(struct hci_dev *hdev);
+ void hci_conn_init_sysfs(struct hci_conn *conn);
+ void hci_conn_add_sysfs(struct hci_conn *conn);
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 041ce9adc378..aab3ffaa264c 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -6,9 +6,10 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
+-static const struct class bt_class = {
++const struct class bt_class = {
+ 	.name = "bluetooth",
+ };
++EXPORT_SYMBOL(bt_class);
+ 
+ static void bt_link_release(struct device *dev)
  {
--	struct bt_bap_pac *pac;
--
- 	DBG(stream->bap, "stream %p", stream);
- 
- 	ascs_ase_rsp_success(rsp, stream->ep->id);
- 
--	pac = stream->lpac;
--	if (pac->ops && pac->ops->clear)
--		pac->ops->clear(stream, pac->user_data);
--
--	stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
-+	stream_set_state(stream, BT_BAP_STREAM_STATE_RELEASING);
- 
- 	return 0;
- }
-@@ -6172,7 +6184,8 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
- 
- 	DBG(stream->bap, "stream %p io disconnected", stream);
- 
--	bt_bap_stream_set_io(stream, -1);
-+	if (stream->ep->state == BT_BAP_STREAM_STATE_RELEASING)
-+		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
- 
- 	return false;
- }
-
----
-base-commit: 2ee08ffd4d469781dc627fa50b4a015d9ad68007
-change-id: 20250208-ascs_bug-e7c5715d3d8c
-
-Best regards,
 -- 
-Yang Li <yang.li@amlogic.com>
-
+2.48.1.502.g6dc24dfdaf-goog
 
