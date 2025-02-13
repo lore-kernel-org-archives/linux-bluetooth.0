@@ -1,133 +1,201 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946D8BA2D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 07:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF7E8494;
+	Thu, 13 Feb 2025 09:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739433235; cv=none; b=Ql9EBix9lcO+HK65DmJVjAaZx/5LQKVTa79E1Fv7tE0VgdNAwX7hXJyOiakvvMH7t/Mhzp9gE+r2z51oa0OFBSZAh7QdziSG7x2Bs5EeUNfgSEaOVW61RGBhU/jlitCTA/OSb4rS2E1bT5xR0BnjYTa+lfq/UMHCo7E67jaCGA0=
+	t=1739438657; cv=none; b=iH6RiQHVwMGXJambQpsJALJ6yPRH5jI8g/uf83opaAxRmqE16loOii4Mk/WGIeBemrN2HI+hj35H0wUksx1zcYMJRhMRiXUaWjHIbIeUm0dWqxxuFDSYj6S076dQVPR8FBW+yAgNiB+3Ij5hOhz9fARcwx+uynjEJEJCp0Yeyyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739433235; c=relaxed/simple;
-	bh=dDhJykGEeNS6u3/3kA5g04/rbSMW4m3g82jcAPbzgvU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gDlu/QkqyZuZnZzZJ4aeQqmvu0Fq27dIlvP1NzYDth0h+ka/Ouiejs6vcnpErcbuBfCQxMoZowBf6xWbEnSm4myY9+xpzwI1x/EGann5g1BrT0bhgF9wp1GWw+WPoXn/pJSh+uxh1BV+pvwuihGLTHzIqC40aARjxIbz/Uv8Gk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MEymq2Wj; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739438657; c=relaxed/simple;
+	bh=SETByG1qewINiXUWVnpG1tbMW3sFfN+fC9WwoSZz3Cg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eT5GLPdaKdKEAsYqN2sCipGPzXB9p81hZ7BlsS/thbwGc1gvyJtxGk8unr2Lf/bUa0H8KPltHbzMUCm2cZQeJrEoAFC9nQzU0PuIthN7GLPpUHUMOaRvOeVbFZJuj47Asxbd1Tqea1m4rCdb+FjNSTwvPTciarzZszRwnlrAGC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOWjFEzM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MEymq2Wj"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-220dc3831e3so2778755ad.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2025 23:53:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739433232; x=1740038032; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=owsj6/hChxVQicxOJCfAcFhIkOXbeKcKnmlSj+horWA=;
-        b=MEymq2Wj8fAUecRuap2n2F5QPgE2frANwmq/c/oz0r8mQjD8quSP3W8B6c65VzJl65
-         jG+5VhOm3NmSoSGsXwfiarSrPhDS6JzlyJAyNEXCqmjEs5Ng+P5mfVttucoMk25s1ywa
-         hhrQxU8jKVUoiNvAbOgGp+9XxCAB4X4aW7sj3RSr1nhM0Oy9yBD+xPXC8DdwaLvDN0yo
-         1DH7RAR4k6NQlG7WvoX8N0RWyYslUB3VlsrDCKlaGtoC4LdmMdNozmLtpRTXblKCvJOq
-         iiY2rB/K6ASxXVrYeE11hBJ4XTuJONGcW+yxnT2UZZ6EDMUXMuRieCM3gr5V2K7BAP1t
-         45Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739433232; x=1740038032;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=owsj6/hChxVQicxOJCfAcFhIkOXbeKcKnmlSj+horWA=;
-        b=W5DKSy3Ys/y+3Y8qJrCijPk5jqQkStZnn6pAyfNgkEka7a8QBkq04ey4Oq5/3yeARh
-         uy61G01cNYZvLYlcGAuGIKX/3BjOXhryPv/D4HwXOdDjmQhKkG7p9qcyM0vW/+SPh/Ug
-         hemtl2cXt1StQJyl5XtxTI43oNWiHzKld8dl4e3LvuL4odU05KehT38sOtp9u1meOApH
-         BfykNDZ+h04wi1iSc2RJudv68rCFUordu+LqHaqBVnKkhZqm2ikI1HzhAf2sItt6NMSD
-         pIOk4JoD/HplfUy6ODVung2eT5s6PC1IkjkVHwJFwFEoVXB41LxuOUJkMBfO0HW9zW7x
-         FeWg==
-X-Gm-Message-State: AOJu0YzRs1WmaDaHl5kGQ5QPvawiBWuxWrvYk0z8QXQrydFjAIkwwa1j
-	usnlhQHQDKex4BJ2A4OshdxTcy1hchkRwRO/QPfsfMRHvBvdEJxoebEyBg==
-X-Gm-Gg: ASbGnctwl2l42FpGuCsoK7XCK8e2GPrAIn0DapyU0Dm1dLZcT8hGWbWHI5ApmxsoU0N
-	F45Wh+fnXJythcCdSlAyVkRGQfWf5/jUYjZU/LRbWjE4rNUjUUtVxib4nUf6yS13maSx74AY2n0
-	n/+JSNmddyF/akRRmphgvkBi37rslEV19JMD1aSpcWS3c9iWjtGgWz39lMcfut3/6544ark5Z0o
-	YN6e303yljl1EpjpSW8EgF5uHg6kdevniV+do2mTP9E1ZN6HvUQNbTalLC0DzQMm4eWnVKx5+nY
-	twrUiwRnljwzfqPRkrB0qQ==
-X-Google-Smtp-Source: AGHT+IHk8C8slRvX2r+TDE1a0/cgMOiAoo63CWAssdPRV7BtYjcl0HYWJl94xq9ue4dl7ngO/PItBQ==
-X-Received: by 2002:a05:6a00:84c3:b0:725:d64c:f122 with SMTP id d2e1a72fcca58-7323c45aab1mr2844381b3a.2.1739433232451;
-        Wed, 12 Feb 2025 23:53:52 -0800 (PST)
-Received: from [172.17.0.2] ([20.171.99.215])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7324257fb92sm673352b3a.75.2025.02.12.23.53.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 23:53:52 -0800 (PST)
-Message-ID: <67ada510.050a0220.2df130.1a3c@mx.google.com>
-Date: Wed, 12 Feb 2025 23:53:52 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6992117633484338308=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOWjFEzM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE2CC4CED1;
+	Thu, 13 Feb 2025 09:24:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739438656;
+	bh=SETByG1qewINiXUWVnpG1tbMW3sFfN+fC9WwoSZz3Cg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oOWjFEzMW5Itbp966Mhhgvt+TSmcPLI232Gake1rJyNJewJB2DhfHk0U5YNO1lnI9
+	 xQ/+R0S1tgEtop555Oa0DEXmWmTzo+yE467JQme2B7qtBZahmDEqSJD00Iwd5qeN29
+	 YmNehKmWRS1AEc7jH5c0n4NV1bzFgDctDN5u7WbrzjTHoG6opz1dwamldQt6qv5iqd
+	 56+oBFZ7CKTXHKkYk6Sd2i/P9P9mIPfYTMbgTjyo9Hsw9y+WNGfQ/qU7nHx8bOWGQy
+	 x/zVofWifwca7Iiy9krdj6/EYQ+c72Cyj1uocQVgooNnXQGiTKq2x5mzluf8iCcm8B
+	 O577k+inauNZQ==
+Date: Thu, 13 Feb 2025 10:24:13 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Ajay Singh <ajay.kathat@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Marek Vasut <marex@denx.de>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 10/12] bluetooth: hci_wilc: add wilc hci driver
+Message-ID: <20250213-fine-thankful-lobster-eed3e8@krzk-bin>
+References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
+ <20250212-wilc3000_bt-v1-10-9609b784874e@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, tatsuya.s2862@gmail.com
-Subject: RE: Bluetooth: btbcm: Fix reset errors at setup
-In-Reply-To: <20250213070520.9308-4-tatsuya.s2862@gmail.com>
-References: <20250213070520.9308-4-tatsuya.s2862@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250212-wilc3000_bt-v1-10-9609b784874e@bootlin.com>
 
---===============6992117633484338308==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Feb 12, 2025 at 04:46:29PM +0100, Alexis Lothor=C3=A9 wrote:
+> +#include "linux/bitops.h"
+> +#include "linux/byteorder/generic.h"
+> +#include "linux/err.h"
+> +#include "linux/gfp_types.h"
+> +#include "net/bluetooth/bluetooth.h"
+> +#include "net/bluetooth/hci.h"
 
-This is automated email and please do not reply to this email!
+Keep some order here. Why some are <> some "", why net is mixed with
+linux...
 
-Dear submitter,
+> +#include <linux/module.h>
+> +#include <linux/firmware.h>
+> +#include <linux/of.h>
+> +#include <linux/serdev.h>
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +#include <net/wilc.h>
+> +
+> +#include "hci_uart.h"
+> +
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=933490
+=2E..
 
----Test result---
+> +static const struct hci_uart_proto wilc_bt_proto =3D {
+> +	.id =3D HCI_UART_WILC,
+> +	.name =3D "Microchip",
+> +	.manufacturer =3D WILC_BT_UART_MANUFACTURER,
+> +	.init_speed =3D WILC_UART_DEFAULT_BAUDRATE,
+> +	.open =3D wilc_open,
+> +	.close =3D wilc_close,
+> +	.flush =3D wilc_flush,
+> +	.recv =3D wilc_recv,
+> +	.enqueue =3D wilc_enqueue,
+> +	.dequeue =3D wilc_dequeue,
+> +	.setup =3D wilc_setup,
+> +	.set_baudrate =3D wilc_set_baudrate,
+> +};
+> +
+> +static int wilc_bt_serdev_probe(struct serdev_device *serdev)
+> +{
+> +	struct wilc_adapter *wilc_adapter;
+> +	struct device_node *wlan_node;
+> +	void *wlan =3D NULL;
+> +	int ret;
+> +
+> +	wilc_adapter =3D kzalloc(sizeof(*wilc_adapter), GFP_KERNEL);
 
-Test Summary:
-CheckPatch                    PENDING   0.38 seconds
-GitLint                       PENDING   0.22 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      24.07 seconds
-CheckAllWarning               PASS      26.71 seconds
-CheckSparse                   PASS      30.22 seconds
-BuildKernel32                 PASS      23.88 seconds
-TestRunnerSetup               PASS      429.93 seconds
-TestRunner_l2cap-tester       PASS      20.39 seconds
-TestRunner_iso-tester         PASS      31.61 seconds
-TestRunner_bnep-tester        PASS      4.79 seconds
-TestRunner_mgmt-tester        PASS      118.42 seconds
-TestRunner_rfcomm-tester      PASS      7.59 seconds
-TestRunner_sco-tester         PASS      9.32 seconds
-TestRunner_ioctl-tester       PASS      8.42 seconds
-TestRunner_mesh-tester        PASS      5.92 seconds
-TestRunner_smp-tester         PASS      6.97 seconds
-TestRunner_userchan-tester    PASS      5.06 seconds
-IncrementalBuild              PENDING   0.91 seconds
+Why not devm?
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+> +	if (!wilc_adapter)
+> +		return -ENOMEM;
+> +
+> +	wlan_node =3D of_parse_phandle(serdev->dev.of_node, "wlan", 0);
+> +	if (!wlan_node) {
+> +		BT_ERR("Can not run wilc bluetooth without wlan node");
+> +		ret =3D -EINVAL;
+> +		goto exit_free_adapter;
+> +	}
+> +
+> +#if IS_ENABLED(CONFIG_WILC1000_SDIO)
+> +	wlan =3D wilc_sdio_get_byphandle(wlan_node);
+> +#endif
+> +#if IS_ENABLED(CONFIG_WILC1000_SPI)
+> +	if (!wlan || wlan =3D=3D ERR_PTR(-EPROBE_DEFER))
+> +		wlan =3D wilc_spi_get_byphandle(wlan_node);
+> +#endif
+> +	if (IS_ERR(wlan)) {
+> +		pr_warn("Can not initialize bluetooth: %pe\n", wlan);
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+dev_warn or even dev_err_probe to handle deferral.
 
 
+> +		ret =3D PTR_ERR(wlan);
+> +		goto exit_put_wlan_node;
+> +	}
+> +
+> +	of_node_put(wlan_node);
+> +	wilc_adapter->wlan_priv =3D wlan;
+> +	ret =3D wilc_bt_init(wlan);
+> +	if (ret) {
+> +		pr_err("Failed to initialize bluetooth firmware (%d)\n", ret);
 
----
-Regards,
-Linux Bluetooth
+dev_err_probe
+
+> +		goto exit_put_wlan;
+> +	}
+> +
+> +	wilc_adapter->dev =3D &serdev->dev;
+> +	wilc_adapter->hu.serdev =3D serdev;
+> +	wilc_adapter->flow_control =3D false;
+> +	serdev_device_set_drvdata(serdev, wilc_adapter);
+> +	ret =3D hci_uart_register_device(&wilc_adapter->hu, &wilc_bt_proto);
+> +	if (ret) {
+> +		dev_err(&serdev->dev, "Failed to register hci device");
+> +		goto exit_deinit_bt;
+> +	}
+> +
+> +	dev_info(&serdev->dev, "WILC hci interface registered");
+
+Drop simple probe statuses. sysfs already provides this.
 
 
---===============6992117633484338308==--
+> +	return 0;
+> +
+> +exit_deinit_bt:
+> +	wilc_bt_shutdown(wlan);
+> +exit_put_wlan:
+> +	wilc_put(wlan);
+> +exit_put_wlan_node:
+> +	of_node_put(wlan_node);
+> +exit_free_adapter:
+> +	kfree(wilc_adapter);
+> +	return ret;
+> +}
+> +
+> +static void wilc_bt_serdev_remove(struct serdev_device *serdev)
+> +{
+> +	struct wilc_adapter *wilc_adapter =3D serdev_device_get_drvdata(serdev);
+> +
+> +	hci_uart_unregister_device(&wilc_adapter->hu);
+> +	wilc_bt_shutdown(wilc_adapter->wlan_priv);
+> +	wilc_put(wilc_adapter->wlan_priv);
+> +	kfree(wilc_adapter);
+> +}
+> +
+> +static const struct of_device_id wilc_bt_of_match[] =3D {
+> +	{ .compatible =3D "microchip,wilc3000-bt" },
+> +	{},
+> +};
+> +MODULE_DEVICE_TABLE(of, wilc_bt_of_match);
+> +
+> +static struct serdev_device_driver wilc_bt_serdev_driver =3D {
+> +	.probe =3D wilc_bt_serdev_probe,
+> +	.remove =3D wilc_bt_serdev_remove,
+> +	.driver =3D {
+> +		.name =3D "hci_uart_wilc",
+> +		.of_match_table =3D of_match_ptr(wilc_bt_of_match),
+
+Drop of_match_tr, you have warnings here.
+
+Best regards,
+Krzysztof
+
