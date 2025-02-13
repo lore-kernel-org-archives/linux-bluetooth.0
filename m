@@ -1,46 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E6541C6A;
-	Thu, 13 Feb 2025 10:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF97A2066D6;
+	Thu, 13 Feb 2025 10:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739440882; cv=none; b=sXe2YHJdpOkeIQRh1JB6uT52Vktzq3UNi3Nisz/0ss22ys0ZahIFk0jqvrrG61pBwGz812SA3EYxql4Tsg3/fEb7iNhKFZPhasIHR6Hub8v2Xz1pr7EaM3ONyqwNnF1/bu+DWnoLdcohxnqYajzEmTRIlZ2yRt7BXHNViG4NYmI=
+	t=1739440904; cv=none; b=JhuCoJ5HeVODN65vH1pC85sfb7kVV6paqhr0XaJvE5fN3JsVIBVSC7dogujYN2zAtPCCwDtRdw/Uxsf89Wtzw4KAhBPNrL05NLUQItESSt4537n6+GP1cqu5LBvRk5LnqUcKGCmmR6e23xMPOI9fwVrdblXlrfb0LjqevXj7MeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739440882; c=relaxed/simple;
-	bh=ZIqYDH1BfJZcAkTWwvMK4oFyPuJrzrCNOnu8RYStqJg=;
+	s=arc-20240116; t=1739440904; c=relaxed/simple;
+	bh=EoGJfc9ifR6hXmDHsanG9hhvpDo5weaiWEA0/w0WM3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F5bVCcDDZWL4dOEniVPSVDUrylL4882Kbq55NhTstweSSNeLQrLE7toUELhMLEV7qR96vN+xTB00+BGY0Am9t+5lxbizfKVqr8guuW6zKo/4UeEnnEZpu8lrnD/c0gzo4zvjm30YPjlXj4aVh4pWhEMZ153tdLkuycenMGXUIWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=CT80kOy+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uo6/WTxq9GdJh2IkKgATUJ4pvz36gHbwZr3WoXszxw/xqEBy091FlcEQrRHRqMTVlJXZRJH2FoNujxjji2p93z23tgM2GFojkRzfWNTjlFsEAypS38OgrtkGlSMQWB/JeGN7n1SyIwJKzPJm/NYCv7HCc8OoHpHVCVsKLAFqmsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=O0TPH38G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="CT80kOy+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE24CC4CED1;
-	Thu, 13 Feb 2025 10:01:20 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="O0TPH38G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8274C4CEE2;
+	Thu, 13 Feb 2025 10:01:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739440881;
-	bh=ZIqYDH1BfJZcAkTWwvMK4oFyPuJrzrCNOnu8RYStqJg=;
+	s=korg; t=1739440904;
+	bh=EoGJfc9ifR6hXmDHsanG9hhvpDo5weaiWEA0/w0WM3w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CT80kOy+UBc1F93xZBALWXH0fBw+w/Wl/AbuBRUZ5RA9pmydy3NjIF+nI0Cs6gAyB
-	 FaX6b6pwa36QQ5fOJUslSk9QaLd9e48+cI6/tJwSlRyRVa91hSeU11nCDDKuvkGhOQ
-	 167EKf9CBvO0ISoqVdxpt9jKdIZnJATxTOLRlXiQ=
-Date: Thu, 13 Feb 2025 11:01:17 +0100
+	b=O0TPH38GR/EpP2CpV7/w6E72VcgkuwpX3MknLXLIUez4Gk5qe2damJYpDjuBa9gfC
+	 v98W1ZKU+7blVsgurfOaVS6mfqnebqCUj2jt8eGcZXl2uKAgbgZtr+RfYnK0EOLXes
+	 euDtXiS+jg5ucC+B7SGxvppc4AuYGVaYBPaius0c=
+Date: Thu, 13 Feb 2025 11:01:41 +0100
 From: Greg KH <gregkh@linuxfoundation.org>
 To: Hsin-chen Chuang <chharry@google.com>
 Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
 	chromeos-bluetooth-upstreaming@chromium.org,
 	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-Message-ID: <2025021352-dairy-whomever-f8bd@gregkh>
+	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 3/3] Bluetooth: Add ABI doc for sysfs isoc_alt
+Message-ID: <2025021325-faction-upward-6395@gregkh>
 References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <20250213034413.3808375-1-chharry@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,80 +43,18 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+In-Reply-To: <20250213034413.3808375-1-chharry@google.com>
 
-On Thu, Feb 13, 2025 at 11:43:59AM +0800, Hsin-chen Chuang wrote:
+On Thu, Feb 13, 2025 at 11:44:01AM +0800, Hsin-chen Chuang wrote:
 > From: Hsin-chen Chuang <chharry@chromium.org>
 > 
-> Expose the isoc_alt attr with device group to avoid the racing.
+> The functionality was completed in commit c04f2e4f4ea1 ("Bluetooth: Fix
+> possible race with userspace of sysfs isoc_alt")
 > 
-> Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> it also becomes the parent device of hci dev.
-> 
-> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> ---
-> 
-> Changes in v4:
-> - Create a dev node for btusb. It's now hci dev's parent and the
->   isoc_alt now belongs to it.
-> - Since the changes is almost limitted in btusb, no need to add the
->   callbacks in hdev anymore.
-> 
-> Changes in v3:
-> - Make the attribute exported only when the isoc_alt is available.
-> - In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
->   (which calls hci_init_sysfs).
-> - Since hci_init_sysfs is called before btusb could modify the hdev,
->   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
-> 
->  drivers/bluetooth/btusb.c        | 98 +++++++++++++++++++++++++-------
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_sysfs.c        |  3 +-
->  3 files changed, 79 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 1caf7a071a73..cb3db18bb72c 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -920,6 +920,8 @@ struct btusb_data {
->  	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
->  
->  	struct qca_dump_info qca_dump;
-> +
-> +	struct device dev;
->  };
->  
->  static void btusb_reset(struct hci_dev *hdev)
-> @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
->  	int alt;
->  	int ret;
->  
-> +	if (!data->hdev)
-> +		return -ENODEV;
-> +
->  	if (kstrtoint(buf, 10, &alt))
->  		return -EINVAL;
->  
-> @@ -3702,6 +3707,34 @@ static ssize_t isoc_alt_store(struct device *dev,
->  
->  static DEVICE_ATTR_RW(isoc_alt);
->  
-> +static struct attribute *btusb_sysfs_attrs[] = {
-> +	NULL,
-> +};
-> +ATTRIBUTE_GROUPS(btusb_sysfs);
-> +
-> +static void btusb_sysfs_release(struct device *dev)
-> +{
-> +	// Resource release is managed in btusb_disconnect
+> Fixes: c04f2e4f4ea1 ("Bluetooth: Fix possible race with userspace of sysfs isoc_alt")
 
-That is NOT how the driver model works, do NOT provide an empty
-release() function just to silence the driver core from complaining
-about it.
-
-If for some reason the code thinks it is handling devices differently
-than it should be, fix that instead.
+Where is this git id?  I don't see it in linux-next, are you sure it is
+correct?
 
 thanks,
 
