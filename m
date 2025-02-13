@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872A924168F;
-	Thu, 13 Feb 2025 18:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA7B28A2D5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 18:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739470206; cv=none; b=kIJWcf84qdXq0FzCqDnb2q02jpyt43DPvi1riRujXuyRMf22LWnBE0nWrhwKFLqNg2EdZDRuJTu2YClS7vg/PCueOcxsHyx7/R+eB7YPw4T+wg9vntgEleVw72m8RI4M77xFIfpTHFmO34rJRQ031LLWyBT9iTK2378+a9DEiVQ=
+	t=1739472007; cv=none; b=lvllMSsaH6bb/JNgdJrabdS1FYFkHqMC+gvX5eOD2jZ6nk8MQsl7Jr4mmNS90Pr4r0PvXagcVF8GSiaqlqFd7rbohvKJ+h/fiaTDmTVjdeb3jDbGtiwOzxT6nbPsg7Bo60dkrsCpSAGTv9kQ1pBWcW8rkYJ34fmnGLjgtYV9lT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739470206; c=relaxed/simple;
-	bh=PMWLdbIdcvDZfOdkXVXUnGoikbYlW7a1W2uScQ1qO8I=;
+	s=arc-20240116; t=1739472007; c=relaxed/simple;
+	bh=YMmJxVsFovwCDpSWc7rctfMcS4WWwTxcQD1X2iYwe5I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=s1orayqSkKpssVRci3DF4wNMdYj3TU1fm8sMCZxC20mBg/L4cdQB8eYD0AGovrMvT32HgG/3tH3RvPD2qxS74SfLCeOLVQMk+l3ec6mKQ8FqIODo94UV/rzvLPoxcG0nAp6zxwaktMLAZ0oHDsjVdVSUQwevcqYar29JIW2RWFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ACp17O3x; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=LGjLIrLthOldVo1PMJvC28iZO3wj4yUSVBy9kTcUzhvMsfq4KGDGIoPXUvBRKsQqOaLJ+j2ddN3OM2r7uaiM9Xm5XZ7CZUjLZ41Z5aU+MzbEaTXrd52USYZqkqdp3UhNukZjVy54uFFFY5okDN4+MmkmVDppxC4f2xFjUhDDnYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwnLHV63; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ACp17O3x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02EEFC4CED1;
-	Thu, 13 Feb 2025 18:10:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwnLHV63"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FE73C4CEE4;
+	Thu, 13 Feb 2025 18:40:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739470206;
-	bh=PMWLdbIdcvDZfOdkXVXUnGoikbYlW7a1W2uScQ1qO8I=;
+	s=k20201202; t=1739472007;
+	bh=YMmJxVsFovwCDpSWc7rctfMcS4WWwTxcQD1X2iYwe5I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ACp17O3x89P3HP1FTNAeu262Sc3xEIjVJY/ELXWk2wIlFbxlKGhpGTpCMRRQY7n1S
-	 PIRhv4JbpraHQDczgSxAqStpM5PunW4sQhhJKyZixMNM3YTWS6MMXYEmIq0DmG0nke
-	 Ab4xnWNAcdywZbGVlz9VeNYGKLZZho31LVhmlsoOmMCTLoGxfdD2q6dG86uZeqLlNh
-	 i+gMfKJQpQwODkpTbMZlyCoGK4QDeNfuIGW1Qgdb6wtvBVifa28CXKYIUAE8a8gPJm
-	 fax35872XBQVrkb8ULFwZJsMNYj2iJBgcU5jw1VTf6fEIJh6z+d9fnsU6jGoptijA5
-	 40E84vzJwNoHQ==
+	b=kwnLHV63yB45vGrZVctwaodtQiI/pXAK2cB60q8RhBgmUhAHS/FVCIUd/acus+uc8
+	 NGOtFuBuOkKy6aAhrryAgq6pDjysu8efPoxZvxQE6WsVIYZZrOuNhqB6Z3lgND949N
+	 acuH2nEUG0XeA+OPMrO6R9+3SutCPJEh0T+jltbEGLJcmtXHiA/ofW98VHNHbI5ZzS
+	 2RmPrGAg+zY09jtGTeUKExSQHTgzS+b8tt+8yzEB8MB+x7HwIDKuswTnm7RKgq+k30
+	 RmXTNGzuquTNMTQHsuk26ZLpR1dJIFijGAfQj4bfLW+ZjLDTRzYzKLn9AfP5hygjFo
+	 KIxdyndSrv/vA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71907380CEEF;
-	Thu, 13 Feb 2025 18:10:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF5F380CEEF;
+	Thu, 13 Feb 2025 18:40:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2025-02-13
-From: patchwork-bot+netdevbpf@kernel.org
+Subject: Re: [PATCH 1/4] test-runner: Increase amount of RAM available in VM
+From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173947023533.1322759.1575617814949046507.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Feb 2025 18:10:35 +0000
-References: <20250213162446.617632-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250213162446.617632-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <173947203651.1333908.1366729347523015801.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Feb 2025 18:40:36 +0000
+References: <20250212135209.129361-1-arkadiusz.bokowy@gmail.com>
+In-Reply-To: <20250212135209.129361-1-arkadiusz.bokowy@gmail.com>
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 13 Feb 2025 11:24:46 -0500 you wrote:
-> The following changes since commit 0469b410c888414c3505d8d2b5814eb372404638:
-> 
->   Merge branch 'net-ethernet-ti-am65-cpsw-xdp-fixes' (2025-02-12 20:12:59 -0800)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-02-13
-> 
-> [...]
+On Wed, 12 Feb 2025 14:52:06 +0100 you wrote:
+> When using default kernel configuration from Ubuntu 24.04 patched with
+> the configuration from tester.config, the kernel image is too big to run
+> on 192M bytes of RAM. As a result the test-runner exits without any
+> message (because of the "quite" kernel command line option).
+> ---
+>  tools/test-runner.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [GIT,PULL] bluetooth 2025-02-13
-    https://git.kernel.org/netdev/net/c/82c260c8806b
+  - [1/4] test-runner: Increase amount of RAM available in VM
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=571bc32fd9d0
+  - [2/4] test-runner: Remove the "-nographic" option passed to QEMU
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8e76a4d0dc56
+  - [3/4] test-runner: Do not use short-form of readonly option
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=54210e0210d4
+  - [4/4] test-runner: Use host CPU when starting VM
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4577f50e739f
 
 You are awesome, thank you!
 -- 
