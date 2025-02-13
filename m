@@ -1,163 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFB9166F32;
-	Thu, 13 Feb 2025 16:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C52142903;
+	Thu, 13 Feb 2025 16:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739462734; cv=none; b=X5t5QpYZ9S0J5hJ8TyeE/L7KDAKIAi6HIecZFVfdoQa/G1+II0YzrwdKW2oOdLcjFhNC+Ie8P39QB2nrsvhFgEph+EWFwAG4QK/ZhlrGTGVw4DrykiKMnBw1ma+khXzw+z24NAMkTWlRZ8HI15sWryimnXjqF0gH1B8/Hk/6Pk0=
+	t=1739463891; cv=none; b=uByUGHuhR1My1WPb08XrxaHhSeCj4E/TeMMiIuotHnI43igIBwKirYVruLFksxz0EbUb6r/gkTH/jxjY6QPEZzKgWKe3ggO0FKrInnfsDerr6et2dC5LVZFWz2X7P+9qQT7POSy8RDcehBMC9k4xPCVYYezYzPoucZ5UubBzCEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739462734; c=relaxed/simple;
-	bh=KqLSD5pr31DT34vaQrITHjUd6zYfdu5KKwcHPMP10TI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h5MqbBI5RBc6O8YNyo8l19KQ8JWgHwbYB0G7v7YZ5bxZ794RPLcKmdB1DN5gWPtmU7COHejp6OIyu93/wXDXSrcXJVfEl/PlYCqu/G6ASKuCIn6Lc7E9IR+gcrTL9PypmMVkg/EZ4e6BF+tixC3yqDuxx856n4MIMUDEWULrz08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=2NS6cZPk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739463891; c=relaxed/simple;
+	bh=hCLaSpRrZNAM+Qdl0uGypkFPjefcYkJglUCk1mcRnZA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pDBGJo61BhrxI4VFAXOMW+AzFaWc2MzrmDFYEFDIF/NcxMQZtygXhCxFg7+DbYIv2UoGcpxWDhuADp1fF66OvD4R9wJbuCiymlV2pDsGuexHDhQnemGEExY7fL1z6P2A1yEck1I+d5cvqxjyb1qd+1X9f7bCIkJqcn0jjqn/sSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FIj7cdja; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="2NS6cZPk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E90C4CED1;
-	Thu, 13 Feb 2025 16:05:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739462733;
-	bh=KqLSD5pr31DT34vaQrITHjUd6zYfdu5KKwcHPMP10TI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=2NS6cZPk3ivMsd0gRCvi8DZbL1qhq2MYNgphXrteL9o+WcQ8efGeYKoS1jExDPNrg
-	 fr0MtF64ijizH5xwA7+R44XJ6tAn8D1K3oWZadl6on62SwNPfUsF1Q01U2j8A9SvI8
-	 4re55Xiopq+TdPM17CGgBcRlc5v7msb22bu8gg+k=
-Date: Thu, 13 Feb 2025 17:05:30 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Hsin-chen Chuang <chharry@google.com>, linux-bluetooth@vger.kernel.org,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FIj7cdja"
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e545c1e8a15so1132171276.1;
+        Thu, 13 Feb 2025 08:24:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739463888; x=1740068688; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DLKNZeQ3LH1NFu616uvDBTZfSlpWUGaGhAaTt3QR6Ww=;
+        b=FIj7cdjafc4Z54GaDJjLOS+NwKAU73Wwgtbwb/+Vf0Ql1LDHM5md0zVKQPF8xiE9ZZ
+         u/JIx7ieBAjibP5AksOqQv7Puvk8KO74AatFa97Cy05OehWsOo/ioBzYuTy8YPeLuzyg
+         dp//xJNZiEUefn0Ac7HoP3RlDXNJ6nnKI/u42tQ8tsDPJhMsEb/sDva16tWzTNGz82WO
+         V25hUPWj5W79/JTp1rAA2OQEYBxmKMK3ZF3Xa/fAOEjA0GNgcIANCzznR8r694b7jh17
+         wxZCDvOlmvRdDqJ88omPxITC9nFNhBb5btxBmk0x64oY+cIkcptPR6BOWmVQU00IyAwS
+         6tfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739463888; x=1740068688;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DLKNZeQ3LH1NFu616uvDBTZfSlpWUGaGhAaTt3QR6Ww=;
+        b=a1oR70iyuEDH/+8duAor656w4xeuTcfyQYKKIJESXLNobSXYdAtaMqyson+v7vZVwd
+         XAaNPdg2/I78Xe/5+VplXwi7rhaAjP/Qg586/pW7nncp7Fl7mOP+HEQcMNXLY6nD86nu
+         b6CSkfWjKBKDBd5kplHtk321ao6Qg1JV+5aG0Jd/8IBxQIW6oR1ymT0+RUpprwNWbKZS
+         OQKT26H+lkRWK4PA1q7VQ1le6S5FpGOGQW+ByZzm+1flvEFP7tXzYisUGGK7w4iNmDzB
+         rs719rkT8aW6dZBzGuM52C76k/WfHcgECxmGQ5VYK7sDDwTcOPY3RijahYb5/TCWu0vA
+         kkrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqUE0IBHbNK4LnTqKB/tRDMXDs4CUqdh8KIBi/vJGwbdekgb6FBZwTIMlkyh4U+K0DBDgrYJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGnqo6RWc8rED2lBOEFrO4JEHypBWRw6qxK5TDgNXB4uCXjds0
+	EouIoV7BH+OosyhsxebhH/+o0LhilCrnWsYHufvrUd5yg4/yMgmvQs8mGlUL6rM=
+X-Gm-Gg: ASbGncvDec6SpKgPzd92y6YZe5OWdEYb2BcdKUtPWXVO/YpPw7jtLqirtjGoYSGS5DN
+	QFIbnzCRwUab5zwgAtgrBvGTIPCbFslYvB70+AADLTWYuXVxZLmXMGGXNAymnqChgypXj785yEy
+	bHS7Iq2lV7x6mfURJvM6AOX2q/YCO+5bD+t6ndwX3yJT8m0CWVHyCE0T63HCQreivHgSRURfEFn
+	U6C7BQRgyfv1A+K/A6NmkunsL+JQKNDFRrfQpUc2VDyKclnQc2CTVlEKExT4WZGtMaCOtV2yTPh
+	RWN2QYEykN4MrjpdQW4rm2nlkFVff5ygTxtMiICfwxB1A8HePlu6nI/ssu7ybhc=
+X-Google-Smtp-Source: AGHT+IE42JvzsphUxmTZF2aJApQSUmf/ILuJJXUvRmKVzR8RKpO/V0mx9qCg7J9rFs9L3mvFCMcLMw==
+X-Received: by 2002:a05:6902:1aca:b0:e5b:225b:19ab with SMTP id 3f1490d57ef6-e5da7cfc5a7mr3657695276.0.1739463888389;
+        Thu, 13 Feb 2025 08:24:48 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e5dae0da0e5sm456937276.39.2025.02.13.08.24.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 08:24:47 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-Message-ID: <2025021338-freewill-nimbly-7218@gregkh>
-References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021352-dairy-whomever-f8bd@gregkh>
- <CADg1FFdez0OdNDPRFPFxNHL_JcKmHE6KNxnYvt4sK7i+Uw6opA@mail.gmail.com>
- <2025021347-washboard-slashed-5d08@gregkh>
- <CADg1FFdbKx3z+SPWFmY4+xZmewh0MnnZp_gmYEdY0z-mxutmEw@mail.gmail.com>
- <2025021318-regretful-factsheet-79a1@gregkh>
- <CABBYNZL4tEBTT3Hrf3JUGNuseLg1SNLmazo88EitmMfhUWUQxw@mail.gmail.com>
- <2025021347-exalted-calculate-b313@gregkh>
- <CABBYNZJSwQJ-KWacoXDGVJ5gni260FTi=XEpNw3ER2CJhpVrKg@mail.gmail.com>
+Subject: [GIT PULL] bluetooth 2025-02-13
+Date: Thu, 13 Feb 2025 11:24:46 -0500
+Message-ID: <20250213162446.617632-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZJSwQJ-KWacoXDGVJ5gni260FTi=XEpNw3ER2CJhpVrKg@mail.gmail.com>
 
-On Thu, Feb 13, 2025 at 10:56:46AM -0500, Luiz Augusto von Dentz wrote:
-> Hi Greg,
-> 
-> On Thu, Feb 13, 2025 at 10:39 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Thu, Feb 13, 2025 at 09:22:28AM -0500, Luiz Augusto von Dentz wrote:
-> > > Hi Greg,
-> > >
-> > > On Thu, Feb 13, 2025 at 8:45 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > >
-> > > > On Thu, Feb 13, 2025 at 09:33:34PM +0800, Hsin-chen Chuang wrote:
-> > > > > On Thu, Feb 13, 2025 at 8:10 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > > > > >
-> > > > > > A: http://en.wikipedia.org/wiki/Top_post
-> > > > > > Q: Were do I find info about this thing called top-posting?
-> > > > > > A: Because it messes up the order in which people normally read text.
-> > > > > > Q: Why is top-posting such a bad thing?
-> > > > > > A: Top-posting.
-> > > > > > Q: What is the most annoying thing in e-mail?
-> > > > > >
-> > > > > > A: No.
-> > > > > > Q: Should I include quotations after my reply?
-> > > > > >
-> > > > > > http://daringfireball.net/2007/07/on_top
-> > > > > >
-> > > > > > On Thu, Feb 13, 2025 at 07:57:15PM +0800, Hsin-chen Chuang wrote:
-> > > > > > > The btusb driver data is allocated by devm_kzalloc and is
-> > > > > > > automatically freed on driver detach, so I guess we don't have
-> > > > > > > anything to do here.
-> > > > > >
-> > > > > > What?  A struct device should NEVER be allocated with devm_kzalloc.
-> > > > > > That's just not going to work at all.
-> > > > >
-> > > > > Noted. Perhaps that needs to be refactored together.
-> > > > >
-> > > > > >
-> > > > > > > Or perhaps we should move btusb_disconnect's content here? Luiz, what
-> > > > > > > do you think?
-> > > > > >
-> > > > > > I think something is really wrong here.  Why are you adding a new struct
-> > > > > > device to the system?  What requires that?  What is this new device
-> > > > > > going to be used for?
-> > > > >
-> > > > > The new device is only for exposing a new sysfs attribute.
-> > > >
-> > > > That feels crazy.
-> > > >
-> > > > > So originally we had a device called hci_dev, indicating the
-> > > > > implementation of the Bluetooth HCI layer. hci_dev is directly the
-> > > > > child of the usb_interface (the Bluetooth chip connected through USB).
-> > > > > Now I would like to add an attribute for something that's not defined
-> > > > > in the HCI layer, but lower layer only in Bluetooth USB.
-> > > > > Thus we want to rephrase the structure: usb_interface -> btusb (new
-> > > > > device) -> hci_dev, and then we could place the new attribute in the
-> > > > > new device.
-> > > > >
-> > > > > Basically I kept the memory management in btusb unchanged in this
-> > > > > patch, as the new device is only used for a new attribute.
-> > > > > Would you suggest we revise the memory management since we added a
-> > > > > device in this module?
-> > > >
-> > > > If you add a new device in the tree, it HAS to work properly with the
-> > > > driver core (i.e. life cycles are unique, you can't have empty release
-> > > > functions, etc.)  Put it on the proper bus it belongs to, bind the
-> > > > needed drivers to it, and have it work that way, don't make a "fake"
-> > > > device for no good reason.
-> > >
-> > > Well we could just introduce it to USB device, since alternate setting
-> > > is a concept that is coming from there, but apparently the likes of
-> > > /sys/bus/usb/devices/usbX/bAlternateSetting is read-only, some
-> > > Bluetooth profiles (HFP) requires switching the alternate setting and
-> > > because Google is switching to handle this via userspace thus why
-> > > there was this request to add a new sysfs to control it.
-> >
-> > That's fine, just don't add devices where there shouldn't be devices, or
-> > if you do, make them actually work properly (i.e. do NOT have empty
-> > release callbacks...)
-> >
-> > If you want to switch alternate settings in a USB device, do it the
-> > normal way from userspace that has been there for decades!  Don't make
-> > up some other random sysfs file for this please, that would be crazy,
-> > and wrong.
-> >
-> > So what's wrong with the current api we have today that doesn't work for
-> > bluetooth devices?
-> 
-> Perhaps it is just lack of knowledge then, how userspace can request
-> to switch alternate settings? If I recall correctly Hsin-chen tried
-> with libusb, or something like that, but it didn't work for some
-> reason.
+The following changes since commit 0469b410c888414c3505d8d2b5814eb372404638:
 
-The USBDEVFS_SETINTERFACE usbfs ioctl should do this.  If not, pleaase
-let us know.  libusb supports this through the
-libusb_set_interface_alt_setting() function.
+  Merge branch 'net-ethernet-ti-am65-cpsw-xdp-fixes' (2025-02-12 20:12:59 -0800)
 
-Here's an 11 year old stackoverflow question about this:
-	https://stackoverflow.com/questions/17546709/what-does-libusb-set-interface-alt-setting-do
+are available in the Git repository at:
 
-thanks,
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-02-13
 
-greg k-h
+for you to fetch changes up to ab4eedb790cae44313759b50fe47da285e2519d5:
+
+  Bluetooth: L2CAP: Fix corrupted list in hci_chan_del (2025-02-13 11:15:37 -0500)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - btintel_pcie: Fix a potential race condition
+ - L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
+ - L2CAP: Fix corrupted list in hci_chan_del
+
+----------------------------------------------------------------
+Kiran K (1):
+      Bluetooth: btintel_pcie: Fix a potential race condition
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
+      Bluetooth: L2CAP: Fix corrupted list in hci_chan_del
+
+ drivers/bluetooth/btintel_pcie.c |   5 +-
+ include/net/bluetooth/l2cap.h    |   3 +-
+ net/bluetooth/l2cap_core.c       | 169 ++++++++++++++++++---------------------
+ net/bluetooth/l2cap_sock.c       |  15 ++--
+ 4 files changed, 92 insertions(+), 100 deletions(-)
