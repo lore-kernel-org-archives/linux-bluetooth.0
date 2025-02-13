@@ -1,315 +1,130 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF3B221572
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 12:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4F523F417
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 13:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739449805; cv=none; b=uhPNd82SAzglppNdH5ct+2vd2bSllTdkcUvg2VU/nrLq5GmEoxhYTg4vooEBpV1Lq02/azfn8yjmUM5ftPO5swVAbozkB5vN8GvR1cdC+HLkSBBHi0hqraKPOebhCd7j6gzWPsuUzOP+qaDnAPVjaMkltTv4crjQX1H9rdspMuw=
+	t=1739453176; cv=none; b=jNinlBci8DPJTZbW5IwnchFIvm6S2gysvwoXAeyW3lcOCMWWRKIV5oNyIeGjSwTNb+C/DRBJBQ8111JBn+0l0SObjMH02e2Xyq9XUSWtDbl98RZUAltvhQRXo/XC5Hsly1uoLs1ycQ6TWaJgOCL2AKfyhfPwQhsGkFZkSuBeprk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739449805; c=relaxed/simple;
-	bh=O1DBPqIsjvRF6KksfJkmlu/qf7D/OHIR+gXUgpJRlO8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lNLeYQdGXt1BVqfAb8ZqvDjMASfknbMgeL+p6qVDZD5OE5XNqMxO6jsDIWWFdy6DikBRZglAhS/76i8d98mzXdw2gN4yidsMjxw5UZBynknIRP/ZY2UKKfw7Q/uThBMJBBptOd8kgvW6dnXBYfV2+vAHQ6xThK814YG8dz/7EHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f2DY8n5l; arc=none smtp.client-ip=209.85.218.44
+	s=arc-20240116; t=1739453176; c=relaxed/simple;
+	bh=SPJicy0G+ZRF7N/TjXF/GTo3/Vjd/YLby07KG1r5PlA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GZWGMu4X5QSk374oAg7Oa/XVTzGBemVzl/mjB5qf81v1Dd9bTyL7SarYIjEKcKfxLZz6C1sLtySnGLWlSLuL82TUPtIoYKc3nb4bLKVT6t5BU4g1R8oWVweAn1fJ8s4LFTOHv1DZcNhXZzEnza5Xy6AhirHkiAxeJwW5MbMgA9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKn9UUG4; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2DY8n5l"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ab7fa1bc957so162737666b.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 04:30:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKn9UUG4"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6e44f9db46bso9625806d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2025 05:26:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739449801; x=1740054601; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tklDtkFMlQXzWAayFc2jpaYXHdwXkPqP10yjNDgF0gM=;
-        b=f2DY8n5lmewCkuGwpTsHUdecWK1k1WAAZ1rdxb1LiWLDvoWOtiXjTmHwct0ZtROBSK
-         BLx7bFBm7drLUAZ1+vk5eIzzdcsfPymMzJWt73B+3ktwW67MLkotZoz0NVhGcXOqqw/t
-         yV45LAXNTCqmyGSj+x4QZGrw6SLrCAWZctzHVG823mVgmfhtVc5fxZlYZOInUeULk2RZ
-         7o3pyvqjkjZcxT0+jKDk9yOiVgeg+a9IsumUnZalmQ0/Di57/w7hid2d/GFx17M6HRM1
-         JJP238nmJIfeBQBAsZVVpvorGR0T4HoZcWDYirR5tuQXzmjqyDF14JM0Tak0da7C/s1E
-         1+tg==
+        d=gmail.com; s=20230601; t=1739453173; x=1740057973; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=es4IpzqyuRTFr49EU9OBzkcSRGHdlmk9G48otOt7Sa4=;
+        b=PKn9UUG4oJ0pgjmylKHPvB/E0ykd2jU+jjaXuR06Vi2rNvi05KZdj2aNxF92NxdJlh
+         DfsKRBuEVul9qnnyxEarc1tKMX89Sz9e9qrZR7FWnBrv+sP43x6ju9sKDCP8edCIqsyi
+         vxfCjRH5bShBNaKeUa8Ff355X2Q8i8kET7zAm+dMBMYCmB051Y1ritQCzYvFpqpz3VeY
+         m8nT8fiA0mm1uEKh0wqjyqP/JHved/1b0OA9xfjCaKH1Obe0KdIModENILVYT85Vm/2n
+         6h5tgbFgmkWmf/UShO/kf2LsNoRSKbSXG3MmAdOr/V0mjq+rcRE0droiAUXPiWMWbt75
+         pnAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739449801; x=1740054601;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tklDtkFMlQXzWAayFc2jpaYXHdwXkPqP10yjNDgF0gM=;
-        b=iMOfe8q9+7nvGnuL8mVJ7apbaTxqtXYtcTwTnw4bCtqbvbNfZiYkAcXEQbsFHM/ZH4
-         7UkUh6xUwAN3FIjcugdzCasQ9gAXDTgqzxa2L3iEzYaT2Ysq9fDIToRRFtmIvgem6YTh
-         JQY+OwNaN+uAy/p/fQRZT5Rkt59/uVOBTHCuEXgkZcifABHENwLAGaSSnjU8JI2CbpIF
-         C9YBzXeWXsQ7DBQaqMQzYes05TvyraYQk1L7CeG2PEVteWbfQGDlluvlc994CqlhkO3P
-         Ls7/TaFuMr8WBfG0TFoIq9r1gFmeg075GPNujaNqtMg+vU9t3RrowS0yfyI8O0RigSB8
-         dhww==
-X-Gm-Message-State: AOJu0YwvQg6QUBkvfdjJdcnTs0IaQaPxLX9X3yB1/W4z2KQZmMNzXGYP
-	8TWZRloWHqQutWqMeQz5GZjFBljZtJ6Z69IddGzrhLY1021w+rcW5ku9Rkqd
-X-Gm-Gg: ASbGnct7Oz3XxOGBRpYA3rY97S5qwUvQjEbxbU1ohH+2bEcDoKK2mLO1EnHZ9cYav3A
-	65qwWAGwpkUZ94M0q0NTh65yrgBMZXwiTotqSnxcLfxvpFdm2yTo4zdJ/NADOJVxY8VgrbNMZjm
-	5HHc1elrgHVyqpnwRLr2qUAeRurnkxU/NShW9jNw67PZt4Tht1YlcFBHwHtcZnBdEm8hfj23z3p
-	Q+DY9ngT4vejb9d3JzExZEVFFX4D4o04l9ih+xcGD9mR32O3q3w2JHAyDrQng0Sv6FYEpsqMJdf
-	8KJsoyn81HB6BKy1gj+x8ShdeTEL3ucGWfTNCbshzCEVZRkImki/DNihvNSnqeepm2E295Qjl6O
-	iAjugpFAV5Pg=
-X-Google-Smtp-Source: AGHT+IE+choaPYJTtIGA2C8Xvl7z9+bOdiptDczuhXDc/gm98XFrS0/BxlJDDCTIBatkbu9ls1AABQ==
-X-Received: by 2002:a17:907:940c:b0:ab7:e47c:b54a with SMTP id a640c23a62f3a-aba5017e74amr312742566b.37.1739449800401;
-        Thu, 13 Feb 2025 04:30:00 -0800 (PST)
-Received: from localhost.localdomain (46.205.193.135.nat.ftth.dynamic.t-mobile.pl. [46.205.193.135])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba53232275sm124300666b.31.2025.02.13.04.29.59
+        d=1e100.net; s=20230601; t=1739453173; x=1740057973;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=es4IpzqyuRTFr49EU9OBzkcSRGHdlmk9G48otOt7Sa4=;
+        b=dxVD79XqRchz2SKcOiHHyPIa8e1s9ys6xSALZ6vuxaR5x89YrMWJUjVgeV9B0GY7Ru
+         NgJwFlsJ8OLY4BMVWbPzU5hGKwwwcSbMLltEZ9XEDrZFmSyIRTAaaD6qrQvnCzsQHWBN
+         1ezJ9RKOGRV9XYOvwl1xoCAgojRyjiSEjTbbPvdvWfdkbgVYIM0BncqaFHuf4ajwIYJQ
+         sNFFYz+lxuavJ/W54zCTwJ4M+D3Q+YWZVKbBrDt08m6qrXBXUSQG1vGbJE2RZu+ltmMg
+         xpzy1/TAlRtGLFPuUt+v5q36EuSG/aZNjtG85dpWKaPOyhMnRSRgKQZd3aVWYvveaaUB
+         Mynw==
+X-Gm-Message-State: AOJu0YzUBI9LRWhFz5pSOtZpNm23BUN6P26aj7kWuFbKhT1oHNzqHinD
+	i5fx91LofxsR652V5mUp0xdQRz034LmJRDgWhzSD8fEiLZO5v8Gaj0dHzw==
+X-Gm-Gg: ASbGncvDiUCITHI2ZVRfvHRCiVzVN7RG8giBtx9yFrO7JyIsAsdFWDyFJUOEwiBjkg1
+	pTZJ12O27A39XfZpMeBUY+SIwpMWO6myL6ZZN0/IopyGMAElN2ql2Z+IZA0xt5KoS8XVt1N1Y+o
+	y1GwkQI2bvsut+6Z/Ho5wpEepnNiVs59nFGh3kMOnS06fzq6m15iTv/ZrxVCuqkDODNb4RbKXe+
+	BtvL9hLOilexyMLo4NfnRc9YGsteexETlyQkt/aTLXq7oQvOD5PL8mbtejn/KyS9fEv5X99uQz5
+	FcC7r3G5SsmQsjLjE5FuXRWe
+X-Google-Smtp-Source: AGHT+IFYmcnqTz/WK/2qPJ9S+XZ4mbHSP51cX7Kg+qFS2TJ5ATYwkpDmSf4AabCAdlaSTki/v7FqEA==
+X-Received: by 2002:a05:6214:c46:b0:6e1:afcf:8711 with SMTP id 6a1803df08f44-6e46ed77a9amr129192926d6.8.1739453172702;
+        Thu, 13 Feb 2025 05:26:12 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.215.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d77917dsm9332076d6.23.2025.02.13.05.26.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 04:29:59 -0800 (PST)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH v4] btdev: Broadcast EXT_ADV packets based on its interval
-Date: Thu, 13 Feb 2025 13:29:52 +0100
-Message-Id: <20250213122952.138986-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250212224444.508659-1-luiz.dentz@gmail.com>
-References: <20250212224444.508659-1-luiz.dentz@gmail.com>
+        Thu, 13 Feb 2025 05:26:12 -0800 (PST)
+Message-ID: <67adf2f4.d40a0220.3c1029.1d16@mx.google.com>
+Date: Thu, 13 Feb 2025 05:26:12 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5389550415331455811=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
+Subject: RE: [v4] btdev: Broadcast EXT_ADV packets based on its interval
+In-Reply-To: <20250213122952.138986-1-arkadiusz.bokowy@gmail.com>
+References: <20250213122952.138986-1-arkadiusz.bokowy@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Real BLE devices transmit LE advertisement report packages in given
-intervals (typically in range between 20 ms and 10.24 s). With current
-kernel module Bluetooth stack implementation it is possible that the
-first LE meta packet just after enabling scanning will be lost. It is
-not an issue for real devices, because more advertisement reports will
-be delivered later (in given interval time).
+--===============5389550415331455811==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch changes optimistic implementation of sending only one LE
-meta packets just after enabling scanning to sending LE meta packets
-every minimal interval thus emulating what a real controller would do
-and will work around the issue of dropping the very first LE meta packet
-by the kernel. For direct advertising, the 10ms interval is used to
-provide high duty cycle advertising.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=933592
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.23 seconds
+GitLint                       PENDING   0.21 seconds
+BuildEll                      PASS      20.41 seconds
+BluezMake                     PASS      1526.03 seconds
+MakeCheck                     PASS      13.37 seconds
+MakeDistcheck                 PASS      161.06 seconds
+CheckValgrind                 PASS      220.16 seconds
+CheckSmatch                   WARNING   287.40 seconds
+bluezmakeextell               PASS      100.78 seconds
+IncrementalBuild              PENDING   0.27 seconds
+ScanBuild                     PASS      886.89 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:450:29: warning: Variable length array is used.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- emulator/btdev.c | 121 +++++++++++++++++++++--------------------------
- 1 file changed, 55 insertions(+), 66 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 70229d9ee..086885d9d 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -91,6 +91,7 @@ struct le_ext_adv {
- 	struct btdev *dev;
- 	uint8_t handle;
- 	uint8_t enable;
-+	uint32_t interval;
- 	uint8_t type;			/* evt_properties */
- 	uint8_t own_addr_type;		/* own_addr_type */
- 	uint8_t direct_addr_type;	/* peer_addr_type */
-@@ -102,7 +103,8 @@ struct le_ext_adv {
- 	uint8_t adv_data_len;
- 	uint8_t scan_data[252];
- 	uint8_t scan_data_len;
--	unsigned int id;
-+	unsigned int broadcast_id;
-+	unsigned int timeout_id;
- };
- 
- struct le_per_adv {
-@@ -575,8 +577,10 @@ static void le_ext_adv_free(void *data)
- 	/* Remove to queue */
- 	queue_remove(ext_adv->dev->le_ext_adv, ext_adv);
- 
--	if (ext_adv->id)
--		timeout_remove(ext_adv->id);
-+	if (ext_adv->broadcast_id)
-+		timeout_remove(ext_adv->broadcast_id);
-+	if (ext_adv->timeout_id)
-+		timeout_remove(ext_adv->timeout_id);
- 
- 	free(ext_adv);
- }
-@@ -4759,9 +4763,13 @@ static void ext_adv_disable(void *data, void *user_data)
- 	if (handle && ext_adv->handle != handle)
- 		return;
- 
--	if (ext_adv->id) {
--		timeout_remove(ext_adv->id);
--		ext_adv->id = 0;
-+	if (ext_adv->broadcast_id) {
-+		timeout_remove(ext_adv->broadcast_id);
-+		ext_adv->broadcast_id = 0;
-+	}
-+	if (ext_adv->timeout_id) {
-+		timeout_remove(ext_adv->timeout_id);
-+		ext_adv->timeout_id = 0;
- 	}
- 
- 	ext_adv->enable = 0x00;
-@@ -4782,6 +4790,8 @@ static struct le_ext_adv *le_ext_adv_new(struct btdev *btdev, uint8_t handle)
- 	ext_adv = new0(struct le_ext_adv, 1);
- 	ext_adv->dev = btdev;
- 	ext_adv->handle = handle;
-+	/* Default value for min/max advertising interval shall be 1.28s. */
-+	ext_adv->interval = 1280;
- 
- 	/* Add to queue */
- 	if (!queue_push_tail(btdev->le_ext_adv, ext_adv)) {
-@@ -4862,6 +4872,23 @@ static int cmd_set_ext_adv_params(struct btdev *dev, const void *data,
- 	}
- 
- 	ext_adv->type = le16_to_cpu(cmd->evt_properties);
-+
-+	/* In case of direct advertising (type == 0x01) the advertising
-+	 * intervals shall be ignored and high duty cycle shall be used.
-+	 */
-+	if (ext_adv->type == 0x01)
-+		ext_adv->interval = 10;
-+	else {
-+		unsigned int min_interval = get_le24(cmd->min_interval);
-+		if (min_interval < 0x0020 || min_interval > 0x4000) {
-+			rsp.status = BT_HCI_ERR_UNSUPPORTED_FEATURE;
-+			cmd_complete(dev, BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
-+						&rsp, sizeof(rsp));
-+			return 0;
-+		}
-+		ext_adv->interval = min_interval * 0.625;
-+	}
-+
- 	ext_adv->own_addr_type = cmd->own_addr_type;
- 	ext_adv->direct_addr_type = cmd->peer_addr_type;
- 	memcpy(ext_adv->direct_addr, cmd->peer_addr, 6);
-@@ -4978,9 +5005,10 @@ static void send_ext_adv(struct btdev *btdev, const struct btdev *remote,
- 					1 + 24 + meta_event.lear.data_len);
- }
- 
--static void le_set_ext_adv_enable_complete(struct btdev *btdev,
--						struct le_ext_adv *ext_adv)
-+static bool ext_adv_broadcast(void *user_data)
- {
-+	struct le_ext_adv *ext_adv = user_data;
-+	struct btdev *btdev = ext_adv->dev;
- 	uint16_t report_type;
- 	int i;
- 
-@@ -5016,7 +5044,10 @@ static void le_set_ext_adv_enable_complete(struct btdev *btdev,
- 							report_type, true);
- 		}
- 	}
-+
-+	return true;
- }
-+
- static void adv_set_terminate(struct btdev *dev, uint8_t status, uint8_t handle,
- 					uint16_t conn_handle, uint8_t num_evts)
- {
-@@ -5035,7 +5066,7 @@ static bool ext_adv_timeout(void *user_data)
- {
- 	struct le_ext_adv *adv = user_data;
- 
--	adv->id = 0;
-+	adv->timeout_id = 0;
- 	adv_set_terminate(adv->dev, BT_HCI_ERR_ADV_TIMEOUT, adv->handle,
- 								0x0000, 0x00);
- 	le_ext_adv_free(adv);
-@@ -5120,32 +5151,28 @@ static int cmd_set_ext_adv_enable(struct btdev *dev, const void *data,
- 
- 		if (!cmd->enable)
- 			ext_adv_disable(ext_adv, NULL);
--		else if (eas->duration)
--			ext_adv->id = timeout_add(eas->duration * 10,
--							ext_adv_timeout,
-+		else {
-+			/* Send the first advertising report right away and
-+			 * start the timer for continuous advertising.
-+			 */
-+			ext_adv_broadcast(ext_adv);
-+			ext_adv->broadcast_id = timeout_add(ext_adv->interval,
-+							ext_adv_broadcast,
- 							ext_adv, NULL);
-+			if (eas->duration) {
-+				unsigned int duration_ms = eas->duration * 10;
-+				ext_adv->timeout_id = timeout_add(duration_ms,
-+								ext_adv_timeout,
-+								ext_adv, NULL);
-+			}
-+		}
-+
- 	}
- 
- exit_complete:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE, &status,
- 							sizeof(status));
- 
--	if (status == BT_HCI_ERR_SUCCESS && cmd->enable) {
--		/* Go through each sets and send adv event to peer device */
--		for (i = 0; i < cmd->num_of_sets; i++) {
--			const struct bt_hci_cmd_ext_adv_set *eas;
--			struct le_ext_adv *ext_adv;
--
--			eas = data + sizeof(*cmd) + (sizeof(*eas) * i);
--
--			ext_adv = queue_find(dev->le_ext_adv,
--						match_ext_adv_handle,
--						UINT_TO_PTR(eas->handle));
--			if (ext_adv)
--				le_set_ext_adv_enable_complete(dev, ext_adv);
--		}
--	}
--
- 	return 0;
- }
- 
-@@ -5495,43 +5522,6 @@ done:
- 	return 0;
- }
- 
--static void scan_ext_adv(struct btdev *dev, struct btdev *remote)
--{
--	const struct queue_entry *entry;
--
--	for (entry = queue_get_entries(remote->le_ext_adv); entry;
--							entry = entry->next) {
--		struct le_ext_adv *ext_adv = entry->data;
--		uint16_t report_type;
--
--		if (!ext_adv->enable)
--			continue;
--
--		if (!ext_adv_match_addr(dev, ext_adv))
--			continue;
--
--		report_type = get_ext_adv_type(ext_adv->type);
--		send_ext_adv(dev, remote, ext_adv, report_type, false);
--
--		if (dev->le_scan_type != 0x01)
--			continue;
--
--		/* if scannable bit is set the send scan response */
--		if (ext_adv->type & 0x02) {
--			if (ext_adv->type == 0x13)
--				report_type = 0x1b;
--			else if (ext_adv->type == 0x12)
--				report_type = 0x1a;
--			else if (!(ext_adv->type & 0x10))
--				report_type &= 0x08;
--			else
--				continue;
--
--			send_ext_adv(dev, remote, ext_adv, report_type, true);
--		}
--	}
--}
--
- static void scan_pa(struct btdev *dev, struct btdev *remote)
- {
- 	struct le_per_adv *per_adv = queue_find(dev->le_per_adv,
-@@ -5560,7 +5550,6 @@ static int cmd_set_ext_scan_enable_complete(struct btdev *dev, const void *data,
- 		if (!btdev_list[i] || btdev_list[i] == dev)
- 			continue;
- 
--		scan_ext_adv(dev, btdev_list[i]);
- 		scan_pa(dev, btdev_list[i]);
- 	}
- 
--- 
-2.43.0
 
+--===============5389550415331455811==--
