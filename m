@@ -1,119 +1,129 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C54B1E376E;
-	Thu, 13 Feb 2025 09:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E6541C6A;
+	Thu, 13 Feb 2025 10:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739438734; cv=none; b=Gxhyh91fdfKRvQog98G8xW4e2PzWV/+ZBbWKxDUq2SLXYLBIVV119wHUUFifq+14JO8ZR+gIGox/dICxdgKcNOs7cfhKHym9TAJMBbd9nIjqBYBs4rvlO+nJIV5jqP09IbfsDTH1jxLZ3Jt8WK5xjWtt/KkgqJ+GFKlvx+ILOGI=
+	t=1739440882; cv=none; b=sXe2YHJdpOkeIQRh1JB6uT52Vktzq3UNi3Nisz/0ss22ys0ZahIFk0jqvrrG61pBwGz812SA3EYxql4Tsg3/fEb7iNhKFZPhasIHR6Hub8v2Xz1pr7EaM3ONyqwNnF1/bu+DWnoLdcohxnqYajzEmTRIlZ2yRt7BXHNViG4NYmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739438734; c=relaxed/simple;
-	bh=38I1hCRodY+InrLjRVaigHjIIKw+PjXL6lLJvQekN7A=;
+	s=arc-20240116; t=1739440882; c=relaxed/simple;
+	bh=ZIqYDH1BfJZcAkTWwvMK4oFyPuJrzrCNOnu8RYStqJg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZIUrsHl43Ds1EYPoqtlGg/pQNCI6O1GahUGG6xBFPhMwODjHWqkzjOz3FsSVzlyEeFkPxam+ttFQe37myuFRyoD0BUP0tLXwNtoo9GxNyWyzNciT/PjPohm/X5HrwSfeW1XTNTydGbA7nEnKVZ3adPTr7QAPpcQPoi0jwJaGDMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sginmXz6; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=F5bVCcDDZWL4dOEniVPSVDUrylL4882Kbq55NhTstweSSNeLQrLE7toUELhMLEV7qR96vN+xTB00+BGY0Am9t+5lxbizfKVqr8guuW6zKo/4UeEnnEZpu8lrnD/c0gzo4zvjm30YPjlXj4aVh4pWhEMZ153tdLkuycenMGXUIWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=CT80kOy+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sginmXz6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 259A1C4CED1;
-	Thu, 13 Feb 2025 09:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739438733;
-	bh=38I1hCRodY+InrLjRVaigHjIIKw+PjXL6lLJvQekN7A=;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="CT80kOy+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE24CC4CED1;
+	Thu, 13 Feb 2025 10:01:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1739440881;
+	bh=ZIqYDH1BfJZcAkTWwvMK4oFyPuJrzrCNOnu8RYStqJg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sginmXz6gdKXf7jVIfQ0FNV/ngeUfT/8xmJIzEGm4eWEnBbttHIEwzjevmFvIfpRN
-	 Pd+aVA8YKEsxtvkAEIsmRuXcI2XmrfQ9mkiVyqYNu42bQ6Xx+6A33CVQB6BzeWgn36
-	 JcAoSYUfAKjtHSWiXjyAzNibfZuwngivq41ju803wH/zi5OpIvQWu0LlpC6Y59ExR7
-	 GremGc+JcHlVjDURRnp3PR3kWlKPDxYtxCg6+gLJHhbQ4Y3teq3AcMEyaexQ+uvsPm
-	 QSdRe6v/Z6sOkkYI9K8GkLr08MYctWhZx0Cnfzjq508crSSSRD0gcwwL77xFfdwkkL
-	 RAX0Sakwu6FVg==
-Date: Thu, 13 Feb 2025 10:25:30 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Ajay Singh <ajay.kathat@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Marek Vasut <marex@denx.de>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 01/12] dt-bindings: bluetooth: describe wilc 3000
- bluetooth chip
-Message-ID: <20250213-chamois-of-unexpected-glory-dd3eab@krzk-bin>
-References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
- <20250212-wilc3000_bt-v1-1-9609b784874e@bootlin.com>
+	b=CT80kOy+UBc1F93xZBALWXH0fBw+w/Wl/AbuBRUZ5RA9pmydy3NjIF+nI0Cs6gAyB
+	 FaX6b6pwa36QQ5fOJUslSk9QaLd9e48+cI6/tJwSlRyRVa91hSeU11nCDDKuvkGhOQ
+	 167EKf9CBvO0ISoqVdxpt9jKdIZnJATxTOLRlXiQ=
+Date: Thu, 13 Feb 2025 11:01:17 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Hsin-chen Chuang <chharry@google.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	chromeos-bluetooth-upstreaming@chromium.org,
+	Hsin-chen Chuang <chharry@chromium.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] Bluetooth: Fix possible race with userspace of
+ sysfs isoc_alt
+Message-ID: <2025021352-dairy-whomever-f8bd@gregkh>
+References: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250212-wilc3000_bt-v1-1-9609b784874e@bootlin.com>
+In-Reply-To: <20250213114400.v4.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
 
-On Wed, Feb 12, 2025 at 04:46:20PM +0100, Alexis Lothor=C3=A9 wrote:
-> WILC3000 is a combo chip providing 802.11b/g/n and Bluetooth 5. The wlan
-> part is exposed either through SDIO or SPI interface, and the bluetooth
-> part is exposed through uart. The notable peculiarity of this chip is
-> that the bluetooth part is not fully autonomous: its firmware is not
-> loaded through UART interface but through SDIO/SPI interface, so the
-> bluetooth description needs a reference to the wlan part to get access
-> to the corresponding bus.
->=20
-> Signed-off-by: Alexis Lothor=C3=A9 <alexis.lothore@bootlin.com>
+On Thu, Feb 13, 2025 at 11:43:59AM +0800, Hsin-chen Chuang wrote:
+> From: Hsin-chen Chuang <chharry@chromium.org>
+> 
+> Expose the isoc_alt attr with device group to avoid the racing.
+> 
+> Now we create a dev node for btusb. The isoc_alt attr belongs to it and
+> it also becomes the parent device of hci dev.
+> 
+> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
 > ---
->  .../net/bluetooth/microchip,wilc3000-bt.yaml       | 41 ++++++++++++++++=
-++++++
->  1 file changed, 41 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/microchip,wi=
-lc3000-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/microchip,=
-wilc3000-bt.yaml
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..2a83ca3ad90b26fd619b574bc=
-343bee9654a1e43
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/microchip,wilc3000-=
-bt.yaml
-> @@ -0,0 +1,41 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/microchip,wilc3000-bt.y=
-aml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> 
+> Changes in v4:
+> - Create a dev node for btusb. It's now hci dev's parent and the
+>   isoc_alt now belongs to it.
+> - Since the changes is almost limitted in btusb, no need to add the
+>   callbacks in hdev anymore.
+> 
+> Changes in v3:
+> - Make the attribute exported only when the isoc_alt is available.
+> - In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
+>   (which calls hci_init_sysfs).
+> - Since hci_init_sysfs is called before btusb could modify the hdev,
+>   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
+> 
+>  drivers/bluetooth/btusb.c        | 98 +++++++++++++++++++++++++-------
+>  include/net/bluetooth/hci_core.h |  1 +
+>  net/bluetooth/hci_sysfs.c        |  3 +-
+>  3 files changed, 79 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 1caf7a071a73..cb3db18bb72c 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -920,6 +920,8 @@ struct btusb_data {
+>  	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+>  
+>  	struct qca_dump_info qca_dump;
 > +
-> +title: Microchip Bluetooth chips
+> +	struct device dev;
+>  };
+>  
+>  static void btusb_reset(struct hci_dev *hdev)
+> @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
+>  	int alt;
+>  	int ret;
+>  
+> +	if (!data->hdev)
+> +		return -ENODEV;
 > +
-> +description:
-> +  This binding describes UART-attached Microchip bluetooth chips. These
-> +  chips are dual-radio chips supporting WiFi and Bluetooth. The bluetooth
-> +  side works with standard HCI commands over 4-wires UART (with flow
-> +  control)
+>  	if (kstrtoint(buf, 10, &alt))
+>  		return -EINVAL;
+>  
+> @@ -3702,6 +3707,34 @@ static ssize_t isoc_alt_store(struct device *dev,
+>  
+>  static DEVICE_ATTR_RW(isoc_alt);
+>  
+> +static struct attribute *btusb_sysfs_attrs[] = {
+> +	NULL,
+> +};
+> +ATTRIBUTE_GROUPS(btusb_sysfs);
 > +
-> +maintainers:
-> +  - Alexis Lothor=C3=A9 <alexis.lothore@bootlin.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - microchip,wilc3000-bt
-> +
-> +  wlan:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      Phandle to the wlan part of the combo chip
+> +static void btusb_sysfs_release(struct device *dev)
+> +{
+> +	// Resource release is managed in btusb_disconnect
 
-No resources here and judging by the driver everything is part of wifi.
-Either you wrote it to match driver or indeed hardware is like that. In
-the first case, why this cannot be part of WiFi with phandle to serial
-bus? In the second case, this needs to be proper hardware description.
+That is NOT how the driver model works, do NOT provide an empty
+release() function just to silence the driver core from complaining
+about it.
 
-Best regards,
-Krzysztof
+If for some reason the code thinks it is handling devices differently
+than it should be, fix that instead.
 
+thanks,
+
+greg k-h
