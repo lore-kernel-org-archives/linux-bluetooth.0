@@ -1,107 +1,103 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD55422D793
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 11:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739531840; cv=none; b=Opft/1nJdZxjWBhBeLnMq3u0o3FJJnFx03mqk06FjvxJwHW/QkCkWjX3VXX79RWOxTVRC4uTtBgJ+ky1IVmuPXOo4lc7BZ338/2k+ULEUVOlm71UUcikx3kHM0yUR2MCKPLht0mo5oMPRTUJ2prxGGv/9J3dGtmpkjrlNFH/2A8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739531840; c=relaxed/simple;
-	bh=TTra3h9T0Q3NSgH3cSLC7VMf+o3j5WRDFH3X3lNLLQE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NBv2FH+29dCht6mjKsGKSBGbEXgbPH5AgOTX/dkRaOEGccoBUxSz3qt1SJEyIxeT3BxYerIGCLMt2EI8hD3fmDoyPzHMzXJOVeDw6M029t/I1wy6WzsKNoi4Xkfhr/zvP6wBkaW0h03Gmw3+B+scspLbjgg8oS6f5rBmjoYP734=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PqwHWiSY; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F389A263C82
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 11:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739532169; cv=pass; b=MIs/2rudwvI8Q3ReXauQ5ij4i2DDcbe7DFGVOUY1hQVET0tDtOiozKqpvAL2OJitwzBeSmnHRlSw0CTEho8ACOPLghJhHEfJEMc/PMwTq4x5wdq1IADl9ioOGmLNd11GXe34NflDAT/EgQ9LV+NCOfF4iLB3c79qav48uZI+//E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739532169; c=relaxed/simple;
+	bh=C76pKuRBSgxzLMaO099PtoKcJmFrPp1yfVkhS0w5Ie4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=I3qxAb9fD4Aq4vWhdpKAeJX3blhGJl4LL6wSm1um1EZi0sl2apayI8JRgDOCenhYkfSKXpORwv+1hOMYKBZUnOHy1OjoU76fbQ4wcvAzp5GYPK7Fu06ilmxn6xz3avwqqbCy3wpy2wt0YZCl5XJF6iho+zH8+rt0P9Jq8Rs3+JM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b=Hsd6wGp8; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PqwHWiSY"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21f6890d42dso64068535ad.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 03:17:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739531838; x=1740136638; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vyd6VZvnLXfIOMtoaeKKTr15aT2gyb+Vo6m831IpGOI=;
-        b=PqwHWiSY8xe6zv3Tafq/1oNzaIH9AJuLMomrj7JQqefQOk4Frjpv8Mf63yBRoKtTJC
-         w5/cBgXVaH2NPGrsXEz4P5HSJv6upFMhvAEb7JxikgmMSm0cu/koxk90lo4pdG+9add4
-         A/o9DL8qorzReRWLdPj9adz+Af6ntW1kQFh6OHjYfAH4X5gNXVLnmg0wxCIQpXxMtxEp
-         sjIS1IdAIx01kY9kaubB877ZVuIJU4WpUumDekN+ra1tShTyyPj9WfHDijnOY8qhFO1g
-         GuSSMgLP9L4a8xP1otdpHwxrYoHfKvrFAJGOktQVB2K76DmDagL7z639xwEBNBzA5YRs
-         n1xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739531838; x=1740136638;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vyd6VZvnLXfIOMtoaeKKTr15aT2gyb+Vo6m831IpGOI=;
-        b=eet9Dasa66HPMWNTmqjt1jtNqWEGUMN232HT7qXSNdeNDOXDsAk64Lbtok+7MLwXri
-         nXuAPOZUR2cPkqPwOQ/EtJj82JVzGE9dwi7j+uQCrRdRaabc8VMq7an2fTQwlycKD50Q
-         AHUzWsOE2kPPanlhF0BrhQDed6drCx+ol4WHuqzzsKcKDaZLkDPVELIPHHYHQO1UlB0F
-         asyZHlVyQZMAXoiwqEL0sJNLK//6Sg5geOvznxmOP3xCPnTiI4wlKN9BasAu0oLjvnXi
-         Pk+odkStPoHfwQ+Lvx/ER3/YxmS9bi+OwiVCfeIuX/TjOphXpBpvgtGguYnpJCEYiV8/
-         DnFA==
-X-Gm-Message-State: AOJu0YzGcc4JRUXR7LlMCPmCmUst/bT/jW5RYEu/AJROGcOiyPZHy4fo
-	sdJPvLdSjMeAk63psurouzOISfszaq0uSa3D73GtY7+IRvuJbcfhPffs1ahD++0PPPTVL678DvZ
-	MVyxzB0024mYAkShNPmH9qxQKi4kOwhDIfEwC8+gy8SqSTAWCBJg+OriGl+Ie1Tkk86jUVy+hba
-	HX4raYaUSYWJxITXiUovVgURI5BeNlbl02JWNCAt4swZX+8dE0gA==
-X-Google-Smtp-Source: AGHT+IFghr9P0HMIUaxBFgnQoWhw1CWBSpSlNf5DupB1nwEy99TDbtwc4wIvagfrECbSa84ztB7qdtZJJYLN
-X-Received: from pgbbw41.prod.google.com ([2002:a05:6a02:4a9:b0:ad5:5920:367])
- (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:8c6:b0:21f:617a:f1b2
- with SMTP id d9443c01a7336-220d21616famr121726985ad.46.1739531838030; Fri, 14
- Feb 2025 03:17:18 -0800 (PST)
-Date: Fri, 14 Feb 2025 19:17:09 +0800
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b="Hsd6wGp8"
+ARC-Seal: i=1; a=rsa-sha256; t=1739532164; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Ry7sDGXltO5/vtxJaKkYtjPsuYL4kY4X96Wzx4KJN66jBxDAqVnLfbWsedb7thcnKOXo3X+AWArbj4mJDSuBZBpca8VPKKyaJR9MJ6pMoxMyz0C/my0advjIQEprcwIJdraou7d0AYdyOa2Aswjoz2MRK8YVmylvIs8BlQq6KfM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1739532164; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=43Gnyoz7EcvcRlBfM0CjyN+GOFGqhGZ3p0N8UsXlex4=; 
+	b=ZoLFzaUxoGAOSNAJn2rKoOELDNHhXgrr65GOrrK1q5ec3Eecv+Dy3kl4/OkLtCkX4pJeV4Zwu22wFzb4dQzM16/HXpr9YcmAA0W9yf8xDM168hH1bWSunM5I/kvWObCJBfRVQMcMQbSeJCQ13U+0ZGRy8aHOqkMtd0MKeqfzWQ4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ludovico.denittis@collabora.com;
+	dmarc=pass header.from=<ludovico.denittis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1739532164;
+	s=zohomail; d=collabora.com; i=ludovico.denittis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:From:From:Subject:Subject:To:To:Cc:Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=43Gnyoz7EcvcRlBfM0CjyN+GOFGqhGZ3p0N8UsXlex4=;
+	b=Hsd6wGp8biZnrT8C/jiNerjStTCRemlxwtNhteP69RHKOhkX+rKpGrjtMynXHmWJ
+	FbRewsQ+pxXceX1wPtqUtIcps4zFccWvXrgYJNDe3b7sQWTsgsisV0n2++k4c1auVLo
+	B4J7JZB7qCp1rgMYymGqGaQLq568uSGeKO+/48bI=
+Received: by mx.zohomail.com with SMTPS id 1739532161660558.1092632505888;
+	Fri, 14 Feb 2025 03:22:41 -0800 (PST)
+Message-ID: <fdb8f9d6-077b-4fa1-871f-6057e5be5c45@collabora.com>
+Date: Fri, 14 Feb 2025 12:22:39 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250214191709.1.I6e9e94dcded65e4a9ed42ad23ca8a5d81f680382@changeid>
-Subject: [PATCH] Bluetooth: Always allow SCO packets for user channel
-From: Hsin-chen Chuang <chharry@google.com>
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc: chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Subject: Re: [PATCH BlueZ v2] device: Clear pending_flags on error
+To: linux-bluetooth@vger.kernel.org
+Cc: ludovico.denittis@collabora.com
+References: <20250128115659.23655-1-ludovico.denittis@collabora.com>
+Content-Language: en-US
+In-Reply-To: <20250128115659.23655-1-ludovico.denittis@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-From: Hsin-chen Chuang <chharry@chromium.org>
+What do you think about this patch? I saw that this was still pending 
+while my other related ones have been merged. I'm not sure if you'd like 
+some changes or if it simply fell through the cracks.
 
-The SCO packets from Bluetooth raw socket are now rejected because
-hci_conn_num is left 0. This patch allows such the usecase to enable
-the userspace SCO support.
+Regards,
+Ludovico de Nittis
 
-Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
----
-
- drivers/bluetooth/btusb.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1caf7a071a73..de3fa725d210 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2130,7 +2130,8 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 		return submit_or_queue_tx_urb(hdev, urb);
- 
- 	case HCI_SCODATA_PKT:
--		if (hci_conn_num(hdev, SCO_LINK) < 1)
-+		if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+		    hci_conn_num(hdev, SCO_LINK) < 1)
- 			return -ENODEV;
- 
- 		urb = alloc_isoc_urb(hdev, skb);
-@@ -2604,7 +2605,8 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 		return submit_or_queue_tx_urb(hdev, urb);
- 
- 	case HCI_SCODATA_PKT:
--		if (hci_conn_num(hdev, SCO_LINK) < 1)
-+		if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+		    hci_conn_num(hdev, SCO_LINK) < 1)
- 			return -ENODEV;
- 
- 		urb = alloc_isoc_urb(hdev, skb);
--- 
-2.48.1.601.g30ceb7b040-goog
+On 1/28/25 12:56 PM, Ludovico de Nittis wrote:
+> If setting WakeAllowed, or the device privacy, fails, we may end up in a
+> situation where `pending_flags` is still set to some `DEVICE_FLAG_*`
+> values, for example from `device_set_wake_allowed()` or
+> `adapter_set_device_flags()`.
+>
+> This can confuse further requests because they'll assume that there is
+> still a pending request in progress.
+> ---
+>   src/adapter.c | 1 +
+>   src/device.c  | 1 +
+>   2 files changed, 2 insertions(+)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 5d4117a49..3eb343cbc 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -5580,6 +5580,7 @@ static void set_device_privacy_complete(uint8_t status, uint16_t length,
+>   	if (status != MGMT_STATUS_SUCCESS) {
+>   		error("Set device flags return status: %s",
+>   					mgmt_errstr(status));
+> +		btd_device_set_pending_flags(dev, 0);
+>   		return;
+>   	}
+>   
+> diff --git a/src/device.c b/src/device.c
+> index e8bff718c..3c2337198 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1575,6 +1575,7 @@ static void set_wake_allowed_complete(uint8_t status, uint16_t length,
+>   			dev->wake_id = -1U;
+>   		}
+>   		dev->pending_wake_allowed = FALSE;
+> +		dev->pending_flags = 0;
+>   		return;
+>   	}
+>   
 
