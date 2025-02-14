@@ -1,223 +1,133 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60889263F3C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 11:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9062661A9
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 15:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739533842; cv=none; b=l6Ypm/ocyDbPeBzkBkrSCGHbIyRB8ay/vT0PCGOM6Aka7l5uo/7SIgAniDdTWTgFLcndz5Ct2H7nWRbKVZOKK4Dcy8b9qSN/U8R4Zuttek8wGG8hiwU3agNf1+Wfxki5bFPG6wNtv2xVgLju0U3jOjxZKpfxAJYCnMhIzdkJs6Q=
+	t=1739546917; cv=none; b=Biepdp2PO+egBOJFluddSGHBJ3Uf8V7rKPY+XpzsDCLbNJU+2EMhuG5s+8kuH5tjy87CWdsFS9q4ZkjBYYQY9IGDMQ9NWrbtO1J8DtvlIww8lnvamDaHrQPgkPUmqR0HVAGHwqpBGiorGuTDRMuz3VNTbz1M716wp/6XkjakNzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739533842; c=relaxed/simple;
-	bh=0XCMhalmMJPFPWW3iaK/Y9DOYMq2KKkz8S7xX9MSkew=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ZApEoNxM6qDhjmkaJkLjKihhz28Yds28qNdGGPhRnhntzfwz5zNJXCORFwLaHVKk6P4WFALHe1O0z9WtIcsTNhGxl29sZlXIcmsyTWne2LD4ufLIgrdvmrE1Nf5mq9ad2ebxb7dxJy34vza/7nSIGnBNmoABRF4vfOowsxbf0ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BdIHjEwX; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1739546917; c=relaxed/simple;
+	bh=9J+kZGcInEaTJ86pf5fOztDgY0lG9omNW+csGzNmksI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RZxOSzjRj8k5kE3pprgFCI9+v1+S6w/mqorvqb6swfhw/74YCvjpx5wzaLlqW2vfNOkMZj3Q+UpOFNkT5xMpPn2pIhMaah5yvkea4FbO44UeSGTNkV/9WVJFIG2yU/rk7Cu8l17T5zEouAyucUYmPVht6rMgxs42G41qiQevmTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uq2dG21M; arc=none smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BdIHjEwX"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-220c8eb195aso37451655ad.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 03:50:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uq2dG21M"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-30920855d5bso7600381fa.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 07:28:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739533840; x=1740138640; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VtCtZaxAqIYtiSaTY8H9PaENVX7q/hxH7A8CE7xarRk=;
-        b=BdIHjEwXcGtt7uDLvXFtF0e6paAIA+onzAVKCc/oVjqE8jUX8id0i+taV5Ubwj6v3y
-         WnmCTuqC9nVtCk2eDEAgLfxTnp7jz23GVmnWKkZnbTyGC1w7mIBzoo4fqVHlx9x2hD6+
-         P8bTg5q/QtokO7hfI1zO/ypAIexsej4YW55gNwzCC7JzsMdCIefI1bFLYus671QUKxCX
-         nr2xevEeaETuIsAC+LcTmHxrBX8Ejwb44doh9aqFz6tLttZnCOe6oDNiHA+qStjqEsOp
-         gm3NPn8AJtjpJ0AcoR7dOEMmszFQys1YV7s6nmL0xC2Y7MglkmmEmyKUSmmisXd8RpiD
-         DN3Q==
+        d=gmail.com; s=20230601; t=1739546913; x=1740151713; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HN44kne2tOzrc/PsM8eEkDjGlLhqXXZ977xNofZ5eHw=;
+        b=Uq2dG21MKzDbc3AIFbs2tnGVwcHvqpqQzV51D5+krI6UdUBAa8feOtKJtMR5JCs0yA
+         ipvxL0UuCgdvBIqYMw41kov8gilUFfaxuC8Pux5eIFEZ76nu//5rRbT4aFyOgiz3qeDi
+         xQhNKkFE/rdi4RjizJVad/VrtkXkCNA0c9IzhLICIcpWRA4E01RKnbiBXdwJ82rCoxP8
+         MKUj7P6CyEc2bmGQC/tNuy/NcM+c2MRFSDs5A5112i9HAfvanG9TieZjCQhRAmz2Dx1D
+         ZTMC4k1XTkP3PvqnFnaXOCknzQS3MxObP8FCFH/xrs1BR9Kpd/DU3M2mVHf5ulxQ1zgS
+         WMMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739533840; x=1740138640;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VtCtZaxAqIYtiSaTY8H9PaENVX7q/hxH7A8CE7xarRk=;
-        b=NTx7z2UvAHWH3a1IT9bSvgqzd47eKhlbMUVcKJuYQtBUzFDky3y4NssKL6R6g+EQUJ
-         EwXvNm5DnMiCa/bhjZPtrgrt3y9iKUTRbOKJU45Du0vBNvY56bTlv3jvY5LiQUQ8JqgX
-         Cp7OTX5k2Xh+t/IVYZKmv+gXYkqgxnZX1+YSF0r4aVCj12Rhl87AR64uH48lnEWhjWxx
-         VE3aOyyeezztN/+S+vru5cDDGCwtzMbi6MTpumX1C9EpHPBY9oUFIIK4FpYUzqYGJTG1
-         6orY86KD7pginGunN9EBSrAtjPaoVP66A8rWyJCsQC966CXEO6Y7n9mnwobAJlkdQfDv
-         TiCA==
-X-Gm-Message-State: AOJu0YzQvI539fTKFTPJF7YoOCtHqirtXY0C/KMQNRn77Jq1DiYZUyHc
-	cRsXGq9sBBupJz5Ty6CR3jPHRIvvDgEqHnxZdn+wgKyNJOWkNrD4DD/d4g==
-X-Gm-Gg: ASbGncsIvXGSvcnrb84KG4l98nBoi644ciuzA60f6qMET9tY7fDOhcuPDzIyPR/qKY2
-	MED6VIYA0hFW2qL0LC1zpLjrNUcKCaG2ODpI5HdOV33bTGijLI9/INxboA8YPD8DMuyp/VURTuV
-	ZXXBzOhMucN2KAPdJIfRAD3gFOPvo8J9lD/0EU8z1e8nqxBWntJRV4luxVsBt3L+Mh8/4VU55nm
-	pi3STqlPzGXb4paY0vP8x7XznTcyrgNK2xy6P23DuRNLw6RdkVFxjNADMmG5t9ZYrAl/jvv5Z8k
-	qs3NHJlsWWAN9hQyvjBy
-X-Google-Smtp-Source: AGHT+IHraOf2VQCzjGXwAYgpbOMHnfmKw255GG6nhBXCQxNBufRnf5O34LUD2vVBcsRc7arMoGinFw==
-X-Received: by 2002:a05:6a20:43ac:b0:1ee:3b8e:3439 with SMTP id adf61e73a8af0-1ee5c88f3dcmr18313362637.38.1739533840292;
-        Fri, 14 Feb 2025 03:50:40 -0800 (PST)
-Received: from [172.17.0.2] ([52.234.33.79])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242568a66sm2902354b3a.44.2025.02.14.03.50.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 03:50:39 -0800 (PST)
-Message-ID: <67af2e0f.050a0220.22b41a.cc51@mx.google.com>
-Date: Fri, 14 Feb 2025 03:50:39 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8861230627262758741=="
+        d=1e100.net; s=20230601; t=1739546913; x=1740151713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HN44kne2tOzrc/PsM8eEkDjGlLhqXXZ977xNofZ5eHw=;
+        b=VflJfgp7snYfYZyeozxsQAahF/wiDPUnCuAK1upuRfl4EULjKvLB3s/SuE1PETkyei
+         FkLTaCWwgZ4d6LdcHsi6MI91dmTsng7SVqFKYj0Q4cZtpaI1XUK28sJlewxg+c66IV4f
+         ST8VAsOvoc/i7/ZSSNsxNu7eabnxpQ9pNC+6SpwJxS7AHwqcIpVDySrN1NFO6/Ry7vWb
+         7z4OU2OUi658Dph5c7CPbzYUyjQ5q3avdqKaNSgp60cBiHR8aVRGbMEy76/UsSzUuHws
+         fExRw+TSEU6QN4DI/tC70XNNYQAjedHmW3xuhzpmXIFruGc+l4+Rv692n+/ePHxBVQ2+
+         WXWg==
+X-Gm-Message-State: AOJu0YyxjmqCwQ8qP/yG1U5HltpOzd+7st5np5ppVWOzN5f/5gt2k5vd
+	sAngSzSVzzu2SHupLThFpGahmAS2O5fcF2oHUPnDe1Bobub10/3R4Oxf0TwhD+OTpG33pqdDl40
+	+aMlNKQDKKcalo7tqGbYxE8Nlf71SbXwI
+X-Gm-Gg: ASbGncuWrYc+nXqsYNcp2P4FYeddVPAZ1jpgLwOThd5xFr/RAYDhL3teIIaX88jRcgj
+	5gayfuRYBcK3WiARZ9ioOhlbysI/M8bmZ6SiwCWBMoPpWRqyhVgvvMchm0+WhO/c+FGsKRp8eEA
+	==
+X-Google-Smtp-Source: AGHT+IH1GhLgyxvRMX6Je7NgTpWl0ZSC+Jpv3Mweo7yM4X+OTgbRxD7H9xL3gqVhxKetEvuGlaF60tE0ulxLgEafhIs=
+X-Received: by 2002:a2e:9648:0:b0:308:eb31:df9c with SMTP id
+ 38308e7fff4ca-3090f11c8e5mr21957101fa.1.1739546912308; Fri, 14 Feb 2025
+ 07:28:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chharry@google.com
-Subject: RE: Bluetooth: Always allow SCO packets for user channel
-In-Reply-To: <20250214191709.1.I6e9e94dcded65e4a9ed42ad23ca8a5d81f680382@changeid>
-References: <20250214191709.1.I6e9e94dcded65e4a9ed42ad23ca8a5d81f680382@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20250128115659.23655-1-ludovico.denittis@collabora.com> <fdb8f9d6-077b-4fa1-871f-6057e5be5c45@collabora.com>
+In-Reply-To: <fdb8f9d6-077b-4fa1-871f-6057e5be5c45@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 14 Feb 2025 10:28:20 -0500
+X-Gm-Features: AWEUYZkN2WZvB1ylx3OAw5vll-aSBWgNbjzk2ebqQuRRXbEjMMfPzo5pkdSfLpw
+Message-ID: <CABBYNZJYZ2DmYuFrT_-M8-LLva4rXGca8TEA1DoybR+q+D5t6g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] device: Clear pending_flags on error
+To: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============8861230627262758741==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Ludovico,
 
-This is automated email and please do not reply to this email!
+On Fri, Feb 14, 2025 at 6:26=E2=80=AFAM Ludovico de Nittis
+<ludovico.denittis@collabora.com> wrote:
+>
+> What do you think about this patch? I saw that this was still pending
+> while my other related ones have been merged. I'm not sure if you'd like
+> some changes or if it simply fell through the cracks.
 
-Dear submitter,
+Let me check if it is not on patchwork, anyway you can always resend
+when this happens.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=933983
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.37 seconds
-GitLint                       PENDING   0.31 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      24.35 seconds
-CheckAllWarning               PASS      26.71 seconds
-CheckSparse                   PASS      30.13 seconds
-BuildKernel32                 PASS      24.04 seconds
-TestRunnerSetup               PASS      427.77 seconds
-TestRunner_l2cap-tester       FAIL      0.09 seconds
-TestRunner_iso-tester         FAIL      0.08 seconds
-TestRunner_bnep-tester        FAIL      0.08 seconds
-TestRunner_mgmt-tester        FAIL      0.08 seconds
-TestRunner_rfcomm-tester      FAIL      0.21 seconds
-TestRunner_sco-tester         FAIL      0.08 seconds
-TestRunner_ioctl-tester       FAIL      0.09 seconds
-TestRunner_mesh-tester        FAIL      0.08 seconds
-TestRunner_smp-tester         FAIL      0.08 seconds
-TestRunner_userchan-tester    FAIL      0.08 seconds
-IncrementalBuild              PENDING   1.00 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_bnep-tester - FAIL
-Desc: Run bnep-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_rfcomm-tester - FAIL
-Desc: Run rfcomm-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_ioctl-tester - FAIL
-Desc: Run ioctl-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_smp-tester - FAIL
-Desc: Run smp-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: TestRunner_userchan-tester - FAIL
-Desc: Run userchan-tester with test-runner
-Output:
-
-Could not access KVM kernel module: No such file or directory
-qemu-system-x86_64: failed to initialize KVM: No such file or directory
-qemu-system-x86_64: Back to tcg accelerator
-qemu-system-x86_64: CPU model 'host' requires KVM
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+> Regards,
+> Ludovico de Nittis
+>
+> On 1/28/25 12:56 PM, Ludovico de Nittis wrote:
+> > If setting WakeAllowed, or the device privacy, fails, we may end up in =
+a
+> > situation where `pending_flags` is still set to some `DEVICE_FLAG_*`
+> > values, for example from `device_set_wake_allowed()` or
+> > `adapter_set_device_flags()`.
+> >
+> > This can confuse further requests because they'll assume that there is
+> > still a pending request in progress.
+> > ---
+> >   src/adapter.c | 1 +
+> >   src/device.c  | 1 +
+> >   2 files changed, 2 insertions(+)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index 5d4117a49..3eb343cbc 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -5580,6 +5580,7 @@ static void set_device_privacy_complete(uint8_t s=
+tatus, uint16_t length,
+> >       if (status !=3D MGMT_STATUS_SUCCESS) {
+> >               error("Set device flags return status: %s",
+> >                                       mgmt_errstr(status));
+> > +             btd_device_set_pending_flags(dev, 0);
+> >               return;
+> >       }
+> >
+> > diff --git a/src/device.c b/src/device.c
+> > index e8bff718c..3c2337198 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -1575,6 +1575,7 @@ static void set_wake_allowed_complete(uint8_t sta=
+tus, uint16_t length,
+> >                       dev->wake_id =3D -1U;
+> >               }
+> >               dev->pending_wake_allowed =3D FALSE;
+> > +             dev->pending_flags =3D 0;
+> >               return;
+> >       }
+> >
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8861230627262758741==--
+--=20
+Luiz Augusto von Dentz
