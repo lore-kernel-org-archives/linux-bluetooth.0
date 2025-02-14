@@ -1,66 +1,70 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803E91FCCFE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 22:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABA11FCCF1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 22:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739572924; cv=none; b=r7y9i3cmyxuwAr845Ez+y+o9r7NW5ux/94VjYTgab+LBYGjQRY4ZnXJYW7nYLCj9Tk4Gr5vz0+1oPzGSpai/czK+/JEBTwjbuRuRMthvDYRO4p+8YmTA7FqVAwDSrEomCYTTvUudYRFhA21pmhhIZf9TrNRIGo0IqUTy3WasMaA=
+	t=1739572927; cv=none; b=i6yhTP2AJ1RbQKeL1L0GRLkjHUGD3KKwclmgtAatiwa+a74P4Re0AuujhX/WN0j20dCWD0HmNmZXJQ7UozoUly3XQFxqt7os/3wrOPcOAtlgpo9OkRQOrUA0ZpdFhbIddss3DEI+nBE+JOEBjAUvEfMX6C0y8XUdf75B0IVlU8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739572924; c=relaxed/simple;
-	bh=UussoHn+ga9geu3I0Q9P4VpTl0oZizRbVPry3DfE/JE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LpY0jtTxTN8A/D3QCVM8YI4Y7Gde6CPL2CLoXbonbsesNUTyWUNT2ENpze6jT6EMgMd7rLwkJg6xkYSUXNfTJn0KzZRZtu6JBK8F2kObrwZfZ7+mnef2azaA7aCDoyw2/s9F3ADYjv4cpclRedSP8thgo1LVFxa6S2AwXpCwVLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RrxWybLL; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1739572927; c=relaxed/simple;
+	bh=TamKxxE+Ufbgvd/HUh/F1UD90tgq7zT3uXn+MvCQNkA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pZthDnGxHoxn0AvBsDlajlmsx0TiaayM5w3UfWgHNMvMsMv0HsmWiYF6xEV/pxNs2lxMMJGcHSTKprn0XdMElBXJVnhLNEgPZInUmCeLVXbxKit9fNUWPkVkwqL4IJ9aSZfhxZbt5DZn1Mu3f48z1KhRmtUzH1ZMPjQ3uYFcw4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ub53c8Y9; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RrxWybLL"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43963935585so24070145e9.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 14:42:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ub53c8Y9"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43962f7b0e4so15567435e9.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 14:42:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739572920; x=1740177720; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Spw4PakIybEJj+BmEGkP4kFq6DWKtU/upOakBE4PnBQ=;
-        b=RrxWybLLtqS5+oL3VfxugK4ek4ix05i2TpZNbdn726flRMSXqcmag0oCkH/gn98oSv
-         WeXVNKYu6Yc0Tj3zcCW6jVSDZhAX8/sUyLVn1+8qhtq2Nmge/vrO9eWur4G8Af/UfZ00
-         jy0rzOZEtSUXd0WRcxVf1EEne+4spqkWONQg6DP8Iuiuw9tU254kn4SNkVlmW08RyPWV
-         tkkXyiMC7HmNVgBKk/NUto5Z73XTlU2OJRm5SVlIp4XrBsGa98M6tVGZnS2vkZlCoYI/
-         /z+t8aPLgyMsymR4EGSJVFRH/uW5I7RBJkAiO3Fl1U0ewoZbACoNbDZ1JGDyFucBr9zR
-         N7FA==
+        d=gmail.com; s=20230601; t=1739572923; x=1740177723; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XunXjeXN65TG4u6bCk6eREzYkbeDYQAacnwiEbp5adI=;
+        b=Ub53c8Y9KV1lIJn0GmZfsm0HMWWBAvcLs4CgsspCcP6YsyjGTpBEWLot1pS09duvVD
+         OB5zOO6PUS2ohlGQZK/Nv3+mwKyMU4fTQrcgr3N3qSMyB835KzY18VTgOs0TwGlVxJpn
+         LAujzTykZi9pTtkWX3U6m6i2I/DwFFAc6jUQ8uHc9NcK/EfBsHYzQalgERmZOyXoFyzh
+         ZBYDULtpOhlvP8qJeZoj2q+1PSnFbGqaqXmI90vKDoEzNehIMl7bWtmE10Hl5tgMj22j
+         dHwe2DOua1YmwyN5f6g1vaBHs4QfplTBbKPV8gXncJC+aUI4T+r0zwJEG5Hko8Vuol1/
+         1bAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739572920; x=1740177720;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Spw4PakIybEJj+BmEGkP4kFq6DWKtU/upOakBE4PnBQ=;
-        b=pMhJ6tyxyQVifMShykhP+hhOLhyr4y0eIOcLbiDeByQIt6JcQrUuT4idSyEfMMFqub
-         mffF9ZdQfWHhTlwHNVDKSrK/hWtcBNOgzh4PDVna42iEgAyG47tiLHWLXSyUHLo/jCbA
-         ZN0mbJ++5aABLtlp4yZGMp7kKGn0iPs7dJuV8xJg67ig/By1/kpxQfUep+O3DfMSqZ8Q
-         z58RM6hNfI1XN/p+liwLr78HMhuzxdIq77Q5QZ8BgZAnfMJfw7sUvKyOBLjTHMT/Szj1
-         5wGFVubNSoE2sj0/p4Nys/awZ0JYEqiTZO84vx3Nx/Gm7GxeLg0UKBEOm8zzfGHnmI9n
-         hDtg==
-X-Gm-Message-State: AOJu0YxvDaaCN+/phJOPvPrX+PsodYSGsd/T2dckQjr+Y8u1YctDl0+k
-	4an+NbkPW90wxr5+/Gc7lvpn2FMdVUA8LZ4VruQQ/lymB0/MU25EWfD2GjYR
-X-Gm-Gg: ASbGncv3GNTCLTwk8nokGgoqtVHY2DonD9BRJzjX7zDV89FuSz2NdEh+6Zq0+tUeFXq
-	i4AN2/TOUOvKmxLbt6yNAe14J5YaG3ryRPwqGbPyXgv7zCFirFQF1rjK1x5tC4r/h142u7fA3k5
-	ktOewpmsqZc4EJLkSGquBwR9B3zbGXcH3AQTVGt0A6upIz5RCvDBzf2uAwaNTUwbT0+dq83b4eH
-	0t6Ga/bz9YZqeNP5BhEAp2Ppc52yezCL2f+xYW50qeqUhZhDON2cOHrEM6d8B+rjCVy5kd7/x59
-	8RCLLczfO/Vk4gFdWOLiBNr6
-X-Google-Smtp-Source: AGHT+IGLg5BIt9lkjWOsfJi8wegy2XsnlBkZv/Ziz73cmDy4U5bDlpO23l0UNpvV9FkGr1GQxCrd8g==
-X-Received: by 2002:a05:600c:5103:b0:439:65f0:c9ce with SMTP id 5b1f17b1804b1-4396e72a6d5mr9728825e9.25.1739572919663;
-        Fri, 14 Feb 2025 14:41:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739572923; x=1740177723;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XunXjeXN65TG4u6bCk6eREzYkbeDYQAacnwiEbp5adI=;
+        b=ql2xhLJpxsl+AoCkIIZot3V1NBarU9RadUgGBbD1LjeDv3kte/5jo2LL192ZBj3SDW
+         iyQwZA516/e9XQI9q8BxlbF+4sfMekNdWKMaz5gbqPcK6eBSpdFYaLPNS/904Lfvdduy
+         Vk2gxKlLwbIOKarCAPgzw3UQOowLy9XaqMjmCpGg8phqJTB85Q7ZU8HOc6DSbpnJThT+
+         OdefyXjzxdrQW3YQF+pBxpXeMqb6u6t6O1kCv6BtbfQI25Y+cSzNcfptg23q9vKPbyCf
+         w3aLhZuNBKGlmylxqFcXv0KT2p8+2uoE0Q+hq9TQB8mHLio9L+ey7HdHXZFs7Sh6Pkpx
+         xLAg==
+X-Gm-Message-State: AOJu0Yx+utoNjS2Vn8rSy/1fMfqKedKU0um7tDOf5VH+g7eYDxnVSX1O
+	8y33N7qjYgZ9lFoVKTgXAjjMZk2kW6vfz4wtppQSyj1D2R7VM6oCX/lIIxHB
+X-Gm-Gg: ASbGncuunNOLBtY1DV35rx/4pCiU8F+VXNrPsU0ztfQOAGYPiER5qr1LAeDj57hzBia
+	lB5qZqyZoF9O9blarBcKrR1zUJOYUFga0NPZJjg2vDlPVMJUhOsy8ldkbT09czu9aVSgDdrGS6K
+	sGqu7a5EUzuJolK2r/aATHfJNN1aNvp7vTeQlTLz3aA/rFwgvQmsgWslDf+xHduKpcKXBGy2NXv
+	vdD1k/gsoSeEXYcOpNXqVAV2pklU6U3L4YASnktxyeriakv6YzFqEffCbk8Qo2Q5qaHeSZSAO9q
+	dZT7H2eB3xnwkgnw8AlPr0n1
+X-Google-Smtp-Source: AGHT+IE93gIqN0l54bUAzrHZs4Op/ol681GEhNHZFe4dU+ocg9Yv2oD0W0gWdXUmepC6VGa9mS5ASQ==
+X-Received: by 2002:a05:6000:402a:b0:38d:e48b:1766 with SMTP id ffacd0b85a97d-38f33f118c8mr785906f8f.6.1739572922574;
+        Fri, 14 Feb 2025 14:42:02 -0800 (PST)
 Received: from vibhavp-an515-58.lan ([122.161.77.217])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43961645422sm34358555e9.2.2025.02.14.14.41.56
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43961645422sm34358555e9.2.2025.02.14.14.42.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 14:41:58 -0800 (PST)
+        Fri, 14 Feb 2025 14:42:02 -0800 (PST)
 From: Vibhav Pant <vibhavp@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vibhav Pant <vibhavp@gmail.com>
-Subject: [PATCH BlueZ 0/1] adapter: Fix unnecessarily enabling the connectable property.
-Date: Sat, 15 Feb 2025 04:11:48 +0530
-Message-ID: <20250214224149.135458-1-vibhavp@gmail.com>
+Subject: [PATCH BlueZ 1/1] adapter: Fix unnecessarily enabling the connectable property.
+Date: Sat, 15 Feb 2025 04:11:49 +0530
+Message-ID: <20250214224149.135458-2-vibhavp@gmail.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250214224149.135458-1-vibhavp@gmail.com>
+References: <20250214224149.135458-1-vibhavp@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -69,25 +73,30 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hello,
-As the Connectable and Discoverable properties for an adapter can now be set independently, this creates an issue where if Connectable is set to true before setting Discoverable to true as well, property_set_mode will still try to set connectability to true, resulting in any future attempts to set Connectable failing with org.bluez.Error.Busy, as the adapter's pending_setting bitmask (specifically, MGMT_SETTING_CONNECTABLE) never gets cleared.
-This can be reproduced by the following commands:
-
-busctl set-property org.bluez /org/bluez/hci0 org.bluez.Adapter1 Connectable b true
-busctl set-property org.bluez /org/bluez/hci0 org.bluez.Adapter1 Discoverable b true
-busctl set-property org.bluez /org/bluez/hci0 org.bluez.Adapter1 Connectable b false
-
-This patch fixes property_set_mode to only set connectable while enabling discoverability if it is currently disabled for the adapter.
-
-Thanks,
-Vibhav
-
-Vibhav Pant (1):
-  adapter: Fix unnecessarily enabling the connectable property.
-
+While enabling the discoverable property for an adapter, only enable
+the connectable property only if it is currently disabled.
+---
  src/adapter.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index da602a7b8..01ef0db5a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3142,10 +3142,11 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+ 		break;
+ 	case MGMT_SETTING_DISCOVERABLE:
+ 		if (btd_has_kernel_features(KERNEL_CONN_CONTROL)) {
+-			if (mode) {
++			if (mode && !(adapter->current_settings &
++				      MGMT_SETTING_CONNECTABLE)) {
+ 				set_mode(adapter, MGMT_OP_SET_CONNECTABLE,
+ 									mode);
+-			} else {
++			} else if (!mode) {
+ 				opcode = MGMT_OP_SET_CONNECTABLE;
+ 				param = &mode;
+ 				len = sizeof(mode);
 -- 
 2.48.1
 
