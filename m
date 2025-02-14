@@ -1,380 +1,223 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC35B2627ED;
-	Fri, 14 Feb 2025 11:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3598263F3C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 11:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739533037; cv=none; b=jJmAdgRbC2+sIP7dv60yqOPTAc8xn15aaEQAMbEHVCEI56nadnQgpwplKAc4qr6DU0kQrkiPTC1zc+h/2q7iZHq6iP5MQiILdAp35/tVJGZeUg8zhm2WfRlOFDRI6B4Jr+4GaAfu4NtAQsMx+3E2ei9Y9fhKHctxlsfk8WDfHYE=
+	t=1739533840; cv=none; b=btberMXe5V1HHBoOnaGDr1JDjOGApomii+WC+9+tjVypV0Sb6Hk5FHzDUHFnc6f/rHCO2YhvcbUqQ4fuaQk3vMAW8PNZdrg7G4LN17pN3rKECGPXdorVCbNlGsIBOTGO0tSn4EhAdIlas9114ffQBVV19xShq+D0dJ9LLWtygbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739533037; c=relaxed/simple;
-	bh=I74jwEEgdzAlIhSsbE1frYKB0EsoLIVW5+jBpBwQJUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m+QmpyKRoO55EIposq6Xmb8qBW5MD2qUvzGOiL/POm7IfnUQEMa+XH9at7ayDIMigh98nG34CSMF5Z5JJziDSBzJuGQFnvH31TWDWemjyE7CV95fkfzKdNkXrkiWEBsulqICoJTuK4p7KY7ljA1SFa4LNHOyDNe0gzYzM+yIiLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=a4/0cF2W; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739533840; c=relaxed/simple;
+	bh=TrNi+BWY9nzRP+p1y3Uy1gVP1AMPSjeO6mLd7GmHK3U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=aHuZqgLbwFUUrqNNSa8/WtBkLcanrtonzC9vbMka+C6pMy34bd8aBESyOd178ULEWTAfC2QsXRagK+/Xv/u3Yfhxq6r8EudEHO1HCorKfVUOAu96FS5df/ifsQKKglanIzVNzo1upEizRYxZVj51EmqtpAWeJg9iyTdM12xCabw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPt43iox; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="a4/0cF2W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F716C4CED1;
-	Fri, 14 Feb 2025 11:37:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739533036;
-	bh=I74jwEEgdzAlIhSsbE1frYKB0EsoLIVW5+jBpBwQJUs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a4/0cF2WRNCjsiaf6pKoUGpuI4u49rX9/YkGi91TzB2R3464I2CurlUIzxZF60Zd5
-	 +hHbnBr43gc5Sj95+g2iGDRUWmzYOwtYxbxNtOsyTSFIbJdA3OPSQnGShbzkyQ/Ywx
-	 4TlmJhAiiV+AV9dwhx9z59IW9RLlmigZgC428enc=
-Date: Fri, 14 Feb 2025 12:37:12 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	chromeos-bluetooth-upstreaming@chromium.org,
-	Hsin-chen Chuang <chharry@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs
- isoc_alt
-Message-ID: <2025021425-surgical-wackiness-0940@gregkh>
-References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPt43iox"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e4468b7099so14987366d6.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2025 03:50:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739533837; x=1740138637; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=A355p97gvzk/6hc2hkRZ8NtTuJZesK8LB70pc8ABY3I=;
+        b=WPt43ioxI3FCwSaCtBbi66R77l7QNh2I028A3kdJ4xuxqsTLVa1IYLiL5kP0Ig318F
+         oJ7bGEXlTRdrjU73k3Bzh5pbmyLq/BReYdOqa7wDfXnL/r2lF6KopiSiwVmneyGCIUvE
+         sBfd0b72kRmF9wxYbtA2w76ADOI3kHqPWxPSJLUJTwEgEtv6saVrVy+AEfJxuvKzLgS7
+         5jqmqLtoGgA8OzZKFHfBQw2lSLNTorYxM2+jT8+ji9Lx2vXkk0TP3g3F/EG2p5UwuVQ3
+         GmMAUYyCua6vn8GfkSBKC1hNaFnYTzGfFY7ZglejhjPeoscb9RO7SgSeVGQN3m2vno7q
+         5GPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739533837; x=1740138637;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=A355p97gvzk/6hc2hkRZ8NtTuJZesK8LB70pc8ABY3I=;
+        b=nbi+RZ4a9n3RC1IQ4jsCau1KqiQFSVUq1ZmfAkQQbHM7rKcZI8wnK9ngxJCzQ6HwSN
+         /iRl2mEMTnB86WDyGh60PXLXWjiff3xwS4nlHAIE7bPpY7Pi2M/kmEvlVfpadKINqtj8
+         30rewHQOH+QV5LEMlkzV59KjsxaLGn8BWnveU093R3qwb+PCMBF/VMmcICmnsn5BS3nh
+         pTsMhaZFR7UJkzE4VteN2PBMLYPr3GMge5lk/dAAO5UGc32kIZlkCt1tDjhprTW9ztb/
+         EJYYa1rLyxogFFgaQO32OEISujBmb8IkjxPzIPyZbqyn0lwqkoapfZPcr1f2l8Dx8u9g
+         T4aw==
+X-Gm-Message-State: AOJu0YzGY96lCZ8gZjQmNAsnE80lPSiVxzMmLfQrszt8whYHouW89sbY
+	OCe2VjdsAnTAyVVsyC0ItRHcwfu7dWFWZjpEm2O28XNDbKcDcgOJTHYhUQ==
+X-Gm-Gg: ASbGncsSBtJZDujbIMN25nR0xraZkTxCz6nG9fpoxInM1CfYvcTo/9PXchTkd/NzYDe
+	icuuLyoH7pp3xgU8FIGqByRaPfy6KrSMxD9geWanAaYax72Q/LBtMSRBUKk1iOS3VerxUMhGZgm
+	muqu5xWwvb9N0XuuM/WaVajJi8hoIjKJtWBD9fmILKFD9FUnEYHK1epGrzDfvDq19UgfIVPjFO6
+	l+HruizTrEncE6WZCd+WrCvx7Ps+iBdK6SvTc5/jUFAXBlrb8Ti0rIjaJkIjWmJsoqBVR/mofZP
+	TSkq32uBH6g6T9Rg25ctFg==
+X-Google-Smtp-Source: AGHT+IEGeYkZPYdGPJ8l4r36JPHxR4lLdBiLtKqRzpU7CD2leXzkF6ObpvvplYU5Recib0HvyCdHew==
+X-Received: by 2002:a0c:ed47:0:b0:6e6:5ec3:868e with SMTP id 6a1803df08f44-6e65ec38accmr66724546d6.31.1739533837568;
+        Fri, 14 Feb 2025 03:50:37 -0800 (PST)
+Received: from [172.17.0.2] ([104.45.201.76])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d786020sm20138336d6.46.2025.02.14.03.50.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 03:50:37 -0800 (PST)
+Message-ID: <67af2e0d.0c0a0220.9de22.6506@mx.google.com>
+Date: Fri, 14 Feb 2025 03:50:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3775226494969898695=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chharry@google.com
+Subject: RE: [v5] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
 In-Reply-To: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuang wrote:
-> From: Hsin-chen Chuang <chharry@chromium.org>
-> 
-> Expose the isoc_alt attr with device group to avoid the racing.
-> 
-> Now we create a dev node for btusb. The isoc_alt attr belongs to it and
-> it also becomes the parent device of hci dev.
-> 
-> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+--===============3775226494969898695==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Wait, step back, why is this commit needed if you can change the alt
-setting already today through usbfs/libusb without needing to mess with
-the bluetooth stack at all?
+This is automated email and please do not reply to this email!
 
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> ---
-> 
-> Changes in v5:
-> - Merge the ABI doc into this patch
-> - Manage the driver data with device
-> 
-> Changes in v4:
-> - Create a dev node for btusb. It's now hci dev's parent and the
->   isoc_alt now belongs to it.
-> - Since the changes is almost limitted in btusb, no need to add the
->   callbacks in hdev anymore.
-> 
-> Changes in v3:
-> - Make the attribute exported only when the isoc_alt is available.
-> - In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
->   (which calls hci_init_sysfs).
-> - Since hci_init_sysfs is called before btusb could modify the hdev,
->   add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
-> 
-> Changes in v2:
-> - The patch has been removed from series
-> 
->  .../ABI/stable/sysfs-class-bluetooth          |  13 ++
->  drivers/bluetooth/btusb.c                     | 111 ++++++++++++++----
->  include/net/bluetooth/hci_core.h              |   1 +
->  net/bluetooth/hci_sysfs.c                     |   3 +-
->  4 files changed, 102 insertions(+), 26 deletions(-)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-class-bluetooth b/Documentation/ABI/stable/sysfs-class-bluetooth
-> index 36be02471174..c1024c7c4634 100644
-> --- a/Documentation/ABI/stable/sysfs-class-bluetooth
-> +++ b/Documentation/ABI/stable/sysfs-class-bluetooth
-> @@ -7,3 +7,16 @@ Description: 	This write-only attribute allows users to trigger the vendor reset
->  		The reset may or may not be done through the device transport
->  		(e.g., UART/USB), and can also be done through an out-of-band
->  		approach such as GPIO.
-> +
-> +What:		/sys/class/bluetooth/btusb<usb-intf>/isoc_alt
-> +Date:		13-Feb-2025
-> +KernelVersion:	6.13
-> +Contact:	linux-bluetooth@vger.kernel.org
-> +Description:	This attribute allows users to configure the USB Alternate setting
-> +		for the specific HCI device. Reading this attribute returns the
-> +		current setting, and writing any supported numbers would change
-> +		the setting. See the USB Alternate setting definition in Bluetooth
-> +		core spec 5, vol 4, part B, table 2.1.
-> +		If the HCI device is not yet init-ed, the write fails with -ENODEV.
-> +		If the data is not a valid number, the write fails with -EINVAL.
-> +		The other failures are vendor specific.
+Dear submitter,
 
-Again, what's wrong with libusb/usbfs to do this today?
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=933982
 
+---Test result---
 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 1caf7a071a73..e2fb3d08a5ed 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -920,6 +920,8 @@ struct btusb_data {
->  	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
->  
->  	struct qca_dump_info qca_dump;
-> +
-> +	struct device dev;
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      23.96 seconds
+CheckAllWarning               PASS      26.59 seconds
+CheckSparse                   PASS      30.50 seconds
+BuildKernel32                 PASS      23.98 seconds
+TestRunnerSetup               PASS      430.81 seconds
+TestRunner_l2cap-tester       FAIL      0.69 seconds
+TestRunner_iso-tester         FAIL      0.31 seconds
+TestRunner_bnep-tester        FAIL      0.21 seconds
+TestRunner_mgmt-tester        FAIL      0.17 seconds
+TestRunner_rfcomm-tester      FAIL      0.17 seconds
+TestRunner_sco-tester         FAIL      0.15 seconds
+TestRunner_ioctl-tester       FAIL      0.18 seconds
+TestRunner_mesh-tester        FAIL      0.15 seconds
+TestRunner_smp-tester         FAIL      0.15 seconds
+TestRunner_userchan-tester    FAIL      0.15 seconds
+IncrementalBuild              PENDING   0.51 seconds
 
-Ah, so now this structure's lifecycle is determined by the device you
-just embedded in it?  Are you sure you got this right?
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
->  };
->  
->  static void btusb_reset(struct hci_dev *hdev)
-> @@ -3693,6 +3695,9 @@ static ssize_t isoc_alt_store(struct device *dev,
->  	int alt;
->  	int ret;
->  
-> +	if (!data->hdev)
-> +		return -ENODEV;
-> +
->  	if (kstrtoint(buf, 10, &alt))
->  		return -EINVAL;
->  
-> @@ -3702,6 +3707,36 @@ static ssize_t isoc_alt_store(struct device *dev,
->  
->  static DEVICE_ATTR_RW(isoc_alt);
->  
-> +static struct attribute *btusb_sysfs_attrs[] = {
-> +	NULL,
-> +};
-> +ATTRIBUTE_GROUPS(btusb_sysfs);
-> +
-> +static void btusb_sysfs_release(struct device *dev)
-> +{
-> +	struct btusb_data *data = dev_get_drvdata(dev);
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-That feels wrong, it's embedded in the device, not pointed to by the
-device.  So this should be a container_of() call, right?
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
 
-> +
-> +	kfree(data);
-> +}
-> +
-> +static const struct device_type btusb_sysfs = {
-> +	.name    = "btusb",
-> +	.release = btusb_sysfs_release,
-> +	.groups  = btusb_sysfs_groups,
-> +};
-> +
-> +static struct attribute *btusb_sysfs_isoc_alt_attrs[] = {
-> +	&dev_attr_isoc_alt.attr,
-> +	NULL,
-> +};
-> +ATTRIBUTE_GROUPS(btusb_sysfs_isoc_alt);
-> +
-> +static const struct device_type btusb_sysfs_isoc_alt = {
-> +	.name    = "btusb",
-> +	.release = btusb_sysfs_release,
-> +	.groups  = btusb_sysfs_isoc_alt_groups,
-> +};
-> +
->  static int btusb_probe(struct usb_interface *intf,
->  		       const struct usb_device_id *id)
->  {
-> @@ -3743,7 +3778,7 @@ static int btusb_probe(struct usb_interface *intf,
->  			return -ENODEV;
->  	}
->  
-> -	data = devm_kzalloc(&intf->dev, sizeof(*data), GFP_KERNEL);
-> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
->  	if (!data)
->  		return -ENOMEM;
->  
-> @@ -3766,8 +3801,10 @@ static int btusb_probe(struct usb_interface *intf,
->  		}
->  	}
->  
-> -	if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep)
-> -		return -ENODEV;
-> +	if (!data->intr_ep || !data->bulk_tx_ep || !data->bulk_rx_ep) {
-> +		err = -ENODEV;
-> +		goto out_free_data;
-> +	}
->  
->  	if (id->driver_info & BTUSB_AMP) {
->  		data->cmdreq_type = USB_TYPE_CLASS | 0x01;
-> @@ -3821,16 +3858,47 @@ static int btusb_probe(struct usb_interface *intf,
->  
->  	data->recv_acl = hci_recv_frame;
->  
-> +	if (id->driver_info & BTUSB_AMP) {
-> +		/* AMP controllers do not support SCO packets */
-> +		data->isoc = NULL;
-> +	} else {
-> +		/* Interface orders are hardcoded in the specification */
-> +		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> +		data->isoc_ifnum = ifnum_base + 1;
-> +	}
-> +
-> +	if (id->driver_info & BTUSB_BROKEN_ISOC)
-> +		data->isoc = NULL;
-> +
-> +	/* Init a dev for btusb. The attr depends on the support of isoc. */
-> +	if (data->isoc)
-> +		data->dev.type = &btusb_sysfs_isoc_alt;
-> +	else
-> +		data->dev.type = &btusb_sysfs;
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
 
-When walking the class, are you sure you check for the proper types now?
-Does anyone walk all of the class devices anywhere?
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_bnep-tester - FAIL
+Desc: Run bnep-tester with test-runner
+Output:
 
-> +	data->dev.class = &bt_class;
-> +	data->dev.parent = &intf->dev;
-> +
-> +	err = dev_set_name(&data->dev, "btusb%s", dev_name(&intf->dev));
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
 
-what does this name look like in a real system?  squashing them together
-feels wrong, why is 'btusb' needed here at all?
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_rfcomm-tester - FAIL
+Desc: Run rfcomm-tester with test-runner
+Output:
 
-> +	if (err)
-> +		goto out_free_data;
-> +
-> +	dev_set_drvdata(&data->dev, data);
-> +	err = device_register(&data->dev);
-> +	if (err < 0)
-> +		goto out_put_sysfs;
-> +
->  	hdev = hci_alloc_dev_priv(priv_size);
-> -	if (!hdev)
-> -		return -ENOMEM;
-> +	if (!hdev) {
-> +		err = -ENOMEM;
-> +		goto out_free_sysfs;
-> +	}
->  
->  	hdev->bus = HCI_USB;
->  	hci_set_drvdata(hdev, data);
->  
->  	data->hdev = hdev;
->  
-> -	SET_HCIDEV_DEV(hdev, &intf->dev);
-> +	SET_HCIDEV_DEV(hdev, &data->dev);
->  
->  	reset_gpio = gpiod_get_optional(&data->udev->dev, "reset",
->  					GPIOD_OUT_LOW);
-> @@ -3969,15 +4037,6 @@ static int btusb_probe(struct usb_interface *intf,
->  		hci_set_msft_opcode(hdev, 0xFD70);
->  	}
->  
-> -	if (id->driver_info & BTUSB_AMP) {
-> -		/* AMP controllers do not support SCO packets */
-> -		data->isoc = NULL;
-> -	} else {
-> -		/* Interface orders are hardcoded in the specification */
-> -		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
-> -		data->isoc_ifnum = ifnum_base + 1;
-> -	}
-> -
->  	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
->  	    (id->driver_info & BTUSB_REALTEK)) {
->  		btrtl_set_driver_name(hdev, btusb_driver.name);
-> @@ -4010,9 +4069,6 @@ static int btusb_probe(struct usb_interface *intf,
->  			set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirks);
->  	}
->  
-> -	if (id->driver_info & BTUSB_BROKEN_ISOC)
-> -		data->isoc = NULL;
-> -
->  	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
->  		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
->  
-> @@ -4065,10 +4121,6 @@ static int btusb_probe(struct usb_interface *intf,
->  						 data->isoc, data);
->  		if (err < 0)
->  			goto out_free_dev;
-> -
-> -		err = device_create_file(&intf->dev, &dev_attr_isoc_alt);
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
 
-You have now moved the file, are you sure you don't also need to update
-the documentation?
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_ioctl-tester - FAIL
+Desc: Run ioctl-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_smp-tester - FAIL
+Desc: Run smp-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: TestRunner_userchan-tester - FAIL
+Desc: Run userchan-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu-system-x86_64: CPU model 'host' requires KVM
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-> -		if (err)
-> -			goto out_free_dev;
->  	}
->  
->  	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
-> @@ -4099,6 +4151,16 @@ static int btusb_probe(struct usb_interface *intf,
->  	if (data->reset_gpio)
->  		gpiod_put(data->reset_gpio);
->  	hci_free_dev(hdev);
-> +
-> +out_free_sysfs:
-> +	device_del(&data->dev);
-> +
-> +out_put_sysfs:
-> +	put_device(&data->dev);
-> +	return err;
-> +
-> +out_free_data:
-> +	kfree(data);
->  	return err;
->  }
->  
-> @@ -4115,10 +4177,8 @@ static void btusb_disconnect(struct usb_interface *intf)
->  	hdev = data->hdev;
->  	usb_set_intfdata(data->intf, NULL);
->  
-> -	if (data->isoc) {
-> -		device_remove_file(&intf->dev, &dev_attr_isoc_alt);
-> +	if (data->isoc)
->  		usb_set_intfdata(data->isoc, NULL);
-> -	}
->  
->  	if (data->diag)
->  		usb_set_intfdata(data->diag, NULL);
-> @@ -4150,6 +4210,7 @@ static void btusb_disconnect(struct usb_interface *intf)
->  		gpiod_put(data->reset_gpio);
->  
->  	hci_free_dev(hdev);
-> +	device_unregister(&data->dev);
->  }
->  
->  #ifdef CONFIG_PM
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 05919848ea95..776dd6183509 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1843,6 +1843,7 @@ int hci_get_adv_monitor_offload_ext(struct hci_dev *hdev);
->  
->  void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
->  
-> +extern const struct class bt_class;
->  void hci_init_sysfs(struct hci_dev *hdev);
->  void hci_conn_init_sysfs(struct hci_conn *conn);
->  void hci_conn_add_sysfs(struct hci_conn *conn);
-> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> index 041ce9adc378..aab3ffaa264c 100644
-> --- a/net/bluetooth/hci_sysfs.c
-> +++ b/net/bluetooth/hci_sysfs.c
-> @@ -6,9 +6,10 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->  
-> -static const struct class bt_class = {
-> +const struct class bt_class = {
->  	.name = "bluetooth",
->  };
-> +EXPORT_SYMBOL(bt_class);
 
-EXPORT_SYMBOL_GPL(), right?
+---
+Regards,
+Linux Bluetooth
 
-thanks,
 
-greg k-h
+--===============3775226494969898695==--
