@@ -1,108 +1,163 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDDA42AA5
-	for <linux-bluetooth@vger.kernel.org>; Sun, 16 Feb 2025 15:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739720947; cv=pass; b=V7BgKZTCgQ8yos35ZjwkpzQ9R13vrAPHfbtkOeil37X6eC/w3V+Rxz5tvenk8t0LZPk/ML6YhXDdD6GuKO8UUr7oXJM/Vm2qki8TzA+RJH25yfNGFf3cvQgsxhY9Zos7fwLiuocuCjRx8ASMq7EvEyt4nwdxxwNx45ING91OlMA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739720947; c=relaxed/simple;
-	bh=gYSKsawVk4aJRtX1Y13BpduMO7F67Id14OhxngQ1tOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K3ajPApAWnQ5OgLlzb3RelHSfFnmEJcxGbJBAnG4xk+iku2D1nRTnoxx6Nscu3Vjj+Fv5Pzfxjulm1xFTdhmKtWjHQ9P4we2Qgo+UPyGFjOGB0i5L9ANhowPNM7i6k+4QCwIPwv3ULEpEArtGLMfF2yJ1scY4XTCnl0eEwe2Vao=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=a2wgcy5x; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DD7DF78;
+	Sun, 16 Feb 2025 16:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739722056; cv=none; b=djw/o42l3eiyhIaZlUyOwGdIyRw+dCcDzm46STbb5i7L+yV9E0NHxIp7ZajI9X2hpGFIoKJtBvE7qBfKCL0hOa2ieIJuEScNsjIhARSwOZoXLs99Q9+temDOTGczJLKlklax8TPChdebhbvPT7nR4iQ4DlCN45EkrT0kuhuvR+Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739722056; c=relaxed/simple;
+	bh=43hB0V5xGtsW08Wu4x/+54J0/oLkkgqApWLJEGgtdtg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KDr6774fUlMOKALnvM8CYPrQwk7DviZ1kWpwUg3aNDUPu0iEVz5luI41Kjfkjpmn+VliPJAZLklghx1/+UyVY1BvhdvcoS4Su4lIBItxMKPNvfYXdlvBxeUJhkuTldv0LgMe+6tok/2spirTYLNatOpaR3Xo+mxa5eD09jrTX6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlM6MgGh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="a2wgcy5x"
-Received: from monolith.lan (unknown [193.138.7.158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Ywqvr5H9bz49Pxd;
-	Sun, 16 Feb 2025 17:48:56 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1739720937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=DlZUd2wHKkDklwGNPCkzpSzDakK6pqWAUEUygtagjAM=;
-	b=a2wgcy5x4RnCgWia4OWbNwmbrZKf3T57WbgCdny6f5fD5i0R1WhPyCcZruMt7IjAB0+62H
-	UxP3cU/hDwxW00XXxBKLlguDnabay3aLI3xjbJxArCq28gBDMkPO1CKw5gfoUOivJivI5W
-	2P1hmPTRR8dfmTw2lbBNuaxXTSDCdyYJaRnGSvLosCaQ6wZwJY3M7vDGfI4Y6MN8xw7OYj
-	08ocO1BkkqblZcw1gKp98JPKLOi4XTpFl0CAf7BxhkMp0dIeKJs1t/VQoa0nrutJt4eQpA
-	e/1fIemzuNv74Rs8rRm1WBsHOIzogu+DNztnl/v3NL+Ni40Dq93dZB9CANB1xw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1739720937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=DlZUd2wHKkDklwGNPCkzpSzDakK6pqWAUEUygtagjAM=;
-	b=D90nbg381dmE1y/SkGnT+5HDffm4RmbVVXTKosjP+tGmxZQdYP21DkUOlTy3pSTeHC3pPj
-	M9KUTAyUNbyD65QvSU0wJPdXL+mUGQ1HtUF5kBcUoaJAIhelH1T/Vi66WcigeNYcjiny83
-	XdscOjizHqyqSO+1kHsnPRjSVUq7t4/FD/5RrY1qK3/KUHjF2E9foLZVeD0xtcPDCfI26G
-	Wy8rhjXRsUULqu1LVvfn7DaVMNBq+4w4LNxloh3AGF6bCq7flA8dSvSAUQtuRapjBjMP/a
-	jHdMLpZEXPUAkxXEkhT7ULY4hXsV6AFS4WaSJec+r9pXX9qKEaV4kkvSbgxRRQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739720937; a=rsa-sha256;
-	cv=none;
-	b=o7CL4C2h6UzOrNZt8aV7yUdvFnc2Ala7MnpO11DMV/R+tbs0R/bO2aXQzHoB/Kk0Ev7gMM
-	ZIKD9j0NoHwc2XqY6xuI0fpCbccR3wU82yUGt2HzPHiTWVoZFv9hOVNsgNEumQYT3b4ksP
-	ocCDmSGP2XO6cdTUAkPzWXmiFz6C7/g4MemZt0T/3CWQBbBzURnJgPZ/ba9GXv88LJNoSf
-	zYyStfHbq/4qGFTOOj0m+2CgGXmIw/8zg9EBvd8/HMp+uwcnwxFaFkbpuxdDhdtdbe9jCJ
-	aZ+hEh6GFubGkoD6bPEvBT7BsDslW8XjuOqsAlgt2sqkcg+SxnlgIah5o4+1Kw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] shared/vcp: fix setting volume back to current value
-Date: Sun, 16 Feb 2025 17:48:54 +0200
-Message-ID: <11cdbf4619d9eda9cd40c84728a2f5cc87d42d2e.1739720857.git.pav@iki.fi>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlM6MgGh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BB6C4CEDD;
+	Sun, 16 Feb 2025 16:07:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739722056;
+	bh=43hB0V5xGtsW08Wu4x/+54J0/oLkkgqApWLJEGgtdtg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LlM6MgGh//jb+HqFo2mNjO2abwlassCQW6QN1S0IhXrx9UWPKTL5lXIMRVICZOzHG
+	 +aYnJH6ZYStPAMiRJq9BoaA6fzzHLdcCGBjnpM5huUWXgAncyX5dPH9jTWi91Cv77M
+	 +3WB5YZYxAlEHNJp704sGJRxxnh02eUtAbNDOw2MfHkvNQ059CHOsRU99vDxYhKXt7
+	 vit/P0fUJ3Q1Fdij3Rpolx/Bjd5n5gQEy+dOsP9hDJgFvZpHViTnJNBLuCntrxlzRm
+	 45+oqW8LoqDcKA8k4nG/gqp6QP/yPQubFrpCeejequuS5/T2OBUF34Br4sw9waNrgt
+	 jsqu0/NtZNKhw==
+Date: Sun, 16 Feb 2025 16:07:29 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ajay Singh <ajay.kathat@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Kalle Valo <kvalo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Marek Vasut <marex@denx.de>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 09/12] wifi: wilc1000: disable firmware power save if
+ bluetooth is in use
+Message-ID: <20250216160729.GG1615191@kernel.org>
+References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
+ <20250212-wilc3000_bt-v1-9-9609b784874e@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250212-wilc3000_bt-v1-9-9609b784874e@bootlin.com>
 
-If there is a volume change request in flight, always update pending
-volume. Otherwise, setting the value back to old value before
-notification arrives, is wrongly ignored.
+On Wed, Feb 12, 2025 at 04:46:28PM +0100, Alexis Lothoré wrote:
+> If the wlan interface exposed by wilc driver has power save enabled
+> (either explicitly with iw dev wlan set power_save on, or because
+> kernel is built with CONFIG_CFG80211_DEFAULT_PS), it will send a power
+> management command to the wlan firmware when corresponding interface is
+> brought up. The bluetooth part, if used, is supposed to work
+> independently from the WLAN CPU. Unfortunately, this power save
+> management, if applied by the WLAN side, disrupts bluetooth operations
+> (the bluetooth CPU does not answer any command anymore on the UART
+> interface)
+> 
+> Make sure that the bluetooth part can work independently by disabling
+> power save in wlan firmware when bluetooth is in use.
+> 
+> Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
+> ---
+>  drivers/net/wireless/microchip/wilc1000/bt.c       | 29 +++++++++++++++++++---
+>  drivers/net/wireless/microchip/wilc1000/cfg80211.c |  5 +++-
+>  drivers/net/wireless/microchip/wilc1000/netdev.h   |  3 +++
+>  3 files changed, 33 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/wireless/microchip/wilc1000/bt.c b/drivers/net/wireless/microchip/wilc1000/bt.c
+> index b0f68a5479a5bd6f70e2390a35512037dc6c332b..f0eb5fb506eddf0f6f4f3f0b182eaa650c1c7a87 100644
+> --- a/drivers/net/wireless/microchip/wilc1000/bt.c
+> +++ b/drivers/net/wireless/microchip/wilc1000/bt.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/of_platform.h>
+>  #include <linux/platform_device.h>
+>  #include <net/wilc.h>
+> +#include "cfg80211.h"
+>  #include "netdev.h"
+>  #include "wlan_if.h"
+>  #include "wlan.h"
+> @@ -261,22 +262,36 @@ static int wilc_bt_start(struct wilc *wilc)
+>  int wilc_bt_init(void *wilc_wl_priv)
+>  {
+>  	struct wilc *wilc = (struct wilc *)wilc_wl_priv;
+> +	struct wilc_vif *vif;
+>  	int ret;
+>  
+> +	wilc->bt_enabled = true;
+> +
+>  	if (!wilc->hif_func->hif_is_init(wilc)) {
+>  		dev_info(wilc->dev, "Initializing bus before starting BT");
+>  		acquire_bus(wilc, WILC_BUS_ACQUIRE_ONLY);
+>  		ret = wilc->hif_func->hif_init(wilc, false);
+>  		release_bus(wilc, WILC_BUS_RELEASE_ONLY);
+> -		if (ret)
+> +		if (ret) {
+> +			wilc->bt_enabled = false;
+>  			return ret;
+> +		}
+>  	}
+>  
+> +	/* Power save feature managed by WLAN firmware may disrupt
+> +	 * operations from the bluetooth CPU, so disable it while bluetooth
+> +	 * is in use (if enabled, it will be enabled back when bluetooth is
+> +	 * not used anymore)
+> +	 */
+> +	vif = wilc_get_wl_to_vif(wilc);
+> +	if (wilc->power_save_mode && wilc_set_power_mgmt(vif, false))
+> +		goto hif_deinit;
 
-Fixes: e77884accdb2 ("shared/vcp: have only one volume change in flight at a time")
----
- src/shared/vcp.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Hi Alexis,
 
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index f0887ad62..321686774 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -2119,15 +2119,15 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
- 	 * the current one completes. This may skip over some volume changes,
- 	 * as it only sends a request for the final value.
- 	 */
--	if (vcp->volume == volume) {
-+	if (vcp->pending_op.timeout_id) {
-+		vcp->pending_op.volume = volume;
-+		vcp->pending_op.resend = true;
-+		return true;
-+	} else if (vcp->volume == volume) {
- 		/* Do not set to current value, as that doesn't generate
- 		 * a notification
- 		 */
- 		return true;
--	} else if (vcp->pending_op.timeout_id) {
--		vcp->pending_op.volume = volume;
--		vcp->pending_op.resend = true;
--		return true;
- 	}
- 
- 	req.op = BT_VCS_SET_ABSOLUTE_VOL;
--- 
-2.48.1
+Jumping to hif_deinit will result in the function returning ret.
+But ret may not not be initialised until a few lines below.
 
+Flagged by Smatch.
+
+> +
+>  	mutex_lock(&wilc->radio_fw_start);
+>  	ret = wilc_bt_power_up(wilc);
+>  	if (ret) {
+>  		dev_err(wilc->dev, "Error powering up bluetooth chip\n");
+> -		goto hif_deinit;
+> +		goto reenable_power_save;
+>  	}
+>  	ret = wilc_bt_firmware_download(wilc);
+>  	if (ret) {
+> @@ -293,10 +308,14 @@ int wilc_bt_init(void *wilc_wl_priv)
+>  
+>  power_down:
+>  	wilc_bt_power_down(wilc);
+> -hif_deinit:
+> +reenable_power_save:
+> +	if (wilc->power_save_mode_request)
+> +		wilc_set_power_mgmt(vif, true);
+>  	mutex_unlock(&wilc->radio_fw_start);
+> +hif_deinit:
+>  	if (!wilc->initialized)
+>  		wilc->hif_func->hif_deinit(wilc);
+> +	wilc->bt_enabled = false;
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(wilc_bt_init);
+
+...
