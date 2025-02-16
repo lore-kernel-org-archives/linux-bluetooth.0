@@ -1,163 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DD7DF78;
-	Sun, 16 Feb 2025 16:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207901AAC9
+	for <linux-bluetooth@vger.kernel.org>; Sun, 16 Feb 2025 17:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739722056; cv=none; b=djw/o42l3eiyhIaZlUyOwGdIyRw+dCcDzm46STbb5i7L+yV9E0NHxIp7ZajI9X2hpGFIoKJtBvE7qBfKCL0hOa2ieIJuEScNsjIhARSwOZoXLs99Q9+temDOTGczJLKlklax8TPChdebhbvPT7nR4iQ4DlCN45EkrT0kuhuvR+Y=
+	t=1739725772; cv=none; b=O1vXkJf7Es0EVsYANRruqio1xdB3VBbXTRk8UjuctxysQlP+OzF1VpJJaWpbkJXm2GHqjDCYKBdW3Hdw5mg+gXe0uxMgJ6XRXuDbWjObshhgXSfyk/IvdSBexQlKbu24X1gnn4B3Hq38RifhT3Bz0lUTl1H71WcYoOmaB8CMmHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739722056; c=relaxed/simple;
-	bh=43hB0V5xGtsW08Wu4x/+54J0/oLkkgqApWLJEGgtdtg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KDr6774fUlMOKALnvM8CYPrQwk7DviZ1kWpwUg3aNDUPu0iEVz5luI41Kjfkjpmn+VliPJAZLklghx1/+UyVY1BvhdvcoS4Su4lIBItxMKPNvfYXdlvBxeUJhkuTldv0LgMe+6tok/2spirTYLNatOpaR3Xo+mxa5eD09jrTX6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlM6MgGh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739725772; c=relaxed/simple;
+	bh=8jAuWfGCOfe+tbdnrX9C8mzvG5TuUI3ITmB8FW+c12k=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ZmOE2GltV6crmynOTB6rK1Uy1YfLT7GVUe0dJTQtFZSAPlw2Zy5z6EJ4bxFVUfFc7r8SgeyPvkRpFDoDYudfc+qQkzueB+EY2KG0/tAR0s249xoA88neQLPvs9M2UbAFEv1qjlI+kKYU8BWm+FlteonJkWZGzAXTE6p3ZbqLCk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hwJi3WT1; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlM6MgGh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BB6C4CEDD;
-	Sun, 16 Feb 2025 16:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739722056;
-	bh=43hB0V5xGtsW08Wu4x/+54J0/oLkkgqApWLJEGgtdtg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LlM6MgGh//jb+HqFo2mNjO2abwlassCQW6QN1S0IhXrx9UWPKTL5lXIMRVICZOzHG
-	 +aYnJH6ZYStPAMiRJq9BoaA6fzzHLdcCGBjnpM5huUWXgAncyX5dPH9jTWi91Cv77M
-	 +3WB5YZYxAlEHNJp704sGJRxxnh02eUtAbNDOw2MfHkvNQ059CHOsRU99vDxYhKXt7
-	 vit/P0fUJ3Q1Fdij3Rpolx/Bjd5n5gQEy+dOsP9hDJgFvZpHViTnJNBLuCntrxlzRm
-	 45+oqW8LoqDcKA8k4nG/gqp6QP/yPQubFrpCeejequuS5/T2OBUF34Br4sw9waNrgt
-	 jsqu0/NtZNKhw==
-Date: Sun, 16 Feb 2025 16:07:29 +0000
-From: Simon Horman <horms@kernel.org>
-To: Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ajay Singh <ajay.kathat@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Kalle Valo <kvalo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Marek Vasut <marex@denx.de>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 09/12] wifi: wilc1000: disable firmware power save if
- bluetooth is in use
-Message-ID: <20250216160729.GG1615191@kernel.org>
-References: <20250212-wilc3000_bt-v1-0-9609b784874e@bootlin.com>
- <20250212-wilc3000_bt-v1-9-9609b784874e@bootlin.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwJi3WT1"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c0771a2f3bso308224385a.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Feb 2025 09:09:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739725770; x=1740330570; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=q1xUJxwH9YMmptHdK/BK+885+5DvqrbARaGvfyxxaAc=;
+        b=hwJi3WT1P1deUulCAyQYK2J8MGBxEsdXFi1/j3ZEjYjvq6kwT74fkbl6YEtVSvV9BL
+         xvbwYzBaQMOqtxdFmf02cqa3PWl70S0ZFHByGcg0Yoqv1LLBNF2uXdtZoUX/n3efse4n
+         +iB+6Z5mJYKfHVhj1iLzwZC3pQUfRfOeqZZMnH3tlww5VuyXNN/dlcP+jPEYXhacOFcU
+         f4DSxMbpSwxPXhmGI3KycC5n1MmKs8nTVyh39Ijd3vISzLzX2knRDOt7LiWQVMMt2x4b
+         RmPsv2vT6HsPwnufTLvrty9+glljJVfMl5WCUQsn51+PP3O13gZgu+wwC0CMH5CSseBW
+         Lunw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739725770; x=1740330570;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q1xUJxwH9YMmptHdK/BK+885+5DvqrbARaGvfyxxaAc=;
+        b=VpiY4K5jDyI6OyYrjuOm2ccPP4NnP2gqfkEze71Z4hbiacek9XdkfE3nkMJA2jJia4
+         aGyILMvQ1l5/5JfPp6kgvDdwhamZpbs+8SxHAQUoN2aJP/HiNOGS1aBd3TC+HfKgaioH
+         W0I/LuxyuJaxsZwrUKsc4iNa/cm8nBH9YBIgsIi5yeHIdS0lZPlf4V8yQ2apQg8yUBWq
+         cX9SGV/AHC9x+3sr6s8Sy77VmRzv/NLuqQ/xk4a4gNeH4zreKeTbivsIMjFCjJfdqSxz
+         bf5VgxL0XAZXKA5f+BIsHxhLjluwyOlvHOzVYtrmWndS692R6BWZ7bFmGObA7T3izE8w
+         GscQ==
+X-Gm-Message-State: AOJu0Yzo2ehBAPtqoDmMqb6oBIH82dYo+wESm+Rhgy8goq6K5GF705vY
+	jHxHU5DNI8dlk91H/iz5wg5CldTLA7qi3SuvotQPyCyuauYwYGZDacSoFg==
+X-Gm-Gg: ASbGncvtdzZsLksEoBF1LfknglXSAxwouiTPXQj1vM/o2F4LLl5hjv18c4DBykN2PUS
+	NMJUqOqVmN0MJ7GZLvn0bpJxrAF34y8jKukenRZxb0d5pR/xq439lEmJPDQvQsAe8ga4ji2u1PW
+	C1zOmkb2VAaQSEq5KyeOpWHPba5cG1TFr7Pnh2Q/CYWcomMHfKhyWPrAem3VgVQ3qBeNVj4Dmyd
+	RIk+yVXYzX6Ccad8jF/6y9KgOqtIuq2MvLTFN8nV3CMmWEBE/jJ4wU3CsFdVAbH98zVg1iyUpcF
+	vEE1CT0+dDqF62CgO7YB4s0G
+X-Google-Smtp-Source: AGHT+IGsFYllmd8V6MoV+NK/4OiY3O9BYV9pzpruJ0LKp2ta9+1fBDaI4hnzyFgVCc9F12rxVpBABA==
+X-Received: by 2002:a05:620a:17a4:b0:7c0:8720:5fbd with SMTP id af79cd13be357-7c08aab44aamr1064693685a.52.1739725769293;
+        Sun, 16 Feb 2025 09:09:29 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.133.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c861b71sm440883585a.70.2025.02.16.09.09.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Feb 2025 09:09:28 -0800 (PST)
+Message-ID: <67b21bc8.050a0220.3c04ac.ef6e@mx.google.com>
+Date: Sun, 16 Feb 2025 09:09:28 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6014314878166651518=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250212-wilc3000_bt-v1-9-9609b784874e@bootlin.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] shared/vcp: fix setting volume back to current value
+In-Reply-To: <11cdbf4619d9eda9cd40c84728a2f5cc87d42d2e.1739720857.git.pav@iki.fi>
+References: <11cdbf4619d9eda9cd40c84728a2f5cc87d42d2e.1739720857.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Wed, Feb 12, 2025 at 04:46:28PM +0100, Alexis Lothoré wrote:
-> If the wlan interface exposed by wilc driver has power save enabled
-> (either explicitly with iw dev wlan set power_save on, or because
-> kernel is built with CONFIG_CFG80211_DEFAULT_PS), it will send a power
-> management command to the wlan firmware when corresponding interface is
-> brought up. The bluetooth part, if used, is supposed to work
-> independently from the WLAN CPU. Unfortunately, this power save
-> management, if applied by the WLAN side, disrupts bluetooth operations
-> (the bluetooth CPU does not answer any command anymore on the UART
-> interface)
-> 
-> Make sure that the bluetooth part can work independently by disabling
-> power save in wlan firmware when bluetooth is in use.
-> 
-> Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
-> ---
->  drivers/net/wireless/microchip/wilc1000/bt.c       | 29 +++++++++++++++++++---
->  drivers/net/wireless/microchip/wilc1000/cfg80211.c |  5 +++-
->  drivers/net/wireless/microchip/wilc1000/netdev.h   |  3 +++
->  3 files changed, 33 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/microchip/wilc1000/bt.c b/drivers/net/wireless/microchip/wilc1000/bt.c
-> index b0f68a5479a5bd6f70e2390a35512037dc6c332b..f0eb5fb506eddf0f6f4f3f0b182eaa650c1c7a87 100644
-> --- a/drivers/net/wireless/microchip/wilc1000/bt.c
-> +++ b/drivers/net/wireless/microchip/wilc1000/bt.c
-> @@ -7,6 +7,7 @@
->  #include <linux/of_platform.h>
->  #include <linux/platform_device.h>
->  #include <net/wilc.h>
-> +#include "cfg80211.h"
->  #include "netdev.h"
->  #include "wlan_if.h"
->  #include "wlan.h"
-> @@ -261,22 +262,36 @@ static int wilc_bt_start(struct wilc *wilc)
->  int wilc_bt_init(void *wilc_wl_priv)
->  {
->  	struct wilc *wilc = (struct wilc *)wilc_wl_priv;
-> +	struct wilc_vif *vif;
->  	int ret;
->  
-> +	wilc->bt_enabled = true;
-> +
->  	if (!wilc->hif_func->hif_is_init(wilc)) {
->  		dev_info(wilc->dev, "Initializing bus before starting BT");
->  		acquire_bus(wilc, WILC_BUS_ACQUIRE_ONLY);
->  		ret = wilc->hif_func->hif_init(wilc, false);
->  		release_bus(wilc, WILC_BUS_RELEASE_ONLY);
-> -		if (ret)
-> +		if (ret) {
-> +			wilc->bt_enabled = false;
->  			return ret;
-> +		}
->  	}
->  
-> +	/* Power save feature managed by WLAN firmware may disrupt
-> +	 * operations from the bluetooth CPU, so disable it while bluetooth
-> +	 * is in use (if enabled, it will be enabled back when bluetooth is
-> +	 * not used anymore)
-> +	 */
-> +	vif = wilc_get_wl_to_vif(wilc);
-> +	if (wilc->power_save_mode && wilc_set_power_mgmt(vif, false))
-> +		goto hif_deinit;
+--===============6014314878166651518==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Hi Alexis,
+This is automated email and please do not reply to this email!
 
-Jumping to hif_deinit will result in the function returning ret.
-But ret may not not be initialised until a few lines below.
+Dear submitter,
 
-Flagged by Smatch.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=934417
 
-> +
->  	mutex_lock(&wilc->radio_fw_start);
->  	ret = wilc_bt_power_up(wilc);
->  	if (ret) {
->  		dev_err(wilc->dev, "Error powering up bluetooth chip\n");
-> -		goto hif_deinit;
-> +		goto reenable_power_save;
->  	}
->  	ret = wilc_bt_firmware_download(wilc);
->  	if (ret) {
-> @@ -293,10 +308,14 @@ int wilc_bt_init(void *wilc_wl_priv)
->  
->  power_down:
->  	wilc_bt_power_down(wilc);
-> -hif_deinit:
-> +reenable_power_save:
-> +	if (wilc->power_save_mode_request)
-> +		wilc_set_power_mgmt(vif, true);
->  	mutex_unlock(&wilc->radio_fw_start);
-> +hif_deinit:
->  	if (!wilc->initialized)
->  		wilc->hif_func->hif_deinit(wilc);
-> +	wilc->bt_enabled = false;
->  	return ret;
->  }
->  EXPORT_SYMBOL(wilc_bt_init);
+---Test result---
 
-...
+Test Summary:
+CheckPatch                    PENDING   0.20 seconds
+GitLint                       PENDING   0.26 seconds
+BuildEll                      PASS      20.33 seconds
+BluezMake                     PASS      1421.94 seconds
+MakeCheck                     PASS      12.89 seconds
+MakeDistcheck                 PASS      157.70 seconds
+CheckValgrind                 PASS      213.80 seconds
+CheckSmatch                   PASS      284.91 seconds
+bluezmakeextell               PASS      97.26 seconds
+IncrementalBuild              PENDING   0.25 seconds
+ScanBuild                     PASS      861.49 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6014314878166651518==--
