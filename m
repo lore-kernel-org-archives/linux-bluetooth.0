@@ -1,130 +1,108 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8507D170A1B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 15 Feb 2025 21:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739654917; cv=none; b=Ezq+FEyoc07ga64oeynYi4iHgOSAG2d5W5N3Fa4/PtXVUdhP7VglL554hqh5YxltuA8tdZTlH1lO5tsQSfYUV1+2Lg5HFiKOIKK0kR55Dpp7eDV9f3+4o3qU3hUuI5+rdKaI0mrTGUX7kYc4GwgoQ20FkZ5wM0yug5VZgwE93u8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739654917; c=relaxed/simple;
-	bh=xA4GBmEEbhKzqhgeRKs3z+Gf0mAGuBw8H9ypXdveqqM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ax8vI8j11doDiXx7cJEws15DARf6lUxEHjsrzW9d0r3+Mdf4cH9/30rX3ILjWEsjdK8b6V5Ajs1KtMUxNb9nlkYZxM0nGIvyXsr0dY3vQgy281M3KFRWaPtVb1z3duvqxPlw0tCqz4N5JnNEr/ugLxrNLkMs5Fe8KjS/50WoaBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AmopRqn6; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDDA42AA5
+	for <linux-bluetooth@vger.kernel.org>; Sun, 16 Feb 2025 15:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739720947; cv=pass; b=V7BgKZTCgQ8yos35ZjwkpzQ9R13vrAPHfbtkOeil37X6eC/w3V+Rxz5tvenk8t0LZPk/ML6YhXDdD6GuKO8UUr7oXJM/Vm2qki8TzA+RJH25yfNGFf3cvQgsxhY9Zos7fwLiuocuCjRx8ASMq7EvEyt4nwdxxwNx45ING91OlMA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739720947; c=relaxed/simple;
+	bh=gYSKsawVk4aJRtX1Y13BpduMO7F67Id14OhxngQ1tOI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K3ajPApAWnQ5OgLlzb3RelHSfFnmEJcxGbJBAnG4xk+iku2D1nRTnoxx6Nscu3Vjj+Fv5Pzfxjulm1xFTdhmKtWjHQ9P4we2Qgo+UPyGFjOGB0i5L9ANhowPNM7i6k+4QCwIPwv3ULEpEArtGLMfF2yJ1scY4XTCnl0eEwe2Vao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=a2wgcy5x; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AmopRqn6"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c08621f6a2so157932985a.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Feb 2025 13:28:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739654914; x=1740259714; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4r2y843VroIoazvCvPZsYxG82WMnfVm3BageyCiNG7k=;
-        b=AmopRqn6eKp5n2oNxAdMHibOuAz3LSOM76pRoWSaBJ3wpD6YNW2AUIK3o/9vAxvNiI
-         tY40cv38pKDEZeVxYPpmlLE+VOGhq441ElEto8mIKgeHayx9xFQuVUVm4/15Aqecfz3T
-         TY0qeTZFr0TQJVYreZaucVo3qTrDzBUXxcYl6OW0N5UWg9HhyJ2jVODOvqLCka7QjE/4
-         6MPocAP1tcyMN2dpvD42IzlMOULYKMBLWiZ7K4v1zTqmV4C0UH5qW9yr4CAJ/1htuK+Q
-         ymX6cdM2sSclDT/SSs2LFAI8jz1p8XKlgRzGhoPVxC+PU1d4WP4fF6zkuZ8l9JKvuXaR
-         K5dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739654914; x=1740259714;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4r2y843VroIoazvCvPZsYxG82WMnfVm3BageyCiNG7k=;
-        b=Q+jAjyHHEuBSo7ff7Z1e51MxWnH1vQelNZQROuIx9tdR9zjIaQq2SGIZxSDvD9Xjuh
-         R+Th8he9t1EjLDUy3sVkqgliHa1HuZKawACXkOtVieUeNNt8S6fqOB9AOwXWuXW/3ohl
-         UyO31d4enhbJaUfWvgE76VlPRFOMmX19nuaJ7yMhV6I1gaskufL2pcLiHgayfjM4wN4K
-         Mh8Vn7ZrUreKkb0/nUEMQpbvGoLgaJIPX9YZAqfqfDvGlBEd9v759n+piEyU1V7bzMeI
-         O0ySNiIWnE/FocuuZA/P/YX0iu3qZWnqFwaPlBd8/aiI+hcKUkC1tYBsYfJGaNy+62S5
-         2oXw==
-X-Gm-Message-State: AOJu0Yz7m2MWrrW559oyX0UwCCJb/tnYvTxfntcOdrV30dAkYwnyoQ4H
-	DO8Hl2GXG2TEdBoOtDZa2lV14ru6/TFhjM0GC9SQQd+z1Opd8rREhBXsuQ==
-X-Gm-Gg: ASbGncunIRZ2xvhxJF02Yc9+Ts7nAvRo/3bzfm2ToLunyfB1DtBHNUbPbCU2zaWii5l
-	0Jy39SNROsafdGiBx7yOpFjmx2RFS8dn6ZCbpvOWUgktVlLqQ+zCc8VeRy78WOwm52hoYgCyDlD
-	oA/HC7VIUGsC0RpgReZvikxNPDmg6syA93M46VXmccp0OV6/V1n1Smn8caFDbyYGe0Fl3qD/jhe
-	Vu88bJ/rpGMhcbdk9Zub8kxNt+KZmxVIiT+yAE8OtKa9M0axfp5QeC5fpnmKITx7eRkiWWbiTBx
-	Ya3zGSTKHSf/rInG8ILSrAQ=
-X-Google-Smtp-Source: AGHT+IFoxw071S93qk5S7u6r0OHcWdzbvF69x55VzR5uTHAIB2zL11f5I1INt+HFp5NMwmJhdDXWyw==
-X-Received: by 2002:a05:620a:3906:b0:7c0:7c8f:c3b4 with SMTP id af79cd13be357-7c08a98fe91mr677577585a.8.1739654914080;
-        Sat, 15 Feb 2025 13:28:34 -0800 (PST)
-Received: from [172.17.0.2] ([172.210.84.239])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c6081cesm358578585a.29.2025.02.15.13.28.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Feb 2025 13:28:33 -0800 (PST)
-Message-ID: <67b10701.e90a0220.2136f6.d514@mx.google.com>
-Date: Sat, 15 Feb 2025 13:28:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5424205268865943754=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="a2wgcy5x"
+Received: from monolith.lan (unknown [193.138.7.158])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Ywqvr5H9bz49Pxd;
+	Sun, 16 Feb 2025 17:48:56 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1739720937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DlZUd2wHKkDklwGNPCkzpSzDakK6pqWAUEUygtagjAM=;
+	b=a2wgcy5x4RnCgWia4OWbNwmbrZKf3T57WbgCdny6f5fD5i0R1WhPyCcZruMt7IjAB0+62H
+	UxP3cU/hDwxW00XXxBKLlguDnabay3aLI3xjbJxArCq28gBDMkPO1CKw5gfoUOivJivI5W
+	2P1hmPTRR8dfmTw2lbBNuaxXTSDCdyYJaRnGSvLosCaQ6wZwJY3M7vDGfI4Y6MN8xw7OYj
+	08ocO1BkkqblZcw1gKp98JPKLOi4XTpFl0CAf7BxhkMp0dIeKJs1t/VQoa0nrutJt4eQpA
+	e/1fIemzuNv74Rs8rRm1WBsHOIzogu+DNztnl/v3NL+Ni40Dq93dZB9CANB1xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1739720937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DlZUd2wHKkDklwGNPCkzpSzDakK6pqWAUEUygtagjAM=;
+	b=D90nbg381dmE1y/SkGnT+5HDffm4RmbVVXTKosjP+tGmxZQdYP21DkUOlTy3pSTeHC3pPj
+	M9KUTAyUNbyD65QvSU0wJPdXL+mUGQ1HtUF5kBcUoaJAIhelH1T/Vi66WcigeNYcjiny83
+	XdscOjizHqyqSO+1kHsnPRjSVUq7t4/FD/5RrY1qK3/KUHjF2E9foLZVeD0xtcPDCfI26G
+	Wy8rhjXRsUULqu1LVvfn7DaVMNBq+4w4LNxloh3AGF6bCq7flA8dSvSAUQtuRapjBjMP/a
+	jHdMLpZEXPUAkxXEkhT7ULY4hXsV6AFS4WaSJec+r9pXX9qKEaV4kkvSbgxRRQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739720937; a=rsa-sha256;
+	cv=none;
+	b=o7CL4C2h6UzOrNZt8aV7yUdvFnc2Ala7MnpO11DMV/R+tbs0R/bO2aXQzHoB/Kk0Ev7gMM
+	ZIKD9j0NoHwc2XqY6xuI0fpCbccR3wU82yUGt2HzPHiTWVoZFv9hOVNsgNEumQYT3b4ksP
+	ocCDmSGP2XO6cdTUAkPzWXmiFz6C7/g4MemZt0T/3CWQBbBzURnJgPZ/ba9GXv88LJNoSf
+	zYyStfHbq/4qGFTOOj0m+2CgGXmIw/8zg9EBvd8/HMp+uwcnwxFaFkbpuxdDhdtdbe9jCJ
+	aZ+hEh6GFubGkoD6bPEvBT7BsDslW8XjuOqsAlgt2sqkcg+SxnlgIah5o4+1Kw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] shared/vcp: fix setting volume back to current value
+Date: Sun, 16 Feb 2025 17:48:54 +0200
+Message-ID: <11cdbf4619d9eda9cd40c84728a2f5cc87d42d2e.1739720857.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
-Subject: RE: [BlueZ,v2] bthost: Set advertising intervals to valid value
-In-Reply-To: <20250215201329.173999-1-arkadiusz.bokowy@gmail.com>
-References: <20250215201329.173999-1-arkadiusz.bokowy@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5424205268865943754==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+If there is a volume change request in flight, always update pending
+volume. Otherwise, setting the value back to old value before
+notification arrives, is wrongly ignored.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=934345
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.18 seconds
-GitLint                       PENDING   0.18 seconds
-BuildEll                      PASS      20.32 seconds
-BluezMake                     PASS      1435.46 seconds
-MakeCheck                     PASS      12.95 seconds
-MakeDistcheck                 PASS      157.43 seconds
-CheckValgrind                 PASS      212.69 seconds
-CheckSmatch                   WARNING   282.54 seconds
-bluezmakeextell               PASS      97.87 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      860.16 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:450:29: warning: Variable length array is used.emulator/bthost.c:613:28: warning: Variable length array is used.emulator/bthost.c:787:28: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: e77884accdb2 ("shared/vcp: have only one volume change in flight at a time")
 ---
-Regards,
-Linux Bluetooth
+ src/shared/vcp.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index f0887ad62..321686774 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -2119,15 +2119,15 @@ static bool vcp_set_volume_client(struct bt_vcp *vcp, uint8_t volume)
+ 	 * the current one completes. This may skip over some volume changes,
+ 	 * as it only sends a request for the final value.
+ 	 */
+-	if (vcp->volume == volume) {
++	if (vcp->pending_op.timeout_id) {
++		vcp->pending_op.volume = volume;
++		vcp->pending_op.resend = true;
++		return true;
++	} else if (vcp->volume == volume) {
+ 		/* Do not set to current value, as that doesn't generate
+ 		 * a notification
+ 		 */
+ 		return true;
+-	} else if (vcp->pending_op.timeout_id) {
+-		vcp->pending_op.volume = volume;
+-		vcp->pending_op.resend = true;
+-		return true;
+ 	}
+ 
+ 	req.op = BT_VCS_SET_ABSOLUTE_VOL;
+-- 
+2.48.1
 
---===============5424205268865943754==--
