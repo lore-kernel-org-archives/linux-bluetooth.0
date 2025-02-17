@@ -1,184 +1,228 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2061.outbound.protection.outlook.com [40.107.22.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E42228CBF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Feb 2025 17:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEF5187858;
+	Mon, 17 Feb 2025 19:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739813155; cv=pass; b=BapwVaJKvNTZ+mATgylwYnsoyqsvWNDFEHXsRUJ63mZPoWNv1M8TfTt3E3VatsaKzARIG72sMvgZkeIumDfp2cSFW6WKpqSqDCU/F2+lTy/zex26llauD3IaIuOmJ1lAKlmUwoO2Nn6NF6VM21XBJlI+m3RmtaG2wx7Bdzb6WGg=
+	t=1739819933; cv=fail; b=m8aLhkXB9kZm+7tni50hUgHvAaFDdtCGhYdSBqr3n/j9RP8XuaKiZ7FwuNv23COzLVGGJterm7h9wTs5SNhjl/wAT1TZFmtCTLV1T4/jkMwmoHDf0GsGM9LKqZ8S+S9/P5S7EG91/FT1UnP5kKWXn9V1w5GqelrCG4Z7OllPuYU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739813155; c=relaxed/simple;
-	bh=r1CTxPcw/EzJvlbeYRtF/LB4bOhgioJnoxWOKT/zqwc=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mqSj3oGk/OMYVZmG40aYYerhrTmsoKbBNyq7uEzMlx2/etWIXmBsl81aCKfB68UKPLn/5/yRXCRy+hJxIfZt5J2l3n4ecbuNKu2WT1CNAbbhuD2Q57tP0aqHD3pFOvahBd8F+G5rPPS3RXmv61JINV01HlmVk5GJyKs9WK4xuQM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=spuvjgtR; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1739819933; c=relaxed/simple;
+	bh=o+xIXU0o5OaPKZDkRfjUuIh3ztVaRSWfOeXufgr3+Aw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mfPqWVYD58G9n8lDjF5CbEY3KbfQ8uQK7EQcM1oABb1Fgkv0M9DlZSiOiwkWzus+DsIMxw85gAN6i6NJJ7QIUXZ4d1AP6HeRJZ2Haxn3hdp0k6nzh7Zka+8tBWfwxNrhgxSz5JpkWtjyhuOomQoD4YWkB3GVD+lNGwgKpEnHsJ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QM7c5Jpe; arc=fail smtp.client-ip=40.107.22.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="spuvjgtR"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:2::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YxV133yJHz49Px4;
-	Mon, 17 Feb 2025 19:25:43 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1739813143;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=r1CTxPcw/EzJvlbeYRtF/LB4bOhgioJnoxWOKT/zqwc=;
-	b=spuvjgtRI2Kt1XTk0CzZa/xR0IpwoGHD1hj6BLpA8ZC6EGy/q0ZCMq7Bk8zFBvIMaoR2p2
-	dq1DrWoPWHf5B9CTljpByRavIZOVkyIpjvcAM6ceDUie/Vig24HoFcDmWl+Z9Acy/wu2nf
-	hbeRb5qk+GXMEYnpvYsh9hyEpl5eujB9xgCbfTk1/Dk4AxM8ATj7UFi9y2wSJz0YIKBP9H
-	RGJhveZrW7i62xB9hQpv4WEa0RAwHtSc6/6PhKmgMRkceVa7FYLrZir7WWgWeN3lgthTsr
-	xxP1k4PPY/3Hc++aFue10SQk1REx2IFNNUKg8xLP4AEqFSaq0YnpMJJj+7tQ+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1739813143;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=r1CTxPcw/EzJvlbeYRtF/LB4bOhgioJnoxWOKT/zqwc=;
-	b=TpUhrU2eTDkoXLQbEnx+5WO4V5/nCf9JFV3K75YHiAycPo8k5Rp6kQGcpqg3FmxLj+qdTZ
-	i0eoOX/eB5TRmiUx9h0CsKjVKWo+SSjXt+MDv+eRpwBFjBoZlBqx49VHUnj19Zpfim78Ui
-	YY/sLsuOI+qVVUjv+lWDpRGmaEQA7kvWWvNArce8DfvWpnxm9qsPoe+fUqmnxtXyHu4/7w
-	3c961Q1OifKFC2DgeW3zqkryw6hhobax1D2s8nm0UN86wUejxQM0LOVDoZl1Gx8tdtYLvf
-	g3OPEezKqusgMKuR5z71ocJmgO7pvCaqpyx3nsy9BjLtrJPL0zzH/u9F81wrCg==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739813143; a=rsa-sha256;
-	cv=none;
-	b=RgEd4bUj6FKbN5Elxwxw8PPn940UlGwDt5ir4UBrXW0fEs+03YnFtKQ7UydT4ngDDyL9pE
-	H2qHZR0IKgdjMf4c5GIN4/HK6aXm6j7Z8Ueji4bAgcW2WIyX1fPAcUt5MpPim/vLSl+gCP
-	CrlhAUrMuULGNQcay0tlFvj1oIyr0/9mE4+un3/oAcM6c2G193QzcgTJ8BTMXtdRLtte0F
-	c/PJTicOB1WjhrrO6tntvnJBZFiUQgSIm0spzDV0lVQMKjcPATZV40QkmhgWHPqdkO/0Sn
-	uSfPtUkvhikT3Y8v53R+I/zL1zMoOgY3rucWUdOiIbEGthPjMoCutuuN5TOCIw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pauli.virtanen@iki.fi
-Message-ID: <3c1039e0cca1a88583710bb5f623d7ee1ff38c1b.camel@iki.fi>
-Subject: Re: [PATCH BlueZ v1] org.bluez.Device: Introduced PreferredBearer
-From: Pauli Virtanen <pauli.virtanen@iki.fi>
-To: Bastien Nocera <hadess@hadess.net>, Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org
-Date: Mon, 17 Feb 2025 19:25:42 +0200
-In-Reply-To: <6b8b1f29602f8303eea241ae69a7fddcb15560c4.camel@hadess.net>
-References: <20250214202129.968369-1-luiz.dentz@gmail.com>
-			 <CABBYNZJmigw_3=5CZ5eaSGC8ZHTzmsZA11p558EtcET-FcrVEA@mail.gmail.com>
-		 <3e36e6c2c9b201a5c06c0bc166cd4d38bb8067b3.camel@iki.fi>
-	 <6b8b1f29602f8303eea241ae69a7fddcb15560c4.camel@hadess.net>
-Autocrypt: addr=pauli.virtanen@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QM7c5Jpe"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WoR8SvsAQ64XgNqB/zcV2pBJTcLxB1/YB8gveNq25wDhnHaJtG9sdtzYUloQwB/9SKUfO1s5U2hu4HMRbude3MDHguzjxcZjIDud+T8wuJ26HsOBIDYHieezwkCWl81xLknW4k3ZV75x45oXA2f54iUM4FmCd1w4S7C4cA+RUmKvMm1HYrtRZzEJwgg1iIJxgX8GUbHIyIrg5za+bffbJqdTGb05j9YL7aCN28HHFMU256EFnc6TLcoojU5+NtENxD6Hm++I3qsGkqobYNVvbWUGyHpWiQBAutV5fGxNTmxGhnHILxcVLIOSKb5Wh0yOf5mepFzubeZ5SzejlLwVSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iP4+QN4Tx8d6O6FF8Eq525+YRSlLgtkHMhJJVcqsw+w=;
+ b=CVP1bdz5CIb63fXsSNPvPMWgTKiPSM7uUhqdX+c/vae6LsOJlfrhx+ERmjvkMZ/eNiFpA2XU7x1FHqM3ZKy2CtqPIj9gwWJT/CGDjX583N0+K6KqTH8sQp3RvL35isTnlGnmhbLyqlQJx2itR3guyxUUfsUQAmKaHItyjqoJP/Qv7TFKTrpEqykvX768odAcwY3JjTKUoQ6Wvim+TsQS81CA/qGV2bn1Blp0ds6KLsM35T/W/pZz86fB2D/XLaYKi+rMNgLpFeyuarJC3kK43WQJCZajwaRLNEzICLot+W2ndLX0U/g/uQ3jMR+lrcWxUZ1rF1qVNh9Jx9wqTceyjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iP4+QN4Tx8d6O6FF8Eq525+YRSlLgtkHMhJJVcqsw+w=;
+ b=QM7c5Jpey4qcaT88oZYY/ug/gBSQRxdOqxUGhp1IgHo21GJdUq1EgWvakDT8rGvuIMDFsn4JzeUWI3a6uLVEbEcuLRq1ML493taysavMtC+dBle3HoJ0vOlnmT8FzK8tv/SX6t0NZ/r++rnBKRHqJpouTvaCYrUwOJ4n+A2FTD4TnUepjBbCBmatreSIuzI30cU8NSDTThqZYsAPqXsAm945/L6FHn6tkUWcNHYtOi73zt3vMbgHEk/qv9oKiFjoEqtazXy/MnE3jvNQKIbcSO9HGt/OAdprr8BJj2YBvPfX1D2T+ZHWmHTtgACZlf6jBGLxm1oSApetCsByIqzMyg==
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
+ by PA1PR04MB10416.eurprd04.prod.outlook.com (2603:10a6:102:446::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Mon, 17 Feb
+ 2025 19:18:48 +0000
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299%4]) with mapi id 15.20.8445.017; Mon, 17 Feb 2025
+ 19:18:48 +0000
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: Loic Poulain <loic.poulain@linaro.org>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>, "robh@kernel.org"
+	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Amitkumar Karwar
+	<amitkumar.karwar@nxp.com>, Sherry Sun <sherry.sun@nxp.com>
+Subject: Re: [PATCH 1/2] bluetooth: btnxpuart: Support for controller wakeup
+ gpio config
+Thread-Topic: [PATCH 1/2] bluetooth: btnxpuart: Support for controller wakeup
+ gpio config
+Thread-Index: AQHbgXDFNx89FIGIzEyE7XZ0QJtUYQ==
+Date: Mon, 17 Feb 2025 19:18:48 +0000
+Message-ID:
+ <AS4PR04MB96923BC61E0112F0F2A0C276E7FB2@AS4PR04MB9692.eurprd04.prod.outlook.com>
+References: <20250217131046.21006-1-loic.poulain@linaro.org>
+ <AS4PR04MB969252FACA03605C1C0E00E3E7FB2@AS4PR04MB9692.eurprd04.prod.outlook.com>
+ <CAMZdPi_apyYRRTTGFwXHcZLNcUks6U3VOQg+3NQwnk2pR8Ldmw@mail.gmail.com>
+In-Reply-To:
+ <CAMZdPi_apyYRRTTGFwXHcZLNcUks6U3VOQg+3NQwnk2pR8Ldmw@mail.gmail.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS4PR04MB9692:EE_|PA1PR04MB10416:EE_
+x-ms-office365-filtering-correlation-id: f213d7aa-e8c4-4d22-11ca-08dd4f87e7cc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?EljmnoZ+4AheAx30SsuNculLnvVw62kHzEB3voGIHJH1JDwSrr7T/i7c8RC4?=
+ =?us-ascii?Q?/MjQoCjGAbXiGoIQQSZSzMQVX7tVZx3Ims9E/HiKJUT6VC+ln8Xy26Q39osX?=
+ =?us-ascii?Q?ML2cED7y+7Mo41xTvU2x5oKarf6bqx+tiIM7DE/Yuqg+lCIKaxg2H/QYafY6?=
+ =?us-ascii?Q?sFyzL71SEPECMLbHamJZztP2jDIHE76qvTVd2FjnnFmhWmaVT7SYOO5MEHyq?=
+ =?us-ascii?Q?stLN9XT0VYHIuJW5vQxbDPIkJnHHOsvFQVcnrgL9VSXcouaj6OEoPod692zw?=
+ =?us-ascii?Q?mSPLPVKtlA/+6lgqwsAK6IKtTxa3jTA2rUhcDaDLvbAo+gnD9xRP5wgC3Uov?=
+ =?us-ascii?Q?C+VEsi4FR6xfoT2h9S89NaJ3Dmoab5F4RmyLsz9fK2w3ht0XHxKxrP7IkWHJ?=
+ =?us-ascii?Q?G9JbaPTRuJVJ4F3sweFiSwwUX23g8ZhaUJhOS7PBVF6foHKey89LCTCXwLv3?=
+ =?us-ascii?Q?KK7XWcC28r1t5MwY3ivo6ZC9Bd5GWIrHUWtB0JMKwFaF8fiPv6JAxDMYoczM?=
+ =?us-ascii?Q?CEG1e9d3fJonT7o/KYQn5N+ja3kqT+x/xKKWCtBgUUzCEFuFgSGEQlLsRNV3?=
+ =?us-ascii?Q?vXExT2j6AFZ0jes+WXg44uVDeK3dXKaaLlUtUJ8UkOPobfwqLBOxUDCjdzrQ?=
+ =?us-ascii?Q?nsjzoQaxNv1bBfVbcGpLpaH3Z9J6cTRSdwEs6Rj3AptaXtqOsuYvguFAg6ul?=
+ =?us-ascii?Q?Ve67hZOhT3VbscSf6l5XQv8TvBWrOYVluDC2UkFnWAaQEjhv8eQoeKupNpjz?=
+ =?us-ascii?Q?3/+2ybkHd5f2XvUd+kF1pHTj20P9ltFgczGvYE8oFmXR52/ERYJd4Prp7SHV?=
+ =?us-ascii?Q?DR1tPJ6gc94t94RZL8zkS8FgzAFskqXP11JowSByOkGHircxbvTAYjrnLTPY?=
+ =?us-ascii?Q?75FV2v5x0gJ8otHA8NFfsEsiAgxfRzhibBOk4P3YStzWOP+RJAxD0Mp/iqD4?=
+ =?us-ascii?Q?aUYJYfBpFK/Gqcu46IFdpVzz7lgizRoTO5IMAZWsB0oShKRdYE6n2vfTPBft?=
+ =?us-ascii?Q?bd8K+w6NP/fO0DG4gLBhPvAGHkf5hXs6W13NsT7EQSxfQi5I5+8eJRBLj7JW?=
+ =?us-ascii?Q?PDaolmN60ttLkYqzBzvg8MX+fLfMrC/jyTO/dgq26019Nnruh362PMXRdlHo?=
+ =?us-ascii?Q?xri0le17l94NVEmVignhX4jbW2pGgrk0ChTsv+Uh4/V9FRoEDEj+LsbJoqu8?=
+ =?us-ascii?Q?QRMXhy51MnwR1x+dZCdRsMQLwKpg8Ueq3iUBx4JdXTh+j0hqrG523K5jkHYb?=
+ =?us-ascii?Q?8JQggWuWpY3o+ZB+imMew67NkCcN+edEtkq3/O3StCUC13Y9tl30fJZS/out?=
+ =?us-ascii?Q?WL5d9ZKXwRziiLux5sfN2cxC40UsPMKUMOQ0/bwoJkVN8oKXtqvVXRF7lcPq?=
+ =?us-ascii?Q?xlU/ue/SZcGECBxR+GxUkYXvC1Eg7Ix1iG0jN8mv/m+Kje9vwnR66xYR5Adt?=
+ =?us-ascii?Q?/+lZ7FGcHfEKRDF+JazXkkGJOiWLwM0d?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?tTOd2MjAe0LaYci+v3s74WLFPiKpCmFIsYZn1RtriaAszFpb5h5/k7H7nxxQ?=
+ =?us-ascii?Q?64j/99v2ze9txoFo249HREXzcahs6Ev+RI1rvnSrt5KrUPxzpkMhUm7GlYAv?=
+ =?us-ascii?Q?5GMYjfYrtbppKsg1bWbmaXxHM8IV3EbPC3WAovcRDy/rkIDriisiZP9EZnMo?=
+ =?us-ascii?Q?6ZBmDKDY0ZbUgiUR9fJmtuKWTic+adKdrWhm/7oyeyXBrt/ZxkLMk0THDCfL?=
+ =?us-ascii?Q?sM97GOI14qjxI0VVeNjIrIqBme9e27zGEA5r/VTtfcpsV2M26Ms6ChT9j+z+?=
+ =?us-ascii?Q?W1q+fXFJeO5LysiLGZyqIdXeRiL+T+4ghToH2eblBn4cINNNIk+R0UO8tfbP?=
+ =?us-ascii?Q?tHuyCScMCf+M7e6SPVUj2XAzrVW3gmbIeTfL5EkYawnyosCiiJiqCtZx66LB?=
+ =?us-ascii?Q?fTzE7QxIO8AQAHF3q7ks16ULxP6c+Q09gWzeWDj4XohgiQo6MgJ/8OqTPZYx?=
+ =?us-ascii?Q?fRAg+WqkIQtg3YUzsuAItj0MtLVdoqqb10qfXJka7J6lf2G10GeRJiBcUC8+?=
+ =?us-ascii?Q?Vs0CMt0wnlPrIU8xJHQZD2bQ7PUQrtIMcUAtzUbU/I4EFx6cNYsrvoZJQW1P?=
+ =?us-ascii?Q?yR1XdutF9VQGRMod6mAao20pI1k5TuEOHJyAWNOY4mpfJSoQz6Hwjd6vWSMb?=
+ =?us-ascii?Q?qogBeCu0Pz+HwDBdebtMgvSuAm6F89pFnZi/2M6LO5WvsB2F1XGeUNYK0qoU?=
+ =?us-ascii?Q?S43k3tLYuidoVW7GJXhWlUbM4R6jYaamGfAD+lwx7S6keJ/aoVruqjnl7Od1?=
+ =?us-ascii?Q?yEfwrE749Jlr9v2gNQx5Bv9S4gQSyPXmxwll90OKaCmw0P+gMPzwqjyaSSb5?=
+ =?us-ascii?Q?0WIETeLFeBDUABv/qJdvctBNcpGp75/OFo7Owd0vpG8ynE4xyKUqLfYQtXhb?=
+ =?us-ascii?Q?NacjMo2OTTgsIITxpztCghcGHx95Wt5yNtuugaJG7F1YU8QB8HcPQWPjsSDa?=
+ =?us-ascii?Q?I/D/GmkOTVDhfa4JlN9iczyS4ZsIqlgArt4xVbFHXMT0nEHDY1C25PshzfAO?=
+ =?us-ascii?Q?M2ZnPhFPkkABEK0A0Unwh/Qhg6sYr1OBGjKNwCoM7VIHaYaWpGHwf6wCk6BT?=
+ =?us-ascii?Q?xB/r/uegC5tpb3j8ULi921Tq4t1QBdIFL17t1NKmerRprvNQ39o8QRref/jK?=
+ =?us-ascii?Q?Mypz8vbk4J5Kv/s8A0tgWxN+wLLgXa5XOnD1SskOph/QaJMePzuxnaNFDJwZ?=
+ =?us-ascii?Q?+fr32F3XdSSgB1n09YoKcJbJblAmgBDslZKyxrYv9lA4LdPGJ+FzuWKzF5xB?=
+ =?us-ascii?Q?uOv6Tb9vnvHFJIqZzcgKoF5UboAZZju2hqNyStyWxIWKj30knqe997bh/Jzr?=
+ =?us-ascii?Q?6rl3dycBt/YToCRn4H2CBUD5c4H+MFTMxjkxV2vO7Xo6X5tkV8yWkO9bKH9f?=
+ =?us-ascii?Q?lcVqDszZUQRCnZBBZ2RQQyOYMAQIh7XJONOPHnEH/9pS6LVdxMv5VDco2CmU?=
+ =?us-ascii?Q?A1egCDTkR9AqiFchdLeSLUU9MFk2oWgx7+v2yuFWUnTvz0V7a+qHUTwcVWkU?=
+ =?us-ascii?Q?nFdQdT6ttoF5kw8KD2OT7AXSReu91JHBJsvdhOHlpP5LMtqRjHZM/gYWgd4A?=
+ =?us-ascii?Q?GBym/ZCN496wnnJytcIsPcvXGXKXBergfPd6Nzxs?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f213d7aa-e8c4-4d22-11ca-08dd4f87e7cc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Feb 2025 19:18:48.4350
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nKroilvA5YQ+kxkbQAdsXGU+HJTBNkjR5ZUqM9RFPXBWED/5Jr8Us4+r+cSyjbVMzWCc6kg1Q700OGLxmwEagkTwTcFCnqOax6ATFLBRkWo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10416
 
-ma, 2025-02-17 kello 16:39 +0100, Bastien Nocera kirjoitti:
-> Hey,
+Hi Loic,
+
+> >
+> > > @@ -616,6 +617,13 @@ static void ps_init(struct hci_dev *hdev)
+> > >                 break;
+> > >         }
+> > >
+> > > +       if (!device_property_read_u8(&nxpdev->serdev->dev, "nxp,wakei=
+n-
+> pin",
+> > > +                                    &psdata->h2c_wakeup_gpio))
+> > > +               psdata->h2c_wakeupmode =3D WAKEUP_METHOD_GPIO;
+> > > +       if (!device_property_read_u8(&nxpdev->serdev->dev,
+> > > + "nxp,wakeout-
+> > > pin",
+> > > +                                    &psdata->c2h_wakeup_gpio))
+> > > +               psdata->c2h_wakeupmode =3D
+> BT_HOST_WAKEUP_METHOD_GPIO;
+> > > +
+> > >         psdata->cur_psmode =3D PS_MODE_DISABLE;
+> > >         psdata->target_ps_mode =3D DEFAULT_PS_MODE;
+> > >
+> > Please move device_property_read for "nxp,wakein-pin" to ps_setup(), af=
+ter
+> "device-wakeup" is read.
+> >
+> > I think we should not set h2c_wakeupmode as WAKEUP_METHOD_GPIO
+> based on "nxp,wakein-pin" alone.
+> >
+> > In existing code, we are setting default_h2c_wakeup_mode to
+> WAKEUP_METHOD_GPIO if "device-wakeup" is defined in DT, and psdata-
+> >h2c_wakeup_gpio =3D 0xff. WAKE_IN pin is not read.
+> > In this case the FW considers default GPIO as WAKE_IN pin (as per
+> datasheet), which is a valid scenario.
+> >
+> > But this logic will fail if we specify only "nxp,wakein-pin", without "=
+device-
+> wakeup" in DT.
+> > Hence, I recommend something as follows in ps_setup():
+> > - if (!psdata->h2c_ps_gpio)
+> > + if (!psdata->h2c_ps_gpio ||
+> > + device_property_read_u8(&nxpdev->serdev->dev, "nxp,wakein-pin",
+> > + &psdata->h2c_wakeup_gpio))
+> >         psdata->h2c_wakeup_gpio =3D 0xff;
 >=20
-> On Sat, 2025-02-15 at 20:27 +0200, Pauli Virtanen wrote:
-> > <snip>robably Gnome BT settings also would need to grow a
-> > corresponding
-> > setting. Labeling such setting so that people understand it is maybe
-> > harder...
-> >=20
-> > There's a few questions:
-> >=20
-> > - Is there something that tells which bearers are available for a
-> > device? It would probably be needed too if it doesn't exist.
-> >=20
-> > - Interaction with CSIP, if you pair initially with bredr I think you
-> > don't get the other earbud paired. If you switch bearer + disconnect
-> > +
-> > connect, does it pair & connect the other one?
-> >=20
-> > - Who is going to be the agent that accepts the pairing of the other
-> > CSIP devices? GNOME BT settings I think is not running all time (and
-> > does it do CSIP accepts?).
-> >=20
-> > - Whether disconnect+reconnect should be needed to switch the bearer,
-> > or if just changing the property is enough if already connected?
-> > Maybe
-> > it is needed?
+> I don't get it, can you clarify when we should default to 0xff value for
+> h2c_wakeup_gpio? and what it means for the firmware.
+> Before the above change, we apply 0xff if there is **no** device-wakeup
+> gpio, so if wakeup mode is not GPIO.
+> After the above change, we apply 0xff if there is no device-wakeup gpio b=
+ut
+> also if there is no wakein-pin (whether there is a device-wakeup gpio or
+> not)...
 >=20
-> I don't have access to any CSIP supported devices, which is one of the
-> reasons why gnome-bluetooth has no support for it.
->=20
-> I think that the AX210 I have has support for CSIP on the adapter side,
-> but I would need to know what cheap device I could get that supports
-> it.
->=20
-> This is tracked in:
-> https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/issues/130
+In send_wakeup_method_cmd(), we always set pcmd.h2c_wakeup_gpio =3D 0xff, n=
+o matter if the wakeup method is BREAK or GPIO.
+This was done on-purpose to allow FW to use default (hardcoded)WAKE_IN pin,=
+ specific to the chip, for GPIO wake-up method.
+User can get the WAKE_IN pin info from the chip's datasheet. Pretty straigh=
+tforward right?
 
-Of the devices I have, Sony Linkbuds S has working CSIP + LE Audio.
+With your patch, send_wakeup_method_cmd() sets pcmd.h2c_wakeup_gpio =3D psd=
+ata->h2c_wakeup_gpio.
+The GPIO based device wakeup functionality works with very limited number o=
+f pins, which again varies from one chip to another.
+So not adding wakein-pin was intentional (based on internal discussion) to =
+avoid any sort of confusion and maintain consistency between datasheet and =
+FW default pins.
 
-It does not support duplex at 48 kHZ, so Pipewire needs to have some
-config to disable input direction for it to work.
-https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/LE-Audio-+-LC3-sup=
-port
+We would want this behaviour to be continued in this patch, such that if "d=
+evice-wakeup-gpios" is defined **without** "wakein-pin", the pcmd. h2c_wake=
+up_gpio parameter =3D psdata->h2c_wakeup_gpio  would still be 0xff in send_=
+wakeup_method_cmd().
 
-Samsung Galaxy Buds2 Pro, and Creative Zen Hybrid initially had
-firmware that had working LE Audio, but the manufacturer broke it
-somehow in later FW updates. These devices now refuse to Enable streams
-or even connect. Not clear what the firmware of these devices is
-expecting to get.
+Hope this clarifies everything.
 
-***
-
-How it currently works in Gnome Settings:
-
-Earbuds appear as two devices with the same name. If you pair one
-earbud, it'll after some seconds ask if you accept that a device with
-the same name as you just paired wants to pair.
-
-If you connect one, also the other one usually connects after a few
-seconds. Devices also autoconnect if they were previously connected.
-
-If you disconnect one, though, it only disconnects one of the two
-earbuds. The other one remains as available sound device, but now with
-just one channel.
-
-So the basics work, similarly as in bluetoothctl, but it may be
-somewhat confusing to users.
-
---=20
-Pauli Virtanen
+Thanks,
+Neeraj
