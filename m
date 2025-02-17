@@ -1,29 +1,29 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395491A3148;
-	Mon, 17 Feb 2025 08:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246821A5BAD;
+	Mon, 17 Feb 2025 08:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739782418; cv=none; b=EAep0mrL5a7LtqF4pRQRwOkSoVszNk5HXcTkG4jSHC/7RWyfNkPo4FgGncb7eesZBXZbFYW9061GFsg9Vk5xApo1/DLchAJkEOCYsY+Gt5ZKm7tzEUtViE8zoYbzDmbPHJjBlmyasL3/zNd4deQP04GKranyLYwG0PNDfRMSWQQ=
+	t=1739782546; cv=none; b=HBQBgXRkQ9ylWTUkg7qCI3h4M9W1OJiPq6D2SDbg8UHKj26LbW3/3kr844grvhXZbAAqw2xOmNSvWX40YEImWd9zcZUB0G2adGAmEpGSqT3WAXR/rAnqGY+XfKz8DAHE9m+Sz68O7/ESSF/uf/1QBcvHX7ukMQOWIijdkzfgQPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739782418; c=relaxed/simple;
-	bh=NQAGRszoXd7XKuzprwEoRex28p+4g9ymhtAUqgJpjSg=;
+	s=arc-20240116; t=1739782546; c=relaxed/simple;
+	bh=EFEkJhwmsl3bE4JjyU5jJiAhM1TmuoUEGGWs/FNGWnY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lT2Q7Bt9EOLRssVeVJSYaHh/O4P+Nl79iiCxSqsu4nmRUOpbD5ulHdcFq/PsF0Um5Th++S7DvI4mOfbW6JdlJ2xjwCHWnrLUQwc4FHC0pMKlcNO5oqh1MpRNoRuhJG62ta5TB3E4nCcBG5e4Lk1LL72zRPhBjr9d80TRWRQAxD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=o1ihM3c0; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=cqZbDmjGREEKMk5rUOwVn58bRWVkSUeAPczOLbOrJ3KqslDvKT1kr6IalzHnVfNjIPvl5Y5CrPKCsAmv8hHWkVcb4HXePLRKzRMy9F8aFonMxc7tCB3eIhbjAj/1fBygzcd94awmG4W0RG+x3KsvWk46bQ0mttd67Vh9TNDGkPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Yo0pUhoV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="o1ihM3c0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206D3C4CED1;
-	Mon, 17 Feb 2025 08:53:37 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Yo0pUhoV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F9EBC4CED1;
+	Mon, 17 Feb 2025 08:55:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739782417;
-	bh=NQAGRszoXd7XKuzprwEoRex28p+4g9ymhtAUqgJpjSg=;
+	s=korg; t=1739782545;
+	bh=EFEkJhwmsl3bE4JjyU5jJiAhM1TmuoUEGGWs/FNGWnY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o1ihM3c0k1Gi4V7VTw/MQnoWlbhwT8JF4wRDuwszLncV0NtqTgKBVUV5ct6geo/uO
-	 dFKMdvYrpnR/raXgPeWQh8w4mgoAUsR7UFNn5zifb4NSrC0s1+4GQbIs/ku9LLYwsy
-	 5F103MI4sPs5o4axCUmlCpdlvku/cfCjAlZbV5GA=
-Date: Mon, 17 Feb 2025 09:53:34 +0100
+	b=Yo0pUhoVFd0aJzWxdHo4ZXreXR6IglCbU7SJLVBMqq/pEZjzyKTx0UeF1sCQ+S3Og
+	 kDg+yxTY63/5tpJ/RPLud90voPYhYnyCzKCpPzl31brSYScbr2ivzccyvxIwQIKe8b
+	 d29cH5pvYTpB3Fn6jGnLFPPkvfSDFqEMtYD3Aj/Y=
+Date: Mon, 17 Feb 2025 09:55:42 +0100
 From: Greg KH <gregkh@linuxfoundation.org>
 To: Hsin-chen Chuang <chharry@google.com>
 Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
@@ -39,7 +39,7 @@ Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
 	netdev@vger.kernel.org
 Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs
  isoc_alt
-Message-ID: <2025021717-prepay-sharpener-37fb@gregkh>
+Message-ID: <2025021705-speckled-ooze-c4d0@gregkh>
 References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
  <2025021425-surgical-wackiness-0940@gregkh>
  <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
@@ -75,14 +75,43 @@ On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wrote:
 > detaching the btusb driver, while detaching seems necessary for
 > libusb_set_interface_alt_setting to work (Please correct me if I'm
 > wrong!)
+> 
+> Background:
+> The Bluetooth Core Specification defines a protocol for the operating
+> system to communicate with a Bluetooth chipset, called HCI (Host
+> Controller Interface) (Host=OS, Controller=chipset).
+> We could say the main purpose of the Linux Bluetooth drivers is to set
+> up and get the HCI ready for the "upper layer" to use.
+> 
+> Who could be the "upper layer" then? There are mainly 2: "Control" and
+> "User" channels.
+> Linux has its default Bluetooth stack, BlueZ, which is splitted into 2
+> parts: the kernel space and the user space. The kernel space part
+> provides an abstracted Bluetooth API called MGMT, and is exposed
+> through the Bluetooth HCI socket "Control" channel.
+> On the other hand Linux also exposes the Bluetooth HCI socket "User"
+> channel, allowing the user space APPs to send/receive the HCI packets
+> directly to/from the chipset. Google's products (Android, ChromeOS,
+> etc) use this channel.
+> 
+> Now why this patch?
+> It's because the Bluetooth spec defines something specific to USB
+> transport: A USB Bluetooth chipset must/should support these alternate
+> settings; When transferring this type of the Audio data this alt must
+> be used, bla bla bla...
+> The Control channel handles this in the kernel part. However, the
+> applications built on top of the User channel are unable to configure
+> the alt setting, and I'd like to add the support through sysfs.
 
-I think changing the alternate setting should work using usbfs as you
-would send that command to the device, not the interface, so the driver
-bound to the existing interface would not need to be removed.
+So the "problem" is that Google doesn't want to use BlueZ, which is
+fine, you do you :)
 
-Try it out and see yourself to verify this before you continue down any
-of this.  There's no need to use libfs for just a single usbfs command,
-right?
+But how does BlueZ handle this same problem today?  What api to the
+kernel does it use to change the interface that you can't also do with
+your "BlueZ replacement"?
+
+Surely this isn't a new issue suddenly, but if it is, it needs to be
+solved so BOTH userspace stacks can handle it.
 
 thanks,
 
