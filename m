@@ -1,525 +1,159 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58B3286A1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 17:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1550426A089
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 17:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739899725; cv=none; b=fEDZw9/Ce6tOUMLN4HdPs4SzmVV5tETN7hWrAK1T5cX0PvRoEG6KXt+NfxOesEuKEkLfLBcp7mOLX0k4LH5YjS7iBcWnGlqBA8S27mG3re5MKHK7nE0eGHj5A091n/mZYO4SXBNYaFmckqvjh/ThR8ZmDACdXkCVAjR25s0HtT4=
+	t=1739901088; cv=none; b=UpOvL9EWlI/lnrfKbwNyyQKDEb2iqjo2WwuybU0jC/TBUpeKgKAjgotZh/OkxHysm629/9VhKf5mzGKaiOclojlzWusj55kqF97madiesuNqWfLcaRpWhbDUH0XQDv/Am6v+Us4RQm29BLpKrQfPOLND0DTFWBShT3VXM26sZw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739899725; c=relaxed/simple;
-	bh=sJgFFc2KBpQPqn1ELRuTIR1QX2DzckW0yp+MeXFLEHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jM59JF8Pwm/Ha9iPS/yiKNb3E8DwFyB5xjMIANI7iO1XaR1VGMDOO03cs7SlJcwKe0sVEHBAPJYCpn/ZhWW/hUifCUpoiJanS3/OIVE210B9hu0N5jK5KdzVJu16/dY/xn0qNcur/19I+ARlEcpRz29Noc8XV89NvcYVFx9WB74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkWDi3To; arc=none smtp.client-ip=209.85.208.171
+	s=arc-20240116; t=1739901088; c=relaxed/simple;
+	bh=M9sa0FtaKbsbe/7BMF1PKYFJyfduBgF8d8xytIpW9VU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=KkF9G3e2cSOmMvApJ8XJTItKqKr7LKcvZsSi911MF0e/BDtJN+4gFWPlGKJJjC4y80BQBFhJydea4MVVn1H1ALWAM9pRtYxD2IemA7HdbGkoNIto9XN61jly547Wrc1CEtFSFD3+1eo3VhlhysRR6Yfj64yKu4G8WDUP3JGP+3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNa2xYTc; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkWDi3To"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3061513d353so61274311fa.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 09:28:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNa2xYTc"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6f74b78df93so51810897b3.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 09:51:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739899722; x=1740504522; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UHhVcd3XcSMi0871lE13OteRup1SWkVVdUxuv2DncSY=;
-        b=YkWDi3ToU7gJnAhP96lFSf+6vCk8GNOXw3+35kDd7hjLFBxP6cD01bvXW5eJLZ4dSk
-         zfPI3Vsr8GVI03iK2lyxupijpw1854DtBVY9Ij4EU/aDKyWrMMfzXxbmGWP08QKUmZKf
-         zmG5GvkBz5Q4y/2beTz7xQ81O9QOXh/yqdthqjgD6/YTCKBskfc6tioQQ+r9W4uekcQo
-         7vRORxB1L/Kh5ZCg89A5Sn5pjGbsmnqQ5Vqu3q0xvDzmjzkzqU3gen/T7Z2ZCr502Nj+
-         seX36LOnoQY3F+5uQT7ENd/Qsz4EsJ3PI6Y1wF1FKpCEqmMuiohvRXoBnJOTt6Lj6ItF
-         cSjQ==
+        d=gmail.com; s=20230601; t=1739901085; x=1740505885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w/ltf5dYFt4hXs8lHoCvJYcEAZxOb3CjNLzyjR1lpW0=;
+        b=jNa2xYTcCgZdBlwmdRkKxFXi0EN5S3cW3ZB0A6LlaZ2eUPP3lXuqf49ybB4uAyV8PQ
+         IOPRuZVEQDcrhtsgP+RGr51/vHhMAVrMQonOtZ0b21LlQu88MME3tGiWsNO0Fs1RPeGJ
+         XyLRWfauSQJydzym9TB2hdWx9VwZuTnoZgjUxvL7MX8KGTAwlfeaxrj13L4/T2YS7pKK
+         k08fFzgrbWsGoDI8SgIL+je2nU62GLud4Os3sLvYSnjla6/Av0Ytt4gqg9AgdSI2nw58
+         QztbjLxcYF+ahcbEBFGrQFuqmtJTyeZvw2ySRCa1ygpOj55iepZK/6W/bGee7XsvOZNj
+         RwYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739899722; x=1740504522;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UHhVcd3XcSMi0871lE13OteRup1SWkVVdUxuv2DncSY=;
-        b=N2L6BzZJqeHgTMw/OmIMCtmIhW1iMXeXjlonZjzsE07FuL7LWOsRtnHT/EUNGKOMA3
-         d2RvZkI26hiQRwaE4CNOoWJ+nlBiwxri5TX3iksGs5ZmMKR+S5vmErgM/QvsSsOTnXKn
-         g3Mi/MipnFvPBcVIaTYtkHFhjxgqS7zOQpSG7y58bVLR1ECrRO4sEUPl8iIBd1GrMGet
-         JZjyRWKRtA+fR0Wm5UfNQIIZ3eXxQEDsD20IV0ZTILi4K5p/QDaKejIWM20vVveREgBh
-         PY+UFSdksjkzr9zMvn73a95eNt4Fzpi0GeAzqsdn4DDvJ69PI7YZNw7HzD0n0x3kDGTo
-         OM/Q==
-X-Gm-Message-State: AOJu0Yw2ljdeYPb0TLeYxsv2NF93JIXyKjG1+yT9zJmK7rtB0r2Jm0Oi
-	jwcpN+OUDyGTqlWDIPfhaEMjwfJdPZ9BbYt0CEAFYljVhSkUi8lur+9mdflK97lxgbPkWu1ksrj
-	BFJVXx7uuqVqq90I+xClQ/Fuan3w=
-X-Gm-Gg: ASbGncsz8ldTKrvn6/p4zJo+8VD9XY1QRcnV+bIHDfA9+GxHUZqHqfx9HP5aRBuRAB1
-	QrjLMec0bxbOSM+oouAKoFdx4vB9jMsxtPZi9rE0iu4IDt+2ro8c2XDkpeau5j87/fhjPvbqbcw
-	==
-X-Google-Smtp-Source: AGHT+IGYMRSen+agcGMtAlPRuUxfuTcAGX2O/LG3HiIpr0bknebeq/msIi++MmXmUm8XnzbubYYmVIWaDiL5zs9jrcI=
-X-Received: by 2002:a2e:b607:0:b0:309:bc3:3b01 with SMTP id
- 38308e7fff4ca-309279833e9mr41509871fa.0.1739899721426; Tue, 18 Feb 2025
- 09:28:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739901085; x=1740505885;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w/ltf5dYFt4hXs8lHoCvJYcEAZxOb3CjNLzyjR1lpW0=;
+        b=LCXmCgCkiPnaEYe8pvpS8hdMowMNmqVqN2Gy8/Mw/81K4jMnkYzBJP3FfOZG9O+uC/
+         o/1rcW/+tf2k0EBGvD/wGRWTaci3fvhaqzuPLD0WVAlqxqUYzYXuwt9veZIQndC5YQgN
+         Vb1YAVQFlPXRb590wNCeQtdmkYcEbsdVS5HFgWAfgf2PZz2/BoAkGlnWkWSBDsLLOlot
+         zpEw18awPvi2kXyOO+zsg7xQ5ncs6h9wq1A+XbLZ8C6xwTqLswvW8etCS5u5Y5q5VDSd
+         LLTHiEwV4y4G3L0AFqCUumkqSqlng4kiBIV79ifdCxy3qjr0MBu9osEdS0qSiezPnygH
+         6JzA==
+X-Gm-Message-State: AOJu0YxvTO/575RmtQaKKtUHLr5wrgfjoE9W9g4zdiiJ/J5hjtnqGAd4
+	QSszpa5mWJ/AUBNDUL86gTNXIeppdbSRMIX7R6euuZL+uM4WIlcM1laNeg==
+X-Gm-Gg: ASbGnctihmDrGblba/6UVVYgEMcDNvUxTTQDWUJF3fpkjzHlwqkyvF+CyxkLoC4AIYp
+	cxCTzFFAMLTQyAC8G7t2pT5U6OGRRDOhMYW/LXBh9Pr0Pg2cLnST68LJ3yxCluEcw7y8AeZ8fwZ
+	D+AJlYp9W9g48y3KGwQduvn95DOB+BCUcwaL/NKdEOCmTnVTpkgyfkruIq60PJoo0RsE7ka4bhd
+	s40RORxDR4zGT2RKuNmm2nKJI/+xehYoyHfildmatgsOU3YcHVysVId0bh219uDxjjwxKllz/UW
+	e1IymGHoPW5bhvHRaVbM4rNqp6dJmCznCVEL3s+ebzEdnjuQk1Y5JuJVkQIRxpg=
+X-Google-Smtp-Source: AGHT+IHV11UowrKp+NXjgW9b3CLqgn3HthVb0uxnlS2hmO5BOHyR4X4lkAlmQRG/C4vupC2HDQsZaQ==
+X-Received: by 2002:a05:690c:9c09:b0:6ef:4cb2:8b4c with SMTP id 00721157ae682-6fba579e7b8mr7837127b3.23.1739901085272;
+        Tue, 18 Feb 2025 09:51:25 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fb35f66ad9sm27166577b3.34.2025.02.18.09.51.24
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 09:51:24 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+Date: Tue, 18 Feb 2025 12:51:23 -0500
+Message-ID: <20250218175123.1479657-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218122620.762523-1-kiran.k@intel.com> <20250218122620.762523-2-kiran.k@intel.com>
-In-Reply-To: <20250218122620.762523-2-kiran.k@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 18 Feb 2025 12:28:26 -0500
-X-Gm-Features: AWEUYZnOjvsbApRbW3cm4lpcI1Hsn1-8FX-h2gZOC--Jfr1HqihB65M-VImyaCE
-Message-ID: <CABBYNZLGg6eJXm6kZmF2KZ-ux5tGRqBssQgL=Cb=CHPcUgx7fA@mail.gmail.com>
-Subject: Re: [PATCH v1 2/4] Bluetooth: btintel_pcie: Read hardware exception data
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com, 
-	chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com, 
-	vijay.satija@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Kiran,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Feb 18, 2025 at 7:27=E2=80=AFAM Kiran K <kiran.k@intel.com> wrote:
->
-> On hardware error, controller writes hardware error event and optional
-> vendor specific hci events in device memory in TLV format and raises
-> MSIX interrupt. Driver reads the device memory and passes the events to
-> the stack for further processing.
->
-> Co-developed-by: Vijay Satija <vijay.satija@intel.com>
-> Signed-off-by: Vijay Satija <vijay.satija@intel.com>
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->  drivers/bluetooth/btintel.h      |   1 +
->  drivers/bluetooth/btintel_pcie.c | 212 ++++++++++++++++++++++++++++++-
->  drivers/bluetooth/btintel_pcie.h |  23 ++++
->  3 files changed, 235 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 19530ea14905..4c21e69887a3 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -190,6 +190,7 @@ enum {
->  struct btintel_data {
->         DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
->         int (*acpi_reset_method)(struct hci_dev *hdev);
-> +       u32     cnvi_top;
->  };
->
->  #define btintel_set_flag(hdev, nr)                                     \
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
-_pcie.c
-> index 11e2b805c7cc..6c78472f9dad 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -51,6 +51,14 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
->
->   #define BTINTEL_PCIE_MAGIC_NUM    0xA5A5A5A5
->
-> +#define BTINTEL_PCIE_BLZR_HWEXP_SIZE           1024
-> +#define BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR       0xB00A7C00
-> +
-> +#define BTINTEL_PCIE_SCP_HWEXP_SIZE            4096
-> +#define BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR                0xB030F800
-> +
-> +#define BTINTEL_PCIE_MAGIC_NUM 0xA5A5A5A5
-> +
->  /* Alive interrupt context */
->  enum {
->         BTINTEL_PCIE_ROM,
-> @@ -353,6 +361,63 @@ static int btintel_pcie_reset_bt(struct btintel_pcie=
-_data *data)
->         return reg =3D=3D 0 ? 0 : -ENODEV;
->  }
->
-> +static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
-> +{
-> +       u32 reg;
-> +
-> +       /* Set MAC_INIT bit to start primary bootloader */
-> +       reg =3D btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_RE=
-G);
-> +       reg &=3D ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
-> +                       BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON |
-> +                       BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET);
-> +       reg |=3D (BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_ENA |
-> +                       BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT);
-> +       btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
-> +}
-> +
-> +static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
-> +{
-> +       u32 reg;
-> +       int retry =3D 15;
-> +
-> +       reg =3D btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_RE=
-G);
-> +
-> +       reg |=3D BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
-> +       reg |=3D BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
-> +       if ((reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS) =3D=3D 0)
-> +               reg |=3D BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
-> +
-> +       btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
-> +
-> +       do {
-> +               reg =3D btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC=
-_CTRL_REG);
-> +               if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS)
-> +                       return 0;
-> +               usleep_range(1000, 1200);
-> +
-> +       } while (--retry > 0);
+L2CAP_ECRED_CONN_RSP needs to respond DCID in the same order received as
+SCID but the order is reversed due to use of list_add which actually
+prepend channels to the list so the response is reversed:
 
-There seems to be a similar call to btintel_pcie_wr_reg32(data,
-BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg); in btintel_pcie_mac_init but
-that doesn't retry for some reason, maybe leave a comment if that is
-intentional, that said this write, read and wait is sort of weird to
-me, if we know it takes time there should probably be an event coming
-back, rather than polling multiple times in quick succession.
+> ACL Data RX: Handle 16 flags 0x02 dlen 26
+      LE L2CAP: Enhanced Credit Connection Request (0x17) ident 2 len 18
+        PSM: 39 (0x0027)
+        MTU: 256
+        MPS: 251
+        Credits: 65535
+        Source CID: 116
+        Source CID: 117
+        Source CID: 118
+        Source CID: 119
+        Source CID: 120
+< ACL Data TX: Handle 16 flags 0x00 dlen 26
+      LE L2CAP: Enhanced Credit Connection Response (0x18) ident 2 len 18
+        MTU: 517
+        MPS: 247
+        Credits: 3
+        Result: Connection successful (0x0000)
+        Destination CID: 68
+        Destination CID: 67
+        Destination CID: 66
+        Destination CID: 65
+        Destination CID: 64
 
-> +
-> +       return -ETIME;
-> +}
-> +
-> +static void btintel_pcie_release_mac_access(struct btintel_pcie_data *da=
-ta)
-> +{
-> +       u32 reg;
-> +
-> +       reg =3D btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_RE=
-G);
-> +
-> +       if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ)
-> +               reg &=3D ~BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
-> +
-> +       if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS)
-> +               reg &=3D ~BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
-> +
-> +       if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ)
-> +               reg &=3D ~BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
-> +
-> +       btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
-> +}
-> +
->  /* This function enables BT function by setting BTINTEL_PCIE_CSR_FUNC_CT=
-RL_MAC_INIT bit in
->   * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
->   * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
-> @@ -473,6 +538,133 @@ static inline char *btintel_pcie_alivectxt_state2st=
-r(u32 alive_intr_ctxt)
->         }
->  }
->
-> +static int btintel_pcie_read_device_mem(struct btintel_pcie_data *data,
-> +                                       void *buf, u32 dev_addr, int len)
-> +{
-> +       int err;
-> +       u32 *val =3D buf;
-> +
-> +       /* Get device mac access */
-> +       err =3D btintel_pcie_get_mac_access(data);
-> +       if (err) {
-> +               bt_dev_err(data->hdev, "Failed to get mac access %d", err=
-);
-> +               return err;
-> +       }
-> +
-> +       for (; len > 0; len -=3D 4, dev_addr +=3D 4, val++)
-> +               *val =3D btintel_pcie_rd_dev_mem(data, dev_addr);
-> +
-> +       btintel_pcie_release_mac_access(data);
-> +
-> +       return 0;
-> +}
-> +
-> +static void btintel_pcie_dump_hwexp(struct btintel_pcie_data *data)
-> +{
-> +       struct btintel_data *intel_data =3D hci_get_priv(data->hdev);
-> +       int len, err, offset, pending;
-> +       struct sk_buff *skb;
-> +       u32 addr, val;
-> +       u8 *buf;
-> +
-> +       struct tlv {
-> +               u8      type;
-> +               u16     len;
-> +               u8      val[];
-> +       } __packed;
-> +
-> +       struct tlv *tlv;
-> +
-> +       switch (intel_data->cnvi_top & 0xfff) {
-> +       case BTINTEL_CNVI_BLAZARI:
-> +       case BTINTEL_CNVI_BLAZARIW:
-> +               /* only from step B0 onwards */
-> +               if (INTEL_CNVX_TOP_STEP(intel_data->cnvi_top) !=3D 0x01)
-> +                       return;
-> +               len =3D BTINTEL_PCIE_BLZR_HWEXP_SIZE; /* exception data l=
-ength */
-> +               addr =3D BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR;
-> +       break;
-> +       case BTINTEL_CNVI_SCP:
-> +               len =3D BTINTEL_PCIE_SCP_HWEXP_SIZE;
-> +               addr =3D BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR;
-> +       break;
-> +       default:
-> +               bt_dev_err(data->hdev, "Unsupported cnvi 0x%8x", intel_da=
-ta->cnvi_top);
-> +               return;
-> +       }
-> +
-> +       buf =3D kzalloc(len, GFP_KERNEL);
-> +       if (!buf)
-> +               goto exit_on_error;
-> +
-> +       btintel_pcie_mac_init(data);
-> +
-> +       err =3D btintel_pcie_read_device_mem(data, buf, addr, len);
-> +       if (err)
-> +               goto exit_on_error;
-> +
-> +       val =3D get_unaligned_le32(buf);
-> +       if (val !=3D BTINTEL_PCIE_MAGIC_NUM) {
-> +               bt_dev_err(data->hdev, "Invalid exception dump signature:=
- 0x%8.8x",
-> +                          val);
-> +               goto exit_on_error;
-> +       }
-> +
-> +       offset =3D 4;
-> +       do {
-> +               pending =3D len - offset;
-> +               if (pending < sizeof(*tlv))
-> +                       break;
-> +               tlv =3D (struct tlv *)(buf + offset);
-> +               if (!tlv->type) {
-> +                       bt_dev_dbg(data->hdev, "Invalid TLV type 0");
-> +                       break;
-> +               }
-> +               tlv->len =3D le16_to_cpu((__force __le16)tlv->len);
-> +               offset +=3D sizeof(*tlv);
-> +               pending =3D len - offset;
-> +               if (tlv->len > pending)
-> +                       break;
-> +
-> +               offset +=3D tlv->len;
-> +                /* Only TLV of type =3D 1 are vendor HCI events */
-> +               if (tlv->type !=3D 1)
-> +                       continue;
-> +
-> +               bt_dev_dbg(data->hdev, "Exception pkt len: %u", tlv->len)=
-;
-> +               if (tlv->len > HCI_MAX_EVENT_SIZE)
-> +                       break;
-> +               skb =3D bt_skb_alloc(tlv->len, GFP_KERNEL);
-> +               if (!skb)
-> +                       goto exit_on_error;
-> +               hci_skb_pkt_type(skb) =3D HCI_EVENT_PKT;
-> +               skb_put_data(skb, tlv->val, tlv->len);
-> +
-> +               /* copy Intel specific pcie packet type */
-> +               val =3D BTINTEL_PCIE_HCI_EVT_PKT;
-> +               memcpy(skb_push(skb, BTINTEL_PCIE_HCI_TYPE_LEN), &val,
-> +                      BTINTEL_PCIE_HCI_TYPE_LEN);
-> +
-> +               print_hex_dump(KERN_DEBUG, "Bluetooth: ", DUMP_PREFIX_OFF=
-SET, 16,
-> +                              1, tlv->val, tlv->len, false);
-> +
-> +               skb_queue_tail(&data->rx_skb_q, skb);
-> +               queue_work(data->workqueue, &data->rx_work);
-> +       } while (offset < len);
+Also make sure the response don't include channels that are not on
+BT_CONNECT2 since the chan->ident can be set to the same value as in the
+following trace:
 
-Could there be multiple exceptions? If there is only one the perhaps
-you could use eir_get_data instead of recreating the code for parsing
-LTV entries, although we could possibly rename that to make it more
-generic.
+< ACL Data TX: Handle 16 flags 0x00 dlen 12
+      LE L2CAP: LE Flow Control Credit (0x16) ident 6 len 4
+        Source CID: 64
+        Credits: 1
+...
+> ACL Data RX: Handle 16 flags 0x02 dlen 18
+      LE L2CAP: Enhanced Credit Connection Request (0x17) ident 6 len 10
+        PSM: 39 (0x0027)
+        MTU: 517
+        MPS: 251
+        Credits: 255
+        Source CID: 70
+< ACL Data TX: Handle 16 flags 0x00 dlen 20
+      LE L2CAP: Enhanced Credit Connection Response (0x18) ident 6 len 12
+        MTU: 517
+        MPS: 247
+        Credits: 3
+        Result: Connection successful (0x0000)
+        Destination CID: 64
+        Destination CID: 68
 
-> +
-> +exit_on_error:
-> +       kfree(buf);
-> +}
-> +
-> +static void btintel_pcie_hwexp_work(struct work_struct *work)
-> +{
-> +       struct btintel_pcie_data *data =3D container_of(work,
-> +                                       struct btintel_pcie_data, hwexp_w=
-ork);
-> +       btintel_pcie_dump_hwexp(data);
-> +
-> +       clear_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags);
-> +}
-> +
->  /* This function handles the MSI-X interrupt for gp0 cause (bit 0 in
->   * BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES) which is sent for boot stage and=
- image response.
->   */
-> @@ -794,6 +986,14 @@ static int btintel_pcie_recv_frame(struct btintel_pc=
-ie_data *data,
->         return ret;
->  }
->
-> +static void btintel_pcie_msix_hw_exp_handler(struct btintel_pcie_data *d=
-ata)
-> +{
-> +       bt_dev_err(data->hdev, "Received hw exception interrupt");
-> +       if (test_and_set_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags)=
-)
-> +               return;
-> +       queue_work(data->workqueue, &data->hwexp_work);
+Closes: https://github.com/bluez/bluez/issues/1094
+Fixes: 9aa9d9473f15 ("Bluetooth: L2CAP: Fix responding with wrong PDU type")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Any particular reason why we can process the exception in the rx_work?
-That shall probably be made into a comment either way.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index fec11e576f31..e716bfed4159 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -632,7 +632,8 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 	    test_bit(FLAG_HOLD_HCI_CONN, &chan->flags))
+ 		hci_conn_hold(conn->hcon);
+ 
+-	list_add(&chan->list, &conn->chan_l);
++	/* Append to the list since the order matters for ECRED */
++	list_add_tail(&chan->list, &conn->chan_l);
+ }
+ 
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+@@ -3771,7 +3772,9 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
+ 	struct l2cap_ecred_conn_rsp *rsp_flex =
+ 		container_of(&rsp->pdu.rsp, struct l2cap_ecred_conn_rsp, hdr);
+ 
+-	if (test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
++	/* Check if channel is pending */
++	if (chan->state != BT_CONNECT2 ||
++	    test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
+ 		return;
+ 
+ 	/* Reset ident so only one response is sent */
+-- 
+2.48.1
 
-> +}
-> +
->  static void btintel_pcie_rx_work(struct work_struct *work)
->  {
->         struct btintel_pcie_data *data =3D container_of(work,
-> @@ -920,6 +1120,10 @@ static irqreturn_t btintel_pcie_irq_msix_handler(in=
-t irq, void *dev_id)
->                 return IRQ_NONE;
->         }
->
-> +       /* This interrupt is raised when there is an hardware exception *=
-/
-> +       if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP)
-> +               btintel_pcie_msix_hw_exp_handler(data);
-> +
->         /* This interrupt is triggered by the firmware after updating
->          * boot_stage register and image_response register
->          */
-> @@ -1000,7 +1204,8 @@ struct btintel_pcie_causes_list {
->  static struct btintel_pcie_causes_list causes_list[] =3D {
->         { BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0,    BTINTEL_PCIE_CSR_MSIX_FH_=
-INT_MASK,      0x00 },
->         { BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1,    BTINTEL_PCIE_CSR_MSIX_FH_=
-INT_MASK,      0x01 },
-> -       { BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0, BTINTEL_PCIE_CSR_MSIX_HW_I=
-NT_MASK,       0x20 },
-> +       { BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0,  BTINTEL_PCIE_CSR_MSIX_HW_=
-INT_MASK,      0x20 },
-> +       { BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP, BTINTEL_PCIE_CSR_MSIX_HW=
-_INT_MASK,     0x23 },
->  };
->
->  /* This function configures the interrupt masks for both HW_INT_CAUSES a=
-nd
-> @@ -1482,6 +1687,7 @@ static void btintel_pcie_release_hdev(struct btinte=
-l_pcie_data *data)
->
->  static int btintel_pcie_setup_internal(struct hci_dev *hdev)
->  {
-> +       struct btintel_data *data =3D hci_get_priv(hdev);
->         const u8 param[1] =3D { 0xFF };
->         struct intel_version_tlv ver_tlv;
->         struct sk_buff *skb;
-> @@ -1520,6 +1726,7 @@ static int btintel_pcie_setup_internal(struct hci_d=
-ev *hdev)
->                 goto exit_error;
->         }
->
-> +       data->cnvi_top =3D ver_tlv.cnvi_top;
->         switch (INTEL_HW_PLATFORM(ver_tlv.cnvi_bt)) {
->         case 0x37:
->                 break;
-> @@ -1667,6 +1874,8 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
->         skb_queue_head_init(&data->rx_skb_q);
->         INIT_WORK(&data->rx_work, btintel_pcie_rx_work);
->
-> +       INIT_WORK(&data->hwexp_work, btintel_pcie_hwexp_work);
-> +
->         data->boot_stage_cache =3D 0x00;
->         data->img_resp_cache =3D 0x00;
->
-> @@ -1731,6 +1940,7 @@ static void btintel_pcie_remove(struct pci_dev *pde=
-v)
->         btintel_pcie_release_hdev(data);
->
->         flush_work(&data->rx_work);
-> +       flush_work(&data->hwexp_work);
->
->         destroy_workqueue(data->workqueue);
->
-> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel=
-_pcie.h
-> index b9d32393002b..98902fd4fc96 100644
-> --- a/drivers/bluetooth/btintel_pcie.h
-> +++ b/drivers/bluetooth/btintel_pcie.h
-> @@ -16,6 +16,8 @@
->  #define BTINTEL_PCIE_CSR_CI_ADDR_LSB_REG       (BTINTEL_PCIE_CSR_BASE + =
-0x118)
->  #define BTINTEL_PCIE_CSR_CI_ADDR_MSB_REG       (BTINTEL_PCIE_CSR_BASE + =
-0x11C)
->  #define BTINTEL_PCIE_CSR_IMG_RESPONSE_REG      (BTINTEL_PCIE_CSR_BASE + =
-0x12C)
-> +#define BTINTEL_PCIE_PRPH_DEV_ADDR_REG         (BTINTEL_PCIE_CSR_BASE + =
-0x440)
-> +#define BTINTEL_PCIE_PRPH_DEV_RD_REG           (BTINTEL_PCIE_CSR_BASE + =
-0x458)
->  #define BTINTEL_PCIE_CSR_HBUS_TARG_WRPTR       (BTINTEL_PCIE_CSR_BASE + =
-0x460)
->
->  /* BTINTEL_PCIE_CSR Function Control Register */
-> @@ -23,6 +25,12 @@
->  #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT            (BIT(6))
->  #define BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT           (BIT(7))
->  #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS      (BIT(20))
-> +
-> +#define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ      (BIT(21))
-> +/* Stop MAC Access disconnection request */
-> +#define BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS (BIT(22))
-> +#define BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ                (BIT(23))
-> +
->  #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_STS      (BIT(28))
->  #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON   (BIT(29))
->  #define BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET            (BIT(31))
-> @@ -72,6 +80,7 @@ enum msix_fh_int_causes {
->  /* Causes for the HW register interrupts */
->  enum msix_hw_int_causes {
->         BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0     =3D BIT(0),       /* caus=
-e 32 */
-> +       BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP   =3D BIT(3),       /* caus=
-e 35 */
->  };
->
->  /* PCIe device states
-> @@ -84,6 +93,11 @@ enum {
->         BTINTEL_PCIE_STATE_D3_HOT =3D 2,
->         BTINTEL_PCIE_STATE_D3_COLD =3D 3,
->  };
-> +
-> +enum {
-> +       BTINTEL_PCIE_HWEXP_INPROGRESS,
-> +};
-> +
->  #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE BIT(7)
->
->  /* Minimum and Maximum number of MSI-X Vector
-> @@ -437,6 +451,7 @@ struct btintel_pcie_data {
->         struct rxq      rxq;
->         u32     alive_intr_ctxt;
->         struct btintel_pcie_dbgc        dbgc;
-> +       struct work_struct      hwexp_work;
->  };
->
->  static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
-> @@ -476,3 +491,11 @@ static inline void btintel_pcie_clr_reg_bits(struct =
-btintel_pcie_data *data,
->         r &=3D ~bits;
->         iowrite32(r, data->base_addr + offset);
->  }
-> +
-> +static inline u32 btintel_pcie_rd_dev_mem(struct btintel_pcie_data *data=
-,
-> +                                         u32 addr)
-> +{
-> +       btintel_pcie_wr_reg32(data, BTINTEL_PCIE_PRPH_DEV_ADDR_REG, addr)=
-;
-> +       return btintel_pcie_rd_reg32(data, BTINTEL_PCIE_PRPH_DEV_RD_REG);
-> +}
-> +
-> --
-> 2.43.0
->
->
-
-
---=20
-Luiz Augusto von Dentz
