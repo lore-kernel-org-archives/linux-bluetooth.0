@@ -1,247 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1B0225408;
-	Tue, 18 Feb 2025 20:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A167B1B87EB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 21:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739910497; cv=none; b=Io0xLb471860xiGopjGmGX4/l9no9wJ4+UMMY3oNH+sFSofO6l0mWaSbDvPGH4FKNXzZF2wlN2CYlGYQalXy2/MH9XaKSEnR8rwZhobUhOujn9XXbZHoGdc9l82FLO9poR/RjsV+F4rvazUIhqQTJBireMoeXdjxrisQOoXVQ7E=
+	t=1739915029; cv=none; b=U11lNmVS+BwtpifgBNRIChtyEcKt7RJbPIxvlT0WW+cGo9robV6wCqX4QZ5CDm+YvuKL98FfE+PacDglEaxC958Ol2ZlZgy567N9GyGnGRT6ZTWFVvIxebaTuChpJsAmbnMWQDi+LppK83QL4+W8liknmi4F0rX8BMxG11na+ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739910497; c=relaxed/simple;
-	bh=V3thYUMbdBq2xVcl31FIhpOKAgrUZSmC+0iKY1uES3A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NaRQVy1ZJLwdzAB78ZuSDCwKEB2HuwT8UdBEq6yOmchicEJcN1dUtazpgIdRLPbDcagoqCjTqjQkuSrae7HWejSdCjXmQEHQfkZ6Mao4bWv+T40fFfyv7jE8sYxzsqF2tNa/lisbPrtAL9OmB4Y4wlRTI/jav7L9Ka4/AGExwEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uCMjTpRL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739915029; c=relaxed/simple;
+	bh=fDRKys+ir8i1cwHL7NC/gNBlVHy0tjpMGtIcTrVa/l0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=iAxasQETWHQ6n2wGPzg4Yi3+XGj0oGuoBpRe6VDX9xRnYENwZtOwXQ7lsgMKl5CjGbnfvRo8wVr+zWdE437ssHcg7k2IcWtL/ZvTld/crx3t9AlooX1dFScy8NaIlbD5H1UwHPxud8B8p9qArh/7vnfdVyriU8duJ82ZGy+raCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WVnVs/AQ; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCMjTpRL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60ECBC4CEE8;
-	Tue, 18 Feb 2025 20:28:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739910497;
-	bh=V3thYUMbdBq2xVcl31FIhpOKAgrUZSmC+0iKY1uES3A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uCMjTpRL+wBzdkX6Sbr7tM7c75Xu/sIQmvze4/IFvhKXy84v5q3ZR9mbm7xQ32s8I
-	 6XHQBeOlqqVnA+lgyS5jyPdb9Yj7dFxPWlwFCTfeM+BDZLFkwCwSmjHLoXm+OtBZeG
-	 fJouWEChvCaJmoNchMzbhEKtr8v0CkJWIEN4rBHdDLVAqKYvzG7SXXRVhIYcI62cpB
-	 SRgM4rfNW2V5T+QLSQyiJ1lDW5Bh03lhkeIPAQEthtyw4Qpqf3Zf2bcyInLJE14VET
-	 hHNpgNJQzcjz5QAw7AnU7zBjJrDUSnjlw9RLXTscAFG1dmKgc50u1TSMuLalRHxQOl
-	 OIU4Tkvc5+/1A==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com,
-	Edward Adam Davis <eadavis@qq.com>,
-	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 17/17] Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
-Date: Tue, 18 Feb 2025 15:27:41 -0500
-Message-Id: <20250218202743.3593296-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250218202743.3593296-1-sashal@kernel.org>
-References: <20250218202743.3593296-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WVnVs/AQ"
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6f4bc408e49so47094117b3.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 13:43:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739915026; x=1740519826; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lz9UKSUTd3lPaP/eK4rwOvoMuKUL3i+41YQQFOvT9MU=;
+        b=WVnVs/AQ48HqKj6/HZKpNmKQ1uE7H1Vpi7DEtQR8aUxJvxYyK0fh02geZfecZti/RO
+         VTlAJZnuXb4QtqRzDoqKemui/MHSlhHufB4Os/2F9WVo7R9H4joOH3+2wGvqZROMEeas
+         Bc35pD/thHFvPCH9v3TU8OGdn3GQWTcbNIx61GaSjYlt3dZxE8c+4OJpe0d/jU+Q/QiE
+         Fk3Mj3k1faNf/GsGy842LaD3s4mV/IrTZoWCVi4DF4C/QZ8jnU9axq8VJ1IYZEFVTtpy
+         HfgzEuupNMWhkNJAyzo7z1Q4r7+t6ZBNsstiHWw1Fz9UO1hMU3ulZaH68naBiutIesd8
+         Kv7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739915026; x=1740519826;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lz9UKSUTd3lPaP/eK4rwOvoMuKUL3i+41YQQFOvT9MU=;
+        b=WQGA6WyPbASPTUb0V4baNiOA/FCz1ODKnM7udTKa6PXJtxTfeV677PXie0/waWTlhp
+         yy58CR0cyfMJT1pOi1I6Nj+LAyhoiZow6YLGjbj6tbkE04Sm2FvBzdRTpA05DWK+GDDH
+         7mw0fjJmHoezDaCg10+CCxEMYjoo+vkqobrMOGIwdON4vZKJure/99uGk6G9HPs6uwT+
+         4FWcMNITq8w7+mBf6wRw3pXCfuXMyDvDgoQJ2KFoMlUvveP8b8WW3GkZQNMftRu8iELH
+         5XpafA1oNwk06xY7hkbJtJgK51zQv/Q4H+tB1iSi/5FVxuXfO3394XsKs4wtoRYiki2U
+         NAUA==
+X-Gm-Message-State: AOJu0YwQh08hv8Gi5PUrG4TL7bqnnuzvHToXcFrk1Gry48KtTJFMrTMi
+	U/TyyC+Km15wG0cS36teBIcISz3+RZmCbralBvci/DP7qbW5e/Z7tvMd0Q==
+X-Gm-Gg: ASbGncsXVZxB1mxmOwxmMke/AnRDA9WYBQmIrW//ECSCAfnYH+uf8otGJ49BFXpoXF/
+	WEysf7fw/BtCmktc5Z71GKIOT1PwgGEwzqzFGdU95syDHM+nu1dNFPypPHpQfGg2/9ZOARQQHr5
+	x5OOHI/0gauz2tdFc2ZAyZfkoUhgQL6Q/0Nn0m1X2ZYURRkGLNHcaJTs3cbfRBhfx7x5UhOUWhd
+	hXpUtEEMvGvOwAfYMfNzOLm8x1FZ1ttG+KFBbfC0/bgsyPT7fRkvt+c0/+xnxIFfsMX4rNuwc5X
+	//IQ78+f0UcT0H+f4OTzGP41y9BmxYkDJf/sCb276yWSc1bcB7ViV1zsmVVLfuE=
+X-Google-Smtp-Source: AGHT+IEN3LVIHv/zYfHK9tjF2N8uA025B0EunqjfgFr2ycZTdhBkB5UK6ARNo5bDwlgtzP+VzllbdA==
+X-Received: by 2002:a05:690c:3703:b0:6f7:56f7:2398 with SMTP id 00721157ae682-6fba56589bbmr15521357b3.7.1739915025757;
+        Tue, 18 Feb 2025 13:43:45 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fb47ab7a1asm23015667b3.72.2025.02.18.13.43.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 13:43:45 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
+Date: Tue, 18 Feb 2025 16:43:44 -0500
+Message-ID: <20250218214344.1519862-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.78
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[ Upstream commit b4f82f9ed43aefa79bec2504ae8c29be0c0f5d1d ]
+This enables buffer flow controler for SCO/eSCO which apparently for
+some reason has not been in use up until now which caused sco_cnt to
+never be updated, but recently this has caused the following problem:
 
-After the hci sync command releases l2cap_conn, the hci receive data work
-queue references the released l2cap_conn when sending to the upper layer.
-Add hci dev lock to the hci receive data work queue to synchronize the two.
+< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
+> HCI Event: Command Complete (0x0e) plen 11
+      Read Buffer Size (0x04|0x0005) ncmd 1
+        Status: Success (0x00)
+        ACL MTU: 1021 ACL max packet: 5
+        SCO MTU: 240  SCO max packet: 8
+...
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+< SCO Data TX: Handle 257 flags 0x00 dlen 120
+> HCI Event: Hardware Error (0x10) plen 1
+        Code: 0x0a
 
-[1]
-BUG: KASAN: slab-use-after-free in l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
-Read of size 8 at addr ffff8880271a4000 by task kworker/u9:2/5837
-
-CPU: 0 UID: 0 PID: 5837 Comm: kworker/u9:2 Not tainted 6.13.0-rc5-syzkaller-00163-gab75170520d4 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: hci1 hci_rx_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:489
- kasan_report+0x143/0x180 mm/kasan/report.c:602
- l2cap_build_cmd net/bluetooth/l2cap_core.c:2964 [inline]
- l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
- l2cap_sig_send_rej net/bluetooth/l2cap_core.c:5502 [inline]
- l2cap_sig_channel net/bluetooth/l2cap_core.c:5538 [inline]
- l2cap_recv_frame+0x221f/0x10db0 net/bluetooth/l2cap_core.c:6817
- hci_acldata_packet net/bluetooth/hci_core.c:3797 [inline]
- hci_rx_work+0x508/0xdb0 net/bluetooth/hci_core.c:4040
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-Allocated by task 5837:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __kmalloc_cache_noprof+0x243/0x390 mm/slub.c:4329
- kmalloc_noprof include/linux/slab.h:901 [inline]
- kzalloc_noprof include/linux/slab.h:1037 [inline]
- l2cap_conn_add+0xa9/0x8e0 net/bluetooth/l2cap_core.c:6860
- l2cap_connect_cfm+0x115/0x1090 net/bluetooth/l2cap_core.c:7239
- hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
- hci_remote_features_evt+0x68e/0xac0 net/bluetooth/hci_event.c:3726
- hci_event_func net/bluetooth/hci_event.c:7473 [inline]
- hci_event_packet+0xac2/0x1540 net/bluetooth/hci_event.c:7525
- hci_rx_work+0x3f3/0xdb0 net/bluetooth/hci_core.c:4035
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Freed by task 54:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2353 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0x196/0x430 mm/slub.c:4761
- l2cap_connect_cfm+0xcc/0x1090 net/bluetooth/l2cap_core.c:7235
- hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
- hci_conn_failed+0x287/0x400 net/bluetooth/hci_conn.c:1266
- hci_abort_conn_sync+0x56c/0x11f0 net/bluetooth/hci_sync.c:5603
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Reported-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=31c2f641b850a348a734
-Tested-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Fixes: 7fedd3bb6b77 ("Bluetooth: Prioritize SCO traffic")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 39 +++++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index acb148759bd04..8680c8fc168ec 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -948,6 +948,16 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
- 	return id;
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e7ec12437c8b..5c88d3816c6a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3564,6 +3564,7 @@ static void hci_sched_sco(struct hci_dev *hdev)
+ 			BT_DBG("skb %p len %d", skb, skb->len);
+ 			hci_send_frame(hdev, skb);
  
-+static void l2cap_send_acl(struct l2cap_conn *conn, struct sk_buff *skb,
-+			   u8 flags)
-+{
-+	/* Check if the hcon still valid before attempting to send */
-+	if (hci_conn_valid(conn->hcon->hdev, conn->hcon))
-+		hci_send_acl(conn->hchan, skb, flags);
-+	else
-+		kfree_skb(skb);
-+}
-+
- static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
- 			   void *data)
- {
-@@ -970,7 +980,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
- 	bt_cb(skb)->force_active = BT_POWER_FORCE_ACTIVE_ON;
- 	skb->priority = HCI_PRIO_MAX;
++			hdev->sco_cnt--;
+ 			conn->sent++;
+ 			if (conn->sent == ~0)
+ 				conn->sent = 0;
+@@ -3588,6 +3589,7 @@ static void hci_sched_esco(struct hci_dev *hdev)
+ 			BT_DBG("skb %p len %d", skb, skb->len);
+ 			hci_send_frame(hdev, skb);
  
--	hci_send_acl(conn->hchan, skb, flags);
-+	l2cap_send_acl(conn, skb, flags);
- }
- 
- static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
-@@ -1792,13 +1802,10 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 	mutex_unlock(&conn->chan_lock);
- 
--	hci_chan_del(conn->hchan);
--
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
- 		cancel_delayed_work_sync(&conn->info_timer);
- 
- 	hcon->l2cap_data = NULL;
--	conn->hchan = NULL;
- 	l2cap_conn_put(conn);
- }
- 
-@@ -1806,6 +1813,7 @@ static void l2cap_conn_free(struct kref *ref)
- {
- 	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
- 
-+	hci_chan_del(conn->hchan);
- 	hci_conn_put(conn->hcon);
- 	kfree(conn);
- }
-@@ -7472,14 +7480,33 @@ static void l2cap_recv_reset(struct l2cap_conn *conn)
- 	conn->rx_len = 0;
- }
- 
-+static struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
-+{
-+	BT_DBG("conn %p orig refcnt %u", c, kref_read(&c->ref));
-+
-+	if (!kref_get_unless_zero(&c->ref))
-+		return NULL;
-+
-+	return c;
-+}
-+
- void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- {
--	struct l2cap_conn *conn = hcon->l2cap_data;
-+	struct l2cap_conn *conn;
- 	int len;
- 
-+	/* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
-+	hci_dev_lock(hcon->hdev);
-+
-+	conn = hcon->l2cap_data;
-+
- 	if (!conn)
- 		conn = l2cap_conn_add(hcon);
- 
-+	conn = l2cap_conn_hold_unless_zero(conn);
-+
-+	hci_dev_unlock(hcon->hdev);
-+
- 	if (!conn)
- 		goto drop;
- 
-@@ -7571,6 +7598,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		break;
- 	}
- 
-+	l2cap_conn_put(conn);
-+
- drop:
- 	kfree_skb(skb);
- }
++			hdev->sco_cnt--;
+ 			conn->sent++;
+ 			if (conn->sent == ~0)
+ 				conn->sent = 0;
 -- 
-2.39.5
+2.48.1
 
