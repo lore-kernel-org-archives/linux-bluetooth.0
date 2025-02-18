@@ -1,159 +1,158 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1550426A089
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 17:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C4626E171
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 17:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739901088; cv=none; b=UpOvL9EWlI/lnrfKbwNyyQKDEb2iqjo2WwuybU0jC/TBUpeKgKAjgotZh/OkxHysm629/9VhKf5mzGKaiOclojlzWusj55kqF97madiesuNqWfLcaRpWhbDUH0XQDv/Am6v+Us4RQm29BLpKrQfPOLND0DTFWBShT3VXM26sZw8=
+	t=1739901370; cv=none; b=UzuIHU+/Yp7erM0LssDB+60uRpWmU3u2KvGr3BG/t6c2ln3jtWzyPaOJ5ThhYgHe3JNIfDd5k7PNm8Oiud4mMDk1C+rHdu5Hm8OXWkIYg8S5iPGttT1F86yS8PdWCq3lhsDYoSig0oNRlrtU5/TU/3nsegxsGyv3VvvqXv4K9aE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739901088; c=relaxed/simple;
-	bh=M9sa0FtaKbsbe/7BMF1PKYFJyfduBgF8d8xytIpW9VU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=KkF9G3e2cSOmMvApJ8XJTItKqKr7LKcvZsSi911MF0e/BDtJN+4gFWPlGKJJjC4y80BQBFhJydea4MVVn1H1ALWAM9pRtYxD2IemA7HdbGkoNIto9XN61jly547Wrc1CEtFSFD3+1eo3VhlhysRR6Yfj64yKu4G8WDUP3JGP+3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNa2xYTc; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739901370; c=relaxed/simple;
+	bh=LwOEgBwElLETGa5mmjKgJSCNdp1qJQxEEmJHrtuGThM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PST1bF8HAofRNOAqWkokmM4u9HHXX3b90+evSNJH1cNvjfjh8YwvUer0YHT7Py8L5BwE5UfSH2eP0PPA/u0P9yPGmHnrmef/4A/kKdb2NXiqYkfYjJplE8Ebxa26w6taJcMFrtmqVFPSiVIwobQgGQqqotfPVIyVpR4mOCCPyDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=khuqMXkA; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNa2xYTc"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6f74b78df93so51810897b3.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 09:51:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739901085; x=1740505885; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w/ltf5dYFt4hXs8lHoCvJYcEAZxOb3CjNLzyjR1lpW0=;
-        b=jNa2xYTcCgZdBlwmdRkKxFXi0EN5S3cW3ZB0A6LlaZ2eUPP3lXuqf49ybB4uAyV8PQ
-         IOPRuZVEQDcrhtsgP+RGr51/vHhMAVrMQonOtZ0b21LlQu88MME3tGiWsNO0Fs1RPeGJ
-         XyLRWfauSQJydzym9TB2hdWx9VwZuTnoZgjUxvL7MX8KGTAwlfeaxrj13L4/T2YS7pKK
-         k08fFzgrbWsGoDI8SgIL+je2nU62GLud4Os3sLvYSnjla6/Av0Ytt4gqg9AgdSI2nw58
-         QztbjLxcYF+ahcbEBFGrQFuqmtJTyeZvw2ySRCa1ygpOj55iepZK/6W/bGee7XsvOZNj
-         RwYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739901085; x=1740505885;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w/ltf5dYFt4hXs8lHoCvJYcEAZxOb3CjNLzyjR1lpW0=;
-        b=LCXmCgCkiPnaEYe8pvpS8hdMowMNmqVqN2Gy8/Mw/81K4jMnkYzBJP3FfOZG9O+uC/
-         o/1rcW/+tf2k0EBGvD/wGRWTaci3fvhaqzuPLD0WVAlqxqUYzYXuwt9veZIQndC5YQgN
-         Vb1YAVQFlPXRb590wNCeQtdmkYcEbsdVS5HFgWAfgf2PZz2/BoAkGlnWkWSBDsLLOlot
-         zpEw18awPvi2kXyOO+zsg7xQ5ncs6h9wq1A+XbLZ8C6xwTqLswvW8etCS5u5Y5q5VDSd
-         LLTHiEwV4y4G3L0AFqCUumkqSqlng4kiBIV79ifdCxy3qjr0MBu9osEdS0qSiezPnygH
-         6JzA==
-X-Gm-Message-State: AOJu0YxvTO/575RmtQaKKtUHLr5wrgfjoE9W9g4zdiiJ/J5hjtnqGAd4
-	QSszpa5mWJ/AUBNDUL86gTNXIeppdbSRMIX7R6euuZL+uM4WIlcM1laNeg==
-X-Gm-Gg: ASbGnctihmDrGblba/6UVVYgEMcDNvUxTTQDWUJF3fpkjzHlwqkyvF+CyxkLoC4AIYp
-	cxCTzFFAMLTQyAC8G7t2pT5U6OGRRDOhMYW/LXBh9Pr0Pg2cLnST68LJ3yxCluEcw7y8AeZ8fwZ
-	D+AJlYp9W9g48y3KGwQduvn95DOB+BCUcwaL/NKdEOCmTnVTpkgyfkruIq60PJoo0RsE7ka4bhd
-	s40RORxDR4zGT2RKuNmm2nKJI/+xehYoyHfildmatgsOU3YcHVysVId0bh219uDxjjwxKllz/UW
-	e1IymGHoPW5bhvHRaVbM4rNqp6dJmCznCVEL3s+ebzEdnjuQk1Y5JuJVkQIRxpg=
-X-Google-Smtp-Source: AGHT+IHV11UowrKp+NXjgW9b3CLqgn3HthVb0uxnlS2hmO5BOHyR4X4lkAlmQRG/C4vupC2HDQsZaQ==
-X-Received: by 2002:a05:690c:9c09:b0:6ef:4cb2:8b4c with SMTP id 00721157ae682-6fba579e7b8mr7837127b3.23.1739901085272;
-        Tue, 18 Feb 2025 09:51:25 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fb35f66ad9sm27166577b3.34.2025.02.18.09.51.24
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 09:51:24 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
-Date: Tue, 18 Feb 2025 12:51:23 -0500
-Message-ID: <20250218175123.1479657-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="khuqMXkA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739901368; x=1771437368;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LwOEgBwElLETGa5mmjKgJSCNdp1qJQxEEmJHrtuGThM=;
+  b=khuqMXkABFgTSLpR0MwLBV17D41dcxY1Eb/sB5jNSQEPk6slplOt+uj/
+   itObDThmJqkLnPqcjhp+Y214WIQ2xN81v/Um+JJ+sWTgvQ/cmqVurUWd9
+   mKD9zuz5FUdUnvGdpQSAqjV4Bp+dxnOLGaAuUKQ4JmNRopd70D7RA6Uq1
+   Jtnjv/wGOHWShB0KdnjfwalVAyYrIpWvWYfX5uhIswUwgTQxGq65kH9JD
+   ORpZQRvQLwXcYVVmA6shkHmDPMNTzd0LPo5W0SOJ7Cepdd10Aj47qNpQ9
+   lhkOIs5aYQRbo1Ykam92Yl9rbJNnqGBymFNInBVoO0mWTen9/7m2fVCXQ
+   A==;
+X-CSE-ConnectionGUID: rXl//Co/TwO8zOKlamcOqA==
+X-CSE-MsgGUID: eUYc6Ix/SIi/mVPwBaHAvw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="58012154"
+X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
+   d="scan'208";a="58012154"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 09:55:58 -0800
+X-CSE-ConnectionGUID: OO3K8ZGpRjSAeTb+Q7LBCQ==
+X-CSE-MsgGUID: XKwAzA7ZTdKy0g2dP0hNLQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
+   d="scan'208";a="119554986"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa004.fm.intel.com with ESMTP; 18 Feb 2025 09:55:56 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tkRp4-0000m3-0y;
+	Tue, 18 Feb 2025 17:55:54 +0000
+Date: Wed, 19 Feb 2025 01:54:56 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com, Kiran K <kiran.k@intel.com>
+Subject: Re: [PATCH v1 1/4] Bluetooth: btintel_pcie: Setup buffers for
+ firmware traces
+Message-ID: <202502190143.0LmI162j-lkp@intel.com>
+References: <20250218122620.762523-1-kiran.k@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218122620.762523-1-kiran.k@intel.com>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Kiran,
 
-L2CAP_ECRED_CONN_RSP needs to respond DCID in the same order received as
-SCID but the order is reversed due to use of list_add which actually
-prepend channels to the list so the response is reversed:
+kernel test robot noticed the following build warnings:
 
-> ACL Data RX: Handle 16 flags 0x02 dlen 26
-      LE L2CAP: Enhanced Credit Connection Request (0x17) ident 2 len 18
-        PSM: 39 (0x0027)
-        MTU: 256
-        MPS: 251
-        Credits: 65535
-        Source CID: 116
-        Source CID: 117
-        Source CID: 118
-        Source CID: 119
-        Source CID: 120
-< ACL Data TX: Handle 16 flags 0x00 dlen 26
-      LE L2CAP: Enhanced Credit Connection Response (0x18) ident 2 len 18
-        MTU: 517
-        MPS: 247
-        Credits: 3
-        Result: Connection successful (0x0000)
-        Destination CID: 68
-        Destination CID: 67
-        Destination CID: 66
-        Destination CID: 65
-        Destination CID: 64
+[auto build test WARNING on bluetooth-next/master]
+[also build test WARNING on bluetooth/master linus/master v6.14-rc3 next-20250218]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Also make sure the response don't include channels that are not on
-BT_CONNECT2 since the chan->ident can be set to the same value as in the
-following trace:
+url:    https://github.com/intel-lab-lkp/linux/commits/Kiran-K/Bluetooth-btintel_pcie-Read-hardware-exception-data/20250218-202903
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20250218122620.762523-1-kiran.k%40intel.com
+patch subject: [PATCH v1 1/4] Bluetooth: btintel_pcie: Setup buffers for firmware traces
+config: sparc-randconfig-002-20250218 (https://download.01.org/0day-ci/archive/20250219/202502190143.0LmI162j-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250219/202502190143.0LmI162j-lkp@intel.com/reproduce)
 
-< ACL Data TX: Handle 16 flags 0x00 dlen 12
-      LE L2CAP: LE Flow Control Credit (0x16) ident 6 len 4
-        Source CID: 64
-        Credits: 1
-...
-> ACL Data RX: Handle 16 flags 0x02 dlen 18
-      LE L2CAP: Enhanced Credit Connection Request (0x17) ident 6 len 10
-        PSM: 39 (0x0027)
-        MTU: 517
-        MPS: 251
-        Credits: 255
-        Source CID: 70
-< ACL Data TX: Handle 16 flags 0x00 dlen 20
-      LE L2CAP: Enhanced Credit Connection Response (0x18) ident 6 len 12
-        MTU: 517
-        MPS: 247
-        Credits: 3
-        Result: Connection successful (0x0000)
-        Destination CID: 64
-        Destination CID: 68
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502190143.0LmI162j-lkp@intel.com/
 
-Closes: https://github.com/bluez/bluez/issues/1094
-Fixes: 9aa9d9473f15 ("Bluetooth: L2CAP: Fix responding with wrong PDU type")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/l2cap_core.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index fec11e576f31..e716bfed4159 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -632,7 +632,8 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 	    test_bit(FLAG_HOLD_HCI_CONN, &chan->flags))
- 		hci_conn_hold(conn->hcon);
- 
--	list_add(&chan->list, &conn->chan_l);
-+	/* Append to the list since the order matters for ECRED */
-+	list_add_tail(&chan->list, &conn->chan_l);
- }
- 
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-@@ -3771,7 +3772,9 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
- 	struct l2cap_ecred_conn_rsp *rsp_flex =
- 		container_of(&rsp->pdu.rsp, struct l2cap_ecred_conn_rsp, hdr);
- 
--	if (test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
-+	/* Check if channel is pending */
-+	if (chan->state != BT_CONNECT2 ||
-+	    test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
- 		return;
- 
- 	/* Reset ident so only one response is sent */
+   drivers/bluetooth/btintel_pcie.c: In function 'btintel_pcie_setup_dbgc':
+>> drivers/bluetooth/btintel_pcie.c:134:72: warning: right shift count >= width of type [-Wshift-count-overflow]
+     134 |                 db_frag.bufs[i].buf_addr_msb = (u32)((buf->data_p_addr >> 32) & 0xffffffff);
+         |                                                                        ^~
+
+
+vim +134 drivers/bluetooth/btintel_pcie.c
+
+    90	
+    91	/* This function initializes the memory for DBGC buffers and formats the
+    92	 * DBGC fragment which consists header info and DBGC buffer's LSB, MSB and
+    93	 * size as the payload
+    94	 */
+    95	static int btintel_pcie_setup_dbgc(struct btintel_pcie_data *data)
+    96	{
+    97		struct btintel_pcie_dbgc_ctxt db_frag;
+    98		struct data_buf *buf;
+    99		int i;
+   100	
+   101		data->dbgc.count = BTINTEL_PCIE_DBGC_BUFFER_COUNT;
+   102		data->dbgc.bufs = devm_kcalloc(&data->pdev->dev, data->dbgc.count,
+   103					       sizeof(*buf), GFP_KERNEL);
+   104		if (!data->dbgc.bufs)
+   105			return -ENOMEM;
+   106	
+   107		data->dbgc.buf_v_addr = dmam_alloc_coherent(&data->pdev->dev,
+   108							    data->dbgc.count *
+   109							    BTINTEL_PCIE_DBGC_BUFFER_SIZE,
+   110							    &data->dbgc.buf_p_addr,
+   111							    GFP_KERNEL | __GFP_NOWARN);
+   112		if (!data->dbgc.buf_v_addr)
+   113			return -ENOMEM;
+   114	
+   115		data->dbgc.frag_v_addr = dmam_alloc_coherent(&data->pdev->dev,
+   116							     sizeof(struct btintel_pcie_dbgc_ctxt),
+   117							     &data->dbgc.frag_p_addr,
+   118							     GFP_KERNEL | __GFP_NOWARN);
+   119		if (!data->dbgc.frag_v_addr)
+   120			return -ENOMEM;
+   121	
+   122		data->dbgc.frag_size = sizeof(struct btintel_pcie_dbgc_ctxt);
+   123	
+   124		db_frag.magic_num = BTINTEL_PCIE_MAGIC_NUM;
+   125		db_frag.ver = BTINTEL_PCIE_DBGC_FRAG_VERSION;
+   126		db_frag.total_size = BTINTEL_PCIE_DBGC_FRAG_PAYLOAD_SIZE;
+   127		db_frag.num_buf = BTINTEL_PCIE_DBGC_FRAG_BUFFER_COUNT;
+   128	
+   129		for (i = 0; i < data->dbgc.count; i++) {
+   130			buf = &data->dbgc.bufs[i];
+   131			buf->data_p_addr = data->dbgc.buf_p_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
+   132			buf->data = data->dbgc.buf_v_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
+   133			db_frag.bufs[i].buf_addr_lsb = (u32)(buf->data_p_addr & 0xffffffff);
+ > 134			db_frag.bufs[i].buf_addr_msb = (u32)((buf->data_p_addr >> 32) & 0xffffffff);
+   135			db_frag.bufs[i].buf_size = BTINTEL_PCIE_DBGC_BUFFER_SIZE;
+   136		}
+   137	
+   138		memcpy(data->dbgc.frag_v_addr, &db_frag, sizeof(db_frag));
+   139		return 0;
+   140	}
+   141	
+
 -- 
-2.48.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
