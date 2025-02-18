@@ -1,38 +1,41 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B41269AEB;
-	Tue, 18 Feb 2025 13:27:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8E661FF2;
+	Tue, 18 Feb 2025 13:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739885226; cv=none; b=Q7D4gRkb4ryiv7UmDchOAgOy8v9dTe7ZY71IyMzAzA1x7y0P1A2djlvZq3U74w19OONd8+DZrdcBLBV4S4dFJR57W8GOGpdMm6UhqDV39b2CumQKPb/FRmOfPkK4WU0Q33XNfnWVUsQha39yoGtiADr+dKZNNHIVNaIH2SJUSOg=
+	t=1739885885; cv=none; b=ZQuxkZSsPzVuTfzwI1X7dE6H+MlkwnWx+mb3UEWQc9ikcR6DatfcFts4FtuxwpvDg759BpCaDv2pEev1TKlxUm30uoufb88Lb90vt6/OfJqS2ClmzKuCsmZHNHr5RlWlQwAXBwnHE3vz91oUZyOtka4GSUvUTa42entCdO2QMUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739885226; c=relaxed/simple;
-	bh=Q5cq18P0XcC2Vl6wgZDytAeWL5PxK8dhgKT/ZZ+mgVI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D5HaelVyOfa5AjA2rHv6dOgg+nzxtABcE3RiBRW2z3t6DeDfLU3Fqhvx4EF7QOpZBK34Vm1svA3a039FiARfqE+/NGDR1QxxQQVaa5Zcyd4cYwg7NWJM1bYFqFVeUSxip3MELaJQ29RuNN1k+Ux0UeBvZR61G+StBLtHbtacXPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=TU/WM7vC; arc=none smtp.client-ip=220.197.31.3
+	s=arc-20240116; t=1739885885; c=relaxed/simple;
+	bh=TwgMB7T3xrklH/XcTQFISwEV9IVITK4a2JBNyBtOMhw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CJyXeO0rJinETh3G/7qSkhgn2uxtx66g/CYnk3vySvcdGijStq/5iVgLBl89bS/pybWowc0OLj5NzSnnKXOgCSLQCNhH1Fm/APnnNdH+95zfLf9jS83CS4sSquNPDjmar5445Xm6WUDHG2L/NH6yOYP+0c6duDQ5+xsrI9p0TDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RbheBNR7; arc=none smtp.client-ip=220.197.31.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="TU/WM7vC"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RbheBNR7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Hz+An
-	7/y8BTdQCJAx4QejdOfO+/Oxf7ZYGLNn21hCHg=; b=TU/WM7vCMgmkgyV84qyI7
-	CqGPLktc6rYskbyXgzIuIW0Yl96CyfRSe1IEd5A90IZhI3HiiZvrdSEBDHTI1FXS
-	Ln66kaxDzj2bgWWkccwqoShjYfVop8kdAf6PnNBfdv6fK9PLuYIEj6jMoYGN3qlP
-	y9/IsP86+E2ijz4aPc/T2g=
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Ij4g2
+	0YFPTl6kiG9pCgMNJFmTxK0iuXkJSFpOeNRl70=; b=RbheBNR7r6JBhK/A9ltUr
+	pYtrYXZ+0pA9IhRZPgHCdQinKQvzxbxyvBy1u4EN0OxsfPwQLipILaKnAtFjI/WH
+	aSf/vCCRCPBJ7l/lFJBXz5V/YtoUzU6WJ7wXgq2P6AKMoTGaKJJH8HSOrjpNe2Aa
+	kKqiwxMh+7imtsGrrCyV3g=
 Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wDXr8iairRnR3jgMw--.2240S4;
-	Tue, 18 Feb 2025 21:26:51 +0800 (CST)
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wD3r6q2jLRnc3EEMg--.34170S4;
+	Tue, 18 Feb 2025 21:35:51 +0800 (CST)
 From: Haoxiang Li <haoxiang_li2024@163.com>
 To: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
+	luiz.dentz@gmail.com,
+	mm@semihalf.com,
+	rad@semihalf.com,
+	acz@semihalf.com
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Haoxiang Li <haoxiang_li2024@163.com>,
 	stable@vger.kernel.org
 Subject: [PATCH] bluetooth: Add check for mgmt_alloc_skb()
-Date: Tue, 18 Feb 2025 21:26:48 +0800
-Message-Id: <20250218132648.2561862-1-haoxiang_li2024@163.com>
+Date: Tue, 18 Feb 2025 21:35:48 +0800
+Message-Id: <20250218133548.2564549-1-haoxiang_li2024@163.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -41,36 +44,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXr8iairRnR3jgMw--.2240S4
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Xr18JFy7tw48Jw18ZFW3trb_yoWfuFcEgr
-	1vv3s7ur1UJa4kJF10krW3urnxJw1rCrn7WrWaq3s7C3y5Wr1DWr18ZrnxJ397ua1xCr4x
-	Aws8CF4kZw48WjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRXBMtUUUUUU==
-X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/1tbiqBv3bme0hThcTwAAsX
+X-CM-TRANSID:_____wD3r6q2jLRnc3EEMg--.34170S4
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Xr15JrW5Zry5XrWUGryUKFg_yoWftFcEgF
+	1Iv34fuFWUJFyDAFs8uFW7WwnIkw1rAF1IgF4a9F93ZrZ8Ww1UJr18urnxA397W3WUCrWx
+	CFWDCFs5Za10qjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNtxhDUUUUU==
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbBkAb3bme0hTGQpAAAsc
 
 Add check for the return value of mgmt_alloc_skb() in
-mgmt_device_connected() to prevent null pointer dereference.
+mgmt_remote_name() to prevent null pointer dereference.
 
-Fixes: e96741437ef0 ("Bluetooth: mgmt: Make use of mgmt_send_event_skb in MGMT_EV_DEVICE_CONNECTED")
+Fixes: ba17bb62ce41 ("Bluetooth: Fix skb allocation in mgmt_remote_name() & mgmt_device_connected()")
 Cc: stable@vger.kernel.org
 Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 ---
- net/bluetooth/mgmt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/mgmt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f53304cb09db..1f028c5105ca 100644
+index f53304cb09db..8383e5ae95be 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -9660,6 +9660,8 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
- 				     sizeof(*ev) + (name ? eir_precalc_len(name_len) : 0) +
- 				     eir_precalc_len(sizeof(conn->dev_class)));
+@@ -10413,7 +10413,8 @@ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
  
+ 	skb = mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND,
+ 			     sizeof(*ev) + (name ? eir_precalc_len(name_len) : 0));
+-
 +	if (!skb)
 +		return;
  	ev = skb_put(skb, sizeof(*ev));
- 	bacpy(&ev->addr.bdaddr, &conn->dst);
- 	ev->addr.type = link_to_bdaddr(conn->type, conn->dst_type);
+ 	bacpy(&ev->addr.bdaddr, bdaddr);
+ 	ev->addr.type = link_to_bdaddr(link_type, addr_type);
 -- 
 2.25.1
 
