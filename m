@@ -1,158 +1,149 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C4626E171
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 17:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A76E271260
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 18:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739901370; cv=none; b=UzuIHU+/Yp7erM0LssDB+60uRpWmU3u2KvGr3BG/t6c2ln3jtWzyPaOJ5ThhYgHe3JNIfDd5k7PNm8Oiud4mMDk1C+rHdu5Hm8OXWkIYg8S5iPGttT1F86yS8PdWCq3lhsDYoSig0oNRlrtU5/TU/3nsegxsGyv3VvvqXv4K9aE=
+	t=1739903812; cv=none; b=ZLCeVrowB6lB0Q+yrbLhNccVRZLrCTpINLE3x5zsiGRPIchg9JYdbkHiTO4dmTsgrkQ3XUkvkioLvF3uwUoE/Bp5eY1v5ZaOHqeOWO/9InurPbfBRXWflI1E6RXqSqqQPQhEWO59fNumhD2VvW0w/ByIdcz2jxOVLf/NiC4WMnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739901370; c=relaxed/simple;
-	bh=LwOEgBwElLETGa5mmjKgJSCNdp1qJQxEEmJHrtuGThM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PST1bF8HAofRNOAqWkokmM4u9HHXX3b90+evSNJH1cNvjfjh8YwvUer0YHT7Py8L5BwE5UfSH2eP0PPA/u0P9yPGmHnrmef/4A/kKdb2NXiqYkfYjJplE8Ebxa26w6taJcMFrtmqVFPSiVIwobQgGQqqotfPVIyVpR4mOCCPyDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=khuqMXkA; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1739903812; c=relaxed/simple;
+	bh=HxOijWZA/5ybVav6lUGtJ5SaNz1vlcU2wjDP85vMP1k=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=QyQSHDTPQ/S+Cc0Z4MsW23r/AvJbwmCnNBdC7n7O5HDJUXOglRsQQ2SMALYndFHASm+ght+GpMDfGR+tH2QaSP+Qo8k/gIAeuga+d8/+R2LgpnFRhGPKaeJbk5yoiWeSsGwEbdfTkU/73jbUGSazbeqRSTESkcEXJ4sqJAW3b/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kY+L/l/o; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="khuqMXkA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739901368; x=1771437368;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LwOEgBwElLETGa5mmjKgJSCNdp1qJQxEEmJHrtuGThM=;
-  b=khuqMXkABFgTSLpR0MwLBV17D41dcxY1Eb/sB5jNSQEPk6slplOt+uj/
-   itObDThmJqkLnPqcjhp+Y214WIQ2xN81v/Um+JJ+sWTgvQ/cmqVurUWd9
-   mKD9zuz5FUdUnvGdpQSAqjV4Bp+dxnOLGaAuUKQ4JmNRopd70D7RA6Uq1
-   Jtnjv/wGOHWShB0KdnjfwalVAyYrIpWvWYfX5uhIswUwgTQxGq65kH9JD
-   ORpZQRvQLwXcYVVmA6shkHmDPMNTzd0LPo5W0SOJ7Cepdd10Aj47qNpQ9
-   lhkOIs5aYQRbo1Ykam92Yl9rbJNnqGBymFNInBVoO0mWTen9/7m2fVCXQ
-   A==;
-X-CSE-ConnectionGUID: rXl//Co/TwO8zOKlamcOqA==
-X-CSE-MsgGUID: eUYc6Ix/SIi/mVPwBaHAvw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="58012154"
-X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
-   d="scan'208";a="58012154"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 09:55:58 -0800
-X-CSE-ConnectionGUID: OO3K8ZGpRjSAeTb+Q7LBCQ==
-X-CSE-MsgGUID: XKwAzA7ZTdKy0g2dP0hNLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
-   d="scan'208";a="119554986"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Feb 2025 09:55:56 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tkRp4-0000m3-0y;
-	Tue, 18 Feb 2025 17:55:54 +0000
-Date: Wed, 19 Feb 2025 01:54:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
-	vijay.satija@intel.com, Kiran K <kiran.k@intel.com>
-Subject: Re: [PATCH v1 1/4] Bluetooth: btintel_pcie: Setup buffers for
- firmware traces
-Message-ID: <202502190143.0LmI162j-lkp@intel.com>
-References: <20250218122620.762523-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kY+L/l/o"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e67ce516efso19733006d6.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 10:36:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739903809; x=1740508609; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=bxsk+aP1yuHzYXVl3sXI7H0ov0ocRTVL7YpllS9OAsM=;
+        b=kY+L/l/oRfhMewQao/On3MSnaJlk9IzNvnpbe9QDNbLpf7lBwlRnIyKUxf9KumfD3C
+         l4w9bQ2I0uAxKALHWvd6WbsnQj5eCEVrSH2GshHqYl2CplQmT7ZVkmTVF7pDeunGr2M9
+         7qJqqd9hJj7D64wluWMQYfX7Xb1XuqnAnZqvpDdBZxZYolWgl49a/3icOt/jcQb3o4+t
+         ADuaTTTLvxPMMFxcsbRmMB2cMGT+7Idt2h2tPuiDxWzjiTHI1HGuzU7rssRvyKuFjiYz
+         OddRFU6aMJWrqKijrp5btguuld99mIMY7PH5kvuhmioSWZKLbQfaQurNfumZHeW1wkib
+         1HUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739903809; x=1740508609;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bxsk+aP1yuHzYXVl3sXI7H0ov0ocRTVL7YpllS9OAsM=;
+        b=GLg5bHnXLjIDdtnWzg4MBZD8dnXu4nn40xE/X1WT+DuUq4YmfZy+mCgJu4iKn7ubYc
+         sf9WCa0igvpPWndkDjyxzgAvsQzoKZvYbZn0blj3atZFtA4js3aK53DKLODSlFvwIfXQ
+         1wgIl+A04Zy4VasBQLGc8aX/l7sUy8A8PrWhmul342wXr2IlZKETdPgC+AkHb89fAxYI
+         9afw3ViguOTXtSaj7bu1En+yse/2cmEBzjXase5qSlSCcAKOn5oUuiGFatCBB7vXwLFr
+         egIqb7qKQAl6eoL2C16Ugc1/SXv75ie7OOY1T0ctjeXuvkYqOFsQUu47hPeH0nWAxNBG
+         1Seg==
+X-Gm-Message-State: AOJu0YxPZgf/c9oloe7DRNGK/of9JiQB4BKtBtwOiFkZhF88fzyhT4Eu
+	IYcl/boMP6L/pk785d4JN3QfKt2++onUYGIg3Vr56p/l4MbSj26uREy5jg==
+X-Gm-Gg: ASbGncu0Uxnz0NXqjSgs9eBtCFe2e4grdQYycTw5+EhOfuZ5pR/tkMFyORufctRzIlF
+	or0YntLGXkxniUK7wX0We2N4BrV2ICHbK5T1S2KKM8V3w06OjUxgxrYyBYbaXkmBbOZaUAiTX+H
+	y82oaHP39TfNldnh/67UzlySNqBRyCZCWqsn+NRSi8Y0O+x2A4TEWNRzfd77Gmb1lN/C9+VJiUE
+	IGbXBItLvuHVD2EuK6TPj980mYaYBWnm1oHfekbvYi597l+9JuZxnUw2l08MrgiLmusm796IltR
+	06gI2NYDxLR6uwERSeqx
+X-Google-Smtp-Source: AGHT+IEX306uqHBXkUJchf/wYByqBbgY4TDAnwZOSrdGLOMW3SrV6zDJRddJG1WWvOzykvhJii3AIQ==
+X-Received: by 2002:a05:6214:240d:b0:6e6:6c39:cb71 with SMTP id 6a1803df08f44-6e6975a4497mr10018746d6.45.1739903809021;
+        Tue, 18 Feb 2025 10:36:49 -0800 (PST)
+Received: from [172.17.0.2] ([20.57.71.180])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0b16072b7sm62915785a.98.2025.02.18.10.36.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 10:36:48 -0800 (PST)
+Message-ID: <67b4d340.050a0220.2e3cf1.4603@mx.google.com>
+Date: Tue, 18 Feb 2025 10:36:48 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8221226562866415993=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250218122620.762523-1-kiran.k@intel.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+In-Reply-To: <20250218175123.1479657-1-luiz.dentz@gmail.com>
+References: <20250218175123.1479657-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+--===============8221226562866415993==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build warnings:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on bluetooth/master linus/master v6.14-rc3 next-20250218]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kiran-K/Bluetooth-btintel_pcie-Read-hardware-exception-data/20250218-202903
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20250218122620.762523-1-kiran.k%40intel.com
-patch subject: [PATCH v1 1/4] Bluetooth: btintel_pcie: Setup buffers for firmware traces
-config: sparc-randconfig-002-20250218 (https://download.01.org/0day-ci/archive/20250219/202502190143.0LmI162j-lkp@intel.com/config)
-compiler: sparc-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250219/202502190143.0LmI162j-lkp@intel.com/reproduce)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=935197
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502190143.0LmI162j-lkp@intel.com/
+---Test result---
 
-All warnings (new ones prefixed by >>):
+Test Summary:
+CheckPatch                    PENDING   0.34 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      24.30 seconds
+CheckAllWarning               PASS      26.56 seconds
+CheckSparse                   PASS      30.54 seconds
+BuildKernel32                 PASS      24.03 seconds
+TestRunnerSetup               PASS      429.73 seconds
+TestRunner_l2cap-tester       FAIL      21.09 seconds
+TestRunner_iso-tester         PASS      33.18 seconds
+TestRunner_bnep-tester        PASS      4.83 seconds
+TestRunner_mgmt-tester        PASS      120.41 seconds
+TestRunner_rfcomm-tester      PASS      7.92 seconds
+TestRunner_sco-tester         PASS      9.64 seconds
+TestRunner_ioctl-tester       PASS      8.31 seconds
+TestRunner_mesh-tester        FAIL      6.22 seconds
+TestRunner_smp-tester         PASS      7.21 seconds
+TestRunner_userchan-tester    PASS      5.02 seconds
+IncrementalBuild              PENDING   0.58 seconds
 
-   drivers/bluetooth/btintel_pcie.c: In function 'btintel_pcie_setup_dbgc':
->> drivers/bluetooth/btintel_pcie.c:134:72: warning: right shift count >= width of type [-Wshift-count-overflow]
-     134 |                 db_frag.bufs[i].buf_addr_msb = (u32)((buf->data_p_addr >> 32) & 0xffffffff);
-         |                                                                        ^~
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+Total: 61, Passed: 58 (95.1%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+L2CAP LE EATT Server - Success                       Failed       0.137 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 2                               Failed       0.108 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-vim +134 drivers/bluetooth/btintel_pcie.c
 
-    90	
-    91	/* This function initializes the memory for DBGC buffers and formats the
-    92	 * DBGC fragment which consists header info and DBGC buffer's LSB, MSB and
-    93	 * size as the payload
-    94	 */
-    95	static int btintel_pcie_setup_dbgc(struct btintel_pcie_data *data)
-    96	{
-    97		struct btintel_pcie_dbgc_ctxt db_frag;
-    98		struct data_buf *buf;
-    99		int i;
-   100	
-   101		data->dbgc.count = BTINTEL_PCIE_DBGC_BUFFER_COUNT;
-   102		data->dbgc.bufs = devm_kcalloc(&data->pdev->dev, data->dbgc.count,
-   103					       sizeof(*buf), GFP_KERNEL);
-   104		if (!data->dbgc.bufs)
-   105			return -ENOMEM;
-   106	
-   107		data->dbgc.buf_v_addr = dmam_alloc_coherent(&data->pdev->dev,
-   108							    data->dbgc.count *
-   109							    BTINTEL_PCIE_DBGC_BUFFER_SIZE,
-   110							    &data->dbgc.buf_p_addr,
-   111							    GFP_KERNEL | __GFP_NOWARN);
-   112		if (!data->dbgc.buf_v_addr)
-   113			return -ENOMEM;
-   114	
-   115		data->dbgc.frag_v_addr = dmam_alloc_coherent(&data->pdev->dev,
-   116							     sizeof(struct btintel_pcie_dbgc_ctxt),
-   117							     &data->dbgc.frag_p_addr,
-   118							     GFP_KERNEL | __GFP_NOWARN);
-   119		if (!data->dbgc.frag_v_addr)
-   120			return -ENOMEM;
-   121	
-   122		data->dbgc.frag_size = sizeof(struct btintel_pcie_dbgc_ctxt);
-   123	
-   124		db_frag.magic_num = BTINTEL_PCIE_MAGIC_NUM;
-   125		db_frag.ver = BTINTEL_PCIE_DBGC_FRAG_VERSION;
-   126		db_frag.total_size = BTINTEL_PCIE_DBGC_FRAG_PAYLOAD_SIZE;
-   127		db_frag.num_buf = BTINTEL_PCIE_DBGC_FRAG_BUFFER_COUNT;
-   128	
-   129		for (i = 0; i < data->dbgc.count; i++) {
-   130			buf = &data->dbgc.bufs[i];
-   131			buf->data_p_addr = data->dbgc.buf_p_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
-   132			buf->data = data->dbgc.buf_v_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
-   133			db_frag.bufs[i].buf_addr_lsb = (u32)(buf->data_p_addr & 0xffffffff);
- > 134			db_frag.bufs[i].buf_addr_msb = (u32)((buf->data_p_addr >> 32) & 0xffffffff);
-   135			db_frag.bufs[i].buf_size = BTINTEL_PCIE_DBGC_BUFFER_SIZE;
-   136		}
-   137	
-   138		memcpy(data->dbgc.frag_v_addr, &db_frag, sizeof(db_frag));
-   139		return 0;
-   140	}
-   141	
+---
+Regards,
+Linux Bluetooth
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+--===============8221226562866415993==--
