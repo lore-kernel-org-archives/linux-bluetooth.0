@@ -1,266 +1,256 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD022417FA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 12:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741B02417E3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 12:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739881518; cv=none; b=C5xcc3UqArg2CFtSEPkttp5BV0bRFQqC+mDfDgSbjv7B0RJPqfFxtnAGAx5hZB3HhxwuX7Vd40G6zyjXDqCIM7HiYT/QPfH3j+t89LPnfwamHm+yB1JLV8Q6+BVojgHd8/1aUlAkv0TyUUk7h6yGc4GUrou9t7CD0YSOLrbr8Rw=
+	t=1739881597; cv=none; b=gm908knx7lBHNhe9wpI3OnixxLq1RjTJpa4IrPrO4vfVWsLUbujKmWM+3YmhQwfXtu49TV3DIzdHzVyMNraya50D4T2gWAYPJHdiYaZ/jP9EhyoqeEAliqr9vMS+7rMUvbJU8vhCdkIaNKwp7M9HLfCl6c5cOioL7MNQ+sfxwWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739881518; c=relaxed/simple;
-	bh=5d/yfDMx+vbAdrc9Pxu6YpWSrcaSDQaBtCbMVdYGCTA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZvVTu9N5AuqEumtcn4QFJCFDIrVj/ZYaK0YvgrdDfYBEdVNA8m7o9aflfi4b2Eof3WZ250cbSd99d02ES9XvY1BjruboXWP+44ldCG1lIganARIQ7bORFZzNwUTlvs8Ix1RboSlHOY9fK4+RSPlggBNrqZDxvcAweZGQorCHFw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lXdsh8/h; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1739881597; c=relaxed/simple;
+	bh=h2zw9gju9/+dJu9qG6aTSIfsRL/Bd4PVcQjKcw11nMg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fdrxjyG9xtDC/BRjQV5FvqGHeKqODItthK5y8SqdZa2N4PjF0duAavEfihtY5ffwKNUeCdufVJpe37dd9cSUrNiKVA1wwb6Z1/dfqlqtk94LkuF+BiQgOcHORbGrIKBWGFl7drH3tkMp0Fv3GefkMRTZdpFjcJnHZpnjjqEgjXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BtcUw2TQ; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lXdsh8/h"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e46ebe19489so3495671276.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2025 04:25:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739881515; x=1740486315; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=89QAT0ZhfsEc4yXc1OMv7rDWxt18UAYuhIx/I7+65G4=;
-        b=lXdsh8/haC1odNmMO2Ia/IlA3ESjSR+1gA2K7jAo/9XNRCRJO5e7aL3DvxKksE4Bsr
-         XeDptL+ITTZg/yc1/NYXlGHT970xyM8eSRNzSWB5tnKqcVSeR6njTPOitTdPotmJMP9e
-         PQu2OY/0NlArG/tlY9fg1NsYVHTIRth3FMBvYt/bXU+FUBSHJj4VqSIHBuucUyWSr8Gj
-         lc9C/BnYva7VrTV77bHq8zJG6qQSyMfFByptTdYKqKWa14quGvz9NOiLvqDTu5jKO+yP
-         eLc7UFkdZuOUcIkj6TLciX83Z7Z6qJ9GmC2q3B0BHQjfAIFmWXdIu0LEeNjUrMh7v4gE
-         y6HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739881515; x=1740486315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=89QAT0ZhfsEc4yXc1OMv7rDWxt18UAYuhIx/I7+65G4=;
-        b=oobFQVBt2E/8JJqaLC6shLavZ8tcswvo4A90nPabk1mVJHZ922GHI73E0ZopT9rsuv
-         sKkr5+oe6HTDtTDRkDgwey+CxrIihf84KodBIgoL1NHuYQaSlRbABd5rW3yzrkDXOdKc
-         q345rNdK1PwnUUacvyldU2tRYrFhCveULcc087z2oujbWX9YO/eB2crN4hSgZw/yZvQY
-         XoOxgAQyv3pS/GoQBjnViDegovx3Elc7DLccD5jHUdpb5VAW6zQLASt/coey/zlbEv/u
-         9jyZcAZbLWL+REv8BKXASG3sXbj4A0hnux7g1V6KxSoNOvP8lRDG3B2drykU78DK4k07
-         W+Vw==
-X-Gm-Message-State: AOJu0Yw9ZuVv0Vyv/MZOkASxjq067hc+WsQyUkxS5xnoSMGcf6ARBHmX
-	kKHlrZJF0nxydKi1gwCihsNzwLLZxzdJ4sDv/EcsgkjM8eWMkhT2ZyvnePnaFU4+KJjs2llP9nQ
-	kpibDrL8NR31OGvtWigpIeuWC8SkgmJtNc8Nr
-X-Gm-Gg: ASbGnct7Y6NofO9DfxE4hVWbx++5EbkUXSkIgolMYKKTEaSvwyG/tzn3Q/5Wn5sAR/U
-	H3DxD1ycQhZrXF7L4VhtGmbl9JJEeyTywmfkLOOL/4QLREsA7haVPVxNzxGjWZI2a1w+E6/A=
-X-Google-Smtp-Source: AGHT+IGTTTUXyz28p5IfFjpKS7EaFa3iqQsYzhp4ew646h9Vw7naGgFckbLjKSjQKEaJ99JXYQSsdA1dcvpnP+uh+SM=
-X-Received: by 2002:a05:6902:1283:b0:e38:c0ed:8128 with SMTP id
- 3f1490d57ef6-e5dc900e95bmr10444153276.3.1739881515290; Tue, 18 Feb 2025
- 04:25:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BtcUw2TQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739881596; x=1771417596;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=h2zw9gju9/+dJu9qG6aTSIfsRL/Bd4PVcQjKcw11nMg=;
+  b=BtcUw2TQChH5LByAGwf8Cxr+x7wWtFH1AkJE7c3yTVE3uxU4gUoCPNgr
+   ja0lf2+WW13BHtJZw9gU533NdCWNjaTmI5Aw4AG1xdqQqmnADBWOaQDdb
+   EHJXWqoIutuwaS5jQgrDGcc+NsEvaWsJ6WlxRlAG6HG7ATi42F0JwI9Yv
+   fEdwmMtJ5ZBdnGqQG2FDO1JWPnTELQxBhFDCcMEoeTAyWzB8iPzPbDTB4
+   65kfhhIYFkGVjvMEmhKjRUSrYiqSNxtYWoTokvgvixRn3aPHm9UC7Efd5
+   JqjD1EEvFDwKrs+oIFSJ4p4BJyL4FGcbxfsIDywDuQGrKqF0EFvhGEv0e
+   w==;
+X-CSE-ConnectionGUID: UEqFEywVQYeVsE3l0YD2Dw==
+X-CSE-MsgGUID: D/FMQuPrSxm9WtnBkEvbMg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="63049851"
+X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
+   d="scan'208";a="63049851"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 04:26:35 -0800
+X-CSE-ConnectionGUID: 67yxHYpMQFuMlABsUcDkpw==
+X-CSE-MsgGUID: dd0uDdtKS52I4ZOwd1YxAA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="151574684"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa001.jf.intel.com with ESMTP; 18 Feb 2025 04:26:33 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1 1/4] Bluetooth: btintel_pcie: Setup buffers for firmware traces
+Date: Tue, 18 Feb 2025 17:56:17 +0530
+Message-ID: <20250218122620.762523-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214191615.v5.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <2025021425-surgical-wackiness-0940@gregkh> <CADg1FFd3H0DLV-WX8jTB1VGyOZYEzchP99QvYxWmg1XCOo1ttg@mail.gmail.com>
- <2025021717-prepay-sharpener-37fb@gregkh> <CADg1FFf7fONc+HJT8rq55rVFRnS_UxnEPnAGQ476WVe+208_pA@mail.gmail.com>
- <2025021829-clamor-lavish-9126@gregkh> <CADg1FFd=PbnNSBWk4KGV85jvvRQBBGG4QD2VHM6ABY-mqC8+Lg@mail.gmail.com>
- <2025021807-ultimate-ascent-f5e0@gregkh> <CADg1FFdLA8LCafbQA=x5onSj6FKS=0ihpYPpSjQmDpGG2iOb5A@mail.gmail.com>
- <2025021812-expedited-fanning-d5d0@gregkh>
-In-Reply-To: <2025021812-expedited-fanning-d5d0@gregkh>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Tue, 18 Feb 2025 20:24:48 +0800
-X-Gm-Features: AWEUYZnWnBW8G7TexUswPhHo_H7wI3bUymhYmNj3r2t0V9rNgx_L5eAPQ8uKEK8
-Message-ID: <CADg1FFdXNEDN7hXX2bw91YKbJzpk4ZiLP+ut9QBRkuK=vDmDJw@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Greg,
+This patch allocates the host memory which is used by controller to dump
+the firmware traces. The memory needs to be shared with controller via
+context information.
 
-On Tue, Feb 18, 2025 at 6:56=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
->
-> On Tue, Feb 18, 2025 at 06:01:42PM +0800, Hsin-chen Chuang wrote:
-> > Hi Greg,
-> >
-> > On Tue, Feb 18, 2025 at 5:21=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Tue, Feb 18, 2025 at 04:57:38PM +0800, Hsin-chen Chuang wrote:
-> > > > Hi Greg,
-> > > >
-> > > > On Tue, Feb 18, 2025 at 4:23=E2=80=AFPM Greg KH <gregkh@linuxfounda=
-tion.org> wrote:
-> > > > >
-> > > > > On Tue, Feb 18, 2025 at 12:24:07PM +0800, Hsin-chen Chuang wrote:
-> > > > > > Hi Greg,
-> > > > > >
-> > > > > > On Mon, Feb 17, 2025 at 4:53=E2=80=AFPM Greg KH <gregkh@linuxfo=
-undation.org> wrote:
-> > > > > > >
-> > > > > > > On Mon, Feb 17, 2025 at 04:44:35PM +0800, Hsin-chen Chuang wr=
-ote:
-> > > > > > > > On Fri, Feb 14, 2025 at 7:37=E2=80=AFPM Greg KH <gregkh@lin=
-uxfoundation.org> wrote:
-> > > > > > > > >
-> > > > > > > > > On Fri, Feb 14, 2025 at 07:16:17PM +0800, Hsin-chen Chuan=
-g wrote:
-> > > > > > > > > > From: Hsin-chen Chuang <chharry@chromium.org>
-> > > > > > > > > >
-> > > > > > > > > > Expose the isoc_alt attr with device group to avoid the=
- racing.
-> > > > > > > > > >
-> > > > > > > > > > Now we create a dev node for btusb. The isoc_alt attr b=
-elongs to it and
-> > > > > > > > > > it also becomes the parent device of hci dev.
-> > > > > > > > > >
-> > > > > > > > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attri=
-bute to control USB alt setting")
-> > > > > > > > >
-> > > > > > > > > Wait, step back, why is this commit needed if you can cha=
-nge the alt
-> > > > > > > > > setting already today through usbfs/libusb without needin=
-g to mess with
-> > > > > > > > > the bluetooth stack at all?
-> > > > > > > >
-> > > > > > > > In short: We want to configure the alternate settings witho=
-ut
-> > > > > > > > detaching the btusb driver, while detaching seems necessary=
- for
-> > > > > > > > libusb_set_interface_alt_setting to work (Please correct me=
- if I'm
-> > > > > > > > wrong!)
-> > > > > > >
-> > > > > > > I think changing the alternate setting should work using usbf=
-s as you
-> > > > > > > would send that command to the device, not the interface, so =
-the driver
-> > > > > > > bound to the existing interface would not need to be removed.
-> > > > > >
-> > > > > > I thought USBDEVFS_SETINTERFACE was the right command to begin =
-with,
-> > > > > > but it seems not working in this case.
-> > > > > > The command itself attempts to claim the interface, but the int=
-erface
-> > > > > > is already claimed by btusb so it failed with Device or resourc=
-e busy
-> > > > > >
-> > > > > > drivers/usb/core/devio.c:
-> > > > > >   USBDEVFS_SETINTERFACE -> proc_setintf -> checkintf -> claimin=
-tf
-> > > > >
-> > > > > Ah, ok, thanks for checking.  So as you control this device, why =
-not
-> > > > > just disconnect it, change the setting, and then reconnect it?
-> > > >
-> > > > After dis/reconnecting, a Bluetooth chipset would lose all its stat=
-e:
-> > > > Existing connections/scanners/advertisers are all dropped.
-> > >
-> > > If you are changing the alternate USB configuration, all state should=
- be
-> > > dropped, right?  If not, huh how does the device know to keep that
-> > > state?
-> >
-> > No, the Bluetooth chip doesn't drop any info when the alt is changed.
-> > It only affects the data transfer bandwidth on that interface.
-> >
-> > >
-> > > > This is as bad as (just an analogy) "Whenever you access a http web
-> > > > page, you need to bring your ethernet interface down and up, and af=
-ter
-> > > > the page is downloaded, do that again".
-> > >
-> > > Your ethernet interface does not contain state like this, we handle
-> > > chainging IP addresses and devices all the time, so perhaps wrong
-> > > analogy :)
-> > >
-> > > > > Also, see my other review comment, how does BlueZ do this today?
-> > > >
-> > > > BlueZ handles that in their MGMT command, that is, through Control
-> > > > channel -> BlueZ kernel space code -> driver callbacks.
-> > > > Once a Bluetooth chipset is opened with the User channel, it can't =
-be
-> > > > used with the Control channel simultaneously, and vice versa.
-> > >
-> > > So why not use that same control channel in your code?  Why are you
-> >
-> > Because we're using the User channel, and they can't be used at the sam=
-e time.
->
-> This doesn't make sense.  Either BlueZ has this same problem, or it
-> doesn't.  As you say it does not, then again, why can't you use the
-> exact same user/kernel api to achieve this?
->
-> The user/kernel api is "fixed" right now, if you wish to replace the
-> userspace side of the BlueZ code with your own, then you should/must use
-> that same user/kernel api.  Don't go adding duplicate interfaces please.
+Co-developed-by: Vijay Satija <vijay.satija@intel.com>
+Signed-off-by: Vijay Satija <vijay.satija@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 89 ++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel_pcie.h | 32 ++++++++++++
+ 2 files changed, 121 insertions(+)
 
-I would say the kernel provides 2 sets of the API, Control and User,
-and now the User channel is missing something.
-I think it makes sense to add support for it.
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index b8b241a92bf9..11e2b805c7cc 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -49,6 +49,8 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
+ #define BTINTEL_PCIE_HCI_EVT_PKT	0x00000004
+ #define BTINTEL_PCIE_HCI_ISO_PKT	0x00000005
+ 
++ #define BTINTEL_PCIE_MAGIC_NUM    0xA5A5A5A5
++
+ /* Alive interrupt context */
+ enum {
+ 	BTINTEL_PCIE_ROM,
+@@ -60,6 +62,83 @@ enum {
+ 	BTINTEL_PCIE_D3
+ };
+ 
++/* Structure for dbgc fragment buffer
++ * @buf_addr_lsb: LSB of the buffer's physical address
++ * @buf_addr_msb: MSB of the buffer's physical address
++ * @buf_size: Total size of the buffer
++ */
++struct btintel_pcie_dbgc_ctxt_buf {
++	u32	buf_addr_lsb;
++	u32	buf_addr_msb;
++	u32	buf_size;
++};
++
++/* Structure for dbgc fragment
++ * @magic_num: 0XA5A5A5A5
++ * @ver: For Driver-FW compatibility
++ * @total_size: Total size of the payload debug info
++ * @num_buf: Num of allocated debug bufs
++ * @bufs: All buffer's addresses and sizes
++ */
++struct btintel_pcie_dbgc_ctxt {
++	u32	magic_num;
++	u32     ver;
++	u32     total_size;
++	u32     num_buf;
++	struct btintel_pcie_dbgc_ctxt_buf bufs[BTINTEL_PCIE_DBGC_BUFFER_COUNT];
++};
++
++/* This function initializes the memory for DBGC buffers and formats the
++ * DBGC fragment which consists header info and DBGC buffer's LSB, MSB and
++ * size as the payload
++ */
++static int btintel_pcie_setup_dbgc(struct btintel_pcie_data *data)
++{
++	struct btintel_pcie_dbgc_ctxt db_frag;
++	struct data_buf *buf;
++	int i;
++
++	data->dbgc.count = BTINTEL_PCIE_DBGC_BUFFER_COUNT;
++	data->dbgc.bufs = devm_kcalloc(&data->pdev->dev, data->dbgc.count,
++				       sizeof(*buf), GFP_KERNEL);
++	if (!data->dbgc.bufs)
++		return -ENOMEM;
++
++	data->dbgc.buf_v_addr = dmam_alloc_coherent(&data->pdev->dev,
++						    data->dbgc.count *
++						    BTINTEL_PCIE_DBGC_BUFFER_SIZE,
++						    &data->dbgc.buf_p_addr,
++						    GFP_KERNEL | __GFP_NOWARN);
++	if (!data->dbgc.buf_v_addr)
++		return -ENOMEM;
++
++	data->dbgc.frag_v_addr = dmam_alloc_coherent(&data->pdev->dev,
++						     sizeof(struct btintel_pcie_dbgc_ctxt),
++						     &data->dbgc.frag_p_addr,
++						     GFP_KERNEL | __GFP_NOWARN);
++	if (!data->dbgc.frag_v_addr)
++		return -ENOMEM;
++
++	data->dbgc.frag_size = sizeof(struct btintel_pcie_dbgc_ctxt);
++
++	db_frag.magic_num = BTINTEL_PCIE_MAGIC_NUM;
++	db_frag.ver = BTINTEL_PCIE_DBGC_FRAG_VERSION;
++	db_frag.total_size = BTINTEL_PCIE_DBGC_FRAG_PAYLOAD_SIZE;
++	db_frag.num_buf = BTINTEL_PCIE_DBGC_FRAG_BUFFER_COUNT;
++
++	for (i = 0; i < data->dbgc.count; i++) {
++		buf = &data->dbgc.bufs[i];
++		buf->data_p_addr = data->dbgc.buf_p_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
++		buf->data = data->dbgc.buf_v_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
++		db_frag.bufs[i].buf_addr_lsb = (u32)(buf->data_p_addr & 0xffffffff);
++		db_frag.bufs[i].buf_addr_msb = (u32)((buf->data_p_addr >> 32) & 0xffffffff);
++		db_frag.bufs[i].buf_size = BTINTEL_PCIE_DBGC_BUFFER_SIZE;
++	}
++
++	memcpy(data->dbgc.frag_v_addr, &db_frag, sizeof(db_frag));
++	return 0;
++}
++
+ static inline void ipc_print_ia_ring(struct hci_dev *hdev, struct ia *ia,
+ 				     u16 queue_num)
+ {
+@@ -1008,6 +1087,11 @@ static void btintel_pcie_init_ci(struct btintel_pcie_data *data,
+ 	ci->addr_urbdq1 = data->rxq.urbd1s_p_addr;
+ 	ci->num_urbdq1 = data->rxq.count;
+ 	ci->urbdq_db_vec = BTINTEL_PCIE_RXQ_NUM;
++
++	ci->dbg_output_mode = 0x01;
++	ci->dbgc_addr = data->dbgc.frag_p_addr;
++	ci->dbgc_size = data->dbgc.frag_size;
++	ci->dbg_preset = 0x00;
+ }
+ 
+ static void btintel_pcie_free_txq_bufs(struct btintel_pcie_data *data,
+@@ -1220,6 +1304,11 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
+ 	/* Setup Index Array */
+ 	btintel_pcie_setup_ia(data, p_addr, v_addr, &data->ia);
+ 
++	/* Setup data buffers for dbgc */
++	err = btintel_pcie_setup_dbgc(data);
++	if (err)
++		goto exit_error_txq;
++
+ 	/* Setup Context Information */
+ 	p_addr += sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 4;
+ 	v_addr += sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 4;
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index f9aada0543c4..b9d32393002b 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -48,6 +48,21 @@
+ #define BTINTEL_PCIE_CSR_MSIX_IVAR_BASE		(BTINTEL_PCIE_CSR_MSIX_BASE + 0x0880)
+ #define BTINTEL_PCIE_CSR_MSIX_IVAR(cause)	(BTINTEL_PCIE_CSR_MSIX_IVAR_BASE + (cause))
+ 
++/* The DRAM buffer count, each buffer size, and
++ * fragment buffer size
++ */
++#define BTINTEL_PCIE_DBGC_BUFFER_COUNT		16
++#define BTINTEL_PCIE_DBGC_BUFFER_SIZE		(256 * 1024) /* 256 KB */
++
++#define BTINTEL_PCIE_DBGC_FRAG_VERSION		1
++#define BTINTEL_PCIE_DBGC_FRAG_BUFFER_COUNT	BTINTEL_PCIE_DBGC_BUFFER_COUNT
++
++/* Magic number(4), version(4), size of payload length(4) */
++#define BTINTEL_PCIE_DBGC_FRAG_HEADER_SIZE	12
++
++/* Num of alloc Dbg buff (4) + (LSB(4), MSB(4), Size(4)) for each buffer */
++#define BTINTEL_PCIE_DBGC_FRAG_PAYLOAD_SIZE	196
++
+ /* Causes for the FH register interrupts */
+ enum msix_fh_int_causes {
+ 	BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0	= BIT(0),	/* cause 0 */
+@@ -325,6 +340,22 @@ struct rxq {
+ 	struct data_buf	*bufs;
+ };
+ 
++/* Structure for DRAM Buffer
++ * @count: Number of descriptors
++ * @buf: Array of data_buf structure
++ */
++struct btintel_pcie_dbgc {
++	u16		count;
++
++	void		*frag_v_addr;
++	dma_addr_t	frag_p_addr;
++	u16		frag_size;
++
++	dma_addr_t	buf_p_addr;
++	void		*buf_v_addr;
++	struct data_buf *bufs;
++};
++
+ /* struct btintel_pcie_data
+  * @pdev: pci device
+  * @hdev: hdev device
+@@ -405,6 +436,7 @@ struct btintel_pcie_data {
+ 	struct txq	txq;
+ 	struct rxq	rxq;
+ 	u32	alive_intr_ctxt;
++	struct btintel_pcie_dbgc	dbgc;
+ };
+ 
+ static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
+-- 
+2.43.0
 
->
-> > > reinventing a new control channel for something that is obviously the=
-re
-> > > already?
-> >
-> > Not quite the same as "reinventing". The Control channel command does
-> > much more than just setting the alt; It just doesn't work with the
-> > User channel.
-> >
-> > >
-> > > So in short, what's preventing you from using the same exact driver
-> > > callbacks, OR the same exact kernel api.  Surely you all are not
-> >
-> > The answer is the same as the above. This feature is missing in the
-> > User channel, and I'm completing it with this patch.
->
-> Again, that seems to be your userspace's issue, not the kernel's.  Just
-> use the same api that bluez uses here.
->
-> > > replacing all of the in-kernel BlueZ code with an external kernel dri=
-ver
-> > > just for this, right?  If so, that's not ok at all.
-> >
-> > Sorry I don't quite get it. What do you mean by the external kernel dri=
-ver?
->
-> You said you are not using the bluez kernel code, right?  So you must
-> have some kernel code to implement this instead for the same
-> functionality.  Otherwise you are using the bluez kernel api here.
-
-No, we don't have kernel code for Bluetooth. We have everything in user spa=
-ce.
-
->
-> Again, just use the same api please, don't go adding new one-off apis
-> through sysfs for this when it is not needed.
->
-> I'll also step back further and say, why not use bluez?  What is so
-> wrong with that that you all need a totally different bluetooth stack?
-> Why not just fix the bluez code for anything that is currently missing
-> or lacking there that required you to write a new one.
-
-I think the main purpose is moving the stack to the user space.
-When the user hits a Bluetooth issue, it's much easier to reset the stack.
-Also, a simple Bluetooth bug just won't crash your kernel and we could
-even crash MORE to detect an incorrect chipset behavior earlier.
-Of course BlueZ has its own advantages, but it's just all trade-offs.
-
->
-> And yes, I know the inclination of Android to constantly rewrite the
-> bluetooth stack, it's on the what, third or fourth iteration already?
-> What's to guarantee that this really will be the last one?  :)
-
-That's incorrect. Android is still using and maintaining the same
-stack since it left BlueZ.
-
---=20
-Best Regards,
-Hsin-chen
