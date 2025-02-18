@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC452147F1;
-	Tue, 18 Feb 2025 20:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1B0225408;
+	Tue, 18 Feb 2025 20:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739910440; cv=none; b=RlwvoUa46gT/gWBAQ7LYYsl50Uqr4v2ZxHYbfkIoC1Qh/xDe3HJ+m9srqoU+sXURClMwybs/M+o49NWB5OM6WSeITuD1v5pP09Xai6UvkNV2VIiu4BYX3Lsf9sBVfwkG5BBgTtkR7NVt7oNIgbVmL98ulYAp3PD05R5lAcD96N8=
+	t=1739910497; cv=none; b=Io0xLb471860xiGopjGmGX4/l9no9wJ4+UMMY3oNH+sFSofO6l0mWaSbDvPGH4FKNXzZF2wlN2CYlGYQalXy2/MH9XaKSEnR8rwZhobUhOujn9XXbZHoGdc9l82FLO9poR/RjsV+F4rvazUIhqQTJBireMoeXdjxrisQOoXVQ7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739910440; c=relaxed/simple;
-	bh=zRUBiYXGpqbJ1HH9DnnQt7QotjP2yWA2rmtGnYu6hk0=;
+	s=arc-20240116; t=1739910497; c=relaxed/simple;
+	bh=V3thYUMbdBq2xVcl31FIhpOKAgrUZSmC+0iKY1uES3A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LK2iPfFRRO3PbcAnefxgH9K9arccpT88KDnoD5BD3pENb34pmkXdGQT0wzV1Jni2RliYuU3aoZrieyPejs576QESoDgRdgAbz5eTR20NdVWFvYkycYgtewmujrikkJu04niP8IsRzikVmo3D9nfuQDos+addDyU+I5GHQgwLdX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZ1Bv2i4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NaRQVy1ZJLwdzAB78ZuSDCwKEB2HuwT8UdBEq6yOmchicEJcN1dUtazpgIdRLPbDcagoqCjTqjQkuSrae7HWejSdCjXmQEHQfkZ6Mao4bWv+T40fFfyv7jE8sYxzsqF2tNa/lisbPrtAL9OmB4Y4wlRTI/jav7L9Ka4/AGExwEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uCMjTpRL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZ1Bv2i4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C22C4CEE8;
-	Tue, 18 Feb 2025 20:27:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCMjTpRL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60ECBC4CEE8;
+	Tue, 18 Feb 2025 20:28:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739910440;
-	bh=zRUBiYXGpqbJ1HH9DnnQt7QotjP2yWA2rmtGnYu6hk0=;
+	s=k20201202; t=1739910497;
+	bh=V3thYUMbdBq2xVcl31FIhpOKAgrUZSmC+0iKY1uES3A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sZ1Bv2i4nt002V+zRTJ0pePY5VJYbPEC7WGACpXcyH5jSTcbL7YxkDxxDscPGwTM6
-	 PegsMkNngs6d4bQJrrkWzupASRGxNPgr26ZYVCXMH/aaWL+I/t7u879ZXFMhKL/Co4
-	 WDPxb7H0cBKw31UQ50uEkDd87aVhKqI629G/2h29qAq/YCgtSXaJ5cA7KnMijKcUD4
-	 9quPnYKr3q6eRqYGtqcMLhkMiIo2GDxVzb2ciQDZRA81YmN8r8M/c8BuuVyaLtPjAD
-	 UcYTyno3B2eW0IcZspHjGeuQdFpUxlPWRu6btdoUCJ5Vo8rOvnpfsv365fS38oFO6g
-	 q9TnRSGajrrDA==
+	b=uCMjTpRL+wBzdkX6Sbr7tM7c75Xu/sIQmvze4/IFvhKXy84v5q3ZR9mbm7xQ32s8I
+	 6XHQBeOlqqVnA+lgyS5jyPdb9Yj7dFxPWlwFCTfeM+BDZLFkwCwSmjHLoXm+OtBZeG
+	 fJouWEChvCaJmoNchMzbhEKtr8v0CkJWIEN4rBHdDLVAqKYvzG7SXXRVhIYcI62cpB
+	 SRgM4rfNW2V5T+QLSQyiJ1lDW5Bh03lhkeIPAQEthtyw4Qpqf3Zf2bcyInLJE14VET
+	 hHNpgNJQzcjz5QAw7AnU7zBjJrDUSnjlw9RLXTscAFG1dmKgc50u1TSMuLalRHxQOl
+	 OIU4Tkvc5+/1A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -37,12 +37,12 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 28/31] Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
-Date: Tue, 18 Feb 2025 15:26:14 -0500
-Message-Id: <20250218202619.3592630-28-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 17/17] Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
+Date: Tue, 18 Feb 2025 15:27:41 -0500
+Message-Id: <20250218202743.3593296-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250218202619.3592630-1-sashal@kernel.org>
-References: <20250218202619.3592630-1-sashal@kernel.org>
+In-Reply-To: <20250218202743.3593296-1-sashal@kernel.org>
+References: <20250218202743.3593296-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.15
+X-stable-base: Linux 6.6.78
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
@@ -147,7 +147,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 34 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 27b4c4a2ba1fd..adb8c33ac5953 100644
+index acb148759bd04..8680c8fc168ec 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
 @@ -948,6 +948,16 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
@@ -198,7 +198,7 @@ index 27b4c4a2ba1fd..adb8c33ac5953 100644
  	hci_conn_put(conn->hcon);
  	kfree(conn);
  }
-@@ -7466,14 +7474,33 @@ static void l2cap_recv_reset(struct l2cap_conn *conn)
+@@ -7472,14 +7480,33 @@ static void l2cap_recv_reset(struct l2cap_conn *conn)
  	conn->rx_len = 0;
  }
  
@@ -233,7 +233,7 @@ index 27b4c4a2ba1fd..adb8c33ac5953 100644
  	if (!conn)
  		goto drop;
  
-@@ -7565,6 +7592,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+@@ -7571,6 +7598,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  		break;
  	}
  
