@@ -1,307 +1,146 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631C023DEB6;
-	Wed, 19 Feb 2025 21:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740002099; cv=pass; b=EW/8i3QX0AYfxXKmps5dQ6pDebklgV5u95cO0PnyWBtke+YzfAFK1HDmtftr57tnkqnjQUK9zaSO6in2IcHwchhol2m2iXAWZR6B8lbS7M8TzSte1EpXBgiIwn88Fh3IXUVowvV+BRWGfsvxv9824VIskYoaaLt5o5Khpg0GS0w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740002099; c=relaxed/simple;
-	bh=3smt+KX0feUWzWD5u7BX0QOcielt0U4BKUcnhRCMcLY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GJNyNbxNuTxarmqc4UJ/Zt5rk1nMpHGHMfMCgaXEKhuL+nos8Zr/yTsGUu/IJU4EXbQzZWrAn8olGzg5fpBuXhUQ6PlKlbC9cC9fsP5srf6LvCUZfmi3OW60q5D5hVqzJA5b1HC7ZclPh1PtXDOUj6ViXD6GXnBchwgvNvf9zck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=g8tBG6+n; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3359117CA12
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2025 22:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740004280; cv=none; b=Q87sb/GYuND2yAZNdOwLvpy4pc/1jMIlX0Ts39Y+NlXT2O9ZoXhTZR7jZdgsvaYVAHU1wZhliG2BNhUrHyenSgtTxpN5itjtH5/ZtBSGQdITIJqfL+iNd7HHEnjTfLHOPr7nhptgzyNpI5GOmRAtpJVJ+fcUWwTNrLpmEXs53AE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740004280; c=relaxed/simple;
+	bh=LO6J8HDfqofuHo+61krMex4/H/OLnhcJ/aAVMQsyyNU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=XAjSO5S3gYLj9SfYm92n7AlNxp7WCUfCo9h5tuSYMBvD9TarHCb5ykvNanM27KfWSxW0WN7F2zB5a7vEHEhLlofMxo96Z9b7i3ZwYV8j86JlJXEbdBKYfgZ/j2n6s6FyGYUXclMpPfRWGMtWPRhNYiya+y9qOHCZBaa6CV2pRnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m2GJ63AC; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="g8tBG6+n"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YyqtX0gwHz49PvR;
-	Wed, 19 Feb 2025 23:54:43 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1740002086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mG6x2AWDkrkQOGEGxoDcHtbU8g613LdS4e6+qEBm2fA=;
-	b=g8tBG6+nviP7GzomdDc832mVTsw+GCgFZaitwduKPBMy56GcVBf6PA4gUCUItP8eWWDUl/
-	QSqdgDLnELQFV4gV+8f2jedm62YV+Fq7ZTlp49QS+9wRugAqYrTkZDm5sBxPtwLuf2dBB/
-	OSY041vNXvFNRdhgSju16/S1Zh8fFMLg+wFrnxNaVju6jlolHozCDgJksq8aTC6QAgOML1
-	LXgPUy9b81iqgFUbNZ2WMb+RLaLQ0KRN5MIZ44UlFbzcNMs/fHe4/GfAi4OXrcLD8HfQ2O
-	xQRjAVG1bZIvqVjv3uJWM8b5rrgf7AGc4mbMC/tFCrUXMtrJhYmJD5tnc1Idsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1740002086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mG6x2AWDkrkQOGEGxoDcHtbU8g613LdS4e6+qEBm2fA=;
-	b=RFyVeQO+A2ZNoCQFYTvo7yH4xj0vPrvc6WFVq1WX+81A+d2hY4TqsgJ7L//Pa/XgAvmd6Y
-	9RmLNpyrGhbRux54D3WM6k2d7HVY2tTINB03IhXpfnaJUQfgFX/QQg7HzDAd0FGnzFCL3f
-	B3AZuDpfEwhZDfM2jyeXa9EcXIVV9arEhSNqYir7fv6iusMjZbfUdwbS/lDBjByDs29lGI
-	qqceL/Zav6A/wzLtq5e3lBx0pzH2Ycr0MAdg3Pz1uLuwzOQMLUG2v4y6L50ts5gII9fEk9
-	mppL1EO7YlrjDufFpRZtvjTEw0tVBmoA/Hildw49HSC2ExUKrxy+LG9ti1Agyw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1740002086; a=rsa-sha256;
-	cv=none;
-	b=LSSgndqzsJfCFr+bWH2fs5pQxRyhEg6DEK/gqBxc8c4zu8D+Ix1NLWKnsOGFFbP/hWqDqj
-	/TTRNy665+Uj0iNjt3yVW9QDGjb3TYjso2ebZKPle1m9n1yzOP5QAqEKNPiTtAb42c0mmy
-	aAz7UJm0TmOYdjtj+PODGYnOK6WQoIF56ZBPSsU+cakHfR2PLsauUoNTRwtBnNKC2l0ANs
-	r+AL7Oo1NrnMDBPR++2Yted2PxHBhNWNRCW5aYzIZesmW+wiiI1AyXsroVV6ih7LeAEZtg
-	9CFBdn0o6KL5AskpuguKAUJ2DgxQmSnsoapW7vlGec4yLdraGh6iU43OkN16pw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <5a916cd4906749eb715561bfe92ae91b3e052028.camel@iki.fi>
-Subject: Re: [PATCH v4 0/5] net: Bluetooth: add TX timestamping for
- ISO/L2CAP/SCO
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, willemdebruijn.kernel@gmail.com
-Date: Wed, 19 Feb 2025 23:54:42 +0200
-In-Reply-To: <CABBYNZ+j=TYq27g-Ym7NnCm_Mhd=f8JZ=gT-Veq75BdHqzvUEw@mail.gmail.com>
-References: <cover.1739988644.git.pav@iki.fi>
-	 <CABBYNZ+j=TYq27g-Ym7NnCm_Mhd=f8JZ=gT-Veq75BdHqzvUEw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m2GJ63AC"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c0a5aa0f84so33055985a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2025 14:31:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740004278; x=1740609078; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Red0/sr9tekjSjaH5e7cQ2ojh/D5dB3Smj4/CMiuoiA=;
+        b=m2GJ63ACv2eN8kyBNdlA6KSbVS84T/c+ojD1EozFQvcrIATnihBtV70khMgI0uQ8w1
+         FpdnfFhNGcKddMR0PWoTXfKxZb4b1eE7UrdQGKGyoa8XxeufX23qA++Nc1spnoembWzE
+         pDrU61Gd8KrB9Z0GrnTpSSFQ6wv6xbnPwEqG85iakKn1MEdfUZKaExSCY4w9+B5QWvow
+         CW0Ib2qCc4MqQD59f0+xJQfHV0tSNLq9+92LPL33YTfhjYoETb8JhMTLmFqm2PjIl0u+
+         CkpGyyU1C/u7Ho60SCvyP42p263bUYYYQK/r9RZ7ljkhqxs4FW3r0GuVal20poSOmVYH
+         +Yew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740004278; x=1740609078;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Red0/sr9tekjSjaH5e7cQ2ojh/D5dB3Smj4/CMiuoiA=;
+        b=ZwH3N0077SG/N8ALkv9WoSci5xYnKoLhD1sVcv0BdFByMr+8LpG8pY837Yn5U375pd
+         swhbFUnSELhbwaYn3RZ62bD3cUuBICNj76FAQKcgEEzTm8e4p7Pd4RYjHbiEMuMs/nZC
+         xS1c1oPtacpmotNPFahVsQVTkRnAN8cK8czj1mkJvdaAqjQhQ8mgJMidDDTraaCmY467
+         nScDOoE15GqqbjbVfjIue3QL3Hf7mAGRlg+wYci3amnu9MAtjCY8Ih1nfinB5xBjPaGY
+         siltChv9/EFAiAP8QBnC+HVz1pGgsN577yQbqCR6LUZsS7Cvyk2WncLMs+priL5As9gN
+         oYUQ==
+X-Gm-Message-State: AOJu0YzqsiwT1+AXmurAgOk+qubRmuwT4gpUCumNZtAdOIFdnWAfdDdF
+	pdekcAAiroLO4W1ylN2oE1dssi37TX+//UsYUBicfFvMkT1DZLezWt4LtA==
+X-Gm-Gg: ASbGncsxrL/pWPfBjvO5F5mcwTquW2pOE50YzrQOnORWYyYDOCzXP0TXbhgZQA+Jtj0
+	TvSIVsyNIpyDYWye1GNmmfAh3KT56vgG6eB7IilU/CTfN5amhlyT9LGXTQ+g35VCl+fkHezSihg
+	HLqn2ZfCMwVxPXPJqZiY595gQ8Og9V3/C6p5MjGuwnceVxv8tWGpNJARlBNeCbaAtzSYM4Xfkdv
+	uufTNe+81tAZZSubWUHu0geHzMy8E/KdEeCCoqsKPCXMiiqpGYn1kHdPMXrMyumzHjt/vY9nDqO
+	qKq63KGGYkz8VJzXYK4=
+X-Google-Smtp-Source: AGHT+IHL5HvMtFeaSpqjCGC1diDXXPzV4Qfnhx40TbanA+24djc6HwRPeCjffwLWQgPywuQMsysI5w==
+X-Received: by 2002:a05:620a:4687:b0:7c0:729c:6487 with SMTP id af79cd13be357-7c0c226a31emr130548985a.23.1740004277808;
+        Wed, 19 Feb 2025 14:31:17 -0800 (PST)
+Received: from [172.17.0.2] ([20.42.14.30])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0a45585f3sm344338185a.93.2025.02.19.14.31.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Feb 2025 14:31:17 -0800 (PST)
+Message-ID: <67b65bb5.050a0220.17f488.1bfb@mx.google.com>
+Date: Wed, 19 Feb 2025 14:31:17 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2363593945434253921=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, nishiyama.pedro@gmail.com
+Subject: RE: bluetooth: btusb: Fix regression in the initialization of fake Bluetooth controllers
+In-Reply-To: <20250219215352.15605-1-nishiyama.pedro@gmail.com>
+References: <20250219215352.15605-1-nishiyama.pedro@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============2363593945434253921==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-ke, 2025-02-19 kello 14:55 -0500, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
->=20
-> On Wed, Feb 19, 2025 at 1:13=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote=
-:
-> >=20
-> > Add support for TX timestamping in Bluetooth ISO/L2CAP/SCO sockets.
-> >=20
-> > Add new COMPLETION timestamp type, to report a software timestamp when
-> > the hardware reports a packet completed. (Cc netdev for this)
-> >=20
-> > Previous discussions:
-> > https://lore.kernel.org/linux-bluetooth/cover.1739097311.git.pav@iki.fi=
-/
-> > https://lore.kernel.org/all/6642c7f3427b5_20539c2949a@willemb.c.googler=
-s.com.notmuch/
-> > https://lore.kernel.org/all/cover.1710440392.git.pav@iki.fi/
-> >=20
-> > Changes
-> > =3D=3D=3D=3D=3D=3D=3D
-> > v4:
-> > - Change meaning of SOF_TIMESTAMPING_TX_COMPLETION, to save a bit in
-> >   skb_shared_info.tx_flags:
-> >=20
-> >   It now enables COMPLETION only for packets that also have software SN=
-D
-> >   enabled.  The flag can now be enabled only via a socket option, but
-> >   coupling with SND allows user to still choose for which packets
-> >   SND+COMPLETION should be generated.  This choice maybe is OK for
-> >   applications which can skip SND if they're not interested.
-> >=20
-> >   However, this would make the timestamping API not uniform, as the
-> >   other TX flags can be enabled via CMSG.
-> >=20
-> >   IIUC, sizeof skb_shared_info cannot be easily changed and I'm not sur=
-e
-> >   there is somewhere else in general skb info, where one could safely
-> >   put the extra separate flag bit for COMPLETION. So here's alternative
-> >   suggestion.
->
-> Due to cloning/dup of socket by bluetoothd wouldn't it be better to
-> have the completion on a per-packet basis?
+This is automated email and please do not reply to this email!
 
-So this is about a few lines change to v3, not a big redesign.
+Dear submitter,
 
-This change is a suggestion in response to the concern on using the
-last available bit in tx_flags raised here:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=935756
 
-https://lore.kernel.org/linux-bluetooth/67a972a6e2704_14761294b0@willemb.c.=
-googlers.com.notmuch/
+---Test result---
 
-So normally how it works is that based on socket flags and CMSG, skb
-info is tagged with bit flags that indicate which tstamps they emit.
-The v3->v4 change just avoids needing another bit for COMPLETION, by
-using the existing bit for SND tstamp together with socket flag (which
-in v3 instead controlled whether skbs are tagged for COMPLETION) to
-decide between SND and SND+COMPLETION.
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 FAIL      4.19 seconds
+BuildKernel                   PASS      24.41 seconds
+CheckAllWarning               PASS      26.56 seconds
+CheckSparse                   PASS      30.47 seconds
+BuildKernel32                 PASS      23.82 seconds
+TestRunnerSetup               PASS      427.42 seconds
+TestRunner_l2cap-tester       PASS      24.18 seconds
+TestRunner_iso-tester         PASS      34.97 seconds
+TestRunner_bnep-tester        PASS      4.74 seconds
+TestRunner_mgmt-tester        FAIL      119.57 seconds
+TestRunner_rfcomm-tester      PASS      7.78 seconds
+TestRunner_sco-tester         PASS      9.62 seconds
+TestRunner_ioctl-tester       PASS      8.36 seconds
+TestRunner_mesh-tester        PASS      5.82 seconds
+TestRunner_smp-tester         PASS      7.23 seconds
+TestRunner_userchan-tester    PASS      5.04 seconds
+IncrementalBuild              PENDING   0.68 seconds
 
-So I'm not sure if this sounds preferable over using the last free
-tx_flags bit to indicate COMPLETION is requested (or if there is some
-other place in skb to put a bit that I'm not seeing).
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
->  Not really sure if that is what setting it via CMSG would mean,
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-I was here referring to the CMSG timestamping API, Sec 1.3.4 in
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
 
-https://www.kernel.org/doc/Documentation/networking/timestamping.rst
-
-> but in the other hand perhaps the
-> problem is that the error queue is socket wide, not per-fd, anyway it
-> doesn't sound very useful to notify the completion on all fd pointing
-> to the same socket. Or perhaps it is time for introducing a proper TX
-> complete queue rather than reuse the error queue? I mean we can keep
-> using the error queue for backwards compatibility but moving forward I
-> think it would be better not to mix errors with tx complete events, so
-> perhaps we can add something like a socket option that dissociates the
-> error queue from tx completion queue.
+Failed Test Cases
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.167 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Some good solution to the issue of wakeups on timestamps and multiple
-errqueue consumers would be useful, but that probably requires a
-separate patch series.
 
-> > - Better name in sof_timestamping_names
-> >=20
-> > - I decided to keep using sockcm_init(), to avoid open coding READ_ONCE
-> >   and since it's passed to sock_cmsg_send() which anyway also may init
-> >   such fields.
-> >=20
-> > v3:
-> > - Add new COMPLETION timestamp type, and emit it in HCI completion.
-> > - Emit SND instead of SCHED, when sending to driver.
-> > - Do not emit SCHED timestamps.
-> > - Don't safeguard tx_q length explicitly. Now that hci_sched_acl_blk()
-> >   is no more, the scheduler flow control is guaranteed to keep it
-> >   bounded.
-> > - Fix L2CAP stream sockets to use the bytestream timestamp conventions.
-> >=20
-> > Overview
-> > =3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > The packet flow in Bluetooth is the following. Timestamps added here
-> > indicated:
-> >=20
-> > user sendmsg() generates skbs
-> > >=20
-> > * skb waits in net/bluetooth queue for a free HW packet slot
-> > >=20
-> > * orphan skb, send to driver -> TSTAMP_SND
-> > >=20
-> > * driver: send packet data to transport (eg. USB)
-> > >=20
-> > * wait for transport completion
-> > >=20
-> > * driver: transport tx completion, free skb (some do this immediately)
-> > >=20
-> > * packet waits in HW side queue
-> > >=20
-> > * HCI report for packet completion -> TSTAMP_COMPLETION (for non-SCO)
-> >=20
-> > In addition, we may want to do the following in future (but not
-> > implemented in this series as we don't have ISO sequence number
-> > synchronization yet which is needed first, moreover e.g. Intel
-> > controllers return only zeros in timestamps):
-> >=20
-> > * if packet is ISO, send HCI LE Read ISO TX Sync
-> > >=20
-> > * HCI response -> hardware TSTAMP_SND for the packet the response
-> >   corresponds to if it was waiting for one, might not be possible
-> >   to get a tstamp for every packet
-> >=20
-> > Bluetooth does not have tx timestamps in the completion reports from
-> > hardware, and only for ISO packets there are HCI commands in
-> > specification for querying timestamps afterward.
-> >=20
-> > The drivers do not provide ways to get timestamps either, I'm also not
-> > aware if some devices would have vendor-specific commands to get them.
-> >=20
-> > Driver-side timestamps
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > Generating SND on driver side may be slightly more accurate, but that
-> > requires changing the BT driver API to not orphan skbs first.  In theor=
-y
-> > this probably won't cause problems, but it is not done in this patchset=
-.
-> >=20
-> > For some of the drivers it won't gain much. E.g. btusb immediately
-> > submits the URB, so if one would emit SND just before submit (as
-> > drivers/net/usb/usbnet.c does), it is essentially identical to emitting
-> > before sending to driver.  btintel_pcie looks like it does synchronous
-> > send, so looks the same.  hci_serdev has internal queue, iiuc flushing
-> > as fast as data can be transferred, but it shouldn't be waiting for
-> > hardware slots due to HCI flow control.
-> >=20
-> > Unless HW buffers are full, packets mostly wait on the HW side.  E.g.
-> > with btusb (non-SCO) median time from sendmsg() to URB generation is
-> > ~0.1 ms, to USB completion ~0.5 ms, and HCI completion report at ~5 ms.
-> >=20
-> > The exception is SCO, for which HCI flow control is disabled, so they d=
-o
-> > not get completion events so it's possible to build up queues inside th=
-e
-> > driver. For SCO, COMPLETION needs to be generated from driver side, eg.
-> > for btusb maybe at URB completion.  This could be useful for SCO PCM
-> > modes (but which are more or less obsolete nowadays), where USB isoc
-> > data rate matches audio data rate, so queues on USB side may build up.
-> >=20
-> > Use cases
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > In audio use cases we want to track and avoid queues building up, to
-> > control latency, especially in cases like ISO where the controller has =
-a
-> > fixed schedule that the sending application must match.  E.g.
-> > application can aim to keep 1 packet in HW queue, so it has 2*7.5ms of
-> > slack for being woken up too late.
-> >=20
-> > Applications can use SND & COMPLETION timestamps to track in-kernel and
-> > in-HW packet queues separately.  This can matter for ISO, where the
-> > specification allows HW to use the timings when it gets packets to
-> > determine what packets are synchronized together. Applications can use
-> > SND to track that.
-> >=20
-> > Tests
-> > =3D=3D=3D=3D=3D
-> >=20
-> > See
-> > https://lore.kernel.org/linux-bluetooth/cover.1739026302.git.pav@iki.fi=
-/
-> >=20
-> > Pauli Virtanen (5):
-> >   net-timestamp: COMPLETION timestamp on packet tx completion
-> >   Bluetooth: add support for skb TX SND/COMPLETION timestamping
-> >   Bluetooth: ISO: add TX timestamping
-> >   Bluetooth: L2CAP: add TX timestamping
-> >   Bluetooth: SCO: add TX timestamping socket-level mechanism
-> >=20
-> >  Documentation/networking/timestamping.rst |   9 ++
-> >  include/net/bluetooth/bluetooth.h         |   1 +
-> >  include/net/bluetooth/hci_core.h          |  13 +++
-> >  include/net/bluetooth/l2cap.h             |   3 +-
-> >  include/uapi/linux/errqueue.h             |   1 +
-> >  include/uapi/linux/net_tstamp.h           |   6 +-
-> >  net/bluetooth/6lowpan.c                   |   2 +-
-> >  net/bluetooth/hci_conn.c                  | 118 ++++++++++++++++++++++
-> >  net/bluetooth/hci_core.c                  |  17 +++-
-> >  net/bluetooth/hci_event.c                 |   4 +
-> >  net/bluetooth/iso.c                       |  24 ++++-
-> >  net/bluetooth/l2cap_core.c                |  41 +++++++-
-> >  net/bluetooth/l2cap_sock.c                |  15 ++-
-> >  net/bluetooth/sco.c                       |  19 +++-
-> >  net/bluetooth/smp.c                       |   2 +-
-> >  net/core/sock.c                           |   2 +
-> >  net/ethtool/common.c                      |   1 +
-> >  17 files changed, 258 insertions(+), 20 deletions(-)
-> >=20
-> > --
-> > 2.48.1
-> >=20
->=20
->=20
+---
+Regards,
+Linux Bluetooth
 
---=20
-Pauli Virtanen
+
+--===============2363593945434253921==--
