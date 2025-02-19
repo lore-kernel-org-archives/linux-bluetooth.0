@@ -1,133 +1,173 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0596943146
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2025 14:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B2E1FA267
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2025 16:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739975557; cv=none; b=naJGPX1rtlkR+Odnxa5XvWTwJj93foNjcQErtrUxmLcEW6TaThw7a762HiLSxADvVviRLKjI26dkEimGrefMMs6YTsvo8sz76QGfDAMNbxsO7cG0rH2h910giPNr7yzisIkqaEBRQKlas4Pxf8BKIi1oYhD5aU7pUT3Y/2LMg/Y=
+	t=1739982462; cv=none; b=uSpmQ6ne1JBs++JZoSVKL122YsPndPFFRA3SjxQJ3CRdtVhFbKHURUPym+TpG5axiO9P2Qs+hGEinPQSEvN43avPwzA4lomvaEVaDN3eRrFq/kJwAvhB+qqDCWv5VVr5kA//0+EA/4HK/I2JUAo0OcddHkgDXHuKlpuSD2pwwHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739975557; c=relaxed/simple;
-	bh=NK3q3TMCvY25KhJnwl01Z/5LuDLvpwV41XrvngMnJTo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MzwSXt2Z43cB+x6W8NjwvL5HAF7ER8ITT4SyV2kTl6ykTSRBQGGDGXDLW/z9HCrMD/ENS4pgedZm6wgDV2G3LdH542vJYeOUeMDRXyHcgutgB1kJ/jxcLZdAPcEkNJNCtD8d2c9kJIX8Raq/ksUG0c8YmVRd99PiGtlXpT4Jof8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QioP1guK; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739982462; c=relaxed/simple;
+	bh=bIjmutvveQSIwl1PIBOhsJYuso7/gwl51/VdwKL0oYg=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=EPPtz91rbU3ssZIb5frqe0ORQoLa/jA6gjpi5Tl3lbg4OdNLl6Yad7GHKEBBZRc5wuS6TBzNz/bJXyhtatR4Kmwo+vOheNEoL7ElAR8svVpHI0Gvd1YeROGvVSaSkL55JfcacsfaJIHr1+ur5Eb/iv3TSXqRGjb4dQebBG93Fjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TWYJ1ne+; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QioP1guK"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-220c8eb195aso138462855ad.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2025 06:32:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739975554; x=1740580354; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UL3t5WpIE+M9LicSy8DbJy+d3Q0odZhkSpODvw9gkZs=;
-        b=QioP1guKGz7BEnG+3ftp2kdUPt27V2pK6yptRwbrxzvapwtC59G4xEK2IEz1aBJVat
-         w868gs7thx32VxbFMEjqSuH93rwwb1iulzxRgziIQ1NoZ61drtheR92y+HeZ7UapFLtl
-         Qf2IIqoLxtoiO4rfwlQmDIdYet6SpegqMByJVNCSyUO4b6CJXIiOpY7Bs+90FcBfcmXJ
-         zAYwI/EMkNegUAzQ2E+3a35Bk/MP2tvbrNE0a4D23j+RTgqWkI3qA8Tk2cH1gB6exyF1
-         PaMgHZvh8oGvF5Dp/Z2FBSVsa0WAnLS3TJ7/yU7wjaE3rQYUtIMDasvw/AoADTq0nWdg
-         ljeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739975554; x=1740580354;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UL3t5WpIE+M9LicSy8DbJy+d3Q0odZhkSpODvw9gkZs=;
-        b=rwxEUUpX6LNQpui2I2T1hJxm/+kWNjowHWzK6NBheWDCRsJgSCTFbVmXCcjrsxjyQ9
-         pfBXeZxy9pHz9vDqEhLMDcwAJ02p5l9nvYrcjw+W/klDArRjOi/KOQkn8gFpUTFevmOd
-         kKZXROwWCUMMrPrIb01GTUktGTX19o4SUVNfHg2eAzavvyWil6tcIqsOeJYKv6lde/Ke
-         0r3vTUwDwR9VNQ6wnhSncIqRyv6sZn2zPjI9cVHyJdS3DCdAXAI5iAaXSjXRXbJTRkYv
-         8whLNHR2DldUrMG70ZV57ixySUUmS1L5bWjqz1OCm0PWLuaX5flp9WIe2f5XlOIJk5S3
-         bfmQ==
-X-Gm-Message-State: AOJu0YxyF7mcr+PzCdvFLhgj8fONlRL5yIJBcZ0+NIWNwMa38Jx9UXlJ
-	U4MNPzFPgH4dYLwJ48zKqAT/5fh6PygLrsgQ7m7J44QjdQaZYG96nNaO5w==
-X-Gm-Gg: ASbGncu2/eu7IY1MxTmlGQGJ0/jy8AhwNpwk/3bZdmPJvT2BTALDkb9rZKMMmy7CiWt
-	MOiZBD6V7YmpWMWeLRUQIJ/kjbbmu165nDyGnLqsGvYW8/ZOPnF81DykQBomLnyKyrNPTCS5SXs
-	LGgfBdEyTbxUWbiXK1f/6ScaD6QIXVf0w/E8VXj7Be5Yo5I2XryX7oYpl8mFuv1Nz/APVdlgtRA
-	s4k8D0vfQOXXO4Ua+K83aQbWzZDttVFXSiCBiWP3O2XFQQ3UbzSpTLNiXSU0Ygb6JxT3ExWwvlm
-	FQhhyalfvo/MzN9Reoik
-X-Google-Smtp-Source: AGHT+IG4ntQzEGYpfk4W2RfP9ZKJvUzM+7p9lywEeKkHmRJRZM6oH0F9QV/8gvq7zDJROButmXGTVg==
-X-Received: by 2002:a17:902:d2c2:b0:215:5625:885b with SMTP id d9443c01a7336-221711c2866mr57439935ad.52.1739975553880;
-        Wed, 19 Feb 2025 06:32:33 -0800 (PST)
-Received: from [172.17.0.2] ([13.83.222.32])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d534903csm106327725ad.32.2025.02.19.06.32.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 06:32:33 -0800 (PST)
-Message-ID: <67b5eb81.170a0220.34bc18.1288@mx.google.com>
-Date: Wed, 19 Feb 2025 06:32:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4608058954046889627=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TWYJ1ne+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739982461; x=1771518461;
+  h=date:from:to:cc:subject:message-id;
+  bh=bIjmutvveQSIwl1PIBOhsJYuso7/gwl51/VdwKL0oYg=;
+  b=TWYJ1ne+eaXw8BFgTTfK8nuijg1bjOeAbA7OPBdemkf2083LYvyKFYS1
+   8hzi1YuB5FG1EnRorwrrtAM0CLh65AU2GgqOb9cphJFP237kyEVmz04ON
+   ZS6pYOdHFwdI+qa5W+sE198KXkJ+gk1zWkM5FHchkgV0lYQNOEU2HUjU8
+   Y5Ar5gRkoU67AWOYBvK0MHzVVYueC4sVgVSYDA6dxuo/Kume5xL+OJeHp
+   mTC31R2qHQR0Zj0ocZd/PLZDmNi/OHVf3c9eVGT27AIrpdJND6YgmHtDr
+   Iv1TNCwxJDbC+6xsYKsBK4mM8hGh4OIb1oMG62XM2fzwh2BhoaNeFyUuZ
+   g==;
+X-CSE-ConnectionGUID: Ex/vcURpRjGwbcpxkkltvw==
+X-CSE-MsgGUID: fCSgGEKeS9qOyXG6PLHBkw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="39961907"
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="39961907"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 08:27:40 -0800
+X-CSE-ConnectionGUID: uoGGGdcRRQyzhiddwfTtrw==
+X-CSE-MsgGUID: 3hHRlMuLQMuMb74fwIi/eA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
+   d="scan'208";a="115287400"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa010.fm.intel.com with ESMTP; 19 Feb 2025 08:17:35 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tkmlD-00039N-2V;
+	Wed, 19 Feb 2025 16:17:22 +0000
+Date: Thu, 20 Feb 2025 00:16:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ e2040fe3b82b6c9b430a5b272e5924e8ace9a8f0
+Message-ID: <202502200051.gEf88PIK-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chharry@google.com
-Subject: RE: [v7] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
-In-Reply-To: <20250219220255.v7.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
-References: <20250219220255.v7.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============4608058954046889627==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: e2040fe3b82b6c9b430a5b272e5924e8ace9a8f0  Bluetooth: hci_uart: fix race during initialization
 
-This is automated email and please do not reply to this email!
+elapsed time: 1444m
 
-Dear submitter,
+configs tested: 96
+configs skipped: 1
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=935602
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+tested configs:
+alpha                            allyesconfig    gcc-14.2.0
+arc                              allmodconfig    gcc-13.2.0
+arc                              allyesconfig    gcc-13.2.0
+arc                   randconfig-001-20250219    gcc-13.2.0
+arc                   randconfig-002-20250219    gcc-13.2.0
+arm                              allmodconfig    gcc-14.2.0
+arm                              allyesconfig    gcc-14.2.0
+arm                   randconfig-001-20250219    gcc-14.2.0
+arm                   randconfig-002-20250219    clang-17
+arm                   randconfig-003-20250219    clang-15
+arm                   randconfig-004-20250219    gcc-14.2.0
+arm64                            allmodconfig    clang-18
+arm64                 randconfig-001-20250219    clang-21
+arm64                 randconfig-002-20250219    gcc-14.2.0
+arm64                 randconfig-003-20250219    gcc-14.2.0
+arm64                 randconfig-004-20250219    gcc-14.2.0
+csky                  randconfig-001-20250219    gcc-14.2.0
+csky                  randconfig-002-20250219    gcc-14.2.0
+hexagon                          allmodconfig    clang-21
+hexagon                          allyesconfig    clang-18
+hexagon               randconfig-001-20250219    clang-14
+hexagon               randconfig-002-20250219    clang-21
+i386                             allmodconfig    gcc-12
+i386                              allnoconfig    gcc-12
+i386                             allyesconfig    gcc-12
+i386        buildonly-randconfig-001-20250219    clang-19
+i386        buildonly-randconfig-002-20250219    clang-19
+i386        buildonly-randconfig-003-20250219    gcc-12
+i386        buildonly-randconfig-004-20250219    clang-19
+i386        buildonly-randconfig-005-20250219    clang-19
+i386        buildonly-randconfig-006-20250219    gcc-12
+i386                                defconfig    clang-19
+loongarch                        allmodconfig    gcc-14.2.0
+loongarch             randconfig-001-20250219    gcc-14.2.0
+loongarch             randconfig-002-20250219    gcc-14.2.0
+m68k                             allmodconfig    gcc-14.2.0
+m68k                              allnoconfig    gcc-14.2.0
+m68k                             allyesconfig    gcc-14.2.0
+microblaze                        allnoconfig    gcc-14.2.0
+mips                              allnoconfig    gcc-14.2.0
+nios2                             allnoconfig    gcc-14.2.0
+nios2                 randconfig-001-20250219    gcc-14.2.0
+nios2                 randconfig-002-20250219    gcc-14.2.0
+openrisc                          allnoconfig    gcc-14.2.0
+openrisc                         allyesconfig    gcc-14.2.0
+parisc                           allmodconfig    gcc-14.2.0
+parisc                            allnoconfig    gcc-14.2.0
+parisc                           allyesconfig    gcc-14.2.0
+parisc                randconfig-001-20250219    gcc-14.2.0
+parisc                randconfig-002-20250219    gcc-14.2.0
+powerpc                           allnoconfig    gcc-14.2.0
+powerpc                          allyesconfig    clang-16
+powerpc               randconfig-001-20250219    clang-15
+powerpc               randconfig-002-20250219    clang-17
+powerpc               randconfig-003-20250219    gcc-14.2.0
+powerpc64             randconfig-001-20250219    gcc-14.2.0
+powerpc64             randconfig-002-20250219    gcc-14.2.0
+powerpc64             randconfig-003-20250219    gcc-14.2.0
+riscv                            allmodconfig    clang-21
+riscv                             allnoconfig    gcc-14.2.0
+riscv                            allyesconfig    clang-21
+riscv                 randconfig-001-20250219    clang-21
+riscv                 randconfig-002-20250219    gcc-14.2.0
+s390                             allmodconfig    clang-19
+s390                              allnoconfig    clang-21
+s390                             allyesconfig    gcc-14.2.0
+s390                  randconfig-001-20250219    clang-18
+s390                  randconfig-002-20250219    clang-21
+sh                               allmodconfig    gcc-14.2.0
+sh                                allnoconfig    gcc-14.2.0
+sh                               allyesconfig    gcc-14.2.0
+sh                    randconfig-001-20250219    gcc-14.2.0
+sh                    randconfig-002-20250219    gcc-14.2.0
+sparc                            allmodconfig    gcc-14.2.0
+sparc                             allnoconfig    gcc-14.2.0
+sparc                 randconfig-001-20250219    gcc-14.2.0
+sparc                 randconfig-002-20250219    gcc-14.2.0
+sparc64               randconfig-001-20250219    gcc-14.2.0
+sparc64               randconfig-002-20250219    gcc-14.2.0
+um                               allmodconfig    clang-21
+um                                allnoconfig    clang-18
+um                               allyesconfig    gcc-12
+um                    randconfig-001-20250219    clang-21
+um                    randconfig-002-20250219    clang-21
+x86_64                            allnoconfig    clang-19
+x86_64                           allyesconfig    clang-19
+x86_64      buildonly-randconfig-001-20250219    gcc-12
+x86_64      buildonly-randconfig-002-20250219    clang-19
+x86_64      buildonly-randconfig-003-20250219    gcc-12
+x86_64      buildonly-randconfig-004-20250219    clang-19
+x86_64      buildonly-randconfig-005-20250219    gcc-12
+x86_64      buildonly-randconfig-006-20250219    clang-19
+x86_64                              defconfig    gcc-11
+xtensa                            allnoconfig    gcc-14.2.0
+xtensa                randconfig-001-20250219    gcc-14.2.0
+xtensa                randconfig-002-20250219    gcc-14.2.0
 
-Test Summary:
-CheckPatch                    PENDING   0.43 seconds
-GitLint                       PENDING   0.36 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      25.03 seconds
-CheckAllWarning               PASS      27.86 seconds
-CheckSparse                   PASS      31.48 seconds
-BuildKernel32                 PASS      25.26 seconds
-TestRunnerSetup               PASS      449.48 seconds
-TestRunner_l2cap-tester       PASS      21.59 seconds
-TestRunner_iso-tester         PASS      42.47 seconds
-TestRunner_bnep-tester        PASS      5.13 seconds
-TestRunner_mgmt-tester        PASS      121.91 seconds
-TestRunner_rfcomm-tester      PASS      8.08 seconds
-TestRunner_sco-tester         PASS      9.82 seconds
-TestRunner_ioctl-tester       PASS      8.68 seconds
-TestRunner_mesh-tester        PASS      6.55 seconds
-TestRunner_smp-tester         PASS      7.46 seconds
-TestRunner_userchan-tester    PASS      5.20 seconds
-IncrementalBuild              PENDING   0.71 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4608058954046889627==--
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
