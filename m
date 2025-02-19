@@ -1,55 +1,52 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D15E1AC88B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1041A7264;
 	Wed, 19 Feb 2025 18:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739988835; cv=pass; b=uUKquAq7B8wrHWGVFJ/f8WWdX0h/xzHrxDNyQDOeOW7Hfpy9zEwbpMtVyujUPPPIKqzSib/U6QM3jy2wFcdSmbY4CcWxRZkDlxbYWWVpsttzy9b5ryZhoAv0BOg5+ApE/2XiZZ2W1UxwQv/5Zm0LKgTNsSzD/RifqomWCVTNaaM=
+	t=1739988836; cv=pass; b=FwOTDlBfRaliUSr1rrVMq3bjm1bDCajAZQ+77dyigKaXOOy+sQbe6ESQoHK7O3B+a2QilrbVCKEGpdbY1kMTWnHHrhz3qTBc18UjuPVkfnsBJeNZvcAAFVqrTDU+FP+fwwEWiuog/t6mdzOoa9OH+wdukA24Ti7nyHsiZd2JzXo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739988835; c=relaxed/simple;
-	bh=OZH7kTm8/KswgBdIM6QM91MfGzhUfImkC8LHhnSfU/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dpU0kh+ohDPh3PjSBBP5yUfrK/elGvzv2H4+52aF0DpcI59mXGY0s/7DzN20jXRseNULu4WG4tOB0b/t1LY1caplPUaaWwASH7fCbqhi/YHLMpDV6/pKSpWZ1EXGydYVR9NKCRWiFJ32ING2Ebvf35wrQKD5+j3uWu632F+2mns=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=LiV51oB/; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1739988836; c=relaxed/simple;
+	bh=H3WFiZ6Lg19AdQqBFHLqhRqZsA/ZRyzUZwtPyPfU6BU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EU/uTO+wkX3QCKxRahvIBtY37bWg1/0vGHWMHZnTFypvvW2YsCc5A4oKQkI0CNFr6EFB9EPIuHviq60DDfVTaH9LUyuJN8cul3NE/mDQemYOveR+SVgzgksyy474TlhgofjJD34wO0UjZSitaXxDQznUulOQHM3ncHn9paeeDp8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=RFZU5qVH; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="LiV51oB/"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="RFZU5qVH"
 Received: from monolith.lan (unknown [193.138.7.178])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4Yykzf20ngz102v;
-	Wed, 19 Feb 2025 20:13:50 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4YykzW3cCvzyQQ;
+	Wed, 19 Feb 2025 20:13:43 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1739988831;
+	t=1739988826;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8L4/5XoOJkThlJm4nTKqNeqJshEiSJlOG+4iUlWNVQ0=;
-	b=LiV51oB/RCUFg+RVJ+KMLs0/XbqHhW6PzOsn0yt0fWTPVfKvif/yIdyDCQmMN+MEAceLpu
-	+TaV7VlYD/SMcvDPGASZCy+gWD3Rb01bju9Q2UbIhHh6bYT14vdUe8IMNEU3SVxeXKc0Yq
-	H6NDAVJQD7x8vPe0Qmf+tgHyeQvRcsw=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hOkm928FH1MXpDJcxJZjAaAV4tVx2mcqhCypx8RXFKo=;
+	b=RFZU5qVHVP7l6n//421bwYECDfZx7wSxoigACfkpE7YUWchicIImxE82CGnpke1AciWj10
+	+qPggQi/TbLADK/2zhfkmT22whWflD57ESu0tZnteOJypH/+ZuKBMbAe8zcpjUz6E1CMSN
+	A463+0Anepsi6TqpJyaFXD7RdSyM/Co=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1739988831;
+	s=meesny; t=1739988826;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8L4/5XoOJkThlJm4nTKqNeqJshEiSJlOG+4iUlWNVQ0=;
-	b=Z6CwBVb8dgZAGh9sCchwXPmwhi2d3WaSCQalSp2ryGjBPIGpKAdlfbq5/jE7yOOzcOePbd
-	DZgl3DMYpY8VVEvgMjlAqvbmMZk2BOT0dkOn5i6uGgHTpIqy303wN46J09DqPlc5YcxR2Z
-	QcGEcH/yCdjKzs9F1Umv6i5YhoL2aUg=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hOkm928FH1MXpDJcxJZjAaAV4tVx2mcqhCypx8RXFKo=;
+	b=oPUNjtQsW1AFibX6fSlgcigzFZFdXlBGarcDDE7dI2bS0vRRERki0C8wbkOZ5/ERnZ7kKb
+	EDOzSapB84e283tnCD1FvyMNPEYJ2lfEBZFrmaHh9Qra2YdOgjUQtcy8pDnBHVEJENN/Rg
+	Fnr2GlBN3APsq4segiFDR1dSsQL4d6M=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1739988831; a=rsa-sha256; cv=none;
-	b=m/3Y9kqTUyTFJDPYiLq3NI6PQz2cmTditLF8D8UaiC1Nw69DS63dwPwmCklegwmKUdTdFm
-	WCdY0AJ1e3p/XFB3aV6Z6RavTjH6HSlr3YOqtO41IIzIdv5EZNPwZD5ZPpnl23jyekE8RZ
-	4KcGXLT18FN/cspeK9t+FfbkJWhV/L4=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1739988826; a=rsa-sha256; cv=none;
+	b=QOvH79VUMMuz8bj+8ZIAE09MBNXRBOmkc90nxaWIoVUwebqVV178TIidCWXRfA6+c47gDk
+	Shv7u5U+s6TDrxMGmZIUwFD++0IARIH2X4ykm7YE9m6uzL1wSAJVzvPzhcaScKj/WAIGP9
+	sGDnJUPx1FqZF6CJGj1XLX7h9yMKbI8=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>,
@@ -58,12 +55,10 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	davem@davemloft.net,
 	kuba@kernel.org,
 	willemdebruijn.kernel@gmail.com
-Subject: [PATCH v4 3/5] Bluetooth: ISO: add TX timestamping
-Date: Wed, 19 Feb 2025 20:13:35 +0200
-Message-ID: <79e7f7ff1b31a45022cbd2fbb4252add9c17e4c2.1739988644.git.pav@iki.fi>
+Subject: [PATCH v4 0/5] net: Bluetooth: add TX timestamping for ISO/L2CAP/SCO
+Date: Wed, 19 Feb 2025 20:13:32 +0200
+Message-ID: <cover.1739988644.git.pav@iki.fi>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1739988644.git.pav@iki.fi>
-References: <cover.1739988644.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,109 +67,164 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add BT_SCM_ERROR socket CMSG type.
+Add support for TX timestamping in Bluetooth ISO/L2CAP/SCO sockets.
 
-Support TX timestamping in ISO sockets.
+Add new COMPLETION timestamp type, to report a software timestamp when
+the hardware reports a packet completed. (Cc netdev for this)
 
-Support MSG_ERRQUEUE in ISO recvmsg.
+Previous discussions:
+https://lore.kernel.org/linux-bluetooth/cover.1739097311.git.pav@iki.fi/
+https://lore.kernel.org/all/6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch/
+https://lore.kernel.org/all/cover.1710440392.git.pav@iki.fi/
 
-If a packet from sendmsg() is fragmented, only the first ACL fragment is
-timestamped.
+Changes
+=======
+v4:
+- Change meaning of SOF_TIMESTAMPING_TX_COMPLETION, to save a bit in
+  skb_shared_info.tx_flags:
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
+  It now enables COMPLETION only for packets that also have software SND
+  enabled.  The flag can now be enabled only via a socket option, but
+  coupling with SND allows user to still choose for which packets
+  SND+COMPLETION should be generated.  This choice maybe is OK for
+  applications which can skip SND if they're not interested.
 
-Notes:
-    v4: no changes
+  However, this would make the timestamping API not uniform, as the
+  other TX flags can be enabled via CMSG.
 
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/iso.c               | 24 ++++++++++++++++++++----
- 2 files changed, 21 insertions(+), 4 deletions(-)
+  IIUC, sizeof skb_shared_info cannot be easily changed and I'm not sure
+  there is somewhere else in general skb info, where one could safely
+  put the extra separate flag bit for COMPLETION. So here's alternative
+  suggestion.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 435250c72d56..bbefde319f95 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -156,6 +156,7 @@ struct bt_voice {
- #define BT_PKT_STATUS           16
- 
- #define BT_SCM_PKT_STATUS	0x03
-+#define BT_SCM_ERROR		0x04
- 
- #define BT_ISO_QOS		17
- 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 44acddf58a0c..f497759a2af5 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -518,7 +518,8 @@ static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
- 	return &iso_pi(sk)->qos;
- }
- 
--static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
-+static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
-+			  const struct sockcm_cookie *sockc)
- {
- 	struct iso_conn *conn = iso_pi(sk)->conn;
- 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
-@@ -538,10 +539,12 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
- 	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
- 						      HCI_ISO_STATUS_VALID));
- 
--	if (sk->sk_state == BT_CONNECTED)
-+	if (sk->sk_state == BT_CONNECTED) {
-+		hci_setup_tx_timestamp(skb, 1, sockc);
- 		hci_send_iso(conn->hcon, skb);
--	else
-+	} else {
- 		len = -ENOTCONN;
-+	}
- 
- 	return len;
- }
-@@ -1348,6 +1351,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- {
- 	struct sock *sk = sock->sk;
- 	struct sk_buff *skb, **frag;
-+	struct sockcm_cookie sockc;
- 	size_t mtu;
- 	int err;
- 
-@@ -1360,6 +1364,14 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
-+	sockcm_init(&sockc, sk);
-+
-+	if (msg->msg_controllen) {
-+		err = sock_cmsg_send(sk, msg, &sockc);
-+		if (err)
-+			return err;
-+	}
-+
- 	lock_sock(sk);
- 
- 	if (sk->sk_state != BT_CONNECTED) {
-@@ -1405,7 +1417,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECTED)
--		err = iso_send_frame(sk, skb);
-+		err = iso_send_frame(sk, skb, &sockc);
- 	else
- 		err = -ENOTCONN;
- 
-@@ -1474,6 +1486,10 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 
- 	BT_DBG("sk %p", sk);
- 
-+	if (unlikely(flags & MSG_ERRQUEUE))
-+		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
-+					  BT_SCM_ERROR);
-+
- 	if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
- 		sock_hold(sk);
- 		lock_sock(sk);
+- Better name in sof_timestamping_names
+
+- I decided to keep using sockcm_init(), to avoid open coding READ_ONCE
+  and since it's passed to sock_cmsg_send() which anyway also may init
+  such fields.
+
+v3:
+- Add new COMPLETION timestamp type, and emit it in HCI completion.
+- Emit SND instead of SCHED, when sending to driver.
+- Do not emit SCHED timestamps.
+- Don't safeguard tx_q length explicitly. Now that hci_sched_acl_blk()
+  is no more, the scheduler flow control is guaranteed to keep it
+  bounded.
+- Fix L2CAP stream sockets to use the bytestream timestamp conventions.
+
+Overview
+========
+
+The packet flow in Bluetooth is the following. Timestamps added here
+indicated:
+
+user sendmsg() generates skbs
+|
+* skb waits in net/bluetooth queue for a free HW packet slot
+|
+* orphan skb, send to driver -> TSTAMP_SND
+|
+* driver: send packet data to transport (eg. USB)
+|
+* wait for transport completion
+|
+* driver: transport tx completion, free skb (some do this immediately)
+|
+* packet waits in HW side queue
+|
+* HCI report for packet completion -> TSTAMP_COMPLETION (for non-SCO)
+
+In addition, we may want to do the following in future (but not
+implemented in this series as we don't have ISO sequence number
+synchronization yet which is needed first, moreover e.g. Intel
+controllers return only zeros in timestamps):
+
+* if packet is ISO, send HCI LE Read ISO TX Sync
+|
+* HCI response -> hardware TSTAMP_SND for the packet the response
+  corresponds to if it was waiting for one, might not be possible
+  to get a tstamp for every packet
+
+Bluetooth does not have tx timestamps in the completion reports from
+hardware, and only for ISO packets there are HCI commands in
+specification for querying timestamps afterward.
+
+The drivers do not provide ways to get timestamps either, I'm also not
+aware if some devices would have vendor-specific commands to get them.
+
+Driver-side timestamps
+======================
+
+Generating SND on driver side may be slightly more accurate, but that
+requires changing the BT driver API to not orphan skbs first.  In theory
+this probably won't cause problems, but it is not done in this patchset.
+
+For some of the drivers it won't gain much. E.g. btusb immediately
+submits the URB, so if one would emit SND just before submit (as
+drivers/net/usb/usbnet.c does), it is essentially identical to emitting
+before sending to driver.  btintel_pcie looks like it does synchronous
+send, so looks the same.  hci_serdev has internal queue, iiuc flushing
+as fast as data can be transferred, but it shouldn't be waiting for
+hardware slots due to HCI flow control.
+
+Unless HW buffers are full, packets mostly wait on the HW side.  E.g.
+with btusb (non-SCO) median time from sendmsg() to URB generation is
+~0.1 ms, to USB completion ~0.5 ms, and HCI completion report at ~5 ms.
+
+The exception is SCO, for which HCI flow control is disabled, so they do
+not get completion events so it's possible to build up queues inside the
+driver. For SCO, COMPLETION needs to be generated from driver side, eg.
+for btusb maybe at URB completion.  This could be useful for SCO PCM
+modes (but which are more or less obsolete nowadays), where USB isoc
+data rate matches audio data rate, so queues on USB side may build up.
+
+Use cases
+=========
+
+In audio use cases we want to track and avoid queues building up, to
+control latency, especially in cases like ISO where the controller has a
+fixed schedule that the sending application must match.  E.g.
+application can aim to keep 1 packet in HW queue, so it has 2*7.5ms of
+slack for being woken up too late.
+
+Applications can use SND & COMPLETION timestamps to track in-kernel and
+in-HW packet queues separately.  This can matter for ISO, where the
+specification allows HW to use the timings when it gets packets to
+determine what packets are synchronized together. Applications can use
+SND to track that.
+
+Tests
+=====
+
+See
+https://lore.kernel.org/linux-bluetooth/cover.1739026302.git.pav@iki.fi/
+
+Pauli Virtanen (5):
+  net-timestamp: COMPLETION timestamp on packet tx completion
+  Bluetooth: add support for skb TX SND/COMPLETION timestamping
+  Bluetooth: ISO: add TX timestamping
+  Bluetooth: L2CAP: add TX timestamping
+  Bluetooth: SCO: add TX timestamping socket-level mechanism
+
+ Documentation/networking/timestamping.rst |   9 ++
+ include/net/bluetooth/bluetooth.h         |   1 +
+ include/net/bluetooth/hci_core.h          |  13 +++
+ include/net/bluetooth/l2cap.h             |   3 +-
+ include/uapi/linux/errqueue.h             |   1 +
+ include/uapi/linux/net_tstamp.h           |   6 +-
+ net/bluetooth/6lowpan.c                   |   2 +-
+ net/bluetooth/hci_conn.c                  | 118 ++++++++++++++++++++++
+ net/bluetooth/hci_core.c                  |  17 +++-
+ net/bluetooth/hci_event.c                 |   4 +
+ net/bluetooth/iso.c                       |  24 ++++-
+ net/bluetooth/l2cap_core.c                |  41 +++++++-
+ net/bluetooth/l2cap_sock.c                |  15 ++-
+ net/bluetooth/sco.c                       |  19 +++-
+ net/bluetooth/smp.c                       |   2 +-
+ net/core/sock.c                           |   2 +
+ net/ethtool/common.c                      |   1 +
+ 17 files changed, 258 insertions(+), 20 deletions(-)
+
 -- 
 2.48.1
 
