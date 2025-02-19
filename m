@@ -1,173 +1,180 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B2E1FA267
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2025 16:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739982462; cv=none; b=uSpmQ6ne1JBs++JZoSVKL122YsPndPFFRA3SjxQJ3CRdtVhFbKHURUPym+TpG5axiO9P2Qs+hGEinPQSEvN43avPwzA4lomvaEVaDN3eRrFq/kJwAvhB+qqDCWv5VVr5kA//0+EA/4HK/I2JUAo0OcddHkgDXHuKlpuSD2pwwHc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739982462; c=relaxed/simple;
-	bh=bIjmutvveQSIwl1PIBOhsJYuso7/gwl51/VdwKL0oYg=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=EPPtz91rbU3ssZIb5frqe0ORQoLa/jA6gjpi5Tl3lbg4OdNLl6Yad7GHKEBBZRc5wuS6TBzNz/bJXyhtatR4Kmwo+vOheNEoL7ElAR8svVpHI0Gvd1YeROGvVSaSkL55JfcacsfaJIHr1+ur5Eb/iv3TSXqRGjb4dQebBG93Fjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TWYJ1ne+; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D15E1AC88B;
+	Wed, 19 Feb 2025 18:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739988835; cv=pass; b=uUKquAq7B8wrHWGVFJ/f8WWdX0h/xzHrxDNyQDOeOW7Hfpy9zEwbpMtVyujUPPPIKqzSib/U6QM3jy2wFcdSmbY4CcWxRZkDlxbYWWVpsttzy9b5ryZhoAv0BOg5+ApE/2XiZZ2W1UxwQv/5Zm0LKgTNsSzD/RifqomWCVTNaaM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739988835; c=relaxed/simple;
+	bh=OZH7kTm8/KswgBdIM6QM91MfGzhUfImkC8LHhnSfU/Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dpU0kh+ohDPh3PjSBBP5yUfrK/elGvzv2H4+52aF0DpcI59mXGY0s/7DzN20jXRseNULu4WG4tOB0b/t1LY1caplPUaaWwASH7fCbqhi/YHLMpDV6/pKSpWZ1EXGydYVR9NKCRWiFJ32ING2Ebvf35wrQKD5+j3uWu632F+2mns=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=LiV51oB/; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TWYJ1ne+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739982461; x=1771518461;
-  h=date:from:to:cc:subject:message-id;
-  bh=bIjmutvveQSIwl1PIBOhsJYuso7/gwl51/VdwKL0oYg=;
-  b=TWYJ1ne+eaXw8BFgTTfK8nuijg1bjOeAbA7OPBdemkf2083LYvyKFYS1
-   8hzi1YuB5FG1EnRorwrrtAM0CLh65AU2GgqOb9cphJFP237kyEVmz04ON
-   ZS6pYOdHFwdI+qa5W+sE198KXkJ+gk1zWkM5FHchkgV0lYQNOEU2HUjU8
-   Y5Ar5gRkoU67AWOYBvK0MHzVVYueC4sVgVSYDA6dxuo/Kume5xL+OJeHp
-   mTC31R2qHQR0Zj0ocZd/PLZDmNi/OHVf3c9eVGT27AIrpdJND6YgmHtDr
-   Iv1TNCwxJDbC+6xsYKsBK4mM8hGh4OIb1oMG62XM2fzwh2BhoaNeFyUuZ
-   g==;
-X-CSE-ConnectionGUID: Ex/vcURpRjGwbcpxkkltvw==
-X-CSE-MsgGUID: fCSgGEKeS9qOyXG6PLHBkw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="39961907"
-X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
-   d="scan'208";a="39961907"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 08:27:40 -0800
-X-CSE-ConnectionGUID: uoGGGdcRRQyzhiddwfTtrw==
-X-CSE-MsgGUID: 3hHRlMuLQMuMb74fwIi/eA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,299,1732608000"; 
-   d="scan'208";a="115287400"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa010.fm.intel.com with ESMTP; 19 Feb 2025 08:17:35 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tkmlD-00039N-2V;
-	Wed, 19 Feb 2025 16:17:22 +0000
-Date: Thu, 20 Feb 2025 00:16:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- e2040fe3b82b6c9b430a5b272e5924e8ace9a8f0
-Message-ID: <202502200051.gEf88PIK-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="LiV51oB/"
+Received: from monolith.lan (unknown [193.138.7.178])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Yykzf20ngz102v;
+	Wed, 19 Feb 2025 20:13:50 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1739988831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8L4/5XoOJkThlJm4nTKqNeqJshEiSJlOG+4iUlWNVQ0=;
+	b=LiV51oB/RCUFg+RVJ+KMLs0/XbqHhW6PzOsn0yt0fWTPVfKvif/yIdyDCQmMN+MEAceLpu
+	+TaV7VlYD/SMcvDPGASZCy+gWD3Rb01bju9Q2UbIhHh6bYT14vdUe8IMNEU3SVxeXKc0Yq
+	H6NDAVJQD7x8vPe0Qmf+tgHyeQvRcsw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1739988831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8L4/5XoOJkThlJm4nTKqNeqJshEiSJlOG+4iUlWNVQ0=;
+	b=Z6CwBVb8dgZAGh9sCchwXPmwhi2d3WaSCQalSp2ryGjBPIGpKAdlfbq5/jE7yOOzcOePbd
+	DZgl3DMYpY8VVEvgMjlAqvbmMZk2BOT0dkOn5i6uGgHTpIqy303wN46J09DqPlc5YcxR2Z
+	QcGEcH/yCdjKzs9F1Umv6i5YhoL2aUg=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1739988831; a=rsa-sha256; cv=none;
+	b=m/3Y9kqTUyTFJDPYiLq3NI6PQz2cmTditLF8D8UaiC1Nw69DS63dwPwmCklegwmKUdTdFm
+	WCdY0AJ1e3p/XFB3aV6Z6RavTjH6HSlr3YOqtO41IIzIdv5EZNPwZD5ZPpnl23jyekE8RZ
+	4KcGXLT18FN/cspeK9t+FfbkJWhV/L4=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	willemdebruijn.kernel@gmail.com
+Subject: [PATCH v4 3/5] Bluetooth: ISO: add TX timestamping
+Date: Wed, 19 Feb 2025 20:13:35 +0200
+Message-ID: <79e7f7ff1b31a45022cbd2fbb4252add9c17e4c2.1739988644.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <cover.1739988644.git.pav@iki.fi>
+References: <cover.1739988644.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: e2040fe3b82b6c9b430a5b272e5924e8ace9a8f0  Bluetooth: hci_uart: fix race during initialization
+Add BT_SCM_ERROR socket CMSG type.
 
-elapsed time: 1444m
+Support TX timestamping in ISO sockets.
 
-configs tested: 96
-configs skipped: 1
+Support MSG_ERRQUEUE in ISO recvmsg.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+If a packet from sendmsg() is fragmented, only the first ACL fragment is
+timestamped.
 
-tested configs:
-alpha                            allyesconfig    gcc-14.2.0
-arc                              allmodconfig    gcc-13.2.0
-arc                              allyesconfig    gcc-13.2.0
-arc                   randconfig-001-20250219    gcc-13.2.0
-arc                   randconfig-002-20250219    gcc-13.2.0
-arm                              allmodconfig    gcc-14.2.0
-arm                              allyesconfig    gcc-14.2.0
-arm                   randconfig-001-20250219    gcc-14.2.0
-arm                   randconfig-002-20250219    clang-17
-arm                   randconfig-003-20250219    clang-15
-arm                   randconfig-004-20250219    gcc-14.2.0
-arm64                            allmodconfig    clang-18
-arm64                 randconfig-001-20250219    clang-21
-arm64                 randconfig-002-20250219    gcc-14.2.0
-arm64                 randconfig-003-20250219    gcc-14.2.0
-arm64                 randconfig-004-20250219    gcc-14.2.0
-csky                  randconfig-001-20250219    gcc-14.2.0
-csky                  randconfig-002-20250219    gcc-14.2.0
-hexagon                          allmodconfig    clang-21
-hexagon                          allyesconfig    clang-18
-hexagon               randconfig-001-20250219    clang-14
-hexagon               randconfig-002-20250219    clang-21
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250219    clang-19
-i386        buildonly-randconfig-002-20250219    clang-19
-i386        buildonly-randconfig-003-20250219    gcc-12
-i386        buildonly-randconfig-004-20250219    clang-19
-i386        buildonly-randconfig-005-20250219    clang-19
-i386        buildonly-randconfig-006-20250219    gcc-12
-i386                                defconfig    clang-19
-loongarch                        allmodconfig    gcc-14.2.0
-loongarch             randconfig-001-20250219    gcc-14.2.0
-loongarch             randconfig-002-20250219    gcc-14.2.0
-m68k                             allmodconfig    gcc-14.2.0
-m68k                              allnoconfig    gcc-14.2.0
-m68k                             allyesconfig    gcc-14.2.0
-microblaze                        allnoconfig    gcc-14.2.0
-mips                              allnoconfig    gcc-14.2.0
-nios2                             allnoconfig    gcc-14.2.0
-nios2                 randconfig-001-20250219    gcc-14.2.0
-nios2                 randconfig-002-20250219    gcc-14.2.0
-openrisc                          allnoconfig    gcc-14.2.0
-openrisc                         allyesconfig    gcc-14.2.0
-parisc                           allmodconfig    gcc-14.2.0
-parisc                            allnoconfig    gcc-14.2.0
-parisc                           allyesconfig    gcc-14.2.0
-parisc                randconfig-001-20250219    gcc-14.2.0
-parisc                randconfig-002-20250219    gcc-14.2.0
-powerpc                           allnoconfig    gcc-14.2.0
-powerpc                          allyesconfig    clang-16
-powerpc               randconfig-001-20250219    clang-15
-powerpc               randconfig-002-20250219    clang-17
-powerpc               randconfig-003-20250219    gcc-14.2.0
-powerpc64             randconfig-001-20250219    gcc-14.2.0
-powerpc64             randconfig-002-20250219    gcc-14.2.0
-powerpc64             randconfig-003-20250219    gcc-14.2.0
-riscv                            allmodconfig    clang-21
-riscv                             allnoconfig    gcc-14.2.0
-riscv                            allyesconfig    clang-21
-riscv                 randconfig-001-20250219    clang-21
-riscv                 randconfig-002-20250219    gcc-14.2.0
-s390                             allmodconfig    clang-19
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-14.2.0
-s390                  randconfig-001-20250219    clang-18
-s390                  randconfig-002-20250219    clang-21
-sh                               allmodconfig    gcc-14.2.0
-sh                                allnoconfig    gcc-14.2.0
-sh                               allyesconfig    gcc-14.2.0
-sh                    randconfig-001-20250219    gcc-14.2.0
-sh                    randconfig-002-20250219    gcc-14.2.0
-sparc                            allmodconfig    gcc-14.2.0
-sparc                             allnoconfig    gcc-14.2.0
-sparc                 randconfig-001-20250219    gcc-14.2.0
-sparc                 randconfig-002-20250219    gcc-14.2.0
-sparc64               randconfig-001-20250219    gcc-14.2.0
-sparc64               randconfig-002-20250219    gcc-14.2.0
-um                               allmodconfig    clang-21
-um                                allnoconfig    clang-18
-um                               allyesconfig    gcc-12
-um                    randconfig-001-20250219    clang-21
-um                    randconfig-002-20250219    clang-21
-x86_64                            allnoconfig    clang-19
-x86_64                           allyesconfig    clang-19
-x86_64      buildonly-randconfig-001-20250219    gcc-12
-x86_64      buildonly-randconfig-002-20250219    clang-19
-x86_64      buildonly-randconfig-003-20250219    gcc-12
-x86_64      buildonly-randconfig-004-20250219    clang-19
-x86_64      buildonly-randconfig-005-20250219    gcc-12
-x86_64      buildonly-randconfig-006-20250219    clang-19
-x86_64                              defconfig    gcc-11
-xtensa                            allnoconfig    gcc-14.2.0
-xtensa                randconfig-001-20250219    gcc-14.2.0
-xtensa                randconfig-002-20250219    gcc-14.2.0
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Notes:
+    v4: no changes
+
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/iso.c               | 24 ++++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 435250c72d56..bbefde319f95 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -156,6 +156,7 @@ struct bt_voice {
+ #define BT_PKT_STATUS           16
+ 
+ #define BT_SCM_PKT_STATUS	0x03
++#define BT_SCM_ERROR		0x04
+ 
+ #define BT_ISO_QOS		17
+ 
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 44acddf58a0c..f497759a2af5 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -518,7 +518,8 @@ static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
+ 	return &iso_pi(sk)->qos;
+ }
+ 
+-static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
++static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
++			  const struct sockcm_cookie *sockc)
+ {
+ 	struct iso_conn *conn = iso_pi(sk)->conn;
+ 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
+@@ -538,10 +539,12 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
+ 	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
+ 						      HCI_ISO_STATUS_VALID));
+ 
+-	if (sk->sk_state == BT_CONNECTED)
++	if (sk->sk_state == BT_CONNECTED) {
++		hci_setup_tx_timestamp(skb, 1, sockc);
+ 		hci_send_iso(conn->hcon, skb);
+-	else
++	} else {
+ 		len = -ENOTCONN;
++	}
+ 
+ 	return len;
+ }
+@@ -1348,6 +1351,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct sk_buff *skb, **frag;
++	struct sockcm_cookie sockc;
+ 	size_t mtu;
+ 	int err;
+ 
+@@ -1360,6 +1364,14 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+ 
++	sockcm_init(&sockc, sk);
++
++	if (msg->msg_controllen) {
++		err = sock_cmsg_send(sk, msg, &sockc);
++		if (err)
++			return err;
++	}
++
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state != BT_CONNECTED) {
+@@ -1405,7 +1417,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state == BT_CONNECTED)
+-		err = iso_send_frame(sk, skb);
++		err = iso_send_frame(sk, skb, &sockc);
+ 	else
+ 		err = -ENOTCONN;
+ 
+@@ -1474,6 +1486,10 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	BT_DBG("sk %p", sk);
+ 
++	if (unlikely(flags & MSG_ERRQUEUE))
++		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
++					  BT_SCM_ERROR);
++
+ 	if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+ 		sock_hold(sk);
+ 		lock_sock(sk);
+-- 
+2.48.1
+
