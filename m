@@ -1,148 +1,119 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333DD1E9B32
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 20:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527D91F666B;
+	Thu, 20 Feb 2025 20:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740083952; cv=none; b=oxm+8J/9NtcDcayv80xriQfhGY/Qof2X331gr+vvnGti7X11zkmSTYfk7xtGWbkkZrN7nTod8/F+V8PNhxcmtFm8+M4eFu0W7ul2jmSmmTDaiEPCPQMHdpeBdTBjGTz89GbOGlJ2VGIBUue/kxXkyLcM/yoouQLmenf6lB7WHOA=
+	t=1740085035; cv=none; b=YEjM3671s33hOhLTrHQFqjG8aeVzI9/OSYeUMAkqe31QwTZ+H7aHpxRR6x6hAufq//vPzTL7Vlukx/2W8mgnkax0gQmj2kQv0DzdbuaI0D+VH/Aj+dVkIVBm1TQ0Nhsb0CgBlcjwx4fKB+fSwUOToFDevQJegPctxtq37LCN2oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740083952; c=relaxed/simple;
-	bh=JJj5scXl96Y3iRx4kFQDbvWGHsOS9Ng4dzUE4IlHeIc=;
+	s=arc-20240116; t=1740085035; c=relaxed/simple;
+	bh=dlZNfarQey9h0/TyxX8JMP4ofEsYAogngKHqVFHdG+k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eSR0yxZ8cpr211PT/gIP7/qRUyb09Hqm2Rfi8S+g8nnEy+QvwHyKg4mNEeErC/204YD6mSm/l1cWVNOHrYEVZVO3vFE1z/uqK/HN7MXXTrT33+3pbeHoqoKsbFOPTukv1gzXSpwStuHunEeuQenmX62szZMjjgZ+Fr6QIgh3LMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ASQLqWvr; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=bf+Ye//yFNbuqaYSoKzUmdVjYqy74KG+WzZVbrWi27zO2AvMFrNkHqbYUttuzkytM2z3FsUQXAe7T8JkdcEkZ1mI8xX6mEu1TbSzFZu8rUdnFYqvSqSVXGDZs4/tBxwLnXGmUCGWgG2hVu6bASmXQFQ5g3qn0Xc/JvK29i+yYjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fXNz1nBK; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ASQLqWvr"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-307325f2436so13735811fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 12:39:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXNz1nBK"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30761be8fa8so14490501fa.2;
+        Thu, 20 Feb 2025 12:57:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740083948; x=1740688748; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740085031; x=1740689831; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=70IT6kRv+1tkfGFKB/GJawFdgsbqV0ZRaZzvKP+35CI=;
-        b=ASQLqWvr+j9fJ+xw2BzoRLwoM0p0hp9D5xX6+IuCsVRlTbIEbBuSHzBSUmuW7701Qu
-         N9AgtMeiIMDTvjDvpMRMkgZMENSv3fRhw2xyeY9gy1MmhAU5uTQRuY/FnhIzMOOdV2cF
-         wZgEAdckvK0Hm2q4UjhdC+BIoCAm4Jc5eWs+PKJg1Afni2KbDwUzYEL0bCPJ3zrOCpL6
-         sd/QiTHrSmgUlFFX+0q4pzmlx4O9S85iRXG65cWDGH3sL3BBjo1IrXPQUjHB9Z/FTjNe
-         ENnCHR+5s4Os35vKIOjgq8W7EXdtWrd9eTQhy8vBT1EENl7JY/T8ZnjCpGG6msiMiLGj
-         va7Q==
+        bh=AwmANW11KcJ+o8GEIBk1sW/g+43on2pUAfhOGICBmhk=;
+        b=fXNz1nBKcqu02fLNmjJBQOu3o8+iDqjrdz5Pwjzevn3paPhBYacIYAUDfmNQ24DwYy
+         G5ul13no4nNuTRkGShF6k/Zo/QX0ktCYJt6D2WrgGae+SZBz2nf3bClNkebUrM0pMvH3
+         rcfPz7Tn13a7dTKQKgZALfYuAor4n54n+qMCaPpnWidsQon0pJWJoyykObM72w7P3e5+
+         BOBTSKRfbwDvPpm13qcGLX3skKCpt6tzC2X6Rdl24bkWIpfFu90hz1B8oc7Ka8r8MuHl
+         9CG/mu6ciz0cWqfqM+zOiiZOVxXSGFJUKaqfc2u8yElYH8IzOgsRHUoVGJo0H6pSJiRb
+         jppQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740083948; x=1740688748;
+        d=1e100.net; s=20230601; t=1740085031; x=1740689831;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=70IT6kRv+1tkfGFKB/GJawFdgsbqV0ZRaZzvKP+35CI=;
-        b=akDvyiPcO/7tuzFdDW/zunqPXdVEucBg1ozxOl0O+6z+gbUNN0LBh2I2mloP0Oh2Lm
-         VVN8d89kH5YzVyLphqOTJCNOYTOhWEaizqVIOd83FyGteRLVLylgqtF5ZvYYIVYLkPXS
-         ZYObGiqQyo5zCnoGRMvb6G5C6frKeSWRsUClXUOgJ7KgmavHVxEhDKLdZpilPyUPLFxK
-         hN77jqiTqm3drImHIg2bLJyoX+/9/G/lj8I0JwxmuPIjqbcri4KoIf7Awj39ck0fRQrA
-         S4E2ZYJFcE9nT825pVDT1rI87HmvapVCpIbKr4BGjFLtcHLq9nXKB7TtPK29mBMhaq1f
-         xl/g==
-X-Gm-Message-State: AOJu0YzcrZSMg73cctIAAxTrMl/XRpOCodL7nzeDcrXhB5DMdD/0izOE
-	d04KUyeDzCj/J20SF6bf+j9JHzZFpDdpnpbBmOVbZSvNrU5wKpS0WZBifWHuJ4uMiDG20/l/mG/
-	mYf9V+YOhwfEf1p1JLZQmEnHLVLU=
-X-Gm-Gg: ASbGnctc3HBLXgw8fqnvi1UfQq09qwGfU3qImnNChxo2QIkIWTe7raRRwH5oxYy5eih
-	OlmdBids62oye9ujtIi8fhgHsGRu26piSOXOYWFS1OgufEB72dwJ9y/YSSQhVrWzHBJ2W4W1sJw
-	==
-X-Google-Smtp-Source: AGHT+IF8S19NBdQzMLfQQYvzD5bzGdOQ62WXsySGkS8qJiJEpvXYMMonQ6VtH1ooKbNFuqaLcS4EYbv5nJUNs2Q6li0=
-X-Received: by 2002:a2e:9ad9:0:b0:308:e0bd:a091 with SMTP id
- 38308e7fff4ca-30a599ba31amr1712231fa.36.1740083947846; Thu, 20 Feb 2025
- 12:39:07 -0800 (PST)
+        bh=AwmANW11KcJ+o8GEIBk1sW/g+43on2pUAfhOGICBmhk=;
+        b=lsv+Puoefjmdih0t7w3r0UquanF4josfKo5yT4b+jYu6wMzgqdEg2z+0dakBntVh5M
+         LXEfUJGKvqFsfKG3BF9T/iqskwTaqhhtQ3B/EmUuJeyMJnrqIUEbTRRGfEBy89snco6P
+         BgFo07lxmpN7+KxicxHk3kChz/7SGrU7f+rbmnr/kMgM8tZbBmzvXiW0uBQLMlN85e8L
+         RIvFoH48/pV7gsbMmUPuRZfhOH/L9BfzO00xvSsEJD3Vn1GkEoB5VXHauR50vSHn5F2S
+         Obgvf2n5WLiOz1Ysm9l0WGSqdXxAhAEKI2gQ1qEemzYMMgUakuBS5fyQvkNLIBD66PhF
+         80LA==
+X-Forwarded-Encrypted: i=1; AJvYcCUd6dHhjW0MRnC5OTWJcxeQi5DuWtiRbrLE+q6Cl4o3VksRykgKngIlBdym5t9NB6zQafiWQtw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWPt8VplO9rKtCr/SMhjsGcs5RMtSPRwaWF45G0pJOZhfv6kKW
+	YTacRhbJ9EaZ+C6Q1Z1qJQHYnZVqDzq21LC+m1U+TE/RVI35he7m2bsmh5JnrnsWTresXJsH77t
+	GbKBVE5ZT8nvfTgHgQDDnPutsIoq6Dv3oNGg=
+X-Gm-Gg: ASbGncvlRfxrIcRfMSRGszWsxCZcyRKvfLIHmS08lfUfx7A6LwIdLA0YZRFYSleEU5b
+	zjA+Ry8J8WMcdFY8sI3CIjdnkLYD4vNZsJJBDvf8GU0Y09QUbswBT4nNBdIrv81CG4gzjgss=
+X-Google-Smtp-Source: AGHT+IHjKlzi4inFbnRyYsAxgjJ5CEHo4alCTy1GdaEVU9lgdOJ+LExmaprvddP8a8hLPsV48bltQVkazwwifdohhVw=
+X-Received: by 2002:a05:651c:1512:b0:309:1d34:1089 with SMTP id
+ 38308e7fff4ca-30a59777b2amr3014411fa.0.1740085031086; Thu, 20 Feb 2025
+ 12:57:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250218214344.1519862-1-luiz.dentz@gmail.com> <7b563cafc5b7d3ad23e845f409cf9b992e37ac79.camel@iki.fi>
-In-Reply-To: <7b563cafc5b7d3ad23e845f409cf9b992e37ac79.camel@iki.fi>
+References: <20250220202402.1986578-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250220202402.1986578-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 20 Feb 2025 15:38:54 -0500
-X-Gm-Features: AWEUYZkFwVsMHHfojtWMke8LfKWp8Ru83g_PmPvw-A9AL6YxCTcXngOSyfZgHJE
-Message-ID: <CABBYNZJ4YXfSfVZrM7yQnqYELJCiPfo1Ho236rTb56Yda7oMyQ@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 20 Feb 2025 15:56:58 -0500
+X-Gm-Features: AWEUYZljrNKvrUtsOJQuYpVBKifIK_icaUHFVaCZtN1qRCzToO30gBDQg7KmiMI
+Message-ID: <CABBYNZJqMOhbVvJEKMOAvQOv2_3NnJW2VPCd5rwvGck5Bscecw@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth 2025-02-20
+To: davem@davemloft.net, kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+Hi,
 
-On Thu, Feb 20, 2025 at 3:26=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+On Thu, Feb 20, 2025 at 3:24=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Hi Luiz,
+> The following changes since commit dd3188ddc4c49cb234b82439693121d2c1c69c=
+38:
 >
-> ti, 2025-02-18 kello 16:43 -0500, Luiz Augusto von Dentz kirjoitti:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > This enables buffer flow controler for SCO/eSCO which apparently for
-> > some reason has not been in use up until now which caused sco_cnt to
-> > never be updated, but recently this has caused the following problem:
+>   Merge branch 'net-remove-the-single-page-frag-cache-for-good' (2025-02-=
+20 10:53:32 +0100)
 >
-> Should this first check or explicitly enable
-> Synchronous_Flow_Control_Enable setting, via
-> HCI_Read/Write_Synchronous_Flow_Control_Enable?
+> are available in the Git repository at:
 >
-> IIRC SCO packets by default don't generate Number of Completed Packets,
-> so is there something that is incrementing sco_cnt?
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git t=
+ags/for-net-2025-02-20
+>
+> for you to fetch changes up to fe476133a67a15bbe8c1357209e31b8d9a8e00c1:
+>
+>   Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO (2025-02-2=
+0 13:25:13 -0500)
+>
+> ----------------------------------------------------------------
+> bluetooth pull request for net:
+>
+>  - btusb: Always allow SCO packets for user channel
+>  - L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+>  - hci_core: Enable buffer flow control for SCO/eSCO
+>
+> ----------------------------------------------------------------
+> Hsin-chen Chuang (1):
+>       Bluetooth: Always allow SCO packets for user channel
+>
+> Luiz Augusto von Dentz (2):
+>       Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+>       Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
+>
+>  drivers/bluetooth/btusb.c  | 6 ++++--
+>  net/bluetooth/hci_core.c   | 2 ++
+>  net/bluetooth/l2cap_core.c | 9 +++++++--
+>  3 files changed, 13 insertions(+), 4 deletions(-)
 
-Yeah, totally forgot this exists for SCO, we will need to check if it
-is supported before we can turn it on.
-
-> > < HCI Command: Read Buffer Size (0x04|0x0005) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 11
-> >       Read Buffer Size (0x04|0x0005) ncmd 1
-> >         Status: Success (0x00)
-> >         ACL MTU: 1021 ACL max packet: 5
-> >         SCO MTU: 240  SCO max packet: 8
-> > ...
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > > HCI Event: Hardware Error (0x10) plen 1
-> >         Code: 0x0a
-> >
-> > Fixes: 7fedd3bb6b77 ("Bluetooth: Prioritize SCO traffic")
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >  net/bluetooth/hci_core.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index e7ec12437c8b..5c88d3816c6a 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -3564,6 +3564,7 @@ static void hci_sched_sco(struct hci_dev *hdev)
-> >                       BT_DBG("skb %p len %d", skb, skb->len);
-> >                       hci_send_frame(hdev, skb);
-> >
-> > +                     hdev->sco_cnt--;
-> >                       conn->sent++;
-> >                       if (conn->sent =3D=3D ~0)
-> >                               conn->sent =3D 0;
-> > @@ -3588,6 +3589,7 @@ static void hci_sched_esco(struct hci_dev *hdev)
-> >                       BT_DBG("skb %p len %d", skb, skb->len);
-> >                       hci_send_frame(hdev, skb);
-> >
-> > +                     hdev->sco_cnt--;
-> >                       conn->sent++;
-> >                       if (conn->sent =3D=3D ~0)
-> >                               conn->sent =3D 0;
->
-> --
-> Pauli Virtanen
-
-
+Please hold on pulling these changes, there is actually a problem with
+Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO, I will
+send a new pull once that is resolved.
 
 --=20
 Luiz Augusto von Dentz
