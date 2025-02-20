@@ -1,202 +1,125 @@
-Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012036.outbound.protection.outlook.com [52.101.71.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214651EB1A3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 08:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740041920; cv=fail; b=LLtH5shshGLxbThk8l4/L30ouGRaKnrzvBtEGFX2mKBoBQZ/L7Tnoyd29p1iraA6o1vTHx32fKMoJIeQI3osAo3SVQpe+Jse3QRohqXcHrIhwBaYdTjfNP+zy08Lj11uxQJ1TFtNszM65m487mV9pWQciCQjfwImraObTQprKxA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740041920; c=relaxed/simple;
-	bh=M59MNMSa6oGLImKXY584S1/FnyBndJT8Ppy60E2yk5I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jCjpQHhPyOAxrTFjUYEQKgQZnfDbnMAEc/KhWZ+iBszYD+GbDShLGyCio9am7+UCOFA2AIps8GqDdMXdt0uUc7cG2+S6cNt8XEesWBaiXPrESRedraaYFHiAODC0ooDjzEn/oyB33tbktzdeF8qPZib47v/U+TYPnMEqWRiWquY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=g0WEyr3b; arc=fail smtp.client-ip=52.101.71.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A781E9B35
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 10:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740046314; cv=none; b=RnL7huyjRflk4RZ5TdoRM7oEEny/HQ4qoYDQiSiCxcbvF7QozdQazOjoIicHAxWDJH9VWp3jl34vN4757/kZmojNnIagZjmtNav4lHBny4gv+ym4phpWY5gztzcj/1wYmlapjvgYlpoM1L6hI260UrRF7FJd4PWJggX/J3NtQsc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740046314; c=relaxed/simple;
+	bh=lL5PbZrO/tn4suIj6CCXX2X5NgQYSFeMHHO6SjpnfAI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=uaqfaJNzDEfmkQCxoSgk29FxQQKRAKc4hjFx/BbBSQi45lRx4TUOyo9sOH4qEIE5qJuTt/qYqngLrbGYQg4qE/iknVB+ALsT865BsDOAlebm+HX4WOHBxmVwFbp/1z/aBd9m/YifUXD3t5EBYvlnAeznB0a6LwnyHcBgLnbcsno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TfXpoxPS; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="g0WEyr3b"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lg71k9w2bgcqMwGOo7K82tjMvRqQb+zSPloqB9yHLg5UeqXhGJ2Zl0/fRq4n79YIp8zG05grk/cgzymgPFBZUSss1TJGlT1nZP68vs4pEVni3l+IrRlUIbjWL8KXNIJHesNUgWbkgiypG0UXAkxT8KOOovtxXV2dCOEd4RV+Uq8I+x/9Cgb46OSM9r/7HTU3Gi62+6l6dq29GzSIUR0mMPQ0ZwBtDh8O6SkKYK0YBwhJq71mFnByPWpMZ28uX8HzwxaDewWmbNXeIjbkaUwg7fgSfvLv2ub+vfgTKh9SnYbKd6ArgXx/Z/TFUKMYjIja6vZlGoNTN8cg1KMKcCWA3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=11C2qMOI4sCJG1bDcd6ecENqRE9aP50qTOmOz3MJ+ZI=;
- b=xbnsM+dXN1zTZzLWYDkb0ha4O+mpDcT5JiwedL/ceymmodIVGDJJSK5hvJwRL4xkwjG4RnqbtweTjMWO03TJyR35XyWbxv/K4IgljgsIyVpSkOmQ5cx+e3tWXkEm0JSWhKv5kRs/T8246JHSGP2aUnEhR5RPlD9FrmXVnTPWxgdctWQw7l2cclE+F75S31dQWEA0CPGPsXVBVGl7B7hfGUUW5G/mK/hlpvkRpOuzwGXSYdSdJyshsEKkRc3uHbVG7Sdvr7Lt7/C+WKrZ5DbuoMrMH7gS0HT4MG3NsLrYzM8aSuQELScRFFQR34VNJfGG4q6ueVRKKNkHymVhTtQSgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=11C2qMOI4sCJG1bDcd6ecENqRE9aP50qTOmOz3MJ+ZI=;
- b=g0WEyr3bks2HhiAXP7q7t5sRmhKikk52rMAP3ZyPY9HDV0DfhTUCsnEhv/5NEAR9KGH2QGbKigw0CEbKufWTvdctP/ws1FczvPyKHgj2/XvsuT4A5jy+QLniOrEhaiDtKCdcC2NSSjnT1Bc1yZyRUJINZoQmHEx44iv2QG2lunUOYAo44oXd7F9zjqQu9JU7FeCdC+fWSftYcZ8Z4CmZLNWgwkAIw5vPUUnflKGSgHgbFFHKJ4NuV3tFEYj7+i5Ag7V2cfOEVadj84ka0yBE3CJgBjVM70APro13PkbiZPjaAeXu7LOW0oqRvYN5KwsmgV46Cl+0Yhh0j3iLwwxEVA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by PAXPR04MB9121.eurprd04.prod.outlook.com (2603:10a6:102:22b::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.14; Thu, 20 Feb
- 2025 08:58:29 +0000
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8445.016; Thu, 20 Feb 2025
- 08:58:29 +0000
-From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudia.rosu@nxp.com,
-	mihai-octavian.urzica@nxp.com,
-	andrei.istodorescu@nxp.com,
-	luiz.dentz@gmail.com,
-	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 3/3] bass: Add checks for bap user data
-Date: Thu, 20 Feb 2025 10:58:11 +0200
-Message-ID: <20250220085811.5033-4-iulia.tanasescu@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250220085811.5033-1-iulia.tanasescu@nxp.com>
-References: <20250220085811.5033-1-iulia.tanasescu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4P190CA0005.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:5de::17) To AS8PR04MB8898.eurprd04.prod.outlook.com
- (2603:10a6:20b:42d::15)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TfXpoxPS"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c0a974d433so170472085a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 02:11:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740046312; x=1740651112; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fZ1R85rYugPTlFjRr95q/vQFE2nPFIvzf/xgf9hreOw=;
+        b=TfXpoxPSO6wBlJE8V8v28JXFN39WcM7l9nm24FNYkLAqpKP1faf4YCA4DKhfMiSGz7
+         FMxxTV4KXX+U3qqx+Oub6gmlU0BHerV9DH5cdDKa+MUu2pNvKaZK/oGez4Iv2sCv6uvf
+         0REA8w3zdzzFhhxulRQMHhC88p2I9jgtyV1J4yYQGBIIo+mtMge3q831LTYOHLyArmgm
+         SO+h4AK32aGkECM7ts9xlKZcd2slXWpdEfZ3ajXj+wvovUWeNt/94lCRsJtPtEGwtiqT
+         j2bNsOyEHON736gOB5GrKbtkUneKhVKkdYfka1YRxPl+PxF6HroT34i+4S8FeFcaoUav
+         rfKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740046312; x=1740651112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fZ1R85rYugPTlFjRr95q/vQFE2nPFIvzf/xgf9hreOw=;
+        b=wodRh79lQTEMIYlnV5X+qu2neiyfO9Sh+Up8kjGTxL7DDMoT2uGpzCYvpEX+/XqS8K
+         dVJw83anBv7rCVIRn6e4lHMruIbKz+9xHxJ4fX+YUDsdCpkeKhZWcGsrrAhjDhonyeuk
+         nJTXo8CAOq9C+EI1Eedb47aUZI8HR3ifpYborg41ZIk+x58i3fLVU8PEZQIS0gb2WkyP
+         JH3Uz73sLiD1yd9NYUkgQTr5QZaRy8nVPKKEjqndyfXCDidI/ll7XP46+M2l43Lk5u9a
+         m9mMADfBsYXJeJZ7hbC/I969n/H2r/PXXwR2MuUYq0oNtE3y9QbPr0h8dPhoh96g0Uro
+         jZ4A==
+X-Gm-Message-State: AOJu0YylD2LVuRHP7lz7AaFHTLVcKCE7GJLceZmL41q8TGssVoMnm4bT
+	8ICT4h0SYrNlXtMy7eSDAibAaDO93SuNOMjGiA6dRLqEosgvKLzysfqtbQ==
+X-Gm-Gg: ASbGncur7mxfPM2ZejxtTbgzjKhPDWOHpHg9st9AsFDYy7w3T6Jc+Rof+Sy56PLxljq
+	zTUbjVav36rk25FPiiRq2KAs/4OUodU5LAphk7AP1me7b+vTxzGFkXLChod3AgXBNQbP+VgSvAR
+	Prvz/xC/xleMH4V07H8cjMrGZnI6J3YCeHwgrUKIDIJRjyKHOikoiudYXlKgtMEjgBn4tL8P7eT
+	YvoHP4F6T/rxhnGEv2Sodjs+Li9ymrxO7Tm3Yjk2un/xjWE4A9xDr8MnZmHEblvKGBlKqPKvMXr
+	uhGOYIOfuHPUYdJe0uWc
+X-Google-Smtp-Source: AGHT+IGbisFvJlG7nsPfCIALKaAwqxz/yNBSrysAsxSLufiINtwTEhGNiG2BhriVmk3Aviz6nfltGA==
+X-Received: by 2002:a05:620a:2985:b0:7b1:44ee:644d with SMTP id af79cd13be357-7c0c21902c7mr353280385a.10.1740046311898;
+        Thu, 20 Feb 2025 02:11:51 -0800 (PST)
+Received: from [172.17.0.2] ([20.57.47.197])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d7864c3sm84177246d6.49.2025.02.20.02.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2025 02:11:51 -0800 (PST)
+Message-ID: <67b6ffe7.d40a0220.58089.2170@mx.google.com>
+Date: Thu, 20 Feb 2025 02:11:51 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============9164573358043967484=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|PAXPR04MB9121:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc1b6100-e2fa-4cca-21b4-08dd518cbe8b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ZIC7zbZiFHXXa0QQVXIvqRDEpoiR9u892SwMU2LSVmMJoC5hWH/atjv/NoG3?=
- =?us-ascii?Q?yC0vpT8luqKa9UaMkWqrcQgsE+1UEn4yIdAu31wxOqNcoyUKLJqg11rIGMCX?=
- =?us-ascii?Q?VkHkh5O+gZx7wjjyk4Trt/XTi9RpSE9evRQHKJe79OQkXK4UhIzwgToJS3G0?=
- =?us-ascii?Q?X5SqUuQbSMUP5FfanlbC2yK+uPy9KTP7xc6qFhgxUm/R1dcQqXf55wsr3nZf?=
- =?us-ascii?Q?l2KwAYlLAq8vDh9Y7ByXxsuvCjLYl6bewu894eyEYlv8gYAZNSOHAmJDBWpk?=
- =?us-ascii?Q?eaVi/0OSXZapzD6zreT+Azm3qE5iYcVljHJ00Dov+Ni4J1T+TBLyqN4fZIUr?=
- =?us-ascii?Q?ZDE9mf3NHry1j3TatHw43KJDTY5NgL6MaRC2ra6167MqaW2Nd+sjHoUDiKSE?=
- =?us-ascii?Q?Au6fkhIJGQpo45FQMGMtIS4KXhpgF1M4WJLtROSZc2v+KkJGVu8Nv2wKqvEa?=
- =?us-ascii?Q?dK3liNAwSiA7xXlGThTZSgqzS5YVE/glM8vEnIXd4DWy/BqPiYJqM6aMqyJV?=
- =?us-ascii?Q?IOnrk59fOJttAbzxdRdBE3z4BLp0KUxWZ6ZKDqI5FZoaeCREYlvTNc/7b++3?=
- =?us-ascii?Q?R2s/dxv3DgtUbXF65WhvkqaJE2iBbKgmFcwltDhFG1xv49yJPWisQ8VJM1Gd?=
- =?us-ascii?Q?grarBlGq/aV4JNMfHYD1+OAqBrcoRXmUAjnaCLRLoGPuWkbHWaq2YeROdI5Z?=
- =?us-ascii?Q?uXXmlIG2bFJ78bSH0YTkDdMX1X76vvD4Y5w/0z1xFQ2KduMdge/GTssNM8lG?=
- =?us-ascii?Q?+4Cic22vShO5dlpm4ySL1Eeyoc+TirKC2f3esP03j8VxmxwcKuBX8BCoAqxn?=
- =?us-ascii?Q?wPFANI50F5YYADDPkkxh7gv9BUMQ5DimVYC2+9rLBClzQtcnPbgR4jfhkWev?=
- =?us-ascii?Q?4QeGV0y1gQk2mLJ15fHNxFNxdBREsfl0SonK3jgGATPYUQl/zcgrOXreSwZT?=
- =?us-ascii?Q?ZA0WjJrDqwccR91+QXiCC+ge/VIPrhPJ+mywVedxNsozsMMDBRo946n8ZLlu?=
- =?us-ascii?Q?JFFg3NAwzi38d1NEaVky8Vwa+t8SWKf57JQlYGjLOFHhlbj7vr1W2/kWLIIF?=
- =?us-ascii?Q?oM9+3HwMcdgZxN4EmroNk4b1vD9cS0P3xpUSNXwb7Xh8Hq/9KM1WVS3H4QlW?=
- =?us-ascii?Q?yPnDiwwr4f5CcDvSiPY69m97clUai4Q2M0ZbJ6TZiCaa1RdmFq00PM8u0s0v?=
- =?us-ascii?Q?ndeRIYcLLA1D76BV7I59DtNt+HDFVZNvOwr+LJDxvoVZVlyhsLd2J1SDRKk6?=
- =?us-ascii?Q?YQ+IundgsF8OdaTu2oqy2qbt8KtKKeHfpwqug/mBkMk04x6gLbIkjQc4+VDH?=
- =?us-ascii?Q?Jf2ozAqWmMofL69lsENyxZKTeTtJXTNVEHuJJ7FFAyBqQgHVrEXyHbkWubs9?=
- =?us-ascii?Q?pX0AwUNycpOsoNmQlw7TbEVua7Zh?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?veihDL5+43f1MIBIyBPMNSP2I2R7hfFDqadeuoUacEXy8sn3/Tisxt8tsnXG?=
- =?us-ascii?Q?75/dOLqy8tQSuss1NNOyezvf16TuXyEJbvKRQBXzrY6yalRCNPOuJQilzLwI?=
- =?us-ascii?Q?vUGLIppTERVP197neDwaDUCzU8nVX3FAnmTp1DM9CxEcfCuAkRcrOcgQ8clU?=
- =?us-ascii?Q?GJlRZvYDdSY2p9bCNvwvMmrw2wKeruB8snMT7+Eu5mESrcDOhd6r/4Hgze+z?=
- =?us-ascii?Q?JeYI057E2wgSWVEQXCKTvetakI/zdTVlAgrZReLGMefokWdnLAkG2OzVFCVJ?=
- =?us-ascii?Q?RhC5/uD62fohDZsAgS8DPiqa+JIK2kIcz1lf0k0wm30qe6hpBsRoIgO3/6Xa?=
- =?us-ascii?Q?VhG5KhTOO2aZCZ3BOn3+pazFCtbx8YX8lA5QmZZd0CyxEXh90N8sdjvHrZ6Q?=
- =?us-ascii?Q?OTyhLgIcHtttV4BdY/dTPHW2OcrZWMF/iOt5vmJlohIrYhue63FOd2cZuVVk?=
- =?us-ascii?Q?xK8dk0QLC5zkXvyK++Rhe8tps2/YzENYrqUdHWTUwGCdmv3/RucgIzv3Zdzg?=
- =?us-ascii?Q?tS3c2T0HeBxDHwID/CooruUbwwmRZeVefLcfD9JDYRzvjL1XoRIkWxeHXFjd?=
- =?us-ascii?Q?UqDwwB5xRGqpzV6oO1aLjcmgUTDQz/2zVS/JMstvfdtAxEsZqWhyAwQjU9e8?=
- =?us-ascii?Q?Ds1J7mU+uY+GZpItg4TToPxux8yNeLps2H2tLipMYhePPbMnoNqxCMhJmeqr?=
- =?us-ascii?Q?EBoHNF/UkV6mnou9fxZF/0pUhiVp/52KnVfSRntQbhJ4u6irke18gIMe5MZx?=
- =?us-ascii?Q?XatHY6qq+RS4xejg3z0TuowrpbTTGMKUuVwKqCgk8P7sVporaRrhbaqj78VJ?=
- =?us-ascii?Q?US4CNxQOIFzlaKvTYDuNRAdyfi/r+xyhugWFAejzcUoAAsiPMWkiMtLmdYxi?=
- =?us-ascii?Q?3BEuQ8j45ocuh7SGsjN0+OPYyKX2KIy0pBVl9Ltxx2GWaXBkHX5cEOcI7G3A?=
- =?us-ascii?Q?xXxc795FVFoP4N3h5BeBi7GIrWTNTrhr+lyBxvMtMskijH9pE/I5tSIWf1cN?=
- =?us-ascii?Q?S1gwY9us4hwxtRG1T9eD8CbRdGIPpf2UqxGkspJhdmEwkVeygimvFoRftuf0?=
- =?us-ascii?Q?96YwAC3jP8RfNwP/KLgAooQsFQum3IvrJ5uMDNtG3Qtpo/iTiZbeXgv7IcRl?=
- =?us-ascii?Q?s1gk3NHGhP8l96PwG02wGsyzQcC0e5RosgP3zylgQeertUfAXj725e1UW4yv?=
- =?us-ascii?Q?dsagLFtnbVJDyvwTEXk/kBLubZgWmCxyB+pLzaTtC8LmZj4fLe3+B1KnDAge?=
- =?us-ascii?Q?5Xueb5YukER4Rhwat/VS9pIrD6I45eF+d9vTZmFzDsHavDb1SN3x4t+24lUb?=
- =?us-ascii?Q?5SGGF8Do4VWqeFGxuVxXTNUdb5ez2tR/sIpY6GCBkPimiE5swSz+trsjjri1?=
- =?us-ascii?Q?Qj1WdZebkwYmT86hHJp7v8Jx1+Ny5q1FkTcXv0nBX+0h6ys60Rwdf6/N6zi9?=
- =?us-ascii?Q?351yVsBFY+ZgKBpi50mScdBIbxuTNbkxv+xwIBf5+JWUfbTQO08NqXL51FJA?=
- =?us-ascii?Q?sNDQ2RcchfnKga5BdhVys3FfWTiRD7tZRf03rKD6/LxP8ykOBZDldnAeIb0x?=
- =?us-ascii?Q?PPYiQ5nBQtEwhm5whX8YQSppMl9G39zCD7seWZo5qdP/souXQvwNqw1Vf4Da?=
- =?us-ascii?Q?gQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc1b6100-e2fa-4cca-21b4-08dd518cbe8b
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 08:58:29.2469
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wrr+uFH1CZ3wCCEobfMVTSJd8rtr2OUFUlyEd5JX8DZkdzR6zg+1Y3/HaUEAbQSC4SSDNR1DHzag4Gai1SD1TA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9121
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: bap: Update bt_bap user data handling
+In-Reply-To: <20250220085811.5033-2-iulia.tanasescu@nxp.com>
+References: <20250220085811.5033-2-iulia.tanasescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This adds checks before parsing bt_bap user data in bap attached/detached,
-to avoid accessing NULL pointers in case the user data has been cleared
-or has not been set before attaching a BAP session.
+--===============9164573358043967484==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=935909
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.22 seconds
+GitLint                       PENDING   0.18 seconds
+BuildEll                      PASS      20.51 seconds
+BluezMake                     PASS      1530.47 seconds
+MakeCheck                     PASS      13.76 seconds
+MakeDistcheck                 PASS      159.59 seconds
+CheckValgrind                 PASS      222.09 seconds
+CheckSmatch                   PASS      286.40 seconds
+bluezmakeextell               PASS      98.96 seconds
+IncrementalBuild              PENDING   0.27 seconds
+ScanBuild                     PASS      877.71 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- profiles/audio/bass.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index 6c84fa1c3..67ee847b8 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -559,14 +559,21 @@ static void confirm_cb(GIOChannel *io, void *user_data)
- 
- static void bap_attached(struct bt_bap *bap, void *user_data)
- {
--	struct btd_service *service = bt_bap_get_user_data(bap);
--	struct btd_device *device = btd_service_get_device(service);
--	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct btd_service *service;
-+	struct btd_device *device;
-+	struct btd_adapter *adapter;
- 	struct bass_delegator *dg;
- 	GError *err = NULL;
- 
- 	DBG("%p", bap);
- 
-+	service = bt_bap_get_user_data(bap);
-+	if (!service)
-+		return;
-+
-+	device = btd_service_get_device(service);
-+	adapter = device_get_adapter(device);
-+
- 	dg = queue_find(delegators, delegator_match_device, device);
- 	if (!dg)
- 		/* Only probe devices added via Broadcast Assistants */
-@@ -620,12 +627,18 @@ static void setup_free(void *data)
- 
- static void bap_detached(struct bt_bap *bap, void *user_data)
- {
--	struct btd_service *service = bt_bap_get_user_data(bap);
--	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_service *service;
-+	struct btd_device *device;
- 	struct bass_delegator *dg;
- 
- 	DBG("%p", bap);
- 
-+	service = bt_bap_get_user_data(bap);
-+	if (!service)
-+		return;
-+
-+	device = btd_service_get_device(service);
-+
- 	dg = queue_remove_if(delegators, delegator_match_device, device);
- 	if (!dg)
- 		return;
--- 
-2.43.0
 
+--===============9164573358043967484==--
