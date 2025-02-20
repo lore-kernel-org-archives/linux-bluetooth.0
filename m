@@ -1,104 +1,146 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6301EFFA4;
-	Thu, 20 Feb 2025 11:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFE81F3BB1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 11:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740051927; cv=none; b=kHTd9iNRCmV0TZ4XlmPvrAAFtN/sYl9uoZnOwHWY73kLsX6kaong46Mhedlj8kXzQFqKE3vNjfXo5mbs8bG+HikKWWI9tFDzBIyX037+sr3AFQFi+RrEc28eX/70tWTeljBIZrFhfoOK9dQ203UH5FWgt6qpJB/ZpexPc5R5xuk=
+	t=1740052460; cv=none; b=P4FQ1Na2niG3nxZ8Qc8dqh1/EDYpo6bTxdUgdCC98nTKFEFJnwlq98gY6Rz3AWkJefKW7dOk1tUUCK8RV5EisnaeGBj9GSvm+ONjBi1CRzBOSqrF1ZeImBn0p0E1YP1+G1g5EjJiFtTf8Q2ryDPJ/H1J5XDIsNzh8ZQNDD7YHoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740051927; c=relaxed/simple;
-	bh=2EEW45Yj8xi2tZwxxOWNkFYSQ4lVAi8o8LQZMo4zddc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lxUlMe8Ye5wAVtAGZHyIqSrr86S+YM761enrCokthufrS3aYQFdPGxX/hhcXLEvMJkNDQH4Dgz0lWyzkJgf6w0+7pxakiBYfPfNbbzVmQ7pw++ZYBdr4BHdlhxCb5AqvFnK12kYmgXoBHdQVcC8hvLjYU0EJU+56lbynfTB7gP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af4d1.dynamic.kabel-deutschland.de [95.90.244.209])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 03CC261E6478A;
-	Thu, 20 Feb 2025 12:45:04 +0100 (CET)
-Message-ID: <184919f9-25bd-4f65-9ed9-dc452a6f4418@molgen.mpg.de>
-Date: Thu, 20 Feb 2025 12:45:03 +0100
+	s=arc-20240116; t=1740052460; c=relaxed/simple;
+	bh=vy2pQyTwIUT2ClNP/DHt1GpBQgzQ9tHDDrMLT4WynXk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ucdycu/6W0pLJCtf8KCUPf8F057ZdGzGT2ng/d+petYZ6uLcFCddeXitm0Z9n7EqooH5wp0fRGEcDqnLZFH68h8z/42V3ckDKPS6YHYF5jiIbaPXjvnnSFBoQwPgvjrsvi7N1A0DUq9ADlYU5UoRUeUbLXPcYZZoJY2XvLJ3Hog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M7dcuU72; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M7dcuU72"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6dd01781b56so10024146d6.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 03:54:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740052457; x=1740657257; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=u/3FZjU+DwykLksPImN7YxhoKZObDZHfxS21RGCFuhY=;
+        b=M7dcuU721orjp5uOQOg1ATAgmb6wdz/RuwhIuxv+5Wim57cuWnuxhRgxE3xLJbBEfY
+         wzCHfmSaoxKLdFTpcCtZytNQ9FTDPZIybM2G8XUYc7X9vH32KOhJGhj2aiI8rjjkibkH
+         QxNPBdf8RzpiLR4bb/z3N/Kk7PRbDII6AS1IbweJ/ZZgg8odwVcz3+wSKMsfsaxu1lyZ
+         6Jy/J4Xn8H7AOWW3KqZNs56qOklej6hqPX15uyo5DejS30bopQMDp0AjoLCCDizUAkjK
+         4lBaXUoLGEbr8P/ggzoAsHXwfg4b8Vun6f7ugq9iLxAm1DSUqgTrqYnLg0Ofp4GRfUgT
+         cYbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740052457; x=1740657257;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u/3FZjU+DwykLksPImN7YxhoKZObDZHfxS21RGCFuhY=;
+        b=kjm2HGPc1LEiif6SwYMNTqt/CBtzpckC6eBv5vhoWQMnvlFZJ8+ESihbYoxgidCeP/
+         BOuJ68alcc5IERrOQA0uoaXCE0yh7z5xnVJQsPU5Lh+pGDThKHKeJVWNKU7QOLMiSplg
+         p1wCD1X+ngjmWLuV14kjxi0SrLrkfWxBOcIYZK4s4/WoJhqcSxXVmDbfcOEb2HZBghyz
+         +bTVAveGb+2CgPWkb6izAY0O2IFOaKt7s/hzhxmXSkfehSybWQwXv4qn+VAuRavZdKR5
+         Y5pueqmPcGI4lpmlLnR1bISc0fTeLiMGmxcwmL42Y0oF7hy3AWzvHkJEhbFzbE8Qm9nB
+         6mRA==
+X-Gm-Message-State: AOJu0YytPgjBwUomHHabM4hGpywdWhD1dBfK2Mx82bYEnZ0c1YNsZc11
+	2hzm0RgmTjPMxMyBT5hbutEL8aCKFu3NyraOSq8W4w86EPgf+Mn1o+3zlQ==
+X-Gm-Gg: ASbGncv3bPwNmKI+Mk8PZLcq9e4sI9AdlPi/bLeaBcNHJZfNbDKJTnJJX008BSM8IRN
+	43ditcMiT3IIyp+9LYxuyAoAN1YI9Gq6XEtydxuZ8BndNP2CFeZ/0GTo8hrOKw23ir5uhCaPMZo
+	uSCYrlt0qEs5YP8o/SQnSSGx4SmzWenJ0Wwr9nA2DADtizzSooSEIIxwQVgUKt+tY2NT+9whLJ5
+	BMHZfJ6pA5ala+OK0uLnlQNb2e9fjtaqVmu8IodzC0BZI89QGHhhRPaVhL9+9hbBsz3JdBalWIM
+	c0RVAphKq0bdtdsvkRIFz1s=
+X-Google-Smtp-Source: AGHT+IGuehXk9w3gCoODN5gAdOYCTpq8VY5Slyxy9CZeQ20blEYLRF980plsMCVgGej0b1ibSjRbGg==
+X-Received: by 2002:ad4:5dcc:0:b0:6d8:e5f4:b969 with SMTP id 6a1803df08f44-6e66cc983a9mr312237766d6.10.1740052456908;
+        Thu, 20 Feb 2025 03:54:16 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.229.67])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c097e43fb4sm503738285a.107.2025.02.20.03.54.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2025 03:54:16 -0800 (PST)
+Message-ID: <67b717e8.050a0220.18df0d.5a02@mx.google.com>
+Date: Thu, 20 Feb 2025 03:54:16 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5886165534209716948=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/2] dt-bindings: net: bluetooth: nxp: Add support to
- set BD address
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- amitkumar.karwar@nxp.com, sherry.sun@nxp.com, ziniu.wang_1@nxp.com,
- johan.korsnes@remarkable.no, kristian.krohn@remarkable.no,
- manjeet.gupta@nxp.com
-References: <20250220114157.232997-1-neeraj.sanjaykale@nxp.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250220114157.232997-1-neeraj.sanjaykale@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_janathot@quicinc.com
+Subject: RE: Enable Bluetooth on qcs6490-rb3gen2 board
+In-Reply-To: <20250220112945.3106086-2-quic_janathot@quicinc.com>
+References: <20250220112945.3106086-2-quic_janathot@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5886165534209716948==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Neeraj,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=935980
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.29 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 FAIL      0.45 seconds
+BuildKernel                   PASS      24.41 seconds
+CheckAllWarning               PASS      26.76 seconds
+CheckSparse                   PASS      29.87 seconds
+BuildKernel32                 PASS      23.68 seconds
+TestRunnerSetup               PASS      435.65 seconds
+TestRunner_l2cap-tester       PASS      20.60 seconds
+TestRunner_iso-tester         PASS      33.18 seconds
+TestRunner_bnep-tester        PASS      12.04 seconds
+TestRunner_mgmt-tester        FAIL      119.52 seconds
+TestRunner_rfcomm-tester      PASS      7.84 seconds
+TestRunner_sco-tester         PASS      9.61 seconds
+TestRunner_ioctl-tester       PASS      8.25 seconds
+TestRunner_mesh-tester        PASS      5.92 seconds
+TestRunner_smp-tester         PASS      7.52 seconds
+TestRunner_userchan-tester    PASS      5.03 seconds
+IncrementalBuild              PENDING   0.41 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.158 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Thank you for your patch.
+
+---
+Regards,
+Linux Bluetooth
 
 
-Am 20.02.25 um 12:41 schrieb Neeraj Sanjay Kale:
-> Allow user to set custom BD address for NXP chipsets.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
-> v2: Add allOf and unevaluatedProperties: false (Krzysztof)
-> v3: Drop local-bd-address: true (Krzysztof)
-> ---
->   .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml   | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> index 0a2d7baf5db3..a84c1c21b024 100644
-> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> @@ -17,6 +17,9 @@ description:
->   maintainers:
->     - Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
->   
-> +allOf:
-> +  - $ref: bluetooth-controller.yaml#
-> +
->   properties:
->     compatible:
->       enum:
-> @@ -43,7 +46,7 @@ properties:
->   required:
->     - compatible
->   
-> -additionalProperties: false
-> +unevaluatedProperties: false
-
-How is this diff related to the change mentioned in the commit message?
-
->   
->   examples:
->     - |
-> @@ -54,5 +57,6 @@ examples:
->               fw-init-baudrate = <3000000>;
->               firmware-name = "uartuart8987_bt_v0.bin";
->               device-wakeup-gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
-> +            local-bd-address = [66 55 44 33 22 11];
->           };
->       };
-
-
-Kind regards,
-
-Paul
+--===============5886165534209716948==--
