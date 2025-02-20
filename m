@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0541214212
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 18:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40AD214212;
+	Thu, 20 Feb 2025 18:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740075003; cv=none; b=FGo12RCVcUv/IO6Qbt/VuYIHu8Raoej+KIxpQ/IqscJJbJDZ5UlIFWYm5xA4W0HY8zAf057j5k3E/j2Q2eriLInicucU0Ebuj7fql+Gbrtake1ylqvJNRLTVXJigNctmmDIQEfw6IQCq8V8M/8Flk4SQFMs5otSQ1jgiHRzSt7w=
+	t=1740075004; cv=none; b=MI01V/Sklq6fNotc3E42l+LKvHvskpcun76Bsh3bk1jGFr1CpMZeYPVxq7kdoZeifsXztzGCE/Nh0rB0xFMglX8libYOzjiL0MiG0Rl6Yi15azXmIUyCWn2rDsouOyTpymeuzAZKIaMtv0t/DGVi77q1vWKxk07lmNFZmapWB/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740075003; c=relaxed/simple;
-	bh=QYrvcNwIiZeTxZ1PN/FrPHWyzXaNRPX3LYhyWPdQ6ko=;
+	s=arc-20240116; t=1740075004; c=relaxed/simple;
+	bh=+lTMN7k22+tbceScadXHP0FzfkytU2gCe6ALjtMRtXo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PZpHG82xkKg/s/FeU8lCYM9XZfTOdvyLjxmLSVnJYwp/aNYd/UqDAbeGSKprYUuH45AsHSQzSAhZYJFzAcpzpsxQ4uAgU1f4QTg+doXsNFhBgamghfzpL/CrxhaGjDABGZ2IB0N/osIhuPe4TmuhgcVg6Q9nbq+94Gc1uQMIc2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYer5ZHp; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=CEAGmklq8YExi6k4gbshL0gTiLVeqRleIAAoqymm3+HmUiHgeeTouaUqwxTzLG8mqaHJDzOGHgKgqryHuRRWFz1IBGbmXH/4giruSdEhWClEvY/zail03CsEX6W8SuqFjPyY/ul/xQOFb2J+c1UI6GOmRxufMUIoFMxqNyshslo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AeOMms5A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYer5ZHp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D5DC4CED1;
-	Thu, 20 Feb 2025 18:10:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AeOMms5A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 831DDC4CED1;
+	Thu, 20 Feb 2025 18:10:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740075003;
-	bh=QYrvcNwIiZeTxZ1PN/FrPHWyzXaNRPX3LYhyWPdQ6ko=;
+	s=k20201202; t=1740075004;
+	bh=+lTMN7k22+tbceScadXHP0FzfkytU2gCe6ALjtMRtXo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YYer5ZHpdpufbTgqSJwHBF2aiVDbdA8rdQVfIuQrSMnZ+lzxdEgzNFfuF9EKU8mK2
-	 BIi8YMEgQ30vVA0/h+U2hnVg+3vOSapih0fwn0hUSxv54xVwQz+vW84iN6yHa2jo0M
-	 pSiwJ/pUlZgEvRYaV+uyPqv+4R8AjhmPVVvMY5HDnlOqNuROn/gICDLT+1/j9Cyf5P
-	 /oGSj+P9mcGWGNiXokdLq8trJOtkmwydyqAde6URGQh+WTOl4gLEmhgxb/ITri1Cp2
-	 MICcpvQlswXuDGFFV3iQSyZqKMfEumxlorxjrZRLz4FDskRI3xgI8GeeZoOH18BlVc
-	 rlDjmWPhBkN/g==
+	b=AeOMms5Ax/p+NCfthNt43308syT98/mSQMGYbmKw0YdH/Q5Nt6uPm89ez616XbmZK
+	 4tCDi7VBiK51ywuiK53BUShX4S/bcOkHaMThEUyQznIKTHswUhsUc7Dfy4vwrZsDI9
+	 1bJiQwA338OyZSwduNffh4bsGy7u5zFw+9laEQ+BPUm2IWF0dMN+jvatI8ppiItEKP
+	 /e7n6szIK4gHP7mgRZw5/oQVkuJlu+vvR30psKchORirr4wtcrJplUMEUM0Q+qWA/Z
+	 reKJngM3fjQfUCQ5ECwLfoAAk+p0KdKzRB7CFG6wvrQMjYVk6IS84390YAl1RNFyvd
+	 qHU4Rc9VCYH5Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34767380CEE2;
-	Thu, 20 Feb 2025 18:10:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71411380CEE2;
+	Thu, 20 Feb 2025 18:10:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,56 +37,43 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
+Subject: Re: [RESEND PATCH v9 0/2] Enable Bluetooth on qcs6490-rb3gen2 board
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174007503404.1411319.16129942979347735146.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Feb 2025 18:10:34 +0000
-References: <20250218222801.1526620-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250218222801.1526620-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <174007503524.1411319.11668264523597671564.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Feb 2025 18:10:35 +0000
+References: <20250220112945.3106086-1-quic_janathot@quicinc.com>
+In-Reply-To: <20250220112945.3106086-1-quic_janathot@quicinc.com>
+To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+ quic_anubhavg@quicinc.com, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 18 Feb 2025 17:28:01 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, 20 Feb 2025 16:59:43 +0530 you wrote:
+> Patch 1/2
+>   The new state node qup_uart7_sleep is causing a dt-check warning because the
+>   base DTSI (sc7280.dtsi) is defined with individual pin configurations
 > 
-> L2CAP_ECRED_CONN_RSP needs to respond DCID in the same order received as
-> SCID but the order is reversed due to use of list_add which actually
-> prepend channels to the list so the response is reversed:
-> 
-> > ACL Data RX: Handle 16 flags 0x02 dlen 26
->       LE L2CAP: Enhanced Credit Connection Request (0x17) ident 2 len 18
->         PSM: 39 (0x0027)
->         MTU: 256
->         MPS: 251
->         Credits: 65535
->         Source CID: 116
->         Source CID: 117
->         Source CID: 118
->         Source CID: 119
->         Source CID: 120
-> < ACL Data TX: Handle 16 flags 0x00 dlen 26
->       LE L2CAP: Enhanced Credit Connection Response (0x18) ident 2 len 18
->         MTU: 517
->         MPS: 247
->         Credits: 3
->         Result: Connection successful (0x0000)
->         Destination CID: 68
->         Destination CID: 67
->         Destination CID: 66
->         Destination CID: 65
->         Destination CID: 64
+> ----
+> Changes from v8:
+> * Fixed the dtb-check warning  in P1 and removed tag: Reviewed-by
+> * Link to v8: https://lore.kernel.org/linux-arm-msm/20250127064940.1360404-1-quic_janathot@quicinc.com/
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
-    https://git.kernel.org/bluetooth/bluetooth-next/c/aa6629540b87
+  - [RESEND,v9,1/2] arm64: dts: qcom: qcs6490-rb3gen: add and enable BT node
+    (no matching commit)
+  - [RESEND,v9,2/2] Bluetooth: hci_qca: use the power sequencer for wcn6750
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3e968fd5dc0a
 
 You are awesome, thank you!
 -- 
