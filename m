@@ -1,218 +1,115 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC5D8488;
-	Thu, 20 Feb 2025 01:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2392862B7;
+	Thu, 20 Feb 2025 02:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740013788; cv=none; b=a2WuDTJtkWIHfruLzNsv9y7y+Mhy2/E+cOCaMPX14ogUcC37qOm16y8iYSredZ7tGtv1JBwzjhCCQvRTRHWdTHyH6xUqPLpkKNND0YwgeRsi0G14BAk6unDZ7qNYYO+cUYZbDBq62eyDpPwaESgYW/T6GRyhEfLB3prWK+bqzTA=
+	t=1740016903; cv=none; b=i9/SoziLOCSk1kc/KGNx1YcpaFe99sgEz8rjU8QEmV5wCWXwvw8lWTZkadfd0n1CWtM6iIUWgXxSGw3f19xr383YcLMXKTVNQzxSfCNXGrDVjqNfSVgGs/CUK9R1ue3x3akP70GSJvB+sWzbYfdeyclLLTpZq+a1oZfs7S66SQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740013788; c=relaxed/simple;
-	bh=PVSEWgOKQB23UpbLrhOb8TAZQTO00wnC/r0zuXDlikM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jvCWSjA72SEnb2GJwwFF3ymzXzXymzX8xvdxIK0mszid6+63pdfycRwX7Wc+8fDQUqxC538ErUmVHk2burddFnDMlX1PXLauTmIjpmwkgrd1VcVr/3roqPKGiC69CMLe9Z1zMciaT1cuVtROibztGcQlPbfryjLS/R+mkPkXJkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBPXwxp8; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1740016903; c=relaxed/simple;
+	bh=mNpEFORjBAbxT8VDCvgklG+lds95zlbjusQeEH/Pgi0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sHDO6RuEm8StmmVoioOKqdSpQN5QMFp1zmPpEt0QPK+rcocVuyEL0RHRzkpeuY073eGiKYHbhKPz8t7sDtLQfh9wqadEepli+7F9xFw5ga6ilFLlABQcN4YiNMVMlFgvnUE6UYkJ02AjtwZOoFgPH2+gRluL/mneVbz/JflZlLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=hyqgyFgH; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBPXwxp8"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3cfce97a3d9so1369045ab.2;
-        Wed, 19 Feb 2025 17:09:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740013786; x=1740618586; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NVIJyBVg5+N3syBltgdH9fL9hJ0Uz/788anvS/S5x30=;
-        b=aBPXwxp8zp+jyqbRDGq/uZRxTqVCfr1e9qHpE4aGUwwRMkrnAIcG3UNggtzx1juajr
-         F7PDHvEKXf/eRWcwbbWvS85CkXHX6zcu6Q4uEclHnHsP8x+tNizvO74/L5Bi+r9uoeAp
-         Qm/r2sxfxE3IgS/qTSjVYtM4m4ymjjN30la7bNj5lLO9iDwgKZyUHQozFepaaU87eqbk
-         hvVcveS84/jQjAkP8HYzZrIJBrlUNmMJ1H0k024l6gL2CpGrUFniRc5k/fVk9RjOr4NI
-         DU8HRHrLe/tg541Vpjz2WRhy7hzGle94pVrTPc4zi8hksE8RVlWnYmK/yKtfSSy+k/80
-         PSCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740013786; x=1740618586;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NVIJyBVg5+N3syBltgdH9fL9hJ0Uz/788anvS/S5x30=;
-        b=EQOTUhZgQ7DaHl9SOEa4z4R1iPSj9pnDdrmw1V62sExjJHDL4ZQiimVcEEVkfqbf6K
-         /Ga13hys5fRPnZaj54K7Mb1jVW5rxaeLuZ3FGHjDMp22DjffTp9tiZTRIgowE0CNAhH2
-         yH6gI2t59AQBAyIsfNw7TjAV2AEPyKqx+SbmrM1+qR4m+BeVR98XEFvNJFlFDYprS5LU
-         56ETYF88KAWJj+Csr3ZaOn8xSmrp8apQyULKxOndFUoszqNoV9fkaQ/yKLwyS2Ej8BeS
-         pwtZGgS6q5XcGWrhFvAyO8faa9u1hA6G8kmfKEsGTSArsP9/PK/nXtwuSwRDNV2hWqMr
-         OIOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVdMD2hASHJA1kXGQdq1ZeFZ/XLGs0g85K1P6Tln4kPw+aeiY0Y/M8Ofjz26g2fuUMvNjntIi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxef1frUysSZ5xLEehiTcD8bz7G5xA1jSAja4UTRbM2EAPy4zw0
-	VueRg787HW4Y72pfazoZDFE56dicqaPhkye5mfPoJmvrq/QgvYKFKnAdDDqGOqeNHyZUCrFU7Ie
-	vie0ZuBkDtd8SInJn1cB0peVTRDcobBJ16nBpBQ==
-X-Gm-Gg: ASbGnct7wiveHI8D0xyOuskA+i0SL9HR1p30QlQ6Xuw14ZTQ0xwWSkT9/u7HOvB7D9R
-	SgFmYypFYknpLs1revf4V852r4h4tRY1j1mbT2SxZggZCjbnfh6/90C0qPAfg1KSGyInslSw=
-X-Google-Smtp-Source: AGHT+IEmLu7+/if+HPcGCoBXkQ3PGalpCvcRHPE7fkeUQcFunpFwCz5/mVVPjZniEytHNhRMS/lhtld2uor2t6qCxQA=
-X-Received: by 2002:a05:6e02:3103:b0:3d0:443d:a5ad with SMTP id
- e9e14a558f8ab-3d280771825mr209495675ab.2.1740013785905; Wed, 19 Feb 2025
- 17:09:45 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="hyqgyFgH"
+X-UUID: 9c225848ef2e11ef8eb9c36241bbb6fb-20250220
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=CRSfEf2M4ecLsopoPb2+M/Ujy7qVTEij8K5gI3vgVwo=;
+	b=hyqgyFgHxqVCjhoxjaa5ywG86sYuxseNOCMyHjEoaIo1M9p3VQ1qiw/VBcQfcyLB8/tdv1/Omaz24mqnwFvALLleJbNTusPPXqKH8+3ZDAnbQTqxIv2BIv5TtbGtTWRj3MO8eV8qulSCdyR49bmHDwdDx59ZNu2xMEBVmcX6cFQ=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.46,REQID:e4457e08-405e-4a58-bf54-fb9090de4eed,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:60aa074,CLOUDID:86e052a4-5c06-4e72-8298-91cabc9efadf,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 9c225848ef2e11ef8eb9c36241bbb6fb-20250220
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
+	(envelope-from <jiande.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1775267927; Thu, 20 Feb 2025 10:01:33 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 20 Feb 2025 10:01:32 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.28 via Frontend Transport; Thu, 20 Feb 2025 10:01:32 +0800
+From: Jiande Lu <jiande.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, Steve
+ Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Jiande Lu <jiande.lu@mediatek.com>
+Subject: [PATCH] Bluetooth: btusb: Add 2 HWIDs for MT7922
+Date: Thu, 20 Feb 2025 10:01:28 +0800
+Message-ID: <20250220020129.2400730-1-jiande.lu@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1739988644.git.pav@iki.fi> <b278a4f39101282e2d920fed482b914d23ffaac3.1739988644.git.pav@iki.fi>
-In-Reply-To: <b278a4f39101282e2d920fed482b914d23ffaac3.1739988644.git.pav@iki.fi>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 20 Feb 2025 09:09:09 +0800
-X-Gm-Features: AWEUYZnIqFcvfOce2doy7Ic49ougeuxZU5UJ6HGQvsWKAvKqQ_YCLUx9-5MH4co
-Message-ID: <CAL+tcoBxtxCT1R8pPFF2NvDv=1PKris1Gzg-acfKHN9qHr7RFA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-On Thu, Feb 20, 2025 at 2:15=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
-> when hardware reports a packet completed.
->
-> Completion tstamp is useful for Bluetooth, as hardware timestamps do not
-> exist in the HCI specification except for ISO packets, and the hardware
-> has a queue where packets may wait.  In this case the software SND
-> timestamp only reflects the kernel-side part of the total latency
-> (usually small) and queue length (usually 0 unless HW buffers
-> congested), whereas the completion report time is more informative of
-> the true latency.
->
-> It may also be useful in other cases where HW TX timestamps cannot be
-> obtained and user wants to estimate an upper bound to when the TX
-> probably happened.
->
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
->
-> Notes:
->     v4: changed SOF_TIMESTAMPING_TX_COMPLETION to only emit COMPLETION
->         together with SND, to save a bit in skb_shared_info.tx_flags
->
->         As it then cannot be set per-skb, reject setting it via CMSG.
->
->  Documentation/networking/timestamping.rst | 9 +++++++++
->  include/uapi/linux/errqueue.h             | 1 +
->  include/uapi/linux/net_tstamp.h           | 6 ++++--
->  net/core/sock.c                           | 2 ++
->  net/ethtool/common.c                      | 1 +
->  5 files changed, 17 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/networking/timestamping.rst b/Documentation/ne=
-tworking/timestamping.rst
-> index 61ef9da10e28..5034dfe326c0 100644
-> --- a/Documentation/networking/timestamping.rst
-> +++ b/Documentation/networking/timestamping.rst
-> @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
->    cumulative acknowledgment. The mechanism ignores SACK and FACK.
->    This flag can be enabled via both socket options and control messages.
->
-> +SOF_TIMESTAMPING_TX_COMPLETION:
-> +  Request tx timestamps on packet tx completion, for the packets that
-> +  also have SOF_TIMESTAMPING_TX_SOFTWARE enabled.  The completion
+Add below HWIDs for MediaTek MT7922 USB Bluetooth chip.
+VID 0x0489, PID 0xe152
+VID 0x0489, PID 0xe153
 
-Is it mandatory for other drivers that will try to use
-SOF_TIMESTAMPING_TX_COMPLETION in the future? I can see you coupled
-both of them in hci_conn_tx_queue in patch [2/5]. If so, it would be
-better if you add the limitation in sock_set_timestamping() so that
-the same rule can be applied to other drivers.
+Patch has been tested successfully and controller is recognized
+device pair successfully.
 
-But may I ask why you tried to couple them so tight in the version?
-Could you say more about this? It's optional, right? IIUC, you
-expected the driver to have both timestamps and then calculate the
-delta easily?
+MT7922 module bring up message as below.
+Bluetooth: Core ver 2.22
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: SCO socket layer initialized
+Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time: 20241106163512
+Bluetooth: hci0: Device setup in 2284925 usecs
+Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+Bluetooth: hci0: AOSP extensions version v1.00
+Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+Bluetooth: BNEP filters: protocol multicast
+Bluetooth: BNEP socket layer initialized
+Bluetooth: MGMT ver 1.22
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM ver 1.11
 
-Thanks,
-Jason
+Signed-off-by: Jiande Lu <jiande.lu@mediatek.com>
+---
+ drivers/bluetooth/btusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 1caf7a071a73..6db25b8d6d42 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -667,6 +667,10 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe102), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe152), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe153), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3804), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
+-- 
+2.45.2
 
-> +  timestamp is generated by the kernel when it receives a packet
-> +  completion report from the hardware. Hardware may report multiple
-> +  packets at once, and completion timestamps reflect the timing of the
-> +  report and not actual tx time. This flag can be enabled *only*
-> +  via a socket option.
-> +
->
->  1.3.2 Timestamp Reporting
->  ^^^^^^^^^^^^^^^^^^^^^^^^^
-> diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/errqueue.=
-h
-> index 3c70e8ac14b8..1ea47309d772 100644
-> --- a/include/uapi/linux/errqueue.h
-> +++ b/include/uapi/linux/errqueue.h
-> @@ -73,6 +73,7 @@ enum {
->         SCM_TSTAMP_SND,         /* driver passed skb to NIC, or HW */
->         SCM_TSTAMP_SCHED,       /* data entered the packet scheduler */
->         SCM_TSTAMP_ACK,         /* data acknowledged by peer */
-> +       SCM_TSTAMP_COMPLETION,  /* packet tx completion */
->  };
->
->  #endif /* _UAPI_LINUX_ERRQUEUE_H */
-> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tst=
-amp.h
-> index 55b0ab51096c..383213de612a 100644
-> --- a/include/uapi/linux/net_tstamp.h
-> +++ b/include/uapi/linux/net_tstamp.h
-> @@ -44,8 +44,9 @@ enum {
->         SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
->         SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
->         SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
-> +       SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
->
-> -       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
-> +       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
->         SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
->                                  SOF_TIMESTAMPING_LAST
->  };
-> @@ -58,7 +59,8 @@ enum {
->  #define SOF_TIMESTAMPING_TX_RECORD_MASK        (SOF_TIMESTAMPING_TX_HARD=
-WARE | \
->                                          SOF_TIMESTAMPING_TX_SOFTWARE | \
->                                          SOF_TIMESTAMPING_TX_SCHED | \
-> -                                        SOF_TIMESTAMPING_TX_ACK)
-> +                                        SOF_TIMESTAMPING_TX_ACK | \
-> +                                        SOF_TIMESTAMPING_TX_COMPLETION)
->
->  /**
->   * struct so_timestamping - SO_TIMESTAMPING parameter
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index a197f0a0b878..76a5d5cb1e56 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -2933,6 +2933,8 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghd=
-r *cmsg,
->                 tsflags =3D *(u32 *)CMSG_DATA(cmsg);
->                 if (tsflags & ~SOF_TIMESTAMPING_TX_RECORD_MASK)
->                         return -EINVAL;
-> +               if (tsflags & SOF_TIMESTAMPING_TX_COMPLETION)
-> +                       return -EINVAL;
->
->                 sockc->tsflags &=3D ~SOF_TIMESTAMPING_TX_RECORD_MASK;
->                 sockc->tsflags |=3D tsflags;
-> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> index 5489d0c9d13f..ed4d6a9f4d7e 100644
-> --- a/net/ethtool/common.c
-> +++ b/net/ethtool/common.c
-> @@ -473,6 +473,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] =
-=3D {
->         [const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
->         [const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-tcp",
->         [const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-filt=
-er",
-> +       [const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "tx-completion"=
-,
->  };
->  static_assert(ARRAY_SIZE(sof_timestamping_names) =3D=3D __SOF_TIMESTAMPI=
-NG_CNT);
->
-> --
-> 2.48.1
->
->
