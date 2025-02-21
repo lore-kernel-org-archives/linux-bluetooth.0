@@ -1,98 +1,148 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D73F17CA17;
-	Fri, 21 Feb 2025 21:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3C03FD1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 22:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740174538; cv=none; b=ay5mleVdnVavgr+1ajilE+7MXdYnOcUT+7HRmBGw/QhhmJr3ivWQ7xrSUvvqBVnXYdmI4AtBYOdtNs0Z59dpf65fbd//yOHDqIcYjC7+rYIGsIYBrrt9zejmD0b7h9aCe7BV+Is1wyQyCWNnEy2zRe9FGqYjqncP/+aUhrZUD2c=
+	t=1740176184; cv=none; b=cpWbIoCNfUxM6FFb63JGRajonB9QjSzZXUYEyEjmyapo1SdHeM1YYF0tK9dFqna+FPXyDpfBhHWSAxr15JQuznUqkGwL9/2yMCOpiWGkujh4+XYiDtHd6F+/2kIanVxKGDCYlR68EBsRlf8h9FJIq5K6pU+EHcX7xbryRmWwlpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740174538; c=relaxed/simple;
-	bh=gPyFzIP24Lc4ZAQes/Bw3FIR5J4Tu1cY7Qe5OFglfYQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ku7279CEzdsp1Vz+KwWe5KNv54E6vetHVMnKqK7HlCMh1qRH5qdrPO/Ik2LTjog3+Smv4xIkNQbm7BYLLqPtvPaWfjrrLUkLELCAsysSYpNRNb44iIWSyz55jEoLzybD1CHxO9+bxVrpDRkg0Dahwy3IAS/KBJFFRsvLooqEQAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lV2uaRVO; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1740176184; c=relaxed/simple;
+	bh=eFKEdRaBoox7gW0mummLZaKGWfx7NukaIpBT3L9EV4s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WLGYKnwh1Kuw2+x+sYI+iaMobw1YuO/xx/zGkKu/Zvt6evSxwnQQXOQMwvJHQ2KMIRdLVzgtZiGs0crhY9HnST5AkbDhkf9Sjz0Ys1uF5xlLY3/Nxbz3P7R2e4APpgjBUebHkaRkgtIOykGndPwE24DwioXk3+YmG/JM1dIUIbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C/fHQy1p; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lV2uaRVO"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5ded1395213so4391905a12.2;
-        Fri, 21 Feb 2025 13:48:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C/fHQy1p"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c081915cf3so325532685a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 14:16:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740174535; x=1740779335; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a9pTIn8QHxz7zjuURjxwEBW82WNxe/Jc1n8xte3Y49I=;
-        b=lV2uaRVOBqW5Daj74v0NEGNczsVV3WyEWbSCyHnjg1+QKiSQuuJm/l5QNSiwHLByjW
-         6aLfmSbwwyHEcDVJWTb8+fhF/zqc8i/VHg1WNImwaSiVx69tw24rWqB19QlpS94msArk
-         EOIkCRWlqR/AQYf8vVa5QKGyhiQYrBuPgOxamJqUXsCazDd13/P6V7uIYuyyTB0074hx
-         DwDAvra3G8pW9o6FNGW8/I9JtqLc6rXSjA81owq4rF+b5OvpG/5TkrIb0i/gaIBjaY6F
-         2EDNNKUQT1e7Dn754tKFjmqOKK18BXGGkfKsadqRVOeCJAFBt+y+vhn4Jq16A3Ih5S8V
-         W53g==
+        d=gmail.com; s=20230601; t=1740176181; x=1740780981; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=lzNwf9NCvGQATt/MWjQDmL2jQkC5GPwjpWDrinQP4xQ=;
+        b=C/fHQy1pp/u+KFi1D/FxZ55W1a1WMt7RSrY+p7hpdBaQs9HARvUT2uFawQgMlEuQZh
+         pW3hql6Mcbo9S35Ol50YOu/8T/IlvIJtX0piVK7g78UjDObx8ysR4Rgvnv3d91O9LRJu
+         bOQFnGXR4VMgwMQzKkHSk5PE6DvsZnkEj9SEsL+IAaAUDIRmgfqUXgSpatnRcZeFiPhK
+         VtcP2UMFv6N/ojY4ev/HI1bICUzNhLm2bV2KovxjFh7MI05vtVfk4MpzJOSZH7syIKRc
+         6CAG3nXqF/Lu5ckeJE/J2GZy+veu0FouNesIELRlU1Pb6TVRNXwzJL/c1+gyAEQ0e/BG
+         mGBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740174535; x=1740779335;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1740176181; x=1740780981;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=a9pTIn8QHxz7zjuURjxwEBW82WNxe/Jc1n8xte3Y49I=;
-        b=lrwvuhAvmi1+G73oxvp4DlXqnv4I83/yDrG4S/vTMcewFnzIPG+IWKQ7IvdRQq2XEw
-         7rji695UptHIopzjYT62vwyFbOEv+UdCDG9D23o4KvuTtvYEcZvumz6wri/fpobNL62Y
-         cP90bLJc7Qz1szM1eZdoQX+/8sZlT5KoZSsvBbBblI+b42h+oKNhGQq9v6FkI71y8J8u
-         Eo+EulXmvyMVe08ajfTBVfBLKKJweSCntT6A9iDv6jeD8FaowAv2sTF9r7gZ7VCm4lKQ
-         i1BYyoWHJFHK1LhRDJiKluCd873X9d14UhlYUn4tUqN5N1TJYQx8Ze1vy/PPeumKCDeB
-         2KVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWmllxdIy3yM/g3HBwPVEd9/zG8TiMtU0/7DxjIM4JO61PxR5LQfplQ1HJxyxDtKldzYCFViEUOlhMrV8V3@vger.kernel.org, AJvYcCXCr7Ro8/WrmxDZDS/9+hqQu58nk3ngEPc3nLRc44xZW9Z+fx4ZllBZhU8WwJJpQooibRRgnrTtn5+Gl07RBqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPa5F4KTEsMaqIMZuCZGQ3kw1+Wiq4ciJ28PWYu0X4C//GtiPw
-	518YowWsS/ScbuFCKfbUf+UysOjYCk1W3ekxkNYHld+uf25KWScF
-X-Gm-Gg: ASbGncv/LvxfxYEoQIxRXJYiaTGmqfJC+cDpE9f/GcAQOjZX+AERXu0+szo9vOgkaeq
-	pT1ryCuKunEQdH0CvoVnXkzp6Q6kwg5mRG3hZ1HE4jEA9OpV2GgFNuXIhHtNNPE48vqs0TyDyqn
-	qlI6G51PGyy8kFxf8uWHsSxIxLmmmWK0ZoJoD+iegSE3m3lyvhg+zczl6WC6UFsQ8dFYqxQS/FO
-	ZY9UQ4aGGmjXIIHaTPNDe+ngW21W2gAhtyf/Zii8u2dzo+TyrIyyhIqhTxRhFFabM9VUXfRC5fx
-	+K1jRQGsZvb0LRodh3/vOWSF9pkUk0u7/HdB/dEyx0Q=
-X-Google-Smtp-Source: AGHT+IHgjsel/2ffzhG3H5/MfbiB4SAy1GJZeV3sYofZe0e1mMUm9l0y3bfHwh1UadRhS/V6bvw8EQ==
-X-Received: by 2002:a17:907:94cf:b0:aa6:a87e:f2e1 with SMTP id a640c23a62f3a-abc09e2f100mr549352466b.56.1740174534537;
-        Fri, 21 Feb 2025 13:48:54 -0800 (PST)
-Received: from localhost.localdomain ([196.235.227.170])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb5781da94sm1374547966b.85.2025.02.21.13.48.51
+        bh=lzNwf9NCvGQATt/MWjQDmL2jQkC5GPwjpWDrinQP4xQ=;
+        b=E9aR+YWag9f5fj3PswcX923/4bJ0WoUsxdLFzkHTZnAm9wUjXMc2pVf29ToIDx+5zH
+         lGc7EsecW3/UjmhI28l80+DGmMqYV2TVJRZAlmucin4U16AnCrBqZSn/WLQIXbdBQqlv
+         TBgp/d7tieRnjGyubUCpmp2T2X+MXJJQ+38Xotam632eORDQH+3LgxE8lMfYW5SmafDj
+         Fl42wCx8lwflR3jjwPRfXkE/6DiphgdYOAXhXKaRS/wW1OKX1rthr9oxd7+xo/cPzEBt
+         g3a1g403FLND82mcUpvt9lEbmQxg00sPxe8g8CPpNsATnP1yYOHOxmjnBtx0ZR+Qq8qn
+         +oqg==
+X-Gm-Message-State: AOJu0YzfetTL1AbDAVphUq+F6l1XJR4D7eFo0ca8+NANLxycHfIMFEZF
+	S6U8LC9V8dB03S7fA/jFTtPXZrom7T3t0giinUQgjFA11axP7GLB2m4ppg==
+X-Gm-Gg: ASbGncuFa6a1jje+n18OhvCp/MFDh3fEU3DFfsocEoiQiclvQXp0xWlRg5JpF2zh5cC
+	OJiPFz4Yf+5oZCceZjDqGUkXF8u8AMm5DA1BK/x+JyYeo+F71kU0uXqcYBmZF/LecnyvvXFDPqy
+	u6JWoarVcSegaW3neeck8kMKyZ2eKyci+9giiuxzOZoNGT/9YfYhCVZT1OPyZMGXPp8zVpNcEOx
+	gvelWo9lKl5V/Iq06T2Y6lncTpVd3dJNzRWImeIk6c22hB4zOraqnUtsBhwlOr3v/Gj0EnWgO3u
+	JPFnrGZkj3DHBHEaHsE3MsKxpOvc2ZXm
+X-Google-Smtp-Source: AGHT+IF8YXd605mIDZqY+azdTk0yEDSgoKxPkB3dqKK74C21bWiTBPmaK6UuP77lduTuwL2kFNqZ8A==
+X-Received: by 2002:a05:620a:4045:b0:7c0:b018:593d with SMTP id af79cd13be357-7c0cef55fe9mr686754585a.39.1740176181313;
+        Fri, 21 Feb 2025 14:16:21 -0800 (PST)
+Received: from [172.17.0.2] ([40.76.181.252])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0a1f089b2sm621554085a.53.2025.02.21.14.16.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 13:48:53 -0800 (PST)
-From: Salah Triki <salah.triki@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Salah Triki <salah.triki@gmail.com>
-Subject: [PATCH] bluetooth: btusb: Initialize .owner field of force_poll_sync_fops
-Date: Fri, 21 Feb 2025 22:32:59 +0100
-Message-Id: <20250221213259.180833-1-salah.triki@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 21 Feb 2025 14:16:20 -0800 (PST)
+Message-ID: <67b8fb34.e90a0220.2effd8.d9ad@mx.google.com>
+Date: Fri, 21 Feb 2025 14:16:20 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5589522826914867955=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, salah.triki@gmail.com
+Subject: RE: bluetooth: btusb: Initialize .owner field of force_poll_sync_fops
+In-Reply-To: <20250221213259.180833-1-salah.triki@gmail.com>
+References: <20250221213259.180833-1-salah.triki@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Initialize .owner field of force_poll_sync_fops to THIS_MODULE in order to
-prevent btusb from being unloaded while its operations are in use.
+--===============5589522826914867955==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Salah Triki <salah.triki@gmail.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=936618
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.25 seconds
+SubjectPrefix                 FAIL      0.34 seconds
+BuildKernel                   PASS      24.92 seconds
+CheckAllWarning               PASS      27.08 seconds
+CheckSparse                   PASS      30.62 seconds
+BuildKernel32                 PASS      23.92 seconds
+TestRunnerSetup               PASS      435.50 seconds
+TestRunner_l2cap-tester       PASS      21.59 seconds
+TestRunner_iso-tester         PASS      34.42 seconds
+TestRunner_bnep-tester        PASS      5.05 seconds
+TestRunner_mgmt-tester        FAIL      126.15 seconds
+TestRunner_rfcomm-tester      PASS      8.10 seconds
+TestRunner_sco-tester         PASS      9.78 seconds
+TestRunner_ioctl-tester       PASS      8.53 seconds
+TestRunner_mesh-tester        PASS      6.16 seconds
+TestRunner_smp-tester         PASS      7.42 seconds
+TestRunner_userchan-tester    PASS      5.15 seconds
+IncrementalBuild              PENDING   0.62 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.152 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.195 seconds
+LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.179 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 90966dfbd278..6cd9428419cb 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3642,6 +3642,7 @@ static ssize_t force_poll_sync_write(struct file *file,
- }
- 
- static const struct file_operations force_poll_sync_fops = {
-+	.owner		= THIS_MODULE,
- 	.open		= simple_open,
- 	.read		= force_poll_sync_read,
- 	.write		= force_poll_sync_write,
--- 
-2.34.1
 
+--===============5589522826914867955==--
