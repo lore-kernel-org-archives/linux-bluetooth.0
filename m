@@ -1,133 +1,326 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617481EE00C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 15:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CEAD1E87B;
+	Fri, 21 Feb 2025 15:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740151972; cv=none; b=n8kT5e9NQKbISvRp8lZ3ahNiZzINs92SYw6f6lxFhGgYOM6aKSpochseU9WQiDBxWGivzZJdLYVaEiHjaGw462jVMSOhWCIoT5fOJTOfEEBG0xNRRZKn8rFWOWymoSIrNseNFOVyjdx+DN9IfM+9fpkzBGw9e6d79xMiVRKsc3E=
+	t=1740152068; cv=none; b=dMtx2mIeUzueSSl+Sie9KJa3Tu4dewc+PUH8xTuWOmPwv8ZFcdLtRlfcOhhfr9OciOhHa94RZsgS0ZuAS+qbqQIqP5/MuwU8A+y05AudhU79876eYRYAztC8pDiGnMlF/VUOPR8oi82c3QkbzPGTm9T4YHBgZpb53pjBSPN8Cug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740151972; c=relaxed/simple;
-	bh=jGVF9ydUb3QITsJBb2+nlxgvGjHze/lZT3kQHQWzaas=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=hKXdDBxaq7dx52NCSKTZzc8DHE1Pkc63cl3HFACKrloTYuu4u2S1vIyJ+GbAErMT4KKb7p5XwyqVACg5PPdRYbqndemHfMuPT9pCMwSvLLSTnuuQuLypqfsOjLdxHJhyX6JUrbVJBbvHG+fbxafcqB7ZC4DQlATocYRJtFAruBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PIOGNEtQ; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1740152068; c=relaxed/simple;
+	bh=+Z3XfbTAZg67slX1S2nMCGuCzrMKLEVhy8QHBbbegAs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MlWNF/qvFNJVlSRSDdcUIV/9Yw9YzWf3ZbBq+121/a2l037u9R0LHaSoVB87q28awvlFK6299PNuyTdEEJqRvQjmBMqZNBVnvO9DAObXA8vHSzYdHWErOXCVcPdJZkJ6czzaYsqFjGrC/sZCPFrHKCUOTJZUf+WtkgGb/zRuU4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nrTcbptD; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PIOGNEtQ"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e6827984b2so24866336d6.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 07:32:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740151969; x=1740756769; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=nt69IgIs/JjmjPX6Y0D/byjonWSDO+M2n7TNzicv9i0=;
-        b=PIOGNEtQmlhzlFJWnLgJDaRFE21uELoG6mxzEEqGHqU5QU8S3L3lL0h1h84RfzODm0
-         kTgEwXiUeOVXj6AxdnzHaA5fHvOhwYh99c32M953VBfpa97hbhXT5dy9ehx+1H3wpkBv
-         lvlwlCX5Ub3HrcgHg19vS3dB8cApfWyE81RC/zmHvxj6/AgtrDAW0GJOZDwLYfU2wwrq
-         p5y+t+LSfYvvSDT1vO8T+IxbvBZERK3ZMUhAtzcjSVYGOdWSRowLsfsz7Mce/RrC1i0R
-         MVzXS7XAqj5hGHvXWUML9zfYmsXmq1d8i1bJXtCyl4HFBS2+uTUefuTKi/Cn+L48bx2X
-         3uUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740151969; x=1740756769;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nt69IgIs/JjmjPX6Y0D/byjonWSDO+M2n7TNzicv9i0=;
-        b=G9vfAqKvZ4il+kun2ZZCm28ksSi0kElNbAAFmhQg4Zp9Dk7XBs3K636rUQA2M5qS68
-         5TIaLPLJ+061oS5IBxN5CM9VlBJeM698pdLq0FGl7a4LP36oSfYKstaoQQnNhH1qowgQ
-         yvARC/fRw/TkGStjVKLX16XLAjfqPHT6TeAdh1EN0wVK2gL0hq2yvU7M4TkC7EzJxNcv
-         OyDw4vkx4t0XeHyVJBgA6uddCCA5BhjcJVTCXvIRDP9wecEQHKABNtxklzpR78qhHRwE
-         zAa6q9bwlMOE6RuidLc+oiev4D85pSTDZ2ORmCSqyuMry8AvqwfrQAdfH8oqc1oD8x1E
-         f/lg==
-X-Gm-Message-State: AOJu0YxDaUMkvtpQXWPBrIe6+z6mr1sTcwmEvAAsjzaqMGJnw1VQf5BZ
-	VvjifOz1vhleAQKGYAvT1Ch136ZiSJ0N7odlexz7Eqq7skb4XtuehPFAuA==
-X-Gm-Gg: ASbGnctWmHvJQHmPZz9/MtMgotIYikJVgJe8Pn25ZTFz6ONqndGl9DZ3v0WjpOiUfVc
-	M/tcoevH3FmVeuWL49P2OtTSy4urKZsEVMvOq0zZ+VoJkP9H1UYC4Ws232GSsrRPb5+bwbrCfY0
-	thV4DPLCL8XtkfdQf/0oVNAfxglRXZa4T1JghVmlko8OnL07a+5xT8ShS2pSEz9YYth4vnnrUxv
-	SsIHfK9RGaBGiwWmiDfn4AshUQgnxfh7ZRb6QEVafvVbs+klCoWyNqTeyotlh2sHYsiTRDdaQkS
-	jrEZIJdoqxQ9HPnAo2WjoaJrQtrj0WBX
-X-Google-Smtp-Source: AGHT+IHkDE++SNQ9hK/9Is1DTOEIksvwXBIDwKkjUviVpTKcYpG43sXNJCEdJVb8VaOlYXOZ/8lC3g==
-X-Received: by 2002:a05:6214:c2c:b0:6e2:4e1a:bc82 with SMTP id 6a1803df08f44-6e6ae976a48mr46155436d6.35.1740151967951;
-        Fri, 21 Feb 2025 07:32:47 -0800 (PST)
-Received: from [172.17.0.2] ([20.246.77.172])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e66983bb45sm81887126d6.100.2025.02.21.07.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 07:32:47 -0800 (PST)
-Message-ID: <67b89c9f.050a0220.2c01d1.3c18@mx.google.com>
-Date: Fri, 21 Feb 2025 07:32:47 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5052645908736207698=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nrTcbptD"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51LD0TdK012089;
+	Fri, 21 Feb 2025 15:34:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	zNGkxsDdav15OKMPklH64+1ptIhGBJSq1byiab6H0rU=; b=nrTcbptDfTv6ksZf
+	dM0bbRzcQUTHCLE+NPCY7KZ5YI5T8s6S5fs7jL9lGmpz7146caARDulBxQG77xz1
+	8a5FfaokHprYeyoLisxyWo7NG3/6P4mCgR0bxBycxXOjYmMt4dOVgtX/zLkFhBg6
+	wjP5Mn+cctmjAOMDDo2rjqgiLtix5SQeZPQik+5yLZKi+npEWOQ4SHWyXJdF9GL0
+	dI5gZIm335fLdPwBU7t7KtlQq7HO9GP1WywmToWlkWIF2ryTTB8mEEBgLLneG0Di
+	a8ql2UVz86GtzqYergNvu+u2e5TGxH7Dwk3+gJXamqgZhluFckq7BIOWqIfxoRac
+	EBMSrQ==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44vyy1tgec-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Feb 2025 15:34:18 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51LFYHus004446
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Feb 2025 15:34:17 GMT
+Received: from [10.219.0.139] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 21 Feb
+ 2025 07:34:12 -0800
+Message-ID: <87f042c2-16df-4ffd-9178-9a13b4ea7acb@quicinc.com>
+Date: Fri, 21 Feb 2025 21:04:09 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2,1/4] Bluetooth: btintel_pcie: Setup buffers for firmware traces
-In-Reply-To: <20250221144245.1012686-1-kiran.k@intel.com>
-References: <20250221144245.1012686-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5052645908736207698==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH v9 1/2] arm64: dts: qcom: qcs6490-rb3gen: add and
+ enable BT node
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Marcel Holtmann
+	<marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>
+References: <20250220112945.3106086-1-quic_janathot@quicinc.com>
+ <20250220112945.3106086-2-quic_janathot@quicinc.com>
+ <s36psuynvcak337thjcy6o532mvxrqogwutdinqodco6tzeebu@npaazdpl6qh3>
+Content-Language: en-US
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <s36psuynvcak337thjcy6o532mvxrqogwutdinqodco6tzeebu@npaazdpl6qh3>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=936457
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.27 seconds
-GitLint                       PENDING   0.23 seconds
-SubjectPrefix                 PASS      6.39 seconds
-BuildKernel                   PASS      24.20 seconds
-CheckAllWarning               PASS      27.27 seconds
-CheckSparse                   PASS      34.78 seconds
-BuildKernel32                 PASS      23.91 seconds
-TestRunnerSetup               PASS      429.61 seconds
-TestRunner_l2cap-tester       PASS      22.93 seconds
-TestRunner_iso-tester         PASS      29.43 seconds
-TestRunner_bnep-tester        PASS      4.78 seconds
-TestRunner_mgmt-tester        PASS      120.75 seconds
-TestRunner_rfcomm-tester      PASS      8.44 seconds
-TestRunner_sco-tester         PASS      9.76 seconds
-TestRunner_ioctl-tester       PASS      8.35 seconds
-TestRunner_mesh-tester        PASS      6.04 seconds
-TestRunner_smp-tester         PASS      7.41 seconds
-TestRunner_userchan-tester    PASS      5.05 seconds
-IncrementalBuild              PENDING   0.37 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: C4q-OqX5UI9zA275EU6Y0zGN8b0Uy5P1
+X-Proofpoint-ORIG-GUID: C4q-OqX5UI9zA275EU6Y0zGN8b0Uy5P1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-21_05,2025-02-20_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ adultscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=999 suspectscore=0 phishscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502210112
 
 
 
----
-Regards,
-Linux Bluetooth
+On 2/21/2025 7:25 PM, Dmitry Baryshkov wrote:
+> On Thu, Feb 20, 2025 at 04:59:44PM +0530, Janaki Ramaiah Thota wrote:
+>> Add the PMU node for WCN6750 present on the qcs6490-rb3gen
+>> board and assign its power outputs to the Bluetooth module.
+>>
+>> In WCN6750 module sw_ctrl and wifi-enable pins are handled
+>> in the wifi controller firmware. Therefore, it is not required
+>> to have those pins' entries in the PMU node.
+>>
+>> Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+>> ---
+>>   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts | 167 ++++++++++++++++++-
+>>   1 file changed, 166 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
+>> index 7a36c90ad4ec..0a3243499dfb 100644
+>> --- a/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
+>> +++ b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
+>> @@ -1,6 +1,6 @@
+>>   // SPDX-License-Identifier: BSD-3-Clause
+>>   /*
+>> - * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+>> + * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+>>    */
+>>   
+>>   /dts-v1/;
+>> @@ -34,6 +34,7 @@ / {
+>>   
+>>   	aliases {
+>>   		serial0 = &uart5;
+>> +		serial1 = &uart7;
+>>   	};
+>>   
+>>   	chosen {
+>> @@ -218,6 +219,63 @@ vph_pwr: vph-pwr-regulator {
+>>   		regulator-min-microvolt = <3700000>;
+>>   		regulator-max-microvolt = <3700000>;
+>>   	};
+>> +
+>> +	wcn6750-pmu {
+>> +		compatible = "qcom,wcn6750-pmu";
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&bt_en>;
+> 
+> pinctrl-0
+> (pinctrl-1 etc.)
+> pinctrl-names
+> 
+> 
+>> +		vddaon-supply = <&vreg_s7b_0p972>;
+>> +		vddasd-supply = <&vreg_l11c_2p8>;
+>> +		vddpmu-supply = <&vreg_s7b_0p972>;
+>> +		vddrfa0p8-supply = <&vreg_s7b_0p972>;
+>> +		vddrfa1p2-supply = <&vreg_s8b_1p272>;
+>> +		vddrfa1p7-supply = <&vreg_s1b_1p872>;
+>> +		vddrfa2p2-supply = <&vreg_s1c_2p19>;
+>> +
+>> +		bt-enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
+>> +
+>> +		regulators {
+>> +			vreg_pmu_rfa_cmn: ldo0 {
+>> +				regulator-name = "vreg_pmu_rfa_cmn";
+>> +			};
+>> +
+>> +			vreg_pmu_aon_0p59: ldo1 {
+>> +				regulator-name = "vreg_pmu_aon_0p59";
+>> +			};
+>> +
+>> +			vreg_pmu_wlcx_0p8: ldo2 {
+>> +				regulator-name = "vreg_pmu_wlcx_0p8";
+>> +			};
+>> +
+>> +			vreg_pmu_wlmx_0p85: ldo3 {
+>> +				regulator-name = "vreg_pmu_wlmx_0p85";
+>> +			};
+>> +
+>> +			vreg_pmu_btcmx_0p85: ldo4 {
+>> +				regulator-name = "vreg_pmu_btcmx_0p85";
+>> +			};
+>> +
+>> +			vreg_pmu_rfa_0p8: ldo5 {
+>> +				regulator-name = "vreg_pmu_rfa_0p8";
+>> +			};
+>> +
+>> +			vreg_pmu_rfa_1p2: ldo6 {
+>> +				regulator-name = "vreg_pmu_rfa_1p2";
+>> +			};
+>> +
+>> +			vreg_pmu_rfa_1p7: ldo7 {
+>> +				regulator-name = "vreg_pmu_rfa_1p7";
+>> +			};
+>> +
+>> +			vreg_pmu_pcie_0p9: ldo8 {
+>> +				regulator-name = "vreg_pmu_pcie_0p9";
+>> +			};
+>> +
+>> +			vreg_pmu_pcie_1p8: ldo9 {
+>> +				regulator-name = "vreg_pmu_pcie_1p8";
+>> +			};
+>> +		};
+>> +	};
+>>   };
+>>   
+>>   &apps_rsc {
+>> @@ -799,6 +857,39 @@ &pon_resin {
+>>   	status = "okay";
+>>   };
+>>   
+>> +&qup_uart7_cts {
+>> +	/*
+>> +	 * Configure a bias-bus-hold on CTS to lower power
+>> +	 * usage when Bluetooth is turned off. Bus hold will
+>> +	 * maintain a low power state regardless of whether
+>> +	 * the Bluetooth module drives the pin in either
+>> +	 * direction or leaves the pin fully unpowered.
+>> +	 */
+>> +	bias-bus-hold;
+>> +};
+>> +
+>> +&qup_uart7_rts {
+>> +	/* We'll drive RTS, so no pull */
+>> +	drive-strength = <2>;
+>> +	bias-disable;
+>> +};
+>> +
+>> +&qup_uart7_rx {
+>> +	/*
+>> +	 * Configure a pull-up on RX. This is needed to avoid
+>> +	 * garbage data when the TX pin of the Bluetooth module is
+>> +	 * in tri-state (module powered off or not driving the
+>> +	 * signal yet).
+>> +	 */
+>> +	bias-pull-up;
+>> +};
+>> +
+>> +&qup_uart7_tx {
+>> +	/* We'll drive TX, so no pull */
+>> +	drive-strength = <2>;
+>> +	bias-disable;
+>> +};
+>> +
+>>   &qupv3_id_0 {
+>>   	status = "okay";
+>>   };
+>> @@ -842,12 +933,86 @@ &sdhc_2 {
+>>   &tlmm {
+>>   	gpio-reserved-ranges = <32 2>, /* ADSP */
+>>   			       <48 4>; /* NFC */
+>> +
+>> +	bt_en: bt-en-state {
+>> +		pins = "gpio85";
+>> +		function = "gpio";
+>> +		output-low;
+>> +		bias-disable;
+>> +	};
+>> +
+>> +	qup_uart7_sleep_cts: qup-uart7-sleep-cts-state {
+>> +		pins = "gpio28";
+>> +		function = "gpio";
+>> +		/*
+>> +		 * Configure a bias-bus-hold on CTS to lower power
+>> +		 * usage when Bluetooth is turned off. Bus hold will
+>> +		 * maintain a low power state regardless of whether
+>> +		 * the Bluetooth module drives the pin in either
+>> +		 * direction or leaves the pin fully unpowered.
+>> +		 */
+>> +		bias-bus-hold;
+>> +	};
+>> +
+>> +	qup_uart7_sleep_rts: qup-uart7-sleep-rts-state {
+>> +		pins = "gpio29";
+>> +		function = "gpio";
+>> +		/*
+>> +		 * Configure pull-down on RTS. As RTS is active low
+>> +		 * signal, pull it low to indicate the BT SoC that it
+>> +		 * can wakeup the system anytime from suspend state by
+>> +		 * pulling RX low (by sending wakeup bytes).
+>> +		 */
+>> +		bias-pull-down;
+>> +	};
+>> +
+>> +	qup_uart7_sleep_rx: qup-uart7-sleep-rx-state {
+>> +		pins = "gpio31";
+>> +		function = "gpio";
+>> +		/*
+>> +		 * Configure a pull-up on RX. This is needed to avoid
+>> +		 * garbage data when the TX pin of the Bluetooth module
+>> +		 * is floating which may cause spurious wakeups.
+>> +		 */
+>> +		bias-pull-up;
+>> +	};
+>> +
+>> +	qup_uart7_sleep_tx: qup-uart7-sleep-tx-state {
+>> +		pins = "gpio30";
+>> +		function = "gpio";
+>> +		/*
+>> +		 * Configure pull-up on TX when it isn't actively driven
+>> +		 * to prevent BT SoC from receiving garbage during sleep.
+>> +		 */
+>> +		bias-pull-up;
+>> +	};
+>>   };
+>>   
+>>   &uart5 {
+>>   	status = "okay";
+>>   };
+>>   
+>> +&uart7 {
+>> +	/delete-property/interrupts;
+> 
+> Missing space before 'interrupts'.
+> 
+>> +	interrupts-extended = <&intc GIC_SPI 608 IRQ_TYPE_LEVEL_HIGH>,
+>> +				<&tlmm 31 IRQ_TYPE_EDGE_FALLING>;
+> 
+> Align by the opening angle bracket.
+> 
+>> +	pinctrl-1 =  <&qup_uart7_sleep_cts>, <&qup_uart7_sleep_rts>,
+>> +		<&qup_uart7_sleep_tx>, <&qup_uart7_sleep_rx>;
+> 
+> Align '<' vertically.
+> 
+>> +	pinctrl-names = "default", "sleep";
+> 
+> Vertical list, please, aligned by the opening quote.
+> 
+> Also please add empty line before status.
+> 
 
-
---===============5052645908736207698==--
+Thanks for the review comments Dmitry, will address all the comments in
+patch v10.
+Thanks,
+Janakiram
