@@ -1,48 +1,48 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA1920F091
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 14:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D71120FA99
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 14:43:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740148984; cv=none; b=o0zfhmm/1c6vwMPuzjgbmPp2jLKIFryesD8GqYTds6A/sfg6g+wSlZ9bqqzLcDvG/z5AvzOFYK3/2D4NBm64fVlfx39KDXvdh0mnY0goe59heYq9yCyP/4+xI7qO4L5a2OP5dRD/JcACCT8HvIEPbT4xnLKtGtVShGzz9yCeTYo=
+	t=1740148988; cv=none; b=LBTZ8rZByZShYutPZ7A+bzAQNX9sx5722MO69nLVavjMWTGsG0cN66EgcYp7bk1eg+cTffWErvEGFLvnKODviK3bekbNC6U3hBXN+kx6kHM0FE0mv56kVjLu1S3iXtRIetkJZAP2+i/DSIe465HcAVe80XhpiOjb/J+hfuOGI7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740148984; c=relaxed/simple;
-	bh=Arpj/YusBACWVMK6K9ISzx/qZW1SDTO/u+wsUSCDZJU=;
+	s=arc-20240116; t=1740148988; c=relaxed/simple;
+	bh=A5DFln0wEVSsfNZx8B/I/TXz1OWMiFWq/Gf7F4EPobQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nPPXWkTtj3PH0P1gsdfGup/vq7z2ExqZ3EUCYbQxIz6mJkt0SKt4OjSfnFxEfP2DWFOvkJ0n7EX87TgPp0dkN3wmalW6PQUKCVJNmQzGaL8SHAc7qu9E+D7mN0wpDQ8YNa7jqq9HqbffPfJBNjHLLPi/DpunMvNJejm8O4k0XeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fMNcdnAo; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=W5yl0yXPaq1pclyq/pKPQp370OlE6M08i4qWbFuz2wx8X9j3875wYaIdkuPIP7e0Tyh38Gt0TCpZwF5KTZspRHmRwxVfG309/t8yRJjhjfkhHYcr1dYPklZAXd6GYp3sa9L6zI7VVtVCKnYfB+GLs19pOiXZhkGB9bY/W2fN1V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bj73yXgz; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fMNcdnAo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bj73yXgz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740148982; x=1771684982;
+  t=1740148986; x=1771684986;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Arpj/YusBACWVMK6K9ISzx/qZW1SDTO/u+wsUSCDZJU=;
-  b=fMNcdnAoWTQUK08QLvRvsK9D/O2GLmFU2gPu6dv0obkJermvt6UUF100
-   wG7D9xmKy4QZwhzU7UskA95Il/GcpwyaZA+G2TJNVi0yJFa+6W2Zmy4IB
-   40wNjVpHJrhb1olK1PeI9c7Rvf0SEA2Qic1HUEU4nF1X5b3Dnfh8nki12
-   ZP8+vwOZud4cbFTjWA849ghMCC0qEqLBNaWHkBo+FubjZZRcGBMls1yf2
-   2wA6htikEcM6q/vLXBRb/OxV1/Pp7cGiJKZQBpqeFk5YykhiHTktLW2ZN
-   NDEYhif9wg/ARwvYLE6K5w44NOyx6/3tWDAZ3BTIAX1i3Gpv2vNJyO0RX
-   w==;
-X-CSE-ConnectionGUID: oBHUmqjrS9aQspTL5dDIXg==
-X-CSE-MsgGUID: jtUjA6pESN2phPoJNSRBRw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11352"; a="40159817"
+  bh=A5DFln0wEVSsfNZx8B/I/TXz1OWMiFWq/Gf7F4EPobQ=;
+  b=Bj73yXgz+R9/hyWTkReJq+Ux/wD6+Y3jvuxINQNryXtgKFDZ0X+KgoY+
+   mN9C8KHghAOjswyGlprMoNxgBWZIaRWcdtIU/I3bYcjFrSqrG8Ni87gYU
+   sHF5Sjyw8mVy9lz1n0xY/aOBEAUVAmbZypmRJ72flSoI6IdJ14B2qeyh4
+   aNSpa+6vBuv0RI/pp4cFmx8q9MOJlwcdJVl1NMDBvvkVsTnmzPs/4Y80C
+   yRoeBI9QnNh+ZHxE2Hoz8d9N4tgA1ob4GnPB4p4+RGbjMsSxa5iO2QZG2
+   OxsZwQq0X2qJQMthUfcCHwRvCPvQlSs6CWXIHlNYctK2MYfAXK3crHLCw
+   Q==;
+X-CSE-ConnectionGUID: bqcP5n8RT8y2P22SRQdWFQ==
+X-CSE-MsgGUID: tXM0aq+4RxO9MP2C5HNYRg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11352"; a="40159820"
 X-IronPort-AV: E=Sophos;i="6.13,305,1732608000"; 
-   d="scan'208";a="40159817"
+   d="scan'208";a="40159820"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 06:43:02 -0800
-X-CSE-ConnectionGUID: W7Ly2DKOTz6YMWOXooY7DA==
-X-CSE-MsgGUID: Ejh5oEJYQ4+ffpqaaL+tEw==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2025 06:43:04 -0800
+X-CSE-ConnectionGUID: KY8guTgwQ1e+rg291ZsppA==
+X-CSE-MsgGUID: JbW8uSpUS+qe95JqG/9O9g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,305,1732608000"; 
-   d="scan'208";a="115914715"
+   d="scan'208";a="115914721"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa010.fm.intel.com with ESMTP; 21 Feb 2025 06:43:00 -0800
+  by fmviesa010.fm.intel.com with ESMTP; 21 Feb 2025 06:43:02 -0800
 From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: ravishankar.srivatsa@intel.com,
@@ -50,9 +50,9 @@ Cc: ravishankar.srivatsa@intel.com,
 	chandrashekar.devegowda@intel.com,
 	vijay.satija@intel.com,
 	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 2/4] Bluetooth: btintel_pcie: Read hardware exception data
-Date: Fri, 21 Feb 2025 20:12:43 +0530
-Message-ID: <20250221144245.1012686-2-kiran.k@intel.com>
+Subject: [PATCH v2 3/4] Bluetooth: btintel_pcie: Add support for device coredump
+Date: Fri, 21 Feb 2025 20:12:44 +0530
+Message-ID: <20250221144245.1012686-3-kiran.k@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250221144245.1012686-1-kiran.k@intel.com>
 References: <20250221144245.1012686-1-kiran.k@intel.com>
@@ -64,403 +64,493 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On hardware error, controller writes hardware error event and optional
-vendor specific hci events in device memory in TLV format and raises
-MSIX interrupt. Driver reads the device memory and passes the events to
-the stack for further processing.
+1. Driver registers device coredump callback
+2. Dumps firmware traces as part of coredump
 
 Co-developed-by: Vijay Satija <vijay.satija@intel.com>
 Signed-off-by: Vijay Satija <vijay.satija@intel.com>
 Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-v1 --> v2:
-- Add comments for the delay added in MAC for target acess
-- Add comment for having a seperate work item to read exception events
-- Add hci interface name while logging expception event in dmesg.
+v1->v2:
+No change
 
- drivers/bluetooth/btintel.h      |   1 +
- drivers/bluetooth/btintel_pcie.c | 226 ++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel_pcie.h |  23 ++++
- 3 files changed, 249 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btintel.h      |   1 -
+ drivers/bluetooth/btintel_pcie.c | 272 ++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btintel_pcie.h |  39 +++++
+ 3 files changed, 305 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 19530ea14905..4c21e69887a3 100644
+index 4c21e69887a3..19530ea14905 100644
 --- a/drivers/bluetooth/btintel.h
 +++ b/drivers/bluetooth/btintel.h
-@@ -190,6 +190,7 @@ enum {
+@@ -190,7 +190,6 @@ enum {
  struct btintel_data {
  	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
  	int (*acpi_reset_method)(struct hci_dev *hdev);
-+	u32	cnvi_top;
+-	u32	cnvi_top;
  };
  
  #define btintel_set_flag(hdev, nr)					\
 diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 11e2b805c7cc..f93ddd2fdb01 100644
+index f93ddd2fdb01..3a46ad7ec0ee 100644
 --- a/drivers/bluetooth/btintel_pcie.c
 +++ b/drivers/bluetooth/btintel_pcie.c
-@@ -51,6 +51,14 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
+@@ -59,6 +59,8 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
  
-  #define BTINTEL_PCIE_MAGIC_NUM    0xA5A5A5A5
+ #define BTINTEL_PCIE_MAGIC_NUM	0xA5A5A5A5
  
-+#define BTINTEL_PCIE_BLZR_HWEXP_SIZE		1024
-+#define BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR	0xB00A7C00
-+
-+#define BTINTEL_PCIE_SCP_HWEXP_SIZE		4096
-+#define BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR		0xB030F800
-+
-+#define BTINTEL_PCIE_MAGIC_NUM	0xA5A5A5A5
++#define BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER	0x17A2
 +
  /* Alive interrupt context */
  enum {
  	BTINTEL_PCIE_ROM,
-@@ -353,6 +361,64 @@ static int btintel_pcie_reset_bt(struct btintel_pcie_data *data)
- 	return reg == 0 ? 0 : -ENODEV;
+@@ -375,6 +377,25 @@ static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
+ 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
  }
  
-+static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
++static int btintel_pcie_add_dmp_data(struct hci_dev *hdev, const void *data, int size)
 +{
-+	u32 reg;
++	struct sk_buff *skb;
++	int err;
 +
-+	/* Set MAC_INIT bit to start primary bootloader */
-+	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
-+	reg &= ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
-+			BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON |
-+			BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET);
-+	reg |= (BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_ENA |
-+			BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT);
-+	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++	skb = alloc_skb(size, GFP_ATOMIC);
++	if (!skb)
++		return -ENOMEM;
++
++	skb_put_data(skb, data, size);
++	err = hci_devcd_append(hdev, skb);
++	if (err) {
++		bt_dev_err(hdev, "Failed to append data in the coredump");
++		return err;
++	}
++
++	return 0;
 +}
 +
-+static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
+ static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
+ {
+ 	u32 reg;
+@@ -419,6 +440,194 @@ static void btintel_pcie_release_mac_access(struct btintel_pcie_data *data)
+ 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
+ }
+ 
++static void btintel_pcie_copy_tlv(struct sk_buff *skb, enum btintel_pcie_tlv_type type,
++				  void *data, int size)
 +{
-+	u32 reg;
-+	int retry = 15;
++	struct intel_tlv *tlv;
 +
-+	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
-+
-+	reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
-+	reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
-+	if ((reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS) == 0)
-+		reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
-+
-+	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
-+
-+	do {
-+		reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
-+		if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS)
-+			return 0;
-+		/* Need delay here for Target Access harwdware to settle down*/
-+		usleep_range(1000, 1200);
-+
-+	} while (--retry > 0);
-+
-+	return -ETIME;
++	tlv = skb_put(skb, sizeof(*tlv) + size);
++	tlv->type = type;
++	tlv->len = size;
++	memcpy(tlv->val, data, tlv->len);
 +}
 +
-+static void btintel_pcie_release_mac_access(struct btintel_pcie_data *data)
++static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
 +{
-+	u32 reg;
++	u32 offset, prev_size, wr_ptr_status, dump_size, i;
++	struct btintel_pcie_dbgc *dbgc = &data->dbgc;
++	u8 buf_idx, dump_time_len, fw_build;
++	struct hci_dev *hdev = data->hdev;
++	struct intel_tlv *tlv;
++	struct timespec64 now;
++	struct sk_buff *skb;
++	struct tm tm_now;
++	char buf[100];
++	u16 hdr_len;
++	int ret;
 +
-+	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
++	wr_ptr_status = btintel_pcie_rd_dev_mem(data, BTINTEL_PCIE_DBGC_CUR_DBGBUFF_STATUS);
++	offset = wr_ptr_status & BTINTEL_PCIE_DBG_OFFSET_BIT_MASK;
 +
-+	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ)
-+		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
++	buf_idx = BTINTEL_PCIE_DBGC_DBG_BUF_IDX(wr_ptr_status);
++	if (buf_idx > dbgc->count) {
++		bt_dev_warn(hdev, "Buffer index is invalid");
++		return -EINVAL;
++	}
 +
-+	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS)
-+		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS;
++	prev_size = buf_idx * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
++	if (prev_size + offset >= prev_size)
++		data->dmp_hdr.write_ptr = prev_size + offset;
++	else
++		return -EINVAL;
 +
-+	if (reg & BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ)
-+		reg &= ~BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ;
++	ktime_get_real_ts64(&now);
++	time64_to_tm(now.tv_sec, 0, &tm_now);
++	dump_time_len = snprintf(buf, sizeof(buf), "Dump Time: %02d-%02d-%04ld %02d:%02d:%02d",
++				 tm_now.tm_mday, tm_now.tm_mon + 1, tm_now.tm_year + 1900,
++				 tm_now.tm_hour, tm_now.tm_min, tm_now.tm_sec);
 +
-+	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++	fw_build = snprintf(buf + dump_time_len, sizeof(buf),
++			    "Firmware Timestamp: Year %u WW %02u buildtype %u build %u",
++			    2000 + (data->dmp_hdr.fw_timestamp >> 8),
++			    data->dmp_hdr.fw_timestamp & 0xff, data->dmp_hdr.fw_build_type,
++			    data->dmp_hdr.fw_build_num);
++
++	hdr_len = sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_bt) +
++		  sizeof(*tlv) + sizeof(data->dmp_hdr.write_ptr) +
++		  sizeof(*tlv) + sizeof(data->dmp_hdr.wrap_ctr) +
++		  sizeof(*tlv) + sizeof(data->dmp_hdr.trigger_reason) +
++		  sizeof(*tlv) + sizeof(data->dmp_hdr.fw_git_sha1) +
++		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvr_top) +
++		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_top) +
++		  sizeof(*tlv) + dump_time_len +
++		  sizeof(*tlv) + fw_build;
++
++	dump_size = hdr_len + sizeof(hdr_len);
++
++	skb = alloc_skb(dump_size, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	/* Add debug buffers data length to dump size */
++	dump_size += BTINTEL_PCIE_DBGC_BUFFER_SIZE * dbgc->count;
++
++	ret = hci_devcd_init(hdev, dump_size);
++	if (ret) {
++		bt_dev_err(hdev, "Failed to init devcoredump, err %d", ret);
++		kfree_skb(skb);
++		return ret;
++	}
++
++	skb_put_data(skb, &hdr_len, sizeof(hdr_len));
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_BT, &data->dmp_hdr.cnvi_bt,
++			      sizeof(data->dmp_hdr.cnvi_bt));
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_WRITE_PTR, &data->dmp_hdr.write_ptr,
++			      sizeof(data->dmp_hdr.write_ptr));
++
++	data->dmp_hdr.wrap_ctr = btintel_pcie_rd_dev_mem(data,
++							 BTINTEL_PCIE_DBGC_DBGBUFF_WRAP_ARND);
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_WRAP_CTR, &data->dmp_hdr.wrap_ctr,
++			      sizeof(data->dmp_hdr.wrap_ctr));
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_TRIGGER_REASON, &data->dmp_hdr.trigger_reason,
++			      sizeof(data->dmp_hdr.trigger_reason));
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_FW_SHA, &data->dmp_hdr.fw_git_sha1,
++			      sizeof(data->dmp_hdr.fw_git_sha1));
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_CNVR_TOP, &data->dmp_hdr.cnvr_top,
++			      sizeof(data->dmp_hdr.cnvr_top));
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
++			      sizeof(data->dmp_hdr.cnvi_top));
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_DUMP_TIME, buf, dump_time_len);
++
++	btintel_pcie_copy_tlv(skb, BTINTEL_FW_BUILD, buf + dump_time_len, fw_build);
++
++	ret = hci_devcd_append(hdev, skb);
++	if (ret)
++		goto exit_err;
++
++	for (i = 0; i < dbgc->count; i++) {
++		ret = btintel_pcie_add_dmp_data(hdev, dbgc->bufs[i].data,
++						BTINTEL_PCIE_DBGC_BUFFER_SIZE);
++		if (ret)
++			break;
++	}
++
++exit_err:
++	hci_devcd_complete(hdev);
++	return ret;
++}
++
++static void btintel_pcie_dump_traces(struct hci_dev *hdev)
++{
++	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++	int ret = 0;
++
++	ret = btintel_pcie_get_mac_access(data);
++	if (ret) {
++		bt_dev_err(hdev, "Failed to get mac access: (%d)", ret);
++		return;
++	}
++
++	ret = btintel_pcie_read_dram_buffers(data);
++
++	btintel_pcie_release_mac_access(data);
++
++	if (ret)
++		bt_dev_err(hdev, "Failed to dump traces: (%d)", ret);
++}
++
++static void btintel_pcie_dump_hdr(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++	u16 len = skb->len;
++	u16 *hdrlen_ptr;
++	char buf[80];
++
++	hdrlen_ptr = skb_put_zero(skb, sizeof(len));
++
++	snprintf(buf, sizeof(buf), "Controller Name: 0x%X\n",
++		 INTEL_HW_VARIANT(data->dmp_hdr.cnvi_bt));
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Firmware Build Number: %u\n",
++		 data->dmp_hdr.fw_build_num);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Driver: %s\n", data->dmp_hdr.driver_name);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Vendor: Intel\n");
++	skb_put_data(skb, buf, strlen(buf));
++
++	*hdrlen_ptr = skb->len - len;
++}
++
++static void btintel_pcie_dump_notify(struct hci_dev *hdev, int state)
++{
++	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++
++	switch (state) {
++	case HCI_DEVCOREDUMP_IDLE:
++		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
++		break;
++	case HCI_DEVCOREDUMP_ACTIVE:
++		data->dmp_hdr.state = HCI_DEVCOREDUMP_ACTIVE;
++		break;
++	case HCI_DEVCOREDUMP_TIMEOUT:
++	case HCI_DEVCOREDUMP_ABORT:
++	case HCI_DEVCOREDUMP_DONE:
++		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
++		break;
++	}
 +}
 +
  /* This function enables BT function by setting BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT bit in
   * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
   * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
-@@ -473,6 +539,140 @@ static inline char *btintel_pcie_alivectxt_state2str(u32 alive_intr_ctxt)
+@@ -562,7 +771,6 @@ static int btintel_pcie_read_device_mem(struct btintel_pcie_data *data,
+ 
+ static void btintel_pcie_dump_hwexp(struct btintel_pcie_data *data)
+ {
+-	struct btintel_data *intel_data = hci_get_priv(data->hdev);
+ 	int len, err, offset, pending;
+ 	struct sk_buff *skb;
+ 	u8 *buf, prefix[64];
+@@ -576,11 +784,11 @@ static void btintel_pcie_dump_hwexp(struct btintel_pcie_data *data)
+ 
+ 	struct tlv *tlv;
+ 
+-	switch (intel_data->cnvi_top & 0xfff) {
++	switch (data->dmp_hdr.cnvi_top & 0xfff) {
+ 	case BTINTEL_CNVI_BLAZARI:
+ 	case BTINTEL_CNVI_BLAZARIW:
+ 		/* only from step B0 onwards */
+-		if (INTEL_CNVX_TOP_STEP(intel_data->cnvi_top) != 0x01)
++		if (INTEL_CNVX_TOP_STEP(data->dmp_hdr.cnvi_top) != 0x01)
+ 			return;
+ 		len = BTINTEL_PCIE_BLZR_HWEXP_SIZE; /* exception data length */
+ 		addr = BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR;
+@@ -590,7 +798,7 @@ static void btintel_pcie_dump_hwexp(struct btintel_pcie_data *data)
+ 		addr = BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR;
+ 	break;
+ 	default:
+-		bt_dev_err(data->hdev, "Unsupported cnvi 0x%8.8x", intel_data->cnvi_top);
++		bt_dev_err(data->hdev, "Unsupported cnvi 0x%8.8x", data->dmp_hdr.cnvi_top);
+ 		return;
  	}
+ 
+@@ -673,6 +881,17 @@ static void btintel_pcie_hwexp_work(struct work_struct *work)
+ 	clear_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags);
  }
  
-+static int btintel_pcie_read_device_mem(struct btintel_pcie_data *data,
-+					void *buf, u32 dev_addr, int len)
-+{
-+	int err;
-+	u32 *val = buf;
-+
-+	/* Get device mac access */
-+	err = btintel_pcie_get_mac_access(data);
-+	if (err) {
-+		bt_dev_err(data->hdev, "Failed to get mac access %d", err);
-+		return err;
-+	}
-+
-+	for (; len > 0; len -= 4, dev_addr += 4, val++)
-+		*val = btintel_pcie_rd_dev_mem(data, dev_addr);
-+
-+	btintel_pcie_release_mac_access(data);
-+
-+	return 0;
-+}
-+
-+static void btintel_pcie_dump_hwexp(struct btintel_pcie_data *data)
-+{
-+	struct btintel_data *intel_data = hci_get_priv(data->hdev);
-+	int len, err, offset, pending;
-+	struct sk_buff *skb;
-+	u8 *buf, prefix[64];
-+	u32 addr, val;
-+
-+	struct tlv {
-+		u8	type;
-+		u16	len;
-+		u8	val[];
-+	} __packed;
-+
-+	struct tlv *tlv;
-+
-+	switch (intel_data->cnvi_top & 0xfff) {
-+	case BTINTEL_CNVI_BLAZARI:
-+	case BTINTEL_CNVI_BLAZARIW:
-+		/* only from step B0 onwards */
-+		if (INTEL_CNVX_TOP_STEP(intel_data->cnvi_top) != 0x01)
-+			return;
-+		len = BTINTEL_PCIE_BLZR_HWEXP_SIZE; /* exception data length */
-+		addr = BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR;
-+	break;
-+	case BTINTEL_CNVI_SCP:
-+		len = BTINTEL_PCIE_SCP_HWEXP_SIZE;
-+		addr = BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR;
-+	break;
-+	default:
-+		bt_dev_err(data->hdev, "Unsupported cnvi 0x%8.8x", intel_data->cnvi_top);
-+		return;
-+	}
-+
-+	buf = kzalloc(len, GFP_KERNEL);
-+	if (!buf)
-+		goto exit_on_error;
-+
-+	btintel_pcie_mac_init(data);
-+
-+	err = btintel_pcie_read_device_mem(data, buf, addr, len);
-+	if (err)
-+		goto exit_on_error;
-+
-+	val = get_unaligned_le32(buf);
-+	if (val != BTINTEL_PCIE_MAGIC_NUM) {
-+		bt_dev_err(data->hdev, "Invalid exception dump signature: 0x%8.8x",
-+			   val);
-+		goto exit_on_error;
-+	}
-+
-+	snprintf(prefix, sizeof(prefix), "Bluetooth: %s: ", bt_dev_name(data->hdev));
-+
-+	offset = 4;
-+	do {
-+		pending = len - offset;
-+		if (pending < sizeof(*tlv))
-+			break;
-+		tlv = (struct tlv *)(buf + offset);
-+
-+		/* If type == 0, then there are no more TLVs to be parsed */
-+		if (!tlv->type) {
-+			bt_dev_dbg(data->hdev, "Invalid TLV type 0");
-+			break;
-+		}
-+		tlv->len = le16_to_cpu((__force __le16)tlv->len);
-+		offset += sizeof(*tlv);
-+		pending = len - offset;
-+		if (tlv->len > pending)
-+			break;
-+
-+		offset += tlv->len;
-+
-+		 /* Only TLVs of type == 1 are HCI events, no need to process other
-+		  * TLVs
-+		  */
-+		if (tlv->type != 1)
-+			continue;
-+
-+		bt_dev_dbg(data->hdev, "TLV packet length: %u", tlv->len);
-+		if (tlv->len > HCI_MAX_EVENT_SIZE)
-+			break;
-+		skb = bt_skb_alloc(tlv->len, GFP_KERNEL);
-+		if (!skb)
-+			goto exit_on_error;
-+		hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-+		skb_put_data(skb, tlv->val, tlv->len);
-+
-+		/* copy Intel specific pcie packet type */
-+		val = BTINTEL_PCIE_HCI_EVT_PKT;
-+		memcpy(skb_push(skb, BTINTEL_PCIE_HCI_TYPE_LEN), &val,
-+		       BTINTEL_PCIE_HCI_TYPE_LEN);
-+
-+		print_hex_dump(KERN_DEBUG, prefix, DUMP_PREFIX_OFFSET, 16, 1,
-+			       tlv->val, tlv->len, false);
-+
-+		skb_queue_tail(&data->rx_skb_q, skb);
-+		queue_work(data->workqueue, &data->rx_work);
-+	} while (offset < len);
-+
-+exit_on_error:
-+	kfree(buf);
-+}
-+
-+static void btintel_pcie_hwexp_work(struct work_struct *work)
++static void btintel_pcie_coredump_work(struct work_struct *work)
 +{
 +	struct btintel_pcie_data *data = container_of(work,
-+					struct btintel_pcie_data, hwexp_work);
-+	btintel_pcie_dump_hwexp(data);
++					struct btintel_pcie_data, coredump_work);
++	struct hci_dev *hdev = data->hdev;
 +
-+	clear_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags);
++	btintel_pcie_dump_traces(hdev);
++
++	clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
 +}
 +
  /* This function handles the MSI-X interrupt for gp0 cause (bit 0 in
   * BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES) which is sent for boot stage and image response.
   */
-@@ -794,6 +994,20 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
+@@ -994,6 +1213,15 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
  	return ret;
  }
  
-+static void btintel_pcie_msix_hw_exp_handler(struct btintel_pcie_data *data)
++static void btintel_pcie_do_firmware_dump(struct btintel_pcie_data *data, u16 trigger_reason)
 +{
-+	bt_dev_err(data->hdev, "Received hw exception interrupt");
-+	if (test_and_set_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags))
++	if (test_and_set_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags))
 +		return;
-+	/* Unlike usb products, there will be no hardware event sent by
-+	 * controller on exception. Instead, controller writes the hardware error
-+	 * event along with optional debug events in devie memory and halts. Driver
-+	 * shall read the events from device memory, construct skbs and push
-+	 * to rx_work item for further processing.
-+	 */
-+	queue_work(data->workqueue, &data->hwexp_work);
++
++	data->dmp_hdr.trigger_reason  = trigger_reason;
++	queue_work(data->workqueue, &data->coredump_work);
 +}
 +
- static void btintel_pcie_rx_work(struct work_struct *work)
+ static void btintel_pcie_msix_hw_exp_handler(struct btintel_pcie_data *data)
  {
- 	struct btintel_pcie_data *data = container_of(work,
-@@ -920,6 +1134,10 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
- 		return IRQ_NONE;
- 	}
- 
-+	/* This interrupt is raised when there is an hardware exception */
-+	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP)
-+		btintel_pcie_msix_hw_exp_handler(data);
-+
- 	/* This interrupt is triggered by the firmware after updating
- 	 * boot_stage register and image_response register
- 	 */
-@@ -1000,7 +1218,8 @@ struct btintel_pcie_causes_list {
- static struct btintel_pcie_causes_list causes_list[] = {
- 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x00 },
- 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x01 },
--	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x20 },
-+	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0,  BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x20 },
-+	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x23 },
- };
- 
- /* This function configures the interrupt masks for both HW_INT_CAUSES and
-@@ -1482,6 +1701,7 @@ static void btintel_pcie_release_hdev(struct btintel_pcie_data *data)
+ 	bt_dev_err(data->hdev, "Received hw exception interrupt");
+@@ -1701,7 +1929,7 @@ static void btintel_pcie_release_hdev(struct btintel_pcie_data *data)
  
  static int btintel_pcie_setup_internal(struct hci_dev *hdev)
  {
-+	struct btintel_data *data = hci_get_priv(hdev);
+-	struct btintel_data *data = hci_get_priv(hdev);
++	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
  	const u8 param[1] = { 0xFF };
  	struct intel_version_tlv ver_tlv;
  	struct sk_buff *skb;
-@@ -1520,6 +1740,7 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
+@@ -1740,7 +1968,6 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
  		goto exit_error;
  	}
  
-+	data->cnvi_top = ver_tlv.cnvi_top;
+-	data->cnvi_top = ver_tlv.cnvi_top;
  	switch (INTEL_HW_PLATFORM(ver_tlv.cnvi_bt)) {
  	case 0x37:
  		break;
-@@ -1667,6 +1888,8 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	skb_queue_head_init(&data->rx_skb_q);
+@@ -1786,6 +2013,23 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
+ 		break;
+ 	}
+ 
++	data->dmp_hdr.cnvi_top = ver_tlv.cnvi_top;
++	data->dmp_hdr.cnvr_top = ver_tlv.cnvr_top;
++	data->dmp_hdr.fw_timestamp = ver_tlv.timestamp;
++	data->dmp_hdr.fw_build_type = ver_tlv.build_type;
++	data->dmp_hdr.fw_build_num = ver_tlv.build_num;
++	data->dmp_hdr.cnvi_bt = ver_tlv.cnvi_bt;
++
++	if (ver_tlv.img_type == 0x02 || ver_tlv.img_type == 0x03)
++		data->dmp_hdr.fw_git_sha1 = ver_tlv.git_sha1;
++
++	err = hci_devcd_register(hdev, btintel_pcie_dump_traces, btintel_pcie_dump_hdr,
++				 btintel_pcie_dump_notify);
++	if (err) {
++		bt_dev_err(hdev, "Failed to register coredump (%d)", err);
++		goto exit_error;
++	}
++
+ 	btintel_print_fseq_info(hdev);
+ exit_error:
+ 	kfree_skb(skb);
+@@ -1850,6 +2094,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ 		goto exit_error;
+ 	}
+ 
++	data->dmp_hdr.driver_name = KBUILD_MODNAME;
+ 	return 0;
+ 
+ exit_error:
+@@ -1889,6 +2134,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
  	INIT_WORK(&data->rx_work, btintel_pcie_rx_work);
  
-+	INIT_WORK(&data->hwexp_work, btintel_pcie_hwexp_work);
-+
+ 	INIT_WORK(&data->hwexp_work, btintel_pcie_hwexp_work);
++	INIT_WORK(&data->coredump_work, btintel_pcie_coredump_work);
+ 
  	data->boot_stage_cache = 0x00;
  	data->img_resp_cache = 0x00;
- 
-@@ -1731,6 +1954,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	btintel_pcie_release_hdev(data);
+@@ -1955,6 +2201,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
  
  	flush_work(&data->rx_work);
-+	flush_work(&data->hwexp_work);
+ 	flush_work(&data->hwexp_work);
++	flush_work(&data->coredump_work);
  
  	destroy_workqueue(data->workqueue);
  
+@@ -1965,11 +2212,24 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
+ 	pci_set_drvdata(pdev, NULL);
+ }
+ 
++#ifdef CONFIG_DEV_COREDUMP
++static void btintel_pcie_coredump(struct device *dev)
++{
++	struct  pci_dev *pdev = to_pci_dev(dev);
++	struct btintel_pcie_data *data = pci_get_drvdata(pdev);
++
++	btintel_pcie_do_firmware_dump(data, BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER);
++}
++#endif
++
+ static struct pci_driver btintel_pcie_driver = {
+ 	.name = KBUILD_MODNAME,
+ 	.id_table = btintel_pcie_table,
+ 	.probe = btintel_pcie_probe,
+ 	.remove = btintel_pcie_remove,
++#ifdef CONFIG_DEV_COREDUMP
++	.driver.coredump = btintel_pcie_coredump
++#endif
+ };
+ module_pci_driver(btintel_pcie_driver);
+ 
 diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index b9d32393002b..98902fd4fc96 100644
+index 98902fd4fc96..c13f17100a74 100644
 --- a/drivers/bluetooth/btintel_pcie.h
 +++ b/drivers/bluetooth/btintel_pcie.h
-@@ -16,6 +16,8 @@
- #define BTINTEL_PCIE_CSR_CI_ADDR_LSB_REG	(BTINTEL_PCIE_CSR_BASE + 0x118)
- #define BTINTEL_PCIE_CSR_CI_ADDR_MSB_REG	(BTINTEL_PCIE_CSR_BASE + 0x11C)
- #define BTINTEL_PCIE_CSR_IMG_RESPONSE_REG	(BTINTEL_PCIE_CSR_BASE + 0x12C)
-+#define BTINTEL_PCIE_PRPH_DEV_ADDR_REG		(BTINTEL_PCIE_CSR_BASE + 0x440)
-+#define BTINTEL_PCIE_PRPH_DEV_RD_REG		(BTINTEL_PCIE_CSR_BASE + 0x458)
- #define BTINTEL_PCIE_CSR_HBUS_TARG_WRPTR	(BTINTEL_PCIE_CSR_BASE + 0x460)
+@@ -56,6 +56,15 @@
+ #define BTINTEL_PCIE_CSR_MSIX_IVAR_BASE		(BTINTEL_PCIE_CSR_MSIX_BASE + 0x0880)
+ #define BTINTEL_PCIE_CSR_MSIX_IVAR(cause)	(BTINTEL_PCIE_CSR_MSIX_IVAR_BASE + (cause))
  
- /* BTINTEL_PCIE_CSR Function Control Register */
-@@ -23,6 +25,12 @@
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT		(BIT(6))
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT		(BIT(7))
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_STS	(BIT(20))
++/* IOSF Debug Register */
++#define BTINTEL_PCIE_DBGC_BASE_ADDR			(0xf3800300)
++#define BTINTEL_PCIE_DBGC_CUR_DBGBUFF_STATUS		(BTINTEL_PCIE_DBGC_BASE_ADDR + 0x1C)
++#define BTINTEL_PCIE_DBGC_DBGBUFF_WRAP_ARND		(BTINTEL_PCIE_DBGC_BASE_ADDR + 0x2C)
 +
-+#define BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ	(BIT(21))
-+/* Stop MAC Access disconnection request */
-+#define BTINTEL_PCIE_CSR_FUNC_CTRL_STOP_MAC_ACCESS_DIS	(BIT(22))
-+#define BTINTEL_PCIE_CSR_FUNC_CTRL_XTAL_CLK_REQ		(BIT(23))
++#define BTINTEL_PCIE_DBG_IDX_BIT_MASK		0x0F
++#define BTINTEL_PCIE_DBGC_DBG_BUF_IDX(data)	(((data) >> 24) & BTINTEL_PCIE_DBG_IDX_BIT_MASK)
++#define BTINTEL_PCIE_DBG_OFFSET_BIT_MASK	0xFFFFFF
 +
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_STS	(BIT(28))
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON	(BIT(29))
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET		(BIT(31))
-@@ -72,6 +80,7 @@ enum msix_fh_int_causes {
- /* Causes for the HW register interrupts */
- enum msix_hw_int_causes {
- 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0	= BIT(0),	/* cause 32 */
-+	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP	= BIT(3),	/* cause 35 */
- };
+ /* The DRAM buffer count, each buffer size, and
+  * fragment buffer size
+  */
+@@ -96,6 +105,19 @@ enum {
  
- /* PCIe device states
-@@ -84,6 +93,11 @@ enum {
- 	BTINTEL_PCIE_STATE_D3_HOT = 2,
- 	BTINTEL_PCIE_STATE_D3_COLD = 3,
- };
-+
-+enum {
-+	BTINTEL_PCIE_HWEXP_INPROGRESS,
+ enum {
+ 	BTINTEL_PCIE_HWEXP_INPROGRESS,
++	BTINTEL_PCIE_COREDUMP_INPROGRESS
 +};
 +
- #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
++enum btintel_pcie_tlv_type {
++	BTINTEL_CNVI_BT,
++	BTINTEL_WRITE_PTR,
++	BTINTEL_WRAP_CTR,
++	BTINTEL_TRIGGER_REASON,
++	BTINTEL_FW_SHA,
++	BTINTEL_CNVR_TOP,
++	BTINTEL_CNVI_TOP,
++	BTINTEL_DUMP_TIME,
++	BTINTEL_FW_BUILD,
+ };
  
- /* Minimum and Maximum number of MSI-X Vector
-@@ -437,6 +451,7 @@ struct btintel_pcie_data {
- 	struct rxq	rxq;
+ #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
+@@ -370,6 +392,21 @@ struct btintel_pcie_dbgc {
+ 	struct data_buf *bufs;
+ };
+ 
++struct btintel_pcie_dump_header {
++	const char	*driver_name;
++	u32		cnvi_top;
++	u32		cnvr_top;
++	u16		fw_timestamp;
++	u8		fw_build_type;
++	u32		fw_build_num;
++	u32		fw_git_sha1;
++	u32		cnvi_bt;
++	u32		write_ptr;
++	u32		wrap_ctr;
++	u16		trigger_reason;
++	int		state;
++};
++
+ /* struct btintel_pcie_data
+  * @pdev: pci device
+  * @hdev: hdev device
+@@ -452,6 +489,8 @@ struct btintel_pcie_data {
  	u32	alive_intr_ctxt;
  	struct btintel_pcie_dbgc	dbgc;
-+	struct work_struct	hwexp_work;
+ 	struct work_struct	hwexp_work;
++	struct work_struct	coredump_work;
++	struct btintel_pcie_dump_header dmp_hdr;
  };
  
  static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
-@@ -476,3 +491,11 @@ static inline void btintel_pcie_clr_reg_bits(struct btintel_pcie_data *data,
- 	r &= ~bits;
- 	iowrite32(r, data->base_addr + offset);
- }
-+
-+static inline u32 btintel_pcie_rd_dev_mem(struct btintel_pcie_data *data,
-+					  u32 addr)
-+{
-+	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_PRPH_DEV_ADDR_REG, addr);
-+	return btintel_pcie_rd_reg32(data, BTINTEL_PCIE_PRPH_DEV_RD_REG);
-+}
-+
 -- 
 2.43.0
 
