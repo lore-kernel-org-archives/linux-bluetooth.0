@@ -1,249 +1,77 @@
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D96718EAB;
-	Fri, 21 Feb 2025 00:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498D12F509
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 01:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740097613; cv=none; b=L6mGf+ZHBQCt6PUy1Ef9OKidtOvS5zWOcWD+3nSriulCkKOhwmrzi8LJUNwIImDqhiSQYA7Z/sOLHj69SCNgZBrNXotEoCz8pIRnakH+QzoLYszY8uNwKOexUfKgyPTAjfhqtmDq1ccdcgLBUAlUKLrh5VuQplFVQYY5BHJyiD0=
+	t=1740099666; cv=none; b=VfZbB7v3C8A1iMjiM6Z1pIqGTf86orb2T3InssfyOpdLEs0L08VpxbDaGx6a5yuVXVE6PiEskmn1CkVkCR0KsC1/v+HZatQHbkbGgKqnfAJqUxGCAk5Wrvz66MyeV6kYXtWoa2W8IeBrvKL7wHf+vjSmvjXH2dMY7dn8LJGpaHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740097613; c=relaxed/simple;
-	bh=I2pO7Wft5pvESP3onPEFemXdrwWNRpRIxMt7iA1vHvc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a9nEXLOkcTMCGv6A8lCtuCeHMXzL1N+0pd9ZHVFjyEirgHPR3K8/+BuqJyGcuk5WpG/E85ma27QaqFb1+y6wUO6Ihv18/IXmZtq0MddNsyG/SGbhhe5VmuUErHY1k3k9zPYgRJM1bRps67XhrWeAOqG4rpNYITBwco5uDpxXEqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7B/ch/S; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7B/ch/S"
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-855a8275758so43311139f.3;
-        Thu, 20 Feb 2025 16:26:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740097610; x=1740702410; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YgF/YRDp6wf7Cg+RtAfP4L1t13pt2UAJwFrfEBCFLto=;
-        b=b7B/ch/Sq9WhYIFDvEaGHqKhIGdmx4RM7UKTyKHneW7FgId6Ygl0R6CioKPUX1F8ox
-         6I73KwDxwoupgAh81ADvlMeg5JzHXJnBcuetiM8IZspyD/zxL+uxNwAA0uszkByvaybz
-         WWRnUCeJL5D9Z/O9mbXh4W/9ffiqd/j7L6xr3cLC0cN0zFpJ36X2QwAhAARdNCD2p4/x
-         X6eLrdD/EH7fk88aFSj7ygG7/YoG2f/Vpf5EEffKlpgG3Z6wcICVBqLpfJba9X4MyjL4
-         YtpQQWu6IFNvAHb5e+4LhQs8+g+iE0Y1xJOincjFP4upgeJ0+QqxB6PeVyWMGR+Yr9b4
-         e+lA==
+	s=arc-20240116; t=1740099666; c=relaxed/simple;
+	bh=4/jkSPd+7SkkOw/6xFeJ6XK66kxAJEdbOzjm8nMZabo=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=dGygT4+RvR/pGdsO3yBlzIeuCoZW1y/o3Z0u8VBlspUlQFbHIkOSLsL5xdi3N7bTIwgb5XXB0S4Fhs6Z8/G3W6WbspCizoS03+tf2ZCJIQI7GZL9jB99afY08s4Jq2BAZX76syl+Og/4xFWzlG5FSqE+lkIljovnbDcWE2hdXks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d2b6d933a3so24895105ab.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Feb 2025 17:01:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740097610; x=1740702410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YgF/YRDp6wf7Cg+RtAfP4L1t13pt2UAJwFrfEBCFLto=;
-        b=BK2ciZrGPI2VTePhmcXmI4QnwlPwQbTZdz0GiKmdeDiqJy4e5r5+Ipr4jRMR2+4Csp
-         V5t/cjWyxZJ1E+g9/KFm2qu9c4swLg/Gi8nuXZRXvoP3mKLUkXCBHS10aUM8b5wc9Cq2
-         qJ9SbHhlh3zxHKAMJcCnjEBRACwz6DZFP58ZmzL74gQoJPh30DTQMM7EcI0OwKg/78x9
-         yffGSBNRTgxol20HDfE0AIYNloQ1JqzE6hgb6cV0qY4UWew1LjyQ1qfR4G9MKVEXPQiV
-         coD+Ue5wIwNvdyXWVKguS1XcZSSgvUR1othyQZbEZRzssbtJ2tT3vSiEPb1lkq2DXGFb
-         beCg==
-X-Forwarded-Encrypted: i=1; AJvYcCV90mhBEkUabfGLl4RKW2k4bcjVXMIZYb0oOcUZCSkyvzeO0fM1httuMqjhSuuC2RHY4Yb6rXQf@vger.kernel.org, AJvYcCWaiWt2yYQAaToEkRBwzlQXCps3SxXMuib6pjCAa5TuEdECl92t486LadbKnwTzNtTCoogTzvRHE6VcIYoZ09c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywVfBhyM2BcAkRlc2htztCVZ5CLekVBRcA6j/CXUpDeprqCmwI
-	7ZSRkbJMLCtCYQb2TjF45PvLEhESunD/YJFHFWFA2TNEHiKrWQsy852/8vnJj7UFKzoEK8fHVMx
-	MUywzkOElWcCjtSrpdUVUO8PTnAU=
-X-Gm-Gg: ASbGnctqeSJYghIARzfmpt7Hw7Kx3UdyuHoVIdjx9ey4r3oJuWvosEpRgfs+p5P4emI
-	eff+kMe61d0CV+CN27CUHl89JRG/GFvODxQIhJ8DfBRzPRqG9QlQ5P5qtk9qnbB+dWtYiQQM=
-X-Google-Smtp-Source: AGHT+IH4D1q3UFeVWtaN2R6x1spI8QRIwqW+I9MgD7CKBpIuB8NO/1V3y1mvWUH7JAiPyJtGpem8T39U0fONBZaJmQM=
-X-Received: by 2002:a05:6e02:1908:b0:3d0:21aa:a752 with SMTP id
- e9e14a558f8ab-3d2cae47e92mr13314065ab.2.1740097610446; Thu, 20 Feb 2025
- 16:26:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740099663; x=1740704463;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PPfQysImRr+xOu4kExsPqpYVpEICotxax76O4rF2U+c=;
+        b=Bp0CjGR6w8+8HbhnPxyU6/NznDw3HGvn0dAuiSNQZuDhha0z22gbz1YlE92BEhm1JQ
+         BLjr/Ajf0M0+R+Ybl0rg4aA8mIbU1d/iIT6vqy1JxknY9MZt2hMOsH9EU0dhCZKRNBg5
+         Gf/wDYO0S9kDaBlsUL3IAwx8FPz2BA8PIsRdW6bYL0o+TSH/pGTm+0toCUZp5TNAsfmd
+         7uIMKad250vrYkq6w2fHaQAhD2udnPSXyklpbqb3wxvF8jsGZQyfoFJVhuA1ZStBO6kx
+         NSvFGm8nn7BixjEjl7hzayOHv3JaRJAjy0jcRTu2VnzYya+QJRJRSa4TswXyHDa9Q3er
+         meHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJS0UFjRa4TbGwa/kyeQ7bVv193Bx8abSWXQPSdWVDWmRfppUlevn8Blo6mxxwlbUHa5iLeT2wDU6/gh1l+kE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxULFpxnf+oRDGQLTEmto6SE4o5W4cDa49xllRY6FuRw3HAv1Sd
+	9k8WhTkO6riQmBQ3yqWHwql63ydyuDFyqYOK/cDmnxN3wXR8IPhEYpELk7lKci7PiuqAg1kFdTN
+	iAcDeVblderKsUcwwIzJFL/XX03B8GHUKxMJ/vW1Jmc9RUsFVoLndt+A=
+X-Google-Smtp-Source: AGHT+IFmlldBkF8QuqaN5ZkFiYY95ZxCZ6cNqSwuC6w7OcrsJlpJZo3bKAh8Iil4mYll5ouOOTyglBqplx9P1Lfq9fPXSS5CINTS
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1739988644.git.pav@iki.fi> <b278a4f39101282e2d920fed482b914d23ffaac3.1739988644.git.pav@iki.fi>
- <CAL+tcoBxtxCT1R8pPFF2NvDv=1PKris1Gzg-acfKHN9qHr7RFA@mail.gmail.com>
- <67b694f08332c_20efb029434@willemb.c.googlers.com.notmuch>
- <CAL+tcoDJAYDce6Ud49q1+srq-wJ=04JxMm1w-Yzcdd1FGE3U7g@mail.gmail.com>
- <67b74c47c14c7_261ab62943@willemb.c.googlers.com.notmuch> <67b7b88c60ea0_292289294bb@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67b7b88c60ea0_292289294bb@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 21 Feb 2025 08:26:14 +0800
-X-Gm-Features: AWEUYZl9k5Vlk7K9nAMc68CLLK_QjgUWZKUtHyfHS_2iX1EuTuSLqxiNyytUcxc
-Message-ID: <CAL+tcoAD4t3f2vMquxwSNVzpRfyHWvG9NYfkjTWZZfd7oHCSGw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, gerhard@engleder-embedded.com
+X-Received: by 2002:a05:6e02:168d:b0:3d1:7835:1031 with SMTP id
+ e9e14a558f8ab-3d2cae6c63fmr12541445ab.7.1740099663233; Thu, 20 Feb 2025
+ 17:01:03 -0800 (PST)
+Date: Thu, 20 Feb 2025 17:01:03 -0800
+In-Reply-To: <67b75955.050a0220.14d86d.02e5.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67b7d04f.050a0220.14d86d.0303.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] general protection fault in h5_close
+From: syzbot <syzbot+ce27f6f75880d7fe265c@syzkaller.appspotmail.com>
+To: avkrasnov@salutedevices.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 21, 2025 at 7:19=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Willem de Bruijn wrote:
-> > Jason Xing wrote:
-> > > On Thu, Feb 20, 2025 at 10:35=E2=80=AFAM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Jason Xing wrote:
-> > > > > On Thu, Feb 20, 2025 at 2:15=E2=80=AFAM Pauli Virtanen <pav@iki.f=
-i> wrote:
-> > > > > >
-> > > > > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software t=
-imestamp
-> > > > > > when hardware reports a packet completed.
-> > > > > >
-> > > > > > Completion tstamp is useful for Bluetooth, as hardware timestam=
-ps do not
-> > > > > > exist in the HCI specification except for ISO packets, and the =
-hardware
-> > > > > > has a queue where packets may wait.  In this case the software =
-SND
-> > > > > > timestamp only reflects the kernel-side part of the total laten=
-cy
-> > > > > > (usually small) and queue length (usually 0 unless HW buffers
-> > > > > > congested), whereas the completion report time is more informat=
-ive of
-> > > > > > the true latency.
-> > > > > >
-> > > > > > It may also be useful in other cases where HW TX timestamps can=
-not be
-> > > > > > obtained and user wants to estimate an upper bound to when the =
-TX
-> > > > > > probably happened.
-> > > > > >
-> > > > > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > > > > > ---
-> > > > > >
-> > > > > > Notes:
-> > > > > >     v4: changed SOF_TIMESTAMPING_TX_COMPLETION to only emit COM=
-PLETION
-> > > > > >         together with SND, to save a bit in skb_shared_info.tx_=
-flags
-> > > > > >
-> > > > > >         As it then cannot be set per-skb, reject setting it via=
- CMSG.
-> > > > > >
-> > > > > >  Documentation/networking/timestamping.rst | 9 +++++++++
-> > > > > >  include/uapi/linux/errqueue.h             | 1 +
-> > > > > >  include/uapi/linux/net_tstamp.h           | 6 ++++--
-> > > > > >  net/core/sock.c                           | 2 ++
-> > > > > >  net/ethtool/common.c                      | 1 +
-> > > > > >  5 files changed, 17 insertions(+), 2 deletions(-)
-> > > > > >
-> > > > > > diff --git a/Documentation/networking/timestamping.rst b/Docume=
-ntation/networking/timestamping.rst
-> > > > > > index 61ef9da10e28..5034dfe326c0 100644
-> > > > > > --- a/Documentation/networking/timestamping.rst
-> > > > > > +++ b/Documentation/networking/timestamping.rst
-> > > > > > @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
-> > > > > >    cumulative acknowledgment. The mechanism ignores SACK and FA=
-CK.
-> > > > > >    This flag can be enabled via both socket options and control=
- messages.
-> > > > > >
-> > > > > > +SOF_TIMESTAMPING_TX_COMPLETION:
-> > > > > > +  Request tx timestamps on packet tx completion, for the packe=
-ts that
-> > > > > > +  also have SOF_TIMESTAMPING_TX_SOFTWARE enabled.  The complet=
-ion
-> > > > >
-> > > > > Is it mandatory for other drivers that will try to use
-> > > > > SOF_TIMESTAMPING_TX_COMPLETION in the future? I can see you coupl=
-ed
-> > > > > both of them in hci_conn_tx_queue in patch [2/5]. If so, it would=
- be
-> > > > > better if you add the limitation in sock_set_timestamping() so th=
-at
-> > > > > the same rule can be applied to other drivers.
-> > > > >
-> > > > > But may I ask why you tried to couple them so tight in the versio=
-n?
-> > > > > Could you say more about this? It's optional, right? IIUC, you
-> > > > > expected the driver to have both timestamps and then calculate th=
-e
-> > > > > delta easily?
-> > > >
-> > > > This is a workaround around the limited number of bits available in
-> > > > skb_shared_info.tx_flags.
-> > >
-> > > Oh, I'm surprised I missed the point even though I revisited the
-> > > previous discussion.
-> > >
-> > > Pauli, please add the limitation when users setsockopt in
-> > > sock_set_timestamping() :)
-> > >
-> > > >
-> > > > Pauli could claim last available bit 7.. but then you would need to
-> > > > find another bit for SKBTX_BPF ;)
-> > >
-> > > Right :D
-> > >
-> > > >
-> > > > FWIW I think we could probably free up 1 or 2 bits if we look close=
-ly,
-> > > > e.g., of SKBTX_HW_TSTAMP_USE_CYCLES or SKBTX_WIFI_STATUS.
-> > >
-> > > Good. Will you submit a patch series to do that, or...?
-> >
-> > Reclaiming space is really up to whoever needs it.
-> >
-> > I'll take a quick look, just to see if there is an obvious path and
-> > we can postpone this whole conversation to next time we need a bit.
->
-> SKBTX_HW_TSTAMP_USE_CYCLES is only true if SOF_TIMESTAMPING_BIND_PHC.
-> It cannot be set per cmsg (is not in SOF_TIMESTAMPING_TX_RECORD_MASK),
-> so no need to record it per skb.
+syzbot has bisected this issue to:
 
-Those flags look like sub-features to me, not like the completion one.
-Occupying one bit in the skb is luxury for them.
+commit 3ca66179e56d25f1e3ed1608241abb487c63e9b7
+Author: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Date:   Thu Jan 30 18:43:26 2025 +0000
 
->
-> It only has two drivers using it, which can easily be updated:
->
->         -                if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_=
-USE_CYCLES)
->         +                if (skb->sk &&
->         +                    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING=
-_BIND_PHC)
->                                         tx_flags |=3D IGC_TX_FLAGS_TSTAMP=
-_TIMER_1;
->
-> They later call skb_tstamp_tx, which does nothing if !skb->sk.
-> Only cost is a higher cost of accessing the sk cacheline.
->
-> SKBTX_WIFI_STATUS essentially follows the same argument. It can only
-> be set in the sockopt. It has a handful more callsites that would need
-> to be updated. sock_flag(sk, SOCK_WIFI_STATUS) will be tested without
-> the socket lock held. But this is already the case in the UDP lockless
-> fast path through ip_make_skb.
->
-> SKBTX_HW_TSTAMP_NETDEV is only used on Rx. Could shadow another bit
-> that is used only on Tx.
->
-> SKBTX_IN_PROGRESS is only used by the driver to suppress the software
-> tx timestamp from skb_tx_timestamp if a later hardware timestamp will
-> be generated. Predates SOF_TIMESTAMPING_OPT_TX_SWHW.
+    Bluetooth: hci_uart: fix race during initialization
 
-Thanks for the detailed analysis. I just checked them out and agreed.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=102567f8580000
+start commit:   e5d3fd687aac Add linux-next specific files for 20250218
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=122567f8580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=142567f8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4e945b2fe8e5992f
+dashboard link: https://syzkaller.appspot.com/bug?extid=ce27f6f75880d7fe265c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178f2ba4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=123375b0580000
 
-> In short plenty of bits we can reclaim if we try.
->
-> SKBTX_BPF was just merged, so we will have to reclaim one.
+Reported-by: syzbot+ce27f6f75880d7fe265c@syzkaller.appspotmail.com
+Fixes: 3ca66179e56d ("Bluetooth: hci_uart: fix race during initialization")
 
-It's worth knowing that we probably will work on top of the bpf-next
-net branch if so.
-
-Do you want to reclaim every possible bit in one go? One series can
-complete the work. // If there is anything, feel free to ask me to
-implement/co-work :)
-
-> The first one seems most straightforward.
-
-If there are more flags than the tx_flags can have in the future, I
-think we can turn to the second method you mentioned.
-
-Could we harvest one or more to have a better uniformed design before
-working on this completion feature, I'm wondering?
-
-Thanks,
-Jason
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
