@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA4F1F8ADB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 16:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CE11FFC73
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 16:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740156602; cv=none; b=lPetcq0xPbTjymVB3aVdVau5oXQllKOUYbZ8svvaLMoPtdmoawWRtfz1EakzZ290wxrMqT7aztDB2qr0b0H/A69cqqjVqaABka6hM4Z93jTJ7FCG3jzxTIhR9beW7pJjEiTK0J70Ok8dMG+4TLvM4HDG4kdPhBCvT1JTZ7Utq9s=
+	t=1740156603; cv=none; b=d2FaQsOWbv43I+N5NTYsUI8LZH/uYib4rMOTRE54XSGXRZUwQUCIiQ4vGRwthjwQlsiZ+pterY8eVTzjYdHMSkHbnzJXrlaCZp4VprTSopseUbs4ODByjYigchEqcqZFDneOW3F7IcUpT+Tq7ZWTSv8GSs6nt0P4FZlQQPE5yvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740156602; c=relaxed/simple;
-	bh=t/s3Efvjh9RRMORgMm6lxuI2eLQcbpCkiykqrTve56g=;
+	s=arc-20240116; t=1740156603; c=relaxed/simple;
+	bh=NO7Jkm7Mz+409bZm48WxnUOvRHFLQKZeuHNw0H+NCA0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=N/oqfaRfx2vU2hK9f/Evd/SmfFn9GIoRRhllZXZIFG4SzgOo3Qz2pyjdiXER0W86h5x/9XMWnb3dLZQbxrjUFOjRRE28kdpYDthrDKFdDUlSX3zCQr5RkSVHiwHnFKU9E5l4CFllr3dAmWdLuj5Ei212Dis8qY31v+N042/B9RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F30S2UHt; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=dJxqJmMCXl2A9GuE26YQPQfOgSeXpGbraVZJS+wki4t7gbM9ta6p2m2J0vog+qlVl/UbHjOs6dX32YjDd0Z3yvvTx8CLoW8FnhH2ZUgWdPzCLV0dHzoiYp4Gkp7j/4MZRvyYDDmlWZ2bJVg4gUhBqp1D8dwZRqFZycL9YDzTRqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lFdVnKix; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F30S2UHt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D984BC4CED6;
-	Fri, 21 Feb 2025 16:50:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lFdVnKix"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A05AC4CED6;
+	Fri, 21 Feb 2025 16:50:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740156601;
-	bh=t/s3Efvjh9RRMORgMm6lxuI2eLQcbpCkiykqrTve56g=;
+	s=k20201202; t=1740156603;
+	bh=NO7Jkm7Mz+409bZm48WxnUOvRHFLQKZeuHNw0H+NCA0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F30S2UHtRLFPqER4WtvnMOw6Foc65REGBXjymnhX8irrknYYfVKYQbZGP+l6H2d+V
-	 GQKzYHZYSutIC+YlwOFna5/f17r1pxzlKBt9TnpVofJ1AVU5M3ytbaDDUryr9ZnS4E
-	 L9y3Cew/LBHrQSMY8tqQF9azPtHpXOR1rVkoiPMwfqXc0shOl1Ci2tsz7eew2j0u+r
-	 XStNwVGt+llAFCyjNUn/MMYDcCqpoGYNihqzVA7Cb+u9aadJpkUCpGNvAhjV35FjYs
-	 KFJL04hkkiEos1kaw/HMYAtEp+6Tj0yTfpUP4bFmnXiVwJgVdKGFFWWvCCrC/oiOu6
-	 bDPmup+GxrKSQ==
+	b=lFdVnKixdW3SfNrZ8xXY68HDQSy4Ub2MhMaZzQ4eSDXZRo+QeAvhgO+lE70yYqxni
+	 B77zHj3fwGLNlZqZBUJQIPKbWEZEvLZc1cdB6XwGqonc9adT3PR3u3yy3LdB/W7K7y
+	 iojm8i8yQ3M9BobGIHAQ7KmwNTzj/V3NOBvdtXNnUe3zNvTw7hgp+WFc2J4PTfEqZO
+	 CKHPC21yFvIp8kXxbh35D1+PmNYyIAl2cHCMxCpeDGUEFdOuf31JERiIuw+y/Xqvtt
+	 z2yherQ+dRcd0zMmxmyv28YZ8v5sxBJmUdVE37eWBxk8EH8PiG8OQmFXStnEpZmGyw
+	 6htvYx2tn7HfQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB9FE380CEEE;
-	Fri, 21 Feb 2025 16:50:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7169A380CEEE;
+	Fri, 21 Feb 2025 16:50:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,35 +37,42 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] tools/avtest: Add AAC configuration
+Subject: Re: [PATCH BlueZ 0/3] bap: Update bt_bap user data handling
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174015663277.2112364.3323748412087717454.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Feb 2025 16:50:32 +0000
-References: <20250220072235.189814-1-frederic.danis@collabora.com>
-In-Reply-To: <20250220072235.189814-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+ <174015663404.2112364.8241467118640071521.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Feb 2025 16:50:34 +0000
+References: <20250220085811.5033-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20250220085811.5033-1-iulia.tanasescu@nxp.com>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+ mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com,
+ luiz.dentz@gmail.com
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 20 Feb 2025 08:22:35 +0100 you wrote:
-> The tests A2DP/SNK/AVP/BI-01-C, A2DP/SNK/AVP/BI-02-C,
-> A2DP/SNK/AVP/BI-05-C and  A2DP/SNK/AVP/BI-07-C expect the IUT to
-> provide an AAC configuration.
+On Thu, 20 Feb 2025 10:58:08 +0200 you wrote:
+> For the BAP Broadcast Assistant/Scan Delegator implementation
+> (BASS Client/Server), BAP sessions with Broadcasters are notified
+> in the bap_attached/bap_detached callbacks registered by BASS.
+> The associated btd_service must be available in the bt_bap
+> user data, to match the session with the Broadcaster device.
 > 
-> This can be used by adding '--aac' to the avtest command, e.g. for
-> A2DP/SNK/AVP/BI-01-C test:
->  tools/avtest --aac --reject setconf --reject-code 214
+> This patch updates the way bt_bap user data is handled, to ensure
+> the above.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ] tools/avtest: Add AAC configuration
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fc7be1e86771
+  - [BlueZ,1/3] bap: Do not clear user_data before detaching bt_bap
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=790a0c5d75ec
+  - [BlueZ,2/3] bap: Do not set adapter as bt_bap user_data
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cfb233b4c6b3
+  - [BlueZ,3/3] bass: Add checks for bap user data
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fefeb495dd22
 
 You are awesome, thank you!
 -- 
