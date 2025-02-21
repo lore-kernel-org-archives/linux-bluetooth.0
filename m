@@ -1,103 +1,121 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B721DC075;
-	Fri, 21 Feb 2025 15:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF95A1F12EC;
+	Fri, 21 Feb 2025 16:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740152986; cv=none; b=nRBfb5ZYpS2f7/OI7DxdZAIOl7ds82CRJlYxGNeOhqvN8HqjMKogz4ouLlGrGaLvlPL5FFXQrzaUbQ57KRsk5NK7HUa+pUGw2OsCOTbknmEloa2m5Hk5TOk/Amhumy5BQC9bmmxCGe50bO/YR90NSaBg6KaCkfF/wM7BK3DtM6E=
+	t=1740154863; cv=none; b=l7wrkr5F1g4wzqn3fc9GN6zMfOQkTsxW71YoWctV5t1p/OLGXFwNoz6qGumJdxiis1dagQKKHGQAYH28Djx3e2s80HncxuMyI7cRSvjfAC+aFp1CJPBpYJ+ou5EoOgazLIVXyq4JaaKA2YOwH8qKGJ/ZSp/7GV1vlFHbJkuPP9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740152986; c=relaxed/simple;
-	bh=1fvhA8V0g/vtY2mcylWXQXy8upiIo6youGRqM1lFRmE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Or0EbaKK/bvDAScqF+kHR/lt/KR2gmNd7cZWiePeVfFGR5SVDjS+Lqr2ESOIWhs7j9yRW/HBQ7APsTdVTKiYU9PnYjCy1aeJqzQ+xEqCdXgswSNmnZpjIS6zbpbMBUPwoR4WGmcRfKZUjjMJiSDCG/2T4BKqj/41FrRZU8kUTCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fPjcOssX; arc=none smtp.client-ip=209.85.128.173
+	s=arc-20240116; t=1740154863; c=relaxed/simple;
+	bh=JupzvUkcz9lij7FMLeO8tMHaN2BmcJV2dSPgnA9ECyo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=czV5eGyp0kcFVVNvVBp6ggxGvTTB4anEnT4ZSIKD3bJ9z79zC0pmvIkb4/PWY5s0LMxDQIKGGJtsTK1kgobMXRbmR5UBPQg4sSqCWlOmyXbAXeYABbnvp0Fc8+KbUfbSCLXSihV9trIoJNPO4kuruClbI77lBL+nrWX3mBVf2jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZANyd6fi; arc=none smtp.client-ip=209.85.208.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fPjcOssX"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6f666c94285so20425027b3.3;
-        Fri, 21 Feb 2025 07:49:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZANyd6fi"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-307bc125e2eso21771511fa.3;
+        Fri, 21 Feb 2025 08:21:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740152984; x=1740757784; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MKWPUDJyTigYpO/lDMrucISTaNX7hl65i0Al0sTxzuI=;
-        b=fPjcOssX1gkhvRGafZq4OmX/yjwo7rPmUb2T24B5I3qOUQCJURPDNz7CxIK4x01qX7
-         3Gk5ExBIzZUAyTH0b+OJNQYoPB6rYYFeOMb3EQNKvD1PfgpVGFhz4aijyRJimdztQ81a
-         l7+//IdegTFTUB4SdGv8gTxd7jvaEDQqPdj4FHbs8DW67dh+Eq+qFIR4FapuvRYiKgxZ
-         MArcecoer1OK8COpgrxtoBm36vlBhjiRRWReCvIDXnLgXFbaV8tIvSJ1Wy/qDVI1ieoO
-         wu4UoBMp/A7Vhd+3mItuWNn+ULj55LKW9fJrGCFuNLfgLfUNP5gMVjpTVAzmehi6ycxI
-         U8ug==
+        d=gmail.com; s=20230601; t=1740154860; x=1740759660; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rbh68tJwGTQhCBEmpp6DPT0uUoYU18GRnhX5rX6s8ME=;
+        b=ZANyd6fiS6yPVXbMjKkIfiuscgILJBR+YvgdTwy1RudmSreAOwJ/o/eE3UbqutcMUK
+         HPmO6IZaF3z03e3Vpp57ttVyGgLmbXtQ4ZjuPILAY1+piBv7nHUKDiJ4RdykWRiI7lEP
+         5qz08OKVRewyjLLq/RJWC/PIpYWr4hZhbHU0BEJsdgyqX41yBxfIPh27GEtmo/EBBdTo
+         q7/Zi+32jUUkUWMCJY2NtrzCZ6BJ87lv3t+gGkq476dUEc5Kjb4wYahVHKf17KknU6GQ
+         vJ+1pg119RTmwdXkObos+0v7Jqo7/v/7Xc2UlPrfLufddFSt90FaMMNZ1zE/K+PW9fkj
+         kfew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740152984; x=1740757784;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MKWPUDJyTigYpO/lDMrucISTaNX7hl65i0Al0sTxzuI=;
-        b=nurGlEV6DCxh/Ep9gj9xQrzxV/r0usroIgp18XUJmRdJON9/f292TLdk+O150cFqCV
-         ZDCSDEXHpeACwqPLUtegpqQ+WCnUiLHZLefQC9JbMtdN2bSXJ1zBoJZA8jpbnacu7aoj
-         RxmpJBsjtKB3MranUxpcyzzowlRC5QFmyxeA5lc8ajFxznQHCxnqjNAIq0ohK+LIbXQR
-         f/3I8l8t3XANmWr7l6E4c9LCb5nVTDJ5f+Yi6tyYpWBzQeWT3NmXQO2Y+gIjV36u0VdM
-         w+uQtuhNs6TG0MCzEz9N3jyU9uBSGMxJQr2nXiwS+ON9k1VfkDEWD83FubwllT8Lja/O
-         PUOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTHz8qfs7q5k3rWG20kxDdi2cZn69/Wx1IOvACXF7QtlU0ukPBYvDFNEjcUE+iarE3wYIFJXg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhWyeyFNuPvyk9hjEl4gluKbebx15JogU3vnC8S1/ptFvtrHgo
-	aj9ecryeHK0z1Zeet8cjDBBgzJSGPFLpJUeYf3z0dAyg2IYniNNd
-X-Gm-Gg: ASbGnctOeOP36G3OLTyRXCOezJ03R3oAadz80vkqz2qtthi+byXNDhyZdIt44iSYx7v
-	vAufuRhNB4p1+TCq340Y2qNxsvCye9Tqzgy9hN7dok5LXQ9GjB9sNsW/o//hARCIHXkaWtFXgkx
-	zKb8ebCbACq1vo4WWfxeYI43hC3e8zOANWtVMLpGssusL1aQ9Zk/V6LL0NSeRdfpQmq1OAv4Le3
-	4Mkyre13Mn+Nnxt6nH04viaaxzjobecVQd0wbVr5Vbw5/K9nqzfjL3p+SXTlUsN/0BsKRImP8pP
-	FKqboOTyO/khS8Pua9w+U0DgRa/19RZnj5HtNsv2WIySvDVDdtYVj7PBp3V22Sv/ZGlEp1uCkg=
-	=
-X-Google-Smtp-Source: AGHT+IH0070/1+amarEXhfBwE99xp6dPZjIGqV0cdKiEdMf3DYfggBUyl9h8TS2yf1QdpUC2qH4tvg==
-X-Received: by 2002:a05:690c:c18:b0:6f9:9d40:35cb with SMTP id 00721157ae682-6fbcc73d9f0mr37626637b3.6.1740152983585;
-        Fri, 21 Feb 2025 07:49:43 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fb35f669fbsm41864487b3.31.2025.02.21.07.49.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 07:49:42 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-02-21
-Date: Fri, 21 Feb 2025 10:49:41 -0500
-Message-ID: <20250221154941.2139043-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+        d=1e100.net; s=20230601; t=1740154860; x=1740759660;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rbh68tJwGTQhCBEmpp6DPT0uUoYU18GRnhX5rX6s8ME=;
+        b=rNdBGjup3/8o4EuUCZcp3efr4RXhWF8VJBwyuJoF4jLdIDoGB9cPGlz5a0587IkvsG
+         967dgp8RPSrkHIMsJnIbfSH5d466fPYHXlv70irfgz8EZ/XtX20iQyr4Wpd/CueHPynj
+         tfw2/dIZyCZ77tI6QTKZ9bygIm61C23j/HoRSkvgTdwvcbvnew2+FBUsVtRkSL2Mj6v3
+         JB97Htx+ABJVIYK+6LKe6domMit6BlizWKhBUaTgQezW9/8L2jjgFL8GZVKvnRwFEaMu
+         FqcfstZiSaDPZAtxBSZ23OSf3D44NmkEW5Nk76dUvN/KsTCp/BPdXoH1t1OjXg+U/Q+3
+         OKfw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9+4KJyymCrk/tiDqmK9Ind15COQJUoQwE9DVIhlurM1foqB8cqZK3sAqAI8UyO2TcXrsiUg7p@vger.kernel.org, AJvYcCXty2HFa+G2FsST4gIl1q6/NScCJ4lwBko7rFSDMStyRLtZW1H3+wx+eRtzePVSxdk8T83gjExH0eDnkXHj@vger.kernel.org, AJvYcCXyJMxzK0LGPU47GBbioSst+QtdrNhsSUxEGqU2As1jBXJKvUHzbh+kmowDUHgy6qdgx9sQiRUpT99DH4PsQfI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0iC5D9vZwL+QMGIwL9rgnClF3rk34u3cDls4S0GTh8EgEImDv
+	tJ5ca1hchf9beHyLepq9awNSMjhtSQEzWNCTu9MJ1ZQli8NR2luZjA0Kus1gr++LMsJDNxGD7eg
+	R5NzX2Zgef3OiWTfSOuQEmcjLU0SEV5Eowao=
+X-Gm-Gg: ASbGncv1WWR5H9i84Zt9hMpMfZxyjkdLOmeyTfHDSq5FN51vZVzlo8/4Wa6n7TIJ/OJ
+	G40TH3UYu4z6ruTnmDuPF6F5hCOF4itMpxjxEBr8f3jiPCWputEzhrrkBDtwWHi+4zX4RR2BaSC
+	p8lq44KHBN
+X-Google-Smtp-Source: AGHT+IGP8VKTcYPVs7TcsZa6QmJ8EakJt2B8Dakv/lyg9X2mFJKJ+xm6sKl7YgNkDp6IEuaf3X3X8jsA/93V3FIxnl8=
+X-Received: by 2002:a2e:b005:0:b0:308:e9ae:b5aa with SMTP id
+ 38308e7fff4ca-30a5984d942mr12670281fa.8.1740154859656; Fri, 21 Feb 2025
+ 08:20:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250219220255.v7.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <CADg1FFfCjXupCu3VaGprdVtQd3HFn3+rEANBCaJhSZQVkm9e4g@mail.gmail.com>
+ <2025022100-garbage-cymbal-1cf2@gregkh> <CADg1FFc=U0JqQKTieNfxdnKQyF29Ox_2UdUUcnVXx6iDfwVvfg@mail.gmail.com>
+In-Reply-To: <CADg1FFc=U0JqQKTieNfxdnKQyF29Ox_2UdUUcnVXx6iDfwVvfg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 21 Feb 2025 11:20:47 -0500
+X-Gm-Features: AWEUYZmR9lRtiledqjDfO03Vf7TqDmtxpp5wJnDHYdrAGlHmKhfz4FBRwMh6IHg
+Message-ID: <CABBYNZ+63EdbEcB7-XD9jN79urmk5CtUZ6iBzphO3HuCMukQoA@mail.gmail.com>
+Subject: Re: [PATCH v7] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+To: Hsin-chen Chuang <chharry@google.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit dd3188ddc4c49cb234b82439693121d2c1c69c38:
+Hi Hsin-chen,
 
-  Merge branch 'net-remove-the-single-page-frag-cache-for-good' (2025-02-20 10:53:32 +0100)
+On Fri, Feb 21, 2025 at 12:57=E2=80=AFAM Hsin-chen Chuang <chharry@google.c=
+om> wrote:
+>
+> On Fri, Feb 21, 2025 at 1:47=E2=80=AFPM Greg KH <gregkh@linuxfoundation.o=
+rg> wrote:
+> >
+> > On Fri, Feb 21, 2025 at 09:42:16AM +0800, Hsin-chen Chuang wrote:
+> > > On Wed, Feb 19, 2025 at 10:03=E2=80=AFPM Hsin-chen Chuang <chharry@go=
+ogle.com> wrote:
+> >
+> > <snip>
+> >
+> > > Hi Luiz and Greg,
+> > >
+> > > Friendly ping for review, thanks.
+> >
+> > A review in less than 2 days?  Please be reasonable here, remember, man=
+y
+> > of us get 1000+ emails a day to deal with.
+> >
+> > To help reduce our load, take the time and review other patches on the
+> > mailing lists.  You are doing that, right?  If not, why not?
+> >
+> > patience please.
+> >
+> > greg k-h
+>
+> Got it. Take your time and thank you
 
-are available in the Git repository at:
+So it is not really possible to change the alt-setting any other way?
+I'm really at odds with adding something to sysfs that only one distro
+cares about, at very least that shall be put behind a Kconfig or as a
+module parameter, or perhaps we start to intercept the likes of
+HCI_EV_SYNC_CONN_COMPLETE when USER_CHANNEL and then check if
+alt_setting needs to be changed based on the air mode, how about that?
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-02-21
-
-for you to fetch changes up to b25120e1d5f2ebb3db00af557709041f47f7f3d0:
-
-  Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response (2025-02-20 13:25:11 -0500)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - btusb: Always allow SCO packets for user channel
- - L2CAP: Fix L2CAP_ECRED_CONN_RSP response
-
-----------------------------------------------------------------
-Hsin-chen Chuang (1):
-      Bluetooth: Always allow SCO packets for user channel
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response
-
- drivers/bluetooth/btusb.c  | 6 ++++--
- net/bluetooth/l2cap_core.c | 9 +++++++--
- 2 files changed, 11 insertions(+), 4 deletions(-)
+--=20
+Luiz Augusto von Dentz
