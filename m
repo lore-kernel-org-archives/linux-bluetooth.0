@@ -1,135 +1,139 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99A31DE4C4
-	for <linux-bluetooth@vger.kernel.org>; Sat, 22 Feb 2025 05:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C6A2EB10
+	for <linux-bluetooth@vger.kernel.org>; Sat, 22 Feb 2025 06:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740203080; cv=none; b=tBjUp4u1+4hyWlY0sRZUwggXGhhYpyAUzdC7flTWuB0L1bWlxH0k4e8hoLUSwdMTsaWY5lRKc028fv3MBD9hgYBh0kpVWm2RBOmQtggjWpAvw+w1nlmaICOOxKIrkFrBYefeNLEaiHqlM2nIuteFR3pP2xg57Y831+SAIXXsW8U=
+	t=1740206128; cv=none; b=bG27Wj8hLFVpqNvJfER+/bn+KV45vHFUy0vXO7KQbNKlSweCbQiBI9rlrw7GvFRIUmvsNw0Ee9dOmksQcNbye0IURoDGWY9y/esr5Y3co5hE0wVY2z28kkJ/pg/tO4DbpBRPNaMd39MC8j89qNsCNw4u6aFFwYdB7ohIZceY2EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740203080; c=relaxed/simple;
-	bh=g2RqUGAPwhT7EVyaCr6VI+SGbjZLelh6Xvm4z6vngrQ=;
+	s=arc-20240116; t=1740206128; c=relaxed/simple;
+	bh=DKkd7IunJ7SFSt7FdgOoNftZ+D4pryqWLYsCdjTCVlQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mBGPfkAvRl86U5suP/1OmCnBBxYbwDV4odbv7naxpOm0r7jwaparTbieRSngnRKXk41zbv5dc7ELcGiKSZyMGom1I3YbIMOVtnBHlYTm88aX4mBmvjPm60WriBIuURQNEIVANNEdYcvGIUGu5ObVV7tljSdnMwCs6RtZPfKOIqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q8w6au87; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=G6PerXaBUZ60WYcaknPicyf1ikCkrnE2IGIoydrz/kFhq6w0rTkswzaNkeB5W8C4oIY9Pg5BBlmj03+DuesciJ6xd2NOToZGFQgAf4EPLAvBau678cn+zXFq0MLGDSWY26NuJp0Ct3UFGT3x56ICHw/bWv3isZ1EsBuk2i5viLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ggbAQ/zi; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q8w6au87"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e5dd164ee34so2656266276.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 21:44:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ggbAQ/zi"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43995b907cfso17344845e9.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 22:35:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740203078; x=1740807878; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740206124; x=1740810924; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IW0U6XE5dadFnlwiaJSOgRm7TtOqVG8RKY4MPvgIS9M=;
-        b=Q8w6au87afMdo91RgXasEKEa3HlvmyE3urikrRtXFs1xCHMC2JfdYljDV13tkH3t4d
-         ixd6w+XYc5TQq4Zr71ngk5bciLLBSDw/xkfguVmA0U5fKEKzq3g7mT176dqChL0b9Vnj
-         nt1MdSxoMNzk/FQr7sTyP91GgX3m/w4JskiRr4ApV09Tc13xZf6G8CLHV98KbNuA1MnA
-         Ug8xSJFPwSmpaHL38o2Da3iYI4q6ctuSev7X2sqmyay4LGjVGPlM+gte01GLApmfoLe+
-         NHZNe4HJu6WCuB+LoPLiec5dcgshF2iG64d+KOTN9XT2wljTc43HKaesK4A0aXERZH8K
-         MqvA==
+        bh=MiifT9U/wBIRDxgpkZ3MlCKafLZmxV4r091kuCsT5N0=;
+        b=ggbAQ/ziUczXXS9XZOWuQiB7uXiHx+6DaM2Nvsf4WqFc59GtSSCBDUGvjg6kGoPp1e
+         yoqKRaJdrfadDdC5kFni1gNrNcPVeo428R9NFmqCBARVmv0smkdvclb6ZVZKYsB1QMKy
+         Y5cyCXEsK06qiFQbkerZFyzP+T5smjxgxdItHPg2+ztp1usKZWoZ7zR+AWCpMYYObW8c
+         zI9ouDqPhrwpcJwqsa7/2SpGj0LWsFlLRIQQ1z/ZHeAovI0LnqXsiHBZ4Z8g3fo0/aus
+         pUVZqAdePnzKZ1ADckKJOkK7n6EQviRCpYa+fdjwJ9qhASHlbW1qfgA2V7Stjts5gggl
+         D0ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740203078; x=1740807878;
+        d=1e100.net; s=20230601; t=1740206125; x=1740810925;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IW0U6XE5dadFnlwiaJSOgRm7TtOqVG8RKY4MPvgIS9M=;
-        b=XZ94NAM44MdEBVmRfc/B0WV21AfiKugxKqbDwwvhQOcW3zMCt71pGft9f6o1ak1gBe
-         HYqsqL2jHbpPgnYfPomHBEX74hIozJ/pq3b26XaTd675KE+z3/+5G2449cRT/c8nBY/D
-         MUxPrN/vKGYROYhuPf/8dEoZPGzz+QO/a22wgIJUYZ4kSV1xoY2+yi5Ms8onif2+svMg
-         1dKglmkfEZkBPxt37dsBbEMGR8qH7aT1Na5RQn4fq9SEMLQs4wnWPgkUFLgKCN0czhzh
-         0NZK8mo0beby6PFpxt7GLbaCUCcYng7tFicr66D4niOouxux3w+YgLFa7wT4tjnjVBe7
-         Yk0A==
-X-Forwarded-Encrypted: i=1; AJvYcCXUZtrqyQ2ObkYg6nOaePLkkQRYfpTgGVX/ouH3bbG3Cifjgj8BdxB7B8MxreRwFwNarYJV9B6SREp0t3Tr3qA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO88Wo1ssUUpU2SuBibrO3BNA0l8Iyp59N6sQg2CNGxE6fkm0n
-	8wnZlie27UCSIxv5p5duQGiYAKmcAE2xcjtBsUxi3xzAZ6dhZl2w96Ye+wqoi1TUAyPuPplpfJc
-	eLuQcY6nqQS0tdZBxpusYjLvkD9QwzKFAXLpX
-X-Gm-Gg: ASbGnctJfM2bz5GKzu6rg7esNbX3waF1fo1OBclDPHB89FZzzxlKX9WGo3ixnBBUi7I
-	Hm9Ffw6F9ZhQSVmlLvNnMb5c0tjl8q4lfbR+A4+U3S6/pDfsFgSqpTGmZ3LZ5yu0J2delUFJQch
-	kPSmvq/w==
-X-Google-Smtp-Source: AGHT+IEMpO00uemXmGY6b464HS40oKo+dihlFMgpDgU1txDpLJh+5Afnfry4LLgBDLhNg47CesKOoJ0XEs4AQlt7H1s=
-X-Received: by 2002:a05:6902:f06:b0:e5d:c686:fe02 with SMTP id
- 3f1490d57ef6-e5e8afcf651mr3936362276.16.1740203077552; Fri, 21 Feb 2025
- 21:44:37 -0800 (PST)
+        bh=MiifT9U/wBIRDxgpkZ3MlCKafLZmxV4r091kuCsT5N0=;
+        b=ol4hApkrVZfQjBEv81KQH+CZKuMFAj5X2VP8NAjj1dG7QsC2TYDhbjUqc2KOU0YGQ2
+         4xKiI16QdkdeGQP6kpz88WKkFlYAgmg/kXSCdXTU4egWAQOwz+Ot1HmRsgMdxbJmWLMc
+         sUS6PhVhcRYif07gjeZvu+Sl0zbBNy2O07FZTb0oDGfqkqfvJVS7/JbWxSxmeUJVd54a
+         36q8kU2TWwceX/X/PXyFjsihzSvQ16lWkh+3M/AdNHh1jI6gJSuzYRI2CeJrGD9tZBD2
+         0+u7uNNHAyhbZgsncmnPZwSxJgrpVFYXsU0vsheRr7iRd/M8RloxtfQ/isvs2CiJlJfK
+         Q47A==
+X-Gm-Message-State: AOJu0YyqFx1UL9EOcjHuZS6V503qMkVm+lkQcZ/tqH6zxjFe1t0x/gVS
+	aRQZMmQtINPOCDUkXj5FSRrb35IJ0Y/a3DPp55btKpONfrFXl0ZryXBgvmYR2qhzIZvY/0263Uw
+	24uaeDtcPy3tvGms72A79/eCk8+zWtLrnXqk=
+X-Gm-Gg: ASbGnctR26ooroObcXbmrhlrkKq7rAYWArHKifpGUds0na8qVQDffIgI92Jwe+EROny
+	iT9qEiIPVw+JDfWQ1C07W45eFs5iU0uUNrjrMJ+t2uxFzI9tdIrfrqckjIOPRHcby6lNfxDNDzh
+	GneGvuWrZ2
+X-Google-Smtp-Source: AGHT+IFaQK2DsGHgJSAxXrxTG8SHzHTNZLE94kaP+XqDKn+/iSBuvBDrqsS37HPh1ORCrgYd1XTeD8u08N5+wnTCEPg=
+X-Received: by 2002:a5d:5350:0:b0:38f:2a84:7542 with SMTP id
+ ffacd0b85a97d-38f6e97af1emr4232379f8f.28.1740206124400; Fri, 21 Feb 2025
+ 22:35:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250219220255.v7.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <CADg1FFfCjXupCu3VaGprdVtQd3HFn3+rEANBCaJhSZQVkm9e4g@mail.gmail.com>
- <2025022100-garbage-cymbal-1cf2@gregkh> <CADg1FFc=U0JqQKTieNfxdnKQyF29Ox_2UdUUcnVXx6iDfwVvfg@mail.gmail.com>
- <CABBYNZ+63EdbEcB7-XD9jN79urmk5CtUZ6iBzphO3HuCMukQoA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+63EdbEcB7-XD9jN79urmk5CtUZ6iBzphO3HuCMukQoA@mail.gmail.com>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Sat, 22 Feb 2025 13:44:11 +0800
-X-Gm-Features: AWEUYZnYXlpbzQNJ7UlFKYOWA3cFheHOAd-U40G8kDxTfwzkk8us50aaQAcEy-4
-Message-ID: <CADg1FFeyN3AWYBD6UxOYGKfUaStyvVKVhuAzVtG_oCpXVdQnMg@mail.gmail.com>
-Subject: Re: [PATCH v7] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20250222050439.1494-1-nishiyama.pedro@gmail.com>
+ <20250222050439.1494-2-nishiyama.pedro@gmail.com> <95d0f052-c931-45f5-8212-60f9308a2672@molgen.mpg.de>
+In-Reply-To: <95d0f052-c931-45f5-8212-60f9308a2672@molgen.mpg.de>
+From: Pedro Nishiyama <nishiyama.pedro@gmail.com>
+Date: Sat, 22 Feb 2025 03:35:13 -0300
+X-Gm-Features: AWEUYZkpyQHZpeKVH0bbY3YlihgQoYeJXK7N7KQ-W-dWdSWFhAhGXILDH8nKNRs
+Message-ID: <CANoxumjLBd5hfNb+FsXN68A0u3oCk96fJragB4LHVBt1TQ1Kqw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] Bluetooth: btusb: Fix regression in the
+ initialization of fake Bluetooth controllers
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
+Hello Paul,
 
-On Sat, Feb 22, 2025 at 12:21=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Sat, Feb 22, 2025 at 2:29=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
 >
-> Hi Hsin-chen,
+> Dear Pedro,
 >
-> On Fri, Feb 21, 2025 at 12:57=E2=80=AFAM Hsin-chen Chuang <chharry@google=
-.com> wrote:
+>
+> Am 22.02.25 um 06:04 schrieb Pedro Nishiyama:
+> > Set HCI_OP_READ_VOICE_SETTING and HCI_OP_READ_PAGE_SCAN_TYPE as broken.
+> > These features are falsely reported as supported.
+>
+> Please list the affected controllers.
+>
+> > Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
+>
+> As the summary/title says, that it=E2=80=99s a regression, could you plea=
+se
+> elaborate, that it worked before, and how it regressed? Were these
+> quirks present before?
+>
+
+Sorry, I realized I put the wrong commit in the fixes tag. The error
+originated after
+commit c8992cffbe74 (=E2=80=9CBluetooth: hci_event: Use of a function table=
+ to
+handle Command Complete=E2=80=9D).
+When the min/max length of the commands began to be checked. The clone
+I have here returns
+a smaller buffer than expected by the command.
+Since I'll need to fix the version tag, I'll put this information in
+the description in the next version.
+
+> > Signed-off-by: Pedro Nishiyama <nishiyama.pedro@gmail.com>
+> > ---
+> >   drivers/bluetooth/btusb.c | 2 ++
+> >   1 file changed, 2 insertions(+)
 > >
-> > On Fri, Feb 21, 2025 at 1:47=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Fri, Feb 21, 2025 at 09:42:16AM +0800, Hsin-chen Chuang wrote:
-> > > > On Wed, Feb 19, 2025 at 10:03=E2=80=AFPM Hsin-chen Chuang <chharry@=
-google.com> wrote:
-> > >
-> > > <snip>
-> > >
-> > > > Hi Luiz and Greg,
-> > > >
-> > > > Friendly ping for review, thanks.
-> > >
-> > > A review in less than 2 days?  Please be reasonable here, remember, m=
-any
-> > > of us get 1000+ emails a day to deal with.
-> > >
-> > > To help reduce our load, take the time and review other patches on th=
-e
-> > > mailing lists.  You are doing that, right?  If not, why not?
-> > >
-> > > patience please.
-> > >
-> > > greg k-h
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 8149e53fd0a7..903361456acf 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -2436,6 +2436,8 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+> >               set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirk=
+s);
+> >               set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks)=
+;
+> >               set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
+> > +             set_bit(HCI_QUIRK_BROKEN_READ_VOICE_SETTING, &hdev->quirk=
+s);
+> > +             set_bit(HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE, &hdev->quir=
+ks);
 > >
-> > Got it. Take your time and thank you
+> >               /* Clear the reset quirk since this is not an actual
+> >                * early Bluetooth 1.1 device from CSR.
 >
-> So it is not really possible to change the alt-setting any other way?
-> I'm really at odds with adding something to sysfs that only one distro
-> cares about, at very least that shall be put behind a Kconfig or as a
-> module parameter, or perhaps we start to intercept the likes of
+>
+> Kind regards,
+>
+> Paul
 
-I'm willing to put this API behind a module parameter if that resolves
-your concerns.
+Best regards,
 
-> HCI_EV_SYNC_CONN_COMPLETE when USER_CHANNEL and then check if
-> alt_setting needs to be changed based on the air mode, how about that?
-
-This is a good idea. Let me verify it and get back to you. Thanks.
-
---=20
-Best Regards,
-Hsin-chen
+Pedro
