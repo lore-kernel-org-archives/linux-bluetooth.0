@@ -1,187 +1,155 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431241DC985;
-	Sat, 22 Feb 2025 12:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740227467; cv=pass; b=MwJh23e4oMnSRsLEQbex/6+ZBPgFbiTFbCCN8z1+06IfBi8q8g4UG2e3n7TrtrKeco31Mm3RCY3WCaZlvknbYPGHxM0LTY/SSSDgZZdnhamAt4dVlYX06B7a68H04FLMV+yzVVaVNe2Wohj9GiOU5j3jS0Cal6A5zN7x/lDHgNQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740227467; c=relaxed/simple;
-	bh=d4LrR1/JyyklKSSAPMrX79W6JK9ixNKrx/3Wk9E74f4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=t+xhkIK3EMWE1xC4KiZOPADHKdc4IvjEKUp6rjI4wo81NChIsbOzpiK29zhZSg2om4I5eAs6RIi9dnEJZ+9M1JVYWuSh0FUmGeLUDCPfh9p8bVQTOP+fipkD4QXEsDmQx7vJE1iT29ALYTipUX/woxw/06jdRmBkvq+/hD/TK/g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=a/FollCo; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AF62080C4
+	for <linux-bluetooth@vger.kernel.org>; Sat, 22 Feb 2025 12:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740227995; cv=none; b=iKNJ3lHxFnEbhXgxn0NBMd/fJEuio4/ye5JA7clfJOP/eXFlNzyAWnqmF+pmXieErsR8qZiY45YH8/6WMhuORYOgTvZQBn/LovBtSG28TEAht9c8g4SnZ/3pj9JzAFAky9B8H4rM0oUghr4lt9gUXyLfwG1uJHrRnjyXz8uwfBU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740227995; c=relaxed/simple;
+	bh=QKeDkRw/HhXwYP9ARKiKBJxkmn+RwnTWQqQ8TzimL6M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=oZUhw6qpwViiwCNtTDlQZZfBZcLsqbkA68mrIzJGqnCmrZUNNOadUOmDhq+OroHYsFaVfsSYm8806EUjP3gpXmGNHTaJ7IGa1doJXgb02+THl4ZZb6IVxroEQuKzvNmAijJ1Ps3VIL5iDXA9vYPQ86xbmaMNSfHMvYzUXSj2/BA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nHrh3XVy; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="a/FollCo"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a02d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Z0R1S1ZZ2z49Pyv;
-	Sat, 22 Feb 2025 14:21:16 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1740226878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=sJRsNtmPYOGIyLDoSNhjS/zQsaRUE47FT/Dx+pfvFTc=;
-	b=a/FollCofaPcsEoNjK0gxZaMJwrovASKR0gnTnC17g7QMB3OaTX1wm89BiKdZ+9x081470
-	4saGSNhyI5T/Ry+TONEMh65YZZRix6TAdddts0e6tjfzDsBz+SuevBE1KRlgbSmzRKon6i
-	ogJRvNS3qCL9G1myl4ccZjVjI8Fv9HdvTShnz3IJ4BnZA+aQokOlqLa0Qy8oi3r2MndRrO
-	IkjTQRBZraPjHriFLz6ePWcC4iBKCRyEdWMm5W3DjX+wknY83StxfkzESDWUC2sOv5t80j
-	Cjl3RRIR18Pbs3DvIl6XjLUj5L+rBpl7dzz5KVUPcUcTLdP/L36hvD0PP/xbfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1740226878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=sJRsNtmPYOGIyLDoSNhjS/zQsaRUE47FT/Dx+pfvFTc=;
-	b=sxfiZ24uHtO9e49tzHwgb9x+xBzAr/m6JFm3eYe9/d15EqoyXKKnUJ+L/8qnJvsMg7aloT
-	WAFncMRMZ9FqT4MmyAyed1yAyQb2/2IQBd3XTSuj1hAiP7pw6xSF6Fa6A+5/0gPkRrka+v
-	KOb2+P07R+NT0drohqqEVpRY82qiKNt4158udJ1pO1eg8SO9vjqgZ87Iwb+Z2HpFisAM3V
-	qZiaFuRsclhLzURCOKzhqTzvf3tg64Mme3jUdt/b1SjUCKQFHoYgBwlvaRyA7qOMMuK6Z+
-	IamvAeIY+128+eUTeXsaR/DZ7XJcWhhunsP3UkMnLCZtv6J1hSu2aON6i4EJ4A==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1740226878; a=rsa-sha256;
-	cv=none;
-	b=LJs3sHhn12LnuxtnHPylgDwDStSPyJv9jwI85gqTMFFyqS4xhhYcquzfQMimTHsgiwzquO
-	CQ6yw7ezmBXoTpJQFeZA8CUZGFTYsBRnfIrAS4eRE5O/6P5L/S+ZMP44DGQp/s67MCOPOb
-	qGvchdPu2fcff5pPfXsP4zsLIVcf0P2a3dpkDQdDxHY0qTWLAX5hYqPZKsDjxtehMDeO5m
-	4cNcu83hIwQ/RAMdBSbFVibrWZlcRBdZOVbWAqbpn4Rfay6hNTCRw//Hm5UPZo920rvNTw
-	8UkRw1w61QVm6D6sKGgBVCV70VEc1u0DJWkr9J6KBlHz2TliTxeMmUZ7kAqMLA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <7e57d93a41b45650506de4fc68dd04fbbc6b55fc.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: SCO: fix ABBA deadlock in sco_connect_cfm
-From: Pauli Virtanen <pav@iki.fi>
-To: Jeongjun Park <aha310510@gmail.com>, marcel@holtmann.org, 
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc: gustavo.padovan@collabora.co.uk, andre.guedes@openbossa.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Sat, 22 Feb 2025 14:21:13 +0200
-In-Reply-To: <20250222114809.11634-1-aha310510@gmail.com>
-References: <20250222114809.11634-1-aha310510@gmail.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHrh3XVy"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6e65e0a3f7eso14067306d6.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Feb 2025 04:39:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740227992; x=1740832792; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SEwA09bdl1ZQ9+PDr/dc3QbKW+S7/ooC0O0S1cvJwxc=;
+        b=nHrh3XVytZDPsT0ymqqRF2QWiyy9bw28bhrDd9jTeMoasFfl2iG6XkTsUieFjv5fyB
+         lCBDfbTqjYJYsNCCaDvpqvhD35aTENbRyAAf1lT4bYW6EtS+UXoHDTfhQkEbajWghDu4
+         sy17iHHaHni6aWjV587oSzB6n+XMYmoOHbZvjkEaTKQJD55wYJcj+XmUxHqhK1qx25Cg
+         nFOTmftavfwiSm5BHI11xkUlu2I6CzguUdtMQSd/hR6D+TqZUJaTkpqbly3maN1DljTA
+         h1jqqlueZxnLB2MAbxu/Z0ewryUkssBS4O6jbxJ019QDx9BpDdDCzf1bDqgZHrCkygsJ
+         BDTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740227992; x=1740832792;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SEwA09bdl1ZQ9+PDr/dc3QbKW+S7/ooC0O0S1cvJwxc=;
+        b=a3n+PiQj2dJ/XhXeXe3snOxIpCcKEmHuF6meugCwrOd1wc4Yti8d98g19MICVsxuIf
+         9oyaSxUEX6/4xcZ/dAWN4EDRSQ0cofe5MGD3zR0OtlAlDeCq/AryjITdqlP8nKaktYOv
+         OzIBJ9r+NRhizS67AAnnftPWhjMfeO4Omy3aecvIzw3nDhGNwtBYUfw8iiCSb/gPilHX
+         CgOivH03Qz7PQXbtstL4gDmB7MD+NF1R8rrJEB5HC8X8xBlRvi5dKrHwTJVL70MBuXV0
+         qEGGMhY7odKBb00P5qwY2d8+/drhAe0cpRei68O8bSccVRhMyNGRin/+cGYuHM9JMZh+
+         z/cQ==
+X-Gm-Message-State: AOJu0Yx3j9vSDq2dzzrdjYkwexOzyZ2jrFofbnw8w9oNQdsrGrMXtcVD
+	Wfejrmgt1h7ro7Jhp4jiQ8LC1TQB/RJ2h/GPoUI2oOU9W7hn5oQfnfXCy4c2
+X-Gm-Gg: ASbGncu4cRxhEONEEIsIinHhPFPyXqoJpo4edJcBOD26Bqcw5yo89klL1Bfo44o0tWE
+	uUu6MlaQV1nT7lazt2CvXLiMnQIG5/zJWRDlcp6GkTH/MI3ZwD+yeOR2lpjQ+Zef9k2mKDZKYDa
+	IynF67GTwBERDpwfcNBWtLEfyEq6BTaMYdS4h8FYvYIT92cvUaUj539gngSdh/w4nYl5/U6gC3z
+	IavaBe+xeHiGoRcb6eOqsUSENTpm0cL4KkMnTU00Y0Z2Mu12qLjP7UIsQ5oTm0I9bAPfYS3geXw
+	nrAnROZcSEUDCZZ4PtEb9W+sL099hsgqZQs=
+X-Google-Smtp-Source: AGHT+IFv9G7uRMOixyfp9mCusAeTVpqJULetxdRhO3UY6WNdJ5925rHrSOsuJjQDvm+G0Yd+pH9FIg==
+X-Received: by 2002:a05:6214:c8b:b0:6e6:630c:71e8 with SMTP id 6a1803df08f44-6e6ae7d03famr83916856d6.7.1740227992207;
+        Sat, 22 Feb 2025 04:39:52 -0800 (PST)
+Received: from [172.17.0.2] ([172.200.180.243])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d9f348bsm109250136d6.77.2025.02.22.04.39.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Feb 2025 04:39:51 -0800 (PST)
+Message-ID: <67b9c597.d40a0220.19924.da68@mx.google.com>
+Date: Sat, 22 Feb 2025 04:39:51 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1073941000646456574=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, aha310510@gmail.com
+Subject: RE: Bluetooth: SCO: fix ABBA deadlock in sco_connect_cfm
+In-Reply-To: <20250222114809.11634-1-aha310510@gmail.com>
+References: <20250222114809.11634-1-aha310510@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============1073941000646456574==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-la, 2025-02-22 kello 20:48 +0900, Jeongjun Park kirjoitti:
-> Caused by previous commit 405280887f8f causes ABBA deadlock. So we need t=
-o=20
-> change the lock order to prevent deadlock.
+This is automated email and please do not reply to this email!
 
-The lock ordering eg. in sco_conn_del() or sco_sock_close() is
+Dear submitter,
 
-	hdev_lock > lock_sock > sco_conn_lock
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=936701
 
-IIRC this is the lock ordering assumed elsewhere in this file, except
-the part touched by 405280887f8f (however, it's locking the parent
-socket there so not clear if this causes deadlock, can you clarify if
-you have observation/proof of deadlock).
+---Test result---
 
-In this patch you have
+Test Summary:
+CheckPatch                    PENDING   0.25 seconds
+GitLint                       PENDING   0.19 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      24.54 seconds
+CheckAllWarning               PASS      27.09 seconds
+CheckSparse                   WARNING   30.47 seconds
+BuildKernel32                 PASS      24.45 seconds
+TestRunnerSetup               PASS      431.91 seconds
+TestRunner_l2cap-tester       PASS      20.76 seconds
+TestRunner_iso-tester         PASS      33.53 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        FAIL      121.54 seconds
+TestRunner_rfcomm-tester      PASS      7.92 seconds
+TestRunner_sco-tester         FAIL      9.40 seconds
+TestRunner_ioctl-tester       PASS      8.37 seconds
+TestRunner_mesh-tester        PASS      5.97 seconds
+TestRunner_smp-tester         PASS      8.37 seconds
+TestRunner_userchan-tester    PASS      5.12 seconds
+IncrementalBuild              PENDING   0.69 seconds
 
-	sco_conn_lock > lock_sock
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-Does that also cause a deadlock?
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
->=20
-> Fixes: 405280887f8f ("Bluetooth: Reduce critical section in sco_conn_read=
-y")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
->  net/bluetooth/sco.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index aa7bfe26cb40..8f1377f4a27c 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -289,13 +289,11 @@ static int sco_chan_add(struct sco_conn *conn, stru=
-ct sock *sk,
->  {
->  	int err =3D 0;
-> =20
-> -	sco_conn_lock(conn);
->  	if (conn->sk)
->  		err =3D -EBUSY;
->  	else
->  		__sco_chan_add(conn, sk, parent);
-> =20
-> -	sco_conn_unlock(conn);
->  	return err;
->  }
-> =20
-> @@ -343,11 +341,13 @@ static int sco_connect(struct sock *sk)
->  		goto unlock;
->  	}
-> =20
-> +	sco_conn_lock(conn);
->  	lock_sock(sk);
-> =20
->  	err =3D sco_chan_add(conn, sk, NULL);
->  	if (err) {
->  		release_sock(sk);
-> +		sco_conn_unlock(conn);
->  		goto unlock;
->  	}
-> =20
-> @@ -363,6 +363,7 @@ static int sco_connect(struct sock *sk)
->  	}
-> =20
->  	release_sock(sk);
-> +	sco_conn_unlock(conn);
-> =20
->  unlock:
->  	hci_dev_unlock(hdev);
-> --
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:147:35: warning: array of flexible structures
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
 
---=20
-Pauli Virtanen
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.201 seconds
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+BUG: sleeping function called from invalid context at net/core/sock.c:3648
+WARNING: possible circular locking dependency detected
+BUG: sleeping function called from invalid context at net/core/sock.c:3648
+BUG: sleeping function called from invalid context at net/core/sock.c:3648
+Total: 15, Passed: 14 (93.3%), Failed: 0, Not Run: 1
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1073941000646456574==--
