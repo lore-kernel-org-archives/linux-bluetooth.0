@@ -1,70 +1,74 @@
 Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C150A18C0C
-	for <linux-bluetooth@vger.kernel.org>; Sat, 22 Feb 2025 05:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7A318C0C
+	for <linux-bluetooth@vger.kernel.org>; Sat, 22 Feb 2025 05:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740200854; cv=none; b=GVtU7o631KRIYGcFjeHngFf4wxj8UzMxb8EFEClP/Cq/WpnEq6Gsw7t3z/z6HNn7VBp1Sx7c5J/ahnTu7wK2xxo7UHsVzoK8731XlHSLVkThEem5oy2vPEcZBJ15iQOfAyWCX+DYJSe4YPVVcZrgL++dh4CTokvV9pLrENJqByc=
+	t=1740200858; cv=none; b=BR7YB+CanDgYb9rQoVRibTL1mKQlk6G8A62RIvjRqerxGIKBqVHAMC4+diOnkooVbeZkMKPC0+HOUf1Vj6FAtEwJ8eYBz40q96Vlmfy5gja7JVZL6Lbz8ylscx/YBN2e+5u0MuCt9xc7dSiimdGOespbrt+BNODA4T3d060WkoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740200854; c=relaxed/simple;
-	bh=WdjpbkHsenDZpPkT3LQXsBJoK4pVrXZAaYoQKLjLfcA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=twr/au0HRc7NVh116GDtqntRW+g4wMRppSupc0VMAtyF3RdkPFTcgh7nodZI8yW9dKsW3e2P9dqXJNEQoYp6Jr5vJ4qLCuAFc/o6jrtDQxveDL2AbmJLHFkImBbWIAuCzCdJcmhvxGrFs6Y+BxYhdstzu7E/bnEvq9Yzh+pANrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CwE7IJkT; arc=none smtp.client-ip=209.85.216.54
+	s=arc-20240116; t=1740200858; c=relaxed/simple;
+	bh=AZGoBqaIToNAQem+7Q2qMaSVXhEXqaGfeuRKhHJ8lUg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ftztMMgiamIemxXrfsQno/aqCeMm5frzhap+crDN0Qt87wXhBpIfmiiw+X4TRPZUOdwZnfnWOnT+5Y8bc9OGlhg1lYbD6XOTd9JNbLiYMRo+6kvYpko4KRniHsBDIwqeuuHmqFlIZXDgrxw2MCc3PVVfheI062sAhnlie+O+430=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FBCeZHLS; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CwE7IJkT"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fa8ac56891so4603281a91.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 21:07:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FBCeZHLS"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2f441791e40so4454404a91.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2025 21:07:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740200851; x=1740805651; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=skAepCMpS5A+SARkM0JSy/NjPFnXGTxwrYBtrHVQjm0=;
-        b=CwE7IJkTl3bHlQLiid+qugxik0oD+dSmuTAdKsK1i2Ziq8g1e/lBxlxj/US4WqFm0F
-         ljFxkqrLkPGyyAI1wkSUFb0QmfH66JlDMhSWrzoaEhAjFs6Ouy/XAxmelvFUvM1QnJW7
-         LO21xCp6bGqPFynTCW7OYpdDd7Puquv1Npb2in50Q60mC/VqCL6C7gbQEKc7p5TGzsE7
-         4nJqeboPLwRGVrVyGZB2GQgk2zuJb/Q4w9UwHB5za7/Ux4rZztBVdJ6OHnAgh3kwxCN7
-         si7GvhDc3e55XeCtBModsPad4tFGrsN5WTrI8Qu96RH7NEB1q/v5QHk24XlZZ6Oc+fgE
-         4Y8w==
+        d=gmail.com; s=20230601; t=1740200856; x=1740805656; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ASgIoc7mLm8FGBKrKVZWao7J0F0383McnLf5Mgv/XJA=;
+        b=FBCeZHLSxiwuDIHW6RtnIln0l8mHMFQy10SyQ0YvjOerGoHlmIzVWvxy1VgaP1vZU7
+         RiIZPHS34xcZJed1LFOciEBgfQ3MPqKFooRFbvTlc+x/pjd12zqd59UCvRxkvUJtJMdP
+         KqQUcOOOz5M0+jA2MOuvsDqTka/PuDJ3WSGdH+1aK6cViuM9LBAol4w87SAP3L29GdjF
+         czUEXz7ow5muBIp+oamllHhwXK0IdhJESG5ZIyi9Wk1ByiwYeFXX5NhGU1NNEDVuHCt9
+         Y8eVfRelOl0hAf2kvPt+9qluIYZlESflV9PJlmKmEsoytBl03Prs6sJ8BAEqIBIx+t+u
+         hY8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740200851; x=1740805651;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=skAepCMpS5A+SARkM0JSy/NjPFnXGTxwrYBtrHVQjm0=;
-        b=NiClSdyfeaqMuPOHtb2fcheyY1CYvpo+DVsmma5CMjbVuU0a3Gi/NbjkvV/gZVJu5t
-         sJcpu8HELGNUyJZRx/o9rJvFUYVBIweH1n+1MWHV6awxitqG5o681WT8Xym2J7idcz6C
-         JinmteaqFFsuViPJ7uHVttfYpnCKOk/eFK2QKNh8aMlXIgs6GhyIDCF51aTIrbDgAqce
-         w5w1PxENScZ78ZbaL7PrwGsXf+zCnxFx+vgvh3VtF9eG2EhtQ5qqH/pNhwOWMbgOpwyD
-         h3uG1uMePF2gRmvA9+7M/KDAy1icKha9jRNmfvji5QWnS42mvJ1ccYwaZ+KWRcCPbob8
-         GxtA==
-X-Gm-Message-State: AOJu0Yxl4gFjdO/FQQelq/QgR2pDvu0D0xiTj0Vdmzshif989NeFJFiB
-	hg9T4TsSHADa7iVdOofHJP9IaPQ4R5p5mCtmmjs96KDqNfHe51N3k6U7mHXr
-X-Gm-Gg: ASbGncv80ifp1smyB4dzF8Q6KuTCA8YyBEqKVz+cD7S7v3rZoUI6+9ZLRwD7xCnxfdE
-	y0kpgrBaWLzyXLVAF1+wq072hP9VkX3kjUAyfrcF7CiQol4aOnf4ydHEnTce39KD7WxmoMJ/+lo
-	TRdEcjxCaGF6uim5pZIsYzizKVAHR9rzFIaaDAn2g3FrbN/guOJocNznY9pzAo+Ngv3mLwI9nD7
-	NXPGvALihOTJjmkssfLkjyxv/x02eLd4aMBkr+Yf2Jfw6FWKbu9t5ZJQeiLs2fmdImyEypvSboy
-	pRyH5BR7w0ZIAtpmPrdU83l9erfLl8P4GtOoMmWzYBdoC7dqqu+W8jf7z4tLRIaFdoYsA+/xQDW
-	5uBiegyuigLk=
-X-Google-Smtp-Source: AGHT+IF54F2qdxtWgjpyd8Q7c8tYVhDVcNaCXj9aa8PVDv+F/nsUR4VnhM9f8ZFMRWW1Loa4uQxSVA==
-X-Received: by 2002:a17:90b:2b8f:b0:2ea:3f34:f194 with SMTP id 98e67ed59e1d1-2fce78aab09mr10185072a91.10.1740200851493;
-        Fri, 21 Feb 2025 21:07:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740200856; x=1740805656;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ASgIoc7mLm8FGBKrKVZWao7J0F0383McnLf5Mgv/XJA=;
+        b=I9IkN7qzQZWQUH1hZFMA92CWDk7qwAjkZuocaZICLJ6WQEYh/tod6oKMm9HCMLrrDk
+         Guy1vkP0+92rj690ff0RDuxOE4bMETLL8q4WRvr2xid6saCgjlhDPEYNXXO9zQ2zKISm
+         Rg5jDETit50bCENiGp8dgktSXd+VQTCKP63YXga0PONWrVCcZWKOy9CJM4tI/b+bWCXc
+         ei4WfyH5iYyO2122R5S8/xGy3rofGHLvE4pLuQn12LvnDo39NKM/FIRJXRuLZ3sL5LzT
+         kaL/igfoB/7pAYJasRkESY4NZhQ06vdFLa+EMUoiVda2zGSRT2FnTa7ubUQS2juEzGiG
+         7/mA==
+X-Gm-Message-State: AOJu0YxA30h7Au3oqHO61rRfJpdSHZ3sXbHwCoMoftAYig8uKDil9VOd
+	pFobYsLyY/vCDPvYp15VU2nEkTgBecrSPQJSQ1exZifIGlBNmj2ivC+xCGNg
+X-Gm-Gg: ASbGncv3KcuOziu5q7Q+riTpgGrRFOmzGtw6g7tm3sUcekbSbPgOeLS63f5Sa0QbjXa
+	XBXPcocqGlTdLPOCJyfkMCZIFEvbQC8SVGviiVtKTxfG20Z04XPdBJlZKNfUJihjCW8d/kwGiG0
+	gEdTJhqIXC7O2XynXzQAiy1nhlMh2eOUR9evv4LSqf5HbKBcNE3E5yxXyXO3I4u50hs/0OeYGVi
+	wu3UBJQ0OYAu9DBBixm+9qCucAR3ALA/j8S72jIBaHgAEAoiA1jKJhEgs+29WkxjzxnRFPSenPq
+	vnuT/gl6u0NNwoJ3kWuBmsDL5zpsD9BmYveRsPV5INwJB2MJ1F5sTl3kmJWHu2cJsSl3NeDXyRt
+	V+ACgeR7nCVM=
+X-Google-Smtp-Source: AGHT+IGNDHUvwMhneiONW3ZVhuxDn9Qo2dJM5o0ZBY4D389P6VLIQkeD9fB+m/MZSgxRX2c75qbzIA==
+X-Received: by 2002:a17:90a:da87:b0:2fa:1f1b:3db6 with SMTP id 98e67ed59e1d1-2fce875b1e1mr8996164a91.29.1740200855988;
+        Fri, 21 Feb 2025 21:07:35 -0800 (PST)
 Received: from localhost.localdomain (168-228-202-11.static.sumicity.net.br. [168.228.202.11])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fceb06539csm2265849a91.28.2025.02.21.21.07.29
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fceb06539csm2265849a91.28.2025.02.21.21.07.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 21:07:31 -0800 (PST)
+        Fri, 21 Feb 2025 21:07:35 -0800 (PST)
 From: Pedro Nishiyama <nishiyama.pedro@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Pedro Nishiyama <nishiyama.pedro@gmail.com>
-Subject: [PATCH v2 1/2] Bluetooth: Add new quirks for fake Bluetooth dongles
-Date: Sat, 22 Feb 2025 02:04:38 -0300
-Message-ID: <20250222050439.1494-1-nishiyama.pedro@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: btusb: Fix regression in the initialization of fake Bluetooth controllers
+Date: Sat, 22 Feb 2025 02:04:39 -0300
+Message-ID: <20250222050439.1494-2-nishiyama.pedro@gmail.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250222050439.1494-1-nishiyama.pedro@gmail.com>
+References: <20250222050439.1494-1-nishiyama.pedro@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,65 +77,28 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This adds quirks for broken READ_VOICE_SETTING and READ_PAGE_SCAN_TYPE.
+Set HCI_OP_READ_VOICE_SETTING and HCI_OP_READ_PAGE_SCAN_TYPE as broken.
+These features are falsely reported as supported.
 
+Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
 Signed-off-by: Pedro Nishiyama <nishiyama.pedro@gmail.com>
 ---
- include/net/bluetooth/hci.h | 16 ++++++++++++++++
- net/bluetooth/hci_sync.c    |  6 ++++++
- 2 files changed, 22 insertions(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0d51970d809f..b99818df8ee7 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -354,6 +354,22 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_PHY,
-+
-+	/* When this quirk is set, the HCI_OP_READ_VOICE_SETTING command is
-+	 * skipped. This is required for a subset of the CSR controller clones
-+	 * which erroneously claim to support it.
-+	 *
-+	 * This quirk must be set before hci_register_dev is called.
-+	 */
-+	HCI_QUIRK_BROKEN_READ_VOICE_SETTING,
-+
-+	/* When this quirk is set, the HCI_OP_READ_PAGE_SCAN_TYPE command is
-+	 * skipped. This is required for a subset of the CSR controller clones
-+	 * which erroneously claim to support it.
-+	 *
-+	 * This quirk must be set before hci_register_dev is called.
-+	 */
-+	HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE,
- };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8149e53fd0a7..903361456acf 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2436,6 +2436,8 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+ 		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
++		set_bit(HCI_QUIRK_BROKEN_READ_VOICE_SETTING, &hdev->quirks);
++		set_bit(HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE, &hdev->quirks);
  
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index dd770ef5ec36..e76012956020 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3696,6 +3696,9 @@ static int hci_read_local_name_sync(struct hci_dev *hdev)
- /* Read Voice Setting */
- static int hci_read_voice_setting_sync(struct hci_dev *hdev)
- {
-+	if (test_bit(HCI_QUIRK_BROKEN_READ_VOICE_SETTING, &hdev->quirks))
-+		return 0;
-+
- 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_VOICE_SETTING,
- 				     0, NULL, HCI_CMD_TIMEOUT);
- }
-@@ -4132,6 +4135,9 @@ static int hci_read_page_scan_type_sync(struct hci_dev *hdev)
- 	if (!(hdev->commands[13] & 0x01))
- 		return 0;
- 
-+	if (test_bit(HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE, &hdev->quirks))
-+		return 0;
-+
- 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_PAGE_SCAN_TYPE,
- 				     0, NULL, HCI_CMD_TIMEOUT);
- }
+ 		/* Clear the reset quirk since this is not an actual
+ 		 * early Bluetooth 1.1 device from CSR.
 -- 
 2.48.1
 
