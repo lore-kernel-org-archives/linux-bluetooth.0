@@ -1,75 +1,152 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB2621CA1F;
-	Mon, 24 Feb 2025 08:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D732586E9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 11:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740386577; cv=none; b=QdTEm2HKDpPo5JJnxG+nxk6MmzyuTg6CFdB2ACyOjF7G7c5rEkY+IuJJSQotUheBj2Gd66vjHW9R51ZONFWF9HK2/6oQ+pYIpHXkIBHUk2rN7uHFoQMtAqVkRQui+zsRUU9Hji3Lp2q1z3ALYRIc0wF92hyOY6ZMJewodfLMAps=
+	t=1740395476; cv=none; b=POfCeSqa+V1zreOppB3zX6MU0jDnqKkNk3o/H3wRXL9r06V9+lfsLA27J9oYOwNATg8aFRy8RAz6Cwu1wnTWZWP5zf2zdWCQzjsHZqZ0OueTntPfo+N8+53uSABO5jomQasNNMVrEqcayiSnEScDODLG1Cs5n4PJnMC6ut7gC3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740386577; c=relaxed/simple;
-	bh=PWO83aK5CYVEGr0X7EyJC9ycMxkzA9Nn+SU+14qBxyk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fCDVjZIevOL0YuCZ2IBhCos/ddocSJdHh7Qqf/cKaD/AKIypglHCZixTDkwExsURz1kTGy31VYStzlaFYYpApxHf54pOmKH2dNFeyS4f8Ad/D3/9AGvxuMt0YjvB+9JgsaSsQzX4Aau1LlJqzWK5F65KJR1AdkETcrEpOwvJqPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (unknown [95.90.242.117])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 981E061E64856;
-	Mon, 24 Feb 2025 09:42:42 +0100 (CET)
-Message-ID: <2ab0d1c5-1bfe-4ef3-b23d-fee0ae1d7ad6@molgen.mpg.de>
-Date: Mon, 24 Feb 2025 09:42:41 +0100
+	s=arc-20240116; t=1740395476; c=relaxed/simple;
+	bh=/GkaB8yWqRWHcyJMrmESw+hukVF82TRyFKnjj6xh2gM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VU/9rqqkEdjKBTor3Z+BmiSC1jko3MgIDGcdl388DhY7hzY7dwAVApsBshVRzmWeWVQ80X0iqzmQYfOgU7K/hv/BGjdj3UVyjsWNx6hA/8+Oucf8t8z+f9CgwfACAuxH0rhgC9Bf0UFYzx0VBaOABo9skHqOmqv4cBIAOPhMD0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=bePcOrfd; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="bePcOrfd"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51O76YYr024409
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 11:11:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=OJoBV+NqdQeEJVT0aSIx2g
+	NfMi5/rnE5XEt4Sv8D6uY=; b=bePcOrfdmxnB6eee/TPyCWsAz1LuE3Nh/8e2iT
+	5k7jWX4x6d6OwlBBd5kgMoq6CIe1MitUDskuhS3Ma/UTmRI4irfndtLj7BuDQfwz
+	QddxnrrIYDWrAFqdYMNO+ZPSSgKVNqgY1aKUQ7HzPSxUTzKZzP+ZRqxrUL5eQudM
+	dQl4ZsBswIGLilJjtBuwOWQvZS0zEmBDRQfcV0g/5LuFTozvQUb+50zgF2q0HvPE
+	FLbUlQ/HkA+dV4RxwxDOFfGGA1pV/IiV6WlSP9bhnYD9NbXtYsN3Nzk9FzuDylCq
+	BXqE/EwZwqq/8mTDFIoAeuLcnZHORuo/SuQOBwzVtm6//UWA==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 450m3d8wme-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 11:11:13 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51OBBD4k014258
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 11:11:13 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 24 Feb 2025 03:11:11 -0800
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [RESEND PATCH v2] obex: Add messages_get_message() implementation for MAP plugin
+Date: Mon, 24 Feb 2025 16:40:56 +0530
+Message-ID: <20250224111056.3255513-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Configure altsetting for USER_CHANNEL
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- gregkh@linuxfoundation.org, chromeos-bluetooth-upstreaming@chromium.org,
- Hsin-chen Chuang <chharry@chromium.org>,
- Marcel Holtmann <marcel@holtmann.org>, Ying Hsu <yinghsu@chromium.org>,
- linux-kernel@vger.kernel.org
-References: <20250224022447.1141413-1-chharry@google.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250224022447.1141413-1-chharry@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: PzyJWfx0M-JIwaCzd27Pw1ghQKIj0cqW
+X-Proofpoint-ORIG-GUID: PzyJWfx0M-JIwaCzd27Pw1ghQKIj0cqW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-24_04,2025-02-24_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ bulkscore=0 impostorscore=0 phishscore=0 mlxscore=0 mlxlogscore=936
+ clxscore=1015 malwarescore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502240081
 
-Dear Hsin-chen,
+GET Message() operation should be supported for passing below PTS
+testcases -
 
+1.MAP/MSE/MMB/BV-12-C
+Verify that the MSE can return an email message to the MCE.
+2.MAP/MSE/MMB/BV-13-C
+Verify that the MSE can return a SMS message in native format to the MCE.
+3.MAP/MSE/MMB/BV-14-C
+Verify that the MSE can return a SMS message with text trans-coded to UTF-8
+to the MCE.
 
-Thank you for your patch.
+Currently get message operation is not implemented, hence above
+testcases are failing.
+Added code to send the complete bmessage in response
+to the get request for the requested message handle.
 
-Am 24.02.25 um 03:24 schrieb Hsin-chen Chuang:
-> From: Hsin-chen Chuang <chharry@chromium.org>
-> 
-> Automatically configure the altsetting for USER_CHANNEL when a SCO is
-> connected or disconnected. This adds support for the USER_CHANNEL to
-> transfer SCO data over USB transport.
+---
+ obexd/plugins/mas.c            |  4 ++--
+ obexd/plugins/messages-dummy.c | 27 ++++++++++++++++++++++++++-
+ 2 files changed, 28 insertions(+), 3 deletions(-)
 
-Should you re-spin, it’d be great if you elaborated a little more. 
-Especially for the motivation. It’d be also great, if you added how to 
-test this.
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index 10b972d65..f63fcf6c6 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -612,11 +612,11 @@ static void *message_open(const char *name, int oflag, mode_t mode,
+ 		return NULL;
+ 	}
+ 
++	mas->buffer = g_string_new("");
++
+ 	*err = messages_get_message(mas->backend_data, name, 0,
+ 			get_message_cb, mas);
+ 
+-	mas->buffer = g_string_new("");
+-
+ 	if (*err < 0)
+ 		return NULL;
+ 	else
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index e313c6163..665face3f 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -516,7 +516,32 @@ int messages_get_message(void *session, const char *handle,
+ 					messages_get_message_cb callback,
+ 					void *user_data)
+ {
+-	return -ENOSYS;
++	struct session *s =  session;
++	FILE *fp;
++	char *path;
++	char buffer[1024];
++
++	DBG(" ");
++	path = g_build_filename(s->cwd_absolute, handle, NULL);
++	fp = fopen(path, "r");
++	if (fp == NULL) {
++		DBG("fopen() failed");
++		return -EBADR;
++	}
++
++	/* 1024 is the maximum size of the line which is calculated to be more
++	 * sufficient*/
++	while (fgets(buffer, 1024, fp)) {
++		if (callback)
++			callback(session, 0, 0, (const char*)buffer, user_data);
++	}
++
++	if (callback)
++		callback(session, 0, 0, NULL, user_data);
++
++	g_free(path);
++	fclose(fp);
++	return 0;
+ }
+ 
+ int messages_update_inbox(void *session, messages_status_cb callback,
+-- 
+2.34.1
 
-> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> ---
-> 
->   drivers/bluetooth/btusb.c | 224 +++++++++++++++++++++++++++++++-------
->   1 file changed, 186 insertions(+), 38 deletions(-)
-
-[…]
-
-
-Kind regards,
-
-Paul
