@@ -1,70 +1,74 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57DC1B21BF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 20:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5368A24EF63
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 20:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740430497; cv=none; b=Rv92eAV5iK0/a0sku3+NfSF8FRPAXu159Gjp4632tolRZscEsJ/MYRZ5/Y6vWRRONFFPoPlpaBrlmY3lIGCNjfMsTBAglml3PTY9OYvMwEtAkydCH8CcschVeHMFSIXwf7oJHTaJTj2m86bfmvYmmn2kFxtH5BuZaDhrvRCRpZc=
+	t=1740430498; cv=none; b=Rb0jRUaq/8ue9M4UOXNn+NdZ277ycqxlXnDA/0MhUqoLFKS2SyIqsh8BmHlazTz3zqnDEOGv1iScdViKBEvgVdMt7p7ha4kmczteFO8XKf7i2lw5w532jCLyXoQZCYbJ76QLOBaYSHFu0rxji4xrkQBqCuV9XFAB7H6FoVSAjC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740430497; c=relaxed/simple;
-	bh=DBtlrv0nr6tEpbV0un0Pj7CTah6K6mP0m94G74MfARg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m7Xa7dQBii2RL2AdJ7Dbp8Dtr66QBBX8gPVbduMMVT0EV02DSkzJ/tiYGLCLdHeSRDJe9j1YWgeUadrl7fI9TuwDqocqesjcAvFBf7BxMIRE7+Gvjxrl1rj09pHVedHnYyv8mhiK1Lw4wFFCVkfXup35x2lkuLtW0E6ijAKaG0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLqvnpT+; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1740430498; c=relaxed/simple;
+	bh=WdjpbkHsenDZpPkT3LQXsBJoK4pVrXZAaYoQKLjLfcA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EibUeWZr2sWfh+qBJmRxN23S30Zrb9PNQX5W3UOlk9zxdeGfVVOcuKReb5yTtecagVPXptAplQeKVNxGxqc0wk6LDbfq0eV/+e/AoWDy4CZJF+jS68J6f6uL4lhnuGFMTvkp9d3/a8LbMKGUgUKEqM6sKtUp18aLwMR1NsZCENE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/hhjYHm; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLqvnpT+"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-220c92c857aso83451595ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 12:54:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/hhjYHm"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-220c665ef4cso85012725ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 12:54:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740430492; x=1741035292; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AYoGF0d2LX+enKXlDIJ3a8UmtPGw/d11dWbkH9zzNBA=;
-        b=aLqvnpT+Orjf04BmMlsRU0zZxyfCuSv4kD4K5lKKq6R/eMafjykE1Q6+v/XFkCbJTC
-         n4o3KBxJTayRuPZkpYQX49OyafB+YUwhouxIJn4X1SnEBgRn9RSdIlRadf5pXBqXP5JX
-         fthWsn/dk1+bmHtydp3XN8ymO1+QTZDSiNi2K4YbbpOvjQDSL7xREsZFAesfEqHVqHeY
-         UlkhCIVmGKyXCpdFTbivGt89IAyePB43M0kWOJdW1UJ2D8jHk3jBVAja+/ZBlczSrzeW
-         AWyMRbhDCDAiN20bfmCssKbhZb6Z1k7Ei/SHud/fbXQg8V8jbJtKO+bG03asZcbEF/bP
-         eK3w==
+        d=gmail.com; s=20230601; t=1740430495; x=1741035295; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=skAepCMpS5A+SARkM0JSy/NjPFnXGTxwrYBtrHVQjm0=;
+        b=K/hhjYHmRYqRBrF9pD7z4Yslu5ksUD4CTwxy8Hebi0AzeHDjj/47WCQyN0ar34mBc/
+         /3LCPz1GiI3u3EZ6M/3cTH+QWSUXlKKXtzHD7Efiy7XxciGcHPmqaDpudzDDV3EdaQ2n
+         HMqoQMAGazfhrVGqyxFXKXG8iufNWUFacFgK5i0kOW9i+9hHpmsQLtQ77gbKdrWnKw3U
+         YoRIsuCtI6o/xcAC6zeQ6SwzPAbRQ91UZQvWskJd7jpNEHvKBi6/mUKywJAVIxtGxyal
+         eediLACqlElHiPOlEqyS0jyuVmh3cEJQ6cpgw3Mpqa5IDoEERpOadYy9DE27854o/cnu
+         5sTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740430492; x=1741035292;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AYoGF0d2LX+enKXlDIJ3a8UmtPGw/d11dWbkH9zzNBA=;
-        b=sPSsLvWMvDhJfbdYxOfRFmsUu0XzoF5I6sMd4rHSBOyFeS6k2bvEsZqowksVAhGxYD
-         kbwBvcvPNCCWIaxmPadi5q3jq8qNDT/UUfD1qdJjxgk5Kv9dSTHMmlU0KLqiEjx0aOtL
-         /prYlxmoLbBD8FJm8jO8vShgUq2JdDxKlP7OwTpVTDOnKmDspD3ys68XmOQvlGWo9udI
-         LmrDuXa9k6FWWSldBzB8s5R8DmAZzfkxFrMcmN78vVTUiPhUugA0fZYgkGXG/LMwNJSb
-         laxfWmG5cwm+poIxZM+pO8+k7UNKplzAZoRefnTQorrnHEb90DPH3XD17xr0kW7ADovI
-         VnUA==
-X-Gm-Message-State: AOJu0YyIqhcO3T2A+5xOGnfuA0C+gerv74sAXO/aPuldVXKKutCqE9IA
-	7ZSb/lclluNN+f4cfSYuQy8ryTFW7gbIrl5FYrtI2/TqnhL4/VS2XZLP2Hde
-X-Gm-Gg: ASbGncv3HxLPCz1wEwiq4CniWrgHycwX8nHA4BfjlJi9OQ7WFrEKTz1lyTR8i8y2ImC
-	yKw+Qdvd8yAe6yYWkGtKE36brhYQCTc7pDkJOXIP7gKGhvNi1GuJtynXG2b36RiCdvmYaxSYZsa
-	V9MA6QUGDyFAMb/0wV4tt1u+3sYzQ3oxN9X/YETknDD3gOq5U3VGEw/zzwuwJWba5wnDbz9qH+L
-	zPGHe5BDH58bNInGvxTcoLZ5rrM2snvt2/hLJqAmaUKyi3/vGhzJ69IEaBj9onHqXQfuoq2gZXG
-	dWvJK2L95TtBH2AA5ODDebfxhxCXno0XECL0DkcuMCcvCvpWgZIWW2rMvANw2csOHZidmWS3RKf
-	qqbflcIuUNck=
-X-Google-Smtp-Source: AGHT+IEM+KKuUYQ2rmO5d15qgNzHJFm90fv98BSjQvqQUK3Vcv3gkbrgXhiteyTdn+8pvMmsbZsWqQ==
-X-Received: by 2002:a17:903:2312:b0:221:1eac:bf7a with SMTP id d9443c01a7336-2218c765b1amr319106655ad.24.1740430492119;
-        Mon, 24 Feb 2025 12:54:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740430495; x=1741035295;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=skAepCMpS5A+SARkM0JSy/NjPFnXGTxwrYBtrHVQjm0=;
+        b=QD4rvoWYnrdZtjCv9xzR6ICdOavvNkPSqKNnzx0twLyiZASzoEBI+z8NC7XfmkVdNQ
+         5OStEReUSY6bzaUk6ui0YpzLY+kCLOHilk43WPwOKbg7KIg/K/5QW6NEpIhu2i64hRCB
+         z9xVmBqJBoabPcbljV1ozfy0cN1ubiK3wgK9X0gDoXW+NysJya2OT32erSPEb47veocB
+         kIMC80bXX9xedenJvsb5neV/v1UqbnDIkictnJa+KWcup5NCbaPiETkmpjX2UlBkcBB8
+         JywuEgnx/AzIoF9kHaOk1dQRipO2WHTml/jOrxTFpCKjjT0aiOpwaugPN9xjlZVB/yIL
+         YcvQ==
+X-Gm-Message-State: AOJu0YyfWT02g9X2Wts7iXld3kuFnVNwNBy+si2UBfzGJNiv0V4+nbve
+	Obm9yYlPIG5qdA4nO0ZJB04UXePBHqDAmVrlr2aJtcMguIG7JiDHblFnioh0
+X-Gm-Gg: ASbGncs8sqaZxV8OGsxUR9298FQ1LApuR/BH19gdVysz5w7yVZL14Rd4cns0cLbWMh4
+	pvjdYBTJVk/Entnbyrs6mwwnNp01GSFKiekyk+37yBIejr7ZX7QMTJ6/3EtgMh4NJEQ9NWCpzcZ
+	IDniMsvvW7LQnG2jH0vzfetIvKWOp9z2IlTfsR8MWjlMqH6Jzwa2f/oHO1dBIfpTrNnm1DIwf/e
+	nuvLwdVxl3LktmhVFBLST0E4GMFHpOcxVTUjimvn5oOdUCDc/22CVQ2WQo4Qv9YLqB0hAxDViau
+	2/xsuILwEsDf7ecjSTos5q8e+s8yOBDyM34VEQ6Tp9cdKeNuUwer3hTMS0fHHuwY+Xbd8AYETp1
+	V4UGh72FVfuw=
+X-Google-Smtp-Source: AGHT+IG4VZc/NaeKyhX9aR1tsFwHhXNWj1TejhT3SH3opPQH4u3vvOD8Mw04jEhHj3D1VT6Bmp3fNw==
+X-Received: by 2002:a17:902:e783:b0:219:e4b0:4286 with SMTP id d9443c01a7336-2219ffc00d7mr241471355ad.29.1740430494655;
+        Mon, 24 Feb 2025 12:54:54 -0800 (PST)
 Received: from localhost.localdomain (168-228-202-11.static.sumicity.net.br. [168.228.202.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2230a01fdeasm471715ad.87.2025.02.24.12.54.49
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2230a01fdeasm471715ad.87.2025.02.24.12.54.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 12:54:51 -0800 (PST)
+        Mon, 24 Feb 2025 12:54:54 -0800 (PST)
 From: Pedro Nishiyama <nishiyama.pedro@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Pedro Nishiyama <nishiyama.pedro@gmail.com>
-Subject: [V3 0/2] Bluetooth: btusb: Fix regression in the initialization of fake Bluetooth controllers
-Date: Mon, 24 Feb 2025 17:54:37 -0300
-Message-ID: <20250224205439.18672-1-nishiyama.pedro@gmail.com>
+Subject: [V3 1/2] Bluetooth: Add new quirks for fake Bluetooth dongles
+Date: Mon, 24 Feb 2025 17:54:38 -0300
+Message-ID: <20250224205439.18672-2-nishiyama.pedro@gmail.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250224205439.18672-1-nishiyama.pedro@gmail.com>
+References: <20250224205439.18672-1-nishiyama.pedro@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,31 +77,65 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These fake controllers cannot be initialized because they return a smaller 
-report than expected for HCI_READ_VOICE_SETTING and HCI_READ_PAGE_SCAN_TYPE.
+This adds quirks for broken READ_VOICE_SETTING and READ_PAGE_SCAN_TYPE.
 
-This affects fake controllers reusing the 0A12:0001 VID/PID.
-
-Fixes: c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
 Signed-off-by: Pedro Nishiyama <nishiyama.pedro@gmail.com>
 ---
-Changes in v3:
-- Correct the fixes commit. 
-
-Changes in v2:
-- Separate the driver changes from the quirks changes.
-
----
-Pedro Nishiyama (2):
-  Bluetooth: Add new quirks for fake Bluetooth dongles
-  Bluetooth: btusb: Fix regression in the initialization of fake
-    Bluetooth controllers
-
- drivers/bluetooth/btusb.c   |  2 ++
  include/net/bluetooth/hci.h | 16 ++++++++++++++++
  net/bluetooth/hci_sync.c    |  6 ++++++
- 3 files changed, 24 insertions(+)
+ 2 files changed, 22 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 0d51970d809f..b99818df8ee7 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -354,6 +354,22 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_PHY,
++
++	/* When this quirk is set, the HCI_OP_READ_VOICE_SETTING command is
++	 * skipped. This is required for a subset of the CSR controller clones
++	 * which erroneously claim to support it.
++	 *
++	 * This quirk must be set before hci_register_dev is called.
++	 */
++	HCI_QUIRK_BROKEN_READ_VOICE_SETTING,
++
++	/* When this quirk is set, the HCI_OP_READ_PAGE_SCAN_TYPE command is
++	 * skipped. This is required for a subset of the CSR controller clones
++	 * which erroneously claim to support it.
++	 *
++	 * This quirk must be set before hci_register_dev is called.
++	 */
++	HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE,
+ };
+ 
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index dd770ef5ec36..e76012956020 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3696,6 +3696,9 @@ static int hci_read_local_name_sync(struct hci_dev *hdev)
+ /* Read Voice Setting */
+ static int hci_read_voice_setting_sync(struct hci_dev *hdev)
+ {
++	if (test_bit(HCI_QUIRK_BROKEN_READ_VOICE_SETTING, &hdev->quirks))
++		return 0;
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_VOICE_SETTING,
+ 				     0, NULL, HCI_CMD_TIMEOUT);
+ }
+@@ -4132,6 +4135,9 @@ static int hci_read_page_scan_type_sync(struct hci_dev *hdev)
+ 	if (!(hdev->commands[13] & 0x01))
+ 		return 0;
+ 
++	if (test_bit(HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE, &hdev->quirks))
++		return 0;
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_PAGE_SCAN_TYPE,
+ 				     0, NULL, HCI_CMD_TIMEOUT);
+ }
 -- 
 2.48.1
 
