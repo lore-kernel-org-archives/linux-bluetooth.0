@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93B6EEA9;
-	Mon, 24 Feb 2025 21:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CC421345;
+	Mon, 24 Feb 2025 21:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740430800; cv=none; b=KS6kx5ZAfC8Duy055WQMoA3Imq8uzPBLy05Qb3jxAxTkf918JKKHYSZr7V8zM31CIJWVRB3xAsyWGWqCBx/7EX/9mQ6BzBvWJYpbZoBAohOdujBf4gpr42KwoqD9H6Sb4W/J2NGEXIWU15j9RHXfGNucqjkGoURt+MtE5vv4FR4=
+	t=1740431402; cv=none; b=uTqXyFjm421fpGbRmpLrzMEj9LI5OULMnjUiajOafb8JK7ytZ24WddZmH3PrPRcUCF0cZQWAmOQ4pH4OHzKfrQAE0bxKloDfr2XKIxGMysGTWE9vq7zxAmgfowpEq+65lepK1vtOiuwpquWzil2PmUywDN+hh1f/GFdT/7EvYk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740430800; c=relaxed/simple;
-	bh=1NWuUJYlBH4z8CLnCuFgDe9PmgNjtMn3ihoud+NaoFQ=;
+	s=arc-20240116; t=1740431402; c=relaxed/simple;
+	bh=hbW/SJlFMzuudS0GacEN5aJw+CSrtge6vWyr9X+ARNs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rehlRnwOKFm8g2Hm4PTWrWJnZklmEuY1CHPd7ewvzlNQ2jvAsK5ct2Gw9cLnzagZ0QYgRlPCbwTtEsWf3G7rf1SAjYQq23wpxSb71n+UJzxDjo193VFZ3z+0EuUJyvTaW17tQ/KFFn//IdGj3NIzmoc80PS4rHgGkkbtMWsbe4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jKJE2Nyq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=ppVmfrTNJK5gyZjPOlr7kbpnWk5gehwtv3Mq2tbkxH9Ze6HrUaLVl/oUteU2xJvpAZmWj8UtJ4U38xy6FGFJWH2kYZW5mizPL8lfwMRwm4/JUlOC4msnelqMMnq3tnbPtjmgIfRTQBO90XjK3jH4GsBUi3x0cyahgLxIXemKGxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UDqPCwGq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jKJE2Nyq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4343BC4CEDD;
-	Mon, 24 Feb 2025 21:00:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UDqPCwGq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16D64C4CED6;
+	Mon, 24 Feb 2025 21:10:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740430800;
-	bh=1NWuUJYlBH4z8CLnCuFgDe9PmgNjtMn3ihoud+NaoFQ=;
+	s=k20201202; t=1740431402;
+	bh=hbW/SJlFMzuudS0GacEN5aJw+CSrtge6vWyr9X+ARNs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jKJE2NyqR29Kt023x1gm6GHxQM7pqiwXfSsuxPIHyrOnrissYnlWvUJkdHkXvqFnN
-	 VTtglcilgltURoaGmYj80s/JFMl3wIsh0RTmwup8CF1lhCSC/GlAF1lXBsnsn9wmrG
-	 Wz8HEV+AnMJa9axgQJpr0Cg4pIUa8y1//W0F+GqX2DcOanm6CmJgHAk5BRtSwfljNb
-	 yIVV6o1s2WD+plV5mhe/UybjBjcIwoU7gpK1nt6STNWQF9A3RnpSForPL0gCG9Ll4J
-	 KTQee+lBd289/cmy9z3JL1RS65moR2f2XpS/zm84KqjqWwqYI+VKPaGbU+LNtQG9Fc
-	 eFeGiPwj7/4Ug==
+	b=UDqPCwGqxDMF/yKvJYMFIzD6OBVp7ih8GAeoV2H4KbIzml6xSmnCA7UFUVS2ICXg+
+	 LjFNAv+NAJXlr53+RY2wXujtNOfM22nZRuVa1PmP2tb93fzIFhq8x1ms3irow7SSJo
+	 ghoSUUj72tiDlJyPu/U3OwSRkoYt5kXuTSJpDZk5wdFEcxubcLS7iz/uWOoh0Xw3Hv
+	 rbnMQ/Z0QbTpaDDUYlyswffLbP2vqcT9houRZft57/E00GD9UiVFWIFc5UkInpR7km
+	 DoFz88d2Ig3LV9RCzTkpoMXTT0nk514cwYCp0jFyPndi5O3Mq7hpp5l2+iQ/9LojvU
+	 k55IrQmbjEdjQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0E6380CEFC;
-	Mon, 24 Feb 2025 21:00:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE264380CEFC;
+	Mon, 24 Feb 2025 21:10:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,41 +37,38 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/2] bluetooth: btnxpuart: Support for controller wakeup
- gpio config
+Subject: Re: [PATCH v2] Bluetooth: Add check for mgmt_alloc_skb() in
+ mgmt_remote_name()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174043083176.3606604.9199619659831675695.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Feb 2025 21:00:31 +0000
-References: <20250219091512.290231-1-loic.poulain@linaro.org>
-In-Reply-To: <20250219091512.290231-1-loic.poulain@linaro.org>
-To: Loic Poulain <loic.poulain@linaro.org>
-Cc: marcel@holtmann.org, neeraj.sanjaykale@nxp.com, robh@kernel.org,
- krzk+dt@kernel.org, linux-bluetooth@vger.kernel.org,
- devicetree@vger.kernel.org, amitkumar.karwar@nxp.com
+ <174043143326.3609111.3392148851063113279.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Feb 2025 21:10:33 +0000
+References: <20250221084947.2756859-1-haoxiang_li2024@163.com>
+In-Reply-To: <20250221084947.2756859-1-haoxiang_li2024@163.com>
+To: Haoxiang Li <haoxiang_li2024@163.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ mm@semihalf.com, acz@semihalf.com, rad@semihalf.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 19 Feb 2025 10:15:11 +0100 you wrote:
-> When using the out-of-band WAKE_IN and WAKE_OUT pins, we have to tell
-> the firmware which pins to use (from controller point of view). This
-> allows to report remote wakeup support when WAKE_OUT(c2h) is configured.
+On Fri, 21 Feb 2025 16:49:47 +0800 you wrote:
+> Add check for the return value of mgmt_alloc_skb() in
+> mgmt_remote_name() to prevent null pointer dereference.
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
-> ---
->  v2: - Move pin properties read in ps_setup
->      - Display warning in case of wakein prop without related gpio
+> Fixes: ba17bb62ce41 ("Bluetooth: Fix skb allocation in mgmt_remote_name() & mgmt_device_connected()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/2] bluetooth: btnxpuart: Support for controller wakeup gpio config
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f66b266e3e4f
-  - [v2,2/2] dt-bindings: net: bluetooth: nxp: Add wakeup pin properties
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c3bb10f6d38a
+  - [v2] Bluetooth: Add check for mgmt_alloc_skb() in mgmt_remote_name()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/62ee156d6b29
 
 You are awesome, thank you!
 -- 
