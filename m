@@ -1,144 +1,77 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC91221F31
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 14:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FE32063CB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2025 19:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740405834; cv=none; b=fZdzrg2XApfwBm2wtZdhTwJnoftdFVp11TjUswrm6xnMqSLNXu0lHYi7qYFkYpTR5cr63NyNA6UGaMpd1rhTzSltOdk1t9jwzwna4hXEy+63uO/be6DZowEnohvt/zbdB9JvwVqviYPzaHSfwpgPfYZPLBghnlGvmRwHkV1yZZY=
+	t=1740427200; cv=none; b=Gn4KMCWVLs/dJ3hngbg8PwVOaG3D/k810VSlE5OmQ+al3TGWkh243yFwHpGY+yExznp+z3r84ozyDg4i5DxMLJMV+1SO0aMFXh0DH+0AJd6+qjRCig6iILKIRrmVpbWnSM/YevWWzB2ztfJfogVXGdik8ypCR1DFujmIV3p0jUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740405834; c=relaxed/simple;
-	bh=0X4GY4CzTa9KBawDcPnaaeOBJ5iWoEbb4UQcadeH5Ss=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iWaiV3TCSn3p+E/sR3VHs33R2PbGIms4IAndpDgW3F5O2rIQblqt1tjnHN/orDWGZ2iUNBSs70wWoda/E9PZ/ELtqfOQ9MRT7VcNbSo5ZSl03lnhDbBEG3r7jf9/gF6eIQh/5e+FDhndrPvaKOttRvBrKNLAkJAjp11JSJMxyeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CC8AD61E647A3;
-	Mon, 24 Feb 2025 15:03:43 +0100 (CET)
-Message-ID: <98149822-8ac9-4099-bb44-16f79419ddc3@molgen.mpg.de>
-Date: Mon, 24 Feb 2025 15:03:43 +0100
+	s=arc-20240116; t=1740427200; c=relaxed/simple;
+	bh=Geq22imbzJho6h3hwYxRUrOq4rosQqhPNxUWnw5U8ac=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=D14PYin8LbrRuKzRn1hR7Wy36Hwhc3G0x6oQuC7SZjoUD//jsvbUNfsBgi2OBDZ7nzjGbyfAUbosiKuxObh3mHOsOiYKkkucvJBXTB7vc6m3cN977KSJzUe9VkmxbB7zy6OqX1rSXyUdKP7s7b3+jvzsJkcnFu1UMuaeSXaOMTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=awVbs5Ej; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="awVbs5Ej"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B872DC4CED6;
+	Mon, 24 Feb 2025 19:59:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740427199;
+	bh=Geq22imbzJho6h3hwYxRUrOq4rosQqhPNxUWnw5U8ac=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=awVbs5Ejy1YUxBxKhIng3MMhxmg6AzgxLam+OpF1Sy6/TcKKcnlCOs6TpC1A37xaN
+	 Qwz1M0bbWQom/lLHa5GVrwtYLmo6kKo5kyXZpTwTBHfiK51YexvF4udAbEY/HQiy92
+	 cnx1egIhI86kublNkcKD9Xys59qc6SthnAPCBCyZX7zebBxfO/FN4XXm9lfmSAAd2O
+	 UVUmTCQtN44SC5pEaqG5JuVLF8SYjON5Gz9Elie4M2rYADtvomFveyLjdfZtM9r9nJ
+	 37/7XRXYCiqfKUAMlKPda35OBIewZnAMV+fA5juvzvsznuFBBZJ6WxCUdzQKaZEgT2
+	 hEUbigW3lzALQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CB2380CEFC;
+	Mon, 24 Feb 2025 20:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH v2] obex: Add messages_get_message() implementation
- for MAP plugin
-To: Amisha Jain <quic_amisjain@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com,
- quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
-References: <20250224111056.3255513-1-quic_amisjain@quicinc.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250224111056.3255513-1-quic_amisjain@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 0/1] shared/gatt-db: Fix incorrect attribute type 
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174042723126.3590450.3653149369627151708.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Feb 2025 20:00:31 +0000
+References: <20250221163139.1705-1-sarveshwar.bajaj@nxp.com>
+In-Reply-To: <20250221163139.1705-1-sarveshwar.bajaj@nxp.com>
+To: Sarveshwar Bajaj <sarveshwar.bajaj@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
+ vinit.mehta@nxp.com, mahesh.talewad@nxp.com, devyani.godbole@nxp.com,
+ iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com
 
-Dear Amisha,
+Hello:
 
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Am 24.02.25 um 12:10 schrieb Amisha Jain:
-> GET Message() operation should be supported for passing below PTS
-> testcases -
+On Fri, 21 Feb 2025 22:01:38 +0530 you wrote:
+> As part of BLE GATT Fuzzing testcase,if application sends an invalid
+> ATT_FIND_BY_TYPE_VALUE_REQ with attribute type as CCC (UUID 0x2902).
+> However, this request is not valid for descriptors like CCC, as it is
+> specifically intended for discovering primary services with a given UUID.
+> When processed in find_by_type(),attempts to access attribute->value
+> without checking if attribute or attribute->value is NULL,leading to a
+> segmentation fault.
 > 
-> 1.MAP/MSE/MMB/BV-12-C
-> Verify that the MSE can return an email message to the MCE.
-> 2.MAP/MSE/MMB/BV-13-C
-> Verify that the MSE can return a SMS message in native format to the MCE.
+> [...]
 
-a*n* SMS
+Here is the summary with links:
+  - [BlueZ,v1,1/1] shared/gatt-db: Fix incorrect attribute type
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4465c577778d
 
-> 3.MAP/MSE/MMB/BV-14-C
-> Verify that the MSE can return a SMS message with text trans-coded to UTF-8
-
-a*n*
-
-> to the MCE.
-
-I’d add a space after the bullet points (the dot).
-
-> Currently get message operation is not implemented, hence above
-> testcases are failing.
-> Added code to send the complete bmessage in response
-
-Should this be *message* or is *bmessage* some terminology?
-
-> to the get request for the requested message handle.
-> 
-> ---
->   obexd/plugins/mas.c            |  4 ++--
->   obexd/plugins/messages-dummy.c | 27 ++++++++++++++++++++++++++-
->   2 files changed, 28 insertions(+), 3 deletions(-)
-> 
-> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-> index 10b972d65..f63fcf6c6 100644
-> --- a/obexd/plugins/mas.c
-> +++ b/obexd/plugins/mas.c
-> @@ -612,11 +612,11 @@ static void *message_open(const char *name, int oflag, mode_t mode,
->   		return NULL;
->   	}
->   
-> +	mas->buffer = g_string_new("");
-> +
->   	*err = messages_get_message(mas->backend_data, name, 0,
->   			get_message_cb, mas);
->   
-> -	mas->buffer = g_string_new("");
-> -
->   	if (*err < 0)
->   		return NULL;
->   	else
-> diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
-> index e313c6163..665face3f 100644
-> --- a/obexd/plugins/messages-dummy.c
-> +++ b/obexd/plugins/messages-dummy.c
-> @@ -516,7 +516,32 @@ int messages_get_message(void *session, const char *handle,
->   					messages_get_message_cb callback,
->   					void *user_data)
->   {
-> -	return -ENOSYS;
-> +	struct session *s =  session;
-> +	FILE *fp;
-> +	char *path;
-> +	char buffer[1024];
-> +
-> +	DBG(" ");
-> +	path = g_build_filename(s->cwd_absolute, handle, NULL);
-> +	fp = fopen(path, "r");
-> +	if (fp == NULL) {
-> +		DBG("fopen() failed");
-> +		return -EBADR;
-> +	}
-> +
-> +	/* 1024 is the maximum size of the line which is calculated to be more
-> +	 * sufficient*/
-
-I do not fully grok this sentence. Could you please rephrase?
-
-> +	while (fgets(buffer, 1024, fp)) {
-> +		if (callback)
-> +			callback(session, 0, 0, (const char*)buffer, user_data);
-> +	}
-> +
-> +	if (callback)
-> +		callback(session, 0, 0, NULL, user_data);
-> +
-> +	g_free(path);
-> +	fclose(fp);
-> +	return 0;
->   }
->   
->   int messages_update_inbox(void *session, messages_status_cb callback,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Kind regards,
-
-Paul
