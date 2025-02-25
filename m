@@ -1,154 +1,318 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7667C19415E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 22:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBD31624CD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 22:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740521226; cv=none; b=lNp10i1wSeWKjgmZqM2pHq4yiVevgTEwvrB6/z/mi5HSDgQ1qDkX9/wni1EH9XARl4Ixyi6D8wc1ayQ5oT8fz2YVIu6RMlgLoEv80bClj0wgztbz7hFrY9pjQspvjT8i1pB/vcY1ef+PCRl+8PannnlhG712uqcvVumOy9G44bw=
+	t=1740521420; cv=none; b=lMd8kdfbiDFUQTvMhbe5FrfjhDt9cK2tik5ltIaSxerAP5iOGxlSSCNqCqO5EA8vKZ7SoWB5p9/MkR09LzHzVSqHTwO7XrsT+ihRfxWuL9PqsceBaOgfYrZMWttBZjuE90kLsZR20R825sUoKlDLClRIVb7z8KDhp7bm800Mx88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740521226; c=relaxed/simple;
-	bh=0iQkApzU9h6eT1uu+Vdd0WuEQXUc3BVJxQPxVbmhSec=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=MnUDSawHeJoRHLopRrm8TlrrEmehpYZyUaJ9BGr0bC6Cp/i8ZGc7UxB55bwV6XHdHoD2xw0lvermqIWRTTzdPe9ta9T9rT9j+ZTUwQTYGWKazuROw0VYHQ1G6Q4xK1rxqLJQdQKYklyPs6328qu9UPBB9/TI14yISqUZPWwlVrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F2W9JkzX; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1740521420; c=relaxed/simple;
+	bh=rXLbvB8A5moayIRtVoYcL3ovZHWTRNX7MGd/DIGlWfA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M0KtFhiw63nMaJbqBWLP/YllIjCfAudDdinJ5VwaQ1+lYulGT8lp2hZbI66bpRSLI+yJfKp7c6NV7Nmp7WDphLqvz/47bYu6WAoI6PliEwQulfUwtKlNJJU3lKkcB6DhnZ/5GafRjIMUOD0UFdTDdBQO4XB2nJnsDbTnT6p6WFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtJGo2SR; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F2W9JkzX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740521225; x=1772057225;
-  h=date:from:to:cc:subject:message-id;
-  bh=0iQkApzU9h6eT1uu+Vdd0WuEQXUc3BVJxQPxVbmhSec=;
-  b=F2W9JkzXqyHXmBjeJp3cXtEUtRWzkhVsGjBuo4VLl4TlAtH8B1w1Yag0
-   1GTmQhGlihyeWeFE7F5VFfo15pDIS9L0+saHxQGIPFHcU5Z2tSYCgMWiR
-   BGDhQaMozuylWD/6FMOf1sbi8BTnlT+ox8m0EJf/hOSitMRpIJznV7JqI
-   UEKW48tCuSNK/pfp05TKVxCKdcaGW6eIGdujensyKeUHtKFWjZz0KqDRX
-   pgsZfzVeuBkYBUL/tPp09aUA8zj/i3PNLGrn8DHL1BiHYnAjrvPSt0JHL
-   zWRrQ73toIXzemN9UDR4n83RI1kEijO8WwyY7vGFyb0xNaictO2jsg+5X
-   A==;
-X-CSE-ConnectionGUID: oZsFSNz6Qu2aFiyg7Y+Y0g==
-X-CSE-MsgGUID: e2SkeQOLTqu1b0tuYPr7Fg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="45264849"
-X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
-   d="scan'208";a="45264849"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 14:07:04 -0800
-X-CSE-ConnectionGUID: Oa5apNa7RsS4kb+5yRUK9w==
-X-CSE-MsgGUID: 0Y6s2RzHTAOPEPS4NvphVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
-   d="scan'208";a="116529321"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 25 Feb 2025 14:07:02 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tn34u-000AqF-2U;
-	Tue, 25 Feb 2025 22:07:00 +0000
-Date: Wed, 26 Feb 2025 06:06:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- a4ce2f1ccebadfc609ea3e067b9fde469cbc908a
-Message-ID: <202502260635.R9kbEevv-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtJGo2SR"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-307bc125e2eso57143861fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 14:10:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740521416; x=1741126216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wNcHpE9sEOKfq0skuAJp/uTci+3i4M66dnDDdbiYtRw=;
+        b=RtJGo2SRLIbYK+FIPgLCqOubV8Pxn4/kSIg1+oHfaKh6wG3+s/xKpOiulw8sBWqu6k
+         +WuXjcgrfS3u6D0j5SoReR13H7p6hU6P7W2oNCJfmpAsKoQJ4/rrG4ONLaBw6Qq8qZRx
+         DDZGo5AuTgmqJ95Yp+wSR5Wu/OMGZ5Nm0IFBz/+WiXFHuMQX8OxJCAU/1AsAzW2Z3yfq
+         bzHQmv202MLb5+FavonJFw246CW5IXhPmVAkaqRB3O2uvAJwHN+KTusb24AWyeR+yxVQ
+         E+0Mi94VNgoeJO3MJm0DnYltJQjpXtJenUDglYRzao1VTA29UVtDTk9ANEjlFe6G/zqi
+         DbHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740521416; x=1741126216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wNcHpE9sEOKfq0skuAJp/uTci+3i4M66dnDDdbiYtRw=;
+        b=R/IcbNcnPNJ9R6lWYVw+Km3DCqrZFmHDsNJjbQ1U02kA8NTGO7ePZSJYNHiI6+nll9
+         M7NvCe6CecUBiYuSIqZ3GBXq2usmnugBYaObQiBkVKZFVoUGM2r9TQBF8G2friam4Enk
+         66txlOebSTTuZPteTnZhbwXr+1IQ4fHrzMwrZTDDGO4r9N194KYG18hYjXwzjwuBNOPs
+         mvBc1Wpsd068D5Pg/LuloVgyipwsvtgKSYNaV35ssDFJML5Vz38hoNQqNqGrtCB/OWv6
+         vnkYApz1eSLCAyniAUuHq4gw9brdfl+jIF1z+gjczslOtjxj1tpN+gumWHweLZbkFxOM
+         LJAw==
+X-Gm-Message-State: AOJu0YxJJXVbkBZ2bU39L5PQEAV6Wxg7d5txrX4tlTFLqIJV0a+e1gva
+	HLYo56rxJQPbb8eVtFzjN5yErJ+YuiSWZGajvnv3zkP4Qjpt8gMBIjIE/0DsQjCZz5lIian83vq
+	7qXd8Lzs/PXUaOJt6JSHcYIlQRs+2nMWDBW0=
+X-Gm-Gg: ASbGnctesaE5LDjnpA5j5nxULXIXXRuJMhult3h+dQ2qxJqFzf8Ia0Kj6xVY68eYb5m
+	EH+kH91Wc8goK+sAObGh/zo3zX6NgAlWIiQzSV5nwmgt8b8X13dQrwYe3VPt2tczbF3TGlX/zh8
+	SJdCX8Kg==
+X-Google-Smtp-Source: AGHT+IF2dM3kqSZW0wHrNbgwlUV1d+Mb1kRZU6o43jmngcPow4sbgy8NGOqqGwTDdMUT8+LvaK0jnZVwu/V2wbK0Qo4=
+X-Received: by 2002:a2e:914f:0:b0:307:e0c3:5293 with SMTP id
+ 38308e7fff4ca-30a80cb7d1dmr27853491fa.36.1740521415556; Tue, 25 Feb 2025
+ 14:10:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20250225220059.2821394-1-luiz.dentz@gmail.com> <20250225220059.2821394-3-luiz.dentz@gmail.com>
+In-Reply-To: <20250225220059.2821394-3-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 25 Feb 2025 17:10:01 -0500
+X-Gm-Features: AQ5f1Jq8Miz_Aixriz-294g7x5mqZG6WGmHzHI7g_k_y61-OJ4gfpVz2aBqpKrE
+Message-ID: <CABBYNZ+32tuRH+T7M=1aeDJJOqHz9qt4ThsuMF4sVpiEeC380A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 3/3] client: Add support get/set PreferredBearer
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>, Bastien Nocera <hadess@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: a4ce2f1ccebadfc609ea3e067b9fde469cbc908a  Bluetooth: Add check for mgmt_alloc_skb() in mgmt_device_connected()
+Hi Pauli, Bastien,
 
-elapsed time: 1453m
+On Tue, Feb 25, 2025 at 5:01=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds support for PreferredBearer which is printed with the likes of
+> info command:
+>
+> bluetoothctl> info <addr>
+> ...
+>         PreferredBearer: last-seen
+>
+> It also introduces a new command to get/set the PreferredBearer:
+>
+> [bluetoothctl]> bearer --help
+> Get/Set preferred bearer
+> Usage:
+>          bearer <dev> [last-seen/bredr/le]
+>
+> [bluetoothctl]> bearer <addr>
+>         PreferredBearer: last-seen
+> [bluetoothctl]> bearer <addr> le
+> bluetoothd: @ MGMT Command: Add Device (0x0033) plen 8
+>         LE Address: <addr>
+>         Action: Auto-connect remote device (0x02)
+> [CHG] Device <addr> PreferredBearer: le
+> Changing le succeeded
+> [bluetoothctl]> bearer <addr>
+>         PreferredBearer: le
+> [bluetoothctl]> bearer <addr> bredr
+> bluetoothd: @ MGMT Command: Remove Device (0x0034) plen 7
+>         LE Address: <addr>
+> [CHG] Device <addr> PreferredBearer: bredr
+> Changing bredr succeeded
+> ---
+>  client/main.c | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+>
+> diff --git a/client/main.c b/client/main.c
+> index feb21a1163d2..76c9bc329c96 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -1714,6 +1714,7 @@ static void cmd_info(int argc, char *argv[])
+>         print_property(proxy, "AdvertisingFlags");
+>         print_property(proxy, "AdvertisingData");
+>         print_property(proxy, "Sets");
+> +       print_property(proxy, "PreferredBearer");
+>
+>         battery_proxy =3D find_proxies_by_path(battery_proxies,
+>                                         g_dbus_proxy_get_path(proxy));
+> @@ -2086,6 +2087,30 @@ static void cmd_wake(int argc, char *argv[])
+>         return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>  }
+>
+> +static void cmd_bearer(int argc, char *argv[])
+> +{
+> +       GDBusProxy *proxy;
+> +       char *str;
+> +
+> +       proxy =3D find_device(argc, argv);
+> +       if (!proxy)
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       if (argc <=3D 2) {
+> +               print_property(proxy, "PreferredBearer");
+> +               return;
+> +       }
+> +
+> +       str =3D strdup(argv[2]);
+> +
+> +       if (g_dbus_proxy_set_property_basic(proxy, "PreferredBearer",
+> +                                       DBUS_TYPE_STRING, &str,
+> +                                       generic_callback, str, free))
+> +               return;
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +}
+> +
+>  static void cmd_list_attributes(int argc, char *argv[])
+>  {
+>         GDBusProxy *proxy;
+> @@ -3247,6 +3272,8 @@ static const struct bt_shell_menu main_menu =3D {
+>                                                         dev_generator },
+>         { "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake su=
+pport",
+>                                                         dev_generator },
+> +       { "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
+> +                               "Get/Set preferred bearer", dev_generator=
+ },
+>         { } },
+>  };
+>
+> --
+> 2.48.1
 
-configs tested: 77
-configs skipped: 1
+So I went ahead and implemented the idea of having PreferredBearer,
+this works great when setting bredr it really stops from connecting to
+LE, the said the other way around when setting to le seems to confuse
+some headsets like EarFun and it ends up connecting both bearers:
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+[EarFun Air Pro 3]> transport.show
+Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
+    UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f9b34fb)
+    Codec: 0x06 (6)
+    Configuration.#0: len 0x02 type 0x01
+    Configuration.Sampling Frequency: 16 Khz (0x03)
+    Configuration.#1: len 0x02 type 0x02
+    Configuration.Frame Duration: 7.5 ms (0x00)
+    Configuration.#2: len 0x05 type 0x03
+    Configuration.Location: 0x00000001
+    Configuration.Location: Front Left (0x00000001)
+    Configuration.#3: len 0x03 type 0x04
+    Configuration.Frame Length: 30 (0x001e)
+    Configuration.#4: len 0x02 type 0x05
+    Configuration.Frame Blocks per SDU: 1 (0x01)
+    Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+    State: idle
+    Volume: 0x00c8 (200)
+    Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
+    QoS.CIG: 0x00 (0)
+    QoS.CIS: 0x00 (0)
+    QoS.Framing: 0x00 (0)
+    QoS.PresentationDelay: 0x00009c40 (40000)
+    QoS.Interval: 0x00001d4c (7500)
+    QoS.Latency: 0x0008 (8)
+    QoS.SDU: 0x001e (30)
+    QoS.PHY: 0x02 (2)
+    QoS.Retransmissions: 0x02 (2)
+    Location: 0x00000003 (3)
+    Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
+Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
+    UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f9b34fb)
+    Codec: 0x06 (6)
+    Configuration.#0: len 0x02 type 0x01
+    Configuration.Sampling Frequency: 16 Khz (0x03)
+    Configuration.#1: len 0x02 type 0x02
+    Configuration.Frame Duration: 7.5 ms (0x00)
+    Configuration.#2: len 0x05 type 0x03
+    Configuration.Location: 0x00000002
+    Configuration.Location: Front Right (0x00000002)
+    Configuration.#3: len 0x03 type 0x04
+    Configuration.Frame Length: 30 (0x001e)
+    Configuration.#4: len 0x02 type 0x05
+    Configuration.Frame Blocks per SDU: 1 (0x01)
+    Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+    State: idle
+    Volume: 0x00c8 (200)
+    Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
+    QoS.CIG: 0x00 (0)
+    QoS.CIS: 0x01 (1)
+    QoS.Framing: 0x00 (0)
+    QoS.PresentationDelay: 0x00009c40 (40000)
+    QoS.Interval: 0x00001d4c (7500)
+    QoS.Latency: 0x0008 (8)
+    QoS.SDU: 0x001e (30)
+    QoS.PHY: 0x02 (2)
+    QoS.Retransmissions: 0x02 (2)
+    Location: 0x00000003 (3)
+    Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
+Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
+    UUID: Source PAC                (00002bcb-0000-1000-8000-00805f9b34fb)
+    Codec: 0x06 (6)
+    Configuration.#0: len 0x02 type 0x01
+    Configuration.Sampling Frequency: 48 Khz (0x08)
+    Configuration.#1: len 0x02 type 0x02
+    Configuration.Frame Duration: 7.5 ms (0x00)
+    Configuration.#2: len 0x05 type 0x03
+    Configuration.Location: 0x00000001
+    Configuration.Location: Front Left (0x00000001)
+    Configuration.#3: len 0x03 type 0x04
+    Configuration.Frame Length: 90 (0x005a)
+    Configuration.#4: len 0x02 type 0x05
+    Configuration.Frame Blocks per SDU: 1 (0x01)
+    Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+    State: idle
+    Volume: 0x00c8 (200)
+    Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
+    QoS.CIG: 0x00 (0)
+    QoS.CIS: 0x00 (0)
+    QoS.Framing: 0x00 (0)
+    QoS.PresentationDelay: 0x00009c40 (40000)
+    QoS.Interval: 0x00001d4c (7500)
+    QoS.Latency: 0x000f (15)
+    QoS.SDU: 0x005a (90)
+    QoS.PHY: 0x02 (2)
+    QoS.Retransmissions: 0x05 (5)
+    Location: 0x00000003 (3)
+    Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
+Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
+    UUID: Source PAC                (00002bcb-0000-1000-8000-00805f9b34fb)
+    Codec: 0x06 (6)
+    Configuration.#0: len 0x02 type 0x01
+    Configuration.Sampling Frequency: 48 Khz (0x08)
+    Configuration.#1: len 0x02 type 0x02
+    Configuration.Frame Duration: 7.5 ms (0x00)
+    Configuration.#2: len 0x05 type 0x03
+    Configuration.Location: 0x00000002
+    Configuration.Location: Front Right (0x00000002)
+    Configuration.#3: len 0x03 type 0x04
+    Configuration.Frame Length: 90 (0x005a)
+    Configuration.#4: len 0x02 type 0x05
+    Configuration.Frame Blocks per SDU: 1 (0x01)
+    Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+    State: idle
+    Volume: 0x00c8 (200)
+    Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
+    QoS.CIG: 0x00 (0)
+    QoS.CIS: 0x01 (1)
+    QoS.Framing: 0x00 (0)
+    QoS.PresentationDelay: 0x00009c40 (40000)
+    QoS.Interval: 0x00001d4c (7500)
+    QoS.Latency: 0x000f (15)
+    QoS.SDU: 0x005a (90)
+    QoS.PHY: 0x02 (2)
+    QoS.Retransmissions: 0x05 (5)
+    Location: 0x00000003 (3)
+    Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
+Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/fd5
+    UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
+    Codec: 0x02 (2)
+    Media Codec: MPEG24
+    Object Types: MPEG-4 AAC LC
+    Frequencies: 48kHz
+    Channels: 2
+    Bitrate: 320000
+    VBR: Yes
+    Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+    State: idle
+    Delay: 0x0960 (2400)
+    Volume: 0x0064 (100)
 
-tested configs:
-alpha                           allyesconfig    gcc-14.2.0
-arc                             allmodconfig    gcc-13.2.0
-arc                             allyesconfig    gcc-13.2.0
-arc                  randconfig-001-20250225    gcc-13.2.0
-arc                  randconfig-002-20250225    gcc-13.2.0
-arm                             allmodconfig    gcc-14.2.0
-arm                             allyesconfig    gcc-14.2.0
-arm                  randconfig-001-20250225    gcc-14.2.0
-arm                  randconfig-002-20250225    gcc-14.2.0
-arm                  randconfig-003-20250225    gcc-14.2.0
-arm                  randconfig-004-20250225    clang-15
-arm64                           allmodconfig    clang-18
-arm64                randconfig-001-20250225    clang-19
-arm64                randconfig-002-20250225    clang-17
-arm64                randconfig-003-20250225    clang-15
-arm64                randconfig-004-20250225    clang-21
-csky                 randconfig-001-20250225    gcc-14.2.0
-csky                 randconfig-002-20250225    gcc-14.2.0
-hexagon                         allmodconfig    clang-21
-hexagon                         allyesconfig    clang-18
-hexagon              randconfig-001-20250225    clang-21
-hexagon              randconfig-002-20250225    clang-21
-i386                            allmodconfig    gcc-12
-i386                             allnoconfig    gcc-12
-i386                            allyesconfig    gcc-12
-i386       buildonly-randconfig-001-20250225    clang-19
-i386       buildonly-randconfig-002-20250225    gcc-11
-i386       buildonly-randconfig-003-20250225    clang-19
-i386       buildonly-randconfig-004-20250225    clang-19
-i386       buildonly-randconfig-005-20250225    gcc-12
-i386       buildonly-randconfig-006-20250225    clang-19
-i386                               defconfig    clang-19
-loongarch                       allmodconfig    gcc-14.2.0
-loongarch            randconfig-001-20250225    gcc-14.2.0
-loongarch            randconfig-002-20250225    gcc-14.2.0
-m68k                            allmodconfig    gcc-14.2.0
-m68k                            allyesconfig    gcc-14.2.0
-nios2                randconfig-001-20250225    gcc-14.2.0
-nios2                randconfig-002-20250225    gcc-14.2.0
-parisc               randconfig-001-20250225    gcc-14.2.0
-parisc               randconfig-002-20250225    gcc-14.2.0
-powerpc              randconfig-001-20250225    gcc-14.2.0
-powerpc              randconfig-002-20250225    clang-19
-powerpc              randconfig-003-20250225    clang-21
-powerpc64            randconfig-001-20250225    gcc-14.2.0
-powerpc64            randconfig-002-20250225    gcc-14.2.0
-powerpc64            randconfig-003-20250225    gcc-14.2.0
-riscv                randconfig-001-20250225    clang-15
-riscv                randconfig-002-20250225    clang-21
-s390                            allmodconfig    clang-19
-s390                            allyesconfig    gcc-14.2.0
-s390                 randconfig-001-20250225    clang-15
-s390                 randconfig-002-20250225    gcc-14.2.0
-sh                              allmodconfig    gcc-14.2.0
-sh                              allyesconfig    gcc-14.2.0
-sh                   randconfig-001-20250225    gcc-14.2.0
-sh                   randconfig-002-20250225    gcc-14.2.0
-sparc                           allmodconfig    gcc-14.2.0
-sparc                randconfig-001-20250225    gcc-14.2.0
-sparc                randconfig-002-20250225    gcc-14.2.0
-sparc64              randconfig-001-20250225    gcc-14.2.0
-sparc64              randconfig-002-20250225    gcc-14.2.0
-um                              allmodconfig    clang-21
-um                              allyesconfig    gcc-12
-um                   randconfig-001-20250225    clang-21
-um                   randconfig-002-20250225    gcc-12
-x86_64                           allnoconfig    clang-19
-x86_64                          allyesconfig    clang-19
-x86_64     buildonly-randconfig-001-20250225    gcc-12
-x86_64     buildonly-randconfig-002-20250225    clang-19
-x86_64     buildonly-randconfig-003-20250225    clang-19
-x86_64     buildonly-randconfig-004-20250225    gcc-11
-x86_64     buildonly-randconfig-005-20250225    gcc-12
-x86_64     buildonly-randconfig-006-20250225    clang-19
-x86_64                             defconfig    gcc-11
-xtensa               randconfig-001-20250225    gcc-14.2.0
-xtensa               randconfig-002-20250225    gcc-14.2.0
+We might need to check if other devices have such behavior, perhaps
+the headset is saving the last bearer it connected to so it tries to
+restore it or something like that, this may messes up with that, in
+the other hand the bearer can be selected even before first connecting
+so we may decide to default to bredr instead of last seen for this
+type of devices (Classic+LE Audio).
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Anyway there are some pieces left that I still need to implement like
+save the bearer in the storage so when the daemon is reloaded, or in
+case of reboot, it restores the last mode properly.
+
+--=20
+Luiz Augusto von Dentz
