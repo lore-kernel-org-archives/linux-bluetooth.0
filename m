@@ -1,67 +1,67 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B032147FA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 22:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E38620E31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 22:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740520870; cv=none; b=JupWuBZLnWxT8l2AhQ2nGPCBeXSQASqaaIsCych80AdIKaa9bzqVpyusT2PSWaOclL0VgkxRSI98Az5y3SWOlMCoIiW/I6QjTuyLUk7eObKcTMAhKC/w2oURpBRH4oGmtlxA06S4tewj18OMoVw36aZa57gyAHh2yc5FOXS8mOk=
+	t=1740520872; cv=none; b=S/x1N1VcSs68jHk9A99N3exL5zOXU0wirLgGFYz91Zbepo8TzSSIH8VwNjOJaCaoVwVGeaOqITKESEavZPDNxJw+FGeeqJMOl361vAki1Hu0IArDopIe+k76FPNnHBKlnmpkiAJy0I17i4MOBuIXp/xkUA3ho9ypO4fFUG931gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740520870; c=relaxed/simple;
-	bh=hxl2QBjIYMEuHwFn89b/7PlrV51RyNaHCiIwfV6ue+A=;
+	s=arc-20240116; t=1740520872; c=relaxed/simple;
+	bh=2qx9GwFfGm/Atsf8mteW/2Zs6/W8gajiBHjSum0S5kI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u/YJCmGi6tkAZICEfm0586X9SZZw0hgQyYTob/JcHVjTK8z0zhDQLbkGZl6PzTILrI8W2dYWZvZsQFr1iqU62jQPCsutzzZbzeDMefYY0Qeeqxi9BdkMyFxaXzesSP6Gloo+GsTT+SPWE1u8HYFyslTHM72wm3Yk7MUqz9+AKhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ajo0pIOW; arc=none smtp.client-ip=209.85.221.174
+	 MIME-Version; b=kHeLdXt6YBzjE3aABbTQLcBBur+0HXkG6CnjET1/Kq7wQs6ImjuUyDjoW5iXNWwHbnpOJgXqfrtu9i3Hk5Mj5+XeDZeW4Bvesq76RkdaQPvpP9vUklaIXARzYoF7w60F8/l0n69vH+Wzjseg4WaVpK425uFpIXg6NTwcUTeyuYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DEytnB6Z; arc=none smtp.client-ip=209.85.217.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ajo0pIOW"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5209ea469e9so186502e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 14:01:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DEytnB6Z"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4be75b2bbceso2103559137.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 14:01:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740520867; x=1741125667; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740520870; x=1741125670; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zkSP9ZgK4CLN4L76ja/nU7mk9o0BiM7eVmUu4dIaAnE=;
-        b=ajo0pIOWoq+IY14ReOQmPw15UHtstoTk3i0aucbI7jmlDs5ypZkvBV1dyxMJhuZVds
-         rFIaTp+TYN/h5LXcMzzQ4U63gVzttzCxAZVN5P2MYgcvV+QCDX9sL3zhbEszZJrrgJua
-         CDOsj0gNB7aT3NLJxYoAK3lnTVo4NP8+CJOFSm3LXfIMJENfQgdD/64+Vmyvm2gbmuJv
-         K2xebUGwUx7xgFGLQIsH05E0V4h1p+uLv2ZgTjtycEN8SF8+opBaU4VbK9KXi7mWLtbg
-         xHvHwDkWuLURjCBmH4mZBlottTY2ORe6zoSCnMvsV4jn70BJ8ByibuBb8SPlbYEzL7ln
-         8Zdw==
+        bh=dAGe+QBkDTuxpOYnGPVHdAhCibFrbVZNPHp1Uilvl9M=;
+        b=DEytnB6Z5jISYn1Vl+Dw6DN9QqNkpwXfkHPHNT2N5YRZi/RroNXXU9L7QmLBMHcrHC
+         44XhLZgX0QzBZYetIKNZeWPxNIpSrnAW49FDxItcboX/wpuiokd1MwZuQD6tf5BI+v9X
+         gDQC5espR87E496P2Yw8YtYIv2U3yU81AOD4QbpATv7bQQ3ypMJF1ZwqI6rKnuQn6A79
+         qn2m0wagwyTF2Zpm/MQObEVkIZnD9Ne+QfEvFtTX12skrIm9vvXw8TpsRjBABQsTtRYO
+         qTz7WEgjhG/UrJdbGEUuR5yd2cxxJ0sxN0ybDdZdzaEP2RqJ1eAssWbb13vBqTLFLiPc
+         /l3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740520867; x=1741125667;
+        d=1e100.net; s=20230601; t=1740520870; x=1741125670;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zkSP9ZgK4CLN4L76ja/nU7mk9o0BiM7eVmUu4dIaAnE=;
-        b=Vxu/llSk90KDZs0tIl7tv2ZFz7lzsBleJGjvKURF0xdtzD9RdLWhH2Ad6blPN41JNh
-         alFVymNoDx/7DpI/ckoGK/2HBFM+LXZ9xdwpQRUQsTjFvQqKNSO2hz/tp6i61vIzOYPI
-         r6YidUJcZ3lpq5VbHVSJDGp8yStLvQQvYalK7jOe/gOJ0kQFF81l+FJwy6tzkGfbkXEt
-         OdteKwfsYJ4uzF6ugORCjRMiIqY+7tyCBX6ZpH+4vOPdzFtGlMofuyGcDaykB3jwoCPW
-         J+crOXLG7NGpAWvz3GoChr2QNV0ujyVG6IBBUFBBR9uKWESSzijjRSASatGN6ahP6fI4
-         q9Yg==
-X-Gm-Message-State: AOJu0YywjxEujUOtC+DuyX2kE/lsw0SitFYrRUGs4jLMekyeE/KYbAIp
-	HpK+0tuJW7N3Vz1RrxWdUoPyILqo5hrS0uZsOlLW5aB1XWyMiQpYdKJiIwLu
-X-Gm-Gg: ASbGncu3UBRU3RhxDlqT6gkT6VWyBudZ6RdAVhi0MfyfuYCLIW/ZTNPZz1ydsd0fNGV
-	8Urex7DMMUHp+PxAXWBFQ3F770TSEv2DaVZSkrLw6fGMm+K75kRrdaA9mimxMIjVUIvdG2Bav7H
-	8p24X27zJkiq8QB4hv2HKsOND4oP5Dr+vxrkTy0HU0JWqDdRuWFX6C05iZEofkyxF7v31mXPH1k
-	6HCAs4Vp14JFgnf9zpoAZ/jL5E477/9o7NqcINJ2qrozYrBRACmKMR3fkav6U98CWQdAX7YMi+Q
-	bzBUHH4DfvMpnlVfVn41yxC8DOiJLvb3NewOo7ZwD/qlSx8KmRVlIksiRhAub8P5F1Jswec=
-X-Google-Smtp-Source: AGHT+IH+mwbONuaaqULBYbeAMxTFFlL/vIOIe6bJzb2XFOVyUtPDvs66KOUQp6/zNlKOgtkU8UX2Mw==
-X-Received: by 2002:ac5:c92c:0:b0:520:9883:29c2 with SMTP id 71dfb90a1353d-521dcfc4539mr10227996e0c.6.1740520867012;
-        Tue, 25 Feb 2025 14:01:07 -0800 (PST)
+        bh=dAGe+QBkDTuxpOYnGPVHdAhCibFrbVZNPHp1Uilvl9M=;
+        b=Ku519qKcJHYKD1OGl+Nb7bXm+KKdV8Kz1Yf4KfZjYd2LGAi3NfXRxQ8VgWQAZ04/0n
+         CIPhJ7tWEmMze7HL5G7K5HzYFTdyb0LcHqJ17pDQ2kCn+MI/ONwWuOXZQbcCP0QxTtsd
+         GYZyxPuSJ13HoxV5XvJGChJ24Oe9+zGc5qZKsV4iPC6tz+bt4JX+V7wihIsHGYJUL70C
+         5TWdi5maN7UFKqZjFZKx2m3h+SyrAzEQxx4L9hkg1dXosP7NZYU9NQw7mXtf10KBXjjL
+         afKZc4ZzhNWGPHWj18m/cetQnMVFmDnGZz90cFaPfe6YTduf80eWXQJ49cvQZiVkTGE9
+         xQZg==
+X-Gm-Message-State: AOJu0YyRFBMZVWUjImS11jJ56WJ1gCFuuSw8c6gRw1345JXRQaATqRMt
+	A5FqS6dTCmshP1I6M1WOCDbgMmv11N9yTV2pwCQ8gOQ/OISTOwxKEYo4pNgF
+X-Gm-Gg: ASbGncuvohjDTN1WMzNmZ9+RkuoInyFYOITu9EWKY839CmqheK1h3lAfjKY5mwfEz55
+	wbEryarcumT3KGbYWcxdxtOy0jYy2Z3p+TWEEWuanU3j/v4YrgU7hja//jJod3H0LoxGWrFjpze
+	qGg7JVil4I+xgU4qHTu8mML9aAVROOzW/Jtw7GGeQxTKLthLkGPnPUDjCTPJVKe/BjeYxuaOnEz
+	lNi4AsOL8580EpOgqciw4jXbLqLcsavB//Gdqy0atNlC/qBgDfpuu2HDNoRdY8k3jCMqDyZ/uFO
+	RlDCE4XmfYufvGkV6vaT2xlDZeWXGBpAKy4r9Bm7DmNkOdIGbFEkZygvFxWz7VLtCCCAmBg=
+X-Google-Smtp-Source: AGHT+IEPpu6UOmlqyIri8VERvmMrlkunXH3J/oJcfwP5Tnnm8lBp+wrd6vb9AKcPoKxVQiDXoUJMcQ==
+X-Received: by 2002:a05:6102:32cc:b0:4bb:d688:9bf8 with SMTP id ada2fe7eead31-4bfc27ed54fmr10110003137.13.1740520869685;
+        Tue, 25 Feb 2025 14:01:09 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86b1ed4e428sm494863241.13.2025.02.25.14.01.03
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86b1ed4e428sm494863241.13.2025.02.25.14.01.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 14:01:05 -0800 (PST)
+        Tue, 25 Feb 2025 14:01:08 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/3] device: Add implementation of PreferredBearer
-Date: Tue, 25 Feb 2025 17:00:58 -0500
-Message-ID: <20250225220059.2821394-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/3] client: Add support get/set PreferredBearer
+Date: Tue, 25 Feb 2025 17:00:59 -0500
+Message-ID: <20250225220059.2821394-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250225220059.2821394-1-luiz.dentz@gmail.com>
 References: <20250225220059.2821394-1-luiz.dentz@gmail.com>
@@ -75,137 +75,89 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds initial implementation of PreferredBearer.
----
- src/device.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 92 insertions(+), 3 deletions(-)
+This adds support for PreferredBearer which is printed with the likes of
+info command:
 
-diff --git a/src/device.c b/src/device.c
-index ec97fc889056..75ae1f0d027e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -152,6 +152,7 @@ struct svc_callback {
+bluetoothctl> info <addr>
+...
+	PreferredBearer: last-seen
+
+It also introduces a new command to get/set the PreferredBearer:
+
+[bluetoothctl]> bearer --help
+Get/Set preferred bearer
+Usage:
+	 bearer <dev> [last-seen/bredr/le]
+
+[bluetoothctl]> bearer <addr>
+	PreferredBearer: last-seen
+[bluetoothctl]> bearer <addr> le
+bluetoothd: @ MGMT Command: Add Device (0x0033) plen 8
+        LE Address: <addr>
+        Action: Auto-connect remote device (0x02)
+[CHG] Device <addr> PreferredBearer: le
+Changing le succeeded
+[bluetoothctl]> bearer <addr>
+	PreferredBearer: le
+[bluetoothctl]> bearer <addr> bredr
+bluetoothd: @ MGMT Command: Remove Device (0x0034) plen 7
+        LE Address: <addr>
+[CHG] Device <addr> PreferredBearer: bredr
+Changing bredr succeeded
+---
+ client/main.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/client/main.c b/client/main.c
+index feb21a1163d2..76c9bc329c96 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1714,6 +1714,7 @@ static void cmd_info(int argc, char *argv[])
+ 	print_property(proxy, "AdvertisingFlags");
+ 	print_property(proxy, "AdvertisingData");
+ 	print_property(proxy, "Sets");
++	print_property(proxy, "PreferredBearer");
  
- /* Per-bearer (LE or BR/EDR) device state */
- struct bearer_state {
-+	bool prefer;
- 	bool paired;
- 	bool bonded;
- 	bool connected;
-@@ -2543,10 +2544,12 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
- 	time_t bredr_last = NVAL_TIME, le_last = NVAL_TIME;
- 	time_t current = time(NULL);
+ 	battery_proxy = find_proxies_by_path(battery_proxies,
+ 					g_dbus_proxy_get_path(proxy));
+@@ -2086,6 +2087,30 @@ static void cmd_wake(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ }
  
--	/* Prefer bonded bearer in case only one is bonded */
--	if (dev->bredr_state.bonded && !dev->le_state.bonded )
-+	/* Use preferred bearer or bonded bearer in case only one is bonded */
-+	if (dev->bredr_state.prefer ||
-+			(dev->bredr_state.bonded && !dev->le_state.bonded))
- 		return BDADDR_BREDR;
--	else if (!dev->bredr_state.bonded && dev->le_state.bonded)
-+	else if (dev->le_state.prefer ||
-+			(!dev->bredr_state.bonded && dev->le_state.bonded))
- 		return dev->bdaddr_type;
- 
- 	/* If the address is random it can only be connected over LE */
-@@ -3340,6 +3343,88 @@ static const GDBusMethodTable device_methods[] = {
- 	{ }
- };
- 
-+static const char *device_prefer_bearer_str(struct btd_device *device)
++static void cmd_bearer(int argc, char *argv[])
 +{
-+	if (device->bredr_state.prefer)
-+		return "bredr";
-+	else if (device->le_state.prefer)
-+		return "le";
-+	else
-+		return "last-seen";
-+}
++	GDBusProxy *proxy;
++	char *str;
 +
-+static gboolean
-+dev_property_get_prefer_bearer(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *device = data;
-+	const char *str = device_prefer_bearer_str(device);
++	proxy = find_device(argc, argv);
++	if (!proxy)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &str);
-+
-+	return TRUE;
-+}
-+
-+static void
-+dev_property_set_prefer_bearer(const GDBusPropertyTable *property,
-+					 DBusMessageIter *value,
-+					 GDBusPendingPropertySet id, void *data)
-+{
-+	struct btd_device *device = data;
-+	const char *str;
-+
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING) {
-+		g_dbus_pending_property_error(id,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
++	if (argc <= 2) {
++		print_property(proxy, "PreferredBearer");
 +		return;
 +	}
 +
-+	dbus_message_iter_get_basic(value, &str);
++	str = strdup(argv[2]);
 +
-+	if (strcasecmp(str, "last-seen") == 0) {
-+		device->bredr_state.prefer = false;
-+		device->le_state.prefer = false;
-+	} else if (strcasecmp(str, "bredr") == 0) {
-+		device->bredr_state.prefer = true;
-+		device->le_state.prefer = false;
-+		/* Remove device from auto-connect list so the kernel does not
-+		 * attempt to auto-connect to it in case it starts advertising.
-+		 */
-+		device_set_auto_connect(device, FALSE);
-+	} else if (strcasecmp(str, "le") == 0) {
-+		device->le_state.prefer = true;
-+		device->bredr_state.prefer = false;
-+		/* Add device to auto-connect list */
-+		device_set_auto_connect(device, TRUE);
-+	} else {
-+		g_dbus_pending_property_error(id,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
++	if (g_dbus_proxy_set_property_basic(proxy, "PreferredBearer",
++					DBUS_TYPE_STRING, &str,
++					generic_callback, str, free))
 +		return;
-+	}
 +
-+	g_dbus_emit_property_changed(dbus_conn, device->path,
-+					DEVICE_INTERFACE, "PreferredBearer");
-+
-+	g_dbus_pending_property_success(id);
++	return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +}
 +
-+static gboolean
-+dev_property_prefer_bearer_exists(const GDBusPropertyTable *property,
-+						void *data)
-+{
-+	struct btd_device *device = data;
-+
-+	/* Check if both BR/EDR and LE bearer are connected/bonded */
-+	if ((device->bredr_state.connected || device->bredr_state.bonded) &&
-+			device->le_state.connected || device->le_state.bonded)
-+		return TRUE;
-+
-+	/* Check if both BR/EDR and LE are connectable */
-+	return device->bredr_state.connectable && device->le_state.connectable;
-+}
-+
- static const GDBusPropertyTable device_properties[] = {
- 	{ "Address", "s", dev_property_get_address },
- 	{ "AddressType", "s", property_get_address_type },
-@@ -3378,6 +3463,10 @@ static const GDBusPropertyTable device_properties[] = {
- 				dev_property_wake_allowed_exist },
- 	{ "Sets", "a{oa{sv}}", dev_property_get_set, NULL,
- 				dev_property_set_exists },
-+	{ "PreferredBearer", "s", dev_property_get_prefer_bearer,
-+				dev_property_set_prefer_bearer,
-+				dev_property_prefer_bearer_exists,
-+				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
+ static void cmd_list_attributes(int argc, char *argv[])
+ {
+ 	GDBusProxy *proxy;
+@@ -3247,6 +3272,8 @@ static const struct bt_shell_menu main_menu = {
+ 							dev_generator },
+ 	{ "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake support",
+ 							dev_generator },
++	{ "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
++				"Get/Set preferred bearer", dev_generator },
+ 	{ } },
  };
  
 -- 
