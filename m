@@ -1,165 +1,154 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E38620E31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 22:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7667C19415E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 22:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740520872; cv=none; b=S/x1N1VcSs68jHk9A99N3exL5zOXU0wirLgGFYz91Zbepo8TzSSIH8VwNjOJaCaoVwVGeaOqITKESEavZPDNxJw+FGeeqJMOl361vAki1Hu0IArDopIe+k76FPNnHBKlnmpkiAJy0I17i4MOBuIXp/xkUA3ho9ypO4fFUG931gc=
+	t=1740521226; cv=none; b=lNp10i1wSeWKjgmZqM2pHq4yiVevgTEwvrB6/z/mi5HSDgQ1qDkX9/wni1EH9XARl4Ixyi6D8wc1ayQ5oT8fz2YVIu6RMlgLoEv80bClj0wgztbz7hFrY9pjQspvjT8i1pB/vcY1ef+PCRl+8PannnlhG712uqcvVumOy9G44bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740520872; c=relaxed/simple;
-	bh=2qx9GwFfGm/Atsf8mteW/2Zs6/W8gajiBHjSum0S5kI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kHeLdXt6YBzjE3aABbTQLcBBur+0HXkG6CnjET1/Kq7wQs6ImjuUyDjoW5iXNWwHbnpOJgXqfrtu9i3Hk5Mj5+XeDZeW4Bvesq76RkdaQPvpP9vUklaIXARzYoF7w60F8/l0n69vH+Wzjseg4WaVpK425uFpIXg6NTwcUTeyuYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DEytnB6Z; arc=none smtp.client-ip=209.85.217.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1740521226; c=relaxed/simple;
+	bh=0iQkApzU9h6eT1uu+Vdd0WuEQXUc3BVJxQPxVbmhSec=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=MnUDSawHeJoRHLopRrm8TlrrEmehpYZyUaJ9BGr0bC6Cp/i8ZGc7UxB55bwV6XHdHoD2xw0lvermqIWRTTzdPe9ta9T9rT9j+ZTUwQTYGWKazuROw0VYHQ1G6Q4xK1rxqLJQdQKYklyPs6328qu9UPBB9/TI14yISqUZPWwlVrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F2W9JkzX; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DEytnB6Z"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4be75b2bbceso2103559137.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 14:01:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740520870; x=1741125670; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dAGe+QBkDTuxpOYnGPVHdAhCibFrbVZNPHp1Uilvl9M=;
-        b=DEytnB6Z5jISYn1Vl+Dw6DN9QqNkpwXfkHPHNT2N5YRZi/RroNXXU9L7QmLBMHcrHC
-         44XhLZgX0QzBZYetIKNZeWPxNIpSrnAW49FDxItcboX/wpuiokd1MwZuQD6tf5BI+v9X
-         gDQC5espR87E496P2Yw8YtYIv2U3yU81AOD4QbpATv7bQQ3ypMJF1ZwqI6rKnuQn6A79
-         qn2m0wagwyTF2Zpm/MQObEVkIZnD9Ne+QfEvFtTX12skrIm9vvXw8TpsRjBABQsTtRYO
-         qTz7WEgjhG/UrJdbGEUuR5yd2cxxJ0sxN0ybDdZdzaEP2RqJ1eAssWbb13vBqTLFLiPc
-         /l3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740520870; x=1741125670;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dAGe+QBkDTuxpOYnGPVHdAhCibFrbVZNPHp1Uilvl9M=;
-        b=Ku519qKcJHYKD1OGl+Nb7bXm+KKdV8Kz1Yf4KfZjYd2LGAi3NfXRxQ8VgWQAZ04/0n
-         CIPhJ7tWEmMze7HL5G7K5HzYFTdyb0LcHqJ17pDQ2kCn+MI/ONwWuOXZQbcCP0QxTtsd
-         GYZyxPuSJ13HoxV5XvJGChJ24Oe9+zGc5qZKsV4iPC6tz+bt4JX+V7wihIsHGYJUL70C
-         5TWdi5maN7UFKqZjFZKx2m3h+SyrAzEQxx4L9hkg1dXosP7NZYU9NQw7mXtf10KBXjjL
-         afKZc4ZzhNWGPHWj18m/cetQnMVFmDnGZz90cFaPfe6YTduf80eWXQJ49cvQZiVkTGE9
-         xQZg==
-X-Gm-Message-State: AOJu0YyRFBMZVWUjImS11jJ56WJ1gCFuuSw8c6gRw1345JXRQaATqRMt
-	A5FqS6dTCmshP1I6M1WOCDbgMmv11N9yTV2pwCQ8gOQ/OISTOwxKEYo4pNgF
-X-Gm-Gg: ASbGncuvohjDTN1WMzNmZ9+RkuoInyFYOITu9EWKY839CmqheK1h3lAfjKY5mwfEz55
-	wbEryarcumT3KGbYWcxdxtOy0jYy2Z3p+TWEEWuanU3j/v4YrgU7hja//jJod3H0LoxGWrFjpze
-	qGg7JVil4I+xgU4qHTu8mML9aAVROOzW/Jtw7GGeQxTKLthLkGPnPUDjCTPJVKe/BjeYxuaOnEz
-	lNi4AsOL8580EpOgqciw4jXbLqLcsavB//Gdqy0atNlC/qBgDfpuu2HDNoRdY8k3jCMqDyZ/uFO
-	RlDCE4XmfYufvGkV6vaT2xlDZeWXGBpAKy4r9Bm7DmNkOdIGbFEkZygvFxWz7VLtCCCAmBg=
-X-Google-Smtp-Source: AGHT+IEPpu6UOmlqyIri8VERvmMrlkunXH3J/oJcfwP5Tnnm8lBp+wrd6vb9AKcPoKxVQiDXoUJMcQ==
-X-Received: by 2002:a05:6102:32cc:b0:4bb:d688:9bf8 with SMTP id ada2fe7eead31-4bfc27ed54fmr10110003137.13.1740520869685;
-        Tue, 25 Feb 2025 14:01:09 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86b1ed4e428sm494863241.13.2025.02.25.14.01.07
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 14:01:08 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/3] client: Add support get/set PreferredBearer
-Date: Tue, 25 Feb 2025 17:00:59 -0500
-Message-ID: <20250225220059.2821394-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250225220059.2821394-1-luiz.dentz@gmail.com>
-References: <20250225220059.2821394-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F2W9JkzX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740521225; x=1772057225;
+  h=date:from:to:cc:subject:message-id;
+  bh=0iQkApzU9h6eT1uu+Vdd0WuEQXUc3BVJxQPxVbmhSec=;
+  b=F2W9JkzXqyHXmBjeJp3cXtEUtRWzkhVsGjBuo4VLl4TlAtH8B1w1Yag0
+   1GTmQhGlihyeWeFE7F5VFfo15pDIS9L0+saHxQGIPFHcU5Z2tSYCgMWiR
+   BGDhQaMozuylWD/6FMOf1sbi8BTnlT+ox8m0EJf/hOSitMRpIJznV7JqI
+   UEKW48tCuSNK/pfp05TKVxCKdcaGW6eIGdujensyKeUHtKFWjZz0KqDRX
+   pgsZfzVeuBkYBUL/tPp09aUA8zj/i3PNLGrn8DHL1BiHYnAjrvPSt0JHL
+   zWRrQ73toIXzemN9UDR4n83RI1kEijO8WwyY7vGFyb0xNaictO2jsg+5X
+   A==;
+X-CSE-ConnectionGUID: oZsFSNz6Qu2aFiyg7Y+Y0g==
+X-CSE-MsgGUID: e2SkeQOLTqu1b0tuYPr7Fg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="45264849"
+X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
+   d="scan'208";a="45264849"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 14:07:04 -0800
+X-CSE-ConnectionGUID: Oa5apNa7RsS4kb+5yRUK9w==
+X-CSE-MsgGUID: 0Y6s2RzHTAOPEPS4NvphVg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
+   d="scan'208";a="116529321"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 25 Feb 2025 14:07:02 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tn34u-000AqF-2U;
+	Tue, 25 Feb 2025 22:07:00 +0000
+Date: Wed, 26 Feb 2025 06:06:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ a4ce2f1ccebadfc609ea3e067b9fde469cbc908a
+Message-ID: <202502260635.R9kbEevv-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: a4ce2f1ccebadfc609ea3e067b9fde469cbc908a  Bluetooth: Add check for mgmt_alloc_skb() in mgmt_device_connected()
 
-This adds support for PreferredBearer which is printed with the likes of
-info command:
+elapsed time: 1453m
 
-bluetoothctl> info <addr>
-...
-	PreferredBearer: last-seen
+configs tested: 77
+configs skipped: 1
 
-It also introduces a new command to get/set the PreferredBearer:
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-[bluetoothctl]> bearer --help
-Get/Set preferred bearer
-Usage:
-	 bearer <dev> [last-seen/bredr/le]
+tested configs:
+alpha                           allyesconfig    gcc-14.2.0
+arc                             allmodconfig    gcc-13.2.0
+arc                             allyesconfig    gcc-13.2.0
+arc                  randconfig-001-20250225    gcc-13.2.0
+arc                  randconfig-002-20250225    gcc-13.2.0
+arm                             allmodconfig    gcc-14.2.0
+arm                             allyesconfig    gcc-14.2.0
+arm                  randconfig-001-20250225    gcc-14.2.0
+arm                  randconfig-002-20250225    gcc-14.2.0
+arm                  randconfig-003-20250225    gcc-14.2.0
+arm                  randconfig-004-20250225    clang-15
+arm64                           allmodconfig    clang-18
+arm64                randconfig-001-20250225    clang-19
+arm64                randconfig-002-20250225    clang-17
+arm64                randconfig-003-20250225    clang-15
+arm64                randconfig-004-20250225    clang-21
+csky                 randconfig-001-20250225    gcc-14.2.0
+csky                 randconfig-002-20250225    gcc-14.2.0
+hexagon                         allmodconfig    clang-21
+hexagon                         allyesconfig    clang-18
+hexagon              randconfig-001-20250225    clang-21
+hexagon              randconfig-002-20250225    clang-21
+i386                            allmodconfig    gcc-12
+i386                             allnoconfig    gcc-12
+i386                            allyesconfig    gcc-12
+i386       buildonly-randconfig-001-20250225    clang-19
+i386       buildonly-randconfig-002-20250225    gcc-11
+i386       buildonly-randconfig-003-20250225    clang-19
+i386       buildonly-randconfig-004-20250225    clang-19
+i386       buildonly-randconfig-005-20250225    gcc-12
+i386       buildonly-randconfig-006-20250225    clang-19
+i386                               defconfig    clang-19
+loongarch                       allmodconfig    gcc-14.2.0
+loongarch            randconfig-001-20250225    gcc-14.2.0
+loongarch            randconfig-002-20250225    gcc-14.2.0
+m68k                            allmodconfig    gcc-14.2.0
+m68k                            allyesconfig    gcc-14.2.0
+nios2                randconfig-001-20250225    gcc-14.2.0
+nios2                randconfig-002-20250225    gcc-14.2.0
+parisc               randconfig-001-20250225    gcc-14.2.0
+parisc               randconfig-002-20250225    gcc-14.2.0
+powerpc              randconfig-001-20250225    gcc-14.2.0
+powerpc              randconfig-002-20250225    clang-19
+powerpc              randconfig-003-20250225    clang-21
+powerpc64            randconfig-001-20250225    gcc-14.2.0
+powerpc64            randconfig-002-20250225    gcc-14.2.0
+powerpc64            randconfig-003-20250225    gcc-14.2.0
+riscv                randconfig-001-20250225    clang-15
+riscv                randconfig-002-20250225    clang-21
+s390                            allmodconfig    clang-19
+s390                            allyesconfig    gcc-14.2.0
+s390                 randconfig-001-20250225    clang-15
+s390                 randconfig-002-20250225    gcc-14.2.0
+sh                              allmodconfig    gcc-14.2.0
+sh                              allyesconfig    gcc-14.2.0
+sh                   randconfig-001-20250225    gcc-14.2.0
+sh                   randconfig-002-20250225    gcc-14.2.0
+sparc                           allmodconfig    gcc-14.2.0
+sparc                randconfig-001-20250225    gcc-14.2.0
+sparc                randconfig-002-20250225    gcc-14.2.0
+sparc64              randconfig-001-20250225    gcc-14.2.0
+sparc64              randconfig-002-20250225    gcc-14.2.0
+um                              allmodconfig    clang-21
+um                              allyesconfig    gcc-12
+um                   randconfig-001-20250225    clang-21
+um                   randconfig-002-20250225    gcc-12
+x86_64                           allnoconfig    clang-19
+x86_64                          allyesconfig    clang-19
+x86_64     buildonly-randconfig-001-20250225    gcc-12
+x86_64     buildonly-randconfig-002-20250225    clang-19
+x86_64     buildonly-randconfig-003-20250225    clang-19
+x86_64     buildonly-randconfig-004-20250225    gcc-11
+x86_64     buildonly-randconfig-005-20250225    gcc-12
+x86_64     buildonly-randconfig-006-20250225    clang-19
+x86_64                             defconfig    gcc-11
+xtensa               randconfig-001-20250225    gcc-14.2.0
+xtensa               randconfig-002-20250225    gcc-14.2.0
 
-[bluetoothctl]> bearer <addr>
-	PreferredBearer: last-seen
-[bluetoothctl]> bearer <addr> le
-bluetoothd: @ MGMT Command: Add Device (0x0033) plen 8
-        LE Address: <addr>
-        Action: Auto-connect remote device (0x02)
-[CHG] Device <addr> PreferredBearer: le
-Changing le succeeded
-[bluetoothctl]> bearer <addr>
-	PreferredBearer: le
-[bluetoothctl]> bearer <addr> bredr
-bluetoothd: @ MGMT Command: Remove Device (0x0034) plen 7
-        LE Address: <addr>
-[CHG] Device <addr> PreferredBearer: bredr
-Changing bredr succeeded
----
- client/main.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
-
-diff --git a/client/main.c b/client/main.c
-index feb21a1163d2..76c9bc329c96 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1714,6 +1714,7 @@ static void cmd_info(int argc, char *argv[])
- 	print_property(proxy, "AdvertisingFlags");
- 	print_property(proxy, "AdvertisingData");
- 	print_property(proxy, "Sets");
-+	print_property(proxy, "PreferredBearer");
- 
- 	battery_proxy = find_proxies_by_path(battery_proxies,
- 					g_dbus_proxy_get_path(proxy));
-@@ -2086,6 +2087,30 @@ static void cmd_wake(int argc, char *argv[])
- 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
- }
- 
-+static void cmd_bearer(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+	char *str;
-+
-+	proxy = find_device(argc, argv);
-+	if (!proxy)
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	if (argc <= 2) {
-+		print_property(proxy, "PreferredBearer");
-+		return;
-+	}
-+
-+	str = strdup(argv[2]);
-+
-+	if (g_dbus_proxy_set_property_basic(proxy, "PreferredBearer",
-+					DBUS_TYPE_STRING, &str,
-+					generic_callback, str, free))
-+		return;
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
- static void cmd_list_attributes(int argc, char *argv[])
- {
- 	GDBusProxy *proxy;
-@@ -3247,6 +3272,8 @@ static const struct bt_shell_menu main_menu = {
- 							dev_generator },
- 	{ "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake support",
- 							dev_generator },
-+	{ "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
-+				"Get/Set preferred bearer", dev_generator },
- 	{ } },
- };
- 
--- 
-2.48.1
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
