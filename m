@@ -1,236 +1,125 @@
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2559D22F163
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 18:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6000D41C71
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 19:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740593507; cv=none; b=MJiEjMHVug5vt3spBQUbg/kT339HjxAHrvnx0yn8GIcYM1NrQe9N5XnYQNXVw2gXGp8BN8caCSoMD726Rq2ICCMAQ2aTFrP32H9VaLza/sq8XlSD4Ii+8QaX7R4xRyvlV+PflzpGNeeAe60FMUuvZZ9DIMNnU+WsNoEWVJjzpwA=
+	t=1740597395; cv=none; b=iNNpfyKwTCkbY8AJSP9oG1qddRFmsH7xuoaAC2HjAvkUmuxocmoEPOvyvS5fzTLnINxLQ9zjj6kh2TVrhfrJGl8loT37epsT1Uyu5fDt2M4VbOYqyIrEMYB1fukDgdo1bavUb8bzcHPU9zSM+E2wciRhdAn3hxElUKF/Bof30a8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740593507; c=relaxed/simple;
-	bh=4DWOG/7vaA0lA92dINcbsX6inqNXR5xkFYj0PWRSVIQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zu8Sl3RHoNjHyoaScTmmLcdSwFVnciozEZ4+/VuQABfqJk4geGFfyaCrpr8p+HshHScby3jDumNpvJHdKdME7bvlen9EWX6qYDbw+1cH6yW5nfBoAkggNT+A+Ar8yp1b0zf6QQ4CMZDEcubFfH4U8DpdVGXiCg+JZKMSc+3Z0uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dhwzab40; arc=none smtp.client-ip=209.85.217.46
+	s=arc-20240116; t=1740597395; c=relaxed/simple;
+	bh=m1tlaULFdGdRbVJfwW4vld36EFSQGk5asBzDzeSDyEQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=iKl+0rIet6GtDmjStLnDbtXhpLrZbswPg21J8UV3cWHozT8IQqTp4WSDhr8B953Vy+3SM7elm5ktToB9CXQToGC8rHZuhvb1b7vp2OK1P1yodxDzmvRJsUdwYeK7DOm487GcGCgkla6g4pEogrdClgQel9kN7xIZCQ4oBM54Qr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lJX/SmIZ; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dhwzab40"
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-4bd3a8b88f3so71425137.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 10:11:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJX/SmIZ"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7be49f6b331so14892085a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 11:16:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740593504; x=1741198304; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rMFkHd1q6uurURxgZwux7q4Uho1ru3VqXOk3BkRMwEM=;
-        b=Dhwzab40h6gaf+UsA9L4w0AF2H8Vg+xGrXTzZL8dle8NguCYfb6F470dt+U2AzYmZb
-         B1RjnxAz/yijsETtkPT7jIMh2CJ8kCkft7JBugu0P1Fzgugplg+nmIro6QwjlwllLOuE
-         GMSFSdN1NVHcbqB6gdg05xVE7S3sOdh02u3fywMN+nTKuIQK8Z3bBUMXrzSdkaB+bEjz
-         aLYMwK/rfH8DvVZv8UMqkQZ8QruQtQ2maFbIAPlvB2AQzrejN+d+0kOr66FHcK4rwYrv
-         uZAwBqreWzumIoVJBtuuEOxHKCWRdBVmFiKGkqc8xfccAT6oeGXnLxSN5QK9HVCPvu/0
-         IINg==
+        d=gmail.com; s=20230601; t=1740597393; x=1741202193; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5xszZpzcFM9WJ7pyh9XvTo+QASngDNDRaG5Dl7UXkuU=;
+        b=lJX/SmIZnVVbtPl9+KcDUBM4o2ZLRRyARHlKUBzgGgLQ52913Cqq24kih9xibMtUlZ
+         8iCho3oSAU4e3cQK965jexedrv22+9j4yxxOLEGcTOONAYicn6y6Fq3uSoBFGhDQKrlx
+         GO5PGybMlx3LlC4lGcJORkytLyYbZekei+NkBxsqIlg0V16AqT2i2qH3zPrOzm2eTkp6
+         /WyEm4Wb5NTT8OWqFffTkQSPWTRCwe2QTKJQqQqXyNCv+Ld26xkgzxwTtFweeb4CyPdY
+         sBJ5x2oYB+iP+UEVY1aEm0ZMutgCiS+KUU3e/XdmTSX8Wn5mzwDSzejvvDJJApmATYkD
+         Kpsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740593504; x=1741198304;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rMFkHd1q6uurURxgZwux7q4Uho1ru3VqXOk3BkRMwEM=;
-        b=qYop2f+7vk4UfJdGFG7CZ7AP1o6/Gvyj0cmo0450wq7WpEfhGsexJJh4A6DkQUzxkA
-         PFTYmEjC1TftI5jqdfmKizH1WMtf59NWHPPCA3FSJmu4tMBDuiSI41PnJsLXW0/PUxe8
-         5HzvqbjArXmyOEWGzMgqxlezXVCMa1K+4YpsWxqc1n9Lfy2pKhWITE4iSoeGCLx55O0v
-         mqF7RB4nEQKzFL8BpAEajsC3YhD4niaUswgxo1ObGNgY/qsBZmA5XMoR1cnbOxFtjGsM
-         FsBf7pznAk/n9XtASu+HWcIDngea/t8iUVbxeiMNQlJ2gunMabjzxzYyfju+pQWSzvjJ
-         zaRQ==
-X-Gm-Message-State: AOJu0Yw9EWkJ0gDALFBxnz3QHRkf8AXD4Jc6IiGGKL1GayE4zIMTED3Q
-	qpc7QW1MiDNLkzLawZ/I/BWz4hQRmWU9LaJtTGiY/vWw4dTReS5OKruhJUVx
-X-Gm-Gg: ASbGncsCkQBc+CsNpHJMDVc7ttDCMeAScxnVP1FGFTEb5j7raeL4jp0JTF3cqiZI+z3
-	7LS6m/u2FCIVbuQtnqGkRVhKEXbphxNNhmr9Wv9uwQw5+195qIz88J3sYfuG6ObOnMUAsAILYaD
-	N/d2M3sywDaSvRuQd/YpLcbQZIJXm9oxCSm3UQE6dHTZMXYQKqfG5gz3ICJ7G1C5/5nkt7017FI
-	Nr+yjCIegM4MuP0Wb6gaAWaKZ8AUH4H1NqA/IDKbG7py0uxQgEdunDOYzJowd2gY6WpYdjhayI8
-	gmgpe8yZN5eWCAQzPuSi54VH3mQkToyp0j9I2LopeG0HTxdDVnB+clE9qCBxnfv2mphQvPM=
-X-Google-Smtp-Source: AGHT+IEZWTm5IJlggfSM24nLJ/c4n/eWB3uVtMelPlurgYxKqEQ5S8m5X/WDtZpHUGFrcYZHmLHrfA==
-X-Received: by 2002:a05:6102:32d2:b0:4bb:d64d:8331 with SMTP id ada2fe7eead31-4c01e1ef3cemr3310172137.11.1740593504278;
-        Wed, 26 Feb 2025 10:11:44 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86b1ef052a6sm857744241.27.2025.02.26.10.11.41
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1740597393; x=1741202193;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5xszZpzcFM9WJ7pyh9XvTo+QASngDNDRaG5Dl7UXkuU=;
+        b=mWnxXiIcsoMdBsWgWJpZ1DCEuo4+ghroUMo+z3JYSfDpctgyGOxIm86IyhN8mupBh3
+         Yr9976NCpST4p6VxmOqrvGLbvzivEy518a8/dw0HpFzZZ8ydW4PKRVXo5BVFIWapIyEz
+         puyt66ECOeFyxWP0PCvp9MWoPOKfaN0ug1OFpiFsk0HQSyPNW5PdyLj9TCEOBtzSXV9u
+         pT+wL0lOoJu8/ca/+qaFm2IL1vRA84A0BBUtdcrpxhMQPABpu05x6ekVQT/OQbzn6HkN
+         QMyRzMWEOmc5kbVQgwi0OSUwFkFWfB/BkdocARV8CZxI5Fa5pyNxQUYMwJX8dR4ShNa0
+         0mKQ==
+X-Gm-Message-State: AOJu0Yx8TQcbA9uTWY3l256jEmd2opc7aCZ6L9/XWspg2PiFvEiH4pxr
+	hHfWeJ1k66FNeb/wdbCB7WBjDmoVA/2Y11ipmG5rMohmDfqEIz7D6co+Aw==
+X-Gm-Gg: ASbGncvptN3pzD/tBV0ME/z5UGL5Tr62JJUOLAHke6EoM3RI1ur6ONyDS2e9NvRXJIi
+	qmMAAwfIWs1anSWTV9qb66m3PeCvHuuJ56KGVrcVwUdOacZ6sJ6r+6gEqhAsC+auQ9RXwFULqy1
+	J5w7npX6wGN4LYu9uo+kv86NzljukWGg8VAcvq+/floWtF9Z3f218nwkZpF27i6IxbsLGCH+whP
+	MGbUFw9G5sZZXKB+Z/Qw75vXpBlNph+Ak6T9JfPnSiPxEv40R1IVgdALu5/J6X6AjB2/I+gKJQW
+	tHmLUrCH/6dkYLdutt4Lr6FZlUd1UKmuFqE=
+X-Google-Smtp-Source: AGHT+IFxHNZ8YK7O5gdWdK1ErfanRIVMhhlPJzdh3D7abXWSEiWUwzTAYh9Yo40CNgWvKhLvXPpLUA==
+X-Received: by 2002:a05:620a:4883:b0:7c0:b523:e1ba with SMTP id af79cd13be357-7c0cf953f36mr3105570785a.45.1740597392957;
+        Wed, 26 Feb 2025 11:16:32 -0800 (PST)
+Received: from [172.17.0.2] ([172.183.175.207])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c23c29930asm289251085a.2.2025.02.26.11.16.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 10:11:42 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 4/4] storage: Add support for storing PreferredBearer
-Date: Wed, 26 Feb 2025 13:11:29 -0500
-Message-ID: <20250226181129.2958079-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250226181129.2958079-1-luiz.dentz@gmail.com>
-References: <20250226181129.2958079-1-luiz.dentz@gmail.com>
+        Wed, 26 Feb 2025 11:16:32 -0800 (PST)
+Message-ID: <67bf6890.050a0220.290bf8.c76c@mx.google.com>
+Date: Wed, 26 Feb 2025 11:16:32 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3206856828563519329=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v3,1/4] org.bluez.Device: Introduced PreferredBearer
+In-Reply-To: <20250226181129.2958079-1-luiz.dentz@gmail.com>
+References: <20250226181129.2958079-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3206856828563519329==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds support for storing PreferredBearer into device info file.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=938178
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.23 seconds
+GitLint                       PENDING   0.19 seconds
+BuildEll                      PASS      20.53 seconds
+BluezMake                     PASS      1523.85 seconds
+MakeCheck                     PASS      13.59 seconds
+MakeDistcheck                 PASS      159.75 seconds
+CheckValgrind                 PASS      216.30 seconds
+CheckSmatch                   PASS      285.52 seconds
+bluezmakeextell               PASS      98.01 seconds
+IncrementalBuild              PENDING   0.30 seconds
+ScanBuild                     PASS      866.45 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- doc/settings-storage.txt |  2 ++
- src/device.c             | 66 +++++++++++++++++++++++++++++-----------
- 2 files changed, 51 insertions(+), 17 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 178e7d07bf11..4e9881eedf02 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -293,6 +293,8 @@ Long term key) related to a remote device.
- 			strings		remote in 128-bits UUID format,
- 					separated by ";"
- 
-+  PreferredBearer	String		Preferred bearer for remote device
-+
- 
- [DeviceID] group contains:
- 
-diff --git a/src/device.c b/src/device.c
-index de92e68d2780..9219eb674f87 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -368,10 +368,25 @@ static GSList *find_service_with_uuid(GSList *list, char *uuid)
- 	return NULL;
- }
- 
-+static const char *device_prefer_bearer_str(struct btd_device *device)
-+{
-+	/* Check if both BR/EDR and LE bearer are supported */
-+	if (!device->bredr || !device->le)
-+		return NULL;
-+
-+	if (device->bredr_state.prefer)
-+		return "bredr";
-+	else if (device->le_state.prefer)
-+		return "le";
-+	else
-+		return "last-seen";
-+}
-+
- static void update_technologies(GKeyFile *file, struct btd_device *dev)
- {
- 	const char *list[2];
- 	size_t len = 0;
-+	const char *bearer;
- 
- 	if (dev->bredr)
- 		list[len++] = "BR/EDR";
-@@ -391,6 +406,12 @@ static void update_technologies(GKeyFile *file, struct btd_device *dev)
- 
- 	g_key_file_set_string_list(file, "General", "SupportedTechnologies",
- 								list, len);
-+
-+	/* Store the PreferredBearer in case of dual-mode devices */
-+	bearer = device_prefer_bearer_str(dev);
-+	if (bearer)
-+		g_key_file_set_string(file, "General", "PreferredBearer",
-+							bearer);
- }
- 
- static void store_csrk(struct csrk_info *csrk, GKeyFile *key_file,
-@@ -2080,6 +2101,7 @@ bool btd_device_add_set(struct btd_device *device, bool encrypted,
- static void device_set_auto_connect(struct btd_device *device, gboolean enable)
- {
- 	char addr[18];
-+	const char *bearer;
- 
- 	if (!device || !device->le || device_address_is_private(device))
- 		return;
-@@ -2100,6 +2122,11 @@ static void device_set_auto_connect(struct btd_device *device, gboolean enable)
- 		return;
- 	}
- 
-+	/* Inhibit auto connect if BR/EDR bearer is preferred */
-+	bearer = device_prefer_bearer_str(device);
-+	if (bearer && !strcasecmp(bearer, "bredr"))
-+		return;
-+
- 	/* Enabling auto connect */
- 	adapter_auto_connect_add(device->adapter, device);
- 
-@@ -3343,16 +3370,6 @@ static const GDBusMethodTable device_methods[] = {
- 	{ }
- };
- 
--static const char *device_prefer_bearer_str(struct btd_device *device)
--{
--	if (device->bredr_state.prefer)
--		return "bredr";
--	else if (device->le_state.prefer)
--		return "le";
--	else
--		return "last-seen";
--}
--
- static gboolean
- dev_property_get_prefer_bearer(const GDBusPropertyTable *property,
- 				DBusMessageIter *iter, void *data)
-@@ -3382,6 +3399,7 @@ dev_property_set_prefer_bearer(const GDBusPropertyTable *property,
- 
- 	dbus_message_iter_get_basic(value, &str);
- 
-+	/* Check if current preferred bearer is the same */
- 	if (!strcasecmp(device_prefer_bearer_str(device), str))
- 		goto done;
- 
-@@ -3407,6 +3425,8 @@ dev_property_set_prefer_bearer(const GDBusPropertyTable *property,
- 		return;
- 	}
- 
-+	store_device_info(device);
-+
- 	g_dbus_emit_property_changed(dbus_conn, device->path,
- 					DEVICE_INTERFACE, "PreferredBearer");
- 
-@@ -3420,13 +3440,7 @@ dev_property_prefer_bearer_exists(const GDBusPropertyTable *property,
- {
- 	struct btd_device *device = data;
- 
--	/* Check if both BR/EDR and LE bearer are connected/bonded */
--	if ((device->bredr_state.connected || device->bredr_state.bonded) &&
--			(device->le_state.connected || device->le_state.bonded))
--		return TRUE;
--
--	/* Check if both BR/EDR and LE are connectable */
--	return device->bredr_state.connectable && device->le_state.connectable;
-+	return device_prefer_bearer_str(device) != NULL;
- }
- 
- static const GDBusPropertyTable device_properties[] = {
-@@ -3996,6 +4010,24 @@ static void load_info(struct btd_device *device, const char *local,
- 
- 	g_strfreev(techno);
- 
-+	/* Load preferred bearer */
-+	str = g_key_file_get_string(key_file, "General", "PreferredBearer",
-+								NULL);
-+	if (str) {
-+		if (!strcasecmp(str, "last-seen")) {
-+			device->bredr_state.prefer = false;
-+			device->le_state.prefer = false;
-+		} else if (!strcasecmp(str, "bredr")) {
-+			device->bredr_state.prefer = true;
-+			device->le_state.prefer = false;
-+		} else if (!strcasecmp(str, "le")) {
-+			device->le_state.prefer = true;
-+			device->bredr_state.prefer = false;
-+		}
-+
-+		g_free(str);
-+	}
-+
- next:
- 	/* Load trust */
- 	device->trusted = g_key_file_get_boolean(key_file, "General",
--- 
-2.48.1
 
+--===============3206856828563519329==--
