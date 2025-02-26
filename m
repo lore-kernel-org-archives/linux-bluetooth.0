@@ -1,141 +1,161 @@
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E6C3596D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 06:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6652819DF62
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 07:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740550703; cv=none; b=CsO2trG3NrgUn7VtaYtoxUfnVKBNkTcqIRceaaP168wrw2TVm6KukWunwa68K+MzwdM/AfC7Xg054aIhW6hMXnWo26ZUPJ5/7QKZJiLlTISlv5Ov62QKILHgb1H1nzggwgWo3qjr9RBnI5ZXbJcAhg8GSawoh3Nzm0oRslWUiAY=
+	t=1740553904; cv=none; b=GJW2yi80qme34oB4DknpQlHioub0XLAHj5qbR2L7aD4VErdFa4PResZuX3Q62rFErk0f8V9ecZaSsxNXojmzNMwIfVWmJjDfJ5I67XcqJtNA4h5vwjUbjukUA+7jGFxHbfnK5S/x0gkP3dk8Ba2FjYAq7XnOmjLuM2HFkRFxiqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740550703; c=relaxed/simple;
-	bh=JryWq7WV8uNmBfkhQojR45hf3u/Eku7l7OsIR6FXLt4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BcxLkbn0NNwO3XZtfzPqAld4Cmq3VR//vnai6VroYeZoGuWHE9YDFzCtoDWyuRsS1RamF+dHAUJTD6ONM4x9zRkPh2dQf86CbMSpaQ7UWuf2tnm/BahUbUO1RHHVIzPB+PUr05yzY8HEMWwgR7fd+tRY7t4WSiy79EV1CNyRudw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d2b6d933a3so111594005ab.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2025 22:18:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740550701; x=1741155501;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KkxgE/b/3yDI6a3ezLAF95DWpHfHSO/kSkJ/250V8Pw=;
-        b=WcfwO15dU0H/OLytq93HR1ZhDjN6MFUvN9WO9IGwVRkiW3wl9NfVRa2GlwB76eensA
-         8OExhwEuPS8jhKCVl4kbDG3R9fIMkeGfHPYAKfRBpeITQm/rylN1SUMWgZqKPxZFdjnM
-         sk29VsWkK+n9LqX0B6fNur2Mbbhnbsv6JEiCM8YpaxOJLFPV4U7oFtYM814lQe+2wpwQ
-         aMfG4jV4GpwvwKp91T5t6qIPGwDIVvJsmhgNLHVAXLgUDDr8NdakOLuStIb1b4VSQMx/
-         nKhlP+GsvxsfEyWFfjoAZd5AVgMWzK4435XX6RHcXDBYSPVKU00M0aD6TKxUZ25wxyWy
-         2WHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAVO+2LiSxIAORgxFw7dYSfKOUEHtRp7D8V8ZY2dCqgYPj+oxL6FKPM7AkN2UV6qjaO+HDgA+nf2fsJGGBkXY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyRNzBjD8+2C4i4th40cpjqiv3hs+W4TVcPC4pfXyjASrgadVX
-	zktwBFTqYFSvdjxHtd+fS63PjPPN5Dt3Lzwv0FtYY+eOq7aauG2ube1pZfNxt1lcfNgTrP5MWj9
-	/DOxObYctUU2fXzlOVLtJtnQtxjw90rvCoxP1TnxsI48YbI5yTP7vhHA=
-X-Google-Smtp-Source: AGHT+IFdIux2xCtFwI+X+/UDsvvVlScy23UF65J2zNj1GVC4lv0CCjLGdoMoDNbuKgtiI8OrR3OPi0YijYbRJGd/OibgL9Kcz2RE
+	s=arc-20240116; t=1740553904; c=relaxed/simple;
+	bh=YnHDWkp366tU72mr3vfJJ10ZNvw9SQcGSIwvgOoYZVU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tj8bXnXwYE9tThds4sjyjkmQStKDLIz0E1bzWuiNYrtccS1eg6Y6FLrpkWYSfsyxKGypYExZKV57cl5tftCLxhDifIBdKuO8EkugL0pzw6ZHW+lcdfmkCnUntJVyw0FWWExMGKjZMtvttWmcwFxmY6F9JJXRigWekr1SOKv5lkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=pHFbvLMD; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pHFbvLMD"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51PMWqqR011767;
+	Wed, 26 Feb 2025 07:11:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	YnHDWkp366tU72mr3vfJJ10ZNvw9SQcGSIwvgOoYZVU=; b=pHFbvLMDswFkfMgm
+	ib4tWxT1MJVfcs5Gec4sLISIWbY8p/XkRxiFi+d7a5CNwCBkR6Lpq1ZLDS6qNHbU
+	O2iwmkMtyTp6Kk1WWXo4A6WVvrdBTr2sec3+FiUUgPeOkGybjxySgQ9JCr7BbP9m
+	pEi9LDkXlVKXjcCkI3EdIO7CawNfaxw6VMh6eLbXEB796re5H39Dtmp/5GNmIbKU
+	eQHJEcCKoISx69w3+rf4MJEv5XWcJ2K+dsUaatShYbFOxuTBQpjzyiwrt40gpV0r
+	L9RkoXq+y2OS+KRnnv/1kvD2yG2tOJUiaxbEt5NeQeWQR1wlw/SNi7DQX0OMXoCl
+	kEzDIw==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 451prmh2qh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Feb 2025 07:11:32 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51Q7BVSS013214
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Feb 2025 07:11:31 GMT
+Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 25 Feb 2025 23:11:31 -0800
+Received: from nasanex01c.na.qualcomm.com ([fe80::ba75:b71c:16c5:acbd]) by
+ nasanex01c.na.qualcomm.com ([fe80::ba75:b71c:16c5:acbd%13]) with mapi id
+ 15.02.1544.009; Tue, 25 Feb 2025 23:11:31 -0800
+From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>,
+        "Harish Bandi
+ (QUIC)" <quic_hbandi@quicinc.com>,
+        "Anubhav Gupta (QUIC)"
+	<quic_anubhavg@quicinc.com>
+Subject: RE: [RESEND PATCH v2] obex: Add messages_get_message() implementation
+ for MAP plugin
+Thread-Topic: [RESEND PATCH v2] obex: Add messages_get_message()
+ implementation for MAP plugin
+Thread-Index: AQHbhqz8Fby1kSofWUKSdWO0MVNjsLNXApWAgAIlZTA=
+Date: Wed, 26 Feb 2025 07:11:31 +0000
+Message-ID: <1937d5048f91464a8bb32fe2466a94b8@quicinc.com>
+References: <20250224111056.3255513-1-quic_amisjain@quicinc.com>
+ <98149822-8ac9-4099-bb44-16f79419ddc3@molgen.mpg.de>
+In-Reply-To: <98149822-8ac9-4099-bb44-16f79419ddc3@molgen.mpg.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd8f:0:b0:3d0:405d:e94f with SMTP id
- e9e14a558f8ab-3d3d1f90759mr21788395ab.17.1740550700768; Tue, 25 Feb 2025
- 22:18:20 -0800 (PST)
-Date: Tue, 25 Feb 2025 22:18:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67beb22c.050a0220.2eba0.0049.GAE@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in hci_send_cmd (2)
-From: syzbot <syzbot+d04bd412c1b0e2f36647@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: DuioLJ_8KETxqu4IoOIuEtnN5_-riOsK
+X-Proofpoint-GUID: DuioLJ_8KETxqu4IoOIuEtnN5_-riOsK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-25_08,2025-02-26_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 impostorscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502260056
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    28b04731a38c MAINTAINERS: fix DWMAC S32 entry
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=15507ae4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
-dashboard link: https://syzkaller.appspot.com/bug?extid=d04bd412c1b0e2f36647
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e10163bfe6ac/disk-28b04731.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0bb611c3bfe3/vmlinux-28b04731.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c3fd8dd5fabb/bzImage-28b04731.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d04bd412c1b0e2f36647@syzkaller.appspotmail.com
-
-Bluetooth: MGMT ver 1.23
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 6674 at kernel/workqueue.c:2257 __queue_work+0xcd3/0xf50 kernel/workqueue.c:2256
-Modules linked in:
-CPU: 1 UID: 0 PID: 6674 Comm: syz.2.227 Not tainted 6.14.0-rc3-syzkaller-00154-g28b04731a38c #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:__queue_work+0xcd3/0xf50 kernel/workqueue.c:2256
-Code: ff e8 e1 af 38 00 90 0f 0b 90 e9 b2 fe ff ff e8 d3 af 38 00 eb 13 e8 cc af 38 00 eb 0c e8 c5 af 38 00 eb 05 e8 be af 38 00 90 <0f> 0b 90 48 83 c4 60 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc
-RSP: 0018:ffffc9001b5ef6c8 EFLAGS: 00010087
-RAX: ffffffff81890ac4 RBX: ffff888028dc8000 RCX: 0000000000080000
-RDX: ffffc9000bf59000 RSI: 000000000003158c RDI: 000000000003158d
-RBP: 0000000000000000 R08: ffffffff8188ff24 R09: 0000000000000000
-R10: ffffc9001b5ef7a0 R11: fffff520036bdef5 R12: ffff888027d1c800
-R13: ffff888027d1c9c0 R14: dffffc0000000000 R15: 0000000000000008
-FS:  00007f93037aa6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c381f89 CR3: 000000007d25a000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- queue_work_on+0x1c2/0x380 kernel/workqueue.c:2390
- queue_work include/linux/workqueue.h:662 [inline]
- hci_send_cmd+0xb6/0x180 net/bluetooth/hci_core.c:3048
- set_link_security+0x606/0x820 net/bluetooth/mgmt.c:1909
- hci_mgmt_cmd+0xa1f/0xf10 net/bluetooth/hci_sock.c:1712
- hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:733
- sock_write_iter+0x2d7/0x3f0 net/socket.c:1137
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0xacf/0xd10 fs/read_write.c:679
- ksys_write+0x18f/0x2b0 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f930298d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f93037aa038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f9302ba5fa0 RCX: 00007f930298d169
-RDX: 0000000000000007 RSI: 0000400000000000 RDI: 0000000000000008
-RBP: 00007f9302a0e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f9302ba5fa0 R15: 00007ffeb82b7bb8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+SGkgUGF1bCwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYXVsIE1l
+bnplbCA8cG1lbnplbEBtb2xnZW4ubXBnLmRlPg0KPiBTZW50OiBNb25kYXksIEZlYnJ1YXJ5IDI0
+LCAyMDI1IDc6MzQgUE0NCj4gVG86IEFtaXNoYSBKYWluIChRVUlDKSA8cXVpY19hbWlzamFpbkBx
+dWljaW5jLmNvbT4NCj4gQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc7IE1vaGFt
+bWVkIFNhbWVlciBNdWxsYSAoUVVJQykNCj4gPHF1aWNfbW9oYW11bGxAcXVpY2luYy5jb20+OyBI
+YXJpc2ggQmFuZGkgKFFVSUMpDQo+IDxxdWljX2hiYW5kaUBxdWljaW5jLmNvbT47IEFudWJoYXYg
+R3VwdGEgKFFVSUMpDQo+IDxxdWljX2FudWJoYXZnQHF1aWNpbmMuY29tPg0KPiBTdWJqZWN0OiBS
+ZTogW1JFU0VORCBQQVRDSCB2Ml0gb2JleDogQWRkIG1lc3NhZ2VzX2dldF9tZXNzYWdlKCkNCj4g
+aW1wbGVtZW50YXRpb24gZm9yIE1BUCBwbHVnaW4NCj4gDQo+IERlYXIgQW1pc2hhLA0KPiANCj4g
+DQo+IEFtIDI0LjAyLjI1IHVtIDEyOjEwIHNjaHJpZWIgQW1pc2hhIEphaW46DQo+ID4gR0VUIE1l
+c3NhZ2UoKSBvcGVyYXRpb24gc2hvdWxkIGJlIHN1cHBvcnRlZCBmb3IgcGFzc2luZyBiZWxvdyBQ
+VFMNCj4gPiB0ZXN0Y2FzZXMgLQ0KPiA+DQo+ID4gMS5NQVAvTVNFL01NQi9CVi0xMi1DDQo+ID4g
+VmVyaWZ5IHRoYXQgdGhlIE1TRSBjYW4gcmV0dXJuIGFuIGVtYWlsIG1lc3NhZ2UgdG8gdGhlIE1D
+RS4NCj4gPiAyLk1BUC9NU0UvTU1CL0JWLTEzLUMNCj4gPiBWZXJpZnkgdGhhdCB0aGUgTVNFIGNh
+biByZXR1cm4gYSBTTVMgbWVzc2FnZSBpbiBuYXRpdmUgZm9ybWF0IHRvIHRoZSBNQ0UuDQo+IA0K
+PiBhKm4qIFNNUw0KPiANCj4gPiAzLk1BUC9NU0UvTU1CL0JWLTE0LUMNCj4gPiBWZXJpZnkgdGhh
+dCB0aGUgTVNFIGNhbiByZXR1cm4gYSBTTVMgbWVzc2FnZSB3aXRoIHRleHQgdHJhbnMtY29kZWQg
+dG8NCj4gPiBVVEYtOA0KPiANCj4gYSpuKg0KPiANCj4gPiB0byB0aGUgTUNFLg0KPiANCj4gSeKA
+mWQgYWRkIGEgc3BhY2UgYWZ0ZXIgdGhlIGJ1bGxldCBwb2ludHMgKHRoZSBkb3QpLg0KPiANCj4g
+PiBDdXJyZW50bHkgZ2V0IG1lc3NhZ2Ugb3BlcmF0aW9uIGlzIG5vdCBpbXBsZW1lbnRlZCwgaGVu
+Y2UgYWJvdmUNCj4gPiB0ZXN0Y2FzZXMgYXJlIGZhaWxpbmcuDQo+ID4gQWRkZWQgY29kZSB0byBz
+ZW5kIHRoZSBjb21wbGV0ZSBibWVzc2FnZSBpbiByZXNwb25zZQ0KPiANCj4gU2hvdWxkIHRoaXMg
+YmUgKm1lc3NhZ2UqIG9yIGlzICpibWVzc2FnZSogc29tZSB0ZXJtaW5vbG9neT8NCj4gDQoNClRo
+aXMgaXMgJ2JtZXNzYWdlJywgbWVzc2FnZSBmb3JtYXQgdXNlZCBieSBNQVAgdG8gc3RvcmUgbWVz
+c2FnZXMuDQpBcyBwZXIgU3BlYywgYk1lc3NhZ2VzIGFyZSBhcHBsaWNhdGlvbiBvYmplY3RzIHVz
+ZWQgYnkgTUFQIGZvciBtZXNzYWdlIHRyYW5zcG9ydC4gDQpFeGNoYW5nZWQgbWVzc2FnZXMgc2hh
+bGwgdXNlIHRoZSBiTWVzc2FnZSBmb3JtYXQuDQoNCj4gPiB0byB0aGUgZ2V0IHJlcXVlc3QgZm9y
+IHRoZSByZXF1ZXN0ZWQgbWVzc2FnZSBoYW5kbGUuDQo+ID4NCj4gPiAtLS0NCj4gPiAgIG9iZXhk
+L3BsdWdpbnMvbWFzLmMgICAgICAgICAgICB8ICA0ICsrLS0NCj4gPiAgIG9iZXhkL3BsdWdpbnMv
+bWVzc2FnZXMtZHVtbXkuYyB8IDI3ICsrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiA+ICAg
+MiBmaWxlcyBjaGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPiA+DQo+
+ID4gZGlmZiAtLWdpdCBhL29iZXhkL3BsdWdpbnMvbWFzLmMgYi9vYmV4ZC9wbHVnaW5zL21hcy5j
+IGluZGV4DQo+ID4gMTBiOTcyZDY1Li5mNjNmY2Y2YzYgMTAwNjQ0DQo+ID4gLS0tIGEvb2JleGQv
+cGx1Z2lucy9tYXMuYw0KPiA+ICsrKyBiL29iZXhkL3BsdWdpbnMvbWFzLmMNCj4gPiBAQCAtNjEy
+LDExICs2MTIsMTEgQEAgc3RhdGljIHZvaWQgKm1lc3NhZ2Vfb3Blbihjb25zdCBjaGFyICpuYW1l
+LCBpbnQNCj4gb2ZsYWcsIG1vZGVfdCBtb2RlLA0KPiA+ICAgCQlyZXR1cm4gTlVMTDsNCj4gPiAg
+IAl9DQo+ID4NCj4gPiArCW1hcy0+YnVmZmVyID0gZ19zdHJpbmdfbmV3KCIiKTsNCj4gPiArDQo+
+ID4gICAJKmVyciA9IG1lc3NhZ2VzX2dldF9tZXNzYWdlKG1hcy0+YmFja2VuZF9kYXRhLCBuYW1l
+LCAwLA0KPiA+ICAgCQkJZ2V0X21lc3NhZ2VfY2IsIG1hcyk7DQo+ID4NCj4gPiAtCW1hcy0+YnVm
+ZmVyID0gZ19zdHJpbmdfbmV3KCIiKTsNCj4gPiAtDQo+ID4gICAJaWYgKCplcnIgPCAwKQ0KPiA+
+ICAgCQlyZXR1cm4gTlVMTDsNCj4gPiAgIAllbHNlDQo+ID4gZGlmZiAtLWdpdCBhL29iZXhkL3Bs
+dWdpbnMvbWVzc2FnZXMtZHVtbXkuYw0KPiA+IGIvb2JleGQvcGx1Z2lucy9tZXNzYWdlcy1kdW1t
+eS5jIGluZGV4IGUzMTNjNjE2My4uNjY1ZmFjZTNmIDEwMDY0NA0KPiA+IC0tLSBhL29iZXhkL3Bs
+dWdpbnMvbWVzc2FnZXMtZHVtbXkuYw0KPiA+ICsrKyBiL29iZXhkL3BsdWdpbnMvbWVzc2FnZXMt
+ZHVtbXkuYw0KPiA+IEBAIC01MTYsNyArNTE2LDMyIEBAIGludCBtZXNzYWdlc19nZXRfbWVzc2Fn
+ZSh2b2lkICpzZXNzaW9uLCBjb25zdA0KPiBjaGFyICpoYW5kbGUsDQo+ID4gICAJCQkJCW1lc3Nh
+Z2VzX2dldF9tZXNzYWdlX2NiIGNhbGxiYWNrLA0KPiA+ICAgCQkJCQl2b2lkICp1c2VyX2RhdGEp
+DQo+ID4gICB7DQo+ID4gLQlyZXR1cm4gLUVOT1NZUzsNCj4gPiArCXN0cnVjdCBzZXNzaW9uICpz
+ID0gIHNlc3Npb247DQo+ID4gKwlGSUxFICpmcDsNCj4gPiArCWNoYXIgKnBhdGg7DQo+ID4gKwlj
+aGFyIGJ1ZmZlclsxMDI0XTsNCj4gPiArDQo+ID4gKwlEQkcoIiAiKTsNCj4gPiArCXBhdGggPSBn
+X2J1aWxkX2ZpbGVuYW1lKHMtPmN3ZF9hYnNvbHV0ZSwgaGFuZGxlLCBOVUxMKTsNCj4gPiArCWZw
+ID0gZm9wZW4ocGF0aCwgInIiKTsNCj4gPiArCWlmIChmcCA9PSBOVUxMKSB7DQo+ID4gKwkJREJH
+KCJmb3BlbigpIGZhaWxlZCIpOw0KPiA+ICsJCXJldHVybiAtRUJBRFI7DQo+ID4gKwl9DQo+ID4g
+Kw0KPiA+ICsJLyogMTAyNCBpcyB0aGUgbWF4aW11bSBzaXplIG9mIHRoZSBsaW5lIHdoaWNoIGlz
+IGNhbGN1bGF0ZWQgdG8gYmUgbW9yZQ0KPiA+ICsJICogc3VmZmljaWVudCovDQo+IA0KPiBJIGRv
+IG5vdCBmdWxseSBncm9rIHRoaXMgc2VudGVuY2UuIENvdWxkIHlvdSBwbGVhc2UgcmVwaHJhc2U/
+DQo+IA0KDQpTdXJlLCB0aGlzIGNvcnJlc3BvbmRzIHRvIG1heCBzaXplIG9mIGEgbGluZSBpbiBh
+IGZpbGUsIGFzIHdlIGFyZSByZWFkaW5nIHRoZSBmaWxlIGxpbmUgYnkgbGluZS4NClNhbWUgd2F5
+IGl0IGlzIHByZXNlbnQgaW4gZXhpc3RpbmcgZnVuY3Rpb24gLSBnZXRfbWVzc2FnZXNfbGlzdGlu
+ZygpLg0KDQpzdGF0aWMgZ2Jvb2xlYW4gZ2V0X21lc3NhZ2VzX2xpc3Rpbmcodm9pZCAqZCkNCnsN
+Cg0KICAgICAgICBzdHJ1Y3QgbWVzc2FnZV9saXN0aW5nX2RhdGEgKm1sZCA9IGQ7DQogICAgICAg
+IC8qIDEwMjQgaXMgdGhlIG1heGltdW0gc2l6ZSBvZiB0aGUgbGluZSB3aGljaCBpcyBjYWxjdWxh
+dGVkIHRvIGJlIG1vcmUNCiAgICAgICAgICogc3VmZmljaWVudCovDQogICAgICAgIGNoYXIgYnVm
+ZmVyWzEwMjRdOw0KICAgICAgICBHTWFya3VwUGFyc2VDb250ZXh0ICpjdHh0Ow0KDQo+ID4gKwl3
+aGlsZSAoZmdldHMoYnVmZmVyLCAxMDI0LCBmcCkpIHsNCj4gPiArCQlpZiAoY2FsbGJhY2spDQo+
+ID4gKwkJCWNhbGxiYWNrKHNlc3Npb24sIDAsIDAsIChjb25zdCBjaGFyKilidWZmZXIsIHVzZXJf
+ZGF0YSk7DQo+ID4gKwl9DQo+ID4gKw0KPiA+ICsJaWYgKGNhbGxiYWNrKQ0KPiA+ICsJCWNhbGxi
+YWNrKHNlc3Npb24sIDAsIDAsIE5VTEwsIHVzZXJfZGF0YSk7DQo+ID4gKw0KPiA+ICsJZ19mcmVl
+KHBhdGgpOw0KPiA+ICsJZmNsb3NlKGZwKTsNCj4gPiArCXJldHVybiAwOw0KPiA+ICAgfQ0KPiA+
+DQo+ID4gICBpbnQgbWVzc2FnZXNfdXBkYXRlX2luYm94KHZvaWQgKnNlc3Npb24sIG1lc3NhZ2Vz
+X3N0YXR1c19jYg0KPiA+IGNhbGxiYWNrLA0KPiANCj4gDQo+IEtpbmQgcmVnYXJkcywNCj4gDQo+
+IFBhdWwNCg0KVGhhbmtzLA0KQW1pc2hhDQo=
