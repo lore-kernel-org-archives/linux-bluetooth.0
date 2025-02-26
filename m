@@ -1,238 +1,283 @@
 Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5D42185B8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 20:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10091222586;
+	Wed, 26 Feb 2025 20:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740602455; cv=none; b=L922DuDq8p2PlxdqA56MLf27tsnP4tZWKhJoLd5of/eZWDR2nczQf08LJyo00xxz8Nfb5NxXXwdbIgdv2UWphD21RIS//YTSvYUJrLYIjl2TJFDTQ3PVqhqtjGjSEST14G3YWZAm8pZa2/O+Lr9XfUtVtjRj+jpIBWLOFNSm6gY=
+	t=1740603315; cv=none; b=lEeO5MMwGg0f91jZarEP8Co134h/U+QiLyeR2nia7fiBwnHabc6L7EGMD+qVq+y7FzszWMRU1q1ksJ5vefddg4qV+rkaftTBUcKqBIYatKhLkAPaX96lCc6yf6qCphVqazh8GReveFdbari+0wkTcgNuxu22diOd+w/EW8Bzd5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740602455; c=relaxed/simple;
-	bh=y9p3IJrV7DaVn2tksMptHr+n5DKa5BJPLGuPDhk5EW4=;
+	s=arc-20240116; t=1740603315; c=relaxed/simple;
+	bh=8oqUoVbYJXkNii15KFVbUHxU2lO/RXEGujdm1d/EcZg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZOWYPabner1B9R4pl701EY4tXDxd846m4rmFkMLszgtX5Gh7VLFxo+zCK5JozzyW41+uJberHW7NwymDc7IaFVrFMduiBRym+gKpGDkM5sBEC3a3XMQxqu+EftA7VPdxLlS2V4UyTAMJk9uKcdmI0bdbN7UWmrYpvrolBZapv9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nBuUVxLj; arc=none smtp.client-ip=209.85.208.181
+	 To:Cc:Content-Type; b=l8J61yOvSLkblIUOwLlFnlDyEm+u3So0VQrb09s7xPIkNORTxUivWdtaPmavzfc9cTyJAUefMxjHXKALHDoZt84SPDmsmYdd+J4AuXSoPXcibXS3pbGEMWwdEo8xZTALmJ4Li/WGtyhTw7DrWFpzf0vKh/zUnpr5mwhq/yBfOSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCv0WMmb; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nBuUVxLj"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30615661f98so2552151fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 12:40:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCv0WMmb"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30930b0b420so2199471fa.2;
+        Wed, 26 Feb 2025 12:55:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740602452; x=1741207252; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740603311; x=1741208111; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3OOoTcAEwXXthp0FmxfDkrLaym3x4TvOLOWUB9g6nKc=;
-        b=nBuUVxLjRELStHJohXVobjinkYzKxpJUBF26vBhZwJ7cbUG33OQP7ph+VTySTGQIWy
-         0dt9ZDnG9XPzqF/8izcN/KJRwPURJa9nqyd5F1/f2gXLXSz98Kab7fe3PHgnC0ShRs8I
-         /jn+pGKnGS3P0QIw0PeFeWDUbO9pknClmvxH+IcfaOlDOZXu3RJUns7I76j1isExZ3TD
-         XMEKkCWVaa2BDBKnmbY7T+F5idHt906hXJD4Tze/8NCQayjdJLQAqCTpITe6w8XnD390
-         DD5FscHz6bCUJTpoMnOZpwV/Q87olzL0V+ys3eOfa5Ql7QPoQve7xUyNPNI76ad83Yu/
-         Koyg==
+        bh=wZFd1cWG8HSTfrYbFkIhhI/LdLxVUxChyJ0UB1bfsQU=;
+        b=KCv0WMmbhb5omCWHnPHqWoIIsT0ydXIUGq26joi5oNAJNZkGhBQr3XX2T6el2GdkdL
+         wWQ3YRXK6yNuA7G8s0iiHpm9TUVX+h7lMmh+toViyVlPLa92utJV6lfQTVmOLvJ1QB/i
+         XMqTNDfo/OhkTEIrF1zCsACq08ABoIoLJhK+aJkhfJ2rjxiSd0/D26Dttj2HGBzhK7Va
+         XGvfslVhd0cdHZVqEIiN/9SDP4jEaJWHU4JfE/p5E2VATXna8OMr5uyqJF1IiIFzegle
+         Rou3CnplD26NVtY1ApiMe6PcKLE3I2112wR3iblvSMM8Y+kBPK1sNebcduylW93f8zxX
+         hnFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740602452; x=1741207252;
+        d=1e100.net; s=20230601; t=1740603311; x=1741208111;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3OOoTcAEwXXthp0FmxfDkrLaym3x4TvOLOWUB9g6nKc=;
-        b=wI9ouY+erGCKUfnElFXnmL9j4ScUhqhw6z5W4DaRpuIs91aiQjWe95fLtBKrpjb30u
-         IrNQZoqlOVqj6h6+/LQU6omjdo02f2VnU0dY2GESjIWK5rR+eOgnUoK6aK1yoweIbsNW
-         r9sVEtt9ylFUvrUj/RlSYOjzo//BSPyO5Iu+S/3XYv/MCyMIUTaSHOQM1jcU44Cg7Kj5
-         AuCGKUcOihJQ8FsucBfENqoOWCN9cfLY9Jj+DVy+5C92erLRKBKo/CZShcv4cWDZmInU
-         /N4wpp2CLs4HxVxlX3X7UEvmtLq/0GOrrbWDO7K18YNyYCES8BcESX+6WHRB2BQtKqYp
-         +f/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWefMzIOwsgH+tknwUh+Fv7Fcej6PjGUnYtwv2c6Xb52ILYx2x2xBIFHoV6L1pyzkO0frqKhl1Lg0aW/nOV5ls=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjvzT+vwUkpceQlpIr+J4A3w/7lKsXy/JoPHEOYGvYtq9KQUfP
-	NlmSw8Q0ey7JH8sb8pmSOHScBQv7fHEint8jc3QaY2DlTs4ws9qV35EauHoYS2ZHtUh8Jpptix/
-	Uizww0Z0aEDCCm5lgUhi9xK8Ry0T3Oxga
-X-Gm-Gg: ASbGncsMr1ah7sJEC7GJPTOCXLf5o3NwMiC90EgAgnvuDtBkqphN6KeYAzPu8uUPERv
-	oTWIv+jxQxLZXu/eMGCT+use6kZYKK0TEiw01mtRMPYMQtU4KZU3aeE7zS5FNaL4yRqlYabQhZl
-	/fZkcbwQ==
-X-Google-Smtp-Source: AGHT+IEeFPdG5twj1LH4wuv85iOqaeicGMFmk3kjCokJ7K4Wz/nvbAFTNBwTO0771itXCY/F6BvfTVRmPJgo+PR3fhg=
-X-Received: by 2002:a2e:9c98:0:b0:307:dc1f:e465 with SMTP id
- 38308e7fff4ca-30a80c419a4mr45810841fa.22.1740602451684; Wed, 26 Feb 2025
- 12:40:51 -0800 (PST)
+        bh=wZFd1cWG8HSTfrYbFkIhhI/LdLxVUxChyJ0UB1bfsQU=;
+        b=TC1m82PY1G6jgKirMGAKX9d2uXH2/3Jt0/9oXrmThBDHzQ0P1Y978R/GJWiasZJXGt
+         M8MsiEc/GhwG1LLt54VZLVQcMnLURA9xQUm/0SP6Uw5FUYWiE0CUVOjQmTOOlX5wPiUw
+         8danrppQUcbUU4s3BQcXdB+EeQg1hDBrD/Xoax+IrpQ21a/MGxfQP/bT3uDOSxugyNxU
+         DR1I3nbiYQyD9oDJxu/UofmxJTr5raTRWkzb6ypYT7yQrWzRGQbgSn3Tq59sHPJ7FLmu
+         Jt7adq7dt1GUQlWAKDnsjssT7iMxq7UoZs8pfVCRsw4ZvCf9NdS7QhSZMb/d9CisgEgm
+         Ip2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUX/e+eLEwbEb5uNidyX5tGEBCU9thMb/IbaFwGghNzLJ4kYLmrenbkqZHm6aM3gE/z816vmyYBl1ariZKpFbo=@vger.kernel.org, AJvYcCXIWxUU+PSgFBuon44Xv5Ry6BJ8b48/41hMvuXkwO143VH2LovteNpzm1skE3i/6NCf3Sy5wD43SV6dxdy5@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPkCKSMsFTerr1U/wCLRoKvk3DC2RwpRdU2JzlJKJPdAPgisMx
+	/HxloBqlL+QusxLeuLs08xLt9ujCMEt1ephtufEbzXfW6vrKD+N/j3RmThOCfSFTnE7/gc4PtIQ
+	2cgWCpnAyvdS6E3iLDE2BsyrXcBY=
+X-Gm-Gg: ASbGncsznjAOLNmTZk0Y/ZM17DVu12NI41PIz/QB5CSlx2Z8TPWeP4GovA27YwD/0V4
+	986K5moHe6iNKFsES4tnR4lIrBnRjhwygZ54Hag987XirOdddMPdWgIzzW4q+XDx+N0CPow9zrk
+	Y7sbIlTg==
+X-Google-Smtp-Source: AGHT+IGvxKlNxIZKR1vSFthzrYv0K+6B/OqQVHzGOvPWnu1MQxE8ywH3QU1kBZ/Xlo3au+KYYCijiF1aOHyplTPLt7w=
+X-Received: by 2002:a2e:8616:0:b0:300:26bc:4311 with SMTP id
+ 38308e7fff4ca-30b7918c228mr30288801fa.18.1740603310766; Wed, 26 Feb 2025
+ 12:55:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224111056.3255513-1-quic_amisjain@quicinc.com>
- <98149822-8ac9-4099-bb44-16f79419ddc3@molgen.mpg.de> <1937d5048f91464a8bb32fe2466a94b8@quicinc.com>
-In-Reply-To: <1937d5048f91464a8bb32fe2466a94b8@quicinc.com>
+References: <20250224045237.1290971-1-chharry@google.com> <2025022431-ditto-shy-c62f@gregkh>
+ <CADg1FFeW5EXOJTqTS+jwBphGnDSCreNwM8hcFOhB1Tatdti6QA@mail.gmail.com>
+ <2025022407-polo-disgrace-9655@gregkh> <CADg1FFehoZr3DmDhV_ri69+XBHLQcpKjoxLMaVhQUdzRuhST9A@mail.gmail.com>
+In-Reply-To: <CADg1FFehoZr3DmDhV_ri69+XBHLQcpKjoxLMaVhQUdzRuhST9A@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 27 Feb 2025 01:40:39 +0500
-X-Gm-Features: AQ5f1JoBsAgyX4S0hr29GNH7pcikJckxHdUuftbxeLR7hS-latY-MwXZizSa9SY
-Message-ID: <CABBYNZKd4sqemB3UJW7OyMS_N0LFA9sPqcD61gBnfYnvYcTkEA@mail.gmail.com>
-Subject: Re: [RESEND PATCH v2] obex: Add messages_get_message() implementation
- for MAP plugin
-To: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>, "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>, 
-	"Anubhav Gupta (QUIC)" <quic_anubhavg@quicinc.com>
+Date: Thu, 27 Feb 2025 01:54:58 +0500
+X-Gm-Features: AQ5f1Jq3pflrBGIS-gvgXR9Xpvr8spar-GwjqM5CkaYMvvHbsWUshuRMq_NNKYQ
+Message-ID: <CABBYNZLhR+OJQnYZ5vN5HjgiWwKrXvOse-pXhCcTdFpJrrzsNg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btusb: Configure altsetting for USER_CHANNEL
+To: Hsin-chen Chuang <chharry@google.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Amisha,
+Hi Hsin-chen,
 
-On Wed, Feb 26, 2025 at 2:11=E2=80=AFAM Amisha Jain (QUIC)
-<quic_amisjain@quicinc.com> wrote:
+On Mon, Feb 24, 2025 at 2:13=E2=80=AFAM Hsin-chen Chuang <chharry@google.co=
+m> wrote:
 >
-> Hi Paul,
->
-> > -----Original Message-----
-> > From: Paul Menzel <pmenzel@molgen.mpg.de>
-> > Sent: Monday, February 24, 2025 7:34 PM
-> > To: Amisha Jain (QUIC) <quic_amisjain@quicinc.com>
-> > Cc: linux-bluetooth@vger.kernel.org; Mohammed Sameer Mulla (QUIC)
-> > <quic_mohamull@quicinc.com>; Harish Bandi (QUIC)
-> > <quic_hbandi@quicinc.com>; Anubhav Gupta (QUIC)
-> > <quic_anubhavg@quicinc.com>
-> > Subject: Re: [RESEND PATCH v2] obex: Add messages_get_message()
-> > implementation for MAP plugin
+> On Mon, Feb 24, 2025 at 2:44=E2=80=AFPM Greg KH <gregkh@linuxfoundation.o=
+rg> wrote:
 > >
-> > Dear Amisha,
-> >
-> >
-> > Am 24.02.25 um 12:10 schrieb Amisha Jain:
-> > > GET Message() operation should be supported for passing below PTS
-> > > testcases -
+> > On Mon, Feb 24, 2025 at 02:25:52PM +0800, Hsin-chen Chuang wrote:
+> > > Hi Greg,
 > > >
-> > > 1.MAP/MSE/MMB/BV-12-C
-> > > Verify that the MSE can return an email message to the MCE.
-> > > 2.MAP/MSE/MMB/BV-13-C
-> > > Verify that the MSE can return a SMS message in native format to the =
-MCE.
-> >
-> > a*n* SMS
-> >
-> > > 3.MAP/MSE/MMB/BV-14-C
-> > > Verify that the MSE can return a SMS message with text trans-coded to
-> > > UTF-8
-> >
-> > a*n*
-> >
-> > > to the MCE.
-> >
-> > I=E2=80=99d add a space after the bullet points (the dot).
-> >
-> > > Currently get message operation is not implemented, hence above
-> > > testcases are failing.
-> > > Added code to send the complete bmessage in response
-> >
-> > Should this be *message* or is *bmessage* some terminology?
-> >
->
-> This is 'bmessage', message format used by MAP to store messages.
-> As per Spec, bMessages are application objects used by MAP for message tr=
-ansport.
-> Exchanged messages shall use the bMessage format.
->
-> > > to the get request for the requested message handle.
-> > >
-> > > ---
-> > >   obexd/plugins/mas.c            |  4 ++--
-> > >   obexd/plugins/messages-dummy.c | 27 ++++++++++++++++++++++++++-
-> > >   2 files changed, 28 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c index
-> > > 10b972d65..f63fcf6c6 100644
-> > > --- a/obexd/plugins/mas.c
-> > > +++ b/obexd/plugins/mas.c
-> > > @@ -612,11 +612,11 @@ static void *message_open(const char *name, int
-> > oflag, mode_t mode,
-> > >             return NULL;
-> > >     }
-> > >
-> > > +   mas->buffer =3D g_string_new("");
-> > > +
-> > >     *err =3D messages_get_message(mas->backend_data, name, 0,
-> > >                     get_message_cb, mas);
-> > >
-> > > -   mas->buffer =3D g_string_new("");
-> > > -
-> > >     if (*err < 0)
-> > >             return NULL;
-> > >     else
-> > > diff --git a/obexd/plugins/messages-dummy.c
-> > > b/obexd/plugins/messages-dummy.c index e313c6163..665face3f 100644
-> > > --- a/obexd/plugins/messages-dummy.c
-> > > +++ b/obexd/plugins/messages-dummy.c
-> > > @@ -516,7 +516,32 @@ int messages_get_message(void *session, const
-> > char *handle,
-> > >                                     messages_get_message_cb callback,
-> > >                                     void *user_data)
-> > >   {
-> > > -   return -ENOSYS;
-> > > +   struct session *s =3D  session;
-> > > +   FILE *fp;
-> > > +   char *path;
-> > > +   char buffer[1024];
-> > > +
-> > > +   DBG(" ");
-> > > +   path =3D g_build_filename(s->cwd_absolute, handle, NULL);
-> > > +   fp =3D fopen(path, "r");
-> > > +   if (fp =3D=3D NULL) {
-> > > +           DBG("fopen() failed");
-> > > +           return -EBADR;
-> > > +   }
-> > > +
-> > > +   /* 1024 is the maximum size of the line which is calculated to be=
- more
-> > > +    * sufficient*/
-> >
-> > I do not fully grok this sentence. Could you please rephrase?
-> >
->
-> Sure, this corresponds to max size of a line in a file, as we are reading=
- the file line by line.
-> Same way it is present in existing function - get_messages_listing().
->
-> static gboolean get_messages_listing(void *d)
-> {
->
->         struct message_listing_data *mld =3D d;
->         /* 1024 is the maximum size of the line which is calculated to be=
- more
->          * sufficient*/
->         char buffer[1024];
->         GMarkupParseContext *ctxt;
->
-> > > +   while (fgets(buffer, 1024, fp)) {
-> > > +           if (callback)
-> > > +                   callback(session, 0, 0, (const char*)buffer, user=
-_data);
-> > > +   }
-> > > +
-> > > +   if (callback)
-> > > +           callback(session, 0, 0, NULL, user_data);
+> > > On Mon, Feb 24, 2025 at 2:10=E2=80=AFPM Greg KH <gregkh@linuxfoundati=
+on.org> wrote:
+> > > >
+> > > > On Mon, Feb 24, 2025 at 12:52:32PM +0800, Hsin-chen Chuang wrote:
+> > > > > From: Hsin-chen Chuang <chharry@chromium.org>
+> > > > >
+> > > > > Automatically configure the altsetting for USER_CHANNEL when a SC=
+O is
+> > > > > connected. This adds support for the USER_CHANNEL to transfer SCO=
+ data
+> > > > > over USB transport.
+> > > > >
+> > > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to co=
+ntrol USB alt setting")
+> > > > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > > > > ---
+> > > > >
+> > > > > Changes in v2:
+> > > > > - Give up tracking the SCO handles. Only configure the altsetting=
+ when
+> > > > >   SCO connected.
+> > > > > - Put the change behind Kconfig/module parameter
+> > > > >
+> > > > >  drivers/bluetooth/Kconfig | 11 ++++++++++
+> > > > >  drivers/bluetooth/btusb.c | 46 +++++++++++++++++++++++++++++++++=
+++++++
+> > > > >  2 files changed, 57 insertions(+)
+> > > > >
+> > > > > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfi=
+g
+> > > > > index 4ab32abf0f48..7c497f878732 100644
+> > > > > --- a/drivers/bluetooth/Kconfig
+> > > > > +++ b/drivers/bluetooth/Kconfig
+> > > > > @@ -56,6 +56,17 @@ config BT_HCIBTUSB_POLL_SYNC
+> > > > >         Say Y here to enable USB poll_sync for Bluetooth USB devi=
+ces by
+> > > > >         default.
+> > > > >
+> > > > > +config BT_HCIBTUSB_AUTO_SET_ISOC_ALT
+> > > > > +     bool "Auto set isoc_altsetting for USER_CHANNEL when SCO co=
+nnected"
+> > > > > +     depends on BT_HCIBTUSB
+> > > > > +     default n
 
-Btw, if the callback is NULL then perhaps we shouldn't be looping with
-fgets, I also thinking that perhaps the whole think about reading the
-messages and copying it over to a buffer perhaps could be avoided,
-perhaps using mmap is better here, although this is just the dummy
-implementation with perhaps doesn't care so much about doing things in
-a 'proper' way.
+Maybe we can do just:
 
-> > > +
-> > > +   g_free(path);
-> > > +   fclose(fp);
-> > > +   return 0;
-> > >   }
+ default y if CHROME_PLATFORMS
+
+> > > > > +     help
+> > > > > +       Say Y here to enable auto set isoc_altsetting for USER_CH=
+ANNEL
+> > > > > +       when SCO connected
+> > > > > +
+> > > > > +       This can be overridden by passing btusb.auto_set_isoc_alt=
+=3D[y|n]
+> > > > > +       on the kernel commandline.
+> > > > > +
+> > > > >  config BT_HCIBTUSB_BCM
+> > > > >       bool "Broadcom protocol support"
+> > > > >       depends on BT_HCIBTUSB
+> > > > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.=
+c
+> > > > > index de3fa725d210..af93d757911b 100644
+> > > > > --- a/drivers/bluetooth/btusb.c
+> > > > > +++ b/drivers/bluetooth/btusb.c
+> > > > > @@ -34,6 +34,8 @@ static bool force_scofix;
+> > > > >  static bool enable_autosuspend =3D IS_ENABLED(CONFIG_BT_HCIBTUSB=
+_AUTOSUSPEND);
+> > > > >  static bool enable_poll_sync =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_P=
+OLL_SYNC);
+> > > > >  static bool reset =3D true;
+> > > > > +static bool auto_set_isoc_alt =3D
+> > > > > +     IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTO_SET_ISOC_ALT);
+> > > > >
+> > > > >  static struct usb_driver btusb_driver;
+> > > > >
+> > > > > @@ -1113,6 +1115,42 @@ static inline void btusb_free_frags(struct=
+ btusb_data *data)
+> > > > >       spin_unlock_irqrestore(&data->rxlock, flags);
+> > > > >  }
+> > > > >
+> > > > > +static void btusb_sco_connected(struct btusb_data *data, struct =
+sk_buff *skb)
+> > > > > +{
+> > > > > +     struct hci_event_hdr *hdr =3D (void *) skb->data;
+> > > > > +     struct hci_ev_sync_conn_complete *ev =3D
+> > > > > +             (void *) skb->data + sizeof(*hdr);
+> > > > > +     struct hci_dev *hdev =3D data->hdev;
+> > > > > +     unsigned int notify_air_mode;
+> > > > > +
+> > > > > +     if (hci_skb_pkt_type(skb) !=3D HCI_EVENT_PKT)
+> > > > > +             return;
+> > > > > +
+> > > > > +     if (skb->len < sizeof(*hdr) || hdr->evt !=3D HCI_EV_SYNC_CO=
+NN_COMPLETE)
+> > > > > +             return;
+> > > > > +
+> > > > > +     if (skb->len !=3D sizeof(*hdr) + sizeof(*ev) || ev->status)
+> > > > > +             return;
+> > > > > +
+> > > > > +     switch (ev->air_mode) {
+> > > > > +     case BT_CODEC_CVSD:
+> > > > > +             notify_air_mode =3D HCI_NOTIFY_ENABLE_SCO_CVSD;
+> > > > > +             break;
+> > > > > +
+> > > > > +     case BT_CODEC_TRANSPARENT:
+> > > > > +             notify_air_mode =3D HCI_NOTIFY_ENABLE_SCO_TRANSP;
+> > > > > +             break;
+> > > > > +
+> > > > > +     default:
+> > > > > +             return;
+> > > > > +     }
+> > > > > +
+> > > > > +     bt_dev_info(hdev, "enabling SCO with air mode %u", ev->air_=
+mode);
+> > > > > +     data->sco_num =3D 1;
+> > > > > +     data->air_mode =3D notify_air_mode;
+> > > > > +     schedule_work(&data->work);
+> > > > > +}
+> > > > > +
+> > > > >  static int btusb_recv_event(struct btusb_data *data, struct sk_b=
+uff *skb)
+> > > > >  {
+> > > > >       if (data->intr_interval) {
+> > > > > @@ -1120,6 +1158,11 @@ static int btusb_recv_event(struct btusb_d=
+ata *data, struct sk_buff *skb)
+> > > > >               schedule_delayed_work(&data->rx_work, 0);
+> > > > >       }
+> > > > >
+> > > > > +     /* Configure altsetting for HCI_USER_CHANNEL on SCO connect=
+ed */
+> > > > > +     if (auto_set_isoc_alt &&
+> > > > > +         hci_dev_test_flag(data->hdev, HCI_USER_CHANNEL))
+> > > > > +             btusb_sco_connected(data, skb);
+> > > > > +
+> > > > >       return data->recv_event(data->hdev, skb);
+> > > > >  }
+> > > > >
+> > > > > @@ -4354,6 +4397,9 @@ MODULE_PARM_DESC(enable_autosuspend, "Enabl=
+e USB autosuspend by default");
+> > > > >  module_param(reset, bool, 0644);
+> > > > >  MODULE_PARM_DESC(reset, "Send HCI reset command on initializatio=
+n");
+> > > > >
+> > > > > +module_param(auto_set_isoc_alt, bool, 0644);
+> > > > > +MODULE_PARM_DESC(auto_set_isoc_alt, "Auto set isoc_altsetting fo=
+r USER_CHANNEL when SCO connected");
+> > > >
+> > > > This is not the 1990's, why are you adding new module parameters wh=
+en we
+> > > > have so many other more proper ways to do this?  And really, this w=
+ould
 > > >
-> > >   int messages_update_inbox(void *session, messages_status_cb
-> > > callback,
+> > > Sorry but could you please provide an example to guard a feature like=
+ this.
 > >
-> >
-> > Kind regards,
-> >
-> > Paul
+> > Depends on what you want to do with this configuration.  Why is it an
+> > option at all?  Why can't it "just work"?  Module parameters are a pain
 >
-> Thanks,
-> Amisha
+> I would like to hand this question to Luiz. I believe this patch just
+> works because this configuration is defined in the spec.
+> I think Luiz's point is to project the potential existing user, but
+> there's probably no User channel user sending SCO data with the latest
+> btusb driver because:
+> a) There's no way to configure alt setting from userspace
+> b) Before eafcfcfca97d, SCO data would be rejected since User channel
+> shouldn't be able to modify hci_conn_num
+
+Perhaps you can just use CHROME_PLATFORMS (suggested above) in Kconfig
+to enable intercepting of the events, etc, so we don't need any
+runtime parameters.
+
+> > to configure, we have loads of other ways to do this now (configfs,
+> > debugfs for debugging stuff, sysfs for device-specific things, etc.)
+> >
+> > > > not work at all for multiple controllers in teh same system, right?
+> > >
+> > > Do you mean we can't have separate parameters for different
+> > > controllers? Yes that's true, but why would a user want the different
+> > > behavior on the same machine?
+> >
+> > Why would you prevent them from allowing this to happen for a
+> > device-specific option?
+> >
+> > thanks,
+> >
+> > greg k-h
+>
+> --
+> Best Regards,
+> Hsin-chen
 
 
 
