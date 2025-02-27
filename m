@@ -1,231 +1,147 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532611A9B2A;
-	Thu, 27 Feb 2025 21:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6D41CEAA3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2025 21:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740692454; cv=none; b=UI8sb9QwwJxZIKo2Muh5OGxS12n+NraWaHQpAcHvsZtZZwT3tDUaBIEFxrunhp14a+HG18mrmPcMj7CQt/evc6hbCaBPR5KH/D73YW4mYZ9t8/VL5NB/XkIGD5JwqjAH2t+T/r6nd4WD0QI9NtljssHucsq7YyjZIVF5nfGRRng=
+	t=1740693279; cv=none; b=Vjh2A0WwSxwMWnUEMoYhtvaYGQHvYecxFfYPGWSEdQshAmpyds4S4CWfRY/0gsQ2PvcgEBWzAmbhlTB6uuWrlS2um4t8SNpuhGxgXlLlqHdXvuPnqnnMMWQAFwiDFjFm8jq+ujiCU0T+BipoLAZLoSozbvUj3N6fZtZ/MZdhxyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740692454; c=relaxed/simple;
-	bh=L80Hlu8u8o5Ot4DJmrVS3vc1lu4qJoip5Aoy1QOg3tc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pc0EhZ0tBQDhrvXWZ0Dirf4TKjJVWZBNWODXXvP9b8vu4Et8ZbQmL0oNxTh0s8H766QrzCIbtKY11Bo9QZ54GWD+sz6LEylf9+/e9n9cY4upY0YNcvq1vJkMQ74V5VienNxGHGNkRp75429qjtk7i8FoK0I9RNpbnqyFw6yVJkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ifD9LFyf; arc=none smtp.client-ip=209.85.167.41
+	s=arc-20240116; t=1740693279; c=relaxed/simple;
+	bh=vnDoe+RiU+YcqZdy7fzMD44Rw92cZ1pz65L6Tziyfec=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=k9s2qW4ijzNHbyg2ndiySk4c+MrOmUo19N0LA5/cp7OZSROkVvJA0JhwOccDD6DVxaxsHbpXZMOW1A4l1VmbvXdI/mJaoAWVARi+YRtz8E6uH9pnp4J9ijce8v/bjUp+aIwyV0B6MfvCmK2w2/ykueTfftS7Jatd71Xuw+A9pyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lKJ/24Re; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ifD9LFyf"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-54843052bcdso1242378e87.1;
-        Thu, 27 Feb 2025 13:40:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKJ/24Re"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22349bb8605so30695885ad.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2025 13:54:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740692450; x=1741297250; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r485+lRjbUqyvnC85LY4WqpLa9nC9htuImJ9LIfqUKQ=;
-        b=ifD9LFyfIn0Uce2rcKCD8P/KFpCn5LX9edfRNTMckBQxSAC+UsEpmMPkKuBeikyTaU
-         jSG/KgsdMWv/e1/a+1yUikPCkQpKaTAgXofFcMW0x9aReN/6CFauW1VYxke9M+AxMTdc
-         I7hs3F69I2A8yY4Pzm3icL6WIFh0ZPXXLiBs2ZtDorv6S0nooZEL3VToMCnl0wVMDosW
-         3+Q1kTZ9jyxKDwojMyi+kan//+9cHVkYRFqLL9H6O+jv3hZlbgPr0YNUnriSJIiMCQZQ
-         5G64ZOu6EtmSjuwITpldtVHISowibDY24bQB0X6x4jLZBejY5IH6SkiOsABjWhi7cUHS
-         6kCw==
+        d=gmail.com; s=20230601; t=1740693277; x=1741298077; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ikWgGAKmkrbyw/ONuhk48dRcQIZd+nRGNmIAf1MI0Ek=;
+        b=lKJ/24Rebv/kcqx4BkrHWGirqTVl2TPpNN9byp/X1hlpmw3Z5Bbaz805CaFD3EvtJb
+         v5RMLMYBVKDB/QxQA+sSF/qR5hI+9y8jGl/Z4QJtiQv4Nq8S7FfJfbnSi8l8jbT6V5Sf
+         otJNahuLiCWFmB79bw8h9UQV6CaIgZc0CSt4yLeiC0ubhGRepFW9Q33BdLKmvYSCRt65
+         5JHDmapwQbfioB7E9aZ7bOfqP+AGU7jSzM0JZSuzYbUHzMDSiutIWDmuMaPxQT/ykG5C
+         02zfnjqlB5sx1EpYyt4/MirpBtwl2noLp2/1nOc7bFBEByw584foDyIXr9rVdCl3Tx2g
+         BOxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740692450; x=1741297250;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r485+lRjbUqyvnC85LY4WqpLa9nC9htuImJ9LIfqUKQ=;
-        b=O6Xg0RsDFwVqo4ww3Xkn7ZfNS8dHsyXv8+m8OPIhB7WlrTiKejvl7KRgo7xVmVFHXL
-         cHChmzD59r+HzwkMh5QQ7mw6TGNJUaJlhq1EiV2i7P84dCbMT1GSrC40Bl3+pyjEavQN
-         Hz1t4W7aFpBNciYylnSeMuxdq20TDzvg5QaV/MFnszA0ANohmal2vBaPof3Qwxe382rz
-         mor/Bvcwa1atnuIMXhZQ6NsI27Xiw6UvmwKdbgEa+qXR4nFdTWl17tfWCB7/MWIDjgY4
-         mrGvgrPgYW6bP7FiIx9DS/V6t+DmDzx9M+b+yrHquycSfS35hozlsQppNliC8hV5dFdY
-         AyLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVlRxo3hzeQC6haJcjgw3/2SWElI579wbXAheoRsEFkNii4xmrNh8bDEkHYKGVU4sReHCrCEy5ZyAXUOWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzp5ZnUILHG3r1dKu8ZNVruDrWGzGwoVS843xfmkstUdKX/KBoI
-	+DBQ0x0AjvBoe32ooQpvE4yEPcF1tdYwionQ5YLlr/snA7HRWEpx73C1wnscgsgc83jOmcnCfzM
-	Hb9LTI3kuiWWFVUew8OAID5M1TuzCH4Zz50A=
-X-Gm-Gg: ASbGncvqJE8QM8y33nJloMaQgo14YjqAg+axnruRuFH9wNkXg2aHq39SVe7rBUBYw6m
-	9K1maPr0C/6BZqdVOm299rf2Ye9knKYfppNZsfYLijtz+AB6kwraHgocZBBdIp0GXP8uzaCYqHR
-	Mf+Zak7g==
-X-Google-Smtp-Source: AGHT+IHc/Epr7Ps+0AR+8pRbVCia557Ml9EMV/xnohQ/bDgHDHT8kiVp140V7y6FhpaXwbFME5SmOFEqm3/MMUqyuaE=
-X-Received: by 2002:a19:521a:0:b0:549:4df0:76 with SMTP id 2adb3069b0e04-5494df00079mr133755e87.4.1740692450037;
- Thu, 27 Feb 2025 13:40:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740693277; x=1741298077;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ikWgGAKmkrbyw/ONuhk48dRcQIZd+nRGNmIAf1MI0Ek=;
+        b=qJWl+EFayg97TrVoe0qT9mL2+Wv4cM2stxhqCvKmP390yAm6CmDPoForhYBT29jIoj
+         LKDxxHhiFpBtWV8s6PRgcUBeTzFdOnAw+fLM+M/Y8wgKcUo05nQPTBGWp2nW/MD2pRHp
+         GT7xC7JJxXqZki94OynfizkYf4UMTTogWr37+MDIN/JVNsNWpHmRHYbPsxx81wulQAdm
+         YfaSDy4bSxikkJSJw01+sNWkLQR//uTv5lUGgUT4KjM498Tqr0DqCI6HN4CFVmFQpQZp
+         NnEaFZZ1G3Wqgt3hEYyV7fAnPFRilBfr7ifDk+D2kVAdQeh5RLtLB5hJ+uiqdozkboSC
+         fvVw==
+X-Gm-Message-State: AOJu0YwEAmhVI+jV9kAWxeKwkt5b1bUAKLDLMHJm1M3Aec0EUw6w1XID
+	8x8Hc1njhk1kXuRo7jPc4Hb541WYimgUcPXF09wFispmNXhkAbQLzSapaw==
+X-Gm-Gg: ASbGnctXlVoAP7xsrUgrJ8fYAYdhU5L5ci/DAv5nefsh/+Z16GJVKv0X3dc6GX7KK5y
+	8PzyCRS5kTUOCzE5t1QMNRPb9E2h+8ATGd9vPa4SMefS1/uKMTV3KFC1rB7rSxbIb1AUW7vVbrv
+	0rfw3WpMPI96WsB8Q7zQCqB8bi1OsMekfvHWhscryrB352yfhdQ/QP0M0CgtmwHPb2hyJ3jKad+
+	Jy8/bv2pDVH4p0d3Orx37AgFZ7Ye9strVticASUD8uENDmWmG2VYIPpEhhn1K/tpkXgRiIbVLA+
+	kb9ZAZ46mBEv5TF1/PFcOga1R1ZeKA==
+X-Google-Smtp-Source: AGHT+IFOFYvd4Pm2geJ451n8jPncWUB0Us5sNtPpxaYQ94fbYcYqRujShpu+BaKtDfplFwTup7ABSQ==
+X-Received: by 2002:a17:902:f90b:b0:223:58ff:bfe7 with SMTP id d9443c01a7336-22368f61b94mr7494365ad.8.1740693277060;
+        Thu, 27 Feb 2025 13:54:37 -0800 (PST)
+Received: from [172.17.0.2] ([20.172.7.56])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235053b0cfsm20128635ad.254.2025.02.27.13.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 13:54:36 -0800 (PST)
+Message-ID: <67c0df1c.170a0220.8db99.28c8@mx.google.com>
+Date: Thu, 27 Feb 2025 13:54:36 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6332925271701993308=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250227171417.4023415-1-chharry@google.com>
-In-Reply-To: <20250227171417.4023415-1-chharry@google.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 28 Feb 2025 02:40:37 +0500
-X-Gm-Features: AQ5f1JoMkjAaQBE1fZYPMwpPqsgvE_QCMmnXVYFBRCrp0nJBRvjDWUeAH45XxtE
-Message-ID: <CABBYNZ+QdWQ49ZMxPLj86d=kjr7Sf38LR1PrYrPhU8kZMQuh0A@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org, 
-	pmenzel@molgen.mpg.de, chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [v2] Bluetooth: SCO: fix sco_conn refcounting on sco_conn_ready
+In-Reply-To: <24279b4ca58e92b96fbe8f8214bf95d485ab73f5.1740691671.git.pav@iki.fi>
+References: <24279b4ca58e92b96fbe8f8214bf95d485ab73f5.1740691671.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Hsin-chen,
+--===============6332925271701993308==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 27, 2025 at 12:14=E2=80=AFPM Hsin-chen Chuang <chharry@google.c=
-om> wrote:
->
-> From: Hsin-chen Chuang <chharry@chromium.org>
->
-> Automatically configure the altsetting for HCI_USER_CHANNEL when a SCO
-> is connected.
->
-> The motivation is to enable the HCI_USER_CHANNEL user to send out SCO
-> data through USB Bluetooth chips, which is mainly used for bidirectional
-> audio transfer (voice call). This was not capable because:
->
-> - Per Bluetooth Core Spec v5, Vol 4, Part B, 2.1, the corresponding
->   alternate setting should be set based on the air mode in order to
->   transfer SCO data, but
-> - The Linux Bluetooth HCI_USER_CHANNEL exposes the Bluetooth Host
->   Controller Interface to the user space, which is something above the
->   USB layer. The user space is not able to configure the USB alt while
->   keeping the channel open.
->
-> This patch intercepts the HCI_EV_SYNC_CONN_COMPLETE packets in btusb,
-> extracts the air mode, and configures the alt setting in btusb.
->
-> This patch is tested on ChromeOS devices. The USB Bluetooth models
-> (CVSD, TRANS alt3 and alt6) could work without a customized kernel.
->
-> Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control US=
-B alt setting")
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> ---
->
-> Changes in v3:
-> - Remove module parameter
-> - Set Kconfig to default y if CHROME_PLATFORMS
->
-> Changes in v2:
-> - Give up tracking the SCO handles. Only configure the altsetting when
->   SCO connected.
-> - Put the change behind Kconfig/module parameter
->
->  drivers/bluetooth/Kconfig | 11 ++++++++++
->  drivers/bluetooth/btusb.c | 43 +++++++++++++++++++++++++++++++++++++++
->  2 files changed, 54 insertions(+)
->
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 4ab32abf0f48..cdf7a5caa5c8 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -56,6 +56,17 @@ config BT_HCIBTUSB_POLL_SYNC
->           Say Y here to enable USB poll_sync for Bluetooth USB devices by
->           default.
->
-> +config BT_HCIBTUSB_AUTO_SET_ISOC_ALT
-> +       bool "Auto set isoc_altsetting for HCI_USER_CHANNEL when SCO conn=
-ected"
-> +       depends on BT_HCIBTUSB
-> +       default y if CHROME_PLATFORMS
-> +       help
-> +         Say Y here to enable auto set isoc_altsetting for HCI_USER_CHAN=
-NEL
-> +         when SCO connected
-> +
-> +         When enabled, btusb intercepts the HCI_EV_SYNC_CONN_COMPLETE pa=
-ckets
-> +         and configures isoc_altsetting automatically for HCI_USER_CHANN=
-EL.
-> +
->  config BT_HCIBTUSB_BCM
->         bool "Broadcom protocol support"
->         depends on BT_HCIBTUSB
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index de3fa725d210..2642d2ca885f 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -34,6 +34,8 @@ static bool force_scofix;
->  static bool enable_autosuspend =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUS=
-PEND);
->  static bool enable_poll_sync =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC=
-);
->  static bool reset =3D true;
-> +static bool auto_set_isoc_alt =3D
-> +       IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTO_SET_ISOC_ALT);
->
->  static struct usb_driver btusb_driver;
->
-> @@ -1113,6 +1115,42 @@ static inline void btusb_free_frags(struct btusb_d=
-ata *data)
->         spin_unlock_irqrestore(&data->rxlock, flags);
->  }
->
-> +static void btusb_sco_connected(struct btusb_data *data, struct sk_buff =
-*skb)
-> +{
-> +       struct hci_event_hdr *hdr =3D (void *) skb->data;
-> +       struct hci_ev_sync_conn_complete *ev =3D
-> +               (void *) skb->data + sizeof(*hdr);
-> +       struct hci_dev *hdev =3D data->hdev;
-> +       unsigned int notify_air_mode;
-> +
-> +       if (hci_skb_pkt_type(skb) !=3D HCI_EVENT_PKT)
-> +               return;
-> +
-> +       if (skb->len < sizeof(*hdr) || hdr->evt !=3D HCI_EV_SYNC_CONN_COM=
-PLETE)
-> +               return;
-> +
-> +       if (skb->len !=3D sizeof(*hdr) + sizeof(*ev) || ev->status)
-> +               return;
-> +
-> +       switch (ev->air_mode) {
-> +       case BT_CODEC_CVSD:
-> +               notify_air_mode =3D HCI_NOTIFY_ENABLE_SCO_CVSD;
-> +               break;
-> +
-> +       case BT_CODEC_TRANSPARENT:
-> +               notify_air_mode =3D HCI_NOTIFY_ENABLE_SCO_TRANSP;
-> +               break;
-> +
-> +       default:
-> +               return;
-> +       }
-> +
-> +       bt_dev_info(hdev, "enabling SCO with air mode %u", ev->air_mode);
-> +       data->sco_num =3D 1;
-> +       data->air_mode =3D notify_air_mode;
-> +       schedule_work(&data->work);
-> +}
-> +
->  static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb=
-)
->  {
->         if (data->intr_interval) {
-> @@ -1120,6 +1158,11 @@ static int btusb_recv_event(struct btusb_data *dat=
-a, struct sk_buff *skb)
->                 schedule_delayed_work(&data->rx_work, 0);
->         }
->
-> +       /* Configure altsetting for HCI_USER_CHANNEL on SCO connected */
-> +       if (auto_set_isoc_alt &&
-> +           hci_dev_test_flag(data->hdev, HCI_USER_CHANNEL))
-> +               btusb_sco_connected(data, skb);
-> +
->         return data->recv_event(data->hdev, skb);
->  }
->
-> --
-> 2.48.1.658.g4767266eb4-goog
+This is automated email and please do not reply to this email!
 
-This has been merged, I did some minor rewording here and there but
-the logic remains the same, now we can problem revert b16b327edb4d
-("Bluetooth: btusb: add sysfs attribute to control USB alt setting")?
+Dear submitter,
 
---=20
-Luiz Augusto von Dentz
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=938698
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.38 seconds
+GitLint                       PENDING   0.27 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      24.23 seconds
+CheckAllWarning               PASS      26.54 seconds
+CheckSparse                   WARNING   29.87 seconds
+BuildKernel32                 PASS      23.71 seconds
+TestRunnerSetup               PASS      427.13 seconds
+TestRunner_l2cap-tester       PASS      22.76 seconds
+TestRunner_iso-tester         PASS      29.58 seconds
+TestRunner_bnep-tester        PASS      4.76 seconds
+TestRunner_mgmt-tester        FAIL      122.49 seconds
+TestRunner_rfcomm-tester      PASS      7.84 seconds
+TestRunner_sco-tester         PASS      11.54 seconds
+TestRunner_ioctl-tester       PASS      8.26 seconds
+TestRunner_mesh-tester        PASS      6.02 seconds
+TestRunner_smp-tester         PASS      7.23 seconds
+TestRunner_userchan-tester    PASS      4.97 seconds
+IncrementalBuild              PENDING   0.58 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:147:35: warning: array of flexible structures
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.159 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.194 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6332925271701993308==--
