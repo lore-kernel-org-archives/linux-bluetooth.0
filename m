@@ -1,309 +1,149 @@
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42829183098
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2025 02:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B27220687
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2025 07:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740622968; cv=none; b=sySxvvaeNF2ocjNH98vwyMhkiS1W1CQesoUGX6Vt+A5Ja5eDzwK4RHdoqtQR0tbNyG9giGVO0amz/+/mqXAkm2qp542qHZs6KfdzqgrLOJp27X+D+u86C0bVIOSSArXTiNnJLKqpGxwUk2O07h6LiKTHtuIAj7bkwcUuzdyTgcs=
+	t=1740640348; cv=none; b=qSq5p1v3/UXFyhcfGSa4Fk4YxH8VcC78hnLtKZcFgsgXimEOc6l5tTQ1wZVMsrYnAicQbaG8XsgseeTJx5n2FL4GHe2f++mnq5tQjBhF5qQURhvA2nrMv/X9qUoxV3fiTWVZ04VlAoBdfxSRpE6CYhk9P6jPw9eCvPJ0qxa5+Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740622968; c=relaxed/simple;
-	bh=amn0AAMAJ9OUAwODEd6WHVij94pctxdh5CpVJcnSY8E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uKng4fufZ/HpH/cWrjnGvM6UfT8MSCkmq29Q+XPQd73Cvjdlsirwm509DZ0df1eGYoD7vdzCl0VYlf14zZpHkQCXMmzSKf6MFkhW02dUfmmCM0r2Vd+D8iCf5km73WbUCGuaEiMGbcojroHhQnTu0kKENhB6AQy+Ms9Wiv6Uk6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fXeU9IiL; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1740640348; c=relaxed/simple;
+	bh=EHkwOsTi98TGffo/fQE6AQx6mmSwXjwpLNRKCm7qY9o=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VdP58g9yOxA7vEFh9LNQzRoilOgTa5H5TAr5UbLwasASFF9IsQVegPukoJreTHyHTXkFJkDYtoYXrDiIlJEg3KPi8gSKwp65eqm9PaMX7K+67HuEhzbsls36cp1LEL8Cl2sFsg52c6+mvx9ap6wUK4PoPLjwKPUjfD866XRVucU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T1QGVuce; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fXeU9IiL"
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e549be93d5eso463029276.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2025 18:22:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740622965; x=1741227765; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M3MWRcNWI09IZPcVKllS0Tgx1fepUOzUdrtIZArS3Ko=;
-        b=fXeU9IiL3Ru5/pVxKvuQB3N9GGqx3BrAwDZCFp7il/MMtviO12xAAYYpFPMvBWQPCR
-         wzVn8fmpWicxj6xrZOr/CWa6upEK83CeHWOnAqUuQ5PuTueNV5OsVQOKiOD1EjTibYMK
-         s7u+Zuj5em6qKHGoKapVQdPYBJ/NSTeAitrVQLaeGKBLslVyHdjf++gpTMaUINTuOP3b
-         4pmacXjrimiF4E5b+YFwc6apeUKXS6OweOADR/bTPSmtJ6kRcLvUgO+8owqKn2+S1+ts
-         WzxTQb5lvHD43KMUInIagnvFPivLqTIHOWRoEqiF1f1eH0MS+7glfUDVYeIQF3XnhN0l
-         eDjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740622965; x=1741227765;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M3MWRcNWI09IZPcVKllS0Tgx1fepUOzUdrtIZArS3Ko=;
-        b=c7Ps7sf2Tbmnvl8t1leLZctFLFGeY2b7n8rU8ZU0phH17pOLWyz/CK7sLLVfzx7bVp
-         ioPoForA2Amk+SwDnq1x1R6WBg7f41FPd0X0pZDDe3yNnOhT39XMqogH+g6Ose0hFGxG
-         frCt7YTtszgrFiDM9AhWEFpWeyvzE0CfilZu4KkJpNeoVHMLj9hXF6n1Kr3MxcwdqiZM
-         j1lCb6PSVJvd9Y6v4gW+3i3bs849+QeHi9pd5IimoqIKrI2gnu2YUi8/w1GAUTg37hjV
-         lI7XYVdyglw9QhdMMUMKQp19nPAko/6Rj+J6PRXKeBtyfLYv1bUGpw4miZTKgUJeJVlZ
-         bZsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKSy6A+5lIWv6C5VD1Zyf3JveynHKuscJsfaRRQ8PYrOfnNAgxylDzHTq/JCTYltVTPG+CJxa2liJRntGdGsM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkhrviQG51foNgvou+3voQLOQyfuSrvOLh7G9prDzKamtt+q7X
-	7Wee6XFy5jbbbtbiHPxqqeeDKdeL54O/QznKNJ4JaxpX7LZ+poO5yP5OKAEzxKgMOM3vweGxe0Q
-	a6KEOZ1SvU4Xnb9BuxTCHy4rI9YK7CBnktmcw
-X-Gm-Gg: ASbGnctlFGyCHpUbg6h2I1rb7VU9F60NuzZlmBcUgjfleznpSMQvDimqaKNMsaiHIN8
-	ZozjbhQnBPcIi+fXIWc/2m5wUZXgwIHR6Zw/oUXjzEmXZBAhmZpv6e+HPxwPRcIIX3rFjTcr9fD
-	0Dhxilt1+S
-X-Google-Smtp-Source: AGHT+IFnY0zvAKqxAj3i0oWKJG6BQPRyz8bYwFfTJn2hQdUfBoQYlUi4gYnyeqcwqBmkrVKaByi7IuRgKh+++eUSatk=
-X-Received: by 2002:a05:6902:1a42:b0:e57:3872:c374 with SMTP id
- 3f1490d57ef6-e607a55318emr8471880276.33.1740622964900; Wed, 26 Feb 2025
- 18:22:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T1QGVuce"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740640348; x=1772176348;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=EHkwOsTi98TGffo/fQE6AQx6mmSwXjwpLNRKCm7qY9o=;
+  b=T1QGVucecsv+XCESVt9j2ml/LUQSZlDSI/eu1EvdVNwuCxfv3OdYVZ1u
+   Htghu8eYWQBkYL82EpBPPm7PMubyfAk/67XdmQhkYJQeX/CBqPJfkwGlJ
+   XylpwawSn//CpP+xxRNX/9bxUQdGj0YGhiEdmVpiLOYZw17sJFPMLcPzE
+   zSO/kwfOPsgTf2CzcifCw+GAJ4Rgosq/WP/rGjoLy5BVBCJN7ax82AY7u
+   oEuzb+8yJyhhRWgDCoTbm+RQt7Q1J0TU3t1IvkdCyF/tE9s26QftkTQ2K
+   qd1lAnXZYiODmhEskA3X/QpuiQTbCUv8OcmmglsmdwLejlBJoFMvUcBwj
+   w==;
+X-CSE-ConnectionGUID: 5Yceeu4qQdqrX00eOiAXrA==
+X-CSE-MsgGUID: sWGI6u2BRQ+dovJVQlpLtQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="41648689"
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="41648689"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 23:12:27 -0800
+X-CSE-ConnectionGUID: ZEqPPcfkTWOPddNawts56Q==
+X-CSE-MsgGUID: V957D0BuTy2LAuHJLiqBDA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="121954904"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 26 Feb 2025 23:12:24 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tnY4B-000D0b-1r;
+	Thu, 27 Feb 2025 07:12:20 +0000
+Date: Thu, 27 Feb 2025 15:11:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Vijay Satija <vijay.satija@intel.com>
+Subject: [bluetooth-next:master 28/29]
+ drivers/bluetooth/btintel_pcie.c:134:58: warning: shift count >= width of
+ type
+Message-ID: <202502271502.37Q8TE9Q-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224045237.1290971-1-chharry@google.com> <2025022431-ditto-shy-c62f@gregkh>
- <CADg1FFeW5EXOJTqTS+jwBphGnDSCreNwM8hcFOhB1Tatdti6QA@mail.gmail.com>
- <2025022407-polo-disgrace-9655@gregkh> <CADg1FFehoZr3DmDhV_ri69+XBHLQcpKjoxLMaVhQUdzRuhST9A@mail.gmail.com>
- <CABBYNZLhR+OJQnYZ5vN5HjgiWwKrXvOse-pXhCcTdFpJrrzsNg@mail.gmail.com>
-In-Reply-To: <CABBYNZLhR+OJQnYZ5vN5HjgiWwKrXvOse-pXhCcTdFpJrrzsNg@mail.gmail.com>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Thu, 27 Feb 2025 10:22:17 +0800
-X-Gm-Features: AQ5f1JrxgnmifW-sMFYHQWe8yAXF3kZCnP2KGZpmQd0LTYVFZem0Dwd5Rb1IBKM
-Message-ID: <CADg1FFdtr2gnKy5VfFoCm4+0cGRJkvsOBRXtrcLSaMJwGjhBUQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Configure altsetting for USER_CHANNEL
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Ying Hsu <yinghsu@chromium.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Luiz,
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   978777bfa2d88998f2ffa2d3405ee20b7276890a
+commit: 3104ae5ad1b732140847f1f29534a448b6804d8e [28/29] Bluetooth: btintel_pcie: Setup buffers for firmware traces
+config: powerpc-randconfig-001-20250227 (https://download.01.org/0day-ci/archive/20250227/202502271502.37Q8TE9Q-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250227/202502271502.37Q8TE9Q-lkp@intel.com/reproduce)
 
-On Thu, Feb 27, 2025 at 4:55=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Hsin-chen,
->
-> On Mon, Feb 24, 2025 at 2:13=E2=80=AFAM Hsin-chen Chuang <chharry@google.=
-com> wrote:
-> >
-> > On Mon, Feb 24, 2025 at 2:44=E2=80=AFPM Greg KH <gregkh@linuxfoundation=
-.org> wrote:
-> > >
-> > > On Mon, Feb 24, 2025 at 02:25:52PM +0800, Hsin-chen Chuang wrote:
-> > > > Hi Greg,
-> > > >
-> > > > On Mon, Feb 24, 2025 at 2:10=E2=80=AFPM Greg KH <gregkh@linuxfounda=
-tion.org> wrote:
-> > > > >
-> > > > > On Mon, Feb 24, 2025 at 12:52:32PM +0800, Hsin-chen Chuang wrote:
-> > > > > > From: Hsin-chen Chuang <chharry@chromium.org>
-> > > > > >
-> > > > > > Automatically configure the altsetting for USER_CHANNEL when a =
-SCO is
-> > > > > > connected. This adds support for the USER_CHANNEL to transfer S=
-CO data
-> > > > > > over USB transport.
-> > > > > >
-> > > > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to =
-control USB alt setting")
-> > > > > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > > > > > ---
-> > > > > >
-> > > > > > Changes in v2:
-> > > > > > - Give up tracking the SCO handles. Only configure the altsetti=
-ng when
-> > > > > >   SCO connected.
-> > > > > > - Put the change behind Kconfig/module parameter
-> > > > > >
-> > > > > >  drivers/bluetooth/Kconfig | 11 ++++++++++
-> > > > > >  drivers/bluetooth/btusb.c | 46 +++++++++++++++++++++++++++++++=
-++++++++
-> > > > > >  2 files changed, 57 insertions(+)
-> > > > > >
-> > > > > > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kcon=
-fig
-> > > > > > index 4ab32abf0f48..7c497f878732 100644
-> > > > > > --- a/drivers/bluetooth/Kconfig
-> > > > > > +++ b/drivers/bluetooth/Kconfig
-> > > > > > @@ -56,6 +56,17 @@ config BT_HCIBTUSB_POLL_SYNC
-> > > > > >         Say Y here to enable USB poll_sync for Bluetooth USB de=
-vices by
-> > > > > >         default.
-> > > > > >
-> > > > > > +config BT_HCIBTUSB_AUTO_SET_ISOC_ALT
-> > > > > > +     bool "Auto set isoc_altsetting for USER_CHANNEL when SCO =
-connected"
-> > > > > > +     depends on BT_HCIBTUSB
-> > > > > > +     default n
->
-> Maybe we can do just:
->
->  default y if CHROME_PLATFORMS
->
-> > > > > > +     help
-> > > > > > +       Say Y here to enable auto set isoc_altsetting for USER_=
-CHANNEL
-> > > > > > +       when SCO connected
-> > > > > > +
-> > > > > > +       This can be overridden by passing btusb.auto_set_isoc_a=
-lt=3D[y|n]
-> > > > > > +       on the kernel commandline.
-> > > > > > +
-> > > > > >  config BT_HCIBTUSB_BCM
-> > > > > >       bool "Broadcom protocol support"
-> > > > > >       depends on BT_HCIBTUSB
-> > > > > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btus=
-b.c
-> > > > > > index de3fa725d210..af93d757911b 100644
-> > > > > > --- a/drivers/bluetooth/btusb.c
-> > > > > > +++ b/drivers/bluetooth/btusb.c
-> > > > > > @@ -34,6 +34,8 @@ static bool force_scofix;
-> > > > > >  static bool enable_autosuspend =3D IS_ENABLED(CONFIG_BT_HCIBTU=
-SB_AUTOSUSPEND);
-> > > > > >  static bool enable_poll_sync =3D IS_ENABLED(CONFIG_BT_HCIBTUSB=
-_POLL_SYNC);
-> > > > > >  static bool reset =3D true;
-> > > > > > +static bool auto_set_isoc_alt =3D
-> > > > > > +     IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTO_SET_ISOC_ALT);
-> > > > > >
-> > > > > >  static struct usb_driver btusb_driver;
-> > > > > >
-> > > > > > @@ -1113,6 +1115,42 @@ static inline void btusb_free_frags(stru=
-ct btusb_data *data)
-> > > > > >       spin_unlock_irqrestore(&data->rxlock, flags);
-> > > > > >  }
-> > > > > >
-> > > > > > +static void btusb_sco_connected(struct btusb_data *data, struc=
-t sk_buff *skb)
-> > > > > > +{
-> > > > > > +     struct hci_event_hdr *hdr =3D (void *) skb->data;
-> > > > > > +     struct hci_ev_sync_conn_complete *ev =3D
-> > > > > > +             (void *) skb->data + sizeof(*hdr);
-> > > > > > +     struct hci_dev *hdev =3D data->hdev;
-> > > > > > +     unsigned int notify_air_mode;
-> > > > > > +
-> > > > > > +     if (hci_skb_pkt_type(skb) !=3D HCI_EVENT_PKT)
-> > > > > > +             return;
-> > > > > > +
-> > > > > > +     if (skb->len < sizeof(*hdr) || hdr->evt !=3D HCI_EV_SYNC_=
-CONN_COMPLETE)
-> > > > > > +             return;
-> > > > > > +
-> > > > > > +     if (skb->len !=3D sizeof(*hdr) + sizeof(*ev) || ev->statu=
-s)
-> > > > > > +             return;
-> > > > > > +
-> > > > > > +     switch (ev->air_mode) {
-> > > > > > +     case BT_CODEC_CVSD:
-> > > > > > +             notify_air_mode =3D HCI_NOTIFY_ENABLE_SCO_CVSD;
-> > > > > > +             break;
-> > > > > > +
-> > > > > > +     case BT_CODEC_TRANSPARENT:
-> > > > > > +             notify_air_mode =3D HCI_NOTIFY_ENABLE_SCO_TRANSP;
-> > > > > > +             break;
-> > > > > > +
-> > > > > > +     default:
-> > > > > > +             return;
-> > > > > > +     }
-> > > > > > +
-> > > > > > +     bt_dev_info(hdev, "enabling SCO with air mode %u", ev->ai=
-r_mode);
-> > > > > > +     data->sco_num =3D 1;
-> > > > > > +     data->air_mode =3D notify_air_mode;
-> > > > > > +     schedule_work(&data->work);
-> > > > > > +}
-> > > > > > +
-> > > > > >  static int btusb_recv_event(struct btusb_data *data, struct sk=
-_buff *skb)
-> > > > > >  {
-> > > > > >       if (data->intr_interval) {
-> > > > > > @@ -1120,6 +1158,11 @@ static int btusb_recv_event(struct btusb=
-_data *data, struct sk_buff *skb)
-> > > > > >               schedule_delayed_work(&data->rx_work, 0);
-> > > > > >       }
-> > > > > >
-> > > > > > +     /* Configure altsetting for HCI_USER_CHANNEL on SCO conne=
-cted */
-> > > > > > +     if (auto_set_isoc_alt &&
-> > > > > > +         hci_dev_test_flag(data->hdev, HCI_USER_CHANNEL))
-> > > > > > +             btusb_sco_connected(data, skb);
-> > > > > > +
-> > > > > >       return data->recv_event(data->hdev, skb);
-> > > > > >  }
-> > > > > >
-> > > > > > @@ -4354,6 +4397,9 @@ MODULE_PARM_DESC(enable_autosuspend, "Ena=
-ble USB autosuspend by default");
-> > > > > >  module_param(reset, bool, 0644);
-> > > > > >  MODULE_PARM_DESC(reset, "Send HCI reset command on initializat=
-ion");
-> > > > > >
-> > > > > > +module_param(auto_set_isoc_alt, bool, 0644);
-> > > > > > +MODULE_PARM_DESC(auto_set_isoc_alt, "Auto set isoc_altsetting =
-for USER_CHANNEL when SCO connected");
-> > > > >
-> > > > > This is not the 1990's, why are you adding new module parameters =
-when we
-> > > > > have so many other more proper ways to do this?  And really, this=
- would
-> > > >
-> > > > Sorry but could you please provide an example to guard a feature li=
-ke this.
-> > >
-> > > Depends on what you want to do with this configuration.  Why is it an
-> > > option at all?  Why can't it "just work"?  Module parameters are a pa=
-in
-> >
-> > I would like to hand this question to Luiz. I believe this patch just
-> > works because this configuration is defined in the spec.
-> > I think Luiz's point is to project the potential existing user, but
-> > there's probably no User channel user sending SCO data with the latest
-> > btusb driver because:
-> > a) There's no way to configure alt setting from userspace
-> > b) Before eafcfcfca97d, SCO data would be rejected since User channel
-> > shouldn't be able to modify hci_conn_num
->
-> Perhaps you can just use CHROME_PLATFORMS (suggested above) in Kconfig
-> to enable intercepting of the events, etc, so we don't need any
-> runtime parameters.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502271502.37Q8TE9Q-lkp@intel.com/
 
-I'm afraid that this doesn't resolve Greg's comment below because the
-multiple controllers are still bonded to the same config.
-Also I would hesitate to put this Chrome devices specific because
-project Floss shall be able to run on a general Linux environment.
-If you have a strong opinion to guard this behind a flag, perhaps we
-could try other options suggested by Greg (configfs or maybe back to
-sysfs).
+All warnings (new ones prefixed by >>):
 
->
-> > > to configure, we have loads of other ways to do this now (configfs,
-> > > debugfs for debugging stuff, sysfs for device-specific things, etc.)
-> > >
-> > > > > not work at all for multiple controllers in teh same system, righ=
-t?
-> > > >
-> > > > Do you mean we can't have separate parameters for different
-> > > > controllers? Yes that's true, but why would a user want the differe=
-nt
-> > > > behavior on the same machine?
-> > >
-> > > Why would you prevent them from allowing this to happen for a
-> > > device-specific option?
-> > >
-> > > thanks,
-> > >
-> > > greg k-h
-> >
-> > --
-> > Best Regards,
-> > Hsin-chen
->
->
->
-> --
-> Luiz Augusto von Dentz
+>> drivers/bluetooth/btintel_pcie.c:134:58: warning: shift count >= width of type [-Wshift-count-overflow]
+     134 |                 db_frag.bufs[i].buf_addr_msb = (u32)((buf->data_p_addr >> 32) & 0xffffffff);
+         |                                                                        ^  ~~
+   drivers/bluetooth/btintel_pcie.c:419:20: warning: unused function 'btintel_pcie_in_rom' [-Wunused-function]
+     419 | static inline bool btintel_pcie_in_rom(struct btintel_pcie_data *data)
+         |                    ^~~~~~~~~~~~~~~~~~~
+   2 warnings generated.
 
 
-Best Regards,
+vim +134 drivers/bluetooth/btintel_pcie.c
 
-Hsin-chen
+    90	
+    91	/* This function initializes the memory for DBGC buffers and formats the
+    92	 * DBGC fragment which consists header info and DBGC buffer's LSB, MSB and
+    93	 * size as the payload
+    94	 */
+    95	static int btintel_pcie_setup_dbgc(struct btintel_pcie_data *data)
+    96	{
+    97		struct btintel_pcie_dbgc_ctxt db_frag;
+    98		struct data_buf *buf;
+    99		int i;
+   100	
+   101		data->dbgc.count = BTINTEL_PCIE_DBGC_BUFFER_COUNT;
+   102		data->dbgc.bufs = devm_kcalloc(&data->pdev->dev, data->dbgc.count,
+   103					       sizeof(*buf), GFP_KERNEL);
+   104		if (!data->dbgc.bufs)
+   105			return -ENOMEM;
+   106	
+   107		data->dbgc.buf_v_addr = dmam_alloc_coherent(&data->pdev->dev,
+   108							    data->dbgc.count *
+   109							    BTINTEL_PCIE_DBGC_BUFFER_SIZE,
+   110							    &data->dbgc.buf_p_addr,
+   111							    GFP_KERNEL | __GFP_NOWARN);
+   112		if (!data->dbgc.buf_v_addr)
+   113			return -ENOMEM;
+   114	
+   115		data->dbgc.frag_v_addr = dmam_alloc_coherent(&data->pdev->dev,
+   116							     sizeof(struct btintel_pcie_dbgc_ctxt),
+   117							     &data->dbgc.frag_p_addr,
+   118							     GFP_KERNEL | __GFP_NOWARN);
+   119		if (!data->dbgc.frag_v_addr)
+   120			return -ENOMEM;
+   121	
+   122		data->dbgc.frag_size = sizeof(struct btintel_pcie_dbgc_ctxt);
+   123	
+   124		db_frag.magic_num = BTINTEL_PCIE_MAGIC_NUM;
+   125		db_frag.ver = BTINTEL_PCIE_DBGC_FRAG_VERSION;
+   126		db_frag.total_size = BTINTEL_PCIE_DBGC_FRAG_PAYLOAD_SIZE;
+   127		db_frag.num_buf = BTINTEL_PCIE_DBGC_FRAG_BUFFER_COUNT;
+   128	
+   129		for (i = 0; i < data->dbgc.count; i++) {
+   130			buf = &data->dbgc.bufs[i];
+   131			buf->data_p_addr = data->dbgc.buf_p_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
+   132			buf->data = data->dbgc.buf_v_addr + i * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
+   133			db_frag.bufs[i].buf_addr_lsb = (u32)(buf->data_p_addr & 0xffffffff);
+ > 134			db_frag.bufs[i].buf_addr_msb = (u32)((buf->data_p_addr >> 32) & 0xffffffff);
+   135			db_frag.bufs[i].buf_size = BTINTEL_PCIE_DBGC_BUFFER_SIZE;
+   136		}
+   137	
+   138		memcpy(data->dbgc.frag_v_addr, &db_frag, sizeof(db_frag));
+   139		return 0;
+   140	}
+   141	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
