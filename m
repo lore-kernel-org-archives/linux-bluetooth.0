@@ -1,141 +1,220 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E523018CC15
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2025 18:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740682137; cv=none; b=nntFUY0epUAEZIMxVSkT0qetoOJwQrsMilon5nJvT1k5qcAOblGD3ho+FSQ1h5ulu/wp/wu0gewdi68kZSgjcefUFLNnlYflghGr/LjtYBJIjEWe4gKuSl0GTXgr06PUZfgbhC8uWUWYbt40EecwxSqIxSQw9KrtsXJfeJiTfoc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740682137; c=relaxed/simple;
-	bh=r6mpwCQWm3MnSbm8PnUnXKYi+JUNBMClfJ/CZBr/7FM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fPEAMsC0GBEoHyCuPQZtXaH4BH7YP46buqrR9nEt1Umlmd45voNrqyorsWY+CHH0536aK1rB7MCMt91ajXgvhS+dAcyU9Wkjyybz7lKOAof0wPHyI7JqRKR7fJFsXI1iT68+gAS9JgGdfUgloLu+x09tOg0x+jsIm+cHjk872tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dxuKbiyE; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B24121ABA0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2025 19:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740685019; cv=pass; b=idvLZfKtVhX/uVV108QkiHUjo3cyXfwXqVu2SRmlm0vN89BK85n2UdnxnXQkzVXhzWbJQg/7YkwYwylujhvNvq/IwmvTKGPpMuRYOA6pM58hJiUlwAgpLrDPRS6XB51q/X2ZmU0Ht1dhtQWqr35pmVlPVJWXzjNJyxC9AjrWqeI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740685019; c=relaxed/simple;
+	bh=C5oGAHvYHeO7aB4G46jLdYndfYzS/GR6i1VJOIOzA5Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CKr7I97koaAxQmGhkwG5Oia8TOI7tGzAFWqdFoShUWe1JsMAjgmr7WraYYYIvKg3DxsbBSsuMnOm6wcWBTGYmipVVF31SMZ/SvRnV/jV3oO6F4ciI8e/XqpVSA9JJiVOEVnve2MplVh/nVByC8g6x+d6ogENqMBx86xO9sww18c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=FgcKnbAp; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dxuKbiyE"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e89b6b5342so7373306d6.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2025 10:48:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740682133; x=1741286933; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kqga+kynbjrmQBRUDVV5s/wuGLmqWqnjqObopIoZf5k=;
-        b=dxuKbiyEEQrfBmvKSCNWkVDQqWINzdMjfUiNYzAetMd5Ig4VG7TiB/U0IDMXX/9sJS
-         LBIvxDdcHoSkrpgVnt87tPNogsmaDfRyhnIPOmXJ7aynE1AD/bBl2ZaiC4f0fx8Si1Ia
-         mUzMpoCbAQDqusb1pRx0oSrnRqIw8MpfZXzFhwqh9GE32nB+iIj6XyMi2qJOXaLm6QZx
-         a7wqONPQwdZ7UmxI6DlT3xmlf+adGH5u0yVpGFJEQbjBF8sEnr/QU1BuQusDrM1MkCEy
-         eHmS94jd7LIL9KYj0KOZJycTR/Ql0SISv4riY3DPWQVdi4lmuwNZ3r5Ci9pWw6WHeem/
-         mV5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740682133; x=1741286933;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Kqga+kynbjrmQBRUDVV5s/wuGLmqWqnjqObopIoZf5k=;
-        b=kKTMlAUt5O7y4lmH41ikneGWkUz5gpG+aALHRJfN8PdGiWPzeNyw5FuISEq/Diy0/3
-         p9MXMzBpVVdkpKxjU87pVpaLgu5wFW8gqQnOwgX/W8rxX4Uh5qPy6jCUfeMF/uMLGR/V
-         IUEODc3eEl0pAyuNgn2yTukiu9d74NUM9MlDFFQjIBYI1vnObrLGchypIiclPYBSsajO
-         nI2WhyNaIm1Fqklh3DhYfEDNFHZd2Cm74ti3gPomA0hNR6+huEBxBZkMOiMuiQY/NIQr
-         FRXUjLddqgLy/pCGa7W/6tLh0jcUrIPUPG6GY7vzX2vuKwshTyQPtZTRc1uv4sphyzx/
-         Ck+g==
-X-Gm-Message-State: AOJu0Yz4wCe67gJQen2ITItDTl2ZP46D7h9G9YBGwiqIK5S0Pkoonr02
-	DXJHP+OQr/lM8Ht0ARabxLyCuK9W8cbgDB3dmfNcpbCNGlTmc/kxdwPkzg==
-X-Gm-Gg: ASbGncsFya/bHL7BAw8ElqFtk4sBa++OQkoVzkXsKHWKpAHDzz4bAKFmEoAxnVKM7OZ
-	RQkDJdGJAGGmikryH6lqtl3F2bA4+4OGszqdo/ijKOl10tvjOICAfD7Gwd3Oq5qjtUDGSqf+0Ab
-	hi8wQ/1WN7W3haZn0iVZihzDQQx/yP5oRZ67uuKGNQ4CbVOS/NHo1uO46WdjJ25741O8I8BkRgB
-	8ks8XL3fyO6fUEWh1bfGmW2vpXDs4oWNhz6s4N4vEh3t+LUEyJohZD71jJlwaCnHGYzOYTqytmV
-	AGkfOy3ZxBalBvoEtZa9i1trEoJZfol4GIc=
-X-Google-Smtp-Source: AGHT+IHPiH7VQvXC1HS1Jb4ideXeJqQAzWZBnqzhf1NnmY3LOsv4cO19N0QM1JwFSMjsBts0h8T8dQ==
-X-Received: by 2002:a05:6214:21e7:b0:6d8:850a:4d6a with SMTP id 6a1803df08f44-6e8a0c801a7mr8230586d6.1.1740682133456;
-        Thu, 27 Feb 2025 10:48:53 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.110.103])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8976ec3absm12593696d6.122.2025.02.27.10.48.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 10:48:53 -0800 (PST)
-Message-ID: <67c0b395.050a0220.3817ee.565b@mx.google.com>
-Date: Thu, 27 Feb 2025 10:48:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4461343079520580104=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="FgcKnbAp"
+Received: from monolith.lan (unknown [193.138.7.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Z3hRg06W3z4BKJH;
+	Thu, 27 Feb 2025 21:36:46 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1740685008;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4rcUswnrmL+szkfc/27Z7b9Kn/yCqYzT22KbLFSXzKA=;
+	b=FgcKnbApRPSnMdUOc6dgb+woQM87Jo/R3cbiPDCdYFMgGx1Q5TFWHVgBS8mGmk9An1ieXM
+	Mybe9XOcorKj1usROzrmRkLrE8ItffzYg8lJwUTxSbWy0wGhXx4PxM8Qjbg9CCjLS2B4Gf
+	CUijG+Iy8AZ+LB7mbS0fdSGwzU/40nxbEZE9HNP9qF7OpoqgZBiOnI72UsF4ibcm7cBb//
+	jMU58vgKiNGDGGzrVI+jM8ArA4WSFXLmqKZYMa9kQrDgCueqa+oC1RL4+wsoakrWdpalj1
+	qNGB5L96Swx4vo7CqCFPeXZBGr0m4D6mbppRWcF6LwSQXOvbuPgUpbignkwOeg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1740685008; a=rsa-sha256;
+	cv=none;
+	b=RLY+ERWOsZuHxXQ1PwH5Tj/6/OS1E0kh2qmf8nFHh8lZDTbY+1EWXnnhK1gBScjrqa80op
+	Nev6+EaH8q/kUqqkOPVd/nLyid5/dv8iaB5ecF/3MS7b6jx4HSURdHfg8RaVxtcfn7VGR6
+	W76a0bcxx5T7r6bGLpfPEAVT/hEmft2pIxaV74LSjXkSQ34Jshl0a5vRUB/r45ly8r5vbA
+	yadUvddTPUCr6fUcCWeJ3HukXM3vS4pjK6+2Jp6tJvGVcFsX3Zu6YX/wcOphfQ6TJ4MY8Q
+	u8qhD9kIVwFDG5I7+3mhwRixWLhO37X/labmiQFY8E38wtMXyXig71WvosvbmA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1740685008;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4rcUswnrmL+szkfc/27Z7b9Kn/yCqYzT22KbLFSXzKA=;
+	b=Tmd5XcyaU/VJsioqX11wqvNWXsoHkRk/+UzMkeQvrYBM4MpKtg0BHUZ7g5ck264fHkqOaQ
+	ypa18rOBWgMGujF/zaORTcbt+kao7FH7bcrNfCwFmzg92Sp7L+C3BncWcgsiECr92XDHaL
+	8wjPdt9C3xa1ZPyPtftTbe58txajkUOu0f2iyJ/9KCFzXOXpPcK6fljgLpF8Q+67k37rFo
+	AmT+mZI4HNg3e17CXy7CHvNfUH/S8GjWvXbWjnN6Snqt+jTUgWz0WlwdyJx7+mcA7z18lb
+	L3Wpy8nN6REUE7wHVBDjlkOIUAUWmvaDYZzEboOab0nmtqoffZvS7acyzfYXtA==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	eadavis@qq.com,
+	luiz.von.dentz@intel.com
+Subject: [PATCH BlueZ] sco-tester: add test for disconnecting SCO
+Date: Thu, 27 Feb 2025 21:36:42 +0200
+Message-ID: <b3bf384b8e710156dd2a0f7ee2c21b98da9f4c79.1740684902.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v1,1/2] Bluetooth: btnxpuart: Move vendor specific initialization to .post_init
-In-Reply-To: <20250227182620.740323-1-neeraj.sanjaykale@nxp.com>
-References: <20250227182620.740323-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4461343079520580104==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add test that checks that shutdown(sk) results to
+HCI_Disconnection_Complete for the SCO handle:
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=938640
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.27 seconds
-SubjectPrefix                 PASS      0.21 seconds
-BuildKernel                   PASS      23.95 seconds
-CheckAllWarning               PASS      26.71 seconds
-CheckSparse                   PASS      29.81 seconds
-BuildKernel32                 PASS      23.77 seconds
-TestRunnerSetup               PASS      427.85 seconds
-TestRunner_l2cap-tester       PASS      21.02 seconds
-TestRunner_iso-tester         PASS      38.03 seconds
-TestRunner_bnep-tester        PASS      4.85 seconds
-TestRunner_mgmt-tester        FAIL      120.37 seconds
-TestRunner_rfcomm-tester      PASS      7.85 seconds
-TestRunner_sco-tester         PASS      9.53 seconds
-TestRunner_ioctl-tester       PASS      8.47 seconds
-TestRunner_mesh-tester        PASS      5.94 seconds
-TestRunner_smp-tester         PASS      7.16 seconds
-TestRunner_userchan-tester    PASS      5.01 seconds
-IncrementalBuild              PENDING   0.56 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.194 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+SCO Disconnect - Success
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    It seems after the following commit closing SCO connections no longer
+    works, as kernel does not seem to be sending HCI Disconnect after the
+    SCO socket is shutdown & closed:
+    
+    commit ed9588554943 ("Bluetooth: SCO: remove the redundant sco_conn_put")
+    
+    The test added here passes with that commit reverted.
 
---===============4461343079520580104==--
+ tools/sco-tester.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
+
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index 6fc26b7af..7f37ca5cf 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -45,6 +45,7 @@ struct test_data {
+ 	bool disable_esco;
+ 	bool enable_codecs;
+ 	int step;
++	uint16_t handle;
+ 	struct tx_tstamp_data tx_ts;
+ };
+ 
+@@ -53,6 +54,9 @@ struct sco_client_data {
+ 	const uint8_t *send_data;
+ 	uint16_t data_len;
+ 
++	/* Shutdown socket after connect */
++	bool shutdown;
++
+ 	/* Enable SO_TIMESTAMPING with these flags */
+ 	uint32_t so_timestamping;
+ 
+@@ -268,6 +272,11 @@ static const struct sco_client_data connect_success = {
+ 	.expect_err = 0
+ };
+ 
++static const struct sco_client_data disconnect_success = {
++	.expect_err = 0,
++	.shutdown = true,
++};
++
+ static const struct sco_client_data connect_failure = {
+ 	.expect_err = EOPNOTSUPP
+ };
+@@ -751,6 +760,11 @@ static gboolean sco_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		}
+ 	}
+ 
++	if (scodata->shutdown) {
++		tester_print("Disconnecting...");
++		shutdown(sk, SHUT_RDWR);
++	}
++
+ 	if (-err != scodata->expect_err)
+ 		tester_test_failed();
+ 	else if (!data->step)
+@@ -875,6 +889,69 @@ end:
+ 	close(sk);
+ }
+ 
++static bool hook_setup_sync_evt(const void *buf, uint16_t len, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct bt_hci_evt_sync_conn_complete *evt = buf;
++
++	if (len < sizeof(*evt)) {
++		tester_warn("Bad event size");
++		tester_test_failed();
++		return true;
++	}
++
++	data->handle = le16_to_cpu(evt->handle);
++	tester_print("SCO Handle %u", data->handle);
++	return true;
++}
++
++static bool hook_disconnect_evt(const void *buf, uint16_t len, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct bt_hci_evt_disconnect_complete *evt = buf;
++	uint16_t handle;
++
++	if (len < sizeof(*evt)) {
++		tester_warn("Bad event size");
++		tester_test_failed();
++		return true;
++	}
++
++	handle = le16_to_cpu(evt->handle);
++	tester_print("Disconnected Handle %u", handle);
++
++	if (handle != data->handle)
++		return true;
++
++	if (evt->status) {
++		tester_test_failed();
++		return true;
++	}
++
++	data->step--;
++	if (!data->step)
++		tester_test_passed();
++
++	return true;
++}
++
++static void test_disconnect(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	data->step++;
++
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT,
++					BT_HCI_EVT_SYNC_CONN_COMPLETE,
++					hook_setup_sync_evt, NULL);
++
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT,
++					BT_HCI_EVT_DISCONNECT_COMPLETE,
++					hook_disconnect_evt, NULL);
++
++	test_connect(test_data);
++}
++
+ static bool hook_simult_disc(const void *msg, uint16_t len, void *user_data)
+ {
+ 	const struct bt_hci_evt_sync_conn_complete *ev = msg;
+@@ -972,6 +1049,9 @@ int main(int argc, char *argv[])
+ 	test_sco("eSCO mSBC - Success", &connect_success, setup_powered,
+ 							test_connect_transp);
+ 
++	test_sco("SCO Disconnect - Success", &disconnect_success, setup_powered,
++							test_disconnect);
++
+ 	test_sco("eSCO Simultaneous Disconnect - Failure",
+ 					&connect_failure_reset, setup_powered,
+ 					test_connect_simult_disc);
+-- 
+2.48.1
+
