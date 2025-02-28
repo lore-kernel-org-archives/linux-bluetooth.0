@@ -1,130 +1,164 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722C227CCF8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 18:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7304A27CCCB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 18:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740767551; cv=none; b=b+/9ZfraR0sTlpOUssYrRw4JWH+RIix4dnZgxWr/Vn6AzSryxwJ/KWBGETX4vkMLCoKyF6IP+FKtQwa0XlB+RDOJ7nJxQ1+Q0u9WQ+5Yd1V2hfipORlfE2mrQziI0SvZ4R2Yyn+X4E6L5VjUqvdrI3F+4nNoHESB3SdaJdsci/k=
+	t=1740767820; cv=none; b=KKQ1ux9ZZcz2lQBiP0S1L2izSKaeoibT3OQCAlJu4wH0mojPVHRR7kdec+XxGaTA413zeeATBR+5Meq2gos+dW1Ag7oWyexfyenC6iYTI8c1YQfm+Z6buBtbEZ5+qygd4of+mdPK253Aes3Z0EocZ6WNQbXtGShWqsINWFSQF9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740767551; c=relaxed/simple;
-	bh=3wQuiZVgLXGaEAQbusRoW+8ct68NssYHFpTT56kCqpg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=pMDaZ99EI0js/Q2i+UzA5WySt7RQRruWzxD4X1L7g50qunzqer1OECY6IIZjng//QJb2dj6sBpZNLT7rnL2uEKG0KpnPwOElWWdivGDyZadA7jXW2Rkj5QydySwx2Ihl0CO0dFZ0lNehgVUW5nVW2Jw6TgEUtRkla5zJo1/5Etg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kg+KMINP; arc=none smtp.client-ip=209.85.160.169
+	s=arc-20240116; t=1740767820; c=relaxed/simple;
+	bh=7LQxBZRw5kqstjXd77yAUQaNvNUeI8Yd4uBHZQAZELg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=aCtJy3LB1cJDaMOPB01ewRiR1a1QZtwHj596damAk6cP4CEKnmx2DhnYuT4IOsuIk30T1yYvuOg6HYtO2NwWKl81B3px9KJ92ioGDolyvSaKTOwNrr3uPHgY7jVaKOm0Gy/A5OUqIY4hJSq72xdpepkd5BQDjB6EwQGST/RsGUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SGabGBSB; arc=none smtp.client-ip=209.85.221.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kg+KMINP"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4720a115d15so30610011cf.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 10:32:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SGabGBSB"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-520aede8ae3so1163698e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 10:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740767549; x=1741372349; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y9Jh3EM/tsxIsTliqoiX0tfQ93fFHHj+dYPXJ5jb41I=;
-        b=kg+KMINPZe9iEgMcG5wAAlFf2czHq+8oIDfXa1HHrmylm3eamUpnXKxHwUmaFlDSQY
-         H1M1p1z3mFgDME7Oz4fMDJt1GpwBQPOtSTkXO27Zfkj7KipS6CqJ99gKqvJScMTRK2aP
-         U1H2N7jjq0CdG+sEg42+V9oWTRo4Nkl/yp18yIY5u428gpotc/qM42kB/l9C10D8pd4I
-         MjcJ10DXSmHJiaaYF6kQ9dhOaAqcPJrYi3rPvyJUHsYAiKffbzWNoAdER+VDOhiAjUEZ
-         cHFVdqW+TIPdETktfPcyG/TSUslXNL/Fq5i8EWkqCFtxLkp19cvG6e4jt0wJQIfiySQh
-         beYA==
+        d=gmail.com; s=20230601; t=1740767816; x=1741372616; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/e+GuBz4FwoWisEC7JWze6A5nxI8m85ib/YZzX4jZjk=;
+        b=SGabGBSBNbe97Ym+SZJrXZOe6Wfy2LbTThyrDMLx6cXcdhFZVgpSeuqZdedpgx7TE5
+         UqPmLhY8Q+D5RM9e5SWI32EC3IqdJJvgWuIzFrVZCRjMwAO3hbBIr2Ma5hbt4D7j+rA5
+         H9TDFJzk5c9ZknvfB3BOGRd7QI7DOLALbsJ59gsoZOb+62T6GpMozqGdDbPt3DdZGcxL
+         iNsmNuuvAPw78xwobSQCCXETuw7xXej6FMar1yrhI4Y2Ilad4A3vsokKlPTyoQhrLu/0
+         Tag6hb7N+Wf5o016u5F+eErp42yDdTdqhLxkGsojwlS39tz54xCUNKnqgRSVDZZwDBOm
+         31AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740767549; x=1741372349;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y9Jh3EM/tsxIsTliqoiX0tfQ93fFHHj+dYPXJ5jb41I=;
-        b=q9rVO3lcfRxbPryKQOcx3IpJPADHKVDBUfNWQ8ZO+7kEEsUELnSke4o4Vt7x54QFAJ
-         QxryBjAtBa/jHOC9F0DlXXpOMr6jvCD8Y6yyIPZ4PaPxxzVr4Hx629NXYO36AAe3LQXR
-         U5b9msNY+3f25pUUe54MSQbwK765bJOcg5n6w9nNypQaa+JGnQ68fSF/jhWYsGTY494E
-         ejwEvtNnL6vv/biu7FqhRxvsywauNq+zHzWqNkTpCFb2hAX/lQiNf3pzhhsO/JPnsxyR
-         7VRwz+gIrruEwz2RYVAYGcLPfCF+ewBmb7umBiTvOPErfq1bH+Mp0qUED60QObl51kYG
-         uyVQ==
-X-Gm-Message-State: AOJu0Yyaktxp8YZpUG7OLrHd58zjOnHjV7USlaq1adiTDqtnn+EqV28U
-	9afm6OwIeogZHD9pqfUQWGwTkeOjshqp7/qdSyOezyMXjhfS6UkpQeHiHA==
-X-Gm-Gg: ASbGncttYDywSV+oF7LK7QHazAN1pDnh0RwkNgatWZ+WLvI6S9ZSSK2HGQyAoc+zWJx
-	Iv5u1LmcHkqy0tAKgAYG1afqaVy9kNzOIGlqg8j5jk5BWma6OvZr2Yb3fE1UU1I9HgNcVyJZRe6
-	pmPGyAmnZewjNoCxtrxw1TwQYSZ7NS7W2fpUF3yYXB13jmDSAzqfH3pPZ+WBBHlf/OKDn0wObUm
-	16S2pkyDpdZvH1YPiJsYl9nW1NQo6IhgcmgXMhlqWEJ1m+cQLDZDGwxBqq6VcB6q237/I2ULxb6
-	fzvg2bGxeKmx2nZC7Rey8p6TBQGh2Q==
-X-Google-Smtp-Source: AGHT+IHNjqKExxXERwMt3jZgNjO2IMSsOX4WIpM9VVuW6xPUe3TPiNG91L63sgZLJZ0twJrHORjQZQ==
-X-Received: by 2002:a05:6214:4113:b0:6e6:5b8e:7604 with SMTP id 6a1803df08f44-6e8a0d3bbcamr62487506d6.12.1740767549020;
-        Fri, 28 Feb 2025 10:32:29 -0800 (PST)
-Received: from [172.17.0.2] ([20.57.79.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e89763472bsm24946216d6.18.2025.02.28.10.32.27
+        d=1e100.net; s=20230601; t=1740767816; x=1741372616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/e+GuBz4FwoWisEC7JWze6A5nxI8m85ib/YZzX4jZjk=;
+        b=YUTC7qEe4fmae1S2D/7OVRy1auYeYfcqLkiDyhnNv37MPhku1OnPnwPGjc5GQZLTlV
+         nFeRaI2f9+mQgg7iL1+uQDECIAAAFW/MUJHQYFQCZTgcxl1Bg5Sy8iUTKFaUs3LVmUco
+         NvJGkhOXftzV7FtLnZAl6hx7KlP+gmoErPdkt0KNTjEfqe+XIsuKvTbXU1BpAWFalN/T
+         +tHO837Td+Fcc5UUEH+XN5A30sYpdRiq3Dpc0LydCbKIQ7ASdJoLwUlPp/j95Ma+6mBy
+         4c1ppdlgjnmwKE2hP8gS3khzULVATuGOP7gc6EQ7vUxP2aKC9hRTdcpFvIb/n3s1sEDA
+         +YSQ==
+X-Gm-Message-State: AOJu0Yyqq97p4OqDmN7l4IanKOEIQg0oJ4Isj4/7c2bfUktvJ3Xk3bAk
+	r1ALGQzGlkE6L6tC/BFR4YStBHqzhMhmFcCSk807cqGvn6RAzLIdjwjvnvWc
+X-Gm-Gg: ASbGnctiTq7XxokTf87gby+svw9mQ6gA1/uYZsHnqwcNh+M2NePP6QxvBBui1YAteJ4
+	fV54ZF7CKfO1UF1fP1cvs7uyFiD9cD30VqsduOaZAuXJ48uEd/iB+jHq5VszNEViy49f0nJ6saD
+	cneyLuo4h97kN8pzStoxtZq//8rcB8CTG+vItsqkwBYCh8TK07JQeZVLOZB1sGv8e5dvyjRE0Rw
+	JYs1j4tKpKTmv4zvorlpbeFRj/myrgFOe6H/7HTk3IXqR+V7OCLBW8VEsTx2KkcRk55MzfrlulJ
+	Iv43xeCOUpMY3K/onWK9/bOjgc1YgkAmw3h6l83RzGANesbMqPQR4gj1UR1PZwPt/hMN3Mg=
+X-Google-Smtp-Source: AGHT+IFaxzYssF3feFHnO6qRXSHy3Bi1YtkWHuG1mjnZncbFydLX/GPgolwJWP1soTAkmF0JrpIYvg==
+X-Received: by 2002:a05:6122:2491:b0:520:5a87:66fd with SMTP id 71dfb90a1353d-5235b844533mr3436887e0c.7.1740767816019;
+        Fri, 28 Feb 2025 10:36:56 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5234bf420desm653538e0c.25.2025.02.28.10.36.52
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 10:32:28 -0800 (PST)
-Message-ID: <67c2013c.d40a0220.292a33.a190@mx.google.com>
-Date: Fri, 28 Feb 2025 10:32:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2206908712208282274=="
+        Fri, 28 Feb 2025 10:36:53 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_event: Fix enabling passive scanning
+Date: Fri, 28 Feb 2025 13:36:51 -0500
+Message-ID: <20250228183651.3492826-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/bap: Fix not starting released operation
-In-Reply-To: <20250228171321.3465285-1-luiz.dentz@gmail.com>
-References: <20250228171321.3465285-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2206908712208282274==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+Passive scanning shall only be enabled when disconnecting LE links,
+otherwise it may start result in triggering scanning when e.g. an ISO
+link disconnects:
 
-Dear submitter,
+> HCI Event: LE Meta Event (0x3e) plen 29
+      LE Connected Isochronous Stream Established (0x19)
+        Status: Success (0x00)
+        Connection Handle: 257
+        CIG Synchronization Delay: 0 us (0x000000)
+        CIS Synchronization Delay: 0 us (0x000000)
+        Central to Peripheral Latency: 10000 us (0x002710)
+        Peripheral to Central Latency: 10000 us (0x002710)
+        Central to Peripheral PHY: LE 2M (0x02)
+        Peripheral to Central PHY: LE 2M (0x02)
+        Number of Subevents: 1
+        Central to Peripheral Burst Number: 1
+        Peripheral to Central Burst Number: 1
+        Central to Peripheral Flush Timeout: 2
+        Peripheral to Central Flush Timeout: 2
+        Central to Peripheral MTU: 320
+        Peripheral to Central MTU: 160
+        ISO Interval: 10.00 msec (0x0008)
+...
+> HCI Event: Disconnect Complete (0x05) plen 4
+        Status: Success (0x00)
+        Handle: 257
+        Reason: Remote User Terminated Connection (0x13)
+< HCI Command: LE Set Extended Scan Enable (0x08|0x0042) plen 6
+        Extended scan: Enabled (0x01)
+        Filter duplicates: Enabled (0x01)
+        Duration: 0 msec (0x0000)
+        Period: 0.00 sec (0x0000)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=939100
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.21 seconds
-GitLint                       PENDING   0.22 seconds
-BuildEll                      PASS      20.30 seconds
-BluezMake                     PASS      1536.37 seconds
-MakeCheck                     PASS      12.92 seconds
-MakeDistcheck                 PASS      157.14 seconds
-CheckValgrind                 PASS      213.05 seconds
-CheckSmatch                   WARNING   283.24 seconds
-bluezmakeextell               PASS      97.43 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      855.57 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:305:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:305:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:305:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: 9fcb18ef3acb ("Bluetooth: Introduce LE auto connect options")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_event.c | 37 ++++++++++++++++++++++---------------
+ 1 file changed, 22 insertions(+), 15 deletions(-)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2cc7a9306350..903b0b52692a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3391,23 +3391,30 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+ 		hci_update_scan(hdev);
+ 	}
+ 
+-	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+-	if (params) {
+-		switch (params->auto_connect) {
+-		case HCI_AUTO_CONN_LINK_LOSS:
+-			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
++	/* Re-enable passive scanning if disconnected device is marked
++	 * as auto-connectable.
++	 */
++	if (conn->type == LE_LINK) {
++		params = hci_conn_params_lookup(hdev, &conn->dst,
++						conn->dst_type);
++		if (params) {
++			switch (params->auto_connect) {
++			case HCI_AUTO_CONN_LINK_LOSS:
++				if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
++					break;
++				fallthrough;
++
++			case HCI_AUTO_CONN_DIRECT:
++			case HCI_AUTO_CONN_ALWAYS:
++				hci_pend_le_list_del_init(params);
++				hci_pend_le_list_add(params,
++						     &hdev->pend_le_conns);
++				hci_update_passive_scan(hdev);
+ 				break;
+-			fallthrough;
+ 
+-		case HCI_AUTO_CONN_DIRECT:
+-		case HCI_AUTO_CONN_ALWAYS:
+-			hci_pend_le_list_del_init(params);
+-			hci_pend_le_list_add(params, &hdev->pend_le_conns);
+-			hci_update_passive_scan(hdev);
+-			break;
+-
+-		default:
+-			break;
++			default:
++				break;
++			}
+ 		}
+ 	}
+ 
+-- 
+2.48.1
 
---===============2206908712208282274==--
