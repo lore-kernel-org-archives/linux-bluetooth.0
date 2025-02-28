@@ -1,164 +1,138 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7304A27CCCB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 18:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634381ADC8C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 19:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740767820; cv=none; b=KKQ1ux9ZZcz2lQBiP0S1L2izSKaeoibT3OQCAlJu4wH0mojPVHRR7kdec+XxGaTA413zeeATBR+5Meq2gos+dW1Ag7oWyexfyenC6iYTI8c1YQfm+Z6buBtbEZ5+qygd4of+mdPK253Aes3Z0EocZ6WNQbXtGShWqsINWFSQF9c=
+	t=1740769556; cv=none; b=hsQdscT/U5utsTeQku2HeOEgcZ8IHFjSjaxXJG4v+SV1Aho3+a9iwmd90rku2RYAtt398maNXkrDmtZXFIPVlwLxYmdx9mMoaPpRuMs2VyyBULHvxnGVPzvdBLPYP3K9fKbOPWl6BRyeWgCApvyHSpOPhDw9KRA6l+iu6CEjokE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740767820; c=relaxed/simple;
-	bh=7LQxBZRw5kqstjXd77yAUQaNvNUeI8Yd4uBHZQAZELg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=aCtJy3LB1cJDaMOPB01ewRiR1a1QZtwHj596damAk6cP4CEKnmx2DhnYuT4IOsuIk30T1yYvuOg6HYtO2NwWKl81B3px9KJ92ioGDolyvSaKTOwNrr3uPHgY7jVaKOm0Gy/A5OUqIY4hJSq72xdpepkd5BQDjB6EwQGST/RsGUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SGabGBSB; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1740769556; c=relaxed/simple;
+	bh=rm5aoGJXRVurNPuxCvWtGrFOSNatnMlkngupqJflnAo=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=HZs1weU5kC4awZmSGr32jBLAKKEttP2y4Cfkvzisq4y4vAOrqypqbgpOMnpgEXiWfolibZ5dHDycYLknzfkHVLsYxUhaO9ifFCVLx5ec3cGQ8X0A2G/dFzIlrpqcG9lZ1OCSUMGysf3cIEweqXKc6cIvJZBHENWZxPB/4KNPl38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RBp2Puwv; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SGabGBSB"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-520aede8ae3so1163698e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 10:36:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740767816; x=1741372616; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/e+GuBz4FwoWisEC7JWze6A5nxI8m85ib/YZzX4jZjk=;
-        b=SGabGBSBNbe97Ym+SZJrXZOe6Wfy2LbTThyrDMLx6cXcdhFZVgpSeuqZdedpgx7TE5
-         UqPmLhY8Q+D5RM9e5SWI32EC3IqdJJvgWuIzFrVZCRjMwAO3hbBIr2Ma5hbt4D7j+rA5
-         H9TDFJzk5c9ZknvfB3BOGRd7QI7DOLALbsJ59gsoZOb+62T6GpMozqGdDbPt3DdZGcxL
-         iNsmNuuvAPw78xwobSQCCXETuw7xXej6FMar1yrhI4Y2Ilad4A3vsokKlPTyoQhrLu/0
-         Tag6hb7N+Wf5o016u5F+eErp42yDdTdqhLxkGsojwlS39tz54xCUNKnqgRSVDZZwDBOm
-         31AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740767816; x=1741372616;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/e+GuBz4FwoWisEC7JWze6A5nxI8m85ib/YZzX4jZjk=;
-        b=YUTC7qEe4fmae1S2D/7OVRy1auYeYfcqLkiDyhnNv37MPhku1OnPnwPGjc5GQZLTlV
-         nFeRaI2f9+mQgg7iL1+uQDECIAAAFW/MUJHQYFQCZTgcxl1Bg5Sy8iUTKFaUs3LVmUco
-         NvJGkhOXftzV7FtLnZAl6hx7KlP+gmoErPdkt0KNTjEfqe+XIsuKvTbXU1BpAWFalN/T
-         +tHO837Td+Fcc5UUEH+XN5A30sYpdRiq3Dpc0LydCbKIQ7ASdJoLwUlPp/j95Ma+6mBy
-         4c1ppdlgjnmwKE2hP8gS3khzULVATuGOP7gc6EQ7vUxP2aKC9hRTdcpFvIb/n3s1sEDA
-         +YSQ==
-X-Gm-Message-State: AOJu0Yyqq97p4OqDmN7l4IanKOEIQg0oJ4Isj4/7c2bfUktvJ3Xk3bAk
-	r1ALGQzGlkE6L6tC/BFR4YStBHqzhMhmFcCSk807cqGvn6RAzLIdjwjvnvWc
-X-Gm-Gg: ASbGnctiTq7XxokTf87gby+svw9mQ6gA1/uYZsHnqwcNh+M2NePP6QxvBBui1YAteJ4
-	fV54ZF7CKfO1UF1fP1cvs7uyFiD9cD30VqsduOaZAuXJ48uEd/iB+jHq5VszNEViy49f0nJ6saD
-	cneyLuo4h97kN8pzStoxtZq//8rcB8CTG+vItsqkwBYCh8TK07JQeZVLOZB1sGv8e5dvyjRE0Rw
-	JYs1j4tKpKTmv4zvorlpbeFRj/myrgFOe6H/7HTk3IXqR+V7OCLBW8VEsTx2KkcRk55MzfrlulJ
-	Iv43xeCOUpMY3K/onWK9/bOjgc1YgkAmw3h6l83RzGANesbMqPQR4gj1UR1PZwPt/hMN3Mg=
-X-Google-Smtp-Source: AGHT+IFaxzYssF3feFHnO6qRXSHy3Bi1YtkWHuG1mjnZncbFydLX/GPgolwJWP1soTAkmF0JrpIYvg==
-X-Received: by 2002:a05:6122:2491:b0:520:5a87:66fd with SMTP id 71dfb90a1353d-5235b844533mr3436887e0c.7.1740767816019;
-        Fri, 28 Feb 2025 10:36:56 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5234bf420desm653538e0c.25.2025.02.28.10.36.52
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 10:36:53 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_event: Fix enabling passive scanning
-Date: Fri, 28 Feb 2025 13:36:51 -0500
-Message-ID: <20250228183651.3492826-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RBp2Puwv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740769554; x=1772305554;
+  h=date:from:to:cc:subject:message-id;
+  bh=rm5aoGJXRVurNPuxCvWtGrFOSNatnMlkngupqJflnAo=;
+  b=RBp2PuwvrA4qgZT4qDBd0NZm5ITdKBW4tcjiQdrY30WvMAA4TkViiJ3N
+   75lvhibqEz2V4fThdFG4piTC9rwfPUeSTvDdP8TY/zMVUF2HOY15I4LX2
+   u1Hg+lIKXX7cX8iZuBDYaQUContYbaFiNfnpAG1DXHjUtuJWj2ZnGabqD
+   EV4r2NLtV7KKQA+2ia9EW+qewEIeqsd15vfmcd9V/M4MzlFF2HyWEiP9c
+   xJjAkU8suuDWOQJQ0HUAXnjXeF8DAVgV7ovOc9VzADzMfrUf+0AyPUk0f
+   XyA7GTMCz3QLnhPMVyCB99Qrtwx4sAl/wdkFqMgLmY1XcsZd1lqFMIdGk
+   g==;
+X-CSE-ConnectionGUID: OFUErZ8ERrmyot2XKGQWMQ==
+X-CSE-MsgGUID: 4rZ/Cy68SjGzFzN0BRgnNQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11359"; a="41829809"
+X-IronPort-AV: E=Sophos;i="6.13,323,1732608000"; 
+   d="scan'208";a="41829809"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 11:05:54 -0800
+X-CSE-ConnectionGUID: w6Gv2ZM7RgKoi9VzRPkWuA==
+X-CSE-MsgGUID: JbSSSogSS5O4iXowx3Khng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,323,1732608000"; 
+   d="scan'208";a="148222910"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa002.jf.intel.com with ESMTP; 28 Feb 2025 11:05:53 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1to5fn-000FNW-0z;
+	Fri, 28 Feb 2025 19:05:32 +0000
+Date: Sat, 01 Mar 2025 03:04:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 7c2203f91affcad4b45ff59945aa621b33f7a413
+Message-ID: <202503010307.zYS2Xocb-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 7c2203f91affcad4b45ff59945aa621b33f7a413  Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL
 
-Passive scanning shall only be enabled when disconnecting LE links,
-otherwise it may start result in triggering scanning when e.g. an ISO
-link disconnects:
+elapsed time: 1460m
 
-> HCI Event: LE Meta Event (0x3e) plen 29
-      LE Connected Isochronous Stream Established (0x19)
-        Status: Success (0x00)
-        Connection Handle: 257
-        CIG Synchronization Delay: 0 us (0x000000)
-        CIS Synchronization Delay: 0 us (0x000000)
-        Central to Peripheral Latency: 10000 us (0x002710)
-        Peripheral to Central Latency: 10000 us (0x002710)
-        Central to Peripheral PHY: LE 2M (0x02)
-        Peripheral to Central PHY: LE 2M (0x02)
-        Number of Subevents: 1
-        Central to Peripheral Burst Number: 1
-        Peripheral to Central Burst Number: 1
-        Central to Peripheral Flush Timeout: 2
-        Peripheral to Central Flush Timeout: 2
-        Central to Peripheral MTU: 320
-        Peripheral to Central MTU: 160
-        ISO Interval: 10.00 msec (0x0008)
-...
-> HCI Event: Disconnect Complete (0x05) plen 4
-        Status: Success (0x00)
-        Handle: 257
-        Reason: Remote User Terminated Connection (0x13)
-< HCI Command: LE Set Extended Scan Enable (0x08|0x0042) plen 6
-        Extended scan: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-        Duration: 0 msec (0x0000)
-        Period: 0.00 sec (0x0000)
+configs tested: 61
+configs skipped: 2
 
-Fixes: 9fcb18ef3acb ("Bluetooth: Introduce LE auto connect options")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_event.c | 37 ++++++++++++++++++++++---------------
- 1 file changed, 22 insertions(+), 15 deletions(-)
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2cc7a9306350..903b0b52692a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3391,23 +3391,30 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
- 		hci_update_scan(hdev);
- 	}
- 
--	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
--	if (params) {
--		switch (params->auto_connect) {
--		case HCI_AUTO_CONN_LINK_LOSS:
--			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
-+	/* Re-enable passive scanning if disconnected device is marked
-+	 * as auto-connectable.
-+	 */
-+	if (conn->type == LE_LINK) {
-+		params = hci_conn_params_lookup(hdev, &conn->dst,
-+						conn->dst_type);
-+		if (params) {
-+			switch (params->auto_connect) {
-+			case HCI_AUTO_CONN_LINK_LOSS:
-+				if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
-+					break;
-+				fallthrough;
-+
-+			case HCI_AUTO_CONN_DIRECT:
-+			case HCI_AUTO_CONN_ALWAYS:
-+				hci_pend_le_list_del_init(params);
-+				hci_pend_le_list_add(params,
-+						     &hdev->pend_le_conns);
-+				hci_update_passive_scan(hdev);
- 				break;
--			fallthrough;
- 
--		case HCI_AUTO_CONN_DIRECT:
--		case HCI_AUTO_CONN_ALWAYS:
--			hci_pend_le_list_del_init(params);
--			hci_pend_le_list_add(params, &hdev->pend_le_conns);
--			hci_update_passive_scan(hdev);
--			break;
--
--		default:
--			break;
-+			default:
-+				break;
-+			}
- 		}
- 	}
- 
--- 
-2.48.1
+tested configs:
+alpha                           allyesconfig    gcc-14.2.0
+arc                  randconfig-001-20250228    gcc-13.2.0
+arc                  randconfig-002-20250228    gcc-13.2.0
+arm                  randconfig-001-20250228    clang-21
+arm                  randconfig-002-20250228    gcc-14.2.0
+arm                  randconfig-003-20250228    gcc-14.2.0
+arm                  randconfig-004-20250228    gcc-14.2.0
+arm64                randconfig-001-20250228    gcc-14.2.0
+arm64                randconfig-002-20250228    clang-21
+arm64                randconfig-003-20250228    clang-16
+arm64                randconfig-004-20250228    gcc-14.2.0
+csky                 randconfig-001-20250228    gcc-14.2.0
+csky                 randconfig-002-20250228    gcc-14.2.0
+hexagon                         allmodconfig    clang-21
+hexagon                         allyesconfig    clang-18
+hexagon              randconfig-001-20250228    clang-19
+hexagon              randconfig-002-20250228    clang-21
+i386       buildonly-randconfig-001-20250228    clang-19
+i386       buildonly-randconfig-002-20250228    clang-19
+i386       buildonly-randconfig-003-20250228    gcc-12
+i386       buildonly-randconfig-004-20250228    clang-19
+i386       buildonly-randconfig-005-20250228    clang-19
+i386       buildonly-randconfig-006-20250228    clang-19
+loongarch            randconfig-001-20250228    gcc-14.2.0
+loongarch            randconfig-002-20250228    gcc-14.2.0
+nios2                randconfig-001-20250228    gcc-14.2.0
+nios2                randconfig-002-20250228    gcc-14.2.0
+parisc               randconfig-001-20250228    gcc-14.2.0
+parisc               randconfig-002-20250228    gcc-14.2.0
+powerpc              randconfig-001-20250228    gcc-14.2.0
+powerpc              randconfig-002-20250228    clang-16
+powerpc              randconfig-003-20250228    clang-18
+powerpc64            randconfig-001-20250228    clang-16
+powerpc64            randconfig-002-20250228    clang-18
+powerpc64            randconfig-003-20250228    gcc-14.2.0
+riscv                randconfig-001-20250228    gcc-14.2.0
+riscv                randconfig-002-20250228    gcc-14.2.0
+s390                            allmodconfig    clang-19
+s390                            allyesconfig    gcc-14.2.0
+s390                 randconfig-001-20250228    gcc-14.2.0
+s390                 randconfig-002-20250228    clang-17
+sh                              allmodconfig    gcc-14.2.0
+sh                              allyesconfig    gcc-14.2.0
+sh                   randconfig-001-20250228    gcc-14.2.0
+sh                   randconfig-002-20250228    gcc-14.2.0
+sparc                randconfig-001-20250228    gcc-14.2.0
+sparc                randconfig-002-20250228    gcc-14.2.0
+sparc64              randconfig-001-20250228    gcc-14.2.0
+sparc64              randconfig-002-20250228    gcc-14.2.0
+um                              allmodconfig    clang-21
+um                              allyesconfig    gcc-12
+um                   randconfig-001-20250228    clang-21
+um                   randconfig-002-20250228    clang-21
+x86_64     buildonly-randconfig-001-20250228    clang-19
+x86_64     buildonly-randconfig-002-20250228    clang-19
+x86_64     buildonly-randconfig-003-20250228    gcc-12
+x86_64     buildonly-randconfig-004-20250228    clang-19
+x86_64     buildonly-randconfig-005-20250228    gcc-12
+x86_64     buildonly-randconfig-006-20250228    gcc-12
+xtensa               randconfig-001-20250228    gcc-14.2.0
+xtensa               randconfig-002-20250228    gcc-14.2.0
 
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
