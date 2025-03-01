@@ -1,70 +1,70 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDCDBA3D
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Mar 2025 06:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0652DBA3D
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Mar 2025 06:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740810207; cv=none; b=oZydGvbOJWuwWke+jPOrAY4Rh64dzaoBYLUOeu1Fnf2JwLGo4YWs8pLgUeg3wSaYZJsKjdnZknNsE2Atd1mb0tBGEV9r155vSWEfeHaCId4p0zwfgZUswi+JDRxaxe6/06Fe9NL9MYVQcix4qRxMAVqKw22GLLNJr2xMyPLJ6Q0=
+	t=1740810210; cv=none; b=YPUAO1cWdHB9KpZCWd2ZbDUlkNwkkpn18kKOaHX/NiiW5mawrxxg1mLpHiGhRzvWmo9rVvIh7VgZvMn6IefT416i+j18NiAgJXxp5nL0V2Uz6qf4XUn0zJ5tBcWOi1Z1PAlyDVB9AOlgJU0pPaqqrpOPfBUJ9gj1Gwu8fYSrhMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740810207; c=relaxed/simple;
-	bh=qmpzxjURd+Kxt06UvyyN1ZAfJ70uld9SRKT1m3M0NVA=;
+	s=arc-20240116; t=1740810210; c=relaxed/simple;
+	bh=QeEqO4yiQMLs/GnfE+GG2gH9OMnt4U9v+98XtvTggR4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U1buTmEo/BazHrgu8aXJXC3e4sMxh4QsMcTKnwcqKPQSjWoUBIJCMglINu6a1+b/Rcfeerwq9iMsTPWkU9WB2qU0nEBeRcV4qmNYMVsVlzmhhohVVZMNUjhypxiNoSQmJyQ0slB5VXMe+dIXWfykjPxni4PjBwtjT1wrZpFccCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iXb9Gi34; arc=none smtp.client-ip=209.85.216.46
+	 MIME-Version; b=EUCx4kxft1iHFKsyQomMSwJH1k+T5um3e1+PhrwHOxgu/cyRd0xfsrNHZKIhI4dtAfG0IPUlQChyUf5xy5hxziE+g3yaavQerM0fROA7PzBU6lput2BJBpsyRoBu9fweDCxo+hG1sC1fNJNIyPzJVYnTo+agctAviP8hgPhKUvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdG0LO31; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXb9Gi34"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2fec3176ef3so1844427a91.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 22:23:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdG0LO31"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2feaca4e99cso3863411a91.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2025 22:23:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740810205; x=1741415005; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740810207; x=1741415007; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=APewLbsu5kCMMHY4PRMW6a/YnApatlD2ZVz79Jz/mG0=;
-        b=iXb9Gi34Td7aa7SuOdnIKaAQiMnM+LC1h/PbJS7Hr/f1DoOEMUY6Ok/i613DNUmnkA
-         x9/Nq83AVJB9iLHKmAgF3Kx+ocQ+8iSDEptOSuNOOx2SzZjfpQA070KajUNkfxLm1M+D
-         vL5FGK7t6YyZ9E3p7gNCbYhMZvzHYTRgb2EjDP26f6+diDR4ODcLsvGl5qg+4HKAANj6
-         J6h61r9zzCNDVcMznFmuBR7tZwvYQ4UoUhn/t/ctZV6htAGf2wf1Z+XW+xfUD3piqWY/
-         iH39yM6ApnpaXgacRCctU5sNX5UW4l/U7zD3xNHThINdrCQS51AXwo4ara77cjJJeOJ2
-         v/yA==
+        bh=vb+dZpUDMgfx4Cp+gq/ZavxuS0GQG+fpzIM7WZgVodk=;
+        b=GdG0LO315C6BHlVOLcT5KsSQ+L7gXkJm7M2DSICRJelTFfs5lmNLBOI6HYxbd3hl11
+         6eK9Stbj9OksDytkoHEdyp/L3X4tyJinm9YRJSRXOvzRjnaJlWsdVTlcBB01kqpQMeUD
+         Pr88AGMDUFamiBXShoZxfHOsjmKm46YQfAGqxdLcGMxeV69ZZQre/LOG7fbEfq6C4rdJ
+         IF9JR3/TnrE1dVcJ99H/hyJ7VaZ3GVD/kp9hwHbul6JPB43w33oROkre1qFvDB3Z1qQ5
+         ejF4KvYpyajGRKJDVouifj+nf4kPfiSnZ2UJD8i5UmIRFBbFmv0aY1hL+ing9f0Nr7Ek
+         Fw+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740810205; x=1741415005;
+        d=1e100.net; s=20230601; t=1740810207; x=1741415007;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=APewLbsu5kCMMHY4PRMW6a/YnApatlD2ZVz79Jz/mG0=;
-        b=IZyxZ3f9a1WvKfhef9gpTeENzJGwxdRuT0iNb/vSRJ0UBxtEyKqgOR4/uZ7FlG7eQY
-         m5Wj3xNQh5lGrNo6UCFLT4fo4W+R2//rzG+mNPDZr2taF3uQLoxsNGHQwcMAtozDaV8f
-         55rdHEGF4aqC9eLxc8iJ5wohYSXyzB1EYnKnQzwWEfyfg5eDlkq5OXh3HPtjSDaU/Uuk
-         STFHQ0ch7yfhaFEPQO6TrNBxW6Wl28uXZx7AB0Fj1Rwziy4QNoTwL8m77O4JvL2J0r0i
-         sfSVUHDBTuqrbbnFTcun5u/+IXXQrmliAUI5yrF8EVGRZQom/Ocqt4GaURy2Zkoz1e9t
-         nw5w==
-X-Gm-Message-State: AOJu0YzYIzAFc1vwAgFI7blqun4FS2e+8EfGtzPR17kR2AX+Hveg2l8r
-	J4Ohz8h9xaC6p9iqrWwT/IODQsPHOFhgtcg3aBjbMHZz0N7IzbmQRI/NQgEf
-X-Gm-Gg: ASbGnct4sYIG8GuHEsnL3b9g7GqnF0SWU/Xfkc7v37+ooc3DVS4JCz8xtkcYuRbHoPO
-	OBDtniAWWXXH2ALEezMS5Lcnq6HU9i8qHnNpjqNdZPsiTiNMKmZpoItUKSZJsXz8sAIpcb+8fYG
-	skpaZAD1NnUsIZ5Fwwr7sNXmB8M4YzMIj3xBhXgWykjfKSrL+jgfB0yL9y0oLCMxNGiGL4omv5w
-	PKN68n7rEVlsez7k9DOLh8KV3TLwUa7CEGhm3vs0ltYd4mHtaeXjPH2QNJotmj6OQHotYWt0v8f
-	oDQ2QKee53Fs6gKrcZeX53kQqP0k2bkUe0GOI30sxwH3wy5XFgwCgoKYaDJ9dzq/kIUNrLLQXJW
-	KoaQgmhXc4tLusqcBg3bHrQj9cvsJcg==
-X-Google-Smtp-Source: AGHT+IGVzfubiLbf0r2qWwhw+SsDs92YwoeZZNQLMfKS8+8qvJHHu8TTJQXX3ZgdLnwqi0Q1V46qeA==
-X-Received: by 2002:a17:90b:1b09:b0:2f2:ab09:c256 with SMTP id 98e67ed59e1d1-2febac1093dmr10920730a91.33.1740810205091;
-        Fri, 28 Feb 2025 22:23:25 -0800 (PST)
+        bh=vb+dZpUDMgfx4Cp+gq/ZavxuS0GQG+fpzIM7WZgVodk=;
+        b=YgwX2EtgPqBAXj4j390iRq5Y8T82Wq/VVLeUQs8czJ5QFaXGvvr7pJgnlyoohTky2A
+         nPZdJrIJiGYUHF+zwP7WLMo0r6J90SEPoZ1sM8oxJR5uytI5M91KGeRMWAfhLgOvrRlY
+         0tMyn6kaNUmsVXS8htrZZfYwzsQOo9AgDes4DUb4klcPOmBfRi3FMsHNjxRtCGvZ5srG
+         gV8hsHY5mo1T8MdClc794FN3xGmlNidNggoz5RCYvcyxlbiV3Sv5dm/ZGZYvGDszzkz0
+         AT2lE9uB1LO1iz299c8LkGQWhFulnjkI9vbHQR6yUPhUEjKdtfQsCz468u7x4VjHjnqF
+         MWWQ==
+X-Gm-Message-State: AOJu0Yy+ZSj341YgwjIqd8NFGY+U2PQFhSgn6bG4vEfUh2WwEcPSbDqW
+	Dbl/Zzlwnri8EmYFKQnWQGGCmC6V6TpSh8GM5H30NTl6E+pDw2Qcvu5ledAU
+X-Gm-Gg: ASbGncu7RJsv/GKmTGQG2bujx6wVUTim8ZWgmsGo3Mvo3II3/HxU2paq50eQws3KFIo
+	ovOd4eYpGJQXJjnulv3k7KtgirgH+P5QglENNKw/+C0sHm0QGf4IJZpYJWGfLlUYuW5+jJztFPj
+	Mh4lXZjiRunu0waiPUciTZJPleGgDQDQaiSkBxWNigyq3hD77QvKTScPZM97/7McCQ/mWdcKXPW
+	YUCJen+Yog5c87UTWkSUZojvEdWOxP0s7IIb+b5S+4SlH+oOtg2702H5lATH1wlEEaAo/4vR9by
+	HxJz07mH1EpN/nBCOAgAQlQvQZnNzn4QSSno6V4uqCZbxZN/UhRSa6hkNIz3J2k+DqTDNu7ZfiJ
+	SWyi0YbgWgbJQRN40QwJSYR1pMDaTIw==
+X-Google-Smtp-Source: AGHT+IHLg/pg8IO3lM4FU9mda1JAev7cg7X9xWdq8s+EOwL4wlRSGGnsH3vUfBJ3JwotoRCmNmA76g==
+X-Received: by 2002:a17:90b:1845:b0:2fe:6942:370e with SMTP id 98e67ed59e1d1-2febab2ff84mr10655331a91.7.1740810207364;
+        Fri, 28 Feb 2025 22:23:27 -0800 (PST)
 Received: from localhost.localdomain (168-228-202-55.static.sumicity.net.br. [168.228.202.55])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fe8284f121sm7014625a91.47.2025.02.28.22.23.23
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fe8284f121sm7014625a91.47.2025.02.28.22.23.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 22:23:24 -0800 (PST)
+        Fri, 28 Feb 2025 22:23:26 -0800 (PST)
 From: Pedro Nishiyama <nishiyama.pedro@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Pedro Nishiyama <nishiyama.pedro@gmail.com>
-Subject: [PATCH V4 1/4] Bluetooth: Add quirk for broken READ_VOICE_SETTING
-Date: Sat,  1 Mar 2025 03:22:58 -0300
-Message-ID: <20250301062301.18029-2-nishiyama.pedro@gmail.com>
+Subject: [PATCH V4 2/4] Bluetooth: Add quirk for broken READ_PAGE_SCAN_TYPE
+Date: Sat,  1 Mar 2025 03:22:59 -0300
+Message-ID: <20250301062301.18029-3-nishiyama.pedro@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250301062301.18029-1-nishiyama.pedro@gmail.com>
 References: <20250301062301.18029-1-nishiyama.pedro@gmail.com>
@@ -77,63 +77,47 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Some fake controllers cannot be initialized because they return a smaller 
-report than expected for READ_VOICE_SETTING.
+report than expected for READ_PAGE_SCAN_TYPE.
 
 Signed-off-by: Pedro Nishiyama <nishiyama.pedro@gmail.com>
 ---
- include/net/bluetooth/hci.h      | 8 ++++++++
- include/net/bluetooth/hci_core.h | 4 ++++
- net/bluetooth/hci_sync.c         | 3 +++
- 3 files changed, 15 insertions(+)
+ include/net/bluetooth/hci.h | 8 ++++++++
+ net/bluetooth/hci_sync.c    | 3 ++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0d51970d809f..6886962eca78 100644
+index 6886962eca78..b99818df8ee7 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -354,6 +354,14 @@ enum {
- 	 * during the hdev->setup vendor callback.
+@@ -362,6 +362,14 @@ enum {
+ 	 * This quirk must be set before hci_register_dev is called.
  	 */
- 	HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_PHY,
+ 	HCI_QUIRK_BROKEN_READ_VOICE_SETTING,
 +
-+	/* When this quirk is set, the HCI_OP_READ_VOICE_SETTING command is
++	/* When this quirk is set, the HCI_OP_READ_PAGE_SCAN_TYPE command is
 +	 * skipped. This is required for a subset of the CSR controller clones
 +	 * which erroneously claim to support it.
 +	 *
 +	 * This quirk must be set before hci_register_dev is called.
 +	 */
-+	HCI_QUIRK_BROKEN_READ_VOICE_SETTING,
++	HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE,
  };
  
  /* HCI device flags */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f756fac95488..5e0534d8b1df 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1924,6 +1924,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- 	((dev)->commands[20] & 0x10 && \
- 	 !test_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks))
- 
-+#define read_voice_setting_capable(dev) \
-+	((dev)->commands[9] & 0x04 && \
-+	 !test_bit(HCI_QUIRK_BROKEN_READ_VOICE_SETTING, &(dev)->quirks))
-+
- /* Use enhanced synchronous connection if command is supported and its quirk
-  * has not been set.
-  */
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index dd770ef5ec36..0c6a85abba2c 100644
+index 0c6a85abba2c..cf60a8da943a 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -3696,6 +3696,9 @@ static int hci_read_local_name_sync(struct hci_dev *hdev)
- /* Read Voice Setting */
- static int hci_read_voice_setting_sync(struct hci_dev *hdev)
- {
-+	if (!read_voice_setting_capable(hdev))
-+		return 0;
-+
- 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_VOICE_SETTING,
- 				     0, NULL, HCI_CMD_TIMEOUT);
- }
+@@ -4132,7 +4132,8 @@ static int hci_read_page_scan_type_sync(struct hci_dev *hdev)
+ 	 * support the Read Page Scan Type command. Check support for
+ 	 * this command in the bit mask of supported commands.
+ 	 */
+-	if (!(hdev->commands[13] & 0x01))
++	if (!(hdev->commands[13] & 0x01) ||
++	    test_bit(HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE, &hdev->quirks))
+ 		return 0;
+ 
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_PAGE_SCAN_TYPE,
 -- 
 2.48.1
 
