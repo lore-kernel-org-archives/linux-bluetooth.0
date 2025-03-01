@@ -1,74 +1,71 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122E11B3927
-	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Mar 2025 16:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDD81B3927
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Mar 2025 16:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740845873; cv=pass; b=C4CzrJ0cciCyU2Si1ORkZXfhyYQA8ueOFsVbpyo2D/+Nsx6TnKd3KPajTcrjrgSv76V0yx3ZtqnnO2GP7AMyMtEREdAFO55DuK4UrKXF5nxHzqTfKIBGpdFLSps+Osh/cRQYzrqYFqsiiDJTO9ri42YUpXhPNW71S9x3FqkWCe4=
+	t=1740846419; cv=pass; b=pDfjnpbUb2mxzEfkhBK0NNs1m0Aj/m3HqtiYJtnmdt28NcFZomkZAJLjn8IgJJ7me782FtrT9PQwIn6TNCfWW105R0gXD/2m9kFXGygVeupJ9UGhH1VcNoVniMLxDvseUvb3coFwHCCoS1580NBlxp0dDcJxNChzTlm6fZpSQQU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740845873; c=relaxed/simple;
-	bh=y/KwRNYHOahr394MluZJV5IElnaX1fLB6SZ67hxytms=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nbaxWFoiXoyBftRNzpRro+TW/RGaxqa95UhCNhgtMbPZ1IBTy2F7gIUFnd+JYoKKZbTFrb/Qr/oPc2r/3NolQZo3CxYlpcEZOTSVsT3xGWve/p1pHKc53nkdb2G1mMxF1eLP2TNelitm0TPr4zO4pMegoCOGtyD3GKK0u7brxas=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=k9Ms9VAk; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1740846419; c=relaxed/simple;
+	bh=6P3BEVCYEVtb+A82QfL/vrpqK0wX8i7Ey54EiYn33F8=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fJEst7d/ixh9wKui4L4vwZ9VDod+glCuGxZF5QUrc5s2OjoNYyBOBD2yjprKAA1jRyKibmwAOD5atd1hpqT28STziTseowjF8HhwN1SHVDgk9PUMDO5LReTJU98lA19p2LYlio5hVgXs9m19MAMio1azV+I4Ze5scHB+nTE+5BM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=OG2nLS8m; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="k9Ms9VAk"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="OG2nLS8m"
 Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:2::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
 	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Z4qx91twGz4BKH9;
-	Sat,  1 Mar 2025 18:17:49 +0200 (EET)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Z4r7f5bcfz4BKH9
+	for <linux-bluetooth@vger.kernel.org>; Sat,  1 Mar 2025 18:26:54 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1740845870;
+	t=1740846415;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Q3HzP4BPDVhmp5lc7DJnYtRVcQxGdcHx9zJZq7wlGqs=;
-	b=k9Ms9VAkJ26apOSK+EGeNTkbFgdtk9g2e3FK80UstpEQPASw1KBSu1ks4EObU25xtjbcJ3
-	NlpgxaZnwvayduINUMUeXlwYQT9RdICLqXiHa4n5PY/fgQJNlqXV9L6oIQKjuBjz4d8GPi
-	jsXwh+x+Z8S2u/PSnJbv97766a654oYxmE6Pu0f2+HhfweLRbO67p/FlNWsz4znKHGJDCA
-	A1A3IZ2A0jjHNKaffwwWmS5I62XCmJhJb39rjhGQ57aMBxTd1jx+DQXTtr/ppB8GaIKdsb
-	SK6yfEDGPeJTmbiYOiGC2oy6S/b26C+zsqKA0GnlC7VfAsV6KE2mZxrRCeGRwg==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1740845870; a=rsa-sha256;
+	bh=Yft6duKyF4ogVTG+O4TF5n+iZLnJEXyuHMaDz/0wIw0=;
+	b=OG2nLS8mO3BKJRreYHAieaokcuMNAV5Fj1y9lrjaxk0iPRjyxzyG+LOA2fro1A2WksGNu8
+	dp5JrfyYQx1zJOBJhftyREbuUGLVmUwEFX/uTmy3lBnY0nnguzXBfHgQLvL8lzMQCm9aHe
+	iNDKijaAjGVv1SXhd/Xow5CwDM8u3TwUiepEMDADVVkwo5czSYGp87dA8JkhQZGTUhoG5u
+	eMj4HKgo/8J4upPeJzH7hXqQRLGFAAgOw6LxxFZLN9oMYVRoMASYKw3lGe7bPV3AXsFgOn
+	Ckqy3WnbFGgHA5lC8YjcqU6t0iSrEYAVX8Q4wujoYL5TRgxTjcsxG08o2z+Fig==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1740846415; a=rsa-sha256;
 	cv=none;
-	b=OsI7fsDJA8Fj8eokg5Ir7w38zGwkgJYkBOlLWzuehSNAy/mS/1EqgN5doYsLtou84nrg4P
-	l3yq4qD1jGi2LYGnGxxLTI/RKj5G1mAgx0eUgen7ylw/V0+Wkg6aMbDb05S6kNYEsz0n/V
-	GD3jTP3SXNDrPA8Z1mUo2EQPqHEhPSQH9nYYw1CaSnANVnMHb5PpFX7ps2zMENlATY0Cey
-	oQ8T20bT7WMvWPnd/7KZlw3N242aAniUq47glK4C9mI3A3P+zZncpmdM/q7hAQhYov89ir
-	CdeGzpREqI5zWwTJn+ikXToM65DUf0wkyAhxOut9W+ncrgacM3qQReutD9USxw==
+	b=rB9XQU2wkCt4rBRowp4cYD6C8cy3srUvpleKRfJvlDUVe3RkNYTJOMEKpQ5BU+QZHLO7/M
+	J9wGeq3GM24KNf1lHvhXzX0Tcqmjo2EmRRchwCpnGQdT1aVZ6jJx0MBY+vJ+lVprM2UqF6
+	hYIMVbNSw7K8L6obVc2ufQm932wxjhnTMQ1No3x4GvwpBULkN/JE7+z5hyZGJHRpZY9NGR
+	wovzzNQIbe65/cwy8FZbHMKpYJeS7wSeBAAClcL1dbarQWg705/A/8gLeilCQFGx05g7WS
+	B6lbPdT1ukipv12clolIeWF/VDmgOWcyQeD77B+xKSyOm4+Du5EuGoUkllLxYQ==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1740845870;
+	s=lahtoruutu; t=1740846415;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Q3HzP4BPDVhmp5lc7DJnYtRVcQxGdcHx9zJZq7wlGqs=;
-	b=CR0QJ3B045vroP7Gierbp2GmjdMMcIlAHg0LcaCvb5goayjCYa5mJQqGP1Y+jfSv3JQKAK
-	zA0QG4R34luMFE7kK0fSD9jTFt5JheSoS3zq3lIYWqiftKoHbOILIUGEFqKZAgcfXQlKKE
-	xZDQrJ7rOb1RfrggFHMwJik26g/Xir85Un1rSMDlkX69uyLh5NEYZou9BlYDJ1sRTI2uFf
-	8F4wWkpn2KxpGDfvm31AA9N3HEFk4pPbpKBJjx4VASH/emsFdkh9U0Gx+G4MzRMfu+mGgD
-	LUlcl+GhKET+x1bMi10DkAcYOchySNfHS3isvo0Icc5vgsCJqOXFRE6SEFlz7w==
-Message-ID: <24709b9c28161f1bc300b6117de63975ae92c00c.camel@iki.fi>
-Subject: Re: [PATCH BlueZ v2 3/3] client: Add support get/set PreferredBearer
+	bh=Yft6duKyF4ogVTG+O4TF5n+iZLnJEXyuHMaDz/0wIw0=;
+	b=QsLqzOTl/klFrh0oI6ck/OGKSXS9NOquuw+vOtX8GTPyqSRjSNl9Lx0UlW7wNM9/mE6dBp
+	PycAz3/wEv/Tt8RcMLuexsIcPP1+cuzoHbX8JL8cA02v3UEJGvmdf9pBXoj/TG03ns2vHh
+	zRTxTUa353obTlYyDkri4bwzGfpVz2SVMZHDp19an8A21P2QYv9AjLuExPcAK7I9w43BQE
+	vRwLzW8tZkLQ4Z0Firgcs32uHFFWYdIrbF0nfHbSYWTYh+iOk5k3CYnKLxwihL7O3BT0Og
+	eRK5KgwN6HVKUMYYkezu9i9LKoc/9qjH+Xs4lp9zLxpBQBftVejsEWABHNKKBQ==
+Message-ID: <718e840dc3a3089f9a8bd24887191617e234c02a.camel@iki.fi>
+Subject: Re: [RFC PATCH BlueZ 6/9] shared/bap: make sure ucast client stream
+ is destroyed after releasing
 From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Date: Sat, 01 Mar 2025 18:17:47 +0200
-In-Reply-To: <CABBYNZLwaqD8X8X0vzBR99bJ9uOScufxpOZfgCQDCYYe6FqJHw@mail.gmail.com>
-References: <20250225220059.2821394-1-luiz.dentz@gmail.com>
-	 <20250225220059.2821394-3-luiz.dentz@gmail.com>
-	 <CABBYNZ+32tuRH+T7M=1aeDJJOqHz9qt4ThsuMF4sVpiEeC380A@mail.gmail.com>
-	 <CABBYNZLwaqD8X8X0vzBR99bJ9uOScufxpOZfgCQDCYYe6FqJHw@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Sat, 01 Mar 2025 18:26:53 +0200
+In-Reply-To: <5f103220d38f8eb549eb41ac971d1f4cf1e684ba.1740844616.git.pav@iki.fi>
+References: <cover.1740844616.git.pav@iki.fi>
+	 <5f103220d38f8eb549eb41ac971d1f4cf1e684ba.1740844616.git.pav@iki.fi>
 Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
  keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
  ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
@@ -112,265 +109,148 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-ti, 2025-02-25 kello 17:12 -0500, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
+la, 2025-03-01 kello 17:57 +0200, Pauli Virtanen kirjoitti:
+> Upper layer as Unicast Client needs to be able to destroy streams when
+> it wants to reconfigure endpoints.
 >=20
-> On Tue, Feb 25, 2025 at 5:10=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >=20
-> > Hi Pauli, Bastien,
-> >=20
-> > On Tue, Feb 25, 2025 at 5:01=E2=80=AFPM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >=20
-> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > >=20
-> > > This adds support for PreferredBearer which is printed with the likes=
- of
-> > > info command:
-> > >=20
-> > > bluetoothctl> info <addr>
-> > > ...
-> > >         PreferredBearer: last-seen
-> > >=20
-> > > It also introduces a new command to get/set the PreferredBearer:
-> > >=20
-> > > [bluetoothctl]> bearer --help
-> > > Get/Set preferred bearer
-> > > Usage:
-> > >          bearer <dev> [last-seen/bredr/le]
-> > >=20
-> > > [bluetoothctl]> bearer <addr>
-> > >         PreferredBearer: last-seen
-> > > [bluetoothctl]> bearer <addr> le
-> > > bluetoothd: @ MGMT Command: Add Device (0x0033) plen 8
-> > >         LE Address: <addr>
-> > >         Action: Auto-connect remote device (0x02)
-> > > [CHG] Device <addr> PreferredBearer: le
-> > > Changing le succeeded
-> > > [bluetoothctl]> bearer <addr>
-> > >         PreferredBearer: le
-> > > [bluetoothctl]> bearer <addr> bredr
-> > > bluetoothd: @ MGMT Command: Remove Device (0x0034) plen 7
-> > >         LE Address: <addr>
-> > > [CHG] Device <addr> PreferredBearer: bredr
-> > > Changing bredr succeeded
-> > > ---
-> > >  client/main.c | 27 +++++++++++++++++++++++++++
-> > >  1 file changed, 27 insertions(+)
-> > >=20
-> > > diff --git a/client/main.c b/client/main.c
-> > > index feb21a1163d2..76c9bc329c96 100644
-> > > --- a/client/main.c
-> > > +++ b/client/main.c
-> > > @@ -1714,6 +1714,7 @@ static void cmd_info(int argc, char *argv[])
-> > >         print_property(proxy, "AdvertisingFlags");
-> > >         print_property(proxy, "AdvertisingData");
-> > >         print_property(proxy, "Sets");
-> > > +       print_property(proxy, "PreferredBearer");
-> > >=20
-> > >         battery_proxy =3D find_proxies_by_path(battery_proxies,
-> > >                                         g_dbus_proxy_get_path(proxy))=
-;
-> > > @@ -2086,6 +2087,30 @@ static void cmd_wake(int argc, char *argv[])
-> > >         return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> > >  }
-> > >=20
-> > > +static void cmd_bearer(int argc, char *argv[])
-> > > +{
-> > > +       GDBusProxy *proxy;
-> > > +       char *str;
-> > > +
-> > > +       proxy =3D find_device(argc, argv);
-> > > +       if (!proxy)
-> > > +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> > > +
-> > > +       if (argc <=3D 2) {
-> > > +               print_property(proxy, "PreferredBearer");
-> > > +               return;
-> > > +       }
-> > > +
-> > > +       str =3D strdup(argv[2]);
-> > > +
-> > > +       if (g_dbus_proxy_set_property_basic(proxy, "PreferredBearer",
-> > > +                                       DBUS_TYPE_STRING, &str,
-> > > +                                       generic_callback, str, free))
-> > > +               return;
-> > > +
-> > > +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> > > +}
-> > > +
-> > >  static void cmd_list_attributes(int argc, char *argv[])
-> > >  {
-> > >         GDBusProxy *proxy;
-> > > @@ -3247,6 +3272,8 @@ static const struct bt_shell_menu main_menu =3D=
+> This does not currently work right, because of Server issued
+> Releasing->Config (caching) state transitions, which currently cause
+> streams never enter Idle (so they are never destroyed).
+>=20
+> Fix this by considering Releasing->Config as Releasing->Idle->Config.
+> Also do not make new streams from cached config data as Unicast Client,
+> and leave all stream configuration to upper layer.
+
+This change also implies the following, so that reconfiguring multi-ASE
+configurations works right:
+
+    shared/bap: ucast client streams always use a free ASE
+   =20
+    Because upper layer controls Unicast Client streams, bt_bap_stream_new(=
+)
+    should for unicast always allocate an unused ASE.
+
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 4f44db07a..a85169009 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -5836,29 +5836,6 @@ static bool find_ep_unused(const void *data, const v=
+oid *user_data)
+ 		return true;
+ }
+=20
+-static bool find_ep_pacs(const void *data, const void *user_data)
+-{
+-	const struct bt_bap_endpoint *ep =3D data;
+-	const struct match_pac *match =3D user_data;
+-
+-	if (!ep->stream)
+-		return false;
+-
+-	if (ep->stream->lpac !=3D match->lpac)
+-		return false;
+-
+-	if (ep->stream->rpac !=3D match->rpac)
+-		return false;
+-
+-	switch (ep->state) {
+-	case BT_BAP_STREAM_STATE_CONFIG:
+-	case BT_BAP_STREAM_STATE_QOS:
+-		return true;
+-	}
+-
+-	return false;
+-}
+-
+ static bool find_ep_source(const void *data, const void *user_data)
  {
-> > >                                                         dev_generator=
- },
-> > >         { "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wak=
-e support",
-> > >                                                         dev_generator=
- },
-> > > +       { "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
-> > > +                               "Get/Set preferred bearer", dev_gener=
-ator },
-> > >         { } },
-> > >  };
-> > >=20
-> > > --
-> > > 2.48.1
-> >=20
-> > So I went ahead and implemented the idea of having PreferredBearer,
-> > this works great when setting bredr it really stops from connecting to
-> > LE, the said the other way around when setting to le seems to confuse
-> > some headsets like EarFun and it ends up connecting both bearers:
-> >=20
-> > [EarFun Air Pro 3]> transport.show
-> > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
-> >     UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f9b34=
-fb)
-> >     Codec: 0x06 (6)
-> >     Configuration.#0: len 0x02 type 0x01
-> >     Configuration.Sampling Frequency: 16 Khz (0x03)
-> >     Configuration.#1: len 0x02 type 0x02
-> >     Configuration.Frame Duration: 7.5 ms (0x00)
-> >     Configuration.#2: len 0x05 type 0x03
-> >     Configuration.Location: 0x00000001
-> >     Configuration.Location: Front Left (0x00000001)
-> >     Configuration.#3: len 0x03 type 0x04
-> >     Configuration.Frame Length: 30 (0x001e)
-> >     Configuration.#4: len 0x02 type 0x05
-> >     Configuration.Frame Blocks per SDU: 1 (0x01)
-> >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
-> >     State: idle
-> >     Volume: 0x00c8 (200)
-> >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
-> >     QoS.CIG: 0x00 (0)
-> >     QoS.CIS: 0x00 (0)
-> >     QoS.Framing: 0x00 (0)
-> >     QoS.PresentationDelay: 0x00009c40 (40000)
-> >     QoS.Interval: 0x00001d4c (7500)
-> >     QoS.Latency: 0x0008 (8)
-> >     QoS.SDU: 0x001e (30)
-> >     QoS.PHY: 0x02 (2)
-> >     QoS.Retransmissions: 0x02 (2)
-> >     Location: 0x00000003 (3)
-> >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
-> > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
-> >     UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f9b34=
-fb)
-> >     Codec: 0x06 (6)
-> >     Configuration.#0: len 0x02 type 0x01
-> >     Configuration.Sampling Frequency: 16 Khz (0x03)
-> >     Configuration.#1: len 0x02 type 0x02
-> >     Configuration.Frame Duration: 7.5 ms (0x00)
-> >     Configuration.#2: len 0x05 type 0x03
-> >     Configuration.Location: 0x00000002
-> >     Configuration.Location: Front Right (0x00000002)
-> >     Configuration.#3: len 0x03 type 0x04
-> >     Configuration.Frame Length: 30 (0x001e)
-> >     Configuration.#4: len 0x02 type 0x05
-> >     Configuration.Frame Blocks per SDU: 1 (0x01)
-> >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
-> >     State: idle
-> >     Volume: 0x00c8 (200)
-> >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
-> >     QoS.CIG: 0x00 (0)
-> >     QoS.CIS: 0x01 (1)
-> >     QoS.Framing: 0x00 (0)
-> >     QoS.PresentationDelay: 0x00009c40 (40000)
-> >     QoS.Interval: 0x00001d4c (7500)
-> >     QoS.Latency: 0x0008 (8)
-> >     QoS.SDU: 0x001e (30)
-> >     QoS.PHY: 0x02 (2)
-> >     QoS.Retransmissions: 0x02 (2)
-> >     Location: 0x00000003 (3)
-> >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
-> > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
-> >     UUID: Source PAC                (00002bcb-0000-1000-8000-00805f9b34=
-fb)
-> >     Codec: 0x06 (6)
-> >     Configuration.#0: len 0x02 type 0x01
-> >     Configuration.Sampling Frequency: 48 Khz (0x08)
-> >     Configuration.#1: len 0x02 type 0x02
-> >     Configuration.Frame Duration: 7.5 ms (0x00)
-> >     Configuration.#2: len 0x05 type 0x03
-> >     Configuration.Location: 0x00000001
-> >     Configuration.Location: Front Left (0x00000001)
-> >     Configuration.#3: len 0x03 type 0x04
-> >     Configuration.Frame Length: 90 (0x005a)
-> >     Configuration.#4: len 0x02 type 0x05
-> >     Configuration.Frame Blocks per SDU: 1 (0x01)
-> >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
-> >     State: idle
-> >     Volume: 0x00c8 (200)
-> >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
-> >     QoS.CIG: 0x00 (0)
-> >     QoS.CIS: 0x00 (0)
-> >     QoS.Framing: 0x00 (0)
-> >     QoS.PresentationDelay: 0x00009c40 (40000)
-> >     QoS.Interval: 0x00001d4c (7500)
-> >     QoS.Latency: 0x000f (15)
-> >     QoS.SDU: 0x005a (90)
-> >     QoS.PHY: 0x02 (2)
-> >     QoS.Retransmissions: 0x05 (5)
-> >     Location: 0x00000003 (3)
-> >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
-> > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
-> >     UUID: Source PAC                (00002bcb-0000-1000-8000-00805f9b34=
-fb)
-> >     Codec: 0x06 (6)
-> >     Configuration.#0: len 0x02 type 0x01
-> >     Configuration.Sampling Frequency: 48 Khz (0x08)
-> >     Configuration.#1: len 0x02 type 0x02
-> >     Configuration.Frame Duration: 7.5 ms (0x00)
-> >     Configuration.#2: len 0x05 type 0x03
-> >     Configuration.Location: 0x00000002
-> >     Configuration.Location: Front Right (0x00000002)
-> >     Configuration.#3: len 0x03 type 0x04
-> >     Configuration.Frame Length: 90 (0x005a)
-> >     Configuration.#4: len 0x02 type 0x05
-> >     Configuration.Frame Blocks per SDU: 1 (0x01)
-> >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
-> >     State: idle
-> >     Volume: 0x00c8 (200)
-> >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
-> >     QoS.CIG: 0x00 (0)
-> >     QoS.CIS: 0x01 (1)
-> >     QoS.Framing: 0x00 (0)
-> >     QoS.PresentationDelay: 0x00009c40 (40000)
-> >     QoS.Interval: 0x00001d4c (7500)
-> >     QoS.Latency: 0x000f (15)
-> >     QoS.SDU: 0x005a (90)
-> >     QoS.PHY: 0x02 (2)
-> >     QoS.Retransmissions: 0x05 (5)
-> >     Location: 0x00000003 (3)
-> >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
-> > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/fd5
-> >     UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34=
-fb)
-> >     Codec: 0x02 (2)
-> >     Media Codec: MPEG24
-> >     Object Types: MPEG-4 AAC LC
-> >     Frequencies: 48kHz
-> >     Channels: 2
-> >     Bitrate: 320000
-> >     VBR: Yes
-> >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
-> >     State: idle
-> >     Delay: 0x0960 (2400)
-> >     Volume: 0x0064 (100)
+ 	const struct bt_bap_endpoint *ep =3D data;
+@@ -6053,15 +6030,11 @@ static struct bt_bap_stream *bap_ucast_stream_new(s=
+truct bt_bap *bap,
+ 	match.lpac =3D lpac;
+ 	match.rpac =3D rpac;
+=20
+-	/* Check for existing stream */
+-	ep =3D queue_find(bap->remote_eps, find_ep_pacs, &match);
++	/* Find unused ASE */
++	ep =3D queue_find(bap->remote_eps, find_ep_unused, &match);
+ 	if (!ep) {
+-		/* Check for unused ASE */
+-		ep =3D queue_find(bap->remote_eps, find_ep_unused, &match);
+-		if (!ep) {
+-			DBG(bap, "Unable to find unused ASE");
+-			return NULL;
+-		}
++		DBG(bap, "Unable to find unused ASE");
++		return NULL;
+ 	}
+=20
+ 	stream =3D ep->stream;
+
+
+
+> ---
+>  src/shared/bap.c | 32 ++++++++++++++++++++++++++++++--
+>  1 file changed, 30 insertions(+), 2 deletions(-)
 >=20
-> Forgot to mention, but with the above transports it seems to confuse
-> the gnome audio output selection, it doesn't seem to be able to mix
-> A2DP and BAP transports for some reason, so when I select the device
-> it enables BAP but A2DP is not shown as an option.
+> diff --git a/src/shared/bap.c b/src/shared/bap.c
+> index 54c6e8629..4f44db07a 100644
+> --- a/src/shared/bap.c
+> +++ b/src/shared/bap.c
+> @@ -1363,6 +1363,31 @@ static void bap_stream_state_changed(struct bt_bap=
+_stream *stream)
+>  	struct bt_bap *bap =3D stream->bap;
+>  	const struct queue_entry *entry;
+> =20
+> +	switch (stream->ep->old_state) {
+> +	case BT_ASCS_ASE_STATE_RELEASING:
+> +		/* After Releasing, Server may either transition to Config or
+> +		 * Idle. Our Unicast Client streams shall be considered
+> +		 * destroyed after Releasing, so that upper layer can control
+> +		 * stream creation. Make the lifecycle management simpler by
+> +		 * making sure the streams are destroyed by always emitting Idle
+> +		 * to upper layer after Releasing, even if the remote ASE did
+> +		 * not go through that state.
+> +		 */
+> +		if (stream->client &&
+> +				stream->ep->state !=3D BT_ASCS_ASE_STATE_IDLE &&
+> +				(stream->lpac->type & (BT_BAP_SINK |
+> +							BT_BAP_SOURCE))) {
+> +			struct bt_bap_endpoint *ep =3D stream->ep;
+> +			uint8_t state =3D ep->state;
+> +
+> +			ep->state =3D BT_ASCS_ASE_STATE_IDLE;
+> +			bap_stream_state_changed(stream);
+> +			ep->state =3D state;
+> +			return;
+> +		}
+> +		break;
+> +	}
+> +
+>  	/* Pre notification updates */
+>  	switch (stream->ep->state) {
+>  	case BT_ASCS_ASE_STATE_IDLE:
+> @@ -4851,7 +4876,8 @@ static void ep_status_config(struct bt_bap *bap, st=
+ruct bt_bap_endpoint *ep,
+>  	}
+> =20
+>  	/* Any previously applied codec configuration may be cached by the
+> -	 * server.
+> +	 * server. However, all Unicast Client stream creation shall be left to
+> +	 * the upper layer.
+>  	 */
+>  	if (!ep->stream) {
+>  		struct match_pac match;
+> @@ -4866,7 +4892,9 @@ static void ep_status_config(struct bt_bap *bap, st=
+ruct bt_bap_endpoint *ep,
+>  		if (!match.lpac || !match.rpac)
+>  			return;
+> =20
+> -		bap_stream_new(bap, ep, match.lpac, match.rpac, NULL, true);
+> +		if (!(match.lpac->type & (BT_BAP_SINK | BT_BAP_SOURCE)))
+> +			bap_stream_new(bap, ep, match.lpac, match.rpac,
+> +								NULL, true);
+>  	}
+> =20
+>  	if (!ep->stream)
 
-I'll have to see if I can reproduce that on current PW master branch.
-
-The visibility of profiles in theory should only cares about whether
-the UUIDs appear in both device properties and transport.
-
-
---=20
-Pauli Virtanen
