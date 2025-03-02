@@ -1,247 +1,125 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0970F111AD
-	for <linux-bluetooth@vger.kernel.org>; Sun,  2 Mar 2025 16:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C993C13B
+	for <linux-bluetooth@vger.kernel.org>; Sun,  2 Mar 2025 18:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740934067; cv=none; b=qvook5IVTyGSty2P2f2ebeAMUvlgutW3ZGy8SGCpqa9TPM86f+dJGnzyWL3k07RrclnHmVUcl5cBVSiyzPXgsWDpacB3+fDPV/0jWkTbS9w5r8s/7tMGIcJVrofMRDMV5JYjHn5FRj9VZBRfr7lQqLfg/H4Yu7s6oVlxAL40UWs=
+	t=1740938731; cv=none; b=jIQapcJodkJKznm+GaFC1HIye9PGA+w/DTsTgOgC2fM8rKUi8gn9e5XUb9ypJt8/ptbHKBC9h07Efo7AcpgoRb11isazejtVIh8mlywfQMZ0Mdaz49QRSJY76P+IkO3LKWXZq1HHlenRaU/UK1pqE1ejQE28id17oBX5Kf1DoqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740934067; c=relaxed/simple;
-	bh=3si7UWlPyjXhGgsRSz/VCn+Zaj49hdHa0e/XxcIyXQc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uLAr4XDrQYsqYLawvw2TkQ4omGr/WPQphcyZyLLcZh2Pa5G0i/JZuoq92XLw4Cv/ckKiK8N1R8bwMfqkHwUUyrM47eDFC3QDZDNRNtmzdtikg485xKUIaTsyJ/j9ySQSIflGSplTVR8n8AGcfQuDDTekH1Td+9bWAFInKTLWLDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KocJICQ2; arc=none smtp.client-ip=209.85.208.42
+	s=arc-20240116; t=1740938731; c=relaxed/simple;
+	bh=ca/uE1aC3a5MruYv78M9xPRI+Jkx7uQOT+fNx6JClpE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=KOxwW26XzuZdhKf9EpsM9UyUOjv3GtgcjM9mdl/1JTho3DIF4ivwU1xp6B765wmnTZHc1yOHSXv6hnAARKAOIi3z8yGGx4TfbyCSnn7zNf35pygHO9+l85vg3ewdSlK9IYaYRtoELzQax7zRe0DQOxFcZ9EG3ojJKPgTb2hXvvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i87rt4x5; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KocJICQ2"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5e4b410e48bso5573699a12.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Mar 2025 08:47:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i87rt4x5"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7c3b3e11f28so70176285a.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Mar 2025 10:05:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740934064; x=1741538864; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X0kHmsu9327PgQWecyEE6nd87H2WEenP+zrK7c1GCLw=;
-        b=KocJICQ2Heri5GbNgzuF5o6dnVEyM2y9vUG15QgZSmif70epBLKcamFYvbhhXEi3Tu
-         AZc+x/RlAEiQGUmE2o/tzpLJyCkV0HUWEk6q9pZJ0HKAJ45RF/OWWHqUU/TPJMBahJfb
-         2MoEjETBSicY3xxVxSzsa15Ns9QiCMcSbhDhn/Cwrq+Q6LAXTsgJMcGd9eBF+REzFO0y
-         S7ziRDSUqg1phHEMkUqgboYlc5SkmRycSSjXVJUQp+pODMyjUrSyKb8QRF2hUdfqOLpA
-         NJo7lr6+gjTz2C9bH5ZB+uakoJBBxvMJ36W19P+XTM0EJUnLrjx4QhdtVFPkdbeeNDuF
-         6kBA==
+        d=gmail.com; s=20230601; t=1740938729; x=1741543529; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=BzbNlZw70PhskVzN7XHFXvX5JW8hCwlDU4Rx07VayjA=;
+        b=i87rt4x5lFNwBDuQAkJeaoMGWwGxyFzivLt4eI8zH0qBDKVnGkkdUtcTMO8GWmbFtQ
+         6YRs7pCv59GafiwTS8TP11IQYt5GF+8JiRBqX36RrA3ud4TxUp5ejn4PaQByz7CkHPbh
+         B1jDvq8AltmCy4kvW8p6RrfQ23kQa0BvtB1Ynkp21kokSMxdnD4AArbxam8CK3JQvn07
+         mqhOYeHdb8BA3gEdGKhjdqkECh8dACjfwRLp9zi0wYohnXkt5S5ZdW82RRVThqHTWiCP
+         rcnWhP72RO+Cy95L/+p5bMRnS0XhXuaqcwIIaMh9zVSlsE0KEt8xmctGeEi9eyosnwCp
+         dlMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740934064; x=1741538864;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1740938729; x=1741543529;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=X0kHmsu9327PgQWecyEE6nd87H2WEenP+zrK7c1GCLw=;
-        b=W7mY0Mr6P/l8t243B4vfaZO2RFfv2XG2ggFNO0JC7JLn4xPb7V61kRSw5owxxVH4Gs
-         k54tlhOJuuIPBV3ATrnPDKxpGId2vmGgkJYqR5Wakchcd2d1mfbDtw3IJIC1AiGTTqGP
-         CzJYOjOm0IDYMsq9pdk9RLQUWiO7NmFWqAid1lkA+LA/CJAqBymqm8EAznxxneJQFsQT
-         C0jc2wQpI59MBIU33Opb67T5FmD+/jwiXx3m/J/tKWPkGVUV4hvCuVMiGKE51SeUgQRr
-         H5K3YnwI66i63jqoUMcboNA68inx/qvhiunm95AxshSXmYn87iPafiTu2TQCLwsuazCJ
-         nDGw==
-X-Gm-Message-State: AOJu0YyEBKhYNgsRpaDAKFv0SYZtQEqwA+ja2T6Cq+BrsV+NrAc9QXL3
-	/sTXv7mxYPVN1Shf/B3Kpu5d/6bc0Kvo2d2qNj208r5t+41H18r/Ha80I+8/
-X-Gm-Gg: ASbGncukt23DddZ7A0e0tQZxTjQzU2w0MoZ+5BmL4+AGqFMulF2g6Y9qApVLT518qwp
-	rois8NaF2jZ7u68sJwCZgF8SKs3rqU3eSiRM2ZdYaLe7NZdP4urnE/a4v8TF9y8aoYxwZombuFt
-	3gSrDLkASSqHYTJu6rFiWFd7qn2gO+Y/iCDjSR1aMjWl80dsFSe8EfzgGhcKXOECzGaT3JBQnZo
-	3eZuq2KpubZVR4K+9po0hQ0ionDmjSQPWJPLfKs85v8yPdubDip9HMiFUX89WnH/YdDKX6zrWgo
-	qc+jrl92QJ5qkhBgWc7lMvCIOKW+PB2VbzY56un8gD3PELCEVRPOy0GFcPvwoqlaHBw2T64ophK
-	QQlrAbABMrdB3/zKOp7hT8TmeL1PuD5j3yeNCgw==
-X-Google-Smtp-Source: AGHT+IEhBdMkEOK5OTh3lTH94DKxzNLX9rR9pAJ+mLAPDNkrO8TqCx1OrCAsbPl8EakDjmYdFu9PQQ==
-X-Received: by 2002:a05:6402:35cd:b0:5db:f5bc:f696 with SMTP id 4fb4d7f45d1cf-5e4d6ad3e14mr10641654a12.5.1740934063778;
-        Sun, 02 Mar 2025 08:47:43 -0800 (PST)
-Received: from localhost.localdomain (46.205.201.86.nat.ftth.dynamic.t-mobile.pl. [46.205.201.86])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3fb51e1sm5808146a12.61.2025.03.02.08.47.41
+        bh=BzbNlZw70PhskVzN7XHFXvX5JW8hCwlDU4Rx07VayjA=;
+        b=rC9Yn0c2/WGZdUiXRmgmSj1HZQvg6B5y57c1JpWmK8VQVl+tji0psOrDYoUJCAuRnt
+         uB8nRl7CL0SrDYS6Ne8pCsHsQomAtqIMMD98n9KDGUiXWL0vFet7KMGBXg1K/FqKKJ95
+         BIds3MCp5e4C7tKzmtfSU4wP8dC6V+Gt+PYcuv3AGzXl/w2xhPqoaogvzst7jqBfSaLL
+         Q/yeWAoo0d/JdcX9lo1lkP6GHjMjh54kpsnQGROHrvEzEzUPCk0+roBtwRIbQGvRH4gH
+         QQtWXyoqs5vriJ0CRHpmAMCas9K209EPeku2BxxCuQZynbTaILGGFnJuIDhaUv8s3Hn2
+         +EuQ==
+X-Gm-Message-State: AOJu0YyCcOSsEI6QtNrz/PyYLLO6VfsoNIYCoO8e4biWj75+hYaeXzCH
+	FSyrYW7DXpMrwIn94Q+ajn61Z8/D1OXmh1GBrMpCvG9qGV23ohNnIp5RtQ==
+X-Gm-Gg: ASbGnctZCyI7cyqAUUgQlRN6lUGIVd/rCdzvOC6TgtqWf4sLKJIaxB0GrMZtrvwY197
+	IdC5QxK+NQM48Q+/c83JxhpD5bNGOlilnfBwnaxEUYl6OhbrezOVNBpKKbVv9CaPxZVH3lZnKw4
+	sH9LVhr+uOuhp0G76bwkRQHDrr+lmu8e4vXs7MAOCVBerStOexpEbALj+BUvQPla5NLJcH7xOMw
+	X40gmry62XBOYEhnleGYfKcs/IYNDqvqJd63Mg942aPGR6XFQxdGQ65mQK2INY3Hf+n0xg1CMHQ
+	Nnw67iOuuoJ+E8cdSrZC0rzCc6MgTKQ12Zm57Lajfcval0KD2ZA=
+X-Google-Smtp-Source: AGHT+IHdQpm/Ljww9dCLjy+ky7k+OU6exhmWvOoqEoMcUnUEe7dToscNAZ+MmurpBqYIrtncJQU51g==
+X-Received: by 2002:a05:620a:c44:b0:7c0:b2ab:2693 with SMTP id af79cd13be357-7c39c677674mr1625896785a.49.1740938728765;
+        Sun, 02 Mar 2025 10:05:28 -0800 (PST)
+Received: from [172.17.0.2] ([20.102.199.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c378da070dsm506258385a.72.2025.03.02.10.05.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Mar 2025 08:47:43 -0800 (PST)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH BlueZ] client: Support single profile connection/disconnection
-Date: Sun,  2 Mar 2025 17:47:36 +0100
-Message-Id: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.5
+        Sun, 02 Mar 2025 10:05:28 -0800 (PST)
+Message-ID: <67c49de8.050a0220.362326.269f@mx.google.com>
+Date: Sun, 02 Mar 2025 10:05:28 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2408503015073257447=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
+Subject: RE: [BlueZ] client: Support single profile connection/disconnection
+In-Reply-To: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
+References: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2408503015073257447==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=939378
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.20 seconds
+GitLint                       PENDING   0.22 seconds
+BuildEll                      PASS      20.33 seconds
+BluezMake                     PASS      1436.96 seconds
+MakeCheck                     PASS      12.76 seconds
+MakeDistcheck                 PASS      158.28 seconds
+CheckValgrind                 PASS      213.64 seconds
+CheckSmatch                   PASS      282.65 seconds
+bluezmakeextell               PASS      97.53 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      858.16 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
- client/main.c | 93 ++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 80 insertions(+), 13 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/main.c b/client/main.c
-index feb21a116..e4ed692ec 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1969,13 +1969,44 @@ static void cmd_remove(int argc, char *argv[])
- 	remove_device(proxy);
- }
- 
-+struct connection_data {
-+	GDBusProxy *proxy;
-+	char *uuid;
-+};
-+
-+static void connection_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	struct connection_data *data = user_data;
-+
-+	if (!data->uuid)
-+		return;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &data->uuid);
-+}
-+
-+static void format_connection_profile(char *output, size_t size,
-+							const char *uuid)
-+{
-+	const char *text;
-+
-+	text = bt_uuidstr_to_str(uuid);
-+	if (!text)
-+		text = uuid;
-+
-+	snprintf(output, size, " profile \"%s\"", text);
-+}
-+
- static void connect_reply(DBusMessage *message, void *user_data)
- {
--	GDBusProxy *proxy = user_data;
-+	struct connection_data *data = user_data;
-+	GDBusProxy *proxy = data->proxy;
- 	DBusError error;
- 
- 	dbus_error_init(&error);
- 
-+	g_free(data->uuid);
-+	g_free(data);
-+
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
- 		bt_shell_printf("Failed to connect: %s %s\n", error.name,
- 				error.message);
-@@ -1991,6 +2022,9 @@ static void connect_reply(DBusMessage *message, void *user_data)
- 
- static void cmd_connect(int argc, char *argv[])
- {
-+	struct connection_data *data;
-+	const char *method = "Connect";
-+	char profile[128] = "";
- 	GDBusProxy *proxy;
- 
- 	if (check_default_ctrl() == FALSE)
-@@ -2002,31 +2036,49 @@ static void cmd_connect(int argc, char *argv[])
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	if (g_dbus_proxy_method_call(proxy, "Connect", NULL, connect_reply,
--							proxy, NULL) == FALSE) {
-+	data = new0(struct connection_data, 1);
-+	data->proxy = proxy;
-+
-+	if (argc == 3) {
-+		method = "ConnectProfile";
-+		data->uuid = g_strdup(argv[2]);
-+		format_connection_profile(profile, sizeof(profile), argv[2]);
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, method, connection_setup,
-+					connect_reply, data, NULL) == FALSE) {
- 		bt_shell_printf("Failed to connect\n");
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	bt_shell_printf("Attempting to connect to %s\n", argv[1]);
-+	bt_shell_printf("Attempting to connect%s to %s\n", profile, argv[1]);
- }
- 
- static void disconn_reply(DBusMessage *message, void *user_data)
- {
--	GDBusProxy *proxy = user_data;
-+	struct connection_data *data = user_data;
-+	const bool profile_disconnected = data->uuid != NULL;
-+	GDBusProxy *proxy = data->proxy;
- 	DBusError error;
- 
- 	dbus_error_init(&error);
- 
-+	g_free(data->uuid);
-+	g_free(data);
-+
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
- 		bt_shell_printf("Failed to disconnect: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	bt_shell_printf("Successful disconnected\n");
-+	bt_shell_printf("Disconnection successful\n");
- 
--	if (proxy == default_dev)
-+	/* If only a single profile was disconnected, the device itself might
-+	 * still be connected. In that case, let the property change handler
-+	 * take care of setting the default device to NULL.
-+	 */
-+	if (proxy == default_dev && !profile_disconnected)
- 		set_default_device(NULL, NULL);
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-@@ -2034,19 +2086,31 @@ static void disconn_reply(DBusMessage *message, void *user_data)
- 
- static void cmd_disconn(int argc, char *argv[])
- {
-+	struct connection_data *data;
-+	const char *method = "Disconnect";
-+	char profile[128] = "";
- 	GDBusProxy *proxy;
- 
- 	proxy = find_device(argc, argv);
- 	if (!proxy)
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 
--	if (g_dbus_proxy_method_call(proxy, "Disconnect", NULL, disconn_reply,
--							proxy, NULL) == FALSE) {
-+	data = new0(struct connection_data, 1);
-+	data->proxy = proxy;
-+
-+	if (argc == 3) {
-+		method = "DisconnectProfile";
-+		data->uuid = g_strdup(argv[2]);
-+		format_connection_profile(profile, sizeof(profile), argv[2]);
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, method, connection_setup,
-+					disconn_reply, data, NULL) == FALSE) {
- 		bt_shell_printf("Failed to disconnect\n");
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	bt_shell_printf("Attempting to disconnect from %s\n",
-+	bt_shell_printf("Attempting to disconnect%s from %s\n", profile,
- 						proxy_address(proxy));
- }
- 
-@@ -3241,10 +3305,13 @@ static const struct bt_shell_menu main_menu = {
- 								dev_generator },
- 	{ "remove",       "<dev>",    cmd_remove, "Remove device",
- 							dev_generator },
--	{ "connect",      "<dev>",    cmd_connect, "Connect device",
--							dev_generator },
--	{ "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
-+	{ "connect",      "<dev> [uuid]", cmd_connect,
-+				"Connect a device and all its profiles or "
-+				"optionally connect a single profile only",
- 							dev_generator },
-+	{ "disconnect",   "[dev] [uuid]", cmd_disconn,
-+				"Disconnect a device or optionally disconnect "
-+				"a single profile only", dev_generator },
- 	{ "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake support",
- 							dev_generator },
- 	{ } },
--- 
-2.39.5
 
+--===============2408503015073257447==--
