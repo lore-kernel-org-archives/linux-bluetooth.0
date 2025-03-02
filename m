@@ -1,146 +1,247 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5445E5661
-	for <linux-bluetooth@vger.kernel.org>; Sun,  2 Mar 2025 09:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0970F111AD
+	for <linux-bluetooth@vger.kernel.org>; Sun,  2 Mar 2025 16:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740909578; cv=none; b=k8e16Pz0Odvnt9SqfnP1astR+LD763dLnhbAXzj4LZcx+lEVJSyqX1BkWIvqOVu+KnY28ePk232zBnyAhtEtTmVCuUhTzDzbzoSQ2/eKuJJG5d3sVqOZ3zytDuWabJUc5m6n+vxI/XYNebkJucqWHPsZLWDzeKyCVRNnEE1UfAA=
+	t=1740934067; cv=none; b=qvook5IVTyGSty2P2f2ebeAMUvlgutW3ZGy8SGCpqa9TPM86f+dJGnzyWL3k07RrclnHmVUcl5cBVSiyzPXgsWDpacB3+fDPV/0jWkTbS9w5r8s/7tMGIcJVrofMRDMV5JYjHn5FRj9VZBRfr7lQqLfg/H4Yu7s6oVlxAL40UWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740909578; c=relaxed/simple;
-	bh=N+YX5cL/z+WJEMi3jfYDU8pJcZKbbP5EunEvRudn7PE=;
-	h=Date:Message-ID:From:To:Cc:Subject:MIME-Version:Content-Type; b=oa4JhYDj6vgbDmVwomOCOyebW3o769dknjXgo3KTyqBkGLBHf5YlTk5YMysC5YuTkdNocEZD7dJRVg61URSddFwKKsjKjamav3qlWrYngd7EMh5Swkvbs/EAQykFIHMaupJBTE7Y2tLh2rCYp7mlXKffW9Xaw1nYpQ8n8GBFfzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IsG5o3An; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/ytnCkaS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IsG5o3An; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/ytnCkaS; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1740934067; c=relaxed/simple;
+	bh=3si7UWlPyjXhGgsRSz/VCn+Zaj49hdHa0e/XxcIyXQc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uLAr4XDrQYsqYLawvw2TkQ4omGr/WPQphcyZyLLcZh2Pa5G0i/JZuoq92XLw4Cv/ckKiK8N1R8bwMfqkHwUUyrM47eDFC3QDZDNRNtmzdtikg485xKUIaTsyJ/j9ySQSIflGSplTVR8n8AGcfQuDDTekH1Td+9bWAFInKTLWLDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KocJICQ2; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IsG5o3An";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/ytnCkaS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IsG5o3An";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/ytnCkaS"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 51C4C1F770;
-	Sun,  2 Mar 2025 09:59:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740909574; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=fH+YcOiwHIZRGS7otWc8ZDXv79Isns7wggIg+WWmGrk=;
-	b=IsG5o3An4NIewTkzS3KdaSW3Hxxgz+z9tjJXix4Rjd7p6y5YBSbXRrAgem2UBxJ9RCrxXA
-	TK/LdQ842tvVttXOTtwqK6zMoX0RUSr5MBMU6UV8YB9PKy37YKzD7w4WAcnNOTrSEwg6ml
-	jMrUK8gnP7DBNCZzutmmUHYGhhoIBco=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740909574;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=fH+YcOiwHIZRGS7otWc8ZDXv79Isns7wggIg+WWmGrk=;
-	b=/ytnCkaS3S/YlJIltSRwcKMyZGiR/LLtFiAH9aDe9nTrNIfS3kjKUWjiyBVzmbtxIjAwy8
-	s2kom5eC6vKnz/Cw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=IsG5o3An;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="/ytnCkaS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740909574; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=fH+YcOiwHIZRGS7otWc8ZDXv79Isns7wggIg+WWmGrk=;
-	b=IsG5o3An4NIewTkzS3KdaSW3Hxxgz+z9tjJXix4Rjd7p6y5YBSbXRrAgem2UBxJ9RCrxXA
-	TK/LdQ842tvVttXOTtwqK6zMoX0RUSr5MBMU6UV8YB9PKy37YKzD7w4WAcnNOTrSEwg6ml
-	jMrUK8gnP7DBNCZzutmmUHYGhhoIBco=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740909574;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=fH+YcOiwHIZRGS7otWc8ZDXv79Isns7wggIg+WWmGrk=;
-	b=/ytnCkaS3S/YlJIltSRwcKMyZGiR/LLtFiAH9aDe9nTrNIfS3kjKUWjiyBVzmbtxIjAwy8
-	s2kom5eC6vKnz/Cw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 28C661395B;
-	Sun,  2 Mar 2025 09:59:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id u7rnBwYsxGfeCgAAD6G6ig
-	(envelope-from <tiwai@suse.de>); Sun, 02 Mar 2025 09:59:34 +0000
-Date: Sun, 02 Mar 2025 10:59:33 +0100
-Message-ID: <87a5a3ah2y.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Is commit 4d94f0555827 safe?
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KocJICQ2"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5e4b410e48bso5573699a12.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Mar 2025 08:47:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740934064; x=1741538864; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X0kHmsu9327PgQWecyEE6nd87H2WEenP+zrK7c1GCLw=;
+        b=KocJICQ2Heri5GbNgzuF5o6dnVEyM2y9vUG15QgZSmif70epBLKcamFYvbhhXEi3Tu
+         AZc+x/RlAEiQGUmE2o/tzpLJyCkV0HUWEk6q9pZJ0HKAJ45RF/OWWHqUU/TPJMBahJfb
+         2MoEjETBSicY3xxVxSzsa15Ns9QiCMcSbhDhn/Cwrq+Q6LAXTsgJMcGd9eBF+REzFO0y
+         S7ziRDSUqg1phHEMkUqgboYlc5SkmRycSSjXVJUQp+pODMyjUrSyKb8QRF2hUdfqOLpA
+         NJo7lr6+gjTz2C9bH5ZB+uakoJBBxvMJ36W19P+XTM0EJUnLrjx4QhdtVFPkdbeeNDuF
+         6kBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740934064; x=1741538864;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X0kHmsu9327PgQWecyEE6nd87H2WEenP+zrK7c1GCLw=;
+        b=W7mY0Mr6P/l8t243B4vfaZO2RFfv2XG2ggFNO0JC7JLn4xPb7V61kRSw5owxxVH4Gs
+         k54tlhOJuuIPBV3ATrnPDKxpGId2vmGgkJYqR5Wakchcd2d1mfbDtw3IJIC1AiGTTqGP
+         CzJYOjOm0IDYMsq9pdk9RLQUWiO7NmFWqAid1lkA+LA/CJAqBymqm8EAznxxneJQFsQT
+         C0jc2wQpI59MBIU33Opb67T5FmD+/jwiXx3m/J/tKWPkGVUV4hvCuVMiGKE51SeUgQRr
+         H5K3YnwI66i63jqoUMcboNA68inx/qvhiunm95AxshSXmYn87iPafiTu2TQCLwsuazCJ
+         nDGw==
+X-Gm-Message-State: AOJu0YyEBKhYNgsRpaDAKFv0SYZtQEqwA+ja2T6Cq+BrsV+NrAc9QXL3
+	/sTXv7mxYPVN1Shf/B3Kpu5d/6bc0Kvo2d2qNj208r5t+41H18r/Ha80I+8/
+X-Gm-Gg: ASbGncukt23DddZ7A0e0tQZxTjQzU2w0MoZ+5BmL4+AGqFMulF2g6Y9qApVLT518qwp
+	rois8NaF2jZ7u68sJwCZgF8SKs3rqU3eSiRM2ZdYaLe7NZdP4urnE/a4v8TF9y8aoYxwZombuFt
+	3gSrDLkASSqHYTJu6rFiWFd7qn2gO+Y/iCDjSR1aMjWl80dsFSe8EfzgGhcKXOECzGaT3JBQnZo
+	3eZuq2KpubZVR4K+9po0hQ0ionDmjSQPWJPLfKs85v8yPdubDip9HMiFUX89WnH/YdDKX6zrWgo
+	qc+jrl92QJ5qkhBgWc7lMvCIOKW+PB2VbzY56un8gD3PELCEVRPOy0GFcPvwoqlaHBw2T64ophK
+	QQlrAbABMrdB3/zKOp7hT8TmeL1PuD5j3yeNCgw==
+X-Google-Smtp-Source: AGHT+IEhBdMkEOK5OTh3lTH94DKxzNLX9rR9pAJ+mLAPDNkrO8TqCx1OrCAsbPl8EakDjmYdFu9PQQ==
+X-Received: by 2002:a05:6402:35cd:b0:5db:f5bc:f696 with SMTP id 4fb4d7f45d1cf-5e4d6ad3e14mr10641654a12.5.1740934063778;
+        Sun, 02 Mar 2025 08:47:43 -0800 (PST)
+Received: from localhost.localdomain (46.205.201.86.nat.ftth.dynamic.t-mobile.pl. [46.205.201.86])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3fb51e1sm5808146a12.61.2025.03.02.08.47.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Mar 2025 08:47:43 -0800 (PST)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH BlueZ] client: Support single profile connection/disconnection
+Date: Sun,  2 Mar 2025 17:47:36 +0100
+Message-Id: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-Rspamd-Queue-Id: 51C4C1F770
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	MID_CONTAINS_FROM(1.00)[];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -2.51
-X-Spam-Flag: NO
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-[ I posted without the subject line mistakenly, so resent again;
-  sorry if you have seen already read it ]
+---
+ client/main.c | 93 ++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 80 insertions(+), 13 deletions(-)
 
-Hi Luiz,
+diff --git a/client/main.c b/client/main.c
+index feb21a116..e4ed692ec 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1969,13 +1969,44 @@ static void cmd_remove(int argc, char *argv[])
+ 	remove_device(proxy);
+ }
+ 
++struct connection_data {
++	GDBusProxy *proxy;
++	char *uuid;
++};
++
++static void connection_setup(DBusMessageIter *iter, void *user_data)
++{
++	struct connection_data *data = user_data;
++
++	if (!data->uuid)
++		return;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &data->uuid);
++}
++
++static void format_connection_profile(char *output, size_t size,
++							const char *uuid)
++{
++	const char *text;
++
++	text = bt_uuidstr_to_str(uuid);
++	if (!text)
++		text = uuid;
++
++	snprintf(output, size, " profile \"%s\"", text);
++}
++
+ static void connect_reply(DBusMessage *message, void *user_data)
+ {
+-	GDBusProxy *proxy = user_data;
++	struct connection_data *data = user_data;
++	GDBusProxy *proxy = data->proxy;
+ 	DBusError error;
+ 
+ 	dbus_error_init(&error);
+ 
++	g_free(data->uuid);
++	g_free(data);
++
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+ 		bt_shell_printf("Failed to connect: %s %s\n", error.name,
+ 				error.message);
+@@ -1991,6 +2022,9 @@ static void connect_reply(DBusMessage *message, void *user_data)
+ 
+ static void cmd_connect(int argc, char *argv[])
+ {
++	struct connection_data *data;
++	const char *method = "Connect";
++	char profile[128] = "";
+ 	GDBusProxy *proxy;
+ 
+ 	if (check_default_ctrl() == FALSE)
+@@ -2002,31 +2036,49 @@ static void cmd_connect(int argc, char *argv[])
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	if (g_dbus_proxy_method_call(proxy, "Connect", NULL, connect_reply,
+-							proxy, NULL) == FALSE) {
++	data = new0(struct connection_data, 1);
++	data->proxy = proxy;
++
++	if (argc == 3) {
++		method = "ConnectProfile";
++		data->uuid = g_strdup(argv[2]);
++		format_connection_profile(profile, sizeof(profile), argv[2]);
++	}
++
++	if (g_dbus_proxy_method_call(proxy, method, connection_setup,
++					connect_reply, data, NULL) == FALSE) {
+ 		bt_shell_printf("Failed to connect\n");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	bt_shell_printf("Attempting to connect to %s\n", argv[1]);
++	bt_shell_printf("Attempting to connect%s to %s\n", profile, argv[1]);
+ }
+ 
+ static void disconn_reply(DBusMessage *message, void *user_data)
+ {
+-	GDBusProxy *proxy = user_data;
++	struct connection_data *data = user_data;
++	const bool profile_disconnected = data->uuid != NULL;
++	GDBusProxy *proxy = data->proxy;
+ 	DBusError error;
+ 
+ 	dbus_error_init(&error);
+ 
++	g_free(data->uuid);
++	g_free(data);
++
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+ 		bt_shell_printf("Failed to disconnect: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	bt_shell_printf("Successful disconnected\n");
++	bt_shell_printf("Disconnection successful\n");
+ 
+-	if (proxy == default_dev)
++	/* If only a single profile was disconnected, the device itself might
++	 * still be connected. In that case, let the property change handler
++	 * take care of setting the default device to NULL.
++	 */
++	if (proxy == default_dev && !profile_disconnected)
+ 		set_default_device(NULL, NULL);
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+@@ -2034,19 +2086,31 @@ static void disconn_reply(DBusMessage *message, void *user_data)
+ 
+ static void cmd_disconn(int argc, char *argv[])
+ {
++	struct connection_data *data;
++	const char *method = "Disconnect";
++	char profile[128] = "";
+ 	GDBusProxy *proxy;
+ 
+ 	proxy = find_device(argc, argv);
+ 	if (!proxy)
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+-	if (g_dbus_proxy_method_call(proxy, "Disconnect", NULL, disconn_reply,
+-							proxy, NULL) == FALSE) {
++	data = new0(struct connection_data, 1);
++	data->proxy = proxy;
++
++	if (argc == 3) {
++		method = "DisconnectProfile";
++		data->uuid = g_strdup(argv[2]);
++		format_connection_profile(profile, sizeof(profile), argv[2]);
++	}
++
++	if (g_dbus_proxy_method_call(proxy, method, connection_setup,
++					disconn_reply, data, NULL) == FALSE) {
+ 		bt_shell_printf("Failed to disconnect\n");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	bt_shell_printf("Attempting to disconnect from %s\n",
++	bt_shell_printf("Attempting to disconnect%s from %s\n", profile,
+ 						proxy_address(proxy));
+ }
+ 
+@@ -3241,10 +3305,13 @@ static const struct bt_shell_menu main_menu = {
+ 								dev_generator },
+ 	{ "remove",       "<dev>",    cmd_remove, "Remove device",
+ 							dev_generator },
+-	{ "connect",      "<dev>",    cmd_connect, "Connect device",
+-							dev_generator },
+-	{ "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
++	{ "connect",      "<dev> [uuid]", cmd_connect,
++				"Connect a device and all its profiles or "
++				"optionally connect a single profile only",
+ 							dev_generator },
++	{ "disconnect",   "[dev] [uuid]", cmd_disconn,
++				"Disconnect a device or optionally disconnect "
++				"a single profile only", dev_generator },
+ 	{ "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake support",
+ 							dev_generator },
+ 	{ } },
+-- 
+2.39.5
 
-due to the CVE assignment, I stumbled on the recent fix for BT
-hci_core, the commit 4d94f0555827 ("Bluetooth: hci_core: Fix sleeping
-function called from invalid context"), and wonder whether it's really
-safe.
-
-As already asked question at the patch review:
-  https://patchwork.kernel.org/comment/26147087/
-the code allows the callbacks to be called even after
-hci_unregister_cb() returns.
-
-Your assumption was that it's never called without the module removal,
-but isn't hci_unregister_cb() also called from iso_exit() which can be
-triggered via set_iso_socket_func() in mgmt.c?  Also, any 3rd party
-module could call hci_unregister_cb() in a wild way, too -- even if
-the function still remains, it doesn't mean that you can call it
-safely if the caller already assumes it being unregistered.
-
-In addition to that, I feel what the patch does as a bit too
-heavy-lifting: it does kmalloc() and copy the whole hci_cb object,
-which isn't quite small for each.  If the callback is still safe to
-call after RCU protection, you may just keep the hci_cb pointer
-instead of copying the whole content, too?
-
-I couldn't find v1 patch in the patchwork, so not sure whether this
-has been already discussed.  If so, let me know.
-
-
-Thanks!
-
-Takashi
