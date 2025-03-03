@@ -1,127 +1,93 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B44C20408D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 12:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB91320E330
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 13:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741006691; cv=none; b=MtaRcwUZu00OSzPKhQbmHaqIdERnm0MkD6SxkRXwckFP624HB184CsX2C2XZmmO1gJL/8UcYELYYyDoYg8vQASCwXXallBfYPGBh8JtdOOeXkj0QEKl/r0VWpoyu62rpJFawdV1NaP5OSIrwmAm8nxxc7G+VxzwePMiguHXLZEE=
+	t=1741008626; cv=none; b=CbntX8/rIdBU2f51j0U+GpQycgwZr+E7SryP1+MF7VB/gdJnKCYGCSniL3Aiz+ud1rcsXhFb9ae8vcwC+vrv9ATIFYXsYKu2wnXG6p7u8azgSxyDbua4djNEwlMaW+XUbENt5lAhpzlUlmDXGt7RQyIlY9Douhf4VmV4PnhW2kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741006691; c=relaxed/simple;
-	bh=CthffvlFZmYkEOQbxsBO8BrlykDXncl0GpZIvHTBHbI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hFOQZhMAnQAowp7jGF+dyisauKXkoXaBxhAJVRyCN/CyBnGKN6gzrQg7bisYTyqAOzbOTIzSSRJxTHDZH0Ol42DzIAcd8bA3nhR24jXnwuI8dET0K1DLaOqVBrCYLelIw78liwb/JqNkAPBb8Vk3KYGNjIYHzx8K5OiQpOI2vv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (178.204.251.109) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 3 Mar
- 2025 15:57:46 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ] client: add input validation to main()
-Date: Mon, 3 Mar 2025 15:57:22 +0300
-Message-ID: <20250303125724.54665-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1741008626; c=relaxed/simple;
+	bh=himwkJ/ZEtJYLR/lwTcqTXCEvR7GaTh/V44yncqlrjo=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=uSI2IVhjMfqTcxRl68q24HlU8sE5nYM6DjnlqXdSjURanAWsXlFUK+gJam9ECSQYm0jQhRmYjMfJcX2nqmmSuMcvKdKYJB+14kunuvCXNUd3fNhl3E5ICxX7gJ+BikbEp99oyH/+QOvwq2XrFZAbP1KhaiE+yc5vK7PAxe0bJ7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mmCS1SpQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mmCS1SpQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 23125C4CEEB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 13:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741008626;
+	bh=himwkJ/ZEtJYLR/lwTcqTXCEvR7GaTh/V44yncqlrjo=;
+	h=From:To:Subject:Date:From;
+	b=mmCS1SpQ9PBNZFiWyAjOWlOVYTjbeqM4WZOB43n7QJy6n8svTEYd61JyE91m7copm
+	 0xaFrljgEOA6Pw+WXkp0YqVCWtPkBMey553ELy56jQiAJJ2k0C+1vAfi68Kv5Rz4Vc
+	 CaBowh5IAo+xStm/Q0Rwrzka//qBDEgSeukWwyMv99EpnZIXAv5Vq6EDUJwYlwhg+a
+	 YcEFhixukJOtvdlelyPiSxMvr/fsBEXvCtKhVuL5jJAS99HQWiMkKBIQ7BrJkGtaSz
+	 6WWyjatfVDI9eC+TbrglemBbXLgzeGaLT172XOH0xzDTyggt/vFwroLIqUagMKGiXs
+	 crUUZEdRFqYgQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 18F60C53BBF; Mon,  3 Mar 2025 13:30:26 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219833] New: USB bluetooth dongle stop working after upgrade
+ from 6.8.0-52 to 6.8.0-53 and/or 6.8.0-54
+Date: Mon, 03 Mar 2025 13:30:25 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: foliden163@envoes.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys bug_status bug_severity priority
+ component assigned_to reporter cc cf_regression
+Message-ID: <bug-219833-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 03/03/2025 12:38:09
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 191431 [Mar 03 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 51 0.3.51
- 68896fb0083a027476849bf400a331a2d5d94398
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {Tracking_repetitive_subdir_in_url}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.204.251.109 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.204.251.109 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	github.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.204.251.109
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/03/2025 12:41:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/3/2025 10:13:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-An error was found during fuzzing testing. When passing Unicode
-characters to bluetoothctl the application crashes in dbus:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219833
 
-dbus[5324]: arguments to dbus_message_iter_append_basic() were
-incorrect, assertion "_dbus_check_is_valid_utf8 (*string_p)"
-failed in file .../dbus-message.c line 2765.
+            Bug ID: 219833
+           Summary: USB bluetooth dongle stop working after upgrade from
+                    6.8.0-52 to 6.8.0-53 and/or 6.8.0-54
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 6.8.0-54
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: foliden163@envoes.com
+                CC: luiz.dentz@gmail.com
+        Regression: Yes
 
-Check that all characters are written in utf8.
+Kernel bug on CSR dongle, same as
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219365
+(https://web.git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/co=
+mmit/?h=3Dmaster&id=3Db29d4ac729754fa1b515a024386f50dadcaa8c7b)
+but this time in current Ubuntu and Mint LTS kernels
 
-Fixes: https://github.com/bluez/bluez/issues/1118
----
- client/main.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+--=20
+You may reply to this email to add a comment.
 
-diff --git a/client/main.c b/client/main.c
-index feb21a116..f3180a0fe 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -843,6 +843,17 @@ static gboolean parse_argument(int argc, char *argv[], const char **arg_table,
- 	return FALSE;
- }
- 
-+static int validate_input(int argc, char *argv[]) {
-+	for (int i = 0; i < argc; i++) {
-+		if (!strisutf8(argv[i], strlen(argv[i]))) {
-+			printf("Invalid character in string: %s\n", argv[i]);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static void cmd_list(int argc, char *argv[])
- {
- 	GList *list;
-@@ -3299,6 +3310,10 @@ int main(int argc, char *argv[])
- 	int timeout;
- 	unsigned int timeout_id;
- 
-+	status = validate_input(argc, argv);
-+	if (status)
-+		return status;
-+
- 	bt_shell_init(argc, argv, &opt);
- 	bt_shell_set_menu(&main_menu);
- 	bt_shell_add_submenu(&advertise_menu);
--- 
-2.43.0
-
+You are receiving this mail because:
+You are the assignee for the bug.=
