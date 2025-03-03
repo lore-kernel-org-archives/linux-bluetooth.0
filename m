@@ -1,201 +1,281 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EE11EF0B7;
-	Mon,  3 Mar 2025 18:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FE022C355
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 18:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741026007; cv=none; b=ctLLeJUCQdIwQWSeUS6FstDK4MidcvtaaSDW9RdwkU0QF393fapR2G9KauoX5RAOhZfX9Ck2N1ObD/1xB4daiR3Mig8Q7W62sw3iUBFihbC8zERKVC01QcZT3UXvg1Zn0K/s5rLfBTiXyWRS3FukfbY97PG1rLpMDBwkb3b63zM=
+	t=1741026226; cv=none; b=cyeKmcIL41n+l8tJrP2WU8GgK1Lgj1rJxJjAc6NuRcl48YAq+Nj0DcqEHzAUSCcqG82EODNgcYNuTy58ejeg6cgaXxMsFmuq/Y5FZ2CUn0J1aM/Tndyh4TBR7tc2r+tmIIHkp8zkrMgOykQVdmeCTgnVA2FTgSeG/VEXQUCyUZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741026007; c=relaxed/simple;
-	bh=DmizAxNlJuAviiyRww3so53b+eUC7H+dI7+Jqm+4JpE=;
+	s=arc-20240116; t=1741026226; c=relaxed/simple;
+	bh=ZlQHrUNMZhwQTFr8PoPMcdDYjDRcfzVj5ScOpSA2GlE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ij1LzZYuD+Auz/0k7hRkGEF//tloKIpO8CrD6rz2KxssZ6V33oqVL2WFll69cjFs6qxotj8te2LbIwYoj/AfzY71n36M6QuARBcSohDsU6BpWGYSvUGvlfaovCeA1gSLQOd/1+qs55JPZ11tf0s7S378uHeS2aiMy5QQ61LWkLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gTwHZN1L; arc=none smtp.client-ip=209.85.208.180
+	 To:Cc:Content-Type; b=CyyunvVqJaKJKYuZsr5egBKbtPzC+pBjGqZj02I6Bl8j2xui+N2Hd7r/SEklx33TPXKa81WpxBhrNqUOpoQX3lF/MD0XMD2k/5zPrgnQIKNRvQtrGsS44oEePhJ4aUEbQaEorn+xcX3rAEXx9kRrxACOWUXJY1ZQWGNQPSno85U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFMonOG7; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gTwHZN1L"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30bb184ab24so16247861fa.0;
-        Mon, 03 Mar 2025 10:20:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFMonOG7"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30bb2fdbb09so16068971fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Mar 2025 10:23:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741026001; x=1741630801; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741026223; x=1741631023; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M58+VkXsEA4mif6LInS3jCCc4BHD0Nl1zisvDwV9ck4=;
-        b=gTwHZN1LrOKDml8mhz3wUWCFCiSoYevT27Aq8uUDRGAGnuyFzbupSriTT6Bk+lpEA4
-         xIdG6aAcN+5pz9o5bFiTWFVYSNelEBYxYrImwDRodOUac2NF9nCk+vEWmLhR4m6ASX5C
-         WWr8tPUpvE3Y1Nd2Vg7Sd93rAP4RnJ/JeUCyMsdpD2vpUAaYYhDA5NzSVm+G3bT4R4T+
-         9taB+OUYBq53dAwmk9KppHYrmv5GlHy2PDXo8OcoNOR3zxEu0NF5G1PSv+Cu39eHlXTs
-         82T4SlxK9n8gLXmzMW+Z05X156Rro8mYI4Ws8GcElcBMLyZkDGTHw0MKtFAbc5PPelb0
-         P5BQ==
+        bh=hI/bZWcoKrGpVTdd16TdcggCvFJzllgm4asrFtmfeTk=;
+        b=CFMonOG76Eble+uIQpUvFj0CyLLDmh1mDVP14XOUDMmUj5WP/kbEcl2LqQSNPDSOWm
+         wdlTiHVVekxCKvw1rQ81jPQFDmdhJKdam0L1tKRrheNgtfsGrwWUNUuk75bhWC2LLpnq
+         hwm4IOWBGDfnSLU2RdIJnMBB1U08n18FkUbL4YC7JrY9ExiPqKve6r3Vio3+tsppu637
+         X88DAjEaFtM9mR/NWrjfLtGseen3L6Woxmsp6wCzSRsiJ2u5yN5zqC1qb96/dEjSYtxq
+         8zaPZEDPshJdcK4gXV1IbklsjQni8VnK1UJiD0UQJPFFsU4qTwzgyATeuv10MRSRuz8e
+         wOWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741026001; x=1741630801;
+        d=1e100.net; s=20230601; t=1741026223; x=1741631023;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M58+VkXsEA4mif6LInS3jCCc4BHD0Nl1zisvDwV9ck4=;
-        b=ddJ6Vw51iWegO2//IIabazOk25JM9doKsaUHL1dOzz0NhGYPdT5y0wVpTNI9dHkynx
-         nozD4olkBnB5QTSupxO1TcpLTiRB0PV/BF43dinlGpSR6DQbypK5B5fsrON1i0rzAfL2
-         +eeHyqmy5ASplMiwmNYw50K8CvQqchsJVtGb6wlat1PBvdvlN9hw9VAfDESmaUrWHgK9
-         Zo0t+maiYef+Br/+mUWbTRUiWcgq2ZjdK167XmrG68jEQQBtZK1e8wbzn+TDGAlKqXNu
-         KiCfYO4sXGQBcaT6uK2sy3pj0gEIwiwR6SyQ3dHHrABz1x/ITQSFuTLjnut/+SOwimWK
-         6Ztg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVhgm7RKBAvqJ1cKV4lUp3vr+m5NPscMbJWprkYBsQqFU2NxWGgHMHie0IScgyoCMjNPgWEIGwNeZFJsZQVjw=@vger.kernel.org, AJvYcCXsOXDyel8kdq7ZIRtA6OpP5/F2OCl/Knwg+gyr1EBblk6RA7v+fsWfi1fX6VJSFCkyajRQw18zXzMy9CF3@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrsfDQpeKSUls+1ey6wSY6kqoPMBxzgkK2b7phd9XHahF3FQnP
-	hJcEoed0jbLsdwJ4viZ0HPnSZ/bhLwzx/LyaGcpaMcoTUlKakNGD0qwI9QtX6A9FKZrXxsNQ7QQ
-	iOKaH38ODV7Y9hxf38HvIc4CebmFHsYIAMSA=
-X-Gm-Gg: ASbGncvERSXk241aG3K/Vtr5WGAUFeRdxKFXClpcYHmUgjiOS9jvblqX2FVEJ+zQPS6
-	/SN6CxtH5j8Q0Z+Sp4obzYEQvY1Oj4amGbPvJw4jsi7wWGVij2Yfm9IeK1NNg0qYvgJ27wkwZIw
-	PTfd0wDQRfilVqhkHcZEf5/Yr/
-X-Google-Smtp-Source: AGHT+IGOF0svxK3qQRi/8A/pDtDENw4ULI4zl6MXAPbotcB3/SQjSXOkeKRKQmZ6vdPoTmxY9mTBNFvvyWdc65qlq1w=
-X-Received: by 2002:a2e:be2a:0:b0:308:fd11:7715 with SMTP id
- 38308e7fff4ca-30b9344e0d1mr50640961fa.33.1741026000335; Mon, 03 Mar 2025
- 10:20:00 -0800 (PST)
+        bh=hI/bZWcoKrGpVTdd16TdcggCvFJzllgm4asrFtmfeTk=;
+        b=WwvDBYA4pIB2WEmL4uPG6Pb7hIsXZZmFIpy+YPSYCftPc8CdvgbUGE0EMzJRtNcQ9A
+         mE5uNJpv3oTlIWZ9dhUMYxkPXYycKHDzzRp4f0N7u6xP9syB/TJs/JNZH9R1tGng5AZw
+         U4qeyeYR3tQ1qeC9RrtMnHNBgUCpDkO790zu9U5OdviHFylQi3q8c4pGmbLuOfOzhV9J
+         SZkWh51zX2WqOn40kEAFrFZEFe80ZPJSwawjRFngx5NkJTIy8CSiAkgxEdMhDttG5kxz
+         lS2uCYeVUzTL8oyLw44ftzp89SE+atrameqDleNenkIgENLd8azcicLaIJZgDMNXAIJQ
+         956A==
+X-Gm-Message-State: AOJu0YxZAf8/l/mMFxU2BqBjOgSK1UVrQhuZWEvZ+M0DOcHuOnK4p6o0
+	GfUm90Iu3dJ+TialfsaJj33I7BBCMDsGpICXf+C09iPpTWqQ6t6m1j6reHGtVEJJZA2mltGbqit
+	Azln9mzsfITcrTB63FAMlLsgRc/M=
+X-Gm-Gg: ASbGncuVBOhWj9N2c0SpGEBKQZWyzv4RwUHQoiAxrbjkGjL8CJ2N5GAFm+XYmklU7pr
+	AXiOFvTZxjSsaVS4vNVJMkEPWDbpHOt2ymAJDa5natp5T04Ml6BYLnSvohoKdk445jcN8CnTCCu
+	VUdgIoPhTPzF3MnI61th9cAa0i
+X-Google-Smtp-Source: AGHT+IGMmm85G7BuGsWL4rnds9CzR6puWOEEm0TUPz5B0eVurKuvXxcx7EEIIsieeliFFeC4jEdOKTY+oAYBA44Qy9g=
+X-Received: by 2002:a2e:bc18:0:b0:30b:b7c3:ea71 with SMTP id
+ 38308e7fff4ca-30bb7c3ef87mr23078051fa.15.1741026222602; Mon, 03 Mar 2025
+ 10:23:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <87a5a3ah2y.wl-tiwai@suse.de> <CABBYNZJOW-YSOLS0tBdUQmxqbOmgT2n2jVheyxbvWbYmBicqyg@mail.gmail.com>
- <877c56dub7.wl-tiwai@suse.de> <CABBYNZJ6Gfmpur2by01B9+XxBX+VBzBY95v+9f5-VpiantunfQ@mail.gmail.com>
- <87y0xmcdl4.wl-tiwai@suse.de> <CABBYNZJsqXLRuY6ZMPujio7-tx82SHRZyZh=tChonVs-XiWMjw@mail.gmail.com>
- <87tt8acbmw.wl-tiwai@suse.de> <52df2ea6bac070c015987547840c78ac27538def.camel@iki.fi>
-In-Reply-To: <52df2ea6bac070c015987547840c78ac27538def.camel@iki.fi>
+References: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
+In-Reply-To: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 3 Mar 2025 13:19:47 -0500
-X-Gm-Features: AQ5f1JplAqjd7PYGQ3BuVifAplBFjnB0tr2QgVmDinNxIFQrIf_XvMo-1Gzgvhs
-Message-ID: <CABBYNZJHSoDzo7DmB84LrBw3Zi+F_QsNcD5MBJHijCo-v_KzGw@mail.gmail.com>
-Subject: Re: Is commit 4d94f0555827 safe?
-To: Pauli Virtanen <pav@iki.fi>
-Cc: Takashi Iwai <tiwai@suse.de>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 3 Mar 2025 13:23:30 -0500
+X-Gm-Features: AQ5f1JoyXNT5OW5gCt4zd17G-mxyNwE2nPKhhvsdGmAVJBdpsKdTWTdhKPo_o6s
+Message-ID: <CABBYNZJNHZ0RGA793bqhK_3VEyW-RQw+zwgLu7xgKNqpmMzYag@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client: Support single profile connection/disconnection
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli, Takashi,
+Hi Arkadiusz,
 
-On Mon, Mar 3, 2025 at 12:47=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+On Sun, Mar 2, 2025 at 11:47=E2=80=AFAM Arkadiusz Bokowy
+<arkadiusz.bokowy@gmail.com> wrote:
 >
-> Hi,
+> ---
+>  client/main.c | 93 ++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 80 insertions(+), 13 deletions(-)
 >
-> ma, 2025-03-03 kello 17:38 +0100, Takashi Iwai kirjoitti:
-> > On Mon, 03 Mar 2025 17:29:58 +0100,
-> > Luiz Augusto von Dentz wrote:
-> > >
-> > > Hi,
-> > >
-> > > On Mon, Mar 3, 2025 at 10:56=E2=80=AFAM Takashi Iwai <tiwai@suse.de> =
-wrote:
-> > > >
-> > > > On Mon, 03 Mar 2025 16:50:37 +0100,
-> > > > Luiz Augusto von Dentz wrote:
-> > > > >
-> > > > > Hi Takashi,
-> > > > >
-> > > > > On Mon, Mar 3, 2025 at 10:10=E2=80=AFAM Takashi Iwai <tiwai@suse.=
-de> wrote:
-> > > > > >
-> > > > > > On Mon, 03 Mar 2025 15:57:16 +0100,
-> > > > > > Luiz Augusto von Dentz wrote:
-> > > > > > >
-> > > > > > > Hi Takashi,
-> > > > > > >
-> > > > > > > Well the assumption was that because we are doing a copy of t=
-he struct
-> > > > > > > being unregistered/freed would never cause any errors, so to =
-trigger
-> > > > > > > something like UAF like the comment was suggesting the functi=
-on
-> > > > > > > callback would need to be unmapped so even if the likes of is=
-o_exit is
-> > > > > > > called it function (e.g. iso_connect_cfm) remains in memory.
-> > > > > >
-> > > > > > But it doesn't guarantee that the callback function would reall=
-y
-> > > > > > work.  e.g. if the callback accesses some memory that was immed=
-iately
-> > > > > > freed after the unregister call, it will lead to a UAF, even th=
-ough
-> > > > > > the function itself is still present on the memory.
-> > > > > >
-> > > > > > That said, the current situation makes hard to judge the object=
- life
-> > > > > > time.
-> > > > > >
-> > > > > > > You can find the previous version here:
-> > > > > > >
-> > > > > > > https://syzkaller.appspot.com/text?tag=3DPatch&x=3D100c0de858=
-0000
-> > > > > > >
-> > > > > > > Problem with it was that it is invalid to unlock and relock l=
-ike that.
-> > > > > >
-> > > > > > Thanks for the pointer!
-> > > > > >
-> > > > > >
-> > > > > > BTW, I saw another patch posted to replace the mutex with spinl=
-ock
-> > > > > > (and you replied later on that it's been already fixed).
-> > > > > > Is it an acceptable approach at all?
-> > > > >
-> > > > > I don't remember if I saw that, but yeah anything that makes the =
-issue
-> > > > > go away, and doesn't create new problems, would probably be
-> > > > > acceptable.
-> > > >
-> > > > I saw this one:
-> > > >   https://lore.kernel.org/all/20230907122234.146449-1-william.xuanz=
-iyang@huawei.com/
-> > >
-> > > Ive might have missed it, we will probably need to rebase it but othe=
-r
-> > > than that it should be acceptable.
-> >
-> > Does it mean that you'd revert the change and apply the above one
-> > (with rebase or modification)?  Or would you keep a part of the
-> > current change (e.g. match callback looks neat) while applying the
-> > similar fix using the spinlock?
+> diff --git a/client/main.c b/client/main.c
+> index feb21a116..e4ed692ec 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -1969,13 +1969,44 @@ static void cmd_remove(int argc, char *argv[])
+>         remove_device(proxy);
+>  }
 >
-> My current understanding of this is that the actual problem for
-> 4d94f0555827 was incorrect RCU use at the callsite in
-> hci_le_create_big_complete_evt(). That part was rewritten in
+> +struct connection_data {
+> +       GDBusProxy *proxy;
+> +       char *uuid;
+> +};
+> +
+> +static void connection_setup(DBusMessageIter *iter, void *user_data)
+> +{
+> +       struct connection_data *data =3D user_data;
+> +
+> +       if (!data->uuid)
+> +               return;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &data->uui=
+d);
+> +}
+> +
+> +static void format_connection_profile(char *output, size_t size,
+> +                                                       const char *uuid)
+> +{
+> +       const char *text;
+> +
+> +       text =3D bt_uuidstr_to_str(uuid);
+> +       if (!text)
+> +               text =3D uuid;
+> +
+> +       snprintf(output, size, " profile \"%s\"", text);
+> +}
+> +
+>  static void connect_reply(DBusMessage *message, void *user_data)
+>  {
+> -       GDBusProxy *proxy =3D user_data;
+> +       struct connection_data *data =3D user_data;
+> +       GDBusProxy *proxy =3D data->proxy;
+>         DBusError error;
 >
-> commit 581dd2dc168f ("Bluetooth: hci_event: Fix using rcu_read_(un)lock
-> while iterating")
+>         dbus_error_init(&error);
+>
+> +       g_free(data->uuid);
+> +       g_free(data);
+> +
+>         if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
+>                 bt_shell_printf("Failed to connect: %s %s\n", error.name,
+>                                 error.message);
+> @@ -1991,6 +2022,9 @@ static void connect_reply(DBusMessage *message, voi=
+d *user_data)
+>
+>  static void cmd_connect(int argc, char *argv[])
+>  {
+> +       struct connection_data *data;
+> +       const char *method =3D "Connect";
+> +       char profile[128] =3D "";
+>         GDBusProxy *proxy;
+>
+>         if (check_default_ctrl() =3D=3D FALSE)
+> @@ -2002,31 +2036,49 @@ static void cmd_connect(int argc, char *argv[])
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       if (g_dbus_proxy_method_call(proxy, "Connect", NULL, connect_repl=
+y,
+> -                                                       proxy, NULL) =3D=
+=3D FALSE) {
+> +       data =3D new0(struct connection_data, 1);
+> +       data->proxy =3D proxy;
+> +
+> +       if (argc =3D=3D 3) {
+> +               method =3D "ConnectProfile";
+> +               data->uuid =3D g_strdup(argv[2]);
+> +               format_connection_profile(profile, sizeof(profile), argv[=
+2]);
+> +       }
+> +
+> +       if (g_dbus_proxy_method_call(proxy, method, connection_setup,
+> +                                       connect_reply, data, NULL) =3D=3D=
+ FALSE) {
+>                 bt_shell_printf("Failed to connect\n");
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       bt_shell_printf("Attempting to connect to %s\n", argv[1]);
+> +       bt_shell_printf("Attempting to connect%s to %s\n", profile, argv[=
+1]);
+>  }
+>
+>  static void disconn_reply(DBusMessage *message, void *user_data)
+>  {
+> -       GDBusProxy *proxy =3D user_data;
+> +       struct connection_data *data =3D user_data;
+> +       const bool profile_disconnected =3D data->uuid !=3D NULL;
+> +       GDBusProxy *proxy =3D data->proxy;
+>         DBusError error;
+>
+>         dbus_error_init(&error);
+>
+> +       g_free(data->uuid);
+> +       g_free(data);
+> +
+>         if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
+>                 bt_shell_printf("Failed to disconnect: %s\n", error.name)=
+;
+>                 dbus_error_free(&error);
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       bt_shell_printf("Successful disconnected\n");
+> +       bt_shell_printf("Disconnection successful\n");
+>
+> -       if (proxy =3D=3D default_dev)
+> +       /* If only a single profile was disconnected, the device itself m=
+ight
+> +        * still be connected. In that case, let the property change hand=
+ler
+> +        * take care of setting the default device to NULL.
+> +        */
+> +       if (proxy =3D=3D default_dev && !profile_disconnected)
+>                 set_default_device(NULL, NULL);
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> @@ -2034,19 +2086,31 @@ static void disconn_reply(DBusMessage *message, v=
+oid *user_data)
+>
+>  static void cmd_disconn(int argc, char *argv[])
+>  {
+> +       struct connection_data *data;
+> +       const char *method =3D "Disconnect";
+> +       char profile[128] =3D "";
+>         GDBusProxy *proxy;
+>
+>         proxy =3D find_device(argc, argv);
+>         if (!proxy)
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>
+> -       if (g_dbus_proxy_method_call(proxy, "Disconnect", NULL, disconn_r=
+eply,
+> -                                                       proxy, NULL) =3D=
+=3D FALSE) {
+> +       data =3D new0(struct connection_data, 1);
+> +       data->proxy =3D proxy;
+> +
+> +       if (argc =3D=3D 3) {
+> +               method =3D "DisconnectProfile";
+> +               data->uuid =3D g_strdup(argv[2]);
+> +               format_connection_profile(profile, sizeof(profile), argv[=
+2]);
+> +       }
+> +
+> +       if (g_dbus_proxy_method_call(proxy, method, connection_setup,
+> +                                       disconn_reply, data, NULL) =3D=3D=
+ FALSE) {
+>                 bt_shell_printf("Failed to disconnect\n");
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       bt_shell_printf("Attempting to disconnect from %s\n",
+> +       bt_shell_printf("Attempting to disconnect%s from %s\n", profile,
+>                                                 proxy_address(proxy));
+>  }
+>
+> @@ -3241,10 +3305,13 @@ static const struct bt_shell_menu main_menu =3D {
+>                                                                 dev_gener=
+ator },
+>         { "remove",       "<dev>",    cmd_remove, "Remove device",
+>                                                         dev_generator },
+> -       { "connect",      "<dev>",    cmd_connect, "Connect device",
+> -                                                       dev_generator },
+> -       { "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
+> +       { "connect",      "<dev> [uuid]", cmd_connect,
+> +                               "Connect a device and all its profiles or=
+ "
+> +                               "optionally connect a single profile only=
+",
+>                                                         dev_generator },
+> +       { "disconnect",   "[dev] [uuid]", cmd_disconn,
+> +                               "Disconnect a device or optionally discon=
+nect "
+> +                               "a single profile only", dev_generator },
 
-In that case maybe we can just revert the 4d94f0555827 ("Bluetooth:
-hci_core: Fix sleeping
-function called from invalid context") and see if that works, might
-need to trigger syzbot just to confirm we don't introduce the original
-problem.
+Great idea, but let's update the documentation as well so it reflects
+this change (client/bluetoothctl.rst), also it is probably worth
+adding a few examples like connect/disconnect all/hfp/a2dp, etc.
 
-> and now it no longer calls hci_connect_cfm() from atomic context. I
-> suspect there were no other callsites that needed hci callbacks be rcu-
-> safe, so the original mutex is maybe OK as well.
->
-> For the other patch
->
-> https://lore.kernel.org/all/20230907122234.146449-1-william.xuanziyang@hu=
-awei.com/
->
-> The current code is doing rcu_read_unlock() in list_for_each_entry_rcu,
-> so it's not quite correct. This could be reorganized to restart the
-> loop after unlock and skip if (conn->abort_reason), which may be
-> preferable to spinlock in rcu critical section.
-
-I guess you referring to hci_cmd_sync_clear, yeah that is doing
-unlock/lock in the loop which is incorrect, that said we don't really
-need this change if for the above issue, although we need to
-re-evaluate the use of mutex vs spin locks given that apparently there
-could be issues other than just the BIG code hitting this sort of
-problem.
-
+>         { "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake su=
+pport",
+>                                                         dev_generator },
+>         { } },
 > --
-> Pauli Virtanen
-
+> 2.39.5
+>
+>
 
 
 --=20
