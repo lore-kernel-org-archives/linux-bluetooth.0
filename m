@@ -1,518 +1,137 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FDB2147FC
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 16:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2C622F178;
+	Mon,  3 Mar 2025 16:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019349; cv=none; b=AQL0AaR097cedEDMpef3cA8va5k6OiapY3aXFJdF2oLAwkymYo98iV5YQPo4PR2Im8v0YE8x79DPgxmrhi4Q5mCflOFKiJZ0Vim/mFCJGOwGApCEZGSAGVDcN+NVlj0/eKEhB+NUhfdJwcbUp8wMJ61+mLoJM5hxH0AyQlGXRvs=
+	t=1741019414; cv=none; b=j12Wb7G69lGcTioXXgR8do5DtcN8iTGUtZ6gG7R8W1OKj81zS7702qewarf7mM/DAbkEs34Xpt12kx/XWSfqfEkRq5DX9pQ6reCsskqCQKoLPwmIaArS0p19ZKX58SdjO8m8oYcosEjAoIYB8OVuUJlOUKGvVRUmSJDnX1isl50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019349; c=relaxed/simple;
-	bh=JZqKp2nci2aHKu9Wv9FYwXSS3E2MY8OWUnRo+G7Zu5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gQlgx5jVeTmCdRKdNVqeusbP4oJQd1eh9hZZp/8YTL5feo2MgLZb6b5gp2EXsKWtf5U78GJoing3ONw+arSCRy11W9zBZ8bfw5bxz9DwukWdgOyF7UcVFJ0TEljvIczUQ7H86ER0q+qZJbb6Aa5hsDPPWc+blm0QLTdWN9jLtMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h7tf2hBl; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1741019414; c=relaxed/simple;
+	bh=gCpLZGk6d2LraPzUQfSO75O3BCaKN/MWPVFymzkjVUY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NuknalVI4/uUmGGswvy9LWUeUnlm+vJaWxAqGNjSHlaoNkqtY8EWieXTNuVk135ZxTLnvJr83FTHQEFpiPAkaNMU0sucC+ZTFp0c/nfnRwQn5zAKBUBQ7IRHxPpL7st0k10p76KIIos/zuqeveHuf/AKc4P85OJ9RXdfo0Ll2nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SKHyETmQ; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h7tf2hBl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741019347; x=1772555347;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=JZqKp2nci2aHKu9Wv9FYwXSS3E2MY8OWUnRo+G7Zu5o=;
-  b=h7tf2hBlMPcqTFGr0f35EnwexBgjum3E4GMdU1UgJU9FaCGLLrgYbrEp
-   H63BXDMZ+B2LkhyxSE0nQ3t2PY3vEwjCNDA1Ww9j4q0w/CU/3yXknCeOV
-   jExsJtVpjhV8mjQansal+OsLkBW0UvAdxPyopb9OOklw6Jto+GD8eXO9l
-   SiykSqvdet5KGJ79PfVM+7NS8Z/5b6Oe0JlOElER0Qm0pJ0ytHljtckwp
-   sJQ/FCIg+ZRnVcnxfSuhhPpGDyUuD/Er1wi/r8YLsEcw8Cv11TSiRaiU0
-   kHtmXY14SretXAucRJmMu7TQ/dSXKgPwNfkbfgVn1UI7KpPLvup4txFUX
-   Q==;
-X-CSE-ConnectionGUID: UrYWOpJzQAioVyPEjvgdjA==
-X-CSE-MsgGUID: EQUZ97ZVQeS4YP5Nzfk8Yg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41078243"
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="41078243"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:29:05 -0800
-X-CSE-ConnectionGUID: VUn04oE4QFW5oCgfF26fSQ==
-X-CSE-MsgGUID: qy8Ljrp3SE6/PmFqogIYxw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="122207000"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa003.fm.intel.com with ESMTP; 03 Mar 2025 08:29:02 -0800
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	vijay.satija@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel_pcie: Add support for device coredump
-Date: Mon,  3 Mar 2025 22:15:27 +0530
-Message-ID: <20250303164527.218458-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SKHyETmQ"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30930b0b420so38848271fa.2;
+        Mon, 03 Mar 2025 08:30:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741019411; x=1741624211; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3JF0xMBR+WwT2sVa6zJeyjN1XH4wIWbrdBRs8wTzL5c=;
+        b=SKHyETmQ9tkuzUkgaHyh3FGTwcgrN/dfrXWjWnhoWROgNMduWZ2aao06jHiaLN5XEj
+         pVLdItQw95UjRAQuU+MWrK2uo42gRQmhWn35xrSqLVLeEORZK0u15DMQqmqKDLIDx+un
+         ilSZVscWKrTUl9+Tauk3GK4FzX/usKWXVoSyEH2H8BevsdVQ32KvIrLQL9Wb2PlK6WNK
+         kyy+Qa8tFhjX5inF+tw15Ppk3Xcelq3uVctFSaMkBAYZoG+AnJINPDNz6bblSZBYLfWk
+         PqMU30jyCH04BOlEp1YEzB9pTt1nCMSdWIxHsP8ytODuqoTKvp1sWJSWatfZJRYIVSyP
+         qiiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741019411; x=1741624211;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3JF0xMBR+WwT2sVa6zJeyjN1XH4wIWbrdBRs8wTzL5c=;
+        b=VqoEBV/iOnMEiQE7oQbignHaJcs8E3U9wDjI1RhjYnYEM/0kNwmHEPQOna9nAw1LzW
+         /A6ed+cdTemaC1UpOXLFvVpYTeGMAX041x4i13tAE/iLeJ/Z3KOOzsqR8NUSVmbp46SE
+         pS0Jt9dYxpAVLP7ivXlt9sLhnpUaw+SG1DQTW7sSofk+doTlcJ3sZJCaMKKKy5gOd/nI
+         R5Td7PirkVBsbBDeqsnSZtUeFj0V23TR+rDzY+DHcsU+8D2nrcFBXJJW8frl9Lz9yDKw
+         RTGjHk9xsYB+xUqGod8ycOMuJtwY0DRWs+jLTBWSG0a/Jpix1l7sTzxTBRpMLvf8VOMs
+         VmgA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2L8VBaPgXeVpBDoDo89eKcTUDvzpMJuPdvqhJFE4cwW+lY2iStz+ktYj+hEPUz11VUbOM9EXRwyRCTB7UGWg=@vger.kernel.org, AJvYcCX0LsU5EFJ80BEUpC0aFZRGBBIs81OY6O9tR0dl+z4Oyn1ofbouj6DtG3O59c1A1RRWBEqHz9uOcvEht2ID@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ7gxw8XZc0Gm4qZmjsKqzR+z54RoRGQIagNx2Vqx5uvJyYaeh
+	UNceDwBYo7+AnQp3CXsxZjcE9/gS04n5sLLdxYiduH32UUfYt1jOjwHYh/H6Ev276eFmC0jrM9m
+	W/tAeeIn7enWMBb24sMpoCcqCl8w=
+X-Gm-Gg: ASbGncthLdBuh3WjMi3EJ9qlZvpKeGbeYeIYYWG6LT5I2/O483AWSu7P36PdPnsOHnN
+	dlvbckE1+IHO7K2eCiJH7S8zxRPOsjZDs41YgSe+taymWwPvV18sAoRw+G4aYxHedGAhJGnE6ul
+	+mIdHtolfm2FzX/vy7pG3F2Sop
+X-Google-Smtp-Source: AGHT+IFfpy/TVn7HOAEXHu6LlZnjUDcGf9rgeYdMySN3cvFDulhxN8Y25ukrxktnaSf1XOKr2/QdU+DTlBtrWHu+9FI=
+X-Received: by 2002:a2e:96c2:0:b0:308:e0bd:a091 with SMTP id
+ 38308e7fff4ca-30b934623e4mr38116531fa.36.1741019410599; Mon, 03 Mar 2025
+ 08:30:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <87a5a3ah2y.wl-tiwai@suse.de> <CABBYNZJOW-YSOLS0tBdUQmxqbOmgT2n2jVheyxbvWbYmBicqyg@mail.gmail.com>
+ <877c56dub7.wl-tiwai@suse.de> <CABBYNZJ6Gfmpur2by01B9+XxBX+VBzBY95v+9f5-VpiantunfQ@mail.gmail.com>
+ <87y0xmcdl4.wl-tiwai@suse.de>
+In-Reply-To: <87y0xmcdl4.wl-tiwai@suse.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 3 Mar 2025 11:29:58 -0500
+X-Gm-Features: AQ5f1JoJWfI57iUJDIvknxt8WH2nhxh_U_EwNLKLgRIt7x4HN_2Y-fusx9Ou3c4
+Message-ID: <CABBYNZJsqXLRuY6ZMPujio7-tx82SHRZyZh=tChonVs-XiWMjw@mail.gmail.com>
+Subject: Re: Is commit 4d94f0555827 safe?
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-1. Driver registers device coredump callback
-2. Dumps firmware traces as part of coredump
+Hi,
 
-Co-developed-by: Vijay Satija <vijay.satija@intel.com>
-Signed-off-by: Vijay Satija <vijay.satija@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
-v1 -> v2:
-Fix warnign reported by smatch tool.
+On Mon, Mar 3, 2025 at 10:56=E2=80=AFAM Takashi Iwai <tiwai@suse.de> wrote:
+>
+> On Mon, 03 Mar 2025 16:50:37 +0100,
+> Luiz Augusto von Dentz wrote:
+> >
+> > Hi Takashi,
+> >
+> > On Mon, Mar 3, 2025 at 10:10=E2=80=AFAM Takashi Iwai <tiwai@suse.de> wr=
+ote:
+> > >
+> > > On Mon, 03 Mar 2025 15:57:16 +0100,
+> > > Luiz Augusto von Dentz wrote:
+> > > >
+> > > > Hi Takashi,
+> > > >
+> > > > Well the assumption was that because we are doing a copy of the str=
+uct
+> > > > being unregistered/freed would never cause any errors, so to trigge=
+r
+> > > > something like UAF like the comment was suggesting the function
+> > > > callback would need to be unmapped so even if the likes of iso_exit=
+ is
+> > > > called it function (e.g. iso_connect_cfm) remains in memory.
+> > >
+> > > But it doesn't guarantee that the callback function would really
+> > > work.  e.g. if the callback accesses some memory that was immediately
+> > > freed after the unregister call, it will lead to a UAF, even though
+> > > the function itself is still present on the memory.
+> > >
+> > > That said, the current situation makes hard to judge the object life
+> > > time.
+> > >
+> > > > You can find the previous version here:
+> > > >
+> > > > https://syzkaller.appspot.com/text?tag=3DPatch&x=3D100c0de8580000
+> > > >
+> > > > Problem with it was that it is invalid to unlock and relock like th=
+at.
+> > >
+> > > Thanks for the pointer!
+> > >
+> > >
+> > > BTW, I saw another patch posted to replace the mutex with spinlock
+> > > (and you replied later on that it's been already fixed).
+> > > Is it an acceptable approach at all?
+> >
+> > I don't remember if I saw that, but yeah anything that makes the issue
+> > go away, and doesn't create new problems, would probably be
+> > acceptable.
+>
+> I saw this one:
+>   https://lore.kernel.org/all/20230907122234.146449-1-william.xuanziyang@=
+huawei.com/
 
- drivers/bluetooth/btintel.h      |   1 -
- drivers/bluetooth/btintel_pcie.c | 259 ++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel_pcie.h |  38 +++++
- 3 files changed, 291 insertions(+), 7 deletions(-)
+Ive might have missed it, we will probably need to rebase it but other
+than that it should be acceptable.
 
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 4c21e69887a3..19530ea14905 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -190,7 +190,6 @@ enum {
- struct btintel_data {
- 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
- 	int (*acpi_reset_method)(struct hci_dev *hdev);
--	u32	cnvi_top;
- };
- 
- #define btintel_set_flag(hdev, nr)					\
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index e8307eeb971f..a499bad58b53 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -59,6 +59,8 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
- 
- #define BTINTEL_PCIE_MAGIC_NUM	0xA5A5A5A5
- 
-+#define BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER	0x17A2
-+
- /* Alive interrupt context */
- enum {
- 	BTINTEL_PCIE_ROM,
-@@ -375,6 +377,25 @@ static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
- 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
- }
- 
-+static int btintel_pcie_add_dmp_data(struct hci_dev *hdev, const void *data, int size)
-+{
-+	struct sk_buff *skb;
-+	int err;
-+
-+	skb = alloc_skb(size, GFP_ATOMIC);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	skb_put_data(skb, data, size);
-+	err = hci_devcd_append(hdev, skb);
-+	if (err) {
-+		bt_dev_err(hdev, "Failed to append data in the coredump");
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
- static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
- {
- 	u32 reg;
-@@ -419,6 +440,194 @@ static void btintel_pcie_release_mac_access(struct btintel_pcie_data *data)
- 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
- }
- 
-+static void btintel_pcie_copy_tlv(struct sk_buff *skb, enum btintel_pcie_tlv_type type,
-+				  void *data, int size)
-+{
-+	struct intel_tlv *tlv;
-+
-+	tlv = skb_put(skb, sizeof(*tlv) + size);
-+	tlv->type = type;
-+	tlv->len = size;
-+	memcpy(tlv->val, data, tlv->len);
-+}
-+
-+static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
-+{
-+	u32 offset, prev_size, wr_ptr_status, dump_size, i;
-+	struct btintel_pcie_dbgc *dbgc = &data->dbgc;
-+	u8 buf_idx, dump_time_len, fw_build;
-+	struct hci_dev *hdev = data->hdev;
-+	struct intel_tlv *tlv;
-+	struct timespec64 now;
-+	struct sk_buff *skb;
-+	struct tm tm_now;
-+	char buf[256];
-+	u16 hdr_len;
-+	int ret;
-+
-+	wr_ptr_status = btintel_pcie_rd_dev_mem(data, BTINTEL_PCIE_DBGC_CUR_DBGBUFF_STATUS);
-+	offset = wr_ptr_status & BTINTEL_PCIE_DBG_OFFSET_BIT_MASK;
-+
-+	buf_idx = BTINTEL_PCIE_DBGC_DBG_BUF_IDX(wr_ptr_status);
-+	if (buf_idx > dbgc->count) {
-+		bt_dev_warn(hdev, "Buffer index is invalid");
-+		return -EINVAL;
-+	}
-+
-+	prev_size = buf_idx * BTINTEL_PCIE_DBGC_BUFFER_SIZE;
-+	if (prev_size + offset >= prev_size)
-+		data->dmp_hdr.write_ptr = prev_size + offset;
-+	else
-+		return -EINVAL;
-+
-+	ktime_get_real_ts64(&now);
-+	time64_to_tm(now.tv_sec, 0, &tm_now);
-+	dump_time_len = snprintf(buf, sizeof(buf), "Dump Time: %02d-%02d-%04ld %02d:%02d:%02d",
-+				 tm_now.tm_mday, tm_now.tm_mon + 1, tm_now.tm_year + 1900,
-+				 tm_now.tm_hour, tm_now.tm_min, tm_now.tm_sec);
-+
-+	fw_build = snprintf(buf + dump_time_len, sizeof(buf) - dump_time_len,
-+			    "Firmware Timestamp: Year %u WW %02u buildtype %u build %u",
-+			    2000 + (data->dmp_hdr.fw_timestamp >> 8),
-+			    data->dmp_hdr.fw_timestamp & 0xff, data->dmp_hdr.fw_build_type,
-+			    data->dmp_hdr.fw_build_num);
-+
-+	hdr_len = sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_bt) +
-+		  sizeof(*tlv) + sizeof(data->dmp_hdr.write_ptr) +
-+		  sizeof(*tlv) + sizeof(data->dmp_hdr.wrap_ctr) +
-+		  sizeof(*tlv) + sizeof(data->dmp_hdr.trigger_reason) +
-+		  sizeof(*tlv) + sizeof(data->dmp_hdr.fw_git_sha1) +
-+		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvr_top) +
-+		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_top) +
-+		  sizeof(*tlv) + dump_time_len +
-+		  sizeof(*tlv) + fw_build;
-+
-+	dump_size = hdr_len + sizeof(hdr_len);
-+
-+	skb = alloc_skb(dump_size, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	/* Add debug buffers data length to dump size */
-+	dump_size += BTINTEL_PCIE_DBGC_BUFFER_SIZE * dbgc->count;
-+
-+	ret = hci_devcd_init(hdev, dump_size);
-+	if (ret) {
-+		bt_dev_err(hdev, "Failed to init devcoredump, err %d", ret);
-+		kfree_skb(skb);
-+		return ret;
-+	}
-+
-+	skb_put_data(skb, &hdr_len, sizeof(hdr_len));
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_BT, &data->dmp_hdr.cnvi_bt,
-+			      sizeof(data->dmp_hdr.cnvi_bt));
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_WRITE_PTR, &data->dmp_hdr.write_ptr,
-+			      sizeof(data->dmp_hdr.write_ptr));
-+
-+	data->dmp_hdr.wrap_ctr = btintel_pcie_rd_dev_mem(data,
-+							 BTINTEL_PCIE_DBGC_DBGBUFF_WRAP_ARND);
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_WRAP_CTR, &data->dmp_hdr.wrap_ctr,
-+			      sizeof(data->dmp_hdr.wrap_ctr));
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_TRIGGER_REASON, &data->dmp_hdr.trigger_reason,
-+			      sizeof(data->dmp_hdr.trigger_reason));
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_FW_SHA, &data->dmp_hdr.fw_git_sha1,
-+			      sizeof(data->dmp_hdr.fw_git_sha1));
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_CNVR_TOP, &data->dmp_hdr.cnvr_top,
-+			      sizeof(data->dmp_hdr.cnvr_top));
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
-+			      sizeof(data->dmp_hdr.cnvi_top));
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_DUMP_TIME, buf, dump_time_len);
-+
-+	btintel_pcie_copy_tlv(skb, BTINTEL_FW_BUILD, buf + dump_time_len, fw_build);
-+
-+	ret = hci_devcd_append(hdev, skb);
-+	if (ret)
-+		goto exit_err;
-+
-+	for (i = 0; i < dbgc->count; i++) {
-+		ret = btintel_pcie_add_dmp_data(hdev, dbgc->bufs[i].data,
-+						BTINTEL_PCIE_DBGC_BUFFER_SIZE);
-+		if (ret)
-+			break;
-+	}
-+
-+exit_err:
-+	hci_devcd_complete(hdev);
-+	return ret;
-+}
-+
-+static void btintel_pcie_dump_traces(struct hci_dev *hdev)
-+{
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+	int ret = 0;
-+
-+	ret = btintel_pcie_get_mac_access(data);
-+	if (ret) {
-+		bt_dev_err(hdev, "Failed to get mac access: (%d)", ret);
-+		return;
-+	}
-+
-+	ret = btintel_pcie_read_dram_buffers(data);
-+
-+	btintel_pcie_release_mac_access(data);
-+
-+	if (ret)
-+		bt_dev_err(hdev, "Failed to dump traces: (%d)", ret);
-+}
-+
-+static void btintel_pcie_dump_hdr(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+	u16 len = skb->len;
-+	u16 *hdrlen_ptr;
-+	char buf[80];
-+
-+	hdrlen_ptr = skb_put_zero(skb, sizeof(len));
-+
-+	snprintf(buf, sizeof(buf), "Controller Name: 0x%X\n",
-+		 INTEL_HW_VARIANT(data->dmp_hdr.cnvi_bt));
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Firmware Build Number: %u\n",
-+		 data->dmp_hdr.fw_build_num);
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Driver: %s\n", data->dmp_hdr.driver_name);
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Vendor: Intel\n");
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	*hdrlen_ptr = skb->len - len;
-+}
-+
-+static void btintel_pcie_dump_notify(struct hci_dev *hdev, int state)
-+{
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+
-+	switch (state) {
-+	case HCI_DEVCOREDUMP_IDLE:
-+		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
-+		break;
-+	case HCI_DEVCOREDUMP_ACTIVE:
-+		data->dmp_hdr.state = HCI_DEVCOREDUMP_ACTIVE;
-+		break;
-+	case HCI_DEVCOREDUMP_TIMEOUT:
-+	case HCI_DEVCOREDUMP_ABORT:
-+	case HCI_DEVCOREDUMP_DONE:
-+		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
-+		break;
-+	}
-+}
-+
- /* This function enables BT function by setting BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT bit in
-  * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
-  * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
-@@ -883,7 +1092,6 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
- 
- static void btintel_pcie_read_hwexp(struct btintel_pcie_data *data)
- {
--	struct btintel_data *intel_data = hci_get_priv(data->hdev);
- 	int len, err, offset, pending;
- 	struct sk_buff *skb;
- 	u8 *buf, prefix[64];
-@@ -898,11 +1106,11 @@ static void btintel_pcie_read_hwexp(struct btintel_pcie_data *data)
- 
- 	struct tlv *tlv;
- 
--	switch (intel_data->cnvi_top & 0xfff) {
-+	switch (data->dmp_hdr.cnvi_top & 0xfff) {
- 	case BTINTEL_CNVI_BLAZARI:
- 	case BTINTEL_CNVI_BLAZARIW:
- 		/* only from step B0 onwards */
--		if (INTEL_CNVX_TOP_STEP(intel_data->cnvi_top) != 0x01)
-+		if (INTEL_CNVX_TOP_STEP(data->dmp_hdr.cnvi_top) != 0x01)
- 			return;
- 		len = BTINTEL_PCIE_BLZR_HWEXP_SIZE; /* exception data length */
- 		addr = BTINTEL_PCIE_BLZR_HWEXP_DMP_ADDR;
-@@ -912,7 +1120,7 @@ static void btintel_pcie_read_hwexp(struct btintel_pcie_data *data)
- 		addr = BTINTEL_PCIE_SCP_HWEXP_DMP_ADDR;
- 	break;
- 	default:
--		bt_dev_err(data->hdev, "Unsupported cnvi 0x%8.8x", intel_data->cnvi_top);
-+		bt_dev_err(data->hdev, "Unsupported cnvi 0x%8.8x", data->dmp_hdr.cnvi_top);
- 		return;
- 	}
- 
-@@ -1017,6 +1225,11 @@ static void btintel_pcie_rx_work(struct work_struct *work)
- 		clear_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags);
- 	}
- 
-+	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags)) {
-+		btintel_pcie_dump_traces(data->hdev);
-+		clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
-+	}
-+
- 	/* Process the sk_buf in queue and send to the HCI layer */
- 	while ((skb = skb_dequeue(&data->rx_skb_q))) {
- 		err = btintel_pcie_recv_frame(data, skb);
-@@ -1702,7 +1915,7 @@ static void btintel_pcie_release_hdev(struct btintel_pcie_data *data)
- 
- static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- {
--	struct btintel_data *data = hci_get_priv(hdev);
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
- 	const u8 param[1] = { 0xFF };
- 	struct intel_version_tlv ver_tlv;
- 	struct sk_buff *skb;
-@@ -1741,7 +1954,6 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 		goto exit_error;
- 	}
- 
--	data->cnvi_top = ver_tlv.cnvi_top;
- 	switch (INTEL_HW_PLATFORM(ver_tlv.cnvi_bt)) {
- 	case 0x37:
- 		break;
-@@ -1787,6 +1999,23 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 		break;
- 	}
- 
-+	data->dmp_hdr.cnvi_top = ver_tlv.cnvi_top;
-+	data->dmp_hdr.cnvr_top = ver_tlv.cnvr_top;
-+	data->dmp_hdr.fw_timestamp = ver_tlv.timestamp;
-+	data->dmp_hdr.fw_build_type = ver_tlv.build_type;
-+	data->dmp_hdr.fw_build_num = ver_tlv.build_num;
-+	data->dmp_hdr.cnvi_bt = ver_tlv.cnvi_bt;
-+
-+	if (ver_tlv.img_type == 0x02 || ver_tlv.img_type == 0x03)
-+		data->dmp_hdr.fw_git_sha1 = ver_tlv.git_sha1;
-+
-+	err = hci_devcd_register(hdev, btintel_pcie_dump_traces, btintel_pcie_dump_hdr,
-+				 btintel_pcie_dump_notify);
-+	if (err) {
-+		bt_dev_err(hdev, "Failed to register coredump (%d)", err);
-+		goto exit_error;
-+	}
-+
- 	btintel_print_fseq_info(hdev);
- exit_error:
- 	kfree_skb(skb);
-@@ -1851,6 +2080,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
- 		goto exit_error;
- 	}
- 
-+	data->dmp_hdr.driver_name = KBUILD_MODNAME;
- 	return 0;
- 
- exit_error:
-@@ -1963,11 +2193,28 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	pci_set_drvdata(pdev, NULL);
- }
- 
-+#ifdef CONFIG_DEV_COREDUMP
-+static void btintel_pcie_coredump(struct device *dev)
-+{
-+	struct  pci_dev *pdev = to_pci_dev(dev);
-+	struct btintel_pcie_data *data = pci_get_drvdata(pdev);
-+
-+	if (test_and_set_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags))
-+		return;
-+
-+	data->dmp_hdr.trigger_reason  = BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER;
-+	queue_work(data->workqueue, &data->rx_work);
-+}
-+#endif
-+
- static struct pci_driver btintel_pcie_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = btintel_pcie_table,
- 	.probe = btintel_pcie_probe,
- 	.remove = btintel_pcie_remove,
-+#ifdef CONFIG_DEV_COREDUMP
-+	.driver.coredump = btintel_pcie_coredump
-+#endif
- };
- module_pci_driver(btintel_pcie_driver);
- 
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index d17808ebe725..873178019cad 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -56,6 +56,15 @@
- #define BTINTEL_PCIE_CSR_MSIX_IVAR_BASE		(BTINTEL_PCIE_CSR_MSIX_BASE + 0x0880)
- #define BTINTEL_PCIE_CSR_MSIX_IVAR(cause)	(BTINTEL_PCIE_CSR_MSIX_IVAR_BASE + (cause))
- 
-+/* IOSF Debug Register */
-+#define BTINTEL_PCIE_DBGC_BASE_ADDR			(0xf3800300)
-+#define BTINTEL_PCIE_DBGC_CUR_DBGBUFF_STATUS		(BTINTEL_PCIE_DBGC_BASE_ADDR + 0x1C)
-+#define BTINTEL_PCIE_DBGC_DBGBUFF_WRAP_ARND		(BTINTEL_PCIE_DBGC_BASE_ADDR + 0x2C)
-+
-+#define BTINTEL_PCIE_DBG_IDX_BIT_MASK		0x0F
-+#define BTINTEL_PCIE_DBGC_DBG_BUF_IDX(data)	(((data) >> 24) & BTINTEL_PCIE_DBG_IDX_BIT_MASK)
-+#define BTINTEL_PCIE_DBG_OFFSET_BIT_MASK	0xFFFFFF
-+
- /* The DRAM buffer count, each buffer size, and
-  * fragment buffer size
-  */
-@@ -97,6 +106,19 @@ enum {
- enum {
- 	BTINTEL_PCIE_CORE_HALTED,
- 	BTINTEL_PCIE_HWEXP_INPROGRESS,
-+	BTINTEL_PCIE_COREDUMP_INPROGRESS
-+};
-+
-+enum btintel_pcie_tlv_type {
-+	BTINTEL_CNVI_BT,
-+	BTINTEL_WRITE_PTR,
-+	BTINTEL_WRAP_CTR,
-+	BTINTEL_TRIGGER_REASON,
-+	BTINTEL_FW_SHA,
-+	BTINTEL_CNVR_TOP,
-+	BTINTEL_CNVI_TOP,
-+	BTINTEL_DUMP_TIME,
-+	BTINTEL_FW_BUILD,
- };
- 
- #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
-@@ -371,6 +393,21 @@ struct btintel_pcie_dbgc {
- 	struct data_buf *bufs;
- };
- 
-+struct btintel_pcie_dump_header {
-+	const char	*driver_name;
-+	u32		cnvi_top;
-+	u32		cnvr_top;
-+	u16		fw_timestamp;
-+	u8		fw_build_type;
-+	u32		fw_build_num;
-+	u32		fw_git_sha1;
-+	u32		cnvi_bt;
-+	u32		write_ptr;
-+	u32		wrap_ctr;
-+	u16		trigger_reason;
-+	int		state;
-+};
-+
- /* struct btintel_pcie_data
-  * @pdev: pci device
-  * @hdev: hdev device
-@@ -452,6 +489,7 @@ struct btintel_pcie_data {
- 	struct rxq	rxq;
- 	u32	alive_intr_ctxt;
- 	struct btintel_pcie_dbgc	dbgc;
-+	struct btintel_pcie_dump_header dmp_hdr;
- };
- 
- static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
--- 
-2.43.0
-
+--=20
+Luiz Augusto von Dentz
