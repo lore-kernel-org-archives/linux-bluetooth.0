@@ -1,282 +1,191 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FE022C355
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 18:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166B3218AB0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 18:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741026226; cv=none; b=cyeKmcIL41n+l8tJrP2WU8GgK1Lgj1rJxJjAc6NuRcl48YAq+Nj0DcqEHzAUSCcqG82EODNgcYNuTy58ejeg6cgaXxMsFmuq/Y5FZ2CUn0J1aM/Tndyh4TBR7tc2r+tmIIHkp8zkrMgOykQVdmeCTgnVA2FTgSeG/VEXQUCyUZQ=
+	t=1741026260; cv=none; b=CwLjvJ+dkpUYnqTteKA23x2xxhQYeRk7GZ1WQH/LIYXEJgzmtsN85IQfhGThlj7bR1DbniKnmcmA9ELYi8FVW0tdd8U1+7cHMrmf6znqUGKkvDThpeYw35/J8kwbmn2cWAOUXC0Fr2VEdH3mw3gYqpNrTG3e7MWJBckRYRmat7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741026226; c=relaxed/simple;
-	bh=ZlQHrUNMZhwQTFr8PoPMcdDYjDRcfzVj5ScOpSA2GlE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CyyunvVqJaKJKYuZsr5egBKbtPzC+pBjGqZj02I6Bl8j2xui+N2Hd7r/SEklx33TPXKa81WpxBhrNqUOpoQX3lF/MD0XMD2k/5zPrgnQIKNRvQtrGsS44oEePhJ4aUEbQaEorn+xcX3rAEXx9kRrxACOWUXJY1ZQWGNQPSno85U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFMonOG7; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741026260; c=relaxed/simple;
+	bh=38+ZPQd8fXpvw5CmVcnRw6HAFcdNY+6Xa5Hmn/FQ3Y4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W8zyv6ZIq1QOENPiq3jVVvwEeyTJxrf1WPlPiPbSTu+5cl71VgNGb113TsBelCsYGJ0YhIGiS9d37YpuPsZ2xbH6ZSBSjzDezpTBHKkr5gG5HFM4d8iE7BxzdJ9u/d6ewzAXSMQv1IfKO7qnc4AmCkSCDn9IquvrgnXHKgZ6eNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=pgXiprzN; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFMonOG7"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30bb2fdbb09so16068971fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Mar 2025 10:23:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741026223; x=1741631023; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hI/bZWcoKrGpVTdd16TdcggCvFJzllgm4asrFtmfeTk=;
-        b=CFMonOG76Eble+uIQpUvFj0CyLLDmh1mDVP14XOUDMmUj5WP/kbEcl2LqQSNPDSOWm
-         wdlTiHVVekxCKvw1rQ81jPQFDmdhJKdam0L1tKRrheNgtfsGrwWUNUuk75bhWC2LLpnq
-         hwm4IOWBGDfnSLU2RdIJnMBB1U08n18FkUbL4YC7JrY9ExiPqKve6r3Vio3+tsppu637
-         X88DAjEaFtM9mR/NWrjfLtGseen3L6Woxmsp6wCzSRsiJ2u5yN5zqC1qb96/dEjSYtxq
-         8zaPZEDPshJdcK4gXV1IbklsjQni8VnK1UJiD0UQJPFFsU4qTwzgyATeuv10MRSRuz8e
-         wOWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741026223; x=1741631023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hI/bZWcoKrGpVTdd16TdcggCvFJzllgm4asrFtmfeTk=;
-        b=WwvDBYA4pIB2WEmL4uPG6Pb7hIsXZZmFIpy+YPSYCftPc8CdvgbUGE0EMzJRtNcQ9A
-         mE5uNJpv3oTlIWZ9dhUMYxkPXYycKHDzzRp4f0N7u6xP9syB/TJs/JNZH9R1tGng5AZw
-         U4qeyeYR3tQ1qeC9RrtMnHNBgUCpDkO790zu9U5OdviHFylQi3q8c4pGmbLuOfOzhV9J
-         SZkWh51zX2WqOn40kEAFrFZEFe80ZPJSwawjRFngx5NkJTIy8CSiAkgxEdMhDttG5kxz
-         lS2uCYeVUzTL8oyLw44ftzp89SE+atrameqDleNenkIgENLd8azcicLaIJZgDMNXAIJQ
-         956A==
-X-Gm-Message-State: AOJu0YxZAf8/l/mMFxU2BqBjOgSK1UVrQhuZWEvZ+M0DOcHuOnK4p6o0
-	GfUm90Iu3dJ+TialfsaJj33I7BBCMDsGpICXf+C09iPpTWqQ6t6m1j6reHGtVEJJZA2mltGbqit
-	Azln9mzsfITcrTB63FAMlLsgRc/M=
-X-Gm-Gg: ASbGncuVBOhWj9N2c0SpGEBKQZWyzv4RwUHQoiAxrbjkGjL8CJ2N5GAFm+XYmklU7pr
-	AXiOFvTZxjSsaVS4vNVJMkEPWDbpHOt2ymAJDa5natp5T04Ml6BYLnSvohoKdk445jcN8CnTCCu
-	VUdgIoPhTPzF3MnI61th9cAa0i
-X-Google-Smtp-Source: AGHT+IGMmm85G7BuGsWL4rnds9CzR6puWOEEm0TUPz5B0eVurKuvXxcx7EEIIsieeliFFeC4jEdOKTY+oAYBA44Qy9g=
-X-Received: by 2002:a2e:bc18:0:b0:30b:b7c3:ea71 with SMTP id
- 38308e7fff4ca-30bb7c3ef87mr23078051fa.15.1741026222602; Mon, 03 Mar 2025
- 10:23:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pgXiprzN"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 523B75BE007314
+	for <linux-bluetooth@vger.kernel.org>; Mon, 3 Mar 2025 18:24:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=zqnKOu7G9fs4VY/Y6oFsf0
+	EAZeQYJPqRtyDksidzDtc=; b=pgXiprzNPOkE6lAbdkdsgETOfBH8oImkwvGVp2
+	XnkOJ2tAyT7nmDPyVXIfDbUJOjaStVc23bXofOg7oZmS855YQgohYVz0hz4lSpCz
+	fVLe7iayGoOtEenhiJC+R14svfnDirvUeVwVrIbRbuiZ0B73slF8cGSkKHurAmkM
+	TEx9Jmy1k5AMfWQDJRPp8oX8TfanOR5i4jTi+8V2jw/GvYRNR7/1JeaeWNgcUb/u
+	tHqL+RFJyJExmDV2HNNJc/8SrK2MDl5D0PnOX6CHWxOFqjPyefnzNCm8rprE88d7
+	rt+C3EQG/69mM6O28RI4/r9YjZsDGyiIoPxeu8nO2kLGv3Uw==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 453uh75grw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 03 Mar 2025 18:24:17 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 523IOH1s002440
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 3 Mar 2025 18:24:17 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 3 Mar 2025 10:24:15 -0800
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v4] obex: Add messages_get_message() implementation for MAP plugin
+Date: Mon, 3 Mar 2025 23:53:59 +0530
+Message-ID: <20250303182359.4081049-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
-In-Reply-To: <20250302164736.22101-1-arkadiusz.bokowy@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 3 Mar 2025 13:23:30 -0500
-X-Gm-Features: AQ5f1JoyXNT5OW5gCt4zd17G-mxyNwE2nPKhhvsdGmAVJBdpsKdTWTdhKPo_o6s
-Message-ID: <CABBYNZJNHZ0RGA793bqhK_3VEyW-RQw+zwgLu7xgKNqpmMzYag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] client: Support single profile connection/disconnection
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: YV4EvRfeXy2zX_o4VwGSdxRvyZGeL7G3
+X-Proofpoint-ORIG-GUID: YV4EvRfeXy2zX_o4VwGSdxRvyZGeL7G3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-03_09,2025-03-03_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ lowpriorityscore=0 phishscore=0 impostorscore=0 clxscore=1015
+ priorityscore=1501 adultscore=0 mlxscore=0 spamscore=0 malwarescore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503030140
 
-Hi Arkadiusz,
+GET Message() operation should be supported for passing below PTS
+testcases -
 
-On Sun, Mar 2, 2025 at 11:47=E2=80=AFAM Arkadiusz Bokowy
-<arkadiusz.bokowy@gmail.com> wrote:
->
-> ---
->  client/main.c | 93 ++++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 80 insertions(+), 13 deletions(-)
->
-> diff --git a/client/main.c b/client/main.c
-> index feb21a116..e4ed692ec 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -1969,13 +1969,44 @@ static void cmd_remove(int argc, char *argv[])
->         remove_device(proxy);
->  }
->
-> +struct connection_data {
-> +       GDBusProxy *proxy;
-> +       char *uuid;
-> +};
-> +
-> +static void connection_setup(DBusMessageIter *iter, void *user_data)
-> +{
-> +       struct connection_data *data =3D user_data;
-> +
-> +       if (!data->uuid)
-> +               return;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &data->uui=
-d);
-> +}
-> +
-> +static void format_connection_profile(char *output, size_t size,
-> +                                                       const char *uuid)
-> +{
-> +       const char *text;
-> +
-> +       text =3D bt_uuidstr_to_str(uuid);
-> +       if (!text)
-> +               text =3D uuid;
-> +
-> +       snprintf(output, size, " profile \"%s\"", text);
-> +}
-> +
->  static void connect_reply(DBusMessage *message, void *user_data)
->  {
-> -       GDBusProxy *proxy =3D user_data;
-> +       struct connection_data *data =3D user_data;
-> +       GDBusProxy *proxy =3D data->proxy;
->         DBusError error;
->
->         dbus_error_init(&error);
->
-> +       g_free(data->uuid);
-> +       g_free(data);
-> +
->         if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
->                 bt_shell_printf("Failed to connect: %s %s\n", error.name,
->                                 error.message);
-> @@ -1991,6 +2022,9 @@ static void connect_reply(DBusMessage *message, voi=
-d *user_data)
->
->  static void cmd_connect(int argc, char *argv[])
->  {
-> +       struct connection_data *data;
-> +       const char *method =3D "Connect";
-> +       char profile[128] =3D "";
->         GDBusProxy *proxy;
->
->         if (check_default_ctrl() =3D=3D FALSE)
-> @@ -2002,31 +2036,49 @@ static void cmd_connect(int argc, char *argv[])
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       if (g_dbus_proxy_method_call(proxy, "Connect", NULL, connect_repl=
-y,
-> -                                                       proxy, NULL) =3D=
-=3D FALSE) {
-> +       data =3D new0(struct connection_data, 1);
-> +       data->proxy =3D proxy;
-> +
-> +       if (argc =3D=3D 3) {
-> +               method =3D "ConnectProfile";
-> +               data->uuid =3D g_strdup(argv[2]);
-> +               format_connection_profile(profile, sizeof(profile), argv[=
-2]);
-> +       }
-> +
-> +       if (g_dbus_proxy_method_call(proxy, method, connection_setup,
-> +                                       connect_reply, data, NULL) =3D=3D=
- FALSE) {
->                 bt_shell_printf("Failed to connect\n");
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       bt_shell_printf("Attempting to connect to %s\n", argv[1]);
-> +       bt_shell_printf("Attempting to connect%s to %s\n", profile, argv[=
-1]);
->  }
->
->  static void disconn_reply(DBusMessage *message, void *user_data)
->  {
-> -       GDBusProxy *proxy =3D user_data;
-> +       struct connection_data *data =3D user_data;
-> +       const bool profile_disconnected =3D data->uuid !=3D NULL;
-> +       GDBusProxy *proxy =3D data->proxy;
->         DBusError error;
->
->         dbus_error_init(&error);
->
-> +       g_free(data->uuid);
-> +       g_free(data);
-> +
->         if (dbus_set_error_from_message(&error, message) =3D=3D TRUE) {
->                 bt_shell_printf("Failed to disconnect: %s\n", error.name)=
-;
->                 dbus_error_free(&error);
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       bt_shell_printf("Successful disconnected\n");
-> +       bt_shell_printf("Disconnection successful\n");
->
-> -       if (proxy =3D=3D default_dev)
-> +       /* If only a single profile was disconnected, the device itself m=
-ight
-> +        * still be connected. In that case, let the property change hand=
-ler
-> +        * take care of setting the default device to NULL.
-> +        */
-> +       if (proxy =3D=3D default_dev && !profile_disconnected)
->                 set_default_device(NULL, NULL);
->
->         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> @@ -2034,19 +2086,31 @@ static void disconn_reply(DBusMessage *message, v=
-oid *user_data)
->
->  static void cmd_disconn(int argc, char *argv[])
->  {
-> +       struct connection_data *data;
-> +       const char *method =3D "Disconnect";
-> +       char profile[128] =3D "";
->         GDBusProxy *proxy;
->
->         proxy =3D find_device(argc, argv);
->         if (!proxy)
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->
-> -       if (g_dbus_proxy_method_call(proxy, "Disconnect", NULL, disconn_r=
-eply,
-> -                                                       proxy, NULL) =3D=
-=3D FALSE) {
-> +       data =3D new0(struct connection_data, 1);
-> +       data->proxy =3D proxy;
-> +
-> +       if (argc =3D=3D 3) {
-> +               method =3D "DisconnectProfile";
-> +               data->uuid =3D g_strdup(argv[2]);
-> +               format_connection_profile(profile, sizeof(profile), argv[=
-2]);
-> +       }
-> +
-> +       if (g_dbus_proxy_method_call(proxy, method, connection_setup,
-> +                                       disconn_reply, data, NULL) =3D=3D=
- FALSE) {
->                 bt_shell_printf("Failed to disconnect\n");
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       bt_shell_printf("Attempting to disconnect from %s\n",
-> +       bt_shell_printf("Attempting to disconnect%s from %s\n", profile,
->                                                 proxy_address(proxy));
->  }
->
-> @@ -3241,10 +3305,13 @@ static const struct bt_shell_menu main_menu =3D {
->                                                                 dev_gener=
-ator },
->         { "remove",       "<dev>",    cmd_remove, "Remove device",
->                                                         dev_generator },
-> -       { "connect",      "<dev>",    cmd_connect, "Connect device",
-> -                                                       dev_generator },
-> -       { "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
-> +       { "connect",      "<dev> [uuid]", cmd_connect,
-> +                               "Connect a device and all its profiles or=
- "
-> +                               "optionally connect a single profile only=
-",
->                                                         dev_generator },
-> +       { "disconnect",   "[dev] [uuid]", cmd_disconn,
-> +                               "Disconnect a device or optionally discon=
-nect "
-> +                               "a single profile only", dev_generator },
+1.MAP/MSE/MMB/BV-12-C
+  Verify that the MSE can return an email message to the MCE.
+2.MAP/MSE/MMB/BV-13-C
+  Verify that the MSE can return a a*n* SMS message in native format
+  to the MCE.
+3.MAP/MSE/MMB/BV-14-C
+  Verify that the MSE can return a SMS message with text trans-coded
+  to UTF-8 to the MCE.
 
-Great idea, but let's update the documentation as well so it reflects
-this change (client/bluetoothctl.rst), also it is probably worth
-adding a few examples like connect/disconnect all/hfp/a2dp, etc.
+Currently get message operation is not implemented, hence above
+testcases are failing.
+Added code to send the complete bmessage in response to the get() request
+for the requested message handle.
 
->         { "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set wake su=
-pport",
->                                                         dev_generator },
->         { } },
-> --
-> 2.39.5
->
->
+As per suggested in previous patch, mmap() is being used
+for reading file.
 
+---
+ obexd/plugins/mas.c            |  5 ++--
+ obexd/plugins/messages-dummy.c | 47 +++++++++++++++++++++++++++++++++-
+ 2 files changed, 49 insertions(+), 3 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index 10b972d65..bf8d689ad 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -408,6 +408,7 @@ static void get_message_cb(void *session, int err, gboolean fmore,
+ 	}
+ 
+ 	g_string_append(mas->buffer, chunk);
++	mas->finished = TRUE;
+ 
+ proceed:
+ 	if (err != -EAGAIN)
+@@ -612,11 +613,11 @@ static void *message_open(const char *name, int oflag, mode_t mode,
+ 		return NULL;
+ 	}
+ 
++	mas->buffer = g_string_new("");
++
+ 	*err = messages_get_message(mas->backend_data, name, 0,
+ 			get_message_cb, mas);
+ 
+-	mas->buffer = g_string_new("");
+-
+ 	if (*err < 0)
+ 		return NULL;
+ 	else
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index e313c6163..bb6431069 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -18,6 +18,8 @@
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
+ 
+ #include "obexd/src/log.h"
+ 
+@@ -516,7 +518,50 @@ int messages_get_message(void *session, const char *handle,
+ 					messages_get_message_cb callback,
+ 					void *user_data)
+ {
+-	return -ENOSYS;
++	struct session *s =  session;
++	FILE *fp;
++	char *path;
++	char *msg;
++	int file_size;
++	struct stat file_info;
++
++	DBG(" ");
++	path = g_build_filename(s->cwd_absolute, handle, NULL);
++	fp = fopen(path, "r");
++	if (fp == NULL) {
++		DBG("fopen() failed");
++		return -EBADR;
++	}
++
++	if (fstat (fileno(fp), &file_info) == -1) {
++		DBG("Error getting file size");
++		fclose(fp);
++		return -EBADR;
++	}
++
++	file_size = file_info.st_size;
++	char buff[file_size+1];
++
++	msg = (char *) mmap(0, file_size, PROT_READ, MAP_PRIVATE, fileno(fp), 0);
++	if (msg == MAP_FAILED) {
++		DBG("Error mapping file");
++		fclose(fp);
++		return -EBADR;
++	}
++
++	fclose(fp);
++	strcpy(buff, msg);
++
++	if (callback)
++		callback(session, 0, 0, (const char*)buff, user_data);
++
++	if (munmap(msg, file_size) == -1) {
++		DBG("Error unmapping");
++		return -EBADR;
++	}
++
++	g_free(path);
++	return 0;
+ }
+ 
+ int messages_update_inbox(void *session, messages_status_cb callback,
+-- 
+2.34.1
+
