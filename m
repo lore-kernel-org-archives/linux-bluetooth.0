@@ -1,45 +1,46 @@
 Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2052.outbound.protection.outlook.com [40.107.21.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06F21EEA5F;
-	Mon,  3 Mar 2025 11:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B15E1F3B85;
+	Mon,  3 Mar 2025 11:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741001168; cv=fail; b=POTge6CqRbRSBBgPkOpZ/5+7AgORulIiUA//3DTpamb4/rJ+EcXso6QhaCNGSfuPjccN6KjlPoj2bftnvNQjnGFtkge1A6GCNcV7xuv07GP3lN4RtD3/XBJl5bXWZgtw9n0CY+GvHZfAoex2e/FjG30ly7YVvof/xZfixo1IvkQ=
+	t=1741001174; cv=fail; b=BN2g6U5oYmV63e+iDi+QiqXG4oKV2r5a/j2lmty96TnbyQkrZWRohCk4gUEQk676KBd1KK0WW/XEneA+2WqWxjCYnBcxa2nFOJwwihsYdRpbvLpkrq8SjCiy1mowYqjKM4qTHiNagGPk9/pj5qMDMA3SyX2eM2XkNGSD6HpxHC8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741001168; c=relaxed/simple;
-	bh=UuFwMo6wr1pcl9GHYSVFb4LCh1HqtlocFxSufZh/N2o=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=DcEcLQGaZ3vxn5feiAoZbuGJRxe/t5of1Q8hM+EixxKjUikCyYujR0PplyxwMLpZ/PbhTzYUokmNLHkkrfnh3Em+N19yUqj71KZOo8nhDEb5TqZpQoFvmHv716ZLEa+3YfiJLs4vxGBHmgk3E2P1EBw4yp7M5BiwB1ArOr/tBxw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=KSL+Amap; arc=fail smtp.client-ip=40.107.21.52
+	s=arc-20240116; t=1741001174; c=relaxed/simple;
+	bh=QgG9cV6xkOAfeXqU6leuQL0aiOkSYY1h9qzxiRuETY8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=p0mi/3D5ysMoPmNd6XdIJdlOcNWlvI+1BwaChK1Uz3vrE27kmH/UxNZSh5OJNARU4CclvHm9dMV4IFlP5wtjHBL+vSMrt1PCIfNtbtVjToqnGOl1qLbAZ/LYN9sEdGQl9wbGQ5+YuHmkb9Rr1vTTbmTTYOu6lT5HNPnIMS+2UhM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ENnShRuz; arc=fail smtp.client-ip=40.107.21.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="KSL+Amap"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ENnShRuz"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UZTTv1fnc/N5GhXkEu/zkNaeYtS6F4vkeEVPDJ9VM0yZHrRKLbZRMP+xe/aT8/bWDPCXjL5euI8bY80PiwqDIqS9nGaAi1BT7w8kAfXJuSc6D1VO39QdvU/uUmKmE8qBr1N2CyTyYNUh6Q/BDHGAQmcBKOhUwN4ZcXJeb8KxuPJTyX05KwiFL2SsfN2WbgUhGjo8/eLMWhLu+UhvFm9MIcquWnd1swAc0zpSplKVFD0OnzyEM42tFKopK+KTE4abZEv6I5NbScuElN5WTyUGMlqWv9zcqcrLJFRBcf6pwIfOxAIEDHhMaT0zGr3GcXCN+ZPlRwU6wZSaT0f9YNPSAA==
+ b=VN/RBL45SwKbRXjE6wcZ7+okBYmkdLFkMMaAqc9KtNsB8tIe82Q06ZVuJP957CfWIqHEQUzpFI/AJFxRf+y8qlLN8/gZg5GQX1iwhA6ThHjez6jFp/N88On4BhO0hXR+yqj6m97XwPfL7ZnbRPm2itXfxd3i8jsS+FKrKyN0e9Tr8x/W027fqjRWNS8y8qxYmrAaD3d7QXMQ3CSHXGoD5hIWqpmuLKVQyeWMRakGmwD5+O0ILSrcHoQGhfZS45xxIXmehVjyIMNuH0qHtu78iwLmD4GOx5np9AivLU+1dVK1MeWXxTibeyr7vVmzPZSvrRD13xzVXet8ZVLEGw2iog==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+Kc9h3Y2ZYHdDU6Cs7gxhOy5j9GQLx1w5aXqhLVUrIg=;
- b=VnnxWk5UJrbCFuS4qEijHAUG2rXWtTY7T21p75vdIfbi3h2qlM4d5jCDJT8hAH/P9+ZluJPHX0vu2JHsYEUy/7mPQbN25B4eDN2EpdY6ogekBgLnnudWYxNUyeKfLNqVo0Ni2RXXn6Mo4w24mJI+iTVxncTmWOKA85MTDSoWn25sCu1N5js5vSfSVNCrTSgOS9bv3bdRmB7G8WX5+V0lz0hRmz1Dsn6Epx7N6L1ckccyrtaxfaBkJtaCXdVA1HgEdVTPqrkjghVbbzbrfhSbAZtJkrH4QknsT8qYVDkXdaHX3awJnpdtj/PxEONHVZv9QttrcQoEGm/rOAjVdlyhqw==
+ bh=1J/WObNg4WV5HLlizyW1hFR8Cf6feJqMU60KgErW2yU=;
+ b=op5LjCy/lKNlE60tarKStD/PUUnxW9Lm1NRvB6jeJXna4ykZsTItcOybGJshdhRJgPz8+l+YjcI2OdTgIDNehPko88OoM3FnmBHm30bHiZhzXh/kvGZHDAdrKObY6oqCsAC8V3ncms+bSPj7rvqrBiepdtiI0X/tiKK7FLp97JCMxejRdTFNmtx2/+zIwg2UfTmz/+6nLV3b+dlupNzkSJNW7kXbLaMp9CVonbJTYvcJkypF5haY3C1ojGpXvz1t3F5WUItMxuLkD55OGm/g7I4Zp55X6xo0xjJwtcBTCDuc8ViP5jtbPVTy5KJMnNKQEYMWhFNZCdlLVDAFgMENZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+Kc9h3Y2ZYHdDU6Cs7gxhOy5j9GQLx1w5aXqhLVUrIg=;
- b=KSL+AmapXu+liIf/9LAXCMw6PRMhf3ja9BSkUtm7IVL9k0lZ1iVDIaSs4fydBjkxQU+d21C4HOqNxaqQxMddXJ6oz/6bQsMtZgf/JbRA6tn+tgbVCoscXPl6qGG4saBiGJhboeFvhqO+YAAVp8NWkFn6sOb2k+CWNn0cW0zr5GOZtyf2a/775xl4d4O+/61yL41bYRrOAEAWGTBaJy74c1rJlzwWE6alf0/w9ao27quxrFSJN7euKUNdBVWBeiapIz2VCjXWBc/znf9inLVPpMcGmUV5hg9Si/MrXCDK0e74K9azkaj1VcC+7gVvZyb6LldFejOYmGvsBgBrlSe2Zg==
+ bh=1J/WObNg4WV5HLlizyW1hFR8Cf6feJqMU60KgErW2yU=;
+ b=ENnShRuzGZPhcwvmYYu6Wa2MqZShsQb3l49vHd2xIawOvw/tE4gqECTfDUhA8UMcWR2eH4aT14Gewd2Aswrkbry//qc/3ytk7AGrGa8HoOofs97JgRv+hInFxRkozitYudylnEiacOKiJusHqsJ9AVpC3+LtsG4EpuzuD6X46IIe5DwOZMstV57ADgfufg198kDN6ECk73HOUMZ5WS0bJAvAJYwUJ40v7IbWNQD5DXKXI4vpuGngLNoTXHu7D2/HF9wbYO4GwVjurWbuHCoAa6ct8Ye8PtLWci1wpTKP0qFhdYJUHjJTS7/0uxfSAWdpnDhMGMYDG0WRlPRno09qng==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
  by AM0PR04MB6994.eurprd04.prod.outlook.com (2603:10a6:208:188::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.28; Mon, 3 Mar
- 2025 11:26:03 +0000
+ 2025 11:26:07 +0000
 Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
  ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
  ([fe80::a2bf:4199:6415:f299%4]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
- 11:26:03 +0000
+ 11:26:07 +0000
 From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
@@ -56,10 +57,12 @@ Cc: linux-bluetooth@vger.kernel.org,
 	johan.korsnes@remarkable.no,
 	kristian.krohn@remarkable.no,
 	manjeet.gupta@nxp.com
-Subject: [PATCH v7 1/2] dt-bindings: net: bluetooth: nxp: Add support to set BD address
-Date: Mon,  3 Mar 2025 16:57:51 +0530
-Message-Id: <20250303112752.7292-1-neeraj.sanjaykale@nxp.com>
+Subject: [PATCH v7 2/2] Bluetooth: btnxpuart: Add support to set BD address
+Date: Mon,  3 Mar 2025 16:57:52 +0530
+Message-Id: <20250303112752.7292-2-neeraj.sanjaykale@nxp.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250303112752.7292-1-neeraj.sanjaykale@nxp.com>
+References: <20250303112752.7292-1-neeraj.sanjaykale@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: SI2PR01CA0018.apcprd01.prod.exchangelabs.com
@@ -73,122 +76,222 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS4PR04MB9692:EE_|AM0PR04MB6994:EE_
-X-MS-Office365-Filtering-Correlation-Id: b14f3a01-9bf6-40e9-921c-08dd5a462e36
+X-MS-Office365-Filtering-Correlation-Id: 4a7afdd4-730d-484d-5efe-08dd5a463104
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|7416014|52116014|1800799024|366016|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Ox+o3LVg2BvX+V3w4OaGvUsvnknjEsQvCiBKc0INgcF00Le/ivBd1MWxqCWp?=
- =?us-ascii?Q?gD+bfiHtqVwltAYeRtLpTLm79z23A0reaWuf+smtJKxVfyPJESGSoAf83KjH?=
- =?us-ascii?Q?QqcQLmBIn/sr8OfYgHqqIzIR8hpe+nHk0KQ6/DL/Id5nHjybtXjLW87rDJ46?=
- =?us-ascii?Q?yC9QwU1qqgdynlsGykhbEN5YRhnaaiXGIqGhM5qYgv8RQT2+q/CKWyfJzeJz?=
- =?us-ascii?Q?DfT98BW/VuUT78WfhAYXvO7j9a4AVC92WWPcqv5C1D0iWcs+PHYxc4YCatCz?=
- =?us-ascii?Q?u9w7zlvRMKFvJV6VwGYn547OYbB6sl/0s9jv4dvSQTJbt0ipsvpo61WmLh3j?=
- =?us-ascii?Q?JqtYONbvQCP6ewfFFLVSm/gx8BcgCER+tPP4ha7a+ixecDcbb6zUBqXoE4OJ?=
- =?us-ascii?Q?3cbjwkq9IkB5CTL3KChn5sdttBVvt0wRPpc43+eMGE0IodYbflAZ+59yYJWM?=
- =?us-ascii?Q?Ms8yT8CL3dOWOdACjhB5ZuvlVL+9EqPzQHkGNISpJ2wCqNoi1RYDhvIRqYK3?=
- =?us-ascii?Q?picMRxKjJvbHsA4kpqVB5ka2dVnU8nBg6WMUq4VwqCDvvHfz8x7lGcDYHzQZ?=
- =?us-ascii?Q?Id9eGwL6q7Pe6X4D10Y2KLnrrjuSJb7xfmW19wjTaCknnCWccA/A5sx/3USm?=
- =?us-ascii?Q?JlmG7B86w9xKf86eBbP5Kl0GYZgW10yf10YDDll9qhMxIk+UZmXqusNZySFp?=
- =?us-ascii?Q?cOewF66Rzz4GPPIKXjnVTz/zEBV+b9ikyjKwpjtxPYFE/1yLBHi97ap+L0ar?=
- =?us-ascii?Q?aGhbu0oQRKFNEEtM2cmH/ABDu3s8kKIwZkQ9fLGEZ8zo8nIGIngUxyTBKgGz?=
- =?us-ascii?Q?8fjcP2ryVdVOPI4Ps+s6SOiot58sLvdCemzo8egh0hJV8LICPuLKIp08tZjn?=
- =?us-ascii?Q?ph/Ju6XMp0iZjF9wfH49uzRUpo2q561KqUQOr1b5iwNyqtVRGEhTjjuhZnBy?=
- =?us-ascii?Q?6PLPd50MZFts8R7BZ68S7XUdx+U8BIaMBEZhwq6k18Q2Tn2dUTof8VsfjmLw?=
- =?us-ascii?Q?kS2SC1peCEwYSVdlzTREedYaRXCe1rWt14xcEtXVMbMllnKajjZSVdL9wKCJ?=
- =?us-ascii?Q?Gd49Q3GCzEGIbgFn0fixj2S4HtzaTrAbbOhkayd3rtXDO4WLwRg3Byjw/I/6?=
- =?us-ascii?Q?ncE63MeVrDRgmlUQBbVj8GMx3DmrAkB5jUgMjtmsL945eVMuckxQiGBdDodJ?=
- =?us-ascii?Q?CYX4Grl5eA++J148OMHx1nuyQgHWmCKOs6W6EUEx9nIc3GIxa6UpUyPdlrM1?=
- =?us-ascii?Q?nLrJVSeAVPX0fIjerQVWcDlyQ00DVBrpwtdrKx1n+OSKfgn19ezBi3mVb+VH?=
- =?us-ascii?Q?ipXjLuevGFYr48zSFl+e4tmjE/IhO1PFSY5fLHibYaPDCTHdTwLSW+kzuejM?=
- =?us-ascii?Q?6CIq2JG15CrX36pOPymdaU8L5AzOpFSGxP8kFap5x9fQ2+zdfERXl5qQ3PP0?=
- =?us-ascii?Q?DJv1JwwKkLY1KC4ibfeOK85qC6OA0eWs?=
+	=?us-ascii?Q?o1veTNpOhUDedew+OyNljlludOk+DcXarDKgG9D8m8Vi6YC0Xr0snVvWfefy?=
+ =?us-ascii?Q?+dBzRuHjCzRtngbLOFWQDrF0M+/nYIV+Qq2CW9iMNU0Us2rZF3eHaioy6nmJ?=
+ =?us-ascii?Q?ksjWT/Ma7CndO6q4Doe3jqBCgPdAvtNcgp/74627yLxmPW3yMQFffNmq3BR2?=
+ =?us-ascii?Q?6hmn6XJe59XOw7agp3LuKh1TYp6mOuF5TIKDPY4dWMcDdVb8QKw30moN3Oc7?=
+ =?us-ascii?Q?s6F59xgjqVtramHK/R8648uq/yc6eqAlw84YtWyq0tf7HACRUviRACHRaq7s?=
+ =?us-ascii?Q?FqNiGoeKE0tG7KxCUdji8iiwafAmgQlOimOIg70Ge49vXSByOITQCT1walxN?=
+ =?us-ascii?Q?LL+woow+8ebTnFPrg7js10+8As9MeopBrkRezDMMghXTxv8PyUqQVyZzPn4l?=
+ =?us-ascii?Q?ORC5Uw4vdBjCq7bc71NhIg8Y86zE0BxCkXIR62NjAmeJ+4MZo0mw+IOirdQZ?=
+ =?us-ascii?Q?vQEz2JHzSnzAkMgU1Z0CZf+tFdgoscMb4WJ96gbxc7Suj0+itZsrh5d2229i?=
+ =?us-ascii?Q?2+3Jad3eZrYxhpfpK3Ygvh4Ki6tOD/7QIMFqCxlGSfuumLqUcIlXXp8a+OkL?=
+ =?us-ascii?Q?HfdidiaCK61VSQYSpXWMOPsHFVmpwletbTs3NNc94DqCoNtun5hY+zWHDyeK?=
+ =?us-ascii?Q?Iri+r8soAJCsh9NXEbESwM9lShnQCRze7K5N/tF2Gm4K7N8jKbmLuaMHSlyk?=
+ =?us-ascii?Q?LoqZtVBlrxRJ46kWCFkhm+x0mN4ac1FQzFNxab6mQnF8/dW6QRnKB+yBprzA?=
+ =?us-ascii?Q?/BlcLEyJ3FgtRASq8+zT31Dg/+w3Z8pevlT6zntDZVGhnwFgQ9Iq8fzqBO03?=
+ =?us-ascii?Q?yLxAt1w+FVVaY3IW5YxI5ksGA4fqlvblPl7JtGseP1umO8T2NAIIDKvEFSvJ?=
+ =?us-ascii?Q?M4KvnqrotZ7x1hp1jJLIIEVB5OVxCmFGBawgrdCYN1jxY72rN4/XfaAsoV4V?=
+ =?us-ascii?Q?zr8ZAoyHi7PLi3DliIzJbevmpraNo0bjQopf2POjcZPHvz01W3VU8V/MId5Z?=
+ =?us-ascii?Q?ILaLOnteMMLhbCmQHpkOCtNF2ByZgQfvjinDA5e0ycf89PxpZkrVowZhMPkN?=
+ =?us-ascii?Q?97+qek9jkJaCZTxpyjyA2aRVmOP3Lco5oQDfXDyNVWA+bcio9SmKV1vfeZ5Y?=
+ =?us-ascii?Q?cigmbMkZAUugLYgSRAytFjnfr+61mKrcJU27UgOh80QnrBMCgTvsmlkcgHhb?=
+ =?us-ascii?Q?rHO39v2bh2Qwo+YTP/06hJQRpwRqfEDM3S60mCAsZH/oORceJE8fmIyI4dH0?=
+ =?us-ascii?Q?qJkqE8SpNeIYExlgDwJr94f5o1WoI7FIfJIGtQIv4sUKEDSdLrUZLQZnYLiE?=
+ =?us-ascii?Q?wNCre0wuBbJV79dQAsz3M8qAIzS+9d6u8tpdLBFGzuwM12BAYFodFJwt0CWs?=
+ =?us-ascii?Q?+NJ2SgpfIMGYe72dQcC18Lh+6zwRwW9vM0NS1yr/vQ9SB1E9gORW5HwfiKqD?=
+ =?us-ascii?Q?K3jfVPcTLOJh/pPD//SOTO6nex3+Jnnx?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(52116014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/Hwj8upxXPLI+i8hNTOt4VmSCQbbkqL8QnrlHItYn4YiLOTejdWxrjECbw6v?=
- =?us-ascii?Q?fZMt8yppI43ot+DOmVB7xzcMQ3GaAiFHh/3mBlbF1cpJ84LUFAfSiV5jXSjl?=
- =?us-ascii?Q?PxIEoOhF6f1+QvGaaw4AEqPmzbc+LkepcY29oz8Hd4I+kiL1Nau9LHCrdEom?=
- =?us-ascii?Q?xxBfx62+WWigJbAqtHKCgyb2toieAKUbboGQ+In4argM9gBwKs5oT0327HRv?=
- =?us-ascii?Q?2jU6MYQVcj/AKWevElwXlpCzb195/OGrpzgQ4QnBJEydHuyHMDpZ+NWX9Fa3?=
- =?us-ascii?Q?qIHxMlv54yGGuqHIZb/gngXgDkezxUFcUYDnRIPCIhxzXvWnUiDQk4TTG4xQ?=
- =?us-ascii?Q?A4Oy7G37eQoxmfD1W17Ju51qdCbaSAWZnlgQYfKnZ5vTKP4CP/Pkwy0S4F4w?=
- =?us-ascii?Q?cH64O2abIhaM26cpV2vpUZH0FUqAk8YriUYDE65d7ow8gI9IKut/dc46fTR4?=
- =?us-ascii?Q?z2W8A/eWArzo3IvWM4x4bgLD3RjCGtzuEQOYdrCrwNqiJiy+PkMcJH0TuxKg?=
- =?us-ascii?Q?yIOG4TfLK5qe5J4++rt6+HNV537/5RiM5QxveGs3IU2PnVov2hGOzsLQBx5f?=
- =?us-ascii?Q?3OAYfPY30wVeSZeU85p7qpuwzulMiueEtMu3ZHeLPQYcgQK9GiQNSC5DhQAV?=
- =?us-ascii?Q?cnOv+BBQWp4qjRR98FPF/pjKXtFoejWmH1WcyEFZC5x5Cn/K6i2NSbw2A75k?=
- =?us-ascii?Q?oXMi4RYPpL9wVw/A7kwsr4G92FxBMZP0jZXhexjJ0ljSg72i8rHPzfBUDwSN?=
- =?us-ascii?Q?/ff233y5uLXtLUj9eBPQLpkHKEYopQykCMEuCrmXZh+RdQYAfIcLLQpSHbpu?=
- =?us-ascii?Q?I7BDb3MwXdzGg5JSyilSsX+YDr3+sB19hXIGBZSORhj4x+4mUNlUMtKX3WQN?=
- =?us-ascii?Q?hRHe+nC85fKEBXD1/ca74xDt9fRiZgf47YaI2awgR/mkWWq7XAsLng9NYUmB?=
- =?us-ascii?Q?ObuRX5aREvUHnY2Vn2Jn9j5p15u7oMeob7Z2TQNeqXuruX36JjCRMclLFT9j?=
- =?us-ascii?Q?ZC3NcXOJMXWlyUxmw33w2MrVm5ndf3hDHpkdy+7xZhERht7VpyqETfH5Z25J?=
- =?us-ascii?Q?prczWgFLu2PRj+TUjqwduTxa9+izrgDJegNDkeOlcS8TAx7z19V0UsJjJjiy?=
- =?us-ascii?Q?5WzG5mEwlsLrlIYSbPDVDO5ke2sf6YUyOtbjIOJleBRI+EhuFALhSTvGbHuv?=
- =?us-ascii?Q?ce/nih8AZ2EBR1ve7dxpzsEFgnbHjUQQaUCzGd89PN4LAWAv627bI0JrMCP5?=
- =?us-ascii?Q?uZGlAoFjI7Y4biuvmLKDQllIrhUlBzgXtPKAwea6QJQGEmPDrRV6aWpMTPkE?=
- =?us-ascii?Q?b4RdrokCRaXUYRQT9FlYVyIIQj5P8FoAunPLbWEmAmKVIyL0d6dAsT78LGpm?=
- =?us-ascii?Q?dVgBiprNJfgKfeyZ2D229FJEBEnfCqVTyiWfbGT885UDzh/k5aYqPwuziSft?=
- =?us-ascii?Q?GG0UwXE6qjsOlqt2ZHgA7+UMDPCfYNzBCIVRqIPd23cME+EwYI+6huq9LYHw?=
- =?us-ascii?Q?jjrhM5FujbRxyfaNm+shKUBbi8X4XJqJumJeffR+Ac84m2hdsqAkn67S9nxv?=
- =?us-ascii?Q?2r4mCWelA4xCyYFGCeU3YvhPNI+ft7oYVb/e3xeNsgAI3H45ScSTWcbAnQw4?=
- =?us-ascii?Q?uQ=3D=3D?=
+	=?us-ascii?Q?pQv2mHZKbY2oiQraWDxMukdV0UkIJQrqKvvXXC/3mjMgHX9ELr7NTk1y4j6a?=
+ =?us-ascii?Q?7ybVD8gmkFlt1zhM3dCSOK8nYmyzSx7K2lsLAjHMraW353i1v5qisHDt9V29?=
+ =?us-ascii?Q?52X4TtyjFah6SfPiBJxGwG7Rq4eh4VmGHjw6qGjCOC5C8SQGUvNeYy8XEhe7?=
+ =?us-ascii?Q?QpmYc3qYnrJXjqTJEthfcWRO7QepALnuMILPeeCQnTtYmq7DnVUADQ98IUA4?=
+ =?us-ascii?Q?heLcYooIP1aMPQydDS0DBzLDE9Iq8uwTZuwviEmq86QX5YVrtOhpwiCSJnK7?=
+ =?us-ascii?Q?5lCgRNubWMj4zV+icO0aFL1ctbqBDaSuI7m7IcRFIStZS9cPzGzTUOvS4WHt?=
+ =?us-ascii?Q?inUGejLGKJYTEDfmr1Ay6qvhVNFMNrwY+ROYyKrSlb9/s1N7eeBIafOtsFza?=
+ =?us-ascii?Q?6Pp4fS4ptn/RDzzcbydmfVH8psJStsCeuLifY4+KNX9yP0673LZNiYbFKroV?=
+ =?us-ascii?Q?akkbkUQcS8LkfGMZzYkCxhblK71DaOY3VwcvjQH2tNDUNYvFt3wrrAwdVMg0?=
+ =?us-ascii?Q?gZvyEDOIgG1y6i5vegbSvLG2RhtJvzZ37GvEM4CMlPXQXXpoC43/vhNCyAFq?=
+ =?us-ascii?Q?e6lC9Ixu96N6ANrZvQpm3hXdIGslj0aliXtQuvLwIkyvcGAATMVJOfSkxWI5?=
+ =?us-ascii?Q?CKJoPbFTyxPwqL+VJNpmtzhyf70aiMKDmK5yrjPyCHhqs9S2hqRA7LTAIbYr?=
+ =?us-ascii?Q?rAl8Jl4rOZfQW1a8R81ZewqXXgmmn0w0PIbeB7b4xyo6bokSJv1y+tQiF3Zc?=
+ =?us-ascii?Q?N2R8ooktFWV9ENxghiL1n0ehp1U1Ba/Vl6r0Zzpc738eBFtMS/P84IQdcElA?=
+ =?us-ascii?Q?izAq+DRSJV2DI+C1xpXOqaUDYUPj37WQTi70d1UkSnWhOGIjV/phWZRzC05+?=
+ =?us-ascii?Q?WLjYryTx0oTa2hTnEO1roMl49rb6DReyPHLtp7i1NMIohNVzAvpZWn3oqprx?=
+ =?us-ascii?Q?S5FyEvvEVXYmaTYBPiNMZbZRNcv+UyKxQ4h860Wjx6hOUcAG7Pq0uS3IcqWW?=
+ =?us-ascii?Q?sa5c9wCD4Z7ODIwWBHNjyAQdsq+3ksghrfTU7wRElsHKl3ymaAu0018pIQJD?=
+ =?us-ascii?Q?UtWuR2MCJveYIrIEOkB3miIWSkxSXzqHaexBMIgm3hPPPMzVqCjVhZrhihTT?=
+ =?us-ascii?Q?4OiV+EEFZzOKE7YBBscNkCPM4+iI1Jow/0DFtQYDWcChuMaPmrS7fNy05MFj?=
+ =?us-ascii?Q?It6fu7OsgVmim7uxSE4pSfb74e61x5EFtZUBOhaJpGexPSyQB1g2REWjnTng?=
+ =?us-ascii?Q?QMm+Y3OgnJ+7JrulyccEJ+BK5ImJAR4f16rIwC1Jd82jD/c72hieRVCrhio0?=
+ =?us-ascii?Q?RyKNSFLpOI7n8+NxebghMSJeL6RnxWESKl7j2yVz5Vs8jplCt54bouKumKue?=
+ =?us-ascii?Q?2//0NWdf6Rx5XWtyJqFqUeYIIhznqmU1X4lT5p5YZ6mWzjmdiX9uT+nu8qRU?=
+ =?us-ascii?Q?6ti+8E3FAjSJ2bh5GVRhDpx2mIpemO3TwNBjqhCHENi0e6s3Ldquy2ePKm95?=
+ =?us-ascii?Q?jY2ctzFLis9oG4fd894ZEbjfPGYGwVPHva61Z0cxHtz6OvAOhu7N5ThiD7Io?=
+ =?us-ascii?Q?lVlEdw6hOVeAXTwe0d5Jm6Nx03rUCiMlfjt7D43oZ6g/uxEktakt9P24rVp3?=
+ =?us-ascii?Q?Hw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b14f3a01-9bf6-40e9-921c-08dd5a462e36
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a7afdd4-730d-484d-5efe-08dd5a463104
 X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 11:26:02.9907
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 11:26:07.5614
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RUYYnuy9xB039wGYscXssfQBHq6LN4aNwwpGHk+4HqQDpbbvd7ZFWLXkos706OGBz4C37t23e7e0DW7xuShKopI1usbog8a4NpbLAPIVAsU=
+X-MS-Exchange-CrossTenant-UserPrincipalName: /a/ilD5q84pj/bJbRi4QjuP6MmoHUIuTLksWW9jxJ9Y0nR6SFXmd8Yg8zs0kUaf2JjVwsj8FjEfG47h/kP99kXRjqHFLYwLFPqd+wQMaD/M=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB6994
 
-Allow user to set custom BD address for NXP chipsets.
+This adds support for setting BD address during hci registration. NXP
+FW does not allow vendor commands unless it receives a reset command
+after FW download and initialization done.
 
+As a workaround, the .set_bdaddr callback function will first send the
+HCI reset command, followed by the actual vendor command to set BD
+address.
+
+The driver checks for the local-bd-address property in device tree, and
+if preset, it sets the HCI_QUIRK_USE_BDADDR_PROPERTY quirk.
+
+With this quirk set, the driver's set_bdaddr callback function is called
+after FW download is complete and before HCI initialization, which sends
+the hci reset and 3f 22 commands. During initialization, kernel reads
+the newly set BD address from the controller.
+
+Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+Signed-off-by: Johan Korsnes <johan.korsnes@remarkable.no>
+Signed-off-by: Kristian Krohn <kristian.krohn@remarkable.no>
+Tested-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
-v2: Add allOf and unevaluatedProperties: false (Krzysztof)
-v3: Drop local-bd-address: true (Krzysztof)
+v4: hci0 interface shows RAW mode if 'local-bd-address' not defined and
+    HCI_QUIRK_USE_BDADDR_PROPERTY is set. Add Quirk only if device tree
+    property 'local-bd-address' found. (Neeraj)
+v5: Initialize local variable ba, update Copywrite year. (Kristian)
+v6: Elaborate commit message, add User Manual reference. (Paul Menzel)
+v7: Use __hci_cmd_sync_status(). (Luiz)
 ---
- .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml   | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btnxpuart.c | 58 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 53 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-index 04f55fac42ce..d02e9dd847ef 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-@@ -17,6 +17,9 @@ description:
- maintainers:
-   - Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 4f2f429c9800..21b07684dd68 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  *  NXP Bluetooth driver
+- *  Copyright 2023 NXP
++ *  Copyright 2023-2025 NXP
+  */
  
-+allOf:
-+  - $ref: bluetooth-controller.yaml#
+ #include <linux/module.h>
+@@ -98,13 +98,16 @@
+ #define PS_STATE_AWAKE          0
+ #define PS_STATE_SLEEP          1
+ 
+-/* Bluetooth vendor command : Sleep mode */
++/* NXP Vendor Commands. Refer user manual UM11628 on nxp.com */
++/* Set custom BD Address */
++#define HCI_NXP_SET_BD_ADDR	0xfc22
++/* Set Auto-Sleep mode */
+ #define HCI_NXP_AUTO_SLEEP_MODE	0xfc23
+-/* Bluetooth vendor command : Wakeup method */
++/* Set Wakeup method */
+ #define HCI_NXP_WAKEUP_METHOD	0xfc53
+-/* Bluetooth vendor command : Set operational baudrate */
++/* Set operational baudrate */
+ #define HCI_NXP_SET_OPER_SPEED	0xfc09
+-/* Bluetooth vendor command: Independent Reset */
++/* Independent Reset (Soft Reset) */
+ #define HCI_NXP_IND_RESET	0xfcfc
+ 
+ /* Bluetooth Power State : Vendor cmd params */
+@@ -310,6 +313,15 @@ union nxp_v3_rx_timeout_nak_u {
+ 	u8 buf[6];
+ };
+ 
++union nxp_set_bd_addr_payload {
++	struct {
++		u8 param_id;
++		u8 param_len;
++		u8 param[6];
++	} __packed data;
++	u8 buf[8];
++};
 +
- properties:
-   compatible:
-     enum:
-@@ -53,7 +56,7 @@ properties:
- required:
-   - compatible
+ static u8 crc8_table[CRC8_TABLE_SIZE];
  
--additionalProperties: false
-+unevaluatedProperties: false
+ /* Default configurations */
+@@ -1209,6 +1221,33 @@ static int nxp_set_ind_reset(struct hci_dev *hdev, void *data)
+ 	return hci_recv_frame(hdev, skb);
+ }
  
- examples:
-   - |
-@@ -66,5 +69,6 @@ examples:
-             device-wakeup-gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
-             nxp,wakein-pin = /bits/ 8 <18>;
-             nxp,wakeout-pin = /bits/ 8 <19>;
-+            local-bd-address = [66 55 44 33 22 11];
-         };
-     };
++static int nxp_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	union nxp_set_bd_addr_payload pcmd;
++	int err;
++
++	pcmd.data.param_id = 0xfe;
++	pcmd.data.param_len = 6;
++	memcpy(pcmd.data.param, bdaddr, 6);
++
++	/* BD address can be assigned only after first reset command. */
++	err = __hci_cmd_sync_status(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (err) {
++		bt_dev_err(hdev, "Reset before setting local-bd-addr failed (%ld)",
++			   PTR_ERR(skb));
++		return err;
++	}
++
++	err = __hci_cmd_sync_status(hdev, HCI_NXP_SET_BD_ADDR, sizeof(pcmd),
++			     pcmd.buf, HCI_CMD_TIMEOUT);
++	if (err) {
++		bt_dev_err(hdev, "Changing device address failed (%d)", err);
++		return err;
++	}
++
++	return 0;
++}
++
+ /* NXP protocol */
+ static int nxp_setup(struct hci_dev *hdev)
+ {
+@@ -1522,6 +1561,7 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+ {
+ 	struct hci_dev *hdev;
+ 	struct btnxpuart_dev *nxpdev;
++	bdaddr_t ba = {0};
+ 
+ 	nxpdev = devm_kzalloc(&serdev->dev, sizeof(*nxpdev), GFP_KERNEL);
+ 	if (!nxpdev)
+@@ -1570,8 +1610,16 @@ static int nxp_serdev_probe(struct serdev_device *serdev)
+ 	hdev->hw_error = nxp_hw_err;
+ 	hdev->shutdown = nxp_shutdown;
+ 	hdev->wakeup = nxp_wakeup;
++	hdev->set_bdaddr = nxp_set_bdaddr;
++
+ 	SET_HCIDEV_DEV(hdev, &serdev->dev);
+ 
++	device_property_read_u8_array(&nxpdev->serdev->dev,
++				      "local-bd-address",
++				      (u8 *)&ba, sizeof(ba));
++	if (bacmp(&ba, BDADDR_ANY))
++		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
++
+ 	if (hci_register_dev(hdev) < 0) {
+ 		dev_err(&serdev->dev, "Can't register HCI device\n");
+ 		goto probe_fail;
 -- 
 2.25.1
 
