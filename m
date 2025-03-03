@@ -1,126 +1,130 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F70D21324F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Mar 2025 14:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A311F3BA3;
+	Mon,  3 Mar 2025 14:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741013361; cv=none; b=K4+ezIpxWUoLr4y+vTD7UoQfGBEv76b0dRSbvfkbyN608hVlA3LTGwBVQZLSDLgftqPu7ohHMKLdIa/LFcEITZiFLTZelF2lNHjdptMi2xqDRqicFXqgz77UVKOkA3NI5A+wzKqEZcJiaak01Gp+NLu7GdOsdEY4K1Su66rPp3k=
+	t=1741013853; cv=none; b=tDvB+vAEWD98Mc1GFJxQGjxPIGNkCHh81vb+kCVHn7ieRARgAT8H6W1MBjSzYa4Gr4d6oAMA+r07xil+Fu4Stt9NM/mDXG0KX1evx2SsvTvSXt1dk/IGtpWsS0yNtQiEqrYCopq9vSVQ85oJvHDZ0hmAqxe3ZzN/N3Y16WDtxBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741013361; c=relaxed/simple;
-	bh=LUqmsrscM1JO+CpaJ49UBDWdxhTsW69euHHiS2lSmTE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lD/p8mjyNN0XeWnDUqhT/wYFMmSmZ5jSOHhRYslb7ASuqYWmqy3GuGzwInaBE+PRi7ndaWG8RZWbbRDughWbPytrkDweK1utR5PMOI95j0fy9JMc7SxRSu6vaD/P6OeN6WWcwr/EQ1JRn6zAbZO+FvJCoDjpvb7NlJJwVIsAmVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (178.204.251.109) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 3 Mar
- 2025 17:49:05 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2] client: add input validation to main()
-Date: Mon, 3 Mar 2025 17:48:43 +0300
-Message-ID: <20250303144844.60025-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1741013853; c=relaxed/simple;
+	bh=D7qcfcr0SCkAu+oO0/nxNDyf3AHLL8DCn/WP4PwPlUM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MtENDEQOKE6Soc3zok9+1DOZ0NXHP7TrsDF8fXyVx/j7oMmaflJK8MkXxg+SodLQ++Dh9Y+ZaMaGT751eOefxZiss+Y5wq1oaz3jBakFKJaP5bRWq8hvCVAQE8jgIAky7kBFwxf03KsSf/nIA2f0T/3wv3bDOSvXInkrdlQ2PIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gDe1YV6P; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gDe1YV6P"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30761be8fcfso48440241fa.0;
+        Mon, 03 Mar 2025 06:57:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741013849; x=1741618649; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6KThmRys+NHUCVCdpws0Gc3jfo7DfXAQV85XyFxt6xY=;
+        b=gDe1YV6P+gDwqQvRKMZ4zeLdnsiRH/Y6rqXeHHGJfdYeW9UuHKNpFBc/cfk0V80YGz
+         OsnOrRT51Skr5a71qwxn9fLerYPxe3ga1yWc8TXexs2xxd83dEF2RHbFZCQKH9cUrTDl
+         qe5jnePLb1rDupFONZTHWnXp2y1RFXBZT0ojtbE/hLHTcW7dJr7+yO4O3aYMOIHmRJI9
+         rWR9e5b1ZOEB0RiNiBkSC7nloyb57kwehGNscP2eVH3alqdVT8F2ETR48Iy64lxUWM2x
+         HHhws2B3gc9FlZAWgNBu3ZgFgYxJ0g7DdZJuDEP5VHDUaJZpOgDrDx/ZIqBYwOZ3YdNE
+         OYkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741013849; x=1741618649;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6KThmRys+NHUCVCdpws0Gc3jfo7DfXAQV85XyFxt6xY=;
+        b=E/PQ/uhWrR8dhcAyj8MQfejAOY6/Qc858vtmGu/UyslrU0FtrgEuzVQ5aYlXHReT+D
+         YY3BhYbAkU27XZUu6SKKu/oIZAglSwaybjGGHSW92gWNSqBVWFrliBJQWsSnw/+Aygop
+         FutbohHG2o6xlB7TyHcuIgu1IwD3/G2Kw/z6LYYK5kL3vqdxKrJOf2eJJXgRjgnW9eMX
+         M02/ybm/09g2qr/GUcwoW4M2laHCwcwYY0ivWwmitUOIBL0EWyqd/+dKN0xNEEEQimnp
+         goo1E1QUWtFl+vJYqd4jACjcJFRTt8Z/nSgy5CtgD2tFzf/3sECNbd0+S+wGFLIJO882
+         muWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqQtsFdLIDi8bgkFLo1zkHni+Uqa/zVIp5W3N6IbeSfxa/7h5YaSszxv4Dky1GQ9n3Pj8liqjVc4wx+hmU@vger.kernel.org, AJvYcCVdumwE/naMCs/0meu9DGX149Ux00ZVw7stvHLCGRQaL4EZ/xrEcvQk83UpxciFMg1Qv/Fnph1QqdrxBzaMzqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxS3MfWETiKOLTpTmFWDbQJweyx0r8nKfG10xmabIp/cUpmzCL9
+	PNvjOh5Mq/QxI3gufCoS8j5tLaFsHq6mYMF40+p7g/jaIVeBD51lFho0KuoSvrOt6KfIvnsodkW
+	d/1N4JEHxxwfAY9foohX2eu/RcfuVHdFsa/Y=
+X-Gm-Gg: ASbGncsKczrhFdD1FdpJOro8Jq6gq4+ovw8WEyTbGciRDBYirgAv/B0B40itUio4Gup
+	k7rvSsbVh7XJok6OJpqwhXYl9vewQyCw3eRmZ5a+SuCSwEXqgEIysq4x1yoFTYyjKQzkdkJjc9B
+	5zAhNJgCWn4N8NmnvRuza9NkF+
+X-Google-Smtp-Source: AGHT+IHdAlfCebOeONmZoZLy+K7mjtkrozwQxes2PzJx5JK2LqgvVwnakCzjTNw1nl3uDo3ggmjb3disuHMLwBfJ9LY=
+X-Received: by 2002:a2e:a99b:0:b0:30b:751f:dd7 with SMTP id
+ 38308e7fff4ca-30b9321a9e4mr59389661fa.9.1741013849149; Mon, 03 Mar 2025
+ 06:57:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 03/03/2025 14:36:34
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 191434 [Mar 03 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 51 0.3.51
- 68896fb0083a027476849bf400a331a2d5d94398
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {Tracking_repetitive_subdir_in_url}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.204.251.109 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;github.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.204.251.109
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/03/2025 14:39:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/3/2025 12:59:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <87a5a3ah2y.wl-tiwai@suse.de>
+In-Reply-To: <87a5a3ah2y.wl-tiwai@suse.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 3 Mar 2025 19:57:16 +0500
+X-Gm-Features: AQ5f1JpSOcYxe-GIV2cMJp2lB1i45Q992KrdpcSPNi7YXDEJbuQ127EuLNOICnI
+Message-ID: <CABBYNZJOW-YSOLS0tBdUQmxqbOmgT2n2jVheyxbvWbYmBicqyg@mail.gmail.com>
+Subject: Re: Is commit 4d94f0555827 safe?
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-An error was found during fuzzing testing. When passing Unicode
-characters to bluetoothctl the application crashes in dbus:
+Hi Takashi,
 
-dbus[5324]: arguments to dbus_message_iter_append_basic() were
-incorrect, assertion "_dbus_check_is_valid_utf8 (*string_p)"
-failed in file .../dbus-message.c line 2765.
+Well the assumption was that because we are doing a copy of the struct
+being unregistered/freed would never cause any errors, so to trigger
+something like UAF like the comment was suggesting the function
+callback would need to be unmapped so even if the likes of iso_exit is
+called it function (e.g. iso_connect_cfm) remains in memory.
 
-Check that all characters are written in utf8.
+You can find the previous version here:
 
-Fixes: https://github.com/bluez/bluez/issues/1118
----
- client/main.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+https://syzkaller.appspot.com/text?tag=3DPatch&x=3D100c0de8580000
 
-diff --git a/client/main.c b/client/main.c
-index feb21a116..6b938da3f 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -843,6 +843,18 @@ static gboolean parse_argument(int argc, char *argv[], const char **arg_table,
- 	return FALSE;
- }
- 
-+static int validate_input(int argc, char *argv[])
-+{
-+	for (int i = 0; i < argc; i++) {
-+		if (!strisutf8(argv[i], strlen(argv[i]))) {
-+			printf("Invalid character in string: %s\n", argv[i]);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static void cmd_list(int argc, char *argv[])
- {
- 	GList *list;
-@@ -3299,6 +3311,10 @@ int main(int argc, char *argv[])
- 	int timeout;
- 	unsigned int timeout_id;
- 
-+	status = validate_input(argc, argv);
-+	if (status)
-+		return status;
-+
- 	bt_shell_init(argc, argv, &opt);
- 	bt_shell_set_menu(&main_menu);
- 	bt_shell_add_submenu(&advertise_menu);
--- 
-2.43.0
+Problem with it was that it is invalid to unlock and relock like that.
 
+On Sun, Mar 2, 2025 at 4:59=E2=80=AFAM Takashi Iwai <tiwai@suse.de> wrote:
+>
+> [ I posted without the subject line mistakenly, so resent again;
+>   sorry if you have seen already read it ]
+>
+> Hi Luiz,
+>
+> due to the CVE assignment, I stumbled on the recent fix for BT
+> hci_core, the commit 4d94f0555827 ("Bluetooth: hci_core: Fix sleeping
+> function called from invalid context"), and wonder whether it's really
+> safe.
+>
+> As already asked question at the patch review:
+>   https://patchwork.kernel.org/comment/26147087/
+> the code allows the callbacks to be called even after
+> hci_unregister_cb() returns.
+>
+> Your assumption was that it's never called without the module removal,
+> but isn't hci_unregister_cb() also called from iso_exit() which can be
+> triggered via set_iso_socket_func() in mgmt.c?  Also, any 3rd party
+> module could call hci_unregister_cb() in a wild way, too -- even if
+> the function still remains, it doesn't mean that you can call it
+> safely if the caller already assumes it being unregistered.
+>
+> In addition to that, I feel what the patch does as a bit too
+> heavy-lifting: it does kmalloc() and copy the whole hci_cb object,
+> which isn't quite small for each.  If the callback is still safe to
+> call after RCU protection, you may just keep the hci_cb pointer
+> instead of copying the whole content, too?
+>
+> I couldn't find v1 patch in the patchwork, so not sure whether this
+> has been already discussed.  If so, let me know.
+>
+>
+> Thanks!
+>
+> Takashi
+>
+
+
+--=20
+Luiz Augusto von Dentz
