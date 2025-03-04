@@ -1,198 +1,125 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1484F1F150D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 11:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C669020468B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 13:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741089556; cv=none; b=eKI87UGdBsUIV5z3YnPcATrmolDGE10bQ3bc5yTC+2OCsOAj+dKGWyDRCJC9hbD6GxtZ3ftAdRqzBgaLdJst+85t0o7HrUJRuRM0x2LQrS8aUSso4bvruGtjb23FrNrOfzDcDEGYBlNkMnIuewdtbbY73FtBTq35v6WKP4izj8w=
+	t=1741094727; cv=none; b=qqkpJPz5QLzfpR8+cTUhNRMFoRSVsG8SWVvE0R7BRZPa6QpylhJb/jG7oJun7xGo7vpiktlizkm3ZQ0DpgLPZZFlGRK8v0itWD72q5Pa/FmYtMjJwOhLFqmd5JrEnBH0aJPcS/kM1buc1trVTj+SkplqdU5wjFxcMv1EIMJvprY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741089556; c=relaxed/simple;
-	bh=d9elx+CxZCKY8KbWeycMxGIzVfox84TT+npwdU0LXJM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LGhUoTjNNbvk4i4hgkdtVVkXt04Fy+XupPPxN3N0dh5uvc8CA13CntuSCBJ/95+5Z3gLJyNl36Pm4dSbpWjkNnvod0LCDh0EtUW825zhd+FM65bNJlR4xpAOwSsK8Jb8cp2WuA54KCP9J+pNq71Z9v66mzGhtPa0+8dU49SQXjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=av8pnWqm; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1741094727; c=relaxed/simple;
+	bh=nOVXmPZa9rzGRjgnMvLHeCwijpWhwKq6eU7BYMEMdTY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=I1nsweDnRD7jqpzgXNgeka0kNfgByfKNn5OWmyRBNDqxxOE+Tx9C9zeaMVL+do8T68GlD6nODaFgwLOqafMbJJdp2L2xUFBLst37elvB7VSiUzx+R8Lu6RtYf9FU4IA81a+Ktr8puLkDTzCZn53MPSZnXHaPO/Djqp0NGZar04g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJFSKIVR; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="av8pnWqm"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524AB2gn019820
-	for <linux-bluetooth@vger.kernel.org>; Tue, 4 Mar 2025 11:59:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=eDYMMkZ29womuhofnnHXUK
-	+ewzfxxgDZcGI66RSCmOk=; b=av8pnWqme+fFcESnFMY55uxDYBZiq69g3lr8dD
-	iIWyWBMuCBo7s5ySstKZZgOu3izmaxWRQzaUJQ2FeN1/5HBIBFzzkXkCKKABYOVJ
-	IPw9Lcq1nNllGWFJAA0048OxwwvaMKfXCSMPP4dKLiqgYNHQUkIV37FQVf0Y78hr
-	CCTFDmj7bmmpGRVmgLuqDBciaGKlrk+VKyCTKUDceGC3X/gCNulb2sUjUotSiXmM
-	H2LcFkLVzlqq3DqLyhjP2Xdcvg3dYp3IhZ6UdzANApWSwfVkfwtziCHRAjMYTNDM
-	AGZ2JyYEknNQQMGrIjEh5bj5OHExsBICDxXlvM1a7M5HNnRQ==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 455p6t1rf0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 04 Mar 2025 11:59:13 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 524BxCZW032085
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 4 Mar 2025 11:59:12 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 4 Mar 2025 03:59:10 -0800
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v5] obex: Add messages_get_message() implementation for MAP plugin
-Date: Tue, 4 Mar 2025 17:28:56 +0530
-Message-ID: <20250304115856.1511495-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJFSKIVR"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2feb96064e4so8938889a91.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Mar 2025 05:25:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741094725; x=1741699525; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TlDet5WRfsatzGlEXHmpVerijQ26hNrpsdv/qQUzEdI=;
+        b=XJFSKIVROwP5p36Mkcg9t71MfVq7z3+sd4tb3my9yZs22dfjB1k6FpzfXMWag5GPEP
+         Swl1SAMst9v4NoptnIhBzw51tG0v6baSmvxB3+BLHRywW58zBNlOlga7eISkTAVd1ppf
+         aCJ4B8jUZ/O4qB8ahqInGO5XpesvyuZWGZp01ZdEHrAANNIKbVkczJWSTRZKk5aG+IPt
+         b8ubrz5uA9GSzRDS54ct3NGiTR0xsf3YbaYlwFhkH+CUXrHHj8tLUFDoZCzgaFwVD32y
+         PcnavqNlpKzXyA0DcSrZdhwZ/zdfTTyZw+QgpEKyMJiFhD13CoIwRznZfnqGdFPxgJjD
+         EkHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741094725; x=1741699525;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TlDet5WRfsatzGlEXHmpVerijQ26hNrpsdv/qQUzEdI=;
+        b=A4n6JtbGDRSZ2lKziHyuVkyH8TUqifb/sr8zugyfUG7a8sccp6v3bZsqToDfxun7Be
+         NUN6SMUMPvv6xqKQUt3RmrZwyKXvaYeTTGBs290jJNNfHDbdofZuw/tIh0p7c3uaKGW9
+         TUsJpOhNaRabgmPoONbpQPE7VJ8VaoytX5/lA4IV9NtMhZDEXCbDlaIrx+mGIPGIoBPG
+         /23TrsHVIliJz1XQPHZsCtbybOn+jD8piaEoLXN/aw0TZ8OUwkigRqpbPE9pr05rKh6r
+         4w+wp3r14bdW1Pb3ALbzDNDhKA2CRzQZclUBvvyXfnI3Hw3yidk80ZZ6pBzV9luWGpOT
+         FwgA==
+X-Gm-Message-State: AOJu0YyHG8+duD6mCpCxxJIpNYi/JLs7MW0Dg+muQqneiKRtnW2XSJ8W
+	xCL8LJKNYUh8QrfwXGwB4B6ItNiQ0YO5aFEi/SiL0EjLmjj8xZh+UScodg==
+X-Gm-Gg: ASbGncvz25/ZdUKhQPX5XJkSFwDKqoqzwAOUouPGnP5uyyJXjW6eJkMJvk463L3WnrH
+	41PZJnx/EXCSzynZOY7DhFBoZx7nvAgklHWJDT/PDPSFO/ePzDN6HtsMkTuomqmAqJN+gwAeavP
+	AJAa6l/+dnl2EYmsnOrBlqGJZfpthYWJLBiR00ja0vXU3XMvJHoy2LegXeeLKXXurDXKoWjl5Iz
+	QQcH5I1y8GgE+jiOYpptVxCV81s0XzVUhnSSixE13IVyPsLe8f9pZL8zvz8p13KXPUAtdoXbrfL
+	zLrw6h+6XLWAPl02XcmTlN0heX8cND/V70BGoxJtOR4c66p6
+X-Google-Smtp-Source: AGHT+IFlaGJPR+tnEqwRs7YNue/I+S8FSoqowJEgbUXe7usoZE7MlyXJKw5YTYd6QUgPBjZnPaiYcw==
+X-Received: by 2002:a17:90b:5747:b0:2ee:df70:1ff3 with SMTP id 98e67ed59e1d1-2febaa924d4mr32383943a91.0.1741094724767;
+        Tue, 04 Mar 2025 05:25:24 -0800 (PST)
+Received: from [172.17.0.2] ([52.234.42.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501f97d9sm95260445ad.62.2025.03.04.05.25.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 05:25:24 -0800 (PST)
+Message-ID: <67c6ff44.170a0220.2d24e7.3ac4@mx.google.com>
+Date: Tue, 04 Mar 2025 05:25:24 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0626143140899638130=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ekdgn2v0SkpFi01V3MQQ0VxgYTkt10u7
-X-Authority-Analysis: v=2.4 cv=KfMosRYD c=1 sm=1 tr=0 ts=67c6eb11 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=Vs1iUdzkB0EA:10 a=oSRza-aUkO-rDw8YJewA:9
-X-Proofpoint-ORIG-GUID: ekdgn2v0SkpFi01V3MQQ0VxgYTkt10u7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-04_05,2025-03-03_04,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- spamscore=0 suspectscore=0 phishscore=0 malwarescore=0 clxscore=1015
- priorityscore=1501 impostorscore=0 mlxlogscore=999 adultscore=0
- bulkscore=0 classifier=spam authscore=0 adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2503040099
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
+Subject: RE: [v5] obex: Add messages_get_message() implementation for MAP plugin
+In-Reply-To: <20250304115856.1511495-1-quic_amisjain@quicinc.com>
+References: <20250304115856.1511495-1-quic_amisjain@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-GET Message() operation should be supported for passing below PTS
-testcases -
+--===============0626143140899638130==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-1.MAP/MSE/MMB/BV-12-C
-  Verify that the MSE can return an email message to the MCE.
-2.MAP/MSE/MMB/BV-13-C
-  Verify that the MSE can return a a*n* SMS message in native format
-  to the MCE.
-3.MAP/MSE/MMB/BV-14-C
-  Verify that the MSE can return a SMS message with text trans-coded
-  to UTF-8 to the MCE.
+This is automated email and please do not reply to this email!
 
-Currently get message operation is not implemented, hence above
-testcases are failing.
-Added code to send the complete bmessage in response to the get() request
-for the requested message handle.
+Dear submitter,
 
-As per suggested in previous patch, mmap() is being used
-for reading file.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=940016
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.29 seconds
+GitLint                       PENDING   0.30 seconds
+BuildEll                      PASS      20.82 seconds
+BluezMake                     PASS      1445.51 seconds
+MakeCheck                     PASS      12.66 seconds
+MakeDistcheck                 PASS      156.73 seconds
+CheckValgrind                 PASS      213.15 seconds
+CheckSmatch                   PASS      282.63 seconds
+bluezmakeextell               PASS      97.30 seconds
+IncrementalBuild              PENDING   0.36 seconds
+ScanBuild                     PASS      863.09 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
- obexd/plugins/mas.c            |  5 ++--
- obexd/plugins/messages-dummy.c | 53 +++++++++++++++++++++++++++++++++-
- 2 files changed, 55 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-index 10b972d65..bf8d689ad 100644
---- a/obexd/plugins/mas.c
-+++ b/obexd/plugins/mas.c
-@@ -408,6 +408,7 @@ static void get_message_cb(void *session, int err, gboolean fmore,
- 	}
- 
- 	g_string_append(mas->buffer, chunk);
-+	mas->finished = TRUE;
- 
- proceed:
- 	if (err != -EAGAIN)
-@@ -612,11 +613,11 @@ static void *message_open(const char *name, int oflag, mode_t mode,
- 		return NULL;
- 	}
- 
-+	mas->buffer = g_string_new("");
-+
- 	*err = messages_get_message(mas->backend_data, name, 0,
- 			get_message_cb, mas);
- 
--	mas->buffer = g_string_new("");
--
- 	if (*err < 0)
- 		return NULL;
- 	else
-diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
-index e313c6163..491203a97 100644
---- a/obexd/plugins/messages-dummy.c
-+++ b/obexd/plugins/messages-dummy.c
-@@ -18,6 +18,8 @@
- #include <errno.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/stat.h>
-+#include <sys/mman.h>
- 
- #include "obexd/src/log.h"
- 
-@@ -516,7 +518,56 @@ int messages_get_message(void *session, const char *handle,
- 					messages_get_message_cb callback,
- 					void *user_data)
- {
--	return -ENOSYS;
-+	struct session *s =  session;
-+	FILE *fp;
-+	char *path;
-+	char *msg, *buffer;
-+	int file_size, err = 0;
-+	struct stat file_info;
-+
-+	DBG(" ");
-+	path = g_build_filename(s->cwd_absolute, handle, NULL);
-+	fp = fopen(path, "r");
-+	if (fp == NULL) {
-+		DBG("fopen() failed");
-+		err = -EBADR;
-+		goto file_open_err;
-+	}
-+
-+	if (fstat (fileno(fp), &file_info) == -1) {
-+		DBG("Error getting file size");
-+		err = -EBADR;
-+		goto mmap_err;
-+	}
-+
-+	file_size = file_info.st_size;
-+
-+	msg = (char *) mmap(0, file_size, PROT_READ, MAP_PRIVATE, fileno(fp), 0);
-+	if (msg == MAP_FAILED) {
-+		DBG("Error mapping file");
-+		err = -EBADR;
-+		goto mmap_err;
-+	}
-+
-+	buffer = (char *) malloc(file_size * sizeof(char));
-+	strcpy(buffer, msg);
-+
-+	if (callback)
-+		callback(session, 0, 0, buffer, user_data);
-+
-+	if (munmap(msg, file_size) == -1) {
-+		DBG("Error unmapping");
-+		err = -EBADR;
-+		goto munmap_err;
-+	}
-+
-+munmap_err:
-+	free(buffer);
-+mmap_err:
-+	fclose(fp);
-+file_open_err:
-+	g_free(path);
-+	return err;
- }
- 
- int messages_update_inbox(void *session, messages_status_cb callback,
--- 
-2.34.1
 
+--===============0626143140899638130==--
