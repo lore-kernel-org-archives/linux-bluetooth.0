@@ -1,297 +1,162 @@
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA89280418
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 18:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741111826; cv=none; b=eCi351/2pzuoKGmSBgMVGkHitch2DfkEoH5ZfD+MScsng+g8a2l5u2L7vCvzAcz4LQDStXHZ4BZxSUznYWIqBFg6dtput8BfjVQNjyBFoWOD29xcHz4Dwat810N2oHkhD1AnIACRdyTN/crDWzuWjOtWD261bZyvvXn4bre1itc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741111826; c=relaxed/simple;
-	bh=PBGgU206YYHROiD3tn2ffkFwJKHwf8GSFXR11ZjvvJc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UjuYa4yZ57Dfug891HDkeVRVqHzRh2lInNC4U9/+1fmV4oWN/u2K4i1toVjLyOX+tD1bcxJCqAU2o9KzCpZhzxDgewXDrhjFvqFMj1Mjx9yrNEY/rPcwS1kB/q7fL7N+/JRX8qR2aoYLns+5YGT70weMMFyptUKRn+mBDa4Xe+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZEATepy; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BC727C878
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 18:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741112426; cv=pass; b=C3fU6jGlU93aAMxGa61g5nwEnw4r6v09Ioew6DmRAyCqN1c8dZEfMmqea0uuCOlDe6MjuqqbI+SGf4ZaihQ+Zu1m4PHrnX5ghrSZbXXtSz+tSEU5Oxfz2w6oymYZ5PCODPsuNkqLKvO2IZPncQu0Oia80XTTXKN3+I7xxczZ1+8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741112426; c=relaxed/simple;
+	bh=2ddPUGx8TvuhwMCUW042ZMEmKLuForXvZnGwbVoPygo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZbbPIqeaPj7+gPr3+Hpaf0J5FEu2Jvy9/LsiOt4dGV7V1POQhVSWQ9Gxxzg3gWEmAjI2j2cMcfr3nJGs4ya4T9neW4We+s/elhWS/BvVd3XPKAYnOdAYlHSWuwomYTjyBC6WrgHcImuqvqR+8Am+ApgTsrjWXIj/Jo28thGteCY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=mV8RQmEO; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZEATepy"
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-52361a772e7so36707e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Mar 2025 10:10:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741111822; x=1741716622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZVUJPZ/0j+m0pWA8a96v2+buGOmTtRUiwM8sSku46w=;
-        b=eZEATepyeGRIVVcokgutKw6pou19WXFbZLKQpI1TeNU9exICBj/ls6UVbxz5epJnwS
-         jeIT/bVgDEVSEdVbJbntbycr+pyTJ2xEiD3ZfzXCoX0r/l/nztx4oi4CaE/y8Nxs+z3c
-         6zRlaSxT+3oLQ2ltDeluRn1kD8lvnq4M6ug5i7RsyB/noU4f9yhtd7CJoyxYWsAYCWDG
-         PQ813Epwy8dCP7O0TQ2DNdpn1uISSM5saP+ltx7ph/n7mBjPywvMApZhu278HxmDgs1W
-         7Xdry2L+StWR33UR+kwmJ1htMuiBrU3cq4QJh3Uq8zjC+pY8skMBwUwNb7kgTbPndKc4
-         64GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741111822; x=1741716622;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZVUJPZ/0j+m0pWA8a96v2+buGOmTtRUiwM8sSku46w=;
-        b=L8Ow+7BXYFVdhHQNPVQe8S8zphyLPRt9mDM7Gqm7/2dHl4YlPHDLaqohHrktEF+H9T
-         8c3rkHDGbE2esg4e6/VrXlbKRldtybm4UpgnLjRmsf/OKlX++vJjz+3GnlK0+Am5tBSS
-         IgE8w0Jpnsr07sXi26jcJv1h2i8emrbWEodhIqIP+OSPjSB3/ALjL6YWsTmuXm9M0kli
-         xrjtmWgHr51PVMIMmlFc1c+eL45NCCSWXngfY0SXkYFiMCp5I+HyZgtLg0aQ2BkiGc08
-         lbTbZ3djhG8aeyrtD01N4b8qFWg718Aqy2/s7bIDbxYySlCexfSLFWETk8WpisQhZeR2
-         ap1g==
-X-Gm-Message-State: AOJu0YysAs5Fu36zSoiLqz0WNl4OlMDjYEKhlqLDlesz9vIiji+ly55x
-	I+tiBxCzUXAC65D5iZ0Z2uBy9GleOYPfhZwBeaUwEz8VdVSl2VPOFRwLjQ==
-X-Gm-Gg: ASbGnct5HjsnjdvS6CYVtXnM4RLGYnpmuYNClRTpNyaqYNhYoIHFSaECoZmLBzNgt4a
-	gKGosCKg4Wt8QvTsVA+AYiak+X8jmYalLk+Km3fhJ623ssYC7pUr2sv+nJxF76hy0rP081V61fo
-	Qsci0rqJPqfXmndNqzvCSs7kyqkHhkKtMD+DxfXzUenMNK6pauBeedFWvdZlWGtDC866e93D5Fy
-	wPO/h9aWpnM2pW/x2hMKq0h4RSh7KfkJ2iSa0KkRd0ezFHh4wfiCDPRqu/Yjny0d3DpeV6clOns
-	H7rq+YrsaCAR3RDVS08ULT4jI2Pgx2ajJVCpK2Sou/Y9zKFDE7Tf9g10IZsMuOzdjvyvRw7c+gE
-	WzwjyHEgCrIpDdg==
-X-Google-Smtp-Source: AGHT+IGAR+Xhh/+foiWixitUjWMS8pRCv5AJRBNP4ru/liRK6oqfk71SemyjJ5Po2P668z8qmon/jQ==
-X-Received: by 2002:a05:6122:308a:b0:520:56ee:78e2 with SMTP id 71dfb90a1353d-523c597ea82mr81226e0c.5.1741111822247;
-        Tue, 04 Mar 2025 10:10:22 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5237e9c140dsm1201583e0c.3.2025.03.04.10.10.19
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 10:10:20 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5] Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
-Date: Tue,  4 Mar 2025 13:10:19 -0500
-Message-ID: <20250304181019.214207-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="mV8RQmEO"
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Z6kW12My2z49Pwk;
+	Tue,  4 Mar 2025 20:20:13 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1741112415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2geKMsC6pBhmIRaxSi9VB7GK8T7mVBstFE6FgqktCIo=;
+	b=mV8RQmEO/VwSPWffzhXg/s1O/MAwtAZXKBOugRnLzua1E5oi4soF5S6NXP/V5xM9eaS+nv
+	Fw7F97fpG9wA0FVpbDK9y51Jtw133Iux/7BsmTTJTjdUmVguGqP64vJqOFlzVFMd9zo4tX
+	fH2ZDR8IY10k6XjTvecITVs80cNm9eZfdgCnN0B6M6G91OQluqXa2XwURBvusdR0JCn/Y8
+	lUta5l6mzhjf6oituSxWwyoNaSQkdJyNfMKm9iwh+jNi9mD6CvAWuQvQwJRvz+x4mTyka/
+	7AqnGD9WjNcQuAhUlKyiTCfP0Jenor9z2ZNapnQVgTdkUxztKEkPCbP1xl8zlQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1741112415; a=rsa-sha256;
+	cv=none;
+	b=SwWM8LEIB5grtJMKrzNhqoiKpePzscZaKzIDmuXmOsKuk2d1FWeOxrgR5fAh5mokiyQJnX
+	qshulOyIRRScBoYLDlAzAjHUB0rqVo0LXxFq+u6bhxTurJW14jkRFtccqnf1tPTshus2Ri
+	5SEM0Wmbt89kWXQYW5IRtNCByP00fyxYRXlBQI8fq+6TDKEsyXl9cgmMZL+ajutnz2YiF9
+	qX9rbihgmiuxdt40r9wr/SlejXcQKVhkfI6RqtEGwmZH0eOskKMkuK4qaTgZqsui/NRqdj
+	G/o2GCJUUSEYgLwD8rzspa5rYsFlzMLjVSLVmGn1xynxMQLIloY0nu3UXHb24Q==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1741112415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2geKMsC6pBhmIRaxSi9VB7GK8T7mVBstFE6FgqktCIo=;
+	b=tE0/PyXPbTqMT1hle1O5DMGjxrUZHgHFi0Icaq/CL8dbwMdhXFjtioh6tM9vwCZ5w9ucyt
+	bbn9ouvf6MOc+rfiTvdvb9uDQy6AY6fzeP11HNQVB1qrc2QEwuRpre5jMJeAunKmNLd0xU
+	sDOQbSAq+ovecmGF0uWjNHn7wwX1ZIQywbk4BmE64aWViqSUcfc3Ke+GUMnIH2MPGqL+Bg
+	YujeWG4HtDBMr6bvwyfG3ybW8d2J5U77hnnSejHRc6R6XIrbaDMxSCfwwyRVQPXQNICaPW
+	Ktf5xoOR+38wK7N7SrizIx+OA888OX8WZrBGzATnkQURAZeaY02cKdv9rjDxoA==
+Message-ID: <53bb8660d1ef946e568f538b988f58688e6b4c66.camel@iki.fi>
+Subject: Re: [PATCH v4] Bluetooth: hci_core: Enable buffer flow control for
+ SCO/eSCO
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org
+Cc: Kiran K <kiran.k@intel.com>
+Date: Tue, 04 Mar 2025 20:20:11 +0200
+In-Reply-To: <CABBYNZLLFG_2JZCYTpcspUp3fN-3=MFoUup-i4X9jBifddN=AA@mail.gmail.com>
+References: <20250304162955.149884-1-luiz.dentz@gmail.com>
+	 <CABBYNZLLFG_2JZCYTpcspUp3fN-3=MFoUup-i4X9jBifddN=AA@mail.gmail.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-This enables buffer flow control for SCO/eSCO
-(see: Bluetooth Core 6.0 spec: 6.22. Synchronous Flow Control Enable),
-recently this has caused the following problem and is actually a nice
-addition for the likes of Socket TX complete:
+ti, 2025-03-04 kello 11:38 -0500, Luiz Augusto von Dentz kirjoitti:
 
-< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
-> HCI Event: Command Complete (0x0e) plen 11
-      Read Buffer Size (0x04|0x0005) ncmd 1
-        Status: Success (0x00)
-        ACL MTU: 1021 ACL max packet: 5
-        SCO MTU: 240  SCO max packet: 8
-...
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-< SCO Data TX: Handle 257 flags 0x00 dlen 120
-> HCI Event: Hardware Error (0x10) plen 1
-        Code: 0x0a
+[clip]
+>=20
+> Looks like this is working when internally, so I wonder what is going
+> on if you don't receive NOCP on Intel controllers, that said perhaps
+> we need some way to detect if NOCP is not being generated, perhaps via
+> timer, then disable HCI_SCO_FLOWCTL, the issue is this perhaps could
+> cause hiccups at the start of the stream so perhaps we could do the
+> opposite and always start without setting HCI_SCO_FLOWCTL and only if
+> NOCP is generated then set HCI_SCO_FLOWCTL which can then be
+> persisted, thoughts?
 
-Fixes: 7fedd3bb6b77 ("Bluetooth: Prioritize SCO traffic")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci.h      |  6 ++++
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 54 +++++++++++++-------------------
- net/bluetooth/hci_event.c        |  5 +++
- net/bluetooth/hci_sync.c         | 18 +++++++++++
- 5 files changed, 52 insertions(+), 32 deletions(-)
+That's weird. The full btmon dumps are here:
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index b99818df8ee7..70169533c940 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -448,6 +448,7 @@ enum {
- 	HCI_WIDEBAND_SPEECH_ENABLED,
- 	HCI_EVENT_FILTER_CONFIGURED,
- 	HCI_PA_SYNC,
-+	HCI_SCO_FLOWCTL,
- 
- 	HCI_DUT_MODE,
- 	HCI_VENDOR_DIAG,
-@@ -1544,6 +1545,11 @@ struct hci_rp_read_tx_power {
- 	__s8     tx_power;
- } __packed;
- 
-+#define HCI_OP_WRITE_SYNC_FLOWCTL	0x0c2f
-+struct hci_cp_write_sync_flowctl {
-+	__u8     enable;
-+} __packed;
-+
- #define HCI_OP_READ_PAGE_SCAN_TYPE	0x0c46
- struct hci_rp_read_page_scan_type {
- 	__u8     status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2f320eeddfec..cf18cf65fe5e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1857,6 +1857,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_hold_capable(dev)      ((dev)->features[0][0] & LMP_HOLD)
- #define lmp_sniff_capable(dev)     ((dev)->features[0][0] & LMP_SNIFF)
- #define lmp_park_capable(dev)      ((dev)->features[0][1] & LMP_PARK)
-+#define lmp_sco_capable(dev)       ((dev)->features[0][1] & LMP_SCO)
- #define lmp_inq_rssi_capable(dev)  ((dev)->features[0][3] & LMP_RSSI_INQ)
- #define lmp_esco_capable(dev)      ((dev)->features[0][3] & LMP_ESCO)
- #define lmp_bredr_capable(dev)     (!((dev)->features[0][4] & LMP_NO_BREDR))
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e7ec12437c8b..9ea9b4091f8f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3548,45 +3548,35 @@ static void __check_timeout(struct hci_dev *hdev, unsigned int cnt, u8 type)
- }
- 
- /* Schedule SCO */
--static void hci_sched_sco(struct hci_dev *hdev)
-+static void hci_sched_sco_type(struct hci_dev *hdev, __u8 type)
- {
- 	struct hci_conn *conn;
- 	struct sk_buff *skb;
- 	int quote;
-+	unsigned int pkts;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "type %u", type);
- 
--	if (!hci_conn_num(hdev, SCO_LINK))
-+	if (!hci_conn_num(hdev, type))
- 		return;
- 
--	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
-+	/* Use sco_pkts if flow control has not been enabled yet which will
-+	 * limit the amount of buffer sent in a row.
-+	 */
-+	if (!hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
-+		pkts = hdev->sco_pkts;
-+	else
-+		pkts = hdev->sco_cnt;
-+
-+	while (pkts && (conn = hci_low_sent(hdev, type, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
- 			BT_DBG("skb %p len %d", skb, skb->len);
- 			hci_send_frame(hdev, skb);
- 
--			conn->sent++;
--			if (conn->sent == ~0)
--				conn->sent = 0;
--		}
--	}
--}
-+			pkts--;
- 
--static void hci_sched_esco(struct hci_dev *hdev)
--{
--	struct hci_conn *conn;
--	struct sk_buff *skb;
--	int quote;
--
--	BT_DBG("%s", hdev->name);
--
--	if (!hci_conn_num(hdev, ESCO_LINK))
--		return;
--
--	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
--						     &quote))) {
--		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
--			hci_send_frame(hdev, skb);
-+			if (hdev->sco_cnt > 0)
-+				hdev->sco_cnt--;
- 
- 			conn->sent++;
- 			if (conn->sent == ~0)
-@@ -3628,8 +3618,8 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
- 			chan->conn->sent++;
- 
- 			/* Send pending SCO packets right away */
--			hci_sched_sco(hdev);
--			hci_sched_esco(hdev);
-+			hci_sched_sco_type(hdev, SCO_LINK);
-+			hci_sched_sco_type(hdev, ESCO_LINK);
- 		}
- 	}
- 
-@@ -3684,8 +3674,8 @@ static void hci_sched_le(struct hci_dev *hdev)
- 			chan->conn->sent++;
- 
- 			/* Send pending SCO packets right away */
--			hci_sched_sco(hdev);
--			hci_sched_esco(hdev);
-+			hci_sched_sco_type(hdev, SCO_LINK);
-+			hci_sched_sco_type(hdev, ESCO_LINK);
- 		}
- 	}
- 
-@@ -3730,8 +3720,8 @@ static void hci_tx_work(struct work_struct *work)
- 
- 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
- 		/* Schedule queues and send stuff to HCI driver */
--		hci_sched_sco(hdev);
--		hci_sched_esco(hdev);
-+		hci_sched_sco_type(hdev, SCO_LINK);
-+		hci_sched_sco_type(hdev, ESCO_LINK);
- 		hci_sched_iso(hdev);
- 		hci_sched_acl(hdev);
- 		hci_sched_le(hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 19e19c9f5e68..e6eadcc13484 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4448,6 +4448,11 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 			hdev->sco_cnt += count;
- 			if (hdev->sco_cnt > hdev->sco_pkts)
- 				hdev->sco_cnt = hdev->sco_pkts;
-+
-+			/* Enable HCI_SCO_FLOWCTL so sco_cnt is used instead of
-+			 * sco_pkts.
-+			 */
-+			hci_dev_set_flag(hdev, HCI_SCO_FLOWCTL);
- 			break;
- 
- 		case ISO_LINK:
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index c4c2cf51b219..91cfb7c2cb08 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3769,6 +3769,22 @@ static int hci_write_ca_timeout_sync(struct hci_dev *hdev)
- 				     sizeof(param), &param, HCI_CMD_TIMEOUT);
- }
- 
-+/* Enable SCO flow control if supported */
-+static int hci_write_sync_flowctl_sync(struct hci_dev *hdev)
-+{
-+	struct hci_cp_write_sync_flowctl cp;
-+
-+	/* Check if the controller supports SCO and HCI_OP_WRITE_SYNC_FLOWCTL */
-+	if (!lmp_sco_capable(hdev) || !(hdev->commands[10] & BIT(4)))
-+		return 0;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = 0x01;
-+
-+	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_SYNC_FLOWCTL,
-+				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-+}
-+
- /* BR Controller init stage 2 command sequence */
- static const struct hci_init_stage br_init2[] = {
- 	/* HCI_OP_READ_BUFFER_SIZE */
-@@ -3787,6 +3803,8 @@ static const struct hci_init_stage br_init2[] = {
- 	HCI_INIT(hci_clear_event_filter_sync),
- 	/* HCI_OP_WRITE_CA_TIMEOUT */
- 	HCI_INIT(hci_write_ca_timeout_sync),
-+	/* HCI_OP_WRITE_SYNC_FLOWCTL */
-+	HCI_INIT(hci_write_sync_flowctl_sync),
- 	{}
- };
- 
--- 
-2.48.1
+https://gitlab.freedesktop.org/pvir/repros/-/raw/main/2025-03-sco-flowctl/s=
+co-flowctl-intel-ax210.txt
 
+https://gitlab.freedesktop.org/pvir/repros/-/raw/main/2025-03-sco-flowctl/s=
+co-flowctl-rtl8761bu.txt
+
+with Intel firmware
+
+[    5.749140] Bluetooth: hci0: Firmware timestamp 2024.33 buildtype 1 buil=
+d 81755
+[    5.749146] Bluetooth: hci0: Firmware SHA1: 0xd028ffe4
+[    5.792830] Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.=
+sfi
+[    5.792868] Bluetooth: hci0: Boot Address: 0x100800
+[    5.792870] Bluetooth: hci0: Firmware Version: 91-33.24
+[    5.792872] Bluetooth: hci0: Firmware already loaded
+[    5.800638] Bluetooth: hci0: Fseq status: Success (0x00)
+[    5.800644] Bluetooth: hci0: Fseq executed: 00.00.02.41
+[    5.800647] Bluetooth: hci0: Fseq BT Top: 00.00.02.41
+
+I checked now again with v4 of the patch, and result was the same: no
+NOCP, so it writes SCO max packet packets and then stops. This was in
+KVM virtual machine on Linux with USB redirection, but I don't think
+that should matter as everything else works in this setup.=20
+
+Enabling flow control only after observing NOCP for SCO handle sounds
+safer. This probably needs timer, since if you write more than max SCO
+buffers initially, I guess it's not guaranteed you get flow control
+messages for each of them.
+
+--=20
+Pauli Virtanen
