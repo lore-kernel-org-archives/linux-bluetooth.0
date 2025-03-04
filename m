@@ -1,89 +1,82 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE812641DF
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 14:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E08276039
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 14:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741099243; cv=none; b=qRpziTjFn1Cf3PrQgGt6JLaRLbKADMOjciAssr9EgcTeerWER+mb2C27PnoJyQvSYtAdk8M49n1emdbNVdjbFvVgdB2uj7LCWn2TxZRqxxmrfmPwwjkJEmZZOkhVDUWrgMUWOSAKecIG/uAHObb+hLlwD3VGn1CVnf9LaI9JTBE=
+	t=1741100397; cv=none; b=ByxjRhKEzFnjYn/oF9wvqB5sN/A49gHjjaD+V/sgpxeGG+oN8GwHYmRvG5Y22SdaFjxjHNSyGsjFflpS/kORWrADx27gTU6lbQVFmZLFXVSl3+JUtuZsdrrtvl5nBIYHwTBsh/x7udwQjqCJG1Pjro6+OJ7acBAvlujcpzWbJbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741099243; c=relaxed/simple;
-	bh=RKx3mGENoFbmQU0chmCucjaUZaFe3zpTyJfDhY4DEJc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=kyD8B5crLyMR6v3zHNUNfKX6ZTPyp+ILDNct6kBpC9C8z8DBL4sLQ0L3LvCgjpULYLBfXoaGFh6SFyK5/8MOysVL+nQ6+saDJY/mvSkdMxSTXVWEoC9SMyF+Vk7N9HMWBGUiRCzZILdyZFugopkhREy/tXDYkXKXIZg8gFgHGc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=C5rEe5a9; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1741100397; c=relaxed/simple;
+	bh=/VPCsNJKk71LFSq/aeX9F2AbFor7UVpNLa7RTtlX1N8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dB9SS49rMfJFmCwDNJI/IgABHbyBhcL1ZMLJWbyVHSRaqE3rVb2ISpNRmnBqC0jIOT23/y5Wpxrz5xyRmNO8dvRg+jjTSaRbN2CBWV8q/ThypQrpyqNiKXqalxCCmKVClRguBTuU/NVv18FkN2Srx1B8JU6iPHUV/mVIa3xIzVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oc/E9N4Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="C5rEe5a9"
-Received: from github.com (hubbernetes-node-0ac6ab5.ash1-iad.github.net [10.56.146.23])
-	by smtp.github.com (Postfix) with ESMTPA id CE3DB92116C
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 06:40:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1741099240;
-	bh=yUr+XER5MqWH7/+PG5Kq4JxMaad6r6x7iwBpwCszAGA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=C5rEe5a944ms/LslURt3ixrS/uxJblKs1RgHWIewmsbbpjQCl5fZsyrbFLusN6Qv6
-	 mWWIivAzNjp2vNgJWASmGwWe4g7IlSkMGoEM3g1lb01u/NBxYOnB+oIAxsL07ojsJG
-	 ZBvxAdBA9aGTwHWjKv4zH5Mk+hWAn5zr3d4AxNs8=
-Date: Tue, 04 Mar 2025 06:40:40 -0800
-From: Arkadiusz Bokowy <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/8479c2-524fa2@github.com>
-Subject: [bluez/bluez] 7a09d2: uuid-helper: Add A2DP to the list of known
- profiles
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oc/E9N4Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53455C4CEE7;
+	Tue,  4 Mar 2025 14:59:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741100397;
+	bh=/VPCsNJKk71LFSq/aeX9F2AbFor7UVpNLa7RTtlX1N8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Oc/E9N4Q8r8+LyeX7M/hTD1t4vaxYX24WCFE3crtKQwE1kR3lG3X6WebtXNr4Lhgm
+	 6B2bcKyqqwex34tPOyi3W8FsvBA+kPDhfzKGGdCbxM/6QiR0P/OC37kZ8Fhq1VVeOE
+	 shzFxJy7Zf/ZBQuizBvki4BgQCSwDElcw8OzTKzcAFACF9/BdAjDLWLMi7UUUP+fNg
+	 OPJTjcX403J80W+zZCxiqIFTokpX5/66Is5EyQT+2a0EGD6I7ckgdAB6guWx5V4qz+
+	 H5BiKJiLXzjJz+uxGJkkRAz1IpN5rdIM4WaixYybgQYiaFZI44UH59ymvsEXbgrkUw
+	 MwoU4IzdsBqsg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D90380AA7F;
+	Tue,  4 Mar 2025 15:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V4 0/4] Bluetooth: btusb: Fix regression in the initialization
+ of fake Bluetooth controllers
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174110043025.174904.10526442488904996490.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Mar 2025 15:00:30 +0000
+References: <20250301062301.18029-1-nishiyama.pedro@gmail.com>
+In-Reply-To: <20250301062301.18029-1-nishiyama.pedro@gmail.com>
+To: Pedro Nishiyama <nishiyama.pedro@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 7a09d207fd9aff93ca474b6aa9631abdcd3e3163
-      https://github.com/bluez/bluez/commit/7a09d207fd9aff93ca474b6aa9631abdcd3e3163
-  Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-  Date:   2025-03-04 (Tue, 04 Mar 2025)
+Hello:
 
-  Changed paths:
-    M src/uuid-helper.c
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  uuid-helper: Add A2DP to the list of known profiles
+On Sat,  1 Mar 2025 03:22:57 -0300 you wrote:
+> These fake controllers cannot be initialized because they return a smaller
+> report than expected for READ_VOICE_SETTING and READ_PAGE_SCAN_TYPE.
+> 
+> This affects fake controllers reusing the 0A12:0001 VID/PID.
+> 
+> Fixes: c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
+> Signed-off-by: Pedro Nishiyama <nishiyama.pedro@gmail.com>
+> 
+> [...]
 
+Here is the summary with links:
+  - [V4,1/4] Bluetooth: Add quirk for broken READ_VOICE_SETTING
+    https://git.kernel.org/bluetooth/bluetooth-next/c/173b1b3e9d6c
+  - [V4,2/4] Bluetooth: Add quirk for broken READ_PAGE_SCAN_TYPE
+    https://git.kernel.org/bluetooth/bluetooth-next/c/700ef3e1674a
+  - [V4,3/4] Bluetooth: Disable SCO support if READ_VOICE_SETTING is unsupported/broken
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d8cba796e61f
+  - [V4,4/4] Bluetooth: btusb: Fix regression in the initialization of fake Bluetooth controllers
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c2fe96fc96f7
 
-  Commit: 2f48028af3a87dc8fdb98aa165b09c52d07eb8d7
-      https://github.com/bluez/bluez/commit/2f48028af3a87dc8fdb98aa165b09c52d07eb8d7
-  Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-  Date:   2025-03-04 (Tue, 04 Mar 2025)
-
-  Changed paths:
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Support single profile connection/disconnection
-
-
-  Commit: 524fa22ed19ec857e00b87c6eaffef8b862520d3
-      https://github.com/bluez/bluez/commit/524fa22ed19ec857e00b87c6eaffef8b862520d3
-  Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-  Date:   2025-03-04 (Tue, 04 Mar 2025)
-
-  Changed paths:
-    M client/bluetoothctl.rst
-
-  Log Message:
-  -----------
-  client: Document connect/disconnect optional profile argument
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/8479c279ea93...524fa22ed19e
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
