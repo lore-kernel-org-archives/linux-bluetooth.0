@@ -1,222 +1,198 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7251DFD8B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 08:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1484F1F150D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 11:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741077157; cv=none; b=YtuXRWoa1NBJIQ4n3F90i+Al6f4qwaTIRfu1s1N+f+InebVLTiXQln6xHTSTVUTvgM09iFMoQ5vfskPcog7wsDfknf8qeyKHEg19AXcoKl/q86tyYI4shVjyst3yQmFXfyoepwyM/HYpRhT1zEGqThZIpedOEDhmcPoOZF1Qv/c=
+	t=1741089556; cv=none; b=eKI87UGdBsUIV5z3YnPcATrmolDGE10bQ3bc5yTC+2OCsOAj+dKGWyDRCJC9hbD6GxtZ3ftAdRqzBgaLdJst+85t0o7HrUJRuRM0x2LQrS8aUSso4bvruGtjb23FrNrOfzDcDEGYBlNkMnIuewdtbbY73FtBTq35v6WKP4izj8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741077157; c=relaxed/simple;
-	bh=bTkTBr7l6nTcb4akvwbTaL+3vTIjzPW+zgzBssEWyzE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ifDypix9sQp5yRVFVQ+PfBRzkT5oG6RRv1JOV24CUSDKBsjmE670V4xaKdnJwLdeXNW1gLVzbvR7g8yQxowqyvEDpzEKkTQcD/+yHn3kZgHduqGtXLqwkLfy+ndeBLGSK3OLi89cwn+iRqjo/pM5zbGWb9vUR1kSWvEFZeUN0s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hNxwfRun; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yia7avhs; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=M4P1BZlk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ChZ1sXn/; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1741089556; c=relaxed/simple;
+	bh=d9elx+CxZCKY8KbWeycMxGIzVfox84TT+npwdU0LXJM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LGhUoTjNNbvk4i4hgkdtVVkXt04Fy+XupPPxN3N0dh5uvc8CA13CntuSCBJ/95+5Z3gLJyNl36Pm4dSbpWjkNnvod0LCDh0EtUW825zhd+FM65bNJlR4xpAOwSsK8Jb8cp2WuA54KCP9J+pNq71Z9v66mzGhtPa0+8dU49SQXjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=av8pnWqm; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hNxwfRun";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yia7avhs";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="M4P1BZlk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ChZ1sXn/"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E2E4B1F387;
-	Tue,  4 Mar 2025 08:32:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741077153; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JmGXXnAiQxl2wGU8Qmfdp+ymPe+1BOtAwR9ux0MeBFE=;
-	b=hNxwfRunnrjvpB5qwse1fwuz97KDvvSC3+Lh5kSVCHO0yL1G1eLEE+Gau5AkdtOkK/oyd9
-	9qUU/fXqvGXIXRz6CLMOcZhOf0FckGJv4/9WsNphjCs6aVo8wqBwUEs5BIAY6CeXmHnMI1
-	sQRnKIlUy6AZ6kuCjm2nqjsMOC7YNo8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741077153;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JmGXXnAiQxl2wGU8Qmfdp+ymPe+1BOtAwR9ux0MeBFE=;
-	b=yia7avhs9pgQYX9LKGnksQtbFMc/heEmldJBakhjFUwFjaO1H1lAqcwNv2YI4D+ZaEH+Pb
-	cfd1RzLP/mixehCQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741077152; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JmGXXnAiQxl2wGU8Qmfdp+ymPe+1BOtAwR9ux0MeBFE=;
-	b=M4P1BZlkJcUtuYnnu6ZqU8LUNZIGS11nQOWEUHC3mDS18F85/HebCPxdpdd4ALREOVoo3+
-	PUYSB0uil2EWCI1XZk91KGM+Lyh7SjFCfx6QGnVTEytIj+5gtbbm7wg/7ixibU/erwPfoP
-	iY9Cvz+UwptGmGr0TN/qSWVEfQtZdaI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741077152;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JmGXXnAiQxl2wGU8Qmfdp+ymPe+1BOtAwR9ux0MeBFE=;
-	b=ChZ1sXn/seQ8AUk2oR+4B84AxIv+7EJ7f9HI6ysKHN3CUVyu1funrED25nyXHlTAasMwS6
-	mOs2Vhu9G1gSN6BQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A57D21393C;
-	Tue,  4 Mar 2025 08:32:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id bu3NJqC6xmdgOgAAD6G6ig
-	(envelope-from <tiwai@suse.de>); Tue, 04 Mar 2025 08:32:32 +0000
-Date: Tue, 04 Mar 2025 09:32:32 +0100
-Message-ID: <877c55ci1r.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Pauli Virtanen <pav@iki.fi>,
-	Takashi Iwai <tiwai@suse.de>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Is commit 4d94f0555827 safe?
-In-Reply-To: <CABBYNZJHSoDzo7DmB84LrBw3Zi+F_QsNcD5MBJHijCo-v_KzGw@mail.gmail.com>
-References: <87a5a3ah2y.wl-tiwai@suse.de>
-	<CABBYNZJOW-YSOLS0tBdUQmxqbOmgT2n2jVheyxbvWbYmBicqyg@mail.gmail.com>
-	<877c56dub7.wl-tiwai@suse.de>
-	<CABBYNZJ6Gfmpur2by01B9+XxBX+VBzBY95v+9f5-VpiantunfQ@mail.gmail.com>
-	<87y0xmcdl4.wl-tiwai@suse.de>
-	<CABBYNZJsqXLRuY6ZMPujio7-tx82SHRZyZh=tChonVs-XiWMjw@mail.gmail.com>
-	<87tt8acbmw.wl-tiwai@suse.de>
-	<52df2ea6bac070c015987547840c78ac27538def.camel@iki.fi>
-	<CABBYNZJHSoDzo7DmB84LrBw3Zi+F_QsNcD5MBJHijCo-v_KzGw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="av8pnWqm"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524AB2gn019820
+	for <linux-bluetooth@vger.kernel.org>; Tue, 4 Mar 2025 11:59:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=eDYMMkZ29womuhofnnHXUK
+	+ewzfxxgDZcGI66RSCmOk=; b=av8pnWqme+fFcESnFMY55uxDYBZiq69g3lr8dD
+	iIWyWBMuCBo7s5ySstKZZgOu3izmaxWRQzaUJQ2FeN1/5HBIBFzzkXkCKKABYOVJ
+	IPw9Lcq1nNllGWFJAA0048OxwwvaMKfXCSMPP4dKLiqgYNHQUkIV37FQVf0Y78hr
+	CCTFDmj7bmmpGRVmgLuqDBciaGKlrk+VKyCTKUDceGC3X/gCNulb2sUjUotSiXmM
+	H2LcFkLVzlqq3DqLyhjP2Xdcvg3dYp3IhZ6UdzANApWSwfVkfwtziCHRAjMYTNDM
+	AGZ2JyYEknNQQMGrIjEh5bj5OHExsBICDxXlvM1a7M5HNnRQ==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 455p6t1rf0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 04 Mar 2025 11:59:13 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 524BxCZW032085
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 4 Mar 2025 11:59:12 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 4 Mar 2025 03:59:10 -0800
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v5] obex: Add messages_get_message() implementation for MAP plugin
+Date: Tue, 4 Mar 2025 17:28:56 +0530
+Message-ID: <20250304115856.1511495-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -0.80
-X-Spamd-Result: default: False [-0.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: ekdgn2v0SkpFi01V3MQQ0VxgYTkt10u7
+X-Authority-Analysis: v=2.4 cv=KfMosRYD c=1 sm=1 tr=0 ts=67c6eb11 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=Vs1iUdzkB0EA:10 a=oSRza-aUkO-rDw8YJewA:9
+X-Proofpoint-ORIG-GUID: ekdgn2v0SkpFi01V3MQQ0VxgYTkt10u7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-04_05,2025-03-03_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 classifier=spam authscore=0 adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503040099
 
-On Mon, 03 Mar 2025 19:19:47 +0100,
-Luiz Augusto von Dentz wrote:
-> 
-> Hi Pauli, Takashi,
-> 
-> On Mon, Mar 3, 2025 at 12:47 PM Pauli Virtanen <pav@iki.fi> wrote:
-> >
-> > Hi,
-> >
-> > ma, 2025-03-03 kello 17:38 +0100, Takashi Iwai kirjoitti:
-> > > On Mon, 03 Mar 2025 17:29:58 +0100,
-> > > Luiz Augusto von Dentz wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > On Mon, Mar 3, 2025 at 10:56 AM Takashi Iwai <tiwai@suse.de> wrote:
-> > > > >
-> > > > > On Mon, 03 Mar 2025 16:50:37 +0100,
-> > > > > Luiz Augusto von Dentz wrote:
-> > > > > >
-> > > > > > Hi Takashi,
-> > > > > >
-> > > > > > On Mon, Mar 3, 2025 at 10:10 AM Takashi Iwai <tiwai@suse.de> wrote:
-> > > > > > >
-> > > > > > > On Mon, 03 Mar 2025 15:57:16 +0100,
-> > > > > > > Luiz Augusto von Dentz wrote:
-> > > > > > > >
-> > > > > > > > Hi Takashi,
-> > > > > > > >
-> > > > > > > > Well the assumption was that because we are doing a copy of the struct
-> > > > > > > > being unregistered/freed would never cause any errors, so to trigger
-> > > > > > > > something like UAF like the comment was suggesting the function
-> > > > > > > > callback would need to be unmapped so even if the likes of iso_exit is
-> > > > > > > > called it function (e.g. iso_connect_cfm) remains in memory.
-> > > > > > >
-> > > > > > > But it doesn't guarantee that the callback function would really
-> > > > > > > work.  e.g. if the callback accesses some memory that was immediately
-> > > > > > > freed after the unregister call, it will lead to a UAF, even though
-> > > > > > > the function itself is still present on the memory.
-> > > > > > >
-> > > > > > > That said, the current situation makes hard to judge the object life
-> > > > > > > time.
-> > > > > > >
-> > > > > > > > You can find the previous version here:
-> > > > > > > >
-> > > > > > > > https://syzkaller.appspot.com/text?tag=Patch&x=100c0de8580000
-> > > > > > > >
-> > > > > > > > Problem with it was that it is invalid to unlock and relock like that.
-> > > > > > >
-> > > > > > > Thanks for the pointer!
-> > > > > > >
-> > > > > > >
-> > > > > > > BTW, I saw another patch posted to replace the mutex with spinlock
-> > > > > > > (and you replied later on that it's been already fixed).
-> > > > > > > Is it an acceptable approach at all?
-> > > > > >
-> > > > > > I don't remember if I saw that, but yeah anything that makes the issue
-> > > > > > go away, and doesn't create new problems, would probably be
-> > > > > > acceptable.
-> > > > >
-> > > > > I saw this one:
-> > > > >   https://lore.kernel.org/all/20230907122234.146449-1-william.xuanziyang@huawei.com/
-> > > >
-> > > > Ive might have missed it, we will probably need to rebase it but other
-> > > > than that it should be acceptable.
-> > >
-> > > Does it mean that you'd revert the change and apply the above one
-> > > (with rebase or modification)?  Or would you keep a part of the
-> > > current change (e.g. match callback looks neat) while applying the
-> > > similar fix using the spinlock?
-> >
-> > My current understanding of this is that the actual problem for
-> > 4d94f0555827 was incorrect RCU use at the callsite in
-> > hci_le_create_big_complete_evt(). That part was rewritten in
-> >
-> > commit 581dd2dc168f ("Bluetooth: hci_event: Fix using rcu_read_(un)lock
-> > while iterating")
-> 
-> In that case maybe we can just revert the 4d94f0555827 ("Bluetooth:
-> hci_core: Fix sleeping
-> function called from invalid context") and see if that works, might
-> need to trigger syzbot just to confirm we don't introduce the original
-> problem.
+GET Message() operation should be supported for passing below PTS
+testcases -
 
-Fair enough, it sounds reasonable.
+1.MAP/MSE/MMB/BV-12-C
+  Verify that the MSE can return an email message to the MCE.
+2.MAP/MSE/MMB/BV-13-C
+  Verify that the MSE can return a a*n* SMS message in native format
+  to the MCE.
+3.MAP/MSE/MMB/BV-14-C
+  Verify that the MSE can return a SMS message with text trans-coded
+  to UTF-8 to the MCE.
 
+Currently get message operation is not implemented, hence above
+testcases are failing.
+Added code to send the complete bmessage in response to the get() request
+for the requested message handle.
 
-thanks,
+As per suggested in previous patch, mmap() is being used
+for reading file.
 
-Takashi
+---
+ obexd/plugins/mas.c            |  5 ++--
+ obexd/plugins/messages-dummy.c | 53 +++++++++++++++++++++++++++++++++-
+ 2 files changed, 55 insertions(+), 3 deletions(-)
+
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index 10b972d65..bf8d689ad 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -408,6 +408,7 @@ static void get_message_cb(void *session, int err, gboolean fmore,
+ 	}
+ 
+ 	g_string_append(mas->buffer, chunk);
++	mas->finished = TRUE;
+ 
+ proceed:
+ 	if (err != -EAGAIN)
+@@ -612,11 +613,11 @@ static void *message_open(const char *name, int oflag, mode_t mode,
+ 		return NULL;
+ 	}
+ 
++	mas->buffer = g_string_new("");
++
+ 	*err = messages_get_message(mas->backend_data, name, 0,
+ 			get_message_cb, mas);
+ 
+-	mas->buffer = g_string_new("");
+-
+ 	if (*err < 0)
+ 		return NULL;
+ 	else
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index e313c6163..491203a97 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -18,6 +18,8 @@
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/stat.h>
++#include <sys/mman.h>
+ 
+ #include "obexd/src/log.h"
+ 
+@@ -516,7 +518,56 @@ int messages_get_message(void *session, const char *handle,
+ 					messages_get_message_cb callback,
+ 					void *user_data)
+ {
+-	return -ENOSYS;
++	struct session *s =  session;
++	FILE *fp;
++	char *path;
++	char *msg, *buffer;
++	int file_size, err = 0;
++	struct stat file_info;
++
++	DBG(" ");
++	path = g_build_filename(s->cwd_absolute, handle, NULL);
++	fp = fopen(path, "r");
++	if (fp == NULL) {
++		DBG("fopen() failed");
++		err = -EBADR;
++		goto file_open_err;
++	}
++
++	if (fstat (fileno(fp), &file_info) == -1) {
++		DBG("Error getting file size");
++		err = -EBADR;
++		goto mmap_err;
++	}
++
++	file_size = file_info.st_size;
++
++	msg = (char *) mmap(0, file_size, PROT_READ, MAP_PRIVATE, fileno(fp), 0);
++	if (msg == MAP_FAILED) {
++		DBG("Error mapping file");
++		err = -EBADR;
++		goto mmap_err;
++	}
++
++	buffer = (char *) malloc(file_size * sizeof(char));
++	strcpy(buffer, msg);
++
++	if (callback)
++		callback(session, 0, 0, buffer, user_data);
++
++	if (munmap(msg, file_size) == -1) {
++		DBG("Error unmapping");
++		err = -EBADR;
++		goto munmap_err;
++	}
++
++munmap_err:
++	free(buffer);
++mmap_err:
++	fclose(fp);
++file_open_err:
++	g_free(path);
++	return err;
+ }
+ 
+ int messages_update_inbox(void *session, messages_status_cb callback,
+-- 
+2.34.1
+
