@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A4B207E18
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 15:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB523280A3A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 15:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741100400; cv=none; b=FMHxWVDe42yeqDcv6PPHVYJx+fPxjDAA9Ik+P2D1cwPioTtn1JLPgSGMonxxpeXEkXas0NXWrDgNwC9vdFbDRF3i7ymprjpG+YArOLmfiP6K5QiSJElWaqzQuaDJ+YzpNcx/MZcpeONFuj8l2ZyMDEaMwImBlvZkPOHKWIELOj4=
+	t=1741100401; cv=none; b=t6+WaN53WN059rFwQjU0atr9KryNjQMYAEtGOW11kXBsBdlJlVn3iyiwlTo0z+UtVscXvVChfBMcEuvmqYRckuFGP/u3ILdepz41aLCR45zPLlMQVD3FUo85QXes+KpkeWE5DWWAM4ZYVUw9oykRkmCpElvhj9la72GTBJKChXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741100400; c=relaxed/simple;
-	bh=BF+OS5BO2scyUHxQ1QSfqLG5roXqlNfCxO66a1dBN7c=;
+	s=arc-20240116; t=1741100401; c=relaxed/simple;
+	bh=SorMa4U+AS/DYX6iwjrpVKlMR2JTB9HDhwVmMT1rMAc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=og1kYtSdDrkOl+xyZqxtp5JkIkFW32fzeee4mrdxJQvgY+QF4jzIUFS78eMNSXegvANidxbZM4WeboMiL9Bm2/dukh+ovBZr9vw43Iloytg28zEvTXgKHxQBZ3MTIlZ6P2JqAdKS8UbH7riZm0SMSjzp5q5+Uirf1CSW2GdA4Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zn1EGbSS; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=LfWt2RTF0uWL96PynHpOPhypNnWmTe7p1zOBePswi+1+X7LNBxkwgduswvV661rDixpyrafeKMtyYB9eKxzHrPqXXNbV3w9AK1RsscXb8JUvlP2/S7+ahMcBvo3Fq0WOQfIzYJ+SSpU6qjVZo+b8c+jvKbgVzOeH231kQl6PMGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=peI8n3Dn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zn1EGbSS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15424C4CEE5;
-	Tue,  4 Mar 2025 15:00:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="peI8n3Dn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57346C4CEE7;
+	Tue,  4 Mar 2025 15:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741100400;
-	bh=BF+OS5BO2scyUHxQ1QSfqLG5roXqlNfCxO66a1dBN7c=;
+	s=k20201202; t=1741100401;
+	bh=SorMa4U+AS/DYX6iwjrpVKlMR2JTB9HDhwVmMT1rMAc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Zn1EGbSSO9fkT7DKvuLaP0EABBC5y0K653rqhqhcvTpWn8O/yzBUpRLiPzw/D6YV+
-	 xsUJaEiufmrPdVSCErWerfkllMGzsNJV7yIUhL08Y7cOrJHVPep2oP2hDtVxA0Jgg/
-	 V0zmSiIOtRScc4tXbA2dln1PEqfUslV9gtEgbM2zh1F9Sruitdj388QUxFSKsT0uyB
-	 Ii+67U6lysXXSwb55ytq7N5pXScU8o0InnBXw4HKln/HkVmkTNxBv5c9rh46UP9ndZ
-	 eczmegyAEAkbcijtPWE0E3bujfgXXXKX3NNTNHbw1FxKhXiZMAwm77uqZNdIofqHTe
-	 djOEaY9+4aB7g==
+	b=peI8n3Dnp2OwhZFqGQeCUneSzXD7bWYZfg/3XoRtCkEAr8utUn5hgBw4BDkd2XAeQ
+	 nMfz1cAua4RGuJ3U4JpasKcShEJsFSZcyqHRSX7R6rmHxt6KqvQASf0PcPvh1agu0j
+	 c4WbfwBGEnPAKK9UJB3U230ruTAxFyKZN/sz0HaGcD18yhFwDel4NjN+R2iyncjaBq
+	 0xnOf5L2JT9Pe3BssG6DcFiAkCJjERm8YWh0/7Bu4kmJK6uP94al2u4OhBNh/PogDn
+	 4wkfjoZEjyAeE9hDUTXthK236dQlWJav3IkMDg04LgNzR8VFs1Yn9TZhZUgrnneoGD
+	 QXjRP18q2Kctg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BF2380AA7F;
-	Tue,  4 Mar 2025 15:00:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F1A380AA7F;
+	Tue,  4 Mar 2025 15:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,37 +37,62 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: Add support for device coredump
+Subject: Re: [PATCH v1] Bluetooth: hci_event: Fix enabling passive scanning
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174110043274.174904.13541424061943104239.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Mar 2025 15:00:32 +0000
-References: <20250303164527.218458-1-kiran.k@intel.com>
-In-Reply-To: <20250303164527.218458-1-kiran.k@intel.com>
-To: K@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org,
-	Kiran <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
- vijay.satija@intel.com
+ <174110043423.174904.6432239706228191863.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Mar 2025 15:00:34 +0000
+References: <20250228183651.3492826-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250228183651.3492826-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon,  3 Mar 2025 22:15:27 +0530 you wrote:
-> 1. Driver registers device coredump callback
-> 2. Dumps firmware traces as part of coredump
+On Fri, 28 Feb 2025 13:36:51 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Co-developed-by: Vijay Satija <vijay.satija@intel.com>
-> Signed-off-by: Vijay Satija <vijay.satija@intel.com>
-> Signed-off-by: Kiran K <kiran.k@intel.com>
+> Passive scanning shall only be enabled when disconnecting LE links,
+> otherwise it may start result in triggering scanning when e.g. an ISO
+> link disconnects:
+> 
+> > HCI Event: LE Meta Event (0x3e) plen 29
+>       LE Connected Isochronous Stream Established (0x19)
+>         Status: Success (0x00)
+>         Connection Handle: 257
+>         CIG Synchronization Delay: 0 us (0x000000)
+>         CIS Synchronization Delay: 0 us (0x000000)
+>         Central to Peripheral Latency: 10000 us (0x002710)
+>         Peripheral to Central Latency: 10000 us (0x002710)
+>         Central to Peripheral PHY: LE 2M (0x02)
+>         Peripheral to Central PHY: LE 2M (0x02)
+>         Number of Subevents: 1
+>         Central to Peripheral Burst Number: 1
+>         Peripheral to Central Burst Number: 1
+>         Central to Peripheral Flush Timeout: 2
+>         Peripheral to Central Flush Timeout: 2
+>         Central to Peripheral MTU: 320
+>         Peripheral to Central MTU: 160
+>         ISO Interval: 10.00 msec (0x0008)
+> ...
+> > HCI Event: Disconnect Complete (0x05) plen 4
+>         Status: Success (0x00)
+>         Handle: 257
+>         Reason: Remote User Terminated Connection (0x13)
+> < HCI Command: LE Set Extended Scan Enable (0x08|0x0042) plen 6
+>         Extended scan: Enabled (0x01)
+>         Filter duplicates: Enabled (0x01)
+>         Duration: 0 msec (0x0000)
+>         Period: 0.00 sec (0x0000)
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btintel_pcie: Add support for device coredump
-    https://git.kernel.org/bluetooth/bluetooth-next/c/aaa9cc6993d3
+  - [v1] Bluetooth: hci_event: Fix enabling passive scanning
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c7c65369f5a3
 
 You are awesome, thank you!
 -- 
