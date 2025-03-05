@@ -1,324 +1,292 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-221.mail.qq.com (out203-205-221-221.mail.qq.com [203.205.221.221])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCCB1FA178
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Mar 2025 20:24:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40E424A05D;
+	Wed,  5 Mar 2025 13:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741119863; cv=none; b=WE6aq8CvuQOAsO/2LJflyckapz6vkyzNv9zJLxKmTvzwuEkB5y8TzAmTv9bhHTnH9Bnpp2PKM1pOdOCkNSmeRg6fM/NIM+45WSoyMzImyG+XBYhi8sFPn9GU6ODVH/jobF7FbnCxWUmr7hsHnUkf3PbapXDlbZaZfY9lS6ijnec=
+	t=1741182105; cv=none; b=Wsr7bOaTk3NTVAmacrk8V7oLeFrB4lCjILqkJASoPPABTyvUx4sUorIUS/n5hhUpNPVtQV1SGKxCk7wifbKt+JeJkH7ikisMWK1voHrngCsH20u0fER5t9xKnclyD2nBhoHiRI0Xh6JlIeWaNonxB7tOihdK/JaWa+onVAeeVRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741119863; c=relaxed/simple;
-	bh=ito4rMRP4q8XyIpTguffWQfeaCD+Z9XPv4Mfl+k9YwE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=S2zVw0wrmBQvIfC2xG8esOISF4EEo+MJUImRXnldEP5yujazfTLVTsjFht2R98aVQkQK9fkxXZnE9qd4bSFXQ4NswthO0ybErdvT7lEHl4AB+A9yzL8U0nFWhw72OhjJoI97rhXUhLWrKxa+gME0e1yuSQOYelBErF/i/tIMXSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yoe2/t5b; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741182105; c=relaxed/simple;
+	bh=stuqNTLT4VTbjxFCnE0ddQ2cHrFjmrfWcNRJ+hwy/us=;
+	h=From:To:Subject:Mime-Version:Content-Type:Date:Message-ID; b=tio31O+l6NcGKuRjAvdgfIHCe2W2zme6C2S6FiRQwn2rqBhuAUSPvb2kvocYccWSc2kGRtT/S/OlnDE4v2b9R1vPw5akC3q7hy+7HhwZ0PEk5vUyHMsXweXESuRXVTmRQLTtnm1RxTCT4GlA+STe//F8la6VV5WbZPIc+i2yhH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=QFu3idIs; arc=none smtp.client-ip=203.205.221.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yoe2/t5b"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5496301c6afso195439e87.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Mar 2025 12:24:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741119858; x=1741724658; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q3aKebPgAlr246/bbZc5bn/kMYZnJn7dhXo1/8J6tFE=;
-        b=Yoe2/t5bqVmZqPAdNafb1UjUDCLAp00zCLqDVcSDHWqwxYgJ0QH3kCnYuuULcDHSLw
-         7C+vkX0FFd9RJ7Afh+amYBlzfFBseAKZUaAtsxPWDgn++oC51jBy/hMsx/dhDZTgnsMR
-         UjvGN1Wn3/JaOjGCg3pfiihUEwrReSF+G4SZePVvP+RQCrLEh9gKn9YbENhpfnyFs6W5
-         1GO/F9Si7nf7dB2zeza3Y+0w2kqYGDV5m/Nrf6sjl5zz1R+kfQhxY4OnOkfcDyP3g61l
-         Gt+tW+rgoGDY7bjIhCRXH6E6K8ePNAwTuChX+l3rrBgEM442rceBbfBPy2chHC26lyT3
-         Z7/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741119858; x=1741724658;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q3aKebPgAlr246/bbZc5bn/kMYZnJn7dhXo1/8J6tFE=;
-        b=ue/D6TPuy4nm9N/eSyUkIm1Men0VfsIieSPddf3im0sGpdmQWGwyLJtOWiIYgq2Tqk
-         T+WvXsypWS/Ie3cseEBq4frC3zrW6thGCBuv2UKwTOzyKPuRsp/cRg7J4k0S5AUPk5f7
-         fM1LZiUioikdLaPLizV1+37fspx4zZtLnfvlrkR0zHwkxjcqyPPULAkMFsuc5dUMZJ3a
-         XDyPeK4GIr3Jmwn9K4y30I1qGr1KyynWpNIltSj6tIG6HyFnIZ/8a0tNtYnnttFIajBr
-         igOA/DHfOHadoX68iSeYByc6O5gC2D0RZPJBbal9lYhMDnD8N7tKuBBoFpubmbctWbq5
-         Na9w==
-X-Gm-Message-State: AOJu0YzFN+pkV8Z6zwYmFlaSooa70qCJ0qAmlVtANqaPRXSOzQABE69l
-	3xvdRKEA/XZRJSQAx0lFbaetF0B593ebtjIYUn71/9n2LzL8GuGIOSepMZzxHdpxBuFprtNTUv5
-	E4poWlpk/8lgHLpsjBsyEpdynVEFiJw==
-X-Gm-Gg: ASbGncsKxDLwuwgg/YLy/Oo+NQvt9/6AqRRxmwDLh/qud9eZCeKBu9H5RsSsg9pRdC7
-	Ve46ZyxM14pN4NcA4jpf+XSNPLWb6mvWJ+0OJSfiiuT0y50QIHp87r11XN2SPmXvJKIH+n02mIz
-	hmO4ehh3QLEKb1e7zATizAucZ1
-X-Google-Smtp-Source: AGHT+IH6+AzBFeoTX/o6mj5h4f5GX7n+91sq4H2KCMX6Ffgd4xf0i3KLrX3D/V29Y/Z9D6sIlDh1iVpsO1+bwwmzKp0=
-X-Received: by 2002:a05:6512:158e:b0:549:69c1:fd32 with SMTP id
- 2adb3069b0e04-549756e23a6mr1799445e87.20.1741119857415; Tue, 04 Mar 2025
- 12:24:17 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="QFu3idIs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1741182090; bh=stuqNTLT4VTbjxFCnE0ddQ2cHrFjmrfWcNRJ+hwy/us=;
+	h=From:To:Subject:Date;
+	b=QFu3idIs0Yw5foxTR4QgDFqus0lhT4ouM5rddq+YMukSOVWs+40IsW/RgaMfhHka1
+	 SVKuz3u2im9SwTytxQQRAGsI1X5C+iYVGjV1YzHnJMihW/1pj7uEQgwSalu/ssejQd
+	 jBlOUtARzffRnmWjVZGR0QSBkSJyxRzlzGzPEBEE=
+X-QQ-FEAT: oHWrrGTW1dCni6VLWI7Xi3lwP5c1dnPf
+X-QQ-SSF: 00000000000000F0000000000000
+X-QQ-XMRINFO: OW8WShJdN8S2cMc/fs8JwkE=
+X-QQ-XMAILINFO: M7dxyDFn9MPm54xxdDXbJsR7xVL9QlxdCAky1NCokoT0Oe/6D0q/3hx5mrjCU+
+	 WE5HhbT19SHaRORKIJ4U8mjs2rgiKqODmbZTAlU9eYrtFPCOp06VGgpJcX+UbG/AryS0M0MlpQIz1
+	 FFBz6BG1tfrzEZmVicERwHH3VqMlZ4l5N/05NWrykuvG7Uc1Jej2PdekcwgBGDVuqfbYz6A9zbahf
+	 kLmwYmLNwkZS2bSmKl+a5S+MEt/yvNfJw+LzxhTSCzwkFLMJ+B5QDGSbimARwSDYcA1UG2ViiqaI/
+	 /kywzTS5dci03Aa+L1JutMVzQBpIL9PX2Ob7icO7rhmYQy8E/H1CWmd2adv55sOuIWgiWyHvdT2/Z
+	 Bu7YdjIDUvHKql5LXaSFYZNMo+Th4q9exICrPqnJ/wONB2UjSQM3EHos08Gbg0Xf+KzqPb1Qfj45L
+	 zSyK8X3hvxBD6zH5D6ZJfGyG8YmSUjJ0hPxso8zKI/fRC3BTQzHRG2UBR3z5Hqhqxrjjb9zMUjJTF
+	 CJy4vMutFpJy80XoJx7Hk2x/buVbF2jIwVRqES7ndQuEXkq9s8twnt24wj3hZbkE2hguNG4yKaZNn
+	 QyqKzIqNaXPEU/vWNxAINc2h0duyAcDFo/vyUCQdfUePfWQo1kS0bCM9Uv2PPv8nlTj7U0qd+k+kW
+	 nxVKVlo1XsrOFUbEazFNBhNalpYNkw8LwjSBt7xwsOBWQlwN+Dx8boUybwIw5dk9W+sloz8DN1C8W
+	 R9IHNL5HDf81l2s8cfUlAyhN0+eXDdmT4izauHcUFBcVieUqZrhaRAOf6uga5luHZ4r1UnzIdObnJ
+	 uU+rLE2UIDruMuxgEHP1Wm37k0yyHRvONjXkqP/Vy17X2rn7rBGL6+26gRLg/PlLVruwOvy16yuLJ
+	 ENaROGTEyVh9kgUTFGMv0OIoetHsxToRcMNUzw8CLhiBMdEGRP8e8JVdw5Ycbg9U4TiyoSkQYX9ZN
+	 7nbOgTRXdU9TJRQmd2RVCHgVnq28w=
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-STYLE: 
+X-QQ-mid: webmail284t1741181717t890802
+From: "=?gb18030?B?ZmZoZ2Z2?=" <744439878@qq.com>
+To: "=?gb18030?B?bWFyY2Vs?=" <marcel@holtmann.org>, "=?gb18030?B?am9oYW4uaGVkYmVyZw==?=" <johan.hedberg@gmail.com>, "=?gb18030?B?bHVpei5kZW50eg==?=" <luiz.dentz@gmail.com>, "=?gb18030?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>, "=?gb18030?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>
+Subject: kernel bug found in bluetooth and suggestions for fixing it
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250304181019.214207-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250304181019.214207-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 4 Mar 2025 15:24:04 -0500
-X-Gm-Features: AQ5f1JoTZlXfLsqOruZq5hfykx0oqkLCupsAR3OtCS_G4uHT1YzyAjL8dh64h0E
-Message-ID: <CABBYNZJx1tz9qDZYESwxNfV6L+jP1mGOCHY6h2DtM7uOTru7CA@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="gb18030"
+Content-Transfer-Encoding: base64
+Date: Wed, 5 Mar 2025 08:35:17 -0500
+X-Priority: 3
+Message-ID: <tencent_7C305172EDB8B9ECD59983C9E4B44FF1BA09@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
 
-Hi,
+SGVsbG8sIEkgZm91bmQgYSBidWcgdGl0bGVkIKGwIEtBU0FOOiBzbGFiLW91dC1vZi1ib3Vu
+ZHMgV3JpdGUgaW4gc2NvX2Nvbm5fcHV0IKGxd2l0aCBtb2RpZmllZCBzeXprYWxsZXIgaW4g
+dGhlIGxhc3RlZCB1cHN0cmVhbSByZWxhdGVkIHRvJm5ic3A7IGJsdWV0b290aCBzdWJzeXN0
+ZW0uCklmIHlvdSBmaXggdGhpcyBpc3N1ZSwgcGxlYXNlIGFkZCB0aGUgZm9sbG93aW5nIHRh
+ZyB0byB0aGUgY29tbWl0OiBSZXBvcnRlZC1ieTogSmlhbnpob3UgWmhhbzx4bnhjMjJ4bnhj
+MjJAcXEuY29tPiAgICB4aW5nd2VpIGxlZSA8eHJpdmVuZGVsbDdAZ21haWwuY29tPiAgICBa
+aGl6aHVvIFRhbmcgPHN0cmZvcmV4Y3R6emNoYW5nZUBmb3htYWlsLmNvbT4KCi0tLS0tLS0t
+LS0tLVsgY3V0IGhlcmUgXS0tLS0tLS0tLS0tLQpUSVRMRTogQlVHOiAgS0FTQU46IHNsYWIt
+b3V0LW9mLWJvdW5kcyBXcml0ZSBpbiBzY29fY29ubl9wdXQgCj09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQo9PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PQpCVUc6IEtBU0FOOiBzbGFiLW91dC1vZi1ib3VuZHMgaW4gc2NvX2Nvbm5fZnJl
+ZSBuZXQvYmx1ZXRvb3RoL3Njby5jOjg3IFtpbmxpbmVdCkJVRzogS0FTQU46IHNsYWItb3V0
+LW9mLWJvdW5kcyBpbiBrcmVmX3B1dCBpbmNsdWRlL2xpbnV4L2tyZWYuaDo2NSBbaW5saW5l
+XQpCVUc6IEtBU0FOOiBzbGFiLW91dC1vZi1ib3VuZHMgaW4gc2NvX2Nvbm5fcHV0KzB4NDc5
+LzB4NGQwIG5ldC9ibHVldG9vdGgvc2NvLmM6MTA3CldyaXRlIG9mIHNpemUgOCBhdCBhZGRy
+IGZmZmY4ODgwMjhiMDc1YTAgYnkgdGFzayBzeXotZXhlY3V0b3IvMTI0ODEKCkNQVTogMSBV
+SUQ6IDAgUElEOiAxMjQ4MSBDb21tOiBzeXotZXhlY3V0b3IgTm90IHRhaW50ZWQgNi4xNC4w
+LXJjNS1kaXJ0eSAjMgpIYXJkd2FyZSBuYW1lOiBRRU1VIFN0YW5kYXJkIFBDIChpNDQwRlgg
+KyBQSUlYLCAxOTk2KSwgQklPUyAxLjE1LjAtMSAwNC8wMS8yMDE0CkNhbGwgVHJhY2U6CiA8
+dGFzaz4KIF9fZHVtcF9zdGFjayBsaWIvZHVtcF9zdGFjay5jOjk0IFtpbmxpbmVdCiBkdW1w
+X3N0YWNrX2x2bCsweDExNi8weDFiMCBsaWIvZHVtcF9zdGFjay5jOjEyMAogcHJpbnRfYWRk
+cmVzc19kZXNjcmlwdGlvbiBtbS9rYXNhbi9yZXBvcnQuYzo0MDggW2lubGluZV0KIHByaW50
+X3JlcG9ydCsweGMxLzB4NjMwIG1tL2thc2FuL3JlcG9ydC5jOjUyMQoga2FzYW5fcmVwb3J0
+KzB4YmQvMHhmMCBtbS9rYXNhbi9yZXBvcnQuYzo2MzQKIHNjb19jb25uX2ZyZWUgbmV0L2Js
+dWV0b290aC9zY28uYzo4NyBbaW5saW5lXQoga3JlZl9wdXQgaW5jbHVkZS9saW51eC9rcmVm
+Lmg6NjUgW2lubGluZV0KIHNjb19jb25uX3B1dCsweDQ3OS8weDRkMCBuZXQvYmx1ZXRvb3Ro
+L3Njby5jOjEwNwogc2NvX2Nvbm5fZGVsKzB4MjVmLzB4MmYwIG5ldC9ibHVldG9vdGgvc2Nv
+LmM6MjYzCiBoY2lfZGlzY29ubl9jZm0gaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3Jl
+Lmg6MjA2OSBbaW5saW5lXQogaGNpX2Nvbm5faGFzaF9mbHVzaCsweDQ0Yi8weDc4MCBuZXQv
+Ymx1ZXRvb3RoL2hjaV9jb25uLmM6MjY5OAogaGNpX2Rldl9jbG9zZV9zeW5jKzB4NWIwLzB4
+MTFhMCBuZXQvYmx1ZXRvb3RoL2hjaV9zeW5jLmM6NTE5NwogaGNpX2Rldl9kb19jbG9zZSsw
+eDMxLzB4YTAgbmV0L2JsdWV0b290aC9oY2lfY29yZS5jOjQ4MgogaGNpX3VucmVnaXN0ZXJf
+ZGV2KzB4MjEzLzB4NjMwIG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuYzoyNjc3CiB2aGNpX3Jl
+bGVhc2UrMHg3YS8weGYwIGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV92aGNpLmM6NjY0CiBfX2Zw
+dXQrMHgzZmYvMHhiNTAgZnMvZmlsZV90YWJsZS5jOjQ2NAogdGFza193b3JrX3J1bisweDE2
+OS8weDI2MCBrZXJuZWwvdGFza193b3JrLmM6MjI3CiBleGl0X3Rhc2tfd29yayBpbmNsdWRl
+L2xpbnV4L3Rhc2tfd29yay5oOjQwIFtpbmxpbmVdCiBkb19leGl0KzB4YWRlLzB4MmQwMCBr
+ZXJuZWwvZXhpdC5jOjkzOAogZG9fZ3JvdXBfZXhpdCsweGQzLzB4MmEwIGtlcm5lbC9leGl0
+LmM6MTA4NwogZ2V0X3NpZ25hbCsweDIyNzgvMHgyNTQwIGtlcm5lbC9zaWduYWwuYzozMDM2
+CiBhcmNoX2RvX3NpZ25hbF9vcl9yZXN0YXJ0KzB4ODEvMHg3ZDAgYXJjaC94ODYva2VybmVs
+L3NpZ25hbC5jOjMzNwogZXhpdF90b191c2VyX21vZGVfbG9vcCBrZXJuZWwvZW50cnkvY29t
+bW9uLmM6MTExIFtpbmxpbmVdCiBleGl0X3RvX3VzZXJfbW9kZV9wcmVwYXJlIGluY2x1ZGUv
+bGludXgvZW50cnktY29tbW9uLmg6MzI5IFtpbmxpbmVdCiBfX3N5c2NhbGxfZXhpdF90b191
+c2VyX21vZGVfd29yayBrZXJuZWwvZW50cnkvY29tbW9uLmM6MjA3IFtpbmxpbmVdCiBzeXNj
+YWxsX2V4aXRfdG9fdXNlcl9tb2RlKzB4MTUwLzB4MmEwIGtlcm5lbC9lbnRyeS9jb21tb24u
+YzoyMTgKIGRvX3N5c2NhbGxfNjQrMHhkOC8weDI1MCBhcmNoL3g4Ni9lbnRyeS9jb21tb24u
+Yzo4OQogZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NzcvMHg3ZgpSSVA6IDAw
+MzM6MHg3ZmQ1MTRkYWJiYjYKQ29kZTogVW5hYmxlIHRvIGFjY2VzcyBvcGNvZGUgYnl0ZXMg
+YXQgMHg3ZmQ1MTRkYWJiOGMuClJTUDogMDAyYjowMDAwN2ZmZjJkYmI4YWMwIEVGTEFHUzog
+MDAwMDAyOTMgT1JJR19SQVg6IDAwMDAwMDAwMDAwMDAwMmMKUkFYOiAwMDAwMDAwMDAwMDAw
+MDI4IFJCWDogMDAwMDdmZDUxNWFmNDYyMCBSQ1g6IDAwMDA3ZmQ1MTRkYWJiYjYKUkRYOiAw
+MDAwMDAwMDAwMDAwMDI4IFJTSTogMDAwMDdmZDUxNWFmNDY3MCBSREk6IDAwMDAwMDAwMDAw
+MDAwMDMKUkJQOiAwMDAwMDAwMDAwMDAwMDAxIFIwODogMDAwMDdmZmYyZGJiOGIxYyBSMDk6
+IDAwMDAwMDAwMDAwMDAwMGMKUjEwOiAwMDAwMDAwMDAwMDAwMDAwIFIxMTogMDAwMDAwMDAw
+MDAwMDI5MyBSMTI6IDAwMDAwMDAwMDAwMDAwMDAKUjEzOiAwMDAwN2ZkNTE1YWY0NjcwIFIx
+NDogMDAwMDAwMDAwMDAwMDAwMyBSMTU6IDAwMDAwMDAwMDAwMDAwMDAKIDwvdGFzaz4KCkFs
+bG9jYXRlZCBieSB0YXNrIDEzMzI2Ogoga2FzYW5fc2F2ZV9zdGFjaysweDI0LzB4NTAgbW0v
+a2FzYW4vY29tbW9uLmM6NDcKIGthc2FuX3NhdmVfdHJhY2srMHgxNC8weDMwIG1tL2thc2Fu
+L2NvbW1vbi5jOjY4CiBwb2lzb25fa21hbGxvY19yZWR6b25lIG1tL2thc2FuL2NvbW1vbi5j
+OjM3NyBbaW5saW5lXQogX19rYXNhbl9rbWFsbG9jKzB4YWEvMHhiMCBtbS9rYXNhbi9jb21t
+b24uYzozOTQKIGttYWxsb2Nfbm9wcm9mIGluY2x1ZGUvbGludXgvc2xhYi5oOjkwMSBbaW5s
+aW5lXQoga3phbGxvY19ub3Byb2YgaW5jbHVkZS9saW51eC9zbGFiLmg6MTAzNyBbaW5saW5l
+XQogcnhycGNfYWxsb2NfY29ubmVjdGlvbisweDkxLzB4NzgwIG5ldC9yeHJwYy9jb25uX29i
+amVjdC5jOjYyCiByeHJwY19wcmVhbGxvY19zZXJ2aWNlX2Nvbm5lY3Rpb24rMHgyOC8weDNh
+MCBuZXQvcnhycGMvY29ubl9zZXJ2aWNlLmM6MTIzCiByeHJwY19zZXJ2aWNlX3ByZWFsbG9j
+X29uZSsweDJjNS8weGYyMCBuZXQvcnhycGMvY2FsbF9hY2NlcHQuYzo4NwogcnhycGNfa2Vy
+bmVsX2NoYXJnZV9hY2NlcHQrMHhkOC8weDEyMCBuZXQvcnhycGMvY2FsbF9hY2NlcHQuYzo0
+NzUKIGFmc19jaGFyZ2VfcHJlYWxsb2NhdGlvbisweGJlLzB4MzEwIGZzL2Fmcy9yeHJwYy5j
+OjczOQogYWZzX29wZW5fc29ja2V0KzB4MjkwLzB4MzYwIGZzL2Fmcy9yeHJwYy5jOjk1CiBh
+ZnNfbmV0X2luaXQrMHg5NjYvMHhjNjAgZnMvYWZzL21haW4uYzoxMjMKIG9wc19pbml0KzB4
+MWRmLzB4NWYwIG5ldC9jb3JlL25ldF9uYW1lc3BhY2UuYzoxMzgKIHNldHVwX25ldCsweDIx
+Zi8weDg3MCBuZXQvY29yZS9uZXRfbmFtZXNwYWNlLmM6MzYyCiBjb3B5X25ldF9ucysweDJh
+YS8weDYwMCBuZXQvY29yZS9uZXRfbmFtZXNwYWNlLmM6NTE2CiBjcmVhdGVfbmV3X25hbWVz
+cGFjZXMrMHgzZjYvMHhhZjAga2VybmVsL25zcHJveHkuYzoxMTAKIHVuc2hhcmVfbnNwcm94
+eV9uYW1lc3BhY2VzKzB4YzAvMHgyMDAga2VybmVsL25zcHJveHkuYzoyMjgKIGtzeXNfdW5z
+aGFyZSsweDQ2Mi8weGEwMCBrZXJuZWwvZm9yay5jOjMzNDIKIF9fZG9fc3lzX3Vuc2hhcmUg
+a2VybmVsL2ZvcmsuYzozNDEzIFtpbmxpbmVdCiBfX3NlX3N5c191bnNoYXJlIGtlcm5lbC9m
+b3JrLmM6MzQxMSBbaW5saW5lXQogX194NjRfc3lzX3Vuc2hhcmUrMHgzMS8weDQwIGtlcm5l
+bC9mb3JrLmM6MzQxMQogZG9fc3lzY2FsbF94NjQgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6
+NTIgW2lubGluZV0KIGRvX3N5c2NhbGxfNjQrMHhjYi8weDI1MCBhcmNoL3g4Ni9lbnRyeS9j
+b21tb24uYzo4MwogZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NzcvMHg3ZgoK
+VGhlIGJ1Z2d5IGFkZHJlc3MgYmVsb25ncyB0byB0aGUgb2JqZWN0IGF0IGZmZmY4ODgwMjhi
+MDcwMDAKIHdoaWNoIGJlbG9uZ3MgdG8gdGhlIGNhY2hlIGttYWxsb2MtMmsgb2Ygc2l6ZSAy
+MDQ4ClRoZSBidWdneSBhZGRyZXNzIGlzIGxvY2F0ZWQgMzA0IGJ5dGVzIHRvIHRoZSByaWdo
+dCBvZgogYWxsb2NhdGVkIDExMzYtYnl0ZSByZWdpb24gW2ZmZmY4ODgwMjhiMDcwMDAsIGZm
+ZmY4ODgwMjhiMDc0NzApCgpUaGUgYnVnZ3kgYWRkcmVzcyBiZWxvbmdzIHRvIHRoZSBwaHlz
+aWNhbCBwYWdlOgpwYWdlOiByZWZjb3VudDowIG1hcGNvdW50OjAgbWFwcGluZzowMDAwMDAw
+MDAwMDAwMDAwIGluZGV4OjB4MCBwZm46MHgyOGIwMApoZWFkOiBvcmRlcjozIG1hcGNvdW50
+OjAgZW50aXJlX21hcGNvdW50OjAgbnJfcGFnZXNfbWFwcGVkOjAgcGluY291bnQ6MApmbGFn
+czogMHhmZmYwMDAwMDAwMDA0MChoZWFkfG5vZGU9MHx6b25lPTF8bGFzdGNwdXBpZD0weDdm
+ZikKcGFnZV90eXBlOiBmNShzbGFiKQpyYXc6IDAwZmZmMDAwMDAwMDAwNDAgZmZmZjg4ODAx
+YjA0MjAwMCBkZWFkMDAwMDAwMDAwMTAwIGRlYWQwMDAwMDAwMDAxMjIKcmF3OiAwMDAwMDAw
+MDAwMDAwMDAwIDAwMDAwMDAwMDAwODAwMDggMDAwMDAwMDBmNTAwMDAwMCAwMDAwMDAwMDAw
+MDAwMDAwCmhlYWQ6IDAwZmZmMDAwMDAwMDAwNDAgZmZmZjg4ODAxYjA0MjAwMCBkZWFkMDAw
+MDAwMDAwMTAwIGRlYWQwMDAwMDAwMDAxMjIKaGVhZDogMDAwMDAwMDAwMDAwMDAwMCAwMDAw
+MDAwMDAwMDgwMDA4IDAwMDAwMDAwZjUwMDAwMDAgMDAwMDAwMDAwMDAwMDAwMApoZWFkOiAw
+MGZmZjAwMDAwMDAwMDAzIGZmZmZlYTAwMDBhMmMwMDEgZmZmZmZmZmZmZmZmZmZmZiAwMDAw
+MDAwMDAwMDAwMDAwCmhlYWQ6IDAwMDAwMDAwMDAwMDAwMDggMDAwMDAwMDAwMDAwMDAwMCAw
+MDAwMDAwMGZmZmZmZmZmIDAwMDAwMDAwMDAwMDAwMDAKcGFnZSBkdW1wZWQgYmVjYXVzZTog
+a2FzYW46IGJhZCBhY2Nlc3MgZGV0ZWN0ZWQKcGFnZV9vd25lciB0cmFja3MgdGhlIHBhZ2Ug
+YXMgYWxsb2NhdGVkCnBhZ2UgbGFzdCBhbGxvY2F0ZWQgdmlhIG9yZGVyIDMsIG1pZ3JhdGV0
+eXBlIFVubW92YWJsZSwgZ2ZwX21hc2sgMHhkMjBjMChfX0dGUF9JT3xfX0dGUF9GU3xfX0dG
+UF9OT1dBUk58X19HRlBfTk9SRVRSWXxfX0dGUF9DT01QfF9fR0ZQX05PTUVNQUxMT0MpLCBw
+aWQgOTQ4OCwgdGdpZCA5NDg4IChzeXotZXhlY3V0b3IpLCB0cyAyNjA1MDU5MjU1MDMsIGZy
+ZWVfdHMgMTk4NDI4NjkzNTk1CiBzZXRfcGFnZV9vd25lciBpbmNsdWRlL2xpbnV4L3BhZ2Vf
+b3duZXIuaDozMiBbaW5saW5lXQogcG9zdF9hbGxvY19ob29rKzB4MTkzLzB4MWMwIG1tL3Bh
+Z2VfYWxsb2MuYzoxNTUxCiBwcmVwX25ld19wYWdlIG1tL3BhZ2VfYWxsb2MuYzoxNTU5IFtp
+bmxpbmVdCiBnZXRfcGFnZV9mcm9tX2ZyZWVsaXN0KzB4ZTRlLzB4MmIyMCBtbS9wYWdlX2Fs
+bG9jLmM6MzQ3NwogX19hbGxvY19mcm96ZW5fcGFnZXNfbm9wcm9mKzB4MjE5LzB4MjFmMCBt
+bS9wYWdlX2FsbG9jLmM6NDczOQogYWxsb2NfcGFnZXNfbXBvbCsweDFmMi8weDU0MCBtbS9t
+ZW1wb2xpY3kuYzoyMjcwCiBhbGxvY19zbGFiX3BhZ2UgbW0vc2x1Yi5jOjI0MjMgW2lubGlu
+ZV0KIGFsbG9jYXRlX3NsYWIgbW0vc2x1Yi5jOjI1ODcgW2lubGluZV0KIG5ld19zbGFiKzB4
+MjQ4LzB4MzUwIG1tL3NsdWIuYzoyNjQwCiBfX19zbGFiX2FsbG9jKzB4YmIyLzB4MTgxMCBt
+bS9zbHViLmM6MzgyNgogX19zbGFiX2FsbG9jLmNvbnN0cHJvcC4wKzB4NTYvMHhiMCBtbS9z
+bHViLmM6MzkxNgogX19zbGFiX2FsbG9jX25vZGUgbW0vc2x1Yi5jOjM5OTEgW2lubGluZV0K
+IHNsYWJfYWxsb2Nfbm9kZSBtbS9zbHViLmM6NDE1MiBbaW5saW5lXQogX19rbWFsbG9jX2Nh
+Y2hlX25vcHJvZisweDI4MC8weDQxMCBtbS9zbHViLmM6NDMyMAoga21hbGxvY19ub3Byb2Yg
+aW5jbHVkZS9saW51eC9zbGFiLmg6OTAxIFtpbmxpbmVdCiBydG5sX25ld2xpbmsrMHhkMC8w
+eDFjZjAgbmV0L2NvcmUvcnRuZXRsaW5rLmM6MzkyMgogcnRuZXRsaW5rX3Jjdl9tc2crMHg5
+ZTMvMHhmYjAgbmV0L2NvcmUvcnRuZXRsaW5rLmM6NjkxMgogbmV0bGlua19yY3Zfc2tiKzB4
+MTY1LzB4NDQwIG5ldC9uZXRsaW5rL2FmX25ldGxpbmsuYzoyNTMzCiBuZXRsaW5rX3VuaWNh
+c3Rfa2VybmVsIG5ldC9uZXRsaW5rL2FmX25ldGxpbmsuYzoxMzEyIFtpbmxpbmVdCiBuZXRs
+aW5rX3VuaWNhc3QrMHg1NDQvMHg4MDAgbmV0L25ldGxpbmsvYWZfbmV0bGluay5jOjEzMzgK
+IG5ldGxpbmtfc2VuZG1zZysweDhhNS8weGQ4MCBuZXQvbmV0bGluay9hZl9uZXRsaW5rLmM6
+MTg4Mgogc29ja19zZW5kbXNnX25vc2VjIG5ldC9zb2NrZXQuYzo3MTggW2lubGluZV0KIF9f
+c29ja19zZW5kbXNnIG5ldC9zb2NrZXQuYzo3MzMgW2lubGluZV0KIF9fc3lzX3NlbmR0bysw
+eDRmYy8weDU3MCBuZXQvc29ja2V0LmM6MjE4NwogX19kb19zeXNfc2VuZHRvIG5ldC9zb2Nr
+ZXQuYzoyMTk0IFtpbmxpbmVdCiBfX3NlX3N5c19zZW5kdG8gbmV0L3NvY2tldC5jOjIxOTAg
+W2lubGluZV0KIF9feDY0X3N5c19zZW5kdG8rMHhlMC8weDFjMCBuZXQvc29ja2V0LmM6MjE5
+MAogZG9fc3lzY2FsbF94NjQgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6NTIgW2lubGluZV0K
+IGRvX3N5c2NhbGxfNjQrMHhjYi8weDI1MCBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzo4Mwpw
+YWdlIGxhc3QgZnJlZSBwaWQgOTMwNSB0Z2lkIDkzMDUgc3RhY2sgdHJhY2U6CiByZXNldF9w
+YWdlX293bmVyIGluY2x1ZGUvbGludXgvcGFnZV9vd25lci5oOjI1IFtpbmxpbmVdCiBmcmVl
+X3BhZ2VzX3ByZXBhcmUgbW0vcGFnZV9hbGxvYy5jOjExMjcgW2lubGluZV0KIGZyZWVfZnJv
+emVuX3BhZ2VzKzB4NzE4LzB4ZmQwIG1tL3BhZ2VfYWxsb2MuYzoyNjYwCiBfX3B1dF9wYXJ0
+aWFscysweDE1NC8weDE3MCBtbS9zbHViLmM6MzE1MwogcWxpbmtfZnJlZSBtbS9rYXNhbi9x
+dWFyYW50aW5lLmM6MTYzIFtpbmxpbmVdCiBxbGlzdF9mcmVlX2FsbCsweDUwLzB4MTIwIG1t
+L2thc2FuL3F1YXJhbnRpbmUuYzoxNzkKIGthc2FuX3F1YXJhbnRpbmVfcmVkdWNlKzB4MTk1
+LzB4MWUwIG1tL2thc2FuL3F1YXJhbnRpbmUuYzoyODYKIF9fa2FzYW5fc2xhYl9hbGxvYysw
+eDY3LzB4OTAgbW0va2FzYW4vY29tbW9uLmM6MzI5CiBrYXNhbl9zbGFiX2FsbG9jIGluY2x1
+ZGUvbGludXgva2FzYW4uaDoyNTAgW2lubGluZV0KIHNsYWJfcG9zdF9hbGxvY19ob29rIG1t
+L3NsdWIuYzo0MTE1IFtpbmxpbmVdCiBzbGFiX2FsbG9jX25vZGUgbW0vc2x1Yi5jOjQxNjQg
+W2lubGluZV0KIF9fZG9fa21hbGxvY19ub2RlIG1tL3NsdWIuYzo0MjkzIFtpbmxpbmVdCiBf
+X2ttYWxsb2Nfbm9wcm9mKzB4MWMzLzB4NTMwIG1tL3NsdWIuYzo0MzA2CiBrbWFsbG9jX25v
+cHJvZiBpbmNsdWRlL2xpbnV4L3NsYWIuaDo5MDUgW2lubGluZV0KIHRvbW95b19yZWFscGF0
+aF9mcm9tX3BhdGgrMHhjMy8weDYwMCBzZWN1cml0eS90b21veW8vcmVhbHBhdGguYzoyNTEK
+IHRvbW95b19nZXRfcmVhbHBhdGggc2VjdXJpdHkvdG9tb3lvL2ZpbGUuYzoxNTEgW2lubGlu
+ZV0KIHRvbW95b19wYXRoX3Blcm0rMHgyMzYvMHg0MzAgc2VjdXJpdHkvdG9tb3lvL2ZpbGUu
+Yzo4MjIKIHNlY3VyaXR5X2lub2RlX2dldGF0dHIrMHgxMjIvMHgyYjAgc2VjdXJpdHkvc2Vj
+dXJpdHkuYzoyMzc3CiB2ZnNfZ2V0YXR0ciBmcy9zdGF0LmM6MjQzIFtpbmxpbmVdCiB2ZnNf
+ZnN0YXQrMHg1MC8weGMwIGZzL3N0YXQuYzoyNjUKIF9fZG9fc3lzX25ld2ZzdGF0KzB4ODQv
+MHgxMDAgZnMvc3RhdC5jOjU0MgogZG9fc3lzY2FsbF94NjQgYXJjaC94ODYvZW50cnkvY29t
+bW9uLmM6NTIgW2lubGluZV0KIGRvX3N5c2NhbGxfNjQrMHhjYi8weDI1MCBhcmNoL3g4Ni9l
+bnRyeS9jb21tb24uYzo4MwogZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4Nzcv
+MHg3ZgoKTWVtb3J5IHN0YXRlIGFyb3VuZCB0aGUgYnVnZ3kgYWRkcmVzczoKIGZmZmY4ODgw
+MjhiMDc0ODA6IGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZj
+IGZjCiBmZmZmODg4MDI4YjA3NTAwOiBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBm
+YyBmYyBmYyBmYyBmYyBmYwomZ3Q7ZmZmZjg4ODAyOGIwNzU4MDogZmMgZmMgZmMgZmMgZmMg
+ZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMKICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIF4KIGZmZmY4ODgwMjhiMDc2MDA6IGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZj
+IGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjCiBmZmZmODg4MDI4YjA3NjgwOiBmYyBmYyBmYyBm
+YyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYyBmYwo9PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCgo9
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT0KSSB1c2UgdGhlIHNhbWUga2VybmVsIGFzIHN5emJvdCBpbnN0YW5jZSB1
+cHN0cmVhbTogN2ViMTcyMTQzZDU1MDhiNGRhNDY4ZWQ1OWVlODU3YzZlNWUwMWRhNgprZXJu
+ZWwgY29uZmlnOiBodHRwczovL3N5emthbGxlci5hcHBzcG90LmNvbS90ZXh0P3RhZz1LZXJu
+ZWxDb25maWcmYW1wO2FtcDthbXA7eD1kYTRiMDRhZTc5OGI3ZWY2CmNvbXBpbGVyOiBnY2Mg
+dmVyc2lvbiAxMS40LjAKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpVbmZvcnR1bmF0ZWx5
+LCB0aGUgbW9kaWZpZWQgc3l6a2FsbGVyIGRvZXMgbm90IGdlbmVyYXRlIGFuIGVmZmVjdGl2
+ZSByZXBlYXQgcHJvZ3JhbS4KVGhlIGZvbGxvd2luZyBpcyBteSBhbmFseXNpcyBvZiB0aGUg
+YnVnIGFuZCByZXBhaXIgc3VnZ2VzdGlvbnMsIGhvcGluZyB0byBoZWxwIHdpdGggdGhlIHJl
+cGFpciBvZiB0aGUgYnVnOgpSb290IGNhdXNlOgpVQUYgKFVzZS1BZnRlci1GcmVlKSA6IFdo
+ZW4gdGhlIHNvY2tldCBwb2ludGVkIHRvIGNvbm4tJmd0O3NrIGhhcyBiZWVuIHJlbGVhc2Vk
+LCBidXQgdGhlIHNjb19jb25uIHN0cnVjdHVyZSBzdGlsbCByZXRhaW5zIGl0cyBwb2ludGVy
+LCB0aGUgb3ZlcnJlYWNoIGlzIHRyaWdnZXJlZCB3aGVuIHRoZSBzY29fcGkoY29ubi0mZ3Q7
+c2spIGlzIGFjY2Vzc2VkLgpMaWZlY3ljbGUgbWFuYWdlbWVudCBmbGF3OiBCaWRpcmVjdGlv
+bmFsIHJlZmVyZW5jZXMgb2YgU29ja2V0IGFuZCBTQ08gY29ubmVjdGlvbnMgZG8gbm90IHN5
+bmNocm9uaXplIHRoZSByZWxlYXNlIG9yZGVyIGNvcnJlY3RseSwgcmVzdWx0aW5nIGluIGFj
+Y2VzcyB0byBmcmVlZCBzb2NrZXQgbWVtb3J5LgoKIyMjIFJlcGFpciBzdWdnZXN0aW9ucwox
+LiBBY3RpdmVseSBkaXNjb25uZWN0IHRoZSBjb25uZWN0aW9uIHJlZmVyZW5jZSB3aGVuIHRo
+ZSBTb2NrZXQgaXMgcmVsZWFzZWQuTW9kaWZ5IHRoZSBTb2NrZXQgcmVsZWFzZSBsb2dpYyB0
+byBlbnN1cmUgdGhhdCB0aGUgYXNzb2NpYXRlZCBjb25uLSZndDtzayBwb2ludGVyIGlzIGNs
+ZWFyZWQgZHVyaW5nIGRlc3RydWN0aW9uIHRvIGF2b2lkIHN1YnNlcXVlbnQgYWNjZXNzLgoK
+Ly8gbmV0L2JsdWV0b290aC9zY28uYwpzdGF0aWMgdm9pZCBzY29fc29ja19kZXN0cnVjdChz
+dHJ1Y3Qgc29jayAqc2spCnsKKysgICAgc3RydWN0IHNjb19jb25uICpjb25uID0gc2NvX3Bp
+KHNrKS0mZ3Q7Y29ubjsKLS0gICAgICBCVF9EQkcoInNrICVwIiwgc2spOworKyAgICBCVF9E
+QkcoInNrICVwIGNvbm4gJXAiLCBzaywgY29ubik7CgotLSAgICBzY29fY29ubl9wdXQoc2Nv
+X3BpKHNrKS0mZ3Q7Y29ubik7ICAgIAorKyAgICBpZiAoY29ubikgeworKyAgICAgICAgICAg
+ICAgICBzY29fcGkoc2spLSZndDtjb25uID0gTlVMTDsgIC8vIERpc2Nvbm5lY3QgdGhlIFNv
+Y2tldCBmcm9tIHRoZSBjb25uIHJlZmVyZW5jZQorKyAgICAgICAgICAgICAgIHNjb19jb25u
+X3B1dChjb25uKTsgICAgICAKKysgICAgfQoKICAgIHNrYl9xdWV1ZV9wdXJnZSgmYW1wO3Nr
+LSZndDtza19yZWNlaXZlX3F1ZXVlKTsKICAgIHNrYl9xdWV1ZV9wdXJnZSgmYW1wO3NrLSZn
+dDtza193cml0ZV9xdWV1ZSk7Cn0KMi4gRW5zdXJlIHRoYXQgU29ja2V0IHJlZmVyZW5jZXMg
+YXJlIGNsZWFyZWQgd2hlbiBTQ08gY29ubmVjdGlvbnMgYXJlIHJlbGVhc2VkLlRoZSB2YWxp
+ZGl0eSBvZiBjb25uLSZndDtzayBpcyBubyBsb25nZXIgcmVsaWVkIG9uIGluIHNjb19jb25u
+X2ZyZWUgYmVjYXVzZSB0aGUgYXNzb2NpYXRpb24gd2FzIGFjdGl2ZWx5IGRpc2Fzc29jaWF0
+ZWQgd2hlbiB0aGUgU29ja2V0IHdhcyByZWxlYXNlZC4KCm5ldC9ibHVldG9vdGgvc2NvLmMK
+c3RhdGljIHZvaWQgc2NvX2Nvbm5fZnJlZShzdHJ1Y3Qga3JlZiAqcmVmKQp7CglzdHJ1Y3Qg
+c2NvX2Nvbm4gKmNvbm4gPSBjb250YWluZXJfb2YocmVmLCBzdHJ1Y3Qgc2NvX2Nvbm4sIHJl
+Zik7CgoJQlRfREJHKCJjb25uICVwIiwgY29ubik7CgorKyAgIC8vQWNjZXNzIHRvIGNvbm4t
+Jmd0O3NrIHdhcyByZW1vdmVkLCBhbmQgdGhlIFNvY2tldCBjbGVhbmVkIGl0c2VsZgotLQlp
+ZiAoY29ubi0mZ3Q7c2spCi0tCQlzY29fcGkoY29ubi0mZ3Q7c2spLSZndDtjb25uID0gTlVM
+TDsKCglpZiAoY29ubi0mZ3Q7aGNvbikgewoJCWNvbm4tJmd0O2hjb24tJmd0O3Njb19kYXRh
+ID0gTlVMTDsKCQloY2lfY29ubl9kcm9wKGNvbm4tJmd0O2hjb24pOwoJfQoKCS8qIEVuc3Vy
+ZSBubyBtb3JlIHdvcmsgaXRlbXMgd2lsbCBydW4gc2luY2UgaGNpX2Nvbm4gaGFzIGJlZW4g
+ZHJvcHBlZCAqLwoJZGlzYWJsZV9kZWxheWVkX3dvcmtfc3luYygmYW1wO2Nvbm4tJmd0O3Rp
+bWVvdXRfd29yayk7CgoJa2ZyZWUoY29ubik7Cn0KMy5BZGp1c3QgdGhlIGNvbm5lY3Rpb24g
+ZGlzY29ubmVjdGlvbiBsb2dpY2FsIHNlcXVlbmNlLkluIHNjb19jb25uX2RlbCwgZGlzY29u
+bmVjdCB0aGUgU29ja2V0IGZyb20gdGhlIGNvbm5lY3Rpb24gYmVmb3JlIHJlbGVhc2luZyBy
+ZXNvdXJjZXMuCgpuZXQvYmx1ZXRvb3RoL3Njby5jCnN0YXRpYyB2b2lkIHNjb19jb25uX2Rl
+bChzdHJ1Y3QgaGNpX2Nvbm4gKmhjb24sIGludCBlcnIpCnsKCXN0cnVjdCBzY29fY29ubiAq
+Y29ubiA9IGhjb24tJmd0O3Njb19kYXRhOwoJc3RydWN0IHNvY2sgKnNrOwoKCWNvbm4gPSBz
+Y29fY29ubl9ob2xkX3VubGVzc196ZXJvKGNvbm4pOwoJaWYgKCFjb25uKQoJCXJldHVybjsK
+CglCVF9EQkcoImhjb24gJXAgY29ubiAlcCwgZXJyICVkIiwgaGNvbiwgY29ubiwgZXJyKTsK
+CglzY29fY29ubl9sb2NrKGNvbm4pOwoJc2sgPSBzY29fc29ja19ob2xkKGNvbm4pOwoJc2Nv
+X2Nvbm5fdW5sb2NrKGNvbm4pOwoJc2NvX2Nvbm5fcHV0KGNvbm4pOwoKCWlmICghc2spIHsK
+CQlzY29fY29ubl9wdXQoY29ubik7CgkJcmV0dXJuOwoJfQoKCS8qIEtpbGwgc29ja2V0ICov
+Cglsb2NrX3NvY2soc2spOwoJc2NvX3NvY2tfY2xlYXJfdGltZXIoc2spOwoJc2NvX2NoYW5f
+ZGVsKHNrLCBlcnIpOwoJcmVsZWFzZV9zb2NrKHNrKTsKCXNvY2tfcHV0KHNrKTsKKysgICBj
+b25uLSZndDtzayA9IE5VTEw7ICAgLy8gRW5zdXJlIHRoYXQgY29ubiBubyBsb25nZXIgaG9s
+ZHMgcHJvY2Vzc2VkIFNLUwp9Cj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KSSBob3BlIGl0IGhlbHBz
+LgpCZXN0IHJlZ2FyZHMKSmlhbnpob3UgWmhhbwp4aW5nd2VpIGxlZQpaaGl6aHVvIFRhbmc8
+L3N0cmZvcmV4Y3R6emNoYW5nZUBmb3htYWlsLmNvbT48L3hyaXZlbmRlbGw3QGdtYWlsLmNv
+bT48L3hueGMyMnhueGMyMkBxcS5jb20+
 
-On Tue, Mar 4, 2025 at 1:10=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This enables buffer flow control for SCO/eSCO
-> (see: Bluetooth Core 6.0 spec: 6.22. Synchronous Flow Control Enable),
-> recently this has caused the following problem and is actually a nice
-> addition for the likes of Socket TX complete:
->
-> < HCI Command: Read Buffer Size (0x04|0x0005) plen 0
-> > HCI Event: Command Complete (0x0e) plen 11
->       Read Buffer Size (0x04|0x0005) ncmd 1
->         Status: Success (0x00)
->         ACL MTU: 1021 ACL max packet: 5
->         SCO MTU: 240  SCO max packet: 8
-> ...
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > HCI Event: Hardware Error (0x10) plen 1
->         Code: 0x0a
->
-> Fixes: 7fedd3bb6b77 ("Bluetooth: Prioritize SCO traffic")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  include/net/bluetooth/hci.h      |  6 ++++
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_core.c         | 54 +++++++++++++-------------------
->  net/bluetooth/hci_event.c        |  5 +++
->  net/bluetooth/hci_sync.c         | 18 +++++++++++
->  5 files changed, 52 insertions(+), 32 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index b99818df8ee7..70169533c940 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -448,6 +448,7 @@ enum {
->         HCI_WIDEBAND_SPEECH_ENABLED,
->         HCI_EVENT_FILTER_CONFIGURED,
->         HCI_PA_SYNC,
-> +       HCI_SCO_FLOWCTL,
->
->         HCI_DUT_MODE,
->         HCI_VENDOR_DIAG,
-> @@ -1544,6 +1545,11 @@ struct hci_rp_read_tx_power {
->         __s8     tx_power;
->  } __packed;
->
-> +#define HCI_OP_WRITE_SYNC_FLOWCTL      0x0c2f
-> +struct hci_cp_write_sync_flowctl {
-> +       __u8     enable;
-> +} __packed;
-> +
->  #define HCI_OP_READ_PAGE_SCAN_TYPE     0x0c46
->  struct hci_rp_read_page_scan_type {
->         __u8     status;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index 2f320eeddfec..cf18cf65fe5e 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1857,6 +1857,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->  #define lmp_hold_capable(dev)      ((dev)->features[0][0] & LMP_HOLD)
->  #define lmp_sniff_capable(dev)     ((dev)->features[0][0] & LMP_SNIFF)
->  #define lmp_park_capable(dev)      ((dev)->features[0][1] & LMP_PARK)
-> +#define lmp_sco_capable(dev)       ((dev)->features[0][1] & LMP_SCO)
->  #define lmp_inq_rssi_capable(dev)  ((dev)->features[0][3] & LMP_RSSI_INQ=
-)
->  #define lmp_esco_capable(dev)      ((dev)->features[0][3] & LMP_ESCO)
->  #define lmp_bredr_capable(dev)     (!((dev)->features[0][4] & LMP_NO_BRE=
-DR))
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index e7ec12437c8b..9ea9b4091f8f 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3548,45 +3548,35 @@ static void __check_timeout(struct hci_dev *hdev,=
- unsigned int cnt, u8 type)
->  }
->
->  /* Schedule SCO */
-> -static void hci_sched_sco(struct hci_dev *hdev)
-> +static void hci_sched_sco_type(struct hci_dev *hdev, __u8 type)
->  {
->         struct hci_conn *conn;
->         struct sk_buff *skb;
->         int quote;
-> +       unsigned int pkts;
->
-> -       BT_DBG("%s", hdev->name);
-> +       bt_dev_dbg(hdev, "type %u", type);
->
-> -       if (!hci_conn_num(hdev, SCO_LINK))
-> +       if (!hci_conn_num(hdev, type))
->                 return;
->
-> -       while (hdev->sco_cnt && (conn =3D hci_low_sent(hdev, SCO_LINK, &q=
-uote))) {
-> +       /* Use sco_pkts if flow control has not been enabled yet which wi=
-ll
-> +        * limit the amount of buffer sent in a row.
-> +        */
-> +       if (!hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
-> +               pkts =3D hdev->sco_pkts;
-> +       else
-> +               pkts =3D hdev->sco_cnt;
-> +
-> +       while (pkts && (conn =3D hci_low_sent(hdev, type, &quote))) {
->                 while (quote-- && (skb =3D skb_dequeue(&conn->data_q))) {
->                         BT_DBG("skb %p len %d", skb, skb->len);
->                         hci_send_frame(hdev, skb);
->
-> -                       conn->sent++;
-> -                       if (conn->sent =3D=3D ~0)
-> -                               conn->sent =3D 0;
-> -               }
-> -       }
-> -}
-> +                       pkts--;
->
-> -static void hci_sched_esco(struct hci_dev *hdev)
-> -{
-> -       struct hci_conn *conn;
-> -       struct sk_buff *skb;
-> -       int quote;
-> -
-> -       BT_DBG("%s", hdev->name);
-> -
-> -       if (!hci_conn_num(hdev, ESCO_LINK))
-> -               return;
-> -
-> -       while (hdev->sco_cnt && (conn =3D hci_low_sent(hdev, ESCO_LINK,
-> -                                                    &quote))) {
-> -               while (quote-- && (skb =3D skb_dequeue(&conn->data_q))) {
-> -                       BT_DBG("skb %p len %d", skb, skb->len);
-> -                       hci_send_frame(hdev, skb);
-> +                       if (hdev->sco_cnt > 0)
-> +                               hdev->sco_cnt--;
->
->                         conn->sent++;
->                         if (conn->sent =3D=3D ~0)
-> @@ -3628,8 +3618,8 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
->                         chan->conn->sent++;
->
->                         /* Send pending SCO packets right away */
-> -                       hci_sched_sco(hdev);
-> -                       hci_sched_esco(hdev);
-> +                       hci_sched_sco_type(hdev, SCO_LINK);
-> +                       hci_sched_sco_type(hdev, ESCO_LINK);
->                 }
->         }
->
-> @@ -3684,8 +3674,8 @@ static void hci_sched_le(struct hci_dev *hdev)
->                         chan->conn->sent++;
->
->                         /* Send pending SCO packets right away */
-> -                       hci_sched_sco(hdev);
-> -                       hci_sched_esco(hdev);
-> +                       hci_sched_sco_type(hdev, SCO_LINK);
-> +                       hci_sched_sco_type(hdev, ESCO_LINK);
->                 }
->         }
->
-> @@ -3730,8 +3720,8 @@ static void hci_tx_work(struct work_struct *work)
->
->         if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
->                 /* Schedule queues and send stuff to HCI driver */
-> -               hci_sched_sco(hdev);
-> -               hci_sched_esco(hdev);
-> +               hci_sched_sco_type(hdev, SCO_LINK);
-> +               hci_sched_sco_type(hdev, ESCO_LINK);
->                 hci_sched_iso(hdev);
->                 hci_sched_acl(hdev);
->                 hci_sched_le(hdev);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 19e19c9f5e68..e6eadcc13484 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4448,6 +4448,11 @@ static void hci_num_comp_pkts_evt(struct hci_dev *=
-hdev, void *data,
->                         hdev->sco_cnt +=3D count;
->                         if (hdev->sco_cnt > hdev->sco_pkts)
->                                 hdev->sco_cnt =3D hdev->sco_pkts;
-> +
-> +                       /* Enable HCI_SCO_FLOWCTL so sco_cnt is used inst=
-ead of
-> +                        * sco_pkts.
-> +                        */
-> +                       hci_dev_set_flag(hdev, HCI_SCO_FLOWCTL);
-
-I may spin another version implement this logic but before triggering
-hci_connect_cfm do send a empty packet just to test if flowctl is
-really enabled, this maybe better than always setting the flag above
-since in that case the socket interface is not involved so we can
-guarantee that only one packet is outstanding.
-
->                         break;
->
->                 case ISO_LINK:
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index c4c2cf51b219..91cfb7c2cb08 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -3769,6 +3769,22 @@ static int hci_write_ca_timeout_sync(struct hci_de=
-v *hdev)
->                                      sizeof(param), &param, HCI_CMD_TIMEO=
-UT);
->  }
->
-> +/* Enable SCO flow control if supported */
-> +static int hci_write_sync_flowctl_sync(struct hci_dev *hdev)
-> +{
-> +       struct hci_cp_write_sync_flowctl cp;
-> +
-> +       /* Check if the controller supports SCO and HCI_OP_WRITE_SYNC_FLO=
-WCTL */
-> +       if (!lmp_sco_capable(hdev) || !(hdev->commands[10] & BIT(4)))
-> +               return 0;
-> +
-> +       memset(&cp, 0, sizeof(cp));
-> +       cp.enable =3D 0x01;
-> +
-> +       return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_SYNC_FLOWCTL,
-> +                                   sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +}
-> +
->  /* BR Controller init stage 2 command sequence */
->  static const struct hci_init_stage br_init2[] =3D {
->         /* HCI_OP_READ_BUFFER_SIZE */
-> @@ -3787,6 +3803,8 @@ static const struct hci_init_stage br_init2[] =3D {
->         HCI_INIT(hci_clear_event_filter_sync),
->         /* HCI_OP_WRITE_CA_TIMEOUT */
->         HCI_INIT(hci_write_ca_timeout_sync),
-> +       /* HCI_OP_WRITE_SYNC_FLOWCTL */
-> +       HCI_INIT(hci_write_sync_flowctl_sync),
->         {}
->  };
->
-> --
-> 2.48.1
->
-
-
---=20
-Luiz Augusto von Dentz
