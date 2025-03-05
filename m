@@ -1,130 +1,187 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C442E567D
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Mar 2025 17:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467B214884C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Mar 2025 18:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741195360; cv=none; b=NUJHbBvWK8F2dvZtRPYiB3gvWKx0xNf3APLApyqTOmsdXJuJpWsmtUUw9Syc79MwIDJsSZDAIfIXMJEKh1MGCiU5v2qkPjkqc9+83f50vVCTC0Kz1pbJVt881jRI7xet7QqXjViRhEwpcp1c0ezcMojzFhxdMSE2pKgQm5jtc/c=
+	t=1741199145; cv=none; b=mNZBqH5+buX7d8H3MfVUDh8dBj/PQpem65OiFaQOsrWYQKcs7RVWRThaXPk/MzWAvlJ79+C/k8YeqHp6IqLCWxaMH316Vw2mxk+FgbosIHLhv6uwvxGX7shOpABqF2MyEJEtDEBDt87xEO2I3GZuKB+4bgBr6ThWXGX+yqdOR60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741195360; c=relaxed/simple;
-	bh=vIf4lpEMTuOb2i7lI2zH6ho3f6bk/mWsRu2usy0LjGE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=f4nBL+I/9hY4IXK3lcp4UDo8+hRLVsj4JLCSPynB5gR+6MkczpzjoqVuSrYG3pL+Y8yovWOK10Yhhw323PBe0HVPQk+X2iiRnEWQnYP/JPMccSbcI1+0b0fWg4QChFBGIwROTsCixOfmsuU+TI0FemD6P1aiyDtD2vb3k7JdprA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DQmdEQrt; arc=none smtp.client-ip=209.85.219.52
+	s=arc-20240116; t=1741199145; c=relaxed/simple;
+	bh=WrBSd/dQGHMoCAP9xKeWX2jrL94Qod44N0cYjPVoWhs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SRIgtHa+/0uYqapsfRRcx6V5hDAeXUkSE2yvHvSwpIe56XlI9np6ICSE1vrLcb3dbJJelwWBucMW7qLSsoE8PdC523jupllTj9B1KlJPzujzTUXOoZCl6sCIMowt3xTc1ggjIO70WMO21uocSwewDv+80MH+LTWLATWBKY2DJDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EADVC6Ig; arc=none smtp.client-ip=209.85.221.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DQmdEQrt"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6e89c11fd8fso86480586d6.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Mar 2025 09:22:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EADVC6Ig"
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5239ed6f3b3so1527510e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Mar 2025 10:25:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741195357; x=1741800157; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rNAM5dxIh2JG9mdYOLDXipYvttp7FDmq1URY+xblmos=;
-        b=DQmdEQrtr/bm/97YbihGYErjr9a8Tc5d9Us7LL6SLQmCm0P6Qby4mRnmwhoqPfJ/by
-         /Te7ozmdK7U659IOftyWw7fMeMbIlq6MNf8VsGqUKPL3TQgaTKJPxZZ9VmuYD+5sCie1
-         i6J9P9xs13Dw7NgrIfCvTNMsZAbalZTkAo1QKclc5hMl93IcFCwb18AOjeov4UtL/nCW
-         QUZYXMs0SmSNZO0R2sY3mBLzfGb0/sKBq1c96eyVzU8IWfMivUcMH90nIoCkrqhdWYVO
-         BCyASo86Q6WHkziTuL6mYvgLPPvWeV7bE9fKNrGAFPh+ZM0ez3B2W+Ugm7EXuyNQcIpI
-         jojg==
+        d=gmail.com; s=20230601; t=1741199142; x=1741803942; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rn4gv0n9omlMw6xnNQNX3Dsf91iiZCY+xhSLDZ3Xma8=;
+        b=EADVC6Ig7s1CO0J7sqKDh0KdG24l0UdnN1WzTWxH7WQIVzaW6i8EgbTuI04LjfEQOi
+         D1KGskt3IXc/QLtENIe9v13CphBW0PAaiDUfbMsOu97LiZq3EhMH52MwSNP9PU7wBaG3
+         JcTDRUrU/mqEbaTUp112+A7zNEusUv5fdSNXgmfTDC6KpOWmHiHBshqw7wkQhMgAhcg0
+         XMVOsmUPYFMfMgW0kHxy94HbWKwCNyf49GIoQW/YGIuOMHIZ4uoag/vhBWW8U65FuN8s
+         VlTsQmveic0lI3+koeZr8rRJDp7NuL8FC9tOxhucWBGA6KM9SfzsKMvTxajvSrsizU2o
+         aznQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741195357; x=1741800157;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rNAM5dxIh2JG9mdYOLDXipYvttp7FDmq1URY+xblmos=;
-        b=CrqafoPqJmEUcJ18xXdlLT8dx2J/8vDIXrw7yj4xrdSF1g+Utph6QkcdyfTacL+XXC
-         4XzpyLmhCGE7ObEhzjfQLSq6OI4762QJnCxK4w0F5Lh8mVIg+rBE9RhrhFMCwPZ05Qng
-         hTHJ7PRsYZGxQsk1Y9BKR452YB3zEe9QeaCzAquUUlytIpGSmpMU33w36YWc5KJUCD4e
-         TrrQ737YKjP5iP1tMsr6AiJ+/9fkQpGIuhmtIkpc1LFYv5dnQGDWaNn6Q6TgOvmzlfJW
-         W416QV78tebvU/lLzRdNUX37XoLgFfAQe9f0UEJmLox1yeRFOdATLRZKwUhZyq17yROc
-         JtCw==
-X-Gm-Message-State: AOJu0YxNNRRa4bIQZBoJyPT+Y2Vkdx9+30Z8izsK8C7hRdbMm1RbZpvT
-	Yu22HyKu3R/bjJI1IBND+3q9+/1IbWbEwMq97VeEui6q6Q//YM6YdWzspw==
-X-Gm-Gg: ASbGnctVh6mcJ4hYD58WGF6AQtFoT5ORFErGIidZumg6uvi4neUbUb1Xqh+ZfXNaRgR
-	qJHBhrrCKIpdJKlrrHKdWf+C+9Qh3WhrSgQ6zMsIO2N99k2XLWhxrBtyDOPS/8vQZBm5/1M/vyK
-	Yc3Vsz7pdxh4PB7cEF4KRq23ygGviamtidUnksn0NLQFEPAQh1uMg05iubIjBmeqHvByAmVh2JO
-	j6mgbi5uqGm/z2UBAb4vMco4Im1tOZOZjG2zV/AMU5oBO+a8cCxXCEFuQQS+dGnqFtKZsdKnq/R
-	jjmcDgcblwZG9dH3riUYwRM/OdUoMqFLVwUMM4jUSrOqSw0mopZH
-X-Google-Smtp-Source: AGHT+IFYlhBB9gPYjt3CJc18QlahkSGhUsev7aNgZnbNRRntZ7oLGbj7tgSiOSAJTeZC6j1TxhjOiw==
-X-Received: by 2002:a05:6214:3002:b0:6e8:9b26:8c5 with SMTP id 6a1803df08f44-6e8e6cd19a0mr64488006d6.10.1741195357324;
-        Wed, 05 Mar 2025 09:22:37 -0800 (PST)
-Received: from [172.17.0.2] ([20.102.212.182])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8e9a007f2sm9040186d6.5.2025.03.05.09.22.36
+        d=1e100.net; s=20230601; t=1741199142; x=1741803942;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rn4gv0n9omlMw6xnNQNX3Dsf91iiZCY+xhSLDZ3Xma8=;
+        b=lP5AIyTQPI+Rv3CowkX8LjkC8vW1MfoSz+/aLWQrVQvLT59fTU13gPTbAM2SH9jXUg
+         4xhxYE9NIifPzmUWfnKwPjeIlq3tZc16AfwEg3dvobsItgxi2F/RVcatknp2HlbT8dvJ
+         7yZ+LBJTthKFcYZfAPRfggnnK1pJ2QHyQyBTN+UKD2dlhiaM6LAYZA7rtBLCDzJCbY3d
+         Mp8A3n1lZgdeKaJLC6GSUlDcoV2C0Vetq3G/Q5sMy/ZOj/tl0S8B9NuG/zGzFMSifafK
+         0TKTYfzuEInoTK3tdAWYPVaWiDD7F796YZLPI5H0dZVEepnAwE/bjoeCJpzONy6/vOrZ
+         w+vQ==
+X-Gm-Message-State: AOJu0Yz709+h5cWFFNEJXlVqUv2nOlL14EuZa60hkT7ayRzK9HB0irF+
+	7g/thrQehINAFYNLb90uWrhXvigpbcpApidsR4cXERxhcOZ0TofNq9dY2Q==
+X-Gm-Gg: ASbGncveIb6msASYaNuiQRI5xE6Gejy2rXU19wpO8X+6fcmVjqR6APnfBGynm/+yvCe
+	pHWs9Tzsmaf9Kge3HWr2/bktY7alAzdkgIoh35U9Keo6LcwvHC9EYZuLxwFmx2EPj5OvhAPnuWB
+	NBRENi5wDXY9BCq00pxUEY9nC7HH1O6ENbqJclekLGVhyRgMAVqJPHKmEAM0F8VjBjMWK7+6VqX
+	B21AnvfLSEI2WvflSOoE2nrbauLP3GLHWP95DxbMnOuIIr/AqgqiKzNY324MybjHt9DkC8Uznhx
+	JicIfyeKhpGfgPRzz1DUs2A6Tay5xhRxpByCBojyY9abrRmUPAPVE3Sgcj7RTA7AGXuFIcT9+C1
+	on8qrxEszxNZm2Q==
+X-Google-Smtp-Source: AGHT+IHJM156RJxEioRJvy7SH+WGWogAaXkdmsQsbvUNquTPmFOgcExq0qsIiFtFG3aWgI94lbRTAw==
+X-Received: by 2002:a05:6122:308e:b0:520:4996:7d2a with SMTP id 71dfb90a1353d-523c62ceafcmr2314915e0c.10.1741199142375;
+        Wed, 05 Mar 2025 10:25:42 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5238a75e141sm1276595e0c.4.2025.03.05.10.25.39
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 09:22:36 -0800 (PST)
-Message-ID: <67c8885c.0c0a0220.2ee539.4931@mx.google.com>
-Date: Wed, 05 Mar 2025 09:22:36 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3067249935298073750=="
+        Wed, 05 Mar 2025 10:25:40 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] btdev: Add support for Sync Flow Control
+Date: Wed,  5 Mar 2025 13:25:38 -0500
+Message-ID: <20250305182538.409019-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,1/3] btdev: pass sent SCO data to bthost
-In-Reply-To: <1b2a8e408573624a7b5e5e792c7e89c8315811e3.1741190102.git.pav@iki.fi>
-References: <1b2a8e408573624a7b5e5e792c7e89c8315811e3.1741190102.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3067249935298073750==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This adds support for Sync Flow Control by supporting command
+Write Sync Flow Control Enable:
 
-Dear submitter,
+< HCI Command: Write Sync Fl.. (0x03|0x002f) plen 1
+        Flow control: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4
+        Write Sync Flow Control Enable (0x03|0x002f) ncmd 1
+        Status: Success (0x00)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=940626
+To act according to the spec this enabled SCO data packets to be
+properly processed and generate Number of Completed Packets event:
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.22 seconds
-BuildEll                      PASS      20.47 seconds
-BluezMake                     PASS      1583.23 seconds
-MakeCheck                     PASS      14.16 seconds
-MakeDistcheck                 PASS      162.66 seconds
-CheckValgrind                 PASS      219.55 seconds
-CheckSmatch                   WARNING   287.84 seconds
-bluezmakeextell               PASS      99.66 seconds
-IncrementalBuild              PENDING   0.29 seconds
-ScanBuild                     PASS      875.85 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:450:29: warning: Variable length array is used.emulator/bthost.c:628:28: warning: Variable length array is used.emulator/bthost.c:826:28: warning: Variable length array is used.tools/sco-tester.c: note: in included file:./lib/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth.h:237:31: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+sco-tester[40]: < SCO Data TX:.. flags 0x00 dlen 9
+> HCI Event: Number of Completed P.. (0x13) plen 5
+	Num handles: 1
+        Handle: 42 Address: 00:AA:01:01:00:00 (Intel Corporation)
 ---
-Regards,
-Linux Bluetooth
+ emulator/btdev.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index ec52c5242df0..51cb60a41dec 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -203,6 +203,7 @@ struct btdev {
+ 	uint8_t  ssp_debug_mode;
+ 	uint8_t  secure_conn_support;
+ 	uint8_t  host_flow_control;
++	uint8_t  sco_flowctl;
+ 	uint8_t  le_supported;
+ 	uint8_t  le_simultaneous;
+ 	uint8_t  le_event_mask[8];
+@@ -2398,6 +2399,20 @@ static int cmd_read_tx_power_level(struct btdev *dev, const void *data,
+ 	return 0;
+ }
+ 
++static int cmd_write_sync_flowctl(struct btdev *dev, const void *data,
++				   uint8_t len)
++{
++	const struct bt_hci_cmd_write_sync_flow_control *cmd = data;
++	uint8_t status = BT_HCI_ERR_SUCCESS;
++
++	dev->sco_flowctl = cmd->enable;
++
++	cmd_complete(dev, BT_HCI_CMD_WRITE_SYNC_FLOW_CONTROL, &status,
++							sizeof(status));
++
++	return 0;
++}
++
+ static int cmd_read_num_iac(struct btdev *dev, const void *data, uint8_t len)
+ {
+ 	struct bt_hci_rsp_read_num_supported_iac rsp;
+@@ -2676,6 +2691,7 @@ static int cmd_enable_dut_mode(struct btdev *dev, const void *data,
+ 	CMD(BT_HCI_CMD_READ_VOICE_SETTING, cmd_read_voice, NULL), \
+ 	CMD(BT_HCI_CMD_WRITE_VOICE_SETTING, cmd_write_voice, NULL), \
+ 	CMD(BT_HCI_CMD_READ_TX_POWER, cmd_read_tx_power_level, NULL), \
++	CMD(BT_HCI_CMD_WRITE_SYNC_FLOW_CONTROL, cmd_write_sync_flowctl, NULL), \
+ 	CMD(BT_HCI_CMD_READ_NUM_SUPPORTED_IAC, cmd_read_num_iac, NULL), \
+ 	CMD(BT_HCI_CMD_READ_CURRENT_IAC_LAP, cmd_read_current_iac_lap, \
+ 					NULL), \
+@@ -2739,6 +2755,7 @@ static void set_common_commands_bredr20(struct btdev *btdev)
+ 	btdev->commands[9]  |= 0x04;	/* Read Voice Setting */
+ 	btdev->commands[9]  |= 0x08;	/* Write Voice Setting */
+ 	btdev->commands[10] |= 0x04;	/* Read TX Power Level */
++	btdev->commands[10] |= BIT(4);	/* Write Sync Flow Control */
+ 	btdev->commands[11] |= 0x04;	/* Read Number of Supported IAC */
+ 	btdev->commands[11] |= 0x08;	/* Read Current IAC LAP */
+ 	btdev->commands[11] |= 0x10;	/* Write Current IAC LAP */
+@@ -7655,6 +7672,31 @@ static void send_acl(struct btdev *dev, const void *data, uint16_t len)
+ 	send_packet(conn->link->dev, iov, 3);
+ }
+ 
++static void send_sco(struct btdev *dev, const void *data, uint16_t len)
++{
++	struct bt_hci_acl_hdr *hdr;
++	struct iovec iov[2];
++	struct btdev_conn *conn;
++	uint8_t pkt_type = BT_H4_SCO_PKT;
++
++	/* Packet type */
++	iov[0].iov_base = &pkt_type;
++	iov[0].iov_len = sizeof(pkt_type);
++
++	iov[1].iov_base = hdr = (void *) (data);
++	iov[1].iov_len = len;
++
++	conn = queue_find(dev->conns, match_handle,
++					UINT_TO_PTR(acl_handle(hdr->handle)));
++	if (!conn)
++		return;
++
++	if (dev->sco_flowctl)
++		num_completed_packets(dev, conn->handle);
++
++	send_packet(conn->link->dev, iov, 2);
++}
++
+ static void send_iso(struct btdev *dev, const void *data, uint16_t len)
+ {
+ 	struct bt_hci_acl_hdr *hdr;
+@@ -7702,6 +7744,9 @@ void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
+ 	case BT_H4_ACL_PKT:
+ 		send_acl(btdev, data + 1, len - 1);
+ 		break;
++	case BT_H4_SCO_PKT:
++		send_sco(btdev, data + 1, len - 1);
++		break;
+ 	case BT_H4_ISO_PKT:
+ 		send_iso(btdev, data + 1, len - 1);
+ 		break;
+-- 
+2.48.1
 
---===============3067249935298073750==--
