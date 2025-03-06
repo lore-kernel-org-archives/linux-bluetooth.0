@@ -1,175 +1,142 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7398325D914
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Mar 2025 18:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFFD25CC85
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Mar 2025 19:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741285155; cv=none; b=iNkbEqZ1IVZ9JojhyPchjfbvQphrRxMO8iqO1T25E2rCTmSjZj8IgLy6SxS/OOCqNaYN1TE6BIwhd8TrOm7QJihuw5Le2Z7X8fsiqW0regE9eKoTKuClkTrNNhVbBSmZFSJdHQkV28j0dxWEHwxcukf6XjpnlCDlqCZwIDShawg=
+	t=1741287840; cv=none; b=iwyzDJBTYe0T7MNlD4Shx1kbK8rD6fjAHL7PwMhfE4Un6C79YvasgDAuP2Ziahhv56h2MF8j26YjmwJ3zPERdycuWRmPVL/8giOGc3K55QvrmbLK3Jn0N3zxVyuu2afHbW4wRKN+X+oUWJuwPQYgTXfGAcuhq/2O1fOwzbkUDOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741285155; c=relaxed/simple;
-	bh=gS4s17oNTiMzmBEdWiVGdLhOQ/8dBxXcXK3luLv5HfU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=nChH2jklowdCJRrKcJ4rE92OhJF4tdA5QBvcaYoFLi7nLiws4rQAXifTbV2fL2vqbxG6JzTmY+zW2GcSuVYAPw5DBzDAmy64hGnaDyNOs7MRVD5x1gsIA+eNSGWI2bMvb1ewnPhtsl1kcMwLGNULkAwwMOOpT5mk5sL+NVNRISU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=aQchVDY2; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1741287840; c=relaxed/simple;
+	bh=0lnsIGqgepCFOroHheFuzi1Yp5ToLqIMuRjd9FWh5CI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TRtL6cOrnNs/7ULmjFkvVQgPlRTfo8Z+8Yiv9FEl2rODobjmpDWUVz/l+lCQgHUB5/U3stT2mwUFHpXJWu5WIndFARyBrUdqr/u0VyDVFTtgLKakWIwr+oaR0zUTgRGyWsUk6Pm8xqmljt43zoNpiERwPv/7gfkBDPgp5jvOFPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aipBpfS6; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="aQchVDY2"
-Received: from github.com (hubbernetes-node-a670f64.ash1-iad.github.net [10.56.163.31])
-	by smtp.github.com (Postfix) with ESMTPA id 847389210D3
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Mar 2025 10:19:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1741285152;
-	bh=pzza8mO8YT1sYw05F1eS/1Imn850lE8uDaq2wmi3YJo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=aQchVDY2DxyiC3PTAGqYqvWtrd5c/becTEUaIdZJ8BKvtvJV1pPGB1kKqOk1fMxYw
-	 OtFNI7+bOAqXR5d6PmIPe8ffJFeFBUnjHw2u79szHJdthyVRCIKHZ688/MGX6sRr65
-	 Bqn7A52SG5vfPqBZp+lfq8NvDEDKD5fuuh8KmVzk=
-Date: Thu, 06 Mar 2025 10:19:12 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/26bc1c-4d3c72@github.com>
-Subject: [bluez/bluez] 04cd5d: btdev: Fix scan-build warnings
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aipBpfS6"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22355618fd9so19914865ad.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Mar 2025 11:03:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741287837; x=1741892637; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yh8b9x7G4QcKaPjpJ6HswfdiFtlR5AA00kEf8yP1jQ8=;
+        b=aipBpfS6O70pkwJQpu+vy0K6yNuFz+/OUZMhRlO2dnjkZR3qDugW8VYXGV2oI4WhKX
+         0NYvE7+hq8cHMyka5rGyuNN/9qiW5carvDzXV2Cn4CCUmql7T+SlWSy/XpF4b7wFoV0o
+         5+p++2b/QFlM0RYVUavoQwCt235jXbX3czxtkEjPbHfbxja5Jv5g6dHttgaBpjcSequJ
+         83fCWhaeqeTV/rG3NRGQL2vxQjWdX0jNASjwFPeMikAidz8UKrKIuAl42zCKRujxVEgZ
+         jeZGi3cuwDjNdIlRS1oqs485ndT1kXU3YheJDaerx9JuLW5CrXE2jI97TfQme32Rx4bE
+         cIxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741287837; x=1741892637;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yh8b9x7G4QcKaPjpJ6HswfdiFtlR5AA00kEf8yP1jQ8=;
+        b=r8ku3KeY4SElp3eZhnBmJTo7+MvdEB2yuIYfCh5ZQqjL7xfyP8K4fr+qtPjQqJKY99
+         44ijc5+YDZB7KGw04PHm5AN/hvZwaTLiVeoW9K7ZHNTCr6OnCWVQUQC0aiCTT7v3w3V7
+         o3CuIpt7uxsYBD6Ckrx43FZW+B5zR/8/IOWY3/OnyRaN5ofHPXlN15vXBJqRsNQ3iF00
+         3L6jVu94R74G5nNFrmZzR8rgntp1LWUBycqZXXLtklDM6AHTfyFX39eGrX9TCLaz494N
+         VHn+lv3tT5zQ3KGWmeYrfzSZNn5WnmQnrV6nahdPTZj+jlsHB8C+VoKsBjgDT1/dx0Bb
+         hAOw==
+X-Gm-Message-State: AOJu0Yxrz+2GHrEyN4Q0y/+A1RNCKn5Jdp7x+5TfKzlFp1saiiivJu28
+	afb8EUL/LdtytsoSemaCJ3A4ixW8FksldLblGUAIPEp3ItsGPzE90xxB/Q==
+X-Gm-Gg: ASbGncueWdV8hheD9JpgY1B/pSy815wMPdeE+xGz7HIePJ2PUzR+Rec9GKegdnU9lT9
+	tq+UfH2eyREJruErGs6iKTGUTCYyfgH74EpZtaB/W67wumfjK4oRv4gfDDJ5/atJXdrQofrekiS
+	KuvKmoLXFlrFLEY3bgC0titrWN7IfVgojK0xfxbAXOqEHfCoNPH3rU/z0aac6xtDszkS0iFsqby
+	L6Mr2KbQrtjzvSFA92+RHxfS462oy21xjhTG4mmnv14Ay0SCvYBchC7BCEun49G6XuPCxK1y5xo
+	+mxGR5HD9EGU08tYcrULBYBmic/qPp4nxJMRDVQ0LWl75QxCVw==
+X-Google-Smtp-Source: AGHT+IH67Jdf0wV6ZHppMuIrj9rwK5IlMQ9IE9AMefFcL3elVBIImscYa1KHRhSWb80aSmODPvCT3w==
+X-Received: by 2002:a05:6a00:cc2:b0:736:9e40:13b1 with SMTP id d2e1a72fcca58-736aab160dcmr638896b3a.23.1741287837018;
+        Thu, 06 Mar 2025 11:03:57 -0800 (PST)
+Received: from [172.17.0.2] ([52.234.5.192])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7369844ce06sm1714829b3a.73.2025.03.06.11.03.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 11:03:56 -0800 (PST)
+Message-ID: <67c9f19c.050a0220.179374.3bb1@mx.google.com>
+Date: Thu, 06 Mar 2025 11:03:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5968765547399130451=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: [v2,1/3] Bluetooth: btnxpuart: Add correct bootloader error codes
+In-Reply-To: <20250306180931.57705-1-neeraj.sanjaykale@nxp.com>
+References: <20250306180931.57705-1-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5968765547399130451==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 04cd5d2a97c887938ff53b621a4a4a6cc7eec967
-      https://github.com/bluez/bluez/commit/04cd5d2a97c887938ff53b621a4a4a6cc7eec967
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-03-06 (Thu, 06 Mar 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M emulator/btdev.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  btdev: Fix scan-build warnings
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=941160
 
-This fixes the following scan-build warnings:
+---Test result---
 
-emulator/btdev.c:1126:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn' [deadcode.DeadStores]
- 1126 |         while ((conn = queue_find(dev->conns, match_handle,
-      |                 ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 1127 |                                         UINT_TO_PTR(handle))))
-      |                                         ~~~~~~~~~~~~~~~~~~~~
-emulator/btdev.c:1413:24: warning: Access to field 'link' results in a dereference of a null pointer (loaded from variable 'conn') [core.NullDereference]
- 1413 |         pending_conn_del(dev, conn->link->dev);
-      |                               ^~~~~~~~~~
-emulator/btdev.c:1535:13: warning: Access to field 'dev' results in a dereference of a null pointer (loaded from variable 'conn') [core.NullDereference]
- 1535 |         send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
-      |                    ^~~~~~~~~
+Test Summary:
+CheckPatch                    PENDING   0.34 seconds
+GitLint                       PENDING   0.31 seconds
+SubjectPrefix                 PASS      0.18 seconds
+BuildKernel                   PASS      24.08 seconds
+CheckAllWarning               PASS      26.34 seconds
+CheckSparse                   PASS      30.76 seconds
+BuildKernel32                 PASS      23.83 seconds
+TestRunnerSetup               PASS      427.39 seconds
+TestRunner_l2cap-tester       PASS      21.17 seconds
+TestRunner_iso-tester         PASS      40.82 seconds
+TestRunner_bnep-tester        PASS      4.74 seconds
+TestRunner_mgmt-tester        FAIL      124.72 seconds
+TestRunner_rfcomm-tester      PASS      7.86 seconds
+TestRunner_sco-tester         PASS      11.67 seconds
+TestRunner_ioctl-tester       PASS      8.31 seconds
+TestRunner_mesh-tester        PASS      5.98 seconds
+TestRunner_smp-tester         PASS      7.15 seconds
+TestRunner_userchan-tester    PASS      4.92 seconds
+IncrementalBuild              PENDING   0.55 seconds
 
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Commit: a22935f9baf507788b438e1e704f735de07fd392
-      https://github.com/bluez/bluez/commit/a22935f9baf507788b438e1e704f735de07fd392
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-03-06 (Thu, 06 Mar 2025)
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Changed paths:
-    M doc/org.bluez.Device.rst
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
 
-  Log Message:
-  -----------
-  org.bluez.Device: Introduced PreferredBearer
-
-This introduces PreferredBearer property which can be used to indicate
-what bearer shall be connected first rather than just using last seen
-bearer which may not work always since it seems some devices sometimes
-advertises on LE bearer but expects connections over BR/EDR e.g:
-
-https://github.com/bluez/bluez/issues/1092
-
-Also with the introduction of LE Audio this might become even more of a
-problem since most likely users would like to select which bearer to use
-rather than using the last-seen policy.
-
-
-  Commit: 03240630b39bc777a66babf6737b26a8dc51c0ab
-      https://github.com/bluez/bluez/commit/03240630b39bc777a66babf6737b26a8dc51c0ab
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-03-06 (Thu, 06 Mar 2025)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Add implementation of PreferredBearer
-
-This adds initial implementation of PreferredBearer.
+Failed Test Cases
+LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.178 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.197 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: f2e7c8f9960094622044197f99e0dc5599fea896
-      https://github.com/bluez/bluez/commit/f2e7c8f9960094622044197f99e0dc5599fea896
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-03-06 (Thu, 06 Mar 2025)
 
-  Changed paths:
-    M client/bluetoothctl.rst
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Add support get/set PreferredBearer
-
-This adds support for PreferredBearer which is printed with the likes of
-info command:
-
-bluetoothctl> info <addr>
-...
-	PreferredBearer: last-seen
-
-It also introduces a new command to get/set the PreferredBearer:
-
-[bluetoothctl]> bearer --help
-Get/Set preferred bearer
-Usage:
-	 bearer <dev> [last-seen/bredr/le]
-
-[bluetoothctl]> bearer <addr>
-	PreferredBearer: last-seen
-[bluetoothctl]> bearer <addr> le
-bluetoothd: @ MGMT Command: Add Device (0x0033) plen 8
-        LE Address: <addr>
-        Action: Auto-connect remote device (0x02)
-[CHG] Device <addr> PreferredBearer: le
-Changing le succeeded
-[bluetoothctl]> bearer <addr>
-	PreferredBearer: le
-[bluetoothctl]> bearer <addr> bredr
-bluetoothd: @ MGMT Command: Remove Device (0x0034) plen 7
-        LE Address: <addr>
-[CHG] Device <addr> PreferredBearer: bredr
-Changing bredr succeeded
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 4d3c721ee037bcc9553bc2e6a8b7fe0bebb3b50c
-      https://github.com/bluez/bluez/commit/4d3c721ee037bcc9553bc2e6a8b7fe0bebb3b50c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-03-06 (Thu, 06 Mar 2025)
-
-  Changed paths:
-    M doc/settings-storage.txt
-    M src/device.c
-
-  Log Message:
-  -----------
-  storage: Add support for storing PreferredBearer
-
-This adds support for storing PreferredBearer into device info file.
-
-
-Compare: https://github.com/bluez/bluez/compare/26bc1c9cd9df...4d3c721ee037
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============5968765547399130451==--
