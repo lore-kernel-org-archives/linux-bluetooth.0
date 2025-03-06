@@ -1,257 +1,345 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66183221F10;
-	Thu,  6 Mar 2025 16:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6E6212D82
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Mar 2025 16:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741279081; cv=none; b=nPttkcBBNNjR6boVpBV+TCWKGzjyM/wyomtnQorq5LpPHFHXNlk925YCrF0TB11Vold6hGRUHGcm3deAppH8TJeeJYcTal/mcgpVjm4PbqvqTCPrikT49n4cO4huM3AUOGxKyzn0U8403KW5LRYmSGVzIGUBvoYQs1/v/4Z6jr8=
+	t=1741279296; cv=none; b=CrHjGscBbHDEEV8QK2B48jVlotY3oTRp2AWd1VRiWwX6n288CFxQc+U7E7ca64wMFJc+RAAeal7F4Vk1uw3AzTKJJNRriD2lNu8MF8/Yls1eMFZ2bXkfWk+YnZOzCD+Nnw6RjM+3YRdRH3RMDwK1wv/filKd3fRDWOfU7xh7mIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741279081; c=relaxed/simple;
-	bh=IsYlA1pLnu2lPgka8Es27hJXGLId8UclLTRhAvqtl8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wus85pHDpkDecNJBrsMvYY7fM4cylTLuC1bLybtrsRB/XFx+ZMxWRIq7cN/C+m4uyc9SQGQyLv8B0vSQRzVzPIrq6eQDBGGgJ4q3DbAWrHDbgUiXCS6yZhIpAWYYrmnhNZukh+5qUD8IIwL9FgbgHmKrv873oLwaYqXuEGl4e1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KcIRlrAO; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1741279296; c=relaxed/simple;
+	bh=x+GMzucCssV/hGF0PbOXa4X2aIttMAAk3Dy3Ci4Jv+0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A3HiMpOIDYIrG1TVvY75Yv/+9zxISi+u9g+c47495fyVmrGWC+Le4nb8YmEjVxq8Bl/FzNUyXVEeyXPo8MTQrutzonKbOLxQVk0kiPCN9g6jtvbm4ktB+We14x3qLKrCnU25/NIuob9ZKkpEQDH2bYdvxR6qrp1SITMLKw9urfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWgARhEe; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KcIRlrAO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741279080; x=1772815080;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IsYlA1pLnu2lPgka8Es27hJXGLId8UclLTRhAvqtl8M=;
-  b=KcIRlrAOEAZjib2uZWmpjlNsxFsU78c5/CS/1fIn6SVKVu8mwJgijPcB
-   3bDaEPDQjAZC2Bhp1p7USdcdVOfd7QwAy5j0yP6zHRDB3+BXwyEaO8dpY
-   6esWpinfhqEteN0N0uGsxp/nP8B3dFRcd5/dzGdsJpGhE+G9AYY2GeZUj
-   Mh9Is2AM5luIfqio6VsBZ5NsHUFRjwNCCfaK1x+WJcNXrFVC6j0bzVRRb
-   4lcEbVE+fFzFZZawT1EOwVHlGqbT/hlR1DlW666L2ciuEZvuUhxwTplkV
-   hnAlW0kV4NKVPg1s1Y0Csf9A2FXY7oKO33NcBRGzqXOT7MtrTz+nYDgl6
-   A==;
-X-CSE-ConnectionGUID: YMV6RP5IQqeCojx6iqPTRQ==
-X-CSE-MsgGUID: HuI0S3qgQSCWmGudMR085g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42327332"
-X-IronPort-AV: E=Sophos;i="6.14,226,1736841600"; 
-   d="scan'208";a="42327332"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 08:37:59 -0800
-X-CSE-ConnectionGUID: gg3mW5X9R8iM0K5KgoVBdw==
-X-CSE-MsgGUID: MTPC3i0RR5mJXDT9hO30xg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,226,1736841600"; 
-   d="scan'208";a="123659819"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa005.fm.intel.com with ESMTP; 06 Mar 2025 08:37:56 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tqEE7-000NIg-2g;
-	Thu, 06 Mar 2025 16:37:46 +0000
-Date: Fri, 7 Mar 2025 00:36:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com
-Subject: Re: [PATCH v1 2/3] Bluetooth: btnxpuart: Handle bootloader error
- during change baudrate
-Message-ID: <202503070049.8e6dNvjC-lkp@intel.com>
-References: <20250305134523.40111-2-neeraj.sanjaykale@nxp.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWgARhEe"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-30bb2fdbb09so8575311fa.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Mar 2025 08:41:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741279293; x=1741884093; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JGUEy1Xiby138CPz4Qc7TKHYO8Y2hJxGi5yQwP2lbYg=;
+        b=AWgARhEeMpyg+MMqxmEmkl9pz8jx6E/nogqOdd198gdNtlSeM036obWZRD0XLRmrGj
+         d33LpLr3v6eCpPR47MLOoqzAGz+DM2ZwPqIpg2xi+vQg6QDT3SKSvyD53Ftoz3fTev4v
+         Ao/0SyKL7f1DZmZt5S/jwnFM/7gUXaZVJ4ilsAKYHKywn4xhCUXx7FqZVXTK+aY34vIp
+         H33scsMe+g2zQQl+7UJosFNGsMmgLryD2Lx0Hl8KHFLixRofmtMe6w+gOcQ13klmGtrw
+         uBNHPLsCPZjEiEz3iykFoSmDDLjGzpuiF963gN8lhlDPU/FL/BCCdCKkgUB3G5xBb8Mj
+         aElg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741279293; x=1741884093;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JGUEy1Xiby138CPz4Qc7TKHYO8Y2hJxGi5yQwP2lbYg=;
+        b=CjTUo/uQ/J4TKhL5Ha44SqhfJvZtSHc4GCCjJk9ZABnhRV5aOLAWK25R+Dr2uu9Fnp
+         PQi6cpT2S5WPpdpqRcblj+QJZoMeMV5MDmJV3e1Jd5kZ3nFg/4BwOMCwrcyzmDwH1JTw
+         uafrLloLJTIcCJSOS7ZrappwrQE4wuJqLcTyYZ/379IiNDEqxJGWeclZ6kC3oIkh2BZR
+         DzbS19B9Xapn33yfXhtcv4qi9ReuasM9H1mHYJ6bC+KL6LI/u0sNklZM0d6eHO0vM2XC
+         Xw0f/i0htJSFk4wqOCt9g1/4FbdJ8JQWPanoVNKePrxpE4+a1H1/QN3uIfJtcxGV5S2c
+         K1gA==
+X-Gm-Message-State: AOJu0YyEuWdolumMgm1O3fgdfXwI0CrUKjOz/SbTIlYrgl8PRPIC7RTa
+	DqPg7jyZ93euMnep5WUA1n8JdDfHGHnffw8mRo5HIAlRHxo5qHGZ6PjlSzl3VCYifHi5NprdtaF
+	Ck/eQ39B+Gx8059W+me+NLoPcamc=
+X-Gm-Gg: ASbGnctBC0lnOW1Lx3tX8fZsHTmxgbY5yBv5EMJiF4xp8958HNb2pJC4y/oI09kvzNO
+	BCLvJSXj9lMw0fpazifx7BFJYAamCV/50mdBk//AgMvWdpZnbouO/IG+qDoP+ePyt1Rcsyu67sR
+	a200FOihKTgjURwboteYw+e/on
+X-Google-Smtp-Source: AGHT+IH9mOZPglPL3BhGZRHkgih+XKWfNhjbJloZXz8TmyNZJq6KhJFeKtKR/8uf43ESFO+WxMLkBXiXKqIOY8oLqnc=
+X-Received: by 2002:a2e:a9a3:0:b0:30b:c6fe:4529 with SMTP id
+ 38308e7fff4ca-30bd7a1c5d0mr31245141fa.8.1741279292235; Thu, 06 Mar 2025
+ 08:41:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250305134523.40111-2-neeraj.sanjaykale@nxp.com>
+References: <20250225220059.2821394-1-luiz.dentz@gmail.com>
+ <20250225220059.2821394-3-luiz.dentz@gmail.com> <CABBYNZ+32tuRH+T7M=1aeDJJOqHz9qt4ThsuMF4sVpiEeC380A@mail.gmail.com>
+ <CABBYNZLwaqD8X8X0vzBR99bJ9uOScufxpOZfgCQDCYYe6FqJHw@mail.gmail.com> <24709b9c28161f1bc300b6117de63975ae92c00c.camel@iki.fi>
+In-Reply-To: <24709b9c28161f1bc300b6117de63975ae92c00c.camel@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 6 Mar 2025 11:41:19 -0500
+X-Gm-Features: AQ5f1JpGQS2xgNKTH3Lw5UGsBM0-P_lheW_Wp3ph0AjmczNoWyZOIdwRMGDazPo
+Message-ID: <CABBYNZJFsJs3U5XpHvHyDit1SuuFiBfcn+sjAn=tyhHV3ZsKFA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 3/3] client: Add support get/set PreferredBearer
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, Bastien Nocera <hadess@hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Neeraj,
+Hi Pauli,
 
-kernel test robot noticed the following build warnings:
+On Sat, Mar 1, 2025 at 11:17=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> ti, 2025-02-25 kello 17:12 -0500, Luiz Augusto von Dentz kirjoitti:
+> > Hi Pauli,
+> >
+> > On Tue, Feb 25, 2025 at 5:10=E2=80=AFPM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Pauli, Bastien,
+> > >
+> > > On Tue, Feb 25, 2025 at 5:01=E2=80=AFPM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > >
+> > > > This adds support for PreferredBearer which is printed with the lik=
+es of
+> > > > info command:
+> > > >
+> > > > bluetoothctl> info <addr>
+> > > > ...
+> > > >         PreferredBearer: last-seen
+> > > >
+> > > > It also introduces a new command to get/set the PreferredBearer:
+> > > >
+> > > > [bluetoothctl]> bearer --help
+> > > > Get/Set preferred bearer
+> > > > Usage:
+> > > >          bearer <dev> [last-seen/bredr/le]
+> > > >
+> > > > [bluetoothctl]> bearer <addr>
+> > > >         PreferredBearer: last-seen
+> > > > [bluetoothctl]> bearer <addr> le
+> > > > bluetoothd: @ MGMT Command: Add Device (0x0033) plen 8
+> > > >         LE Address: <addr>
+> > > >         Action: Auto-connect remote device (0x02)
+> > > > [CHG] Device <addr> PreferredBearer: le
+> > > > Changing le succeeded
+> > > > [bluetoothctl]> bearer <addr>
+> > > >         PreferredBearer: le
+> > > > [bluetoothctl]> bearer <addr> bredr
+> > > > bluetoothd: @ MGMT Command: Remove Device (0x0034) plen 7
+> > > >         LE Address: <addr>
+> > > > [CHG] Device <addr> PreferredBearer: bredr
+> > > > Changing bredr succeeded
+> > > > ---
+> > > >  client/main.c | 27 +++++++++++++++++++++++++++
+> > > >  1 file changed, 27 insertions(+)
+> > > >
+> > > > diff --git a/client/main.c b/client/main.c
+> > > > index feb21a1163d2..76c9bc329c96 100644
+> > > > --- a/client/main.c
+> > > > +++ b/client/main.c
+> > > > @@ -1714,6 +1714,7 @@ static void cmd_info(int argc, char *argv[])
+> > > >         print_property(proxy, "AdvertisingFlags");
+> > > >         print_property(proxy, "AdvertisingData");
+> > > >         print_property(proxy, "Sets");
+> > > > +       print_property(proxy, "PreferredBearer");
+> > > >
+> > > >         battery_proxy =3D find_proxies_by_path(battery_proxies,
+> > > >                                         g_dbus_proxy_get_path(proxy=
+));
+> > > > @@ -2086,6 +2087,30 @@ static void cmd_wake(int argc, char *argv[])
+> > > >         return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > > >  }
+> > > >
+> > > > +static void cmd_bearer(int argc, char *argv[])
+> > > > +{
+> > > > +       GDBusProxy *proxy;
+> > > > +       char *str;
+> > > > +
+> > > > +       proxy =3D find_device(argc, argv);
+> > > > +       if (!proxy)
+> > > > +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > > > +
+> > > > +       if (argc <=3D 2) {
+> > > > +               print_property(proxy, "PreferredBearer");
+> > > > +               return;
+> > > > +       }
+> > > > +
+> > > > +       str =3D strdup(argv[2]);
+> > > > +
+> > > > +       if (g_dbus_proxy_set_property_basic(proxy, "PreferredBearer=
+",
+> > > > +                                       DBUS_TYPE_STRING, &str,
+> > > > +                                       generic_callback, str, free=
+))
+> > > > +               return;
+> > > > +
+> > > > +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > > > +}
+> > > > +
+> > > >  static void cmd_list_attributes(int argc, char *argv[])
+> > > >  {
+> > > >         GDBusProxy *proxy;
+> > > > @@ -3247,6 +3272,8 @@ static const struct bt_shell_menu main_menu =
+=3D {
+> > > >                                                         dev_generat=
+or },
+> > > >         { "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set w=
+ake support",
+> > > >                                                         dev_generat=
+or },
+> > > > +       { "bearer",       "<dev> [last-seen/bredr/le]", cmd_bearer,
+> > > > +                               "Get/Set preferred bearer", dev_gen=
+erator },
+> > > >         { } },
+> > > >  };
+> > > >
+> > > > --
+> > > > 2.48.1
+> > >
+> > > So I went ahead and implemented the idea of having PreferredBearer,
+> > > this works great when setting bredr it really stops from connecting t=
+o
+> > > LE, the said the other way around when setting to le seems to confuse
+> > > some headsets like EarFun and it ends up connecting both bearers:
+> > >
+> > > [EarFun Air Pro 3]> transport.show
+> > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
+> > >     UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f9b=
+34fb)
+> > >     Codec: 0x06 (6)
+> > >     Configuration.#0: len 0x02 type 0x01
+> > >     Configuration.Sampling Frequency: 16 Khz (0x03)
+> > >     Configuration.#1: len 0x02 type 0x02
+> > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > >     Configuration.#2: len 0x05 type 0x03
+> > >     Configuration.Location: 0x00000001
+> > >     Configuration.Location: Front Left (0x00000001)
+> > >     Configuration.#3: len 0x03 type 0x04
+> > >     Configuration.Frame Length: 30 (0x001e)
+> > >     Configuration.#4: len 0x02 type 0x05
+> > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > >     State: idle
+> > >     Volume: 0x00c8 (200)
+> > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
+> > >     QoS.CIG: 0x00 (0)
+> > >     QoS.CIS: 0x00 (0)
+> > >     QoS.Framing: 0x00 (0)
+> > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > >     QoS.Interval: 0x00001d4c (7500)
+> > >     QoS.Latency: 0x0008 (8)
+> > >     QoS.SDU: 0x001e (30)
+> > >     QoS.PHY: 0x02 (2)
+> > >     QoS.Retransmissions: 0x02 (2)
+> > >     Location: 0x00000003 (3)
+> > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
+> > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
+> > >     UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f9b=
+34fb)
+> > >     Codec: 0x06 (6)
+> > >     Configuration.#0: len 0x02 type 0x01
+> > >     Configuration.Sampling Frequency: 16 Khz (0x03)
+> > >     Configuration.#1: len 0x02 type 0x02
+> > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > >     Configuration.#2: len 0x05 type 0x03
+> > >     Configuration.Location: 0x00000002
+> > >     Configuration.Location: Front Right (0x00000002)
+> > >     Configuration.#3: len 0x03 type 0x04
+> > >     Configuration.Frame Length: 30 (0x001e)
+> > >     Configuration.#4: len 0x02 type 0x05
+> > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > >     State: idle
+> > >     Volume: 0x00c8 (200)
+> > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
+> > >     QoS.CIG: 0x00 (0)
+> > >     QoS.CIS: 0x01 (1)
+> > >     QoS.Framing: 0x00 (0)
+> > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > >     QoS.Interval: 0x00001d4c (7500)
+> > >     QoS.Latency: 0x0008 (8)
+> > >     QoS.SDU: 0x001e (30)
+> > >     QoS.PHY: 0x02 (2)
+> > >     QoS.Retransmissions: 0x02 (2)
+> > >     Location: 0x00000003 (3)
+> > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
+> > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
+> > >     UUID: Source PAC                (00002bcb-0000-1000-8000-00805f9b=
+34fb)
+> > >     Codec: 0x06 (6)
+> > >     Configuration.#0: len 0x02 type 0x01
+> > >     Configuration.Sampling Frequency: 48 Khz (0x08)
+> > >     Configuration.#1: len 0x02 type 0x02
+> > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > >     Configuration.#2: len 0x05 type 0x03
+> > >     Configuration.Location: 0x00000001
+> > >     Configuration.Location: Front Left (0x00000001)
+> > >     Configuration.#3: len 0x03 type 0x04
+> > >     Configuration.Frame Length: 90 (0x005a)
+> > >     Configuration.#4: len 0x02 type 0x05
+> > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > >     State: idle
+> > >     Volume: 0x00c8 (200)
+> > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
+> > >     QoS.CIG: 0x00 (0)
+> > >     QoS.CIS: 0x00 (0)
+> > >     QoS.Framing: 0x00 (0)
+> > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > >     QoS.Interval: 0x00001d4c (7500)
+> > >     QoS.Latency: 0x000f (15)
+> > >     QoS.SDU: 0x005a (90)
+> > >     QoS.PHY: 0x02 (2)
+> > >     QoS.Retransmissions: 0x05 (5)
+> > >     Location: 0x00000003 (3)
+> > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
+> > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
+> > >     UUID: Source PAC                (00002bcb-0000-1000-8000-00805f9b=
+34fb)
+> > >     Codec: 0x06 (6)
+> > >     Configuration.#0: len 0x02 type 0x01
+> > >     Configuration.Sampling Frequency: 48 Khz (0x08)
+> > >     Configuration.#1: len 0x02 type 0x02
+> > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > >     Configuration.#2: len 0x05 type 0x03
+> > >     Configuration.Location: 0x00000002
+> > >     Configuration.Location: Front Right (0x00000002)
+> > >     Configuration.#3: len 0x03 type 0x04
+> > >     Configuration.Frame Length: 90 (0x005a)
+> > >     Configuration.#4: len 0x02 type 0x05
+> > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > >     State: idle
+> > >     Volume: 0x00c8 (200)
+> > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
+> > >     QoS.CIG: 0x00 (0)
+> > >     QoS.CIS: 0x01 (1)
+> > >     QoS.Framing: 0x00 (0)
+> > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > >     QoS.Interval: 0x00001d4c (7500)
+> > >     QoS.Latency: 0x000f (15)
+> > >     QoS.SDU: 0x005a (90)
+> > >     QoS.PHY: 0x02 (2)
+> > >     QoS.Retransmissions: 0x05 (5)
+> > >     Location: 0x00000003 (3)
+> > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
+> > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/fd5
+> > >     UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b=
+34fb)
+> > >     Codec: 0x02 (2)
+> > >     Media Codec: MPEG24
+> > >     Object Types: MPEG-4 AAC LC
+> > >     Frequencies: 48kHz
+> > >     Channels: 2
+> > >     Bitrate: 320000
+> > >     VBR: Yes
+> > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > >     State: idle
+> > >     Delay: 0x0960 (2400)
+> > >     Volume: 0x0064 (100)
+> >
+> > Forgot to mention, but with the above transports it seems to confuse
+> > the gnome audio output selection, it doesn't seem to be able to mix
+> > A2DP and BAP transports for some reason, so when I select the device
+> > it enables BAP but A2DP is not shown as an option.
+>
+> I'll have to see if I can reproduce that on current PW master branch.
+>
+> The visibility of profiles in theory should only cares about whether
+> the UUIDs appear in both device properties and transport.
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v6.14-rc5 next-20250306]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I think I will merge these changes since the property is marked as
+experimental; we can always change it or revert later.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Neeraj-Sanjay-Kale/Bluetooth-btnxpuart-Handle-bootloader-error-during-change-baudrate/20250305-214856
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20250305134523.40111-2-neeraj.sanjaykale%40nxp.com
-patch subject: [PATCH v1 2/3] Bluetooth: btnxpuart: Handle bootloader error during change baudrate
-config: i386-buildonly-randconfig-001-20250306 (https://download.01.org/0day-ci/archive/20250307/202503070049.8e6dNvjC-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250307/202503070049.8e6dNvjC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503070049.8e6dNvjC-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/bluetooth/btnxpuart.c:1104:6: warning: variable 'len' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-    1104 |         if (!req->error) {
-         |             ^~~~~~~~~~~
-   drivers/bluetooth/btnxpuart.c:1168:28: note: uninitialized use occurs here
-    1168 |         nxpdev->fw_v3_prev_sent = len;
-         |                                   ^~~
-   drivers/bluetooth/btnxpuart.c:1104:2: note: remove the 'if' if its condition is always true
-    1104 |         if (!req->error) {
-         |         ^~~~~~~~~~~~~~~~
-    1105 |                 nxp_send_ack(NXP_ACK_V3, hdev);
-    1106 |                 if (nxpdev->timeout_changed == cmd_sent)
-    1107 |                         nxpdev->timeout_changed = changed;
-    1108 |                 if (nxpdev->baudrate_changed == cmd_sent)
-    1109 |                         nxpdev->baudrate_changed = changed;
-    1110 |         } else {
-         |           ~~~~~~
-    1111 |                 nxp_handle_fw_download_error(hdev, req);
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1112 |                 if (nxpdev->timeout_changed == cmd_sent &&
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1113 |                     req->error == NXP_CRC_RX_ERROR) {
-         |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1114 |                         nxpdev->fw_v3_offset_correction -= nxpdev->fw_v3_prev_sent;
-         |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1115 |                         nxpdev->timeout_changed = not_changed;
-         |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1116 |                 }
-         |                 ~
-    1117 |                 /* After baudrate change, it is normal to get ACK Timeout error */
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1118 |                 if (nxpdev->baudrate_changed == cmd_sent &&
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1119 |                     req->error == NXP_CRC_RX_ERROR) {
-         |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/bluetooth/btnxpuart.c:1101:6: warning: variable 'len' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-    1101 |         if (!req || !nxpdev->fw)
-         |             ^~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/btnxpuart.c:1168:28: note: uninitialized use occurs here
-    1168 |         nxpdev->fw_v3_prev_sent = len;
-         |                                   ^~~
-   drivers/bluetooth/btnxpuart.c:1101:2: note: remove the 'if' if its condition is always false
-    1101 |         if (!req || !nxpdev->fw)
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~
-    1102 |                 goto free_skb;
-         |                 ~~~~~~~~~~~~~
->> drivers/bluetooth/btnxpuart.c:1101:6: warning: variable 'len' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-    1101 |         if (!req || !nxpdev->fw)
-         |             ^~~~
-   drivers/bluetooth/btnxpuart.c:1168:28: note: uninitialized use occurs here
-    1168 |         nxpdev->fw_v3_prev_sent = len;
-         |                                   ^~~
-   drivers/bluetooth/btnxpuart.c:1101:6: note: remove the '||' if its condition is always false
-    1101 |         if (!req || !nxpdev->fw)
-         |             ^~~~~~~
-   drivers/bluetooth/btnxpuart.c:1097:6: warning: variable 'len' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-    1097 |         if (!process_boot_signature(nxpdev))
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/btnxpuart.c:1168:28: note: uninitialized use occurs here
-    1168 |         nxpdev->fw_v3_prev_sent = len;
-         |                                   ^~~
-   drivers/bluetooth/btnxpuart.c:1097:2: note: remove the 'if' if its condition is always false
-    1097 |         if (!process_boot_signature(nxpdev))
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1098 |                 goto free_skb;
-         |                 ~~~~~~~~~~~~~
-   drivers/bluetooth/btnxpuart.c:1094:11: note: initialize the variable 'len' to silence this warning
-    1094 |         __u16 len;
-         |                  ^
-         |                   = 0
-   4 warnings generated.
-
-
-vim +1104 drivers/bluetooth/btnxpuart.c
-
-27489364299a2d Neeraj Sanjay Kale     2024-06-14  1089  
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1090  static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1091  {
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1092  	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1093  	struct v3_data_req *req;
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1094  	__u16 len;
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1095  	__u32 offset;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1096  
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1097  	if (!process_boot_signature(nxpdev))
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1098  		goto free_skb;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1099  
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1100  	req = skb_pull_data(skb, sizeof(*req));
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16 @1101  	if (!req || !nxpdev->fw)
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1102  		goto free_skb;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1103  
-27489364299a2d Neeraj Sanjay Kale     2024-06-14 @1104  	if (!req->error) {
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1105  		nxp_send_ack(NXP_ACK_V3, hdev);
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1106  		if (nxpdev->timeout_changed == cmd_sent)
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1107  			nxpdev->timeout_changed = changed;
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1108  		if (nxpdev->baudrate_changed == cmd_sent)
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1109  			nxpdev->baudrate_changed = changed;
-27489364299a2d Neeraj Sanjay Kale     2024-06-14  1110  	} else {
-27489364299a2d Neeraj Sanjay Kale     2024-06-14  1111  		nxp_handle_fw_download_error(hdev, req);
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1112  		if (nxpdev->timeout_changed == cmd_sent &&
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1113  		    req->error == NXP_CRC_RX_ERROR) {
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1114  			nxpdev->fw_v3_offset_correction -= nxpdev->fw_v3_prev_sent;
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1115  			nxpdev->timeout_changed = not_changed;
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1116  		}
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1117  		/* After baudrate change, it is normal to get ACK Timeout error */
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1118  		if (nxpdev->baudrate_changed == cmd_sent &&
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1119  		    req->error == NXP_CRC_RX_ERROR) {
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1120  			nxpdev->fw_v3_offset_correction -= nxpdev->fw_v3_prev_sent;
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1121  			nxpdev->baudrate_changed = not_changed;
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1122  		}
-27489364299a2d Neeraj Sanjay Kale     2024-06-14  1123  		goto free_skb;
-27489364299a2d Neeraj Sanjay Kale     2024-06-14  1124  	}
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1125  
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1126  	len = __le16_to_cpu(req->len);
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1127  
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1128  	if (nxpdev->timeout_changed != changed) {
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1129  		nxp_fw_change_timeout(hdev, len);
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1130  		nxpdev->timeout_changed = cmd_sent;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1131  		goto free_skb;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1132  	}
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1133  
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1134  	if (nxpdev->baudrate_changed != changed) {
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1135  		if (nxp_fw_change_baudrate(hdev, len)) {
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1136  			nxpdev->baudrate_changed = cmd_sent;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1137  			serdev_device_set_baudrate(nxpdev->serdev,
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1138  						   HCI_NXP_SEC_BAUDRATE);
-b0310d6ed684b8 Neeraj Sanjay Kale     2023-04-19  1139  			serdev_device_set_flow_control(nxpdev->serdev, true);
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1140  			nxpdev->current_baudrate = HCI_NXP_SEC_BAUDRATE;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1141  		}
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1142  		goto free_skb;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1143  	}
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1144  
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1145  	if (req->len == 0) {
-2684dd614ccf08 Neeraj Sanjay Kale     2024-05-15  1146  		bt_dev_info(hdev, "FW Download Complete: %zu bytes",
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1147  			   nxpdev->fw->size);
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1148  		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1149  		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1150  		goto free_skb;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1151  	}
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1152  
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1153  	offset = __le32_to_cpu(req->offset);
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1154  	if (offset < nxpdev->fw_v3_offset_correction) {
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1155  		/* This scenario should ideally never occur. But if it ever does,
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1156  		 * FW is out of sync and needs a power cycle.
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1157  		 */
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1158  		bt_dev_err(hdev, "Something went wrong during FW download");
-9e080b53dafae5 Luiz Augusto von Dentz 2023-04-17  1159  		bt_dev_err(hdev, "Please power cycle and try again");
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1160  		goto free_skb;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1161  	}
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1162  
-e3c4891098c875 Neeraj Sanjay Kale     2024-05-15  1163  	nxpdev->fw_dnld_v3_offset = offset - nxpdev->fw_v3_offset_correction;
-e3c4891098c875 Neeraj Sanjay Kale     2024-05-15  1164  	serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data +
-e3c4891098c875 Neeraj Sanjay Kale     2024-05-15  1165  				nxpdev->fw_dnld_v3_offset, len);
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1166  
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1167  free_skb:
-5bf71799df5728 Neeraj Sanjay Kale     2025-03-05  1168  	nxpdev->fw_v3_prev_sent = len;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1169  	kfree_skb(skb);
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1170  	return 0;
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1171  }
-689ca16e523278 Neeraj Sanjay Kale     2023-03-16  1172  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+Luiz Augusto von Dentz
