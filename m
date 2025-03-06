@@ -1,130 +1,363 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC6524A06A
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Mar 2025 17:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741281269; cv=none; b=bB+KzI186SI7xYSV3/us8g5T7F1MJNRqOU4hzry++lBWMpmfCRyuoXNU/PpiiF0k/rDJCkjQKM7gNjFLyIZN6TOxBSfZSaBAjXW7gF5DPf7EsTapNHFiMsqdnApFafgNUcww3yLpU90qpz4NeTcI+3yx9jTlrWC6L4toddTKiGI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741281269; c=relaxed/simple;
-	bh=F9YFpd4pWRufluD6WtpNrRnvd7RUGHNQVsHk9OQ8TFg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=oLnK0QxTsUZeKAsu+SdkOxlZdm8kEhz8PBvflvrf2DUN4L75d6e4nTjQ2qiclM2fgV+Julrk4+jhgrntEKknltEsP7kGTu2o2aAUr9tMZhoIYDG9/mXwZ+tCKrqljc2dnjU/g7lmLQis2AznYdFZQ5UBqcCKk1/fZ9j8jBwvnos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JG+qzuG9; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF8C18DB2C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Mar 2025 17:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741282741; cv=pass; b=TGEFX4O5iaHL/ufbh544E8Zc39Vyp7QmETFRvvz4Q2Ub7e9E1m0DEJ6xTM5oVXAPexY23Hr+ibLAKB3XAx6m3Z319SuyGx7x9tCD7hR5oUOgnXbYHCWgSofRjJ+AVBCu7AE0Ikg/FsaYBujZNeZol9Ajgl8ojkXMOOhFDPmRl5k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741282741; c=relaxed/simple;
+	bh=jO1W6xPrgT0osYrNbZKIvSHoTatKjY1ihpLWIMG+hgc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TCKa7yJLqjxicDdrwsNA7taDI9iZzEVXpHkVHS99/F9cSGK+f6NyGcVc5t2BrtZScw8MLR1FZ5Ut1q1jS5O2SiWkG13nL9G3fZOMtACWNWQrmvDtkYzteok3XD9cb8ED8Jjrl/3/z+oDVQiqtXUChSfGIH1PXZKwyy4WtBrsf0I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=n4+MQbD0; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JG+qzuG9"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c0818add57so89732885a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Mar 2025 09:14:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741281266; x=1741886066; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GTEEx4k3zmugR+DLXElBkZkFH+cg/6V+sOlyV6jPlL0=;
-        b=JG+qzuG97/hJ2nDQ+gpG6WJUB5H1o+aRLJxsOd2g9gFUDjVzY8uYdEbcGLTRuDxlzG
-         /ROtMzTcHj9qKFpUmuyChL5W8T+PTgqNhheQSAmSBjMze+29ji4tWDmnf95mTwh+nfi6
-         jc0kLIj4IMODCHF7Ax7K0tzFaNrVovN9el2SN3HgSh8dDHWMVT+zLLxGNcayNwkXk6AB
-         c5i2UJgrZyNJ+3xZ1Q0SglZqSlU0foGIObb0eiJJVlqOGK4dM5LhprDWLckb4V9t3Uty
-         mXF+cG/A8wWcf07zSvLwzNYo4zG4XkO7HmGy672rqrwfyFtte7EP6KdjBKGKHTPnCRSA
-         fBdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741281266; x=1741886066;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GTEEx4k3zmugR+DLXElBkZkFH+cg/6V+sOlyV6jPlL0=;
-        b=FgTDDHU6qeKPXajMecj1XCFlfdSvl6/E1gwJV8nn3kp/AJUi2l/hduzGR7zFRFl2lY
-         Uog2YssAsa12tUKtXWZYHdAad1KuJLrqCbtvGKEjiXiT01/gujf/5jcz7aEZAOnn/cPp
-         nsZYiMJa6EMbwqctkIfEGZar3EOzv0GxFi6AHp5E745+bwaYgH9vNELVwvz9r8lJVZ2X
-         C8frqbMZHB+7MmD53FqJVNNJP71KMXfY5UFB5HxDxMSbpn6H2HkQx5+VuFi7uevfKA/y
-         1Yk2m8A42av3aF0jwk2YT6+RvyHwiusz5zUX7Kj4HjOspqdZlIM0dgkgMQMC1aKWIB1Q
-         lNsA==
-X-Gm-Message-State: AOJu0YzPlofG17PKFEg6SPl3uU33xq5yD59gvcFF8e9jRyYGidD+XGDw
-	j5XTImt1hud3WL/Rm2vAPZ74MOlT059zC3gw0tIwDeQzIymWCpEWSdAh/g==
-X-Gm-Gg: ASbGncub8l0UHeY6phYAsiAP39AlmNcINeEoDy0N/jSMfEl+QoV9s0WFAa+kp5OxHOX
-	ZaaHO9CjOl00Cd+iU3ORrtdUJGdRD3YKDlMsoVgItPm9GAFnJMxuBFgWWjskAM4fnV2+QrTcERl
-	AWvdPjy/pt6BJ8gP7viPC+6CEWMib38ho5fzttzbv/rtVHobWq/6U1XwB2p+iEliYTWPXe0UDzA
-	3GPoNWSNYYb6TCEjfjYv49pr9xcN7rGEvdOa9tfVkwUjSYS2uYP8d9LrE9JqlnURQXPy/GI6uYJ
-	VhjXO/7PTGTniUpqJjL8O5BX4Ft/Nf8qVpWb3gynxHS8iTGklw==
-X-Google-Smtp-Source: AGHT+IGLbN8kKR+fL7LXP6s99OeWM6JUCWjTEajKUMoMPAvekoptOJDZpf9MIx3wtuqJ5V5Km7pVZA==
-X-Received: by 2002:a05:620a:1b90:b0:7c3:d86d:94a with SMTP id af79cd13be357-7c3d8e558c2mr1247983385a.43.1741281265996;
-        Thu, 06 Mar 2025 09:14:25 -0800 (PST)
-Received: from [172.17.0.2] ([20.98.37.235])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3e54ff907sm113283785a.77.2025.03.06.09.14.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 09:14:25 -0800 (PST)
-Message-ID: <67c9d7f1.050a0220.279f58.43cd@mx.google.com>
-Date: Thu, 06 Mar 2025 09:14:25 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2117700574983948945=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="n4+MQbD0"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Z7xVH0jyLz49Psw;
+	Thu,  6 Mar 2025 19:38:47 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1741282727;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MwANoRM0Nd1GUGywtfBXgIVxbvKSVJer8KB5/tF3n8A=;
+	b=n4+MQbD0k/FVSCnrPk0CI6ZS4ma+1OoviDMfHKYWHsKZYFIk9QfTCqxXSDD3L0qrHbab7C
+	oAB03f05jvuLHJfmGkE6PG7rk5PsBK6H5hbcQH7r7gZqnViULn8y8wW0bS8b+gzUzXG895
+	r8WHFjEkcuHG/spEekrD3F73+/VdvhkvrxCRiqoCR0Y9eZE+wnoYhHmE/3EafW3zvbsxDI
+	efj7Ah9xFyPfKLqcbKRNT9Ara6shvYTC1nGXD958RtumEv6eNHBs8b5VCbIUF93MrBMwq5
+	/lpG1I24Dovpb4FQNNL1abCa418MnPj8PKtG0wEo5MeACvpszWe9oUkQp9boRw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1741282727; a=rsa-sha256;
+	cv=none;
+	b=oH4h4YYH7vlm0v+qsJ/4a0d2N5X2fW6WE/Oa/iaZ428Bqs1G0iXB7vjlD4OXLfUK3DniKp
+	hwOpI9jfUIn/7/6j/G+HrGrseEY+Sn3H5tIYBjKg8gnmlKe/pJsq08WJ9XnH2mNZ0pVXSi
+	m9dj04AGpbxpZOILnVvbw8WbczpunVKaZqSsRdfVvauOyTmtjZkDg6Xokwa3vQjNamNqNx
+	qQgnesgvxRlA8I4IaBE2cgbvEvSGOsTn3nFDDuJat9ogJiQ9yqFS0bAKy4vE8OEj3jhqIA
+	+K3F1EKfWXBjTuRy85c7+iPiqFmdlzDqxk+Nm9EXZUti1SzrvMkawST6aAx0Ew==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1741282727;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MwANoRM0Nd1GUGywtfBXgIVxbvKSVJer8KB5/tF3n8A=;
+	b=HCfcxG+ibznzkR1FNgAGPBhVHIcH2s4rMNIiw0VSlNU74h2Y7U0dcZEHaZCUMUlzVSvrbi
+	muIs/fNXv1fLDBX2RaFFC2WFkTHBYiBTX1b208qYE5INw0iw5k/ZE1S4YWRZWEVA71NeVH
+	L0LQplv9//Gu/JlXb4lH5N9K5L+i/AnckaWzGJpDXCLrhROZ80v61mDNcCmAdBwOmO2z3B
+	C+XijdpkeeiEccxcuWIS+Bkcmgf3n0bCkZVngnBE6eWcsnFIOtdIg9qoCN6g4ulf+PJR1q
+	McTxZcevzA20Z+3ZbxpvMYH9cgvllqCHvaADbEg67YJcS47uWc1OqzEkETobeA==
+Message-ID: <f01b7cbb8326c405b1c4287add512b9a059815a8.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v2 3/3] client: Add support get/set PreferredBearer
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Bastien Nocera <hadess@hadess.net>
+Date: Thu, 06 Mar 2025 19:38:46 +0200
+In-Reply-To: <CABBYNZJFsJs3U5XpHvHyDit1SuuFiBfcn+sjAn=tyhHV3ZsKFA@mail.gmail.com>
+References: <20250225220059.2821394-1-luiz.dentz@gmail.com>
+	 <20250225220059.2821394-3-luiz.dentz@gmail.com>
+	 <CABBYNZ+32tuRH+T7M=1aeDJJOqHz9qt4ThsuMF4sVpiEeC380A@mail.gmail.com>
+	 <CABBYNZLwaqD8X8X0vzBR99bJ9uOScufxpOZfgCQDCYYe6FqJHw@mail.gmail.com>
+	 <24709b9c28161f1bc300b6117de63975ae92c00c.camel@iki.fi>
+	 <CABBYNZJFsJs3U5XpHvHyDit1SuuFiBfcn+sjAn=tyhHV3ZsKFA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] btdev: Fix scan-build warnings
-In-Reply-To: <20250306160003.587816-1-luiz.dentz@gmail.com>
-References: <20250306160003.587816-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============2117700574983948945==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+to, 2025-03-06 kello 11:41 -0500, Luiz Augusto von Dentz kirjoitti:
+> On Sat, Mar 1, 2025 at 11:17=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote=
+:
+> >=20
+> > ti, 2025-02-25 kello 17:12 -0500, Luiz Augusto von Dentz kirjoitti:
+> > > Hi Pauli,
+> > >=20
+> > > On Tue, Feb 25, 2025 at 5:10=E2=80=AFPM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >=20
+> > > > Hi Pauli, Bastien,
+> > > >=20
+> > > > On Tue, Feb 25, 2025 at 5:01=E2=80=AFPM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >=20
+> > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > > >=20
+> > > > > This adds support for PreferredBearer which is printed with the l=
+ikes of
+> > > > > info command:
+> > > > >=20
+> > > > > bluetoothctl> info <addr>
+> > > > > ...
+> > > > >         PreferredBearer: last-seen
+> > > > >=20
+> > > > > It also introduces a new command to get/set the PreferredBearer:
+> > > > >=20
+> > > > > [bluetoothctl]> bearer --help
+> > > > > Get/Set preferred bearer
+> > > > > Usage:
+> > > > >          bearer <dev> [last-seen/bredr/le]
+> > > > >=20
+> > > > > [bluetoothctl]> bearer <addr>
+> > > > >         PreferredBearer: last-seen
+> > > > > [bluetoothctl]> bearer <addr> le
+> > > > > bluetoothd: @ MGMT Command: Add Device (0x0033) plen 8
+> > > > >         LE Address: <addr>
+> > > > >         Action: Auto-connect remote device (0x02)
+> > > > > [CHG] Device <addr> PreferredBearer: le
+> > > > > Changing le succeeded
+> > > > > [bluetoothctl]> bearer <addr>
+> > > > >         PreferredBearer: le
+> > > > > [bluetoothctl]> bearer <addr> bredr
+> > > > > bluetoothd: @ MGMT Command: Remove Device (0x0034) plen 7
+> > > > >         LE Address: <addr>
+> > > > > [CHG] Device <addr> PreferredBearer: bredr
+> > > > > Changing bredr succeeded
+> > > > > ---
+> > > > >  client/main.c | 27 +++++++++++++++++++++++++++
+> > > > >  1 file changed, 27 insertions(+)
+> > > > >=20
+> > > > > diff --git a/client/main.c b/client/main.c
+> > > > > index feb21a1163d2..76c9bc329c96 100644
+> > > > > --- a/client/main.c
+> > > > > +++ b/client/main.c
+> > > > > @@ -1714,6 +1714,7 @@ static void cmd_info(int argc, char *argv[]=
+)
+> > > > >         print_property(proxy, "AdvertisingFlags");
+> > > > >         print_property(proxy, "AdvertisingData");
+> > > > >         print_property(proxy, "Sets");
+> > > > > +       print_property(proxy, "PreferredBearer");
+> > > > >=20
+> > > > >         battery_proxy =3D find_proxies_by_path(battery_proxies,
+> > > > >                                         g_dbus_proxy_get_path(pro=
+xy));
+> > > > > @@ -2086,6 +2087,30 @@ static void cmd_wake(int argc, char *argv[=
+])
+> > > > >         return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > > > >  }
+> > > > >=20
+> > > > > +static void cmd_bearer(int argc, char *argv[])
+> > > > > +{
+> > > > > +       GDBusProxy *proxy;
+> > > > > +       char *str;
+> > > > > +
+> > > > > +       proxy =3D find_device(argc, argv);
+> > > > > +       if (!proxy)
+> > > > > +               return bt_shell_noninteractive_quit(EXIT_FAILURE)=
+;
+> > > > > +
+> > > > > +       if (argc <=3D 2) {
+> > > > > +               print_property(proxy, "PreferredBearer");
+> > > > > +               return;
+> > > > > +       }
+> > > > > +
+> > > > > +       str =3D strdup(argv[2]);
+> > > > > +
+> > > > > +       if (g_dbus_proxy_set_property_basic(proxy, "PreferredBear=
+er",
+> > > > > +                                       DBUS_TYPE_STRING, &str,
+> > > > > +                                       generic_callback, str, fr=
+ee))
+> > > > > +               return;
+> > > > > +
+> > > > > +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > > > > +}
+> > > > > +
+> > > > >  static void cmd_list_attributes(int argc, char *argv[])
+> > > > >  {
+> > > > >         GDBusProxy *proxy;
+> > > > > @@ -3247,6 +3272,8 @@ static const struct bt_shell_menu main_menu=
+ =3D {
+> > > > >                                                         dev_gener=
+ator },
+> > > > >         { "wake",         "[dev] [on/off]",    cmd_wake, "Get/Set=
+ wake support",
+> > > > >                                                         dev_gener=
+ator },
+> > > > > +       { "bearer",       "<dev> [last-seen/bredr/le]", cmd_beare=
+r,
+> > > > > +                               "Get/Set preferred bearer", dev_g=
+enerator },
+> > > > >         { } },
+> > > > >  };
+> > > > >=20
+> > > > > --
+> > > > > 2.48.1
+> > > >=20
+> > > > So I went ahead and implemented the idea of having PreferredBearer,
+> > > > this works great when setting bredr it really stops from connecting=
+ to
+> > > > LE, the said the other way around when setting to le seems to confu=
+se
+> > > > some headsets like EarFun and it ends up connecting both bearers:
+> > > >=20
+> > > > [EarFun Air Pro 3]> transport.show
+> > > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
+> > > >     UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f=
+9b34fb)
+> > > >     Codec: 0x06 (6)
+> > > >     Configuration.#0: len 0x02 type 0x01
+> > > >     Configuration.Sampling Frequency: 16 Khz (0x03)
+> > > >     Configuration.#1: len 0x02 type 0x02
+> > > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > > >     Configuration.#2: len 0x05 type 0x03
+> > > >     Configuration.Location: 0x00000001
+> > > >     Configuration.Location: Front Left (0x00000001)
+> > > >     Configuration.#3: len 0x03 type 0x04
+> > > >     Configuration.Frame Length: 30 (0x001e)
+> > > >     Configuration.#4: len 0x02 type 0x05
+> > > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > > >     State: idle
+> > > >     Volume: 0x00c8 (200)
+> > > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
+> > > >     QoS.CIG: 0x00 (0)
+> > > >     QoS.CIS: 0x00 (0)
+> > > >     QoS.Framing: 0x00 (0)
+> > > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > > >     QoS.Interval: 0x00001d4c (7500)
+> > > >     QoS.Latency: 0x0008 (8)
+> > > >     QoS.SDU: 0x001e (30)
+> > > >     QoS.PHY: 0x02 (2)
+> > > >     QoS.Retransmissions: 0x02 (2)
+> > > >     Location: 0x00000003 (3)
+> > > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
+> > > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
+> > > >     UUID: Sink PAC                  (00002bc9-0000-1000-8000-00805f=
+9b34fb)
+> > > >     Codec: 0x06 (6)
+> > > >     Configuration.#0: len 0x02 type 0x01
+> > > >     Configuration.Sampling Frequency: 16 Khz (0x03)
+> > > >     Configuration.#1: len 0x02 type 0x02
+> > > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > > >     Configuration.#2: len 0x05 type 0x03
+> > > >     Configuration.Location: 0x00000002
+> > > >     Configuration.Location: Front Right (0x00000002)
+> > > >     Configuration.#3: len 0x03 type 0x04
+> > > >     Configuration.Frame Length: 30 (0x001e)
+> > > >     Configuration.#4: len 0x02 type 0x05
+> > > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > > >     State: idle
+> > > >     Volume: 0x00c8 (200)
+> > > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0
+> > > >     QoS.CIG: 0x00 (0)
+> > > >     QoS.CIS: 0x01 (1)
+> > > >     QoS.Framing: 0x00 (0)
+> > > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > > >     QoS.Interval: 0x00001d4c (7500)
+> > > >     QoS.Latency: 0x0008 (8)
+> > > >     QoS.SDU: 0x001e (30)
+> > > >     QoS.PHY: 0x02 (2)
+> > > >     QoS.Retransmissions: 0x02 (2)
+> > > >     Location: 0x00000003 (3)
+> > > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
+> > > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd3
+> > > >     UUID: Source PAC                (00002bcb-0000-1000-8000-00805f=
+9b34fb)
+> > > >     Codec: 0x06 (6)
+> > > >     Configuration.#0: len 0x02 type 0x01
+> > > >     Configuration.Sampling Frequency: 48 Khz (0x08)
+> > > >     Configuration.#1: len 0x02 type 0x02
+> > > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > > >     Configuration.#2: len 0x05 type 0x03
+> > > >     Configuration.Location: 0x00000001
+> > > >     Configuration.Location: Front Left (0x00000001)
+> > > >     Configuration.#3: len 0x03 type 0x04
+> > > >     Configuration.Frame Length: 90 (0x005a)
+> > > >     Configuration.#4: len 0x02 type 0x05
+> > > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > > >     State: idle
+> > > >     Volume: 0x00c8 (200)
+> > > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
+> > > >     QoS.CIG: 0x00 (0)
+> > > >     QoS.CIS: 0x00 (0)
+> > > >     QoS.Framing: 0x00 (0)
+> > > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > > >     QoS.Interval: 0x00001d4c (7500)
+> > > >     QoS.Latency: 0x000f (15)
+> > > >     QoS.SDU: 0x005a (90)
+> > > >     QoS.PHY: 0x02 (2)
+> > > >     QoS.Retransmissions: 0x05 (5)
+> > > >     Location: 0x00000003 (3)
+> > > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd1
+> > > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0/fd4
+> > > >     UUID: Source PAC                (00002bcb-0000-1000-8000-00805f=
+9b34fb)
+> > > >     Codec: 0x06 (6)
+> > > >     Configuration.#0: len 0x02 type 0x01
+> > > >     Configuration.Sampling Frequency: 48 Khz (0x08)
+> > > >     Configuration.#1: len 0x02 type 0x02
+> > > >     Configuration.Frame Duration: 7.5 ms (0x00)
+> > > >     Configuration.#2: len 0x05 type 0x03
+> > > >     Configuration.Location: 0x00000002
+> > > >     Configuration.Location: Front Right (0x00000002)
+> > > >     Configuration.#3: len 0x03 type 0x04
+> > > >     Configuration.Frame Length: 90 (0x005a)
+> > > >     Configuration.#4: len 0x02 type 0x05
+> > > >     Configuration.Frame Blocks per SDU: 1 (0x01)
+> > > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > > >     State: idle
+> > > >     Volume: 0x00c8 (200)
+> > > >     Endpoint: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_sink0
+> > > >     QoS.CIG: 0x00 (0)
+> > > >     QoS.CIS: 0x01 (1)
+> > > >     QoS.Framing: 0x00 (0)
+> > > >     QoS.PresentationDelay: 0x00009c40 (40000)
+> > > >     QoS.Interval: 0x00001d4c (7500)
+> > > >     QoS.Latency: 0x000f (15)
+> > > >     QoS.SDU: 0x005a (90)
+> > > >     QoS.PHY: 0x02 (2)
+> > > >     QoS.Retransmissions: 0x05 (5)
+> > > >     Location: 0x00000003 (3)
+> > > >     Links: /org/bluez/hci0/dev_70_5A_6F_63_B6_41/pac_source0/fd2
+> > > > Transport /org/bluez/hci0/dev_70_5A_6F_63_B6_41/fd5
+> > > >     UUID: Audio Source              (0000110a-0000-1000-8000-00805f=
+9b34fb)
+> > > >     Codec: 0x02 (2)
+> > > >     Media Codec: MPEG24
+> > > >     Object Types: MPEG-4 AAC LC
+> > > >     Frequencies: 48kHz
+> > > >     Channels: 2
+> > > >     Bitrate: 320000
+> > > >     VBR: Yes
+> > > >     Device: /org/bluez/hci0/dev_70_5A_6F_63_B6_41
+> > > >     State: idle
+> > > >     Delay: 0x0960 (2400)
+> > > >     Volume: 0x0064 (100)
+> > >=20
+> > > Forgot to mention, but with the above transports it seems to confuse
+> > > the gnome audio output selection, it doesn't seem to be able to mix
+> > > A2DP and BAP transports for some reason, so when I select the device
+> > > it enables BAP but A2DP is not shown as an option.
+> >=20
+> > I'll have to see if I can reproduce that on current PW master branch.
+> >=20
+> > The visibility of profiles in theory should only cares about whether
+> > the UUIDs appear in both device properties and transport.
+>=20
+> I think I will merge these changes since the property is marked as
+> experimental; we can always change it or revert later.
 
-Dear submitter,
+Since the default value retains previous behavior, I think that's a
+good idea as it makes it easier to iterate on this.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=941078
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.21 seconds
-GitLint                       PENDING   0.21 seconds
-BuildEll                      PASS      20.77 seconds
-BluezMake                     PASS      1518.85 seconds
-MakeCheck                     PASS      13.48 seconds
-MakeDistcheck                 PASS      157.01 seconds
-CheckValgrind                 PASS      212.28 seconds
-CheckSmatch                   WARNING   281.44 seconds
-bluezmakeextell               PASS      97.61 seconds
-IncrementalBuild              PENDING   0.29 seconds
-ScanBuild                     PASS      852.14 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:450:29: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2117700574983948945==--
+--=20
+Pauli Virtanen
