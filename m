@@ -1,61 +1,61 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA0F18FC92
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Mar 2025 18:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F023226D1D
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Mar 2025 18:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741370529; cv=pass; b=UYOwTuWHVXEnsleVyf0KAMk92G/wk0NGZHVtQsAyAUZyWjdkcLpgmjw/1N5WEDrjBFxUSQMz6zMTpd/5eCVMoIEUG2shjvf/fGip4zBi8a3w18Y9QHI6avOh1n8tksD8O2PAR/MQNxNC53bExzzBN2pMvsStcAO8dO+nyMu7LFs=
+	t=1741370529; cv=pass; b=LnLTQ30LlnnC/BDftBYUNLnlPFNU6TqviR9U8H7sernTHgc6tkREFrYwQ39WzAw5mzKRe+dKi7VmPTGJmvRrYrtLzutrnCMjJJDDj/PzRkhCOvgmWFBzcGGa5E+IZdCL+ypgYsCdL+iMIdptfiMwFbUSR7NXVBPYw7UI59z2GVs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741370529; c=relaxed/simple;
-	bh=yumEmpbN2MEy4HR0ELu7efNuKnshv9gIxDx9RV7Q2+Y=;
+	bh=ingKNGgrafJeyB8CphgJLmFQPmYlJEKviX6Rpk3AjQ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bOY6pUBPxT3xrH6OJ6exb5Exa8NOhU2COifSQySR4qWG4MgFX21zUNOcikpOl2gPNCZKE9sfGb85v5gfmg+XAcN17CmQGpKzLZr9bu/My62T9uocHRzvNDMURLHyc03G3sg69rNH6TaOyx/W4HhR22jtAcuWplQe9DQ0W2VBWW4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=B5uw3yT3; arc=pass smtp.client-ip=195.140.195.201
+	 MIME-Version; b=fTjh74/T8q1796+iCT8eBVZLUe50kkQCqbi5NvWeLVzhEHSfsoHO5biAeLH+3YbQdy+9rBxKG0vn041OaaaRw+lgH3ipzmeJZsFNttcPr3p99XgpJ3xRe2wT3opfjhXzL8k4+fD/q/IIf/my8GaRz/EasYsH2qYS3kXUFrS0zQk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=BfWuH0Z+; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="B5uw3yT3"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="BfWuH0Z+"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4Z8YyX4D1BzylZ;
-	Fri,  7 Mar 2025 20:01:56 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Z8Yyb1qDgz103W;
+	Fri,  7 Mar 2025 20:01:59 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1741370517;
+	t=1741370520;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GpfrvS38rqzSKds6++urKSjloPOYY0pqHouYeBAfW4M=;
-	b=B5uw3yT3L6Vn2zd34DdBDZfSzgKLAflbMb+/keUw2KFMwR8pJaH1PSz87F43f3apDBMR4e
-	uc8Hb2t0haO3T2fwwaKXmk+gDH/2G5EdbGrtoRHJvK3++15gXZhZUQaUa3De0xp47euJN9
-	xoaODADOfGRNJ04cHKoWlmKOajf/gyE=
+	bh=ADY6fRBrm6ktynVpo1nOXmj14nqagKe6lrW6MOuduw0=;
+	b=BfWuH0Z+Iy6Ly22eAht/eDjCUOPouMpbOK+ZVBKqDh6q+o9T4lwpKG/Feeiq5GdWPHDs7J
+	6L6HN9J+2vZFzoMsLGkrzkIRzLQ0ddJPD7BOkFWXnnwEGVXdfgnboN9E/MD01g15FsnAn1
+	PoGJfujfGsPedHuXw4Rfs7FC6+6eEqs=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1741370517;
+	s=meesny; t=1741370520;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GpfrvS38rqzSKds6++urKSjloPOYY0pqHouYeBAfW4M=;
-	b=XFmjO48HQvkMZiJXuicWCMIW1wu4ttjLu4JusftXpHgJiEvxodVVobiYvFBV/awfPB/wSo
-	fsap5VyvzyXwf5UU0CYY6MYpsp0Bx0bYifoJN3fvA1hrh4lS2Gh8Apj6GjAAG3xiGkET1C
-	eB/MEjOy6WZ9mQZegHFksAVDiwEnRkA=
+	bh=ADY6fRBrm6ktynVpo1nOXmj14nqagKe6lrW6MOuduw0=;
+	b=QZINk8oIo+mbm9Ku6UNSyFrxeRbNCohFn+BCELffHSKYzrYOYxjxKTuL8k8sydWmMDug3S
+	eTKZLQcYhoo2ZX4tBis0efqXJOKYKGIeOa+DwitoZqEb2olf6bI6R1QKz7XfpGSGl3x9by
+	6wS3BtWVPCErWVsfczGghncgXSIn660=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1741370517; a=rsa-sha256; cv=none;
-	b=vy40ih0lmI0wk3ODg9eRQCKK5mt8Pe2QkJT27VFSCfyWaH7R4SZ8vk5AWt8OAFCFitw8WP
-	Eo1V7MCHyKhA4AgoTc2gEkq9PBWyd9/cNQR81v7hqAtXmQlVloVMXi3tGMZq1geEfIB2qY
-	XExmnh4o2H1UD88bYF78R718RHP23XE=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1741370520; a=rsa-sha256; cv=none;
+	b=mQk8SCVVj5EFs5pEesCanmWrlHm2ARgXoVD7i/3IMRbcRpCameNb+3x7IwuwWqYNFJIBYQ
+	F5itMshFAout7QRXNnvzZ9N0zOd5h3uHu4ECt7Fb/IJRBPMMVOpOPqYrLzJPjQee1/QfPE
+	Y/Zo5VEBldZmUYu7+H4ifSxLKUEUnsc=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 3/6] bthost: add hooks receiving SCO connections and data
-Date: Fri,  7 Mar 2025 20:00:56 +0200
-Message-ID: <a03dcf5ccf4dbc7950a8615408f26ca008728be2.1741370367.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 5/6] btdev: support disabling commands
+Date: Fri,  7 Mar 2025 20:00:58 +0200
+Message-ID: <ce4f50612ac11f8de42ce8093adb1e03e1fb4fe4.1741370367.git.pav@iki.fi>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <747adb1a5f2a6b7b25e823bf22f8795f4c7c6322.1741370367.git.pav@iki.fi>
 References: <747adb1a5f2a6b7b25e823bf22f8795f4c7c6322.1741370367.git.pav@iki.fi>
@@ -67,283 +67,81 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add hooks for new SCO connections and receiving SCO data. SCO
-connection accept/reject flow remains unimplemented.
+Add function to return command mask, so that it is possible to disable
+some in tests if needed.
 ---
- emulator/bthost.c | 130 +++++++++++++++++++++++++++++++++++++++++++++-
- emulator/bthost.h |  10 ++++
- monitor/bt.h      |   1 +
- 3 files changed, 139 insertions(+), 2 deletions(-)
+ emulator/btdev.c  |  5 +++++
+ emulator/btdev.h  |  2 ++
+ emulator/hciemu.c | 14 ++++++++++++++
+ emulator/hciemu.h |  1 +
+ 4 files changed, 22 insertions(+)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index a76b02ecc..5db750aae 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -39,6 +39,8 @@
- #define acl_handle(h)		(h & 0x0fff)
- #define acl_flags(h)		(h >> 12)
- 
-+#define sco_flags_status(f)	(f & 0x03)
-+
- #define iso_flags_pb(f)		(f & 0x0003)
- #define iso_flags_ts(f)		((f >> 2) & 0x0001)
- #define iso_flags_pack(pb, ts)	(((pb) & 0x03) | (((ts) & 0x01) << 2))
-@@ -138,8 +140,14 @@ struct rfcomm_chan_hook {
- 	struct rfcomm_chan_hook *next;
- };
- 
-+struct sco_hook {
-+	bthost_sco_hook_func_t func;
-+	void *user_data;
-+	bthost_destroy_func_t destroy;
-+};
-+
- struct iso_hook {
--	bthost_cid_hook_func_t func;
-+	bthost_iso_hook_func_t func;
- 	void *user_data;
- 	bthost_destroy_func_t destroy;
- };
-@@ -155,6 +163,7 @@ struct btconn {
- 	struct rcconn *rcconns;
- 	struct cid_hook *cid_hooks;
- 	struct rfcomm_chan_hook *rfcomm_chan_hooks;
-+	struct sco_hook *sco_hook;
- 	struct iso_hook *iso_hook;
- 	struct btconn *next;
- 	void *smp_data;
-@@ -241,6 +250,8 @@ struct bthost {
- 	void *cmd_complete_data;
- 	bthost_new_conn_cb new_conn_cb;
- 	void *new_conn_data;
-+	bthost_new_conn_cb new_sco_cb;
-+	void *new_sco_data;
- 	bthost_accept_conn_cb accept_iso_cb;
- 	bthost_new_conn_cb new_iso_cb;
- 	void *new_iso_data;
-@@ -326,9 +337,13 @@ static void btconn_free(struct btconn *conn)
- 		free(hook);
- 	}
- 
-+	if (conn->sco_hook && conn->sco_hook->destroy)
-+		conn->sco_hook->destroy(conn->sco_hook->user_data);
-+
- 	if (conn->iso_hook && conn->iso_hook->destroy)
- 		conn->iso_hook->destroy(conn->iso_hook->user_data);
- 
-+	free(conn->sco_hook);
- 	free(conn->iso_hook);
- 	free(conn->recv_data);
- 	free(conn);
-@@ -722,6 +737,30 @@ void bthost_add_cid_hook(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 	conn->cid_hooks = hook;
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index bd8ea0d7f..976c1125d 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -7406,6 +7406,11 @@ uint8_t *btdev_get_features(struct btdev *btdev)
+ 	return btdev->features;
  }
  
-+void bthost_add_sco_hook(struct bthost *bthost, uint16_t handle,
-+				bthost_sco_hook_func_t func, void *user_data,
-+				bthost_destroy_func_t destroy)
++uint8_t *btdev_get_commands(struct btdev *btdev)
 +{
-+	struct sco_hook *hook;
-+	struct btconn *conn;
-+
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn || conn->sco_hook)
-+		return;
-+
-+	hook = malloc(sizeof(*hook));
-+	if (!hook)
-+		return;
-+
-+	memset(hook, 0, sizeof(*hook));
-+
-+	hook->func = func;
-+	hook->user_data = user_data;
-+	hook->destroy = destroy;
-+
-+	conn->sco_hook = hook;
++	return btdev->commands;
 +}
 +
- void bthost_add_iso_hook(struct bthost *bthost, uint16_t handle,
- 				bthost_iso_hook_func_t func, void *user_data,
- 				bthost_destroy_func_t destroy)
-@@ -1184,6 +1223,29 @@ static void init_conn(struct bthost *bthost, uint16_t handle,
- 	}
- }
- 
-+static void init_sco(struct bthost *bthost, uint16_t handle,
-+				const uint8_t *bdaddr, uint8_t addr_type)
-+{
-+	struct btconn *conn;
-+
-+	bthost_debug(bthost, "SCO handle 0x%4.4x", handle);
-+
-+	conn = malloc(sizeof(*conn));
-+	if (!conn)
-+		return;
-+
-+	memset(conn, 0, sizeof(*conn));
-+	conn->handle = handle;
-+	memcpy(conn->bdaddr, bdaddr, 6);
-+	conn->addr_type = addr_type;
-+
-+	conn->next = bthost->conns;
-+	bthost->conns = conn;
-+
-+	if (bthost->new_sco_cb)
-+		bthost->new_sco_cb(handle, bthost->new_sco_data);
-+}
-+
- static void evt_conn_complete(struct bthost *bthost, const void *data,
- 								uint8_t len)
+ uint8_t btdev_get_scan_enable(struct btdev *btdev)
  {
-@@ -1195,7 +1257,13 @@ static void evt_conn_complete(struct bthost *bthost, const void *data,
- 	if (ev->status)
- 		return;
+ 	return btdev->scan_enable;
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index cad5f699f..a96c1a325 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -76,6 +76,8 @@ bool btdev_set_bdaddr(struct btdev *btdev, const uint8_t *bdaddr);
  
--	init_conn(bthost, le16_to_cpu(ev->handle), ev->bdaddr, BDADDR_BREDR);
-+	if (ev->link_type == 0x00) {
-+		init_sco(bthost, le16_to_cpu(ev->handle), ev->bdaddr,
-+								BDADDR_BREDR);
-+	} else if (ev->link_type == 0x01) {
-+		init_conn(bthost, le16_to_cpu(ev->handle), ev->bdaddr,
-+								BDADDR_BREDR);
-+	}
+ uint8_t *btdev_get_features(struct btdev *btdev);
+ 
++uint8_t *btdev_get_commands(struct btdev *btdev);
++
+ uint8_t btdev_get_scan_enable(struct btdev *btdev);
+ 
+ uint8_t btdev_get_le_scan_enable(struct btdev *btdev);
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index f13b4bda1..ccc57aada 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -528,6 +528,20 @@ uint8_t *hciemu_get_features(struct hciemu *hciemu)
+ 	return btdev_get_features(dev);
  }
  
- static void evt_disconn_complete(struct bthost *bthost, const void *data,
-@@ -1397,6 +1465,20 @@ static void evt_simple_pairing_complete(struct bthost *bthost, const void *data,
- 		return;
- }
- 
-+static void evt_sync_conn_complete(struct bthost *bthost, const void *data,
-+								uint8_t len)
++uint8_t *hciemu_get_commands(struct hciemu *hciemu)
 +{
-+	const struct bt_hci_evt_sync_conn_complete *ev = data;
++	struct btdev *dev;
 +
-+	if (len < sizeof(*ev))
-+		return;
++	if (!hciemu || !hciemu->vhci)
++		return NULL;
 +
-+	if (ev->status)
-+		return;
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
++		return NULL;
 +
-+	init_sco(bthost, le16_to_cpu(ev->handle), ev->bdaddr, BDADDR_BREDR);
++	return btdev_get_commands(dev);
 +}
 +
- static void evt_le_conn_complete(struct bthost *bthost, const void *data,
- 								uint8_t len)
+ const uint8_t *hciemu_get_central_bdaddr(struct hciemu *hciemu)
  {
-@@ -1705,6 +1787,10 @@ static void process_evt(struct bthost *bthost, const void *data, uint16_t len)
- 		evt_disconn_complete(bthost, param, hdr->plen);
- 		break;
+ 	struct btdev *dev;
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index dba920fdd..9fbe34316 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -55,6 +55,7 @@ void hciemu_flush_client_events(struct hciemu *hciemu);
  
-+	case BT_HCI_EVT_SYNC_CONN_COMPLETE:
-+		evt_sync_conn_complete(bthost, param, hdr->plen);
-+		break;
-+
- 	case BT_HCI_EVT_NUM_COMPLETED_PACKETS:
- 		evt_num_completed_packets(bthost, param, hdr->plen);
- 		break;
-@@ -2947,6 +3033,36 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
- 	}
- }
+ const char *hciemu_get_address(struct hciemu *hciemu);
+ uint8_t *hciemu_get_features(struct hciemu *hciemu);
++uint8_t *hciemu_get_commands(struct hciemu *hciemu);
  
-+static void process_sco(struct bthost *bthost, const void *data, uint16_t len)
-+{
-+	const struct bt_hci_sco_hdr *sco_hdr = data;
-+	uint16_t handle, sco_len;
-+	uint8_t status;
-+	struct btconn *conn;
-+	struct sco_hook *hook;
-+
-+	sco_len = le16_to_cpu(sco_hdr->dlen);
-+	if (len != sizeof(*sco_hdr) + sco_len)
-+		return;
-+
-+	handle = acl_handle(sco_hdr->handle);
-+	status = sco_flags_status(acl_flags(sco_hdr->handle));
-+
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn) {
-+		bthost_debug(bthost, "Unknown handle: 0x%4.4x", handle);
-+		return;
-+	}
-+
-+	bthost_debug(bthost, "SCO data: %u bytes", sco_len);
-+
-+	hook = conn->sco_hook;
-+	if (!hook)
-+		return;
-+
-+	hook->func(sco_hdr->data, sco_len, status, hook->user_data);
-+}
-+
- static void process_iso_data(struct bthost *bthost, struct btconn *conn,
- 					const void *data, uint16_t len)
- {
-@@ -3062,6 +3178,9 @@ void bthost_receive_h4(struct bthost *bthost, const void *data, uint16_t len)
- 	case BT_H4_ACL_PKT:
- 		process_acl(bthost, data + 1, len - 1);
- 		break;
-+	case BT_H4_SCO_PKT:
-+		process_sco(bthost, data + 1, len - 1);
-+		break;
- 	case BT_H4_ISO_PKT:
- 		process_iso(bthost, data + 1, len - 1);
- 		break;
-@@ -3085,6 +3204,13 @@ void bthost_set_connect_cb(struct bthost *bthost, bthost_new_conn_cb cb,
- 	bthost->new_conn_data = user_data;
- }
- 
-+void bthost_set_sco_cb(struct bthost *bthost, bthost_new_conn_cb cb,
-+							void *user_data)
-+{
-+	bthost->new_sco_cb = cb;
-+	bthost->new_sco_data = user_data;
-+}
-+
- void bthost_set_iso_cb(struct bthost *bthost, bthost_accept_conn_cb accept,
- 				bthost_new_conn_cb cb, void *user_data)
- {
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 2c5b0d516..405d66bf0 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -51,6 +51,9 @@ typedef void (*bthost_new_conn_cb) (uint16_t handle, void *user_data);
- void bthost_set_connect_cb(struct bthost *bthost, bthost_new_conn_cb cb,
- 							void *user_data);
- 
-+void bthost_set_sco_cb(struct bthost *bthost, bthost_new_conn_cb cb,
-+							void *user_data);
-+
- void bthost_set_iso_cb(struct bthost *bthost, bthost_accept_conn_cb accept,
- 				bthost_new_conn_cb cb, void *user_data);
- 
-@@ -69,6 +72,13 @@ typedef void (*bthost_cid_hook_func_t)(const void *data, uint16_t len,
- void bthost_add_cid_hook(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 				bthost_cid_hook_func_t func, void *user_data);
- 
-+typedef void (*bthost_sco_hook_func_t)(const void *data, uint16_t len,
-+					uint8_t status, void *user_data);
-+
-+void bthost_add_sco_hook(struct bthost *bthost, uint16_t handle,
-+				bthost_sco_hook_func_t func, void *user_data,
-+				bthost_destroy_func_t destroy);
-+
- typedef void (*bthost_iso_hook_func_t)(const void *data, uint16_t len,
- 							void *user_data);
- 
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 6fb81abfe..e708e580f 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -523,6 +523,7 @@ struct bt_hci_acl_hdr {
- struct bt_hci_sco_hdr {
- 	uint16_t handle;
- 	uint8_t  dlen;
-+	uint8_t  data[];
- } __attribute__ ((packed));
- 
- struct bt_hci_iso_hdr {
+ const uint8_t *hciemu_get_central_bdaddr(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
 -- 
 2.48.1
 
