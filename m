@@ -1,59 +1,64 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DE81607A4
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Mar 2025 18:02:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7DA217670
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Mar 2025 18:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741370527; cv=pass; b=uc7+ia4hnsyVTLIbcy44hBxtwlFuKrhV9zIP3ZVLNcaVsleNwKpHYikMjCM3fHUfBytGc56VGOKpCtmTp852yqOdJqiz5d/tVOP1bo+9Pz7dvt7AwmpajyJ1ULBpvRx4EXMOqhDHlsczRXV5yUuAzxpa6m3ywCl0n4CC91jEjI4=
+	t=1741370528; cv=pass; b=pQo98qbQU7SzBcIQ26A/6XAqgIwwasGTHtYxysq9WbRsmxNtddg50rhwHnXDoDnEftAg7rEnHU506XVsa1oRj9IAlIOUpfXB8DnUt/0b+SFc7GZGQGpDQE1I/Mmy3HKNUTn51h6KvEYYCsA0r7OC1uLcQUAMGJ/FpuKCHUirPuA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741370527; c=relaxed/simple;
-	bh=P4m1MKQuQvSe+2Vs/2C4cApBw6TtxxPt4pwfvA8KHHM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zd31UhPrTTTK+cVHINyDIiWK9SBrLb+kYCvsNnvTnYtDaGRX50nLchuomZ+SNWsDXOAs7pe8UhU6Q5Y/cRW+mKzhXqDF6LQOuolJ4Mo9GRYYBaMTna00JoYpUIokWnbAM26Vau9EF/WUkqmCyw/1p0L93LoHzipksPmMFO4z8FY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=VTYCLhOo; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1741370528; c=relaxed/simple;
+	bh=c+9YHb+Y5QPv7Vrdwrl5MMvdX+TbvrCwyQcrVyClB2s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fogt84bvW2mk59ZPcQgF1lCMPyUReyqG1HFE7AcR8/RoiqTuigHMdCLFj99ltDIcGZ2J7mV6wE03ghBL6ZlK8fVerFsfzN4uNuQgbJVC98MHJu9DITlLrwJ+LwjR/+xIY6jkOpt/J7wY/8BpxcXSGU2hU92biIKmkL7NOuzANwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=sb58LVFf; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="VTYCLhOo"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="sb58LVFf"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4Z8YyT1w9xzyRf;
-	Fri,  7 Mar 2025 20:01:53 +0200 (EET)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Z8YyZ0YY7zyyf;
+	Fri,  7 Mar 2025 20:01:57 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1741370514;
+	t=1741370518;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RSpVstkCNR6LOSw/Xo8iV2GsAxCL5LN5m23JRTo8o1E=;
-	b=VTYCLhOoIqr4CeAAPHWJ5UUSV/Abf/orxAONNZN2YpwaPv2y8V3l53iW+mlTqTKBSsR8UY
-	nPzV3mGEtzgcEJujWGRbWsrVg/KliMcB7+tHumj0yIIbrILviuM+0RkKMFApgFFxBZaGrH
-	EmTsRqwvSQgooL9kzUyLtgHKBXhDZZA=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nSr0gtHfZEF48CpGo6uRjVwXU5NXO8qweUla6SKHKpk=;
+	b=sb58LVFfWAVjzPpGu0QgHdW8uEolcqieZ+A/+wExaHTBrRy81ev764TIAlWHV9Yr8iIoYE
+	F6k0D8P3TAm03nHEqkkKK+xkMVDhl/puL/jeJXQWvDxm0icPI/KO/spw1j181U2LPR86HE
+	Tctd4BWYZdPQN0Ef/FaBK4dmDBkSb0k=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1741370514;
+	s=meesny; t=1741370518;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RSpVstkCNR6LOSw/Xo8iV2GsAxCL5LN5m23JRTo8o1E=;
-	b=wW/HNSTm/Yvadn+SWy7sBdraOHHQtZuF3mEItIvLoVV+LgTAMQN8jpAtWyVmdj1+OLcIJC
-	bjw6Tl91bxYV/3l0mXen2BfJdLJdOGCXgQGpZGbibOWsivUPA8GlPMekDmNidJQeMzfaTb
-	1je3VHaK6bPkLhpSedGIoLVdvMvgGvA=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nSr0gtHfZEF48CpGo6uRjVwXU5NXO8qweUla6SKHKpk=;
+	b=wAs5sYDPkeKXlcN5zmioQjuDo0AMZJCrZUDe8C+SBxkeIcLmxxoCRuxOwqz/sYq/6E2PBl
+	atmQgcl3A78c7YRYCkVw0ms0Dopvs7dYWoRoK1OEq8qHx9co+SQy4Om5oNocgS00vWuA88
+	au+p/F/b1Z5umaxvnm/NENPzdQJH5ZI=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1741370514; a=rsa-sha256; cv=none;
-	b=dVgpbem0C417e7KglFGtVv3mdfjESkaLDlG7P+c2MLk14pZiUcxgR1oPNAnrqMxAJY8vke
-	3zMmptnuv+J8u8mcVK40jIqeJ0h85/OWeE7Wm5FZfAI9hH4G0ZzWiVoBm99e8nR9GQ/0+r
-	BlXcJhhjeANg/Kn5nIgjcMnf6xStKh0=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1741370518; a=rsa-sha256; cv=none;
+	b=b3M9YayElGAIqGyomD4DZRCwFlRsDsHb0qTsFQ/yaKZJ3suO4k5IulpfHgWTulK1XP7688
+	uzXwCLuAHaB0rDFvHTc5dBYWdKesYltKXPop1xVF3r7cOMJzzw3xxXb/tQwbO2rZSt/V0y
+	zLz2cK+iXATDnzvrKy4E3Wvspur9qCg=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 1/6] btdev: Add support for Sync Flow Control
-Date: Fri,  7 Mar 2025 20:00:54 +0200
-Message-ID: <747adb1a5f2a6b7b25e823bf22f8795f4c7c6322.1741370367.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 4/6] sco-tester: check sent SCO data is received at bthost
+Date: Fri,  7 Mar 2025 20:00:57 +0200
+Message-ID: <82eb32fd199ab8d80dd4d5a02e3f6aa9926968bd.1741370367.git.pav@iki.fi>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <747adb1a5f2a6b7b25e823bf22f8795f4c7c6322.1741370367.git.pav@iki.fi>
+References: <747adb1a5f2a6b7b25e823bf22f8795f4c7c6322.1741370367.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,119 +67,94 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This adds support for Sync Flow Control by supporting command
-Write Sync Flow Control Enable:
-
-< HCI Command: Write Sync Fl.. (0x03|0x002f) plen 1
-        Flow control: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4
-        Write Sync Flow Control Enable (0x03|0x002f) ncmd 1
-        Status: Success (0x00)
-
-To act according to the spec this enabled SCO data packets to be
-properly processed and generate Number of Completed Packets event:
-
-sco-tester[40]: < SCO Data TX:.. flags 0x00 dlen 9
-> HCI Event: Number of Completed P.. (0x13) plen 5
-	Num handles: 1
-        Handle: 42 Address: 00:AA:01:01:00:00 (Intel Corporation)
+When sending data, also check that the data is received by bthost.
 ---
- emulator/btdev.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ tools/sco-tester.c | 47 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 45 insertions(+), 2 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 77d44ad84..713ec7acb 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -203,6 +203,7 @@ struct btdev {
- 	uint8_t  ssp_debug_mode;
- 	uint8_t  secure_conn_support;
- 	uint8_t  host_flow_control;
-+	uint8_t  sco_flowctl;
- 	uint8_t  le_supported;
- 	uint8_t  le_simultaneous;
- 	uint8_t  le_event_mask[8];
-@@ -2398,6 +2399,20 @@ static int cmd_read_tx_power_level(struct btdev *dev, const void *data,
- 	return 0;
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index 7f37ca5cf..9886481ff 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -318,10 +318,51 @@ static void client_connectable_complete(uint16_t opcode, uint8_t status,
+ 		tester_setup_complete();
  }
  
-+static int cmd_write_sync_flowctl(struct btdev *dev, const void *data,
-+				   uint8_t len)
++static void bthost_recv_data(const void *buf, uint16_t len, uint8_t status,
++								void *user_data)
 +{
-+	const struct bt_hci_cmd_write_sync_flow_control *cmd = data;
-+	uint8_t status = BT_HCI_ERR_SUCCESS;
++	struct test_data *data = user_data;
++	const struct sco_client_data *scodata = data->test_data;
 +
-+	dev->sco_flowctl = cmd->enable;
++	--data->step;
 +
-+	cmd_complete(dev, BT_HCI_CMD_WRITE_SYNC_FLOW_CONTROL, &status,
-+							sizeof(status));
++	tester_print("Client received %u bytes of data", len);
 +
-+	return 0;
++	if (scodata->send_data && (scodata->data_len != len ||
++			memcmp(scodata->send_data, buf, len)))
++		tester_test_failed();
++	else if (!data->step)
++		tester_test_passed();
 +}
 +
- static int cmd_read_num_iac(struct btdev *dev, const void *data, uint8_t len)
++static void bthost_sco_disconnected(void *user_data)
++{
++	struct test_data *data = user_data;
++
++	tester_print("SCO handle 0x%04x disconnected", data->handle);
++
++	data->handle = 0x0000;
++}
++
++static void sco_new_conn(uint16_t handle, void *user_data)
++{
++	struct test_data *data = user_data;
++	struct bthost *host;
++
++	tester_print("New client connection with handle 0x%04x", handle);
++
++	data->handle = handle;
++
++	host = hciemu_client_get_host(data->hciemu);
++	bthost_add_sco_hook(host, data->handle, bthost_recv_data, data,
++				bthost_sco_disconnected);
++}
++
+ static void setup_powered_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	struct bt_hci_rsp_read_num_supported_iac rsp;
-@@ -2676,6 +2691,7 @@ static int cmd_enable_dut_mode(struct btdev *dev, const void *data,
- 	CMD(BT_HCI_CMD_READ_VOICE_SETTING, cmd_read_voice, NULL), \
- 	CMD(BT_HCI_CMD_WRITE_VOICE_SETTING, cmd_write_voice, NULL), \
- 	CMD(BT_HCI_CMD_READ_TX_POWER, cmd_read_tx_power_level, NULL), \
-+	CMD(BT_HCI_CMD_WRITE_SYNC_FLOW_CONTROL, cmd_write_sync_flowctl, NULL), \
- 	CMD(BT_HCI_CMD_READ_NUM_SUPPORTED_IAC, cmd_read_num_iac, NULL), \
- 	CMD(BT_HCI_CMD_READ_CURRENT_IAC_LAP, cmd_read_current_iac_lap, \
- 					NULL), \
-@@ -2739,6 +2755,7 @@ static void set_common_commands_bredr20(struct btdev *btdev)
- 	btdev->commands[9]  |= 0x04;	/* Read Voice Setting */
- 	btdev->commands[9]  |= 0x08;	/* Write Voice Setting */
- 	btdev->commands[10] |= 0x04;	/* Read TX Power Level */
-+	btdev->commands[10] |= BIT(4);	/* Write Sync Flow Control */
- 	btdev->commands[11] |= 0x04;	/* Read Number of Supported IAC */
- 	btdev->commands[11] |= 0x08;	/* Read Current IAC LAP */
- 	btdev->commands[11] |= 0x10;	/* Write Current IAC LAP */
-@@ -7655,6 +7672,31 @@ static void send_acl(struct btdev *dev, const void *data, uint16_t len)
- 	send_packet(conn->link->dev, iov, 3);
+ 	struct test_data *data = tester_get_data();
++	const struct sco_client_data *scodata = data->test_data;
+ 	struct bthost *bthost;
+ 
+ 	if (status != MGMT_STATUS_SUCCESS) {
+@@ -334,6 +375,9 @@ static void setup_powered_callback(uint8_t status, uint16_t length,
+ 	bthost = hciemu_client_get_host(data->hciemu);
+ 	bthost_set_cmd_complete_cb(bthost, client_connectable_complete, data);
+ 	bthost_write_scan_enable(bthost, 0x03);
++
++	if (scodata && scodata->send_data)
++		bthost_set_sco_cb(bthost, sco_new_conn, data);
  }
  
-+static void send_sco(struct btdev *dev, const void *data, uint16_t len)
-+{
-+	struct bt_hci_acl_hdr *hdr;
-+	struct iovec iov[2];
-+	struct btdev_conn *conn;
-+	uint8_t pkt_type = BT_H4_SCO_PKT;
-+
-+	/* Packet type */
-+	iov[0].iov_base = &pkt_type;
-+	iov[0].iov_len = sizeof(pkt_type);
-+
-+	iov[1].iov_base = hdr = (void *) (data);
-+	iov[1].iov_len = len;
-+
-+	conn = queue_find(dev->conns, match_handle,
-+					UINT_TO_PTR(acl_handle(hdr->handle)));
-+	if (!conn)
-+		return;
-+
-+	if (dev->sco_flowctl)
-+		num_completed_packets(dev, conn->handle);
-+
-+	send_packet(conn->link->dev, iov, 2);
-+}
-+
- static void send_iso(struct btdev *dev, const void *data, uint16_t len)
- {
- 	struct bt_hci_acl_hdr *hdr;
-@@ -7702,6 +7744,9 @@ void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
- 	case BT_H4_ACL_PKT:
- 		send_acl(btdev, data + 1, len - 1);
- 		break;
-+	case BT_H4_SCO_PKT:
-+		send_sco(btdev, data + 1, len - 1);
-+		break;
- 	case BT_H4_ISO_PKT:
- 		send_iso(btdev, data + 1, len - 1);
- 		break;
+ static void setup_powered(const void *test_data)
+@@ -740,8 +784,6 @@ static gboolean sco_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		ssize_t ret = 0;
+ 		unsigned int count;
+ 
+-		data->step = 0;
+-
+ 		sco_tx_timestamping(data, io);
+ 
+ 		tester_print("Writing %u*%u bytes of data",
+@@ -751,6 +793,7 @@ static gboolean sco_connect_cb(GIOChannel *io, GIOCondition cond,
+ 			ret = write(sk, scodata->send_data, scodata->data_len);
+ 			if (scodata->data_len != ret)
+ 				break;
++			data->step++;
+ 		}
+ 		if (scodata->data_len != ret) {
+ 			tester_warn("Failed to write %u bytes: %zu %s (%d)",
 -- 
 2.48.1
 
