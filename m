@@ -1,42 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722717464;
-	Fri,  7 Mar 2025 00:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1450E1CD2C
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Mar 2025 01:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741307164; cv=none; b=JTloT51ZgunLJ3gcjes5jQKokj+smZ6nei/+OSPqqrDjiEt1Jh/6dNZrpeif85OSRq+0ZLUBEef1BqjYQqr6hgESNgJyPt+cy1/cURwqRhYTsgNslxOY4nsI/hvUoyvbOZyArLtBvR5TLqA9yAWTko/eqL5ivhxDnVtQlAPiSsQ=
+	t=1741310141; cv=none; b=FaKxCK+e2JCCEHkqirJnbC5Ox322BmSTcVPZe+0RL/6PYRfhvfCwaLK/rq+n/iGJY31oBZOd6vC1xChoFqAqVfNnyWpmJZQoMs4gyDSf3/cVn2o5a+5w7Q0GN0WCT45uJNWDt4y49du3y5IQD5Nqiy0IC3VqXNf74Hu+6GSVu9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741307164; c=relaxed/simple;
-	bh=eBsDNEUWdffyGJJ47jDOZ2DY6q3Bcjg6RjIoTLAUQiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SdYbFGujxya3i8JSOU60GvQZ3Kq1/Dgk4APd4bjfZApZjlrbMJkDcG/0bEhB3Vl484MTzGx/pfBslzqwdlkhR23UvpRLHxl8ToJLJ9SVVk0aRcPTzkOhMBalQcVuf061hld3CxhRvTG6ZScJ5wnsSMCz6/Bq3CJHxFQl/exMF74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ATGdgcI5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741310141; c=relaxed/simple;
+	bh=IDqfehStYsDReh/OmURi3sjsjrl6MnnNxdL6gw8M0/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mJtZGN0weZLpMqNYjasx0zySXYlzbhCFduNCHbB4bA+WAloa/7qD6nB3ZWKgkJRcUEgnjmEUf3fERhIms69JM0rAOl0X6pgbrpbibpzdH5pL0uhBs0Hev4WyPaHYqwxnkPyKz/tzeEva1LO5hKLFr4Boc8oU3fMfoBI7V12UmjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HOhatSWs; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ATGdgcI5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5D00C4CEE0;
-	Fri,  7 Mar 2025 00:26:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741307163;
-	bh=eBsDNEUWdffyGJJ47jDOZ2DY6q3Bcjg6RjIoTLAUQiU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ATGdgcI5svBZKvg/rCQ8JSOVcUyHHj1NwT0rFobnPoZS4kXvqEYVJ9Z6iTTmbhkyt
-	 rPXRa9gm4wZapxFKwookb0PiYZrtdcJAtJJXBHCpyPf+zwsy98dwQf85pY40Vpheco
-	 rtfwfDPKYLBhMI2qsZwlcB1sBI7lxcMVnraNZXZPnF+UdaRGbomYp8jtIrQaP7jJrS
-	 Wydk583jedDKc5uwXBvGEfMoNi63U+fuaYjWRi9v1kR6mERrrjzIxrb+S2sDphNoVb
-	 ERg6s7qavu+3OB43L1ryt1XCqQJ1F8a/YoVDN8hJKEW9YAsixBi2KR46co0WqAmkmg
-	 lzDG0ca42u/TA==
-Date: Fri, 7 Mar 2025 00:25:38 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: syzbot <syzbot+e9abaabc441d3dd18735@syzkaller.appspotmail.com>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-	marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in
- l2cap_connect_cfm
-Message-ID: <20250307002538.GA302609@google.com>
-References: <6761bbbd.050a0220.29fcd0.0075.GAE@google.com>
- <67ca3c79.050a0220.15b4b9.0072.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HOhatSWs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741310140; x=1772846140;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=IDqfehStYsDReh/OmURi3sjsjrl6MnnNxdL6gw8M0/g=;
+  b=HOhatSWslwGrzyptV4i8ve7qXU4awHBUprEkTgnbGTC2QjGG2aNs/9Fu
+   EsW4V+x1lsOfAX90X7FtuSyWh3oRw8Q70h7GOA+bnPrMlprI+IGmPJgqG
+   jBnkqyhj54m+sRxuqjTKrsSlCc2On3Se+dqouCy9K9boOFbRDzZAF+MUc
+   b3AIx5sxrA7gkQEQOAGaVX6ck+bhJIdsuho8+KfJxdA2Lt2jFbziSObFV
+   xsgmmbFyRwc0gDsgYTbfnRO7WPRJtgnNYjKBUSm8PAJXJRy7tfaaP+UKN
+   EPsMC7yWILVPICDsY3x4aT4+nYmUoPebOImVrKsr6abXc6P9uOvWlyRGt
+   g==;
+X-CSE-ConnectionGUID: NjwvXquPTJq9drS7I/EWrw==
+X-CSE-MsgGUID: F9ZRAyO1RLWStwzjtvZl6Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="41521130"
+X-IronPort-AV: E=Sophos;i="6.14,227,1736841600"; 
+   d="scan'208";a="41521130"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 17:15:39 -0800
+X-CSE-ConnectionGUID: ajNg/lLuSlewTQfMV/QH+A==
+X-CSE-MsgGUID: OolEWDI0QViGY/fYcEFpxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,227,1736841600"; 
+   d="scan'208";a="124115152"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 06 Mar 2025 17:15:37 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tqMJ3-000Nqq-0e;
+	Fri, 07 Mar 2025 01:15:23 +0000
+Date: Fri, 7 Mar 2025 09:11:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [bluetooth-next:master 40/43] drivers/bluetooth/btnxpuart.c:1683:8:
+ error: no member named 'cmd_timeout' in 'struct hci_dev'; did you mean
+ 'rpa_timeout'?
+Message-ID: <202503070951.EcxRrnHK-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -45,20 +64,108 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67ca3c79.050a0220.15b4b9.0072.GAE@google.com>
 
-On Thu, Mar 06, 2025 at 04:23:21PM -0800, syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
-> 
-> HEAD commit:    f66d6acccbc0 Merge tag 'x86_urgent_for_v6.12' of git://git..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1666b2e8580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=ca2f08f822652bd0
-> dashboard link: https://syzkaller.appspot.com/bug?extid=e9abaabc441d3dd18735
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   8968f507940cad09c8e2ecc4631f90d62709e17b
+commit: b21ae0e8b43797d7c9c3ae1d97a0257686e24005 [40/43] Bluetooth: btnxpuart: Add support for HCI coredump feature
+config: x86_64-buildonly-randconfig-001-20250307 (https://download.01.org/0day-ci/archive/20250307/202503070951.EcxRrnHK-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250307/202503070951.EcxRrnHK-lkp@intel.com/reproduce)
 
-Maybe this will stop the spam:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503070951.EcxRrnHK-lkp@intel.com/
 
-#syz invalid
+All errors (new ones prefixed by >>):
+
+>> drivers/bluetooth/btnxpuart.c:1683:8: error: no member named 'cmd_timeout' in 'struct hci_dev'; did you mean 'rpa_timeout'?
+    1683 |         hdev->cmd_timeout = nxp_cmd_timeout;
+         |               ^~~~~~~~~~~
+         |               rpa_timeout
+   include/net/bluetooth/hci_core.h:593:10: note: 'rpa_timeout' declared here
+     593 |         __u32                   rpa_timeout;
+         |                                 ^
+   1 error generated.
+
+
+vim +1683 drivers/bluetooth/btnxpuart.c
+
+  1629	
+  1630	static int nxp_serdev_probe(struct serdev_device *serdev)
+  1631	{
+  1632		struct hci_dev *hdev;
+  1633		struct btnxpuart_dev *nxpdev;
+  1634	
+  1635		nxpdev = devm_kzalloc(&serdev->dev, sizeof(*nxpdev), GFP_KERNEL);
+  1636		if (!nxpdev)
+  1637			return -ENOMEM;
+  1638	
+  1639		nxpdev->nxp_data = (struct btnxpuart_data *)device_get_match_data(&serdev->dev);
+  1640	
+  1641		nxpdev->serdev = serdev;
+  1642		serdev_device_set_drvdata(serdev, nxpdev);
+  1643	
+  1644		serdev_device_set_client_ops(serdev, &btnxpuart_client_ops);
+  1645	
+  1646		INIT_WORK(&nxpdev->tx_work, btnxpuart_tx_work);
+  1647		skb_queue_head_init(&nxpdev->txq);
+  1648	
+  1649		init_waitqueue_head(&nxpdev->fw_dnld_done_wait_q);
+  1650		init_waitqueue_head(&nxpdev->check_boot_sign_wait_q);
+  1651	
+  1652		device_property_read_u32(&nxpdev->serdev->dev, "fw-init-baudrate",
+  1653					 &nxpdev->fw_init_baudrate);
+  1654		if (!nxpdev->fw_init_baudrate)
+  1655			nxpdev->fw_init_baudrate = FW_INIT_BAUDRATE;
+  1656	
+  1657		set_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
+  1658	
+  1659		crc8_populate_msb(crc8_table, POLYNOMIAL8);
+  1660	
+  1661		/* Initialize and register HCI device */
+  1662		hdev = hci_alloc_dev();
+  1663		if (!hdev) {
+  1664			dev_err(&serdev->dev, "Can't allocate HCI device\n");
+  1665			return -ENOMEM;
+  1666		}
+  1667	
+  1668		nxpdev->hdev = hdev;
+  1669	
+  1670		hdev->bus = HCI_UART;
+  1671		hci_set_drvdata(hdev, nxpdev);
+  1672	
+  1673		hdev->manufacturer = MANUFACTURER_NXP;
+  1674		hdev->open  = btnxpuart_open;
+  1675		hdev->close = btnxpuart_close;
+  1676		hdev->flush = btnxpuart_flush;
+  1677		hdev->setup = nxp_setup;
+  1678		hdev->post_init = nxp_post_init;
+  1679		hdev->send  = nxp_enqueue;
+  1680		hdev->hw_error = nxp_hw_err;
+  1681		hdev->shutdown = nxp_shutdown;
+  1682		hdev->wakeup = nxp_wakeup;
+> 1683		hdev->cmd_timeout = nxp_cmd_timeout;
+  1684		SET_HCIDEV_DEV(hdev, &serdev->dev);
+  1685	
+  1686		if (hci_register_dev(hdev) < 0) {
+  1687			dev_err(&serdev->dev, "Can't register HCI device\n");
+  1688			goto probe_fail;
+  1689		}
+  1690	
+  1691		if (ps_setup(hdev))
+  1692			goto probe_fail;
+  1693	
+  1694		hci_devcd_register(hdev, nxp_coredump, nxp_coredump_hdr, NULL);
+  1695	
+  1696		return 0;
+  1697	
+  1698	probe_fail:
+  1699		hci_free_dev(hdev);
+  1700		return -ENODEV;
+  1701	}
+  1702	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
