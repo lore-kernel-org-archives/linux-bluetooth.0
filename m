@@ -1,34 +1,34 @@
 Received: from m.b4.vu (m.b4.vu [203.16.231.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB21DC99E;
-	Sat,  8 Mar 2025 19:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FA97482;
+	Sat,  8 Mar 2025 19:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.16.231.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741462366; cv=none; b=ioJ8M7v467QktOOdEXUqpA3TdR4c9j2bE0x55myf76uIIzPGsdauWWZSL/F+NJPYkNNdTBCwmEqpLosUYchKHUcEHmx5cczhn7kj+RDdRfbYGBC6KkW0oaNSzITm3JTaCLbZpeEiabkYwqOPvcL8clMF0EoWLq3UxEFl7YvOOH8=
+	t=1741462378; cv=none; b=UZmFAHIrRFKEY572OP3LzgdaEd7RgqL5jNdyJAwDgaUpAIvnMoYJ6E4xtzIX4Ys1tSiAQKcSJr4P/mzzkQS24PYW/GVt9kk0Z0XfMDFUAim4qD6VM4AYeqD8AEnPJGnH+T3SjrcBmJv+HtdTHvG1YcO4TjQzLmQjUwvi3ZQ+oMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741462366; c=relaxed/simple;
-	bh=3n4Gx0k4wvJdU3ldrwBd9uwvsIO6uc7ywXM/gJ1w3vw=;
+	s=arc-20240116; t=1741462378; c=relaxed/simple;
+	bh=emC6OB8lTXSoRRoCFOb3yZ+YVJ2JlAc3UP9xBHUtUzM=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GP3DYZ5LHpr5/wXyP1NjRuA0ANBzJq5sM8ZQhpZDeCXb5+V+Cy0jRyoxR8oJrhX4yC+f2lhOaavYNzycTxlba2wjqdcDoV1gjPa9V5Dn4BsLmyiuIEyeykdPPdIJgadWnD8KUoXAsBgj6bbEbYoE8ES1PRMh6+MdYnsKtVWzxFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=b4.vu; spf=pass smtp.mailfrom=b4.vu; dkim=pass (2048-bit key) header.d=b4.vu header.i=@b4.vu header.b=qn82shWK; arc=none smtp.client-ip=203.16.231.148
+	 Content-Disposition; b=GPCODppvXdWCPA+XcIn19jUlxyvio/fSWT6A0dKPMjX80AeMwEYE8AFu+Mu/YjRvsKq45eu/PywTyNvjOuFEp6z12XC4eXSpzEgWBLOw8w89V05TQvbvXvTiD006W3q0JwEiweAkFiTX3siMXSGkBlAXLY/dVVWH5jKf34vYJ4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=b4.vu; spf=pass smtp.mailfrom=b4.vu; dkim=pass (2048-bit key) header.d=b4.vu header.i=@b4.vu header.b=HzJIoshS; arc=none smtp.client-ip=203.16.231.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=b4.vu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=b4.vu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=b4.vu header.i=@b4.vu header.b="qn82shWK"
+	dkim=pass (2048-bit key) header.d=b4.vu header.i=@b4.vu header.b="HzJIoshS"
 Received: by m.b4.vu (Postfix, from userid 1000)
-	id 6B63F6668A63; Sun,  9 Mar 2025 06:02:39 +1030 (ACDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 m.b4.vu 6B63F6668A63
+	id 785706664BC7; Sun,  9 Mar 2025 06:02:53 +1030 (ACDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 m.b4.vu 785706664BC7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=b4.vu; s=m1;
-	t=1741462359; bh=UEh1amhXjYUH2yT7shpS4PzlgsIWQ03wZXpMr1EMP5Q=;
+	t=1741462373; bh=H12oj0fN2bK16oG3tQmIiRFnDs/bH/Uh3CCjkbFh5O8=;
 	h=Date:From:To:Cc:Subject:From;
-	b=qn82shWKQH8gjGklxTLiESWXGfBHKS0Bdt4HxIm7TwQ/UgiARe2a4vR99Eh4C2hIm
-	 gvdZEYmXXzkHUzJy/36SSlDgJriq54Sry4ccNzXHVpoowmD98MS8FOen5YZgGHamMI
-	 I9vpgVCiWaUuuTcmqtuxNoXtGWqT2gjys3IwqHXgk0foLFiTbokf1b7aAPlcf7Wqfr
-	 UhMx03leIez+cz0YY4Rb8MfGcQMY8nFOckFACqgmr1MsRPiNeMgJv67uyV94wtYbO9
-	 kVIiD2Cqle7xliqv06ru377H+r+ODLbSUrOtZeG/gByFH5sF0Z1LhpEIQylGQp6Wdz
-	 44M+jrxUWCE0A==
-Date: Sun, 9 Mar 2025 06:02:39 +1030
+	b=HzJIoshSflgRl33D6OLEJtEmTl/wjmp8sYNSr48UnJZP9aiikquxYeE+aHMSRMuNF
+	 FkiLWZevMXxg9iQ36FjcxGCRc8AJiRwjFVlUGcFUm8Mg0udxGYT8IIxZ7Jkv80Mr9G
+	 MMPe+yCQ+rIdnECQCmDD8HmzOmkKlcLL/eBP2dLHvCnDGdF2UXl7hTeGMwgexMkU3X
+	 yJfVkVAni1aAp/ne5j7GPv9YRreGqFQFbuz96hWXx22t5ptwspvSheneROEBqBnYqP
+	 PjFbv9njKhUwoZNC/wQ2paBnymD91t3Q2cEwKMrFAvlAkeLFgzzkRwI1f/95oQv4iK
+	 k86kaFmIjrdhw==
+Date: Sun, 9 Mar 2025 06:02:53 +1030
 From: "Geoffrey D. Bennett" <g@b4.vu>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -37,9 +37,9 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 Cc: linux-bluetooth@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>,
 	Chris Lu <chris.lu@mediatek.com>, linux-sound@vger.kernel.org,
 	Benedikt Ziemons <ben@rs485.network>
-Subject: [PATCH 1/2] Revert "Bluetooth: btusb: mediatek: reset the controller
- before downloading the fw"
-Message-ID: <Z8ybV04CVUfVAykH@m.b4.vu>
+Subject: [PATCH 2/2] Bluetooth: btmtk: Remove resetting mt7922 before
+ downloading the fw
+Message-ID: <Z8ybZZ38RvJqYC2+@m.b4.vu>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,11 +49,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-This reverts commit ccfc8948d7e4d93cab341a99774b24586717d89a.
-
-The MediaTek Bluetooth controller reset that was added is causing
-Focusrite USB audio devices to fail to initialise when connected
-during boot on kernels 6.11 and newer.
+The MediaTek Bluetooth controller reset that was added in commit
+ccfc8948d7e4 ("Bluetooth: btusb: mediatek: reset the controller before
+downloading the fw") is causing Focusrite USB audio devices to fail to
+initialise when connected during boot on kernels 6.11 and newer.
 
 The issue was reported by three users, with Scarlett 2nd Gen 6i6 and
 3rd Gen Solo and 4i4 audio interfaces. Two of the reporters confirmed
@@ -77,40 +76,29 @@ Tested-by: Benedikt Ziemons <ben@rs485.network>
 Cc: stable@vger.kernel.org
 Signed-off-by: Geoffrey D. Bennett <g@b4.vu>
 ---
- drivers/bluetooth/btmtk.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ drivers/bluetooth/btmtk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 68846c5bd4f7..4390fd571dbd 100644
+index 68846c5bd4f7..3b2d50fe3ec6 100644
 --- a/drivers/bluetooth/btmtk.c
 +++ b/drivers/bluetooth/btmtk.c
-@@ -1330,13 +1330,6 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+@@ -1328,7 +1328,6 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 	case 0x7668:
+ 		fwname = FIRMWARE_MT7668;
  		break;
- 	case 0x7922:
+-	case 0x7922:
  	case 0x7925:
--		/* Reset the device to ensure it's in the initial state before
--		 * downloading the firmware to ensure.
--		 */
--
--		if (!test_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags))
--			btmtk_usb_subsys_reset(hdev, dev_id);
--		fallthrough;
+ 		/* Reset the device to ensure it's in the initial state before
+ 		 * downloading the firmware to ensure.
+@@ -1337,6 +1336,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 		if (!test_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags))
+ 			btmtk_usb_subsys_reset(hdev, dev_id);
+ 		fallthrough;
++	case 0x7922:
  	case 0x7961:
  		btmtk_fw_get_filename(fw_bin_name, sizeof(fw_bin_name), dev_id,
  				      fw_version, fw_flavor);
-@@ -1345,12 +1338,9 @@ int btmtk_usb_setup(struct hci_dev *hdev)
- 						btmtk_usb_hci_wmt_sync);
- 		if (err < 0) {
- 			bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
--			clear_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags);
- 			return err;
- 		}
-
--		set_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags);
--
- 		/* It's Device EndPoint Reset Option Register */
- 		err = btmtk_usb_uhw_reg_write(hdev, MTK_EP_RST_OPT,
- 					      MTK_EP_RST_IN_OUT_OPT);
 --
 2.45.0
 
