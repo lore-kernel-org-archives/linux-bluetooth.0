@@ -1,169 +1,153 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CFE1E49F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Mar 2025 12:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05741C07D9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Mar 2025 12:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741608781; cv=none; b=Yxd+M+wjINsRbUk/f8NCRUxuKNOQwI0s5WWOX4MpoqJAeUfEgicJYrI4isdxde2dXN3YEqBmI5+8VAq4+VeQsR1Tkj9+F1U5gW/pvIRRG4DxtjxyiU2NHGd7F6PdKJBrzETGJwYMI3mQO3qqZiRldT3/Mb8NGB2nKSpSyM5t6m4=
+	t=1741610701; cv=none; b=KUsqa1HMMTYWSHE+HddN+HCYFh8H0ezl2NGDCnsSLEjrUsbCnYtF8J6sI9m/GHyxScobES3O+mlM+5ju6Ih4YaHycd89IM2as1bgbEr8saoHmOFO8ovGg4kCdiXcFpXmPn0xZvyb6YtP+ERPqD72fcXpYWeuN8EwumBBrNSVT2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741608781; c=relaxed/simple;
-	bh=6lPxCi5OSBTcJ4g57ih5BC/LzuD3r6cXSZqA+90vQrA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YFiE86N+vINdKVHjlfYK4BbaoN/NCV5UC4lT4yZfy0nV22eAbDHMdUeIdBrN6HA+L6VOulWlL/dIgp0A3VMfvQXRlz0ia6e8WJ2AAaboKqlQSLISS3AdWsfz+ZJ9b3Uq2RhzPWmZDL04wqppFRT86YJ0NoCK683kDDWZpAOJJZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HPQ3xoq9; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1741610701; c=relaxed/simple;
+	bh=uALFHkZBh6mr+U8Eax9mJ7F4FcKL9cfKB4hJ+UPDhPA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Zndy5Ibz+khR9whK6ZPTKTM5hHp1Whq3No9Jk1A6Lo0KR1ZxGvkd3uqKa6c+SX+FWIdggMQ5yIlmGWgJkprF2i26+qu2II+SR2YKLF8xnLRGklq6yTDk+WX8PFnnoQb3ayGUWzQwlsON3fg6HJ0J6oHUXRbsjL5i0sPj81QraTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lUzi/GFc; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HPQ3xoq9"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52A9bLxr017131
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Mar 2025 12:12:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=ZIkLxbPZaHrZZn59L1U/Bm
-	RT0y9gOrubdcZFuMynrOs=; b=HPQ3xoq95R/REImSvJheSmubiu+fskfBoXFr4s
-	qWklvEEvaitgwKo+ewCxdTsqQEMug7D/6vLbvc9VbpWqkg2wteiR3MmcdaykhZ+q
-	3ExsfYrfoaFwr++Zixel5gRB9GICGbY9B0ZS40rMKggAorXkWOz8RrVi/XTUcmaE
-	TYZlXFrW0LbTyajI66X1z63NyUfr0myR/ogD2qzSAGUs2Wdpbilsa+32n5AEKSA8
-	BcXCAR7hJopkxtwqteU3nHo1f5nXU2TuB7orh4MVl/UEhTRJh6AS/FpI7PoFFPOT
-	c7J1ipBBGz0C4vEc+AkYWviQdh7cNrzErcx+aHVoWEc0jS6w==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 458eypcq43-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Mar 2025 12:12:58 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52ACCwRJ010920
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Mar 2025 12:12:58 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 10 Mar 2025 05:12:56 -0700
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v1] obex: Add base implementation for get_mas_instance info and set notification filter
-Date: Mon, 10 Mar 2025 17:42:40 +0530
-Message-ID: <20250310121240.1731654-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lUzi/GFc"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6e41e17645dso38367096d6.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Mar 2025 05:44:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741610698; x=1742215498; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qYK/a0FirV+xmbZwA/nbNxlQ5T3peyARA6GG+dY4Rdo=;
+        b=lUzi/GFcHBcSs4KJDxvXCTXE3p1IGSgxFeo1X3u8F0WU2uTLPFupJUD30F+RG8rCMS
+         T8tjMyANvYnst0Q3BqXJLNnYjLCC6S2cDrHBkgenv1NR5cIf26UAmxxJ7W1SiG7sMTgI
+         YSv3xocD7fO1B1Sgkf+vLRn+Zhazjj9XMHkZ7abzSbM07hLMvAVAVjjZJ+68g1gVBaYA
+         kpFx4aMb1jkE5kulEUmvQBfZ+DZJr90nA4MTA+Xjy2+jJ6L73klBHQL9cCvsgGNrg2Es
+         daTjkwnd+8/WGbBJfMDYxfimc54UekCrV2kYU7RB84HwY6rdVY48eA/mbsrGreWwzzm4
+         c3sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741610698; x=1742215498;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qYK/a0FirV+xmbZwA/nbNxlQ5T3peyARA6GG+dY4Rdo=;
+        b=vVAPUkTVrmad8aD6r1PShTD16xpSxgfjBCD77Eq3MatsYxHn4bAtbMhpPZdAk21zb0
+         S1Ye/mREjMyBu6lLQKLc0qXdJb9moRLiH0TJCXk5aViX4F9bRsapBEOE1oKARSmS/ZHE
+         oMTjIBmwkfcnjIHGsRUWlO/VnVZ1HoLGZ3T/jdsxI98IGYVt/6NvOC6iBIRu4+sNy/x1
+         KhutdII9a6OMXvxxx/glCJhcOjpcGJyLJxM+sYxdAdpH4cLvyiTCPIifZyV01wd4g/oN
+         6Of3pODDOVS33cKzftmn77UBCTtTKzSGmuSe0c+vr5IcqgPgeQKNLA2G4BbfAKRBnyho
+         K3ag==
+X-Gm-Message-State: AOJu0Yz/A9k0fG9/MHiG4caRjwnmkJPozu/gqdCIE+h73gDNXFlws7yB
+	PUSlRb4jPiYkK1NLKUTyEQQYmQZ72G+VFDnno/9ljmhDjZ8zk8eVrmLU6qUj
+X-Gm-Gg: ASbGncv/VhkRdrpDVNh5kuAigFEDQBBuvI8SvwJKW2YLmzMg+JrmNtt0jOpvMPRHA02
+	WD/g7+RrXS8uZCmxEbaVCERn5f0KKFGo+EDuTZerAPjz5YRuE1b7gs1G7ubzUVunK/GkB9zofAp
+	i7zeZ0ICdGUJWNu+SBfpwk6pjiqB9nfJMbHir/YrBBYfrLUiGreaujP50gKwED1fV3x2NWnbhfo
+	EitknWsF5t/sx8ot3s6KL9/HnRNOiUzAYyHU8cb3FeryuOaWF0dMcFOGmRaU9JHU72DzAcCkbYm
+	Q83+wfikD00Q4wVPDFEykIw9ybgdKP+BhAVZwbZ/dqyIhZakEtwoatbCJMZv+Gjq
+X-Google-Smtp-Source: AGHT+IGWsz+lJ3rjweNXgdFqTSZ4tLwJbF5Hh1DLM9VYvH9TqjnCEZF90EJ6VqIsxOXHxp8veh2zmw==
+X-Received: by 2002:a05:6214:29ef:b0:6e6:6b99:cd1e with SMTP id 6a1803df08f44-6e900641555mr134988386d6.26.1741610698481;
+        Mon, 10 Mar 2025 05:44:58 -0700 (PDT)
+Received: from [172.17.0.2] ([172.206.111.192])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f707bf47sm57837496d6.25.2025.03.10.05.44.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 05:44:58 -0700 (PDT)
+Message-ID: <67cedeca.d40a0220.3c5a1.17c6@mx.google.com>
+Date: Mon, 10 Mar 2025 05:44:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6762836371271749790=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=A9yWP7WG c=1 sm=1 tr=0 ts=67ced74a cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=Vs1iUdzkB0EA:10 a=kIFDCYoabvEFXoaHkvkA:9
-X-Proofpoint-ORIG-GUID: Lu-LTWpDQIvJuSvf5r1v1r5n3cU-NY9i
-X-Proofpoint-GUID: Lu-LTWpDQIvJuSvf5r1v1r5n3cU-NY9i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-10_05,2025-03-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- adultscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
- priorityscore=1501 malwarescore=0 impostorscore=0 spamscore=0
- suspectscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503100097
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: [v3,1/3] Bluetooth: btnxpuart: Add correct bootloader error codes
+In-Reply-To: <20250310120231.263174-1-neeraj.sanjaykale@nxp.com>
+References: <20250310120231.263174-1-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This change is required for passing below testcases-
-1. MAP/MSE/MMI/BV-02-C
-   Verify that the MCE can return user-readable information about the
-   MAS-instance to the MCE
-2. MAP/MSE/MMN/BV-06-C
-   Verify that the MSE correctly responds to a request
-   to filter notifications.
+--===============6762836371271749790==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-We are adding the raw skeleton implementaton for PTS certification.
-Although the functionality can be added later as per requirement.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=942225
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.23 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 PASS      0.34 seconds
+BuildKernel                   PASS      24.91 seconds
+CheckAllWarning               PASS      27.03 seconds
+CheckSparse                   PASS      30.92 seconds
+BuildKernel32                 PASS      24.54 seconds
+TestRunnerSetup               PASS      436.19 seconds
+TestRunner_l2cap-tester       PASS      21.27 seconds
+TestRunner_iso-tester         PASS      35.38 seconds
+TestRunner_bnep-tester        PASS      4.84 seconds
+TestRunner_mgmt-tester        FAIL      124.48 seconds
+TestRunner_rfcomm-tester      PASS      8.04 seconds
+TestRunner_sco-tester         PASS      11.96 seconds
+TestRunner_ioctl-tester       PASS      8.54 seconds
+TestRunner_mesh-tester        FAIL      6.32 seconds
+TestRunner_smp-tester         PASS      7.30 seconds
+TestRunner_userchan-tester    PASS      5.08 seconds
+IncrementalBuild              PENDING   0.85 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.202 seconds
+LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.143 seconds
+LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.150 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in run_timer_softirq+0x76f/0x7d0
+WARNING: CPU: 0 PID: 65 at kernel/workqueue.c:2257 __queue_work+0x687/0xb40
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Failed       0.112 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
- obexd/plugins/mas.c | 52 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-index bf8d689ad..6076ad44c 100644
---- a/obexd/plugins/mas.c
-+++ b/obexd/plugins/mas.c
-@@ -782,6 +782,36 @@ static void *notification_registration_open(const char *name, int oflag,
- 	return mas;
- }
- 
-+static void *message_get_instance_open(const char *name, int oflag,
-+					mode_t mode, void *driver_data,
-+					size_t *size, int *err)
-+{
-+	struct mas_session *mas = driver_data;
-+
-+	DBG("");
-+
-+	mas->buffer = g_string_new("Mas Instance 0");
-+	mas->finished = TRUE;
-+	*err = 0;
-+
-+	return mas;
-+}
-+
-+static void *message_notification_filter_open(const char *name, int oflag,
-+					mode_t mode, void *driver_data,
-+					size_t *size, int *err)
-+{
-+	struct mas_session *mas = driver_data;
-+
-+	DBG("");
-+
-+	//TODO notifcation filter add
-+	mas->finished = TRUE;
-+	*err = 0;
-+
-+	return mas;
-+}
-+
- static const struct obex_service_driver mas = {
- 	.name = "Message Access server",
- 	.service = OBEX_MAS,
-@@ -866,6 +896,26 @@ static const struct obex_mime_type_driver mime_message_update = {
- 	.write = any_write,
- };
- 
-+static struct obex_mime_type_driver mime_message_instance = {
-+	.target = MAS_TARGET,
-+	.target_size = TARGET_SIZE,
-+	.mimetype = "x-bt/MASInstanceInformation",
-+	.open = message_get_instance_open,
-+	.close = any_close,
-+	.read = any_read,
-+	.write = any_write,
-+};
-+
-+static struct obex_mime_type_driver mime_message_notification_filter = {
-+	.target = MAS_TARGET,
-+	.target_size = TARGET_SIZE,
-+	.mimetype = "x-bt/MAP-notification-filter",
-+	.open = message_notification_filter_open,
-+	.close = any_close,
-+	.read = any_read,
-+	.write = any_write,
-+};
-+
- static const struct obex_mime_type_driver *map_drivers[] = {
- 	&mime_map,
- 	&mime_message,
-@@ -874,6 +924,8 @@ static const struct obex_mime_type_driver *map_drivers[] = {
- 	&mime_notification_registration,
- 	&mime_message_status,
- 	&mime_message_update,
-+	&mime_message_instance,
-+	&mime_message_notification_filter,
- 	NULL
- };
- 
--- 
-2.34.1
 
+--===============6762836371271749790==--
