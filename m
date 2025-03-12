@@ -1,33 +1,33 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340A92F43
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Mar 2025 06:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9414879B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Mar 2025 06:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741759594; cv=none; b=parEVwyLrhnUoIPtoTFXY5+KclEnZMa2GgcA1vJ9wKgWidcnBFOb6/HOV1w2wGIyb3JD5e7qCKIPpFIau8BvD7xSQcopeQd9C9qoBogOEnfunm1vJlu//0budOROaIn0H0Ue+cqm4ti3kvENcrt6H2cMZSJCuT+ScQzsjqJ++Ns=
+	t=1741759920; cv=none; b=kJ9ayfCmujBOIQkNCywG7wRTUGaJFL4yHL5CvVed97/0JS7Zgk6k5HqRMbr3XuU0OZ+oMf0u8gc/B249HalYumb74IH1lmoLavmjek9gPEd7g71h1KxiwLxph00OWhTO628DMT2e7pZyl1wZwI1ZnNYD+djNJ/U2sWzboopnL9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741759594; c=relaxed/simple;
+	s=arc-20240116; t=1741759920; c=relaxed/simple;
 	bh=3gUYVXUImx1evT7tSBl3zlk/8cB+RVqW6Vd0zD56Ewg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mj5gcUrPPO7p6YrSSI0yr/e/2bqoyx7gzKDUpuQWDUFFWo6G1gUPhR+gp0GrVb0eyKFNrsytvWhlf5sUyz5pVZWfGdxX+3+RvkYpUTsgjHT4LZA79tqddJuhANFfnlj0tw8SWBKugRCiwhZbkeFNpbgr22WML+FfQl1tXW6Oj2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=CRtsObbs; arc=none smtp.client-ip=220.197.31.3
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ubOzdJg0Xd/qD+NDzj7gVoDMfRSJ+z490i0rBl421rbgmleoVS2cToYZa62LkmQAKUY8xi0HIXLPTV0DZqH5TVjLJFAo6751mdoaOl3TWege3fewunBMc3XQOMhbZ03kgMi3qggVUVfVbCwJA0xopokX92//QPUyU4ez5ytfBU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Rda6wzJm; arc=none smtp.client-ip=220.197.31.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="CRtsObbs"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Rda6wzJm"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
 	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=24AMA
-	qZj9+CBjN+19Li4jBovtaXcNsGtNcCbAHy+xs8=; b=CRtsObbsqCsdc+auhl8DE
-	ZUbgbpcnwDZ9VKmozxEQLg59l2Se5u1oaCb4NBKzE/Pt3cr/8kLrpMBE5Z2u0QnD
-	FTUw3IBMhCjTqRseTNsey5VFwffCSu9b/bz24DKmSN5DL3HAai1BBlUzkLd0tRVd
-	uRLV6IgvE09YOMj3nxGbhI=
+	qZj9+CBjN+19Li4jBovtaXcNsGtNcCbAHy+xs8=; b=Rda6wzJmdf+h6hayJSWu7
+	cxoe1idCGTeaV0HLDo56oGmblSHRSB18sayZSfQZ8/b4f8hAodHUkJLom8OT9tba
+	WVeAiyaIqophbKW4awapXEooIXw08OOCeJiUOFgJOuzJXJKjYnylPjTw8bbxF4aw
+	PrYkof4YRsbEcd/DgsMiD0=
 Received: from A207080518.realsil.com.cn (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD3H81aJNFn1xzBRQ--.175S2;
-	Wed, 12 Mar 2025 14:06:20 +0800 (CST)
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgBHjvOgJdFnHArkKg--.9333S2;
+	Wed, 12 Mar 2025 14:11:45 +0800 (CST)
 From: michael_kong <kx960506@163.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: michael_kong <kx960506@163.com>
-Subject: [PATCH] share/hci: Fix data type in bt_hci_send_data
-Date: Wed, 12 Mar 2025 14:06:05 +0800
-Message-Id: <20250312060605.305-1-kx960506@163.com>
+Subject: [PATCH BlueZ] share/hci: Fix data type in bt_hci_send_data
+Date: Wed, 12 Mar 2025 14:11:28 +0800
+Message-Id: <20250312061128.1084-1-kx960506@163.com>
 X-Mailer: git-send-email 2.29.1.windows.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -36,10 +36,10 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3H81aJNFn1xzBRQ--.175S2
+X-CM-TRANSID:PSgvCgBHjvOgJdFnHArkKg--.9333S2
 X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjTRC1vsDUUUU
-X-CM-SenderInfo: dn0zliqvqwqiywtou0bp/1tbiuhgOumfRHizNRgAAsZ
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjTRCPfQDUUUU
+X-CM-SenderInfo: dn0zliqvqwqiywtou0bp/xtbBDxkOumfRH5fPDgAAsd
 
 The data type in bt_hci_send_data shall be ACL, SCO or ISO.
 ---
