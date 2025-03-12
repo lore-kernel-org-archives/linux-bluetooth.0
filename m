@@ -1,110 +1,69 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEF71D63D8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Mar 2025 16:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C7F1D5CCC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Mar 2025 16:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741797948; cv=none; b=OyiJRxXopE6jsfT5lSLBvAKeO0mvaUm6WN/CLLklzkXRMuGVof4KPzLpRhOI8SKN/WaNQ8U6hAgaqM/o8/up8JgnG9ckak3nyHRrxtbmAkmm7m2SqC9IKUGtvjQk0pS59nsWZ85ibITMe7cxf0C6K9O1Ojwa1uNk2mlpY4Z8U0U=
+	t=1741798198; cv=none; b=h6v1grrgzw7Q+7+RrhK7j+9B9xDEkSxlCMMkI2IAp5ERrwJk+BlpX7ymK1oZCRb15bUF4pHxb1u5pY0pTlxDlgG2BOmHnTMUW5LA6ZGyyDh5CBFMAzVXcD8X96teJUK22OvPY19sFL/aCikQIQN0f8aRQmAtANHnaTu9qINWUCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741797948; c=relaxed/simple;
-	bh=kwYLOg5K9trJSbG0q2Lfg+9nS4FPUQOTg0PN9G+wsd8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RdMzHVAAA5TUxQ7ixD1T8NoWNIJ5jNQ+65WiSfMueVJ/iELkmCiG9Bk/q/1foL1a+DzPzG+mg9u6udUOB/jlPgDt8HJjUAFunx2sBpDdSLqd1e8b5Zrh1AB8/xvbwNlQDeCITmfgnqjP1tAIoz71wH+68C6oUYbXwGr1r+XtnRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=MEHc++/j; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1741798198; c=relaxed/simple;
+	bh=Uq1/ZLOQP2cvBg8RBCHkrJ1VYboGGDmPsLVOMjE860k=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rsK8EI73rZopIoo++LtZlC+q5Bh6u9oyIObPJqwz0lKlLxKLtp5C1YNXmuFa4+jsCgsFSQtoWBoHOLyzEd5TPNgFRCdZ5JjBBz2DnEUmJ3hJEE1hFifxuZBKTO9dSNfUrwXvRXnKbDsVFu0qMJ5ck6Nreh5memuzuxCTOunmqh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSBsc9Yq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="MEHc++/j"
-Received: from github.com (hubbernetes-node-43b47b7.ash1-iad.github.net [10.56.150.43])
-	by smtp.github.com (Postfix) with ESMTPA id B8CCB92095F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Mar 2025 09:45:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1741797945;
-	bh=WbeduhRr47++DS/kdQX0k7idSZDuVAQqiitjEiS/gmM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=MEHc++/j7dGjPPEAe8XT0QMNni0MR8GoXuqyOFwqsIAa/BlGKsn73x8+qJbyFMp0K
-	 p2q2cmuwS+uZasvIxo5JkZMpn3HhC00aTxKnO6FyXIk+Jb05741wIBLHy+OD32HoDG
-	 7idg0rSfZpHWyzGtxU/VB/LBjv5jAmuG9k4Cogt8=
-Date: Wed, 12 Mar 2025 09:45:45 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/adcd73-d4749c@github.com>
-Subject: [bluez/bluez] e3b275: share/hci: Fix data type in bt_hci_send_data
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSBsc9Yq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AFDAC4CEDD;
+	Wed, 12 Mar 2025 16:49:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741798198;
+	bh=Uq1/ZLOQP2cvBg8RBCHkrJ1VYboGGDmPsLVOMjE860k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BSBsc9Yq1LbnL6OgG9+KDs3jYSfXw3Z6WGyv6HkH6X7napG1a6tfrIE9Vd3h8+IMN
+	 1LaHGkLmqZCC4rKKRZxV9gSaEXC/CE1kI7RuUFbPmeby8gmmxURBb7z9PN7gzl2gX9
+	 vMDjw7SwpKqRqRnq+kodY6zqL7rZpyQY2CyYMgHCEAlBU4s0fl6v4uMA3G+rrPLXeG
+	 eTJ8fA0NooQOH1aRz4Fo2/+E5eagWTAoHA4D2/8LF5lWPB70Yu1WikK39ZCwbaTsQc
+	 P7fwj+x4L5tIPRP2PkyXOpARrKtiU3K21AWhLuyeyZYZL8hzGwS85et9os5YDXnyR4
+	 6KSo+jicwurPA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD0B380DBDF;
+	Wed, 12 Mar 2025 16:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] Fix typo: s/registery/registry/
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174179823253.864475.18361388046278369281.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Mar 2025 16:50:32 +0000
+References: <20250310105218.4127627-1-kernel.org@pileofstuff.org>
+In-Reply-To: <20250310105218.4127627-1-kernel.org@pileofstuff.org>
+To: Andrew Sayers <kernel.org@pileofstuff.org>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: e3b2759634d4bd244c2090a96c76aef5a118c93d
-      https://github.com/bluez/bluez/commit/e3b2759634d4bd244c2090a96c76aef5a118c93d
-  Author: michael_kong <kx960506@163.com>
-  Date:   2025-03-12 (Wed, 12 Mar 2025)
+Hello:
 
-  Changed paths:
-    M src/shared/hci.c
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  share/hci: Fix data type in bt_hci_send_data
+On Mon, 10 Mar 2025 10:52:18 +0000 you wrote:
+> ---
+>  obexd/plugins/phonebook-ebook.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-The data type in bt_hci_send_data shall be ACL, SCO or ISO.
+Here is the summary with links:
+  - [BlueZ] Fix typo: s/registery/registry/
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8fba2cd3b712
 
-
-  Commit: 8e835a685935b8e90fb45b96e6781d8332b00ef3
-      https://github.com/bluez/bluez/commit/8e835a685935b8e90fb45b96e6781d8332b00ef3
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-03-12 (Wed, 12 Mar 2025)
-
-  Changed paths:
-    M tools/mpris-proxy.service.in
-
-  Log Message:
-  -----------
-  mpris-proxy: Avoid spurious warnings when dbus.service stops
-
-The systemd services generates a warning when it loses
-ownership of its D-Bus name, which happens routinely
-when dbus.service exits (e.g. when the user logs out).
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 8fba2cd3b71267a9aad125f03ff39c0cfc2733bb
-      https://github.com/bluez/bluez/commit/8fba2cd3b71267a9aad125f03ff39c0cfc2733bb
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-03-12 (Wed, 12 Mar 2025)
-
-  Changed paths:
-    M obexd/plugins/phonebook-ebook.c
-
-  Log Message:
-  -----------
-  phonebook-ebook: Fix typo: s/registery/registry/
-
-
-  Commit: d4749cfd7fba432341f335147833c3204c533aa9
-      https://github.com/bluez/bluez/commit/d4749cfd7fba432341f335147833c3204c533aa9
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-03-12 (Wed, 12 Mar 2025)
-
-  Changed paths:
-    M HACKING
-
-  Log Message:
-  -----------
-  HACKING: Fix URL for submitting patches
-
-The previous URL is out of date, and now just says
-"This file has moved to process/submitting-patches.rst"
-
-
-Compare: https://github.com/bluez/bluez/compare/adcd73901831...d4749cfd7fba
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
