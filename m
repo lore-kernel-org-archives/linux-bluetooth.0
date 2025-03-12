@@ -1,141 +1,101 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91365225764
-	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Mar 2025 23:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97FE32C181;
+	Wed, 12 Mar 2025 01:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741737242; cv=none; b=b7qUlJN6LUUgg7BZbKjZKb+X/qWl8og8MSXcmhJQ+gx1rGh/E2pq8H/8OBXPtil1YyifSP4iNKXKSPxuN5nnYqk799Sr82xG6+mkd8te9o8avUA7wm7mMUmeUZvURkHK04OQq36raTYqTqQmD8T7X8R11rv2ISuscd29uUPDsFA=
+	t=1741742729; cv=none; b=DioyCbnUtaxT8AFyGe0fQlkcdObOXgUmSmIUbggUayHdxMqpZCujmSPtPV0Tov7nNYtoqm+/GgjBBd72mH7pZ+P9vh9Lfceku4iyqFb3QV5pPHIAa482+unDhybyLjWKmzOeMn37YOKSnwK5m4PANqSAnanF4a1CjhF4wVoDE1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741737242; c=relaxed/simple;
-	bh=e1DAyFF3QdMAIfVHsail4Qz7JEBQx7gvrRKFDtHY+W4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=GcO+YT4o5Y/YSafRZEDXoVOi2uCPSX1e7Jz5KJLRoVksCsUQ8eaYlEByAkMOdhjwWiaKccAacfOcD2DtPKqtrNX5X8mT2qrI3Mg7xpaVvfteXbI6L5LDO6R2KpI+BDCQ8/LCjRIgv+CFB1H3Xb9fGbkGInd6xpuJyandt5rpgvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZkpFPbox; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1741742729; c=relaxed/simple;
+	bh=RvGWcc9fuIRtTev66CwxvXunOVuOUGiGWLCZu9fsd7U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sYC2gPeteiJmWZqN2CBM2s0zuTdHTOMGW4vqOll14yu74GotB4dDQEZaJa3WY412g8lyDIbt7ehXviLLFXY9JQ+39h7QETPVuic876V+7nx77yjuiYJDeFRjeyWzOc63s5fxG7TvrZ0SlJSmjxu++1V5N6vsCBy4Qkzgy7hndbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZkpFPbox"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7be8f28172dso397259085a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Mar 2025 16:54:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741737239; x=1742342039; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=M+jUWSLGlU/IuIhVfIGgpzucjlgInepmFjqSZ86Ho6I=;
-        b=ZkpFPboxCmUnqolfoT2ngOIsjutkGSZw2RiFUeCdu8eCQSozUbGMs2KWvV3Ru+lXij
-         vJznDTWsae/9TUHrYoP/q5IngI0pulQyzEqMr5/9QLzMUZ6UBxmm2rLFPwK+TVqtoWBs
-         KfIj6S51q6NVrPhjs5yjt388LSp/uPwCeSS02jfs8g3vHk6p895c9j/U5MUC4lO2h/e+
-         u7j+1rqxr2Z5suWPrO6pZSl6L4p/v8lXCHQX7/ZbnTcOrSzqT5DN/9VdndgskzGsi3DR
-         Fri6PG1Q4LQeJVeRGOnUjfQAOGXEkIWWSFMvWfFESiZD1DTn0BFGfvV39Vy7c6wmNn3P
-         jpKg==
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3fa0eb29cebso250246b6e.0;
+        Tue, 11 Mar 2025 18:25:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741737239; x=1742342039;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1741742726; x=1742347526;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=M+jUWSLGlU/IuIhVfIGgpzucjlgInepmFjqSZ86Ho6I=;
-        b=cZhjeZ/fsmAk8w1mE5hEdiJmbvbDlx+muhrCPzSSTisy1oDHbtjgop/cf4xXMvtQCE
-         goxlcnj8mxS3txAaD6J/tXKpKo582ltsd/tmRtEXmzkivR55ynZbHGmVN0PD7PMKIQW9
-         Pmnh3TFy+kdHqUrGk50/H64SGXRl/tkU+Haj6XVxm0EC3ZwVP91TppbfhGCE+wmFYIKG
-         YxULaCXdFN/jrFEEiTPUvI3TShGaXrXqo0loKX+yuNVyMW48DEnkVnqFOUdzqyWCoRSL
-         3gofc6rkM+xwjUk5gc1JHAbIvD/vrAZ+Ve3gXvojR1unC4yn8CFLXM6JUXcsCNeMLfTu
-         Xo/g==
-X-Gm-Message-State: AOJu0YwP6vmTGMq0vb+l7dm+iIdPt7iyuv8BKtuxwOeEU7AEUwXX1kng
-	OSB+Ti4l3aFFnbH/p3V7dQiVuT7dz9pXvH336/dUwwjorP5eu5fpXevIhg==
-X-Gm-Gg: ASbGncv8KD6Arbd1eZsVFws6Oj+fB7Ws83PMGn17+mDSwb7XMMcixpQUWjjeYcnjQEp
-	bL9DjXG4yl3j5UH6WihskjYylPFLPBAtaGDOYNHvkU3/Bqz88iK11QLt0qPp1zIXwO9uS0UBG4k
-	yon+0DUSg59/2DhijO9UQNULQAlyR96VhPmvXmhWTsAjy6ggAiYEi5n9SD1vJU63WqG5pkf0+QO
-	xrWg3t3hZ/DQ4NmS+QvWtpoN5Je9ns9vDuNnngyMJ9+NOBbq9NVe5VpDayAEfE4OQG48Gn5ATye
-	BzUZw/OfHwCrncllfELkFvTrhktfN/1du2ZrLrHvOvYJYgzVqtFFxHLMVJ8=
-X-Google-Smtp-Source: AGHT+IF2fZTAETQYHSsxXV76ZnTkGaLA8/8VZA5y2ebzelDyNShj91gYumxy51rTTyRPhoTKBavuUw==
-X-Received: by 2002:a05:620a:271a:b0:7c5:4088:e48c with SMTP id af79cd13be357-7c54088e708mr1802107685a.29.1741737239171;
-        Tue, 11 Mar 2025 16:53:59 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.192.0])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f707bf47sm78631656d6.25.2025.03.11.16.53.58
+        bh=hlQ8zGSiXC2UMWrLxIq5J480S5wYp1oqhkE9P9/QTxY=;
+        b=Zi5H6qv1aS/iYer5ihvuoIkFEH98t3aMplrlYMv6sPXX80Oq5xgkPsnChay3VNdjD0
+         FAplJFnNMa6Lc1W7ldXRB3k02WRo8txQAvrNREZjSI+CAJxe1+KhZg+b81t44fBE3slK
+         j+D1aTmW335MoH7aQYWg7R6vLx9vRYW7PyhTNj8cA5jYiL15ZoVWE7mtwFhPLhE+sMFP
+         vfN6khPPYwfevhuUhArmVPm8s3hIKKlmicwQgi0qbFb9QfKkl9kaIh2lmPoaVm09hiQ0
+         G+tgjEXpUf9jhEqM/qeQMFNhVait5aYuL4392EbfmWK9WFf3/ZZ3gOSJ/QO9JBGBeMpn
+         3WYA==
+X-Forwarded-Encrypted: i=1; AJvYcCV03MwXRVDXBovR+Kbs5O9C0jpUKhAINVRq2Q79dvkarxPAKddo7TzydrZ55crrZQa58ESDXVvPZJslpjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY43wuihrtSdoTdCvJKzngKWlLYj0B26UtVvavp/u/R1simTqr
+	bUIJFxHOdGqyy0NVGvO8JGnR+8T390xMM31+ifluBoOlfWAlb/De
+X-Gm-Gg: ASbGncu30ojHQXrSMl0+nnmw+3IBYnhHZ18INge2+x3wkO4USpmDwid24eMDNPO89NK
+	gBouHkOtS9lmE6g17ZvjdyzUNlJGj52tJmS3JTzfa223GL/XOuSytGAocBspVI71kFA5wD4BRRn
+	2dcJoJwZif3MwHOXdgEsPrGCSNPNK5WOETL6TsGtMkV08PgaLEeU3la53Tbr64pu6O8Il+mCExP
+	URSk9KFNAxP+zOhGPPjmIQzBKRoxwJFJengpvGwDew+FjW6T6XGvO0GWmlSDNPmywy7q0thJlsq
+	QVGcuA1oJQx9oND0MKjNC9BnrebjWP/aG+BE8K6Nm7Ljj349rcFFZAyQWHjz/w==
+X-Google-Smtp-Source: AGHT+IHUHVqGRHi1FiHDLSZpilZtJwCnpP7CO+C8rk9WvHyA0Y80iswmxtal4O25p0GjBlCr+YNcJw==
+X-Received: by 2002:a05:6808:38c6:b0:3f8:7727:88cd with SMTP id 5614622812f47-3fa2b7eda13mr3313051b6e.7.1741742726566;
+        Tue, 11 Mar 2025 18:25:26 -0700 (PDT)
+Received: from sean-ThinkPad-T450s.lan ([207.191.35.252])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f9ff1c6696sm650888b6e.42.2025.03.11.18.25.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 16:53:58 -0700 (PDT)
-Message-ID: <67d0cd16.d40a0220.3c5a1.ba68@mx.google.com>
-Date: Tue, 11 Mar 2025 16:53:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5717317814279417831=="
+        Tue, 11 Mar 2025 18:25:25 -0700 (PDT)
+From: sean.wang@kernel.org
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Sean Wang <sean.wang@mediatek.com>,
+	Pedro Tsai <pedro.tsai@mediatek.com>,
+	Felix Freimann <felix.freimann@mediatek.com>
+Subject: [PATCH] Bluetooth: btmtksdio: Prevent enabling interrupts after IRQ handler removal
+Date: Tue, 11 Mar 2025 18:25:22 -0700
+Message-Id: <20250312012522.53604-1-sean.wang@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sean.wang@kernel.org
-Subject: RE: Bluetooth: btmtk: delay usb_autopm_put_interface until WMT event received
-In-Reply-To: <20250311231630.35255-1-sean.wang@kernel.org>
-References: <20250311231630.35255-1-sean.wang@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5717317814279417831==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Sean Wang <sean.wang@mediatek.com>
 
-This is automated email and please do not reply to this email!
+Ensure interrupts are not re-enabled when the IRQ handler has already been
+removed. This prevents unexpected IRQ handler execution due to stale or
+unhandled interrupts.
 
-Dear submitter,
+Modify btmtksdio_txrx_work to check if bdev->func->irq_handler exists
+before calling sdio_writel to enable interrupts.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=942888
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.27 seconds
-GitLint                       PENDING   0.20 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      23.82 seconds
-CheckAllWarning               PASS      26.19 seconds
-CheckSparse                   PASS      29.48 seconds
-BuildKernel32                 PASS      23.39 seconds
-TestRunnerSetup               PASS      430.18 seconds
-TestRunner_l2cap-tester       PASS      20.38 seconds
-TestRunner_iso-tester         PASS      32.54 seconds
-TestRunner_bnep-tester        PASS      4.69 seconds
-TestRunner_mgmt-tester        FAIL      122.41 seconds
-TestRunner_rfcomm-tester      PASS      7.81 seconds
-TestRunner_sco-tester         PASS      16.29 seconds
-TestRunner_ioctl-tester       PASS      8.22 seconds
-TestRunner_mesh-tester        PASS      6.04 seconds
-TestRunner_smp-tester         PASS      7.14 seconds
-TestRunner_userchan-tester    PASS      4.91 seconds
-IncrementalBuild              PENDING   0.51 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.194 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Co-developed-by: Pedro Tsai <pedro.tsai@mediatek.com>
+Signed-off-by: Pedro Tsai <pedro.tsai@mediatek.com>
+Co-developed-by: Felix Freimann <felix.freimann@mediatek.com>
+Signed-off-by: Felix Freimann <felix.freimann@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btmtksdio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index bd5464bde174..edd5eead1e93 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -610,7 +610,8 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 	} while (int_status || time_is_before_jiffies(txrx_timeout));
+ 
+ 	/* Enable interrupt */
+-	sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
++	if (bdev->func->irq_handler)
++		sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
+ 
+ 	sdio_release_host(bdev->func);
+ 
+-- 
+2.25.1
 
---===============5717317814279417831==--
