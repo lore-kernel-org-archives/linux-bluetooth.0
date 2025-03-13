@@ -1,393 +1,330 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.net.athox.de (oasis.rs485.network [85.10.209.247])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5821EE7D9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Mar 2025 20:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7367A4C6C;
+	Thu, 13 Mar 2025 01:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.209.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741811428; cv=none; b=p64vdg65MFMJk/Y1OgSmXILUl2BEfwEtDcsbvIECWNJxiCxLbqTqAYXX4Ke4t4gNQA61LogHSfjg683xHHKlmTvd3tT+TtMNWcbOpAriUy3aAmb0ULtPiJuKjdHSt4awQP7ksxpygylX4xgPN+hS6Y3kQrsL7G+wuP4FWht4kkM=
+	t=1741830583; cv=none; b=nTwtA1pHKnRSaNq5AFXJNEpCbmW3s8xZ0ycRt4pc3QXrkJAMeIqnA2s+ryURudPj1rYE7ikXDPo6dYcf28RF2Cr7lbwaSD61H7JXVpobBctFSDqSZiGo1nZ/4NSfmEjnNt0rS7hVqQphXuAWUVRP9mmNZu3plAbn5zYGZGfMxq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741811428; c=relaxed/simple;
-	bh=bE2MFDG9JbBywzjGK4WyrIFRbddqh7JUGWBzpHo6xpA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CDOyfdDhAUkrpvIPHEBL3/kUzVzVBs0bU0/o1sfojkxmGW/IR1vkPs8I1KlELB87vRyNHOdBD52HyUqtCIz4phqcYwVccW5HvZmVf52sC+f+fZdr3XYPDNLQzHDYvncvDMVafMZTErIh3qisuFbf3+PvU/MLSxoqjwBUXXPoAqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a8w3nrDI; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741830583; c=relaxed/simple;
+	bh=XxrrmV6CulMYlto0eoVhF0zP2eRT2hxkVL6SYu7Rnm8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DrYnboNC8oroNBbmobDLRMrRxdjOA4Jp91ZyoaLCHmStWleo5nuoB2Yc+yBQwfBWEXJuVUkl4M2qGjeBNjV+Ab5QcwqNs9bBeJAU6veTGKsLvRCSnTMZkd3sIN+C8n8XrYE0CHhRffxe08nRMi/XHxd9t9rhu2NGu5+RdO3s2s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rs485.network; spf=pass smtp.mailfrom=rs485.network; dkim=pass (4096-bit key) header.d=rs485.network header.i=@rs485.network header.b=NUIhvyEo; arc=none smtp.client-ip=85.10.209.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rs485.network
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rs485.network
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a8w3nrDI"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30761be8fcfso3197021fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Mar 2025 13:30:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741811424; x=1742416224; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SFAuqHXbMB4sCI0zCL9QC4OM/RKh6UD2rG6iWD0ufRU=;
-        b=a8w3nrDIPF0chZsb311EOp9AeMXueEFjr597TuypfhuUJRzJUVtZZYFyXf1BfWQqgi
-         wkSKquwT4A19iNL8hFln6V6ldMeC74yiouwtgI4bg4BUtC563QljoFp9rrNaoRRHrHvf
-         iQm+3Mq0VbeQ/aAKGax1/p/cNYRZSS6bMvstkXrZT3BVTd0LZyAuOGlDV8j3SQtmqbP2
-         BGl8Hgfvm045itQgYeHf+NLqbqs8/X4la2U0yGRmhPsNrwzkfPdFHLwxhn1dreBsVpZU
-         x1jWj9ggdULI08yY0m12i0sw6gjKyUeqQ/fMrpIYPYyD4rqAUMN5QB2XxLAXbqpodisT
-         xHIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741811424; x=1742416224;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SFAuqHXbMB4sCI0zCL9QC4OM/RKh6UD2rG6iWD0ufRU=;
-        b=M22+JQQn2zPxnY4nIikdipJLZCgdZkBgrcsKRQAHJ0i+bAfY1BCdKCUUZBsZ3Q0ciK
-         2GqiD1cMlsPIEGL7LH3xyN4o0sMwTuVi2/0KmjJRRhmSS3fb8gfwG9Jf101Gfzg/nOj1
-         pa8Vy8DqOBGddEbyHlJsUX4cZ/Uy79tPFOqf1H+HF1Ow/Q8RTQcFXWgpiiQKksblKfFr
-         85M8x7LUPUmf+1+4SKBRxh6NK4T2VzYOPMI5wR/PwrP4rrMu/EcG9tFzu70D3wmWT7tU
-         kbnjkxej3RIu8On8gBcEiNhmqO5YZ+8M9GQk3/PBmGj+WGkii2Ycq6u+TrircB76Xo5X
-         Pltg==
-X-Gm-Message-State: AOJu0YwLMJjYY8W02/AFgjwFKTaL6fEdXKfyHeOM5YtTSvvOvfH2EfgN
-	k42kWS6YsPDywWnKp3gBXyIL10ky2UFQVk57mKeFwFjtl8JmF8McxC5ZYKvvW3JfwRr+f7ltipQ
-	M7s5MeG3JXpBuzDnswrlSnX4JJrMKvxXM
-X-Gm-Gg: ASbGncsSPAyOL0sBblWOihY0f3OQgKQ/rX/9hCuj5S/hEp0NxEpUUN+XR2bmKJ/uT1D
-	ybbj4RSx60KEgdJ8NUvZbga/HA9OxuP56uS5T94OhbjwUCFdYJzWcJ49HuVZlkBkN9aw9Bwn7fT
-	iaWUnSUasxZeBIy2LgMNOoGyl8
-X-Google-Smtp-Source: AGHT+IGjrDmoNrW89O0E809FWMgNNhrK/7/UzGOQ9/jBJ11JGSnmur6GmWGskdZ3Wq0ifIW38fj1jylCUbmGIWFoiR4=
-X-Received: by 2002:a2e:bc23:0:b0:30c:1002:faa8 with SMTP id
- 38308e7fff4ca-30c1002ff06mr53388461fa.7.1741811423941; Wed, 12 Mar 2025
- 13:30:23 -0700 (PDT)
+	dkim=pass (4096-bit key) header.d=rs485.network header.i=@rs485.network header.b="NUIhvyEo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rs485.network;
+	s=smtp_rs485.network; t=1741830190;
+	bh=XxrrmV6CulMYlto0eoVhF0zP2eRT2hxkVL6SYu7Rnm8=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=NUIhvyEottPGL/1dQI3dmOU4cfQW4sS18sEeMWj8M1TiM9VO7v2EcupZ0814iEyCn
+	 hfr5xoBEWN84vKGGAD/KhyZ3q6ewIvoWKDqATvwHKVLOfFYJcsMwcoN0FQY8lEgbCJ
+	 zJ1Au/JuihQYJos0OI1F1czP7r7qyCTBJC4doRNWSYsQyin/4WkBKKPYKV03ZBx/na
+	 gR8Wiz10Z5rvV5NibG6wqtGFwx5Ujm/yjESzneFvR5EhFr8bx+nWY0tpSiwvOyDmd3
+	 HFH54oc+UHIuY+mM3DjJyUMG501WBtZQJhLskmBL29hRO7xZFxazpWhXIVvyfMlfY8
+	 FxaEgehSJhIRhuxwnQbYt5pGe98ZK3bS3g1VC1X11d7Qap3iId6Icp0RBY3bE5F+/v
+	 E5kuAEDVcE9pDOLphcf2uvxM5PQ+DiRcX5epO4o1cQeKqoSzckKBKJSgBm566B33Co
+	 5eUZyJ5HtWWx4r1TNEmR+Iuc0gIpyvVgCSgWiXlmlHfwN88ysqzXzzjKR7B/Qd2407
+	 MCxbFwWnay2O9Nfaup1xyZfsipHWaobBjh1MITQBeeHwZU77TOEWF9VM4oqQLl0ngl
+	 /Pr2vBYK8c8MnIhfYZegAW9FPtHpwzCjhc4NfAtS3JpL1Qp5tiUCt3c3gjNibJxDH3
+	 o1w6FRKGlgk1qFDH8Zos+tM8=
+Message-ID: <d81e863b00b3153c1de1c782205713fa99a79308.camel@rs485.network>
+Subject: Re: [PATCH 0/2] Fix for MediaTek reset affecting Focusrite audio
+ interfaces
+From: Benedikt Ziemons <ben@rs485.network>
+To: "Geoffrey D. Bennett" <g@b4.vu>, Luiz Augusto von Dentz
+	 <luiz.dentz@gmail.com>, Geraldo Nascimento <geraldogabriel@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz	
+ <luiz.von.dentz@intel.com>, Hao Qin <hao.qin@mediatek.com>, 
+	linux-bluetooth@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>, Chris
+ Lu	 <chris.lu@mediatek.com>, linux-sound@vger.kernel.org, Takashi Iwai
+ <tiwai@suse.de>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Thu, 13 Mar 2025 02:43:09 +0100
+In-Reply-To: <CABBYNZJCko6radLuW=M=jTzqUEr2rUoKc_TUBVWP9wFSgkKb6Q@mail.gmail.com>
+References: <Z8ybO7DfeP3Ag9wz@m.b4.vu> <Z89YcqoED633dr_M@geday>
+	 <CABBYNZJCko6radLuW=M=jTzqUEr2rUoKc_TUBVWP9wFSgkKb6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250312151421.201772-1-luiz.dentz@gmail.com> <f82dd646f177ed414fe4864b0fd66e95d885a089.camel@iki.fi>
-In-Reply-To: <f82dd646f177ed414fe4864b0fd66e95d885a089.camel@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 12 Mar 2025 16:30:11 -0400
-X-Gm-Features: AQ5f1JpBbwW0cBZnyRTZJMTWUkXB0Inj60mZvBeBL2dySMZleDS1AwGrpHXd-NU
-Message-ID: <CABBYNZKJSoTK2sLL7ns67F6EQWj5qd7Hu7kTe5LgWyZaOwAgmg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] Bluetooth: hci_core: Enable buffer flow control
- for SCO/eSCO
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+On Tue, 2025-03-11 at 21:53 -0400, Luiz Augusto von Dentz wrote:
+> Hi Chris, Sean, Hao,
+>=20
+> On Mon, Mar 10, 2025 at 5:24=E2=80=AFPM Geraldo Nascimento
+> <geraldogabriel@gmail.com> wrote:
+> >=20
+> > On Sun, Mar 09, 2025 at 06:02:11AM +1030, Geoffrey D. Bennett
+> > wrote:
+> > > This series (choose 1 of the 2 patches) addresses an issue where
+> > > the
+> > > MT7922 Bluetooth controller reset added in commit ccfc8948d7e4
+> > > ("Bluetooth: btusb: mediatek: reset the controller before
+> > > downloading
+> > > the fw") is causing Focusrite USB audio devices to fail to
+> > > initialise
+> > > when connected during boot on kernels 6.11 and newer.
+> > >=20
+> > > Reported by three users here:
+> > > https://github.com/geoffreybennett/linux-fcp/issues/24
+> > >=20
+> > > Two users confirmed they have an MT7922.
+> > >=20
+> > > I'm providing two possible solutions as I note there was a
+> > > similar
+> > > change made in commit a7208610761a ("Bluetooth: btmtk: Remove
+> > > resetting mt7921 before downloading the fw"), so I'm not sure if
+> > > the
+> > > reset should be reverted for the MT7925 as well as the MT7922.
+> > >=20
+> > > Option 1: Revert the problematic reset behaviour entirely (MT7922
+> > > +
+> > > MT7925)
+> > >=20
+> > > Option 2: Remove the reset only for the MT7922
+> > >=20
+> > > Geoffrey D. Bennett (2):
+> > >=20
+> > > =C2=A0 [PATCH 1/2] Revert "Bluetooth: btusb: mediatek: reset the
+> > > controller
+> > > =C2=A0=C2=A0=C2=A0 before downloading the fw"
+> > >=20
+> > > =C2=A0 [PATCH 2/2] Bluetooth: btmtk: Remove resetting mt7922 before
+> > > =C2=A0=C2=A0=C2=A0 downloading the fw
+> > >=20
+> > > --
+> > > 2.45.0
+> > >=20
+> > >=20
+> >=20
+> > Hi Geoffrey,
+> >=20
+> > I understand there's no apparent nexus of causality here.
+> >=20
+> > However if three different users suddenly reported the same problem
+> > and
+> > the fix fixes it, we should take the report seriously and back down
+> > on the problematic commit until we figure for sure what the heck is
+> > going on.
+> >=20
+> > My bet is this is bona fide bug in the USB subsystem, but either
+> > I'm not
+> > looking hard enough or I'm looking into the wrong places, because
+> > there's no way I can see in which way USB bluetooth driver from
+> > MediaTek could cause clock detection to fail.
+> >=20
+> > No point in pressing this harder, but yeah, take the reports more
+> > than
+> > seriously, because if we don't understand in which way our own
+> > (Linux)
+> > code could be causing this, at least we should take cautionary
+> > measures.
+> >=20
+> > In that sense, putting Takashi Iwai and Greg KH to Cc: in a modest
+> > but
+> > sincere belief that this issue is more than real, even though it
+> > looks
+> > like anticipated April 1st. Takashi can help with his expertise in
+> > clock
+> > detection and Greg could help pinpoint if this is indeed madness in
+> > the
+> > USB subsystem.
+> >=20
+> > Hope you and them don't mind the escalation :)
+>=20
+> Do you guys have any idea what could be possibly going on here? There
+> really seems something is not right if one driver affects the other,
+> especially if the devices are not actually related in any way.
+>=20
+>=20
 
-On Wed, Mar 12, 2025 at 4:00=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Hi,
->
-> ke, 2025-03-12 kello 11:14 -0400, Luiz Augusto von Dentz kirjoitti:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > This enables buffer flow control for SCO/eSCO
-> > (see: Bluetooth Core 6.0 spec: 6.22. Synchronous Flow Control Enable),
-> > recently this has caused the following problem and is actually a nice
-> > addition for the likes of Socket TX complete:
-> >
-> > < HCI Command: Read Buffer Size (0x04|0x0005) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 11
-> >       Read Buffer Size (0x04|0x0005) ncmd 1
-> >         Status: Success (0x00)
-> >         ACL MTU: 1021 ACL max packet: 5
-> >         SCO MTU: 240  SCO max packet: 8
-> > ...
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > < SCO Data TX: Handle 257 flags 0x00 dlen 120
-> > > HCI Event: Hardware Error (0x10) plen 1
-> >         Code: 0x0a
-> >
-> > To fix the code will now attempt to enable buffer flow control when
-> > HCI_QUIRK_SYNC_FLOWCTL_SUPPORTED is set by the driver:
-> >
-> > < HCI Command: Write Sync Fl.. (0x03|0x002f) plen 1
-> >         Flow control: Enabled (0x01)
-> > > HCI Event: Command Complete (0x0e) plen 4
-> >       Write Sync Flow Control Enable (0x03|0x002f) ncmd 1
-> >         Status: Success (0x00)
-> >
-> > On success then HCI_SCO_FLOWCTL would be set which indicates sco_cnt
-> > shall be used for flow contro.
->
-> Tested-by: Pauli Virtanen <pav@iki.fi>
->
-> ... to the degree that this does not break things on hardware that does
-> not support SCO flow control, and that the flow control case seemed to
-> be fine in the emulator.
+Hello everyone,
 
-Yes, thanks to you we have tests that cover both cases and with these
-changes it can confirm if NOCP is being generated or not, so at least
-it gives you the ability to implement the TX complete logic for SCO
-using the emulator, right?
+I did the kernel bisection on this issue and tested Geoffrey's patches
+since I own the affected combination of hardware and can reliably
+reproduce the issue.
 
-> I don't seem to have HW that support SCO flow control at hand, the
-> controllers I tested claim to support these commands, but either the
-> enable command reports success but the feature doesn't actually work
-> (Intel/Realtek), or the command fails (CSR, error code 0x11).
+I was now able to capture both the sound device initialization failure
+and the successful initialization from initramfs using the usbmon
+module. One difference that is immediately noticeable is the amount of
+URB_CONTROL data that is sent to the mediatek btusb device and a
+considerable slow-down of the boot process (around 16s difference).
 
-Yeah, I am afraid we can't do much about that if the controller is
-just not generating NOCP then we cannot enable the quirk, but at least
-in the case of Intel it should work so perhaps there is something else
-missing which I am trying to dig out.
+Following is some more information about the timing and other related
+messages from the kernel message log. The first excerpt is from an
+unpatched kernel 6.14.0-rc5:
 
-> >
-> > Fixes: 7fedd3bb6b77 ("Bluetooth: Prioritize SCO traffic")
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >  include/net/bluetooth/hci.h      | 13 +++++++
-> >  include/net/bluetooth/hci_core.h |  1 +
-> >  net/bluetooth/hci_core.c         | 62 +++++++++++++++-----------------
-> >  net/bluetooth/hci_event.c        |  2 ++
-> >  net/bluetooth/hci_sync.c         | 24 +++++++++++++
-> >  5 files changed, 68 insertions(+), 34 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index b99818df8ee7..3c8f95174fcf 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -208,6 +208,13 @@ enum {
-> >        */
-> >       HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
-> >
-> > +     /* When this quirk is set consider Sync Flow Control as supported=
- by
-> > +      * the driver.
-> > +      *
-> > +      * This quirk must be set before hci_register_dev is called.
-> > +      */
-> > +     HCI_QUIRK_SYNC_FLOWCTL_SUPPORTED,
-> > +
-> >       /* When this quirk is set, the LE states reported through the
-> >        * HCI_LE_READ_SUPPORTED_STATES are invalid/broken.
-> >        *
-> > @@ -448,6 +455,7 @@ enum {
-> >       HCI_WIDEBAND_SPEECH_ENABLED,
-> >       HCI_EVENT_FILTER_CONFIGURED,
-> >       HCI_PA_SYNC,
-> > +     HCI_SCO_FLOWCTL,
-> >
-> >       HCI_DUT_MODE,
-> >       HCI_VENDOR_DIAG,
-> > @@ -1544,6 +1552,11 @@ struct hci_rp_read_tx_power {
-> >       __s8     tx_power;
-> >  } __packed;
-> >
-> > +#define HCI_OP_WRITE_SYNC_FLOWCTL    0x0c2f
-> > +struct hci_cp_write_sync_flowctl {
-> > +     __u8     enable;
-> > +} __packed;
-> > +
-> >  #define HCI_OP_READ_PAGE_SCAN_TYPE   0x0c46
-> >  struct hci_rp_read_page_scan_type {
-> >       __u8     status;
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
-ci_core.h
-> > index 7966db4038cc..f78e4298e39a 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -1858,6 +1858,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
-> >  #define lmp_hold_capable(dev)      ((dev)->features[0][0] & LMP_HOLD)
-> >  #define lmp_sniff_capable(dev)     ((dev)->features[0][0] & LMP_SNIFF)
-> >  #define lmp_park_capable(dev)      ((dev)->features[0][1] & LMP_PARK)
-> > +#define lmp_sco_capable(dev)       ((dev)->features[0][1] & LMP_SCO)
-> >  #define lmp_inq_rssi_capable(dev)  ((dev)->features[0][3] & LMP_RSSI_I=
-NQ)
-> >  #define lmp_esco_capable(dev)      ((dev)->features[0][3] & LMP_ESCO)
-> >  #define lmp_bredr_capable(dev)     (!((dev)->features[0][4] & LMP_NO_B=
-REDR))
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 012fc107901a..94d9147612da 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -3552,18 +3552,27 @@ static void __check_timeout(struct hci_dev *hde=
-v, unsigned int cnt, u8 type)
-> >  }
-> >
-> >  /* Schedule SCO */
-> > -static void hci_sched_sco(struct hci_dev *hdev)
-> > +static void hci_sched_sco(struct hci_dev *hdev, __u8 type)
-> >  {
-> >       struct hci_conn *conn;
-> >       struct sk_buff *skb;
-> > -     int quote;
-> > +     int quote, *cnt;
-> > +     unsigned int pkts =3D hdev->sco_pkts;
-> >
-> > -     BT_DBG("%s", hdev->name);
-> > +     bt_dev_dbg(hdev, "type %u", type);
-> >
-> > -     if (!hci_conn_num(hdev, SCO_LINK))
-> > +     if (!hci_conn_num(hdev, type) || !pkts)
-> >               return;
-> >
-> > -     while (hdev->sco_cnt && (conn =3D hci_low_sent(hdev, SCO_LINK, &q=
-uote))) {
-> > +     /* Use sco_pkts if flow control has not been enabled which will l=
-imit
-> > +      * the amount of buffer sent in a row.
-> > +      */
-> > +     if (!hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
-> > +             cnt =3D &pkts;
-> > +     else
-> > +             cnt =3D &hdev->sco_cnt;
-> > +
-> > +     while (*cnt && (conn =3D hci_low_sent(hdev, type, &quote))) {
-> >               while (quote-- && (skb =3D skb_dequeue(&conn->data_q))) {
-> >                       BT_DBG("skb %p len %d", skb, skb->len);
-> >                       hci_send_frame(hdev, skb);
-> > @@ -3571,32 +3580,17 @@ static void hci_sched_sco(struct hci_dev *hdev)
-> >                       conn->sent++;
-> >                       if (conn->sent =3D=3D ~0)
-> >                               conn->sent =3D 0;
-> > +                     (*cnt)--;
-> >               }
-> >       }
-> > -}
-> >
-> > -static void hci_sched_esco(struct hci_dev *hdev)
-> > -{
-> > -     struct hci_conn *conn;
-> > -     struct sk_buff *skb;
-> > -     int quote;
-> > -
-> > -     BT_DBG("%s", hdev->name);
-> > -
-> > -     if (!hci_conn_num(hdev, ESCO_LINK))
-> > -             return;
-> > -
-> > -     while (hdev->sco_cnt && (conn =3D hci_low_sent(hdev, ESCO_LINK,
-> > -                                                  &quote))) {
-> > -             while (quote-- && (skb =3D skb_dequeue(&conn->data_q))) {
-> > -                     BT_DBG("skb %p len %d", skb, skb->len);
-> > -                     hci_send_frame(hdev, skb);
-> > -
-> > -                     conn->sent++;
-> > -                     if (conn->sent =3D=3D ~0)
-> > -                             conn->sent =3D 0;
-> > -             }
-> > -     }
-> > +     /* Rescheduled if all packets were sent and flow control is not e=
-nabled
-> > +      * as there could be more packets queued that could not be sent a=
-nd
-> > +      * since no HCI_EV_NUM_COMP_PKTS event will be generated the resc=
-hedule
-> > +      * needs to be forced.
-> > +      */
-> > +     if (!pkts && !hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
-> > +             queue_work(hdev->workqueue, &hdev->tx_work);
-> >  }
-> >
-> >  static void hci_sched_acl_pkt(struct hci_dev *hdev)
-> > @@ -3632,8 +3626,8 @@ static void hci_sched_acl_pkt(struct hci_dev *hde=
-v)
-> >                       chan->conn->sent++;
-> >
-> >                       /* Send pending SCO packets right away */
-> > -                     hci_sched_sco(hdev);
-> > -                     hci_sched_esco(hdev);
-> > +                     hci_sched_sco(hdev, SCO_LINK);
-> > +                     hci_sched_sco(hdev, ESCO_LINK);
-> >               }
-> >       }
-> >
-> > @@ -3688,8 +3682,8 @@ static void hci_sched_le(struct hci_dev *hdev)
-> >                       chan->conn->sent++;
-> >
-> >                       /* Send pending SCO packets right away */
-> > -                     hci_sched_sco(hdev);
-> > -                     hci_sched_esco(hdev);
-> > +                     hci_sched_sco(hdev, SCO_LINK);
-> > +                     hci_sched_sco(hdev, ESCO_LINK);
-> >               }
-> >       }
-> >
-> > @@ -3734,8 +3728,8 @@ static void hci_tx_work(struct work_struct *work)
-> >
-> >       if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-> >               /* Schedule queues and send stuff to HCI driver */
-> > -             hci_sched_sco(hdev);
-> > -             hci_sched_esco(hdev);
-> > +             hci_sched_sco(hdev, SCO_LINK);
-> > +             hci_sched_sco(hdev, ESCO_LINK);
-> >               hci_sched_iso(hdev);
-> >               hci_sched_acl(hdev);
-> >               hci_sched_le(hdev);
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 19e19c9f5e68..6d0138b778aa 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -4445,9 +4445,11 @@ static void hci_num_comp_pkts_evt(struct hci_dev=
- *hdev, void *data,
-> >                       break;
-> >
-> >               case SCO_LINK:
-> > +             case ESCO_LINK:
-> >                       hdev->sco_cnt +=3D count;
-> >                       if (hdev->sco_cnt > hdev->sco_pkts)
-> >                               hdev->sco_cnt =3D hdev->sco_pkts;
-> > +
-> >                       break;
-> >
-> >               case ISO_LINK:
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index c4c2cf51b219..609b035e5c90 100644
-> > --- a/net/bluetooth/hci_sync.c
-> > +++ b/net/bluetooth/hci_sync.c
-> > @@ -3769,6 +3769,28 @@ static int hci_write_ca_timeout_sync(struct hci_=
-dev *hdev)
-> >                                    sizeof(param), &param, HCI_CMD_TIMEO=
-UT);
-> >  }
-> >
-> > +/* Enable SCO flow control if supported */
-> > +static int hci_write_sync_flowctl_sync(struct hci_dev *hdev)
-> > +{
-> > +     struct hci_cp_write_sync_flowctl cp;
-> > +     int err;
-> > +
-> > +     /* Check if the controller supports SCO and HCI_OP_WRITE_SYNC_FLO=
-WCTL */
-> > +     if (!lmp_sco_capable(hdev) || !(hdev->commands[10] & BIT(4)) ||
-> > +         !test_bit(HCI_QUIRK_SYNC_FLOWCTL_SUPPORTED, &hdev->quirks))
-> > +             return 0;
-> > +
-> > +     memset(&cp, 0, sizeof(cp));
-> > +     cp.enable =3D 0x01;
-> > +
-> > +     err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_SYNC_FLOWCTL,
-> > +                                 sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> > +     if (!err)
-> > +             hci_dev_set_flag(hdev, HCI_SCO_FLOWCTL);
-> > +
-> > +     return err;
-> > +}
-> > +
-> >  /* BR Controller init stage 2 command sequence */
-> >  static const struct hci_init_stage br_init2[] =3D {
-> >       /* HCI_OP_READ_BUFFER_SIZE */
-> > @@ -3787,6 +3809,8 @@ static const struct hci_init_stage br_init2[] =3D=
- {
-> >       HCI_INIT(hci_clear_event_filter_sync),
-> >       /* HCI_OP_WRITE_CA_TIMEOUT */
-> >       HCI_INIT(hci_write_ca_timeout_sync),
-> > +     /* HCI_OP_WRITE_SYNC_FLOWCTL */
-> > +     HCI_INIT(hci_write_sync_flowctl_sync),
-> >       {}
-> >  };
-> >
->
-> --
-> Pauli Virtanen
+[   59.987242] lunar kernel: usb 1-2: new high-speed USB device number 2 us=
+ing xhci_hcd
+[   59.987975] lunar kernel: usb 1-2: New USB device found, idVendor=3D1235=
+, idProduct=3D8212, bcdDevice=3D 6.45
+[   59.988048] lunar kernel: usb 1-2: New USB device strings: Mfr=3D1, Prod=
+uct=3D3, SerialNumber=3D2
+[   59.988121] lunar kernel: usb 1-2: Product: Scarlett 4i4 USB
+[   59.988197] lunar kernel: usb 1-2: Manufacturer: Focusrite
+[   60.571193] lunar kernel: mt7921e 0000:0a:00.0: enabling device (0000 ->=
+ 0002)
+[   60.571314] lunar kernel: mt7921e 0000:0a:00.0: ASIC revision: 79220010
+[   60.571501] lunar kernel: usbcore: registered new interface driver btusb
+[   60.571513] lunar kernel: mt7921e 0000:0a:00.0: HW/SW Version: 0x8a108a1=
+0, Build Time: 20241106163228a
+[   60.571627] lunar kernel: mt7921e 0000:0a:00.0: WM Firmware Version: ___=
+_000000, Build Time: 20241106163310
+[   60.616673] lunar kernel: Bluetooth: hci0: HW/SW Version: 0x008a008a, Bu=
+ild Time: 20241106163512
+[   64.549017] lunar kernel: mt7921e 0000:0a:00.0 wlp10s0: renamed from wla=
+n0
+[   70.700407] lunar kernel: usb 1-2: parse_audio_format_rates_v2v3(): unab=
+le to retrieve number of sample rates (clock 41)
+[   81.264360] lunar kernel: usb 1-2: parse_audio_format_rates_v2v3(): unab=
+le to retrieve number of sample rates (clock 41)
+[   81.264611] lunar kernel: usb 1-2: Focusrite Scarlett Gen 3 Mixer Driver=
+ enabled (pid=3D0x8212); report any issues to https://github.com/geoffreybe=
+nnett/scarlett-gen2/issues
+[   81.264782] lunar kernel: usb 1-2: Error initialising Scarlett Gen 3 Mix=
+er Driver: -71
+[   81.264903] lunar kernel: snd-usb-audio 1-2:1.0: probe with driver snd-u=
+sb-audio failed with error -71
+[   81.265040] lunar kernel: usb 1-2: Quirk or no altset; falling back to M=
+IDI 1.0
+[   81.400030] lunar kernel: Bluetooth: hci0: Device setup in 20435397 usec=
+s
+[   81.400114] lunar kernel: Bluetooth: hci0: HCI Enhanced Setup Synchronou=
+s Connection command is advertised, but not supported.
+[   81.680052] lunar kernel: Bluetooth: hci0: AOSP extensions version v1.00
+[   81.680170] lunar kernel: Bluetooth: hci0: AOSP quality report is suppor=
+ted
+[   87.373353] lunar kernel: usbcore: registered new interface driver snd-u=
+sb-audio
 
 
+The following second excerpt is from the same kernel version with
+Geoffrey's second patch applied:
 
---=20
-Luiz Augusto von Dentz
+[  139.603887] lunar kernel: usb 1-2: new high-speed USB device number 2 us=
+ing xhci_hcd
+[  139.604524] lunar kernel: usb 1-2: New USB device found, idVendor=3D1235=
+, idProduct=3D8212, bcdDevice=3D 6.45
+[  139.604598] lunar kernel: usb 1-2: New USB device strings: Mfr=3D1, Prod=
+uct=3D3, SerialNumber=3D2
+[  139.604672] lunar kernel: usb 1-2: Product: Scarlett 4i4 USB
+[  139.604744] lunar kernel: usb 1-2: Manufacturer: Focusrite
+[  140.192488] lunar kernel: usbcore: registered new interface driver btusb
+[  140.192501] lunar kernel: mt7921e 0000:0a:00.0: enabling device (0000 ->=
+ 0002)
+[  140.192627] lunar kernel: Bluetooth: hci0: HW/SW Version: 0x008a008a, Bu=
+ild Time: 20241106163512
+[  140.192639] lunar kernel: mt7921e 0000:0a:00.0: ASIC revision: 79220010
+[  140.192753] lunar kernel: mt7921e 0000:0a:00.0: HW/SW Version: 0x8a108a1=
+0, Build Time: 20241106163228a
+[  140.192866] lunar kernel: mt7921e 0000:0a:00.0: WM Firmware Version: ___=
+_000000, Build Time: 20241106163310
+[  140.240011] lunar kernel: Bluetooth: hci0: Device setup in 188119 usecs
+[  140.240048] lunar kernel: Bluetooth: hci0: HCI Enhanced Setup Synchronou=
+s Connection command is advertised, but not supported.
+[  140.513341] lunar kernel: Bluetooth: hci0: AOSP extensions version v1.00
+[  140.513379] lunar kernel: Bluetooth: hci0: AOSP quality report is suppor=
+ted
+[  144.115475] lunar kernel: mt7921e 0000:0a:00.0 wlp10s0: renamed from wla=
+n0
+[  144.115747] lunar kernel: usb 1-2: Focusrite Scarlett Gen 3 Mixer Driver=
+ enabled (pid=3D0x8212); report any issues to https://github.com/geoffreybe=
+nnett/scarlett-gen2/issues
+[  144.115857] lunar kernel: usb 1-2: Firmware version 1605
+[  144.115954] lunar kernel: usb 1-2: Quirk or no altset; falling back to M=
+IDI 1.0
+[  147.843340] lunar kernel: usbcore: registered new interface driver snd-u=
+sb-audio
+
+
+Comparing the USB captures from the hub, filtered to just the first few
+messages of the audio device yield the following exchanges. Again,
+first the broken case:
+
+No.     Time           Source                Destination           Protocol=
+ Length Info
+      7 0.011098       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request DEVICE
+      8 0.015218       1.2.0                 host                  USB     =
+ 82     GET DESCRIPTOR Response DEVICE
+      9 0.015272       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request CONFIGURATION
+     10 0.017966       1.2.0                 host                  USB     =
+ 73     GET DESCRIPTOR Response CONFIGURATION
+     11 0.018020       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request CONFIGURATION
+     12 0.025965       1.2.0                 host                  USB     =
+ 425    GET DESCRIPTOR Response CONFIGURATION
+     23 2.482241       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request STRING
+     24 2.484931       1.2.0                 host                  USB     =
+ 98     GET DESCRIPTOR Response STRING
+     25 2.484939       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request STRING
+     26 2.487916       1.2.0                 host                  USB     =
+ 84     GET DESCRIPTOR Response STRING
+     27 2.487941       host                  1.2.0                 USBAUDIO=
+ 65     SET CUR CX_CLOCK_SELECTOR_CONTROL request
+   2047 7.661154       1.2.0                 host                  USBAUDIO=
+ 64     SET CUR CX_CLOCK_SELECTOR_CONTROL status
+   2048 7.661197       host                  1.2.0                 USBAUDIO=
+ 64     GET RANGE CS_SAM_FREQ_CONTROL request
+   4097 12.781553      1.2.0                 host                  USBAUDIO=
+ 64     GET RANGE CS_SAM_FREQ_CONTROL[Malformed Packet]
+
+
+The first discrepancy can be found in the URB status field of packet
+no. 2047 (vs. 74 below) which is -2: No such file or directory (-
+ENOENT).
+In the second (following) case where the sound device initializes okay,
+the URB status of the similar packet is Success (0) instead:
+
+No.     Time           Source                Destination           Protocol=
+ Length Info
+      7 0.011565       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request DEVICE
+      8 0.015471       1.2.0                 host                  USB     =
+ 82     GET DESCRIPTOR Response DEVICE
+      9 0.015523       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request CONFIGURATION
+     10 0.018477       1.2.0                 host                  USB     =
+ 73     GET DESCRIPTOR Response CONFIGURATION
+     11 0.018537       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request CONFIGURATION
+     12 0.026331       1.2.0                 host                  USB     =
+ 425    GET DESCRIPTOR Response CONFIGURATION
+     23 4.168190       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request STRING
+     24 4.171031       1.2.0                 host                  USB     =
+ 98     GET DESCRIPTOR Response STRING
+     25 4.171040       host                  1.2.0                 USB     =
+ 64     GET DESCRIPTOR Request STRING
+     26 4.174021       1.2.0                 host                  USB     =
+ 84     GET DESCRIPTOR Response STRING
+     27 4.174041       host                  1.2.0                 USBAUDIO=
+ 65     SET CUR CX_CLOCK_SELECTOR_CONTROL request
+     74 4.476033       1.2.0                 host                  USBAUDIO=
+ 64     SET CUR CX_CLOCK_SELECTOR_CONTROL status
+     75 4.476050       host                  1.2.0                 USBAUDIO=
+ 64     GET CUR CX_CLOCK_SELECTOR_CONTROL request
+     76 4.479034       1.2.0                 host                  USBAUDIO=
+ 65     GET CUR CX_CLOCK_SELECTOR_CONTROL response
+     77 4.479050       host                  1.2.0                 USBAUDIO=
+ 64     GET RANGE CS_SAM_FREQ_CONTROL request
+    202 4.582043       1.2.0                 host                  USBAUDIO=
+ 66     GET RANGE CS_SAM_FREQ_CONTROL response
+
+
+Please ask, if I should provide any more information or how and to whom
+I can provide the full USB captures.
+
+Thank you,
+Ben
