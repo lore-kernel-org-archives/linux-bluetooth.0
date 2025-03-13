@@ -1,77 +1,77 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53302676C0
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Mar 2025 12:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CD0267701
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Mar 2025 13:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741868760; cv=none; b=ZRLFY+8udc+wN18ySWGv3zcRr0zP5I/MCM48y/WFKnjHFkfXZyhiu4bJvZUwxZOX0X9y3KJQoQWjddgDNfYuFHGvN5i4A7/ZLmYKFAiTtROn3wOm6WIgU5j0CNX7OEqdfjgLqYQHDjJQnUFGO0tav3nTJs4p61cIjMlgCXBvigs=
+	t=1741874398; cv=none; b=RkjX/AuS1NMHUACZJNs45ywan6Jgek04TvyxzgA+n8vkUzWm9JDWzPuhKlGgZtN+AAvZtO6BeUN4+L5E/8KyZ4K+JwI4LU4MDi6ejTaMzJMXSYKFSJRy2lRDwjdQrMKTp9roto5XyzLho1zVe/M7s+0bQCNZ6cD04V61liIHbFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741868760; c=relaxed/simple;
-	bh=pf9juoEnZT6rBnRfX18cLylMYmCr4p134XHHavCEj9I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OKeKttKwh2r51zRFpo//3EQTgVHWTRDQYFI2JScMAMt0YPeOMPz/GRwrgW/SqTonItZE1mUmnEcjd4ERq/WfR1GKo8p6SPsYKw1JCNYzbigc1f/MDhUVmfyCK+R92iJTAOoq4WIKAL4GuTouqGBUzdoMWdBJpEXswLjw8XjIIOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ax0rkPx7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741874398; c=relaxed/simple;
+	bh=mbPfvjFhBUcTWKHMBIG0TENXsQ8YJoJxyLVPVAClqbg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=q1mNrOuB4znOs4X+IMvy+L8L/NlimBRDdFfhIUbWrNI22aSFdZm+vgsJTvC0p1JYNvXCcUEFro04LxucNaxkBgoOov6K/djaFnBhvv/I1UeVvcb8+Ejl044rFEunbd9LcNJ6Ionq4c4w8jr+9vYHDv2ZnAt0+hEHTYDtrNmbH0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ip/y4qPT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ax0rkPx7"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F350C4CEDD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Mar 2025 12:26:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ip/y4qPT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D1FCC4CEDD;
+	Thu, 13 Mar 2025 13:59:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741868760;
-	bh=pf9juoEnZT6rBnRfX18cLylMYmCr4p134XHHavCEj9I=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ax0rkPx7ejcqWru5202hrSVU8rUom5+S0yS9N2zok1M3FknXSZoEl1lZc6cNncK4E
-	 tKVJGUJHCSsI01VFU72EmyvQa55QxmxHnlRp7Z4PoMNJ5E/o9x/LNt7KlDcE5jJXX+
-	 jQELjiB9ZfkhltZzT0zsKHOjFaIki6XIcQQUyX7sgHwF23gTvJvTbaNjqt5astWEYk
-	 mAmyMJAU4mqHUjkjySC+mLOPZetN2XCFo3L7BrLcqXq2L/GGg/loh/2EwE4R0KKK73
-	 MxOKnW2qHRXAoFlUEy60Zxgdo2jjQcdo4rqY+4FsWQliuZvzG2dJ6esDZcNUxlhjNl
-	 gbtB4GvbwXlgA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 2104DC41613; Thu, 13 Mar 2025 12:26:00 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219861] Bluetooth device in reset loop after suspend
- [regression]
-Date: Thu, 13 Mar 2025 12:25:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pierre-bugzilla@ossman.eu
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219861-62941-8cHLLOOHyH@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219861-62941@https.bugzilla.kernel.org/>
-References: <bug-219861-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1741874397;
+	bh=mbPfvjFhBUcTWKHMBIG0TENXsQ8YJoJxyLVPVAClqbg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ip/y4qPT2Oq4CwqNLwQA48SJf3CBwBNz01qX8BK8FBLGQ8+LZYQUjiHJXi3NR2I9w
+	 jcFE9vPAsRAdXiD0xIYbnMNyZK/oun8LAeicQXxQDO4Pc1zSA9sw5D2zaf1YZlsViQ
+	 iBew7eDQ9nRn/W0TfgDkmYpmIekyL4CZbMv/R97T00D+fm5F3v352pz+13nnR0HV/3
+	 1v/TINYqHrEdn242HnkEZ3hiX6/mEbn8hYJMu6+lGKCY0tVVLaZEgCmgsKqiajBJl8
+	 tkPmXu1dKX1stffA+Q/TBcA6/Vi42m4kvbe1dSI1nY43i5uyJCSHvxOmKDklxlEmxF
+	 yYQrkksMLeCUA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C083806652;
+	Thu, 13 Mar 2025 14:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 1/2] Bluetooth: hci_core: Enable buffer flow control for
+ SCO/eSCO
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174187443201.1524310.8087699036754748717.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Mar 2025 14:00:32 +0000
+References: <20250312151421.201772-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250312151421.201772-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219861
+Hello:
 
---- Comment #1 from Pierre Ossman (pierre-bugzilla@ossman.eu) ---
-Something to block the looping and log spam would be appreciated, until the
-issue can be properly fixed.
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Bluetooth support is not critical for me at the moment.
+On Wed, 12 Mar 2025 11:14:20 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This enables buffer flow control for SCO/eSCO
+> (see: Bluetooth Core 6.0 spec: 6.22. Synchronous Flow Control Enable),
+> recently this has caused the following problem and is actually a nice
+> addition for the likes of Socket TX complete:
+> 
+> [...]
 
---=20
-You may reply to this email to add a comment.
+Here is the summary with links:
+  - [v2,1/2] Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
+    https://git.kernel.org/bluetooth/bluetooth-next/c/174f3c12f664
+  - [v2,2/2] Bluetooth: hci_vhci: Mark Sync Flow Control as supported
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5c301fb00b84
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
