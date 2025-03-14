@@ -1,68 +1,107 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F7A1FF615
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Mar 2025 18:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9C417D2;
+	Fri, 14 Mar 2025 19:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741976330; cv=none; b=bvNKHPiRUj0XKTubGnC+cwus8zXIVuDq7JSgeT1k8wvF4QIgEKg/U0pVwwSQth4FlIdAIacaWnU+XVsF1aFblIiMZjx0osclthIY98gwINycAG7PF+I1GXL53yLCRoPWNU/zdWh1Ux6qJ8xbv0B8KB41+cVnNDkmJIyP4WVjrKE=
+	t=1741981233; cv=none; b=PNJRTVJzYiHhQ+G/4bB0yK3Hw4gcjilSIVwL+/W/sYWkiDbuSZ5GFmPsry7Mn4a4AAKJaZ6eoTVQZyfmS+d1bgh80hEhWuFtTtzPOWYiRF3iplJhJjr/T3RX2lpbpIIa3NATFAr3G2O4KJzGtJDl/4zJEsJiFy1A0miCEkmpzJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741976330; c=relaxed/simple;
-	bh=lgrGRzThNX6o6xMlPHGL3U19CsC6bhWsgQqMxUIyhKE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=e676V63G6aredIotz6tTW7obGzyA3TbU2JHDVa8EwUjMofmsT/eIGSgJJ+YRdjTRNH+SdD4hcGN6BHVAZwbFbvIqF1O84CqAJVXBJZ7xivbmb/tdWPNaU1alK9jGW/a+iaOvXgdF51XffqYaa6aGyUEusx5flVA6N4PnaTlbkEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HXvg6MiP; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1741981233; c=relaxed/simple;
+	bh=IcViIoyQuIwvjOKTv7xso/ATQXDP/KFmnaBlf6ULPVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=cNSfCDvw05CijDSYrwwfC2Dz0QU/L8DVa+Sod5cMsorn78cxH+1ji12WMKgdjXJlFO4hj1hppS5fMWxJ8jakEHpwIoAfP+yo8gOJJTVTYULZ40j4Tv5H4Q7o4ZOBINmrC5maY8N9BXZkGj0LpQVTcjnTDET5eS3NFSN206jOaPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lkNexEeb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HXvg6MiP"
-Received: from github.com (hubbernetes-node-c4c8ce6.va3-iad.github.net [10.48.130.41])
-	by smtp.github.com (Postfix) with ESMTPA id E3940E0B62
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Mar 2025 11:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1741976327;
-	bh=eNX2+T96VkZ2aC4M6FzyJk9M/vWEeMcKrr3w4NGv5CE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=HXvg6MiPKaKEo36n2KGFwj3QJlGEMljhlzOTI4JZZuz+aQqD+U5tKvU750T7ystlK
-	 QbpJhy3M0rKkz5cGBHFSUuXx5JGXnzfnIvpdkSNvygbIS6K0f3IsETlIJIFj63WmEh
-	 H+CCnxrYD62ErhD1HfvbyXr21OyOQZXebZmwLM+4=
-Date: Fri, 14 Mar 2025 11:18:47 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/ee2243-21d45d@github.com>
-Subject: [bluez/bluez] 21d45d: gatt-client: Fix Handle property of descriptors
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lkNexEeb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC10C4CEE3;
+	Fri, 14 Mar 2025 19:40:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741981233;
+	bh=IcViIoyQuIwvjOKTv7xso/ATQXDP/KFmnaBlf6ULPVw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=lkNexEebThSwtdRrPAup8bXMoJER1M9KpLBf3fswA1CsmARAK9TKlnFcOJA/HEBrG
+	 VIUtez4QCUJVsdf4/OCMlZEH2jUAE5+lOR5B/4VPLx5ETPmCMoFkFzqrKyEyBWfVT4
+	 gdnJHxGT3RmJ41fTmi2kjuZqIaA9oKCmcubKh1/1SLkPxa9xtVthGvf0FCpAVSeIsS
+	 mX5pGt/6Y1Qq4InYwiqI6anNLA0l2MPhEDImz6wfEFvfX6rmTSmGhqk2DV3ywXqKWE
+	 XC859CiCBaiJ8BKTYbTCEZS2Gi5u2cT7CqwAb2YKLVxRzQ80cEHrI86kHpGhKq6zVk
+	 KZ8WcqllXpdfA==
+Date: Fri, 14 Mar 2025 14:40:31 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-pci@vger.kernel.org,
+	bhelgaas@google.com, ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com, Kiran K <kiran.k@intel.com>
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Support function level reset
+Message-ID: <20250314194031.GA785335@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250314101613.3682010-1-chandrashekar.devegowda@intel.com>
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 21d45dda01da8665f04a7d17dbd040c54f6091c0
-      https://github.com/bluez/bluez/commit/21d45dda01da8665f04a7d17dbd040c54f6091c0
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-03-13 (Thu, 13 Mar 2025)
+On Fri, Mar 14, 2025 at 12:16:13PM +0200, Chandrashekar Devegowda wrote:
+> Support function level reset (flr) on hardware exception to recover
+> controller. Driver also implements the back-off time of 5 seconds and
+> the maximum number of retries are limited to 5 before giving up.
 
-  Changed paths:
-    M src/gatt-client.c
+Sort of weird that the commit log mentions FLR, but it's not mentioned
+in the patch itself except for BTINTEL_PCIE_FLR_RESET_MAX_RETRY.
+Apparently the assumption is that DSM_SET_RESET_METHOD_PCIE performs
+an FLR.
 
-  Log Message:
-  -----------
-  gatt-client: Fix Handle property of descriptors
+Since this is an ACPI _DSM, presumably this mechanism only works for
+devices built into the platform, not for any potential plug-in devices
+that would not be described via ACPI.  I guess this driver probably
+already only works for built-in devices because it also uses
+DSM_SET_WDISABLE2_DELAY and DSM_SET_RESET_METHOD.
 
-Patch cda5549f2475 ("gatt-client: Add read-only handles to dbus")
-introduced support for Handle properties to GATT attributes but the
-function descriptor_get_handle do access the user_pointer as it was a
-service not a descriptor.
+There is a generic PCI core way to do FLR (pcie_reset_flr()), so I
+assume the _DSM exists because the device needs some additional
+device-specific work around the FLR.
 
-Fixes: https://github.com/bluez/bluez/issues/1133
+> +static void btintel_pcie_removal_work(struct work_struct *wk)
+> +{
+> +	struct btintel_pcie_removal *removal =
+> +		container_of(wk, struct btintel_pcie_removal, work);
+> +	struct pci_dev *pdev = removal->pdev;
+> +	struct pci_bus *bus;
+> +	struct btintel_pcie_data *data;
+> +
+> +	data = pci_get_drvdata(pdev);
+> +
+> +	pci_lock_rescan_remove();
+> +
+> +	bus = pdev->bus;
+> +	if (!bus)
+> +		goto out;
+> +
+> +	btintel_acpi_reset_method(data->hdev);
+> +	pci_stop_and_remove_bus_device(pdev);
+> +	pci_dev_put(pdev);
+> +
+> +	if (bus->parent)
+> +		bus = bus->parent;
+> +	pci_rescan_bus(bus);
 
+This remove and rescan by a driver that's bound to the device subverts
+the driver model.  pci_stop_and_remove_bus_device() detaches the
+driver from the device.  After the driver is detached, we should not
+be running any driver code.
 
+There are a couple other drivers that remove their own device (ath9k,
+iwlwifi, asus_wmi, eeepc-laptop), but I think those are broken and
+it's a mistake to add this pattern to more drivers.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+What's the reason for doing the remove and rescan?  The PCI core
+doesn't reset the device when you do this, so it's not a "bigger
+hammer reset".
+
+> +out:
+> +	pci_unlock_rescan_remove();
+> +	kfree(removal);
+> +}
