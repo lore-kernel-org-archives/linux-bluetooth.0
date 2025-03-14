@@ -1,103 +1,82 @@
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441E318B494;
-	Fri, 14 Mar 2025 16:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3898E204C00
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Mar 2025 17:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741970335; cv=none; b=UoZ3rQqP4FgThJ9OpCOc2d4g2FgE+DEa3NN9XqRdKId9LV0SSCbB/WGb6uaFf3JhRWeYwE6B4+R/Ki7hMZpiQVzJ/7TXOdqrCMLdyXjSZUPsSk9Vh7XA8WV646Jn0A2fHfzeTpNBiC3fLcqbAwUsdTkYpt5MpOsD2C0UgCgfXdQ=
+	t=1741974829; cv=none; b=QTplSRIV5GLBatPY+QWxaqsgFpzPa77H+367N5KD2cy5VQQDpIF0VZz179KMqXtkzFcTfT2bS0FZlBW0dMesyKcWWgZLqYew9jFobXfOX06QDK2AD4BCDSrdx6WmFINrO4Ckbwl7KKB+SXZZQBocYToSivdqUFycgcynHM/Qdwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741970335; c=relaxed/simple;
-	bh=mUmGdDNy7CflPQgurDgMSe2jxfVMINCSiKslqK4V44Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AOvzOzB4rwMGnbmo/66O1iKIdLdndUrD+tcOfTDM8LsbShbl6Rm35qRBMRzE+4z71B/4NKgjBX6REqCcPelaFAIThkzTddMRLSJBQ8A5yz/LdOA8ITT4OXRxfuMxkhsHu8jS6QlQY0RfYgrhftIiVQuodNYvSIlhdPZJFTyv72g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IbzXk7t9; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741974829; c=relaxed/simple;
+	bh=tM9Ecu/g3KO40hvd3k1ANYSsOhpQPTo9AVrI5HvdchU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iEH2Hq8IO6yUejrgIlipyW5xYBolv0cQrmmYRNLcumyd0t6lEQqtLeat1UYBCk+OM2qKRd1lW2ErqZFTqKNlR7Inq9Ij/YzgSNJeMIdS6CBjv2GvLQoGkLN+4iSvXO0L0KLzELyv6D4BnvdqHyilxKi15wA2anmvDqAf8IOz5do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTbQC06b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbzXk7t9"
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-86b68e51af4so942498241.1;
-        Fri, 14 Mar 2025 09:38:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741970333; x=1742575133; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PZeAtTBWW6NSQAJkyfYhJOSxTlP/7BOudKr/+e8Hc9g=;
-        b=IbzXk7t9bjFXknQvRQ03QdU3UcZLt1C4uIXyRuqNOZTC1bDNHOZMuLKv9EvjhnEBIu
-         uKVgLlHgBEeGVOAiCwT+u3uPAdU/VvvZDbuoyMqHIUMvdBi+3GOOropdATYNvazNpTV6
-         2WtML9+Y54sFxk6emNSRV+TMGUtaLdTEjujdN/KCxfoMpBHdLPeEcaoBpAiPa5oSZSPp
-         4WI56JUdWMt48qGXHZNCyfJgdWptMWJvc8X1b72VrPR+KIGBvFv+zEOrjrQQNCNybfV4
-         8kEjyH/BBO5fz8AGUmN3dbXCiEvXybbBFrOIM7ce4+wfkH2cDuEOJGgFHihSh507h9of
-         0p8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741970333; x=1742575133;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PZeAtTBWW6NSQAJkyfYhJOSxTlP/7BOudKr/+e8Hc9g=;
-        b=stEuljYx57IgMHIjRBxxiprdFPsRwvRS10Kecn1+pgW6uyA6FAF3DVPbOyKBetJDvm
-         qAFtdekqYNyC6zgkVG8Sn1mUbkQ+EiCpddHpZ7IQ0FEPdmbPWxGfyGUZpuher5+rWKt2
-         TrVzZGn7lOLiuK85DljR0pQgFBCSJXpIjpVOJB3YhAXp1rY8OjjbDZGYNyQm4fJUFjjR
-         zaUfBkPjsRlhTqIIK3MvxS2dh/22PzUNJKT5HWAt+9vFnu192oIRs+wxhhQLN5hWqRTJ
-         3loMejAguBf3cYMpZ3/n5YdkXKC9KfSGfKPlCXjWKOZ+LGqFrGs5sbK/8U5MIpiRIoSW
-         /5Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCX00aBjyzAYkBTr4aYVud6BbaZmCgFuTl4Qw3582vQGRYPkpdc1KWx09p/0OPV/mnXLdxpzVNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAU9r6FDmO87moSWEdJCJrhXrCn3U0i88WnQJ0W+B9Rrg5FJUI
-	W1zTQ0FCWReqIkbJogYF5UXo4sdZZb2S8pUTUc88S14ugeSv73wA
-X-Gm-Gg: ASbGncudm23FZ66yhrymrvbmRnEsy/FOSikClu+GIfKSJ5EoV7YlfRwnbKCGeY221Xo
-	GNthnQj7KykJjp+pNTWhGHiEAFRA39HCCNof9tjrXbavnm+bswwIKUc+BKJlaTg3v1nQvYin+S9
-	6qmk0iacR6EmoLICpbJ7w0cIrBg7MqyvIrJW+zdSrW1caqAiQiJ6S0+YX6AD/r8n8tiUu9SRYat
-	HCSmjqtu+QPG1vSLVuocN6/njpkJ2MtUiGfB4T4SLKwTSe4AjVtatomfx0xuKJgP4TLodeNOPi2
-	tQe7+0thEX/jaLX8lJehpoRj7SHL0/Clx8Uaj0Oo0BpQ1LX97qMoKec/PEafc65Uu3zL+FFXAXo
-	Ze0/Xk6xG4iWWSXjTYe5MuTRo
-X-Google-Smtp-Source: AGHT+IEehblAXKmi+T0Pq/D31/D3w5D4vNCyox/3GOl11p1JP0+j1HjqShy4WUtYsrzANc9fikjs8A==
-X-Received: by 2002:a05:6102:549e:b0:4c1:a448:ac7d with SMTP id ada2fe7eead31-4c383145426mr2371110137.10.1741970332843;
-        Fri, 14 Mar 2025 09:38:52 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86d90d68c61sm616851241.3.2025.03.14.09.38.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Mar 2025 09:38:51 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-03-14
-Date: Fri, 14 Mar 2025 12:38:47 -0400
-Message-ID: <20250314163847.110069-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTbQC06b"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A9FCCC4CEEC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Mar 2025 17:53:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741974828;
+	bh=tM9Ecu/g3KO40hvd3k1ANYSsOhpQPTo9AVrI5HvdchU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=jTbQC06bNS9O8hNSg0nYHezivTVAod1g7l2q0vEOYwfj403kxYCU15ZY4Zo0vjwkF
+	 PPxXBXUIeKBoHdmMFgwzE+XWrdj8Ud5dQ0qNUuQeWlbT4jz755HlZ4b2Tp+4SXn5Kp
+	 +mvpRok7tEEDQ830C3/HC1U8cll+QPf2g67Wgo/uf1tNH8s2qQoMjlqo/SJV8Pzvc7
+	 8vCaQYECQgs6VaRqZIb+10DWB0LFo7Z+xGlqnvpHt+iC5x/IbhMsrmPqWAq85Z45X0
+	 5cPv7NaO/+WT/WRZPsJQ4AAIdSldpfn68EqnUI1+ICT7ePqHTde+4nZMZnjz48+Lkb
+	 bK590CC7GgywQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 94C09C3279F; Fri, 14 Mar 2025 17:53:48 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219866] Bluetooth stops working on BE201 after linux-firmware
+ 20250311
+Date: Fri, 14 Mar 2025 17:53:48 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: bhabeck34@outlook.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-219866-62941-RYfcZFQvMI@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219866-62941@https.bugzilla.kernel.org/>
+References: <bug-219866-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-The following changes since commit 2409fa66e29a2c09f26ad320735fbdfbb74420da:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219866
 
-  Merge tag 'nf-25-03-13' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2025-03-13 15:07:39 +0100)
+Bryan H. (bhabeck34@outlook.com) changed:
 
-are available in the Git repository at:
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |CODE_FIX
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-03-14
+--- Comment #1 from Bryan H. (bhabeck34@outlook.com) ---
+There appears to be a merge request in the linux-firmware git repo that
+addresses this issue, so I'm marking this as resolved.
 
-for you to fetch changes up to f6685a96c8c8a07e260e39bac86d4163cfb38a4d:
+--=20
+You may reply to this email to add a comment.
 
-  Bluetooth: hci_event: Fix connection regression between LE and non-LE adapters (2025-03-13 16:43:39 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - hci_event: Fix connection regression between LE and non-LE adapters
- - Fix error code in chan_alloc_skb_cb()
-
-----------------------------------------------------------------
-Arkadiusz Bokowy (1):
-      Bluetooth: hci_event: Fix connection regression between LE and non-LE adapters
-
-Dan Carpenter (1):
-      Bluetooth: Fix error code in chan_alloc_skb_cb()
-
- include/net/bluetooth/hci.h | 2 +-
- net/bluetooth/6lowpan.c     | 7 ++++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+You are receiving this mail because:
+You are the assignee for the bug.=
