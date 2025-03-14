@@ -1,125 +1,478 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D105C1F4706
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Mar 2025 22:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE031459F6;
+	Fri, 14 Mar 2025 06:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741903749; cv=none; b=Axf66HSsLygWUsw46ShND1ho8wa7RWyGtU/hUtNmiElCx2szuTCsG3twHxY3vA3jXbvKnth18ffD0Fy1fbptpPrgCe5foy/gJFm40Ft/DaB/iNC519e25DIJZngDpXWmWUDP/dQcQKhPJUI+6E28rqhAJPhAczhz9XJbAMgOjA0=
+	t=1741934810; cv=none; b=dMD9CQUgC4aAGMjUAfQIALpZe4UdcnjuldqYegRuLhka0CFVeCzhT5RrEbZAESWGfozCgzH17p7WYOsfaNkgmZCF9POPYl4+to96NPbtBAFPhF0YhgU9yzpqn+txZSg++1StIrT4QhAQAJX26fd41W3MzZAyU+vznqLvBKafsVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741903749; c=relaxed/simple;
-	bh=gUHKK4EKt/0cZIg0XIExCeB2eFJMz2oHJ5bGZ06yK6A=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rbPN1xA17noIB1/UN3W/JLYQj5U9yPSL8lysOMKxKel/+VJA/4ozlt4s2iQEro87OYPGVvhBGLDJaTQPCEfYQKFz/Y/KxghYguPx57fwVC4mx6ZF6B9TNMHkJUZg8lwbDJiW9Rz37PmsG6StbZynAibK+F6gCx4eY0zYCxIQPEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GoCNhYc7; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741934810; c=relaxed/simple;
+	bh=PwZy2LvuHa0TDcVFLLz4m68zpq9Ia/g9vaB9uGWAXJY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=EBrz0LDLhqzB77FqBehP/UKufGFt2q/+Cd9UteCYxtk68//ZihLCMee7hTT2L41bfj0as4jIhS5KzNyeCKqdc8IAnod0ggqkptYU5ND6c/qfD+3g/ie3Wq9lsATpWDwz0Z7J9dX0/2DDlmdrU5GOB9WsVTXafyA+sx0+KoD8Pl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hRalku2S; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GoCNhYc7"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6e8ffa00555so13033386d6.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Mar 2025 15:09:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741903746; x=1742508546; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TIdn8YtmtsMogUMyHmvQReiVP//Th7WeapUahLOQ3c8=;
-        b=GoCNhYc7F1lAJNNVmK9H3VQV0IyVhG+mh4aGUu7RrqCrGZw3iwtYsZYMIbsM1f6RSc
-         oiWXrrUEBKKEKXktpNP6JOw07CWE0Vtw4v5a/pGYGk49fU5TLkaq2j4wY9iwrY+lSsq7
-         0/waGWYEtJ8r1xO66fR7doDeubloEhRii39Csdl3PbGa5mNrO6EeQyoq5FPsRTmr4a18
-         BzUgK45AzysHScwKjt7OcrlYzDoWKPNBywYGva1CCNJ4+NvLV+tgF0je4fYvNXyjX1NX
-         sN8k2/CgDwwYxQWovI4VjTa2mUCFKh4eqzsrHSyFUNCNbkAeMQ62feu0u4Cf3EDCAK3N
-         y/pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741903746; x=1742508546;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TIdn8YtmtsMogUMyHmvQReiVP//Th7WeapUahLOQ3c8=;
-        b=IoodlEyCeZhImoSb0o7CUBNGaLKp9EKdGGGeGccOuWIzoWXZILLT2OEdWHt1w8JnnP
-         fXyAxIuhvpv1Z2JYv3LGVDofOVJejEPLOQn4o6ziW+c4x5EDFmBILkVq+04GCNrfbXGh
-         BCjiUQOn1AbydfXopH3DYCk82pjJD/2lASKQVYePkx3h2QefisJpnxBiDsBZaXsBYH2Z
-         z/q9fQwTzBqP34FJ3griiYn7GSdPI+rtS6iMsjHW1h2WbY9lkz81ZohH5iYCtF4LeGZL
-         tQ46qYvdbzlgXVkcUAt11f3JzGLfFNb6K+LWVJ7Zdlq6U46BPgjyiMZx4O1rGjCzPIY/
-         GlKg==
-X-Gm-Message-State: AOJu0YxL8MttpvwTIg3BOzrc04bgxoemY73zQT/Ky8f8i2PhJW7hnCuL
-	5NTKjQYMw3csF42qNOOj4qrTBRv21CjCdiaYVSXFbcDdOVgf+7g7uyPZHg==
-X-Gm-Gg: ASbGncsq+x2avH1esisz8Zc982Py3iqAYivVkFb23TDlqzizAIQ5aXMPbXnpEU62XL3
-	Y6HhW2mO1NyXnSbbBoR3xsHQ0Pvp3+bdYgso+MvwZgSltrhRoh7PrD7L7G/XJ36R66DV7YXUEM5
-	a6+BZaJex49e9LWbXF7cRLdd3q38WwPzs3Xn89kSO9aXGDpTZa9Y/dH+R8TuX9jBHv6ZNaNVN5z
-	CQAF9LTVla+R57KjVEfBvvyTwi6vf90kBq1G6joK8y2xYvrQRf+E6ZfrFWxS1tCbELESOPN7YEt
-	mMeg7rMc7boZXW4V6eHCVoTzF4iAgAtk1wykd2fYJEH5EHDpPQ==
-X-Google-Smtp-Source: AGHT+IErq4/Pr9IZs3U71vuWOPG923eXw65QR49Qt5WKDi4S+a8Awt89PGlVyAB3wBFcHpbIS2yRPw==
-X-Received: by 2002:ad4:5b83:0:b0:6e4:2872:45f5 with SMTP id 6a1803df08f44-6eaeaa8a17dmr1210376d6.25.1741903746593;
-        Thu, 13 Mar 2025 15:09:06 -0700 (PDT)
-Received: from [172.17.0.2] ([20.49.54.162])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade3343b8sm14441026d6.69.2025.03.13.15.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 15:09:05 -0700 (PDT)
-Message-ID: <67d35781.050a0220.161188.5f0b@mx.google.com>
-Date: Thu, 13 Mar 2025 15:09:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4941790580368916111=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hRalku2S"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741934809; x=1773470809;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PwZy2LvuHa0TDcVFLLz4m68zpq9Ia/g9vaB9uGWAXJY=;
+  b=hRalku2Sd87D6/tOSDbqpzaqOCPx7Zwu8WJ7WEqAivbmNEssOo4PZmHC
+   hJfwhpugBkvVt3Deoc9HEVB+XaxrDM3HxbR5Quwl2bh+uaE4TiRMXcAmd
+   EPLNTs/W20DhRBd36Kb2xTlf4UxfsSufkW8fgPyn8oqQ5rdwC9VCQ4qpQ
+   vI267e+zgi83q9vF2HxL98aTYdNlNotLi8zuRl8XXVFQjYmhIeZyFXGEi
+   C9s0ZYE9JqXShnlDuuqEPdFO6LzVog6ljJfNXwMMOd2NWCUui9+fXtq2h
+   YaDXHF0kMu2CVWANaukV3kd93cgvgkBQW1dsuh8MonoQWYe4zT0JiEqs3
+   w==;
+X-CSE-ConnectionGUID: Ef+TmA66T7+E6UlvR47itA==
+X-CSE-MsgGUID: L1yjcl+ySYacOKX/4hOwlg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="54456640"
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="54456640"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 23:46:47 -0700
+X-CSE-ConnectionGUID: JT6lrTunTyWjap8z4B/fPg==
+X-CSE-MsgGUID: Xg3Jb6j3SGu6D2UzOoU3Bg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="125371150"
+Received: from unknown (HELO BSINU234.iind.intel.com) ([10.66.226.146])
+  by fmviesa003.fm.intel.com with ESMTP; 13 Mar 2025 23:46:44 -0700
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-pci@vger.kernel.org,
+	bhelgaas@google.com,
+	ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Support function level reset
+Date: Fri, 14 Mar 2025 12:16:13 +0200
+Message-Id: <20250314101613.3682010-1-chandrashekar.devegowda@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] gatt-client: Fix Handle property of descriptors
-In-Reply-To: <20250313205404.534383-1-luiz.dentz@gmail.com>
-References: <20250313205404.534383-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============4941790580368916111==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Support function level reset (flr) on hardware exception to recover
+controller. Driver also implements the back-off time of 5 seconds and
+the maximum number of retries are limited to 5 before giving up.
 
-This is automated email and please do not reply to this email!
+The function btintel_acpi_reset_method() is made public and reused to
+invoke flr for pcie products.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=943694
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.16 seconds
-GitLint                       PENDING   0.16 seconds
-BuildEll                      PASS      21.12 seconds
-BluezMake                     PASS      1474.58 seconds
-MakeCheck                     PASS      12.72 seconds
-MakeDistcheck                 PASS      159.38 seconds
-CheckValgrind                 PASS      215.52 seconds
-CheckSmatch                   PASS      285.85 seconds
-bluezmakeextell               PASS      98.75 seconds
-IncrementalBuild              PENDING   0.24 seconds
-ScanBuild                     PASS      871.10 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel.c      |  11 +-
+ drivers/bluetooth/btintel.h      |  12 ++
+ drivers/bluetooth/btintel_pcie.c | 246 ++++++++++++++++++++++++++++++-
+ 3 files changed, 260 insertions(+), 9 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index ec5e2c7a56ae..aae6a85d9f64 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -30,11 +30,6 @@
+ 
+ #define BTINTEL_EFI_DSBR	L"UefiCnvCommonDSBR"
+ 
+-enum {
+-	DSM_SET_WDISABLE2_DELAY = 1,
+-	DSM_SET_RESET_METHOD = 3,
+-};
+-
+ #define CMD_WRITE_BOOT_PARAMS	0xfc0e
+ struct cmd_write_boot_params {
+ 	__le32 boot_addr;
+@@ -49,9 +44,10 @@ static struct {
+ 	u32        fw_build_num;
+ } coredump_info;
+ 
+-static const guid_t btintel_guid_dsm =
++const guid_t btintel_guid_dsm =
+ 	GUID_INIT(0xaa10f4e0, 0x81ac, 0x4233,
+ 		  0xab, 0xf6, 0x3b, 0x2a, 0xc5, 0x0e, 0x28, 0xd9);
++EXPORT_SYMBOL_GPL(btintel_guid_dsm);
+ 
+ int btintel_check_bdaddr(struct hci_dev *hdev)
+ {
+@@ -2547,7 +2543,7 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
+ 	kfree_skb(skb);
+ }
+ 
+-static int btintel_acpi_reset_method(struct hci_dev *hdev)
++int btintel_acpi_reset_method(struct hci_dev *hdev)
+ {
+ 	int ret = 0;
+ 	acpi_status status;
+@@ -2586,6 +2582,7 @@ static int btintel_acpi_reset_method(struct hci_dev *hdev)
+ 	kfree(buffer.pointer);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(btintel_acpi_reset_method);
+ 
+ static void btintel_set_dsm_reset_method(struct hci_dev *hdev,
+ 					 struct intel_version_tlv *ver_tlv)
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 19530ea14905..bc4edfe08216 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -64,6 +64,12 @@ struct intel_tlv {
+ 
+ #define BTINTEL_FWID_MAXLEN 64
+ 
++enum {
++	DSM_SET_WDISABLE2_DELAY = 1,
++	DSM_SET_RESET_METHOD = 3,
++	DSM_SET_RESET_METHOD_PCIE = 5 /* Used for PCIe products */
++};
++
+ struct intel_version_tlv {
+ 	u32	cnvi_top;
+ 	u32	cnvr_top;
+@@ -255,6 +261,7 @@ int btintel_shutdown_combined(struct hci_dev *hdev);
+ void btintel_hw_error(struct hci_dev *hdev, u8 code);
+ void btintel_print_fseq_info(struct hci_dev *hdev);
+ int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb);
++int btintel_acpi_reset_method(struct hci_dev *hdev);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -393,4 +400,9 @@ static inline int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	return -EOPNOTSUPP;
+ }
++
++static int btintel_acpi_reset_method(struct hci_dev *hdev)
++{
++	return -EOPNOTSUPP;
++}
+ #endif
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 9114be1fc3ce..9346c8d68636 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -13,6 +13,7 @@
+ #include <linux/wait.h>
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
++#include <linux/acpi.h>
+ 
+ #include <linux/unaligned.h>
+ 
+@@ -22,6 +23,8 @@
+ #include "btintel.h"
+ #include "btintel_pcie.h"
+ 
++extern const guid_t btintel_guid_dsm;
++
+ #define VERSION "0.1"
+ 
+ #define BTINTEL_PCI_DEVICE(dev, subdev)	\
+@@ -41,6 +44,13 @@ static const struct pci_device_id btintel_pcie_table[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
+ 
++struct btintel_pcie_dev_restart_data {
++	struct list_head list;
++	u8 restart_count;
++	time64_t last_error;
++	char name[];
++};
++
+ /* Intel PCIe uses 4 bytes of HCI type instead of 1 byte BT SIG HCI type */
+ #define BTINTEL_PCIE_HCI_TYPE_LEN	4
+ #define BTINTEL_PCIE_HCI_CMD_PKT	0x00000001
+@@ -62,6 +72,9 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
+ #define BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER	0x17A2
+ #define BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT		0x1E61
+ 
++#define BTINTEL_PCIE_RESET_OK_TIME_SECS		5
++#define BTINTEL_PCIE_FLR_RESET_MAX_RETRY	5
++
+ /* Alive interrupt context */
+ enum {
+ 	BTINTEL_PCIE_ROM,
+@@ -99,6 +112,14 @@ struct btintel_pcie_dbgc_ctxt {
+ 	struct btintel_pcie_dbgc_ctxt_buf bufs[BTINTEL_PCIE_DBGC_BUFFER_COUNT];
+ };
+ 
++struct btintel_pcie_removal {
++	struct pci_dev *pdev;
++	struct work_struct work;
++};
++
++static LIST_HEAD(btintel_pcie_restart_data_list);
++static DEFINE_SPINLOCK(btintel_pcie_restart_data_lock);
++
+ /* This function initializes the memory for DBGC buffers and formats the
+  * DBGC fragment which consists header info and DBGC buffer's LSB, MSB and
+  * size as the payload
+@@ -1804,6 +1825,9 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
+ 	u32 type;
+ 	u32 old_ctxt;
+ 
++	if (test_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags))
++		return -ENODEV;
++
+ 	/* Due to the fw limitation, the type header of the packet should be
+ 	 * 4 bytes unlike 1 byte for UART. In UART, the firmware can read
+ 	 * the first byte to get the packet type and redirect the rest of data
+@@ -2041,6 +2065,210 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ 	return err;
+ }
+ 
++static struct btintel_pcie_dev_restart_data *btintel_pcie_get_restart_data(struct pci_dev *pdev,
++									   struct device *dev)
++{
++	struct btintel_pcie_dev_restart_data *tmp, *data = NULL;
++	const char *name = pci_name(pdev);
++	struct hci_dev *hdev = to_hci_dev(dev);
++
++	spin_lock(&btintel_pcie_restart_data_lock);
++	list_for_each_entry(tmp, &btintel_pcie_restart_data_list, list) {
++		if (strcmp(tmp->name, name))
++			continue;
++		data = tmp;
++		break;
++	}
++	spin_unlock(&btintel_pcie_restart_data_lock);
++
++	if (data) {
++		bt_dev_dbg(hdev, "Found restart data for BDF:%s", data->name);
++		return data;
++	}
++
++	/* First time allocate */
++	data = kzalloc(struct_size(data, name, strlen(name) + 1), GFP_ATOMIC);
++	if (!data)
++		return NULL;
++
++	strscpy(data->name, name, strlen(data->name) + 1);
++	spin_lock(&btintel_pcie_restart_data_lock);
++	list_add_tail(&data->list, &btintel_pcie_restart_data_list);
++	spin_unlock(&btintel_pcie_restart_data_lock);
++
++	return data;
++}
++
++static void btintel_pcie_free_restart_list(void)
++{
++	struct btintel_pcie_dev_restart_data *tmp;
++
++	while ((tmp = list_first_entry_or_null(&btintel_pcie_restart_data_list,
++					       typeof(*tmp), list))) {
++		list_del(&tmp->list);
++		kfree(tmp);
++	}
++}
++
++static void btintel_pcie_inc_restart_count(struct pci_dev *pdev, struct device *dev)
++{
++	struct btintel_pcie_dev_restart_data *data;
++	struct hci_dev *hdev = to_hci_dev(dev);
++	time64_t retry_window;
++
++	data = btintel_pcie_get_restart_data(pdev, dev);
++	if (!data)
++		return;
++
++	retry_window = ktime_get_boottime_seconds() - data->last_error;
++	if (data->restart_count == 0) {
++		/* First iteration initialise the time and counter */
++		data->last_error = ktime_get_boottime_seconds();
++		data->restart_count++;
++		bt_dev_dbg(hdev, "First iteration initialise. last_error:%lld seconds restart_count:%d",
++			   data->last_error, data->restart_count);
++	} else if (retry_window < BTINTEL_PCIE_RESET_OK_TIME_SECS &&
++		   data->restart_count <= BTINTEL_PCIE_FLR_RESET_MAX_RETRY) {
++		/* FLR triggered still within the Max retry time so
++		 * increment the counter
++		 */
++		data->restart_count++;
++		bt_dev_err(hdev, "FLR triggered still within the Max retry time so increment the restart_count:%d",
++			   data->restart_count);
++	} else if (retry_window > BTINTEL_PCIE_RESET_OK_TIME_SECS) {
++		/* FLR triggered out of the retry window so reset */
++		bt_dev_err(hdev, "FLR triggered OUT of the retry window so RESET counters last_error:%lld seconds restart_count:%d",
++			   data->last_error, data->restart_count);
++		data->last_error = 0;
++		data->restart_count = 0;
++	}
++}
++
++static void btintel_pcie_removal_work(struct work_struct *wk)
++{
++	struct btintel_pcie_removal *removal =
++		container_of(wk, struct btintel_pcie_removal, work);
++	struct pci_dev *pdev = removal->pdev;
++	struct pci_bus *bus;
++	struct btintel_pcie_data *data;
++
++	data = pci_get_drvdata(pdev);
++
++	pci_lock_rescan_remove();
++
++	bus = pdev->bus;
++	if (!bus)
++		goto out;
++
++	btintel_acpi_reset_method(data->hdev);
++	pci_stop_and_remove_bus_device(pdev);
++	pci_dev_put(pdev);
++
++	if (bus->parent)
++		bus = bus->parent;
++	pci_rescan_bus(bus);
++
++out:
++	pci_unlock_rescan_remove();
++	kfree(removal);
++}
++
++static void btintel_pcie_reset(struct hci_dev *hdev)
++{
++	struct btintel_pcie_removal *removal;
++	struct btintel_pcie_data *data;
++	union acpi_object *obj, argv4;
++	acpi_handle handle;
++	struct pldr_mode {
++		u16	cmd_type;
++		u16	cmd_payload;
++	} __packed mode;
++
++	data = hci_get_drvdata(hdev);
++	if (!btintel_test_flag(hdev, INTEL_FIRMWARE_LOADED)) {
++		bt_dev_dbg(hdev, "Firmware not loaded, so reset not supported");
++		return;
++	}
++
++	handle = ACPI_HANDLE(GET_HCIDEV_DEV(hdev));
++	if (!handle) {
++		bt_dev_dbg(hdev, "No support for bluetooth device in ACPI firmware");
++		return;
++	}
++
++	if (!acpi_has_method(handle, "_PRR")) {
++		bt_dev_err(hdev, "No support for _PRR ACPI method");
++		return;
++	}
++
++	if (!acpi_check_dsm(handle, &btintel_guid_dsm, 0,
++			    BIT(DSM_SET_RESET_METHOD_PCIE))) {
++		bt_dev_err(hdev, "No dsm support to set reset method for _PRR");
++		return;
++	}
++
++	/* set 1 for_PRR Mode */
++	mode.cmd_type = 1;
++	/* 0 – BT Core Reset (Default)
++	 * 1 – Product Reset (PLDR Abort flow)
++	 */
++	mode.cmd_payload = 0;
++
++	argv4.buffer.type = ACPI_TYPE_BUFFER;
++	argv4.buffer.length = sizeof(mode);
++	argv4.buffer.pointer = (void *)&mode;
++
++	obj = acpi_evaluate_dsm(handle, &btintel_guid_dsm, 0,
++				DSM_SET_RESET_METHOD_PCIE, &argv4);
++	if (!obj) {
++		bt_dev_err(hdev, "Failed to call dsm to set reset method");
++		return;
++	}
++	ACPI_FREE(obj);
++
++	removal = kzalloc(sizeof(*removal), GFP_ATOMIC);
++	if (!removal)
++		return;
++
++	removal->pdev = data->pdev;
++	INIT_WORK(&removal->work, btintel_pcie_removal_work);
++	pci_dev_get(removal->pdev);
++	schedule_work(&removal->work);
++}
++
++static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
++{
++	struct  btintel_pcie_dev_restart_data *data;
++	struct btintel_pcie_data *dev_data = hci_get_drvdata(hdev);
++	struct pci_dev *pdev = dev_data->pdev;
++	time64_t retry_window;
++
++	if (code == 0x13) {
++		bt_dev_err(hdev, "Encountered top exception");
++		return;
++	}
++
++	data = btintel_pcie_get_restart_data(pdev, &hdev->dev);
++	if (!data)
++		return;
++
++	retry_window = ktime_get_boottime_seconds() - data->last_error;
++
++	/* If within 5 seconds max 5 attempts have already been made
++	 * then stop any more retry and indicate to user for cold boot
++	 */
++	if (retry_window < BTINTEL_PCIE_RESET_OK_TIME_SECS &&
++	    data->restart_count >= BTINTEL_PCIE_FLR_RESET_MAX_RETRY) {
++		bt_dev_err(hdev, "Recovery options exhausted, Please cold boot!");
++		bt_dev_err(hdev, "Boot time:%lld seconds first_flr at:%lld seconds restart_count:%d",
++			   ktime_get_boottime_seconds(), data->last_error,
++			   data->restart_count);
++		return;
++	}
++	btintel_pcie_inc_restart_count(pdev, &hdev->dev);
++	btintel_pcie_reset(hdev);
++}
++
+ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ {
+ 	int err;
+@@ -2062,9 +2290,10 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ 	hdev->send = btintel_pcie_send_frame;
+ 	hdev->setup = btintel_pcie_setup;
+ 	hdev->shutdown = btintel_shutdown_combined;
+-	hdev->hw_error = btintel_hw_error;
++	hdev->hw_error = btintel_pcie_hw_error;
+ 	hdev->set_diag = btintel_set_diag;
+ 	hdev->set_bdaddr = btintel_set_bdaddr;
++	hdev->reset = btintel_pcie_reset;
+ 
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
+@@ -2208,7 +2437,20 @@ static struct pci_driver btintel_pcie_driver = {
+ 	.driver.coredump = btintel_pcie_coredump
+ #endif
+ };
+-module_pci_driver(btintel_pcie_driver);
++
++static int __init btintel_pcie_init(void)
++{
++	return pci_register_driver(&btintel_pcie_driver);
++}
++
++static void __exit btintel_pcie_exit(void)
++{
++	pci_unregister_driver(&btintel_pcie_driver);
++	btintel_pcie_free_restart_list();
++}
++
++module_init(btintel_pcie_init);
++module_exit(btintel_pcie_exit);
+ 
+ MODULE_AUTHOR("Tedd Ho-Jeong An <tedd.an@intel.com>");
+ MODULE_DESCRIPTION("Intel Bluetooth PCIe transport driver ver " VERSION);
+-- 
+2.34.1
 
---===============4941790580368916111==--
