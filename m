@@ -1,324 +1,139 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941B21E1DE8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D924C9F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742236992; cv=none; b=sPMaYMDrl8DUtakHKcuKzytwuZjtsQ43MNn0/AzFDQQ7aYu3QlGynTfmQmZg6mics/EXFlq+X8oNEkf9jMir4WeAZInVyjPCzes9TgRDjneEkJuY6MNpQmfI++S/VKv65lAHUi1oI3fgu4+Ny2eEnzcHFoGPl3j8thp+Zub+ExE=
+	t=1742237619; cv=none; b=qO7MFMmpEKmv9+4knM7rAwuocVWE2Yuuj9+7InuTZblpYP3qbwn0p2DMnXrtJ7Uw1T0/EGs+1VeQQEiDi79aUYoKxTwSXU8u6nTxQYEyt1KSITJktJC9/ExDMWyT2Xwd3BQuS11E/LIpcvgcgITXC9dMgUtVIqtc+xQANwuKs6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742236992; c=relaxed/simple;
-	bh=rZy267QVzaHrzj+oPQKhxmdhpRbsSMxH1LmcHiDH6gc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kEakUCmB/yY6kLtpOaqyXius8VtCZsbmn0hM5Iwtdb6okQHfznM8bnWSqpJ2l0amKCqXMuSPkz8Bhl4Vdi8/E2Y0dbtqnU20Ru4iVOahILBKwMbaunwizzBzkpGbBf/A2LkMKVRxqGFlw22nOBgDkIApVcVmQfk4f0gTrCcsMi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fULqOcIa; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742237619; c=relaxed/simple;
+	bh=sAJfvlsqgTqAA6hXcOOs+RMObFF8SDbHdyMOYBRBznk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=owskRhreer72cMgvPTXb26SPf0FZxH2Nk9yRgXxFg6jtL690s6badQwGo6s8ZdDGj2w5YSYTIFo4qpPW9dPw8BYGZqQ5N819cEtgiZNvKqOOBsoY359egn3stnqHhR3i7kXCs5UXs1h+67JXsIBdEjxl4YU7CjlMR/heV9D3NH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=CWvllHTG; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fULqOcIa"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30c461a45f8so40132211fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 11:43:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742236989; x=1742841789; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NA1wszRs5T2ouUUFQ9msDMkStJoUCbF75LIILyXvWtY=;
-        b=fULqOcIaSsnohN3+Ion7N6NjOxz4fiRqIuKO4zbna1eif25Nk5nRxXUSt6KlV1B0Uh
-         Y9lP3SFXRxzGdg+JZjfygqs8nABZO/AHX+pB9c3cEUupfUrADVf40qtIgvAu/PaBC+Qi
-         onHZ2Kkfj+NVuPzLXYjxwcb75XfRUqW67UAhE/qKLM0srPNweVCbfrKdwoVRYUvGgDeP
-         y//yhxgwdxrN6HCz98TZORVjOvlDsREajuusdhPTFJW1DXeU5yCG2VFF93xXp8uFUZSZ
-         htgEmOyy6SFKhEGgWds065/xBKC7vX8nRvKcxFnWrOM7tDunkjB941H0FOEbW2jiZbVG
-         83eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742236989; x=1742841789;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NA1wszRs5T2ouUUFQ9msDMkStJoUCbF75LIILyXvWtY=;
-        b=R0kN5EmTurNEkPtMcwjoCfJDPRaVLu79BF7Z7Ct1TNiwyEZJbIPmHoFfez6fhmJElJ
-         UkeTfqEFEXdQYSXAcgvy3oCR3mOcviaUPOytdQKj694Rz6vKRKpsusR0Fd746Ic7/zNO
-         vqmpSIB0m68+XbmQf2dzBAJDOEAEtljayJDpb3y2Ljh4NUE2HIkpTMPS+A1+D1E15lBe
-         qX58GFwRJMhF04nZhHoXrp4SWxXmLP2qoQjNsZGMt5AQfs9sWV9QR114iFoJaGkHlYsl
-         0+XSryrpO8k/tDhtZ9bL9hEuEFpCPjziqt6DiKFEfsWz2groZGk2F8q0go59ybGh4kqX
-         9SSg==
-X-Gm-Message-State: AOJu0YxF9cAljaJ0ri9kTcDay2zLb7pM4qFbcwaLFyMUIYRwj0gxoMlC
-	x/yPgctRHTUBPNRQ+8hw3cZudsTGUxvxI2V1BoTkWMSgnSt9IGCX7Qip8GFLbjtiuYZJ47SeP5i
-	QG0LRGGrtEqWYx8Xhmj+UUSzngq48YJOmBYU=
-X-Gm-Gg: ASbGnct6cRFA61Bo7DBCXJuSJFdY0evYxW4UQ3a5nxPduFUvTQFsF4/ArhI4oNVQ+ei
-	0nFB/da4iEoBpE6zGij66vaKhLOyZaTF02KNe0c7QK9t7VFjLDpItH7fS+FYVuqaBohFiOXgNAC
-	MJ9ZysbR4mZqzms+N2ACrSzJkTo9g1Y/hHHDU=
-X-Google-Smtp-Source: AGHT+IHE0zw9Hjq+ZwCvQL/ad5w1C42jY4Qt61UuZ6/eSIWVCWnYrDkITZeW5F4+0VTs68YcIUIlysl1Y03171DjySA=
-X-Received: by 2002:a2e:a78a:0:b0:30b:f006:3f5 with SMTP id
- 38308e7fff4ca-30c4a8672acmr70799911fa.15.1742236988393; Mon, 17 Mar 2025
- 11:43:08 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="CWvllHTG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1742237593;
+	bh=2SMIGmdU0arUnN+8CnilMKwbqZHhcI7tFniL9Z+diO0=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=CWvllHTGOc7aA/fLZ1KKMA/u6AtmbxlGcZZob5jBBGLPkh7T2dfzLqJoSxq1JguJK
+	 swJkg/5zKNyFLcsds2VJ46grS4sX+VxyeWKyVl5U0ihCj24z2Fnw8Br6Ruk4lYxt6Q
+	 PQNWvmJl2pREHFIp6XhsNA5YsuLjzaPxfe9DATYc=
+X-QQ-mid: bizesmtp79t1742237578t0r4xyka
+X-QQ-Originating-IP: IDmb7yvLRFp+32r4kBCU4WPV0+iSbpOD2ulyFtGC5d8=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 18 Mar 2025 02:52:56 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 1448328365827845178
+From: Wentao Guan <guanwentao@uniontech.com>
+To: luiz.von.dentz@intel.com
+Cc: linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org,
+	Wentao Guan <guanwentao@uniontech.com>
+Subject: [PATCH v2] Bluetooth: HCI: Add definition of hci_rp_remote_name_req_cancel
+Date: Tue, 18 Mar 2025 02:50:34 +0800
+Message-Id: <20250317185033.11476-1-guanwentao@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1740844616.git.pav@iki.fi> <5aff62c90e7e313b42f28cbc3c8c81788f74c8ce.1740844616.git.pav@iki.fi>
-In-Reply-To: <5aff62c90e7e313b42f28cbc3c8c81788f74c8ce.1740844616.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 17 Mar 2025 14:42:56 -0400
-X-Gm-Features: AQ5f1Jrty4U7c5o9Tj871rN5oPkapMcU50Yrp7wnqY9Zl7yJYS6ED9UiBEenMJM
-Message-ID: <CABBYNZLmZW7HgWoAH0Catej4532A5=2BT2osz8f7K1wX84dR9w@mail.gmail.com>
-Subject: Re: [RFC PATCH BlueZ 3/9] bap: add and use chainable future abstraction
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-0
+X-QQ-XMAILINFO: MCqxCcyBE+BGcVW+TJjgLixk8fNZfHMwLO9eAl4ldei6X+p5FgQqGR9E
+	q8gsN3GGKFm66s+3xFq7kOxTfFWs5oeLX8owCWXxwAVV3OKWwM0MRNNbd2DpxNoyQspyu1n
+	5iX+hxZf1XM/tRMSWwQYIRVV85fgw/TZ9vI+qc36ASPFGU2u2x0cVmJqnL8uBREnelO48+W
+	Nv0W+ARugMHRQHrbwQ+zGEO8hrGxM2MxHKXRzP5UIRkrsHzR3lhZX6F3LAaDG4FRTzbepb9
+	qEbLoSMPv6WlY5eM8n+4Ke381W4FORGGqqOx9qIXVriiOqZdANejj4LrKzWW6O0wXcZRKXB
+	okC2so80Qu8sFplXR9Jhy3q6srxzy1WGLzA7bqDw39ijAYkC21ZqexDjTNngL52vsAEu3wQ
+	LLJMHmImkVt871i0FgG7rEYqFK9FPxVlM2fJNslWpWWbpZSXfl68WdwbPU5ZfPgxdKTI3Mm
+	PT+RuVi7X3CdR4oMYfJzZhbrzfWZxlhMAQ9Sh3hFuooPSw9GcD9ku/+nEhFasjm9t/wOe2v
+	w3n7yY1OifDOacirPFHOpK9j+PXIRqXdPImr68qqb2kAfvrrTnoK134guzK3izYsem/NhTS
+	zcj6yTi04BlaFuZP7PcxHQ6fG/16sO8SdhWI8KIFzjNH50SppAmcO/0W6tCEioV/BXyFU6R
+	Q95DQbYiBy1fGki+On7jQ9tRezgUwQmlhl4gQR+vEG1njmrqUApMXq3BIAHbM1LCWHw9p3+
+	bvgC7T3vuv/MtL1c4MdLIZGpJua8uWzGADpGarnVWh3dgAWpcl8MRqMiIqMXJ28Uv+4Ld3X
+	zZaZTs4pTzATPvZ6iu1zEZbkGxNdh49NSSktGmbVX1lfLriRCGC1bogs7moPmxzF4iBLyYx
+	dcvmLvkaSBB9SxNy02o/wellFKDzwkbkY0yKej4YctAjlbwh59PiM9aj6ABJQAxbR6sbP86
+	GnqEsAnjsx/lrtHPeGj6GdH3G7IaFpnzyc+D2s2GBR6IRmirLICfTcm6DSNeO9oojKWuSUb
+	s3I0Mg/p2OFY7lZNP6lr69tWyevPABXRLSsKCQNMGEHmWceIkSdqoSsp7Y1WQ=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-Hi Pauli,
+Return Parameters is not only status, also bdaddr:
 
-On Sat, Mar 1, 2025 at 10:58=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Multi-part operations will need to postpone things like DBus replies
-> until all parts are complete. Make this a bit simpler with a chainable
-> future.
-> ---
->  profiles/audio/bap.c | 136 +++++++++++++++++++++++++++++++++----------
->  1 file changed, 105 insertions(+), 31 deletions(-)
->
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index 37168e58c..8b9b89c70 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -80,7 +80,7 @@ struct bap_setup {
->         struct iovec *metadata;
->         unsigned int id;
->         struct iovec *base;
-> -       DBusMessage *msg;
-> +       struct future *qos_done;
->         void (*destroy)(struct bap_setup *setup);
->  };
->
-> @@ -114,6 +114,17 @@ struct bap_data {
->         void *user_data;
->  };
->
-> +typedef void (*future_func_t)(int err, const char *err_msg, void *data);
-> +
-> +struct future {
-> +       unsigned int step, steps;
-> +       const char *name;
-> +       future_func_t func;
-> +       void *data;
-> +       int err;
-> +       const char *err_msg;
-> +};
+BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E
+page 1870:
+BLUETOOTH CORE SPECIFICATION Version 5.0 | Vol 2, Part E
+page 802:
 
-This I'm not convinced is the right direction, it will be sort of hard
-to make it generic enough besides I think this should actually be
-handled directly by bt_bap instead, it is actually weird that the
-testing spec doesn't capture stream reconfiguration from streaming
-state for example, in any case we can come up with our on tests for it
-to ensure the stream is properly released and CIS is closed before we
-attempt reconfigure it for example.
+Return parameters:
+  Status:
+  Size: 1 octet
+  BD_ADDR:
+  Size: 6 octets
 
->  static struct queue *sessions;
->
->  /* Structure holding the parameters for Periodic Advertisement create sy=
-nc.
-> @@ -155,6 +166,94 @@ struct bt_iso_qos bap_sink_pa_qos =3D {
->         }
->  };
->
-> +static void future_clear(struct future **p, int err, const char *err_msg=
-)
-> +{
-> +       struct future *h =3D *p;
-> +
-> +       if (!h)
-> +               return;
-> +
-> +       DBG("future %p (%s) 0x%02x (%s) step %u/%u", h, h->name ? h->name=
- : "",
-> +               err, (err && err_msg) ? err_msg : "", h->step + 1, h->ste=
-ps);
-> +
-> +       *p =3D NULL;
-> +
-> +       if (err && !h->err) {
-> +               h->err =3D err;
-> +               h->err_msg =3D err_msg;
-> +       }
-> +
-> +       if (++h->step < h->steps)
-> +               return;
-> +
-> +       h->func(h->err, h->err_msg, h->data);
-> +       free(h);
-> +}
-> +
-> +static void future_dbus_callback_func(int err, const char *err_msg, void=
- *data)
-> +{
-> +       DBusMessage *msg =3D data;
-> +       DBusMessage *reply;
-> +
-> +       if (err && !err_msg)
-> +               err_msg =3D strerror(err);
-> +
-> +       switch (err) {
-> +       case 0:
-> +               reply =3D dbus_message_new_method_return(msg);
-> +               break;
-> +       case EINVAL:
-> +               reply =3D btd_error_invalid_args_str(msg, err_msg);
-> +               break;
-> +       default:
-> +               reply =3D btd_error_failed(msg, err_msg);
-> +               break;
-> +       }
-> +
-> +       g_dbus_send_message(btd_get_dbus_connection(), reply);
-> +
-> +       dbus_message_unref(msg);
-> +}
-> +
-> +static void future_init(struct future **p, const char *name, future_func=
-_t func,
-> +                                                               void *dat=
-a)
-> +{
-> +       struct future *h;
-> +
-> +       future_clear(p, ECANCELED, NULL);
-> +
-> +       h =3D new0(struct future, 1);
-> +       h->steps =3D 1;
-> +       h->name =3D name;
-> +       h->func =3D func;
-> +       h->data =3D data;
-> +
-> +       DBG("future %p (%s) init", h, h->name ? h->name : "");
-> +
-> +       *p =3D h;
-> +}
-> +
-> +static void future_init_dbus_reply(struct future **p, const char *name,
-> +                                                       DBusMessage *msg)
-> +{
-> +       future_init(p, name, future_dbus_callback_func, dbus_message_ref(=
-msg));
-> +}
-> +
-> +__attribute__((unused))
-> +static void future_init_chain(struct future **p, struct future *h)
-> +{
-> +       future_clear(p, ECANCELED, NULL);
-> +
-> +       if (h) {
-> +               h->steps++;
-> +
-> +               DBG("future %p (%s) init step %u", h, h->name ? h->name :=
- "",
-> +                                                               h->steps)=
-;
-> +       }
-> +
-> +       *p =3D h;
-> +}
-> +
->  static bool bap_data_set_user_data(struct bap_data *data, void *user_dat=
-a)
->  {
->         if (!data)
-> @@ -740,24 +839,12 @@ static void qos_cb(struct bt_bap_stream *stream, ui=
-nt8_t code, uint8_t reason,
->                                         void *user_data)
->  {
->         struct bap_setup *setup =3D user_data;
-> -       DBusMessage *reply;
->
->         DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
->
->         setup->id =3D 0;
->
-> -       if (!setup->msg)
-> -               return;
-> -
-> -       if (!code)
-> -               reply =3D dbus_message_new_method_return(setup->msg);
-> -       else
-> -               reply =3D btd_error_failed(setup->msg, "Unable to configu=
-re");
-> -
-> -       g_dbus_send_message(btd_get_dbus_connection(), reply);
-> -
-> -       dbus_message_unref(setup->msg);
-> -       setup->msg =3D NULL;
-> +       future_clear(&setup->qos_done, code ? EIO : 0, "Unable to configu=
-re");
->  }
->
->  static void config_cb(struct bt_bap_stream *stream,
-> @@ -765,7 +852,6 @@ static void config_cb(struct bt_bap_stream *stream,
->                                         void *user_data)
->  {
->         struct bap_setup *setup =3D user_data;
-> -       DBusMessage *reply;
->
->         DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
->
-> @@ -786,14 +872,7 @@ static void config_cb(struct bt_bap_stream *stream,
->                 return;
->         }
->
-> -       if (!setup->msg)
-> -               return;
-> -
-> -       reply =3D btd_error_failed(setup->msg, "Unable to configure");
-> -       g_dbus_send_message(btd_get_dbus_connection(), reply);
-> -
-> -       dbus_message_unref(setup->msg);
-> -       setup->msg =3D NULL;
-> +       future_clear(&setup->qos_done, EIO, "Unable to configure");
->  }
->
->  static void setup_io_close(void *data, void *user_data)
-> @@ -872,7 +951,6 @@ static struct bap_setup *setup_new(struct bap_ep *ep)
->  static void setup_free(void *data)
->  {
->         struct bap_setup *setup =3D data;
-> -       DBusMessage *reply;
->
->         DBG("%p", setup);
->
-> @@ -881,12 +959,7 @@ static void setup_free(void *data)
->                 setup->id =3D 0;
->         }
->
-> -       if (setup->msg) {
-> -               reply =3D btd_error_failed(setup->msg, "Canceled");
-> -               g_dbus_send_message(btd_get_dbus_connection(), reply);
-> -               dbus_message_unref(setup->msg);
-> -               setup->msg =3D NULL;
-> -       }
-> +       future_clear(&setup->qos_done, ECANCELED, NULL);
->
->         if (setup->ep)
->                 queue_remove(setup->ep->setups, setup);
-> @@ -1038,7 +1111,8 @@ static DBusMessage *set_configuration(DBusConnectio=
-n *conn, DBusMessage *msg,
->
->         switch (bt_bap_stream_get_type(setup->stream)) {
->         case BT_BAP_STREAM_TYPE_UCAST:
-> -               setup->msg =3D dbus_message_ref(msg);
-> +               future_init_dbus_reply(&setup->qos_done, "set_configurati=
-on",
-> +                                                                       m=
-sg);
->                 break;
->         case BT_BAP_STREAM_TYPE_BCAST:
->                 /* No message sent over the air for broadcast */
-> --
-> 2.48.1
->
->
+Note that it also fixes the warning:
+"Bluetooth: hci0: unexpected cc 0x041a length: 7 > 1"
 
+Fixes: c8992cffbe741 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
+Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+------
+v2: add Fixes and change rp type.
+------
 
---=20
-Luiz Augusto von Dentz
+---
+ include/net/bluetooth/hci.h | 5 +++++
+ net/bluetooth/hci_event.c   | 6 +++---
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 6203bd8663b7..ffb6524788f5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -856,6 +856,11 @@ struct hci_cp_remote_name_req_cancel {
+ 	bdaddr_t bdaddr;
+ } __packed;
+ 
++struct hci_rp_remote_name_req_cancel {
++	__u8     status;
++	bdaddr_t bdaddr;
++} __packed;
++
+ #define HCI_OP_READ_REMOTE_FEATURES	0x041b
+ struct hci_cp_read_remote_features {
+ 	__le16   handle;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2cc7a9306350..763a8ad9d2b2 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -151,7 +151,7 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev *hdev, void *data,
+ static u8 hci_cc_remote_name_req_cancel(struct hci_dev *hdev, void *data,
+ 					struct sk_buff *skb)
+ {
+-	struct hci_ev_status *rp = data;
++	struct hci_rp_remote_name_req_cancel *rp = data;
+ 
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
+ 
+@@ -4005,8 +4005,8 @@ static const struct hci_cc {
+ 	HCI_CC_STATUS(HCI_OP_INQUIRY_CANCEL, hci_cc_inquiry_cancel),
+ 	HCI_CC_STATUS(HCI_OP_PERIODIC_INQ, hci_cc_periodic_inq),
+ 	HCI_CC_STATUS(HCI_OP_EXIT_PERIODIC_INQ, hci_cc_exit_periodic_inq),
+-	HCI_CC_STATUS(HCI_OP_REMOTE_NAME_REQ_CANCEL,
+-		      hci_cc_remote_name_req_cancel),
++	HCI_CC(HCI_OP_REMOTE_NAME_REQ_CANCEL,
++		      hci_cc_remote_name_req_cancel, sizeof(struct hci_rp_remote_name_req_cancel)),
+ 	HCI_CC(HCI_OP_ROLE_DISCOVERY, hci_cc_role_discovery,
+ 	       sizeof(struct hci_rp_role_discovery)),
+ 	HCI_CC(HCI_OP_READ_LINK_POLICY, hci_cc_read_link_policy,
+-- 
+2.20.1
+
