@@ -1,85 +1,154 @@
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1812F1A2630
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F681D90D7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742235375; cv=none; b=f4ox5KpwF7+KL1MA7G0+gu1IDEuiErSodz62/3fZcgkx+PcjcZzPNB3yxUeal8EXW+MDevxNbewwj20T+Xycf0OyY82DksKvM/IfYqFlFqnxWtd8VhdLx801FL7SnxU9cmE/HkI3462GuaEvl91cprMH45FhWb8//2e+7j03k78=
+	t=1742235662; cv=none; b=g3ZDMydJNORr24nFbGEWR4bqhXtOv4JC+b7S/NGNMGbaRln0UwQzZQcb75Z5QNZ6+zyQUOr7ihv0zL58jLImtrM6nhyTrS+iI0ZXiu4XMiSoeLh8+6Fl63ZufGiQGYfaZNS3VV8nBlJUAPdeAHjQhZd97qGlOqAim8E4kPBrXrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742235375; c=relaxed/simple;
-	bh=P9nuSolWh/nEZvcOmxJ7qruiZITOZXk1CSUGMKBWr9I=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
-	 References:In-Reply-To; b=ntem1z5Gk76lRVZGePOJkb2+i0C9hu0bHE/0cgO/fhgNHgwNaODAwSR/VfsfsrL41OegXQAk3huPe+JtjEi22s2TKA2Pdqu2LM6m0eRZYjU+LDFPDID2XN+mQPCzjBnEHjb94SpoUX3MMp14GTCuZi+yRdDj9kBhHDXslV54FQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=EmrQw9la; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1742235662; c=relaxed/simple;
+	bh=us7rZ6ci6bZXvTd1jEu2ZC8/vYKnUMPV5bc2DI3c1ww=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Mx4yrfoDEp6YVlo63yI6Sf71pms13bsvpKzjOeVordKq1LkrUZSAyppTlcOyH4a1ZZQy0j4wbg3mtJOyMworFiTYtlf3uZz/d430jNV4lmuUxgIIC4kfd0m6NLT3RokYJI7MyT0BZ2Jdn2N925rurjk1h9R/+1aZtF40H5nyckA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CtjuVKVZ; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="EmrQw9la"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1742235342;
-	bh=P9nuSolWh/nEZvcOmxJ7qruiZITOZXk1CSUGMKBWr9I=;
-	h=From:To:Subject:Mime-Version:Date:Message-ID;
-	b=EmrQw9laoZ0gZIbHHGoLop4G8+6ONky1rbwtsZXRgHX5WmabBGLltqs/LMiC0UeYU
-	 kOBU8QaHkcmTz7wvFo9jUb+tgtTbIOXHPfGU93pGg/W062sXKBz/gDdVEhl8J8quxi
-	 EpDHthTLYXW51urevaF31jRPKNaMXMmNKeH8ED1U=
-X-QQ-GoodBg: 1
-X-QQ-SSF: 00400000000000F0
-X-QQ-FEAT: D4aqtcRDiqT6iyfUez+DXx4B7ybItHVbSxkDlA8/kMI=
-X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: 7s6yzF3zASig0FjzGfRNCaezCQkEO4+FLqH7YYvX33g=
-X-QQ-STYLE: 
-X-QQ-mid: v3sz3a-6t1742235336t7602166
-From: "=?utf-8?B?V2VudGFvIEd1YW4=?=" <guanwentao@uniontech.com>
-To: "=?utf-8?B?THVpeiBBdWd1c3RvIHZvbiBEZW50eg==?=" <luiz.dentz@gmail.com>
-Cc: "=?utf-8?B?bHVpei52b24uZGVudHo=?=" <luiz.von.dentz@intel.com>, "=?utf-8?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>, "=?utf-8?B?bWFyY2Vs?=" <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: HCI: Add definition of hci_rp_remote_name_req_cancel
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtjuVKVZ"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30761be8fa8so9856551fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 11:21:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742235659; x=1742840459; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SBhSv1NKV3w3nOycbQWJ25sVUojq+R6r8mIJ2by2jQM=;
+        b=CtjuVKVZ1NtUt/EkjpQ09O/mhk7ZI7tpDxrS2HWGvIxNvspmXOV3tg5MJcGS4qLzIr
+         4gVHcbbe4r4AIZ/CxZlOcGV/G3MK5ZTS/wrMysG5FNHKj7llMRXXIcuHr9K6oPOzaEbj
+         gIe9EXn3Y3yIeu1qFo2+p38QGJp4wzl5gJ75A9Zem6h7uKwhHlOZFAFm2zLpg2HNqKz+
+         yIch+tdUYytXX9BBAaZTgt+s28XnXut3ks0Dtn6TEuRZpTNayyZ6jqnu+oYSTKKcPcFm
+         9lu2Q0k/JhiAtLHAVYNwUIbI2F7y9jOnNk+ALv0cnqfSQJYMVYi3OTewSL8uo18feyha
+         I65A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742235659; x=1742840459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SBhSv1NKV3w3nOycbQWJ25sVUojq+R6r8mIJ2by2jQM=;
+        b=i+CgG3iDbAiY6GFjfHZBVwQgwrQ9ieTlYk8AoyYH3IS+TS1qzBySpzgmoXhddK77aE
+         YIvToK0me7RG3al+/wznV9Tce0nQX0+345O50IRPy2kKe0fqvc5/eRxGJsC3E88l47eI
+         OFiIL357OiMb7uB2ImnC6TU+D+HR3c9PyQn9hdP0ODZbn5a9i6W7x3AgIKiB+WIWwGkj
+         klPiCgkuuOcjL+ksaqb7vGZjlhuSI2mgRt1nSyU01yglgzD0b8DyN8SdiURVTCKjlWeR
+         SIMNaMvp+ozf6JX56XE5huA5Kt9XWg0UR/XYSmk9P5BssBY+rZDGUMSMzaIMDMJh3P5i
+         QDHQ==
+X-Gm-Message-State: AOJu0YwRUIwaE/IogceTwCnkfqv9EO8Do/mc9bVR2no761NCEiAcu0sB
+	iQa4lJ2nMWbOLmzcX7aCNJu4hLealbyRGDWdUcGmvhtjirE0ezg4yJOZXiJwtIpWJi74uQzXC+Z
+	m6wlXE6EX/1H1sNQoig4ra+s7FfZE386/oyI=
+X-Gm-Gg: ASbGncvrejsPeCbuO6wd8sM3VL/4Ng67x27EctCls4RLum1zERZc1e56wZxLGGJ5gNF
+	yl9ZHJ78UZ5T5JN2+dpObm+aWjV/6JOON7ij3ckUKT5pR/XFATV6O4QOkKodTKDlmuodDTnjCwB
+	9TJJWJWMaZE/a73mHHFOcOv7tI
+X-Google-Smtp-Source: AGHT+IHyH0IyGP+VFE6do3U1hlxUvgcQWMna662ZdRtkEjWCUqEGaPJR6V158uKZSWapU10Exmu7Lq5xM3eAZa5DpBg=
+X-Received: by 2002:a2e:b8cf:0:b0:30b:d40c:7eb4 with SMTP id
+ 38308e7fff4ca-30c4a7546b6mr91335631fa.7.1742235658613; Mon, 17 Mar 2025
+ 11:20:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Tue, 18 Mar 2025 02:15:36 +0800
-X-Priority: 3
-Message-ID: <tencent_27D3557D435FC05369A3ACCA@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-References: <20250317154715.15023-1-guanwentao@uniontech.com>
-	<CABBYNZ+MdXNdLrgNb0UOuh2aFnukcUTTAvGkD6M5js=pvQuQkw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+MdXNdLrgNb0UOuh2aFnukcUTTAvGkD6M5js=pvQuQkw@mail.gmail.com>
-X-QQ-ReplyHash: 2399442445
-X-BIZMAIL-ID: 3930025385411776433
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-	by smtp.qq.com (ESMTP) with SMTP
-	id ; Tue, 18 Mar 2025 02:15:38 +0800 (CST)
-Feedback-ID: v:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NEaes6yu2o+mIs0PGN3Wk0b+mFNDIEzk7aYXBUl4ououcIYIXDJ99nrx
-	nONvS1MCQsU8knGFqcWoEYt2rp1WL/j35RUHY+vUv3oUb1aMCS3thloEim6v7c9zv0bgf/g
-	sshtWODQJxJ4K+EHy6s0Ptzs+sm+nVCHpGWNIIdTdsiKwwQbQdx1iKdtJywRH1n4Gs7mBG1
-	3Wsk0aybaHOL0DRWjXSOODwRer4gurQZ6AAez0T/bTyM6fdcT7FMx6rMlhh/OPJL7b8hpgU
-	8pjVtLRkbaK7V+M/KGlu6rBMC+zRXRDpqplNNPmOuhWh8sW11ds71DXHTsyrsTQbsgH/Z8m
-	VZZwiyAsuN5cLaEai9T7GmNq90W5zSmUCVivNzaWPycDsFYzzQ2vGnCGCLynbpqPmnpWZeD
-	H9jq/xVJ+zqSfK1u+KFiXZkUYx1Apo+fLZd5l9wAOO0QdkKljvgBadOasZFA6acYvco3Aje
-	8/gg+4NHdIE8OG6QWwf5qSYKk3Sp9fliTrxlrJV5Z7plj5gcq1YRg+ip3utgBgqEvs632CR
-	/QrM00gF9DtrWb/2Dv6Uht5yMgX3HjpIIbGYJx7mmETkM0wlBRnVHGzy6DYkq/xE825fGf8
-	Z9aAY2E+MT7okWO2LkkFrmoBg1LfCWpxZjSvxVYCpOo+zHtq2WZVzX2b/6QcieAsjg1mYCW
-	Rcj6ncX73jYnnURW1Bh8EVZhYG5Z0TgkcfvJ2vZuvXr7llzoCRK9DzHPObFt5hiWoH3QCRh
-	iJg7p8VookJKRNF7ndRb9GkujWxqBbFOYTwr3qqh+1KQ1MaSXICWJ9bvCrETdkbqTUR+LF1
-	USTjw8je6bS2cStJCStpJc4+ix9/TUJU+5BdW6Uv7R1vxGmgjMrFTi7pKXmzPd2SBwCMS+9
-	v+Tto2beHHj0b+nOjbHjU/MZqSGkZKtn62gzezjr/bK3rQy8F2xa8TrxVloNJXorXHIt6xj
-	aGAHONgVT6+Y2WFyZx9Z+CtBKDsAyC8/dnWmwT/TUysxwCQ==
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+References: <cover.1740844616.git.pav@iki.fi> <e6c11514c61343d0991e5d6952f800076a941cf3.1740844616.git.pav@iki.fi>
+In-Reply-To: <e6c11514c61343d0991e5d6952f800076a941cf3.1740844616.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 17 Mar 2025 14:20:46 -0400
+X-Gm-Features: AQ5f1JrwSFXmCRzZjZD20AB6LaOJSQls7jUBTbK--WXSCkKQK-5K64AaV0e5Ct4
+Message-ID: <CABBYNZJERCGbUu-0iMxiroi9Omc4ui5aurDFEVxQ50ey41g8fg@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ 2/9] org.bluez.MediaEndpoint: add client role SelectProperties
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGVsbG8sDQoNCmM4OTkyY2ZmYmU3NCBCbHVldG9vdGg6IGhjaV9ldmVudDogVXNlIG9mIGEg
-ZnVuY3Rpb24gdGFibGUgdG8gaGFuZGxlIENvbW1hbmQgQ29tcGxldGUsIGlzIGl0IG9rPw0K
-YTlkZTkyNDgwNjRiIFtCbHVldG9vdGhdIFN3aXRjaCBmcm9tIE9HRitPQ0YgdG8gdXNpbmcg
-b25seSBvcGNvZGVzLGlzIG1hbnkgeWVhcnMgYWdvIGFuZCBpdCBzZWVtcyBub3Qgd3Jvbmcu
-DQoNCkJScw0KV2VudGFvIEd1YW4=
+Hi Pauli,
 
+On Sat, Mar 1, 2025 at 10:58=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Add a simple way for the sound server to reconfigure a BAP unicast
+> endpoint, by calling org.bluez.MediaEndpoint.SelectProperties().
+>
+> This shall destroy all streams of the endpoint, and restart the
+> SelectProperties() configuration flow from the beginning.
+>
+> Since it may be necessary to reconfigure multiple endpoints at once to
+> correctly make bidirectional CIS, add Defer argument to just mark eps
+> for configuration.
+>
+> In future, org.bluez.MediaEndpoint.SetConfiguration() could be changed
+> to handle unicast in the same way as broadcast: only create streams.
+> This allows sound server to have full control over stream configuration
+> itself, and not rely on bt_bap_select().
+
+This one Im not too sure, perhaps it would be better to add something
+like org.bluez.MediaTransport.Reconfigure to avoid having to add role
+dependent documentation like bellow
+
+> ---
+>  doc/org.bluez.MediaEndpoint.rst | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>
+> diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoin=
+t.rst
+> index b81106f0b..5c42b878c 100644
+> --- a/doc/org.bluez.MediaEndpoint.rst
+> +++ b/doc/org.bluez.MediaEndpoint.rst
+> @@ -69,6 +69,8 @@ array{byte} SelectConfiguration(array{byte} capabilitie=
+s)
+>  dict SelectProperties(dict capabilities)
+>  ````````````````````````````````````````
+>
+> +       **Server Role**
+> +
+>         Select BAP unicast configuration from the supported capabilities:
+>
+>         :object Endpoint:
+> @@ -104,6 +106,25 @@ dict SelectProperties(dict capabilities)
+>         Note: There is no need to cache the selected properties since on
+>         success the configuration is send back as parameter of SetConfigu=
+ration.
+>
+> +       **Client Role**
+> +
+> +       Reconfigure a BAP unicast endpoint. This closes all existing
+> +       streams of the endpoint, and restarts the configuration
+> +       selection flow which e.g. triggers calls to *SelectProperties*
+> +       allowing the sound server to modify the configuration.
+> +
+> +       The following arguments are taken in *capabilities*:
+> +
+> +       :boolean Defer [optional]:
+> +
+> +               If True, mark endpoint for reconfiguration, but
+> +               postpone it until a non-deferred *SelectProperties()*
+> +               operation is made on an endpoint of the same device.
+> +
+> +               This is necessary to use when reconfiguring source and
+> +               sink streams with the intention that they be combined
+> +               into the same CIG, possibly forming bidirectional CIS.
+
+We could perhaps adds Defer option to MediaTransport.Reconfigure and
+then use MediaTransport.Select to clear it, that said for broadcast we
+did set a dedicated state when it is not active so perhaps we should
+do something similar here.
+
+>  void ClearConfiguration(object transport)
+>  `````````````````````````````````````````
+>
+> --
+> 2.48.1
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
