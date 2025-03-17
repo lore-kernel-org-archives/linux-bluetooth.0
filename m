@@ -1,81 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF674D53C
-	for <linux-bluetooth@vger.kernel.org>; Sun, 16 Mar 2025 19:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330952356C1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 11:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742154331; cv=none; b=c6GaiZtrWR9yYtTtddGzPUvjGN7o8Tq9ytMqh0UuHYXdjg7TVgntFSMqCSpFGsFxzd+/PMJD4ueiJaAwHC7DzeUPUWUZCoASsD6Lw6v2RnihVPIRplli+osB+L+38Q8iODykXDLLZrJocPgLNXtmFgGRw/WJkkn9oOOgoqEC118=
+	t=1742211369; cv=none; b=e80H+SoaO7wf7nSqLOAfVp3QdwjeGzc77Ydktg8t1nVIGabNBvS+P032LCgJoIBPVgqb1NXdg5dHRMPod3PrfR2tlHhELNdwcIt9/5amZmXU2cpFOC/2pwCspI+TFKQeQjE0FjEP0OkwlBzZ3LnHVv1MwzbWXrJot7rxjdjqYrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742154331; c=relaxed/simple;
-	bh=Ul6qaHbxQJLUxfaHf+trNiuCbcXT9ISS89pYtHoe0aw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UVYdMZo5Fxu4vm+4zt029LkRTWIfufdfUYwGl0RJ2/+afAG1Xe8MfJ/GWyW9wmvy3lgUYFr+DteulJWBUsHrKl9J9vtM4UxMueIBJ9EY2mV/9COwDbIOWjpD/XXfOMaRYUlccSLB/OUdI8lc6/A1aASB7J+F8QjI5PqR2AQ8iMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJOIP7/J; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742211369; c=relaxed/simple;
+	bh=xneAZzXhO4J7EyAqY+8OVHePYPsvIxYpj0dK4CMjBZw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Xpi6+BXKG5VHs8wYT99pBIg8l1hRssR4Q5roabYFJnhECYAFInITCpAM0RlflH+jT453c0f8lRBv92K5LKxeBCttZjcg8waz8EMe3/JIAb33bwuUpP44cB3Y7YMLqMx4yqRwJ9UURV4ZeTRTJDs4ptqr59GsJ4I/hU5PTLld8Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=k7964HZF; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJOIP7/J"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D418C4CEEE
-	for <linux-bluetooth@vger.kernel.org>; Sun, 16 Mar 2025 19:45:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742154330;
-	bh=Ul6qaHbxQJLUxfaHf+trNiuCbcXT9ISS89pYtHoe0aw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ZJOIP7/J/W0Jofej6ENbCbnb6kZC2vDKTD2lHjAXeZDOlMGlhsfrsHzJZXBWqsKC+
-	 YVoWoBO+Em6+wgQB17A2r3hfsbkPCTuoRPxSS/IIDgDcOMEyvZwy/yUCondmJoDigK
-	 OcPe0tptvbXKVgMg+tdU7DDFP1zTtonM5P+UTDL4wYwqEkclNMQVvU4RsxTk3kV/pA
-	 /2DjEe6W0D/8CkGvTitaZJO07mohJILLVk6sOWzNz58D2Kd01/XgVx15WGZv8lf/wz
-	 ObvXQAusFsXZ0ZRM0I5Sxc8A5ALtZp/6301YHF/Sau6AoklrFTyg0QMIiTEpjwjyse
-	 dK054pTN71wkQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 4D70DC53BC5; Sun, 16 Mar 2025 19:45:30 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="k7964HZF"
+Received: from github.com (hubbernetes-node-4edcd0a.ac4-iad.github.net [10.52.12.57])
+	by smtp.github.com (Postfix) with ESMTPA id 3826B70012B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 04:36:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1742211366;
+	bh=cz9eHi4thW8hZA3FS4VpknTF5TGWNIWSmQYEbf2P3mQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=k7964HZFD5RUSWo1GLGDRqdVnFTo6daYLLmhoTFKTma6VYfNk2A9OCbDWsHcBoOWm
+	 TeXnke9Ehxsj7dNZQCwhIM/Bcbxv+Y4nBZc8DoyVp6+Z++dDCdCjCVS0tC4m9OXXgI
+	 XjfecOq3zEx3/qWiChBOB8VhVdFta39JsPNwyq8Q=
+Date: Mon, 17 Mar 2025 04:36:06 -0700
+From: Marcel Holtmann <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219553] Intel Corp. Bluetooth 9460/9560 Jefferson Peak (JfP)
- not able to connnect to Logitech MX Master 3S
-Date: Sun, 16 Mar 2025 19:45:30 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: Freeman.mobi@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219553-62941-FzmckHHNof@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219553-62941@https.bugzilla.kernel.org/>
-References: <bug-219553-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/master/21d45d-9590cf@github.com>
+Subject: [bluez/bluez] 9590cf: Release 5.80
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219553
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 9590cf12b23207af2a2cc212d808339d7ac85963
+      https://github.com/bluez/bluez/commit/9590cf12b23207af2a2cc212d808339d7ac85963
+  Author: Marcel Holtmann <marcel@holtmann.org>
+  Date:   2025-03-17 (Mon, 17 Mar 2025)
 
-Aleksandr (Freeman.mobi@gmail.com) changed:
+  Changed paths:
+    M ChangeLog
+    M configure.ac
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |Freeman.mobi@gmail.com
+  Log Message:
+  -----------
+  Release 5.80
 
---- Comment #1 from Aleksandr (Freeman.mobi@gmail.com) ---
-On Pop_os with kernel 6.12.3 not possible to pair the device with a Logitech
-Master MX 3S mice. On Pop_os with kernel 6.9 it is works.
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
