@@ -1,142 +1,324 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419BFA47
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941B21E1DE8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742236678; cv=none; b=YDEk2D6+ga2LmeD8XsoKcTjcw3Kbp3IONlgCIG1Q6DVM3MuJz4itN/Cjtzb8LRFy3YS7dfqPa7dSXE2X0DAA7Tljhe+Rfc/2l5p5At7GnG/t2dMABLCmbGYGY1N3Qr/jgYoA/GFbwwN5knzVY6To+rVkCMhlvRFr4QO7ne4TGcM=
+	t=1742236992; cv=none; b=sPMaYMDrl8DUtakHKcuKzytwuZjtsQ43MNn0/AzFDQQ7aYu3QlGynTfmQmZg6mics/EXFlq+X8oNEkf9jMir4WeAZInVyjPCzes9TgRDjneEkJuY6MNpQmfI++S/VKv65lAHUi1oI3fgu4+Ny2eEnzcHFoGPl3j8thp+Zub+ExE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742236678; c=relaxed/simple;
-	bh=zxj2of243bv1RnGM8XwnSJ4nopQ2C670I313IP/S7kc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RvDvAdk1tP1ezeBkv+6YR8a40pfjynioHI9Dw/HztCNeQhGU/FNfIVDgaTXisoDy6jeFEV93Q4QPVfO0M4P+qVCy0rfQT04ZyGuQxESU5D+0EMIvneHDIOxvx7Uc7kAoBl8IZYfUD7gX+1ZWfyt9ugGY4Q8Ujw/9uHsa2SqFy6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qluqgje8; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1742236992; c=relaxed/simple;
+	bh=rZy267QVzaHrzj+oPQKhxmdhpRbsSMxH1LmcHiDH6gc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kEakUCmB/yY6kLtpOaqyXius8VtCZsbmn0hM5Iwtdb6okQHfznM8bnWSqpJ2l0amKCqXMuSPkz8Bhl4Vdi8/E2Y0dbtqnU20Ru4iVOahILBKwMbaunwizzBzkpGbBf/A2LkMKVRxqGFlw22nOBgDkIApVcVmQfk4f0gTrCcsMi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fULqOcIa; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qluqgje8"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c56321b22cso490083085a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 11:37:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fULqOcIa"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30c461a45f8so40132211fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 11:43:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742236676; x=1742841476; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xjG02uRiU0nvQX/jumTAiKO1lffrr6EWjI52oudBneo=;
-        b=Qluqgje8MaoNSmcgz25b3F5qQoVXkuoFJyX5+8a+qwdooTVFMRYKdIdeIaH1tNtEzi
-         9BdD/R70EwNl5qwxhrLpTpXvNGjpzGtVH5+p4XFXoPATYFumiIriqxW3eoNibHvjSM+O
-         3z0e5KccRkMkshXfNLMSU2bLjHOMQVrNlVnMp5nNuT8Ptz/O9f4L02hppOcxT4+5Tf/z
-         0xF+1s1PuzU++KiaKsPvS4uoFeGZ7gMsmD2VS5DV460pF2kjLciGy2r+BG/e1zedvtcX
-         XCTcoDrTZaZI/XsEJo49PEgXCHG6WquN8o85Rr32niNaJdVDAMDjqP7aBWjUsxNnA7HC
-         r4EA==
+        d=gmail.com; s=20230601; t=1742236989; x=1742841789; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NA1wszRs5T2ouUUFQ9msDMkStJoUCbF75LIILyXvWtY=;
+        b=fULqOcIaSsnohN3+Ion7N6NjOxz4fiRqIuKO4zbna1eif25Nk5nRxXUSt6KlV1B0Uh
+         Y9lP3SFXRxzGdg+JZjfygqs8nABZO/AHX+pB9c3cEUupfUrADVf40qtIgvAu/PaBC+Qi
+         onHZ2Kkfj+NVuPzLXYjxwcb75XfRUqW67UAhE/qKLM0srPNweVCbfrKdwoVRYUvGgDeP
+         y//yhxgwdxrN6HCz98TZORVjOvlDsREajuusdhPTFJW1DXeU5yCG2VFF93xXp8uFUZSZ
+         htgEmOyy6SFKhEGgWds065/xBKC7vX8nRvKcxFnWrOM7tDunkjB941H0FOEbW2jiZbVG
+         83eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742236676; x=1742841476;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xjG02uRiU0nvQX/jumTAiKO1lffrr6EWjI52oudBneo=;
-        b=QPZH9ckAb/qHB89H+RZOYkZb/yao0hpLFpgvb1/BxBhlrgP8FdC0/WoWnd+gXgBo3i
-         4UewaxpfVkWYxAZtMCwkhRrdbkuemK9fD70bwMi69oyrmDao0kU8BDdhMZ9maolPAYZz
-         ddEtyJlNT+QWLs45ryH7CT4lUKd79DU/Aqze7utrza/uUOPkDRPoQMssfZ5NK2ETnXQT
-         Bu+tpWVzkD5KWk948SJtUfE44J6MKMxKSBU6VvAUlhBnl3RD8W61APQj4DxT+VoKuGKS
-         0dUQ0LCFNtx170lpvJwHyThBBbJK8qMxhbzpmsw2ci2dNfL2l0YC2EziEhcVb9URZzYd
-         UarA==
-X-Gm-Message-State: AOJu0Yw/XsR2LcCXo8269qytiBJCty7aqDELehYBjssMiyIvoOs4LgeB
-	qhmcfEza7fNHfIzZe/XXyKzw//6yWfrr03NETFkkAZIy5Vom9sE1dIzfbA==
-X-Gm-Gg: ASbGncs15DMpw8uoZUfAAv6jtZJwNozE6x52Tx06E5aRH2tTug5Z6xXkFOOieQ5tLir
-	BMT54rIcysTk7OMgRNpSIuS8KNJzuxPDdwVPSORXVbTi4rEziBVuhPGzrN4u0FtyF7IhpXIbeQn
-	cjpMpUiClSoQhqtb07SL6PCvdnqBczm/7YdYns3uINlA2vzBG5f/Av3kZ4aPpMo2OHHec0BzKCR
-	kdKG4W+5il8KTgS4G2xn1/aq8BooIbFWRJXNS5TicWNKzVP5dLVIKmz221C39IBrso5KHdpg16G
-	8UnKoq8lJPsOC4x6HPzCmYWpYnCNZMRfIi3nNuS9QP+iShIjFB6fuUbFqQ==
-X-Google-Smtp-Source: AGHT+IGhBGD/w9aPP+od1qCn5vpvoP3s2D8J0bAGydyh837dii33YilPIt2zm4dKmVaZYekJj1ULjA==
-X-Received: by 2002:a05:620a:d81:b0:7c5:93bd:fbf2 with SMTP id af79cd13be357-7c59b8aa8ffmr85894485a.19.1742236675805;
-        Mon, 17 Mar 2025 11:37:55 -0700 (PDT)
-Received: from [172.17.0.2] ([20.49.15.3])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573d6fb61sm619069485a.73.2025.03.17.11.37.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 11:37:55 -0700 (PDT)
-Message-ID: <67d86c03.050a0220.38e2cd.625c@mx.google.com>
-Date: Mon, 17 Mar 2025 11:37:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8584339708236190073=="
+        d=1e100.net; s=20230601; t=1742236989; x=1742841789;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NA1wszRs5T2ouUUFQ9msDMkStJoUCbF75LIILyXvWtY=;
+        b=R0kN5EmTurNEkPtMcwjoCfJDPRaVLu79BF7Z7Ct1TNiwyEZJbIPmHoFfez6fhmJElJ
+         UkeTfqEFEXdQYSXAcgvy3oCR3mOcviaUPOytdQKj694Rz6vKRKpsusR0Fd746Ic7/zNO
+         vqmpSIB0m68+XbmQf2dzBAJDOEAEtljayJDpb3y2Ljh4NUE2HIkpTMPS+A1+D1E15lBe
+         qX58GFwRJMhF04nZhHoXrp4SWxXmLP2qoQjNsZGMt5AQfs9sWV9QR114iFoJaGkHlYsl
+         0+XSryrpO8k/tDhtZ9bL9hEuEFpCPjziqt6DiKFEfsWz2groZGk2F8q0go59ybGh4kqX
+         9SSg==
+X-Gm-Message-State: AOJu0YxF9cAljaJ0ri9kTcDay2zLb7pM4qFbcwaLFyMUIYRwj0gxoMlC
+	x/yPgctRHTUBPNRQ+8hw3cZudsTGUxvxI2V1BoTkWMSgnSt9IGCX7Qip8GFLbjtiuYZJ47SeP5i
+	QG0LRGGrtEqWYx8Xhmj+UUSzngq48YJOmBYU=
+X-Gm-Gg: ASbGnct6cRFA61Bo7DBCXJuSJFdY0evYxW4UQ3a5nxPduFUvTQFsF4/ArhI4oNVQ+ei
+	0nFB/da4iEoBpE6zGij66vaKhLOyZaTF02KNe0c7QK9t7VFjLDpItH7fS+FYVuqaBohFiOXgNAC
+	MJ9ZysbR4mZqzms+N2ACrSzJkTo9g1Y/hHHDU=
+X-Google-Smtp-Source: AGHT+IHE0zw9Hjq+ZwCvQL/ad5w1C42jY4Qt61UuZ6/eSIWVCWnYrDkITZeW5F4+0VTs68YcIUIlysl1Y03171DjySA=
+X-Received: by 2002:a2e:a78a:0:b0:30b:f006:3f5 with SMTP id
+ 38308e7fff4ca-30c4a8672acmr70799911fa.15.1742236988393; Mon, 17 Mar 2025
+ 11:43:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: L2CAP: Fix missing options not using most recent value
-In-Reply-To: <20250317174143.530997-1-luiz.dentz@gmail.com>
-References: <20250317174143.530997-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <cover.1740844616.git.pav@iki.fi> <5aff62c90e7e313b42f28cbc3c8c81788f74c8ce.1740844616.git.pav@iki.fi>
+In-Reply-To: <5aff62c90e7e313b42f28cbc3c8c81788f74c8ce.1740844616.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 17 Mar 2025 14:42:56 -0400
+X-Gm-Features: AQ5f1Jrty4U7c5o9Tj871rN5oPkapMcU50Yrp7wnqY9Zl7yJYS6ED9UiBEenMJM
+Message-ID: <CABBYNZLmZW7HgWoAH0Catej4532A5=2BT2osz8f7K1wX84dR9w@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ 3/9] bap: add and use chainable future abstraction
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============8584339708236190073==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+On Sat, Mar 1, 2025 at 10:58=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Multi-part operations will need to postpone things like DBus replies
+> until all parts are complete. Make this a bit simpler with a chainable
+> future.
+> ---
+>  profiles/audio/bap.c | 136 +++++++++++++++++++++++++++++++++----------
+>  1 file changed, 105 insertions(+), 31 deletions(-)
+>
+> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> index 37168e58c..8b9b89c70 100644
+> --- a/profiles/audio/bap.c
+> +++ b/profiles/audio/bap.c
+> @@ -80,7 +80,7 @@ struct bap_setup {
+>         struct iovec *metadata;
+>         unsigned int id;
+>         struct iovec *base;
+> -       DBusMessage *msg;
+> +       struct future *qos_done;
+>         void (*destroy)(struct bap_setup *setup);
+>  };
+>
+> @@ -114,6 +114,17 @@ struct bap_data {
+>         void *user_data;
+>  };
+>
+> +typedef void (*future_func_t)(int err, const char *err_msg, void *data);
+> +
+> +struct future {
+> +       unsigned int step, steps;
+> +       const char *name;
+> +       future_func_t func;
+> +       void *data;
+> +       int err;
+> +       const char *err_msg;
+> +};
 
-Dear submitter,
+This I'm not convinced is the right direction, it will be sort of hard
+to make it generic enough besides I think this should actually be
+handled directly by bt_bap instead, it is actually weird that the
+testing spec doesn't capture stream reconfiguration from streaming
+state for example, in any case we can come up with our on tests for it
+to ensure the stream is properly released and CIS is closed before we
+attempt reconfigure it for example.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=944804
+>  static struct queue *sessions;
+>
+>  /* Structure holding the parameters for Periodic Advertisement create sy=
+nc.
+> @@ -155,6 +166,94 @@ struct bt_iso_qos bap_sink_pa_qos =3D {
+>         }
+>  };
+>
+> +static void future_clear(struct future **p, int err, const char *err_msg=
+)
+> +{
+> +       struct future *h =3D *p;
+> +
+> +       if (!h)
+> +               return;
+> +
+> +       DBG("future %p (%s) 0x%02x (%s) step %u/%u", h, h->name ? h->name=
+ : "",
+> +               err, (err && err_msg) ? err_msg : "", h->step + 1, h->ste=
+ps);
+> +
+> +       *p =3D NULL;
+> +
+> +       if (err && !h->err) {
+> +               h->err =3D err;
+> +               h->err_msg =3D err_msg;
+> +       }
+> +
+> +       if (++h->step < h->steps)
+> +               return;
+> +
+> +       h->func(h->err, h->err_msg, h->data);
+> +       free(h);
+> +}
+> +
+> +static void future_dbus_callback_func(int err, const char *err_msg, void=
+ *data)
+> +{
+> +       DBusMessage *msg =3D data;
+> +       DBusMessage *reply;
+> +
+> +       if (err && !err_msg)
+> +               err_msg =3D strerror(err);
+> +
+> +       switch (err) {
+> +       case 0:
+> +               reply =3D dbus_message_new_method_return(msg);
+> +               break;
+> +       case EINVAL:
+> +               reply =3D btd_error_invalid_args_str(msg, err_msg);
+> +               break;
+> +       default:
+> +               reply =3D btd_error_failed(msg, err_msg);
+> +               break;
+> +       }
+> +
+> +       g_dbus_send_message(btd_get_dbus_connection(), reply);
+> +
+> +       dbus_message_unref(msg);
+> +}
+> +
+> +static void future_init(struct future **p, const char *name, future_func=
+_t func,
+> +                                                               void *dat=
+a)
+> +{
+> +       struct future *h;
+> +
+> +       future_clear(p, ECANCELED, NULL);
+> +
+> +       h =3D new0(struct future, 1);
+> +       h->steps =3D 1;
+> +       h->name =3D name;
+> +       h->func =3D func;
+> +       h->data =3D data;
+> +
+> +       DBG("future %p (%s) init", h, h->name ? h->name : "");
+> +
+> +       *p =3D h;
+> +}
+> +
+> +static void future_init_dbus_reply(struct future **p, const char *name,
+> +                                                       DBusMessage *msg)
+> +{
+> +       future_init(p, name, future_dbus_callback_func, dbus_message_ref(=
+msg));
+> +}
+> +
+> +__attribute__((unused))
+> +static void future_init_chain(struct future **p, struct future *h)
+> +{
+> +       future_clear(p, ECANCELED, NULL);
+> +
+> +       if (h) {
+> +               h->steps++;
+> +
+> +               DBG("future %p (%s) init step %u", h, h->name ? h->name :=
+ "",
+> +                                                               h->steps)=
+;
+> +       }
+> +
+> +       *p =3D h;
+> +}
+> +
+>  static bool bap_data_set_user_data(struct bap_data *data, void *user_dat=
+a)
+>  {
+>         if (!data)
+> @@ -740,24 +839,12 @@ static void qos_cb(struct bt_bap_stream *stream, ui=
+nt8_t code, uint8_t reason,
+>                                         void *user_data)
+>  {
+>         struct bap_setup *setup =3D user_data;
+> -       DBusMessage *reply;
+>
+>         DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
+>
+>         setup->id =3D 0;
+>
+> -       if (!setup->msg)
+> -               return;
+> -
+> -       if (!code)
+> -               reply =3D dbus_message_new_method_return(setup->msg);
+> -       else
+> -               reply =3D btd_error_failed(setup->msg, "Unable to configu=
+re");
+> -
+> -       g_dbus_send_message(btd_get_dbus_connection(), reply);
+> -
+> -       dbus_message_unref(setup->msg);
+> -       setup->msg =3D NULL;
+> +       future_clear(&setup->qos_done, code ? EIO : 0, "Unable to configu=
+re");
+>  }
+>
+>  static void config_cb(struct bt_bap_stream *stream,
+> @@ -765,7 +852,6 @@ static void config_cb(struct bt_bap_stream *stream,
+>                                         void *user_data)
+>  {
+>         struct bap_setup *setup =3D user_data;
+> -       DBusMessage *reply;
+>
+>         DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
+>
+> @@ -786,14 +872,7 @@ static void config_cb(struct bt_bap_stream *stream,
+>                 return;
+>         }
+>
+> -       if (!setup->msg)
+> -               return;
+> -
+> -       reply =3D btd_error_failed(setup->msg, "Unable to configure");
+> -       g_dbus_send_message(btd_get_dbus_connection(), reply);
+> -
+> -       dbus_message_unref(setup->msg);
+> -       setup->msg =3D NULL;
+> +       future_clear(&setup->qos_done, EIO, "Unable to configure");
+>  }
+>
+>  static void setup_io_close(void *data, void *user_data)
+> @@ -872,7 +951,6 @@ static struct bap_setup *setup_new(struct bap_ep *ep)
+>  static void setup_free(void *data)
+>  {
+>         struct bap_setup *setup =3D data;
+> -       DBusMessage *reply;
+>
+>         DBG("%p", setup);
+>
+> @@ -881,12 +959,7 @@ static void setup_free(void *data)
+>                 setup->id =3D 0;
+>         }
+>
+> -       if (setup->msg) {
+> -               reply =3D btd_error_failed(setup->msg, "Canceled");
+> -               g_dbus_send_message(btd_get_dbus_connection(), reply);
+> -               dbus_message_unref(setup->msg);
+> -               setup->msg =3D NULL;
+> -       }
+> +       future_clear(&setup->qos_done, ECANCELED, NULL);
+>
+>         if (setup->ep)
+>                 queue_remove(setup->ep->setups, setup);
+> @@ -1038,7 +1111,8 @@ static DBusMessage *set_configuration(DBusConnectio=
+n *conn, DBusMessage *msg,
+>
+>         switch (bt_bap_stream_get_type(setup->stream)) {
+>         case BT_BAP_STREAM_TYPE_UCAST:
+> -               setup->msg =3D dbus_message_ref(msg);
+> +               future_init_dbus_reply(&setup->qos_done, "set_configurati=
+on",
+> +                                                                       m=
+sg);
+>                 break;
+>         case BT_BAP_STREAM_TYPE_BCAST:
+>                 /* No message sent over the air for broadcast */
+> --
+> 2.48.1
+>
+>
 
----Test result---
 
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.30 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      24.64 seconds
-CheckAllWarning               PASS      27.31 seconds
-CheckSparse                   PASS      30.69 seconds
-BuildKernel32                 PASS      24.30 seconds
-TestRunnerSetup               PASS      436.96 seconds
-TestRunner_l2cap-tester       PASS      21.63 seconds
-TestRunner_iso-tester         PASS      37.29 seconds
-TestRunner_bnep-tester        PASS      5.10 seconds
-TestRunner_mgmt-tester        FAIL      135.73 seconds
-TestRunner_rfcomm-tester      PASS      8.08 seconds
-TestRunner_sco-tester         PASS      12.30 seconds
-TestRunner_ioctl-tester       PASS      8.48 seconds
-TestRunner_mesh-tester        PASS      8.82 seconds
-TestRunner_smp-tester         PASS      7.55 seconds
-TestRunner_userchan-tester    PASS      5.02 seconds
-IncrementalBuild              PENDING   0.76 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.144 seconds
-LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.170 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8584339708236190073==--
+--=20
+Luiz Augusto von Dentz
