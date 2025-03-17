@@ -1,139 +1,253 @@
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D924C9F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F171EB1A0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742237619; cv=none; b=qO7MFMmpEKmv9+4knM7rAwuocVWE2Yuuj9+7InuTZblpYP3qbwn0p2DMnXrtJ7Uw1T0/EGs+1VeQQEiDi79aUYoKxTwSXU8u6nTxQYEyt1KSITJktJC9/ExDMWyT2Xwd3BQuS11E/LIpcvgcgITXC9dMgUtVIqtc+xQANwuKs6M=
+	t=1742237775; cv=none; b=KxnJqP76lAFot5rf87qFTGb2n6cqfJVqPJGQoSGliPRujJXRowGS9uCYiclvAFW2hjd8AuQAzECNgK7Rxf9mZ4IDh+cHJpp5UR7GcrimFKnQcTaQuvGbKTwB1aBKP8B/EflhYrCuEDL++bUf9H+qePqpa4a0MAEZBVUgOuKDkVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742237619; c=relaxed/simple;
-	bh=sAJfvlsqgTqAA6hXcOOs+RMObFF8SDbHdyMOYBRBznk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=owskRhreer72cMgvPTXb26SPf0FZxH2Nk9yRgXxFg6jtL690s6badQwGo6s8ZdDGj2w5YSYTIFo4qpPW9dPw8BYGZqQ5N819cEtgiZNvKqOOBsoY359egn3stnqHhR3i7kXCs5UXs1h+67JXsIBdEjxl4YU7CjlMR/heV9D3NH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=CWvllHTG; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1742237775; c=relaxed/simple;
+	bh=Scmnff0CAEgJVbHa4EXuU+UWntPFTMeP+MQVxfsLTqI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UHipguMklaSMVVpm0DcEUFp9tgRLSG4nuIdJL6sPehLKNXNMlAQI2kLws9YwD/g9TLLyg7SUtv1nK1zpwoorHJ8giaea/Vw3dvokDVxz3vf3lrQFKGcKR0UYgi8PrgFuGdOuBqow82pQYgWEWPwjiCozX9YXPSxhPe7azg8Szm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MLPPcwgs; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="CWvllHTG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1742237593;
-	bh=2SMIGmdU0arUnN+8CnilMKwbqZHhcI7tFniL9Z+diO0=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=CWvllHTGOc7aA/fLZ1KKMA/u6AtmbxlGcZZob5jBBGLPkh7T2dfzLqJoSxq1JguJK
-	 swJkg/5zKNyFLcsds2VJ46grS4sX+VxyeWKyVl5U0ihCj24z2Fnw8Br6Ruk4lYxt6Q
-	 PQNWvmJl2pREHFIp6XhsNA5YsuLjzaPxfe9DATYc=
-X-QQ-mid: bizesmtp79t1742237578t0r4xyka
-X-QQ-Originating-IP: IDmb7yvLRFp+32r4kBCU4WPV0+iSbpOD2ulyFtGC5d8=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 18 Mar 2025 02:52:56 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 1448328365827845178
-From: Wentao Guan <guanwentao@uniontech.com>
-To: luiz.von.dentz@intel.com
-Cc: linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org,
-	Wentao Guan <guanwentao@uniontech.com>
-Subject: [PATCH v2] Bluetooth: HCI: Add definition of hci_rp_remote_name_req_cancel
-Date: Tue, 18 Mar 2025 02:50:34 +0800
-Message-Id: <20250317185033.11476-1-guanwentao@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MLPPcwgs"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30c0517142bso43004111fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 11:56:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742237770; x=1742842570; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EsA1baSW2GG9zJr1UMdA/T8/A/7vhV2MmHPk+RkhP9M=;
+        b=MLPPcwgsdZF9ocMRH5SPkrn8iiA6IYk8T8TPMDzAk3KY7ILYGtfmHo4LlXTx3Kb1Nv
+         fjouHjz68Q5QznCWkqcWklBfz4E54XoNY8j0IKKpwDJWeiBkOQvNLHiVZ/vujsFT4YPl
+         npm92JIn7VEiohG0ICmKAaYqsmqyZIOcmw9p0b35xfhmlNoZy8NZZRLiO7jozGNkyvC4
+         WDr5RoQouT6tF8A/mePa8xsLVGERF6n8ukEyosLASX3SrVbrmu+7JOFmD2R/0lScCgV8
+         fqoCV/z/EwMtjGwtvIhlWRIR3zoRlZL4dSFXBp6sW20aJ9vaua6O028/2KGmCk460dE2
+         YskA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742237770; x=1742842570;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EsA1baSW2GG9zJr1UMdA/T8/A/7vhV2MmHPk+RkhP9M=;
+        b=snya7kJJYHyfiZXUs2mE/mTZi6rDboqKT0nbYnRCfhKHfG6CUxVhlxZhLXv1TOTqJP
+         +CrElrTCRlQoWA1qQ3bFbZzmUi278CbIFfv7GIqLgGPCZp7vvJEGeiQHQDV3scrAOh3U
+         S6PslFDrRq1N6c625B4hpf8a6QCgLEhqMettPd5XTYDDkh9VjPIgnQ9tVY51cLs95hPX
+         rDgnjpeRezt3YAQeeq6dq+TwCop1Ka3w5XG3P1Ij5JqhC+wViMHpPffjFBJzVRVLttFq
+         oHH1zNwyE+7J33P7IVaDlvUGHXUInoizEvEyhnS+FJKMJvYaCo0q4z8RlQFFII3E1j0c
+         zN3A==
+X-Gm-Message-State: AOJu0Yx5ibAKKOyApX3EP/dvfzFDwJRY656b0ve0d9qM9sdBcD1/PsTi
+	bsX77B1suJESgpLMP7sAxniTImIU8zA26LLl/PxqWr3q1QBNQzi04lmWGYExu/1CZShE+CybdeO
+	yjwRDd+gLz5qpEuOUCbZ/Fm+++jYa8lzr+nI=
+X-Gm-Gg: ASbGncsWjSVGpN2JfUrhWRQV2JIsukVidpIq28PLzc0Sjw79sHr3EzeARFbh+VM4F7i
+	A+bQ7TjYhGVu0JxaCq6QzuzybH1+KE5enrWrvSX4W+MVLr6nkLHjsxz+W0A4ielCyYtDvwOvmE1
+	QPs35ZtmMxdK7aIXVFVpV9HIMN
+X-Google-Smtp-Source: AGHT+IFQ3H2LSNCc+WfWQNfK5+aUg7IMa0rH1gbby+HjOwPaZN6mLjI0asimJmOVOLXZREfnGDpQcV8oJZnuk8cxfZA=
+X-Received: by 2002:a2e:a583:0:b0:30b:c6fe:4529 with SMTP id
+ 38308e7fff4ca-30c4a749065mr75357981fa.8.1742237770053; Mon, 17 Mar 2025
+ 11:56:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-0
-X-QQ-XMAILINFO: MCqxCcyBE+BGcVW+TJjgLixk8fNZfHMwLO9eAl4ldei6X+p5FgQqGR9E
-	q8gsN3GGKFm66s+3xFq7kOxTfFWs5oeLX8owCWXxwAVV3OKWwM0MRNNbd2DpxNoyQspyu1n
-	5iX+hxZf1XM/tRMSWwQYIRVV85fgw/TZ9vI+qc36ASPFGU2u2x0cVmJqnL8uBREnelO48+W
-	Nv0W+ARugMHRQHrbwQ+zGEO8hrGxM2MxHKXRzP5UIRkrsHzR3lhZX6F3LAaDG4FRTzbepb9
-	qEbLoSMPv6WlY5eM8n+4Ke381W4FORGGqqOx9qIXVriiOqZdANejj4LrKzWW6O0wXcZRKXB
-	okC2so80Qu8sFplXR9Jhy3q6srxzy1WGLzA7bqDw39ijAYkC21ZqexDjTNngL52vsAEu3wQ
-	LLJMHmImkVt871i0FgG7rEYqFK9FPxVlM2fJNslWpWWbpZSXfl68WdwbPU5ZfPgxdKTI3Mm
-	PT+RuVi7X3CdR4oMYfJzZhbrzfWZxlhMAQ9Sh3hFuooPSw9GcD9ku/+nEhFasjm9t/wOe2v
-	w3n7yY1OifDOacirPFHOpK9j+PXIRqXdPImr68qqb2kAfvrrTnoK134guzK3izYsem/NhTS
-	zcj6yTi04BlaFuZP7PcxHQ6fG/16sO8SdhWI8KIFzjNH50SppAmcO/0W6tCEioV/BXyFU6R
-	Q95DQbYiBy1fGki+On7jQ9tRezgUwQmlhl4gQR+vEG1njmrqUApMXq3BIAHbM1LCWHw9p3+
-	bvgC7T3vuv/MtL1c4MdLIZGpJua8uWzGADpGarnVWh3dgAWpcl8MRqMiIqMXJ28Uv+4Ld3X
-	zZaZTs4pTzATPvZ6iu1zEZbkGxNdh49NSSktGmbVX1lfLriRCGC1bogs7moPmxzF4iBLyYx
-	dcvmLvkaSBB9SxNy02o/wellFKDzwkbkY0yKej4YctAjlbwh59PiM9aj6ABJQAxbR6sbP86
-	GnqEsAnjsx/lrtHPeGj6GdH3G7IaFpnzyc+D2s2GBR6IRmirLICfTcm6DSNeO9oojKWuSUb
-	s3I0Mg/p2OFY7lZNP6lr69tWyevPABXRLSsKCQNMGEHmWceIkSdqoSsp7Y1WQ=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+References: <cover.1740844616.git.pav@iki.fi> <5f103220d38f8eb549eb41ac971d1f4cf1e684ba.1740844616.git.pav@iki.fi>
+ <718e840dc3a3089f9a8bd24887191617e234c02a.camel@iki.fi>
+In-Reply-To: <718e840dc3a3089f9a8bd24887191617e234c02a.camel@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 17 Mar 2025 14:55:57 -0400
+X-Gm-Features: AQ5f1Jp62MVLDuVjsfhmddFmDwQEifn36ozsDv3QNwq52kODULAnQC0Es1S70Uo
+Message-ID: <CABBYNZK9b5Wkm_cXwsW2ZTqf7E7bEyCjSHe_7OYvaDSa8YoQEg@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ 6/9] shared/bap: make sure ucast client stream
+ is destroyed after releasing
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Return Parameters is not only status, also bdaddr:
+Hi Pauli,
 
-BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E
-page 1870:
-BLUETOOTH CORE SPECIFICATION Version 5.0 | Vol 2, Part E
-page 802:
+On Sat, Mar 1, 2025 at 11:27=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> la, 2025-03-01 kello 17:57 +0200, Pauli Virtanen kirjoitti:
+> > Upper layer as Unicast Client needs to be able to destroy streams when
+> > it wants to reconfigure endpoints.
+> >
+> > This does not currently work right, because of Server issued
+> > Releasing->Config (caching) state transitions, which currently cause
+> > streams never enter Idle (so they are never destroyed).
+> >
+> > Fix this by considering Releasing->Config as Releasing->Idle->Config.
+> > Also do not make new streams from cached config data as Unicast Client,
+> > and leave all stream configuration to upper layer.
 
-Return parameters:
-  Status:
-  Size: 1 octet
-  BD_ADDR:
-  Size: 6 octets
+Not sure I follow you here, how can we consider it idle even for
+cached config data? If we don't keep the stream there won't be a
+MediaTransport representing it either so it won't even be possible to
+know from the upper layer there is something already configured, so I
+really think we should have an option to reconfigure at MediaTransport
+layer rather than trying to hide it somehow.
 
-Note that it also fixes the warning:
-"Bluetooth: hci0: unexpected cc 0x041a length: 7 > 1"
+> This change also implies the following, so that reconfiguring multi-ASE
+> configurations works right:
+>
+>     shared/bap: ucast client streams always use a free ASE
+>
+>     Because upper layer controls Unicast Client streams, bt_bap_stream_ne=
+w()
+>     should for unicast always allocate an unused ASE.
+>
+> diff --git a/src/shared/bap.c b/src/shared/bap.c
+> index 4f44db07a..a85169009 100644
+> --- a/src/shared/bap.c
+> +++ b/src/shared/bap.c
+> @@ -5836,29 +5836,6 @@ static bool find_ep_unused(const void *data, const=
+ void *user_data)
+>                 return true;
+>  }
+>
+> -static bool find_ep_pacs(const void *data, const void *user_data)
+> -{
+> -       const struct bt_bap_endpoint *ep =3D data;
+> -       const struct match_pac *match =3D user_data;
+> -
+> -       if (!ep->stream)
+> -               return false;
+> -
+> -       if (ep->stream->lpac !=3D match->lpac)
+> -               return false;
+> -
+> -       if (ep->stream->rpac !=3D match->rpac)
+> -               return false;
+> -
+> -       switch (ep->state) {
+> -       case BT_BAP_STREAM_STATE_CONFIG:
+> -       case BT_BAP_STREAM_STATE_QOS:
+> -               return true;
+> -       }
+> -
+> -       return false;
+> -}
+> -
+>  static bool find_ep_source(const void *data, const void *user_data)
+>  {
+>         const struct bt_bap_endpoint *ep =3D data;
+> @@ -6053,15 +6030,11 @@ static struct bt_bap_stream *bap_ucast_stream_new=
+(struct bt_bap *bap,
+>         match.lpac =3D lpac;
+>         match.rpac =3D rpac;
+>
+> -       /* Check for existing stream */
+> -       ep =3D queue_find(bap->remote_eps, find_ep_pacs, &match);
+> +       /* Find unused ASE */
+> +       ep =3D queue_find(bap->remote_eps, find_ep_unused, &match);
 
-Fixes: c8992cffbe741 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
-------
-v2: add Fixes and change rp type.
-------
+And if there aren't any ASE left then what? I'd go with the design the
+spec suggests that stream can be reconfigured for QoS Configuration
+state down to Idle, the only hard part is figuring out if a stream
+state affects another, etc.
 
----
- include/net/bluetooth/hci.h | 5 +++++
- net/bluetooth/hci_event.c   | 6 +++---
- 2 files changed, 8 insertions(+), 3 deletions(-)
+>         if (!ep) {
+> -               /* Check for unused ASE */
+> -               ep =3D queue_find(bap->remote_eps, find_ep_unused, &match=
+);
+> -               if (!ep) {
+> -                       DBG(bap, "Unable to find unused ASE");
+> -                       return NULL;
+> -               }
+> +               DBG(bap, "Unable to find unused ASE");
+> +               return NULL;
+>         }
+>
+>         stream =3D ep->stream;
+>
+>
+>
+> > ---
+> >  src/shared/bap.c | 32 ++++++++++++++++++++++++++++++--
+> >  1 file changed, 30 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/src/shared/bap.c b/src/shared/bap.c
+> > index 54c6e8629..4f44db07a 100644
+> > --- a/src/shared/bap.c
+> > +++ b/src/shared/bap.c
+> > @@ -1363,6 +1363,31 @@ static void bap_stream_state_changed(struct bt_b=
+ap_stream *stream)
+> >       struct bt_bap *bap =3D stream->bap;
+> >       const struct queue_entry *entry;
+> >
+> > +     switch (stream->ep->old_state) {
+> > +     case BT_ASCS_ASE_STATE_RELEASING:
+> > +             /* After Releasing, Server may either transition to Confi=
+g or
+> > +              * Idle. Our Unicast Client streams shall be considered
+> > +              * destroyed after Releasing, so that upper layer can con=
+trol
+> > +              * stream creation. Make the lifecycle management simpler=
+ by
+> > +              * making sure the streams are destroyed by always emitti=
+ng Idle
+> > +              * to upper layer after Releasing, even if the remote ASE=
+ did
+> > +              * not go through that state.
+> > +              */
+> > +             if (stream->client &&
+> > +                             stream->ep->state !=3D BT_ASCS_ASE_STATE_=
+IDLE &&
+> > +                             (stream->lpac->type & (BT_BAP_SINK |
+> > +                                                     BT_BAP_SOURCE))) =
+{
+> > +                     struct bt_bap_endpoint *ep =3D stream->ep;
+> > +                     uint8_t state =3D ep->state;
+> > +
+> > +                     ep->state =3D BT_ASCS_ASE_STATE_IDLE;
+> > +                     bap_stream_state_changed(stream);
+> > +                     ep->state =3D state;
+> > +                     return;
+> > +             }
+> > +             break;
+> > +     }
+> > +
+> >       /* Pre notification updates */
+> >       switch (stream->ep->state) {
+> >       case BT_ASCS_ASE_STATE_IDLE:
+> > @@ -4851,7 +4876,8 @@ static void ep_status_config(struct bt_bap *bap, =
+struct bt_bap_endpoint *ep,
+> >       }
+> >
+> >       /* Any previously applied codec configuration may be cached by th=
+e
+> > -      * server.
+> > +      * server. However, all Unicast Client stream creation shall be l=
+eft to
+> > +      * the upper layer.
+> >        */
+> >       if (!ep->stream) {
+> >               struct match_pac match;
+> > @@ -4866,7 +4892,9 @@ static void ep_status_config(struct bt_bap *bap, =
+struct bt_bap_endpoint *ep,
+> >               if (!match.lpac || !match.rpac)
+> >                       return;
+> >
+> > -             bap_stream_new(bap, ep, match.lpac, match.rpac, NULL, tru=
+e);
+> > +             if (!(match.lpac->type & (BT_BAP_SINK | BT_BAP_SOURCE)))
+> > +                     bap_stream_new(bap, ep, match.lpac, match.rpac,
+> > +                                                             NULL, tru=
+e);
+> >       }
+> >
+> >       if (!ep->stream)
+>
+>
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 6203bd8663b7..ffb6524788f5 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -856,6 +856,11 @@ struct hci_cp_remote_name_req_cancel {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+struct hci_rp_remote_name_req_cancel {
-+	__u8     status;
-+	bdaddr_t bdaddr;
-+} __packed;
-+
- #define HCI_OP_READ_REMOTE_FEATURES	0x041b
- struct hci_cp_read_remote_features {
- 	__le16   handle;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2cc7a9306350..763a8ad9d2b2 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -151,7 +151,7 @@ static u8 hci_cc_exit_periodic_inq(struct hci_dev *hdev, void *data,
- static u8 hci_cc_remote_name_req_cancel(struct hci_dev *hdev, void *data,
- 					struct sk_buff *skb)
- {
--	struct hci_ev_status *rp = data;
-+	struct hci_rp_remote_name_req_cancel *rp = data;
- 
- 	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
- 
-@@ -4005,8 +4005,8 @@ static const struct hci_cc {
- 	HCI_CC_STATUS(HCI_OP_INQUIRY_CANCEL, hci_cc_inquiry_cancel),
- 	HCI_CC_STATUS(HCI_OP_PERIODIC_INQ, hci_cc_periodic_inq),
- 	HCI_CC_STATUS(HCI_OP_EXIT_PERIODIC_INQ, hci_cc_exit_periodic_inq),
--	HCI_CC_STATUS(HCI_OP_REMOTE_NAME_REQ_CANCEL,
--		      hci_cc_remote_name_req_cancel),
-+	HCI_CC(HCI_OP_REMOTE_NAME_REQ_CANCEL,
-+		      hci_cc_remote_name_req_cancel, sizeof(struct hci_rp_remote_name_req_cancel)),
- 	HCI_CC(HCI_OP_ROLE_DISCOVERY, hci_cc_role_discovery,
- 	       sizeof(struct hci_rp_role_discovery)),
- 	HCI_CC(HCI_OP_READ_LINK_POLICY, hci_cc_read_link_policy,
--- 
-2.20.1
 
+--=20
+Luiz Augusto von Dentz
