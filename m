@@ -1,114 +1,85 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BEA1A7AF7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1812F1A2630
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 18:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742235070; cv=none; b=umqT4CBvqcnj1PxsgnuMfF26IG+Sb1CyAoRUX6/ge/krZS+a9J8Jb0ZvvlH1kwO9ZLl5Qx4ukFQZ6XHGMZkCJu5iXLcD3iSNgius6NvHukEh6NVVQVfazHFyuBL2hDL+QhKs5+LoZHVBloRu3KBeBKvHASWJSLnJvFO6ocViEpc=
+	t=1742235375; cv=none; b=f4ox5KpwF7+KL1MA7G0+gu1IDEuiErSodz62/3fZcgkx+PcjcZzPNB3yxUeal8EXW+MDevxNbewwj20T+Xycf0OyY82DksKvM/IfYqFlFqnxWtd8VhdLx801FL7SnxU9cmE/HkI3462GuaEvl91cprMH45FhWb8//2e+7j03k78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742235070; c=relaxed/simple;
-	bh=nlvHPmP/sCF87iS9AUKIJrehiQw1sbQrTAuTTgaQ4Cg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gdZrtS1FoJ8obdhryVeF0583DgOaxUG+Z4Miv7BFPefGXjEZnyGPry9vuFbmxMuNLSREY4NDbPj0O6rcbEHGibz/8uNg6TuJCG3B2+pSSRr9i0FImZHuqWXWmdLwOwumceIcXNifZ+PUpIiWAdIQlQmbXLsEx5N6SQBTE53PkC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NtrRHxmY; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742235375; c=relaxed/simple;
+	bh=P9nuSolWh/nEZvcOmxJ7qruiZITOZXk1CSUGMKBWr9I=;
+	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
+	 References:In-Reply-To; b=ntem1z5Gk76lRVZGePOJkb2+i0C9hu0bHE/0cgO/fhgNHgwNaODAwSR/VfsfsrL41OegXQAk3huPe+JtjEi22s2TKA2Pdqu2LM6m0eRZYjU+LDFPDID2XN+mQPCzjBnEHjb94SpoUX3MMp14GTCuZi+yRdDj9kBhHDXslV54FQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=EmrQw9la; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NtrRHxmY"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30bef9b04adso51485391fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Mar 2025 11:11:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742235067; x=1742839867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=izv2soa/Lkb0fze4uYaQ0tFkWAj7tpI64gdtFALNwWY=;
-        b=NtrRHxmY89xhxV9Q29ZSIXN6kL9K5GqXC4JnUhqFi8Vx82+B8WptEdx6IvmqqmU6qH
-         HxzL+Ko36PIV7iYAluRVDDdAyw5OwYmkllvVsW/OnZvc5WJQXzBA23IMYdBSfxtVnbdc
-         PWecZaVYZemfRC6GZdi7PbfWQJE8ff2MxMS8RFkYjJqhv+Lu+df2rd49m51yQNayXBNG
-         ELeORr5dNAok+idZAD4Q5/ljEuZzHeYD4773hJBLK6HWhK9Z6tiIKlaLa74eymg4l6FO
-         7t7K36VtN9qQ8/UGJrBq9Mci/QfL0P7+x+fVOIXfSBGNp3lqutZU/Ii6KQtJJBh01SnR
-         zk0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742235067; x=1742839867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=izv2soa/Lkb0fze4uYaQ0tFkWAj7tpI64gdtFALNwWY=;
-        b=RFFgXD21tU1Gh0A3NuSaSQyQhIHODCO6WsIAyFtzVi/+SHlIrHebMj/HERUkFBlYmN
-         AfGiBG6ww6cbthoCdk+cnSEK5QtBnbaB9n5KRT8Wp/tSutu84WyRsO0APfPGuJXlOyQU
-         xSaFCFlMV2abQZ+Q57iPIaOwnLvUmQc7OPt4AZPvrMjC/rALVyTXfXGJJgvams4fLFaH
-         7gpRgKzcQsxAgK6AWBny9bDt58gl6ZMPa9Ppf/xI2ezQnLUfYiTH6Cxk4O1wpJ6Op8Ul
-         8z3I+Zv0rXnCVVvOd3b9ZR28p8mrJg0M7TtSQNhuOF2WzssJBTqIKCJyQdaoxw1CT955
-         2L7Q==
-X-Gm-Message-State: AOJu0Yz1O1OGrWTMz0s/hwAb3XGCEV+bqBYeCnpqC1bpWPX6/u51pZdS
-	v6ALvViRFumuxH6eMdwNA1L336Zj1jRmafLjlH5MIsm0G8rgL5rnttdcJQxQkn0lWOhR+upN+KK
-	OBfnTL1VgJETGytFrV5gxgEvdxZE=
-X-Gm-Gg: ASbGncsJ6icgPn/somxXaPDEAbMnK0C5NN+adl1AYwb8u+iUubaNpU61dHbs2+0fGve
-	K8NB1Ip6l8OwYESDoKpVQJB9X0oJCGWqebhgG21WWiv0uRJtQfyqbvLsuR5Hjn/yKTKjE+WMTxV
-	VFIb7W4rIciX0mS5CEWMLE5VvJ
-X-Google-Smtp-Source: AGHT+IHbRmkWEB2awJPvWMWFsjcaNQZf1+rm3UU0qhmfxURBR+m/JbZ1d8LKLi+pNmg8VKYU9lX0gdaF6p6AhitbojI=
-X-Received: by 2002:a05:651c:b0b:b0:30b:b28d:f0a6 with SMTP id
- 38308e7fff4ca-30c97534d5fmr9156201fa.8.1742235066663; Mon, 17 Mar 2025
- 11:11:06 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="EmrQw9la"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1742235342;
+	bh=P9nuSolWh/nEZvcOmxJ7qruiZITOZXk1CSUGMKBWr9I=;
+	h=From:To:Subject:Mime-Version:Date:Message-ID;
+	b=EmrQw9laoZ0gZIbHHGoLop4G8+6ONky1rbwtsZXRgHX5WmabBGLltqs/LMiC0UeYU
+	 kOBU8QaHkcmTz7wvFo9jUb+tgtTbIOXHPfGU93pGg/W062sXKBz/gDdVEhl8J8quxi
+	 EpDHthTLYXW51urevaF31jRPKNaMXMmNKeH8ED1U=
+X-QQ-GoodBg: 1
+X-QQ-SSF: 00400000000000F0
+X-QQ-FEAT: D4aqtcRDiqT6iyfUez+DXx4B7ybItHVbSxkDlA8/kMI=
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-Originating-IP: 7s6yzF3zASig0FjzGfRNCaezCQkEO4+FLqH7YYvX33g=
+X-QQ-STYLE: 
+X-QQ-mid: v3sz3a-6t1742235336t7602166
+From: "=?utf-8?B?V2VudGFvIEd1YW4=?=" <guanwentao@uniontech.com>
+To: "=?utf-8?B?THVpeiBBdWd1c3RvIHZvbiBEZW50eg==?=" <luiz.dentz@gmail.com>
+Cc: "=?utf-8?B?bHVpei52b24uZGVudHo=?=" <luiz.von.dentz@intel.com>, "=?utf-8?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>, "=?utf-8?B?bWFyY2Vs?=" <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: HCI: Add definition of hci_rp_remote_name_req_cancel
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1740844616.git.pav@iki.fi> <a0a8eb4d51a35f3181617303aa8f6ad8227b2bca.1740844616.git.pav@iki.fi>
-In-Reply-To: <a0a8eb4d51a35f3181617303aa8f6ad8227b2bca.1740844616.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 17 Mar 2025 14:10:54 -0400
-X-Gm-Features: AQ5f1JoGYln5BK4mePJEWdNElLfRDqt_jZYvxGDeJ7JEladVYhDyI1G9rtMsIVA
-Message-ID: <CABBYNZKVj5b7CRAU0qi1CfxGd2FabtCaQsxTUoc1yq0AabztXw@mail.gmail.com>
-Subject: Re: [RFC PATCH BlueZ 1/9] org.bluez.MediaEndpoint: removing BAP
- streams with ClearConfiguration
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Date: Tue, 18 Mar 2025 02:15:36 +0800
+X-Priority: 3
+Message-ID: <tencent_27D3557D435FC05369A3ACCA@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+References: <20250317154715.15023-1-guanwentao@uniontech.com>
+	<CABBYNZ+MdXNdLrgNb0UOuh2aFnukcUTTAvGkD6M5js=pvQuQkw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+MdXNdLrgNb0UOuh2aFnukcUTTAvGkD6M5js=pvQuQkw@mail.gmail.com>
+X-QQ-ReplyHash: 2399442445
+X-BIZMAIL-ID: 3930025385411776433
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1])
+	by smtp.qq.com (ESMTP) with SMTP
+	id ; Tue, 18 Mar 2025 02:15:38 +0800 (CST)
+Feedback-ID: v:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NEaes6yu2o+mIs0PGN3Wk0b+mFNDIEzk7aYXBUl4ououcIYIXDJ99nrx
+	nONvS1MCQsU8knGFqcWoEYt2rp1WL/j35RUHY+vUv3oUb1aMCS3thloEim6v7c9zv0bgf/g
+	sshtWODQJxJ4K+EHy6s0Ptzs+sm+nVCHpGWNIIdTdsiKwwQbQdx1iKdtJywRH1n4Gs7mBG1
+	3Wsk0aybaHOL0DRWjXSOODwRer4gurQZ6AAez0T/bTyM6fdcT7FMx6rMlhh/OPJL7b8hpgU
+	8pjVtLRkbaK7V+M/KGlu6rBMC+zRXRDpqplNNPmOuhWh8sW11ds71DXHTsyrsTQbsgH/Z8m
+	VZZwiyAsuN5cLaEai9T7GmNq90W5zSmUCVivNzaWPycDsFYzzQ2vGnCGCLynbpqPmnpWZeD
+	H9jq/xVJ+zqSfK1u+KFiXZkUYx1Apo+fLZd5l9wAOO0QdkKljvgBadOasZFA6acYvco3Aje
+	8/gg+4NHdIE8OG6QWwf5qSYKk3Sp9fliTrxlrJV5Z7plj5gcq1YRg+ip3utgBgqEvs632CR
+	/QrM00gF9DtrWb/2Dv6Uht5yMgX3HjpIIbGYJx7mmETkM0wlBRnVHGzy6DYkq/xE825fGf8
+	Z9aAY2E+MT7okWO2LkkFrmoBg1LfCWpxZjSvxVYCpOo+zHtq2WZVzX2b/6QcieAsjg1mYCW
+	Rcj6ncX73jYnnURW1Bh8EVZhYG5Z0TgkcfvJ2vZuvXr7llzoCRK9DzHPObFt5hiWoH3QCRh
+	iJg7p8VookJKRNF7ndRb9GkujWxqBbFOYTwr3qqh+1KQ1MaSXICWJ9bvCrETdkbqTUR+LF1
+	USTjw8je6bS2cStJCStpJc4+ix9/TUJU+5BdW6Uv7R1vxGmgjMrFTi7pKXmzPd2SBwCMS+9
+	v+Tto2beHHj0b+nOjbHjU/MZqSGkZKtn62gzezjr/bK3rQy8F2xa8TrxVloNJXorXHIt6xj
+	aGAHONgVT6+Y2WFyZx9Z+CtBKDsAyC8/dnWmwT/TUysxwCQ==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-Hi Pauli,
+SGVsbG8sDQoNCmM4OTkyY2ZmYmU3NCBCbHVldG9vdGg6IGhjaV9ldmVudDogVXNlIG9mIGEg
+ZnVuY3Rpb24gdGFibGUgdG8gaGFuZGxlIENvbW1hbmQgQ29tcGxldGUsIGlzIGl0IG9rPw0K
+YTlkZTkyNDgwNjRiIFtCbHVldG9vdGhdIFN3aXRjaCBmcm9tIE9HRitPQ0YgdG8gdXNpbmcg
+b25seSBvcGNvZGVzLGlzIG1hbnkgeWVhcnMgYWdvIGFuZCBpdCBzZWVtcyBub3Qgd3Jvbmcu
+DQoNCkJScw0KV2VudGFvIEd1YW4=
 
-On Sat, Mar 1, 2025 at 10:58=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Allow user to remove specific streams by calling
-> ClearConfiguration(transport_path) on the endpoint.  If the path is the
-> endpoint path instead, clear all streams associated with the endpoint.
-> ---
->  doc/org.bluez.MediaEndpoint.rst | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/doc/org.bluez.MediaEndpoint.rst b/doc/org.bluez.MediaEndpoin=
-t.rst
-> index f2b830ab0..b81106f0b 100644
-> --- a/doc/org.bluez.MediaEndpoint.rst
-> +++ b/doc/org.bluez.MediaEndpoint.rst
-> @@ -109,6 +109,12 @@ void ClearConfiguration(object transport)
->
->         Clear transport configuration.
->
-> +       **Server role:** [ISO only]
-> +
-> +       Close the stream associated with the given transport. If the
-> +       path given is the path of this endpoint, all its streams are
-> +       closed.
-
-This seems sort of trivial, that said we can't really guarantee the
-MediaTransports will be closed even if we send an ASCS_Release
-operation the server may still cache the codec configuration.
-
->  void Release()
->  ``````````````
->
-> --
-> 2.48.1
->
->
-
-
---=20
-Luiz Augusto von Dentz
