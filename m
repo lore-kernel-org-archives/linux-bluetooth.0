@@ -1,125 +1,157 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6ED20E32B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 14:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCDF20DD59;
+	Tue, 18 Mar 2025 14:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742308711; cv=none; b=GSGXpSnZVkgZEp5GkdUqZahPaIjLjNdWxAtCbejf5hTF9ir1wLOlFN9lb93Bdro9vayZQ8DNoFHTMOBF9d8dqwkz24nwTMkQcQpnY7WlLtrVo8iKXj2dHxnTwZw+DJIO9SMrDTohjD0Xmsc9Sh6PTUwhboK1U1BA6CfVynWXMkg=
+	t=1742309726; cv=none; b=dngIMYLLYZi0r0gK3Cios7kcW2P9gqkJ5Zk7ediyEdFP6j/q+wAd7gLLqjUY0h2RZX4m7hPxrwJDrzjEu8KUYzRTvadwz0g8aocT9HB6vsqZ8DSbBMsbdIJF0pfHM0v4KcBBsCfGK6pSM6+PaTyIbIGGmZfvepCkxggG3/LkupA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742308711; c=relaxed/simple;
-	bh=mgXCp+t83QxcUgFuPzZmH6sBxuskd1FpRzKw26Eoj+8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=K9DMlbTDa6bSdSknkX3Fvp9olREVXVLHV/LKKA0w7yjYHCHwpzZHOG7W/cVgdMYRnVNQ6LDbuIYg895IwYvCCCo+NNZ78aehY7FIeI1eP7kSYNSyG+aP2lpVOhfj4s+jIcb9nOuzcSsTYVuDP8JF/7tcLNtvCEURMfkpw8b2c24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mbu1B/f0; arc=none smtp.client-ip=209.85.222.179
+	s=arc-20240116; t=1742309726; c=relaxed/simple;
+	bh=H9DLnK3r7MFZDcbdgHuLqqfMHsM14MtRNwArj1moT8A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gFCAjU0BMXiz7rEoAscOLsuqYyUhArKb3pI4JoBOraz+m3v/a1HLMQ6I/BkcPOBKXFid92cGNLwGBTJEuZAdubzHMVyU/NXrqWUzM7/bbTY4jjP+QA/ImStaQ6k5ZhyzMg7KyBiX1q3KbyFr2QJ8ushhSC/DZwe27wrjj4BvwLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GVmz39mq; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mbu1B/f0"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c08b14baa9so451856085a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 07:38:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GVmz39mq"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30762598511so59865601fa.0;
+        Tue, 18 Mar 2025 07:55:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742308708; x=1742913508; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=c7+JpL2OBktHTBtMI++7w5SZEPMFapkC+mb3CFdfLB8=;
-        b=mbu1B/f01VRgThSEjIz3KuKzMynR1OfnjZIk9/DnfV7LG2XOW1lb+WEK/As2DCNmTL
-         Tuc4kYekUTzPnFnqDDRlQi/uSbvDqyYaMozQ2sQD64rLcX3ZPh4xYVFbZpo6zK9Xt9tp
-         ibHpaSMjdSeBQeFOnxMkTZfUa2t+QOxM1WL94qLuK085LNPaALYuVO1nBGmeuCXQHSvw
-         3a7+RCQY/k5kOn9QgzVLP5bGMfJkwR0hsSEpQLFr3FHm5JdxkegcmqUlQ7gY0Szw5cwP
-         pj9xbfDxB0kBqMp3yJ1SAlB+7cxnYJZsYdfk4BP7YR/4SAhMaRdsD7mrlstCNmBeZMaq
-         OcrA==
+        d=gmail.com; s=20230601; t=1742309719; x=1742914519; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vk1MOiDuVZr9W40/mLkzWnl5G4mhGBTZpl9F//I5jok=;
+        b=GVmz39mqEBqiv8gTRHV2XOtEvy6q2ngLGAkGi7Jud/dF1CdFOVlRsZ8TaEZk/Zb0RT
+         RRzIxriY0Dz+oooDMvnE7CfDMoMi6okqDG918EbPdTUj/CEeh9s3DzruZd7g7CELNopP
+         TqT3lI/QPBmXZSwS15fDDzWSEO3mfUg0ZiWX6WbBx4namnLwz5IytQVKaNAMU5Fm+6Zy
+         4LzY/jNViF6o4SrjItBqKUO1CdP0eXefQxprGYF03RAbodiDWRRUQYb3ohnALl53mfcz
+         V1+QJQhT3Ogz0J+ZlxRwOuHV4a42Zt0xhTVI3aE2MMh7fWD10RK60Oq0PVpHK8TKXONf
+         Q+sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742308708; x=1742913508;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c7+JpL2OBktHTBtMI++7w5SZEPMFapkC+mb3CFdfLB8=;
-        b=JPSN3ZEBL1qq+vp2i8GogaazKdcV53UGAq89ep+fj0jeuga4TGCHUcRrGUKNWslXGC
-         LyKUNjfzyrqHY2C+XpAfpBLOVUqdIpmN/qfEyTLBrrvGYx+D35us1SKM3w4IFeveTk3C
-         AbNGWPai9WagtqPnSaIai6P4INr6aU2J+CREdf07JIC/1Pdc878RZMDJ4A0EEdqOV1EQ
-         r3L8OjfEazTGRfXpUg64eJs2zwOVDAr2NVG2lIhEL93/Iil16zllGtIf04IhEk9R5eRt
-         LRH6VIzdDVTf3cvGrJSh4uajxv63iFzOu0T9SDbJbu5tayDEGB1KlDjUlzKF8De4Bath
-         JLBg==
-X-Gm-Message-State: AOJu0YxhKv16V4d+wuXI9OdbO3aqs67xOF7priFA296s5kSSu72tNk9s
-	Uio8kXRZkxt3vQek+UlItI7QPy73m0tt1ctiOeDQkDMhjZCV4NvDyoiaUA==
-X-Gm-Gg: ASbGncsiBKMSt00o3OUPYfGBxBR/+1hKoQ2/nT4OauJz7wYZh1fnOkD4HgBeVxJ/Euk
-	6FoYfFhG8szeWf3XOw7Kdu8V2wR7ZHS+HHLd75Z3OptqrsRAjCnGtlWRtv+YIYZdrQkRIHvL2qK
-	DrsMqhYN64CNu6btFh5E+Sm1f9mNv1vkQ0miEWsLnq93emqkDIwUaH4tBmOOuU7VD48mUxIX4Dd
-	RSEwQ65Ns6wxYv9AP1TPFism13RwtHEya/zVTVv7KGJ1wi02ZodEUHGJWaIa1u2vh2Hn/uvt8bB
-	CD+DdfG2eR9nOaRPlAjrSUleEME/n+LBLc7SaHvR0mj4CAKJ9w==
-X-Google-Smtp-Source: AGHT+IH6nYbt+Mbq5LzWiSI64A49DUeu9Ymhp2bcQw0lhCOuX2bUjCuRk2NtXj8VpC2E9hAIBkl9uQ==
-X-Received: by 2002:a05:620a:bc1:b0:7c5:6375:1450 with SMTP id af79cd13be357-7c57c79c06cmr2235146585a.18.1742308708331;
-        Tue, 18 Mar 2025 07:38:28 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.79.181])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573d9256asm727072785a.106.2025.03.18.07.38.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 07:38:27 -0700 (PDT)
-Message-ID: <67d98563.e90a0220.276345.9eb7@mx.google.com>
-Date: Tue, 18 Mar 2025 07:38:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6008245717534889755=="
+        d=1e100.net; s=20230601; t=1742309719; x=1742914519;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vk1MOiDuVZr9W40/mLkzWnl5G4mhGBTZpl9F//I5jok=;
+        b=uQ9kpfUpGFhNl8kcmui1p9LA+4RwzP3b4vmj1gFSOA+lyY8loG4QhQ4xEHNhsjcvjn
+         q9R3hFwwGOZP0uugc+Mk7SV9O1yIYvlleFbWY6qjBWdVWyeN7+qn8GxrEDTJ6b6VhnqZ
+         TkaFFpGHPywzmugmBUGjRafWwqevpAC5LSc+nRUYjAw7JZ/0kUC3sbzjdF5OmyBYb03o
+         xMNIG6/dO4BpHwZnmcGoJfLJSaOx+pcaDYUPIn3qwYyFZ+snPOqQcET9czC8gOsIQTGM
+         Cq3ilr8QzvNQ9Krzowt6dhWIA7oz5ZTr84IZGmVDFp3CbKHo9s/uJfK0qlDqvAvykG1e
+         j+Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9J5XtFwg/CdCV3v8uVvUjWUlH2VKnZzBlwZOWdV+fwE6lWEzTgB7jHypCQS/iGHNcif6Dc9y8WWoI@vger.kernel.org, AJvYcCXYk4phqeEHUbmRV9yVqs2zdRCgpYiHdgRuBWZP/UByqNYEydeLIXw+LszFQOYrjMITUbbeF0z6y/uFG5wrBWM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjMhItwH3TRk9rtj1D+MOaaYmEz5SHazxH6tb+j32O3bYLZoxG
+	t1QyycbQqGCM1zl98gYk6O7AQrXYQUqwUxUI2P002r/r3WpKQejOqV9287QRCWLjecZ0Ntj79qe
+	+TGS+ZkibfhX0271x5d/krsok7OU=
+X-Gm-Gg: ASbGncsJ+/YpCY8qLNW2s/opfxlJHZn6PgepIFb8WRO/RlU8kYLUw7hPFosjp2Rfz7d
+	6CkehZmVAKir9Qemkyz/xPcRsnjh56vhnrxJSMfp1qdXdLhQzabFhSuQffc5FZdOIoAAoAS9kxR
+	Wga+g3j1cW5fN3IA6ae0SAOj7J
+X-Google-Smtp-Source: AGHT+IGr+uYyVgPeNQu960dfIc9ujbpOwU8c48uenI1Yjyt54q2PhPy9HSGdKaQ5VuBpNHAIAArZ2K3Ckjj/ZnRlWTo=
+X-Received: by 2002:a05:651c:503:b0:30b:c22d:83b3 with SMTP id
+ 38308e7fff4ca-30c4a861dd4mr96849811fa.15.1742309718913; Tue, 18 Mar 2025
+ 07:55:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] obex: Publish SDP record for Phonebook Access Client
-In-Reply-To: <20250318132741.92320-1-frederic.danis@collabora.com>
-References: <20250318132741.92320-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20250314101613.3682010-1-chandrashekar.devegowda@intel.com> <20250314194031.GA785335@bhelgaas>
+In-Reply-To: <20250314194031.GA785335@bhelgaas>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 18 Mar 2025 10:55:06 -0400
+X-Gm-Features: AQ5f1JoQCuhokgmJqmNrk8yopLZQilzqZUrF-cnQh2mSnJeE7OSgEgLfRWhXP-w
+Message-ID: <CABBYNZJQn4ZYMxLqCkJwA71a_VWhu4QXTkU7vt7wiQXf3bdYdQ@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Support function level reset
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, linux-bluetooth@vger.kernel.org, 
+	linux-pci@vger.kernel.org, bhelgaas@google.com, 
+	ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com, 
+	Kiran K <kiran.k@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6008245717534889755==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Bjorn,
 
-This is automated email and please do not reply to this email!
+On Fri, Mar 14, 2025 at 3:40=E2=80=AFPM Bjorn Helgaas <helgaas@kernel.org> =
+wrote:
+>
+> On Fri, Mar 14, 2025 at 12:16:13PM +0200, Chandrashekar Devegowda wrote:
+> > Support function level reset (flr) on hardware exception to recover
+> > controller. Driver also implements the back-off time of 5 seconds and
+> > the maximum number of retries are limited to 5 before giving up.
+>
+> Sort of weird that the commit log mentions FLR, but it's not mentioned
+> in the patch itself except for BTINTEL_PCIE_FLR_RESET_MAX_RETRY.
+> Apparently the assumption is that DSM_SET_RESET_METHOD_PCIE performs
+> an FLR.
+>
+> Since this is an ACPI _DSM, presumably this mechanism only works for
+> devices built into the platform, not for any potential plug-in devices
+> that would not be described via ACPI.  I guess this driver probably
+> already only works for built-in devices because it also uses
+> DSM_SET_WDISABLE2_DELAY and DSM_SET_RESET_METHOD.
+>
+> There is a generic PCI core way to do FLR (pcie_reset_flr()), so I
+> assume the _DSM exists because the device needs some additional
+> device-specific work around the FLR.
+>
+> > +static void btintel_pcie_removal_work(struct work_struct *wk)
+> > +{
+> > +     struct btintel_pcie_removal *removal =3D
+> > +             container_of(wk, struct btintel_pcie_removal, work);
+> > +     struct pci_dev *pdev =3D removal->pdev;
+> > +     struct pci_bus *bus;
+> > +     struct btintel_pcie_data *data;
+> > +
+> > +     data =3D pci_get_drvdata(pdev);
+> > +
+> > +     pci_lock_rescan_remove();
+> > +
+> > +     bus =3D pdev->bus;
+> > +     if (!bus)
+> > +             goto out;
+> > +
+> > +     btintel_acpi_reset_method(data->hdev);
+> > +     pci_stop_and_remove_bus_device(pdev);
+> > +     pci_dev_put(pdev);
+> > +
+> > +     if (bus->parent)
+> > +             bus =3D bus->parent;
+> > +     pci_rescan_bus(bus);
+>
+> This remove and rescan by a driver that's bound to the device subverts
+> the driver model.  pci_stop_and_remove_bus_device() detaches the
+> driver from the device.  After the driver is detached, we should not
+> be running any driver code.
 
-Dear submitter,
+Yeah, this self removal was sort of bugging me as well, although I'm
+not familiar enough with the pci subsystem, having the driver remove
+and continue running code like pci_rescan_bus seems wrong as we may
+end up with multiple instances of the same driver.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=945153
+> There are a couple other drivers that remove their own device (ath9k,
+> iwlwifi, asus_wmi, eeepc-laptop), but I think those are broken and
+> it's a mistake to add this pattern to more drivers.
+>
+> What's the reason for doing the remove and rescan?  The PCI core
+> doesn't reset the device when you do this, so it's not a "bigger
+> hammer reset".
 
----Test result---
+I guess it was more of the expectation of Chandru to have a sort of
+hard reset, driver remove+probe, instead of a soft reset where the
+driver will just need to reinit itself after performing
+pcie_reset_flr.
 
-Test Summary:
-CheckPatch                    PENDING   0.20 seconds
-GitLint                       PENDING   0.27 seconds
-BuildEll                      PASS      20.57 seconds
-BluezMake                     PASS      1556.55 seconds
-MakeCheck                     PASS      13.35 seconds
-MakeDistcheck                 PASS      158.91 seconds
-CheckValgrind                 PASS      215.02 seconds
-CheckSmatch                   PASS      284.27 seconds
-bluezmakeextell               PASS      98.26 seconds
-IncrementalBuild              PENDING   0.33 seconds
-ScanBuild                     PASS      880.70 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+> > +out:
+> > +     pci_unlock_rescan_remove();
+> > +     kfree(removal);
+> > +}
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6008245717534889755==--
+--=20
+Luiz Augusto von Dentz
