@@ -1,170 +1,188 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54137211A24
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 18:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742322005; cv=none; b=HEvkj3L9hAtxZ6reqJMTSYjCIwWNyfO6a6fMJuGQwnZ66cVzY0DPBixVlfFkxMHNG1ibhhyt2uKKg5b2Y7dXkPEkWFBtV2tn6ecD/AG8vOoS3pjsTp7hUprUhbSMyqAdkjI7YHlb6Y31a6yhIZzF85LvNnBdNhsYqI230Qd0c3o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742322005; c=relaxed/simple;
-	bh=EmUi7JrslqGWUVlpLTvctiSBhVgihjdxbdz1f8uMFYA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=sCkLf3sKsr8C1P6onr/7gdBIT71sQhXqWTtpKlW6XfaUqixCCYcDwC24u4Js7gJHMKq8T4L+tSyJbnFeo2xWBf1j1ArLDQ/9VwJsyBTVSLTIRx6fWm35TYOBes12+IadMn/+TFbkkZICIeQJyEs49Ji89U0GSTwC7E8n9mN7WIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UVar3Rh/; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5974A2135DD;
+	Tue, 18 Mar 2025 19:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742324821; cv=pass; b=GcX/Z/6RkOwxge5cxuvVF2Q9k/VpwVmCoaik5r5BbUGHCixAKpAOCmnezQa8kRpqmouH6GHCSXpfNUqOUX2l1HIq9hdmsRq8vMtnL977mmDhOy1ln42r4Bz7so4nNvwVU4awFI0OIZVLhjdbYxiCOg5FZdVjRNbMQEHHc54Boz4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742324821; c=relaxed/simple;
+	bh=q70UAXhsENkm9ZeXmtS2XijVh5iSYWo7ckxIbMjrRH0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o9qCTI1sZlf1iRbRUOJGCfOBAAlVIg+HAsPdGcSwTHYxaySHFk5fZxXxWKa5fRmdnjHCRVBCBB6NrTKS1ktdjcNVDA42NbGk3bWA9LkWrb5XX6nkRcoUUcWf4n235kxtyem6fsmK7P9ZYxgTeOPDL9bc+xLVVSK42UBOtslycxo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=u1SmbPA3; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UVar3Rh/"
-Received: from github.com (hubbernetes-node-6277201.va3-iad.github.net [10.48.136.31])
-	by smtp.github.com (Postfix) with ESMTPA id 3D9FCE113C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 11:20:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1742322002;
-	bh=P96j7bbjpFE8wBuONIpGL09+stu9GpoSa/N4quKnCLI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=UVar3Rh/Y9PZvSZyQglR4yt8LwpaVoJNFyZF0X/8y5PCYeqP5eCH32DeYYQ8vl1ol
-	 d+80IiTCVubm7MF3hVd8/9aIGFp3ueoBGM7ncBmlYJ4XUtT1wGcmvxQTpoYkcdgNrK
-	 oNLur4FzJOcyYER2uDCZQ3TvfGTtIzY2jZEW7Ge4=
-Date: Tue, 18 Mar 2025 11:20:02 -0700
-From: fdanis-oss <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="u1SmbPA3"
+Received: from monolith.lan (unknown [193.138.7.158])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZHLtR4rFYz49Q6T;
+	Tue, 18 Mar 2025 21:06:55 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1742324816;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7+AxRvhWzK8Bfth2Uhhm+w7hR/Z5mABCOIn/69HeMbQ=;
+	b=u1SmbPA3jbAH9ZxJfNzJilgsZg1ZgmeNnLp0Y6TMTm7saWtqmZCnN5+rm7vQjE8uDL0GGW
+	DvZMHkWegpK480xwyhONxT/lDaQvGJFjDo0B9xfyVBPDgM/KK3T0aMhxySPtmPKR/7ZPjQ
+	cLX2dpeUHzCgAxacG2hh0clB1YfbMKHFFvGWd+Gz6ZPnr7QaLcRhyikblcUOAX33w9NwRb
+	Jayj3OlHHQzIe+Lua9YU1jyireiAsyUczH+YWwt5y/8wm/bqKV2tHKGRjstincDw25/GnZ
+	BBXaKPuJwmTAFFHckOEYuKyoxNfi5CuWCPXNJtPVaEhoA8W61PO8c6uXER5jvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1742324816;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7+AxRvhWzK8Bfth2Uhhm+w7hR/Z5mABCOIn/69HeMbQ=;
+	b=QznujIy+EqYO2vZAZdxuteyssZYpyQvIqOS/9FkNSJzLMWWFuwzxQlw3uQBUHMq1Pxxavy
+	kGMskjxRonyEGRQQXjmHWAWBQYQC/4uNfgsDO2zoJGrCeVyC2V9dPESZfNK7oSmYvAwQZJ
+	L9yD7U9GKuvZAqB8h/2U8tXAdMA0/aI4xPyw9VRKilssmOt6mLaHZUZnnJc4cq6hZR//ak
+	O0E4uQSyHLJAf+XIPMg2WR8SO9WCw36daG7icThmRT0WxWexgnLT8+IfArka3Ace3EJcu3
+	v1cbYADxqJjom3WCa8LQbyOJBuvaT2A6UAVs2ulKcGRi3cnfUR31H50gzFlIVg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1742324816; a=rsa-sha256;
+	cv=none;
+	b=JyL+djjeyL5qS3KcInAhp0RtQU+nmIeMtFQYhumIjcPSV6e7dhLSuVoYw/TyR3Qnxt03jN
+	jGYcJ6ytO1MX0Nr2fmcdC4Vza1TpzbwovGEO8OgUUOdTtMGCdyOrMvAAzZmpqoifbPyyta
+	YtKqrc94mvymm+WtJQxfqlsWC8YEEKCyLdd0z3FCYGzEdsRJFtBmNisPl1gycmIAdc9QoG
+	JBx58zGKRzFaEcqHiJRr5joAx16KTDbY/6inABCaBkHST47hqpLEMpJdabbM8Kav4hKVuo
+	ENZMSUE+OW05m7j5yiGAIlnaTbH4+PrwDxE323iIpxtodIGs1S+KeHRvMjbhfA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/9590cf-3b9a6d@github.com>
-Subject: [bluez/bluez] 48c33d: client/player: Fix changing preset SDU
+Cc: Pauli Virtanen <pav@iki.fi>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	willemdebruijn.kernel@gmail.com
+Subject: [PATCH v5 3/5] Bluetooth: ISO: add TX timestamping
+Date: Tue, 18 Mar 2025 21:06:44 +0200
+Message-ID: <af69c75a4d38e42bb11b344defc96adc5f703357.1742324341.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <cover.1742324341.git.pav@iki.fi>
+References: <cover.1742324341.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 48c33d291d921be2fb2a7958528e0d16a176a913
-      https://github.com/bluez/bluez/commit/48c33d291d921be2fb2a7958528e0=
-d16a176a913
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-03-17 (Mon, 17 Mar 2025)
+Add BT_SCM_ERROR socket CMSG type.
 
-  Changed paths:
-    M client/player.c
+Support TX timestamping in ISO sockets.
 
-  Log Message:
-  -----------
-  client/player: Fix changing preset SDU
+Support MSG_ERRQUEUE in ISO recvmsg.
 
-This fixes changing preset SDU when configuring multiple channels, the
-SDU of the configuration is the one the needs to be adjusted not the
-preset itself.
+If a packet from sendmsg() is fragmented, only the first ACL fragment is
+timestamped.
 
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-  Commit: 0205edbd29fc972f9aad2b2d21789e97f45d3c24
-      https://github.com/bluez/bluez/commit/0205edbd29fc972f9aad2b2d21789=
-e97f45d3c24
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
+Notes:
+    v5:
+    - use sockcm_init -> hci_sockcm_init
 
-  Changed paths:
-    M src/shared/util.c
-    M src/shared/util.h
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/iso.c               | 24 ++++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
-  Log Message:
-  -----------
-  shared/util: implement argsisutf8()
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 435250c72d56..bbefde319f95 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -156,6 +156,7 @@ struct bt_voice {
+ #define BT_PKT_STATUS           16
+ 
+ #define BT_SCM_PKT_STATUS	0x03
++#define BT_SCM_ERROR		0x04
+ 
+ #define BT_ISO_QOS		17
+ 
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 0cb52a3308ba..3501a991f1c6 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -518,7 +518,8 @@ static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
+ 	return &iso_pi(sk)->qos;
+ }
+ 
+-static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
++static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
++			  const struct sockcm_cookie *sockc)
+ {
+ 	struct iso_conn *conn = iso_pi(sk)->conn;
+ 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
+@@ -538,10 +539,12 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
+ 	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
+ 						      HCI_ISO_STATUS_VALID));
+ 
+-	if (sk->sk_state == BT_CONNECTED)
++	if (sk->sk_state == BT_CONNECTED) {
++		hci_setup_tx_timestamp(skb, 1, sockc);
+ 		hci_send_iso(conn->hcon, skb);
+-	else
++	} else {
+ 		len = -ENOTCONN;
++	}
+ 
+ 	return len;
+ }
+@@ -1348,6 +1351,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct sk_buff *skb, **frag;
++	struct sockcm_cookie sockc;
+ 	size_t mtu;
+ 	int err;
+ 
+@@ -1360,6 +1364,14 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+ 
++	hci_sockcm_init(&sockc, sk);
++
++	if (msg->msg_controllen) {
++		err = sock_cmsg_send(sk, msg, &sockc);
++		if (err)
++			return err;
++	}
++
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state != BT_CONNECTED) {
+@@ -1405,7 +1417,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state == BT_CONNECTED)
+-		err = iso_send_frame(sk, skb);
++		err = iso_send_frame(sk, skb, &sockc);
+ 	else
+ 		err = -ENOTCONN;
+ 
+@@ -1474,6 +1486,10 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	BT_DBG("sk %p", sk);
+ 
++	if (unlikely(flags & MSG_ERRQUEUE))
++		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
++					  BT_SCM_ERROR);
++
+ 	if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+ 		sock_hold(sk);
+ 		lock_sock(sk);
+-- 
+2.48.1
 
-This implements argsisutf8() which checks that all strings in the
-argv array are written in utf8.
-
-
-  Commit: eb1dd2bc1c4b32b791203340b303306bd7f5fe0b
-      https://github.com/bluez/bluez/commit/eb1dd2bc1c4b32b791203340b3033=
-06bd7f5fe0b
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
-
-  Changed paths:
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: replace validate_input() with argsisutf8()
-
-argsisutf8() does the same thing as validate_input(), but can
-be used elsewhere.
-
-
-  Commit: 1edffc22a343511ad1357d002f1968e4746c68a6
-      https://github.com/bluez/bluez/commit/1edffc22a343511ad1357d002f196=
-8e4746c68a6
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
-
-  Changed paths:
-    M src/shared/shell.c
-
-  Log Message:
-  -----------
-  shared/shell: add check to shell_exec()
-
-When passing a Unicode character to bluetoothctl, the application
-crashes in dbus:
-
-dbus[5324]: arguments to dbus_message_iter_append_basic() were
-incorrect, assertion "_dbus_check_is_valid_utf8 (*string_p)"
-failed in file .../dbus-message.c line 2765.
-
-Check that all characters are written in utf8.
-
-Fixes: https://github.com/bluez/bluez/issues/1137
-
-
-  Commit: 2eba5b6e91555d9f4dfb1c4b2adcc5b18d1d8897
-      https://github.com/bluez/bluez/commit/2eba5b6e91555d9f4dfb1c4b2adcc=
-5b18d1d8897
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
-
-  Changed paths:
-    M obexd/plugins/bluetooth.c
-
-  Log Message:
-  -----------
-  obex: Fix typo
-
-
-  Commit: 3b9a6d3f6186c510bcd762498b141c6114e612b2
-      https://github.com/bluez/bluez/commit/3b9a6d3f6186c510bcd762498b141=
-c6114e612b2
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
-
-  Changed paths:
-    M obexd/client/pbap.c
-
-  Log Message:
-  -----------
-  obex: Publish SDP record for Phonebook Access Client
-
-This is required for passing below PTS test cases:
-
-1. PBAP/PCE/SGSIT/ATTR/BV-01-C
-   Attribute GSIT - Bluetooth Profile Descriptor List, PBAP 1.2
-2. PBAP/PCE/SGSIT/OFFS/BV-02-C
-   Attribute ID Offset String GSIT - Service Name
-3. PBAP/PCE/SGSIT/SERR/BV-01-C
-   Service record GSIT - PBAP PCE
-
-Currently the Phonebook Access Client SDP record is not registered,
-hence  above test cases are failing.
-This commit adds code to register the profile (0x112e).
-
-
-Compare: https://github.com/bluez/bluez/compare/9590cf12b232...3b9a6d3f61=
-86
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
