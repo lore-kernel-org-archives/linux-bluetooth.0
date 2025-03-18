@@ -1,117 +1,112 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F61A1FCCF2
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 22:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742336016; cv=none; b=n1EaqwHkTVmWCD0T13hokLmMoMG6SAWtd3t0hj3PbY0h28yiEJmJT4tO9xdd/D+hppfON4bNbm6bavWbI7R4vlg1CjSHVeiOSWSua6bbsjUQl23+ilRkbcn3kn7Jp8MOirfrN0rceDSZg46Ok+6Hg7TmqfGov3EjNZ8Vj6xuu94=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742336016; c=relaxed/simple;
-	bh=rftD2s4UantuypfnH1/QPbyTncy389cuQZane2LfuB4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BpGULTGAzxQbKDQJp2P/Qxk6kEsuhYcjV7E+5/7oOdg/XJsSK3XrKuhXObXB8tq/UepfTUZCJgc7gqb/PawM5WMO/40ek4bg2T5VfsDrhM/NOotUg9UB4USrpHzw0s7XymlBl01l+joZNgfqI6HTYub1e+u3lKKoK6xZlVmj5TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VoQxWvVQ; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556A0DDC5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 22:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742336533; cv=pass; b=S6zqxPlueP7xZ2fW2OIH2/K1chIovgCw4ED2zigx+61R9gIhwK3kgRTjD5yV4pai7PfoV7ksU5QpU+oHJ0OZBz4Gpy6klVl/boi/XqCN5bgK95ZyAZNLgD3QNbJkIiumXeDjWUUGuBIgNtwX+NVHHvIMb79tjF1JDAWkRNwvcwE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742336533; c=relaxed/simple;
+	bh=kh6n01HTEcsbukMhvzwT/Rrg3OSccXzIwgyWvu0tCL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YguntDVfxwfTb1lGmaB1/Nsw58Sp+27WRQhNrKri56JPUFQbc1RM134YiXxsuNzpHnC1NuGE5GJuohzBQrs5zQkRmgSjBqHufkdUp+JHsgZaQ6qHn/OyThfVfBgrg+XEO4uVgWi4Ya58v+d3b+dTKmStT0pggDHH4d2JAJUwZPY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=mJD5WaBU; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VoQxWvVQ"
-Received: from github.com (hubbernetes-node-b190362.ac4-iad.github.net [10.52.200.39])
-	by smtp.github.com (Postfix) with ESMTPA id 3AB3E2123A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 15:13:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1742336013;
-	bh=8h8C1SlT7klF3SZzffb++m0IvPtnEa3zOvmqVaxHZ4U=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=VoQxWvVQE6oJMGv8wIc+wM/5SBoXemDgbJQB5ZqT6r/ZND3hYJIk+qPsrUBm1wnJW
-	 e8aZFVuYvdFzAcbcmai/P5QtlX+FF59tGKkZgHHrwz2FLxHajfyxq7/yciEQnOGfAo
-	 BA86Unwhyhho89gcFBeMcgFFfLhU68klEgw2zFsQ=
-Date: Tue, 18 Mar 2025 15:13:33 -0700
-From: Pauli Virtanen <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="mJD5WaBU"
+Received: from monolith.lan (unknown [193.138.7.158])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZHRCg3yWtz49Q3T;
+	Wed, 19 Mar 2025 00:22:07 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1742336528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OJ1LIQX3ANzegZIxBkwnk2Dnz00L0hOB9PW/AWHR7xY=;
+	b=mJD5WaBUWJqkqHZaKubI+fCk9iD9GXmP6PBAaUCaJ18x02xat1ZMSBBKiBRnnNXXgMFMaL
+	3XoaBq5/0Qa17/WOATo0JtVqhuOntkQwfugVvEzbQQe039em4KT0g5stTVlXvSQV4ylmKv
+	09hpXSPEu4tkvYKW1c7mn6P3dOQQ4RBxWJyYYyO60w0O7aAezwzj0mfPY8bHjI4C5zqzO8
+	ztAq3cL85xwrN5HTaTSFzR2Bam/mDmixmt4fTfsMFkVsFTyJskBilieVlcj2T7iEiUDjZL
+	rwfYS4Qji1b9JNp+XIORNokz5/RGrb+ibCRpfzmTw7cQB7kGkQ3rubQ63iAWMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1742336528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OJ1LIQX3ANzegZIxBkwnk2Dnz00L0hOB9PW/AWHR7xY=;
+	b=f8BklsbWo52BO55ReCkEA5oJq4PfcpJ18EWpz1LyOYIQl8VSNoDctO94Itm3myPRzZFEIE
+	M+hSAwNoth9hIDAL0rhOhbjCQJLqvdnv1zjXaI0yjz1qLuEyJXUH3/7b/XiuK00g6W+rCl
+	J7+aW75PqHJorMhFiiSEOL3AKaIoKrxmaZSfjHWPBphNjZNxlzquUmOYUYaB296F3ZoeMA
+	vq20pHUMEbeXffyZM5a7dN0W4r/vLYko/r+g6QSiamowGH24C8dXcq12hErNOInZxbXwph
+	DhMKEiNF4sXLNvdMnldx/SttfgC1GK3PylMJXsEPhqbUrhxfgRx7WI8jzisAsw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1742336528; a=rsa-sha256;
+	cv=none;
+	b=jyb0xyIViVMsUhAtI0/O/R6c9yl7/oXO3boecnNY0R30WcxNjQ0T8FVwebp3jH8E8GiqVV
+	IM+G+z1gGx5vipHBeeT8sBiPfRBKkH0UWgfAce6UwdT9I1He9C19wo0xYtSXFCQaFm9z/o
+	0G2mg8cUTiVpc9d3HKvqNg3IqMkkCB0QdtI9Vxh+blT8lB9evJiAByhCdmpgh6Axl+rM8D
+	CDd2VJKF5XE1WDvYODSXVMqA/iR1alev6W2WtgYyTEzD3stpWbl2QQijL+kD9w+yaZJC3V
+	NegJMWdubzx0fAE3hFzG9QcROIT5AZzpaPsuECRWjyQzRYdsp6TBfMkeQObdSg==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/3b9a6d-f4b6a6@github.com>
-Subject: [bluez/bluez] c89e18: tools/tester: test COMPLETION timestamps
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] l2cap-tester: ensure SO_SNDBUF is large enough for the writes
+Date: Wed, 19 Mar 2025 00:22:03 +0200
+Message-ID: <975ef1acdd3903f4e0fcb26dc1d0046762d99140.1742336487.git.pav@iki.fi>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: c89e18fa55e2d261e002a1f667eb8f351e0258fb
-      https://github.com/bluez/bluez/commit/c89e18fa55e2d261e002a1f667eb8f351e0258fb
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
+Since btdev runs from same thread and won't flush, SO_SNDBUF needs to
+hold all data we are going to write.  Fix spurious test failure
+in "L2CAP LE Client - Write 32k Success".
+---
+ tools/l2cap-tester.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-  Changed paths:
-    M configure.ac
-    M tools/iso-tester.c
-    M tools/l2cap-tester.c
-    M tools/sco-tester.c
-    M tools/tester.h
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index e56773d13..3b3ffb6a7 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -1451,8 +1451,9 @@ static void l2cap_write_data(struct test_data *data, GIOChannel *io,
+ 	const struct l2cap_data *l2data = data->test_data;
+ 	struct bthost *bthost;
+ 	ssize_t ret;
+-	int sk;
++	int sk, size;
+ 	unsigned int count;
++	socklen_t len = sizeof(size);
+ 
+ 	sk = g_io_channel_unix_get_fd(io);
+ 
+@@ -1464,6 +1465,15 @@ static void l2cap_write_data(struct test_data *data, GIOChannel *io,
+ 
+ 	l2cap_tx_timestamping(data, io);
+ 
++	/* Socket buffer needs to hold what we send, btdev doesn't flush now */
++	ret = getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, &len);
++	if (!ret) {
++		size += l2data->data_len * (l2data->repeat_send + 1);
++		ret = setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, len);
++	}
++	if (ret)
++		tester_warn("Failed to set SO_SNDBUF = %d", size);
++
+ 	for (count = 0; count < l2data->repeat_send + 1; ++count) {
+ 		ret = l2cap_send(sk, l2data->write_data, l2data->data_len,
+ 							data->l2o.omtu);
+-- 
+2.48.1
 
-  Log Message:
-  -----------
-  tools/tester: test COMPLETION timestamps
-
-Add support for SOF_TIMESTAMPING_TX_COMPLETION also in cases where
-errqueue.h is old and doesn't define it.
-
-Support timestamps of different types arriving out of order, as multiple
-SND may well arrive before COMPLETION.  Also allow TX timestamp arriving
-before bthost receives data, as that may well happen.
-
-Remove tests SCHED timestamps, as those won't be generated for now.
-
-Don't test COMPLETION for SCO, since it's not supported now either.
-
-Add test:
-
-SCO CVSD Send No Flowctl - TX Timestamping
-
-
-  Commit: fe5a5f509e0cd1ab60e524863dbacd461fb38023
-      https://github.com/bluez/bluez/commit/fe5a5f509e0cd1ab60e524863dbacd461fb38023
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
-
-  Changed paths:
-    M tools/iso-tester.c
-    M tools/l2cap-tester.c
-    M tools/sco-tester.c
-    M tools/tester.h
-
-  Log Message:
-  -----------
-  l2cap-tester: add test for stream socket TX timestamping
-
-Stream socket TX timestamp ids shall refer to the byte positions.
-Add test:
-
-L2CAP BR/EDR Client - Stream TX Timestamping
-
-
-  Commit: f4b6a649ccdd0ff63817bab13b9c94f2bc3d648e
-      https://github.com/bluez/bluez/commit/f4b6a649ccdd0ff63817bab13b9c94f2bc3d648e
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-03-18 (Tue, 18 Mar 2025)
-
-  Changed paths:
-    M tools/iso-tester.c
-    M tools/l2cap-tester.c
-    M tools/sco-tester.c
-
-  Log Message:
-  -----------
-  tools/tester: enable TX timestamping tests by default
-
-
-Compare: https://github.com/bluez/bluez/compare/3b9a6d3f6186...f4b6a649ccdd
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
