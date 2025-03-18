@@ -1,59 +1,56 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5974A2135DD;
-	Tue, 18 Mar 2025 19:06:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48091214233;
+	Tue, 18 Mar 2025 19:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742324821; cv=pass; b=GcX/Z/6RkOwxge5cxuvVF2Q9k/VpwVmCoaik5r5BbUGHCixAKpAOCmnezQa8kRpqmouH6GHCSXpfNUqOUX2l1HIq9hdmsRq8vMtnL977mmDhOy1ln42r4Bz7so4nNvwVU4awFI0OIZVLhjdbYxiCOg5FZdVjRNbMQEHHc54Boz4=
+	t=1742324821; cv=pass; b=qzRWO479A0TdqWhIVvicS1H+q/ZDY+KPBQTBQ7N5PT/4A6+nyhlYSHumqESqoZgxkVwfMEPWX14MrOMMfqw/rXSbW3p+yOlnfsvoIIbyBcwRjsj14+skJvSRTH58ElCrVh/jjMJ7umy0yCXhYUBfl8yQHvPtVNgp3cwUWgmjNAw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742324821; c=relaxed/simple;
-	bh=q70UAXhsENkm9ZeXmtS2XijVh5iSYWo7ckxIbMjrRH0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o9qCTI1sZlf1iRbRUOJGCfOBAAlVIg+HAsPdGcSwTHYxaySHFk5fZxXxWKa5fRmdnjHCRVBCBB6NrTKS1ktdjcNVDA42NbGk3bWA9LkWrb5XX6nkRcoUUcWf4n235kxtyem6fsmK7P9ZYxgTeOPDL9bc+xLVVSK42UBOtslycxo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=u1SmbPA3; arc=pass smtp.client-ip=185.185.170.37
+	bh=n1QSrIBWMfQwnITPFOpkIogERBaaJLsqB+NW3mjqhss=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZIJ83K+lvfziHZWyv6bDbCpZZJ+RNmyZaZHFJiGnSIRhwv1/r/r3k12aItP7i44fQzjjyCtrfH210kUW5fXOg4Acntgjf4BYVGKJKF4OVLa8nR+maT3lb7GliJlIvRvPyB+/c9ruAwQ+k8SyAD6SFwL50Vdp1tbMnLmEREutKK4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=u2Gkqddy; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="u1SmbPA3"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="u2Gkqddy"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZHLtR4rFYz49Q6T;
-	Tue, 18 Mar 2025 21:06:55 +0200 (EET)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZHLtM0K4Kz49PyD;
+	Tue, 18 Mar 2025 21:06:50 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1742324816;
+	t=1742324812;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7+AxRvhWzK8Bfth2Uhhm+w7hR/Z5mABCOIn/69HeMbQ=;
-	b=u1SmbPA3jbAH9ZxJfNzJilgsZg1ZgmeNnLp0Y6TMTm7saWtqmZCnN5+rm7vQjE8uDL0GGW
-	DvZMHkWegpK480xwyhONxT/lDaQvGJFjDo0B9xfyVBPDgM/KK3T0aMhxySPtmPKR/7ZPjQ
-	cLX2dpeUHzCgAxacG2hh0clB1YfbMKHFFvGWd+Gz6ZPnr7QaLcRhyikblcUOAX33w9NwRb
-	Jayj3OlHHQzIe+Lua9YU1jyireiAsyUczH+YWwt5y/8wm/bqKV2tHKGRjstincDw25/GnZ
-	BBXaKPuJwmTAFFHckOEYuKyoxNfi5CuWCPXNJtPVaEhoA8W61PO8c6uXER5jvA==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HFebrYrMFr7ev38Y7ujtdui6zWTbqO0IUVOh+45Kyys=;
+	b=u2GkqddykrTt+/X1IGQXEogaDBg2GqZohdIL4wJz3S0TvTipTBpDBjeqLJB3fVl6IHBE7M
+	ZnsPN2QCy4LkmJC33CpoNskrCTvYgwzYtkosS7cmNchDiKbW0wMgHw900saBn+lUYlMXJ3
+	6hjnJA+GBhaLEOLo2XLxbdboLP3RcXJneLNqSvnPfY+PZ6U/NRd41ZwV3KFOsl5EqlCbPj
+	RWR5R4aLXHpfz8qgpw8m6su6HV/sHW15Bx1hIsO+Ax3OjZIjToZHiyT/zi0FKlw9fFzV9u
+	N3omw9uIt+t+bnBNtBBOu/eHwCZe2VIRCnksRHGcX6q6wlVBC+DtShX4kFbCvA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1742324816;
+	s=lahtoruutu; t=1742324812;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7+AxRvhWzK8Bfth2Uhhm+w7hR/Z5mABCOIn/69HeMbQ=;
-	b=QznujIy+EqYO2vZAZdxuteyssZYpyQvIqOS/9FkNSJzLMWWFuwzxQlw3uQBUHMq1Pxxavy
-	kGMskjxRonyEGRQQXjmHWAWBQYQC/4uNfgsDO2zoJGrCeVyC2V9dPESZfNK7oSmYvAwQZJ
-	L9yD7U9GKuvZAqB8h/2U8tXAdMA0/aI4xPyw9VRKilssmOt6mLaHZUZnnJc4cq6hZR//ak
-	O0E4uQSyHLJAf+XIPMg2WR8SO9WCw36daG7icThmRT0WxWexgnLT8+IfArka3Ace3EJcu3
-	v1cbYADxqJjom3WCa8LQbyOJBuvaT2A6UAVs2ulKcGRi3cnfUR31H50gzFlIVg==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1742324816; a=rsa-sha256;
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HFebrYrMFr7ev38Y7ujtdui6zWTbqO0IUVOh+45Kyys=;
+	b=RoZDhmfYlIMoB/IHlamLTB3fSLzUIIpF6283RPRoe7VzdYvYBqS7oZZfaTPI5DqozbT23n
+	FcQAe5GBwfiRcme/LJJjuseOpYblUB48gOO3X0Jec2rvdilwTbKvYmVrb6iYfsqZADvpf+
+	QKFS19EZWlXhy7VJtIPYCa3PbUtPbtxov0SHy/kM+d+cHEzSWgRojn1Bykgw198Ww5RfHz
+	/EQBM3ydcQvBbaRnGpB6bKEEFKJmWrLsXbfPkKFYyzCVlTMUEtkIGPB/7UWJbxNMM9izfD
+	Kw0molREoyJAt34YmXT7cxOF7Ghjcox8sHykJ2vv45nSqjt32IMT6Xr5yo7y5g==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1742324812; a=rsa-sha256;
 	cv=none;
-	b=JyL+djjeyL5qS3KcInAhp0RtQU+nmIeMtFQYhumIjcPSV6e7dhLSuVoYw/TyR3Qnxt03jN
-	jGYcJ6ytO1MX0Nr2fmcdC4Vza1TpzbwovGEO8OgUUOdTtMGCdyOrMvAAzZmpqoifbPyyta
-	YtKqrc94mvymm+WtJQxfqlsWC8YEEKCyLdd0z3FCYGzEdsRJFtBmNisPl1gycmIAdc9QoG
-	JBx58zGKRzFaEcqHiJRr5joAx16KTDbY/6inABCaBkHST47hqpLEMpJdabbM8Kav4hKVuo
-	ENZMSUE+OW05m7j5yiGAIlnaTbH4+PrwDxE323iIpxtodIGs1S+KeHRvMjbhfA==
+	b=DexcBlxSUgAqmp8blJ+4KI+AFA90A4bHzvmGgtwCpgq2y4MTJZbJyIyRjMu0udmtk5Ks8S
+	Tm5C8AUvDTlyq71gIv2nJUiP5Q+0bvwnx4gfcVumTPAqyTD3ZGoXjZLmJM1e/h5bnr01fM
+	X782IBVU++lvi8xazR+aipu3YEE1z4v0FOi/u++NZvI3u1g10wW7zcttZMN/Lbi6aSth9l
+	RY4FqPp9vxv0PTsd0MiIwxn37G9Kxv5elXY+zSuDUUk2dQJiC5D28t78Vy4A2G5/+Jd4vA
+	e4Bzh7A1vbuIIAKjPUZqP+t1I8oLImo9pu4o2mC5dX5X9OaygdesyOu8CU1fRw==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -65,12 +62,10 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	davem@davemloft.net,
 	kuba@kernel.org,
 	willemdebruijn.kernel@gmail.com
-Subject: [PATCH v5 3/5] Bluetooth: ISO: add TX timestamping
-Date: Tue, 18 Mar 2025 21:06:44 +0200
-Message-ID: <af69c75a4d38e42bb11b344defc96adc5f703357.1742324341.git.pav@iki.fi>
+Subject: [PATCH v5 0/5] net: Bluetooth: add TX timestamping for ISO/L2CAP/SCO
+Date: Tue, 18 Mar 2025 21:06:41 +0200
+Message-ID: <cover.1742324341.git.pav@iki.fi>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1742324341.git.pav@iki.fi>
-References: <cover.1742324341.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -79,110 +74,173 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add BT_SCM_ERROR socket CMSG type.
+Add support for TX timestamping in Bluetooth ISO/L2CAP/SCO sockets.
 
-Support TX timestamping in ISO sockets.
+Add new COMPLETION timestamp type, to report a software timestamp when
+the hardware reports a packet completed. (Cc netdev for this)
 
-Support MSG_ERRQUEUE in ISO recvmsg.
+Previous discussions:
+https://lore.kernel.org/linux-bluetooth/cover.1739988644.git.pav@iki.fi/
+https://lore.kernel.org/linux-bluetooth/cover.1739097311.git.pav@iki.fi/
+https://lore.kernel.org/all/6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch/
+https://lore.kernel.org/all/cover.1710440392.git.pav@iki.fi/
 
-If a packet from sendmsg() is fragmented, only the first ACL fragment is
-timestamped.
+Changes
+=======
+v5:
+- Revert to v3 vs decoupled SND & COMPLETION, just use the bit in tx_flags.
+- Add hci_sockcm_init() and use it.
+- Emit COMPLETION also for SCO if flowctl enabled, now that we enable it
+  for some HW (most HW doesn't seem to support it)
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
+v4:
+- Change meaning of SOF_TIMESTAMPING_TX_COMPLETION, to save a bit in
+  skb_shared_info.tx_flags:
 
-Notes:
-    v5:
-    - use sockcm_init -> hci_sockcm_init
+  It now enables COMPLETION only for packets that also have software SND
+  enabled.  The flag can now be enabled only via a socket option, but
+  coupling with SND allows user to still choose for which packets
+  SND+COMPLETION should be generated.  This choice maybe is OK for
+  applications which can skip SND if they're not interested.
 
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/iso.c               | 24 ++++++++++++++++++++----
- 2 files changed, 21 insertions(+), 4 deletions(-)
+  However, this would make the timestamping API not uniform, as the
+  other TX flags can be enabled via CMSG.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 435250c72d56..bbefde319f95 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -156,6 +156,7 @@ struct bt_voice {
- #define BT_PKT_STATUS           16
- 
- #define BT_SCM_PKT_STATUS	0x03
-+#define BT_SCM_ERROR		0x04
- 
- #define BT_ISO_QOS		17
- 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 0cb52a3308ba..3501a991f1c6 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -518,7 +518,8 @@ static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
- 	return &iso_pi(sk)->qos;
- }
- 
--static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
-+static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
-+			  const struct sockcm_cookie *sockc)
- {
- 	struct iso_conn *conn = iso_pi(sk)->conn;
- 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
-@@ -538,10 +539,12 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
- 	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
- 						      HCI_ISO_STATUS_VALID));
- 
--	if (sk->sk_state == BT_CONNECTED)
-+	if (sk->sk_state == BT_CONNECTED) {
-+		hci_setup_tx_timestamp(skb, 1, sockc);
- 		hci_send_iso(conn->hcon, skb);
--	else
-+	} else {
- 		len = -ENOTCONN;
-+	}
- 
- 	return len;
- }
-@@ -1348,6 +1351,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- {
- 	struct sock *sk = sock->sk;
- 	struct sk_buff *skb, **frag;
-+	struct sockcm_cookie sockc;
- 	size_t mtu;
- 	int err;
- 
-@@ -1360,6 +1364,14 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
-+	hci_sockcm_init(&sockc, sk);
-+
-+	if (msg->msg_controllen) {
-+		err = sock_cmsg_send(sk, msg, &sockc);
-+		if (err)
-+			return err;
-+	}
-+
- 	lock_sock(sk);
- 
- 	if (sk->sk_state != BT_CONNECTED) {
-@@ -1405,7 +1417,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECTED)
--		err = iso_send_frame(sk, skb);
-+		err = iso_send_frame(sk, skb, &sockc);
- 	else
- 		err = -ENOTCONN;
- 
-@@ -1474,6 +1486,10 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 
- 	BT_DBG("sk %p", sk);
- 
-+	if (unlikely(flags & MSG_ERRQUEUE))
-+		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
-+					  BT_SCM_ERROR);
-+
- 	if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
- 		sock_hold(sk);
- 		lock_sock(sk);
+  IIUC, sizeof skb_shared_info cannot be easily changed and I'm not sure
+  there is somewhere else in general skb info, where one could safely
+  put the extra separate flag bit for COMPLETION. So here's alternative
+  suggestion.
+
+- Better name in sof_timestamping_names
+
+- I decided to keep using sockcm_init(), to avoid open coding READ_ONCE
+  and since it's passed to sock_cmsg_send() which anyway also may init
+  such fields.
+
+v3:
+- Add new COMPLETION timestamp type, and emit it in HCI completion.
+- Emit SND instead of SCHED, when sending to driver.
+- Do not emit SCHED timestamps.
+- Don't safeguard tx_q length explicitly. Now that hci_sched_acl_blk()
+  is no more, the scheduler flow control is guaranteed to keep it
+  bounded.
+- Fix L2CAP stream sockets to use the bytestream timestamp conventions.
+
+Overview
+========
+
+The packet flow in Bluetooth is the following. Timestamps added here
+indicated:
+
+user sendmsg() generates skbs
+|
+* skb waits in net/bluetooth queue for a free HW packet slot
+|
+* orphan skb, send to driver -> TSTAMP_SND
+|
+* driver: send packet data to transport (eg. USB)
+|
+* wait for transport completion
+|
+* driver: transport tx completion, free skb (some do this immediately)
+|
+* packet waits in HW side queue
+|
+* HCI report for packet completion -> TSTAMP_COMPLETION (for non-SCO)
+
+In addition, we may want to do the following in future (but not
+implemented in this series as we don't have ISO sequence number
+synchronization yet which is needed first, moreover e.g. Intel
+controllers return only zeros in timestamps):
+
+* if packet is ISO, send HCI LE Read ISO TX Sync
+|
+* HCI response -> hardware TSTAMP_SND for the packet the response
+  corresponds to if it was waiting for one, might not be possible
+  to get a tstamp for every packet
+
+Bluetooth does not have tx timestamps in the completion reports from
+hardware, and only for ISO packets there are HCI commands in
+specification for querying timestamps afterward.
+
+The drivers do not provide ways to get timestamps either, I'm also not
+aware if some devices would have vendor-specific commands to get them.
+
+Driver-side timestamps
+======================
+
+Generating SND on driver side may be slightly more accurate, but that
+requires changing the BT driver API to not orphan skbs first.  In theory
+this probably won't cause problems, but it is not done in this patchset.
+
+For some of the drivers it won't gain much. E.g. btusb immediately
+submits the URB, so if one would emit SND just before submit (as
+drivers/net/usb/usbnet.c does), it is essentially identical to emitting
+before sending to driver.  btintel_pcie looks like it does synchronous
+send, so looks the same.  hci_serdev has internal queue, iiuc flushing
+as fast as data can be transferred, but it shouldn't be waiting for
+hardware slots due to HCI flow control.
+
+Unless HW buffers are full, packets mostly wait on the HW side.  E.g.
+with btusb (non-SCO) median time from sendmsg() to URB generation is
+~0.1 ms, to USB completion ~0.5 ms, and HCI completion report at ~5 ms.
+
+The exception is SCO, for which HCI flow control is disabled, so they do
+not get completion events so it's possible to build up queues inside the
+driver. For SCO, COMPLETION needs to be generated from driver side, eg.
+for btusb maybe at URB completion.  This could be useful for SCO PCM
+modes (but which are more or less obsolete nowadays), where USB isoc
+data rate matches audio data rate, so queues on USB side may build up.
+
+Use cases
+=========
+
+In audio use cases we want to track and avoid queues building up, to
+control latency, especially in cases like ISO where the controller has a
+fixed schedule that the sending application must match.  E.g.
+application can aim to keep 1 packet in HW queue, so it has 2*7.5ms of
+slack for being woken up too late.
+
+Applications can use SND & COMPLETION timestamps to track in-kernel and
+in-HW packet queues separately.  This can matter for ISO, where the
+specification allows HW to use the timings when it gets packets to
+determine what packets are synchronized together. Applications can use
+SND to track that.
+
+Tests
+=====
+
+See
+https://lore.kernel.org/linux-bluetooth/cover.1739026302.git.pav@iki.fi/
+
+Pauli Virtanen (5):
+  net-timestamp: COMPLETION timestamp on packet tx completion
+  Bluetooth: add support for skb TX SND/COMPLETION timestamping
+  Bluetooth: ISO: add TX timestamping
+  Bluetooth: L2CAP: add TX timestamping
+  Bluetooth: SCO: add TX timestamping
+
+ Documentation/networking/timestamping.rst |   8 ++
+ include/linux/skbuff.h                    |   7 +-
+ include/net/bluetooth/bluetooth.h         |   1 +
+ include/net/bluetooth/hci_core.h          |  20 ++++
+ include/net/bluetooth/l2cap.h             |   3 +-
+ include/uapi/linux/errqueue.h             |   1 +
+ include/uapi/linux/net_tstamp.h           |   6 +-
+ net/bluetooth/6lowpan.c                   |   2 +-
+ net/bluetooth/hci_conn.c                  | 122 ++++++++++++++++++++++
+ net/bluetooth/hci_core.c                  |  15 ++-
+ net/bluetooth/hci_event.c                 |   4 +
+ net/bluetooth/iso.c                       |  24 ++++-
+ net/bluetooth/l2cap_core.c                |  41 +++++++-
+ net/bluetooth/l2cap_sock.c                |  15 ++-
+ net/bluetooth/sco.c                       |  19 +++-
+ net/bluetooth/smp.c                       |   2 +-
+ net/core/skbuff.c                         |   2 +
+ net/ethtool/common.c                      |   1 +
+ net/socket.c                              |   3 +
+ 19 files changed, 274 insertions(+), 22 deletions(-)
+
 -- 
 2.48.1
 
