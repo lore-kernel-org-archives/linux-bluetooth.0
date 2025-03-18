@@ -1,144 +1,102 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585C6214232
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 19:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742324853; cv=pass; b=V+YM382mzVXKd50B9S9Jo0Vo1/sY6T76diy4jaV7LvX8dnaqF2n1jAJ0t8pJUcjzjXRohSMftjkqQFeDO9tMsvOujp+ENtRfYpzKzMTAI3owQhnVeaEG+tTw8zeoTf1z5y5o7gDF/JJO/N/+1LU79LvYvReOIHM8APiLj+qJFI4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742324853; c=relaxed/simple;
-	bh=9HAU5lpq7cib34jibfg4Vh9+QjZYWqOpqAghT4OescE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lf69MrzvlgVW53kdZ6eSfd5G+xw1pGDDg/Hhw02d6xP59ZiNF8vhj94OEt8gbl06OP38wF/cYkchfbbLvV7LG8fafB7EbEHYLpS+GzjMptdIBzrM8mx50ijNr4PjpWwQTqj2Psk8jgdTpwWg350Jwb10A4yT5jfCAgilMZQ9ksE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=XGSXvQrz; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=ujkR105y; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8387E1CAA8E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 19:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742325249; cv=none; b=Q3wqBRN/s6xk64W0TITT4ZCZNvllOeaborbHvuK7sXR2M+090A5mpuysoOeZpfDmUhL0Mz1f5fe8VEd6izrrx1r7PTNX/G6KEOIK6CXKGCMO0kMkVNxPBwTkgdIkGh2Drdsyu/Ar+blB7ti9TZaZIS1BywUflxTGVdHpHmWqdWw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742325249; c=relaxed/simple;
+	bh=rxebzVv/aZFQ6K+DeMGhrvuH4kh26yqFItlWRzd6Wno=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=YPh0hchWcPGkJwTq4hd4jye2lrFLkAx4WSxwI1PK0MSbMcSuXuGpOFcchbdjCHv9rqm0iYzHu3Cgs9+M/Lfvc4qRZ58lGv+QGb4fbszJlgOLTwhVHb67NLhRWNWyH0HIHRIO3duZbeB5T9hpn+suUyeY5XMg/KWasz1wruSMhOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B3h2oPgN; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="XGSXvQrz";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="ujkR105y"
-Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4ZHLv24QCPz49Q5Y
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 21:07:26 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1742324846;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fYLxqNsO+xT5BocEODug8Sfge2D24HcyMm5XSIFka0c=;
-	b=XGSXvQrzZjzht200xJf+hnL9cX9s0Duo9jIQDD2+5CGuM65GsiFqzMsJyagzZUoQwQ5oK/
-	PlhdxfcarGrg8JQGANUhiOVVFV4OcTNrdhnJJyPyLVMYY3lgrXr5Nf6nrEMCb2mXIRBSMI
-	8ltRuxoWY46tgJlp0it/nj8loB35wtX19A6XzOeg/w0VxPRIAiAi0XyvlSAYyHmS7+uJZc
-	PlhnI+7JUOewRbs6DZyyNJThkhCRdjmaI93SWULfGOZbkJ9w5ILzsGf5GcZ1DvNJYSMfX+
-	57T+2QKh7oiVXEFb1ctz2BPq9pD6nLSDEXNb8MR9bGKE16anmpsijiYmrfjLAw==
-Received: from monolith.lan (unknown [193.138.7.158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4ZHLtt10Rlzyhr;
-	Tue, 18 Mar 2025 21:07:18 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1742324838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fYLxqNsO+xT5BocEODug8Sfge2D24HcyMm5XSIFka0c=;
-	b=ujkR105yLnfJhmwpfD5znps+QbHbUwQ/761Z0zjlTo1k64dBZ3m/N+ak7g+S1YCBE6mMH0
-	Ead7PZT64sgFGc8s0yPtSB/K18FEl9FllxXZPoDbMVeX1NKm0S/4iEDtJ+YKUY5rGQNG6/
-	KvIiAojL4+wzdTuNU9snL0N6xm34Pew=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1742324838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fYLxqNsO+xT5BocEODug8Sfge2D24HcyMm5XSIFka0c=;
-	b=CFSGTLG2tURWTahTuNr/bY0PgA0XoHx+uZdom1q/2VYSdxt+p4U+2S9sopcF98y4jWD6Ug
-	4HvDM0Wht6nSg9aZHLzHkrCFsA4JFC9BmM9XiqDSoJ12pqNGQ/cGABwMEYRPnsOt2f+peJ
-	N556FTCznCuy89LCPFT3WtBfvR8xsl8=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1742324838; a=rsa-sha256; cv=none;
-	b=F5AMVYZmG7k2GKXO3fYn/JM/i5Pa02Rk3JWW/68HxvBOy1qaIzXuYASALSAlhJ1AG+NfC5
-	oEjRfTIe+KTil1OJipDJZUi8GpOLGdd7TluLlvoez8qhUw/7Cu/F6swYTMnQO3yy9KG4dB
-	Y6UN3QAF5h3v/hXs2t9L+LLKwPY6Dgw=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 3/3] tools/tester: enable TX timestamping tests by default
-Date: Tue, 18 Mar 2025 21:07:10 +0200
-Message-ID: <172a8faa86f41e288b446beea9db37763eaccfc3.1742324646.git.pav@iki.fi>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <3d378acca803b578522100e8f9fd3d6adb1deb25.1742324646.git.pav@iki.fi>
-References: <3d378acca803b578522100e8f9fd3d6adb1deb25.1742324646.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3h2oPgN"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-225fbdfc17dso55086065ad.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Mar 2025 12:14:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742325247; x=1742930047; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rxebzVv/aZFQ6K+DeMGhrvuH4kh26yqFItlWRzd6Wno=;
+        b=B3h2oPgNHdwCQGkvTYrNwIVL6uKxOAtLg3Ig5QxaFZolj+pIzJR/LdJPtOT+zcXj8m
+         DpnRJTHmWtAvRJ8zsNOpIk7UlJful3ywjWXt9YBeF1Ko/7WdVOKCKtCFkON9JQxfsFhz
+         AqtjBbFVlVh9XtBJpPlcDNPG7if24k60MUFR3tyyHmZC6mX5zzPCho+mNDaL4KxXvQPb
+         qJC5ER81AZMCsOk/msigVuq0jpbN+iJjKEnabShCjW4M6idkBQRjLEQ8g8xTBJHOKcIA
+         vwW8ocy2frge7fK+G4XagjDYuEUi6ht9shDhamXWktzVBV2GTa1+eTa2kgwZtr5jbStz
+         n8Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742325247; x=1742930047;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rxebzVv/aZFQ6K+DeMGhrvuH4kh26yqFItlWRzd6Wno=;
+        b=nrBuRzm7hFEkVfHpzf90T0Tzah9zzIL3cu+7cBrQffu0jvmZx13Nlrs6V47sHPMXte
+         HcXws99Py5n2GtWGRUhTr5Qxkq0xPKoWzcLWFu3T6wkuwUzInVeUotgueIZHXTFyZHhi
+         54EfLyeN7VRkUuEKco87y+VJPDSLWfTOADzHGLu6VFtKzaGYD+00eYx6zrYii9ifNKsn
+         zKJifTLJyzvmKKDVymW/9FJZTrUSZbVowagi6gojH3hWPu7RqRJPr9JVXgJaQj4RVVTj
+         iUQXKrvNHgfgcpMF/xmkHcd+STXPe/4XxbJiK+2Y8lRPyRmlrKie/Xe1FB6tXTy7u6oh
+         RqNQ==
+X-Gm-Message-State: AOJu0Yy6jW0GpVAn3a7+AwQvzoGxxpCUSB24QUvsKe8gFCBXzrlgNtq9
+	N/iLdg1rfJAZRvBBYUp72Ubb1LfmSXSYbVLuUUxwyvvZ9gkQrLU9Sg9pWw==
+X-Gm-Gg: ASbGnctcntRDhiY/9lgcPAS7y5gF6A67mrdBg0xE6CiwKRigjsw5vfho1865FKAdj5D
+	bZ2wqrRUgcA5e55ewzLMOQkAyuS1zdXNEHi2BfPab6wTiTsodxdF1imHhRYcr0TOIZo9u31qrmG
+	0tgDQgCnhNLNy8DoZ1bmDzY4ZEnlXwIHDPMGtq2aU5VdXlTLj1pxd8snmCtERLylHeNEAurcuB5
+	VaJrV723MBcIyWjKxGpYX9U59aZzuLGYEpGJzXAOLbR9XQNzOl+qbWzSmlae4L0UH7W0nBNgNxX
+	f60OZTd85+XU/0x56UQs3ZUlB54otO4j2TOpIOgiPH80GVLLxA==
+X-Google-Smtp-Source: AGHT+IFfHviu0d5MxwEGnhBgGATdlZMRI8ekXoL09hloBCVdxr58YBfRZosKVY90gh9pXJFtOPvcDA==
+X-Received: by 2002:a17:903:2f89:b0:223:7006:4db2 with SMTP id d9443c01a7336-225e0a93e74mr214184135ad.31.1742325247483;
+        Tue, 18 Mar 2025 12:14:07 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.42.83])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6bbe7d9sm98518165ad.195.2025.03.18.12.14.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 12:14:06 -0700 (PDT)
+Message-ID: <67d9c5fe.170a0220.21d2a4.7507@mx.google.com>
+Date: Tue, 18 Mar 2025 12:14:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5580641511702557549=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: net: Bluetooth: add TX timestamping for ISO/L2CAP/SCO
+In-Reply-To: <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+References: <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5580641511702557549==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: include/linux/skbuff.h:478
+error: include/linux/skbuff.h: patch does not apply
+error: patch failed: net/core/skbuff.c:5523
+error: net/core/skbuff.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
 
 ---
- tools/iso-tester.c   | 2 +-
- tools/l2cap-tester.c | 6 ------
- tools/sco-tester.c   | 6 ------
- 3 files changed, 1 insertion(+), 13 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index ad0738091..640692b77 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -691,7 +691,7 @@ static void test_pre_setup(const void *test_data)
- 	struct test_data *data = tester_get_data();
- 	const struct iso_client_data *isodata = test_data;
- 
--	if (isodata && isodata->so_timestamping) {
-+	if (isodata && isodata->no_poll_errqueue) {
- 		if (tester_pre_setup_skip_by_default())
- 			return;
- 	}
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 395e76dbc..e56773d13 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -221,12 +221,6 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
- static void test_pre_setup(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
--	const struct l2cap_data *l2data = test_data;
--
--	if (l2data && l2data->so_timestamping) {
--		if (tester_pre_setup_skip_by_default())
--			return;
--	}
- 
- 	data->mgmt = mgmt_new_default();
- 	if (!data->mgmt) {
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index 145506321..650f8bab3 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -212,12 +212,6 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
- static void test_pre_setup(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
--	const struct sco_client_data *scodata = test_data;
--
--	if (scodata && scodata->so_timestamping) {
--		if (tester_pre_setup_skip_by_default())
--			return;
--	}
- 
- 	data->mgmt = mgmt_new_default();
- 	if (!data->mgmt) {
--- 
-2.48.1
 
+--===============5580641511702557549==--
