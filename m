@@ -1,433 +1,146 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2069.outbound.protection.outlook.com [40.107.22.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57ECE1C6B4;
-	Wed, 19 Mar 2025 00:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742344804; cv=none; b=ZJSQRp5ZrLKaKldCmilDhEpVeadHS2mX8fakLy0Q+glL/tQw6TqCGkJ6C32V2wjKZuCDVul+XtRdNuqQqMvij6RmeGVWWzPbV0RmEUF/uxisyBuayPHN5c0Q5RouBJltVMCRegZPaeZIVRtblPbMHke4f6678qOF9F0Xirq3fLs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742344804; c=relaxed/simple;
-	bh=drJSKEBLFLYr0WuxGH8sNwYoyO8GyGSP34YO/5Gt0Xw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QgjUMTzM5U56PQrfhbUwZAN/K3ExbL4JWDTEZ0X0MNeHCCvOIrXRNoCh3iYxC5dHUEh9dppOzjgIRTTzl20jIIm+shx6vADBAkCq7C+4SSySEQA6Eszq7BgguUW2X0N7i/ijblHxjvCzrPJNCoYIbZX/BTkHnE7H6CRiLb0ykBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWzFUW8l; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D566C8F5A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 10:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742380673; cv=fail; b=qBooOsEg5dgd/R1cyBLxR5opFengT1jarrl/iS87IwLqFJQIWrgpo2FEviP77N16GponsSN3wsxtSRO14lU+g97N1LXZETz3lVjTau72J/e2f1FtaCxziG9cBvR9Ux3mmQIUa5R0HoPohbMTzeKfZn7dQhizfKYXtYGNcpADllU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742380673; c=relaxed/simple;
+	bh=jXXNgJTWTk8dVuDax09gh/e1IqeS/lxI8waL88eygyw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=laOPsuV6TE22Y9LCSifGOwyt3+QQj3b7EvYF58YkirFfear8eME3QDsWXVsiUPun0fUf+CJ2Aso2tDVvj0ovES1ZcdFrX6oqX3qr4APWM06WbLIKGk9iQ/DYtD7is3yAQ1nn5y6eercgn7SyAGfy40eJrbLzWiJwHMWgWNMcSfk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=q6h0KauK; arc=fail smtp.client-ip=40.107.22.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWzFUW8l"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-85b4277d03fso196989939f.1;
-        Tue, 18 Mar 2025 17:40:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742344801; x=1742949601; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pF3rKAbtwRpNpJJUBHBzadk02bRgA6h529sX7PrSrVg=;
-        b=GWzFUW8lY3Xpq+KviVQ4bN/404sFrp3jv5MbMtOCVZGsl0VX9PGks7MHeOLA79XVS5
-         1aw2upFqUUUqFRifznBL1rgFATfU5OEckP/JDGuscio1NeZkaXuD+LHXzLqu9C+IUrph
-         2a7+klUKCqz6sovzHklK6rjRS1YqtD3JiSHagInUYSoKmwB7ZppPySq886sZhYV4TEZR
-         oafbAAU0rBTkmfEkyTwN8hmb/Kj4fRbN3yo+EWGsL8td/jQ6wE7Wlu+X1hd0Q4DjurHU
-         nZNmdwyZGP5TLof7FPwTrwXhhyDoTV2TgnCGFN7Exa0c+C4+iyrCeHu1gKdG86umPb0d
-         0wfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742344801; x=1742949601;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pF3rKAbtwRpNpJJUBHBzadk02bRgA6h529sX7PrSrVg=;
-        b=Ktwt/2kYupEy0ujP4MF0SxRyDRuIZfrWy7KNFsqFcm0VlE0d4c2u3xE0GDgXBTFjws
-         g3oTkuXKpdKD3l8b0OwGnNEAdE8bxccHBGchO9Qjjatso5l5pkJlhPj/aZ/kqxIBD0kd
-         JKXB5gX6AOAlU0WptFYA0qvtbIAGHp2XG9vrcLkzxVP0aYZ4YJ48sbN90JrJyhZ8FdzU
-         2j8VZgf1ofzz2ThziPy3z3BKITlAaA7VOt+YVn2xnkZmGzt8R2A9CvMP9fydPvHSAR1W
-         jtn3Gj9H6+59ujfrd9rUNP3YyNOMSdnfJ1Gvvp5WWJtHutjwrXFhjFJ6uNEweQ5J8v2+
-         o4sg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdPwP0uIytX0m2tqHevAHmBppnAGLrzG4B9JW1dpZ81mi0epqEhScm6Ej1/bweQI0NCNNVIWU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq4Qs2x9b93Nljdm5m4RebqFQID5p5eYABLxN0KLdWAh4kvgYK
-	ACQWQ28uF9YZ7fraTd5QqOrenlnsgdlaOz0mOiZBsiWtVSWrTAFqjMGogTo4rBl4c8cMDXq8HQ4
-	lW2t5VadP+xoho3wsVuUuLY2KgGc=
-X-Gm-Gg: ASbGncsxF5nmCmCptWdfSJzGXih7FhUF3Cd9/a3PI1pRMgLw25Zp2pglUVLNZ69TzLJ
-	GhNZyYvLiNIP3ny7SeoS5/POxGSXbQXM+0wQKnWZXJrxqvGG1I3uvoCca/QsI8mpMnKf7Q7XR5N
-	rnEJc6d2z2vvaSz/wGIEmkvyD2
-X-Google-Smtp-Source: AGHT+IGAcD5/abo0x66lU0yq0nB2enwV8hk01y9CRBcYfmrhlYmLekhTk1f+24JvARvsR+Wy7Kv0tR1XAxoG1lqGB/I=
-X-Received: by 2002:a05:6e02:2588:b0:3d0:235b:4810 with SMTP id
- e9e14a558f8ab-3d586b2a02dmr9180575ab.2.1742344801264; Tue, 18 Mar 2025
- 17:40:01 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="q6h0KauK"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PU0r2vkJY7rpmzs81SrCt8sMoRcgORRsH/ljp7KvIUR+vP3R14SIlv1EQVMOJs01h0Ldtskw6wvN7r46ioQdNRYVAuxD8MteEBp6n9L5ZH9+g6gbXXYjZ9enlvVc1aqNSeJn7oe/8tRdOut4y0G1eJkIRQCNlNCSfvLQyQvOq6Or4wJxU0HktZJEYvD8oAY9++Bcq4ji8oIPHC8dz6UTZqEaiGZrFUtVoSlUCEvLWadN3izmM/5qU59MqStpPMrQBbwL5CnBewcU8Xw537mlCZ0d1ZyW+UW+AEvCOxMoCGM0CmzHnzQtXHSpGsWdnXHm/dhwTdeJ8ukuNsJt30n0hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qTKJO1b3yBpEtZ6cW/yx4Et261kuaISsFHZyANcXTaE=;
+ b=s6ywDhBY8Dzvv/0T8GOj/OL9Dimrqf37TalhCKwSvJSVcnaerXzw3P1xsGvdf5U/oHXAVAEYlMG/XPXXtz3LBKbMlKII4fuKqY0evBrY1/vlHud/BLNgXLprgsqGxlHv5RIUt5jfByhol7LOk4F2Q4xiZycFrBH/M88G5M7DiVpsN8LI/z+i1Euf5godCyWtSvzL7IGihblidRY+IAR4QHpgtDEnOYuKjfBkUyNN00Slyb0vjuzHPCm7Drg9C/mobXn/Ve7o6Cv8/Zhccv+lr0tZGBvdwfeH3vLsHEEGKWHrNLvhVhKmlPFUdIf7UbQSngJvMRX+Ui0v3BhG01zCkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qTKJO1b3yBpEtZ6cW/yx4Et261kuaISsFHZyANcXTaE=;
+ b=q6h0KauKB1vL5QE0ryZ8fv9xK5q9iAAUaJmGHsai55mk5U1QpPd/JpCrRP0/j6ZLKW1bnE7W4jYeALK24nQ/Q5yLt/1vC4INx+p75BHNptPRy5NHyjTO740lF3NmWN21ZZb0EefHosiiohDyAR6mMal72r3gEM0SL9Cdmrm1t30=
+Received: from AM0PR01CA0120.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::25) by VI2PR03MB10955.eurprd03.prod.outlook.com
+ (2603:10a6:800:291::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Wed, 19 Mar
+ 2025 10:37:44 +0000
+Received: from AMS0EPF00000196.eurprd05.prod.outlook.com
+ (2603:10a6:208:168:cafe::e2) by AM0PR01CA0120.outlook.office365.com
+ (2603:10a6:208:168::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.33 via Frontend Transport; Wed,
+ 19 Mar 2025 10:37:44 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ AMS0EPF00000196.mail.protection.outlook.com (10.167.16.217) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.20 via Frontend Transport; Wed, 19 Mar 2025 10:37:44 +0000
+Received: from N9W6SW14.arri.de (10.30.5.20) by mta.arri.de (10.10.18.5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Wed, 19 Mar
+ 2025 11:37:43 +0100
+From: Christian Eggers <ceggers@arri.de>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Christian Eggers <ceggers@arri.de>
+Subject: [PATCH BlueZ 1/5] tools: iso-tester: add inclusion of time.h
+Date: Wed, 19 Mar 2025 11:37:20 +0100
+Message-ID: <20250319103724.10433-1-ceggers@arri.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1742324341.git.pav@iki.fi> <a5c1b2110e567f499e17a4a67f1cc7c2036566c4.1742324341.git.pav@iki.fi>
-In-Reply-To: <a5c1b2110e567f499e17a4a67f1cc7c2036566c4.1742324341.git.pav@iki.fi>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 19 Mar 2025 08:39:24 +0800
-X-Gm-Features: AQ5f1JoMsIkIrj4zSPRTqHEHKHheFQq7_Hy24_HS7mKbWpDfPVPR9yRbt_4d_q8
-Message-ID: <CAL+tcoCr-Z_PrWMsERtsm98Q4f-RXkMVzTW3S1gnNY6cFQM0Sg@mail.gmail.com>
-Subject: Re: [PATCH v5 2/5] Bluetooth: add support for skb TX SND/COMPLETION timestamping
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF00000196:EE_|VI2PR03MB10955:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd3273ca-388c-4e13-1f46-08dd66d21561
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?pBvGECrhS3VCyN/8RSZcF93M7d/AvJ2DBPRkJfrxuO7/3fkflEoP+qDjZaNZ?=
+ =?us-ascii?Q?xXgt2a1ZpV6UNL4k076RlTMnZ07UttDGbT8ujfP5dwP65QB90T86EPsVkmf9?=
+ =?us-ascii?Q?68t527ZJhI2vmugH747yu0DWIBAwHC7e/XtNYdT/YtYWruhGpga8Z6duvp5R?=
+ =?us-ascii?Q?LS7NdYM+Z3ilCv06dbdnzvoI2QdYG1HYJeVqlmgjDOsumyBXjkGw1UvLJqfq?=
+ =?us-ascii?Q?Y0xMTXRcFW/fqdrZkPgK11v/Cz2zhs0n1ZPtA0J3lqMz0G6xTj/tYrpwSLyx?=
+ =?us-ascii?Q?5RrVVpwAdZLGYiCjQAGBROmseU7EL3jgxNOcZQCNbdZwKOLE7uQ8HyoVLbCQ?=
+ =?us-ascii?Q?/mmF4qzzKZ0qNtT8StAQ+XB1mwaMfZduA99OJO+r3nX83hYGKZb7fmOYoPku?=
+ =?us-ascii?Q?zxMmMmSMvDsNJJElc135eJekBHUvG7iJ0pChVIJfzzpSrsgMSkVvqKetRedA?=
+ =?us-ascii?Q?fCPc49oSWusBkWyPXiWg/BVNxzxqePBHOKKjVVWC5ZiKTYhseki6zQC6o4Cb?=
+ =?us-ascii?Q?kKPhCVDsLhWI4D/agzUs+qYDHC3X7XBlNnRKhH4M1dOiuqY5rwASkaaf9IwC?=
+ =?us-ascii?Q?/JvJ9QIw1Ii92R5GB+Q01tj+8/qyskmlKjuy789fGrLP2FtzjJYLx9MsXcIN?=
+ =?us-ascii?Q?8mA4SyeTIv1tuLASu/WlwYcCqRdmbA0wnLTNpKNvwz2Y/HgeDpgaTnKdpaC6?=
+ =?us-ascii?Q?vaDook3kV+6VQCGBaUUBQAKlFnSA8hxy5PkndaI70wVYkDbcfgER2pO0Yisu?=
+ =?us-ascii?Q?QZcNNoQ+CjaCgxqvJJrt/HJy7cEAjwYx4Cz6alMi5JvCwExLZjuy7n28m/+a?=
+ =?us-ascii?Q?SowzDR9kw7bheOpEkMkkD/GTXHW+udN1d4O4DIuSyncP4H0IlhgWVHkcMDTu?=
+ =?us-ascii?Q?v2BPwpLeIF8PFxgxDZ9v//uu5mJap3+ca0M0IfaV/VBpcwlxzgs0w/S6EpWC?=
+ =?us-ascii?Q?YhqLDcPwM3is7N1IcFDU14orQkpX3Tr0g+J9QtPl91GpaZ4QJ54b5Yn/dT14?=
+ =?us-ascii?Q?K23cAos31n4sj4TYkhdhSNueYVhAS2SXfopXbOFJlnIZ3Q8i9sNHO1DaWEW8?=
+ =?us-ascii?Q?Z4JNMuUTp3RDZ9NaV+pYZEJJ9W/J2rLP6PfunKW/PeKqO7QfJ61YpDSMiOfQ?=
+ =?us-ascii?Q?8BczxYLNJW/jykYax7zjG2xs7SqrBmDZxS+OS1lWFgS23aarksuISj3x+n3i?=
+ =?us-ascii?Q?l3SQQFv+P3TB7U0E6ILFLAw0fgwJ+Bne6sMojZGUbhL+EsMqbS/M0oYqT3Q+?=
+ =?us-ascii?Q?fr+H+2GoozDUgYrfS1hHyC2yH0MrzObFpO2J8189Xhuvyz/6HCO6L83B0ayb?=
+ =?us-ascii?Q?QxjseYH9eOkLqj5IZHpxWO6hPdGc4vWPkEW2uyCmsCflXWfiuxwfEHcqCgbf?=
+ =?us-ascii?Q?JHqhY9nHTE/rodm1/S08QTczqH4lv8quqCF3GKJEpvLTBaovG5Xntn/nWwhw?=
+ =?us-ascii?Q?F9Y3bxSgSRbYN7SnYLnHmoI1S2B8ECDco72H1DISwrpGYZKWQiqnEJvL5upB?=
+ =?us-ascii?Q?dwj3BvpJUZkWUY8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 10:37:44.3861
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd3273ca-388c-4e13-1f46-08dd66d21561
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF00000196.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR03MB10955
 
-On Wed, Mar 19, 2025 at 3:10=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Support enabling TX timestamping for some skbs, and track them until
-> packet completion. Generate software SCM_TSTAMP_COMPLETION when getting
-> completion report from hardware.
->
-> Generate software SCM_TSTAMP_SND before sending to driver. Sending from
-> driver requires changes in the driver API, and drivers mostly are going
-> to send the skb immediately.
->
-> Make the default situation with no COMPLETION TX timestamping more
-> efficient by only counting packets in the queue when there is nothing to
-> track.  When there is something to track, we need to make clones, since
-> the driver may modify sent skbs.
->
-> The tx_q queue length is bounded by the hdev flow control, which will
-> not send new packets before it has got completion reports for old ones.
->
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
->
-> Notes:
->     v5:
->     - Add hci_sockm_init()
->     - Back to decoupled COMPLETION & SND, like in v3
->     - Handle SCO flow controlled case
->
->  include/net/bluetooth/hci_core.h |  20 +++++
->  net/bluetooth/hci_conn.c         | 122 +++++++++++++++++++++++++++++++
->  net/bluetooth/hci_core.c         |  15 +++-
->  net/bluetooth/hci_event.c        |   4 +
->  4 files changed, 157 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index f78e4298e39a..5115da34f881 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -261,6 +261,12 @@ struct adv_info {
->         struct delayed_work     rpa_expired_cb;
->  };
->
-> +struct tx_queue {
-> +       struct sk_buff_head queue;
-> +       unsigned int extra;
-> +       unsigned int tracked;
-> +};
-> +
->  #define HCI_MAX_ADV_INSTANCES          5
->  #define HCI_DEFAULT_ADV_DURATION       2
->
-> @@ -733,6 +739,8 @@ struct hci_conn {
->         struct sk_buff_head data_q;
->         struct list_head chan_list;
->
-> +       struct tx_queue tx_q;
-> +
->         struct delayed_work disc_work;
->         struct delayed_work auto_accept_work;
->         struct delayed_work idle_work;
-> @@ -1572,6 +1580,18 @@ void hci_conn_enter_active_mode(struct hci_conn *c=
-onn, __u8 force_active);
->  void hci_conn_failed(struct hci_conn *conn, u8 status);
->  u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle);
->
-> +void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb);
-> +void hci_conn_tx_dequeue(struct hci_conn *conn);
-> +void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
-> +                           const struct sockcm_cookie *sockc);
-> +
-> +static inline void hci_sockcm_init(struct sockcm_cookie *sockc, struct s=
-ock *sk)
-> +{
-> +       *sockc =3D (struct sockcm_cookie) {
-> +               .tsflags =3D READ_ONCE(sk->sk_tsflags),
-> +       };
-> +}
-> +
->  /*
->   * hci_conn_get() and hci_conn_put() are used to control the life-time o=
-f an
->   * "hci_conn" object. They do not guarantee that the hci_conn object is =
-running,
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index d097e308a755..95972fd4c784 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -27,6 +27,7 @@
->
->  #include <linux/export.h>
->  #include <linux/debugfs.h>
-> +#include <linux/errqueue.h>
->
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> @@ -1002,6 +1003,7 @@ static struct hci_conn *__hci_conn_add(struct hci_d=
-ev *hdev, int type, bdaddr_t
->         }
->
->         skb_queue_head_init(&conn->data_q);
-> +       skb_queue_head_init(&conn->tx_q.queue);
->
->         INIT_LIST_HEAD(&conn->chan_list);
->         INIT_LIST_HEAD(&conn->link_list);
-> @@ -1155,6 +1157,7 @@ void hci_conn_del(struct hci_conn *conn)
->         }
->
->         skb_queue_purge(&conn->data_q);
-> +       skb_queue_purge(&conn->tx_q.queue);
->
->         /* Remove the connection from the list and cleanup its remaining
->          * state. This is a separate function since for some cases like
-> @@ -3064,3 +3067,122 @@ int hci_abort_conn(struct hci_conn *conn, u8 reas=
-on)
->          */
->         return hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL);
->  }
-> +
-> +void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
-> +                           const struct sockcm_cookie *sockc)
-> +{
-> +       struct sock *sk =3D skb ? skb->sk : NULL;
-> +
-> +       /* This shall be called on a single skb of those generated by use=
-r
-> +        * sendmsg(), and only when the sendmsg() does not return error t=
-o
-> +        * user. This is required for keeping the tskey that increments h=
-ere in
-> +        * sync with possible sendmsg() counting by user.
-> +        *
-> +        * Stream sockets shall set key_offset to sendmsg() length in byt=
-es
-> +        * and call with the last fragment, others to 1 and first fragmen=
-t.
-> +        */
-> +
-> +       if (!skb || !sockc || !sk || !key_offset)
-> +               return;
-> +
-> +       sock_tx_timestamp(sk, sockc, &skb_shinfo(skb)->tx_flags);
-> +
-> +       if (sockc->tsflags & SOF_TIMESTAMPING_OPT_ID &&
-> +           sockc->tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
-> +               if (sockc->tsflags & SOCKCM_FLAG_TS_OPT_ID) {
-> +                       skb_shinfo(skb)->tskey =3D sockc->ts_opt_id;
-> +               } else {
-> +                       int key =3D atomic_add_return(key_offset, &sk->sk=
-_tskey);
-> +
-> +                       skb_shinfo(skb)->tskey =3D key - 1;
-> +               }
-> +       }
-> +}
-> +
-> +void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb)
-> +{
-> +       struct tx_queue *comp =3D &conn->tx_q;
-> +       bool track =3D false;
-> +
-> +       /* Emit SND now, ie. just before sending to driver */
-> +       if (skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP)
-> +               __skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SND)=
-;
+Inclusion of <linux/errqueue.h> requires that 'struct timespec' has
+already been defined:
 
-It's a bit strange that SCM_TSTAMP_SND is under the control of
-SKBTX_SW_TSTAMP. Can we use the same flag for both lines here
-directly? I suppose I would use SKBTX_SW_TSTAMP then.
+| In file included from ../bluez-5.79/tools/iso-tester.c:21:
+| /usr/include/linux/errqueue.h:57:25: error: array type has incomplete element type 'struct timespec'
+|    57 |         struct timespec ts[3];
+|       |                         ^~
+---
+ tools/iso-tester.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> +
-> +       /* COMPLETION tstamp is emitted for tracked skb later in Number o=
-f
-> +        * Completed Packets event. Available only for flow controlled ca=
-ses.
-> +        *
-> +        * TODO: SCO support without flowctl (needs to be done in drivers=
-)
-> +        */
-> +       switch (conn->type) {
-> +       case ISO_LINK:
-> +       case ACL_LINK:
-> +       case LE_LINK:
-> +               break;
-> +       case SCO_LINK:
-> +       case ESCO_LINK:
-> +               if (!hci_dev_test_flag(conn->hdev, HCI_SCO_FLOWCTL))
-> +                       return;
-> +               break;
-> +       default:
-> +               return;
-> +       }
-> +
-> +       if (skb->sk && (skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTA=
-MP))
-> +               track =3D true;
-> +
-> +       /* If nothing is tracked, just count extra skbs at the queue head=
- */
-> +       if (!track && !comp->tracked) {
-> +               comp->extra++;
-> +               return;
-> +       }
-> +
-> +       if (track) {
-> +               skb =3D skb_clone_sk(skb);
-> +               if (!skb)
-> +                       goto count_only;
-> +
-> +               comp->tracked++;
-> +       } else {
-> +               skb =3D skb_clone(skb, GFP_KERNEL);
-> +               if (!skb)
-> +                       goto count_only;
-> +       }
-> +
-> +       skb_queue_tail(&comp->queue, skb);
-> +       return;
-> +
-> +count_only:
-> +       /* Stop tracking skbs, and only count. This will not emit timesta=
-mps for
-> +        * the packets, but if we get here something is more seriously wr=
-ong.
-> +        */
-> +       comp->tracked =3D 0;
-> +       comp->extra +=3D skb_queue_len(&comp->queue) + 1;
-> +       skb_queue_purge(&comp->queue);
-> +}
-> +
-> +void hci_conn_tx_dequeue(struct hci_conn *conn)
-> +{
-> +       struct tx_queue *comp =3D &conn->tx_q;
-> +       struct sk_buff *skb;
-> +
-> +       /* If there are tracked skbs, the counted extra go before dequeui=
-ng real
-> +        * skbs, to keep ordering. When nothing is tracked, the ordering =
-doesn't
-> +        * matter so dequeue real skbs first to get rid of them ASAP.
-> +        */
-> +       if (comp->extra && (comp->tracked || skb_queue_empty(&comp->queue=
-))) {
-> +               comp->extra--;
-> +               return;
-> +       }
-> +
-> +       skb =3D skb_dequeue(&comp->queue);
-> +       if (!skb)
-> +               return;
-> +
-> +       if (skb->sk) {
-> +               comp->tracked--;
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 640692b779c9..350775fddc96 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -17,6 +17,7 @@
+ #include <errno.h>
+ #include <poll.h>
+ #include <stdbool.h>
++#include <time.h>
+ 
+ #include <linux/errqueue.h>
+ #include <linux/net_tstamp.h>
+-- 
+2.43.0
 
-Need an explicit if statement here?
-
-> +               __skb_tstamp_tx(skb, NULL, NULL, skb->sk,
-> +                               SCM_TSTAMP_COMPLETION);
-
-This is the socket timestamping, and that's right. My minor question
-is: for the use of bpf timestamping (that should be easy as you've
-done in patch 1, I presume), I'm not sure if you're familiar with it.
-If not, I plan to implement it myself in a follow-up patch and then
-let you do some tests? Of course, I will provide the bpf test script
-:)
-
-Thanks,
-Jason
-
-> +       }
-> +
-> +       kfree_skb(skb);
-> +}
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 94d9147612da..5eb0600bbd03 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3029,6 +3029,13 @@ static int hci_send_frame(struct hci_dev *hdev, st=
-ruct sk_buff *skb)
->         return 0;
->  }
->
-> +static int hci_send_conn_frame(struct hci_dev *hdev, struct hci_conn *co=
-nn,
-> +                              struct sk_buff *skb)
-> +{
-> +       hci_conn_tx_queue(conn, skb);
-> +       return hci_send_frame(hdev, skb);
-> +}
-> +
->  /* Send HCI command */
->  int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
->                  const void *param)
-> @@ -3575,7 +3582,7 @@ static void hci_sched_sco(struct hci_dev *hdev, __u=
-8 type)
->         while (*cnt && (conn =3D hci_low_sent(hdev, type, &quote))) {
->                 while (quote-- && (skb =3D skb_dequeue(&conn->data_q))) {
->                         BT_DBG("skb %p len %d", skb, skb->len);
-> -                       hci_send_frame(hdev, skb);
-> +                       hci_send_conn_frame(hdev, conn, skb);
->
->                         conn->sent++;
->                         if (conn->sent =3D=3D ~0)
-> @@ -3618,7 +3625,7 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
->                         hci_conn_enter_active_mode(chan->conn,
->                                                    bt_cb(skb)->force_acti=
-ve);
->
-> -                       hci_send_frame(hdev, skb);
-> +                       hci_send_conn_frame(hdev, chan->conn, skb);
->                         hdev->acl_last_tx =3D jiffies;
->
->                         hdev->acl_cnt--;
-> @@ -3674,7 +3681,7 @@ static void hci_sched_le(struct hci_dev *hdev)
->
->                         skb =3D skb_dequeue(&chan->data_q);
->
-> -                       hci_send_frame(hdev, skb);
-> +                       hci_send_conn_frame(hdev, chan->conn, skb);
->                         hdev->le_last_tx =3D jiffies;
->
->                         (*cnt)--;
-> @@ -3708,7 +3715,7 @@ static void hci_sched_iso(struct hci_dev *hdev)
->         while (*cnt && (conn =3D hci_low_sent(hdev, ISO_LINK, &quote))) {
->                 while (quote-- && (skb =3D skb_dequeue(&conn->data_q))) {
->                         BT_DBG("skb %p len %d", skb, skb->len);
-> -                       hci_send_frame(hdev, skb);
-> +                       hci_send_conn_frame(hdev, conn, skb);
->
->                         conn->sent++;
->                         if (conn->sent =3D=3D ~0)
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 0df4a0e082c8..83990c975c1f 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4415,6 +4415,7 @@ static void hci_num_comp_pkts_evt(struct hci_dev *h=
-dev, void *data,
->                 struct hci_comp_pkts_info *info =3D &ev->handles[i];
->                 struct hci_conn *conn;
->                 __u16  handle, count;
-> +               unsigned int i;
->
->                 handle =3D __le16_to_cpu(info->handle);
->                 count  =3D __le16_to_cpu(info->count);
-> @@ -4425,6 +4426,9 @@ static void hci_num_comp_pkts_evt(struct hci_dev *h=
-dev, void *data,
->
->                 conn->sent -=3D count;
->
-> +               for (i =3D 0; i < count; ++i)
-> +                       hci_conn_tx_dequeue(conn);
-> +
->                 switch (conn->type) {
->                 case ACL_LINK:
->                         hdev->acl_cnt +=3D count;
-> --
-> 2.48.1
->
->
