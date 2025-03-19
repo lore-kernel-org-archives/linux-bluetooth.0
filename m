@@ -1,110 +1,254 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BF123A0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 00:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858138F6D;
+	Wed, 19 Mar 2025 00:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742342467; cv=none; b=u07hQofjPzv9mp9SR4OoQ69ZWXJv4fIiohK+dmq/QzQO15/ZWSs3WOTnr9GOmaaQMNs5rFh4YqNNojjwdQ3vp9M9f0mslOWYepu4pr9SavQVTAbPGrIan5pfNEN+YqKGO+pkh6q8olUqIYYQ56RIGrK21wTZvD8TX482J1Xbnf4=
+	t=1742343246; cv=none; b=oC8CQrpgH5rK0yuj6lKSBkj9QYSnhEE2XpykBsDzLz3mu4WngwMFI6KB5jTxNv6GHO3QQghOChXdvUeAJRs+FZwK/GTb66lL+rWZC8Bv8it5+GjKbwLQT5ifwx36UemH++WTirzcAo3Kll/DBfgLutiMPQH5PigYqyQHLkf327U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742342467; c=relaxed/simple;
-	bh=jyNBFTtCpEPzBH+e8ogmq4oRfDXPYFgfetph/OjeNTA=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=fbni+25/5Kf/yuQ/4Sfu+2IAtyOsNx4t5oZGnfkAdx3EyMiBSzkxKDtkgcXhoO4jb2L3k8nFWXfvSjfjAOAR1s33z5qRkupwMZDVpnzg8NpJcuTsg92iARpv8bdQy6CE5GZIZWmN1Pefr4QvtZ8PwfUGd8w/6cOo+xyHjmH6014=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pA0IR0W7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742343246; c=relaxed/simple;
+	bh=MKV9mldf0+4FyDmj8o9yUY5iaNVxvWM0Ed5a/roJW7Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ct/22OmGuyP0DnmYAFdm7OB8yoBXgGIvW80QKpN4j93b6htSkWvxZAjH/98H59D8NK0DkRodC9nMouZ5cemZepEb2bNEXYIkZ6dK+LG9gcmPuRvTbPHP5EIfF5dMxM2l9jYSLZAzt583XE8rq+wS7mfa9hJaOKpVZ0VDAtia08o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7uE20AQ; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pA0IR0W7"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 04893C4CEDD
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 00:01:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742342467;
-	bh=jyNBFTtCpEPzBH+e8ogmq4oRfDXPYFgfetph/OjeNTA=;
-	h=From:To:Subject:Date:From;
-	b=pA0IR0W7MTQj5i4Qwzm5l0blwqGJcbvcPLO7H4L5XRWfmZhQR56MmXrW6a2qnxNrh
-	 fRlqM60h28VyqbUVivJHa0dnkKtZBQAT8HTpTu7M8Id5rPIfdzYwoLPlTIT1jxz1Wo
-	 SOXzBKoc5vUEhPEszcJrbfWxwlyXRJY991lxwASjBkBYT0SxZJwygu9xfh1XXe3Wdg
-	 ftRWlbsKcnx+6rhDqlymX88WPh7tAal5b9SWSg6XaRGBUdqC4BCe5vYpXiSllFZHbi
-	 3B9JBy+Hbq05v8QGR1Xuv5nAPAdD6JHtW8+VWD27ZIoAZ5M4X++gBHwwUrKfaImz0W
-	 19erotIVO3wVA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E1379C3279F; Wed, 19 Mar 2025 00:01:06 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219894] New: Bluetooth Qualcomm WCN785x - Input/output error
-Date: Wed, 19 Mar 2025 00:01:06 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: agurenko@protonmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219894-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7uE20AQ"
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3d450154245so47113685ab.2;
+        Tue, 18 Mar 2025 17:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742343243; x=1742948043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X2fi7e9XAXBy8lWgbII5AXZTyL4VEd07+VXnYBp5Ecs=;
+        b=f7uE20AQ8t9+DDB9yseKAaVl9gOfrJtrcV5fbYMKKhDxNswAohxuE4cFvEsz/UzRKm
+         VkK6lWntzYOFooPbbf+l84IGwQ5eZpQ6AqrKxrJuRINFKe8fuTmTDRj/MaxgQWRs0fIx
+         ZOoUpjKKFffVMOO5gWTJzS3BF5KxpzahqCC8e6TWqlS094+HcjUuqacDFIuWcCvsAFrJ
+         x1ilW2GoaJVx69/ZcVUHrHvJkwSVN9UHPBVBU8DHvHF0C/2gEe4Y8cRS31UzUUiNEy1T
+         LuaEE4JAECbjWeBFf75TOSILmPrdNoKdKGtD5TNCIIHgPp4ucTxzDm2Pd2UtlUathUgI
+         yQEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742343243; x=1742948043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X2fi7e9XAXBy8lWgbII5AXZTyL4VEd07+VXnYBp5Ecs=;
+        b=K83NCOojLlK60oq5tFzc22kX+CGmcyYHzYZ1FCoBuBvrftDvdhmy+75KjuHFFxMFT4
+         ASJ5/iPdcGAtPHIlz2cSFj+hryGKa1ZR5AEwJV8ZtBDCbpsIfoVPH0ZdmdDzboT55KUG
+         zqlSUMF8vki1rUXITasD+lHYakS2ttubWU7PfuHxjVIywgAhj521rCqWVdwZFZSaYqma
+         Mgw5ZELvUGqkS/k89tnUp3RkWiYGlIOwtrTx9mrQLbZSXhL29gF0iZHyDam4K0w6meaV
+         YQsjxmwxTyIzLxat2OqoBOXgVwHlk1KbbmathWbST5QVvsMju4vMXMC+gxocljHziFQ5
+         jC3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUjloUGEOlgXWvkAnrtY0j6k5hgtO9yjJgqN+ZOfInxIxcRaf+ahIyxV6jYiof/sEMspmJT6I0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuzFJwGNpqkVNEpQrr//rwnGg2aUAXld9vyjrwbkyzUxC6llOh
+	YnilcRtdddwOcIykbVKNqUn80ok+yyGkmHRMo9hVHz2NtJ3Nmr1h2BT3iRLsVhriR36AGyEA5KC
+	UHCt2nZPsZ/nBtqE/X8ZWUQFpVzNb9qMw
+X-Gm-Gg: ASbGncuk8NmuMuutYKjMO7xK1kw4yGvZkFcxXuhIzStfb6BbYKqvOgWjfc3yjJrt/St
+	MW+E1diZ2aLctw8AyDCWRbfhr8RVTr3Tf7IwYVUqqa2ezUbzvQYdOELtPxdMYwQDRaqKnbAB4y2
+	wCcsxpaUZwFpmPRCwXfjXGH7oe8QICDqQFOtA=
+X-Google-Smtp-Source: AGHT+IE3gSCH9UrTcfxJRC0OGpuf/+vx1CqPVrvnShQCtYDOtQq48MC7EjkJveX0rCxuXIiH9HKa5jX0znahwJbSs2A=
+X-Received: by 2002:a05:6e02:1a47:b0:3d1:92fc:fb45 with SMTP id
+ e9e14a558f8ab-3d586b243e3mr7670635ab.5.1742343243477; Tue, 18 Mar 2025
+ 17:14:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <cover.1742324341.git.pav@iki.fi> <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+In-Reply-To: <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 19 Mar 2025 08:13:27 +0800
+X-Gm-Features: AQ5f1JoIE7st4RKueBH-_TmpE1yFcPtsvt5-6nt7lNOw2_qPUkbl84LiibMF_hY
+Message-ID: <CAL+tcoDL0FwC6i_3q46HrKA0Sua-KKXxTpWpR94ev9RovdHgWQ@mail.gmail.com>
+Subject: Re: [PATCH v5 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219894
+On Wed, Mar 19, 2025 at 3:08=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
+> when hardware reports a packet completed.
+>
+> Completion tstamp is useful for Bluetooth, as hardware timestamps do not
+> exist in the HCI specification except for ISO packets, and the hardware
+> has a queue where packets may wait.  In this case the software SND
+> timestamp only reflects the kernel-side part of the total latency
+> (usually small) and queue length (usually 0 unless HW buffers
+> congested), whereas the completion report time is more informative of
+> the true latency.
+>
+> It may also be useful in other cases where HW TX timestamps cannot be
+> obtained and user wants to estimate an upper bound to when the TX
+> probably happened.
+>
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
 
-            Bug ID: 219894
-           Summary: Bluetooth Qualcomm WCN785x - Input/output error
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: agurenko@protonmail.com
-        Regression: No
+Hi Pauli,
 
-I've got today new MSI X870E Tomahawk WiFi board and it comes with Qualcomm
-WCN785x for WiFi/Bluetooth. While Bluetooth is available and can scan for t=
-he
-devices, I cannot complete the pairing process with following errors in log=
-s:
+This patch overall looks good to me but it depends on the small
+question in another patch that is relevant to how we use this new flag
+in reality. Let's discuss a bit there.
 
-Mar 19 00:56:01 bluetoothd[1456]: src/device.c:search_cb() EC:73:79:59:9A:4=
-E:
-error updating services: Input/output error (5)
-Mar 19 00:56:17 bluetoothd[1456]: src/device.c:search_cb() EC:73:79:59:9A:4=
-E:
-error updating services: Input/output error (5)
-Mar 19 00:56:17 bluedevil-wizard[40108]: kf.bluezqt: PendingCall Error:
-"br-connection-create-socket"
+Thanks,
+Jason
 
-I can see that device is added and set to trusted, but attempt to connect s=
-hows
-the same error:
-
-Mar 19 00:57:33 bluetoothd[1456]: src/device.c:search_cb() EC:73:79:59:9A:4=
-E:
-error updating services: Input/output error (5)
-Mar 19 00:57:33 systemsettings[40016]: kf.bluezqt: PendingCall Error:
-"br-connection-create-socket"
-
-Please let me know what other information I can provide to help.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+> ---
+>
+> Notes:
+>     v5:
+>     - back to decoupled COMPLETION & SND, like in v3
+>     - BPF reporting not implemented here
+>
+>  Documentation/networking/timestamping.rst | 8 ++++++++
+>  include/linux/skbuff.h                    | 7 ++++---
+>  include/uapi/linux/errqueue.h             | 1 +
+>  include/uapi/linux/net_tstamp.h           | 6 ++++--
+>  net/core/skbuff.c                         | 2 ++
+>  net/ethtool/common.c                      | 1 +
+>  net/socket.c                              | 3 +++
+>  7 files changed, 23 insertions(+), 5 deletions(-)
+>
+> diff --git a/Documentation/networking/timestamping.rst b/Documentation/ne=
+tworking/timestamping.rst
+> index 61ef9da10e28..b8fef8101176 100644
+> --- a/Documentation/networking/timestamping.rst
+> +++ b/Documentation/networking/timestamping.rst
+> @@ -140,6 +140,14 @@ SOF_TIMESTAMPING_TX_ACK:
+>    cumulative acknowledgment. The mechanism ignores SACK and FACK.
+>    This flag can be enabled via both socket options and control messages.
+>
+> +SOF_TIMESTAMPING_TX_COMPLETION:
+> +  Request tx timestamps on packet tx completion.  The completion
+> +  timestamp is generated by the kernel when it receives packet a
+> +  completion report from the hardware. Hardware may report multiple
+> +  packets at once, and completion timestamps reflect the timing of the
+> +  report and not actual tx time. This flag can be enabled via both
+> +  socket options and control messages.
+> +
+>
+>  1.3.2 Timestamp Reporting
+>  ^^^^^^^^^^^^^^^^^^^^^^^^^
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index cd8294cdc249..b974a277975a 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -478,8 +478,8 @@ enum {
+>         /* device driver is going to provide hardware time stamp */
+>         SKBTX_IN_PROGRESS =3D 1 << 2,
+>
+> -       /* reserved */
+> -       SKBTX_RESERVED =3D 1 << 3,
+> +       /* generate software time stamp on packet tx completion */
+> +       SKBTX_COMPLETION_TSTAMP =3D 1 << 3,
+>
+>         /* generate wifi status information (where possible) */
+>         SKBTX_WIFI_STATUS =3D 1 << 4,
+> @@ -498,7 +498,8 @@ enum {
+>
+>  #define SKBTX_ANY_SW_TSTAMP    (SKBTX_SW_TSTAMP    | \
+>                                  SKBTX_SCHED_TSTAMP | \
+> -                                SKBTX_BPF)
+> +                                SKBTX_BPF          | \
+> +                                SKBTX_COMPLETION_TSTAMP)
+>  #define SKBTX_ANY_TSTAMP       (SKBTX_HW_TSTAMP | \
+>                                  SKBTX_ANY_SW_TSTAMP)
+>
+> diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/errqueue.=
+h
+> index 3c70e8ac14b8..1ea47309d772 100644
+> --- a/include/uapi/linux/errqueue.h
+> +++ b/include/uapi/linux/errqueue.h
+> @@ -73,6 +73,7 @@ enum {
+>         SCM_TSTAMP_SND,         /* driver passed skb to NIC, or HW */
+>         SCM_TSTAMP_SCHED,       /* data entered the packet scheduler */
+>         SCM_TSTAMP_ACK,         /* data acknowledged by peer */
+> +       SCM_TSTAMP_COMPLETION,  /* packet tx completion */
+>  };
+>
+>  #endif /* _UAPI_LINUX_ERRQUEUE_H */
+> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tst=
+amp.h
+> index 55b0ab51096c..383213de612a 100644
+> --- a/include/uapi/linux/net_tstamp.h
+> +++ b/include/uapi/linux/net_tstamp.h
+> @@ -44,8 +44,9 @@ enum {
+>         SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
+>         SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
+>         SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
+> +       SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
+>
+> -       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
+> +       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
+>         SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
+>                                  SOF_TIMESTAMPING_LAST
+>  };
+> @@ -58,7 +59,8 @@ enum {
+>  #define SOF_TIMESTAMPING_TX_RECORD_MASK        (SOF_TIMESTAMPING_TX_HARD=
+WARE | \
+>                                          SOF_TIMESTAMPING_TX_SOFTWARE | \
+>                                          SOF_TIMESTAMPING_TX_SCHED | \
+> -                                        SOF_TIMESTAMPING_TX_ACK)
+> +                                        SOF_TIMESTAMPING_TX_ACK | \
+> +                                        SOF_TIMESTAMPING_TX_COMPLETION)
+>
+>  /**
+>   * struct so_timestamping - SO_TIMESTAMPING parameter
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index ab8acb737b93..6cbf77bc61fc 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -5523,6 +5523,8 @@ static bool skb_tstamp_tx_report_so_timestamping(st=
+ruct sk_buff *skb,
+>                                                     SKBTX_SW_TSTAMP);
+>         case SCM_TSTAMP_ACK:
+>                 return TCP_SKB_CB(skb)->txstamp_ack & TSTAMP_ACK_SK;
+> +       case SCM_TSTAMP_COMPLETION:
+> +               return skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTAM=
+P;
+>         }
+>
+>         return false;
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index 7e3c16856c1a..0cb6da1f692a 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -476,6 +476,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] =
+=3D {
+>         [const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
+>         [const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-tcp",
+>         [const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-filt=
+er",
+> +       [const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "tx-completion"=
+,
+>  };
+>  static_assert(ARRAY_SIZE(sof_timestamping_names) =3D=3D __SOF_TIMESTAMPI=
+NG_CNT);
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index b64ecf2722e7..e3d879b53278 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -689,6 +689,9 @@ void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_flag=
+s)
+>         if (tsflags & SOF_TIMESTAMPING_TX_SCHED)
+>                 flags |=3D SKBTX_SCHED_TSTAMP;
+>
+> +       if (tsflags & SOF_TIMESTAMPING_TX_COMPLETION)
+> +               flags |=3D SKBTX_COMPLETION_TSTAMP;
+> +
+>         *tx_flags =3D flags;
+>  }
+>  EXPORT_SYMBOL(__sock_tx_timestamp);
+> --
+> 2.48.1
+>
+>
