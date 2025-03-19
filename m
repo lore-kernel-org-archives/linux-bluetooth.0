@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92F71CAA86
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 14:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DA51DED78
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 15:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742396184; cv=none; b=GDqvFSU6b6r3gcbfsS6yMi/6nbFoeU952dAK30wr3trJngzK4lkZa40Ht6m0cq2acQ/ZhqBZiMzJP+k7r/rlotUY6biN+j/4CYxYKbJIMI+D9wTToqLFnGmdrJOX5cRttb475x7paJvBm4wHtYVsgWh85XamKTjKnj2CDeHTdzA=
+	t=1742396550; cv=none; b=lR6sP/zlX1IfBR7gXNuEN02crpNBbq12iDJ8R3OwSBXeqCpBjm8Mr0zN2PiA+a+QsRm/2MRQzDcEBKoHWnFfgztJYGoZlvvnCBJCdE2435PLFUWa/AEavxoyUmU7Zsggbu23P9va4GyrnrbxzMfRVq3pdFK0/fs1/hOBlvv2vsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742396184; c=relaxed/simple;
-	bh=XeRzBgQKq5MYfmEYv1+63DG9oJH1AlqPnUlCne0S1NU=;
+	s=arc-20240116; t=1742396550; c=relaxed/simple;
+	bh=9JRt77/AinlWaYdHfhYAlbv5ZlluRWCi1iHOvOZB+og=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=q+/QiwBwFUSD48b6rHzj7+LTF1JzUFO2nOpWfgP8Mgd5kRcF57bI+wr/G3M6xPdkiH0XvzXPs43F1aO4aDMCuetbu4xW77tt/pRxKSWiLSibg/u1MRuDcXHGHR6cmUplhqoLv14pvcOhuLIn5rDvniZNvw+gNJ3mUvZPp+1S/gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LsLrc0jI; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=Qkkl/fbCgB1pwQ5ShlyyFk367rDou6zkxW35toCzIx+SsDn/VufkwjzUgDJGsDe+w+BOHx7Q2hbgKzKBRPLg+fd3eWcztoxW+rrbs4wwemKJS7AEQzloGVoj99YkZ4ZmrRTbwf6bXdzEx+jRdq9ghCyHbYSDldX6eTNUoQdQM70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YvHxoUmc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LsLrc0jI"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 701F0C4CEE4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 14:56:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YvHxoUmc"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7532CC4CEE4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 15:02:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742396183;
-	bh=XeRzBgQKq5MYfmEYv1+63DG9oJH1AlqPnUlCne0S1NU=;
+	s=k20201202; t=1742396549;
+	bh=9JRt77/AinlWaYdHfhYAlbv5ZlluRWCi1iHOvOZB+og=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=LsLrc0jIjKT146KJudW1rY2VP4CnjFalXrD4BbeLcbjq5irjDRuvWNDmLkFx7P88Q
-	 fDxfffJ5xY0voAk2mBPpwRnX+aJjx3oFF+gROJqx13oQjXo8e9YhL/Tf16eKONaG1a
-	 HGWPfO4556nFv+PQgHR0LhvAAvni8Hh0MhraIxVZUV/5jy9BaTO4xehFz9Wtj4XGmA
-	 4Jkb8NuoDAfpSzzpZShP3PIsQ54zsgTjgBJq1unc/arQYMHJPQAKY+GS5AV3suFIJz
-	 jdCrcGh2lRTcXeTM5LROPkfYnokN1+SBvDEXkITZHTpOVhefG65asSkR2X8tdcnzSu
-	 plR93/WclySPA==
+	b=YvHxoUmckug5h+TheBER1Cyt/rkL5qrgsyqLICoLgsJZxynn9ov1liMbL9lriMa2G
+	 CZdHdSf0eM1j6Ar1mBcVNkRExlZYSZ1g7PhKELz5x9rZGKeGgQFOFeSwB3khnYK3Na
+	 TttFkhNakqf4qvUBip6tprBub7ZprwDQpA4LMrXz/CUVJWoh8DfjLIOF/dLQpnkRLr
+	 PQluQHqh6daArJOGmeNYM8vw2CGsWjM//t2eivuVuw4xvZCSE+HsifowQdmdbSrNvK
+	 CPuO4G8lxrZoKqVjHEdMFUgpgoDOhqhgmBbuDe4sYMphS7/0g3KdNqpYqCKpfoSTlb
+	 l4aMPU4NL1hvA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 69B39C4160E; Wed, 19 Mar 2025 14:56:23 +0000 (UTC)
+	id 67F45C433E1; Wed, 19 Mar 2025 15:02:29 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 219898] BLE - Intel AX211 fails to Pair on first attempt but
  succeeds on second attempt (utilizing software-controlled bluez API via Dbus)
-Date: Wed, 19 Mar 2025 14:56:23 +0000
+Date: Wed, 19 Mar 2025 15:02:29 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,8 +47,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-219898-62941-hZJ2EW7CeJ@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cf_kernel_version
+Message-ID: <bug-219898-62941-nafBnMAQKM@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219898-62941@https.bugzilla.kernel.org/>
 References: <bug-219898-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,13 +64,24 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219898
 
---- Comment #3 from Hunter M (miller.hunterc@gmail.com) ---
-Created attachment 307863
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D307863&action=3Dedit
-Syslog when using Bluetoothctl
+Hunter M (miller.hunterc@gmail.com) changed:
 
-Syslog attached when using Bluetoothctl. Shows that
-new_long_term_key_callback() is hit on first Pair attempt.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+     Kernel Version|                            |6.13.7-arch1-1
+
+--- Comment #4 from Hunter M (miller.hunterc@gmail.com) ---
+uname -r
+6.13.7-arch1-1
+
+linux-firmware version 20250311
+(arch linux version 20250311.b69d4b74-3)
+
+Bluetooth: hci0: Found device firmware: intel/ibt-0040-0041.sfi
+Bluetooth: hci0: Firmware Version: 200-48.24
+
+Note that this bug has been reported to Bluez
+https://github.com/bluez/bluez/issues/1125.
 
 --=20
 You may reply to this email to add a comment.
