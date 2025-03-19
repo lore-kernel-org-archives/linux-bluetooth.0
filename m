@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E8014AD29;
-	Wed, 19 Mar 2025 18:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C9120B808
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 19:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742410195; cv=none; b=OEYJD+XWo1PmLwyEGZesDCJ8xHSUfErvB1Mg3Gfr+QRdQxop/YlezEfsGxI+GY/X98a6Cw7mxUv1AGcxLDcbmH1VonX5L12PsA9wKlBLMpEGK9RZHUvVHuQEj+SEN+O1wdprsdzJDlHlMm8ydstsrhFoFT6tgzESf2rrUF5liiE=
+	t=1742411399; cv=none; b=TnMVwoTsBEulffUWeXzv6Xfw6k2tmjj+jNaPVTJhgusKT8yYQJeL3hYESqwc5tNqYQ6sWejTtAkybVcgybBeHIvUrZ2AeoHVtVLDEN2P9qLRM669nJ/2NacNu30rKfhRrGzULno/kyrFDUhEkCXHVHp1DSt+9gifReagLmtAnTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742410195; c=relaxed/simple;
-	bh=rm4xirwhaDR5TIdx6kvxHxB5k9bRwwf2sUbhGhtC6l0=;
+	s=arc-20240116; t=1742411399; c=relaxed/simple;
+	bh=ELh1AqU3X9es8Nu1aZXzfXA12ZAkSA9yEdPZ+1sWJM4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AxbpL6LyGF0dJy2rg/djHyZPLL1oAeXLCbRfgmn2/+uaNJc/QIoFT+r+ZYpCPfyNpqlMnn6gTsz0D1zzxkk54ngxEH2O/gn9LtmJyubFPW5r2h+jtEifIY4fQcq/LdyJNdHPyNAbOA4f/EWVFQViCm0WHCzwkVwr4wBT+TZ4bcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPf1Qj1b; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=sBq8HEP+bfBO+/pubUcOhel1MeylvMTUvsMLl9spZR6LnKioT9pn6UObbe7OiuPFRvrvpKc4b0molIyZQKjJbCCLQYVeVWCBIj2S4/YUBV3tYfIyQRV+7tqJaVh7P1mQSEJhbXWc9GNL4Svrq0WqOhzEmvt2Ss5bmune92xl2yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmIxKIkk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPf1Qj1b"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C7C5C4CEEA;
-	Wed, 19 Mar 2025 18:49:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmIxKIkk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5306DC4CEE4;
+	Wed, 19 Mar 2025 19:09:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742410195;
-	bh=rm4xirwhaDR5TIdx6kvxHxB5k9bRwwf2sUbhGhtC6l0=;
+	s=k20201202; t=1742411399;
+	bh=ELh1AqU3X9es8Nu1aZXzfXA12ZAkSA9yEdPZ+1sWJM4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hPf1Qj1bFyq3/jXZtMYgCV9r6Fv488bi4xU8o2Xu8SYgO55GOzdOJCXZJvXmPZYZp
-	 ZA/w06lrkQV9vvap2hBbJWrD8yGkNBGhX7GGTtiYKyuVRuuBqtoCdR9v1o9km/YmqB
-	 IsOicz9Wbu6RDfB1rGvjX8rKC+OunuaunjzO+/6v/NT2H+xRQkvFuAoH7AYQzqGlwD
-	 g+RyASNOUr1kJj/gj2jkSDbFNNgFg9efMCJ1BzkvZxIz9s2loJCZozyEZ7Sz2OQ/gn
-	 H873Jq+RFYHL0X8qfn1vzqMyHNYNNho5LotL2Ju6OEGRZSvXrR5h4fAYd3SEj6YIlz
-	 hB1n8BYJq1/ow==
+	b=tmIxKIkkHdXzasVq0bg5rPb87VbyU3z1vuQK9kSv7GfsUkpGPKBqyHc9Dv2cwdzMi
+	 +E/U++6C3IvoySEsvXpWppEFplfXD4oysE6YiqyFV4pmPoMdUvzbZWQwWR31jHWeIs
+	 1lkNMEUd6OBRdz0OJUPSc0Tt/IsSLAFozdXMAjoAgu09ILxRGbDQX+N/sbVDKTtOdu
+	 cfRy4UsSSPQYoYanqUTT01tHUHquQHuQsBu5yot5vF1uRRP6UUyrC//lEJ4Rzu7mL6
+	 /9pSGqCvJDvxGQAhBcfoczv1oso6xqybc9/kzqYceYpvsvQ/kaO7VxjNGVDMnYRmw5
+	 35GKvoU4ci5Kg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EA2380CFFE;
-	Wed, 19 Mar 2025 18:50:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34758380CFFE;
+	Wed, 19 Mar 2025 19:10:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,43 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2025-03-14
-From: patchwork-bot+netdevbpf@kernel.org
+Subject: Re: [PATCH BlueZ 1/5] tools: iso-tester: add inclusion of time.h
+From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174241023127.1152495.8410585054247771618.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Mar 2025 18:50:31 +0000
-References: <20250314163847.110069-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250314163847.110069-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <174241143502.1158753.5729727884437482019.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Mar 2025 19:10:35 +0000
+References: <20250319103724.10433-1-ceggers@arri.de>
+In-Reply-To: <20250319103724.10433-1-ceggers@arri.de>
+To: Christian Eggers <ceggers@arri.de>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 14 Mar 2025 12:38:47 -0400 you wrote:
-> The following changes since commit 2409fa66e29a2c09f26ad320735fbdfbb74420da:
+On Wed, 19 Mar 2025 11:37:20 +0100 you wrote:
+> Inclusion of <linux/errqueue.h> requires that 'struct timespec' has
+> already been defined:
 > 
->   Merge tag 'nf-25-03-13' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2025-03-13 15:07:39 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-03-14
+> | In file included from ../bluez-5.79/tools/iso-tester.c:21:
+> | /usr/include/linux/errqueue.h:57:25: error: array type has incomplete element type 'struct timespec'
+> |    57 |         struct timespec ts[3];
+> |       |                         ^~
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] bluetooth 2025-03-14
-    https://git.kernel.org/netdev/net/c/a0aff75e1553
+  - [BlueZ,1/5] tools: iso-tester: add inclusion of time.h
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d26a7f96cdd4
+  - [BlueZ,2/5] mesh: include <time.h> before <ell/ell.h>
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6f26f2f8de7f
+  - [BlueZ,3/5] tools/btpclient: include <time.h> before <ell/ell.h>
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ba9f9fbde34a
+  - [BlueZ,4/5] client/player: fix printf format mismatch
+    (no matching commit)
+  - [BlueZ,5/5] shared/bap: fix printf format mismatch
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=50a01b0c17e9
 
 You are awesome, thank you!
 -- 
