@@ -1,153 +1,143 @@
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011063.outbound.protection.outlook.com [52.101.70.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7509A252912
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 10:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742380712; cv=fail; b=BkJJPnYrPt243sVf1zlbreDpMgZcdPljIpYD67GYeKWqoNNBOr1nb7ZNmzne2pdgOPEJzowFpDJhg8o841crob8k2lc1WNycterU03h87QCSuMv1u4GrWDYOXcrXvgednWgBXpxICk8FgVfDdZGjCa5IWSuFrRgB9+3fn7Huxg4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742380712; c=relaxed/simple;
-	bh=/FYWtueBur7TBQtEwvP2ONG0/3LY5wONG3uhzJRa5Ys=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IyvpIe7+ZNAP3bo5arZ0P5htW8G9VyVSC//Rc+54O1hGbiPEvLhwp9BxVVb4Sb+BnCwr0LqJZH3dVDSFa5xGT30OH3s7x6IDqEbG9BjU4j9vJBoCCsQ6ppl/GVZSgn1TKUxcEZg2s14abMDF6br1y3OMTEebbNAxVHiVRXiysqs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=fwGi6eQK; arc=fail smtp.client-ip=52.101.70.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FD7253B4E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 11:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742384207; cv=none; b=tLWQaz3sFo3j4TNzGx0QmALpXgfXkk435dd1bSyk6WfFqkJpMFPpSjh2ajyXljRKafy3QbHO6R1gAnJozi7us9bB8qayoRmd+l7FNQVwkbxMkgC1YXeS6gZ6UecvJlP2zDcdLxQXJe+ChpANtlfjLxRUYLj9qd//ZY7banXfFNI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742384207; c=relaxed/simple;
+	bh=YZnhUHzN0cZiYwzwjnYiceUizApQDS6+ZQVAXLUTBlk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=a/6cEug8cpbI0QpN1ti01NVCYSbGg1iF0o4tnArp3+UNpEhZuDiaRx0ZIWTp8nPxPrjGM84kp5jvLr9ETsZRqw8VLhufCLTbRznN42SXrydtwVOO96qt8OzkrGvi9Wpri+sWe4JRy4jvbrB4n7BV+mRn+wDGaXhj+pFtuFmTDns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K7I0rfHq; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="fwGi6eQK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N0pMlkjyV15JJYEr09Uzi66auVqjrda1m7E60jkaTxHfjinPGh//1l6YRe14Ug9vZqlhewRDqChmI8dPFFkAZwqwuM3spkRvuD11FJ3G07RAvhVCAOiZ35CFUMljAKWGrZQVqJOsbeR4UoC1Ru4WqVAHiKG3ut2koNFstn4ajDsDvva+t1O9ZDAGVGfvb0fU9EuZXpmHOF9FkATCxm8ukDjS1ZlPMqiH6Qzt1l/97ppxGfjQ0oEZhtWojrTmZcQjFUINeryK7zTP+Ry5KPmiKun0QoZcSybLICEf8UHXCSsysqz3VWMHAHBswZA6IATKY0ImcGP9JCh1iT/FIUla9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aOyfQDC2SaaZBKJP1grO9/Lwo8Fyb6eTUFMKlmtD8dc=;
- b=WQAypOIgl6O60dG7fFLBaVyQKHWMXHURM97fhAuOZOSNnqBdhLA//TMQ15Q9tofnYMKUJBCpnFNdW3VF6qtdon6dsCbk2aiRV49MxeUKF8opC1I70TZC6nwXwSosExyNZGLuasXZa70r6yX5/rLkMOEjofaXz8bphI25iEoe4NmQpMjDccpUGiKezXCWDiVfi7zAXRDuJTqRoy6BjfJ7JAhNuczUmEyDON/uabTodGlxqmRHxyGPsivHEH+ihAOXaQIWlxkgrQE8LwbEKm6gikhFPUnHUH4+pF4ZFG7krcTRAGMIu8aVl/CpxbaQnp3VlEkJRW+DuvD9dEu/T6P0Tw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aOyfQDC2SaaZBKJP1grO9/Lwo8Fyb6eTUFMKlmtD8dc=;
- b=fwGi6eQK3ViWOWUZopUTqPQzdb/jn+P5hELNUTd2feS+UeN08evCD00tpDdwCCgjxKXTijS78sbHSOh3f7MAACUQlohFxY1Y9g6HXOj8dWIlpLzTYMqOU+8RsuNAEqnmzoGylOH9LlnvTuzWx+lEZe/BMgot+yngg0HSqk38J7Q=
-Received: from AM9P250CA0021.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:21c::26)
- by DU0PR03MB8140.eurprd03.prod.outlook.com (2603:10a6:10:353::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Wed, 19 Mar
- 2025 10:38:22 +0000
-Received: from AMS0EPF00000190.eurprd05.prod.outlook.com
- (2603:10a6:20b:21c:cafe::23) by AM9P250CA0021.outlook.office365.com
- (2603:10a6:20b:21c::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.34 via Frontend Transport; Wed,
- 19 Mar 2025 10:38:21 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- AMS0EPF00000190.mail.protection.outlook.com (10.167.16.213) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.20 via Frontend Transport; Wed, 19 Mar 2025 10:38:21 +0000
-Received: from N9W6SW14.arri.de (10.30.5.20) by mta.arri.de (10.10.18.5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Wed, 19 Mar
- 2025 11:38:21 +0100
-From: Christian Eggers <ceggers@arri.de>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Christian Eggers <ceggers@arri.de>
-Subject: [PATCH BlueZ 5/5] shared/bap: fix printf format mismatch
-Date: Wed, 19 Mar 2025 11:37:24 +0100
-Message-ID: <20250319103724.10433-5-ceggers@arri.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250319103724.10433-1-ceggers@arri.de>
-References: <20250319103724.10433-1-ceggers@arri.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7I0rfHq"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-225477548e1so117949165ad.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Mar 2025 04:36:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742384205; x=1742989005; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Jow+4MtyYWM5e/hL5erHWLLe9Iz22RI3j5xUf38SmU=;
+        b=K7I0rfHqef3xvuPUZJr8cswsfgZ2jb7+GII7IpTxjKMSiW/HqqGnf+4UBg/oOLkBL6
+         tu9heIKqIrD/LDt8IWK16y0a9reIDOpkKiko2HmUPdRSVzyoKd22FsgIWewDrGnJIDNX
+         Tr0GgZTOszxLENgH1k+zz4K2eyv4OvXCSeHN5gvoI3qeBL6GF/IBdpdPVcX3SUwjQXgN
+         vgZMY7HM7m3IPOvOLVkI8EeN8ZTuPbK0THFPIhoMJT9BwXE3HVfvwF11zvFN9ZpLzfVd
+         MnhEQmyOWkwnfLz7ZYqOOsDEVt5qiBShw0SDW8eW4RQy/DPn7lLLOfSXlcGJ/mhdzkU3
+         XgHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742384205; x=1742989005;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6Jow+4MtyYWM5e/hL5erHWLLe9Iz22RI3j5xUf38SmU=;
+        b=fKApNupVjAe9IR9Xk8IV5NA5B/mVr4fBsyO1MXfxcoC45SCQVTb9s/tVpGl+Nodykj
+         w09uxJwnp5RLPsd4QlR270oE5fw1n5XiweAIv+B/6a7tQkBKVgM4GWSBsBWTtbVMO5QU
+         VQ4Gk0xBAt53KM+UFgLqdOhj6IwQH/skZkZ8w11ytddCw6E4Pt/WOQBnUNqeCODybfyi
+         HBoNKW16CbKnTohXVlJZua7UuCV1sDHIjxbVKZEUyLvZmcG4uGUlU+pJNXFzB7JcwdJR
+         PyDFunUrQ/99HeLQLyl4p70LRBMK6gCkxziaUV2+igevODpQcmJcdYJWhXBRDoghKeP1
+         95HA==
+X-Gm-Message-State: AOJu0YxCSG+x/TNHMrqAhV6Gvaha4YH4/KvMranjWwgTiBZ4g59CQ+zR
+	yQTWPtQ5CNgduWonm3UuEFUYHQP7QcRA/yDW5gfBDhsW8o2BBXBnw47tfw==
+X-Gm-Gg: ASbGncsMfFYSSfE1TJDHdyonOYSKOMSBV0qDLY/T0D2ojwWHVkoPT8T6qIyjoqPwRc5
+	e3/fxxwvuuMskwxHkppPnJ7ExnmBltNbDU88LTo+UjCLfXkmPCr/e/XJhtSy41+ZhpQ3aHjOjc3
+	+fn3IEooCVI2mHQXelkWMWSzP6jQ63EQSQJy/hrd+70PyctkLg9fQAxsOg5uGoaLWl7QHdeiCcI
+	PjEHSw3a3SaIWCc2HyhHq9m6Te2O97dUWnkUfu3hQ27h7rUlTMJpd+EENVfIMBnHxUutg8C3LgU
+	GH/bWZ9ZIILJhcBwrPodQPvN7liRiTuLVyMpWNgSQuegDW5vzSY=
+X-Google-Smtp-Source: AGHT+IEOdK7H1bvntIm+z7XqrnmiKJAui2bQpk+2NHtk9jGRjYy7ukmimqNPmR98IIs2cHjaAr1U/g==
+X-Received: by 2002:a05:6a00:298d:b0:736:b9f5:47c6 with SMTP id d2e1a72fcca58-7376d6d1349mr3880148b3a.16.1742384205070;
+        Wed, 19 Mar 2025 04:36:45 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.99.213])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7371152b5c7sm11766960b3a.13.2025.03.19.04.36.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 04:36:44 -0700 (PDT)
+Message-ID: <67daac4c.050a0220.75983.e4da@mx.google.com>
+Date: Wed, 19 Mar 2025 04:36:44 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5271139070789324572=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF00000190:EE_|DU0PR03MB8140:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ec7ec08-0be0-4424-2ed3-08dd66d22ba6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kpnD2a7t9+tsaaLLYznPOPDMPd24D7B07iR5cax6RAus9LTFYKvmVd8ZInOO?=
- =?us-ascii?Q?M6cpQBmt+YjlhmHy5ElJBzeU2Y1GlJFsstnaNw/maFxxlJJlR7pfelnQc2Ho?=
- =?us-ascii?Q?SYGkgWkTTTFRhYCaTeYxrJqm4wTszuJ7bs8+ThWP7Qm/aAv7R8g82GD2xo+T?=
- =?us-ascii?Q?QviRxMMInuHzhiL47y0ovQ7hh4ReFFZHZc861ghIXCsoeVkiKzFTZ4eY8EMV?=
- =?us-ascii?Q?ju/fXJUk7LiFDKlzT8Oo+QlOrKlLOeIY4e1mnkIx1NLNqpHgaWPuc/szjFFO?=
- =?us-ascii?Q?1wcVqa3Mn2gRB06nZkCCZ36U1CFJoKLSpw+VlCJF6lS15BRodl2H4leJ3V3y?=
- =?us-ascii?Q?othSlvui+TBKa8qaDbOHNWu4YGCDyF4/AW3pT3bzyU8We9oQ6aIRFm32/Iuq?=
- =?us-ascii?Q?RDMwA/D1yGMwYaPe35dRMDDs70jisKJsfqExkTNvrbA2NqiE5Lp2DRTCjsM9?=
- =?us-ascii?Q?pdI2iPwKGsYzJqzadQWGkTLcKWCN/DUlT99XKciiKYJqCdTxD7R+8AZM2/e4?=
- =?us-ascii?Q?T9UGSbcF3Tuz+Ds40Ey+0kIG1Me4zDp9pZOuBPrVJQW1SPLUsSDmFK2mt6jR?=
- =?us-ascii?Q?Hatw07QEbfBi8ovDIdGSRiTfuz3vd5W29nCn6QBxvBpzyUj2de9pkbVXzhUl?=
- =?us-ascii?Q?DhAj6O1zMBimww/mVhQx3Uf8oaw1VoepGy4NMUJT2w+31lrqG9CZ5/mr+84F?=
- =?us-ascii?Q?f9c1db4k8ehWpZPvIzh/Tp7fdWLW+22xz64g/gY4I89u/2feu9p0GUmrVW8m?=
- =?us-ascii?Q?12XjefLKVkDadCxT7RTs1eVx8Evw+487FO7AnKVSFEt++yDREwP4tWQPtjjV?=
- =?us-ascii?Q?oJcwdiZxg9ua6UMbim7TAHrWYgfbRgjDYpOCDUewIMqecA2VcxmwW72cVXJD?=
- =?us-ascii?Q?vxo0gW+1TKz3XUppyDfn3uEpcx7Zet++npYj81L29EAKZXI7njOCWFskIxhO?=
- =?us-ascii?Q?z/FjWQhNsdLWDfYpoASFxNHo0SwGxTevfhHrki9djChL/TTx8pokRKvDbAow?=
- =?us-ascii?Q?SqY9ooM8xU4THeY6gU5z0TWa2DAO3v7xiJeRxU6yJFcZfkMRCKKlQbOEslRR?=
- =?us-ascii?Q?yphsvn70mlYGLvItndhVOJzRvjEgCAJOphDKDunNmkecsFb+SoO2pNtogQ+u?=
- =?us-ascii?Q?aKGMqu+FKbkB4w6ZnzqOKQCDcmr/fxnKO16LZvqgQrQQIYaNxelk7WHeCCaN?=
- =?us-ascii?Q?9TeMlQW1QGFaqaH5Sfd+Z902F+h69irZEoMAxpaQFLxTMSDcu4OTRR7u5wWN?=
- =?us-ascii?Q?q6WIiaNiINB2FOwfzjgvP2//BZqdSp2nJ3NTASJ+aljirQtng+04U2h6ZMbc?=
- =?us-ascii?Q?xhci5/Tqpa5L9HexdmZFai9w5bIGO7r3Mzy1sIKQBtYHUq9BjUaWhpqCJnrW?=
- =?us-ascii?Q?v/E6ui383ukB09J9RjcSPUEGf67443zg4GnCD2axkBICZgNKTiReE/oQeMwy?=
- =?us-ascii?Q?ezLdRbx4x3I=3D?=
-X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 10:38:21.7486
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ec7ec08-0be0-4424-2ed3-08dd66d22ba6
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF00000190.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR03MB8140
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ceggers@arri.de
+Subject: RE: [BlueZ,1/5] tools: iso-tester: add inclusion of time.h
+In-Reply-To: <20250319103724.10433-1-ceggers@arri.de>
+References: <20250319103724.10433-1-ceggers@arri.de>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-struct iovec::iov_len is 'size_t' rather than 'long int'.
-https://man7.org/linux/man-pages/man3/iovec.3type.html
+--===============5271139070789324572==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=945530
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.23 seconds
+GitLint                       PENDING   0.26 seconds
+BuildEll                      PASS      20.50 seconds
+BluezMake                     PASS      1506.66 seconds
+MakeCheck                     PASS      12.74 seconds
+MakeDistcheck                 PASS      157.32 seconds
+CheckValgrind                 PASS      212.85 seconds
+CheckSmatch                   WARNING   282.90 seconds
+bluezmakeextell               PASS      97.90 seconds
+IncrementalBuild              PENDING   0.31 seconds
+ScanBuild                     WARNING   866.83 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+mesh/mesh-io-mgmt.c:524:67: warning: Variable length array is used.src/shared/bap.c:313:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:313:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:313:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+1 warning generated.
+tools/gatt-service.c:294:2: warning: 2nd function call argument is an uninitialized value
+tools/btgatt-server.c:1212:2: warning: Value stored to 'argv' is never read
+        chr_write(chr, value, len);
+        argv -= optind;
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+        ^       ~~~~~~
+1 warning generated.
+
+
+
 ---
- src/shared/bap.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 1cf0fcfb9b79..5d4d69d2925b 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -7313,7 +7313,7 @@ bool bt_bap_parse_base(struct iovec *iov,
- 	uint8_t sgrps;
- 	bool ret = true;
- 
--	util_debug(func, NULL, "BASE len: %ld", iov->iov_len);
-+	util_debug(func, NULL, "BASE len: %zd", iov->iov_len);
- 
- 	if (!util_iov_pull_le24(iov, &delay))
- 		return false;
-@@ -7359,7 +7359,7 @@ bool bt_bap_parse_base(struct iovec *iov,
- 		l2_cc.iov_len = l2_cc_len;
- 
- 		/* Print Codec Specific Configuration */
--		util_debug(func, NULL, "CC len: %ld", l2_cc.iov_len);
-+		util_debug(func, NULL, "CC len: %zd", l2_cc.iov_len);
- 		bt_bap_debug_config(l2_cc.iov_base, l2_cc.iov_len,
- 								func, NULL);
- 
--- 
-2.43.0
 
+--===============5271139070789324572==--
