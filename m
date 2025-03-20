@@ -1,156 +1,185 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C27155A25;
-	Thu, 20 Mar 2025 14:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664C91D5CCD;
+	Thu, 20 Mar 2025 14:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742481797; cv=none; b=gSgcV/s2ZBMUTJ9oOkEHLfnY0sfvokzsH36dC6uxignq47+VLE/n6qF6wcr7SqZ5xKU2zD73gRpMpgVNYm3zhYsGSQcR3wdO+NyEWTI0+fA2/kd2UL2bqy0mvMkCaGprMqyYa/N+FCgJLuk10wIxBO0v/l0mTF21N4icE9vGIKQ=
+	t=1742482197; cv=none; b=rCa/tqcD9dODZc5T7yP6vdO6zVtIS1AC+UAj95Do8EOaclieosI3cLEPNufmIEBKjwe0asRwoHfPNWg/Awair1oPebZMPZr5icJrm3OhzqDxbAisDinYeLuhjUZALswmy8n5zeYH7+StpcdvZWDhSQF6b1pQnUypwqDnhwNfGXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742481797; c=relaxed/simple;
-	bh=xdTfcSk/e8jyJr0vBxzXrOtHZlW6oDVogzoYsC5f3M0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j33zs+zo4aMpWas3MrSJqRgyaX+Muaz8j/jA2mdPuB7CUm/sk/QK8Pvzdns1dP5rq8YwnUipRLJMUPD3xv4BJ+nxSPkwDhFlPIyEGKU2C1YsUImu2h8Y5j+Oe9/EgzWFD5IOjHRTGk71r0ympGJeN+iefD/yG9impcE8QyJMzu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=daWDCXXJ; arc=none smtp.client-ip=209.85.208.175
+	s=arc-20240116; t=1742482197; c=relaxed/simple;
+	bh=g+zzHx89ZVOsZ1+j0S/ETcKko5Sah4yuDyoEtdyMynM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=epVDZaH9zArCwYILUe2kbCCZouJ06IIUPP7qphNpPvb9aIFHaIW4/WllAZHflXXYLnthElbS0kF2FC18Z9ZKTalZb80Zvc2VzTE/d216LHfftE3YyIwP3tBxZuHYfoeMxHlCw2v6KXdox5AQb8Jt+VlnHZ0eC7LS0hKoVtZKsV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zrwn+tGM; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="daWDCXXJ"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-307bc125e2eso9972201fa.3;
-        Thu, 20 Mar 2025 07:43:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zrwn+tGM"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4769f3e19a9so5474621cf.0;
+        Thu, 20 Mar 2025 07:49:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742481793; x=1743086593; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1742482194; x=1743086994; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zawsEvfSPE3Ae0ASL3bJZhMYC8bn/dwArZppWUwszh4=;
-        b=daWDCXXJEENpfv+tMWCA3n5gj3aZHncNns9zul9aZhPKJZKDQ6aPHLeS6XSx9+ZP4T
-         Lz3jq+2aXLfj8Hry/pMO5YwVDV1IQdsVIhRbSo+yNAOc0gQXrhCiWvFVCfHmngurEJ5P
-         OZaVYWAG8AV/tqLjqQ2XEEM1yp8cY/TaFzZnu7mvZbNy3AZ3q2IjeyyEAG7lHP7uGCo4
-         5RU7TnsOm8qw4pD0qdoDMWqEJU+G7m+wLEF2ZgUteVlYwXbQHePBv1PL0k6pBGt6y/kj
-         zmcjePLojvgezb8kLeURD5lracCpgLlFP/cwjJKJME9kZfhLFCMM8ZCok3Gaw9hQjZf4
-         9W2w==
+        bh=lTxdgXG9b8klrJS1MbOgXiJ35hJw0juxUhnYlYWpU2c=;
+        b=Zrwn+tGM5HLvdm69lKx3kWSQhTMjlskLmWWLGl4n/oo9B5Tx8uAdIAYy0fH3shMwlW
+         QXc9USoEVMdcFiCOoKBvP2Ia75U/yN2Vgo9Z33JNDXXjpy6Y18JpcD5hBX/GE5Fg+lQp
+         bJe9AEYaLHr7nUltn8mBqTmODfMU66VmMSwQ8zPczALjFk3tgpd97jN9N10l/xh4BvZ0
+         4bxKcHRe8MEJisXG7MyEDARj5z3V8oAdDtZgaiT7hKD7IL+H+jCDWw1YFdpkyfsPxPXZ
+         gNxPZUGVZQkW2MY+BUYVtQh5BNdLbEwq2QK250LYObgrXrkrJJ0HlC8rNSD2DC36k7hn
+         wlPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742481793; x=1743086593;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zawsEvfSPE3Ae0ASL3bJZhMYC8bn/dwArZppWUwszh4=;
-        b=GrZhNRO2WVUMt7EQ1ECvCcs/YxcvQm/93j/W6RvDvq10i5MhzYguATFa/2KpX/TsBp
-         c5Pd38wyr1MH6PFNluSo/kjVsR2s2seAxp5c1cj4IFEJLLwIugriCKMlMWrMxgnUTNtk
-         /NtYyyoHCoUxIwhCzhSccLWLfKIuhKBAsyWp3BqCazI6f3+65mQi/m7r/yc8bl8Z6zpr
-         ZkVwtZsD5FQEEKG3qu74Xu0CDNIlvN4Tvv8oPtUF10BS4uxiLD8O9BmQyRszp0FtcnCb
-         ZZHf//AySbsPHHml8bRiO7rF2s7yvexdFhzJLqpwrAQ51sQpQ/DUaq/CLfFIxqMdWY6Y
-         H10w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhg5NDVzOuz/nNcmDlIMOCnM2Kw95nFjUF2EyhaReGPz6ZH3nTBGYxBVr+6O47qwVY4jsd/rsw@vger.kernel.org, AJvYcCXsK4k9plQ/6e7PJHbtJ8HBCR9Zo6MMzEhtIjNJiEHFYQ332uCQjich5SkEpEc37bNjP35tict5L0E1d9NAkQ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZn9UHjb6t4VxkyDdpNUGS+wKtks5fKwwffLxGQVwCC07SX7AD
-	fA5iEEKxOwGN5ZnYPo6CSxgCnde2cv8KXzJVd7zSAlIkm39y9Jmu4S+Mok9i2Fho863YIykVX7A
-	KSmabOogmZeBMaAYSYPAuhUjS+HE=
-X-Gm-Gg: ASbGncsGqpAubJlCSmnJGpKIHvlF2I/0ENTL2JapeGeIn/rAvqq3VECD25OG/a5BYoT
-	GXPsgs8IM2dORmG7CX3m9q8p1YarDnjf2mrtcdcMPM889DpP7T02P0QOjfI24/eeRx9r6rIC8ml
-	samjJ/EgbvOOEwUrucwShOsL/Z
-X-Google-Smtp-Source: AGHT+IHkiFY9/QFe4mg8V1fWWKKLgWuX/l2HgYGY/LfxmHIReYGicT7Wk3zR9k9bZGXdwWYBMWVeVFq23+OMEspxbN4=
-X-Received: by 2002:a05:651c:a0a:b0:30c:160b:c741 with SMTP id
- 38308e7fff4ca-30d6a3d5ab3mr25588321fa.6.1742481793104; Thu, 20 Mar 2025
- 07:43:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742482194; x=1743086994;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lTxdgXG9b8klrJS1MbOgXiJ35hJw0juxUhnYlYWpU2c=;
+        b=Ufver8uMd8T37cqKX3ZAqTyuJwMHRazB0W+h8DUSBXzcG72aW6vYDZyOj3wvBkc6lw
+         AVCDhQJKpUQQShyjcZwrz4M5q7dHkVp8cv5MUU4HWFNPP86n6tPAODjTn2Y6FCYV6Xe7
+         QhlHhbTzsnduZ8M8NvPjn5lAuq9kVI0G0Z2BUI+q51dDRpMzpYnbWMZwllkDQ6uur6ax
+         euQogwmxkMZnAkOUx4b6ogcUS4GIqxl7O4EXMG1gz1KwbBojJ76wrq8dtq0PqmMhx/mj
+         xmJmw2Kb+cV2XQFzooZ4IGX+JUN+BwtI7YF5VMBjiCcdrU4raqHQVhtkFmAluBG2E9oY
+         RykA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYmnPc+AgZ+RAGA0sIyju0uL2nYBoRvVCY3bOE1ufigv+AyntYkBu4yauigJPrF+np6BXb4IC6@vger.kernel.org, AJvYcCXtOf5brDExFZiNtalcql/qR2ZBcBTH6IejJw35LWgSVNjy22Sus9Cd2fqIlTsT1doo1Obfcl/nbcyLCR+scDQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVHKR2bzcX3+nJl3B02I9A26GKd4I2Ary2Y9v/WNNHvoWmCsUH
+	Ql1GRmdwv2NomaVTLA/vypJaOAVnltjomLAFaioArWWVkOalOUXL
+X-Gm-Gg: ASbGnct5HCNR1ElK91ovNfR5Z0CnSDt7KF3Y54eD4oUSyU1DNPdtsLYCXR8FCFnKJey
+	UCtVhSmfr/gywZP5K5/9SqUGgsjaccxidW50lh8LG86uAE3CxNJH7LnLma2mZmp1M94Dk9XZnQA
+	04nafgh+NUK709gZNkbompeQxDU7HKYccvGzY/f9R3wqcYf3zz7ONLBcl1KcKnyZfM+rdnEtpQ0
+	8XaJ0+Jja+Cpo9ODpsga7kkENlJKuAxpmB75dbML82ESj58HpGXVBlztZXewgwGMUhzMDUACpwC
+	XY5QmgFpCuqLgvmbtqUpOQg5zQvKcHztMfzUD6AM0UngDzRtaBgxbCOzUNcOEkuEURz4xVsV4J2
+	X9DN4cKdnkiJ6x5LfhqqNOA==
+X-Google-Smtp-Source: AGHT+IFtT0hSw7HraNbw576jDJbpoIeXcmG2BCJkM4+BmItxY4vf6/QI2fZfsREyRD5o2pRrk5pFGg==
+X-Received: by 2002:a05:622a:230a:b0:476:a895:7e82 with SMTP id d75a77b69052e-47710dd04c0mr70818741cf.50.1742482194174;
+        Thu, 20 Mar 2025 07:49:54 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d179ea2sm27451cf.27.2025.03.20.07.49.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 07:49:53 -0700 (PDT)
+Date: Thu, 20 Mar 2025 10:49:53 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Pauli Virtanen <pav@iki.fi>, 
+ linux-bluetooth@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <67dc2b111b3cf_a8274294af@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CABBYNZJk2QjUaJCurAocMAJdOTfFHCjKO_S2rcxWLwTv8K9VDw@mail.gmail.com>
+References: <cover.1742324341.git.pav@iki.fi>
+ <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+ <6cf69a7e-da5d-49da-ab05-4523f2914254@molgen.mpg.de>
+ <CABBYNZJk2QjUaJCurAocMAJdOTfFHCjKO_S2rcxWLwTv8K9VDw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/5] net-timestamp: COMPLETION timestamp on packet tx
+ completion
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1742324341.git.pav@iki.fi> <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
- <6cf69a7e-da5d-49da-ab05-4523f2914254@molgen.mpg.de>
-In-Reply-To: <6cf69a7e-da5d-49da-ab05-4523f2914254@molgen.mpg.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 20 Mar 2025 10:43:00 -0400
-X-Gm-Features: AQ5f1JrIJNLT3MvHXMnbcByEP50gDRiAnXlfZCMHT5d20iPY_LpbRuGLz3fQ0P4
-Message-ID: <CABBYNZJk2QjUaJCurAocMAJdOTfFHCjKO_S2rcxWLwTv8K9VDw@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli, Willem, Jason,
+Luiz Augusto von Dentz wrote:
+> Hi Pauli, Willem, Jason,
+> =
 
-On Wed, Mar 19, 2025 at 11:48=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de=
-> wrote:
->
-> Dear Pauli,
->
->
-> Thank you for your patch. Two minor comments, should you resend.
->
-> You could make the summary/title a statement:
->
-> Add COMPLETION timestamp on packet tx completion
->
-> Am 18.03.25 um 20:06 schrieb Pauli Virtanen:
-> > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
-> > when hardware reports a packet completed.
+> On Wed, Mar 19, 2025 at 11:48=E2=80=AFAM Paul Menzel <pmenzel@molgen.mp=
+g.de> wrote:
 > >
-> > Completion tstamp is useful for Bluetooth, as hardware timestamps do no=
-t
-> > exist in the HCI specification except for ISO packets, and the hardware
-> > has a queue where packets may wait.  In this case the software SND
-> > timestamp only reflects the kernel-side part of the total latency
-> > (usually small) and queue length (usually 0 unless HW buffers
-> > congested), whereas the completion report time is more informative of
-> > the true latency.
+> > Dear Pauli,
 > >
-> > It may also be useful in other cases where HW TX timestamps cannot be
-> > obtained and user wants to estimate an upper bound to when the TX
-> > probably happened.
 > >
-> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > ---
+> > Thank you for your patch. Two minor comments, should you resend.
 > >
-> > Notes:
-> >      v5:
-> >      - back to decoupled COMPLETION & SND, like in v3
-> >      - BPF reporting not implemented here
+> > You could make the summary/title a statement:
 > >
-> >   Documentation/networking/timestamping.rst | 8 ++++++++
-> >   include/linux/skbuff.h                    | 7 ++++---
-> >   include/uapi/linux/errqueue.h             | 1 +
-> >   include/uapi/linux/net_tstamp.h           | 6 ++++--
-> >   net/core/skbuff.c                         | 2 ++
-> >   net/ethtool/common.c                      | 1 +
-> >   net/socket.c                              | 3 +++
-> >   7 files changed, 23 insertions(+), 5 deletions(-)
+> > Add COMPLETION timestamp on packet tx completion
 > >
-> > diff --git a/Documentation/networking/timestamping.rst b/Documentation/=
-networking/timestamping.rst
-> > index 61ef9da10e28..b8fef8101176 100644
-> > --- a/Documentation/networking/timestamping.rst
-> > +++ b/Documentation/networking/timestamping.rst
-> > @@ -140,6 +140,14 @@ SOF_TIMESTAMPING_TX_ACK:
-> >     cumulative acknowledgment. The mechanism ignores SACK and FACK.
-> >     This flag can be enabled via both socket options and control messag=
-es.
-> >
-> > +SOF_TIMESTAMPING_TX_COMPLETION:
-> > +  Request tx timestamps on packet tx completion.  The completion
-> > +  timestamp is generated by the kernel when it receives packet a
-> > +  completion report from the hardware. Hardware may report multiple
->
-> =E2=80=A6 receives packate a completion =E2=80=A6 sounds strange to me, b=
-ut I am a
-> non-native speaker.
->
-> [=E2=80=A6]
->
->
-> Kind regards,
->
-> Paul
+> > Am 18.03.25 um 20:06 schrieb Pauli Virtanen:
+> > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software times=
+tamp
+> > > when hardware reports a packet completed.
+> > >
+> > > Completion tstamp is useful for Bluetooth, as hardware timestamps d=
+o not
+> > > exist in the HCI specification except for ISO packets, and the hard=
+ware
+> > > has a queue where packets may wait.  In this case the software SND
+> > > timestamp only reflects the kernel-side part of the total latency
+> > > (usually small) and queue length (usually 0 unless HW buffers
+> > > congested), whereas the completion report time is more informative =
+of
+> > > the true latency.
+> > >
+> > > It may also be useful in other cases where HW TX timestamps cannot =
+be
+> > > obtained and user wants to estimate an upper bound to when the TX
+> > > probably happened.
+> > >
+> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > ---
+> > >
+> > > Notes:
+> > >      v5:
+> > >      - back to decoupled COMPLETION & SND, like in v3
+> > >      - BPF reporting not implemented here
+> > >
+> > >   Documentation/networking/timestamping.rst | 8 ++++++++
+> > >   include/linux/skbuff.h                    | 7 ++++---
+> > >   include/uapi/linux/errqueue.h             | 1 +
+> > >   include/uapi/linux/net_tstamp.h           | 6 ++++--
+> > >   net/core/skbuff.c                         | 2 ++
+> > >   net/ethtool/common.c                      | 1 +
+> > >   net/socket.c                              | 3 +++
+> > >   7 files changed, 23 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/Documentation/networking/timestamping.rst b/Documentat=
+ion/networking/timestamping.rst
+> > > index 61ef9da10e28..b8fef8101176 100644
+> > > --- a/Documentation/networking/timestamping.rst
+> > > +++ b/Documentation/networking/timestamping.rst
+> > > @@ -140,6 +140,14 @@ SOF_TIMESTAMPING_TX_ACK:
+> > >     cumulative acknowledgment. The mechanism ignores SACK and FACK.=
 
-Is v5 considered good enough to be merged into bluetooth-next and can
-this be send to in this merge window or you think it is best to leave
-for the next? In my opinion it could go in so we use the RC period to
-stabilize it.
+> > >     This flag can be enabled via both socket options and control me=
+ssages.
+> > >
+> > > +SOF_TIMESTAMPING_TX_COMPLETION:
+> > > +  Request tx timestamps on packet tx completion.  The completion
+> > > +  timestamp is generated by the kernel when it receives packet a
+> > > +  completion report from the hardware. Hardware may report multipl=
+e
+> >
+> > =E2=80=A6 receives packate a completion =E2=80=A6 sounds strange to m=
+e, but I am a
+> > non-native speaker.
+> >
+> > [=E2=80=A6]
+> >
+> >
+> > Kind regards,
+> >
+> > Paul
+> =
 
---=20
-Luiz Augusto von Dentz
+> Is v5 considered good enough to be merged into bluetooth-next and can
+> this be send to in this merge window or you think it is best to leave
+> for the next? In my opinion it could go in so we use the RC period to
+> stabilize it.
+
+I'm fine with merging as is.
+
+Most of my comments were design points for consideration. If Pauli
+prefers as is, no objections from me.
+
+For the series:
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+
