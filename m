@@ -1,88 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43252227E9F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Mar 2025 21:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4D616F858
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Mar 2025 23:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742504999; cv=none; b=ngt1AB9Gp17D4cojYjsQryoJqQ3vdt3yid9EEnGQsge86+fslehfdGjj2fNjUaTu/loFWJvl3vzXGXKpVNUJoAbpQoQG/rFrlBgfvmwJT96kqaSCndCEMo3DO2+k5g2F4t5URKnNmoZgLVjjoo8GkNny9wcbkbGvATMucNiNmOg=
+	t=1742514516; cv=none; b=HrGNhbsBUVxbDaXuzTuugUHTDInsSKr7q/QD9Y9ECJ31+FosjQ20fYv7j7iDaU6S9r9V+MmLC2EbiHMQ8gi/o+0TijBDWdKZY7/2FpQM6mrM7ClXKDAqPX+tomSTmdsGPjHt5ghKtXt9Q+aOyd2sDRaFtg23zfyZD0tyca+odCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742504999; c=relaxed/simple;
-	bh=G5Exs7o267Si3GXzJTCNeidxxTLEawdUhgnSqHiKkZ0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=lfZZmmK9cPVBbGF2rreco8kGguNBPdqH5XTKNtn6pKuupiG/s4YjfifaVA2SpoSRWaCGBk82ozuoSA+ih1oJOyDW7uLv96czqLBywp4Bo/8aLiHaAyuCbOMj97oKG4KAVuLNtGWubN7SLl5XUIONkxVa1ApRhopY7H12G3qaqTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bWM16eUR; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bWM16eUR"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BB475C4CEE3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Mar 2025 21:09:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742504997;
-	bh=G5Exs7o267Si3GXzJTCNeidxxTLEawdUhgnSqHiKkZ0=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=bWM16eURmo0Mr9Wm24F5hS+LzSowsvELUFm4JQRJMIc8WDcnB3mAeSb1t6BpQ6G6a
-	 NQaM8SiJWgpxGSffwiqMhfw3bFcCx4UUFbheUC3tbY/DvZ4dPbBHwJ0ZZQfqoKz08F
-	 62bD5RPKWxPNqq8nJMyE5ZsV5QMN2IMMKZ+gEuQABP1FQNEp6WVGMlWTAkN/yx+4im
-	 b/T8VSC3bFjlhqHMQFG3U9Wl1Uen8qitH/RnEbxTZE7+93p2leeMIUgnmMWM9wHf81
-	 OE1Otn+1m5mdSLwIucGaNWWHr41MNQpZjHyMh4etV2qst7B//3s/gESdAepxWAe2TY
-	 /4IDINIu823Eg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id AAB4DC3279F; Thu, 20 Mar 2025 21:09:57 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219898] BLE - Intel AX211 fails to Pair on first attempt but
- succeeds on second attempt
-Date: Thu, 20 Mar 2025 21:09:57 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: miller.hunterc@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219898-62941-vsJIJx4pTj@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219898-62941@https.bugzilla.kernel.org/>
-References: <bug-219898-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1742514516; c=relaxed/simple;
+	bh=/67vlHR+yzivopGOH8NnRt+rwnIBGuEuYA3AcqPzAbw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=S8V1cGvPtYpGfxjcAQYr3rKBVjmFSTLKvHJ0EDtA+02Q7YofX8f9Z+hWP2/gGBL+aHPBUOdHQwAGtyHTe8dGg4ykT79OyCsltEgV3z0zL15/oXwHW0cZDJcVy79SF/7iNqfxe/XRk7KtLVv1ofdHbKXKT/lC1hpDmUBh9dqsN68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3cfb20d74b5so18039945ab.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Mar 2025 16:48:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742514513; x=1743119313;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j2Z8Qd5/Rkca80sOD11PnGP8NP8AwU91dlrNXFMEDds=;
+        b=qH6LQLZsL8yno24lm2fq31n0eivoBoETgcDToFDTcyKAuE8HvltyjI1EDNA3zSWJXX
+         KjOzSlUuBAaaZy/4VJbHzE66u3LdFGjhZtICxgV3q0SZD3zwZ2OOMESOY1xhpAgIRGt0
+         898mch9B5qr/tlbzXH184t11f/7WDxPuu8RKkyrPldILgY4nqYPHGTL5hWZFxpvCtdgK
+         Bu4k+GBzzTDsQ2I6WOo6orVjB21WeWY42nwMW+4cQd64nPs9WmkCoT9gjqqlSn+zNSgb
+         mPT0PoTGIZlwGmgqqq+vv0e72wTPDX+8hBb/pjcRVX0HmRB15myq13m3gnL4PrUjFLCh
+         lxeg==
+X-Gm-Message-State: AOJu0Yw6QdTVN6N1tk6VVkzk+il3BP3bR31vXGQBb64g4F5dktACg8O/
+	sryORADIapDFzpTivZPPkMEGzOcJmvQKPWwukdCyuCRg93E1cmikQ03WCnCBMv1SUY9Q8iMCmgc
+	5jaFJBSUhJw4F8g51oxHT2yQsaGbyOh/j0EUv8U+rWCeQ+jTrjOHRTXw=
+X-Google-Smtp-Source: AGHT+IGnEdHU8/Go9DITU/jHDTM/nXkAFLf0Cg8GY21geJeZjfySh3tD9Pt8sFMOxHAXPjz56PIWkq7OGgRLHBf+qAsQcurPYtmG
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:2783:b0:3d4:700f:67e2 with SMTP id
+ e9e14a558f8ab-3d5960f2e60mr12763565ab.10.1742514512886; Thu, 20 Mar 2025
+ 16:48:32 -0700 (PDT)
+Date: Thu, 20 Mar 2025 16:48:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67dca950.050a0220.25ae54.0029.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Mar 2025)
+From: syzbot <syzbot+list4dde778597ae28b2ed4e@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219898
+Hello bluetooth maintainers/developers,
 
---- Comment #8 from Hunter M (miller.hunterc@gmail.com) ---
-After further testing, issue does occur utilizing bluetoothctl as well. On =
-the
-first Pair attempt, org.bluez.Error.AuthenticationCanceled occurs.=20
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-On the second attempt, pairing is successful.=20
+During the period, 6 new issues were detected and 0 were fixed.
+In total, 58 issues are still open and 79 have already been fixed.
 
-This issue can be duplicated by removing the /var/lib/bluetooth/<adapter
-address>/<remote device address>/ folder and restarting the bluetooth.servi=
-ce
-(systemctl restart bluetooth).
+Some of the still happening issues:
 
-Seems that without the cached attributes/info, this issue arises. However, =
-if
-the BLE peripheral attributes/info is stored in /var/lib/bluetooth/<adapter
-address>/<remote device address>/ folder, the issue does not occur.
+Ref  Crashes Repro Title
+<1>  32796   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
+                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
+<2>  6267    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<3>  1289    Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<4>  313     Yes   WARNING in hci_conn_timeout (2)
+                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
+<5>  312     Yes   KASAN: slab-use-after-free Read in force_devcd_write
+                   https://syzkaller.appspot.com/bug?extid=bc71245e56f06e3127b7
+<6>  212     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
+                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+<7>  163     No    WARNING in l2cap_chan_del
+                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+<8>  129     Yes   BUG: sleeping function called from invalid context in lock_sock_nested (3)
+                   https://syzkaller.appspot.com/bug?extid=55cd5225f71c5cff7f6f
+<9>  89      No    KASAN: slab-use-after-free Write in sco_conn_put
+                   https://syzkaller.appspot.com/bug?extid=55d58a05f0b5fd2ea0c7
+<10> 47      Yes   WARNING in hci_recv_frame
+                   https://syzkaller.appspot.com/bug?extid=3e07a461b836821ff70e
 
---=20
-You may reply to this email to add a comment.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
