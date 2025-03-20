@@ -1,185 +1,144 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664C91D5CCD;
-	Thu, 20 Mar 2025 14:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B83A1DC185
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Mar 2025 15:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742482197; cv=none; b=rCa/tqcD9dODZc5T7yP6vdO6zVtIS1AC+UAj95Do8EOaclieosI3cLEPNufmIEBKjwe0asRwoHfPNWg/Awair1oPebZMPZr5icJrm3OhzqDxbAisDinYeLuhjUZALswmy8n5zeYH7+StpcdvZWDhSQF6b1pQnUypwqDnhwNfGXU=
+	t=1742484861; cv=none; b=kXxYxjyCYpT7WHXtv2Ds5Gjz9EFOL1MfRhpqWHtgeaW1XLioVTsf3eDgPyctI2ALsXzE6iOa5Mypjs3OLuc8zqX9vZENSIwKMOdL+axO+thxO9pROkdnixOXtZb9pr8yIXu4XblK1vNp6CYn76clDXII4Mle4lirkU1uc9nvo7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742482197; c=relaxed/simple;
-	bh=g+zzHx89ZVOsZ1+j0S/ETcKko5Sah4yuDyoEtdyMynM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=epVDZaH9zArCwYILUe2kbCCZouJ06IIUPP7qphNpPvb9aIFHaIW4/WllAZHflXXYLnthElbS0kF2FC18Z9ZKTalZb80Zvc2VzTE/d216LHfftE3YyIwP3tBxZuHYfoeMxHlCw2v6KXdox5AQb8Jt+VlnHZ0eC7LS0hKoVtZKsV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zrwn+tGM; arc=none smtp.client-ip=209.85.160.171
+	s=arc-20240116; t=1742484861; c=relaxed/simple;
+	bh=A74eMZJRJ6gERM/X4hoPCchXy0M0NEMYK8/YzuRCSWY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gL++coJNpk4bj07+hrDjXnuNQXxYD4gZF16YpxLrMEz8O0hzRjNXzVHt8Yc0YOyuVHjU4ik/dtuWwKlBl+y1U+8vqUltIqq/AkeH5mfoa1M9uMfDf0UxW5wXnZyROW0IZiKxivE8UeqVrFFLZNuGoWcI85H0vqsNsuWW2saejiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lt4tyD0K; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zrwn+tGM"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4769f3e19a9so5474621cf.0;
-        Thu, 20 Mar 2025 07:49:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lt4tyD0K"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-523edc385caso386289e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Mar 2025 08:34:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742482194; x=1743086994; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lTxdgXG9b8klrJS1MbOgXiJ35hJw0juxUhnYlYWpU2c=;
-        b=Zrwn+tGM5HLvdm69lKx3kWSQhTMjlskLmWWLGl4n/oo9B5Tx8uAdIAYy0fH3shMwlW
-         QXc9USoEVMdcFiCOoKBvP2Ia75U/yN2Vgo9Z33JNDXXjpy6Y18JpcD5hBX/GE5Fg+lQp
-         bJe9AEYaLHr7nUltn8mBqTmODfMU66VmMSwQ8zPczALjFk3tgpd97jN9N10l/xh4BvZ0
-         4bxKcHRe8MEJisXG7MyEDARj5z3V8oAdDtZgaiT7hKD7IL+H+jCDWw1YFdpkyfsPxPXZ
-         gNxPZUGVZQkW2MY+BUYVtQh5BNdLbEwq2QK250LYObgrXrkrJJ0HlC8rNSD2DC36k7hn
-         wlPQ==
+        d=gmail.com; s=20230601; t=1742484858; x=1743089658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6FdTCwqMzkmFdWitB2V5bgPRQJHyyKDjK4an6/4ZyU=;
+        b=Lt4tyD0K7BRR4gXVOFzovmJ4FWhWUn3UatPrH5NB6VYSz9pJTAvh06P/cSgwt31H8k
+         NZEd/7OMdlVwQJQd0TXkHXqXJFbODDlZPDn/6ufmdMRfjSYV9t7vaXqRjfRa9cyEzKza
+         N6qntCrRyePxcidR6xx3f/u90yRSdU5rsSe+Cv7QYUS6wPGJOHANddiaW0QOSJmYywyq
+         gc9ToXAeD8FGqXbtiScXTpgNx44U6ncetAVxHCyjmI26MOvZl25o42YUNgkfoQpgb4Rs
+         gJeI3phjZZvYz5GLoL0gIyoTmNEtvELJUgr6t/8PnmCLLKC7Yb3hdNGOKloKlEGIQ0ow
+         19LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742482194; x=1743086994;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lTxdgXG9b8klrJS1MbOgXiJ35hJw0juxUhnYlYWpU2c=;
-        b=Ufver8uMd8T37cqKX3ZAqTyuJwMHRazB0W+h8DUSBXzcG72aW6vYDZyOj3wvBkc6lw
-         AVCDhQJKpUQQShyjcZwrz4M5q7dHkVp8cv5MUU4HWFNPP86n6tPAODjTn2Y6FCYV6Xe7
-         QhlHhbTzsnduZ8M8NvPjn5lAuq9kVI0G0Z2BUI+q51dDRpMzpYnbWMZwllkDQ6uur6ax
-         euQogwmxkMZnAkOUx4b6ogcUS4GIqxl7O4EXMG1gz1KwbBojJ76wrq8dtq0PqmMhx/mj
-         xmJmw2Kb+cV2XQFzooZ4IGX+JUN+BwtI7YF5VMBjiCcdrU4raqHQVhtkFmAluBG2E9oY
-         RykA==
-X-Forwarded-Encrypted: i=1; AJvYcCXYmnPc+AgZ+RAGA0sIyju0uL2nYBoRvVCY3bOE1ufigv+AyntYkBu4yauigJPrF+np6BXb4IC6@vger.kernel.org, AJvYcCXtOf5brDExFZiNtalcql/qR2ZBcBTH6IejJw35LWgSVNjy22Sus9Cd2fqIlTsT1doo1Obfcl/nbcyLCR+scDQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVHKR2bzcX3+nJl3B02I9A26GKd4I2Ary2Y9v/WNNHvoWmCsUH
-	Ql1GRmdwv2NomaVTLA/vypJaOAVnltjomLAFaioArWWVkOalOUXL
-X-Gm-Gg: ASbGnct5HCNR1ElK91ovNfR5Z0CnSDt7KF3Y54eD4oUSyU1DNPdtsLYCXR8FCFnKJey
-	UCtVhSmfr/gywZP5K5/9SqUGgsjaccxidW50lh8LG86uAE3CxNJH7LnLma2mZmp1M94Dk9XZnQA
-	04nafgh+NUK709gZNkbompeQxDU7HKYccvGzY/f9R3wqcYf3zz7ONLBcl1KcKnyZfM+rdnEtpQ0
-	8XaJ0+Jja+Cpo9ODpsga7kkENlJKuAxpmB75dbML82ESj58HpGXVBlztZXewgwGMUhzMDUACpwC
-	XY5QmgFpCuqLgvmbtqUpOQg5zQvKcHztMfzUD6AM0UngDzRtaBgxbCOzUNcOEkuEURz4xVsV4J2
-	X9DN4cKdnkiJ6x5LfhqqNOA==
-X-Google-Smtp-Source: AGHT+IFtT0hSw7HraNbw576jDJbpoIeXcmG2BCJkM4+BmItxY4vf6/QI2fZfsREyRD5o2pRrk5pFGg==
-X-Received: by 2002:a05:622a:230a:b0:476:a895:7e82 with SMTP id d75a77b69052e-47710dd04c0mr70818741cf.50.1742482194174;
-        Thu, 20 Mar 2025 07:49:54 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d179ea2sm27451cf.27.2025.03.20.07.49.53
+        d=1e100.net; s=20230601; t=1742484858; x=1743089658;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6FdTCwqMzkmFdWitB2V5bgPRQJHyyKDjK4an6/4ZyU=;
+        b=ub3ysXLenpzXyFayNTrRnIyf06+bJA6CfJ5imi4wiPKW/9XF9kTz7VXTGCleQgGX2w
+         2vznFsHLrWPBXc2MitwMX6sKiM7eQej1H8xNpoOLwF2rqSPaycWtl9wJ1ld+7T50JEMm
+         +KLwE4DfT0Np9ylpDmJQQwD8j7rzlP0myn71ugKrCy2wXTyvVDzL1GSSxR093oCmMz9z
+         Wn2wg7ixJTUeK/GgPv2H+IBwr0UE5fLeNfGdrEwJTriem7b3ghwlQddTXYy7x4h2cs+x
+         YRomcqkC5omnEikDT8De1u29+KupY3klIjBev1BcNGCKqV9uuMfVFLpP5LOmbrb2DofN
+         1KjQ==
+X-Gm-Message-State: AOJu0Yw1ow7UchxQrAaVUxECoYaY+uumqs2oOVSZUOU3CLJSsWCn6NPf
+	nMeHC1uoD3L4di/3UDnSS/37LkKtjUfKnrLNfGqgtgXMqW+xJUfAijc5eohN+W0=
+X-Gm-Gg: ASbGncuYKqNkWqq6Q+9vK3Wa8mTTkTLISPMw55Pfs9joRxw/lA/zeZqu+1GnSU/5iV1
+	JCkYuQgjBVdsJdrfP5HDz6HG18LyvaQJdXh6C16sfOU67TTeaI7zFcSE3VRP+6S5YePZ90i9XZ2
+	4KaKdihWmC/+cwx4I9J8WvvtLC5dMOK248AhFTHcBwm8Bz4u4k5vK9DBG1Ere0jHRALlXFXw6Nk
+	tSW4jAIYdEV53UgRKqcXGqgCKvCEL0S2vM0/zddluAidVoFU+2lhYV7UCUg95K1kCu7o4sURC/x
+	oISSvvm/+9m59L2GSZYTn3PLPU+K66rqOLSP0NK75w4Xoi8lf078qzY+1B8cqFk1RlvCv556VxK
+	ihALkfoAs9I7KPA==
+X-Google-Smtp-Source: AGHT+IE4WJ4Eak03dhOwufAfE2KQ3wgLoZ7KOVn1+KFJ2QqRMdeikJXpKidnGHdeGi0jPTGk5dkEbA==
+X-Received: by 2002:a05:6122:4312:b0:520:6773:e5c5 with SMTP id 71dfb90a1353d-5258926463bmr6576743e0c.7.1742484858169;
+        Thu, 20 Mar 2025 08:34:18 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-525a7359ccdsm20198e0c.4.2025.03.20.08.34.15
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 07:49:53 -0700 (PDT)
-Date: Thu, 20 Mar 2025 10:49:53 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Pauli Virtanen <pav@iki.fi>, 
- linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- willemdebruijn.kernel@gmail.com
-Message-ID: <67dc2b111b3cf_a8274294af@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CABBYNZJk2QjUaJCurAocMAJdOTfFHCjKO_S2rcxWLwTv8K9VDw@mail.gmail.com>
-References: <cover.1742324341.git.pav@iki.fi>
- <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
- <6cf69a7e-da5d-49da-ab05-4523f2914254@molgen.mpg.de>
- <CABBYNZJk2QjUaJCurAocMAJdOTfFHCjKO_S2rcxWLwTv8K9VDw@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] net-timestamp: COMPLETION timestamp on packet tx
- completion
+        Thu, 20 Mar 2025 08:34:16 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_event: Fix handling of HCI_EV_LE_DIRECT_ADV_REPORT
+Date: Thu, 20 Mar 2025 11:34:14 -0400
+Message-ID: <20250320153415.1391223-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Luiz Augusto von Dentz wrote:
-> Hi Pauli, Willem, Jason,
-> =
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> On Wed, Mar 19, 2025 at 11:48=E2=80=AFAM Paul Menzel <pmenzel@molgen.mp=
-g.de> wrote:
-> >
-> > Dear Pauli,
-> >
-> >
-> > Thank you for your patch. Two minor comments, should you resend.
-> >
-> > You could make the summary/title a statement:
-> >
-> > Add COMPLETION timestamp on packet tx completion
-> >
-> > Am 18.03.25 um 20:06 schrieb Pauli Virtanen:
-> > > Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software times=
-tamp
-> > > when hardware reports a packet completed.
-> > >
-> > > Completion tstamp is useful for Bluetooth, as hardware timestamps d=
-o not
-> > > exist in the HCI specification except for ISO packets, and the hard=
-ware
-> > > has a queue where packets may wait.  In this case the software SND
-> > > timestamp only reflects the kernel-side part of the total latency
-> > > (usually small) and queue length (usually 0 unless HW buffers
-> > > congested), whereas the completion report time is more informative =
-of
-> > > the true latency.
-> > >
-> > > It may also be useful in other cases where HW TX timestamps cannot =
-be
-> > > obtained and user wants to estimate an upper bound to when the TX
-> > > probably happened.
-> > >
-> > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > > ---
-> > >
-> > > Notes:
-> > >      v5:
-> > >      - back to decoupled COMPLETION & SND, like in v3
-> > >      - BPF reporting not implemented here
-> > >
-> > >   Documentation/networking/timestamping.rst | 8 ++++++++
-> > >   include/linux/skbuff.h                    | 7 ++++---
-> > >   include/uapi/linux/errqueue.h             | 1 +
-> > >   include/uapi/linux/net_tstamp.h           | 6 ++++--
-> > >   net/core/skbuff.c                         | 2 ++
-> > >   net/ethtool/common.c                      | 1 +
-> > >   net/socket.c                              | 3 +++
-> > >   7 files changed, 23 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/Documentation/networking/timestamping.rst b/Documentat=
-ion/networking/timestamping.rst
-> > > index 61ef9da10e28..b8fef8101176 100644
-> > > --- a/Documentation/networking/timestamping.rst
-> > > +++ b/Documentation/networking/timestamping.rst
-> > > @@ -140,6 +140,14 @@ SOF_TIMESTAMPING_TX_ACK:
-> > >     cumulative acknowledgment. The mechanism ignores SACK and FACK.=
+Some controllers seems to generate HCI_EV_LE_DIRECT_ADV_REPORT even when
+scan_filter is not set to 0x02 or 0x03, which indicates that local
+privacy is enabled, causing them to be ignored thus breaking
+auto-connect logic:
 
-> > >     This flag can be enabled via both socket options and control me=
-ssages.
-> > >
-> > > +SOF_TIMESTAMPING_TX_COMPLETION:
-> > > +  Request tx timestamps on packet tx completion.  The completion
-> > > +  timestamp is generated by the kernel when it receives packet a
-> > > +  completion report from the hardware. Hardware may report multipl=
-e
-> >
-> > =E2=80=A6 receives packate a completion =E2=80=A6 sounds strange to m=
-e, but I am a
-> > non-native speaker.
-> >
-> > [=E2=80=A6]
-> >
-> >
-> > Kind regards,
-> >
-> > Paul
-> =
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+        Type: Passive (0x00)
+        Interval: 60.000 msec (0x0060)
+        Window: 30.000 msec (0x0030)
+        Own address type: Public (0x00)
+        Filter policy: Ignore not in accept list (0x01)
+...
+> HCI Event: LE Meta Event (0x3e) plen 18
+      LE Direct Advertising Report (0x0b)
+        Num reports: 1
+        Event type: Connectable directed - ADV_DIRECT_IND (0x01)
+        Address type: Random (0x01)
+        Address: XX:XX:XX:XX:XX:XX (Static)
+        Direct address type: Random (0x01)
+        Direct address: XX:XX:XX:XX:XX:XX (Non-Resolvable)
+        RSSI: -54 dBm (0xca)
 
-> Is v5 considered good enough to be merged into bluetooth-next and can
-> this be send to in this merge window or you think it is best to leave
-> for the next? In my opinion it could go in so we use the RC period to
-> stabilize it.
+So this attempts to mitigate the above problem by skipping checking of
+direct_addr if local privacy is not enabled.
 
-I'm fine with merging as is.
+Link: https://github.com/bluez/bluez/issues/1138
+Fixes: e209e5ccc5ac ("Bluetooth: MGMT: Mark LL Privacy as stable")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_event.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-Most of my comments were design points for consideration. If Pauli
-prefers as is, no objections from me.
-
-For the series:
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0df4a0e082c8..01d8c11c2c7e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6056,8 +6056,17 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	 * a LE Direct Advertising Report event. In that case it is
+ 	 * important to see if the address is matching the local
+ 	 * controller address.
++	 *
++	 * If local privacy is not enable the controller shall not be
++	 * generating such event since according to its documentation it is only
++	 * valid for filter_policy 0x02 and 0x03, but the fact that it did
++	 * generate LE Direct Advertising Report means it is probably broken and
++	 * won't generate any other event which can potentially break
++	 * auto-connect logic so in case local privacy is not enable this
++	 * ignores the direct_addr so it works as a regular report.
+ 	 */
+-	if (!hci_dev_test_flag(hdev, HCI_MESH) && direct_addr) {
++	if (!hci_dev_test_flag(hdev, HCI_MESH) && direct_addr &&
++	    hci_dev_test_flag(hdev, HCI_PRIVACY)) {
+ 		direct_addr_type = ev_bdaddr_type(hdev, direct_addr_type,
+ 						  &bdaddr_resolved);
+ 
+@@ -6067,12 +6076,6 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 		if (!hci_bdaddr_is_rpa(direct_addr, direct_addr_type))
+ 			return;
+ 
+-		/* If the controller is not using resolvable random
+-		 * addresses, then this report can be ignored.
+-		 */
+-		if (!hci_dev_test_flag(hdev, HCI_PRIVACY))
+-			return;
+-
+ 		/* If the local IRK of the controller does not match
+ 		 * with the resolvable random address provided, then
+ 		 * this report can be ignored.
+-- 
+2.48.1
 
