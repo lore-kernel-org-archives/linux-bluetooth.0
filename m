@@ -1,42 +1,42 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8BD25C6FE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 10:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB4F25D544
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 10:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742812813; cv=none; b=Q9xrB8lcMvMhI3GfMgM/6CG7VRliw6McKy2iofvYrRuneXiz5xNaO5Un0QN1DpDEAECOnQHpB56PVYBrQqRNEyBn60Ui4nS+K5liAYWfrdPDSKKOwO3ZBsqrgb9cc6qq2V5K6j4/1Ef3ZPgKiZCpMq5tSyml26n51oEGSPoSF0s=
+	t=1742813035; cv=none; b=Wd6MBpAWjzK84Yd0L3HEyD1kSWKE4edQGOGKKDQzZkqluUd/6XZooQtlFx8YCKn6DFO1i9gH8oa/3aspLIWqN2/2qJH4dGx3FWPoIGFl0vdM2MUrCNVlde7xzJY6Hpw2DqElU1u7mkXdJx8MBV8yfqWIcAGo9d/juoHXrWKy/UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742812813; c=relaxed/simple;
-	bh=r6DNCeYvSUNk4U8GYV1ZBqdTGFtWHU+IkRt96LJdSaA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BwE2+mpx/YNXF/5h4ws5/7jtytg3lYk9X6dhwplgVQ7E16Jl/79KkY/geDgYpMIJTQm+Tc7Pi4rvIAneuelR0Lmlq0BrUqZIS2EjgWPodZCHsk/oPcBjh1b8g3F2CUlCV3Kv3O1TkCsxIwda1AWxki2IrJaOIiVbREr1AMaTtqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=RGJ68EJI; arc=none smtp.client-ip=148.251.105.195
+	s=arc-20240116; t=1742813035; c=relaxed/simple;
+	bh=KJHLU8TmCzVj6ngBS1n2z77EbpIdgkGtrgiFycESaQo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=oiNtY/pgOQpRiMXktWw2pt0nT5uyqO7/vjkmT6YDdjXLnwEgNryno49xQlT+wLmBD9z8vjaeMFKutsBkdOBX84jsVdbPQIH3Ha+flFwzaTdeG1mHKH0RP7Ip9xAM2AA3B1SB0Yu7gSj3a2cAs0fokv5qSRCPD1pHlrJNxiIhDMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VwANKScb; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="RGJ68EJI"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VwANKScb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1742812809;
-	bh=r6DNCeYvSUNk4U8GYV1ZBqdTGFtWHU+IkRt96LJdSaA=;
+	s=mail; t=1742813032;
+	bh=KJHLU8TmCzVj6ngBS1n2z77EbpIdgkGtrgiFycESaQo=;
 	h=From:To:Subject:Date:From;
-	b=RGJ68EJIL5uUiTsaixmZ5UFdaQiSTDZzyFi25Y6ceNyeCBpRiP33o6DP2jKuT1aES
-	 iIfz5UU3wd7K9MYRTIEgRzjMuEmeREvUg446M67brDWGUIKVxpNNTWdKLkeW+MIgkJ
-	 1AGoHC3PE9K32YL7dGQz/+WkMjxiiCY9D9cURU+4SwJmw4wtjSYf/Ct9MqthdaM2e6
-	 QcG51vylt0MIJJNkO+XdnuHwstGVGje8SqyWG1akwbtcFJI98jzfOaoYUNC7l7F31c
-	 5yeAH7D/eMH0TeH7KpnHL6UWh5WkeydSNE4hNtA3syJE6QdN62tnG2wDvL+izKzSPa
-	 HqRto2fSitA4Q==
+	b=VwANKScbHPKhBWXoMys+H7eDp5ZoGqg1WR8pb8F1UwyQC2dnGOzQ7Zn/SthK/bp9l
+	 3ChlaEea7AJRu8SsyMmoiFKDfGkIbdpAkMJgkdoyOtzDJ1oxCGmryIdHRSSG3wWaxX
+	 zdcoMgmVJXfYHxBMP53sW25okZf25m+3MqY6wbaluC1KwyWCMnZ1hmDon2lCwa2mP0
+	 bNudx71F44kMl6pbEwCl2JR+xZgxGCLFy0MQBDo1uPnNQpjI19WdsGqUrinlNgoNDi
+	 Q28JvekJzynBYP1oFdO0D8iKYXm+UIfybPOB79q/z9tkCHTy2j3N06XIOVZPn+KAFs
+	 LwHYJFqHeHIcA==
 Received: from fdanis-XPS-13-9370.. (2a02-8428-Af44-1001-EdC7-2366-cd4a-E59d.rev.sfr.net [IPv6:2a02:8428:af44:1001:edc7:2366:cd4a:e59d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id E6C7017E0B9D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 11:40:08 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id DBE6817E0385
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 11:43:51 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] obex: MAP MCE Publish supported features during connect
-Date: Mon, 24 Mar 2025 11:40:03 +0100
-Message-ID: <20250324104003.64019-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2] obex: MAP MCE Publish supported features during connect
+Date: Mon, 24 Mar 2025 11:43:46 +0100
+Message-ID: <20250324104346.64309-1-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -50,8 +50,6 @@ This is required for passing MAP/MCE/MFB/BV-06-C PTS test case:
 Verify that the MCE sends its MapSupportedFeatures in the OBEX
 Connect request if the MSE declares support for the feature
 MapSupportedFeatures in Connect Request in its SDP record.
-
-Upstream-Status: Submitted []
 ---
  obexd/client/map.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 57 insertions(+)
