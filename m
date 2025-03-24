@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07DDCFC0A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1892A1BA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 14:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742824392; cv=none; b=q9kx6DTI8OxjGg69zLpLcEpztTD+L+yxzdDvYCsyOujehEwg2T49fczCabOeqgE39GmLgIHUsPrAw6uzjLWOO+2GdVuBcFll9aJCIE4hCULOQUq/n2rxn14QIST3kChubP0XRnv1a5FNp6mNgzo7BniXRr4kVCaG2on6mnOM2Ko=
+	t=1742825838; cv=none; b=bdQf9v5r06kc+9hSF12lhQzHWayy9CDt6TZ5EBmUPuK9P0dFtrd9WoyTS5Ibp2HKnwwYQ4D0/UKi9f/L5HTxeTgKhIL2s20o6L9ziD+1A92eP1Vk9Q7ae8EX9x9KKHS4O17Bbs+w3mudBEFpf13Py5Zn8cKl835kgeyAwyt7kPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742824392; c=relaxed/simple;
-	bh=Uhttl6uK6sVvB6j0fUp9uQPS0x7Y/kMTP7+8fQlzhoc=;
+	s=arc-20240116; t=1742825838; c=relaxed/simple;
+	bh=txdmrJiKB6UbVhI7xYqWq6iDl3PxMKq4BO9QZw3HnbA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gWALywEWQSejsSWEqDNwlls+Kklh+DOldZ7X0AoSadWjjUkfYz3/yeN260x2TcIzlG7ZMrDCRPj6rK6QphtSXsGGjoFDUuyJuJ7NECd7BemTNSZjn78U6AEuTISTgHtVhtpb5Y4Ha8nYzNLCeew0d46Y4otJA6ZH47bBM2lNpis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U0wxwlFT; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=LbVlCAlQOe5pA6eE9v9PfXtOt7lOjqJjXZlV2kgFR/hPPbfoM9GEjFuyXnR/39o80nijW0mq1knQqiOaa8T2UlEp/CbfwhgJ2zGg3w1EE+zrse1YxxaG5QL9DzOQQ0s07G2JmenYvD4JIL2vFyu588GwST2uUeW0QcM8zWuf+sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvR9cnl1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U0wxwlFT"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FCFCC4CEDD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:53:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvR9cnl1"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B43CCC4CEE9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 14:17:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742824389;
-	bh=Uhttl6uK6sVvB6j0fUp9uQPS0x7Y/kMTP7+8fQlzhoc=;
+	s=k20201202; t=1742825837;
+	bh=txdmrJiKB6UbVhI7xYqWq6iDl3PxMKq4BO9QZw3HnbA=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=U0wxwlFTJl8Bqy23WpSGpE9qvAC7F4mLGQ8Keu7vKS1GQQ1WVzdzteGZXsTah0s26
-	 XOLc1c8dc5XlRBVSxqlzQYVfegDgysx+D2h5whiiGMeww/m1ACgTzxk1vHx6o9Uwmt
-	 pAI5Y2iVMl3g8/zEKxCHDqEKPp5MwtPA0k6t42tmBRUkTVot6T1HQxlJDuEweW4sgX
-	 gRPo/dURJNk7DKOMB5ITnnCmJGdsnhBXwk5TfCfk5bpVyoWipl5/bECPZUfO43tSC3
-	 YHD/5VtMi/ax1XC+NN6IC6XqjqRbb71tGl4wO+Sx14lPQFcEau9UEN9zceF7IyWPNg
-	 RIFusd/mkSBxw==
+	b=BvR9cnl1y6n4pC/JDrdgha5mvfEMmzGAOjqm2jnRg6nlxPdJxcxEMAWVDN40+GnXg
+	 pvQQVpvUnhA13jR9Op75JNLOopTCOHWO4KNWPgKAUhg5BzIl89pQimLrzET6BTf/D4
+	 3/R8vefncEOPNktWemNTa7zyynFdZM9398zC0Ca1iSadbCwxZIAWM7//+tGp8fGg7F
+	 WwZojGmgnT35vYncgxk43XbbeVTjkrZcQ7d0uRYwWMqWs3tOAzNzUNewDO8Zd60NhK
+	 24U47NoOo+r3M2ukxu3PyjaX26CFA6+KcuY3FYVnsm3bUomQDYAnpvRl+x7xtDsERK
+	 W37b11NfsWolQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 6ADD2C53BC5; Mon, 24 Mar 2025 13:53:09 +0000 (UTC)
+	id A3137C41612; Mon, 24 Mar 2025 14:17:17 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 219553] Intel Corp. Bluetooth 9460/9560 Jefferson Peak (JfP)
  not able to connnect to Logitech MX Master 3S
-Date: Mon, 24 Mar 2025 13:53:09 +0000
+Date: Mon, 24 Mar 2025 14:17:17 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,8 +47,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219553-62941-iewVMGKBIV@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219553-62941-kXBiFFbVqD@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219553-62941@https.bugzilla.kernel.org/>
 References: <bug-219553-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,14 +64,58 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219553
 
-Luiz Von Dentz (luiz.dentz@gmail.com) changed:
+--- Comment #4 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+(In reply to Ike Devolder from comment #2)
+> Hi,
+>=20
+> I think this is the exact same issue encountered on the Starlite Mk V
+>=20
+> I have bisected the issue with a generic LE bluetooth keyboard here:
+> https://github.com/StarLabsLtd/firmware/issues/180#issuecomment-2732540740
+>=20
+> And currently have that keyboard working on the Starlite Mk V with kernel
+> 6.13.8 as it was working before with kernel 6.1.131 lts.
+>=20
+> The change made to have it work is the following:
+>=20
+> ```
+> commit 49de268ad2d7f217579090da90a5d93cad281477 (HEAD ->
+> refs/heads/blackikeeagle-starlite-btintel)
+> Author: BlackEagle <ike.devolder@gmail.com>
+> Date:   Tue Mar 18 09:06:21 2025 +0100
+>=20
+>     Bluetooth: btintel, don't reclassify signal for GfP2 and GaP
+>=20=20=20=20=20
+>     Should fix issue with LE devices not being found or able to connect.
+>=20
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index d496cf2c3411..4ecebae58792 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -3249,9 +3249,6 @@ static int btintel_setup_combined(struct hci_dev *h=
+dev)
+>                 break;
+>         case 0x18: /* GfP2 */
+>         case 0x1c: /* GaP */
+> -               /* Re-classify packet type for controllers with LE audio =
+*/
+> -               hdev->classify_pkt_type =3D btintel_classify_pkt_type;
+> -               fallthrough;
+>         case 0x17:
+>         case 0x19:
+>         case 0x1b:
+> ```
+>=20
+> https://gist.github.com/BlackIkeEagle/630e76164d9eca5f1eb617888c7f1576
+>=20
+> This is not the real fix I guess since that reclassification of the pkt_t=
+ype
+> is not there for no reason. But the skipping of it works around the issue
+>=20
+> Hopefully this helps someone to find the actual issue
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |luiz.dentz@gmail.com
-
---- Comment #3 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
-It might be related to https://github.com/bluez/bluez/issues/1138
+These are not the same controller as the bug description suggests, so if you
+are having something with GfP2/GaP that is probably something different.
 
 --=20
 You may reply to this email to add a comment.
