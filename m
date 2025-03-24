@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581822641D4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 16:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C04D263F44
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 17:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742835000; cv=none; b=eJl+60eOevO3h94MI3AqXWRQTnzUxGJC9ZiUZ1cvz0pm44URT/uJEhB3Ltorcn2qiCetIAf9ddX3hNF9AWQWtvn1dTBMIvO0/I2V19fY8vQpmfniqFv8gwaXR45r75TcVAQ+UFTgL5chcolDw0mXo/25IjP0m58TWQ+aZrBM0kM=
+	t=1742836199; cv=none; b=gc8CaC8Kg1hl3ZxIUX+3p2t7E9oXiGXsbnVrWWkv1niubkc67OzrkIWzuxbSJ6WTQCdn1h4Ximvw2QposY4mZvnvaz1lyO5C8ItrNDwTvh2i8Aj9wRXaNtit6da0pOw5+brqf+upyUdNUkCNEI339OGDOKNolHVXIEeY9LEYYiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742835000; c=relaxed/simple;
-	bh=P12zUGC81+nQ+3LmBF9tPaGAGiiqrjfuZSRjP+vOXhM=;
+	s=arc-20240116; t=1742836199; c=relaxed/simple;
+	bh=zndSX8Ij5UVJbY3BvhviZQI6bvdxmHPGaspilkG8qxU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WLTcFJVpzuyE/DVkQNlybzwOz6MEO3vXuyFnQKDOx2Y5th7LMR7bklIHmbvS4SSgupVjp7LTQO75MaPu6lEo8MML4HvQ9G5i+vTWYQqK4Aa/fdqx92Xqgcq4zmcUIGOUeMr2H9ScFsqOTiK4E1b0uS0liAT1iGaGZ9O2CPuYPDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T8xvA+6+; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=CEarjWX43DQq6db5b+cc/maOGTOaOF+wz40jzXdexIyGDR3biDC2aeKDkHqadABhZHQ1DyJrWU1z3VLW7HxPvYLB2BIF10+u08Y/nTYdL21KSuOI+xvwVD5FJt3ptwOrjnFQmuBrjJ/iPR7b63KYkiy5WIltwqL4NERPYa6vVtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3993VFX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T8xvA+6+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6FD9C4CEDD;
-	Mon, 24 Mar 2025 16:49:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3993VFX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EE95C4CEEA;
+	Mon, 24 Mar 2025 17:09:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742834999;
-	bh=P12zUGC81+nQ+3LmBF9tPaGAGiiqrjfuZSRjP+vOXhM=;
+	s=k20201202; t=1742836198;
+	bh=zndSX8Ij5UVJbY3BvhviZQI6bvdxmHPGaspilkG8qxU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T8xvA+6++7AwwXXei+5s3tTvw0KjBTTjfCssAPsrKTkUceNAkvESADXySwRP1nh4I
-	 sJBlXYcgsO6+xyvo9iRUBELWqL5ai8gQaQzRxQIB2jaOOZ6sK7SeEeC4DlKD967dDC
-	 Oj+b4c1HKVwlDE9FOfYOgX5MYJZipdIinETXm6QhMEPhBSwRuUZYtsJCEk1P1FHcyH
-	 789MTvABrKujyZXHn06ZaljlXulUnUGWuJZxfyQ9ujm4g0qF5Gs8NKzuLLtlJWbclr
-	 4WrsjM2Qdl+MNbFD1B0xunXz8vsasyUbK3dFyE3Ncm6eIa6uBE8dHCyTEUInzkjdqR
-	 XjFL6bvQQLpzA==
+	b=k3993VFXaRZaX7vJVM7NlzEB548UlXXBPrvYNMHuk0rNRD+WvpRcjXP9Vb13zf4Qj
+	 EYu4hW4B01LyR+AvFxoGU/9eOXNG337xK3pKV32G1SRTMPuCZFAXdYOrzO26ExdOeH
+	 8vgBRIJGR6uWqgUI+R95Bh8VjqJMR0QHPbj/ifGs4tcs+cLQE77iEJx3MkvyA1TV2v
+	 +ROlFtM2igtsa6WWtSR3YaV3zxcJSxzm5emxUHha8q9NA3s6jpw+j4dLqK21jvamxb
+	 cSFFIeOTeiQ+rnIdEE51FcnjpVAwVIekYHhCCwjCtDac9JTZGwbGA5Z9CDev33u5eb
+	 b1gFtR5RreE/g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34774380664D;
-	Mon, 24 Mar 2025 16:50:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ED392380664D;
+	Mon, 24 Mar 2025 17:10:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,35 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 1/5] mgmt-api: Add missing Device Flag
+Subject: Re: [PATCH v1] Bluetooth: MGMT: Add LL Privacy Setting
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174283503601.4093797.9637620850433944288.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Mar 2025 16:50:36 +0000
-References: <20250324134920.2111414-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250324134920.2111414-1-luiz.dentz@gmail.com>
+ <174283623478.4100869.2431559901673277247.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Mar 2025 17:10:34 +0000
+References: <20250321194627.1729246-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250321194627.1729246-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 24 Mar 2025 09:49:16 -0400 you wrote:
+On Fri, 21 Mar 2025 15:46:27 -0400 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This adds the missing Device Flag - Address Resolution = bit(2)
-> ---
->  doc/mgmt-api.txt | 1 +
->  1 file changed, 1 insertion(+)
+> This adds LL Privacy (bit 22) to Read Controller Information so the likes
+> of bluetoothd(1) can detect when the controller supports it or not.
+> 
+> Fixes: e209e5ccc5ac ("Bluetooth: MGMT: Mark LL Privacy as stable")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v3,1/5] mgmt-api: Add missing Device Flag
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e45343a37bf8
-  - [BlueZ,v3,2/5] mgmt-api: Add LL Privacy setting
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cf8b2f308e31
-  - [BlueZ,v3,3/5] gatt-database: Fix always registering CentralAddressResolution
-    (no matching commit)
-  - [BlueZ,v3,4/5] mgmt-tester: Fix missing MGMT_SETTING_LL_PRIVACY
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=122c9fcacfa9
-  - [BlueZ,v3,5/5] monitor: Add decoding of MGMT LL Privacy setting
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=912e2f54fd57
+  - [v1] Bluetooth: MGMT: Add LL Privacy Setting
+    https://git.kernel.org/bluetooth/bluetooth-next/c/402f42938757
 
 You are awesome, thank you!
 -- 
