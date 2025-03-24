@@ -1,68 +1,68 @@
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C4825EFBA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB4E25E476
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742823686; cv=none; b=QoN7gdYGeNVr5kbcU9v256wtP5Pblo3uXKGj7VC/F0QCT8UpAT+/FANCEzsjljRGk02g91TNW3dm6xhEaX1iMVH8fwE4QldHa0ARoVi6yBOZRKqERu8Bzns23T047siS829pKVR61Mj8aHokhZ4bGbIJ0VfQUbspSNL8R1ggdP0=
+	t=1742823689; cv=none; b=QS8BAnWzO8IKT7qWiUmkWpARDEe/w072zXwg2iD0395ILVL2GRkwwc079ZtOAGCUNPURabOufaRttB9oCcFKvJM/mM4Dc1X7WZnSbCk2r4gn8c+vsmdUFWOPPruSJ7E7ZBJ9GxIhUpbfXaKGF/x1SXa1g7NUKTD3pGdfG+jP/uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742823686; c=relaxed/simple;
-	bh=twyj47WMg4IFJ0gOy9506DV1Qq8RF2mGfLyWQnLYyrk=;
+	s=arc-20240116; t=1742823689; c=relaxed/simple;
+	bh=LPxHNojHHxFjxK9cv7msPQBk8qsECJOcM/eoTcaQgaU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZXqVfIjNTQDF3XoBHdjPbkE9CvVQSbzuNOq70A36+P9QYWviNrCcjodDtmOm9SUjlgrqeUkQ1LxkzKi3T+ARahi4jVhnSxyOnIC4mwZH+fx/an17iq1rZUBM4EDagDkSN88LDTQnGHHJh+5CPypZsr7i5aKOE8DvMLk5zkdPATo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brd/eWEG; arc=none smtp.client-ip=209.85.221.170
+	 MIME-Version; b=kB4Ww8IqTpAiFXePTI8L3El86ZSbNA/XN8VCb7XbU3g63F3+YgSY7EFjXlPmLtFSfCeo6k6y99bI+3eDL5mLZUtizZUrFDDXUeawVeLTihnVRPIQ1ybYWfxeYxTw7n0Qxc0XCkQHXWtTYVZhoBTClU7PKK8Ht1VFbIQM22ULOFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KLjsJ5kp; arc=none smtp.client-ip=209.85.221.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brd/eWEG"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-523ee30e0d4so2118452e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 06:41:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KLjsJ5kp"
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-525b44b7720so860592e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 06:41:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742823683; x=1743428483; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1742823686; x=1743428486; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tatSE/r5CYak+9Z6BPPWFBTkdHhGdx0ulDG7+j/WkEQ=;
-        b=brd/eWEG8ivXXsBJf+tQ30h66TX5l5Pa1+5EwlQ7RxRBeeNRPwmKCb9nRrLG5pG4BL
-         Lb+nRJg3ehNkjmOKpRQVcmzgQvTcGzG/cuk5JIPg//HOTVbJMA8xJyo4j5vbbkca+9u1
-         5JDzT1hBctH3LhOVMdeBh5BK7a11Bx1ByDTwPmBj/DHADw1+V2EnvA4mr+MLkRI3c62+
-         e/xIrIGjMFYOf3WUijAn36itVqkrD5fr6RgnuCMnCi4tfoTC/UnQ0Q0KWgaGtUSAEP9y
-         jvfc3QSsJTCQ4mFO+1mdoqzkTnTQRGc7HTuCEQe3YvfdyurQqCrc1T76qBrMjT4tyOUy
-         s8aA==
+        bh=xoqDStSvbF51626ZKzLQc+ha0pNUc8/bT+FkhmUHUFY=;
+        b=KLjsJ5kp1NBzfCsxD+Bj3xfgXraciUJQEpfsKPNOFTGxejDNG6FXnFhcZiqRF9lJyY
+         nYoL2KzSd351k1umFawCdIRnqHrs3XNJ+g1Xc04mQOs2hU38C3nj+1JsmkF3mzauVc/E
+         0ge4pOR5OL4OGZzY8NrBqN1CW0i/tH9D7S2sCtL8lpF3MW6eMkiZ9C0/ITpWBKZ2oaQU
+         rUe0yiz2bqNz8JOOrLd0RLSbkIYAHFabRn29P0t0wSAsxuHfD6kfnxLDbLkOedNUmBPC
+         fn6LfLDYA/VmGOKVCn/fVdKSya0jYdxkvoFkBNeKMPtybih/BXj+CJI+SKlP7HTkFDmW
+         6IfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742823683; x=1743428483;
+        d=1e100.net; s=20230601; t=1742823686; x=1743428486;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tatSE/r5CYak+9Z6BPPWFBTkdHhGdx0ulDG7+j/WkEQ=;
-        b=DTr7WKnMieiefA4y1djh+jkDkbky2mVmKLGsVftyIccETL9kDkNqopw9RXUOaEX7Xu
-         9qhxPvT1IzkQP0QSb5ccRBkE30Vl60rj+AlptUZR8RZIVrjvG8bxmoFX3fYkKVzj4a07
-         QNZrjeG5jUrXm1vt57YPEgGAec05B5iZSA9q5xwtZhijBXGkMBBrZh6DASJHudiJ5+iE
-         dzUT76inosibgqH+V1URMDD90XLKNgZuyiMaPXwnS9sIJs5detoLydc+Ds1B3vdU/DKj
-         /RAQ5IwKZ8V1N5A7O/hzf/T1wCR3oBmUhXR17Qy4nMv8hOxFnhhnLCWmoHameVzFVoRI
-         WUng==
-X-Gm-Message-State: AOJu0YwAZo9bfM/5DJWoiwPUsAaLm6p2DreeRA+cHoz4HbQ9t318Rugk
-	N044lH2iL363KJ9m9ZUXjvDicLAisjBpJ0YdJN0ZdRDnZm/MTlWwQZlgHdPB
-X-Gm-Gg: ASbGnctyFvJt6MjOnqtfB58U767GtFHA2/1Caw6V760FhkCSVJAwu9W8W4HKD7WyrCg
-	3cVN/UvbTvHX7VUPHQptfN9jIkznEEirmq6eM7PQNHB0QsiM7e3i+T7D9Q3IJymdEQArsrUgApO
-	p5mZt5SxGocVX6+XUCDDIhhjCcU+gi6b3jK1P6l6D3G9zZI8SLA1Y+hOhRwhtrjt1DkszY25TK8
-	zKXkXt6G2ij9zali/MuCWOassSgvxAtJLGCi40AcDxmX+Yy0JMWau+0vSJ3fWIAC19VZLf6xs2e
-	YYuxtyIVjQBAvIenUCca1VB6YRcCPqBMCfwubp2uEUox95AAXd+QJzad8el9U6XjNkbAtNdc3U+
-	w0MTF/FR5Cg+Lmg==
-X-Google-Smtp-Source: AGHT+IHtIT+BjsGRcABsUiCfTJ6eDZ6A7g1ifmXINhmmt7j+wJMC5MoD8kp2DsOqKi2o9rZ+o3HxTg==
-X-Received: by 2002:a05:6102:94c:b0:4b9:bd00:454b with SMTP id ada2fe7eead31-4c50d5267b4mr8278348137.13.1742823683224;
-        Mon, 24 Mar 2025 06:41:23 -0700 (PDT)
+        bh=xoqDStSvbF51626ZKzLQc+ha0pNUc8/bT+FkhmUHUFY=;
+        b=aiKCVfyMyZEd1TMUfQQAhA3uSEyJvb50AfzT/BMC2ofFcxeKXoft67nNFSCoLsevud
+         Nnb1Q0a8VEkx6kbEuEArO5iTP6IafWiZHFSjIiGDOmrq4lewHyKK62ZZtbqdhlGM5zcb
+         1WmsrOsLO1jI6qHFqwOfqawKkgGJyiabxjOLvvJwrg+BIygh1mSjoE7lUasfW4pzT/m4
+         KeIRfUOFo7rA53ilV0bkrK9c8Vr+8zQZ7KB9cyNkUQGkPerGF2gy/4xjr0ZuKOxSHgph
+         L16SyImmsEQgv1XeKxhWAi93JtWmcWQjvI1iLNx8CsikX7/JHMyn+nLyHFKqxcfq3q0I
+         tPeQ==
+X-Gm-Message-State: AOJu0YxfQ0vSvFzsKPfigWn+GbHIuuDpcYir5VjDf6kUZkGfg1f+k7A+
+	MOkmYvdE63+6Tk86qPBBEKDMkgJ3Q6yFbIr6jXaCspdryulA6VNpE0qHiPcX
+X-Gm-Gg: ASbGncsiuDpDJWEmLeAW5WXfMlUuIW4TjZ4WCoZW2ZAv5J06GcbSOsT/mbGD91u2vK3
+	eXXLUvKyyUVEUqsPriWzjpX09SuyI+jdPvCCiR6Jv2UPEjtPiK1YGJ4C8HWfzFRrox5tERYy4c0
+	W21SJyDWLpoTmuWkm5EzGbApbb79488Up2nraU+6OygoXLVy9c7TnnhxIQKw8NQr2svFj+5hOYo
+	tzvAJPE//OY2yKRAC3V0EUkBSvLpBOV4/OzzcV7wHM0T80FqkVDk0NnYNeWouS0dDOhsT+A1qrR
+	rnKrXu+2NtUEBrAUFegBVXS2wXVxx2YlNLVCy6+5h8AyoxZkAWHJJZ60Gg7dLxdmv4XtFZi5HAR
+	zGaQkwpTNOMrIHg==
+X-Google-Smtp-Source: AGHT+IHsSsYGwtGtYmqtLzSEe7SDylEeOlZqB5puV0TVIThlRhvoBmx9t96CrO06924nEOh19m2uRg==
+X-Received: by 2002:a05:6102:6cf:b0:4c1:86bc:f959 with SMTP id ada2fe7eead31-4c50d4bc997mr7075064137.8.1742823686001;
+        Mon, 24 Mar 2025 06:41:26 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bc11d7asm1564850137.12.2025.03.24.06.41.20
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bc11d7asm1564850137.12.2025.03.24.06.41.23
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 06:41:21 -0700 (PDT)
+        Mon, 24 Mar 2025 06:41:24 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/5] gatt-database: Fix always registering CentralAddressResolution
-Date: Mon, 24 Mar 2025 09:41:10 -0400
-Message-ID: <20250324134112.2108216-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/5] mgmt-tester: Fix missing MGMT_SETTING_LL_PRIVACY
+Date: Mon, 24 Mar 2025 09:41:11 -0400
+Message-ID: <20250324134112.2108216-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250324134112.2108216-1-luiz.dentz@gmail.com>
 References: <20250324134112.2108216-1-luiz.dentz@gmail.com>
@@ -76,81 +76,190 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-CentralAddressResolution shall be conditional to LL Privacy to avoid
-peripherals assuming Directed Advertising can be used which may lead
-to issues like:
-
-Fixes: https://github.com/bluez/bluez/issues/1138
+This fixes the tests which now requires MGMT_SETTING_LL_PRIVACY (bit
+22).
 ---
- lib/mgmt.h          |  1 +
- src/gatt-database.c | 21 ++++++++++++++-------
- 2 files changed, 15 insertions(+), 7 deletions(-)
+ tools/mgmt-tester.c | 60 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 37 insertions(+), 23 deletions(-)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 6a397645bcf2..6af82fc4a1a5 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -104,6 +104,7 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_CIS_PERIPHERAL	BIT(19)
- #define MGMT_SETTING_ISO_BROADCASTER	BIT(20)
- #define MGMT_SETTING_ISO_SYNC_RECEIVER	BIT(21)
-+#define MGMT_SETTING_LL_PRIVACY		BIT(22)
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index ebb158d1f15a..030827cd51d1 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -1509,6 +1509,7 @@ static const char set_ssp_invalid_param[] = { 0x02 };
+ static const char set_ssp_garbage_param[] = { 0x01, 0x00 };
+ static const char set_ssp_settings_param_1[] = { 0xc0, 0x00, 0x00, 0x00 };
+ static const char set_ssp_settings_param_2[] = { 0xc1, 0x00, 0x00, 0x00 };
++static const char set_ssp_settings_param_3[] = { 0xc1, 0x00, 0x40, 0x00 };
+ static const char set_ssp_on_write_ssp_mode_param[] = { 0x01 };
  
- #define MGMT_OP_READ_INFO		0x0004
- struct mgmt_rp_read_info {
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 239a0dc72be9..1498720ad5a4 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -749,7 +749,7 @@ static void gap_car_read_cb(struct gatt_db_attribute *attrib,
- 		device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
- 		if (device)
- 			value = btd_device_flags_enabled(device,
--					DEVICE_FLAG_ADDRESS_RESOLUTION);
-+						DEVICE_FLAG_ADDRESS_RESOLUTION);
- 	}
+ static const struct generic_data set_ssp_on_success_test_1 = {
+@@ -6077,8 +6078,8 @@ static const struct generic_data set_dev_id_power_off_on = {
+ 	.send_param = set_powered_on_param,
+ 	.send_len = sizeof(set_powered_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_ssp_settings_param_2,
+-	.expect_len = sizeof(set_ssp_settings_param_2),
++	.expect_param = set_ssp_settings_param_3,
++	.expect_len = sizeof(set_ssp_settings_param_3),
+ 	.expect_settings_set = MGMT_SETTING_POWERED,
+ 	.expect_hci_command = BT_HCI_CMD_WRITE_EXT_INQUIRY_RESPONSE,
+ 	.expect_hci_param = write_eir_set_dev_id_success_1,
+@@ -6094,8 +6095,8 @@ static const struct generic_data set_dev_id_ssp_off_on = {
+ 	.send_param = set_ssp_on_param,
+ 	.send_len = sizeof(set_ssp_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_ssp_settings_param_2,
+-	.expect_len = sizeof(set_ssp_settings_param_2),
++	.expect_param = set_ssp_settings_param_3,
++	.expect_len = sizeof(set_ssp_settings_param_3),
+ 	.expect_hci_command = BT_HCI_CMD_WRITE_EXT_INQUIRY_RESPONSE,
+ 	.expect_hci_param = write_eir_set_dev_id_success_1,
+ 	.expect_hci_len = sizeof(write_eir_set_dev_id_success_1),
+@@ -8214,13 +8215,17 @@ static const uint8_t set_ext_adv_data_test1[] = {
+ 	0x74, 0x65, 0x73, 0x74, 0x31,	/* "test1" */
+ };
  
- 	gatt_db_attribute_read_result(attrib, id, 0, &value, sizeof(value));
-@@ -873,10 +873,13 @@ static void populate_gap_service(struct btd_gatt_database *database)
- {
- 	bt_uuid_t uuid;
- 	struct gatt_db_attribute *service, *attrib;
-+	bool ll_privacy = btd_adapter_has_settings(database->adapter,
-+						MGMT_SETTING_LL_PRIVACY);
- 
- 	/* Add the GAP service */
- 	bt_uuid16_create(&uuid, UUID_GAP);
--	service = gatt_db_add_service(database->db, &uuid, true, 7);
-+	service = gatt_db_add_service(database->db, &uuid, true,
-+						ll_privacy ? 7 : 5);
- 
- 	/*
- 	 * Device Name characteristic.
-@@ -898,15 +901,19 @@ static void populate_gap_service(struct btd_gatt_database *database)
- 							NULL, database);
- 	gatt_db_attribute_set_fixed_length(attrib, 2);
- 
--	/*
--	 * Central Address Resolution characteristic.
--	 */
--	bt_uuid16_create(&uuid, GATT_CHARAC_CAR);
--	attrib = gatt_db_service_add_characteristic(service, &uuid,
-+	/* Only enable Central Address Resolution if LL Privacy is supported */
-+	if (ll_privacy) {
-+		/*
-+		 * Central Address Resolution characteristic.
-+		 */
-+		bt_uuid16_create(&uuid, GATT_CHARAC_CAR);
-+		attrib = gatt_db_service_add_characteristic(service, &uuid,
- 							BT_ATT_PERM_READ,
- 							BT_GATT_CHRC_PROP_READ,
- 							gap_car_read_cb,
- 							NULL, database);
-+	}
++static const char set_powered_ext_adv_instance_settings_param[] = {
++	0x81, 0x02, 0x40, 0x00,
++};
 +
- 	gatt_db_attribute_set_fixed_length(attrib, 1);
+ static const struct generic_data add_ext_advertising_success_pwron_data = {
+ 	.send_opcode = MGMT_OP_SET_POWERED,
+ 	.send_param = set_powered_on_param,
+ 	.send_len = sizeof(set_powered_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_powered_adv_instance_settings_param,
+-	.expect_len = sizeof(set_powered_adv_instance_settings_param),
++	.expect_param = set_powered_ext_adv_instance_settings_param,
++	.expect_len = sizeof(set_powered_ext_adv_instance_settings_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_DATA,
+ 	.expect_hci_param = set_ext_adv_data_test1,
+ 	.expect_hci_len = sizeof(set_ext_adv_data_test1),
+@@ -8239,7 +8244,7 @@ static const struct generic_data add_ext_advertising_success_pwron_enabled = {
+ 	.send_param = set_powered_on_param,
+ 	.send_len = sizeof(set_powered_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_powered_adv_instance_settings_param,
++	.expect_param = set_powered_ext_adv_instance_settings_param,
+ 	.expect_len = sizeof(set_powered_adv_instance_settings_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE,
+ 	.expect_hci_param = set_ext_adv_on_set_adv_enable_param,
+@@ -8256,13 +8261,15 @@ static const uint8_t set_ext_adv_data_txpwr[] = {
+ 	0x00,			/* tx power */
+ };
  
- 	gatt_db_service_set_active(service, true);
++static const char set_ext_adv_settings_param[] = { 0x81, 0x06, 0x40, 0x00 };
++
+ static const struct generic_data add_ext_advertising_success_4 = {
+ 	.send_opcode = MGMT_OP_SET_ADVERTISING,
+ 	.send_param = set_adv_on_param,
+ 	.send_len = sizeof(set_adv_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_adv_settings_param_2,
+-	.expect_len = sizeof(set_adv_settings_param_2),
++	.expect_param = set_ext_adv_settings_param,
++	.expect_len = sizeof(set_ext_adv_settings_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_DATA,
+ 	.expect_hci_param = set_ext_adv_data_txpwr,
+ 	.expect_hci_len = sizeof(set_ext_adv_data_txpwr),
+@@ -8273,8 +8280,8 @@ static const struct generic_data add_ext_advertising_success_5 = {
+ 	.send_param = set_adv_off_param,
+ 	.send_len = sizeof(set_adv_off_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_powered_adv_instance_settings_param,
+-	.expect_len = sizeof(set_powered_adv_instance_settings_param),
++	.expect_param = set_powered_ext_adv_instance_settings_param,
++	.expect_len = sizeof(set_powered_ext_adv_instance_settings_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_DATA,
+ 	.expect_hci_param = set_ext_adv_data_test1,
+ 	.expect_hci_len = sizeof(set_ext_adv_data_test1),
+@@ -8545,13 +8552,16 @@ static uint8_t preset_connectable_on_ext_adv_param[] = {
+ 	0x00,					/* Scan req notification */
+ };
+ 
++static const char set_connectable_settings_param_4[] = {
++						0x83, 0x02, 0x40, 0x00 };
++
+ static const struct generic_data add_ext_advertising_success_16 = {
+ 	.send_opcode = MGMT_OP_SET_CONNECTABLE,
+ 	.send_param = set_connectable_on_param,
+ 	.send_len = sizeof(set_connectable_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_connectable_settings_param_3,
+-	.expect_len = sizeof(set_connectable_settings_param_3),
++	.expect_param = set_connectable_settings_param_4,
++	.expect_len = sizeof(set_connectable_settings_param_4),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
+ 	.expect_hci_param = preset_connectable_on_ext_adv_param,
+ 	.expect_hci_len = sizeof(preset_connectable_on_ext_adv_param),
+@@ -8575,25 +8585,29 @@ static uint8_t preset_connectable_off_ext_adv_param[] = {
+ 	0x00,					/* Scan req notification */
+ };
+ 
++static const char set_le_settings_param_3[] = { 0x81, 0x02, 0x40, 0x00 };
++
+ static const struct generic_data add_ext_advertising_success_17 = {
+ 	.send_opcode = MGMT_OP_SET_CONNECTABLE,
+ 	.send_param = set_connectable_off_param,
+ 	.send_len = sizeof(set_connectable_off_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_le_settings_param_2,
+-	.expect_len = sizeof(set_le_settings_param_2),
++	.expect_param = set_le_settings_param_3,
++	.expect_len = sizeof(set_le_settings_param_3),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
+ 	.expect_hci_param = preset_connectable_off_ext_adv_param,
+ 	.expect_hci_len = sizeof(preset_connectable_off_ext_adv_param),
+ };
+ 
++static const char set_le_settings_param_off_1[] = { 0x81, 0x00, 0x40, 0x00 };
++
+ static const struct generic_data add_ext_advertising_le_off = {
+ 	.send_opcode = MGMT_OP_SET_LE,
+ 	.send_param = set_le_off_param,
+ 	.send_len = sizeof(set_le_off_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_le_settings_param_off,
+-	.expect_len = sizeof(set_le_settings_param_off),
++	.expect_param = set_le_settings_param_off_1,
++	.expect_len = sizeof(set_le_settings_param_off_1),
+ 	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
+ 	.expect_alt_ev_param = advertising_instance1_param,
+ 	.expect_alt_ev_len = sizeof(advertising_instance1_param),
+@@ -8875,8 +8889,8 @@ static const struct generic_data multi_ext_advertising_add_no_power = {
+ 	.send_param = set_powered_on_param,
+ 	.send_len = sizeof(set_powered_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_powered_adv_instance_settings_param,
+-	.expect_len = sizeof(set_powered_adv_instance_settings_param),
++	.expect_param = set_powered_ext_adv_instance_settings_param,
++	.expect_len = sizeof(set_powered_ext_adv_instance_settings_param),
+ 	.expect_hci_list = multi_ext_adv_add_2_advs_hci_cmds,
+ };
+ 
+@@ -9403,8 +9417,8 @@ static const struct generic_data add_ext_advertising_conn_on_1m = {
+ 	.send_param = set_connectable_on_param,
+ 	.send_len = sizeof(set_connectable_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_connectable_settings_param_3,
+-	.expect_len = sizeof(set_connectable_settings_param_3),
++	.expect_param = set_connectable_settings_param_4,
++	.expect_len = sizeof(set_connectable_settings_param_4),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
+ 	.expect_hci_param = preset_connectable_on_ext_pdu_adv_param,
+ 	.expect_hci_len = sizeof(preset_connectable_on_ext_pdu_adv_param),
+@@ -9463,8 +9477,8 @@ static const struct generic_data add_ext_advertising_conn_off_1m = {
+ 	.send_param = set_connectable_off_param,
+ 	.send_len = sizeof(set_connectable_off_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_le_settings_param_2,
+-	.expect_len = sizeof(set_le_settings_param_2),
++	.expect_param = set_le_settings_param_3,
++	.expect_len = sizeof(set_le_settings_param_3),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
+ 	.expect_hci_param = preset_connectable_off_ext_1m_adv_param,
+ 	.expect_hci_len = sizeof(preset_connectable_off_ext_1m_adv_param),
 -- 
 2.48.1
 
