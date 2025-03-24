@@ -1,130 +1,132 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C0886334
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 15:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E001B2641EA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 16:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742829000; cv=none; b=Fg7oWDjbR4/COIhuL7xt3lXYtaUvZsF0KjIgwQy9fELPiyVLP+MduZaiBwWAXi0MkPcFRJAU5w8Zpbms25qbC1Y+CriDAzIYNwPWFCBaoZTs1AgEHBpUlIyEsSARiOLWFYRlERVhdhp1vjm07vw8USMIwC+4j/FaMfmZk3IMz10=
+	t=1742834770; cv=none; b=lXrWOJrL2nRvtlsaupIO0EiEFbNBg6y5yl+kZeNG4Ej8M9B8bgdWDZmTlnFhSumeHUVJ/Z/Jnt9wpCMQ4pthzA2I0/jkEmzYuimIHhiSWBP+Wkh9qRs4SG/8v5ZGvuRImDy+PWDgGXJ++Mmk7IoHCAgfWISUoqF5+SFetoIKnTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742829000; c=relaxed/simple;
-	bh=nqzx+U4pCHzJQ3CaCmEmQFyZiV62qJ42X6xIix+jMuM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=CD5wZPRyjLbEQ9ZDLkXGhD8YLAvQafR8iS2yBVnemvsO4B8XipkVCzALuR1TXWScAtTugO12zo2ea8Yc/9mmbhh3mAp05IkoESTCDudGQKgZWB/IpK2zsBbt9ZZHrloc/Ofj61V+D9+4LfejXEDACdiDz3/nAFu4a2cZf1mZrjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nYrKwlHq; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742834770; c=relaxed/simple;
+	bh=MwsRNSgWZWEYNj4IrFucJVpnIjRYeZHX6S47eATX7kQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=NrtxPfT68TzqzdxNOCq+fibCyTQ29DoMKjI1gk/cj4SxBmVEZTVNNXgXZILwAUbGdfsdfG7a5e/RBdEt4M6+7sM9H84FLiROBDXvioS99scJZcsUlWbgI7WV7I9+qVuLwmyeDYyf0RWbxiIu5GUfHy/xQaG63cVU9raKWpxEvlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=G7zoh1GQ; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYrKwlHq"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c07cd527e4so419900585a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 08:09:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742828997; x=1743433797; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bKMBQ8oJa3tlvLxNvqlZJy1F2Tux7LG5MZkFNKJr05o=;
-        b=nYrKwlHqTTXk7/tPxhDsqSRz4okIt6vtnFSS5+D/8AjhjKxKmiIvprMoLtUIYmgDCQ
-         4SIP8F9bWlVosyaSYoP01Z5H+K+5yXzvMialzTdOBzLjtCyxAcKtLLjO3vkInVb7Rr2B
-         21le77h4D/ebfhjVDXE94dcKt+5oYJNI6u6LHspWQIW4CPOH/J+HRKJ+P5H3qdmJbkKT
-         IzNkABiWl+v1PijQOJa0btkiSM5oc0TuZlrja/cLwAfkdXnEwddQH9XCJz9vTYFMFcOR
-         rKFSSIMxT+THBIIqkPV920gaE68YaJmp5PIdYbXU2BQ3EzqREG3KSK6g8EhJa9WWyf+b
-         OMSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742828997; x=1743433797;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bKMBQ8oJa3tlvLxNvqlZJy1F2Tux7LG5MZkFNKJr05o=;
-        b=nLEc0Q7AXEvBoFFStSHi96rwd1rIm3pjy3bkXhbEZrtkFH9lIZ/dXwYDeep+fOg4qO
-         iA1mPQoEyIPbccD4OzgKngNB+piX0N5V8SahvI9n1h2HmFyAcgbtKVhMMIEduEr4XEp2
-         RAIrQwmmNzzgTZLPm1yGeJA3CQDF/YstUxrQOO3Jm11LfJIAo5nl8LZlFImo/Kouzzrs
-         St/gW15tyP4s8pALmmS6M9RNZ78nzGRqcWDPWhjDOsFANKpxiGbJx5Y30bX+zWmrJoyN
-         BdVvdwrLauOigWcpSAsfZZ52hlmVh+qkrYb4PD8uFlxLoE1cF0JRUPlVv6D4JxAEG3PL
-         F+iQ==
-X-Gm-Message-State: AOJu0Yxnwh+xCD1mnHXLVdsl7ohyV2RS3fi3HKWGe8k1j+mnuFll+TFa
-	D1L9IpWfdArC48Bq5rRCQJAbNtsdbUuLfT6H+h3yihy2rTkRc0uMdq6mQw==
-X-Gm-Gg: ASbGnctyek7gQRw/0wCygAacrn6h23P65us8lwL3DsWHnmMokUhoOLJxYx8NjX9NnM9
-	SZ6kO/GvlnBVJNj3piyH4hnyxJdQSkgu5DOgfnhucCJu8ghWzC087S5u5+g9+Bl5LwIJD9MrtpX
-	+oryn5PymI4AyMNluGT7gimFtE/WCyRKqb+ZbdsCAMCUdqMKNLq+Ivl/Iq4rz61MVQSW7GueddT
-	UPRcAZRLmen8UXaMBaL49+QQqWgWj7g9Zrjc9i5mc9zYZyooPQINg8aDqgkOq+PbSUzfzgKSrPA
-	9glns3W5NubhVb/fQrY+3bVifFMKfAtQmp8G+pj1fL8MB7Myh1nUxJoFvH2nmroP
-X-Google-Smtp-Source: AGHT+IGCoCzecU0syhBO8rjpDxPvXLxFX8v0yOgshzYbIWFAL9y08nFAPDPr/5mfUDQ8tzwXAZgNdw==
-X-Received: by 2002:a05:620a:2545:b0:7c5:5d4b:e62a with SMTP id af79cd13be357-7c5ba1ffa11mr2785701985a.54.1742828996856;
-        Mon, 24 Mar 2025 08:09:56 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.215.164])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5b92d68dcsm521525185a.42.2025.03.24.08.09.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 08:09:56 -0700 (PDT)
-Message-ID: <67e175c4.050a0220.d4e08.43d0@mx.google.com>
-Date: Mon, 24 Mar 2025 08:09:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2760741814747183723=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="G7zoh1GQ"
+Received: from github.com (hubbernetes-node-c6d2e56.ac4-iad.github.net [10.52.139.43])
+	by smtp.github.com (Postfix) with ESMTPA id DD23F211F3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 09:46:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1742834767;
+	bh=iIyMEibm6cgXJg/4sCIRrzFuYKZ//9cr5KIt+wgB7vo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=G7zoh1GQUkZ7SIap6RWhjk7qo6smSd+3WtqCXIP+/5eud08IkvxEVsXgrWgh4oMRW
+	 Z1r/1KNChSGT2Yu3D5OlN8Q6mMcrCamlcN+p9NQQXoKm0EmObeYIghS1cRx9b8VhYk
+	 eCRfLJRYnTwsyw1CIP0bqfMKU4j/uK6LS28DgJ8I=
+Date: Mon, 24 Mar 2025 09:46:07 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/f77e72-912e2f@github.com>
+Subject: [bluez/bluez] e45343: mgmt-api: Add missing Device Flag
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3,1/5] mgmt-api: Add missing Device Flag
-In-Reply-To: <20250324134920.2111414-1-luiz.dentz@gmail.com>
-References: <20250324134920.2111414-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2760741814747183723==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: e45343a37bf8a30ba1059743a3645551639974b7
+      https://github.com/bluez/bluez/commit/e45343a37bf8a30ba1059743a3645551639974b7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-03-24 (Mon, 24 Mar 2025)
 
-Dear submitter,
+  Changed paths:
+    M doc/mgmt-api.txt
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=946846
+  Log Message:
+  -----------
+  mgmt-api: Add missing Device Flag
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.24 seconds
-BuildEll                      PASS      20.49 seconds
-BluezMake                     PASS      1452.10 seconds
-MakeCheck                     PASS      12.82 seconds
-MakeDistcheck                 PASS      158.05 seconds
-CheckValgrind                 PASS      216.19 seconds
-CheckSmatch                   WARNING   287.51 seconds
-bluezmakeextell               PASS      98.28 seconds
-IncrementalBuild              PENDING   0.31 seconds
-ScanBuild                     PASS      867.26 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1876:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3607:52: warning: array of flexible structuresmonitor/bt.h:3595:40: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+This adds the missing Device Flag - Address Resolution = bit(2)
 
 
+  Commit: cf8b2f308e31be757b5aa08a6c11887244cb5b21
+      https://github.com/bluez/bluez/commit/cf8b2f308e31be757b5aa08a6c11887244cb5b21
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-03-24 (Mon, 24 Mar 2025)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M doc/mgmt-api.txt
+
+  Log Message:
+  -----------
+  mgmt-api: Add LL Privacy setting
+
+This adds LL Privacy (bit 22) to Read Controller Information so it can
+be propagated to the likes of bluetoothd.
 
 
---===============2760741814747183723==--
+  Commit: a0d6d3c78b28e667e53524b5e5961711e60ff13e
+      https://github.com/bluez/bluez/commit/a0d6d3c78b28e667e53524b5e5961711e60ff13e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-03-24 (Mon, 24 Mar 2025)
+
+  Changed paths:
+    M lib/mgmt.h
+    M src/adapter.c
+    M src/gatt-database.c
+
+  Log Message:
+  -----------
+  gatt-database: Fix always registering CentralAddressResolution
+
+CentralAddressResolution shall be conditional to LL Privacy to avoid
+peripherals assuming Directed Advertising can be used which may lead
+to issues like:
+
+Fixes: https://github.com/bluez/bluez/issues/1138
+
+
+  Commit: 122c9fcacfa93266051de2edabef608bc63986a3
+      https://github.com/bluez/bluez/commit/122c9fcacfa93266051de2edabef608bc63986a3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-03-24 (Mon, 24 Mar 2025)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Fix missing MGMT_SETTING_LL_PRIVACY
+
+This fixes the tests which now requires MGMT_SETTING_LL_PRIVACY (bit
+22).
+
+
+  Commit: 912e2f54fd57ba4fbe66b6331149d7131122ad09
+      https://github.com/bluez/bluez/commit/912e2f54fd57ba4fbe66b6331149d7131122ad09
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-03-24 (Mon, 24 Mar 2025)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Add decoding of MGMT LL Privacy setting
+
+This adds decoding support of MGM LL Privacy setting (bit 22).
+
+
+Compare: https://github.com/bluez/bluez/compare/f77e72c3ab11...912e2f54fd57
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
