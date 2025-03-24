@@ -1,68 +1,68 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859DC38DE9
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C4825EFBA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742823684; cv=none; b=PVDRyzw1lIqdgUQaIpPkIXh4cc0wiCamd6oK2XAFs0Xfz35N2e7YQDCtMNYA+ewfo8uBrHJgpYHWPTct9leYMAjvwDwT2zNgYEJnXXxDcmQKweJ7B+1Vue2zttuwOCCy/FTiOWZDptinVUqG/ZA/3BIPXI7N/G/s1CZqZl9VxK4=
+	t=1742823686; cv=none; b=QoN7gdYGeNVr5kbcU9v256wtP5Pblo3uXKGj7VC/F0QCT8UpAT+/FANCEzsjljRGk02g91TNW3dm6xhEaX1iMVH8fwE4QldHa0ARoVi6yBOZRKqERu8Bzns23T047siS829pKVR61Mj8aHokhZ4bGbIJ0VfQUbspSNL8R1ggdP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742823684; c=relaxed/simple;
-	bh=BEugHfuWTTWwpom9bxqbBFACjK5cjiXEg+fSDceHnjE=;
+	s=arc-20240116; t=1742823686; c=relaxed/simple;
+	bh=twyj47WMg4IFJ0gOy9506DV1Qq8RF2mGfLyWQnLYyrk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=txP8g168hfw6Vh2BW806Nnhvshn6j/K9xDdq+5LLD1e3I4Hk0CtIwsEg5EzpuWPVIhGIa5cJtnjIHfLu3TXjhgsRH93xMqm/tHoIwuqHAbs4GyQ8NwYUg6+US6KxulDS32xCNKWnNU/7vpOwmncRTnDfHUDyEct+2tacyetfaNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJ10T1sh; arc=none smtp.client-ip=209.85.222.48
+	 MIME-Version; b=ZXqVfIjNTQDF3XoBHdjPbkE9CvVQSbzuNOq70A36+P9QYWviNrCcjodDtmOm9SUjlgrqeUkQ1LxkzKi3T+ARahi4jVhnSxyOnIC4mwZH+fx/an17iq1rZUBM4EDagDkSN88LDTQnGHHJh+5CPypZsr7i5aKOE8DvMLk5zkdPATo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brd/eWEG; arc=none smtp.client-ip=209.85.221.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJ10T1sh"
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-86718c2c3b9so1897557241.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 06:41:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brd/eWEG"
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-523ee30e0d4so2118452e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 06:41:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742823681; x=1743428481; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1742823683; x=1743428483; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8yUFzEeP23ae02zx94YcHk+D3FSZrRH8pMWsZ4/dLsk=;
-        b=YJ10T1shr1kzjFcC2WQ9PGOijBjI+G2VvbdNFZenakrnq5zekEuKVFdGWoQhcIOcyF
-         wtlHiKF29ygIOOtK2bxnF8Pfvn7DfXhHbJb6/Oy8NhGStUy+lZ23ZKzA4+jC3gnDjtem
-         6HDZK4bUZA3vDTKnvbM/mv/iFow8hRMnLR/NS8iiJVcyA8w7oNfd9IKN7vQR7/HODsOr
-         WDEOFVam7yGqMHcV3/59h9N0hEZynJ8E6tZAKPxFUlWRuJcSGJLeQQDJ2VR9dY9wrHbw
-         +MpkAseebGKQcVzbQt4QVa50kDY2WmMZihxIpoiBf4itYr7gEOyvMMvgFcVBPGBK5/p1
-         JaUg==
+        bh=tatSE/r5CYak+9Z6BPPWFBTkdHhGdx0ulDG7+j/WkEQ=;
+        b=brd/eWEG8ivXXsBJf+tQ30h66TX5l5Pa1+5EwlQ7RxRBeeNRPwmKCb9nRrLG5pG4BL
+         Lb+nRJg3ehNkjmOKpRQVcmzgQvTcGzG/cuk5JIPg//HOTVbJMA8xJyo4j5vbbkca+9u1
+         5JDzT1hBctH3LhOVMdeBh5BK7a11Bx1ByDTwPmBj/DHADw1+V2EnvA4mr+MLkRI3c62+
+         e/xIrIGjMFYOf3WUijAn36itVqkrD5fr6RgnuCMnCi4tfoTC/UnQ0Q0KWgaGtUSAEP9y
+         jvfc3QSsJTCQ4mFO+1mdoqzkTnTQRGc7HTuCEQe3YvfdyurQqCrc1T76qBrMjT4tyOUy
+         s8aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742823681; x=1743428481;
+        d=1e100.net; s=20230601; t=1742823683; x=1743428483;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8yUFzEeP23ae02zx94YcHk+D3FSZrRH8pMWsZ4/dLsk=;
-        b=iTg0QuRXrJ2Uul8gmSeZXpg/ep5R42MZ/SarOzYgoHSjiir6EJpAynijDNVVP6XZ9p
-         RdVxm6SJiR4d0LQNiH1n1lGb+9/Ni5K+n1pGkjwn5eypDuKjPSbzQrZC8uwL2elBgge9
-         4qTcTgWskWtuVDiuLjIoFJtDaOLQCpgqCiv+j1dwUiHQ5mAZ+1Nph7M+RnQV40tKslX2
-         KuV/QcqY4I0Z30RXrtu1bRq3KxncMyIpa0Qq4btuY8mlfRV/p12QVFs8zY1nCCOxF8ra
-         9FUMK2uxxEi4Sf2Dn5dzirlvprN7B4RUJbwDq1ljd/YNCcIKIcPMWFXOJXuOErigl2df
-         Cxxg==
-X-Gm-Message-State: AOJu0YzfMRZGTLddo7NdM3xWhoTiAOdVuqg+jYJ8ZV1CzcPHP1EO1DtP
-	tuo3NzjqljzvrWxQ0GWaaqtq/lEVN3LQd2pbjwuMUHLVh81Tiv7fcf7/Zh/R
-X-Gm-Gg: ASbGncvf5QvJBE6ro1NXs7iNNzthqwpTezwzuRFsCjJOHEiRDPG4cvzIGGKXXgGxT9D
-	rOJbCw4u+qNTZZS54hf6rLkClRL+uw2GtsWzmCjmI5GhFQ1ykJp97QIn7NqOQYqXoiZbol039WX
-	oDmeYm0+hKAayAlzX23j++M0d3Xxmbd9rdorabqilFaTCPudzYLzpx07iLhI4Zuys1BoFtFKt6t
-	/L9kHmgwk8NEm1QmTCgGr2iXfheWQDpLmgJhYYNLyVVK3MfFcjA3Euu+3vswfrhJze2Qj9uywRq
-	ANYuW4NMUVj316PZfvVYtChIf0Fcu0C5Yhvf+AEmQ4Psq7bMkiIdreNrXuG2LvEazaupaR7Eo52
-	Cyim+8eszel+NZxq98j3bU28G
-X-Google-Smtp-Source: AGHT+IGg6UIRLM5KtN5iy6/lV9enHwuDTYPBgmDnS6oUBaQefJsFp29/rHyuV6vN//JbDgy9o+jcGA==
-X-Received: by 2002:a05:6102:e10:b0:4c1:9695:c7c with SMTP id ada2fe7eead31-4c50d645bbamr9618365137.24.1742823680542;
-        Mon, 24 Mar 2025 06:41:20 -0700 (PDT)
+        bh=tatSE/r5CYak+9Z6BPPWFBTkdHhGdx0ulDG7+j/WkEQ=;
+        b=DTr7WKnMieiefA4y1djh+jkDkbky2mVmKLGsVftyIccETL9kDkNqopw9RXUOaEX7Xu
+         9qhxPvT1IzkQP0QSb5ccRBkE30Vl60rj+AlptUZR8RZIVrjvG8bxmoFX3fYkKVzj4a07
+         QNZrjeG5jUrXm1vt57YPEgGAec05B5iZSA9q5xwtZhijBXGkMBBrZh6DASJHudiJ5+iE
+         dzUT76inosibgqH+V1URMDD90XLKNgZuyiMaPXwnS9sIJs5detoLydc+Ds1B3vdU/DKj
+         /RAQ5IwKZ8V1N5A7O/hzf/T1wCR3oBmUhXR17Qy4nMv8hOxFnhhnLCWmoHameVzFVoRI
+         WUng==
+X-Gm-Message-State: AOJu0YwAZo9bfM/5DJWoiwPUsAaLm6p2DreeRA+cHoz4HbQ9t318Rugk
+	N044lH2iL363KJ9m9ZUXjvDicLAisjBpJ0YdJN0ZdRDnZm/MTlWwQZlgHdPB
+X-Gm-Gg: ASbGnctyFvJt6MjOnqtfB58U767GtFHA2/1Caw6V760FhkCSVJAwu9W8W4HKD7WyrCg
+	3cVN/UvbTvHX7VUPHQptfN9jIkznEEirmq6eM7PQNHB0QsiM7e3i+T7D9Q3IJymdEQArsrUgApO
+	p5mZt5SxGocVX6+XUCDDIhhjCcU+gi6b3jK1P6l6D3G9zZI8SLA1Y+hOhRwhtrjt1DkszY25TK8
+	zKXkXt6G2ij9zali/MuCWOassSgvxAtJLGCi40AcDxmX+Yy0JMWau+0vSJ3fWIAC19VZLf6xs2e
+	YYuxtyIVjQBAvIenUCca1VB6YRcCPqBMCfwubp2uEUox95AAXd+QJzad8el9U6XjNkbAtNdc3U+
+	w0MTF/FR5Cg+Lmg==
+X-Google-Smtp-Source: AGHT+IHtIT+BjsGRcABsUiCfTJ6eDZ6A7g1ifmXINhmmt7j+wJMC5MoD8kp2DsOqKi2o9rZ+o3HxTg==
+X-Received: by 2002:a05:6102:94c:b0:4b9:bd00:454b with SMTP id ada2fe7eead31-4c50d5267b4mr8278348137.13.1742823683224;
+        Mon, 24 Mar 2025 06:41:23 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bc11d7asm1564850137.12.2025.03.24.06.41.17
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bc11d7asm1564850137.12.2025.03.24.06.41.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 06:41:19 -0700 (PDT)
+        Mon, 24 Mar 2025 06:41:21 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/5] mgmt-api: Add LL Privacy setting
-Date: Mon, 24 Mar 2025 09:41:09 -0400
-Message-ID: <20250324134112.2108216-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/5] gatt-database: Fix always registering CentralAddressResolution
+Date: Mon, 24 Mar 2025 09:41:10 -0400
+Message-ID: <20250324134112.2108216-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250324134112.2108216-1-luiz.dentz@gmail.com>
 References: <20250324134112.2108216-1-luiz.dentz@gmail.com>
@@ -76,24 +76,81 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds LL Privacy (bit 22) to Read Controller Information so it can
-be propagated to the likes of bluetoothd.
----
- doc/mgmt-api.txt | 1 +
- 1 file changed, 1 insertion(+)
+CentralAddressResolution shall be conditional to LL Privacy to avoid
+peripherals assuming Directed Advertising can be used which may lead
+to issues like:
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 3181607d94fa..2fe8ca22b9b5 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -336,6 +336,7 @@ Read Controller Information Command
- 		19	Connected Isochronous Stream - Peripheral
- 		20	Isochronous Broadcaster
- 		21	Synchronized Receiver
-+		22	LL Privacy
+Fixes: https://github.com/bluez/bluez/issues/1138
+---
+ lib/mgmt.h          |  1 +
+ src/gatt-database.c | 21 ++++++++++++++-------
+ 2 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 6a397645bcf2..6af82fc4a1a5 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -104,6 +104,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_CIS_PERIPHERAL	BIT(19)
+ #define MGMT_SETTING_ISO_BROADCASTER	BIT(20)
+ #define MGMT_SETTING_ISO_SYNC_RECEIVER	BIT(21)
++#define MGMT_SETTING_LL_PRIVACY		BIT(22)
  
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
+ #define MGMT_OP_READ_INFO		0x0004
+ struct mgmt_rp_read_info {
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 239a0dc72be9..1498720ad5a4 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -749,7 +749,7 @@ static void gap_car_read_cb(struct gatt_db_attribute *attrib,
+ 		device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
+ 		if (device)
+ 			value = btd_device_flags_enabled(device,
+-					DEVICE_FLAG_ADDRESS_RESOLUTION);
++						DEVICE_FLAG_ADDRESS_RESOLUTION);
+ 	}
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, &value, sizeof(value));
+@@ -873,10 +873,13 @@ static void populate_gap_service(struct btd_gatt_database *database)
+ {
+ 	bt_uuid_t uuid;
+ 	struct gatt_db_attribute *service, *attrib;
++	bool ll_privacy = btd_adapter_has_settings(database->adapter,
++						MGMT_SETTING_LL_PRIVACY);
+ 
+ 	/* Add the GAP service */
+ 	bt_uuid16_create(&uuid, UUID_GAP);
+-	service = gatt_db_add_service(database->db, &uuid, true, 7);
++	service = gatt_db_add_service(database->db, &uuid, true,
++						ll_privacy ? 7 : 5);
+ 
+ 	/*
+ 	 * Device Name characteristic.
+@@ -898,15 +901,19 @@ static void populate_gap_service(struct btd_gatt_database *database)
+ 							NULL, database);
+ 	gatt_db_attribute_set_fixed_length(attrib, 2);
+ 
+-	/*
+-	 * Central Address Resolution characteristic.
+-	 */
+-	bt_uuid16_create(&uuid, GATT_CHARAC_CAR);
+-	attrib = gatt_db_service_add_characteristic(service, &uuid,
++	/* Only enable Central Address Resolution if LL Privacy is supported */
++	if (ll_privacy) {
++		/*
++		 * Central Address Resolution characteristic.
++		 */
++		bt_uuid16_create(&uuid, GATT_CHARAC_CAR);
++		attrib = gatt_db_service_add_characteristic(service, &uuid,
+ 							BT_ATT_PERM_READ,
+ 							BT_GATT_CHRC_PROP_READ,
+ 							gap_car_read_cb,
+ 							NULL, database);
++	}
++
+ 	gatt_db_attribute_set_fixed_length(attrib, 1);
+ 
+ 	gatt_db_service_set_active(service, true);
 -- 
 2.48.1
 
