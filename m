@@ -1,98 +1,80 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9E925D543
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07DDCFC0A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742824178; cv=none; b=qgg8NrY6UsPq25RAz9ZmwK8I7ha22dLiSzsKFv103Y5jC+smiynyIheojWAWkGqM6beFqyuLSA8BScuvuAQItSCt22qKx/vxypuxWFffFP7iBjEnSA0SenCBwgwm24B6MjgUtPBlJ6+aDlrN6f1p8VfXbTdetj21Olm5HWzlX+s=
+	t=1742824392; cv=none; b=q9kx6DTI8OxjGg69zLpLcEpztTD+L+yxzdDvYCsyOujehEwg2T49fczCabOeqgE39GmLgIHUsPrAw6uzjLWOO+2GdVuBcFll9aJCIE4hCULOQUq/n2rxn14QIST3kChubP0XRnv1a5FNp6mNgzo7BniXRr4kVCaG2on6mnOM2Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742824178; c=relaxed/simple;
-	bh=6M2KwkVehYTn4tKLU92RILSeR/qXao2q2Sq6wrnF2vI=;
+	s=arc-20240116; t=1742824392; c=relaxed/simple;
+	bh=Uhttl6uK6sVvB6j0fUp9uQPS0x7Y/kMTP7+8fQlzhoc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K3kXujl9oLheSOlKOWTp3n8uDahD/rqwukWGLzDIeh3LW94Yz8+o3SOiZJxr2TfphoMyK6l3j6rtNc4rPWO7GYzhmEUSaPfOyLv4kCp+6tGbNhd1UWdWTPV8NkJ6af4Dp+Q+ao9H4GCVNkCTzd4KLrDOQGJ5eogsynQsJVQvTUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kIMIHr2h; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:MIME-Version; b=gWALywEWQSejsSWEqDNwlls+Kklh+DOldZ7X0AoSadWjjUkfYz3/yeN260x2TcIzlG7ZMrDCRPj6rK6QphtSXsGGjoFDUuyJuJ7NECd7BemTNSZjn78U6AEuTISTgHtVhtpb5Y4Ha8nYzNLCeew0d46Y4otJA6ZH47bBM2lNpis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U0wxwlFT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kIMIHr2h"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-524038ba657so4352626e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 06:49:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742824175; x=1743428975; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RuYRLbUicIv2IY5VaipSHbaYdhol8Fsaq1RRboNi1jE=;
-        b=kIMIHr2h9yWf3e68cmvyp3osEO0ElP1w/Xy0vpg+5hJYtxgRx2eDOKDRMz3mIixLjU
-         lJC43+LsK+0GKwU6IgAf/t/kwPqQsPvj31UVDGKnkUVxHS66Nhwf1wuXuoVHtKamIdtN
-         +QQHX3D40nCKuS6Nl9cJFjaEKxmL0FXbKw41CPD1tpyQR/Mh2MHDT37yv8owz7g1PfVA
-         htLOSAzV995095+xzUqL65J26EkEoT+3DAPZ7HJAgNbaYVwEJAY0Da362ccASahVC7SX
-         jRtUkoZcJ49diKyk6h1pkMbtyuqhs0wbHYMZwV3sIpPPCsVBtqp9uuvzhUzl3O0akc9l
-         keAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742824175; x=1743428975;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RuYRLbUicIv2IY5VaipSHbaYdhol8Fsaq1RRboNi1jE=;
-        b=H4zXZf/ZbUsi0/gUwwQk410kC0EVzyaha04AWxTA0Mzf4UQCygYNEyTf5eRm81y92e
-         0S/fTZSYXQIcAvd0es8I6TeaJeW3UIcQhSAPvZHagCDm1ORYP8mpH1z1N+oEGQKk5npu
-         0JrblwSfVwIAjDL3p7dTknFqv+2Sa1wXVMCYFCZuX1CQl/NXy07ik0TUU6mD+LXzoxHq
-         /s54hrlseKbcXBdKbypEIG57eSOkBd5gwtNTpETwgTNEltE6lDT//iGMeM48jK/M8Z2U
-         T+QumdMNUHcSBR9R4kuBbRPSQZdIfWrSXQclHj/+7ijOd/9BY35pfyK57iNDpzEtjen1
-         REJA==
-X-Gm-Message-State: AOJu0YxuK2uOw3YAJXwSwfc4/yslX46mX75ST+QF14NE9L8mgPlW0MCK
-	CGiCigVKclPeVn0lh64G4KzZ51UWKIBh34G7RQkKaAZ95UXwSMMQrafBdyHB
-X-Gm-Gg: ASbGncs1cb3nwISwCOM0iIuBk+t/tdjmvMa8DE37JaNLa08rPbwrNU4el0T24IvDLhI
-	kIIpfyUHrEjLT5yNFF18TgmN+ZcxvR4FDHM6VOfZGUztD2NUji8MnxmV8crJphG09yG7b7dMsrB
-	xU+HaVy9cfGUDcwe9uhPTUI8GreikMKC9nFbFndBXNwAKK+OoWIWwR/ApgUHAfMDMEasPVVOqEH
-	QZFVI5VxdaSReCn8VuYavQpCcNJrdTj0OQPZWONd3Trjzi4khief29CDt2V11Xj2XuWtSX3rNfM
-	AKbn5bgZE6iyaQp4xlpqzhMGDbloKRXzj1r/8xOR66zVakes5T4TuAwetsid29JwSqcrYnsgGI6
-	yHrpSQqyNjiGksw==
-X-Google-Smtp-Source: AGHT+IFTiwwa48O9GOWMTaxQ0EA2lbKgbUhLh6JMPYT9AQjn5LjwyDPb7SFMK5Khy9MQddmVMmYd2w==
-X-Received: by 2002:a05:6122:f1b:b0:51e:ffd1:67f3 with SMTP id 71dfb90a1353d-525a7ff39femr8436910e0c.7.1742824175104;
-        Mon, 24 Mar 2025 06:49:35 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-525a73ed878sm1398381e0c.26.2025.03.24.06.49.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 06:49:33 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U0wxwlFT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FCFCC4CEDD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 13:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742824389;
+	bh=Uhttl6uK6sVvB6j0fUp9uQPS0x7Y/kMTP7+8fQlzhoc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=U0wxwlFTJl8Bqy23WpSGpE9qvAC7F4mLGQ8Keu7vKS1GQQ1WVzdzteGZXsTah0s26
+	 XOLc1c8dc5XlRBVSxqlzQYVfegDgysx+D2h5whiiGMeww/m1ACgTzxk1vHx6o9Uwmt
+	 pAI5Y2iVMl3g8/zEKxCHDqEKPp5MwtPA0k6t42tmBRUkTVot6T1HQxlJDuEweW4sgX
+	 gRPo/dURJNk7DKOMB5ITnnCmJGdsnhBXwk5TfCfk5bpVyoWipl5/bECPZUfO43tSC3
+	 YHD/5VtMi/ax1XC+NN6IC6XqjqRbb71tGl4wO+Sx14lPQFcEau9UEN9zceF7IyWPNg
+	 RIFusd/mkSBxw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 6ADD2C53BC5; Mon, 24 Mar 2025 13:53:09 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 5/5] monitor: Add decoding of MGMT LL Privacy setting
-Date: Mon, 24 Mar 2025 09:49:20 -0400
-Message-ID: <20250324134920.2111414-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250324134920.2111414-1-luiz.dentz@gmail.com>
-References: <20250324134920.2111414-1-luiz.dentz@gmail.com>
+Subject: [Bug 219553] Intel Corp. Bluetooth 9460/9560 Jefferson Peak (JfP)
+ not able to connnect to Logitech MX Master 3S
+Date: Mon, 24 Mar 2025 13:53:09 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-219553-62941-iewVMGKBIV@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219553-62941@https.bugzilla.kernel.org/>
+References: <bug-219553-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219553
 
-This adds decoding support of MGM LL Privacy setting (bit 22).
----
- monitor/packet.c | 1 +
- 1 file changed, 1 insertion(+)
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b186431cf135..15f741c61489 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -12999,6 +12999,7 @@ static const struct bitfield_data mgmt_settings_table[] = {
- 	{ 19, "CIS Peripheral"		},
- 	{ 20, "ISO Broadcaster"		},
- 	{ 21, "Sync Receiver"		},
-+	{ 22, "LL Privacy"		},
- 	{}
- };
- 
--- 
-2.48.1
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
+--- Comment #3 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+It might be related to https://github.com/bluez/bluez/issues/1138
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
