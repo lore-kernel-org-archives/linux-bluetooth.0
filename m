@@ -1,140 +1,125 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF811E3DE5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 11:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F0A43ABC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 11:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742814279; cv=none; b=Bepf+DvUWTNORnnLUWXh1TJu3p96w8INf4SbXojyhlHtxQLOd8Axpg+hfrazieJ794V7FOIyCPoMaK1s0DpIxcIx9pB55I+ojE/QlTwpGmvEzM9N6nvfMkXlqNWvCLNIDNa3ov3WqpFUt5D8vKpwDn5TyJconsMr8gGdJCrU6Vw=
+	t=1742816242; cv=none; b=DXJ4WxwIbs7Lsrrr6d+Gwhd3mwWOACxVxttdLRoOB51+N7h4IJ1zbrOiuNOWuR+39ll7AQr24C3CuLgNTuJ8axgRMBrbSszEAA9jEh7FquplyZe+xLBBMXbfSwuS9MMs/6UXwp2TRMDR8SvZFYIh4sT8u/BkLYqkyhre/u0SUAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742814279; c=relaxed/simple;
-	bh=iVUts5Fn+tSeEfH/cCDPTvgsLVYEdbsmgcG/LaEhruY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=on2RVz+17WpkwX99chd/DMu9jXM7e0WSQ+3gy1jjrTGOwX4nTADkB5/Jfyx8/MOsoP91+AL24GWL7nZ8oLxgETIBPom9ifqSFbhusjsKeyd/La4XG5/RWG9+sHpOgIwfDF4GlgoAdGDQN28txb5olrSCvVq7fDeG9ZQmE1NH0wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=FWKdULYr; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1742816242; c=relaxed/simple;
+	bh=vFfmE8R2IOCwAzLnXNy7JfOnPktkxudqQIt2Gl1uIEo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lznMFUu0B3d6Mv7miKZlRn7kUHyNo6JSPTmIRanvxpj9tT5elMKR+KJXER2B5CkdhSSUKiVhYxaELkcQK+k2wJPZiTAz7+vhv1BwgP1oSwTntD8mshgRrvNji7cUK4qN5ZNFq6Lk/XXQ+60PyUv/qNOX/MBQ3RKznAUO/IZCPac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dw62hhEz; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FWKdULYr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1742814275;
-	bh=iVUts5Fn+tSeEfH/cCDPTvgsLVYEdbsmgcG/LaEhruY=;
-	h=From:To:Subject:Date:From;
-	b=FWKdULYr1t07y37VUcN8JpU8PFSvtU3tlQkvQkf44avUgsilneYZ6uoQ/w8zwt0Ua
-	 ZI7hm/46X19nPB6VQwpNEmExL9mWDzkMvs6+dBfOTMSAlR2duTY7tj0YXjBoszNUAY
-	 EYuaXO54QrOySNjQkxadeFDrJ5EC/1/dvusuf/r4YnXTXz9gk8JoOJedkc/gmdmbB/
-	 v2TYoFcNmb+oSulkcf6zbA4snaNZXHHs1RsHty9Uz2oGdgEPRHPgcf3L9GWd/ND0Vp
-	 Kjn05WREnpgWqKRuIZQ6a7SWebBiwytoUccRoOUsnO97004uN9q4l+XlgsVmwknyzP
-	 Hn525tWYJY4qw==
-Received: from fdanis-XPS-13-9370.. (2A02-8428-Af44-1001-EDc7-2366-cd4A-E59d.rev.sfr.net [IPv6:2a02:8428:af44:1001:edc7:2366:cd4a:e59d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 13DE717E0B12
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 12:04:35 +0100 (CET)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3] obex: MAP MCE Publish supported features during connect
-Date: Mon, 24 Mar 2025 12:04:29 +0100
-Message-ID: <20250324110429.65866-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dw62hhEz"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2260c915749so53187275ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 04:37:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742816240; x=1743421040; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YpMVk9UARhNGnGw+k7MYfQUkBpaU5ENdsYWvsuqSldc=;
+        b=Dw62hhEzM8n1Gfjvcfjmpd0w8IP20FPUHRs4727LB0CZtMzBVLVE3rNWM59jPYMgsm
+         cWB9d9CrgPP9Rt4vPIGk4YoZl8ZbllbFC14LPPNabDmHfKmeOYWTUha81Yz/DUID6R2p
+         N4HG8zAiJouMM5ZGsyLAnZ+MzcZhHo8meaE52YYvaHARLFVkXiREVilAZyyC/dGmlF3B
+         TvMA614DWrxncZyAPkOIXOOkHdiGcQMnt1whXhLjatM0QZxVlemnCSJRBRKze2rk4eNT
+         jNgkwXau6K/UXmc1MbuVkD3AH2K6uVu5mlAN8RbV3JN17gOLbLqqeqBBUaCt/s8czru+
+         JPFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742816240; x=1743421040;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YpMVk9UARhNGnGw+k7MYfQUkBpaU5ENdsYWvsuqSldc=;
+        b=XhhXm8WEA/zVPeMdpFgKDG34cH/V6VKwxJjV7gL5uGvCUKPAe/ntFZH7MiiiuoOJQC
+         6/dhAtlylOuicmO0UNJHBArGh3X9v6A+cvjTE0pIyZiU6+mkD8VtjcsfVSstW69p7zTB
+         IIXnEWheXB1x0CgB88Gw3EuMzxCYb8q/kcWQXBwdzsmQKRyoV+y73r0vm6r82jemzSPx
+         xN2AIdNTj3TtydFyH0ydHIJreStLqQ918+8uiUkLjy1Mb9KMR289PfM1z5zaBFPjmIVR
+         2P9FQvxZtVQrHjscMYNtXfOQHCJ0GkBVYi7I9peFAhKkFh3zeQeIBxqZaXciwR7zJPjX
+         59qw==
+X-Gm-Message-State: AOJu0YzLzSFkXH5phdVG3x+QwBj+wGp7NiC/A9KC84HfbwmnU2cNt1N8
+	z9hZsbXiZ/v0zkxrC8/9hg+/Y3xyr4cTQ8nz+R8ivzM9wT5eZ+QLiNuOrg==
+X-Gm-Gg: ASbGnctutQwBFulRI0tfgftAj9hhywZofAR0CT6Hx2trbPnd0f2Xs1YR4uhOL4KEpfE
+	dgN3m0Zwne2nycesDX4TBkAX5qCCsl4fZwThL/Q6pmoCTWFi9+xrufLjePdz6sHcDtbsZSPQwdo
+	1SNhanQwGMlg96+KzEdu/fb4IEOhq57BP0BzlpQ1qG2R5e5XPJR42grSIt1IBieHkRODF2xfYeI
+	WoYgTKEYvLTG8358GzwU7HHSIlr4pAOZA6yhGJzVGudWqcKFAflsozTeqnC5D1hB6xxIM8L2oNp
+	/9M/t1xrSuK8XKhBvy0OHB0MZ3STnX9F6+ECuxppCEzqi95vNb0M/TYG8kgR
+X-Google-Smtp-Source: AGHT+IGVV9SVLEMJ/BLIr/R5WgBhhLTjfQtVBSP6XnbRAGF2L7rZ8EZiRT/D1Dn4ulCCdamvg0FUkw==
+X-Received: by 2002:a05:6a00:4fd6:b0:736:fff2:9ac with SMTP id d2e1a72fcca58-73905a2780bmr20109813b3a.23.1742816239758;
+        Mon, 24 Mar 2025 04:37:19 -0700 (PDT)
+Received: from [172.17.0.2] ([20.169.1.152])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73905fd564fsm7958349b3a.52.2025.03.24.04.37.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Mar 2025 04:37:19 -0700 (PDT)
+Message-ID: <67e143ef.050a0220.2851a4.a69b@mx.google.com>
+Date: Mon, 24 Mar 2025 04:37:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3814095548351811653=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ] obex: MAP MCE Publish supported features during connect
+In-Reply-To: <20250324104003.64019-1-frederic.danis@collabora.com>
+References: <20250324104003.64019-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This is required for passing MAP/MCE/MFB/BV-06-C PTS test case:
-Verify that the MCE sends its MapSupportedFeatures in the OBEX
-Connect request if the MSE declares support for the feature
-MapSupportedFeatures in Connect Request in its SDP record.
+--===============3814095548351811653==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=946750
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.25 seconds
+BuildEll                      PASS      20.31 seconds
+BluezMake                     PASS      1502.79 seconds
+MakeCheck                     PASS      13.30 seconds
+MakeDistcheck                 PASS      157.89 seconds
+CheckValgrind                 PASS      213.97 seconds
+CheckSmatch                   PASS      284.95 seconds
+bluezmakeextell               PASS      97.62 seconds
+IncrementalBuild              PENDING   0.31 seconds
+ScanBuild                     PASS      863.25 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- obexd/client/map.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 7ca33cfe0..58d786ecb 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -57,6 +57,33 @@
- #define SDP_MESSAGE_TYPE_MMS		0x08
- #define SDP_MESSAGE_TYPE_IM		0x10
- 
-+#define SDP_MCE_MAP_SUPPORTED_FEATURES_IN_CONNECT	0x00080000
-+
-+#define MAP_SUPPORTED_FEATURES_TAG  	0x29
-+
-+#define NOTIFICATION_REGISTRATION_FEATURE	0x00000001
-+#define NOTIFICATION_FEATURE			0x00000002
-+#define BROWSING_FEATURE			0x00000004
-+#define UPLOADING_FEATURE			0x00000008
-+#define DELETE_FEATURE				0x00000010
-+#define INSTANCE_INFORMATION_FEATURE		0x00000020
-+#define EXTENDED_EVENT_REPORT_1_1		0x00000040
-+#define EVENT_REPORT_1_2			0x00000080
-+#define MESSAGE_FORMAT_1_1			0x00000100
-+#define MESSAGE_LISTING_FORMAT_1_1		0x00000200
-+#define PERSISTENT_MESSAGE_HANDLES		0x00000400
-+#define DATABASE_IDENTIFIER			0x00000800
-+#define FOLDER_VERSION_COUNTER			0x00001000
-+#define CONVERSATION_VERSION_COUNTERS		0x00002000
-+#define PARTICIPANT_PRESENCE_CHANGE		0x00004000
-+#define PARTICIPANT_CHAT_STATE_CHANGE		0x00008000
-+#define PBAP_CONTACT_CROSS_REFERENCE		0x00010000
-+#define NOTIFICATION_FILTERING			0x00020000
-+#define UTC_OFFSET_TIMESTAMP_FORMAT		0x00040000
-+#define RESERVED				0x00080000
-+#define CONVERSATION_LISTING			0x00100000
-+#define OWNER_STATUS				0x00200000
-+
- static const char * const filter_list[] = {
- 	"subject",
- 	"timestamp",
-@@ -2224,6 +2251,33 @@ static void parse_service_record(struct map_data *map)
- 		map->supported_features = 0x0000001f;
- }
- 
-+static void *map_supported_features(struct obc_session *session)
-+{
-+	const void *data;
-+	uint32_t features;
-+
-+	/* Supported Feature Bits */
-+	data = obc_session_get_attribute(session,
-+		SDP_ATTR_MAP_SUPPORTED_FEATURES);
-+
-+	if (!data)
-+		return NULL;
-+
-+	features = *(uint32_t *) data;
-+	if (!(features & SDP_MCE_MAP_SUPPORTED_FEATURES_IN_CONNECT))
-+		return NULL;
-+
-+	return g_obex_apparam_set_uint32(NULL, MAP_SUPPORTED_FEATURES_TAG,
-+		NOTIFICATION_REGISTRATION_FEATURE |
-+		NOTIFICATION_FEATURE |
-+		BROWSING_FEATURE |
-+		UPLOADING_FEATURE |
-+		DELETE_FEATURE |
-+		INSTANCE_INFORMATION_FEATURE |
-+		EXTENDED_EVENT_REPORT_1_1 |
-+		MESSAGE_LISTING_FORMAT_1_1);
-+}
-+
- static int map_probe(struct obc_session *session)
- {
- 	struct map_data *map;
-@@ -2269,6 +2323,7 @@ static struct obc_driver map = {
- 	.uuid = MAS_UUID,
- 	.target = OBEX_MAS_UUID,
- 	.target_len = OBEX_MAS_UUID_LEN,
-+	.supported_features = map_supported_features,
- 	.probe = map_probe,
- 	.remove = map_remove
- };
--- 
-2.43.0
 
+--===============3814095548351811653==--
