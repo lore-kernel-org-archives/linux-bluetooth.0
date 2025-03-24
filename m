@@ -1,189 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6AE6125
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 14:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC2010F1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 14:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742826758; cv=none; b=QUKC8/Lmd+jTWIO68ZpU90+YNgmunexXYTPj5o+MICk325hDl55qFjLrWTgCfxNDsT83LAnOvwn4GkZAyGBEYJHqMVxamwHWJOHp9jk63I7K0W0HREqVWnelIr3Qt+hQ/DCay5m+M/vSqCk5S5Paz/4OUSBMsqHtPY3QI8e1RwA=
+	t=1742827165; cv=none; b=FHECIKPIWmBEQr9aNHWby8LhjQTW0vTiEQSvb+GWdavZ+ScJCerNRHwoE9KPPDHdPCashJY9GNNp9qr7gFvmnRfcxhwJY/8xMDyzZs1afP6ihPZ4wvuMIrnIdEjgi2fCZmbFAIuF/Z/GD4P/1wLC5STZilXHXdZOamt5CnhaI8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742826758; c=relaxed/simple;
-	bh=IoLd2bL1f8a2XMA/Q2GSioBcTON/2HZlFQRZmEBrksc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=joqJvZmUwkiBre/nD8rxVN7jey9CzJj4LLHewyjneKgjw9CxbZg1WmBZYQaxarB5JNU2pb0T7c3rqHQfRhajuRqaElk2gefDP2KwcrgJp0z1UK6V6+KCyZUPLkuY3maMTPztR6sOOrK9B8Mf2shMhheltMGsP/c+0aVvRWH9ELM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WrhwDjvD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742827165; c=relaxed/simple;
+	bh=OZJZeoneYGew+nnpZrHb6ITmFbZ+jJx4ycgFEpqgmKk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=StiPU5+4YIZJSiwg6q42NcbBftOOA9oNRZ2P9CDbyzuQMulAxV2fcFtxsZLWCbGy4348XJIzLwh45vM3TJUfZBJy7u7K+96n5QfyoepXHZP5OkwjGeYiizxmjC4AATDvjd2Eeo4Pf5n0Lbn34ArDci4jc9xafAPT1/sC3d92c2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGUEdO6f; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WrhwDjvD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F40A2C4CEED
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 14:32:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742826758;
-	bh=IoLd2bL1f8a2XMA/Q2GSioBcTON/2HZlFQRZmEBrksc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=WrhwDjvDGSa/3PqY/SfgYwKgAlHLnKI5R80iMg8bRt1mOKGMrgbzUXUp2fXrXL7Sj
-	 NAU7/EMOOdJT2feCct1F2uewHv+gwRdWq57JJ2WM4uX+C2Zci84rH4AGaAXqggzuow
-	 3tK3cweuqepHp/ApcC5VgfD5T9iCEVHKDAB08HgIhgJLRnPnrVsJcLGEY3ucMuoHdY
-	 q14DiVBg6vKV9e1zBxPzVX1JmpV9JvNDIqkpjLPRKN5slmLZagQjg50E/MfCE0vxez
-	 XG3W72hUo+ZYlHBASlzvK5PVx5zdtNPSrJZ65kd/XAy7iO45izBaxKcPrg9GOsNsCU
-	 QTtL1oYXq6uRg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id EB3A9C41612; Mon, 24 Mar 2025 14:32:37 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219553] Intel Corp. Bluetooth 9460/9560 Jefferson Peak (JfP)
- not able to connnect to Logitech MX Master 3S
-Date: Mon, 24 Mar 2025 14:32:37 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ike.devolder@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219553-62941-AgwS8d2xEO@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219553-62941@https.bugzilla.kernel.org/>
-References: <bug-219553-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGUEdO6f"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6e8fce04655so41993566d6.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Mar 2025 07:39:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742827163; x=1743431963; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xt+VR1vhtLl7DQ88F99hcNtducM1ou8y9qT/thN+hsA=;
+        b=cGUEdO6fjWBYOADBPnElRTRVlQFmrJBvdmzVXOEtsQJMAKZqtzlG9DmGbHQZuVZ6wb
+         WoqEZR3uu8GQyq75VTE/jN5SGeNV/kBdmkW7sbJ9L5ivUNtCFUb7Jmc+eJIFcqjdab29
+         WCALwVzPcWT2Deh99cRWRPJgBdbTmkf6NxeOibjHcL7/geCZY4e+ftRvGG6dP2KoN8On
+         y1XaoTifwh+Okg/WeUF/9xAf3I+4oOtvy9uzkxu4PAxkj7QAr2eU7BSWpIS3cXtQjeZH
+         r9GVOFh/4FMGAS8O1Svmv6eFnFXTG1Jj4KZzkLCUVQhH0+0nrjilgtdUv4n9z2Cs1XRb
+         owLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742827163; x=1743431963;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xt+VR1vhtLl7DQ88F99hcNtducM1ou8y9qT/thN+hsA=;
+        b=v9kf3atTF1NQxCaO5dbo29cRvv3ITyx32yy9pJ/3i4aKQxVShFOeYS00VJ4blM/t/M
+         dN7cXXF5XGbRG+QPr+J3mTKkYM3sitEVYxYXQyshnfftBISQ8kiJK1f5n5jCYIKgx8sA
+         Qi0QpSxkrhi3BxOcAU5FftEfp4WbdmMbOeWEJktOg+IXXdYqleUn/R+oMRuQKvXTOGKU
+         0gP+nd3h+zVB6AMaP2gud8fOJ2hpAF9fiROr2AQB+0x+5+0SAAF2+EIC0zfKWkcvRcbj
+         0SOp9BKGfaQiRMdC7KESze0eEvzQh73KPeHC4U56Jm9RBIQLnJZBGfJIzUGYuY8bO1YP
+         M9XQ==
+X-Gm-Message-State: AOJu0YwRwICEhrW8PxNNhoQvGQC3mBGyxEoEjKrHAKcW1FzwKGFNJyJ5
+	ip6L6Y84PrU4VYBMTL1dJUlPcc0RjdHIY1vwajFjfz0VWQn226LyhPjnMMhC
+X-Gm-Gg: ASbGnctNo16G7qNwwT6XVq3sbv04aX8JzCJquClNQA6uoPGi2Q1C0JG1fYfaVIT5TkH
+	dLgtOhOwPl4omeWkrgPG+NYLq/DxM9+OSy+5cuf9En3wQH6ubju5VHeZ/CN98grWifmhQH1GpYE
+	yoDS62XyCSmUCJ7DjgUvpbCeJ2GMGji58ewMIxwl67/yiOMKM1wBm4tOtS/v4z4wvUD3G/6rxXi
+	AQDdeqIOSVnklVqb3ih/Cjl+swXqNK5/M8Q8m6c3iFZGZO2p7xEqAg2lGLBUefkc0mLrsbovaOH
+	QKTYfGL2oraGWgM1lbe4t77U/SlU/bzEyXMqi7wDbizZOSH8nA==
+X-Google-Smtp-Source: AGHT+IH6KpVerKKwIb02rvgt0hzo+Oca2BidrdeIZA0dtn8KkCVtYEGp6KJ1NcDqB/m3bb0yp89cww==
+X-Received: by 2002:a05:6214:529e:b0:6e4:4085:9f72 with SMTP id 6a1803df08f44-6eb3f26e8c8mr183832926d6.7.1742827162851;
+        Mon, 24 Mar 2025 07:39:22 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.44.197])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3efc5593sm45078076d6.87.2025.03.24.07.39.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Mar 2025 07:39:22 -0700 (PDT)
+Message-ID: <67e16e9a.050a0220.1ed581.134b@mx.google.com>
+Date: Mon, 24 Mar 2025 07:39:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1117476423429849339=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/5] mgmt-api: Add missing Device Flag
+In-Reply-To: <20250324134112.2108216-1-luiz.dentz@gmail.com>
+References: <20250324134112.2108216-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219553
+--===============1117476423429849339==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---- Comment #5 from Ike Devolder (ike.devolder@gmail.com) ---
-(In reply to Luiz Von Dentz from comment #4)
-> (In reply to Ike Devolder from comment #2)
-> > Hi,
-> >=20
-> > I think this is the exact same issue encountered on the Starlite Mk V
-> >=20
-> > I have bisected the issue with a generic LE bluetooth keyboard here:
-> > https://github.com/StarLabsLtd/firmware/issues/180#issuecomment-2732540=
-740
-> >=20
-> > And currently have that keyboard working on the Starlite Mk V with kern=
-el
-> > 6.13.8 as it was working before with kernel 6.1.131 lts.
-> >=20
-> > The change made to have it work is the following:
-> >=20
-> > ```
-> > commit 49de268ad2d7f217579090da90a5d93cad281477 (HEAD ->
-> > refs/heads/blackikeeagle-starlite-btintel)
-> > Author: BlackEagle <ike.devolder@gmail.com>
-> > Date:   Tue Mar 18 09:06:21 2025 +0100
-> >=20
-> >     Bluetooth: btintel, don't reclassify signal for GfP2 and GaP
-> >=20=20=20=20=20
-> >     Should fix issue with LE devices not being found or able to connect.
-> >=20
-> > diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> > index d496cf2c3411..4ecebae58792 100644
-> > --- a/drivers/bluetooth/btintel.c
-> > +++ b/drivers/bluetooth/btintel.c
-> > @@ -3249,9 +3249,6 @@ static int btintel_setup_combined(struct hci_dev
-> *hdev)
-> >                 break;
-> >         case 0x18: /* GfP2 */
-> >         case 0x1c: /* GaP */
-> > -               /* Re-classify packet type for controllers with LE audi=
-o */
-> > -               hdev->classify_pkt_type =3D btintel_classify_pkt_type;
-> > -               fallthrough;
-> >         case 0x17:
-> >         case 0x19:
-> >         case 0x1b:
-> > ```
-> >=20
-> > https://gist.github.com/BlackIkeEagle/630e76164d9eca5f1eb617888c7f1576
-> >=20
-> > This is not the real fix I guess since that reclassification of the
-> pkt_type
-> > is not there for no reason. But the skipping of it works around the iss=
-ue
-> >=20
-> > Hopefully this helps someone to find the actual issue
->=20
-> These are not the same controller as the bug description suggests, so if =
-you
-> are having something with GfP2/GaP that is probably something different.
+This is automated email and please do not reply to this email!
 
-Oh, I did not realize it could be a different chip, I looked at the opensuse
-report and saw the same firmware `ibt-0040-2120.sfi`.
+Dear submitter,
 
-Do I have to create a new ticket for this?
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=946842
 
-Some info about my bluetooth:
+---Test result---
 
-```
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Device revision=
- is
-2
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Secure boot is
-enabled
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: OTP lock is ena=
-bled
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: API lock is ena=
-bled
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Debug lock is
-disabled
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Minimum firmware
-build 1 week 10 2014
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Bootloader
-timestamp 2019.40 buildtype 1 build 38
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: DSM reset method
-type: 0x00
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Found device
-firmware: intel/ibt-0040-2120.sfi
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Boot Address:
-0x100800
-mrt 23 00:53:25 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Firmware Versio=
-n:
-151-5.24
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Waiting for
-firmware download to complete
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Firmware loaded=
- in
-1917199 usecs
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Waiting for dev=
-ice
-to boot
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Device booted in
-17233 usecs
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Found Intel DDC
-parameters: intel/ibt-0040-2120.ddc
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Applying Intel =
-DDC
-parameters completed
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Firmware timest=
-amp
-2024.5 buildtype 1 build 151
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Firmware SHA1:
-0x00000000
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Fseq status:
-Success (0x00)
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Fseq executed:
-00.00.02.36
-mrt 23 00:53:27 archlinux-Yjk4NzBh kernel: Bluetooth: hci0: Fseq BT Top:
-00.00.02.36
-```
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.25 seconds
+BuildEll                      PASS      20.71 seconds
+BluezMake                     PASS      1560.39 seconds
+MakeCheck                     PASS      13.72 seconds
+MakeDistcheck                 PASS      159.08 seconds
+CheckValgrind                 PASS      216.26 seconds
+CheckSmatch                   WARNING   286.65 seconds
+bluezmakeextell               PASS      98.72 seconds
+IncrementalBuild              PENDING   0.27 seconds
+ScanBuild                     PASS      869.27 seconds
 
---=20
-You may reply to this email to add a comment.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1876:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3607:52: warning: array of flexible structuresmonitor/bt.h:3595:40: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1117476423429849339==--
