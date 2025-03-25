@@ -1,44 +1,44 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D8B203706
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Mar 2025 17:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2706A2627E2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Mar 2025 17:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742923804; cv=none; b=EvUv/qtHK8W3aM7WiEdtJFu7nZt4mtLTtUHFjzwxAox0clivmV9npB4kd0lsr/sz8XfAhbJNbtypPEG6dmOltmBIasxMWWQxp+tilLhItBi5ggi3YMSzu+v1E58xo8kgF7/vubUdxhBI6zk+LOxqn1xBsOtdr80ewoL/txgeViA=
+	t=1742923810; cv=none; b=p2AMI2ZlvNYRZt8Vv6VYq4w+nfWi1Cv6bFzcl98RoJHQxx6gd/XZy7KNvnablqcf4Z8832KDhDlskvBAzwqDoHG34MlL3xx76aEHCYb6n6sQh4nIVioGw8vmILawO++p3JdLIsf3dMBFo5OKvdJpLPaj1hjZMyt5ljaH4X5Upqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742923804; c=relaxed/simple;
-	bh=UXInSgiudcVIHyzQzgokiw1Fgmg65Tw9+F1DZF3wkls=;
+	s=arc-20240116; t=1742923810; c=relaxed/simple;
+	bh=JsRPNgZrgpEMZQniwu9kf7Xq9Z9HlL/Q/H01JGa2K6I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fJFOCP62/7RkN10P/USxmKApmjisL5t75S9KS9Ee9C8NOWaLRZfZzdQ63+jfH+SmfdkRhyQfYn8+56t4hmphQDwRYo88fjfQqXD1DIv1/MBt60jJrFsTwrkY+ISPwsOco29mHRJxmVqv3qa9z+kqzeeZQYSk8dHoK6qdufIDNyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=N8N1hAcf; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version; b=VTZDyTWsE3hpPZpQ65HkSbdvuyDIJYZaZl3aAamrHkk8toXEeuXTYRmldJLl73nGjLwihK4LLO6066FLHFHuRJKDaPlnmpoEgqWHzwYNNBn/RWkDb6RBMjekv8k1d7Hq4LYSg/Iy5P3UgTYOT40WIF4EFE/pldlrM6M3vxeZmeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=FYMqS9vA; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="N8N1hAcf"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FYMqS9vA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1742923801;
-	bh=UXInSgiudcVIHyzQzgokiw1Fgmg65Tw9+F1DZF3wkls=;
+	s=mail; t=1742923806;
+	bh=JsRPNgZrgpEMZQniwu9kf7Xq9Z9HlL/Q/H01JGa2K6I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N8N1hAcfyZ46JQnM8EXD/lCcq3y5I3Q9TQ21HS0BXMUz2nKZv1TV5Jxlsp+DHvs6C
-	 D/tFWQpPTK6HDUv0OjaLH4jHrJEo2sNkWYny81BvcNUG4pMzZB7mEjZhhc6yj8qrS/
-	 /m5hYS0fCkYeH2CJXUI8VDn2hxVNbT959X/QNzBRJuC/xn+kWXJK2BB3anAcCIY6mz
-	 kxoIKqgT5OsDu28tCsO4r5KgwwBe+onUSeAzdRTTD8CTA5mrC66JPmlzK5lVeaJ5Gg
-	 +ozo3im/+z5A++4LlLGjQDMXr1dOD6UygzJPrGDLo7QqKHbMHRM0c0s/5lPKRRNYIm
-	 RygJTu4XwDrDg==
+	b=FYMqS9vAX6pE4mkxuJsM6dB9QlGrI5AasC+9T7nRwFeOKbuRqAeIpJ7I9NAFep8ZL
+	 YSigY3NnS3uCAHDpufm4HIB4t6KX30vk4dCnIO5VCrVPaSuG4PwxwBqCR+VCTaAIrU
+	 1TC5O2pZqZjpI3SfIJjwmxjP9qKWq+Ywff/cv0/CQjbhfZQLM5YYg1bFLui+zqDigK
+	 AXLCNZDHHPrJdIbDVoN4GD/ux3y7x3fDYeqjg/J4TEZjnQ+8ZHQrDiaEUA80/zvF/L
+	 AioYDs7CQBwibF7tI8H/PmkIHusjap+DM3asbmOR4UsGggDFZeO8KJhAeXrA450NzI
+	 P6OF911KpDtZA==
 Received: from localhost.localdomain (unknown [81.56.51.115])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id ED83D17E0607;
-	Tue, 25 Mar 2025 18:30:00 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2A79D17E0599;
+	Tue, 25 Mar 2025 18:30:06 +0100 (CET)
 From: Ludovico de Nittis <ludovico.denittis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ 2/3] device: Preserve pending flags when setting the wake allowed
-Date: Tue, 25 Mar 2025 18:28:45 +0100
-Message-ID: <20250325172846.139431-3-ludovico.denittis@collabora.com>
+Subject: [PATCH BlueZ 3/3] device: Try to set the wake_allowed property only for bonded devices
+Date: Tue, 25 Mar 2025 18:28:46 +0100
+Message-ID: <20250325172846.139431-4-ludovico.denittis@collabora.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250325172846.139431-1-ludovico.denittis@collabora.com>
 References: <20250325172846.139431-1-ludovico.denittis@collabora.com>
@@ -50,29 +50,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If there are already flags that are pending to be applied, we should
-keep them to avoid overwriting them.
-In device_set_wake_allowed() we only want to either add or remove the
-remote wakeup flag, while keeping the existing flags as-is.
+When the function `device_set_wake_support()` is called, we don't have
+the guarantees for the device to be already bonded.
+
+For example, that function gets called by `hog_probe()`, that is also
+triggered when bluez scans for new devices. In that instance, we don't
+want to try setting the `wake_allowed` property, because those devices
+are only in range of the host and are not connected, paired or bonded
+yet.
+
+This fixes the following Bluez error when we scan for new devices and a
+new hog or hid is in range:
+```
+src/device.c:set_wake_allowed_complete() Set device flags return status:
+Invalid Parameters
+```
+
+Additionally, because that initial `device_set_allowed()` call can fail,
+this commit fixes the issue of hog and hid devices that, after the first
+pairing, were unexpectedly showing `WakeAllowed: no`. And it required a
+reboot to let that property be set to the expected `WakeAllowed: yes` by
+default.
 ---
- src/device.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/device.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index e8bff718c..474ec5763 100644
+index 474ec5763..727b668af 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1605,6 +1605,10 @@ void device_set_wake_allowed(struct btd_device *device, bool wake_allowed,
- 	device->pending_wake_allowed = wake_allowed;
+@@ -1526,10 +1526,13 @@ void device_set_wake_support(struct btd_device *device, bool wake_support)
+ 	if (device->wake_override == WAKE_FLAG_DEFAULT)
+ 		device_set_wake_override(device, wake_support);
  
- 	flags = device->current_flags;
+-	/* Set wake_allowed according to the override value. */
+-	device_set_wake_allowed(device,
+-				device->wake_override == WAKE_FLAG_ENABLED,
+-				-1U);
++	/* Set wake_allowed according to the override value.
++	 * Limit this to bonded device to avoid trying to set it
++	 * to new devices that are simply in range. */
++	if (device_is_bonded(device, device->bdaddr_type))
++		device_set_wake_allowed(device,
++					device->wake_override == WAKE_FLAG_ENABLED,
++					-1U);
+ }
+ 
+ static bool device_get_wake_allowed(struct btd_device *device)
+@@ -6561,6 +6564,10 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 
+ 	device_auth_req_free(device);
+ 
++	/* Enable the wake_allowed property if required */
++	if (device->wake_override == WAKE_FLAG_ENABLED)
++		device_set_wake_allowed(device, true, -1U);
 +
-+	/* Include the pending flags, or they may get overwritten. */
-+	flags |= device->pending_flags;
-+
- 	if (wake_allowed)
- 		flags |= DEVICE_FLAG_REMOTE_WAKEUP;
- 	else
+ 	/* If we're already paired nothing more is needed */
+ 	if (state->paired)
+ 		return;
 -- 
 2.49.0
 
