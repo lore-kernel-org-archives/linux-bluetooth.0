@@ -1,113 +1,125 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2706A2627E2
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Mar 2025 17:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DB62E3361
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Mar 2025 17:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742923810; cv=none; b=p2AMI2ZlvNYRZt8Vv6VYq4w+nfWi1Cv6bFzcl98RoJHQxx6gd/XZy7KNvnablqcf4Z8832KDhDlskvBAzwqDoHG34MlL3xx76aEHCYb6n6sQh4nIVioGw8vmILawO++p3JdLIsf3dMBFo5OKvdJpLPaj1hjZMyt5ljaH4X5Upqc=
+	t=1742924384; cv=none; b=osL4vc0tyWsD3CTNTGlLDsSfE/K7ql03xtwKVyci6HMAqUn0tXPUIqz5RUfoxu7PJNvtEgL37L3z8JL9suzw8EjzbnJY7XJMNBJ4DTVxMboWeLbdYDNIG12nU1HafuQ/fp2iFEwXZzhNVON5dlwZr3jKq7YMB8XKeX+mlTNKrUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742923810; c=relaxed/simple;
-	bh=JsRPNgZrgpEMZQniwu9kf7Xq9Z9HlL/Q/H01JGa2K6I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VTZDyTWsE3hpPZpQ65HkSbdvuyDIJYZaZl3aAamrHkk8toXEeuXTYRmldJLl73nGjLwihK4LLO6066FLHFHuRJKDaPlnmpoEgqWHzwYNNBn/RWkDb6RBMjekv8k1d7Hq4LYSg/Iy5P3UgTYOT40WIF4EFE/pldlrM6M3vxeZmeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=FYMqS9vA; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1742924384; c=relaxed/simple;
+	bh=OyWRe2VjAQsls8ESDzwcmlbRvsHbN+B8FInxZq6lFkU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=kdoilHHfPB92W4amY2W6bmI3j9xOM8lC5a2oZkmJ/K64YT2ByWYPbtisqcZa3jgF8YThBgNRxLOokg4koRG8jef7hY8TzFFGQqY+clrubNAh1dWnxpK4/3Y0zyJ/7zY0YZA56GDbdqhTQNfC+XXjb3FJl5O0soLlovaD6yb0seQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bRNEeGJQ; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FYMqS9vA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1742923806;
-	bh=JsRPNgZrgpEMZQniwu9kf7Xq9Z9HlL/Q/H01JGa2K6I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FYMqS9vAX6pE4mkxuJsM6dB9QlGrI5AasC+9T7nRwFeOKbuRqAeIpJ7I9NAFep8ZL
-	 YSigY3NnS3uCAHDpufm4HIB4t6KX30vk4dCnIO5VCrVPaSuG4PwxwBqCR+VCTaAIrU
-	 1TC5O2pZqZjpI3SfIJjwmxjP9qKWq+Ywff/cv0/CQjbhfZQLM5YYg1bFLui+zqDigK
-	 AXLCNZDHHPrJdIbDVoN4GD/ux3y7x3fDYeqjg/J4TEZjnQ+8ZHQrDiaEUA80/zvF/L
-	 AioYDs7CQBwibF7tI8H/PmkIHusjap+DM3asbmOR4UsGggDFZeO8KJhAeXrA450NzI
-	 P6OF911KpDtZA==
-Received: from localhost.localdomain (unknown [81.56.51.115])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2A79D17E0599;
-	Tue, 25 Mar 2025 18:30:06 +0100 (CET)
-From: Ludovico de Nittis <ludovico.denittis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ 3/3] device: Try to set the wake_allowed property only for bonded devices
-Date: Tue, 25 Mar 2025 18:28:46 +0100
-Message-ID: <20250325172846.139431-4-ludovico.denittis@collabora.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250325172846.139431-1-ludovico.denittis@collabora.com>
-References: <20250325172846.139431-1-ludovico.denittis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bRNEeGJQ"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4774193fdffso35707421cf.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Mar 2025 10:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742924380; x=1743529180; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sFrT7ufJcr8lBXG5zwgSEvfnW6PChoFfNZfrcrl28Gw=;
+        b=bRNEeGJQ03sahtP2yxbx2Vuj++fa8JUeaxCrM2Dw9k4OiTlFzi32gqMKJrZrEIdFZF
+         5wrG/dwDKKGdUgaTxYvmy3jbII3eOp8Zdi7YASykIHcd/BLPAUagpyilP5+lIVkd1yBy
+         OVsYYNg/vIQT3bibLZ5QXhZMhosFd28NGeKhA1NYm8O6Xgp9nS120GxUvCbHcjc8rmd6
+         ubAs0j9hocrLW7Xltws6L1uYow8J6PetiaEfIycRkuahnMJVobSHLJP9OrYxoZj5idPI
+         NJ21NqYdkBC+j+dfCOdeKBt77L5EpmaRL7tzcUutRE+oNHoEK9vO39SG2fgxi91AKUOf
+         Jhwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742924380; x=1743529180;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sFrT7ufJcr8lBXG5zwgSEvfnW6PChoFfNZfrcrl28Gw=;
+        b=jWQr+zu6S/NxVAwi/h9xzrRAtb0VhP6id2XsbqFP8QD2RU5CJILk6lIEKXMf8MZP7e
+         lhTN6NTP/JTpus9qVxX8kESbw/1XFWcZFRFhb2dtZQCVOaKsdq3zpTas93+UkEKdztsU
+         bSusvUo/KPyFcO00aYDQBlDjINLMxp4lHMbwHFzjGsqMeAsh8Jo5VFjlIxk2E+l9+ivC
+         W5zqixl861JNKWUCcYb/1G4ALocilUShs2gNqYAfASbHD1lzOSL0a/caYgBIGbrDl6T5
+         7HrV7qZSR9VsOFk82qXdSLWXpa/nxluaelz9DutokioZ/9OtW2Vb3Su6YFK6VMKkrffU
+         E05g==
+X-Gm-Message-State: AOJu0YzFbt4pmGiy2RNwykyIyB0jzOVSKXdpCbYOyagUf9dA5E+I1Yl2
+	B+zNIlk+2lmbXsxHH4O8dQuOtbc2w1qvtGGJjzqWp72nWug4kA5hYe1Miw==
+X-Gm-Gg: ASbGnctqx/CFp5JareyGbs+cQCWzRoUnAaASGxsFaYISRzuYfAE/uyEZbMGeIyYCPH9
+	XLT5f/pL1jpCn6RuCRGCToatjc/5Bvlk7Q5dWwy5I9P+Qy3SWYTQZg6eStLa0+wfSf77PTUd2TA
+	+ioxhwd2GX8F8FMHs9Ce6zNCG2bb2O5IFZYvz60b6/PK9pp0lrXXB7D+xIpJwsNsZC4aX2qIb7b
+	8uu2YQ2eBEIC4UaxuMXMpCS8tk6IK8ltWgC5AfIJh+0+lJKs9A+tT3yMKAhyWkd42ic8/GmAnsL
+	dCJvaNrd+KqerZfJuXtP/BdhKel0skVCTjJJC5mzS26/3DoReYm5Gydd+KI8lg==
+X-Google-Smtp-Source: AGHT+IHDz25gdnZkQO0TkJrMpnzR1EUGZW7jzcMiQymWA3GSptcpqOxkgf6FFM7zRBzqObBy9bUhWQ==
+X-Received: by 2002:a05:622a:4d8d:b0:476:a7f2:272d with SMTP id d75a77b69052e-4771de8b4b5mr333875351cf.44.1742924380231;
+        Tue, 25 Mar 2025 10:39:40 -0700 (PDT)
+Received: from [172.17.0.2] ([68.154.30.159])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d15a3d0sm61900401cf.5.2025.03.25.10.39.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 10:39:39 -0700 (PDT)
+Message-ID: <67e2ea5b.050a0220.5f395.b735@mx.google.com>
+Date: Tue, 25 Mar 2025 10:39:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3619322780063263068=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ] profiles/avdtp: Fix reply for bad media transport format
+In-Reply-To: <20250325162548.149495-1-frederic.danis@collabora.com>
+References: <20250325162548.149495-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When the function `device_set_wake_support()` is called, we don't have
-the guarantees for the device to be already bonded.
+--===============3619322780063263068==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-For example, that function gets called by `hog_probe()`, that is also
-triggered when bluez scans for new devices. In that instance, we don't
-want to try setting the `wake_allowed` property, because those devices
-are only in range of the host and are not connected, paired or bonded
-yet.
+This is automated email and please do not reply to this email!
 
-This fixes the following Bluez error when we scan for new devices and a
-new hog or hid is in range:
-```
-src/device.c:set_wake_allowed_complete() Set device flags return status:
-Invalid Parameters
-```
+Dear submitter,
 
-Additionally, because that initial `device_set_allowed()` call can fail,
-this commit fixes the issue of hog and hid devices that, after the first
-pairing, were unexpectedly showing `WakeAllowed: no`. And it required a
-reboot to let that property be set to the expected `WakeAllowed: yes` by
-default.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=947225
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.21 seconds
+GitLint                       PENDING   0.20 seconds
+BuildEll                      PASS      20.51 seconds
+BluezMake                     PASS      1506.42 seconds
+MakeCheck                     PASS      13.68 seconds
+MakeDistcheck                 PASS      159.55 seconds
+CheckValgrind                 PASS      216.15 seconds
+CheckSmatch                   PASS      289.42 seconds
+bluezmakeextell               PASS      99.94 seconds
+IncrementalBuild              PENDING   0.89 seconds
+ScanBuild                     PASS      866.94 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- src/device.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/device.c b/src/device.c
-index 474ec5763..727b668af 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1526,10 +1526,13 @@ void device_set_wake_support(struct btd_device *device, bool wake_support)
- 	if (device->wake_override == WAKE_FLAG_DEFAULT)
- 		device_set_wake_override(device, wake_support);
- 
--	/* Set wake_allowed according to the override value. */
--	device_set_wake_allowed(device,
--				device->wake_override == WAKE_FLAG_ENABLED,
--				-1U);
-+	/* Set wake_allowed according to the override value.
-+	 * Limit this to bonded device to avoid trying to set it
-+	 * to new devices that are simply in range. */
-+	if (device_is_bonded(device, device->bdaddr_type))
-+		device_set_wake_allowed(device,
-+					device->wake_override == WAKE_FLAG_ENABLED,
-+					-1U);
- }
- 
- static bool device_get_wake_allowed(struct btd_device *device)
-@@ -6561,6 +6564,10 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
- 
- 	device_auth_req_free(device);
- 
-+	/* Enable the wake_allowed property if required */
-+	if (device->wake_override == WAKE_FLAG_ENABLED)
-+		device_set_wake_allowed(device, true, -1U);
-+
- 	/* If we're already paired nothing more is needed */
- 	if (state->paired)
- 		return;
--- 
-2.49.0
 
+--===============3619322780063263068==--
