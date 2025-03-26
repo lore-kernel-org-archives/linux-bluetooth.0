@@ -1,68 +1,68 @@
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145B318DB19
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 19:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588AA254841
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 19:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743017506; cv=none; b=qOFv5ISubqbOUqx8px8KAI2HWKXaIOG6GUbmqnmAaMn5b2V3WiTku0rvKVuL6tn6QL7pVCL6rQFXkquK9dR9rRQX5duwHmomwPj3sPWzz6UyVf5gm9kT+O/OX+a/Qk6X/md7l5Xpm97wVUjp/WRmpQ9EwLaUB3DFJSz7jLOJyp4=
+	t=1743017508; cv=none; b=jnxU+vfNDAIYmpEFfHBO5aALwLd5UtFHNdMTlAFlh+1KFli2k7W1EpVbNDQC2tfnvIO6pL75gn0woncr3jYcDEtz3x8K7ZYr0ThC//1HinsHv7rbKH1VVCRRy/1SB11C5POCb7tO/SGYDgZqepRKXj9vKRUhiDxaLwB7BjeOqxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743017506; c=relaxed/simple;
-	bh=TzE4sWl67jzUR5nMTFd7OnUN0ibDp+vZF27lcsfobaM=;
+	s=arc-20240116; t=1743017508; c=relaxed/simple;
+	bh=nb8o1+pwYN6p6PByhy8ZCrDYm6br8C1OtwXvmjyWa64=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qb0eSz5SDRglWbbMd4095jzleqDdaXItNqC3Sot/YNHUYL35BikI8U2gcyWqErlpd9QuWLvabSR6e8GG/BxPEuoSOYB0kw59+uLiE6ItGjK2NJOkNqIkVk/6sT2Ah6t0U/9Of5oTe6jp22NNkkVssAj1KK6gZ315FOGnvSj6xz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V983NCJO; arc=none smtp.client-ip=209.85.222.54
+	 MIME-Version; b=A7Y0eKJFdsY+HiLbOwin03IcS0NJKze4uEx4hoNYkeiL4/8Ef7plYsqdtcCr+eazo2KlEBMgR7Nf0pRbZ+YzpqiW2p6HUfKWw6Qek/2yy+dlE+bgT9PcXHaexXR+rZz8kDt4Om2LrDrhwqSPhxhmkUkV6rK2yZQ1A2z2M9zD6W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ILSACgWQ; arc=none smtp.client-ip=209.85.222.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V983NCJO"
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-86d6fd581f4so1144834241.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 12:31:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ILSACgWQ"
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-86d6fd581f4so1144863241.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 12:31:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743017502; x=1743622302; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743017505; x=1743622305; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=T3SRuHLKAOKf7El2v2wYycMLbTwvDLlYXfZbdRUo32U=;
-        b=V983NCJOGV0woxkfbVtsJF0N+TzKnNvBuWYSmWWDWyOg4kB+rJaZeRPhaj3Paxzk/w
-         sV2HlloKNv3/5yg+lOfX5ygGbJ7AW6qnG2uJhFRRqDsqevXK/Mie1tRovVpz9siSXh06
-         0062lnH2tMJOK06uyH/9eh3hPg9WUbP0j4tQP0/ykfwBWJ4zrkhRjSnDe6kx6Gs0PTrX
-         A3pTQhm5u/HwsCVNc/aWegIGrQWiTdKdw3fCMygxLQeja6IEqnrm2go3g1buDubmJqsv
-         yVs/zB1JDN0eS0/1JEVhZIkXvlfC7vE7UCoHU4uoOqpNiC9ItjHyPS8eAaL+5SFg46NG
-         vskA==
+        bh=KtPK5mnFg/e6V37aqsMHx4SftU4CbHjXD29JzxP223o=;
+        b=ILSACgWQI68a2wTyI0mqj9a1RkqESvz3ChcjPS652zQa/pJSb9uMmrYJ9jPbec/4pS
+         UgV8vihlLaSiW323gudpSAZLuvWOBJz9n2IlnyjrB69/JenulzVJRl3/ofngpM/Xj71J
+         Jez5jv05qcLp1rJEvaXwDF8w6YcKsq1obzx/MHyzsdxKcjUo2BPmqzgVWUXB+R6cYG1Y
+         PVSGvSLiBM5y53XIcToYTGvGtyBvciGvNmMW+PKhZgrQtgpMbL0SC8jj8ZU5fxkiOmIs
+         gA6Jbw+U39/nlvT8diV/vNE6T0LJeP26kNl/DWxqwT4HNZMvlUu25ytlZtcf6H2Q+ozz
+         ZfOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743017502; x=1743622302;
+        d=1e100.net; s=20230601; t=1743017505; x=1743622305;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T3SRuHLKAOKf7El2v2wYycMLbTwvDLlYXfZbdRUo32U=;
-        b=wQ7UTPCVsDlNJDEPg535coYU3yZ9gW17rMg2N9woHTXkhAY4Yv5v1pkItLdFnXCxY4
-         tu2iqnCnv51For4nOmzQizB/XlAcIV4OS1AeMZy2V8paWhz3BgJrWVr9qNKfE96HjQl3
-         B3fGtvoXSP5rB+GjFwk7ZNzNV6wL7i865EmJ05fO/sbkD3RnE/Gbt7NWOzFjl2QlKR2q
-         U7mVQzzGameDyIqu+7gPWolNKS3p0I+CFI5bssTAY+348fodn5v7fUhJ8Kb7tA9xL9Ls
-         ea94sBhw8pyB6q5mZqvyUwaQWPL2Exw0VWMjrDYflgL9bN62xtgG2aKbc6sPoPNZHLuw
-         nqcw==
-X-Gm-Message-State: AOJu0YwY2YY4gsyDgzXQeE+FnwEgM67ABFmEQMSWA5nqTiE6u+GUqQzI
-	5k/hGBOVyefRQZLUBvtIdovjl90ugwcZeyEMHfbdIOjDI9eh0UKRBOTmDofU1Ts=
-X-Gm-Gg: ASbGncugPPUaI0ah0+TKsn2PtcKoStyhtb3RQJKMI2orqqX1tlu5iBnJeilJV60N8tm
-	KI7u2tenK48+Uv3QhelUbY6D/hu1++zA5bFeilteKuh+XBQCu0Wtm42s7i4XuR2NaaGRHuJOkjq
-	yVfiqr9H1n6/bY7M/sJB2e4EdnEYGp9QVg/1TZDu1tvuSzT7u5C0LKMxXWbHyBiQN/K3Dz9kTkx
-	rMQAS9yYxpp1TdcGoLPK0dDrnUL19vxQWzJMhocl5WPOtEJi3i8Tzm/MhzKEjpUoWoBdo360YT4
-	xEpgUA9mehjWCaOWc4gi6wKgbcI0zrKe1lCB+aOnABg0QTs2oiWhuosQ/fp0VwYBImrhU9ICVX4
-	hPsPlBhZEH6PZrg==
-X-Google-Smtp-Source: AGHT+IE9AQ3feGdl4+9BaeOVtY209vT1mEa1NymI1ViHEcOmnukaOjkysTX8ejSCMIj/Y9HHRNLcXw==
-X-Received: by 2002:a05:6102:2b92:b0:4b3:fee3:2820 with SMTP id ada2fe7eead31-4c587072560mr1161717137.9.1743017502077;
-        Wed, 26 Mar 2025 12:31:42 -0700 (PDT)
+        bh=KtPK5mnFg/e6V37aqsMHx4SftU4CbHjXD29JzxP223o=;
+        b=vq1rKboB+p8jzt/2FewrKV5j/obiP2M50HjgQIH3GyhuDip8o5425i1o4GIPHjiHnV
+         WzOX7UOYH7p4VNHrtOlU9ZZMO47XiPGlGtxQpC7EceunE7taGrDdpVjOD0XuvE0nOvtl
+         Lr/iL94IkjqpVF5m5JIAUBDVsMQ3w1aKEsHzgc2Hyua8F+MdJwXzWoNSTo0BnHkAsTEJ
+         Z0dOMEjKC5SsPU0Cnje72zB/qEZtsVsD1wpOPmxC0lxgUt+9+9ca6LJkbNH8uLDSd3kU
+         MyiPQo5TxdYN2HW/DFu1mTCQNiCxQvxONk27zPGghmDtyU2MP27db7oRq8VutyEcRFcR
+         9eww==
+X-Gm-Message-State: AOJu0Yw214oN4f0yUaAUQ2gAh0J76PuPCsrlW9EcRozVVPMo0cKEcerd
+	6zwE7dpi/tpREyaK6aie3O+wIQq7EJ+V/LdBAk7mfweA8CRVSDiFzH//6cQPP5Q=
+X-Gm-Gg: ASbGncsEUiNU3VZyO2AdVys0OgZRi7DF4IIb9FNZuQUYlz+d37KzVrflS//76Svy+aD
+	wrgVEKa3JicKOFnbQXqcZgvm4C2gczBh4OQc0G3zgrqUdbDS0Rg5NaHiFoq3fZGyWeK7krizbcC
+	e/bCxuRQY7AmDbSy8ohJpiL/I7sVXIdeQK9F8TbdYK/BFFKfx6p/wrR/aAKE806k50vgfwEk0JT
+	+dPmogKmff9kHwdbuCioNU/4ed/+wpXUqRqqu/Vq20E051enCyJsXT6SaZ/EdsINi5AQcotOHQd
+	8nlcLHF1eFnyytIMsMdNKxbWZJW5ZQPE58Aq/f4ZpkvB7xV5RL/YdRbd1beSyj3OsAwIZQ5O3kx
+	CyulYNcY1bYYXUw==
+X-Google-Smtp-Source: AGHT+IHpgl/BNO4mv52eToQEgnBhRS+/uivZJ2YCCGSu1FzAtbKPYT9pBqxJCJw8Axwzfx3I35Knzw==
+X-Received: by 2002:a67:e7c2:0:b0:4bd:39c7:804d with SMTP id ada2fe7eead31-4c586c813f5mr1279492137.0.1743017505356;
+        Wed, 26 Mar 2025 12:31:45 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bd75e84sm2497804137.20.2025.03.26.12.31.38
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bd75e84sm2497804137.20.2025.03.26.12.31.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 12:31:40 -0700 (PDT)
+        Wed, 26 Mar 2025 12:31:43 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/5] device: Make Connect and Pair mutually exclusive
-Date: Wed, 26 Mar 2025 15:31:30 -0400
-Message-ID: <20250326193133.2718934-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/5] device: Use btd_device_is_initiator instead of Connect message
+Date: Wed, 26 Mar 2025 15:31:31 -0400
+Message-ID: <20250326193133.2718934-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250326193133.2718934-1-luiz.dentz@gmail.com>
 References: <20250326193133.2718934-1-luiz.dentz@gmail.com>
@@ -76,47 +76,52 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes Device.Connect and Device.Pair methods mutually exclusive so
-they cannot happen in parallel, so just as Connect:Connect and Pair:Pair
-combinations the Connect:Pair and Pair:Connect will now return
-org.bluez.Error.InProgress.
+Device.Connect message is not the only way to initiate a connection as
+there is also the likes of Device.Pair which will initiate bonding, so
+this incorporate the bonding check into btd_device_is_initiator and
+replaces the checks of were Connect message was used to determine if
+initiator to use btd_device_is_initiator.
 ---
- src/device.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ src/device.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index f76c1ec3eabf..6a6c379fcbbf 100644
+index 6a6c379fcbbf..034491b59d30 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -2629,6 +2629,9 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
- 	struct btd_device *dev = user_data;
- 	uint8_t bdaddr_type;
+@@ -320,6 +320,8 @@ bool btd_device_is_initiator(struct btd_device *dev)
+ 		return dev->le_state.initiator;
+ 	else if (dev->bredr_state.connected)
+ 		return dev->bredr_state.initiator;
++	else if (dev->bonding)
++		return true;
  
-+	if (dev->bonding)
-+		return btd_error_in_progress(msg);
+ 	return dev->att_io ? true : false;
+ }
+@@ -5780,11 +5782,12 @@ static void gatt_client_init(struct btd_device *device)
+ 
+ 	gatt_client_cleanup(device);
+ 
+-	if (!device->connect && !btd_opts.reverse_discovery) {
++	if (!btd_device_is_initiator(device) && !btd_opts.reverse_discovery) {
+ 		DBG("Reverse service discovery disabled: skipping GATT client");
+ 		return;
+ 	}
+-	if (!device->connect && !btd_opts.gatt_client) {
 +
- 	if (dev->bredr_state.connected) {
- 		/*
- 		 * Check if services have been resolved and there is at least
-@@ -2648,6 +2651,9 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
- 	if (bdaddr_type != BDADDR_BREDR) {
- 		int err;
++	if (!btd_device_is_initiator(device) && !btd_opts.gatt_client) {
+ 		DBG("GATT client disabled: skipping GATT client");
+ 		return;
+ 	}
+@@ -5834,7 +5837,7 @@ static void gatt_client_init(struct btd_device *device)
+ 	 * it shall be triggered only when ready to avoid possible clashes where
+ 	 * both sides attempt to connection at same time.
+ 	 */
+-	if (device->connect)
++	if (btd_device_is_initiator(device))
+ 		btd_gatt_client_eatt_connect(device->client_dbus);
+ }
  
-+		if (dev->connect)
-+			return btd_error_in_progress(msg);
-+
- 		if (dev->le_state.connected)
- 			return dbus_message_new_method_return(msg);
- 
-@@ -3133,7 +3139,7 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	if (device->bonding)
-+	if (device->bonding || device->connect)
- 		return btd_error_in_progress(msg);
- 
- 	/* Only use this selection algorithms when device is combo
 -- 
 2.48.1
 
