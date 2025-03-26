@@ -1,155 +1,125 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7301A262D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 09:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1544C1B21B4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 10:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742980049; cv=none; b=C462DIKdxDX0SFdpWRbVF5QM4I8KMmwqMLHU7VCGAj5rZ0YtB4buvdbgy64utqE7drk875TM7aLCPXCt/MAWFmf/Umhb67uqCKFQu2ws8K4UlIjqSp5CftJAOWmHz1u2431ocWCNt3ksJTsqkjnY2rHyhZgS9LHEzvHEeOQNPgk=
+	t=1742983922; cv=none; b=kwIdhl+k4MDY7wkG0KzHem7G7KQukmXK5JjW3NDcWE8I0nZ+HMNq0D8x/1kXyUMR/ImW0ZlcQtA9AbptE2yF1ongHsAJyP0lK52LTHh7dC7dsRpHlainKJdLmeCHQxBfWFys9eZK6xhs//yFE+OTPASpsXZblkG/8g6kPiDE6M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742980049; c=relaxed/simple;
-	bh=pKKkYdmRdXQLcy+r9T6Hvuf8gwrchlokRe/rp6DJ2lE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cc3qgcPbwqcOGTHIjvzip/ENaa4UvSLVrRia6DD0RPcKJWsOPScHPK+ocu7Rl88zcNlyGlcAKjBnnecPeCiRECfQs0Tw5zGFVloNTB/DR9xDe8i8e8XdK8U4rqx/2Et6VUjuWPAl0NEdVc0zYxS2/Uy8FgXBaD06Z/1VGoa4r38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=bamflqQC; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1742983922; c=relaxed/simple;
+	bh=+9OmNvqiRVXgcv+dvaWaQ0P34o70i+P8dgFD1bm8RPc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qSVHp6rqSwBAzOHLEiCDxwzLGph/2Lj+NwHQL67dzwa091RSP9xiMJaudefRW+fZj3WEtqkwJ39ppz8FqB81qP7m412Ak6twirxALCqz4uVrtytQ8iN53KXBYZw/vxHC2kxMk9Nz3xnLGzMhbGAKirXO6ADEBQt9HLVYzRttnDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f2mfS6ix; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="bamflqQC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1742980038;
-	bh=pKKkYdmRdXQLcy+r9T6Hvuf8gwrchlokRe/rp6DJ2lE=;
-	h=From:To:Subject:Date:From;
-	b=bamflqQCgnMmPnWL6oPq5IIjaT+Or9sxh8C6RZiXX4c7Pzu2bD1ZHHKaYzetBwEXD
-	 lzmGWUo8cq1iXeOJ8HGSFwZFQ97QEF3K2RXq0c9ky27vszswzc64dX7B+E8eDz0GTU
-	 HI2jpx9EVeS+2KHlueeQc7hywEXVvSZtFPQtX5q+Pv54tf8GrS9cZxtWR6rYOP7BoV
-	 VpnZqhfD3NEVX8nUTaZXaQ5/WC1bHOZSsURjTjl3uFu8Jwzh5YhufagVIJge4ZOcmO
-	 qYhCW62WIR+LAzEhXq9lp/V+8tHz4JB47FJwthIswDav/EXxErpAbRDy/5NAGdlob3
-	 wfqBwfZMM4aJQ==
-Received: from fdanis-XPS-13-9370.. (2a02-8428-aF44-1001-4D02-0f29-39F2-0741.rev.sfr.net [IPv6:2a02:8428:af44:1001:4d02:f29:39f2:741])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 86A4417E0B9D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 10:07:18 +0100 (CET)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] profiles/avdtp: Fix reply for bad media transport format
-Date: Wed, 26 Mar 2025 10:07:11 +0100
-Message-ID: <20250326090712.171313-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2mfS6ix"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-227914acd20so10819725ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 03:12:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742983920; x=1743588720; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OBKekiMq1fEWzexzXfAj9cqUrNpd7E9BSgE78D5RrlY=;
+        b=f2mfS6ixzNetCyqyehTSFs+4Q2TvJZ4h0vykHFSDQ8SH7Ytpt9CEe3DIXH5JaQ+rQV
+         hkskqgmFGvsfCQHJJs52dQ9TpCldokUbzJGv6gr8VWyoaVkj1VAY5EzvPmtsqnaqKxfu
+         vaaMbdbRHoTcua1eLM2Ck0zAsMxGYLrVdJJKYNBd3J9hz9ndKCVZNe/cZ4As+PPT3lhr
+         fzznEgvSBxyzIHqGbzTxhBdaFBQXACQL1Y89jA1KNvoVBnA5u1CaBb2WinRKjElq9wGe
+         eC+zBLlS8w6eDUxVaXqi2UA4gl2hO7owePwEXGRNssUKMIl5Ksk38Xv/iBqsrb9B9QYl
+         swqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742983920; x=1743588720;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OBKekiMq1fEWzexzXfAj9cqUrNpd7E9BSgE78D5RrlY=;
+        b=LJnP6iNmvvMt24v1JDzLhLcuyd9t2UC6FvsKEPMpy8OghDvDEUO67zw+xaqOdgZdrE
+         sDiu4n0ewWAKXOgfgHi+SjPypRQaE8P55Ss4PYaDUctkgnjzFvwr7BbZUSKSjufFCEHq
+         /dbF3gJ5yuS8UwfNfv//6o+vGA3Lq0XgcXd/44qw1aovqm5J4dlWK54GXb118fHVMli/
+         V3vyva4MUU2AEJ7azYy46DORjUAzkEMaS6EKK0y14rcOfFdJhYCC4f02SxoENnYvRLgE
+         0wDgMpOvk3KJYaV5ui0AVO9IAesiGB6Hfv133y7kPxufkS/ahMxZhWxxIfr1jn4Qea6/
+         0MCw==
+X-Gm-Message-State: AOJu0Yz39uF4Hti2VhB1UbMzTUWV0BXn4oUlWB6NZxQE0WnwY/MNbp/b
+	LycYzVw4V1JmVJ/pnB6gOSzzv6yow0RxKHcU5nAGLkYACo/knneGe62wxg==
+X-Gm-Gg: ASbGncuFD9mdQySZ8+Ym6stlvZX9GkSDv55JK64Kw/Qz1nEbhSn4wMsTE7WqhZsjkEm
+	3zQG7ULb2zUZ/2g8jSLzRT+yWdmHLfIbvu70idCrHLg7P4zTUALLoMozdVYfkvDNVl8+6LwgAzn
+	5qAlLxD8F6TvEre/egyof+h8xkSWLEBUfRNAfLC4aRqWOn2DEjMnGuN3+RAO1+7Rh6jCBpqraBY
+	DNZBMX7DsUURA68N2vPKwxiPmpATUjRoSRWtoD1JlpMYI1sZTpFwjZDGhH5yOYm1xDfmf+lp++F
+	RyUrLcNRvQACPBu+Xc/DQYBA/cbcQnGvsdEGQif+UcIhpDDubA==
+X-Google-Smtp-Source: AGHT+IELQUlk3D53QEo/CTlyjQKmY64VfTjA7x/y4zjKkBjK7kURDk4ox1s35i7S+jD14ZRk7EmG2g==
+X-Received: by 2002:a17:90b:2751:b0:2fa:30e9:2051 with SMTP id 98e67ed59e1d1-303788d902bmr4737112a91.5.1742983919819;
+        Wed, 26 Mar 2025 03:11:59 -0700 (PDT)
+Received: from [172.17.0.2] ([20.169.14.39])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3030f806fb9sm11984827a91.45.2025.03.26.03.11.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 03:11:59 -0700 (PDT)
+Message-ID: <67e3d2ef.170a0220.1635dd.b6d6@mx.google.com>
+Date: Wed, 26 Mar 2025 03:11:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8323999861762993620=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,v2] profiles/avdtp: Fix reply for bad media transport format
+In-Reply-To: <20250326090712.171313-1-frederic.danis@collabora.com>
+References: <20250326090712.171313-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Currently the avdtp_setconf_cmd() fails to check the capability length
-of the Media Transport Service Category, which should be 0, because
-caps_to_list() doesn't add it to the list of services as it should
-be bigger than packet boundary.
+--===============8323999861762993620==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This commit adds an &err parameter to caps_to_list() and set the error
-to AVDTP_BAD_MEDIA_TRANSPORT_FORMAT if Media Transport capability as
-invalid length.
+This is automated email and please do not reply to this email!
 
-This is required for passing AVDTP/SNK/ACP/TRA/BTR/BI-01-C PTS test
-case:
-To verify that the IUT (ACP) is able to issue a set configuration
-reject response to the INT if the format of the media transport is
-incorrect.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=947397
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.30 seconds
+BuildEll                      PASS      20.47 seconds
+BluezMake                     PASS      1487.29 seconds
+MakeCheck                     PASS      12.99 seconds
+MakeDistcheck                 PASS      158.22 seconds
+CheckValgrind                 PASS      214.27 seconds
+CheckSmatch                   PASS      284.62 seconds
+bluezmakeextell               PASS      98.90 seconds
+IncrementalBuild              PENDING   0.32 seconds
+ScanBuild                     PASS      868.30 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
-v1 -> v2: Pass the &err as parameter to caps_to_list instead of
-          fabricating the capability
+Regards,
+Linux Bluetooth
 
- profiles/audio/avdtp.c | 35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 80fbe847e..dd8458f20 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -1312,7 +1312,8 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
- 
- static GSList *caps_to_list(uint8_t *data, size_t size,
- 				struct avdtp_service_capability **codec,
--				gboolean *delay_reporting)
-+				gboolean *delay_reporting,
-+				uint8_t *err)
- {
- 	struct avdtp_service_capability *cap;
- 	GSList *caps;
-@@ -1328,6 +1329,17 @@ static GSList *caps_to_list(uint8_t *data, size_t size,
- 
- 		cap = (struct avdtp_service_capability *)data;
- 
-+		/* Verify that the Media Transport capability's length = 0.
-+		 * Reject otherwise
-+		 */
-+		if (cap->category == AVDTP_MEDIA_TRANSPORT &&
-+					cap->length != 0) {
-+			error("Invalid media transport in getcap resp");
-+			if (err)
-+				*err = AVDTP_BAD_MEDIA_TRANSPORT_FORMAT;
-+			break;
-+		}
-+
- 		if (sizeof(*cap) + cap->length > size) {
- 			error("Invalid capability data in getcap resp");
- 			break;
-@@ -1494,9 +1506,8 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
- 	struct conf_rej rej;
- 	struct avdtp_local_sep *sep;
- 	struct avdtp_stream *stream;
--	uint8_t err, category = 0x00;
-+	uint8_t err = 0, category = 0x00;
- 	struct btd_service *service;
--	GSList *l;
- 
- 	if (size < sizeof(struct setconf_req)) {
- 		error("Too short getcap request");
-@@ -1552,7 +1563,10 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
- 	stream->caps = caps_to_list(req->caps,
- 					size - sizeof(struct setconf_req),
- 					&stream->codec,
--					&stream->delay_reporting);
-+					&stream->delay_reporting,
-+					&err);
-+	if (err)
-+		goto failed_stream;
- 
- 	if (!stream->caps || !stream->codec) {
- 		err = AVDTP_UNSUPPORTED_CONFIGURATION;
-@@ -1560,16 +1574,6 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
- 		goto failed_stream;
- 	}
- 
--	/* Verify that the Media Transport capability's length = 0. Reject otherwise */
--	for (l = stream->caps; l != NULL; l = g_slist_next(l)) {
--		struct avdtp_service_capability *cap = l->data;
--
--		if (cap->category == AVDTP_MEDIA_TRANSPORT && cap->length != 0) {
--			err = AVDTP_BAD_MEDIA_TRANSPORT_FORMAT;
--			goto failed_stream;
--		}
--	}
--
- 	if (stream->delay_reporting && session->version < 0x0103)
- 		session->version = 0x0103;
- 
-@@ -2827,7 +2831,8 @@ static gboolean avdtp_get_capabilities_resp(struct avdtp *session,
- 	}
- 
- 	sep->caps = caps_to_list(resp->caps, size - sizeof(struct getcap_resp),
--					&sep->codec, &sep->delay_reporting);
-+					&sep->codec, &sep->delay_reporting,
-+					NULL);
- 
- 	return TRUE;
- }
--- 
-2.43.0
-
+--===============8323999861762993620==--
