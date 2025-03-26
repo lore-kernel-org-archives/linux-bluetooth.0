@@ -1,68 +1,68 @@
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C718818DB19
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 19:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F1C18DB19
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 19:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743017514; cv=none; b=ZW6461emqQXKL9eT+zDUnEYcCFrm4iqiWVEiR3G5DNqbhH4DQO3us3RmlHoGrcWRy67rLCuliSa2QsEWsJefUHhJAyB9D6eHQaxGMykcS2NAtmgcaclTre0oK7MfLtqd0ErHnnMphJ2hB62VAydk76bE7HQjitVqT/XI7XtX4lA=
+	t=1743017516; cv=none; b=C+g50L0GVLggD75PVIUjUG1ab6HIvLMNYi88cg/zgzM4PL2CHGZYYUhtZ3uk/ABV8mJbCfHFM6JcvNNTWSRKV7FdudMbR/9S+3mlKbWCIvCuUTAIPgb4Yxh2nP1iWHNXubAz2qhNmVNpC0pwPFWwFdH8XM2ggKUmDwzF3GimX8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743017514; c=relaxed/simple;
-	bh=0kAz14LJeBzujGmsf5ftu+pOZ9J8TTK6EMSZWmrZ+1g=;
+	s=arc-20240116; t=1743017516; c=relaxed/simple;
+	bh=ZXY8byP9dQrVc5B5b2BRNnvuew3SQyUj4T1zCT9fjYA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hio0ljODLiYpFl0apUzYsr5Ltk05YFS6C42U37aDaDPUjavtzNvslB8eHKBRmkSEUJkTw8Nfglyabr6QkT8Ncwj5nYElOt4QgbOPPKFyVY6Wdv5GNgBCjhZHRUJBhudhf9nsFdl5dfk5Ce1FfDV50pXcU64MoVqwGOeH6jFlhuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hP3nXNkP; arc=none smtp.client-ip=209.85.222.53
+	 MIME-Version; b=D6d+gAGofiNINE4pSaercKqKqzyJQrEk7+qI11+ZfFIu2XW45UjhaF+1mBXdRO3mYeo+BAF9n2p0nkYBPPdmfg8I9IpNFIr9QWlZ1Jyb4eHHOQAN2ipbIqXnGGNdKooX0XpdGxuY5DdAyMPWXj/9jW3e1qNkVajrtfCMJOr/NSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B4miZjDj; arc=none smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hP3nXNkP"
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-86fbb48fc7fso82620241.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 12:31:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B4miZjDj"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5240764f7c1so103141e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Mar 2025 12:31:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743017511; x=1743622311; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743017513; x=1743622313; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qUFzjok7KDF0U/68DXlWp0PHaQBteZtCHRinspvqPZs=;
-        b=hP3nXNkPYbaYsbX0XQfs83DG30e18M78xXT14nA92lMlFIT+IKRdA5tHZugbpt66mr
-         GFtbjsTw0hqSqlF6S4jTMED43D6v9DN74+VepYlW3Oq5d7htZAM2vgpuO7xCecHCl96K
-         3v3vRb2j7osBM0EUJNQpTD5Knj0VZmvX1SiDMG6FmABSZaLX6hpODvCqLZzCS7M9F8WE
-         JXbU2krfS+rXYJ/l100+sQTzBa5oQb3GsN31WScbpF1qrg4gidbaf0wgzUKZUsBpqDFe
-         KnRSchire7aRKGjSojxXAvwFByzlo5vURVnRX7LuUwfqI1aPIfuRuJuSMcNXN35vOBWy
-         Ml4g==
+        bh=EycdN3E1BSZiORJ6XzALLnkt7w3brNrRMBKjtqd4mzs=;
+        b=B4miZjDjbD7bwevH1dxaTi4yK+YVE6ATwIPSiJpNrj0SL31WDdcqhTWQT5YV/SixAH
+         BRIezA7B6J7ldn6mIliik1583BGa+TAKfCASpyPF44JKVnpIjlUn1ZVhKy9WF0yxXJML
+         wBi4Y8XqgyNmLzbuAafb6NKTLjG9f9y9rhYSDDiRgc9n8meRxeRHrZ35j2RShl4QXNEe
+         J9F7jLz1dGtnZ2OjXUr9RFwlWGK8N+rOp+WjTxyOz1mRXne4nOXYu1GwdXQFpNje8KtP
+         k5H/9iSHpAUFv4Lx8OwiRv4ZDxAhf3YCySe9C56YWcB2Oz8GZ+FQzTu7X2va7IVWWBpz
+         wVzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743017511; x=1743622311;
+        d=1e100.net; s=20230601; t=1743017513; x=1743622313;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qUFzjok7KDF0U/68DXlWp0PHaQBteZtCHRinspvqPZs=;
-        b=WDl5buIEa06jZJ4B6Ds27XDZnRfbRtigLXRXJQ0HlmffBOKDqMIFBu20CC6RxiHz5e
-         xzKC1StNNZxJJ5685qtXfbw1F1Q8sxmvGtI/bEme+1In90uSY/ghfOmHK5PXIDjYgtwF
-         nwuKVyXMB2bBxtVEkVCZ8Ucfd7/t2DlKoIHCDJ1GCO9OdEZ6iyv6NeHdYND64TJyehr7
-         lFFurWWCQBuTkBFGOEJd6C68Bvm5tAGrIAFFLfMv3tJ5qvkB6xwZ+ix3K4/a0Ml4HBr2
-         v80vwbP+NUJCv9nFXRpguw63Ne3aRvnLC3uKL3XNeqDcWbmF1E6IGhIihf6Zv1W/8sz1
-         K6sw==
-X-Gm-Message-State: AOJu0YwcDcCdBkAw6vVSXixLkp2Rq+CeJSLb77nyPUcaOnWxQGGNhGDX
-	1glG0Te4UW/p7ID4Ozla9hy4jGIW4LupIVndE4j20TwY5bPG4iX85CC5GN3uG2Y=
-X-Gm-Gg: ASbGnctsnl4yH9ZpCwxZmiPCYWF4W1hG1ok9gPFWdE9N9liVgT1n7Z2wG2FBoQvHrA2
-	PDSUN5yLhg90PtlzRv9BU3/KAf2HSF0DYNN3esbA9tDBg+haJcQzLRlR5c4pbE7VBbuHB0JJAoX
-	Z4V1+Ankj4Hp8XoGpjPBjCMtN9JzfApf3HTLwYFAoNqVv4AWGDraKhV8OLQLXkmpRsxmdKqalOQ
-	1FJ/C9LHNdWL2WIyTlcSgD9MBzrRHBaBgKa/qqQj007ovS7d0AzINV4ZXDYwY5I+/Yq8Bq+0kbU
-	4RbwXmaaYvfamMn9IcPGmS+NAnH84bKM6hfA5Hf2WKvBS9DaaQmH8soMIIgf1JY7NogFUFqUTmo
-	+a6vY9U7YCRiF3Q==
-X-Google-Smtp-Source: AGHT+IFp9sQ1O1Xp2dLCKaavs2hu3htqG1YN9GpJQQ4Goh4wOf920e7bF/mz3S7j9V2wFfuBpKvd8A==
-X-Received: by 2002:a05:6102:3e08:b0:4c1:8928:cefb with SMTP id ada2fe7eead31-4c586fa84cbmr1680904137.12.1743017509221;
-        Wed, 26 Mar 2025 12:31:49 -0700 (PDT)
+        bh=EycdN3E1BSZiORJ6XzALLnkt7w3brNrRMBKjtqd4mzs=;
+        b=ftHbCroWOD7bo6k4ltPkNwiNZCNLMK6iJBwDQgDjBBMjzyFPVbM9t8OmZRUOxKXJMv
+         uFvX6evAp3bRPAglZFkNVCnlS5lNdLHGLugdSLwpMOXtrOEhjRc+NUuVtH8RIOInWDn5
+         QRZK79DaPfvtnpp6TkQcVNW7smTgfWy6rX/F8/IuLQfTHUrmzinzfVqnuRNpsY7DA0Dz
+         iRL6Um+qymMk8rxfRR+3d1xNuNnJLjO28x73NsZ7D3OXet06TnMa/qXU0X1JgvR6fm3K
+         Yt1CniPdlvPITSX3cv/y8Zx5Z7gAWidUimjflFY2toN+Q+MHO/vt3Yi5l2qFEsSBn/bg
+         Itlw==
+X-Gm-Message-State: AOJu0YyN67tgHi5h70IMybR768AUyOyeFJAO4OXzVm9H4LfVvMl4u4Gm
+	0Zncz6+iYchn1ancVrIfY1GlJ4tnYRir7whmQQc26yZ3SjZReOE3AcRFZrodv4g=
+X-Gm-Gg: ASbGnct7uCBl4mdPFrnfglh9eo63+GMjVZizuuZ+qGYoQkPKpupIAfxL3STbEfv9HBM
+	H5hIDSLw8oWCQ0Qxy+Y9v5ISqb4qBGJ3JbSfwbTeHuB8bdgqeMtKQ3bXs4AGgxO7a9Q/wDU9y6e
+	mUljZlqtGq9Xgh74iDCjiGUNjS2OovW1UaUadMJ/D+GL+Opla+LMMSON00OdCm3xP6DJbpuuvYN
+	uKOxswIx4dnvtFBhSWGna7sRRT0jS+rAENPsQj9okwZBEAJz8BtRqoEpPFNzghTZLKsbeqHzhNj
+	TgVeqhki2x6MwClOvS2UaN4E4TKdxfhoqqcsPC7JMl4ykYGqZ6p9Qo/t4nikNOYaRTaA+mS89tl
+	evspEeMIms/KCkA==
+X-Google-Smtp-Source: AGHT+IGYR8ND60QxsfmpxCzXgxQCtYNYjtcJ8a8i9kmkioJzuSks91yatnqYIc+nsUA1me80uvp2kg==
+X-Received: by 2002:a05:6102:2ad1:b0:4c1:9f48:617e with SMTP id ada2fe7eead31-4c5870b58a4mr1296327137.21.1743017513227;
+        Wed, 26 Mar 2025 12:31:53 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bd75e84sm2497804137.20.2025.03.26.12.31.45
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bd75e84sm2497804137.20.2025.03.26.12.31.51
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 12:31:47 -0700 (PDT)
+        Wed, 26 Mar 2025 12:31:51 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/5] shared/att: Make bt_att_set_security never downgrade security level
-Date: Wed, 26 Mar 2025 15:31:32 -0400
-Message-ID: <20250326193133.2718934-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 5/5] device: Elevate bt_att security if bonding is in progress
+Date: Wed, 26 Mar 2025 15:31:33 -0400
+Message-ID: <20250326193133.2718934-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250326193133.2718934-1-luiz.dentz@gmail.com>
 References: <20250326193133.2718934-1-luiz.dentz@gmail.com>
@@ -76,30 +76,33 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Requesting a lower security level than existing one shall result in no
-operation since higher security satisfy a lower one and it is never a
-good practice to allow downgrading security to begin with.
----
- src/shared/att.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+When bonding is in progress it means Device.Pair has been called thus
+the user indicated the intend to pair/bond from the start so the
+security of bt_att shall be set in order for it to wait until pairing
+process complete before attempting to proceed with GATT discovery and
+any other traffic.
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index dabbdb4315eb..8657cb6423fb 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -727,7 +727,11 @@ static bool bt_att_chan_set_security(struct bt_att_chan *chan, int level)
- {
- 	struct bt_security sec;
+Fixes: https://github.com/bluez/bluez/issues/1125
+---
+ src/device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index 034491b59d30..057d116be6fc 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5797,6 +5797,11 @@ static void gatt_client_init(struct btd_device *device)
+ 	if (btd_opts.gatt_channels > 1)
+ 		features |= BT_GATT_CHRC_CLI_FEAT_EATT;
  
--	if (level == bt_att_chan_get_security(chan))
-+	/* Check if security level has already been set, if the security level
-+	 * is higher it shall satisfy the request since we never want to
-+	 * downgrade security.
-+	 */
-+	if (level <= bt_att_chan_get_security(chan))
- 		return true;
- 
- 	if (chan->type == BT_ATT_LOCAL) {
++	if (device->bonding) {
++		DBG("Elevating security level since bonding is in progress");
++		bt_att_set_security(device->att, BT_ATT_SECURITY_MEDIUM);
++	}
++
+ 	device->client = bt_gatt_client_new(device->db, device->att,
+ 						device->att_mtu, features);
+ 	if (!device->client) {
 -- 
 2.48.1
 
