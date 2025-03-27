@@ -1,142 +1,125 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0DD207E1F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 08:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780831A8F60
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 09:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743064898; cv=none; b=XZ9k6PHRrLg33jI5llWZnfblEp3kUMYsRgganEIhuqSXiVHwun/eKKTqfOgbNFBqAQK8pDjjNnfSEKyLo2eu5Edlmqy+KSya9FlC7NyY4NNunIe6+pxHc9YvegnxBv6ram8rBBdgVi2eAMA4VwwkcqhADJzzSiXFxD9zgGFNWiI=
+	t=1743068249; cv=none; b=nG8KwdgOioo/Zt3nqRjJdMIlZa4F31JJTkAreDLV5G2AXarcg668AxJUDPgxXZcO/YqQUFzWTtOVhF+XtCPOAvZAeAWn6crbWM3dQtiJWh8o47LyjJ7zypFlzBaaEIDSQK9JFzNmHHOlfaYP4jQaL4g8OjlHRJKMfKJdIVyBP+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743064898; c=relaxed/simple;
-	bh=dUcDMfeI5H4ywpx5kx0qh1jViiwOPZCMfyr8fysg0M0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LBfG5U8/rQkdXmzmk8OVVaVMC0g+CogUAvHKNkyKttcHNRFoNPrq9G74PilYx1R+tLGnLA81Z0iiQ+tl3yXP9y1xdJUNCXQc5yMKqRhxhzYWeSbR9+tYmKWphlGF3/+pzTAn+YnCKAFo6zQ19sVHx24IS9eeBnpisXP//Fk2D4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LLah7PKU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1743068249; c=relaxed/simple;
+	bh=mO6sKsxXOtkkrfG73QDQv6wCM2WIhkNBp3WBAuPXWyY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bTzuGdH6xgMXIE2lyi6Y2WlI/ZXcYCbj6nVmlY94x5HK8sTcRNuWVAnHuPurRTTdPd5zAdkoBdrANjo9GZBoaEkVCxnWrEieaL7vzJPWoMpzGxWNfnKPGy8rVt1mMSZziV+Dby2hdoH07O/KUscK4hqfyEWL0Kng13Gzl1pu0T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cl2EW2gg; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LLah7PKU"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52R5jFaD010192
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 08:41:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=oUe35kkA15tCUL50WVex/AH7EA29Z9wdrUy
-	7yBf2alQ=; b=LLah7PKUjuhgAALJLF4s1mV3WKFsvwAZVsp+3iXSqOD4d/eo6MD
-	m2laYQ3t6GWd/oRVVqeNgNonYlzBiXABX2zs9F1yzYSeK5PhEQjBrtiNhb7mWdVj
-	rHHTWVtJYhTBw6b34iwF+ph7AaR28LcX0sMuOvwVFyDlx/w+8VEqPn3Ju4GSLGuv
-	seIgF1i/yqX2uY22xpgNOckISMUXvYrv/E/EuLT7G9BEKCAhWAUDKwttN53R43PM
-	u+yhNBGIqyG6Yjyg7UKLpuPctHJLb8uCjqz6jT4KQoZ7J4x6XVOz3da1r4go22ud
-	hOWsoc5k7TPkm4bpuVbw5tCVo2cK7IOJrrQ==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45kmcyfw97-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 08:41:35 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 52R8fWR7009015
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 08:41:32 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 45hp9mfsm5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 08:41:32 +0000
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 52R8fWBY009010
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 08:41:32 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 52R8fWjG009009
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Mar 2025 08:41:32 +0000
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
-	id 303E22260D; Thu, 27 Mar 2025 16:41:31 +0800 (CST)
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: quic_shuaz@quicinc.com, quic_chejiang@quicinc.com,
-        quic_jiaymao@quicinc.com, quic_chezhou@quicinc.com,
-        quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
-Subject: [PATCH v1] dbus: Fix add invalid memory during interface removal
-Date: Thu, 27 Mar 2025 16:41:28 +0800
-Message-Id: <20250327084128.3315736-1-quic_shuaz@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cl2EW2gg"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ef60e500d7so6566497b3.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Mar 2025 02:37:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743068246; x=1743673046; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oCcV4JEmqVhfMqwB6gEOMkZwlwvgOq/9WnA93QzFT3o=;
+        b=Cl2EW2gg/W2tn4b7xJMqtltoNEoJyniGigpxdK/qIpM6PdftAm+J+vchEQnPqduLDG
+         Gn2VL0+vD4Y8+hu7b0vB69UybWEHwu+1/VdXP1rIwuZtZKgn9kselJNBIDcKEijwi6gh
+         HTZy6P8VwdtHa82k4eGMMRA2meZe87vxvN/MqTyC5Geayn8hYalI9EltsWP01N5CrMJJ
+         4NV9xr3A/A89Zk39TO6xH3+bQwk0kJi4tooCZVVAOCZ1GMAi6ltUZdrmxo/3YWrxKb/1
+         ABYH9jkDRfWn7KmbBZS8LOhkPdITUz72SCsyWojBjkd2POBiXRsw1fIht/SDCIEvt3ik
+         alYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743068246; x=1743673046;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oCcV4JEmqVhfMqwB6gEOMkZwlwvgOq/9WnA93QzFT3o=;
+        b=iZVB72V9WVO9u0KHUWsGlMSoFJSnK3DpwN+PZNvCnH7qA4OES2a9ylVakwiV661hwy
+         khoJh5HVAp/6sM/o0ThWhxfLkKkXDhByUKLTm4q4VmMoEjw43CQwZxwiesQpOHI4UlwQ
+         TBw0zedz2ztIJKXftoq7uOvZN80y2robWXR8FAV5KGww8cXNaiZWtHEa8Dd/CotdIqj+
+         phrKQyhZvH2FJKXNHiZsOsZ6N9iBFQldyGx9F03/5hAVfCtRd3K2IwUhyFrslLcQEk07
+         NSEPD97AEQ16qHremaWC3ZUrdKCDVGqoRu4IwfBxdzCDfpPUS4iieYYgVt2V2m25iek0
+         BSZQ==
+X-Gm-Message-State: AOJu0YxykE/3p3WIjItnovL8dHDFQeIgqjp9jleP3D9byDXa0cTNCyW0
+	DzYmAi1RXNUcK0fUnldfsgd7dKyBslQf26kUlJE+uGEU12HVdlPLCkN+oA==
+X-Gm-Gg: ASbGncvHUihmu6ETMGd7pFtvYplkcqOANSlyOcvLM/fpn1HH7VKcVFgyifFZa1/cKO3
+	L78ISSACC9o9iFOfl2RPaqDsZPfH1xQ9+CPkZkaN5vG/pAztFiFccr8PjfrqM8GYhahKs5YxUrH
+	bCcyA+pUNFVsFuuarzlFSvegGS65zh/C00LZwXFI7AGBBrXZepoPHjTRj4oiY00DCMKd9x8C4dU
+	0L3tVHwUHEZXoDQKhMRblNddNc/J8okX5owRyhF0qj7sQyrcLkEv2clMlUknIiuEKU8B82UGCkX
+	UZ1loGMEvEeCEa4eRDcclIn9XPXv75sNOhTRzr40KgeNyvIY8uk=
+X-Google-Smtp-Source: AGHT+IEhDDNBy7G/5lJr9uob7LesCD1pmSDhOOspj39wTunf2yOSIZhMGWKEGsQYgnP/rvxMnSUkHg==
+X-Received: by 2002:a05:690c:6f89:b0:6ef:8dd0:fff9 with SMTP id 00721157ae682-70224ef9a35mr36767717b3.8.1743068246037;
+        Thu, 27 Mar 2025 02:37:26 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.54.74])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-700ba73b9a0sm29652107b3.12.2025.03.27.02.37.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Mar 2025 02:37:25 -0700 (PDT)
+Message-ID: <67e51c55.050a0220.264bb6.c82f@mx.google.com>
+Date: Thu, 27 Mar 2025 02:37:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7113973618789725878=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=EZ3IQOmC c=1 sm=1 tr=0 ts=67e50f3f cx=c_pps a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17 a=Vs1iUdzkB0EA:10 a=COk6AnOGAAAA:8 a=Yilk4jFxLBpVIceRAnQA:9 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: 6kdiOHDHU8lMhucHElBT-Crc_kZXJy1I
-X-Proofpoint-GUID: 6kdiOHDHU8lMhucHElBT-Crc_kZXJy1I
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-26_09,2025-03-26_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=612
- spamscore=0 lowpriorityscore=5 clxscore=1015 bulkscore=5 phishscore=0
- adultscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2503270057
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
+Subject: RE: [v1] dbus: Fix add invalid memory during interface removal
+In-Reply-To: <20250327084128.3315736-1-quic_shuaz@quicinc.com>
+References: <20250327084128.3315736-1-quic_shuaz@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-test setp
-register_service <uuid>
-register_application <uuid>
-unregister_service <uuid>
-unregister_application
-register_service <uuid>
-register_application <uuid>   
-core dump
+--===============7113973618789725878==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-invalidate_parent_data is called to add the service to the application's
-glist when unregister_service. However, this service has already been
-added to the glist of root object in register_service. This results in
-services existing in both queues,but only the services in the
-application's glist are freed upon removal. A null address is stored
-in root object's glist, a crash dump will occur when get_object is called.
+This is automated email and please do not reply to this email!
 
-Add a check for the parent pointer to avoid adding the service again.
+Dear submitter,
 
-0  0x0000007ff7df6058 in dbus_message_iter_append_basic ()
-   from /usr/lib/libdbus-1.so.3
-1  0x00000055555a3780 in append_object (data=0x31306666,
-  user_data=0x7ffffff760) at /usr/src/debug/bluez5/5.72/gdbus/object.c:1117
-2  0x0000007ff7ece0cc in g_slist_foreach () from /usr/lib/libglib-2.0.so.0
-3  0x00000055555a37ac in append_object (data=0x5555642cf0,
-  user_data=0x7ffffff760) at /usr/src/debug/bluez5/5.72/gdbus/object.c:1122
-4  0x0000007ff7ece0cc in g_slist_foreach () from /usr/lib/libglib-2.0.so.0
-5  0x00000055555a3630 in get_objects (connection=<optimized out>,
-    message=<optimized out>, user_data=0x555563b390)
-    at /usr/src/debug/bluez5/5.72/gdbus/object.c:1154
-6  0x00000055555a51d0 in process_message (
-    connection=connection@entry=0x5555639310,
-    message=message@entry=0x5555649ac0,
-    method=method@entry=0x55555facf8 <manager_methods>,
-    iface_user_data=<optimized out>)
-    at /usr/src/debug/bluez5/5.72/gdbus/object.c:246
-7  0x00000055555a575c in generic_message (connection=0x5555639310,
-    message=0x5555649ac0, user_data=<optimized out>)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=947676
 
-Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.21 seconds
+GitLint                       PENDING   0.21 seconds
+BuildEll                      PASS      20.58 seconds
+BluezMake                     PASS      1463.81 seconds
+MakeCheck                     PASS      13.21 seconds
+MakeDistcheck                 PASS      156.36 seconds
+CheckValgrind                 PASS      211.73 seconds
+CheckSmatch                   PASS      281.97 seconds
+bluezmakeextell               PASS      97.21 seconds
+IncrementalBuild              PENDING   0.28 seconds
+ScanBuild                     PASS      859.96 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- gdbus/object.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 7b0476f1a..d87a81160 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -809,7 +809,8 @@ static struct generic_data *invalidate_parent_data(DBusConnection *conn,
- 
- 	if (child == NULL || g_slist_find(data->objects, child) != NULL)
- 		goto done;
--
-+	if(g_slist_find(parent->objects, child) != NULL)
-+		goto done;
- 	data->objects = g_slist_prepend(data->objects, child);
- 	child->parent = data;
- 
--- 
-2.34.1
 
+--===============7113973618789725878==--
