@@ -1,100 +1,100 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310C579C0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 20:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F929219A67
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 20:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743452201; cv=none; b=WYh4OAFcKET2SXdaeC2T5P3uspeAVtQNkVRB9qun0mMdgRlDraf82NZRRIiNMWEDwA9yJwa7blW6xOZipQFgRYvCfcEQ8cLF3iejkMDK5/u9Dj3QlWxCm7Y31i9ItT0aznLniD8IEipNoAqGf8Z7uhcr7+vIpjr9RRK66EG1jcQ=
+	t=1743452290; cv=none; b=Ju7hh3NWET9Opetax3leDAgwsiwmxRcLdhOsjHPbwj5UkxLUn6whO1xAe3ZPCijrYax83/+F71BdwlzRRYEyXZLXZXmRrlMbUDK8UBOAtKcwChL4Bgxe5Vou6NrzmdRegGwalxl/pb+i1dU6gSPfX/+oHM/5ws9L5mkfLNReGSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743452201; c=relaxed/simple;
-	bh=BxfTwYGEc/8kocBwn0fRMRRqRGuAsafv3LZ3D+3JGQo=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HCjAQpM43PhAtBdr4G5NW4F2Jv/kIJN0bcG4/c29aYCWTZAMLcgYYyRczDGZe2BUnDjKk1ofr9W2vX5E0wVO4gic/eJ9GW4rv7+veyKSv4DJb8g1hnS075Zg2hrdd8gw1huCg2S8gDEE/7HIp0X09Pz46OT6yb8jn22Ygtv/64E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Tl0FaA/x; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1743452290; c=relaxed/simple;
+	bh=JVlYEwRwikuzUOgEINGp7li9we21O1TcMlC0U0e11IM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=C6KSPN/keIIHHlaXFbDZ3Olp+oW04z7PtttP2RrnAX/COw0Qr/jZOnk881TM5GxaML9f9+O5bY5fDjl90P9LhP7hlyCHldSHtIDIiU6WV/xRYmZlfeAdwHwMz1bQI3nVoQIR8B+iu2S26sIqcpiRQv9vXQvVfDOEf6Cv3R3aAlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CtgIkwWt; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Tl0FaA/x"
-Received: from github.com (hubbernetes-node-08ca2c2.va3-iad.github.net [10.48.205.114])
-	by smtp.github.com (Postfix) with ESMTPA id 178394E0B4C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 13:16:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1743452199;
-	bh=cWbP+AH3q9K0TBmywSkeIFznOGQz5ftVROy5gRgFVlg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Tl0FaA/xsZmh31224c41b7ssMTrFRgaAmH8CjzkYB+5BoCQxcGNbuCcfWHWowH7nQ
-	 p5jxeZGV+DTz3ZY8aoHFhADez9Md5jRP0FtHqqyzA3ffMJQV5gsKN57JGzzE0byXfo
-	 v7Bl+ApOCZKjH17ZbPUrli3joEMtMUsUK2HdxDQs=
-Date: Mon, 31 Mar 2025 13:16:39 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d9430c-cdd02a@github.com>
-Subject: [bluez/bluez] cdd02a: dbus: Fix add invalid memory during interface
- removal
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtgIkwWt"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2243803b776so16089865ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 13:18:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743452288; x=1744057088; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=JVlYEwRwikuzUOgEINGp7li9we21O1TcMlC0U0e11IM=;
+        b=CtgIkwWtX6RiM3VNfB++5xztbUBnfDdaTQE50dluxUvxsdIk5uh4BBxSxdwSDhwnuZ
+         DBRGooCPYs+uggYT+lgspqpPanpM6kJYfGIhkYxFXO5cB60in49xdqbJQyGOB4jTVjS4
+         lxYsq3xOs58H+B+uKyRgS4Ky7NtHNejuTJTfyrktG8tvimxB7Xhhq6qTU1kkAM+xPpOG
+         wb6vmGj0hmqFEjX4yWlNtAaRySQzQ4Sw7AO/ZxUtuavcEs0UdJE8Wn2voBRCmCh2H6eK
+         KOUzjRDH5PlVPbnmSmXw/h5V6ChV8AwlJHpMJjSUh1wMt6syHxUCOnSyaboovXwGgLQr
+         Zf9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743452288; x=1744057088;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JVlYEwRwikuzUOgEINGp7li9we21O1TcMlC0U0e11IM=;
+        b=sEro+DMixXIAvghHkRYceAZsu1uTsqc4nYpOUL1DcYltRrwOT7i+AogyS8hKV3zFeX
+         WdLKcrbT+Dr0t4i9CVlNv33kWNnDGhfdoLICHa2NSKK9q35epGA7JeQY7gXCZrLf25kz
+         xkBMJJo5XqjuAAL1GR3t+f1/0pUX80dQ9dh1yYGuaVwML3x9KrmkMJKDj6YsY8LGgvux
+         BsHBoOyDzFgd/SlZCDtdrEd6XwYpH63EgnmZXmOTuz4m9w5zYtwS3Nt2g0IQLv0kTa/a
+         Vl//prLok0dshhCcaaf6sH1P598aegtwZRewz2k4MHOiFCbMj5r/3ICGfaqsIcpZrSqB
+         ey3w==
+X-Gm-Message-State: AOJu0YySoNHquc5RmuMz1z/vBCFZuIcK2gnlEhYH4eZCbiDkg/3dAr9k
+	M75B5DFgQMaiOYmaxhGZnX7KSMymPTiEEMljak2eLlQgyCsUr2Ijg0YV1Q==
+X-Gm-Gg: ASbGncv2vsFPNkXi+OiO6aW4oNb7KgfK9hhyTHzfbHaO+HY5gLW/Ejvfgt/n9KsKulM
+	nmN1seAna7wbuUT6lLev40hZPMeumey1JBvErKrxjBziTs4h0eOMx0p4y4TCIR6X3W5a1WfG7xZ
+	46qhWYEfLZIztoSmMeGFBMpQ9njQBQikzp+5Hi+CYey4eq3pY15dT7tW7Mu1OSfT1VmJrJJvOT3
+	f4YNypO6LRJf9DcfR1eLeZHu8JiAWYnWvkLRD15Ue9vn4YjLAlaXlMKPG/5e23pvU27eLUmr422
+	ZWl2n/fZi8dzvprkVSYrlJgZzgx+pNFDUNncOdp9a5H4LCe8Mn88
+X-Google-Smtp-Source: AGHT+IGUJDor05Um1vC2mwIPYjncJxW2YYlCdTFw+EIag6NUmgqnyP6NsANvZfV/HzKlsmoLmO8j/w==
+X-Received: by 2002:a17:903:2308:b0:223:5ca8:5ecb with SMTP id d9443c01a7336-2292f9f2b5cmr165618435ad.42.1743452288276;
+        Mon, 31 Mar 2025 13:18:08 -0700 (PDT)
+Received: from [172.17.0.2] ([52.160.161.188])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739710acd6esm7623239b3a.145.2025.03.31.13.18.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 13:18:07 -0700 (PDT)
+Message-ID: <67eaf87f.050a0220.f9eb8.8282@mx.google.com>
+Date: Mon, 31 Mar 2025 13:18:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3410005993155171988=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, metze@samba.org
+Subject: RE: net/io_uring: pass a kernel pointer via optlen_t to proto[_ops].getsockopt()
+In-Reply-To: <156e83128747b2cf7c755bffa68f2519bd255f78.1743449872.git.metze@samba.org>
+References: <156e83128747b2cf7c755bffa68f2519bd255f78.1743449872.git.metze@samba.org>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3410005993155171988==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: cdd02afbb7eff7aa1bb9f9e8a7b6e0b8321d323c
-      https://github.com/bluez/bluez/commit/cdd02afbb7eff7aa1bb9f9e8a7b6e0b8321d323c
-  Author: Shuai Zhang <quic_shuaz@quicinc.com>
-  Date:   2025-03-31 (Mon, 31 Mar 2025)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    M gdbus/object.c
+Dear Submitter,
 
-  Log Message:
-  -----------
-  dbus: Fix add invalid memory during interface removal
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-test setp
-register_service <uuid>
-register_application <uuid>
-unregister_service <uuid>
-unregister_application
-register_service <uuid>
-register_application <uuid>
-core dump
+----- Output -----
 
-invalidate_parent_data is called to add the service to the application's
-glist when unregister_service. However, this service has already been
-added to the glist of root object in register_service. This results in
-services existing in both queues,but only the services in the
-application's glist are freed upon removal. A null address is stored
-in root object's glist, a crash dump will occur when get_object is called.
+error: patch failed: include/net/inet_connection_sock.h:47
+error: include/net/inet_connection_sock.h: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-Add a check for the parent pointer to avoid adding the service again.
-
-0  0x0000007ff7df6058 in dbus_message_iter_append_basic ()
-   from /usr/lib/libdbus-1.so.3
-1  0x00000055555a3780 in append_object (data=0x31306666,
-  user_data=0x7ffffff760) at /usr/src/debug/bluez5/5.72/gdbus/object.c:1117
-2  0x0000007ff7ece0cc in g_slist_foreach () from /usr/lib/libglib-2.0.so.0
-3  0x00000055555a37ac in append_object (data=0x5555642cf0,
-  user_data=0x7ffffff760) at /usr/src/debug/bluez5/5.72/gdbus/object.c:1122
-4  0x0000007ff7ece0cc in g_slist_foreach () from /usr/lib/libglib-2.0.so.0
-5  0x00000055555a3630 in get_objects (connection=<optimized out>,
-    message=<optimized out>, user_data=0x555563b390)
-    at /usr/src/debug/bluez5/5.72/gdbus/object.c:1154
-6  0x00000055555a51d0 in process_message (
-    connection=connection@entry=0x5555639310,
-    message=message@entry=0x5555649ac0,
-    method=method@entry=0x55555facf8 <manager_methods>,
-    iface_user_data=<optimized out>)
-    at /usr/src/debug/bluez5/5.72/gdbus/object.c:246
-7  0x00000055555a575c in generic_message (connection=0x5555639310,
-    message=0x5555649ac0, user_data=<optimized out>)
+Please resolve the issue and submit the patches again.
 
 
+---
+Regards,
+Linux Bluetooth
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+
+--===============3410005993155171988==--
