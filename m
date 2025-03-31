@@ -1,142 +1,126 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828EE1547D2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 09:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDE5202C40
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 13:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743411835; cv=none; b=cH/ZAwjrlmOa5aav5lYzCfABcEqYk6sIF2pAjv+SvZxJp2aucia09grgOUIOJczM4i+9ItkdIirt7vHzFMYd5ceTmbQUg3sGjWajhti8pfxRLTODQenyOdY+HpfR1TeFNaFA/KIposniYa+zwjwHpRAaz26wQk+ZioJlT1tHZKc=
+	t=1743426912; cv=none; b=BK4ztQq/siIR4NA7P5CGuilWlhgu6h4Ho7j6EY+4DgJ8A8/TtdWT2mHYmCkqiW4ch9KOrG9Z7xat5nSOONr15QMjfsFj6p+iP1BZZ1KBvnL8s4da203p3+HHtRqMQf/NuGFTVVeEgYyWQ2IAU3pWcY4rH8iilNkwELaoQ/O+BMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743411835; c=relaxed/simple;
-	bh=8vfz3jrR8VPVhQ+NHA5ByhUUwSiQS35O6XFfiMFBYQ8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Xt2xyQPOJBKEDTZRs4/vKJQWQAR9MUc+AUmIlxEqrKBHuvOGaAGXgv0hKXEvQx6zlKnkF7xu7YgQ/fMihzMwIDMUghciWHftEIpDdTVFSF11IjXeCOKd5qdgERPWzkOJqww9/4jl9w1YdPEM2xzgIH42dsFPHFHc3SctSjpQTEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CgU2tzZ0; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743426912; c=relaxed/simple;
+	bh=g25dOdAIsn7hvzwtAgPgy3LhrMdbM2O3w8w+IjJkQ8o=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=iKMoTH2jAE332HAGjjNiHF/xqpbnDbBme4yjfd1TiITlIYirMi2WnKuJxZ9Rv3Fs2CIrQmwmVL5Kh5BiOFRnFfU6M7oxwUB5zN4a+Zk6yIk6AcoOE6IGCYP1qF6vCoQ2+b6edWH2vXJILxcqltef7CFH+RRcrF0DuiTGe1wBMB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VmcKPNxd; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CgU2tzZ0"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-227a8cdd241so45622305ad.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 02:03:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743411833; x=1744016633; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KtcGRiQ9oEekL3oiqhhfwGWCIKmbRkBODw5FAFNe/L4=;
-        b=CgU2tzZ07xGlQ8nOpRge9l7JoQYOJpQE6ZXMtwie38l1YYmaHhou1LCOERe9e2oFjx
-         pCBORyIkfV6Igl6A9an6PZsg0s+yutJc8W8IgBp5XYBWeh+6syx/w4oPoPjsDmrrndU5
-         iO+1Pc34dGyiTSuuGzBC7luvTu8OAV+KTGVRWfSa7tcyPzggNu1y6i17rQRWiPCLvDPF
-         R/0SokhIrI3vULezvNarDU80o/tdiVuefy5wwXxMbwEoVeiAHIZ7f4h8HIVe1hoWDAos
-         Z4OxdN9nl9qQysXW/pc1h9unsT1hQ08LhWcb+toTys6zYhU+VX+ZaRopzPh//xZyk91S
-         j4DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743411833; x=1744016633;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KtcGRiQ9oEekL3oiqhhfwGWCIKmbRkBODw5FAFNe/L4=;
-        b=rm+1yESoKfJko/SlAxkfMRmFMWBjiZPGKlMwju2TqEnHusbuc6qItCvUir3FKz83uL
-         9Cbg7M0u2cNHpx4ZXReS66uRsbdpY8tEr/htNWPkauUjCkPXJumH3ZzguOTzSrqXQm2k
-         6NnVQ1R/yCuem/qa3Nwp2DaOFWi1mY8zvcyPlpxwfCr6JSgY8WULxVuEZ/fhYzx8BUoj
-         3nnjoWXeQEigYwJw/bXo90GVOV8qjYw8rMmDSYHTnvrGEI8WeM4ZmAaDuKQNpRrn1Jm6
-         fuzOl3DFhG2hr0KH7gVPA190oITBdyvJSkYiiV6hFHEGmKpRwpMCOYEpLAe7y6oj/BAi
-         azcw==
-X-Gm-Message-State: AOJu0YwCkMsUNnbjj6tGK4Ivc26rDFS4Bue7TRq2pojwqVvC0onXkb1N
-	fPakIgaenPJAgrwrTFPx2K0eB8KJKMfnk+PzY3j5wjBGU2cYROkraYcwCw==
-X-Gm-Gg: ASbGncvzrVS56ji6N7HSWelg5fDo8SeeHuwlOyhIUA96yZB1PCQUGeEQON/SSEU0CAY
-	CMtfg359tYu3LZSGWtEvqELS3LIIRraXk6hIuHONhJlCG0uCUSfzlFeq6UsDkFVvfpoqk/1XTTA
-	2b0XCUCISrjIpdqfq4hQD3I9DkrG0R3INakv4ssPbJ76EB85pO37u594DAoKqkOwqJ0iKaFkOMR
-	RCeSPb7quQmqWsEH9oYpKGfSdsLmjFgv5wxVzJvGGct7y0yTlR+RZXF2J9d5d8CIpQGOnq4fPId
-	3hBoMGs1fFfJfUgP7ZunGRvUCW7oYymCaUma0MpZiekIPR4zh/w=
-X-Google-Smtp-Source: AGHT+IHHIJ8Ik0gQcx2YhMoyIRB8G0H79k5s5BQT4OcyuEiuvZT/DsMcGP0KJw5sMOAQeEh5pZxY4w==
-X-Received: by 2002:a05:6a00:4b05:b0:736:4830:68a6 with SMTP id d2e1a72fcca58-739803359e7mr13757083b3a.4.1743411833421;
-        Mon, 31 Mar 2025 02:03:53 -0700 (PDT)
-Received: from [172.17.0.2] ([52.234.38.116])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73970e27183sm6721024b3a.63.2025.03.31.02.03.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 02:03:53 -0700 (PDT)
-Message-ID: <67ea5a79.050a0220.264666.4c7b@mx.google.com>
-Date: Mon, 31 Mar 2025 02:03:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5297378922226761144=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VmcKPNxd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1743426908;
+	bh=g25dOdAIsn7hvzwtAgPgy3LhrMdbM2O3w8w+IjJkQ8o=;
+	h=From:To:Subject:Date:From;
+	b=VmcKPNxdWChgevdb6pFKGVbFWq6GktGFWirT1ZuQXvXw+XiZQXAruuvl37Jvf+/nd
+	 vbPpfz5xygJKzmJSEZk+sUhE32EeqTXDLDr6jdxFEEkffFIH/dXRnclsa3VzqaQ7fx
+	 XQQSlRCVGJ+UvR7Y8U4u4hUuKwAIrP7wbCywKbFirqrVyuMaS+Lwrta0ceSfiycHsB
+	 TRmJ/6W1+Mxm3Q/FdFL89D0NeCUCzZKWuVvufsf1CTLdzmby16Vr/KTFROeY1i7ASM
+	 8wjlIRZoRfbIp395rxQUY/iLcW1SnN4wEgKhYkxwRZ84XbMjESYOsCtSYNboVURZmV
+	 hP3KqAY5Sy90A==
+Received: from fdanis-XPS-13-9370.. (2A02-8428-af44-1001-1A63-3db9-41B7-AcE4.rev.sfr.net [IPv6:2a02:8428:af44:1001:1a63:3db9:41b7:ace4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 93CD417E0215
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 15:15:08 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: rfcomm: Accept any XON/XOFF char
+Date: Mon, 31 Mar 2025 15:15:03 +0200
+Message-ID: <20250331131503.63375-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chharry@google.com
-Subject: RE: Bluetooth: btusb: Reset altsetting when no SCO connection
-In-Reply-To: <20250331083523.1132457-1-chharry@google.com>
-References: <20250331083523.1132457-1-chharry@google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============5297378922226761144==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The latest version of PTS test RFCOMM/DEVA-DEVB/RFC/BV-17-C
+(RFCOMM v11.7.6.3) used unusual chars for XON (0x28 instead of
+0x11) and XOFF (0xC8 instead of 0x13) and expect a reply with RPN
+parameters set for XON and XOFF.
 
-This is automated email and please do not reply to this email!
+Current btmon traces:
+> ACL Data RX: Handle 11 flags 0x02 dlen 18
+      Channel: 64 len 14 [PSM 3 mode Basic (0x00)] {chan 0}
+      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
+         Address: 0x03 cr 1 dlci 0x00
+         Control: 0xef poll/final 0
+         Length: 10
+         FCS: 0x70
+         MCC Message type: Remote Port Negotiation Command CMD (0x24)
+           Length: 8
+           dlci 32
+           br 3 db 3 sb 0 p 0 pt 0 xi 0 xo 0
+           rtri 0 rtro 0 rtci 0 rtco 0 xon 40 xoff 200
+           pm 0xff7f
+< ACL Data TX: Handle 11 flags 0x00 dlen 18
+      Channel: 64 len 14 [PSM 3 mode Basic (0x00)] {chan 0}
+      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
+         Address: 0x01 cr 0 dlci 0x00
+         Control: 0xef poll/final 0
+         Length: 10
+         FCS: 0xaa
+         MCC Message type: Remote Port Negotiation Command RSP (0x24)
+           Length: 8
+           dlci 32
+           br 3 db 3 sb 0 p 0 pt 0 xi 0 xo 0
+           rtri 0 rtro 0 rtci 0 rtco 0 xon 17 xoff 19
+           pm 0x3f1f
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=948479
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.35 seconds
-GitLint                       PENDING   0.35 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.41 seconds
-CheckAllWarning               PASS      27.01 seconds
-CheckSparse                   PASS      30.02 seconds
-BuildKernel32                 PASS      24.00 seconds
-TestRunnerSetup               PASS      430.44 seconds
-TestRunner_l2cap-tester       PASS      21.06 seconds
-TestRunner_iso-tester         PASS      39.22 seconds
-TestRunner_bnep-tester        PASS      4.67 seconds
-TestRunner_mgmt-tester        FAIL      120.34 seconds
-TestRunner_rfcomm-tester      PASS      7.93 seconds
-TestRunner_sco-tester         PASS      12.67 seconds
-TestRunner_ioctl-tester       PASS      8.37 seconds
-TestRunner_mesh-tester        PASS      6.54 seconds
-TestRunner_smp-tester         PASS      7.25 seconds
-TestRunner_userchan-tester    PASS      5.23 seconds
-IncrementalBuild              PENDING   0.77 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.146 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.194 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/rfcomm/core.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index ad5177e3a69b..0c0525939aa0 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1562,23 +1562,15 @@ static int rfcomm_recv_rpn(struct rfcomm_session *s, int cr, int len, struct sk_
+ 		}
+ 	}
+ 
+-	if (rpn->param_mask & cpu_to_le16(RFCOMM_RPN_PM_XON)) {
++	if (rpn->param_mask & cpu_to_le16(RFCOMM_RPN_PM_XON))
+ 		xon_char = rpn->xon_char;
+-		if (xon_char != RFCOMM_RPN_XON_CHAR) {
+-			BT_DBG("RPN XON char mismatch 0x%x", xon_char);
+-			xon_char = RFCOMM_RPN_XON_CHAR;
+-			rpn_mask ^= RFCOMM_RPN_PM_XON;
+-		}
+-	}
++	else
++		rpn_mask ^= RFCOMM_RPN_PM_XON;
+ 
+-	if (rpn->param_mask & cpu_to_le16(RFCOMM_RPN_PM_XOFF)) {
++	if (rpn->param_mask & cpu_to_le16(RFCOMM_RPN_PM_XOFF))
+ 		xoff_char = rpn->xoff_char;
+-		if (xoff_char != RFCOMM_RPN_XOFF_CHAR) {
+-			BT_DBG("RPN XOFF char mismatch 0x%x", xoff_char);
+-			xoff_char = RFCOMM_RPN_XOFF_CHAR;
+-			rpn_mask ^= RFCOMM_RPN_PM_XOFF;
+-		}
+-	}
++	else
++		rpn_mask ^= RFCOMM_RPN_PM_XOFF;
+ 
+ rpn_out:
+ 	rfcomm_send_rpn(s, 0, dlci, bit_rate, data_bits, stop_bits,
+-- 
+2.43.0
 
---===============5297378922226761144==--
