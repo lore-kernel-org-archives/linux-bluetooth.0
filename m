@@ -1,133 +1,151 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C8D1C69D
-	for <linux-bluetooth@vger.kernel.org>; Sun, 30 Mar 2025 13:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80B92E3391;
+	Mon, 31 Mar 2025 00:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743340889; cv=none; b=jmtG2wf3hoUDjFdRv7dx3l0YqVWzk0uUkVO5oO71y6eyq75mEL8DzP4KR1i3ulrqeEgaFedh6YPjMkxZt3q/gBsxUShyvbnXQ5ZDS1JAFjKPsHvVWoEO6hV2rRZ2U5nfRLmcbCAv5ozoaejRtVagfMB7BGfGB3NmjTakjM9/zmM=
+	t=1743381625; cv=none; b=JPhc8QNnCQ2tJ+D4xmYqEE30QvV6BIZAnEYehtM0Xpoa4E2cnrfMOSVYJ5abUpjNVCTP+ce8/zczs1pefebVLJotFa8Z5xOJUmMPzrB3I/WoPppdtn+fyYQrIO74QKYYJAAMLl+S1is7Gc24addd3bwHO9zc1tkwhrxETJ/JJZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743340889; c=relaxed/simple;
-	bh=9bU9CC++cDEeYJsJnfeZHx+6RQBjNe7Fqz8JdmX99b4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=a1eQXQN5N2dOkegxw5bIv1/kfITOje9Xw1mtavvV/ZoHaLeuExan/gD7p49o+Tzy8dQTg6YuPy5pLW3Bd1CH4P4i5okGNrvXFiX/JimpDYoEVBf7ipWRnoETExFQbLTErdoiXAgR/X14/yYaMkVsBd70KzYnBhGdOdw5yU99I6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fXw55jrS; arc=none smtp.client-ip=209.85.219.48
+	s=arc-20240116; t=1743381625; c=relaxed/simple;
+	bh=CKpFOxFM9RiaLlkNxdeKxCbkNLU4hkniP8PEEHv41ds=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MU4EXxGKUlOeWsdIemxgY+lCwlG9xGbxuwFOoRjmakMCDnrLs9E1+lEq7T2iBIkaseyiCqq3o/SGCX7BR+UIstzF9KUBDrqO70LMB7nCdOjKxwMRon395LSehouYojU2d8p7UwtYAj2hsm1vzjlO3itiD16PS4qsgxnYwwXBO7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AEt6/a+o; arc=none smtp.client-ip=209.85.166.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXw55jrS"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6e17d3e92d9so28701736d6.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Mar 2025 06:21:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AEt6/a+o"
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d45875d440so15502665ab.0;
+        Sun, 30 Mar 2025 17:40:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743340887; x=1743945687; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pl8aRXradTq2SD6jVMMSLCgwe8zjfhlBGWdB0p47RiE=;
-        b=fXw55jrSg9CsYGTLHEJnqWhECPCtJqA0B9LKRN2ntVMpIiR7r4yk2zll2zMfwHog7T
-         SbJOe+EqjwTugoa8fn1BehBwL2Gwsxoi1dePxetM2Svz1bd2xWIi7J2OXR46JNxzFyLJ
-         AfhuAghqEX1H1SSfE56glf4y0p3Zq3/0jWNGDz05fMg1ZSs8lMo6dkLlPf8cD6EJ2P+N
-         a68ye54f+CriQR+2UxDy9Zehtc7AqlN4FnUPYb2v/7PYWgL/ioWllwUGKaq9NFUOeMto
-         AHhe56xh4LxFMdm6ATujYJWU0AVV7lneLKdEgko0uIuY14C0lJZ44Xt8RwOd23hgjc/a
-         V78w==
+        d=gmail.com; s=20230601; t=1743381623; x=1743986423; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XTi8tTiuzmW2svwLSuHqGg7YclWCnvqmfA6Gyx6yOyE=;
+        b=AEt6/a+oYVCND3KDUYRBLOd8AMAa3w6IwsfIOOQuuTaKEB6cl4a40zLujkrqDBdB6B
+         n5q+rITakTwuEeuHIT+vUecOnNFftQ5G3hxkdp7qz2acddYPhyR9j3NHX/a+oWQhMD/+
+         sTM6iuAu9vq+6hzhmFAyVAZRqexTXtq9sTnywgvTIr64RZN/n+t8q9oGLxvd01ZrZgLK
+         wH19zlLB6lU6lQbfF096lRRwDfApI14Sw7UFMvzh5sfS7cXPo+GduzaS8fcmZ7QBsxDK
+         jZXHvOjnoukY+idDXmf58763FL0qUHU7JvSFOcB5uaNt9IsvrAMGbwmmT1AVzrexXVHp
+         xSbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743340887; x=1743945687;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pl8aRXradTq2SD6jVMMSLCgwe8zjfhlBGWdB0p47RiE=;
-        b=CvQ1buPaXC46wOHkiOfuU1gVsOtsKFW0q7/ywx08G7FIJgR6sEdZgQzCxG7iIXvnUd
-         UKJgEb1KeTTlrFD+D64sHkMagRraj97TwKZQ48cjw7kXJhiJyn6zRHl/UNBVBUjvvPwq
-         fXSnh1+hXC6EPk+UC6/vlZ3yZiw2dQO/k5wNzFqHIAbMndvIhKAYxOVyLrPr5e5dHpRW
-         JoRtQcbMcqlhqBkw4TXsZ29jAPmNVRpkoaWR/O4z9AGG1Jbn7EUPClk18LBhFSfAPe37
-         DfFdy657CsviJATRm9gfPhd9XGZH5gq3hefKWBwUNKNWG0RYZ0QilVXgayPPLvbaAPVY
-         vJww==
-X-Gm-Message-State: AOJu0YwCfN2dL1gtjVioj2/mG5oBk+bCySdEpP7JhX0ymQ45Lh0bZdQu
-	lflM1Bj3JHT70JkT+DkWLuzDMzGw/vK2478H3mkPa3+MYzNtzf2WyuGiZQ==
-X-Gm-Gg: ASbGnctRN0tB/oklYNj+XD/jIz+LCSpTDxwZCDk/j0z5T9Ncs4+/7aYNrgdiFjUigcJ
-	l+YLj1JkyL6UOAMHb93fBTx12PfXULsf0gT43pyuasckrikNCIUM9EY3SSerg+86p6eEhMTDELN
-	ZXQfECtwWDp2ZyOM7bTqigLyzj34udqY/mt7q3cWQlqeA3FdAKIXGbCF6kNtDoaJfCnVTiu75h7
-	RwL/TwjCCJmOu5JTG8d0i4kJSCKDmQwQZut3eXIyunt/xG7OU6EbXzTuzL9MxuMHwqsu50VEuUC
-	+8kGuP7eY0Lh95vxKR5kFnfkU6fIwJS06Cy2jvmqrUbeTHEvQ5o=
-X-Google-Smtp-Source: AGHT+IGYtA1V+vc06tVLvPP8YqyIq9NWPz3JI8TEcpeSqYPVqoZGnQK4MFeCOO4tJSb684PqPLk10A==
-X-Received: by 2002:a05:6214:493:b0:6e8:fcc9:a29c with SMTP id 6a1803df08f44-6eed66971b9mr81540566d6.19.1743340886897;
-        Sun, 30 Mar 2025 06:21:26 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.199.126])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eec9771b42sm34183026d6.88.2025.03.30.06.21.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Mar 2025 06:21:26 -0700 (PDT)
-Message-ID: <67e94556.050a0220.24adab.e6a1@mx.google.com>
-Date: Sun, 30 Mar 2025 06:21:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2996731238135490454=="
+        d=1e100.net; s=20230601; t=1743381623; x=1743986423;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XTi8tTiuzmW2svwLSuHqGg7YclWCnvqmfA6Gyx6yOyE=;
+        b=ovACxTQe6xTa/L3rByqR5U2Yh/Sg5cblt+v0ca4qglAEFimZ12PPhVj7i0u6zRmFkc
+         GtCPnMr7ANWUr9uy39HHN4NanngvldlZZuseUGnDnh8mGuQ6hRDlD32doG1XOpGQwQ47
+         Ts7FM/EBTglp5WPm4V9CEqdlhEDoH5Cy78JUjAt/yVz8k5hjFHK4IYWdMy0CW1BorP+Y
+         XKYPU2QgB7zCO0lfqLnD+FUAnBBEC8cgBXKtKi3kq8RclNkkxRpNzIBANfYaptNTicU/
+         6zqIvg4C01yeAdbMN2g3tnrE8XabJvnEALwyyPZWfM7z1LcFpWE2MoZ5laekJpO7IMvO
+         SYLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQibeU8ltxfA2K91X8B/NXSmBYvYJHVqM0oX2CJRqCrWGYRNkCOhXQzc+NM5drj3QZ2D4=@vger.kernel.org, AJvYcCW48gvFjbeL61D/n1bNuusRaY5xqI/9DBuPXEXV7gbeYh0LhzGwQhHPAzom8KIPhiELR8mgaRx/@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD1TgRg0KrBfk6s3Sp4flLkzCslvLqrMmy3mLs1x413KTVUKqS
+	ww2tWAWdwE0tjTlM4ED1cSJQHDtN8zwGrDfzdfaPja3ZetlL56Zyd3vFKpVQ9aV4r+MuD82f97F
+	tIODBGKSo0o3aRDKPyZyuZQp4Qyc=
+X-Gm-Gg: ASbGncuJLXKK3ZcAF+7b+/6MstbPUoBK++zd4qypisqbgHgb3n6Il8mAD6pMdFfX2EG
+	B1DjcBERULUFqIe0ThxxuagYi3F3yjWApbM1zrSbWD4ZGbmPdKMb3O+rlBMw+TXW78eKBFfEJq2
+	7s1BKDKyFn0bmm5Zdw+Ng+Wunz
+X-Google-Smtp-Source: AGHT+IEG2me0G6zAaE4m/FhI4fxfPP7RqjG7OBqfejMtUHFMdpdNanLAAkYJUVIJcvHDCrEAbKpNqjkUXq2QCFL6aQk=
+X-Received: by 2002:a05:6e02:17ce:b0:3a7:820c:180a with SMTP id
+ e9e14a558f8ab-3d5e0a093b2mr76160105ab.19.1743381622902; Sun, 30 Mar 2025
+ 17:40:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] tools: add BPF timestamping tests
-In-Reply-To: <a74e58b9cf12bc9c64a024d18e6e58999202f853.1743336056.git.pav@iki.fi>
-References: <a74e58b9cf12bc9c64a024d18e6e58999202f853.1743336056.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <cover.1743337403.git.pav@iki.fi>
+In-Reply-To: <cover.1743337403.git.pav@iki.fi>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 31 Mar 2025 08:39:46 +0800
+X-Gm-Features: AQ5f1JoVuXTXHl4OZ6-Pj0C0gXm60GE5eQjrZqTptP7zoCwFTx3OkG9S97GF3Lw
+Message-ID: <CAL+tcoAvFCm9xCOwCLAp18JpT-JBzXQ2yziTZvO8QvZdL5gRZw@mail.gmail.com>
+Subject: Re: [PATCH 0/3] bpf: TSTAMP_COMPLETION_CB timestamping + enable it
+ for Bluetooth
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
+	Martin KaFai Lau <martin.lau@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2996731238135490454==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+On Sun, Mar 30, 2025 at 8:23=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Add BPF_SOCK_OPS_TSTAMP_COMPLETION_CB and emit it on completion
+> timestamps.
+>
+> Enable that for Bluetooth.
 
-Dear submitter,
+Thanks for working on this!
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=948351
+It would be better if you can cc Martin in the next revision since he
+is one of co-authors of BPF timestamping. Using
+./scripts/get_maintainer.pl will show you which group people you're
+supposed to cc.
 
----Test result---
+>
+> Tests:
+> https://lore.kernel.org/linux-bluetooth/a74e58b9cf12bc9c64a024d18e6e58999=
+202f853.1743336056.git.pav@iki.fi/
+>
+> ***
+>
+> However, I don't quite see how to do the tskey management so
+> that BPF and socket timestamping do not interfere with each other.
+>
+> The tskey counter here increments only for sendmsg() that have
+> timestamping turned on. IIUC this works similarly as for UDP.  I
+> understood the documentation so that stream sockets would do similarly,
+> but apparently TCP increments also for non-timestamped packets.
 
-Test Summary:
-CheckPatch                    PENDING   0.21 seconds
-GitLint                       PENDING   0.19 seconds
-BuildEll                      PASS      20.62 seconds
-BluezMake                     PASS      1469.53 seconds
-MakeCheck                     PASS      12.86 seconds
-MakeDistcheck                 FAIL      8.87 seconds
-CheckValgrind                 PASS      221.66 seconds
-CheckSmatch                   PASS      294.34 seconds
-bluezmakeextell               PASS      101.95 seconds
-IncrementalBuild              PENDING   0.22 seconds
-ScanBuild                     PASS      862.20 seconds
+TCP increments sequence number for every skb regardless of BPF
+timestamping feature. BPF timetamping uses the last byte of the last
+skb to generate the tskey in tcp_tx_timestamp(). So it means the tskey
+comes with the sequence number of each to-be-traced skb. It works for
+both socket and BPF timestamping features.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+>
+> If BPF needs tskey while socket timestamping is off, we can't increment
+> sk_tskey, as that interferes with counting by user applications doing
+> socket timestamps.
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+That is the reason why in TCP we chose to implement the tskey of BPF
+timestamping in the socket timestamping area. Please take a look at
+tcp_tx_timestamp(). As for UDP implementation, it is a leftover that I
+will make work next month.
 
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
+>
+> Should the Bluetooth timestamping actually just increment the counters
+> for any packet, timestamped or not?
 
-make[2]: *** No rule to make target 'tools/tester.skel.h', needed by 'distdir-am'.  Stop.
-make[1]: *** [Makefile:12503: distdir] Error 2
-make: *** [Makefile:12579: dist] Error 2
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+It's supposed to be the same tskey shared with socket timestamping so
+that people don't need to separately take care of a new tskey
+management.That is to say, if the socket timestamping and BPF
+timestamping are turned on, sharing the same tskey will be consistent.
 
+Thanks,
+Jason
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2996731238135490454==--
+>
+> Pauli Virtanen (3):
+>   bpf: Add BPF_SOCK_OPS_TSTAMP_COMPLETION_CB callback
+>   [RFC] bpf: allow non-TCP skbs for bpf_sock_ops_enable_tx_tstamp
+>   [RFC] Bluetooth: enable bpf TX timestamping
+>
+>  include/net/bluetooth/bluetooth.h |  1 +
+>  include/uapi/linux/bpf.h          |  5 +++++
+>  net/bluetooth/hci_conn.c          | 21 +++++++++++++++++++--
+>  net/core/filter.c                 | 12 ++++++++++--
+>  net/core/skbuff.c                 |  3 +++
+>  5 files changed, 38 insertions(+), 4 deletions(-)
+>
+> --
+> 2.49.0
+>
