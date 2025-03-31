@@ -1,303 +1,171 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB4E41760
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 08:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743410168; cv=none; b=Y4HOLOpmt7q3Y+9yk1m/iDNTvH0N739AQM83Whahp4NxCbB7J6pYV9UHcnx6zc3GJI6H7TY0617ZU/R3ESTzzY7gJnP8R8uB0AUYM1zS+xsTjhnaBM3puWMVm/fVvnb8FOx7cL7V8Ev7cIteQQpunzcE2hMKry7goju9uzNtJVo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743410168; c=relaxed/simple;
-	bh=Mhn9yKtm87ipdObZvgKYxUhE+zR0GVeV9H9Uos0pht8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PnIPfZ7wMzZzF0lzoWGfu+N6SdIFgt88z57r0af1rSpSLUYrvgavAULde6FjVvcXYqFSA50PQHapdx/BHl0DvzA4stC77TU5aix6LRUO9ZoQvOZwUo/5s2h5rtG647BHQPIBtkbGd9uwZQUNmcXfMBQroZDLFBwAIHC23yE++xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FYayCFMc; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5E5142900;
+	Mon, 31 Mar 2025 08:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743410258; cv=pass; b=GRCK95/qYCUeYdIYvyr4mxClZBEtg4wAd6xhxSS+EF/eCcIdJKV29WfLHeh03zQlD700QPJ9xfLrW0uWrO0dD7JHZijbgCN8GexZGwOXaZA0u5kvkmne9E8Y4ZgH8GP0Lb+L93E3wtc96KOT4P3NcVukG9IJnf9piiRXxSwObnI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743410258; c=relaxed/simple;
+	bh=H9Dv6zHFoOfkNPb48Z/rEqNtZQCA8F7k2FEyTJooeqo=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=gf7xPF/0e7UyHpOVoRnlb9Nipyb9Yc5lbMhxNFpBo+cK2GigLzHP423p762XAPlRIfelfsVB/DA7kf8O4MVn6oZCFnaVcRQSMfDNY25iq7cF59YIZnpvWls2+z//lb4dN9FLeFn6rOKpqH9ncpZ1u3COtjj6eQKZQ2BNAoqd7Vo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=e355AXQr; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FYayCFMc"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-225107fbdc7so75598785ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 01:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743410166; x=1744014966; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MKeMpxUnr+//+9lo+N74iCSg/prnlHMe/OAFpG5wj60=;
-        b=FYayCFMcRhTY5Ai2N+OdyDYyLOttZoWMdE4g1eEtGHdDNOOBmds68DF0OBgBsoA65f
-         ph9fiEM5KPytm2tMMkBtUE7Fss0AgeKGPqT075NsYfh/Ou8GU5Qs+fhAP5jJLWygGdlz
-         G5vXegR1v3mXY6KNCEAkIESpe6Ht9PKf5RpaMn2rAP1EuCBLnN101F5Nax1lnxo4M5je
-         vOI9H1ZY9yJ6em+YW4mU9BaYV+Omeqq83tcrBG01f4BXI4pliETRpZ24w51geRunCXH6
-         hyUw1/BffPEi1OcNZkdXyeoqsNfCtegTxwWaRHwIOgnXmr5J5uUUtiZIFa0fhOre1T1j
-         nMfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743410166; x=1744014966;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MKeMpxUnr+//+9lo+N74iCSg/prnlHMe/OAFpG5wj60=;
-        b=wzPghk+C+AuMExnzFAZIjnkJUrmJWL2vkeiZcYJdPIr7z+rFUc6EPrHibwwngjCTGR
-         T/NwAG23lB504tbI9us0/1JhDf26NvgFFux7yBmMCQVzsQKxRyLdfH8E9t//W0LVudBv
-         FkWGrvspEr0gf+nsT9eaAiegEFtHeWuCIQscNQpptrEDGjdhGuB/VziMhzde+bLBAlk3
-         z6+SeNIkWUaUiRzoHLkGYF3KgYCXzqcyfaUppxbqe7KnxxuXQkSosyvL1zP9c4usf4YT
-         6Q2BdFpuHrq5DrSbgotx5Yx4AOJQRoG8SMAXAlsfV+0emUDmGck6YdfKLOA80ieSeEH4
-         Cdlg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFoQp1MVY63c7mSuD5uDFAFt9ZCVsxEi1M6i4yHTrDAmP3/vM12AJKfS4xp368n9Z8+ZR+9iXhpP5WUxCUROo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTo5XFpwG7etuslO3hLFP1hYqAoG7xAlMwQPlEaqKYPf+U8wfz
-	sWOGi/fokPMiQr51FTnbLkdHC9AE6kPw55hGb3onkwsfYkzIyz52W8eteYek9GnQYyHFCT8z0XO
-	X58ZxCA==
-X-Google-Smtp-Source: AGHT+IEA44RU4N4ESkiu5d9YAa5ebPxUjvOFQ2Sa1DBOHp7f0Kicg0TVlqyWmK5zlTK19+ssiQoyH9P+cQJI
-X-Received: from plbw11.prod.google.com ([2002:a17:902:d3cb:b0:223:5416:c809])
- (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d548:b0:223:5ca1:3b0b
- with SMTP id d9443c01a7336-2292f9f1990mr139468345ad.40.1743410165825; Mon, 31
- Mar 2025 01:36:05 -0700 (PDT)
-Date: Mon, 31 Mar 2025 16:33:01 +0800
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="e355AXQr"
+Received: from [127.0.0.1] (unknown [193.138.7.172])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZR4J83vjwz49Q0n;
+	Mon, 31 Mar 2025 11:37:28 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1743410249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ftu6Ca8PxJX4/bWOkVggbgzlv2SRHX4J5kcFhu65I10=;
+	b=e355AXQr+mAfc/77Dt3aXP87cCVeG5IIv341nMs+GGiyaYa7QNhM5O2nAOM/TjoDSGltrx
+	OXc0VBL3c3+KjK+hOr7ltdb0hI37b5HB7T/Q4r8bLgexsnXPXyQBYTNYLQ0AnQPVBUPFlb
+	EOksiAKXUhNhxsSHhDXtsHx1l6eMp8n/R80oZ5Ek2Qj73UWrloGGYerVjzONwvUYayiIql
+	b6wPpNwuJT0vPvas0UmMiEw0WH4JanWqsdPtyRAxCkf0LQ2fdfdpKnVLf363z4AWbDPUyR
+	DD8L0KVS41DkS1JwTIclrl7aErEBvqppIEB7WFIrZ/46UFXDtRUjjSxkiPEAJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1743410249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ftu6Ca8PxJX4/bWOkVggbgzlv2SRHX4J5kcFhu65I10=;
+	b=El220epuTaZol6fH8HGMM3JxGOXL1SQBVmtp1vOXNdNaSC6zYPgXfJE52Gxml1Xb3d+q7W
+	2klhVR6jk9MlrEjY9bAUmWcO2s00fnmH4GAquYLzzN2njNSYAPQcfnXsZpYrue/wj/ETJB
+	PSr9f5FbpdFEs7NPQvlAyIW4XMuKKRYninO1WFj/QdedKyoEbCAN2CVyMiNwpaD/iruhSm
+	JEvXZjTeAURVqqeqvMZ9N3mG02XMSj2xvh7czJyo2UHHi7xogCR/5SNNMMN2uB30QxIZs/
+	T1joPLEkDtwDb/Y6vVotXhQFQTnL9QdCi3W7ETOOEKlb8JWSt0QuTh/XuRt2/A==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1743410249; a=rsa-sha256;
+	cv=none;
+	b=c0OvtlU7IXpEVUqI4LACxL12laPtjwtetFKlmTr/PbggwY/gijZ+/wUe5V009pOWFNwOix
+	425UoN53TI33MSHRdnhI6q/ileG3wt63yWsFt66cbTM3wx3S7OaMBGbAlkEZG33DZlpOOJ
+	mAt1gQcSIDL0fj2uLjiyv+a2ZmjfauHT2efroQsVFbNMGBZYVnVrmc4Mfi6+FuKXiptlVg
+	ZtWQKQwyLUQ7RAKE03LJW6Ai0ArrYjzIRpzshsq0erBnDxoKnBLuMZB8jtVCYd/Ze8vB8b
+	3A72++abLZt9fMYgPfTzp3PFNfY2GxUMAwLkM9p9bq4aNIKQMvL+oZ+Xs14zTQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Date: Mon, 31 Mar 2025 11:37:29 +0300
+From: Pauli Virtanen <pav@iki.fi>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ willemdebruijn.kernel@gmail.com, Martin KaFai Lau <martin.lau@linux.dev>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_0/3=5D_bpf=3A_TSTAMP=5FCOMPLETION=5FC?=
+ =?US-ASCII?Q?B_timestamping_+_enable_it_for_Bluetooth?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <CAL+tcoAvFCm9xCOwCLAp18JpT-JBzXQ2yziTZvO8QvZdL5gRZw@mail.gmail.com>
+References: <cover.1743337403.git.pav@iki.fi> <CAL+tcoAvFCm9xCOwCLAp18JpT-JBzXQ2yziTZvO8QvZdL5gRZw@mail.gmail.com>
+Message-ID: <1F98E20C-2F0D-4B3F-8DBE-3F0C44FCC65D@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250331083523.1132457-1-chharry@google.com>
-Subject: [PATCH] Bluetooth: btusb: Reset altsetting when no SCO connection
-From: Hsin-chen Chuang <chharry@google.com>
-To: luiz.dentz@gmail.com
-Cc: Hsin-chen Chuang <chharry@chromium.org>, chromeos-bluetooth-upstreaming@chromium.org, 
-	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Hsin-chen Chuang <chharry@chromium.org>
+Hi,
 
-Although commit 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting
-for HCI_USER_CHANNEL") has enabled the HCI_USER_CHANNEL user to send out
-SCO data through USB Bluetooth chips, it's observed that with the patch
-HFP is flaky on most of the existing USB Bluetooth controllers: Intel
-chips sometimes send out no packet for Transparent codec; MTK chips may
-generate SCO data with a wrong handle for CVSD codec; RTK could split
-the data with a wrong packet size for Transparent codec.
+31=2E maaliskuuta 2025 3=2E39=2E46 GMT+03:00 Jason Xing <kerneljasonxing@g=
+mail=2Ecom> kirjoitti:
+>Hi Pauli,
+>
+>On Sun, Mar 30, 2025 at 8:23=E2=80=AFPM Pauli Virtanen <pav@iki=2Efi> wro=
+te:
+>>
+>> Add BPF_SOCK_OPS_TSTAMP_COMPLETION_CB and emit it on completion
+>> timestamps=2E
+>>
+>> Enable that for Bluetooth=2E
+>
+>Thanks for working on this!
+>
+>It would be better if you can cc Martin in the next revision since he
+>is one of co-authors of BPF timestamping=2E Using
+>=2E/scripts/get_maintainer=2Epl will show you which group people you're
+>supposed to cc=2E
+>
+>>
+>> Tests:
+>> https://lore=2Ekernel=2Eorg/linux-bluetooth/a74e58b9cf12bc9c64a024d18e6=
+e58999202f853=2E1743336056=2Egit=2Epav@iki=2Efi/
+>>
+>> ***
+>>
+>> However, I don't quite see how to do the tskey management so
+>> that BPF and socket timestamping do not interfere with each other=2E
+>>
+>> The tskey counter here increments only for sendmsg() that have
+>> timestamping turned on=2E IIUC this works similarly as for UDP=2E  I
+>> understood the documentation so that stream sockets would do similarly,
+>> but apparently TCP increments also for non-timestamped packets=2E
+>
+>TCP increments sequence number for every skb regardless of BPF
+>timestamping feature=2E BPF timetamping uses the last byte of the last
+>skb to generate the tskey in tcp_tx_timestamp()=2E So it means the tskey
+>comes with the sequence number of each to-be-traced skb=2E It works for
+>both socket and BPF timestamping features=2E
+>
+>>
+>> If BPF needs tskey while socket timestamping is off, we can't increment
+>> sk_tskey, as that interferes with counting by user applications doing
+>> socket timestamps=2E
+>
+>That is the reason why in TCP we chose to implement the tskey of BPF
+>timestamping in the socket timestamping area=2E Please take a look at
+>tcp_tx_timestamp()=2E As for UDP implementation, it is a leftover that I
+>will make work next month=2E
 
-To address the issue above btusb needs to reset the altsetting back to
-zero when there is no active SCO connection, which is the same as the
-BlueZ behavior, and another benefit is the bus doesn't need to reserve
-bandwidth when no SCO connection.
+Ok, I guess I forgot tskey is reset to zero when socket timestamping is (r=
+e-)enabled=2E Then it's ok to increment the counter when either BPF or sock=
+et tstamps are enabled, although BPF will then have to live with tskey disc=
+ontinuity when that happens=2E
 
-This patch adds a fixed-size array in btusb_data which is used for
-tracing the active SCO handles. When the controller is reset or any
-tracing handle has disconnected, btusb adjusts the USB alternate setting
-correspondingly for the Isoc endpoint.
+But from the above, if BT stream socket tskey should work same as TCP (inc=
+rement on every byte, also when timestamping is off) that probably should b=
+e fixed now while nobody is yet using the feature=2E
 
-The array size is configured by BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES.
-If the size is set to zero, the auto set altsetting feature is disabled.
+And for seqpacket, retain current behaviour of increment by one for each t=
+imestamped packet (and reset to 0 when stamping turned on)=2E
 
-This patch is tested on ChromeOS devices. The USB Bluetooth models
-(CVSD, TRANS alt3 and alt6) could pass the stress HFP test narrow band
-speech and wide band speech.
-
-Cc: chromeos-bluetooth-upstreaming@chromium.org
-Fixes: 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL")
-Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
----
-
- drivers/bluetooth/Kconfig |  18 ++++--
- drivers/bluetooth/btusb.c | 116 ++++++++++++++++++++++++++++++--------
- 2 files changed, 105 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 7771edf54fb3..5c811af8d15f 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -56,17 +56,23 @@ config BT_HCIBTUSB_POLL_SYNC
- 	  Say Y here to enable USB poll_sync for Bluetooth USB devices by
- 	  default.
- 
--config BT_HCIBTUSB_AUTO_ISOC_ALT
--	bool "Automatically adjust alternate setting for Isoc endpoints"
-+config BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES
-+	int "Automatically adjust alternate setting for Isoc endpoints"
- 	depends on BT_HCIBTUSB
--	default y if CHROME_PLATFORMS
-+	default 2 if CHROME_PLATFORMS
-+	default 0
- 	help
--	  Say Y here to automatically adjusting the alternate setting for
--	  HCI_USER_CHANNEL whenever a SCO link is established.
-+	  Say positive number here to automatically adjusting the alternate
-+	  setting for HCI_USER_CHANNEL whenever a SCO link is established.
- 
--	  When enabled, btusb intercepts the HCI_EV_SYNC_CONN_COMPLETE packets
-+	  When positive, btusb intercepts the HCI_EV_SYNC_CONN_COMPLETE packets
- 	  and configures isoc endpoint alternate setting automatically when
- 	  HCI_USER_CHANNEL is in use.
-+	  btusb traces at most the given number of SCO handles and intercepts
-+	  the HCI_EV_DISCONN_COMPLETE and the HCI_EV_CMD_COMPLETE of
-+	  HCI_OP_RESET packets. When the controller is reset, or all tracing
-+	  handles are disconnected, btusb reset the isoc endpoint alternate
-+	  setting to zero.
- 
- config BT_HCIBTUSB_BCM
- 	bool "Broadcom protocol support"
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5012b5ff92c8..31439d66cf0e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -34,7 +34,7 @@ static bool force_scofix;
- static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
- static bool enable_poll_sync = IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC);
- static bool reset = true;
--static bool auto_isoc_alt = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT);
-+static bool auto_isoc_alt = CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES > 0;
- 
- static struct usb_driver btusb_driver;
- 
-@@ -907,6 +907,8 @@ struct btusb_data {
- 	__u8 cmdreq;
- 
- 	unsigned int sco_num;
-+	u16 sco_handles[CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES];
-+
- 	unsigned int air_mode;
- 	bool usb_alt6_packet_flow;
- 	int isoc_altsetting;
-@@ -1118,40 +1120,108 @@ static inline void btusb_free_frags(struct btusb_data *data)
- 	spin_unlock_irqrestore(&data->rxlock, flags);
- }
- 
--static void btusb_sco_connected(struct btusb_data *data, struct sk_buff *skb)
-+static void btusb_sco_changed(struct btusb_data *data, struct sk_buff *skb)
- {
- 	struct hci_event_hdr *hdr = (void *) skb->data;
--	struct hci_ev_sync_conn_complete *ev =
--		(void *) skb->data + sizeof(*hdr);
- 	struct hci_dev *hdev = data->hdev;
--	unsigned int notify_air_mode;
- 
--	if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT)
--		return;
-+	if (data->sco_num > CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES) {
-+		bt_dev_warn(hdev, "Invalid sco_num to HCI_USER_CHANNEL");
-+		data->sco_num = 0;
-+	}
- 
--	if (skb->len < sizeof(*hdr) || hdr->evt != HCI_EV_SYNC_CONN_COMPLETE)
-+	if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT || skb->len < sizeof(*hdr))
- 		return;
- 
--	if (skb->len != sizeof(*hdr) + sizeof(*ev) || ev->status)
--		return;
-+	switch (hdr->evt) {
-+	case HCI_EV_CMD_COMPLETE: {
-+		struct hci_ev_cmd_complete *ev =
-+			(void *) skb->data + sizeof(*hdr);
-+		struct hci_ev_status *rp =
-+			(void *) skb->data + sizeof(*hdr) + sizeof(*ev);
-+		u16 opcode;
-+
-+		if (skb->len != sizeof(*hdr) + sizeof(*ev) + sizeof(*rp))
-+			return;
-+
-+		opcode = __le16_to_cpu(ev->opcode);
-+
-+		if (opcode != HCI_OP_RESET || rp->status)
-+			return;
-+
-+		bt_dev_info(hdev, "Resetting SCO");
-+		data->sco_num = 0;
-+		data->air_mode = HCI_NOTIFY_DISABLE_SCO;
-+		schedule_work(&data->work);
- 
--	switch (ev->air_mode) {
--	case BT_CODEC_CVSD:
--		notify_air_mode = HCI_NOTIFY_ENABLE_SCO_CVSD;
- 		break;
-+	}
-+	case HCI_EV_DISCONN_COMPLETE: {
-+		struct hci_ev_disconn_complete *ev =
-+			(void *) skb->data + sizeof(*hdr);
-+		u16 handle;
-+		int i;
-+
-+		if (skb->len != sizeof(*hdr) + sizeof(*ev) || ev->status)
-+			return;
-+
-+		handle = __le16_to_cpu(ev->handle);
-+		for (i = 0; i < data->sco_num; i++) {
-+			if (data->sco_handles[i] == handle)
-+				break;
-+		}
-+
-+		if (i == data->sco_num)
-+			return;
-+
-+		bt_dev_info(hdev, "Disabling SCO");
-+		data->sco_handles[i] = data->sco_handles[data->sco_num - 1];
-+		data->sco_num--;
-+		data->air_mode = HCI_NOTIFY_DISABLE_SCO;
-+		schedule_work(&data->work);
- 
--	case BT_CODEC_TRANSPARENT:
--		notify_air_mode = HCI_NOTIFY_ENABLE_SCO_TRANSP;
- 		break;
-+	}
-+	case HCI_EV_SYNC_CONN_COMPLETE: {
-+		struct hci_ev_sync_conn_complete *ev =
-+			(void *) skb->data + sizeof(*hdr);
-+		unsigned int notify_air_mode;
-+		u16 handle;
- 
-+		if (skb->len != sizeof(*hdr) + sizeof(*ev) || ev->status)
-+			return;
-+
-+		switch (ev->air_mode) {
-+		case BT_CODEC_CVSD:
-+			notify_air_mode = HCI_NOTIFY_ENABLE_SCO_CVSD;
-+			break;
-+
-+		case BT_CODEC_TRANSPARENT:
-+			notify_air_mode = HCI_NOTIFY_ENABLE_SCO_TRANSP;
-+			break;
-+
-+		default:
-+			return;
-+		}
-+
-+		handle = __le16_to_cpu(ev->handle);
-+		if (data->sco_num
-+		    == CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES) {
-+			bt_dev_err(hdev, "Failed to add the new SCO handle");
-+			return;
-+		}
-+
-+		bt_dev_info(hdev, "Enabling SCO with air mode %u",
-+			    ev->air_mode);
-+		data->sco_handles[data->sco_num++] = handle;
-+		data->air_mode = notify_air_mode;
-+		schedule_work(&data->work);
-+
-+		break;
-+	}
- 	default:
--		return;
-+		break;
- 	}
--
--	bt_dev_info(hdev, "enabling SCO with air mode %u", ev->air_mode);
--	data->sco_num = 1;
--	data->air_mode = notify_air_mode;
--	schedule_work(&data->work);
- }
- 
- static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
-@@ -1161,9 +1231,9 @@ static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
- 		schedule_delayed_work(&data->rx_work, 0);
- 	}
- 
--	/* Configure altsetting for HCI_USER_CHANNEL on SCO connected */
-+	/* Configure altsetting for HCI_USER_CHANNEL on SCO changed */
- 	if (auto_isoc_alt && hci_dev_test_flag(data->hdev, HCI_USER_CHANNEL))
--		btusb_sco_connected(data, skb);
-+		btusb_sco_changed(data, skb);
- 
- 	return data->recv_event(data->hdev, skb);
- }
--- 
-2.49.0.472.ge94155a9ec-goog
-
+>> Should the Bluetooth timestamping actually just increment the counters
+>> for any packet, timestamped or not?
+>
+>It's supposed to be the same tskey shared with socket timestamping so
+>that people don't need to separately take care of a new tskey
+>management=2EThat is to say, if the socket timestamping and BPF
+>timestamping are turned on, sharing the same tskey will be consistent=2E
+>
+>Thanks,
+>Jason
+>
+>>
+>> Pauli Virtanen (3):
+>>   bpf: Add BPF_SOCK_OPS_TSTAMP_COMPLETION_CB callback
+>>   [RFC] bpf: allow non-TCP skbs for bpf_sock_ops_enable_tx_tstamp
+>>   [RFC] Bluetooth: enable bpf TX timestamping
+>>
+>>  include/net/bluetooth/bluetooth=2Eh |  1 +
+>>  include/uapi/linux/bpf=2Eh          |  5 +++++
+>>  net/bluetooth/hci_conn=2Ec          | 21 +++++++++++++++++++--
+>>  net/core/filter=2Ec                 | 12 ++++++++++--
+>>  net/core/skbuff=2Ec                 |  3 +++
+>>  5 files changed, 38 insertions(+), 4 deletions(-)
+>>
+>> --
+>> 2=2E49=2E0
+>>
