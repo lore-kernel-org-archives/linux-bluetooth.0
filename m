@@ -1,165 +1,128 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0ED526AF6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 17:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267487080D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 18:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743441124; cv=none; b=ghomN2tTLUKjjHAce5U1R45ZM6KvNMH0YH4A43RRT3eqHrUZnTLjIH9V5veGEqpvPP0VrOW5DzN48RGQgo++pLL1ob+o92W7jrOHhCAbfr8TuicaqAfaJoLv/2lFHEJ8+jhibbaPDprvFYE96k/aebujMCW+Lep/v2mea8qaA1s=
+	t=1743444559; cv=none; b=NQTiJxT58zgojtEZqxa4ROpwkBNwAkdxs4UTr8GgBk3j4cPWCqF6GYQrcJiICKw+KDlBygI8hP0hsU6wbKiBbsstDL0GUXMSdrT+nDIsn2aMEZZCo8Iun7hkE5e2tnYsWE7atytSKyBJaRgXDokOR6koMJofHe6x6HXOEOG48pM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743441124; c=relaxed/simple;
-	bh=8udGiQU5ZRAiro+3u84xU1691oYYYgMFURpfFG125yU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=q/mm5LlUF5c/Ol6RZfG3jBzlPLSri8dLXnsQNUTkACYC6N4T0rJx5iMtUDWXlDHLDSB8VTX5Al9Czcr8R7lg2DVBnUhKV7S60fLpE7bjO1cAshY9Nh/UuGQPMIh1wCEJ02i6VXNRe45DfgjsaDUd/K7AnbaNuufRw+IdHgbLCdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O9OSfw9P; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1743444559; c=relaxed/simple;
+	bh=ZzF0LIRDcJoU7uM7qFWF+e57YdFNsBfF2wtDC0jOzbs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GWHovwlFLpq4n/Pj2HbWfZFO7q9zubvWc+QQFtCXDZAXJDCXzBhXcQwB9gBtIjX58hyyJ79jAS3wspJ6UVjpG8ewUbZjOTqb7E1sX90QadLCmS/9Xze6/qzY77GXM1GuxcMSKVBpJtrTprgb8Ga1b8jpjP35I/aEa0CNqemo+w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BForRGSZ; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9OSfw9P"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-51eb1823a8eso2415727e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 10:12:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BForRGSZ"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-301302a328bso8150930a91.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 11:09:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743441121; x=1744045921; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zcuF0+ZKE7JCP7NOtTQzlRSim4RB1PAdxmeupWvyor8=;
-        b=O9OSfw9PM+0sDe+M61M0/v3P3SOraaF0Pg1tVnTir39UBtgEnOPuPZNSnlZlZ6SRH1
-         zV33qWgwuIXXenr9tmYP5kZRM95dGBXSaSuJnYEOmOWXOxBKSqhiHBMYK2DEFFC1l+kQ
-         NAFGBv34QTVhA+Teasgshwcy2n7axjIy4gJQtucCpLAlpRGqxiP5t9lBpLmfRAHXzs85
-         50s4WUZ72NCNnb3edtNMY2xcDQ17qmvUpJ/+aG4BUITpSpA6vhuQPV6v5c0/h52KtIfp
-         FTavfM3Umu6McFu3v05qrQFcEPnpbpqDNV1QE+j1tQ5Y8K2tlStQeeUD+m6Q3WNMApye
-         1kAA==
+        d=gmail.com; s=20230601; t=1743444557; x=1744049357; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZzF0LIRDcJoU7uM7qFWF+e57YdFNsBfF2wtDC0jOzbs=;
+        b=BForRGSZPyeKMk9gBYO3frPkn5dlsmApLxmVWP0YonDhU2VHpiZ9GE4dYdlFlVFzur
+         HN15eLYXuVIHtyaxAW47vUS6b0gkrujZctQVoH+4P7GOQRpxg30GJCILegTpVozCrKUx
+         nvfVP1K9TPcZNSWeCcBxYI0ltFPRv0WVjdBVX9C3HHtcoeLzxh5cQ/xvaxvvFyA192FF
+         WCStGO6SSqahBJaJQWNrOpHvTa2duC9VDTPvNWVwkDL0L8GCBToozw6KlglKk1KmB0o7
+         S0VbzYodLTjm5BRs8TP2/6ap9/4rNzhJYkGrJKVe6byf8hyBi0EqWt51ti9zhyXvA8hM
+         Kx/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743441121; x=1744045921;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zcuF0+ZKE7JCP7NOtTQzlRSim4RB1PAdxmeupWvyor8=;
-        b=VW43CG0GElyhceStVouvYI4lECrkDf2ZJkE99wkFWNVo+gscLtGL15W/76Li5DMfz0
-         1lbk+N18Gn8Jl3J+y1LXQsgRtYzld+VmeJ6YFjrKdwbZebVk8yfjngUN3BeCyDDXIYhp
-         RJwvqEhC+/zSLw2AliN53SMnNgAHXw2BwyMLuaF7/ag35+Im7yObq8PFLwBDrKvFypUK
-         hAj2T/lWvpjw8Hz+lqxFKgzT3Xgr21dwm1rCnxSSgCLFuJ4PdcBrNQmDeNBzD7E2Mgzf
-         ehKTopBGlLcPw1252Okka02TyzHBw/GgYLTVovz+duLm1qvVyCTc197GUMfY8S0IznQX
-         xOCg==
-X-Gm-Message-State: AOJu0Yx5nUG09RTfTRacTnQxrfNVKYbf6OsDNwE1pzSm4ap6EeAPw5DZ
-	DVuAaRkQEOkj4ilIZzypLqdrSY3ebNI+gTgS9Sp3Z4pUnK5N6Q12r5tdVw==
-X-Gm-Gg: ASbGncuNDnCfi0lUsHn0aqCXXQHcWX7IbN2nUPguWGPNGyYte/EByi1zEFsDFfOwB/0
-	xqH4NUF0PHvJGsKS2s/6xuRAN0dt9Klx5zPfm7v1ZqhO1OgVdMz1czFp8dHNrcc3Kk52lRUtKTZ
-	RIxjzQlmQVtXEA6fhExIWj5DXHqfI0eZ7gNzyOw0G/xHmAfOMNu1KqXRvjz/qFB5jEfpjGn/Xu5
-	+utoFeqd6GBR9eLrUAzlcGIpV+xezH/fd5WwEnR/+Z34xGVT1zTLhq0x0XiRBfePeP+Y+/oyWID
-	KF2iKVKxmaUafnsxcIm18Mq2EmIS3OSKjOpyWbkjDZn/R8eIByH2gkJSbRLiZMYnc9NIovKlQ2X
-	MDhb0W8ov9wz0+g==
-X-Google-Smtp-Source: AGHT+IGWt/DMlYXsTOjX5F4/+wul1K/mVWGyIyjofQfN7kJ6lyBE4fGEm5A6TtmxNzfH3phypq39Vg==
-X-Received: by 2002:a05:6122:1307:b0:520:5f0a:b5a5 with SMTP id 71dfb90a1353d-5261d47bd0dmr6068226e0c.6.1743441119936;
-        Mon, 31 Mar 2025 10:11:59 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5260e6a0f03sm1641471e0c.1.2025.03.31.10.11.58
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1743444557; x=1744049357;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZzF0LIRDcJoU7uM7qFWF+e57YdFNsBfF2wtDC0jOzbs=;
+        b=BY/SbjNwsZCC9W3IThPKXC0w/xuGgGwrNKt3IYzifFg6ccel+5b/tT/sLIvQ5HHu1x
+         /3SEHz9ie6gSMaTnI8/nHQJG/etwnnlPD0eKmO8zWylAltrWDHcHrs/MoHXDktbePyab
+         1VX0tgDmMZ6x2zoQOt5WL33RLb9iEzsCdZlSYwf9IYXE67yya3of5n0aDfzUPdsw5qcN
+         DappJbu5MJwkbLe4uNXqI9Vt+Bkj+XEcM0Ha7qJ+t7NsVc9AVDui2lOTDftlZf96O550
+         GE5cBi16yWdQ9HTrCVlfU/FTFUTaYQ1kk5o03knFOTSVUzp1wbIKS2FjJ7EjTPAwrPK/
+         Y+Zw==
+X-Gm-Message-State: AOJu0Yw4TgdBgj1RVC4RCAS00t9D8sFipUGbCez/rhFQJJ/Xw0AVQSBV
+	L/n9YEHtdBYXvYZ7KVL5JIMUSX7EHy/9+mwHh4v8bp2fMR09VXFQV21xqA==
+X-Gm-Gg: ASbGncudNkcscNXdz6x1UUxnZIXyjnjFrOSHx7AWWdM1RuHSbNJz9FzkBu9esUF9rfz
+	gglbKKvhf4cMEb6boa+gkmjtm4R9YZsGQb4gMu9DnJi0vrE8jc4e+m8OJ+lly7xehOoC4aaRWnB
+	WNYB9SMtlHUVDIEusTJDORkPlTZwpqVCYP+4XkEevr/pXCNW8OAxXUuOL8RqP0X1UFIpNfQgGU4
+	lsk256KgmdAbTm9+tRLACFvRGC6oCk8RIO41ocpS1TKXknCsQ/JwTEcAjmNbV0YI40i6qJY4PFD
+	4TI2Lc60uF1i07hCK5IVOoXGdWj1JJCDG0A4L2FCfJyFkbXAq00y
+X-Google-Smtp-Source: AGHT+IHsZiCKIZgMg12Z8qeVg06q/AZ9uoCZCwr49auKvWdHKfk9fdPfTkQ/SFcOURNIK8Mm7Io+6g==
+X-Received: by 2002:a17:90a:c88f:b0:2ff:5016:7fd2 with SMTP id 98e67ed59e1d1-3053215e085mr18292333a91.24.1743444557032;
+        Mon, 31 Mar 2025 11:09:17 -0700 (PDT)
+Received: from [172.17.0.2] ([52.160.165.198])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-305175cb0eesm7515669a91.46.2025.03.31.11.09.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 10:11:59 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] shared/bap: Fix swallowing states transitions
-Date: Mon, 31 Mar 2025 13:11:57 -0400
-Message-ID: <20250331171157.3608035-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+        Mon, 31 Mar 2025 11:09:16 -0700 (PDT)
+Message-ID: <67eada4c.170a0220.3c3a50.8975@mx.google.com>
+Date: Mon, 31 Mar 2025 11:09:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4247256793638724891=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] shared/bap: Fix swallowing states transitions
+In-Reply-To: <20250331171157.3608035-1-luiz.dentz@gmail.com>
+References: <20250331171157.3608035-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4247256793638724891==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-In certain cases (e.g ASCS_Enable) a Control Point operation may change
-states multiple times causing states not to be notified.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTQ4NjQwCgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQRU5ESU5HICAgMC4zMiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
+TkRJTkcgICAwLjM0IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDIwLjcyIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDE0OTMuNjggc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MTIuNzggc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTYw
+LjUwIHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDIxNS43
+NyBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFdBUk5JTkcgICAyODYuNTQg
+c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgOTkuMTIgc2Vj
+b25kcwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQRU5ESU5HICAgMC4zOSBzZWNvbmRz
+ClNjYW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICA4ODguMDcgc2Vjb25kcwoK
+RGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAt
+IFBFTkRJTkcKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0Ck91dHB1dDoKCiMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBHaXRMaW50IC0gUEVORElORwpEZXNjOiBSdW4g
+Z2l0bGludApPdXRwdXQ6CgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFr
+ZUNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6CgptYWtlWzNd
+OiAqKiogW01ha2VmaWxlOjExNzgwOiB0ZXN0LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzJdOiAq
+KiogW01ha2VmaWxlOjExODg4OiBjaGVjay1URVNUU10gRXJyb3IgMgptYWtlWzFdOiAqKiogW01h
+a2VmaWxlOjEyMzE3OiBjaGVjay1hbV0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEyMzE5
+OiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hl
+Y2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmlu
+ZApPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp0
+b29scy9tZ210LXRlc3Rlci5jOjEyOTA3OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUg
+bGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0
+cnlpbmcgd2l0aG91dAoxMjkwNyB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAg
+ICAgIHwgICAgIF5+fn4KbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTc4MDogdGVzdC1zdWl0ZS5s
+b2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtNYWtlZmlsZToxMTg4ODogY2hlY2stVEVTVFNdIEVy
+cm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMjMxNzogY2hlY2stYW1dIEVycm9yIDIKbWFr
+ZTogKioqIFtNYWtlZmlsZToxMjMxOTogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNoIC0gV0FSTklORwpEZXNjOiBSdW4gc21hdGNo
+IHRvb2wgd2l0aCBzb3VyY2UKT3V0cHV0OgpzcmMvc2hhcmVkL2JhcC5jOjMxNDoyNTogd2Fybmlu
+ZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlc3NyYy9zaGFyZWQvYmFwLmM6IG5vdGU6IGlu
+IGluY2x1ZGVkIGZpbGU6Li9zcmMvc2hhcmVkL2FzY3MuaDo4ODoyNTogd2FybmluZzogYXJyYXkg
+b2YgZmxleGlibGUgc3RydWN0dXJlc3NyYy9zaGFyZWQvYmFwLmM6MzE0OjI1OiB3YXJuaW5nOiBh
+cnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzc3JjL3NoYXJlZC9iYXAuYzogbm90ZTogaW4gaW5j
+bHVkZWQgZmlsZTouL3NyYy9zaGFyZWQvYXNjcy5oOjg4OjI1OiB3YXJuaW5nOiBhcnJheSBvZiBm
+bGV4aWJsZSBzdHJ1Y3R1cmVzc3JjL3NoYXJlZC9iYXAuYzozMTQ6MjU6IHdhcm5pbmc6IGFycmF5
+IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXNzcmMvc2hhcmVkL2JhcC5jOiBub3RlOiBpbiBpbmNsdWRl
+ZCBmaWxlOi4vc3JjL3NoYXJlZC9hc2NzLmg6ODg6MjU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhp
+YmxlIHN0cnVjdHVyZXMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEluY3Jl
+bWVudGFsQnVpbGQgLSBQRU5ESU5HCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxkIHdpdGggdGhlIHBh
+dGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6CgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9v
+dGgKCg==
 
-To fix this attempts to queue states if timeout is pending (state_id)
-and then proceed to notify them ahead of the last state set in the ASE
-so the remote side is informed of all the state transitions.
----
- src/shared/bap.c | 38 +++++++++++++++++++++++++++-----------
- 1 file changed, 27 insertions(+), 11 deletions(-)
-
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 5d4d69d2925b..2bab316f3802 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -293,6 +293,7 @@ struct bt_bap_stream {
- 	uint8_t old_state;
- 	uint8_t state;
- 	unsigned int state_id;
-+	struct queue *pending_states;
- 	bool client;
- 	void *user_data;
- };
-@@ -1705,19 +1706,11 @@ static bool bap_queue_req(struct bt_bap *bap, struct bt_bap_req *req)
- 	return true;
- }
- 
--static bool stream_notify_state(void *data)
-+static void stream_notify(struct bt_bap_stream *stream, uint8_t state)
- {
--	struct bt_bap_stream *stream = data;
--	struct bt_bap_endpoint *ep = stream->ep;
-+	DBG(stream->bap, "stream %p state %d", stream, state);
- 
--	DBG(stream->bap, "stream %p status %d", stream, ep->state);
--
--	if (stream->state_id) {
--		timeout_remove(stream->state_id);
--		stream->state_id = 0;
--	}
--
--	switch (ep->state) {
-+	switch (state) {
- 	case BT_ASCS_ASE_STATE_IDLE:
- 		break;
- 	case BT_ASCS_ASE_STATE_CONFIG:
-@@ -1735,6 +1728,24 @@ static bool stream_notify_state(void *data)
- 		stream_notify_release(stream);
- 		break;
- 	}
-+}
-+
-+static bool stream_notify_state(void *data)
-+{
-+	struct bt_bap_stream *stream = data;
-+	struct bt_bap_endpoint *ep = stream->ep;
-+	uint8_t state;
-+
-+	if (stream->state_id) {
-+		timeout_remove(stream->state_id);
-+		stream->state_id = 0;
-+	}
-+
-+	/* Notify any pending states before notifying ep->state */
-+	while ((state = PTR_TO_UINT(queue_pop_head(stream->pending_states))))
-+		stream_notify(stream, state);
-+
-+	stream_notify(stream, ep->state);
- 
- 	return false;
- }
-@@ -1760,6 +1771,10 @@ static void bap_ucast_set_state(struct bt_bap_stream *stream, uint8_t state)
- 		stream->state_id = timeout_add(BAP_PROCESS_TIMEOUT,
- 						stream_notify_state,
- 						stream, NULL);
-+	else /* If a state_id is already pending then queue the old one */
-+		queue_push_tail(stream->pending_states,
-+				UINT_TO_PTR(ep->old_state));
-+
- 
- done:
- 	bap_stream_state_changed(stream);
-@@ -2716,6 +2731,7 @@ static struct bt_bap_stream *bap_stream_new(struct bt_bap *bap,
- 	stream->cc = util_iov_dup(data, 1);
- 	stream->client = client;
- 	stream->ops = bap_stream_new_ops(stream);
-+	stream->pending_states = queue_new();
- 
- 	queue_push_tail(bap->streams, stream);
- 
--- 
-2.48.1
-
+--===============4247256793638724891==--
