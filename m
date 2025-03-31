@@ -1,180 +1,303 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9773A13D521
-	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 06:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB4E41760
+	for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 08:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743404027; cv=none; b=g77C9EgFdVBbx997NlvXxiRx7ZPBRQDRLUlnr0MZbuEeZR0N+7Y/1cxKbYMolty2IOP93rMGlUYt83U8q8dHzWMB13kpNwF6J2tNz676EA/xPST/bcpITAJUne6OkU/b0lRKkto942CXLcyXBx4cU8zoSVzWhG0+B+yw9jcwUHA=
+	t=1743410168; cv=none; b=Y4HOLOpmt7q3Y+9yk1m/iDNTvH0N739AQM83Whahp4NxCbB7J6pYV9UHcnx6zc3GJI6H7TY0617ZU/R3ESTzzY7gJnP8R8uB0AUYM1zS+xsTjhnaBM3puWMVm/fVvnb8FOx7cL7V8Ev7cIteQQpunzcE2hMKry7goju9uzNtJVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743404027; c=relaxed/simple;
-	bh=f2mCC6NMDoWYEE5R16uQt6kxvUVZkcDV9JlUUAzLz2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JbSmn5CXBGKnBDpP+JC3TRoDfuEL7a1Lk5W9kyCjxYuLg5oUmpsoJLPFOGPX4a4NF7EVADBkYdePJTN0PmSXHveAi5/tL2LO1nsIGBDZQMwyWZeap+2y1GxWS2F5bLcFqsmx4ivuUlH7Jy3ajNGfQBQxM7WTldYXEQ/xyNBjlTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=blrTva+u; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1743410168; c=relaxed/simple;
+	bh=Mhn9yKtm87ipdObZvgKYxUhE+zR0GVeV9H9Uos0pht8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PnIPfZ7wMzZzF0lzoWGfu+N6SdIFgt88z57r0af1rSpSLUYrvgavAULde6FjVvcXYqFSA50PQHapdx/BHl0DvzA4stC77TU5aix6LRUO9ZoQvOZwUo/5s2h5rtG647BHQPIBtkbGd9uwZQUNmcXfMBQroZDLFBwAIHC23yE++xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FYayCFMc; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="blrTva+u"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52V6klZR028092;
-	Mon, 31 Mar 2025 06:53:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	dVwDgdd2VemErrYW7dy7a8VmW2/aix2I54BNxMeAp7o=; b=blrTva+uKyqThaoF
-	7ZU9IHCG0uIXaW78mXa/v9LDvO5ZKwBZb72GU51hWBrR6Lf/Li08Bg/bCV/Hy5Fh
-	W0i3S3wkd8D3F6h8lrSn+s/oLrqwjACC0JgVeyFm6TT32WdIi1m0qLSkbqa9hVAE
-	zeQiuI29BDlCWlpzuCMjuHpaSBGrcbilg7QxyhF1SJ9+rBEB7pHOZaKQqBmfMn1J
-	tIWsztkxtgZbcbhIJ9ikRSRYHEXJieHVLGjCqGE9J0HIFLDQLglLFd502sacXn0I
-	OKzpFTXF4JWD4U4ygI2cKDmLqWkhzLNDfU26dKj5BX0lO5kPbojqNDu86yJCJP9Y
-	TBDn+Q==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45p86kksp0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 31 Mar 2025 06:53:42 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52V6rfGM007735
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 31 Mar 2025 06:53:41 GMT
-Received: from [10.253.78.63] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 30 Mar
- 2025 23:53:39 -0700
-Message-ID: <03742dd2-43ec-4911-a821-741d3e8106df@quicinc.com>
-Date: Mon, 31 Mar 2025 14:53:37 +0800
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FYayCFMc"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-225107fbdc7so75598785ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 01:36:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743410166; x=1744014966; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MKeMpxUnr+//+9lo+N74iCSg/prnlHMe/OAFpG5wj60=;
+        b=FYayCFMcRhTY5Ai2N+OdyDYyLOttZoWMdE4g1eEtGHdDNOOBmds68DF0OBgBsoA65f
+         ph9fiEM5KPytm2tMMkBtUE7Fss0AgeKGPqT075NsYfh/Ou8GU5Qs+fhAP5jJLWygGdlz
+         G5vXegR1v3mXY6KNCEAkIESpe6Ht9PKf5RpaMn2rAP1EuCBLnN101F5Nax1lnxo4M5je
+         vOI9H1ZY9yJ6em+YW4mU9BaYV+Omeqq83tcrBG01f4BXI4pliETRpZ24w51geRunCXH6
+         hyUw1/BffPEi1OcNZkdXyeoqsNfCtegTxwWaRHwIOgnXmr5J5uUUtiZIFa0fhOre1T1j
+         nMfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743410166; x=1744014966;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MKeMpxUnr+//+9lo+N74iCSg/prnlHMe/OAFpG5wj60=;
+        b=wzPghk+C+AuMExnzFAZIjnkJUrmJWL2vkeiZcYJdPIr7z+rFUc6EPrHibwwngjCTGR
+         T/NwAG23lB504tbI9us0/1JhDf26NvgFFux7yBmMCQVzsQKxRyLdfH8E9t//W0LVudBv
+         FkWGrvspEr0gf+nsT9eaAiegEFtHeWuCIQscNQpptrEDGjdhGuB/VziMhzde+bLBAlk3
+         z6+SeNIkWUaUiRzoHLkGYF3KgYCXzqcyfaUppxbqe7KnxxuXQkSosyvL1zP9c4usf4YT
+         6Q2BdFpuHrq5DrSbgotx5Yx4AOJQRoG8SMAXAlsfV+0emUDmGck6YdfKLOA80ieSeEH4
+         Cdlg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFoQp1MVY63c7mSuD5uDFAFt9ZCVsxEi1M6i4yHTrDAmP3/vM12AJKfS4xp368n9Z8+ZR+9iXhpP5WUxCUROo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTo5XFpwG7etuslO3hLFP1hYqAoG7xAlMwQPlEaqKYPf+U8wfz
+	sWOGi/fokPMiQr51FTnbLkdHC9AE6kPw55hGb3onkwsfYkzIyz52W8eteYek9GnQYyHFCT8z0XO
+	X58ZxCA==
+X-Google-Smtp-Source: AGHT+IEA44RU4N4ESkiu5d9YAa5ebPxUjvOFQ2Sa1DBOHp7f0Kicg0TVlqyWmK5zlTK19+ssiQoyH9P+cQJI
+X-Received: from plbw11.prod.google.com ([2002:a17:902:d3cb:b0:223:5416:c809])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d548:b0:223:5ca1:3b0b
+ with SMTP id d9443c01a7336-2292f9f1990mr139468345ad.40.1743410165825; Mon, 31
+ Mar 2025 01:36:05 -0700 (PDT)
+Date: Mon, 31 Mar 2025 16:33:01 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] dbus: Fix add invalid memory during interface removal
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <quic_chejiang@quicinc.com>,
-        <quic_jiaymao@quicinc.com>, <quic_chezhou@quicinc.com>,
-        <quic_zijuhu@quicinc.com>, <quic_mohamull@quicinc.com>
-References: <20250327084128.3315736-1-quic_shuaz@quicinc.com>
- <CABBYNZLkwH=8TztnGnuzGy7FJ+iugp3sKT_cS0dsRoo1aV_hrw@mail.gmail.com>
- <CABBYNZLZfuEXS7YzANUrkuD59oWWyctLU9wPWsyOLO6LNG7oxA@mail.gmail.com>
-Content-Language: en-US
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-In-Reply-To: <CABBYNZLZfuEXS7YzANUrkuD59oWWyctLU9wPWsyOLO6LNG7oxA@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
+Message-ID: <20250331083523.1132457-1-chharry@google.com>
+Subject: [PATCH] Bluetooth: btusb: Reset altsetting when no SCO connection
+From: Hsin-chen Chuang <chharry@google.com>
+To: luiz.dentz@gmail.com
+Cc: Hsin-chen Chuang <chharry@chromium.org>, chromeos-bluetooth-upstreaming@chromium.org, 
+	Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=W8g4VQWk c=1 sm=1 tr=0 ts=67ea3bf6 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=NEAV23lmAAAA:8 a=pGLkceISAAAA:8 a=COk6AnOGAAAA:8
- a=_3-blLh4wLk4toAw60wA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: 63dTkRv0Fu1RcjI6dniyxLlLeXbofh6C
-X-Proofpoint-ORIG-GUID: 63dTkRv0Fu1RcjI6dniyxLlLeXbofh6C
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-31_03,2025-03-27_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 suspectscore=0
- mlxlogscore=999 mlxscore=0 clxscore=1015 malwarescore=0 adultscore=0
- phishscore=0 impostorscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2503310047
 
-Hi Luiz
+From: Hsin-chen Chuang <chharry@chromium.org>
 
-On 3/27/2025 11:10 PM, Luiz Augusto von Dentz wrote:
-> Hi Shuai,
-> 
-> On Thu, Mar 27, 2025 at 10:58 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->>
->> Hi Shuai,
->>
->> On Thu, Mar 27, 2025 at 4:41 AM Shuai Zhang <quic_shuaz@quicinc.com> wrote:
->>>
->>> test setp
->>> register_service <uuid>
->>> register_application <uuid>
->>> unregister_service <uuid>
->>> unregister_application
->>> register_service <uuid>
->>> register_application <uuid>
->>> core dump
->>
->> Ok, what exactly are you talking about above, you are not referring to
->> D-Bus api it seems, are these bluetoothctl commands?
-> 
-> Tried this with bluetoothctl, doesn't seem to trigger any errors:
-> 
-> https://gist.github.com/Vudentz/7b20ff8b59e3122606a2239e1b63aa8a
-> 
+Although commit 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting
+for HCI_USER_CHANNEL") has enabled the HCI_USER_CHANNEL user to send out
+SCO data through USB Bluetooth chips, it's observed that with the patch
+HFP is flaky on most of the existing USB Bluetooth controllers: Intel
+chips sometimes send out no packet for Transparent codec; MTK chips may
+generate SCO data with a wrong handle for CVSD codec; RTK could split
+the data with a wrong packet size for Transparent codec.
 
-This error is a probabilistic issue, and the frequency of reproduction is 
-quite high. I have left the reproduction commit in your GitHub glist.
+To address the issue above btusb needs to reset the altsetting back to
+zero when there is no active SCO connection, which is the same as the
+BlueZ behavior, and another benefit is the bus doesn't need to reserve
+bandwidth when no SCO connection.
 
->>
->>> invalidate_parent_data is called to add the service to the application's
->>> glist when unregister_service. However, this service has already been
->>> added to the glist of root object in register_service. This results in
->>> services existing in both queues,but only the services in the
->>> application's glist are freed upon removal. A null address is stored
->>> in root object's glist, a crash dump will occur when get_object is called.
->>>
->>> Add a check for the parent pointer to avoid adding the service again.
->>>
->>> 0  0x0000007ff7df6058 in dbus_message_iter_append_basic ()
->>>    from /usr/lib/libdbus-1.so.3
->>> 1  0x00000055555a3780 in append_object (data=0x31306666,
->>>   user_data=0x7ffffff760) at /usr/src/debug/bluez5/5.72/gdbus/object.c:1117
->>> 2  0x0000007ff7ece0cc in g_slist_foreach () from /usr/lib/libglib-2.0.so.0
->>> 3  0x00000055555a37ac in append_object (data=0x5555642cf0,
->>>   user_data=0x7ffffff760) at /usr/src/debug/bluez5/5.72/gdbus/object.c:1122
->>> 4  0x0000007ff7ece0cc in g_slist_foreach () from /usr/lib/libglib-2.0.so.0
->>> 5  0x00000055555a3630 in get_objects (connection=<optimized out>,
->>>     message=<optimized out>, user_data=0x555563b390)
->>>     at /usr/src/debug/bluez5/5.72/gdbus/object.c:1154
->>> 6  0x00000055555a51d0 in process_message (
->>>     connection=connection@entry=0x5555639310,
->>>     message=message@entry=0x5555649ac0,
->>>     method=method@entry=0x55555facf8 <manager_methods>,
->>>     iface_user_data=<optimized out>)
->>>     at /usr/src/debug/bluez5/5.72/gdbus/object.c:246
->>> 7  0x00000055555a575c in generic_message (connection=0x5555639310,
->>>     message=0x5555649ac0, user_data=<optimized out>)
->>>
->>> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
->>> ---
->>>  gdbus/object.c | 3 ++-
->>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/gdbus/object.c b/gdbus/object.c
->>> index 7b0476f1a..d87a81160 100644
->>> --- a/gdbus/object.c
->>> +++ b/gdbus/object.c
->>> @@ -809,7 +809,8 @@ static struct generic_data *invalidate_parent_data(DBusConnection *conn,
->>>
->>>         if (child == NULL || g_slist_find(data->objects, child) != NULL)
->>>                 goto done;
->>> -
->>> +       if(g_slist_find(parent->objects, child) != NULL)
->>> +               goto done;
->>
->> Use empty lines after if statements, and keep the one you are removing.
->>
->>
->>>         data->objects = g_slist_prepend(data->objects, child);
->>>         child->parent = data;
->>>
->>> --
->>> 2.34.1
->>>
->>>
->>
->>
->> --
->> Luiz Augusto von Dentz
-> 
-> 
-> 
+This patch adds a fixed-size array in btusb_data which is used for
+tracing the active SCO handles. When the controller is reset or any
+tracing handle has disconnected, btusb adjusts the USB alternate setting
+correspondingly for the Isoc endpoint.
+
+The array size is configured by BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES.
+If the size is set to zero, the auto set altsetting feature is disabled.
+
+This patch is tested on ChromeOS devices. The USB Bluetooth models
+(CVSD, TRANS alt3 and alt6) could pass the stress HFP test narrow band
+speech and wide band speech.
+
+Cc: chromeos-bluetooth-upstreaming@chromium.org
+Fixes: 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL")
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+---
+
+ drivers/bluetooth/Kconfig |  18 ++++--
+ drivers/bluetooth/btusb.c | 116 ++++++++++++++++++++++++++++++--------
+ 2 files changed, 105 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 7771edf54fb3..5c811af8d15f 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -56,17 +56,23 @@ config BT_HCIBTUSB_POLL_SYNC
+ 	  Say Y here to enable USB poll_sync for Bluetooth USB devices by
+ 	  default.
+ 
+-config BT_HCIBTUSB_AUTO_ISOC_ALT
+-	bool "Automatically adjust alternate setting for Isoc endpoints"
++config BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES
++	int "Automatically adjust alternate setting for Isoc endpoints"
+ 	depends on BT_HCIBTUSB
+-	default y if CHROME_PLATFORMS
++	default 2 if CHROME_PLATFORMS
++	default 0
+ 	help
+-	  Say Y here to automatically adjusting the alternate setting for
+-	  HCI_USER_CHANNEL whenever a SCO link is established.
++	  Say positive number here to automatically adjusting the alternate
++	  setting for HCI_USER_CHANNEL whenever a SCO link is established.
+ 
+-	  When enabled, btusb intercepts the HCI_EV_SYNC_CONN_COMPLETE packets
++	  When positive, btusb intercepts the HCI_EV_SYNC_CONN_COMPLETE packets
+ 	  and configures isoc endpoint alternate setting automatically when
+ 	  HCI_USER_CHANNEL is in use.
++	  btusb traces at most the given number of SCO handles and intercepts
++	  the HCI_EV_DISCONN_COMPLETE and the HCI_EV_CMD_COMPLETE of
++	  HCI_OP_RESET packets. When the controller is reset, or all tracing
++	  handles are disconnected, btusb reset the isoc endpoint alternate
++	  setting to zero.
+ 
+ config BT_HCIBTUSB_BCM
+ 	bool "Broadcom protocol support"
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5012b5ff92c8..31439d66cf0e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -34,7 +34,7 @@ static bool force_scofix;
+ static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
+ static bool enable_poll_sync = IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC);
+ static bool reset = true;
+-static bool auto_isoc_alt = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT);
++static bool auto_isoc_alt = CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES > 0;
+ 
+ static struct usb_driver btusb_driver;
+ 
+@@ -907,6 +907,8 @@ struct btusb_data {
+ 	__u8 cmdreq;
+ 
+ 	unsigned int sco_num;
++	u16 sco_handles[CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES];
++
+ 	unsigned int air_mode;
+ 	bool usb_alt6_packet_flow;
+ 	int isoc_altsetting;
+@@ -1118,40 +1120,108 @@ static inline void btusb_free_frags(struct btusb_data *data)
+ 	spin_unlock_irqrestore(&data->rxlock, flags);
+ }
+ 
+-static void btusb_sco_connected(struct btusb_data *data, struct sk_buff *skb)
++static void btusb_sco_changed(struct btusb_data *data, struct sk_buff *skb)
+ {
+ 	struct hci_event_hdr *hdr = (void *) skb->data;
+-	struct hci_ev_sync_conn_complete *ev =
+-		(void *) skb->data + sizeof(*hdr);
+ 	struct hci_dev *hdev = data->hdev;
+-	unsigned int notify_air_mode;
+ 
+-	if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT)
+-		return;
++	if (data->sco_num > CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES) {
++		bt_dev_warn(hdev, "Invalid sco_num to HCI_USER_CHANNEL");
++		data->sco_num = 0;
++	}
+ 
+-	if (skb->len < sizeof(*hdr) || hdr->evt != HCI_EV_SYNC_CONN_COMPLETE)
++	if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT || skb->len < sizeof(*hdr))
+ 		return;
+ 
+-	if (skb->len != sizeof(*hdr) + sizeof(*ev) || ev->status)
+-		return;
++	switch (hdr->evt) {
++	case HCI_EV_CMD_COMPLETE: {
++		struct hci_ev_cmd_complete *ev =
++			(void *) skb->data + sizeof(*hdr);
++		struct hci_ev_status *rp =
++			(void *) skb->data + sizeof(*hdr) + sizeof(*ev);
++		u16 opcode;
++
++		if (skb->len != sizeof(*hdr) + sizeof(*ev) + sizeof(*rp))
++			return;
++
++		opcode = __le16_to_cpu(ev->opcode);
++
++		if (opcode != HCI_OP_RESET || rp->status)
++			return;
++
++		bt_dev_info(hdev, "Resetting SCO");
++		data->sco_num = 0;
++		data->air_mode = HCI_NOTIFY_DISABLE_SCO;
++		schedule_work(&data->work);
+ 
+-	switch (ev->air_mode) {
+-	case BT_CODEC_CVSD:
+-		notify_air_mode = HCI_NOTIFY_ENABLE_SCO_CVSD;
+ 		break;
++	}
++	case HCI_EV_DISCONN_COMPLETE: {
++		struct hci_ev_disconn_complete *ev =
++			(void *) skb->data + sizeof(*hdr);
++		u16 handle;
++		int i;
++
++		if (skb->len != sizeof(*hdr) + sizeof(*ev) || ev->status)
++			return;
++
++		handle = __le16_to_cpu(ev->handle);
++		for (i = 0; i < data->sco_num; i++) {
++			if (data->sco_handles[i] == handle)
++				break;
++		}
++
++		if (i == data->sco_num)
++			return;
++
++		bt_dev_info(hdev, "Disabling SCO");
++		data->sco_handles[i] = data->sco_handles[data->sco_num - 1];
++		data->sco_num--;
++		data->air_mode = HCI_NOTIFY_DISABLE_SCO;
++		schedule_work(&data->work);
+ 
+-	case BT_CODEC_TRANSPARENT:
+-		notify_air_mode = HCI_NOTIFY_ENABLE_SCO_TRANSP;
+ 		break;
++	}
++	case HCI_EV_SYNC_CONN_COMPLETE: {
++		struct hci_ev_sync_conn_complete *ev =
++			(void *) skb->data + sizeof(*hdr);
++		unsigned int notify_air_mode;
++		u16 handle;
+ 
++		if (skb->len != sizeof(*hdr) + sizeof(*ev) || ev->status)
++			return;
++
++		switch (ev->air_mode) {
++		case BT_CODEC_CVSD:
++			notify_air_mode = HCI_NOTIFY_ENABLE_SCO_CVSD;
++			break;
++
++		case BT_CODEC_TRANSPARENT:
++			notify_air_mode = HCI_NOTIFY_ENABLE_SCO_TRANSP;
++			break;
++
++		default:
++			return;
++		}
++
++		handle = __le16_to_cpu(ev->handle);
++		if (data->sco_num
++		    == CONFIG_BT_HCIBTUSB_AUTO_ISOC_ALT_MAX_HANDLES) {
++			bt_dev_err(hdev, "Failed to add the new SCO handle");
++			return;
++		}
++
++		bt_dev_info(hdev, "Enabling SCO with air mode %u",
++			    ev->air_mode);
++		data->sco_handles[data->sco_num++] = handle;
++		data->air_mode = notify_air_mode;
++		schedule_work(&data->work);
++
++		break;
++	}
+ 	default:
+-		return;
++		break;
+ 	}
+-
+-	bt_dev_info(hdev, "enabling SCO with air mode %u", ev->air_mode);
+-	data->sco_num = 1;
+-	data->air_mode = notify_air_mode;
+-	schedule_work(&data->work);
+ }
+ 
+ static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
+@@ -1161,9 +1231,9 @@ static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
+ 		schedule_delayed_work(&data->rx_work, 0);
+ 	}
+ 
+-	/* Configure altsetting for HCI_USER_CHANNEL on SCO connected */
++	/* Configure altsetting for HCI_USER_CHANNEL on SCO changed */
+ 	if (auto_isoc_alt && hci_dev_test_flag(data->hdev, HCI_USER_CHANNEL))
+-		btusb_sco_connected(data, skb);
++		btusb_sco_changed(data, skb);
+ 
+ 	return data->recv_event(data->hdev, skb);
+ }
+-- 
+2.49.0.472.ge94155a9ec-goog
 
