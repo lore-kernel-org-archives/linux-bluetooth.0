@@ -1,360 +1,142 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460D920AF82
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Apr 2025 15:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBB31A5B9A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Apr 2025 15:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743521259; cv=none; b=VbuSAvtQrGgHR5x6XSSYOYmFnO254G0JAH2ilb8ejA7zxFNgFkXVDMIroQeDWucYTecMPsrYb4eosouGkzyvAmDmMvdzR6T9tJMhk7rrEa4MD2t21aUQbuKSNjt+WK0KF7I5KvRzXIuB5CciJxLaxzP308gS6SJPA7MrTe7SpG8=
+	t=1743521646; cv=none; b=U+KHP/HYfColBdKxVn3URiHCQx0F9wNbTTFzgoPZ+N99yYXcQMe85IlQn1CTFlsKj7sK+l24zDs7VI32npkP6bjZTcCp2+MShbBu7AlqhEoskUB+Q33XZThdcrmKapSv/3yZ8FwKnzwW6ybU52GJhYLVdIBBFgsfp7X4g2WOCLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743521259; c=relaxed/simple;
-	bh=Hc0JBTwcblF9exbzjWcnb6VWqPc+E1BTIFbOZZXNqbs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i9uK5Q35ELNKKSrIg0bq4NaaPjZi1YTeXKSyyFmtaDlyGYcrlnRUcMWGJ2Mdk15Z4j6UZMMjlXmuxYvsMCIkbcjegH4qRrVN9CPdXed+wUaO4+LLgMJ4Iud6zFW35ggG2pTc+C6CeMsVTF7129zaRHlQFR15QG6WQcdn27arQl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LcNDXGoo; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1743521646; c=relaxed/simple;
+	bh=dFR4ZxRi2LKfTtrb0AHHlnGZd/yF8H96A6GiIhkPfDM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=JOpiRwZbN5qlgKe6PSUj0i4GT+Lg2zvaoWrVaRTWWNBKvhzq6Rv/Vri+zsMwM5Cd6Pjtbe/EF/XavclTSni1gHMEwPfGjtS/1qiEriGmwZgszCoBLqfVWUTtzGwr2quttfrgF9/s7OVNtKfp/lLrf6K/DNIxtXnN0T8XOyaUfwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EIYgiEPF; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LcNDXGoo"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6ff07872097so49180597b3.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Apr 2025 08:27:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EIYgiEPF"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c5568355ffso495454985a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Apr 2025 08:34:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743521256; x=1744126056; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YrTAT73/pytPO5BDqSRBwDug9yOh7SSsAyZQaMHt+8I=;
-        b=LcNDXGoo1/14bwqIr6BqiNbGMGciIpqqwfec7r1lMpdLwaE+8kE3Bhd2+Ds6bQvj7B
-         agaTRiB01p0eWsYoMaBf+/sn5C/oTSwzOAxLTtb0U/24Sl5USQ0sn/nuWPM0DetTrO4P
-         gj0l0x98Tey/r7HfelNjXfJz75BP7P/dEX1XXouC4WjpERDmCpsPtpEqhk2Hq1X5QmBx
-         ApHFF8z1COI5WqD22PuSMjhmnLbtNq9TqpsJ/5hfrisupMdcMEotkAzDfJBLTLuxaFbc
-         nNnK2O7KAdShcmLW7P8NUHfS2hfkQ6e2b0wu/ewiXbZL8Vld2FQBnJFYuqGhaKD3Knyy
-         ucaQ==
+        d=gmail.com; s=20230601; t=1743521644; x=1744126444; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hKXJbDNNQlYK4PlzuvR3+/T8g0y+a4B3NuIylOXNx2c=;
+        b=EIYgiEPFpNic6kUVXj16Sq3yrwYy4lV5C59jL9pgnssBWe2XwjFpy376o1Mc4lW6Q+
+         G93XSDTrMeiV67uJKsksAt7XzO6SyK73+cCBQWo1EkGzpGVPt0alDTLL+W59ghaKNQO/
+         y1CTKAsufLYJw3onkksNn7fGE8lJ3WO4tNO0yI5oF9KIcLNREsIzQD2QSyaNEpaT1W1J
+         QmYxhBwbm7QWkAUiHvD2mhfYru6vTc+z/Pc+wn8FDD8XHroxPF8NlOnJ8FQpC+kwwQzI
+         Iou1ZTmXQ7RqzMC+QIUK59OWjUa4AsAFrEEq9JGQuD3VMFMfzyUqy6xelWOoIoiH66Nl
+         xdUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743521256; x=1744126056;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YrTAT73/pytPO5BDqSRBwDug9yOh7SSsAyZQaMHt+8I=;
-        b=fVjaTDFG0xqYYkfIQCexiPGtHkUJ1YfRkzDNvqn2gxWwkKayFh4tlhc5HsypWWu/g8
-         GOTVuh9gGjxStroFogE+YHyPzV6f8N2kte+3f7XJPI8omT9aGuX3bXGzmP2mTLr9iXXb
-         qUN0PKCzD1Rc239dYMqHa1TWquHNiBKArjWT/3KkYngvsn4GgjEMrRf1vF4tU/NBxuQx
-         HFGspULqSjOJKjurUMzKtEKWd9Uvg79j3zmhzQOd0ulFlR7jb9RhAzLq5IqQtk/38NG0
-         ueWYULy1LVr+qkfjSfbUMOzNgF0BCQw3TgHn4Cd84v/bF5mGUhQro5uPYHEzQwCAwzER
-         7iXg==
-X-Forwarded-Encrypted: i=1; AJvYcCWjhRdPqbIaL3NIh7tB4k/13FVS4y5wujltsiZlvDiEoX2iSPfeLdRZHrjteHW1AgTeOF0QU/Z9GzDIoBCLTVM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0xk+qSHxnAMD9x5Mlccye/nbAY2OqMJbq1vdpNlfK/I6tycMK
-	6oZyVP/dlKkubBU4FSKixTmE6BrOo5LqHmZJ3SMYwHvCKAAAlfcq48cLCpEBlsuO0Qj+aXTuA0/
-	kUeOr7uPPuEwpY3jVgKoAM2UHd9wX6aevGzfs
-X-Gm-Gg: ASbGnct9y1IAGtXlI4GxmtRUlqVZ0w8hQ/5mGHut2wjMAn4RnDqCrH6wQLHaExgD9AK
-	J6u2lDisNlCAHigh1PxWBPqXThh1yl9naePlvI3cB7v2nWf31jsuMEaciz38adQn53OGhiZ3wxn
-	hJ1b13cDDQnxhgtP/gT/EdQARU
-X-Google-Smtp-Source: AGHT+IEjX/jjY8IHxq9srXQvt2Ttjh0zWE7Q87FlLz3zplPodhA9JDcKoR+aISyyJLiyJEMASpHY8zS7u8oRwVeU+TU=
-X-Received: by 2002:a05:690c:6c82:b0:6fd:474a:60a8 with SMTP id
- 00721157ae682-7025710afc9mr197129247b3.11.1743521255933; Tue, 01 Apr 2025
- 08:27:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743521644; x=1744126444;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hKXJbDNNQlYK4PlzuvR3+/T8g0y+a4B3NuIylOXNx2c=;
+        b=fs7isCE9J2TzQVh4MXL/JYUCkDrl4J2Ph+hhnnur8u7A0sk3msd2dS/aTWjAOTqlut
+         5AIrPrMHxtv2/oWMf0QlNDPTK4OUUN+oZI3Uom+uMQQx303Pk6lOfw9v1PF5R/68jSXu
+         /arZZbE2bnJRflg+a/J5lozMMDCVJhy9y5V5Boa2CYa5Bw8ciED0WqGElFrQ1d5fzFws
+         4vQjOjj0lAH8ZOVLmH4IB5eryvhJLwJLPtvPn/2Xs50ZpgSb+cmhOp7nXBJw4zq+qIY1
+         VI3eUzePQGVw/KnBLHUmXNjFFRyzJqLDH91wX3pz7i312TCoGGcA/1Sv1v05cqHBFHRX
+         tAFw==
+X-Gm-Message-State: AOJu0Yyt0clngS0smwBE/dtW4r5wGzd1Lc613tJ5SvkVvEdeoXUVKwQg
+	OLZOOE8sR8ndaE7KVprktgi+e8BZuVNY8/nsOMpUUY2ghrJYjuJ+O1LpUA==
+X-Gm-Gg: ASbGncuewMxzwoMbWrnS+CaS6OYMKs9Y9dL8/wk3nlIFqKjwcsyYOM8hQkO8uLffPCZ
+	Xfq0+omUTyIzBqYUV2oNzb/itVDN9lZIWd9kfA/8SJFr2GaGNxUx77sUhf37hqIOB5PnQiz5JoH
+	FazPzKcLDduUdU8WSlUEz4Aj7MnsxjLgL2zMp2grmKynSzYT/6PiY0QseOq5LPTf3/K6S4ErjEh
+	/FTpXbyDFLmfORyHkxSLnPlOhR+JquJzIsFwc3ZR09bTgvA+pVlfhxAq8Zwiq3F9MR72aCyVvBf
+	W3kRsNr9OcAOGF8EqCWGZlEQpjFvNs+MXYrdZlAxxGVbLZkiIEM=
+X-Google-Smtp-Source: AGHT+IHwI4nwTNfzXCUM6T7rdoBduzUe5VshkXEl+41IRQjlvPkYlU19uJfOIuzXOpclyN6MvsmaZQ==
+X-Received: by 2002:a05:620a:488f:b0:7c5:4738:8a0e with SMTP id af79cd13be357-7c75bc6ab00mr511062285a.44.1743521644021;
+        Tue, 01 Apr 2025 08:34:04 -0700 (PDT)
+Received: from [172.17.0.2] ([20.161.78.136])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5f765ada7sm675785785a.9.2025.04.01.08.34.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 08:34:03 -0700 (PDT)
+Message-ID: <67ec076b.050a0220.272156.86c0@mx.google.com>
+Date: Tue, 01 Apr 2025 08:34:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0349440519492645749=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250401134424.3725875-1-chharry@google.com> <CABBYNZKu_jRm4b-gBT=DRtn0c_svgxyM7tc_u3HDRCUAwvABnQ@mail.gmail.com>
-In-Reply-To: <CABBYNZKu_jRm4b-gBT=DRtn0c_svgxyM7tc_u3HDRCUAwvABnQ@mail.gmail.com>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Tue, 1 Apr 2025 23:26:59 +0800
-X-Gm-Features: AQ5f1JqKHimVqd6cxraxMet6vAte91WjpA6TRIa_BXNcv9HJ6LM7mbljvPf2jcU
-Message-ID: <CADg1FFePfuOmHE+s9Fks8LvPY5dt9gcxrULn+X5wM9S3J57H7A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add driver command BTUSB_DRV_CMD_SWITCH_ALT_SETTING
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Hsin-chen Chuang <chharry@chromium.org>, chromeos-bluetooth-upstreaming@chromium.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Ying Hsu <yinghsu@chromium.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, dmitry.baryshkov@oss.qualcomm.com
+Subject: RE: Bluetooth: qca: fix NV variant for one of WCN3950 SoCs
+In-Reply-To: <20250401-fix-rb1-bt-v1-1-0d140c583a06@oss.qualcomm.com>
+References: <20250401-fix-rb1-bt-v1-1-0d140c583a06@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============0349440519492645749==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 1, 2025 at 11:03=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Hsin-chen,
->
-> On Tue, Apr 1, 2025 at 9:44=E2=80=AFAM Hsin-chen Chuang <chharry@google.c=
-om> wrote:
-> >
-> > From: Hsin-chen Chuang <chharry@chromium.org>
-> >
-> > Although commit 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting
-> > for HCI_USER_CHANNEL") has enabled the HCI_USER_CHANNEL user to send ou=
-t
-> > SCO data through USB Bluetooth chips, it's observed that with the patch
-> > HFP is flaky on most of the existing USB Bluetooth controllers: Intel
-> > chips sometimes send out no packet for Transparent codec; MTK chips may
-> > generate SCO data with a wrong handle for CVSD codec; RTK could split
-> > the data with a wrong packet size for Transparent codec; ... etc.
-> >
-> > To address the issue above one needs to reset the altsetting back to
-> > zero when there is no active SCO connection, which is the same as the
-> > BlueZ behavior, and another benefit is the bus doesn't need to reserve
-> > bandwidth when no SCO connection.
-> >
-> > This patch introduces a fundamental solution that lets the user space
-> > program to configure the altsetting freely:
-> > - Define the new packet type HCI_DRV_PKT which is specifically used for
-> >   communication between the user space program and the Bluetooth drvier=
-s
-> > - Define the btusb driver command BTUSB_DRV_CMD_SWITCH_ALT_SETTING whic=
-h
-> >   indicates the expected altsetting from the user space program
-> > - btusb intercepts the command and adjusts the Isoc endpoint
-> >   correspondingly
-> >
-> > This patch is tested on ChromeOS devices. The USB Bluetooth models
-> > (CVSD, TRANS alt3, and TRANS alt6) could pass the stress HFP test narro=
-w
-> > band speech and wide band speech.
-> >
-> > Cc: chromeos-bluetooth-upstreaming@chromium.org
-> > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control =
-USB alt setting")
-> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > ---
-> >
-> >  drivers/bluetooth/btusb.c       | 67 +++++++++++++++++++++++++++++++++
-> >  include/net/bluetooth/hci.h     |  1 +
-> >  include/net/bluetooth/hci_mon.h |  2 +
-> >  net/bluetooth/hci_core.c        |  2 +
-> >  net/bluetooth/hci_sock.c        | 14 +++++--
-> >  5 files changed, 83 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 5012b5ff92c8..a7bc64e86661 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -2151,6 +2151,67 @@ static int submit_or_queue_tx_urb(struct hci_dev=
- *hdev, struct urb *urb)
-> >         return 0;
-> >  }
-> >
-> > +static struct sk_buff *btusb_drv_response(u8 opcode, size_t data_len)
-> > +{
-> > +       struct sk_buff *skb;
-> > +
-> > +       /* btusb driver response starts with 1 oct of the opcode,
-> > +        * and followed by the command specific data.
-> > +        */
-> > +       skb =3D bt_skb_alloc(1 + data_len, GFP_KERNEL);
-> > +       if (!skb)
-> > +               return NULL;
-> > +
-> > +       skb_put_u8(skb, opcode);
-> > +       hci_skb_pkt_type(skb) =3D HCI_DRV_PKT;
-> > +
-> > +       return skb;
-> > +}
-> > +
-> > +static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts=
-);
-> > +
-> > +#define BTUSB_DRV_CMD_SWITCH_ALT_SETTING 0x35
->
-> Any particular reason why you are starting with 0x35? We may need to
-> add something like Read Supported Driver Commands to begin with.
+This is automated email and please do not reply to this email!
 
-Um, it's just my lucky number. No particular reason in terms of the design.
-And sure Read Supported Driver Commands seems good, but does that
-indicate that the meaning of the opcodes is shared across different
-driver modules? That's fine but we would need to move these
-definitions somewhere else.
+Dear submitter,
 
->
-> > +static int btusb_drv_cmd(struct hci_dev *hdev, struct sk_buff *skb)
-> > +{
-> > +       /* btusb driver command starts with 1 oct of the opcode,
-> > +        * and followed by the command specific data.
-> > +        */
-> > +       if (!skb->len)
-> > +               return -EILSEQ;
->
-> We might need to define a struct header, and I'd definitely recommend
-> using skb_pull_data for parsing.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=948999
 
-So far the header has only 1 oct of the opcode. Would you suggest
-something similar to HCI command e.g. 2 oct of the opcode + 1 oct of
-the param length?
+---Test result---
 
->
-> > +       switch (skb->data[0]) {
-> > +       case BTUSB_DRV_CMD_SWITCH_ALT_SETTING: {
-> > +               struct sk_buff *resp;
-> > +               int status;
-> > +
-> > +               /* Response data: Total 1 Oct
-> > +                *   Status: 1 Oct
-> > +                *     0 =3D Success
-> > +                *     1 =3D Invalid command
-> > +                *     2 =3D Other errors
-> > +                */
-> > +               resp =3D btusb_drv_response(BTUSB_DRV_CMD_SWITCH_ALT_SE=
-TTING, 1);
-> > +               if (!resp)
-> > +                       return -ENOMEM;
-> > +
-> > +               if (skb->len !=3D 2 || skb->data[1] > 6) {
-> > +                       status =3D 1;
-> > +               } else {
-> > +                       status =3D btusb_switch_alt_setting(hdev, skb->=
-data[1]);
-> > +                       if (status)
-> > +                               status =3D 2;
-> > +               }
-> > +               skb_put_u8(resp, status);
-> > +
-> > +               kfree_skb(skb);
-> > +               return hci_recv_frame(hdev, resp);
-> > +       }
-> > +       }
-> > +
-> > +       return -EILSEQ;
-> > +}
-> > +
-> >  static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> >  {
-> >         struct urb *urb;
-> > @@ -2192,6 +2253,9 @@ static int btusb_send_frame(struct hci_dev *hdev,=
- struct sk_buff *skb)
-> >                         return PTR_ERR(urb);
-> >
-> >                 return submit_or_queue_tx_urb(hdev, urb);
-> > +
-> > +       case HCI_DRV_PKT:
-> > +               return btusb_drv_cmd(hdev, skb);
-> >         }
-> >
-> >         return -EILSEQ;
-> > @@ -2669,6 +2733,9 @@ static int btusb_send_frame_intel(struct hci_dev =
-*hdev, struct sk_buff *skb)
-> >                         return PTR_ERR(urb);
-> >
-> >                 return submit_or_queue_tx_urb(hdev, urb);
-> > +
-> > +       case HCI_DRV_PKT:
-> > +               return btusb_drv_cmd(hdev, skb);
-> >         }
-> >
-> >         return -EILSEQ;
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index a8586c3058c7..e297b312d2b7 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -494,6 +494,7 @@ enum {
-> >  #define HCI_EVENT_PKT          0x04
-> >  #define HCI_ISODATA_PKT                0x05
-> >  #define HCI_DIAG_PKT           0xf0
-> > +#define HCI_DRV_PKT            0xf1
-> >  #define HCI_VENDOR_PKT         0xff
-> >
-> >  /* HCI packet types */
-> > diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hc=
-i_mon.h
-> > index 082f89531b88..bbd752494ef9 100644
-> > --- a/include/net/bluetooth/hci_mon.h
-> > +++ b/include/net/bluetooth/hci_mon.h
-> > @@ -51,6 +51,8 @@ struct hci_mon_hdr {
-> >  #define HCI_MON_CTRL_EVENT     17
-> >  #define HCI_MON_ISO_TX_PKT     18
-> >  #define HCI_MON_ISO_RX_PKT     19
-> > +#define HCI_MON_DRV_TX_PKT     20
-> > +#define HCI_MON_DRV_RX_PKT     21
->
-> Are you planning to write some btmon decoding for these packets?
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      24.59 seconds
+CheckAllWarning               PASS      26.75 seconds
+CheckSparse                   PASS      29.99 seconds
+BuildKernel32                 PASS      23.96 seconds
+TestRunnerSetup               PASS      430.98 seconds
+TestRunner_l2cap-tester       PASS      21.07 seconds
+TestRunner_iso-tester         PASS      33.11 seconds
+TestRunner_bnep-tester        PASS      5.63 seconds
+TestRunner_mgmt-tester        FAIL      120.89 seconds
+TestRunner_rfcomm-tester      PASS      7.87 seconds
+TestRunner_sco-tester         PASS      12.49 seconds
+TestRunner_ioctl-tester       PASS      8.33 seconds
+TestRunner_mesh-tester        PASS      6.05 seconds
+TestRunner_smp-tester         PASS      7.20 seconds
+TestRunner_userchan-tester    PASS      4.95 seconds
+IncrementalBuild              PENDING   0.54 seconds
 
-Yeah, I believe this is helpful for debugging. ChromeOS still uses
-btmon for btsnoop capturing.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
->
-> >  struct hci_mon_new_index {
-> >         __u8            type;
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 5eb0600bbd03..bb4e1721edc2 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -2911,6 +2911,8 @@ int hci_recv_frame(struct hci_dev *hdev, struct s=
-k_buff *skb)
-> >                 break;
-> >         case HCI_ISODATA_PKT:
-> >                 break;
-> > +       case HCI_DRV_PKT:
-> > +               break;
-> >         default:
-> >                 kfree_skb(skb);
-> >                 return -EINVAL;
-> > diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> > index 022b86797acd..0bc4f77ed17b 100644
-> > --- a/net/bluetooth/hci_sock.c
-> > +++ b/net/bluetooth/hci_sock.c
-> > @@ -234,7 +234,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct =
-sk_buff *skb)
-> >                         if (hci_skb_pkt_type(skb) !=3D HCI_EVENT_PKT &&
-> >                             hci_skb_pkt_type(skb) !=3D HCI_ACLDATA_PKT =
-&&
-> >                             hci_skb_pkt_type(skb) !=3D HCI_SCODATA_PKT =
-&&
-> > -                           hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT)
-> > +                           hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT =
-&&
-> > +                           hci_skb_pkt_type(skb) !=3D HCI_DRV_PKT)
-> >                                 continue;
-> >                 } else {
-> >                         /* Don't send frame to other channel types */
-> > @@ -391,6 +392,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, str=
-uct sk_buff *skb)
-> >                 else
-> >                         opcode =3D cpu_to_le16(HCI_MON_ISO_TX_PKT);
-> >                 break;
-> > +       case HCI_DRV_PKT:
-> > +               if (bt_cb(skb)->incoming)
-> > +                       opcode =3D cpu_to_le16(HCI_MON_DRV_RX_PKT);
-> > +               else
-> > +                       opcode =3D cpu_to_le16(HCI_MON_DRV_TX_PKT);
-> > +               break;
-> >         case HCI_DIAG_PKT:
-> >                 opcode =3D cpu_to_le16(HCI_MON_VENDOR_DIAG);
-> >                 break;
-> > @@ -1806,7 +1813,7 @@ static int hci_sock_sendmsg(struct socket *sock, =
-struct msghdr *msg,
-> >         if (flags & ~(MSG_DONTWAIT | MSG_NOSIGNAL | MSG_ERRQUEUE | MSG_=
-CMSG_COMPAT))
-> >                 return -EINVAL;
-> >
-> > -       if (len < 4 || len > hci_pi(sk)->mtu)
-> > +       if (len > hci_pi(sk)->mtu)
-> >                 return -EINVAL;
-> >
-> >         skb =3D bt_skb_sendmsg(sk, msg, len, len, 0, 0);
-> > @@ -1860,7 +1867,8 @@ static int hci_sock_sendmsg(struct socket *sock, =
-struct msghdr *msg,
-> >                 if (hci_skb_pkt_type(skb) !=3D HCI_COMMAND_PKT &&
-> >                     hci_skb_pkt_type(skb) !=3D HCI_ACLDATA_PKT &&
-> >                     hci_skb_pkt_type(skb) !=3D HCI_SCODATA_PKT &&
-> > -                   hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT) {
-> > +                   hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT &&
-> > +                   hci_skb_pkt_type(skb) !=3D HCI_DRV_PKT) {
-> >                         err =3D -EINVAL;
-> >                         goto drop;
-> >                 }
-> > --
-> > 2.49.0.472.ge94155a9ec-goog
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
---=20
-Best Regards,
-Hsin-chen
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.169 seconds
+LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.142 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0349440519492645749==--
