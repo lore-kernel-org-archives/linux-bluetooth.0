@@ -1,134 +1,125 @@
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A516E43AB7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Apr 2025 02:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271CE2E3398
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Apr 2025 03:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743473091; cv=none; b=cdF+GHABzFf7GXJegX8bsucz9VWClxm8GjmRqdTnoVO23VxOj5/bXA3fd28k6vuRFpWQ5Y9rPv4rMg17ijestnvrVPYWIy2vju8Cp1NP3vlrKOLd9B/9E+vHqiSPK2FNkEJwov8wWUT7ioR0Hhz+d3iZIzZuYi2QlucV7p4z79k=
+	t=1743479726; cv=none; b=Ay1MUmPRyA9++LR9SHDhVqB2LwS428pLSJNWfOLwUE2RRTPB9+CGCh3Rd92s1nDOoRxRCa/wCTPz62XbCaN8oCGzHUz50zc8+er5NTXmTl5CdBWve9jsTHWJL3qN36gSMrYYOEruhxGSHrn+8QOtPCkvAN/991UCkVtJIOYqud0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743473091; c=relaxed/simple;
-	bh=dlYLHy5/WHM1QFwQwrhb/tDr3KUlz40cYPmP13Ofr6M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Yz5A+WfpMpPVof7Hx/FUjwGPWW1UhEn7WFKmI5rg8l1uYd8UXuBxuDBoi3kroYtETMBJcQVW9R9JTDy/UtW3sszTSYuuBf2k7H6XdmJIGnIb0GqX6fTWThsEomY+kjLJh3AmBo5te/GF3KKvHOyGBKRyzj6FFdB0ijsZesOLKtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=mahpIK2I; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1743479726; c=relaxed/simple;
+	bh=AHe3rlGrNt9nVRLTYA57QyxjzkdjsVfF8RnIn1V/QpE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=HYNRTh10BAZCDFN7DuQvrgjoX7C4Cb9tFZepNnigZoF61ws5YX1qgCQEAo8mc91WBZKHSi4t03PGyYfBjzGyRxPewAoK3engPhfR058scgdCnSZw8EogGivqtnPh74GfIFhCX0QiqtUqvF9Jaq5Tijd+OhO1urL6sIJrQkgCUk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8BjOqYV; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="mahpIK2I"
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 8BB663F880
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Apr 2025 02:04:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1743473082;
-	bh=gsebR6Npq5QZ08qOfLdxjEyTfj/E8fT4/O8QrxOwzIM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=mahpIK2I6gzueX5RCh9x5Vo981Y4JZ/kkMsFcys1r+QWyqMIAhnxNC4VfpvbXXzmu
-	 JPJks6ESGf9iE+NpFza9euYpikqoeYshFC3kak/7y0ixUzDYgwLUMCiDySXytwRp0m
-	 R24EuAppbMq2MRHv7qOMeuS9GhTQhG2oN2cATH/r6pniNAHC2jNQx9j/YVZZ+NZ0v/
-	 8WU5oOMkWYwCD2dtG/vbFCAWSbfX1IUyG1gzj+OTb3EqlyWa/nvZdD/UAMZwQcR0id
-	 hoqSLRTERqqmoWXdUltY0AU54V3iFvk9VlMqIP9zgujjyQ48cwfHnGnp7+cUumYlCI
-	 B+k8pfXJIaBGg==
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-22403329f9eso88829805ad.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 19:04:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8BjOqYV"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-227cf12df27so72201345ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Mar 2025 20:55:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743479724; x=1744084524; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4BErke1Lfm3NFYDVjwANn0jZoyJ7DNPzIKCaOR1HbnE=;
+        b=Z8BjOqYVXWyKi0oGU4pUIWNrPkECbCXsmgnE1ki54E81JsTZPAvjcjoV4bSPimB/iM
+         9kEeT5BG7SbNJyKYShi2Z6tbNNqziK9Ly1X/JY2e2qGU1PYpDbQ2Wv3Ngl6MV5fMEo40
+         gM8b50qYp2sxxuBps8ySVA8FawhVKz1MxdjywAlV5FGmOB+9oZmYT2xepc9QXn28SYdI
+         rjTEThS1DpRlwPuK0yijr1CAqbT1nefLS7e0c+PswftzW6VRGkCVIb1ShKrXtwRFcF4l
+         Y073ZSMNTCwjtxYejT+1FWiPv6uRNIoioo83wGRxORWQUNxtC1M9OvN4fRH2OgXjBdfd
+         l7pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743473081; x=1744077881;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gsebR6Npq5QZ08qOfLdxjEyTfj/E8fT4/O8QrxOwzIM=;
-        b=AfSsuIWTKcKCiqxYFAX2h/cowaD8kAmRItnHVFL3tkG/fWRQBi7nL37+0Y4UJU5Nyn
-         8wShHZsE9P6AnSj8qGL+58Gl0oepLoDuQmYTX0GE1K2v4mEWIJlQn0QQZYdMOqIfDc9f
-         k7yI52XxzOdwOLroNGwsEA5D3USGn/xCXuU013uibGdL4Yq2Pk0wIeBivzsCP8dB9fHq
-         Et9FgUUoCq3D6lrt+XZ0qBNicCe7lP+/27g2lzLS+wRN53DAknC0SmQMKt7DxSFQ8mAw
-         0/djOalfMBoWyYlSOvcZlB8Xfgu9e2pGU41odWmHjN8f9fYf2oIwz08EnPpF4G2dek0r
-         S9BA==
-X-Gm-Message-State: AOJu0YwwElwMALGjpWCopmFQG0thEnlkaWeJGSD3S2d6YgYP0r6lsGOf
-	O01a/q7Nd7n1K1mm3CKHQUPtq5ymibIuiFVAoibsCc/uQzPhZfKCCmVMgTO9MYokPUJb+7BZVrx
-	pwWZSZkLSStZS3e6OdR9kz/ueLWZ1INIBzpouGfrh+UyjwuUiHTHrAOH49LJ8BkTafFzJ/Eo1dJ
-	Y2Dq0cg8aLynnQmg==
-X-Gm-Gg: ASbGncuT0+LFyd3GNtQkcaqVIL6inOEkKwl0qG6UVEhIx+vPmVUCUhpwXG/xX51OBUQ
-	kQfWibWfd6huNbiFDrS7sU8ADrPuYtQ31T9e3HjZUkcu/Z0swWGdHwI9yX6oJijfAJg5gYt4UYF
-	0IS21Auvjwoh/DbqEmIZsB09kLPadxc3phuVd70KI7XRR/XB6wWPGvWBZu7FKaiK+uVAZCgY0aI
-	eIffi03WLuLbgFsiQff3HbBkLWr0YThIZeB8UQly24HU76yCiKcL/mvHsKUEOYCzAuiRrOwDRSw
-	aZN9GGqSGJ8Oj+7DwJkMAoRmFARkVsuoB9WG3j+8jB1creoR1BQiT0aZvJ7CKK0lLFE=
-X-Received: by 2002:a17:902:ebc7:b0:224:160d:3f54 with SMTP id d9443c01a7336-2292f97caa0mr189890375ad.31.1743473081009;
-        Mon, 31 Mar 2025 19:04:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFAWjl7alzPtHu0YQntb4W4DxLpjK15/vQSgHYhNZAo+QhBC5SAuttgigcTvmFtB5KwbxxGg==
-X-Received: by 2002:a17:902:ebc7:b0:224:160d:3f54 with SMTP id d9443c01a7336-2292f97caa0mr189890095ad.31.1743473080636;
-        Mon, 31 Mar 2025 19:04:40 -0700 (PDT)
-Received: from localhost.localdomain (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1cf51asm76903225ad.151.2025.03.31.19.04.39
+        d=1e100.net; s=20230601; t=1743479724; x=1744084524;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4BErke1Lfm3NFYDVjwANn0jZoyJ7DNPzIKCaOR1HbnE=;
+        b=GJ3+JUwFH0pTtYAV7EeE3U5wT8WqIIlgnuNUCNcT9r7uYhi3A9Jb0p9ONg8eLP5YPn
+         BvVOyRZkDn0uGQTarPkslAAtFQzC27WqqJmijp2JUQbrpEJMhZ1BmpbFZKBv5uP6R+SD
+         rGhX328lr1iN2cFC08BGkrsmaf+vEpS7ezgDhvjRREMFSJ8aIsqsMeRmBzW/ef/sOKxI
+         cdm0tg8iZtaUchEK0n0rxjmhE77L5u+smE/u94NdIWuH3GZZEjoQzNrVdVTDakl93ZOJ
+         KGwR7PO4PB4IPHvolX1kLBdY943+8xznH83v9PcRWTONGB7J3UGVdRicY5Qq9IxMnbEv
+         8KBQ==
+X-Gm-Message-State: AOJu0YxDxiwNk8oMdVMTQW7L05Ym6DmIPXneSOi77UD/NQysp9RLndD2
+	HRO/HvVqDOrGeAcjzGAqem8Z1Z5E7wTxwCA5sIqOUi1llIizUfwpZ/PnOQ==
+X-Gm-Gg: ASbGncvU+guFSp9N/E7HRB3R5K+ecOImCrpT9bVEWAwKVyVVy5+Ojq9kTqpXUy1aBng
+	2Llxpj3USyuCbygSbsVgM6kn0sIOjBlCRWpKMNUggT+fSmrxIoZuHLc5CFdJEpe0Uz8MNgjh+wH
+	nRd1OCB/pL5Fyw5jJt+CZWARGNE5eD5AVvQUDBeKXE0MU8v5qhzyw0LPUf0cyOb4HjCFfWfi29g
+	TA/XDI3YNoCG/XhSb73W5gijFGsOrsDPo1Vrs5j8kGX8NVtF6I72Np94d1nHaw8jw8K8taMH89U
+	ACrO85u9IHBaxho37zDTDppD+AAknX3HEUUw2WNPzCVVACtcISs=
+X-Google-Smtp-Source: AGHT+IGUlqALfA3Nh+sVDcJ363WgR2pq8gHL/T/rWrDMDy4mDreuTFnXI2a5uscyjaJ/EEII9C5Mfw==
+X-Received: by 2002:a17:902:e84a:b0:21f:53a5:19e0 with SMTP id d9443c01a7336-22921ccc4e3mr253812955ad.12.1743479724098;
+        Mon, 31 Mar 2025 20:55:24 -0700 (PDT)
+Received: from [172.17.0.2] ([20.43.247.168])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1df027sm78147385ad.181.2025.03.31.20.55.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 19:04:40 -0700 (PDT)
-From: =?UTF-8?q?Yao=20Wei=20=28=E9=AD=8F=E9=8A=98=E5=BB=B7=29?= <yao.wei@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Yao=20Wei=20=28=E9=AD=8F=E9=8A=98=E5=BB=B7=29?= <yao.wei@canonical.com>
-Subject: [PATCH BlueZ 1/1] policy: fix HSP/HFP reconnection
-Date: Tue,  1 Apr 2025 10:02:21 +0800
-Message-ID: <20250401020221.119615-2-yao.wei@canonical.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250401020221.119615-1-yao.wei@canonical.com>
-References: <20250401020221.119615-1-yao.wei@canonical.com>
+        Mon, 31 Mar 2025 20:55:23 -0700 (PDT)
+Message-ID: <67eb63ab.170a0220.259bee.d2a3@mx.google.com>
+Date: Mon, 31 Mar 2025 20:55:23 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8716510324242082570=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yao.wei@canonical.com
+Subject: RE: policy: fix HSP/HFP reconnection
+In-Reply-To: <20250401020221.119615-2-yao.wei@canonical.com>
+References: <20250401020221.119615-2-yao.wei@canonical.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This patch removes checking whether A2DP service initiates the
-connection starting HSP/HFP connection, instead just start timer
-when HSP/HFP is not connected, also move order so that setting
-HSP/HFP connection timer is not blocked by AVRCP connection.
+--===============8716510324242082570==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The previous patch also did not get HSP service if HFP is not
-available.  This patch adds it in.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=948733
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.40 seconds
+BuildEll                      PASS      20.84 seconds
+BluezMake                     PASS      1562.68 seconds
+MakeCheck                     PASS      12.91 seconds
+MakeDistcheck                 PASS      161.21 seconds
+CheckValgrind                 PASS      217.39 seconds
+CheckSmatch                   PASS      289.96 seconds
+bluezmakeextell               PASS      100.81 seconds
+IncrementalBuild              PENDING   0.36 seconds
+ScanBuild                     PASS      893.38 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- plugins/policy.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/plugins/policy.c b/plugins/policy.c
-index 360d1359f..0e533ba1f 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -312,6 +312,14 @@ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
- 			data->sink_timer = 0;
- 		}
- 
-+		/* Try connecting HSP/HFP if it is not connected */
-+		hs = btd_device_get_service(dev, HFP_HS_UUID);
-+		if (hs == NULL)
-+			hs = btd_device_get_service(data->dev, HSP_HS_UUID);
-+		if (hs && btd_service_get_state(hs) !=
-+						BTD_SERVICE_STATE_CONNECTED)
-+			policy_set_hs_timer(data);
-+
- 		/* Check if service initiate the connection then proceed
- 		 * immediatelly otherwise set timer
- 		 */
-@@ -321,16 +329,6 @@ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
- 						BTD_SERVICE_STATE_CONNECTED)
- 			policy_set_ct_timer(data, CONTROL_CONNECT_TIMEOUT);
- 
--		/* Also try connecting HSP/HFP if it is not connected */
--		hs = btd_device_get_service(dev, HFP_HS_UUID);
--		if (hs) {
--			if (btd_service_is_initiator(service))
--				policy_connect(data, hs);
--			else if (btd_service_get_state(hs) !=
--						BTD_SERVICE_STATE_CONNECTED)
--				policy_set_hs_timer(data);
--		}
--
- 		break;
- 	case BTD_SERVICE_STATE_DISCONNECTING:
- 		break;
--- 
-2.49.0
 
+--===============8716510324242082570==--
