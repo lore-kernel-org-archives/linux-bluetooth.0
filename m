@@ -1,137 +1,142 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981711EB9F3
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Apr 2025 11:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B519B1DB13A
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Apr 2025 11:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743591868; cv=none; b=tKCPw0bqPnxxDDs4gkbY9QZP8T31mmCC2+H0hj1tkucBwtnVvkwwgP88Ewsk57lm6vUGSgfooX1rGDjQjG/jsZ0mrZUK2jn7xeA3znpXv5Ev7qKAePVqN+wPgvLNlika3mB9BFMZeEVuZN5li19BhYKR9nhbWuqAb3ROKaSiLFw=
+	t=1743593442; cv=none; b=lxX147+ABEkSnMWSIvVwKgWZmsnxUusP34eRVVmgVAvFTZWpSsxzmJssMbe7OggWA/nCAtHaA+tsvYvSJqYNQPYISZn3hytRAlKw835ErTrh7KzmGru3ur3X++u8WYsiDOCtNqIh5OrsWVd7vTd9efoPNOSYEqwRk3Sw5v6bohM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743591868; c=relaxed/simple;
-	bh=zuWdNMKv4jFpUEv03k57TS7zZVpBZOgXI2SS02WW0oQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cZKmfA6hE43cP2E8qXXFkTDVYtDNhjZ1jJULmXa7YgE0tPkQ9D/7o5NTVFmy1POk+gLvUnp/eX1ixBL7CojqdXWKh5ZaSNjelj9LSPFwZOsc83XdltYDaXvULyad2VnE7LGI4H3qCL0mQ81IlwtJ9ipuBg5hFDqIt52G3BjHnsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FQ/l7bke; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1743593442; c=relaxed/simple;
+	bh=mgNtf8pFFhdGXX1EdnrUQoDXDdm/u0WbHiZdfz1NgBw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=iwpnUFC68/LbX5NofcKpg1FQFuk5OQP2BoZ/LmKf67KfIGTp93BYJK1tI3O/0X+lTabJSUCPCe4oeyza5KWVJadgPfl0Mu40iXvkYmNavYGL+Yy3JUYUkh+Ayzt222+9WJke1b+ACPnodef7lniOj+rH0+fscwcu3v5mtUKWab0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cprzQqfd; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FQ/l7bke"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43d0359b1fcso5126075e9.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Apr 2025 04:04:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cprzQqfd"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c081915cf3so804478485a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Apr 2025 04:30:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1743591865; x=1744196665; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WiWQ1IjSqnVvfaZMMteWA9D4GWFNY1IcFJZCyB9/5DM=;
-        b=FQ/l7bkemtUotUhBAs+chUizguhvzMGEyBs3J0dat+HKPNYEZNTQuW03TgxX6jqqf5
-         capJndmJDQBSVQMAtvysc6BOHEN+h5sfz7wP+uPCW7olihKUAAI/Gnbm7I0uIfgT5NIx
-         oggAFmnh0jhT/oRKeiFmZhjLT9eSuHHMV36bv8C+5q5mURPDrP9VwO3a921hpDK3GrOy
-         3le2y8lu5zvWngSpn25oIsotbhag/cT7Gr5lVVOMXxd5s4ZetFtWKrOOxP16UErRE8O8
-         bxJB4fW8j+nAkbE7pZYGtXRnWMI/4oNW2WunSRlU/vyUvkZB8PLbz1h1byOWEsuJep5c
-         R0yg==
+        d=gmail.com; s=20230601; t=1743593439; x=1744198239; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=KmcrOYxp2EN6DLj8WZBH2Nt0J7PK2eMrpbeihVokRR8=;
+        b=cprzQqfdJgDm8JEAOtFZ35wSeRQYHxeSAwnRL5mwJlV7o3ZaoClqXtHPNEcZSq1EjF
+         l34CoGlP+cOOUCN/eY1XPCFB2ClDPARuzNVXVfFyG8po1rFtTpD28+f/YxQcZ+yjG/XQ
+         +SDFMsM9x5rXj9KwhXK9yr/6k2O95L3EFzZqXiT+fbwUYntJCaSeUb6c8FYP3QAVBQLJ
+         yaYmw4WWy84J7EK8xmbZy5jNU1C40TWgANYmarvav2dBUZL6zaVdAYqNGu2f1t5yg+jg
+         vXBdoz8LhsNTRMrfxghdApKhDhbs1Bfq77w+jgOEnk6/0ZdistLPl3pKMA0WAL4q47mt
+         IDhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743591865; x=1744196665;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WiWQ1IjSqnVvfaZMMteWA9D4GWFNY1IcFJZCyB9/5DM=;
-        b=EwUyn+6T+BO3QTaqbo4pvMztiz5s7s4euKc/ghgCQok1wHzq1LHYM7lqzzCUAY14xV
-         5DhjXRq6+xsLlj0G1evvkUANGXjaC0SljnXFyiewkKcqiCd76HIEJW5oOUcJ6ND1cP6E
-         d6Tbn1RvH3r2FkMDyFe6+NcmVu5+GSci62MJKG1I6MB9wg5qCK+wsETyESKMQI9bsvl2
-         IsOfJKbRTcymeER/SY6NVxOGDHfv2tOm/5pwraohdYGGqM3/+y3eGv9gCS8O324OOQkj
-         +DAdDlj2X63EC55W000jbt7tEDubdQn4CEluZoTw8KHRbzcdIckSC0oCsn6J5lhF9uQ0
-         xBMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUSK10k10XqQQrP5un+5iE+z49cOd2KO2A0EE411Muddm/EUELhBnCMCywf+LPFhBfev2AK3hvuM3Ay4KVSngs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdE7ymGummD5wBuOzfwpnqlvc7V38WxudbKyny6l6ORDUXlRIQ
-	poIGLBS/JeC5hH8FFIvqDCwtRRg1ufR3MvznzBWeJcAJXLTmC3bx0bEe1SCc+ro=
-X-Gm-Gg: ASbGnctdF5bKHkRC5QSslzIOpn6HNVnsbyof5gxu6VyhOuwy5lpPhwSBoSni/vD4B3C
-	ZYF31AXw4rQ/HkOGWlNk6+8W1BrnJvn7vBKmw+I4JG9dzposYL6VWhWy/6Td8NDf4x3kzJVRDOi
-	n3zpfsq+IzXcqLbaNgwwx7uXIn2CNsazAeO29Y9I8pj93kP4c9IHZyPQVw63KfEWJDShhdg16NO
-	jQY45hx/WTXLOwWeB1OXGgFnATr0nYshNtXRsGkSIbCoGveSQBnGEDjQYJ8tcxZ8c5x1ceixZKD
-	kTPurDmQcOyyDH5k9rfXrxxwlQ07fpWpJEeaMfJBTroA04jcrw==
-X-Google-Smtp-Source: AGHT+IEuSwJMvS8cZa0Du9xKI27gsODZuLV0ZBW+bJBs4DUPfdJgnj+2vvUti8wHM7UgzyboWnQO2g==
-X-Received: by 2002:a05:600c:4c8a:b0:43c:f3e1:a729 with SMTP id 5b1f17b1804b1-43eb70464d1mr12811005e9.12.1743591864857;
-        Wed, 02 Apr 2025 04:04:24 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43eb60cd74dsm16962315e9.20.2025.04.02.04.04.23
+        d=1e100.net; s=20230601; t=1743593439; x=1744198239;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KmcrOYxp2EN6DLj8WZBH2Nt0J7PK2eMrpbeihVokRR8=;
+        b=hhrmPvSBXYzmQhxyn8Dkd1za7SL3y2ggC5q24yQaW9Cpo86K8lYvPW/WEfQoA/9//g
+         eaTs74OHeV0wMcvDZRRRBtZoeDmuJOEfK5AaL4BT6EjJV1omTihkf7LKKpTUYo7asAKf
+         PG5o7ippoA19In+6i0Pd4gOjzad/RzfIsbCPIYjY72WHZL4L8hvQ5c65G5J78jyGEZpQ
+         qRkkaa9pA1qF+ozyMGjRKJBzc5uNP1BsoVpZVcqxVsQv8lv1QOfvCq7MSZFpsqyaanjQ
+         EnTzZyJpjg7CbzQabw68rO3wjWv9VuPGPAgAC2o29FG0z0EZKoMKM4V5pi6egK24Y/HR
+         lVRA==
+X-Gm-Message-State: AOJu0Yx1gJoT6/XnEnQL4rzt5HB1NsZgI6V62pTWSkkjPS/Z5XJCDfnv
+	zHD9YRvqlmJnAKxGmbHtgF3AjYKiMWGKWntHfNyf+ZRRTWkjKO338rIx7A==
+X-Gm-Gg: ASbGncsvvxCWKwMxRetv/5b+ZI2Ptp+y/XSMrwAWS44WqyzSHd5/qxCKyBzvdebsEJg
+	jjLR4lzowemdXDNCc5TK5Wbef+1iXMKdPI9dTx6WNQilmSQDFM14VXIt1hBuTMcuVc6wWASvLks
+	oLQREL3xm6/aATg+H02uH5s4TeLNlbM4BE1OJY1ddlGImRCheof5BMbbGJpSY2h/gUFYShDG98/
+	iazKIj7oXF9kwttUML0ZcoouSzDLQIqvKXm2iNhhLt4bQOVoXowjJqqj5P/u/B4Mgx7KNTKfi0d
+	6JOo/vInNey4I3owGMY32QwmWRtuq9apSXQmwbjPH8x9R4fPjA==
+X-Google-Smtp-Source: AGHT+IFWLdYZslpH5M/cVjp8fw9bucw5BXb+1Cuh4I1qj0CIO8fAtrmrQo9+Ijv9s19MJXwOpzx5kg==
+X-Received: by 2002:a05:620a:2903:b0:7c5:6a04:d0a8 with SMTP id af79cd13be357-7c6862e5bdcmr2253288785a.5.1743593439396;
+        Wed, 02 Apr 2025 04:30:39 -0700 (PDT)
+Received: from [172.17.0.2] ([20.246.78.17])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5f776510esm781406385a.72.2025.04.02.04.30.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 04:04:24 -0700 (PDT)
-Date: Wed, 2 Apr 2025 14:04:22 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@kernel.org>,
-	martin.blumenstingl@googlemail.com, linux-bluetooth@vger.kernel.org
-Subject: Re: [bug report] Bluetooth: btrtl: split the device initialization
- into smaller parts
-Message-ID: <ba834820-4b23-404a-a8ce-cd3e01042fa0@stanley.mountain>
-References: <20180806204257.hqrwgufmu6ukq2sj@kili.mountain>
- <109d2b01-3e9a-4410-8f30-e393503ef7f6@stanley.mountain>
- <Z-hr0s8xkkM6AEpU@bombadil.infradead.org>
+        Wed, 02 Apr 2025 04:30:38 -0700 (PDT)
+Message-ID: <67ed1fde.050a0220.2e9726.b254@mx.google.com>
+Date: Wed, 02 Apr 2025 04:30:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4863846819594458677=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-hr0s8xkkM6AEpU@bombadil.infradead.org>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, dan.carpenter@linaro.org
+Subject: RE: Bluetooth: btrtl: Prevent potential NULL dereference
+In-Reply-To: <0174d93d-f3a5-48ed-a755-ed7f6455c1bf@stanley.mountain>
+References: <0174d93d-f3a5-48ed-a755-ed7f6455c1bf@stanley.mountain>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Sat, Mar 29, 2025 at 02:53:22PM -0700, Luis Chamberlain wrote:
-> On Fri, Mar 21, 2025 at 05:35:18PM +0300, Dan Carpenter wrote:
-> > On Mon, Aug 06, 2018 at 11:42:57PM +0300, Dan Carpenter wrote:
-> > > Hello Martin Blumenstingl,
-> > > 
-> > > The patch 26503ad25de8: "Bluetooth: btrtl: split the device
-> > > initialization into smaller parts" from Aug 2, 2018, leads to the
-> > > following static checker warning:
-> > > 
-> > > 	drivers/bluetooth/btrtl.c:592 btrtl_initialize()
-> > > 	warn: passing zero to 'ERR_PTR'
-> > > 
-> > > drivers/bluetooth/btrtl.c
-> > >    559          btrtl_dev->fw_len = rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
-> > >    560                                            &btrtl_dev->fw_data);
-> > >    561          if (btrtl_dev->fw_len < 0) {
-> > >    562                  rtl_dev_err(hdev, "firmware file %s not found\n",
-> > >    563                              btrtl_dev->ic_info->fw_name);
-> > >    564                  ret = btrtl_dev->fw_len;
-> > >    565                  goto err_free;
-> > >    566          }
-> > >    567  
-> > >    568          if (btrtl_dev->ic_info->cfg_name) {
-> > >    569                  if (postfix) {
-> > >    570                          snprintf(cfg_name, sizeof(cfg_name), "%s-%s.bin",
-> > >    571                                   btrtl_dev->ic_info->cfg_name, postfix);
-> > >    572                  } else {
-> > >    573                          snprintf(cfg_name, sizeof(cfg_name), "%s.bin",
-> > >    574                                   btrtl_dev->ic_info->cfg_name);
-> > >    575                  }
-> > >    576                  btrtl_dev->cfg_len = rtl_load_file(hdev, cfg_name,
-> > >    577                                                     &btrtl_dev->cfg_data);
-> > >    578                  if (btrtl_dev->ic_info->config_needed &&
-> > >    579                      btrtl_dev->cfg_len <= 0) {
-> > >                             ^^^^^^^^^^^^^^^^^^^^^^^
-> > > Assume btrtl_dev->cfg_len == 0
-> > > 
-> > 
-> > This is the length of the firmware file.  Does it make sense for
-> > request_firmware() to load empty files?  Probably there is a test for
-> > this in the firmware code which rejects zero length files?
-> 
-> We don't know the size of the file until we try to read it. Although
-> kernel_read_file_from_path_initns() perhaps should allow for empty
-> files, I do agree it seems odd to use the firmware API for 0 length
-> files.
-> 
-> We should extend tools/testing/selftests/firmware/ to check for this.
-> Care for a patch?
+--===============4863846819594458677==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I was hoping that maybe the code already existed and I just hadn't seen
-it.  I wouldn't have the foggiest idea how to write it myself.  This code
-returns 0 if there is a zero length file and that results in a NULL
-dereference.  I've sent a fix for that.
+This is automated email and please do not reply to this email!
 
-regards,
-dan carpenter
+Dear submitter,
 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=949268
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.22 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      24.66 seconds
+CheckAllWarning               PASS      27.27 seconds
+CheckSparse                   PASS      30.53 seconds
+BuildKernel32                 PASS      24.45 seconds
+TestRunnerSetup               PASS      437.44 seconds
+TestRunner_l2cap-tester       PASS      21.50 seconds
+TestRunner_iso-tester         PASS      32.92 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        FAIL      119.45 seconds
+TestRunner_rfcomm-tester      PASS      7.94 seconds
+TestRunner_sco-tester         PASS      12.70 seconds
+TestRunner_ioctl-tester       PASS      8.43 seconds
+TestRunner_mesh-tester        PASS      6.15 seconds
+TestRunner_smp-tester         PASS      7.26 seconds
+TestRunner_userchan-tester    PASS      4.98 seconds
+IncrementalBuild              PENDING   0.54 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.195 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.169 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4863846819594458677==--
