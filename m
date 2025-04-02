@@ -1,402 +1,224 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DBA71922C4
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Apr 2025 16:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743611309; cv=none; b=PPKV/p1Ti4DVXoQMQL66HYei8Zi1+mOA2ju+KT/l2ec+yzrht5+bblucIDandsDgm1elEqgDTIouUelcYEeZ3FNx9PziWeWQrSoM3neG/OBycn7FvopgHUhXglRnNCJIa14hC8HlxzRkVnMkUIEH3B1fd2WgBWQ2Ayn/fWYmmUU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743611309; c=relaxed/simple;
-	bh=ASGfdhX3k9dJLmVK1k3GHGI9EXnD92JevJJhXYn3e9U=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Rv5ySxDLYFpDjiyocN8Pgn90DVDKdYYexWW6DSxOYT95auj4HeP8Wlty+8LBnwgNHB0Nls+fCQ0W3rijXGkQ74r5J6CcK+zX/yQIZaSWaI5FHZfFl8Z9rl84ojdgCSceYs+/NCbpJMq1pI78cO2ThZjXt92qa7C9spF4RH3aI6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KNJ98kdl; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB5813957E;
+	Wed,  2 Apr 2025 16:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743613032; cv=pass; b=TkPR15HNc2/KIcQz9HkoXA7I/PUB8PVCYgDQ+lIvvtu28UESuAtTK/vXgy8TIEpptuqkbA06PGxfVxn5OQ/0Oov2X+3WPs1zmgwd0tGI6g4xfiZPRLhHmV/O2ocaa1yllHgNpcnoLJ5NnXDaClIPFIGwfHoL1tJWW/leuTRcn+I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743613032; c=relaxed/simple;
+	bh=LRXoD+4ibjTlc788eBC7ZXZcOBL4T/2hgXYKcWIvyxM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QgKYjcGH+ZHCHtgSjoMduMXaLHQHnAAkK/q/nVitMMxnk8qJID1H+tK8EJtfiaLO7jNCwoaCogp3P4oz5QTTQdoLXBWYQ4gIbDp9wKz+rrDnfbWyr04i0VrEsiGu87h7dLvQxvbve1XGfo225ce1pl/EWvXJS+4G0wJv918p82s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=aw7nrYss; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KNJ98kdl"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2240a7aceeaso515145ad.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Apr 2025 09:28:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743611307; x=1744216107; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=11c1kNcqbP6MqoCK7+Gzq8Uhztec/eqhGAQKiMTpHok=;
-        b=KNJ98kdlVckmj9UDWLgOgXRUrplBhUuOFWEhCE/1fO5v2e1YGa0hzBfqEAltgAlmrR
-         kJv4+3+URgOORJ+aDPvFNpQ5y1iR5TWJfMf1idj78g1ArFSCX/okpvZbQ0Zfhq9fPaes
-         8EuhugzZsp21hfBzPlaks80Y+dV1G3ymY2Z9jfbRQN89yZKwoXaE1sx8lFxfzRyIkgTI
-         /Idw1kMME2mwGcUgTq5jI85iYGoIeSUo9vPk0lYhex+D+K6zw4AyMYzmBy7H8a2CawM7
-         8+87+Cxv3tcvkbKD2/1YqbA+OtsCjTV9RCZpf/jfc5/Ku8YFwK9qlauBl3HRqawQMcMq
-         RUYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743611307; x=1744216107;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=11c1kNcqbP6MqoCK7+Gzq8Uhztec/eqhGAQKiMTpHok=;
-        b=ZbYgdw4ZBy/EXqLofG80SAbJk4CG+1F5l92RUbKmM2LSYD3nQSV62Hl1itkaCsnK9L
-         h76DuAxwla8E/BnGd26unSHtiR+1LJW/Rb+7AuE1EekOXwTR39i+kGppesQqB9pG9oqv
-         daD+59AezAGkrNUHuDcjrRC8zfV+hqIOy2323Z9DMvrAFAY3gtc2zrS2HSdxNSFsF8n/
-         3POIK3zhFZM0TEJferb7giJVAAYP6rEZ/Ri3qyP7iMV5qsKrpd/PrGmjY3sbvrlJtj8m
-         wcvMPi1SJRzDaDC8P2PKT00jrIDDWOXOeaXEv9G8eiYD7cv00VNM0cZ65msEi3Vu30VL
-         vLXg==
-X-Forwarded-Encrypted: i=1; AJvYcCVLhN566SOcWlZ+8k12DJd48Pv6xmFETXTyjZM2GVE9kB4Aoctk48SaZkfS9/fzawGBRGLdwAkVX5Ef/aK4wso=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWAA+7R86MmXrgdjGTfGXPwntPVPax7Dm91fbpYZQKkrq7j1Yx
-	DwfcEJJP/nZZ2LpsAJ270V5AcoqF9ljkOOZbvksX9AoNzJO+q1RUo6pvmZVn+FgLZeLY0vdptSa
-	W/dwvdg==
-X-Google-Smtp-Source: AGHT+IFWEVM26nWhKTmcRs27xc4x5P78/M0Gu8fFWKjc9MeSe72cY4HBNTUq235I7EmfHmHQKlBZ98YyeSEj
-X-Received: from plpl14.prod.google.com ([2002:a17:903:3dce:b0:223:4c5f:3494])
- (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2350:b0:223:628c:199
- with SMTP id d9443c01a7336-2292fa1adeemr222285535ad.52.1743611306858; Wed, 02
- Apr 2025 09:28:26 -0700 (PDT)
-Date: Thu,  3 Apr 2025 00:26:34 +0800
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="aw7nrYss"
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZSWHW6CmRz49Pxf;
+	Wed,  2 Apr 2025 19:56:55 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1743613016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LIPp4RLl6pJSdKh+bwSIUD+9HN3F5P5UNyXOAKQ6xsQ=;
+	b=aw7nrYss69EQ2UHNELm+pE4z1p/JtPZr3nrp+HEmHyJar46JNxqtG/dALqfa6gyq9dmB7z
+	v29jFgAZxJm6HVjQp40rkFvo/g6p/EdKxVtgCSQSL/lK8HhMX87DUHnIzA2HjgewyEIo0g
+	y0ewgU+z+jRbxLBNCH5+dmtn3gPYCl4/YZIVSHrwxmD9ETIOL1e32voDCspP6jBZycAXkD
+	jmmWmCFna4Hev/WaXMI5nMzGW7Vc53SxNGpuMGJCOr/FFkNshw0nzGiDgH7dVqTe/7hS/m
+	CWPQG5O3ijgse4XxdiC2Dyt+PUUdAyGGwTRpbN1+tQF/AqZeO9hJEilk/vONrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1743613016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LIPp4RLl6pJSdKh+bwSIUD+9HN3F5P5UNyXOAKQ6xsQ=;
+	b=fgDTLb5T0tFqGWUR66reVHEf2f9xTo/71wZk8ewRuDHqbR41hrWTCkzZT/GMwaeYuM6Vk7
+	DzmnvBl3AT6lfSOVm1XTyfPut6gkdudCUuKQEI+Vrhk1Ko1bXL3zIoyd7ts4ARB/OncYtm
+	Yw/MdkgtG9q7jPSk0tRc1b5CdY0ilvZXhDmE2LHvfHi7oT1pOglmLo1pHlqYVH/fLQq3bW
+	U8FiwPLk9Xf5ONbeFHePnbDlJa8hE3uhZ2KgJ/NQi55l6mymYffuI0sOXBJc+MVpGH+6H1
+	ft83TyYP8gtX04pL5s+RgfaKGJGCSsh/sl5okfutY13bxuyobr+H8dnXEBLINg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1743613016; a=rsa-sha256;
+	cv=none;
+	b=oj5ts3byDH0fxrLoPrCAf65IOrjAZatzuY82dY3q+lqL27ABnKwIlqlflBrR7c/3DZEHEt
+	jB4XhKN/p/Ui4InMPlBFSQ5oAbbWoq0QP9EVMa4Ei7t9sJcu29wSF5hamKY5gsiBb9c0JZ
+	esS5bOhaS/w/DX5eltLcSsCYvul1Qsw136eerMNarChp4M9Kw2sMFChiYimRpFagMbpDm1
+	aZ9+yH5jB9g2yj+4J3dNW+gOvxFlaSH79EZsEXPl0ZgrHXdfo+DFSrTK/UqCZDe1MM+MK6
+	mDZppUV0eM/0+G2IqT21cVxdki8KUwIVaVI0BgGx0oBkEQDYj7ZfClH5p5/n4A==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <db7f317539cbda89df7e87efaea9b22328af610a.camel@iki.fi>
+Subject: Re: [PATCH 3/3] [RFC] Bluetooth: enable bpf TX timestamping
+From: Pauli Virtanen <pav@iki.fi>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
+	kerneljasonxing@gmail.com
+Date: Wed, 02 Apr 2025 19:56:52 +0300
+In-Reply-To: <3546b79d-a09b-4971-abd7-ce18696a9536@linux.dev>
+References: <cover.1743337403.git.pav@iki.fi>
+	 <bbd7fa454ed03ebba9bfe79590fb78a75d4f07db.1743337403.git.pav@iki.fi>
+	 <3546b79d-a09b-4971-abd7-ce18696a9536@linux.dev>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250402162737.3271704-1-chharry@google.com>
-Subject: [PATCH] Bluetooth: Introduce HCI Driver Packet
-From: Hsin-chen Chuang <chharry@google.com>
-To: luiz.dentz@gmail.com
-Cc: Hsin-chen Chuang <chharry@chromium.org>, chromeos-bluetooth-upstreaming@chromium.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Ying Hsu <yinghsu@chromium.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-From: Hsin-chen Chuang <chharry@chromium.org>
+Hi,
 
-Although commit 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting
-for HCI_USER_CHANNEL") has enabled the HCI_USER_CHANNEL user to send out
-SCO data through USB Bluetooth chips, it's observed that with the patch
-HFP is flaky on most of the existing USB Bluetooth controllers: Intel
-chips sometimes send out no packet for Transparent codec; MTK chips may
-generate SCO data with a wrong handle for CVSD codec; RTK could split
-the data with a wrong packet size for Transparent codec; ... etc.
+ti, 2025-04-01 kello 18:34 -0700, Martin KaFai Lau kirjoitti:
+> On 3/30/25 5:23 AM, Pauli Virtanen wrote:
+> > Emit timestamps also for BPF timestamping.
+> >=20
+> > ***
+> >=20
+> > The tskey management here is not quite right: see cover letter.
+> > ---
+> >   include/net/bluetooth/bluetooth.h |  1 +
+> >   net/bluetooth/hci_conn.c          | 21 +++++++++++++++++++--
+> >   2 files changed, 20 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/=
+bluetooth.h
+> > index bbefde319f95..3b2e59cedd2d 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -383,6 +383,7 @@ struct bt_sock {
+> >   	struct list_head accept_q;
+> >   	struct sock *parent;
+> >   	unsigned long flags;
+> > +	atomic_t bpf_tskey;
+> >   	void (*skb_msg_name)(struct sk_buff *, void *, int *);
+> >   	void (*skb_put_cmsg)(struct sk_buff *, struct msghdr *, struct sock =
+*);
+> >   };
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index 95972fd4c784..7430df1c5822 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -28,6 +28,7 @@
+> >   #include <linux/export.h>
+> >   #include <linux/debugfs.h>
+> >   #include <linux/errqueue.h>
+> > +#include <linux/bpf-cgroup.h>
+> >  =20
+> >   #include <net/bluetooth/bluetooth.h>
+> >   #include <net/bluetooth/hci_core.h>
+> > @@ -3072,6 +3073,7 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, =
+size_t key_offset,
+> >   			    const struct sockcm_cookie *sockc)
+> >   {
+> >   	struct sock *sk =3D skb ? skb->sk : NULL;
+> > +	bool have_tskey =3D false;
+> >  =20
+> >   	/* This shall be called on a single skb of those generated by user
+> >   	 * sendmsg(), and only when the sendmsg() does not return error to
+> > @@ -3096,6 +3098,20 @@ void hci_setup_tx_timestamp(struct sk_buff *skb,=
+ size_t key_offset,
+> >  =20
+> >   			skb_shinfo(skb)->tskey =3D key - 1;
+> >   		}
+> > +		have_tskey =3D true;
+> > +	}
+> > +
+> > +	if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
+> > +	    SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING)) {
+> > +		struct bt_sock *bt_sk =3D container_of(sk, struct bt_sock, sk);
+> > +		int key =3D atomic_inc_return(&bt_sk->bpf_tskey);
+>=20
+> I don't think it needs to add "atomic_t bpf_tskey". Allow the bpf to deci=
+de what=20
+> the skb_shinfo(skb)->tskey should be if it is not set by the userspace.
 
-To address the issue above one needs to reset the altsetting back to
-zero when there is no active SCO connection, which is the same as the
-BlueZ behavior, and another benefit is the bus doesn't need to reserve
-bandwidth when no SCO connection.
+Ok. So if I understand correctly, the plan is that for UDP and
+Bluetooth seqpacket sockets it works like this:
 
-This patch introduces a fundamental solution that lets the user space
-program to configure the altsetting freely:
-- Define the new packet type HCI_DRV_PKT which is specifically used for
-  communication between the user space program and the Bluetooth drviers
-- Define the btusb driver command HCI_DRV_OP_SWITCH_ALT_SETTING which
-  indicates the expected altsetting from the user space program
-- btusb intercepts the command and adjusts the Isoc endpoint
-  correspondingly
+bpf_sock_ops_enable_tx_tstamp() does not set tskey.
 
-This patch is tested on ChromeOS devices. The USB Bluetooth models
-(CVSD, TRANS alt3, and TRANS alt6) could pass the stress HFP test narrow
-band speech and wide band speech.
+Socket timestamping sets tskey the same way as previously.
 
-Cc: chromeos-bluetooth-upstreaming@chromium.org
-Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
-Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
----
+So when both are in play, it shall work like:
 
- drivers/bluetooth/btusb.c       | 112 ++++++++++++++++++++++++++++++++
- drivers/bluetooth/hci_drv_pkt.h |  62 ++++++++++++++++++
- include/net/bluetooth/hci.h     |   1 +
- include/net/bluetooth/hci_mon.h |   2 +
- net/bluetooth/hci_core.c        |   2 +
- net/bluetooth/hci_sock.c        |  12 +++-
- 6 files changed, 189 insertions(+), 2 deletions(-)
- create mode 100644 drivers/bluetooth/hci_drv_pkt.h
+* attach BPF timestamping
+* setsockopt(SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_OPT_ID)
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D SOF_TIMESTAMPING_TX_SOFTWARE
+=3D> tskey 0
+* sendmsg() CMSG SO_TIMESTAMPING =3D SOF_TIMESTAMPING_TX_SOFTWARE
+=3D> tskey 1
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D SOF_TIMESTAMPING_TX_SOFTWARE
+=3D> tskey 2
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5012b5ff92c8..644a0f13f8ee 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -26,6 +26,7 @@
- #include "btbcm.h"
- #include "btrtl.h"
- #include "btmtk.h"
-+#include "hci_drv_pkt.h"
- 
- #define VERSION "0.8"
- 
-@@ -2151,6 +2152,111 @@ static int submit_or_queue_tx_urb(struct hci_dev *hdev, struct urb *urb)
- 	return 0;
- }
- 
-+static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts);
-+
-+static int btusb_drv_process_cmd(struct hci_dev *hdev, struct sk_buff *cmd_skb)
-+{
-+	struct hci_drv_cmd_hdr *hdr;
-+	u16 opcode, cmd_len;
-+
-+	hdr = skb_pull_data(cmd_skb, sizeof(*hdr));
-+	if (!hdr)
-+		return -EILSEQ;
-+
-+	opcode = le16_to_cpu(hdr->opcode);
-+	cmd_len = le16_to_cpu(hdr->len);
-+	if (cmd_len != cmd_skb->len)
-+		return -EILSEQ;
-+
-+	switch (opcode) {
-+	case HCI_DRV_OP_READ_SUPPORTED_DRIVER_COMMANDS: {
-+		struct hci_drv_resp_read_supported_driver_commands *resp;
-+		struct sk_buff *resp_skb;
-+		struct btusb_data *data = hci_get_drvdata(hdev);
-+		int ret;
-+		u16 num_commands = 1; /* SUPPORTED_DRIVER_COMMANDS */
-+
-+		if (data->isoc)
-+			num_commands++; /* SWITCH_ALT_SETTING */
-+
-+		resp_skb = hci_drv_skb_alloc(
-+			opcode, sizeof(*resp) + num_commands * sizeof(__le16),
-+			GFP_KERNEL);
-+		if (!resp_skb)
-+			return -ENOMEM;
-+
-+		resp = skb_put(resp_skb,
-+			       sizeof(*resp) + num_commands * sizeof(__le16));
-+		resp->status = HCI_DRV_STATUS_SUCCESS;
-+		resp->num_commands = cpu_to_le16(num_commands);
-+		resp->commands[0] =
-+			cpu_to_le16(HCI_DRV_OP_READ_SUPPORTED_DRIVER_COMMANDS);
-+
-+		if (data->isoc)
-+			resp->commands[1] =
-+				cpu_to_le16(HCI_DRV_OP_SWITCH_ALT_SETTING);
-+
-+		ret = hci_recv_frame(hdev, resp_skb);
-+		if (ret)
-+			return ret;
-+
-+		kfree_skb(cmd_skb);
-+		return 0;
-+	}
-+	case HCI_DRV_OP_SWITCH_ALT_SETTING: {
-+		struct hci_drv_cmd_switch_alt_setting *cmd;
-+		struct hci_drv_resp_status *resp;
-+		struct sk_buff *resp_skb;
-+		int ret;
-+		u8 status;
-+
-+		resp_skb = hci_drv_skb_alloc(opcode, sizeof(*resp), GFP_KERNEL);
-+		if (!resp_skb)
-+			return -ENOMEM;
-+
-+		cmd = skb_pull_data(cmd_skb, sizeof(*cmd));
-+		if (!cmd || cmd_skb->len || cmd->new_alt > 6) {
-+			status = HCI_DRV_STATUS_INVALID_PARAMETERS;
-+		} else {
-+			ret = btusb_switch_alt_setting(hdev, cmd->new_alt);
-+			if (ret)
-+				status = HCI_DRV_STATUS_UNSPECIFIED_ERROR;
-+			else
-+				status = HCI_DRV_STATUS_SUCCESS;
-+		}
-+
-+		resp = skb_put(resp_skb, sizeof(*resp));
-+		resp->status = status;
-+
-+		ret = hci_recv_frame(hdev, resp_skb);
-+		if (ret)
-+			return ret;
-+
-+		kfree_skb(cmd_skb);
-+		return 0;
-+	}
-+	default: {
-+		struct hci_drv_resp_status *resp;
-+		struct sk_buff *resp_skb;
-+		int ret;
-+
-+		resp_skb = hci_drv_skb_alloc(opcode, sizeof(*resp), GFP_KERNEL);
-+		if (!resp_skb)
-+			return -ENOMEM;
-+
-+		resp = skb_put(resp_skb, sizeof(*resp));
-+		resp->status = HCI_DRV_STATUS_UNKNOWN_COMMAND;
-+
-+		ret = hci_recv_frame(hdev, resp_skb);
-+		if (ret)
-+			return ret;
-+
-+		kfree_skb(cmd_skb);
-+		return 0;
-+	}
-+	}
-+}
-+
- static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct urb *urb;
-@@ -2192,6 +2298,9 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 			return PTR_ERR(urb);
- 
- 		return submit_or_queue_tx_urb(hdev, urb);
-+
-+	case HCI_DRV_PKT:
-+		return btusb_drv_process_cmd(hdev, skb);
- 	}
- 
- 	return -EILSEQ;
-@@ -2669,6 +2778,9 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 			return PTR_ERR(urb);
- 
- 		return submit_or_queue_tx_urb(hdev, urb);
-+
-+	case HCI_DRV_PKT:
-+		return btusb_drv_process_cmd(hdev, skb);
- 	}
- 
- 	return -EILSEQ;
-diff --git a/drivers/bluetooth/hci_drv_pkt.h b/drivers/bluetooth/hci_drv_pkt.h
-new file mode 100644
-index 000000000000..800e0090f816
---- /dev/null
-+++ b/drivers/bluetooth/hci_drv_pkt.h
-@@ -0,0 +1,62 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2025 Google Corporation
-+ */
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci.h>
-+
-+struct hci_drv_cmd_hdr {
-+	__le16	opcode;
-+	__le16	len;
-+} __packed;
-+
-+struct hci_drv_resp_hdr {
-+	__le16	opcode;
-+	__le16	len;
-+} __packed;
-+
-+struct hci_drv_resp_status {
-+	__u8	status;
-+} __packed;
-+
-+#define HCI_DRV_STATUS_SUCCESS			0x00
-+#define HCI_DRV_STATUS_UNSPECIFIED_ERROR	0x01
-+#define HCI_DRV_STATUS_UNKNOWN_COMMAND		0x02
-+#define HCI_DRV_STATUS_INVALID_PARAMETERS	0x03
-+
-+/* Common commands that make sense on all drivers start from 0x0000. */
-+
-+#define HCI_DRV_OP_READ_SUPPORTED_DRIVER_COMMANDS	0x0000
-+struct hci_drv_resp_read_supported_driver_commands {
-+	__u8	status;
-+	__le16	num_commands;
-+	__le16	commands[];
-+} __packed;
-+
-+/* btusb specific commands start from 0x1135.
-+ * No particular reason - It's my lucky number.
-+ */
-+
-+#define HCI_DRV_OP_SWITCH_ALT_SETTING	0x1135
-+struct hci_drv_cmd_switch_alt_setting {
-+	__u8	new_alt;
-+} __packed;
-+
-+static inline struct sk_buff *hci_drv_skb_alloc(u16 opcode, u16 plen, gfp_t how)
-+{
-+	struct hci_drv_resp_hdr *hdr;
-+	struct sk_buff *skb;
-+
-+	skb = bt_skb_alloc(sizeof(*hdr) + plen, how);
-+	if (!skb)
-+		return NULL;
-+
-+	hdr = skb_put(skb, sizeof(*hdr));
-+	hdr->opcode = __cpu_to_le16(opcode);
-+	hdr->len = __cpu_to_le16(plen);
-+
-+	hci_skb_pkt_type(skb) = HCI_DRV_PKT;
-+
-+	return skb;
-+}
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index a8586c3058c7..e297b312d2b7 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -494,6 +494,7 @@ enum {
- #define HCI_EVENT_PKT		0x04
- #define HCI_ISODATA_PKT		0x05
- #define HCI_DIAG_PKT		0xf0
-+#define HCI_DRV_PKT		0xf1
- #define HCI_VENDOR_PKT		0xff
- 
- /* HCI packet types */
-diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
-index 082f89531b88..bbd752494ef9 100644
---- a/include/net/bluetooth/hci_mon.h
-+++ b/include/net/bluetooth/hci_mon.h
-@@ -51,6 +51,8 @@ struct hci_mon_hdr {
- #define HCI_MON_CTRL_EVENT	17
- #define HCI_MON_ISO_TX_PKT	18
- #define HCI_MON_ISO_RX_PKT	19
-+#define HCI_MON_DRV_TX_PKT	20
-+#define HCI_MON_DRV_RX_PKT	21
- 
- struct hci_mon_new_index {
- 	__u8		type;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5eb0600bbd03..bb4e1721edc2 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2911,6 +2911,8 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 		break;
- 	case HCI_ISODATA_PKT:
- 		break;
-+	case HCI_DRV_PKT:
-+		break;
- 	default:
- 		kfree_skb(skb);
- 		return -EINVAL;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 022b86797acd..428ee5c7de7e 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -234,7 +234,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 			if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT &&
- 			    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
- 			    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
--			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT)
-+			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT &&
-+			    hci_skb_pkt_type(skb) != HCI_DRV_PKT)
- 				continue;
- 		} else {
- 			/* Don't send frame to other channel types */
-@@ -391,6 +392,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
- 		else
- 			opcode = cpu_to_le16(HCI_MON_ISO_TX_PKT);
- 		break;
-+	case HCI_DRV_PKT:
-+		if (bt_cb(skb)->incoming)
-+			opcode = cpu_to_le16(HCI_MON_DRV_RX_PKT);
-+		else
-+			opcode = cpu_to_le16(HCI_MON_DRV_TX_PKT);
-+		break;
- 	case HCI_DIAG_PKT:
- 		opcode = cpu_to_le16(HCI_MON_VENDOR_DIAG);
- 		break;
-@@ -1860,7 +1867,8 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		if (hci_skb_pkt_type(skb) != HCI_COMMAND_PKT &&
- 		    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
- 		    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
--		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT) {
-+		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT &&
-+		    hci_skb_pkt_type(skb) != HCI_DRV_PKT) {
- 			err = -EINVAL;
- 			goto drop;
- 		}
--- 
-2.49.0.504.g3bcea36a83-goog
+and BPF program has to handle the (unset) cases itself.
 
+>=20
+> > +
+> > +		if (!have_tskey)
+> > +			skb_shinfo(skb)->tskey =3D key - 1;
+> > +
+> > +		bpf_skops_tx_timestamping(sk, skb,
+> > +					  BPF_SOCK_OPS_TSTAMP_SENDMSG_CB);
+> > +
+> >   	}
+> >   }
+> >  =20
+>=20
+>=20
+
+--=20
+Pauli Virtanen
