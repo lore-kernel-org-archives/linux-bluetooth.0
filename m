@@ -1,113 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21191F3BBF;
-	Wed,  2 Apr 2025 21:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1B51F1936
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Apr 2025 21:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743628204; cv=none; b=NnvhVLdCKQXNZGc30kRBnDEQpu/GF4+PHnNJIzbpcLh8TJzvGv75WPJrNiO5IaXgVcD2hqAXonjpbbKZPCKbDlcFTHaV2YQ5zIrINAj3V6Spl70XG9IW7MS4kKaPKEC/+WaHqGO0FOKXvMXqojiLUmUl/Ltbc1J39G7fcH6odkU=
+	t=1743628437; cv=none; b=BMFA3kkj2fkUFSDXJXZuMVmOfVVPtvHHNep9jmj6FYKsMfEpx+QiX5RL//wqkFLsvTfzcQDARnVBv8hfkJ2QMYKbU9M3D4fkGdfNBGkDEdCJaXfJStGv6U7EtkP4/jTXj3EJVEFDR97cewYuX0B2Dm4Y9vYEW9RG+8Z9yjLm+TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743628204; c=relaxed/simple;
-	bh=FBNTlGNNsRm01fVfSRNG6bUBmnCrE7gjx+gJO/WY9pY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=K70mTxkrAa1U1GQrHU66hC3ohveWMGeVJuOWBrzkr8QsVhZ799BTgGxw820FnkXo/jx/yaA1DFGqTnc4J9Kc1zwVeB8sQ1nRL+oaaZYAW3ertB3vNlncNnhxvL5z/5hBiIZp89tKGofF+rtXcAwnqDvQgQQoi+q12cbxwGQy0pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWq1gLoE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743628437; c=relaxed/simple;
+	bh=yMtg/5bd9WuFFPh1QUVVbVzPyQ8PxgEFM//QPDYEqaE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OJVtaQ8XCzJiqpxkXUCieCJH8Cpx17of3y2M0ksy8CVbM5GP/nZXBAhYx4EUEDQ1qj7ytA5l6bxMXd0Zq1DpkxsXZaRZiIcjdVA31Z5AV0laV89dOuyAjWVtnw5VFCZHq4paIqs53iDE11NNdEVM1bqz/L2QtQPopkiPEJNBK5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=bfa+LuvQ; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mWq1gLoE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17EA9C4CEDD;
-	Wed,  2 Apr 2025 21:10:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743628204;
-	bh=FBNTlGNNsRm01fVfSRNG6bUBmnCrE7gjx+gJO/WY9pY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mWq1gLoEsSJc2bCa0FBlL1cHu+nuzJ46OPEZt7R8d5KEjGXCIVO1FzQ5ywH2E3sUs
-	 pOG5MGWp5FljvvXKvpLW3DsWNgISHpfnjN+AeJ7oIPlt8lBFinatRGRTHj82GxOW7V
-	 towTAm8idpRAMZBjuAEZmdW0G4PcrYB1kwRcLjB32Ny64idbwK2y284/uE6qOAkyMt
-	 uoFGJHERvvbsRrz1rH5TNbpLcI2HBVYRNVfGDkCHzSU9uKsVI7aA2jVCSIulPrck2p
-	 /SpRl0MTQnxUi3UH2WULlRTqzVbV8PEUEM3vJ9LTmQhNcL+YpxMo5b17rv6qF5pwZc
-	 Wp/SH59G/GVqA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341DB380665A;
-	Wed,  2 Apr 2025 21:10:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="bfa+LuvQ"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-abf3d64849dso27815166b.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Apr 2025 14:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1743628433; x=1744233233; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6vOkaWbZeGW9ejcyKHqKRgGRaPzQmhuks1cZQp6R9ag=;
+        b=bfa+LuvQjO3wNd8nBCUqIbk6+pcQsTgzXgHmwBahXEwzn8lBhcyuoqun0TIfkKGiRO
+         dciQvgB3992UIyabIgVrBpfSXwB6FpXE92UbVcKum7M9LMN1dgyKKcC/qe0fxhZYYJNK
+         h180Glb2pJWuyT5ZRJNzlKyrYuqHFK0giRl7E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743628433; x=1744233233;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6vOkaWbZeGW9ejcyKHqKRgGRaPzQmhuks1cZQp6R9ag=;
+        b=YMgUzY8kA3fQ5Sygvuls8cveMpLuZlHWPMUTaZlZq//wq/xRhf40OXMA73flRCUxjC
+         dt6rP5jizAOAJ0ULCbk+tEg/lzXxYuU/f0nzap/NMLPXqToqw9brfVgvTBz2X+WVe68A
+         07Ab3GPCMZ8aBfU9ddPjv7tsjIkz/PAGw+j5oDpsXnZKxp0gVRDoli8D859lMaHu7gCw
+         SaG1guMVXUGBIsPThjoUPcbuQUyuOmwZ/gfp0pH7rgq+ugH43dLk/+pabxYbdXrFppFX
+         CCzm73t1JRCT19WzrwlIqrKD3YaxmOrUHaPNgEEO8gviX4rFE4CalcRb2Td2AmJiwrdT
+         3Ygg==
+X-Forwarded-Encrypted: i=1; AJvYcCWVdU/xtR8p+MaRAxKNWbN47H8HPq24IpnxKbhKxUsx4phIStNbNVtP+Lk3J7jPdqGbVDwF8nlv05SomkIA9rc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7c/m7JCmrMugz+HwKUZyuf1pyoYjQL/MOYWVNjXTJmoaKGbX8
+	YkEesFBZumQ2jpd0DnA9aNfKSNjtykXQrmZVSt3mSupHf82UPMvK1TmWxodacvNVAA+sFfQ49vz
+	IezgETg==
+X-Gm-Gg: ASbGncswujGmlx6Rn3Ef/7YgRbLaEImF8YJz2S2EEVZQ46Z5j4RwWEqawcVQ/2Bghgq
+	5v+0TtVfsGpnP+DXEozCe5JxmR0QEK0muU3wYLJMhdn68eP92s3JbL6leg0NgYefFlbJi2l1hhM
+	rp6IDNqZwLy4zhJsEqXU78G5HEP+xZW/94MBYJ+JCRrbS1eT/ERuJyOoWdCugh+vISucG6/eK3N
+	aFHhp/zdG+esGkG9+xM663fS0fuWFOOQYcTFavftnfOuE/XcjNlFKC3EPCiENQP7+R4LAyNGM07
+	shz3SrbprpSt4hw0R1AOU0ApB/DJl24+ywFWFX0hM/s3bEqaSZfH38p13yAqgjO+Loncot3Z77M
+	rpkG1/LWQT3fpYjGWIzU=
+X-Google-Smtp-Source: AGHT+IFJCtPgmZKwzYwd4MCyA/hEPiTc1HHdIh2u7kMtzuV9TPpV/QoOyyfGIN38m4MmWVShCU4WDw==
+X-Received: by 2002:a17:907:d86:b0:ac3:121e:f2cb with SMTP id a640c23a62f3a-ac7bc03af5cmr21371366b.1.1743628433184;
+        Wed, 02 Apr 2025 14:13:53 -0700 (PDT)
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com. [209.85.218.51])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5edc16aae6fsm8942230a12.16.2025.04.02.14.13.51
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Apr 2025 14:13:52 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ac298c8fa50so36295966b.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Apr 2025 14:13:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVygVLUIjf4m/tKZ8xCxixREBYY9VPrKfE7FB9Lx1ddBIH+qtVIFGBJzEAyc3K/uzPKHxHn06oSTZSDeLq8mQM=@vger.kernel.org
+X-Received: by 2002:a17:907:9409:b0:ac7:970b:8ee5 with SMTP id
+ a640c23a62f3a-ac7bc126208mr19593966b.27.1743628091735; Wed, 02 Apr 2025
+ 14:08:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btusb: Add new VID/PID 13d3/3613 for MT7925
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174362824074.1678044.1440179296394282108.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Apr 2025 21:10:40 +0000
-References: <TV5EwAth53CPjyEfnDT-hesfQb45wew-qCxhVuZeUL6oUcviiJ9nz83ctko6izmh6X1-O0pphWqltS2XToK2Pj2skYkWLPJ5a210TtQbYJ8=@melois.dev>
-In-Reply-To: <TV5EwAth53CPjyEfnDT-hesfQb45wew-qCxhVuZeUL6oUcviiJ9nz83ctko6izmh6X1-O0pphWqltS2XToK2Pj2skYkWLPJ5a210TtQbYJ8=@melois.dev>
-To: =?utf-8?b?WW91biBNw4lMT0lTIDx5b3VuQG1lbG9pcy5kZXY+?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <Z-sDc-0qyfPZz9lv@mini-arch> <39515c76-310d-41af-a8b4-a814841449e3@samba.org>
+ <407c1a05-24a7-430b-958c-0ca78c467c07@samba.org> <ed2038b1-0331-43d6-ac15-fd7e004ab27e@samba.org>
+ <Z+wH1oYOr1dlKeyN@gmail.com> <Z-wKI1rQGSgrsjbl@mini-arch> <0f0f9cfd-77be-4988-8043-0d1bd0d157e7@samba.org>
+ <Z-xi7TH83upf-E3q@mini-arch> <4b7ac4e9-6856-4e54-a2ba-15465e9622ac@samba.org>
+ <20250402132906.0ceb8985@pumpkin> <Z-1Hgv4ImjWOW8X2@mini-arch> <20250402214638.0b5eed55@pumpkin>
+In-Reply-To: <20250402214638.0b5eed55@pumpkin>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 2 Apr 2025 14:07:54 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi7p9bKgZt1E1BWE-NjwSRDBQs=Coviiz0ZTQy9OhHvPg@mail.gmail.com>
+X-Gm-Features: AQ5f1JpKVAIlc4pALP5yKNCr8F3ijIqVBIOCCdqoIfNZomenel-ajZbKWJ5EdvE
+Message-ID: <CAHk-=wi7p9bKgZt1E1BWE-NjwSRDBQs=Coviiz0ZTQy9OhHvPg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/4] net/io_uring: pass a kernel pointer via optlen_t
+ to proto[_ops].getsockopt()
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, Stefan Metzmacher <metze@samba.org>, 
+	Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>, 
+	Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Karsten Keil <isdn@linux-pingi.de>, Ayush Sawal <ayush.sawal@chelsio.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	Neal Cardwell <ncardwell@google.com>, Joerg Reuter <jreuter@yaina.de>, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Robin van der Gracht <robin@protonic.nl>, 
+	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de, 
+	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Alexandra Winter <wintera@linux.ibm.com>, 
+	Thorsten Winkler <twinkler@linux.ibm.com>, James Chapman <jchapman@katalix.com>, 
+	Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Remi Denis-Courmont <courmisch@gmail.com>, Allison Henderson <allison.henderson@oracle.com>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
+	"D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
+	Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Boris Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Martin Schiller <ms@dev.tdt.de>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
+	dccp@vger.kernel.org, linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org, 
+	mptcp@lists.linux.dev, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
+	linux-afs@lists.infradead.org, tipc-discussion@lists.sourceforge.net, 
+	virtualization@lists.linux.dev, linux-x25@vger.kernel.org, 
+	bpf@vger.kernel.org, isdn4linux@listserv.isdn4linux.de, 
+	io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+On Wed, 2 Apr 2025 at 13:46, David Laight <david.laight.linux@gmail.com> wrote:
+>
+> The problem is that the generic code has to deal with all the 'wild stuff'.
+> It is also common to do non-sequential accesses - so iov_iter doesn't match
+> at all.
+> There also isn't a requirement for scatter-gather.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Note that the generic code has special cases for the simple stuff,
+which is all that the sockopt code would need.
 
-On Tue, 01 Apr 2025 12:24:35 +0000 you wrote:
-> Add VID 13d3 & PID 3613 for MediaTek MT7925 USB Bluetooth chip.
-> 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
-> 
-> T:  Bus=01 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  4 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3613 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-> 
-> [...]
+Now, that's _particularly_ true for the "single user address range"
+thing, where there's a special ITER_UBUF thing.
 
-Here is the summary with links:
-  - Bluetooth: btusb: Add new VID/PID 13d3/3613 for MT7925
-    https://git.kernel.org/bluetooth/bluetooth-next/c/faf3e02d3240
+We don't actually have a "single kernel range" version of that, but
+ITER_KVEC is simple to use, and the sockopt code could say "I only
+ever look at the first buffer".
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It's ok to just not handle all the cases, and you don't *have* to use
+the generic "copy_from_iter()" routines if you don't want to.
 
+In fact, I would expect that something like sockopt generally wouldn't
+want to use the normal iter copying routines, since those are
+basically all geared towards "copy and update the iter".
 
+           Linus
