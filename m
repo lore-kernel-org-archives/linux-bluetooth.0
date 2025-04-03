@@ -1,46 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F1D298CC0;
-	Thu,  3 Apr 2025 19:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A935925A346;
+	Thu,  3 Apr 2025 19:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707364; cv=none; b=dnH6iTA/QwXRawo0rLOBm92rtKEoHLGCnGs1HYbOdksHE0FoTpqI22TNq0eAjcw+uF3RbqncoM5qHUgFC7/yBMmzZhdi5vddh/PVNHK5fs7QMIbHeE8N4Juysgeh92r8zy5wbFp69qeLXaQTek+dQKk4kEEmLu2QNtkSdBfmR2o=
+	t=1743707401; cv=none; b=EB6WxjsGa9BeXbFygv6Me4xhYPrjvX/7K41pAEumd6ytipxoo2mJZqDQSnl9ykzjPI9HDnEVd9NhgzrRrghKn3WpSf8JpGS9To4gMok7z9cg4EZy75M0H1yaVEZFfAwaTdwoZtyJLV6X6S/rOGfWyd+3OuG7ukl/T7/qzkQWado=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707364; c=relaxed/simple;
-	bh=7zBfxOeKowvILKEW1QSzrQZrveRRJM0g71wQQJo401k=;
+	s=arc-20240116; t=1743707401; c=relaxed/simple;
+	bh=akN3gPfvOXKk+2v94TGQKZAVvPyKGYp1GkvgfiTqnVY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ovT4KG2ZvkdtBmHm4rOl6ge1O/I+mY4vkt4BTZj8alUt0cAH1jIssUsWvLpa2PUPHw8opSXZJPlsylI0oyrkU3K88BCO1LqyfHxD0Y4oNHWj/PEBZpewmPJqCjuNTp2jiV75FJuPSpkITN2z2r6FebKuHr6gQQm2C52OmcjsXOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DegWdWru; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=EI7B4qzpteT1Rv59fX1u8Cen0KB/bQJM5CBsSWMYWs8iU/rfbgZ38ETLxx0i0LpZHXAHVHDU6cl1bFgkiCJy5K6jUCVfKDr0STR5Nx5s0BP/15Zh8+i5FLvymXFrhgVJjFF28b2YAK86kyckaVrUwDLfq3aVmZrVMvqdCoMXoF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6zpEs0O; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DegWdWru"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49912C4CEE8;
-	Thu,  3 Apr 2025 19:09:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6zpEs0O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BBCBC4CEE3;
+	Thu,  3 Apr 2025 19:10:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707364;
-	bh=7zBfxOeKowvILKEW1QSzrQZrveRRJM0g71wQQJo401k=;
+	s=k20201202; t=1743707401;
+	bh=akN3gPfvOXKk+2v94TGQKZAVvPyKGYp1GkvgfiTqnVY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DegWdWruHCdhP9JJA0QrggNiXWBDI23y7cgUAleIOX4Oxc3Q1hBidGzpkDfl99l3v
-	 58T+zg+b+0rWmEIISSHx5Hp3LrJGGZ1kKowuvw8+vo7HSAkTTwCGQg8gtcJYOheDOt
-	 v4Cz8rRRdMuEIfFg7QoJPSifnPKDXanK1QFUo/DLMbA+4LUcobNs4UiY07tQcpdl4/
-	 BLrB+RBAiDknSqfb7473VIMpfNHW7MtTFgPGmXxIi/gwFyz4c+QdCBzUvWlUGHWCqp
-	 v1U0dRSutfEo0qakyBAPo6ugyG7gogAhFVjnz2F+9HHjQ6IsdIRBnVIXm4IxyIUAW+
-	 wqlkDpLI7g28A==
+	b=T6zpEs0OXWDn6cc4saSEIOefrTLIfgx8B3ImHpcTnkshoqJ08/6ujtvsY6TopxmUw
+	 X+rYQqEgo9JGyrCEMxl8PEEwtwlRhYlTK1vHuIvrqDKJNg0pddE/y/2GBG3xtAewrE
+	 VhzKmVoITwFmONlD6Q1CVRx9cE6+sCCWJCCvDhvHZu/Fx1yLgZmNx81k2lADLXJ0RA
+	 zMH7/zQlvrMl8SzfCG8/k0Ok5xcbBG7zAXmyQMw8k99YesRhA0u+HT/8dqEpfuCNk2
+	 bvkP/CWtgrh3ebZ5DCe4iss54kaFelEAodTmpArLmnYTbufaJggUjzyw65fP0mQESU
+	 E/w6WHB2bRU6g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 18/18] Bluetooth: qca: simplify WCN399x NVM loading
-Date: Thu,  3 Apr 2025 15:08:44 -0400
-Message-Id: <20250403190845.2678025-18-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 16/16] Bluetooth: hci_uart: fix race during initialization
+Date: Thu,  3 Apr 2025 15:09:24 -0400
+Message-Id: <20250403190924.2678291-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250403190845.2678025-1-sashal@kernel.org>
-References: <20250403190845.2678025-1-sashal@kernel.org>
+In-Reply-To: <20250403190924.2678291-1-sashal@kernel.org>
+References: <20250403190924.2678291-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,56 +49,50 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.132
+X-stable-base: Linux 5.15.179
 Content-Transfer-Encoding: 8bit
 
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
 
-[ Upstream commit 1cc41b5092e3aa511454ec882c525af311bee631 ]
+[ Upstream commit 366ceff495f902182d42b6f41525c2474caf3f9a ]
 
-The WCN399x code has two separate cases for loading the NVM data. In
-preparation to adding support for WCN3950, which also requires similar
-quirk, split the "variant" to be specified explicitly and merge two
-snprintfs into a single one.
+'hci_register_dev()' calls power up function, which is executed by
+kworker - 'hci_power_on()'. This function does access to bluetooth chip
+using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'.
+Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
+if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
+'hci_register_dev()', and there is tiny chance that 'hci_power_on()' will
+be executed before setting this bit. In that case HCI init logic fails.
 
-Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Patch moves setting of 'HCI_UART_PROTO_READY' before calling function
+'hci_uart_register_dev()'.
+
+Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btqca.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 892e2540f008a..5651f40db1736 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -807,6 +807,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		   const char *firmware_name)
- {
- 	struct qca_fw_config config = {};
-+	const char *variant = "";
- 	int err;
- 	u8 rom_ver = 0;
- 	u32 soc_ver;
-@@ -901,13 +902,11 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		case QCA_WCN3990:
- 		case QCA_WCN3991:
- 		case QCA_WCN3998:
--			if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID) {
--				snprintf(config.fwname, sizeof(config.fwname),
--					 "qca/crnv%02xu.bin", rom_ver);
--			} else {
--				snprintf(config.fwname, sizeof(config.fwname),
--					 "qca/crnv%02x.bin", rom_ver);
--			}
-+			if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID)
-+				variant = "u";
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index be51528afed9d..fbbd832e4def1 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -706,12 +706,13 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 
+ 	hu->proto = p;
+ 
++	set_bit(HCI_UART_PROTO_READY, &hu->flags);
 +
-+			snprintf(config.fwname, sizeof(config.fwname),
-+				 "qca/crnv%02x%s.bin", rom_ver, variant);
- 			break;
- 		case QCA_WCN3988:
- 			snprintf(config.fwname, sizeof(config.fwname),
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
+ 		return err;
+ 	}
+ 
+-	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 	return 0;
+ }
+ 
 -- 
 2.39.5
 
