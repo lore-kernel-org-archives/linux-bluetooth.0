@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A935925A346;
-	Thu,  3 Apr 2025 19:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560892550C7;
+	Thu,  3 Apr 2025 19:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707401; cv=none; b=EB6WxjsGa9BeXbFygv6Me4xhYPrjvX/7K41pAEumd6ytipxoo2mJZqDQSnl9ykzjPI9HDnEVd9NhgzrRrghKn3WpSf8JpGS9To4gMok7z9cg4EZy75M0H1yaVEZFfAwaTdwoZtyJLV6X6S/rOGfWyd+3OuG7ukl/T7/qzkQWado=
+	t=1743707436; cv=none; b=ZXvrL9hFODD7j7jQgyERp+4TVHOraHhu1pL/nMc2d2Wcfs0W+Z68lAvzDiI9Gua0m1zApG2mTEhiMzVTbsBrJlE6Xd8CGxmhAn/buhBrCVaidby91IB7MvxoDXPMd5fxVBwlUEZZc6X7+/isa03ohlm1Po980UHdh2SAAc9zy0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707401; c=relaxed/simple;
-	bh=akN3gPfvOXKk+2v94TGQKZAVvPyKGYp1GkvgfiTqnVY=;
+	s=arc-20240116; t=1743707436; c=relaxed/simple;
+	bh=PbcYz7bxFLedZ5ZzdHbmuxTgcku+VPUGlZi/qQ1CUW8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EI7B4qzpteT1Rv59fX1u8Cen0KB/bQJM5CBsSWMYWs8iU/rfbgZ38ETLxx0i0LpZHXAHVHDU6cl1bFgkiCJy5K6jUCVfKDr0STR5Nx5s0BP/15Zh8+i5FLvymXFrhgVJjFF28b2YAK86kyckaVrUwDLfq3aVmZrVMvqdCoMXoF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6zpEs0O; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ncy92eiRTvy+MqQ8tONEtk/WQWBP/STKlKIh3nEqj0PUrq8xhfkFkLQm/Tj8A8GGwrkxw8BK0XeyvVb6t7WI2PVDmIbCwEUmankMIv0+/MVax1aaoawiu12xqVfC1aiigQfenapsWQYhdhEah7RRkkjQi14N/X0d4pZHXSPxwzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRLC80IL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6zpEs0O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BBCBC4CEE3;
-	Thu,  3 Apr 2025 19:10:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JRLC80IL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E03A7C4CEE8;
+	Thu,  3 Apr 2025 19:10:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707401;
-	bh=akN3gPfvOXKk+2v94TGQKZAVvPyKGYp1GkvgfiTqnVY=;
+	s=k20201202; t=1743707435;
+	bh=PbcYz7bxFLedZ5ZzdHbmuxTgcku+VPUGlZi/qQ1CUW8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=T6zpEs0OXWDn6cc4saSEIOefrTLIfgx8B3ImHpcTnkshoqJ08/6ujtvsY6TopxmUw
-	 X+rYQqEgo9JGyrCEMxl8PEEwtwlRhYlTK1vHuIvrqDKJNg0pddE/y/2GBG3xtAewrE
-	 VhzKmVoITwFmONlD6Q1CVRx9cE6+sCCWJCCvDhvHZu/Fx1yLgZmNx81k2lADLXJ0RA
-	 zMH7/zQlvrMl8SzfCG8/k0Ok5xcbBG7zAXmyQMw8k99YesRhA0u+HT/8dqEpfuCNk2
-	 bvkP/CWtgrh3ebZ5DCe4iss54kaFelEAodTmpArLmnYTbufaJggUjzyw65fP0mQESU
-	 E/w6WHB2bRU6g==
+	b=JRLC80ILH6vqOydmDw8ZPVWepm0yMh1KWTYn0twTsy5MenjgsVDu7uPKpwZR0xfvK
+	 /WWpAQjki5xPOMpo7cwcd5sjcdr2J/+jX6cBKdVFpg1nMCMUqTjVvoZtxWgoPR7tKp
+	 HhUNroUp/nMtpL9n/n0E8MJF8MhnhTLeSMZtHefiBKTL5z7O8ezpUQLvA84Q+BPBnH
+	 S3DCa9vglXHkO521okFsfwlySM2/lTfDGJUkVQjJ6ztxH0h3CZNaPINBq3UV/2SkSp
+	 HmwVFj2OMS045ymOIlaRCRqblBCG59fSEwkomFligg/h1SeLHhMG28KYx+TPDVD9gh
+	 VsJ+WTJprJ+sQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 16/16] Bluetooth: hci_uart: fix race during initialization
-Date: Thu,  3 Apr 2025 15:09:24 -0400
-Message-Id: <20250403190924.2678291-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 15/15] Bluetooth: hci_uart: fix race during initialization
+Date: Thu,  3 Apr 2025 15:10:02 -0400
+Message-Id: <20250403191002.2678588-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250403190924.2678291-1-sashal@kernel.org>
-References: <20250403190924.2678291-1-sashal@kernel.org>
+In-Reply-To: <20250403191002.2678588-1-sashal@kernel.org>
+References: <20250403191002.2678588-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.179
+X-stable-base: Linux 5.10.235
 Content-Transfer-Encoding: 8bit
 
 From: Arseniy Krasnov <avkrasnov@salutedevices.com>
@@ -75,7 +75,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index be51528afed9d..fbbd832e4def1 100644
+index e7d78937f7d6b..8ca0ac3a440c9 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
 @@ -706,12 +706,13 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
