@@ -1,125 +1,133 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E801F2E62DE
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Apr 2025 19:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38F6259C96
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Apr 2025 19:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743709311; cv=none; b=mbmKq4EDowUPjr4dvh+p4TgWN4ZwK3E0z6H76U/3BdGAriyGXybCg7E5SX9P4gq9sXvdnYcFIJSmgfWqb3tUKMN1Gr81+d807oa7nXwcUHL6D2mOPOVHd5cOCoXACvKrTuOx7TAGi093smIrMeED6/WVVmucrmNga+jh/cJw+nQ=
+	t=1743709804; cv=none; b=LaVfel0o/7qfUCIYJAmTnB5mKZUSY3Q5KeH5QY1y4VtVDgKoYgdeemSPqeyF29MZRzLrv6x/hKVEajn4oK3i2f9Pufja51ZjqjE0J6gjzirYxWsPayWV+BOYlkA6JY1UbV0gbeEP2ZXY4z83SOwOfcz/YV3Sp0J7Ur+aQ1i9PdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743709311; c=relaxed/simple;
-	bh=eWzBFkaUgKZqiGcnJDAtcw9tY/kKXcd4AJP+u8kQxZE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=FMakV46n8D44QEIP90UT8WQHXIU8R3yNkOBzItAtGW+IkeHGY9RU/M7zsDT4zfvQKyGcyR7SwlurS09i2Eir1YLJIozhp0/6dfb+ZCNXqG6c6xpS9SoD6X+S90VDum5CRqfzUT159gxAW6EJxRkelS4Hw+NT9vSEMYOWYm5JOoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aMcrgp5I; arc=none smtp.client-ip=209.85.160.173
+	s=arc-20240116; t=1743709804; c=relaxed/simple;
+	bh=XmqYaxehJePhYgBOM9e2FSYZIGWMxaI9ZA6LdW16FVw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WC0cxP+dapjnxOadwKH24QFCsfJjqtAEZ4JwUxAB+bSuRx7DuC5MsLuv2hZwuUMReM+B65ppe04xazklWHIbo9RHynEFkM5ad94ilUbC6jOm3Jn6O14nUVcjI/2qM2XUtROXs2rJ93krRa7VZRC3zC6UXXb4/lh3to8P3kjLGZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AbxdF7zs; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aMcrgp5I"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-476a720e806so11371661cf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Apr 2025 12:41:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AbxdF7zs"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30bd21f887aso9615081fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Apr 2025 12:50:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743709308; x=1744314108; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5NyoPnvvIF9yZjA03rJ5w0a8J/VsKV3Ry0hC570H03A=;
-        b=aMcrgp5IJG4UKJrrIYzTXop0qjLJnrMxhKBpIe+9t4YEP78hctYV6+V4A/cyhhAESR
-         361lyo7OZ+9HrdBIwZnB9i1Wk7akqmUkiHk0tXasvs8CPc5/TdrIKPxmFD1z1ouMbXwC
-         18VhJRwNb1t6T+ptR9aRHpMyrUUgd/+u4B4T7q6++dX8p4o4xw+0vOL2sK/HDYoD3CwL
-         S5fwcf6TW3yfHfv+C8I+Tm8KW4VV2VQAJsEJxhe4l2O40TGQ4YxlVDYcF2P90QdagnIw
-         GHixvAMk2gFb+NYbBSYoHCCToQsgTEEZz4gTysLgbesW/mxiAUwue3G++qG/ACA9TQfX
-         RI/Q==
+        d=gmail.com; s=20230601; t=1743709800; x=1744314600; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SICcoNlF4Pp0klZv3GbtZTgi9LJ5tjvYEFUCwA42y0M=;
+        b=AbxdF7zskHOHDxCpU/URyaqRBCpBhJNqHdEusSLsh0FGMFmLb0xsIw5fUntfXKRV7e
+         XaNi8WeOu1cmc4m4rjW+u+ZAAoeic+79pa0Sg1Fn0YVDxWKAgfE370bhudcgxZQ/vUPe
+         TV/igwrs+VvabM7wNAMrBlbrDVGRquqPqaKOk/5GyDampZjJgFps47wn3oL/7pulZTAW
+         L/LXjaVOBPIrI9s9BWfyzDMebuo8ezORQJH32p0zxy09t2wxWTGt/G+NqBEexQp+Oa+r
+         oTxRxO8nJF4uZIpGeJImQdauvmBeyqE4dpu1r9f/om8ftvuepcp8suMPo3iPt2Gil5oN
+         vYYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743709308; x=1744314108;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5NyoPnvvIF9yZjA03rJ5w0a8J/VsKV3Ry0hC570H03A=;
-        b=nYWH5NXPmjtZyewnH/j6eznHGGW6hU9Ja/2ktr4uJBLFQNWdWMb35/KKhEM3F/xiol
-         V4BBktNfbfhc4kujzt16PvCqQeleONHEaqlSsxcWMJu4nbRPfoSyZAzmot1L6WGuX/u9
-         U3vc6g+eu7v5vuvtyWZYI5/y9kiDm6FmGyXQ1mQkXh6d38hbvUwPvtzbYSRug3Y9XTNG
-         o+JCkIyfwMYUfKxxz066LkMUoRBzTk8SiqxrOQMGleDYWRYd0eAbNBwtGL9bJtCSX1uM
-         M8U86/ejZ7xfMiB9w4iT74+qElixQnfHS2A9/cJg6twQ9IYLwP/eaNjafO0c3Lph4vTn
-         LGSA==
-X-Gm-Message-State: AOJu0Yy/Xo0ZM2B8nGj5GrWgjqG8DWcs+gYzeP5BTlLYb4I1o6Q9jP42
-	FDC3NhbE6+B726P3jbD9YRv1pVAh02AK9J1iIGEcoEQvQerrg8G6nW7FqQ==
-X-Gm-Gg: ASbGncvqq6nsXW8hYzouaVIcImKYslWwKPQX0CtAX1M8jV7oqmS/WMWT2BI8h9l8UR7
-	aCk4mxtzledEmG6vgZinkzd0P9rMdSDbs/O/PGdZTIF7aES8G3DksQyBfnwmuqe6NPMnMqkcT7Y
-	+YMNrZsMKIH9SEKotU0iCiiAZTIf8dFf/hDawhHIvGirYD7KKcir1uUGOu3pmJqjft7URCkFlGf
-	/aI9iSn0IWCd46f8JwKgQ8dgDtKijaU1rpHMRcIVtewFIg3jY2/i+TvGW8AI9TszzPQ02MM4qzq
-	09TOicOpT9ZKmZdfzBgd6KvlrA/wjnrcZsUTNeI06XC/4/rtBzQ=
-X-Google-Smtp-Source: AGHT+IFj8z5ud4bve7RcoJDCNEQpNcZzQ9TA+ROcxDDCrFsVeefyzQmp/t8Mn1tvhWGxUohwRzlcgg==
-X-Received: by 2002:a05:622a:142:b0:477:c89:3813 with SMTP id d75a77b69052e-47924910309mr10480481cf.9.1743709308564;
-        Thu, 03 Apr 2025 12:41:48 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.77.239])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4791b0713f6sm11397171cf.21.2025.04.03.12.41.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 12:41:48 -0700 (PDT)
-Message-ID: <67eee47c.050a0220.ca0c2.4678@mx.google.com>
-Date: Thu, 03 Apr 2025 12:41:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3393036110236505643=="
+        d=1e100.net; s=20230601; t=1743709800; x=1744314600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SICcoNlF4Pp0klZv3GbtZTgi9LJ5tjvYEFUCwA42y0M=;
+        b=r/1yN44HJF6T2gDo09eADcfou5bm9Of+uPRKa8qrZ8DxYxPQMtExLK+peTXANlKopE
+         OfVqsybp+GHX2YeoWX16QwZYMDbM9pI+XURcCKsGuiBiXtlUcD1KSPuCOLiDkeFiSgcy
+         b5E97RvY3bk3ERwUDX1nxND3uDqAn+mfLYF79ldAc3GRKqSHm5cAhiltxb9iyw3Ih+yS
+         f5e1KxXdf6d41dTiIUX1ZkX8T7X0KjHShHRGemToqs94i3bInD2hFJbVcFjgd/w8rCV8
+         ctUGA24XS994ySU/23895STG9snDB6o/K1d0JEbbxy3FoSitymr/EV0wK5xvIl8pu/Et
+         vp9w==
+X-Gm-Message-State: AOJu0YyLpdw52wId4g6y/ozK0NBaaNFFcf8thCFd4Z7r0soszIe4BplE
+	Wqg5xVkmot7bN9a1SZOTCByC/J1JU8BtRcCLxpTouSZWFpvRrudgVgnIDJ6H8N8H6YqS/v2Z/Vy
+	/Kaf4lhmlcLUS/hSd9DVFC2ADTxmFifhAn/Q=
+X-Gm-Gg: ASbGnctFFcJt79UEuX1eDGoiUtJg32nywNztUrifGdHQ8x0JaxnXpgN1oq+Dfn2MEJQ
+	WLWNaTtbxQ+on0tGa2KSOPMiNopMJIpDG9ztBb6KzpLyOly5KlKS6nCUIBtd1Cs2lRl8Vx6XsKn
+	rWTOT79LZ1Ytm7L6IvYVk6+eZh
+X-Google-Smtp-Source: AGHT+IHl/hSAL6iJII9K1ebnLHmkmMgTHCrV3ckigGWCvkTD19fDit0TIrxh1Yl0MbLXyhI1nlTqDqpIMG9/aUy9xg4=
+X-Received: by 2002:a2e:bc84:0:b0:30b:a92e:8b42 with SMTP id
+ 38308e7fff4ca-30f0a171700mr2903561fa.26.1743709800298; Thu, 03 Apr 2025
+ 12:50:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
-Subject: RE: [BlueZ,bluez,v2] bass: Set the service connection flag when BASS connected
-In-Reply-To: <20250403-bass-v2-1-7925bb16468a@amlogic.com>
 References: <20250403-bass-v2-1-7925bb16468a@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20250403-bass-v2-1-7925bb16468a@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 3 Apr 2025 15:49:47 -0400
+X-Gm-Features: ATxdqUHJSNun84Rh9LSJbGKa4M3JxkJ6TcJ-ALRaEqrKbk_PgqYXi7Pho9F5erU
+Message-ID: <CABBYNZKW23-P_8OZGTz-bQ2b2vZX_SbxA_hEJ=BAbk6Bkmwsrw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ bluez v2] bass: Set the service connection flag when
+ BASS connected
+To: yang.li@amlogic.com
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3393036110236505643==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Yang,
 
-This is automated email and please do not reply to this email!
+On Wed, Apr 2, 2025 at 11:37=E2=80=AFPM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
+>
+> From: Yang Li <yang.li@amlogic.com>
+>
+> When BASS serice connected, set the service states to
+> BTD_SERVICE_STATE_CONNECTED. Otherwise, the device will
+> timeout and be removed, triggering the automatic termination
+>  of BIG.
+>
+> issue: https://github.com/bluez/bluez/issues/1144
+>
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+> Changes in v2:
+> - Set the BASS service connection success flag in the connect_cb function=
+.
+> - Link to v1: https://patch.msgid.link/20250402-bass-v1-1-3e753841faa5@am=
+logic.com
+> ---
+>  profiles/audio/bass.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+> index c36f43277..c28d9d1ad 100644
+> --- a/profiles/audio/bass.c
+> +++ b/profiles/audio/bass.c
+> @@ -321,6 +321,8 @@ static void connect_cb(GIOChannel *io, GError *err, v=
+oid *user_data)
+>         if (bt_bap_stream_set_io(stream, fd)) {
+>                 g_io_channel_set_close_on_unref(io, FALSE);
+>         }
+> +
+> +       btd_service_connecting_complete(setup->dg->service, 0);
 
-Dear submitter,
+Ok, do we mark it as disconnected when the BIS is disconnected? In
+case we are acting as assistante then there is probably no reason to
+keep the device object around after it has been pushed to the remote
+sink.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=949647
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.23 seconds
-GitLint                       PENDING   0.34 seconds
-BuildEll                      PASS      20.61 seconds
-BluezMake                     PASS      1558.06 seconds
-MakeCheck                     PASS      12.78 seconds
-MakeDistcheck                 PASS      163.31 seconds
-CheckValgrind                 PASS      219.19 seconds
-CheckSmatch                   PASS      290.61 seconds
-bluezmakeextell               PASS      100.96 seconds
-IncrementalBuild              PENDING   0.28 seconds
-ScanBuild                     PASS      898.04 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+>  }
+>
+>  static bool link_enabled(const void *data, const void *match_data)
+>
+> ---
+> base-commit: 0efa20cbf3fb5693c7c2f14ba8cf67053ca029e5
+> change-id: 20250402-bass-66200bb7eba1
+>
+> Best regards,
+> --
+> Yang Li <yang.li@amlogic.com>
+>
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3393036110236505643==--
+--=20
+Luiz Augusto von Dentz
