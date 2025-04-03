@@ -1,141 +1,119 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E509255231
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Apr 2025 19:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A466E267B0E;
+	Thu,  3 Apr 2025 19:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707052; cv=none; b=qq//ldkqUDvZpvhFJysW8QL/MJHJi4F4mTFz0NJxUr3bqeTJZk22kUX0p8iv9MdQS2P6TDDotVH04+BtOOjZklj93olaQrUwDdiuWBraqRz8zOSLnAxCiQ+7lZqHUfAkDETxE7wm4BYVmxYMwibqz9572Pa6tJ2fnow8WoFbpxE=
+	t=1743707141; cv=none; b=q3eVNFFH8QLp5+K49gILsEvLS3BlBxYYWBHUJT9tr7SdUAwWX0XbCUYvfum7mfIcVuTFnSVZkNRQzMVFEQMipyNUCGKOqMjco4bN/XRV6kC+f7L07N+Lb5r22zLlWvQRPb1CaIm6RyfmkT6tw3UdbGRw4kOMUkohr8DYxtb5cik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707052; c=relaxed/simple;
-	bh=GRM+G/ln7VcwaBSi7kZRXXfsYNRcNfS6qduNbaCaV38=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ZESB+rdI5NfjHSrmR8WqMu2j0IDl8ME73WfToFNPXyDddccorl6EFDjcleq7LTW9l2r3bYoQZ9VD1T5FeiIvdEVb7dLjTl5NnF4KdXtl6evj5SY5V6cddUvcZS86WOvCC9x67NW/GLHWPFFpGqNzbJLpwnq7RA7/MTpSdcm1DtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/IjPJcR; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743707141; c=relaxed/simple;
+	bh=vrGmpaNVvAsSaDweDSZRAOm56FRJOhsQVc1eIbIQIq8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=RxtyEVfH9XoPLRr0v3TWwzhTXLqC8ZJE4d75uMBloCbSw55l/4B4zqwhf38ve1xw/7aJD6cN4tgjiwLM7EX2Hmwe+7cAXoPntv7D3Z8ulTm54nSiSG7MvbdpH7i5fKqICSvW7mChGyv3zKzKzcMtFYXXO6OpLf7udGXPAsagGjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SPqXzJzL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/IjPJcR"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so1218507b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Apr 2025 12:04:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743707049; x=1744311849; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=S8YiNHG6IFBPKFhsip0cVfaATSHXgGchQeAwMnNrJhg=;
-        b=l/IjPJcRvLNhgq20LUGKsy3hSFL0i3lB9kFYAqcQmBO8QUc2lkvb7tg8a0YvwVqmVM
-         2KX1tvF23pXpldTnxYpdBptgfDzy/Hz/RWlFH32keg5n6gSLQjnt6v9RjDSKUYGR7t41
-         3xsi/ncEug4tB6N+qHAqxs3rsGwh6KGHzd7y/2kPhRgxwcacYuBMZgVI5wtabrAO4K3G
-         T2cqMWFNVamgkcufdmF+M83KJRTXrY0NFdOjU4o8ufl5wvXD95QoydZHxgVW2blgV643
-         ZwX6ZDnavWFvjGNO5olPvLdlBV6i8/SO8dkbPcNFPOt/4Ad6BzpQhxHc+p7LAs4OiH47
-         xIoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743707049; x=1744311849;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S8YiNHG6IFBPKFhsip0cVfaATSHXgGchQeAwMnNrJhg=;
-        b=R513kCeh3UBTj5OYYqEZu818jiRc97ChuqDYi67KRDIHhTOONjtFfN/4pKK+fQ+Apx
-         dLlI4d9M1tXVCUnCRVnSfEy5vznYaLkY4Dk+R18r/8IOOmPy80KDQtyGnY76fTN4+Bc0
-         a1j0FX5tBwMa+NWzzADdCnih/PX1HkYU/6FhUWv7R8y+mcHtxZLwQAPmLKcdawuAPpGg
-         YbDKA7vmiiak4Wqc2rwB8eh3ELbBPgAFgIyWYlyspU973vG11jNn6I1POrV+QUOe+erd
-         ITWyDN9/CRDfSEDkt72KfpTdYRT+uxgYY+8AANynyF26ykt3p5icneJoYIA7jXTxEkgq
-         fpyg==
-X-Gm-Message-State: AOJu0YwIvWWK0G4bTsD3xtrrDM3M8n+lSF5bOJBx3CckJBELAS63dsap
-	DNMJ8hAzQB5wSdiFxWoqdgXr2AGxXXkt8CGUgN8dArHVpzWBdYpCNgbY/g==
-X-Gm-Gg: ASbGnctVSj3AV3mxMrtCoK5JjlGLFtSsSqGeqqwI2fKKMVZ7hoEII+lyQs2yvWSO1hN
-	zOyEly3saFRHq2tfUVHGLcSHHNpatZdVAr0oUpYclPAVRU7VPCmhFUiTRQBBbdoNLUUc2a1xzUy
-	ewJdtMDn8dA0e0JPkIe3kZFPjFqodauvdRrHuuckYlJWqjajzQoCzxPbcSBqtMBU0i5MZqTZcGo
-	8T/LpoH16je47PQ25wfYE6MXSCrOnsuaCrUYtXXIEetZoGro7EzDQdTc+5USqMr30pgmhKgxWha
-	MdCacPILgjVF3d/RAmtytgk+2bIqB9T5wCZuf1y1JmCpSTdWPA==
-X-Google-Smtp-Source: AGHT+IHOzQeDLJmAjN+LYzNZU8xhCarmEZShpIule0CGrs2Hhf1aTRGVVpo9BmW2MXmdNZWYwSiBKA==
-X-Received: by 2002:a05:6a00:1a94:b0:736:476b:fcd3 with SMTP id d2e1a72fcca58-739e4bc3811mr870847b3a.24.1743707049053;
-        Thu, 03 Apr 2025 12:04:09 -0700 (PDT)
-Received: from [172.17.0.2] ([20.169.0.203])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739da0e7be3sm1912804b3a.175.2025.04.03.12.04.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 12:04:08 -0700 (PDT)
-Message-ID: <67eedba8.050a0220.d6196.07ed@mx.google.com>
-Date: Thu, 03 Apr 2025 12:04:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4710797928489881751=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SPqXzJzL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11F4C4CEE8;
+	Thu,  3 Apr 2025 19:05:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743707141;
+	bh=vrGmpaNVvAsSaDweDSZRAOm56FRJOhsQVc1eIbIQIq8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=SPqXzJzLn69SVaodkAUg5doQ8Fig2w8an7mf7zcsWbuTMF++gzwAratwnR2pVugBI
+	 FtRyG3sgPm8TPKqlDTeNm4FedLOY8qzlKJnSDwLDrFH9W1g03DYEgTBtBy5YQnYP94
+	 PUBiuya7S94/cgqN05wZ52AKo70/mpqbbXrwTe2ysMnnALJAEIBEekj3P66rs3WNPy
+	 OuzWdqqEeoe19lBlkpmhuHFLAXfr/goAvbTmR0qS0v2DJzgvAlA/6fzY70N4fyUuuz
+	 uVQdYCKb7qr9tuR4ZF7AKVFjBZBHaM5rblWl4TnNKq100iKU1gs16At1svjxRv/mjN
+	 ZGSTqfWME7DkQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Dorian Cruveiller <doriancruveiller@gmail.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.13 41/49] Bluetooth: btusb: Add new VID/PID for WCN785x
+Date: Thu,  3 Apr 2025 15:04:00 -0400
+Message-Id: <20250403190408.2676344-41-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250403190408.2676344-1-sashal@kernel.org>
+References: <20250403190408.2676344-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Bluetooth: increment TX timestamping tskey always for stream sockets
-In-Reply-To: <cf8e3a5bd2f4dbdba54d785d744e2b1970b28301.1743699406.git.pav@iki.fi>
-References: <cf8e3a5bd2f4dbdba54d785d744e2b1970b28301.1743699406.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.13.9
+Content-Transfer-Encoding: 8bit
 
---===============4710797928489881751==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Dorian Cruveiller <doriancruveiller@gmail.com>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit c7629ccfa175e16bb44a60c469214e1a6051f63d ]
 
-Dear submitter,
+Add VID 0489 & PID e10d for Qualcomm WCN785x USB Bluetooth chip.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=949650
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
----Test result---
+T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e10d Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
 
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.27 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.17 seconds
-CheckAllWarning               PASS      26.55 seconds
-CheckSparse                   PASS      29.49 seconds
-BuildKernel32                 PASS      24.12 seconds
-TestRunnerSetup               PASS      429.74 seconds
-TestRunner_l2cap-tester       PASS      20.91 seconds
-TestRunner_iso-tester         PASS      32.78 seconds
-TestRunner_bnep-tester        PASS      4.69 seconds
-TestRunner_mgmt-tester        FAIL      119.63 seconds
-TestRunner_rfcomm-tester      PASS      7.69 seconds
-TestRunner_sco-tester         PASS      12.55 seconds
-TestRunner_ioctl-tester       PASS      8.28 seconds
-TestRunner_mesh-tester        PASS      6.00 seconds
-TestRunner_smp-tester         PASS      7.15 seconds
-TestRunner_userchan-tester    PASS      4.93 seconds
-IncrementalBuild              PENDING   1.06 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.145 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Dorian Cruveiller <doriancruveiller@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 75dbe07e07e21..cf15e18521607 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -375,6 +375,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0f3), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe10d), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3623), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x2c7c, 0x0130), .driver_info = BTUSB_QCA_WCN6855 |
+-- 
+2.39.5
 
---===============4710797928489881751==--
