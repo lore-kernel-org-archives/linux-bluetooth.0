@@ -1,68 +1,68 @@
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5115A221550
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Apr 2025 19:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5C5227EB9
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Apr 2025 19:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743795626; cv=none; b=GAPu6OEybRUborhLWl+nlSqEZ8edJbYL82gZrhhMmY3YxzjEU4jYtLJtYruDlf7prmWDjI5Q0Gvmml7b1aG6kYAM9pF5LbFdij1KLaUosOUMVwalMbuiglqrTkdsrLtzvBVC87+RT4mRbwGD2Jd79lWjyU6RHkKgHO9pZ8rwzB8=
+	t=1743795628; cv=none; b=mQRF/Y8JzH/JZVxdUI81opv2xQoGCfvKLXZkLoMjMJJM6XMIm3gw0bYKrzKHJh1MiBSNpEmcJcET1iwqo6ku6XMrtnC1CJ8k3J/dpqTf7OoGeJhF/U4xDGlQ7mW8mKh4q2GPK2ISumUltWOj3TNxt9toCY5YfHnGBiSB4hKOEUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743795626; c=relaxed/simple;
-	bh=cmC7hky2Vn+LUZjmB6afbYjb8teibBXf7df+BoGBptQ=;
+	s=arc-20240116; t=1743795628; c=relaxed/simple;
+	bh=CXLxyP410fRpt64ZOOLY4z3YvvSGAudaFdOL6DsKMPo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O7yk0lslhC+r/kBfmzgxVPNOB/Xcu3TrUdhECeVogGnlMRLQPK3nbW96IZnCh7iO03IjBmISS/DuOBocsmbLe0tzC246x10CKTcXEwKo8IAFr0u16G7TKYmrcixou7oF5j7YG2Tf59IBkTt6/Dn7cYUJJ0BYHrqWVAmrIolS+bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sdyyf0d2; arc=none smtp.client-ip=209.85.222.43
+	 MIME-Version; b=iAyDEu6Vtwriu3dHTacqvh57kGIU1iVfVBEpy6k2kFPd9XX2IkmnxhffWov5inyVCwe85ixfKvdcIXtqJCrD899B12Ov4WlXQL6vlmPtFKLwp5JydBFaAey+rlEo8fRNW6OM2trZE4JRQdpOUZ+W6mGi8Uo7fm17RJkKI7zXpfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nFgF6FmG; arc=none smtp.client-ip=209.85.222.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sdyyf0d2"
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-86d587dbc15so2120707241.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Apr 2025 12:40:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFgF6FmG"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-86b9d1f729eso1128409241.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Apr 2025 12:40:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743795622; x=1744400422; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743795624; x=1744400424; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WqlP6RFd3tIMU3a40inzv1GaWZAnR1PRLKpi+ND6FDM=;
-        b=Sdyyf0d2/bom2t8tCCO4cjo0dZ2FVDTnBfSX1SskcvYfVSGcKzIiXmSxVRjsl52/h7
-         m0uBhqexQYYVx8D5i92+UeRGpTv0xgnhoeokWkQyut6YpluEJiamudtr9h7gTrFDmjPg
-         X6rvMoBMYYGo/AGarbOTiVcX5hz+nsrSisVk8yDfMTwBXQNcsr10dQp0MwyZegkDESWr
-         s1/jxT2eqx7x3/eIiM1k3Or6O7m5jd7mxlTsmlA/ztV2XJqQYePeyCISN2rge36/Q379
-         62LM/Z67/BDPRRMexDoOtUMLR3z1iD0PGGI0XTddUJYP1Bgdu8eSS/NUzDQ2W5Mx7Aav
-         Dd9g==
+        bh=Q8jttERukblywXwrKsL0Af2/sHwoQGtFPkhNzIFFZIk=;
+        b=nFgF6FmG8XsVNiAMff9iukdOlYWvvIPESZmgqn7noyqTfMpR6C9BHOtFcCMzJn7unj
+         yC0OahDpJZh3Jv7QC4YddMBkF4rPZnTd3ZijZ5anuZcJOz8owz0WzywsEgqgu6nVAyBP
+         1pP7zzP44IZFOpOYdP3N96Mr5RgFTcfYEoyu+EL1hxXBWONJ/ZyXcSV373JuKN+Ww3sx
+         /GDkIFx5Gmqf4O+K0GthEHjcLKaoWrqtYsWMuDVk+N9l9NU/0Kje2Ex/sS/LVKnX9rEc
+         UAdVCCyMJYGl7SA5W1rxRLbKQFPIFC6N0t0bE/xwAFqRrpJa+25EmW1T4r4TXljaS1qk
+         6Mtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743795622; x=1744400422;
+        d=1e100.net; s=20230601; t=1743795624; x=1744400424;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WqlP6RFd3tIMU3a40inzv1GaWZAnR1PRLKpi+ND6FDM=;
-        b=Si4vLx1gtvAfqkMDOZPCY8iNNZgir/+LiIV3S5t5ZdR19ZjWIV2E2PY5JVSCOdiVEk
-         /Ka3JfpdPEacBs3X2l5gDQZq5dJZq9xkZkwU9vT5osPD0BxcQIrkgYpHUFGsnPb+8o7R
-         WcG9hHSwa0Cxas3M/v5HXTwlY+5/KreJ51vKVroD5+8FIGhMSuGufvgpAd0CZAyrE4Lr
-         CZyw1dZUvgzZzBJc0g0KWU6MLDsgXp6i61TU/i/K3O3X5hJ6NXWfLXVFON7ABN88EsU1
-         LOt3j4+MQ8mLWr9JblFQ8+hGptmdJhFXgVyQ3TViYEgCuqKedj75vc1xu6blidI87YOz
-         WITQ==
-X-Gm-Message-State: AOJu0YzeNOSNoSF1DqGc1jeKrSIyK6z7DMyjuAOhSb9UKsg3Go4piUa5
-	R4YGHLux2eGHoymmG0GZkFI446LwVV45/872NsyaS0S89VfsSZ7FeHrfC0cJdbA=
-X-Gm-Gg: ASbGncua9GNeTNn9tuJhQ4/KomRelML+QW/Rr4HO050OZCzDEghFbXPAMS6ARcSW97c
-	E1dnZQya3rWvmFdklgJ7Y84y4s6irnyErNlGl+ZOYSnCEimgsSYhVP7eyy5KiDaO374bcoHyJjw
-	PnfL7ULr4AEr/pw4M0wMaEl07dXR7dgvMFBQHkCebUcNqDtL4f2bkZ7lY1D591FETMegmI83yvX
-	T8l1rM1htq4WvELDISJyNQtqSXN4HwNx2GwUDkPETy2plwwzifGYYENNvhdsTceZG7QaZ+A1/xm
-	nlflZ8BbgYW/J5F75ZwgekC9Iz9oRAvFqBBjIH26dbyIqNeClDf3CYHpnaRuQ+oSIHUwiHSu3Cj
-	kYkLfiJ/FourRrLNXp1iHPZ+7
-X-Google-Smtp-Source: AGHT+IHJ9y8m5fgoS6NQMK4FxQu13ku5mP8SU6kA5foDaLoBYCXjgt/88ZfAenlS28bnijWLWpldJg==
-X-Received: by 2002:a67:f714:0:b0:4c0:435b:5dd2 with SMTP id ada2fe7eead31-4c8459f513fmr6210890137.1.1743795621964;
-        Fri, 04 Apr 2025 12:40:21 -0700 (PDT)
+        bh=Q8jttERukblywXwrKsL0Af2/sHwoQGtFPkhNzIFFZIk=;
+        b=UPXGb2Cj/Ad4vm9cX+irqScFHl71Ay7YSiALZ7Ks7O1pNIt4wiP0Lc2Q1CXvNS0TXH
+         qwKWc33qH2GGRbh8/eNIJFssAVi0zIleimFQpcCotfFTrpK4h9yuvjFz6n+ml8rszr18
+         zoQ1vtjCqsiNgCNfCNiEcCG3H8qK8QszLcutmtRRlGHvo6dgbHazHmIiomUzAD7jVa6e
+         O7XmSTp5aozJyZJO3f6UrsYXErHjQEq6NEeLZYCua5VFbn7YNe+cq421BS107ii242oQ
+         xXhjxLK5oXalLvwmRvswyryT6kafI1CtgaA06fe9Bs1w1pXdx3dSilPUxiTADyKSspdS
+         m1Cw==
+X-Gm-Message-State: AOJu0YzbHgwv/c7RwxwCjz8cKbFdpkFO2+Cm+KZ4LOijTmytBYhdZfyr
+	4KAfxoww/Qf3zyOLn8ulUGfqrB4fApwhCaAEgsn+jfLG95jaszJ5JaLgf8j7IzQ=
+X-Gm-Gg: ASbGncuA0+Gy5j54JugdUyiBxBy6cQtRj5tM/J68XWqCX0spQorCJKs3DKV05qGOydB
+	j1c+X8ON73skuam2BHgFNFBIE4ZMhGurBtzROiKc7FG9KZ71syuvvp+LjKX20RyNaZsesxoL4GL
+	uNEeqX+m6QhRiKum74DAJgAI0I4glGo3LJiFdntdHg75ZRdftxCe+0bIR6Lq7um/Yu7++UuOfFN
+	+/lzrEZ+cGphFhGOxDrcfrzOOlcvdIqyiZCMqdfXRrQsm3aVV9dGinaDSWIFmEHI111Wi8NTtjr
+	RX6vRoeVS22L2gehjkM0lAaYUK2wci3whRXQj7IJBwKcXtS6EawDmKzuh713Sorwmf95fPz6Yho
+	1oTM9x6QGXDGY1A==
+X-Google-Smtp-Source: AGHT+IGwsOpiFIqmZVVO7XZj2lw0KgBT9Zyy1C4pDxpFGYq/fiQ+QUJ7ix2CAFehHKrP7K2BJG/LmA==
+X-Received: by 2002:a05:6102:54aa:b0:4c3:7f7:92f4 with SMTP id ada2fe7eead31-4c85539d9c7mr3799750137.6.1743795624183;
+        Fri, 04 Apr 2025 12:40:24 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8738b1d352esm718587241.19.2025.04.04.12.40.20
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8738b1d352esm718587241.19.2025.04.04.12.40.22
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 12:40:21 -0700 (PDT)
+        Fri, 04 Apr 2025 12:40:22 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 10/11] shared/bap: Fix not sending ASE Notication in case of Metadata update
-Date: Fri,  4 Apr 2025 15:39:48 -0400
-Message-ID: <20250404193959.359008-11-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 11/11] test-bap: Introduce USR/SCC Metadata tests for LC3
+Date: Fri,  4 Apr 2025 15:39:49 -0400
+Message-ID: <20250404193959.359008-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250404193959.359008-1-luiz.dentz@gmail.com>
 References: <20250404193959.359008-1-luiz.dentz@gmail.com>
@@ -76,26 +76,139 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Tests such if metadata update requires the server to generate ASE
-notification on Update Metadata operation.
----
- src/shared/bap.c | 3 +++
- 1 file changed, 3 insertions(+)
+Unicast Server Performs Update Metadata Operation
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 73d1b6192843..ae840c14ded1 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2148,6 +2148,9 @@ static uint8_t stream_metadata(struct bt_bap_stream *stream, struct iovec *meta,
- 	util_iov_free(stream->meta, 1);
- 	stream->meta = util_iov_dup(meta, 1);
+Test Purpose:
+Verify that a Unicast Server IUT can perform an Update Metadata operation
+initiated by a Unicast Client.
+
+Pass verdict:
+The IUT sends a notification of the ASE Control Point characteristic with
+Response_Code set to Success (0x00) for the requested ASE_ID and opcode.
+
+Test Summary
+------------
+BAP/USR/SCC/BV-161-C [USR SRC Update Metadata in Enabling State] Passed
+BAP/USR/SCC/BV-162-C [USR SNK Update Metadata in Enabling or Streaming state] Passed
+BAP/USR/SCC/BV-163-C [USR SRC Update Metadata in Streaming State] Passed
+Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
+---
+ unit/test-bap.c | 56 ++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 44 insertions(+), 12 deletions(-)
+
+diff --git a/unit/test-bap.c b/unit/test-bap.c
+index c77fc83d83de..9a07bd8f53e7 100644
+--- a/unit/test-bap.c
++++ b/unit/test-bap.c
+@@ -3734,6 +3734,9 @@ static void test_ucl_scc_release(void)
+  * Verify the behavior of a Unicast Server IUT when a Unicast Client initiates
+  * a Release operation.
+  *
++ * Pass verdict:
++ * The IUT sends a notification of the ASE Control Point characteristic value.
++ *
+  */
+ static void test_usr_scc_release(void)
+ {
+@@ -3815,15 +3818,13 @@ static struct test_config cfg_snk_metadata = {
+  *    Data: 0701010000
+  * ATT: Handle Value Notification (0x1b) len 37
+  *   Handle: 0x0016
+- *     Data: 01010102010a00204e00409c00204e00409c00_qos
++ *     Data: 0103000000
+  */
+ #define ASE_SNK_METADATA \
+ 	IOV_DATA(0x52, 0x22, 0x00, 0x07, 0x01, 0x01, 0x00), \
+ 	IOV_DATA(0x1b, 0x22, 0x00, 0x07, 0x01, 0x01, 0x00, 0x00), \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
+-			0x00, 0x02, 0x1a, 0x00, 0x02, 0x08, 0x00, 0x40, 0x9c, \
+-			0x00)
++	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00)
  
-+	/* Force state change to the same state to update the metadata */
-+	stream_set_state(stream, bt_bap_stream_get_state(stream));
-+
- 	return 0;
+ #define SCC_SNK_METADATA \
+ 	SCC_SNK_ENABLE, \
+@@ -3845,18 +3846,16 @@ static struct test_config cfg_src_metadata = {
+  *    Data: 0701030000
+  * ATT: Handle Value Notification (0x1b) len 37
+  *   Handle: 0x001c
+- *     Data: 030300000403020100
++ *     Data: 0303000000
+  */
+-#define ASE_SRC_METADATA \
++#define ASE_SRC_METADATA(_state) \
+ 	IOV_DATA(0x52, 0x22, 0x00, 0x07, 0x01, 0x03, 0x00), \
+ 	IOV_DATA(0x1b, 0x22, 0x00, 0x07, 0x01, 0x03, 0x00, 0x00), \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
+-			0x00, 0x02, 0x1a, 0x00, 0x04, 0x08, 0x00, 0x40, 0x9c, \
+-			0x00)
++	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, _state, 0x00, 0x00, 0x00)
+ #define SCC_SRC_METADATA \
+ 	SCC_SRC_ENABLE, \
+-	ASE_SRC_METADATA
++	ASE_SRC_METADATA(0x03)
+ 
+ static void state_start_metadata(struct bt_bap_stream *stream,
+ 					uint8_t old_state, uint8_t new_state,
+@@ -3886,7 +3885,7 @@ static struct test_config cfg_src_metadata_streaming = {
+ #define SCC_SRC_METADATA_STREAMING \
+ 	SCC_SRC_ENABLE, \
+ 	SRC_START, \
+-	ASE_SRC_METADATA
++	ASE_SRC_METADATA(0x04)
+ 
+ /* Unicast Client Initiates Update Metadata Operation
+  *
+@@ -3898,7 +3897,7 @@ static struct test_config cfg_src_metadata_streaming = {
+  * The IUT successfully writes to the ASE Control Point characteristic with the
+  * opcode set to 0x07 (Update Metadata) and the specified parameters.
+  */
+-static void test_scc_metadata(void)
++static void test_ucl_scc_metadata(void)
+ {
+ 	define_test("BAP/UCL/SCC/BV-115-C [UCL SNK Update Metadata in Enabling "
+ 			"State]",
+@@ -3914,6 +3913,39 @@ static void test_scc_metadata(void)
+ 			SCC_SRC_METADATA_STREAMING);
  }
  
++/* Unicast Server Performs Update Metadata Operation
++ *
++ * Test Purpose:
++ * Verify that a Unicast Server IUT can perform an Update Metadata operation
++ * initiated by a Unicast Client.
++ *
++ * Pass verdict:
++ * The IUT sends a notification of the ASE Control Point characteristic with
++ * Response_Code set to Success (0x00) for the requested ASE_ID and opcode.
++ */
++static void test_usr_scc_metadata(void)
++{
++	define_test("BAP/USR/SCC/BV-161-C [USR SRC Update Metadata in Enabling "
++			"State]",
++			test_setup_server, test_server, &cfg_src_metadata,
++			SCC_SRC_METADATA);
++	define_test("BAP/USR/SCC/BV-162-C [USR SNK Update Metadata in Enabling "
++			"or Streaming state]",
++			test_setup_server, test_server, &cfg_snk_metadata,
++			SCC_SNK_METADATA);
++	define_test("BAP/USR/SCC/BV-163-C [USR SRC Update Metadata in Streaming"
++			" State]",
++			test_setup_server, test_server,
++			&cfg_src_metadata_streaming,
++			SCC_SRC_METADATA_STREAMING);
++}
++
++static void test_scc_metadata(void)
++{
++	test_ucl_scc_metadata();
++	test_usr_scc_metadata();
++}
++
+ #define SNK_ENABLE \
+ 	IOV_DATA(0x52, 0x22, 0x00, 0x03, 0x01, 0x01, 0x04, 0x03, 0x02, 0x01, \
+ 			00), \
 -- 
 2.49.0
 
