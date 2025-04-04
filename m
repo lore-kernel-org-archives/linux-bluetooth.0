@@ -1,214 +1,197 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5C5227EB9
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Apr 2025 19:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D03114831E
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Apr 2025 21:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743795628; cv=none; b=mQRF/Y8JzH/JZVxdUI81opv2xQoGCfvKLXZkLoMjMJJM6XMIm3gw0bYKrzKHJh1MiBSNpEmcJcET1iwqo6ku6XMrtnC1CJ8k3J/dpqTf7OoGeJhF/U4xDGlQ7mW8mKh4q2GPK2ISumUltWOj3TNxt9toCY5YfHnGBiSB4hKOEUc=
+	t=1743800587; cv=none; b=tNKgFYv5iZUN5BaD/5Cw5qzdcwdBxEBSqusdDXez7Wa/SmNHaYigu2lH9pzY2DqOo91vXLQ4v0tuNKBFJU8PCrRqjsxNIjWzrUhuqUaLibrrF6Maqc2sBh6i46xMOVJ+kJVJWsaw/NxFKXu1mYKnQK9VDA7X13tt8nsXlUqKtm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743795628; c=relaxed/simple;
-	bh=CXLxyP410fRpt64ZOOLY4z3YvvSGAudaFdOL6DsKMPo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iAyDEu6Vtwriu3dHTacqvh57kGIU1iVfVBEpy6k2kFPd9XX2IkmnxhffWov5inyVCwe85ixfKvdcIXtqJCrD899B12Ov4WlXQL6vlmPtFKLwp5JydBFaAey+rlEo8fRNW6OM2trZE4JRQdpOUZ+W6mGi8Uo7fm17RJkKI7zXpfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nFgF6FmG; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743800587; c=relaxed/simple;
+	bh=uDX2u0BK3fCq7vaZjouzdbCGKkWzaISVB2+nZRQKiCs=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=DuuNPbWqqbL9frwoGLL39DXtgJSM7fs0qwbDdpWVSLA/11nn0gKblLdpxWgTwZwr7Rw8EMZRTR/FBeIxhw30d33kclbxoZsFa27CQFEF3n3O3lS3NxbeoiXvWA6PGLaJacrMG3gc4vhs5yDoxZzSFGGG/JHE2FjYHsthxlXZ9yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gIzmjdYp; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFgF6FmG"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-86b9d1f729eso1128409241.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Apr 2025 12:40:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743795624; x=1744400424; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q8jttERukblywXwrKsL0Af2/sHwoQGtFPkhNzIFFZIk=;
-        b=nFgF6FmG8XsVNiAMff9iukdOlYWvvIPESZmgqn7noyqTfMpR6C9BHOtFcCMzJn7unj
-         yC0OahDpJZh3Jv7QC4YddMBkF4rPZnTd3ZijZ5anuZcJOz8owz0WzywsEgqgu6nVAyBP
-         1pP7zzP44IZFOpOYdP3N96Mr5RgFTcfYEoyu+EL1hxXBWONJ/ZyXcSV373JuKN+Ww3sx
-         /GDkIFx5Gmqf4O+K0GthEHjcLKaoWrqtYsWMuDVk+N9l9NU/0Kje2Ex/sS/LVKnX9rEc
-         UAdVCCyMJYGl7SA5W1rxRLbKQFPIFC6N0t0bE/xwAFqRrpJa+25EmW1T4r4TXljaS1qk
-         6Mtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743795624; x=1744400424;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q8jttERukblywXwrKsL0Af2/sHwoQGtFPkhNzIFFZIk=;
-        b=UPXGb2Cj/Ad4vm9cX+irqScFHl71Ay7YSiALZ7Ks7O1pNIt4wiP0Lc2Q1CXvNS0TXH
-         qwKWc33qH2GGRbh8/eNIJFssAVi0zIleimFQpcCotfFTrpK4h9yuvjFz6n+ml8rszr18
-         zoQ1vtjCqsiNgCNfCNiEcCG3H8qK8QszLcutmtRRlGHvo6dgbHazHmIiomUzAD7jVa6e
-         O7XmSTp5aozJyZJO3f6UrsYXErHjQEq6NEeLZYCua5VFbn7YNe+cq421BS107ii242oQ
-         xXhjxLK5oXalLvwmRvswyryT6kafI1CtgaA06fe9Bs1w1pXdx3dSilPUxiTADyKSspdS
-         m1Cw==
-X-Gm-Message-State: AOJu0YzbHgwv/c7RwxwCjz8cKbFdpkFO2+Cm+KZ4LOijTmytBYhdZfyr
-	4KAfxoww/Qf3zyOLn8ulUGfqrB4fApwhCaAEgsn+jfLG95jaszJ5JaLgf8j7IzQ=
-X-Gm-Gg: ASbGncuA0+Gy5j54JugdUyiBxBy6cQtRj5tM/J68XWqCX0spQorCJKs3DKV05qGOydB
-	j1c+X8ON73skuam2BHgFNFBIE4ZMhGurBtzROiKc7FG9KZ71syuvvp+LjKX20RyNaZsesxoL4GL
-	uNEeqX+m6QhRiKum74DAJgAI0I4glGo3LJiFdntdHg75ZRdftxCe+0bIR6Lq7um/Yu7++UuOfFN
-	+/lzrEZ+cGphFhGOxDrcfrzOOlcvdIqyiZCMqdfXRrQsm3aVV9dGinaDSWIFmEHI111Wi8NTtjr
-	RX6vRoeVS22L2gehjkM0lAaYUK2wci3whRXQj7IJBwKcXtS6EawDmKzuh713Sorwmf95fPz6Yho
-	1oTM9x6QGXDGY1A==
-X-Google-Smtp-Source: AGHT+IGwsOpiFIqmZVVO7XZj2lw0KgBT9Zyy1C4pDxpFGYq/fiQ+QUJ7ix2CAFehHKrP7K2BJG/LmA==
-X-Received: by 2002:a05:6102:54aa:b0:4c3:7f7:92f4 with SMTP id ada2fe7eead31-4c85539d9c7mr3799750137.6.1743795624183;
-        Fri, 04 Apr 2025 12:40:24 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8738b1d352esm718587241.19.2025.04.04.12.40.22
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 12:40:22 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 11/11] test-bap: Introduce USR/SCC Metadata tests for LC3
-Date: Fri,  4 Apr 2025 15:39:49 -0400
-Message-ID: <20250404193959.359008-12-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250404193959.359008-1-luiz.dentz@gmail.com>
-References: <20250404193959.359008-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gIzmjdYp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743800585; x=1775336585;
+  h=date:from:to:cc:subject:message-id;
+  bh=uDX2u0BK3fCq7vaZjouzdbCGKkWzaISVB2+nZRQKiCs=;
+  b=gIzmjdYpYwcx7FmdPydeKPQ02zkildrSyBxd4+zRORfJoQ8NeHNTa96c
+   zSt62RoqGrYyqTgjdBfluzR1QWRg8JCN4pn21C+OJE9ncH+s3ed5IDelp
+   Sq1xTnvicET/IvNDvnWyJApDcSJo3CweJ2aPpC/XGgnroRuPL81SKNbDY
+   5Q5+xoJVbOVbyv24nNR5rV4GsLTv34Py3e2co6keS9oyh7TgxWb1fjPGo
+   o68cIc5sUBgsQqUf0mklSkOYhyAYwPF9xA6DlXUS5B8UjeyXFZXV+FJv5
+   PDKtxqhiinecZ6ZEc3lnB4ZdfBVNJej/l3ED43Al4yPjBk7LhT4N2E6ic
+   w==;
+X-CSE-ConnectionGUID: St+xQN40TlSDiOjTOiMDpw==
+X-CSE-MsgGUID: zDYu+HaJRO2HzmvYg7fDvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11394"; a="44499578"
+X-IronPort-AV: E=Sophos;i="6.15,189,1739865600"; 
+   d="scan'208";a="44499578"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2025 14:03:04 -0700
+X-CSE-ConnectionGUID: 5audLA0KRVWkhJGki7C8UA==
+X-CSE-MsgGUID: aCBaUD92RXm6o/x+j1Z+Sg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,189,1739865600"; 
+   d="scan'208";a="127391400"
+Received: from lkp-server01.sh.intel.com (HELO b207828170a5) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 04 Apr 2025 14:03:04 -0700
+Received: from kbuild by b207828170a5 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1u0oBp-0001Y4-1q;
+	Fri, 04 Apr 2025 21:03:01 +0000
+Date: Sat, 05 Apr 2025 05:02:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 061e4972c48c032fb90927d468511d57210a65e4
+Message-ID: <202504050544.gV3nCDO0-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 061e4972c48c032fb90927d468511d57210a65e4  Bluetooth: btnxpuart: Add an error message if FW dump trigger fails
 
-Unicast Server Performs Update Metadata Operation
+elapsed time: 1448m
 
-Test Purpose:
-Verify that a Unicast Server IUT can perform an Update Metadata operation
-initiated by a Unicast Client.
+configs tested: 120
+configs skipped: 4
 
-Pass verdict:
-The IUT sends a notification of the ASE Control Point characteristic with
-Response_Code set to Success (0x00) for the requested ASE_ID and opcode.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-Test Summary
-------------
-BAP/USR/SCC/BV-161-C [USR SRC Update Metadata in Enabling State] Passed
-BAP/USR/SCC/BV-162-C [USR SNK Update Metadata in Enabling or Streaming state] Passed
-BAP/USR/SCC/BV-163-C [USR SRC Update Metadata in Streaming State] Passed
-Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
----
- unit/test-bap.c | 56 ++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 44 insertions(+), 12 deletions(-)
+tested configs:
+alpha                             allnoconfig    gcc-14.2.0
+alpha                            allyesconfig    gcc-14.2.0
+arc                              allmodconfig    gcc-14.2.0
+arc                               allnoconfig    gcc-14.2.0
+arc                              allyesconfig    gcc-14.2.0
+arc                   randconfig-001-20250404    gcc-14.2.0
+arc                   randconfig-002-20250404    gcc-14.2.0
+arm                              allmodconfig    gcc-14.2.0
+arm                               allnoconfig    clang-21
+arm                              allyesconfig    gcc-14.2.0
+arm                            hisi_defconfig    gcc-14.2.0
+arm                           imxrt_defconfig    clang-21
+arm                          pxa910_defconfig    gcc-14.2.0
+arm                   randconfig-001-20250404    clang-21
+arm                   randconfig-002-20250404    gcc-7.5.0
+arm                   randconfig-003-20250404    clang-21
+arm                   randconfig-004-20250404    clang-21
+arm                        spear3xx_defconfig    clang-17
+arm64                            allmodconfig    clang-19
+arm64                             allnoconfig    gcc-14.2.0
+arm64                 randconfig-001-20250404    gcc-5.5.0
+arm64                 randconfig-002-20250404    gcc-7.5.0
+arm64                 randconfig-003-20250404    gcc-9.5.0
+arm64                 randconfig-004-20250404    clang-15
+csky                              allnoconfig    gcc-14.2.0
+csky                  randconfig-001-20250404    gcc-13.3.0
+csky                  randconfig-002-20250404    gcc-11.5.0
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-21
+hexagon                          allyesconfig    clang-21
+hexagon               randconfig-001-20250404    clang-15
+hexagon               randconfig-002-20250404    clang-21
+i386                             allmodconfig    gcc-12
+i386                              allnoconfig    gcc-12
+i386                             allyesconfig    gcc-12
+i386        buildonly-randconfig-001-20250404    gcc-12
+i386        buildonly-randconfig-002-20250404    gcc-12
+i386        buildonly-randconfig-003-20250404    gcc-12
+i386        buildonly-randconfig-004-20250404    gcc-12
+i386        buildonly-randconfig-005-20250404    gcc-12
+i386        buildonly-randconfig-006-20250404    gcc-12
+i386                                defconfig    clang-20
+loongarch                        allmodconfig    gcc-14.2.0
+loongarch                         allnoconfig    gcc-14.2.0
+loongarch             randconfig-001-20250404    gcc-14.2.0
+loongarch             randconfig-002-20250404    gcc-14.2.0
+m68k                             allmodconfig    gcc-14.2.0
+m68k                              allnoconfig    gcc-14.2.0
+m68k                             allyesconfig    gcc-14.2.0
+m68k                        m5272c3_defconfig    gcc-14.2.0
+m68k                        stmark2_defconfig    gcc-14.2.0
+microblaze                       allmodconfig    gcc-14.2.0
+microblaze                        allnoconfig    gcc-14.2.0
+microblaze                       allyesconfig    gcc-14.2.0
+mips                              allnoconfig    gcc-14.2.0
+nios2                         10m50_defconfig    gcc-14.2.0
+nios2                             allnoconfig    gcc-14.2.0
+nios2                 randconfig-001-20250404    gcc-5.5.0
+nios2                 randconfig-002-20250404    gcc-11.5.0
+openrisc                          allnoconfig    gcc-14.2.0
+openrisc                         allyesconfig    gcc-14.2.0
+openrisc                            defconfig    gcc-14.2.0
+openrisc                  or1klitex_defconfig    gcc-14.2.0
+parisc                           allmodconfig    gcc-14.2.0
+parisc                            allnoconfig    gcc-14.2.0
+parisc                           allyesconfig    gcc-14.2.0
+parisc                              defconfig    gcc-14.2.0
+parisc                randconfig-001-20250404    gcc-8.5.0
+parisc                randconfig-002-20250404    gcc-14.2.0
+powerpc                          allmodconfig    gcc-14.2.0
+powerpc                           allnoconfig    gcc-14.2.0
+powerpc                          allyesconfig    clang-21
+powerpc                 linkstation_defconfig    clang-20
+powerpc                     mpc83xx_defconfig    clang-21
+powerpc                      pcm030_defconfig    clang-15
+powerpc                     ppa8548_defconfig    gcc-14.2.0
+powerpc               randconfig-001-20250404    gcc-5.5.0
+powerpc               randconfig-002-20250404    gcc-9.3.0
+powerpc               randconfig-003-20250404    clang-21
+powerpc64             randconfig-001-20250404    gcc-10.5.0
+powerpc64             randconfig-002-20250404    clang-21
+powerpc64             randconfig-003-20250404    gcc-10.5.0
+riscv                            allmodconfig    clang-21
+riscv                             allnoconfig    gcc-14.2.0
+riscv                 randconfig-001-20250404    gcc-14.2.0
+riscv                 randconfig-002-20250404    clang-19
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-15
+s390                             allyesconfig    gcc-14.2.0
+s390                  randconfig-001-20250404    clang-15
+s390                  randconfig-002-20250404    clang-17
+sh                               allmodconfig    gcc-14.2.0
+sh                                allnoconfig    gcc-14.2.0
+sh                               allyesconfig    gcc-14.2.0
+sh                    randconfig-001-20250404    gcc-5.5.0
+sh                    randconfig-002-20250404    gcc-5.5.0
+sh                           se7705_defconfig    gcc-14.2.0
+sparc                            allmodconfig    gcc-14.2.0
+sparc                             allnoconfig    gcc-14.2.0
+sparc                 randconfig-001-20250404    gcc-14.2.0
+sparc                 randconfig-002-20250404    gcc-8.5.0
+sparc64               randconfig-001-20250404    gcc-10.5.0
+sparc64               randconfig-002-20250404    gcc-14.2.0
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-21
+um                               allyesconfig    gcc-12
+um                    randconfig-001-20250404    gcc-12
+um                    randconfig-002-20250404    clang-21
+x86_64                            allnoconfig    clang-20
+x86_64                           allyesconfig    clang-20
+x86_64      buildonly-randconfig-001-20250404    clang-20
+x86_64      buildonly-randconfig-002-20250404    clang-20
+x86_64      buildonly-randconfig-003-20250404    clang-20
+x86_64      buildonly-randconfig-004-20250404    gcc-12
+x86_64      buildonly-randconfig-005-20250404    gcc-12
+x86_64      buildonly-randconfig-006-20250404    gcc-12
+x86_64                              defconfig    gcc-11
+xtensa                            allnoconfig    gcc-14.2.0
+xtensa                randconfig-001-20250404    gcc-14.2.0
+xtensa                randconfig-002-20250404    gcc-10.5.0
 
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index c77fc83d83de..9a07bd8f53e7 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -3734,6 +3734,9 @@ static void test_ucl_scc_release(void)
-  * Verify the behavior of a Unicast Server IUT when a Unicast Client initiates
-  * a Release operation.
-  *
-+ * Pass verdict:
-+ * The IUT sends a notification of the ASE Control Point characteristic value.
-+ *
-  */
- static void test_usr_scc_release(void)
- {
-@@ -3815,15 +3818,13 @@ static struct test_config cfg_snk_metadata = {
-  *    Data: 0701010000
-  * ATT: Handle Value Notification (0x1b) len 37
-  *   Handle: 0x0016
-- *     Data: 01010102010a00204e00409c00204e00409c00_qos
-+ *     Data: 0103000000
-  */
- #define ASE_SNK_METADATA \
- 	IOV_DATA(0x52, 0x22, 0x00, 0x07, 0x01, 0x01, 0x00), \
- 	IOV_DATA(0x1b, 0x22, 0x00, 0x07, 0x01, 0x01, 0x00, 0x00), \
- 	IOV_NULL, \
--	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
--			0x00, 0x02, 0x1a, 0x00, 0x02, 0x08, 0x00, 0x40, 0x9c, \
--			0x00)
-+	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00)
- 
- #define SCC_SNK_METADATA \
- 	SCC_SNK_ENABLE, \
-@@ -3845,18 +3846,16 @@ static struct test_config cfg_src_metadata = {
-  *    Data: 0701030000
-  * ATT: Handle Value Notification (0x1b) len 37
-  *   Handle: 0x001c
-- *     Data: 030300000403020100
-+ *     Data: 0303000000
-  */
--#define ASE_SRC_METADATA \
-+#define ASE_SRC_METADATA(_state) \
- 	IOV_DATA(0x52, 0x22, 0x00, 0x07, 0x01, 0x03, 0x00), \
- 	IOV_DATA(0x1b, 0x22, 0x00, 0x07, 0x01, 0x03, 0x00, 0x00), \
- 	IOV_NULL, \
--	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
--			0x00, 0x02, 0x1a, 0x00, 0x04, 0x08, 0x00, 0x40, 0x9c, \
--			0x00)
-+	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, _state, 0x00, 0x00, 0x00)
- #define SCC_SRC_METADATA \
- 	SCC_SRC_ENABLE, \
--	ASE_SRC_METADATA
-+	ASE_SRC_METADATA(0x03)
- 
- static void state_start_metadata(struct bt_bap_stream *stream,
- 					uint8_t old_state, uint8_t new_state,
-@@ -3886,7 +3885,7 @@ static struct test_config cfg_src_metadata_streaming = {
- #define SCC_SRC_METADATA_STREAMING \
- 	SCC_SRC_ENABLE, \
- 	SRC_START, \
--	ASE_SRC_METADATA
-+	ASE_SRC_METADATA(0x04)
- 
- /* Unicast Client Initiates Update Metadata Operation
-  *
-@@ -3898,7 +3897,7 @@ static struct test_config cfg_src_metadata_streaming = {
-  * The IUT successfully writes to the ASE Control Point characteristic with the
-  * opcode set to 0x07 (Update Metadata) and the specified parameters.
-  */
--static void test_scc_metadata(void)
-+static void test_ucl_scc_metadata(void)
- {
- 	define_test("BAP/UCL/SCC/BV-115-C [UCL SNK Update Metadata in Enabling "
- 			"State]",
-@@ -3914,6 +3913,39 @@ static void test_scc_metadata(void)
- 			SCC_SRC_METADATA_STREAMING);
- }
- 
-+/* Unicast Server Performs Update Metadata Operation
-+ *
-+ * Test Purpose:
-+ * Verify that a Unicast Server IUT can perform an Update Metadata operation
-+ * initiated by a Unicast Client.
-+ *
-+ * Pass verdict:
-+ * The IUT sends a notification of the ASE Control Point characteristic with
-+ * Response_Code set to Success (0x00) for the requested ASE_ID and opcode.
-+ */
-+static void test_usr_scc_metadata(void)
-+{
-+	define_test("BAP/USR/SCC/BV-161-C [USR SRC Update Metadata in Enabling "
-+			"State]",
-+			test_setup_server, test_server, &cfg_src_metadata,
-+			SCC_SRC_METADATA);
-+	define_test("BAP/USR/SCC/BV-162-C [USR SNK Update Metadata in Enabling "
-+			"or Streaming state]",
-+			test_setup_server, test_server, &cfg_snk_metadata,
-+			SCC_SNK_METADATA);
-+	define_test("BAP/USR/SCC/BV-163-C [USR SRC Update Metadata in Streaming"
-+			" State]",
-+			test_setup_server, test_server,
-+			&cfg_src_metadata_streaming,
-+			SCC_SRC_METADATA_STREAMING);
-+}
-+
-+static void test_scc_metadata(void)
-+{
-+	test_ucl_scc_metadata();
-+	test_usr_scc_metadata();
-+}
-+
- #define SNK_ENABLE \
- 	IOV_DATA(0x52, 0x22, 0x00, 0x03, 0x01, 0x01, 0x04, 0x03, 0x02, 0x01, \
- 			00), \
--- 
-2.49.0
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
