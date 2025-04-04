@@ -1,68 +1,68 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B74225A5B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Apr 2025 19:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123EF227586
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Apr 2025 19:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743795619; cv=none; b=hF/Y4Yp2upIsxsCOrRQQ8Rj2b5aI/8pg69064NkH5wN6vufsPm8xqglQkMKKP9TCZkwKG7GgIZTM2rMNCWh3IYWyHqoIM/09jOvSe7gdaVyR+4PEL08eDUPAEkyd1WNKByrB7S8VOccvvHH4jfufQrVR5pttX54ovbBInNQDsPE=
+	t=1743795622; cv=none; b=KVfbjfwt4GJLMLdZQH9C+ALyAoVVMLsG+ohHJc3TySP5nZ7/I+v6IZUMBR8wX+fHiqHCFWOfp0eMpe6ZbUFD5ux2/u/bDlRTT/Ct7m25DA7b0uTvMaDPWy85eJomJhARfV7nijCCVQLABRCjFLn0h1swqp147q/3YiYbBA9f9+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743795619; c=relaxed/simple;
-	bh=csyXIAGZsx/4/kbyX+yl4X0nadT51zQGk9f42m+3hFI=;
+	s=arc-20240116; t=1743795622; c=relaxed/simple;
+	bh=6MTuJY3lF3nXkrFWIUCXlfQcdvNEPpg1b9L01pRqFtE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jQU5KWXO0Ss4UelEgK9v1E2+EWJezJ2/rLtdyzypgiXh02JZPD3GRUYmT99daMjsW3WgxVIk1gWrJOavWx0+Q38YErxuYyJ1ApPDW4zrFu7oZD2MciBQvkWv/1Wa9ivzbSBynC0/iT1/aF5+tqiB3/sCcxAqBguIOiidbV9p+DE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H1tg/wz8; arc=none smtp.client-ip=209.85.222.48
+	 MIME-Version; b=nI2BoMgaGXeuV5X8VkhoG0TFSS4fNP6lfQb2SQXlRTnCUzSebxBTGpnQSpFW8iOxPwagjXf1NAm2zTczvAPubNu2AWkD1bnHjOC5AO3/SacOOMnciHIkW9Al4KcXOt/8j7xQdWvekeF0xMLjCGyHDL/K+mLRIyTVuNsKR9F6bWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrLGILAk; arc=none smtp.client-ip=209.85.222.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1tg/wz8"
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-86d377306ddso1102589241.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Apr 2025 12:40:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrLGILAk"
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-86d6fd581f4so2944697241.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Apr 2025 12:40:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743795616; x=1744400416; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743795618; x=1744400418; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=abiJZqZPSgloceKnqEePK/H3ytaF6NiSgkualltBJX8=;
-        b=H1tg/wz8NqjitzvR7toU7P8NBFvnMXxMxSBwauKxb/S5IG6dEFYAXLGhe9qN731FNT
-         I6fSfEKnyMc47GIbwwUSXt2uoaUGsXP3KGc2Y4/PevKF3IyqNPMBcD9p8lX+Pi0NtCdM
-         6id0Kq3fa98btl1BG+ffgUZ/vjohMrwQSfOiaaTTI0sb4vF0fvqIwjFpn7/BEh788OgU
-         G3Tci898PXUV2iDO1tp1Yh+GfCwr+dTK4dqK4y/wJuESS0LGH8V9JMZduARxVLvNHGNV
-         LzoCAodfIQQ6b9kECbWloQ5dhXMIC+CJ+H2mJ8MnDBfEOe4wMGVZ8GOGiSC1LaoPDRy/
-         QHKQ==
+        bh=hKrVRoyW78yEO2SQvS5IegOdCkHEtUZJqpDGV6Xy6o8=;
+        b=UrLGILAkZjStemssUcmt5ZmpAM9JE2etxVZIjQihyghUl2Hjg65fY7pXnBObWYBwRE
+         5XWmm0ybiZF4t9Pismih7RAVheT3pLGy9YCn5js3plzXoxSXr59k/kZxjnJlWSGnYU2C
+         JSEuI4uHkdBHDuxvyaky67o6DAfm56tHatXClbcDUE5GQXvh1ZrSZRvlwQAuEUh/kuA/
+         3ho2hijFD2P6lMGRkyBIREiHApcNh7KAZkIRZoVVnG/4cDo71mhqFCRA6eI65A7A13VQ
+         9fM0SYIrAoWFBqtP+8+Vbm5g8O6odb2gkdkeKw4uYzaT6G+dO6vu/E2/Zl+F1LfVrl8O
+         HGQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743795616; x=1744400416;
+        d=1e100.net; s=20230601; t=1743795618; x=1744400418;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=abiJZqZPSgloceKnqEePK/H3ytaF6NiSgkualltBJX8=;
-        b=GBq3zMlpkxNs+r7zAXD9BEmupMbYR4D9eZoTUVWlTa7a2Czcpi4yfbV9ttfK2YvIGV
-         5UgaPSwR+b8wT+Gmqm+HTIYY9Fmt6r4W2QC/Xri6IFfTS3UHzFUD1xGg+68iQA5v3nC7
-         ipq4My9GGRMOto9/YiZ58BtlWb5QOYfxK/+5Onb5C6tqGJw2BdsXO1y8lcwajQXBLQaD
-         yw5Q0GsGio4mbZzkBUvPhHqoOQudKgXfUorT8zlRwm+QT+rA0FqosCo088PaXkPkqV25
-         oXQ/PTLnjsuG+s73hPpdhQKIdAdzkbK7uZkCmFQ2Cp5BbWYndZCHmfxO6elkQi9XNbd7
-         51VA==
-X-Gm-Message-State: AOJu0YynBzKvE9tQw3cCvklAStCUWQDKxEu2JZ2nxL4wigVfVJRFAVZE
-	CdR/3SZAhSPcuVCYPmBp3WhNEIr546JAmXiHosPCzP7N0jcs7huj8vuZU30y2PA=
-X-Gm-Gg: ASbGncsmG2Ggz4uOce6H5jaP+0nLDIKU3G1v0fdGgzKqsCe22BH7xLWuogAiGQoXTaQ
-	DtiVrW5syx0sJWLgARurrGiZtFq+tXymrZjb5ZjSlEgjm/O2ruiK+WISB2vcXiYv+r5x9ir9Pi4
-	1kBCWeQ4V09sn3AFhKId3uR6GAaeUfBi+njNOZTLrQbbbB/9x29MQm9Fk0ZhXE8Xon9s1dYXhxo
-	FOk++h2UMo23napd1IDJzha2WDhRdyOSaAz42dLOpmFHVJKGfkbV9osu+woSW6vmxI81WHldPuh
-	EJhDZ4135cgWRbENN5xhcBGjnJ7hVNeSx1qQjUT8PjlX1LrzN+YLUasGq1cEhQ9qROkpwqFEmvW
-	T6bGG7fS7MxS28Q==
-X-Google-Smtp-Source: AGHT+IGaSSQPynYR3la62Ef29Wf1zndMcFBOH3HoprRP/Q19C0Rs8Vf/+6ZCNkCCheygeSZ1VBYf2A==
-X-Received: by 2002:a05:6102:38d4:b0:4c1:a66f:a468 with SMTP id ada2fe7eead31-4c86378748amr602337137.22.1743795615828;
-        Fri, 04 Apr 2025 12:40:15 -0700 (PDT)
+        bh=hKrVRoyW78yEO2SQvS5IegOdCkHEtUZJqpDGV6Xy6o8=;
+        b=ixRKp1eT2IPU48gTGba/23OxY3Uv4m+QV46Fx+rjHRgsKjZabYypuP+a6B3RpKQiZX
+         F+XRv4hg7XipKx6xX2dYj2YkZWZqhNN7Twho3TeOrVPbx+kWcmQq+AiydbGkTR27WXx3
+         g92sLCCSg9ToH2yf0tAwU6GHl6kd+KYNpGfj6C1YLqAHvuJbsJMURYToBmnpSzRxYG0Q
+         BSgpouM/ZFymvhkbx3XVJPyjqN3J4h/PUwVcgzhVqyJLAQ/CBocUUZ+fkaRPqbcXEQA5
+         5JC3khecAxgMoPzpsfmAY8wVIEkoorGKcBCwLt7P63+0x14shNWqVcnr7wl/gRXez4Ce
+         QV4g==
+X-Gm-Message-State: AOJu0YzT9tWAh/h12gd2RYHIyZi919Num/lsBq75p0X3QDCtWq/p4G73
+	kgXN2PR+bSC8Otb6HqA9+8+QJtMSFK6c9xrjPNg7qIgzQssr2JoZJ+TTydgUL60=
+X-Gm-Gg: ASbGncuIT40NfZ1vmj4jQ2Umyqx+v6F17hfMgqpv+C6LEZ3r5apbV6YbfxcGJbesxq0
+	lKrnXrCqW+WZAP+T3FL04PLb4fzlkMAMkGiP9iviPXogWdinjQMzzw1cOPGdoFDO0vW7ciZy4vT
+	0grXEBlB8nHHfxJqaAEy7+glwi2PyrJNC9FtLiDtTl2+VDa1SdDkH7w0lYvon1vXPJtQFCVUGis
+	K8o29Nx9hEbcKm9SV7w3LoAJsBkmzSYrU4GSjqp2cfq62cdU58aFWLEtgkjk9SnnnIFW5hIBWUa
+	OXrbGno94AlfvvmV+SGycqXnNG8gvNSnfxWagyulqgVwMFmeblyavy+1Fmodxys4xcnFqaONeq9
+	xCyq3DjSDkFoNUA==
+X-Google-Smtp-Source: AGHT+IF+UWbd/b1wdgpeCaKHdGcbEura6KxfSSF7vMpu8zUGQP4cB9NFokHrvBWIQP2p0g2ZbeXYww==
+X-Received: by 2002:a67:be02:0:b0:4c1:8ded:2d66 with SMTP id ada2fe7eead31-4c845b9933dmr6742303137.12.1743795618024;
+        Fri, 04 Apr 2025 12:40:18 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8738b1d352esm718587241.19.2025.04.04.12.40.14
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8738b1d352esm718587241.19.2025.04.04.12.40.16
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 12:40:14 -0700 (PDT)
+        Fri, 04 Apr 2025 12:40:17 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 07/11] test-bap: Introduce USR/SCC Enable tests for LC3
-Date: Fri,  4 Apr 2025 15:39:45 -0400
-Message-ID: <20250404193959.359008-8-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 08/11] shared/bap: Fix not always sending Releasing state
+Date: Fri,  4 Apr 2025 15:39:46 -0400
+Message-ID: <20250404193959.359008-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250404193959.359008-1-luiz.dentz@gmail.com>
 References: <20250404193959.359008-1-luiz.dentz@gmail.com>
@@ -76,97 +76,82 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Unicast Server Performs Client-Initiated Disable Operation
-
-Test Purpose:
-Verify that a Unicast Server IUT can perform a client-initiated Disable
-operation for an ASE in the Enabling or Streaming state.
-
-Pass verdict:
-The IUT sends a notification of the ASE Control Point characteristic.
-
-Test Summary
-------------
-BAP/USR/SCC/BV-137-C [USR SRC Disable in Enabling State] Passed
-BAP/USR/SCC/BV-138-C [USR SNK Disable in Enabling or Streaming state] Passed
-BAP/USR/SCC/BV-139-C [USR SRC Disable in Streaming State] Passed
-Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
+In order for states to be sent the stream cannot be freed since
+pending_states could be pending due to be processing a CP operation, so
+this attempts to grap a reference to the stream so it is not freed
+while states are pending.
 ---
- unit/test-bap.c | 40 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 34 insertions(+), 6 deletions(-)
+ src/shared/bap.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index 5edcc739b675..73dac275907e 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -3349,8 +3349,8 @@ static struct test_config cfg_snk_disable = {
- 	IOV_DATA(0x52, 0x22, 0x00, 0x05, 0x01, 0x01), \
- 	IOV_DATA(0x1b, 0x22, 0x00, 0x05, 0x01, 0x01, 0x00, 0x00), \
- 	IOV_NULL, \
--	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x02, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
--			0x00, 0x02, 0x1a, 0x00, 0x02, 0x08, 0x00, 0x40, 0x9c, \
-+	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x02, 0x00, 0x00, 0x10, 0x27, 0x00, \
-+			0x00, 0x02, 0x28, 0x00, 0x02, 0x0a, 0x00, 0x40, 0x9c, \
- 			0x00)
- 
- #define SCC_SNK_DISABLE \
-@@ -3378,9 +3378,8 @@ static struct test_config cfg_src_disable = {
- 	IOV_DATA(0x52, 0x22, 0x00, 0x05, 0x01, 0x03), \
- 	IOV_DATA(0x1b, 0x22, 0x00, 0x05, 0x01, 0x03, 0x00, 0x00), \
- 	IOV_NULL, \
--	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x05, 0x00, 0x00, 0x4c, 0x1d, 0x00, \
--			0x00, 0x02, 0x1a, 0x00, 0x04, 0x08, 0x00, 0x40, 0x9c, \
--			0x00)
-+	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x05, 0x00, 0x00, 0x04, 0x03, 0x02, \
-+		 0x01, 0x00)
- #define SCC_SRC_DISABLE \
- 	SCC_SRC_ENABLE, \
- 	ASE_SRC_DISABLE
-@@ -3439,7 +3438,7 @@ static struct test_config cfg_src_disable_streaming = {
-  * The IUT successfully writes to the ASE Control Point characteristic with the
-  * opcode set to 0x05 (Disable) and the specified parameters.
-  */
--static void test_scc_disable(void)
-+static void test_ucl_scc_disable(void)
- {
- 	define_test("BAP/UCL/SCC/BV-103-C [UCL SNK Disable in Enabling State]",
- 			test_setup, test_client, &cfg_src_disable,
-@@ -3453,6 +3452,35 @@ static void test_scc_disable(void)
- 			SCC_SRC_DISABLE_STREAMING);
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 650bea2f4e8d..73d1b6192843 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -1283,8 +1283,10 @@ static void bap_abort_stream_req(struct bt_bap *bap,
+ 	queue_remove_all(bap->reqs, match_req_stream, stream, bap_req_abort);
  }
  
-+/* Unicast Server Performs Client-Initiated Disable Operation
-+ *
-+ * Test Purpose:
-+ * Verify that a Unicast Server IUT can perform a client-initiated Disable
-+ * operation for an ASE in the Enabling or Streaming state.
-+ *
-+ * Pass verdict:
-+ * The IUT sends a notification of the ASE Control Point characteristic.
-+ */
-+static void test_usr_scc_disable(void)
+-static void bt_bap_stream_unref(struct bt_bap_stream *stream)
++static void bt_bap_stream_unref(void *data)
+ {
++	struct bt_bap_stream *stream = data;
++
+ 	if (!stream)
+ 		return;
+ 
+@@ -1308,7 +1310,6 @@ static void bap_ucast_detach(struct bt_bap_stream *stream)
+ 	queue_remove(stream->bap->streams, stream);
+ 	bap_stream_clear_cfm(stream);
+ 
+-	stream->ep = NULL;
+ 	ep->stream = NULL;
+ 	bt_bap_stream_unref(stream);
+ }
+@@ -1751,6 +1752,16 @@ static bool stream_notify_state(void *data)
+ 	return false;
+ }
+ 
++static struct bt_bap_stream *bt_bap_stream_ref(struct bt_bap_stream *stream)
 +{
-+	define_test("BAP/USR/SCC/BV-137-C [USR SRC Disable in Enabling State]",
-+			test_setup_server, test_server, &cfg_src_disable,
-+			SCC_SRC_DISABLE);
-+	define_test("BAP/USR/SCC/BV-138-C [USR SNK Disable in Enabling or "
-+			"Streaming state]",
-+			test_setup_server, test_server, &cfg_snk_disable,
-+			SCC_SNK_DISABLE);
-+	define_test("BAP/USR/SCC/BV-139-C [USR SRC Disable in Streaming State]",
-+			test_setup, test_client, &cfg_src_disable_streaming,
-+			SCC_SRC_DISABLE_STREAMING);
++	if (!stream)
++		return NULL;
++
++	__sync_fetch_and_add(&stream->ref_count, 1);
++
++	return stream;
 +}
 +
-+static void test_scc_disable(void)
-+{
-+	test_ucl_scc_disable();
-+	test_usr_scc_disable();
-+}
-+
- static void bap_release(struct bt_bap_stream *stream,
- 					uint8_t code, uint8_t reason,
- 					void *user_data)
+ static void bap_ucast_set_state(struct bt_bap_stream *stream, uint8_t state)
+ {
+ 	struct bt_bap_endpoint *ep = stream->ep;
+@@ -1771,7 +1782,8 @@ static void bap_ucast_set_state(struct bt_bap_stream *stream, uint8_t state)
+ 	else if (!stream->state_id)
+ 		stream->state_id = timeout_add(BAP_PROCESS_TIMEOUT,
+ 						stream_notify_state,
+-						stream, NULL);
++						bt_bap_stream_ref(stream),
++						bt_bap_stream_unref);
+ 	else /* If a state_id is already pending then queue the old one */
+ 		queue_push_tail(stream->pending_states,
+ 				UINT_TO_PTR(ep->old_state));
+@@ -2258,16 +2270,6 @@ static unsigned int bap_ucast_release(struct bt_bap_stream *stream,
+ 	return req->id;
+ }
+ 
+-static struct bt_bap_stream *bt_bap_stream_ref(struct bt_bap_stream *stream)
+-{
+-	if (!stream)
+-		return NULL;
+-
+-	__sync_fetch_and_add(&stream->ref_count, 1);
+-
+-	return stream;
+-}
+-
+ static void bap_bcast_set_state(struct bt_bap_stream *stream, uint8_t state)
+ {
+ 	struct bt_bap *bap = stream->bap;
 -- 
 2.49.0
 
