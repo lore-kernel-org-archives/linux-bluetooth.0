@@ -1,130 +1,105 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99221CAA67
-	for <linux-bluetooth@vger.kernel.org>; Sat,  5 Apr 2025 11:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1915CA6B
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Apr 2025 20:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743851608; cv=none; b=ifxk8BvwPDIqcToQGz10FSt26m4pjs0Wa2CGDXpJhWFWkTB11l0LuM7mhRtSCD7T+Bn/kNCOeQy1VoLYfiQ2EfzDdKDHRbFan7Qu8U/9aMSvOd+HVySzNx3Ra+dTGMMQbDrENeH/VJJhsaXScPLePtG1Eh5aU9PsRH1UFQAvVQQ=
+	t=1743970224; cv=none; b=gWST/QjIiVGXR/phGoQXSUr1mvKz1BGsTRaok/IOAkWFWIVrUfe40lnhGBF+ppNzeC7vM/tWsUdSTpN+HnBwX44caYidlIvLaSQt3raJmgeMP1xvObBFDJ8p9pOB44l845fGkjY1NpcMzYkspdWg2c/trH1Joh1igjfG2tS1cM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743851608; c=relaxed/simple;
-	bh=OaZVfjgVrlPok3vg7AvUCyAYw1EXuk4MnqJbpg5xuqk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Mwf/OSOYRWxkUtzxb5VW+F/2T86QrHjw7VDOOPxPF+NWT99+sAzRMyo87ecmywgs+r0h4QknkQuBVoDX8Cm4GRo0uSMAMuaR0vA3C4wrWKIoaflZ0RpG/MYsqwJ6IUZnhISmDO69XPaOZd2wuI+5WiN4VW7nEbhfWosRcpmfnZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YW0kVTk1; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743970224; c=relaxed/simple;
+	bh=jH2cvGtBsvpZMSJ6OaDrQFL28kzgcLYK9NbsocgnfaM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cLuyAFBaPCyT8JNjjbPJ94BAFhZ8q5TKDDQtFzSK+TGRcOb0H7voQFrxeK4yxUsx6HrTDm2sc5C7ETq1zsg86euts9+FmPIYI2lyrr5awe6wddibj7ag/t2M4tI5cmeKc9jMxmXasa0+u0ecs5mdYezkYvTM4wfpWxiIeyrzIJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SNBLhkj3; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YW0kVTk1"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c55500d08cso266748185a.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 05 Apr 2025 04:13:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SNBLhkj3"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3912b75c0f2so499591f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Apr 2025 13:10:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743851605; x=1744456405; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=lhzOxRX9toAbVBaNHWlWNcJULAhBHvhSIi4HYzqAl/w=;
-        b=YW0kVTk1PJ4MpV+ZS/0NuTVR81AZ60nqjKh/kEVaPLHhGnG0THQeP6iJyRgxLNmnJD
-         Yz+Ce6S3hRJxRQMp8LjR4L4Vb5MtP2O+jM+L/F/WsuYoXGtsDm/+9WQWguUpCsDHZG0d
-         K11A9J/UVUAX9qdjvcyxKVyPhurQaTWUkgSgGdSEZ2CuTZxJCg27ux6ItBKOXg9laF89
-         XzczhPzE3AyR76vD5a4kKjpezlUaPmUfqrFaXbyhN3R928aJitDODBs4T4pNhWZgyEnY
-         so7FT4ff+3QVAKob3x8rl6keXVpF8BhPjo++DQeXFDaszn0jUugxf50PilJ/qMaHqrQ3
-         O5uQ==
+        d=linaro.org; s=google; t=1743970221; x=1744575021; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9DTqIB1KXItguWXeNYQcNwaI7W5L7sSNfK7n5CdOhYU=;
+        b=SNBLhkj3LJ+9ok8ivRsJIjHka/YPKO8qeO8C5QmhQzsgLT6mMfwaUkDdrrluSBr4Mu
+         qkQK/Bs9PLQI/qX7SUkCvd3IOjLQWzVe3JeHkerZmKR4HR43wOfp4XGLhzsfwwRxcTLu
+         0RwdPQAlOwK9do8tE0UeUXaeNTT9NX+mmkObZNnyg4WqF0J76lEh0LY+OtL3YL2J1Tuo
+         n9oA+hTni5Tl7HdE4usLu1fgYnEYnRWFy8tcI5WUezdOfVlXJVi/UaK2TUNOykqL3bfI
+         +Mh7EIYWXAYEx3YW8UZSONXxvS2gUa6xpA0t9tEz5MSy3V1MDDUYUHJMHy35oodFc+c7
+         7PNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743851605; x=1744456405;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1743970221; x=1744575021;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lhzOxRX9toAbVBaNHWlWNcJULAhBHvhSIi4HYzqAl/w=;
-        b=lq9uvgczP8QU4WjVzvwkZV8xG7XQfadI8JJOiiINMV2RQ1nDfE4sHlCWkfYhDHY7W5
-         6siTyX187WCOa8REGJXTb1vNTcMZeCkN+8vQwsRC2cdaCBNmQmzdBuSwvnOsz30rKHZi
-         EiOmBTZSzXfyGfkKR51fEstkS5AuW6UdnRAaawa7tqz03naEfg2lHZCBmDXRPXHwpBxN
-         2PFFpe03x3muczKJVb2Kzp4w5CKkQcsQy+sYOFFOI3Y7k5FFV8m3xUT+VyEXdiIvyXpj
-         JJgIYMbI4k9Jlu+G7g0SOdl/FJHoTnJYAk+HdmxT/UX7KkcJmiuLw4NzJN+331OoEV7Z
-         IjsQ==
-X-Gm-Message-State: AOJu0YzYu9nxZrDwUUxlSR7+gvOLUsd58toU017NeVEIyTFNwe7G0tjg
-	pP/6HbVzFDHEuJ1yyDCj84BSMIKRpdjqVlX67CfJgzMJx08sj1uU36TFxg==
-X-Gm-Gg: ASbGnct3UGFneJML32Psrit7INbLZmz/8vuY45UFDtEmrRCsJmn+Py5JSLYrZF+8p3x
-	GKRFDysYGbKjaPtDiH3hLP2ldPf3Sooegqq9HzbCtK2hH6sfaf0lpAT/oEkKGjrFs+vP44zWl9f
-	sCfNdevEvrVf15LUdBlgPiaoiZg4H5wo++HDz+e7yU3PCPMNB82YC5PnHXWhgCk1o+aIuT42gKR
-	pYJxCWuJK/QLT9cwmK2Ifs+oiGQKbVk3sKVmwM9tHXpQHd9Mdq5bvQjNXnik+A96er8DPDm0Eg/
-	LTVQ+f8MlXUPk6yCwg5oYzyd8exDZUreLbiPM1ac36Yrku/D
-X-Google-Smtp-Source: AGHT+IEQzhQnscs5cSYczotW3/lucUNJa4InBOm30vnc1w4Wp69Q3vztDQXMpv8MUaolfQUjVbG6Uw==
-X-Received: by 2002:a05:620a:298b:b0:7c5:4caa:21af with SMTP id af79cd13be357-7c77ddde0eamr436442885a.53.1743851605399;
-        Sat, 05 Apr 2025 04:13:25 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.17.68])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c76ea857f7sm322955585a.106.2025.04.05.04.13.24
+        bh=9DTqIB1KXItguWXeNYQcNwaI7W5L7sSNfK7n5CdOhYU=;
+        b=jbAUfmBO5544zOLhgRJpGWL3uwvy9YtnvvaNCGoP2P6emjfFfuBB3/PRlmfdYf15Pw
+         y786rjB4wPoAJn+bBL05EhMiYCcP4ayZr1h19EoOVs8ubyu2jbjpvdbjozxtqRLch2vs
+         RLW6mzlbRABvo3b+NByxNSDmDYb36AKnzVCyD6c3NYl5ZhwSv1lZw0WyDIFHBjHrBhTJ
+         ANqpAQWYUvYgaM0d0GAUdxbD0BxoYZQRh0PR/ByEKjKJxmg0i4EGdxFVWIS5ynvKF4UB
+         s0IejYXu7vzPlsuKQn1DVpJ4WftqLR4Rrl8ik6sUXPZjhSPPeFWzOi57YCy+H7Dyhmnw
+         3EyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlreCVI54YmH+MHPSvKRBA7yLHowza6DrMOGclsxEe/8SywAgClpryTNIV2hynW2+JIWVr/lE0RLVoqMXEOw4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwodgZk4NPEL17jwHs1TOieI9jrVAAmdbGsioowsQwbE1eoyAAz
+	IgxrBqYIlJGWcjqvnA7eow/t3G8+r9bO//3uDgw/C4CIl/UC8E/s/rYeDGgGNh0=
+X-Gm-Gg: ASbGncuFb93JQ9UbwWiNqOSP+xluiS/Z5X3Eic4iQplEftbmpVNRn6G9vl557kGw1TW
+	fKeTmGxCLTILHYWzkrFf99hBwC8qt5SBVfSPiPDXD6CUsZHfTCY/svh+8cFhbZ0ecTLziu0J89F
+	2I5SR/JLR1rBLb+DwduzQZFe6+dbemKwjmpVCtbSLOK+W7HQ94OBxDSitzNrjRYGrOMKnxRF7ur
+	lg6IcpUh6GX1+mwGpjY04ckgDMFlzecmR7XTB37FBA0ruedQFnC5OenkS9YMG5G78M9TcSW5oNv
+	Y929UNzcZ+xmidfaT2Zs8Bf1zAQxHxi3Dzk8u0189sw5de/6C+b2cA==
+X-Google-Smtp-Source: AGHT+IEaJAv7cq8up/ZJcJ41xkkrRi1H6wbFP+rMyncmJcukHJubfsFDxahu/j9T6NCNJr3cSnjNkA==
+X-Received: by 2002:a05:600c:548c:b0:43b:bbb9:e25f with SMTP id 5b1f17b1804b1-43ecfa05765mr31050015e9.6.1743970221127;
+        Sun, 06 Apr 2025 13:10:21 -0700 (PDT)
+Received: from shite.. ([178.197.198.86])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301acec9sm10080656f8f.40.2025.04.06.13.10.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Apr 2025 04:13:24 -0700 (PDT)
-Message-ID: <67f11054.050a0220.111dc5.a3a1@mx.google.com>
-Date: Sat, 05 Apr 2025 04:13:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5435137890010973630=="
+        Sun, 06 Apr 2025 13:10:20 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 1/2] Bluetooth: btmrvl_sdio: Fix wakeup source leaks on device unbind
+Date: Sun,  6 Apr 2025 22:10:16 +0200
+Message-ID: <20250406201017.47727-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v2] tools: add BPF timestamping tests
-In-Reply-To: <632807049a6b64e11103b95163ffa5de8f18a4ed.1743846534.git.pav@iki.fi>
-References: <632807049a6b64e11103b95163ffa5de8f18a4ed.1743846534.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5435137890010973630==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Device can be unbound or probe can fail, so driver must also release
+memory for the wakeup source.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=950146
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.20 seconds
-GitLint                       PENDING   0.19 seconds
-BuildEll                      PASS      20.99 seconds
-BluezMake                     PASS      1631.60 seconds
-MakeCheck                     PASS      13.98 seconds
-MakeDistcheck                 PASS      163.79 seconds
-CheckValgrind                 PASS      224.03 seconds
-CheckSmatch                   WARNING   294.82 seconds
-bluezmakeextell               PASS      103.18 seconds
-IncrementalBuild              PENDING   0.18 seconds
-ScanBuild                     PASS      886.40 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/sco-tester.c: note: in included file:./lib/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth.h:237:31: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btmrvl_sdio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 07cd308f7abf..93932a0d8625 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -100,7 +100,9 @@ static int btmrvl_sdio_probe_of(struct device *dev,
+ 			}
+ 
+ 			/* Configure wakeup (enabled by default) */
+-			device_init_wakeup(dev, true);
++			ret = devm_device_init_wakeup(dev);
++			if (ret)
++				return dev_err_probe(dev, ret, "Failed to init wakeup\n");
+ 		}
+ 	}
+ 
+-- 
+2.45.2
 
---===============5435137890010973630==--
