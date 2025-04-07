@@ -1,68 +1,68 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8804F2222C4
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 20:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300642222C4
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 20:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744056131; cv=none; b=phTCIqlW2D7nEVyy0VK5RfJqKqNIIl6WCuIUQcrT0Fx4ZG6NWAYpL0m8nmFAvREqigjvNrf2izN2p2YwfWoggA6yZB0yKzWsKPxsRk8kqqjzcn7ZIS9QH9atsw6dJQAqSsJBh0KLsEOeBnjWKyCSZxUvOqVzF3Dnc+iW/FAq+FA=
+	t=1744056133; cv=none; b=quxSmXLS5I8jao4EKsUfNbVECz9k0QlTyNTqnBNNfV3XnStp8p/iri8BSj63YjaFlHrcmMH0tFhAewEd1prD2J6dN75KdgwpHoDY9QzhgSjIs09N/Z56SXpLA8to9UY1ahalxsjTwgyrp76jsGBVBjtVtuMkZ6wkNTRu4yA0EQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744056131; c=relaxed/simple;
-	bh=6IDTVKF2V9igFEgIWeSddA+HgqYPaB8uSQ0WRp4pd4I=;
+	s=arc-20240116; t=1744056133; c=relaxed/simple;
+	bh=rtFznkee/hfiJclSoLZHUJ06b11xpiXnJ35OAR/6dV4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dOb58jUNR1oGivrvoNRs3fkm2rAeliFXzhDAXpqkp8606vBsxoxuoswarX2VOxg8o6dCyxwSuRdU+SMTJc4ypSIEePSzLjko8f68sjMqkEA6+R55wmUYOqLC3qGndPFLg6pBl1ZWo+SaPGsJjCeiOOZxI4FbSR29SF0VlQUsMrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dtHJP9VY; arc=none smtp.client-ip=209.85.221.175
+	 MIME-Version; b=m9u+X4datKj2jVbnP7+CGJXeuR3BnZ4KtgtoRsxVYkcQI6jr9IfAdeqmS2GScpsAph0+YBn+/rA+EHp0EA6lw9pBzfvWSMPuSHAhXHkHU6FvANHof5l7ejgNqUdGSovFoLnJbzq96gw2EY5UpDx70TelpYBx+K83kP9zp1CAAhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fk0TCWZ2; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtHJP9VY"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5259331b31eso2232430e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 13:02:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fk0TCWZ2"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-85dac9729c3so323743339f.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 13:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744056128; x=1744660928; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744056130; x=1744660930; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=R26u60CrrYvf7mC775l8Z8/4e5MyzOnBvrVyYtVW+T4=;
-        b=dtHJP9VY+YkLkeYJpiI0bh3CDpzf/MCvt+/QxXp8ePHZSBPAEIWz1QZ2viyq7jeda7
-         PekI05Xegj+OE5Atm0XazHTRnXRHyf+DFtj3MSZxzKFi9wc1Ye2ZXZbZIkteK3vZ0Qo3
-         AaaJA9YqKMN2FphEgSsSenMFtDhymDrR7V6+1YGUOvG6Lnk/GlqWimLlfWxFpCcF15tw
-         nG+SdTgPlJl00uwZh+xl00QSWQetp9k5i+pWOE2ynJWtKLddczoGHyKnYN7koh64gGb7
-         SuEHc4NXy89KI5rvfuCmq38yARO9E6MMaHi1O+eHdjDknA4TDAHPyeHf6ovz/VHnaX+F
-         AQzw==
+        bh=KhOLzS/aTB7p+rCSf6gjBGzekkXKtABaMGKHSe8dHUE=;
+        b=Fk0TCWZ2+igi01Ezd599ULc5vMZgK049VlelTjPSbE+ycpsvP8RRcc1vpxq0lGYl+z
+         nrEukUs/cV7AAJa7vxn/S4RsriteGW91+Fpt6TyoTZFeAGmSnP/S4od4EobzYJkgAHtO
+         BYZPTR3fkBKHFatqS2U90AMHGKlirqgcNY4pL+JAUT2toxWsa6cwmULOhtRrz7KjoCzg
+         nkAanh20lq2SUVXt68X3dkKysFidEtyMY0L+WYGsCi2Kr30KYMJ/kUK7ggkwJiIiuQDV
+         CJ8oJimkh0R6K0xOyQsdr5SuNDEq7ZsCIGhU+OjsqEyVE/eViWtZ27xvbklQeGfKba4c
+         Vuyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744056128; x=1744660928;
+        d=1e100.net; s=20230601; t=1744056130; x=1744660930;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R26u60CrrYvf7mC775l8Z8/4e5MyzOnBvrVyYtVW+T4=;
-        b=QzHZuCgZaoMCk/0D7AzN2poXf+hbRe7qbVVQVWoAGVYrHu7bk4/zNo6cljQ0a80Bf/
-         occrUqSx02yfK58lCRuqpTeKbFpZdupukvgZgjNODBysrm//TEa4HEJ11u6tar2O8afJ
-         wsn+XkINfTjDyjD9Z5mSjXGtTq7LN7v+EzjtHSEeJIp0x0TVgOQ2hJ4kv8UQSPHQ7T7a
-         Yf6JF5Ioo5KeKvzgubenic1acFzWW4BdcvsLmbp3zPo0lbQ4kEJdK+LV+5CwjaXrcfxt
-         VTZlINuPwv91y3lVM6/dGVAeb6OETkk3Gs7da+eWOSbLDx4jF4iPZuiyv8z9/nGQ5DJ1
-         SVhw==
-X-Gm-Message-State: AOJu0YwZLtSiLkPUxS7y5mvAXJcIuICpkD96YRWa4/MbyKtHTp5WuWOR
-	6n+qA2/h5VF6xVTYzk30pZjO11+2p+BBc8ySlolzLJPYm+JzpeYknVbpri4a
-X-Gm-Gg: ASbGncupDBBCWcZPnlhDJGErQ11VJNUo+LMdMcyufbGNwjwi6tk+wEwYKSK4Ct2EioU
-	PQ/UJ0fEzcW62IayEhOtVAtdIXLu101h0bepUSZrTfnf5rKfl/4iXAHFYK3EhqfHOLF0/Pp6vZK
-	+6/9UoU0X+Jsz3AViFWwn6f0GZY6puPeRJ2fmCgz+95TYpD8Ru16YDhDxtbcEAdVrU/NurrKyqD
-	cHrwsSOKUKoMz1o/yHga6MAsG0M37tFLaP5g5G71gN02g5gtqhyM4wvGFSfOPaL2Jy5v1pC7fFI
-	31tmSYExBRZASYvEXD0Fa1nK+IenDefoU91tk/XbpmDPUxOs+HsasnmR9jEzXvuzuwwDNxzgEW/
-	PAJm+zS6OTh1qbw==
-X-Google-Smtp-Source: AGHT+IH6p9VavrHI0wMfKEoQrvaPFtsxVkGJhYB4qo/D3RoE0XV6IDOmJwQzLj3v/5814DasrK+Bow==
-X-Received: by 2002:a05:6122:32cf:b0:519:fcf2:ef51 with SMTP id 71dfb90a1353d-52765c8dffcmr9682767e0c.5.1744056127700;
-        Mon, 07 Apr 2025 13:02:07 -0700 (PDT)
+        bh=KhOLzS/aTB7p+rCSf6gjBGzekkXKtABaMGKHSe8dHUE=;
+        b=WwvRqmC5PUH05w7gVSkYTtUKEyYZWmDkLwLGuFw14pVmFFtcaDj9gxRSkTnm4CanEk
+         lRA1mDzFiXi+OTRxt0YtHS8T2Rq3o2ngWxrkdT8nVg6Kavskn5clrPEqw2Bxh8IyIXNd
+         9hqFgCXasb9W3gEcv9L21k8+TVqEbERp21MM8O15g5oVxx8WMquCDlprQh2TJHsj8o/3
+         2Y/2p9bCGkGHokCKcn6e6KSkgM53ZInKCFLSgKe3Dx3dsK9xhhRjxUcEeP+vvz6TLcPZ
+         nNq+eQlzoU10elPi6BUu78WLMYYESrBxbL2iMBtkj8mI0aNoReT8pBc5jpzKQJgGamjM
+         zouA==
+X-Gm-Message-State: AOJu0YyH6csaqgjLJskWHuIL7F414CDcNfA7PA1sLJ+F1+NJonAqw9ga
+	oEPU2q8ZrbfZCTISCAjbSKXBTCDKHpooJ4QLHAxn9luCZVIfj2XsZGhw0VsB
+X-Gm-Gg: ASbGncsfHSrtwUEfAdwhGoafLfmaAJ9b3O1RrQvOGPps75FYiIG3qYaSHJGIuECY7jn
+	iH4CzQyojRIfnSuuipvIeHx06XQcyoGavsgw6iD/7Uch4AzR41nSECctYz0NhIVZRMQcbNYJPoE
+	q3dn1dy4fRV+XDMTMxkOhzWXvOSH1jbwl9d8st4mAQFdO9pIRuueGM3uKmhOp+y2P/Yo7281Bwd
+	MPWyhcR17DSCDPUhsd0Hurcnpq5IwjPKqgSlv/onmB336x3VRk51IJwGpITNWvMwDIMW7qmRa8N
+	wZppKVa9THXV5SNnVv+abPR48bEPjvxvoxtNVETMxcCXSkWKYYBPCxehBS5HMzg7n/l+0wUPI8o
+	BiMCwThV6TU0+8Q==
+X-Google-Smtp-Source: AGHT+IGhB9HrKv4I3bFsg9iIwaoSWL2Mn+mPrF6FWAStG/0+KyTxXqMIu4ryoDSmDB6pTFUR1VwJ+A==
+X-Received: by 2002:a05:6122:181b:b0:520:9688:d1bb with SMTP id 71dfb90a1353d-52772ede57bmr6997386e0c.2.1744056119554;
+        Mon, 07 Apr 2025 13:01:59 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5279b691f07sm69140e0c.41.2025.04.07.13.02.05
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5279b691f07sm69140e0c.41.2025.04.07.13.01.56
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 13:02:06 -0700 (PDT)
+        Mon, 07 Apr 2025 13:01:57 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 14/15] shared/tester: Fix not detecting NULL packets
-Date: Mon,  7 Apr 2025 16:01:20 -0400
-Message-ID: <20250407200124.881534-15-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 11/15] shared/bap: Fix not sending ASE Notication in case of Metadata update
+Date: Mon,  7 Apr 2025 16:01:17 -0400
+Message-ID: <20250407200124.881534-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250407200124.881534-1-luiz.dentz@gmail.com>
 References: <20250407200124.881534-1-luiz.dentz@gmail.com>
@@ -76,26 +76,26 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When receiving packets if the iovec is NULL it means it shall be
-skipped.
+Tests such if metadata update requires the server to generate ASE
+notification on Update Metadata operation.
 ---
- src/shared/tester.c | 3 +++
+ src/shared/bap.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 56c8cba6f578..371ccacedc66 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -978,6 +978,9 @@ static bool test_io_recv(struct io *io, void *user_data)
- 	if (!iov)
- 		return true;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index ec23e882f389..76f221102dc6 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2162,6 +2162,9 @@ static uint8_t stream_metadata(struct bt_bap_stream *stream, struct iovec *meta,
+ 	util_iov_free(stream->meta, 1);
+ 	stream->meta = util_iov_dup(meta, 1);
  
-+	if (test->iovcnt && !iov->iov_base)
-+		iov = test_get_iov(test);
++	/* Force state change to the same state to update the metadata */
++	stream_set_state(stream, bt_bap_stream_get_state(stream));
 +
- 	g_assert_cmpint(len, ==, iov->iov_len);
+ 	return 0;
+ }
  
- 	if (memcmp(buf, iov->iov_base, len))
 -- 
 2.49.0
 
