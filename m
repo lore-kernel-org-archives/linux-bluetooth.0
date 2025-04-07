@@ -1,68 +1,68 @@
 Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA538221D88
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 20:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB68221D88
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 20:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744056116; cv=none; b=UVPztq9L1M1id0LhDnwzpWXxKHSc0T4DXArs1i0FaVTIAlirb0cpRCQFVdl87StYmgsX51a6RKXqSdcFqE8vj8zzhDwin+WN2f42sRuftOZhdpDhiPPnFZk4bF49sRg7ztHhrnhnFd5AbyrD6i9CwRHpQ0c1US7a02bXtMJWMDI=
+	t=1744056119; cv=none; b=Bf74W65sN4breg3D2wuTQ+1d8ykrkGbKssgNordA87PzzQx5XVESUcjJihsyWRKthv2urTdg/gCkLlybtYExUsUSVO7YfQS2fUdr8IYgPl/mHsIwEn1N0des6IUv8aF+VBk0T+sidVJYssVSjZg3qeg88+dgu8tv/+PYNKkJ0FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744056116; c=relaxed/simple;
-	bh=RLeTl37TW4N6Zfr0lHg8RGps8YFC3vjs7wWMgOXyoYw=;
+	s=arc-20240116; t=1744056119; c=relaxed/simple;
+	bh=sUscmQJlqFR2lS0AjSQV2lEVK/T+ghgD+cWQTpeyb20=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lk7nPfSwTHWEuI5aNdvTpDPPGg8gHKL9CAzSCn2cCuiIw3gtm0t+dR3b7xd9CE8rPTVt/dHxNicMXFMtbKLqxAl6S09yap+kLQMLqocy27wpHDUECtcqaGOoaIuNKjNN+snuRkvI5eQWjDtsvfFUgthgkFS3gzxpsggerB90iN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AkHAeFq/; arc=none smtp.client-ip=209.85.221.171
+	 MIME-Version; b=TbsaveMyaAgjPviUpFqCPa4/49xLmoXOod+Qo7oRBW2AFuu/ZpOhxTA4/Ie8CKWJ3hJdGTw2Kb8P9rame+EYY29GiWX8pgVS3RBgmmeNPAu5unlO1SyK+PiqKN7JIUIOHjJ0QMwsel3M9ovbbWiS86R/PyI7QAZghWvgyIt5lCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=INw5KEzW; arc=none smtp.client-ip=209.85.221.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AkHAeFq/"
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-524125f6cadso4515002e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 13:01:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="INw5KEzW"
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-52403e39a23so3856448e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 13:01:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744056112; x=1744660912; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744056116; x=1744660916; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3zRNsq30CgpjucwwcKkU/6QUB6ZkvtlRSn7jRFOzCxI=;
-        b=AkHAeFq/VTQLscI0zcvCxtuGfu7E/pC84NV6GgN6FIXr7vNHCqdD8F1ofFXm2eWP2J
-         VweoJuSzQrsLiWNQhsGFJRduu/iWmiFZ5S+eJZ2VjV1wX1NQDXxHXuwAFUoPISpeVO8u
-         vaMbzwFGMdyB45bShTswJhrFCHP+kcDV7qM8/Qs+35YrMTDbsLvscyLnILu/q7gWx4Ad
-         geOcpRyTe4oP2tPyzEWV0fWk9lKcUDeLoQ2hIKza6XmpbkJVnyselE0AniPWpJLOxNHh
-         Cl6b3tKIxTr1rM3sOp4fU+cSk2Zb60lHjp/8s8/fw7wvjzScyvYDoUs36GnJWaNC5v0I
-         jZqQ==
+        bh=mjGAIa1i+etugNmeAp6Vtd5kmpIXm+DHp1189Qjs204=;
+        b=INw5KEzWWmZebAdwrG9jL/5gnYguxkisa5LVapUQjxFQKacN+6W5uPbJZytwJ2o15N
+         b1XdOpmkv5K2tP91Hr7/hJ7ExNT/dALsJ+1wN3OZsEfmAtoIHCjnFAV+ZVILqmmkVNd8
+         WvbCfEULEVcsQdlhKfldo8CpA8BYrVJo/l45BZ0AkrB+jcmL7eMwoHmOooOqFops26mi
+         ZFOgaiXKPQg5UISVhtP3g5Crrzpm/InbAKAUSP7u9wigDTVOoLniai6ngJNSpolIV2lK
+         SbwtFlnN7B8zHm9kYEwxLOSRcqX0u7zCwzn4ppYeMUKyvaB/AndIFVtCpBqMmG5uGRvf
+         biKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744056112; x=1744660912;
+        d=1e100.net; s=20230601; t=1744056116; x=1744660916;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3zRNsq30CgpjucwwcKkU/6QUB6ZkvtlRSn7jRFOzCxI=;
-        b=JhfPFjv6IhNMAAnAGKoJdxxMAkhq6cM4Mzkc4q6H+YIP/kPG8PfpvshHZj282TS4bB
-         32DmRldAWDe2tCFUiygTC7c4AclLy7dkQWsr8RKolj6Cje912xAbj5RCVL60+g9v0r1A
-         EznRYngBrooicYbbM+QRzXW9/qtwK7Wn6yC6mC1MVhBYF0374Z0M6BYzoMCojlTRF2PV
-         qsCYXj69dv3pEFxszQBKAciSiXW+RHDznk6sHT12pXr0PLml21IWH7+TF2S6qc+PG+ew
-         Qw5KOrWXC7HuGlKrmeDKWmVg4Lekc/KKVYuCqV6aINd4nmkMymkoJ6ivDoomjuW4ZV3V
-         UXEg==
-X-Gm-Message-State: AOJu0YzlFH9KoUKhW9zVCnJYCd7+JwOPbdMSPiPA6LsGkxFxo9oBrldn
-	zo9e0ph/51QHRC8Ds4diO3iPj4iyCd8ssHpXXIOy8HYqQ7tm9NWPNp3qdUio
-X-Gm-Gg: ASbGnctGEFAs0+ZSHpSKcGIhSOVUr3IGNax4aTOuENNzlgvmhvT/avk87RAbN+xiqlN
-	xUZlthGSBdko1v6hmBCWPD5fiTqWZJISdAc8NNhd0+t2s4ZTX45Zh+Y5vWhsG+dhCvg2R4EydTE
-	2Xc9S0+Lj23VCZuqt/+RbGds4N3oVD/yY0ZQOpHbfEiT3poff+j40tX0A4EuJm/DHGjd4OOiHcg
-	tDrISHh9+jBak3cE73h090TGBuDjvsiogOqqhnGM6U9YABc/yPgfg85vW3NDUW1MFrv49OsFOoD
-	Inio4u2yce+3IMU+p6C5nuZWuZoslc6htPXyUk6zKPHgpIbUXAF+nCJ0IolAHb78HE/XHLYgA8Q
-	xDVXVFnq6rPaRPQ==
-X-Google-Smtp-Source: AGHT+IF85pW/TGF3YVHqcnEKOGdNS1AKxEckvTyajAT6GaK5QEMDlf49pi8ubaipPV0t7iHDYWoI8Q==
-X-Received: by 2002:a05:6122:2516:b0:520:6773:e5ba with SMTP id 71dfb90a1353d-52765c03cd1mr11542751e0c.2.1744056112355;
-        Mon, 07 Apr 2025 13:01:52 -0700 (PDT)
+        bh=mjGAIa1i+etugNmeAp6Vtd5kmpIXm+DHp1189Qjs204=;
+        b=xEJYbAR5mbfOOeXry5MkAiwiwvRRmBl/0pWP1Vx0KrIZnHNeYvC8a/CDwBes/cz3qB
+         3UDs+mZqP1NG4zOtf+eAxzyGJGGXqpIPUhTi/EZNuGuqB42e4VaJgoTe7Kd7bohTE2Ry
+         lCbGX3dqyuUse9ub2yDS/wqAM5hUZ2qR3rqYllqEb3dpS7aMuUCV9oZhzbz/KxvhGlPq
+         +8a471PWpFS4XP0RBI7LoCjbwdeBMLWrpiQrmukpVzDkWLd8YBpTSUHdSGZ/+dro06A5
+         oVHYA0c2E0lBG8Z4WEJwO8vkr+HFdTRwgx8Y/tEDeLEgW5Jaeh6eV0IDzFFBCI5/I37c
+         wP0A==
+X-Gm-Message-State: AOJu0YwaoBp5xu3AqtQSd+g0y5jWAuRhiHmHt2nChfYqxpGgYojX3lON
+	iN+I/MO+qbghj7jNjJSx2iaFvehXJCbJVRhqSoU6w95w1+FfbdAZNk+dItZB
+X-Gm-Gg: ASbGncvLD5BsAF8BXlpKEZseY9tshvKGxgtW2rEe/ymr8FbnJB5TS6Ky10SG3uU5T4S
+	qZYaY9STvj2p52tGpKeX6owJhLoyBBoekWwCQ8xxuOHQdA5UEKp0g3XFxiKupOy8Hx57cmvLD2t
+	NNVU89xwuCScKc6eTwFRIg21ElMv2gSs22PbVVwzDdWnMsiTQ+5xlKard6vW4jwjixhS3FjVt79
+	WNlYVdClnib+fZYja8pW1ivrhncBFR98x0pT967L/O5vkeu3S1FlsvsvrsclOa9j9CTMbe1QF1M
+	9NIT9Q52GyCk/T1b7xPmWI7yymMuKKFtl668AolLKmExFzFufekGn55mFtD42VfD4vRxrOuZu6Q
+	sP/sGkPK0wttVQg==
+X-Google-Smtp-Source: AGHT+IG/iAfQ5TO/cEjYNH6tMyAh4xRYPykhvqTh+LIOnMIZM51iXqoshiCD6WRnsmMtA69yubMBnQ==
+X-Received: by 2002:a05:6122:251f:b0:520:61ee:c7f9 with SMTP id 71dfb90a1353d-52773051a54mr7824333e0c.7.1744056116230;
+        Mon, 07 Apr 2025 13:01:56 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5279b691f07sm69140e0c.41.2025.04.07.13.01.48
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5279b691f07sm69140e0c.41.2025.04.07.13.01.52
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 13:01:50 -0700 (PDT)
+        Mon, 07 Apr 2025 13:01:54 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 09/15] shared/bap: Fix not notifying idle state
-Date: Mon,  7 Apr 2025 16:01:15 -0400
-Message-ID: <20250407200124.881534-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 10/15] test-bap: Introduce USR/SCC Release tests for LC3
+Date: Mon,  7 Apr 2025 16:01:16 -0400
+Message-ID: <20250407200124.881534-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250407200124.881534-1-luiz.dentz@gmail.com>
 References: <20250407200124.881534-1-luiz.dentz@gmail.com>
@@ -76,45 +76,125 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The idle state must be notified like any other state.
----
- src/shared/bap.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Unicast Server Performs Client-Initiated Release Operation
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index dbeb43fe509d..ec23e882f389 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -1138,6 +1138,21 @@ static void stream_notify_release(struct bt_bap_stream *stream)
- 					bt_bap_get_att(stream->bap));
+Test Purpose:
+Verify the behavior of a Unicast Server IUT when a Unicast Client initiates
+a Release operation.
+
+Pass verdict:
+The IUT sends a notification of the ASE Control Point characteristic value.
+
+Test Summary
+------------
+BAP/USR/SCC/BV-143-C [USR SRC Release in Codec Configured state] Passed
+BAP/USR/SCC/BV-144-C [USR SNK Release in Codec Configured state] Passed
+BAP/USR/SCC/BV-145-C [USR SRC Release in QoS Configured state] Passed
+BAP/USR/SCC/BV-146-C [USR SNK Release in QoS Configured state] Passed
+BAP/USR/SCC/BV-147-C [USR SRC Release in Enabling state] Passed
+BAP/USR/SCC/BV-148-C [USR SNK Release in Enabling or Streaming state] Passed
+BAP/USR/SCC/BV-149-C [USR SRC Release in Streaming state] Passed
+BAP/USR/SCC/BV-150-C [USR SRC Release in Disabling state] Passed
+Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
+---
+ unit/test-bap.c | 56 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 49 insertions(+), 7 deletions(-)
+
+diff --git a/unit/test-bap.c b/unit/test-bap.c
+index 73dac275907e..c77fc83d83de 100644
+--- a/unit/test-bap.c
++++ b/unit/test-bap.c
+@@ -1160,10 +1160,6 @@ static void bap_attached(struct bt_bap *bap, void *user_data)
+ 	data->bap = bap;
+ 
+ 	bt_bap_set_debug(data->bap, print_debug, "bt_bap:", NULL);
+-
+-	if (data->cfg && data->cfg->state_func)
+-		bt_bap_state_register(data->bap, data->cfg->state_func, NULL,
+-						data, NULL);
  }
  
-+static void stream_notify_idle(struct bt_bap_stream *stream)
+ static void test_server(const void *user_data)
+@@ -3525,7 +3521,7 @@ static struct test_config cfg_src_cc_release = {
+ 	IOV_DATA(0x52, 0x22, 0x00, 0x08, 0x01, 0x03), \
+ 	IOV_DATA(0x1b, 0x22, 0x00, 0x08, 0x01, 0x03, 0x00, 0x00), \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x00)
++	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x06)
+ 
+ #define SCC_SRC_CC_RELEASE \
+ 	SCC_SRC_16_2, \
+@@ -3552,7 +3548,7 @@ static struct test_config cfg_snk_cc_release = {
+ 	IOV_DATA(0x52, 0x22, 0x00, 0x08, 0x01, 0x01), \
+ 	IOV_DATA(0x1b, 0x22, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00), \
+ 	IOV_NULL, \
+-	IOV_DATA(0x1b, 0x16, 0x00, 0x03, 0x00)
++	IOV_DATA(0x1b, 0x16, 0x00, 0x01, 0x06)
+ 
+ #define SCC_SNK_CC_RELEASE \
+ 	SCC_SNK_16_2, \
+@@ -3699,7 +3695,7 @@ static struct test_config cfg_src_disable_release = {
+  * The IUT successfully writes to the ASE Control Point characteristic with the
+  * opcode set to 0x08 (Release) and the specified parameters.
+  */
+-static void test_scc_release(void)
++static void test_ucl_scc_release(void)
+ {
+ 	define_test("BAP/UCL/SCC/BV-106-C [UCL SNK Release in Codec Configured"
+ 			" state]",
+@@ -3732,6 +3728,52 @@ static void test_scc_release(void)
+ 			SCC_SRC_DISABLE_RELEASE);
+ }
+ 
++/* Unicast Server Performs Client-Initiated Release Operation
++ *
++ * Test Purpose:
++ * Verify the behavior of a Unicast Server IUT when a Unicast Client initiates
++ * a Release operation.
++ *
++ */
++static void test_usr_scc_release(void)
 +{
-+	struct bt_bap_endpoint *ep = stream->ep;
-+	struct bt_ascs_ase_status status;
-+
-+	DBG(stream->bap, "stream %p", stream);
-+
-+	memset(&status, 0, sizeof(status));
-+	status.id = ep->id;
-+	status.state = BT_ASCS_ASE_STATE_IDLE;
-+
-+	gatt_db_attribute_notify(ep->attr, (void *)&status, sizeof(status),
-+					bt_bap_get_att(stream->bap));
++	define_test("BAP/USR/SCC/BV-143-C [USR SRC Release in Codec Configured"
++			" state]",
++			test_setup_server, test_server, &cfg_src_cc_release,
++			SCC_SRC_CC_RELEASE);
++	define_test("BAP/USR/SCC/BV-144-C [USR SNK Release in Codec Configured"
++			" state]",
++			test_setup_server, test_server, &cfg_snk_cc_release,
++			SCC_SNK_CC_RELEASE);
++	define_test("BAP/USR/SCC/BV-145-C [USR SRC Release in QoS Configured"
++			" state]",
++			test_setup_server, test_server, &cfg_src_qos_release,
++			SCC_SRC_QOS_RELEASE);
++	define_test("BAP/USR/SCC/BV-146-C [USR SNK Release in QoS Configured"
++			" state]",
++			test_setup_server, test_server, &cfg_snk_qos_release,
++			SCC_SNK_QOS_RELEASE);
++	define_test("BAP/USR/SCC/BV-147-C [USR SRC Release in Enabling state]",
++			test_setup_server, test_server, &cfg_src_enable_release,
++			SCC_SRC_ENABLE_RELEASE);
++	define_test("BAP/USR/SCC/BV-148-C [USR SNK Release in Enabling or"
++			" Streaming state]",
++			test_setup_server, test_server, &cfg_snk_enable_release,
++			SCC_SNK_ENABLE_RELEASE);
++	define_test("BAP/USR/SCC/BV-149-C [USR SRC Release in Streaming state]",
++			test_setup_server, test_server, &cfg_src_start_release,
++			SCC_SRC_START_RELEASE);
++	define_test("BAP/USR/SCC/BV-150-C [USR SRC Release in Disabling state]",
++			test_setup_server, test_server,
++			&cfg_src_disable_release, SCC_SRC_DISABLE_RELEASE);
 +}
 +
- static struct bt_bap *bt_bap_ref_safe(struct bt_bap *bap)
- {
- 	if (!bap || !bap->ref_count || !queue_find(sessions, NULL, bap))
-@@ -1712,6 +1727,7 @@ static void stream_notify(struct bt_bap_stream *stream, uint8_t state)
- 
- 	switch (state) {
- 	case BT_ASCS_ASE_STATE_IDLE:
-+		stream_notify_idle(stream);
- 		break;
- 	case BT_ASCS_ASE_STATE_CONFIG:
- 		stream_notify_config(stream);
++static void test_scc_release(void)
++{
++	test_ucl_scc_release();
++	test_usr_scc_release();
++}
++
+ static void bap_metadata(struct bt_bap_stream *stream,
+ 					uint8_t code, uint8_t reason,
+ 					void *user_data)
 -- 
 2.49.0
 
