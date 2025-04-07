@@ -1,130 +1,177 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0A322DFA0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 11:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B3C5680
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 13:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744025994; cv=none; b=drHQfRJDaQVYBwZnNfEwXPv9dermjmEUcO+ERdxtWuIxakecvzJgzOaZG9Q/njXM/U2EUD/9uf1xTVzQhjRFoUSoR9UyBkWM9OjJMf0RfwZuBNBlbS5SANRD4YVac1VeeO3FIqLbbHVI4UkgMfnhSQ+Z0yadTsqq7M9s2Yx/zXs=
+	t=1744031298; cv=none; b=Y+9rBFTFX1siLGpKFKAG4Zhiw5QuB1ZYJ2hfus6j7dFmMZegswaabxBhHOsp9hlNwCjIwuaCb4RKyoh5R/RkDHsjrakuDUsAPm0tFNAcXYTEGBmkbQihOinUlE/paN2arICzxgpFWfxlx+yUTsTnk17EAFCGrsGcdN7NQXqkW6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744025994; c=relaxed/simple;
-	bh=EhfCFOcWzy/IozR5KL66MnSMzgd1cYp0lsv4oZc30cg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=sSdOCjl9hIgcDj/t5u0yQre8s53wS11PHcVarHudEHSYJGcwcWqqx+iiX6GnQbXwQr6ZnOYRQLuAQxebQ2tIMqIwX0mwifHhCfrIj72mgd6bOUNzALNegT/veLw8nVxxaqqtw/g1lqRbciJUba1yN2cqpJssAAmiM0nDQztH9pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=He4T5zhl; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1744031298; c=relaxed/simple;
+	bh=1tp3pARZ5qNFDuKf947k17A1igg9tJ0UxdhC7qvkJ2I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aI0GUOMU71Au31hssOTZHrx2EUaYeaoBAIXoMhY4W0s93PZRT0t0ghKRKEHB7XsSflh8/5St2stMmPPuyZmIQgDFAh9/MbCMBCUkI+YzxDzcIogMfCvYnF3O061eK780M2UZE8iD5HuVKg+QnrqL+w/cygyzgg0sFeFMR45v3Mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lmWdtPWT; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="He4T5zhl"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-30572effb26so3670273a91.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 04:39:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lmWdtPWT"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-549967c72bcso5160873e87.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 06:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744025992; x=1744630792; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=icnT745Hi18TmYNEA7v25BWLtQBZP+GvOVM9XU9S5jc=;
-        b=He4T5zhlgCYfWOUYkArrLZYdb4OU514gM+Kygb5EJiRdByKggylT3j18rgxCJQGid2
-         CjsQtW5118Na9ykPema2lwqQ8MGVtvf8CXA/3ZRIYyWBCDLsD+xJflb790F57SZ5i2K4
-         xuARuIXqIniWj1QZt6C6eQSnhy4ItBTu9jrgA2aPOp0mvak54Bvp3P2WRY9NE23JEcim
-         I0fEzyn7CNVwn8MruyiM10s1qyYCZiBSjTxBJFr5cMpxjEE8wWuC7hfg6xvtX6jFWkNM
-         uxhMZT73nsGCl0gOQ6SbLTzZWGTU4m0YjL7D8E6DklByLHl4LgmBUAhCF54apxOdEMus
-         dVjw==
+        d=gmail.com; s=20230601; t=1744031294; x=1744636094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vubFuGu5LF8TMxZJOhYWbSvBm0DDW1KLGq35BKvCM5k=;
+        b=lmWdtPWTqCzTs1zfceXdJbKoaLdzSLmEQ299Ja8pYYIfCAxX+gs5txO/zz+dhFxkM3
+         y1R3XCY3/vCYX8x2vZBuGCfgRWh0x1lOBx4YpxLpbYMyjJGNODFjdVd0N55lBbwkKHeu
+         DujPuZKiYNKtlCnA3QW3NMLo5dCmFMcAdOolQxRRimhUsqYnb0MxcJ+VXTsbXBnROV7f
+         YeJ1lKhXZ/FIqShLO13n6K2JSUkBvgrR7chYzE27yH4ZbPwO9mvjVTrtHj9mx9XINIt8
+         EM5rl1hsZeTWZUK1fOUKYYbDPWjOqVOD4rVtPeXjsTtJpsLzIHp4YY2cRRTiIS15H+W/
+         2r8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744025992; x=1744630792;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=icnT745Hi18TmYNEA7v25BWLtQBZP+GvOVM9XU9S5jc=;
-        b=kLFv/lQ+D4VPDlc3zqcH9X8/HmU0aBCWqKoSdAKRgB/vQrmypVVpxvUYMALXPKW118
-         DB5DfEM34K0udOrVyZFSgxwW3S1ZaJ6C7k5g/g4Jzv7Af1GXvYG84alAbyMDgO7YkkNc
-         dPfQqz9CKtCSy3KrJGv9qisgr3P1ztzVAC51OQAfAPDVJxd8ysFM93WOs+0g3G6xOsAf
-         v7LWRoMx0gD4EKRSXmB1gYbjtSWflPhVXy7vC0lG5Q9QxOyUI1Fw2S+0oMiR4+1C3NW3
-         JhwJXDk1NS3fmAACoL3HPrR9vVC9U7/g8cdzuws/tUMOJXU1Osnzhj8mUsKXNY9CqVsQ
-         sZxw==
-X-Gm-Message-State: AOJu0YzfizOpRyW6DmrDnMK3DCpwjmu+Y2CJyIx2yxMf3OwSj/BvSILx
-	dMnpmPgg3E1rgZh19A2pxVvsFeoQfNAc4pMHycw83kWtgXyM983Ia4kHrA==
-X-Gm-Gg: ASbGncu+ijNujDMLX5FRhc/sJazsAaUnhktUQOLMaokGNLpwBz7RMQf/73EPdzMo7V1
-	nbA7FpLLPCDobI7uCPOCEYnAax1LCZJkKr/zMVEFOdxmkaVlZaHtz5s8gKOyR+ImHpnQcMh06I4
-	60tpfKInEGWj3emjzN3nQa06dmuQnXMw16emDIUYvmmnNC4TUH+6rn47L/eGCDTBG+2QXT09BoP
-	HOkiZBZ+yQubM+ulEW0llWh+POYXV4JbvVwzi7gsE8hs7WOcbwmzTLPa/td+1DYv4Vg3VlSIm99
-	WNhPEdFDh4GAPX177+wzRRm92Vg7zSzDKbChxHEoJEKtte44jt4=
-X-Google-Smtp-Source: AGHT+IGjORe9u5MVLvWXhP3NqeNGfhnsUvaw4sJzo4s2zMz9ddU2BooKv+Y4C5XJDPj4YciQJhSKTg==
-X-Received: by 2002:a17:90b:2f03:b0:2f8:34df:5652 with SMTP id 98e67ed59e1d1-306a48a57f9mr15268309a91.21.1744025992331;
-        Mon, 07 Apr 2025 04:39:52 -0700 (PDT)
-Received: from [172.17.0.2] ([52.155.62.248])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30588a2f6b2sm8672781a91.24.2025.04.07.04.39.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 04:39:51 -0700 (PDT)
-Message-ID: <67f3b987.170a0220.12708a.e9b5@mx.google.com>
-Date: Mon, 07 Apr 2025 04:39:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0152085675423287454=="
+        d=1e100.net; s=20230601; t=1744031294; x=1744636094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vubFuGu5LF8TMxZJOhYWbSvBm0DDW1KLGq35BKvCM5k=;
+        b=k617v76wGnUcU702Y2WWv26W0OV1jqT5ddbfDHOf8hN+g4zymarz46KoIrUYJXGkaS
+         Tv4+9WsQxZmxA6kGDqDZMl69v+gKoXd7tFCFK8nwaGWdC6oa8bjkL3YdjkCJFxFEDdrX
+         lu3IDbU4UOrofr8GqLSuj2GsNewWY9BHxkGq6jAZ7VmDN3R9ueGh+6it6XDfWepKzIW/
+         i2hS96PckW3OROnHu4DjxQHqzn7KZEVEsyuPTweGK7+XGRE39Vf3Msd25NH220zWFS7V
+         T2kvRrosFCgbcUtXH7IIqxumgUqXaBcofU6rw9hbqxxNYjNRqLVQzrKfvam7B1lbAbU6
+         X9OQ==
+X-Gm-Message-State: AOJu0Yx2j9xJ1UPDEerSOorMJf/VQyWDdShON3GW2XgAWmsC4U59j6h5
+	AF/cxQDXMvxO6dusWHBkNLHhLEhieKrKq9wP7MEwJfwa/VwQlr3yd/zm7vXBGVWBVnflC0SGLws
+	AoNmZUnbRAsXjMwMJixWKjgQ347+HiAVt
+X-Gm-Gg: ASbGncsut9ZdaHlIQKgl6xKEhqOsdT5rr6aph7he28G7LAEE1weiQdOrLLhaGk1KEmQ
+	cK6cwmYGQXreS6qgZu+Vfrx9hgiDZxaAlrrIzlJjjnr3sa6RBuTBKb49CyZWQzgZiRvSdumkZTM
+	W+fE83Jw2E0BlQJ4cbDF5/r52w
+X-Google-Smtp-Source: AGHT+IF++PHRM5dCIE4b9LQwnSD5QQxzeWVBRMJAEoYjy9u4mvpm+ROgIed90zmUwUYIvO5y9PEX9jtqT5FQNn2cvAY=
+X-Received: by 2002:a05:651c:154e:b0:30b:badf:75f0 with SMTP id
+ 38308e7fff4ca-30f0be061b3mr37166671fa.2.1744031293425; Mon, 07 Apr 2025
+ 06:08:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
-Subject: RE: [BlueZ,bluez] bap: Add idle notification for ASE State
-In-Reply-To: <20250407-bap_aes_state-v1-1-dfc090c49cea@amlogic.com>
 References: <20250407-bap_aes_state-v1-1-dfc090c49cea@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20250407-bap_aes_state-v1-1-dfc090c49cea@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 7 Apr 2025 09:08:00 -0400
+X-Gm-Features: ATxdqUE4yLh1Uq4ivHxA3Ljtw7-D1DUcsZ-Co-ZVQlIwyiXCCqB-1QWjQ_0_CZY
+Message-ID: <CABBYNZJsJAbGz=VUZuabixnTJcj1gZHM5m1P_cU06aMn3YZo3Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ bluez] bap: Add idle notification for ASE State
+To: yang.li@amlogic.com
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============0152085675423287454==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Yang,
 
-This is automated email and please do not reply to this email!
+On Mon, Apr 7, 2025 at 6:34=E2=80=AFAM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
+>
+> From: Yang Li <yang.li@amlogic.com>
+>
+> When the ASE state changes from releasing(6) -> idle(0),
+> the idle state needs to be notified to the Client.
+>
+> ---
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  src/shared/bap.c | 13 ++++---------
+>  1 file changed, 4 insertions(+), 9 deletions(-)
+>
+> diff --git a/src/shared/bap.c b/src/shared/bap.c
+> index 650bea2f4..c40d6e051 100644
+> --- a/src/shared/bap.c
+> +++ b/src/shared/bap.c
+> @@ -1123,17 +1123,12 @@ static void stream_notify_metadata(struct bt_bap_=
+stream *stream)
+>         free(status);
+>  }
+>
+> -static void stream_notify_release(struct bt_bap_stream *stream)
+> +static void stream_notify_ase_state(struct bt_bap_stream *stream)
+>  {
+>         struct bt_bap_endpoint *ep =3D stream->ep;
+>         struct bt_ascs_ase_status status;
+>
+> -       DBG(stream->bap, "stream %p", stream);
+> -
+> -
+> -       memset(&status, 0, sizeof(status));
+>         status.id =3D ep->id;
+> -       ep->state =3D BT_BAP_STREAM_STATE_RELEASING;
 
-Dear submitter,
+Not really sure why you are taking away releasing state, we actually
+depend on it for the new tests:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=950501
+https://patchwork.kernel.org/project/bluetooth/list/?series=3D950067
 
----Test result---
+>         status.state =3D ep->state;
+>
+>         gatt_db_attribute_notify(ep->attr, (void *)&status, sizeof(status=
+),
+> @@ -1713,6 +1708,7 @@ static void stream_notify(struct bt_bap_stream *str=
+eam, uint8_t state)
+>
+>         switch (state) {
+>         case BT_ASCS_ASE_STATE_IDLE:
+> +               stream_notify_ase_state(stream);
 
-Test Summary:
-CheckPatch                    PENDING   0.32 seconds
-GitLint                       PENDING   0.32 seconds
-BuildEll                      PASS      20.39 seconds
-BluezMake                     PASS      1606.58 seconds
-MakeCheck                     PASS      20.68 seconds
-MakeDistcheck                 PASS      157.73 seconds
-CheckValgrind                 PASS      213.33 seconds
-CheckSmatch                   WARNING   283.70 seconds
-bluezmakeextell               PASS      97.99 seconds
-IncrementalBuild              PENDING   0.34 seconds
-ScanBuild                     PASS      870.13 seconds
+We need something like stream_notify_idle.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+>                 break;
+>         case BT_ASCS_ASE_STATE_CONFIG:
+>                 stream_notify_config(stream);
+> @@ -1726,7 +1722,7 @@ static void stream_notify(struct bt_bap_stream *str=
+eam, uint8_t state)
+>                 stream_notify_metadata(stream);
+>                 break;
+>         case BT_ASCS_ASE_STATE_RELEASING:
+> -               stream_notify_release(stream);
+> +               stream_notify_ase_state(stream);
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+This is actually wrong, we need to notify the releasing state.
 
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+>                 break;
+>         }
+>  }
+> @@ -6397,9 +6393,8 @@ static bool stream_io_disconnected(struct io *io, v=
+oid *user_data)
+>         DBG(stream->bap, "stream %p io disconnected", stream);
+>
+>         if (stream->ep->state =3D=3D BT_ASCS_ASE_STATE_RELEASING)
+> -               stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
+> +               stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
+
+Ok, so this is sort of reverting from  bap: Fix not generating
+releasing state? I was wondering how much testing you guys did to
+confirm this is the right behavior, I don't think it is and Im trying
+to figure out if there are any tests for the testing spec that do
+properly verify this behavior.
+
+> -       bt_bap_stream_set_io(stream, -1);
+>         return false;
+>  }
+>
+>
+> ---
+> base-commit: 0efa20cbf3fb5693c7c2f14ba8cf67053ca029e5
+> change-id: 20250407-bap_aes_state-9306798ff95a
+>
+> Best regards,
+> --
+> Yang Li <yang.li@amlogic.com>
+>
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0152085675423287454==--
+--=20
+Luiz Augusto von Dentz
