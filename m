@@ -1,68 +1,68 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DBF221573
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 20:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840411B87F0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 20:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744056101; cv=none; b=VzQnx569Am5oT/Kg7CHUyF8Xba94HfF9T74/Ap/93oz0oz2o6vpvZjoQDXnGTHGPMh1BVBgmIK3hQQxiXIeY+mvxriHXe5tFPwv23EbEaZivbLRpvfT+OOuhSkenR2r6qPTb3x0v4j7NgFJOt+CBvBJp/zHqH/m107luBytRCCs=
+	t=1744056105; cv=none; b=eZ3n1tMtrEcLAGF6oOZQ63p2de3lDHOR/wWhnabUxNQ5CvdGJCNQuXLs0rsp6lRWBbGyIZHVCVxDYG2/RwxiX7XkJWIrBeHbHwAR47OdowYZ9NHdfYaWVnEjsBNrAF0WiPemM3XL37t8wkBv/WEDZlYhjB43aS8V33jEcWzMbfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744056101; c=relaxed/simple;
-	bh=MgGuLFJ2DjfVF7ek98JsWFIEL2sH9WB3iOfFHAUb3Oc=;
+	s=arc-20240116; t=1744056105; c=relaxed/simple;
+	bh=k4mTeg3N2nFLrcmIeFZW+iYlyOpN0M4pQPLjJ92/wXQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KWMQ+W3Ik9JnaFykefyYUkN6iDdqNJiS9k40P3BM+R6+UyUMnVZN9Ozv4wRS+4Xab3r15sfF+iuL8C5hDQ6B/UNUOm7X+MLw2Hc7YcHZlQ5iSvql370rtz/D+lbFw1ycustk6ANsE2giNbhFi8cnI47fmlm6s6OTLp1ADmZQ8rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y8CReIDE; arc=none smtp.client-ip=209.85.221.176
+	 MIME-Version:Content-Type; b=CMqXnoujox9V31ZMu7iWsE8kCDM2upKKqgkn5gGA4R1NdY9PtYHwm4oN6ztJ+g9UD6PDzUh/0ey4VpgYaiyxkZRAfMM7Sftt3ca4n2J7yFOyVSpQGe3goION5d7QS84bZQnDcZrWEb205BTDO88xb51pBtnaCZ0P0VeD613SzDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CrGpvFfe; arc=none smtp.client-ip=209.85.221.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y8CReIDE"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5240317b3e0so1729375e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 13:01:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CrGpvFfe"
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-523edc385caso1944934e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 13:01:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744056098; x=1744660898; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744056102; x=1744660902; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gA3QOuG3Dd4SRx2ENqGs0NC8RCaJrlEWYszAo+sPZBU=;
-        b=Y8CReIDEq2XG6Xn65tf74fAcMVPyg7os/yqIUCehivu9ODZL5ffAj0EnQ87lqVHuaI
-         VInojYBqSYOUgizBVuokecgkD5uAbrA3NeHj6GLkK+gNR8svkI57u94ZLnnDpu4zwQkR
-         v5mME58vAh7huQ6SjsvRBUolTAPyy1UPN/bp+Vl13Q9a4nSIarWAxRhbVhf3ouZcc0Av
-         ZMUy8XDdARVtUV2llLgCw+zmrEQ7NVjWXkdNMZHl6LjSorzTvO2kbOAimdsoyC+zixVN
-         56z08ioNtLGD/JBe5o2hi2zC1MpchAeHYtQfyeISftSwowdJGgxZoVkVLdsxjy4BdKzP
-         hhxg==
+        bh=MVaX20wo7w1Y3NZXUbSGU27hwlvxAUbfzuc80lnuofE=;
+        b=CrGpvFfeKmLgfVQxcZZzYcbd7wLkJZ6jJe/PRKIMeeeaxauyCIDCCI5u3JaLm4DHCg
+         aA9iwSSm6liV9wuBmkjEkYfa2hrCpCqQXHa+AST3Vnjy1ciSImrUsOlrbR1w9JxjRpZb
+         XuCdqCmq7Qns0Btz+CLKdQ5yF1mH7ntmOZZEIGgBJMoEM0fzSqzLX/3HsxnLBXAH8Z//
+         zuwXOmhrIIA4S75EzYneALSfkSAlmJ8XtV+7zyYh1oksne3paM0lqDvQag1qeNt4H5MI
+         dlS3V74iljW9GKzTMVFtzLIpMoTpOgcgKpiL6ZXkDEdxXZwZ//bFYfTlvH6CRscI/aWy
+         hkFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744056098; x=1744660898;
+        d=1e100.net; s=20230601; t=1744056102; x=1744660902;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gA3QOuG3Dd4SRx2ENqGs0NC8RCaJrlEWYszAo+sPZBU=;
-        b=MMS5t6BQ2rrx2KPqfYieH8imHGq+Gr9GLrDT2Fj9lAWUl12cjjt1QBHI5A3wLfAh7t
-         Lsey7eaYC8jOBbaLJPI4SIWcRduohKT2SXeVYuwEdEL4d0mOYA6J0z8rt1d3npHnhFaY
-         r01cJwwwIOL6bkNWKeI+CpSjVrX8qz88tajycWTyOgkQRQihdvG/ZZNdra3LiKBylL2H
-         sAuveLkwITy08srWkp+00WeCl6F5JzBjyYJKXhn4jmcvfDiKqs69IjrI+43gaTbUDX7F
-         I05PEQwlHjj9LQpnCufP7djNsErKC4YocT/QyW7nzzkNPgYIsTnW2nGCYwF59GsUQrwR
-         UCYA==
-X-Gm-Message-State: AOJu0YwqKgk40vF5Oa0qsWeY6SX1nHzBUnA38eD65XBN6gOKVq1keY/3
-	VboAyi+oDWHm21ZBi0iBON1v4tghUqkyQYEa0koBr37GKKIU0PDNoQ4pAf0Y
-X-Gm-Gg: ASbGncvJr/znOiHuENDhHhCnMUyWpxX9UhLMqWYbAxuuge6b05UcIEF26W4vTTAEf5P
-	0iSslxa8Ax1oZcMC2ZUQPCCIBO2p9j0nSOZDBYKAa143Dm1oPlHL/NYfgWD5BEvutA6+T3uxKGE
-	/Qg/DuHxhRAnl8VgrHvD7wOLHsFidQP7W6w5/XsoL2ANjaLC8XzzdMkwUH/eJ1ypLPXAbhSoX8W
-	ozLhJ3Wwj6YPc786g2z50UY9TBL97oJRUrfp6LgrDGVoguLLqvdNKVlnFgmiisLY74vdarNNk/m
-	+FQIkapO/hkFw7w4Gio0omBM//CXUfzltxqmmlkMVjAwg2AvIlqi9uX4crOAGIUZDOKJC/5CIpO
-	swZPfNgpVPsU76CO7DsASbYjP
-X-Google-Smtp-Source: AGHT+IHep4LxOlVAJNRD960TW2FMEEwNgSAXFXfL5/KVCOSB5+4SGlHhnddbQhJvXo+He+YFurOr/g==
-X-Received: by 2002:a05:6122:2016:b0:520:6773:e5bf with SMTP id 71dfb90a1353d-52765c22e36mr8360589e0c.1.1744056097706;
-        Mon, 07 Apr 2025 13:01:37 -0700 (PDT)
+        bh=MVaX20wo7w1Y3NZXUbSGU27hwlvxAUbfzuc80lnuofE=;
+        b=i2x6gOZCUhVI/iEAjH21RXgqGh+OM3hfZz041KyI3T7g1XSo7uW4ovF4n7eeKCIC92
+         ywbQHtd4rgf0DnmN6p/ZfQFGTpn7kMWkqmvBD/BLnFbSEjA6zR5FIgfnNh19RCv+YSUO
+         e4gtXF1c0ljQP/Zua44GALpeRwrdxZ5nKMx3YK40iwhPX0iK550Qu77ySI4GWNlXAPvd
+         Zihtd0ztS9WvgBW/CQwwH0v+TpKP6lRr+s3dhwoZhuJk896RUYPolNXCv4HvFQsoyGmu
+         zKUAHL+vYoCRaCS3qpHBiWXVOlYT2MG4GTAGqPU8tlyRLJtiT1CtWwhGNdf/zwLHWhzQ
+         eZjQ==
+X-Gm-Message-State: AOJu0YyN8B3RoJ8AKX2P4kwOBhoX70rFvcUF4BhWUP5UyLUPZFXL/VrU
+	YdQwuoI1qoGeoj/2eASDcldKq+brZId4yoVQed3MXPLvM+//UKrfko33P+4w
+X-Gm-Gg: ASbGnct3cx+rTZNnVxz8Q8PQPDAf0oavJLexH81/s0A6uiNOLa2o/XOHFr4fn+FK/8X
+	xbDQBerItv0AFY9xt+SJ8y9k8J6MrKvAyx5P+M6821tjiwoFr1gdWB7T5R8QBs8MBnx/Y2xwZzi
+	lxZwJ4rp4HiWyhGRx+sPda/eN7FixU0WnGMQNDIuFougjKxz9DtQaV/TRnguTYY/vWbQTaZhgcs
+	jQfXMPDisgXn8T+j8DF1PML1+stW3PV+vNmTh+rRun1674yS1ZX+I11PHJeaVr528VatMzTy1wR
+	IbCl9EPj/4k5u8HPeYGwtkFAMXN++Dnukl3GfXjUezl+r0PPXdw5vWXku6MmpnzytYYH5QkNfXc
+	P6jR613aVQzH3Lw==
+X-Google-Smtp-Source: AGHT+IEQvWSapHhG0j0oicIlGPO7vfYqt1K8WxYDja5vDgffK/u/XDhBkLo6Mc2uXh6B/jfvZTNrGQ==
+X-Received: by 2002:a05:6122:17a7:b0:526:19e6:fa34 with SMTP id 71dfb90a1353d-5276443fbf8mr9100658e0c.1.1744056099816;
+        Mon, 07 Apr 2025 13:01:39 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5279b691f07sm69140e0c.41.2025.04.07.13.01.36
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5279b691f07sm69140e0c.41.2025.04.07.13.01.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 13:01:36 -0700 (PDT)
+        Mon, 07 Apr 2025 13:01:38 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 04/15] test-bap: Introduce USR/SCC QoS tests for LC3
-Date: Mon,  7 Apr 2025 16:01:10 -0400
-Message-ID: <20250407200124.881534-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 05/15] test-bap: Introduce USR/SCC QoS tests for VS
+Date: Mon,  7 Apr 2025 16:01:11 -0400
+Message-ID: <20250407200124.881534-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250407200124.881534-1-luiz.dentz@gmail.com>
 References: <20250407200124.881534-1-luiz.dentz@gmail.com>
@@ -77,338 +77,83 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Unicast Server Performs Config QoS – LC3
+Unicast Server Performs Config QoS – Vendor-Specific
 
 Test Purpose:
-Verify that a Unicast Server IUT can perform a Config QoS operation
-initiated by a Unicast Client for the LC3 codec.
+Verify that a Unicast Server IUT can handle a Config QoS operation for a
+vendor-specific codec.
 
 Pass verdict:
-In step 2, the IUT sends a notification of the ASE Control Point
-characteristic with Response_Code set to Success (0x00) for the requested
-ASE_ID and opcode.
-In step 3, the notified ASE characteristic value is correctly formatted, has
-the ASE_ID field set to Test_ASE_ID, the ASE_State field set to 0x02
-(QoS Configured), and the Additional_ASE_Parameters field containing the
-CIG_ID, CIS_ID, and QoS configuration values requested in step 2.
+The IUT sends a notification of the ASE Control Point characteristic with
+Response_Code set to Success (0x00) for the requested ASE_ID and opcode
 
 Test Summary
 ------------
-BAP/USR/SCC/BV-069-C [USR SNK Config QoS, LC3 8_1_1] Passed
-BAP/USR/SCC/BV-070-C [USR SNK Config QoS, LC3 8_2_1] Passed
-BAP/USR/SCC/BV-071-C [USR SNK Config QoS, LC3 16_1_1] Passed
-BAP/USR/SCC/BV-072-C [USR SNK Config QoS, LC3 16_2_1] Passed
-BAP/USR/SCC/BV-073-C [USR SNK Config QoS, LC3 24_1_1] Passed
-BAP/USR/SCC/BV-074-C [USR SNK Config QoS, LC3 24_2_1] Passed
-BAP/USR/SCC/BV-075-C [USR SNK Config QoS, LC3 32_1_1] Passed
-BAP/USR/SCC/BV-076-C [USR SNK Config QoS, LC3 32_2_1] Passed
-BAP/USR/SCC/BV-077-C [USR SNK Config QoS, LC3 44.1_1_1] Passed
-BAP/USR/SCC/BV-078-C [USR SNK Config QoS, LC3 44.1_2_1] Passed
-BAP/USR/SCC/BV-079-C [USR SNK Config QoS, LC3 48_1_1] Passed
-BAP/USR/SCC/BV-080-C [USR SNK Config QoS, LC3 48_2_1] Passed
-BAP/USR/SCC/BV-081-C [USR SNK Config QoS, LC3 48_3_1] Passed
-BAP/USR/SCC/BV-082-C [USR SNK Config QoS, LC3 48_4_1] Passed
-BAP/USR/SCC/BV-083-C [USR SNK Config QoS, LC3 48_5_1] Passed
-BAP/USR/SCC/BV-084-C [USR SNK Config QoS, LC3 48_6_1] Passed
-BAP/USR/SCC/BV-085-C [USR SRC Config QoS, LC3 8_1_1] Passed
-BAP/USR/SCC/BV-086-C [USR SRC Config QoS, LC3 8_2_1] Passed
-BAP/USR/SCC/BV-087-C [USR SRC Config QoS, LC3 16_1_1] Passed
-BAP/USR/SCC/BV-088-C [USR SRC Config QoS, LC3 16_2_1] Passed
-BAP/USR/SCC/BV-089-C [USR SRC Config QoS, LC3 24_1_1] Passed
-BAP/USR/SCC/BV-090-C [USR SRC Config QoS, LC3 24_2_1] Passed
-BAP/USR/SCC/BV-091-C [USR SRC Config QoS, LC3 32_1_1] Passed
-BAP/USR/SCC/BV-092-C [USR SRC Config QoS, LC3 32_2_1] Passed
-BAP/USR/SCC/BV-093-C [USR SRC Config QoS, LC3 44.1_1_1] Passed
-BAP/USR/SCC/BV-094-C [USR SRC Config QoS, LC3 44.1_2_1] Passed
-BAP/USR/SCC/BV-095-C [USR SRC Config QoS, LC3 48_1_1] Passed
-BAP/USR/SCC/BV-096-C [USR SRC Config QoS, LC3 48_2_1] Passed
-BAP/USR/SCC/BV-097-C [USR SRC Config QoS, LC3 48_3_1] Passed
-BAP/USR/SCC/BV-098-C [USR SRC Config QoS, LC3 48_4_1] Passed
-BAP/USR/SCC/BV-099-C [USR SRC Config QoS, LC3 48_5_1] Passed
-BAP/USR/SCC/BV-100-C [USR SRC Config QoS, LC3 48_6_1] Passed
-BAP/USR/SCC/BV-101-C [USR SNK Config QoS, LC3 8_1_2] Passed
-BAP/USR/SCC/BV-102-C [USR SNK Config QoS, LC3 8_2_2] Passed
-BAP/USR/SCC/BV-103-C [USR SNK Config QoS, LC3 16_1_2] Passed
-BAP/USR/SCC/BV-104-C [USR SNK Config QoS, LC3 16_2_2] Passed
-BAP/USR/SCC/BV-105-C [USR SNK Config QoS, LC3 24_1_2] Passed
-BAP/USR/SCC/BV-106-C [USR SNK Config QoS, LC3 24_2_2] Passed
-BAP/USR/SCC/BV-107-C [USR SNK Config QoS, LC3 32_1_2] Passed
-BAP/USR/SCC/BV-108-C [USR SNK Config QoS, LC3 32_2_2] Passed
-BAP/USR/SCC/BV-109-C [USR SNK Config QoS, LC3 44.1_1_2] Passed
-BAP/USR/SCC/BV-110-C [USR SNK Config QoS, LC3 44.1_2_2] Passed
-BAP/USR/SCC/BV-111-C [USR SNK Config QoS, LC3 48_1_2] Passed
-BAP/USR/SCC/BV-112-C [USR SNK Config QoS, LC3 48_2_2] Passed
-BAP/USR/SCC/BV-113-C [USR SNK Config QoS, LC3 48_3_2] Passed
-BAP/USR/SCC/BV-114-C [USR SNK Config QoS, LC3 48_4_2] Passed
-BAP/USR/SCC/BV-115-C [USR SNK Config QoS, LC3 48_5_2] Passed
-BAP/USR/SCC/BV-116-C [USR SNK Config QoS, LC3 48_6_2] Passed
-BAP/USR/SCC/BV-117-C [USR SRC Config QoS, LC3 8_1_2] Passed
-BAP/USR/SCC/BV-118-C [USR SRC Config QoS, LC3 8_2_2] Passed
-BAP/USR/SCC/BV-119-C [USR SRC Config QoS, LC3 16_1_2] Passed
-BAP/USR/SCC/BV-120-C [USR SRC Config QoS, LC3 16_2_2] Passed
-BAP/USR/SCC/BV-121-C [USR SRC Config QoS, LC3 24_1_2] Passed
-BAP/USR/SCC/BV-122-C [USR SRC Config QoS, LC3 24_2_2] Passed
-BAP/USR/SCC/BV-123-C [USR SRC Config QoS, LC3 32_1_2] Passed
-BAP/USR/SCC/BV-124-C [USR SRC Config QoS, LC3 32_2_2] Passed
-BAP/USR/SCC/BV-125-C [USR SRC Config QoS, LC3 44.1_1_2] Passed
-BAP/USR/SCC/BV-126-C [USR SRC Config QoS, LC3 44.1_2_2] Passed
-BAP/USR/SCC/BV-127-C [USR SRC Config QoS, LC3 48_1_2] Passed
-BAP/USR/SCC/BV-128-C [USR SRC Config QoS, LC3 48_2_2] Passed
-BAP/USR/SCC/BV-129-C [USR SRC Config QoS, LC3 48_3_2] Passed
-BAP/USR/SCC/BV-130-C [USR SRC Config QoS, LC3 48_4_2] Passed
-BAP/USR/SCC/BV-131-C [USR SRC Config QoS, LC3 48_5_2] Passed
-BAP/USR/SCC/BV-132-C [USR SRC Config QoS, LC3 48_6_2] Passed
-Total: 64, Passed: 64 (100.0%), Failed: 0, Not Run: 0
+BAP/USR/SCC/BV-133-C [USR SNK Config QoS, VS]        Passed
+BAP/USR/SCC/BV-134-C [USR SRC Config QoS, VS]        Passed
+Total: 2, Passed: 2 (100.0%), Failed: 0, Not Run: 0
 ---
- unit/test-bap.c | 221 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 219 insertions(+), 2 deletions(-)
+ unit/test-bap.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
 
 diff --git a/unit/test-bap.c b/unit/test-bap.c
-index 470f59d387e5..4bd5ef8b9847 100644
+index 4bd5ef8b9847..7edb8d8a9b7d 100644
 --- a/unit/test-bap.c
 +++ b/unit/test-bap.c
-@@ -2268,7 +2268,7 @@ static struct test_config cfg_src_48_6_1 = {
-  */
- #define QOS_SRC(_qos...) \
- 	IOV_DATA(0x52, 0x22, 0x00, 0x02, 0x01, 0x03, 0x00, 0x00, _qos), \
--	IOV_DATA(0x1b, 0x22, 0x00, 0x02, 0x01, 0x01, 0x00, 0x00), \
-+	IOV_DATA(0x1b, 0x22, 0x00, 0x02, 0x01, 0x03, 0x00, 0x00), \
- 	IOV_NULL, \
- 	IOV_DATA(0x1b, 0x1c, 0x00, 0x03, 0x02, 0x00, 0x00, _qos)
- 
-@@ -2744,7 +2744,7 @@ static struct test_config cfg_src_48_6_2 = {
-  * The IUT successfully writes to the ASE Control Point characteristic with the
-  * opcode set to 0x02 (Config QoS) and the specified parameters.
-  */
--static void test_scc_qos_lc3(void)
-+static void test_ucl_scc_qos_lc3(void)
- {
- 	define_test("BAP/UCL/SCC/BV-035-C [UCL SRC Config QoS, LC3 8_1_1]",
- 			test_setup, test_client, &cfg_snk_8_1_1,
-@@ -2940,6 +2940,223 @@ static void test_scc_qos_lc3(void)
+@@ -2940,7 +2940,7 @@ static void test_ucl_scc_qos_lc3(void)
  			SCC_SRC_48_6_2);
  }
  
-+/* 4.9.5 Unicast Server Performs Config QoS – LC3
+-/* 4.9.5 Unicast Server Performs Config QoS – LC3
++/* Unicast Server Performs Config QoS – LC3
+  *
+  * Test Purpose:
+  * Verify that a Unicast Server IUT can perform a Config QoS operation
+@@ -3191,16 +3191,42 @@ static struct test_config cfg_src_qos_vs = {
+  * The IUT successfully writes to the ASE Control Point characteristic with the
+  * opcode set to 0x02 (Config QoS) and the specified parameters.
+  */
+-static void test_scc_qos_vs(void)
++static void test_ucl_scc_qos_vs(void)
+ {
+ 	define_test("BAP/UCL/SCC/BV-099-C [UCL SNK Config QoS, VS]",
+ 			test_setup, test_client, &cfg_src_qos_vs,
+ 			SCC_SRC_QOS_VS);
+-	define_test("BAP/UCL/SCC/BV-100-C [UCL SRC QoS Codec, VS]",
++	define_test("BAP/UCL/SCC/BV-100-C [UCL SRC Config QoS, VS]",
+ 			test_setup, test_client, &cfg_snk_qos_vs,
+ 			SCC_SNK_QOS_VS);
+ }
+ 
++/* Unicast Server Performs Config QoS – Vendor-Specific
 + *
 + * Test Purpose:
-+ * Verify that a Unicast Server IUT can perform a Config QoS operation
-+ * initiated by a Unicast Client for the LC3 codec.
-+ *.
++ * Verify that a Unicast Server IUT can handle a Config QoS operation for a
++ * vendor-specific codec.
++ *
 + * Pass verdict:
-+ * In step 2, the IUT sends a notification of the ASE Control Point
-+ * characteristic with Response_Code set to Success (0x00) for the requested
-+ * ASE_ID and opcode.
-+ * In step 3, the notified ASE characteristic value is correctly formatted, has
-+ * the ASE_ID field set to Test_ASE_ID, the ASE_State field set to 0x02
-+ * (QoS Configured), and the Additional_ASE_Parameters field containing the
-+ * CIG_ID, CIS_ID, and QoS configuration values requested in step 2.
++ * The IUT sends a notification of the ASE Control Point characteristic with
++ * Response_Code set to Success (0x00) for the requested ASE_ID and opcode.
 + */
-+static void test_usr_scc_qos_lc3(void)
++static void test_usr_scc_qos_vs(void)
 +{
-+	define_test("BAP/USR/SCC/BV-069-C [USR SNK Config QoS, LC3 8_1_1]",
-+			test_setup_server, test_server, &cfg_snk_8_1_1,
-+			SCC_SNK_8_1_1);
-+	define_test("BAP/USR/SCC/BV-070-C [USR SNK Config QoS, LC3 8_2_1]",
-+			test_setup_server, test_server, &cfg_snk_8_2_1,
-+			SCC_SNK_8_2_1);
-+	define_test("BAP/USR/SCC/BV-071-C [USR SNK Config QoS, LC3 16_1_1]",
-+			test_setup_server, test_server, &cfg_snk_16_1_1,
-+			SCC_SNK_16_1_1);
-+	define_test("BAP/USR/SCC/BV-072-C [USR SNK Config QoS, LC3 16_2_1]",
-+			test_setup_server, test_server, &cfg_snk_16_2_1,
-+			SCC_SNK_16_2_1);
-+	define_test("BAP/USR/SCC/BV-073-C [USR SNK Config QoS, LC3 24_1_1]",
-+			test_setup_server, test_server, &cfg_snk_24_1_1,
-+			SCC_SNK_24_1_1);
-+	define_test("BAP/USR/SCC/BV-074-C [USR SNK Config QoS, LC3 24_2_1]",
-+			test_setup_server, test_server, &cfg_snk_24_2_1,
-+			SCC_SNK_24_2_1);
-+	define_test("BAP/USR/SCC/BV-075-C [USR SNK Config QoS, LC3 32_1_1]",
-+			test_setup_server, test_server, &cfg_snk_32_1_1,
-+			SCC_SNK_32_1_1);
-+	define_test("BAP/USR/SCC/BV-076-C [USR SNK Config QoS, LC3 32_2_1]",
-+			test_setup_server, test_server, &cfg_snk_32_2_1,
-+			SCC_SNK_32_2_1);
-+	define_test("BAP/USR/SCC/BV-077-C [USR SNK Config QoS, LC3 44.1_1_1]",
-+			test_setup_server, test_server, &cfg_snk_44_1_1,
-+			SCC_SNK_44_1_1);
-+	define_test("BAP/USR/SCC/BV-078-C [USR SNK Config QoS, LC3 44.1_2_1]",
-+			test_setup_server, test_server, &cfg_snk_44_2_1,
-+			SCC_SNK_44_2_1);
-+	define_test("BAP/USR/SCC/BV-079-C [USR SNK Config QoS, LC3 48_1_1]",
-+			test_setup_server, test_server, &cfg_snk_48_1_1,
-+			SCC_SNK_48_1_1);
-+	define_test("BAP/USR/SCC/BV-080-C [USR SNK Config QoS, LC3 48_2_1]",
-+			test_setup_server, test_server, &cfg_snk_48_2_1,
-+			SCC_SNK_48_2_1);
-+	define_test("BAP/USR/SCC/BV-081-C [USR SNK Config QoS, LC3 48_3_1]",
-+			test_setup_server, test_server, &cfg_snk_48_3_1,
-+			SCC_SNK_48_3_1);
-+	define_test("BAP/USR/SCC/BV-082-C [USR SNK Config QoS, LC3 48_4_1]",
-+			test_setup_server, test_server, &cfg_snk_48_4_1,
-+			SCC_SNK_48_4_1);
-+	define_test("BAP/USR/SCC/BV-083-C [USR SNK Config QoS, LC3 48_5_1]",
-+			test_setup_server, test_server, &cfg_snk_48_5_1,
-+			SCC_SNK_48_5_1);
-+	define_test("BAP/USR/SCC/BV-084-C [USR SNK Config QoS, LC3 48_6_1]",
-+			test_setup_server, test_server, &cfg_snk_48_6_1,
-+			SCC_SNK_48_6_1);
-+	define_test("BAP/USR/SCC/BV-085-C [USR SRC Config QoS, LC3 8_1_1]",
-+			test_setup_server, test_server, &cfg_src_8_1_1,
-+			SCC_SRC_8_1_1);
-+	define_test("BAP/USR/SCC/BV-086-C [USR SRC Config QoS, LC3 8_2_1]",
-+			test_setup_server, test_server, &cfg_src_8_2_1,
-+			SCC_SRC_8_2_1);
-+	define_test("BAP/USR/SCC/BV-087-C [USR SRC Config QoS, LC3 16_1_1]",
-+			test_setup_server, test_server, &cfg_src_16_1_1,
-+			SCC_SRC_16_1_1);
-+	define_test("BAP/USR/SCC/BV-088-C [USR SRC Config QoS, LC3 16_2_1]",
-+			test_setup_server, test_server, &cfg_src_16_2_1,
-+			SCC_SRC_16_2_1);
-+	define_test("BAP/USR/SCC/BV-089-C [USR SRC Config QoS, LC3 24_1_1]",
-+			test_setup_server, test_server, &cfg_src_24_1_1,
-+			SCC_SRC_24_1_1);
-+	define_test("BAP/USR/SCC/BV-090-C [USR SRC Config QoS, LC3 24_2_1]",
-+			test_setup_server, test_server, &cfg_src_24_2_1,
-+			SCC_SRC_24_2_1);
-+	define_test("BAP/USR/SCC/BV-091-C [USR SRC Config QoS, LC3 32_1_1]",
-+			test_setup_server, test_server, &cfg_src_32_1_1,
-+			SCC_SRC_32_1_1);
-+	define_test("BAP/USR/SCC/BV-092-C [USR SRC Config QoS, LC3 32_2_1]",
-+			test_setup_server, test_server, &cfg_src_32_2_1,
-+			SCC_SRC_32_2_1);
-+	define_test("BAP/USR/SCC/BV-093-C [USR SRC Config QoS, LC3 44.1_1_1]",
-+			test_setup_server, test_server, &cfg_src_44_1_1,
-+			SCC_SRC_44_1_1);
-+	define_test("BAP/USR/SCC/BV-094-C [USR SRC Config QoS, LC3 44.1_2_1]",
-+			test_setup_server, test_server, &cfg_src_44_2_1,
-+			SCC_SRC_44_2_1);
-+	define_test("BAP/USR/SCC/BV-095-C [USR SRC Config QoS, LC3 48_1_1]",
-+			test_setup_server, test_server, &cfg_src_48_1_1,
-+			SCC_SRC_48_1_1);
-+	define_test("BAP/USR/SCC/BV-096-C [USR SRC Config QoS, LC3 48_2_1]",
-+			test_setup_server, test_server, &cfg_src_48_2_1,
-+			SCC_SRC_48_2_1);
-+	define_test("BAP/USR/SCC/BV-097-C [USR SRC Config QoS, LC3 48_3_1]",
-+			test_setup_server, test_server, &cfg_src_48_3_1,
-+			SCC_SRC_48_3_1);
-+	define_test("BAP/USR/SCC/BV-098-C [USR SRC Config QoS, LC3 48_4_1]",
-+			test_setup_server, test_server, &cfg_src_48_4_1,
-+			SCC_SRC_48_4_1);
-+	define_test("BAP/USR/SCC/BV-099-C [USR SRC Config QoS, LC3 48_5_1]",
-+			test_setup_server, test_server, &cfg_src_48_5_1,
-+			SCC_SRC_48_5_1);
-+	define_test("BAP/USR/SCC/BV-100-C [USR SRC Config QoS, LC3 48_6_1]",
-+			test_setup_server, test_server, &cfg_src_48_6_1,
-+			SCC_SRC_48_6_1);
-+	define_test("BAP/USR/SCC/BV-101-C [USR SNK Config QoS, LC3 8_1_2]",
-+			test_setup_server, test_server, &cfg_snk_8_1_2,
-+			SCC_SNK_8_1_2);
-+	define_test("BAP/USR/SCC/BV-102-C [USR SNK Config QoS, LC3 8_2_2]",
-+			test_setup_server, test_server, &cfg_snk_8_2_2,
-+			SCC_SNK_8_2_2);
-+	define_test("BAP/USR/SCC/BV-103-C [USR SNK Config QoS, LC3 16_1_2]",
-+			test_setup_server, test_server, &cfg_snk_16_1_2,
-+			SCC_SNK_16_1_2);
-+	define_test("BAP/USR/SCC/BV-104-C [USR SNK Config QoS, LC3 16_2_2]",
-+			test_setup_server, test_server, &cfg_snk_16_2_2,
-+			SCC_SNK_16_2_2);
-+	define_test("BAP/USR/SCC/BV-105-C [USR SNK Config QoS, LC3 24_1_2]",
-+			test_setup_server, test_server, &cfg_snk_24_1_2,
-+			SCC_SNK_24_1_2);
-+	define_test("BAP/USR/SCC/BV-106-C [USR SNK Config QoS, LC3 24_2_2]",
-+			test_setup_server, test_server, &cfg_snk_24_2_2,
-+			SCC_SNK_24_2_2);
-+	define_test("BAP/USR/SCC/BV-107-C [USR SNK Config QoS, LC3 32_1_2]",
-+			test_setup_server, test_server, &cfg_snk_32_1_2,
-+			SCC_SNK_32_1_2);
-+	define_test("BAP/USR/SCC/BV-108-C [USR SNK Config QoS, LC3 32_2_2]",
-+			test_setup_server, test_server, &cfg_snk_32_2_2,
-+			SCC_SNK_32_2_2);
-+	define_test("BAP/USR/SCC/BV-109-C [USR SNK Config QoS, LC3 44.1_1_2]",
-+			test_setup_server, test_server, &cfg_snk_44_1_2,
-+			SCC_SNK_44_1_2);
-+	define_test("BAP/USR/SCC/BV-110-C [USR SNK Config QoS, LC3 44.1_2_2]",
-+			test_setup_server, test_server, &cfg_snk_44_2_2,
-+			SCC_SNK_44_2_2);
-+	define_test("BAP/USR/SCC/BV-111-C [USR SNK Config QoS, LC3 48_1_2]",
-+			test_setup_server, test_server, &cfg_snk_48_1_2,
-+			SCC_SNK_48_1_2);
-+	define_test("BAP/USR/SCC/BV-112-C [USR SNK Config QoS, LC3 48_2_2]",
-+			test_setup_server, test_server, &cfg_snk_48_2_2,
-+			SCC_SNK_48_2_2);
-+	define_test("BAP/USR/SCC/BV-113-C [USR SNK Config QoS, LC3 48_3_2]",
-+			test_setup_server, test_server, &cfg_snk_48_3_2,
-+			SCC_SNK_48_3_2);
-+	define_test("BAP/USR/SCC/BV-114-C [USR SNK Config QoS, LC3 48_4_2]",
-+			test_setup_server, test_server, &cfg_snk_48_4_2,
-+			SCC_SNK_48_4_2);
-+	define_test("BAP/USR/SCC/BV-115-C [USR SNK Config QoS, LC3 48_5_2]",
-+			test_setup_server, test_server, &cfg_snk_48_5_2,
-+			SCC_SNK_48_5_2);
-+	define_test("BAP/USR/SCC/BV-116-C [USR SNK Config QoS, LC3 48_6_2]",
-+			test_setup_server, test_server, &cfg_snk_48_6_2,
-+			SCC_SNK_48_6_2);
-+	define_test("BAP/USR/SCC/BV-117-C [USR SRC Config QoS, LC3 8_1_2]",
-+			test_setup_server, test_server, &cfg_src_8_1_2,
-+			SCC_SRC_8_1_2);
-+	define_test("BAP/USR/SCC/BV-118-C [USR SRC Config QoS, LC3 8_2_2]",
-+			test_setup_server, test_server, &cfg_src_8_2_2,
-+			SCC_SRC_8_2_2);
-+	define_test("BAP/USR/SCC/BV-119-C [USR SRC Config QoS, LC3 16_1_2]",
-+			test_setup_server, test_server, &cfg_src_16_1_2,
-+			SCC_SRC_16_1_2);
-+	define_test("BAP/USR/SCC/BV-120-C [USR SRC Config QoS, LC3 16_2_2]",
-+			test_setup_server, test_server, &cfg_src_16_2_2,
-+			SCC_SRC_16_2_2);
-+	define_test("BAP/USR/SCC/BV-121-C [USR SRC Config QoS, LC3 24_1_2]",
-+			test_setup_server, test_server, &cfg_src_24_1_2,
-+			SCC_SRC_24_1_2);
-+	define_test("BAP/USR/SCC/BV-122-C [USR SRC Config QoS, LC3 24_2_2]",
-+			test_setup_server, test_server, &cfg_src_24_2_2,
-+			SCC_SRC_24_2_2);
-+	define_test("BAP/USR/SCC/BV-123-C [USR SRC Config QoS, LC3 32_1_2]",
-+			test_setup_server, test_server, &cfg_src_32_1_2,
-+			SCC_SRC_32_1_2);
-+	define_test("BAP/USR/SCC/BV-124-C [USR SRC Config QoS, LC3 32_2_2]",
-+			test_setup_server, test_server, &cfg_src_32_2_2,
-+			SCC_SRC_32_2_2);
-+	define_test("BAP/USR/SCC/BV-125-C [USR SRC Config QoS, LC3 44.1_1_2]",
-+			test_setup_server, test_server, &cfg_src_44_1_2,
-+			SCC_SRC_44_1_2);
-+	define_test("BAP/USR/SCC/BV-126-C [USR SRC Config QoS, LC3 44.1_2_2]",
-+			test_setup_server, test_server, &cfg_src_44_2_2,
-+			SCC_SRC_44_2_2);
-+	define_test("BAP/USR/SCC/BV-127-C [USR SRC Config QoS, LC3 48_1_2]",
-+			test_setup_server, test_server, &cfg_src_48_1_2,
-+			SCC_SRC_48_1_2);
-+	define_test("BAP/USR/SCC/BV-128-C [USR SRC Config QoS, LC3 48_2_2]",
-+			test_setup_server, test_server, &cfg_src_48_2_2,
-+			SCC_SRC_48_2_2);
-+	define_test("BAP/USR/SCC/BV-129-C [USR SRC Config QoS, LC3 48_3_2]",
-+			test_setup_server, test_server, &cfg_src_48_3_2,
-+			SCC_SRC_48_3_2);
-+	define_test("BAP/USR/SCC/BV-130-C [USR SRC Config QoS, LC3 48_4_2]",
-+			test_setup_server, test_server, &cfg_src_48_4_2,
-+			SCC_SRC_48_4_2);
-+	define_test("BAP/USR/SCC/BV-131-C [USR SRC Config QoS, LC3 48_5_2]",
-+			test_setup_server, test_server, &cfg_src_48_5_2,
-+			SCC_SRC_48_5_2);
-+	define_test("BAP/USR/SCC/BV-132-C [USR SRC Config QoS, LC3 48_6_2]",
-+			test_setup_server, test_server, &cfg_src_48_6_2,
-+			SCC_SRC_48_6_2);
++	define_test("BAP/USR/SCC/BV-133-C [USR SNK Config QoS, VS]",
++			test_setup_server, test_server, &cfg_snk_qos_vs,
++			SCC_SNK_QOS_VS);
++	define_test("BAP/USR/SCC/BV-134-C [USR SRC Config QoS, VS]",
++			test_setup, test_client, &cfg_src_qos_vs,
++			SCC_SRC_QOS_VS);
 +}
 +
-+static void test_scc_qos_lc3(void)
++static void test_scc_qos_vs(void)
 +{
-+	test_ucl_scc_qos_lc3();
-+	test_usr_scc_qos_lc3();
++	test_ucl_scc_qos_vs();
++	test_usr_scc_qos_vs();
 +}
 +
- static struct test_config cfg_snk_qos_vs = {
- 	.cc = IOV_NULL,
- 	.qos = QOS_UCAST,
+ static struct test_config cfg_snk_enable = {
+ 	.cc = LC3_CONFIG_16_2,
+ 	.qos = LC3_QOS_16_2_1,
 -- 
 2.49.0
 
