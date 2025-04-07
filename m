@@ -1,130 +1,167 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AB221147C
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 21:37:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7147D3AC1C
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Apr 2025 22:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744061877; cv=none; b=bYzF7My7Be1hkBZ4Q00X5VUOqPe6m2IwhBNq/s/Gf1XyinO3L5MhldJONj55n0pzmxew4ScTj2UnQAFaAfw1whL8wPAA0buxfop/Op70jYEz1O9Yi+foSScCNSDxApZ738XQ6Xj6XLLxKu5KYN8jGzib7N1WXFRI3cucJsZszVw=
+	t=1744065025; cv=none; b=lOpEogI9CC5IOJq7Q1qV6ZQL0SNsptxyiY4XN+rkVIDW2W82airkKnw9wjE3eCVXn07+RjlX4xfD4DdkVnO5tVTzlpc+4XqSk/VtFXQwGXmPiVUi9AgA9uFUCvkiwSq86ojPaZt40H6qqfRfOuHbcS4seaD5EwY5K/M1c7s6P1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744061877; c=relaxed/simple;
-	bh=CQPhiA4VhsnInighPM6dxsBp4lYkZFN92nhqNQq3vWE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=hBtf7dMD4axv7L6OgIIDy18Y7OLIMq3snNNCTGu3E7V1n6/4B33Vw884hSo/+VsPj+wCW4g4xG5e4mBuo3U/TzYMAZ59MK8YfApxqVg71QiNVEJ0/C0yQD4YzHXvSDt3QHyJX2G2d38mRiLS3BUg/QFfNtz/D+ylxkxzkFalJTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aFuPzxXb; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744065025; c=relaxed/simple;
+	bh=VT5e2QPJpXKPCyt+xyHhkKuDO/O11DKdFu/Gm0y60i8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VOkROtF1odcS/FBknBQvzGbJ4fzlYQIGCQxlzQHgXt50ZefyxsJTz7fSHQA1EMpk03Uk9z4I/MpH0CFFBqXFBM7g98uUZWcNp7mnImuKby40ZnGbgzUOqDVck51mdEoA2BLIwsGx82gR1RyFmw8vsUDeen1V/jWPW8tAxCOMjf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZjQcfVvQ; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aFuPzxXb"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6ecfc7fb2aaso44813026d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Apr 2025 14:37:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744061874; x=1744666674; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=17RneGU3JIQnMHPKznJwyRd5AtaFq2T+RDqiWYww2SU=;
-        b=aFuPzxXbU6C1Z5YzRWGFv9+282bMGt6uTUBjSDA1ZwFMRVCMJaM5Vvt6rUachsG0No
-         d2YJ6/c2dDuenZOCehbRE0bt5jG36cYY8Ss9LU4XSrgE9AfccivT73dXRRowhMp0ndeg
-         sw6XZrixaeZYttphcZLp48WiY/83jkVQV3HoSpW3fXjuDpAWq5oLgEDXOzRrb9GKWFpB
-         cKcMHPIm7FZRAf3SO9tOzS8s1QVKtLYmTxjyA4xj26ACR8jhPCPq/PmEO7SIrFoEgGwh
-         2cyIyDJfqrk/Aq/ANoANlTLoIsB/WrY+nSHWjHzwMkOejnedGBUP7F513EaTIezHBc3e
-         yKmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744061874; x=1744666674;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=17RneGU3JIQnMHPKznJwyRd5AtaFq2T+RDqiWYww2SU=;
-        b=m5lerwE8L/bi0+yvD4H71u7QYMr8ksF+qV1aXLszkmz/+njHtFMiCbNXxRuqlH8Xx3
-         dvTKn6MVSApMI68NEW0+VYq+cjLMF3TkgVKxEON1dMO3nmhj+eb6m5WD5oOp/IoaFKP0
-         uu5PZ9SznaEU1dpuqXBUi7i+EPKuOP8+b+zjweHM+TtIs6b+wGQzT+Pl+NAUg9pe/jUp
-         RUks8jUELed7JP5Bj5BWARDqxpneKU55GjH/7NsakjpbhQXAPOxl0geuUbEglXh4WxMX
-         s5alKlLcVX95L6M4S7htyw3XLFBXxfPKa4jTZch0hOyD/wjL8ZNdkOQyaXmnKwdFzpQe
-         lhUQ==
-X-Gm-Message-State: AOJu0YyA+i9fB+/7E1UmNcmUHEUmIrRopMI7pIEsmcjbo1Edk45zNt6i
-	2nI0+rK6s8tVitU6PkD1WbTkWHDkpzufZPdU4gnrctorGC+T2neKj7lLlw==
-X-Gm-Gg: ASbGnctIysGLrj7+zefoBVTBsFTksEIwn0WO2pN0knV48KuKZbb4WnPT8IB79EQnugL
-	W+eBRPK3Db2EeR3hzs2ri/yTTD5bWtP95aqeG5EOJ7LhaWXVde7ZfAffXGJj1KmAx8v9/pHdAHH
-	FA8vq67vtTDNZmtms7inv4rJTmJYPFBhur87drVH0Bz4nNShZUdQQ0sO2EioRz7tUH4+tWC1+0D
-	7xLnMIJpPesbBwg+QrpoeLOpAUX2Uv+seT0zA9n2c7+4n/M40F65SD+3vNyO9STywWLubvDUE+3
-	9i7PTHhgvvZ42r7zDEJpaV8Ownuzaby2Vt+dRxtzl0oMY9/P
-X-Google-Smtp-Source: AGHT+IFI3oFaRoY6fmJUj7PSu10qvrK+aCclhqWKV9KKwVe74utDhtqpXZzkga/cqEYXAjSUsXLYbA==
-X-Received: by 2002:a05:6214:f6a:b0:6e6:6ba9:9e84 with SMTP id 6a1803df08f44-6f0584b75b1mr218049936d6.26.1744061874546;
-        Mon, 07 Apr 2025 14:37:54 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.17.52])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f00ec2esm63456306d6.47.2025.04.07.14.37.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 14:37:54 -0700 (PDT)
-Message-ID: <67f445b2.d40a0220.121c54.33f7@mx.google.com>
-Date: Mon, 07 Apr 2025 14:37:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4329906070661456669=="
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZjQcfVvQ"
+Message-ID: <b9a75b48-9572-482c-9f8d-0dfae41f09a1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744065011;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1yvXU5VmWeqiR0pVuAEpxZIKJoqNCtLLKDriulf8zQ8=;
+	b=ZjQcfVvQKYGxrfUAMfNwzHXmYQ6RCmx/NFE+B7cq67P0q/LGw1Wd8xTkUCSxKUYRpTxXld
+	85utElGLAoEcSGxmFLZ1ieGEePJNEHqKAfSTNh3FYwpreN0e4DHa6JydwRlPbq98rI5xFt
+	/nr+38u12DjTy7RGq1sjZElYGI1yGaA=
+Date: Mon, 7 Apr 2025 15:30:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: BAP Server test cases
-In-Reply-To: <20250407200124.881534-2-luiz.dentz@gmail.com>
-References: <20250407200124.881534-2-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4329906070661456669==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCH 3/3] [RFC] Bluetooth: enable bpf TX timestamping
+To: Pauli Virtanen <pav@iki.fi>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ kerneljasonxing@gmail.com
+References: <cover.1743337403.git.pav@iki.fi>
+ <bbd7fa454ed03ebba9bfe79590fb78a75d4f07db.1743337403.git.pav@iki.fi>
+ <3546b79d-a09b-4971-abd7-ce18696a9536@linux.dev>
+ <db7f317539cbda89df7e87efaea9b22328af610a.camel@iki.fi>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <db7f317539cbda89df7e87efaea9b22328af610a.camel@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-This is automated email and please do not reply to this email!
+On 4/2/25 9:56 AM, Pauli Virtanen wrote:
+> Hi,
+> 
+> ti, 2025-04-01 kello 18:34 -0700, Martin KaFai Lau kirjoitti:
+>> On 3/30/25 5:23 AM, Pauli Virtanen wrote:
+>>> Emit timestamps also for BPF timestamping.
+>>>
+>>> ***
+>>>
+>>> The tskey management here is not quite right: see cover letter.
+>>> ---
+>>>    include/net/bluetooth/bluetooth.h |  1 +
+>>>    net/bluetooth/hci_conn.c          | 21 +++++++++++++++++++--
+>>>    2 files changed, 20 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>> index bbefde319f95..3b2e59cedd2d 100644
+>>> --- a/include/net/bluetooth/bluetooth.h
+>>> +++ b/include/net/bluetooth/bluetooth.h
+>>> @@ -383,6 +383,7 @@ struct bt_sock {
+>>>    	struct list_head accept_q;
+>>>    	struct sock *parent;
+>>>    	unsigned long flags;
+>>> +	atomic_t bpf_tskey;
+>>>    	void (*skb_msg_name)(struct sk_buff *, void *, int *);
+>>>    	void (*skb_put_cmsg)(struct sk_buff *, struct msghdr *, struct sock *);
+>>>    };
+>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>>> index 95972fd4c784..7430df1c5822 100644
+>>> --- a/net/bluetooth/hci_conn.c
+>>> +++ b/net/bluetooth/hci_conn.c
+>>> @@ -28,6 +28,7 @@
+>>>    #include <linux/export.h>
+>>>    #include <linux/debugfs.h>
+>>>    #include <linux/errqueue.h>
+>>> +#include <linux/bpf-cgroup.h>
+>>>    
+>>>    #include <net/bluetooth/bluetooth.h>
+>>>    #include <net/bluetooth/hci_core.h>
+>>> @@ -3072,6 +3073,7 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
+>>>    			    const struct sockcm_cookie *sockc)
+>>>    {
+>>>    	struct sock *sk = skb ? skb->sk : NULL;
+>>> +	bool have_tskey = false;
+>>>    
+>>>    	/* This shall be called on a single skb of those generated by user
+>>>    	 * sendmsg(), and only when the sendmsg() does not return error to
+>>> @@ -3096,6 +3098,20 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
+>>>    
+>>>    			skb_shinfo(skb)->tskey = key - 1;
+>>>    		}
+>>> +		have_tskey = true;
+>>> +	}
+>>> +
+>>> +	if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
+>>> +	    SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING)) {
+>>> +		struct bt_sock *bt_sk = container_of(sk, struct bt_sock, sk);
+>>> +		int key = atomic_inc_return(&bt_sk->bpf_tskey);
+>>
+>> I don't think it needs to add "atomic_t bpf_tskey". Allow the bpf to decide what
+>> the skb_shinfo(skb)->tskey should be if it is not set by the userspace.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=950796
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.26 seconds
-BuildEll                      PASS      25.11 seconds
-BluezMake                     PASS      2752.24 seconds
-MakeCheck                     PASS      24.90 seconds
-MakeDistcheck                 PASS      202.47 seconds
-CheckValgrind                 PASS      277.53 seconds
-CheckSmatch                   WARNING   321.20 seconds
-bluezmakeextell               PASS      140.26 seconds
-IncrementalBuild              PENDING   0.32 seconds
-ScanBuild                     PASS      887.91 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:314:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+The idea was that the bpf prog can directly set the skb_shinfo(skb)->tskey if it 
+is not used by the userspace. iirc, it is where the discussion left at during 
+the earlier UDP support thread.
 
 
+> Ok. So if I understand correctly, the plan is that for UDP and
+> Bluetooth seqpacket sockets it works like this:
+> 
+> bpf_sock_ops_enable_tx_tstamp() does not set tskey.
 
----
-Regards,
-Linux Bluetooth
+The bpf_sock_ops_enable_tx_tstamp() has an used "u64 flags" argument. 
+Potentially, it can use the higher 32bits to specify the tskey.
 
+> 
+> Socket timestamping sets tskey the same way as previously.
+> 
+> So when both are in play, it shall work like:
+> 
+> * attach BPF timestamping
+> * setsockopt(SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_OPT_ID)
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = SOF_TIMESTAMPING_TX_SOFTWARE
+> => tskey 0
+> * sendmsg() CMSG SO_TIMESTAMPING = SOF_TIMESTAMPING_TX_SOFTWARE
+> => tskey 1
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = SOF_TIMESTAMPING_TX_SOFTWARE
+> => tskey 2
+> 
+> and BPF program has to handle the (unset) cases itself.
+> 
+>>
+>>> +
+>>> +		if (!have_tskey)
+>>> +			skb_shinfo(skb)->tskey = key - 1;
+>>> +
+>>> +		bpf_skops_tx_timestamping(sk, skb,
+>>> +					  BPF_SOCK_OPS_TSTAMP_SENDMSG_CB);
+>>> +
+>>>    	}
+>>>    }
+>>>    
+>>
+>>
+> 
 
---===============4329906070661456669==--
