@@ -1,182 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10102185BE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Apr 2025 09:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56819264F9F;
+	Tue,  8 Apr 2025 09:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744102880; cv=none; b=gXs84yxhftUR6Q9w5qjF3gU+8VXguwKFV4q9IEhCnB6EqtGOKZ3SV8xhlKvaf9J2hOTkJ7AcYbGd4gi7lkqPwJLdUkt1+mFnaDanvZvEr2n5kwmzYn79htOCqIV6WT3L30J8/lX1bVnqkhBosgyzJqKNHl3X+obE0H7zZMXQGew=
+	t=1744104468; cv=none; b=PKLOSt/hoz2hR6dAPvmCJZocjwM4tnCjzNSC7aknGEUa0lqgWhVLPWSOjW10a92rk4KYpH4xPQP7oKS6MbjmtKEyWt3uyQrmxhsmbebPGCbx3qgFUAB/v1LbBjqHe6MrTzo6qkcCRLoyIxJbRoTx1DYzFjqbpE60CnAk96qyIEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744102880; c=relaxed/simple;
-	bh=e5NxcCWmjv2WruSKwl14eFbLIo5cRmfOhpvUyP9MiIg=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sn6Z3leUaCWJoWNbByXtPX9h+RL31cU7eMrpru4ZuTiIUXTcx5nQyMS5mopFiDYohNJ6gLVyGFCc1SDDDgJxJCJGFEvNmh/te8kau90iTufpn1pwZhairrvQkm9ixydlejJFEIRj+RFEkgXWLu9D6mZDXX3xC3Q3xDWkvsWqrKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rIqW/ch1; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rIqW/ch1"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 46F47C4CEEA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Apr 2025 09:01:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744102877;
-	bh=e5NxcCWmjv2WruSKwl14eFbLIo5cRmfOhpvUyP9MiIg=;
-	h=From:To:Subject:Date:From;
-	b=rIqW/ch13VU3BF+ctv+orUdbeJRCXokYbHAgUABcwi/4pbBea+gsc2btAO4jMWEML
-	 ES/hqsAdcwtT6wavXehNMfw45NDYdjt2p7wbwScPXrx0+ouUw/jmNI7oJsOJZO/mS+
-	 FnSbaUgfREW0x2JyuhX/2lZuPxCfP24z3mxTpilxQKI9o7dy5S5iswLzm7ERqIeGhT
-	 GNzTFO50S41j7yoyrl07isVUXtmo2AArAVV8hYwpSSvGsORvzksxvu1/4IjITb2YZH
-	 VeXsBQ6WQGe4Hg8IKzu5P46EzUUuc3H0kxqqBMR6ffwUv3giOxvBkuaPj2W8cDTux/
-	 8b/C0sMfSxZqQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 395A7C53BC5; Tue,  8 Apr 2025 09:01:17 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219992] New: Linux logs warning `Bluetooth: hci0: SCO packet
- for unknown connection handle 3`
-Date: Tue, 08 Apr 2025 09:01:17 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219992-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1744104468; c=relaxed/simple;
+	bh=aMbRfljk3VL783Mt6idyLGub6ZrKA5QxLM0kTwp3sf0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VixKrsH011ScrPXYbbs/7+TDmWYI0hLNhX1C0CXI7jttt/9e8w9FgIxl+/z+r9w4R9IzKOOsQqPIq22loaDq2QyC350CAyrWmHZPx3Yk7xsa3ez0l/mhN9SgUj5CBuqb7YZAk+FoBs9a7jM21If5tf8JgJp2WP9ato+PVejZmDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.43] (g43.guest.molgen.mpg.de [141.14.220.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AD33E61E647BB;
+	Tue, 08 Apr 2025 11:26:48 +0200 (CEST)
+Message-ID: <a8e7171b-d859-4611-9681-e4c614f29d64@molgen.mpg.de>
+Date: Tue, 8 Apr 2025 11:26:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel WARNING (RCU) with btnxpuart on TI AM62 platform
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+ Neeraj Kale <neeraj.sanjaykale@nxp.com>, Nishanth Menon <nm@ti.com>,
+ Tero Kristo <kristo@kernel.org>, Santosh Shilimkar <ssantosh@kernel.org>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-serial@vger.kernel.org, regressions@lists.linux.dev
+References: <20250408083512.GA26035@francesco-nb>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250408083512.GA26035@francesco-nb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219992
+[Cc: +regressions@]
 
-            Bug ID: 219992
-           Summary: Linux logs warning `Bluetooth: hci0: SCO packet for
-                    unknown connection handle 3`
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-        Regression: No
+#regzbot introduced: v6.14..v6.15-rc1
 
-Using Linux 6.15-rc1 with Debian sid/unstable with *bluez* 5.79-2 and a JBL=
- GO
-2 speaker, Linux logs the warnings below:
 
-    [27836.585885] Bluetooth: hci0: SCO packet for unknown connection handl=
-e 3
-    [27836.585889] Bluetooth: hci0: SCO packet for unknown connection handl=
-e 3
-    [27836.585893] Bluetooth: hci0: SCO packet for unknown connection handl=
-e 3
+Dear Francesco,
 
-I haven=E2=80=99t seen this before, but I also do not use the box that ofte=
-n.
 
-Also, I cannot find out, if it=E2=80=99s related to the box shutting down to
-inactivity.
+Thank you for your report.
 
-```
-Apr 07 08:30:45.389947 abreu kernel: Linux version 6.15.0-rc1
-(build@bohemianrhapsody.molgen.mpg.de) (gcc (Debian 14.2.0-19) 14.2.0, GNU =
-ld
-(GNU Binutils for Debian) 2.44) #19 SMP PREEMPT_DYNAMIC Mon Apr  7 08:17
-:41 CEST 2025
-[=E2=80=A6]
-Apr 07 08:30:45.391407 abreu kernel: DMI: Dell Inc. XPS 13 9360/0596KF, BIOS
-2.21.0 06/02/2022
-[=E2=80=A6]
-Apr 07 08:30:46.920819 abreu kernel: Bluetooth: Core ver 2.22
-Apr 07 08:30:46.920859 abreu kernel: Bluetooth: HCI device and connection
-manager initialized
-Apr 07 08:30:46.920903 abreu kernel: Bluetooth: HCI socket layer initialized
-Apr 07 08:30:46.920922 abreu kernel: Bluetooth: L2CAP socket layer initiali=
-zed
-Apr 07 08:30:46.920945 abreu kernel: Bluetooth: SCO socket layer initialized
-Apr 07 08:30:47.008583 abreu kernel: Bluetooth: hci0: using rampatch file:
-qca/rampatch_usb_00000302.bin
-Apr 07 08:30:47.008779 abreu kernel: Bluetooth: hci0: QCA: patch rome 0x302
-build 0x3e8, firmware rome 0x302 build 0x111
-[=E2=80=A6]
-Apr 07 17:55:46.519507 abreu wireplumber[1450]: spa.bluez5.native: RFCOMM
-receive command but modem not available: AT+CHLD=3D?
-Apr 07 17:55:46.567877 abreu wireplumber[1450]: spa.bluez5.native: RFCOMM
-receive command but modem not available: AT+BTRH?
-Apr 07 17:55:46.743477 abreu wireplumber[1450]: spa.bluez5.native: RFCOMM
-receive command but modem not available: AT+XEVENT=3D0,0
-Apr 07 17:55:46.771757 abreu wireplumber[1450]: spa.bluez5.native: RFCOMM
-receive command but modem not available: AT+NREC=3D0
-Apr 07 17:55:48.735757 abreu gsd-media-keys[1713]: Unable to get default si=
-nk
-Apr 07 17:55:48.798996 abreu kernel: Bluetooth: hci0: SCO packet for unknown
-connection handle 3
-Apr 07 17:55:48.799164 abreu kernel: Bluetooth: hci0: SCO packet for unknown
-connection handle 3
-Apr 07 17:55:49.167305 abreu bluetoothd[99290]:
-/org/bluez/hci0/dev_70_99_1C_BB_23_4E/sep1/fd1: fd(29) ready
-Apr 07 17:55:49.183109 abreu bluetoothd[99290]:
-profiles/audio/avctp.c:uinput_create() Can't open input device: No such fil=
-e or
-directory (2)
-Apr 07 17:55:49.183121 abreu bluetoothd[99290]:
-profiles/audio/avctp.c:init_uinput() AVRCP: failed to init uinput for JBL G=
-O 2
-[=E2=80=A6]
-Apr 07 18:14:52.872325 abreu bluetoothd[99290]: Player unregistered:
-sender=3D:1.64 path=3D/_1_109
-[=E2=80=A6]
-Apr 07 18:25:01.645509 abreu CRON[102993]: pam_unix(cron:session): session
-closed for user root
-Apr 07 18:25:52.495118 abreu kernel: Bluetooth: hci0: SCO packet for unknown
-connection handle 3
-Apr 07 18:25:52.495629 abreu kernel: usb 4-1.3: USB disconnect, device numb=
-er 4
-Apr 07 18:25:52.623048 abreu kernel: usb 3-1.3: USB disconnect, device numb=
-er 4
-Apr 07 18:25:52.954533 abreu kernel: usb 3-1.3.3: USB disconnect, device nu=
-mber
-6
-Apr 07 18:25:52.955123 abreu kernel: usb 3-1.3.4: USB disconnect, device nu=
-mber
-7
-Apr 07 18:30:03.815634 abreu bluetoothd[99290]:
-src/profile.c:ext_io_disconnected() Unable to get io data for Hands-Free Vo=
-ice
-gateway: getpeername: Transport endpoint is not connected (107)
-Apr 07 18:30:03.836632 abreu dbus-daemon[693]: [system] Rejected send messa=
-ge,
-0 matched rules; type=3D"method_return", sender=3D":1.71" (uid=3D5272 pid=
-=3D1450
-comm=3D"/usr/bin/wireplumber") interface=3D"(unset)" member=3D"(unset)" err=
-or
-name=3D"(unset)" requested_reply=3D"0" destination=3D":1.384" (uid=3D0 pid=
-=3D99290
-comm=3D"/usr/libexec/bluetooth/bluetoothd")
-Apr 07 18:30:03.838911 abreu gsd-media-keys[1713]: Unable to get default si=
-nk
-```
+Am 08.04.25 um 10:35 schrieb Francesco Dolcini:
 
---=20
-You may reply to this email to add a comment.
+> I do have the following kernel warning with 6.15-rc1, on a TI AM62
+> platform (arm64), single CPU core, using btnxpuart driver, any idea?
+> PREEMPT_RT is enabled, if it matters.
+> 
+> Either the issue is not systematic, or multi cores SoCs are not affected
+> (no error on the exact same image on a dual nor on quad core TI AM62).
+> 
+> 
+> [   23.139080] Voluntary context switch within RCU read-side critical section!
+> [   23.139119] WARNING: CPU: 0 PID: 61 at /kernel/rcu/tree_plugin.h:332 rcu_note_context_switch+0x3c4/0x430
+> [   23.139172] Modules linked in: uas onboard_usb_dev optee_rng dwc3 evdev btnxpuart spidev aes_ce_blk aes_ce_cipher ghash_ce gf128mul sha2_ce sha256_arm64 sha1_ce snd_soc_simple_card snd_soc_simple_card_utils optee spi_cadence_quadspi tee gpio_keys usb_conn_gpio display_connector roles dwc3_am62 mwifiex_sdio k3_j72xx_bandgap mwifiex rtc_ti_k3 cfg80211 tidss sa2ul sha512_generic snd_soc_davinci_mcasp authenc drm_display_helper snd_soc_ti_udma crypto_null snd_soc_ti_edma sha1_generic snd_soc_ti_sdma omap_hwspinlock lontium_lt8912b ina2xx snd_soc_wm8904 ti_ads1015 industrialio_triggered_buffer kfifo_buf lm75 tpm_tis_i2c tps65219_pwrbutton crc_ccitt tpm_tis_core tpm rng_core tc358768 m_can_platform pwm_tiehrpwm m_can spi_omap2_mcspi can_dev bluetooth ecdh_generic ecc rfkill libaes loop fuse ipv6 autofs4
+> [   23.139459] CPU: 0 UID: 0 PID: 61 Comm: kworker/u5:0 Not tainted 6.15.0-rc1-0.0.0-devel #1 PREEMPT_RT
+> [   23.139471] Hardware name: Toradex Verdin AM62 WB on Dahlia Board (DT)
+> [   23.139478] Workqueue: hci0 hci_power_off [bluetooth]
+> [   23.139615] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [   23.139625] pc : rcu_note_context_switch+0x3c4/0x430
+> [   23.139647] lr : rcu_note_context_switch+0x3c4/0x430
+> [   23.139658] sp : ffff8000819fb740
+> [   23.139661] x29: ffff8000819fb740 x28: 0000000000000000 x27: ffff0000079d2010
+> [   23.139673] x26: ffff0000011e7810 x25: ffff000001c2c200 x24: 0000000000000000
+> [   23.139688] x23: 0000000000000000 x22: ffff000001c2c200 x21: ffff000001c2c200
+> [   23.139700] x20: ffff800081083ec0 x19: ffff00001da9fec0 x18: fffffffffffe7e78
+> [   23.139712] x17: ffff7fff9ca1c000 x16: ffff800080000000 x15: ffff00001da9f8c0
+> [   23.139726] x14: fffffffffffc7e77 x13: 216e6f6974636573 x12: 206c616369746972
+> [   23.139738] x11: 6320656469732d64 x10: 6165722055435220 x9 : 206e696874697720
+> [   23.139750] x8 : ffff80008113f040 x7 : ffff8000819fb4e0 x6 : 000000000000000c
+> [   23.139761] x5 : ffff00001da95888 x4 : 0000000000000000 x3 : 0000000000000027
+> [   23.139775] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000001c2c200
+> [   23.139788] Call trace:
+> [   23.139793]  rcu_note_context_switch+0x3c4/0x430 (P)
+> [   23.139813]  __schedule+0xa0/0x7dc
+> [   23.139830]  schedule+0x34/0x11c
+> [   23.139841]  schedule_timeout+0x8c/0x110
+> [   23.139861]  wait_for_completion_timeout+0x78/0x14c
+> [   23.139873]  ti_sci_set_device_state+0x120/0x1fc
+> [   23.139886]  ti_sci_cmd_get_device_exclusive+0x18/0x30
+> [   23.139899]  ti_sci_pd_power_on+0x28/0x54
+> [   23.139916]  _genpd_power_on+0x98/0x188
+> [   23.139927]  genpd_power_on+0xa8/0x168
+> [   23.139940]  genpd_runtime_resume+0xc0/0x298
+> [   23.139957]  __rpm_callback+0x48/0x1a4
+> [   23.139974]  rpm_callback+0x74/0x80
+> [   23.139987]  rpm_resume+0x3b0/0x698
+> [   23.140000]  __pm_runtime_resume+0x48/0x88
+> [   23.140012]  omap8250_set_mctrl+0x2c/0xbc
+> [   23.140030]  serial8250_set_mctrl+0x20/0x40
+> [   23.140046]  uart_update_mctrl+0x80/0x110
+> [   23.140062]  uart_dtr_rts+0x104/0x118
+> [   23.140079]  tty_port_shutdown+0xd4/0xe0
+> [   23.140092]  tty_port_close+0x3c/0xb8
+> [   23.140103]  uart_close+0x34/0x98
+> [   23.140116]  ttyport_close+0x50/0xa0
+> [   23.140137]  serdev_device_close+0x40/0x5c
+> [   23.140150]  btnxpuart_close+0x1c/0xa0 [btnxpuart]
+> [   23.140175]  hci_dev_close_sync+0x304/0x7cc [bluetooth]
+> [   23.140243]  hci_dev_do_close+0x2c/0x70 [bluetooth]
+> [   23.140309]  hci_power_off+0x20/0x64 [bluetooth]
+> [   23.140379]  process_one_work+0x148/0x284
+> [   23.140403]  worker_thread+0x2c8/0x3dc
+> [   23.140414]  kthread+0x12c/0x208
+> [   23.140426]  ret_from_fork+0x10/0x20
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+As I understood, that it’s a regression, and you can reproduce it, would 
+it be possible, that you bisected the issue?
+
+
+Kind regards,
+
+Paul
