@@ -1,92 +1,101 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81208266593;
-	Tue,  8 Apr 2025 09:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1B620CCD8
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Apr 2025 09:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744104939; cv=none; b=XF447oFQ0f+UNPz8y2XzvaTMWruoAA/VEi2FOLuQR0tqbZOIfVNaKIsGpKLt4dEa0zC0k8zYB7C9IH0Kry/ffRPJDiWRit9aTZohkP0pc8zwVu7cPFqrDxy3VE0pgpfF5mOjdlnuTNJKBb6wywQyzw8kRk9Qrw0Tq9XZCGruuYI=
+	t=1744105052; cv=none; b=B6p/YM6YHuSK8igtbzR9BmjbaLbF8bTqRxNiNs2CIYBjU4ViNWDtkijv3803Sj9Dz6tOwLCBqgY8Nsz+x7RM1Uf3FMhiv/E/yCAGFBbmSwVyy7GZ7W1HXXwpgj52kQwmJznq+f2H2HMgVervp67Ejy/mJexFBX8XntRlBz1vaF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744104939; c=relaxed/simple;
-	bh=EJSHMKpGhViqTfouoTjG+vkCRWxUv1idSyLcCyeRa1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FowtkyRXLclY4D5BWZUHH8gEapeI9B+ojKAZz9fq83QD/WuJUmNNaKaNZO3LYPR6vAUVMPRYXC41xE3G40WrL2wfIGP9kQwYjfVsoSBFA5KfRFWIppJPKh2tz3tKmT2WdcsblUQrJWi9eGz8Zqk0GHOgXQl+ONAg6cnLD1nzADo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=kRPeka47; arc=none smtp.client-ip=217.194.8.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="kRPeka47"
-Received: from gaggiata.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-	by mail11.truemail.it (Postfix) with ESMTPA id 7B98F1F9BC;
-	Tue,  8 Apr 2025 11:35:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
-	s=default; t=1744104935;
-	bh=epFMM6E3b5n0AAjQqhCMwFutqLu+axl/bDlyBr62jpM=;
-	h=Received:From:To:Subject;
-	b=kRPeka47FL9mUb/LiDd/KpngGvLjxHugS25K7j24KcMayZUKVJPhJdJic4fXTaRVi
-	 fPOKGwxQ9qqLyl/6RhA+Mkw+mSUUotd/VLHTPRETb8/UwuMohmuRXW2/8U1bs6f4VH
-	 Oi86j2bfeCOn5i5AOeFvnjiAxLLKcY1NZFy8sbaYmOVOVxEuQogIE6orN3NX/x1J8h
-	 YqBnKXKQ9DHpF+MV9LJeyRylGN9US8ePAGtJBC4+Ph1R1G+T1m6qPROnW/SZtOPqNl
-	 HOkkaWNeoZ7K7vLm7xW/IvqQLofWQOA+ODX83FJvJAcIHsqOYm8yU5rO7K+M2NBmFz
-	 tJS0d65nIZHLw==
-Received: by gaggiata.pivistrello.it (Postfix, from userid 1000)
-	id 328987F8D5; Tue,  8 Apr 2025 11:35:35 +0200 (CEST)
-Date: Tue, 8 Apr 2025 11:35:35 +0200
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Francesco Dolcini <francesco@dolcini.it>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Kale <neeraj.sanjaykale@nxp.com>, Nishanth Menon <nm@ti.com>,
-	Tero Kristo <kristo@kernel.org>,
-	Santosh Shilimkar <ssantosh@kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-serial@vger.kernel.org, regressions@lists.linux.dev
-Subject: Re: Kernel WARNING (RCU) with btnxpuart on TI AM62 platform
-Message-ID: <Z_Tt58Ar9TAUy4gB@gaggiata.pivistrello.it>
-References: <20250408083512.GA26035@francesco-nb>
- <a8e7171b-d859-4611-9681-e4c614f29d64@molgen.mpg.de>
+	s=arc-20240116; t=1744105052; c=relaxed/simple;
+	bh=I6cJUdFJXRoy3lC1VOhonP7thtChsfvGa5IOWUa39Mo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=stFYQp7c+BUrNUGqMsNC+kaOT0m5nTEDF+p2/h0k6vgvnCpNp0YCqtvnzVY3ZO/FiOP0RUe3RTUgUkm11JRiSbMmvu5zSl4Wgk1BvpU+ovigfNKmsSaSWlIVzoIvU6zEKT9Q4Q8ZNQYWLFn9ASkCAJEO3vAaU4vSKosjIoh2DxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.43] (g43.guest.molgen.mpg.de [141.14.220.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 370BC61E647BB;
+	Tue, 08 Apr 2025 11:37:23 +0200 (CEST)
+Message-ID: <4db1b876-afa7-4ccb-be2f-36974669f269@molgen.mpg.de>
+Date: Tue, 8 Apr 2025 11:37:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Establishing ACL links is
+ prohibited when power off
+To: Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: quic_chejiang@quicinc.com, quic_jiaymao@quicinc.com,
+ quic_chezhou@quicinc.com, quic_zijuhu@quicinc.com,
+ quic_mohamull@quicinc.com, linux-bluetooth@vger.kernel.org
+References: <20250408024646.1784057-1-quic_shuaz@quicinc.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250408024646.1784057-1-quic_shuaz@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a8e7171b-d859-4611-9681-e4c614f29d64@molgen.mpg.de>
 
-Hello,
+Dear Shuai,
 
-On Tue, Apr 08, 2025 at 11:26:47AM +0200, Paul Menzel wrote:
-> [Cc: +regressions@]
+
+Thank you for your patch. Some minor comments.
+
+It’d be great if you made the summary/title a statement about the action 
+of the patch and not about the issue. Maybe:
+
+Prohibit establishing of ACL links during poweroff
+
+
+Am 08.04.25 um 04:46 schrieb Shuai Zhang:
+> If turning off BT during pairing, "hci_acl_create_conn_sync" has chances
+> to be left in cmd_sync_work_list. Then the driver will try to send
+> the HCI command of creating connection but failed.
+
+s/failed/fails/
+
+> When establishing ACL link, add judgment for BT power off.
+
+Maybe:
+
+Check if the device is *not* starting up, that means powering off, when 
+establishing the ACL link, and cancel early in this case.
+
+
+It’d be great if you documented how to reproduce the bug and test the patch.
+
+> Change-Id: I9844a1ce1f207453e4fadeded3da1738eb4660c9
+> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+> ---
+>   net/bluetooth/hci_sync.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> #regzbot introduced: v6.14..v6.15-rc1
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index aeeadb45e..fdd57132e 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -6761,7 +6761,7 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
+>   	struct hci_cp_create_conn cp;
+>   	int err;
 > 
+> -	if (!hci_conn_valid(hdev, conn))
+> +	if (!hci_conn_valid(hdev, conn) || !test_bit(HCI_UP, &hdev->flags))
+>   		return -ECANCELED;
 > 
-> Thank you for your report.
-> 
-> Am 08.04.25 um 10:35 schrieb Francesco Dolcini:
-> 
-> > I do have the following kernel warning with 6.15-rc1, on a TI AM62
-> > platform (arm64), single CPU core, using btnxpuart driver, any idea?
-> > PREEMPT_RT is enabled, if it matters.
-> > 
-> > Either the issue is not systematic, or multi cores SoCs are not affected
-> > (no error on the exact same image on a dual nor on quad core TI AM62).
-> > 
-> > 
-> > [   23.139080] Voluntary context switch within RCU read-side critical section!
-> > [   23.139119] WARNING: CPU: 0 PID: 61 at /kernel/rcu/tree_plugin.h:332 rcu_note_context_switch+0x3c4/0x430
+>   	/* Many controllers disallow HCI Create Connection while it is doing
+> --
+> 2.34.1
 
-...
+The diff looks reasonable.
 
-> As I understood, that it’s a regression, and you can reproduce it, would it
-> be possible, that you bisected the issue?
 
-I am not sure if this is a regression. It's possible that the issue is not new,
-and it is just non systematic. For sure it was reproduced by our CI on v6.15-rc1.
+Kind regards,
 
-Francesco
-
+Paul
