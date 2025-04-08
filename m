@@ -1,183 +1,157 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0AE022DFB0
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Apr 2025 17:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACAB184524
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Apr 2025 17:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744133580; cv=none; b=uMJ8kV0GwP2FEb4zPf8cZESyJgdfyswyASzhmW/RkDBvsSDv3Br/XvyLPGkaAD15kksbIeG9s/3Ji9uQeFrOzOdD6Sx4cZc73wW0/f/J8GtE+YSCosWW7oL7gp14zCiuJHLEMgYwS1PKOia623iS15qj/zt0oT457RLlJrHxa0s=
+	t=1744133695; cv=none; b=bx+4FoH97d5A1E/cx2v7O0rBO6HOZhy5c0SQ+k3iquZeLapvCmxDmW/36u7s8rk/JOdzSkKtkLiVHkKEBoCiXfkCGtDV8dg79/VBZ7KBgJ5zSp1hSwoKbl5irnm/junwstKuph+VQLTfIOl8goN0PeJO8v29ez3ffpmvg9E6zbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744133580; c=relaxed/simple;
-	bh=xR5EEg54XDBTo0qEcFEu7QCS013H/CCV3r1d8nx5ZkY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iKorzff9Iaq02kIcJKr7/21mdiXl4E4+/S2C+YM4NkNU73CQq5Jl4aLCz3hmIeAoYz7C5+QvLmNXleOs38TRs9avYYQVqSI2pMxP0woD5IFqGTowfc7dbSkLvRtvj2LTTgfJvw93H5VeMXuiQ1Ah5L9H/BqWh6u7+hJo8VFhAgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l49DfkQ9; arc=none smtp.client-ip=209.85.167.44
+	s=arc-20240116; t=1744133695; c=relaxed/simple;
+	bh=nUWe8Ou+5doHNJKLW2GlnfltdWXDtUyYlkcv8PdK7Hs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VqORn/d6ZxNYArucMud2PXPr8ryXjg+LyX/BNfTVD5nO91l/A1g2vr/gcp/yoWFGc91Ruz+/j5rmlkUCJBMlQEs6H0fBKSikjOiFrzkv3kIPd/c1vudCu9veO5M03LjvbfXAp1+s1yEtTMTuma1RYzuHZe0uCRLmcwmnJTfggVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDK3NrXP; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l49DfkQ9"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54acc04516cso6743576e87.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Apr 2025 10:32:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDK3NrXP"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c55500d08cso549330285a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Apr 2025 10:34:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744133576; x=1744738376; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ac10o4rGUomrqU2G9Z4ZxoQKUZH3TorDKzb4ytt4HPQ=;
-        b=l49DfkQ9YZ3bfg3fq9VAKY8qn4ZiLmZP8BZPqWVzDywmjm+gdvXha/drprCgLjAHgf
-         QsYhaFqR8uys0tMc7FgCYT1hadfTqi8Obz4c7L14Br8cyeJmsPIZuV96lkNsMNPcDXlX
-         3NlgJENwLhLD+yUaQ/tDpJZnsUECbopf/H9KeIFU9smqTELxlwBaE/fglPLEEkjsBWLT
-         iAYN1n2bw3m24dhtI+kJFBnHEQ3G2NaprTo2ujgKgNgdvJPFxbtAUKRzixkOcqgGloEB
-         owTd6ST+JOr7WsD7NPkvwh1KVNpSnrm9o5/56/KfGMbfdlsv7sug9qcBDhWITTTJzeQ1
-         vcCA==
+        d=gmail.com; s=20230601; t=1744133693; x=1744738493; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2DOb0dvbNmvqnEY0NU/IIA+TeEfJQS2OE5iiA+rmTTo=;
+        b=QDK3NrXPGptOWnHS9f4FgMmJ7NWyRflHonjbdXPi5+6eN91tcDSZFhJiscu2PvMrK/
+         BqD3Vo5JFb8kQu30rcNpje7ZULR6tdf+VU8DON/2w3vJbTqzavZQW5ZwOUhlo3b+/TZ+
+         FKnkG3NpNh7YHI1QCXq9QfC5dJHLaiwhpeaVEnJpz9ru1QKvPELlKdlG73UWs1RyBHUZ
+         jpHznbAcG6v2d0vrdyU+p4Iu+rUeUDK9wUgRWEFXSWpZxtpiPzShI1Cqtri3HL5fkRWY
+         z/CeqUf0+4DJNjAkHhbt48QC10OP1r14XBuQVjYqLoKxUqvQxq7zK2bCIEu1gImXrKJT
+         VGog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744133576; x=1744738376;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ac10o4rGUomrqU2G9Z4ZxoQKUZH3TorDKzb4ytt4HPQ=;
-        b=mLfcOzvSOwFEyOvD9IymHCPkJ3YB2zIV8YYvje8BnEIfjxkUs0Xv+Qf+cqaXwfzCYO
-         FA5G4n3yKBSA8fhBiRYcx2WONc2kWb4sKf+2z6fkESvSARHX+LdWUdgWnarZjZe4DgdO
-         UMVBpep4qu823nBpP8+IzSi7Zq+CTevDlBWBrhVPbNYunNk8EDB37poGnTNNwyDLg+pa
-         onj1/5E4SonNJsq2Qgrugyput+3GzidHQp+aLowvFrWZ/Gtg8DsT4/rf/ayH+sdOcsOc
-         cQKGfExSwd3cXiTDCsIV29m+1WlNbZjOEZu5jysD01WIxyzEsTFnZwFn5eXnUMRqv1xW
-         gssA==
-X-Gm-Message-State: AOJu0YzQ6jruJFhcMrziyCJk+JpXtC5OmHQg+GktaEXvQiCEd/F+4O/+
-	Noa5gswtscYKfqeyS7R5lBjUSI8q/9IC7NQ0ySwiCsf9Tg2EvXH9ReW9yb2Lsxs5qUUqR3eRSGu
-	RD7WcP6Lpqblcjkt70H8aa6kchkkpd8FiLe8=
-X-Gm-Gg: ASbGncuveG6+ZGqcGCCExrtB+HfSkdRHaiVvf4u2cD0KjW0EDOWALkI0rcGNXia5cgP
-	8bVZQpf2AKrGtk3X5ESJuHgAr8J27H7U9pbpR1XShifVEn2H/HOG4dgV1amrAwUq+wBYdQCK94K
-	CMS88xNVyMNabYeuwiCm91I5ec
-X-Google-Smtp-Source: AGHT+IHpvtcLuB9dhglS+v9gILDcpQui5YUzl/mMZdLdLg1aftR4tb0OaoWxXOVxQi2sy3eNMsDu78LcjuN9nAxHz2w=
-X-Received: by 2002:a05:6512:1255:b0:549:9143:4e8d with SMTP id
- 2adb3069b0e04-54c297b7221mr3648224e87.8.1744133576410; Tue, 08 Apr 2025
- 10:32:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744133693; x=1744738493;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2DOb0dvbNmvqnEY0NU/IIA+TeEfJQS2OE5iiA+rmTTo=;
+        b=sBjksYcql64e318w+vODjWPKnpl/Y55SBzdhqS527rdvIVkxeoTOscAZ9HUvgei0MX
+         XEzQPJmv5rPVunjM9eF7LVikvlIeeEBFyA7jZ/8tKQACYOwGOJK+MolMOzYQ4qiob9m3
+         4cVzubYKkc5NdXrysaW7HSO5sRx9Y1bQuzP01k7rojUw8uM7Pcr9VIQxa190V/5SVrXr
+         /7EQ9eagxggridhkXC0Gf8mRejGpy1vqM1kEQR9Tpt9VUxk8EQJyn1YEp7HeliX6v4uk
+         hSISWA1kNXaJwr/FtD3r1l2zMQ6INQzafWYQw/dqxOuSSHgIEVkTQ5B/ZiGW2++d8O/A
+         EwBA==
+X-Gm-Message-State: AOJu0YzRNne5SYptmuxG9adBhTign+yCN0cH/icBLtTYcoutk1SwZ1rx
+	9nwuot2tX+j4MUXlkmqf2GQs29FEPqdMA58eBKqEJYOk68uBmkld66rWHw==
+X-Gm-Gg: ASbGncvbQTghFHNRwSxehwPI2UxG+5P2+nAbOkYS9QoWZ4AWQKB7GXrVbZoPlQkVcwn
+	DNVS+qKdmXmaoZ6wX/Ke55PHWzSoAuXhCqz9cZZDZf4i50ci7NL458KbC8YBqOdtHZz12IVCddi
+	E3TgRcCbNa52Q0zE4NVCxCnwdrN4VktobXDKuezfloGN+iHZRP/AwZtRFN6HIRUBQ2h9/yHJGFZ
+	AvUrpIcC696nQyYegHW/abppZ+gEmv7VahTJvT+l20luSDwf2BiCoJugopZO5UTlCBhn/De6eDO
+	Q14+BwvdJbey6kBaqk7H/c2ye2Unq+G50oG1j12Fjp565WVpV5YfNA==
+X-Google-Smtp-Source: AGHT+IFU36MQHqpxMfXsoK6Uf9EOHakdLuUZq97ayx37fxmfUfTn9Kmt26mjbke61IXTsukL/P5hYg==
+X-Received: by 2002:a05:620a:4409:b0:7c5:5584:dc1b with SMTP id af79cd13be357-7c77ddde0f5mr2685442485a.54.1744133693010;
+        Tue, 08 Apr 2025 10:34:53 -0700 (PDT)
+Received: from [172.17.0.2] ([172.200.199.208])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c76ea8b7b1sm786903085a.108.2025.04.08.10.34.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Apr 2025 10:34:52 -0700 (PDT)
+Message-ID: <67f55e3c.050a0220.23b5b9.887d@mx.google.com>
+Date: Tue, 08 Apr 2025 10:34:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3656264972077028678=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250408170915.623602-1-frederic.danis@collabora.com> <CABBYNZJNTJsn9a+n1V2yyp2kkEVKTvvP_F4S-rnH-Trqm0hKPQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJNTJsn9a+n1V2yyp2kkEVKTvvP_F4S-rnH-Trqm0hKPQ@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 8 Apr 2025 13:32:44 -0400
-X-Gm-Features: ATxdqUFUySIltFHM_5P1liMJUidn9HCWj64bBALCl7iMDodhouImA1LQ9YLGpy4
-Message-ID: <CABBYNZJ5L_qvats5dL7PAR==r4VaAfYQLsD372W9FmAfD3R9sw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: l2cap: Check encryption key size on incoming connection
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: Bluetooth: l2cap: Check encryption key size on incoming connection
+In-Reply-To: <20250408170915.623602-1-frederic.danis@collabora.com>
+References: <20250408170915.623602-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Fr=C3=A9d=C3=A9ric,
+--===============3656264972077028678==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 8, 2025 at 1:28=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Fr=C3=A9d=C3=A9ric,
->
-> On Tue, Apr 8, 2025 at 1:09=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
-> <frederic.danis@collabora.com> wrote:
-> >
-> > This is required for passing GAP/SEC/SEM/BI-04-C PTS test case:
-> >   Security Mode 4 Level 4, Responder - Invalid Encryption Key Size
-> >   - 128 bit
-> >
-> > This tests the security key with size from 1 to 15 bytes while the
-> > Security Mode 4 Level 4 requests 16 bytes key size.
-> >
-> > Currently PTS fails with the following logs:
-> > - expected:Connection Response:
-> >     Code: [3 (0x03)] Code
-> >     Identifier: (lt)WildCard: Exists(gt)
-> >     Length: [8 (0x0008)]
-> >     Destination CID: (lt)WildCard: Exists(gt)
-> >     Source CID: [64 (0x0040)]
-> >     Result: [3 (0x0003)] Connection refused - Security block
-> >     Status: (lt)WildCard: Exists(gt),
-> > but received:Connection Response:
-> >     Code: [3 (0x03)] Code
-> >     Identifier: [1 (0x01)]
-> >     Length: [8 (0x0008)]
-> >     Destination CID: [64 (0x0040)]
-> >     Source CID: [64 (0x0040)]
-> >     Result: [0 (0x0000)] Connection Successful
-> >     Status: [0 (0x0000)] No further information available
-> >
-> > And HCI logs:
-> > < HCI Command: Read Encrypti.. (0x05|0x0008) plen 2
-> >         Handle: 14 Address: 00:1B:DC:F2:24:10 (Vencer Co., Ltd.)
-> > > HCI Event: Command Complete (0x0e) plen 7
-> >       Read Encryption Key Size (0x05|0x0008) ncmd 1
-> >         Status: Success (0x00)
-> >         Handle: 14 Address: 00:1B:DC:F2:24:10 (Vencer Co., Ltd.)
-> >         Key size: 7
-> > > ACL Data RX: Handle 14 flags 0x02 dlen 12
-> >       L2CAP: Connection Request (0x02) ident 1 len 4
-> >         PSM: 4097 (0x1001)
-> >         Source CID: 64
-> > < ACL Data TX: Handle 14 flags 0x00 dlen 16
-> >       L2CAP: Connection Response (0x03) ident 1 len 8
-> >         Destination CID: 64
-> >         Source CID: 64
-> >         Result: Connection successful (0x0000)
-> >         Status: No further information available (0x0000)
-> >
-> > Signed-off-by: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-> > ---
-> >  net/bluetooth/l2cap_core.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index c7b66b2ea9f2..f2ab09582146 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -3997,6 +3997,13 @@ static void l2cap_connect(struct l2cap_conn *con=
-n, struct l2cap_cmd_hdr *cmd,
-> >                 goto response;
-> >         }
-> >
-> > +       /* Check the encryption key size */
-> > +       if (!l2cap_check_enc_key_size(conn->hcon)) {
-> > +               conn->disc_reason =3D HCI_ERROR_AUTH_FAILURE;
-> > +               result =3D L2CAP_CR_SEC_BLOCK;
-> > +               goto response;
-> > +       }
-> > +
->
-> Hmm maybe we should incorporate this is the statement before:
->
->     /* Check if the ACL is secure enough (if not SDP) */
->     if (psm !=3D cpu_to_le16(L2CAP_PSM_SDP) &&
->         !hci_conn_check_link_mode(conn->hcon)) {
->         conn->disc_reason =3D HCI_ERROR_AUTH_FAILURE;
->         result =3D L2CAP_CR_SEC_BLOCK;
->         goto response;
->     }
->
-> That said I don't quite understand why the likes of
-> hci_conn_check_link_mode is not checking the key size since it is
-> already doing security level checks, either way that indeed seem to be
-> missing for incoming connection requests.
+This is automated email and please do not reply to this email!
 
-Also this need to add Fixes: 288c06973daa ("Bluetooth: Enforce key
-size of 16 bytes on FIPS level") since apparently tha missed some code
-paths.
+Dear submitter,
 
-> >         result =3D L2CAP_CR_NO_MEM;
-> >
-> >         /* Check for valid dynamic CID range (as per Erratum 3253) */
-> > --
-> > 2.43.0
-> >
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=951217
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      28.75 seconds
+CheckAllWarning               PASS      29.00 seconds
+CheckSparse                   PASS      45.36 seconds
+BuildKernel32                 PASS      30.55 seconds
+TestRunnerSetup               PASS      479.36 seconds
+TestRunner_l2cap-tester       PASS      21.96 seconds
+TestRunner_iso-tester         FAIL      121.76 seconds
+TestRunner_bnep-tester        PASS      4.90 seconds
+TestRunner_mgmt-tester        FAIL      131.22 seconds
+TestRunner_rfcomm-tester      PASS      13.00 seconds
+TestRunner_sco-tester         PASS      12.71 seconds
+TestRunner_ioctl-tester       PASS      8.54 seconds
+TestRunner_mesh-tester        FAIL      9.33 seconds
+TestRunner_smp-tester         PASS      15.16 seconds
+TestRunner_userchan-tester    PASS      6.96 seconds
+IncrementalBuild              PENDING   0.79 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in iso_conn_hold_unless_zero+0x78/0x1c0
+Total: 124, Passed: 123 (99.2%), Failed: 0, Not Run: 1
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.190 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in run_timer_softirq+0x76f/0x7d0
+WARNING: CPU: 0 PID: 36 at kernel/workqueue.c:2257 __queue_work+0x93e/0xba0
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Failed       0.107 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3656264972077028678==--
