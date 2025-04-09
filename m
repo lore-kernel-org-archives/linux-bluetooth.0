@@ -1,90 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547A625D553
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Apr 2025 12:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573622253E4
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Apr 2025 12:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744200204; cv=none; b=iYDmsyxM/O40GQhBky6ouE0ySJ0UlbgUXkUj0zXZ1BoZvlHlvFPG36TwMzZRTdEafRI0EfZiodX4zaFnG1FjftexUpb+zGYlUODf75Pmny6iBhozFxKqtytnhrCa5bJiOlx0Y5N/b/ovMF1Z3dWUxJ8YVTQEgzehhZnAx5tZNY8=
+	t=1744201983; cv=none; b=Y0G/0C2M26U1vyoqutUHvOuU4CO255o0v34UubYHT5zoNnOdIEL8t7o5+oclk2W6uYdfK59J2gvXEl8WiJSR+wkQ63rZzjOAVJPhFQXBFOHwnyfPoCxBhz8+peMJJV5sGp3MWf+P+JLD9gc5JV7xaPr9hk9x3FFDgtjHNlBoGB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744200204; c=relaxed/simple;
-	bh=cib0t84cz0fmRD5zl67pX7rCc4UhSpif8woU6/40hAc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uGL/5y1zpgJxUw8GLGoeI4FnRE6wdfBA9nbULb/VChGVGNgFwinV1mosX4cRGu0YsZgFHlKf7aZV+ZYTXuI9bqxzoLhC1bWK8wMAGwkI5FZ4+WOUlkNQkOkWDoCCgnx7GqA/25xKD4oC/KLjcaWSs9euVDrh3elaemuMm4QqXic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/mh2LGZ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/mh2LGZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B133DC4CEE9
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Apr 2025 12:03:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744200203;
-	bh=cib0t84cz0fmRD5zl67pX7rCc4UhSpif8woU6/40hAc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=h/mh2LGZh1b7iRR0yT79KGq2i+eVukVX26S6AcUmXG+jPPGy02j+SGBU2FWi+6hbR
-	 ov2Plf7e1aS7oSp9DIjeR+14B+T1kCqIlk6STz/B26Pn8KLUqACdaDCQl6uyCmz6yl
-	 CRvC1A6zm8g5Vk/aKSyZmWfa7hmJTkgFQ3/CqitNAphGuvjqPWWTSw2BKewCXhyaYH
-	 Pywcs5LC6V4aLn/4pMC2j/Ha8iGvx0Y8nY1+qYrrZs1rb6Qz+qq5WkB74IBBeMIUE4
-	 +nzochqDqSg28REfl4pLEpz28UC6yk7Pp37RZ3ZlzX/06Gu7zwO1LaGjz+47KVLHuM
-	 LKeSdkpkWZhEw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A750FC3279F; Wed,  9 Apr 2025 12:03:23 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 209659] Intel USB AX201 bluetooth (8087:0026) device is gone
- after system resume
-Date: Wed, 09 Apr 2025 12:03:23 +0000
-X-Bugzilla-Reason: CC AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: khalil.fazal.0@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209659-62941-AqAz1oYwxR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209659-62941@https.bugzilla.kernel.org/>
-References: <bug-209659-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1744201983; c=relaxed/simple;
+	bh=COhtqQHd5uQMLEHUMwktHuVOl2dqgnbJjBhJzWVDCE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d45Qygi3MzWM7ok5iIt0mdh44joPfBFzgF4Yf1bP+qiFe7fJU5xeMOPlKK1xVjBlrePndQTipLn+wDFoW10+K9XWbgg4g447V0LmC28vZnS6dYDE/RNyNNNNuivjN2MrgpGFzUEKUgZeMe1G27jCl747Y6Irxg0DUoyx0avps/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.43] (g43.guest.molgen.mpg.de [141.14.220.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6D0B661E64799;
+	Wed, 09 Apr 2025 14:32:52 +0200 (CEST)
+Message-ID: <570876be-3dfb-41b1-b6a5-613dc7ec7b87@molgen.mpg.de>
+Date: Wed, 9 Apr 2025 14:32:52 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: hci_sync: Prohibit establishing of ACL
+ links during poweroff
+To: Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_bt@quicinc.com
+References: <20250408115146.2300584-1-quic_shuaz@quicinc.com>
+ <46521c87-ed61-420d-bb2d-d5499d119f5c@quicinc.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <46521c87-ed61-420d-bb2d-d5499d119f5c@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D209659
+Dear Shuai,
 
-Khalil Fazal (khalil.fazal.0@gmail.com) changed:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |khalil.fazal.0@gmail.com
+Thank you for the improved patch. Should you resend only some minor things.
 
---- Comment #9 from Khalil Fazal (khalil.fazal.0@gmail.com) ---
-Confirming bug.
 
-Bluetooth Device: Intel Wireless Bluetooth (USB ID 8087:0aaa, Intel 9460/95=
-60
-Jefferson Peak)=20=20
-USB Controller: xHCI at 0000:00:14.0 (Bus 003), 0000:00:0d.0 (Bus 001/002)
-BIOS: DJCN25WW
-Laptop Product: Lenovo ThinkBook 14 IIL, Model: 20SL0015US
-Kernels: 6.15.0-rc1-1-mainline, 6.13.8.arch1-1, 6.12.21-1 (LTS)
-Distribution: Arch Linux
+Am 09.04.25 um 11:13 schrieb Shuai Zhang:
 
---=20
-You may reply to this email to add a comment.
+> On 4/8/2025 7:51 PM, Shuai Zhang wrote:
+>> If turning off BT during pairing, "hci_acl_create_conn_sync" has chances
+>> to be left in cmd_sync_work_list. Then the driver will try to send
+>> the HCI command of creating connection but failed.
+>>
+>> bluetoothctl test step:
+>> 1. local device pair with remote device
+>> 2. once pair is complete, local device will immediately perform power off
 
-You are receiving this mail because:
-You are on the CC list for the bug.
-You are the assignee for the bug.=
+The noun is written without a space: poweroff.
+
+>> 3. powe on local device fail
+
+powe*r*
+
+>> Check if the device is not starting up, that means powering off,
+>> when establishing the ACL link, and cancel early in this case.
+> 
+> Do you have other suggestions? Please let me know. Thanks.
+> 
+>> Change-Id: I72802f306a20d43282dd374dd33b8cb1a22f48d8
+>> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+>> ---
+>>   net/bluetooth/hci_sync.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>> index c553b637c..c4f1c0f30 100644
+>> --- a/net/bluetooth/hci_sync.c
+>> +++ b/net/bluetooth/hci_sync.c
+>> @@ -6755,7 +6755,7 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
+>>   	struct hci_cp_create_conn cp;
+>>   	int err;
+>>   
+>> -	if (!hci_conn_valid(hdev, conn))
+>> +	if (!hci_conn_valid(hdev, conn)|| !test_bit(HCI_UP, &hdev->flags))
+>>   		return -ECANCELED;
+>>   
+>>   	/* Many controllers disallow HCI Create Connection while it is doing
+
+
+Kind regards,
+
+Paul
