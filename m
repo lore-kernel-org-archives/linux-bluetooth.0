@@ -1,109 +1,135 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54405261572
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Apr 2025 12:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54458264618
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Apr 2025 13:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744203172; cv=none; b=V+xyxwMo0H6h4t0CR9sp8dL2++XxYXQu75WDCdrFqbbBlcDy4A8E3XL6qbUgSnoUBBQreHjXTk5WykWwbH4pxDRSEgW/UKY4M5BtwMReRJFtUG+CAvFYfVofaIPOuhCctyE7Rvdnj8NXTuhfiRLeKlCNNjAODUZvbNoLpWQhNXk=
+	t=1744204636; cv=none; b=pybuL74j3kptcxXaRpRQlzGpcqqE/cWn+TA82MGzTlXCgt4hsPtrBjg1ODhH40MKOe1v8SMQkTIrzoDpnvW3RPxEIa+pOLmIf/WlKlwdwR0Gm5Gz6KEb8yvFrucJ4HL5qyRv4RcUkOLsQWcPNI4tLCoIAaXchEZlSmmduU2+wTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744203172; c=relaxed/simple;
-	bh=laFJ+NAB5dzmpkElsJcZlT1j4uHjJByO+6zwPaIyWHk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XTeqjqjnUuKfFtA9hIQe4tHajK2C6vJMW2Zcz79M/N1GWDkZenGpr9eb/w8Jh73NAUV4dnM40OBjGOYjCVKw0/HVuiMVZ8SbLgqO+FS2JrqV33leJ3playl2vOFEwrbsTDxz7Xy2zIxpLWXFeoIKIK+Kse0G+JhRvgM76Vb0KQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EJIddI88; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1744204636; c=relaxed/simple;
+	bh=HdYUDeZTObKEBDHCi01QKPUZiC3RO2BYFzKPvjQgEw8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eIYClRcChYiRblixiuTzOEs60eV1YLd6rke6X2ujnDwlclv5teVqR25bGH16d96REGYqaAty7LdUlW1x5iMZHW1ORA2tG7Zw+lsu5sjY6gh3rG/KqEYNceTNMhC/7ppT8WeOIffjWKQAD6feJA5zq5YwFpXOSOCnq7p92Lxa8Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzOTanzh; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EJIddI88"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5398WDLn030143
-	for <linux-bluetooth@vger.kernel.org>; Wed, 9 Apr 2025 12:52:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=D96BAy9Kur+5jmyNd3ydPz
-	rao+lvAvJ+MLkaJetakAc=; b=EJIddI88RaGDadTbNGi9zjbMmtkzH7d4VKECtQ
-	SDWDh6/fV/9CL9XDHBcAjuUnR5CgJIXPxwTrjXIQblFa5v5nnKjmI4JVPG3wc3/l
-	im1MKtXbVwRdDK5WcWKvu9q8Ur4EtoOvsfFr9MBHRYl84nZQmT7CsVFSn5ZcLDFR
-	NKE78uGTgT4awR0n8TRkj2Xi4oBxgkAtWgjzjvDjD+Z8aJPLPT1L9xKgw6zeKO4A
-	x0l5ehOvLTXoP+Rgi5SuqcX7jT+bq4JAy71GKc8E4AtQJYWKhJzSZEavzI1ISPF8
-	dDkyEZ/1ETP//sQikZZ+9R8SL63ZGRAcdCb2xnaod2QLc1iA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45twpmb95c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 09 Apr 2025 12:52:49 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 539CqmHG009671
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 9 Apr 2025 12:52:48 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 9 Apr 2025 05:52:46 -0700
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v1] obex: Send response to client for Abort request
-Date: Wed, 9 Apr 2025 18:22:32 +0530
-Message-ID: <20250409125232.1385922-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzOTanzh"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-30bef9b04adso63585261fa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Apr 2025 06:17:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744204632; x=1744809432; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nr6vPILkeIGu/ii7F9WWGF9cxCmgHElCiLk3ffStoAo=;
+        b=IzOTanzh9bw8I+6qnosDMv8cHcC4yBzJrbXbltFGlTCg3vwabQlG7tnnwfUWxxFLHJ
+         ep95c4FdZO78/RK43RhuyGYz+mh/SeQElIfahIecVy4aT8mxMb43kwW0JAlWpzcVNFW2
+         Gn2JUKfRNOFk1fO3Am4SIBddgisTKm2TYBEMSTShEoToXToIy29v5fcYqUaqtQcW48nM
+         7mIZx/L01iFBzBP78mvJxgLq46BwBol6sYNO5QWX/EKHYUafzVe45QBg5Ho8t3NZVRFV
+         Oli2AIEXfpX0zJA2o10W/qzux8qYejBZ9dMoE04PiPypu7xq/lPJ39P1lqPeNKKg8IC7
+         OcKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744204632; x=1744809432;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Nr6vPILkeIGu/ii7F9WWGF9cxCmgHElCiLk3ffStoAo=;
+        b=mVi/UHLlGtyA7/DswUE8p3ol1hZ+V1G1h2sqNuMkzETlA9hQFe+yeAbRc98DQ4jMcr
+         SGr9MQ5VS5N3DTYmH757ttyGgHNv90rdTxWFXUAcnBJGNk3D/SojvEgiJ1f6B5pMP9ms
+         y/yvKMKjFwoG7D7VkPZCPvAq3X2wqiPkK8wMU5MGYHDprgKLLxFmINGA3FYxYQBToG6Z
+         CFMTlRwsGqshaNxI2r8gJ4HToIS7Xdv4Kj+/UXdNu7vZFBU9j4ng9HFKhFTlP7CaTk7K
+         S4zAXjJCEPEUutQPW4wU6capvZ6hU0IOHNE+uLExzESm2yqOgLhFuWBVs2xpxifegeim
+         jeng==
+X-Forwarded-Encrypted: i=1; AJvYcCUceps6ckgBnVkUxPZmD5vo835WtuwS6Xw5LdidLGmNv1swWIcp4uKgiTZ8gfP8VEUIgPLO315r77zai7WOCsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFmsQt1qgcmmmKiyAbg6dlqhkfpfqv49u4dnYeoTANBxJlpg4H
+	AqkPQKID3bMfcqSABv9FrX7bDE1Vx4q6I/fX8+W0LPXVJAT0/YWCHkCVmcDTvm4mo1C/uvni73R
+	PAEdXDyn2yBUD4Zyxuvh8Tz41eaY=
+X-Gm-Gg: ASbGncsnCINWNmEDioM9ld4qRM79XboMYBx1wbUfmUL+13XMb8WxpdLjmANh8xsmefO
+	jh5tBnoHmkOnPdjZND1u2OFAF0V3/lnVdoJXMlUFE2Bo3hTNOrMsAduj4V2BTzweLli+FCWcG5n
+	l2r8ChG0VfRTAMCX8+dVCMDViw8nmwuv4=
+X-Google-Smtp-Source: AGHT+IFfUKkJEEnXyoSw5bO75YHHZVELVfznxXY3gimTLlv8tJbzd0oQgjhoauYalVdaDKrPsmX/bE71h1SFp0h0ff4=
+X-Received: by 2002:a2e:9a09:0:b0:30c:1017:e5e2 with SMTP id
+ 38308e7fff4ca-30f438a2fe6mr10381241fa.26.1744204632108; Wed, 09 Apr 2025
+ 06:17:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: W487xsTeCYh5eoBGV6JM1hUYZAI9Sl0t
-X-Proofpoint-ORIG-GUID: W487xsTeCYh5eoBGV6JM1hUYZAI9Sl0t
-X-Authority-Analysis: v=2.4 cv=MpRS63ae c=1 sm=1 tr=0 ts=67f66da1 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=XR8D0OoHHMoA:10 a=tyeDOegBlPOMNIItdlAA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-09_05,2025-04-08_04,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=885 clxscore=1015 priorityscore=1501 impostorscore=0
- spamscore=0 bulkscore=0 suspectscore=0 malwarescore=0 adultscore=0
- phishscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504090077
+References: <20250408115146.2300584-1-quic_shuaz@quicinc.com> <46521c87-ed61-420d-bb2d-d5499d119f5c@quicinc.com>
+In-Reply-To: <46521c87-ed61-420d-bb2d-d5499d119f5c@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 9 Apr 2025 09:16:58 -0400
+X-Gm-Features: ATxdqUENWCPDpJKXh6iJrcVETZCH3QACGE1kG6iPob8mXGZy9vplL_E8jifwwBs
+Message-ID: <CABBYNZLL7C=C-X+YCFmwh1PNQ-uq5cbVi8o6FXPHPkEBxFFGPA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_sync: Prohibit establishing of ACL
+ links during poweroff
+To: Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: pmenzel@molgen.mpg.de, linux-bluetooth@vger.kernel.org, 
+	quic_bt@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Incase of ongoing transfer, If the client sends Abort request, Server is not
-sending any response back.
+Hi Shuai,
 
-Ideally it should send OK or Success reponse code for the abort command.
+On Wed, Apr 9, 2025 at 5:13=E2=80=AFAM Shuai Zhang <quic_shuaz@quicinc.com>=
+ wrote:
+>
+> Dear Paul
+>
+> On 4/8/2025 7:51 PM, Shuai Zhang wrote:
+> > If turning off BT during pairing, "hci_acl_create_conn_sync" has chance=
+s
+> > to be left in cmd_sync_work_list. Then the driver will try to send
+> > the HCI command of creating connection but failed.
+> >
+> > bluetoothctl test step:
+> > 1. local device pair with remote device
+> > 2. once pair is complete, local device will immediately perform power o=
+ff
+> > 3. powe on local device fail
 
-This is required in PTS testing for passing below testcases -
-1) OPP/SR/OPH/BV-27-I
-To verify that a server can respond to an ABORT from the client during an OBEX operation.
-2)FTP/SR/OTR/BV-02-C
-To verify that the pushed file is aborted normally.
-3)PBAP/PSE/PDF/BV-06-I
-Verify that the PCE can abort a Phone Book object download from the PSE.
-4)PBAP/PSE/PBF/BV-03-I
-Verify that the PCE can abort a vCard-listing object download from the PSE.
+Doesn't look like the real commands to me, can you create an init
+script out of it?
 
----
- obexd/src/obex.c | 2 ++
- 1 file changed, 2 insertions(+)
+> > Check if the device is not starting up, that means powering off,
+> > when establishing the ACL link, and cancel early in this case.
+> >
 
-diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-index 370bfac9e..a9bc3d3a9 100644
---- a/obexd/src/obex.c
-+++ b/obexd/src/obex.c
-@@ -389,6 +389,8 @@ static void transfer_complete(GObex *obex, GError *err, gpointer user_data)
- 
- 	if (err != NULL) {
- 		error("transfer failed: %s\n", err->message);
-+		if(strcmp(err->message,"Request was aborted")==0)
-+			os_set_response(os, 0);
- 		goto reset;
- 	}
- 
--- 
-2.34.1
+Ok, but if the controller has been powered off, or is in the process,
+then hci_cmd_sync_cancel_sync shall have been called so commands shall
+not be pending, or perhaps there are more then one command pending?
 
+> Do you have other suggestions? Please let me know. Thanks.
+>
+> > Change-Id: I72802f306a20d43282dd374dd33b8cb1a22f48d8
+> > Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+> > ---
+> >  net/bluetooth/hci_sync.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > index c553b637c..c4f1c0f30 100644
+> > --- a/net/bluetooth/hci_sync.c
+> > +++ b/net/bluetooth/hci_sync.c
+> > @@ -6755,7 +6755,7 @@ static int hci_acl_create_conn_sync(struct hci_de=
+v *hdev, void *data)
+> >       struct hci_cp_create_conn cp;
+> >       int err;
+> >
+> > -     if (!hci_conn_valid(hdev, conn))
+> > +     if (!hci_conn_valid(hdev, conn)|| !test_bit(HCI_UP, &hdev->flags)=
+)
+> >               return -ECANCELED;
+> >
+> >       /* Many controllers disallow HCI Create Connection while it is do=
+ing
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
