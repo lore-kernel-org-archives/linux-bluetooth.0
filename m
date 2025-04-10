@@ -1,156 +1,282 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2137.outbound.protection.outlook.com [40.107.255.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E4E219312
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Apr 2025 22:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744238089; cv=none; b=n8k5uy0xxIe6eVY/kfp4fk4wz8aXVj+OY49ogkEfcRdaqBolYEAUsYypiCCv4mVzZq7AYcUDN+2A8dflZbbikzBsSwj6qYHk7JvVjDnXwoSDELyugJEk8E+xDyU8fEu0tyuUVEWK0shh3n8+gX4at2NjSIVc41aAvquwhKOMm/0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744238089; c=relaxed/simple;
-	bh=uagqODZ+pKwR/+ierBw9Ml6Hfqu/zNVzxI359bVfj1c=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ntk+5xrTJun0nOipyhDJgRJppKyEuWayuHlMiF0zqpLomh0iruW3IfYdGKZ7JUgmSt/JIbCI1/Zbva87TJdLkdYLXiuvEgaxQlpLNTj3/BBi4/B2sNZqRbeIT1fASE+wQkfvajlw59fjukPGNsixqQTcfB1AOHd3bzxBLtte9Uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PbsKaqf1; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0A815E97
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Apr 2025 02:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.137
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744253458; cv=fail; b=XEf7gcbpVuBu3z+VhXspiUeLmfhI6amjm4VdIU/L4i4mf5p6oCpZTXk2tutty/FXj2cZep8qlMMHJ6naCQWRUayUZMJvNGBxuhZp5zq840549eBGFEtnW3Ce8etKjZe4HVtchRlZv53DeKs/IKUjpceewacLotV7DxUNUTWyMCM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744253458; c=relaxed/simple;
+	bh=TZ6Zp0IvnKyPe8BrpeTXc6Zw4XBLH5BBz6ROVojA644=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=W28dIsy5iKmQugHWRHvPD9h/HkcMsjhoZ5WaMzNoWdvtiCjW2m8Lql/bdOT0jr5aXofYTmy/ZuZHp3lH+gMhC958DC/gnTmjExFyhIStRt6MQzgemcXlWm1MiwivGu4G227A0LOr5M2PiAf3c9YR6vzg+3q20r96GFspIlqh9dw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=plOA+aLY; arc=fail smtp.client-ip=40.107.255.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PbsKaqf1"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-476ac73c76fso1313851cf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Apr 2025 15:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744238086; x=1744842886; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LrwVfqflHc88ZNH+8zl4Z5eWGP86dGfdbwsVSeG61AE=;
-        b=PbsKaqf1nnyw7Kt/zIXPdWRLYFZQ3nv1SfHbbQMbn/gh2KRCI6mc5Gt8Hb0HwQ9znH
-         /lI8FSW5nMk/htNkg51yFCnmKKhcEdgcTdw412rLZX5nqVmNSKIg1sCVcrAiUPd2PgH9
-         +YPRg1ucl6SKaSBM9cQLhkvKoDmQR5fPEdyQZ09eA4nmDM8YpEfHbZsFdAYSLzNt73Gu
-         kVq8/NJB/K38awHk9kHkgQPRWg/4PuU8nBSg5DPiozdWHDwFl/8eQ7s7Jl4AkVpTq8SU
-         WxEeo10QZDOjfBUhaLjLMeo1UQOg1ZU8uMcuCtMcrGxkQEB6LejTGLXq2AIZxhlYFQnx
-         j9dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744238086; x=1744842886;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LrwVfqflHc88ZNH+8zl4Z5eWGP86dGfdbwsVSeG61AE=;
-        b=uqxUZqGTZXeiwBmq/Epq+Ntu/mgDe9M2zGZuFzUX6nCKolYQlsLBk8e2vw+xWLrouN
-         ya3nerSYZLPqUZhh/uP1Ncs2zXqI2Hg58Jd/10t20Jr+1OIYScumeHcNlYD969K8RRQS
-         gTpi7McOYKZnBPxrU7UQjuGhmUh4tKgcOSijScua31Q8+CQPN0YbxtTWYkeLjQrhHdpH
-         bte5ztGWJr1zpfduN3/S3c0yLDiqNrPR3yfCIRZpRmWAYpgPtP/QhZdBBrDe/OR3ayS7
-         2/3/Sua6TUgUBuGuIdS1FgeSCD/YFdlnxwjw/I+1J7Z8/SKOUOwCVbpy0/+o2Zj7FMH8
-         DQhA==
-X-Gm-Message-State: AOJu0YxnY22WJFPnCNqbJZqe9T7UyQxas0/kfH7HY6MZY4MsKMTthzvI
-	0KdnWpvErSJXhnXqApuZFeUJcvj0TLWoOFdEBk8PRGdjI4UHeSZewXaMYQ==
-X-Gm-Gg: ASbGncs9F11PxAebVMrrL3jQ5u+hg7KiO5bJJWcdh7Ku7GAQlsRimmGg3oXjTqpLw4n
-	v5jQMSHyhr5mYR0RUyk+DIb9+qUhxdCbcHF1bh0pNdteBSXN1c9fyWedwsr4qIVmpng6gcRVBbs
-	u5FK54WVxjbGzkf7+FsMNMIu7FwdThJ1fvHglSgeMO9wpEnykwUF/H/e8mxa5Yr/saou71ACDug
-	wGOVbTenYUjU8WluJsJQZqBgf5d9G9ebzuf+IZ8UfCZWEEIMF6/d0WRF2P2hde29moXry6NV98o
-	sVNTl929Bdz3aqsYwHkg6Wr1eeiTbNnZ/Zk8HO4ax8lRaF1B0GtFvLQ=
-X-Google-Smtp-Source: AGHT+IEVZeQXE5K8BisN+3Ap0MI9VSsOfekWut7r6iqDOCyJfXvWYFq96ij+KGhAKUtzDY0W+qjgZw==
-X-Received: by 2002:a05:622a:205:b0:478:f00f:4440 with SMTP id d75a77b69052e-4796e36318amr2098091cf.40.1744238086088;
-        Wed, 09 Apr 2025 15:34:46 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.51.85])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47964db6ab1sm12524931cf.26.2025.04.09.15.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 15:34:45 -0700 (PDT)
-Message-ID: <67f6f605.c80a0220.1670a1.513e@mx.google.com>
-Date: Wed, 09 Apr 2025 15:34:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5996942061022168302=="
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="plOA+aLY"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KgMOMeir4fVR2MfAxX8cXULASS/2yikfrK8YmzPL3SE1vDiyHt7dn/m9X9HHUXA/faTQNV9TX8JP15oTlXoZ3MHmQrif9HVjinCoH0ac4KnFAewYRnRYORd9SKPSoPPcZI1vpcGh9RwhetLHW+at7iWOHebm/HUv0QqmMqkOZ9cmT1z0Ud6c8m2mTVj2q8aWZQeZiY7mK2+XNEt+w54pAojZxQ7hlMjWAVXBhkT62Fvae8sLJtfcccku+MF7GRnPn+sHh8GvOmo3iELORYjYKPKJLkQVKUXHHWfYBs5VRavuPtAMtuTQ9I8zI62vvPo4EP6z2AM2hHn3stoPuf8R5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fUd4IpKqFY2em9x5+cs79lQKoeS7K0Qe6u1l/kAVLus=;
+ b=q8ekLvNhmgoAPfLUjgvauOljWc/3k5FQdnn2tdygOkw1f8fRiNsfYmhTtLRKp87z9gGcGb34tbCOq8LcO7TBWeFzRJuOd3LqO6xXrBY1C5naqpvEXSog8I7FXnfQG4kg2ZAiMN29UihGXQXmRrZ1MUXvNgednWwHeaGipFAtMcPm++V/KCvaNMvvvy7PC90brGNTpmeoh1zIuOX3rIGAnEX4QZyM1DTrbNJidboH9NAC8o+zB7b915FgOP2RlC18OLCVtPV/iGPpY0/cOU89XG0mTyb3obaZyPYMwWOdgNCJfbX8rVacXHFLnvwSLYwWoVdfQY/FdIj974ONSV+MGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
+ dkim=pass header.d=amlogic.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fUd4IpKqFY2em9x5+cs79lQKoeS7K0Qe6u1l/kAVLus=;
+ b=plOA+aLYdXDPa/jbYlRVrz9/ocgI3k2whtfVm5eOoeAN08chqN7kliRaPsrUw4OlyRFj1kRwI3yyFrRSFivKGkQ8J1RRRIpE3WnCISxvY67M+BEzUOUmDczSVF2mccYfesIxx9Ti29lNVeeTJpZfRO97FS4JbTncxqTSn1c65EMHKxVWcV1lV9NllcQleymHVf7hCW/NbMpeyVMr8hJO0Ff1DNRQ8YcdLxxLHiRcg6Z4/5HlL92qKJv13UWDOoDhMJBNJ5VZ1Gt3PjS41+0ftcbYcX2vduQPXjyTXX9TD1mh0ItGpIYe/3IiE4geQCK/T78l4JR1Y0p6uNUA7cVedA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amlogic.com;
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+ by SEYPR03MB8264.apcprd03.prod.outlook.com (2603:1096:101:1b3::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.35; Thu, 10 Apr
+ 2025 02:50:52 +0000
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd%4]) with mapi id 15.20.8606.029; Thu, 10 Apr 2025
+ 02:50:52 +0000
+Message-ID: <f9268355-8907-41bc-b13c-448a61f9321c@amlogic.com>
+Date: Thu, 10 Apr 2025 10:50:36 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ bluez] bap: Add idle notification for ASE State
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+References: <20250407-bap_aes_state-v1-1-dfc090c49cea@amlogic.com>
+ <CABBYNZJsJAbGz=VUZuabixnTJcj1gZHM5m1P_cU06aMn3YZo3Q@mail.gmail.com>
+Content-Language: en-US
+From: Yang Li <yang.li@amlogic.com>
+In-Reply-To: <CABBYNZJsJAbGz=VUZuabixnTJcj1gZHM5m1P_cU06aMn3YZo3Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2PR04CA0012.apcprd04.prod.outlook.com
+ (2603:1096:4:197::14) To JH0PR03MB7468.apcprd03.prod.outlook.com
+ (2603:1096:990:16::12)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: hci_conn: Fix not setting conn_timeout for Broadcast Receiver
-In-Reply-To: <20250409201455.345144-1-luiz.dentz@gmail.com>
-References: <20250409201455.345144-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|SEYPR03MB8264:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ced4749-0334-4edc-a821-08dd77da81d4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VmdpYkIvMlowa1VaTFliRTZ6QUIxckpnckhKUGgyMmNrUHQ4TXFVOG9oM1Nu?=
+ =?utf-8?B?ZkhVc3I0Y1pnSW9MeE9xT2srKzNBREpzKzFVN2pnMndyZDBmWnRJTkZyRnRi?=
+ =?utf-8?B?TTl2NG1ZdzVwZTA0RmlJdG81N2pnUTV5TGtqMjU0dytjOHQybUt6OUxiVTYy?=
+ =?utf-8?B?ZFk5RWgxbkwvSHF0T2I4a1ZaZW1nSHNTc1VhT3RyNVZxZGZ3cHdjUUpySVlX?=
+ =?utf-8?B?ZlBleEVhajRuU1FQWHg1Zk91ZXFCY2s3N3lhakVGMlBpa0U3cHZlTC81dDVk?=
+ =?utf-8?B?ZGNMQmRBZUNzenlGMDdnWHZlUFh2blJSR01UWDFwR29ueFNBTWpJSWNlN3JU?=
+ =?utf-8?B?eER1aVdLenUxL0FTZnJSMW5zRGxBdHkxbWFUM3ZVbzB0MVRhR1J0a1dVbERH?=
+ =?utf-8?B?Z1ArNUlITUkyQWhSUVVKMjNUbGpibmozT3ZMdjhrekFDZ2tqaWdaTkZqMVVy?=
+ =?utf-8?B?eWlUcUUzN2RZbnFzaXJ6S25SakRGRnk2YW9XUnpYZzFkMkdZcG5hT0hiYjhW?=
+ =?utf-8?B?MGFSa3VoeHYwbzBhek9oVWcwUFgwczBHcXlhWGowU0hlM3B1enh0SDU5djNs?=
+ =?utf-8?B?VktVb0UreVNFa2RzUUpTMmlLeXlpNTEwT0VrUis5Mkp0aFlxSW1XTzhXMGZN?=
+ =?utf-8?B?Wlpia2NnMG9kR1gvS1RrcDhKeDBjblk1L1dWVW5rRzIxOG9TRG1oK253Mm9U?=
+ =?utf-8?B?dXFNalltdVh1VG9UUVU5VnNVZG5kOHd4eEdhVkZudFhING00aGVqR1JvdmtQ?=
+ =?utf-8?B?UGIyTk8weTArYk82WWhCVDZaNjJJRmorVWU4TldNU2dGRzhiUFpUbW4rdGc5?=
+ =?utf-8?B?eTRLZDQ5b1dBc3cxZklZMTh6bWRHL3VGOU1WaUZaUjlpc3o0cVVleUI1UVNU?=
+ =?utf-8?B?YXBqNE52a0srYkxVZFd3RzZKeFhtbkFDNk1vRUM2RjNxV2Q0V3VpTloxYXE3?=
+ =?utf-8?B?RDdhYlBydDZ1Y1RQRW1QcSszUGlrVGlCRkQ4T2ZRZncrODhOcE42aDBsVnIv?=
+ =?utf-8?B?YkwvM0FSYUFobFdQeFFENjloZzVDdG1VcHpuM3MwSkIwbFpWKzk5eW00cC9L?=
+ =?utf-8?B?dGtKTXk5K2hEaU5oZE9vWWpkVE1KSmgydjFwYTNYQlR3SUpPS3VzckFvZzlI?=
+ =?utf-8?B?WlExY0xCZmVTbFpwcFRyQ2hjQ1I1UjArSkdOSmxuOTF6UWtyUE1Sb2NUR2dE?=
+ =?utf-8?B?MHhMSG5mRm5mNUt1S3p2c2N5dENvVG80WUdJZytzUlhzU3gzdWN3Qmh0SU1z?=
+ =?utf-8?B?TXF5bllqZHhUNTI3QmJTYk5Oekt4YWhnakNyQVJicnZrcVhRaHAxQXdSZU9j?=
+ =?utf-8?B?aFlZd0xMT0t6WDVFSHFrRU90c3BCMjBmdTc4S05MVHpnSndvaDl3bk1XeHJo?=
+ =?utf-8?B?ODluVEVKMkhQKy80OXBMcEkzWnljUnQwdVBPWUUvSGg0Q0VWc0ZsckhTcVU0?=
+ =?utf-8?B?VGhsVU5WM3VQZ0VLV2U2SHUwdlplN05kbzB2NG8zd2tRRmRLMjRTSGluZDJH?=
+ =?utf-8?B?ZXBwSXR1U2g0em1jdlBZbjZTcFp6QytUVWVIcE1Kd2tTOEJPNWdzWWdibUJ0?=
+ =?utf-8?B?Zk9BTGtWVktDOTZRT2w3SitlQTdIUEI3MldESW52VDhxV0pxdTRtbVdtMVUx?=
+ =?utf-8?B?TVk2UzQ0Vlh3eTVQRndvZStKaXZwYUpvdFJ4REIrbmp6aldPaS8zWWd6M0Iv?=
+ =?utf-8?B?VXpZYkVkQkZ0T1d4eHFFek5YN2R1L3F1Z243ZzduYnk1ZHZLTm9yenJVbURo?=
+ =?utf-8?B?RjZiL3hSK211NktqR0J5UXV2SXpoc2Q4TkZzc29PWTdOSVhLZmlHUTBjdTNG?=
+ =?utf-8?B?RnRSaFBUa2FSWUQ1NHBjMUJnRU83ekYvaHgxNVptS1poZWcxaFRGY0pNVEt0?=
+ =?utf-8?B?Q0NlQzRGOExqd29Xb0JnRVF5Tk9kVTgvaytIazRQV0pGVG1Sa3pvcFRYWWRD?=
+ =?utf-8?Q?gVR43kJYCfg=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dzJUQ3BGa2QzS2hMUXZmcU1ueldmR2xmdTVIczVaSFhBTnZIZWlLVFg1UkVM?=
+ =?utf-8?B?aDAwTnFKeERJRUtvNnFvdmc3dG1KTC9TM3JhbFJ0ZVFWQ2VDT2hEbDVBalI1?=
+ =?utf-8?B?UWNwNHhNR1JBSVoySnpHaVpNOTlBS2JRWE9UcjEwd1BVL2dwMlRFVzlmVEdh?=
+ =?utf-8?B?UGJsZzI5ck0vS2h5WnFsQmNoanNEeWpFQ1NacGFsdXoyL01aZnBWZHNVVC9v?=
+ =?utf-8?B?aGJ6dUJyR3FmZDVzOHdsdmRzVllDV2xueFFrZU90RTlaM0FGKzN4ekRza2c1?=
+ =?utf-8?B?bFczcUYxZzBCTnQ0SjVFVUtTNjVBMG5WRGhZelRrc20wTFEybXFCejI5dEw2?=
+ =?utf-8?B?Q3BiaTVqMjJRM0kxYno3VnNQeFBNYnd5UjUxSUE4M2YxTG9BQjAwTVRMQTkw?=
+ =?utf-8?B?RXJpK0NVdFpYWGZ2Q2tGWWk4M2dWdDdtQlYraSt0aWFzZE92VjBpMEZPejlP?=
+ =?utf-8?B?bTcvQ21CQy90U2dCK0wvTXdhWXIzVjJYSFRuNUhQRTFoUGFBTHEweUJYZDNJ?=
+ =?utf-8?B?aVBiSXdnbzViSnFPNCt6QWxUd3RzT3ZSQnkzekRDbXNRbGdNNlNIVEhKbXBu?=
+ =?utf-8?B?R21KRGJaQmE4UmlaRWdGNjdIeXNCNmxBZUMvVDZ0YlVESVM3WExQN0pYNHV6?=
+ =?utf-8?B?NDNkY3hxY0QwclVHTTRSeEVoMWQwTjBLcjYrY2s2c0RNRWlmS0EzVzZLNWdi?=
+ =?utf-8?B?bVEwYThDQ00rMTF4bFplQWhuOGM3WGxrRVkwNHZaTGUwN001WlEzcWthUVFr?=
+ =?utf-8?B?cmhKazlRS280Vmo2cDhMTkZHNlBMK1hyNXpKZ2pMNy9nWXRnMTNhVWxEeXVR?=
+ =?utf-8?B?YldpSjY0WDJhUzBWZVp6czRzZmFZSTg4N09ZK3ByckVtSVB0cEJqZUFadWhG?=
+ =?utf-8?B?b29ucC9nWisxRHpxNEZZOG1aQkFEd3hrWVhBZ2o4dTRXK3l1TU0wOUlWdWtG?=
+ =?utf-8?B?TWU0b3BXWHNsY2FyK3BpSWt6Z2hvR1dKRjVxeEZnQnNlZ0JRT0pTNHo1QlVj?=
+ =?utf-8?B?TXRIUkRSZlhIRnFNMW4xUUlMcmhCam9kOVhtUzVudnJJcWtTTnhCTUpUaXdX?=
+ =?utf-8?B?ay9XY3lrcjJBbkpjVUZxK1VCckc0MXU1TFR2MGoyelF4cmxWeVh6MjZhZWNJ?=
+ =?utf-8?B?Q212enF5a3RSM2FTMU5MVzAzc05tSTkzUzlpL2RuNzNVNWI1bk84S2pkWUFT?=
+ =?utf-8?B?UTF5SnU5WW45cWxWZ1dmK25MZVpjOTZ0WFpzbGNYVmxyMlBqaEdzbUVDU1cx?=
+ =?utf-8?B?cEpkVlgrVFNwSFd5eUk1WkZ0bENGMzZqbHpmbFJKNW5HV1lRd3AxUzZBY3Rx?=
+ =?utf-8?B?QmpLcDJWdGpxa3ZoZHRsdDd1bDVaNERkWkxDZkUwMi8yRFU4cCtMSS9yamls?=
+ =?utf-8?B?Y0JYWndTaGhhZ0MyZ0EwM2E3Z1ZqbnJuSDl2MzlPQ1JjdGlCQWNMeVNFcFZK?=
+ =?utf-8?B?QmUyYjZwaFlaRGxCWmU1aE5VV0hraTNVT0FaM3VQOWRWckVhNXdnRzY0VkNt?=
+ =?utf-8?B?Tit3bGVOd2FHbjYxZUVXMmNzdGpwYlcybHhHWUdLWG1YR1VzRUM0MWx4T1Bl?=
+ =?utf-8?B?d1VkZk5tcGlKUkhONHZuQzJMWStVNUZFUituckhBOXA3V0hIRnYvOVdOTm5s?=
+ =?utf-8?B?RTdLQkswU3p3Z0J3NjFhVzJQRUJBdXBVSWt4TU5HUGFackZ4Nmo2cDArZncz?=
+ =?utf-8?B?WFdGM3MvYTVGK1NrY0d5TzNZbmJOUWRaSHZsUjlkS1NPNlJ2RlFQUm1vSmhY?=
+ =?utf-8?B?VEg4V3dFd011QW1Ed2xNQmxpekhGMVJFZUxBTlZQeUlMSE5ObGZEU0lidE5E?=
+ =?utf-8?B?dmMyNnFWRE84aHNyTjE5cDB6NllSWjErWUs1N0kxaDl0bGhDbUF3UHZsQTZ4?=
+ =?utf-8?B?RkNGMkc0Ykl3UFRna1RKdFVrQzFLbVFhU3QxVGF1Z2lmeUprWUFrNUhvNE4v?=
+ =?utf-8?B?MWJZZlBnMzBPbDBhQ2RWcFNyNVViNFhjZ3ptRFVvZUdQTVFZVklnVnNPSWov?=
+ =?utf-8?B?ODlFUzVKVnRTRHN3aVFmU0NGb3YvVTUrcWR0SDlNNE42bFhwUXphLy96NC9G?=
+ =?utf-8?B?WFkwRXNnS2dCOVpPNDRTdlBoaE9UbkNpL2ltZmEyc25zUzU0b1BlUWttd3Bp?=
+ =?utf-8?Q?EReKpqEkgu0SCY8bzrYaS9c9j?=
+X-OriginatorOrg: amlogic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ced4749-0334-4edc-a821-08dd77da81d4
+X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 02:50:52.2840
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PPXX9ZdNfjUvCKwRvasE/5vBKvjEYp2un9PMhKsO00EiiUTUVYcdqvZSfEzMeO/+oOfMOgETyhZmakNH2CoLCQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR03MB8264
 
---===============5996942061022168302==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz，
+> [ EXTERNAL EMAIL ]
+>
+> Hi Yang,
+>
+> On Mon, Apr 7, 2025 at 6:34 AM Yang Li via B4 Relay
+> <devnull+yang.li.amlogic.com@kernel.org> wrote:
+>> From: Yang Li <yang.li@amlogic.com>
+>>
+>> When the ASE state changes from releasing(6) -> idle(0),
+>> the idle state needs to be notified to the Client.
+>>
+>> ---
+>> Signed-off-by: Yang Li <yang.li@amlogic.com>
+>> ---
+>>   src/shared/bap.c | 13 ++++---------
+>>   1 file changed, 4 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/src/shared/bap.c b/src/shared/bap.c
+>> index 650bea2f4..c40d6e051 100644
+>> --- a/src/shared/bap.c
+>> +++ b/src/shared/bap.c
+>> @@ -1123,17 +1123,12 @@ static void stream_notify_metadata(struct bt_bap_stream *stream)
+>>          free(status);
+>>   }
+>>
+>> -static void stream_notify_release(struct bt_bap_stream *stream)
+>> +static void stream_notify_ase_state(struct bt_bap_stream *stream)
+>>   {
+>>          struct bt_bap_endpoint *ep = stream->ep;
+>>          struct bt_ascs_ase_status status;
+>>
+>> -       DBG(stream->bap, "stream %p", stream);
+>> -
+>> -
+>> -       memset(&status, 0, sizeof(status));
+>>          status.id = ep->id;
+>> -       ep->state = BT_BAP_STREAM_STATE_RELEASING;
+> Not really sure why you are taking away releasing state, we actually
+> depend on it for the new tests:
+>
+> https://patchwork.kernel.org/project/bluetooth/list/?series=950067
+Well, I got it.
+>>          status.state = ep->state;
+>>
+>>          gatt_db_attribute_notify(ep->attr, (void *)&status, sizeof(status),
+>> @@ -1713,6 +1708,7 @@ static void stream_notify(struct bt_bap_stream *stream, uint8_t state)
+>>
+>>          switch (state) {
+>>          case BT_ASCS_ASE_STATE_IDLE:
+>> +               stream_notify_ase_state(stream);
+> We need something like stream_notify_idle.
+Well, I got it.
+>>                  break;
+>>          case BT_ASCS_ASE_STATE_CONFIG:
+>>                  stream_notify_config(stream);
+>> @@ -1726,7 +1722,7 @@ static void stream_notify(struct bt_bap_stream *stream, uint8_t state)
+>>                  stream_notify_metadata(stream);
+>>                  break;
+>>          case BT_ASCS_ASE_STATE_RELEASING:
+>> -               stream_notify_release(stream);
+>> +               stream_notify_ase_state(stream);
+> This is actually wrong, we need to notify the releasing state.
+>
+>>                  break;
+>>          }
+>>   }
+>> @@ -6397,9 +6393,8 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
+>>          DBG(stream->bap, "stream %p io disconnected", stream);
+>>
+>>          if (stream->ep->state == BT_ASCS_ASE_STATE_RELEASING)
+>> -               stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
+>> +               stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
+> Ok, so this is sort of reverting from  bap: Fix not generating
+> releasing state? I was wondering how much testing you guys did to
+> confirm this is the right behavior, I don't think it is and Im trying
+> to figure out if there are any tests for the testing spec that do
+> properly verify this behavior.
 
-This is automated email and please do not reply to this email!
+There are some misunderstandings that need to be clarified. Initially, 
+patchset V1 
+https://lore.kernel.org/all/20250106-upstream-v1-1-a16879b78ffd@amlogic.com/ 
+was proposed to solve the issue 
+https://github.com/bluez/bluez/issues/1053, but after discussion, I felt 
+that the process of Streaming->Releasing->Idle was OK, so V1 was 
+abandoned. Then I submitted patchset V2/V3 
+https://lore.kernel.org/all/20250213-ascs_bug-v3-1-d5594f0f20c6@amlogic.com/. 
+I tested K70 and Pixel phones on V3, and both can solve the above 
+issues. So my original intention was to merge V3, but after the release 
+of version 5.82, I checked the code and found that V1 was merged. So I 
+submitted the modification again on the latest version.
 
-Dear submitter,
+I sorted out the process of ASE state switching when the media of 
+different mobile phones is paused:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=951731
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.19 seconds
-SubjectPrefix                 PASS      29.43 seconds
-BuildKernel                   PASS      24.06 seconds
-CheckAllWarning               PASS      26.49 seconds
-CheckSparse                   WARNING   29.70 seconds
-BuildKernel32                 PASS      23.68 seconds
-TestRunnerSetup               PASS      453.02 seconds
-TestRunner_l2cap-tester       PASS      24.70 seconds
-TestRunner_iso-tester         PASS      30.66 seconds
-TestRunner_bnep-tester        PASS      5.78 seconds
-TestRunner_mgmt-tester        FAIL      123.23 seconds
-TestRunner_rfcomm-tester      PASS      7.72 seconds
-TestRunner_sco-tester         PASS      29.02 seconds
-TestRunner_ioctl-tester       PASS      9.50 seconds
-TestRunner_mesh-tester        FAIL      8.16 seconds
-TestRunner_smp-tester         PASS      7.12 seconds
-TestRunner_userchan-tester    PASS      5.50 seconds
-IncrementalBuild              PENDING   0.70 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.171 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in run_timer_softirq+0x76f/0x7d0
-WARNING: CPU: 0 PID: 66 at kernel/workqueue.c:2257 __queue_work+0x93e/0xba0
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Failed       0.100 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5996942061022168302==--
+1. Redmi K70+DUT: Pause operation, ASE state process is 
+Streaming--->Disabling->QoS
+2. Pixel+DUT: Pause operation, DUT does not cache Codec, ASE state 
+process is Streaming->Releasing->Idl
+3. Pixel+RedmiBud5 earbuds: Pause operation, earbuds cache Codec, ASE 
+state process is Streaming->Releasing->Codec
+If the DUT also caches Codec, the latest version of the process is 
+Streaming->Releasing->Codec->QoS, but the QoS status will be abnormal on 
+Pixel phones, causing LE disconnection, so the process without caching 
+Codec is still adopted.
+>
+>> -       bt_bap_stream_set_io(stream, -1);
+>>          return false;
+>>   }
+>>
+>>
+>> ---
+>> base-commit: 0efa20cbf3fb5693c7c2f14ba8cf67053ca029e5
+>> change-id: 20250407-bap_aes_state-9306798ff95a
+>>
+>> Best regards,
+>> --
+>> Yang Li <yang.li@amlogic.com>
+>>
+>>
+>>
+>
+> --
+> Luiz Augusto von Dentz
