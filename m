@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02191EF37E;
-	Thu, 10 Apr 2025 17:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5C61EFF97;
+	Thu, 10 Apr 2025 17:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744304997; cv=none; b=rmrOjRpMNfH/NkVNi304HixTWxk2C+Ru0p8pwZvQTHqzK4mdzbYi4o7PHuExHKbpWAcTG4om1OKQILhKi1rvAUtrOh219RLsuzLwoUwnvmQJh5nMPaaUB3ZGXXfvjl7rmOYmqSEIjn+CmDYL4/U9tpwG5VhcD7HcMs/AuSjWCE4=
+	t=1744304998; cv=none; b=NUgb2IvQU/90VqNYXiQE5PJOzlOvQeBEsuXXf8yVRMFsrAQ8jRsXjAqqHRCq0dL52y/vg4YYG3o0Rp9jUsilgTx/6bL2UHBjXtPZuV/Nl+3DD7pB8qGs4raeZwDwYcOj8yM1EUt/apr/xEvbo0ETuuIaUj1YhMQ+b+SCkS+HPD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744304997; c=relaxed/simple;
-	bh=9+nMyQCYKZANlH9EIcmhK3mecsDX2e4WtxOXzOv8sLs=;
+	s=arc-20240116; t=1744304998; c=relaxed/simple;
+	bh=9pVxLXv9jgr3EZk1y5pl6/E/9gwYXcGjSrA4i8XB6W8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eQS/bRXi6jN5ajlI/EjL/ApCEMX2SScJiftVpUeX7fvf+7HUBIzwlvSc33jwPQXvwqn94y4P4AC6ckB65kIDCgv64+KnStx3AzhvyKFsYieZUtIxOhJkNBUJY2rjyNfBgMY7jeHLQXeluEJOA6zaQUMvvy0I24QHXCMPkUTkdpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZk5/AmH; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=JTD5Gwj7kL5Yqiohh+jOQrkay4ExnXJww3wQxUD1pOhTTEKPn7pnQJh6NHjh0Fu4N2xPyKnSXPHjycOeH/dGg4/eYG6suGwJa137/MX+SycLVEWfOf1/vGTcq1VXptCQ7ItPCAootX3IlrTvLNkVt5XFTEVZv3i7rHlcH8catjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGcw5QGO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZk5/AmH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 684B2C4CEDD;
-	Thu, 10 Apr 2025 17:09:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGcw5QGO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A96B4C4CEEA;
+	Thu, 10 Apr 2025 17:09:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744304996;
-	bh=9+nMyQCYKZANlH9EIcmhK3mecsDX2e4WtxOXzOv8sLs=;
+	s=k20201202; t=1744304997;
+	bh=9pVxLXv9jgr3EZk1y5pl6/E/9gwYXcGjSrA4i8XB6W8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GZk5/AmHhSZx4qZ4cR5oBlNTY9g4v0b8aTUWBIA0AZzQ1+oaM+tdnR8eovR8HdQuI
-	 b1zaAMTxbRj4czDqNxDqBsV2o5IjltxQH1nNwXO+OkfJvXsbJJg9XwqoTECGj/xU37
-	 jAYgC2KP6a7hMMaK5uv0Z6ktUysHCDMS67kDU+ubSxcKd0XuN+nIhsbrtEdz3ErvUF
-	 5z0h2IsKZDUpNQGaj1O8urc+Ke6wBkvgSfiNJkopdi7eQPsj8b6dRU9hC/uHgI6n1P
-	 5FA+J7yOCErQzdUeCmZmakf816lygwX/fXWKPY5KElbNYWfIiIExAAYjCmC0ak79Sb
-	 uOfY3WhZ433kQ==
+	b=tGcw5QGOE5g3xy6L/HZRmY4ori10cI85weEqP85ec0xua18l7eS4Qf+R8k7qU3VZz
+	 4RV/HnBgj3DpBaYPkqJjFpuoBTehqJDO8sUqpNb0fHLfNcbbzmVqqyh/nYYqsV+xuR
+	 iB06XjH6mqBTCJ8IwgQzoJlTiHZdG1O+HSUV5WVRZgXrlAcZy0d8vvAiRqwDifYTA4
+	 IGidS8GC4GClchh+d8X0suEIqr0xoiiObcXYzLKZxAi3WJ1RKGiiLRj3YbgEpbtj9z
+	 w59q0UuH81IUracQnJcD+ZKVhk+rs5DgMQ4ZKBM++xjUpma6eIVLplCtAxD3thmg/2
+	 8FTswIFB6xwsg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34595380CEF4;
-	Thu, 10 Apr 2025 17:10:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DF8380CEF4;
+	Thu, 10 Apr 2025 17:10:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,39 +37,35 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] Bluetooth: btmrvl_sdio: Fix wakeup source leaks on device
- unbind
+Subject: Re: [PATCH] Bluetooth: hci_uart: Remove unnecessary NULL check before
+ release_firmware()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174430503404.3757803.3784966096528810575.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Apr 2025 17:10:34 +0000
-References: <20250406201017.47727-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20250406201017.47727-1-krzysztof.kozlowski@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
+ <174430503525.3757803.14280506503586570075.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Apr 2025 17:10:35 +0000
+References: <20250410073456.3558507-1-nichen@iscas.ac.cn>
+In-Reply-To: <20250410073456.3558507-1-nichen@iscas.ac.cn>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: yang.li@amlogic.com, marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun,  6 Apr 2025 22:10:16 +0200 you wrote:
-> Device can be unbound or probe can fail, so driver must also release
-> memory for the wakeup source.
+On Thu, 10 Apr 2025 15:34:56 +0800 you wrote:
+> release_firmware() checks for NULL pointers internally.
+> Remove unneeded NULL check for fmw here.
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 > ---
->  drivers/bluetooth/btmrvl_sdio.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  drivers/bluetooth/hci_aml.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
 Here is the summary with links:
-  - [1/2] Bluetooth: btmrvl_sdio: Fix wakeup source leaks on device unbind
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e760c4024eae
-  - [2/2] Bluetooth: btmtksdio: Fix wakeup source leaks on device unbind
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0be454533788
+  - Bluetooth: hci_uart: Remove unnecessary NULL check before release_firmware()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b53b259e34e4
 
 You are awesome, thank you!
 -- 
