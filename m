@@ -1,282 +1,194 @@
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2137.outbound.protection.outlook.com [40.107.255.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0A815E97
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Apr 2025 02:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.137
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744253458; cv=fail; b=XEf7gcbpVuBu3z+VhXspiUeLmfhI6amjm4VdIU/L4i4mf5p6oCpZTXk2tutty/FXj2cZep8qlMMHJ6naCQWRUayUZMJvNGBxuhZp5zq840549eBGFEtnW3Ce8etKjZe4HVtchRlZv53DeKs/IKUjpceewacLotV7DxUNUTWyMCM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744253458; c=relaxed/simple;
-	bh=TZ6Zp0IvnKyPe8BrpeTXc6Zw4XBLH5BBz6ROVojA644=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=W28dIsy5iKmQugHWRHvPD9h/HkcMsjhoZ5WaMzNoWdvtiCjW2m8Lql/bdOT0jr5aXofYTmy/ZuZHp3lH+gMhC958DC/gnTmjExFyhIStRt6MQzgemcXlWm1MiwivGu4G227A0LOr5M2PiAf3c9YR6vzg+3q20r96GFspIlqh9dw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=plOA+aLY; arc=fail smtp.client-ip=40.107.255.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2307F20127A;
+	Thu, 10 Apr 2025 06:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744266023; cv=none; b=Wx3JKVWR9lcCzQbaG+W/MglP0sikWv3ap2H/XcdnzUZZXKdn5JYanGQk/t0oi4URJ/G/Kn202gxG6n8VTY9CcNR9JVLJriKPU2iqazQE/sF8OfjbIAMhGw1JO4ITPbnXFfI/5Ub5w9WAnAmaOJkGtsjm2vP6Ttr2TO+notr/p5o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744266023; c=relaxed/simple;
+	bh=lkx98ebqcmPCh4xeCzFwmwzylG+x1E+m6RftXkDHziw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pCJkl4bVyuixIq+uK9WxM/flFjeywTNJBSBqRiyFnLLxV53zZq1wSHA/tKE2nzEy4ngMejl3CEojvoJL1orG8UyJQyXMnU9b013ARYeZ7MXq7LJMh/8PN5yKBNxkLUfgqXU2IG3rKXriuHyQmSVJeqmw8qCI3LodcPIvup4D8IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=fhHeL/Jy; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="plOA+aLY"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KgMOMeir4fVR2MfAxX8cXULASS/2yikfrK8YmzPL3SE1vDiyHt7dn/m9X9HHUXA/faTQNV9TX8JP15oTlXoZ3MHmQrif9HVjinCoH0ac4KnFAewYRnRYORd9SKPSoPPcZI1vpcGh9RwhetLHW+at7iWOHebm/HUv0QqmMqkOZ9cmT1z0Ud6c8m2mTVj2q8aWZQeZiY7mK2+XNEt+w54pAojZxQ7hlMjWAVXBhkT62Fvae8sLJtfcccku+MF7GRnPn+sHh8GvOmo3iELORYjYKPKJLkQVKUXHHWfYBs5VRavuPtAMtuTQ9I8zI62vvPo4EP6z2AM2hHn3stoPuf8R5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fUd4IpKqFY2em9x5+cs79lQKoeS7K0Qe6u1l/kAVLus=;
- b=q8ekLvNhmgoAPfLUjgvauOljWc/3k5FQdnn2tdygOkw1f8fRiNsfYmhTtLRKp87z9gGcGb34tbCOq8LcO7TBWeFzRJuOd3LqO6xXrBY1C5naqpvEXSog8I7FXnfQG4kg2ZAiMN29UihGXQXmRrZ1MUXvNgednWwHeaGipFAtMcPm++V/KCvaNMvvvy7PC90brGNTpmeoh1zIuOX3rIGAnEX4QZyM1DTrbNJidboH9NAC8o+zB7b915FgOP2RlC18OLCVtPV/iGPpY0/cOU89XG0mTyb3obaZyPYMwWOdgNCJfbX8rVacXHFLnvwSLYwWoVdfQY/FdIj974ONSV+MGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fUd4IpKqFY2em9x5+cs79lQKoeS7K0Qe6u1l/kAVLus=;
- b=plOA+aLYdXDPa/jbYlRVrz9/ocgI3k2whtfVm5eOoeAN08chqN7kliRaPsrUw4OlyRFj1kRwI3yyFrRSFivKGkQ8J1RRRIpE3WnCISxvY67M+BEzUOUmDczSVF2mccYfesIxx9Ti29lNVeeTJpZfRO97FS4JbTncxqTSn1c65EMHKxVWcV1lV9NllcQleymHVf7hCW/NbMpeyVMr8hJO0Ff1DNRQ8YcdLxxLHiRcg6Z4/5HlL92qKJv13UWDOoDhMJBNJ5VZ1Gt3PjS41+0ftcbYcX2vduQPXjyTXX9TD1mh0ItGpIYe/3IiE4geQCK/T78l4JR1Y0p6uNUA7cVedA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
- by SEYPR03MB8264.apcprd03.prod.outlook.com (2603:1096:101:1b3::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.35; Thu, 10 Apr
- 2025 02:50:52 +0000
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd%4]) with mapi id 15.20.8606.029; Thu, 10 Apr 2025
- 02:50:52 +0000
-Message-ID: <f9268355-8907-41bc-b13c-448a61f9321c@amlogic.com>
-Date: Thu, 10 Apr 2025 10:50:36 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ bluez] bap: Add idle notification for ASE State
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-References: <20250407-bap_aes_state-v1-1-dfc090c49cea@amlogic.com>
- <CABBYNZJsJAbGz=VUZuabixnTJcj1gZHM5m1P_cU06aMn3YZo3Q@mail.gmail.com>
-Content-Language: en-US
-From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <CABBYNZJsJAbGz=VUZuabixnTJcj1gZHM5m1P_cU06aMn3YZo3Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR04CA0012.apcprd04.prod.outlook.com
- (2603:1096:4:197::14) To JH0PR03MB7468.apcprd03.prod.outlook.com
- (2603:1096:990:16::12)
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="fhHeL/Jy"
+Received: from francesco-nb (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id 4A3331F902;
+	Thu, 10 Apr 2025 08:20:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1744266010;
+	bh=ssU05irLt5PvBcX8hhfOhbJQ1N7VoDmvVHtSXSOguvM=; h=From:To:Subject;
+	b=fhHeL/JyeeBV1PY/7+p4OC/T3f0MHtD3sTn7oYswvRzD/PiOcVLfoSVdhX9AWLOmP
+	 wjntNacPpfMjxzQ3f51BiovOLEHxY7roIhhvjN6cSLWSzyXaTVDecJlh6O4ONyvsxy
+	 Q7zWhy5BnRMyMY9EPu+Crcrrf5AgRbdEVlyCAKlRrLFdljAPnNiS3xwUIlGHTVRP9V
+	 2gingCqNaRUvcFJiaq59EEyuDMx0YwQVkQFZ2RXYIhpcRtn5sCspky8xkJF8vrNRxD
+	 SeM9greAHYBdMsSz4FYZPoqlplBj3D7PCuN8lTvdGrNYtMxcTW6hOTG9lSCVY7KfgJ
+	 SV+qPjh7dGvcQ==
+Date: Thu, 10 Apr 2025 08:20:06 +0200
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Vignesh Raghavendra <vigneshr@ti.com>
+Cc: Francesco Dolcini <francesco@dolcini.it>,
+	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Neeraj Kale <neeraj.sanjaykale@nxp.com>, Nishanth Menon <nm@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Santosh Shilimkar <ssantosh@kernel.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org,
+	linux-serial@vger.kernel.org
+Subject: Re: Kernel WARNING (RCU) with btnxpuart on TI AM62 platform
+Message-ID: <20250410062006.GA7506@francesco-nb>
+References: <20250408083512.GA26035@francesco-nb>
+ <24b28bda-e294-4680-bed5-c44efcb6c455@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|SEYPR03MB8264:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3ced4749-0334-4edc-a821-08dd77da81d4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VmdpYkIvMlowa1VaTFliRTZ6QUIxckpnckhKUGgyMmNrUHQ4TXFVOG9oM1Nu?=
- =?utf-8?B?ZkhVc3I0Y1pnSW9MeE9xT2srKzNBREpzKzFVN2pnMndyZDBmWnRJTkZyRnRi?=
- =?utf-8?B?TTl2NG1ZdzVwZTA0RmlJdG81N2pnUTV5TGtqMjU0dytjOHQybUt6OUxiVTYy?=
- =?utf-8?B?ZFk5RWgxbkwvSHF0T2I4a1ZaZW1nSHNTc1VhT3RyNVZxZGZ3cHdjUUpySVlX?=
- =?utf-8?B?ZlBleEVhajRuU1FQWHg1Zk91ZXFCY2s3N3lhakVGMlBpa0U3cHZlTC81dDVk?=
- =?utf-8?B?ZGNMQmRBZUNzenlGMDdnWHZlUFh2blJSR01UWDFwR29ueFNBTWpJSWNlN3JU?=
- =?utf-8?B?eER1aVdLenUxL0FTZnJSMW5zRGxBdHkxbWFUM3ZVbzB0MVRhR1J0a1dVbERH?=
- =?utf-8?B?Z1ArNUlITUkyQWhSUVVKMjNUbGpibmozT3ZMdjhrekFDZ2tqaWdaTkZqMVVy?=
- =?utf-8?B?eWlUcUUzN2RZbnFzaXJ6S25SakRGRnk2YW9XUnpYZzFkMkdZcG5hT0hiYjhW?=
- =?utf-8?B?MGFSa3VoeHYwbzBhek9oVWcwUFgwczBHcXlhWGowU0hlM3B1enh0SDU5djNs?=
- =?utf-8?B?VktVb0UreVNFa2RzUUpTMmlLeXlpNTEwT0VrUis5Mkp0aFlxSW1XTzhXMGZN?=
- =?utf-8?B?Wlpia2NnMG9kR1gvS1RrcDhKeDBjblk1L1dWVW5rRzIxOG9TRG1oK253Mm9U?=
- =?utf-8?B?dXFNalltdVh1VG9UUVU5VnNVZG5kOHd4eEdhVkZudFhING00aGVqR1JvdmtQ?=
- =?utf-8?B?UGIyTk8weTArYk82WWhCVDZaNjJJRmorVWU4TldNU2dGRzhiUFpUbW4rdGc5?=
- =?utf-8?B?eTRLZDQ5b1dBc3cxZklZMTh6bWRHL3VGOU1WaUZaUjlpc3o0cVVleUI1UVNU?=
- =?utf-8?B?YXBqNE52a0srYkxVZFd3RzZKeFhtbkFDNk1vRUM2RjNxV2Q0V3VpTloxYXE3?=
- =?utf-8?B?RDdhYlBydDZ1Y1RQRW1QcSszUGlrVGlCRkQ4T2ZRZncrODhOcE42aDBsVnIv?=
- =?utf-8?B?YkwvM0FSYUFobFdQeFFENjloZzVDdG1VcHpuM3MwSkIwbFpWKzk5eW00cC9L?=
- =?utf-8?B?dGtKTXk5K2hEaU5oZE9vWWpkVE1KSmgydjFwYTNYQlR3SUpPS3VzckFvZzlI?=
- =?utf-8?B?WlExY0xCZmVTbFpwcFRyQ2hjQ1I1UjArSkdOSmxuOTF6UWtyUE1Sb2NUR2dE?=
- =?utf-8?B?MHhMSG5mRm5mNUt1S3p2c2N5dENvVG80WUdJZytzUlhzU3gzdWN3Qmh0SU1z?=
- =?utf-8?B?TXF5bllqZHhUNTI3QmJTYk5Oekt4YWhnakNyQVJicnZrcVhRaHAxQXdSZU9j?=
- =?utf-8?B?aFlZd0xMT0t6WDVFSHFrRU90c3BCMjBmdTc4S05MVHpnSndvaDl3bk1XeHJo?=
- =?utf-8?B?ODluVEVKMkhQKy80OXBMcEkzWnljUnQwdVBPWUUvSGg0Q0VWc0ZsckhTcVU0?=
- =?utf-8?B?VGhsVU5WM3VQZ0VLV2U2SHUwdlplN05kbzB2NG8zd2tRRmRLMjRTSGluZDJH?=
- =?utf-8?B?ZXBwSXR1U2g0em1jdlBZbjZTcFp6QytUVWVIcE1Kd2tTOEJPNWdzWWdibUJ0?=
- =?utf-8?B?Zk9BTGtWVktDOTZRT2w3SitlQTdIUEI3MldESW52VDhxV0pxdTRtbVdtMVUx?=
- =?utf-8?B?TVk2UzQ0Vlh3eTVQRndvZStKaXZwYUpvdFJ4REIrbmp6aldPaS8zWWd6M0Iv?=
- =?utf-8?B?VXpZYkVkQkZ0T1d4eHFFek5YN2R1L3F1Z243ZzduYnk1ZHZLTm9yenJVbURo?=
- =?utf-8?B?RjZiL3hSK211NktqR0J5UXV2SXpoc2Q4TkZzc29PWTdOSVhLZmlHUTBjdTNG?=
- =?utf-8?B?RnRSaFBUa2FSWUQ1NHBjMUJnRU83ekYvaHgxNVptS1poZWcxaFRGY0pNVEt0?=
- =?utf-8?B?Q0NlQzRGOExqd29Xb0JnRVF5Tk9kVTgvaytIazRQV0pGVG1Sa3pvcFRYWWRD?=
- =?utf-8?Q?gVR43kJYCfg=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dzJUQ3BGa2QzS2hMUXZmcU1ueldmR2xmdTVIczVaSFhBTnZIZWlLVFg1UkVM?=
- =?utf-8?B?aDAwTnFKeERJRUtvNnFvdmc3dG1KTC9TM3JhbFJ0ZVFWQ2VDT2hEbDVBalI1?=
- =?utf-8?B?UWNwNHhNR1JBSVoySnpHaVpNOTlBS2JRWE9UcjEwd1BVL2dwMlRFVzlmVEdh?=
- =?utf-8?B?UGJsZzI5ck0vS2h5WnFsQmNoanNEeWpFQ1NacGFsdXoyL01aZnBWZHNVVC9v?=
- =?utf-8?B?aGJ6dUJyR3FmZDVzOHdsdmRzVllDV2xueFFrZU90RTlaM0FGKzN4ekRza2c1?=
- =?utf-8?B?bFczcUYxZzBCTnQ0SjVFVUtTNjVBMG5WRGhZelRrc20wTFEybXFCejI5dEw2?=
- =?utf-8?B?Q3BiaTVqMjJRM0kxYno3VnNQeFBNYnd5UjUxSUE4M2YxTG9BQjAwTVRMQTkw?=
- =?utf-8?B?RXJpK0NVdFpYWGZ2Q2tGWWk4M2dWdDdtQlYraSt0aWFzZE92VjBpMEZPejlP?=
- =?utf-8?B?bTcvQ21CQy90U2dCK0wvTXdhWXIzVjJYSFRuNUhQRTFoUGFBTHEweUJYZDNJ?=
- =?utf-8?B?aVBiSXdnbzViSnFPNCt6QWxUd3RzT3ZSQnkzekRDbXNRbGdNNlNIVEhKbXBu?=
- =?utf-8?B?R21KRGJaQmE4UmlaRWdGNjdIeXNCNmxBZUMvVDZ0YlVESVM3WExQN0pYNHV6?=
- =?utf-8?B?NDNkY3hxY0QwclVHTTRSeEVoMWQwTjBLcjYrY2s2c0RNRWlmS0EzVzZLNWdi?=
- =?utf-8?B?bVEwYThDQ00rMTF4bFplQWhuOGM3WGxrRVkwNHZaTGUwN001WlEzcWthUVFr?=
- =?utf-8?B?cmhKazlRS280Vmo2cDhMTkZHNlBMK1hyNXpKZ2pMNy9nWXRnMTNhVWxEeXVR?=
- =?utf-8?B?YldpSjY0WDJhUzBWZVp6czRzZmFZSTg4N09ZK3ByckVtSVB0cEJqZUFadWhG?=
- =?utf-8?B?b29ucC9nWisxRHpxNEZZOG1aQkFEd3hrWVhBZ2o4dTRXK3l1TU0wOUlWdWtG?=
- =?utf-8?B?TWU0b3BXWHNsY2FyK3BpSWt6Z2hvR1dKRjVxeEZnQnNlZ0JRT0pTNHo1QlVj?=
- =?utf-8?B?TXRIUkRSZlhIRnFNMW4xUUlMcmhCam9kOVhtUzVudnJJcWtTTnhCTUpUaXdX?=
- =?utf-8?B?ay9XY3lrcjJBbkpjVUZxK1VCckc0MXU1TFR2MGoyelF4cmxWeVh6MjZhZWNJ?=
- =?utf-8?B?Q212enF5a3RSM2FTMU5MVzAzc05tSTkzUzlpL2RuNzNVNWI1bk84S2pkWUFT?=
- =?utf-8?B?UTF5SnU5WW45cWxWZ1dmK25MZVpjOTZ0WFpzbGNYVmxyMlBqaEdzbUVDU1cx?=
- =?utf-8?B?cEpkVlgrVFNwSFd5eUk1WkZ0bENGMzZqbHpmbFJKNW5HV1lRd3AxUzZBY3Rx?=
- =?utf-8?B?QmpLcDJWdGpxa3ZoZHRsdDd1bDVaNERkWkxDZkUwMi8yRFU4cCtMSS9yamls?=
- =?utf-8?B?Y0JYWndTaGhhZ0MyZ0EwM2E3Z1ZqbnJuSDl2MzlPQ1JjdGlCQWNMeVNFcFZK?=
- =?utf-8?B?QmUyYjZwaFlaRGxCWmU1aE5VV0hraTNVT0FaM3VQOWRWckVhNXdnRzY0VkNt?=
- =?utf-8?B?Tit3bGVOd2FHbjYxZUVXMmNzdGpwYlcybHhHWUdLWG1YR1VzRUM0MWx4T1Bl?=
- =?utf-8?B?d1VkZk5tcGlKUkhONHZuQzJMWStVNUZFUituckhBOXA3V0hIRnYvOVdOTm5s?=
- =?utf-8?B?RTdLQkswU3p3Z0J3NjFhVzJQRUJBdXBVSWt4TU5HUGFackZ4Nmo2cDArZncz?=
- =?utf-8?B?WFdGM3MvYTVGK1NrY0d5TzNZbmJOUWRaSHZsUjlkS1NPNlJ2RlFQUm1vSmhY?=
- =?utf-8?B?VEg4V3dFd011QW1Ed2xNQmxpekhGMVJFZUxBTlZQeUlMSE5ObGZEU0lidE5E?=
- =?utf-8?B?dmMyNnFWRE84aHNyTjE5cDB6NllSWjErWUs1N0kxaDl0bGhDbUF3UHZsQTZ4?=
- =?utf-8?B?RkNGMkc0Ykl3UFRna1RKdFVrQzFLbVFhU3QxVGF1Z2lmeUprWUFrNUhvNE4v?=
- =?utf-8?B?MWJZZlBnMzBPbDBhQ2RWcFNyNVViNFhjZ3ptRFVvZUdQTVFZVklnVnNPSWov?=
- =?utf-8?B?ODlFUzVKVnRTRHN3aVFmU0NGb3YvVTUrcWR0SDlNNE42bFhwUXphLy96NC9G?=
- =?utf-8?B?WFkwRXNnS2dCOVpPNDRTdlBoaE9UbkNpL2ltZmEyc25zUzU0b1BlUWttd3Bp?=
- =?utf-8?Q?EReKpqEkgu0SCY8bzrYaS9c9j?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ced4749-0334-4edc-a821-08dd77da81d4
-X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 02:50:52.2840
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PPXX9ZdNfjUvCKwRvasE/5vBKvjEYp2un9PMhKsO00EiiUTUVYcdqvZSfEzMeO/+oOfMOgETyhZmakNH2CoLCQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR03MB8264
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <24b28bda-e294-4680-bed5-c44efcb6c455@ti.com>
 
-Hi Luiz，
-> [ EXTERNAL EMAIL ]
->
-> Hi Yang,
->
-> On Mon, Apr 7, 2025 at 6:34 AM Yang Li via B4 Relay
-> <devnull+yang.li.amlogic.com@kernel.org> wrote:
->> From: Yang Li <yang.li@amlogic.com>
->>
->> When the ASE state changes from releasing(6) -> idle(0),
->> the idle state needs to be notified to the Client.
->>
->> ---
->> Signed-off-by: Yang Li <yang.li@amlogic.com>
->> ---
->>   src/shared/bap.c | 13 ++++---------
->>   1 file changed, 4 insertions(+), 9 deletions(-)
->>
->> diff --git a/src/shared/bap.c b/src/shared/bap.c
->> index 650bea2f4..c40d6e051 100644
->> --- a/src/shared/bap.c
->> +++ b/src/shared/bap.c
->> @@ -1123,17 +1123,12 @@ static void stream_notify_metadata(struct bt_bap_stream *stream)
->>          free(status);
->>   }
->>
->> -static void stream_notify_release(struct bt_bap_stream *stream)
->> +static void stream_notify_ase_state(struct bt_bap_stream *stream)
->>   {
->>          struct bt_bap_endpoint *ep = stream->ep;
->>          struct bt_ascs_ase_status status;
->>
->> -       DBG(stream->bap, "stream %p", stream);
->> -
->> -
->> -       memset(&status, 0, sizeof(status));
->>          status.id = ep->id;
->> -       ep->state = BT_BAP_STREAM_STATE_RELEASING;
-> Not really sure why you are taking away releasing state, we actually
-> depend on it for the new tests:
->
-> https://patchwork.kernel.org/project/bluetooth/list/?series=950067
-Well, I got it.
->>          status.state = ep->state;
->>
->>          gatt_db_attribute_notify(ep->attr, (void *)&status, sizeof(status),
->> @@ -1713,6 +1708,7 @@ static void stream_notify(struct bt_bap_stream *stream, uint8_t state)
->>
->>          switch (state) {
->>          case BT_ASCS_ASE_STATE_IDLE:
->> +               stream_notify_ase_state(stream);
-> We need something like stream_notify_idle.
-Well, I got it.
->>                  break;
->>          case BT_ASCS_ASE_STATE_CONFIG:
->>                  stream_notify_config(stream);
->> @@ -1726,7 +1722,7 @@ static void stream_notify(struct bt_bap_stream *stream, uint8_t state)
->>                  stream_notify_metadata(stream);
->>                  break;
->>          case BT_ASCS_ASE_STATE_RELEASING:
->> -               stream_notify_release(stream);
->> +               stream_notify_ase_state(stream);
-> This is actually wrong, we need to notify the releasing state.
->
->>                  break;
->>          }
->>   }
->> @@ -6397,9 +6393,8 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
->>          DBG(stream->bap, "stream %p io disconnected", stream);
->>
->>          if (stream->ep->state == BT_ASCS_ASE_STATE_RELEASING)
->> -               stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
->> +               stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
-> Ok, so this is sort of reverting from  bap: Fix not generating
-> releasing state? I was wondering how much testing you guys did to
-> confirm this is the right behavior, I don't think it is and Im trying
-> to figure out if there are any tests for the testing spec that do
-> properly verify this behavior.
+Hello Vignesh,
 
-There are some misunderstandings that need to be clarified. Initially, 
-patchset V1 
-https://lore.kernel.org/all/20250106-upstream-v1-1-a16879b78ffd@amlogic.com/ 
-was proposed to solve the issue 
-https://github.com/bluez/bluez/issues/1053, but after discussion, I felt 
-that the process of Streaming->Releasing->Idle was OK, so V1 was 
-abandoned. Then I submitted patchset V2/V3 
-https://lore.kernel.org/all/20250213-ascs_bug-v3-1-d5594f0f20c6@amlogic.com/. 
-I tested K70 and Pixel phones on V3, and both can solve the above 
-issues. So my original intention was to merge V3, but after the release 
-of version 5.82, I checked the code and found that V1 was merged. So I 
-submitted the modification again on the latest version.
+On Tue, Apr 08, 2025 at 09:15:26PM +0530, Vignesh Raghavendra wrote:
+> On 08/04/25 14:05, Francesco Dolcini wrote:
+> > I do have the following kernel warning with 6.15-rc1, on a TI AM62
+> > platform (arm64), single CPU core, using btnxpuart driver, any idea?
+> > PREEMPT_RT is enabled, if it matters.
+> > 
+> > Either the issue is not systematic, or multi cores SoCs are not affected
+> > (no error on the exact same image on a dual nor on quad core TI AM62).
+> > 
+> > 
+> > [   23.139080] Voluntary context switch within RCU read-side critical section!
+> > [   23.139119] WARNING: CPU: 0 PID: 61 at /kernel/rcu/tree_plugin.h:332 rcu_note_context_switch+0x3c4/0x430
+> > [   23.139172] Modules linked in: uas onboard_usb_dev optee_rng dwc3 evdev btnxpuart spidev aes_ce_blk aes_ce_cipher ghash_ce gf128mul sha2_ce sha256_arm64 sha1_ce snd_soc_simple_card snd_soc_simple_card_utils optee spi_cadence_quadspi tee gpio_keys usb_conn_gpio display_connector roles dwc3_am62 mwifiex_sdio k3_j72xx_bandgap mwifiex rtc_ti_k3 cfg80211 tidss sa2ul sha512_generic snd_soc_davinci_mcasp authenc drm_display_helper snd_soc_ti_udma crypto_null snd_soc_ti_edma sha1_generic snd_soc_ti_sdma omap_hwspinlock lontium_lt8912b ina2xx snd_soc_wm8904 ti_ads1015 industrialio_triggered_buffer kfifo_buf lm75 tpm_tis_i2c tps65219_pwrbutton crc_ccitt tpm_tis_core tpm rng_core tc358768 m_can_platform pwm_tiehrpwm m_can spi_omap2_mcspi can_dev bluetooth ecdh_generic ecc rfkill libaes loop fuse ipv6 autofs4
+> > [   23.139459] CPU: 0 UID: 0 PID: 61 Comm: kworker/u5:0 Not tainted 6.15.0-rc1-0.0.0-devel #1 PREEMPT_RT
+> > [   23.139471] Hardware name: Toradex Verdin AM62 WB on Dahlia Board (DT)
+> > [   23.139478] Workqueue: hci0 hci_power_off [bluetooth]
+> > [   23.139615] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> > [   23.139625] pc : rcu_note_context_switch+0x3c4/0x430
+> > [   23.139647] lr : rcu_note_context_switch+0x3c4/0x430
+> > [   23.139658] sp : ffff8000819fb740
+> > [   23.139661] x29: ffff8000819fb740 x28: 0000000000000000 x27: ffff0000079d2010
+> > [   23.139673] x26: ffff0000011e7810 x25: ffff000001c2c200 x24: 0000000000000000
+> > [   23.139688] x23: 0000000000000000 x22: ffff000001c2c200 x21: ffff000001c2c200
+> > [   23.139700] x20: ffff800081083ec0 x19: ffff00001da9fec0 x18: fffffffffffe7e78
+> > [   23.139712] x17: ffff7fff9ca1c000 x16: ffff800080000000 x15: ffff00001da9f8c0
+> > [   23.139726] x14: fffffffffffc7e77 x13: 216e6f6974636573 x12: 206c616369746972
+> > [   23.139738] x11: 6320656469732d64 x10: 6165722055435220 x9 : 206e696874697720
+> > [   23.139750] x8 : ffff80008113f040 x7 : ffff8000819fb4e0 x6 : 000000000000000c
+> > [   23.139761] x5 : ffff00001da95888 x4 : 0000000000000000 x3 : 0000000000000027
+> > [   23.139775] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000001c2c200
+> > [   23.139788] Call trace:
+> > [   23.139793]  rcu_note_context_switch+0x3c4/0x430 (P)
+> > [   23.139813]  __schedule+0xa0/0x7dc
+> > [   23.139830]  schedule+0x34/0x11c
+> > [   23.139841]  schedule_timeout+0x8c/0x110
+> > [   23.139861]  wait_for_completion_timeout+0x78/0x14c
+> > [   23.139873]  ti_sci_set_device_state+0x120/0x1fc
+> > [   23.139886]  ti_sci_cmd_get_device_exclusive+0x18/0x30
+> > [   23.139899]  ti_sci_pd_power_on+0x28/0x54
+> > [   23.139916]  _genpd_power_on+0x98/0x188
+> > [   23.139927]  genpd_power_on+0xa8/0x168
+> > [   23.139940]  genpd_runtime_resume+0xc0/0x298
+> > [   23.139957]  __rpm_callback+0x48/0x1a4
+> > [   23.139974]  rpm_callback+0x74/0x80
+> > [   23.139987]  rpm_resume+0x3b0/0x698
+> > [   23.140000]  __pm_runtime_resume+0x48/0x88
+> > [   23.140012]  omap8250_set_mctrl+0x2c/0xbc
+> > [   23.140030]  serial8250_set_mctrl+0x20/0x40
+> > [   23.140046]  uart_update_mctrl+0x80/0x110
+> 
+> I think issue is that uart_update_mctrl() holds a spinlock:
+> 
+> 	uart_port_lock_irqsave(port, &flags);
+> 
+> and then omap8250_set_mctrl() calls pm_runtime APIs which on K3 SoC
+> needs to talk to a Firmware to enable pd. This IPC call is a sleeping
+> call leading to scheduling with IRQs disabled.
+> 
+> I guess this is what RT linux is complaining? I dont have a solution
+> though, maybe serdev delays pm_runtime_put till the port is closed?
 
-I sorted out the process of ASE state switching when the media of 
-different mobile phones is paused:
+Our CI reproduced what looks like the same issue also on current
+torvalds/master (6.15-rc1+) branch, without PREEMPT_RT.
 
-1. Redmi K70+DUT: Pause operation, ASE state process is 
-Streaming--->Disabling->QoS
-2. Pixel+DUT: Pause operation, DUT does not cache Codec, ASE state 
-process is Streaming->Releasing->Idl
-3. Pixel+RedmiBud5 earbuds: Pause operation, earbuds cache Codec, ASE 
-state process is Streaming->Releasing->Codec
-If the DUT also caches Codec, the latest version of the process is 
-Streaming->Releasing->Codec->QoS, but the QoS status will be abnormal on 
-Pixel phones, causing LE disconnection, so the process without caching 
-Codec is still adopted.
->
->> -       bt_bap_stream_set_io(stream, -1);
->>          return false;
->>   }
->>
->>
->> ---
->> base-commit: 0efa20cbf3fb5693c7c2f14ba8cf67053ca029e5
->> change-id: 20250407-bap_aes_state-9306798ff95a
->>
->> Best regards,
->> --
->> Yang Li <yang.li@amlogic.com>
->>
->>
->>
->
-> --
-> Luiz Augusto von Dentz
+The call trace seems just the same, but attaching it here for
+completeness.
+
+
+[   20.931923] BUG: scheduling while atomic: kworker/u5:0/42/0x00000002
+[   20.938429] Modules linked in: sd_mod uas onboard_usb_dev btnxpuart optee_rng dwc3 evdev spidev aes_ce_blk aes_ce_cipher ghash_ce gf128mul sha2_ce sha256_arm64 sha1_ce snd_soc_simple_card snd_soc_simple_card_utils mwifiex_sdio mwifiex display_connector spi_cadence_quadspi optee usb_conn_gpio tee gpio_keys roles k3_j72xx_bandgap cfg80211 rtc_ti_k3 dwc3_am62 bluetooth ecdh_generic ecc sa2ul sha512_generic rfkill authenc tidss crypto_null libaes snd_soc_davinci_mcasp sha1_generic drm_display_helper snd_soc_ti_udma snd_soc_ti_edma snd_soc_ti_sdma omap_hwspinlock lontium_lt8912b ina2xx ti_ads1015 snd_soc_wm8904 industrialio_triggered_buffer kfifo_buf lm75 tpm_tis_i2c crc_ccitt tps65219_pwrbutton tpm_tis_core tpm m_can_platform m_can rng_core tc358768 can_dev pwm_tiehrpwm spi_omap2_mcspi loop fuse ipv6 autofs4
+[   20.938865] CPU: 0 UID: 0 PID: 42 Comm: kworker/u5:0 Not tainted 6.15.0-rc1-0.0.0-devel #1 PREEMPT
+[   20.938878] Hardware name: Toradex Verdin AM62 WB on Dahlia Board (DT)
+[   20.938895] Workqueue: hci0 hci_power_off [bluetooth]
+[   20.939032] Call trace:
+[   20.939037]  show_stack+0x2c/0x84 (C)
+[   20.939063]  dump_stack_lvl+0x60/0x80
+[   20.939084]  dump_stack+0x18/0x24
+[   20.939096]  __schedule_bug+0x54/0x70
+[   20.939116]  __schedule+0x628/0x7dc
+[   20.939129]  schedule+0x34/0x11c
+[   20.939138]  rpm_resume+0x17c/0x6a0
+[   20.939155]  __pm_runtime_resume+0x50/0x9c
+[   20.939168]  omap8250_set_mctrl+0x2c/0xc0
+[   20.939183]  serial8250_set_mctrl+0x20/0x40
+[   20.939193]  uart_update_mctrl+0x88/0x11c
+[   20.939215]  uart_dtr_rts+0x104/0x120
+[   20.939226]  tty_port_shutdown+0xd4/0xdc
+[   20.939236]  tty_port_close+0x40/0xc0
+[   20.939248]  uart_close+0x34/0x9c
+[   20.939259]  ttyport_close+0x50/0xa0
+[   20.939272]  serdev_device_close+0x40/0x5c
+[   20.939283]  btnxpuart_close+0x1c/0xa0 [btnxpuart]
+[   20.939309]  hci_dev_close_sync+0x304/0x7cc [bluetooth]
+[   20.939376]  hci_dev_do_close+0x2c/0x70 [bluetooth]
+[   20.939441]  hci_power_off+0x20/0x64 [bluetooth]
+[   20.939508]  process_one_work+0x148/0x290
+[   20.939528]  worker_thread+0x2c8/0x3e4
+[   20.939541]  kthread+0x12c/0x204
+[   20.939554]  ret_from_fork+0x10/0x20
+[   20.943567] BUG: scheduling while atomic: kworker/u5:0/42/0x00000000
+[   20.950126] Modules linked in: sd_mod uas onboard_usb_dev btnxpuart optee_rng dwc3 evdev spidev aes_ce_blk aes_ce_cipher ghash_ce gf128mul sha2_ce sha256_arm64 sha1_ce snd_soc_simple_card snd_soc_simple_card_utils mwifiex_sdio mwifiex display_connector spi_cadence_quadspi optee usb_conn_gpio tee gpio_keys roles k3_j72xx_bandgap cfg80211 rtc_ti_k3 dwc3_am62 bluetooth ecdh_generic ecc sa2ul sha512_generic rfkill authenc tidss crypto_null libaes snd_soc_davinci_mcasp sha1_generic drm_display_helper snd_soc_ti_udma snd_soc_ti_edma snd_soc_ti_sdma omap_hwspinlock lontium_lt8912b ina2xx ti_ads1015 snd_soc_wm8904 industrialio_triggered_buffer kfifo_buf lm75 tpm_tis_i2c crc_ccitt tps65219_pwrbutton tpm_tis_core tpm m_can_platform m_can rng_core tc358768 can_dev pwm_tiehrpwm spi_omap2_mcspi loop fuse ipv6 autofs4
+[   20.950550] CPU: 0 UID: 0 PID: 42 Comm: kworker/u5:0 Tainted: G        W           6.15.0-rc1-0.0.0-devel #1 PREEMPT
+[   20.950566] Tainted: [W]=WARN
+[   20.950570] Hardware name: Toradex Verdin AM62 WB on Dahlia Board (DT)
+[   20.950584] Workqueue: hci0 hci_power_off [bluetooth]
+[   20.950721] Call trace:
+[   20.950726]  show_stack+0x2c/0x84 (C)
+[   20.950747]  dump_stack_lvl+0x60/0x80
+[   20.950771]  dump_stack+0x18/0x24
+[   20.950783]  __schedule_bug+0x54/0x70
+[   20.950798]  __schedule+0x628/0x7dc
+[   20.950815]  schedule+0x34/0x11c
+[   20.950824]  schedule_timeout+0xd4/0x110
+[   20.950838]  wait_for_completion+0x78/0x140
+[   20.950853]  __flush_work+0x250/0x340
+[   20.950868]  flush_work+0x14/0x20
+[   20.950879]  omap_8250_shutdown+0x2c/0x1a4
+[   20.950903]  serial8250_shutdown+0x18/0x40
+[   20.950913]  uart_port_shutdown+0x40/0x58
+[   20.950926]  uart_tty_port_shutdown+0x5c/0x178
+[   20.950940]  tty_port_shutdown+0x84/0xdc
+[   20.950950]  tty_port_close+0x40/0xc0
+[   20.950958]  uart_close+0x34/0x9c
+[   20.950969]  ttyport_close+0x50/0xa0
+[   20.950990]  serdev_device_close+0x40/0x5c
+[   20.951001]  btnxpuart_close+0x1c/0xa0 [btnxpuart]
+[   20.951017]  hci_dev_close_sync+0x304/0x7cc [bluetooth]
+[   20.951082]  hci_dev_do_close+0x2c/0x70 [bluetooth]
+[   20.951149]  hci_power_off+0x20/0x64 [bluetooth]
+[   20.951214]  process_one_work+0x148/0x290
+[   20.951227]  worker_thread+0x2c8/0x3e4
+[   20.951242]  kthread+0x12c/0x204
+[   20.951258]  ret_from_fork+0x10/0x20
+
+
+Francesco
+
