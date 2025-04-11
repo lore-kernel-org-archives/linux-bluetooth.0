@@ -1,80 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BD229C320;
-	Fri, 11 Apr 2025 22:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7621D2BF3CB;
+	Fri, 11 Apr 2025 23:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744409341; cv=none; b=lJwKmaOlMbeN468GZ/w29gIdlEDrF/BncSTFcSupdXg0Q1Ruj4ymfeT44luUEj9LC9FFTtDHNbiORAXxsNYPGGcxQO79k4zBlTmgr6rsZwLmmQpItjt51wiukDllI1NgEEVYcw7aH+GA758jQ0LNPynaBfACa5vDVQbA2TYumgU=
+	t=1744414797; cv=none; b=Z+PdxHpywIU+Yivf7o6eT2of98eDW2F9j0sXV+iX/r3RCqaxl0MX00s9wK4aQ+82CJMluLdkBklOD89Chk44FKHrenXc88a918pFUiDQ0LMCwFS2BilZaa5vVaHbmGCgvbpDReWPobvIlxRq/bfBay/VdWc1zDTiB51gyRXsQk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744409341; c=relaxed/simple;
-	bh=CwxJV85DmXjkLTZP7LuCR5nM7rqdQ8ApRtiEEh9MpZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rRupXiM/PVazUlM2QQAyA1Jsc+saMuxIhXZJdAAfwZ7kdtAMKqKaV/viC1vUzCPVEBA8fJ66eOK4Z4s5GSab6W2sLCE2lGlDS2M9DIoOjoB4K6OgKZET986rvgadaK9SnGuMe4W39SZEh+8poHAQZnjhjLVPVgng0qjvKI6QTuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2gP/WVf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744414797; c=relaxed/simple;
+	bh=Iub9tIu4lDZSTS4D57n9KDNfEekOGDs0iibxj+YOwbs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DG2ijJFTG69qwvUN2HQEddoKm25WNa75ftqYlVe2fLxP9u/K0zMPQ/HI7tyKdtjESHAQZGy1Pl4Ax8u311MG5pD6GrsFGMY1mPG7g9o1QZp5532aRRFx1B7g4YlotweZMc3HkrqyFWWOtvAMKJKl3vrm7oInrrSt8INLHpuS0oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SdbSxd8c; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2gP/WVf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B890C4CEE2;
-	Fri, 11 Apr 2025 22:09:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SdbSxd8c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EDAEC4CEE2;
+	Fri, 11 Apr 2025 23:39:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744409340;
-	bh=CwxJV85DmXjkLTZP7LuCR5nM7rqdQ8ApRtiEEh9MpZQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a2gP/WVfUHALinaeKHZXcmNAR7o087H3E6hd2k8t+9LfE72OzhZqhEZPnDsngCNyX
-	 oQfmZiQ07PDKhh2omu4fYK57/JceFpC4BHfJ4Lhj2Fxooo5xjfSf02fx89XfzEQeXF
-	 u3ZYbxnPJ7aYr6WIepBZOx671BmLxb4hVyVR+8KWhfjZO9VP3fkY/bVMDgnKOOxhWa
-	 GyPwjOWEeWaiP0AHUoQFTwYO+OlMinYHWBAt0fA/iQ2lOaI8Ii6XUHVZfUYK0eJLC5
-	 N4hAzjowUt6gB8ZdTLL/izN+Px4PGMq62N5+2E1JVpRbH0J/H6Ail/53scqTb2N+Y1
-	 Ye3UwHW75kT3w==
-Date: Fri, 11 Apr 2025 17:08:59 -0500
-From: Rob Herring <robh@kernel.org>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	amitkumar.karwar@nxp.com, sherry.sun@nxp.com, manjeet.gupta@nxp.com
-Subject: Re: [PATCH v1 1/2] dt-bindings: net: bluetooth: nxp: Add support for
- host-wakeup
-Message-ID: <20250411220859.GA4161337-robh@kernel.org>
-References: <20250411163719.326558-1-neeraj.sanjaykale@nxp.com>
+	s=k20201202; t=1744414797;
+	bh=Iub9tIu4lDZSTS4D57n9KDNfEekOGDs0iibxj+YOwbs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SdbSxd8cI7F/2RqhuHNdVkUQ/e8fgdtrkwpIGUkfL/3rUbCQX6EzvIyU2fE51OMzN
+	 HF7ubfamfiNYZKo/bKLdW0q1WnfSeiAkNxgevwQLQEMSzs7Z1/gmNnfLaeEtWc1hBs
+	 5GRX0dxvAsU+iZqWV5wcnIQX5JuOhxjAvgMJ0Dh3rYD1FhBfUGORS/rO1YGd08Hsbt
+	 63hgsTdRwEKumgZO6TXjsJ9s8xnJSaad+e911kx9uiYKOVNPVaFGTaPKjGyjfZHBLO
+	 rOgHKZa/RxjL+QdKGDq0Lwsf9W55J+6VVQLy1XkEYHa474RzsggU1lHrrJSf2pCEdG
+	 wdECgTi3S/+YQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CAB38111E2;
+	Fri, 11 Apr 2025 23:40:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250411163719.326558-1-neeraj.sanjaykale@nxp.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth 2025-04-10
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174441483476.518794.631210422314921616.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Apr 2025 23:40:34 +0000
+References: <20250410173542.625232-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250410173542.625232-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Fri, Apr 11, 2025 at 10:07:18PM +0530, Neeraj Sanjay Kale wrote:
-> Add support for host-wakeup on GPIO interrupt.
+Hello:
+
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 10 Apr 2025 13:35:41 -0400 you wrote:
+> The following changes since commit eaa517b77e63442260640d875f824d1111ca6569:
 > 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
->  .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml  | 7 +++++++
->  1 file changed, 7 insertions(+)
+>   ethtool: cmis_cdb: Fix incorrect read / write length extension (2025-04-10 14:32:43 +0200)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> index d02e9dd847ef..ab1411c05f49 100644
-> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> @@ -48,6 +48,12 @@ properties:
->      description:
->        The GPIO number of the NXP chipset used for BT_WAKE_IN.
->  
-> +  host-wakeup-gpios:
-> +    maxItems: 1
-> +    description:
-> +      Host wakeup by falling edge interrupt on this GPIO which
-> +      is connected to BT_WAKE_OUT pin of the NXP chipset.
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-04-10
+> 
+> [...]
 
-Read the description in the Broadcom binding you copied this from. 
-Define this as an interrupt named 'wakeup', not a GPIO. After all, to be 
-a wake-up source, it kind of has to be an interrupt.
+Here is the summary with links:
+  - [GIT,PULL] bluetooth 2025-04-10
+    https://git.kernel.org/netdev/net/c/9767870e76f4
 
-Just because I said no to putting wakeup source handling in serdev, 
-doesn't mean the binding should change. The handling just has to be in 
-the driver.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Rob
+
