@@ -1,125 +1,80 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE582290BD2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Apr 2025 21:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BD229C320;
+	Fri, 11 Apr 2025 22:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744407324; cv=none; b=g8uQz8DlxV6Pg1CZ+pR6x0MmGI+akzUIeuCZ5MmjIbxoE8d9OFifMqXMSjcs6pTtEJdwm4FA4lHpQ2JKgwL9fc4g4WKl4HmDNoL8pMEwYKVImsO5Y77+UvVINkP3ZurzWYmQIZslias8VYa50zhaxcVy0XEQM5k4+/JLOQtXdAQ=
+	t=1744409341; cv=none; b=lJwKmaOlMbeN468GZ/w29gIdlEDrF/BncSTFcSupdXg0Q1Ruj4ymfeT44luUEj9LC9FFTtDHNbiORAXxsNYPGGcxQO79k4zBlTmgr6rsZwLmmQpItjt51wiukDllI1NgEEVYcw7aH+GA758jQ0LNPynaBfACa5vDVQbA2TYumgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744407324; c=relaxed/simple;
-	bh=zGK1qd6rts8i2Qe0GqSHfL8DfuGip1RXIEACoRDFNjY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=BlyFxe/HUpQLYJTI/Ge5OYul3JbNqMbr0RMEX61Nu1qIvSqTo0uLRifym+6c4wCJdwgK5/hwXoatWemSQt2w0cYvYh7dIffeQz5I6/nPL1zCQItqjUNiQZm6Sk+CkgF0VrgBOHf9qyKBUnNDKNIpj8Mp/OUEFrNteTkLp4nG2n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NpVaZ47h; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744409341; c=relaxed/simple;
+	bh=CwxJV85DmXjkLTZP7LuCR5nM7rqdQ8ApRtiEEh9MpZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rRupXiM/PVazUlM2QQAyA1Jsc+saMuxIhXZJdAAfwZ7kdtAMKqKaV/viC1vUzCPVEBA8fJ66eOK4Z4s5GSab6W2sLCE2lGlDS2M9DIoOjoB4K6OgKZET986rvgadaK9SnGuMe4W39SZEh+8poHAQZnjhjLVPVgng0qjvKI6QTuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2gP/WVf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpVaZ47h"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e8f4c50a8fso21811626d6.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Apr 2025 14:35:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744407321; x=1745012121; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1UDTTtynN97HVPwT0WUALQnU/4a1jHk+UFdM3vPgPOw=;
-        b=NpVaZ47hLiZI3XXAwjooJyzxBHgZrwmikNJ56NKbPnXiGIus3PVEfQCfWInpxlSnNd
-         k34s3zPQI8S6SoaJiI4XgK+worIulun1O8rGKEoeEYQZKRQe962PsyMew+WPBR7LndzB
-         23DI1J2j8ffBRx5QDVdyOemfVgIksbgyTL+aFRy9QQI6jcf7FU7hdaSgErjBb5Cbh5w0
-         KjaNSUbOalPSaTJsLaP5uHMupm66E7qKKfXmAajpFV+fK44WBD9XZtQ0QNU2bJijHu5F
-         lQmYu8S4VOqVkwdSOCL0WapBSfJUoDM8hN4pOiyK3WSqsfVJUA9VozJ4htyU3bnFCVDw
-         Hb4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744407321; x=1745012121;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1UDTTtynN97HVPwT0WUALQnU/4a1jHk+UFdM3vPgPOw=;
-        b=AkD52+UIGvwjv49oSeHkTRuiiujM9NL200jPKxiSrNclJifRgVS1K5XpRI6VP25sR7
-         UfNjDv0EeGum9AreaH8DrFwnu0oZF0T1mktD+VcMspSizzEIelB6PoG26s1VdmtlaqWC
-         sCWTPDeYVt2I7+n4ua/cSmgJzqXEqeOpVsohu1+UkFx4gcl5JxOEp/dzIcTg7Aq+TjPJ
-         YQzyvuveg+9P6RHfwLsgtgt5gPjDlDcsU40zkjltduLMKD7yQ0kwLgvYJ+a5au61TN5Z
-         2U2sHKB6Q2rAPMIyKZvA+I4/r+Ex2t8CAgsMVOO0XQmzzXF88i8aB+XyhkqG4kAGDN//
-         0JBQ==
-X-Gm-Message-State: AOJu0YxSSmtCNy400If+2N+xBHefuCdqAzy2bOh22KZzsFQyS2i1aK4n
-	rEDEZhQDnEGXWNEAinNMd2sWhi4ihRnfNBxV+h2I3FnueVB0fQjCPkAIXQ==
-X-Gm-Gg: ASbGncse0HerCuUXMwyskPOvtfl2ZZLXzRAxbHPO52w8QXyovLauqVzGFdB9y1Wr7Pf
-	dThO8P6gchYZTiGyAC8seTTxhzYWwPHGlYgv3my7Wqnv07z2qE49k8U8CBZjTGZvVePEToNUDc7
-	qLBhber8Mxul5cwhyqISDfx5FQ5wNFcuqC8LzSZWAYIro06/iUP0lyqOx7kS8grAdvHPjlsqXQM
-	5Z2DlbAf5t76pSk/KlR4Cu5e7iM2s3MiWyM73TmWmQDZQOeaqmDlCFygOcnixwOoDulySAHWpGG
-	9HsfV2TwA26K52iny8LFiSyijQrHXf6pNmlP3mkphDHrAA==
-X-Google-Smtp-Source: AGHT+IFHQ6cwPjqLB1jmyhueNWENojrZqEu7TIYtg2udmiOMlswuagockpEH24gr0anPQojRQKCP5A==
-X-Received: by 2002:ad4:5ba1:0:b0:6e6:6c39:cb71 with SMTP id 6a1803df08f44-6f23f18b4bamr58535216d6.45.1744407321357;
-        Fri, 11 Apr 2025 14:35:21 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.47.210])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0dea0806esm41760026d6.69.2025.04.11.14.35.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 14:35:20 -0700 (PDT)
-Message-ID: <67f98b18.d40a0220.35d60d.d60c@mx.google.com>
-Date: Fri, 11 Apr 2025 14:35:20 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4546618065707079601=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2gP/WVf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B890C4CEE2;
+	Fri, 11 Apr 2025 22:09:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744409340;
+	bh=CwxJV85DmXjkLTZP7LuCR5nM7rqdQ8ApRtiEEh9MpZQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a2gP/WVfUHALinaeKHZXcmNAR7o087H3E6hd2k8t+9LfE72OzhZqhEZPnDsngCNyX
+	 oQfmZiQ07PDKhh2omu4fYK57/JceFpC4BHfJ4Lhj2Fxooo5xjfSf02fx89XfzEQeXF
+	 u3ZYbxnPJ7aYr6WIepBZOx671BmLxb4hVyVR+8KWhfjZO9VP3fkY/bVMDgnKOOxhWa
+	 GyPwjOWEeWaiP0AHUoQFTwYO+OlMinYHWBAt0fA/iQ2lOaI8Ii6XUHVZfUYK0eJLC5
+	 N4hAzjowUt6gB8ZdTLL/izN+Px4PGMq62N5+2E1JVpRbH0J/H6Ail/53scqTb2N+Y1
+	 Ye3UwHW75kT3w==
+Date: Fri, 11 Apr 2025 17:08:59 -0500
+From: Rob Herring <robh@kernel.org>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	amitkumar.karwar@nxp.com, sherry.sun@nxp.com, manjeet.gupta@nxp.com
+Subject: Re: [PATCH v1 1/2] dt-bindings: net: bluetooth: nxp: Add support for
+ host-wakeup
+Message-ID: <20250411220859.GA4161337-robh@kernel.org>
+References: <20250411163719.326558-1-neeraj.sanjaykale@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2] bap: Fix not setting SID for broadcast receiver
-In-Reply-To: <20250411195626.109307-1-luiz.dentz@gmail.com>
-References: <20250411195626.109307-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250411163719.326558-1-neeraj.sanjaykale@nxp.com>
 
---===============4546618065707079601==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Apr 11, 2025 at 10:07:18PM +0530, Neeraj Sanjay Kale wrote:
+> Add support for host-wakeup on GPIO interrupt.
+> 
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+>  .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml  | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> index d02e9dd847ef..ab1411c05f49 100644
+> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> @@ -48,6 +48,12 @@ properties:
+>      description:
+>        The GPIO number of the NXP chipset used for BT_WAKE_IN.
+>  
+> +  host-wakeup-gpios:
+> +    maxItems: 1
+> +    description:
+> +      Host wakeup by falling edge interrupt on this GPIO which
+> +      is connected to BT_WAKE_OUT pin of the NXP chipset.
 
-This is automated email and please do not reply to this email!
+Read the description in the Broadcom binding you copied this from. 
+Define this as an interrupt named 'wakeup', not a GPIO. After all, to be 
+a wake-up source, it kind of has to be an interrupt.
 
-Dear submitter,
+Just because I said no to putting wakeup source handling in serdev, 
+doesn't mean the binding should change. The handling just has to be in 
+the driver.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=952626
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.19 seconds
-GitLint                       PENDING   0.20 seconds
-BuildEll                      PASS      20.42 seconds
-BluezMake                     PASS      2682.13 seconds
-MakeCheck                     PASS      20.42 seconds
-MakeDistcheck                 PASS      197.76 seconds
-CheckValgrind                 PASS      274.01 seconds
-CheckSmatch                   PASS      303.52 seconds
-bluezmakeextell               PASS      127.62 seconds
-IncrementalBuild              PENDING   0.32 seconds
-ScanBuild                     PASS      896.94 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4546618065707079601==--
+Rob
