@@ -1,149 +1,133 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C6B63B9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Apr 2025 14:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAE221B9DB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Apr 2025 16:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744380217; cv=none; b=YjwHCL/PBCFjX7u/ZENaubN4E5G14vHHPAB48dXKAdHw9misBHIxCdGlROEUACq6opl35oWbGEOYexbBLLnQ5Y0w/MjnPnPnzkGGVbjatgwHrCD9itoUrfZT2m6lnJ+BIJLh5r4Z+I+Q/OVmYqZv87U9ZYOh9EjcDbnfTT15LFw=
+	t=1744388957; cv=none; b=gEWnQ/lu7n6VKWPQCSWsr1LOG+W+AXlmdq+QYkMXFV650/REEfjhuxqBa1Y6Vg/XwbDFwYdSQJEvunT5/++DnzWUJjun43aHMdAFDW3SGHnrajjwu0D47HN02MN7j4yhheAXM40Yux1SBSs+zhMeWm9kYRCMbQCD0oEclN+D/po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744380217; c=relaxed/simple;
-	bh=pXGHudOfBxLDPf1JPcql0SmKd6XOUXDJ2Qd7gq1xVtU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fXtX6ZdbL/9M5Usavo0uTrKz4oTn4Xl555QnJJvsZbf7u03B/sN3AaI1VyTMXz+BM8BH2AHPCQIEEYlYA/5pTaZBnNjo4olpBIokGrGBhyivyJKFWaUgEpPkqpdzEG2yh2I0/zmkkWDBI9JV90XTcEblAmkeMwBQkm3R8WfcVDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V6HhEA3G; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744388957; c=relaxed/simple;
+	bh=MfwdEcpoO4gFwwY/mbFsoS/W5cFZF/N3okyG0c7wc6A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=hZvqOFbWX3UvEPCETVj24o/BIszcFnKq2m7O+SM3c/MVYnIfV6fFZGti9Id7bkCc/3dU+cE22Vyv/OSjkgJVBQDc6kZ200gBEfqiCd8rFJTM52xSZ2ZTYPiLMD2zVpxhTxw5uImrchCM0ruPPqIVlrYwxyieTk7x32bgsPtBkrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=EEVyyN2b; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6HhEA3G"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6e8f8657f29so16642476d6.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Apr 2025 07:03:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744380214; x=1744985014; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vG9I1FBeaBa8loIFKFTqnz14XEwl00ieHLOmqeugw/w=;
-        b=V6HhEA3GXA/hUY/HJjygnEvac78ZUkYPaOlIQ9VBtKm+m4svV1eI4eGqw/ZB+PMlqc
-         mrgb4NN6NNMQSdInZYmAKt97NMwlGr0yEgIgcmGRJcGhf4eRS7G3SzqBu3pqPyVzGhqU
-         OV4O76uQ8YKLz/2PiMJTKqouscQhEJW45GXLc7us87c2nwaitlKGHOozKyySbccHzhIj
-         qV2aW2mju4JG4FZLwbyyj9EVFFXtjMTupU4/tgxWkQUDyFBsZKhuo9/YKRZBuqc1oOFT
-         RRpAYruO/4ExlMy/yfqI+MowL0PIvSlaRv0a5YeQQGgJWdB9pxlNDoVSxAev7S5YgJwX
-         a3nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744380214; x=1744985014;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vG9I1FBeaBa8loIFKFTqnz14XEwl00ieHLOmqeugw/w=;
-        b=ry4j7MTXhkbBQfl/XwORBZm9b3kC0LIcm2GDXwB5FcBGGx1DrWdJ6tFhk1aUTTZWvX
-         XsRKxUUb/TT8F+WG2U5zMgBy4+Y+km3FZVeU1o/dfDCJ0CpRl16ekIomWPSdvqF3f6Ls
-         plxMIxBxHhbCzaHEmJI4+RW1VAL32C5BJk1jFr4oDlp5nZfUQVGmTHNnS7izqOUpHecf
-         aKDJXzbVTELz3bObWCfGkLHl25VahT32kITcsm4n0BM2xK3/iTyPjf2kOIMwTRAxwPYd
-         2ny6+E1WsbBfX4emsHHX1ME9FjUzM4q/rKv3dE/ixxmOR0ja1WUmLbMc4JprVn1WfF33
-         cHkQ==
-X-Gm-Message-State: AOJu0Yx5DThZBRf+C88EmOtNpu6enc1RKOLMUgXpgfchFMGlbejAYZJv
-	MLvma6jnK0dKVZTTf/zvl4KLXIaxw3zO/F7P3LjhdkqEZG5RbJaYmAH0sg==
-X-Gm-Gg: ASbGncvXWvqUGNVLYwY+uPjvfDWWDAxTEu6Dyq0nNAo0VkpslN+jml/b3NA9za7VOE4
-	qt4kp7b1ePh0rQb/Mmuc0pf7JiCFRpFmJBEVV4Jp3o+Z9gFqZTywy/u+CrkBy2SmzD7uM4tjbh/
-	MEk/zGTy40fyFiXK2DSwJIAKj4XtHjwY7sCtPGQ8opx9RE8jaZHBL9bB40/rSOTRyz053vATKSq
-	eS4JlqNV09Sf2xnYlZ36+POWOlL8XAn9xqCF4iZ7fQ5fiWubx5zdJlTptq8Bx8XsH2g5B1Abtry
-	7p0R2FehJk+6ROUc1lOL1uK5SQvwNQIJcQbp+W/pSwg+nZoahA==
-X-Google-Smtp-Source: AGHT+IGVG1S1iX+npDwocnsCvUxuaiAZCoMQn/+96wtrL86xdOGoAiJBpD3vmilVK5abXVnh3b0I3w==
-X-Received: by 2002:a05:6214:248e:b0:6e4:4274:aaf8 with SMTP id 6a1803df08f44-6f230d45827mr41810346d6.17.1744380213376;
-        Fri, 11 Apr 2025 07:03:33 -0700 (PDT)
-Received: from [172.17.0.2] ([172.206.110.240])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0de9734e4sm36813626d6.39.2025.04.11.07.03.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 07:03:31 -0700 (PDT)
-Message-ID: <67f92133.050a0220.218762.b40a@mx.google.com>
-Date: Fri, 11 Apr 2025 07:03:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1244356316533428337=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="EEVyyN2b"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1744388953;
+	bh=MfwdEcpoO4gFwwY/mbFsoS/W5cFZF/N3okyG0c7wc6A=;
+	h=From:To:Subject:Date:From;
+	b=EEVyyN2bvQRtOs6hcqCqYGcDACAQBzxdHVLP5g+U0eVywJm8tQEjYICqZW4XA1nEP
+	 Yj/7wKnBKtutB2HzTU2cwQEzaav99bDE3juqPJlqd7fYyp6Qgi5aPMiijcVAV9phNl
+	 hXX1oXfqX4mtbEnugb95CY0qENAsS6OIPWZPVgodoeTxcF04g0cGJcOYa3U5d1IbsN
+	 GzvlEf+Zy6MlMv77gCCG0eFn8JGLi9TmMenP37jmIpNT+BP4JNB5+aONGeP9K2LE58
+	 XP2VokCd9yv1RndJhaRxICBWtwyvETcl+rYjfaXWP5oDX9JF6gJpHOmub6r5faNcHN
+	 idSdWIuNvBv2g==
+Received: from fdanis-XPS-13-9370.. (2a02-8428-Af44-1001-856f-D478-a78e-A409.rev.sfr.net [IPv6:2a02:8428:af44:1001:856f:d478:a78e:a409])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4CD9717E0402
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Apr 2025 18:29:13 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: l2cap: Process valid commands in too long frame
+Date: Fri, 11 Apr 2025 18:29:08 +0200
+Message-ID: <20250411162908.772132-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chharry@google.com
-Subject: RE: [1/4] Bluetooth: Introduce HCI Driver protocol
-In-Reply-To: <20250411133330.171563-1-chharry@google.com>
-References: <20250411133330.171563-1-chharry@google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============1244356316533428337==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This is required for passing PTS test cases:
+- L2CAP/COS/CED/BI-14-C
+  Multiple Signaling Command in one PDU, Data Truncated, BR/EDR,
+  Connection Request
+- L2CAP/COS/CED/BI-15-C
+  Multiple Signaling Command in one PDU, Data Truncated, BR/EDR,
+  Disconnection Request
 
-This is automated email and please do not reply to this email!
+The test procedure defined in L2CAP.TS.p39 for both tests is:
+1. The Lower Tester sends a C-frame to the IUT with PDU Length set
+   to 8 and Channel ID set to the correct signaling channel for the
+   logical link. The Information payload contains one L2CAP_ECHO_REQ
+   packet with Data Length set to 0 with 0 octets of echo data and
+   one command packet and Data Length set as specified in Table 4.6
+   and the correct command data.
+2. The IUT sends an L2CAP_ECHO_RSP PDU to the Lower Tester.
+3. Perform alternative 3A, 3B, 3C, or 3D depending on the IUT’s
+   response.
+   Alternative 3A (IUT terminates the link):
+     3A.1 The IUT terminates the link.
+     3A.2 The test ends with a Pass verdict.
+   Alternative 3B (IUT discards the frame):
+     3B.1 The IUT does not send a reply to the Lower Tester.
+   Alternative 3C (IUT rejects PDU):
+     3C.1 The IUT sends an L2CAP_COMMAND_REJECT_RSP PDU to the
+          Lower Tester.
+   Alternative 3D (Any other IUT response):
+     3D.1 The Upper Tester issues a warning and the test ends.
+4. The Lower Tester sends a C-frame to the IUT with PDU Length set
+   to 4 and Channel ID set to the correct signaling channel for the
+   logical link. The Information payload contains Data Length set to
+   0 with an L2CAP_ECHO_REQ packet with 0 octets of echo data.
+5. The IUT sends an L2CAP_ECHO_RSP PDU to the Lower Tester.
 
-Dear submitter,
+With expected outcome:
+  In Steps 2 and 5, the IUT responds with an L2CAP_ECHO_RSP.
+  In Step 3A.1, the IUT terminates the link.
+  In Step 3B.1, the IUT does not send a reply to the Lower Tester.
+  In Step 3C.1, the IUT rejects the PDU.
+  In Step 3D.1, the IUT sends any valid response.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=952530
+Currently PTS fails with the following logs:
+  Failed to receive ECHO RESPONSE.
 
----Test result---
+And HCI logs:
+> ACL Data RX: Handle 11 flags 0x02 dlen 20
+      L2CAP: Information Response (0x0b) ident 2 len 12
+        Type: Fixed channels supported (0x0003)
+        Result: Success (0x0000)
+        Channels: 0x000000000000002e
+          L2CAP Signaling (BR/EDR)
+          Connectionless reception
+          AMP Manager Protocol
+          L2CAP Signaling (LE)
+> ACL Data RX: Handle 11 flags 0x02 dlen 13
+        frame too long
+        08 01 00 00 08 02 01 00 aa                       .........
 
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.20 seconds
-SubjectPrefix                 PASS      0.46 seconds
-BuildKernel                   PASS      24.45 seconds
-CheckAllWarning               PASS      26.95 seconds
-CheckSparse                   PASS      30.86 seconds
-BuildKernel32                 PASS      24.07 seconds
-TestRunnerSetup               PASS      460.92 seconds
-TestRunner_l2cap-tester       PASS      21.13 seconds
-TestRunner_iso-tester         PASS      36.61 seconds
-TestRunner_bnep-tester        PASS      7.18 seconds
-TestRunner_mgmt-tester        FAIL      119.99 seconds
-TestRunner_rfcomm-tester      PASS      7.91 seconds
-TestRunner_sco-tester         PASS      12.57 seconds
-TestRunner_ioctl-tester       PASS      8.32 seconds
-TestRunner_mesh-tester        FAIL      6.40 seconds
-TestRunner_smp-tester         PASS      7.24 seconds
-TestRunner_userchan-tester    PASS      5.04 seconds
-IncrementalBuild              PENDING   0.87 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 3 (AL is full)               Failed       0.193 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 2                               Failed       0.120 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/l2cap_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f1c4b8bd7a8b..46b2884170fa 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7539,6 +7539,11 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 		if (skb->len > len) {
+ 			BT_ERR("Frame is too long (len %u, expected len %d)",
+ 			       skb->len, len);
++			/* Process valid commands from the PDU before
++			 * setting the socket unreliable
++			 */
++			skb->len = len;
++			l2cap_recv_frame(conn, skb);
+ 			l2cap_conn_unreliable(conn, ECOMM);
+ 			goto drop;
+ 		}
+-- 
+2.43.0
 
---===============1244356316533428337==--
