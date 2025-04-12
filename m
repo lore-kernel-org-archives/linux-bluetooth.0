@@ -1,76 +1,79 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7621D2BF3CB;
-	Fri, 11 Apr 2025 23:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F541DE4EC
+	for <linux-bluetooth@vger.kernel.org>; Sat, 12 Apr 2025 10:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744414797; cv=none; b=Z+PdxHpywIU+Yivf7o6eT2of98eDW2F9j0sXV+iX/r3RCqaxl0MX00s9wK4aQ+82CJMluLdkBklOD89Chk44FKHrenXc88a918pFUiDQ0LMCwFS2BilZaa5vVaHbmGCgvbpDReWPobvIlxRq/bfBay/VdWc1zDTiB51gyRXsQk4=
+	t=1744452925; cv=none; b=JvfNfmUS5pnjuUKuW+DrLlJXhyDrybhcTgNN+sYcZQ20VdstCHikA0lEQpFqr38UCdtzWVusB5NrZQ1Zga3qpzXE4wMfThUDPesyqIIFjdEzpnI7zJ62bvb6Q4iyAjTNHgY004gopUVHQmVnDxsFn7KS67nwGEyYUhQAEqwWp4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744414797; c=relaxed/simple;
-	bh=Iub9tIu4lDZSTS4D57n9KDNfEekOGDs0iibxj+YOwbs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DG2ijJFTG69qwvUN2HQEddoKm25WNa75ftqYlVe2fLxP9u/K0zMPQ/HI7tyKdtjESHAQZGy1Pl4Ax8u311MG5pD6GrsFGMY1mPG7g9o1QZp5532aRRFx1B7g4YlotweZMc3HkrqyFWWOtvAMKJKl3vrm7oInrrSt8INLHpuS0oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SdbSxd8c; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744452925; c=relaxed/simple;
+	bh=tPTfjhjsRV6S09LOFqa0K9lGLvvyR67TROac/Qn+LHQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JKPVB5xNkAao+CUliSyhEwv0yPbQJSNG0KbWPmZzSCk9BowCW0446XfOpIPYUm9i2E0VvcrAwr+4DWYHYVcs3/o/uKpuBjNYsPOyu5yBVEmUhosSLJ+8nGp+AgsUcABIepo2+Yxf5LAikxRy40tKdZNCskVSdaFV6f0a5rw1Z78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cW4GocOV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SdbSxd8c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EDAEC4CEE2;
-	Fri, 11 Apr 2025 23:39:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cW4GocOV"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AC95BC4CEED
+	for <linux-bluetooth@vger.kernel.org>; Sat, 12 Apr 2025 10:15:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744414797;
-	bh=Iub9tIu4lDZSTS4D57n9KDNfEekOGDs0iibxj+YOwbs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SdbSxd8cI7F/2RqhuHNdVkUQ/e8fgdtrkwpIGUkfL/3rUbCQX6EzvIyU2fE51OMzN
-	 HF7ubfamfiNYZKo/bKLdW0q1WnfSeiAkNxgevwQLQEMSzs7Z1/gmNnfLaeEtWc1hBs
-	 5GRX0dxvAsU+iZqWV5wcnIQX5JuOhxjAvgMJ0Dh3rYD1FhBfUGORS/rO1YGd08Hsbt
-	 63hgsTdRwEKumgZO6TXjsJ9s8xnJSaad+e911kx9uiYKOVNPVaFGTaPKjGyjfZHBLO
-	 rOgHKZa/RxjL+QdKGDq0Lwsf9W55J+6VVQLy1XkEYHa474RzsggU1lHrrJSf2pCEdG
-	 wdECgTi3S/+YQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CAB38111E2;
-	Fri, 11 Apr 2025 23:40:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1744452924;
+	bh=tPTfjhjsRV6S09LOFqa0K9lGLvvyR67TROac/Qn+LHQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=cW4GocOVYwQ8siLW16PVwJJ799ONQBq0wkdtrvsX3+JKSLeVPAJk+HBOPML+/MbbB
+	 PIPh4F78VbqLfDQwZc+eENdd29viWBWq1OMEEuw8qm/AA9K9XvY6shIZy8ImtflnYO
+	 tp4zVOiKvfx8HnPJiDjNGw1NgaE0LjnXjcLjkid5xNM4dbngaBF4Y9ocYNIlup85hH
+	 oggvIs6+MU35867mw5Ki8SDpeg9Ce2eSuSHWL3Kodbek3fA206C1A7ZQoP73gBXUbh
+	 xtaBqmqUl5lafDWxcbin1zt/PvXdFuAYVXt6XqYkPq64ddqH7Ge8iDJrnxhwJ03OEc
+	 faRrh/NJDQH6w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 9D6A1C41614; Sat, 12 Apr 2025 10:15:24 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 217256] 0bda:b00a Realtek Bluetooth 4.2 adapter disappears
+ after suspend
+Date: Sat, 12 Apr 2025 10:15:24 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: short_desc
+Message-ID: <bug-217256-62941-039OYydfJo@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217256-62941@https.bugzilla.kernel.org/>
+References: <bug-217256-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2025-04-10
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174441483476.518794.631210422314921616.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Apr 2025 23:40:34 +0000
-References: <20250410173542.625232-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250410173542.625232-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217256
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-On Thu, 10 Apr 2025 13:35:41 -0400 you wrote:
-> The following changes since commit eaa517b77e63442260640d875f824d1111ca6569:
-> 
->   ethtool: cmis_cdb: Fix incorrect read / write length extension (2025-04-10 14:32:43 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-04-10
-> 
-> [...]
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+            Summary|Bluetooth disappears after  |0bda:b00a Realtek Bluetooth
+                   |suspend                     |4.2 adapter disappears
+                   |                            |after suspend
 
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2025-04-10
-    https://git.kernel.org/netdev/net/c/9767870e76f4
+--=20
+You may reply to this email to add a comment.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+You are receiving this mail because:
+You are the assignee for the bug.=
