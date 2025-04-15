@@ -1,71 +1,66 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A15256C7A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 21:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4032625487E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 21:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744753714; cv=none; b=Ndm0CbDAYBss835H1XeVsEGXT7gZDIjsBqwex+4B/bBdcsIC9vTDKUs3xjA5CVRI+svSe3QL2vfHdkbYHDMlBSXeSaf5y1oF7utfAGnMw+HsSn1HDMNblA4DzqAtmsTWv+c8wpLNp5rEBD0XsXz9/UEK/+NXRIUHWGdybMoGmWM=
+	t=1744753721; cv=none; b=UzISaHFktudnSBfVNnYHS01RwQ3j0oPaTLZan9pOpn3dbjpCjlvdk0fVm7YFedxhAQc54nrjdDtUruhdAMrJTG0pvNtdTtdVSAeCn4jmay6oXwpI3btK6WZHLOBktIgLXbYVqhe6b9mEpUhJYWSDVwy58BlP6loxuei1DOEzhrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744753714; c=relaxed/simple;
-	bh=r32oAtmJV4GUBVTcyRweY8W3ZwcYF9lzM96+0PEcaBo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OrmT3BZsq6GzdpxFEZX0z0fFou2owhwdYf2FEIMEffD69g4vtGYWcFck0bRxpVpmo5QlEmTJkR2aBa+cR19nbcxj1XD/iTJbKfmYQVXiEzSW4X3K8AW3tGr9tzbbmq2u3jQQ6a4bORyyisIkgxdZnkX3NMIbrZ+X50FUdGklAiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Md8BjTxL; arc=none smtp.client-ip=209.85.221.169
+	s=arc-20240116; t=1744753721; c=relaxed/simple;
+	bh=MT3TBWdZDLaDtAdzVvrq+10E46zRQqDSLBaeljk4oMU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=nklAVxNQFoeRWjlVg35PD1fkQO48v9Am7dPvBtxgztwlwYVD2+OXslYP4Or8Y5lDstXBPfQLgkPdlpQ8PMQWpgzFZ2SS9LsVceoItRtN7yzoB6sdCcncFy1lPAIMk/wzbo4lj1X9vFUX87uQqQEew12OoAxaqqQcTg0QSiH8g8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GIXM+UHh; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Md8BjTxL"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-523fa0df55dso101719e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 14:48:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GIXM+UHh"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-523ffbe0dbcso5764635e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 14:48:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744753710; x=1745358510; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aO8ssM0dfDJUhN473dOwaJoGRWoeMmAGYDR1boXBPUI=;
-        b=Md8BjTxL2k3LHRHAu/d4kjAffLesJnGYhq0eYfZ0hOVW37K6hXskCoS+ejDmaWpetY
-         k/6/YuJXjJnlKYW1p8ufmLfvI6f4nKoMnVMKgFmlJhtaaiNseDvLo4g4deeNdJlyYPhK
-         Za8y6LxHTkM7053b8eXAow2Lse3Zu+n0vSkWBCJd9d1GUiGCqi1S0zUl2fS2DPaL7Y6u
-         gAQm5EmQFwyaPI55dmFR0+76dTb2iu7zkAiaLiJdExZfF8lZ7VcjwUs6wPqmrbPbe5zy
-         SDT7cp4KOoKG0Db3FcdY9+AI9ZbDs+jbs878Bn5xObJUqgjEGdVwyFGR/KNjskeeuC8f
-         rBWA==
+        d=gmail.com; s=20230601; t=1744753717; x=1745358517; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fv5wheeTGFY7eyXs5jHGk4v1zefqLCeWb70ziGf21V4=;
+        b=GIXM+UHhnpkVyOMunVwL7KIYARRjb2Py/8jR5+jdBSJsEAFhZi/Cn914y4yuqhqrXJ
+         87rCAMHsaOYOOgKkt+IkA0l5sgyPN7Qshmiv2Z7nNO2E96RGUkLtPeKNrlPleBh1tmiS
+         MJktqe88mArlzw+NNcfiCQiFNjKJJWacBZkWRfeAtLSZdw+F0aBhHkUOx7E7rjSyPEa+
+         DcMXaGtbtwnoGD8+sSA0EFikuISCRdH64+FIXnoYYPUGSlQC4/o1Z7e6VPGGd/84uS7D
+         DxDFtDqtA4H2oGun1vJLSd8YcvoCfqshZ8nvhhAMiJH4gLB7mRKFj9A0XyMdf6sADBGD
+         QhiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744753710; x=1745358510;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aO8ssM0dfDJUhN473dOwaJoGRWoeMmAGYDR1boXBPUI=;
-        b=c3iM1KluUjAdSeo7ag9BAjsLUu3VaDWRkEV4kn1NC/KCX8tWZJ0KiHg1+rtxb2uahw
-         jQVPgzNpcCN7xoijJkOQLXW/AxqEMBjB7F7c6mjN231bZ3z+AfXdQg06/hLnenFA2nN4
-         ck1rA/AkL46Fq46wAsvQDq5T7FvMOJPGqPxHWeZFqX72tEWwumPBqx2Ik8tRQznfHedR
-         dnwhM1OkSGdYLdi6sZWjbyDt1MeDSGCZk3hhT4GIMyP93bp0BLJl9U/el+fFMG0D8ubk
-         jao7B0F5rMZrZTVJlGxK6tqSV9SuIOL3M5Z1bHWntNaS1RiEtSVjnSyEOZ2rjSTG1QwO
-         Hhcw==
-X-Gm-Message-State: AOJu0Ywpc6mdO8fnr0KjXXo3QLGW2B2RtbxkXeRXcskRDO10XsPEof3s
-	Pko2C9JyJ8MDp/+dJeUV+LykdnpIzVQ5bgIsteDSTK2Kso4atQV7gO+LDdQV+nk=
-X-Gm-Gg: ASbGncuRpBczPKEJiDhce/8J0Y/T+ZrH+tjtAHuWLpiHKKM+kxjypu3sWkONUlFRvVD
-	0K3Aik8c8uP/mFVLOYKUmqKSCS3v13/uk0YellYvPgt+f/91qEbN1MC7S5L1BqoPTGFxHrji1j1
-	S1xwLehS6E96S8aZr9LznoZb1AqcBXOxyqA7G4+pFNrcLjLfuV26909a1cXRJxYngHZeWrXqlja
-	nuc7W1OxfaCEW3Jp7VRqjvq3GcIOeENkNjmHdO7HXi3VKIb81/b/uuF3441V2IGkKARCat/PW+m
-	aZicgqjtqIxJRVN7uuj5jYOugpV5gv7uaNv96VR6PAEo+iz92A8Z4MhRFZDS4PMm2pAwE85apHp
-	BdJzlYgJozA==
-X-Google-Smtp-Source: AGHT+IEh7Xb8lr7HRfTwH9FSWdEbx8QJBefd4E07jT3DpTzAFNS4r5XT49KvXEPkqmjG29BgR5sKUQ==
-X-Received: by 2002:a05:6122:547:b0:523:6eef:af62 with SMTP id 71dfb90a1353d-528f0c5b625mr4436688e0c.4.1744753710128;
-        Tue, 15 Apr 2025 14:48:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744753717; x=1745358517;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fv5wheeTGFY7eyXs5jHGk4v1zefqLCeWb70ziGf21V4=;
+        b=nySHqMpdmwfnrrx+opXGtujAO0LN9YArcxaF3vKFmXqh+XElt9POde6eiLBY72RpkK
+         pkUuwvh+KcqlDbPxvfOE53bQFpf7mDOakkdmmS6y2SjM6YJka372/IQb/VydEILbpqJB
+         luoix3XbRepSCZIPhmsNdsApeUSeYVOqQQaUyz/mHCVYGGEVGOmpYhjiu5Bkz+vBleTk
+         hLfn0b+oebXZ6afV7uN/gU5hqYLwqXOdrbVPbF/c1AkpbuQQI8rdpGJcubDDZ2k9vm8v
+         fcPoebdKRqNgGZMOOr3mISgP0dIGfOwGBngYiMT5J4XoA7wYoAqr7beY9XkR+IJLPw4s
+         F1EA==
+X-Gm-Message-State: AOJu0Yy6VaMR+vJnnOxqjtkcQ6HEFoYSgVYPOh1gTDNaa/GYaufRCNP2
+	G837Ksu35oB82tA0CJJc42+kjWK8qWR0xo55EJRzao5l8jYAgYQC4NVeux4eWGg=
+X-Gm-Gg: ASbGncvCOScWR/8hE0PR54hemHrFKpb6MMCYQoVJnt/dy8/Srw2vEr2GMqWxviughat
+	LhdR6AmAZsdjdK8qnzpoQ70NGM+ZV2R98EKXy+AYkfEm3RI65KD3isEM2kIRkMqHO6CNzw8KS5D
+	B+VsIIauBnRUqlX6U7imZdhXi8/1L1tukp+6M7Dnre8EJV8awN7B6CzQtGt6xz4wKvhYKLLo7t7
+	eta2aCuAjOazv1rjdJ6Wlf88TxCVXI1qR6sAkV4aIfDBDaYs0Qsu1QpMAPqqRdWKr2V2A3Hlu5B
+	bGxGVs+x6kAugiJgq+Duh6MvHhvDjxNAxiKYXIosMFsSRWkeC0EdqE5RmXJ4gGZ92jM5TMt4r90
+	a31uQU+9bgA==
+X-Google-Smtp-Source: AGHT+IHbpOAuHuYlMmtVa+JoG0Z3SGDebs61T4qq1Z76DaoEnnc1S0cx8HY6sVKiszCn6ejvduMsOw==
+X-Received: by 2002:a05:6122:20a7:b0:526:1d98:b046 with SMTP id 71dfb90a1353d-52908f9973fmr797884e0c.0.1744753717151;
+        Tue, 15 Apr 2025 14:48:37 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-527abe8d740sm2844459e0c.33.2025.04.15.14.48.28
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-527abd74563sm2859321e0c.11.2025.04.15.14.48.35
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 14:48:28 -0700 (PDT)
+        Tue, 15 Apr 2025 14:48:36 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] bap: Fix not setting SID for broadcast receiver
-Date: Tue, 15 Apr 2025 17:48:11 -0400
-Message-ID: <20250415214811.1677842-8-luiz.dentz@gmail.com>
+Subject: [PATCH v4 1/3] Bluetooth: hci_conn: Fix not setting conn_timeout for Broadcast Receiver
+Date: Tue, 15 Apr 2025 17:48:33 -0400
+Message-ID: <20250415214835.1678138-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250415214811.1677842-1-luiz.dentz@gmail.com>
-References: <20250415214811.1677842-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -76,35 +71,330 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-SID most be set otherwise 0x00 is assume which may not be what the
-broadcast source is using over the air. but since we don't have access
-to the SID of the advertisement in userspace mark de SID as invalid
-(0xff) so the kernel fill it up while scanning when creating the PA
-sync.
----
- profiles/audio/bap.c | 2 ++
- 1 file changed, 2 insertions(+)
+Broadcast Receiver requires creating PA sync but the command just
+generates a status so this makes use of __hci_cmd_sync_status_sk to wait
+for HCI_EV_LE_PA_SYNC_ESTABLISHED, also because of this chance it is not
+longer necessary to use a custom method to serialize the process of
+creating the PA sync since the cmd_work_sync itself ensures only one
+command would be pending which now awaits for
+HCI_EV_LE_PA_SYNC_ESTABLISHED before proceeding to next connection.
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index fd9b751cc1bf..24763666ce96 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -2813,6 +2813,7 @@ static void bap_detached(struct bt_bap *bap, void *user_data)
- static int pa_sync(struct bap_data *data)
- {
- 	GError *err = NULL;
-+	uint8_t sid = 0xff;
+Fixes: 4a5e0ba68676 ("Bluetooth: ISO: Do not emit LE PA Create Sync if previous is pending")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci.h      |  2 +
+ include/net/bluetooth/hci_core.h | 13 +++--
+ include/net/bluetooth/hci_sync.h |  2 +
+ net/bluetooth/hci_conn.c         | 92 +-------------------------------
+ net/bluetooth/hci_event.c        |  6 +--
+ net/bluetooth/hci_sync.c         | 87 ++++++++++++++++++++++++++++--
+ 6 files changed, 95 insertions(+), 107 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a8586c3058c7..8ea7a063cc65 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1931,6 +1931,8 @@ struct hci_cp_le_pa_create_sync {
+ 	__u8      sync_cte_type;
+ } __packed;
  
- 	if (data->listen_io) {
- 		DBG("Already probed");
-@@ -2833,6 +2834,7 @@ static int pa_sync(struct bap_data *data)
- 		btd_device_get_bdaddr_type(data->device),
- 		BT_IO_OPT_MODE, BT_IO_MODE_ISO,
- 		BT_IO_OPT_QOS, &bap_sink_pa_qos,
-+		BT_IO_OPT_ISO_BC_SID, sid,
- 		BT_IO_OPT_INVALID);
- 	if (!data->listen_io) {
- 		error("%s", err->message);
++#define HCI_OP_LE_PA_CREATE_SYNC_CANCEL	0x2045
++
+ #define HCI_OP_LE_PA_TERM_SYNC		0x2046
+ struct hci_cp_le_pa_term_sync {
+ 	__le16    handle;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5115da34f881..f20368b9a5d2 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1113,10 +1113,8 @@ static inline struct hci_conn *hci_conn_hash_lookup_bis(struct hci_dev *hdev,
+ 	return NULL;
+ }
+ 
+-static inline struct hci_conn *hci_conn_hash_lookup_sid(struct hci_dev *hdev,
+-							__u8 sid,
+-							bdaddr_t *dst,
+-							__u8 dst_type)
++static inline struct hci_conn *
++hci_conn_hash_lookup_create_pa_sync(struct hci_dev *hdev)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct hci_conn  *c;
+@@ -1124,8 +1122,10 @@ static inline struct hci_conn *hci_conn_hash_lookup_sid(struct hci_dev *hdev,
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+-		if (c->type != ISO_LINK  || bacmp(&c->dst, dst) ||
+-		    c->dst_type != dst_type || c->sid != sid)
++		if (c->type != ISO_LINK)
++			continue;
++
++		if (!test_bit(HCI_CONN_CREATE_PA_SYNC, &c->flags))
+ 			continue;
+ 
+ 		rcu_read_unlock();
+@@ -1524,7 +1524,6 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
+ void hci_sco_setup(struct hci_conn *conn, __u8 status);
+ bool hci_iso_setup_path(struct hci_conn *conn);
+ int hci_le_create_cis_pending(struct hci_dev *hdev);
+-int hci_pa_create_sync_pending(struct hci_dev *hdev);
+ int hci_le_big_create_sync_pending(struct hci_dev *hdev);
+ int hci_conn_check_create_cis(struct hci_conn *conn);
+ 
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 7e2cf0cca939..93dac4c7f9e3 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -185,3 +185,5 @@ int hci_connect_le_sync(struct hci_dev *hdev, struct hci_conn *conn);
+ int hci_cancel_connect_sync(struct hci_dev *hdev, struct hci_conn *conn);
+ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 			    struct hci_conn_params *params);
++
++int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7e1b53857648..c3112ce39f67 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2064,95 +2064,6 @@ static int create_big_sync(struct hci_dev *hdev, void *data)
+ 	return hci_le_create_big(conn, &conn->iso_qos);
+ }
+ 
+-static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
+-{
+-	bt_dev_dbg(hdev, "");
+-
+-	if (err)
+-		bt_dev_err(hdev, "Unable to create PA: %d", err);
+-}
+-
+-static bool hci_conn_check_create_pa_sync(struct hci_conn *conn)
+-{
+-	if (conn->type != ISO_LINK || conn->sid == HCI_SID_INVALID)
+-		return false;
+-
+-	return true;
+-}
+-
+-static int create_pa_sync(struct hci_dev *hdev, void *data)
+-{
+-	struct hci_cp_le_pa_create_sync cp = {0};
+-	struct hci_conn *conn;
+-	int err = 0;
+-
+-	hci_dev_lock(hdev);
+-
+-	rcu_read_lock();
+-
+-	/* The spec allows only one pending LE Periodic Advertising Create
+-	 * Sync command at a time. If the command is pending now, don't do
+-	 * anything. We check for pending connections after each PA Sync
+-	 * Established event.
+-	 *
+-	 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+-	 * page 2493:
+-	 *
+-	 * If the Host issues this command when another HCI_LE_Periodic_
+-	 * Advertising_Create_Sync command is pending, the Controller shall
+-	 * return the error code Command Disallowed (0x0C).
+-	 */
+-	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
+-		if (test_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags))
+-			goto unlock;
+-	}
+-
+-	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
+-		if (hci_conn_check_create_pa_sync(conn)) {
+-			struct bt_iso_qos *qos = &conn->iso_qos;
+-
+-			cp.options = qos->bcast.options;
+-			cp.sid = conn->sid;
+-			cp.addr_type = conn->dst_type;
+-			bacpy(&cp.addr, &conn->dst);
+-			cp.skip = cpu_to_le16(qos->bcast.skip);
+-			cp.sync_timeout = cpu_to_le16(qos->bcast.sync_timeout);
+-			cp.sync_cte_type = qos->bcast.sync_cte_type;
+-
+-			break;
+-		}
+-	}
+-
+-unlock:
+-	rcu_read_unlock();
+-
+-	hci_dev_unlock(hdev);
+-
+-	if (bacmp(&cp.addr, BDADDR_ANY)) {
+-		hci_dev_set_flag(hdev, HCI_PA_SYNC);
+-		set_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags);
+-
+-		err = __hci_cmd_sync_status(hdev, HCI_OP_LE_PA_CREATE_SYNC,
+-					    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+-		if (!err)
+-			err = hci_update_passive_scan_sync(hdev);
+-
+-		if (err) {
+-			hci_dev_clear_flag(hdev, HCI_PA_SYNC);
+-			clear_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags);
+-		}
+-	}
+-
+-	return err;
+-}
+-
+-int hci_pa_create_sync_pending(struct hci_dev *hdev)
+-{
+-	/* Queue start pa_create_sync and scan */
+-	return hci_cmd_sync_queue(hdev, create_pa_sync,
+-				  NULL, create_pa_complete);
+-}
+-
+ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
+ 				    __u8 dst_type, __u8 sid,
+ 				    struct bt_iso_qos *qos)
+@@ -2167,10 +2078,11 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->dst_type = dst_type;
+ 	conn->sid = sid;
+ 	conn->state = BT_LISTEN;
++	conn->conn_timeout = msecs_to_jiffies(qos->bcast.sync_timeout * 10);
+ 
+ 	hci_conn_hold(conn);
+ 
+-	hci_pa_create_sync_pending(hdev);
++	hci_connect_pa_sync(hdev, conn);
+ 
+ 	return conn;
+ }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5f808f0b0e9a..ea7ccafd055a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6378,8 +6378,7 @@ static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
+ 
+-	conn = hci_conn_hash_lookup_sid(hdev, ev->sid, &ev->bdaddr,
+-					ev->bdaddr_type);
++	conn = hci_conn_hash_lookup_create_pa_sync(hdev);
+ 	if (!conn) {
+ 		bt_dev_err(hdev,
+ 			   "Unable to find connection for dst %pMR sid 0x%2.2x",
+@@ -6418,9 +6417,6 @@ static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
+ 	}
+ 
+ unlock:
+-	/* Handle any other pending PA sync command */
+-	hci_pa_create_sync_pending(hdev);
+-
+ 	hci_dev_unlock(hdev);
+ }
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 609b035e5c90..99c116b056ce 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2693,16 +2693,16 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ 
+ 	/* Force address filtering if PA Sync is in progress */
+ 	if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
+-		struct hci_cp_le_pa_create_sync *sent;
++		struct hci_conn *conn;
+ 
+-		sent = hci_sent_cmd_data(hdev, HCI_OP_LE_PA_CREATE_SYNC);
+-		if (sent) {
++		conn = hci_conn_hash_lookup_create_pa_sync(hdev);
++		if (conn) {
+ 			struct conn_params pa;
+ 
+ 			memset(&pa, 0, sizeof(pa));
+ 
+-			bacpy(&pa.addr, &sent->addr);
+-			pa.addr_type = sent->addr_type;
++			bacpy(&pa.addr, &conn->dst);
++			pa.addr_type = conn->dst_type;
+ 
+ 			/* Clear first since there could be addresses left
+ 			 * behind.
+@@ -6895,3 +6895,80 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CONN_UPDATE,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
++
++static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
++{
++	bt_dev_dbg(hdev, "err %d", err);
++
++	if (!err)
++		return;
++
++	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
++
++	if (err == -ECANCELED)
++		return;
++
++	hci_dev_lock(hdev);
++
++	hci_update_passive_scan_sync(hdev);
++
++	hci_dev_unlock(hdev);
++}
++
++static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
++{
++	struct hci_cp_le_pa_create_sync cp;
++	struct hci_conn *conn = data;
++	struct bt_iso_qos *qos = &conn->iso_qos;
++	int err;
++
++	if (!hci_conn_valid(hdev, conn))
++		return -ECANCELED;
++
++	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
++		return -EBUSY;
++
++	/* Mark HCI_CONN_CREATE_PA_SYNC so hci_update_passive_scan_sync can
++	 * program the address in the allow list so PA advertisements can be
++	 * received.
++	 */
++	set_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags);
++
++	hci_update_passive_scan_sync(hdev);
++
++	memset(&cp, 0, sizeof(cp));
++	cp.options = qos->bcast.options;
++	cp.sid = conn->sid;
++	cp.addr_type = conn->dst_type;
++	bacpy(&cp.addr, &conn->dst);
++	cp.skip = cpu_to_le16(qos->bcast.skip);
++	cp.sync_timeout = cpu_to_le16(qos->bcast.sync_timeout);
++	cp.sync_cte_type = qos->bcast.sync_cte_type;
++
++	/* The spec allows only one pending LE Periodic Advertising Create
++	 * Sync command at a time so we forcefully wait for PA Sync Established
++	 * event since cmd_work can only schedule one command at a time.
++	 *
++	 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
++	 * page 2493:
++	 *
++	 * If the Host issues this command when another HCI_LE_Periodic_
++	 * Advertising_Create_Sync command is pending, the Controller shall
++	 * return the error code Command Disallowed (0x0C).
++	 */
++	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_PA_CREATE_SYNC,
++				       sizeof(cp), &cp,
++				       HCI_EV_LE_PA_SYNC_ESTABLISHED,
++				       conn->conn_timeout, NULL);
++	if (err == -ETIMEDOUT)
++		__hci_cmd_sync_status(hdev, HCI_OP_LE_PA_CREATE_SYNC_CANCEL,
++				      0, NULL, HCI_CMD_TIMEOUT);
++
++	return err;
++}
++
++int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn)
++{
++	return hci_cmd_sync_queue_once(hdev, hci_le_pa_create_sync, conn,
++				       create_pa_complete);
++}
 -- 
 2.49.0
 
