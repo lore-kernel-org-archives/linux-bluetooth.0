@@ -1,70 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B95619F11F;
-	Tue, 15 Apr 2025 16:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1187F146A66
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 17:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744734572; cv=none; b=fADH3iGzmMEgmmoeb85I2GKOkUBMhlCi7s6eSB6uWa5trm1R4GdvHIZ/aSsCvKb6n9K9XmalJfKc86qQ3g7vIJDkZHW//toKH080Sm8G3iGx5NPu6HmFilJRdIeTHBsuuUHNqecvxWq+kksl8lKlAOSf372Y1yLEBeqSH8i9DDI=
+	t=1744736653; cv=none; b=P8lCMNlwB+gWfBP+1Ezvrt8QF6Mkj20y6JwhE65bTobvrPw2LTx64PU7hZxh8oMjpaCH5ClmtClzstSLddaONbYgZDGwnm/je+rZXxiT8PCyuZxSeHcmMqlBRUG77Poh482UaLhwHQVQwamcbk8x5IgYoRdey4F6D/lrZP2LKao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744734572; c=relaxed/simple;
-	bh=N0EmEElYpU/e4cDljzDCDa5v6XT89r7iNvCAZRNdzxU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IUwzydBirpHeqHDFyxmBOaV2P81qiN4pk88WqTQjRcyeMxp+JiYTC6GDQfDJxUBShKWtXwTTt1auK0mdZUvFDfcFPjSs+ID4aMTfF6u/b9OawBDVYHPqhPYqHS7CS8PvFjf6Zpy7aMiVhwQlTr69Q8MQ4be/2TpFLWlqM9BR9vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RC3prLA1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744736653; c=relaxed/simple;
+	bh=ZZhNfeV99yofBi0vHFbLNv8/SiUVzj0tm/V4n0sdAdY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Tf4xK7lfz9hDXuMzZ7OwKhbafSvwwk3DahuLMNVcncye3kTpoQQDL3uFXj/W9Lqqiyu8EgRwVhTs46NYCFjP6MSvGQuYm3DubjIm1vMTPlgiNn7WVEm7vpgKXUeTSye+dVC1deqIWmUAdZ2nIaBso02WTG9nouVssM+yOCeZXyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QAOuRRid; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RC3prLA1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 253D8C4CEEB;
-	Tue, 15 Apr 2025 16:29:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744734571;
-	bh=N0EmEElYpU/e4cDljzDCDa5v6XT89r7iNvCAZRNdzxU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RC3prLA1Icp60GmlzXhlHlvfG5Fymk6EJ53q7SPjTFO91Ik/XUglo8irNzn4yJ/I/
-	 jdbjLAGb3OX6NJ3t6I4aGZF/GSm+OVfQoDYhiSPzylt+c4whDAIUdWgyiS3IMFH+e2
-	 V4kOm1pEbTBp4H3I8QXuwJuMnpCZ0subL8hJGbYxE0ZlB0KGPPLdSSWUow3bPNXUME
-	 KQYATuYAbrjdbWCWGWZE9J7zEY3nz5U1JME3MfNExXDOQJYciTFxwV3J5a4sUxa6qu
-	 F5Vc7Ye0Bc7qTcs33nVHGWWo7Li4GoZ9hjEACJK+PhQMty8KU5G6q65Zui4BS9Gw8y
-	 ohZvlKC+/y9jQ==
-Date: Tue, 15 Apr 2025 09:29:29 -0700
-From: Josh Poimboeuf <jpoimboe@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: stable@vger.kernel.org, kernel test robot <lkp@intel.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	linux-bluetooth@vger.kernel.org, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Manish Mandlik <mmandlik@google.com>, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: vhci: Avoid needless snprintf() calls
-Message-ID: <5b2vwh4a2gp25wovqx26rbeveo7q6nbwg7c5pnsbsddyg434yc@ug6zgdwg5xel>
-References: <20250415161518.work.889-kees@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QAOuRRid"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6ecfbf8fa76so67034676d6.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 10:04:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744736650; x=1745341450; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=j/f63C7ZDUm4vqDbloxMG7spJb1mJ6NiQNQv/radAaw=;
+        b=QAOuRRidGOyPTtIDnx0BkuR25PHHcPObIEjnBsODj727dd44ARwcbcQ7h80uLdy6y9
+         oVcGKw7lZhP+4PvsG3KTxw9awT5aux0oL01dK/pTGkbBtMk+c5UkBJUCwzgYqlXkZsYE
+         dkBZceUMwaGjgLdiUZzoCIngYJ0Mo7XZbAvNdzjWiLSXnq/+tV0q/vb4I3Uua24aHnyL
+         MwCY5Zr57lN3OP8wsSL6P4ZaUxyGISYdg8PeT2T3YvhaLRixhQaUgSNHypca8/AcUAn/
+         FRhFJV/fJ6GmII6dw/b+1Z1kzMm7805Ip4we25BjWPRUBxQptlDaQMZ7GDXwW89BB6Oj
+         o5XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744736650; x=1745341450;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j/f63C7ZDUm4vqDbloxMG7spJb1mJ6NiQNQv/radAaw=;
+        b=dkkSc24HlBMt3u0+fUFxlQswv1Yj66Lc/H/pPzsN8dUe5bV/gR6t+ozTcDM8KHTVeS
+         MVJwJSRFzso/Ki6SGr0alIFK24+eSXQRypOEDAvIbrm8Gtct2Pe2ul0N9k9VWk3T4Px4
+         gLuCYGUaovpCY9OH04G5KkAVkZlQlMIrfdI5GSBKCFvy02uNOl+1C5NXbKPGSurlK+1K
+         badI2Q8pZBSfX1tcAjOQ5xNlFc2q7pzHR8/4a1JrFFL+VLquJJNwlRYnmwA76bXWnZed
+         G+9X6yr1oOZg3Zc4LAFkMbKTYizclYiqtk0IhGdMri+c8+mYb8tlriib5rVHLhpEKKDj
+         Oi8w==
+X-Gm-Message-State: AOJu0YxOQrtVkJ6NLBTjf6IBNjmCoh1ZpLpXLw4tzkgxb0/eHRf6UPcv
+	x+Z2VIAZ5prvvz34+/KIuoDbEjjOaBvLF+3n0okXNdJGiOeSIxDkf7ASVw==
+X-Gm-Gg: ASbGncsu4HnqVkXBCPHN7elRAuULHh8pjxCThflM7zfYU/bdHhqbAFp3hYuLJD4Ov+o
+	Ac/kG7pxBhssKf4CWVT0+GNZN5ht3aWustfDAkDkl82MSRzj/WzKLW3RYqKD8i5MXQ8OTBT2rV3
+	icgtg+KX0wkfq7yY9EpETizFHNjstQljbShOQIAjeSqI1yb8ro9ylHhWOXxqAoLaqL2yS54R3nv
+	a266qRmiOky5FILGfJ2RjkJZYJxZ1pMJL/alHfieJi0MYG1xJYYVqv9i1oLjglHVb1mSCd17gzE
+	H1dmJTrCGMPtf0YAQ2J4tcj1ni+cdhsgVJvRH84oJH6H
+X-Google-Smtp-Source: AGHT+IF4ii1y/phrW8YY7U/4ph8j4vr0KJyeMTClQTTVQnOuPSMjPCxM+IURGe/mD8yiMIyhu4K3XA==
+X-Received: by 2002:ad4:5f07:0:b0:6e8:f770:5045 with SMTP id 6a1803df08f44-6f2ad9747a6mr3515886d6.28.1744736650300;
+        Tue, 15 Apr 2025 10:04:10 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.79.64])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0dea106cesm103316216d6.103.2025.04.15.10.04.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 10:04:09 -0700 (PDT)
+Message-ID: <67fe9189.050a0220.3238e4.a78d@mx.google.com>
+Date: Tue, 15 Apr 2025 10:04:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8002397388483491234=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kees@kernel.org
+Subject: RE: Bluetooth: vhci: Avoid needless snprintf() calls
 In-Reply-To: <20250415161518.work.889-kees@kernel.org>
+References: <20250415161518.work.889-kees@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, Apr 15, 2025 at 09:15:19AM -0700, Kees Cook wrote:
-> Avoid double-copying of string literals. Use a "const char *" for each
-> string instead of copying from .rodata into stack and then into the skb.
-> We can go directly from .rodata to the skb.
-> 
-> This also works around a Clang bug (that has since been fixed[1]).
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202401250927.1poZERd6-lkp@intel.com/
-> Fixes: ab4e4380d4e1 ("Bluetooth: Add vhci devcoredump support")
-> Link: https://github.com/llvm/llvm-project/commit/ea2e66aa8b6e363b89df66dc44275a0d7ecd70ce [1]
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Kees Cook <kees@kernel.org>
+--===============8002397388483491234==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thanks!
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Josh Poimboeuf <jpoimboe@kernel.org>
+Dear submitter,
 
--- 
-Josh
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=953638
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      24.58 seconds
+CheckAllWarning               PASS      26.80 seconds
+CheckSparse                   PASS      30.60 seconds
+BuildKernel32                 PASS      24.17 seconds
+TestRunnerSetup               PASS      463.69 seconds
+TestRunner_l2cap-tester       PASS      21.37 seconds
+TestRunner_iso-tester         PASS      32.87 seconds
+TestRunner_bnep-tester        PASS      4.71 seconds
+TestRunner_mgmt-tester        FAIL      120.00 seconds
+TestRunner_rfcomm-tester      PASS      7.85 seconds
+TestRunner_sco-tester         PASS      12.70 seconds
+TestRunner_ioctl-tester       PASS      8.43 seconds
+TestRunner_mesh-tester        PASS      6.25 seconds
+TestRunner_smp-tester         PASS      7.33 seconds
+TestRunner_userchan-tester    PASS      5.06 seconds
+IncrementalBuild              PENDING   0.84 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.147 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.183 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.185 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8002397388483491234==--
