@@ -1,68 +1,68 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E31A21D5B2
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 21:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173032DFA20
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 21:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744753705; cv=none; b=fzpf8rqrVu4+T6ok+zy9wUWqusa+3ZIBZ3NVkTOZuTsXpZ5fDb2sgD4QE7VlkePnEDNy0ZHQRR99uaWn22YzIfrWZnJJrp2j9PxmUaiyGHFIz3sCD1sMd7+2t4fkKYmdvVtq4pUtY2f8PyuX1NO8f0eCbgRtCJTvMG3Pvjm3bnI=
+	t=1744753706; cv=none; b=A2Og9cAJJM+zQN92pwL/+xyW+FlulHZSFK0svAb/yTIpgaiy4u1aanva2H7QRB4XM0GMEoBA3ddhjq7vVWJ16udOLpbFLKymhiCm0VRIGnJrWmUFgENWzFkJmZvFLbe93PXHDPrh4DtYSVyJ72vwcA93I02WgMUMYm3RS7y0JKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744753705; c=relaxed/simple;
-	bh=DPZ4Fy8hFB79kXhQkjjsaUMg1+lmOHgCZ9nLOHWNdV4=;
+	s=arc-20240116; t=1744753706; c=relaxed/simple;
+	bh=L3JCkH3UOERCddVJK7QZMFBci/1m6FwhSUZ3on3hKJg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=stT3UJypUoIWqx7yaL9tdgdkalhEcbM76j2RBXwGTrJpjhB+QeL2vd2VoLO1a0CCrJRSWo4p4EQuZenkdhKhndLhImuCdtPn1Ar6tGmVgo0+4nka4nUBw8yDZaYc7yvm88FNo1GDnyHpuhbWzHkyi0ah6YO4gJIDx8ZQ1xM/oDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fawZUGjX; arc=none smtp.client-ip=209.85.221.174
+	 MIME-Version; b=XeLp0eB/fBt0fn3F7GjzFE0ajH1bdk9A0RGEE2oLb7nQm4TPXqKxyjeVT2fHKkmuHCRR9rMTeaJV1viDmzwR6++uU/ehaRVuABk3OKOqSDM09AM5edzeHxmuLmukPphQyqwJEEaN6roIhAkzEV69Cg2cAU3euBdyV5xWqLkuOmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUzOSM8B; arc=none smtp.client-ip=209.85.221.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fawZUGjX"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-525da75d902so2289378e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 14:48:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUzOSM8B"
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-528ce9731dbso884407e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 14:48:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744753701; x=1745358501; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744753703; x=1745358503; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wEjjwG5jx2aPU05qIE/xX2hSXaML6GcxiCjF2JKd8Z0=;
-        b=fawZUGjXQeqy07DWH5x/ZDk1at1S1j5YLNk71oSaDE+9jJzvFwl4BH35Sh6fJYypCD
-         YptJvwBY25JoKvApl/mGZxFGaMj4jzVwMzAyAXpA869zv9RkuqmH0PN1IPedlpb/hm7R
-         h6vsBIKkM0N/2CzRH7d8we1DuXGrL7T2XaMlQye3k4JufMoRzon9w6UmEn5jHAR5HF7W
-         M+c6uxtflFq0tAnbdXEzqdz5rd16w30cII16m5pym/oaMHNQmmN1u9EPAcnRywoXcmZl
-         rFuGm5dkerZZqlSsR1J9uLp0bc306l9EutwReYdOmzDW0hZu0jrfY7d+AXdIqV02ffsh
-         m/Pg==
+        bh=SuX4QN1XO5qkD+Mq8ZB4etY5v24jEcjvNl1G0WRpx40=;
+        b=WUzOSM8B7UQvI4XEiiRwTu5yQeX8EYkOjiU2WWQGU+x7v0Ma7CbbLWzkWh7S/beTWD
+         0GAnds3+9ogqrhao6dc7cn8re0Ih5cGrumrRZTRIXY731Q4rt+uivPM7vGs0AvwZgYX3
+         z7ImDEomz/xev/7Y0C6z4eBeLH6yHUVjToRszdefNKPbwjZEaoNWwq6Z3Shos6BGMd0f
+         31H+3TLJtvMcB/UygUPN4hNe6nilJDAegbBVCXMG37vnSo4kgu7cHVVoeoM4GPGbHV5T
+         3MAiDKN+otesraVOU5x0FjyHFgU0QLWZEJznaUKSc0k7auHFcLSxiMWf+ix832ob7aA3
+         MBcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744753701; x=1745358501;
+        d=1e100.net; s=20230601; t=1744753703; x=1745358503;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wEjjwG5jx2aPU05qIE/xX2hSXaML6GcxiCjF2JKd8Z0=;
-        b=UtTvYEdRrkztEouP9VtNg5jJJl/5oBSBg7Lj5G84/5em0iF5c1XPgN/x8qPjQFXWj/
-         b+6U47rq86cd5TInQxXS7Yljjgc6dJUWcVHOqtWv+PRKmMVTglsYiRq1cFQrqt0YQn1y
-         DtdzFyijxVsIjdeT2+OqsEOISsPD22wQczb+RLdJ52yyXDrpZ9LQqEsUASeL87slr0ye
-         +9FcAIJaTrpSrgTMKHw+JpoouR/U1rPtMv6XcI2jKnndb2N3BLzvr9G/9jBW0BLNs+Lu
-         62kc6cwNn8vLmA4xJchSJDBmZrmbSYVkEuJr5KEctSO7Wbd6AYEsFlno/bJX8kM5qwJF
-         cfXw==
-X-Gm-Message-State: AOJu0Yypmgmc8uR0xn3PwOWqvRy9TjDA5nsiRW5cHAav/Plh2gsih5GU
-	sB0RDyYUne1Y/MVftoXL6RCX2V922IiuoSUha8jro0K8LlfM48jV9wWwsy6Bmdc=
-X-Gm-Gg: ASbGncss27kTgq5JTaUbNgIfnrte0xIp+Ub3sCuJOm1EiBx7P4WU1N+8c74KRSE34QQ
-	KsgUm1gqMjCrvDn/lRo8jQFlCe3mk6rJlUh80BawWb79EaHt/BR7gEIvEGsSXrq8WO82R2yIGCx
-	Q3SOhEN2rnziojcVfYcYDs4jeqrI1VACvoSqCXMXkqDaF3YKZf3yQNJeW53qqAyW7J1LAQsVdUp
-	seR1wsWJGtKph/vjut5K8zuwPS3R7jY37dDknDG7AWlf2zoLli+iFYydgYtDQpiYrd87NEkxKny
-	/YGx/7oDww9MbNFxV+Znrrj8oNj6oB3A18ZRdlLsdKPc1hYWax2iIJKtfwpm26hHOIxbhdUI7iS
-	XVRrVx/a98A==
-X-Google-Smtp-Source: AGHT+IE1tcDTiGW0zUOxjrX/T5lBBXgtp041aV4ZWAR253BUc/XTmVmPwbhxK0t88p2eIrSU3IoNzg==
-X-Received: by 2002:a05:6122:8d6:b0:523:6c0c:e991 with SMTP id 71dfb90a1353d-5290915d761mr915854e0c.3.1744753701124;
-        Tue, 15 Apr 2025 14:48:21 -0700 (PDT)
+        bh=SuX4QN1XO5qkD+Mq8ZB4etY5v24jEcjvNl1G0WRpx40=;
+        b=la/N0Xv7Hd5tLeDFzVh+66NPw7+AVYSL6xscDRYtA7SfO6yOO5ylITQhuOJZTZjm5W
+         nFDem5utnrFTkgmUQ+iq4vn/TvxV+L5q105VcfFDyAgwgKRDgy0EHnJaM92M0PdKp/jg
+         +9r88YcbhWoJ9FIk8jk+HI/FArUVn+XiGo6GkPa+Xt9HwL3k08GcBmlIE+w8tQkQoByq
+         lTBs9o+MhH/Ky7B9gVNm83sHsUQNv3sfPl/8BDSf19vWiEW0gIe8+WRBxx0Fn5i2vdiy
+         Wacn8tDeL1PtEH+42+ewdBR+6Y1+heiR6O0nII0neBfSpCVEv6QKrLQ57WmqkqBJhuXp
+         bCuQ==
+X-Gm-Message-State: AOJu0Yzn2ZmdUHGSYa1jAC0aOt7gjZsVmkFr2PlOQl2oVPAo8wxd5H+7
+	4qOJaLyh/8dVa6f+iDIk1Eou8T0FuOzWeOalOmrYOSfu1DMSvch3FuR85yEzoNM=
+X-Gm-Gg: ASbGncv3ZoXWNWSvEphq2GZOjqCOOjAMjqxDxyi4ERgNV88Cqg7Q4DTV9FZWRGYnDVy
+	K3ldBeyIotM9H5wSVUm6cIrtBXek4+PnqcgrRs5sTOFSaYaZ23xVLYUAjo/VOiON2Xtnlp+HfZj
+	EYqju3afrt87oyIR+9ayf1OAzz7w+klbr0QOFkWMmTfNp9o8qJQGS6K/aFwiHy1VM0oExJ6Rxmn
+	QDZhaW8Yg/zeanLOX2pD0WQnfid1vwrkQ+K3gbMFi3ZqKwyNcRSTEdWyPSZJ218KM5FkJ1p5PrL
+	9cGafdFD7/fHo96pl6byS0xSznMDCGVluWLuiKdvjItUHlhTJLwfEEVhdmDSd2AhdGKxzWZrbft
+	eBIXrFNckhA==
+X-Google-Smtp-Source: AGHT+IHTgK70cNa1O/BlXSFEEZw8Sv2cI0O2E5xGDBVr4kVrNU7IUIGsx2DvvERlBNOy9FJ0bgwX9g==
+X-Received: by 2002:a05:6122:a1b:b0:516:230b:eec with SMTP id 71dfb90a1353d-5290919c84bmr839980e0c.5.1744753703258;
+        Tue, 15 Apr 2025 14:48:23 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-527abe8d740sm2844459e0c.33.2025.04.15.14.48.19
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-527abe8d740sm2844459e0c.33.2025.04.15.14.48.21
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 14:48:19 -0700 (PDT)
+        Tue, 15 Apr 2025 14:48:22 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/7] iso-tester: Add test for SID=0xff
-Date: Tue, 15 Apr 2025 17:48:07 -0400
-Message-ID: <20250415214811.1677842-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 5/7] iso-tester: Test getpeername return SID
+Date: Tue, 15 Apr 2025 17:48:08 -0400
+Message-ID: <20250415214811.1677842-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250415214811.1677842-1-luiz.dentz@gmail.com>
 References: <20250415214811.1677842-1-luiz.dentz@gmail.com>
@@ -76,63 +76,57 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the following test which is used to verify that when
-application sets bc_sid to 0xff the kernel will attempt to scan for a
-valid SID before attempting to create the PA sync:
-
-ISO Broadcaster Receiver SID 0xff
+If test is not setting a valid SID (0xff) use getpeername to validate
+the SID gets updated.
 ---
- tools/iso-tester.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ tools/iso-tester.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 350775fddc96..b362647461c3 100644
+index b362647461c3..63f6951e3d0a 100644
 --- a/tools/iso-tester.c
 +++ b/tools/iso-tester.c
-@@ -495,6 +495,7 @@ struct iso_client_data {
- 	uint8_t pkt_status;
- 	const uint8_t *base;
- 	size_t base_len;
-+	uint8_t sid;
- 	bool listen_bind;
- 	bool pa_bind;
- 	bool big;
-@@ -1419,6 +1420,16 @@ static const struct iso_client_data bcast_16_2_1_recv2 = {
- 	.big = true,
- };
+@@ -2575,6 +2575,40 @@ static gboolean iso_connect(GIOChannel *io, GIOCondition cond,
+ 		}
+ 	}
  
-+static const struct iso_client_data bcast_16_2_1_recv_sid = {
-+	.qos = QOS_IN_16_2_1,
-+	.expect_err = 0,
-+	.recv = &send_16_2_1,
-+	.bcast = true,
-+	.server = true,
-+	.big = true,
-+	.sid = 0xff,
-+};
++	if (isodata->sid == 0xff) {
++		struct {
++			struct sockaddr_iso iso;
++			struct sockaddr_iso_bc bc;
++		} addr;
++		socklen_t olen;
 +
- static const struct iso_client_data bcast_enc_16_2_1_recv = {
- 	.qos = QOS_IN_ENC_16_2_1,
- 	.expect_err = 0,
-@@ -2843,6 +2854,7 @@ static int listen_iso_sock(struct test_data *data, uint8_t num)
++		olen = sizeof(addr);
++
++		memset(&addr, 0, olen);
++		if (getpeername(sk, (void *)&addr, &olen) < 0) {
++			tester_warn("getpeername: %s (%d)",
++					strerror(errno), errno);
++			data->step = 0;
++			tester_test_failed();
++			return FALSE;
++		}
++
++		if (olen != sizeof(addr)) {
++			tester_warn("getpeername: olen %d != %zu sizeof(addr)",
++					olen, sizeof(addr));
++			data->step = 0;
++			tester_test_failed();
++			return FALSE;
++		}
++
++		if (addr.bc.bc_sid > 0x0f) {
++			tester_warn("Invalid SID: %d", addr.bc.bc_sid);
++			data->step = 0;
++			tester_test_failed();
++			return FALSE;
++		}
++	}
++
+ 	len = sizeof(sk_err);
  
- 		bacpy(&addr->iso_bc->bc_bdaddr, (void *) dst);
- 		addr->iso_bc->bc_bdaddr_type = BDADDR_LE_PUBLIC;
-+		addr->iso_bc->bc_sid = isodata->sid;
- 
- 		if (!isodata->defer || isodata->listen_bind) {
- 			addr->iso_bc->bc_num_bis = 1;
-@@ -3817,6 +3829,10 @@ int main(int argc, char *argv[])
- 	test_iso("ISO Broadcaster Receiver - Success", &bcast_16_2_1_recv,
- 							setup_powered,
- 							test_bcast_recv);
-+	test_iso("ISO Broadcaster Receiver SID 0xff - Success",
-+							&bcast_16_2_1_recv_sid,
-+							setup_powered,
-+							test_bcast_recv);
- 	test_iso2("ISO Broadcaster Receiver2 - Success", &bcast_16_2_1_recv2,
- 							setup_powered,
- 							test_bcast_recv2);
+ 	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &sk_err, &len) < 0)
 -- 
 2.49.0
 
