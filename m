@@ -1,66 +1,71 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EAF2DFA20
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 21:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630182DFA20
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 21:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744753698; cv=none; b=DBWZbEK4vIXS3Fiv4iKd3Q8Vb37VcZ323lbCRh7Enhp5Pn/zlex1v57LB2+aeXfGKgPCTkRUrXQoyk/hur7LjNVDv7/hPUthaNBdMYGdSIFr4xw3uSUEnL9PNQWo3BjDyBKTgvMedNPKJl6oNrqsl15uzzMz62ARmMMQxob/lpw=
+	t=1744753700; cv=none; b=Ivuka6KZ0ru+vuAJmyXaQMV+fiIiWpWoAFeeCmO2VyS20HApJr2lfim12FoEtUTdZ8t5BPePbXf/DjXLEJnroSF3aZnnH6CH5Uj3rTO92rPoCLzX58PDY7yLkHa0U4yOMa54o2cJGY18JAVnat5w99o4SfmkJzajM3+sN5YJkxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744753698; c=relaxed/simple;
-	bh=r32oAtmJV4GUBVTcyRweY8W3ZwcYF9lzM96+0PEcaBo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CjTBza9XlIXb3eUXLXkY86V1VvbASpToh27Dzp5TXUEwrYlEAyDpfM0SprkiiyHxvLWfFhOpBLK4ciOaI0/mI63uafugVmMaz/6ujHgLeLlQnUL6jOL4RMFraJpR5uA14d4pmUM4VEVZa1ImwFXOCwuymeUi+7MCZC3L3ldaQ4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7CB0C38; arc=none smtp.client-ip=209.85.221.169
+	s=arc-20240116; t=1744753700; c=relaxed/simple;
+	bh=tn3LLMUkmIgzSHBzNCOPge8xddrWH9LcOTg27zwPgds=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=J42Q7AxOnIEW0EfZsaedCrOLDFhmCUcbbFGN+Ufu/y1xDTPSciMnqv48KcsWAmHUx1WoxbALFD0uDeLpOkNI/tEDl/+Mb1Y/HpsfUzLSFCKd971BuaTKob66PU8co8GqHB++4sg7nwx1FHOKIoMZvtbpcg9NKXrOj8vwLQ/UgeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fhQ/YNe+; arc=none smtp.client-ip=209.85.221.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7CB0C38"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-523f721bc63so105218e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 14:48:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fhQ/YNe+"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-527a2b89a11so2546222e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Apr 2025 14:48:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744753695; x=1745358495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aO8ssM0dfDJUhN473dOwaJoGRWoeMmAGYDR1boXBPUI=;
-        b=h7CB0C38oA4h5qfimlrKjVW3KMZPRBzA6zTwOcW/IoqkGEk86UI8RHK8Nk7qU4jnbu
-         Eud1hKn8U8SykOFRlBpmoZqcirfb4nEkz/PgGn/WqD423zGE3MbILSobQ+N3wmbh1Uve
-         DqSAW53YBgBVBgtlm91FePpG17QxLtmUmneagH/Dmz+/iM9VT6/yaCV1dR8dPCQL+HUn
-         KjtG5K3gsQhW/NEFfmu4VKD087C6kA6weSH7K2hEigNDHnK0XlsDSEUEOBU75+UjFoAC
-         TSjRDxU+fsleN/u9X6bw0i+MtRq+yy6JFOiMwhakoEKsPX7EE2dotbMTuMBtoHiu2nhp
-         gZwA==
+        d=gmail.com; s=20230601; t=1744753697; x=1745358497; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0qAWmu4uWB6mmSNQRF8c6wKOSO8fTTfpFkXVXjHgTSk=;
+        b=fhQ/YNe+CahBs+4eGa5NSpRHK4Dy3QMQLlbNnkZcEySHCNljsh2FZOXVq2rrrLXpEH
+         GvtpfaojskWURBQ3765ZTuAiVSvIKgV5kWTkWad9aMdjwYVrbQcxwObzxREvKFq4Ak+y
+         DiwvayYthTeTm6BxIf+EVIncJqohuIyvTO4VINvsgk9znvqCM3I5HR23iQ6vxb5oRc+6
+         V1JfhWbv+rW0glQjIri8oJvX4JBzvXBXymNgC+JTYfDs8WAz7RTy8nInNREO6u42k7CA
+         f25Ze9RQVERFUYj/PXJolHSd6mXFU4o/sZom3H+uCFOlE3I13FhXLLLJEoz+n/7wBiTr
+         qWhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744753695; x=1745358495;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aO8ssM0dfDJUhN473dOwaJoGRWoeMmAGYDR1boXBPUI=;
-        b=LDskO8oFv8d1dNcWEO/hXdO9brfZHI0fd2Er6NOSWTQll2ElKQ19RAcZSo1uRvSDBO
-         f8gDPDyYOL/KtLa/Re0NELo+c+puU8gQ/e7P2SFFKx4dwyw/xpXlgjo/PgZ7E1pHy8To
-         mt7resUfY9QeXjhM9lgXrEeijjEwMA1S5mVXPNZVYrY9dMc7lH65j+Mz3Jke7vuPlUTJ
-         KqYpkUeoz8wYsm0LazR4d8fMy2y4dDdEHFMFn2hbp/sToSC+VGSOKZSh5h1tiy6LS7AT
-         AxaQJTf4GDKKjV6FrG66uFVI15ZgWJGdk9nEjrD0Rhrbq4Q/WhnlSZJCyG7g+CXxw2hS
-         fpOg==
-X-Gm-Message-State: AOJu0YwQRa4GLszgNu8EwgXH3PwNiPwPrA+dMgyRC/0pThyoz5bbFb4m
-	sVflZwzjDERjUPp1ituJzsN6KNlRk+n2tTvRDM6k+TE+ExNoXe9Q0Y2105d7ZHI=
-X-Gm-Gg: ASbGncsr1UEi50OLEzCZ2u0rZYpAgXfuz6hz0oH5Gaj9WN6oHngD6A86ju9MoN4tblm
-	obTusldZ4Fp5NlhQl1xjXQlzqhY9N3KEMV8NXkmKwcHyfbSRjMY9g9WBCpZcqAaZEBzuTXSFuiJ
-	CQnYc+a03SOf24Xd6e3eOBGrz7jk5HQumGTnUPEEMrQjUQlmL+VtrDpX1JzrPs7APhwocLIXB9q
-	SZF0wWDoPYEms1uToNeDrhH0V5ieEyZx5bvf4cGGiHns+pvJfkKB8u5AY8ku5c3lsy8e9F2/ML8
-	SyjyA2fEYdVSf/Q5S+N1FBhgM3MZ7CKQr7L8RASQ34NBBYiYQ31lebdoEc1z96lOXhETW4CW1tl
-	McvkBUmSVDg==
-X-Google-Smtp-Source: AGHT+IHGl6YJrT0kUUlQMcC55dE6TA7U7DKEjH8NUSU0Nzmc2L6f3pNfpKHRWSqPoV+3ailaD4Zsvw==
-X-Received: by 2002:a05:6122:1d8a:b0:51f:a02b:45d4 with SMTP id 71dfb90a1353d-529085e897fmr1302344e0c.1.1744753694768;
-        Tue, 15 Apr 2025 14:48:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744753697; x=1745358497;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0qAWmu4uWB6mmSNQRF8c6wKOSO8fTTfpFkXVXjHgTSk=;
+        b=DS4vafKlTYyYbN4Xk0pAAYvyjqDwxddOqrX13UWTCbW97lkWFz6V4rrQk1H5NIjKjv
+         LGFO7ibPvh9fAcRfeNWOROKHRAW4kxGQe4COlONgP7alRfoInHV5qQrqVI/RYLgqWrje
+         86EeVEPX/Jp7yqGZRLTB6oudsUD8UjZUsX2h39eIjN3PSRTT/stupsrXdYHBC1sRZi5l
+         riX4cdoKHydHhbk/LaGSi+sjzZijXLMmAPtCOIEi1Go4IMw3p2mwrQGtYvEl//k/Ekua
+         XzgKPbMsMEI4JJagpGWi9iwTA2mLt9mFbAZrEkimJ3Kxs2mTTH3aKfopTBV8EiRAchRk
+         hqhA==
+X-Gm-Message-State: AOJu0YyZcUib5dsTrVGfZg0G0Gj2YbGtUtIQqg4lNlh2hW0NHJhHxBDp
+	YQpvKo8a7rgHqljYFmwsV0jSzlxWHN44MsZGLDm40CbcghB6jYRfS0cVlGtfVBY=
+X-Gm-Gg: ASbGnctT83nkEOOBij0KhZnMXy7UnLDM1puQFHrRty1/4xxiwI+qVInGsbSI+92d/PB
+	PhxDsb8VQAPyn5g7s0Unl1S6LebtkFnZZAwVQCt9BqNDEfnIOCrw0+CXIpLXWR01FIG9uFTKa5o
+	k0Ol7Ohp/M/kxKA1cjhO5I/fhGZzQrsqqeZ6DY+ATdSIVKfv+XN8mcQ+cGyn+M7z5CPYh9WZtoS
+	HDwVstXrbgb7zTPNqSKCAXyF+eLBA9CwbS9/kcOhy2HzJo6H25t2NDcbdczN+NFFXne7oClyohi
+	1UvH9ZtCgPagMyaUa7rA3MDei7yVCMm+XlgBvTnWFEbtcP9ITFbsFhCIbP7npmCXFrySAWK7Ica
+	6Frq/mbs9IA==
+X-Google-Smtp-Source: AGHT+IHcwLMPmq7vYPoLYRHzX7sN1yNxg1hBAHQzBWwlefGiqGdZQpkd1oFLzrK1bQC42rb231vX0Q==
+X-Received: by 2002:a05:6122:903:b0:528:f417:6f95 with SMTP id 71dfb90a1353d-52908f9c012mr959811e0c.0.1744753697394;
+        Tue, 15 Apr 2025 14:48:17 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-527abe8d740sm2844459e0c.33.2025.04.15.14.48.12
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-527abe8d740sm2844459e0c.33.2025.04.15.14.48.15
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 14:48:14 -0700 (PDT)
+        Tue, 15 Apr 2025 14:48:16 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/7] bap: Fix not setting SID for broadcast receiver
-Date: Tue, 15 Apr 2025 17:48:04 -0400
-Message-ID: <20250415214811.1677842-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/7] btdev: Check for valid SID on BT_HCI_CMD_LE_PA_CREATE_SYNC
+Date: Tue, 15 Apr 2025 17:48:05 -0400
+Message-ID: <20250415214811.1677842-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250415214811.1677842-1-luiz.dentz@gmail.com>
+References: <20250415214811.1677842-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,35 +76,27 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-SID most be set otherwise 0x00 is assume which may not be what the
-broadcast source is using over the air. but since we don't have access
-to the SID of the advertisement in userspace mark de SID as invalid
-(0xff) so the kernel fill it up while scanning when creating the PA
-sync.
 ---
- profiles/audio/bap.c | 2 ++
- 1 file changed, 2 insertions(+)
+ emulator/btdev.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index fd9b751cc1bf..24763666ce96 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -2813,6 +2813,7 @@ static void bap_detached(struct bt_bap *bap, void *user_data)
- static int pa_sync(struct bap_data *data)
- {
- 	GError *err = NULL;
-+	uint8_t sid = 0xff;
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 7e4cb9393593..a1c82ae306d7 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -5728,6 +5728,12 @@ static int cmd_pa_create_sync(struct btdev *dev, const void *data, uint8_t len)
+ 	uint8_t status = BT_HCI_ERR_SUCCESS;
+ 	struct le_per_adv *per_adv;
  
- 	if (data->listen_io) {
- 		DBG("Already probed");
-@@ -2833,6 +2834,7 @@ static int pa_sync(struct bap_data *data)
- 		btd_device_get_bdaddr_type(data->device),
- 		BT_IO_OPT_MODE, BT_IO_MODE_ISO,
- 		BT_IO_OPT_QOS, &bap_sink_pa_qos,
-+		BT_IO_OPT_ISO_BC_SID, sid,
- 		BT_IO_OPT_INVALID);
- 	if (!data->listen_io) {
- 		error("%s", err->message);
++	if (cmd->sid > 0x0f) {
++		cmd_status(dev, BT_HCI_ERR_INVALID_PARAMETERS,
++			   BT_HCI_CMD_LE_PA_CREATE_SYNC);
++		return 0;
++	}
++
+ 	/* Create new train */
+ 	per_adv = le_per_adv_new(dev, cmd->addr_type, cmd->addr);
+ 	if (!per_adv)
 -- 
 2.49.0
 
