@@ -1,68 +1,68 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FFD2253A8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 19:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96608225408
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 19:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744833336; cv=none; b=o7jUPcfl+Ueqf7AXvhOXMmff4bZOI9V0E/6P2ak4weokP+o3Gb3q8mtZHmTnVtkWndd6xVW9nOlVZd5DOkiBv2v8j0bTv3cnePWD55Es6Stn5UxINBRhkNVvtaqWWnvwvRYPSNJjivE3CdsJJCQDOc5xlSQLk7NY0FkrvUYFEKI=
+	t=1744833338; cv=none; b=JzsEgwE5Eof6cbpgBWzgtEPo8ds2ZSfmU8xKZjzqvkfRg8Pq4z7QTWWJzzbvdS8xHexLoDCg/grHoQ67GpREp2FMj8RQqY4SFzseCrg8PiMGz9EKV98ngNkAU3R+SUvJkBmcmpdMspJK7xD725fqiJ2ufdmXfUS/ObeAj4VhnsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744833336; c=relaxed/simple;
-	bh=wRhT4AdPU5EIaOJZDvmnouNPUQSbhXuIGhIefDVWwBg=;
+	s=arc-20240116; t=1744833338; c=relaxed/simple;
+	bh=WCruzil8CW2bYmslJXOzRaeOplSPiK+FWl1FjlWhi4M=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TVw64oKgCxiDB4FXPr/dlwwTHFCXrgD8PP61OOeSDH63N9YJ4DBWSq4tvsun+3U5X4wgXqmjNHwVdgqUpbDQdufsVjjAjJT39cFuEbnpvGoM5MECpIwEVhOvJIubqnYouk1hT6Bc4l1BxqzpM2bZJ+U/tV55wamj98lSISySdqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vv0WJOkP; arc=none smtp.client-ip=209.85.221.180
+	 MIME-Version; b=b9kA7wBM5w3JMbPTBL6UyvLmhuUFczi9U5cyDCAttU/qlTkZwEfQrcd+Scv0ZYPUhNunKBJ1UI1NpefT/xIo8OETqJH8yXF+0Ckm+2DzgP8Pyk/2891HAciaa8gsYTfTPsdJ17f9cralx4K1CKvsHb06gh3pz4+MC/DQY+owO6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEaoTMhx; arc=none smtp.client-ip=209.85.222.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vv0WJOkP"
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-523de5611a3so19182e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 12:55:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEaoTMhx"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-86d6ac4d5a9so21382241.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 12:55:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744833333; x=1745438133; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744833335; x=1745438135; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VCcU0PHneyNkLmixqYfJgoG5ao/saRUq/QJk1Fqu+Tg=;
-        b=Vv0WJOkPT3GkftybRhtIvtB34GqOahRyv9jvb6RLK3FVmOMkqNcmzLRS198YS0d86F
-         aSOFxJmNRnjkB9PsMd43x3tLPNb1qJbQyflHNPQioQtMqclBVhPInB4s13Rls0nplAFM
-         W/Nv9xtMYRNDtusoDsMWR+IS+poxBaZh1aoMRzyvoEF0DXOhRGZtLYUMNhLXc+DfY4oN
-         yyjzKkgwSoLO77l82zy6Vl5P/bsIq/ldXL1Jgchxm0hDEcdRtSHYfAG1uYn/VCRCRDNR
-         3+frwb298q2ExLpFmugKJN1POtOyE3wEujJw0ky7E8bJKKx+/HW0h5IFsqS7W4CjLvkk
-         HWGQ==
+        bh=2G8THI2yClH7rv1jbhssbjCNVQujFadW3iEgZJTztBM=;
+        b=hEaoTMhxHhtqqVSYMLX9/STeiSBtTNQrKcURartq213dFGuA6kaREdrH9quZ668dPx
+         YbaHWgBkJACLzgquCiB0dqr32/cA5bnyw9ZLFqyPwvGACxi6dYgHCswUjh7ABB2azcBW
+         Bj2zS00j/RKjTQR3y2hlnGIvCABi9LlrcNE+7Lqvh8g4OVE5l44M2qMQ9MCpDPcZVgqS
+         HNHuA+sxoYAJv3TAsJA0Xj8G+DZD4Ho2/9QL9DcGPTyI3FfucgBhoLyYOCkqz2jIWGLI
+         qKEml9Xavu/Uc0rZUvdwi0BjWhKK5Pt9Jac7WuhMU3q0QIZVZuX7x3y0IP5mhuQFazjr
+         XOMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744833333; x=1745438133;
+        d=1e100.net; s=20230601; t=1744833335; x=1745438135;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VCcU0PHneyNkLmixqYfJgoG5ao/saRUq/QJk1Fqu+Tg=;
-        b=nylGvjBcpscyptzDwzFeS7Nn1+pOXwNXwJzEnnK33V2l39ffYxWcQYt9CQWCeTL3WZ
-         oC0UVoWyAaEaoIW5R2dZYyl5eZP6BgaM3H/xSPNJfQF9SBxNT5UA2fg4L67VYQSwq/Xz
-         5HJNiKoPGFocj5LOAlM8U6ZzwySfdj+CklsvVAHqapfIyR+ODcXYf2mSdOCz/ZQ00keQ
-         l8hBoaKFA98wkJj/VQFBy+Ui6LU7IV8j112i2R5bm+PtyyZrYaGY6kV20jAAqX2n9x5s
-         yd/oZHbCHEaAYGPaL1VFsAdlJMb0CdRYjJf5bslT69u5z1Hnrnwd/5zGe1a5X4UQ7MSE
-         3caw==
-X-Gm-Message-State: AOJu0YySwlsombTvClKiJOFFQLyQvHgxZdVHwSMCVrseDVAf6vtDzPWX
-	JMg461nf3jGOsGUwYJ1H89MSMKX4irSCv6VsJfGUcY6fT9ALsnuiAE4D7r3J
-X-Gm-Gg: ASbGncuGR+jdjaVaO6q2ye7UgrdLdgTQq06e5X8dXfyIWa0PCh9cW7uaSKqNOPzSyT5
-	mLYSOMk9Dff2mWCa+++u90vwlB0EdZsOi4SslRJDeM950f9K6URz/wrkQ6zRCxsl/QF9z+cJtTO
-	4BwS3vYkix05s8uWcHPh1NNxTasH7BeIyI8uH1i6wsNxdchDXQGulDJlYZlIbMyCeowTdcILkk2
-	XdCVqQGaGLdp2miWTUv+Uex4H0DK8DNcTbLIqpR7MQpEgj5iCy+CU7MeI2yl8LMfahEhDEUd1IJ
-	qNgWXxED0OvngvR/id02RXR6NqeeK5NRGbuLF1SIiLoaDcX2G6oa1UFwqA1m0UNHzPeo6mHto+V
-	7HqW9CAN48A==
-X-Google-Smtp-Source: AGHT+IECpkKxf0WboNfufh43HH2rB4iTqC3Pr9OCqLVsqmhN8EXszFw2KF0DShdMIoLfVOAWpJHUAg==
-X-Received: by 2002:a05:6122:32c9:b0:527:bc6b:35bb with SMTP id 71dfb90a1353d-5290de8d3eamr2751542e0c.3.1744833332598;
-        Wed, 16 Apr 2025 12:55:32 -0700 (PDT)
+        bh=2G8THI2yClH7rv1jbhssbjCNVQujFadW3iEgZJTztBM=;
+        b=Ow9MpbKT+f9my4TV9B60t9Ds5qDU3ID46blwoj6PXO9Q8g5nP4yNr3o1P6tBQECqe1
+         0OqhhkYHGZCn3yp2UpZv32AD3YCUiDUJ8xEQRzeIXnfPaj/YZYxLTbPaj24LFyqS29x2
+         V9IkW4qwmgcPU9mXyeBx4F9v97evtIzTNfXJIvFwThQ/w6A9t3EYtAi4twV6jZuSQWsO
+         eE+GQSx+EBqQEJUOWY+RuitbKUw1Sffv6pkCQUBFJ6ZyRoIvgXIDJW+VPGhWAX3u8ZQ9
+         5+Vz88YHs2fL2KIUFiPT08AGJgyy7Fq2j2mSiODcJl2Acj2yGubK2yn8SNOUdQUo12Cm
+         55WQ==
+X-Gm-Message-State: AOJu0YyHTNsPvkPO72sl0/pELNLlTRV9dDmcgu8hZvMpfwYCmpMHFGWN
+	FWVgqxW6QDQYtVAVfWa0kggdqkAa0RJ/y8vZn56gIu3/9cmTGSpfWLXCsfQS
+X-Gm-Gg: ASbGncvx8KXpTTzBxjC+3Ye73xESRyRpGszgIh+jxWGvMQgj3DCWZ1p3tgZ9xHlymhb
+	IQN+gse/tpWbrePrhjxywVmdECz5q5xLWwtdWTKBUN5ciFmxGHerA/sobWz8oKGAnJ0B8eveNSz
+	FiZwwGt8auLWJHcoHxuXozlAdeBZZlrQsLToIm0lQy7onaXVkJE82OZ9PgWQq5uUz8E8KpkUKXI
+	JaX5hAaU7vnL++e2xXmyfTNdIFBDsjCOWweTKVH68Jdp8mtIwrmPPAMzcJTo1GHM+q/1KpEE5JI
+	odVc8rWbIgUT+pR0PM4oNWUFDvEICrVjmjMjf8BTRVGTFYPNXRlkkaBZSOzx4N32OWTRJ/yHZeP
+	iH4UHRzsSu64UTdnQeqWJ
+X-Google-Smtp-Source: AGHT+IGIgStfdzp9ioLVc868UlT2A4RjmPeIhGVynW3SeMg3Ilef0VvC6Abne24A3+1RCYTCxw/Y3g==
+X-Received: by 2002:a05:6102:55c2:b0:4c4:edfa:9634 with SMTP id ada2fe7eead31-4cb5918fc9cmr2188930137.1.1744833334408;
+        Wed, 16 Apr 2025 12:55:34 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87557281a80sm3243415241.27.2025.04.16.12.55.31
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87557281a80sm3243415241.27.2025.04.16.12.55.33
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 12:55:31 -0700 (PDT)
+        Wed, 16 Apr 2025 12:55:33 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 3/4] Bluetooth: ISO: Fix not using SID from adv report
-Date: Wed, 16 Apr 2025 15:55:25 -0400
-Message-ID: <20250416195526.1989143-3-luiz.dentz@gmail.com>
+Subject: [PATCH v5 4/4] Bluetooth: ISO: Fix getpeername not returning sockaddr_iso_bc fields
+Date: Wed, 16 Apr 2025 15:55:26 -0400
+Message-ID: <20250416195526.1989143-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250416195526.1989143-1-luiz.dentz@gmail.com>
 References: <20250416195526.1989143-1-luiz.dentz@gmail.com>
@@ -76,292 +76,65 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Up until now it has been assumed that the application would be able to
-enter the advertising SID in sockaddr_iso_bc.bc_sid, but userspace has
-no access to SID since the likes of MGMT_EV_DEVICE_FOUND cannot carry
-it, so it was left unset (0x00) which means it would be unable to
-synchronize if the broadcast source is using a different SID e.g. 0x04:
-
-> HCI Event: LE Meta Event (0x3e) plen 57
-      LE Extended Advertising Report (0x0d)
-        Num reports: 1
-        Entry 0
-          Event type: 0x0000
-            Props: 0x0000
-            Data status: Complete
-          Address type: Random (0x01)
-          Address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-          Primary PHY: LE 1M
-          Secondary PHY: LE 2M
-          SID: 0x04
-          TX power: 127 dBm
-          RSSI: -55 dBm (0xc9)
-          Periodic advertising interval: 180.00 msec (0x0090)
-          Direct address type: Public (0x00)
-          Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
-          Data length: 0x1f
-        06 16 52 18 5b 0b e1 05 16 56 18 04 00 11 30 4c  ..R.[....V....0L
-        75 69 7a 27 73 20 53 32 33 20 55 6c 74 72 61     uiz's S23 Ultra
-        Service Data: Broadcast Audio Announcement (0x1852)
-        Broadcast ID: 14748507 (0xe10b5b)
-        Service Data: Public Broadcast Announcement (0x1856)
-          Data[2]: 0400
-        Unknown EIR field 0x30[16]: 4c75697a27732053323320556c747261
-< HCI Command: LE Periodic Advertising Create Sync (0x08|0x0044) plen 14
-        Options: 0x0000
-        Use advertising SID, Advertiser Address Type and address
-        Reporting initially enabled
-        SID: 0x00 (<- Invalid)
-        Adv address type: Random (0x01)
-        Adv address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-        Skip: 0x0000
-        Sync timeout: 20000 msec (0x07d0)
-        Sync CTE type: 0x0000
-
-So instead this changes now allow application to set HCI_SID_INVALID
-which will make hci_le_pa_create_sync to wait for a report, update the
-conn->sid using the report SID and only then issue PA create sync
-command:
-
-< HCI Command: LE Periodic Advertising Create Sync
-        Options: 0x0000
-        Use advertising SID, Advertiser Address Type and address
-        Reporting initially enabled
-        SID: 0x04
-        Adv address type: Random (0x01)
-        Adv address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-        Skip: 0x0000
-        Sync timeout: 20000 msec (0x07d0)
-        Sync CTE type: 0x0000
-> HCI Event: LE Meta Event (0x3e) plen 16
-      LE Periodic Advertising Sync Established (0x0e)
-        Status: Success (0x00)
-        Sync handle: 64
-        Advertising SID: 0x04
-        Advertiser address type: Random (0x01)
-        Advertiser address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-        Advertiser PHY: LE 2M (0x02)
-        Periodic advertising interval: 180.00 msec (0x0090)
-        Advertiser clock accuracy: 0x05
+If the socket is a broadcast receiver fields from sockaddr_iso_bc shall
+be part of the values returned to getpeername since some of these fields
+are updated while doing the PA and BIG sync procedures.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_conn.c  |  2 ++
- net/bluetooth/hci_core.c  | 13 +++++-----
- net/bluetooth/hci_event.c | 16 +++++++++++-
- net/bluetooth/hci_sync.c  | 51 ++++++++++++++++++++++++++++++++++-----
- net/bluetooth/iso.c       |  9 +++++--
- 5 files changed, 76 insertions(+), 15 deletions(-)
+ net/bluetooth/iso.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 6533e281ada3..08e060669c2b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2070,6 +2070,8 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- {
- 	struct hci_conn *conn;
- 
-+	bt_dev_dbg(hdev, "dst %pMR type %d sid %d", dst, dst_type, sid);
-+
- 	conn = hci_conn_add_unset(hdev, ISO_LINK, dst, HCI_ROLE_SLAVE);
- 	if (IS_ERR(conn))
- 		return conn;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index df7d7bf32eb8..a58fd3bf8851 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4068,10 +4068,13 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 	}
- 
--	err = hci_send_frame(hdev, skb);
--	if (err < 0) {
--		hci_cmd_sync_cancel_sync(hdev, -err);
--		return;
-+	if (hci_skb_opcode(skb) != HCI_OP_NOP) {
-+		err = hci_send_frame(hdev, skb);
-+		if (err < 0) {
-+			hci_cmd_sync_cancel_sync(hdev, -err);
-+			return;
-+		}
-+		atomic_dec(&hdev->cmd_cnt);
- 	}
- 
- 	if (hdev->req_status == HCI_REQ_PEND &&
-@@ -4079,8 +4082,6 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
- 		kfree_skb(hdev->req_skb);
- 		hdev->req_skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
- 	}
--
--	atomic_dec(&hdev->cmd_cnt);
- }
- 
- static void hci_cmd_work(struct work_struct *work)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6d6061111ac5..105d1446c9dc 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6340,6 +6340,17 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
- 			info->secondary_phy &= 0x1f;
- 		}
- 
-+		/* Check if PA Sync is pending and if the hci_conn SID has not
-+		 * been set update it.
-+		 */
-+		if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
-+			struct hci_conn *conn;
-+
-+			conn = hci_conn_hash_lookup_create_pa_sync(hdev);
-+			if (conn && conn->sid == HCI_SID_INVALID)
-+				conn->sid = info->sid;
-+		}
-+
- 		if (legacy_evt_type != LE_ADV_INVALID) {
- 			process_adv_report(hdev, legacy_evt_type, &info->bdaddr,
- 					   info->bdaddr_type, NULL, 0,
-@@ -7144,7 +7155,8 @@ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
- 
- 	/* Only match event if command OGF is for LE */
- 	if (hdev->req_skb &&
--	    hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) == 0x08 &&
-+	   (hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) == 0x08 ||
-+	    hci_skb_opcode(hdev->req_skb) == HCI_OP_NOP) &&
- 	    hci_skb_event(hdev->req_skb) == ev->subevent) {
- 		*opcode = hci_skb_opcode(hdev->req_skb);
- 		hci_req_cmd_complete(hdev, *opcode, 0x00, req_complete,
-@@ -7500,8 +7512,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		goto done;
- 	}
- 
-+	hci_dev_lock(hdev);
- 	kfree_skb(hdev->recv_event);
- 	hdev->recv_event = skb_clone(skb, GFP_KERNEL);
-+	hci_dev_unlock(hdev);
- 
- 	event = hdr->evt;
- 	if (!event) {
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index e56b1cbedab9..d00ff18f3be0 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6898,20 +6898,37 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 
- static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- {
-+	struct hci_conn *conn = data;
-+	struct hci_conn *pa_sync;
-+
- 	bt_dev_dbg(hdev, "err %d", err);
- 
--	if (!err)
--		return;
--
--	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
--
- 	if (err == -ECANCELED)
- 		return;
- 
- 	hci_dev_lock(hdev);
- 
--	hci_update_passive_scan_sync(hdev);
-+	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
- 
-+	if (!hci_conn_valid(hdev, conn))
-+		clear_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags);
-+
-+	if (!err)
-+		goto unlock;
-+
-+	/* Add connection to indicate PA sync error */
-+	pa_sync = hci_conn_add_unset(hdev, ISO_LINK, BDADDR_ANY,
-+				     HCI_ROLE_SLAVE);
-+
-+	if (IS_ERR(pa_sync))
-+		goto unlock;
-+
-+	set_bit(HCI_CONN_PA_SYNC_FAILED, &pa_sync->flags);
-+
-+	/* Notify iso layer */
-+	hci_connect_cfm(pa_sync, bt_status(err));
-+
-+unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -6925,9 +6942,23 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 	if (!hci_conn_valid(hdev, conn))
- 		return -ECANCELED;
- 
-+	if (conn->sync_handle != HCI_SYNC_HANDLE_INVALID)
-+		return -EINVAL;
-+
- 	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
- 		return -EBUSY;
- 
-+	/* Stop scanning if SID has not been set and active scanning is enabled
-+	 * so we use passive scanning which will be scanning using the allow
-+	 * list programmed to contain only the connection address.
-+	 */
-+	if (conn->sid == HCI_SID_INVALID &&
-+	    hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
-+		hci_scan_disable_sync(hdev);
-+		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+	}
-+
- 	/* Mark HCI_CONN_CREATE_PA_SYNC so hci_update_passive_scan_sync can
- 	 * program the address in the allow list so PA advertisements can be
- 	 * received.
-@@ -6936,6 +6967,14 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 
- 	hci_update_passive_scan_sync(hdev);
- 
-+	/* SID has not been set listen for HCI_EV_LE_EXT_ADV_REPORT to update
-+	 * it.
-+	 */
-+	if (conn->sid == HCI_SID_INVALID)
-+		__hci_cmd_sync_status_sk(hdev, HCI_OP_NOP, 0, NULL,
-+					 HCI_EV_LE_EXT_ADV_REPORT,
-+					 conn->conn_timeout, NULL);
-+
- 	memset(&cp, 0, sizeof(cp));
- 	cp.options = qos->bcast.options;
- 	cp.sid = conn->sid;
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 2819cda616bc..7c0012ce1b89 100644
+index 7c0012ce1b89..2f348f48e99d 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -941,7 +941,7 @@ static int iso_sock_bind_bc(struct socket *sock, struct sockaddr *addr,
- 
- 	iso_pi(sk)->dst_type = sa->iso_bc->bc_bdaddr_type;
- 
--	if (sa->iso_bc->bc_sid > 0x0f)
-+	if (sa->iso_bc->bc_sid > 0x0f && sa->iso_bc->bc_sid != HCI_SID_INVALID)
- 		return -EINVAL;
- 
- 	iso_pi(sk)->bc_sid = sa->iso_bc->bc_sid;
-@@ -2029,6 +2029,9 @@ static bool iso_match_sid(struct sock *sk, void *data)
+@@ -1330,6 +1330,7 @@ static int iso_sock_getname(struct socket *sock, struct sockaddr *addr,
  {
- 	struct hci_ev_le_pa_sync_established *ev = data;
+ 	struct sockaddr_iso *sa = (struct sockaddr_iso *)addr;
+ 	struct sock *sk = sock->sk;
++	int len = sizeof(struct sockaddr_iso);
  
-+	if (iso_pi(sk)->bc_sid == HCI_SID_INVALID)
-+		return true;
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+ 
+@@ -1338,12 +1339,20 @@ static int iso_sock_getname(struct socket *sock, struct sockaddr *addr,
+ 	if (peer) {
+ 		bacpy(&sa->iso_bdaddr, &iso_pi(sk)->dst);
+ 		sa->iso_bdaddr_type = iso_pi(sk)->dst_type;
 +
- 	return ev->sid == iso_pi(sk)->bc_sid;
++		if (test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags)) {
++			sa->iso_bc->bc_sid = iso_pi(sk)->bc_sid;
++			sa->iso_bc->bc_num_bis = iso_pi(sk)->bc_num_bis;
++			memcpy(sa->iso_bc->bc_bis, iso_pi(sk)->bc_bis,
++			       ISO_MAX_NUM_BIS);
++			len += sizeof(struct sockaddr_iso_bc);
++		}
+ 	} else {
+ 		bacpy(&sa->iso_bdaddr, &iso_pi(sk)->src);
+ 		sa->iso_bdaddr_type = iso_pi(sk)->src_type;
+ 	}
+ 
+-	return sizeof(struct sockaddr_iso);
++	return len;
  }
  
-@@ -2075,8 +2078,10 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 	if (ev1) {
- 		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
- 				  iso_match_sid, ev1);
--		if (sk && !ev1->status)
-+		if (sk && !ev1->status) {
- 			iso_pi(sk)->sync_handle = le16_to_cpu(ev1->handle);
-+			iso_pi(sk)->bc_sid = ev1->sid;
-+		}
+ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+@@ -1988,11 +1997,13 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 			hcon->dst_type = iso_pi(parent)->dst_type;
+ 		}
  
- 		goto done;
- 	}
+-		if (ev3) {
++		if (test_bit(HCI_CONN_PA_SYNC, &hcon->flags)) {
+ 			iso_pi(sk)->qos = iso_pi(parent)->qos;
+ 			hcon->iso_qos = iso_pi(sk)->qos;
++			iso_pi(sk)->bc_sid = iso_pi(parent)->bc_sid;
+ 			iso_pi(sk)->bc_num_bis = iso_pi(parent)->bc_num_bis;
+-			memcpy(iso_pi(sk)->bc_bis, iso_pi(parent)->bc_bis, ISO_MAX_NUM_BIS);
++			memcpy(iso_pi(sk)->bc_bis, iso_pi(parent)->bc_bis,
++			       ISO_MAX_NUM_BIS);
+ 			set_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags);
+ 		}
+ 
 -- 
 2.49.0
 
