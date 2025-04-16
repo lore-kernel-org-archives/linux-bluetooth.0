@@ -1,68 +1,68 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C717822577C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 19:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FFD2253A8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 19:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744833334; cv=none; b=M22neXVGAZ3lphjPY7a8qMftznllaDT54cfFHzw8ys2QTDPXeykopVLgmy6eceD+tiJSSoPjDrLXEYBOfLZ/ijcSIpOP0rTAuhdMuymlTFFHL6gpkS3eBRBFn8EylU7kk8lei2fZ7csXmNdCVX2wn0Zdkr4/nVI3RcWfSe7zPH8=
+	t=1744833336; cv=none; b=o7jUPcfl+Ueqf7AXvhOXMmff4bZOI9V0E/6P2ak4weokP+o3Gb3q8mtZHmTnVtkWndd6xVW9nOlVZd5DOkiBv2v8j0bTv3cnePWD55Es6Stn5UxINBRhkNVvtaqWWnvwvRYPSNJjivE3CdsJJCQDOc5xlSQLk7NY0FkrvUYFEKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744833334; c=relaxed/simple;
-	bh=VMEuZTQb6T+TjQeDLHhqLk9mlXAxqIWTBWdaHRCtmcI=;
+	s=arc-20240116; t=1744833336; c=relaxed/simple;
+	bh=wRhT4AdPU5EIaOJZDvmnouNPUQSbhXuIGhIefDVWwBg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nu+JeahXZHstYOTsQFFafgSQeyCkb8JNuy5j6fWZ0HGyRJ1LVQZRugCcpTfCtLg4ym4hWFgSTYAnVSRrBIfyXCQfokzAURpnwazN8NRKWkeZWbckdMaGwTPclHwu0n2p/5gnPSgcy+aMB8yoq0uxIWZvdRV3BOfudJEnsv9b/EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzzDiFj0; arc=none smtp.client-ip=209.85.222.45
+	 MIME-Version; b=TVw64oKgCxiDB4FXPr/dlwwTHFCXrgD8PP61OOeSDH63N9YJ4DBWSq4tvsun+3U5X4wgXqmjNHwVdgqUpbDQdufsVjjAjJT39cFuEbnpvGoM5MECpIwEVhOvJIubqnYouk1hT6Bc4l1BxqzpM2bZJ+U/tV55wamj98lSISySdqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vv0WJOkP; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzzDiFj0"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-86fbc8717fcso19770241.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 12:55:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vv0WJOkP"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-523de5611a3so19182e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 12:55:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744833331; x=1745438131; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744833333; x=1745438133; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zXNsW6tRxV5cSah1rHmuP2/qTkRVkWP7G7Itgz2s4dM=;
-        b=UzzDiFj02BsESYCKL0XVXp3d7gZdQGa6ZqCF+xXdpsB/KwSpBfAnzjamSwZHD5nNSN
-         j+OqRTHc8TZu0+XtOX+oMGccYwuYnQHB7w050VldYJS/nU6NGCug7znqFIpQMsHqf7ET
-         AUMGADD3ippMs+lnqrAiZElmhsI1i9OzBtDkJ3/mzYQ+LKGqHwyByZfeTCuB4zd2/IJz
-         xg/aXl3OPCDNTpY15WJmOTXgYJnrIpjn+DQPukJ9H9rlDDENjzVYqaR1fZ+4iYi4KMkm
-         +/3W8ejGZLP+KdA9rE+yOAj/vibnPy8OE943EV91w3LQCyTomh7B5uXUtPAN/e7fpC9Y
-         vd4w==
+        bh=VCcU0PHneyNkLmixqYfJgoG5ao/saRUq/QJk1Fqu+Tg=;
+        b=Vv0WJOkPT3GkftybRhtIvtB34GqOahRyv9jvb6RLK3FVmOMkqNcmzLRS198YS0d86F
+         aSOFxJmNRnjkB9PsMd43x3tLPNb1qJbQyflHNPQioQtMqclBVhPInB4s13Rls0nplAFM
+         W/Nv9xtMYRNDtusoDsMWR+IS+poxBaZh1aoMRzyvoEF0DXOhRGZtLYUMNhLXc+DfY4oN
+         yyjzKkgwSoLO77l82zy6Vl5P/bsIq/ldXL1Jgchxm0hDEcdRtSHYfAG1uYn/VCRCRDNR
+         3+frwb298q2ExLpFmugKJN1POtOyE3wEujJw0ky7E8bJKKx+/HW0h5IFsqS7W4CjLvkk
+         HWGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744833331; x=1745438131;
+        d=1e100.net; s=20230601; t=1744833333; x=1745438133;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zXNsW6tRxV5cSah1rHmuP2/qTkRVkWP7G7Itgz2s4dM=;
-        b=Iz0jNS1egsER0nuU2jeMsMkl3mAq6hkWNRIkuzmKvoAWbOYxzgYG4MBlK5UmKSIagA
-         6Yoji3D/MNePTFmnuy23f+eaidJPLh1DpEra8cLIo4ZSMti1OKvAvY9hWK4FUCPqwRrW
-         +i5xA0EKbVrxl7cqmNtSd/6UqpzasirJTB056rFE2ILz74b5fCLjc8LbBcqRTQ6SZ1T/
-         eMeaorsF/Wd2Uecye/xB7qk9h0/zJvC5ddQ4Io6ZmprdDMCp6oeNyQ7+cE+1GvNSCQq/
-         LZLexEVFeP4RTQyg3AVUUeHZyyMn9XBvFQR535TnDqiMT2rYxBHr7zRoVa3+HteJ7LZz
-         rI8Q==
-X-Gm-Message-State: AOJu0YyvDBOJkLz59iXBAP8qkwpBG0mFMWZGVHAVrExVf1kkDvx3nuKk
-	9BZ3OiiLfvaDieUA8boLeVbtIaGsvKETBweMIv2YE1UI71UEMHZTKe6ouC/F
-X-Gm-Gg: ASbGncsQhA9tSlI5xvgh4XnRddrFTVdWXa0+ZUCMnST0v69MDURp7gNzgbo1Gi+j1Og
-	1M5B8CS7DJRdLVHJDmAKnrffM7Gp1JGbEnkLYs520XHWn6qndJWlCs4LASecB2PBauvHAoJQYcS
-	Xo1Kr20dpw4hT29dh7auXhiBGv0EmgEpRGqKxfJKlx25FSMFMMUsUcZn9VbBQUTRlPU4qsXbT1g
-	xG1HBqj5CzA2un8JC4x1u4mXulFnNPOzrWF4/m01STXDBNwUb+/xpsSYCI/QsSE0BTP47w3dYnt
-	KCKHUL+bMiAxsNa+03GxVMRLrk/zfVe5Pevoex+60dUp8+15bYR3KpnGg2vinYvSTOWOqKtYHpS
-	bO+HaEe2wDQ==
-X-Google-Smtp-Source: AGHT+IHnwakQYqVzYDMdvE+Iq/OcGnVzYkEYRh8TTDAN8tw1etkixlMXnxnvLDOXv3C1CHXKnYQrmA==
-X-Received: by 2002:a67:f083:0:b0:4c2:fa6a:7e2d with SMTP id ada2fe7eead31-4cb591b80admr1959962137.1.1744833330760;
-        Wed, 16 Apr 2025 12:55:30 -0700 (PDT)
+        bh=VCcU0PHneyNkLmixqYfJgoG5ao/saRUq/QJk1Fqu+Tg=;
+        b=nylGvjBcpscyptzDwzFeS7Nn1+pOXwNXwJzEnnK33V2l39ffYxWcQYt9CQWCeTL3WZ
+         oC0UVoWyAaEaoIW5R2dZYyl5eZP6BgaM3H/xSPNJfQF9SBxNT5UA2fg4L67VYQSwq/Xz
+         5HJNiKoPGFocj5LOAlM8U6ZzwySfdj+CklsvVAHqapfIyR+ODcXYf2mSdOCz/ZQ00keQ
+         l8hBoaKFA98wkJj/VQFBy+Ui6LU7IV8j112i2R5bm+PtyyZrYaGY6kV20jAAqX2n9x5s
+         yd/oZHbCHEaAYGPaL1VFsAdlJMb0CdRYjJf5bslT69u5z1Hnrnwd/5zGe1a5X4UQ7MSE
+         3caw==
+X-Gm-Message-State: AOJu0YySwlsombTvClKiJOFFQLyQvHgxZdVHwSMCVrseDVAf6vtDzPWX
+	JMg461nf3jGOsGUwYJ1H89MSMKX4irSCv6VsJfGUcY6fT9ALsnuiAE4D7r3J
+X-Gm-Gg: ASbGncuGR+jdjaVaO6q2ye7UgrdLdgTQq06e5X8dXfyIWa0PCh9cW7uaSKqNOPzSyT5
+	mLYSOMk9Dff2mWCa+++u90vwlB0EdZsOi4SslRJDeM950f9K6URz/wrkQ6zRCxsl/QF9z+cJtTO
+	4BwS3vYkix05s8uWcHPh1NNxTasH7BeIyI8uH1i6wsNxdchDXQGulDJlYZlIbMyCeowTdcILkk2
+	XdCVqQGaGLdp2miWTUv+Uex4H0DK8DNcTbLIqpR7MQpEgj5iCy+CU7MeI2yl8LMfahEhDEUd1IJ
+	qNgWXxED0OvngvR/id02RXR6NqeeK5NRGbuLF1SIiLoaDcX2G6oa1UFwqA1m0UNHzPeo6mHto+V
+	7HqW9CAN48A==
+X-Google-Smtp-Source: AGHT+IECpkKxf0WboNfufh43HH2rB4iTqC3Pr9OCqLVsqmhN8EXszFw2KF0DShdMIoLfVOAWpJHUAg==
+X-Received: by 2002:a05:6122:32c9:b0:527:bc6b:35bb with SMTP id 71dfb90a1353d-5290de8d3eamr2751542e0c.3.1744833332598;
+        Wed, 16 Apr 2025 12:55:32 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87557281a80sm3243415241.27.2025.04.16.12.55.29
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87557281a80sm3243415241.27.2025.04.16.12.55.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 12:55:30 -0700 (PDT)
+        Wed, 16 Apr 2025 12:55:31 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 2/4] Bluetooth: hci_conn: Fix not setting timeout for BIG Create Sync
-Date: Wed, 16 Apr 2025 15:55:24 -0400
-Message-ID: <20250416195526.1989143-2-luiz.dentz@gmail.com>
+Subject: [PATCH v5 3/4] Bluetooth: ISO: Fix not using SID from adv report
+Date: Wed, 16 Apr 2025 15:55:25 -0400
+Message-ID: <20250416195526.1989143-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250416195526.1989143-1-luiz.dentz@gmail.com>
 References: <20250416195526.1989143-1-luiz.dentz@gmail.com>
@@ -76,339 +76,292 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-BIG Create Sync requires the command to just generates a status so this
-makes use of __hci_cmd_sync_status_sk to wait for
-HCI_EVT_LE_BIG_SYNC_ESTABLISHED, also because of this chance it is not
-longer necessary to use a custom method to serialize the process of
-creating the BIG sync since the cmd_work_sync itself ensures only one
-command would be pending which now awaits for
-HCI_EVT_LE_BIG_SYNC_ESTABLISHED before proceeding to next connection.
+Up until now it has been assumed that the application would be able to
+enter the advertising SID in sockaddr_iso_bc.bc_sid, but userspace has
+no access to SID since the likes of MGMT_EV_DEVICE_FOUND cannot carry
+it, so it was left unset (0x00) which means it would be unable to
+synchronize if the broadcast source is using a different SID e.g. 0x04:
 
-Fixes: 42ecf1947135 ("Bluetooth: ISO: Do not emit LE BIG Create Sync if previous is pending")
+> HCI Event: LE Meta Event (0x3e) plen 57
+      LE Extended Advertising Report (0x0d)
+        Num reports: 1
+        Entry 0
+          Event type: 0x0000
+            Props: 0x0000
+            Data status: Complete
+          Address type: Random (0x01)
+          Address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
+          Primary PHY: LE 1M
+          Secondary PHY: LE 2M
+          SID: 0x04
+          TX power: 127 dBm
+          RSSI: -55 dBm (0xc9)
+          Periodic advertising interval: 180.00 msec (0x0090)
+          Direct address type: Public (0x00)
+          Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+          Data length: 0x1f
+        06 16 52 18 5b 0b e1 05 16 56 18 04 00 11 30 4c  ..R.[....V....0L
+        75 69 7a 27 73 20 53 32 33 20 55 6c 74 72 61     uiz's S23 Ultra
+        Service Data: Broadcast Audio Announcement (0x1852)
+        Broadcast ID: 14748507 (0xe10b5b)
+        Service Data: Public Broadcast Announcement (0x1856)
+          Data[2]: 0400
+        Unknown EIR field 0x30[16]: 4c75697a27732053323320556c747261
+< HCI Command: LE Periodic Advertising Create Sync (0x08|0x0044) plen 14
+        Options: 0x0000
+        Use advertising SID, Advertiser Address Type and address
+        Reporting initially enabled
+        SID: 0x00 (<- Invalid)
+        Adv address type: Random (0x01)
+        Adv address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
+        Skip: 0x0000
+        Sync timeout: 20000 msec (0x07d0)
+        Sync CTE type: 0x0000
+
+So instead this changes now allow application to set HCI_SID_INVALID
+which will make hci_le_pa_create_sync to wait for a report, update the
+conn->sid using the report SID and only then issue PA create sync
+command:
+
+< HCI Command: LE Periodic Advertising Create Sync
+        Options: 0x0000
+        Use advertising SID, Advertiser Address Type and address
+        Reporting initially enabled
+        SID: 0x04
+        Adv address type: Random (0x01)
+        Adv address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
+        Skip: 0x0000
+        Sync timeout: 20000 msec (0x07d0)
+        Sync CTE type: 0x0000
+> HCI Event: LE Meta Event (0x3e) plen 16
+      LE Periodic Advertising Sync Established (0x0e)
+        Status: Success (0x00)
+        Sync handle: 64
+        Advertising SID: 0x04
+        Advertiser address type: Random (0x01)
+        Advertiser address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
+        Advertiser PHY: LE 2M (0x02)
+        Periodic advertising interval: 180.00 msec (0x0090)
+        Advertiser clock accuracy: 0x05
+
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci.h      |  2 +-
- include/net/bluetooth/hci_core.h |  7 ++-
- include/net/bluetooth/hci_sync.h |  1 +
- net/bluetooth/hci_conn.c         | 89 ++------------------------------
- net/bluetooth/hci_event.c        |  9 ++--
- net/bluetooth/hci_sync.c         | 63 ++++++++++++++++++++++
- net/bluetooth/iso.c              | 26 +++++-----
- 7 files changed, 88 insertions(+), 109 deletions(-)
+ net/bluetooth/hci_conn.c  |  2 ++
+ net/bluetooth/hci_core.c  | 13 +++++-----
+ net/bluetooth/hci_event.c | 16 +++++++++++-
+ net/bluetooth/hci_sync.c  | 51 ++++++++++++++++++++++++++++++++++-----
+ net/bluetooth/iso.c       |  9 +++++--
+ 5 files changed, 76 insertions(+), 15 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0e785047b1d4..2502febf4da7 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2833,7 +2833,7 @@ struct hci_evt_le_create_big_complete {
- 	__le16  bis_handle[];
- } __packed;
- 
--#define HCI_EVT_LE_BIG_SYNC_ESTABILISHED 0x1d
-+#define HCI_EVT_LE_BIG_SYNC_ESTABLISHED 0x1d
- struct hci_evt_le_big_sync_estabilished {
- 	__u8    status;
- 	__u8    handle;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1b016d5811a9..965ca1ca841c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1527,7 +1527,6 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
- void hci_sco_setup(struct hci_conn *conn, __u8 status);
- bool hci_iso_setup_path(struct hci_conn *conn);
- int hci_le_create_cis_pending(struct hci_dev *hdev);
--int hci_le_big_create_sync_pending(struct hci_dev *hdev);
- int hci_conn_check_create_cis(struct hci_conn *conn);
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
-@@ -1568,9 +1567,9 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 				 __u8 data_len, __u8 *data);
- struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- 		       __u8 dst_type, __u8 sid, struct bt_iso_qos *qos);
--int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
--			   struct bt_iso_qos *qos,
--			   __u16 sync_handle, __u8 num_bis, __u8 bis[]);
-+int hci_conn_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
-+			     struct bt_iso_qos *qos, __u16 sync_handle,
-+			     __u8 num_bis, __u8 bis[]);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 93dac4c7f9e3..72558c826aa1 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -187,3 +187,4 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 			    struct hci_conn_params *params);
- 
- int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn);
-+int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn);
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c3112ce39f67..6533e281ada3 100644
+index 6533e281ada3..08e060669c2b 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -2087,89 +2087,9 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- 	return conn;
- }
- 
--static bool hci_conn_check_create_big_sync(struct hci_conn *conn)
--{
--	if (!conn->num_bis)
--		return false;
--
--	return true;
--}
--
--static void big_create_sync_complete(struct hci_dev *hdev, void *data, int err)
--{
--	bt_dev_dbg(hdev, "");
--
--	if (err)
--		bt_dev_err(hdev, "Unable to create BIG sync: %d", err);
--}
--
--static int big_create_sync(struct hci_dev *hdev, void *data)
--{
--	DEFINE_FLEX(struct hci_cp_le_big_create_sync, pdu, bis, num_bis, 0x11);
--	struct hci_conn *conn;
--
--	rcu_read_lock();
--
--	pdu->num_bis = 0;
--
--	/* The spec allows only one pending LE BIG Create Sync command at
--	 * a time. If the command is pending now, don't do anything. We
--	 * check for pending connections after each BIG Sync Established
--	 * event.
--	 *
--	 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
--	 * page 2586:
--	 *
--	 * If the Host sends this command when the Controller is in the
--	 * process of synchronizing to any BIG, i.e. the HCI_LE_BIG_Sync_
--	 * Established event has not been generated, the Controller shall
--	 * return the error code Command Disallowed (0x0C).
--	 */
--	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
--		if (test_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags))
--			goto unlock;
--	}
--
--	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
--		if (hci_conn_check_create_big_sync(conn)) {
--			struct bt_iso_qos *qos = &conn->iso_qos;
--
--			set_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
--
--			pdu->handle = qos->bcast.big;
--			pdu->sync_handle = cpu_to_le16(conn->sync_handle);
--			pdu->encryption = qos->bcast.encryption;
--			memcpy(pdu->bcode, qos->bcast.bcode,
--			       sizeof(pdu->bcode));
--			pdu->mse = qos->bcast.mse;
--			pdu->timeout = cpu_to_le16(qos->bcast.timeout);
--			pdu->num_bis = conn->num_bis;
--			memcpy(pdu->bis, conn->bis, conn->num_bis);
--
--			break;
--		}
--	}
--
--unlock:
--	rcu_read_unlock();
--
--	if (!pdu->num_bis)
--		return 0;
--
--	return hci_send_cmd(hdev, HCI_OP_LE_BIG_CREATE_SYNC,
--			    struct_size(pdu, bis, pdu->num_bis), pdu);
--}
--
--int hci_le_big_create_sync_pending(struct hci_dev *hdev)
--{
--	/* Queue big_create_sync */
--	return hci_cmd_sync_queue_once(hdev, big_create_sync,
--				       NULL, big_create_sync_complete);
--}
--
--int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
--			   struct bt_iso_qos *qos,
--			   __u16 sync_handle, __u8 num_bis, __u8 bis[])
-+int hci_conn_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
-+			     struct bt_iso_qos *qos, __u16 sync_handle,
-+			     __u8 num_bis, __u8 bis[])
+@@ -2070,6 +2070,8 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
  {
- 	int err;
+ 	struct hci_conn *conn;
  
-@@ -2186,9 +2106,10 @@ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
- 
- 		hcon->num_bis = num_bis;
- 		memcpy(hcon->bis, bis, num_bis);
-+		hcon->conn_timeout = msecs_to_jiffies(qos->bcast.timeout * 10);
++	bt_dev_dbg(hdev, "dst %pMR type %d sid %d", dst, dst_type, sid);
++
+ 	conn = hci_conn_add_unset(hdev, ISO_LINK, dst, HCI_ROLE_SLAVE);
+ 	if (IS_ERR(conn))
+ 		return conn;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index df7d7bf32eb8..a58fd3bf8851 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4068,10 +4068,13 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+ 		return;
  	}
  
--	return hci_le_big_create_sync_pending(hdev);
-+	return hci_connect_big_sync(hdev, hcon);
+-	err = hci_send_frame(hdev, skb);
+-	if (err < 0) {
+-		hci_cmd_sync_cancel_sync(hdev, -err);
+-		return;
++	if (hci_skb_opcode(skb) != HCI_OP_NOP) {
++		err = hci_send_frame(hdev, skb);
++		if (err < 0) {
++			hci_cmd_sync_cancel_sync(hdev, -err);
++			return;
++		}
++		atomic_dec(&hdev->cmd_cnt);
+ 	}
+ 
+ 	if (hdev->req_status == HCI_REQ_PEND &&
+@@ -4079,8 +4082,6 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+ 		kfree_skb(hdev->req_skb);
+ 		hdev->req_skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
+ 	}
+-
+-	atomic_dec(&hdev->cmd_cnt);
  }
  
- static void create_big_complete(struct hci_dev *hdev, void *data, int err)
+ static void hci_cmd_work(struct work_struct *work)
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ea7ccafd055a..6d6061111ac5 100644
+index 6d6061111ac5..105d1446c9dc 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -6928,7 +6928,7 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 
- 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
- 
--	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_BIG_SYNC_ESTABILISHED,
-+	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_BIG_SYNC_ESTABLISHED,
- 				flex_array_size(ev, bis, ev->num_bis)))
- 		return;
- 
-@@ -6999,9 +6999,6 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+@@ -6340,6 +6340,17 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
+ 			info->secondary_phy &= 0x1f;
  		}
  
- unlock:
--	/* Handle any other pending BIG sync command */
--	hci_le_big_create_sync_pending(hdev);
++		/* Check if PA Sync is pending and if the hci_conn SID has not
++		 * been set update it.
++		 */
++		if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
++			struct hci_conn *conn;
++
++			conn = hci_conn_hash_lookup_create_pa_sync(hdev);
++			if (conn && conn->sid == HCI_SID_INVALID)
++				conn->sid = info->sid;
++		}
++
+ 		if (legacy_evt_type != LE_ADV_INVALID) {
+ 			process_adv_report(hdev, legacy_evt_type, &info->bdaddr,
+ 					   info->bdaddr_type, NULL, 0,
+@@ -7144,7 +7155,8 @@ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
+ 
+ 	/* Only match event if command OGF is for LE */
+ 	if (hdev->req_skb &&
+-	    hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) == 0x08 &&
++	   (hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) == 0x08 ||
++	    hci_skb_opcode(hdev->req_skb) == HCI_OP_NOP) &&
+ 	    hci_skb_event(hdev->req_skb) == ev->subevent) {
+ 		*opcode = hci_skb_opcode(hdev->req_skb);
+ 		hci_req_cmd_complete(hdev, *opcode, 0x00, req_complete,
+@@ -7500,8 +7512,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		goto done;
+ 	}
+ 
++	hci_dev_lock(hdev);
+ 	kfree_skb(hdev->recv_event);
+ 	hdev->recv_event = skb_clone(skb, GFP_KERNEL);
++	hci_dev_unlock(hdev);
+ 
+ 	event = hdr->evt;
+ 	if (!event) {
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index e56b1cbedab9..d00ff18f3be0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -6898,20 +6898,37 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 
+ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
+ {
++	struct hci_conn *conn = data;
++	struct hci_conn *pa_sync;
++
+ 	bt_dev_dbg(hdev, "err %d", err);
+ 
+-	if (!err)
+-		return;
 -
+-	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
+-
+ 	if (err == -ECANCELED)
+ 		return;
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	hci_update_passive_scan_sync(hdev);
++	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
+ 
++	if (!hci_conn_valid(hdev, conn))
++		clear_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags);
++
++	if (!err)
++		goto unlock;
++
++	/* Add connection to indicate PA sync error */
++	pa_sync = hci_conn_add_unset(hdev, ISO_LINK, BDADDR_ANY,
++				     HCI_ROLE_SLAVE);
++
++	if (IS_ERR(pa_sync))
++		goto unlock;
++
++	set_bit(HCI_CONN_PA_SYNC_FAILED, &pa_sync->flags);
++
++	/* Notify iso layer */
++	hci_connect_cfm(pa_sync, bt_status(err));
++
++unlock:
  	hci_dev_unlock(hdev);
  }
  
-@@ -7123,8 +7120,8 @@ static const struct hci_le_ev {
- 		     hci_le_create_big_complete_evt,
- 		     sizeof(struct hci_evt_le_create_big_complete),
- 		     HCI_MAX_EVENT_SIZE),
--	/* [0x1d = HCI_EV_LE_BIG_SYNC_ESTABILISHED] */
--	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_ESTABILISHED,
-+	/* [0x1d = HCI_EV_LE_BIG_SYNC_ESTABLISHED] */
-+	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_ESTABLISHED,
- 		     hci_le_big_sync_established_evt,
- 		     sizeof(struct hci_evt_le_big_sync_estabilished),
- 		     HCI_MAX_EVENT_SIZE),
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 99c116b056ce..e56b1cbedab9 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6972,3 +6972,66 @@ int hci_connect_pa_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	return hci_cmd_sync_queue_once(hdev, hci_le_pa_create_sync, conn,
- 				       create_pa_complete);
- }
+@@ -6925,9 +6942,23 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
+ 	if (!hci_conn_valid(hdev, conn))
+ 		return -ECANCELED;
+ 
++	if (conn->sync_handle != HCI_SYNC_HANDLE_INVALID)
++		return -EINVAL;
 +
-+static void create_big_complete(struct hci_dev *hdev, void *data, int err)
-+{
-+	struct hci_conn *conn = data;
-+
-+	bt_dev_dbg(hdev, "err %d", err);
-+
-+	if (err == -ECANCELED)
-+		return;
-+
-+	if (hci_conn_valid(hdev, conn))
-+		clear_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
-+}
-+
-+static int hci_le_big_create_sync(struct hci_dev *hdev, void *data)
-+{
-+	DEFINE_FLEX(struct hci_cp_le_big_create_sync, cp, bis, num_bis, 0x11);
-+	struct hci_conn *conn = data;
-+	struct bt_iso_qos *qos = &conn->iso_qos;
-+	int err;
-+
-+	if (!hci_conn_valid(hdev, conn))
-+		return -ECANCELED;
-+
-+	set_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
-+
-+	memset(cp, 0, sizeof(*cp));
-+	cp->handle = qos->bcast.big;
-+	cp->sync_handle = cpu_to_le16(conn->sync_handle);
-+	cp->encryption = qos->bcast.encryption;
-+	memcpy(cp->bcode, qos->bcast.bcode, sizeof(cp->bcode));
-+	cp->mse = qos->bcast.mse;
-+	cp->timeout = cpu_to_le16(qos->bcast.timeout);
-+	cp->num_bis = conn->num_bis;
-+	memcpy(cp->bis, conn->bis, conn->num_bis);
-+
-+	/* The spec allows only one pending LE BIG Create Sync command at
-+	 * a time, so we forcefully wait for BIG Sync Established event since
-+	 * cmd_work can only schedule one command at a time.
-+	 *
-+	 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-+	 * page 2586:
-+	 *
-+	 * If the Host sends this command when the Controller is in the
-+	 * process of synchronizing to any BIG, i.e. the HCI_LE_BIG_Sync_
-+	 * Established event has not been generated, the Controller shall
-+	 * return the error code Command Disallowed (0x0C).
+ 	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
+ 		return -EBUSY;
+ 
++	/* Stop scanning if SID has not been set and active scanning is enabled
++	 * so we use passive scanning which will be scanning using the allow
++	 * list programmed to contain only the connection address.
 +	 */
-+	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_BIG_CREATE_SYNC,
-+				       struct_size(cp, bis, cp->num_bis), cp,
-+				       HCI_EVT_LE_BIG_SYNC_ESTABLISHED,
-+				       conn->conn_timeout, NULL);
-+	if (err == -ETIMEDOUT)
-+		hci_le_big_terminate_sync(hdev, cp->handle);
++	if (conn->sid == HCI_SID_INVALID &&
++	    hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
++		hci_scan_disable_sync(hdev);
++		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
++		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++	}
 +
-+	return err;
-+}
+ 	/* Mark HCI_CONN_CREATE_PA_SYNC so hci_update_passive_scan_sync can
+ 	 * program the address in the allow list so PA advertisements can be
+ 	 * received.
+@@ -6936,6 +6967,14 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
+ 
+ 	hci_update_passive_scan_sync(hdev);
+ 
++	/* SID has not been set listen for HCI_EV_LE_EXT_ADV_REPORT to update
++	 * it.
++	 */
++	if (conn->sid == HCI_SID_INVALID)
++		__hci_cmd_sync_status_sk(hdev, HCI_OP_NOP, 0, NULL,
++					 HCI_EV_LE_EXT_ADV_REPORT,
++					 conn->conn_timeout, NULL);
 +
-+int hci_connect_big_sync(struct hci_dev *hdev, struct hci_conn *conn)
-+{
-+	return hci_cmd_sync_queue_once(hdev, hci_le_big_create_sync, conn,
-+				       create_big_complete);
-+}
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.options = qos->bcast.options;
+ 	cp.sid = conn->sid;
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 3501a991f1c6..2819cda616bc 100644
+index 2819cda616bc..7c0012ce1b89 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -1462,14 +1462,13 @@ static void iso_conn_big_sync(struct sock *sk)
- 	lock_sock(sk);
+@@ -941,7 +941,7 @@ static int iso_sock_bind_bc(struct socket *sock, struct sockaddr *addr,
  
- 	if (!test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
--		err = hci_le_big_create_sync(hdev, iso_pi(sk)->conn->hcon,
--					     &iso_pi(sk)->qos,
--					     iso_pi(sk)->sync_handle,
--					     iso_pi(sk)->bc_num_bis,
--					     iso_pi(sk)->bc_bis);
-+		err = hci_conn_big_create_sync(hdev, iso_pi(sk)->conn->hcon,
-+					       &iso_pi(sk)->qos,
-+					       iso_pi(sk)->sync_handle,
-+					       iso_pi(sk)->bc_num_bis,
-+					       iso_pi(sk)->bc_bis);
- 		if (err)
--			bt_dev_err(hdev, "hci_le_big_create_sync: %d",
--				   err);
-+			bt_dev_err(hdev, "hci_big_create_sync: %d", err);
+ 	iso_pi(sk)->dst_type = sa->iso_bc->bc_bdaddr_type;
+ 
+-	if (sa->iso_bc->bc_sid > 0x0f)
++	if (sa->iso_bc->bc_sid > 0x0f && sa->iso_bc->bc_sid != HCI_SID_INVALID)
+ 		return -EINVAL;
+ 
+ 	iso_pi(sk)->bc_sid = sa->iso_bc->bc_sid;
+@@ -2029,6 +2029,9 @@ static bool iso_match_sid(struct sock *sk, void *data)
+ {
+ 	struct hci_ev_le_pa_sync_established *ev = data;
+ 
++	if (iso_pi(sk)->bc_sid == HCI_SID_INVALID)
++		return true;
++
+ 	return ev->sid == iso_pi(sk)->bc_sid;
+ }
+ 
+@@ -2075,8 +2078,10 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	if (ev1) {
+ 		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
+ 				  iso_match_sid, ev1);
+-		if (sk && !ev1->status)
++		if (sk && !ev1->status) {
+ 			iso_pi(sk)->sync_handle = le16_to_cpu(ev1->handle);
++			iso_pi(sk)->bc_sid = ev1->sid;
++		}
+ 
+ 		goto done;
  	}
- 
- 	release_sock(sk);
-@@ -1922,7 +1921,7 @@ static void iso_conn_ready(struct iso_conn *conn)
- 					      hcon);
- 		} else if (test_bit(HCI_CONN_BIG_SYNC_FAILED, &hcon->flags)) {
- 			ev = hci_recv_event_data(hcon->hdev,
--						 HCI_EVT_LE_BIG_SYNC_ESTABILISHED);
-+						 HCI_EVT_LE_BIG_SYNC_ESTABLISHED);
- 
- 			/* Get reference to PA sync parent socket, if it exists */
- 			parent = iso_get_sock(&hcon->src, &hcon->dst,
-@@ -2113,12 +2112,11 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 
- 			if (!test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags) &&
- 			    !test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
--				err = hci_le_big_create_sync(hdev,
--							     hcon,
--							     &iso_pi(sk)->qos,
--							     iso_pi(sk)->sync_handle,
--							     iso_pi(sk)->bc_num_bis,
--							     iso_pi(sk)->bc_bis);
-+				err = hci_conn_big_create_sync(hdev, hcon,
-+							       &iso_pi(sk)->qos,
-+							       iso_pi(sk)->sync_handle,
-+							       iso_pi(sk)->bc_num_bis,
-+							       iso_pi(sk)->bc_bis);
- 				if (err) {
- 					bt_dev_err(hdev, "hci_le_big_create_sync: %d",
- 						   err);
 -- 
 2.49.0
 
