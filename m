@@ -1,140 +1,105 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD8C2045B7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 15:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24917204F8A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 16:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744818912; cv=none; b=TZeHXJhX+ihv0+Rya5Udjs50fRU3Hhw9R2B/GdXn9bJ/wJaxgz6Q69/zKIKeAzBsBpsmXINch1+JHNBFBHmxbQArMpb2KgZJU5F6OATTKGySolXqCIUfn26wHAJIGxofci+ylJELMVVjKI0d6WHcbE7rWto3YPd4zg9n+mvhmN0=
+	t=1744819479; cv=none; b=qmjCwwgZj1ziwb7wVA3w1KeLmnrHSUGFaBNyv/SxIZ9RYmg92RmW5/RwvaviZPijqEVNsVj+U3tRGZqn2e4/2rRrIdcvk+MkMT+0OcVqi3WkG+p/miHUYiY6WhD11KnD8jdugOpcMEZyLdYelK7/PupAcanpPNGw6PM9B2L27eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744818912; c=relaxed/simple;
-	bh=iAQPmX16cDOzwPLlIilGb02YB41RjtdOLemfhmEP33k=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ku1vOq+gEMqdjiPO9tFfvU1pPrIaTErDeBWF9EYPsRjpzjE5HO4I+8no3t2k6sXFK/XP1TY8f20zJ56GXvVWWnwQS5Flx2CD7Mtquve1r+SUl1D8GY8NFqKY9pkAlUxkRa5avKYxamBQvJ7NyQ4j131b+Fz3QYMx53GwQe9rrzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=dVKL2kdQ; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1744819479; c=relaxed/simple;
+	bh=r32oAtmJV4GUBVTcyRweY8W3ZwcYF9lzM96+0PEcaBo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dTzedM3Dj0GFLlO+JwJHG2V4iIeQ4K/gJIg9+48IPxzQ9lzw6802zOGrv+1D72BMU8eiLjx2TfjuuuGUABbTrzwFJkeG4IpJeP3EA8Ymq0mJHMa0Dkny+uJ+cAd4dO/DJyN5rrc2gx8psF07cBAm6w0P1MHIQgYyMX/gi37AFfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DyD2pVI6; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="dVKL2kdQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1744818908;
-	bh=iAQPmX16cDOzwPLlIilGb02YB41RjtdOLemfhmEP33k=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=dVKL2kdQGNOL5MMgmyyzhtu1bG5ENwNicahrL4JlSwNvm33IAv/My09VZozdSzkxg
-	 r9/tF8TLXDmiC0BL5EKFAT8xMRHmkTe2XdxMvehxmqnPNLc8t3AbS2M2a25Fyo6BZJ
-	 vfUQr2uQOQSQVmVWT2RwNUB1RK6FsTwDz15l+ZDUAKQJnc/EDBqTkdXDH5AycBO+Cn
-	 QQrvF2QIQS40d0gs1kaa+5fiW7NoHyX2kYx1ooLkXW2uyBjqKvxxv1qHZmLHUj28vK
-	 0NWyseYYj0+zF9hG36seuRjJmecsDoar0xgwVDPh5P94IX1CXE/NjE8ccqzE+KiPhQ
-	 UbW81Cl4Ej2Mw==
-Received: from fdanis-XPS-13-9370.. (2a02-8428-af44-1001-B876-6480-8eAf-ACd0.rev.sfr.net [IPv6:2a02:8428:af44:1001:b876:6480:8eaf:acd0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3EE4017E09B5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 17:55:08 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyD2pVI6"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-72ecb4d9a10so124538a34.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 09:04:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744819476; x=1745424276; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aO8ssM0dfDJUhN473dOwaJoGRWoeMmAGYDR1boXBPUI=;
+        b=DyD2pVI6eqDrC97fgNCjdaPbDeqyhEOUY7Wg50khWhcsJBwjdcMo0IzwOW67Nr6y+c
+         0+JBJ7OCH/Z25yTIr+M06myraYEBJaDeLOvYwg7Rdfuo06+w1gbSgeySQLgUqyKNCB7N
+         ckguXfcggic4v12jMOALWg8sCqEzZ0usjOtYORS8mmVpy0h7A6qemcUYVwmkeohCO2w8
+         vdS6NqDMc6hEp/ck1t1u79ncJIVeG8VjpPj8+kiQ6z1IxlQbQ7th5BHkPS8MjGiHl3wm
+         eHk7V2qbZ7qXfxzC1KgMwKFK/6ZuvZrBv8kvNCt3xRLHHXRiBMFcEB7lvhbzpubXYrmM
+         vBLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744819476; x=1745424276;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aO8ssM0dfDJUhN473dOwaJoGRWoeMmAGYDR1boXBPUI=;
+        b=kp+IeOsunhLtFMYF/lUVCNmXUZnTz2jdA66iJ4RvUQ50j09QrsofsrtHpsZCBrgomr
+         GdwrV0WUrlrF7ZhQKeUqlwXASRsEoTk9kz3itjZTW3nx7QpInSadasOFsytHjy7SVHCj
+         PYHow3MJ1JMWPxJg3poUmeRp2Q9JwJWTmZ7NBQsZG4FiEKTf5kQYhhlZtqVXGlZfJWDp
+         54JBs7FtznOOYhw5B7xUqc0GlFMFurvioUNHBfBC088dZ8UbTTw2F7RrRy4riIRcdgMy
+         aFHFOFaAZKUOtXMFIE6cBwiYf34KTRxBitnur36P25OBKjTD5Wqi2Oh4AZBW2sYN2+Me
+         QMdg==
+X-Gm-Message-State: AOJu0YxlukUQ2IcyOdOvgOeShQeyBMwj31V1OBvFEevZ14LbU4Az+fJu
+	6Mi0i+qmdMch66ru+t20V0rEhiLzWAaEvlUl+teN0oJfTmHianphCA28FOI5
+X-Gm-Gg: ASbGncsUIUa3IwdjqlnOjrF/TkvmlGq7b0gEWD5tao12OGAYTbGVFEAia0g8qmQQ048
+	OeOxyPPCeK9ETR4yeCLYlfFidpINBXWeWKjurOCFw78oD1KqsWIiYpHTgrvqZqSFkW8+xPVXClz
+	5xD6xDbjzwkcPXl3trQDT7FkCik5y6tSK/xR3yjYbZBk8+FcY6gmQfMn3hBWUW1vulc9r+BnLzz
+	/W7ZYK5mo2I0zoUT/yna3FOv78DOFOe2wN1c064pTGL2RsTRH1QwpdOuZJyDCYi06Ft10q0KbGo
+	dXDZgW/tldC+WoQhmjO/SnXe49WTg+fokRvalDW5AGeStMpwO4dJw/RQ0xhZqSNbdbCIzamoCop
+	7+HyhQNIAMQ==
+X-Google-Smtp-Source: AGHT+IF8U5ZYKhkFSkpYiKWxsc31+YvpwJxNxmjUzfjSTaYaIPcDgzE0Qe7H5HbAcnM7WK8uF0uZtA==
+X-Received: by 2002:a05:6830:6f85:b0:727:33e9:322a with SMTP id 46e09a7af769-72ec6c36a4amr1531691a34.16.1744819475845;
+        Wed, 16 Apr 2025 09:04:35 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c9c98afd43sm3094029137.20.2025.04.16.09.04.34
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 09:04:35 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] input: device: Browse SDP records if not cached
-Date: Wed, 16 Apr 2025 17:55:02 +0200
-Message-ID: <20250416155503.250763-2-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250416155503.250763-1-frederic.danis@collabora.com>
-References: <20250416155503.250763-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 1/7] bap: Fix not setting SID for broadcast receiver
+Date: Wed, 16 Apr 2025 12:04:27 -0400
+Message-ID: <20250416160433.1822263-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-For a HID paired device, if the cache file containing the SDP records
-is not present this will prevent the device to connect and need to
-remove it and pair again.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Current bluetoothd traces:
-src/shared/mgmt.c:can_read_data() [0x0000] event 0x000b
-src/adapter.c:connected_callback() hci0 device EC:83:50:76:BD:67
-  connected eir_len 31
-src/shared/mgmt.c:can_read_data() [0x0000] event 0x0006
-profiles/input/server.c:connect_event_cb() Incoming connection from
-  EC:83:50:76:BD:67 on PSM 17
-profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
-  psm 17
-profiles/input/server.c:confirm_event_cb()
-profiles/input/server.c:connect_event_cb() Incoming connection from
-  EC:83:50:76:BD:67 on PSM 19
-profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
-  psm 19
-profiles/input/device.c:hidp_add_connection() Could not parse HID SDP
-  record: No such file or directory (2)
-profiles/input/device.c:ctrl_watch_cb() Device EC:83:50:76:BD:67
-  disconnected
-profiles/input/device.c:intr_watch_cb() Device EC:83:50:76:BD:67
-  disconnected
-
-This commit tries to retrieve the SDP record from the remote HID then
-to add the HIDP connection.
+SID most be set otherwise 0x00 is assume which may not be what the
+broadcast source is using over the air. but since we don't have access
+to the SID of the advertisement in userspace mark de SID as invalid
+(0xff) so the kernel fill it up while scanning when creating the PA
+sync.
 ---
- profiles/input/device.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ profiles/audio/bap.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index b162c0bc7..c1bb5588d 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -86,6 +86,7 @@ struct input_device {
- 	bool			virtual_cable_unplug;
- 	uint8_t			type;
- 	unsigned int		idle_timer;
-+	bool			sdp_rediscover;
- };
- 
- static int idle_timeout = 0;
-@@ -1045,6 +1046,22 @@ static gboolean encrypt_notify(GIOChannel *io, GIOCondition condition,
- 	return FALSE;
- }
- 
-+static void input_device_update_rec(struct input_device *idev);
-+static int hidp_add_connection(struct input_device *idev);
-+
-+static void hidp_sdp_cb(struct btd_device *dev, int err, void *user_data)
-+{
-+	struct input_device *idev = user_data;
-+
-+	DBG("");
-+
-+	/* Attempt to update SDP record if it had changed */
-+	input_device_update_rec(idev);
-+
-+	if (hidp_add_connection(idev) < 0)
-+		btd_service_disconnect(idev->service);
-+}
-+
- static int hidp_add_connection(struct input_device *idev)
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index fd9b751cc1bf..24763666ce96 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -2813,6 +2813,7 @@ static void bap_detached(struct bt_bap *bap, void *user_data)
+ static int pa_sync(struct bap_data *data)
  {
- 	struct hidp_connadd_req *req;
-@@ -1061,6 +1078,18 @@ static int hidp_add_connection(struct input_device *idev)
- 	if (err < 0) {
- 		error("Could not parse HID SDP record: %s (%d)", strerror(-err),
- 									-err);
-+		if (err == -ENOENT && !idev->sdp_rediscover) {
-+			err = device_discover_services(idev->device);
-+			if (err < 0) {
-+				error("Could not discover services: %s (%d)",
-+							strerror(-err), -err);
-+				goto cleanup;
-+			}
-+
-+			idev->sdp_rediscover = TRUE;
-+			device_wait_for_svc_complete(idev->device,
-+				hidp_sdp_cb, idev);
-+		}
- 		goto cleanup;
- 	}
+ 	GError *err = NULL;
++	uint8_t sid = 0xff;
  
+ 	if (data->listen_io) {
+ 		DBG("Already probed");
+@@ -2833,6 +2834,7 @@ static int pa_sync(struct bap_data *data)
+ 		btd_device_get_bdaddr_type(data->device),
+ 		BT_IO_OPT_MODE, BT_IO_MODE_ISO,
+ 		BT_IO_OPT_QOS, &bap_sink_pa_qos,
++		BT_IO_OPT_ISO_BC_SID, sid,
+ 		BT_IO_OPT_INVALID);
+ 	if (!data->listen_io) {
+ 		error("%s", err->message);
 -- 
-2.43.0
+2.49.0
 
