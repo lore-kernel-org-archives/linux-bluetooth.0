@@ -1,110 +1,87 @@
-Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E401C27
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 17:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924B0221D8B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 18:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744826188; cv=none; b=Q7Bsj4RuQYRNIKUimmxuGt+9kNbkIxKu/R66YoN6Bi8Bl7Rs8Eh4jpasoTUfEoa+5DmRodojcG+fvhwKNPhk5mApuxhd5tMoHsAIMp35NgHptfPfo+7UDs9JwjSBDEYI8tc98ioz/S2+s+aIuldVpNWLRee/8r5AlGUPsVLItac=
+	t=1744829997; cv=none; b=LwzDzuHLT+8Ue5eFPWUdiW/QXJetW9/LpTyCb++a4UgG24FVsM+eTSEEx8Fh1E4vW84lBH7352VWSJgNG/zuSb0q9zRrFojkhN20bySlIaQhYTLon19onuEbuMxUhoR3CG+PljU+lMWlYqU4sz/DRa+0UkJiRUR2ENNSXURYY8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744826188; c=relaxed/simple;
-	bh=Iu7cIEbX0+E1gvaP6omapnU4mVli9zg1DmU1vbIk6Qs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uwAaPoRB6IGmZDZ3fq5rSupIeLGfOdJRFmmk7u7SH/2V2AfXm3ngtRdDWi+yygzDKQLc5ow/tLDT0oYztRG68RzERER2PR0e6SQTwhWwx4yzX0SODIlMNVJkTI+iTZ+uA1bXvrGBltk8Q3po9aud6ntaY9EC8FfypWwa/GuKPt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
-Received: from 1.b.9.e.f.d.5.5.7.e.f.c.1.f.7.2.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:27f1:cfe7:55df:e9b1] helo=[IPV6:fd34:5ae5:dfe:ae11::1])
-	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
-	(envelope-from <kernel.org@pileofstuff.org>)
-	id 1u56zl-009mxM-1r;
-	Wed, 16 Apr 2025 18:56:21 +0100
-Message-ID: <d6936cb9-c246-46b6-bdb8-95429147c6e3@pileofstuff.org>
-Date: Wed, 16 Apr 2025 18:56:20 +0100
+	s=arc-20240116; t=1744829997; c=relaxed/simple;
+	bh=JaFLnCxjqQ7osLntXEYuSeYeue4K/Ge5NEdeS7KwF8w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JCGXbw5+ICqu279tGUvfbas+d73ldWERCz5SQgpzUxRCNfyX6FqEEBHlBrrCyV4lOptLThGnOASbcglBYao3bk58uYSmBPCsujy3AZy2i7+RsOKng4bqFve8QTWp0fwhxqoy7GNGZSnps8nW4pLzxipjjXz1Sy1qUdQEQpdj1ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZ5Yx3vT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZ5Yx3vT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 067B4C4CEE2;
+	Wed, 16 Apr 2025 18:59:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744829997;
+	bh=JaFLnCxjqQ7osLntXEYuSeYeue4K/Ge5NEdeS7KwF8w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cZ5Yx3vTT8Gbxe34j+IVojEMQV7NZyDj65Ozx1V2OgCweU6JtyMiGbUiyB3hUfF6n
+	 fzXJ5iZSGU1E7/xatEco7OTl83r9CuBh4bnjOz4GXbdYhfuYCs2deYue0w74AVVSoB
+	 YHtzND201Jo6xKFTn0AIAVAtP6N6BwY8+dI2JNdBOpptUcRKYhaEvdr2qR4dCiSvKj
+	 Ktnkyyl/0CTOEiubcFRsWMV0K/be2xAjVbWVZAJ/aOR2ZZX/2XMwE3koq4Fa1Zv31l
+	 yz8Ec8P3Y+k/XMxhkwBNe3ykC/bRL9toHmiCgrMXGffzEAcNyvwjYjxrrCHTM9V3ue
+	 rrDryljsthkXw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3449F3822D59;
+	Wed, 16 Apr 2025 19:00:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 1/2] build: add bluez.tmpfiles
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v3 1/7] bap: Fix not setting SID for broadcast receiver
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174483003501.3467435.1794681280909394200.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Apr 2025 19:00:35 +0000
+References: <20250416160433.1822263-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250416160433.1822263-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-References: <20250416152039.971257-1-kernel.org@pileofstuff.org>
- <20250416152039.971257-2-kernel.org@pileofstuff.org>
- <CABBYNZLULgM_9DPvbD-Vf-_h3nQvTNsnYK4b-6X4BkaHO1T0_w@mail.gmail.com>
-Content-Language: en-GB
-From: Andrew Sayers <kernel.org@pileofstuff.org>
-In-Reply-To: <CABBYNZLULgM_9DPvbD-Vf-_h3nQvTNsnYK4b-6X4BkaHO1T0_w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-On 16/04/2025 16:31, Luiz Augusto von Dentz wrote:
-> Hi Andrew,
->
-> On Wed, Apr 16, 2025 at 11:21 AM Andrew Sayers
-> <kernel.org@pileofstuff.org> wrote:
->> Systemd tmpfiles ensure the status of particular files.
->> Add a file that bluez can use in future.
->>
->> Distributors should install the new "tools/bluez.tmpfiles" file, e.g. by
->> moving it to `debian/bluez.tmpfile` or using Fedora's `%{_tmpfilesdir}`
->> variable.
-> Not really following the purpose of this one, it just in order to tell
-> the packages to create this file? Is this specific to obexd lock file?
-> If it is then we probably should have it somewhere under obexd folder.
-We need a directory for the lock file that's guaranteed to be 
-world-writable,
-but in some distributions (e.g. Fedora), /run/lock is only writable by root.
-systemd-tmpfiles is systemd's solution to this problem - config files 
-like this
-go in /usr/lib/tmpfiles.d and tell systemd to create files at boot time.
-In this case, patch 2/2 adds an instruction to create `/run/lock/bluez`.
+Hello:
 
-Distro's need to install this in some distro-specific way, so I split
-it out into its own commit to make it easier for them to spot.  As
-that's a bit of extra work for them, I've proposed creating a more
-general file that can be reused in the (plausible but not probable)
-case another temporary file is required some time in the future.
-Happy to make the file obex-specific instead if that's better, in
-which case I'll call the temp directory /run/lock/obex.
->> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
->> ---
->>   .gitignore              | 1 +
->>   configure.ac            | 1 +
->>   tools/bluez.tmpfiles.in | 0
->>   3 files changed, 2 insertions(+)
->>   create mode 100644 tools/bluez.tmpfiles.in
->>
->> diff --git a/.gitignore b/.gitignore
->> index 108c3b820..e4431443f 100644
->> --- a/.gitignore
->> +++ b/.gitignore
->> @@ -157,6 +157,7 @@ obexd/src/obex.service
->>   obexd/src/org.bluez.obex.service
->>   tools/obex-client-tool
->>   tools/obex-server-tool
->> +tools/bluez.tmpfiles
->>   unit/test-gobex
->>   unit/test-gobex-apparam
->>   unit/test-gobex-header
->> diff --git a/configure.ac b/configure.ac
->> index 1e089aaa7..4ebd513d6 100644
->> --- a/configure.ac
->> +++ b/configure.ac
->> @@ -530,5 +530,6 @@ AC_CONFIG_FILES(
->>          src/bluetooth.service
->>          tools/bluetooth-logger.service
->>          tools/mpris-proxy.service
->> +       tools/bluez.tmpfiles
->>   )
->>   AC_OUTPUT
->> diff --git a/tools/bluez.tmpfiles.in b/tools/bluez.tmpfiles.in
->> new file mode 100644
->> index 000000000..e69de29bb
->> --
->> 2.49.0
->>
->>
->
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed, 16 Apr 2025 12:04:27 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> SID most be set otherwise 0x00 is assume which may not be what the
+> broadcast source is using over the air. but since we don't have access
+> to the SID of the advertisement in userspace mark de SID as invalid
+> (0xff) so the kernel fill it up while scanning when creating the PA
+> sync.
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ,v3,1/7] bap: Fix not setting SID for broadcast receiver
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=890149c1fb56
+  - [BlueZ,v3,2/7] btdev: Check for valid SID on BT_HCI_CMD_LE_PA_CREATE_SYNC
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=709aa00a1e50
+  - [BlueZ,v3,3/7] btdev: Fix not matching SID on le_pa_sync_estabilished
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e5a27a9c7b68
+  - [BlueZ,v3,4/7] iso-tester: Add test for SID=0xff
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7e67dc9dcb9e
+  - [BlueZ,v3,5/7] iso-tester: Test getpeername return SID
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b4c5300f5304
+  - [BlueZ,v3,6/7] btio: Add support to BT_IO_OPT_ISO_BC_SID to bt_io_get
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=64e7377d455b
+  - [BlueZ,v3,7/7] bap: Add support for using SID for broadcast receiver
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aedd7b936b72
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
