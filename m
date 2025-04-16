@@ -1,125 +1,110 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656552153C4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 17:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E401C27
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 17:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744825147; cv=none; b=bR9CYj++EdnUxYLlVP3xmqceHdAdtm4iP9aEQLRt7BPRZKAXzkHAx8wsER6iCRBB+YYKfwowdtWg5eLE+PRjwAwyKOhBs64bcN7Bxv7N7lPXtz0Mc7HtdsCd01DKX/QUSSJ8tBFVppWKHzUpXIfQc3zSkMUxBAUB8O+f4DPo73g=
+	t=1744826188; cv=none; b=Q7Bsj4RuQYRNIKUimmxuGt+9kNbkIxKu/R66YoN6Bi8Bl7Rs8Eh4jpasoTUfEoa+5DmRodojcG+fvhwKNPhk5mApuxhd5tMoHsAIMp35NgHptfPfo+7UDs9JwjSBDEYI8tc98ioz/S2+s+aIuldVpNWLRee/8r5AlGUPsVLItac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744825147; c=relaxed/simple;
-	bh=Kz8U6v+dEwKMRPZVHK2uPvLhv+5SuevF8lx3yEDS2fM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=CvJC+cj0+XW2zhKVb7wsqvpBozk5F+3FyoDd0WI/6hV+GH5RUsu7u10y+se7WawDhD9+Rz6q/8uWQUCtXbVBmSjvKXD0VwzcSqfx4jqOBB/VqvA2GesFTRKo1/EJ8c9hObaVWdoYLQMxTsu9Q08/cCYHqsJ81YYiSS0FKbdO/mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8L4gGbG; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8L4gGbG"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7376e311086so9473535b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 10:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744825145; x=1745429945; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FiZFu3Uu3SNvdbhlue9vqlWtQMaptutTd4ikGfVbU/0=;
-        b=f8L4gGbGmmoAIff1U3UbDaqReqW7i2JXEtvFubafXHlJh0sAhyAUGJ0/GFfissSuRh
-         80wB1Qi/VJP6n9yMLogdv+9i36CRrIKjfEhL+aUcMZn8G3fIPv4z94LAaaQVqVG3Nmgz
-         JmgfqXUtspe13jTUhwM3OvKq064vUkhxjgITyG+jlJHYr+hr+i1MgdCpVzO2xwoqQiBT
-         58hPeItcc6l1eggHVGbolbAQ+wP6zfoO/RxZf5xeHF6O/slxB2N27iOsOSU3rxpwhu2c
-         uNNTMr9tQi37J9tVfNjY0dG23CmM830WuKpBmpMekvO1+bNbVvRXquy7BwDrHU0HAEqO
-         +GvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744825145; x=1745429945;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FiZFu3Uu3SNvdbhlue9vqlWtQMaptutTd4ikGfVbU/0=;
-        b=CB7TInVyH4/GtpCMQrgjsNdaQfYFLI/w5JI2fLHi7r2ikStv6T1jBAZ1G+HUIviBk8
-         OlpSv8SZKfm2MK/PwBJaHCST83Y+QLwRG2BcrKPNwFmapiW6nOtW27Dc8X5w/kU53/Ai
-         /LHjEGoXDQZ2HoMdlTiwP7nCgPKjy3sG5rXmTqyMGccpxp+pjw3jzWglAfeS57ekReIs
-         GDJJbOSQIXxD7eWABNntA9sdPDdhDDDpWCkmuxZ4TgRPsK6NfPiQD3lIGA8vm6Bkzw04
-         e5loFzdqJclJoEk3QWcP5o1lE26OikmBMdjyjxV/oupUyHqSVX87heMfaT3HGZMXTzgm
-         xBsA==
-X-Gm-Message-State: AOJu0Yzd/uctIjycERwjOW8adrBsjVbs4hmzofsljpu6Yjx1KmoizHoU
-	Pg0wB2NR3RnvfpHs//3EZ9mHBw7qhXbnDkROWmIYzm9sFPlziSbIvT9rXA==
-X-Gm-Gg: ASbGnctTZ1XuzUgErze0LlX2FzpUlTDI1dcP011OJJjkWJgp6vpuEzOnvmuzV5d4HtJ
-	ACC4MKZmpjIp0kByHgUzhbo0BDrwkh11QDoUMGPhd6hKtH4/uvY4ZjboBpZ17TQKWcPZ7zhTO7o
-	A0WbWxa+mXTZfo38XMmQdF9zZ3vJ5xoV4i2zH24DK7sZhma7gOCRAQPiOihPDNYHVYOpAzxJrlS
-	7KGFH23KXkgPJlI0ASWLpo1gXUTeTi66kJPtYzAknByMfuJiqoJ31C3cgOgddM6NNsj8WaXVqWM
-	3cEBuXQVGl4ycgGEQacyD3aOoJea+7J7kKWS8/ZO9DF4ZQ==
-X-Google-Smtp-Source: AGHT+IFdueUulN1eMsp8ahwlc3LUFX22MNnuzdwInzL+XOqfa78AolJJHv+dSzCCl8+rL3DU0L/6ew==
-X-Received: by 2002:a05:6a20:9f05:b0:1fe:90c5:7d00 with SMTP id adf61e73a8af0-203b3fbed1bmr3762012637.28.1744825145185;
-        Wed, 16 Apr 2025 10:39:05 -0700 (PDT)
-Received: from [172.17.0.2] ([52.234.33.64])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b0b220fd37csm1585492a12.44.2025.04.16.10.39.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 10:39:04 -0700 (PDT)
-Message-ID: <67ffeb38.630a0220.26b4c2.53ff@mx.google.com>
-Date: Wed, 16 Apr 2025 10:39:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1612792008077376480=="
+	s=arc-20240116; t=1744826188; c=relaxed/simple;
+	bh=Iu7cIEbX0+E1gvaP6omapnU4mVli9zg1DmU1vbIk6Qs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uwAaPoRB6IGmZDZ3fq5rSupIeLGfOdJRFmmk7u7SH/2V2AfXm3ngtRdDWi+yygzDKQLc5ow/tLDT0oYztRG68RzERER2PR0e6SQTwhWwx4yzX0SODIlMNVJkTI+iTZ+uA1bXvrGBltk8Q3po9aud6ntaY9EC8FfypWwa/GuKPt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
+Received: from 1.b.9.e.f.d.5.5.7.e.f.c.1.f.7.2.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:27f1:cfe7:55df:e9b1] helo=[IPV6:fd34:5ae5:dfe:ae11::1])
+	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
+	(envelope-from <kernel.org@pileofstuff.org>)
+	id 1u56zl-009mxM-1r;
+	Wed, 16 Apr 2025 18:56:21 +0100
+Message-ID: <d6936cb9-c246-46b6-bdb8-95429147c6e3@pileofstuff.org>
+Date: Wed, 16 Apr 2025 18:56:20 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ,1/2] device: Reset svc_resolved on device_discover_services() request
-In-Reply-To: <20250416155503.250763-1-frederic.danis@collabora.com>
-References: <20250416155503.250763-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ 1/2] build: add bluez.tmpfiles
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20250416152039.971257-1-kernel.org@pileofstuff.org>
+ <20250416152039.971257-2-kernel.org@pileofstuff.org>
+ <CABBYNZLULgM_9DPvbD-Vf-_h3nQvTNsnYK4b-6X4BkaHO1T0_w@mail.gmail.com>
+Content-Language: en-GB
+From: Andrew Sayers <kernel.org@pileofstuff.org>
+In-Reply-To: <CABBYNZLULgM_9DPvbD-Vf-_h3nQvTNsnYK4b-6X4BkaHO1T0_w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============1612792008077376480==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 16/04/2025 16:31, Luiz Augusto von Dentz wrote:
+> Hi Andrew,
+>
+> On Wed, Apr 16, 2025 at 11:21 AM Andrew Sayers
+> <kernel.org@pileofstuff.org> wrote:
+>> Systemd tmpfiles ensure the status of particular files.
+>> Add a file that bluez can use in future.
+>>
+>> Distributors should install the new "tools/bluez.tmpfiles" file, e.g. by
+>> moving it to `debian/bluez.tmpfile` or using Fedora's `%{_tmpfilesdir}`
+>> variable.
+> Not really following the purpose of this one, it just in order to tell
+> the packages to create this file? Is this specific to obexd lock file?
+> If it is then we probably should have it somewhere under obexd folder.
+We need a directory for the lock file that's guaranteed to be 
+world-writable,
+but in some distributions (e.g. Fedora), /run/lock is only writable by root.
+systemd-tmpfiles is systemd's solution to this problem - config files 
+like this
+go in /usr/lib/tmpfiles.d and tell systemd to create files at boot time.
+In this case, patch 2/2 adds an instruction to create `/run/lock/bluez`.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=954076
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.32 seconds
-GitLint                       PENDING   0.36 seconds
-BuildEll                      PASS      21.65 seconds
-BluezMake                     PASS      2640.54 seconds
-MakeCheck                     PASS      20.53 seconds
-MakeDistcheck                 PASS      199.25 seconds
-CheckValgrind                 PASS      276.84 seconds
-CheckSmatch                   PASS      311.95 seconds
-bluezmakeextell               PASS      132.45 seconds
-IncrementalBuild              PENDING   0.42 seconds
-ScanBuild                     PASS      945.63 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1612792008077376480==--
+Distro's need to install this in some distro-specific way, so I split
+it out into its own commit to make it easier for them to spot.  As
+that's a bit of extra work for them, I've proposed creating a more
+general file that can be reused in the (plausible but not probable)
+case another temporary file is required some time in the future.
+Happy to make the file obex-specific instead if that's better, in
+which case I'll call the temp directory /run/lock/obex.
+>> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+>> ---
+>>   .gitignore              | 1 +
+>>   configure.ac            | 1 +
+>>   tools/bluez.tmpfiles.in | 0
+>>   3 files changed, 2 insertions(+)
+>>   create mode 100644 tools/bluez.tmpfiles.in
+>>
+>> diff --git a/.gitignore b/.gitignore
+>> index 108c3b820..e4431443f 100644
+>> --- a/.gitignore
+>> +++ b/.gitignore
+>> @@ -157,6 +157,7 @@ obexd/src/obex.service
+>>   obexd/src/org.bluez.obex.service
+>>   tools/obex-client-tool
+>>   tools/obex-server-tool
+>> +tools/bluez.tmpfiles
+>>   unit/test-gobex
+>>   unit/test-gobex-apparam
+>>   unit/test-gobex-header
+>> diff --git a/configure.ac b/configure.ac
+>> index 1e089aaa7..4ebd513d6 100644
+>> --- a/configure.ac
+>> +++ b/configure.ac
+>> @@ -530,5 +530,6 @@ AC_CONFIG_FILES(
+>>          src/bluetooth.service
+>>          tools/bluetooth-logger.service
+>>          tools/mpris-proxy.service
+>> +       tools/bluez.tmpfiles
+>>   )
+>>   AC_OUTPUT
+>> diff --git a/tools/bluez.tmpfiles.in b/tools/bluez.tmpfiles.in
+>> new file mode 100644
+>> index 000000000..e69de29bb
+>> --
+>> 2.49.0
+>>
+>>
+>
