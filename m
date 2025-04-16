@@ -1,191 +1,530 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4D622A4E9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 04:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF59923817D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 09:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744778660; cv=none; b=MSL85GjsbTRrjLVw27wyW4jgaq4WvScuYiZe8tQ109rshkznw6Ij+y59ilznyelsivLovVAQhDJ0XSfR/pEEjHcfb6ijJaj3410NUrN3z5u/TGV+33wxLKS3xq75KWIjMxNWXnCjtuVF+iSbg3o28aKLgoEl8WdOtxUj75l7iXk=
+	t=1744797313; cv=none; b=LNrrv8UziQcm4we53eG2fdNgXC0EryifEIVZuGWdEWLntdc1HWBcpMxIP9rkPTrNAxUPWjESobf5OOzEoylmkODj1e68FvZjlLTK/w27OBb9jk39PGB4jOzz/OGxxrG0vVe0mSykGuK5Wsb4xW9u2Vzz2otNcKvWNkwQgKyq91Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744778660; c=relaxed/simple;
-	bh=04n0lfd0mr4iDn4KjOUdiOOeqiLea673DzFshe5KCPI=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=t+Kai2AuHh+DNCG+nhjlT11o5GEp6EA5c7YIdUwEAveFquNAIm/8K6P23nGHZBuaqIO3ZhBQQs9DSwDiBUqxaJMLIrtf17eOInEmHx5LKJY4kC7orAutipPhVUgFoWr/6iwyNvLTubgqVIhalfflpjD4Ev+OgU3SXLB8ndZbDxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=attHtlMz; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1744797313; c=relaxed/simple;
+	bh=AmixYYDH1ZKvvrGtK8hvhxMkDVtSKsVn6a+Mo+h0VmA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=G/uboWMCylNA2BAyzdM5i/yyFl0fWlpQjqdEzF1bxBFNe5FR2iQ37NVBWv1C9iYWf1xEcyZk2vNgCKBcab/X5Y29426DYcMzyuRJA+2XeRE1DMPirZPb+Pcjs7Ia1GMvgDcxQQWEmk3BgJNISVRHpox+0vmGK1cUGDlwbch+PkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QtUlhWKG; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="attHtlMz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744778659; x=1776314659;
-  h=date:from:to:cc:subject:message-id;
-  bh=04n0lfd0mr4iDn4KjOUdiOOeqiLea673DzFshe5KCPI=;
-  b=attHtlMz9+hIWwnErkhHWM8TrsSoV9ydBMk+K1uRIHxwvahdofQFE6SC
-   q5q4eV9O4FsGxERu20BK2so4M+hq1xcikIPKpDNBuq8X0EzGJSgeH9KMS
-   obzGb0A3Ri226+7XUNTUpVloxQKjtbrk3lYf41GdXc6XD0cyrZ+sx8r+R
-   5GJuhGABYSssyKmu2HPXUPy3Mev13pGPMqTQwtfwHGl40H167UrBNV14J
-   E/HlrOSL9cvSPhFuaT84Lg8NCz0HacIbUwOa9BMRHB6Z6xdjy72tMyvVg
-   bxYIRwVMBU+GQuAsrYOUHWmH039PEo+e8XbaZB4CO8zYgVlMJtK0weysp
-   g==;
-X-CSE-ConnectionGUID: tZw+mAuVSnWWWl89VtQcww==
-X-CSE-MsgGUID: UrWwtGbqTEmLSleSvB4z+A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="45445496"
-X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="45445496"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 21:44:19 -0700
-X-CSE-ConnectionGUID: uI+QjQWWR1OVOnfJdvAOjA==
-X-CSE-MsgGUID: hF17jg2NQ/uzVSYgpPEH4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
-   d="scan'208";a="134426827"
-Received: from lkp-server01.sh.intel.com (HELO b207828170a5) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 15 Apr 2025 21:44:17 -0700
-Received: from kbuild by b207828170a5 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u4iA4-000GcJ-0b;
-	Tue, 15 Apr 2025 15:25:20 +0000
-Date: Tue, 15 Apr 2025 23:24:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- ad5747d4eed1c53eeeefca48b2520f1b0ad6dbcc
-Message-ID: <202504152352.Ohz7a52e-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QtUlhWKG"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-229170fbe74so55268545ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Apr 2025 02:55:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744797311; x=1745402111; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=InEo4fDcRL9q31V6DTrhwJjfPEkjK1fc2RFFHanel/w=;
+        b=QtUlhWKGZG5pKFHWMHY3mgzFldxvj2mhQ4Onx1ED6bC+R04mckvU9JyV40Ippo98w2
+         x2m6kMilScmneBw6WQWcCPDuC9G6g/MBpOLZOZn5Fm7gZcVHK9uv9nWTgFn6Dx5ILG8X
+         R7VQ14tctwwHFrLfLvki21WqNrizlDTCf96+71XZxkKt2HIp+b0gvweI9er/QLn+om9O
+         I5woub+FIkvF09H3CvXefyq40trUI3P4sPSvZWQWHx77UwXQHJ/7jTSs1hk0uHiIQjNz
+         fYeJL/DDEriNG7y3tDUPyLqlRwsUFVcz8DnkV+3Ljpmz7o++Jx7Ia/p6ikFwPuEJsFII
+         J8HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744797311; x=1745402111;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=InEo4fDcRL9q31V6DTrhwJjfPEkjK1fc2RFFHanel/w=;
+        b=jSnnLCkZ/GOka5c6ZnXD6rQBcu32b4y5OvbEo6DmyOyvY98bQX0D1OnZklBaWp3c1l
+         joeuNbplvV9kCNhyC81LpNFk4QmJBLZrYk8jDnqk4jnoNPui3K8oHfzhNrE9ukmTrMfj
+         iaguALbzKsCnBEUTNNgi08+1zAMi116jIYKVkhoPpapC21V87d1a3BtrFgz4YgpUTFix
+         hhSUK4m8QgRvQIoCu7wDpeCgc2mQuTGczydsj2t8pSMVuUk3sgZSMaS3P+HrocetespL
+         sLBNvPlsjINTJfsYqufNHEsazYjc1s9nH9c8IxmwPPz6WY0vtryYakmjepqUrCkgI7h+
+         QG4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXiYMgIE1N7A57lYcFpoeqgBAHOwIfzHOvTExZrhm3mjehSTJapQ77IwiZeReyx7LrXtaeeokWiMtHnO/vHKG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw35HTqjAkeqqYhTb50fJfl0B3YquI1VmPyHlbIVG74yt2ID+C6
+	yUGcYg2xnqgDmDAvHdz5cb+j8SVLBXew+ObZkp0FTHNMnMwAPofzc3CLrN7HcO9AosFZYdXL9Cs
+	FeQMlMg==
+X-Google-Smtp-Source: AGHT+IGlWFEHgcXVhtD8bhrbBEorI+mmSq2kg9Nl2j3VREL+nCdIzhb+JaqrWa/36cmimrphtXHeb9bFV40l
+X-Received: from plqw3.prod.google.com ([2002:a17:902:a703:b0:220:da6b:5d08])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3284:b0:220:e338:8d2
+ with SMTP id d9443c01a7336-22c358ddb8bmr15086005ad.21.1744797310972; Wed, 16
+ Apr 2025 02:55:10 -0700 (PDT)
+Date: Wed, 16 Apr 2025 09:53:35 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.604.gff1f9ca942-goog
+Message-ID: <20250416095505.769906-1-chharry@google.com>
+Subject: [PATCH v2 1/4] Bluetooth: Introduce HCI Driver protocol
+From: Hsin-chen Chuang <chharry@google.com>
+To: luiz.dentz@gmail.com
+Cc: Hsin-chen Chuang <chharry@chromium.org>, chromeos-bluetooth-upstreaming@chromium.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ying Hsu <yinghsu@chromium.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: ad5747d4eed1c53eeeefca48b2520f1b0ad6dbcc  Bluetooth: l2cap: Process valid commands in too long frame
+From: Hsin-chen Chuang <chharry@chromium.org>
 
-elapsed time: 1449m
+Although commit 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting
+for HCI_USER_CHANNEL") has enabled the HCI_USER_CHANNEL user to send out
+SCO data through USB Bluetooth chips, it's observed that with the patch
+HFP is flaky on most of the existing USB Bluetooth controllers: Intel
+chips sometimes send out no packet for Transparent codec; MTK chips may
+generate SCO data with a wrong handle for CVSD codec; RTK could split
+the data with a wrong packet size for Transparent codec; ... etc.
 
-configs tested: 114
-configs skipped: 5
+To address the issue above one needs to reset the altsetting back to
+zero when there is no active SCO connection, which is the same as the
+BlueZ behavior, and another benefit is the bus doesn't need to reserve
+bandwidth when no SCO connection.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+This patch adds the infrastructure that allow the user space program to
+talk to Bluetooth drivers directly:
+- Define the new packet type HCI_DRV_PKT which is specifically used for
+  communication between the user space program and the Bluetooth drviers
+- hci_send_frame intercepts the packets and invokes drivers' HCI Drv
+  callbacks (so far only defined for btusb)
+- 2 kinds of events to user space: Command Status and Command Complete,
+  the former simply returns the status while the later may contain
+  additional response data.
 
-tested configs:
-alpha                             allnoconfig    gcc-14.2.0
-alpha                            allyesconfig    gcc-14.2.0
-alpha                               defconfig    gcc-14.2.0
-arc                              allmodconfig    gcc-14.2.0
-arc                               allnoconfig    gcc-14.2.0
-arc                              allyesconfig    gcc-14.2.0
-arc                   randconfig-001-20250415    gcc-14.2.0
-arc                   randconfig-002-20250415    gcc-14.2.0
-arm                              allmodconfig    gcc-14.2.0
-arm                               allnoconfig    clang-21
-arm                              allyesconfig    gcc-14.2.0
-arm                      jornada720_defconfig    clang-21
-arm                            mmp2_defconfig    gcc-14.2.0
-arm                   randconfig-001-20250415    clang-21
-arm                   randconfig-002-20250415    clang-21
-arm                   randconfig-003-20250415    gcc-10.5.0
-arm                   randconfig-004-20250415    gcc-6.5.0
-arm64                            allmodconfig    clang-19
-arm64                             allnoconfig    gcc-14.2.0
-arm64                 randconfig-001-20250415    clang-16
-arm64                 randconfig-002-20250415    gcc-7.5.0
-arm64                 randconfig-003-20250415    gcc-9.5.0
-arm64                 randconfig-004-20250415    gcc-9.5.0
-csky                              allnoconfig    gcc-14.2.0
-csky                  randconfig-001-20250414    gcc-14.2.0
-csky                  randconfig-002-20250414    gcc-10.5.0
-hexagon                           allnoconfig    clang-21
-hexagon                          allyesconfig    clang-21
-hexagon               randconfig-001-20250414    clang-18
-hexagon               randconfig-002-20250414    clang-21
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250414    gcc-12
-i386        buildonly-randconfig-002-20250414    clang-20
-i386        buildonly-randconfig-003-20250414    clang-20
-i386        buildonly-randconfig-004-20250414    gcc-12
-i386        buildonly-randconfig-005-20250414    gcc-12
-i386        buildonly-randconfig-006-20250414    gcc-12
-i386                                defconfig    clang-20
-loongarch                        allmodconfig    gcc-14.2.0
-loongarch                         allnoconfig    gcc-14.2.0
-loongarch             randconfig-001-20250414    gcc-12.4.0
-loongarch             randconfig-002-20250414    gcc-14.2.0
-m68k                             allmodconfig    gcc-14.2.0
-m68k                              allnoconfig    gcc-14.2.0
-m68k                             allyesconfig    gcc-14.2.0
-microblaze                       allmodconfig    gcc-14.2.0
-microblaze                        allnoconfig    gcc-14.2.0
-microblaze                       allyesconfig    gcc-14.2.0
-mips                              allnoconfig    gcc-14.2.0
-mips                        bcm63xx_defconfig    clang-21
-mips                           mtx1_defconfig    clang-21
-mips                        omega2p_defconfig    clang-21
-nios2                             allnoconfig    gcc-14.2.0
-nios2                 randconfig-001-20250414    gcc-12.4.0
-nios2                 randconfig-002-20250414    gcc-12.4.0
-openrisc                          allnoconfig    gcc-14.2.0
-openrisc                         allyesconfig    gcc-14.2.0
-parisc                           allmodconfig    gcc-14.2.0
-parisc                            allnoconfig    gcc-14.2.0
-parisc                           allyesconfig    gcc-14.2.0
-parisc                randconfig-001-20250414    gcc-5.5.0
-parisc                randconfig-002-20250414    gcc-7.5.0
-powerpc                          allmodconfig    gcc-14.2.0
-powerpc                           allnoconfig    gcc-14.2.0
-powerpc                          allyesconfig    clang-21
-powerpc               randconfig-001-20250414    gcc-8.5.0
-powerpc               randconfig-002-20250414    clang-21
-powerpc               randconfig-003-20250414    gcc-6.5.0
-powerpc64             randconfig-001-20250414    clang-17
-powerpc64             randconfig-002-20250414    clang-21
-powerpc64             randconfig-003-20250414    gcc-6.5.0
-riscv                            allmodconfig    clang-21
-riscv                             allnoconfig    gcc-14.2.0
-riscv                            allyesconfig    clang-16
-riscv                 randconfig-001-20250415    gcc-14.2.0
-riscv                 randconfig-002-20250415    gcc-9.3.0
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-14.2.0
-s390                  randconfig-001-20250415    clang-21
-s390                  randconfig-002-20250415    gcc-7.5.0
-sh                               allmodconfig    gcc-14.2.0
-sh                                allnoconfig    gcc-14.2.0
-sh                               allyesconfig    gcc-14.2.0
-sh                ecovec24-romimage_defconfig    gcc-14.2.0
-sh                    randconfig-001-20250415    gcc-11.5.0
-sh                    randconfig-002-20250415    gcc-9.3.0
-sh                          rsk7269_defconfig    gcc-14.2.0
-sparc                            allmodconfig    gcc-14.2.0
-sparc                             allnoconfig    gcc-14.2.0
-sparc                 randconfig-001-20250415    gcc-6.5.0
-sparc                 randconfig-002-20250415    gcc-12.4.0
-sparc                       sparc32_defconfig    gcc-14.2.0
-sparc64               randconfig-001-20250415    gcc-14.2.0
-sparc64               randconfig-002-20250415    gcc-12.4.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-21
-um                               allyesconfig    gcc-12
-um                    randconfig-001-20250415    clang-21
-um                    randconfig-002-20250415    clang-21
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250415    clang-20
-x86_64      buildonly-randconfig-002-20250415    gcc-11
-x86_64      buildonly-randconfig-003-20250415    gcc-12
-x86_64      buildonly-randconfig-004-20250415    clang-20
-x86_64      buildonly-randconfig-005-20250415    clang-20
-x86_64      buildonly-randconfig-006-20250415    gcc-12
-x86_64                              defconfig    gcc-11
-xtensa                            allnoconfig    gcc-14.2.0
-xtensa                randconfig-001-20250415    gcc-6.5.0
-xtensa                randconfig-002-20250415    gcc-10.5.0
+Cc: chromeos-bluetooth-upstreaming@chromium.org
+Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+---
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Changes in v2:
+- Specifying drvier specific commands by hci_opcode_ogf
+
+ drivers/bluetooth/btusb.c        |  69 ++++++++++++++++++--
+ include/net/bluetooth/hci.h      |   1 +
+ include/net/bluetooth/hci_core.h |   3 +
+ include/net/bluetooth/hci_drv.h  |  76 ++++++++++++++++++++++
+ include/net/bluetooth/hci_mon.h  |   2 +
+ net/bluetooth/Makefile           |   3 +-
+ net/bluetooth/hci_core.c         |  10 +++
+ net/bluetooth/hci_drv.c          | 104 +++++++++++++++++++++++++++++++
+ net/bluetooth/hci_sock.c         |  12 +++-
+ 9 files changed, 271 insertions(+), 9 deletions(-)
+ create mode 100644 include/net/bluetooth/hci_drv.h
+ create mode 100644 net/bluetooth/hci_drv.c
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a9b89bcea22..79a944cdb662 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -21,6 +21,7 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci_drv.h>
+ 
+ #include "btintel.h"
+ #include "btbcm.h"
+@@ -3754,6 +3755,61 @@ static ssize_t isoc_alt_store(struct device *dev,
+ 
+ static DEVICE_ATTR_RW(isoc_alt);
+ 
++static const struct {
++	u16 opcode;
++	const char *desc;
++} btusb_hci_drv_supported_commands[] = {
++	/* Common commands */
++	{ HCI_DRV_OP_READ_INFO, "Read Info" },
++};
++static int btusb_hci_drv_read_info(struct hci_dev *hdev, void *data,
++				   u16 data_len)
++{
++	struct hci_drv_rp_read_info *rp;
++	size_t rp_size;
++	int err, i;
++	u16 opcode, num_supported_commands =
++		ARRAY_SIZE(btusb_hci_drv_supported_commands);
++
++	rp_size = sizeof(*rp) + num_supported_commands * 2;
++
++	rp = kmalloc(rp_size, GFP_KERNEL);
++	if (!rp)
++		return -ENOMEM;
++
++	strscpy_pad(rp->driver_name, btusb_driver.name);
++
++	rp->num_supported_commands = cpu_to_le16(num_supported_commands);
++	for (i = 0; i < num_supported_commands; i++) {
++		opcode = btusb_hci_drv_supported_commands[i].opcode;
++		bt_dev_info(hdev,
++			    "Supported HCI Drv command (0x%02x|0x%04x): %s",
++			    hci_opcode_ogf(opcode),
++			    hci_opcode_ocf(opcode),
++			    btusb_hci_drv_supported_commands[i].desc);
++		rp->supported_commands[i] = cpu_to_le16(opcode);
++	}
++
++	err = hci_drv_cmd_complete(hdev, HCI_DRV_OP_READ_INFO,
++				   HCI_DRV_STATUS_SUCCESS, rp, rp_size);
++
++	kfree(rp);
++	return err;
++}
++
++static const struct hci_drv_handler btusb_hci_drv_common_handlers[] = {
++	{ btusb_hci_drv_read_info,	HCI_DRV_READ_INFO_SIZE },
++};
++
++static const struct hci_drv_handler btusb_hci_drv_specific_handlers[] = {};
++
++static struct hci_drv btusb_hci_drv = {
++	.common_handler_count	= ARRAY_SIZE(btusb_hci_drv_common_handlers),
++	.common_handlers	= btusb_hci_drv_common_handlers,
++	.specific_handler_count	= ARRAY_SIZE(btusb_hci_drv_specific_handlers),
++	.specific_handlers	= btusb_hci_drv_specific_handlers,
++};
++
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -3893,12 +3949,13 @@ static int btusb_probe(struct usb_interface *intf,
+ 		data->reset_gpio = reset_gpio;
+ 	}
+ 
+-	hdev->open   = btusb_open;
+-	hdev->close  = btusb_close;
+-	hdev->flush  = btusb_flush;
+-	hdev->send   = btusb_send_frame;
+-	hdev->notify = btusb_notify;
+-	hdev->wakeup = btusb_wakeup;
++	hdev->open    = btusb_open;
++	hdev->close   = btusb_close;
++	hdev->flush   = btusb_flush;
++	hdev->send    = btusb_send_frame;
++	hdev->notify  = btusb_notify;
++	hdev->wakeup  = btusb_wakeup;
++	hdev->hci_drv = &btusb_hci_drv;
+ 
+ #ifdef CONFIG_PM
+ 	err = btusb_config_oob_wake(hdev);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a8586c3058c7..e297b312d2b7 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -494,6 +494,7 @@ enum {
+ #define HCI_EVENT_PKT		0x04
+ #define HCI_ISODATA_PKT		0x05
+ #define HCI_DIAG_PKT		0xf0
++#define HCI_DRV_PKT		0xf1
+ #define HCI_VENDOR_PKT		0xff
+ 
+ /* HCI packet types */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5115da34f881..dd80f1a398be 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -31,6 +31,7 @@
+ #include <linux/rculist.h>
+ 
+ #include <net/bluetooth/hci.h>
++#include <net/bluetooth/hci_drv.h>
+ #include <net/bluetooth/hci_sync.h>
+ #include <net/bluetooth/hci_sock.h>
+ #include <net/bluetooth/coredump.h>
+@@ -613,6 +614,8 @@ struct hci_dev {
+ 	struct list_head	monitored_devices;
+ 	bool			advmon_pend_notify;
+ 
++	struct hci_drv		*hci_drv;
++
+ #if IS_ENABLED(CONFIG_BT_LEDS)
+ 	struct led_trigger	*power_led;
+ #endif
+diff --git a/include/net/bluetooth/hci_drv.h b/include/net/bluetooth/hci_drv.h
+new file mode 100644
+index 000000000000..2f01c44f05ec
+--- /dev/null
++++ b/include/net/bluetooth/hci_drv.h
+@@ -0,0 +1,76 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2025 Google Corporation
++ */
++
++#ifndef __HCI_DRV_H
++#define __HCI_DRV_H
++
++#include <linux/types.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci.h>
++
++struct hci_drv_cmd_hdr {
++	__le16	opcode;
++	__le16	len;
++} __packed;
++
++struct hci_drv_ev_hdr {
++	__le16	opcode;
++	__le16	len;
++} __packed;
++
++#define HCI_DRV_EV_CMD_STATUS	0x0000
++struct hci_drv_ev_cmd_status {
++	__le16	opcode;
++	__u8	status;
++} __packed;
++
++#define HCI_DRV_EV_CMD_COMPLETE	0x0001
++struct hci_drv_ev_cmd_complete {
++	__le16	opcode;
++	__u8	status;
++	__u8	data[];
++} __packed;
++
++#define HCI_DRV_STATUS_SUCCESS			0x00
++#define HCI_DRV_STATUS_UNSPECIFIED_ERROR	0x01
++#define HCI_DRV_STATUS_UNKNOWN_COMMAND		0x02
++#define HCI_DRV_STATUS_INVALID_PARAMETERS	0x03
++
++#define HCI_DRV_MAX_DRIVER_NAME_LENGTH	32
++
++/* Common commands that make sense on all drivers start from 0x0000 */
++#define HCI_DRV_OP_READ_INFO	0x0000
++#define HCI_DRV_READ_INFO_SIZE	0
++struct hci_drv_rp_read_info {
++	__u8	driver_name[HCI_DRV_MAX_DRIVER_NAME_LENGTH];
++	__le16	num_supported_commands;
++	__le16	supported_commands[];
++} __packed;
++
++/* Driver specific OGF (Opcode Group Field)
++ * Commands in this group may have different meanings across different drivers.
++ */
++#define HCI_DRV_OGF_DRIVER_SPECIFIC	0x01
++
++int hci_drv_cmd_status(struct hci_dev *hdev, u16 cmd, u8 status);
++int hci_drv_cmd_complete(struct hci_dev *hdev, u16 cmd, u8 status, void *rp,
++			 size_t rp_len);
++int hci_drv_process_cmd(struct hci_dev *hdev, struct sk_buff *cmd_skb);
++
++struct hci_drv_handler {
++	int (*func)(struct hci_dev *hdev, void *data, u16 data_len);
++	size_t data_len;
++};
++
++struct hci_drv {
++	size_t common_handler_count;
++	const struct hci_drv_handler *common_handlers;
++
++	size_t specific_handler_count;
++	const struct hci_drv_handler *specific_handlers;
++};
++
++#endif /* __HCI_DRV_H */
+diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
+index 082f89531b88..bbd752494ef9 100644
+--- a/include/net/bluetooth/hci_mon.h
++++ b/include/net/bluetooth/hci_mon.h
+@@ -51,6 +51,8 @@ struct hci_mon_hdr {
+ #define HCI_MON_CTRL_EVENT	17
+ #define HCI_MON_ISO_TX_PKT	18
+ #define HCI_MON_ISO_RX_PKT	19
++#define HCI_MON_DRV_TX_PKT	20
++#define HCI_MON_DRV_RX_PKT	21
+ 
+ struct hci_mon_new_index {
+ 	__u8		type;
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 5a3835b7dfcd..a7eede7616d8 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -14,7 +14,8 @@ bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+-	ecdh_helper.o mgmt_util.o mgmt_config.o hci_codec.o eir.o hci_sync.o
++	ecdh_helper.o mgmt_util.o mgmt_config.o hci_codec.o eir.o hci_sync.o \
++	hci_drv.o
+ 
+ bluetooth-$(CONFIG_DEV_COREDUMP) += coredump.o
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5eb0600bbd03..2815b2d7d28d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2911,6 +2911,8 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 		break;
+ 	case HCI_ISODATA_PKT:
+ 		break;
++	case HCI_DRV_PKT:
++		break;
+ 	default:
+ 		kfree_skb(skb);
+ 		return -EINVAL;
+@@ -3019,6 +3021,14 @@ static int hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 		return -EINVAL;
+ 	}
+ 
++	if (hci_skb_pkt_type(skb) == HCI_DRV_PKT) {
++		// Intercept HCI Drv packet here and don't go with hdev->send
++		// callabck.
++		err = hci_drv_process_cmd(hdev, skb);
++		kfree_skb(skb);
++		return err;
++	}
++
+ 	err = hdev->send(hdev, skb);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "sending frame failed (%d)", err);
+diff --git a/net/bluetooth/hci_drv.c b/net/bluetooth/hci_drv.c
+new file mode 100644
+index 000000000000..3c011edc7fd8
+--- /dev/null
++++ b/net/bluetooth/hci_drv.c
+@@ -0,0 +1,104 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2025 Google Corporation
++ */
++
++#include <linux/skbuff.h>
++#include <linux/types.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci_drv.h>
++
++int hci_drv_cmd_status(struct hci_dev *hdev, u16 cmd, u8 status)
++{
++	struct hci_drv_ev_hdr *hdr;
++	struct hci_drv_ev_cmd_status *ev;
++	struct sk_buff *skb;
++
++	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*ev), GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	hdr = skb_put(skb, sizeof(*hdr));
++	hdr->opcode = __cpu_to_le16(HCI_DRV_EV_CMD_STATUS);
++	hdr->len = __cpu_to_le16(sizeof(*ev));
++
++	ev = skb_put(skb, sizeof(*ev));
++	ev->opcode = __cpu_to_le16(cmd);
++	ev->status = status;
++
++	hci_skb_pkt_type(skb) = HCI_DRV_PKT;
++
++	return hci_recv_frame(hdev, skb);
++}
++EXPORT_SYMBOL(hci_drv_cmd_status);
++
++int hci_drv_cmd_complete(struct hci_dev *hdev, u16 cmd, u8 status, void *rp,
++			 size_t rp_len)
++{
++	struct hci_drv_ev_hdr *hdr;
++	struct hci_drv_ev_cmd_complete *ev;
++	struct sk_buff *skb;
++
++	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*ev) + rp_len, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	hdr = skb_put(skb, sizeof(*hdr));
++	hdr->opcode = __cpu_to_le16(HCI_DRV_EV_CMD_COMPLETE);
++	hdr->len = __cpu_to_le16(sizeof(*ev) + rp_len);
++
++	ev = skb_put(skb, sizeof(*ev));
++	ev->opcode = __cpu_to_le16(cmd);
++	ev->status = status;
++
++	skb_put_data(skb, rp, rp_len);
++
++	hci_skb_pkt_type(skb) = HCI_DRV_PKT;
++
++	return hci_recv_frame(hdev, skb);
++}
++EXPORT_SYMBOL(hci_drv_cmd_complete);
++
++int hci_drv_process_cmd(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_drv_cmd_hdr *hdr;
++	const struct hci_drv_handler *handler = NULL;
++	u16 opcode, len, ogf, ocf;
++
++	hdr = skb_pull_data(skb, sizeof(*hdr));
++	if (!hdr)
++		return -EILSEQ;
++
++	opcode = __le16_to_cpu(hdr->opcode);
++	len = __le16_to_cpu(hdr->len);
++	if (len != skb->len)
++		return -EILSEQ;
++	ogf = hci_opcode_ogf(opcode);
++	ocf = hci_opcode_ocf(opcode);
++
++	if (!hdev->hci_drv)
++		return hci_drv_cmd_status(hdev, opcode,
++					  HCI_DRV_STATUS_UNKNOWN_COMMAND);
++
++	if (ogf != HCI_DRV_OGF_DRIVER_SPECIFIC) {
++		if (opcode < hdev->hci_drv->common_handler_count)
++			handler = &hdev->hci_drv->common_handlers[opcode];
++	} else {
++		if (ocf < hdev->hci_drv->specific_handler_count)
++			handler = &hdev->hci_drv->specific_handlers[ocf];
++	}
++
++	if (!handler || !handler->func)
++		return hci_drv_cmd_status(hdev, opcode,
++					  HCI_DRV_STATUS_UNKNOWN_COMMAND);
++
++	if (len != handler->data_len)
++		return hci_drv_cmd_status(hdev, opcode,
++					  HCI_DRV_STATUS_INVALID_PARAMETERS);
++
++	return handler->func(hdev, skb->data, len);
++}
++EXPORT_SYMBOL(hci_drv_process_cmd);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 022b86797acd..428ee5c7de7e 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -234,7 +234,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 			if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT &&
+ 			    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
+ 			    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
+-			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT)
++			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT &&
++			    hci_skb_pkt_type(skb) != HCI_DRV_PKT)
+ 				continue;
+ 		} else {
+ 			/* Don't send frame to other channel types */
+@@ -391,6 +392,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			opcode = cpu_to_le16(HCI_MON_ISO_TX_PKT);
+ 		break;
++	case HCI_DRV_PKT:
++		if (bt_cb(skb)->incoming)
++			opcode = cpu_to_le16(HCI_MON_DRV_RX_PKT);
++		else
++			opcode = cpu_to_le16(HCI_MON_DRV_TX_PKT);
++		break;
+ 	case HCI_DIAG_PKT:
+ 		opcode = cpu_to_le16(HCI_MON_VENDOR_DIAG);
+ 		break;
+@@ -1860,7 +1867,8 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		if (hci_skb_pkt_type(skb) != HCI_COMMAND_PKT &&
+ 		    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
+ 		    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
+-		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT) {
++		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT &&
++		    hci_skb_pkt_type(skb) != HCI_DRV_PKT) {
+ 			err = -EINVAL;
+ 			goto drop;
+ 		}
+-- 
+2.49.0.604.gff1f9ca942-goog
+
