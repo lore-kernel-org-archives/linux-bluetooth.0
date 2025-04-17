@@ -1,104 +1,154 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E13015F41F;
-	Wed, 16 Apr 2025 21:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C488488
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Apr 2025 03:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744837291; cv=none; b=bWrlJT5e0wkNjpPRTy8+4Q31ZMgvqnGrNp8hoyYkHIKTLcFqPFmJ81jnho8tESfQMMay6+sCfwW2e42Fpi+YOepnl7X/f5WhBurs7OIIx9pV7Xmw5Mm/mqvTl4xA7L6pkAoW9eHaG4d5J94WtAGaXld9S9Sya+6PcDErJTEiS90=
+	t=1744860728; cv=none; b=BjGkl0/vi7UPAIQ93/AKXVRD+2yWJi8IcRuUmAC3C2QtQV8ydXv6CVAvz0IrP3aZPtgv0XRvCrm8YdwNOD+/C5T6P6sAIK8mBYOZTAzXolfFl4OvG3DdFeAQN13lfWbkNFb4YTK1oy3TzQNJR3S4uGsJIulas0kNOHpp5/7Qmjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744837291; c=relaxed/simple;
-	bh=jC5I5oqz7XH/41ajHpQ2HQsgm/qRsdrsgOrtAet8GkU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RG2ip+wDulz/2SZzAntzqSJN6nLyQn8LTBPVt+UJS7VKp7H3SKwxqV8WeCS9y3Y9HVJqZh6M55wtD3HU4Pf6v4R2pUYZwypuTNVrCXehERKmoSJimJcfm1oRjGYEpIPzhUSooA+bUqHXwgUtDFSW2Y02uw5LbLsWqiceBdxtVd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TU+JAct8; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744860728; c=relaxed/simple;
+	bh=kTB2Zx8f/9t3hbKG5egoNoItUvtTj5lF6AEH4PwdseE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EaVjUHDZcCNFnBlS1tKvL23yzbJ9ETGIp97T8edymc1dT5ZmWOBDrr9W5yv/uamvutN4u6RrwtVw7a+ldt6uEgdWEy7A5tJNelvnbcxGxKqQ9fnlLiEyUMZzKaIFv5jkdnbtI2hTWtjNsw+bTpCxmY9gtkUGKxmlRvwd0LN6Jok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KP9nCkja; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TU+JAct8"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-51eb1823a8eso43127e0c.3;
-        Wed, 16 Apr 2025 14:01:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744837289; x=1745442089; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qsRW3mztoWCPw38DZt/jtkCvfKzq42W27KJSKjcXFN0=;
-        b=TU+JAct8K2cQaJfKwJ6DybKRUFiZZiKHdfViLz/BHveiPpY70eDXvdBzOyuhAuCg+n
-         GgLpDFADT1EcKZOshNTZW6DZabtRE5FGc1A3YGcmnsQ8PS7rCdujyJ4T+Yt4kSx3czn4
-         bs/IL6uUlejzg9rH7nrh1BxUzM0yxfQ23UypjfrJu7BKSC0jnRD0s7WL/bt8/sGZ0BRW
-         cn3mA+6fwviV2sL4S+Yol2+44tOX2r4xqTuo/Nv9AQNx+V9mJDQ7bOAp/Sg/inpcM2Co
-         vDuVnlcD7X0+oQNB6OojIL05mAcGy7Ns8QNzn9OMvP5pdZ0pEKtMOcarb+PtaCJFsbBQ
-         kqXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744837289; x=1745442089;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qsRW3mztoWCPw38DZt/jtkCvfKzq42W27KJSKjcXFN0=;
-        b=WcYM3KWj8Mr/vbWKiX6CgQrrMrCnehifTYjPopp7GY6X4C2kcFcLVkJ9qtzhlFW9TB
-         G6VabD8oQx4mgHR63qiyPR4HHg8iGWjEOYRhsE5VlPFyEGBJwabBOtL1M9Z3cXjxavfB
-         zC5Uz6InOTjJWoZEj7P4BhAF9PaLkFOQPpv92coeXPX9byqb2nkkgt7Y2060ElSq6PSB
-         brjkEtXzmlQoPpq4KDD1WsdmQFal7JKlje2B2pTvVTxODDofUxijHoZ1rrb88yGbv8qU
-         R9a6f4UjiUlbDUeGYaFkXkz9DoPN13bYSJgSzRyrMV75OCymcETnwEiqBiJ1h4yU9ykA
-         9qHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVY9gP8hW0JKeAyiEzIGb2eca2PDIm6+GHfMMgXGLTPdTVFCQhGBOl+JsJRwsQiwT8JoHoZ/9w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQ4sjHDnuponRtlznBBFH7qzhp3jMFau2w77xMwG2cmgGF3q++
-	W0ihW7AZAyN1YUy+2vWFsI2OSDTv+AwS59n++ZOezaA8891vhsjCJIa7CQ==
-X-Gm-Gg: ASbGncuMbrJHPb/D/1at8Lfd63AnO14V0hMo+B3X6puxJ8qllbV7AYoNJZz7gD1Zpvn
-	MVJc2kNXLX6+mREyiflOoPFNL/GP1FfRbqZ3p9cjzhb79nRzvpPwEh5Lfulbu8Ww5oceOJ1bd1K
-	tPnmj7HAgn2HjbUfH6TR41+RKXGRZUhQvwBH4Dl3sv/JM1HokuwWyNb7QwDv0S0nHSgMCOQatz4
-	Sagfp3NDvltuDAlbY2R9ZG6QJWXVN+gjinofb9kC1He2+CgC9xTS58qCsUaQpo6a6jxZQRYtXqk
-	X0WSfpHIVQpZAzUSjM50SCrlfXl5C7XiGI/23N//CNOCCtICo8Lh8//gzVk6eo7CjpnaV55PEz0
-	OtyfF2WK4dA==
-X-Google-Smtp-Source: AGHT+IEltzokz9A8PByHB1ITgyOBNRKuWg0qg0N8qNv+N1MKDD+kxxuqdxiYK8IAUZW+KnjA+CQoiQ==
-X-Received: by 2002:a05:6122:32c9:b0:527:bc6b:35bb with SMTP id 71dfb90a1353d-5290de8d3eamr2916658e0c.3.1744837288935;
-        Wed, 16 Apr 2025 14:01:28 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8755716f08fsm3230008241.18.2025.04.16.14.01.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 14:01:28 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-04-16
-Date: Wed, 16 Apr 2025 17:01:25 -0400
-Message-ID: <20250416210126.2034212-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KP9nCkja"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744860727; x=1776396727;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kTB2Zx8f/9t3hbKG5egoNoItUvtTj5lF6AEH4PwdseE=;
+  b=KP9nCkja3+RFeEU9CWAOnZqCBpvzJp9RpnAbwenlI069CF/0pM23YNq1
+   VusOz3CEOHQIVZrgyeq5mqECFrL8tXjK3BCbzt8suIqhAh0IrjN0bpwbt
+   plSen0MSoRgm2LC54LnXkvgoAXB5pqYdTRk9em6a/4SiE/toKL/2s0pB4
+   hSJ12wR7YFfKj+tBTYC09kInTeZK0dTIchoPTE3Lvuhbe4lbE6Wy+Rj0r
+   SAW440Gp/zrz8zmezPKNkxPiespJHEZpxyKeO9r7I7aTZjOLpNOwIU9vT
+   FUmuk0qxYKHmUAqgd9t7yMCnugvQwIC+sNA94tYHgAAenLoNuaosVxAfh
+   Q==;
+X-CSE-ConnectionGUID: NyUul3c0TWCRHi+9ceu60w==
+X-CSE-MsgGUID: isDkgcvrSmGqS8GnlsD3xg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="46522601"
+X-IronPort-AV: E=Sophos;i="6.15,217,1739865600"; 
+   d="scan'208";a="46522601"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 20:32:06 -0700
+X-CSE-ConnectionGUID: Gl+f9aFXSrm2o5M00SyU6g==
+X-CSE-MsgGUID: WWLz086PR6KlcH5FGNHvjQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,217,1739865600"; 
+   d="scan'208";a="130537854"
+Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
+  by fmviesa006.fm.intel.com with ESMTP; 16 Apr 2025 20:32:04 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel_pcie: Avoid redundant buffer allocation
+Date: Thu, 17 Apr 2025 09:18:42 +0530
+Message-ID: <20250417034842.165796-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit adf6b730fc8dc61373a6ebe527494f4f1ad6eec7:
+Reuse the skb buffer provided by the PCIe driver to pass it onto the
+stack, instead of copying it to a new skb.
 
-  Merge tag 'linux-can-fixes-for-6.15-20250415' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can (2025-04-15 20:05:55 -0700)
+Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 33 ++++++++++++--------------------
+ 1 file changed, 12 insertions(+), 21 deletions(-)
 
-are available in the Git repository at:
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index e0b50513403f..b73928e38d34 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -947,8 +947,10 @@ static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 		/* This is a debug event that comes from IML and OP image when it
+ 		 * starts execution. There is no need pass this event to stack.
+ 		 */
+-		if (skb->data[2] == 0x97)
++		if (skb->data[2] == 0x97) {
++			hci_recv_diag(hdev, skb);
+ 			return 0;
++		}
+ 	}
+ 
+ 	return hci_recv_frame(hdev, skb);
+@@ -964,7 +966,6 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
+ 	u8 pkt_type;
+ 	u16 plen;
+ 	u32 pcie_pkt_type;
+-	struct sk_buff *new_skb;
+ 	void *pdata;
+ 	struct hci_dev *hdev = data->hdev;
+ 
+@@ -1041,24 +1042,20 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
+ 
+ 	bt_dev_dbg(hdev, "pkt_type: 0x%2.2x len: %u", pkt_type, plen);
+ 
+-	new_skb = bt_skb_alloc(plen, GFP_ATOMIC);
+-	if (!new_skb) {
+-		bt_dev_err(hdev, "Failed to allocate memory for skb of len: %u",
+-			   skb->len);
+-		ret = -ENOMEM;
+-		goto exit_error;
+-	}
+-
+-	hci_skb_pkt_type(new_skb) = pkt_type;
+-	skb_put_data(new_skb, skb->data, plen);
++	hci_skb_pkt_type(skb) = pkt_type;
+ 	hdev->stat.byte_rx += plen;
++	skb_trim(skb, plen);
+ 
+ 	if (pcie_pkt_type == BTINTEL_PCIE_HCI_EVT_PKT)
+-		ret = btintel_pcie_recv_event(hdev, new_skb);
++		ret = btintel_pcie_recv_event(hdev, skb);
+ 	else
+-		ret = hci_recv_frame(hdev, new_skb);
++		ret = hci_recv_frame(hdev, skb);
++	skb = NULL; /* skb is freed in the callee  */
+ 
+ exit_error:
++	if (skb)
++		kfree_skb(skb);
++
+ 	if (ret)
+ 		hdev->stat.err_rx++;
+ 
+@@ -1192,8 +1189,6 @@ static void btintel_pcie_rx_work(struct work_struct *work)
+ 	struct btintel_pcie_data *data = container_of(work,
+ 					struct btintel_pcie_data, rx_work);
+ 	struct sk_buff *skb;
+-	int err;
+-	struct hci_dev *hdev = data->hdev;
+ 
+ 	if (test_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags)) {
+ 		/* Unlike usb products, controller will not send hardware
+@@ -1214,11 +1209,7 @@ static void btintel_pcie_rx_work(struct work_struct *work)
+ 
+ 	/* Process the sk_buf in queue and send to the HCI layer */
+ 	while ((skb = skb_dequeue(&data->rx_skb_q))) {
+-		err = btintel_pcie_recv_frame(data, skb);
+-		if (err)
+-			bt_dev_err(hdev, "Failed to send received frame: %d",
+-				   err);
+-		kfree_skb(skb);
++		btintel_pcie_recv_frame(data, skb);
+ 	}
+ }
+ 
+-- 
+2.43.0
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-04-16
-
-for you to fetch changes up to 875db86e1ec75fe633f1e85ed2f92c731cdbf760:
-
-  Bluetooth: vhci: Avoid needless snprintf() calls (2025-04-16 16:50:47 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - l2cap: Process valid commands in too long frame
- - vhci: Avoid needless snprintf() calls
-
-----------------------------------------------------------------
-Frédéric Danis (1):
-      Bluetooth: l2cap: Process valid commands in too long frame
-
-Kees Cook (1):
-      Bluetooth: vhci: Avoid needless snprintf() calls
-
- drivers/bluetooth/hci_vhci.c | 10 +++++-----
- net/bluetooth/l2cap_core.c   | 18 +++++++++++++++++-
- 2 files changed, 22 insertions(+), 6 deletions(-)
