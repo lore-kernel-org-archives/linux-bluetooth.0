@@ -1,151 +1,108 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C642165E8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 16:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744992992; cv=pass; b=Pkh+0xXhF5P1IhhjtGVRi8pC2dH/qFHqJTV1xsuUqNJQ+lcnV18agYF43Sy4cSGalFJn9Pk2MOu6Uu/lLzB3ph1j3w7Y+H53DnSfZ3QmyP9z8ACYkL5hheqbMgp4dubvquiEh6kXdKpT/IlmTtLHsJjSaSsT0v+C+HKn8weO9VI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744992992; c=relaxed/simple;
-	bh=qO9OfM8JAXZOgKJB2FDVil8GlW5SQrXfYSAkWOuELmI=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=i5ABuj+r0hrQWwiQVF1TpaR/VmBQ7egFyut8Ip4cceBTf6bcmSm/eqtnAjS4oy5UQdIkBW1XMlJibX+E2xB1J7BvkTMC0C0Hok0TqY+DJLDFdwMXeaVSoNKAGEeMoyyxc+Kva+2HNf5dAUnCc9mn1l3ZuIeo3dMDaeBHte6CV+c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=GUk9EFi/; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFECA126BF7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 16:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744993054; cv=none; b=nRuq5/+CSIPqbcS4nawj2jIf9o4mpVbgLZOHI7xqR2k+cYCVMAZVaGZptbI1FmsjjmZMm0EWTVhZ0uWMknE8EpXBSeHi8JEj/JfrqsfI7UE36ae20DcpfS/5Ign5Jb2NWjaoW0i+polYxM2CxI8038Oly/zFkUyTD3jrZmvH5+o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744993054; c=relaxed/simple;
+	bh=+c6bbY+y3cmqe1V4+99LA+NpuapXb0qATD2Zu0pJaGQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=h/l1vyk1DNKEwZuvCU1bUScdFNzdNeroXTf4DR+SY7qrSjwe11h86ENA7+VAx8kzgala8hwZ6kqbSjtMr+EO4qv0oNk0zzLkUstm7VDTCMf7Hzmof3rqzA8k8aPSyaXVMHEppVei7BClSOzBUllvo9rVX0KS+RUofvVky1IchMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=T97fZZUB; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="GUk9EFi/"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZfKdD0Gnlz49Pv9;
-	Fri, 18 Apr 2025 19:16:15 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1744992976;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=L9xV/RVoewqgsAw1+AmE7wyATnntSR3XtaySxuMk1bs=;
-	b=GUk9EFi/G4+WjpPybjdjd2AKEsntXZKRx1brmYB1yJ+W+z9zuRjptFphAee5oIzL5fRT0S
-	aYgxPNaaq20tneoe8fQVEUMreFykG87h+cgirkl0oYFGs2T9EVJ8iq5pL9y5OjV6duiKZz
-	+XMol59kFy+unIM3buDcvj3CvlGVVSm7UXgw5f5IToFFaEoEzJcsxjOJ9Bitat657rMLmu
-	SGqCZhVktp7CyJTNmEUbir/DLRjLNCeiLAZLBF/DGQRPTThby7dt2m24CPoxHTWrCgIDCd
-	Qu1Xha6VE4pDu5xfpl712h2vJZ8drzYi3l/OyOqQsN8EWZ7VP1UtpOu6WLFeTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1744992976;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=L9xV/RVoewqgsAw1+AmE7wyATnntSR3XtaySxuMk1bs=;
-	b=qaZ75jP+KOVrma8/wkTyYjg9mP/6LBtWgymofM+7hWDhMw0FB6+pcZIW7Ku7vkm9dHD9Kp
-	68Lpsak26e62uHJi6FX/hHT/JIVQIeC4SlkFoAmnEhecs21VF0Z9oeaK8Og1b0jPGO7tqA
-	aMKP5t6ItZRsYSfkq+jej/Yzxsb4c0U+5VlNd6KteZtB4CmTcUvshZmrEEocRLlmWHHiqQ
-	PUBa+AVJCiiLdXxInYeK/5wDWrc1RpWowdt4RuvH3aAY89mKwg3FVin2YWF91LqIySU565
-	uEQYdXiKI9CEORe8K+7ip2s88pSw3t8efALOhJpQ6Q3xXu0xGuTgEyUyLTBfnw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1744992976; a=rsa-sha256;
-	cv=none;
-	b=F+NfBqnMG/pBzPMqqdDhMd1piYx63utE4w0tyDzkze7MI2bhy2SLPtaRg1YMWQKuXNa0D/
-	5Y9uDt4CyGw5h82C0QiSvdRb/QL+upjH/S/Fn+rqGicn/kARlL2mTS7Ob73VtqFmNx2EkZ
-	JEeS3ZnrK1rqVV2qMguNd6u04iU9VCHe4apW61uCbhaG+vhkjZbpdNqI4YmWx4hC5JnJcf
-	2sySIH61SgLS34oj3RSWz28fCU3dpa61xKsxUEvKU5+Gd9brI+MjhzYS1c/uFINS5gxG3z
-	vR0Jg5SFn9+Ri/X7TM7AK4S8advcEUp3ntgd9U1QvEMAe0xNDqDxnKo5B7m4mA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <b6ef92f938a53a0038a247ea6555e609791c9325.camel@iki.fi>
-Subject: Re: [PATCH v2 BlueZ 0/2] obexd: only run one instance at once
-From: Pauli Virtanen <pav@iki.fi>
-To: Andrew Sayers <kernel.org@pileofstuff.org>, 
-	linux-bluetooth@vger.kernel.org
-Date: Fri, 18 Apr 2025 19:16:12 +0300
-In-Reply-To: <20250418153115.1714964-1-kernel.org@pileofstuff.org>
-References: <20250418153115.1714964-1-kernel.org@pileofstuff.org>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="T97fZZUB"
+Received: from github.com (hubbernetes-node-da265f8.ash1-iad.github.net [10.56.148.25])
+	by smtp.github.com (Postfix) with ESMTPA id 7ED2E9210CD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 09:17:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1744993051;
+	bh=kzPAyws5GaSdDlvWc0SFq5qbaUjB1XIKWUXgGXX+ceE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=T97fZZUBp/BuVQkkfStBcxGhj5JgPdaNOObTR1NGMxgxwQQKQr/IG4Fo0/XKg+rrM
+	 gk/4B3XOApjIIdW+0MQDUfv/8uQbf/bJ64CgTomcul/C1w/QuM5vlQb9zQEHtqEpT9
+	 OAvfWOyUuz+201sE3rPlWUUZgL3iz7xB2DJ9hVao=
+Date: Fri, 18 Apr 2025 09:17:31 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/2a569e-8d472b@github.com>
+Subject: [bluez/bluez] 8d472b: obexd: only run one instance at once
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0
+      https://github.com/bluez/bluez/commit/8d472b8758dcdd89bf13cf2fb06a8846e1f483a0
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-18 (Fri, 18 Apr 2025)
 
-pe, 2025-04-18 kello 16:30 +0100, Andrew Sayers kirjoitti:
-> Obex is a device-oriented protocol, so only one instance can run per devi=
-ce.
-> But Linux file security is user-oriented, so obexd should be a user servi=
-ce.
-> Tell systemd to only run this service for the first non-system user to lo=
-g in.
+  Changed paths:
+    M obexd/src/obex.service.in
 
-Sound servers have this same problem.=C2=A0As there's no concept of multipl=
-e
-users in BlueZ, the solution there is to monitor systemd/elogind seat
-state, and detach the user process from bluetoothd if the seat is
-inactive.
+  Log Message:
+  -----------
+  obexd: only run one instance at once
 
-How to do the monitoring, see:
-https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/m=
-odule-logind.c#L52
+Obex is a device-oriented protocol, so only one instance can run per device.
+But Linux file security is user-oriented, so obexd should be a user service.
+Tell systemd to only run this service for the first non-system user to log in.
 
->=20
-> This series causes systemd not to run obexd if it would just generate err=
-ors,
-> after adding a new bluez.tmpfiles file that distributors will need to ins=
-tall.
->=20
-> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
-> ---
->=20
-> V1 -> V2 add a hint in obex.service.in about installing the tmpfile
->          (recommended by Luiz Augusto von Dentz)
->=20
-> Andrew Sayers (2):
->       build: add bluez.tmpfiles
->       obexd: only run one instance at once
->=20
->  .gitignore                | 1 +
->  configure.ac              | 1 +
->  obexd/src/obex.service.in | 9 +++++++++
->  tools/bluez.tmpfiles.in   | 1 +
->  4 files changed, 12 insertions(+)
+Without this patch, errors like the following will occur if you
+use the "switch account" feature of your desktop environment,
+then log in with another account:
+
+Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001133-0000-1000-8000-00805f9b34fb which is already registered
+Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001132-0000-1000-8000-00805f9b34fb which is already registered
+Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 0000112f-0000-1000-8000-00805f9b34fb which is already registered
+Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001104-0000-1000-8000-00805f9b34fb which is already registered
+Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001106-0000-1000-8000-00805f9b34fb which is already registered
+Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001105-0000-1000-8000-00805f9b34fb which is already registered
+Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00005005-0000-1000-8000-0002ee000001 which is already registered
+Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+
+The above errors indicate the service completely failed to register, so this
+does not change the user experience beyond removing the above messages.
+Specifically, the first user who logs in to a multi-user system still retains
+obex access to devices paired by users who log in later.
+
+This is based on a pair of recent changes to the FluidSynth daemon:
+
+https://github.com/FluidSynth/fluidsynth/pull/1491
+https://github.com/FluidSynth/fluidsynth/pull/1528
+
+This was discussed in the comments for a GitHub advisory available at
+https://github.com/bluez/bluez/security/advisories/GHSA-fpgq-25xf-jcwv
+but comments are not shown in the published version of the advisory.
+To summarise the useful conversation with Luiz Augusto von Dentz:
+
+Obex requires access to the user's home directory, so an attacker can only
+transfer files between locations the user controls.  That may be a problem
+if the user who runs obexd is different to the user who paired the device,
+but solving that would involve pairing per-user, which causes other problems.
+Bluetooth connections can be initiated by peripherals, so switching user could
+trigger re-pairing and cause the original user to lose access to the device.
+This may seem reasonable for file access, but for example users would likely
+object to constantly re-pairing their Bluetooth keyboard.
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
