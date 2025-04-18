@@ -1,182 +1,146 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1AA1FBEA2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Apr 2025 22:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B6E1DFFD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 09:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744928781; cv=none; b=ueewm29WQQpOfk4xfYhQMlxFSvwp4FTZ7R7GyXa1k5MZ5C0QlC9l1jM6/h+Q/+YVwYzZFnfOyR/j6QJArfx1q/mSoxHOrbhFzvU+fc6weyNZmgC/T6N7Cay2EBf7NrRKS55r1E+vE+AwcpB/TFyttsGilqbTL6X7vk/3XV5mem4=
+	t=1744967580; cv=none; b=AvMurO1gUc4Xhcp9KP6D61lXmrFsnZ5SNo4PyT7uXTDngZTa1Y4yJsqZCFK2BwVnAjMLskOZOZsbggFyU1MbfDcATiR8wUzOw616vbFdTJy/6rO0S6nFOKzs4cz7fOgr6iZfhFufMoral106KKaH4beH2LFMt4aeEi7T9OA6rwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744928781; c=relaxed/simple;
-	bh=WomWO4S+QSXJa8EDiEb74rIJyshEXzbCe3hd16RW4vY=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=Sy+w8KFjLGoJKP5kn8fVT+oZKv/RV3WbZJ8h6vCz2v+IqW0Fj8ruuGD8i5nN0cppDycNpxI2QL4PH5gmuJoM7kPJ96skkV828sUlQGbb2+oOB+VWQIjIAAlrzsy7tfql94IQCBoXRqqtH2yLNXWMaruAUtzyOqDxMfeefuL80Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NmVOwNMp; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NmVOwNMp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744928780; x=1776464780;
-  h=date:from:to:cc:subject:message-id;
-  bh=WomWO4S+QSXJa8EDiEb74rIJyshEXzbCe3hd16RW4vY=;
-  b=NmVOwNMpqaCFFTW1CF4mzqXAn4lxCDKWUYyAmMK13103h9RV2NDABO/F
-   qQQ4z04DFGWRHP+b3qaTxpNA1/ofPHTeile9t4pBt6rQxMKx9vD1RHXxV
-   OQyML9IC3uqpvg00rK5WhnpLHv/CCEZJN4ormqSpIugwN/7Yw3PsAMASc
-   CVcIw8LgEUhX27bTzjogr/02N3uvdBU5wy2oiXU0aZJncAwb7eyY+7TNg
-   In5yOZ/y415hZWwoHnan/cesdVoh9lEHFwirXGjXdXQ7tpHhSLHJxLqbP
-   F+YmFqTkI1C81n+MOnXKLFmBSHA4B0Q7ner8RinApxOC+EGN6jyeBydgm
-   w==;
-X-CSE-ConnectionGUID: giwxCY0aTG2nH8S7KJ2CWg==
-X-CSE-MsgGUID: RhmqRSanR9+iF53bsv6pFA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11406"; a="56727984"
-X-IronPort-AV: E=Sophos;i="6.15,220,1739865600"; 
-   d="scan'208";a="56727984"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 15:26:20 -0700
-X-CSE-ConnectionGUID: pVrZf5fyShapum5fOfMJdw==
-X-CSE-MsgGUID: p3X/GSaVS+G7XyFjpAzO/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,220,1739865600"; 
-   d="scan'208";a="135804536"
-Received: from lkp-server01.sh.intel.com (HELO 61e10e65ea0f) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 17 Apr 2025 15:26:18 -0700
-Received: from kbuild by 61e10e65ea0f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u5XgW-00025n-1L;
-	Thu, 17 Apr 2025 22:26:16 +0000
-Date: Fri, 18 Apr 2025 06:25:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- ffd068349018b768f1f8d262c8ace83b975e2db1
-Message-ID: <202504180643.I6lm2N7E-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	s=arc-20240116; t=1744967580; c=relaxed/simple;
+	bh=qjZXvryJ2W+KSJcZg6q/yL/hMFJBWsY9K5bryQV8mPg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=KhTrIm1Vl9v5jFLnOr/x2kF+DuYXhhoezAJQf46Rjg6uBWrlWMzY0VKp/W4jhcya/3rqVvaH25Wq1eayEjmq29PFAbeDQ+/jZDRHkInLckI5SdY6+etnDpb5TccpNZ0jl6XeE45YfUDo0I7xJlNDdDlSmclzYPu4bKaY6UDSdss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
+Received: from 5.b.4.c.0.b.6.8.4.c.5.9.d.5.9.8.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:895d:95c4:86b0:c4b5] helo=[IPV6:fd34:5ae5:dfe:ae11::1])
+	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
+	(envelope-from <andrew+antispam-20250418@pileofstuff.org>)
+	id 1u5hmJ-000Rqy-0n;
+	Fri, 18 Apr 2025 10:12:54 +0100
+Message-ID: <db879066-a355-4b98-a802-7982e9736a2b@pileofstuff.org>
+Date: Fri, 18 Apr 2025 10:12:30 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ 2/2] obexd: only run one instance at once
+To: linux-bluetooth@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20250416152039.971257-1-kernel.org@pileofstuff.org>
+ <20250416152039.971257-3-kernel.org@pileofstuff.org>
+Content-Language: en-GB
+From: Andrew Sayers <andrew+antispam-20250418@pileofstuff.org>
+In-Reply-To: <20250416152039.971257-3-kernel.org@pileofstuff.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: ffd068349018b768f1f8d262c8ace83b975e2db1  Bluetooth: ISO: Fix getpeername not returning sockaddr_iso_bc fields
+On 16/04/2025 16:19, Andrew Sayers wrote:
+> Obex is a device-oriented protocol, so only one instance can run per device.
+> But Linux file security is user-oriented, so obexd should be a user service.
+> Tell systemd to only run this service for the first non-system user to log in.
+>
+> Without this patch, errors like the following will occur if you
+> use the "switch account" feature of your desktop environment,
+> then log in with another account:
+>
+> Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001133-0000-1000-8000-00805f9b34fb which is already registered
+> Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001132-0000-1000-8000-00805f9b34fb which is already registered
+> Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 0000112f-0000-1000-8000-00805f9b34fb which is already registered
+> Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001104-0000-1000-8000-00805f9b34fb which is already registered
+> Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001106-0000-1000-8000-00805f9b34fb which is already registered
+> Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00001105-0000-1000-8000-00805f9b34fb which is already registered
+> Mar 26 15:20:38 andrews-2024-laptop bluetoothd[873]: src/profile.c:register_profile() :1.2016 tried to register 00005005-0000-1000-8000-0002ee000001 which is already registered
+> Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+> Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+> Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+> Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+> Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+> Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+> Mar 26 15:20:38 andrews-2024-laptop obexd[1795560]: bluetooth: RequestProfile error: org.bluez.Error.NotPermitted, UUID already registered
+>
+> The above errors indicate the service completely failed to register, so this
+> does not change the user experience beyond removing the above messages.
+> Specifically, the first user who logs in to a multi-user system still retains
+> obex access to devices paired by users who log in later.
+>
+> This is based on a pair of recent changes to the FluidSynth daemon:
+>
+> https://github.com/FluidSynth/fluidsynth/pull/1491
+> https://github.com/FluidSynth/fluidsynth/pull/1528
+>
+> This was discussed in the comments for a GitHub advisory available at
+> https://github.com/bluez/bluez/security/advisories/GHSA-fpgq-25xf-jcwv
+> but comments are not shown in the published version of the advisory.
+> To summarise the useful conversation with Luiz Augusto von Dentz:
+>
+> Obex requires access to the user's home directory, so an attacker can only
+> transfer files between locations the user controls.  That may be a problem
+> if the user who runs obexd is different to the user who paired the device,
+> but solving that would involve pairing per-user, which causes other problems.
+> Bluetooth connections can be initiated by peripherals, so switching user could
+> trigger re-pairing and cause the original user to lose access to the device.
+> This may seem reasonable for file access, but for example users would likely
+> object to constantly re-pairing their Bluetooth keyboard.
+>
+> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+> ---
+>   obexd/src/obex.service.in | 6 ++++++
+>   tools/bluez.tmpfiles.in   | 1 +
+>   2 files changed, 7 insertions(+)
+>
+> diff --git a/obexd/src/obex.service.in b/obexd/src/obex.service.in
+> index cf4d8c985..42d2185fb 100644
+> --- a/obexd/src/obex.service.in
+> +++ b/obexd/src/obex.service.in
+> @@ -1,10 +1,16 @@
+>   [Unit]
+>   Description=Bluetooth OBEX service
+> +# This is a user-specific service, but bluetooth is a device-specific protocol.
+> +# Only run one instance at a time, even if multiple users log in at once:
+> +ConditionPathExists=!/run/lock/bluez/obexd.lock
+> +ConditionUser=!@system
+>   
+>   [Service]
+>   Type=dbus
+>   BusName=org.bluez.obex
+>   ExecStart=@PKGLIBEXECDIR@/obexd
+> +ExecStartPre=touch /run/lock/bluez/obexd.lock
+> +ExecStopPost=rm -f /run/lock/bluez/obexd.lock
 
-elapsed time: 1457m
+Recent experience with the equivalent FluidSynth patch shows that,
+if a package maintainer upgrades without adding the tmpfile,
+the above causes the service to fail in ways that users find confusing.
 
-configs tested: 105
-configs skipped: 1
+One solution would be to prefix a '-' to make systemd ignore errors:
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
++-ExecStartPre=touch /run/lock/bluez/obexd.lock
++-ExecStopPost=rm -f /run/lock/bluez/obexd.lock
 
-tested configs:
-alpha                             allnoconfig    gcc-14.2.0
-alpha                            allyesconfig    gcc-14.2.0
-arc                              allmodconfig    gcc-14.2.0
-arc                               allnoconfig    gcc-14.2.0
-arc                              allyesconfig    gcc-14.2.0
-arc                   randconfig-001-20250417    gcc-13.3.0
-arc                   randconfig-002-20250417    gcc-13.3.0
-arm                              allmodconfig    gcc-14.2.0
-arm                               allnoconfig    clang-21
-arm                              allyesconfig    gcc-14.2.0
-arm                       aspeed_g4_defconfig    clang-21
-arm                   randconfig-001-20250417    gcc-7.5.0
-arm                   randconfig-002-20250417    clang-16
-arm                   randconfig-003-20250417    gcc-10.5.0
-arm                   randconfig-004-20250417    gcc-6.5.0
-arm                           sunxi_defconfig    gcc-14.2.0
-arm64                            allmodconfig    clang-19
-arm64                             allnoconfig    gcc-14.2.0
-arm64                 randconfig-001-20250417    gcc-7.5.0
-arm64                 randconfig-002-20250417    gcc-5.5.0
-arm64                 randconfig-003-20250417    clang-21
-arm64                 randconfig-004-20250417    gcc-9.5.0
-csky                              allnoconfig    gcc-14.2.0
-csky                  randconfig-001-20250417    gcc-13.3.0
-csky                  randconfig-002-20250417    gcc-11.5.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-21
-hexagon                          allyesconfig    clang-21
-hexagon               randconfig-001-20250417    clang-21
-hexagon               randconfig-002-20250417    clang-21
-i386                             alldefconfig    gcc-12
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250417    clang-20
-i386        buildonly-randconfig-002-20250417    gcc-12
-i386        buildonly-randconfig-003-20250417    gcc-12
-i386        buildonly-randconfig-004-20250417    gcc-12
-i386        buildonly-randconfig-005-20250417    clang-20
-i386        buildonly-randconfig-006-20250417    gcc-12
-i386                                defconfig    clang-20
-loongarch                        allmodconfig    gcc-14.2.0
-loongarch                         allnoconfig    gcc-14.2.0
-loongarch             randconfig-001-20250417    gcc-14.2.0
-loongarch             randconfig-002-20250417    gcc-13.3.0
-m68k                             allmodconfig    gcc-14.2.0
-m68k                              allnoconfig    gcc-14.2.0
-m68k                             allyesconfig    gcc-14.2.0
-microblaze                       allmodconfig    gcc-14.2.0
-microblaze                        allnoconfig    gcc-14.2.0
-microblaze                       allyesconfig    gcc-14.2.0
-mips                              allnoconfig    gcc-14.2.0
-nios2                             allnoconfig    gcc-14.2.0
-nios2                 randconfig-001-20250417    gcc-11.5.0
-nios2                 randconfig-002-20250417    gcc-9.3.0
-openrisc                          allnoconfig    gcc-14.2.0
-parisc                            allnoconfig    gcc-14.2.0
-parisc                randconfig-001-20250417    gcc-12.4.0
-parisc                randconfig-002-20250417    gcc-6.5.0
-powerpc                           allnoconfig    gcc-14.2.0
-powerpc                      arches_defconfig    gcc-14.2.0
-powerpc                      ep88xc_defconfig    gcc-14.2.0
-powerpc               randconfig-001-20250417    clang-21
-powerpc               randconfig-002-20250417    gcc-9.3.0
-powerpc               randconfig-003-20250417    gcc-9.3.0
-powerpc64             randconfig-001-20250417    clang-21
-powerpc64             randconfig-002-20250417    clang-21
-powerpc64             randconfig-003-20250417    gcc-5.5.0
-riscv                             allnoconfig    gcc-14.2.0
-riscv                 randconfig-001-20250417    gcc-7.5.0
-riscv                 randconfig-002-20250417    clang-21
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-14.2.0
-s390                  randconfig-001-20250417    gcc-7.5.0
-s390                  randconfig-002-20250417    clang-21
-sh                               allmodconfig    gcc-14.2.0
-sh                                allnoconfig    gcc-14.2.0
-sh                               allyesconfig    gcc-14.2.0
-sh                        apsh4ad0a_defconfig    gcc-14.2.0
-sh                    randconfig-001-20250417    gcc-13.3.0
-sh                    randconfig-002-20250417    gcc-7.5.0
-sparc                            allmodconfig    gcc-14.2.0
-sparc                             allnoconfig    gcc-14.2.0
-sparc                 randconfig-001-20250417    gcc-12.4.0
-sparc                 randconfig-002-20250417    gcc-14.2.0
-sparc64               randconfig-001-20250417    gcc-14.2.0
-sparc64               randconfig-002-20250417    gcc-10.5.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-21
-um                               allyesconfig    gcc-12
-um                    randconfig-001-20250417    gcc-12
-um                    randconfig-002-20250417    gcc-12
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250417    clang-20
-x86_64      buildonly-randconfig-002-20250417    clang-20
-x86_64      buildonly-randconfig-003-20250417    gcc-12
-x86_64      buildonly-randconfig-004-20250417    clang-20
-x86_64      buildonly-randconfig-005-20250417    clang-20
-x86_64      buildonly-randconfig-006-20250417    clang-20
-x86_64                              defconfig    gcc-11
-xtensa                            allnoconfig    gcc-14.2.0
-xtensa                randconfig-001-20250417    gcc-8.5.0
-xtensa                randconfig-002-20250417    gcc-14.2.0
+That would reduce a missing tmpfile from a crash to just log spam.
+But if the tmpfile gains a more important use case in future,
+you might uncover bugs in distro's that never installed the tmpfile.
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+An alternative would be to add a comment like:
+
++# If the service fails on the following line, please ensure
++# the bluez tmpfile has been installed in /usr/lib/tmpfiles.d/
++ExecStartPre=touch /run/lock/bluez/obexd.lock
++ExecStopPost=rm -f /run/lock/bluez/obexd.lock
+
+That wouldn't fix the problem, but would make it easier to debug,
+and hopefully nudge users to file a useful report with their distro.
+
+>   
+>   [Install]
+>   Alias=dbus-org.bluez.obex.service
+> diff --git a/tools/bluez.tmpfiles.in b/tools/bluez.tmpfiles.in
+> index e69de29bb..05b8ad65c 100644
+> --- a/tools/bluez.tmpfiles.in
+> +++ b/tools/bluez.tmpfiles.in
+> @@ -0,0 +1 @@
+> +d /run/lock/bluez 0777 root root
