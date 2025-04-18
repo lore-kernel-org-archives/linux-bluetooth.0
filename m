@@ -1,103 +1,114 @@
-Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B5D213E71
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 16:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9DA4CB5B;
+	Fri, 18 Apr 2025 17:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744994426; cv=none; b=KW0j7It3IfLb3R5aNJnVCHdlWQfEobQd8piYr5X0Veg9vf+OAgDv5uLBn+fi1ummH8HCOyzIFEJ1plG9uVJm1QBSTGhdNZW7lQuRQUsXi1kLEMc5uBRH0I79RiHS0FICzpSncxILDxgvrTC0fr+yovcF1MzgMrqrKX0UZrPcRMo=
+	t=1744995800; cv=none; b=ioVEIsp3/O4KUPOybyXn3VTM5Ac2Wi1NlbAs4YyjTjBxps/cdNOqmZLSPQ1VdoNVLr6uQMr64sZiW+9nSAHvrbj0+ao0n8WQ0llgDo2TbrzABQ2f7xQqBgUqbtkUiAfXHVM/BcsZMkrzXSHHo8oEy4kgVaK2rhpo9ZkjcuIu6WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744994426; c=relaxed/simple;
-	bh=M0J4Mgn9F9irsN2m6mpYfviUnacvHSomHWFxoE3sCzw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=edAi2ZgwEkUAOXxtsiEkINmzpEBG7OkLPqIfvMDK0ghml6WTlc2AbI3pK4pX4bMP6Z1GCIfRlsZI6mwkWnCn5jMBMLmW75sgfEpbVucvE+4RArRvu356Jf2p6aEsGoz8c8NfqD84k0XnV1gsuKXj2AuEXmmtkpoO1vRpknZeKwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
-Received: from 5.b.4.c.0.b.6.8.4.c.5.9.d.5.9.8.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:895d:95c4:86b0:c4b5] helo=[IPV6:fd34:5ae5:dfe:ae11::1])
-	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
-	(envelope-from <kernel.org@pileofstuff.org>)
-	id 1u5olJ-0010bQ-0R;
-	Fri, 18 Apr 2025 17:40:20 +0100
-Message-ID: <71a14d3e-7625-4414-9873-9105c991684d@pileofstuff.org>
-Date: Fri, 18 Apr 2025 17:40:12 +0100
+	s=arc-20240116; t=1744995800; c=relaxed/simple;
+	bh=3yZrrJGOXM7r2a4fOoqHfAicY7yN/Iqf8k1LBE56EDY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FreoUO32q0dGPCmSk1jzQSFJiaCRqzzIIGL+zvTMldfganJ4eZFyu4VqaD9aDZ1CkNlNbzMTKqth7yI52sC+08fi53AOZ2usdubN7xvK0WctMXvloLWfPMIF10wHXdncbWPJ+KUKGZnx18fw2Bp380j3WKSZ8+lkYgCK1kTddL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=f8rcAPZd; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="f8rcAPZd"
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9730E10273DBF;
+	Fri, 18 Apr 2025 19:03:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1744995796; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=OWXzo4OMHnLS4NPQ/xzmDOeZDiOZxuFA/2rUofiU76s=;
+	b=f8rcAPZdZjOYwq/L6E43t7xdHa2uzRG7aoJK1AlbVOvb0Wdex2AB+58FT2G+ra1DgX2jzW
+	GBwvToPhERvW1Onx5v8ydQhHXxgY7s7jPllGOHywOZmeWdX7iIge9fYORMp3hjQTFH9+I1
+	DZkjZ228evpalH8amOCq7QU1Gf2tfZHdLWC37fOQWWV/SkNHtMY/Ee6Dj6goFxurWAP6KC
+	ucbs7wdfripyT0OSheDZ7KbsuXez2ITU2wo7GOywr6ONRcLEzxEhVvo3IAiVT9+wpi7UUA
+	LbHLlWRwremYGaLrssdh+27y2SauRb1ITB8CwwmrP6t/uazu0QOZ4SZUqk+QvA==
+Date: Fri, 18 Apr 2025 19:03:11 +0200
+From: Pavel Machek <pavel@denx.de>
+To: Sasha Levin <sashal@kernel.org>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	marcel@holtmann.org, luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 5.10 15/15] Bluetooth: hci_uart: fix race during
+ initialization
+Message-ID: <aAKFz3wsy+HOMphC@duo.ucw.cz>
+References: <20250403191002.2678588-1-sashal@kernel.org>
+ <20250403191002.2678588-15-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ v2 1/2] build: add bluez.tmpfiles
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Pauli Virtanen <pav@iki.fi>
-References: <20250418153115.1714964-1-kernel.org@pileofstuff.org>
- <20250418153115.1714964-2-kernel.org@pileofstuff.org>
- <CABBYNZ+ig2=VWOwFQvkmZB4WebtY03C9AYktSXLmz6XZHXppMg@mail.gmail.com>
-Content-Language: en-GB
-From: Andrew Sayers <kernel.org@pileofstuff.org>
-In-Reply-To: <CABBYNZ+ig2=VWOwFQvkmZB4WebtY03C9AYktSXLmz6XZHXppMg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Vc6D8ODBsAjs0Y2/"
+Content-Disposition: inline
+In-Reply-To: <20250403191002.2678588-15-sashal@kernel.org>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 18/04/2025 16:35, Luiz Augusto von Dentz wrote:
-> Hi Andrew,
->
-> On Fri, Apr 18, 2025 at 11:31 AM Andrew Sayers
-> <kernel.org@pileofstuff.org> wrote:
->> Systemd tmpfiles ensure the status of particular files.
->> Add a file that bluez can use in future.
->>
->> Distributors should install the new "tools/bluez.tmpfiles" file, e.g. by
->> moving it to `debian/bluez.tmpfile` or using Fedora's `%{_tmpfilesdir}`
->> variable.
-> I thought we would not be adding this anymore with the addition to '-'
-> prefix and the added comments that should be left to distros to figure
-> it out.
 
-Ah sorry, I thought you meant to add the comment *instead of* the '-'.
-Leaving it to distro's feels a bit dangerous, but Pauli Virtanen's idea
-seems like a better approach anyway (thanks Pauli!).
+--Vc6D8ODBsAjs0Y2/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'll take a look at that and should be back with a v3 next week.
+Hi!
 
->
->> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
->> ---
->>   .gitignore              | 1 +
->>   configure.ac            | 1 +
->>   tools/bluez.tmpfiles.in | 0
->>   3 files changed, 2 insertions(+)
->>   create mode 100644 tools/bluez.tmpfiles.in
->>
->> diff --git a/.gitignore b/.gitignore
->> index 108c3b820..e4431443f 100644
->> --- a/.gitignore
->> +++ b/.gitignore
->> @@ -157,6 +157,7 @@ obexd/src/obex.service
->>   obexd/src/org.bluez.obex.service
->>   tools/obex-client-tool
->>   tools/obex-server-tool
->> +tools/bluez.tmpfiles
->>   unit/test-gobex
->>   unit/test-gobex-apparam
->>   unit/test-gobex-header
->> diff --git a/configure.ac b/configure.ac
->> index 1e089aaa7..4ebd513d6 100644
->> --- a/configure.ac
->> +++ b/configure.ac
->> @@ -530,5 +530,6 @@ AC_CONFIG_FILES(
->>          src/bluetooth.service
->>          tools/bluetooth-logger.service
->>          tools/mpris-proxy.service
->> +       tools/bluez.tmpfiles
->>   )
->>   AC_OUTPUT
->> diff --git a/tools/bluez.tmpfiles.in b/tools/bluez.tmpfiles.in
->> new file mode 100644
->> index 000000000..e69de29bb
->> --
->> 2.49.0
->>
->>
->
+> From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>=20
+> [ Upstream commit 366ceff495f902182d42b6f41525c2474caf3f9a ]
+>=20
+> 'hci_register_dev()' calls power up function, which is executed by
+> kworker - 'hci_power_on()'. This function does access to bluetooth chip
+> using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'.
+> Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
+> if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
+> 'hci_register_dev()', and there is tiny chance that 'hci_power_on()' will
+> be executed before setting this bit. In that case HCI init logic fails.
+>=20
+> Patch moves setting of 'HCI_UART_PROTO_READY' before calling function
+> 'hci_uart_register_dev()'.
+
+Ok, but do we need to adjust the error handling?
+
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -706,12 +706,13 @@ static int hci_uart_set_proto(struct hci_uart *hu, =
+int id)
+> =20
+>  	hu->proto =3D p;
+> =20
+> +	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+> +
+>  	err =3D hci_uart_register_dev(hu);
+>  	if (err) {
+>  		return err;
+>  	}
+> =20
+> -	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+>  	return 0;
+>  }
+
+Should we clear the bit in the error path to undo the effects?
+
+Best regards,
+								Pavel
+--=20
+DENX Software Engineering GmbH,        Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+
+--Vc6D8ODBsAjs0Y2/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCaAKFzwAKCRAw5/Bqldv6
+8nteAKC0ZaQK2eqV9AEc2XJ5g+RVdnJTbQCgt9ZXQXxEKNTvTonIxI6BFOcY8kw=
+=+60M
+-----END PGP SIGNATURE-----
+
+--Vc6D8ODBsAjs0Y2/--
