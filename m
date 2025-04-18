@@ -1,78 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761481519AC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 14:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24D745009
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 14:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744985397; cv=none; b=G06WZoBn9iPVdLvGTQAVo39mOGArEdLyZ0IUoyMjwsmiDztOc57uMan7PlHncz807sKqShTZ/rwm/KuhYqS8y4sX5ZKOZ7xtWxMDpVq2C69oRlCalwv5N06hDdyMSp0R7svv1STsmh3tQHQB8xIGA4SWb6nHB39mf+YNNP+bHTI=
+	t=1744985614; cv=none; b=URiMFvm3olRqcbDXyiPjIbR9YinLfFlyZN3jpi0TaBTFKRF2FMtbwinXs0HtnjZojklUseKm+3jlf/u2akGpaiR3xojY4YoJRgMJkaD4/sUMh6TEmZnyw3ru58gvy+0JPPYUsCAv+EFsDzZ41O6aMupQPkYMZ+drkbhHvILcB/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744985397; c=relaxed/simple;
-	bh=dqYVNidP0gFA5HgV3DeIKZIdz3JtlBy6cekiqzICmE4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B3x6cvmEkNVLJCX63iXWJsPn8UPbc96rfAaaV8wEnJSOIilAbH0KfcldTV5o2a83fLXZRELDgDA1DLTXhtMyNPCQtjiMttUrhQm2P+fmYFGrRFaaLsFAF+0u7IuhoGXpwGWDFUjUrqHo3J9SmxohYnf9Vuay3vgjSfYLwW0nOIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uyRpG3Of; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744985614; c=relaxed/simple;
+	bh=u2T4IXx34pO0DNac8ziaGs3avKomFZYGehi2H0pxxHk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=j7UEcs4fnjCuLFKqT4s3Ik5I2PWIeouwIQRy7VcaTo6yLn/D51LhfMBcXF2qqfIa1ho+HWyy3TSy2ZUo1YkUt3YJt6l191o02XhH8gROi7q8P9ZDEciD3e4GlbC0Aaw02ROq6pJpTsgTV3QJ0TnE/uiT8vdEYenk2HXIdhC0tP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XeO6lNce; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uyRpG3Of"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E45C4CEE2;
-	Fri, 18 Apr 2025 14:09:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744985396;
-	bh=dqYVNidP0gFA5HgV3DeIKZIdz3JtlBy6cekiqzICmE4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uyRpG3OfR7Qfif2QaSGd6ixhAFPNk6rNtlDouMM8PvE7590R7JvTBc1HxIC1fR+4H
-	 Rl8Q4VHUZeBMD2MApSXDzDOPT+fmdKaWFmFbfZfvExE68osolYMxjdQeoC0WWJQBuz
-	 fW5DDX7xlGVjYc99ID4l+8v5trGW7quFVs9cBsQFP+o3UsrSh7gVOOg9hFzwWSV65Z
-	 CNy6VjZjXSqkky1+NVKdSiblZ9GBgsa/9H3q/b0Cf2QdLDn8IoYg+rTgwW2nYIC97u
-	 O67/Du10nJgHVqxR8QsoKE8j20XSPVWs8iqqqXxpu5KBGpj+E01Px9a9KD9C8bNMGh
-	 fXgpLpaQkrKZQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 365E33810917;
-	Fri, 18 Apr 2025 14:10:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XeO6lNce"
+Received: from github.com (hubbernetes-node-4618ac8.va3-iad.github.net [10.48.15.72])
+	by smtp.github.com (Postfix) with ESMTPA id ECADFE08AE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Apr 2025 07:13:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1744985612;
+	bh=DXucQp+VGO1mwrqlyUxa672ddlDXeBDeTJ6j3xjfd30=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=XeO6lNceh4/9XuJOiOzczoaKjYljbN76Nyux1mggudjGV1dhnhxy6YnGsNBx0ez5+
+	 1yYAUAnCeJI8TCreVCZea4cbFVeWzOIGBzYeRq7SNlc5fA0bY3+wgBI7/pnE8MV/E9
+	 HrTIzfyQN5dzWkYBDRd1Al+gEyTsP6rij6P7WNNg=
+Date: Fri, 18 Apr 2025 07:13:31 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/aedd7b-2a569e@github.com>
+Subject: [bluez/bluez] e501c8: shared/shell: Fix build errors in fc42
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] shared/shell: Fix build errors in fc42
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174498543503.225291.7790404171985405348.git-patchwork-notify@kernel.org>
-Date: Fri, 18 Apr 2025 14:10:35 +0000
-References: <20250417202113.80496-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250417202113.80496-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: e501c8ab3023155700bc752d318b1ba3480311da
+      https://github.com/bluez/bluez/commit/e501c8ab3023155700bc752d318b1=
+ba3480311da
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-17 (Thu, 17 Apr 2025)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/shell.c
 
-On Thu, 17 Apr 2025 16:21:12 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes the following errors:
-> 
-> src/shared/shell.c: In function 'rl_cleanup':
-> src/shared/shell.c:1429:20: error: zero-length gnu_printf format string [-Werror=format-zero-length]
->  1429 |         rl_message("");
->       |                    ^~
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/shell: Fix build errors in fc42
 
-Here is the summary with links:
-  - [BlueZ,v1,1/2] shared/shell: Fix build errors in fc42
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e501c8ab3023
-  - [BlueZ,v1,2/2] mesh: Fix build errors when compiling on fc42
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2a569ec80ffb
+This fixes the following errors:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+src/shared/shell.c: In function 'rl_cleanup':
+src/shared/shell.c:1429:20: error: zero-length gnu_printf format string [=
+-Werror=3Dformat-zero-length]
+ 1429 |         rl_message("");
+      |                    ^~
 
 
+  Commit: 2a569ec80ffb4ea7a7dc1651b6befb51f2d34cd7
+      https://github.com/bluez/bluez/commit/2a569ec80ffb4ea7a7dc1651b6bef=
+b51f2d34cd7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-17 (Thu, 17 Apr 2025)
+
+  Changed paths:
+    M mesh/crypto.c
+    M tools/mesh-gatt/crypto.c
+
+  Log Message:
+  -----------
+  mesh: Fix build errors when compiling on fc42
+
+./mesh/crypto.c: In function =E2=80=98mesh_crypto_device_key=E2=80=99:
+./mesh/crypto.c:436:33: error: initializer-string for array of =E2=80=98u=
+nsigned char=E2=80=99 truncates NUL terminator but destination lacks =E2=80=
+=98nonstring=E2=80=99 attribute (5 chars into 4 available) [-Werror=3Dunt=
+erminated-string-initialization]
+  436 |         const uint8_t prdk[4] =3D "prdk";
+      |                                 ^~~~~~
+
+
+Compare: https://github.com/bluez/bluez/compare/aedd7b936b72...2a569ec80f=
+fb
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
