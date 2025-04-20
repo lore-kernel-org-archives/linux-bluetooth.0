@@ -1,210 +1,132 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E9F171A1
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Apr 2025 15:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFD62F2E
+	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Apr 2025 01:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745074842; cv=none; b=d7PW5dTaVi48kaV5oJn39ppFY71SI4o6gG922kUpBsOSvzCwRnQaQaxLysbeYZmftuRppArl1EXTS1UGo2fNPQjbF12HvVD7Si28RJcA7rNITvaUqAwEB2ZsjkC27NBTERd/LnRuvx2E/X/yEz+mH8CipLVqvtluTgHfgRbhYs4=
+	t=1745112923; cv=none; b=E7ODTscFC3U+iqQ+rSf30FNebNn/b3a5v+ZRfDsmXKwKe2audKdIO0pPI/njuyhreRxp3S+QpXgj+3RcyEV7X/z2wnJzEHNYr8BSbCpNd8KtSbBZIEaX5kaaByxm5ST0Bz6BK1A2oX6zL+sFcLx2arAfxkFAQXHauk5xXct7OBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745074842; c=relaxed/simple;
-	bh=kvYr638sLl6n2Pv1URAO57/NtXCKTumsReRhFV+Wmb8=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=c8h1tDIEa2dhMLA4bjInDoUVfH5R0Z8yIK/RSj/k7lewbQaew9XwsCfk+VgB0WZhDiOctyRXjin1cp1S28/hYHJwGnI4UAI1lP+Kwk4igGNU548GyJG9xAT7txn4GAnw3jSJFVrS0iPR1hGFzBoiceGbhD0Q4Irj++xygQRXGeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PjQes3wY; arc=none smtp.client-ip=192.198.163.17
+	s=arc-20240116; t=1745112923; c=relaxed/simple;
+	bh=e5FOpdeQYyfZ4Pgs95G2k194B2gcNFmls5hoqGwfgLE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VSNjBsDuD96FYkRV9NT9oi5facI9C4Ge+tnzIkOQfhvjQRcrpjSa6/hWHhG09N8hmiNOT3we/yWSJ8svw+VbNWuk8ylBrY/hSb3DDMAcmzulBAcRxekTleUBQQX9g0o461vUY4fYagh1/p+sX+IjGiGqRQmEXPgC7sCZKtzuubk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kgm0bS9l; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PjQes3wY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kgm0bS9l"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745074839; x=1776610839;
-  h=date:from:to:cc:subject:message-id;
-  bh=kvYr638sLl6n2Pv1URAO57/NtXCKTumsReRhFV+Wmb8=;
-  b=PjQes3wYVdsQSS0f5NBZWxa6VHv8nlhTDln28MzoHmikvPLsTILs4/sW
-   CIY6dWBN4RoTqgqLPnPh1d8HRZB6tqqt572a/BjVeP6sUljE2+kt5Cufb
-   mH2Msg7+eTerM4nLZZVJpFNjvXF7aWed7HztIJviuFv1Z5oi/NGVzIbfd
-   Mzp8HIurX5P/CIV42KOC3ibTtlI5+4GOVQkKYb06LaYMg8w6vBRLhv/19
-   OvRUrHPA+YGChLetFgIHVUmCt0qrpXcRz1IajxXSvh/PhuYKjNfZyC7S3
-   7Q+FOAtSAx++Vh223zraZaiaajtm2aAG2upP1wb+DNOYYMdioVADqxulS
-   A==;
-X-CSE-ConnectionGUID: pi22mH7aR9eBT3oy1BZxaQ==
-X-CSE-MsgGUID: CIrMYwZbQhiHSBbL9jU0fQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11408"; a="46558545"
-X-IronPort-AV: E=Sophos;i="6.15,224,1739865600"; 
-   d="scan'208";a="46558545"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2025 08:00:39 -0700
-X-CSE-ConnectionGUID: +rReaNXnQe64g2JaThUCSg==
-X-CSE-MsgGUID: hYZBV4ghRWyhMfq8+5JNAQ==
+  t=1745112921; x=1776648921;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=e5FOpdeQYyfZ4Pgs95G2k194B2gcNFmls5hoqGwfgLE=;
+  b=kgm0bS9lJ5XE2gZnkH6q/oLuZ53WnC9Ct4dMAQHlb353VHtltnXwt6Jo
+   ofBNDdH8aF9VZG13qPiMpZbYfGzTYNJryi97aeRYxXevb2cWlyasD9psi
+   O/TF83eEYXbNeuQWygeG3+/fyv/vUa8jsJoDzHRbgNbDDIgsnNK+gkQMh
+   SIHFJZh6Uf62VSXrk7fQWZ+1s7GK0x9FSo7ZaoSz5aHSFhbgr9kIFTcgc
+   gmg52PCgeZkUUnUMZIDVkGbEH+hrWdvaX/6FX2t2kWer7KRqVqvoARoby
+   Xz5Q6XlgFHdFnNVjVz+lL7EkwFEB1JvNnPpoau4UdC2vCm3gO2TAl7khP
+   g==;
+X-CSE-ConnectionGUID: HAEIgsJdTgGWJkhyLM20Hg==
+X-CSE-MsgGUID: vwRXZdJBRGaui6KsKWrWzQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11408"; a="34310924"
+X-IronPort-AV: E=Sophos;i="6.15,225,1739865600"; 
+   d="scan'208";a="34310924"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2025 18:35:21 -0700
+X-CSE-ConnectionGUID: qj2uPorqTp21mkUq+euS+A==
+X-CSE-MsgGUID: YYhGkXigQDK16mMMBYo90g==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,224,1739865600"; 
-   d="scan'208";a="162391800"
-Received: from lkp-server01.sh.intel.com (HELO 61e10e65ea0f) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 19 Apr 2025 08:00:38 -0700
-Received: from kbuild by 61e10e65ea0f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u69gK-0003wL-0H;
-	Sat, 19 Apr 2025 15:00:36 +0000
-Date: Sat, 19 Apr 2025 23:00:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD REGRESSION
- 16b4f97defefd93cfaea017a7c3e8849322f7dde
-Message-ID: <202504192321.ne9byniW-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+X-IronPort-AV: E=Sophos;i="6.15,225,1739865600"; 
+   d="scan'208";a="131273611"
+Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
+  by fmviesa006.fm.intel.com with ESMTP; 19 Apr 2025 18:35:19 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Add additional to checks to clear TX/RX paths
+Date: Sun, 20 Apr 2025 07:21:56 +0530
+Message-ID: <20250420015156.192605-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 16b4f97defefd93cfaea017a7c3e8849322f7dde  Bluetooth: btintel_pcie: Avoid redundant buffer allocation
+Due to a hardware issue, there is a possibility that the driver may miss
+an MSIx interrupt on the RX/TX data path. Since the TX and RX paths are
+independent, when a TX MSIx interrupt occurs, the driver can check the
+RX queue for any pending data and process it if present. The same
+approach applies to the RX path.
 
-Unverified Error/Warning (likely false positive, kindly check if interested):
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-    drivers/media/i2c/ccs/ccs-core.o: warning: objtool: ccs_set_selection() falls through to next function ccs_get_selection()
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index b73928e38d34..c23823e2a3ec 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1262,10 +1262,8 @@ static void btintel_pcie_msix_rx_handle(struct btintel_pcie_data *data)
+ 	bt_dev_dbg(hdev, "RXQ: cr_hia: %u  cr_tia: %u", cr_hia, cr_tia);
+ 
+ 	/* Check CR_TIA and CR_HIA for change */
+-	if (cr_tia == cr_hia) {
+-		bt_dev_warn(hdev, "RXQ: no new CD found");
++	if (cr_tia == cr_hia)
+ 		return;
+-	}
+ 
+ 	rxq = &data->rxq;
+ 
+@@ -1301,6 +1299,16 @@ static irqreturn_t btintel_pcie_msix_isr(int irq, void *data)
+ 	return IRQ_WAKE_THREAD;
+ }
+ 
++static inline bool btintel_pcie_is_rxq_empty(struct btintel_pcie_data *data)
++{
++	return data->ia.cr_hia[BTINTEL_PCIE_RXQ_NUM] == data->ia.cr_tia[BTINTEL_PCIE_RXQ_NUM];
++}
++
++static inline bool btintel_pcie_is_txackq_empty(struct btintel_pcie_data *data)
++{
++	return data->ia.cr_tia[BTINTEL_PCIE_TXQ_NUM] == data->ia.cr_hia[BTINTEL_PCIE_TXQ_NUM];
++}
++
+ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
+ {
+ 	struct msix_entry *entry = dev_id;
+@@ -1332,12 +1340,18 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
+ 		btintel_pcie_msix_gp0_handler(data);
+ 
+ 	/* For TX */
+-	if (intr_fh & BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0)
++	if (intr_fh & BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0) {
+ 		btintel_pcie_msix_tx_handle(data);
++		if (!btintel_pcie_is_rxq_empty(data))
++			btintel_pcie_msix_rx_handle(data);
++	}
+ 
+ 	/* For RX */
+-	if (intr_fh & BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1)
++	if (intr_fh & BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1) {
+ 		btintel_pcie_msix_rx_handle(data);
++		if (!btintel_pcie_is_txackq_empty(data))
++			btintel_pcie_msix_tx_handle(data);
++	}
+ 
+ 	/*
+ 	 * Before sending the interrupt the HW disables it to prevent a nested
+-- 
+2.43.0
 
-Error/Warning ids grouped by kconfigs:
-
-recent_errors
-`-- x86_64-buildonly-randconfig-006-20250419
-    `-- drivers-media-i2c-ccs-ccs-core.o:warning:objtool:ccs_set_selection-falls-through-to-next-function-ccs_get_selection()
-
-elapsed time: 1446m
-
-configs tested: 126
-configs skipped: 6
-
-tested configs:
-alpha                             allnoconfig    gcc-14.2.0
-alpha                            allyesconfig    gcc-14.2.0
-arc                              allmodconfig    gcc-14.2.0
-arc                               allnoconfig    gcc-14.2.0
-arc                              allyesconfig    gcc-14.2.0
-arc                   randconfig-001-20250418    gcc-14.2.0
-arc                   randconfig-002-20250418    gcc-12.4.0
-arm                              allmodconfig    gcc-14.2.0
-arm                               allnoconfig    clang-21
-arm                              allyesconfig    gcc-14.2.0
-arm                      jornada720_defconfig    clang-21
-arm                       multi_v4t_defconfig    clang-16
-arm                   randconfig-001-20250418    gcc-8.5.0
-arm                   randconfig-002-20250418    gcc-7.5.0
-arm                   randconfig-003-20250418    gcc-8.5.0
-arm                   randconfig-004-20250418    clang-21
-arm                         socfpga_defconfig    gcc-14.2.0
-arm64                            allmodconfig    clang-19
-arm64                             allnoconfig    gcc-14.2.0
-arm64                 randconfig-001-20250418    clang-21
-arm64                 randconfig-002-20250418    clang-21
-arm64                 randconfig-003-20250418    clang-21
-arm64                 randconfig-004-20250418    gcc-6.5.0
-csky                              allnoconfig    gcc-14.2.0
-csky                  randconfig-001-20250418    gcc-14.2.0
-csky                  randconfig-002-20250418    gcc-10.5.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-21
-hexagon                          allyesconfig    clang-21
-hexagon               randconfig-001-20250418    clang-21
-hexagon               randconfig-002-20250418    clang-21
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250418    clang-20
-i386        buildonly-randconfig-002-20250418    gcc-12
-i386        buildonly-randconfig-003-20250418    clang-20
-i386        buildonly-randconfig-004-20250418    gcc-12
-i386        buildonly-randconfig-005-20250418    gcc-11
-i386        buildonly-randconfig-006-20250418    clang-20
-i386                                defconfig    clang-20
-loongarch                         allnoconfig    gcc-14.2.0
-loongarch             randconfig-001-20250418    gcc-14.2.0
-loongarch             randconfig-002-20250418    gcc-12.4.0
-m68k                             alldefconfig    gcc-14.2.0
-m68k                             allmodconfig    gcc-14.2.0
-m68k                              allnoconfig    gcc-14.2.0
-m68k                             allyesconfig    gcc-14.2.0
-microblaze                       allmodconfig    gcc-14.2.0
-microblaze                        allnoconfig    gcc-14.2.0
-microblaze                       allyesconfig    gcc-14.2.0
-mips                              allnoconfig    gcc-14.2.0
-mips                           gcw0_defconfig    clang-21
-mips                           mtx1_defconfig    clang-21
-nios2                             allnoconfig    gcc-14.2.0
-nios2                 randconfig-001-20250418    gcc-10.5.0
-nios2                 randconfig-002-20250418    gcc-14.2.0
-openrisc                          allnoconfig    gcc-14.2.0
-openrisc                         allyesconfig    gcc-14.2.0
-openrisc                            defconfig    gcc-14.2.0
-parisc                           allmodconfig    gcc-14.2.0
-parisc                            allnoconfig    gcc-14.2.0
-parisc                           allyesconfig    gcc-14.2.0
-parisc                              defconfig    gcc-14.2.0
-parisc                randconfig-001-20250418    gcc-11.5.0
-parisc                randconfig-002-20250418    gcc-13.3.0
-powerpc                          allmodconfig    gcc-14.2.0
-powerpc                           allnoconfig    gcc-14.2.0
-powerpc                          allyesconfig    clang-21
-powerpc                     asp8347_defconfig    clang-21
-powerpc                      chrp32_defconfig    clang-19
-powerpc                      pasemi_defconfig    clang-21
-powerpc                      ppc64e_defconfig    gcc-14.2.0
-powerpc               randconfig-001-20250418    gcc-8.5.0
-powerpc               randconfig-002-20250418    gcc-6.5.0
-powerpc               randconfig-003-20250418    clang-21
-powerpc64             randconfig-001-20250418    clang-21
-powerpc64             randconfig-002-20250418    clang-21
-powerpc64             randconfig-003-20250418    clang-17
-riscv                            allmodconfig    clang-21
-riscv                             allnoconfig    gcc-14.2.0
-riscv                            allyesconfig    clang-16
-riscv                               defconfig    clang-21
-riscv                 randconfig-001-20250418    clang-21
-riscv                 randconfig-002-20250418    clang-21
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-14.2.0
-s390                                defconfig    clang-21
-s390                  randconfig-001-20250418    gcc-7.5.0
-s390                  randconfig-002-20250418    gcc-6.5.0
-sh                               allmodconfig    gcc-14.2.0
-sh                                allnoconfig    gcc-14.2.0
-sh                               allyesconfig    gcc-14.2.0
-sh                                  defconfig    gcc-14.2.0
-sh                        dreamcast_defconfig    gcc-14.2.0
-sh                    randconfig-001-20250418    gcc-12.4.0
-sh                    randconfig-002-20250418    gcc-14.2.0
-sh                             shx3_defconfig    gcc-14.2.0
-sparc                            allmodconfig    gcc-14.2.0
-sparc                             allnoconfig    gcc-14.2.0
-sparc                 randconfig-001-20250418    gcc-10.3.0
-sparc                 randconfig-002-20250418    gcc-7.5.0
-sparc                       sparc64_defconfig    gcc-14.2.0
-sparc64                             defconfig    gcc-14.2.0
-sparc64               randconfig-001-20250418    gcc-9.3.0
-sparc64               randconfig-002-20250418    gcc-11.5.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-21
-um                               allyesconfig    gcc-12
-um                                  defconfig    clang-21
-um                             i386_defconfig    gcc-12
-um                    randconfig-001-20250418    clang-21
-um                    randconfig-002-20250418    clang-21
-um                           x86_64_defconfig    clang-21
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250419    gcc-12
-x86_64      buildonly-randconfig-002-20250419    gcc-11
-x86_64      buildonly-randconfig-003-20250419    gcc-12
-x86_64      buildonly-randconfig-004-20250419    gcc-11
-x86_64      buildonly-randconfig-005-20250419    gcc-12
-x86_64      buildonly-randconfig-006-20250419    clang-20
-x86_64                              defconfig    gcc-11
-xtensa                            allnoconfig    gcc-14.2.0
-xtensa                randconfig-001-20250418    gcc-7.5.0
-xtensa                randconfig-002-20250418    gcc-14.2.0
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
