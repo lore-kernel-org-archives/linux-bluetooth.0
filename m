@@ -1,133 +1,166 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C604C8E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 14:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF84213D279
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 14:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745244128; cv=none; b=DenuoaGdeVO0o4yrfBq+P4IUvyIvcCAIDSNgD5yGCEnGyh0DBJwyxQlVLQjaWpbm/3VauH4WIVYiZHMHEdSNb6hCvFvCJUtNyx6gU5izY5J94YmmbTj2BH9s1sK2avpjS34K0/qaRmc1uS7kDQYD2fA2NqQJ/Xaxpkjl9POVq2E=
+	t=1745245149; cv=none; b=rHeOepfxBGjlT5RMYkaBIvoenc/1mFQtGbmHdZvf628qg1BRlK5vaYKr6o8EdaX9E+JR0gXDwmOUQzudKYWnpasikYzRukJIItYGOLiSsGyal/5937DvJmxRUIhHIFiz4Q+vVESj1dudX5A2O23yCA8VT1JoVIvSJANyUb+pfIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745244128; c=relaxed/simple;
-	bh=sEJN+UHpp2WL4IAwAWTC1Zmm+0gmN2IW98OoWWDRTCs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mbieb96+n38L0SoS29j6ej/5CqPAgATWNb2IUC4bgpcnXQ8I+1ukPw928jJfQAg1Zrh10GAfkbf1qaExcrgVAsa1dQ3RB8d7aYDbgSmyrmPqI1ifMkje05YcjSBOxuNLcLOCVLgevCBmfAzIUUrKKYXIP/Xrc7Cfiu/nI8imXNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hb6rcZZ9; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1745245149; c=relaxed/simple;
+	bh=pS0n0FUi8capciaGRZi1M6h7VDFUOycGHFbiiyEUEaY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SpbxGylGeWGXu+U3oJfV3FSjpqA5UL1Vflq0CsDmpu2mkQQCVPn3MyGVvhedg8Yx9RXQRyIvIqJ2fdrg2nMYjwOdDzrRh07E7hWxUJYUQ9cGtpxq0FxHb50DrEmQzQ/Q45/7sEPpMIVlyOLCLa0waRdNBB3NZ9w/1oXt4g83Uqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IqmS31Rl; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hb6rcZZ9"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2279915e06eso41320805ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 07:02:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IqmS31Rl"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30bfd4d4c63so36095141fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 07:19:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745244124; x=1745848924; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=flz4GPUNP9Ijo2hySZU/0QcVsAejDqM3MT87E37xAik=;
-        b=Hb6rcZZ9uwq7IymirpRl1qnu3S/K6ZnBmF7Cm7C+otxurWci67NLFgSw7Efkt59+kx
-         Hntb0NhKo6CEuhbxEoVQW8ezK7Nijv/ofGkalznJX1z28Pc5MepWwh66uGkfxwvaXeMI
-         y7YigL3awyMMJoVgSiVHrqo3xgsqkPc235nfsZB+ce9J3ZD47CSBpKPrVzk7TfIc7BJ3
-         vl1yt5ytacyvpVD3Ed1ORpkmZqlXUGCqf9HRg1wCdC91RfjMt9rTG3E0JgL1X4SjCM4h
-         E1+vELQjyghyNtQjtg6b9GIvEW97QrO3+Jibqx9RdEoiBcFqUCZ34JlwaiZzWnpewwJS
-         EvzA==
+        d=gmail.com; s=20230601; t=1745245146; x=1745849946; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dOWgaZm1p0rXaHm/Bpzd7RfLJHBZ97brK75IXcP4duk=;
+        b=IqmS31RlThPr9NBgSxqDbP+SY/FJ/+bxNv1hL/bOq31Rm+cYo7rDKE8p+OlBnGoj+7
+         nt7DS1fs3pwgPJ6h8N/qe9wowUaKbOtdNzHlp620wXXUdzMNZA+UhRhvTEeDEmtrsUtk
+         ELMjnlr3JX2xQClXxZsiR6hrksN4wmz3AgIDQgjrGPk6PTcnrNQCBOglOqT7fz6ZE+gc
+         1Jm8ArjUmeMPvmS2Gv+6nlbq2EDIh7YEyCQehOV5/imbLDr/WvbeKTkSoJOnWwEFyqtM
+         +FstOzdvopGfs0sOkLXG5EK6kyMuKo46qTJQwGhEMZXT/vHIZF1IDa1IbpY0neeqEOmH
+         UGqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745244124; x=1745848924;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=flz4GPUNP9Ijo2hySZU/0QcVsAejDqM3MT87E37xAik=;
-        b=XYELAcNZQvgL2mFtq58yvp7pYiPGNabjS1LX7HFMSIIL+HPnLyv6sONcT5/bhFRWMK
-         wg/HHtpt1w7pjarm1otZLhBE99kTB1xtkc4yExwBt4Z+tEnK3ePfPsEeYaEXSy/0sb0Q
-         3pMv6KIVTOGVDgU7ID1gVw+hoUbGdkxdgxwwWdlIF9ePdRMtXzH5F/N5gzTioPHhjb5K
-         KwK64S8HLCoSYhqO6Sk/WwLfmyERQGpqG9ZnvsFO7jBVFbGpjqNOqvECsG3Ior5yH3/s
-         cOzJeHKr8eVM6oEtC31cUM3n+Kv6MSyEcfWQ5eiKxVr5Ai1e8InvIaewHWAx/MC2DL4N
-         k20Q==
-X-Gm-Message-State: AOJu0YzbVqpoEWp8j2cEtEQdYvZ2zHYaYVOMiNRBeQzfjC52hgDTK+pX
-	A3eFMrK5ht8O2ZjebaB53aFpIL/R0zurnL5TJD2KouuGhlLBNHCLQ4/ljw==
-X-Gm-Gg: ASbGncuwjzVKOo7WPbgOZPP508ggkUrZai+CazH+rknI+1TtXwYQfvxxscFlFsiDZOx
-	9YVeiInwJAkob6KOpoDMfsoAuDZdlK2rIh8Ei0KObiZ9p4EiKlogr1MjQdN2/Ypz0vxqdgsYSU2
-	HP27uw9ibLBaIEDzwfjLZgbcPRypcFUVhhcdYyBMkpKPsBfXMkajTjBmbQ+SdD3KlXJayst8nNk
-	lEZunMIHlA/t8gbI+ZMS9mSvcR+FZs6XfEQ3Hb0XaT8TF0eBgvIBQxrlPtxeDiSZFt0jtfTO3uq
-	nJP1b8fqupipecwPa8bGIaIV3cdlQE4oBeaedPZSSschQ+k=
-X-Google-Smtp-Source: AGHT+IEiBXOpuf3ADf4fN6D2ethyq/UoQyo4c/w9lThMmvw3OGLSzC1s9foPL0GSuN2gkZxzI6QQSg==
-X-Received: by 2002:a17:902:f60a:b0:223:60ce:2451 with SMTP id d9443c01a7336-22c5359c344mr167860355ad.15.1745244124160;
-        Mon, 21 Apr 2025 07:02:04 -0700 (PDT)
-Received: from [172.17.0.2] ([52.234.33.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8e1556sm6575231b3a.42.2025.04.21.07.02.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Apr 2025 07:02:03 -0700 (PDT)
-Message-ID: <68064fdb.a70a0220.2dbeae.80f3@mx.google.com>
-Date: Mon, 21 Apr 2025 07:02:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6937256969366836373=="
+        d=1e100.net; s=20230601; t=1745245146; x=1745849946;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dOWgaZm1p0rXaHm/Bpzd7RfLJHBZ97brK75IXcP4duk=;
+        b=GNli6AB4g4mdOwyGE2qSiLXkmE9iF/1SqhxtC2tqKxycnRPpo1SM8xsnw8Gwdlwr0J
+         +Z8M7QMxfI6/GVlqp9MrshhpPAZ8WRlhtKn2EuOOBimCycXt59yF2XjxEaay90Pr3oHA
+         eRVl8UD+sznl/DCVgZBwFHWtKvTCx0sNZ2o7Bp5pgy7bbduegqCH4LE/qg/IVvBzs8CB
+         yTda1R9UusQgZr2Wo+wk2K6xVkHWj7HctSWGbKE6JYRy+t4UpuLifi4gmJ/n9UaJr31d
+         DD+ZxctQWBiT0Q1kj7xcfsz082D7X5XJoBFN51Ji3ESB9cmCE4xusVO+3RopQvS+mJO+
+         XFUg==
+X-Gm-Message-State: AOJu0Yw02mn3Fl/qKTSnYolb1zt+3JE3l1rpZKP08Lv0vAa2iNeZBv6l
+	KSDDyWA0/TXK77QL+5jpKKwNtpMWmpp+4SZsVamu7I2xMLtH5HFKW94t+D+m5pEFzqmUE/3LIgC
+	JalBYsR8D4yg95VModk+gOwSfHLQ=
+X-Gm-Gg: ASbGncvX0qLptrn7zvfGbZa2wa/iEwn46YRiJSeJO9YK54r4Mu3kKpVd2P6lXn6R3MM
+	Kp3SZ0qDCTS2nf/ldFMOLl9yWLlrF6foz1lNFKL95D0j5Q64m5bz4urw/mhRIK6feLncnAYd81/
+	DGyCSJWr6IkkOn0v046/DEPTvDGsXtCsU=
+X-Google-Smtp-Source: AGHT+IE0ExsaBJVyweENvvbrbeCYVZaBmO16dqOrxAWy0N8YDeeQFU2dXkfmVmYSjZoygTOZaTkQAVUf1cl+gdmBYso=
+X-Received: by 2002:a05:651c:30d5:b0:30c:50fd:9afe with SMTP id
+ 38308e7fff4ca-310904db007mr36424661fa.9.1745245145525; Mon, 21 Apr 2025
+ 07:19:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v1] Bluetooth: btintel_pcie: Dump debug registers on error
-In-Reply-To: <20250421092744.219097-1-kiran.k@intel.com>
-References: <20250421092744.219097-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20250421111251.108943-1-ludovico.denittis@collabora.com> <20250421111251.108943-5-ludovico.denittis@collabora.com>
+In-Reply-To: <20250421111251.108943-5-ludovico.denittis@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 21 Apr 2025 10:18:52 -0400
+X-Gm-Features: ATxdqUHDRRrdz0vQvqa_VhJse7Fw0gIwMY5WKHO0ITC2xfmL6FmkN6O7jbsrM70
+Message-ID: <CABBYNZ+QwX8r_8vU=piJ2AF6i_Us9opDNOe4r+9hM=9Jv0N0Bg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/5] input: Start the server with sec low and bump
+ it when making the connection
+To: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6937256969366836373==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Ludovico,
 
-This is automated email and please do not reply to this email!
+On Mon, Apr 21, 2025 at 7:14=E2=80=AFAM Ludovico de Nittis
+<ludovico.denittis@collabora.com> wrote:
+>
+> BT_IO_SEC_LOW is the only way to allow Sixaxis devices to establish
+> a connection.
+>
+> When BlueZ has been compiled with Sixaxis support enabled, we start the
+> listening input server with BT_IO_SEC_LOW to avoid breaking the Sixaxis
+> support.
+> Then, in `hidp_add_connection()`, we check if either
+> `classic_bonded_only` was disabled or if this device is a Sixaxis. If
+> neither are true, we bump the security back to BT_IO_SEC_MEDIUM, i.e.
+> enforcing encryption.
+>
+> This allows supporting the Sixaxis gamepad without having to change the
+> classic bonded only option.
+> ---
+>  profiles/input/device.c | 6 ++++--
+>  profiles/input/server.c | 7 +++++++
+>  2 files changed, 11 insertions(+), 2 deletions(-)
+>
+> diff --git a/profiles/input/device.c b/profiles/input/device.c
+> index 3627573e7..eb2fb5c8e 100644
+> --- a/profiles/input/device.c
+> +++ b/profiles/input/device.c
+> @@ -1088,8 +1088,10 @@ static int hidp_add_connection(struct input_device=
+ *idev)
+>         if (device_name_known(idev->device))
+>                 device_get_name(idev->device, req->name, sizeof(req->name=
+));
+>
+> +       sixaxis_cable_pairing =3D device_is_sixaxis_cable_pairing(idev->d=
+evice);
+> +
+>         /* Make sure the device is bonded if required */
+> -       if (classic_bonded_only && !input_device_bonded(idev)) {
+> +       if (classic_bonded_only && !sixaxis_cable_pairing && !input_devic=
+e_bonded(idev)) {
+>                 error("Rejected connection from !bonded device %s", idev-=
+>path);
+>                 goto cleanup;
+>         }
+> @@ -1098,7 +1100,7 @@ static int hidp_add_connection(struct input_device =
+*idev)
+>         /* Some platforms may choose to require encryption for all device=
+s */
+>         /* Note that this only matters for pre 2.1 devices as otherwise t=
+he */
+>         /* device is encrypted by default by the lower layers */
+> -       if (classic_bonded_only || idev->type =3D=3D BT_UHID_KEYBOARD) {
+> +       if (!sixaxis_cable_pairing && (classic_bonded_only || idev->type =
+=3D=3D BT_UHID_KEYBOARD)) {
+>                 if (!bt_io_set(idev->intr_io, &gerr,
+>                                         BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_ME=
+DIUM,
+>                                         BT_IO_OPT_INVALID)) {
+> diff --git a/profiles/input/server.c b/profiles/input/server.c
+> index 79cf08a66..73caeb076 100644
+> --- a/profiles/input/server.c
+> +++ b/profiles/input/server.c
+> @@ -273,6 +273,13 @@ int server_start(const bdaddr_t *src)
+>         BtIOSecLevel sec_level =3D input_get_classic_bonded_only() ?
+>                                         BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
+>
+> +#ifdef HAVE_SIXAXIS
+> +       /* Lower security to allow the Sixaxis gamepad to connect. */
+> +       /* Unless classic bonded only mode is disabled, the security leve=
+l */
+> +       /* will be bumped again for non sixaxis devices in hidp_add_conne=
+ction() */
+> +       sec_level =3D BT_IO_SEC_LOW;
+> +#endif
 
-Dear submitter,
+This is not that great, even if we increase the level at a later stage
+there is no reason to use low security while there are no input
+devices that require such logic, so I'd keep medium and downgrade the
+security only when required (which will probably need to restart the
+listening socket.)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=955283
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.41 seconds
-GitLint                       PENDING   0.29 seconds
-SubjectPrefix                 PASS      0.30 seconds
-BuildKernel                   PASS      24.75 seconds
-CheckAllWarning               PASS      27.09 seconds
-CheckSparse                   PASS      30.88 seconds
-BuildKernel32                 PASS      24.56 seconds
-TestRunnerSetup               PASS      466.92 seconds
-TestRunner_l2cap-tester       PASS      22.01 seconds
-TestRunner_iso-tester         PASS      33.67 seconds
-TestRunner_bnep-tester        PASS      4.83 seconds
-TestRunner_mgmt-tester        PASS      120.08 seconds
-TestRunner_rfcomm-tester      PASS      8.02 seconds
-TestRunner_sco-tester         PASS      12.67 seconds
-TestRunner_ioctl-tester       PASS      8.51 seconds
-TestRunner_mesh-tester        PASS      6.22 seconds
-TestRunner_smp-tester         PASS      7.47 seconds
-TestRunner_userchan-tester    PASS      5.08 seconds
-IncrementalBuild              PENDING   0.66 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+> +
+>         server =3D g_new0(struct input_server, 1);
+>         bacpy(&server->src, src);
+>
+> --
+> 2.49.0
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6937256969366836373==--
+--=20
+Luiz Augusto von Dentz
