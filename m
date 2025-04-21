@@ -1,130 +1,130 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D041519BA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 14:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44268139D0A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 14:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745245639; cv=none; b=XbCopjAawdc2nGWaR+l0S7vUSpnVbJCBZ0xTg6Relv+uJRcxXs8EEuE3tzB8KxsXIcoXNpmlM5oaKFj9OuCGGQNO6k7rC6TDuHWqacPpc0E66UlyD284nS9MynghxRWkviae+xyirVsOVBL9R4X7hT5e/VhKiMO3KhO4kvinfzs=
+	t=1745246293; cv=none; b=HdBe3DTC9NHnatnr7S8TTyZ6Wy7SpWH0hROh7fuoPik/jewuZmgOfAyZ7zJlFpJoI2l7YfXnPwRx5PufHF91NtT5mJRkSIofKorMu5KNSGNkUWvCx0RZtvnhUhnbwxoRjlNJQ/4WaDQcDd7x/zzJxs9PDmgPJJchlcMoI16CGhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745245639; c=relaxed/simple;
-	bh=kD29/uoB/2r7VHQiS8AIMvODaCfnHX23tosO3xqUH44=;
+	s=arc-20240116; t=1745246293; c=relaxed/simple;
+	bh=Ta8H1uBZpVXj4CU3PYLW3pNst7aQCsBXi2qClo1CQHI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qNwiRYv7nOxcU6lTZZ+C3xNGGkHOqE2ScZyG0nVcgVHqnIaQ9xu9UbXyyNjb3+Q82TvuJgeft88nvI4byuGIxxmuTIaODNWl+DU31AuOsJIQF+ektcRzkEC9ULi3zy8AJFF78ys92yncOU+kHFizUoAHk2teJ7BCR1LSI8puyh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zcf2De4G; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=ULl7UdLF6uQwEzA2e+7QvYQ8eWrekBHOwfke3p7xNqYJOtOCN921S/S7VPIBh+kqtq4b0afJ+Vx2Hdphp3RVABn5fzIebA2WX5XQxdWrrLE+3TYWNdPz71khvTFoGfjfPGfBl1GhBcmBVQ34Xp1RW0Fppmxqv+CNFvZ1FFWAUEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KHU5pHjx; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zcf2De4G"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-30bfd4d4c63so36180721fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 07:27:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHU5pHjx"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-30bfb6ab47cso38037371fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 07:38:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745245636; x=1745850436; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745246290; x=1745851090; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7n5S3vTjGg8VrXKt5Pr6zzI5aFfpqwnp53LQh+hV9CE=;
-        b=Zcf2De4GeKH0wSR7zFa7k2g7dYYiyUAutMAyrm8oITmmsvqwG6F9KrIDqV5R9U9VGe
-         AvBFAHHNKtU6Cau+l23iJv6Xt0lhRbX8G5+E45DWWQfKqUpp0zR9lbyJpX4ndzUtmEVi
-         7lQCnl9EfvJ0lVENRVi0KtFB90eG7wxaFouQDPsb4LDmf3mIlOOzXztIsKyKun6Yahjp
-         lvXEeQX31wuZ6mK0vOSL4jREtSRVAoC8uTOjH9DIhW9XGJ+/aJZPvB6i88r+LyloPpO2
-         jDxchVxTTxxOBBjk3Kn4ZGJOrm3N4x1Zy+9Qk4IoQrHqAsN+ngx2S1+UM4OuQPJAWCQ4
-         GLPQ==
+        bh=vPKmHekpSnAsvFJPjoPrV4NCxHRlTsOCAdcHBiGBVgQ=;
+        b=KHU5pHjxDsm52m12csyZ1Ejp3h/LoISIKgAunysUrQY77RJzJtNIR4il+34ZgJcUBa
+         GaDslDIWoQradT7TFOe4yjO74DL9hfcClYnwysWowwHTsNtMHV3lraW4ZMCmevpSv4R7
+         ppyx3CTl12Q4TFsy4A25DNvofML2dcj5iotd3PIbJguU4Ma0B8XgnKbnINb2nHpa7ysB
+         2gAv5wDZ7HnGWrQvTyPrGnNICENdjF8GVMMsxCORf1IHvqeKkezSiXtQ6eebWqEouZsD
+         ZS13o0r9Ye6wYBzrJPvKTzzi6x6vilxPVwUVZuwOUW3/m0r1nZYNm3APvabExiLLKte7
+         GwBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745245636; x=1745850436;
+        d=1e100.net; s=20230601; t=1745246290; x=1745851090;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7n5S3vTjGg8VrXKt5Pr6zzI5aFfpqwnp53LQh+hV9CE=;
-        b=Xky/ujZ/4Q7EHAjFBAJxusYy+pzNJrlRPWsa2WdXJmsrDJWH3uaVHb0LThrK0kzLJH
-         eNxSdW3HYqxITe7kj9x54Bg9UFUj+DuvKt5cQvWVzDiNg0VnFAYHqfi+jT1DphH7U98t
-         tBGHBxHvUc4xNmoQH6NwOpXtTcMsSEb0yG/dPvSPqznaYQ+dbO3ul2Kj1WJL0oOQ4fdA
-         KQ0JexoxTwQReVtlnIcgmRjW0BegNrKpl+asv4DavINDdUZg6Xk8fnN3S+WJdj9YTkyB
-         7g8Q+GVkw84LyJBkB1arYUzEBFOW+4wu+131HTbfo1nsuiqL2szpsjoFzEoS7j0in65S
-         1kQQ==
-X-Gm-Message-State: AOJu0YwxHFzXtMBH93YH21KeHBUe/LMrPK9ExDgOjUdWdukB12kzyy9O
-	ohzS5GViFQtOK49RT2x42y5ZrDdyPdnROzs85deaOOVZNsrHaPW+p8HSRkn6R2XtT0n52KglvBH
-	qbB3Mc1gWkvWmAH9OmhGNCoXP2+awGpR0ETQ=
-X-Gm-Gg: ASbGncvlG3S6F/m69TbCqYTPlDPm+VZYX4Rs4P/inwApiL6fPwDVr+90ZSaoCMJb9Y4
-	U4ozKSpEKE7soGSw7z58Tq5jF1lsHFo/ytsySjpI02aF3gcVYKMLxvqXHte3UK6wYeIRV/r9EhK
-	60tlNSJDxo9d+qEnN1ugK+
-X-Google-Smtp-Source: AGHT+IEIF+ees4e1zG955V9h4ZKArjOyI0bWmQqSa6gXGuiGdCgiyvBQ2i9CYPSBgtsIY/ATxBF5rhSwXYApGmSFJjw=
-X-Received: by 2002:a05:651c:3225:b0:30d:e104:cb74 with SMTP id
- 38308e7fff4ca-310905a3a25mr29341271fa.41.1745245635741; Mon, 21 Apr 2025
- 07:27:15 -0700 (PDT)
+        bh=vPKmHekpSnAsvFJPjoPrV4NCxHRlTsOCAdcHBiGBVgQ=;
+        b=MghEOFNuNaRCZ58/kgxKRUR+Ikwrpc7kF2OW/Ky9LpmrePwlwnfLOcWv4x8G6O9deu
+         BjINshJf5rRpfZ1/iQV+GN9Pb6AZLYwAmRr30mz06RAr0nMp+MzuR+OhRqXCoBYEFdkH
+         Wk4yQR7eFKmHkVNHSlKPaivtpOvCkJxpy88zKNzVKZwbmw+cpvJeDm8kQiftwNM2Oy9r
+         R/vn698Fwyf/o3Z32sPe0UDuPTBQPIw0z9lTNSlKXQonZ23wGgjiRubFjcu507EVDXc6
+         ev/yT9HPrfkYnDMa6/axrIZBFuStp5Sz1ZjyWmGwi+RRi6nAG+i8NlCyKl3b5srkLTQs
+         +VOQ==
+X-Gm-Message-State: AOJu0YzaQ7z4dcvrIbLnOhfXNZomQOCQBBLVcuxjb5ZrQps9wFIlI4VL
+	P/3MmMLk1xf7VTFd7rqsycaUQqSv7XkbmJbnmML4xwflTWZQ7OVMicTd2lMDodkhEyIMUmw2MuE
+	YNlPOsgMFo70y+HgjCtqO+flsLTtsI8yc5pM=
+X-Gm-Gg: ASbGncsqD2QzNfJYLUIfVrJi7mORGa6FGuwt/tS1Hr/zSL/6ZAWzO7xfVSZoQXL10w4
+	jq9enqsABfo0uBB/Eo3sKYJhZZgPg9cl0Krg/ZAdQC7LQ6DeXzkx5HdWbYug+25mqNUt3/Jsv2L
+	vHQQ4agbI1AoYPs+nuCkV9
+X-Google-Smtp-Source: AGHT+IHDZDzIQCyfZRgIZ1Rb8LOFFRvCuNWPcRkdQXB3EFw0jNR7l7pr5WLYCvNof2QcUGg7uWzNUWjSF105hP8jIBw=
+X-Received: by 2002:a2e:bc88:0:b0:30b:9813:b010 with SMTP id
+ 38308e7fff4ca-31090554278mr35434321fa.31.1745246289975; Mon, 21 Apr 2025
+ 07:38:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250421055814.96955-1-quic_amisjain@quicinc.com>
-In-Reply-To: <20250421055814.96955-1-quic_amisjain@quicinc.com>
+References: <fb302ed17cf2a4331d7ca57529cdbdde80376d82.1745233468.git.pav@iki.fi>
+ <ebc8762f1d7d65b9fb414d2b538985b23546ab57.1745233468.git.pav@iki.fi>
+In-Reply-To: <ebc8762f1d7d65b9fb414d2b538985b23546ab57.1745233468.git.pav@iki.fi>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 21 Apr 2025 10:27:02 -0400
-X-Gm-Features: ATxdqUGwgFPRkIXw68nv3BSEyFm_LXtrtY_n-4jnWWCCCNlebB0vpOzWRZ-AiLQ
-Message-ID: <CABBYNZ+umV4SZqVdtFq_ThD9PDpYA41+rZ=EF=xVxgOUXXQwsw@mail.gmail.com>
-Subject: Re: [RESEND PATCH v2] obex: Send response to client for Abort request
-To: Amisha Jain <quic_amisjain@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Date: Mon, 21 Apr 2025 10:37:57 -0400
+X-Gm-Features: ATxdqUEDFMvQLNiP7hqTFdKexlgGNy5CZNczJfleaL1uBFy6L6DtX7sR9DYXGGA
+Message-ID: <CABBYNZ+CVKheEVCPJnpdhTDr+ReOUTZwXyD0O8eAvZuM+GYGiA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] media: implement SupportedFeatures property
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Amisha,
+Hi Pauli,
 
-On Mon, Apr 21, 2025 at 1:58=E2=80=AFAM Amisha Jain <quic_amisjain@quicinc.=
-com> wrote:
+On Mon, Apr 21, 2025 at 7:05=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
 >
-> Incase of ongoing transfer, If the client sends Abort request, Server is =
-not
-> sending any response back.
->
-> Ideally it should send OK or Success reponse code for the abort command.
->
-> This is required in PTS testing for passing below testcases -
-> 1) OPP/SR/OPH/BV-27-I
-> To verify that a server can respond to an ABORT from the client during an=
- OBEX operation.
-> 2)FTP/SR/OTR/BV-02-C
-> To verify that the pushed file is aborted normally.
-> 3)PBAP/PSE/PDF/BV-06-I
-> Verify that the PCE can abort a Phone Book object download from the PSE.
-> 4)PBAP/PSE/PBF/BV-03-I
-> Verify that the PCE can abort a vCard-listing object download from the PS=
-E.
->
+> Add org.bluez.Media.SupportedFeatures. The value tx-timestamping is
+> hardcoded as it is currently always enabled.
 > ---
->  obexd/src/obex.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  profiles/audio/media.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 >
-> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-> index 370bfac9e..0330d5a7c 100644
-> --- a/obexd/src/obex.c
-> +++ b/obexd/src/obex.c
-> @@ -389,6 +389,8 @@ static void transfer_complete(GObex *obex, GError *er=
-r, gpointer user_data)
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index 69c6dc671..df36bc2df 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -3340,8 +3340,28 @@ static gboolean supported_uuids(const GDBusPropert=
+yTable *property,
+>         return TRUE;
+>  }
 >
->         if (err !=3D NULL) {
->                 error("transfer failed: %s\n", err->message);
-> +               if (strcmp(err->message, "Request was aborted") =3D=3D 0)
-> +                       os_set_response(os, 0);
+> +static gboolean supported_features(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       static const char * const features[] =3D { "tx-timestamping" };
+> +       DBusMessageIter entry;
+> +       size_t i;
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                               DBUS_TYPE_STRING_AS_STRING, &entry);
+> +
+> +       for (i =3D 0; i < ARRAY_SIZE(features); ++i)
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+> +                                                       &features[i]);
 
-We shouldn't be checking the error message but rather check the error
-code G_OBEX_ERROR_CANCELLED, that said I wonder why this is not being
-handled directly in the likes of
-gobex/gobex-transfer.c:transfer_abort_req, but it looks like it
-responding already:
+That doesn't really handle if the kernel doesn't support it or setting
+SO_TIMESTAMPING fails in case the kernel is too old? We might need to
+have a MGMT flag indicating that kernel has support for it otherwise,
+that said perhaps it would actually be better to have a socket option
+since for the likes of SCO sockets we actually need hardware support
+as well.
 
-    rsp =3D g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID)=
-;
-    g_obex_send(obex, rsp, NULL);
-
->                 goto reset;
->         }
+> +       dbus_message_iter_close_container(iter, &entry);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static const GDBusPropertyTable media_properties[] =3D {
+>         { "SupportedUUIDs", "as", supported_uuids },
+> +       { "SupportedFeatures", "as", supported_features },
+>         { }
+>  };
 >
 > --
-> 2.34.1
+> 2.49.0
 >
 >
 
