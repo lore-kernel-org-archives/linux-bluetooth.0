@@ -1,76 +1,43 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F1425FA1D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 11:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745233527; cv=pass; b=R+R55K8KrrCx56JA9Dng4WQ6fbwtM+BS2SqN373u9TIyy1Yg9ZWb+Nd2Of3Pr2OBcMcPLCMxSvKtF0tModGwKxUP9wH1GjoQDM4VdpfMjRat7tkZ10pw9VmgdQ7u3zk2hVe9+WSub4DOBOLOAFeSHrE/tbNiotJnyH9j20UNtjE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745233527; c=relaxed/simple;
-	bh=i1CS/0qEe8EA7gnJ1f4taCyLAzKw4Gc1vdfQP1glISk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kblmqIa5PwmcQLLPXWRSszDZAqXrzGbXAP4KDVkjbEnflysfJwJotrLOLO/oz+qSZZcaCuxpBdsiEHSjpdwPX8wCfQxMSyRNiBHi4/1fpyeqhX4IgMFJ5yM7b12S8GIAonu+BbTPCyMa77cejpGQXfMyTx5pF3l4VMxEB88e560=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=hFR1XUmb; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=A47YMYaJ; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6AA29D0E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 11:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745234016; cv=none; b=jRvg8ygh8FujfSCxUxInt/FsdM0zs73CrmKB6p5my+YIw9iAsWlVk/QhY+zx0orWMTszKPyNbyzVGh9GCzLGgFDIFeEMNakP0gKjnJENfQQNuOeyBAfavrFwEjhqXPfLiECp9VEIzrKVKgnII66HySU9PB2BpnNpjnlFj2kJrFE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745234016; c=relaxed/simple;
+	bh=GI25HrXWQAU3WpowxX7mAHaQmEX4DD76QzVLvQ3iXyo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CPL6nMK/a4M847s3n4ZYog/SGhIybJ5xFmp3y838JHDBsxkZOYJk0fXLAU9U3mPumP1Jiu27btjkO3eDW2B1/nW5l9ooq6redtR0yppLesqd6MVIoR1DHRXY3jCpXXg77mbcUj+E5EVzit7yJPPhYLMUY9ix0NwvQh1rA6uEUqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=YaF2/MyY; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="hFR1XUmb";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="A47YMYaJ"
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YaF2/MyY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1745234006;
+	bh=GI25HrXWQAU3WpowxX7mAHaQmEX4DD76QzVLvQ3iXyo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YaF2/MyY5iCioPXZjUKq/MnsAroBssWFUV2amEdGRJCbtkmrTSbWp0sq3ekA7pV9T
+	 LJMLZAZWL6dgYxhKFtP2Y/iyyI+p459Aqyy0kHyPhQjj0YpR4+12mh2/Dxdj3RQdBe
+	 VOBsu7uBehzGlZvophm5yMl8oI4xQIHRyboxluec8Gh52rOwkrtiWy4ZxtBEW72iwL
+	 7nXPq1Sw9mzmn/q7K7XrO58A2ufAvVQ/vkTlVWMHDd3XjEFFmG7CChIuifVHujeDEa
+	 eNkrx0GTzAHIc4SUrIGCsDQuyx/A7Z2Vj4s+kXFH6FWAQC53UUlsoIfHfAg5YV/rOi
+	 DshN6GYFvF+ZA==
+Received: from localhost.localdomain (unknown [81.56.51.115])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4Zh2b06k21z49Q5l
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 14:05:16 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1745233516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TnNvl7Tqo0FcWKW1uYS/pZx6za1f0Zj7zLNY4494PLc=;
-	b=hFR1XUmb7SROSEP3PXHA+EPfh7z4dOd2Q3yTfwiRwei1HBDXWZt0Y+uuGMAgLe1473GFkq
-	6yUz1aIyIuXnebtloBn8Us/S2+z+6xo1nwxziJTOZ5P94ncm8Q1esxJiZzYnNk7HSJP+ro
-	c0vADnG0LlLJGfx74nP5W94zuLu4ZCPEbuvZ6jAwawLO1cd06m8Z+Q7e8SOzE5RRr4hA0/
-	3CHWHIIqGMLL6ULyNZob2tXe6adIiIjYRMfzUHRFE/7a9l8D5VKuf15UQRSTjJ0YJ1Vug0
-	cDOPEx+YwLmja/miuQpK5gxUs4BNcyQlVyNyilQFRXvidBEk8NslKNM3oUmWsw==
-Received: from monolith.lan (unknown [185.77.218.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4Zh2Zr3hRZzyR8;
-	Mon, 21 Apr 2025 14:05:08 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1745233508;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TnNvl7Tqo0FcWKW1uYS/pZx6za1f0Zj7zLNY4494PLc=;
-	b=A47YMYaJHedXerIG0tEVfD/dr27GVPb8xAxH9i8kyDUde5WjIYsSnCRjG8cjnmN4JNBYRF
-	OB5SCpKyjm3aq0hFaYHHUuxKqhHSRtKjddG9MSfjNflaxdKRWPk3WFwalBih1M5r7+O0uc
-	B4+TF/QycilYh4A9qKZUp6fvJQt0nzw=
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1745233508; a=rsa-sha256; cv=none;
-	b=VIEluk5fePiMu+1M5FYfC2Q0TNYwHUe3x1zGdIu76ARIqIUSYsfuKW/BfqbFVgpQyg6oec
-	lYNT8l/z8aZwfEJY9D68tuXVJBYIIrtP2GgKNX4shaEL9MgtcLcjoVYD8cd2OLHcrZBIxc
-	1VtGv+GlaB68PTmhOnx31OlwaKfiB1M=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1745233508;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TnNvl7Tqo0FcWKW1uYS/pZx6za1f0Zj7zLNY4494PLc=;
-	b=ZbRIhIqzNVv1W8MiNaaovnK+TtNuJAxYjkBPRP5BQx8qpQu6qBo2WE/bWq4y06RxN3Fkqt
-	MjtJeRkGKQwJJWQMGqAuO+jiJYpT246GDTw4FCo+1FuYmeUh2N/ZO33pFy9v2sjtnRBtAt
-	T4N6yTlgMiB0vuMiPaI+iufe+OEflO8=
-From: Pauli Virtanen <pav@iki.fi>
+	(Authenticated sender: denittis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id E5A2817E00FC;
+	Mon, 21 Apr 2025 13:13:25 +0200 (CEST)
+From: Ludovico de Nittis <ludovico.denittis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/2] org.bluez.Media: add SupportedFeatures
-Date: Mon, 21 Apr 2025 14:04:33 +0300
-Message-ID: <fb302ed17cf2a4331d7ca57529cdbdde80376d82.1745233468.git.pav@iki.fi>
+Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Subject: [PATCH BlueZ 0/5] Support Sixaxis gamepad with classic bonded only
+Date: Mon, 21 Apr 2025 13:12:46 +0200
+Message-ID: <20250421111251.108943-1-ludovico.denittis@collabora.com>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -80,44 +47,45 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add SupportedFeatures property for feature information that applications
-cannot find otherwise.
+This series adds a new "SixaxisCablePairing" property to allow us to
+indentify sixaxis devices that have been paired using the canonical USB
+cable method. With that information, we can dynamically enforce
+encryption to drastically reduce the attack surface, compared to just
+disabling the "ClassicBondedOnly" property.
 
-Add feature tx-timestamping. Applications cannot enable it on old BlueZ
-versions without that feature, as it requires special handling on BlueZ
-side.
----
- doc/org.bluez.Media.rst | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+The "SixaxisCablePairing" property is exposed via D-Bus to allow
+clients to potentually show this information to end users.
 
-diff --git a/doc/org.bluez.Media.rst b/doc/org.bluez.Media.rst
-index ecd982652..d41329ccb 100644
---- a/doc/org.bluez.Media.rst
-+++ b/doc/org.bluez.Media.rst
-@@ -7,7 +7,7 @@ BlueZ D-Bus Media API documentation
- -----------------------------------
- 
- :Version: BlueZ
--:Date: September 2023
-+:Date: April 2025
- :Manual section: 5
- :Manual group: Linux System Administration
- 
-@@ -131,3 +131,14 @@ array{string} SupportedUUIDs [readonly]
- 
- 	List of 128-bit UUIDs that represents the supported Endpoint
- 	registration.
-+
-+array{string} SupportedFeatures [readonly]
-+``````````````````````````````````````````
-+
-+	List of strings that represent supported special features.
-+	Possible values:
-+
-+	:"tx-timestamping":
-+
-+		Media applications are allowed to enable kernel TX
-+		timestamping for acquired fds.
+As far as I can tell, starting the listening input server with
+BT_IO_SEC_LOW and then bumping it in `hidp_add_connection()` should not
+have any negative effect regarding the overall security. However,
+please let me know if it turns out not being the case. 
+
+The last commit "input: Validate the Sixaxis HID report descriptor" can
+probably be reviewed and merged separately if needed.
+
+Addresses https://github.com/bluez/bluez/issues/1165
+
+Ludovico de Nittis (5):
+  src: Add new SixaxisCablePairing property
+  client: Print SixaxisCablePairing value if BlueZ was compiled with
+    sixaxis
+  plugins: Set SixaxisCablePairing property when pairing a sixaxis with
+    USB
+  input: Start the server with sec low and bump it when making the
+    connection
+  input: Validate the Sixaxis HID report descriptor
+
+ client/main.c            |  3 ++
+ configure.ac             |  3 ++
+ doc/org.bluez.Device.rst |  6 ++++
+ plugins/sixaxis.c        |  5 ++-
+ profiles/input/device.c  | 77 ++++++++++++++++++++++++++++++++++++++--
+ profiles/input/server.c  |  7 ++++
+ src/device.c             | 44 +++++++++++++++++++++++
+ src/device.h             |  3 ++
+ 8 files changed, 145 insertions(+), 3 deletions(-)
+
 -- 
 2.49.0
 
