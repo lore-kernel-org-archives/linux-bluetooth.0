@@ -1,71 +1,70 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E75E20E03C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 21:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745269570; cv=none; b=FuF2iLPlk9Sw6L22/4QgQmv5g4WDKpZYM+l3u7pc0kXFMRX/q268dVVfHzgWGvHGrh6EyUFOmqf6CoNhZ+/jUhQG0uH1p493RL+YFRFkxx6BpImOrNEwy6E/o9ri79rbjKMP/VyRjUE9r54D8SIa9hdzSztMyrv2BPdMvb8pta8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745269570; c=relaxed/simple;
-	bh=WYBeKD+zcZNnUz63L3ujhK4F3KC6HCuglN5U2eXY7I4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p1WgY2YYaL1MtLKuiWbefwxmQbaMaUIUzY6v2F+3bJ+Wi7+vUo2coXwvuAufKW9mR52DtpCZQanU2lBX4UxHmTGLyICFN3M/T7/PrtzzOMHH8yKVxOYk5HZT6CIaUohIJTfJLt7ererrNMx/Z5C7wpYJHGJT+5IDGIuD0D2WB7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Br/wT5XQ; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99BE221289;
+	Mon, 21 Apr 2025 22:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745272976; cv=pass; b=anA/GpSs78hGhjPFem/Uzfxvl8QjaujyXTMJa7YHTR+VeyXaMfyH7j2bybGkA8bmCwFVlJIf+ItjYJDtZZjZe1M9zA1GH7fDXtb5BvwyUlThBuOtHoGq975fv1HkDpLXuG+21xUaZd8bBrR9SEHm+a0EMF6/DI7M2KiATobNa1I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745272976; c=relaxed/simple;
+	bh=TDuUmjERxzpZupEEIWrAYX9CP7zrQEa4WT8BuKPzMms=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OwPgnCZIfidZynQ08gSE4VK1Dfk007eTLoVBWXchj7lm3Pjfane4w8YxLweyRZiDhlugDBYIPEa+9py0mdl47Mg4aN8EQjv9cmTcyLqVYUBhVlwh9CILbdDEHbbWqKyAwcWVaHMJRgDjQxARUUmqycFrvIdVUOSeWMx+w4ZLMXE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=nQJC0Fc4; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Br/wT5XQ"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c546334bdeso304382685a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 14:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745269567; x=1745874367; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LL7Tzq1YFE76lG1+vg1wRjKJohByhgz8Z/Gg0ylwKho=;
-        b=Br/wT5XQ0UETtPe1QgHkhjdDzLzZckQu/8hNfuTBseB+CqAUEZa5pSa6c1x6kwgrLc
-         NMYZgoCMfaPE6yvt3diPuea7ifVNl0tpC14T+wvutwUy+HJ9N/Xz0Dsmdy2ufR3e6OiG
-         9Xg48MA8wlDs+IQIaLJ77VDHU1YlrrtJnncNjTpiSCoAN7hnQVo96e1uxQB9ijZPEmrb
-         umxP+Jfrp0claiL7qS57aQtS6PyPGAbaJ2I46D6CK+7GZd47lOLEs/XMxVI3qQiSkxQ4
-         uYR4UOEOsrRgLGnbqooMz55TVP+aBFocNLJF6yMXobB5U7Nt4mtRH7qn9S39BIcCkavg
-         COqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745269567; x=1745874367;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LL7Tzq1YFE76lG1+vg1wRjKJohByhgz8Z/Gg0ylwKho=;
-        b=okHJOxwqBINXQPswT2kWFftqH3vx5D83N/s+xGTqOb1+jE4Vc2X0R8rsq2IgdqhWzY
-         BcUjMhhJbFc5sttxp6bwA4YHNcHwN9iHnpm5hnO1yiEpfMrF3Mx4GVVeslhxY3xgN7UQ
-         FPryNUnxD1XI3Uk2mSVHWx1QIM8jFiodhr6PMvglwF+N4Y2ZzyxRohGJs0ZX2GCnXhMa
-         RutJm7CNdR77BDvl/sOt/t/0AGkpM/QO4pNRHVNo+bhAMg2Uwe2gdn02i46UqyZwr4oc
-         yyW1xd4NRxIUZo4dh/m+ofJapETCPisElf8zZHoUhIv1Mbi3Wbvy4AiKh3DnuiuI2MPW
-         /W7Q==
-X-Gm-Message-State: AOJu0YzRuhUgtONVAhcL03xei6dK/Q8+OYTQlePBCK9ud8jmjeSZxNqm
-	lg5NYbrJGvLYuznFnZzhZT8nUP/ykRNPOxETTWWqz2a6qCE0l/DVE4MqWVfEqck=
-X-Gm-Gg: ASbGncsznwlwuI00mEETKI7qE1wYoaVPokHAlY9whTPnHoDghzsxPKZ+6PABBZ0+UEL
-	Pew/GBjJg3miTzqVHUIvKasVGzkWc7QNuI/1em8jCikugRvtxu6PhkGrflHaegD9lGwRYAhMByW
-	w8z2zLn88Y6ZxcQuSSnmRPlo0dhyjlIkguLnkviJ2QRfOUo+t+xNwyCpMutJxmSZXGC29gNtNOC
-	m0ap6Sml3ZuXgs6y9n8VieQ6PDQ1h4wGzUtG4Qmyd5XudlMGcarPW+Kv1+iBZ+OCBpNCqKyTmhA
-	PmTvT2MiNV2xKaqJVaWsxoLd055sVoY1KWgVVpkb5hOqqTJ7p0juKUO1aA/2jQltJXAzgfLL7z5
-	caJ7WIqVBDA==
-X-Google-Smtp-Source: AGHT+IF+y4qkiP27yyD5qsCMA0fqCDhYAzBYNDwItLj8SlVSKVrt5WJTkTj3Uc6o7vN15dBskt3QuQ==
-X-Received: by 2002:a05:620a:394e:b0:7c5:4caa:21a4 with SMTP id af79cd13be357-7c92804d47amr2518573485a.55.1745269566617;
-        Mon, 21 Apr 2025 14:06:06 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87764654c5csm1913958241.5.2025.04.21.14.06.05
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Apr 2025 14:06:05 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="nQJC0Fc4"
+Received: from monolith.lan (unknown [185.77.218.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZhK9X3wD6z49Pwm;
+	Tue, 22 Apr 2025 01:02:40 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1745272961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Nn7shMwnID3Cbv85If5AHt3xSsWKkrff5w2tj8O7Hco=;
+	b=nQJC0Fc4n44QBI3x22Un5+usQfsSt3V8qe/IVEyXCcLl21XU3FKkUVdNFhPRZZSZxzuUW3
+	aAb0LckRxsmqQJl6N++dXcOUP7CWxgrP87qSafzokOGUJB5LqtNKvPrM0aazV1b9iHXyq8
+	4iscCaDdmJOQMSvhG8Fw06v9tNsQtTWYe4Ca0+gRVU0uZ7Eg70hbjqCtoUZ6FA53+BABgh
+	2Yop2Bn/oliTIkrXGqAYtSA4s85mdaCbmEbz3vN7U1qswveWADPOncAC1a6rqPWun1ytPw
+	C+S9jqXeY6ugey0OX89XZDbR4iiek8i0FI7cc2CLWCKnhcR4L903sb79aHwrdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1745272961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Nn7shMwnID3Cbv85If5AHt3xSsWKkrff5w2tj8O7Hco=;
+	b=jP26Hq+gxt8Pbt2P8liSeG2s4pQv1Ho57MsIay49YUqOwGAlc704nMRaZI72gT9vFKjEGr
+	0bIXJzIt8N7tuNGybwPox0QRm7TcWlsuEt0DD2eqWseWRmhW54l+j+E678jGvWHWW7jYI3
+	UovI91fpEFM/iApHFYFM2aARHHeI1j4lzrnWBdrvSm+7/h+/3Mv/4PRKVX+mjINk1pW0CN
+	VsIeqxjVSM2zW4FLYBNBTCRoWX95GICIc3GqlH1m8ncVOriaBa/EaL974ZLFAU9/5GdvGY
+	9zAyVnFhdCSuMDbvUioPMhEaBQDVKpnCZtX6zaNeb8D2+vClmpgvxrGIZlAiBg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745272961; a=rsa-sha256;
+	cv=none;
+	b=dcNYe4cpxZqtI3/gVTzxGO60DVfV0tBgbI0OA149gITIOu4GanLtaikeytgfDOkzMq/zI1
+	ZYnwFRjlrpV4yCXlTUmw5OiTeqghGUK3Xgq04hZy5qd5AryOfEjZUaNruVFoZnuHwSpIZ0
+	NX0B4uFE4SZb8rtF/q+kfKDJ9YG10S7kdW7ph2/hCFWOo/tsLhdP2/7x82aca++cQvgvwv
+	gHdTVYjGYhASAw+0/ebVF3H40dMKf60sd9WeblRLjdSTj6UI+mQYuS5eidyhrv2WYgm+Pf
+	vIjwPkYNKdQ7Npp591cJgigOgPP/ohflpPLnCB33TL7ZlXCvWbOVuNy8b0mcsA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/2] eir: Use Broadcast Name as Device.Name
-Date: Mon, 21 Apr 2025 17:06:02 -0400
-Message-ID: <20250421210602.746957-2-luiz.dentz@gmail.com>
+Cc: Pauli Virtanen <pav@iki.fi>,
+	luiz.dentz@gmail.com,
+	netdev@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	kernelxing@tencent.com
+Subject: [PATCH] Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
+Date: Tue, 22 Apr 2025 01:02:08 +0300
+Message-ID: <0ff3e783e36ac2a18f04cf3bc6c0d639873dd39d.1745272179.git.pav@iki.fi>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250421210602.746957-1-luiz.dentz@gmail.com>
-References: <20250421210602.746957-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,48 +73,212 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Bluetooth needs some way for user to get supported so_timestamping flags
+for the different socket types.
 
-This makes use of Broadcast Name advertising data field as device name
-so it can be identified by upper layer.
+Use SIOCETHTOOL API for this purpose. As hci_dev is not associated with
+struct net_device, the existing implementation can't be reused, so we
+add a small one here.
+
+Add support (only) for ETHTOOL_GET_TS_INFO command. The API differs
+slightly from netdev in that the result depends also on socket proto,
+not just hardware.
+
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- src/eir.c | 3 ++-
- src/eir.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index 3e3ee2863058..28b09653cbae 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -293,6 +293,7 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+Notes:
+    Another option could be a new socket option, not sure what would be best
+    here. Using SIOCETHTOOL may not be that great since the 'ethtool' program
+    can't query these as the net_device doesn't actually exist.
+
+ include/net/bluetooth/bluetooth.h |  4 ++
+ net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++++
+ net/bluetooth/hci_conn.c          | 40 ++++++++++++++
+ 3 files changed, 131 insertions(+)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index bbefde319f95..114299bd8b98 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -29,6 +29,7 @@
+ #include <linux/poll.h>
+ #include <net/sock.h>
+ #include <linux/seq_file.h>
++#include <linux/ethtool.h>
  
- 		case EIR_NAME_SHORT:
- 		case EIR_NAME_COMPLETE:
-+		case EIR_BC_NAME:
- 			/* Some vendors put a NUL byte terminator into
- 			 * the name */
- 			while (data_len > 0 && data[data_len - 1] == '\0')
-@@ -301,7 +302,7 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
- 			g_free(eir->name);
+ #define BT_SUBSYS_VERSION	2
+ #define BT_SUBSYS_REVISION	22
+@@ -448,6 +449,9 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+ 			  hci_req_complete_t *req_complete,
+ 			  hci_req_complete_skb_t *req_complete_skb);
  
- 			eir->name = name2utf8(data, data_len);
--			eir->name_complete = eir_data[1] == EIR_NAME_COMPLETE;
-+			eir->name_complete = eir_data[1] != EIR_NAME_SHORT;
- 			break;
++int hci_ethtool_ts_info(unsigned int index, int sk_proto,
++			struct kernel_ethtool_ts_info *ts_info);
++
+ #define HCI_REQ_START	BIT(0)
+ #define HCI_REQ_SKB	BIT(1)
  
- 		case EIR_TX_POWER:
-diff --git a/src/eir.h b/src/eir.h
-index f34291952823..2fe8cddf783d 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -39,6 +39,7 @@
- #define EIR_SVC_DATA128             0x21  /* LE: Service data, 128-bit UUID */
- #define EIR_TRANSPORT_DISCOVERY     0x26  /* Transport Discovery Service */
- #define EIR_CSIP_RSI                0x2e  /* Resolvable Set Identifier */
-+#define EIR_BC_NAME                 0x30  /* Broadcast Name */
- #define EIR_MANUFACTURER_DATA       0xFF  /* Manufacturer Specific Data */
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 0b4d0a8bd361..6ad2f72f53f4 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -34,6 +34,9 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <linux/proc_fs.h>
  
- /* Flags Descriptions */
++#include <linux/ethtool.h>
++#include <linux/sockios.h>
++
+ #include "leds.h"
+ #include "selftest.h"
+ 
+@@ -563,6 +566,86 @@ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
+ }
+ EXPORT_SYMBOL(bt_sock_poll);
+ 
++static int bt_ethtool_get_ts_info(struct sock *sk, unsigned int index,
++				  void __user *useraddr)
++{
++	struct ethtool_ts_info info;
++	struct kernel_ethtool_ts_info ts_info = {};
++	int ret;
++
++	ret = hci_ethtool_ts_info(index, sk->sk_protocol, &ts_info);
++	if (ret == -ENODEV)
++		return ret;
++	else if (ret < 0)
++		return -EIO;
++
++	memset(&info, 0, sizeof(info));
++
++	info.cmd = ETHTOOL_GET_TS_INFO;
++	info.so_timestamping = ts_info.so_timestamping;
++	info.phc_index = ts_info.phc_index;
++	info.tx_types = ts_info.tx_types;
++	info.rx_filters = ts_info.rx_filters;
++
++	if (copy_to_user(useraddr, &info, sizeof(info)))
++		return -EFAULT;
++
++	return 0;
++}
++
++static int bt_ethtool(struct sock *sk, const struct ifreq *ifr,
++		      void __user *useraddr)
++{
++	unsigned int index;
++	u32 ethcmd;
++	int n;
++
++	if (copy_from_user(&ethcmd, useraddr, sizeof(ethcmd)))
++		return -EFAULT;
++
++	if (sscanf(ifr->ifr_name, "hci%u%n", &index, &n) != 1 ||
++	    n != strlen(ifr->ifr_name))
++		return -ENODEV;
++
++	switch (ethcmd) {
++	case ETHTOOL_GET_TS_INFO:
++		return bt_ethtool_get_ts_info(sk, index, useraddr);
++	}
++
++	return -EOPNOTSUPP;
++}
++
++static int bt_dev_ioctl(struct socket *sock, unsigned int cmd, void __user *arg)
++{
++	struct sock *sk = sock->sk;
++	struct ifreq ifr = {};
++	void __user *data;
++	char *colon;
++	int ret = -ENOIOCTLCMD;
++
++	if (get_user_ifreq(&ifr, &data, arg))
++		return -EFAULT;
++
++	ifr.ifr_name[IFNAMSIZ - 1] = 0;
++	colon = strchr(ifr.ifr_name, ':');
++	if (colon)
++		*colon = 0;
++
++	switch (cmd) {
++	case SIOCETHTOOL:
++		ret = bt_ethtool(sk, &ifr, data);
++		break;
++	}
++
++	if (colon)
++		*colon = ':';
++
++	if (put_user_ifreq(&ifr, arg))
++		return -EFAULT;
++
++	return ret;
++}
++
+ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -595,6 +678,10 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ 		err = put_user(amount, (int __user *)arg);
+ 		break;
+ 
++	case SIOCETHTOOL:
++		err = bt_dev_ioctl(sock, cmd, (void __user *)arg);
++		break;
++
+ 	default:
+ 		err = -ENOIOCTLCMD;
+ 		break;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 95972fd4c784..55f703076e25 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -3186,3 +3186,43 @@ void hci_conn_tx_dequeue(struct hci_conn *conn)
+ 
+ 	kfree_skb(skb);
+ }
++
++int hci_ethtool_ts_info(unsigned int index, int sk_proto,
++			struct kernel_ethtool_ts_info *info)
++{
++	struct hci_dev *hdev;
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return -ENODEV;
++
++	info->so_timestamping =
++		SOF_TIMESTAMPING_TX_SOFTWARE |
++		SOF_TIMESTAMPING_SOFTWARE |
++		SOF_TIMESTAMPING_OPT_ID |
++		SOF_TIMESTAMPING_OPT_CMSG |
++		SOF_TIMESTAMPING_OPT_TSONLY;
++	info->phc_index = -1;
++	info->tx_types = BIT(HWTSTAMP_TX_OFF);
++	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE);
++
++	switch (sk_proto) {
++	case BTPROTO_ISO:
++		info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE;
++		info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
++	case BTPROTO_L2CAP:
++		info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
++	case BTPROTO_SCO:
++		info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE;
++		if (hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
++			info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
++	default:
++		info->so_timestamping = 0;
++	}
++
++	hci_dev_put(hdev);
++	return 0;
++}
 -- 
 2.49.0
 
