@@ -1,264 +1,149 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18C01F5833
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 22:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745273018; cv=pass; b=YVvJuk3mfPBJng6c5EK0a8IUABowgv6bygxbAAtJKmbB+M1jL2e4Y+70P/ThRWr2xa+GGMZeTjXlhe7UenWH1ZYMEmzLkwMJJ3A3ndEdos0Y6oc6ObY7ZZsHHcPfvNY5D0kCTzU7bwMvraMTXhWGRYOQlZjbgRkHwwrcP11emZQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745273018; c=relaxed/simple;
-	bh=gCdXMA09YJzwqknGWWUyS0e05AMngyWR6fb3ROJFWsY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fDkwQTYSL4SucMfgLTgdv3sgN8dM+gzwmouLmMdxYKKPH9Y2mYLKgBBSOllKnkFumc4uWX80x5KVWISQO0CQpOnYSbHzaXx7e6brXzL0ueQN+iUsGrWWfc3Qegz4HOWbX4BzPh+kLHx1eKdoTMQs3EEFKIUZHvgdOlcbMpKtrsQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=s93Qb+ae; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58FF9219A91
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 22:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745274793; cv=none; b=J59U+FrYU1H/XPwSpHRpfag8OZb1z7XYnZUXD/wYjGBFUBoZFIHUhcR0zR25lZ7daYxlt/Tqnt/Pz8VPL86HkFeyZjE9WbPO1VLhmnfQlEy0bfZUc6fNuVFLBuryUf74SgiQDu7RcRvYZir8BDjLilsvykvCzM7CnfeGvs/qekE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745274793; c=relaxed/simple;
+	bh=mnJyGZLSvUv/zSSMrEw+jhV94cKijNpWvE+rgmTB2Yw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=NQ7fcQmRCk8sm96rHsAwwakONh8/AGyGIso7B4aMBkQaLVuku5NvinEPnPc7Lt/smDqmUok6UroNC9fSaFpb0X2FKdi+SJUvBAZRt7tCkX4qN1XNVXNcAT2/d6RdDHpJv4LToTMRi9kWbPiJaPZT7hiaHQnlE8KIpDUG8Eaq6o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N/VEAkLb; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="s93Qb+ae"
-Received: from monolith.lan (unknown [185.77.218.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZhKBT49smz49PyD;
-	Tue, 22 Apr 2025 01:03:29 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1745273009;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fdwJkixs9RYYqK3KVBCxCcaFdU0sPJC4DJJgD3Kb018=;
-	b=s93Qb+aetP2SF29u+pV7zXxtIuDWGAphJb+KbeLhbY5tGMARX63q9DrTy3cZHlocdvdqQg
-	qVyDdd1lSuv9QldLDNM0kxtvo7r0J0/ledSbsQUBHEpYIPA3A5lcwzg8PHUhRHgDsKeuNx
-	mv7BySouXsQKzCxF5NNhDowPRETPPxVoGVmCdVLUC+9SB9fw8UveILQWBHZTUqSjb9JTWK
-	MfAtLkv4GtFyQ8P2d8coQt3iF+R7KkVE8l5twBhO+pgGbO5G+GVgYdCDCgelLXMGcVuL/3
-	LEu/iwrQv2lCqxqNcGJhGdnWQ2jIUFFToC+XfKq0/0M/sBkInC/X85qgI3vRcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1745273009;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fdwJkixs9RYYqK3KVBCxCcaFdU0sPJC4DJJgD3Kb018=;
-	b=hgQdH2Tyg5+ivvSf8CMZp6u2WfqYJirPV1K08d7DLCP68zIPCJCvoLH3Wq08BAAOpdT0eO
-	f2vivTQPZ2uKR+hUj+UzLklFnOHQQCJHSggL3GQ9HfEiQI9nK62bQz87CSjRMZEC3Yia5l
-	M5LNYv5rC1fDKYDz3BGEKo67JHxNRQLOEKg/KAMG9Yiw+nJcANAaEzDyX4oQypF3/qU5jC
-	elzsMgkdFHbA8NXu4WYln5qo+AlRfDHQDvKp01NAkLiJAhgXtsTQK3QJYBWjZKqMq+3H4s
-	uVlGU+pzfetawQE1D+a/YihAMv2TDkb45I/0SMgwc6V9p3BgPdZ3B+FF7G+A+w==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745273009; a=rsa-sha256;
-	cv=none;
-	b=njXjyYjiO+hsmwYhXXvQiECmmMHyNtdPiJhd9uHVDF2IPqbnFknKoQownSXcnItBvXt6Pe
-	YWXgU3eO6fMXT1LftGO0QlDTcQDdeko0rkrWeOD+LSnwUDj89Qiu58anTJI3HeBzwcJHdC
-	6LmBydM10vrcE5YPHtldync0K4sEBwNusSclXkvytDSM4/9S1GT8uneMBQIyO/78a6W+Oh
-	PKyi+jH0FyLtpTq4LK0nNBhVMB7PoutebEjjzt/A280ApCPeD8963Sl9z4CB22drZecDAg
-	wgAbaobFuelWYi5opTFnQEJ/NRNtHHO4j9Cp+GoHNpRnQ4MIGC4qKp8gHMsw+w==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] tools: add tests for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-Date: Tue, 22 Apr 2025 01:03:27 +0300
-Message-ID: <34c98b16c31ff4e5eb1a6d23326e7e2d7763a0ee.1745272994.git.pav@iki.fi>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/VEAkLb"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c5b8d13f73so462904885a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 15:33:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745274791; x=1745879591; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ih68fNuFNMdGBN3Th5kQlby4W5iGmBCztvaVxouNZMc=;
+        b=N/VEAkLb0onMfYmRWyOkH9tRj0uSdqvavFGijHKJ0yz5Fl57wSNimOdEr/6mPxwJ7s
+         15jhzxyhGB1e40hDZmN8LDNTDKPofIO1Bj/PEF+nBEA2XxdOYKb6dJm4tGkZ96B1LKIp
+         GeyfRU85sFz71OcgaRzoPpK4u38SCX5bpCWtI9N1hHXskr+6Pp4FbdeQ4QYUm+QxETwd
+         5tS+pxVyc+7BlZ9muRTA+rKt0LJAl7ceXFmCpRyIdX2h+zj+2L9cE7Waevruy6tmkAHb
+         iiJ/yDhr3HwGVYtHt23yk2BQodTwrFmtoweTkDzwzJFK/z6T6xcphpoAZ3LiilreXI/E
+         t81A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745274791; x=1745879591;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ih68fNuFNMdGBN3Th5kQlby4W5iGmBCztvaVxouNZMc=;
+        b=nQKKqwBIdWIJL1SzcRb1b2/gwXHfRBchAd7kp+8C3ZT770Kk/ebqr5lsN1HIH5yP4h
+         HSXEBp4P/EFKeliY3SHOYQGuQWf+bSDgyGJ6DH9bOVJY88r0b2EmBGSixUINGOiRVWZ1
+         So4gQcMNYIY7F29VMOQdZpSEiqOvvLX6mW4IQCtUPtXaT0WCsM2u0xcNrVhgpon90wVq
+         EdSsTxfgmtRArhZ6R6ueT0g/8XH0Es6D+U7rpLjsvs4MlZFMGJJKB4+LcKfaqvKZ58zy
+         H6M2kE2891smVVWca1zFcxQN1IRXZij34kcrBnwNRO/z7XY29tZq+9XRxN0mpdJENJ97
+         c3qg==
+X-Gm-Message-State: AOJu0YwK0SZDQBHeQGrAPAXvoA+zx+Ax2QMpDuhLBNn319oY7NR7B5Oy
+	y1Pf8mdyCjaC8g3hF+m3Bs6f8jrfWzYUvhRYsU57eNoIrdEWF0ZiNJSfLA==
+X-Gm-Gg: ASbGncun8VoK3lRn8FtNg1/1HZnylSR0J9RZwUyJKLad8mBWHCBfEw15xwsaWMobwlB
+	z4Bi48h8Nz8bfQ/UrtF/HHAKbFXL4uwEpkAt/iwc03LjjYnKzh+D8/l69aYSTcezmRE99EBcwkF
+	WXk7qXnNaagrWftZ3UqcOwp8VnS54f4tjTDsxVN7NDCc28giqbumX8ND3n+wLl9xMcRZv8wtAtd
+	cI3T7yyz+7xHhXVFoROHi0pw3iUpAeMMORXf+lRMR7ZiP8wYwEEXDzHjq2QkzvulJtZLOH5nXL8
+	ipJltIJBx6C8c1tR42oMcZMWH9YM0TxIa3SP0ny7HQ9lx8axqQ==
+X-Google-Smtp-Source: AGHT+IH6Tm1McJ31gJiNtsQPxsywrJ9DByegyGB6a3ng00y96tAhzwi8maHspetNjIzFV5dN8VuDEQ==
+X-Received: by 2002:a05:620a:240c:b0:7c5:a513:1fd2 with SMTP id af79cd13be357-7c927f59459mr1954365185a.6.1745274790742;
+        Mon, 21 Apr 2025 15:33:10 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.199.178])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925a6e51fsm472882785a.6.2025.04.21.15.33.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Apr 2025 15:33:10 -0700 (PDT)
+Message-ID: <6806c7a6.050a0220.11f3ce.f7ba@mx.google.com>
+Date: Mon, 21 Apr 2025 15:33:10 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7860612697888469191=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
+In-Reply-To: <0ff3e783e36ac2a18f04cf3bc6c0d639873dd39d.1745272179.git.pav@iki.fi>
+References: <0ff3e783e36ac2a18f04cf3bc6c0d639873dd39d.1745272179.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add tests for obtaining timestamping capabilities via ethtool ioctl:
+--===============7860612697888469191==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-L2CAP BR/EDR Ethtool Get Ts Info - Success
-L2CAP LE Ethtool Get Ts Info - Success
-SCO Ethtool Get Ts Info - Success
-SCO Ethtool Get Ts Info No Flowctl - Success
-ISO Ethtool Get Ts Info - Success
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=955479
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.24 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      24.63 seconds
+CheckAllWarning               PASS      27.22 seconds
+CheckSparse                   WARNING   30.66 seconds
+BuildKernel32                 PASS      24.39 seconds
+TestRunnerSetup               PASS      464.21 seconds
+TestRunner_l2cap-tester       PASS      21.21 seconds
+TestRunner_iso-tester         PASS      35.37 seconds
+TestRunner_bnep-tester        PASS      4.75 seconds
+TestRunner_mgmt-tester        FAIL      120.93 seconds
+TestRunner_rfcomm-tester      PASS      7.95 seconds
+TestRunner_sco-tester         PASS      12.49 seconds
+TestRunner_ioctl-tester       PASS      8.32 seconds
+TestRunner_mesh-tester        PASS      6.01 seconds
+TestRunner_smp-tester         PASS      7.20 seconds
+TestRunner_userchan-tester    PASS      5.05 seconds
+IncrementalBuild              PENDING   0.44 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/af_bluetooth.c:248:25: warning: context imbalance in 'bt_accept_enqueue' - different lock contexts for basic block
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 482 (98.4%), Failed: 4, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.206 seconds
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.153 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.186 seconds
+LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.142 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- tools/iso-tester.c   | 10 ++++++++
- tools/l2cap-tester.c | 15 +++++++++++-
- tools/sco-tester.c   | 14 +++++++++++
- tools/tester.h       | 57 ++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 95 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 63f6951e3..96467a973 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -3495,6 +3495,13 @@ static void test_connect2_suspend(const void *test_data)
- 	trigger_force_suspend((void *)test_data);
- }
- 
-+static void test_iso_ethtool_get_ts_info(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	test_ethtool_get_ts_info(data->mgmt_index, BTPROTO_ISO, false);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -3919,5 +3926,8 @@ int main(int argc, char *argv[])
- 	test_iso("ISO Broadcaster AC 14 - Success", &bcast_ac_14, setup_powered,
- 							test_bcast);
- 
-+	test_iso("ISO Ethtool Get Ts Info - Success", NULL, setup_powered,
-+						test_iso_ethtool_get_ts_info);
-+
- 	return tester_run();
- }
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 41ef62578..53b7d6f1a 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -994,7 +994,7 @@ static void setup_powered_server_callback(uint8_t status, uint16_t length,
- 
- 	tester_print("Controller powered on");
- 
--	if (!test->enable_ssp) {
-+	if (!test || !test->enable_ssp) {
- 		tester_setup_complete();
- 		return;
- 	}
-@@ -2494,6 +2494,13 @@ done:
- 	close(sk);
- }
- 
-+static void test_l2cap_ethtool_get_ts_info(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	test_ethtool_get_ts_info(data->mgmt_index, BTPROTO_L2CAP, false);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -2604,6 +2611,9 @@ int main(int argc, char *argv[])
- 				&l2cap_server_nval_cid_test2,
- 				setup_powered_server, test_server);
- 
-+	test_l2cap_bredr("L2CAP BR/EDR Ethtool Get Ts Info - Success", NULL,
-+			setup_powered_server, test_l2cap_ethtool_get_ts_info);
-+
- 	test_l2cap_le("L2CAP LE Client - Success",
- 				&le_client_connect_success_test_1,
- 				setup_powered_client, test_connect);
-@@ -2723,5 +2733,8 @@ int main(int argc, char *argv[])
- 				&le_eatt_server_reject_test_1,
- 				setup_powered_server, test_server);
- 
-+	test_l2cap_le("L2CAP LE Ethtool Get Ts Info - Success", NULL,
-+			setup_powered_server, test_l2cap_ethtool_get_ts_info);
-+
- 	return tester_run();
- }
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index 650f8bab3..8db424815 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -1098,6 +1098,14 @@ static void test_connect_acl_disc(const void *test_data)
- 	test_connect(test_data);
- }
- 
-+static void test_sco_ethtool_get_ts_info(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	test_ethtool_get_ts_info(data->mgmt_index, BTPROTO_SCO,
-+				!data->disable_sco_flowctl);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -1166,5 +1174,11 @@ int main(int argc, char *argv[])
- 	test_offload_sco("eSCO mSBC - Offload - Success",
- 		&connect_success, setup_powered, test_connect_offload_msbc);
- 
-+	test_sco("SCO Ethtool Get Ts Info - Success",
-+			NULL, setup_powered, test_sco_ethtool_get_ts_info);
-+
-+	test_sco_no_flowctl("SCO Ethtool Get Ts Info No Flowctl - Success",
-+			NULL, setup_powered, test_sco_ethtool_get_ts_info);
-+
- 	return tester_run();
- }
-diff --git a/tools/tester.h b/tools/tester.h
-index 4e7d7226b..241fba559 100644
---- a/tools/tester.h
-+++ b/tools/tester.h
-@@ -15,6 +15,11 @@
- #include <linux/errqueue.h>
- #include <linux/net_tstamp.h>
- 
-+#include <linux/ethtool.h>
-+#include <linux/sockios.h>
-+#include <net/if.h>
-+#include <sys/ioctl.h>
-+
- #include <glib.h>
- 
- #define SEC_NSEC(_t)  ((_t) * 1000000000LL)
-@@ -198,3 +203,55 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
- 
- 	return data->count - data->pos;
- }
-+
-+static inline void test_ethtool_get_ts_info(unsigned int index, int proto,
-+							bool sco_flowctl)
-+{
-+	struct ifreq ifr = {};
-+	struct ethtool_ts_info cmd = {};
-+	uint32_t so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
-+		SOF_TIMESTAMPING_RX_SOFTWARE |
-+		SOF_TIMESTAMPING_SOFTWARE |
-+		SOF_TIMESTAMPING_OPT_ID |
-+		SOF_TIMESTAMPING_OPT_CMSG |
-+		SOF_TIMESTAMPING_OPT_TSONLY |
-+		SOF_TIMESTAMPING_TX_COMPLETION;
-+	int sk;
-+
-+	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, proto);
-+	if (sk < 0) {
-+		if (sk == -EPROTONOSUPPORT)
-+			tester_test_abort();
-+		else
-+			tester_test_failed();
-+		return;
-+	}
-+
-+	snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "hci%u", index);
-+	ifr.ifr_data = (void *)&cmd;
-+	cmd.cmd = ETHTOOL_GET_TS_INFO;
-+
-+	if (ioctl(sk, SIOCETHTOOL, &ifr) == -1) {
-+		tester_warn("SIOCETHTOOL failed");
-+		tester_test_failed();
-+		return;
-+	}
-+	close(sk);
-+
-+	if (proto == BTPROTO_SCO && !sco_flowctl)
-+		so_timestamping &= ~SOF_TIMESTAMPING_TX_COMPLETION;
-+	if (proto == BTPROTO_L2CAP)
-+		so_timestamping &= ~SOF_TIMESTAMPING_RX_SOFTWARE;
-+
-+	if (cmd.cmd != ETHTOOL_GET_TS_INFO ||
-+			cmd.so_timestamping != so_timestamping ||
-+			cmd.phc_index != -1 ||
-+			cmd.tx_types != (1 << HWTSTAMP_TX_OFF) ||
-+			cmd.rx_filters != (1 << HWTSTAMP_FILTER_NONE)) {
-+		tester_warn("bad ethtool_ts_info");
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	tester_test_passed();
-+}
--- 
-2.49.0
 
+--===============7860612697888469191==--
