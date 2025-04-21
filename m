@@ -1,277 +1,189 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021D584039;
-	Mon, 21 Apr 2025 15:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745249379; cv=none; b=hsRiROtfmD0vagLr4owyqoos/Xt8h0aPGIbLuB2oMADFcAyptn2to3UWj3y0vSh+MhfXzW8F2E2hG3KOgdDBF8FpXi8z5gfF6biGi1HOe3QAnTX1M/exe/iyR36h0V1EkBJE1WRGdltyURjcqwUhGg4Cbuo9MiFLyBRLtsRCOOo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745249379; c=relaxed/simple;
-	bh=bRLShvjowgOOy//RuPIGSqjBET7Ge6MZ51PkkqL9DOk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qTAvPCYbrXFbr3Kh0ZWS7vrUEyvFdcce2kk69JZ+drv5uMBE6+A4dsdUPilTDqp5TGmod0NVV+Pf0pqd//In9G3YPWUUDSZqaq4Cwm2vZMO0cqKFMvarFYOLUNQN0Yy0kqKgRQl0/ukjA1vs7xlbqg+8WYqypUPXNviagIKd6FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LvOZEEjm; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1B914F9FB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Apr 2025 15:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745250185; cv=pass; b=GqZJlNlV30SDz6Q7rurbUeN2xk3tCoPf4Hhlq82aIQ4Vn+iSEpOCjpOKL/Lqi4bJcUuXSlRo8IZrdzm6+TYIaYHdsTisAzIY/ylVn131ZCg3PbeLgpaHLHVUvEJlorUstseZV9SddBbHiYCoKc84jA2lDxzrZwn6Kib9eexk8+w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745250185; c=relaxed/simple;
+	bh=5P4DeIzDHNTyA24FsNHkyBbOfNIhCgjamo3cITZICOs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=j79NgB9m8UPnaW7tfIXTj3tv6lc7s0Kxjmx1Yy2NXnBOEkuudNf2OGiDJr6Iwej6SrP6TCUskUz8zaLUAhsmBT2DUB1vnPou84QtvsctTNWRY95vZ0anDay2kI2/zTmHxbPDlIDd8l0Wz8nBmYPgRHRihQXRyqeT6bOPJzeUr1Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=B59zJYqn; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvOZEEjm"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-54e6788d07eso1329284e87.1;
-        Mon, 21 Apr 2025 08:29:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745249376; x=1745854176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hm47Qc5tmb6NJsCaaNaJW9/9jIlAIIjJmwiENTdYKpQ=;
-        b=LvOZEEjmO3NG1OV1qpL7/hmnh7/9Za1pUYJA+PR+vFBZjAPKPKWj61rMbuOKoYTRDb
-         kXSHMXnaUyJoXvfWXLcdoiqpUrFKWsQQuJuy9gs04l1gu1K9p0bF3K/LJR2bcPcBc4V0
-         l2u2WsDsZWPq4TaDCWQqf4KyLmYTT43Lzt18DbLKOMCIWiaKX1B4hFJXzk62KdGRH5vz
-         CH5NSrhk8HF1GZtzfJNJOI84uZ8zO8I1D5qAiCeGp7Ik4m20FpXZGr7d/JPFRa0wdTWl
-         uvFJ4xJVI9EoffvtVeTW1rTcjNMHlRJobN+n8j+n7bpjNBfgXiLa/bGCKotXKA7nx86P
-         FDxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745249376; x=1745854176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hm47Qc5tmb6NJsCaaNaJW9/9jIlAIIjJmwiENTdYKpQ=;
-        b=n3BftIvFzfZDYlSLUXJji9Z6WqYT1EPkQr/OC5x4zZ9jQxKgSskXDkcK2/x+qMIS8M
-         YvdZGnhNXpmo7d2KLeSNnWGRs3oW781pWwVXC1BNS91Y28DuDNeRQYXe5jyltBsVcBLF
-         yoXxZrLpZLEF+86ySzCt5/E6mTY3f5T2RMeV8RtaVVOfNJahqGxznV0cRxqOainu2ypy
-         qdMktJ9uqdNYFszxCdO2ZDQy11UOkrR5sNvyXgLqEoYeX7MDdLoKCZ6894vLXqdG9O1V
-         JrTqPxCTLYepHA2SPgyLWmxeB/9MmDuWDIcm3KZFJCsX9Z6KMjPD2++iGcqk3CkT8tGS
-         gNZg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+UlDKdTSh0lNmqcLwo5RU5olAfdmXLXeMReBCIMpzkzF3TwnKSJRSuF0SywlDbs+8WUSkhXz85aLdLtvmg8U=@vger.kernel.org, AJvYcCV4QrraqrEFKWjdHixvArEBcqewperYWS+bjQ5BUAXVJJZdkop28FbrAO8T3jp6tRpmp0Qx6n3RvElJDhpF@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/MIJiq1adjap8IOpGElm/wAqfx7AEhCwGgyOwNhDHZatP56u9
-	fAcx53o4Z2UukbFUPGas2TVINHd9uEGS6C5bHEPv87MhxpW9wvoVUmEcAbiRhAp81LnBtd0ha3a
-	8p9hc8h82v/SP6RFrJqDT+VAMH6iHqOPs
-X-Gm-Gg: ASbGncuzIXfTFU/MgKCE7wHaIekuJJlSgQ+h9QThmb9Dwxmdygz3mcMQsGw7G+vhoQY
-	SUqKufawFX3zwlFboqN2KRk/84QB2oAUhd6OS7EMmp3YjSsgdbof5FU/NezxMmopa3p6CWxRqf6
-	yjpqPBgDOzXwwXDE4NGMcc
-X-Google-Smtp-Source: AGHT+IFYK9UQRC9T9E6sSm0bjJDKv0XdOqwUFIcj0VoIYAESeejUyZSw0qHGc9lVnJYfjVUe0N/XOX1Q6cc+GfyINrg=
-X-Received: by 2002:a05:6512:3356:b0:549:9643:68d0 with SMTP id
- 2adb3069b0e04-54d6dbf65d3mr3796209e87.17.1745249375754; Mon, 21 Apr 2025
- 08:29:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="B59zJYqn"
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Zh8lN3Scvz49Q5l;
+	Mon, 21 Apr 2025 18:42:56 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1745250176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=fOOm3rVHsguds6IxOMwaISAiWEpD9gJQWXV8T0kj9gI=;
+	b=B59zJYqnHBnPFbwWDAMWGdy154TJmEw1fB3zS2tIm+Z+gFrKz8uMksZ1RrHl9k+ZjeUHa8
+	K2tG5q1WQxZDHYijWrwfsQjilkZ6hssBbDIE6O4XCNSjKUKDXvlrOIGxyqaaVw30alYmqk
+	/Tg9jJvk+aptZKC3RPDhEwxrvFCWge062cgTyVvM+S6C7Ff9P2+QlMJ6cNiTZ+LqoCSjna
+	rTLYqGMeCp3cFNkqeJ0RF0YXEmL/jwTk6DsEedzldIbmqzSu5/OeuyFzAMyGduOGESMQiA
+	4StvFkofyPn4UF2dsDHXWfkPJzWEUcM0tHd+g+cMgYndtgFpir/J7J57b++Crw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1745250176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=fOOm3rVHsguds6IxOMwaISAiWEpD9gJQWXV8T0kj9gI=;
+	b=mDHpwojiSB4MwLjR0BdZattpyAoCmc+4zYMH6omTHtBsflIPoQSheLqrEdMC8oPzRGlufZ
+	IaUyin1SWt5bqylj7d+gWdJ7/b5lRSzB6C2iEypqQQZU7btTYT+9PKLDM2sdlqvwpuo595
+	yqs+0ynQrSM+wvEErZCUtso4Si/WjxOT4fjXjWsiEh/hqE2wf5IX/cFqgTTWmALr86Z3FR
+	lZpnqZAmDeuvN+VnR3x9TQx4Wf8eQMYMXoV+0EXhUkhD0yc0OZeEJayz7yXp8hhT1cQ7Gr
+	3prIX/pY+U7vy8oToQhkb8Qsf4B8V09c6Gl9ZCdPU9RYjY1WM2UG5CXvzEgKAg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745250176; a=rsa-sha256;
+	cv=none;
+	b=s6bS6gEZv7Wdv0LT4Fd2OHM6d6awjOOpkefMefpZZPR1o3rFOsHfoINpUoNnHeGbyIdzzH
+	9xmVLTKo9FNfPli44DScs/91oKAGmJsxYuhPieU1DWpbUGRTSeXJXHEGzsJdBq6q4zh4Hf
+	hzW+kFsQ9blVm95kWMUBpMh69aZ7aoZeSJgVktGtZcxMDJ4NiRQNdxSGL9Wq9IbnT8NHle
+	AOT/QE57ISXqXfIysGITjT1xPoY5Pt4CYEwbDQuK2AhTdS4Lcgcjz6WJJzzgtEe2FuCKfb
+	/yIZN0Ax7fYMdAOylhm4GStTmuPrBnUFq8xTtfic96aj8WXVRbvTnkJUGm5a0A==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <b172e66316a34d9c86122233e0d2a5461f9e00f8.camel@iki.fi>
+Subject: Re: [PATCH BlueZ 2/2] media: implement SupportedFeatures property
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 21 Apr 2025 18:42:53 +0300
+In-Reply-To: <CABBYNZ+CVKheEVCPJnpdhTDr+ReOUTZwXyD0O8eAvZuM+GYGiA@mail.gmail.com>
+References: 
+	<fb302ed17cf2a4331d7ca57529cdbdde80376d82.1745233468.git.pav@iki.fi>
+	 <ebc8762f1d7d65b9fb414d2b538985b23546ab57.1745233468.git.pav@iki.fi>
+	 <CABBYNZ+CVKheEVCPJnpdhTDr+ReOUTZwXyD0O8eAvZuM+GYGiA@mail.gmail.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
+ ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
+ cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
+ aUeWsA9+/AwcjqJV2pa1kblWjfZZw4TxrBgCB72dC7FAYs94ebUmNg3dyv8PQq63EnC8TAUTyph+M
+ cnQiCPz6chp7XHVQdeaxSfcCEsOJaHlS+CtdUHiGYxN4mewPm5JwM1C7PW6QBPIpx6XFvtvMfG+Ny
+ +AZ/jZtXxHmrGEJ5sz5YfqucDV8bMcNgnbFzFWxvVklafpP80O/4VkEZ8Og09kvDBdB6MAhr71b3O
+ n+dE0S83rEiJs4v64/CG8FQ8B9K2p9HE55Iu3AyovR6jKajAi/iMKR/x4KoSq9Jgj9ZI3g86voWxM
+ 4735WC8h7vnhFSA8qKRhsbvlNlMplPjq0f9kVLg9cyNzRQBVrNcH6zGMhkMqbSvCTR5I1kY4SfU4f
+ QqRF1Ai5f9Q9D8ExKb6fy7ct8aDUZ69Ms9N+XmqEL8C3+AAYod1XaXk9/hdTQ1Dhb51VPXAMWTICB
+ dXi5z7be6KALQARAQABtCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaWtpLmZpPokCWg
+ QTAQgARAIbAwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgBYhBGrOSfUCZNEJOswAnOS
+ aCbhLOrBPBQJl/qsDAhkBAAoJEOSaCbhLOrBPB/oP/1j6A7hlzheRhqcj+6sk+OgZZ+5eX7mBomyr
+ 76G+m/3RhPGlKbDxKTWtBZaIDKg2c0Q6yC1TegtxQ2EUD4kk7wKoHKj8dKbR29uS3OvURQR1guCo2
+ /5kzQQVxQwhIoMdHJYF0aYNQgdA+ZJL09lDz+JC89xvup3spxbKYc9Iq6vxVLbVbjF9Uv/ncAC4Bs
+ g1MQoMowhKsxwN5VlUdjqPZ6uGebZyC+gX6YWUHpPWcHQ1TxCD8TtqTbFU3Ltd3AYl7d8ygMNBEe3
+ T7DV2GjBI06Xqdhydhz2G5bWPM0JSodNDE/m6MrmoKSEG0xTNkH2w3TWWD4o1snte9406az0YOwkk
+ xDq9LxEVoeg6POceQG9UdcsKiiAJQXu/I0iUprkybRUkUj+3oTJQECcdfL1QtkuJBh+IParSF14/j
+ Xojwnf7tE5rm7QvMWWSiSRewro1vaXjgGyhKNyJ+HCCgp5mw+ch7KaDHtg0fG48yJgKNpjkzGWfLQ
+ BNXqtd8VYn1mCM3YM7qdtf9bsgjQqpvFiAh7jYGrhYr7geRjary1hTc8WwrxAxaxGvo4xZ1XYps3u
+ ayy5dGHdiddk5KJ4iMTLSLH3Rucl19966COQeCwDvFMjkNZx5ExHshWCV5W7+xX/2nIkKUfwXRKfK
+ dsVTL03FG0YvY/8A98EMbvlf4TnpyyaytBtQYXVsaSBWaXJ0YW5lbiA8cGF2QGlraS5maT6JAlcEE
+ wEIAEEWIQRqzkn1AmTRCTrMAJzkmgm4SzqwTwUCZf6qYQIbAwUJEswDAAULCQgHAgIiAgYVCgkICw
+ IEFgIDAQIeBwIXgAAKCRDkmgm4SzqwTxYZD/9hfC+CaihOESMcTKHoK9JLkO34YC0t8u3JAyetIz3
+ Z9ek42FU8fpf58vbpKUIR6POdiANmKLjeBlT0D3mHW2ta90O1s711NlA1yaaoUw7s4RJb09W2Votb
+ G02pDu2qhupD1GNpufArm3mOcYDJt0Rhh9DkTR2WQ9SzfnfzapjxmRQtMzkrH0GWX5OPv368IzfbJ
+ S1fw79TXmRx/DqyHg+7/bvqeA3ZFCnuC/HQST72ncuQA9wFbrg3ZVOPAjqrjesEOFFL4RSaT0JasS
+ XdcxCbAu9WNrHbtRZu2jo7n4UkQ7F133zKH4B0SD5IclLgK6Zc92gnHylGEPtOFpij/zCRdZw20VH
+ xrPO4eI5Za4iRpnKhCbL85zHE0f8pDaBLD9L56UuTVdRvB6cKncL4T6JmTR6wbH+J+s4L3OLjsyx2
+ LfEcVEh+xFsW87YQgVY7Mm1q+O94P2soUqjU3KslSxgbX5BghY2yDcDMNlfnZ3SdeRNbssgT28PAk
+ 5q9AmX/5YyNbexOCyYKZ9TLcAJJ1QLrHGoZaAIaR72K/kmVxy0oqdtAkvCQw4j2DCQDR0lQXsH2bl
+ WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250421130038.34998-1-en-wei.wu@canonical.com> <20250421130038.34998-3-en-wei.wu@canonical.com>
-In-Reply-To: <20250421130038.34998-3-en-wei.wu@canonical.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 21 Apr 2025 11:29:22 -0400
-X-Gm-Features: ATxdqUFMvQZeigKWA623h_DM9bCAMtg78BUdI0q0OqyB8wci3znKgNDP-EzK_Ek
-Message-ID: <CABBYNZJi857F45eDfwA0W83jt7gT5z501hc0r68hxOMXzrAy=A@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] Bluetooth: btusb: use skb_pull to avoid unsafe
- access in QCA dump handling
-To: En-Wei Wu <en-wei.wu@canonical.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de, quic_tjiang@quicinc.com, 
-	chia-lin.kao@canonical.com, anthony.wong@canonical.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi En-Wei,
+Hi,
 
-On Mon, Apr 21, 2025 at 9:00=E2=80=AFAM En-Wei Wu <en-wei.wu@canonical.com>=
- wrote:
->
-> Use skb_pull() and skb_pull_data() to safely parse QCA dump packets.
->
-> This avoids direct pointer math on skb->data, which could lead to
-> invalid access if the packet is shorter than expected.
->
-> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
-> ---
->  drivers/bluetooth/btusb.c | 98 ++++++++++++++++-----------------------
->  1 file changed, 41 insertions(+), 57 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f905780fcdea..031292ab766f 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3017,8 +3017,6 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev=
-, struct sk_buff *skb)
->  {
->         int ret =3D 0;
->         u8 pkt_type;
-> -       u8 *sk_ptr;
-> -       unsigned int sk_len;
->         u16 seqno;
->         u32 dump_size;
->
-> @@ -3027,18 +3025,8 @@ static int handle_dump_pkt_qca(struct hci_dev *hde=
-v, struct sk_buff *skb)
->         struct usb_device *udev =3D btdata->udev;
->
->         pkt_type =3D hci_skb_pkt_type(skb);
-> -       sk_ptr =3D skb->data;
-> -       sk_len =3D skb->len;
-> +       dump_hdr =3D (struct qca_dump_hdr *)skb->data;
->
-> -       if (pkt_type =3D=3D HCI_ACLDATA_PKT) {
-> -               sk_ptr +=3D HCI_ACL_HDR_SIZE;
-> -               sk_len -=3D HCI_ACL_HDR_SIZE;
-> -       }
-> -
-> -       sk_ptr +=3D HCI_EVENT_HDR_SIZE;
-> -       sk_len -=3D HCI_EVENT_HDR_SIZE;
-> -
-> -       dump_hdr =3D (struct qca_dump_hdr *)sk_ptr;
->         seqno =3D le16_to_cpu(dump_hdr->seqno);
->         if (seqno =3D=3D 0) {
->                 set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
-> @@ -3058,16 +3046,15 @@ static int handle_dump_pkt_qca(struct hci_dev *hd=
-ev, struct sk_buff *skb)
->
->                 btdata->qca_dump.ram_dump_size =3D dump_size;
->                 btdata->qca_dump.ram_dump_seqno =3D 0;
-> -               sk_ptr +=3D offsetof(struct qca_dump_hdr, data0);
-> -               sk_len -=3D offsetof(struct qca_dump_hdr, data0);
-> +
-> +               skb_pull(skb, offsetof(struct qca_dump_hdr, data0));
->
->                 usb_disable_autosuspend(udev);
->                 bt_dev_info(hdev, "%s memdump size(%u)\n",
->                             (pkt_type =3D=3D HCI_ACLDATA_PKT) ? "ACL" : "=
-event",
->                             dump_size);
->         } else {
-> -               sk_ptr +=3D offsetof(struct qca_dump_hdr, data);
-> -               sk_len -=3D offsetof(struct qca_dump_hdr, data);
-> +               skb_pull(skb, offsetof(struct qca_dump_hdr, data));
->         }
->
->         if (!btdata->qca_dump.ram_dump_size) {
-> @@ -3087,7 +3074,6 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev=
-, struct sk_buff *skb)
->                 return ret;
->         }
->
-> -       skb_pull(skb, skb->len - sk_len);
->         hci_devcd_append(hdev, skb);
->         btdata->qca_dump.ram_dump_seqno++;
->         if (seqno =3D=3D QCA_LAST_SEQUENCE_NUM) {
-> @@ -3115,67 +3101,65 @@ static int handle_dump_pkt_qca(struct hci_dev *hd=
-ev, struct sk_buff *skb)
->  /* Return: true if the ACL packet is a dump packet, false otherwise. */
->  static bool acl_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *sk=
-b)
->  {
-> -       u8 *sk_ptr;
-> -       unsigned int sk_len;
-> -
->         struct hci_event_hdr *event_hdr;
->         struct hci_acl_hdr *acl_hdr;
->         struct qca_dump_hdr *dump_hdr;
-> +       void *orig_data;
-> +       unsigned int orig_len;
->
-> -       sk_ptr =3D skb->data;
-> -       sk_len =3D skb->len;
-> +       orig_data =3D skb->data;
-> +       orig_len =3D skb->len;
->
-> -       acl_hdr =3D hci_acl_hdr(skb);
-> -       if (le16_to_cpu(acl_hdr->handle) !=3D QCA_MEMDUMP_ACL_HANDLE)
-> -               return false;
-> -       sk_ptr +=3D HCI_ACL_HDR_SIZE;
-> -       sk_len -=3D HCI_ACL_HDR_SIZE;
-> -       event_hdr =3D (struct hci_event_hdr *)sk_ptr;
-> +       acl_hdr =3D skb_pull_data(skb, sizeof(*acl_hdr));
-> +       if (!acl_hdr || (le16_to_cpu(acl_hdr->handle) !=3D QCA_MEMDUMP_AC=
-L_HANDLE))
-> +               goto restore_return;
->
-> -       if ((event_hdr->evt !=3D HCI_VENDOR_PKT)
-> -               || (event_hdr->plen !=3D (sk_len - HCI_EVENT_HDR_SIZE)))
-> -               return false;
-> +       event_hdr =3D skb_pull_data(skb, sizeof(*event_hdr));
-> +       if (!event_hdr || (event_hdr->evt !=3D HCI_VENDOR_PKT))
-> +               goto restore_return;
->
-> -       sk_ptr +=3D HCI_EVENT_HDR_SIZE;
-> -       sk_len -=3D HCI_EVENT_HDR_SIZE;
-> -
-> -       dump_hdr =3D (struct qca_dump_hdr *)sk_ptr;
-> -       if ((sk_len < offsetof(struct qca_dump_hdr, data))
-> -               || (dump_hdr->vse_class !=3D QCA_MEMDUMP_VSE_CLASS)
-> -           || (dump_hdr->msg_type !=3D QCA_MEMDUMP_MSG_TYPE))
-> -               return false;
-> +       dump_hdr =3D (struct qca_dump_hdr *)skb->data;
-> +       if ((skb->len < sizeof(*dump_hdr)) ||
-> +          (dump_hdr->vse_class !=3D QCA_MEMDUMP_VSE_CLASS) ||
-> +          (dump_hdr->msg_type !=3D QCA_MEMDUMP_MSG_TYPE))
-> +               goto restore_return;
->
->         return true;
-> +
-> +restore_return:
-> +       skb->data =3D orig_data;
-> +       skb->len =3D orig_len;
-> +       return false;
->  }
->
->  /* Return: true if the event packet is a dump packet, false otherwise. *=
-/
->  static bool evt_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *sk=
-b)
->  {
-> -       u8 *sk_ptr;
-> -       unsigned int sk_len;
-> -
->         struct hci_event_hdr *event_hdr;
->         struct qca_dump_hdr *dump_hdr;
-> +       void *orig_data;
-> +       unsigned int orig_len;
->
-> -       sk_ptr =3D skb->data;
-> -       sk_len =3D skb->len;
-> +       orig_data =3D skb->data;
-> +       orig_len =3D skb->len;
->
-> -       event_hdr =3D hci_event_hdr(skb);
-> +       event_hdr =3D skb_pull_data(skb, sizeof(*event_hdr));
-> +       if (!event_hdr || (event_hdr->evt !=3D HCI_VENDOR_PKT))
-> +               goto restore_return;
->
-> -       if ((event_hdr->evt !=3D HCI_VENDOR_PKT)
-> -               || (event_hdr->plen !=3D (sk_len - HCI_EVENT_HDR_SIZE)))
-> -               return false;
-> +       dump_hdr =3D (struct qca_dump_hdr *)skb->data;
-> +       if ((skb->len < sizeof(*dump_hdr)) ||
-> +          (dump_hdr->vse_class !=3D QCA_MEMDUMP_VSE_CLASS) ||
-> +          (dump_hdr->msg_type !=3D QCA_MEMDUMP_MSG_TYPE))
-> +               goto restore_return;
->
-> -       sk_ptr +=3D HCI_EVENT_HDR_SIZE;
-> -       sk_len -=3D HCI_EVENT_HDR_SIZE;
-> +       return true;
->
-> -       dump_hdr =3D (struct qca_dump_hdr *)sk_ptr;
-> -       if ((sk_len < offsetof(struct qca_dump_hdr, data))
-> -               || (dump_hdr->vse_class !=3D QCA_MEMDUMP_VSE_CLASS)
-> -           || (dump_hdr->msg_type !=3D QCA_MEMDUMP_MSG_TYPE))
-> -               return false;
-> +restore_return:
-> +       skb->data =3D orig_data;
-> +       skb->len =3D orig_len;
-> +       return false;
->
-> -       return true;
->  }
->
->  static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
-> --
-> 2.43.0
+ma, 2025-04-21 kello 10:37 -0400, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+>=20
+> On Mon, Apr 21, 2025 at 7:05=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote=
+:
+> >=20
+> > Add org.bluez.Media.SupportedFeatures. The value tx-timestamping is
+> > hardcoded as it is currently always enabled.
+> > ---
+> >  profiles/audio/media.c | 20 ++++++++++++++++++++
+> >  1 file changed, 20 insertions(+)
+> >=20
+> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> > index 69c6dc671..df36bc2df 100644
+> > --- a/profiles/audio/media.c
+> > +++ b/profiles/audio/media.c
+> > @@ -3340,8 +3340,28 @@ static gboolean supported_uuids(const GDBusPrope=
+rtyTable *property,
+> >         return TRUE;
+> >  }
+> >=20
+> > +static gboolean supported_features(const GDBusPropertyTable *property,
+> > +                                       DBusMessageIter *iter, void *da=
+ta)
+> > +{
+> > +       static const char * const features[] =3D { "tx-timestamping" };
+> > +       DBusMessageIter entry;
+> > +       size_t i;
+> > +
+> > +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> > +                               DBUS_TYPE_STRING_AS_STRING, &entry);
+> > +
+> > +       for (i =3D 0; i < ARRAY_SIZE(features); ++i)
+> > +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING=
+,
+> > +                                                       &features[i]);
+>=20
+> That doesn't really handle if the kernel doesn't support it or setting
+> SO_TIMESTAMPING fails in case the kernel is too old? We might need to
+> have a MGMT flag indicating that kernel has support for it otherwise,
+> that said perhaps it would actually be better to have a socket option
+> since for the likes of SCO sockets we actually need hardware support
+> as well.
 
-While I agree using the likes of skb_pull is a much safer way to parse
-these packets Im not so sure it is safe to restore the skb->data and
-skb->len like that, perhaps we should be using skb_clone and
-skb_unclone for example.
+I was thinking the application itself can do necessary kernel checks.
+
+I see now application can now also find running BlueZ version from
+adapter modalias, so this is then not so urgently needed.
+
+netdev has some way to indicate supported timestamping flags,=C2=A0it may b=
+e
+it's not applicable to bluetooth, but probably would be good to check
+first if that can be used before adding new MGMT flags.
+
+>=20
+> > +       dbus_message_iter_close_container(iter, &entry);
+> > +
+> > +       return TRUE;
+> > +}
+> > +
+> >  static const GDBusPropertyTable media_properties[] =3D {
+> >         { "SupportedUUIDs", "as", supported_uuids },
+> > +       { "SupportedFeatures", "as", supported_features },
+> >         { }
+> >  };
+> >=20
+> > --
+> > 2.49.0
+> >=20
+> >=20
+>=20
 
 --=20
-Luiz Augusto von Dentz
+Pauli Virtanen
