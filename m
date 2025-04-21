@@ -1,127 +1,116 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FA31C3C1F;
-	Mon, 21 Apr 2025 19:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5491EEA56;
+	Mon, 21 Apr 2025 19:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745263081; cv=none; b=e6YlbQ78Q8i/m+6IrBXCGhVD/RXkycMwJpV9xW3sTNgjkf+c9D9Qzxoia22ZD9vEon10NsFi+/KCek3UOrCw8cc4kry2krUC5WQtlTnNpD4k+k6TT+0IZ8rMJ6SVKTXYeUdMJTu807LTkCKovr3mikbiyvfFmnpveaB7JcSI4Hc=
+	t=1745263157; cv=none; b=IGhm6IoCq3qVkGrkkyPxbg/npUFkrohluBLD1fichcno5tmQzPFUsp6dFNB31EXYT3PMj9HWRZg7qrdD+jFtt03Pit3XJHJS94JEwIzs+vxo6D3crhAujIQLZg03oY63kJsRRCcX7blvQimyGnSGeBT/cNlpeg0nfncqf/ab/8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745263081; c=relaxed/simple;
-	bh=6Lt6s2kB5xiKzlFdAj66SBUP/GuCc0AQgjD4vfIFCcI=;
+	s=arc-20240116; t=1745263157; c=relaxed/simple;
+	bh=DYO3AST2o4cYujiXtTVLxnklyh1EeJ0a9ELH1uW0/4U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nNohjCrl4Y+My5Ncz0UI0yDW/5zT7yzzZI3tpl9jx3qPd+d/HOS95ts/5iNpaBjAFuJZ6IyCJieZfouoE03ThcFI9tBdjZvSgZxXOTQe0VKa0nTy8TwdWlMYmyBhWiuprm978bFKm/9U0FlhyYoqInLuFkMmH7uTGy5SZQDJoig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NDqlCtEn; arc=none smtp.client-ip=209.85.208.175
+	 To:Cc:Content-Type; b=hRB6pJkIqJiPXSeuVoQmV0f8cesboA+eGOczf7m2kW8uREp1rNBEJ+voROqUYaKW6A19DLNLjtH3I0xXxv5E8yg/oPbHRj+TtljV3oYRpoDEWlLqDA5W4dlC2Mi5JG9FQXp/ifVjOhNY03Z6ex3y4V+suFc46VD9vNZKuowasw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HAzdaqfL; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDqlCtEn"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3105ef2a070so43427061fa.2;
-        Mon, 21 Apr 2025 12:17:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HAzdaqfL"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-54d98aa5981so3074108e87.0;
+        Mon, 21 Apr 2025 12:19:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745263078; x=1745867878; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745263153; x=1745867953; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Rvx762aZIWnIRrfPsLkFmtHGZEgCQuMTQMsPMH9+g74=;
-        b=NDqlCtEnUVMk4FRJoX8MnOos9pZi3Btle/9KUDfHqP18po007j7PL4pd0KJoEFjj5q
-         CH7aFU0HYwAfDngyoTaOcj0nUu+SzrWR8YsvfkySjzCOjeaiFdFgwJ3UQu07EQhw2bht
-         OyDMPXElX37zlCJLFHTyR7/5v7PMX4BhiiKg+grISCFauoPepbs8+33SLe7zznRlGUde
-         ndS2hnKl9MDkmhLgwtNnvYviil8VHy9WJMGmdZth5kCp9FvgLCovmFUxhDibeKmA2Nm1
-         KxPkQuPw4NdUjQJl7zxh6JjN763KnlA4lFL4OM4gYNbe/374EePCJt8joBw2TyK7YTjA
-         PP+g==
+        bh=KJcRqfa5CCPmTaOo2sTvJJGxZ9DlOMCI9iLuHheiPr8=;
+        b=HAzdaqfLVj5cCkKa+X+aiomkAFSsvkGTY9nbGrdEtvQ6EIoeZ9Jyo7iXcBccedk/+5
+         xV37iiqpczm260z8NDR6+Fn+EFAMmBvXdYnFigXGNkWN75YdPb8IbDOWmcpwvlKqw7GY
+         dSOV/GrVgQfBmFvfhPpNmzXV4eO9hNN/MT9ZTlQkKhe1uUJmdDPc80xeLmcXbs57Ax78
+         EE1iFxRqpAlZa+fa+aerWwQKgPtzV5Uz25vqPCoogzLNiS7rv/nvDkIfycRMPa0s7ITJ
+         7DpGdPR/8faQS6LhTfgc63j2i2LToXBoMAanMy+ARocnNlKX5b8/y0zsFrG+mMaVkrIy
+         aUQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745263078; x=1745867878;
+        d=1e100.net; s=20230601; t=1745263153; x=1745867953;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Rvx762aZIWnIRrfPsLkFmtHGZEgCQuMTQMsPMH9+g74=;
-        b=hMCbQIyYdaWSsxePL6WaJoJgZ3SqW9jjJwx3+OM4Dxk07zWUPYJCe5KX7mfAbBF7pN
-         dPhr3k4IOrRIwJmhTiPSwTssCVbUG0soDqKHdSrswYGZJa3Eai/qz/9yTcl3pd+dFcD2
-         0ZgPs0gLrmoipVOVVqfNpKz9trijou16VOUyqjNh3T32BnAH0Hha54U3nINDfDzY2PRZ
-         bO5Gu+XHdsZ9HaNof19EFJXLaI7xQbLGCFGF95qyCn6UuPm1mgN+IkXwpsW3N4WaDYoz
-         agwrI4Lf4AS3+/uFjBSyk2KIYcCkYzaReru4WTtlx1pD1hEiEncClXrupwMN+KfPq0Jl
-         5BHA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBbQRVPt+JYa0+dyU92Ujo43NoW2Tpc5GA4+bIuK0CmfU4OeVrwMIUvfi1hkRLxV6s5M/djtRsCkP2Do/pPYI=@vger.kernel.org, AJvYcCW+9JlesJtIpzDa3WPIYl3swJcapb4RdU1ARpcmwlg4mkmtwCz2gXDZYEQdsnjL+VknMQLP1iaCcKE0IKso@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkPu2ps/u45AO4t7CyF8ePNeoxBC7DPxLaq39Q3ozLGQ4c1ypM
-	q1TN7Mcvedo3DHUpm5QBx8jpEqpQhuJgCXlFVbSGR8TpE16VLHqvifIdGQiu0/EaQ8aBzjJHE7E
-	ihi0lkabnPeyg027MqpC7ol4muBr3+FAU/vY=
-X-Gm-Gg: ASbGncu018RNMeylfnnAua/bWIKlGw3tkS5RboBRMocrCqLCC93jdeeHEKJVO+iWy7K
-	pPZtEfgpwYvmXzHkiwbV4KtcndOIdr1s/m/n5W0SLNXXI966ij8nYFu51/ywl1YG/zWW7rjYLjh
-	IQEdC4PU3yW4qcHVClhei9
-X-Google-Smtp-Source: AGHT+IGs3B57KMvlgjlfvccjd0/38p0xmvDab1+u0Sox3eMJMunwv+qpBFbV8vLCIEwxkeTnXIuR2T9fhEFCZyWI0PY=
-X-Received: by 2002:a05:651c:988:b0:30b:c328:3c9a with SMTP id
- 38308e7fff4ca-3109054ea5amr43995041fa.29.1745263077487; Mon, 21 Apr 2025
- 12:17:57 -0700 (PDT)
+        bh=KJcRqfa5CCPmTaOo2sTvJJGxZ9DlOMCI9iLuHheiPr8=;
+        b=A3BTjdLJSew2/1T4MgClIWi8EiyTY3x9gMijx/VY5EhcGeJfa/aC4dkvqF4ExrPWUm
+         zLFAMSrP4RkyHMf2Dd5+ALKKIH/BZd2qFCB94rNBKb8mjNsmgApM/YpZwZqdtwNstbyM
+         QFdbWlv8hSmdE5zft8t3uU3Pb82wMRprgjOyMHg4N2Yfne6n/pqDTu7FGA/qjnDh0sbb
+         yiNhOr4Q2bOJ8ZHXLVJ+iL48JsHL17n+swqEPjUl4PptqQt6PIt81uclta4z7UEdF3tF
+         Z89IJX9TnmITDrlSDyvjq9M8CvOswBTbcbXvJkFx7iEwqu9yhXRItOXtV/gGxsbsFQQy
+         G/Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCUn+ykMSGf6FOdPQ0IRjXhTd+6T34brT3DBCSy+ISKggLgASDZ5hefs782qVe9HH04jI6e4ehnLuFTefKuu@vger.kernel.org, AJvYcCV2xvXjgBfabWAwyKxNNWP/K/3DzvZGP4c43oFNx0wEdUy+Ld0Uyf+fNJJpA2mH+1se6M0Pd8mfpa4j/UdGm0U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH8xbKlgHPlPNCSKCf6X6owXPCXzAQVr09HSfP1lcQvtXUDn4/
+	oMUxXky20yIEbTJXK1JkU5JlhZLSHzwHGSzabRscq8PClEYuzYBkkHfbebzzpABQjyZdIojxEb5
+	hQWApr6qlQNeAC/aVb3+XklO+k0c=
+X-Gm-Gg: ASbGncsWbUkbDRK2tttUtcTedFGBDijNGjpTC7DdFaKkN1nFxhufLp7VVlnlkgJleuZ
+	aD4MxEMEcxXzb/eLwl1aBq8iTPvZfqP3C43cOcv1UpnOiamSjs3g+gpu0eaCkHzhFbnaLAfEWOf
+	5BR5yHdX/28BCdMS4tW4a9
+X-Google-Smtp-Source: AGHT+IHXHFlrF4EijWInQ0q6byiERQ/3YNIJpnij63pytbHmgcPlJabHpsS0ZaHrvX3ER21PDg85XpuTKP5mo+QMWuE=
+X-Received: by 2002:a05:6512:4020:b0:54c:a49:d3de with SMTP id
+ 2adb3069b0e04-54d6e61ba8amr3683500e87.10.1745263152985; Mon, 21 Apr 2025
+ 12:19:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250421130038.34998-1-en-wei.wu@canonical.com>
-In-Reply-To: <20250421130038.34998-1-en-wei.wu@canonical.com>
+References: <20250421072914.466092-1-chris.lu@mediatek.com> <20250421072914.466092-2-chris.lu@mediatek.com>
+In-Reply-To: <20250421072914.466092-2-chris.lu@mediatek.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 21 Apr 2025 15:17:45 -0400
-X-Gm-Features: ATxdqUGFwSCA4kgTPjKIQgEDjGMucb5LwgwhlNcqp8vwVHLix3TA-zSWQ7Rfkno
-Message-ID: <CABBYNZLXd3EzMhf41wJg93jNp7DWQK7oHOnHGv_ThZJ7yMXTGw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] btusb: fix NULL pointer dereference in QCA
- devcoredump handling
-To: En-Wei Wu <en-wei.wu@canonical.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de, quic_tjiang@quicinc.com, 
-	chia-lin.kao@canonical.com, anthony.wong@canonical.com
+Date: Mon, 21 Apr 2025 15:19:00 -0400
+X-Gm-Features: ATxdqUGL3FDMyjw1v0Rvzf5QBxrifSLl3fT6ELdaZgKRxwz3EqxSIe_IBUO2sh0
+Message-ID: <CABBYNZLZ7tx6nm1=gzuShgrp5xV4_4AT4_Y=kvAg8zbWjTR5dQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: btmtksdio: Check function enabled
+ before doing close
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Jiande Lu <jiande.lu@mediatek.com>, 
+	Will Lee <will-cy.lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>, 
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi En-Wei,
+Hi Chris,
 
-On Mon, Apr 21, 2025 at 9:00=E2=80=AFAM En-Wei Wu <en-wei.wu@canonical.com>=
- wrote:
+On Mon, Apr 21, 2025 at 3:29=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
+ote:
 >
-> This patch series fixes a NULL pointer dereference in skb_dequeue()
-> during QCA devcoredump handling, and adds some safety checks to make the
-> parsing more robust.
+> Check BTMTKSDIO_FUNC_ENABLED flag before doing close to prevent
+> btmtksdio_close been called twice.
+>
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 
-While at it, please move this logic to qca specific file, there is no
-reason for this logic to remain inside btusb.c
+Please add Fixes tag.
 
-> The first patch fixes the logic bug where dump packets were mistakenly
-> passed to hci_recv_frame() and freed prematurely. This was caused by
-> handle_dump_pkt_qca() returning 0 even when the dump was successfully
-> handled. It also refactors dump packet detection into separate helpers
-> for ACL and event packets.
+> ---
+>  drivers/bluetooth/btmtksdio.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> The second patch adds bounds checks and replaces direct pointer access
-> with skb_pull() and skb_pull_data() to avoid accessing invalid memory
-> on malformed packets.
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.=
+c
+> index 566c136e83bf..3c66e3ee9834 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -723,6 +723,10 @@ static int btmtksdio_close(struct hci_dev *hdev)
+>  {
+>         struct btmtksdio_dev *bdev =3D hci_get_drvdata(hdev);
 >
-> Tested on WCN7851 (0489:e0f3) with devcoredump enabled. Crash no
-> longer occurs and dumps are processed correctly.
+> +       /* Skip btmtksdio_close if BTMTKSDIO_FUNC_ENABLED isn't set */
+> +       if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
+> +               return 0;
+> +
+>         sdio_claim_host(bdev->func);
 >
-> Changes in v4:
-> - Fix unused variable error in the first patch
-> - Refine commit messages
->
-> Changes in v3:
-> - Use skb_pull_data() for safe packet header access
-> - Split dump packet detection into separate ACL and event helpers
->
-> Changes in v2:
-> - Fixed typo in the title
-> - Re-flowed commit message line to fit 72 characters
-> - Added blank line before btusb_recv_acl_qca()
->
-> En-Wei Wu (2):
->   Bluetooth: btusb: avoid NULL pointer dereference in skb_dequeue()
->   Bluetooth: btusb: use skb_pull to avoid unsafe access in QCA dump
->     handling
->
->  drivers/bluetooth/btusb.c | 120 +++++++++++++++++++++++---------------
->  1 file changed, 74 insertions(+), 46 deletions(-)
->
+>         /* Disable interrupt */
 > --
-> 2.43.0
+> 2.45.2
 >
 
 
