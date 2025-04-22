@@ -1,65 +1,65 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7A6262FCC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 21:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BFF2BEC3C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 21:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745356714; cv=none; b=SQblAH6yE3smRI5Z7fehNqGIykg3/A45HRsad2WRd3pSD6vtTaNtyz6BPMiyNgUh0/4SPIUHHkBdHVvylhjIsiYjwgn+TMZKZTau+9Kes8fjGOvUOA34i1rZOGihQHYGKUMTQFWa7Pj8aZi7z1kO+237wvrW6C/xOXHDHfhRzdQ=
+	t=1745358226; cv=none; b=KcgY0+gF7lQd7VFt7la9EYooQb4/irfdlg+SZuwMLOjB41/WDNIgBEaul66uvwFdD2QjzJ2U/CPjIRlivemXlLD9CNv5gBEbITOo/pKh1VIBPTYwhY7VytozB6wAKX0Nbc1BBMx1l9bBGPOm66iCFhZVCGNYNRod6SJ/y/JI4tI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745356714; c=relaxed/simple;
-	bh=FQ3UOvq50hnPlAZ7hp/9kgjIjDLvyz+gh22llBoa11s=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=R5D9MlnCGofwZcazu4lP9iniqn4Fe6jStv2DIn8OVymW6GqR+xWe4dF3KCdHAOh0VYvMjvmmLipw3QZegviSIpWYeyMDWQJ9xLuemXQR06eClRqmOxGoESuvgAmod5C9sg/t90P61/WHdSh5jIkZu6UsxJwpjENU86REhaRELJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkMcuyEs; arc=none smtp.client-ip=209.85.222.49
+	s=arc-20240116; t=1745358226; c=relaxed/simple;
+	bh=eJhdMAbsXeU8zsSeN92v6AMmWvAgGLbdSDpjRTMsA+k=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ttGfrHLp6De1PiI9CtsiIWNRRoGoW8+te3fJ7hkaNfoZoZgaKOn6+FOI0vh/1k9eU7A61WLQRg3mQ8KcRBampZU0GK2EeK21Y+Wg5DdiuLK8z2zMMoHBJefGd2f4vCr5ln/M65wU7O1rkVW40kMVRuRFjZaZ+dTsH1xTmPkFD/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DDMy0l9n; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkMcuyEs"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-86d69774081so2081759241.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 14:18:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDMy0l9n"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-527b70bd90dso2231819e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 14:43:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745356711; x=1745961511; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745358222; x=1745963022; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9PjDrgCVGbbgUs55dcM6Yt/rgNKKgfwzKAYqFDpCNSY=;
-        b=YkMcuyEsosqBWSTFO+rYT9YLceCdwkiRc354zKJXAw5y3mWops3NKFyAYgRxB+8qld
-         ydg7f2vX1JZ+luZjaeEOIYZYjNTTW10uhyflfrF490YwRlpmAMQO6jUDB3nC4H8X+Drz
-         wA5TlVOFsZ4i/+PB+WnZSDmK2MIotONSJkh22dw0yalzwYDlAeIcGWY/mIoXDXaXGlNd
-         yyvijZi+kLZsW2WDhcirVTbBpN/UFpNCNbx6DePJo8Kj+3qEY9zGEZcOVMNr2IvGgKUR
-         aH/atvlHeLk4Q8lXsGHSUlXeEYdt4pHCX3btoBcSpKAsFG5qKyLqpGI240HpwKmdxaC+
-         PT+A==
+        bh=YWiDdDDv3fK3+B7pt/iQEwv4r84tJfm03AwnLmEIzVc=;
+        b=DDMy0l9nNjbl8/FLAOXYedVVuJ+8sbcgEfUArY1EEJJYAHBa9DWGVHuyDEXe9aoS9N
+         GyMhX4lEhb+zfNPfiUjaQxH+AOsa0QmOeqPSEBu4FuJfOJlb/0Z4f3Wx3TTP/iezdVtV
+         lDv6aouuOLSZdToHP1J1an/IKvGQF45bd2voEJenwISJ3ICqs1aKjkVPFAFLn7Szu8Um
+         rQPspIKxtW15jSfOI+EoifXE82vut/ApqVU+6p/SDYPa09fVCj4JVkd76dwWLOEkrM9n
+         GaoWwICgn5Kznd6IlWBg5qT2WLC3G0JLiD2lNBCgckjOXsmRCCuAmBaz8MCPM/nYmdkh
+         dAag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745356711; x=1745961511;
+        d=1e100.net; s=20230601; t=1745358222; x=1745963022;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9PjDrgCVGbbgUs55dcM6Yt/rgNKKgfwzKAYqFDpCNSY=;
-        b=H/reP6znQEnU/sFpR4Ri7tWkk5JxHDbCXVG0qah9ZDnUlXeb6j4gC3Qg0pgvsEg/BH
-         CayIEI74b0BhVGSWI4ofdIorBJ9x4DtG2KbQKjKw3aROrhuHh7VSH4RUFZHlEvmFFs9q
-         xsmq6v+PXowyWaUM5N2hDODKFGPLBhfJQAglKj7fAFDBb31JkklDY2broiYHRqh/NDzM
-         ey6h+hY7SG6XPHAty1f+NleikDMzweXnX09/9B0tSoY+iQkK4BbHzPe02jdvp4QxFYit
-         WLiO/a/raeVl6L6DUV2ULeQdnz+o7R7ZdAKyZ9rUbir6dZ0XI5VJAvEY1CdGKq6C7jhb
-         OKuA==
-X-Gm-Message-State: AOJu0YxGg36cTzuGurPBv1nVM9p4Hikv6uTxGDEYe3Tgitm3a/GFGLc8
-	7Cd+njlrow976+vPOXwFeOIr8WAfOLANX5zLMt2WoUz3yjNwlDWxLOdpgZV+mTo=
-X-Gm-Gg: ASbGncsQwYkCNRwpdvgvnzWuEuuSfq1FcCFqpsNuURWPiy/pQMAhK8FpHy4kyD6pxZ+
-	shJ0R05ov72jF1p0rZqSHR6lC9TbgF7xtddjqDQL3tDVwq6S32obQxK7sf9hC2wHrH/3AY2YINB
-	dViQ+m8PDG1i+cYG+Qdn5z8rQttQ5BcSTH5G93esm29a79AfacMCcS+/7//J8r6jgL7j5Z+HNhr
-	wOzE79h56HNY1kag076Eq0UCrdBLkxPWrIatemh9wAwXXjHAn4eZaUtarWJUGiQ6tmK0HoIZY3l
-	0wD6MykSVdPRJi1XmV0M40z/6tjIlLxYSaTRBjdrkw0bN9OGpImsnJnHQASyri69syV66U1ixW2
-	CsPtp+yyymg==
-X-Google-Smtp-Source: AGHT+IEI+Az57yWzpT8boeDcTu9vZBEqJFbAa5k02T/rrpcYk/V7TraLRSkv3vW96KA6hE7TgFKwUg==
-X-Received: by 2002:a05:6102:2259:b0:4c3:64be:5983 with SMTP id ada2fe7eead31-4cb8023ef61mr11495889137.25.1745356711384;
-        Tue, 22 Apr 2025 14:18:31 -0700 (PDT)
+        bh=YWiDdDDv3fK3+B7pt/iQEwv4r84tJfm03AwnLmEIzVc=;
+        b=LvRLLy+6WjByw05zSLXDy5E57Um51lXJoXKNTiBeCVyCjMjPDzlDZ5pf750cCGoa8c
+         /TiQN2hoKwxlGqN21OghkAkwk7mMFP8/DuTZ4CG8/t0QfGZVMFxa106UxnjKxrJUFe2U
+         LQ0ymAJRceAmZMKmX/C5jL1mLzSrVDYt9fICvY/rGIjnQ9PevU0MIAG24MZ3MCqHP7Kn
+         rUzadbeIHYY/QOYjFVAiTy2EQwh3xR/qka/U3V5FfjUVT738PqSsbQZ7RDZawTo5hFXo
+         GFmoZdN1LQCmuz34+OkHlm9D4ZFDRpmS8jMLHWEHQZEsbGkownujoDLReSo9WyFE1Yey
+         EVFg==
+X-Gm-Message-State: AOJu0Yw6Pv422J9NijtkYk3lRlKHswTUopMCggTGxAnrEckB8+NIDbXP
+	iCQ4MX3Wxy4vjLz7990Vmrg69zPnqBtQN6PDphLIYfKY+UYAp70/0SFQdEzzCto=
+X-Gm-Gg: ASbGncs1fWRLcBZPXOQTXoVSth1XV3DlAyYrFDOQe7A3FCc/xm75aEZLFMlpmt9RGah
+	3Cx2hAwMfSeIOlAEG23dzuGHkIAuMRUNDEXQtXmP8f6bmL8flxD7H/pjDlPGkdx3H+E3AX87sv2
+	z0L713ZBmXgIeRK289vn+vYBK2wSSbOyKZM+V0jFV2HQcuNExF+g2z4PM4tXv9eFnVVp8z7cjSq
+	Yjrr/7f2IR2miuyEncXSqR3V7puwRdF7Nrtc45dgbVB+vpd38EbSORF0m6EKTGLuCJsbngNHZhN
+	fnaZyhcelPjrJE1nxIMjXquSOKmI7EcCK4q4O2KjYAcPeLKSYlzReS/0pS6vCWoiAe3pTFmXZGz
+	CoifuIC2NmA==
+X-Google-Smtp-Source: AGHT+IGCge1V9ha/2qU9dspOzIxfDUEdXU6qwn3FST8UdT2+Pk3dnkHKW9IH5JieRtg6X/Lif9Simg==
+X-Received: by 2002:a05:6122:1781:b0:529:b2:ea5e with SMTP id 71dfb90a1353d-529253bdce8mr15294258e0c.2.1745358222009;
+        Tue, 22 Apr 2025 14:43:42 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4cb7dde9b6asm2324981137.13.2025.04.22.14.18.28
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52922beb8casm2161019e0c.1.2025.04.22.14.43.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 14:18:29 -0700 (PDT)
+        Tue, 22 Apr 2025 14:43:41 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] workflows: Add sync-repo action
-Date: Tue, 22 Apr 2025 17:18:27 -0400
-Message-ID: <20250422211827.987293-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1] sync-repo: Add patchwork job to synchronize with patchwork
+Date: Tue, 22 Apr 2025 17:43:40 -0400
+Message-ID: <20250422214340.991450-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -71,48 +71,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds sync-repo which was part of https://github.com/bluez/actions/
-but it gets disabled every 60 days due to inactivity.
+This is required in order to pickup the pending patches and create PR
+which then triggers ci action to run.
 ---
- .github/workflows/sync-repo.yml | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 .github/workflows/sync-repo.yml
+ .github/workflows/sync-repo.yml | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/.github/workflows/sync-repo.yml b/.github/workflows/sync-repo.yml
-new file mode 100644
-index 000000000000..4b106ee4f68a
---- /dev/null
+index 4b106ee4f68a..cd85bdd478c3 100644
+--- a/.github/workflows/sync-repo.yml
 +++ b/.github/workflows/sync-repo.yml
-@@ -0,0 +1,29 @@
-+name: Sync Repo
-+on:
-+  schedule:
-+    - cron: "*/5 * * * *"
+@@ -1,4 +1,4 @@
+-name: Sync Repo
++name: Sync Repositories and Patchwork
+ on:
+   schedule:
+     - cron: "*/5 * * * *"
+@@ -27,3 +27,19 @@ jobs:
+         dest_repo: 'bluez/bluetooth-next'
+         for_upstream_branch: 'for-upstream'
+         secret_token: ${{ secrets.ACTION_TOKEN }}
 +
-+jobs:
-+  bluez:
-+    runs-on: ubuntu-latest
-+    steps:
-+    - uses: actions/checkout@v2
-+    - uses: bluez/action-sync-repo@master
-+      with:
-+        src_repo: 'https://git.kernel.org/pub/scm/bluetooth/bluez.git'
-+        src_branch: 'master'
-+        dest_repo: 'bluez/bluez'
-+        dest_branch: 'master'
-+        secret_token: ${{ secrets.ACTION_TOKEN }}
-+
-+  bluetooth-next:
++  patchwork:
 +    needs: bluez
 +    runs-on: ubuntu-latest
 +    steps:
-+    - uses: actions/checkout@v2
-+    - uses: bluez/action-sync-repo@master
++    - uses: actions/checkout@v3
++
++    - name: Sync Patchwork
++      uses: tedd-an/bzcafe@main
 +      with:
-+        src_repo: 'https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git'
-+        dest_repo: 'bluez/bluetooth-next'
-+        for_upstream_branch: 'for-upstream'
-+        secret_token: ${{ secrets.ACTION_TOKEN }}
++        task: patchwork
++        space: user
++        github_token: ${{ secrets.ACTION_TOKEN }}
++        email_token: ${{ secrets.EMAIL_TOKEN }}
++        patchwork_token: ${{ secrets.PATCHWORK_TOKEN }}
++        patchwork_user: ${{ secrets.PATCHWORK_USER }}
 -- 
 2.49.0
 
