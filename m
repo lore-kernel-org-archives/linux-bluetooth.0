@@ -1,99 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B63327700A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 13:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93311F150B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 13:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745329201; cv=none; b=SGVYt5IoviQi1Wb0m0s+AlARbo0ATRnTwAcdHl2itQujcKIyB1YayozMayozz3TQ+M+602wOkdOt8QepYMCrC3oN2HEJruFlS7C2Wsw6i2bmzoZUQJZMcxp/d2qWmDA4G6A3X5dPFIppHNJZZeVwrs34zXEM6NR6/VtzkqOrFs8=
+	t=1745329964; cv=none; b=Afo7Lqmk0pUz5AGE+/qrHzGqekPVs0yCQcrUTm6pU0RGSrHqamTpt6dLwEUGNlcJlOa6hMOBPCNUnN9woKu65vlfUcLBqqUnxGZcDqL874Aniz+z5UKnBbN6W9UBQ+cIOpqcez9e4K/W28f1+PKJSwZsQm6WgquuxXac7Wbnc0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745329201; c=relaxed/simple;
-	bh=PO9vQWhwXv+5IL6PkPpQLorheFP7U2qnKXwDdGIvfrI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H6/EgwXS4gGrKPF5iD547cK31D0Or4517Ew9dMY4xWO40USlQcWHj6mFBfP5Sn1fe3qfbyN7mr6Dr6NkeqjHyoD0vHkNYymBhWI5+0VifjPQVJLGPUEP6Ipda+aJwaBUzH91KK2uXqZNB8mramfG1rdyxt68f2Z8e1wGer51axM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMViEnPx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745329964; c=relaxed/simple;
+	bh=2W3iuYk/0Zj37UP/dhxX64Q1dh6NmQXuJD+CRnYOjss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L8CxRTrV0BSv1vw/kDWgg4Ok4kkGBfQN8dDUOEvy2sO8fo/sYV1kFrqwgV7SB9WZsLVzB+qKh2mzukTYW4O6ae7kuPdrYkLVOIYSz8zNU/r8MN78GaeljsQiUawmlyXqOFiu1cRuHryYFGyGplL558RHvBCKcn5GsPOqoW+4DWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W34ANjNm; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMViEnPx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AEFAC4CEE9;
-	Tue, 22 Apr 2025 13:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745329199;
-	bh=PO9vQWhwXv+5IL6PkPpQLorheFP7U2qnKXwDdGIvfrI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lMViEnPx0TqCA0xeoFHv/SVgb+FiyZU12GDzSYPKa1LEG/u0aKGdgZGamnwFAIG6o
-	 B5RGZsZxVoSz9hbF/wIjQ5iYvJo/eL3CfYUPaaJXuy8bh8tgzggbEHQwcx/IYWtPyu
-	 /awfZvSoEIbSrHYT/xJBFhly6N80TnSFl43uDKm3jpm5ohLfghH1JrpScv2g7oUA8I
-	 xpZLkSPvCPlYHeIOYCzQKpBbNRQ5TSSZawGw/21d2x9P0hYXcMJGPOoz2QXT7SdRIv
-	 ErzMosNNSyb/sEEc15H2EFsc2jlQlD6VDjw5FKxHxIskPZM2KxEkSVNPPcnbr1O1/Z
-	 aPaZuRe0ELqrA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341D3380CEF4;
-	Tue, 22 Apr 2025 13:40:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W34ANjNm"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-54c0fa6d455so5948358e87.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 06:52:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745329961; x=1745934761; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EQtYbnnzXEgdH3FWdbBn9Y9ve5/iDrVPN4scq8U+eNU=;
+        b=W34ANjNmdtZQnuZ9IiowtHCDkaDC8UARt4s5Ql66ME+PJUe2daWw/Givg5lCJ4BDc5
+         tJapISAj71wbdD3rRzCsJXj7pO6edNfqDOGaKhXW/yq7QmgrYdQT4aHDI8rodeKsIry3
+         z65S01+NjNJR9oGsj/tICp1V5JhvBDNsLcZX+GBehz/RbVf3B60gMa9whTT4t8AKM6Qr
+         wpO2V/AmJVl7ivMwvMwRB1gTZs+ooxBjQQnphRmbKGFFuvnaS5w7xCNMRUQSeG3HMuyn
+         dVF0Bntkpnt4Bb34cOWA8ni76WVL8zTAyYc3XJU4U7RUxd7J/6CBGFXtoNRVce/D10OT
+         MKOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745329961; x=1745934761;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EQtYbnnzXEgdH3FWdbBn9Y9ve5/iDrVPN4scq8U+eNU=;
+        b=QvbTkqYot4yu7UT5AqyAT+zZAEG9nO+ebq+KUZQ1hEJvKMaVLSj9CAIIbupVIYAslB
+         6FfoWI3IsI9EXClAII4jtka66CcVfRnPEn+41+Is0DvMmfCPzTCt8llS0sN36lyCGyg1
+         MkjnXARh1zgGJpLbxcNCxj6JMXMmRl61K1GmxEQg/sUZhDhlWGbioQW/u480ZpzOO96w
+         QEe/ojpBuk686nTe2ZedGVCe1+PDsvt8iUf7Xrdna3Ssw8regtZf9rOH6ffTwCiJUer5
+         CuiptRUH3p6YmEq7gDl2Q0s8lI+uXGDYXBxibHuMBXcJIhgJO/fFqk2qt39o/oOKqeru
+         DMmg==
+X-Gm-Message-State: AOJu0YzimLZhcLHXoxHddPkk0uHUhHdEFCMYjYP4Cwkn88ZrTiH4NhFZ
+	LaMKc479HmhbpuvC19eFALCPGMvK5p/0ZgtmgfpI9nt9zWfBhZzMv15ScUIzdd4b8f97HAjzDar
+	jbSDeYbVFAUcMaahWMgxYO2hhVTv2LTPX
+X-Gm-Gg: ASbGncsYRDRoE2Q+5xx/JD3ae/I9XeIWaI32hIbJJv/4a0pz80qPSshHwdq6jzug4IZ
+	U6fk8mab1S0ew5ricPBjbkQude87o4mQjZpO6ktrwIJNwUrzcHoLPR3dKKah/CdBXvBsaJ+FGJh
+	ScheSChWF+fzvih8+9XEoF
+X-Google-Smtp-Source: AGHT+IFCA2+Nh4S3p1mrnsHgrGwN8rNRR+qK81GpsLCA6QfUwnO7lMJsvRrNq25d93SKCwtCXypYJlR1vuscJoVcnBU=
+X-Received: by 2002:a05:6512:3b95:b0:54b:117b:b54c with SMTP id
+ 2adb3069b0e04-54d6e66d881mr4212732e87.55.1745329960522; Tue, 22 Apr 2025
+ 06:52:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] btmon: Decode Broadcast Name
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174532923802.1911785.9439654680693948349.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Apr 2025 13:40:38 +0000
-References: <20250421210602.746957-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250421210602.746957-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <20250422054547.132400-1-sanchayan@asymptotic.io> <20250422054547.132400-2-sanchayan@asymptotic.io>
+In-Reply-To: <20250422054547.132400-2-sanchayan@asymptotic.io>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 22 Apr 2025 09:52:27 -0400
+X-Gm-Features: ATxdqUEYrr2lQV7fHsz6YaTjpeo-mF6ayHw9iwaYdzvCavMDloLrcJ55JEiZ9d0
+Message-ID: <CABBYNZ+-ETFabKbANa2mdUOd1-z8ihp-1V3D+0pLyOTuztcEuQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] profiles/audio: asha: Reset state on disconnect
+To: Sanchayan Maity <sanchayan@asymptotic.io>
+Cc: linux-bluetooth@vger.kernel.org, Arun Raghavan <arun@asymptotic.io>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Sanchayan,
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Tue, Apr 22, 2025 at 1:46=E2=80=AFAM Sanchayan Maity <sanchayan@asymptot=
+ic.io> wrote:
+>
+> This fixes the issue of an ASHA device failing to re-connect after
+> getting disconnected since `asha->state` was not set to STOPPED on
+> a disconnect.
+> ---
+>  profiles/audio/asha.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
+> index 10115b92d..df283dd22 100644
+> --- a/profiles/audio/asha.c
+> +++ b/profiles/audio/asha.c
+> @@ -478,20 +478,21 @@ static int asha_source_disconnect(struct btd_servic=
+e *service)
+>         DBG("Disconnecting ASHA on %s", addr);
+>
+>         if (!asha_dev) {
+>                 /* Can this actually happen? */
+>                 DBG("Not handlihng ASHA profile");
+>                 return -1;
+>         }
+>
+>         asha_source_endpoint_unregister(asha_dev);
+>         bt_asha_reset(asha_dev->asha);
+> +       bt_asha_state_reset(asha_dev->asha);
 
-On Mon, 21 Apr 2025 17:06:01 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds support for decoding Broadcast Name:
-> 
-> > HCI Event: LE Meta Event (0x3e) plen 57
->       LE Extended Advertising Report (0x0d)
->         Num reports: 1
->         Entry 0
->           Event type: 0x0000
->             Props: 0x0000
->             Data status: Complete
->           Address type: Random (0x01)
->           Address: XX:XX:XX:XX:XX:XX (Non-Resolvable)
->           Primary PHY: LE 1M
->           Secondary PHY: LE 2M
->           SID: 0x02
->           TX power: 127 dBm
->           RSSI: -67 dBm (0xbd)
->           Periodic advertising interval: 180.00 msec (0x0090)
->           Direct address type: Public (0x00)
->           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->           Data length: 0x1f
->         06 16 52 18 2f 92 f3 05 16 56 18 04 00 11 30 4c  ..R./....V....0L
->         75 69 7a 27 73 20 53 32 33 20 55 6c 74 72 61     uiz's S23 Ultra
->         Service Data: Broadcast Audio Announcement (0x1852)
->         Broadcast ID: 15962671 (0xf3922f)
->         Service Data: Public Broadcast Announcement (0x1856)
->           Data[2]: 0400
->         Broadcast Name: Luiz's S23 Ultra
-> 
-> [...]
+Any reason why the state reset is not handled inside bt_asha_reset?
+Also perhaps it would make it more clear if we use the term detach,
+since the general idea for src/shared is to handle the sessions not
+the driver logic like probe, so whenever there is a connection you
+attach function and on disconnect detach function.
 
-Here is the summary with links:
-  - [BlueZ,v1,1/2] btmon: Decode Broadcast Name
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=99deeea86f15
-  - [BlueZ,v1,2/2] eir: Use Broadcast Name as Device.Name
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e4c1d03ef73c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>         btd_service_disconnecting_complete(service, 0);
+>
+>         return 0;
+>  }
+>
+>  static struct btd_profile asha_source_profile =3D {
+>         .name           =3D "asha-source",
+>         .priority       =3D BTD_PROFILE_PRIORITY_MEDIUM,
+>         .remote_uuid    =3D ASHA_PROFILE_UUID,
+> --
+> 2.49.0
+>
+>
 
 
+--=20
+Luiz Augusto von Dentz
