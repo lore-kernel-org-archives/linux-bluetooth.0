@@ -1,96 +1,83 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E482B20B1F7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 10:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4640C284B5F;
+	Tue, 22 Apr 2025 13:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745316696; cv=none; b=tQodBEUvSfOe6XIJytSgwYE1nkZSgNH4Mwm8hl+GAz4FBvvYqPJ1ji8xZyqOOthXex+uWH5bhZ6k+vt4IJDIS63rHE//gGkzqmOJrwp0Xcwo3o0nUXo//31aY++42P4bUkFs5Vg3OoCKVmIq+YyoF2O/ubPUSCWR575y7VlNErA=
+	t=1745328597; cv=none; b=oJfsO68k16/6ebvfbGMCoxpBR1Ec766/9EUyHd+V0qyr+cEGKDvEAPoo4U7+OOeEkMc0uEWhRzYd3dZGsfIQSMyWbGp/GMIZT5BGMJpKudRShHZFOI85yIUCh5c121Qs9NuEiv6gN1iNGnePGu9Jq2bxGL7e7F0fzfvNrHPnR2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745316696; c=relaxed/simple;
-	bh=KTWw2A2W5r7XIE7yNUuzgC4l1Uy5bt01OYJWw/4U4SA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MvW8LnAcToI3Aj8bvUWNGQ+xtTJ9FzNRKEG9DQfecaFHMLvj3MRrm0Di6mfrbd4fi9dF0mqDNZgkZ2CZMQ4d47B/E6HGLqRoAPB+Wpu6RrxzOKyIRSZSGeeiAHHxjzMDWhVgoNdHP8Tvx1gpJRfUslcR6lKJZLXzAHftDLENCyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d5b38276deso84291675ab.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 03:11:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745316694; x=1745921494;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qXwWJHvyf5rrUrVosJUo/obcxzIJOyen+c/SsGAvCfM=;
-        b=If/lgbBIsvALEjdiXsyoafJ7xD+eKBkhqSHexsOGqXCwAaMRsJ9DQg2t2QbvqfTfGj
-         /q631KGMZemDoSRVH4bqLX/P134VXbmm6PMAqK8wvHlmhpgNIS2zkqsk2XpxLCixgraM
-         UOMiT3zhkiH7ztXElwUCFGTbLghu78q7PJsvek7O4adqaInDh/VjrQWpcZVmiuOvYDHI
-         pIY3CdWIDkfz7lXGq5YwClGY8orJJpAsY3o/xWlmL74qeyObHkPNxe3Q/BkJx7zbeqcW
-         75gNc+SQsqMxD1/seJwrpqEs/Mhw0iMfQwvKzhC4vBvmegyBJiRKr1QBneJcLm1wWVXl
-         VIjg==
-X-Gm-Message-State: AOJu0Yw6KC19e/fQw5qbZ5NGwTBzB7xJ/4O7qPBG8+kbPWi9/nMwGW+f
-	ZViWYCl926GB2BrSJMCil5wnCVRDot6+lNnl4BOJjlTw3S2CNEZ3odvADKYFH+aquIFN7NJJdgw
-	OS5QOVYe3wFHmWMzVnnFftiRGCsKpVI/Ap0mQEZeJDwHHUQ4jc5j2J94=
-X-Google-Smtp-Source: AGHT+IFdNZfRtpoJ6sqN95w/HZYWx5B3VCO9ZfcceQXYX5W2MnWsdfZ0gje5KvSlJjSLuGujxY1Yw9adOWR2Q8JgcRGr/RfCqvvf
+	s=arc-20240116; t=1745328597; c=relaxed/simple;
+	bh=CL2ckKdWyQEF03LN3BXjBPax5VKKfrOO3/dC6q0A6Wc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nDZKVAbaPZsN8E+zT8EwVMefxq7j4sy3nFnVnw/oj+K92sscVFj6miU2Oq64Z6UCUTRtocfmBeGcn5vvPMfog2fZ2VIu27oyfu1VkB8q41lGwVuAtaJ1F/B5zMFJYtwVWm9/UN5MvcBgI4AWCqE2AiXlFfl9XUl84CRGjImLNgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgVoomws; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgVoomws"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12137C4CEE9;
+	Tue, 22 Apr 2025 13:29:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745328597;
+	bh=CL2ckKdWyQEF03LN3BXjBPax5VKKfrOO3/dC6q0A6Wc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qgVoomws5FoccIq04RK627QjiVSuWooOhRpAh4HGP9GEm7ab8JFMOtKPZ11j55qdV
+	 zO7iYO69Hg1OLxv8oTf7+dxdDEZu7XVgspN1qSwi91elD9garjcQ0xfa9v0kBbSXEj
+	 ceJxhYaO7L7CKXug1zS2xTads/zg6RtA/yZqrXfx4qYEhstwt/5imF6h1kRu9CzPsS
+	 d0sLlmFPifC7Z+0u/w4x4za1zM5TMIRSpnEjJ4o0MYjnyvznvX/ew0ddnrkGzrQURJ
+	 rAgwvcPN9OnC1nR0Y4Ts8QvMkdtBzlWZoqkvKD4E7K+Zbjm4kLk+8vu/gslanveD0f
+	 0/qg8JeDG08GA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDB0380CEF4;
+	Tue, 22 Apr 2025 13:30:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2785:b0:3d8:1e96:1f0 with SMTP id
- e9e14a558f8ab-3d88ee6540amr156709575ab.20.1745316693994; Tue, 22 Apr 2025
- 03:11:33 -0700 (PDT)
-Date: Tue, 22 Apr 2025 03:11:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68076b55.050a0220.8500a.0004.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Apr 2025)
-From: syzbot <syzbot+list87f1666b0fff7a351cea@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/2] Bluetooth: btmtksdio: ensure btmtksdio_close is
+ executed before btmtksdio_remove
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174532863556.1909182.13691276348024740432.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 13:30:35 +0000
+References: <20250422012156.586600-1-chris.lu@mediatek.com>
+In-Reply-To: <20250422012156.586600-1-chris.lu@mediatek.com>
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, jiande.lu@mediatek.com, will-cy.lee@mediatek.com,
+ ss.wu@mediatek.com, steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
 
-Hello bluetooth maintainers/developers,
+Hello:
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 53 issues are still open and 82 have already been fixed.
+On Tue, 22 Apr 2025 09:21:54 +0800 you wrote:
+> If Bluetooth SDIO card is unexpectedly removed due to hardware removal
+> or SDIO issue, it is possible for remove to be called before close.
+> If an interrupt occurs during this process, it may cause kernel panic.
+> Therefore, it is necessary to ensure that close is executed before
+> remove to stop interrupts and cancel txrx workqueue.
+> 
+> Chris Lu (2):
+>   Bluetooth: btmtksdio: Check function enabled before doing close
+>   Bluetooth: btmtksdio: Do close if SDIO card removed without close
+> 
+> [...]
 
-Some of the still happening issues:
+Here is the summary with links:
+  - [v2,1/2] Bluetooth: btmtksdio: Check function enabled before doing close
+    https://git.kernel.org/bluetooth/bluetooth-next/c/04c96a7ace25
+  - [v2,2/2] Bluetooth: btmtksdio: Do close if SDIO card removed without close
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e0af21b30c82
 
-Ref  Crashes Repro Title
-<1>  35675   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
-                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
-<2>  6521    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<3>  1876    Yes   general protection fault in lock_sock_nested
-                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-<4>  382     Yes   WARNING in hci_conn_timeout (2)
-                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
-<5>  359     Yes   KASAN: vmalloc-out-of-bounds Read in hci_devcd_dump
-                   https://syzkaller.appspot.com/bug?extid=ac3c79181f6aecc5120c
-<6>  334     Yes   KASAN: slab-use-after-free Read in force_devcd_write
-                   https://syzkaller.appspot.com/bug?extid=bc71245e56f06e3127b7
-<7>  228     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-<8>  224     Yes   general protection fault in h5_recv
-                   https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
-<9>  199     No    WARNING in l2cap_chan_del
-                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
-<10> 166     Yes   general protection fault in bcsp_recv
-                   https://syzkaller.appspot.com/bug?extid=4ed6852d4da4606c93da
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
