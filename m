@@ -1,81 +1,74 @@
-Received: from o6.sgmail.github.com (o6.sgmail.github.com [192.254.113.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF7526D4C3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 21:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.254.113.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887581F8756
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 21:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745358789; cv=none; b=WVqOwszpWVyMpuOKk+Nky6cos5AdaIr/EmtvG++dRsZJ71lBHDbguTRN9xxPv+NQUs7kXLCL6Ed9kl1g/sDNpWhZvvtAoJ6R8ruaicS9UZ7ka46qwyT4RzdZzA2loybpMxL8n+zgC2zUH/QeeeHKBWof10YqsII0cc4CLqFfxo4=
+	t=1745359198; cv=none; b=prUSs3ueZyXUUnysLpl+L1TlrXp0x80Oci6TxJ+uMmu9EK25I9xFxc7T0Sdn4oNNU5M+Q8r2U9fURXsUkEAQ8IW1fjKkfBvExiqX6Z9QSwQ9ttIYihiZJ61xcctq9mLOkMxGop6+YDsELjVKNLezF9yRhYtZX+GkFQ3VueTi6OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745358789; c=relaxed/simple;
-	bh=hM9W8DDhbTGGv/LyXe6vNmOkSXePIFqcoe5Cbo8Sr7s=;
-	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=E3jcCzfC2z1GABOFosIqwV4v42txTts+/RbjgnRVg8QaaDV0MwxhKFScAFxkV+W4Hf8LiRwk183TMZ+41leSkfZKMxAEvVNohaiD/W4LZeu+MWvD+hXNsJiNg6sOaitmV/PyRYbrm28TXkxEgqbcH2sNRg8g9oLtPvJh6XVP+kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=vESGddav; arc=none smtp.client-ip=192.254.113.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
+	s=arc-20240116; t=1745359198; c=relaxed/simple;
+	bh=Ezi+1nz0oPrS9jr2cibh2a7MmgaW0BawMHsvvX2/RKE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RWcPUIwGl35CV6Na0le12Qj+k0oOixB67i+N6+G2P84cqIeqKn4i2ULASEc8MLFbHN87189/Ylrd0aMTWfiAyRxZhWAhNsb8WNPEJLBLAM9KYyM+Kc0UhpTgijpvQfqByKUDPdcWuUgf3ddw5SEoTU2al88nVoBccrBOheSp58Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txh7oIHE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="vESGddav"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	h=from:subject:mime-version:content-type:content-transfer-encoding:
-	list-unsubscribe:to:cc:content-type:from:subject:to;
-	s=smtpapi; bh=hyjsXnfwP9YwLLXrHOKp9n++GJQ/8iTmzcsBo/woG2Y=;
-	b=vESGddav+0DEWlz8GNv1eDcBWu7ObSBx6Mo1QXoqXEau8WEWqWVDeaILY4PvDBL4NeOQ
-	CuoKLS05k2w9UFHIAF7rsGqROb6yKvkCAgWkaMNsUEAx4rgWl2bIQgNmWwjqkk59a95Ekc
-	Fhf0msDWioBNihGzNJqeSNv3yHdfX8S8M=
-Received: by recvd-d9d8c758f-7tj27 with SMTP id recvd-d9d8c758f-7tj27-1-68080FC2-48
-	2025-04-22 21:53:06.993676495 +0000 UTC m=+1208673.511893528
-Received: from out-22.smtp.github.com (unknown)
-	by geopod-ismtpd-3 (SG)
-	with ESMTP id qEXnM_Y1RQuXZGKD-3IW2g
-	for <linux-bluetooth@vger.kernel.org>;
-	Tue, 22 Apr 2025 21:53:06.970 +0000 (UTC)
-Received: from github.com (hubbernetes-node-b6181c9.ac4-iad.github.net [10.52.211.40])
-	by smtp.github.com (Postfix) with ESMTPA id 540D02104F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Apr 2025 14:53:00 -0700 (PDT)
-Date: Tue, 22 Apr 2025 21:53:07 +0000 (UTC)
-From: Luiz Augusto von Dentz <noreply@github.com>
-Message-ID: <bluez/bluez/push/refs/heads/master/3616d5-46e6a3@github.com>
-Subject: [bluez/bluez] 46e6a3: workflows: Add sync action
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txh7oIHE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08465C4CEE9;
+	Tue, 22 Apr 2025 21:59:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745359197;
+	bh=Ezi+1nz0oPrS9jr2cibh2a7MmgaW0BawMHsvvX2/RKE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=txh7oIHETS/96/3dhQkgPvHbCRd71AR36FoPmfcRA/bjT0OR8SlfiiDCDpg7ZGy9z
+	 a5eg2j4auVEPliKRiZdRimgoA3vp/nJo+ZNHvYGVb0QGq9nXrgYMIUrwDdfwfkObcI
+	 A9W+z98TRTP7NRVDxDfqftfj0OfwDIJmb15NJwY/sJOC/C3m8SdhnEbzFIdHA9n5Zm
+	 1Wp5fKxCuDTYfI0Ny1/7NFXpS77dhJDVaXTPp8gFiaq7iRhMo6GyuDc2zUA/U/TCFI
+	 mCsrC/TCn1yZLeV+DFzqifDMCC2V/BKWUqeIhCxPT9OJc0T+j+Ivo1p3/pgJu7GvOM
+	 RvA/QyKP/iFpg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE82B380CEF4;
+	Tue, 22 Apr 2025 22:00:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-X-SG-EID: 
- =?us-ascii?Q?u001=2E8ki=2FFbqwlQO04QBiriT34f6qhM6wd38+BQvADylPPTIQmeZqt0Mdj+E9P?=
- =?us-ascii?Q?ngWQlMPxccS8u9EBUyRL9UmZaAIAn9cYYyitBNt?=
- =?us-ascii?Q?msFIegYgDthqIfnrIlAN1UiXvCJQl5Epjf5NJ9e?=
- =?us-ascii?Q?Rwf+Ko5E59Ec=2FWeYugeEPxun76H1Nzvagaphiv2?=
- =?us-ascii?Q?JmhTxleOybR8zcDje9Ny0I0D01HBL9DuMI2CW1E?=
- =?us-ascii?Q?B44XDVbEHn+mYoZAYZ94qLWx6f80wF8XXejDiAD?=
- =?us-ascii?Q?MIQWEDhoe4dJBfgdZQvXJm4x7g=3D=3D?=
-To: linux-bluetooth@vger.kernel.org
-X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2] workflows: Add sync action
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174535923550.2067560.567124223573252925.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 22:00:35 +0000
+References: <20250422214935.993192-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250422214935.993192-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 46e6a3856dbda48096a3510e16e977c12b93bae7
-      https://github.com/bluez/bluez/commit/46e6a3856dbda48096a3510e16e977c12b93bae7
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-04-22 (Tue, 22 Apr 2025)
+Hello:
 
-  Changed paths:
-    A .github/workflows/sync.yml
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  workflows: Add sync action
+On Tue, 22 Apr 2025 17:49:35 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds sync action which was part of https://github.com/bluez/actions/
+> but it gets disabled every 60 days due to inactivity, in addition to
+> syncing with upstream repositories it also syncs with patchwork which
+> created the PR and then triggers ci action to do the testing.
+> 
+> [...]
 
-This adds sync action which was part of https://github.com/bluez/actions/
-but it gets disabled every 60 days due to inactivity, in addition to
-syncing with upstream repositories it also syncs with patchwork which
-created the PR and then triggers ci action to do the testing.
+Here is the summary with links:
+  - [BlueZ,v2] workflows: Add sync action
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=46e6a3856dbd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
