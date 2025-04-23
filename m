@@ -1,72 +1,32 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from b-painless.mh.aa.net.uk (b-painless.mh.aa.net.uk [81.187.30.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C928C28B503
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 15:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAED288CA4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 16:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745420986; cv=none; b=TYOxFHQvFFV9NlTFIJZKEvZ0t2Liin7CTZ+3HAhCy3ZBeF7MPOy9+6bavHv78jcELtgEt81hN3p1KISdbNOKWpf4o3o5hXW3ayqUYmkZfXpunqObchA/8EZrubV1FhCWzSyio1PoggVDMpG4RiQ7LHDiVNd64LVs9G61Ho21Vso=
+	t=1745426074; cv=none; b=IlLfspW7D2psK34WIUV+SGlldxSfZ7V98wqMFmHnLffSqCEZkyVzDew/y28qbg/ok5FL3/allOtbXFzcPL008+bX22phjW+dzWpovbW/TbHffnshPK4qZX9NBtmyYWBdtaySqPMHToUUpqT6bACvot7UYEudFmd3yy0gihzPFwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745420986; c=relaxed/simple;
-	bh=SxjVySoPnr5ZWmPh6jsYJN+WWxAIWrGd5uAstAKUIFE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rDY9kv7mhQagGzdvMu9Y2HurG1InVyZrzq4MFUaqOiI0ri0JjK6L2CAc2IIUgLUiAO8JqyqK7B3EkcJ5NRmZP6xsY9SsvoZ8mxDvZe3N+bcPvF2DgwSB1MpOjaSl+UGDdayZnMlg+d6920BN2rsM/JiwDNYEnDp3b3nfdiI2nrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=ceygFh0R; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="ceygFh0R"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-47ae894e9b7so109725281cf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 08:09:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1745420983; x=1746025783; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TVhPt6MnDoPuk2Qnb2PNXtcL1RsGqtNeRByAXpMT8a4=;
-        b=ceygFh0R9/Jx5Oiktn5462CR5kA7qUieSn17HJItcZoU1JKvo5w7HWCfTSE4Uwqre7
-         0kBkUQ36W8oczoFPBvlpr+VyOYxbhFGQynHKtToqc0bFuWu37t0TK46zNHJTQo4BtrDR
-         v82LfPM0A6cILfwqmq8jMP7dsK9ParacITii/1mcQsa+vYHGyRFFSy11Z0C4cQD+Xofg
-         nDMLeWrYhuNiMv6WIhweSAMyHapssAQK0jdKUOWVHyqp+KnjRxboHCocULqHHe+NiXrp
-         kjF06Yy+mrMNYTLT7k6osaHiNLpAkXiznf/U6pyrxn1mdH62je2rdGGJzcH/3jyZ4shV
-         Lbxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745420983; x=1746025783;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TVhPt6MnDoPuk2Qnb2PNXtcL1RsGqtNeRByAXpMT8a4=;
-        b=FJ7Oh9/zLvIM595O7ENfcjfsmoUZkKfozYSIN6m4mHR97Ka8cZR7aDxJkoTxmZlIYU
-         LWAI32qIoEAW8UbOWkwMXUkIb/kRD5Bo6q0U2kC9p3mSj0ih9ixIyNmXQf7210AMJmBn
-         XwhAZK+V0JAqCsbzKPnpALSzHKLxpS9rWjU2gSLGNRhuHh+5Zxc0NHY+Qjwydp2UlcP3
-         zvjzYNqjPvgPeP+OG2tY4pf495cTXoi5fi3f1Fs5H1PlSiwnJxD5xXQ0wePevKDFRsQZ
-         yEXByjOz88KjU1WUj1u0Kyn7bo98Afj2le8ClFpiGM/l8/gq8nicn3RS3zJPxo9dmnX6
-         SmvQ==
-X-Gm-Message-State: AOJu0YwkuOHXIhPmxSrDZEiEFNPu7T2Rn285DF7SHf+lg8VMEToSext2
-	PKcNopXDxP2HpfOfCSnZRIPm4sON1MBlx70bwPFn/nFaJcWI8kCa4cqTE5em2cZV81OcBNmoPvY
-	Y
-X-Gm-Gg: ASbGncv85x5ZEnhfwhMV2g+eD92hDGLpYK/ODqdj3fcyiayriCZzBt/e9Pt1xJvVQ7H
-	9orn/zQyCF3IbghB0diAS1SXpJ/RLNqzsIfYRBr2rftT8EFw8pKD0ESBQFsyFQi3DxNNHVyV/O2
-	ERQFeDHzTyKFmRQ9guPBARlIpI4hPCy+KPYdTJinYSqIjT8kjXGoTUb73kYGHATUKvA4E6zCOXg
-	mhVyjkQZyoA/F9AjYtkpoESHPqGrEnzzS86+jWO5fEGR+QO8OUTjD/jqtdrSIgr6u1mYtcXDJCA
-	GwBVu3QydBrL05nD8lXC4hXiVs8vvMx59IubRg==
-X-Google-Smtp-Source: AGHT+IGMliHYY9qk/rVr3aoZ1UyK9dkEgZRm0PSb/iVSk1y8wB7psmWF0YAFsgk20/W0YgIfOWooNg==
-X-Received: by 2002:a05:622a:144e:b0:476:bb72:f429 with SMTP id d75a77b69052e-47aec49fe7dmr316374101cf.42.1745420983058;
-        Wed, 23 Apr 2025 08:09:43 -0700 (PDT)
-Received: from andromeda.lan ([74.15.9.135])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ae9cfa3f1sm68953601cf.79.2025.04.23.08.09.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 08:09:42 -0700 (PDT)
-From: Arun Raghavan <arun@asymptotic.io>
+	s=arc-20240116; t=1745426074; c=relaxed/simple;
+	bh=FVIXcLF1VvJzBXnTY5lcWWJHoS/TYBDE0MmDy88qFc8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d3N1LlhRpn8gidESkEZ1Ht08dvgSUjHyuTiyy6PXjVi5wJqK75k8uZ6lClvth0roG1F2X8VbkyiUiH7vu7iCtkQxdvMEoR6SCWJfccpqJPCwJsZWCjYqepVvWHVZUgC6XpS/lq+iSHtclWqXOPy74zwzA6Slp1SbhM9BW2JLl0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
+Received: from 2.d.9.3.3.f.4.8.6.f.f.b.b.0.3.7.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:730b:bff6:84f3:39d2] helo=andrews-2024-laptop.lan)
+	by painless-b.tch.aa.net.uk with esmtp (Exim 4.96)
+	(envelope-from <kernel.org@pileofstuff.org>)
+	id 1u7d3M-00El0N-08;
+	Wed, 23 Apr 2025 17:34:28 +0100
+From: Andrew Sayers <kernel.org@pileofstuff.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@asymptotic.io>,
-	sanchayan@asymptotic.io
-Subject: [PATCH BlueZ v2 3/3] shared: asha: Use a more descriptive name for the state callback
-Date: Wed, 23 Apr 2025 11:07:42 -0400
-Message-ID: <20250423150742.319463-4-arun@asymptotic.io>
+Cc: luiz.dentz@gmail.com,
+	pav@iki.fi,
+	Andrew Sayers <kernel.org@pileofstuff.org>
+Subject: [PATCH 0/4] obex: unregster profiles when the user is inactive
+Date: Wed, 23 Apr 2025 17:33:22 +0100
+Message-ID: <20250423163343.4160595-1-kernel.org@pileofstuff.org>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250423150742.319463-1-arun@asymptotic.io>
-References: <20250423150742.319463-1-arun@asymptotic.io>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,89 +35,43 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- src/shared/asha.c | 24 ++++++++++++------------
- src/shared/asha.h |  4 ++--
- 2 files changed, 14 insertions(+), 14 deletions(-)
+This is a follow-up to "obexd: only run one instance at once".
+Instead of refusing to run parallel services, it unregisters
+profiles when the user is inactive.  This avoids the need
+for tmpfiles, and avoids issues where the user with the
+obex service logs out, leaving obex disabled altogether.
 
-diff --git a/src/shared/asha.c b/src/shared/asha.c
-index d99ae4d8b..bcaf6b843 100644
---- a/src/shared/asha.c
-+++ b/src/shared/asha.c
-@@ -189,8 +189,8 @@ void bt_asha_state_reset(struct bt_asha *asha)
- {
- 	asha->state = ASHA_STOPPED;
- 
--	asha->cb = NULL;
--	asha->cb_user_data = NULL;
-+	asha->state_cb = NULL;
-+	asha->state_cb_data = NULL;
- }
- 
- void bt_asha_free(struct bt_asha *asha)
-@@ -210,8 +210,8 @@ static void asha_acp_sent(bool success, uint8_t err, void *user_data)
- 	} else {
- 		error("Failed to send AudioControlPoint command: %d", err);
- 
--		if (asha->cb)
--			asha->cb(-1, asha->cb_user_data);
-+		if (asha->state_cb)
-+			asha->state_cb(-1, asha->state_cb_data);
- 
- 		bt_asha_state_reset(asha);
- 	}
-@@ -226,8 +226,8 @@ static int asha_send_acp(struct bt_asha *asha, uint8_t *cmd,
- 		return -1;
- 	}
- 
--	asha->cb = cb;
--	asha->cb_user_data = user_data;
-+	asha->state_cb = cb;
-+	asha->state_cb_data = user_data;
- 
- 	return 0;
- }
-@@ -439,8 +439,8 @@ static void audio_status_notify(uint16_t value_handle, const uint8_t *value,
- 	struct bt_asha *asha = user_data;
- 	uint8_t status = *value;
- 	/* Back these up to survive the reset paths */
--	bt_asha_cb_t cb = asha->cb;
--	bt_asha_cb_t cb_user_data = asha->cb_user_data;
-+	bt_asha_cb_t state_cb = asha->state_cb;
-+	bt_asha_cb_t state_cb_data = asha->state_cb_data;
- 
- 	if (asha->state == ASHA_STARTING) {
- 		if (status == 0) {
-@@ -457,10 +457,10 @@ static void audio_status_notify(uint16_t value_handle, const uint8_t *value,
- 		DBG("ASHA stop %s", status == 0 ? "complete" : "failed");
- 	}
- 
--	if (cb) {
--		cb(status, cb_user_data);
--		asha->cb = NULL;
--		asha->cb_user_data = NULL;
-+	if (state_cb) {
-+		state_cb(status, state_cb_data);
-+		asha->state_cb = NULL;
-+		asha->state_cb_data = NULL;
- 	}
- }
- 
-diff --git a/src/shared/asha.h b/src/shared/asha.h
-index 39e55f22e..680a27010 100644
---- a/src/shared/asha.h
-+++ b/src/shared/asha.h
-@@ -44,8 +44,8 @@ struct bt_asha {
- 	int8_t volume;
- 
- 	enum bt_asha_state_t state;
--	bt_asha_cb_t cb;
--	void *cb_user_data;
-+	bt_asha_cb_t state_cb;
-+	void *state_cb_data;
- 
- 	bt_asha_attach_cb_t attach_cb;
- 	void *attach_cb_data;
--- 
-2.49.0
+Luiz previously suggested moving this to systemd, but I haven't had much
+luck getting the systemd devs to accept changes, and Pauli's mention of
+elogind (i.e. logind without systemd) suggests it's probably better
+to avoid the dependency anyway.
+
+I considered writing a separate D-Bus service that would notify you
+when the session became (in)active, but D-Bus doesn't have particularly
+strong guarantees about how long messages take to deliver, which could
+lead to race conditions between instances on overloaded systems.
+
+I also considered writing some kind of library, but there's not much
+code to deduplicate, and most of it would need to be reworked for every
+service that uses it.  So I wrote a gist for people to copy/paste:
+
+https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+---
+
+Andrew Sayers (4):
+      pbap: Support calling pbap_init() after pbap_exit()
+      obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
+      obex: unregster profiles when the user is inactive
+      Revert "obexd: only run one instance at once"
+
+ Makefile.obexd            |  10 ++
+ obexd/client/pbap.c       |  34 ++++++-
+ obexd/plugins/bluetooth.c |  44 ++++++++-
+ obexd/src/logind.c        | 238 ++++++++++++++++++++++++++++++++++++++++++++++
+ obexd/src/logind.h        |  26 +++++
+ obexd/src/main.c          |   4 +
+ obexd/src/obex.service.in |   9 --
+ 7 files changed, 350 insertions(+), 15 deletions(-)
 
