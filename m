@@ -1,228 +1,202 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA32026D4CE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 11:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072F427F4D9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 14:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745408346; cv=none; b=KepzTAh+64Yjhwpkn5uUq89gBBUBQ5W2R5i6dozvrQf+T3FHxH7JF9lyGTDYBhNUIWOgHEiLrqGpI1W5ovn4UmmNPxAna30QT7MZ1tbE9b1LaP3c3C7YAswEd7JPyhinrJm105ZWKhM912KasTZDRFEHh7HMTJkugRdgLIJ03cY=
+	t=1745418541; cv=none; b=LCHK7gxOeoyzg4MSDgj1cBSSdIX9/x70nIneZAm4Rx5gggWubpZ7RglSxiShJnQML/cblJw3JHUh1O3lf/hWkB/sp1ozaQoBxI5zZ03cj+AXQrwQzpVlpZg+7vbCD5fPUGAeQrBbeK17RvY+NVvVHL39cntugD2lAznMyjJZK4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745408346; c=relaxed/simple;
-	bh=604DmnlN5FKJXlnCPF7Cz5HzYTZ0ji8BEc2CCi775SY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=FDg/flkU1cKtyslqNxzv4EAX/j28b+bX9KaiSP83m5SG7wujg+N8muxl1UD4MFdCytKnOlbvJNgFHPrrFlnXNSDQsrFYPmcdh71+JisaplRM8Q+z8UQZYmWWP7Go9htGHTCvWhflHJejsn6er4tZgelAtDta2ChC7NOYHli1rKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d91a0d3e15so34152825ab.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 04:39:04 -0700 (PDT)
+	s=arc-20240116; t=1745418541; c=relaxed/simple;
+	bh=gELOe3zH5CE7VJ8k9NHhX1M+i7E4SDbp2ETviZsNX6E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qJzaGRqQ5LMUCUE8wiBdutwes1ELx5lY9iydL3j/H5lPNE+LptbL4uak1CTdBzCKHGrSOCdKaLWNRCwqXv8AUMuXSJGfC9CmXDn6ACwEZxnqdCQlP7TPuqvkVATaqZ8h7+S+/K859nFi2L1RD6K0UT88DgeUtoHkJl9cfYi5Pas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FKBGABdC; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FKBGABdC"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-3104ddb8051so58816421fa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 07:28:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745418538; x=1746023338; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/37q08q21hIJJx64ZscOPv/YH6uvXQDzyXHHpMgGsxA=;
+        b=FKBGABdCufIUoeo2Xtn/vr9eICCIg2Nt+LAAn5p1HV/oSQr+amOpdsESZ0napm0jQ4
+         wtTfkKI+hF2NKw2DFDDPhZd70/IW/DDYzmPCcxBXtmk19O/w9l6a4u1sCjYEwhgMjVIL
+         bGNoUvppB8e290YbdxSsoTcXMz8dVeHS2VE81b3+ccG3UsDAQT8s+0JRgfjmSQYMxpA6
+         1p8nnWKBgLcTlak/w3jxHbtnYk7Xf92ivo2AxiSWGdzGuXkxTe2Hq+dzBjNoDpHnM73i
+         sJmrDhseDHuR1yYkzmiuFlL3RaSJ97948SlqgTyjWTVsDrqNcgxzkSBbi5v6+BUFKd8Y
+         BnmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745408344; x=1746013144;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2d9QnuJwif/hl9wfYSPziOPeakCUUaYqmPPjpsjgZsI=;
-        b=JatzGolneHWkn5HuRsG5svVH0ZGVXzhNjCLX06IdlILbemw0tMc+iPM936rZg63gBh
-         JdXmH2AeN1SXHLTKSMTPjFnw1BupcIu2yF0jTtM9fPUNpr7i8g6w5d21bmjh46qdff8Z
-         Xa5LMFYTj5LkhGlV1eZMj2s/fWJdAssJU4JsyopA7ExkgCMbYt7VgdbZLVQ689kjep9y
-         69WOzdc6lYpdL3fW5zDqpnDsXyC2FmnHa6lKuRlCmMBDXUPXIQesOnJLKOaO5Jn/5ILq
-         6QKs1b6YJgw2Urm5j00tEBqYw4eD0oAZToccDJByveIuWh5M7lL1LexQVQpIplD/3Or3
-         kTmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaqscn8nqidn9RKPCo3uqD5952BoFUNAQg8Uewv90n2uSMgOAXASjpq4/+6LnfRbTBdV4YVi6O62ctz1g/4B4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywhwl/0cCu7xlID9X6izVw1lLBki+msi8E9VB/RzjR+18NChVEx
-	FK65FZ5x/2XqpcutGlsUknfhoHdHT/4bjFZDvly+49Cs7cYIzH4i2xpV22nLWdZYuBsRO1JT68R
-	yDL1+VPazl+/OHemSDr9Cv06V6qX5ILlTUw8NhhRx61NgnSpoD1hK/dw=
-X-Google-Smtp-Source: AGHT+IFm5o/15WP2P4URudbHWvdLxIL0lEkMO3WXWucEcI/jthl/ryFZiCpJFsx3TfnEC2kMFaReG/DHXvl2zeL9QTWqAbTR86lt
+        d=1e100.net; s=20230601; t=1745418538; x=1746023338;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/37q08q21hIJJx64ZscOPv/YH6uvXQDzyXHHpMgGsxA=;
+        b=jApjNXYgosGXkcHWz2LRoHdWWhCbzFB9Jp+GTT2PYG4XbPoy27SxHI1Je0O73pW0mk
+         VxvE3APB56oH1+ovN0Vyzb5nxQDqJs4NCVcUjz85jbg9LHgs1c4xtJDpdBekv7gk6S5Q
+         offDnDQ3jhydTwYWW2N2JKoqxPDEwVKXPp+PgAYz/inboDgKzirDXOR/2xRIOEThwoKS
+         w0BO70YrEHkka3hI0XnVbF07PbFc+PZoxYIBZx8w3aQu03umTNzSX6VmH8try7AXRG2m
+         X5OamsPVZ9fMaBfaTXwgkAk/gPqhA+7CnJdIpEPVzvUaD8y4Ld5zhFS9j1MmOQNVMT2t
+         hxxg==
+X-Gm-Message-State: AOJu0Yx8j7sx8ohwoPPJmjYPAa0i33d+Sqj/f0ahHik/sVVzAo9NiKpe
+	pFzKZ9L4KE7L1Sz28u0vlRSefS0T2ofS8RYMfAHk3GY+mY8dUYIP2Q6t2v56w7WnPgUamKi1zPN
+	TNuBa4yNUcu/oYyJ/oIgH6QwvrVNhhLt36piDHw==
+X-Gm-Gg: ASbGncswpWVavGMySoNhsR11tD3E8YfwKewanX3CnXMsLKQfF+sf7Vl9W/imWH8FW9t
+	yI1ABY4N/lH1PAUqYoUWoZ7U8B57gfcIVHLpiE5y6xfdk6tZ7iOxacONaX4mRXa53yYkAtNEc61
+	y15rh0tIoFh8cSaVtPOXTY
+X-Google-Smtp-Source: AGHT+IENIB1yeKtXTgm7X25wPOVQuWgHu3vwleTWPGGZ7XPS4jaH4OV7IisyVfYLKZ2X1TJJvW6wUX49PC969drIv7Y=
+X-Received: by 2002:a2e:a914:0:b0:30b:c91d:35cb with SMTP id
+ 38308e7fff4ca-310904c99dfmr61675321fa.4.1745418537633; Wed, 23 Apr 2025
+ 07:28:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca48:0:b0:3d8:8900:9a30 with SMTP id
- e9e14a558f8ab-3d89428ae3bmr203350565ab.20.1745408344038; Wed, 23 Apr 2025
- 04:39:04 -0700 (PDT)
-Date: Wed, 23 Apr 2025 04:39:04 -0700
-In-Reply-To: <20250423112029.189032-1-contact@arnaud-lcm.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6808d158.050a0220.dd94f.01de.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: vmalloc-out-of-bounds Read in hci_devcd_dump
-From: syzbot <syzbot+ac3c79181f6aecc5120c@syzkaller.appspotmail.com>
-To: contact@arnaud-lcm.com, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+References: <CAA_e4kpzwje7r-ufYj49uhKVO8dqE=7mC52UeFMfouEvH6VdZw@mail.gmail.com>
+In-Reply-To: <CAA_e4kpzwje7r-ufYj49uhKVO8dqE=7mC52UeFMfouEvH6VdZw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 23 Apr 2025 10:28:45 -0400
+X-Gm-Features: ATxdqUGkzwNG71CPLmhqbQqSVj7ip9wqcyHVyUQ539qVZu_fafofIzTOYmtsCTk
+Message-ID: <CABBYNZLCnDJ9W9Gr90pN+jcXAu9XBXgkzt5A2ZLtRz0E6KR8zg@mail.gmail.com>
+Subject: =?UTF-8?Q?Re=3A_=5BBUG=5D=5BLE=5D_Disconnect_after_LL=5FPERIPHERAL=5FFEATURE?=
+	=?UTF-8?Q?=5FREQ_=E2=86=92_LL=5FUNKNOWN=5FRSP_=28Pi_Zero_2_W_peripheral_vs_nRF52840_?=
+	=?UTF-8?Q?central=29?=
+To: Faranak Karimi <faranakkarimi.iot@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Faranak,
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-KASAN: slab-use-after-free Read in force_devcd_write
+On Wed, Apr 23, 2025 at 5:33=E2=80=AFAM Faranak Karimi
+<faranakkarimi.iot@gmail.com> wrote:
+>
+>
+> Hello BlueZ maintainers,
+>
+> I am seeing a systematic link-loss the moment a Nordic nRF52840 (central)
+> connects to a Raspberry Pi Zero 2 W running BlueZ in *peripheral* role.
+> BlueZ disconnects immediately after the peer replies =E2=80=9CUnsupported=
+ Remote
+> Feature / Unsupported LMP Feature (0x1a)=E2=80=9D to an
+> LL_PERIPHERAL_FEATURE_REQ.  Per Core Spec v5.4, that feature exchange is
+> optional, so a simple UNKNOWN_RSP should not abort the connection.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in force_devcd_write+0x312/0x340 drivers/bluetooth/hci_vhci.c:327
-Read of size 8 at addr ffff888028448800 by task syz.0.616/8068
+This was introduced a really long time ago:
 
-CPU: 0 UID: 0 PID: 8068 Comm: syz.0.616 Not tainted 6.15.0-rc3-syzkaller-gbc3372351d0c-dirty #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0xc3/0x670 mm/kasan/report.c:521
- kasan_report+0xe0/0x110 mm/kasan/report.c:634
- force_devcd_write+0x312/0x340 drivers/bluetooth/hci_vhci.c:327
- full_proxy_write+0x13c/0x200 fs/debugfs/file.c:398
- vfs_write+0x25c/0x1180 fs/read_write.c:682
- ksys_write+0x12a/0x240 fs/read_write.c:736
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1dc558e169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1dc47fe038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f1dc57b5fa0 RCX: 00007f1dc558e169
-RDX: 000000000000000e RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007f1dc5610a68 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1dc57b5fa0 R15: 00007ffc66674788
- </TASK>
+commit 0fe29fd1cd77ffbdb8e36ec1715868d9d8011c9b
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Wed Apr 8 09:05:27 2015 -0700
 
-Allocated by task 6607:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
- kmalloc_noprof include/linux/slab.h:905 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- vhci_open+0x4c/0x430 drivers/bluetooth/hci_vhci.c:635
- misc_open+0x35a/0x420 drivers/char/misc.c:179
- chrdev_open+0x231/0x6a0 fs/char_dev.c:414
- do_dentry_open+0x741/0x1c10 fs/open.c:956
- vfs_open+0x82/0x3f0 fs/open.c:1086
- do_open fs/namei.c:3880 [inline]
- path_openat+0x1e5e/0x2d40 fs/namei.c:4039
- do_filp_open+0x20b/0x470 fs/namei.c:4066
- do_sys_openat2+0x11b/0x1d0 fs/open.c:1429
- do_sys_open fs/open.c:1444 [inline]
- __do_sys_openat fs/open.c:1460 [inline]
- __se_sys_openat fs/open.c:1455 [inline]
- __x64_sys_openat+0x174/0x210 fs/open.c:1455
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+    Bluetooth: Read LE remote features during connection establishment
 
-Freed by task 6607:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2398 [inline]
- slab_free mm/slub.c:4656 [inline]
- kfree+0x2b6/0x4d0 mm/slub.c:4855
- vhci_release+0xbb/0xf0 drivers/bluetooth/hci_vhci.c:671
- __fput+0x3ff/0xb70 fs/file_table.c:465
- task_work_run+0x14d/0x240 kernel/task_work.c:227
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0xafb/0x2c30 kernel/exit.c:953
- do_group_exit+0xd3/0x2a0 kernel/exit.c:1102
- get_signal+0x2673/0x26d0 kernel/signal.c:3034
- arch_do_signal_or_restart+0x8f/0x7a0 arch/x86/kernel/signal.c:337
- exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x150/0x2a0 kernel/entry/common.c:218
- do_syscall_64+0xda/0x230 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+    When establishing a Bluetooth LE connection, read the remote used
+    features mask to determine which features are supported. This was
+    not really needed with Bluetooth 4.0, but since Bluetooth 4.1 and
+    also 4.2 have introduced new optional features, this becomes more
+    important.
 
-The buggy address belongs to the object at ffff888028448800
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 0 bytes inside of
- freed 1024-byte region [ffff888028448800, ffff888028448c00)
+    This works the same as with BR/EDR where the connection enters the
+    BT_CONFIG stage and hci_connect_cfm call is delayed until the remote
+    features have been retrieved. Only after successfully receiving the
+    remote features, the connection enters the BT_CONNECTED state.
 
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x28448
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-anon flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801b441dc0 0000000000000000 dead000000000001
-raw: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801b441dc0 0000000000000000 dead000000000001
-head: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
-head: 00fff00000000003 ffffea0000a11201 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5928, tgid 5928 (kworker/u8:2), ts 88342641017, free_ts 88224139595
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x181/0x1b0 mm/page_alloc.c:1718
- prep_new_page mm/page_alloc.c:1726 [inline]
- get_page_from_freelist+0x135c/0x3920 mm/page_alloc.c:3688
- __alloc_frozen_pages_noprof+0x263/0x23a0 mm/page_alloc.c:4970
- alloc_pages_mpol+0x1fb/0x550 mm/mempolicy.c:2301
- alloc_slab_page mm/slub.c:2468 [inline]
- allocate_slab mm/slub.c:2632 [inline]
- new_slab+0x244/0x340 mm/slub.c:2686
- ___slab_alloc+0xd9c/0x1940 mm/slub.c:3872
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3962
- __slab_alloc_node mm/slub.c:4037 [inline]
- slab_alloc_node mm/slub.c:4198 [inline]
- __do_kmalloc_node mm/slub.c:4340 [inline]
- __kmalloc_noprof+0x2f2/0x510 mm/slub.c:4353
- kmalloc_noprof include/linux/slab.h:909 [inline]
- load_elf_phdrs+0x102/0x210 fs/binfmt_elf.c:532
- load_elf_binary+0x14b3/0x4f80 fs/binfmt_elf.c:960
- search_binary_handler fs/exec.c:1778 [inline]
- exec_binprm fs/exec.c:1810 [inline]
- bprm_execve fs/exec.c:1862 [inline]
- bprm_execve+0x8c0/0x1650 fs/exec.c:1838
- kernel_execve+0x2ef/0x3b0 fs/exec.c:2028
- call_usermodehelper_exec_async+0x255/0x4c0 kernel/umh.c:109
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-page last free pid 5903 tgid 5903 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1262 [inline]
- __free_frozen_pages+0x69d/0xff0 mm/page_alloc.c:2725
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x4e/0x120 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x195/0x1e0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:329
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4161 [inline]
- slab_alloc_node mm/slub.c:4210 [inline]
- kmem_cache_alloc_noprof+0x1cb/0x3b0 mm/slub.c:4217
- getname_flags.part.0+0x4c/0x550 fs/namei.c:146
- getname_flags+0x93/0xf0 include/linux/audit.h:322
- getname include/linux/fs.h:2852 [inline]
- do_sys_openat2+0xb8/0x1d0 fs/open.c:1423
- do_sys_open fs/open.c:1444 [inline]
- __do_sys_openat fs/open.c:1460 [inline]
- __se_sys_openat fs/open.c:1455 [inline]
- __x64_sys_openat+0x174/0x210 fs/open.c:1455
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+    Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 
-Memory state around the buggy address:
- ffff888028448700: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888028448780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff888028448800: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff888028448880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888028448900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+We don't seem to be doing anything with conn->features so perhaps
+!status can be just ignored, that said it sort of weird coming from
+nordic, or perhaps it only responds like that when connection as
+central?
+
+> Environment
+> -----------
+> =E2=80=A2 HW=E2=80=83 Raspberry Pi Zero 2 W (CYW43438 controller, BT 4.2)
+> =E2=80=A2 Kernel=E2=80=83=E2=9F=A86.12.20+rpt-rpi-v8=E2=9F=A9
+> =E2=80=A2 BlueZ=E2=80=835.66
+> =E2=80=A2 bluetoothd started as: `bluetoothd -d -n`
+> =E2=80=A2 Peer=E2=80=83Nordic nRF52840-DK, Zephyr 3.6.0, SoftDevice Contr=
+oller v1.6.0
+> =E2=80=A2 Pi role=E2=80=83Peripheral; simple GATT server advertising via
+>   `bluez-peripheral 0.1.7` Python script
+> =E2=80=A2 BR/EDR disabled (`controller-mode =3D le` in main.conf)
+>
+> Steps to reproduce
+> ------------------
+> 1. On the Pi
+>    bluetoothd -d -n &
+>    python3 advert.py       # advertises, no security required
+>
+> 2. On the nRF52840 central firmware: scan for =E2=80=9CExample-Peripheral=
+=E2=80=9D and connect.
+>
+> 3. Capture on the Pi with btmon (excerpt below).
+>
+> > HCI Event: LE Connection Complete (0x3e) plen 19          # handle 0x00=
+40
+> < HCI Command: LE Read Remote Used Features (0x08|0x0016)
+> > LE Meta Event: Read Remote Used Features (0x04)
+>     Status: Unsupported Remote Feature (0x1a)
+> < HCI Command: Disconnect (0x01|0x0006)
+>     Reason: Remote User Terminated Connection (0x13)
+>
+> An over-the-air sniffer trace shows the same thing at Link Layer level: P=
+i (peripheral) sends LL_PERIPHERAL_FEATURE_REQ, the nRF52840 responds LL_UN=
+KNOWN_RSP, and the Pi immediately terminates the link (PDU log attached).
+>
+> Expected result
+>
+> The connection should stay up; BlueZ should tolerate LL_UNKNOWN_RSP for P=
+ERIPHERAL_FEATURE_REQ and continue without feature-exchange.
+>
+> Actual result
+>
+> BlueZ disconnects with reason 0x13 as soon as the UNKNOWN_RSP appears.
+>
+> Things I=E2=80=99ve tried
+>
+> Connecting the same Pi peripheral to an Android 14 phone works fine (phon=
+e supports the PFR procedure).
+>
+> Connecting the nRF52840 central to another nRF52840 peripheral also works=
+, so the central side is capable of normal operation.
+>
+> Questions
+>
+> Is the immediate disconnect on 0x1a intentional?
+>
+> If it is unintended, would a patch that ignores UNKNOWN_RSP for LL_PERIPH=
+ERAL_FEATURE_REQ be welcome? (Happy to test/submit.)
+>
+> If it is intended, can I disable the LL_PERIPHERAL_FEATURE_REQ from being=
+ sent in the first place?
+>
+> Attachments
+>
+> btmon_nrf52840_fail.log =E2=80=93 full bluetoothd -d+btmon output
+>
+> Ras_dongle_Unsuccessful_connection.pcapng =E2=80=93 sniffer trace
+> (same files referenced in the Nordic DevZone thread=C2=B9)
+>
+> Many thanks for any guidance!
+>
+> Best regards, Faranak Karimi, IDmelon Technologies, Faranakkarimi.iot@gma=
+il.com
+>
+> =E2=80=93=E2=80=93=E2=80=93 =C2=B9 https://devzone.nordicsemi.com/f/nordi=
+c-q-a/120846/bluetooth-le-unsupported-remote-feature-0x1a-error-when-connec=
+ting-nrf52840-central-to-raspberry-pi-zero-2w-peripheral Emil Lenngren sugg=
+ested asking here because =E2=80=9Cthe connection can of course be kept ali=
+ve despite this problem=E2=80=9D and the PFR procedure is optional .
+>
+>
 
 
-Tested on:
-
-commit:         bc337235 Merge tag 'for-6.15-rc3-tag' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11a91014580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f65c1740d8e72188
-dashboard link: https://syzkaller.appspot.com/bug?extid=ac3c79181f6aecc5120c
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=11fdbacc580000
-
+--=20
+Luiz Augusto von Dentz
