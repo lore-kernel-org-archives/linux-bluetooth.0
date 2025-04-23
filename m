@@ -1,65 +1,73 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A261289351
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 19:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54881266569
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 19:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745435065; cv=none; b=U8G79P570W3k8h7GsbeeEo+5HxxPcgnJW+D0jvsnnl2c7JE0TzgziFt6FwG1bc/TFxilZ6nsPhcT9ydPGj70OiD/6yiW70QxoKIGH/yT5Tn9RfnSFHJjxYuToZreExKpDMFczyyJSGWvuJLFMkgBu7LqsfpBa8CFKD0CyRJ5U5Y=
+	t=1745435389; cv=none; b=T1v2i7DSgVnBSJWm2/daYpmOTPpWgpLx+DEHqkPRRp69aA7cVVJs13WIx09rybx2RaghFATbuj9K9+x+4H5SyQ+PPtB8CA2zBL8F5A2JzViwp++0KHKC0ly8a0/Et0tDK1cNRuY6BkxdNObrHOyHmgiUaqzIw4nsONn6tZGdV3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745435065; c=relaxed/simple;
-	bh=J7/38fqP5r2XahpKJaou5SzW1WHeJY+uOdudl7Psc+w=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BFG3t67xa+VoYkqgDrxbPvMAaMn67hAc+C/R/O7hXstjwWTN/H5eOjhVKkqoMc5BoFFUuue2QKnv5a/abSdwX+6U2XOQOHm+XfWgCnkDZHMLw6aZCDx5ico+WYfekEb84rGsek/fDI25CU0oz1z5lmvdqHzUQwRiGXEPvyQdks0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OGKvy7x6; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1745435389; c=relaxed/simple;
+	bh=gvU4KoC0GZJD2eDcQUrqHcZt28Gbz9ns+8IhuMSpCyU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mAhZAMP1gx0m04wI/ywmJjei4pwNxtBWqXCDY3iOzkB1789fxFZTFbJUn1qxMBJdy2LrAOvfFJH53Yn8pWn9uVnO6ZME0FHWw35oDNM6SsMA2ToXJ3bzCQak8sF0Fyc4gko57HPTCI42LMFtqM5MdZmYiZPHeo5MiJFhkPP4jjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/aj53e7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OGKvy7x6"
-Received: from github.com (hubbernetes-node-2e2a1fd.ac4-iad.github.net [10.52.149.42])
-	by smtp.github.com (Postfix) with ESMTPA id EDA2364071C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 12:04:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745435063;
-	bh=fLYKteujoX1qwBwviMXzPUDp+5aGnyem48rirz7zs7U=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=OGKvy7x6c42bgzdIG/sEFzGQZKpQAzXgnU4/uZqoFvbjS4a4JV9v9Q2SD5j1+21hy
-	 qH2+h3ji62kXDC2F2PKyJkIzDlIUUPc+18h7S/h7Go3XRPOhzs786GW1ibUyiwno5V
-	 3Un4P7pi9JlVRxmTTxEDIg+cx5o2+VvwiMwF5NVU=
-Date: Wed, 23 Apr 2025 12:04:22 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/46e6a3-3e9827@github.com>
-Subject: [bluez/bluez] 3e9827: workflows/sync: Add Cleanup PR and Sync
- Workflow
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/aj53e7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7AC6C4CEE2;
+	Wed, 23 Apr 2025 19:09:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745435388;
+	bh=gvU4KoC0GZJD2eDcQUrqHcZt28Gbz9ns+8IhuMSpCyU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=c/aj53e7FLR2D4/Lopcw88jEIQHqZmi1ei7WaHrR7bOG3HhNLSNWI4n9NKS9gz9u1
+	 JxScBR7uel/AQS6DH6QWnmqsoJR4Mu96FgGj+FlRrPGE7dwKHZEaPPndyPjZvzEr2m
+	 bQItJY/PKhx/JKgjJR/RyIHdtlM9EKpwysbKjtUNKLDwyeeU5Zm0kzlYNz1xDnuKei
+	 UyV9LqQckAeXaDXc8Ai6WvoZbqUcIfuBCEuCUfeTXT2XKICGbbpG8CR9FCxUusMjqh
+	 tOkSiFcnFVOutgUmJePKiU5+XqoQnD5oQ7ZZRyjfs8BFgbKZKtyqgLhuh2vRR0+OiX
+	 6lo9eoog4f/zA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BA7380CED9;
+	Wed, 23 Apr 2025 19:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] workflows/sync: Add Cleanup PR and Sync Workflow
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174543542725.2741026.4025376279006650553.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Apr 2025 19:10:27 +0000
+References: <20250423185951.1171350-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250423185951.1171350-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 3e9827d3a67254deeb82d0b11bd5cd63f5499ff5
-      https://github.com/bluez/bluez/commit/3e9827d3a67254deeb82d0b11bd5cd63f5499ff5
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-04-23 (Wed, 23 Apr 2025)
+Hello:
 
-  Changed paths:
-    M .github/workflows/sync.yml
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  workflows/sync: Add Cleanup PR and Sync Workflow
+On Wed, 23 Apr 2025 14:59:51 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds the missing tasks of Cleanup PR and Sync Workflow which are
+> required in order to properly handle the PRs.
+> ---
+>  .github/workflows/sync.yml | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 
-This adds the missing tasks of Cleanup PR and Sync Workflow which are
-required in order to properly handle the PRs.
+Here is the summary with links:
+  - [BlueZ,v1] workflows/sync: Add Cleanup PR and Sync Workflow
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3e9827d3a672
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
