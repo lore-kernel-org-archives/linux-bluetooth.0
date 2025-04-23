@@ -1,69 +1,69 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B415528B4F4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 15:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C928C28B503
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 15:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745420985; cv=none; b=sphkovAhazKtwq8uFr0r6ny8bDfPNg3HiuR8+tlkBsnwnPIahIq2IV/9dw8tsOi1hEk5thItojHWtJpOkL7b5VpEXzu/PKqV9vg3M5G80p0Gr0cAdneI1WFgSnGocNzTd66mSKMPyV30xI0EKWh1AH6yf5nVHwoIkcW5E23qkBs=
+	t=1745420986; cv=none; b=TYOxFHQvFFV9NlTFIJZKEvZ0t2Liin7CTZ+3HAhCy3ZBeF7MPOy9+6bavHv78jcELtgEt81hN3p1KISdbNOKWpf4o3o5hXW3ayqUYmkZfXpunqObchA/8EZrubV1FhCWzSyio1PoggVDMpG4RiQ7LHDiVNd64LVs9G61Ho21Vso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745420985; c=relaxed/simple;
-	bh=UO7xT63uttbpBnaCw8lb3fncOxdmQ3/d2XV/QJGxPT8=;
+	s=arc-20240116; t=1745420986; c=relaxed/simple;
+	bh=SxjVySoPnr5ZWmPh6jsYJN+WWxAIWrGd5uAstAKUIFE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XGVvXyib+DOoxmCxpLU6Y0YAcgrU7Ojr9cG/IaP2Tmi3s2Io92++Bx5HZiItds6Hgg1+6vMX2WQVkEMNikuSKEoy5c9JTELedK+NHFAXjMabv3gNLeSzRxSetmQwjAmZuI0MwFPUrjUDSpODgxzB7MY32QJxZi8pYz2n3j1Rc9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=XIC6AK1y; arc=none smtp.client-ip=209.85.160.170
+	 MIME-Version; b=rDY9kv7mhQagGzdvMu9Y2HurG1InVyZrzq4MFUaqOiI0ri0JjK6L2CAc2IIUgLUiAO8JqyqK7B3EkcJ5NRmZP6xsY9SsvoZ8mxDvZe3N+bcPvF2DgwSB1MpOjaSl+UGDdayZnMlg+d6920BN2rsM/JiwDNYEnDp3b3nfdiI2nrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=ceygFh0R; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="XIC6AK1y"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-47677b77725so72446451cf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 08:09:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="ceygFh0R"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-47ae894e9b7so109725281cf.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Apr 2025 08:09:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1745420982; x=1746025782; darn=vger.kernel.org;
+        d=asymptotic.io; s=google; t=1745420983; x=1746025783; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IdAQgJGh6L8DgG96ysAv4TN+nxAzuWJNdtJrdyEhb5w=;
-        b=XIC6AK1yU87x0aMaIHi2T1xbGpWImM/eNrPj+zOMg8uRu9HQQczD3IIgCSNpcqUW43
-         rbUlTdZqfmFcqoGIzK43cGq3PMsLmxSWM1R7+rx5HXxhAx1gSiFsBGjKVyq7BX8UA19v
-         PpCMFfq11XdnpS4GQYIhZ/c9TlQUlPfqZ8swsgN7tU0V0sbPa+jht7RkB1pfg9fd1mZM
-         0FQq096p5YGS8y7klLRqAJ6GX9SjNVCpJdErrMK4WarsfWKlCsSwrrK8neLp+J7fErGC
-         LuVN9rEDJkMpEYybNqd8i02Y7cIJdLTeb2oQNjW5chLxnBZ51aMiCJGPonirBukNTQd3
-         oMUg==
+        bh=TVhPt6MnDoPuk2Qnb2PNXtcL1RsGqtNeRByAXpMT8a4=;
+        b=ceygFh0R9/Jx5Oiktn5462CR5kA7qUieSn17HJItcZoU1JKvo5w7HWCfTSE4Uwqre7
+         0kBkUQ36W8oczoFPBvlpr+VyOYxbhFGQynHKtToqc0bFuWu37t0TK46zNHJTQo4BtrDR
+         v82LfPM0A6cILfwqmq8jMP7dsK9ParacITii/1mcQsa+vYHGyRFFSy11Z0C4cQD+Xofg
+         nDMLeWrYhuNiMv6WIhweSAMyHapssAQK0jdKUOWVHyqp+KnjRxboHCocULqHHe+NiXrp
+         kjF06Yy+mrMNYTLT7k6osaHiNLpAkXiznf/U6pyrxn1mdH62je2rdGGJzcH/3jyZ4shV
+         Lbxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745420982; x=1746025782;
+        d=1e100.net; s=20230601; t=1745420983; x=1746025783;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IdAQgJGh6L8DgG96ysAv4TN+nxAzuWJNdtJrdyEhb5w=;
-        b=QchFVlHhdq330b9SL/ka2KvqkvLyKnvww4mElvJ306cXZifmC7kBTOVdmmP6ddV4e/
-         JR2SFSqVSi8MD/0MsesUVEsy1zqbOyZhOLDB8ijSlaqVDF6VQlFh/5qBkMr3wH8v2i7c
-         Q6mY8RbbeQ0AK+G430M8DhC3NfM0Uf6XVNHt/eeReGLe5cBTioL+FuWUuBP1KXL+h3tA
-         LSMi/iVaGp4l8yBtmLnysBawYOQGhgHBKaPTinNt5A5tI3I5zysepc6KDuwgVVUJjaGM
-         BBvdb/2KZU/hPwvI/ItFBCwWtuEIc2KLy3hz4nIYGWa+n/XLPNtXpyKBcnoL7iskg9pl
-         t5WQ==
-X-Gm-Message-State: AOJu0YwxnvZJB+6VuwC+aZnl7nPR1vb+ojiDOYfySC/xrxbJVlrL17rl
-	EmGPoUcsKVrMThPM70kRC7nNE/LqSn4wH85/VjeUjySHO6dFXbGpgBqupF1h79cBzwr4LG2h09h
-	M
-X-Gm-Gg: ASbGncsesbHr0LcPFL0E1k9G3HmiaqqmwQsI6dW2XtFm2CDlW9thry7T231mkCD7ffV
-	utpznrnzdA1QemUoMBIsrCUPNnXePflwctxF+NMeimj7IxKg5ezg8qZ+gbgMuS0GMVzSWMUYBFN
-	NfEODC3BcJDbCR5vXC3bMeUJ8F7Dbz6sx2dHqoEAnpbhMbDvCK6PwdXZVb+ofEg4QGhJsWNs0q8
-	0RH9pR+R95OmbTzpxLN9S9npQz0FjTZiAmRSzUI4KEElAiAYmj0gtPx8kocjjIvUhGxpaU4fz3j
-	Bdmm5LmYwtj5ae9K16bUhuka0vR1Nz5nmt68Kg==
-X-Google-Smtp-Source: AGHT+IGlZtvxNSpPdsWriPMWYaPAeUPfEicjUI6pUMer+e+wMtDnJA4Md29xnVdp9dlEYVGOKotGWw==
-X-Received: by 2002:a05:622a:11c7:b0:476:ae71:eabe with SMTP id d75a77b69052e-47aec4bd58emr396743931cf.50.1745420981538;
-        Wed, 23 Apr 2025 08:09:41 -0700 (PDT)
+        bh=TVhPt6MnDoPuk2Qnb2PNXtcL1RsGqtNeRByAXpMT8a4=;
+        b=FJ7Oh9/zLvIM595O7ENfcjfsmoUZkKfozYSIN6m4mHR97Ka8cZR7aDxJkoTxmZlIYU
+         LWAI32qIoEAW8UbOWkwMXUkIb/kRD5Bo6q0U2kC9p3mSj0ih9ixIyNmXQf7210AMJmBn
+         XwhAZK+V0JAqCsbzKPnpALSzHKLxpS9rWjU2gSLGNRhuHh+5Zxc0NHY+Qjwydp2UlcP3
+         zvjzYNqjPvgPeP+OG2tY4pf495cTXoi5fi3f1Fs5H1PlSiwnJxD5xXQ0wePevKDFRsQZ
+         yEXByjOz88KjU1WUj1u0Kyn7bo98Afj2le8ClFpiGM/l8/gq8nicn3RS3zJPxo9dmnX6
+         SmvQ==
+X-Gm-Message-State: AOJu0YwkuOHXIhPmxSrDZEiEFNPu7T2Rn285DF7SHf+lg8VMEToSext2
+	PKcNopXDxP2HpfOfCSnZRIPm4sON1MBlx70bwPFn/nFaJcWI8kCa4cqTE5em2cZV81OcBNmoPvY
+	Y
+X-Gm-Gg: ASbGncv85x5ZEnhfwhMV2g+eD92hDGLpYK/ODqdj3fcyiayriCZzBt/e9Pt1xJvVQ7H
+	9orn/zQyCF3IbghB0diAS1SXpJ/RLNqzsIfYRBr2rftT8EFw8pKD0ESBQFsyFQi3DxNNHVyV/O2
+	ERQFeDHzTyKFmRQ9guPBARlIpI4hPCy+KPYdTJinYSqIjT8kjXGoTUb73kYGHATUKvA4E6zCOXg
+	mhVyjkQZyoA/F9AjYtkpoESHPqGrEnzzS86+jWO5fEGR+QO8OUTjD/jqtdrSIgr6u1mYtcXDJCA
+	GwBVu3QydBrL05nD8lXC4hXiVs8vvMx59IubRg==
+X-Google-Smtp-Source: AGHT+IGMliHYY9qk/rVr3aoZ1UyK9dkEgZRm0PSb/iVSk1y8wB7psmWF0YAFsgk20/W0YgIfOWooNg==
+X-Received: by 2002:a05:622a:144e:b0:476:bb72:f429 with SMTP id d75a77b69052e-47aec49fe7dmr316374101cf.42.1745420983058;
+        Wed, 23 Apr 2025 08:09:43 -0700 (PDT)
 Received: from andromeda.lan ([74.15.9.135])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ae9cfa3f1sm68953601cf.79.2025.04.23.08.09.40
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ae9cfa3f1sm68953601cf.79.2025.04.23.08.09.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 08:09:41 -0700 (PDT)
+        Wed, 23 Apr 2025 08:09:42 -0700 (PDT)
 From: Arun Raghavan <arun@asymptotic.io>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arun Raghavan <arun@asymptotic.io>,
 	sanchayan@asymptotic.io
-Subject: [PATCH BlueZ v2 2/3] profiles/audio: asha: Only expose device after we have attributes
-Date: Wed, 23 Apr 2025 11:07:41 -0400
-Message-ID: <20250423150742.319463-3-arun@asymptotic.io>
+Subject: [PATCH BlueZ v2 3/3] shared: asha: Use a more descriptive name for the state callback
+Date: Wed, 23 Apr 2025 11:07:42 -0400
+Message-ID: <20250423150742.319463-4-arun@asymptotic.io>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250423150742.319463-1-arun@asymptotic.io>
 References: <20250423150742.319463-1-arun@asymptotic.io>
@@ -75,140 +75,89 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Let's get the PSM and read-only properties before we expose the device
-and transport. While we're at it, rename "probe" as "attach" for
-consistency.
 ---
- profiles/audio/asha.c |  6 +++---
- src/shared/asha.c     | 31 +++++++++++++++++++++++++++++--
- src/shared/asha.h     |  9 +++++++--
- 3 files changed, 39 insertions(+), 7 deletions(-)
+ src/shared/asha.c | 24 ++++++++++++------------
+ src/shared/asha.h |  4 ++--
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-index 10115b92d..9e32822c9 100644
---- a/profiles/audio/asha.c
-+++ b/profiles/audio/asha.c
-@@ -458,10 +458,10 @@ static int asha_source_accept(struct btd_service *service)
+diff --git a/src/shared/asha.c b/src/shared/asha.c
+index d99ae4d8b..bcaf6b843 100644
+--- a/src/shared/asha.c
++++ b/src/shared/asha.c
+@@ -189,8 +189,8 @@ void bt_asha_state_reset(struct bt_asha *asha)
+ {
+ 	asha->state = ASHA_STOPPED;
+ 
+-	asha->cb = NULL;
+-	asha->cb_user_data = NULL;
++	asha->state_cb = NULL;
++	asha->state_cb_data = NULL;
+ }
+ 
+ void bt_asha_free(struct bt_asha *asha)
+@@ -210,8 +210,8 @@ static void asha_acp_sent(bool success, uint8_t err, void *user_data)
+ 	} else {
+ 		error("Failed to send AudioControlPoint command: %d", err);
+ 
+-		if (asha->cb)
+-			asha->cb(-1, asha->cb_user_data);
++		if (asha->state_cb)
++			asha->state_cb(-1, asha->state_cb_data);
+ 
+ 		bt_asha_state_reset(asha);
+ 	}
+@@ -226,8 +226,8 @@ static int asha_send_acp(struct bt_asha *asha, uint8_t *cmd,
  		return -1;
  	}
  
--	if (!bt_asha_probe(asha_dev->asha, db, client))
-+	if (!bt_asha_attach(asha_dev->asha, db, client,
-+		(bt_asha_attach_cb_t) asha_source_endpoint_register, asha_dev)) {
- 		return -1;
--
--	asha_source_endpoint_register(asha_dev);
-+	}
+-	asha->cb = cb;
+-	asha->cb_user_data = user_data;
++	asha->state_cb = cb;
++	asha->state_cb_data = user_data;
  
- 	btd_service_connecting_complete(service, 0);
- 
-diff --git a/src/shared/asha.c b/src/shared/asha.c
-index fa6b489d6..d99ae4d8b 100644
---- a/src/shared/asha.c
-+++ b/src/shared/asha.c
-@@ -177,6 +177,10 @@ void bt_asha_reset(struct bt_asha *asha)
- 	bt_asha_state_reset(asha);
- 
- 	asha->psm = 0;
-+	memset(asha->hisyncid, 0, sizeof(asha->hisyncid));
-+
-+	asha->attach_cb = NULL;
-+	asha->attach_cb_data = NULL;
- 
- 	update_asha_set(asha, false);
+ 	return 0;
  }
-@@ -335,6 +339,21 @@ static bool uuid_cmp(const char *uuid1, const bt_uuid_t *uuid2)
- 	return bt_uuid_cmp(&lhs, uuid2) == 0;
+@@ -439,8 +439,8 @@ static void audio_status_notify(uint16_t value_handle, const uint8_t *value,
+ 	struct bt_asha *asha = user_data;
+ 	uint8_t status = *value;
+ 	/* Back these up to survive the reset paths */
+-	bt_asha_cb_t cb = asha->cb;
+-	bt_asha_cb_t cb_user_data = asha->cb_user_data;
++	bt_asha_cb_t state_cb = asha->state_cb;
++	bt_asha_cb_t state_cb_data = asha->state_cb_data;
+ 
+ 	if (asha->state == ASHA_STARTING) {
+ 		if (status == 0) {
+@@ -457,10 +457,10 @@ static void audio_status_notify(uint16_t value_handle, const uint8_t *value,
+ 		DBG("ASHA stop %s", status == 0 ? "complete" : "failed");
+ 	}
+ 
+-	if (cb) {
+-		cb(status, cb_user_data);
+-		asha->cb = NULL;
+-		asha->cb_user_data = NULL;
++	if (state_cb) {
++		state_cb(status, state_cb_data);
++		asha->state_cb = NULL;
++		asha->state_cb_data = NULL;
+ 	}
  }
- 
-+static void check_probe_done(struct bt_asha *asha)
-+{
-+	uint8_t zeroes[8] = { 0, };
-+
-+	/* Once we have ROPs & PSM, we should be good to go */
-+	if (asha->psm == 0 || memcmp(asha->hisyncid, zeroes, sizeof(zeroes) == 0))
-+		return;
-+
-+	if (asha->attach_cb) {
-+		asha->attach_cb(asha->attach_cb_data);
-+		asha->attach_cb = NULL;
-+		asha->attach_cb_data = NULL;
-+	}
-+}
-+
- static void read_psm(bool success,
- 			uint8_t att_ecode,
- 			const uint8_t *value,
-@@ -356,6 +375,8 @@ static void read_psm(bool success,
- 	asha->psm = get_le16(value);
- 
- 	DBG("Got PSM: %u", asha->psm);
-+
-+	check_probe_done(asha);
- }
- 
- static void read_rops(bool success,
-@@ -400,6 +421,8 @@ static void read_rops(bool success,
- 			asha->render_delay, asha->codec_ids);
- 
- 	update_asha_set(asha, true);
-+
-+	check_probe_done(asha);
- }
- 
- static void audio_status_register(uint16_t att_ecode, void *user_data)
-@@ -501,14 +524,18 @@ static void foreach_asha_service(struct gatt_db_attribute *attr,
- 	gatt_db_service_foreach_char(asha->attr, handle_characteristic, asha);
- }
- 
--bool bt_asha_probe(struct bt_asha *asha, struct gatt_db *db,
--						struct bt_gatt_client *client)
-+bool bt_asha_attach(struct bt_asha *asha, struct gatt_db *db,
-+		struct bt_gatt_client *client, bt_asha_attach_cb_t attach_cb,
-+							void *cb_user_data)
- {
- 	bt_uuid_t asha_uuid;
- 
- 	asha->db = gatt_db_ref(db);
- 	asha->client = bt_gatt_client_clone(client);
- 
-+	asha->attach_cb = attach_cb;
-+	asha->attach_cb_data = cb_user_data;
-+
- 	bt_uuid16_create(&asha_uuid, ASHA_SERVICE);
- 	gatt_db_foreach_service(db, &asha_uuid, foreach_asha_service, asha);
  
 diff --git a/src/shared/asha.h b/src/shared/asha.h
-index e87a9fc3f..39e55f22e 100644
+index 39e55f22e..680a27010 100644
 --- a/src/shared/asha.h
 +++ b/src/shared/asha.h
-@@ -23,6 +23,7 @@ enum bt_asha_state_t {
- };
+@@ -44,8 +44,8 @@ struct bt_asha {
+ 	int8_t volume;
  
- typedef void (*bt_asha_cb_t)(int status, void *data);
-+typedef void (*bt_asha_attach_cb_t)(void *data);
- 
- struct bt_asha {
- 	struct bt_gatt_client *client;
-@@ -45,6 +46,9 @@ struct bt_asha {
  	enum bt_asha_state_t state;
- 	bt_asha_cb_t cb;
- 	void *cb_user_data;
-+
-+	bt_asha_attach_cb_t attach_cb;
-+	void *attach_cb_data;
- };
+-	bt_asha_cb_t cb;
+-	void *cb_user_data;
++	bt_asha_cb_t state_cb;
++	void *state_cb_data;
  
- struct bt_asha_set {
-@@ -65,5 +69,6 @@ unsigned int bt_asha_stop(struct bt_asha *asha, bt_asha_cb_t cb,
- 
- bool bt_asha_set_volume(struct bt_asha *asha, int8_t volume);
- 
--bool bt_asha_probe(struct bt_asha *asha, struct gatt_db *db,
--						struct bt_gatt_client *client);
-+bool bt_asha_attach(struct bt_asha *asha, struct gatt_db *db,
-+		struct bt_gatt_client *client, bt_asha_attach_cb_t probe_cb,
-+							void *cb_user_data);
+ 	bt_asha_attach_cb_t attach_cb;
+ 	void *attach_cb_data;
 -- 
 2.49.0
 
