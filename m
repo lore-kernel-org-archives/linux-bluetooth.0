@@ -1,99 +1,106 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA1B1B4227
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3289A27D78C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745510188; cv=none; b=WwTpcYLvQpRrzdkGukEENlfN2HX+ZuoTjUso9hhAGR1T0prwVEOUy+AqiKp/YOIduc8d9GwnOD93VBUuN1Z1jPwjBXOEVorsAnP8RIJ5TslrdPROusfcqVxXtApo0mxyehZ4zwcoIr9O2wyQR73q5OZz6XDUmnQy3necamDovfw=
+	t=1745510608; cv=none; b=al0s3368Fnp/1mRY4BmxiYivkE+DscYnc+mc1/ZCJTDMFyFKaQfS/gs/gsoV+chfEtRTX8hwEVBcILLkBH/ixFkoSeaItsBao5ooGkO/eCCDTP6YBRTAnc96AdXCCcSSctYqkUmiApHHPq2umHDT2Gvn7zx/VPh38DNteu0+eb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745510188; c=relaxed/simple;
-	bh=hAtWCo2twW+q56168HlpOUnNJv9Ena+nP+WZhNTI0/M=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=WhdWLZCJMNyFn1uQSn1gMUINMm/OQr3YLnGBkTxqfgju4YaSjNFOgY8ano5NEHxnwo4DlL++l2DRcrPvFyt+19NbF/LsnYtxuYzU4M61MpnFjN7maaJiyPCmP6epmaIvaERs6t84Fj/qOJhWkJrJCrXSZMePPs58RnhGpNWi2eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSlKM7+Z; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745510608; c=relaxed/simple;
+	bh=ndGX+k0nyJpXYiYwj3o0/CRgbf+jglVAYYfSL09K12s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WYUPWK4lWUDekUrXl9cFQNrfb9M5BIcrI98KOQO8CFfymUkZtBonP+ZxruAY8YlKqbvNgvgsQVZkfWmGVEtwyOTOLhhm1a/yBQ4yifvZnGnlLImslH0XT/ndTdokv2Tnfoq16ZvQoF4JVN1+jilKrJgfGB2/ewGuYhJnfOhwvqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=AdPSpoX0; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSlKM7+Z"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-476f4e9cf92so9104721cf.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:56:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745510185; x=1746114985; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hAtWCo2twW+q56168HlpOUnNJv9Ena+nP+WZhNTI0/M=;
-        b=PSlKM7+ZXq0Gtfde5w4X0TNFolwAXx+ogexOtfgfdOCVxM22hv8tvI9bJU/BBdOc8u
-         OMwhsg0wEHLwcvmOBxVDVCvBrQEcOhJXzeEgJX3173QLdVaZw4gWelSQHS8yULNUhgRl
-         dHIEYZnjUZ20ADta859tDbm//ya03fDNIaOhTRXGVt29T5ccBQHlc9Ha2IX+Mw7zGzG8
-         YPltDhVa8fLNOvIGwqNKMub6Q/wAJjrtVxpf++0gBXEMwafmBDVWE4cRWNmz3syytt8I
-         I9ZgEpEdfUPSfIl7cp8wUUDH7i5dLtT03yvuZ6afScwn2CYmHtOlgC21gOmE/pY1n2DA
-         LnGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745510185; x=1746114985;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hAtWCo2twW+q56168HlpOUnNJv9Ena+nP+WZhNTI0/M=;
-        b=bgsgtqjmLJeqzlSZzvd8JK01eL3DiRHjtCO8pgWZAadTewI2sqkBIJaJqniTKF91ka
-         vEybXomL2EmjMMOytOJ8B3qlFAJz9LbHyVN8Ya+FCwHor7HRlgLfg4AJqvKhszQyJqIV
-         NhkCNHvk8LxyD/hHF+s491hWmT53f6pT7nT2hWJ7NYu4fdvmfWTAcbhZ+olDHwY5U4st
-         vAMwaNTm+CuG3xDQWrRrifaxUqcXMcc7Rj8WM1kYFZ7WKdv5Lzqi4hdcztcXz5Kyqy8s
-         7PHcwqBmbi3e3dP2t7Ryj/iIGv0PiOAreBVcPpxRcDh3JVnUbHkiEg5+rS2LMESmWDUa
-         s6Aw==
-X-Gm-Message-State: AOJu0Yxc+rivW6OdlKSBDDcQl2Z3kPEYY4cTFF389zFAAOtb3sh5U/ma
-	w42Mu0mln44kHqMTBE2ps4dUccHLWjh/CL2SyAe0GNfRJcgr7aZm2c9BuQ==
-X-Gm-Gg: ASbGnct3u/x93+E9ACEjkm7h3DNDXzOgXZv9GWyPgC4qM94Gt0BK8szyhTMuRYXTJN0
-	iUoVLu96fkuU/mX/VC0vYsdz0mHO8V/K45HiH8aO4fLxQZi1AnzbYUDID/KMR42kVdrXX85Gs7x
-	TuAQhkADVRF+JgDsVI429EiURP3KuFGcZbSXJPsc/9JKWJY6xQGmIbeoUkb1iKr+nsAVSTRxavQ
-	qoqsCx5hwkvMU073EppjWDXySM/07PCQaxiB/l1zwBwZ9rIdnNvgI/smiFt/1sqljrVHEies3tj
-	boQYvD3c7yYuqDsBoWPBLcnHtHwx5zNcLlolrfZD1XwAfWWI
-X-Google-Smtp-Source: AGHT+IG52D0udnGp+S78DIn5NuXROt4EXOtV12xV1BoHKh4uTL0f4F7Qx5VPZgO8aqm/fEN/yba+tw==
-X-Received: by 2002:ac8:5aca:0:b0:476:903a:b7f1 with SMTP id d75a77b69052e-47fb96e40e3mr3136281cf.11.1745510185159;
-        Thu, 24 Apr 2025 08:56:25 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.79.101])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47ea16938e9sm13131091cf.57.2025.04.24.08.56.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 08:56:24 -0700 (PDT)
-Message-ID: <680a5f28.050a0220.78df2.666c@mx.google.com>
-Date: Thu, 24 Apr 2025 08:56:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3580183605333152322=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="AdPSpoX0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1745510604;
+	bh=ndGX+k0nyJpXYiYwj3o0/CRgbf+jglVAYYfSL09K12s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AdPSpoX0iw4YrJ0vit5z0Zqbhb68+I32rQXOJqj1nmtZZFpoT3mi2mEFxXFOSvEv7
+	 jDOtHpeUHGm+tQ2aDC0AIkC/AWJR7GVURWks4sRflnOINMD070f4scjxSZCOIxVb6d
+	 joKzqgL9w0wK7TYYclVmj8fn4XF/FRitpg0dXc4lwcTFbwfLAbPR/uqXRaLrJYmjRj
+	 0aQk3YUwG+fXoDOJtfH03o58UvzbHu5zkFOCrcbfXKEexeLE1nwflFKj5n0mvUpNj8
+	 sUre34byX1pc4VLvLVrTqhVcKIUYdYTYTJSDQd1jWKYV9som+2BDvSJhGb7iOgx6qH
+	 2G2BBBbty4Clw==
+Received: from localhost.localdomain (unknown [81.56.51.115])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: denittis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 28BE017E0402;
+	Thu, 24 Apr 2025 18:03:24 +0200 (CEST)
+From: Ludovico de Nittis <ludovico.denittis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Subject: [PATCH BlueZ v4 0/6] Support Sixaxis gamepad with classic bonded only
+Date: Thu, 24 Apr 2025 18:02:30 +0200
+Message-ID: <20250424160236.179982-1-ludovico.denittis@collabora.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2] workflows: Add sync action
-In-Reply-To: <20250422214935.993192-1-luiz.dentz@gmail.com>
-References: <20250422214935.993192-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3580183605333152322==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This series adds a new "CablePairing" property to allow us to
+indentify devices that have been paired using a custom USB cable
+cable method and that don't support the canonical bonding with
+encryption. With that information, we can dynamically enforce
+encryption to drastically reduce the attack surface, compared to just
+disabling the "ClassicBondedOnly" property.
 
-This is an automated email and please do not reply to this email.
+The "CablePairing" property is exposed via D-Bus to allow
+clients to potentually show this information to end users.
 
-Dear Submitter,
+As far as I can tell, starting the listening input server with
+BT_IO_SEC_LOW and then bumping it in `hidp_add_connection()` should not
+have any negative effect regarding the overall security. However,
+please let me know if it turns out not being the case.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Addresses https://github.com/bluez/bluez/issues/1165
 
------ Output -----
+Changes in v2:
+ - Start the listening input server with BT_IO_SEC_LOW only if we
+   actually have a known sixaxis device
 
-error: .github/workflows/sync.yml: already exists in index
-hint: Use 'git am --show-current-patch' to see the failed patch
+Changes in v3:
+  - Change the property from being sixaxis specific to a generic
+    "CablePairing"
+  - Remove the manual validation of Sixaxis HID report descriptor
+    because we already replace it with a pre-dermined SDP record
+    in `sixaxis.c`
 
-Please resolve the issue and submit the patches again.
+Changes in v4:
+  - Instead of setting the server security level in adapter.c, we
+    do it when registering the input devices, during probing
 
+Ludovico de Nittis (6):
+  src: Add new CablePairing property
+  client: Print CablePairing property
+  sixaxis: Set CablePairing when pairing a Sixaxis with USB
+  adapter: Add btd_adapter_has_cable_pairing_devices()
+  input: Automatically use sec level low when using a cable paired
+    device
+  sixaxis: Set security level when adding a sixaxis device
 
----
-Regards,
-Linux Bluetooth
+ client/main.c            |  1 +
+ doc/org.bluez.Device.rst |  7 +++++
+ plugins/sixaxis.c        |  8 ++++-
+ profiles/input/device.c  | 20 +++++++++++--
+ profiles/input/manager.c |  3 +-
+ profiles/input/server.c  | 63 ++++++++++++++++++++++++++++++++++++++--
+ profiles/input/server.h  |  3 +-
+ src/adapter.c            | 17 +++++++++++
+ src/adapter.h            |  1 +
+ src/device.c             | 40 +++++++++++++++++++++++++
+ src/device.h             |  2 ++
+ 11 files changed, 157 insertions(+), 8 deletions(-)
 
+-- 
+2.49.0
 
---===============3580183605333152322==--
