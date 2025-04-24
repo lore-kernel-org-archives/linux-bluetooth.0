@@ -1,183 +1,125 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9B02820C8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 17:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4505280CCE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 17:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745515794; cv=none; b=WoG/HYqyaFMgF5hGCpBBNNqlgYgUWhzUPr92QUU+/mL1URTm1rgnLKJh7a9fPFott1w9d83ft6y2jd94k6kQlwd3xWljNmSP/h1kIdUx8EJJLc9Revm6COXKrwM4XYvCNDWLZVtGtauA2MDlXQLUe8k+QQMOlSG84b2kDt1YTls=
+	t=1745517489; cv=none; b=Au61oNrlr93rpnB4V1kpzdeXZAH85roq6J0/1jpf7ghmcvyn7AyHrSWdWkHj61SSBIYw3tVUFNkKHv45AcTH5B6s7ZLIp4SuZ/TRrOTqdKkN2BlybxczGpmcjnPS2oL4gugs19hbHJlOrR9k13A0fezHDxoFWeDCkVobALmOCcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745515794; c=relaxed/simple;
-	bh=S5QwLqK60wW7Nx8bSiEmPddOPQHSARtXTtQMw/OKcXU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=sMif+0woX94mUSXhJp8c85Jvmfssqesr9YHLcDzjzseBVuvnPCl7BaTIvjQR6cj9hyobEiVrIWLNp3da/BdrI2Zoi3J33fIx/hgGqVxuNwDW8aZRB1P/3WRryzdOqGR1ZdU44ztv7IExqikrUBpTI9ya01blj85pqlSI20ejdrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jx+Jqe/a; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1745517489; c=relaxed/simple;
+	bh=EnehdyiprGQvnkSHPLNncIltv7yE/IIuRs5vBe93ggo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jX3QhGOD/IRbwUN6My7exrIs9Vz9hE59dIXsRnXxvGj1OY/WsW2YSUtEGkNB8kvKHTSH08DbmR5XAWNr7ffx3f2fscdhBUkmnbgd3v7Ukfwn3Jaq3i/ysrnND70EaumaQwH/cgt705pJWTw41Iewjof38tiOJoouPx9IXGUk858=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CVKR2JeI; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jx+Jqe/a"
-Received: from github.com (hubbernetes-node-cf1c5ab.va3-iad.github.net [10.48.206.53])
-	by smtp.github.com (Postfix) with ESMTPA id A79A34E12ED
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 10:29:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745515791;
-	bh=0NTQO8capbhgadBqKeUaNFdN9WTlF7vbEGLDx6ctz5k=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=jx+Jqe/a4rIk3WdBPJOk34vGY+j9RTE7gRRGtX28eq4LMzhtGbMnHNd7InG2RhFQD
-	 u6zufi1C77fr3/Ea0NlnrDBARqqcqxjIA1/1vUV5eaYj8aRT+agu5DEpyvZlWY794W
-	 nGeFniQ+Y8OdGYtJR08SWnaF5rTlVMjEBn7UY4y4=
-Date: Thu, 24 Apr 2025 10:29:51 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/c8bce6-b74d30@github.com>
-Subject: [bluez/bluez] 20ea34: src: Add new CablePairing property
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVKR2JeI"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c53b9d66fdso190529685a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 10:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745517486; x=1746122286; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=g/FM7RBMduetnju9NHiRdGb9ku9PPXQStTdjSCwvAJc=;
+        b=CVKR2JeI2SrTfw42cpo7DcuN/72jw62zHo5ovapgdL0hhdtoeTe6nlKM5FFMC/zDAn
+         9h4At22FSS8wFdZ49FM7qJrImD5JDgzN9eM4666mThuZu0C/zgqaZ93/1TbMw6i2tmuY
+         og7IehVYud1PSKQengYeBtNAKguNxaAilQVR4nDPxYNkXS16xvO+X+iHMILGznerVDOa
+         uUfdkrRfQEsKzKCh/Gq2ID7U4lRMsi1OtyPrrrTMYh2Mtl2/KwUKG83rc6v3/tmtKK+B
+         ThkKKw/6Y43GPXYFuSvupHbqkhtngtZ8n40unIhARy/Td2HeD9ASf4an/0tItZx7Q8aR
+         QaUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745517486; x=1746122286;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g/FM7RBMduetnju9NHiRdGb9ku9PPXQStTdjSCwvAJc=;
+        b=nU99BvlZfPW7ojYYLZLUXTNcLOJaGwePpqIZZU8/37u/xfFD6UH7nIu+y3PAoAx45G
+         zHYwD4UjGycMGayGEBZuYRlc5x7LLjIjiKfoGd/5Ic5Gl7DpY19hN6npfOjjnbepOdDa
+         xmgcuAQw8hwapB+omPEVcKCB+sJXlrC4Uf8mkZcmPgwrtI18O48dmEoaGh62TExaEZWa
+         bF7HQg8VIMtIRT/IpnCOOykJWHUg5U3YhM/yVoeOP5mKKVZDazArHFB4Yi8/ysiVZRc8
+         PlhNoGUuCBpFgrXsgDZChuR7me9gOPHDSO0dh6hBpjwPuzY+aYOHLC2Jj++j1EMl7/jo
+         KeRQ==
+X-Gm-Message-State: AOJu0YwdO6pmmJnaQ4kpPoXUG+rDMGQATfufTFuwUoIc61lAVuOGBI9Y
+	zhK6DtbTU40dc+TRIpluViMqo1Tmnh8TgtHOlgyzCQvutMMAMjLXCvTRoQ==
+X-Gm-Gg: ASbGncu5f3NwMH58tPozHyKcXzjGf1x2kJOJ/nlzKwO9koacph7IeqMGojdXWksSawy
+	7Ge2EE+5BgzWyopkz2q+WER782VcYbyi0iAtw122hX5iKGcrMdYDEcxPpH5IVnAXKfQ60Q1LdWo
+	JlMEs4Nq9aTIwOu52GJP9VRaecuWC5QgSxDO61f0tfSPYxx0qrU/P05VcBKvEtyyqGmT0nETn/u
+	x7uEZdyYV7rbKut7Ij9OsJqRticbFsNymqPKTvWJLqbKoQEo7nZPL3dfvvVlXNJApCtGFasvXHH
+	nsojdOM6Pj5iDo1Er54ILjrkeTUYvid2lJSwHvszEhLbOCsbRg==
+X-Google-Smtp-Source: AGHT+IEPtKfVF8XdSsifNip5pYwGgcsiveNiFGh7+nI0nM5IUzEiM7gjkzAwvLMF7N0NR4mxfgazTA==
+X-Received: by 2002:a05:620a:424d:b0:7c5:6dc7:7e7c with SMTP id af79cd13be357-7c95ef08247mr55037385a.26.1745517486487;
+        Thu, 24 Apr 2025 10:58:06 -0700 (PDT)
+Received: from [172.17.0.2] ([172.214.173.180])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958cdc7f9sm114328485a.59.2025.04.24.10.58.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 10:58:06 -0700 (PDT)
+Message-ID: <680a7bae.050a0220.3c5e9c.615f@mx.google.com>
+Date: Thu, 24 Apr 2025 10:58:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3173033385080739407=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ludovico.denittis@collabora.com
+Subject: RE: Support Sixaxis gamepad with classic bonded only
+In-Reply-To: <20250424162933.182103-2-ludovico.denittis@collabora.com>
+References: <20250424162933.182103-2-ludovico.denittis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3173033385080739407==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 20ea34e729b230ee4f3c8671bbc8255b65825d6b
-      https://github.com/bluez/bluez/commit/20ea34e729b230ee4f3c8671bbc8255b65825d6b
-  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M doc/org.bluez.Device.rst
-    M src/device.c
-    M src/device.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  src: Add new CablePairing property
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=956700
 
-This adds initial support for a new CablePairing property.
-The property can be used for devices that are paired using a cable and
-don't support the expected bonding (with pairing/encryption), for
-example like the Sixaxis gamepads.
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.24 seconds
+BuildEll                      PASS      21.34 seconds
+BluezMake                     PASS      2888.91 seconds
+MakeCheck                     PASS      20.90 seconds
+MakeDistcheck                 PASS      207.84 seconds
+CheckValgrind                 PASS      284.02 seconds
+CheckSmatch                   PASS      312.39 seconds
+bluezmakeextell               PASS      133.40 seconds
+IncrementalBuild              PENDING   0.20 seconds
+ScanBuild                     PASS      944.83 seconds
 
-  Commit: 373146be299fb07de38b841ed1320c0b78d33c12
-      https://github.com/bluez/bluez/commit/373146be299fb07de38b841ed1320c0b78d33c12
-  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M client/main.c
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  client: Print CablePairing property
-
-When using the `info` command, include the new CablePairing value.
-
-
-  Commit: 56516d6cc8d967b1480fc31a1ac74fe61e04f270
-      https://github.com/bluez/bluez/commit/56516d6cc8d967b1480fc31a1ac74fe61e04f270
-  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
-
-  Changed paths:
-    M plugins/sixaxis.c
-
-  Log Message:
-  -----------
-  sixaxis: Set CablePairing when pairing a Sixaxis with USB
-
-Sixaxis gamepads don't support encryption. When doing the USB cable
-pairing, set the CablePairing property to keep the connection to the
-device unencrypted.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: c5dffe0ce2fea65134d90b30bb27093134c12213
-      https://github.com/bluez/bluez/commit/c5dffe0ce2fea65134d90b30bb27093134c12213
-  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
 
-  Changed paths:
-    M src/adapter.c
-    M src/adapter.h
-
-  Log Message:
-  -----------
-  adapter: Add btd_adapter_has_cable_pairing_devices()
-
-Add a function that can be used to know if any of the known devices have
-the `CablePaired` property set.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: ba101f47dfbad6d4f6fd439570ac4a1093df2ceb
-      https://github.com/bluez/bluez/commit/ba101f47dfbad6d4f6fd439570ac4a1093df2ceb
-  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
-
-  Changed paths:
-    M profiles/input/device.c
-    M profiles/input/manager.c
-    M profiles/input/server.c
-    M profiles/input/server.h
-
-  Log Message:
-  -----------
-  input: Automatically use sec level low when using a cable paired device
-
-BT_IO_SEC_LOW is the only way to allow devices that use cable pairing to
-establish a connection.
-
-This adds the ability to start the listening input server with
-BT_IO_SEC_LOW to avoid breaking support for these devices, and then,
-in `hidp_add_connection()`, we check if either `classic_bonded_only` was
-disabled or if this device has `CablePairing`. If neither are true, we
-bump the security back to BT_IO_SEC_MEDIUM, i.e. enforcing encryption.
-
-This allows supporting these devices without having to change the
-classic bonded only option.
-
-
-  Commit: 08e3277331613bb21c9c5307a98b51bcdd10f56d
-      https://github.com/bluez/bluez/commit/08e3277331613bb21c9c5307a98b51bcdd10f56d
-  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
-
-  Changed paths:
-    M plugins/sixaxis.c
-
-  Log Message:
-  -----------
-  sixaxis: Set security level when adding a sixaxis device
-
-When doing the cable pairing for a sixaxis, we may need to change the
-listening input server security level.
-This is because sixaxis gamepads can only work with the level
-BT_IO_SEC_LOW.
-
-
-  Commit: b74d30fb9f72eafb8d98f9faa4327ce1a66ff4b0
-      https://github.com/bluez/bluez/commit/b74d30fb9f72eafb8d98f9faa4327ce1a66ff4b0
-  Author: Yang Li <yang.li@amlogic.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
-
-  Changed paths:
-    M profiles/audio/bass.c
-
-  Log Message:
-  -----------
-  bass: remove the device of BIS source when modify operation.
-
-When the Client sends a modify operation and PA Sync is
-"Do not synchronize to PA", the BIS source information
-needs to be cleared.
-
-Fixes: https://github.com/bluez/bluez/issues/1145
-
-
-Compare: https://github.com/bluez/bluez/compare/c8bce6574327...b74d30fb9f72
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============3173033385080739407==--
