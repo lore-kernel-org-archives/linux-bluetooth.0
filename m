@@ -1,65 +1,65 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2EF28BABB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 19:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745524284; cv=pass; b=L4T7cWc+CO5gzvrNYrE3nzjutQqijj3IWUuKPg+oAE+Fc4yxmxXm+MvdNwO9waqHw9jymME017CTq7hcGLBi5oKU21klA6rC51CgN3qiZBESHjJifWcwSdNIpDox03yeG67L6V3cfZQXgfs1NQxMBT00+qcl81yskr3F78yEkB8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745524284; c=relaxed/simple;
-	bh=ANcZOPbf4n2WueDKJ7XSd5il9uSigblDV1Lawz1Gw9Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b3LyEJRRh6xNLE3aIyudthNVRCzb7GkVBk0G1hNfQUfAHLDRUVetC+z9KX0gvh+F6PF6Ljri7MmZokSf47FcCnGsu5kKJX46YagrF1Ir4stCBRod902C7pxlQrE0v5pqtPNnQ/8zyXYDuD41hFXjQGRPOOJDL7j+TWXyslZRgp8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=HqFzeFHv; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10874292911
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 19:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745524609; cv=none; b=O4/606GR94bVWHR58oT4hO9fkno12XN7dpc+N0XkuW5b8G4oWQldCjQ83cbaFMs3367YE1hdcHS/iXK74Wy7M9udf813I1uZbqLZmNg2WB5R2WVn2/vOpoK4pvCGLPbaZmcpM/yUeDCA5m7TpeP8SWogcP2IAI0TQRfy5VZG4SU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745524609; c=relaxed/simple;
+	bh=nrdqykpbBeh8ZTnJH/QaO682xvhQyktiTq8ZrElZjbg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=AjrPJxtziFoQajpBrMCuBl7Vkr/BNiRiBrxMODSjhhXK+yx0Zvve90F3GwdFHq6M9xb7/E0mKarFKYJYedlc8eRt/oiAOO7EH38XOHESBTd7/gqhqDV9n+F+gjzJcrhTprMpH1Ml3r6a1/cBUedHcnAa9eU4eJR7Nu58QLuZaUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EfVGUyUx; arc=none smtp.client-ip=209.85.221.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="HqFzeFHv"
-Received: from monolith.lan (unknown [193.138.7.138])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Zk66N4SBqz49Psw;
-	Thu, 24 Apr 2025 22:51:08 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1745524269;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=y/w1sGr15vGKh6YHtfQFe9xuBpg7BLUGFTt2v4engvA=;
-	b=HqFzeFHvoLMvrFkoNrXdLQySbkTGaEfLDWlsL4dnPyEJUpUgj7Jdbh9oji/dYGpzw43rWf
-	xS84F7HeCD2XirfUG4HVHvXOWNyp+sP5+0VSk/oW2tuANdpU7H+cX4zboQFwNVPhp99yv2
-	wV6fK1Gs8MTF8XAIAhr734DGa0372Ux4CgqOqMbp35X6vL6NxotXYcPqoPVrgPAaN9yn0D
-	n87m7C7MK5GqgukGL6bOHnoZl6Gr2NIzDB1gj4emys+k52rhQxdFmBxGzuPPK3/mJNvsqA
-	MbjBlrUnjD/jyTMve2vTK69XMowuVLk9B0j8dwtHIsq63g5FEOE0ghDUrDSlbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1745524269;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=y/w1sGr15vGKh6YHtfQFe9xuBpg7BLUGFTt2v4engvA=;
-	b=eMb5Wa/zoFuP0sQlmUAMt7UP/6Xu1I+421UFwJwweP3940uCNQCQsqounv0MKrgpTDp+QG
-	xrD376NLhzlwqhOp0OvCKfBZE/wfgibGL+n9wWwgDy6my9uEQ9qJ27wni04ewu+j2JFSMb
-	4KcsI5Fho7KEBOHvJaLmGWriuxbeNlEHCWx3NnG2vWHgJkoDF6IMsoSZ6atTQFW/iI1+fF
-	Koj2d4Ax+YaoOlKCCFa9kc3XdbnoOFfOK1EeNF6w+5t7D5tRTqRlDBYcErhYyClrF8OMZT
-	HIiELyMOcRwNMOawOflS+1Pne6TSlHp6jsxNdDfrIMDTlrjpsDUxPBfDEyeZVA==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745524269; a=rsa-sha256;
-	cv=none;
-	b=as5m598xMwUDzYgXnmR4V/xSgOumPxBQeu+5w2Sh7WFfAVt+wAEsm24RT9Hc7/dKawAPSt
-	04exzWJHRnMtioYDJX8svqdnk9JszKAnN3YQXj0q40KBzd1/24fKjN9Q1CJcs1f6sUncKt
-	i4/h9rGVhsVLi9PoZ0JSna8NwJshymkkLd3b6tH6lsfG+VxliYUka9eOdfBWbNO4IMEeA6
-	SyPyb4DXhF7oXMTUh76dEsHg1mFKqGqr+xbpaCsm2J52SkCJ6yXqjzEEnj1ZdWWin2r9lV
-	4fe0xF4K3n9ve17BLFY6RX0uSk0l9JbSFJYlp3N5kPlikj9X39YVrPv/NDUt/w==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfVGUyUx"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-525b44ec88aso684772e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 12:56:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745524606; x=1746129406; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hWcUC95b7VNHsS4QYSms4r2gSRyPSA87tyFWHfvt5Jk=;
+        b=EfVGUyUx7QCm59lJ54+JGU5t9AeTApF5TT1BtlPwmrzTdb71FoZmXvGpc/JfpGK65z
+         IQlYGeJWV23GWHPEZXPV4fbWHqQtnLg8ewnjVENPQ59n3QFo8RRARlZ5Cs1rM8XCIpt4
+         qSscHTyYMm4+c6syifKPnEjOa+Xx2MIr9norG4AJF9eAhfs7nniOWlIPMqfo8JQeJRY5
+         eytRrLArcMpHNf/Dw1HVhPeKOmuIyL8jxFUiOfvGcA66iLmUU+D/rK4GTh+xcw7TUHCo
+         IG9MTmLkKWZ+bk5Wic95/6jeNdVZQiAFEBHFERtLQM/TcwZYjVqbVGiL6IBZPeLajs9k
+         ZgOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745524606; x=1746129406;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hWcUC95b7VNHsS4QYSms4r2gSRyPSA87tyFWHfvt5Jk=;
+        b=pSQPXd7YCZDIPS57M80JYZy/rFmxzt10AafZdMDE/1KG1PvaIYS0xng7E1IVXQDL1e
+         U5J3m77fH7EEr0S8my/dQGRR1DANaYNEUVHmyaVySdZJ0w8N8GeSSQFQvXCYuPSMMVLF
+         T6j6tWrSJDOsJ7lj22sGio+77mvrKxQBYdVjcR28XKRKLIECn9fNutp9efELQki1CFFt
+         8NKbzJiwx2xYPIPjOG0A42NUsRVvLhlOqmau4YC5xbwoyirJal///k9MYQ9YuvNQfk3E
+         ohsfcv757tX5G/6K5MCiLiMVbDIm2SMgBlWmEuGtgbEq0CWovhcDBIKpzlZ7cqyCfuX2
+         AmZA==
+X-Gm-Message-State: AOJu0YwXwI8kzlLLdYUee2YU54EHrO+DhZ8/W8BV3b4SDiNgAkMTOxiB
+	SRno3ejyqXlYV9ykMzp2Fb1DtFy/GvX3wnWgYkaNZB1v87Ev/qGnk0//nw==
+X-Gm-Gg: ASbGnctpt6m0z9nQLqVQKwfBxCLBAigbgOUngtNSXxGZ0urY1QwYX8HRnyd2bWIwras
+	qSrpFwaFegevOw0486KnEZcn3FiBBhod50hTFdcZzcYOf0Ekh5V+clbbO2raibJ3vKGET9vdDlG
+	DOWgsmWJjUGMgdhmg0++n8/hesfMcrEIh2EO+xGYyzdjx/eyonCUGSY6LtkmyfnJqMUB/iIHZ0g
+	AnDPCIY6pe95E2t1B19AcW3KMCmc2ax9HsWW4tDiHstJR85a8uNCZqU7vYo8RPVRv8TFTJXWmle
+	oYdDNg04h+Ar/pr6EeSjJxD5Yp7cVLo7FopPiV7KrH3gHY+9nYqei4Vl6B5X4Yc/2p28Xz7vY26
+	hV7whvd4B87WaearxWZO7
+X-Google-Smtp-Source: AGHT+IFWx+8Bn9I13J/l+6n+NekSzdQSZvwl+dXdufX9p3/IkgYkwVceRQpU362c1htS2bHr+lVOTQ==
+X-Received: by 2002:a05:6102:36d3:b0:4c3:9b0:9e6b with SMTP id ada2fe7eead31-4d4cdfbc9a2mr958893137.10.1745524606145;
+        Thu, 24 Apr 2025 12:56:46 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4d3d49a9108sm379884137.5.2025.04.24.12.56.43
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 12:56:44 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH] Bluetooth: L2CAP: copy RX timestamp to new fragments
-Date: Thu, 24 Apr 2025 22:51:03 +0300
-Message-ID: <01117138d56019a8598f24f0df2dd289713cfab4.1745524193.git.pav@iki.fi>
+Subject: [PATCH BlueZ v1 1/2] workflows: Add checkpatch action
+Date: Thu, 24 Apr 2025 15:56:41 -0400
+Message-ID: <20250424195643.1375697-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -69,29 +69,35 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Copy timestamp too when allocating new skb for received fragment.
-Fixes missing RX timestamps with fragmentation.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+This adds checkpatch action rather replacing the custom CI one which
+will be going to be disabled.
 ---
- net/bluetooth/l2cap_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ .github/workflows/checkpatch.yml | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 .github/workflows/checkpatch.yml
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5ca7ac43c58d..73472756618a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7415,6 +7415,9 @@ static int l2cap_recv_frag(struct l2cap_conn *conn, struct sk_buff *skb,
- 			return -ENOMEM;
- 		/* Init rx_len */
- 		conn->rx_len = len;
+diff --git a/.github/workflows/checkpatch.yml b/.github/workflows/checkpatch.yml
+new file mode 100644
+index 000000000000..42ef7d03e157
+--- /dev/null
++++ b/.github/workflows/checkpatch.yml
+@@ -0,0 +1,14 @@
++name: Checkpatch on PR
 +
-+		skb_set_delivery_time(conn->rx_skb, skb->tstamp,
-+				      skb->tstamp_type);
- 	}
- 
- 	/* Copy as much as the rx_skb can hold */
++on: [pull_request]
++
++jobs:
++  my_review:
++    name: checkpatch
++    runs-on: ubuntu-latest
++    steps:
++    - uses: actions/checkout@v1
++    - name: Run checkpatch review
++      uses: webispy/checkpatch-action@master
++      env:
++        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 -- 
 2.49.0
 
