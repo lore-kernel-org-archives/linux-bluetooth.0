@@ -1,82 +1,100 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000A827BF79
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D3E27C879
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745508786; cv=none; b=HgPUxVMjnpx/zKD2wfYcp0byi7Q5QwpW8PFdhd6v5cwtDgfHfmvThzy7PM6wsGRaVavz3fCS+T4Sh0pPuqyA6NyM5u8kt39ozx+WImyfGgBqqGA6Ki43pGvHR+4Y4scmn1fJPE1BxDTVEcg7//lqvr/hw79w4pHZOh/WD0pxf6M=
+	t=1745509505; cv=none; b=ShAplTC9zD8m0b4X6xHzcS02wFTFYpjARvifCKOzlMGjrtV3PWAN7Hu38EOXkVTm9Qpn8CNdVgHuzqRiV6/7SPLIi/9Q4RBk1sbfGBSsYUdogjJLLVgwwRiei9t+/J9UElj67tZzqNCEQM45j7mLKEHG+qcmSKINsLzCIulI4Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745508786; c=relaxed/simple;
-	bh=A/kxHzxW0kKV/zNdVskTzn901OttQEkPD+t6YvhsQcs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Tt2Z5hOzl7i0GeMBAOjrVXAUDF4QzKHy5iT5Q0cyj0D/etlg9fS0MkyaFTuiX36r7fCqQUOsKZIT9Soks9GDOemBEv188BYRhtB8ljas7iezyj7UVTVjAS03ZLtCnMkFbWNOEo6z+6E573OwlMCGxNjBNFyyCD+wE9PFyFNL3v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=cDFGTM4B; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1745509505; c=relaxed/simple;
+	bh=Q8XEQ0MV2m2lofoNCKJUjf5+gvnpRo9wOuKckRn/Ze4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=GAYHHvUr3utYysrC2oTkWVK0BCIqiuaWPytCJVEfIsQqW/nI9vmQ+fHIZ/nFheLhcv1kkPm6jY+fs/VRBxyLx0MSSeFKe7PBnZSP0XhxauyQiozb6YxPqHOcimxYFHtHklMr3wVzHWlV7m9Cm4u2tJlReKLenxAovli3n7zyrQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qvsrus1v; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="cDFGTM4B"
-Received: from github.com (hubbernetes-node-79efdbb.ac4-iad.github.net [10.52.144.34])
-	by smtp.github.com (Postfix) with ESMTPA id 0CD0E2126C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:33:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745508784;
-	bh=Bn5UZRWE0oMz5/7gTAEfXTZHpoQac9HJwJwn7CWQxU4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=cDFGTM4B2vjIIP7MdMoV6h/ILXDrV0t1Bsbr9++Jhs1AQ5aYbjUbcDThrqknV2gmp
-	 gmp43EpjWF/eBOiiQkuONzI/UdX0WTtLlfY1oZUhEOnZpKWmWKpGg9K3BPxV6nIskS
-	 3cE+t3vpWxtaiaHEPxlnQ0rmebYCFNAdXkRzRoyc=
-Date: Thu, 24 Apr 2025 08:33:04 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/629672-c8bce6@github.com>
-Subject: [bluez/bluez] 9a769a: workflows: Make use bluez/action-ci action
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qvsrus1v"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-476977848c4so14758861cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:45:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745509502; x=1746114302; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8XEQ0MV2m2lofoNCKJUjf5+gvnpRo9wOuKckRn/Ze4=;
+        b=Qvsrus1v2fd4NY8Omdsr3j3zdJcpfuhfU6J+HGZ/qRYbLN6H0R3En1HClsHgJCnZOS
+         Nu7EqD0wBZQ+Kiu7LPwRBf8J5kQ12OEdeF5fJxvzctdTpmNCg6EQSZLOPS0bBluvmDDf
+         uBB3Yc/AIuOIvK7qM54Dn3n2GMrZ3QyFDBcOyoad89RqepQl5ZcEPGHwsZkt58lBD50d
+         4t0CbLatjUofecllQQyzwbPwoemhe5TjLbfQfycEp0nIB8wNEeaq0DXZNXjOThoDmOHW
+         5vr8NNMMGRF1WFhImWfyplRxwDZOmDjCBw5r/Il7ZAjEymhLBguywcUIKPQ75XPEtMs4
+         THSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745509502; x=1746114302;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q8XEQ0MV2m2lofoNCKJUjf5+gvnpRo9wOuKckRn/Ze4=;
+        b=YjodpZP88LfUPQY8ZljJnVa9UYbiG8dlbay6pnEUN6k1BeO//VkMWFqTTIUSlUx7L1
+         ZlmKgiTxE5xGBTMAIc83MukOMVEdphAq5ePxI92CMUT3qJXDyPQWRIZIic47RUgBSJxg
+         cmZHg1AYXJd0Xjt6n/+xsSZtsgs1fsfUJGgv7timRGr6oBJtYs/paT7Z1GtMpHyIy0qB
+         IBb7x8qi+ySy6m4Ggu8Y8Wv+mcbXp2y0a8v1ChKnXwjfrwteY2phtzDO7pNnxl+eee3X
+         FNWRfXGuVeJmt8gYOUhGgW2N946KnDvI+co4LebB8lzMV/vcCgxiS/Oz7xVuqKvy8lJg
+         Z5cQ==
+X-Gm-Message-State: AOJu0YxStgiyreeeqR008OK5eOl/glJlma1LOEqmLB5O3MbA3nABtws2
+	4IkCAW5bHpSJa1wLtwyKdfR90DSUSX7iHDNkZi1HlwXJtm3gg1XL7VXkug==
+X-Gm-Gg: ASbGnculiQye1UxLou/K/uG++2tmaZZammZXuCsZohnTn3Vk4KxRjzvMYi3v+TyDws3
+	N9CDa2Fuf1MtVtLQBrgaNM4SN+PcsDo3r4KUFZ6gwvGojFbgK/ZWUsem1a96IOAyZNqgDPL+wOA
+	OMXK2D8g57htrqe7gghVvQnrYll2oSRhwPGryyTmzkjYcEp9eX+9CYxyFEHxTaTpgrJFKGptnyJ
+	xGEQli3cqT7O2OY5jNPf8nMNDDCZ4uUzEF2bJZJLvcCdl82TG2BqFTVHxN8GhJ/gtmXZIFpwtpR
+	/qNma95F9Qo3NoNP4g/WgdAGhtidXF7CQAZ8C3xMesB7HTWf2g==
+X-Google-Smtp-Source: AGHT+IFhZdjhDoQ9Vcb+R4A5S71Wme14vjsH5GpPlJ6UnxSPrxaXjrqcDBN+RkFKd/ka1mihh1fhfQ==
+X-Received: by 2002:ac8:598d:0:b0:476:9017:bbf1 with SMTP id d75a77b69052e-47fbbc44333mr2926381cf.46.1745509502417;
+        Thu, 24 Apr 2025 08:45:02 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.133.175])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47e9f0d21a2sm13215771cf.27.2025.04.24.08.45.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 08:45:02 -0700 (PDT)
+Message-ID: <680a5c7e.050a0220.33c83b.664a@mx.google.com>
+Date: Thu, 24 Apr 2025 08:45:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5921054072865396655=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/2] btmon: Decode Broadcast Name
+In-Reply-To: <20250421210602.746957-1-luiz.dentz@gmail.com>
+References: <20250421210602.746957-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5921054072865396655==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 9a769a3af138202a95e37d4196cb27fbcb665aa0
-      https://github.com/bluez/bluez/commit/9a769a3af138202a95e37d4196cb27fbcb665aa0
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
+This is an automated email and please do not reply to this email.
 
-  Changed paths:
-    M .github/workflows/ci.yml
-    M .github/workflows/sync.yml
+Dear Submitter,
 
-  Log Message:
-  -----------
-  workflows: Make use bluez/action-ci action
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-This replaces the bzcafe action with bluez/action-ci so we can maintain
-everything in the github bluez organization.
+----- Output -----
+
+error: patch failed: monitor/packet.c:3213
+error: monitor/packet.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
 
 
-  Commit: c8bce6574327ffb34358bf6829b1ddecedd0ed04
-      https://github.com/bluez/bluez/commit/c8bce6574327ffb34358bf6829b1ddecedd0ed04
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
-
-  Changed paths:
-    M .github/workflows/sync.yml
-
-  Log Message:
-  -----------
-  workflows/sync: Remove workflow job
-
-The workflow branch update is not needed now that action-ci no longer
-use to base the PR and CI tasks.
+---
+Regards,
+Linux Bluetooth
 
 
-Compare: https://github.com/bluez/bluez/compare/629672307f6c...c8bce6574327
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============5921054072865396655==--
