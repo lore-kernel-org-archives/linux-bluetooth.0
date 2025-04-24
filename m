@@ -1,44 +1,47 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6613E19F47E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660E219DF7D
 	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 14:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745506176; cv=none; b=TXHVRpjeX9+O8QYKBwh3dqOkkNDiKzjFr1R91aBjisursZ1yjGr29uGftd8VMeL5JVSKXYe9gQ74o9sYSmL/HlsONKkJ0oSENH78K/r30K12yFYJCr9s9OiRoxGgGbYvfiFAgGRMwbTOG1pD45sS7tAy9igBLo0qK6Sc1K4tPmY=
+	t=1745506176; cv=none; b=q0JgZrXJ6obUcJZvGM0eXzlOmoFxndRuoV80nU48tXCrpGSO8Ac8qus2cfXkF/bjByJdyfvKaue9QROCZlfU7TaJF6WD0AV/Y2Ok92jHoiQq12e1EXtd7t5totsbwaEhgcmzcolLz55klf//uwgfQa3N6DbGxB8gk5GVDhg5/I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745506176; c=relaxed/simple;
-	bh=TdKrhlELeuj4BLov1BiitT8X8OYNuWvLi6t2WogZkbA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OVkbYSIAlUyVyZYEmY2njcLBcb8b74VTWAMzVhFIoUYth4wgBlRc8T/ppUW7MpT58bgvY2034h3jS6RBqjZUerxhbgda0kfMtik/LWKDWGD6LntIj2XFgeTaxO7IAswKwBZm6WxkPDFsboLYkh6nxQp5XTVQlV87NORgZpSsvMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=BXh+piIg; arc=none smtp.client-ip=148.251.105.195
+	bh=VbhOsvfPzj15yFnYL9KtWMl5bGSXIe6QDJnauWIS+TI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nnqBpAAwjCehECgRJ8mOfQPJOdVGMHWinKEJ+KfuYgfYo/RuODzo5k7mmKvPsG7u5Avu67jk36qrWwPoLK179oG3bUUxmQpAv01wZqYh0aXvgUaksLzgNlW0pgJIJ7KE1quIlpRslMBSdfbY3JTcvbMF5ZQpWDd9Bz3y0dux/5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=LnubI00o; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="BXh+piIg"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="LnubI00o"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1745506166;
-	bh=TdKrhlELeuj4BLov1BiitT8X8OYNuWvLi6t2WogZkbA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BXh+piIgGz47YM5IWjxAD/GnJj/q/43lkBmnwuln2rrWH7yRKTuTyHALp4LRjEuNw
-	 QM9p+1M9zShlQYKQ5Pk2Rgi2L46Jo8OI9xv53JP178XIJk4fP8eCvQw5tmz3MBi9EQ
-	 tJXlyzNaENtkdZ4VZbUmTsS0k9PuTFZH0WHGZI8i8/pfF0srS2Pn1bvuxFKedsYQYS
-	 9qXTfNzpqpBDRdcMgWMT2dclnIMct27Hv2H9UyW1yJlUjzDX2VaKBCEgzCkYLzvluG
-	 TonSbfj383ecXGPs6Pj8ptin3vbcT3UQE2U2jSyV9x1zLfpZUVcIUKq1EQxsPUYFxp
-	 1Tdqo9tTy2I9A==
+	s=mail; t=1745506167;
+	bh=VbhOsvfPzj15yFnYL9KtWMl5bGSXIe6QDJnauWIS+TI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LnubI00o7RLJ55pY3GHKKG4ShsZHxSN12YjWMZ+RDzLQNngKQkm7+MIwBeaxrWznV
+	 uTshNIsI8LIPc0j7DsB5GRQfmtHuhMBH3o3lvCqImt2xO/L6sj+p+XxUNAsfn8NaJS
+	 Aklr0R5X9eQTGI8/Mn/vaS6Bph2fcHNI9Q97UkjN+z0jfpKhZL1mHBzCS2Xow2yn85
+	 /+suMLUQZYswvBTMXcLdCg3GABthRNQIk2Z8kfysaaOhmxf59nEmTe2/lGxI3osaRx
+	 vFYfxPD+LZbYCSbgplcmLJ1L4Pfn4MQRADl3tqQXhtFqGPfc4IljZFJhBwTZLtQCf1
+	 q+aL57aNXbWzA==
 Received: from localhost.localdomain (unknown [81.56.51.115])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id BA5B317E0987;
-	Thu, 24 Apr 2025 16:49:26 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1E31C17E0C10;
+	Thu, 24 Apr 2025 16:49:27 +0200 (CEST)
 From: Ludovico de Nittis <ludovico.denittis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ v3 0/7] Support Sixaxis gamepad with classic bonded only
-Date: Thu, 24 Apr 2025 16:48:24 +0200
-Message-ID: <20250424144831.95766-1-ludovico.denittis@collabora.com>
+Subject: [PATCH BlueZ v3 1/7] src: Add new CablePairing property
+Date: Thu, 24 Apr 2025 16:48:25 +0200
+Message-ID: <20250424144831.95766-2-ludovico.denittis@collabora.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250424144831.95766-1-ludovico.denittis@collabora.com>
+References: <20250424144831.95766-1-ludovico.denittis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -47,57 +50,147 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series adds a new "CablePairing" property to allow us to
-indentify devices that have been paired using a custom USB cable
-cable method and that don't support the canonical bonding with
-encryption. With that information, we can dynamically enforce
-encryption to drastically reduce the attack surface, compared to just
-disabling the "ClassicBondedOnly" property.
-
-The "CablePairing" property is exposed via D-Bus to allow
-clients to potentually show this information to end users.
-
-As far as I can tell, starting the listening input server with
-BT_IO_SEC_LOW and then bumping it in `hidp_add_connection()` should not
-have any negative effect regarding the overall security. However,
-please let me know if it turns out not being the case.
-
-Addresses https://github.com/bluez/bluez/issues/1165
-
-Changes in v2:
- - Start the listening input server with BT_IO_SEC_LOW only if we
-   actually have a known sixaxis device
-
-Changes in v3:
-  - Change the property from being sixaxis specific to a generic
-    "CablePairing"
-  - Remove the manual validation of Sixaxis HID report descriptor
-    because we already replace it with a pre-dermined SDP record
-    in `sixaxis.c`
-
-Ludovico de Nittis (7):
-  src: Add new CablePairing property
-  client: Print CablePairing property
-  sixaxis: Set CablePairing when pairing a Sixaxis with USB
-  adapter: Add btd_adapter_has_cable_pairing_devices()
-  input: Automatically use sec level low when using a cable paired
-    device
-  adapter: Set server security level in load_devices()
-  sixaxis: Set security level when adding a sixaxis device
-
- client/main.c            |  1 +
- doc/org.bluez.Device.rst |  7 +++++
- plugins/sixaxis.c        |  8 ++++-
- profiles/input/device.c  |  9 ++++--
- profiles/input/manager.c |  3 +-
- profiles/input/server.c  | 63 ++++++++++++++++++++++++++++++++++++++--
- profiles/input/server.h  |  3 +-
- src/adapter.c            | 24 +++++++++++++++
- src/adapter.h            |  1 +
- src/device.c             | 40 +++++++++++++++++++++++++
+This adds initial support for a new CablePairing property.
+The property can be used for devices that are paired using a cable and
+don't support the expected bonding (with pairing/encryption), for
+example like the Sixaxis gamepads.
+---
+ doc/org.bluez.Device.rst |  7 +++++++
+ src/device.c             | 40 ++++++++++++++++++++++++++++++++++++++++
  src/device.h             |  2 ++
- 11 files changed, 153 insertions(+), 8 deletions(-)
+ 3 files changed, 49 insertions(+)
 
+diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
+index 13328249b..80501eddd 100644
+--- a/doc/org.bluez.Device.rst
++++ b/doc/org.bluez.Device.rst
+@@ -279,6 +279,13 @@ boolean LegacyPairing [readonly]
+ 	Bluetooth 2.1 (or newer) devices that have disabled Extended Inquiry
+ 	Response support.
+ 
++boolean CablePairing [readonly]
++```````````````````````````````
++
++	Set to true if the device was cable paired and it doesn't support the
++	canonical bonding with encryption, e.g. the Sixaxis gamepad.
++	If true, BlueZ will establish a connection without enforcing encryption.
++
+ string Modalias [readonly, optional]
+ ````````````````````````````````````
+ 
+diff --git a/src/device.c b/src/device.c
+index b82a905f9..123d44c14 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -239,6 +239,7 @@ struct btd_device {
+ 	GSList		*watches;		/* List of disconnect_data */
+ 	bool		temporary;
+ 	bool		connectable;
++	bool		cable_pairing;
+ 	unsigned int	disconn_timer;
+ 	unsigned int	discov_timer;
+ 	unsigned int	temporary_timer;	/* Temporary/disappear timer */
+@@ -507,6 +508,9 @@ static gboolean store_device_info_cb(gpointer user_data)
+ 	g_key_file_set_boolean(key_file, "General", "Blocked",
+ 							device->blocked);
+ 
++	g_key_file_set_boolean(key_file, "General", "CablePairing",
++							device->cable_pairing);
++
+ 	if (device->wake_override != WAKE_FLAG_DEFAULT) {
+ 		g_key_file_set_boolean(key_file, "General", "WakeAllowed",
+ 				       device->wake_override ==
+@@ -908,6 +912,11 @@ bool btd_device_is_trusted(struct btd_device *device)
+ 	return device->trusted;
+ }
+ 
++bool device_is_cable_pairing(struct btd_device *device)
++{
++	return device->cable_pairing;
++}
++
+ static gboolean dev_property_get_address(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -1153,6 +1162,17 @@ static gboolean dev_property_get_legacy(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean dev_property_get_cable_pairing(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	dbus_bool_t val = device->cable_pairing;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
++
++	return TRUE;
++}
++
+ static gboolean dev_property_get_rssi(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -3483,6 +3503,7 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "Trusted", "b", dev_property_get_trusted, dev_property_set_trusted },
+ 	{ "Blocked", "b", dev_property_get_blocked, dev_property_set_blocked },
+ 	{ "LegacyPairing", "b", dev_property_get_legacy },
++	{ "CablePairing", "b", dev_property_get_cable_pairing },
+ 	{ "RSSI", "n", dev_property_get_rssi, NULL, dev_property_exists_rssi },
+ 	{ "Connected", "b", dev_property_get_connected },
+ 	{ "UUIDs", "as", dev_property_get_uuids },
+@@ -4062,6 +4083,9 @@ next:
+ 	if (blocked)
+ 		device_block(device, FALSE);
+ 
++	device->cable_pairing = g_key_file_get_boolean(key_file, "General",
++							"CablePairing", NULL);
++
+ 	/* Load device profile list */
+ 	uuids = g_key_file_get_string_list(key_file, "General", "Services",
+ 						NULL, NULL);
+@@ -6416,6 +6440,22 @@ void device_set_legacy(struct btd_device *device, bool legacy)
+ 					DEVICE_INTERFACE, "LegacyPairing");
+ }
+ 
++void device_set_cable_pairing(struct btd_device *device, bool cable_pairing)
++{
++	if (!device)
++		return;
++
++	if (device->cable_pairing == cable_pairing)
++		return;
++
++	DBG("setting cable pairing %d", cable_pairing);
++
++	device->cable_pairing = cable_pairing;
++
++	g_dbus_emit_property_changed(dbus_conn, device->path,
++					DEVICE_INTERFACE, "CablePairing");
++}
++
+ void device_store_svc_chng_ccc(struct btd_device *device, uint8_t bdaddr_type,
+ 								uint16_t value)
+ {
+diff --git a/src/device.h b/src/device.h
+index 2e4a9771d..a35bb1386 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -94,6 +94,7 @@ bool device_is_connectable(struct btd_device *device);
+ bool device_is_paired(struct btd_device *device, uint8_t bdaddr_type);
+ bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type);
+ bool btd_device_is_trusted(struct btd_device *device);
++bool device_is_cable_pairing(struct btd_device *device);
+ void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
+ void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
+ void btd_device_set_temporary(struct btd_device *device, bool temporary);
+@@ -101,6 +102,7 @@ void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
+ void btd_device_set_connectable(struct btd_device *device, bool connectable);
+ void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
+ void device_set_legacy(struct btd_device *device, bool legacy);
++void device_set_cable_pairing(struct btd_device *device, bool cable_pairing);
+ void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
+ 							int8_t delta_threshold);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
 -- 
 2.49.0
 
