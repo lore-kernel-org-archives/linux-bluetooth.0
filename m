@@ -1,36 +1,35 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB9E284679
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A284F280A37
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745511105; cv=none; b=lpcAEk13DwKCBtnF4ZvEwy2oxnsLLxxH6xe3HoX2mSNqsQ3441D6q3RmtHcme4x/f644N1C1ON8JtIYWMqvLugY2ZUPpwez4BkzbuiWgwiprRQPIYaVKLMMjSGLxYQqfdNaho206exOLQrB+veNJvqVChFOsSrDfnY7ose+2Uf4=
+	t=1745511108; cv=none; b=fk08/vNMljEL/78zH88MXziPlySSAvovoo1SYkglfnkAHZoeE4tT64mrKn9Su6LnZRnFAZtZj/rKT0eAsj4ujgGjZijsum6PJzDYuHkQfQp/pCrryQFLF8g0kMBHAqjcF4SKFfTXGrp6LNzQidKuTUFeCuln862ueP4NWus6AZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745511105; c=relaxed/simple;
-	bh=odqxKj5ld20EjV3R/ey1WjH3DY9tk9XZKtZ2hjFQ9uQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=bVLIjDl2uKt8Mlb2LKwwIVKT5VSFLyBQfpZ2BMY4GydvMPE7IXTAROC8mm0CaGoucY7n8+b08kQLyMnLXwdMZEAM6O0z4+rpDNdyuYQVD1HBQGYLEVaSYtOU4sTU7en+zbMW83K/kuH2kpEtoC/vhYx4A5h8m2GHe8+paodYG4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lZ5ErMuT; arc=none smtp.client-ip=192.30.252.204
+	s=arc-20240116; t=1745511108; c=relaxed/simple;
+	bh=yWOm69DALGe8GaBP+kRBo+BC2ffCYAm+4uQ5ycqgSBY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YMo8fNUmwAr0mLSgmOAQXbIYAZ72SaiIWHOgpI9b/LbLs51aBa/2Gxp0oNngIhrdGqpQVBXIpCxmBF91EiAWDQeJYSzpXPFWGSC9mWnWLzTiCAgOXqUWJPKLoswQ6gwvrQqJywY/PVgjpUXa6E6iAI+b1Q9p7C8VBbhJbvg+ZEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=YZdfhhCt; arc=none smtp.client-ip=192.30.252.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lZ5ErMuT"
-Received: from github.com (hubbernetes-node-eaaf49b.ac4-iad.github.net [10.52.211.57])
-	by smtp.github.com (Postfix) with ESMTPA id 76CDC70072E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 09:11:42 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="YZdfhhCt"
+Received: from github.com (hubbernetes-node-1ae8a12.ac4-iad.github.net [10.52.175.32])
+	by smtp.github.com (Postfix) with ESMTPA id 9CB6221310
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 09:11:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745511102;
-	bh=xJZr0lOJ9N7A2noEpo86fOtNIGQBVHxsAgDAA4gERx0=;
+	s=pf2023; t=1745511105;
+	bh=D+OFN+qH6f/jdgWf1CbZABBkfLoe2XcLfY64ipMSqwo=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=lZ5ErMuTwuFx8Iq54/KAxh6T9vuAt1E0E5UZ/FKKrqeNP77OTHwheXZxI2XMSatxf
-	 xMsydITPKeJYDEn8FacgJG4u3TINT7d2RyQWG1i2hB5Kk9PNqww2nH9D2Ymaff5DQI
-	 sDLnzwXzq9iqgcCKHs3NeAp0aqoRHzEH6LQ6OkuY=
-Date: Thu, 24 Apr 2025 09:11:42 -0700
-From: "github-actions[bot]" <noreply@github.com>
+	b=YZdfhhCtt8fXVZOb3fznhr5pNV/Za1RpXQ9yH6BhvRDTVJ3pcxOk00jKEftVimmo2
+	 jGGHPh68teNK0j+fizuogExbeWp6uKyFhwMdxd3wDrtFpJr3nKi63+LYZh/4rm7PQs
+	 wo6jPfx5kO0umqeNgxVoRye+pjE+BYjbSWPA6pAQ=
+Date: Thu, 24 Apr 2025 09:11:45 -0700
+From: Ludovico de Nittis <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/956257/000000-3e0c4a@github.com>
-Subject: [bluez/bluez] e43e99: pbap: Support calling pbap_init() after
- pbap_exit()
+Message-ID: <bluez/bluez/push/refs/heads/956666/000000-72d064@github.com>
+Subject: [bluez/bluez] 352237: src: Add new CablePairing property
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,136 +42,143 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/956257
+  Branch: refs/heads/956666
   Home:   https://github.com/bluez/bluez
-  Commit: e43e99d1d30eb70a67f6c8b5a983e45d9a1522de
-      https://github.com/bluez/bluez/commit/e43e99d1d30eb70a67f6c8b5a983e45d9a1522de
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Commit: 352237cb35cb4d0f606733ed36b7a3da4fedcf08
+      https://github.com/bluez/bluez/commit/352237cb35cb4d0f606733ed36b7a3da4fedcf08
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
   Date:   2025-04-24 (Thu, 24 Apr 2025)
 
   Changed paths:
-    M obexd/client/pbap.c
+    M doc/org.bluez.Device.rst
+    M src/device.c
+    M src/device.h
 
   Log Message:
   -----------
-  pbap: Support calling pbap_init() after pbap_exit()
+  src: Add new CablePairing property
 
-pbap_exit() didn't previously unregister itself thoroughly.  That
-was fine if it was only called when the service was about to exit,
-because everything was implicitly unregistered when the process ended.
-But we need to be more scrupulous if this can be called throughout
-the program's lifecycle.
-
-Send the UnregisterProfile message directly from pbap_exit(),
-then call unregister_profile().
-
-The UnregisterProfile message can't be sent directly from
-unregister_profile(), because that also needs to be called when
-register_profile() fails halfway through.
-
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+This adds initial support for a new CablePairing property.
+The property can be used for devices that are paired using a cable and
+don't support the expected bonding (with pairing/encryption), for
+example like the Sixaxis gamepads.
 
 
-  Commit: 0fa4ecbe78f50a476fdbdcf257468ecd2fd27e34
-      https://github.com/bluez/bluez/commit/0fa4ecbe78f50a476fdbdcf257468ecd2fd27e34
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Commit: 1ead3988ad6718d386a70a113269e02815028f41
+      https://github.com/bluez/bluez/commit/1ead3988ad6718d386a70a113269e02815028f41
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
   Date:   2025-04-24 (Thu, 24 Apr 2025)
 
   Changed paths:
-    M obexd/plugins/bluetooth.c
+    M client/main.c
 
   Log Message:
   -----------
-  obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
+  client: Print CablePairing property
 
-bluetooth_exit() didn't previously unregister itself thoroughly.  That
-was fine if it was only called when the service was about to exit,
-because everything was implicitly unregistered when the process ended.
-But we need to be more scrupulous if this can be called throughout
-the program's lifecycle.
-
-Send UnregisterProfile messages directly from bluetooth_exit(),
-then call unregister_profile(profile).
-
-The UnregisterProfile message can't be sent directly from
-unregister_profile(), because that also needs to be called when
-register_profile() fails halfway through.
-
-Do not free profiles in bluetooth_exit() - profiles are needed
-by a future call to bluetooth_init(), or will be freed by
-bluetooth_stop() if necessary.
-
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+When using the `info` command, include the new CablePairing value.
 
 
-  Commit: dcd6c02f34ee7e92627a363a70eacb460ccd60a9
-      https://github.com/bluez/bluez/commit/dcd6c02f34ee7e92627a363a70eacb460ccd60a9
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Commit: 9787d5520347693a2de5e7a1ffa923c963cf1af3
+      https://github.com/bluez/bluez/commit/9787d5520347693a2de5e7a1ffa923c963cf1af3
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
   Date:   2025-04-24 (Thu, 24 Apr 2025)
 
   Changed paths:
-    M Makefile.obexd
-    M obexd/client/pbap.c
-    M obexd/plugins/bluetooth.c
-    A obexd/src/logind.c
-    A obexd/src/logind.h
-    M obexd/src/main.c
+    M plugins/sixaxis.c
 
   Log Message:
   -----------
-  obex: unregster profiles when the user is inactive
+  sixaxis: Set CablePairing when pairing a Sixaxis with USB
 
-Obexd is usually run as a user service, and can exhibit surprising
-behaviour if two users are logged in at the same time.
-
-Unregister profiles when the user is detected to be off-seat.
-
-It may be impossible to detect whether a user is on-seat in some cases.
-For example, a version of obexd compiled with systemd support might be
-run outside of a systemd environment.  Warn and leave services
-registered if that happens.
-
-Obexd can be run as a system service, in which case this check makes no
-sense.  Disable this check when called with `--system-bus`.
-
-Obexd can also be run by a user that does not have an active session.
-For example, someone could use `ssh` to access the system.  There might
-be a use case where someone needs Bluetooth access but can't log in with
-a keyboard, or there might be a security issue with doing so.  This isn't
-handled explicitly by this patch, but a future patch could add support
-by calling `logind_set(FALSE)` in the same way as is currently done
-with `--system-bus`.
-
-Based in large part on the wireplumber code mentioned by Pauli Virtanen:
-https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
-
-Other services are likely to need similar functionality,
-so I have created a gist to demonstrate the basic technique:
-https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
-
-Suggested-by: Pauli Virtanen <pav@iki.fi>
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+Sixaxis gamepads don't support encryption. When doing the USB cable
+pairing, set the CablePairing property to keep the connection to the
+device unencrypted.
 
 
-  Commit: 3e0c4ade6389e70d86e41f4b734bb3558b499ac1
-      https://github.com/bluez/bluez/commit/3e0c4ade6389e70d86e41f4b734bb3558b499ac1
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Commit: 61b9c83d82d1cadf58f12596b08f8b5062f8600c
+      https://github.com/bluez/bluez/commit/61b9c83d82d1cadf58f12596b08f8b5062f8600c
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
   Date:   2025-04-24 (Thu, 24 Apr 2025)
 
   Changed paths:
-    M obexd/src/obex.service.in
+    M src/adapter.c
+    M src/adapter.h
 
   Log Message:
   -----------
-  Revert "obexd: only run one instance at once"
+  adapter: Add btd_adapter_has_cable_pairing_devices()
 
-No longer needed now services can share resources.
-
-This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
-
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+Add a function that can be used to know if any of the known devices have
+the `CablePaired` property set.
 
 
-Compare: https://github.com/bluez/bluez/compare/e43e99d1d30e%5E...3e0c4ade6389
+  Commit: 16a2c7919e8da98a08ef72f76156d0b4e5a570a9
+      https://github.com/bluez/bluez/commit/16a2c7919e8da98a08ef72f76156d0b4e5a570a9
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M profiles/input/device.c
+    M profiles/input/manager.c
+    M profiles/input/server.c
+    M profiles/input/server.h
+
+  Log Message:
+  -----------
+  input: Automatically use sec level low when using a cable paired device
+
+BT_IO_SEC_LOW is the only way to allow devices that use cable pairing to
+establish a connection.
+
+This adds the ability to start the listening input server with
+BT_IO_SEC_LOW to avoid breaking support for these devices, and then,
+in `hidp_add_connection()`, we check if either `classic_bonded_only` was
+disabled or if this device has `CablePairing`. If neither are true, we
+bump the security back to BT_IO_SEC_MEDIUM, i.e. enforcing encryption.
+
+This allows supporting these devices without having to change the
+classic bonded only option.
+
+This doesn't cover the case where a device with `CablePairing` gets
+loaded from storage. That case will be handled with a followup commit.
+
+
+  Commit: abbcb3352cc6621c9858733dbb29362f29cc2cc0
+      https://github.com/bluez/bluez/commit/abbcb3352cc6621c9858733dbb29362f29cc2cc0
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M src/adapter.c
+
+  Log Message:
+  -----------
+  adapter: Set server security level in load_devices()
+
+After loading known devices from storage, change the security level if
+we have a device with `CablePairing`.
+This will allow it to successfully establish a connection.
+
+
+  Commit: 72d064cccbfb7f37aef6e32dc8ee97ea1ae93498
+      https://github.com/bluez/bluez/commit/72d064cccbfb7f37aef6e32dc8ee97ea1ae93498
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M plugins/sixaxis.c
+
+  Log Message:
+  -----------
+  sixaxis: Set security level when adding a sixaxis device
+
+When doing the cable pairing for a sixaxis, we may need to change the
+listening input server security level.
+This is because sixaxis gamepads can only work with the level
+BT_IO_SEC_LOW.
+
+
+Compare: https://github.com/bluez/bluez/compare/352237cb35cb%5E...72d064cccbfb
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
