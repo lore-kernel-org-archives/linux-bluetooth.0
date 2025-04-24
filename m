@@ -1,35 +1,36 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD02227F73A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551D827F720
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745509530; cv=none; b=YgrmetQukQk5iSVa90B7M0GpcktctoBT9WlcBY92ctJvVNkp4/tFCpoelxzHLiUImojWjOOie+Rz9E8EbczAiObXXdYAFCs4oSajWiQSJHcK2O0T5+c83cpm3uXoRe0E80AsD/UT9P36CAsgoTWg5HNmDp8jVsi54R3Z3pkPovk=
+	t=1745509534; cv=none; b=rMXapKNsfH4vDsDRJx9wsK07KLNbdtm9MCJzmZApeu4SdgEbCb1ZvnVOk3nqHNQZTXq7eKsKgqeL2pflS98W+qLj14SMoJp+2DHxkRigoTKZAe/tLjL6bApTXPriLbwTN+4z40LPAGEAbbqrhlGO8ZTj0s//yGzVSXN+u/3yCsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745509530; c=relaxed/simple;
-	bh=9rL4FQnPkmCyP8Zu0CsHvqDUVyySgiKlMxIlVR/KJvA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=n4XHHyYn+LU33tSrsx2ZyOKFj+KL+jiMGOr8jFcDaUSsCF3OEDoC2QgURBWX6BVM6xVQjvdH4evxHLElHIeRpKIBARzUzwpadu1VoTYT+s+gwPZPOnBq7Roz9+gusrn2tNdIIjsnvdQyDJTtT57ITDjmM+jUlYi2En5fBruLV90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kw7KJJox; arc=none smtp.client-ip=192.30.252.206
+	s=arc-20240116; t=1745509534; c=relaxed/simple;
+	bh=+4NfP4vePkMDrok5vltS+WtT7k0LcMa6beNH/3/JYxY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=cS5/gIgMB9TKobFQYi1yFtkjRAvcOyElkdqUHjy4Bz0Zr9xutF3pe0GnCiyMuFQBSYyrid4LRUJe/ZqvDebQxFMa6GGwYtWnZXx7Ee00C19Ed6hK04pc0kWn+zmmueZVzLoMDqQQ3eQpjxPcnrMzibz5ZvFIei7DhZID1cO1bXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=LxuyjmCP; arc=none smtp.client-ip=192.30.252.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kw7KJJox"
-Received: from github.com (hubbernetes-node-c191d69.ac4-iad.github.net [10.52.205.75])
-	by smtp.github.com (Postfix) with ESMTPA id 3A1E921014
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:45:21 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="LxuyjmCP"
+Received: from github.com (hubbernetes-node-6261fd4.va3-iad.github.net [10.48.210.87])
+	by smtp.github.com (Postfix) with ESMTPA id 407AC4E0FF9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:45:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745509521;
-	bh=Tm5Z0B4MdnmXmlYWZOXYnYLL7qdob+5gF2BeyCWH/IM=;
+	s=pf2023; t=1745509526;
+	bh=DjNooWEW8VvwpvozhQyqeEVD1+EP/jPTqbfdEDKhOBk=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kw7KJJoxe4yTYgw+F4KoL+QgU0y5Z3W0nxse3+zDXYv2qnuQlNQ3qKCEUmCO7dha9
-	 ovGhYZ3QSb3j8x2W4IXhHYE8iCZCmpxwhHObBgPIcKqmfi61PtB19Jlf+iBR5Y0Q/j
-	 C8O+I5IQaPJZ+++K4zhYMpFUsgkH8AFsWX2hO6xc=
-Date: Thu, 24 Apr 2025 08:45:21 -0700
+	b=LxuyjmCPHFhRggHCaOfwamRpqQmwPYraWCOHgFYOobYXBoHpmFMsScq37wBXr25Ih
+	 CAX5ocR3PJwDeNEGbiPYKpwy7At6ppLdvtMpOxDXj2rfm/QI2GNIK7sx73BmYz0jVK
+	 Hd3VvNYuZ0sB7ZcvbokDe5oKFaCpV+Y9mltJbHik=
+Date: Thu, 24 Apr 2025 08:45:26 -0700
 From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/955284/000000-6ae7c4@github.com>
-Subject: [bluez/bluez] 1e7f2a: org.bluez.Media: add SupportedFeatures
+Message-ID: <bluez/bluez/push/refs/heads/955480/000000-42d3e7@github.com>
+Subject: [bluez/bluez] 42d3e7: tools: add tests for SIOCETHTOOL
+ ETHTOOL_GET_TS_INFO
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,44 +43,31 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/955284
+  Branch: refs/heads/955480
   Home:   https://github.com/bluez/bluez
-  Commit: 1e7f2ad78caad4c096cdcc5a565cac68733ad6d9
-      https://github.com/bluez/bluez/commit/1e7f2ad78caad4c096cdcc5a565cac68733ad6d9
+  Commit: 42d3e71781425289efbe8757c78cc1bece1c35bf
+      https://github.com/bluez/bluez/commit/42d3e71781425289efbe8757c78cc1bece1c35bf
   Author: Pauli Virtanen <pav@iki.fi>
   Date:   2025-04-24 (Thu, 24 Apr 2025)
 
   Changed paths:
-    M doc/org.bluez.Media.rst
+    M tools/iso-tester.c
+    M tools/l2cap-tester.c
+    M tools/sco-tester.c
+    M tools/tester.h
 
   Log Message:
   -----------
-  org.bluez.Media: add SupportedFeatures
+  tools: add tests for SIOCETHTOOL ETHTOOL_GET_TS_INFO
 
-Add SupportedFeatures property for feature information that applications
-cannot find otherwise.
+Add tests for obtaining timestamping capabilities via ethtool ioctl:
 
-Add feature tx-timestamping. Applications cannot enable it on old BlueZ
-versions without that feature, as it requires special handling on BlueZ
-side.
-
-
-  Commit: 6ae7c4ed188dd06423d26a480dbad895b71e2298
-      https://github.com/bluez/bluez/commit/6ae7c4ed188dd06423d26a480dbad895b71e2298
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
-
-  Changed paths:
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  media: implement SupportedFeatures property
-
-Add org.bluez.Media.SupportedFeatures. The value tx-timestamping is
-hardcoded as it is currently always enabled.
+L2CAP BR/EDR Ethtool Get Ts Info - Success
+L2CAP LE Ethtool Get Ts Info - Success
+SCO Ethtool Get Ts Info - Success
+SCO Ethtool Get Ts Info No Flowctl - Success
+ISO Ethtool Get Ts Info - Success
 
 
-Compare: https://github.com/bluez/bluez/compare/1e7f2ad78caa%5E...6ae7c4ed188d
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
