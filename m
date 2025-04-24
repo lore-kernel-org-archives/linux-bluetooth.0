@@ -1,141 +1,135 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A00521884A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 20:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745526910; cv=none; b=N0RCMboXaoqFw9kU5iwFhSQVoaRRCGhr+GgLH9Wk0Y4uJ04Wlk1NDvZY6p7OsHmxRM7v+qjy36l+/64HzKDeLR3mJLy7SQn9NjinKLWTPi+Utzln7FYacPIR10X7JwvWopUf/4F0xxgV99hP9eaHIGLEodaO4gdq2ha6Rg8bGUk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745526910; c=relaxed/simple;
-	bh=YPNIqdNmTkqynf38nVpFcHQ4BM4j5Ub4jO5qpSR/UPM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lVWexT0LOzBWSLFSJrTmDzuF0XzU0wg2LZD29urtTeLzf/pUeRObByLhQyBrZ9+af5TkMVxfNmP9advNSrD1PTC4kwTFeSTkAFzj9sW7UbxI9ZjSOwWUtbgF6PjJvqmtMH2RgKEBHJQzs1H2bBfFJn6bc9nG10ig7+hY+aUBtGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bDriEWEN; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC56F202C5C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 20:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745527439; cv=pass; b=lfS2hXK6bwnTVecm22CWnx4uy1TYcs4t3zgWiwQ75MYpH5aU2dhLe1CwygyHm4tIF3GUR8Tqa9bZGckFrPw5rKStsLukYkNWhXKPAm6cN/6vcs2cxeeuB6ZTJ+7eaP4UPNnw/pzGzkSX3lGJqezjIoqnubhm26zXTm6G38FT8Ig=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745527439; c=relaxed/simple;
+	bh=ygA57Kjv56TuY/FNJ3BoT/duAMX/GHdsoIc5rbAykRc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gw6eMCaJqcmwYyqwrBUd7lL+C/M+jC186KB5HUVoy3JIT4iHymcmqb/Iq8qlQ96LD3w1kJXnh0l5POTyxWzdpHSSNtX5dvyIjQEEtgbTgJNiWFsr7urzr32yhri79++XkSkk1JEG5gc2ec8Rdh374jXjT6gurntc1oKrahx6q4g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=MB9OWUgk; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDriEWEN"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c5e1b40f68so157053285a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 13:35:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745526908; x=1746131708; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ewbVOZcHB0hRqeGMP4zfkX/nK+3gVShheEvdJwf5cpE=;
-        b=bDriEWEN6GXXWc6ZXNBxt7wgEUjINXP+ZeNcZuBrdhkHqLR/tLZkpnVL67W8mNmHfk
-         Xc4KwiDSnld15XLPh6UNL6hoFg8cCtyjMblkBIXUaqY7iUFhk7d0SIoHRmVyevTFbdjC
-         S9pD80Lcu8v8QJ9dA9BvoSc+TnsPQiSO1zEeFxv/zkVduT5pWSDQeXXf7TmIHfyEDPbu
-         q9egzpbwAFDLBGuOyjJ3+xlwtuWyRZsxBkt6S30UB7RgJHHRgmMuohGHOBYMC7PERWFf
-         /lMd2Ot4okH5vJTj4UZDpVV2v97eYQtskZREqF0LWVDK6MoCtReKpejzaGH0lYhpqk42
-         jfCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745526908; x=1746131708;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ewbVOZcHB0hRqeGMP4zfkX/nK+3gVShheEvdJwf5cpE=;
-        b=Zdw4DGA6ejXU9eRqU/Ew8coM6UX8QuXSxOq1YakBmFrMb5Z0SGq528s2F1A37XqnkX
-         zjyRr89xR7pLOZtxXdZWZia+x8x5jigQJEu6GCT5bSOqFQzfjUs/8CSjwM87R7Q8/fiM
-         6uDW0GY/gmLU0j5kxRitQJ3+d9TIa5egeqNIch7C+mzXMT/1EeRyU4sHzNdFvC39PoeH
-         yCSbYVlq4rGDIctRhyic/sNeir4B+aAjZHr5jj/ap/JB4K6DvINZuVVQGZSmo5Iuba2z
-         i7Au0hNssRo0CXWYRKsuoxW5MC4un/Lzl98+d3dy5TsROYP0mL2UJ4S96dlB/IUzUp7N
-         XJGQ==
-X-Gm-Message-State: AOJu0YyqAveR44Z0KjA0TWY479OP9Kz8Z9AKfPqXDzPkBM8lEpgy1C4W
-	wKXyo/qjvEkWR1oQMvFFNCrDF/STHlPV3fHRKmIdThuFQL4jjSTZgBybxQ==
-X-Gm-Gg: ASbGncs7t/0q4kFyPyMAm6Q1jI7s9GsN1fj0ZOlVXJRcue4cCKOEeQSqEyvvRA5q/X2
-	DYK83mMFy5lNT4rO7PAy+MUYK9mBuOVQCJnCjAxoURRkdhSIMLVrhLIs8qsHtNEBaBWtQ1ZPmZD
-	t3T5ALpmj6fMK0i6Qmqcqxla4TKNafjjT8WJHU+99DUslJvtzbolouReqZ75M/t60wb2ggDTpwB
-	riJjCsi1gaEVSf2ML+LcHHq3uoc9/gpXayqMAyLNv6wxr0Cf6GT0+XQ6mp35jshN5avbTY5voSa
-	9wrSkndK5Rng5iC15i2MU5qPBN7hbc+M2fqVfzSyFX0n
-X-Google-Smtp-Source: AGHT+IGn8RwBukJ13NtLXBiTIjwcMQVzEGJO38ETR2PDgoG4G5DvQQXxIpXf3mbW+Glg5jQtYXZR6g==
-X-Received: by 2002:a05:620a:d87:b0:7c5:4711:dc51 with SMTP id af79cd13be357-7c95eed474dmr118781085a.2.1745526908012;
-        Thu, 24 Apr 2025 13:35:08 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.14.21])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958ce4e97sm131470885a.65.2025.04.24.13.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 13:35:07 -0700 (PDT)
-Message-ID: <680aa07b.050a0220.333847.6e37@mx.google.com>
-Date: Thu, 24 Apr 2025 13:35:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7990527437531695204=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="MB9OWUgk"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Zk7HB08Ygz49Psw;
+	Thu, 24 Apr 2025 23:43:49 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1745527430;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UqI60/Jke2ESMkhuK8WSF1zcRzCxb7FegIrnGJ64tC4=;
+	b=MB9OWUgk4caBcmyjcxGnFGcUv5Ymqks/u6LMyQ36b7SUS8Lt4/l6LHO4AYfho/Ib1HVHJn
+	oa0krBiWOiULB9PN6Fr0Yj+GzLaAXnNFSAmjWV1ISRrH9Cf5S5tVY8Y3mPelquWR9Za9dL
+	tYY+ESJHI8Bj4YYXiUXjsem07RXCTdldMHm5zbZ9lpT5nCsGZlAUF2USY0IgPNVWMpQf5i
+	jNZwhohJRMX38RR4FLkANnLx2J5VRE8OU+Jmrb1H/UcNpMv+rM4FHHJxoYjtbRZ06bCyQK
+	5IftNg4KYyS6y7qyDINXeAKBNy8JGgDyIAeWinUAbkHgCAOyOtyflJBn3HP/Eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1745527430;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UqI60/Jke2ESMkhuK8WSF1zcRzCxb7FegIrnGJ64tC4=;
+	b=opR01jIhuOLkgVln/PKE3aZUQRqfwN7zpcAGq6LWLpnfy8E9xTorsg0xv9wH6IQR8dWr0M
+	6sOjr3nM9lsgGs2DkC6qo4Z5X8mgyajURIJ/+foZZOeBiCEyLOgvrz/HevduUj1EV8f7rv
+	WCd6SQ4WMiu+LBD/nifBAgT7Ze9At9YVHyYjcxefAi0f38vqnUgoXAJ4bxxzOm3ATCmh+C
+	iQa+YkotT4wthH/yx0TNfCCHa/oRqWYguEZAHY2+m/qYpjBVvJdmDlWKuZNCloKmpUhx6h
+	/4VSAMumK1l37mzGzVk9iWuAQaTonFsAjse4OtjK/nX7WKlBMlmgReLecYnAPw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745527430; a=rsa-sha256;
+	cv=none;
+	b=Bvo3vfK98Ok1QeUEtbBlz3EjGZM/E88LnqI+0nYC6n946rkExB4ua3lsDpWXntQ5NUxCVN
+	R7Dzq39lMJrB5/bDxaFvzoW4PMBtLPIZd+KuqRGeGBd3dlLTnbqbrYGeIyY8wFtJySNc6A
+	wUCOX3S0kv5UQKZqd1nVsuOUvIGfUleH4cXeFIhlRmjj34mwKuFi5zCHYzZglK9uMpeL2e
+	cAO7+dtF7P0yZ3o0I/h6TkoTM4mzCob9BIn1xqdg4AjDOQz6MFD59Z2tZ+sIGBP/z7ID7p
+	5XWOg7nxFKv/i2oXm3e7k09wT3ggSEBJXs0+LIlItH7GdGi/1MJBBhYmko9wMQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <a19c84b9214708ac13270a024c15619daaa2c231.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: L2CAP: copy RX timestamp to new fragments
+From: Pauli Virtanen <pav@iki.fi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 24 Apr 2025 23:43:48 +0300
+In-Reply-To: <CABBYNZKRDZRUW-H9gXaS3kjxgcK8UXieQ0_S2Gtdjvbctgks-g@mail.gmail.com>
+References: 
+	<01117138d56019a8598f24f0df2dd289713cfab4.1745524193.git.pav@iki.fi>
+	 <CABBYNZKRDZRUW-H9gXaS3kjxgcK8UXieQ0_S2Gtdjvbctgks-g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: Bluetooth: L2CAP: copy RX timestamp to new fragments
-In-Reply-To: <01117138d56019a8598f24f0df2dd289713cfab4.1745524193.git.pav@iki.fi>
-References: <01117138d56019a8598f24f0df2dd289713cfab4.1745524193.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============7990527437531695204==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+to, 2025-04-24 kello 16:19 -0400, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+>=20
+> On Thu, Apr 24, 2025 at 3:59=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote=
+:
+> >=20
+> > Copy timestamp too when allocating new skb for received fragment.
+> > Fixes missing RX timestamps with fragmentation.
+> >=20
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+>=20
+> Hmm I though it only matters for TX timestamp but this is actually
+> different,  anyway I don't think it would be possible to backport to
+> that old patch, so we might need to use a more recent one when we
+> introduced l2cap_recv_frag to make sure it properly backported:
+>=20
+> Fixes: 4d7ea8ee90e4 ("Bluetooth: L2CAP: Fix handling fragmented length")
+>=20
+> I can fix it up in place though, so don't bother spinning a new one,
 
-This is automated email and please do not reply to this email!
+Yes, that's probably first where the patch applies directly. The bug
+itself is old.
 
-Dear submitter,
+> btw shall we replace the __net_timestamp with skb_set_delivery_time?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=956750
+AFAICS the __net_timestamp() in hci_recv_frame() is correct as it is
+now.
 
----Test result---
+> > ---
+> >  net/bluetooth/l2cap_core.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >=20
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 5ca7ac43c58d..73472756618a 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -7415,6 +7415,9 @@ static int l2cap_recv_frag(struct l2cap_conn *con=
+n, struct sk_buff *skb,
+> >                         return -ENOMEM;
+> >                 /* Init rx_len */
+> >                 conn->rx_len =3D len;
+> > +
+> > +               skb_set_delivery_time(conn->rx_skb, skb->tstamp,
+> > +                                     skb->tstamp_type);
+> >         }
+> >=20
+> >         /* Copy as much as the rx_skb can hold */
+> > --
+> > 2.49.0
+> >=20
+> >=20
+>=20
 
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.22 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      24.69 seconds
-CheckAllWarning               PASS      27.05 seconds
-CheckSparse                   PASS      30.42 seconds
-BuildKernel32                 PASS      24.25 seconds
-TestRunnerSetup               PASS      458.00 seconds
-TestRunner_l2cap-tester       PASS      21.12 seconds
-TestRunner_iso-tester         PASS      33.21 seconds
-TestRunner_bnep-tester        PASS      4.72 seconds
-TestRunner_mgmt-tester        FAIL      117.13 seconds
-TestRunner_rfcomm-tester      PASS      7.83 seconds
-TestRunner_sco-tester         PASS      12.48 seconds
-TestRunner_ioctl-tester       PASS      8.28 seconds
-TestRunner_mesh-tester        PASS      6.04 seconds
-TestRunner_smp-tester         PASS      7.16 seconds
-TestRunner_userchan-tester    PASS      4.98 seconds
-IncrementalBuild              PENDING   0.78 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 4 (RL is full)                Failed       0.244 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7990527437531695204==--
+--=20
+Pauli Virtanen
