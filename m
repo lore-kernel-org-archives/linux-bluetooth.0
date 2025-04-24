@@ -1,36 +1,35 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F7413DDAA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8CA27F744
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745509519; cv=none; b=n86g7sTXAXEGBT/J9xgFIyg78FniidqibgNsxjPZOC02XnA39bMJc0N8ed3bz++MRVaXYpUGFXehdnfrLUnOASpOcSlMB6RaqutGW+SNm8iBYrYb+qYoiorG5xoxlx9EBl4+bWPRgZAEMs618v6tFLKidCL4pyNAs7YmNxv5cgs=
+	t=1745509523; cv=none; b=G7gjvycMZjnhUEq7tz1pNDfP8sA1b9GiZUqjcBzP5TKymetyLi8+TH2PMO97LlWfCgKgPQNm7eL+eXCMD0DKwBLOgljQSk4LBx8XqncbNBUlk8ZbSbLSlw7DP+B/mh+Qr0ul+mJdldJJKarD3kab7QKXK8aaciqYPrRs+EvQpWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745509519; c=relaxed/simple;
-	bh=4rL4X7rRZKUCmsVGBzE21XE+hqno9h8IfeBTsc0hQS4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=u0B9cjwv0yuw9ZRCrDDLDPl0CWDoZ03YXG48UjgaKNF2DwpV3au1deUuvZT/+wk4nnzVRgdEO6q42I21+wtg2mrUz8HT3vFl6oUJu7Mf2cD2W0aO3Fsv2tVG+wcFXHbZRLhIb9f6PGNpil4SWh2pQsTg+iyTVZlxQ7WGkfAahJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=a/e3hmQL; arc=none smtp.client-ip=192.30.252.204
+	s=arc-20240116; t=1745509523; c=relaxed/simple;
+	bh=5HfCS+4k0OMFQ2brGukEOOormWaaZsVv+2NMO5A5QW8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HNRtXxafc0EcOrUPsVODHv+Y60cD20SsneyAZOEGCsCwpZAgtSLRSFl2ya7wpkqioQDDSQ0lL1uqkORv10dSaYibqH+CNzR5CZenaYYL4f98WMYFW+rYB9MbsCTEJhL4FuEg3otKBwkhYJfnizW7nyIuPYOkJgGT//TFvqnBeWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VQ0Heopm; arc=none smtp.client-ip=192.30.252.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="a/e3hmQL"
-Received: from github.com (hubbernetes-node-1e4d2da.ac4-iad.github.net [10.52.210.29])
-	by smtp.github.com (Postfix) with ESMTPA id 1D939700927
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:45:17 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VQ0Heopm"
+Received: from github.com (hubbernetes-node-f819557.va3-iad.github.net [10.48.132.33])
+	by smtp.github.com (Postfix) with ESMTPA id 38BBE4E026C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745509517;
-	bh=7PAch83PPYVoRRRN7MLXPF1Zy0Reem1oZGd2uiqar0o=;
+	s=pf2023; t=1745509519;
+	bh=4XkVjV8S05oFCbESheAVcvMkBTl9OnX7B5XOFHJ/+4Q=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=a/e3hmQL0il7slmoAs/3CbX8Uwvx0T6QdX9f4SF8VjGT8drkDz6psQEnNuv8PPlMb
-	 xdebuVegpGFVVRYRwNvuSE6eV4kUT7WErrEez3+0a2Rx94QcpY6ZWkmF8u37fGrOUb
-	 GgCu6AouvZvT+GqziJUXMPGsi886zLJEdlMIo1zM=
-Date: Thu, 24 Apr 2025 08:45:17 -0700
-From: fdanis-oss <noreply@github.com>
+	b=VQ0HeopmK7NVius9DPHJCpZghai/zBWBF+MxhfosaCC8omW0XvkTFf7TGMWrhsgBW
+	 AZCYBATTfUlfYDenXV472PW1IzQcxYBq2/arGbgz4kkDSfY9bnAau79BlrrGtxhW/c
+	 dP2Gl2AFEIq6+z0yavw2Wag7qXeRnEcTFMVFdli8=
+Date: Thu, 24 Apr 2025 08:45:19 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/954076/000000-c2e574@github.com>
-Subject: [bluez/bluez] 13d214: device: Reset svc_resolved on
- device_discover_serv...
+Message-ID: <bluez/bluez/push/refs/heads/955281/000000-889087@github.com>
+Subject: [bluez/bluez] 889087: obex: Send response to client for Abort request
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -39,74 +38,39 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/954076
+  Branch: refs/heads/955281
   Home:   https://github.com/bluez/bluez
-  Commit: 13d214c19f71e47a30cfd77c4a868e6fab683ebd
-      https://github.com/bluez/bluez/commit/13d214c19f71e47a30cfd77c4a868=
-e6fab683ebd
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Commit: 889087d13261d2f6fb7ee9cff1a56d46dd6b714b
+      https://github.com/bluez/bluez/commit/889087d13261d2f6fb7ee9cff1a56d46dd6b714b
+  Author: Amisha Jain <quic_amisjain@quicinc.com>
   Date:   2025-04-24 (Thu, 24 Apr 2025)
 
   Changed paths:
-    M src/device.c
+    M obexd/src/obex.c
 
   Log Message:
   -----------
-  device: Reset svc_resolved on device_discover_services() request
+  obex: Send response to client for Abort request
 
-This allows profiles requesting to re-retrieve the services records
-(SDP or GATT) to be called back once the services are completed using
-device_wait_for_svc_complete().
+Incase of ongoing transfer, If the client sends Abort request, Server is not
+sending any response back.
 
+Ideally it should send OK or Success reponse code for the abort command.
 
-  Commit: c2e574bf2f97482df99435ae9bf34a1b7932693c
-      https://github.com/bluez/bluez/commit/c2e574bf2f97482df99435ae9bf34=
-a1b7932693c
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-04-24 (Thu, 24 Apr 2025)
-
-  Changed paths:
-    M profiles/input/device.c
-
-  Log Message:
-  -----------
-  input: device: Browse SDP records if not cached
-
-For a HID paired device, if the cache file containing the SDP records
-is not present this will prevent the device to connect and need to
-remove it and pair again.
-
-Current bluetoothd traces:
-src/shared/mgmt.c:can_read_data() [0x0000] event 0x000b
-src/adapter.c:connected_callback() hci0 device EC:83:50:76:BD:67
-  connected eir_len 31
-src/shared/mgmt.c:can_read_data() [0x0000] event 0x0006
-profiles/input/server.c:connect_event_cb() Incoming connection from
-  EC:83:50:76:BD:67 on PSM 17
-profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
-  psm 17
-profiles/input/server.c:confirm_event_cb()
-profiles/input/server.c:connect_event_cb() Incoming connection from
-  EC:83:50:76:BD:67 on PSM 19
-profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
-  psm 19
-profiles/input/device.c:hidp_add_connection() Could not parse HID SDP
-  record: No such file or directory (2)
-profiles/input/device.c:ctrl_watch_cb() Device EC:83:50:76:BD:67
-  disconnected
-profiles/input/device.c:intr_watch_cb() Device EC:83:50:76:BD:67
-  disconnected
-
-This commit tries to retrieve the SDP record from the remote HID then
-to add the HIDP connection.
+This is required in PTS testing for passing below testcases -
+1) OPP/SR/OPH/BV-27-I
+To verify that a server can respond to an ABORT from the client during an OBEX operation.
+2)FTP/SR/OTR/BV-02-C
+To verify that the pushed file is aborted normally.
+3)PBAP/PSE/PDF/BV-06-I
+Verify that the PCE can abort a Phone Book object download from the PSE.
+4)PBAP/PSE/PBF/BV-03-I
+Verify that the PCE can abort a vCard-listing object download from the PSE.
 
 
-Compare: https://github.com/bluez/bluez/compare/13d214c19f71%5E...c2e574b=
-f2f97
 
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
