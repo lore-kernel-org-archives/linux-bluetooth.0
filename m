@@ -1,243 +1,131 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38CE28BAB5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745512214; cv=none; b=JqI/nM68qRibaLPdhfDKbvnxWweF639CjN3vaREBMLC4hHzOd/5tZ32edfTXrixYJlwvXsEDjN9ThJzp0mnv8vHweipCL8NYuaPAWI3Dz8+c3MN7D0XhHsAMmuQYbqGKruNIJKkrwiaAeIZ53NNd50egeno/5vMGbq2L4okBalw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745512214; c=relaxed/simple;
-	bh=MvA7vc36ro/NSBWdtgafstg3IasmiKEtqTrHgGfTYn4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ho0uVUUESajdFZIRChPVwXR/xfjsTbE/hQJDJmO8+hwXHMIVf4RLWJDIRN2R9T1c7k3D0Nodv/KsEl9pQRCgUfrRSfpIvMuIsPqmbVpYq4oF4GE4mMCIRDROq2qFPgVYEbaKvlIet9qm6y1HzoMIY3otq9ki6RD+yZVtRQppnys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=U4/EisMk; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AAE284670
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745512338; cv=pass; b=YPSgxkvFuyRmOgcATj/t0S5OwyriCjKXcyK8RZMA7k+3Zsq3viJ+d77/NnvzkekLX+zIrwrCF9ogEEMWnk/7lsICgkEAfHaQ13PW/z9ZD8MD64kP4TNM1GdEpwIOy5ukDqNq+DSOpyulu2EidGFlMlosDOC+fd3PqgMXdETbZ8k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745512338; c=relaxed/simple;
+	bh=EFeZtfM79JvEhUrbqIGGnna3hRelxbspI896dxz9Evc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W8v4lkAIp609Ap8YKGx7vTW8fGMRNczhNGbmrhzWhlx44Uf9bSFT2UzMZxQzdk63vAMMgmZuoUSwQHRLFsjzUUgrcfXs0DSq3vRkAsy3UZcWiqFj79SJ3AwlJeRDHJPLPJxsuGhDp7mSfUWhQPfAYr+Fa7w7w1HHtjCs1tSuXjs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b=GrxoWUtn; arc=pass smtp.client-ip=136.143.188.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="U4/EisMk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1745512207;
-	bh=MvA7vc36ro/NSBWdtgafstg3IasmiKEtqTrHgGfTYn4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U4/EisMkbGXIynfCpLHPw2Lxaqy5KAKEUjBu0H9WAPdM7CTGqHiZVgwoZ17AUs2Ky
-	 yOVQ7YVD7oagwP34/Q9xw1GI8JBlzqmO8X0Z/VsZwwmnwoa3+sAkkIGSsBNjNz8E3E
-	 fUJ/rUt6UJMT0hRU4mFEwmTbdUtVmwLecZVYehJ+4cKaQ676ckdTmS8ELOYUvj9aEJ
-	 UwjhQu05K6S2yWqylOT5HUeYTpt+ifG88fb9ikjRCyVeoMkl+E0MvRq9s57h5JHLH1
-	 DIdfu5TuNbReseV9qduFrvxJI2cioBvc/+nYLIRUyWveJ680l8KA1drlKN+gERYirK
-	 I+UB/ZXi6bCSQ==
-Received: from localhost.localdomain (unknown [81.56.51.115])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 887EE17E36BB;
-	Thu, 24 Apr 2025 18:30:07 +0200 (CEST)
-From: Ludovico de Nittis <ludovico.denittis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ v5 5/6] input: Automatically use sec level low when using a cable paired device
-Date: Thu, 24 Apr 2025 18:29:32 +0200
-Message-ID: <20250424162933.182103-6-ludovico.denittis@collabora.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250424162933.182103-1-ludovico.denittis@collabora.com>
-References: <20250424162933.182103-1-ludovico.denittis@collabora.com>
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b="GrxoWUtn"
+ARC-Seal: i=1; a=rsa-sha256; t=1745512331; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=NbNZF9IJ2LQ5UZbKSJ/JFtQYmSZWOUt7cqnh3ou8ctpeNLodamixQowXY6UgFbGVwH7TpRaNuOC6NFGtvQLk5qKlNI4WOXH8IawanA0i5KgZL4x8U2PN7Kur7FnZVIiEgD0a1LbgeDGJNcnhttpql0GzaLb40myL57fMBLbi/Gk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1745512331; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=cUpdiRHu6xj95GibiL2cgCzfrIGaLthQbFsVAAYJmyA=; 
+	b=jJhYBCuQgC3vLKHfXv/nlCzA9gPrDm3twLbtpPdAkyM5OHX/4MGjTtO8rwWSrqAnC4KomCLt5wHtXlMvvrEjoRLL8mtFgBFdKv1zp+iD+Fqd4Av48RSFvBom2xW4O7DWLJjvu8O7HAti6/ptGBaMWXi8+8cYtOxE1a6vCV3ykww=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ludovico.denittis@collabora.com;
+	dmarc=pass header.from=<ludovico.denittis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1745512331;
+	s=zohomail; d=collabora.com; i=ludovico.denittis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=cUpdiRHu6xj95GibiL2cgCzfrIGaLthQbFsVAAYJmyA=;
+	b=GrxoWUtnRjjqrUGz+82XA2sItygtbwPCpq49Hgh5oD6pcV9jIqR+2uf6uHdwYIsT
+	2sNviWPsyHLJLozUCeAD5MNTBdQCcMGQsydNObsOoeoxi1rDOfTIIgh1UenrHLuMyUy
+	hlKZny08ETQOrAdSaWACzJROmQjlz7pNX2AFi1w8=
+Received: by mx.zohomail.com with SMTPS id 1745512328298518.0830631884635;
+	Thu, 24 Apr 2025 09:32:08 -0700 (PDT)
+Message-ID: <b3a66041-dce3-45db-8410-c67223151ce7@collabora.com>
+Date: Thu, 24 Apr 2025 18:32:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v4 0/6] Support Sixaxis gamepad with classic bonded
+ only
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20250424160236.179982-1-ludovico.denittis@collabora.com>
+ <CABBYNZKFmW8a3MggGHp23d5SYotGQKDZBzn4Q2EB-xUToAUhDQ@mail.gmail.com>
+Content-Language: en-US
+From: Ludovico de Nittis <ludovico.denittis@collabora.com>
+In-Reply-To: <CABBYNZKFmW8a3MggGHp23d5SYotGQKDZBzn4Q2EB-xUToAUhDQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-BT_IO_SEC_LOW is the only way to allow devices that use cable pairing to
-establish a connection.
+Hi Luiz,
 
-This adds the ability to start the listening input server with
-BT_IO_SEC_LOW to avoid breaking support for these devices, and then,
-in `hidp_add_connection()`, we check if either `classic_bonded_only` was
-disabled or if this device has `CablePairing`. If neither are true, we
-bump the security back to BT_IO_SEC_MEDIUM, i.e. enforcing encryption.
+On 4/24/25 6:18 PM, Luiz Augusto von Dentz wrote:
+> Hi Ludovico,
+>
+> On Thu, Apr 24, 2025 at 12:03 PM Ludovico de Nittis
+> <ludovico.denittis@collabora.com> wrote:
+>> This series adds a new "CablePairing" property to allow us to
+>> indentify devices that have been paired using a custom USB cable
+>> cable method and that don't support the canonical bonding with
+>> encryption. With that information, we can dynamically enforce
+>> encryption to drastically reduce the attack surface, compared to just
+>> disabling the "ClassicBondedOnly" property.
+>>
+>> The "CablePairing" property is exposed via D-Bus to allow
+>> clients to potentually show this information to end users.
+>>
+>> As far as I can tell, starting the listening input server with
+>> BT_IO_SEC_LOW and then bumping it in `hidp_add_connection()` should not
+>> have any negative effect regarding the overall security. However,
+>> please let me know if it turns out not being the case.
+>>
+>> Addresses https://github.com/bluez/bluez/issues/1165
+>>
+>> Changes in v2:
+>>   - Start the listening input server with BT_IO_SEC_LOW only if we
+>>     actually have a known sixaxis device
+>>
+>> Changes in v3:
+>>    - Change the property from being sixaxis specific to a generic
+>>      "CablePairing"
+>>    - Remove the manual validation of Sixaxis HID report descriptor
+>>      because we already replace it with a pre-dermined SDP record
+>>      in `sixaxis.c`
+>>
+>> Changes in v4:
+>>    - Instead of setting the server security level in adapter.c, we
+>>      do it when registering the input devices, during probing
+>>
+>> Ludovico de Nittis (6):
+>>    src: Add new CablePairing property
+>>    client: Print CablePairing property
+>>    sixaxis: Set CablePairing when pairing a Sixaxis with USB
+>>    adapter: Add btd_adapter_has_cable_pairing_devices()
+>>    input: Automatically use sec level low when using a cable paired
+>>      device
+>>    sixaxis: Set security level when adding a sixaxis device
+>>
+>>   client/main.c            |  1 +
+>>   doc/org.bluez.Device.rst |  7 +++++
+>>   plugins/sixaxis.c        |  8 ++++-
+>>   profiles/input/device.c  | 20 +++++++++++--
+>>   profiles/input/manager.c |  3 +-
+>>   profiles/input/server.c  | 63 ++++++++++++++++++++++++++++++++++++++--
+>>   profiles/input/server.h  |  3 +-
+>>   src/adapter.c            | 17 +++++++++++
+>>   src/adapter.h            |  1 +
+>>   src/device.c             | 40 +++++++++++++++++++++++++
+>>   src/device.h             |  2 ++
+>>   11 files changed, 157 insertions(+), 8 deletions(-)
+>>
+>> --
+>> 2.49.0
+>>
+> Looks like CI has found something not quite right still:
+>
+> https://github.com/bluez/bluez/pull/1191#issuecomment-2828175923
+>
 
-This allows supporting these devices without having to change the
-classic bonded only option.
----
- profiles/input/device.c  | 20 +++++++++++--
- profiles/input/manager.c |  3 +-
- profiles/input/server.c  | 63 ++++++++++++++++++++++++++++++++++++++--
- profiles/input/server.h  |  3 +-
- 4 files changed, 82 insertions(+), 7 deletions(-)
-
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 3627573e7..2fa4e0b82 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -47,6 +47,7 @@
- 
- #include "device.h"
- #include "hidp_defs.h"
-+#include "server.h"
- 
- #define INPUT_INTERFACE "org.bluez.Input1"
- 
-@@ -1065,6 +1066,7 @@ static gboolean encrypt_notify(GIOChannel *io, GIOCondition condition,
- static int hidp_add_connection(struct input_device *idev)
- {
- 	struct hidp_connadd_req *req;
-+	bool cable_pairing;
- 	GError *gerr = NULL;
- 	int err;
- 
-@@ -1088,8 +1090,10 @@ static int hidp_add_connection(struct input_device *idev)
- 	if (device_name_known(idev->device))
- 		device_get_name(idev->device, req->name, sizeof(req->name));
- 
-+	cable_pairing = device_is_cable_pairing(idev->device);
-+
- 	/* Make sure the device is bonded if required */
--	if (classic_bonded_only && !input_device_bonded(idev)) {
-+	if (!cable_pairing && classic_bonded_only && !input_device_bonded(idev)) {
- 		error("Rejected connection from !bonded device %s", idev->path);
- 		goto cleanup;
- 	}
-@@ -1098,7 +1102,9 @@ static int hidp_add_connection(struct input_device *idev)
- 	/* Some platforms may choose to require encryption for all devices */
- 	/* Note that this only matters for pre 2.1 devices as otherwise the */
- 	/* device is encrypted by default by the lower layers */
--	if (classic_bonded_only || idev->type == BT_UHID_KEYBOARD) {
-+	/* Don't enforce encryption for cable paired devices because they */
-+	/* don't support it */
-+	if (!cable_pairing && (classic_bonded_only || idev->type == BT_UHID_KEYBOARD)) {
- 		if (!bt_io_set(idev->intr_io, &gerr,
- 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
- 					BT_IO_OPT_INVALID)) {
-@@ -1546,6 +1552,16 @@ int input_device_register(struct btd_service *service)
- 	btd_service_set_user_data(service, idev);
- 	device_set_wake_support(device, true);
- 
-+	if (device_is_cable_pairing(device)) {
-+		struct btd_adapter *adapter = device_get_adapter(device);
-+		const bdaddr_t *adapter_bdaddr = btd_adapter_get_address(adapter);
-+
-+		DBG("This is a cable paired device, setting the listening input "
-+			"server security level accordingly");
-+
-+		server_set_cable_pairing(adapter_bdaddr, true);
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index d1accc24f..95ca0a7ee 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -33,7 +33,8 @@
- 
- static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
--	return server_start(btd_adapter_get_address(adapter));
-+	return server_start(btd_adapter_get_address(adapter),
-+				btd_adapter_has_cable_pairing_devices(adapter));
- }
- 
- static void hid_server_remove(struct btd_profile *p,
-diff --git a/profiles/input/server.c b/profiles/input/server.c
-index 79cf08a66..3de2282f6 100644
---- a/profiles/input/server.c
-+++ b/profiles/input/server.c
-@@ -266,12 +266,23 @@ drop:
- 	g_io_channel_shutdown(chan, TRUE, NULL);
- }
- 
--int server_start(const bdaddr_t *src)
-+static BtIOSecLevel get_necessary_sec_level(bool device_cable_pairing)
-+{
-+	/* Use lower security to allow the cable paired devices to connect. */
-+	/* Unless classic bonded only mode is disabled, the security level */
-+	/* will be bumped again for non cable paired devices in */
-+	/* hidp_add_connection() */
-+	if (device_cable_pairing)
-+		return BT_IO_SEC_LOW;
-+
-+	return input_get_classic_bonded_only() ? BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
-+}
-+
-+int server_start(const bdaddr_t *src, bool device_sixaxis_cable_pairing)
- {
- 	struct input_server *server;
- 	GError *err = NULL;
--	BtIOSecLevel sec_level = input_get_classic_bonded_only() ?
--					BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
-+	const BtIOSecLevel sec_level = get_necessary_sec_level(device_sixaxis_cable_pairing);
- 
- 	server = g_new0(struct input_server, 1);
- 	bacpy(&server->src, src);
-@@ -308,6 +319,52 @@ int server_start(const bdaddr_t *src)
- 	return 0;
- }
- 
-+int server_set_cable_pairing(const bdaddr_t *src, bool device_cable_pairing)
-+{
-+	struct input_server *server;
-+	GSList *l;
-+	BtIOSecLevel sec_level;
-+	const BtIOSecLevel new_sec_level = get_necessary_sec_level(device_cable_pairing);
-+	GError *err = NULL;
-+
-+	l = g_slist_find_custom(servers, src, server_cmp);
-+	if (!l)
-+		return -1;
-+
-+	server = l->data;
-+
-+	bt_io_get(server->ctrl, &err, BT_IO_OPT_SEC_LEVEL, &sec_level,
-+				BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		return -1;
-+	}
-+
-+	if (sec_level == new_sec_level) {
-+		DBG("The listening input server is already using the expected security level");
-+		return -1;
-+	}
-+
-+	DBG("Applying the new security level to the listening input server");
-+
-+	if (!bt_io_set(server->ctrl, &err, BT_IO_OPT_SEC_LEVEL, new_sec_level,
-+							BT_IO_OPT_INVALID)) {
-+		error("bt_io_set(OPT_SEC_LEVEL): %s", err->message);
-+		g_error_free(err);
-+		return -1;
-+	}
-+
-+	if (!bt_io_set(server->intr, &err, BT_IO_OPT_SEC_LEVEL, new_sec_level,
-+						BT_IO_OPT_INVALID)) {
-+		error("bt_io_set(OPT_SEC_LEVEL): %s", err->message);
-+		g_error_free(err);
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- void server_stop(const bdaddr_t *src)
- {
- 	struct input_server *server;
-diff --git a/profiles/input/server.h b/profiles/input/server.h
-index 50f4b6135..4ad82c10e 100644
---- a/profiles/input/server.h
-+++ b/profiles/input/server.h
-@@ -8,5 +8,6 @@
-  *
-  */
- 
--int server_start(const bdaddr_t *src);
-+int server_start(const bdaddr_t *src, bool device_cable_pairing);
-+int server_set_cable_pairing(const bdaddr_t *src, bool device_cable_pairing);
- void server_stop(const bdaddr_t *src);
--- 
-2.49.0
+Oops, it should be fixed in the v5.
 
