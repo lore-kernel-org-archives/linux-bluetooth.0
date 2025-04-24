@@ -1,66 +1,71 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10874292911
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 19:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F77292926
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 19:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745524609; cv=none; b=O4/606GR94bVWHR58oT4hO9fkno12XN7dpc+N0XkuW5b8G4oWQldCjQ83cbaFMs3367YE1hdcHS/iXK74Wy7M9udf813I1uZbqLZmNg2WB5R2WVn2/vOpoK4pvCGLPbaZmcpM/yUeDCA5m7TpeP8SWogcP2IAI0TQRfy5VZG4SU=
+	t=1745524613; cv=none; b=UpGL0tOuyv3DqFiJAEDRtY4hNH70NwaN7h5vn1esBk22YPhLtN8grS2uTAWWGCy25DzLw6Sfh92N4jzKVtxRPrD+DtSuNUKxk3e7VjpmWRwtqESwG55HAxU1+V+EsGwV3Cxy1LDhDPnD6zuYM8FreIQqeGuyT5pTvm3TBmF5fSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745524609; c=relaxed/simple;
-	bh=nrdqykpbBeh8ZTnJH/QaO682xvhQyktiTq8ZrElZjbg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=AjrPJxtziFoQajpBrMCuBl7Vkr/BNiRiBrxMODSjhhXK+yx0Zvve90F3GwdFHq6M9xb7/E0mKarFKYJYedlc8eRt/oiAOO7EH38XOHESBTd7/gqhqDV9n+F+gjzJcrhTprMpH1Ml3r6a1/cBUedHcnAa9eU4eJR7Nu58QLuZaUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EfVGUyUx; arc=none smtp.client-ip=209.85.221.179
+	s=arc-20240116; t=1745524613; c=relaxed/simple;
+	bh=cDvDLDekrJzxFm7cD6fZJ4cCUZ2Noz/cwMLJ42QCY8k=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VfB8elB9iCGppi2B537wP4wrFgz/seoLy+es5r5fO2erS/XkM/505XxDqZ8fYTURw2n7t+CNW+KKfVVsfbVBXdctdzSIdcOfD1GCE59iYEzcEdLlKaWByTKm6cpkyLuE9wdTkaLM5NZxHvjby6qUqBpznMGuuNtXyke2aDdufag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QPiXpeMw; arc=none smtp.client-ip=209.85.222.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfVGUyUx"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-525b44ec88aso684772e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 12:56:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPiXpeMw"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-86d69774081so663141241.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 12:56:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745524606; x=1746129406; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hWcUC95b7VNHsS4QYSms4r2gSRyPSA87tyFWHfvt5Jk=;
-        b=EfVGUyUx7QCm59lJ54+JGU5t9AeTApF5TT1BtlPwmrzTdb71FoZmXvGpc/JfpGK65z
-         IQlYGeJWV23GWHPEZXPV4fbWHqQtnLg8ewnjVENPQ59n3QFo8RRARlZ5Cs1rM8XCIpt4
-         qSscHTyYMm4+c6syifKPnEjOa+Xx2MIr9norG4AJF9eAhfs7nniOWlIPMqfo8JQeJRY5
-         eytRrLArcMpHNf/Dw1HVhPeKOmuIyL8jxFUiOfvGcA66iLmUU+D/rK4GTh+xcw7TUHCo
-         IG9MTmLkKWZ+bk5Wic95/6jeNdVZQiAFEBHFERtLQM/TcwZYjVqbVGiL6IBZPeLajs9k
-         ZgOg==
+        d=gmail.com; s=20230601; t=1745524610; x=1746129410; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sS4RL0z+Ob82qobo4tVa5DU3OE1E+MnCL7mnK/Gkylo=;
+        b=QPiXpeMwHkRZ85u49J33eCE3UT4H+WJ8/uIZrSt6mx6DBwXKt2cSfk49g0mfK7TIaH
+         88SuhSB+ok2qdTiskUOpY7d2tUXIfBYEZonMWeTnAVT2fZNj+kF2ow5BXQrxQCqz8xaz
+         mrklWCIuzG+p5Q1CPosceGpCZL36L/Gt8FkvtBAQ+1GBkR6O8XoF8K+VaROi5E8smSFB
+         IwCvCj2Ouge/nc9SRU9IlYdTlNjmoSBHnnCnCZy+HoLA3KeJ1iMCyt0LdvKbraAn8MRK
+         cQfeX8SF8eo5u7cVZwDnYAgCUg0qX63D+l/reXxbKUZGfPt1zFlohfOlxug0dsKuOej6
+         nKvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745524606; x=1746129406;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hWcUC95b7VNHsS4QYSms4r2gSRyPSA87tyFWHfvt5Jk=;
-        b=pSQPXd7YCZDIPS57M80JYZy/rFmxzt10AafZdMDE/1KG1PvaIYS0xng7E1IVXQDL1e
-         U5J3m77fH7EEr0S8my/dQGRR1DANaYNEUVHmyaVySdZJ0w8N8GeSSQFQvXCYuPSMMVLF
-         T6j6tWrSJDOsJ7lj22sGio+77mvrKxQBYdVjcR28XKRKLIECn9fNutp9efELQki1CFFt
-         8NKbzJiwx2xYPIPjOG0A42NUsRVvLhlOqmau4YC5xbwoyirJal///k9MYQ9YuvNQfk3E
-         ohsfcv757tX5G/6K5MCiLiMVbDIm2SMgBlWmEuGtgbEq0CWovhcDBIKpzlZ7cqyCfuX2
-         AmZA==
-X-Gm-Message-State: AOJu0YwXwI8kzlLLdYUee2YU54EHrO+DhZ8/W8BV3b4SDiNgAkMTOxiB
-	SRno3ejyqXlYV9ykMzp2Fb1DtFy/GvX3wnWgYkaNZB1v87Ev/qGnk0//nw==
-X-Gm-Gg: ASbGnctpt6m0z9nQLqVQKwfBxCLBAigbgOUngtNSXxGZ0urY1QwYX8HRnyd2bWIwras
-	qSrpFwaFegevOw0486KnEZcn3FiBBhod50hTFdcZzcYOf0Ekh5V+clbbO2raibJ3vKGET9vdDlG
-	DOWgsmWJjUGMgdhmg0++n8/hesfMcrEIh2EO+xGYyzdjx/eyonCUGSY6LtkmyfnJqMUB/iIHZ0g
-	AnDPCIY6pe95E2t1B19AcW3KMCmc2ax9HsWW4tDiHstJR85a8uNCZqU7vYo8RPVRv8TFTJXWmle
-	oYdDNg04h+Ar/pr6EeSjJxD5Yp7cVLo7FopPiV7KrH3gHY+9nYqei4Vl6B5X4Yc/2p28Xz7vY26
-	hV7whvd4B87WaearxWZO7
-X-Google-Smtp-Source: AGHT+IFWx+8Bn9I13J/l+6n+NekSzdQSZvwl+dXdufX9p3/IkgYkwVceRQpU362c1htS2bHr+lVOTQ==
-X-Received: by 2002:a05:6102:36d3:b0:4c3:9b0:9e6b with SMTP id ada2fe7eead31-4d4cdfbc9a2mr958893137.10.1745524606145;
-        Thu, 24 Apr 2025 12:56:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745524610; x=1746129410;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sS4RL0z+Ob82qobo4tVa5DU3OE1E+MnCL7mnK/Gkylo=;
+        b=jm597cXoXlUZeLjOwylNhfVEJfiE9fQH3DZ4R1Vks3QWjAD6fZnSfzR/zZB/kO6H2E
+         s3nSs757k/5iaMP5vVe03w/ofbzWo2v8LYG8XZp01oMy9Enqh55fdA6ylk5o74lpYcFY
+         yX112kevi1q9jFK6STHmjkWfTIKg/tkKucOf7QOatLtwA9nWEXRQUckWcp4tgf1lcSao
+         Fu9renVWN58ESGTgtU7YjhjOMlzft7WPe3+IwD6qoN1YDDaJdEHpCIrUpr+3gXEDIpt6
+         SpRE/tNIIJFv1hciQ/5FaKrRicR9neCiEpO0aQRIhxDKI+FabArQUYIA7hQYzpENabNF
+         cHQA==
+X-Gm-Message-State: AOJu0YyU9UPvw1vLwP9JguniWFZuVqFsQyOZpC3eT2u2FJTR8Mummu05
+	oeQ6TyEXGVpuzGjjHLzt2h4jsts359iKvyCY/JIHZDJTANlHfVkBbUo1Jg==
+X-Gm-Gg: ASbGncuuYN+3zvo37sY3pROco9idGElTn3lPEvgNvx2tJn4PwRs2so9xOHGLyj8xR6G
+	ppYCLndUEIAAVg1Fvqqa+MiVM3WP9H5wpqKAh2P4SfxitW8J9fPpwFJRdkjAfDp8Q6LxMpPw4Oq
+	q+EscfGL5QHuG7P5cOpRekuTKQqpc6xZXHiWwv04/fNT/CG6cJLMhWYZ6jxC2dwzsHWvwFXAWUk
+	cb+zVjQ/8kIWqSjUlK/N2U4DWLcgp/L/UnaXT0tCLCzIqC8BwpDeT1Y61Kmin++TNxPkheQnZZL
+	3veZunnHyhN867s8uXzzcPycvmfM4qfQ8bbOGTQE555Rk3aJcSLKFCCE4wy/dUOzP/+VbODQQQE
+	KmPY0mtvENw==
+X-Google-Smtp-Source: AGHT+IFn2m0eH5Da2wjgZ+pUSbLYhIGWLW8qP+hXpRB7mv5P1CRgiiFJGwXHLT+OZ/eH7Jm3rkcj6w==
+X-Received: by 2002:a05:6102:5793:b0:4c3:b0:46fd with SMTP id ada2fe7eead31-4d4d007eda6mr1375610137.24.1745524610008;
+        Thu, 24 Apr 2025 12:56:50 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4d3d49a9108sm379884137.5.2025.04.24.12.56.43
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4d3d49a9108sm379884137.5.2025.04.24.12.56.46
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 12:56:44 -0700 (PDT)
+        Thu, 24 Apr 2025 12:56:48 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] workflows: Add checkpatch action
-Date: Thu, 24 Apr 2025 15:56:41 -0400
-Message-ID: <20250424195643.1375697-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] workflows: Add lint action
+Date: Thu, 24 Apr 2025 15:56:42 -0400
+Message-ID: <20250424195643.1375697-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250424195643.1375697-1-luiz.dentz@gmail.com>
+References: <20250424195643.1375697-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,33 +76,51 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds checkpatch action rather replacing the custom CI one which
-will be going to be disabled.
+This adds lint action replacing the custom CI one which will be going
+to be disabled.
 ---
- .github/workflows/checkpatch.yml | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
- create mode 100644 .github/workflows/checkpatch.yml
+ .github/workflows/lint.yml | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100644 .github/workflows/lint.yml
 
-diff --git a/.github/workflows/checkpatch.yml b/.github/workflows/checkpatch.yml
+diff --git a/.github/workflows/lint.yml b/.github/workflows/lint.yml
 new file mode 100644
-index 000000000000..42ef7d03e157
+index 000000000000..9f775cf638f6
 --- /dev/null
-+++ b/.github/workflows/checkpatch.yml
-@@ -0,0 +1,14 @@
-+name: Checkpatch on PR
++++ b/.github/workflows/lint.yml
+@@ -0,0 +1,32 @@
++---
++name: Lint
 +
-+on: [pull_request]
++on: # yamllint disable-line rule:truthy
++  push: null
++
++permissions: {}
 +
 +jobs:
-+  my_review:
-+    name: checkpatch
++  build:
++    name: Lint
 +    runs-on: ubuntu-latest
++
++    permissions:
++      contents: read
++      packages: read
++      # To report GitHub Actions status checks
++      statuses: write
++
 +    steps:
-+    - uses: actions/checkout@v1
-+    - name: Run checkpatch review
-+      uses: webispy/checkpatch-action@master
-+      env:
-+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
++      - name: Checkout code
++        uses: actions/checkout@v4
++        with:
++          # super-linter needs the full git history to get the
++          # list of files that changed across commits
++          fetch-depth: 0
++
++      - name: Super-linter
++        uses: super-linter/super-linter@v7.3.0 # x-release-please-version
++        env:
++          # To report GitHub Actions status checks
++          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 -- 
 2.49.0
 
