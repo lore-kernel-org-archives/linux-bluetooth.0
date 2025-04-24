@@ -1,243 +1,178 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3524B2820B9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB9E284679
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745510612; cv=none; b=XeSIdqU7RhwnnHDaXSnkP07i/YHgibOKA+cd6HPZRSHEDrBWFkO7NfP+sV5BJ7ffgd1sjws2NrO4zCWXdXNaO2zH7GdQZDTmQcW3zgYx9eWRCePSTVm8yCVOFocsFW5rIxEJ172bdUJEKgfgH07MaIjAHQVQu9aOUlN8wK9aruo=
+	t=1745511105; cv=none; b=lpcAEk13DwKCBtnF4ZvEwy2oxnsLLxxH6xe3HoX2mSNqsQ3441D6q3RmtHcme4x/f644N1C1ON8JtIYWMqvLugY2ZUPpwez4BkzbuiWgwiprRQPIYaVKLMMjSGLxYQqfdNaho206exOLQrB+veNJvqVChFOsSrDfnY7ose+2Uf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745510612; c=relaxed/simple;
-	bh=pUSuEiGELLJxwFbspNXX02w0xcO7ksP1hlZbyaFv1bw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YnKYHmHwIpqcygKjWj7NcryCngdt9jti86AMsCQCYdHzAArrNneA8Zey95HFDH3sw+0ESq2N+RzTGV1QGPU+UwTRo66oXADtqZCvqEcD7nxwKgI0uvN9e3w91hh/lnNffPGpL0VUTYHyYfHmvGB9AOtKyqwHUhBGY1myuRc5k9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=FBXCAmYP; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1745511105; c=relaxed/simple;
+	bh=odqxKj5ld20EjV3R/ey1WjH3DY9tk9XZKtZ2hjFQ9uQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=bVLIjDl2uKt8Mlb2LKwwIVKT5VSFLyBQfpZ2BMY4GydvMPE7IXTAROC8mm0CaGoucY7n8+b08kQLyMnLXwdMZEAM6O0z4+rpDNdyuYQVD1HBQGYLEVaSYtOU4sTU7en+zbMW83K/kuH2kpEtoC/vhYx4A5h8m2GHe8+paodYG4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lZ5ErMuT; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FBXCAmYP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1745510606;
-	bh=pUSuEiGELLJxwFbspNXX02w0xcO7ksP1hlZbyaFv1bw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FBXCAmYPcCSmEs1ABXzy/wUAB8cJpmWyS09HHsEzhlUeTroytGbGENhqy6AjSUkBD
-	 OnoN+59onX5P1+DD37uKK48cMSAuBqyE5Ze7yY57toSekVcLMl704fu5YnjKDd4kkj
-	 d+EJobuCKLFHo8l9Hh4M+JEOP9SiruzbP+AKJ+aGn3JLB1c56cJatMvcB7CGjRtEPy
-	 TPF09R4z49A8eby4UGX0M14U7SpOXhQypdCewcDpbwhPQx0HnS5go25yVqfX98lChF
-	 fcMtiLh2eaABJpefMGEXEkWaV3qp1LAI/Uio78JygAZUf/ANBlV7kDBb369Icym6Re
-	 Fg9nbm4I2o/Gg==
-Received: from localhost.localdomain (unknown [81.56.51.115])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: denittis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id E89C417E362C;
-	Thu, 24 Apr 2025 18:03:25 +0200 (CEST)
-From: Ludovico de Nittis <ludovico.denittis@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lZ5ErMuT"
+Received: from github.com (hubbernetes-node-eaaf49b.ac4-iad.github.net [10.52.211.57])
+	by smtp.github.com (Postfix) with ESMTPA id 76CDC70072E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 09:11:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745511102;
+	bh=xJZr0lOJ9N7A2noEpo86fOtNIGQBVHxsAgDAA4gERx0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=lZ5ErMuTwuFx8Iq54/KAxh6T9vuAt1E0E5UZ/FKKrqeNP77OTHwheXZxI2XMSatxf
+	 xMsydITPKeJYDEn8FacgJG4u3TINT7d2RyQWG1i2hB5Kk9PNqww2nH9D2Ymaff5DQI
+	 sDLnzwXzq9iqgcCKHs3NeAp0aqoRHzEH6LQ6OkuY=
+Date: Thu, 24 Apr 2025 09:11:42 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ludovico de Nittis <ludovico.denittis@collabora.com>
-Subject: [PATCH BlueZ v4 5/6] input: Automatically use sec level low when using a cable paired device
-Date: Thu, 24 Apr 2025 18:02:35 +0200
-Message-ID: <20250424160236.179982-6-ludovico.denittis@collabora.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250424160236.179982-1-ludovico.denittis@collabora.com>
-References: <20250424160236.179982-1-ludovico.denittis@collabora.com>
+Message-ID: <bluez/bluez/push/refs/heads/956257/000000-3e0c4a@github.com>
+Subject: [bluez/bluez] e43e99: pbap: Support calling pbap_init() after
+ pbap_exit()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-BT_IO_SEC_LOW is the only way to allow devices that use cable pairing to
-establish a connection.
+  Branch: refs/heads/956257
+  Home:   https://github.com/bluez/bluez
+  Commit: e43e99d1d30eb70a67f6c8b5a983e45d9a1522de
+      https://github.com/bluez/bluez/commit/e43e99d1d30eb70a67f6c8b5a983e45d9a1522de
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
 
-This adds the ability to start the listening input server with
-BT_IO_SEC_LOW to avoid breaking support for these devices, and then,
-in `hidp_add_connection()`, we check if either `classic_bonded_only` was
-disabled or if this device has `CablePairing`. If neither are true, we
-bump the security back to BT_IO_SEC_MEDIUM, i.e. enforcing encryption.
+  Changed paths:
+    M obexd/client/pbap.c
 
-This allows supporting these devices without having to change the
-classic bonded only option.
----
- profiles/input/device.c  | 20 +++++++++++--
- profiles/input/manager.c |  3 +-
- profiles/input/server.c  | 63 ++++++++++++++++++++++++++++++++++++++--
- profiles/input/server.h  |  3 +-
- 4 files changed, 82 insertions(+), 7 deletions(-)
+  Log Message:
+  -----------
+  pbap: Support calling pbap_init() after pbap_exit()
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 3627573e7..2fa4e0b82 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -47,6 +47,7 @@
- 
- #include "device.h"
- #include "hidp_defs.h"
-+#include "server.h"
- 
- #define INPUT_INTERFACE "org.bluez.Input1"
- 
-@@ -1065,6 +1066,7 @@ static gboolean encrypt_notify(GIOChannel *io, GIOCondition condition,
- static int hidp_add_connection(struct input_device *idev)
- {
- 	struct hidp_connadd_req *req;
-+	bool cable_pairing;
- 	GError *gerr = NULL;
- 	int err;
- 
-@@ -1088,8 +1090,10 @@ static int hidp_add_connection(struct input_device *idev)
- 	if (device_name_known(idev->device))
- 		device_get_name(idev->device, req->name, sizeof(req->name));
- 
-+	cable_pairing = device_is_cable_pairing(idev->device);
-+
- 	/* Make sure the device is bonded if required */
--	if (classic_bonded_only && !input_device_bonded(idev)) {
-+	if (!cable_pairing && classic_bonded_only && !input_device_bonded(idev)) {
- 		error("Rejected connection from !bonded device %s", idev->path);
- 		goto cleanup;
- 	}
-@@ -1098,7 +1102,9 @@ static int hidp_add_connection(struct input_device *idev)
- 	/* Some platforms may choose to require encryption for all devices */
- 	/* Note that this only matters for pre 2.1 devices as otherwise the */
- 	/* device is encrypted by default by the lower layers */
--	if (classic_bonded_only || idev->type == BT_UHID_KEYBOARD) {
-+	/* Don't enforce encryption for cable paired devices because they */
-+	/* don't support it */
-+	if (!cable_pairing && (classic_bonded_only || idev->type == BT_UHID_KEYBOARD)) {
- 		if (!bt_io_set(idev->intr_io, &gerr,
- 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
- 					BT_IO_OPT_INVALID)) {
-@@ -1546,6 +1552,16 @@ int input_device_register(struct btd_service *service)
- 	btd_service_set_user_data(service, idev);
- 	device_set_wake_support(device, true);
- 
-+	if (device_is_cable_pairing(device)) {
-+		struct btd_adapter *adapter = device_get_adapter(device);
-+		const bdaddr_t *adapter_bdaddr = btd_adapter_get_address(adapter);
-+
-+		DBG("This is a cable paired device, setting the listening input "
-+			"server security level accordingly");
-+
-+		server_set_cable_pairing(adapter_bdaddr, true);
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index d1accc24f..95ca0a7ee 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -33,7 +33,8 @@
- 
- static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
--	return server_start(btd_adapter_get_address(adapter));
-+	return server_start(btd_adapter_get_address(adapter),
-+				btd_adapter_has_cable_pairing_devices(adapter));
- }
- 
- static void hid_server_remove(struct btd_profile *p,
-diff --git a/profiles/input/server.c b/profiles/input/server.c
-index 79cf08a66..e1160d668 100644
---- a/profiles/input/server.c
-+++ b/profiles/input/server.c
-@@ -266,12 +266,23 @@ drop:
- 	g_io_channel_shutdown(chan, TRUE, NULL);
- }
- 
--int server_start(const bdaddr_t *src)
-+static BtIOSecLevel get_necessary_sec_level(bool device_cable_pairing)
-+{
-+	/* Use lower security to allow the cable paired devices to connect. */
-+	/* Unless classic bonded only mode is disabled, the security level */
-+	/* will be bumped again for non cable paired devices in
-+	/* hidp_add_connection() */
-+	if (device_cable_pairing)
-+		return BT_IO_SEC_LOW;
-+
-+	return input_get_classic_bonded_only() ? BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
-+}
-+
-+int server_start(const bdaddr_t *src, bool device_sixaxis_cable_pairing)
- {
- 	struct input_server *server;
- 	GError *err = NULL;
--	BtIOSecLevel sec_level = input_get_classic_bonded_only() ?
--					BT_IO_SEC_MEDIUM : BT_IO_SEC_LOW;
-+	const BtIOSecLevel sec_level = get_necessary_sec_level(device_sixaxis_cable_pairing);
- 
- 	server = g_new0(struct input_server, 1);
- 	bacpy(&server->src, src);
-@@ -308,6 +319,52 @@ int server_start(const bdaddr_t *src)
- 	return 0;
- }
- 
-+int server_set_cable_pairing(const bdaddr_t *src, bool device_cable_pairing)
-+{
-+	struct input_server *server;
-+	GSList *l;
-+	BtIOSecLevel sec_level;
-+	const BtIOSecLevel new_sec_level = get_necessary_sec_level(device_cable_pairing);
-+	GError *err = NULL;
-+
-+	l = g_slist_find_custom(servers, src, server_cmp);
-+	if (!l)
-+		return -1;
-+
-+	server = l->data;
-+
-+	bt_io_get(server->ctrl, &err, BT_IO_OPT_SEC_LEVEL, &sec_level,
-+				BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		return -1;
-+	}
-+
-+	if (sec_level == new_sec_level) {
-+		DBG("The listening input server is already using the expected security level");
-+		return -1;
-+	}
-+
-+	DBG("Applying the new security level to the listening input server");
-+
-+	if (!bt_io_set(server->ctrl, &err, BT_IO_OPT_SEC_LEVEL, new_sec_level,
-+							BT_IO_OPT_INVALID)) {
-+		error("bt_io_set(OPT_SEC_LEVEL): %s", err->message);
-+		g_error_free(err);
-+		return -1;
-+	}
-+
-+	if (!bt_io_set(server->intr, &err, BT_IO_OPT_SEC_LEVEL, new_sec_level,
-+						BT_IO_OPT_INVALID)) {
-+		error("bt_io_set(OPT_SEC_LEVEL): %s", err->message);
-+		g_error_free(err);
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- void server_stop(const bdaddr_t *src)
- {
- 	struct input_server *server;
-diff --git a/profiles/input/server.h b/profiles/input/server.h
-index 50f4b6135..4ad82c10e 100644
---- a/profiles/input/server.h
-+++ b/profiles/input/server.h
-@@ -8,5 +8,6 @@
-  *
-  */
- 
--int server_start(const bdaddr_t *src);
-+int server_start(const bdaddr_t *src, bool device_cable_pairing);
-+int server_set_cable_pairing(const bdaddr_t *src, bool device_cable_pairing);
- void server_stop(const bdaddr_t *src);
--- 
-2.49.0
+pbap_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
 
+Send the UnregisterProfile message directly from pbap_exit(),
+then call unregister_profile().
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: 0fa4ecbe78f50a476fdbdcf257468ecd2fd27e34
+      https://github.com/bluez/bluez/commit/0fa4ecbe78f50a476fdbdcf257468ecd2fd27e34
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M obexd/plugins/bluetooth.c
+
+  Log Message:
+  -----------
+  obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
+
+bluetooth_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
+
+Send UnregisterProfile messages directly from bluetooth_exit(),
+then call unregister_profile(profile).
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
+
+Do not free profiles in bluetooth_exit() - profiles are needed
+by a future call to bluetooth_init(), or will be freed by
+bluetooth_stop() if necessary.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: dcd6c02f34ee7e92627a363a70eacb460ccd60a9
+      https://github.com/bluez/bluez/commit/dcd6c02f34ee7e92627a363a70eacb460ccd60a9
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M Makefile.obexd
+    M obexd/client/pbap.c
+    M obexd/plugins/bluetooth.c
+    A obexd/src/logind.c
+    A obexd/src/logind.h
+    M obexd/src/main.c
+
+  Log Message:
+  -----------
+  obex: unregster profiles when the user is inactive
+
+Obexd is usually run as a user service, and can exhibit surprising
+behaviour if two users are logged in at the same time.
+
+Unregister profiles when the user is detected to be off-seat.
+
+It may be impossible to detect whether a user is on-seat in some cases.
+For example, a version of obexd compiled with systemd support might be
+run outside of a systemd environment.  Warn and leave services
+registered if that happens.
+
+Obexd can be run as a system service, in which case this check makes no
+sense.  Disable this check when called with `--system-bus`.
+
+Obexd can also be run by a user that does not have an active session.
+For example, someone could use `ssh` to access the system.  There might
+be a use case where someone needs Bluetooth access but can't log in with
+a keyboard, or there might be a security issue with doing so.  This isn't
+handled explicitly by this patch, but a future patch could add support
+by calling `logind_set(FALSE)` in the same way as is currently done
+with `--system-bus`.
+
+Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+
+Other services are likely to need similar functionality,
+so I have created a gist to demonstrate the basic technique:
+https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: 3e0c4ade6389e70d86e41f4b734bb3558b499ac1
+      https://github.com/bluez/bluez/commit/3e0c4ade6389e70d86e41f4b734bb3558b499ac1
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M obexd/src/obex.service.in
+
+  Log Message:
+  -----------
+  Revert "obexd: only run one instance at once"
+
+No longer needed now services can share resources.
+
+This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+Compare: https://github.com/bluez/bluez/compare/e43e99d1d30e%5E...3e0c4ade6389
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
