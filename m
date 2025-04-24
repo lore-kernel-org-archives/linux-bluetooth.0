@@ -1,35 +1,35 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8CA27F744
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD02227F73A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 15:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745509523; cv=none; b=G7gjvycMZjnhUEq7tz1pNDfP8sA1b9GiZUqjcBzP5TKymetyLi8+TH2PMO97LlWfCgKgPQNm7eL+eXCMD0DKwBLOgljQSk4LBx8XqncbNBUlk8ZbSbLSlw7DP+B/mh+Qr0ul+mJdldJJKarD3kab7QKXK8aaciqYPrRs+EvQpWw=
+	t=1745509530; cv=none; b=YgrmetQukQk5iSVa90B7M0GpcktctoBT9WlcBY92ctJvVNkp4/tFCpoelxzHLiUImojWjOOie+Rz9E8EbczAiObXXdYAFCs4oSajWiQSJHcK2O0T5+c83cpm3uXoRe0E80AsD/UT9P36CAsgoTWg5HNmDp8jVsi54R3Z3pkPovk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745509523; c=relaxed/simple;
-	bh=5HfCS+4k0OMFQ2brGukEOOormWaaZsVv+2NMO5A5QW8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HNRtXxafc0EcOrUPsVODHv+Y60cD20SsneyAZOEGCsCwpZAgtSLRSFl2ya7wpkqioQDDSQ0lL1uqkORv10dSaYibqH+CNzR5CZenaYYL4f98WMYFW+rYB9MbsCTEJhL4FuEg3otKBwkhYJfnizW7nyIuPYOkJgGT//TFvqnBeWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VQ0Heopm; arc=none smtp.client-ip=192.30.252.200
+	s=arc-20240116; t=1745509530; c=relaxed/simple;
+	bh=9rL4FQnPkmCyP8Zu0CsHvqDUVyySgiKlMxIlVR/KJvA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=n4XHHyYn+LU33tSrsx2ZyOKFj+KL+jiMGOr8jFcDaUSsCF3OEDoC2QgURBWX6BVM6xVQjvdH4evxHLElHIeRpKIBARzUzwpadu1VoTYT+s+gwPZPOnBq7Roz9+gusrn2tNdIIjsnvdQyDJTtT57ITDjmM+jUlYi2En5fBruLV90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kw7KJJox; arc=none smtp.client-ip=192.30.252.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VQ0Heopm"
-Received: from github.com (hubbernetes-node-f819557.va3-iad.github.net [10.48.132.33])
-	by smtp.github.com (Postfix) with ESMTPA id 38BBE4E026C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:45:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kw7KJJox"
+Received: from github.com (hubbernetes-node-c191d69.ac4-iad.github.net [10.52.205.75])
+	by smtp.github.com (Postfix) with ESMTPA id 3A1E921014
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 08:45:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745509519;
-	bh=4XkVjV8S05oFCbESheAVcvMkBTl9OnX7B5XOFHJ/+4Q=;
+	s=pf2023; t=1745509521;
+	bh=Tm5Z0B4MdnmXmlYWZOXYnYLL7qdob+5gF2BeyCWH/IM=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=VQ0HeopmK7NVius9DPHJCpZghai/zBWBF+MxhfosaCC8omW0XvkTFf7TGMWrhsgBW
-	 AZCYBATTfUlfYDenXV472PW1IzQcxYBq2/arGbgz4kkDSfY9bnAau79BlrrGtxhW/c
-	 dP2Gl2AFEIq6+z0yavw2Wag7qXeRnEcTFMVFdli8=
-Date: Thu, 24 Apr 2025 08:45:19 -0700
-From: "github-actions[bot]" <noreply@github.com>
+	b=kw7KJJoxe4yTYgw+F4KoL+QgU0y5Z3W0nxse3+zDXYv2qnuQlNQ3qKCEUmCO7dha9
+	 ovGhYZ3QSb3j8x2W4IXhHYE8iCZCmpxwhHObBgPIcKqmfi61PtB19Jlf+iBR5Y0Q/j
+	 C8O+I5IQaPJZ+++K4zhYMpFUsgkH8AFsWX2hO6xc=
+Date: Thu, 24 Apr 2025 08:45:21 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/955281/000000-889087@github.com>
-Subject: [bluez/bluez] 889087: obex: Send response to client for Abort request
+Message-ID: <bluez/bluez/push/refs/heads/955284/000000-6ae7c4@github.com>
+Subject: [bluez/bluez] 1e7f2a: org.bluez.Media: add SupportedFeatures
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,35 +42,44 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/955281
+  Branch: refs/heads/955284
   Home:   https://github.com/bluez/bluez
-  Commit: 889087d13261d2f6fb7ee9cff1a56d46dd6b714b
-      https://github.com/bluez/bluez/commit/889087d13261d2f6fb7ee9cff1a56d46dd6b714b
-  Author: Amisha Jain <quic_amisjain@quicinc.com>
+  Commit: 1e7f2ad78caad4c096cdcc5a565cac68733ad6d9
+      https://github.com/bluez/bluez/commit/1e7f2ad78caad4c096cdcc5a565cac68733ad6d9
+  Author: Pauli Virtanen <pav@iki.fi>
   Date:   2025-04-24 (Thu, 24 Apr 2025)
 
   Changed paths:
-    M obexd/src/obex.c
+    M doc/org.bluez.Media.rst
 
   Log Message:
   -----------
-  obex: Send response to client for Abort request
+  org.bluez.Media: add SupportedFeatures
 
-Incase of ongoing transfer, If the client sends Abort request, Server is not
-sending any response back.
+Add SupportedFeatures property for feature information that applications
+cannot find otherwise.
 
-Ideally it should send OK or Success reponse code for the abort command.
-
-This is required in PTS testing for passing below testcases -
-1) OPP/SR/OPH/BV-27-I
-To verify that a server can respond to an ABORT from the client during an OBEX operation.
-2)FTP/SR/OTR/BV-02-C
-To verify that the pushed file is aborted normally.
-3)PBAP/PSE/PDF/BV-06-I
-Verify that the PCE can abort a Phone Book object download from the PSE.
-4)PBAP/PSE/PBF/BV-03-I
-Verify that the PCE can abort a vCard-listing object download from the PSE.
+Add feature tx-timestamping. Applications cannot enable it on old BlueZ
+versions without that feature, as it requires special handling on BlueZ
+side.
 
 
+  Commit: 6ae7c4ed188dd06423d26a480dbad895b71e2298
+      https://github.com/bluez/bluez/commit/6ae7c4ed188dd06423d26a480dbad895b71e2298
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M profiles/audio/media.c
+
+  Log Message:
+  -----------
+  media: implement SupportedFeatures property
+
+Add org.bluez.Media.SupportedFeatures. The value tx-timestamping is
+hardcoded as it is currently always enabled.
+
+
+Compare: https://github.com/bluez/bluez/compare/1e7f2ad78caa%5E...6ae7c4ed188d
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
