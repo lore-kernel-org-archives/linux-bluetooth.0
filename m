@@ -1,83 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987731891AA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 20:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1361FE46D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 20:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745525003; cv=none; b=fNKTEC2UBxX6I1cJuDKL9f/z2R2MXL2Qt6EzLc9nOTpQ7nSPT0FdeCmV7cxkdjs6kbsLypoxmjwvPvs7kP6fWUXEQhQUQYEoUYwQiWWzZRm1Nr91Duu5yKulbRHxRtEGWhbYIB2i9V4qB3aqz66OfZSep95y71DsPNLoxN2x0ro=
+	t=1745526009; cv=none; b=aKXhTGXApcTxyFaIkgQu1Jah1xTcbRWgppdqteoa8WCqTyzGfwbUmNw+op5p37b57vQG62Hku0tE1iIpRkbHccQZeDGmZF+iF4ag5jfnBjeGyziB/2P+zvahvT8vMLzTotugfzyx/P4Dt+VZJjDq4dmUQRZiVhXmJA0U9aQYRCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745525003; c=relaxed/simple;
-	bh=WyBS+7xFCHv+gM1Vj+1iIDx1AYgOJA8woifn5m+SAAk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JnYZOfknuxNSRbioZcpOgDTAHIjj6jV5QmfeRVc6GAjm0+FdqJSSDxdDMYbtJN1AdRMhxS0th5PT59yBAK6geMVyURoblU668IxGrjAwCYPP1RLb9H9KLq0kYjUE7/tXSciNMy4geo3IEElw4bgoNy1OKG5Db+7yWKDwA3c5Hy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vK3h5cAT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745526009; c=relaxed/simple;
+	bh=0uBFjQK55vtJmavjqaPicM6t21S5KJsRzcRFSUfOPqI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SFj43It4jhyn02NH/2DyRSSeGprCPJBu06cxLWrcoctOCQzS6bRlghuG8DYUwr+xfgYMXdGKFDvY9noyw98smvMeWuiW3DtVRdTvZYbb6VLd368Do0gdTT11yxY+KlSN75zh9A2HXF7VV5QEhsPfN9QFb27qtbC+lwB3uu71MFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nkjDIbsi; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vK3h5cAT"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 18285C4CEE4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 20:03:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745525003;
-	bh=WyBS+7xFCHv+gM1Vj+1iIDx1AYgOJA8woifn5m+SAAk=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=vK3h5cATo3BnKLa66w469vaHo9MvfLZ4PXC3W+7ILhCoJb6a7zVe66+EfagIxI9VU
-	 BofEkwr72F/xVxQraCBjeAUYibEE6b0WlO6Hjpe2OJBzfSL32Y9AzjKY+xtRnFXzO+
-	 ySP6HI9/I/ZZHEHw3DWC7R0QoRnFVToJBEbpr6a/ASkonXI+T5eheG4ZpWf1sxbU4d
-	 mniqpfDKmoCXm+KMgPcDQuC8CabBnENxM5poNo2PIgR47TBP3WEv6iIATDp3xyAaDN
-	 pp6tcmG/XacrFD+gQ3f7n7bT/BFH/deo/H2UGiOr4pXxsqdi6dsTyxntargTu77bjI
-	 VEBlkAp5mkjuw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 0CAAEC41613; Thu, 24 Apr 2025 20:03:23 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219854] Bluetooth devices can't connect after toggling
- Bluetooth unless they are re-paired
-Date: Thu, 24 Apr 2025 20:03:22 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: UNREPRODUCIBLE
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219854-62941-Fuhnhhe2lW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219854-62941@https.bugzilla.kernel.org/>
-References: <bug-219854-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkjDIbsi"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30bfc79ad97so28496281fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 13:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745526006; x=1746130806; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RuOVEW/w23OTlYq5VD/9jLEhFG5pDF0yoyq7+5+r1rs=;
+        b=nkjDIbsi33EtzQSFaphzlldUNv/CIIqeIjjLPcHZt+cVAHJuO5foPStzDaSo30ivcw
+         dF/inxUh/ypMCNmlQDv2eikIDMw5MPhC3U8uNp95pWRuF6tVGF2cwONVAgLLbX6ur33H
+         9NSzD85DKCxiCc5H0Ifd4Shc5UDX6FKtxVQdhRQ0W8/MghyNIL3qXUvDEQif83Z8K8OJ
+         3g1UKbvaY/mU3M2jaPbva86N0wadgPuHr7Ak+/9pBjVZeWcRuxmZP6VY/2R6gXF/KW9G
+         TrehyIV4OaDtrPK+V6ApJfQusWnm4mmRYDITVdEK9asUYnXBpEdSPllrmIihTNl8xSSQ
+         vE9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745526006; x=1746130806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RuOVEW/w23OTlYq5VD/9jLEhFG5pDF0yoyq7+5+r1rs=;
+        b=JSWswfZPmFGXF/u2uzh7sn+OPV7G7ZMVT8mnSvLvRjje/YyLc6h0bHLjsvTNd44yxV
+         UPB/U/sgDUDN41S6ooz9GIRtgxS1jh+j45/CRYva4FiRI21fyMcI5AYlNrAq8gc9vXSd
+         I4W8ZEPVWIq9FVU/2HNFIcVfP//A1AHF0PH9aESXE1iW2gU+0dtX3l1c0R7k07K8Ha2f
+         KzdHlIMh6Pv0rx1JG6qjdZNs1kMAPCoccvfFwlhhMv8lN2Y+HtRDQ2CTBPwzt8c9v7Te
+         DFyKA1zAn0zieJPPikGJLr5TsWkvkCuWFB76R5T8HsoYP3A58LTuGja5ILiBPGdM+EHv
+         Am5Q==
+X-Gm-Message-State: AOJu0Ywu+PWyMnusgv+VWmIj4m73BOXfgQ4ouCgmI7U7ozcbuPAGzzyB
+	Q8g8Nx6vpGYvh997R1uWaHvAIdEuNPSxxTAgCfQZcuY+mPgpFZuIgyuUQIjfvRrlmJ6PshQ9Hdm
+	RXQLqLEhaFo5MLQsNF4azJB4z8hBVikbY
+X-Gm-Gg: ASbGncvWkyGSSI2nss6QgI5EQ1FagHvid7y/ZY46nytccinU5Mue/dkPdD/0CguEmpk
+	x253n45m/lgQeBVGM4qgH+ZUNqkBGaIbeUcesupOSom/iZY/6S/03p5G3pAXZ1YsGtmboGcbj62
+	akRYLIRR852RFkvxlvpYLl
+X-Google-Smtp-Source: AGHT+IGlOe//WYFM+JV3Op06hzYw+TuBSaTl2fXdDailwPu2EeCrLa2Ov163i3mDg/SJ7NVByCCwyeksQUqHUJ+3xqk=
+X-Received: by 2002:a05:651c:1446:b0:30d:b2a6:8e1b with SMTP id
+ 38308e7fff4ca-317cde05f21mr11419311fa.13.1745526005527; Thu, 24 Apr 2025
+ 13:20:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <01117138d56019a8598f24f0df2dd289713cfab4.1745524193.git.pav@iki.fi>
+In-Reply-To: <01117138d56019a8598f24f0df2dd289713cfab4.1745524193.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 24 Apr 2025 16:19:52 -0400
+X-Gm-Features: ATxdqUFXrK5XbyAkY8nwQoG-ez3GEAtDQDQqvoVomXx7tm-Bysl-G2PWCZHUeA0
+Message-ID: <CABBYNZKRDZRUW-H9gXaS3kjxgcK8UXieQ0_S2Gtdjvbctgks-g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: copy RX timestamp to new fragments
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219854
+Hi Pauli,
 
-Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
+On Thu, Apr 24, 2025 at 3:59=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Copy timestamp too when allocating new skb for received fragment.
+> Fixes missing RX timestamps with fragmentation.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |pmenzel+bugzilla.kernel.org
-                   |                            |@molgen.mpg.de
+Hmm I though it only matters for TX timestamp but this is actually
+different,  anyway I don't think it would be possible to backport to
+that old patch, so we might need to use a more recent one when we
+introduced l2cap_recv_frag to make sure it properly backported:
 
---- Comment #3 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
- ---
-Should it happen again, I think, the output of `sudo btmon` could be helpfu=
-l.
+Fixes: 4d7ea8ee90e4 ("Bluetooth: L2CAP: Fix handling fragmented length")
+
+I can fix it up in place though, so don't bother spinning a new one,
+btw shall we replace the __net_timestamp with skb_set_delivery_time?
+
+> ---
+>  net/bluetooth/l2cap_core.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 5ca7ac43c58d..73472756618a 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -7415,6 +7415,9 @@ static int l2cap_recv_frag(struct l2cap_conn *conn,=
+ struct sk_buff *skb,
+>                         return -ENOMEM;
+>                 /* Init rx_len */
+>                 conn->rx_len =3D len;
+> +
+> +               skb_set_delivery_time(conn->rx_skb, skb->tstamp,
+> +                                     skb->tstamp_type);
+>         }
+>
+>         /* Copy as much as the rx_skb can hold */
+> --
+> 2.49.0
+>
+>
+
 
 --=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Luiz Augusto von Dentz
