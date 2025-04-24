@@ -1,131 +1,164 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AAE284670
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745512338; cv=pass; b=YPSgxkvFuyRmOgcATj/t0S5OwyriCjKXcyK8RZMA7k+3Zsq3viJ+d77/NnvzkekLX+zIrwrCF9ogEEMWnk/7lsICgkEAfHaQ13PW/z9ZD8MD64kP4TNM1GdEpwIOy5ukDqNq+DSOpyulu2EidGFlMlosDOC+fd3PqgMXdETbZ8k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745512338; c=relaxed/simple;
-	bh=EFeZtfM79JvEhUrbqIGGnna3hRelxbspI896dxz9Evc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W8v4lkAIp609Ap8YKGx7vTW8fGMRNczhNGbmrhzWhlx44Uf9bSFT2UzMZxQzdk63vAMMgmZuoUSwQHRLFsjzUUgrcfXs0DSq3vRkAsy3UZcWiqFj79SJ3AwlJeRDHJPLPJxsuGhDp7mSfUWhQPfAYr+Fa7w7w1HHtjCs1tSuXjs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b=GrxoWUtn; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119FC27FD79
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 16:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745512640; cv=none; b=iBuGiWI1fv7mwci1CG3yLH4YwNafElu009PjO5XTAxAjZ/TFvaBPkPW99NDr+uwa9X1+oG2COpSpcdFbz62ClIegVelo2YmuIcNAPZWmLGin1xxLowKCBtQ+dbYWpgLpBAFPlUurCf0QHm99XqYu6VNSBShkTiCc1/DFYRYaxyM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745512640; c=relaxed/simple;
+	bh=hophk24uQ99G1DM5bJ6BVbZ/oO7aUWAUb/6tuR2OSas=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=B0M/syIg0eBdPfgq4zsVXnFOVPwQVsmOitP2BK+TGiGAtawjZTsto52mdSawV8bCBePzpDMq2Tio/HB8mWKBbVC2xmStyRoCvn4V/VVLOwUj7hSEK3gxbGHc+w3xI0k78s6h8qJT1CuntE+SWdzif/AFZt8/q5z06TbVnoKm1uE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XAbAV2mm; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=ludovico.denittis@collabora.com header.b="GrxoWUtn"
-ARC-Seal: i=1; a=rsa-sha256; t=1745512331; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=NbNZF9IJ2LQ5UZbKSJ/JFtQYmSZWOUt7cqnh3ou8ctpeNLodamixQowXY6UgFbGVwH7TpRaNuOC6NFGtvQLk5qKlNI4WOXH8IawanA0i5KgZL4x8U2PN7Kur7FnZVIiEgD0a1LbgeDGJNcnhttpql0GzaLb40myL57fMBLbi/Gk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1745512331; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=cUpdiRHu6xj95GibiL2cgCzfrIGaLthQbFsVAAYJmyA=; 
-	b=jJhYBCuQgC3vLKHfXv/nlCzA9gPrDm3twLbtpPdAkyM5OHX/4MGjTtO8rwWSrqAnC4KomCLt5wHtXlMvvrEjoRLL8mtFgBFdKv1zp+iD+Fqd4Av48RSFvBom2xW4O7DWLJjvu8O7HAti6/ptGBaMWXi8+8cYtOxE1a6vCV3ykww=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=ludovico.denittis@collabora.com;
-	dmarc=pass header.from=<ludovico.denittis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1745512331;
-	s=zohomail; d=collabora.com; i=ludovico.denittis@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=cUpdiRHu6xj95GibiL2cgCzfrIGaLthQbFsVAAYJmyA=;
-	b=GrxoWUtnRjjqrUGz+82XA2sItygtbwPCpq49Hgh5oD6pcV9jIqR+2uf6uHdwYIsT
-	2sNviWPsyHLJLozUCeAD5MNTBdQCcMGQsydNObsOoeoxi1rDOfTIIgh1UenrHLuMyUy
-	hlKZny08ETQOrAdSaWACzJROmQjlz7pNX2AFi1w8=
-Received: by mx.zohomail.com with SMTPS id 1745512328298518.0830631884635;
-	Thu, 24 Apr 2025 09:32:08 -0700 (PDT)
-Message-ID: <b3a66041-dce3-45db-8410-c67223151ce7@collabora.com>
-Date: Thu, 24 Apr 2025 18:32:05 +0200
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XAbAV2mm"
+Received: from github.com (hubbernetes-node-20ef36f.ash1-iad.github.net [10.56.212.83])
+	by smtp.github.com (Postfix) with ESMTPA id 2503960117E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 09:37:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745512637;
+	bh=TnFKLZDrv59tbcn3iELJPAqmJ5CLt63Jz8K9FWXrDGU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=XAbAV2mmuWfQ41Yx825D9/ELCuRVwlfXgTFMvnnBf8PD7EMsGs3pGt96sfj2rrkaW
+	 3E0t+r2jx/M6GbkV88eN0xTYduBueMDLgERuKBoZOtWgjdMBmTEIqSfrhrE4P1HMTK
+	 f1ndM/zXmPx26jFB4dTByap5QvLXncMZaSnvlZBU=
+Date: Thu, 24 Apr 2025 09:37:17 -0700
+From: Ludovico de Nittis <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/956700/000000-c03b3f@github.com>
+Subject: [bluez/bluez] c62df9: src: Add new CablePairing property
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ v4 0/6] Support Sixaxis gamepad with classic bonded
- only
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20250424160236.179982-1-ludovico.denittis@collabora.com>
- <CABBYNZKFmW8a3MggGHp23d5SYotGQKDZBzn4Q2EB-xUToAUhDQ@mail.gmail.com>
-Content-Language: en-US
-From: Ludovico de Nittis <ludovico.denittis@collabora.com>
-In-Reply-To: <CABBYNZKFmW8a3MggGHp23d5SYotGQKDZBzn4Q2EB-xUToAUhDQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Luiz,
+  Branch: refs/heads/956700
+  Home:   https://github.com/bluez/bluez
+  Commit: c62df91830396908b4ef3ccdbf8a0e2db35bcd3f
+      https://github.com/bluez/bluez/commit/c62df91830396908b4ef3ccdbf8a0e2db35bcd3f
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
 
-On 4/24/25 6:18 PM, Luiz Augusto von Dentz wrote:
-> Hi Ludovico,
->
-> On Thu, Apr 24, 2025 at 12:03 PM Ludovico de Nittis
-> <ludovico.denittis@collabora.com> wrote:
->> This series adds a new "CablePairing" property to allow us to
->> indentify devices that have been paired using a custom USB cable
->> cable method and that don't support the canonical bonding with
->> encryption. With that information, we can dynamically enforce
->> encryption to drastically reduce the attack surface, compared to just
->> disabling the "ClassicBondedOnly" property.
->>
->> The "CablePairing" property is exposed via D-Bus to allow
->> clients to potentually show this information to end users.
->>
->> As far as I can tell, starting the listening input server with
->> BT_IO_SEC_LOW and then bumping it in `hidp_add_connection()` should not
->> have any negative effect regarding the overall security. However,
->> please let me know if it turns out not being the case.
->>
->> Addresses https://github.com/bluez/bluez/issues/1165
->>
->> Changes in v2:
->>   - Start the listening input server with BT_IO_SEC_LOW only if we
->>     actually have a known sixaxis device
->>
->> Changes in v3:
->>    - Change the property from being sixaxis specific to a generic
->>      "CablePairing"
->>    - Remove the manual validation of Sixaxis HID report descriptor
->>      because we already replace it with a pre-dermined SDP record
->>      in `sixaxis.c`
->>
->> Changes in v4:
->>    - Instead of setting the server security level in adapter.c, we
->>      do it when registering the input devices, during probing
->>
->> Ludovico de Nittis (6):
->>    src: Add new CablePairing property
->>    client: Print CablePairing property
->>    sixaxis: Set CablePairing when pairing a Sixaxis with USB
->>    adapter: Add btd_adapter_has_cable_pairing_devices()
->>    input: Automatically use sec level low when using a cable paired
->>      device
->>    sixaxis: Set security level when adding a sixaxis device
->>
->>   client/main.c            |  1 +
->>   doc/org.bluez.Device.rst |  7 +++++
->>   plugins/sixaxis.c        |  8 ++++-
->>   profiles/input/device.c  | 20 +++++++++++--
->>   profiles/input/manager.c |  3 +-
->>   profiles/input/server.c  | 63 ++++++++++++++++++++++++++++++++++++++--
->>   profiles/input/server.h  |  3 +-
->>   src/adapter.c            | 17 +++++++++++
->>   src/adapter.h            |  1 +
->>   src/device.c             | 40 +++++++++++++++++++++++++
->>   src/device.h             |  2 ++
->>   11 files changed, 157 insertions(+), 8 deletions(-)
->>
->> --
->> 2.49.0
->>
-> Looks like CI has found something not quite right still:
->
-> https://github.com/bluez/bluez/pull/1191#issuecomment-2828175923
->
+  Changed paths:
+    M doc/org.bluez.Device.rst
+    M src/device.c
+    M src/device.h
 
-Oops, it should be fixed in the v5.
+  Log Message:
+  -----------
+  src: Add new CablePairing property
 
+This adds initial support for a new CablePairing property.
+The property can be used for devices that are paired using a cable and
+don't support the expected bonding (with pairing/encryption), for
+example like the Sixaxis gamepads.
+
+
+  Commit: f384c59f7ef7c5e754f2240c91567a45fb25fc8e
+      https://github.com/bluez/bluez/commit/f384c59f7ef7c5e754f2240c91567a45fb25fc8e
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Print CablePairing property
+
+When using the `info` command, include the new CablePairing value.
+
+
+  Commit: 6d92db305fc027b732f91d005b437e1f1210ab18
+      https://github.com/bluez/bluez/commit/6d92db305fc027b732f91d005b437e1f1210ab18
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M plugins/sixaxis.c
+
+  Log Message:
+  -----------
+  sixaxis: Set CablePairing when pairing a Sixaxis with USB
+
+Sixaxis gamepads don't support encryption. When doing the USB cable
+pairing, set the CablePairing property to keep the connection to the
+device unencrypted.
+
+
+  Commit: 2d1745a125679e34e7acab6fbd1807625da59ec5
+      https://github.com/bluez/bluez/commit/2d1745a125679e34e7acab6fbd1807625da59ec5
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M src/adapter.c
+    M src/adapter.h
+
+  Log Message:
+  -----------
+  adapter: Add btd_adapter_has_cable_pairing_devices()
+
+Add a function that can be used to know if any of the known devices have
+the `CablePaired` property set.
+
+
+  Commit: 509cbe9f3551ef8420eb135ca5f67924f0a3ed73
+      https://github.com/bluez/bluez/commit/509cbe9f3551ef8420eb135ca5f67924f0a3ed73
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M profiles/input/device.c
+    M profiles/input/manager.c
+    M profiles/input/server.c
+    M profiles/input/server.h
+
+  Log Message:
+  -----------
+  input: Automatically use sec level low when using a cable paired device
+
+BT_IO_SEC_LOW is the only way to allow devices that use cable pairing to
+establish a connection.
+
+This adds the ability to start the listening input server with
+BT_IO_SEC_LOW to avoid breaking support for these devices, and then,
+in `hidp_add_connection()`, we check if either `classic_bonded_only` was
+disabled or if this device has `CablePairing`. If neither are true, we
+bump the security back to BT_IO_SEC_MEDIUM, i.e. enforcing encryption.
+
+This allows supporting these devices without having to change the
+classic bonded only option.
+
+
+  Commit: c03b3fa2e7b9ccf126789628d02be8f43a811bae
+      https://github.com/bluez/bluez/commit/c03b3fa2e7b9ccf126789628d02be8f43a811bae
+  Author: Ludovico de Nittis <ludovico.denittis@collabora.com>
+  Date:   2025-04-24 (Thu, 24 Apr 2025)
+
+  Changed paths:
+    M plugins/sixaxis.c
+
+  Log Message:
+  -----------
+  sixaxis: Set security level when adding a sixaxis device
+
+When doing the cable pairing for a sixaxis, we may need to change the
+listening input server security level.
+This is because sixaxis gamepads can only work with the level
+BT_IO_SEC_LOW.
+
+
+Compare: https://github.com/bluez/bluez/compare/c62df9183039%5E...c03b3fa2e7b9
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
