@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC31821882B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 19:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E652021882B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 19:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745607677; cv=none; b=NhCMCW2kqghE3d8UGaoQ4+IMz3VIVIx8BwRVnqfIOrb88tJNFYx1ZfB124bgTVlG/T4a4loDQ1Icl9udYMHYdiI/lnhZFvOVD+xcUlJi9MfDlfyrowGpfELTen2KLOc65dTJYPRe+Z8ZVApeCEQ8Xf53NgGXUEdc1zBF1TCEaX0=
+	t=1745607680; cv=none; b=JcP8lRW2ZJGgk+yABV9/QwSIi28qfYVBysQWFyzLL+/81tXVarnQ/Q63vP/fLsb1QRI3JIwkucWRGYq+x90KnbnISnI7as8thIxxxASoSdQCMu3Pcexl43v+cnYgacllafedOnHQLOUem5oFajQIUo9P80ymI2OIDKzGFEwNrLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745607677; c=relaxed/simple;
-	bh=ZuoxXJSXM6he3mfS++ejMk12ZH/tENFrNb0GL8JzOk4=;
+	s=arc-20240116; t=1745607680; c=relaxed/simple;
+	bh=ovX83Ut+iwAvCru6L9B1e9bdf4bx3ENv4VjKBm1MD4k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cH8N4A5jUtmP7n+Tpm3ShKkDEyuM0B6NyneFiNUHiQVxER1VQGwK2J2UMBM4/iezgNaCUlBfImXhNTagjp5x50nJpiPUdBJo5UjUr8jmOtG3BvLBi9VJoARYc26r8gbJcbENGyp2EsT4DKwZLT/ilCBZlIut9vdJsa0fVNjSe94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6bQTyuE; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=mfz/j2WdrRq9wNdZOHTgtONX1rg2U9ijictkDW1WHgtLha21fzEbkR16B2E3ZxNaLe9p+e3uPSuTxrsjdK5e3M7iPK6aV93dbvzyFeC791XCcRWX7dNQeegqYN/134F1NZ49nEpDwb2UkU5MT+2BiuamC5zbzXRpk/detdG05cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3/rFG8k; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6bQTyuE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD1EAC4CEE4;
-	Fri, 25 Apr 2025 19:01:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3/rFG8k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53327C4CEE4;
+	Fri, 25 Apr 2025 19:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745607677;
-	bh=ZuoxXJSXM6he3mfS++ejMk12ZH/tENFrNb0GL8JzOk4=;
+	s=k20201202; t=1745607679;
+	bh=ovX83Ut+iwAvCru6L9B1e9bdf4bx3ENv4VjKBm1MD4k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p6bQTyuE1BxuUNM5iXVSyZbu338wsOWhXb1JNoJiCBy7ZbL+nWOiIbcwMJtbLWoey
-	 Ac2Rh5rZ5wHpO165I57fBFXJehBr9nRMrGDNK8laRelqo0pgVUYgIIOgx6ayfta37g
-	 /A8oTazBL0jIGCtMx+pr+Jdy5lbesv+0M9j5Y2O0gtFH5a7VdiVImE7LWRF8Dnuqv7
-	 l092eQWpHeq9ARnWC+7n+05X+5V5RvVT16MWhrMPAE87Lo3CVvDACD6cg1+XwENNTg
-	 9GEWv6Gxe9HeE3LWcqHvLoz46rluDb2J32MSc3UKL5GTC1+agt0rcxwLcNMRHRuWvY
-	 CtovKPqXxUfVA==
+	b=t3/rFG8k/mj7mhYfZ989vRaOmqLfpD3ffryhOa4topwxLAkeGhkM1cFLIMWkOYH4f
+	 xTr5eabMjz6cvKRumSlTMTmwLINAGk/H6OTzQ6lYzvW3fmZ33KIqJTFX1FhI7vQMvW
+	 0OuEWFt2LZX/JcJQLT/kOthTZEl5QuBr10pGdBeNYlXOaPRi/wPJocXOTY4via24sj
+	 5MMQMYz0Uv+nPKmiH1ihlpN3vK0ngChFsLBGJLc55I6ntHt9su6wyyGFHNuBYXqS/x
+	 Jr0U/EqgN+0VRUvgS4/snA3hr+tQClN54l/4f9cy9JnvXWaY4DIGL5Azkd28ifFZZP
+	 SYX815GdzIioA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD39380CFD7;
-	Fri, 25 Apr 2025 19:01:57 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CA4380CFD7;
+	Fri, 25 Apr 2025 19:01:59 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,53 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] Add support clang-format
+Subject: Re: [PATCH BlueZ] device: Check presence of ServiceRecords when loading
+ from store
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174560771626.3803904.16628194840606766864.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Apr 2025 19:01:56 +0000
-References: <20250425164435.1482617-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250425164435.1482617-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+ <174560771773.3803904.2138994537181737272.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Apr 2025 19:01:57 +0000
+References: <20250425144418.408145-1-frederic.danis@collabora.com>
+In-Reply-To: <20250425144418.408145-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 25 Apr 2025 12:44:34 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Fri, 25 Apr 2025 16:44:18 +0200 you wrote:
+> For a HID paired device, if the cache file containing the SDP records
+> is not present this will prevent the device to connect and need to
+> remove it and pair again.
 > 
-> This adds .clang-format (based on kernel) which can be used by linters,
-> editors, etc to check the coding style.
-> ---
->  .clang-format | 119 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 119 insertions(+)
->  create mode 100644 .clang-format
+> Current bluetoothd traces:
+> src/shared/mgmt.c:can_read_data() [0x0000] event 0x000b
+> src/adapter.c:connected_callback() hci0 device EC:83:50:76:BD:67
+>   connected eir_len 31
+> src/shared/mgmt.c:can_read_data() [0x0000] event 0x0006
+> profiles/input/server.c:connect_event_cb() Incoming connection from
+>   EC:83:50:76:BD:67 on PSM 17
+> profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
+>   psm 17
+> profiles/input/server.c:confirm_event_cb()
+> profiles/input/server.c:connect_event_cb() Incoming connection from
+>   EC:83:50:76:BD:67 on PSM 19
+> profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
+>   psm 19
+> profiles/input/device.c:hidp_add_connection() Could not parse HID SDP
+>   record: No such file or directory (2)
+> profiles/input/device.c:ctrl_watch_cb() Device EC:83:50:76:BD:67
+>   disconnected
+> profiles/input/device.c:intr_watch_cb() Device EC:83:50:76:BD:67
+>   disconnected
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v1,1/2] Add support clang-format
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=42f5184b9882
-  - [BlueZ,v1,2/2] Add .editorconfig file for basic formatting
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cb8f216f51b7
+  - [BlueZ] device: Check presence of ServiceRecords when loading from store
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c3b6f4e4b456
 
 You are awesome, thank you!
 -- 
