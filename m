@@ -1,207 +1,125 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B8178F2D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 19:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35B521660D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 19:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745609032; cv=none; b=ImSYIAcxSfoQNRSrcPGJKi5tXk91MTf/BGcPQK6TZj4n42wajj4C++ivnm5QGf8nb0jEYvQz4gGwG2+zrmHptSeS3l5aBB8IoNmNUD+9M7CE8769GIsWDRd8JRZfqKJ3puti1f3C6sLj3nV9czW+zPr89bOBwANxd+qV5Qb6Faw=
+	t=1745609041; cv=none; b=DGE5zA9m2oD3ww+1uMMWmV+GTl0LVAIpgbskKiZq8Y/qHLGKhLJ1/KXyF5mb2Tq/3CPUA+Hc0VEjrRprLh9tcxAyupxznDL+RLnLkbj0a4h+QvDylRpwtlEm3lhseQ3jTdWv0OnPO3Mi89Rgy4twoANHmGjnBU6yWaphDNGG9g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745609032; c=relaxed/simple;
-	bh=fS7wsDAzrtHJN2hwpIgAezeOla1QZDCm5R2/l0auZA4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ayshX8XKNp8g1O5XjaxwEcENVgyp23tKBY6EUwg0Q+4wB7he3wN/DyPs1HaMRYuR23Gh8MS3yOLqlbAb9414We1M4m2219EDud3W8z/+el3ibgCyUk2Ps2MFfGzXnCbecDVotlhL/M6T6nhfWpPBv+FtysRwuEzc5HQKOCqtbB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=M6PVO937; arc=none smtp.client-ip=192.30.252.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1745609041; c=relaxed/simple;
+	bh=bHam3Q3+jElp8fCkLomlcfEPt3kJAMIJOK2axlN3350=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=rj/FYz+cXMK7oUZmwG0yKkvUB4Fo2x9WYTusRYRKxHirStMXrDFweY36Sc8/xeyHhJhWEGlqLJL50izFtamLSaZJ19nUf5633jnetU9mIgZ0u5UHvyz2Wi+Kltlg49RvGCgsA4C93HiykNjRQJkREEm1Is37eXPGsGTt0Svbzok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dO/NxpT2; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="M6PVO937"
-Received: from github.com (hubbernetes-node-af6095a.va3-iad.github.net [10.48.153.37])
-	by smtp.github.com (Postfix) with ESMTPA id CA735E0AC1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 12:23:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745609029;
-	bh=qGgQcs5cYhqlAwObxLJ9jMeHdFLvnLkq0sD3PgG1Tp4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=M6PVO937/DSBcbiHMfBrR6rbh8vSpCYnfRYfp5ACeLEqsR3wcuzAFgA1DEA8TKvMC
-	 1S5NJbRYGjk4BUzl2TgaC5qbJ7c39AjjHLlreXxsYx6/DMJ9fb7xWUFqz+/eshWR43
-	 rHqKe0pKwfWgZTX/SQ0VLc58ylESy9cY6e1vb+I8=
-Date: Fri, 25 Apr 2025 12:23:49 -0700
-From: "github-actions[bot]" <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dO/NxpT2"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-52413efd0d3so1034495e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 12:23:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745609038; x=1746213838; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lIDuHC8h9cMc7qwARTO7Z+Zuc2xY4Zk+wLulRs/SGVs=;
+        b=dO/NxpT2xt2BRs3chYRhicJs3fXTRAFsWNrdJ81TV2wAIIQPEwiiuY0+V2GX4S3IPG
+         wfK9fFVuHtotozzBVBoIcA7nornpgX7EHqsuIGkkLpw/Sep4UbbtcqTsw9s0m0r8ymME
+         wJy08rPSWYdEoJ0AEcjt+eWORQ3qvgdLLmXcbhov6N1Jiha6VZ3lpR42BqN9NB39Z0Fh
+         n2JEOnNuvYnOCbOQ8nw1tMwhG9KJfxihNOsc7iIZRItWz8NaKOOQrGsW1b5c/p4nKRTI
+         /AKmzpW6zIFZ+E1dH8p4lfYc+zBQR36y8ZsnvjXqXZJzZ4ppZy46GCnCOaJDEglKgMZf
+         rk7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745609038; x=1746213838;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lIDuHC8h9cMc7qwARTO7Z+Zuc2xY4Zk+wLulRs/SGVs=;
+        b=iBWQSG/pu5Eog59SRIlkINQV1/Rly1fS06VjSvVpMYRcXn2AcgD/dKtxo5HGbmtUew
+         BcERIlpwSTzWe8Z6EaQorR+9K9kASyyWOhTAbw5mQPDUaberat7IlG4aF/wSZ/Hmt/VK
+         77IFVRF1XeBEBPjrQkdpw8SWRq8c6N3WM5PnPRTA93+BSRCFEz2L72/OV29PWkImca7D
+         R5J0GNVpbVqovIFlIp9+T+1PBt7SQDIdHsyKxDgYU99zanqpj5roRqVx/4YC2T2pMtw1
+         ifI3w9iizLO/FOp7LVGongfu1zWayY1HOcc2VaGIBdFhwr/+o4Q7FgdXuK8/DtgOF3T2
+         uJnQ==
+X-Gm-Message-State: AOJu0YxBXzqMySem1rUc+z+KEt8TrEvKCZerdsnCp5JCvHVFsoVYJ4No
+	76HwjPIzzUf6mCy1S0lxw79Kb35ayqyZp3cuC3EUjRFo1GGWmLfUH1zK93lRCK0=
+X-Gm-Gg: ASbGncvpC/x/XK9YPBTXhYzr+4Q4Q9S/I1TsSsu9goHRVzwKw4JJTmSKItxtsbyRRnf
+	V+7NIvF2F3NYkKUy3HV5wyNny+WGyd9VfNzsieVN6aaE6VP6HV+J/JoD+LNytEdD2mjRXVHs6L+
+	HNkmwtfjRh40sMTmGqtvW5voGh6UXx5jTCtilwdy//VdyxxQiBetexlZrUzS4RbgqdEKE8OIdwE
+	SGVncAGbaBFz2rJ9fHwM9Yp+scbYFDRVBkEmdhawS0hmof6CWGCse+mtESgaZJKRmKKVbSTRBjr
+	1VtdjwCihQlKtt85Ct/iIDJiByOV8687+SKF0DF6pP6cKnSpo/INnTSUldRtVxy0W8ZHuFLQmMm
+	ijHQm1DvMdg==
+X-Google-Smtp-Source: AGHT+IEquuilzuWQSbrFfHD1h8EIesJsWsMonarD++vyyQU3WHhTY18C2b0/xxo31ixnxrRtlPeRVA==
+X-Received: by 2002:a05:6122:179a:b0:524:2fe2:46ba with SMTP id 71dfb90a1353d-52a97172bbcmr573402e0c.11.1745609037632;
+        Fri, 25 Apr 2025 12:23:57 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52a79f5f71esm780939e0c.14.2025.04.25.12.23.56
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 12:23:56 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/957156/000000-a762d3@github.com>
-Subject: [bluez/bluez] 693274: pbap: Support calling pbap_init() after
- pbap_exit()
+Subject: [GIT PULL] bluetooth 2025-04-25
+Date: Fri, 25 Apr 2025 15:23:55 -0400
+Message-ID: <20250425192355.1578678-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/957156
-  Home:   https://github.com/bluez/bluez
-  Commit: 693274a4a67c07ac1c9cc0dcc195816e05e6c398
-      https://github.com/bluez/bluez/commit/693274a4a67c07ac1c9cc0dcc195816e05e6c398
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-25 (Fri, 25 Apr 2025)
+The following changes since commit 49ba1ca2e0cc6d2eb0667172f1144c8b85907971:
 
-  Changed paths:
-    M obexd/client/pbap.c
+  Merge branch 'mlx5-misc-fixes-2025-04-23' (2025-04-24 18:20:00 -0700)
 
-  Log Message:
-  -----------
-  pbap: Support calling pbap_init() after pbap_exit()
+are available in the Git repository at:
 
-pbap_exit() didn't previously unregister itself thoroughly.  That
-was fine if it was only called when the service was about to exit,
-because everything was implicitly unregistered when the process ended.
-But we need to be more scrupulous if this can be called throughout
-the program's lifecycle.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-04-25
 
-Send the UnregisterProfile message directly from pbap_exit(),
-then call unregister_profile().
+for you to fetch changes up to 3908feb1bd7f319a10e18d84369a48163264cc7d:
 
-The UnregisterProfile message can't be sent directly from
-unregister_profile(), because that also needs to be called when
-register_profile() fails halfway through.
+  Bluetooth: L2CAP: copy RX timestamp to new fragments (2025-04-25 15:03:19 -0400)
 
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+----------------------------------------------------------------
+bluetooth pull request for net:
 
+ - btmtksdio: Check function enabled before doing close
+ - btmtksdio: Do close if SDIO card removed without close
+ - btusb: avoid NULL pointer dereference in skb_dequeue()
+ - btintel_pcie: Avoid redundant buffer allocation
+ - btintel_pcie: Add additional to checks to clear TX/RX paths
+ - hci_conn: Fix not setting conn_timeout for Broadcast Receiver
+ - hci_conn: Fix not setting timeout for BIG Create Sync
 
-  Commit: f87692e4cf1e0018ff96a030094a607b4d1d3e5f
-      https://github.com/bluez/bluez/commit/f87692e4cf1e0018ff96a030094a607b4d1d3e5f
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-25 (Fri, 25 Apr 2025)
+----------------------------------------------------------------
+Chris Lu (2):
+      Bluetooth: btmtksdio: Check function enabled before doing close
+      Bluetooth: btmtksdio: Do close if SDIO card removed without close
 
-  Changed paths:
-    M obexd/plugins/bluetooth.c
+En-Wei Wu (1):
+      Bluetooth: btusb: avoid NULL pointer dereference in skb_dequeue()
 
-  Log Message:
-  -----------
-  obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
+Kiran K (2):
+      Bluetooth: btintel_pcie: Avoid redundant buffer allocation
+      Bluetooth: btintel_pcie: Add additional to checks to clear TX/RX paths
 
-bluetooth_exit() didn't previously unregister itself thoroughly.  That
-was fine if it was only called when the service was about to exit,
-because everything was implicitly unregistered when the process ended.
-But we need to be more scrupulous if this can be called throughout
-the program's lifecycle.
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_conn: Fix not setting conn_timeout for Broadcast Receiver
+      Bluetooth: hci_conn: Fix not setting timeout for BIG Create Sync
 
-Send UnregisterProfile messages directly from bluetooth_exit(),
-then call unregister_profile(profile).
+Pauli Virtanen (1):
+      Bluetooth: L2CAP: copy RX timestamp to new fragments
 
-The UnregisterProfile message can't be sent directly from
-unregister_profile(), because that also needs to be called when
-register_profile() fails halfway through.
-
-Do not free profiles in bluetooth_exit() - profiles are needed
-by a future call to bluetooth_init(), or will be freed by
-bluetooth_stop() if necessary.
-
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
-
-
-  Commit: 97af61e4e6b9ed696b000cfc2ad12058d5280de1
-      https://github.com/bluez/bluez/commit/97af61e4e6b9ed696b000cfc2ad12058d5280de1
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-25 (Fri, 25 Apr 2025)
-
-  Changed paths:
-    M obexd/src/main.c
-    M obexd/src/obexd.h
-
-  Log Message:
-  -----------
-  obexd: Support creating private system/session bus connections
-
-Obexd can either connect to the system or session bus.
-We mostly share a common connection to that bus, but it can be useful
-to have a private connection.  For example, this allows us to quickly
-unregister profiles when switching user.
-
-Add obex_setup_dbus_connection_private(), which creates a new
-connection to whichever bus was specified by the user.
-
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
-
-
-  Commit: 50c1bfdd8822d5b66949874b2fd6233ff39226f9
-      https://github.com/bluez/bluez/commit/50c1bfdd8822d5b66949874b2fd6233ff39226f9
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-25 (Fri, 25 Apr 2025)
-
-  Changed paths:
-    M Makefile.obexd
-    M obexd/client/pbap.c
-    M obexd/plugins/bluetooth.c
-    A obexd/src/logind.c
-    A obexd/src/logind.h
-    M obexd/src/main.c
-
-  Log Message:
-  -----------
-  obexd: Unregister profiles when the user is inactive
-
-Obexd is usually run as a user service, and can exhibit surprising
-behaviour if two users are logged in at the same time.
-
-Unregister profiles when the user is detected to be off-seat.
-
-It may be impossible to detect whether a user is on-seat in some cases.
-For example, a version of obexd compiled with systemd support might be
-run outside of a systemd environment.  Warn and leave services
-registered if that happens.
-
-Obexd can be run as a system service, in which case this check makes no
-sense.  Disable this check when called with `--system-bus`.
-
-Obexd can also be run by a user that does not have an active session.
-For example, someone could use `ssh` to access the system.  There might
-be a use case where someone needs Bluetooth access but can't log in with
-a keyboard, or there might be a security issue with doing so.  This isn't
-handled explicitly by this patch, but a future patch could add support
-by calling `logind_set(FALSE)` in the same way as is currently done
-with `--system-bus`.
-
-Unregister profiles by closing private connections instead of sending
-UnregisterProfile on the shared connection.  Pipewire has apparently
-found the latter to cause long shutdown delays, because bluetoothd
-may be shutting down and unable to handle this message.
-
-Based in large part on the wireplumber code mentioned by Pauli Virtanen:
-https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
-
-Other services are likely to need similar functionality,
-so I have created a gist to demonstrate the basic technique:
-https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
-
-Suggested-by: Pauli Virtanen <pav@iki.fi>
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
-
-
-  Commit: a762d3a54c6dd548bf737e2a54c822ea4b089352
-      https://github.com/bluez/bluez/commit/a762d3a54c6dd548bf737e2a54c822ea4b089352
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-25 (Fri, 25 Apr 2025)
-
-  Changed paths:
-    M obexd/src/obex.service.in
-
-  Log Message:
-  -----------
-  Revert "obexd: only run one instance at once"
-
-No longer needed now services can share resources.
-
-This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
-
-Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
-
-
-Compare: https://github.com/bluez/bluez/compare/693274a4a67c%5E...a762d3a54c6d
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+ drivers/bluetooth/btintel_pcie.c |  57 ++++++------
+ drivers/bluetooth/btmtksdio.c    |  12 ++-
+ drivers/bluetooth/btusb.c        | 101 ++++++++++++++++------
+ include/net/bluetooth/hci.h      |   4 +-
+ include/net/bluetooth/hci_core.h |  20 ++---
+ include/net/bluetooth/hci_sync.h |   3 +
+ net/bluetooth/hci_conn.c         | 181 ++-------------------------------------
+ net/bluetooth/hci_event.c        |  15 +---
+ net/bluetooth/hci_sync.c         | 150 ++++++++++++++++++++++++++++++--
+ net/bluetooth/iso.c              |  26 +++---
+ net/bluetooth/l2cap_core.c       |   3 +
+ 11 files changed, 300 insertions(+), 272 deletions(-)
