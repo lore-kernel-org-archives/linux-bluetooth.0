@@ -1,93 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E652021882B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 19:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FF221ADC7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 19:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745607680; cv=none; b=JcP8lRW2ZJGgk+yABV9/QwSIi28qfYVBysQWFyzLL+/81tXVarnQ/Q63vP/fLsb1QRI3JIwkucWRGYq+x90KnbnISnI7as8thIxxxASoSdQCMu3Pcexl43v+cnYgacllafedOnHQLOUem5oFajQIUo9P80ymI2OIDKzGFEwNrLs=
+	t=1745608251; cv=none; b=RBKWm3Dv0l2Y/sl4uzgVRAIQtpeTuga3TgGgChr9dEx4c0amOmo9guYWJda1CpWIF4KCiI/+rkjMVqvz0Cp4o1jUPvo4ARCN5sF5T6AotoBGnYOX6LgRPStAwazSqiPcE2XEei+vajCk6nDL875ZXaX/sq3mxp+jtaMAGj1Vld0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745607680; c=relaxed/simple;
-	bh=ovX83Ut+iwAvCru6L9B1e9bdf4bx3ENv4VjKBm1MD4k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mfz/j2WdrRq9wNdZOHTgtONX1rg2U9ijictkDW1WHgtLha21fzEbkR16B2E3ZxNaLe9p+e3uPSuTxrsjdK5e3M7iPK6aV93dbvzyFeC791XCcRWX7dNQeegqYN/134F1NZ49nEpDwb2UkU5MT+2BiuamC5zbzXRpk/detdG05cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3/rFG8k; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745608251; c=relaxed/simple;
+	bh=65e4dBCFqL83LML31iu5yN5NR51/O4VjJhI6ERg+8oE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=O5U4iFZfN4ryLUIZqeAi+hfMPHYkMRKyL9hdblbwMBrmOHLSzsgFAEDcbZ3GnYBTqUqnJI3cOR8Jh8ImwNREMXpR3WMFvI+nzNtVG29LUMm/AMYxKwzNBmvsz3O7jz2liSjCQnfpdWTTeghSgQFuYRh52Itl/+q9yuXX+svyd4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WuErSePj; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3/rFG8k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53327C4CEE4;
-	Fri, 25 Apr 2025 19:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745607679;
-	bh=ovX83Ut+iwAvCru6L9B1e9bdf4bx3ENv4VjKBm1MD4k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t3/rFG8k/mj7mhYfZ989vRaOmqLfpD3ffryhOa4topwxLAkeGhkM1cFLIMWkOYH4f
-	 xTr5eabMjz6cvKRumSlTMTmwLINAGk/H6OTzQ6lYzvW3fmZ33KIqJTFX1FhI7vQMvW
-	 0OuEWFt2LZX/JcJQLT/kOthTZEl5QuBr10pGdBeNYlXOaPRi/wPJocXOTY4via24sj
-	 5MMQMYz0Uv+nPKmiH1ihlpN3vK0ngChFsLBGJLc55I6ntHt9su6wyyGFHNuBYXqS/x
-	 Jr0U/EqgN+0VRUvgS4/snA3hr+tQClN54l/4f9cy9JnvXWaY4DIGL5Azkd28ifFZZP
-	 SYX815GdzIioA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CA4380CFD7;
-	Fri, 25 Apr 2025 19:01:59 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WuErSePj"
+Received: from github.com (hubbernetes-node-93b324b.ash1-iad.github.net [10.56.171.10])
+	by smtp.github.com (Postfix) with ESMTPA id 937F26006F1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 12:10:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745608249;
+	bh=h37X/MWjO0nFw+kPLAbbd9JF62njGasQVySBebPlH74=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=WuErSePjGUHeZcqpmJovlmLzK3XRjNaxGKU1ZqHmvyoOaM4V6x1w03JQB1VsrEi9L
+	 /xtWhAbKpfJuhABwCWD24XvRcKBQrBsjfn+NO4fRCT64eUMhspo8ca2ItEP/C+I8+c
+	 a5Q+n4r/4lrTw58fusqRXpGPnZ1jzh9VT2SMXCrw=
+Date: Fri, 25 Apr 2025 12:10:49 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/957118/97ecb3-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] device: Check presence of ServiceRecords when loading
- from store
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174560771773.3803904.2138994537181737272.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Apr 2025 19:01:57 +0000
-References: <20250425144418.408145-1-frederic.danis@collabora.com>
-In-Reply-To: <20250425144418.408145-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/957118
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Fri, 25 Apr 2025 16:44:18 +0200 you wrote:
-> For a HID paired device, if the cache file containing the SDP records
-> is not present this will prevent the device to connect and need to
-> remove it and pair again.
-> 
-> Current bluetoothd traces:
-> src/shared/mgmt.c:can_read_data() [0x0000] event 0x000b
-> src/adapter.c:connected_callback() hci0 device EC:83:50:76:BD:67
->   connected eir_len 31
-> src/shared/mgmt.c:can_read_data() [0x0000] event 0x0006
-> profiles/input/server.c:connect_event_cb() Incoming connection from
->   EC:83:50:76:BD:67 on PSM 17
-> profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
->   psm 17
-> profiles/input/server.c:confirm_event_cb()
-> profiles/input/server.c:connect_event_cb() Incoming connection from
->   EC:83:50:76:BD:67 on PSM 19
-> profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
->   psm 19
-> profiles/input/device.c:hidp_add_connection() Could not parse HID SDP
->   record: No such file or directory (2)
-> profiles/input/device.c:ctrl_watch_cb() Device EC:83:50:76:BD:67
->   disconnected
-> profiles/input/device.c:intr_watch_cb() Device EC:83:50:76:BD:67
->   disconnected
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ] device: Check presence of ServiceRecords when loading from store
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c3b6f4e4b456
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
