@@ -1,140 +1,125 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62796215F7D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 18:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2324C215F53
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 18:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745605220; cv=none; b=TLuUYRd+jTKV9eti/m2neCePx7dOLGE3vi2n72aB2CnYOL3Gn+wN/9Z5argo9dP90f1hVx2hJHCclTlSIW3QL8qCYbyfssjfLOATAYAV1CEDe3Syp9jnQ7tw8n+kAlPtcJqNM7pZHQZIxBWSdUfN905WUimPhSJF5WLZ/914nSY=
+	t=1745605809; cv=none; b=P9vNVV+k/c42HN1MwmbgSyWFioKiNFj8c0wei5Q0/BV21cTPOD6exwXsv/2B8+kky7FO3T6E9Usmy1bzZU47IrhfLFywO9fTI5axCV/pFnW1K7G5zUVWK5qjZP32VqbaYhOQwhHLeOrEtKgXJqYZ1KmIvwn2MH3EyCwRITSzgoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745605220; c=relaxed/simple;
-	bh=ShraT/ycBj2nZBWqXisrh0Rkv57NXR3xoJHGp8homNs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dXjbYXZ/BiOEquUvMJ3IkuRRnMvbXi0G67QbVJ76DvDdqklSscIpsjNKRPt9Tf/7J1c0P7F16Pk7/zNSt3P6CrGHOyBKSmEJbHLCNWPwYi6rKunNFeWKrcbELR3/H6KRN0IZIs++wXbDkwcFq5tGWbW046eqG0OGgNcRbZbsN2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mGXo38ph; arc=none smtp.client-ip=209.85.208.181
+	s=arc-20240116; t=1745605809; c=relaxed/simple;
+	bh=Fi5PclbQVTKZxSWS8m1DkUt6mqqzhkr51FD6mK/NR58=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=N+/6gCo/PP3zK0U0hDLWPU2zRv0dKjAVheH4sdeT643aSBvRpoRUsBWSbQbh9mkYtWx3rS1hKgBvFKNxqIV2rsdEbs1eLrYcuwK7uo9V7d/SGm0szsaCDbrxKK0/jjiK/GBqfFG7bC/KFXSlRfyFCzuvAOxM6Dztbj7oLoZRECE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=InT/O3NU; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mGXo38ph"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30db1bd3bddso24972011fa.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 11:20:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InT/O3NU"
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b07d607dc83so2392457a12.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 11:30:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745605215; x=1746210015; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mMke1zJlfzHfqAOlFLYgmiWCPNk9C4fZh9wGl2/FhQ4=;
-        b=mGXo38phAnqx78xLAg2Ca0toLUUKfV//3GQz5Ls9Agrp8A9hXCGTQFkh1jGf86RK11
-         +MoxZ50gDfRjacS3rKhM7BKrJJTEnnzyoNIZcCNQ51talYHfFHWQ1R8SzNN7/Ar54EvT
-         40caqud0D8l1hjICdF8KqAr5WZwUb1bZGvSCXb7WHZQ0kA16CQp1nVLfpcEnV6QF5nWt
-         MDLkhidMeQTjRDU5//OAEScRsVVfpR5PGhRJfIHJRoGmtuEPYwgxVkzFDNl+Km6dZlza
-         9u6e0gCGELMrpKrZ8cB99naxbBc5bG8XpMAltUWj89J8tucBVDdhBTpWWMXw6Ysn0LFc
-         yJYw==
+        d=gmail.com; s=20230601; t=1745605807; x=1746210607; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oN+snJgMVy3Y6VxGkAb34cAztgz8ro/kVAyeJJUtVHs=;
+        b=InT/O3NUdgJr63oErtoCRzUdNCZidRYAGBzoDNAgvv3/XUbXziT0K3+lgdr3E3laS+
+         Oy3+O3B6nEJeANQVK1zAViz1czo7HiMOf5cSux+658KMXqYPkYnUmCvK1PlOXgtF1EnY
+         Etd3rUOFqH9DRC9iBkUOCnaCT9i3oTv2QoMKMK+JVSuQxRYGwwSGluoZFy2NO0XUvUqf
+         rQsnEBcDa4ktF/qtkA9MQQo9z+Vf3dVbx90vXsMT1mXMEEZ2csVThN8GWKSv8xbIwJ8V
+         fbkQCM2BywY4i4egk6POIX/ecP71I04aBD2QELlq0a7PKdKsA821Cruk0zNR6Ffb+Qa0
+         dhCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745605215; x=1746210015;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mMke1zJlfzHfqAOlFLYgmiWCPNk9C4fZh9wGl2/FhQ4=;
-        b=TyhXt5FnnlWlldrwxQZ3qpc4y6IpROhuygkRZekpWReXFgmJMPCwynyljgPTySqTlH
-         RPaQ1RHGqDdUeChz+9H5ninFYI3ZVamaLdrOqjomASoCE+vP4zmj9lvn61BLAXdAAr34
-         hVBN6j+tHhyatSTN83vCSjMNtgZBSGlVQyUIGJyZBLL+6PsTp0HbLPLVCrjbDc08Kpt+
-         cIMsxYvoYmijsvK4r6WYQz3Lw2mh0v1HFef+P+GpYGx0S9IRZGLSog4y30cWW6b18i9/
-         j4sfU50jmzVQy1O2fvBewECBPaLizYcImV9XQy2FnAgdFbVIOy7TnTbrLt4xcXG/Rrtl
-         j6XA==
-X-Gm-Message-State: AOJu0Yz+1s5HbwalRv6hEi243QfjvYGkI7bh0YbwlQLEuKDRBLQMwAOd
-	PrStuNsC9yrh8ZTIJ0VnJniRr5krC3t+IeuX8CcNcEU1t0OvDmjgfBXzGU+3pC410HR+UB1Pd7o
-	lGMBNyDgR+v0q6jAwnmhAygbuNvaLBXTnwe/TDw==
-X-Gm-Gg: ASbGnctkQ3zGvXq5bLlJuXSoWSvlncqnKIq8HvJmJMMKThyMIPEqtr18GForPkQqhju
-	NjVoRicV8ibX+TQ0ZEWd8jv6ciep+CrXsv8z3NPHb9p1OCpKJMV8iNN+md6jLuC+2KlxMt/JulF
-	Tkg7K7I2pFsd59J64NEJy8
-X-Google-Smtp-Source: AGHT+IG8l4anTsRrJCAMJrscIFJyxB35TUqIKM8O3yAVI4et+THW/dkb+fJtYND6eCA0GIezc0gv99yiIG/UI84LCmM=
-X-Received: by 2002:a05:651c:1463:b0:30b:ec4d:e5df with SMTP id
- 38308e7fff4ca-319ddd6681emr940521fa.34.1745605215057; Fri, 25 Apr 2025
- 11:20:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745605807; x=1746210607;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oN+snJgMVy3Y6VxGkAb34cAztgz8ro/kVAyeJJUtVHs=;
+        b=NKO7/yHmiJyiPkrVsWJMMV5v/8PX6PjHQ+5WJJnj4uwl+Gp6DXn9XenNKBrsRNT1aB
+         xZoGUs4sZis0lOsGBS+COn4GoK/RNej8q9BX0x6Y7PR7OcMp1MFdp1KZfN+W66qk8Hqt
+         XOGF6CASnN7CaI60bOnHfG7r1tJCo3C4wE5ppIk2rTfenDJNNJVfErwMWU16+DhhhfB/
+         +pkvQ/u1c4P1vYYJCF8T59tksdo3WN9Vj96BYH2MkFnzMlJImkgTiffgoErC/Jl9h5pL
+         DyZq8zFey1F6yTSzqu00vZIG4vbJOMEP5XaaXufmSDa2QhDa+lguFa+La4yZc0Npyp31
+         /GVQ==
+X-Gm-Message-State: AOJu0Yy06OwcIz6MDhncwqnqHlQ6DM1Thq/OoV4ZfZV84ZeHEyk+ViPT
+	Fd/GOlwGGXEVEPLew8BOPZFSFFZ9nI/tX959M4qolZO7lhJMMbGi3fVFrQ==
+X-Gm-Gg: ASbGncvhMv3PoLCvu4dxY+8BYAYyLbY5EA+I3rqGZ3c6LrttuKm63iEciEFMK3WeuEv
+	+9znj4iPxpI2MFW1dkooy1mYERS6J7GEBJd13WbQi+fh+U/OxyhmKopJtcgcD46UeeacCGokERq
+	8/Hl+7yiEwCRIsOuXgjIa8JNRsr9vlrV19GQ/Dr38p08K88yLeLO1fc+Sq16V30SFSjkmMXpSUF
+	pkdGZHwB4+n1hC72sx/jcOEqUHaZZK1BY3wJbLOvEmdMDDJRQz7m2q6z0OoZn/sw16ArTNp2wCF
+	PlWPis79HHr2s3To2E1as90Agp/3Bti07kDgb/SYlFnivmu8
+X-Google-Smtp-Source: AGHT+IG+HZfyUcgiRx7GpWePTRnMpeMmTXyuKFks0wwqsd6FMbYI3hGyL14bdO4qLEItP6JoPIzYyw==
+X-Received: by 2002:a05:6a21:9984:b0:1f5:51d5:9ef3 with SMTP id adf61e73a8af0-2045b71b22bmr4147388637.20.1745605807053;
+        Fri, 25 Apr 2025 11:30:07 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.103.255])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15fa80fb9fsm3213117a12.57.2025.04.25.11.30.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 11:30:06 -0700 (PDT)
+Message-ID: <680bd4ae.630a0220.1ee2d8.cbf1@mx.google.com>
+Date: Fri, 25 Apr 2025 11:30:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4649552976066173447=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250425171505.573271-1-kernel.org@pileofstuff.org>
-In-Reply-To: <20250425171505.573271-1-kernel.org@pileofstuff.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 25 Apr 2025 14:20:03 -0400
-X-Gm-Features: ATxdqUFuytn8stJ-0ObWNESGIf40vHMkruJPXx63bx_D6sPRwl8qlBLTi0V4e_8
-Message-ID: <CABBYNZLb+GrBEiy8VaQDAGtxcRqn6wUweaxXu7mD6ti4VoTeKw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/4] obexd: unregister profiles when the user is inactive
-To: Andrew Sayers <kernel.org@pileofstuff.org>
-Cc: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] workflows: Add sync-repo action
+In-Reply-To: <20250422211827.987293-1-luiz.dentz@gmail.com>
+References: <20250422211827.987293-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Andrew,
+--===============4649552976066173447==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 25, 2025 at 1:15=E2=80=AFPM Andrew Sayers
-<kernel.org@pileofstuff.org> wrote:
->
-> This is a follow-up to "obexd: only run one instance at once".
-> Instead of refusing to run parallel services, it unregisters
-> profiles when the user is inactive.  This avoids the need
-> for tmpfiles, and avoids issues where the user with the
-> obex service logs out, leaving obex disabled altogether.
->
-> Luiz previously suggested moving this to systemd, but I haven't had much
-> luck getting the systemd devs to accept changes, and Pauli's mention of
-> elogind (i.e. logind without systemd) suggests it's probably better
-> to avoid the dependency anyway.
->
-> I considered writing a separate D-Bus service that would notify you
-> when the session became (in)active, but D-Bus doesn't have particularly
-> strong guarantees about how long messages take to deliver, which could
-> lead to race conditions between instances on overloaded systems.
->
-> I also considered writing some kind of library, but there's not much
-> code to deduplicate, and most of it would need to be reworked for every
-> service that uses it.  So I wrote a gist for people to copy/paste:
->
-> https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
->
-> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
-> ---
->
-> V1 -> V2 Open/close private DBus connections instead of
->           calling UnregisterProfile (thanks Pauli Virtanen)
->          Add obex_setup_dbus_connection_private() (to enable the above)
->          Fix CI errors
->          Minor issues I missed last time:
->            * s/regster/register/ in e-mail subject lines
->            * s/login_.*_cb/logind_$1_cb/g in logind.[ch]
->            * remove watches on exit in pbap.c and bluetooth.c
->
-> Andrew Sayers (5):
->       pbap: Support calling pbap_init() after pbap_exit()
->       obexd/bluetooth: Support calling bluetooth_init() after bluetooth_e=
-xit()
->       obexd: Support creating private system/session bus connections
->       obexd: Unregister profiles when the user is inactive
->       Revert "obexd: only run one instance at once"
->
->  Makefile.obexd            |  10 ++
->  obexd/client/pbap.c       |  33 ++++++-
->  obexd/plugins/bluetooth.c |  30 +++++-
->  obexd/src/logind.c        | 245 ++++++++++++++++++++++++++++++++++++++++=
-++++++
->  obexd/src/logind.h        |  26 +++++
->  obexd/src/main.c          |  12 +++
->  obexd/src/obex.service.in |   9 --
->  obexd/src/obexd.h         |   2 +
->  8 files changed, 349 insertions(+), 18 deletions(-)
+This is automated email and please do not reply to this email!
 
-Seems that the coding style is not quite right:
+Dear submitter,
 
-https://github.com/bluez/bluez/actions/runs/14670164969/job/41174608664?pr=
-=3D1198
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=955880
 
-I'm adding .clang-format and .editorconfig in order to make it simpler
-for linters and editor to detect the coding style automatically.
+---Test result---
 
---=20
-Luiz Augusto von Dentz
+Test Summary:
+CheckPatch                    PENDING   0.25 seconds
+GitLint                       PENDING   0.25 seconds
+BuildEll                      PASS      20.30 seconds
+BluezMake                     PASS      2672.80 seconds
+MakeCheck                     PASS      19.89 seconds
+MakeDistcheck                 PASS      199.00 seconds
+CheckValgrind                 PASS      277.29 seconds
+CheckSmatch                   PASS      303.01 seconds
+bluezmakeextell               PASS      127.54 seconds
+IncrementalBuild              PENDING   0.30 seconds
+ScanBuild                     PASS      916.55 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4649552976066173447==--
