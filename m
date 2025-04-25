@@ -1,35 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A50E1F4297
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Apr 2025 21:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E755537F8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 14:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745530792; cv=none; b=QEMbk6ta02T76Hfx2efN7h+W1mWCmMcAPY+yzY1dC4NPFDXYWnp37pYQK7XUE6vij0O9wLkJn8AQUcIWVtOJUtNCsv1pM2o6cTtw5bG5nNNp7ygJRtRv53f3KqHhA/mamRJILBQ90Hjz/BtQAI+Rqil0MtP5SQpU53l+2kR8KBA=
+	t=1745589901; cv=none; b=Jxc5Zl9hudnkATUuCOnTOcSAmsa7ucSukcTgSU+/TwtveRmB+E1nnlcF+AA9gfTV7fHcunpnBYAVVrJI3XtOPXNG6R2OsXeKkemPRKQGnBhPtl1DEzBDRaYOiyu8idojwSxNazwjcTJ02iHh3IZfasQlbrvMDJrQeAuG24Kg2xE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745530792; c=relaxed/simple;
-	bh=LayZdEAnGxj3XcPsgvDXqT+ZUVlXRQBwURYEOO7yGlo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Z+hkMe3PLBHySQKUcNyJaBFUGGXCGoHSx6obEfbBmLH/VJZycgJp0CFEtBKQ8vZnZKRQuIew3mff5UlIEi0e0R10mSAO/GXLxZtL1eoNynaE4+iRzGzwSDFEMWAoJj6C6zYnsjO5eFP3DSW6jR9CqAKXlIHpg11x03WAnPUiv0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZWdrMqt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745589901; c=relaxed/simple;
+	bh=WIETOBVd/t9OIh3lFAIlGoTg18s6Gfm/6LJe+lVeM78=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tlXRf9byFBxUriNydg96NLrOZHGAF+YZD8KtWg7zkO6TpEDX4Q8LWwuS+H41Me1BG9hoBTIriJUjbJriQu0I36DKrm5MXfTy66+UQSXO8d8QBkgo9Ente8wcTJb0h/rT5ikvNPVQw8fBzoCVhw3ZZ03/ESBxaxiF6r0U666Ax70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=BOZWqcBQ; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZWdrMqt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A535FC4CEE3;
-	Thu, 24 Apr 2025 21:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745530791;
-	bh=LayZdEAnGxj3XcPsgvDXqT+ZUVlXRQBwURYEOO7yGlo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eZWdrMqtdfqR2c9UjYUiTO5BVxL7bhywBCRMERXwCP95N50sByfPancvh7q5WGufC
-	 YVqJeIa2OhwDtDdE8VBzmsKFUsEprdW//hASSXzNCCLIfBGqfapZwKXVtgpqOKhWgP
-	 n2Et3n3JWOqCBgiowpN8EMcqTvvEhFE4QLWpIy+z3RkvDRvcqLAfzKUDkhfbtTQt3H
-	 BV4/SLRizJP0YacuwxP99dGJsCv7c4dturdXP3X7Vw3dBN7c0TvNwBckWXSsJhrgPH
-	 GD3e40qc4ZsPrsX9k3f2wCY8YT+oSLVGSyMt1m8dBPlq71t9TQRcnCrozYBQhiCQH/
-	 RdGiBkQBh1xmg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D32380CFD9;
-	Thu, 24 Apr 2025 21:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="BOZWqcBQ"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6f2b05f87bcso23700496d6.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 07:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asymptotic.io; s=google; t=1745589898; x=1746194698; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V9u0EsiiWYB9w+4KowwbuwpKDKj+7XfBuZlNF2jmejs=;
+        b=BOZWqcBQKXXKU8hXr2iMvDah8d61SPIW7R0kxVx1FXjsxgg192y4Mlt0+ikhizpr3V
+         H1477vZ8PTvlERwotguxvWPNiKBbK4FwyY6PNx5lh5niQzkOvtzMduKU6BKlYvTkVmmH
+         ATwKBw3B1PlKZoo2gC/aqr1JBdavtxdz+vYyrxQTYq1znVOWlENf9MiTl7xY4nAhcpCR
+         meIXwbmprxBNxoqoEr1rMrWX1feJ0nCxacwIh7+UzfGSOA7nZX07SA+s3G0YQlil6PsA
+         HXrFGqSUuEv9GvqnYnaI/xwe4UiqjPylyV9oGG3leR8vNbSzKyvHbuyC1CxrSjDQ8HaI
+         u10Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745589898; x=1746194698;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V9u0EsiiWYB9w+4KowwbuwpKDKj+7XfBuZlNF2jmejs=;
+        b=lKf+eAk96vJws3SYWr+77CnIeVqsgRelhAZX9elu3gJeUi5LoxBrKDynrFC1C/TtV3
+         tHbLsnEmLen3CdrBX91UwnOluG2I7RS8VdYgCBOX7F45rI41C4ZrFQJwVFA/QVbLslWd
+         m2gsc3oTjDdSh0Sj7QWiMdEFFfJe629iv4q/fU/KurGCbRpOp34LmSpvC457gx6zrJVl
+         4v0/WJAuHzeYqcxZtQenkol72b501glXj2AME0NNdFsPZ11OkW6h8INsBgr4Ir1Hqqfp
+         3wsfsazpA+FWfHC2RQITpTwq4rGYMaewe2x0Fsk7VDKNj4MD/4T/9HPkcNsd4o0Nsb5O
+         GsvQ==
+X-Gm-Message-State: AOJu0YyRfKIFrhOSOzguqbigZlFVl3EN6SlCnyQ6uCLDUMVgBaQ6EVpL
+	iCsuSQPpR7hGnDSurTtuWkMyFUmI3UsN9ghYPgiWNoBrdKq2I4i4uYzxDCvNLliL186rZsUt8/o
+	p
+X-Gm-Gg: ASbGnct1wFWdS7vnCRsRi4tnHq2tlHyVbUPQJkKpPkA2hXfWlTCMWA1c7mOMrODGq7X
+	uFvN0fHsEnawlIU6K152iFaro3uJYh69w60IoCgjELtslPnAiBP/pRIH6696y8xXIUR7c4cKQbz
+	qOIp27ozluEzuzU7nGv99NrXYSDhlLQ0JjilDFdlkqaihcv5xrFZK9RyE65KnOtXlzle8QP2QJl
+	8lV8tMSeTin6tbcqsWv7J56x9lUM0rlxy8yQEi5jm4aJVDyTUOSymhUqU+ZHA/nY+1TsMWD4WWK
+	08FKsk5z4g9GcO5tXZwmUvjBb6xKo4BTyapePg==
+X-Google-Smtp-Source: AGHT+IEjO+JtWEwwy9PAm4ZW3hmLczWmZirNMCIz096plIvKJvLCx56kIJRZ/Y02CoJbvBk6YgDBsw==
+X-Received: by 2002:a05:6214:226d:b0:6d8:a39e:32a4 with SMTP id 6a1803df08f44-6f4cb9edb2fmr45634816d6.25.1745589897863;
+        Fri, 25 Apr 2025 07:04:57 -0700 (PDT)
+Received: from andromeda.lan ([74.15.9.135])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f4c0aaea5fsm22253396d6.94.2025.04.25.07.04.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 07:04:57 -0700 (PDT)
+From: Arun Raghavan <arun@asymptotic.io>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arun Raghavan <arun@asymptotic.io>,
+	sanchayan@asymptotic.io
+Subject: [PATCH BlueZ] shared/asha: Only update device set after start succeeds
+Date: Fri, 25 Apr 2025 10:04:47 -0400
+Message-ID: <20250425140447.615075-1-arun@asymptotic.io>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,40 +70,34 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] workflows: Add checkpatch action
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174553083025.3499833.16686023878410871107.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Apr 2025 21:40:30 +0000
-References: <20250424195643.1375697-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250424195643.1375697-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+This ensures that one side's connected status is only exposed to the
+other after the connection is actually complete.
+---
+ src/shared/asha.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Thu, 24 Apr 2025 15:56:41 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds checkpatch action rather replacing the custom CI one which
-> will be going to be disabled.
-> ---
->  .github/workflows/checkpatch.yml | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->  create mode 100644 .github/workflows/checkpatch.yml
-
-Here is the summary with links:
-  - [BlueZ,v1,1/2] workflows: Add checkpatch action
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=55b02fe5a2bd
-  - [BlueZ,v1,2/2] workflows: Add lint action
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=faca96e9c9a3
-
-You are awesome, thank you!
+diff --git a/src/shared/asha.c b/src/shared/asha.c
+index e623e7156..33bec40da 100644
+--- a/src/shared/asha.c
++++ b/src/shared/asha.c
+@@ -421,8 +421,6 @@ static void read_rops(bool success,
+ 			asha->right_side, asha->binaural, asha->csis_supported,
+ 			asha->render_delay, asha->codec_ids);
+ 
+-	update_asha_set(asha, true);
+-
+ 	check_probe_done(asha);
+ }
+ 
+@@ -447,6 +445,7 @@ static void audio_status_notify(uint16_t value_handle, const uint8_t *value,
+ 		if (status == 0) {
+ 			asha->state = ASHA_STARTED;
+ 			DBG("ASHA start complete");
++			update_asha_set(asha, true);
+ 			asha_set_send_status(asha, true);
+ 		} else {
+ 			bt_asha_state_reset(asha);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.0
 
