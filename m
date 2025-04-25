@@ -1,42 +1,122 @@
-Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C911DED5D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 17:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3079C189B80
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 17:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745601340; cv=none; b=UqdwGD+5yyura2g0gVlG84fH/G5iyWLnlOnmBcwQPtHZ5Tci79lTRK0X9VITokxd6FoekJac6QZsBdfuB/7ZE35R9pjxeQJKchRJn3jSly0qAOuODzTKS2+LcX/opsOsqvq2S+RjoyFndFdYJvGK3bvQ25YQ6PCggGxzDpgBzO4=
+	t=1745602247; cv=none; b=djirbxutwQxcmqvCTWDFRNrp0r6y46diWxc35AxCa4uf5aUInlaPDaozilaE4Tz03z4TE+j8+AyHwdTlUGEY7tb9FwxrSgTBxN0oMVUwnzCj6AnAcugGRUvH9h6NK6CGTvW4BHaVMhwfv9Eb6JWT12Y2Z9cTIEkn2qMwc/1X98k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745601340; c=relaxed/simple;
-	bh=iNoNFHPOntE9VXU3/sXp34BzYarmL3L23nkondhyhLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o54hF0EQ41ka4HlnuCxBgxj5eGw5L+4OAlgGrYWwC0THegJW7d1Z/7TUXbsXwZxtwAV8bpF49OpwPcc4NU57YkICeYcoJFjw+grQl44Mu1sk5AUdGqWn2Pr86x6MiLObFKZLKBQr8Mojc/5fRwk0GLGDPjEVXJG+0xQmw5MF/aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
-Received: from f.e.3.8.2.2.5.b.8.9.9.0.4.5.1.6.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:6154:998:b522:83ef] helo=andrews-2024-laptop.lan)
-	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
-	(envelope-from <kernel.org@pileofstuff.org>)
-	id 1u8MeF-0005GV-0J;
-	Fri, 25 Apr 2025 18:15:34 +0100
-From: Andrew Sayers <kernel.org@pileofstuff.org>
+	s=arc-20240116; t=1745602247; c=relaxed/simple;
+	bh=/+i73R+04cncB9t2rOZYN/RgRY9UQtzYQ0Oxui02FWI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YFBjJjw/NhQIwOOTa9cb1hLATrnnTUGt1Ciqbtcg8vwEgRNC4FZiFLqzSuCPq0gmwcfRjvScOAYPbrUmhKoBYflHQUyf8MJFTHyBp2rd034BsEvWhenQ9iK+nTGro6kHmUiDtLjd3Us0oABQu66NJF9U9L7XD+sei9BcHXJGg38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AZFu1rvm; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AZFu1rvm"
+Received: from github.com (hubbernetes-node-a0e7df4.ac4-iad.github.net [10.52.158.25])
+	by smtp.github.com (Postfix) with ESMTPA id 2151D700368
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 10:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745602245;
+	bh=k+8d9/iu9Y3zJjH6Rm2CJeJWoOt38r1pl+yWOOj1KI4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=AZFu1rvmfyMrK3nLFnHv8WHVpuOAUiLkfoOBRvbs58EcWrPWLkT0v4HF2lmBvZCub
+	 ebISw0UMwJIWqStKXEEB03sEYlxaGH3zbAqVfXvMmnN7kLPTGmqBcGqECDDRkAdgAf
+	 bRJd2juqW4xv42+cXmVgnS3x4IwhkMaTzpo8HPTE=
+Date: Fri, 25 Apr 2025 10:30:45 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	pav@iki.fi,
-	Andrew Sayers <kernel.org@pileofstuff.org>
-Subject: [PATCH BlueZ v2 3/5] obexd: Support creating private system/session bus connections
-Date: Fri, 25 Apr 2025 18:13:02 +0100
-Message-ID: <20250425171505.573271-4-kernel.org@pileofstuff.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250425171505.573271-1-kernel.org@pileofstuff.org>
-References: <20250425171505.573271-1-kernel.org@pileofstuff.org>
+Message-ID: <bluez/bluez/push/refs/heads/957129/000000-b8068a@github.com>
+Subject: [bluez/bluez] 1ddc62: pbap: Support calling pbap_init() after
+ pbap_exit()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/957129
+  Home:   https://github.com/bluez/bluez
+  Commit: 1ddc62fa5cbe4aa7378b772fb8f9cf97d2551385
+      https://github.com/bluez/bluez/commit/1ddc62fa5cbe4aa7378b772fb8f9cf97d2551385
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
+
+  Changed paths:
+    M obexd/client/pbap.c
+
+  Log Message:
+  -----------
+  pbap: Support calling pbap_init() after pbap_exit()
+
+pbap_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
+
+Send the UnregisterProfile message directly from pbap_exit(),
+then call unregister_profile().
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: 61f5836a9a738d32eac9a3da67e5c46b218fb887
+      https://github.com/bluez/bluez/commit/61f5836a9a738d32eac9a3da67e5c46b218fb887
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
+
+  Changed paths:
+    M obexd/plugins/bluetooth.c
+
+  Log Message:
+  -----------
+  obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
+
+bluetooth_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
+
+Send UnregisterProfile messages directly from bluetooth_exit(),
+then call unregister_profile(profile).
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
+
+Do not free profiles in bluetooth_exit() - profiles are needed
+by a future call to bluetooth_init(), or will be freed by
+bluetooth_stop() if necessary.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: e4829a671a616fdc99043dc1d445f57a25421bc6
+      https://github.com/bluez/bluez/commit/e4829a671a616fdc99043dc1d445f57a25421bc6
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
+
+  Changed paths:
+    M obexd/src/main.c
+    M obexd/src/obexd.h
+
+  Log Message:
+  -----------
+  obexd: Support creating private system/session bus connections
 
 Obexd can either connect to the system or session bus.
 We mostly share a common connection to that bus, but it can be useful
@@ -47,40 +127,81 @@ Add obex_setup_dbus_connection_private(), which creates a new
 connection to whichever bus was specified by the user.
 
 Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
----
- obexd/src/main.c  | 8 ++++++++
- obexd/src/obexd.h | 2 ++
- 2 files changed, 10 insertions(+)
 
-diff --git a/obexd/src/main.c b/obexd/src/main.c
-index 703173662..ca95a70de 100644
---- a/obexd/src/main.c
-+++ b/obexd/src/main.c
-@@ -253,6 +253,14 @@ DBusConnection *obex_setup_dbus_connection(const char *name,
- 	return connection;
- }
- 
-+DBusConnection *obex_setup_dbus_connection_private(const char *name,
-+					DBusError *error)
-+{
-+	return g_dbus_setup_private(option_system_bus ?
-+				DBUS_BUS_SYSTEM : DBUS_BUS_SESSION,
-+				name, error);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
-diff --git a/obexd/src/obexd.h b/obexd/src/obexd.h
-index 5e5edc4de..560db29ce 100644
---- a/obexd/src/obexd.h
-+++ b/obexd/src/obexd.h
-@@ -33,3 +33,5 @@ const char *obex_option_capability(void);
- DBusConnection *obex_get_dbus_connection(void);
- DBusConnection *obex_setup_dbus_connection(const char *name,
- 					DBusError *error);
-+DBusConnection *obex_setup_dbus_connection_private(const char *name,
-+					DBusError *error);
--- 
-2.49.0
 
+  Commit: feadad7a76f9f8d5a4557321fa3f0592de10b747
+      https://github.com/bluez/bluez/commit/feadad7a76f9f8d5a4557321fa3f0592de10b747
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
+
+  Changed paths:
+    M Makefile.obexd
+    M obexd/client/pbap.c
+    M obexd/plugins/bluetooth.c
+    A obexd/src/logind.c
+    A obexd/src/logind.h
+    M obexd/src/main.c
+
+  Log Message:
+  -----------
+  obexd: Unregister profiles when the user is inactive
+
+Obexd is usually run as a user service, and can exhibit surprising
+behaviour if two users are logged in at the same time.
+
+Unregister profiles when the user is detected to be off-seat.
+
+It may be impossible to detect whether a user is on-seat in some cases.
+For example, a version of obexd compiled with systemd support might be
+run outside of a systemd environment.  Warn and leave services
+registered if that happens.
+
+Obexd can be run as a system service, in which case this check makes no
+sense.  Disable this check when called with `--system-bus`.
+
+Obexd can also be run by a user that does not have an active session.
+For example, someone could use `ssh` to access the system.  There might
+be a use case where someone needs Bluetooth access but can't log in with
+a keyboard, or there might be a security issue with doing so.  This isn't
+handled explicitly by this patch, but a future patch could add support
+by calling `logind_set(FALSE)` in the same way as is currently done
+with `--system-bus`.
+
+Unregister profiles by closing private connections instead of sending
+UnregisterProfile on the shared connection.  Pipewire has apparently
+found the latter to cause long shutdown delays, because bluetoothd
+may be shutting down and unable to handle this message.
+
+Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+
+Other services are likely to need similar functionality,
+so I have created a gist to demonstrate the basic technique:
+https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: b8068a1c6ef32530d05bf892dd1c027ed1aeb2ce
+      https://github.com/bluez/bluez/commit/b8068a1c6ef32530d05bf892dd1c027ed1aeb2ce
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
+
+  Changed paths:
+    M obexd/src/obex.service.in
+
+  Log Message:
+  -----------
+  Revert "obexd: only run one instance at once"
+
+No longer needed now services can share resources.
+
+This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+Compare: https://github.com/bluez/bluez/compare/1ddc62fa5cbe%5E...b8068a1c6ef3
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
