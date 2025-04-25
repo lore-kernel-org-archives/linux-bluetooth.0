@@ -1,125 +1,144 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2324C215F53
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 18:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD13170A11
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 18:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745605809; cv=none; b=P9vNVV+k/c42HN1MwmbgSyWFioKiNFj8c0wei5Q0/BV21cTPOD6exwXsv/2B8+kky7FO3T6E9Usmy1bzZU47IrhfLFywO9fTI5axCV/pFnW1K7G5zUVWK5qjZP32VqbaYhOQwhHLeOrEtKgXJqYZ1KmIvwn2MH3EyCwRITSzgoY=
+	t=1745606400; cv=none; b=seIaSmk700D6pgQssV1iC3BRhcqwXfwvDuIW0SHG0Iksswm35foolK6LF/dBFNQnIYQMAX6uhzwvAf94V0hmwE2S0ggVaQf2/7oZnzGAB3I568KsqCV3DW5uygB3NJSCoDxwY4cv+t7ce65D+wWL42AtT/CI2H8IM3y+PEUtz2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745605809; c=relaxed/simple;
-	bh=Fi5PclbQVTKZxSWS8m1DkUt6mqqzhkr51FD6mK/NR58=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=N+/6gCo/PP3zK0U0hDLWPU2zRv0dKjAVheH4sdeT643aSBvRpoRUsBWSbQbh9mkYtWx3rS1hKgBvFKNxqIV2rsdEbs1eLrYcuwK7uo9V7d/SGm0szsaCDbrxKK0/jjiK/GBqfFG7bC/KFXSlRfyFCzuvAOxM6Dztbj7oLoZRECE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=InT/O3NU; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745606400; c=relaxed/simple;
+	bh=dKNU92LlCa6GOJ8WEsO3TOTp8eBWPTJg+CReC+zJZA4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=NB/a0dL7kF7br+TDLG00PElSAt1rHIRB8+kKts5d0zk3TLTUsCfRccGp2U5wYWwJLfsdCccw91hfpIpsAgco6biRLhE8NVbcUBdWgI1ZtPInn07JfYtAPENbUWufB1mOPFrJB9hKKmxl4DV79Uy5w5ELHyn1W8CZimLuJTAIsH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jykaUpPP; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InT/O3NU"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b07d607dc83so2392457a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 11:30:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745605807; x=1746210607; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oN+snJgMVy3Y6VxGkAb34cAztgz8ro/kVAyeJJUtVHs=;
-        b=InT/O3NUdgJr63oErtoCRzUdNCZidRYAGBzoDNAgvv3/XUbXziT0K3+lgdr3E3laS+
-         Oy3+O3B6nEJeANQVK1zAViz1czo7HiMOf5cSux+658KMXqYPkYnUmCvK1PlOXgtF1EnY
-         Etd3rUOFqH9DRC9iBkUOCnaCT9i3oTv2QoMKMK+JVSuQxRYGwwSGluoZFy2NO0XUvUqf
-         rQsnEBcDa4ktF/qtkA9MQQo9z+Vf3dVbx90vXsMT1mXMEEZ2csVThN8GWKSv8xbIwJ8V
-         fbkQCM2BywY4i4egk6POIX/ecP71I04aBD2QELlq0a7PKdKsA821Cruk0zNR6Ffb+Qa0
-         dhCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745605807; x=1746210607;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oN+snJgMVy3Y6VxGkAb34cAztgz8ro/kVAyeJJUtVHs=;
-        b=NKO7/yHmiJyiPkrVsWJMMV5v/8PX6PjHQ+5WJJnj4uwl+Gp6DXn9XenNKBrsRNT1aB
-         xZoGUs4sZis0lOsGBS+COn4GoK/RNej8q9BX0x6Y7PR7OcMp1MFdp1KZfN+W66qk8Hqt
-         XOGF6CASnN7CaI60bOnHfG7r1tJCo3C4wE5ppIk2rTfenDJNNJVfErwMWU16+DhhhfB/
-         +pkvQ/u1c4P1vYYJCF8T59tksdo3WN9Vj96BYH2MkFnzMlJImkgTiffgoErC/Jl9h5pL
-         DyZq8zFey1F6yTSzqu00vZIG4vbJOMEP5XaaXufmSDa2QhDa+lguFa+La4yZc0Npyp31
-         /GVQ==
-X-Gm-Message-State: AOJu0Yy06OwcIz6MDhncwqnqHlQ6DM1Thq/OoV4ZfZV84ZeHEyk+ViPT
-	Fd/GOlwGGXEVEPLew8BOPZFSFFZ9nI/tX959M4qolZO7lhJMMbGi3fVFrQ==
-X-Gm-Gg: ASbGncvhMv3PoLCvu4dxY+8BYAYyLbY5EA+I3rqGZ3c6LrttuKm63iEciEFMK3WeuEv
-	+9znj4iPxpI2MFW1dkooy1mYERS6J7GEBJd13WbQi+fh+U/OxyhmKopJtcgcD46UeeacCGokERq
-	8/Hl+7yiEwCRIsOuXgjIa8JNRsr9vlrV19GQ/Dr38p08K88yLeLO1fc+Sq16V30SFSjkmMXpSUF
-	pkdGZHwB4+n1hC72sx/jcOEqUHaZZK1BY3wJbLOvEmdMDDJRQz7m2q6z0OoZn/sw16ArTNp2wCF
-	PlWPis79HHr2s3To2E1as90Agp/3Bti07kDgb/SYlFnivmu8
-X-Google-Smtp-Source: AGHT+IG+HZfyUcgiRx7GpWePTRnMpeMmTXyuKFks0wwqsd6FMbYI3hGyL14bdO4qLEItP6JoPIzYyw==
-X-Received: by 2002:a05:6a21:9984:b0:1f5:51d5:9ef3 with SMTP id adf61e73a8af0-2045b71b22bmr4147388637.20.1745605807053;
-        Fri, 25 Apr 2025 11:30:07 -0700 (PDT)
-Received: from [172.17.0.2] ([20.171.103.255])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15fa80fb9fsm3213117a12.57.2025.04.25.11.30.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 11:30:06 -0700 (PDT)
-Message-ID: <680bd4ae.630a0220.1ee2d8.cbf1@mx.google.com>
-Date: Fri, 25 Apr 2025 11:30:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4649552976066173447=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jykaUpPP"
+Received: from github.com (hubbernetes-node-222d189.va3-iad.github.net [10.48.133.37])
+	by smtp.github.com (Postfix) with ESMTPA id 115084E0AF1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Apr 2025 11:39:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745606396;
+	bh=GrQy94pzngR6ZeXEYvNhg41lTo/AayN7KdTe/0Kyr5w=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=jykaUpPP1qUYSyrrd71UcbI11H8vbqYvZi6k9faF2lEcdGaeRTKbcd1H1I8R2qrw2
+	 YKRVgnSJt07qk9OZQ2GGxyjchyuDsUh2y2sLYtinmMjg8M+p+GmdT0yXacBJ8t2JEC
+	 0tQzQUCIj6Nt0O9D+TUf6NwBr9GdcM4F/VGrMpmo=
+Date: Fri, 25 Apr 2025 11:39:56 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/faca96-c3b6f4@github.com>
+Subject: [bluez/bluez] 42f518: Add support clang-format
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] workflows: Add sync-repo action
-In-Reply-To: <20250422211827.987293-1-luiz.dentz@gmail.com>
-References: <20250422211827.987293-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============4649552976066173447==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 42f5184b98821900867ae2a99e75069352dff2b7
+      https://github.com/bluez/bluez/commit/42f5184b98821900867ae2a99e750=
+69352dff2b7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    A .clang-format
 
-Dear submitter,
+  Log Message:
+  -----------
+  Add support clang-format
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=955880
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.25 seconds
-GitLint                       PENDING   0.25 seconds
-BuildEll                      PASS      20.30 seconds
-BluezMake                     PASS      2672.80 seconds
-MakeCheck                     PASS      19.89 seconds
-MakeDistcheck                 PASS      199.00 seconds
-CheckValgrind                 PASS      277.29 seconds
-CheckSmatch                   PASS      303.01 seconds
-bluezmakeextell               PASS      127.54 seconds
-IncrementalBuild              PENDING   0.30 seconds
-ScanBuild                     PASS      916.55 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+This adds .clang-format (based on kernel) which can be used by linters,
+editors, etc to check the coding style.
 
 
+  Commit: cb8f216f51b7f9712873870701f48f39d94bf3c9
+      https://github.com/bluez/bluez/commit/cb8f216f51b7f9712873870701f48=
+f39d94bf3c9
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    A .editorconfig
+
+  Log Message:
+  -----------
+  Add .editorconfig file for basic formatting
+
+See https://editorconfig.org
 
 
---===============4649552976066173447==--
+  Commit: c29bb3f92825eb8b688a11bc0a7ade9b8ed1c287
+      https://github.com/bluez/bluez/commit/c29bb3f92825eb8b688a11bc0a7ad=
+e9b8ed1c287
+  Author: Arun Raghavan <arun@asymptotic.io>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
+
+  Changed paths:
+    M src/shared/asha.c
+
+  Log Message:
+  -----------
+  shared/asha: Only update device set after start succeeds
+
+This ensures that one side's connected status is only exposed to the
+other after the connection is actually complete.
+
+
+  Commit: c3b6f4e4b4562b5c5350bb44a16af40e97658321
+      https://github.com/bluez/bluez/commit/c3b6f4e4b4562b5c5350bb44a16af=
+40e97658321
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Check presence of ServiceRecords when loading from store
+
+For a HID paired device, if the cache file containing the SDP records
+is not present this will prevent the device to connect and need to
+remove it and pair again.
+
+Current bluetoothd traces:
+src/shared/mgmt.c:can_read_data() [0x0000] event 0x000b
+src/adapter.c:connected_callback() hci0 device EC:83:50:76:BD:67
+  connected eir_len 31
+src/shared/mgmt.c:can_read_data() [0x0000] event 0x0006
+profiles/input/server.c:connect_event_cb() Incoming connection from
+  EC:83:50:76:BD:67 on PSM 17
+profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
+  psm 17
+profiles/input/server.c:confirm_event_cb()
+profiles/input/server.c:connect_event_cb() Incoming connection from
+  EC:83:50:76:BD:67 on PSM 19
+profiles/input/device.c:input_device_set_channel() idev 0x5580c6a331b0
+  psm 19
+profiles/input/device.c:hidp_add_connection() Could not parse HID SDP
+  record: No such file or directory (2)
+profiles/input/device.c:ctrl_watch_cb() Device EC:83:50:76:BD:67
+  disconnected
+profiles/input/device.c:intr_watch_cb() Device EC:83:50:76:BD:67
+  disconnected
+
+This commit sets BREDR svc_resolved to false if the ServiceRecords
+entry is not present in the cache file, triggering service rediscover
+on next device connection.
+
+
+Compare: https://github.com/bluez/bluez/compare/faca96e9c9a3...c3b6f4e4b4=
+56
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
