@@ -1,65 +1,64 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7391922DD
-	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 11:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3E91ABEC5;
+	Sun, 27 Apr 2025 11:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745753187; cv=pass; b=OCXSHoL8NJcdNiaoPjLCgAdpc5ZH1EzYCMXt9TqV1LqInI9UooFQkEpJBOL6nYA1NV3rbs+y8VDADekZn224A2OM/v2SuXtphq+O+MEzi7IzgZNZgBmmlfPZ+/Rar5GZvRgajyLe6kSlzR7uHbIbnVdAEOHDxJZq0/g+U/VEfQo=
+	t=1745753264; cv=pass; b=LeHlj0s0wAB55j6qjBpsUMpkK0AyaGpBGscx75ryIP5sK0b93kcLcEoqjNuAtndL55O0XP9FmzJkf6zwluvG4fJLErx3MygSd09nNH1qnY3vmhmwlh28X7x1p9tLwriWwyEe3UnNeXKgydeSKkeTnGvqu9OudqgjF7KVu+FNn9c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745753187; c=relaxed/simple;
-	bh=2fjpN3b57qpKwDcsC6fUvK/csSh1Nn7ZbhBuZyngqkA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aQWVFyENyLVeA6fK352HKOD7zLD3gYIPqbiidUMVx1andJ6ut7wIPx99XfXEmjvEVNtdbOPr5l+d0qrNvWauBsAYawi0PQWCutWii8p4Dvyyx0glCE5EVcF6R9c8HOkaWB0ZlD0FiH+lNP/+5DrXptAuU/Nj9cahfq7uKAVd6zg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=NJE0T7xj; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1745753264; c=relaxed/simple;
+	bh=fUKt/We2zVZjSJfEQjeZ+KVbE/071SlD+D3Ahcy6w5A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WZAKtMahh6tkjcJE8g5IRy4Aeju9h+TghrvUXKKpwPGj2cGmGXr5O9RC+dA28/nPZQ0hKNOIqOuYEiehf6X7iOoAkjklkakCx4RS7skv/0wthBCq4Jt5u3RpEvrWC0LhsobHVL5eCMK8p+ftrSOWAjCqcETLGaCkGGw0nVCo+H8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=dhoKF9xP; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="NJE0T7xj"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="dhoKF9xP"
 Received: from monolith.lan (unknown [193.138.7.178])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZlkmV3DzDz49QJY;
-	Sun, 27 Apr 2025 14:26:18 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1745753179;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Zlknt094nzyQD;
+	Sun, 27 Apr 2025 14:27:29 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1745753251;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=D7VEvfwd9SkCW4X254zV5EomqMMv4elWHppQfX3RfJc=;
-	b=NJE0T7xjvJeWu/cKYWeC8v7NUbiRYKZund3fNzRWmgKj/hZPHt+9foVf41sgiK6HjJAl8U
-	hw1hR67jIrNMmBwSug315hPiaXSkwdYoJtuLaFgm0TO7nI/aXbybPk+Fw3yBmixZDnySQo
-	rh960ExALfNhLGv1kXnbjQsvT1uUt1O2KSm5dmXVR/SoHFxU1TQKJu6yTszzLu/KnMPaZr
-	TZD0Lal0Z2/U8DKbgp97u1jYFAYb5W7WtwJVJdkxwIWwzJxkA19VtHLbmL9paoOm2J+KUa
-	uugPGfW8LZw1xqiiDUuqUPvwMdRTLuPv/xB/7ampIsdjl7XHb1iKfgueqqqi0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1745753178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=D7VEvfwd9SkCW4X254zV5EomqMMv4elWHppQfX3RfJc=;
-	b=gd09/lVmx5kpP+AYYDSTqxPuzDav2BPWXikWxEYqCzX8VnZFSIZ3m9JPJccW0ROSwKFY47
-	5xiex+tV0ee7CFnPPhK+moPNaKVMacgw62gZMQh6xB1F0mT31VUjdvWUZ+Zcw43ijuXUnA
-	o9DTRL9JbsOhtMteNL+W58A5g0SYeZh8Hm1KeT6poEcYOtXRDwcUIhPYIL4lU9LTq1i7Tx
-	kFwBK8MvB4SfVnt9L+Haa9tSZySCHCIbuy5nxHbB7oKeMVI9uAm+aqMsUcc23rKB7xdJc2
-	BpPMCaj61TDIkvs49Wy7hr2Mm32hiJhWKyMaYWK0iLB+opHe0VZekkUqypRHvQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745753179; a=rsa-sha256;
-	cv=none;
-	b=KRX68jaPAK7dmT+vbOjlyuhPhuI2doV8PJbS/sObchuQ/uhZtkyrtrW0zOY3i1JJiXaLec
-	aI/xaryHtKX9vBMNxG1WVvWT2HKPM8Eyy7gDIeUkK9hArhgk0c18TpcpIWMnNNX5tmoX6o
-	GMxWZwDobdQZi6gvybecOeeA0+b3/0YAZ0WHUqhuqVFGvfFsSabrzq3kWEikAN9kjaw9Ya
-	FB+0Ei3licpzcTYok8wBfAUYomc7oeIH2ZuZ8j7UiZqj1RbHe4ETJJ91ONu+KFSp/VWeIT
-	lSQUyKnztLK6iosMm8MxL5oPIGaJb9BSoqRjFasE35Odx6M9E5nawYSHYBKZzw==
+	bh=7ESJ98B5Xbm36wHQBKf3qWmAPeJxbmwPHcvqZfxcxP8=;
+	b=dhoKF9xPbxpqcvUcux9oM0nIAFC+HaVsp9ipUXa0vW93oFsBGo0x2dgbs/PgOH+co6Pap3
+	C0Z7I4X1Na6dwXA4B1ylgqRA0immE8dLRgL00MA+Cooe/MxJYDBVNC9MCZnAkc9GRrjhyy
+	N1mWxyBwIS6ZvMfHWXFxMrRSNGHSog0=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1745753251; a=rsa-sha256; cv=none;
+	b=a4xZUa1dsE783aDkT7aBbBCze2Rby1GH4lzLt0OVF3F5hVDfKuWyTrvAINiGQoGBeBdq18
+	8dXdpZmGdhdAfa3/4qrUbk/ab2rkjNpOGLyyrJwEqquawX/AOk/Mnk1NaMhwQi1iFhsRp7
+	qUflCZpD9QND4V01sXVH9LDL41TS+g4=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1745753251;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7ESJ98B5Xbm36wHQBKf3qWmAPeJxbmwPHcvqZfxcxP8=;
+	b=X0EyRaji1UW16lFegXcskLXB1ve+4eGJkeFURqzyqSXuBtKwVqE9IwEs8RkerRPLq8XS5l
+	IPFdRtN9J0Nvr6GPXCi3bMl26ad5M6kI2BpelMgwR9F1DSJpC8Uqd3R13oRDhTI+RcF93o
+	DzbWsfJufUaxfmPKhHRP38umw3KL4BY=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2] tools: add tests for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-Date: Sun, 27 Apr 2025 14:26:15 +0300
-Message-ID: <fb7b09305a729369d1755569d4e7bdda48d94327.1745751513.git.pav@iki.fi>
+Cc: Pauli Virtanen <pav@iki.fi>,
+	netdev@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	kerneljasonxing@gmail.com,
+	andrew@lunn.ch,
+	luiz.dentz@gmail.com,
+	kuba@kernel.org
+Subject: [PATCH v2] Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
+Date: Sun, 27 Apr 2025 14:27:25 +0300
+Message-ID: <20867a4e60802de191bfb1010f55021569f4fb01.1745751821.git.pav@iki.fi>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -69,195 +68,211 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add tests for obtaining timestamping capabilities via ethtool ioctl:
+Bluetooth needs some way for user to get supported so_timestamping flags
+for the different socket types.
 
-L2CAP BR/EDR Ethtool Get Ts Info - Success
-L2CAP LE Ethtool Get Ts Info - Success
-SCO Ethtool Get Ts Info - Success
-SCO Ethtool Get Ts Info No Flowctl - Success
-ISO Ethtool Get Ts Info - Success
+Use SIOCETHTOOL API for this purpose. As hci_dev is not associated with
+struct net_device, the existing implementation can't be reused, so we
+add a small one here.
+
+Add support (only) for ETHTOOL_GET_TS_INFO command. The API differs
+slightly from netdev in that the result depends also on socket type.
+
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
 
 Notes:
+    Another option could be a new socket option, not sure what would be best
+    here. Using SIOCETHTOOL may not be that great since the 'ethtool'
+    program can't query these as the net_device doesn't actually exist.
+
+    Tests: https://lore.kernel.org/linux-bluetooth/fb7b09305a729369d1755569d4e7bdda48d94327.1745751513.git.pav@iki.fi/
+    
     v2:
-    - change expected timestamping flags to match kernel.
+    - don't advertise *_OPT_* which are supposed always available
+    - advertise RX_SOFTWARE for all
+      (L2CAP missing RX tstamps was a bug in l2cap_core.c, fixed in another
+      patch)
 
- tools/iso-tester.c   | 10 +++++++++
- tools/l2cap-tester.c | 15 ++++++++++++-
- tools/sco-tester.c   | 14 ++++++++++++
- tools/tester.h       | 52 ++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 90 insertions(+), 1 deletion(-)
+ include/net/bluetooth/bluetooth.h |  4 ++
+ net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++++
+ net/bluetooth/hci_conn.c          | 33 ++++++++++++
+ 3 files changed, 124 insertions(+)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 63f6951e3..96467a973 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -3495,6 +3495,13 @@ static void test_connect2_suspend(const void *test_data)
- 	trigger_force_suspend((void *)test_data);
- }
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index bbefde319f95..114299bd8b98 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -29,6 +29,7 @@
+ #include <linux/poll.h>
+ #include <net/sock.h>
+ #include <linux/seq_file.h>
++#include <linux/ethtool.h>
  
-+static void test_iso_ethtool_get_ts_info(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	test_ethtool_get_ts_info(data->mgmt_index, BTPROTO_ISO, false);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -3919,5 +3926,8 @@ int main(int argc, char *argv[])
- 	test_iso("ISO Broadcaster AC 14 - Success", &bcast_ac_14, setup_powered,
- 							test_bcast);
+ #define BT_SUBSYS_VERSION	2
+ #define BT_SUBSYS_REVISION	22
+@@ -448,6 +449,9 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+ 			  hci_req_complete_t *req_complete,
+ 			  hci_req_complete_skb_t *req_complete_skb);
  
-+	test_iso("ISO Ethtool Get Ts Info - Success", NULL, setup_powered,
-+						test_iso_ethtool_get_ts_info);
++int hci_ethtool_ts_info(unsigned int index, int sk_proto,
++			struct kernel_ethtool_ts_info *ts_info);
 +
- 	return tester_run();
- }
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 41ef62578..53b7d6f1a 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -994,7 +994,7 @@ static void setup_powered_server_callback(uint8_t status, uint16_t length,
+ #define HCI_REQ_START	BIT(0)
+ #define HCI_REQ_SKB	BIT(1)
  
- 	tester_print("Controller powered on");
- 
--	if (!test->enable_ssp) {
-+	if (!test || !test->enable_ssp) {
- 		tester_setup_complete();
- 		return;
- 	}
-@@ -2494,6 +2494,13 @@ done:
- 	close(sk);
- }
- 
-+static void test_l2cap_ethtool_get_ts_info(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	test_ethtool_get_ts_info(data->mgmt_index, BTPROTO_L2CAP, false);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -2604,6 +2611,9 @@ int main(int argc, char *argv[])
- 				&l2cap_server_nval_cid_test2,
- 				setup_powered_server, test_server);
- 
-+	test_l2cap_bredr("L2CAP BR/EDR Ethtool Get Ts Info - Success", NULL,
-+			setup_powered_server, test_l2cap_ethtool_get_ts_info);
-+
- 	test_l2cap_le("L2CAP LE Client - Success",
- 				&le_client_connect_success_test_1,
- 				setup_powered_client, test_connect);
-@@ -2723,5 +2733,8 @@ int main(int argc, char *argv[])
- 				&le_eatt_server_reject_test_1,
- 				setup_powered_server, test_server);
- 
-+	test_l2cap_le("L2CAP LE Ethtool Get Ts Info - Success", NULL,
-+			setup_powered_server, test_l2cap_ethtool_get_ts_info);
-+
- 	return tester_run();
- }
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index 650f8bab3..8db424815 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -1098,6 +1098,14 @@ static void test_connect_acl_disc(const void *test_data)
- 	test_connect(test_data);
- }
- 
-+static void test_sco_ethtool_get_ts_info(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	test_ethtool_get_ts_info(data->mgmt_index, BTPROTO_SCO,
-+				!data->disable_sco_flowctl);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -1166,5 +1174,11 @@ int main(int argc, char *argv[])
- 	test_offload_sco("eSCO mSBC - Offload - Success",
- 		&connect_success, setup_powered, test_connect_offload_msbc);
- 
-+	test_sco("SCO Ethtool Get Ts Info - Success",
-+			NULL, setup_powered, test_sco_ethtool_get_ts_info);
-+
-+	test_sco_no_flowctl("SCO Ethtool Get Ts Info No Flowctl - Success",
-+			NULL, setup_powered, test_sco_ethtool_get_ts_info);
-+
- 	return tester_run();
- }
-diff --git a/tools/tester.h b/tools/tester.h
-index 4e7d7226b..1ba7a01a2 100644
---- a/tools/tester.h
-+++ b/tools/tester.h
-@@ -15,6 +15,11 @@
- #include <linux/errqueue.h>
- #include <linux/net_tstamp.h>
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 0b4d0a8bd361..6ad2f72f53f4 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -34,6 +34,9 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <linux/proc_fs.h>
  
 +#include <linux/ethtool.h>
 +#include <linux/sockios.h>
-+#include <net/if.h>
-+#include <sys/ioctl.h>
 +
- #include <glib.h>
+ #include "leds.h"
+ #include "selftest.h"
  
- #define SEC_NSEC(_t)  ((_t) * 1000000000LL)
-@@ -198,3 +203,50 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
+@@ -563,6 +566,86 @@ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
+ }
+ EXPORT_SYMBOL(bt_sock_poll);
  
- 	return data->count - data->pos;
++static int bt_ethtool_get_ts_info(struct sock *sk, unsigned int index,
++				  void __user *useraddr)
++{
++	struct ethtool_ts_info info;
++	struct kernel_ethtool_ts_info ts_info = {};
++	int ret;
++
++	ret = hci_ethtool_ts_info(index, sk->sk_protocol, &ts_info);
++	if (ret == -ENODEV)
++		return ret;
++	else if (ret < 0)
++		return -EIO;
++
++	memset(&info, 0, sizeof(info));
++
++	info.cmd = ETHTOOL_GET_TS_INFO;
++	info.so_timestamping = ts_info.so_timestamping;
++	info.phc_index = ts_info.phc_index;
++	info.tx_types = ts_info.tx_types;
++	info.rx_filters = ts_info.rx_filters;
++
++	if (copy_to_user(useraddr, &info, sizeof(info)))
++		return -EFAULT;
++
++	return 0;
++}
++
++static int bt_ethtool(struct sock *sk, const struct ifreq *ifr,
++		      void __user *useraddr)
++{
++	unsigned int index;
++	u32 ethcmd;
++	int n;
++
++	if (copy_from_user(&ethcmd, useraddr, sizeof(ethcmd)))
++		return -EFAULT;
++
++	if (sscanf(ifr->ifr_name, "hci%u%n", &index, &n) != 1 ||
++	    n != strlen(ifr->ifr_name))
++		return -ENODEV;
++
++	switch (ethcmd) {
++	case ETHTOOL_GET_TS_INFO:
++		return bt_ethtool_get_ts_info(sk, index, useraddr);
++	}
++
++	return -EOPNOTSUPP;
++}
++
++static int bt_dev_ioctl(struct socket *sock, unsigned int cmd, void __user *arg)
++{
++	struct sock *sk = sock->sk;
++	struct ifreq ifr = {};
++	void __user *data;
++	char *colon;
++	int ret = -ENOIOCTLCMD;
++
++	if (get_user_ifreq(&ifr, &data, arg))
++		return -EFAULT;
++
++	ifr.ifr_name[IFNAMSIZ - 1] = 0;
++	colon = strchr(ifr.ifr_name, ':');
++	if (colon)
++		*colon = 0;
++
++	switch (cmd) {
++	case SIOCETHTOOL:
++		ret = bt_ethtool(sk, &ifr, data);
++		break;
++	}
++
++	if (colon)
++		*colon = ':';
++
++	if (put_user_ifreq(&ifr, arg))
++		return -EFAULT;
++
++	return ret;
++}
++
+ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -595,6 +678,10 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ 		err = put_user(amount, (int __user *)arg);
+ 		break;
+ 
++	case SIOCETHTOOL:
++		err = bt_dev_ioctl(sock, cmd, (void __user *)arg);
++		break;
++
+ 	default:
+ 		err = -ENOIOCTLCMD;
+ 		break;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 08e060669c2b..d8f6aaf14703 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -3025,3 +3025,36 @@ void hci_conn_tx_dequeue(struct hci_conn *conn)
+ 
+ 	kfree_skb(skb);
  }
 +
-+static inline void test_ethtool_get_ts_info(unsigned int index, int proto,
-+							bool sco_flowctl)
++int hci_ethtool_ts_info(unsigned int index, int sk_proto,
++			struct kernel_ethtool_ts_info *info)
 +{
-+	struct ifreq ifr = {};
-+	struct ethtool_ts_info cmd = {};
-+	uint32_t so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
++	struct hci_dev *hdev;
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return -ENODEV;
++
++	info->so_timestamping =
 +		SOF_TIMESTAMPING_RX_SOFTWARE |
-+		SOF_TIMESTAMPING_SOFTWARE |
-+		SOF_TIMESTAMPING_TX_COMPLETION;
-+	int sk;
++		SOF_TIMESTAMPING_SOFTWARE;
++	info->phc_index = -1;
++	info->tx_types = BIT(HWTSTAMP_TX_OFF);
++	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE);
 +
-+	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, proto);
-+	if (sk < 0) {
-+		if (sk == -EPROTONOSUPPORT)
-+			tester_test_abort();
-+		else
-+			tester_test_failed();
-+		return;
++	switch (sk_proto) {
++	case BTPROTO_ISO:
++	case BTPROTO_L2CAP:
++		info->so_timestamping |= SOF_TIMESTAMPING_TX_SOFTWARE;
++		info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
++	case BTPROTO_SCO:
++		info->so_timestamping |= SOF_TIMESTAMPING_TX_SOFTWARE;
++		if (hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
++			info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
 +	}
 +
-+	snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "hci%u", index);
-+	ifr.ifr_data = (void *)&cmd;
-+	cmd.cmd = ETHTOOL_GET_TS_INFO;
-+
-+	if (ioctl(sk, SIOCETHTOOL, &ifr) == -1) {
-+		tester_warn("SIOCETHTOOL failed");
-+		tester_test_failed();
-+		return;
-+	}
-+	close(sk);
-+
-+	if (proto == BTPROTO_SCO && !sco_flowctl)
-+		so_timestamping &= ~SOF_TIMESTAMPING_TX_COMPLETION;
-+
-+	if (cmd.cmd != ETHTOOL_GET_TS_INFO ||
-+			cmd.so_timestamping != so_timestamping ||
-+			cmd.phc_index != -1 ||
-+			cmd.tx_types != (1 << HWTSTAMP_TX_OFF) ||
-+			cmd.rx_filters != (1 << HWTSTAMP_FILTER_NONE)) {
-+		tester_warn("bad ethtool_ts_info");
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	tester_test_passed();
++	hci_dev_put(hdev);
++	return 0;
 +}
 -- 
 2.49.0
