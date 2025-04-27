@@ -1,130 +1,119 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C035E4A18
-	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 12:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745757845; cv=none; b=hT08kKmbe9ASg1cQGMiUwomuSVVcoIF5DNp1d26f+pWE1rWHkLGVEelb+zM0aRHHrs1kPN4fqd4aDg7Gqvdv4lWGdtNG1VRG7VxHUUH17AQEiZEjDr1RkyeJlRgacfqgyPIFQDOKBfVjxZf350mh1+lgYy1/Kacws+g5KYKU8m0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745757845; c=relaxed/simple;
-	bh=erwLLK6RzBmFLea4XmfxYSBw84lQujQceCVkveTK3DI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=l4LYx6d78ZLY03Dm2R+Xx+jyAhfDdTtvguNMYdSXxngOvSi9HR0dNwPY2I47CcyD3DwLR5Nl5Xl+fXM6jd2cwtBSaOVyefnwUSufClnSyH8Sf9ZRYQxHOhaMfSCmwJUuU5Vi/mgev6LYdtFczTN/OFf6ywTltVXRR+C1VfTPh7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jSIwcI1q; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5231CE555
+	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 14:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745762651; cv=pass; b=KSmbJwZBHZZe6FS4vF99YEoNs3Sv07Pj0yTcBuearD8+/vesR9MAoqMifdXF5FSIPQ70jGPZ7sWNsclTGuVSYT2o8OtZcMdeAM6kbdVVTA4V4u5h4u07qUpY/btu3t3KMUk+Cw5g6qWIkQ09rDKJl5RVAl9QN+Uv7alNCN46ZLU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745762651; c=relaxed/simple;
+	bh=aHBbuLVhT9qECBBNC6u8yY1JkGVL9SOaB3FxKWj0ELA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aRNvcF158qBX9Jxuyk9YATo84E4Z9N885DMQ3twz//dDbqCekBizHdNP31GrwlFrp4NXNRXBs19Vbll2hNv9n+NdzhQZxH8ginhQzlCfFFaJZzDG+6DHpMfbZQ2pC+GZrchXYo3WX8i7PRwguHPubGAfW9vubiqOphifHRhvBxI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=rRdQFfIM; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jSIwcI1q"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6f0ad744811so28679626d6.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 05:44:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745757842; x=1746362642; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LvMkg1IWeClvvaScShhHVMDyleAqqrBQLICBurzCMDA=;
-        b=jSIwcI1qrJna0PIiLQ/qSBBspoU2bAXSrbtUqdUm6TKRPqiwSc3e+1kJf+R2S/z0OJ
-         OIXkZJiA9YQQxH7o/xtcdQWJ2jgiOVnTWku9H0tRgnCmf8yGyestqkrTUlZr2sG+wRka
-         MrPSBAXb5ZEZ21Daub0nfls5vEr+djqtOsRpFHUrhTRUeKuLMg2sMA7wx1AvGOMLnKoI
-         rlm88tYUX/6oP63PBJ4pXOA9/XDzJP+CItlaYcX2YXzReqMddiZLMuy1aAb47lgHfqJh
-         gUW6TwSFSvRyynyMnbZ2xiMJruN8a/HhFGGdQV+ESHgYuB6dWM1v4bzC0Kq4Rqua1Pfz
-         oA/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745757842; x=1746362642;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LvMkg1IWeClvvaScShhHVMDyleAqqrBQLICBurzCMDA=;
-        b=KRoVguB29vhD6DNK+LoWP8m4CReb4jjkq2wk9Sz/7XBZ9Ac2zKjtn+KQJ6JajF5xUq
-         CvZ+4PLZVpHvTO6a3ZzPMvFteTfWZ1/MDi6cBITd8nfL4lCup2nvWQTuGtJ/oic2KlUw
-         kWQ4pLRPamsXHswECvVSSQhYfgSB/CXHSuwkTIX/7DBXXtZuqtX0sD+y/6ywXE0KRnJm
-         aK8tKzTbfI5w9Nu0vt/OxwaXJMLEa/WubYxI7eNxkSTf8Qa+0Fx3L/OMRlPQQbjQYIio
-         Rrz9O0zCotq/G3KAdrxLPvdhu/qbnMVBuB3nTVcTpvAIBbItkM395cC00XXnWPxDp+3S
-         nydA==
-X-Gm-Message-State: AOJu0Yxecrjzpg9pbpetHDrC/Le+Co99HHtNcStgX+bI2TcFJnoAvqd5
-	nxgriCYst1vekBg27x/WWTtcuwIQM/Mqhr19Z1Ra30Xd28UQjounHZ1fyw==
-X-Gm-Gg: ASbGncvXGGxeY9tu8GfffJTAjAHX/JcEsxECqPzjEaG5IDYBEPVyD69JF+VYQYTSDhX
-	DzsiJX66X0f52thuN82HROQFeJHs7XQsnPRCRl1ofTerSKYBaTtDD9YNjfM8IhMXNveb+Nu+0xp
-	U0ZW0/XYKHziWBnBxglMhWcMIxLRVPvB8tdiE25c45TZ/ZLjbichqXSkysNXXa5vROT/O65NM0/
-	7DM9j8MgtPqfeyaMnuX+7M61WDo9JDmvpE5yVdBtBsM3PPTqjZiOa5laGbmCkhySZVgbk47nQNR
-	N2uCJgmF6yRCoibvjbo9Ph1lPWk8/xgWreDedKy8iv4PrvkiW+oqUFUcTw==
-X-Google-Smtp-Source: AGHT+IGTT7A6uxgk5mfEamKOer8tLAzNhRtGvAGnu1qPIFQyFfL84HKYLvcU9V9GTHiYVlpNkSECuQ==
-X-Received: by 2002:a05:6214:29e2:b0:6ea:d033:2853 with SMTP id 6a1803df08f44-6f4cb9bf0abmr156707586d6.16.1745757842347;
-        Sun, 27 Apr 2025 05:44:02 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.77.230])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f4c0969657sm44514326d6.65.2025.04.27.05.44.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Apr 2025 05:44:01 -0700 (PDT)
-Message-ID: <680e2691.050a0220.1f53cc.bd2e@mx.google.com>
-Date: Sun, 27 Apr 2025 05:44:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5695946250245703488=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="rRdQFfIM"
+Received: from monolith.lan (unknown [193.138.7.178])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZlpGT1r6rz49QK4;
+	Sun, 27 Apr 2025 17:04:01 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1745762642;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zfMA/smy0v+RqNoDkN6ZjdtXA+CZF+3tf8QwpkhPzAQ=;
+	b=rRdQFfIMJFZtRG7fY3faLFVZqh5jcKKV2NinmVksIsRcVjih4Xfo8n4x7O86CjTQUjk1M6
+	pDUzIC4mTHg37h9KjjrBnVtXUONVDQDbhej+tuynBJ0FXDG7M/dH/Jsvh8t2nyMrR/GldG
+	JrB7cY8pGmZoEHO7Uz1rPnOflrzsojJSXo4tZZfC5BQdQrCk1/5HAHfyZwibZuCjqANxPq
+	wDEo0R///WG8i3s81F9tglWSAXWacbvZyOw3kLdJTtCDxAj85EkAyujx1Axg4Y/+hkt/gO
+	OQhHBkIhuClf6R6zOcFHJ8azePdiH+yGteYHaqrpzEj8lDq+TM7VxutiFRPkGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1745762642;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zfMA/smy0v+RqNoDkN6ZjdtXA+CZF+3tf8QwpkhPzAQ=;
+	b=AzJyneOu8hRUDjVeKk+9cRCCF9TmK+6/sWfA4vUCWmrlXb54w1FojIgNYXanpWQqN5PCW/
+	yyhgiCNJRsAYCPJQvJf1H8dnPb2jGAPDZ4dI82wJuHOkgOllboXwQDyuyYB7HxJGmXP3xU
+	VD42WmLAADl+ZIEUrNu/H/MQmhnFt3yBIbkmf7L3bHjJNC/9590GODTWsa2XgS2RwyhDVA
+	V7cNWwVgjzopWGxur2hPUwCgPmlT2HYfjv+YBT4Y/AqX7w/ze/pEetUaJd0U++LFMe8E0l
+	LUTxPhTAsFzMJVhmOB9yjb7dsvjLxaiFqOs31AtKQMWGHvMHABkBcLbcICUMVg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745762642; a=rsa-sha256;
+	cv=none;
+	b=e73/7QhESJ3MRy4ANntl5aiam5zSZVnC/hmThLib/qD8DjDov6xgbSrirysHk8o4LgWKPl
+	YmRRgDswOnMV4D2fMZdR8q6Yz0aXVph2wGnw4CjSUm9BYM8yeMhrMw+bY2cUCbEmD1t1EC
+	Zxhug5dCLO2vlZlm4zkSvpaZ0ztVDGuJiEgAlJW6dM97JHLowcRKMmSOe2m9R9VPaAfzch
+	J8PdVVq8tMJ5zRo9LrHJ0njLdi3/7bS7r7TeTSaJL0EiDa1vvZntqqGpZrk6ExljPUM/hn
+	CzY6RodplPj9h0r/NL+vRQWzi7D1wK6BE9vlL1GlzKMigl81LnaxpW+9aAqrGA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2 1/2] org.bluez.Media: add SupportedFeatures
+Date: Sun, 27 Apr 2025 17:03:54 +0300
+Message-ID: <c304d0b98ed0ce4504549e43a99adcfcaca77521.1745762308.git.pav@iki.fi>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v2] tools: add tests for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-In-Reply-To: <fb7b09305a729369d1755569d4e7bdda48d94327.1745751513.git.pav@iki.fi>
-References: <fb7b09305a729369d1755569d4e7bdda48d94327.1745751513.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5695946250245703488==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add SupportedFeatures property for feature information that applications
+cannot find otherwise.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=957489
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.20 seconds
-GitLint                       PENDING   0.20 seconds
-BuildEll                      PASS      20.63 seconds
-BluezMake                     PASS      2609.23 seconds
-MakeCheck                     PASS      20.80 seconds
-MakeDistcheck                 PASS      196.62 seconds
-CheckValgrind                 PASS      272.88 seconds
-CheckSmatch                   WARNING   300.34 seconds
-bluezmakeextell               PASS      127.32 seconds
-IncrementalBuild              PENDING   0.20 seconds
-ScanBuild                     PASS      893.36 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/sco-tester.c: note: in included file:./lib/bluetooth.h:232:15: warning: array of flexible structures./lib/bluetooth.h:237:31: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Add feature tx-timestamping. Applications cannot enable it on old BlueZ
+versions without that feature, as it requires special handling on BlueZ
+side.
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    v2:
+    - mention user application can check tstamp types itself
 
---===============5695946250245703488==--
+ doc/org.bluez.Media.rst | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/doc/org.bluez.Media.rst b/doc/org.bluez.Media.rst
+index ecd982652..ef13a56a9 100644
+--- a/doc/org.bluez.Media.rst
++++ b/doc/org.bluez.Media.rst
+@@ -7,7 +7,7 @@ BlueZ D-Bus Media API documentation
+ -----------------------------------
+ 
+ :Version: BlueZ
+-:Date: September 2023
++:Date: April 2025
+ :Manual section: 5
+ :Manual group: Linux System Administration
+ 
+@@ -131,3 +131,16 @@ array{string} SupportedUUIDs [readonly]
+ 
+ 	List of 128-bit UUIDs that represents the supported Endpoint
+ 	registration.
++
++array{string} SupportedFeatures [readonly]
++``````````````````````````````````````````
++
++	List of strings that represent supported special features.
++	Possible values:
++
++	:"tx-timestamping":
++
++		Bluetooth TX timestamping in media stream sockets is
++		supported by BlueZ and kernel.  Applications may check
++		kernel support for specific timestamp types via
++		SIOCETHTOOL.
+-- 
+2.49.0
+
