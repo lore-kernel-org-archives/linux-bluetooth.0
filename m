@@ -1,107 +1,115 @@
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095B4522A;
-	Sun, 27 Apr 2025 16:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745771013; cv=none; b=qabsocOK+1LHmoO7Ehq12Ic7RwEAqo+OTXiU2uCRN/OLfLNvXZQEhkKSDtGT8MFB9+dnbi3Vf3B/4NmUO0SKoCD27i36uSSbt5FTcyxiGVWafEKsvLr3eqzwV3yraq90+D34C6jlatLwgrDPIGQuWhMadlWQODyB58bSTamygf0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745771013; c=relaxed/simple;
-	bh=u7rZtqeTEBNhbCs2z+YD+W2pM0dkaKhKfuee9KJf3qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RB9K/8dmObonWc/P3Q6lgbVEr7Gr8SKwHGh2MqCQTP8GHl5k4ZKmqXX6qASbGjqjqEa7TFYv9NQtBxAQvMBhfz1L1z7/yl+XIGyyii4Rw0etl1Izz2Ni7KNyUWzS5oP+zUb76zkGMaBxdF/fU2x4tGL6V24Lsd2aolmHKVkPtFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DADPMBjl; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A995522A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 16:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745771141; cv=pass; b=FJwSLIPMVdrpPwYMns8sco8sUsE+U70KQGVpiZoz0vagPvEb0ve6xrv61F6oFu6xFzfIhoSQz9Om/CWFiDtM2lCzjQJFRC7S2133BMSS+Eh8kr8VFu98PSJP8kX5kFTAhaxgT3v4EpQZ7hZ9Yd2udE+HDKfDQGFNJNsQVCwix/c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745771141; c=relaxed/simple;
+	bh=rV41norhLiG+J8T+84wDMBsRNlfVTZzzRFBhjW5ptcw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JrRoVcksKl+1WSR3tuo40DHZiPUKySmu77yujQM9yOMH/31Jof76f7pWg0mIRnEBruGYTHDysv1jtCXMR+3mMkTOG3IZ+lzItV0uIN4RwPsLbWAlVksAexUEv9DHtkU9EFC4v96sZd1ZzXnuOaaqTr/yn+Vu+/62nyGtGLZSNCY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=AYhtlMPQ; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DADPMBjl"
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-acacb8743a7so649246866b.1;
-        Sun, 27 Apr 2025 09:23:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745771010; x=1746375810; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fzIFX0CgigFkZBJm8z/5Q/haOTHH6wXgOdQd6IFogh4=;
-        b=DADPMBjlmoZM2TSR6xwskxd8S8fu3mC4aR8ReKi0LEpaeagCNUTGmLiOtPR15Cyivg
-         yBvlpAhGDUOFoE8sOiBLRf1WyxV4G74ef3MC/ELwjCYuzrCjXaKyRHfPbBUdV2vZdjez
-         l5tRMPAtl3uzEsWiDkIMhOX7yfF7tHlXwKFaL3I2axeVCaIMRAozCGwNX0UnAvnLgln0
-         VRplOMZz4RYO36CyR9h7dHKsPqBoAaGoUH6xT7yJSfG08wu3txEtFItHcgM4g4/Jhz6o
-         9+qTD+Sh/lEK25dq8d7UvKFkPtUuxDQ7fHEAMmhWOyzf/73GrlT5Pck5lSSu9Ck27ub5
-         5+wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745771010; x=1746375810;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fzIFX0CgigFkZBJm8z/5Q/haOTHH6wXgOdQd6IFogh4=;
-        b=d6DAmPA/kqkrtoJHW0UyB3srJAKVicXQT6x6knCO14l4Tmo7WEW/CBbB8gqRKzIMjx
-         ULLjLSIe39B9epEbQfKLHZICIva6G2gG4HtMyu4xHd+KqRvtx7wII8NmNL1wX6cL/+Hv
-         N31gPIA0eDMnoIomGCN+YqfFOkiBdpbDQzziRwLBdVpdYTsre1mVxB8Q0fQnTcmmlcK8
-         OyhuOCPTBg6f9xGlMZAp9Kcl2aWSQcY6Q8k3Krvn8J6OVDE8dLEl+iLedaDJxUDpNd8R
-         eaHdC/xxcwwHidEbxfreqM5Jclfw5R7qDSEvbv97GwWp44Czn0UCN3gLb5kLo1g+qu/2
-         C7bA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIMpYf7c+N3/JziB0520n7C+QGTinSDy1vNWzBUm2aa+ww1wj0Dsz3DkjbHTl/OOpdTETVwuzviSLY5dGguxY=@vger.kernel.org, AJvYcCX5ewNLODF6DiUu5CicoOQK65dxwIFiwLo656/Z95izjuoda7vAmLPdYvWSJy20Vo2GLa85g10ks8xwqqff@vger.kernel.org
-X-Gm-Message-State: AOJu0YxT4tisj4ph67pBBgLaofAmQgZqAcLfhnJ/dCfLAzWNpM2astAi
-	vyH3dEt+lbadIi2u23z5ldM57BYDWk0S5tuFz4QQ7CCWeRvnST5Y
-X-Gm-Gg: ASbGnctYNsTi0NtjvB44gTwIxfQwNhS43S6DZ6qXo87tNNnPHvkPHRPX3braK5zeKia
-	agqCI5ioKW9T5Su/2HKlkL7sltXX5oGqGzoXbjR+PABDb8KJlNwc01r5mL/7KnMiu1eP51nsiXQ
-	Jo0HTZhnLT4qpu2fBBzmraEgtiAr1yfgzKGFF7oIayxyySvv16sc1hEvqOFV+Y9hQzT0asEzH/k
-	iTUmqT6ccTDn0zrB1JFHe9sR9n4LST6U846t1By3ywBMGydiyyveoBYZdoDkY99bJT+TAUwca+i
-	z5paova2RFaFA51IOecSSLoAFbnUbA==
-X-Google-Smtp-Source: AGHT+IHXfV6TTaPbNAIrIP+nUudqNK6Mq96yLZNja9aJs85relvKdY2lu2TnQiEeecpvKpEXSU68Vw==
-X-Received: by 2002:a17:906:9f87:b0:ac7:b213:b7e5 with SMTP id a640c23a62f3a-ace5a2a92ebmr1252341666b.18.1745771010013;
-        Sun, 27 Apr 2025 09:23:30 -0700 (PDT)
-Received: from pc ([165.51.118.63])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e4e7a41sm476761566b.55.2025.04.27.09.23.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Apr 2025 09:23:29 -0700 (PDT)
-Date: Sun, 27 Apr 2025 17:23:26 +0100
-From: Salah Triki <salah.triki@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: salah.triki@gmail.com
-Subject: [PATCH] drivers: bluetooth: bpa10x: use usb_{get,put}_dev in
- bpa10x_{probe,disconnect}
-Message-ID: <aA5Z_gOXAwrWDI7E@pc>
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="AYhtlMPQ"
+Received: from monolith.lan (unknown [193.138.7.178])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4ZlsPp3d62zyQD;
+	Sun, 27 Apr 2025 19:25:34 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1745771135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SIuncC0CIYOMaivsZTAXrPQaejvomTI8jmDi02vU19o=;
+	b=AYhtlMPQgxjCHZST8kASjlkbGTxqHHU9uGfgsQgnkZRyMgoaq01hTSesk1CuYI09hDo2eB
+	qkkFbPT3cOim+xd6UfwS5uFndIcDRzzttsRzevR3Je6J5cQcvwEx5oQ/5OCZgiESTPD8SF
+	5T68AMm72A6AFPHHltlj9KKGg1yuPBg=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1745771135; a=rsa-sha256; cv=none;
+	b=G0zUMeLvlArRY+yf50MoPYpiCkhPXDytms8RkgXGvSwpp2EFXfOJ4Rg99+XVNLzWdU6os9
+	9v4ensfg/sIZt+R/QdApUA3L4EnIToDxNPcoAa/nWYR8KTekXyeGXnZbm7oAw3zlTTfZaO
+	arqPBgppKnCpx4ew6TRqfKksE3BqQGw=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1745771135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SIuncC0CIYOMaivsZTAXrPQaejvomTI8jmDi02vU19o=;
+	b=SJ4Vc7XFYbpHg28M66zsSSO8X7Hodny+QqsFWPVhJNUb+QnEjaR8XpDt2TitTY1MV3Mxby
+	Jpu2/6bytRx7YbM9jWBspmxXaWQttiHnQqUD4OOLV/MhFzjlA3dLdHXPONU83FBU0rSRtN
+	xCki+ZfFru+l5CXe8xxnGKXRqavWLb0=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v3 1/2] org.bluez.Media: add SupportedFeatures
+Date: Sun, 27 Apr 2025 19:25:29 +0300
+Message-ID: <c304d0b98ed0ce4504549e43a99adcfcaca77521.1745771127.git.pav@iki.fi>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Use usb_{get,put}_dev() to update the ref count of udev.
+Add SupportedFeatures property for feature information that applications
+cannot find otherwise.
 
-Signed-off-by: Salah Triki <salah.triki@gmail.com>
+Add feature tx-timestamping. Applications cannot enable it on old BlueZ
+versions without that feature, as it requires special handling on BlueZ
+side.
 ---
- drivers/bluetooth/bpa10x.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 1fa58c059cbf..0b9931311a59 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -375,7 +375,7 @@ static int bpa10x_probe(struct usb_interface *intf,
- 	if (!data)
- 		return -ENOMEM;
+Notes:
+    v3:
+    - no change
+    
+    v2:
+    - mention user application can check tstamp types itself
+
+ doc/org.bluez.Media.rst | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/doc/org.bluez.Media.rst b/doc/org.bluez.Media.rst
+index ecd982652..ef13a56a9 100644
+--- a/doc/org.bluez.Media.rst
++++ b/doc/org.bluez.Media.rst
+@@ -7,7 +7,7 @@ BlueZ D-Bus Media API documentation
+ -----------------------------------
  
--	data->udev = interface_to_usbdev(intf);
-+	data->udev = usb_get_dev(interface_to_usbdev(intf));
+ :Version: BlueZ
+-:Date: September 2023
++:Date: April 2025
+ :Manual section: 5
+ :Manual group: Linux System Administration
  
- 	init_usb_anchor(&data->tx_anchor);
- 	init_usb_anchor(&data->rx_anchor);
-@@ -422,6 +422,8 @@ static void bpa10x_disconnect(struct usb_interface *intf)
+@@ -131,3 +131,16 @@ array{string} SupportedUUIDs [readonly]
  
- 	usb_set_intfdata(intf, NULL);
- 
-+	usb_put_dev(data->udev);
+ 	List of 128-bit UUIDs that represents the supported Endpoint
+ 	registration.
 +
- 	hci_unregister_dev(data->hdev);
- 
- 	hci_free_dev(data->hdev);
++array{string} SupportedFeatures [readonly]
++``````````````````````````````````````````
++
++	List of strings that represent supported special features.
++	Possible values:
++
++	:"tx-timestamping":
++
++		Bluetooth TX timestamping in media stream sockets is
++		supported by BlueZ and kernel.  Applications may check
++		kernel support for specific timestamp types via
++		SIOCETHTOOL.
 -- 
-2.43.0
+2.49.0
 
