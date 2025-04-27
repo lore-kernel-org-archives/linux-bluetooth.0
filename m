@@ -1,71 +1,66 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC342459C9
-	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 10:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F272C2376E0
+	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 10:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745750699; cv=pass; b=bYZ+fvhc2eW1lLja6GC54tDaCROxz69sxgnjzTivnfk/bpWuXPizNP8lYE3Ix6ukCuGUafrM/Pi6tKe8rF6/kEuB2WzTp5R3x/OcNeGC7VD6GepmGrB7oGRTpHZVf81YTpjS/TZFGTpT/kKCmgmgE5cYzkjhqV6HHG9WUdwd4vo=
+	t=1745750699; cv=pass; b=uyPKe7QCLXMPvYa7B3qSOttfQBoEpcOjW4F+KktP8k6rB9fSDWI5Y98YqILxF65VnD60/TbCm5tDfEGGt77H6F2oMunLTCpN7IJSf32cniaBS71Xc6blSmAJ1X+zyT2Q+qHliJAbPWavbsHrLanybRQcU8YyvFiHshi3tVIncbo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745750699; c=relaxed/simple;
-	bh=dJ9BGXtlV0YqiN+XrFlGdYUL5iQQPsASWTX+kDuf4Ns=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rBSXJAFlpqG4Mbgv74uSGH59yUrD7rFD46j3w8wbPywzbfq1P5x+9msL19jYqdg+vcpR2QiFfqJiV9qjUmPWh8nJs+DVzESVVUGBpFYMsb9XuwBGqCDN2EilfOra1A/eTT9vo5sYCMyusTtmgTVIkigp69Aj4A5wo0CFrBnDv7Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=ivqpq2Uh; arc=pass smtp.client-ip=185.185.170.37
+	bh=CIFUk183Yl9bZ6PlEyw087s8V47fpGEyYlVSd2tVAc4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G89063VhIrCSlgXkyOyIt6tmSq6VeUa4PkmUrPrsjKKyGfQFNpM6A4LUlzWKIXr8R0uQBuU6GxiPpF/yoAUomRm0M1tochZ4vq5YT4lQRQYcCt6Q3mWWoqq3nfktlnr3/dDI7Uu4lro1yO5jByZPQt2Vg0hKlFsl9bmUZzm4l4g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=akHb+tk3; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="ivqpq2Uh"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="akHb+tk3"
 Received: from monolith.lan (unknown [193.138.7.178])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Zljrk0zM3z49QJv;
-	Sun, 27 Apr 2025 13:44:54 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZljrW2HV3z49QJY;
+	Sun, 27 Apr 2025 13:44:43 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1745750694;
+	t=1745750683;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gpPlndArWFqZeEqXmU0v8Ut53EzDd+QekLndD77nOb4=;
-	b=ivqpq2UhS5UBUFLxviNa4JXjYduJ1lRSCDBgFxtI/IgmCasnO0PT2+0MNCamXRhFX32Idg
-	uLFG9v1V1CqpzmetOmIIdkwCDI+4Xzz8MDAii10s6tKmcQx7Bw2kCs2ieX/qulLToc6BPJ
-	8TlnlkdVNhay4/BWhZnIoEZz3WGgrqENnwXybMgM0Dgax7uXSNln+m3G4Bn2GTzS2ilra8
-	colscFp16DK/mb2uAHrqg/137mDw+7W02DNwS8C8iiZp4D4I91Q2+rUITc1rjVMe6cXIHb
-	hW847XEVOX6RTE9JDSAVyOycKpj2Zwx4Dm5roo4geFxuJ6YkhrV8rmxmJWeA6g==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=f6AZj7XWYgdMwSQlxjGUdQ2NoZiGiGc7vvKhY8ypxVI=;
+	b=akHb+tk3PbB50EjxLa83skLFJFGqijrFqQHDlrimMC8DAgS7RA4b5gbutBxhayP8pqK0Mo
+	+DbxikbZxbczimA2tdBXv6zNEAB1ODITPdLhuDeg9YeQUVFZ7Vx+3229A5+i/z6tZCdspN
+	bCftIsf6MDxrj57eE2pJV2OMOwES9g8tGgL4sJqFskpCTvt73ICugI0Og4Y59kb8Y1Jxnv
+	c9Hx1P/7c7UdieU24AJD6FUBzZHJxQl6gAi97CrT6zu/00C/Hs54pLFclu1A4l6NJgXXgI
+	Vd9ALChrM+oo3/T+upqt2zjEEpS4vz6QjDulvOI0c/Hhi6j6+2fW8AxwvGEktQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1745750694;
+	s=lahtoruutu; t=1745750683;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gpPlndArWFqZeEqXmU0v8Ut53EzDd+QekLndD77nOb4=;
-	b=k0xu01Q4lpDSm9cB3Zb2PV6ftuOR2Ska9fWPQegHSeBtP3ygne5Z4d20ELLHLDWNUhesYZ
-	5z40qZsZjuhRHrBGtwpLEmjMwdIr3bgKi5iLzsfQ9bBxBGXPVjKxE0xJ1Y5tdIM4mI6L+I
-	jb99X8Dfybfdi9/8WMnJ+7C17GB4BKAVjE24CkqcAVvdQBjTqlngMYV2EZ4MDiTOUgth9b
-	p36e36UqYtsFTa845anUxi1BGQywXhWR0cJl55DMpZ3XIhRrr7KuazUJjvzFk9ECGBZpZV
-	YRTnRPuXmq0uDtDPeCYZMiFGC1gbqoM48ALBr7kTCTpcS+ACp/2nh7rMqQqdzw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745750694; a=rsa-sha256;
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=f6AZj7XWYgdMwSQlxjGUdQ2NoZiGiGc7vvKhY8ypxVI=;
+	b=WHxZ096STwUvaZSUqWx6/ZnpNRU6eDYwBM9pN87wGPSlyWvoD6amlNb0eNreCAAOWQrPkc
+	wJnpsOK8pbSmo5pTy3ViAdEzOt7iD6IffygTRvby5wsfbQpklcS6lDLCzc2/aw2ugYwPzC
+	qL6TG6raH/RC4GYtWOeJv8vizT0VSO/GinBPPuCHjCnwCVteNekioj7ARr1QOLXlljA61A
+	1TpKoEfDAokTETdclo4oomzTiVg892YtNdATvMT5Ats97aRtiLzA2YRu0OgtO5Ods0bWYX
+	TEZLpYcPNyvQlOffsc5GIkT5fqruSXAR0xOUCHBpMAFnI+U3XXrm1rEJoQfhlw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745750683; a=rsa-sha256;
 	cv=none;
-	b=SpGTjklKpwjauI4o0Ci6+a9Mdv0MenekyUvP9ZOqv9aLRkd4NREjjnZpudoMwxbiPA5nj8
-	7QRUT9eoextMCR8axeKgNxvF56bpjR+QukMQUUVYAleL4e9dJ3LHBA7Jr+fokqxUpOHDlD
-	FlRdEEADYliZSH6msmknGdmi3UA34X49cIbQhGThoxVxT+kcMyPgJigBplGy9kwCa7uYf1
-	AmsZrfUoDXr9pLFARv2jlEdfG3eGxmwiyHy0ckzolWAQbqqTvNqQMzKkTwmWDrEdkueR9I
-	LwUR//zF1V0RqV+8aKfy5P9v7lL+39/DBGywjJt3lEUfuRCzsxnr7hs6CU8qVQ==
+	b=VZLNJp/8zcNNrMM319WADpeJXzaasim9u3n2Fb6OkFdlTn86CfMKeRyAxePIYBJsGWgB8f
+	kJR1cHqsUdeuLysO0xq20xu/nCZAMSjo57Cs60yVpMJqjlK5F9S3EcJ8eYZH5LfQfaSTR2
+	+D5rFA8Ro7A4shcpHoMEKyeCME8k2bFNP+a7TKgOGctv91cO2q5IuGhxCpWb9l8X/UUi2z
+	+YE118awHuWHLf6GQtN5P900RjhlccUnvwzCNrC7Qz9cBPLDo4mcbazNrP5uqiugwZQ4d+
+	ZZDSeTuZNhLaEoeDQ7qQN2j1ZEwWEcbKdtdif8/m3iUj1fsuisK/DN20fZpSdw==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 4/5] bthost: support sending SCO packets
-Date: Sun, 27 Apr 2025 13:44:38 +0300
-Message-ID: <1a6c413e2d6d7d0e0f96b2e5d32079b1dad6fdf5.1745750626.git.pav@iki.fi>
+Subject: [PATCH BlueZ 1/5] tools: add tests for RX timestamping
+Date: Sun, 27 Apr 2025 13:44:35 +0300
+Message-ID: <b4a9c82f09efddcff2e604546c33e3737d8955c5.1745750626.git.pav@iki.fi>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <b4a9c82f09efddcff2e604546c33e3737d8955c5.1745750626.git.pav@iki.fi>
-References: <b4a9c82f09efddcff2e604546c33e3737d8955c5.1745750626.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,75 +69,280 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add function to send SCO packets via bthost.
----
- emulator/bthost.c | 32 ++++++++++++++++++++++++++++++++
- emulator/bthost.h |  2 ++
- 2 files changed, 34 insertions(+)
+Add tests:
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 1ae33ba6b..214583cc5 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -40,6 +40,7 @@
- #define acl_flags(h)		(h >> 12)
+ISO Receive - RX Timestamping
+L2CAP BR/EDR Client - RX Timestamping
+L2CAP BR/EDR Client - RX Timestamping 32k
+L2CAP LE Client - RX Timestamping
+L2CAP LE Client - RX Timestamping 32k
+---
+ tools/iso-tester.c   | 22 +++++++++++-
+ tools/l2cap-tester.c | 60 ++++++++++++++++++++++++++++++++-
+ tools/tester.h       | 80 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 160 insertions(+), 2 deletions(-)
+
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 63f6951e3..ff6418ce9 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -1118,6 +1118,15 @@ static const struct iso_client_data listen_16_2_1_recv_pkt_status = {
+ 	.pkt_status = 0x02,
+ };
  
- #define sco_flags_status(f)	(f & 0x03)
-+#define sco_flags_pack(status)	(status & 0x03)
- 
- #define iso_flags_pb(f)		(f & 0x0003)
- #define iso_flags_ts(f)		((f >> 2) & 0x0001)
-@@ -878,6 +879,37 @@ void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 	send_iov(bthost, handle, cid, iov, iovcnt);
- }
- 
-+void bthost_send_sco(struct bthost *bthost, uint16_t handle, uint8_t pkt_status,
-+					const struct iovec *iov, int iovcnt)
-+{
-+	uint8_t pkt = BT_H4_SCO_PKT;
-+	struct iovec pdu[2 + iovcnt];
-+	struct bt_hci_sco_hdr sco_hdr;
-+	struct btconn *conn;
-+	int i, len = 0;
++static const struct iso_client_data listen_16_2_1_recv_rx_timestamping = {
++	.qos = QOS_16_2_1,
++	.expect_err = 0,
++	.recv = &send_16_2_1,
++	.server = true,
++	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
++					SOF_TIMESTAMPING_RX_SOFTWARE),
++};
 +
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn)
+ static const struct iso_client_data defer_16_2_1 = {
+ 	.qos = QOS_16_2_1,
+ 	.expect_err = 0,
+@@ -2148,7 +2157,7 @@ static gboolean iso_recv_data(GIOChannel *io, GIOCondition cond,
+ 	struct test_data *data = user_data;
+ 	const struct iso_client_data *isodata = data->test_data;
+ 	int sk = g_io_channel_unix_get_fd(io);
+-	unsigned char control[64];
++	unsigned char control[256];
+ 	ssize_t ret;
+ 	char buf[1024];
+ 	struct msghdr msg;
+@@ -2202,6 +2211,9 @@ static gboolean iso_recv_data(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
++	if (isodata->so_timestamping & SOF_TIMESTAMPING_RX_SOFTWARE)
++		rx_timestamp_check(&msg);
++
+ 	if (memcmp(buf, isodata->recv->iov_base, ret))
+ 		tester_test_failed();
+ 	else
+@@ -2224,6 +2236,10 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
+ 		return;
+ 	}
+ 
++	if (rx_timestamping_init(g_io_channel_unix_get_fd(io),
++						isodata->so_timestamping))
 +		return;
 +
-+	for (i = 0; i < iovcnt; i++) {
-+		pdu[2 + i].iov_base = iov[i].iov_base;
-+		pdu[2 + i].iov_len = iov[i].iov_len;
-+		len += iov[i].iov_len;
+ 	host = hciemu_client_get_host(data->hciemu);
+ 	bthost_send_iso(host, data->handle, isodata->ts, sn++, 0,
+ 				isodata->pkt_status, isodata->recv, 1);
+@@ -3704,6 +3720,10 @@ int main(int argc, char *argv[])
+ 						&listen_16_2_1_recv_pkt_status,
+ 						setup_powered, test_listen);
+ 
++	test_iso("ISO Receive - RX Timestamping",
++					&listen_16_2_1_recv_rx_timestamping,
++					setup_powered, test_listen);
++
+ 	test_iso("ISO Defer - Success", &defer_16_2_1, setup_powered,
+ 							test_defer);
+ 
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 41ef62578..9087d635d 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -357,6 +357,24 @@ static const struct l2cap_data client_connect_read_32k_success_test = {
+ 	.data_len = sizeof(l2_data_32k),
+ };
+ 
++static const struct l2cap_data client_connect_rx_timestamping_test = {
++	.client_psm = 0x1001,
++	.server_psm = 0x1001,
++	.read_data = l2_data,
++	.data_len = sizeof(l2_data),
++	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
++					SOF_TIMESTAMPING_RX_SOFTWARE),
++};
++
++static const struct l2cap_data client_connect_rx_timestamping_32k_test = {
++	.client_psm = 0x1001,
++	.server_psm = 0x1001,
++	.read_data = l2_data_32k,
++	.data_len = sizeof(l2_data_32k),
++	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
++					SOF_TIMESTAMPING_RX_SOFTWARE),
++};
++
+ static const struct l2cap_data client_connect_write_success_test = {
+ 	.client_psm = 0x1001,
+ 	.server_psm = 0x1001,
+@@ -575,6 +593,27 @@ static const struct l2cap_data le_client_connect_read_32k_success_test = {
+ 	.data_len = sizeof(l2_data_32k),
+ };
+ 
++static const struct l2cap_data le_client_connect_rx_timestamping_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.read_data = l2_data,
++	.data_len = sizeof(l2_data),
++	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
++					SOF_TIMESTAMPING_RX_SOFTWARE),
++};
++
++static const struct l2cap_data le_client_connect_rx_timestamping_32k_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.mtu = 672,
++	.mps = 251,
++	.credits = 147,
++	.read_data = l2_data_32k,
++	.data_len = sizeof(l2_data_32k),
++	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
++					SOF_TIMESTAMPING_RX_SOFTWARE),
++};
++
+ static const struct l2cap_data le_client_connect_write_success_test = {
+ 	.client_psm = 0x0080,
+ 	.server_psm = 0x0080,
+@@ -1227,13 +1266,14 @@ static gboolean sock_received_data(GIOChannel *io, GIOCondition cond,
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const struct l2cap_data *l2data = data->test_data;
++	bool tstamp = l2data->so_timestamping & SOF_TIMESTAMPING_RX_SOFTWARE;
+ 	char buf[1024];
+ 	int sk;
+ 	ssize_t len;
+ 
+ 	sk = g_io_channel_unix_get_fd(io);
+ 
+-	len = read(sk, buf, sizeof(buf));
++	len = recv_tstamp(sk, buf, sizeof(buf), tstamp);
+ 	if (len < 0) {
+ 		tester_warn("Unable to read: %s (%d)", strerror(errno), errno);
+ 		tester_test_failed();
+@@ -1430,6 +1470,10 @@ static void l2cap_read_data(struct test_data *data, GIOChannel *io,
+ 
+ 	data->step = 0;
+ 
++	if (rx_timestamping_init(g_io_channel_unix_get_fd(io),
++						l2data->so_timestamping))
++		return;
++
+ 	bthost = hciemu_client_get_host(data->hciemu);
+ 	g_io_add_watch(io, G_IO_IN, sock_received_data, NULL);
+ 
+@@ -2535,6 +2579,14 @@ int main(int argc, char *argv[])
+ 					&client_connect_read_32k_success_test,
+ 					setup_powered_client, test_connect);
+ 
++	test_l2cap_bredr("L2CAP BR/EDR Client - RX Timestamping",
++					&client_connect_rx_timestamping_test,
++					setup_powered_client, test_connect);
++
++	test_l2cap_bredr("L2CAP BR/EDR Client - RX Timestamping 32k",
++				&client_connect_rx_timestamping_32k_test,
++				setup_powered_client, test_connect);
++
+ 	test_l2cap_bredr("L2CAP BR/EDR Client - Write Success",
+ 					&client_connect_write_success_test,
+ 					setup_powered_client, test_connect);
+@@ -2619,6 +2671,12 @@ int main(int argc, char *argv[])
+ 	test_l2cap_le("L2CAP LE Client - Read 32k Success",
+ 				&le_client_connect_read_32k_success_test,
+ 				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE Client - RX Timestamping",
++				&le_client_connect_rx_timestamping_test,
++				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE Client - RX Timestamping 32k",
++				&le_client_connect_rx_timestamping_32k_test,
++				setup_powered_client, test_connect);
+ 	test_l2cap_le("L2CAP LE Client - Write Success",
+ 				&le_client_connect_write_success_test,
+ 				setup_powered_client, test_connect);
+diff --git a/tools/tester.h b/tools/tester.h
+index 4e7d7226b..bdfff356f 100644
+--- a/tools/tester.h
++++ b/tools/tester.h
+@@ -198,3 +198,83 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
+ 
+ 	return data->count - data->pos;
+ }
++
++static inline int rx_timestamp_check(struct msghdr *msg)
++{
++	struct cmsghdr *cmsg;
++	struct timespec now;
++	int64_t t = 0;
++
++	for (cmsg = CMSG_FIRSTHDR(msg); cmsg; cmsg = CMSG_NXTHDR(msg, cmsg)) {
++		struct scm_timestamping *tss;
++
++		if (cmsg->cmsg_level != SOL_SOCKET)
++			continue;
++		if (cmsg->cmsg_type != SCM_TIMESTAMPING)
++			continue;
++
++		tss = (struct scm_timestamping *)CMSG_DATA(cmsg);
++		t = TS_NSEC(&tss->ts[0]);
++		break;
++	}
++	if (!cmsg) {
++		tester_warn("RX timestamp missing");
++		return -EINVAL;
 +	}
 +
-+	pdu[0].iov_base = &pkt;
-+	pdu[0].iov_len = sizeof(pkt);
++	clock_gettime(CLOCK_REALTIME, &now);
 +
-+	sco_hdr.handle = acl_handle_pack(handle, sco_flags_pack(pkt_status));
-+	sco_hdr.dlen = len;
++	if (TS_NSEC(&now) < t || TS_NSEC(&now) > t + SEC_NSEC(10)) {
++		tester_warn("RX timestamp bad time");
++		return -EINVAL;
++	}
 +
-+	pdu[1].iov_base = &sco_hdr;
-+	pdu[1].iov_len = sizeof(sco_hdr);
-+
-+	send_packet(bthost, pdu, 2 + iovcnt);
++	tester_print("Got valid RX timestamp");
++	return 0;
 +}
 +
- static void send_iso(struct bthost *bthost, uint16_t handle, bool ts,
- 			uint16_t sn, uint32_t timestamp, uint8_t pkt_status,
- 			const struct iovec *iov, int iovcnt)
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 583a8b6df..db640daff 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -92,6 +92,8 @@ void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 					const void *data, uint16_t len);
- void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 					const struct iovec *iov, int iovcnt);
-+void bthost_send_sco(struct bthost *bthost, uint16_t handle, uint8_t pkt_status,
-+			const struct iovec *iov, int iovcnt);
- void bthost_send_iso(struct bthost *bthost, uint16_t handle, bool ts,
- 			uint16_t sn, uint32_t timestamp, uint8_t pkt_status,
- 			const struct iovec *iov, int iovcnt);
++static inline ssize_t recv_tstamp(int sk, void *buf, size_t size, bool tstamp)
++{
++	union {
++		char buf[2 * CMSG_SPACE(sizeof(struct scm_timestamping))];
++		struct cmsghdr align;
++	} control;
++	struct iovec data = {
++		.iov_base = buf,
++		.iov_len = size
++	};
++	struct msghdr msg = {
++		.msg_iov = &data,
++		.msg_iovlen = 1,
++		.msg_control = control.buf,
++		.msg_controllen = sizeof(control.buf),
++	};
++	ssize_t ret;
++
++	ret = recvmsg(sk, &msg, 0);
++	if (ret < 0 || !tstamp)
++		return ret;
++
++	if (rx_timestamp_check(&msg)) {
++		errno = EIO;
++		return -1;
++	}
++
++	return ret;
++}
++
++static inline int rx_timestamping_init(int fd, int flags)
++{
++	socklen_t len = sizeof(flags);
++
++	if (!(flags & SOF_TIMESTAMPING_RX_SOFTWARE))
++		return 0;
++
++	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, len) < 0) {
++		tester_warn("failed to set SO_TIMESTAMPING");
++		tester_test_failed();
++		return -EIO;
++	}
++
++	return 0;
++}
 -- 
 2.49.0
 
