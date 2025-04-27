@@ -1,35 +1,35 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E38F9D9
-	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 16:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A2F2F29
+	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 17:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745771891; cv=none; b=Hl40XhY3IKFCCg99gGYMr7ax+7v2HM4kxDrgzISoxmI/9rQcD2iDk5xw24jI6Jjx3BPiItlYSN/aIHn1T80PD1FnspQKDIqHJI4WS74S4GBTXZEJ9gkPfBNr290DdsOD026kwKDj15Dq6H/nJBH2tmaoViVI7LzFO8TTReYF3K4=
+	t=1745773202; cv=none; b=lslDJdOtPeE2P8Uh/P6xNBuZkKqdwGGQCKyTl41cLjOBFyVIVnsRgEP5kIA9PqRR6ln2PPrhGWE2z0++vMeid+1CdMLUfZKammlSz50+xyUi4qNJJx5UGrqbOfosG4VhLrxSdrMblhPSAf9Fngf2Lzx96NnAyVRV4O0ylugG6M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745771891; c=relaxed/simple;
-	bh=gDBMSGprEVkaS4/Lhp63aOUyzAX3fkLkumP7SR0MQpE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HZiPGWbJ1yjXgFefJv24KFLa6F4Ra6mY3dDChCEdRMD4OALWsruzK2L+HOQ631LElqnFvHpcsNFS88DEvJSZ49ItoIXHPUy6S+Asx2OuZHP61PuR483AxyFAufQIkqyBJj0bqT1/JiT+FL8b1R8umt7TZDdAC3ZO1GoWas4NVus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OJZxtGET; arc=none smtp.client-ip=192.30.252.209
+	s=arc-20240116; t=1745773202; c=relaxed/simple;
+	bh=ScfE2ns5F+murgV0lo95MwXMEP2fdMrsCxKIOSUmyNk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=P58XErJ1LFt7RHEjXRltKaTnFvaveggJAbv4vZsGs8UNoqEsFCFzZZTXA1a7m6GI+4p91AA8H1JuIfFJEI7oUJ0ffNHEXKuMbM0FiR2MWimMwbmbsEn/pDpuOq/MLJP7v/VnOCuvr5NxA3EDmpiF4BT59ielqobjTrr75ZNSfkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ahJVAH09; arc=none smtp.client-ip=192.30.252.208
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OJZxtGET"
-Received: from github.com (hubbernetes-node-2628f34.ash1-iad.github.net [10.56.158.33])
-	by smtp.github.com (Postfix) with ESMTPA id 9C49C600342
-	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 09:38:09 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ahJVAH09"
+Received: from github.com (hubbernetes-node-7fe5816.ash1-iad.github.net [10.56.166.30])
+	by smtp.github.com (Postfix) with ESMTPA id B7F92140794
+	for <linux-bluetooth@vger.kernel.org>; Sun, 27 Apr 2025 09:59:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745771889;
-	bh=I7QLEk2ZRPXDx6t2u8IhBKkBx3mlqRjgdRSsbJmvfPo=;
+	s=pf2023; t=1745773199;
+	bh=GjVJsYI3y0K5ApuMN/ou/+iMrkqKFrqpBDBUNRZ7L9w=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=OJZxtGET9HodJLHJ+Wk6TQe9FMV+DbBZom61mTmUh/IuTh7kBdUcFWPUixX8zvspi
-	 lvRK3e7v+6KkwAqJb3H+GDf//3pYXuvQGLVd9Z13td5+Vd17PFU937xWS1hMbBR6nX
-	 lIYTe/mEaORT/zmoAE5WEMWPU4zLB1lk098jktyU=
-Date: Sun, 27 Apr 2025 09:38:09 -0700
-From: Pauli Virtanen <noreply@github.com>
+	b=ahJVAH09/qcZ6AAkWeUXkj/alV6m1HNLj8m3hwumYriKYCdEFy6AKkB+cr+n7dFxS
+	 I5aemUqla6DXa/xFRicqtJgiNYVQ1MNIKizAZcXkmHjAV/tr2QqQs2tK12oTu8ofmZ
+	 DB2DNjQf/ilFgEqqSV5fhuh97TUu7upOEGPbZ1W0=
+Date: Sun, 27 Apr 2025 09:59:59 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/957508/000000-7dd5f5@github.com>
-Subject: [bluez/bluez] bfac9e: org.bluez.Media: add SupportedFeatures
+Message-ID: <bluez/bluez/push/refs/heads/957498/e838d5-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,44 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/957508
+  Branch: refs/heads/957498
   Home:   https://github.com/bluez/bluez
-  Commit: bfac9ed35ad8bfa96782ed271816e7a8f9a868b6
-      https://github.com/bluez/bluez/commit/bfac9ed35ad8bfa96782ed271816e7a8f9a868b6
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-04-27 (Sun, 27 Apr 2025)
-
-  Changed paths:
-    M doc/org.bluez.Media.rst
-
-  Log Message:
-  -----------
-  org.bluez.Media: add SupportedFeatures
-
-Add SupportedFeatures property for feature information that applications
-cannot find otherwise.
-
-Add feature tx-timestamping. Applications cannot enable it on old BlueZ
-versions without that feature, as it requires special handling on BlueZ
-side.
-
-
-  Commit: 7dd5f5ffdaddf89728aaa571e32aaa8b201f6d4e
-      https://github.com/bluez/bluez/commit/7dd5f5ffdaddf89728aaa571e32aaa8b201f6d4e
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-04-27 (Sun, 27 Apr 2025)
-
-  Changed paths:
-    M profiles/audio/media.c
-    M src/adapter.h
-
-  Log Message:
-  -----------
-  media: implement SupportedFeatures property
-
-Add org.bluez.Media.SupportedFeatures. Add feature tx-timestamping.
-
-
-Compare: https://github.com/bluez/bluez/compare/bfac9ed35ad8%5E...7dd5f5ffdadd
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
