@@ -1,100 +1,66 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFD7270EBC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 17:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745860747; cv=pass; b=q/zXQsVXKX3QuF5iFKA3e11SgYQrKXQLbxftT6aOoVZsQu4MoViRe6xol+kCwNnRVYfcUrbEOBpYH/bH5Mf5SHLWJoIcMbXkw9kUB5rxDS4/WIRbx7HpMjUeRHqRqiWjFsUj2w8oomME35FFueM+FevzrnFjzg29ug5gKiHzo/A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745860747; c=relaxed/simple;
-	bh=V5yVRB6msPSU0nzctUEg0kzyG4O9nHaFYufQk42BUwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D/bUBGtUvELpPLUxkgM6Wn0rP1MKs/b0pB9/CuA4nGGtM38riNskck/+8nwpvfO8ZQBYsLzsfsXB8WNJMtp8yVuC/xvLO2cQDATD/a7KlW59sSdWgrz9IhdkRybGhEo3TM/KwdVkpdK1svIZZaZE+sGvXwfGHMdOEYUCee2rdpU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=Sp9Om7q0; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098E728F526
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 17:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745861365; cv=none; b=uER4h5LqXBuFq4QLHMydP0U5RYZK2tWRGt/jM20h5GAnimUdbQW5PvljcvOC79sHMBalKxXVK4u1xiBvQ/G3UuUVIN1VI1CDwU/k1HWPp15aREP/SKwe5GD5r27NskNLNiGE1Vr8Z/Buz77G39p96CNctyil79hl48jUxSccSUc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745861365; c=relaxed/simple;
+	bh=CAmZl+Gc4ysF7n71f1/t0Xx98dJtQwtuivaeJli5Mmc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=d+9qHny/3mflY9kBokngYxPAJiYI2xlOPXqa0B4tyhUZtCHw4SicnlRU9P9iFoeXMKjTgujlXkol5uyppxa3GH3EX21Vughq4FP7yH55rEw61vLCp0kIisV8zvpZ/c5bdhEiHPgvkQ9+TmoFC4GO4yk/McESHEXD6su1rvSs+mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FHzCmz8j; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="Sp9Om7q0"
-Received: from monolith.lan (unknown [193.138.7.178])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4ZmVXx0qF2zyVQ;
-	Mon, 28 Apr 2025 20:18:56 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1745860737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rBc5dhDs5crErV0QyaGZ8VG+K+gpVJDMwq8QNuS42Mw=;
-	b=Sp9Om7q0gysZp0oY0B5/C7OCgrVZwf+7GrLcowq/hmyItMCteCC6lbvn5MgNyTPN7/VuuA
-	2TCkEBM0fFKLl0Uxqfap/bgA6f9xENpbEIXvyZgPZEZVYaF0SfU0Y4uKUvt+BknEWmnzpp
-	mw5tRZS5fZfFgkJB99Qic2jIA12Q9Cs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1745860737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rBc5dhDs5crErV0QyaGZ8VG+K+gpVJDMwq8QNuS42Mw=;
-	b=averGzBQ5ZHyCXEuBakSC2Hb1BVthsr0G6WJ8f0cZYTc/YY4cYRSD3z4bfzr46m6AME9NI
-	zRuq8svS4VAdwL1T5f8aPFCPqX7qB8JqBiHR0l1na/essH2+ex4jFNLV0AeLNgjttj6Et2
-	1vQtoGsu4+D/+/1uGO/GrgwuZe65hCs=
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1745860737; a=rsa-sha256; cv=none;
-	b=HC6vyWyIkTPmUbZIR+o7R/hH/GChU9C366vMh5FZFKxpuCX6daKuu/iEFcl1jwH7AYqT7l
-	a5YRcB4Uzga3dxQHzG5twSihFhCoB5rDUSjRIiFs+B97AWvWSOhmFn/0peL3sJHXNuyJ6n
-	RkrjB/23dC83dBkJzy39XwJWyAgmKfo=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FHzCmz8j"
+Received: from github.com (hubbernetes-node-74a33c8.va3-iad.github.net [10.48.146.26])
+	by smtp.github.com (Postfix) with ESMTPA id 104FB4E03FC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 10:29:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745861363;
+	bh=NOyh0rDpQ6dOGkbp0xhOZYjK8BfS2TEzMRZJOoHorOU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FHzCmz8jWUAA4Cp12BTMtXkOdaKREDzy+JejDSPiOqYS20N2QsZ6dj/0t8ZrP7Seq
+	 dJuD6hOKLxKVtXVfAUOem4/L/xPB9cBhry6+SxrsvaFDNqDOZJj41+IhkIW+lOLSjS
+	 N/1CNT8Mb7VSyyTuFQrIGGS/d2uBRAfJIkvOHKrg=
+Date: Mon, 28 Apr 2025 10:29:23 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] hciemu: fix accessing wrong/uninitialized variables
-Date: Mon, 28 Apr 2025 20:18:53 +0300
-Message-ID: <1ac4f119e79c10da2da2d41f9458daaf170d466f.1745860619.git.pav@iki.fi>
-X-Mailer: git-send-email 2.49.0
+Message-ID: <bluez/bluez/push/refs/heads/957795/000000-eaa24c@github.com>
+Subject: [bluez/bluez] eaa24c: hciemu: fix accessing wrong/uninitialized
+ variables
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/957795
+  Home:   https://github.com/bluez/bluez
+  Commit: eaa24c7663fe217dca4c608f190b30d25f27f405
+      https://github.com/bluez/bluez/commit/eaa24c7663fe217dca4c608f190b30d25f27f405
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M emulator/btdev.c
+    M emulator/bthost.c
+
+  Log Message:
+  -----------
+  hciemu: fix accessing wrong/uninitialized variables
 
 Fixes: aeeb4fd64adf ("hciemu: set bthost ACL MTU to match btdev")
 Fixes: a112d4345771 ("bthost: implement fragmenting to ACL MTU")
----
- emulator/btdev.c  | 2 +-
- emulator/bthost.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index cf5c36bb4..7bb40670c 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -7466,7 +7466,7 @@ void btdev_get_mtu(struct btdev *btdev, uint16_t *acl, uint16_t *sco,
- 	if (acl)
- 		*acl = btdev->acl_mtu;
- 	if (sco)
--		*acl = btdev->sco_mtu;
-+		*sco = btdev->sco_mtu;
- 	if (iso)
- 		*iso = btdev->iso_mtu;
- }
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 214583cc5..f53b4382d 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -688,7 +688,7 @@ static void send_iov(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 
- 	/* Fragment to ACL MTU */
- 
--	payload_mtu = bthost->acl_mtu - pdu[0].iov_len - pdu[1].iov_len;
-+	payload_mtu = bthost->acl_mtu - sizeof(pkt) - sizeof(acl_hdr);
- 
- 	flag = 0x00;
- 	do {
--- 
-2.49.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
