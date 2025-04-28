@@ -1,80 +1,146 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13102951DF
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 19:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7985D18DF62
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 19:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745869898; cv=none; b=DlmQ1P1vQBMSdMt5+97ZmdNPU4fLxhv1eoWc6tFnET5lE8kq3WuPRpX0WE0QnnBKMsExX5jU1fSHHqXQ5ftwEugiu1kdaBH3OTBBYVYs5V7rg0jsFPTeCxe9FWsauOw8g8+yRkdHyeu4TQZ2OOuoiBD21qYNBlb5UgU4a+iQNqo=
+	t=1745870321; cv=none; b=jYXwQ5fSv3L9mQkvlYFx7zL4GTmeW7rpBQ/gAAaq+Lev9WGe4fWflbyvII+EvO440Y7Id5H7CUt6yX2rR2WCrgZVoC0TS0A8A1GHhvRrBUvKP6k36bVLHfbnihx/rvZak9Bwc6ZAUR60vNaJYVUYiyn9D7IFa4Amn+XRoTY8ihU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745869898; c=relaxed/simple;
-	bh=VGPDVXLYyZGw0bswnM3YvhKRJv+uPjNA+y0WcnAKPS4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MME3cLsXO2r6sflXUViVnFBRddX3LFS28d7VFPkfdBNOgFO0oZFs1vTIOC396+6x/eUnhqX3CcYT8lEf4hNNy0FJeq1EbqAS8yfmXMeGnUmpEjjThTdBY1H9nNqGl1Asm1ZOd+HeDPDM7HdD1CboseD02mMetLdNWn56JgHsfu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+26PNcb; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745870321; c=relaxed/simple;
+	bh=q76rkTaz+FyjvpfT4HPF2OEZbTQDkXOHMI+xZLw7KvM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GwOI36hlQSIA3WD0cs7NjGLcBgGg/EXQpdzrnflWP3qGiY9oxO1PndX6SHw1J7IFeuNS2JwrBcijfitL+sj7sXBNV1DtipfKrB+ruwJ7s4n85r07eAhSbYLb4PycofW2v8eDYmAODnRlXs3086IdJHDhBXah1rfSl0jR/QLHILM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Wch6d4Mi; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+26PNcb"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-51eb1823a8eso2879105e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 12:51:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745869895; x=1746474695; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b9Ao0Hz/2YmXb4eX4MMkkt+UrMh9rLiTbSqgklBFTss=;
-        b=H+26PNcb0hdw4W86wBd9rP57fSabl2cKpxS5QwxJYLqvldl6/gI7Rg/n4ojMdeFTv7
-         qQRL8fnOV/8FmBuJvANINogE0Ifz7/KpUF0dTy+pUIXsrK9jM//BYn6Bs1IUMAk44lEy
-         SELYBTc8iiN8eJOvBWUugFhnio4/gBTkOT5OaceuMzHerXudN5C6TpdHtFS1vtaPF+iV
-         A6WjBy2aE/GNS/sCKXhn4KwhwFQV5+QOqMgMFM9xc0c7i5LJ0DgevccaCLR05JNeel8z
-         6o+10o4C1re3ZUp1Qld1h6dWl9cplkoUx1eEG4KPyWsrCQ2CkaQiNuI3k9+JKhXF+32D
-         o4Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745869895; x=1746474695;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b9Ao0Hz/2YmXb4eX4MMkkt+UrMh9rLiTbSqgklBFTss=;
-        b=TvY4ZF7jn9pZwZWc9tzV6av4lCjG+X1L0ntNZeyqaw5vSL9ZsHqrl0FuoWg0TfPNvU
-         F0bG08RXC1/wmXw0q55L/dteQjyDhBsoPB4gdq49jVfIO7nWXaCT3EZL98Attj4U2U1i
-         rW6og3yIWlhI5q9ztVunjbVuPuhYMJlYYWnfhqgLH5VyRG9L8fvT3+/qP0T1nqMdEB/7
-         SPBigK7vxbjBeQ2F2IFjDIKYQ+ljm7klUCDAtW5hvk9TV+jpectI16h7k7c1LW3jDK1B
-         nDLufH2uxynte8ZExy3v/Xpg1+CZQbg0yR7wP8VsPnL8i92L2wlr7xufnjNxhEZVHNAn
-         mMfg==
-X-Gm-Message-State: AOJu0YwVrXRe0o3ijaFikETjMJ8MKBXkzVlK9tsvMMP4M751whBjkmQe
-	v2ukm16MmaedGf2i5pkVtQHZ2zaDo4DvhzvzmGChQ+zrEICYCcwClHmap7znooY=
-X-Gm-Gg: ASbGncucya+ppFChdT4N458jTRt155CuepiXjHDoaGefKuFCTMXz7l3KVLk4OcV4x1i
-	8ItoE20+UdObx4oBaRAw29u+pzuIlw9SRVsnpcO0p96/dVAQZj+E0Nnyk+z69Yssh+nP1Wjhqjy
-	pSGJ2NHGYmr73Ck91yWhh8O7bNI3lYTAs5Y4j7wdDXH18uu2+aI2oANdjHWGREtYf95ASHeVgN0
-	KR0v3Ivfq8lnLIypwnJLhBphR4z2iAs42UkLH29Ol2B9LbtPNRynkVhu0DzYI4uZ/LVQcvIAjtk
-	zSJGq+uTDsb5xn0LX92wz2ysD+2LP2epKY0VcNf+hH7EgcxN8h90Px+fVwrzR75otu/O3PPY5x1
-	3L5myY7k/qw==
-X-Google-Smtp-Source: AGHT+IF6fMl4iDmqzSoracgWRuQt8mzzAvE/TU14ZuKId/HWs/vlizTVontEVOmMbF++BtOyP+Haiw==
-X-Received: by 2002:a05:6122:3c95:b0:52a:863f:4189 with SMTP id 71dfb90a1353d-52a97132b78mr6461683e0c.8.1745869894725;
-        Mon, 28 Apr 2025 12:51:34 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52a99279c2dsm1067669e0c.27.2025.04.28.12.51.33
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 12:51:33 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Wch6d4Mi"
+Received: from github.com (hubbernetes-node-4c3612b.va3-iad.github.net [10.48.146.31])
+	by smtp.github.com (Postfix) with ESMTPA id 66358E03C0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 12:58:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745870319;
+	bh=wSMbsRX4k6fdePI9wIbiTmqcWTeBZnvtJ6EjwEBW4Rg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Wch6d4Mi1j3/doW+w/5cOq2V/48SLY19KKshrLEoKtC9Qve9zEM5BpOOKomgqxoX2
+	 hjjb6VareoU43HD0ktv51W3slJw+FUp80gWNmKXvBnRcDFJMrV/O1OjhHr/SDcq9+8
+	 1zZ472j86W2FshgoOcZmfXWgHPCfDbyXxsHdGllc=
+Date: Mon, 28 Apr 2025 12:58:39 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 5/5] shared/bap: Too few arguments to formatting function
-Date: Mon, 28 Apr 2025 15:51:22 -0400
-Message-ID: <20250428195122.2000808-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250428195122.2000808-1-luiz.dentz@gmail.com>
-References: <20250428195122.2000808-1-luiz.dentz@gmail.com>
+Message-ID: <bluez/bluez/push/refs/heads/957841/000000-cc95d1@github.com>
+Subject: [bluez/bluez] e99742: main: Fix comparison of narrow type with wide
+ type...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/957841
+  Home:   https://github.com/bluez/bluez
+  Commit: e99742221211b5516bad849f2d213f21ddcbe06a
+      https://github.com/bluez/bluez/commit/e99742221211b5516bad849f2d213f21ddcbe06a
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M src/main.c
+
+  Log Message:
+  -----------
+  main: Fix comparison of narrow type with wide type in loop condition
+
+In a loop condition, comparison of a value of a narrow type with a
+value of a wide type may result in unexpected behavior if the wider
+value is sufficiently large (or small).
+
+Fixes: https://github.com/bluez/bluez/issues/1213
+
+
+  Commit: 95d86f50e633750e19ed53fc54c09b683724cd71
+      https://github.com/bluez/bluez/commit/95d86f50e633750e19ed53fc54c09b683724cd71
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M client/mgmt.c
+
+  Log Message:
+  -----------
+  client/mgmt: Fix comparison of narrow type with wide type in loop condition
+
+In a loop condition, comparison of a value of a narrow type with a
+value of a wide type may result in unexpected behavior if the wider
+value is sufficiently large (or small).
+
+Fixes: https://github.com/bluez/bluez/issues/1211
+
+
+  Commit: 4018a89f1f50e11b1a9ab2b338bc44761880829e
+      https://github.com/bluez/bluez/commit/4018a89f1f50e11b1a9ab2b338bc44761880829e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: Fix potentially overflowing call to snprintf
+
+The return value of a call to snprintf is the number of characters that
+would have been written to the buffer assuming there was sufficient
+space.
+In the event that the operation reaches the end of the buffer and more
+than one character is discarded, the return value will be greater than
+the buffer size.
+
+Fixes: https://github.com/bluez/bluez/issues/1215
+
+
+  Commit: 27bc1ce18a40543e92787e673630c8b655f9f9ec
+      https://github.com/bluez/bluez/commit/27bc1ce18a40543e92787e673630c8b655f9f9ec
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M client/mgmt.c
+
+  Log Message:
+  -----------
+  client/mgmt: Fix potentially overflowing call to snprintf
+
+The return value of a call to snprintf is the number of characters that
+would have been written to the buffer assuming there was sufficient
+space.
+In the event that the operation reaches the end of the buffer and more
+than one character is discarded, the return value will be greater than
+the buffer size.
+
+Fixes: https://github.com/bluez/bluez/issues/1216
+Fixes: https://github.com/bluez/bluez/issues/1217
+Fixes: https://github.com/bluez/bluez/issues/1218
+Fixes: https://github.com/bluez/bluez/issues/1219
+
+
+  Commit: cc95d1000371c6d9452f57aa9eb66a8a58aa8651
+      https://github.com/bluez/bluez/commit/cc95d1000371c6d9452f57aa9eb66a8a58aa8651
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Too few arguments to formatting function
 
 Each call to the printf function, or a related function, should include
 the number of arguments defined by the format. Passing the function more
@@ -85,33 +151,8 @@ will process the next item on the stack as the missing arguments.
 
 Fixes: https://github.com/bluez/bluez/issues/1221
 Fixes: https://github.com/bluez/bluez/issues/1222
----
- src/shared/bap.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 4c5b38b1e3d2..2a08f3eea7b8 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -1630,7 +1630,8 @@ static bool bap_send(struct bt_bap *bap, struct bt_bap_req *req)
- 	DBG(bap, "req %p len %u", req, iov.iov_len);
- 
- 	if (req->stream && !queue_find(bap->streams, NULL, req->stream)) {
--		DBG(bap, "stream %p detached, aborting op 0x%02x", req->op);
-+		DBG(bap, "stream %p detached, aborting op 0x%02x", req->stream,
-+								req->op);
- 		return false;
- 	}
- 
-@@ -3138,7 +3139,7 @@ static uint8_t ascs_qos(struct bt_ascs *ascs, struct bt_bap *bap,
- 
- 	ep = bap_get_local_endpoint_id(bap, req->ase);
- 	if (!ep) {
--		DBG(bap, "%s: Invalid ASE ID 0x%02x", req->ase);
-+		DBG(bap, "Invalid ASE ID 0x%02x", req->ase);
- 		ascs_ase_rsp_add(rsp, req->ase,
- 				BT_ASCS_RSP_INVALID_ASE, BT_ASCS_REASON_NONE);
- 		return 0;
--- 
-2.49.0
 
+Compare: https://github.com/bluez/bluez/compare/e99742221211%5E...cc95d1000371
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
