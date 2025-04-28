@@ -1,68 +1,68 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A982951C9
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 19:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555FC2951C9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 19:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745869892; cv=none; b=uEBO1UJeJlDxY48r/pNgho4+bFn6a7zOqkNxuxx9cmfxdFznWlcadrnv8Wvgou3gOPgZmMYO8EeBg4+kmtaHn0T+1yGn2CrSLdi28r21mdNb3azvME7nEQG8Wk6BlOhmw7V6JRzd7OaF3bUtawCQE8qTxdOY2IiQvogYd34uGlQ=
+	t=1745869894; cv=none; b=bgAce3lMfb31v/Y9CwlN8vBwj/MJBQMLNLkm6WvCff1fgj1m33uiKZ/fv32iypFLBaV56f/zV5kcN8B6LnBANPxwjjXQwwOjatWSsCdCYT4rhfISvmlH7IqsDIGv1/Zlr8p2qcJNIRpQSJPySlFHHNNRjDusXGUYT54Qr+LTqEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745869892; c=relaxed/simple;
-	bh=nE0NWE1fFey8Y44xOvPHfv5x7bC6k6ZAvJZ2ASyd6Ko=;
+	s=arc-20240116; t=1745869894; c=relaxed/simple;
+	bh=JJfipXQk1PyQD/mEXr9AggEJthLLp5N4AI6Twj8Ouro=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y9X47os/BKmgI5J+H+EbH2sJ/+EiEwDMNDIidW9GMcrAwP5iDvnJT4qOHPZiQW5x7vylOFurR7RBUH7TW+10/IjNoPCPvtbhJ5+1w9GfJySxu7UqvoGGKtpUt14CAq4qDgW51QHV7aFKyitp1trtakuNpDUMxRLLb3ieUvXoKlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZwojCkLg; arc=none smtp.client-ip=209.85.221.180
+	 MIME-Version; b=qBvJ4iLtUo238nML7oN5gSXXTYsUI4Oio3ruxXq4yN5tHmaNu/JDgNH5yJwnPOi4daA7Al5wJ+8Ya+lx/ZAj197brBleIw9GR2j0cj5Bz60cZmyzgfJUDncQ1T7ao5bVg7YaPXdK2P97S4nyN0O34P7JkygtNJVbS9Bg/Jtn/6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R9xUW3Eh; arc=none smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZwojCkLg"
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5240b014f47so2213035e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 12:51:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R9xUW3Eh"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5241abb9761so1908981e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 12:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745869889; x=1746474689; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745869890; x=1746474690; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IB+lsq+QMlgAo5Jf8RjgkOhIMJ6zPfvm2iKuWTRT1bc=;
-        b=ZwojCkLgq08WyUa3yD6xllqYmCrTeKgsWlrtwpeGoIHaZlkD8mleLndzogYh+Iwh6h
-         LxTr3zHOq88gPVU97rsvmtDz8Hz+DUiZDYvT5ThbBrs4w17eXAzC609p/0CVLKXimT8P
-         t7e+hNE5QEY+or0L1kQnetWOz2JE4Q1tI9A2qEPNvrS2S5T0cdk616PkR+E+QXw4qWxR
-         QXKFwqZeNhTI9uEb6Nw9im4cDhj5HAI5EjnJ8oNFuHOLHRIcsSKt+6cRu6KyRuLytlfT
-         nVBp9drG8LeMR6MIzOY5I0qRHJCvxjyozxnv4th7KZex8eNRzTnecVhMYKd0bbtkXi+/
-         BNdw==
+        bh=W+qHI0gVWEFa5ZQBSlOOTvwkkqU6pVunKHNS9oPVueU=;
+        b=R9xUW3EhzmVxU62cInBHgv986CHTEHp/Jz2sr8ulZWLdNUG4dJAQeioHDrG1yWKooP
+         p/Wk9Mm5heChquj1kr2dbeE9/PZKe5rLffdZlXWrZ9hvmEoGiG9feivtPbdYrYkFcW4l
+         5a51E7yV7LDsZ9GcpllHjma+kSd/+BWtqbI7G99kN5ZwhTwnwZNB/7lJKhRwMnCr4TzS
+         rFxJFlTKyPzxijeNN/67JlSo6G5s7xIGEY+cVrC9g0JplMn3IAZpIbsfQdt6mZcDrcyO
+         0FZlmkvzYXL3jp7sJj5TaG+pBc4XjH+Ru4z+cvrPd/Mn+fRxBEq9XjHhH/p5++7KDO3r
+         QGog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745869889; x=1746474689;
+        d=1e100.net; s=20230601; t=1745869890; x=1746474690;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IB+lsq+QMlgAo5Jf8RjgkOhIMJ6zPfvm2iKuWTRT1bc=;
-        b=ocv0EdjuUA/WrTEzgLVbZUY9Ow2ZLT3jzpcFIZjcE5HMLuSgLfiWnbEBdmz1gyRt5u
-         4nR5xfYswqC57dSyw1UX6XV7BFBlUFzIWE4Q0yaIHHHmC+/mSdxTMz0/ThpQKup3C9MQ
-         udVHJ9josoiGsBhhOCFX+B+/xWDjME0S3rfi6Q/tpre0iZ8Rhgqy3o+g4rkPNr56V6J4
-         zEg+8IEO5eTAQGEZSUyoO9IGLT7br5xoeINYzSzSg93EU8FNueKvJZO2ay7c89KJK5t+
-         QMc95cwmPplMmJGmt9V0bc33j1dOit4+oKg6UbHH+BUBu7x1fQ7NPImxZZXI3232c2kq
-         u1LA==
-X-Gm-Message-State: AOJu0YxhrPzq0VjqzzIRgfowJyS4q0p7/SUc2ja3jbJNja5I+m8Pacrw
-	GEpuaPgB2lPHdb3J+VN+OiBx4vwKg4rJfeu/Xlzq7fUe+R96ynnWUQjv+MSqSKw=
-X-Gm-Gg: ASbGncto51qRVDtfJWMVrms7XRo3P7ebe91rYjH2gPm4lBW3nWK6cjuKrK9RmeB/NwJ
-	aHbk5mjud0i728XALBgI2MRE8Ee/BcY8yhbRPzmd7DL/sdDImH99ZuwkUh9RGwEh82R7xpHHUOX
-	JZo/UmYeLADxbkvmPRiIB8KYcGgo7AQSVJR085v91L+/mrJDMkRipHPj7THcoNf+RnQVRkytjT3
-	5xtL6QIBs4nGZkctNgE6JK6fz4p12YI8vz9UmiRmEKGSF0EbA/GX+vyhWzFZ+HU+0+Ev4bsa7AW
-	uDikFk6noUVWs4VUY9EQHxyQ2QrKdmpCtJ1dUdfMhTstBSTRoMqfhvE4RfPG8QqmhkEp+tSYHAL
-	dcJPPsUql4g==
-X-Google-Smtp-Source: AGHT+IFdIDKhnZIZllqpJfff1u77XaPOzQArZAoCFmolLZLYDv8/dKG7cjMWzpLNDgmcCY1BVZ/7Tw==
-X-Received: by 2002:a05:6122:1794:b0:523:e9d2:404d with SMTP id 71dfb90a1353d-52a9716cd80mr6120575e0c.11.1745869888995;
-        Mon, 28 Apr 2025 12:51:28 -0700 (PDT)
+        bh=W+qHI0gVWEFa5ZQBSlOOTvwkkqU6pVunKHNS9oPVueU=;
+        b=qmfpub+dP28lOHbJ0GIdqYl+cY9RhQQ900dxGVgaPAxCAKlxzVTc/a2up80x7QpPNi
+         36zGBeI73Z1t3FuBzb+eODg+O4BLsGqhP0ytH6OFuT8Mo33v6q5wKgej5rlM+sC/7WGJ
+         GB9qV0PkZDMP3hKk/7icNSNAOlmErChqQX1WxOWPbyjAJ8b32dq+TEyDMRzIL9rJtIkR
+         GQmCTJIQagi2jaZbuYqQj/RX7OsS68fg54P/SE02JcNeSjGSsOSSVJiLLz5+URyYP8sG
+         tbgOrGjhpzomWmhV+f2kAj+fT+i5isDBjgq25UdLgEp9q5ouEBYigCqHK5SYmGD17mxg
+         ou1A==
+X-Gm-Message-State: AOJu0YyE8tip9Hcj2tXO6De0OTgS8hCbnFBzQFtuvhfcXm+MUy1IjrFx
+	aihczM4vLGu184LaNiSwQjkzAptJssd78zDxFACh3WPbB0Tdh1CH8KffIzvEEk4=
+X-Gm-Gg: ASbGncvl7RztKceRepXdV+svXVRQEnaCQWiqHR4GjGht81NgC4rBOG9fY7pjw9QjIek
+	JHbspz0iV0NyW/ybxvto1uBHzQBBxTPhQeE/qidt206nV2lFSulaaqHoh9tICNf887vikWnB9NQ
+	N8ZMWtWus6ExIvkaxy2rLeV9MjiccASxHkYttDB28Ek08rnYhSWB/Qi8uqb+9Fd0nciqIq+g7bB
+	sPBTJid9hTHC5oGuAfs3Liq03+rqn1g73jwgCsc1X0iL0U9ZWWcJ529lM4i5YntNNjFvd62RrYi
+	UuZsFuIjAU+ogIJ0IBPWa0zb10g2x4QVbXSGiKOkVTvF45Pb/xJ8UaUL/cPxthHQ94BNADQ0eAF
+	KJzwW5l9/YA==
+X-Google-Smtp-Source: AGHT+IH9PNZzupj8Gp/PVRgQKknjWNUPlThwPqCx4ujPPdDLNj26++iYeHx+Os88vFcQg2QHOAEAhA==
+X-Received: by 2002:a05:6122:a1b:b0:529:2644:5eec with SMTP id 71dfb90a1353d-52abf1d62b8mr597363e0c.8.1745869890528;
+        Mon, 28 Apr 2025 12:51:30 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52a99279c2dsm1067669e0c.27.2025.04.28.12.51.27
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52a99279c2dsm1067669e0c.27.2025.04.28.12.51.29
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 12:51:27 -0700 (PDT)
+        Mon, 28 Apr 2025 12:51:29 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/5] client/mgmt: Fix comparison of narrow type with wide type in loop condition
-Date: Mon, 28 Apr 2025 15:51:19 -0400
-Message-ID: <20250428195122.2000808-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/5] test-runner: Fix potentially overflowing call to snprintf
+Date: Mon, 28 Apr 2025 15:51:20 -0400
+Message-ID: <20250428195122.2000808-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250428195122.2000808-1-luiz.dentz@gmail.com>
 References: <20250428195122.2000808-1-luiz.dentz@gmail.com>
@@ -76,37 +76,39 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In a loop condition, comparison of a value of a narrow type with a
-value of a wide type may result in unexpected behavior if the wider
-value is sufficiently large (or small).
+The return value of a call to snprintf is the number of characters that
+would have been written to the buffer assuming there was sufficient
+space.
+In the event that the operation reaches the end of the buffer and more
+than one character is discarded, the return value will be greater than
+the buffer size.
 
-Fixes: https://github.com/bluez/bluez/issues/1211
+Fixes: https://github.com/bluez/bluez/issues/1215
 ---
- client/mgmt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/test-runner.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/client/mgmt.c b/client/mgmt.c
-index 1946d65d2fe2..86b5879db8b0 100644
---- a/client/mgmt.c
-+++ b/client/mgmt.c
-@@ -571,7 +571,7 @@ static void confirm_name_rsp(uint8_t status, uint16_t len,
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 1d770330ceaa..7c9386d2c3d3 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -261,7 +261,15 @@ static void start_qemu(void)
  
- static char *eir_get_name(const uint8_t *eir, uint16_t eir_len)
- {
--	uint8_t parsed = 0;
-+	uint16_t parsed = 0;
+ 	for (i = 1; i < test_argc; i++) {
+ 		int len = sizeof(testargs) - pos;
+-		pos += snprintf(testargs + pos, len, " %s", test_argv[i]);
++		int n = snprintf(testargs + pos, len, " %s", test_argv[i]);
++
++		if (n < 0 || n >= len) {
++			fprintf(stderr, "Buffer overflow detected in "
++					"testargs\n");
++			exit(EXIT_FAILURE);
++		}
++
++		pos += n;
+ 	}
  
- 	if (eir_len < 2)
- 		return NULL;
-@@ -599,7 +599,7 @@ static char *eir_get_name(const uint8_t *eir, uint16_t eir_len)
- 
- static unsigned int eir_get_flags(const uint8_t *eir, uint16_t eir_len)
- {
--	uint8_t parsed = 0;
-+	uint16_t parsed = 0;
- 
- 	if (eir_len < 2)
- 		return 0;
+ 	snprintf(cmdline, sizeof(cmdline),
 -- 
 2.49.0
 
