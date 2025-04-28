@@ -1,71 +1,100 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A42B25EF8E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 15:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF6B2AD04
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 15:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745854466; cv=none; b=ENI1YOM7S9zRLODl4wNxUisomsSTc/4tN3sTzpn2gBRgPLRq9TJNWElHTIpY1KaUYThr3R0lBoyfl88SnNtTq4x7ILEM0O/nxkDj2DgrOghtAyGvCXOxuDw7MIuzEzjnTltw3u0VQcZmYx7PmRcfnu2T/BV6m3Vn4J13S+AAu7Q=
+	t=1745854797; cv=none; b=BgjnomU3OFNYR0eqKYYVFj/rf8g/h/Yfgmo0sicE+bR2Z5Dz3C0ZO4oXnOEGwnNQZsVKo45CZe0xSKZqLWYyeC+ieZQEtgYH2e68jWiOyBtKL8yrW+EBDhctCDUKPDnq9700FzDeUl2iK6ih9j7QJzYVvtvD9ZKjhiLycsitiIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745854466; c=relaxed/simple;
-	bh=f/KJ4Oaj79cRPIj7FXMSE523VwBUJ7wvIJYW4caCLJw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=X+swB9vu5EtVy64vo+T0rxFggIsP6mkkkFUjKH9BzwrCDb/RDFCyvfojXTFEcRIoOcoF49i2UKK5ojsagS96Cg1uyELjbCcPKHp/v9MT2Kt53N5SzmPSclpgZcHf1EVK1ThuiUwiqorsPeJvhh/ElBiz8rhI+1Kh/M34q9DI2X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hfZQjKce; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1745854797; c=relaxed/simple;
+	bh=dg4kN87Keho+/h/KIBcQBT852kn8XKudU1Is1zZBM3Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=gjcwxKzunAUZmuOCDSOkWwWF7Usj3n47xCaif50ZFE/BZZRC96hNGnrgjdxHgFSP548zoyl5Qcr8XzxV0Qoejy4FywQfL7M/Ozz59pfu0FvfnNc1jNRDrn0XKD7s6NdkK3f+NgS6mJZcHsGvCl86t1rcriWFhrplF1441ROP7Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O0kh+MD6; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hfZQjKce"
-Received: from github.com (hubbernetes-node-38032fe.ac4-iad.github.net [10.52.151.31])
-	by smtp.github.com (Postfix) with ESMTPA id 7BCAA640B81
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 08:34:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745854464;
-	bh=qd+91krrLxymYE2WyWu0bLeg9R0X55jYGIKG/uMJ9XY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=hfZQjKce+6uKaOOEsAO+Yy1CpZjwbyeu2WuKOAq2hAv549L+N4cU0xLeeA5Be1h85
-	 RietJjz5HJP75lSyB3IbG4jkmTQhvTL8EAQuc2QdTgwmE9Qr/oFYJO7G9yEDl8kDAL
-	 4ezw+S2JzZjtgK8rSU+i5TZs1vdasKqKy0zeSuCw=
-Date: Mon, 28 Apr 2025 08:34:24 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O0kh+MD6"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-52934f4fb23so4927579e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 08:39:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745854793; x=1746459593; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t8xARpUhAdxHyOYjMWOPNECZiI4w5ZhP36J6Ott8Qt0=;
+        b=O0kh+MD61M9N7YuHK5cnPeXa7gueN9kF3nnNNE5Qxgk+nvocG6NUyAE0Jh+hJkutdT
+         rQruY/DEhVORHaNC+8W4x4MAlOoOuQfuaISf6oNAXXvpZt8jCDmOU+9hOICVmbQ5VGBu
+         qOEcq954Mb69Y6ddjC7XTwM7KuvninDc2NRcvOtPk6nYF8U+PTq3KQ6Ghe0w/MRvCv9X
+         Bi3PCXgsGp4r4fAAveP+QXF3en5D2hLMfh2NxAJ+amgqc01ryJG4eIDnMqzThkLNjaTL
+         XhZ9pIyIna5TeC3XvQe4DAZvmmfBaMEpYBhhGc6V/PGcjULLShcWNIf0AiA6u83URHOF
+         DSrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745854793; x=1746459593;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t8xARpUhAdxHyOYjMWOPNECZiI4w5ZhP36J6Ott8Qt0=;
+        b=C0AqeFoz016owv4pn3iaYCK5Lrn2DymhiLM4TxU/OTPekAp+nLBjvbOtDYzJlhKiIc
+         tjbhX+WBNwchrjTKvajl7HjgRoZpe7Y6irXJesXmocuIdNxL46V46fS6SnPRI1XezC56
+         H4blVB7ocMHdE1fDmWbsKcAinB8w7YFpNfdn0CC5IFtt4hr+sabI4UDzbYK6hBwP9Jgz
+         wC1ZidEBCsV8mRZS5yvRCyqzzNwX4F8QGgS/fGVhqOpRouxGH29ArrIqvOa+LxSgEOfU
+         uCP2NDvERWKjLUrmUwzntdZgKqH7NPb271ux+3vHFEhMGHC80Untz48AMqs0WP7GOe72
+         PDzA==
+X-Gm-Message-State: AOJu0YxS84HUulWLQq45L97ES5Qs3pwgwBSogiYSWa+ILWxF9/obqEoT
+	837HWa9lo7oqoiOLo5r1DSoxq4h0CMesCeY83sXS5P33/1PcVNqhvGqHjxsh0K4=
+X-Gm-Gg: ASbGncvVFc2U0MuUExjPCfTds9oebIIWg8uPLZECjoXzSlBuwXjsXzW4Z4mHCdQK2Zu
+	cs2MS7YzBCH0JiGDX0UquHbKyVtNM8EB14i0y0Z55h5VgA0w/Z1LzkqSE+qczD8zuxOdEyEKtui
+	hozhGbI2tR4XYocksiXLBN3cqBFdQ8EKK6C5jquiDH7TzfU9vXPlvxQV4d9P7OzPSjDWwQpO4a3
+	tosMCZR4Sn6uU/rRxVAlrbyc3gaPvJepmB3i/MvHmZ0xLm3wdbiBz7ySK3SUmWVP4qGnExYl2q7
+	KYgEjC1OPAm6vGsmp/RI3WhRSABULapkKyF628xDhxAf/JUs0fVeWgIWuECa5R4Xd2uEc1YBOab
+	IbvqXcNB0pJ7xTpgDy2/j
+X-Google-Smtp-Source: AGHT+IEIUTYoGsk4bnpaZZ+Ad53BhrKoLEeTyoPfngKpK6+JiOtuB24fKQk4kQP6uaQTgUcBQN7XLw==
+X-Received: by 2002:a05:6122:daa:b0:520:9688:d1bb with SMTP id 71dfb90a1353d-52a89d28789mr8527645e0c.2.1745854792859;
+        Mon, 28 Apr 2025 08:39:52 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52a9923ce11sm958896e0c.12.2025.04.28.08.39.51
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 08:39:52 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/alert-autofix-21/f1d167-198457@github.com>
-Subject: [bluez/bluez] 198457: main: Potential fix for code scanning alert no.
- 21
+Subject: [PATCH BlueZ v1] main: Fix scanning alert no. 21
+Date: Mon, 28 Apr 2025 11:39:50 -0400
+Message-ID: <20250428153950.1942867-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/alert-autofix-21
-  Home:   https://github.com/bluez/bluez
-  Commit: 1984573513daf25b7da6b39b39a0f166c00dd182
-      https://github.com/bluez/bluez/commit/1984573513daf25b7da6b39b39a0f166c00dd182
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-04-28 (Mon, 28 Apr 2025)
-
-  Changed paths:
-    M src/main.c
-
-  Log Message:
-  -----------
-  main: Potential fix for code scanning alert no. 21
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 Comparison of narrow type with wide type in loop condition
-Comparison between
-of type uint16_t and
-of wider type size_t.
+Comparison between of type uint16_t and of wider type size_t.
 
-In a loop condition, comparison of a value of a narrow type with a value of a wide type may result in unexpected behavior if the wider value is sufficiently large (or small). This is because the narrower value may overflow. This can lead to an infinite loop.
+In a loop condition, comparison of a value of a narrow type with a value
+of a wide type may result in unexpected behavior if the wider value is
+sufficiently large (or small). This is because the narrower value may
+overflow. This can lead to an infinite loop.
+---
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Co-authored-by: Copilot Autofix powered by AI <62310815+github-advanced-security[bot]@users.noreply.github.com>
+diff --git a/src/main.c b/src/main.c
+index 6a682e9b921f..3c51a0092425 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -501,7 +501,7 @@ static void parse_mode_config(GKeyFile *config, const char *group,
+ 				const struct config_param *params,
+ 				size_t params_len)
+ {
+-	uint16_t i;
++	size_t i;
+ 
+ 	if (!config)
+ 		return;
+-- 
+2.49.0
 
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
