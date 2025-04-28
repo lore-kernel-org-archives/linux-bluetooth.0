@@ -1,237 +1,178 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC63F4C91
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 14:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1599279358
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 14:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745851790; cv=none; b=L1WWwJcYVC110t/7oyzQ5FOzxAUAbfoTVgEv+VX2CdGDDpM3sLVyiE8NZTla+CVIJljy3Mh4vLhPeRxD6GUka6S85b2Z0/leSe69/cJLIUz69rE1NFIEclB6awKjHtVBJqeBcU/MFcw0HD5/AD/w3aw47g5sT8y1ssFxf8Wme3g=
+	t=1745852264; cv=none; b=FvfPfWQDdcZvofMomPNP3EmI1Rej/U8v++mfzQY5owZnAt4Wjx7+UilB8KTKTXSACyy7j7TSnrbzfFIx9hfGzOvC2UNNZjiS5tEQ5CYF4DE1Dy/eGYk2p3TPZ1mtCkh2s5BGzuI3yyEzwF+L6Gg1wZntqyJR9kHUVUwEmgmc/Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745851790; c=relaxed/simple;
-	bh=pv0gp6NiwW2nisCUHvwqAd99zZmNT6KzNOy11fyEyho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WY5K0/kKo9QXcsg7LCrBkx0j5YhzZCc2HV/uIKrCQDhdDx3F/Vhvajb03jm9hiAmv4UWtit9arMKasy9jQpD6F+c027Gf2NX7JwN32YjITqL+lBnB5sjgAIpZjtatH5uz7TPCn+aROeSRczDBQUeWN5gKNqjO7K0D9wZDJIiJY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+c/qQs9; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745852264; c=relaxed/simple;
+	bh=YDO4t3PviQTBOXHydRcS0liSTLHAPBAraVic9c35sNE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=aEkAv687XkJK7OtrmRhYWt/tAx1q3epa6uJ1xK/6W/JrfiNeI89fWoQIGuFIsrBJMAuyr7GDHmb74+KvXzKhf/fyewUc8/CZX1dIFOoyJcd8c0UJN3SXY1vuHH5DjwXNeoPti9vRGE/NwZlm6JdMiP/wLuIbDKSq5NC9BNQmqUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=H+yVIWaz; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+c/qQs9"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-30c461a45f8so47005211fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 07:49:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745851787; x=1746456587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f4PjYJhC4kipD4OwhU5FiptGG5pnIgyg6OsPn8oyfeA=;
-        b=C+c/qQs9FbcXqbKwb31ygb+pwESk6DiBuQH0X/jYRrNIScpWjrLoRLwgh0vRt0xPCf
-         n3R1ZWlmWtRq2RjzIc9pCS+R0FsW6O/ULHTtYuZEHwpSv9nwLbAc7rjD5u2WNO0IdswE
-         xOFlBw9FKhsaeLhvQToI66EojubnrrsrJnAn/S0aJ1tD7JqdoViCbw+p4f2TQqafR5aG
-         YGYN0636SZjCUGXK3o2bcP24Bbjq6IgY5560Fg2j35XTpBPdXk2m6s9ukKOa5RXXYBPH
-         kwtDGP+y0tugB4KptbSbWElZwWTvHP4KQOY6KrVOcdYPxNJpzHkuhGsR+iDPoVjEfDh5
-         UUrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745851787; x=1746456587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f4PjYJhC4kipD4OwhU5FiptGG5pnIgyg6OsPn8oyfeA=;
-        b=EUKn1E84hcM+99pCgZESQ4R2xY+CsFjc+yvX7Vl8RrjoneOHm8gjoJr9w5SC2kzWiy
-         h4h2rZ1VKSpNdgb/aC+xbqTUG4Rd4fThqbwvxNXjnRZot6CF1pOgYVlJX8YAeuoT7t/g
-         I+GxrJ8wjk/faRR5uPB2ZKEHiaVLriHcV93y0MoG9hrgYXBXFvF02HnZCFhzxKgWKFgK
-         sBY5qxa5/HuiumlaLcR2aI1z3HJScAbGtwLyHWgRO+c8Man82w8ySmPLkrz3HFdHiaV6
-         OpyH2AGa7bzuBpV5Kn1yK3wvCvYTnkTG/63uhwDHkTbJlF9Za2xkFaORVerdZO1XcqDM
-         cAhA==
-X-Gm-Message-State: AOJu0YzHcbWJBOjEFiYoyXdXd0SrG36WpvCluCGvTypoE0u2Yr2iusNq
-	vTDMVmMHtHjJMKrjL7Iz+myeND81MQvYTU0DlWDNxMJbSWpN8ZHygaYnxq9eva+AuX2c1xVuCt5
-	8mh5qM87JKDidtneByJ1+PDUOq2Nil4qBMifHwA==
-X-Gm-Gg: ASbGncvqFEG/zbIpMrlx0AkM6WmnFB2EoLfHWQiiYDWFfEkBZlPbz4/VwawnFnVvoug
-	Zbwq+HTdBHbE6mAcix6gJre6DT7Qt4aMzTgc+cA3k6SLLQeO5kgecqVg2RuL9d3An+F5ljkOqne
-	DatkZ68nLgb276EUrftZuv
-X-Google-Smtp-Source: AGHT+IFBITbxXjLpK2pHRjOr91krbyc4UKn21cIGewNFmedovruH59Gpjv9iRNcOkLl5l7gJCJNI3fGRpbnZzu9pO0g=
-X-Received: by 2002:a05:651c:1509:b0:30d:e104:b67c with SMTP id
- 38308e7fff4ca-31907bec1f7mr36243871fa.39.1745851786560; Mon, 28 Apr 2025
- 07:49:46 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="H+yVIWaz"
+Received: from github.com (hubbernetes-node-f35bf9b.va3-iad.github.net [10.48.156.33])
+	by smtp.github.com (Postfix) with ESMTPA id AF57C8C08C0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 07:57:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745852261;
+	bh=xSntEAQAro7Y3m4fYV3pAxk4KVRTkFIbXZbT7YwhK+w=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=H+yVIWazaAPeCLJKMVcv3WAkXUpg6UUOPCpJRBp19JVna6qiKxHiXQ2KhmzCZHuxq
+	 /Tp1yfZNG2dq5MNBHgRToDjaWSbBjr+kDjyGcWvytigiHGRu5INVQReIeS5i/wg9cA
+	 I3D4dCIIJD+m+V9i1q/SdMALPpQE43nD5sEVadlU=
+Date: Mon, 28 Apr 2025 07:57:41 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/c3b6f4-f1d167@github.com>
+Subject: [bluez/bluez] 1be171: shared/ad: Fix crash on match_manufacturer
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <c304d0b98ed0ce4504549e43a99adcfcaca77521.1745771127.git.pav@iki.fi>
- <ed970951e6eaef866ebec82f47fb49929a9f1ea2.1745771127.git.pav@iki.fi>
-In-Reply-To: <ed970951e6eaef866ebec82f47fb49929a9f1ea2.1745771127.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 28 Apr 2025 10:49:33 -0400
-X-Gm-Features: ATxdqUGk1e2aouEnI-qOn3jbz-dWxRWTcBAvdu_8PIoIVIj3XUTnUw14jhqK2jc
-Message-ID: <CABBYNZJhtui6-dzeqUqPfeV=C27QGQNJMsgyRnQeLG1TFP3vBw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 2/2] media: implement SupportedFeatures property
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Pauli,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 1be17107d22b9c92bf7c43ff763e656b3a6f5ea2
+      https://github.com/bluez/bluez/commit/1be17107d22b9c92bf7c43ff763e656b3a6f5ea2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-25 (Fri, 25 Apr 2025)
 
-On Sun, Apr 27, 2025 at 12:25=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Add org.bluez.Media.SupportedFeatures. Add feature tx-timestamping.
-> ---
->
-> Notes:
->     v3:
->     - fix #includes
->
->     v2:
->     - use SIOCETHTOOL to get kernel support
->
->  profiles/audio/media.c | 74 ++++++++++++++++++++++++++++++++++++++++++
->  src/adapter.h          |  3 ++
->  2 files changed, 77 insertions(+)
->
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 69c6dc671..07264cfa1 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -18,6 +18,17 @@
->  #include <errno.h>
->  #include <inttypes.h>
->
-> +#include <time.h>
-> +#include <stdio.h>
-> +#include <unistd.h>
-> +#include <linux/errqueue.h>
-> +#include <linux/net_tstamp.h>
-> +#include <linux/ethtool.h>
-> +#include <linux/sockios.h>
-> +#include <net/if.h>
-> +#include <sys/socket.h>
-> +#include <sys/ioctl.h>
-> +
->  #include <glib.h>
->
->  #include "lib/bluetooth.h"
-> @@ -81,6 +92,7 @@ struct media_adapter {
->  #ifdef HAVE_AVRCP
->         GSList                  *players;       /* Players list */
->  #endif
-> +       int                     so_timestamping;
->  };
->
->  struct endpoint_request {
-> @@ -3340,8 +3352,69 @@ static gboolean supported_uuids(const GDBusPropert=
-yTable *property,
->         return TRUE;
->  }
+  Changed paths:
+    M src/shared/ad.c
 
-One thing that just occurred to me, can ETHTOOL_GET_TS_INFO be written
-as well? If it can we could make this just an ioctl operation where we
-attempt to enable so_timestamping field and then the kernel checks if
-it can be enabled, that way we don't have to introduce another to
-D-Bus since so_timestamping would only be enabled if bluetoothd had
-enabled it, that said we need to confirm that would fail with older
-kernels.
+  Log Message:
+  -----------
+  shared/ad: Fix crash on match_manufacturer
 
-> +static bool probe_tx_timestamping(struct media_adapter *adapter)
-> +{
-> +       struct ifreq ifr =3D {};
-> +       struct ethtool_ts_info cmd =3D {};
-> +       int sk =3D -1;
-> +
-> +       if (adapter->so_timestamping !=3D -1)
-> +               goto done;
-> +
-> +       snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "hci%u",
-> +                               btd_adapter_get_index(adapter->btd_adapte=
-r));
-> +       ifr.ifr_data =3D (void *)&cmd;
-> +       cmd.cmd =3D ETHTOOL_GET_TS_INFO;
-> +
-> +       sk =3D socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-> +       if (sk < 0)
-> +               goto error;
-> +       if (ioctl(sk, SIOCETHTOOL, &ifr))
-> +               goto error;
-> +       close(sk);
-> +
-> +       adapter->so_timestamping =3D cmd.so_timestamping;
-> +
-> +done:
-> +       return adapter->so_timestamping & SOF_TIMESTAMPING_TX_SOFTWARE;
-> +
-> +error:
-> +       if (sk >=3D 0)
-> +               close(sk);
-> +       adapter->so_timestamping =3D 0;
-> +       return false;
-> +}
-> +
-> +static const struct {
-> +       const char *name;
-> +       bool (*probe)(struct media_adapter *adapter);
-> +} features[] =3D {
-> +       { "tx-timestamping", probe_tx_timestamping },
-> +};
-> +
-> +static gboolean supported_features(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data=
-)
-> +{
-> +       struct media_adapter *adapter =3D data;
-> +       DBusMessageIter entry;
-> +       size_t i;
-> +
-> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-> +                               DBUS_TYPE_STRING_AS_STRING, &entry);
-> +
-> +       for (i =3D 0; i < ARRAY_SIZE(features); ++i)
-> +               if (features[i].probe(adapter))
-> +                       dbus_message_iter_append_basic(&entry, DBUS_TYPE_=
-STRING,
-> +                                                       &features[i].name=
-);
-> +
-> +       dbus_message_iter_close_container(iter, &entry);
-> +
-> +       return TRUE;
-> +}
-> +
->  static const GDBusPropertyTable media_properties[] =3D {
->         { "SupportedUUIDs", "as", supported_uuids },
-> +       { "SupportedFeatures", "as", supported_features },
->         { }
->  };
->
-> @@ -3383,6 +3456,7 @@ int media_register(struct btd_adapter *btd_adapter)
->         adapter =3D g_new0(struct media_adapter, 1);
->         adapter->btd_adapter =3D btd_adapter_ref(btd_adapter);
->         adapter->apps =3D queue_new();
-> +       adapter->so_timestamping =3D -1;
->
->         if (!g_dbus_register_interface(btd_get_dbus_connection(),
->                                         adapter_get_path(btd_adapter),
-> diff --git a/src/adapter.h b/src/adapter.h
-> index 6b2bc28f6..9371cdefb 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -262,6 +262,9 @@ bool btd_le_connect_before_pairing(void);
->
->  bool btd_adapter_has_settings(struct btd_adapter *adapter, uint32_t sett=
-ings);
->
-> +int btd_adapter_get_so_timestamping(struct btd_adapter *adapter, int pro=
-to,
-> +                                                       int *so_timestamp=
-ing);
-> +
->  enum experimental_features {
->         EXP_FEAT_DEBUG                  =3D 1 << 0,
->         EXP_FEAT_LE_SIMULT_ROLES        =3D 1 << 1,
-> --
-> 2.49.0
->
->
+When matching manufacturer BT_EA_MAX_DATA_LEN in case of EA since that
+can be bigger than regular advertisements otherwise it can cause the
+following crash:
+
+data #0 __libc_do_syscall () at ../sysdeps/unix/sysv/linux/arm/libc-do-syscall.S:47
+1 0xb6e05c58 in __pthread_kill_implementation (threadid=, signo=signo@entry=6,
+no_tid=no_tid@entry=0) at pthread_kill.c:43
+2 0xb6e05c8c in __pthread_kill_internal (signo=6, threadid=) at pthread_kill.c:78
+3 0xb6dd63ce in __GI_raise (sig=sig@entry=6)
+at /usr/src/debug/glibc/2.39+git/sysdeps/posix/raise.c:26
+4 0xb6dc7f5c in __GI_abort () at abort.c:79
+5 0xb6dfd608 in __libc_message_impl (fmt=0xb6ea1a50 "*** %s **: terminated\n")
+at /usr/src/debug/glibc/2.39+git/sysdeps/posix/libc_fatal.c:134
+6 0xb6e5a430 in __GI___fortify_fail (msg=) at fortify_fail.c:24
+7 0xb6e59ffe in __GI___chk_fail () at chk_fail.c:28
+8 0xb6e5a8a2 in __GI___memcpy_chk (dstpp=dstpp@entry=0xbefff7e6, srcpp=,
+len=, dstlen=dstlen@entry=29) at memcpy_chk.c:27
+9 0x004944f4 in memcpy (__len=, __src=, __dest=0xbefff7e6)
+at /usr/include/bits/string_fortified.h:29
+10 match_manufacturer (data=, user_data=)
+
+Fixes: https://github.com/bluez/bluez/issues/1169
 
 
---=20
-Luiz Augusto von Dentz
+  Commit: 7763584f6d0186e77adcdc212b0a1c8a53e6ccc9
+      https://github.com/bluez/bluez/commit/7763584f6d0186e77adcdc212b0a1c8a53e6ccc9
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M tools/iso-tester.c
+    M tools/l2cap-tester.c
+    M tools/tester.h
+
+  Log Message:
+  -----------
+  tools: add tests for RX timestamping
+
+Add tests:
+
+ISO Receive - RX Timestamping
+L2CAP BR/EDR Client - RX Timestamping
+L2CAP BR/EDR Client - RX Timestamping 32k
+L2CAP LE Client - RX Timestamping
+L2CAP LE Client - RX Timestamping 32k
+
+
+  Commit: a112d434577182894598ae8e7d0d98c0fa4745c9
+      https://github.com/bluez/bluez/commit/a112d434577182894598ae8e7d0d98c0fa4745c9
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M emulator/bthost.c
+    M emulator/bthost.h
+
+  Log Message:
+  -----------
+  bthost: implement fragmenting to ACL MTU
+
+Support fragmenting ACL packets to given ACL MTU.
+
+
+  Commit: aeeb4fd64adfcf7ca7adaac8dadca43dab6f2939
+      https://github.com/bluez/bluez/commit/aeeb4fd64adfcf7ca7adaac8dadca43dab6f2939
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M emulator/btdev.c
+    M emulator/btdev.h
+    M emulator/hciemu.c
+
+  Log Message:
+  -----------
+  hciemu: set bthost ACL MTU to match btdev
+
+Set the bthost ACL MTU to avoid generating larger packets than the btdev
+ACL MTU.
+
+This tests RX timestamping on ACL fragmentation.
+
+
+  Commit: 682e9252def95c2db242c85bda02c97fb8dfe512
+      https://github.com/bluez/bluez/commit/682e9252def95c2db242c85bda02c97fb8dfe512
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M emulator/bthost.c
+    M emulator/bthost.h
+
+  Log Message:
+  -----------
+  bthost: support sending SCO packets
+
+Add function to send SCO packets via bthost.
+
+
+  Commit: f1d16721593566849b5ac096cd08cf3c620847ca
+      https://github.com/bluez/bluez/commit/f1d16721593566849b5ac096cd08cf3c620847ca
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M tools/sco-tester.c
+
+  Log Message:
+  -----------
+  sco-tester: add SCO receive and RX timestamping tests
+
+Add tests:
+
+SCO CVSD Recv - Success
+SCO CVSD Recv - RX Timestamping
+
+
+Compare: https://github.com/bluez/bluez/compare/c3b6f4e4b456...f1d167215935
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
