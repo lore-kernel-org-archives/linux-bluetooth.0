@@ -1,78 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC39226A0F8
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 15:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4727F25F79D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 15:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745853140; cv=none; b=Ycz5ECR+9ZvarpCPCoCsAMAQb74+QYlf80VcZQwD6vMfWyGPnEGrcAv1t42p2OBjhifuoUatknUdSijP860vHIfUWLlsn+wwrNHfQnnJQR7+V+wDu8DzEzMqZfzUs25KyVspxewAUwzoHjdhzkQWy1DG7Kw7hnqIt8tmrUNg7pE=
+	t=1745853258; cv=none; b=vAzYhgnTkfcYtZF4Iown6y2LHac2MjK4XiWBaXG0Jr9Vho40HJkCF/zth10vn9WO5H+kofwV/pMEwCsWdTxdGYiPrTCpT71ljV5El2QolnOMtEjv7j+wrEko473euTEloBR2qEmucbSnCh3iakc1KUFyi6rHO6IlWIgZufSqnDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745853140; c=relaxed/simple;
-	bh=K6aqCuxSZqYa+Ubtm8GpnQLYzb6GqTvQapDtbX4U10w=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LvxEzNWHIxSDpL20cD4vdPclDuQKEZGEwAJ3q7yMLuSqnthjnRfbAcapsbJy+c4yFSwv1bmzXj70+nCPVIKh+9j8AHi1psKI1TGcUQF35LkVL04/rGZPEe+EJ2GsTa5RcqtJ+bm+Uymp06U7yhLJZ90IX460BrviHy6QoJc5+MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YQIkqDdq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745853258; c=relaxed/simple;
+	bh=QkdDiIAxxs+OMdtqpJvpXj1p+4tplBG1nbE0pbO77JU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lPd+hMW2DNeSH+GGETMAJ1QzB4ab1Y+SwI55b9Y3gpO4vkYm6CJqg2zxwmi3Lkf+Itrc8LkWiQl5RQyxmNdS9njVec8rUCSVLnzqS5kFV1NFZC4cP+PAVRkTA1SDkMiK1GOmtzr9gc/0mpfyacvirJLInhhW4USMLFNE2Pxonx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RF3fwS6O; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YQIkqDdq"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 283FEC4CEEA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 15:12:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745853139;
-	bh=K6aqCuxSZqYa+Ubtm8GpnQLYzb6GqTvQapDtbX4U10w=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=YQIkqDdqIsRXAnz9iGbn7ol5ZEbZV6+nKBPRFHXSP2qE4kY4d0ppGFnqSPVhgUdFX
-	 8vF5roOKrFJMir88urh8FZHBBb/VHiyW1JomNisRhT0m/LR2ZfLbzRRpIDwk+LlgJL
-	 0fJPoFK8CuF6Gob78v1bDqruqh8fJr7s0cF3NOCTBysFs7Q/Lom1DabsvKyQDBJ07R
-	 dbB7Z17Haee8/m2q3Z/EUmW3KfthG5VTWj5cKOm+KfAwWkqbpsQPEQlReqGT0wGH66
-	 1nvxZ0icXsdAueVNbLtM0ogTBbPpV21koBeSt8gbR5yNlmhCe6sEMvrdYVSsr+bKUR
-	 Ige4ZNY7HPzeQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 207F8C4160E; Mon, 28 Apr 2025 15:12:19 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RF3fwS6O"
+Received: from github.com (hubbernetes-node-b2cf291.va3-iad.github.net [10.48.163.18])
+	by smtp.github.com (Postfix) with ESMTPA id 5590C8C087B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 08:14:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745853256;
+	bh=dOf9F3sihkgRjBxcsjpEXhB5VT/QUXt+4bhFewXUPPM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=RF3fwS6OE6+PpN+vYUJhSdRvFv63wfnHwlSgA+BckTkXwycZA3gmQeD4KY1Sscfg7
+	 HernFSL92RVo6f/IUxrVpsgx+A7RcxdrNFQ3ABCYy+l1e3ArQewpXByeFZ7a+OMuP6
+	 F0/NvMTT+lTjDnt1lLkVyERuyZiUtHam7qmPq+9Q=
+Date: Mon, 28 Apr 2025 08:14:16 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220061] [REGRESSION, BISECTED] Multiple Bluetooth devices
- cannot be paired under Linux 6.14.4
-Date: Mon, 28 Apr 2025 15:12:19 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_file_loc
-Message-ID: <bug-220061-62941-CK7C8JnKVW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220061-62941@https.bugzilla.kernel.org/>
-References: <bug-220061-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/957482/eff3c7-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220061
+  Branch: refs/heads/957482
+  Home:   https://github.com/bluez/bluez
 
-Artem S. Tashkinov (aros@gmx.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                URL|                            |https://bbs.archlinux.org/v
-                   |                            |iewtopic.php?id=3D305211
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
