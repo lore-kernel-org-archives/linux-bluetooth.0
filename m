@@ -1,106 +1,234 @@
-Received: from b-painless.mh.aa.net.uk (b-painless.mh.aa.net.uk [81.187.30.52])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF5A25E81D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 13:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0735F262FE6
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 13:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745846371; cv=none; b=fwiRC+At/BCOPZZql7mHTWTa0tWf55tlqgFuajlji3DP+MBUi7Afvzkur0Dky1Tauu+9hbqk8tCezJWBvlyh1d1wuaH1Asf50sgfP1L4p22knoUiNo2PWjg7xk2xhaqQM2YMqVuAXeDuwz8fM0XIMphX3alz0KziuBbpw9eeJek=
+	t=1745848198; cv=none; b=l315fAOtdiKxU+3kx7AEvqVCFn98Kk6tldPA9sqF2wP4sCTlMlz4Kso/oTGXoFdJfX8siDDV5XjAJbu/fPhcuydn6q9OeRNev9ycsHFsSi6JizxFBGGeHP3mTkQADysw59lpdk4x7FNVS43ajBz5G0nBo9QCOl6mEOsXVHKz7q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745846371; c=relaxed/simple;
-	bh=Q+xh5x1bADGM+Kb6hhwnzoCofdJmoCoBkobCElMeAoE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FgF7CBQRF4YTrqvpuDs1EXgNXGrlIUYKQEgdCifIGxDHpH+UJ0+8GOCj8MF2iWJ+MqghnuHWWnTNce06iTqpN+I3aGfSTzYgwffTw6UUaRNsTNErrH2LkmPcAeNC3Onm0b1i/oGDBfJtykmfEHFulGDp1A8rXD6RpD8ONG4YvT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
-Received: from 4.0.e.4.2.0.f.6.8.d.6.d.1.1.3.4.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:4311:d6d8:6f02:4e04] helo=andrews-2024-laptop.lan)
-	by painless-b.tch.aa.net.uk with esmtp (Exim 4.96)
-	(envelope-from <kernel.org@pileofstuff.org>)
-	id 1u9OOL-0079pP-2Y;
-	Mon, 28 Apr 2025 14:19:25 +0100
-From: Andrew Sayers <kernel.org@pileofstuff.org>
+	s=arc-20240116; t=1745848198; c=relaxed/simple;
+	bh=bLg2ypKmhsJLY5gb22bfVO+53QV13816FFkw11jJqa4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=UuJWo1Qg7H/NPaYhS3pWx3B2AMwXCXhwoKyrJ1XC7bpkPOFmcMYv8yu3TuANchIWSxBVQG/T0J/5iC58AnQCZy0U4kP7IcLvXVIBvhFdyeRZdp8emSVwrnWEDgsuymZpUtTupWSusLU8CKYIFe66WBalMpJn+rCvQ1W3gFlzT04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lnq3lOjd; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lnq3lOjd"
+Received: from github.com (hubbernetes-node-61de8af.va3-iad.github.net [10.48.144.43])
+	by smtp.github.com (Postfix) with ESMTPA id EF5018C0D99
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Apr 2025 06:49:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745848196;
+	bh=9CX9aQL/nC+YBbk/SJYYLsO1WbaCUNRqp2eGaNYedqU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=lnq3lOjdix9kOQq3quaKnVOIlpUdc/kqP0fx8WkLypypIT8NC7u62Pd6ZLKolyMan
+	 j9IVe1x77dlzWKcGtGoOU4rIesrtWbR2CR7jbEukaJv/3SA7+XiT4mdbgfL2klohVq
+	 ZxzyhZNNd8GlM2ssoJD0+bThVxt4h+8BSxypf1H0=
+Date: Mon, 28 Apr 2025 06:49:55 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	pav@iki.fi,
-	Andrew Sayers <kernel.org@pileofstuff.org>
-Subject: [PATCH BlueZ v4 0/6] obexd: unregister profiles when the user is inactive
-Date: Mon, 28 Apr 2025 14:15:29 +0100
-Message-ID: <20250428131842.488921-1-kernel.org@pileofstuff.org>
-X-Mailer: git-send-email 2.49.0
+Message-ID: <bluez/bluez/push/refs/heads/957730/000000-9a58a1@github.com>
+Subject: [bluez/bluez] 9afbce: pbap: Support calling pbap_init() after
+ pbap_exit()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is a follow-up to "obexd: only run one instance at once".
-Instead of refusing to run parallel services, it unregisters
-profiles when the user is inactive.  This avoids the need
-for tmpfiles, and avoids issues where the user with the
-obex service logs out, leaving obex disabled altogether.
+  Branch: refs/heads/957730
+  Home:   https://github.com/bluez/bluez
+  Commit: 9afbce45b7ce64269eea3da1d9ae9eca2fe60258
+      https://github.com/bluez/bluez/commit/9afbce45b7ce64269eea3da1d9ae9eca2fe60258
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
 
-Luiz previously suggested moving this to systemd, but I haven't had much
-luck getting the systemd devs to accept changes, and Pauli's mention of
-elogind (i.e. logind without systemd) suggests it's probably better
-to avoid the dependency anyway.
+  Changed paths:
+    M obexd/client/pbap.c
 
-I considered writing a separate D-Bus service that would notify you
-when the session became (in)active, but D-Bus doesn't have particularly
-strong guarantees about how long messages take to deliver, which could
-lead to race conditions between instances on overloaded systems.
+  Log Message:
+  -----------
+  pbap: Support calling pbap_init() after pbap_exit()
 
-I also considered writing some kind of library, but there's not much
-code to deduplicate, and most of it would need to be reworked for every
-service that uses it.  So I wrote a gist for people to copy/paste:
+pbap_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
 
-https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+Send the UnregisterProfile message directly from pbap_exit(),
+then call unregister_profile().
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
 
 Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
----
 
-Pauli pointed out timeout_handler() isn't required by the implementation,
-even though the documentation implies otherwise.  Having thought about it
-over the weekend, it seems hard to avoid concluding both that
-timeout_handler() cannot be fully tested in the real world right now;
-and that any change to the API would likely happen in many years' time,
-when we've all forgotten how to fix the problem.  So I've moved that bit
-to a separate patch, which can be bisected and reverted if necessary.
 
-Pauli - I appreciate the feedback and wanted to note it in the patch,
-without implying you wanted that function kept in.  I've settled on
-a Cc: line, but happy to change it if you'd prefer.
+  Commit: 73ccc40580c32b6baa461447041e6af4fc5f62d5
+      https://github.com/bluez/bluez/commit/73ccc40580c32b6baa461447041e6af4fc5f62d5
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
 
-V1 -> V2 Open/close private DBus connections instead of
-           calling UnregisterProfile (thanks Pauli Virtanen)
-         Add obex_setup_dbus_connection_private() (to enable the above)
-         Fix CI errors
-         Minor issues I missed last time...
-           s/regster/register/ in e-mail subject lines
-           s/login_.*_cb/logind_$1_cb/g in logind.[ch]
-           remove watches on exit in pbap.c and bluetooth.c
-V2 -> V3 Fix checkpatch.pl errors - thanks Luiz
-           Note: false positive warning about commit #4 is still present -
-           this URL can't be split or shortened without causing issues.
-V3 -> V4 Fix various bugs - thanks Pauli
-         Split timeout_handler() into a separate patch - see above
+  Changed paths:
+    M obexd/plugins/bluetooth.c
 
-Andrew Sayers (6):
-      pbap: Support calling pbap_init() after pbap_exit()
-      obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
-      obexd: Support creating private system/session bus connections
-      obexd: Unregister profiles when the user is inactive
-      obexd: Support sd_login_monitor_get_timeout()
-      Revert "obexd: only run one instance at once"
+  Log Message:
+  -----------
+  obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
 
- Makefile.obexd            |  10 ++
- obexd/client/pbap.c       |  33 +++++-
- obexd/plugins/bluetooth.c |  30 +++++-
- obexd/src/logind.c        | 260 ++++++++++++++++++++++++++++++++++++++++++++++
- obexd/src/logind.h        |  26 +++++
- obexd/src/main.c          |  12 +++
- obexd/src/obex.service.in |   9 --
- obexd/src/obexd.h         |   2 +
- 8 files changed, 364 insertions(+), 18 deletions(-)
+bluetooth_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
 
+Send UnregisterProfile messages directly from bluetooth_exit(),
+then call unregister_profile(profile).
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
+
+Do not free profiles in bluetooth_exit() - profiles are needed
+by a future call to bluetooth_init(), or will be freed by
+bluetooth_stop() if necessary.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: 5a201e5f6ac7feea5d170d34e117c46689e1b155
+      https://github.com/bluez/bluez/commit/5a201e5f6ac7feea5d170d34e117c46689e1b155
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M obexd/src/main.c
+    M obexd/src/obexd.h
+
+  Log Message:
+  -----------
+  obexd: Support creating private system/session bus connections
+
+Obexd can either connect to the system or session bus.
+We mostly share a common connection to that bus, but it can be useful
+to have a private connection.  For example, this allows us to quickly
+unregister profiles when switching user.
+
+Add obex_setup_dbus_connection_private(), which creates a new
+connection to whichever bus was specified by the user.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: bdead1f7be05cc72a375b098213b0aac73f825be
+      https://github.com/bluez/bluez/commit/bdead1f7be05cc72a375b098213b0aac73f825be
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M Makefile.obexd
+    M obexd/client/pbap.c
+    M obexd/plugins/bluetooth.c
+    A obexd/src/logind.c
+    A obexd/src/logind.h
+    M obexd/src/main.c
+
+  Log Message:
+  -----------
+  obexd: Unregister profiles when the user is inactive
+
+Obexd is usually run as a user service, and can exhibit surprising
+behaviour if two users are logged in at the same time.
+
+Unregister profiles when the user is detected to be off-seat.
+
+It may be impossible to detect whether a user is on-seat in some cases.
+For example, a version of obexd compiled with systemd support might be
+run outside of a systemd environment.  Warn and leave services
+registered if that happens.
+
+Obexd can be run as a system service, in which case this check makes no
+sense.  Disable this check when called with `--system-bus`.
+
+Obexd can also be run by a user that does not have an active session.
+For example, someone could use `ssh` to access the system.  There might
+be a use case where someone needs Bluetooth access but can't log in with
+a keyboard, or there might be a security issue with doing so.  This isn't
+handled explicitly by this patch, but a future patch could add support
+by calling `logind_set(FALSE)` in the same way as is currently done
+with `--system-bus`.
+
+Unregister profiles by closing private connections instead of sending
+UnregisterProfile on the shared connection.  Pipewire has apparently
+found the latter to cause long shutdown delays, because bluetoothd
+may be shutting down and unable to handle this message.
+
+Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+
+Other services are likely to need similar functionality,
+so I have created a gist to demonstrate the basic technique:
+https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: d13886173ceb99e952aed6cf9f0740cc0743926f
+      https://github.com/bluez/bluez/commit/d13886173ceb99e952aed6cf9f0740cc0743926f
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M obexd/src/logind.c
+
+  Log Message:
+  -----------
+  obexd: Support sd_login_monitor_get_timeout()
+
+The documentation for sd_login_monitor_get_timeout() implies the API
+may need to be checked after some time, even if no events have been
+received via the fd.
+
+In practice, the implementation has always returned a dummy value,
+and changing it now would cause enough breakage in other projects
+to make it unlikely to ever happen.
+
+Add a handler for that case, even though it can't currently
+happen in the real world.
+
+Cc: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: 9a58a10482ca3429a62885199f7ad376ec553899
+      https://github.com/bluez/bluez/commit/9a58a10482ca3429a62885199f7ad376ec553899
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-28 (Mon, 28 Apr 2025)
+
+  Changed paths:
+    M obexd/src/obex.service.in
+
+  Log Message:
+  -----------
+  Revert "obexd: only run one instance at once"
+
+No longer needed now services can share resources.
+
+This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+Compare: https://github.com/bluez/bluez/compare/9afbce45b7ce%5E...9a58a10482ca
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
