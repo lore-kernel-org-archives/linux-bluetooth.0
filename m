@@ -1,254 +1,241 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A6E86353;
-	Tue, 29 Apr 2025 14:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0351317A2E2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 14:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745937101; cv=none; b=iRW4UNdLxDm5rbf0+2Yi5wterrvnjKmeWpRkKay4bTdCa+ameJdcEJiJt7ezGN3OnmGDYxTNpV3PPZN7v6LUcgqqf8PplEUtj4dk0UkxRvN8OjyMjuXAPSW4T3AqQKu6mRKv2CARp2oOzy5+NMq3OSLpHzzUlVMz4lU1J2hoWsI=
+	t=1745937323; cv=none; b=TV6FgLs2NF4kGo+V8O63aGrm998kuPrKBOF/NQYH9xa0OHIbU0ASJYO7uKwPuglOKEp1QUb8UR1IuwdAao/Hf4vF50Mawnw0xnUFArqbDP7B8p1v7+7ePUskqfWnpNuFbK72AzN4m30TI1a/ZndiFzMJCJEs2/XxFECqrliKjwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745937101; c=relaxed/simple;
-	bh=BuV2kIcOU1QQNR3kYDfQPsfP9qEL9yxy190zugAJauk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AmmrTxDTw/+/msycs3BJp/Q9APwjRwRBj6Xz8sStLgt3tKK0nZhwP5fgv4CGMyYKHWUqkf131LmPnzUdu3zXZOljlOdTBjM5rSGDXAPX6lE9EKe8mok8gi7rvKjsLlELZQCucP/TzTyPLefst223FcFj84vHC94mC1IBipbjiCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mBkIkY9E; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745937323; c=relaxed/simple;
+	bh=pWporQMFFYhQLxTOQl2k6rG30wvwHYBGHdBc/DRlq7g=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=XmQ688C8fM21pFJzvCPfkVq77VXiuruBGfA9Is01EoGCt0H+2KqQlYQBH+FzKVTVQUK1+cs1HVQLHkw1vuKEZe7imi2uO0JWg7hR0uYG6yhnpc7y8Jwti7nCDNr7JmyypQCNqdY2Ue0+nE6xrbv41ruMA0Asp58krRwusWhEgKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=aVWaaiFH; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBkIkY9E"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30bf1d48843so53179121fa.2;
-        Tue, 29 Apr 2025 07:31:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745937098; x=1746541898; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O7La73gWRjthE0KmwgISND3H1wfD+o1YzxL8iBXHILs=;
-        b=mBkIkY9EYKUv9mjW0koDcydNLfyW6CuGyYET3mEOnTx21D2lqR60ROF50u8w6zzze4
-         PVWEaXFehSb+vIpn7OjVURbBSSJqgABIOOp3xTk3RSNobRMu2snF92RWJMc9kZVOaLJf
-         4t0zN8I/r2lMIE2KeEzbjZR7kom771mEgpqMa9jCrcNHeR8O5gPuhyTUxFkGL9PeLMc2
-         4rp9p/4ApD2IeCHEJ7fetTRSF6C2rIU6/0OvIoC+8Jqq9+1Lm86hkZZSruKRoJCiUwj0
-         jZGklGyHjIncImAz1c8WkRgXt1rPB8RMH01VNQazjsdaje4D3Vi+0fAjP/1r6bLlSb/N
-         IIlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745937098; x=1746541898;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O7La73gWRjthE0KmwgISND3H1wfD+o1YzxL8iBXHILs=;
-        b=OxqY+hTAmES7vHFyvb7pdyBqMkZkWSf29FY+EevrMWJz6el9bGV+bVKlqdxR3BQCCP
-         YjMhXPrMCqG8XVyJcoLv+3QM0eNka9NG37Vhkqns/ZtCJ3reIGOd9AMt97mKlpSsu7pS
-         a+VGeUv14zvbYzkpevmMDuKSxL2l8+nVTNOOouSiDHy0rOPtyAq0ARS0xzh11O7VTKbv
-         gt34UMhEGGhgyiFSZjH/e2QCczYNARYxT7earqH/7LpHJwsTkPwumhpVK/bviH/y+XpI
-         zrqdhsBxeD5oMGeaADt/DKSyi0W+Aicxp5GWS9BMNGv0zVP7qVexuRa/X3m1saX9b+f7
-         7y6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVuLfCIJR1LhtP6fga6ICWLCHRh1r0AR78BZzOD0+Nxs0gLd/SX/HcTHLIfwaUEfYj13cQcVLafNZsl4zK0oy0=@vger.kernel.org, AJvYcCXyjbrmp4n9pxBUuHKHUhs74Ri9x/Qwxj2mcL1Q6jFHS3JNyCcZmY57sZMsY223qOnc5TkmH+LS@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJbiKaOGDQx/3P9yFSiDL+ELfKezgYnOOQ7Y8GbPmQceHYQ35/
-	/CMudMzzbt7YgL/mXYQxiUsaLWHZ6RtBZnM9bI4Xi8jMSVw3p/OXzs1hzAsXaeeehwQMzO2V3zd
-	qBaf0HHy68NyiM4IDtgogBlCGcME=
-X-Gm-Gg: ASbGnct5sCHvhutyXgAAIfXMCzAdp3maz9oUeviniPtOU0oTbrRS3VjG6b7FvXRxVF9
-	FkuqDMJgaYrK2Q7mhsQ1WFyCv5w5oXSSWs54dtSlt32IqmA4bRvI/szUut2+7GjxqYP51r5/OAJ
-	GKjAPSwVKnBeADFRp8s6qUMHUowZXjpL8=
-X-Google-Smtp-Source: AGHT+IFLMgvgtO3VpelWAllyGGOfLmlI23DRkW+kNEE8JExIPtXZ6j571Y+YrrYIfVm1BYFU7V0qJwYiX2cm8uqf8YU=
-X-Received: by 2002:a05:651c:154e:b0:30b:edd8:886 with SMTP id
- 38308e7fff4ca-31d34774bf1mr16555611fa.9.1745937097750; Tue, 29 Apr 2025
- 07:31:37 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="aVWaaiFH"
+Received: from github.com (hubbernetes-node-a0c1f41.ac4-iad.github.net [10.52.132.23])
+	by smtp.github.com (Postfix) with ESMTPA id BDAC721370
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 07:35:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745937318;
+	bh=Q6Qp3HyBMKphbCe9ywzaLWAi2X3shScUIGDoFR22nfI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=aVWaaiFHh2MKD1Z+Owx63Dvuvggeo0vfDA1x6JNyGg03ITA9Yno242lkLw0J0A419
+	 tqFRA0IQ5R+TRiHsRh5zKmuqJdUQn8MiJvaLmV9LPv1V/GAXaSRGa4igvXdEDII7mM
+	 DIGDcpvwEm7Jn2mZIYFHjytzNdM3vqADs3IpfrpY=
+Date: Tue, 29 Apr 2025 07:35:18 -0700
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/958158/000000-aad0cc@github.com>
+Subject: [bluez/bluez] dfa2fb: pbap: Support calling pbap_init() after
+ pbap_exit()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com>
- <e8190a3bedc0c477347d0799f5a4c16480bfb4e9.camel@iki.fi> <d68a9f4b25f6df883a75f1a44eb90bee64d4c3bc.camel@iki.fi>
-In-Reply-To: <d68a9f4b25f6df883a75f1a44eb90bee64d4c3bc.camel@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 29 Apr 2025 10:31:25 -0400
-X-Gm-Features: ATxdqUEhiSlxovu_06ig3E2bD8qA5L00Ddka1s76SH1l3tndrqrkUV6FxtYsx6c
-Message-ID: <CABBYNZ+StxjHC4f_JmPdJg2iv+o+ngyEuSvsBZB7Rrr=9juouQ@mail.gmail.com>
-Subject: Re: [PATCH] iso: add BT_ISO_TS optional to enable ISO timestamp
-To: Pauli Virtanen <pav@iki.fi>
-Cc: yang.li@amlogic.com, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Pauli,
+  Branch: refs/heads/958158
+  Home:   https://github.com/bluez/bluez
+  Commit: dfa2fb1cd6714a9d3748465b70855e953f476db6
+      https://github.com/bluez/bluez/commit/dfa2fb1cd6714a9d3748465b70855e953f476db6
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-29 (Tue, 29 Apr 2025)
 
-On Tue, Apr 29, 2025 at 10:29=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> ti, 2025-04-29 kello 17:26 +0300, Pauli Virtanen kirjoitti:
-> > Hi,
-> >
-> > ti, 2025-04-29 kello 11:35 +0800, Yang Li via B4 Relay kirjoitti:
-> > > From: Yang Li <yang.li@amlogic.com>
-> > >
-> > > Application layer programs (like pipewire) need to use
-> > > iso timestamp information for audio synchronization.
-> >
-> > I think the timestamp should be put into CMSG, same ways as packet
-> > status is. The packet body should then always contain only the payload.
->
-> Or, this maybe should instead use the SOF_TIMESTAMPING_RX_HARDWARE
-> mechanism, which would avoid adding a new API.
+  Changed paths:
+    M obexd/client/pbap.c
 
-Either that or we use BT_PKT_STATUS, does SOF_TIMESTAMPING_RX_HARDWARE
-requires the use of errqueue?
+  Log Message:
+  -----------
+  pbap: Support calling pbap_init() after pbap_exit()
 
-> > >
-> > > Signed-off-by: Yang Li <yang.li@amlogic.com>
-> > > ---
-> > >  include/net/bluetooth/bluetooth.h |  4 ++-
-> > >  net/bluetooth/iso.c               | 58 +++++++++++++++++++++++++++++=
-++++------
-> > >  2 files changed, 52 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetoot=
-h/bluetooth.h
-> > > index bbefde319f95..a102bd76647c 100644
-> > > --- a/include/net/bluetooth/bluetooth.h
-> > > +++ b/include/net/bluetooth/bluetooth.h
-> > > @@ -242,6 +242,7 @@ struct bt_codecs {
-> > >  #define BT_CODEC_MSBC              0x05
-> > >
-> > >  #define BT_ISO_BASE                20
-> > > +#define BT_ISO_TS          21
-> > >
-> > >  __printf(1, 2)
-> > >  void bt_info(const char *fmt, ...);
-> > > @@ -390,7 +391,8 @@ struct bt_sock {
-> > >  enum {
-> > >     BT_SK_DEFER_SETUP,
-> > >     BT_SK_SUSPEND,
-> > > -   BT_SK_PKT_STATUS
-> > > +   BT_SK_PKT_STATUS,
-> > > +   BT_SK_ISO_TS
-> > >  };
-> > >
-> > >  struct bt_sock_list {
-> > > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> > > index 2f348f48e99d..2c1fdea4b8c1 100644
-> > > --- a/net/bluetooth/iso.c
-> > > +++ b/net/bluetooth/iso.c
-> > > @@ -1718,7 +1718,21 @@ static int iso_sock_setsockopt(struct socket *=
-sock, int level, int optname,
-> > >             iso_pi(sk)->base_len =3D optlen;
-> > >
-> > >             break;
-> > > +   case BT_ISO_TS:
-> > > +           if (optlen !=3D sizeof(opt)) {
-> > > +                   err =3D -EINVAL;
-> > > +                   break;
-> > > +           }
-> > >
-> > > +           err =3D copy_safe_from_sockptr(&opt, sizeof(opt), optval,=
- optlen);
-> > > +           if (err)
-> > > +                   break;
-> > > +
-> > > +           if (opt)
-> > > +                   set_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
-> > > +           else
-> > > +                   clear_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
-> > > +           break;
-> > >     default:
-> > >             err =3D -ENOPROTOOPT;
-> > >             break;
-> > > @@ -1789,7 +1803,16 @@ static int iso_sock_getsockopt(struct socket *=
-sock, int level, int optname,
-> > >                     err =3D -EFAULT;
-> > >
-> > >             break;
-> > > +   case BT_ISO_TS:
-> > > +           if (len < sizeof(u32)) {
-> > > +                   err =3D -EINVAL;
-> > > +                   break;
-> > > +           }
-> > >
-> > > +           if (put_user(test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags),
-> > > +                       (u32 __user *)optval))
-> > > +                   err =3D -EFAULT;
-> > > +           break;
-> > >     default:
-> > >             err =3D -ENOPROTOOPT;
-> > >             break;
-> > > @@ -2271,13 +2294,21 @@ static void iso_disconn_cfm(struct hci_conn *=
-hcon, __u8 reason)
-> > >  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
-> > >  {
-> > >     struct iso_conn *conn =3D hcon->iso_data;
-> > > +   struct sock *sk;
-> > >     __u16 pb, ts, len;
-> > >
-> > >     if (!conn)
-> > >             goto drop;
-> > >
-> > > -   pb     =3D hci_iso_flags_pb(flags);
-> > > -   ts     =3D hci_iso_flags_ts(flags);
-> > > +   iso_conn_lock(conn);
-> > > +   sk =3D conn->sk;
-> > > +   iso_conn_unlock(conn);
-> > > +
-> > > +   if (!sk)
-> > > +           goto drop;
-> > > +
-> > > +   pb =3D hci_iso_flags_pb(flags);
-> > > +   ts =3D hci_iso_flags_ts(flags);
-> > >
-> > >     BT_DBG("conn %p len %d pb 0x%x ts 0x%x", conn, skb->len, pb, ts);
-> > >
-> > > @@ -2294,17 +2325,26 @@ void iso_recv(struct hci_conn *hcon, struct s=
-k_buff *skb, u16 flags)
-> > >             if (ts) {
-> > >                     struct hci_iso_ts_data_hdr *hdr;
-> > >
-> > > -                   /* TODO: add timestamp to the packet? */
-> > > -                   hdr =3D skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SI=
-ZE);
-> > > -                   if (!hdr) {
-> > > -                           BT_ERR("Frame is too short (len %d)", skb=
-->len);
-> > > -                           goto drop;
-> > > -                   }
-> > > +                   if (test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags)) {
-> > > +                           hdr =3D (struct hci_iso_ts_data_hdr *)skb=
-->data;
-> > > +                           len =3D hdr->slen + HCI_ISO_TS_DATA_HDR_S=
-IZE;
-> > > +                   } else {
-> > > +                           hdr =3D skb_pull_data(skb, HCI_ISO_TS_DAT=
-A_HDR_SIZE);
-> > > +                           if (!hdr) {
-> > > +                                   BT_ERR("Frame is too short (len %=
-d)", skb->len);
-> > > +                                   goto drop;
-> > > +                           }
-> > >
-> > > -                   len =3D __le16_to_cpu(hdr->slen);
-> > > +                           len =3D __le16_to_cpu(hdr->slen);
-> > > +                   }
-> > >             } else {
-> > >                     struct hci_iso_data_hdr *hdr;
-> > >
-> > > +                   if (test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags)) {
-> > > +                           BT_ERR("Invalid option BT_SK_ISO_TS");
-> > > +                           clear_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags=
-);
-> > > +                   }
-> > > +
-> > >                     hdr =3D skb_pull_data(skb, HCI_ISO_DATA_HDR_SIZE)=
-;
-> > >                     if (!hdr) {
-> > >                             BT_ERR("Frame is too short (len %d)", skb=
-->len);
-> > >
-> > > ---
-> > > base-commit: 16b4f97defefd93cfaea017a7c3e8849322f7dde
-> > > change-id: 20250421-iso_ts-c82a300ae784
-> > >
-> > > Best regards,
+pbap_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
+
+Send the UnregisterProfile message directly from pbap_exit(),
+then call unregister_profile().
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
 
 
+  Commit: 87f7941949a160ca41a0360e739fef469ad86b9e
+      https://github.com/bluez/bluez/commit/87f7941949a160ca41a0360e739fef469ad86b9e
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-29 (Tue, 29 Apr 2025)
 
---=20
-Luiz Augusto von Dentz
+  Changed paths:
+    M obexd/plugins/bluetooth.c
+
+  Log Message:
+  -----------
+  obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
+
+bluetooth_exit() didn't previously unregister itself thoroughly.  That
+was fine if it was only called when the service was about to exit,
+because everything was implicitly unregistered when the process ended.
+But we need to be more scrupulous if this can be called throughout
+the program's lifecycle.
+
+Send UnregisterProfile messages directly from bluetooth_exit(),
+then call unregister_profile(profile).
+
+The UnregisterProfile message can't be sent directly from
+unregister_profile(), because that also needs to be called when
+register_profile() fails halfway through.
+
+Do not free profiles in bluetooth_exit() - profiles are needed
+by a future call to bluetooth_init(), or will be freed by
+bluetooth_stop() if necessary.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: 3a09b8645cadad8241e905c03f892497675db27b
+      https://github.com/bluez/bluez/commit/3a09b8645cadad8241e905c03f892497675db27b
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-29 (Tue, 29 Apr 2025)
+
+  Changed paths:
+    M obexd/src/main.c
+    M obexd/src/obexd.h
+
+  Log Message:
+  -----------
+  obexd: Support creating private system/session bus connections
+
+Obexd can either connect to the system or session bus.
+We mostly share a common connection to that bus, but it can be useful
+to have a private connection.  For example, this allows us to quickly
+unregister profiles when switching user.
+
+Add obex_setup_dbus_connection_private(), which creates a new
+connection to whichever bus was specified by the user.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: cc8ff2d8810ec423de795d9da60a4f0483c1c9e5
+      https://github.com/bluez/bluez/commit/cc8ff2d8810ec423de795d9da60a4f0483c1c9e5
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-29 (Tue, 29 Apr 2025)
+
+  Changed paths:
+    M Makefile.obexd
+    M obexd/client/pbap.c
+    M obexd/plugins/bluetooth.c
+    A obexd/src/logind.c
+    A obexd/src/logind.h
+    M obexd/src/main.c
+
+  Log Message:
+  -----------
+  obexd: Unregister profiles when the user is inactive
+
+Obexd is usually run as a user service, and can exhibit surprising
+behaviour if two users are logged in at the same time.
+
+Unregister profiles when the user is detected to be off-seat.
+
+It may be impossible to detect whether a user is on-seat in some cases.
+For example, a version of obexd compiled with systemd support might be
+run outside of a systemd environment.  Warn and leave services
+registered if that happens.
+
+Obexd can be run as a system service, in which case this check makes no
+sense.  Disable this check when called with `--system-bus`.
+
+Obexd can also be run by a user that does not have an active session.
+For example, someone could use `ssh` to access the system.  There might
+be a use case where someone needs Bluetooth access but can't log in with
+a keyboard, or there might be a security issue with doing so.  This isn't
+handled explicitly by this patch, but a future patch could add support
+by calling `logind_set(FALSE)` in the same way as is currently done
+with `--system-bus`.
+
+Unregister profiles by closing private connections instead of sending
+UnregisterProfile on the shared connection.  Pipewire has apparently
+found the latter to cause long shutdown delays, because bluetoothd
+may be shutting down and unable to handle this message.
+
+Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+
+Other services are likely to need similar functionality,
+so I have created a gist to demonstrate the basic technique:
+https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: 5b879c8598d59fa80b8d784c2cedd0e22a869f12
+      https://github.com/bluez/bluez/commit/5b879c8598d59fa80b8d784c2cedd0e22a869f12
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-29 (Tue, 29 Apr 2025)
+
+  Changed paths:
+    M obexd/src/logind.c
+
+  Log Message:
+  -----------
+  obexd: Support sd_login_monitor_get_timeout()
+
+The documentation for sd_login_monitor_get_timeout() implies the API
+may need to be checked after some time, even if no events have been
+received via the fd.
+
+In practice, the implementation has always returned a dummy value,
+and changing it now would cause enough breakage in other projects
+to make it unlikely to ever happen.
+
+Add a handler for that case, even though it can't currently
+happen in the real world.
+
+The API assumes we call poll() directly, so in theory it could change
+the timeout based on some event that doesn't trigger a callback
+(e.g. sending a signal to the service).  It's hard to see how we'd
+handle that without running a poll() in a separate thread,
+which would be a lot of complexity for an untestable edge case.
+Don't try to handle that problem.
+
+Cc: Pauli Virtanen <pav@iki.fi>
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+  Commit: aad0cc679c0af34fad399030f5c82c82f6284959
+      https://github.com/bluez/bluez/commit/aad0cc679c0af34fad399030f5c82c82f6284959
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-04-29 (Tue, 29 Apr 2025)
+
+  Changed paths:
+    M obexd/src/obex.service.in
+
+  Log Message:
+  -----------
+  Revert "obexd: only run one instance at once"
+
+No longer needed now services can share resources.
+
+This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
+
+Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+
+
+Compare: https://github.com/bluez/bluez/compare/dfa2fb1cd671%5E...aad0cc679c0a
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
