@@ -1,128 +1,118 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C90924728A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 18:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB571F4736
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 19:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745950431; cv=none; b=WuH/Z/l9OLDd7UzKOglhrw6L8kvtUhSj1LCix2kk3flVH5VKyk2eI4xNQHL7TN6AXimI4DY7biGDo972aMOCubch/Vk8e7w15ZOPZgKYTflvffbHD2kvYVF7td13Et9cJtPz5Hi6PP6oStgzVfGkPoefdoL1J8e5N2XdlYt6D8Y=
+	t=1745954006; cv=none; b=LAvT0HOQUsgNp0I9fVUUcWNfhgGPX3p0nVkffWsyEYybAaGQCUL1q1yab9WDSZmTWekrsKZfmHEBVNGorSnMauLI/6sle+nOwrHIdUNTijcq9mOzXZVV1n2ljXvK1mskweYhPOXeCeXzJjG7LvKR9j6dJ48TAjHH3vulPFviXmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745950431; c=relaxed/simple;
-	bh=xpiQCn5MJAuAEQLg7Sy1/GuLmNlXH5nZ2bzI4UoVS/U=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HgYmU3GEOXEgp4UTm4ilZXxCjRX4GpNLtWyn7gLd4RqeERjfzrvDgrXKFbPo1jNDzjI8klqJiWxqVKgM6+7XwCLqMhOJ+JCT0BM6f/SNhLM8TbQD5cO5Ru3OtACA4NKczZXl/MKS3FU+5zhHAgc56AIWLT2nESVJ+q+9YaysMJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=f8PnwF3D; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1745954006; c=relaxed/simple;
+	bh=FICA8ldjVTbB5SS4fcLjGWjcLdCi5OvP1oWVZSpwj3k=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SxNOKdNlgUTW213NiIjl4w2g0aEKfdGBWS2KK+p/Tt/ZHKb5RzeqRkOxNqwVmfoXOvWvUJi3m0B3E1vX2ZeTz7oXDiut0FvrV9H6UBf8k7C/8N4eLAH9/iZjRMp68r4u5kctr7dysQll497uTEC+uL0l1ZsCuOwQV8SciteiIHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aIZ1a1xK; arc=none smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="f8PnwF3D"
-Received: from github.com (hubbernetes-node-0117935.ash1-iad.github.net [10.56.149.36])
-	by smtp.github.com (Postfix) with ESMTPA id 0FF68140602
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 11:13:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1745950429;
-	bh=ltLjbgfb6Q+Bv/tNZ6sfcnnylkvgCRnIjGFpRqYizLg=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=f8PnwF3DOJ+xgGykRgCq30ODd/55wjW3OUdmDHfC2n1eELBdNC1DfMzbiwk2Ul5jn
-	 kMsBG2aAWfHFZRoXdGDQGSTXPgA0iRZUMJ7YoI++nROm45ZOeQLbq7tUnxrbnIteqs
-	 mfRkYmNl1t6kLfJKcKDtOu9rjYKs/Pq6qbxXAZa8=
-Date: Tue, 29 Apr 2025 11:13:49 -0700
-From: BluezTestBot <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aIZ1a1xK"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-4c4d8638e17so137970137.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 12:13:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745954003; x=1746558803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZNzb8D7BDI1m5l4txfXJf1yUSyQkE1IugTeypokTQmo=;
+        b=aIZ1a1xKkoOYVjGkIr6x0SMvRqXcVRrY9lRgMDPvwy8m7XxWP+/1kk82NqxyhlJHcl
+         Wk/M2zmP+6lBnFGc7xGrhRMVAOAU3PBd7vZyEDqIRsWR+GSWdGiGMzPgxAIH3RI2uV3l
+         WUTB3zyRzQjUNf0yqvNvk10VAud2of4qFe+fIpvitte/HrG4uREE/M3I7mBlgbrMU+8+
+         uHqxVNQBuGiWhPmd/2Pe6n5YU8Vt0rJYOigUAJYAJQx2jqVGYhL/2EvDWC/CJUMcMMNg
+         nLhIX4O+h4c+I1mmw2y0r9p0DqnsPVHK8eabSTIYCkab1MyCrWEtypzXFWhbXIAnxwZh
+         55gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745954003; x=1746558803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZNzb8D7BDI1m5l4txfXJf1yUSyQkE1IugTeypokTQmo=;
+        b=ugH5sUCNM1wvAQQq4CbXesmrSRBoUyxMb5yCsfFV4wX97e0jQ5TpoO+8EeHpTIaOBG
+         N3a/ki0zcajKT3geoQs0Ixv+nRoZCIpyjrSnNCTuUMwUlcYocCclNrI+keuVXbe48iv9
+         yri3gr8yfJOgNpePFL9cZ2Jv3Zc3y7USaYMCg7DVp7wCkSp9IJ6014FJd8WvvPuScROA
+         Fh5FMBRbFHzP72nFdn571pvnpVtjcWmOupC/vlWsDffrOaMHlM/IV2CmawF7Q8AehVzH
+         amyexWP7Jj4MvdNXclt8QecZ4SoLNplATkHu8oF8KhPdP748MvkgWdM/vvaEQZL+uWlA
+         FCRQ==
+X-Gm-Message-State: AOJu0YwE+L2+N/fzryaS1eqk6+CcASY2rP30LAo9t4cqJlHVq+Ipy3W2
+	7stcxRsMsPkQ481bpLgVpU5Ti5Icda76cehXi7EMvoXdgrH+lOtBKmLHxPeq
+X-Gm-Gg: ASbGncuu/u2ewMZv54R1ojXNviGbdIm4LynpjcQ7eWWu6Q3Ryy73oP94isua8ithEI1
+	t6Ig8hum5FRdLHZEd2iCQ8q0OOPVdvbbZGzPG4x2ejI8QtdTRJTXuy1BDpi6T5gIObFEY5jDDIp
+	HRDmLr81ciIlpcLJufW9/CtJ13Bq2+Rfv9mxdPwqrXWRMRvEQrjvZBZ+vfAGIa48HF9cK8nbHSp
+	vuzNphovVaNGNf+U2dLoyvF7qRjC1+XXVOIngMQfx0WeGMd85ePuZT2kngWiM2YWYCK05w/OrCY
+	jESC5jReUeRQYzd0e8NB25ki/eSolUaHya1O9UznKqFMe3wNf5RDT7CIrMYrzlhkYLmwbiG4yqP
+	3Eh2LIMdGiQ==
+X-Google-Smtp-Source: AGHT+IFcmiXSdXIQDlj/fsEHU1GnlRIzA9gDVowHiUd/uwtUs56PfRBZkpHWfFrIQ7w9MJmTRMlmhg==
+X-Received: by 2002:a05:6102:3048:b0:4bb:db41:3b6c with SMTP id ada2fe7eead31-4dad35ac562mr348197137.12.1745954003361;
+        Tue, 29 Apr 2025 12:13:23 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4dad423db57sm5360137.19.2025.04.29.12.13.20
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 12:13:22 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/f96f3b-237d81@github.com>
-Subject: [bluez/bluez] 9bf6bb: pbap: Support calling pbap_init() after
- pbap_exit()
+Subject: [PATCH v1] Bluetooth: MGMT: Fix MGMT_OP_ADD_DEVICE invalid device flags
+Date: Tue, 29 Apr 2025 15:13:19 -0400
+Message-ID: <20250429191319.2234877-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 9bf6bb654ff78efafe8cb4c4d55b6acaa0f53c27
-      https://github.com/bluez/bluez/commit/9bf6bb654ff78efafe8cb4c4d55b6acaa0f53c27
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-29 (Tue, 29 Apr 2025)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M obexd/client/pbap.c
+Device flags could be updated in the meantime while MGMT_OP_ADD_DEVICE
+is pending on hci_update_passive_scan_sync so instead of setting the
+current_flags as cmd->user_data just do a lookup using
+hci_conn_params_lookup and use the latest stored flags.
 
-  Log Message:
-  -----------
-  pbap: Support calling pbap_init() after pbap_exit()
+Fixes: a182d9c84f9c ("Bluetooth: MGMT: Fix Add Device to responding before completing")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/mgmt.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-pbap_exit() didn't previously unregister itself thoroughly.  That
-was fine if it was only called when the service was about to exit,
-because everything was implicitly unregistered when the process ended.
-But we need to be more scrupulous if this can be called throughout
-the program's lifecycle.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index c1e1e529e26c..46b22708dfbd 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7506,11 +7506,16 @@ static void add_device_complete(struct hci_dev *hdev, void *data, int err)
+ 	struct mgmt_cp_add_device *cp = cmd->param;
+ 
+ 	if (!err) {
++		struct hci_conn_params *params;
++
++		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
++						le_addr_type(cp->addr.type));
++
+ 		device_added(cmd->sk, hdev, &cp->addr.bdaddr, cp->addr.type,
+ 			     cp->action);
+ 		device_flags_changed(NULL, hdev, &cp->addr.bdaddr,
+ 				     cp->addr.type, hdev->conn_flags,
+-				     PTR_UINT(cmd->user_data));
++				     params ? params->flags : 0);
+ 	}
+ 
+ 	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_ADD_DEVICE,
+@@ -7613,8 +7618,6 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	cmd->user_data = UINT_PTR(current_flags);
+-
+ 	err = hci_cmd_sync_queue(hdev, add_device_sync, cmd,
+ 				 add_device_complete);
+ 	if (err < 0) {
+-- 
+2.49.0
 
-Send the UnregisterProfile message directly from pbap_exit(),
-then call unregister_profile().
-
-The UnregisterProfile message can't be sent directly from
-unregister_profile(), because that also needs to be called when
-register_profile() fails halfway through.
-
-
-  Commit: 29f3c07b8dc95a17a128f2b461f133099fff3da7
-      https://github.com/bluez/bluez/commit/29f3c07b8dc95a17a128f2b461f133099fff3da7
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-29 (Tue, 29 Apr 2025)
-
-  Changed paths:
-    M obexd/plugins/bluetooth.c
-
-  Log Message:
-  -----------
-  obexd/bluetooth: Support calling bluetooth_init() after bluetooth_exit()
-
-bluetooth_exit() didn't previously unregister itself thoroughly.  That
-was fine if it was only called when the service was about to exit,
-because everything was implicitly unregistered when the process ended.
-But we need to be more scrupulous if this can be called throughout
-the program's lifecycle.
-
-Send UnregisterProfile messages directly from bluetooth_exit(),
-then call unregister_profile(profile).
-
-The UnregisterProfile message can't be sent directly from
-unregister_profile(), because that also needs to be called when
-register_profile() fails halfway through.
-
-Do not free profiles in bluetooth_exit() - profiles are needed
-by a future call to bluetooth_init(), or will be freed by
-bluetooth_stop() if necessary.
-
-
-  Commit: 237d818ef294e22be87fba69b3cdd79c75c201e7
-      https://github.com/bluez/bluez/commit/237d818ef294e22be87fba69b3cdd79c75c201e7
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-04-29 (Tue, 29 Apr 2025)
-
-  Changed paths:
-    M obexd/src/main.c
-    M obexd/src/obexd.h
-
-  Log Message:
-  -----------
-  obexd: Support creating private system/session bus connections
-
-Obexd can either connect to the system or session bus.
-We mostly share a common connection to that bus, but it can be useful
-to have a private connection.  For example, this allows us to quickly
-unregister profiles when switching user.
-
-Add obex_setup_dbus_connection_private(), which creates a new
-connection to whichever bus was specified by the user.
-
-
-Compare: https://github.com/bluez/bluez/compare/f96f3b34db40...237d818ef294
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
