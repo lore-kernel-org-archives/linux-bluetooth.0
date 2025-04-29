@@ -1,75 +1,61 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A00B242D6E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 16:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14CF215060
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 16:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745944582; cv=none; b=EzymTtynJKcbHcBIRb5fCuZN3dONUD+qvmjqtzv3FW7+g7+KCvSZ3MvcYl+cVyiXLwP5fxwppxE8pmlI1onyKIB+FNRa99W6NfTTCICh14wMV6HAKHv5TaWflczMMqrpCH8aJr4gGJ6lsSt7n2DXLRw9Ek22ow/AtTKMlHpyq+g=
+	t=1745945445; cv=none; b=DUt9zWvNnquNwZfqCRcyXj2SOl4JJq6kOv8rHVofpqTvvNHbe/pnW2VEPou4FeoUByNqWDFbl4YPoqtRfZwpHG5yH2+s11Bveb7UcYsbo3R7ZLyiEOu1VbpM9brQjN/H5m3jEYxzA+Jzt1GVX1xnwCPjbizR1a/vvoyof9gsmuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745944582; c=relaxed/simple;
-	bh=4Zt6lm+ijCiwNoQ0+YHP7RYoMlAO4J5BE21gI1xJH6Y=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=bekoRLrhT+pZWIx7deanjFNU/+bRzzdldtKX5pgG0Y+a3rEFgsTfK6xKdR6UOVcJMU0rATUtypOG1RKKyfUC9T3blWqf8Qhw74S2ALR+F7HUnxp8eWPFowRU3555euIHaxao4h26fTHyFJ8Q7PN4h1Db414Ri3p2kGMlcXi711k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=clcjCYEX; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1745945445; c=relaxed/simple;
+	bh=tYd25HdFOX5I8ntpFz8R5vkb/02d8bVL12/m00Rt+8M=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=tE4uk/Uc77Fp+l6D2Mx2fihLmkwryYJdugOxicQ8o+hby1N98dq+LNFLxvXZiJp30U326arMOTDSzNxITj6RBBpRFDDcF/3G2OT26y4OivA+nkGsWip92r3l0WsHoR2wBIHiZrIrsGZZpr0klS1rtRhG3z3pCJPRLXuRNiXcp3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fxS1hOmZ; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clcjCYEX"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7c55500cf80so568143585a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 09:36:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745944578; x=1746549378; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ko/RPF6WWmuEmzTg635e4sT+vu+cVKTOWplD+pMZ46E=;
-        b=clcjCYEXQhfzXqKkLxGntAfhWOP5csrsEw1L+TfTuWoOyzmnmRNLkBPx+TWp6K3qV/
-         DlI+0jJ3AdeBEenpxvIBJZyM19y/UQrjRlUlX298Ktc8sFmPiT7UNQitFoA7Xnc7HjbJ
-         RmkAO+GVHUC/ULB4hrxwlDpqL9XtveBCtGVqYqyRJQRmxj0WswUQJpqn6FPxB7NX1mjk
-         /WOvG8wY5ITPcx1gb9j+478+wdt5BJcsGC3ecxEiQpp7y+EkKxYBtuAEd2dVinfZD/Nx
-         nsA5tKgapik6Y7cKxBG00oBsCy8zBpniRW6uZzbpNWqLRfxhy6G5xMB98Be6xyWRyVkg
-         EovQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745944578; x=1746549378;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ko/RPF6WWmuEmzTg635e4sT+vu+cVKTOWplD+pMZ46E=;
-        b=rRWSINqNvf2ItRzkSJD5AnKcb0FDDKMe3jZRn2odZ1NEpnTG4c+bDeD1Mu3dB3FS1O
-         gy31Ion+VYXkqDtxSnfQDCF7WR57yuq2Lc/DQVrIm+/ognmCOKE9vr0XjiFEJnndn2Wp
-         qCnoIBJ3bnmft/Lt2h6rkURCa0qqNMe2b3WXhFec9mEFSgvpMRgEtxxleo/FldDj3+UI
-         gLqkAiBkPuY7ChnoI7jVtoYDJwpLOZqUf05/Iw5sG9FEYWqAoU9kVjjkM6BIbeGM4yUU
-         Ptgfcp1cDlldlALizuwPxwLpo1eewDplOYMu/HvdV0Y+hRG4lIJbQolxAQcK6pETTvRg
-         hHNA==
-X-Gm-Message-State: AOJu0YxwV4w+Bk6Su/jT/khswMB8jvsfOiMZT34/80lmgnv51Rd5Q63e
-	rjvqDC2GiPEtUryBsJ1Ah9hnFOdXdIPowP2ZPYLswgy3ZwD6oW4nRGdyuirz
-X-Gm-Gg: ASbGncuyDKTedY6OqNTo0g072yNSZNhes1Ce13nKN6EerfHd7QK7N0ucMIalHLSb10s
-	YSaEm2ZVf8ww0PH+DQO8vdq5tUEHipkE7IiMvMy6XjHfkyd54XopLeWGVWKv+xHF+v0vw6Blu4U
-	Sj9CyhKp9aELGL8KHMzsJ+X5rh40OZ4enA4lejY3kivr8hkV5Mno6BhgIFqFfzGEFGtDWXvE7hH
-	v4HFqaktNg7hWjaMc5Hf7jTe0/TMqnRoaEMv9CKJXo7vASKSvPZgHt/Z/S05YSeY65vBKJC11H0
-	DBHbDdK03GyF4IzzVrJhquff+eE44aup0m0Fx3weizIV7pZcGF2gQ4PCznTVV00AjrqIQPyCxRB
-	IA9cwf09Jcw==
-X-Google-Smtp-Source: AGHT+IFgLHLsHmacfr0nxbG++CaOP5VlXC9sz8pG1rrdm0rsy4GjJdoDBKlLy5iepNUoUi9yZDLCMQ==
-X-Received: by 2002:a05:620a:40c4:b0:7c5:65ab:5002 with SMTP id af79cd13be357-7cabddda0fbmr737042185a.49.1745944578419;
-        Tue, 29 Apr 2025 09:36:18 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-877c6a87a26sm1392119241.30.2025.04.29.09.36.16
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 09:36:17 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fxS1hOmZ"
+Received: from github.com (hubbernetes-node-0138e36.ac4-iad.github.net [10.52.143.32])
+	by smtp.github.com (Postfix) with ESMTPA id DA71164135F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Apr 2025 09:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1745945442;
+	bh=HEy1wbV1h7JFh3cUGm05u9O3uDzNccquk27ZR8sfjCs=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=fxS1hOmZyoRmxr4lWc7/BpLOYE/Gxt5vvwqlw+ha8ac/RrW+drEnEUfdAQ1/mTn0v
+	 QKGpPfBb2fNVrvLBxzV8gc9jzZkTkn7XI4WYCUe/yFr/nblrfUrLonZpT5aJNyEJ7H
+	 SNrL/BI3XEIvTAMoBDIB5zgIekdb4kRG73pdAJuM=
+Date: Tue, 29 Apr 2025 09:50:42 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] device: Fix not setting DEVICE_FLAG_REMOTE_WAKEUP when required
-Date: Tue, 29 Apr 2025 12:36:15 -0400
-Message-ID: <20250429163615.2188056-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
+Message-ID: <bluez/bluez/push/refs/heads/958207/000000-46c2aa@github.com>
+Subject: [bluez/bluez] 46c2aa: device: Fix not setting
+ DEVICE_FLAG_REMOTE_WAKEUP ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/958207
+  Home:   https://github.com/bluez/bluez
+  Commit: 46c2aa5c97070a51fd5d68f863c42e5316d69d17
+      https://github.com/bluez/bluez/commit/46c2aa5c97070a51fd5d68f863c42e5316d69d17
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-04-29 (Tue, 29 Apr 2025)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Fix not setting DEVICE_FLAG_REMOTE_WAKEUP when required
 
 Due to the introduction of DEVICE_FLAG_ADDRESS_RESOLUTION it is no
 longer possible to check if the kernel has support for it ahead of time
@@ -77,27 +63,7 @@ since that would depend on device->supported_flags which is only updated
 with MGMT_OP_ADD_DEVICE _after_ services are probed.
 
 Fixes: https://github.com/bluez/bluez/issues/1207
----
- src/device.c | 6 ------
- 1 file changed, 6 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 2ee319c4f7c2..c364d72c3bdf 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1552,12 +1552,6 @@ static bool device_get_wake_support(struct btd_device *device)
- 
- void device_set_wake_support(struct btd_device *device, bool wake_support)
- {
--	if (device->rpa && !btd_adapter_has_exp_feature(device->adapter,
--						EXP_FEAT_RPA_RESOLUTION)) {
--		warn("Unable to set wake_support without RPA resolution");
--		return;
--	}
--
- 	device->wake_support = wake_support;
- 
- 	if (device->wake_support)
--- 
-2.49.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
