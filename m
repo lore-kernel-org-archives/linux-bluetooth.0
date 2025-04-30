@@ -1,32 +1,32 @@
 Received: from b-painless.mh.aa.net.uk (b-painless.mh.aa.net.uk [81.187.30.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A9F25B1E0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Apr 2025 13:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C04525A630
+	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Apr 2025 13:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746019031; cv=none; b=XBTHUJJXUQw1Ow1N0tUAF6Lyz0pBdmLPee7gZKcKFPo+TyNAmqzrfsAxQRo0TzHwn+DRZdmKcHFQoT46rbcR2kEMGBKc6xSLju9zdWDJcN9k+aNGyppV2u88auAYzlB7txi8CcU6qCcbW4KAmvE8iHCnk+Id0Kubns2pPKubDqE=
+	t=1746019031; cv=none; b=lIYTc/5afT8fXXpD534Lf0VYB7Cdu5HbGIWown82USU45ARTIe+Ywv3lmYPMHy5apFyLdrELWdJaheVfeVuXfmika7UApbTeRoXFokn6ueytMPerR7lfTR6fZCS334rQKCVgTAEZqPkY5bCkWhUi9JPLLJvuE8W6y5SJWNonhbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746019031; c=relaxed/simple;
-	bh=/pORlkl6iy5CCHtXO4r13EYVKwWAZM7hO+8n2bM2/Qs=;
+	bh=VVZH/4Ehelx94+EyAqqqbH7gWMjvhe71oDMWyZZfqtY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dj46VdzQhlLySOdObKym71/mWrIXFobXLxmcjxuYhk/XkY6tSS+k1aCKE6h/ie1UE6OqcyFYXl7r3xXcZQAVfQfVWENJx00dFg/FaCm/xfF4Two7I7cjO1rPTnMLJ85VwVHv2a8qhXc8jqR55jGni6GU03VX7RAesPKLhm/9sz0=
+	 MIME-Version; b=ZKmuGUDFaTxwt18e1QeiYHlu+JKZ6nIXf4tvpink70Ad9Q/pcFg0IVvPFmvb5yZnd/giqWElld75tiFijZcda3eizs6mIRDegf9pBXoOPsHmI0r2lm9K8JJ1NPlM4GoBeAxnpBmAJUjUe+Zh+w4hVkckm1pHLMz4SbmkunZ5h3A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
 Received: from a.d.e.2.8.8.9.5.f.7.2.3.4.3.2.4.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:4234:327f:5988:2eda] helo=andrews-2024-laptop.lan)
 	by painless-b.tch.aa.net.uk with esmtp (Exim 4.96)
 	(envelope-from <kernel.org@pileofstuff.org>)
-	id 1uA7JB-00B6cr-2J;
+	id 1uA7JB-00B6cr-1I;
 	Wed, 30 Apr 2025 14:17:06 +0100
 From: Andrew Sayers <kernel.org@pileofstuff.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	pav@iki.fi,
 	Andrew Sayers <kernel.org@pileofstuff.org>
-Subject: [PATCH BlueZ v6 3/3] Revert "obexd: only run one instance at once"
-Date: Wed, 30 Apr 2025 14:14:02 +0100
-Message-ID: <20250430131648.1291354-4-kernel.org@pileofstuff.org>
+Subject: [PATCH BlueZ v6 1/3] obexd: Unregister profiles when the user is inactive
+Date: Wed, 30 Apr 2025 14:14:00 +0100
+Message-ID: <20250430131648.1291354-2-kernel.org@pileofstuff.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250430131648.1291354-1-kernel.org@pileofstuff.org>
 References: <20250430131648.1291354-1-kernel.org@pileofstuff.org>
@@ -38,39 +38,498 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-No longer needed now services can share resources.
+Obexd is usually run as a user service, and can exhibit surprising
+behaviour if two users are logged in at the same time.
 
-This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
+Unregister profiles when the user is detected to be off-seat.
 
+It may be impossible to detect whether a user is on-seat in some cases.
+For example, a version of obexd compiled with systemd support might be
+run outside of a systemd environment.  Warn and leave services
+registered if that happens.
+
+Obexd can be run as a system service, in which case this check makes no
+sense.  Disable this check when called with `--system-bus`.
+
+Obexd can also be run by a user that does not have an active session.
+For example, someone could use `ssh` to access the system.  There might
+be a use case where someone needs Bluetooth access but can't log in with
+a keyboard, or there might be a security issue with doing so.  This isn't
+handled explicitly by this patch, but a future patch could add support
+by calling `logind_set(FALSE)` in the same way as is currently done
+with `--system-bus`.
+
+Unregister profiles by closing private connections instead of sending
+UnregisterProfile on the shared connection.  Pipewire has apparently
+found the latter to cause long shutdown delays, because bluetoothd
+may be shutting down and unable to handle this message.
+
+Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+
+Other services are likely to need similar functionality,
+so I have created a gist to demonstrate the basic technique:
+https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+
+Suggested-by: Pauli Virtanen <pav@iki.fi>
 Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
 ---
- obexd/src/obex.service.in | 9 ---------
- 1 file changed, 9 deletions(-)
+ Makefile.obexd            |  10 ++
+ obexd/client/pbap.c       |  17 ++-
+ obexd/plugins/bluetooth.c |  14 ++-
+ obexd/src/logind.c        | 239 ++++++++++++++++++++++++++++++++++++++
+ obexd/src/logind.h        |  37 ++++++
+ obexd/src/main.c          |   4 +
+ 6 files changed, 316 insertions(+), 5 deletions(-)
+ create mode 100644 obexd/src/logind.c
+ create mode 100644 obexd/src/logind.h
 
-diff --git a/obexd/src/obex.service.in b/obexd/src/obex.service.in
-index f269bc513..cf4d8c985 100644
---- a/obexd/src/obex.service.in
-+++ b/obexd/src/obex.service.in
-@@ -1,19 +1,10 @@
- [Unit]
- Description=Bluetooth OBEX service
--# This is a user-specific service, but bluetooth is a device-specific protocol.
--# Only run one instance at a time, even if multiple users log in at once:
--ConditionPathExists=!/run/lock/bluez/obexd.lock
--ConditionUser=!@system
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 74dd977a0..b59cfaf8f 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -67,6 +67,7 @@ obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
+ 			obexd/src/main.c obexd/src/obexd.h \
+ 			obexd/src/plugin.h obexd/src/plugin.c \
+ 			obexd/src/log.h obexd/src/log.c \
++			obexd/src/logind.h obexd/src/logind.c \
+ 			obexd/src/manager.h obexd/src/manager.c \
+ 			obexd/src/obex.h obexd/src/obex.c obexd/src/obex-priv.h \
+ 			obexd/src/mimetype.h obexd/src/mimetype.c \
+@@ -96,6 +97,8 @@ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
  
- [Service]
- Type=dbus
- BusName=org.bluez.obex
- ExecStart=@PKGLIBEXECDIR@/obexd
+ if EXTERNAL_PLUGINS
+ obexd_src_obexd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic
++else
++obexd_src_obexd_LDFLAGS =
+ endif
  
--# If the service fails on the following line, please ensure
--# the bluez tmpfile has been installed in /usr/lib/tmpfiles.d/
--ExecStartPre=touch /run/lock/bluez/obexd.lock
--ExecStopPost=rm -f /run/lock/bluez/obexd.lock
--
- [Install]
- Alias=dbus-org.bluez.obex.service
+ obexd_src_obexd_CPPFLAGS = $(AM_CPPFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+@@ -109,6 +112,13 @@ obexd-add-service-symlink:
+ obexd-remove-service-symlink:
+ endif
+ 
++if OBEX
++if SYSTEMD
++obexd_src_obexd_CPPFLAGS += -DSYSTEMD
++obexd_src_obexd_LDFLAGS += -lsystemd
++endif
++endif
++
+ obexd_src_obexd_SHORTNAME = obexd
+ 
+ obexd_builtin_files = obexd/src/builtin.h $(obexd_builtin_nodist)
+diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+index 90f8bdc02..51b523592 100644
+--- a/obexd/client/pbap.c
++++ b/obexd/client/pbap.c
+@@ -27,6 +27,7 @@
+ #include "gdbus/gdbus.h"
+ 
+ #include "obexd/src/log.h"
++#include "obexd/src/logind.h"
+ #include "obexd/src/obexd.h"
+ 
+ #include "transfer.h"
+@@ -1454,13 +1455,13 @@ static struct obc_driver pbap = {
+ 	.remove = pbap_remove
+ };
+ 
+-int pbap_init(void)
++static int pbap_init_cb(void)
+ {
+ 	int err;
+ 
+ 	DBG("");
+ 
+-	conn = obex_get_dbus_connection();
++	conn = obex_setup_dbus_connection_private(NULL, NULL);
+ 	if (!conn)
+ 		return -EIO;
+ 
+@@ -1481,7 +1482,7 @@ int pbap_init(void)
+ 	return 0;
+ }
+ 
+-void pbap_exit(void)
++static void pbap_exit_cb(void)
+ {
+ 	DBG("");
+ 
+@@ -1496,9 +1497,19 @@ void pbap_exit(void)
+ 	}
+ 
+ 	if (conn) {
++		dbus_connection_close(conn);
+ 		dbus_connection_unref(conn);
+ 		conn = NULL;
+ 	}
+ 
+ 	obc_driver_unregister(&pbap);
+ }
++
++int pbap_init(void)
++{
++	return logind_register(pbap_init_cb, pbap_exit_cb);
++}
++void pbap_exit(void)
++{
++	return logind_unregister(pbap_init_cb, pbap_exit_cb);
++}
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index 8cf718922..7ff27a8a8 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -35,6 +35,7 @@
+ #include "obexd/src/transport.h"
+ #include "obexd/src/service.h"
+ #include "obexd/src/log.h"
++#include "obexd/src/logind.h"
+ 
+ #define BT_RX_MTU 32767
+ #define BT_TX_MTU 32767
+@@ -426,7 +427,7 @@ static const struct obex_transport_driver driver = {
+ 
+ static unsigned int listener_id = 0;
+ 
+-static int bluetooth_init(void)
++static int bluetooth_init_cb(void)
+ {
+ 	connection = g_dbus_setup_private(DBUS_BUS_SYSTEM, NULL, NULL);
+ 	if (connection == NULL)
+@@ -438,7 +439,7 @@ static int bluetooth_init(void)
+ 	return obex_transport_driver_register(&driver);
+ }
+ 
+-static void bluetooth_exit(void)
++static void bluetooth_exit_cb(void)
+ {
+ 	GSList *l;
+ 
+@@ -462,4 +463,13 @@ static void bluetooth_exit(void)
+ 	obex_transport_driver_unregister(&driver);
+ }
+ 
++static int bluetooth_init(void)
++{
++	return logind_register(bluetooth_init_cb, bluetooth_exit_cb);
++}
++static void bluetooth_exit(void)
++{
++	return logind_unregister(bluetooth_init_cb, bluetooth_exit_cb);
++}
++
+ OBEX_PLUGIN_DEFINE(bluetooth, bluetooth_init, bluetooth_exit)
+diff --git a/obexd/src/logind.c b/obexd/src/logind.c
+new file mode 100644
+index 000000000..ff2bf3219
+--- /dev/null
++++ b/obexd/src/logind.c
+@@ -0,0 +1,239 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  Enable functionality only when the user is active
++ *
++ *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ */
++
++#ifdef SYSTEMD
++
++#include <assert.h>
++#include <errno.h>
++#include <poll.h>
++#include <stddef.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++#include <glib.h>
++
++#include <systemd/sd-login.h>
++
++#include "obexd/src/log.h"
++#include "obexd/src/logind.h"
++
++static sd_login_monitor * monitor;
++static int uid;
++static gboolean active = FALSE;
++static gboolean monitoring_enabled = TRUE;
++static guint event_source;
++
++struct callback_pair {
++	logind_init_cb init_cb;
++	logind_exit_cb exit_cb;
++};
++
++GSList *callbacks;
++
++static void call_init_cb(gpointer data, gpointer user_data)
++{
++	int res;
++
++	res = ((struct callback_pair *)data)->init_cb();
++	if (res)
++		*(int *)user_data = res;
++}
++static void call_exit_cb(gpointer data, gpointer user_data)
++{
++	((struct callback_pair *)data)->exit_cb();
++}
++
++static int update(void)
++{
++	char *state = NULL;
++	gboolean state_is_active;
++	int res;
++
++	res = sd_login_monitor_flush(monitor);
++	if (res < 0)
++		return res;
++	res = sd_uid_get_state(uid, &state);
++	state_is_active = g_strcmp0(state, "active");
++	free(state);
++	if (res < 0)
++		return res;
++
++	if (state_is_active) {
++		if (!active)
++			return 0;
++	} else {
++		res = sd_uid_get_seats(uid, 1, NULL);
++		if (res < 0)
++			return res;
++		if (active == !!res)
++			return 0;
++	}
++	active ^= TRUE;
++	res = 0;
++	g_slist_foreach(callbacks, active ? call_init_cb : call_exit_cb, &res);
++	return res;
++}
++
++static int check_event(void)
++{
++	int res;
++
++	res = sd_login_monitor_flush(monitor);
++	if (res < 0)
++		return res;
++	if (!monitoring_enabled)
++		return 0;
++	res = update();
++	if (res < 0)
++		return res;
++
++	return 0;
++}
++
++
++static gboolean event_handler(GIOChannel *source, GIOCondition condition,
++				gpointer data)
++{
++	int res;
++
++	res = check_event();
++	if (res) {
++		error("%s: %s", __func__, strerror(-res));
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
++static int logind_init(void)
++{
++	GIOChannel *channel;
++	int events;
++	int fd;
++	int res;
++
++	monitor = NULL;
++
++	DBG("");
++
++	if (!monitoring_enabled)
++		return 0;
++
++	uid = getuid();
++
++	res = sd_login_monitor_new("uid", &monitor);
++	if (res < 0) {
++		monitor = NULL;
++		goto FAIL;
++	}
++
++	// Check this after creating the monitor, in case of race conditions:
++	res = update();
++	if (res < 0)
++		goto FAIL;
++
++	events = res = sd_login_monitor_get_events(monitor);
++	if (res < 0)
++		goto FAIL;
++
++	fd = res = sd_login_monitor_get_fd(monitor);
++	if (res < 0)
++		goto FAIL;
++
++	channel = g_io_channel_unix_new(fd);
++
++	g_io_channel_set_close_on_unref(channel, TRUE);
++	g_io_channel_set_encoding(channel, NULL, NULL);
++	g_io_channel_set_buffered(channel, FALSE);
++
++	event_source = g_io_add_watch(channel, events, event_handler, NULL);
++
++	g_io_channel_unref(channel);
++
++	return check_event();
++
++FAIL:
++	sd_login_monitor_unref(monitor);
++	monitoring_enabled = FALSE;
++	active = TRUE;
++	return res;
++}
++
++static void logind_exit(void)
++{
++	if (event_source) {
++		g_source_remove(event_source);
++		event_source = 0;
++	}
++	sd_login_monitor_unref(monitor);
++}
++
++static gint find_cb(gconstpointer a, gconstpointer b)
++{
++	return ((struct callback_pair *)a)->init_cb - (logind_init_cb)b;
++}
++
++int logind_register(logind_init_cb init_cb, logind_exit_cb exit_cb)
++{
++	struct callback_pair *cbs;
++
++	if (!monitoring_enabled)
++		return init_cb();
++	if (callbacks == NULL) {
++		int res;
++
++		res = logind_init();
++		if (res) {
++			error("logind_init(): %s - login detection disabled",
++				strerror(-res));
++			return init_cb();
++		}
++	}
++	cbs = g_new(struct callback_pair, 1);
++	cbs->init_cb = init_cb;
++	cbs->exit_cb = exit_cb;
++	callbacks = g_slist_prepend(callbacks, cbs);
++	return active ? init_cb() : 0;
++}
++void logind_unregister(logind_init_cb init_cb, logind_exit_cb exit_cb)
++{
++	GSList *cb_node;
++
++	if (!monitoring_enabled)
++		return exit_cb();
++	if (active)
++		exit_cb();
++	cb_node = g_slist_find_custom(callbacks, init_cb, find_cb);
++	if (cb_node != NULL)
++		callbacks = g_slist_delete_link(callbacks, cb_node);
++	if (callbacks == NULL)
++		logind_exit();
++}
++
++int logind_set(gboolean enabled)
++{
++	int res = 0;
++
++	if (monitoring_enabled == enabled)
++		return 0;
++
++	monitoring_enabled = enabled;
++	if (enabled) {
++		active = FALSE;
++		return update();
++	}
++
++	active = TRUE;
++	g_slist_foreach(callbacks, call_exit_cb, &res);
++	return res;
++}
++
++#endif
+diff --git a/obexd/src/logind.h b/obexd/src/logind.h
+new file mode 100644
+index 000000000..eb3ff8d7b
+--- /dev/null
++++ b/obexd/src/logind.h
+@@ -0,0 +1,37 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  Enable functionality only when the user is active
++ *
++ *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ */
++
++typedef int (*logind_init_cb)(void);
++typedef void (*logind_exit_cb)(void);
++
++#ifdef SYSTEMD
++
++int logind_register(logind_init_cb init_cb, logind_exit_cb exit_cb);
++void logind_unregister(logind_init_cb init_cb, logind_exit_cb exit_cb);
++int logind_set(gboolean enabled);
++
++#else
++
++static inline int logind_register(logind_init_cb init_cb,
++					logind_exit_cb exit_cb)
++{
++	return init_cb();
++}
++static inline void logind_unregister(logind_init_cb init_cb,
++					logind_exit_cb exit_cb)
++{
++	return exit_cb();
++}
++static inline int logind_set(gboolean enabled)
++{
++	return 0;
++}
++
++#endif
+diff --git a/obexd/src/main.c b/obexd/src/main.c
+index ca95a70de..df150973e 100644
+--- a/obexd/src/main.c
++++ b/obexd/src/main.c
+@@ -35,6 +35,7 @@
+ #include "../client/manager.h"
+ 
+ #include "log.h"
++#include "logind.h"
+ #include "obexd.h"
+ #include "server.h"
+ 
+@@ -283,6 +284,9 @@ int main(int argc, char *argv[])
+ 
+ 	__obex_log_init(option_debug, option_detach);
+ 
++	if (option_system_bus)
++		logind_set(FALSE);
++
+ 	DBG("Entering main loop");
+ 
+ 	main_loop = g_main_loop_new(NULL, FALSE);
 -- 
 2.49.0
 
