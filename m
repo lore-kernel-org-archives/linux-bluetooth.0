@@ -1,125 +1,192 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2D025DD0A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Apr 2025 14:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE0220CCE4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Apr 2025 15:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746025138; cv=none; b=nEO6bIVBFX1svOxgfzu78YrmuGo1y3fPOUe8j+SQkcR77FnFzp0rxtRarT2WXMpv/i9u9/xPeZcEHNCNsXc6bxYxkpbgcnT0wBF7QIHlofRe/i8F2odFg9WKAtWZ3ZjsLEPZGRV8GO06aaFDXBk6SuhpRq7XXxjkHGRQ+iCBpbU=
+	t=1746026463; cv=none; b=E4I/TkDEHIhgIWmYma9MvWRJPyNQwXyCIUwLmQySYJisbNEC5vLFW671FG3FCXXmvywYxjSRzM1rap4ELx4X0d5VjPhjGTCDNVOaTbH24j6Gg7oW8uBfJyJ8FMpFCmDwpNraDzi0U1dJPnMJPBdwE9ecXwBMHfDOkjDL8tqab3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746025138; c=relaxed/simple;
-	bh=DVCP8tXvcw/9WZmTI9TJZ8yd3vT+XniAWmt0SZetmXk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IX5EphybLpLpL7rZ8OHcV0/Au9cNh3OlEC7TEULv4xJ498dAyQjXIFQmrQKxQ3SK5cFvYNsCnx9lvxbxVHqHXazcx6EZ1YOr1pzmt4jMBfDrjfRjoa4bRifG/8Ct3lmplfZoshEd1xAMGZVV7meQhd5C+8PmnYbd6uM0atDYXjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jVUzQBb0; arc=none smtp.client-ip=209.85.222.172
+	s=arc-20240116; t=1746026463; c=relaxed/simple;
+	bh=Nk+Am8/iUytRUaQ4iH0OJmdcUVQtxXScU70G5anafWM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oOpf+OqYwQKPOLzFWHysoZNkSb4WRz/Q6/orF4v0k4DCGxSOXFSE6t7GPwRe7h/ikDZbr0EkEPHFJ8NLu/3238t6khA73a/mJjDrPBJo8nzm7fl3oZyeBPB3ek6rgMDV2huvUwbkOCZp+aVC+n3mIR+0tunSz3WAyxTNqR66LFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BfYIzjrA; arc=none smtp.client-ip=209.85.167.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jVUzQBb0"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c5a88b34a6so732605985a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Apr 2025 07:58:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BfYIzjrA"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-54d98aa5981so9477434e87.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Apr 2025 08:21:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746025136; x=1746629936; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ImIG5Vs+DQqy9JIGpPxlE78q9K7XF+bWlbW/ipQIbZQ=;
-        b=jVUzQBb0dj6kgwk9VXOOJDnyeeFYm2nYFtYyXqLI2a/U4PwYvFQOPXnLsUgfixhDCN
-         Aa64x4fHyszRjNj6N2dHGstP8UOGnKKqZxLMlZ1uZpudQK2ORqtqzfmyCFL0RXq+GTvU
-         +Wm/rwsLFgCbvm0xEhpvY9BDt5Hm/D9A16fxEqaUT8LXHz+hrdJkHyd4ezts81dSdZSH
-         UwVWWOu2tyW9ROlRiUXYaG7eEo46ZdujOb1AmMaqPeDd1yBG91nDhIC9uFOf4qHbw1o1
-         mapSxOTVBcvtadK6UtAlHpwEP94xpcgSSqI0KdGoMmVlJ9g3pLPmkwF2N9hcnijwg6+X
-         dtBA==
+        d=gmail.com; s=20230601; t=1746026460; x=1746631260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iZ4QfWt9dAZxTfomkZ6XpxyfodO3dfGg/qb1ERnDAfI=;
+        b=BfYIzjrAYN+uVwZI+EV76milBQLTBG40P7PtpkFwKazVB2oGpWXdAGLTV33HFLUrUv
+         0ROGBSxBojSyVA4QePYkHKQ9SUFMwwciSKFFmelV/MG0DA4v18xJrOF66EsA0qIEqo5Q
+         7aqgDeVKUqFR28AygK346+M0PS6MsWd7JGI7gVrIorNCwGcQEEZ5ZU2mpTjqLHKbXS6N
+         AReFmGfSCtmVUik8dd3ISlU1eK8GDB1fSH7vMm68wtppQU9h2cdfNeg5hIrhkxDwTSuw
+         Lh9H4CRQ/h7A8TSdgpS2zSy/jyNnjCuK3rC7iyy56t/nLEb7Z/gnDjfM5jWz1mUVSPIK
+         oWTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746025136; x=1746629936;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ImIG5Vs+DQqy9JIGpPxlE78q9K7XF+bWlbW/ipQIbZQ=;
-        b=YfQ23QWnbLthem1qmnfBv2vZjLwADn9Q11B1l6pzIgG3enpqnc3EkXxxDcU9MkEPfB
-         rWx2gPGZF+BN+t+4xwgo5VabCGF/cKQfckcmHK4jXNIvQFtkQvqscf4/5HGyO9oSmT5A
-         Aefch666bBBUQ0Ist1FFsD6kIbXkC/lFeT5kcfpuvgQmySQxTQJK7IrjC4UpoAzXLXCC
-         hCPflVDy4o0T6BJZddOyXMiITGIXiHNQcTOgjW6bXHA7IpKi4lFoya3R9Rqk0wfVRgLf
-         oBVt+FyUvcE0ny+ypS7N+X81mOrvPS/7JJQF3xeihEu7qGASAqcOgXwQKQqikfQEMxAt
-         uQ9A==
-X-Gm-Message-State: AOJu0YxwxGunYnJ4OYE7vBzPAo7rowXYKusWv0CB0J41vLEbaFm54Vjb
-	9V49rSn2MY8F9zpzbBrmSB527FqHfNzFxj4R+IDclDlc0l2hg52yN35Wog==
-X-Gm-Gg: ASbGnct2l4r5nQsYBXE7hHWLxX3g3p79Tb5QAf1TqCk0rBOpjt6H49h1Y1m28TV7JmV
-	3d7dND6tkVVW8s01wmZ1PL7KaqlpBpwJKaGoPvsk6j0Z+PXm/ZiMeWrNlBmFljbjuGFYmf8Y6G8
-	wpaX/sdtxCCmYz622GmyL9U1WWegW7Wc3wiKhc1r+4lWQtiCOxo79KwRNhX0EmHI+mgmy+FiBUY
-	VI29QmX1N1dtgY7+ideIk1/Y4iHYQhQfXXNWRtDJKCtn+wMdm7A/wEEyxi1zOfw4JRnG2Ucvp66
-	G3rc6puuuSHHc6KWFKJRqFC9xncz/yvJJR69VHGifIREzPU=
-X-Google-Smtp-Source: AGHT+IHhYe95CnSGqMqEsWXpiZ4ZoOQNSxCjxL0OfKKGJfzRl9RvvekdhLlRVy2elfEnalkT/cIoKQ==
-X-Received: by 2002:a05:620a:4694:b0:7c5:4788:a14e with SMTP id af79cd13be357-7cac7e97b3cmr386060185a.39.1746025135816;
-        Wed, 30 Apr 2025 07:58:55 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.181.251])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958cbca14sm861595685a.41.2025.04.30.07.58.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Apr 2025 07:58:55 -0700 (PDT)
-Message-ID: <68123aaf.050a0220.1ccf73.b9af@mx.google.com>
-Date: Wed, 30 Apr 2025 07:58:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4289591401854420804=="
+        d=1e100.net; s=20230601; t=1746026460; x=1746631260;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iZ4QfWt9dAZxTfomkZ6XpxyfodO3dfGg/qb1ERnDAfI=;
+        b=SHH6Xy2D9OW+vrO14y2RBVGDOSG/2BtAu1Llz9D4M2ZBDLEtwmp5ko8QlDzSD4WMaJ
+         GWzWhVQTDpulRzWfBASW/aYAkQMsBPNr6ZG/7UhCb5noHw+lbQ8jyZ7w6bh7dmOuYaw6
+         KPjwcR4B9sIRJBVitVGneTG8cpM1Br/3JllPlglkqycQh45S5rnRMNVZ1aSjCbnZb3EL
+         MkcFLIRSrpu3hIKkMt2Z0OzGzmnzctc3WrueV+C9QAKpZ6NipelzVilET+u1yfJTMxYW
+         ptkAyX/Mgb2C5aHxz8xVzNVr62owVm6gXUiXikb9hNv3wwNbCtE87J4qtOzneKYx2Ci1
+         6Fng==
+X-Gm-Message-State: AOJu0Yx8Cl7jOBlEfr7Dac8X5n395F6hJs3SoWGnlgI9sh9CyzvrTNtJ
+	QJ48pDW0JjpfJkWAyn9dRs2J9cpXjes4XC+zdZ2QMN7PvOqAGWKNGT3jIhzCFUeCRkEYHq4hLJH
+	onJB+v5ADxlq1oclCVHCE82gjfKUEvA==
+X-Gm-Gg: ASbGnctifXbaFjdmzeuhJ+/Ui3UQoqLesPUCcekuQYwDmZNSZHuYkt3AGpSczlUgWow
+	/yQafRgkRwFSrqXfXqb1hIgNHtPM0WezNKBqZe25JE1FhXAOJvGzDjNox7qGMj+2rMjl+nCbkss
+	WzuGKOyPBY7WyV5WiKxJMI
+X-Google-Smtp-Source: AGHT+IG6bAQqSh/u0rIjiU+nT+ibASiJOsaOlJp8EOe3nUw0IoykEsET5F3F+5lZwpo7eyGm+upT5FjGyKA5aR7jSxY=
+X-Received: by 2002:a05:6512:3090:b0:54a:cc04:ea24 with SMTP id
+ 2adb3069b0e04-54ea33ab4d2mr1056992e87.46.1746026459630; Wed, 30 Apr 2025
+ 08:20:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kernel.org@pileofstuff.org
-Subject: RE: obexd: unregister profiles when the user is inactive
-In-Reply-To: <20250430131648.1291354-2-kernel.org@pileofstuff.org>
-References: <20250430131648.1291354-2-kernel.org@pileofstuff.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20250430143610.387300-1-thomas.perale@mind.be> <20250430143610.387300-3-thomas.perale@mind.be>
+In-Reply-To: <20250430143610.387300-3-thomas.perale@mind.be>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 30 Apr 2025 11:20:46 -0400
+X-Gm-Features: ATxdqUF3lBjW6rDKGZtUl1ZZZixqk054yAQDykTKyGV37Cht3px3SxJpAMVmXfc
+Message-ID: <CABBYNZK8wTSAD=4A3Rvc59tLwr7JvC1wWZbSduQCUNonjhk68Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] input: fix HoG compilation w/o HID
+To: Thomas Perale <thomas.perale@mind.be>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============4289591401854420804==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Thomas,
 
-This is automated email and please do not reply to this email!
+On Wed, Apr 30, 2025 at 10:42=E2=80=AFAM Thomas Perale <thomas.perale@mind.=
+be> wrote:
+>
+> Commit [1] introduced a dependency with the HID plugin in the HoG code
+> As a result, building with --disable-hid --enable-hog caused linker
+> errors due to undefined references to HID-related functions:
+>
+> ```
+> > ./configure --disable-hid --enable-hog
+> > make
+> /usr/bin/ld: profiles/input/bluetoothd-hog.o: in function `hog_accept':
+> /home/../bluez/profiles/input/hog.c:184:(.text.hog_accept+0xbb): undefine=
+d reference to `input_get_auto_sec'
+> /usr/bin/ld: profiles/input/bluetoothd-hog.o: in function `hog_disconnect=
+':
+> /home/../bluez/profiles/input/hog.c:205:(.text.hog_disconnect+0x12): unde=
+fined reference to `input_get_userspace_hid'
+> collect2: error: ld returned 1 exit status
+> make[1]: *** [Makefile:6344: src/bluetoothd] Error 1
+> make: *** [Makefile:4695: all] Error 2
+> ```
+>
+> This patch introduces the HAVE_HID symbol to conditionally call the
+> HID-related code in the HoG plugin only when HID is enabled.
+>
+> Additionally, hog_disconnect() reverts to its pre-[1] behavior when
+> the HID plugin is unavailable.
+>
+> [1] 1782bfd79 input: Add support for UserspaceHID=3Dpersist
+>
+> Fixes: https://github.com/bluez/bluez/issues/1228
+> ---
+>  configure.ac         |  3 +++
+>  profiles/input/hog.c | 11 ++++++++++-
+>  2 files changed, 13 insertions(+), 1 deletion(-)
+>
+> diff --git a/configure.ac b/configure.ac
+> index 1e089aaa7..aa56b7b81 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -194,6 +194,9 @@ AM_CONDITIONAL(NETWORK, test "${enable_network}" !=3D=
+ "no")
+>  AC_ARG_ENABLE(hid, AS_HELP_STRING([--disable-hid],
+>                 [disable HID profile]), [enable_hid=3D${enableval}])
+>  AM_CONDITIONAL(HID, test "${enable_hid}" !=3D "no")
+> +if test "${enable_hid}" !=3D "no"; then
+> +       AC_DEFINE(HAVE_HID, 1, [Define to 1 if you have HID support.])
+> +fi
+>
+>  AC_ARG_ENABLE(hog, AS_HELP_STRING([--disable-hog],
+>                 [disable HoG profile]), [enable_hog=3D${enableval}])
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index 97224f0d1..7ad94c474 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -40,13 +40,16 @@
+>  #include "src/shared/gatt-client.h"
+>  #include "src/plugin.h"
+>
+> -#include "device.h"
+>  #include "suspend.h"
+>  #include "attrib/att.h"
+>  #include "attrib/gattrib.h"
+>  #include "attrib/gatt.h"
+>  #include "hog-lib.h"
+>
+> +#ifdef HAVE_HID
+> +#include "device.h"
+> +#endif /* HAVE_HID */
+> +
+>  struct hog_device {
+>         struct btd_device       *device;
+>         struct bt_hog           *hog;
+> @@ -181,8 +184,10 @@ static int hog_accept(struct btd_service *service)
+>         if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))=
+) {
+>                 struct bt_gatt_client *client;
+>
+> +#ifdef HAVE_HID
+>                 if (!input_get_auto_sec())
+>                         return -ECONNREFUSED;
+> +#endif /* HAVE_HID */
 
-Dear submitter,
+This doesn't look correct, the input.conf is used to configure both
+HID and HOG, so why do you think it is a good idea to ignore it if HID
+has been disabled? What we probably should do is to move the portion
+of input_init that are HOG specific, e.g. LEAutoSecurity, which is
+what is being used above.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=958531
+>                 client =3D btd_device_get_gatt_client(device);
+>                 if (!bt_gatt_client_set_security(client,
+> @@ -202,10 +207,14 @@ static int hog_disconnect(struct btd_service *servi=
+ce)
+>  {
+>         struct hog_device *dev =3D btd_service_get_user_data(service);
+>
+> +#ifdef HAVE_HID
+>         if (input_get_userspace_hid() =3D=3D UHID_PERSIST)
+>                 bt_hog_detach(dev->hog, false);
+>         else
+>                 bt_hog_detach(dev->hog, true);
+> +#else
+> +       bt_hog_detach(dev->hog, false);
+> +#endif /* HAVE_HID */
 
----Test result---
+This part we will probably have to duplicate the parsing of
+UserspaceHID from input_init.
 
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.22 seconds
-BuildEll                      PASS      21.34 seconds
-BluezMake                     PASS      3010.56 seconds
-MakeCheck                     PASS      20.59 seconds
-MakeDistcheck                 PASS      207.85 seconds
-CheckValgrind                 PASS      286.19 seconds
-CheckSmatch                   PASS      317.67 seconds
-bluezmakeextell               PASS      136.41 seconds
-IncrementalBuild              PENDING   0.25 seconds
-ScanBuild                     PASS      968.58 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+>         btd_service_disconnecting_complete(service, 0);
+>
+> --
+> 2.49.0
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4289591401854420804==--
+--=20
+Luiz Augusto von Dentz
