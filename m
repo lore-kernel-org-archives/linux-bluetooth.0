@@ -1,151 +1,75 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545302AF04
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 13:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3D2125DF
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 13:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746106429; cv=none; b=L2MZR0dnSZdIhA6lTJ/iITLUlYG5kBfvWxJ+Y+n9izOrbqGsMvUg+rPWf+/bkwjqvO4gzTf9ysHNedTYqghtnxXCslfJsTizm7Ts0vJ03OzNjsE22fP1zXcaYx5TuOo4stjaMehzvtY5o4mlaSZKDR+HM5BcsthgFtk6Fhv+Y0A=
+	t=1746107389; cv=none; b=jqgvuqUUhrG81RSr10B3z9gMzw5hqH5PJSmUGiSwqQ/CmbxluensDnZYCPkDKRKYlEecZLqSsVB0DlQnVxZZ6pPT+rMOvzo4sjeZnP0x88TG62gOnu/Xmg2JI2Zzx8huP0zNX5GTBorSvBBs77+NU5MttL9GzC+A92iZ4NoAaaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746106429; c=relaxed/simple;
-	bh=ocSfkUfww2/6cOVlBDS+F8aeVjc51fLqFr1bVCjF9Pc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=rBTU3eD9CXhFUbS6Hymcv//l483UDhuyYVc6+0IpnOQhlG6Hy6g1P77Ucl6oreyGftUIzD1QwY6Xv8DBOt+dLiKGUWD3+PsveIUqAbgXdnj4rLQsHzl2PQ+cfOOdvdDpk49hSDYivkUMXw0ZFA6gnqbecvs0d2plzBl0EmVUIgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=SgIjL2zA; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1746107389; c=relaxed/simple;
+	bh=ZhTLO9BgFHc7vch2ZbeUKSSaUMm3g6SoIvcqzabYydo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MRtWZwaityXSprXodIxGWn/rTzswQPc+mDj2qsKSsQiUF0RiIi8B3uNhSZviNHQSTo+9s87KSUnLHFMRB+MOBJoPfBfrSiLAjujj3fy71VJ5Esdrw1wOlke9CRoZJsssVlimuXQkTrQKpER+ipj9QMeUXB2Pk3vZeCU5w5fTklI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBH8Lavz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="SgIjL2zA"
-Received: from github.com (hubbernetes-node-5f624db.ash1-iad.github.net [10.56.209.106])
-	by smtp.github.com (Postfix) with ESMTPA id 6FF456003C3
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 06:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1746106427;
-	bh=DruoItjo5qRuOofWPzfaqpgwwXGesbyikKoa16gnRoE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=SgIjL2zAGRvcrhgCf0fDVH9H+Z/HJUcaR7FefiLkyYnr0x9GuN+vDOpeVym4y6Jf1
-	 72qSFYF7hl9Bv4mjHSXLDioXQV0Wl/Dg8U6zSIP/81EPEVdPEoAh5mqJFZnr9IwgeK
-	 tauamalmY7UvDS2Ctfy+CAaetZnXdK+o+q6pl3pU=
-Date: Thu, 01 May 2025 06:33:47 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/5b6c09-f8d0dc@github.com>
-Subject: [bluez/bluez] 765356: obexd: Unregister profiles when the user is
- inactive
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBH8Lavz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E705BC4CEE3;
+	Thu,  1 May 2025 13:49:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746107388;
+	bh=ZhTLO9BgFHc7vch2ZbeUKSSaUMm3g6SoIvcqzabYydo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lBH8LavzfICuBFNo8qMnzBUY0oX4Deb/jkyMiX1AR0u6rP/cfyEDpdrTkHXFuCd0Z
+	 EJk12IDXzGhwehRKIqwmW+oN7psua2lBRVXKXS7WCF1/RZA+XcFRBKsku08Ea7vcy5
+	 VqVMeBopUXrf8N46gz66IfWt8JZAmNivrDICzQSD4RuO3s7esRyWAaXWzd6D4lzSGW
+	 AXcca8tTRwGQprwK/kgdtzgJBpgBv7bPCpJvGN83wewRlJ1jb42a1Hv4Znv4lY8K8v
+	 KbLESR7/F5MUHJYZFTAPor+nAxHiOih07MIMfqdkEz92muEGrsrrcxhC6yJIsVQBLa
+	 SKxJrTOGCU3Wg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CEA3822D59;
+	Thu,  1 May 2025 13:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: MGMT: Fix MGMT_OP_ADD_DEVICE invalid device
+ flags
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174610742800.2986402.3752531720911579312.git-patchwork-notify@kernel.org>
+Date: Thu, 01 May 2025 13:50:28 +0000
+References: <20250429191319.2234877-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250429191319.2234877-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 765356e80262a20c359ec7722a5590232442d0d3
-      https://github.com/bluez/bluez/commit/765356e80262a20c359ec7722a5590232442d0d3
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-05-01 (Thu, 01 May 2025)
+Hello:
 
-  Changed paths:
-    M Makefile.obexd
-    M obexd/client/pbap.c
-    M obexd/plugins/bluetooth.c
-    A obexd/src/logind.c
-    A obexd/src/logind.h
-    M obexd/src/main.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  obexd: Unregister profiles when the user is inactive
+On Tue, 29 Apr 2025 15:13:19 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Device flags could be updated in the meantime while MGMT_OP_ADD_DEVICE
+> is pending on hci_update_passive_scan_sync so instead of setting the
+> current_flags as cmd->user_data just do a lookup using
+> hci_conn_params_lookup and use the latest stored flags.
+> 
+> [...]
 
-Obexd is usually run as a user service, and can exhibit surprising
-behaviour if two users are logged in at the same time.
+Here is the summary with links:
+  - [v1] Bluetooth: MGMT: Fix MGMT_OP_ADD_DEVICE invalid device flags
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a1afd438e713
 
-Unregister profiles when the user is detected to be off-seat.
-
-It may be impossible to detect whether a user is on-seat in some cases.
-For example, a version of obexd compiled with systemd support might be
-run outside of a systemd environment.  Warn and leave services
-registered if that happens.
-
-Obexd can be run as a system service, in which case this check makes no
-sense.  Disable this check when called with `--system-bus`.
-
-Obexd can also be run by a user that does not have an active session.
-For example, someone could use `ssh` to access the system.  There might
-be a use case where someone needs Bluetooth access but can't log in with
-a keyboard, or there might be a security issue with doing so.  This isn't
-handled explicitly by this patch, but a future patch could add support
-by calling `logind_set(FALSE)` in the same way as is currently done
-with `--system-bus`.
-
-Unregister profiles by closing private connections instead of sending
-UnregisterProfile on the shared connection.  Pipewire has apparently
-found the latter to cause long shutdown delays, because bluetoothd
-may be shutting down and unable to handle this message.
-
-Based in large part on the wireplumber code mentioned by Pauli Virtanen:
-https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
-
-Other services are likely to need similar functionality,
-so I have created a gist to demonstrate the basic technique:
-https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
-
-Suggested-by: Pauli Virtanen <pav@iki.fi>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 8b29b5a46cdc7015a1dc5b502fe103e0c2e7f219
-      https://github.com/bluez/bluez/commit/8b29b5a46cdc7015a1dc5b502fe103e0c2e7f219
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-05-01 (Thu, 01 May 2025)
-
-  Changed paths:
-    M obexd/src/logind.c
-
-  Log Message:
-  -----------
-  obexd: Support sd_login_monitor_get_timeout()
-
-The documentation for sd_login_monitor_get_timeout() implies the API
-may need to be checked after some time, even if no events have been
-received via the fd.
-
-In practice, the implementation has always returned a dummy value,
-and changing it now would cause enough breakage in other projects
-to make it unlikely to ever happen.
-
-Add a handler for that case, even though it can't currently
-happen in the real world.
-
-The API assumes we call poll() directly, so in theory it could change
-the timeout based on some event that doesn't trigger a callback
-(e.g. sending a signal to the service).  It's hard to see how we'd
-handle that without running a poll() in a separate thread,
-which would be a lot of complexity for an untestable edge case.
-Don't try to handle that problem.
-
-
-  Commit: f8d0dc114036806c25856ec1f0161d3e5ef5e2a1
-      https://github.com/bluez/bluez/commit/f8d0dc114036806c25856ec1f0161d3e5ef5e2a1
-  Author: Andrew Sayers <kernel.org@pileofstuff.org>
-  Date:   2025-05-01 (Thu, 01 May 2025)
-
-  Changed paths:
-    M obexd/src/obex.service.in
-
-  Log Message:
-  -----------
-  Revert "obexd: only run one instance at once"
-
-No longer needed now services can share resources.
-
-This reverts commit 8d472b8758dcdd89bf13cf2fb06a8846e1f483a0.
-
-
-Compare: https://github.com/bluez/bluez/compare/5b6c096fb859...f8d0dc114036
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
