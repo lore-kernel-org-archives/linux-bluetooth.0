@@ -1,123 +1,115 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956E62236FA
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 19:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3455215191;
+	Thu,  1 May 2025 19:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746126510; cv=none; b=fGxyQHCSpC/YM/Q4zk297wA2hVo8MrWmCSKzteP/7HrDWDyCF9vqzVxDnxVDPtjdlaSZrEZGJGCOizaG5gjTZOPpG3OZIiESp23gV9RH42vOz+84KXo7nwatDB3AlzY9AljfWSISBTsLQRidZR3T2AyI6f81OcpRirtHrPFIc0k=
+	t=1746126589; cv=none; b=myiPfMQEUs9ZW3gYyLK++rtjYa1rNdfq9N0F06hD0Wr1sDq98/E5zwo9hH66ggsxo039NJDVpN+n8n10GHQutvrlfPY87BadKDI6nkHcJIstIanDpeibmRC+Q2JBBgAp7ZosR1st3E+DCfphNwnOPhA99yqk455s1YakXYTmZsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746126510; c=relaxed/simple;
-	bh=k/y+DF2bK7x5Nc0qZ8Fan34XMXRpt7CpMtRnhkdOPRM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=KUXkzvLSMUHBeKYbSba3wylJxJbe/jxGifvH8UDR5QLmk2zDkGVGaEqVaOQxGg77KfS25o27VnPAvy+pjy8XZejCOLjb3fHAhfNjExg1oO3E848s9Nn788iiutPdYIaDcDAVoz3HK0LXX8F6dVbfI3tdd70VuwrFIWYdJiEveXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Cu+PQyXu; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1746126589; c=relaxed/simple;
+	bh=w5oQGsL5WVbxAnOLzbr4QxMJ0KAY+AvOJhyFU9NztRs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QhBaMPBCE7DjVA1ckHE+jMzTv3ScYg3L5KhVOtJBXnsU/1W/qQ5+hjC71mmEtvWpIL39Z/iJ11u/qXjThiH834Qj3+TJChwMTOZYzlpjQFJhEKWUU+ruTmxjtpsC2V4Nx7oC7sEYgd0YUecwaOVYIM6L3iA/CxUkL6nmMIEI8JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TV04T+3Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Cu+PQyXu"
-Received: from github.com (hubbernetes-node-1eeca9b.ac4-iad.github.net [10.52.139.40])
-	by smtp.github.com (Postfix) with ESMTPA id 6E71A6407D7
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 12:08:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1746126507;
-	bh=W4fE26knlYMrj136LFLuS3b8ew36mqYHXst4g9815nE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Cu+PQyXubXX43I0AUYSOaLaD+bTtBuzVZ9AHfC6YNi7/SAOFtAiZsKmxhGvHpCcvI
-	 BvukKyqLHMGgIGxYtoiKm3nN3x6EjLWlGVDvNwoOJoSGfWTn2af0r/9nkUcEi62kET
-	 IhMdHw1SuulehIzTdpz3NCyiAUnYQnZ6ftB9/LX4=
-Date: Thu, 01 May 2025 12:08:27 -0700
-From: Perale Thomas <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/bbfeef-9c5218@github.com>
-Subject: [bluez/bluez] b111b5: input: fix HID compilation w/o HoG
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TV04T+3Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A3F8C4CEE3;
+	Thu,  1 May 2025 19:09:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746126589;
+	bh=w5oQGsL5WVbxAnOLzbr4QxMJ0KAY+AvOJhyFU9NztRs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TV04T+3ZCAfB/UqTFExArQJ7o8xyrRomHxpy8WMkw5I7VbO9aBYp4SRpRSvZBfr9r
+	 cAqR8IdWhQ1oywXI0Bb/EXZFVijKhnbglCiFAmKz4JJeOnO/Z/qfyLScOZfJtf1+HW
+	 jCRUohUUx3dtzbJ0dR0iy+PY09slNgGdSpOtsMzpoEC78Ocf/GqTQTDYzljBfWaAJJ
+	 CRdllFluIyFSZ0rKK8YICn2V/gJymgUNVwFbYve7ucHu4spzpmqutOp9l5eamTbVU0
+	 NtsG902OSLPY6EoodGMzOAhX7Z+5BG57AglvkjETPJR3wKa1MuBj13vZVsuL8znq97
+	 34Tp75blb+bVA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BD13822D59;
+	Thu,  1 May 2025 19:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: btusb: Add new VID/PID 13d3/3630 for MT7925
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174612662826.3052720.2548130502833643921.git-patchwork-notify@kernel.org>
+Date: Thu, 01 May 2025 19:10:28 +0000
+References: <20250429101605.2862004-1-jiande.lu@mediatek.com>
+In-Reply-To: <20250429101605.2862004-1-jiande.lu@mediatek.com>
+To: Jiande Lu <jiande.lu@mediatek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, chris.lu@mediatek.com, will-cy.lee@mediatek.com,
+ ss.wu@mediatek.com, steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: b111b5e15eb74e08b74cb3c7e91bcb21f54be4c7
-      https://github.com/bluez/bluez/commit/b111b5e15eb74e08b74cb3c7e91bcb21f54be4c7
-  Author: Thomas Perale <thomas.perale@mind.be>
-  Date:   2025-05-01 (Thu, 01 May 2025)
+Hello:
 
-  Changed paths:
-    M profiles/input/device.h
-    M profiles/input/hog.c
-    M profiles/input/manager.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  input: fix HID compilation w/o HoG
+On Tue, 29 Apr 2025 18:16:05 +0800 you wrote:
+> Add VID 13d3 & PID 3630 for MediaTek MT7925 USB Bluetooth chip.
+> 
+> The information in /sys/kernel/debug/usb/devices about the Bluetooth
+> device is listed as the below.
+> 
+> T:  Bus=07 Lev=01 Prnt=01 Port=10 Cnt=02 Dev#=  2 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=13d3 ProdID=3630 Rev= 1.00
+> S:  Manufacturer=MediaTek Inc.
+> S:  Product=Wireless_Device
+> S:  SerialNumber=000000000
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> 
+> [...]
 
-Commit [1] introduced a dependency with the HID plugin in the HoG code
-As a result, building with --enable-hid --disable-hog caused linker
-errors due to undefined references to HoG-related functions:
+Here is the summary with links:
+  - [v1] Bluetooth: btusb: Add new VID/PID 13d3/3630 for MT7925
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c03e896217f7
 
-```
-> ./configure --enable-hid --disable-hog
-...
-> make
-...
-  CCLD     src/bluetoothd
-/usr/bin/ld: profiles/input/bluetoothd-manager.o: in function `input_init':
-/home/../bluez/profiles/input/manager.c:122:(.text.input_init+0x1c8): undefined reference to `input_set_auto_sec'
-collect2: error: ld returned 1 exit status
-make[1]: *** [Makefile:6376: src/bluetoothd] Error 1
-```
-
-This patch moves the reading of the HOG specific configuration of the
-'input.conf' file: LEAutoSecurity, to the HoG plugin file.
-
-[1] f2778f587 input: Add LEAutoSecurity setting to input.conf
-
-
-  Commit: 9c52188d753002a6afd6ae145f921a2ff52c1c81
-      https://github.com/bluez/bluez/commit/9c52188d753002a6afd6ae145f921a2ff52c1c81
-  Author: Thomas Perale <thomas.perale@mind.be>
-  Date:   2025-05-01 (Thu, 01 May 2025)
-
-  Changed paths:
-    M profiles/input/device.c
-    M profiles/input/device.h
-    M profiles/input/hog.c
-
-  Log Message:
-  -----------
-  input: fix HoG compilation w/o HID
-
-Commit [1] introduced a dependency with the HID plugin in the HoG code
-As a result, building with --disable-hid --enable-hog caused linker
-errors due to undefined references to HID-related functions:
-
-```
-> ./configure --disable-hid --enable-hog
-> make
-/usr/bin/ld: profiles/input/bluetoothd-hog.o: in function `hog_accept':
-/home/../bluez/profiles/input/hog.c:184:(.text.hog_accept+0xbb): undefined reference to `input_get_auto_sec'
-/usr/bin/ld: profiles/input/bluetoothd-hog.o: in function `hog_disconnect':
-/home/../bluez/profiles/input/hog.c:205:(.text.hog_disconnect+0x12): undefined reference to `input_get_userspace_hid'
-collect2: error: ld returned 1 exit status
-make[1]: *** [Makefile:6344: src/bluetoothd] Error 1
-make: *** [Makefile:4695: all] Error 2
-```
-
-This patch duplicate the read of the 'UserspaceHID=persist' config entry
-in the HoG plugin file to remove the dependency on the HID plugin files.
-
-[1] 1782bfd79 input: Add support for UserspaceHID=persist
-
-Fixes: https://github.com/bluez/bluez/issues/1228
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/bbfeef3a04b0...9c52188d7530
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
