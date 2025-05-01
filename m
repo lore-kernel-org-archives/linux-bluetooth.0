@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3455215191;
-	Thu,  1 May 2025 19:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDF2226CE4
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 19:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746126589; cv=none; b=myiPfMQEUs9ZW3gYyLK++rtjYa1rNdfq9N0F06hD0Wr1sDq98/E5zwo9hH66ggsxo039NJDVpN+n8n10GHQutvrlfPY87BadKDI6nkHcJIstIanDpeibmRC+Q2JBBgAp7ZosR1st3E+DCfphNwnOPhA99yqk455s1YakXYTmZsA=
+	t=1746126592; cv=none; b=NCm3dCMy2e3x+55L6FuboG+db7si7+SGe5pxfEai3TjhJKuJTQALO+KfkK0zzTGZMGctLyuhidgbIjNPX7djqlXuni7nrY2qZkYc4FLTVLrSTNqxHY0lndCLHlt1KWk841022IxLYLSzjWnMkzysXhpm3/GWgD1y8kvY9fyN2ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746126589; c=relaxed/simple;
-	bh=w5oQGsL5WVbxAnOLzbr4QxMJ0KAY+AvOJhyFU9NztRs=;
+	s=arc-20240116; t=1746126592; c=relaxed/simple;
+	bh=HC340vBXzu2QAKMP7Aa2WXUbWoAZm8lqQwaSPK8+9qo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QhBaMPBCE7DjVA1ckHE+jMzTv3ScYg3L5KhVOtJBXnsU/1W/qQ5+hjC71mmEtvWpIL39Z/iJ11u/qXjThiH834Qj3+TJChwMTOZYzlpjQFJhEKWUU+ruTmxjtpsC2V4Nx7oC7sEYgd0YUecwaOVYIM6L3iA/CxUkL6nmMIEI8JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TV04T+3Z; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=reiu0TMHgjuIWW2ouZ9E2T+SQIPSGfnv/rNqa4jsgE41SnDuNPrTB1BGWLyBNOEl7Cgj4uHpIKLSGErM3rFs9ilMHke20m5ka5YgX+/ak7ea58lxqKFVe/y5D8oDLBB6CiMttUD3Rvtr8rMoX7Asee2IlHvvbSGs8w8PIrtPX1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSkcSKnu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TV04T+3Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A3F8C4CEE3;
-	Thu,  1 May 2025 19:09:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSkcSKnu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FF98C4CEE3;
+	Thu,  1 May 2025 19:09:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746126589;
-	bh=w5oQGsL5WVbxAnOLzbr4QxMJ0KAY+AvOJhyFU9NztRs=;
+	s=k20201202; t=1746126592;
+	bh=HC340vBXzu2QAKMP7Aa2WXUbWoAZm8lqQwaSPK8+9qo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TV04T+3ZCAfB/UqTFExArQJ7o8xyrRomHxpy8WMkw5I7VbO9aBYp4SRpRSvZBfr9r
-	 cAqR8IdWhQ1oywXI0Bb/EXZFVijKhnbglCiFAmKz4JJeOnO/Z/qfyLScOZfJtf1+HW
-	 jCRUohUUx3dtzbJ0dR0iy+PY09slNgGdSpOtsMzpoEC78Ocf/GqTQTDYzljBfWaAJJ
-	 CRdllFluIyFSZ0rKK8YICn2V/gJymgUNVwFbYve7ucHu4spzpmqutOp9l5eamTbVU0
-	 NtsG902OSLPY6EoodGMzOAhX7Z+5BG57AglvkjETPJR3wKa1MuBj13vZVsuL8znq97
-	 34Tp75blb+bVA==
+	b=NSkcSKnuPmEuWK0i4/SYShV0t3Yd27O9UUZrR+UB/bcElrsHNhI2k2Q/QuElNzdXx
+	 5tnfqVP+HYwHYZG2ZPEy9Pc0TuifkkD9Enw1ofZmtmdWMxN2Z6ehHQi3JMvFpQMDok
+	 j39K2HQ9d+kQahHXYILbrGL64S9Fiqatyfw+mQ0W+gy8i9pR/Ksww0YM8xXD10i2DI
+	 cKfr45L2jKxnBWaTCC4U17Kv74CtWJKXuUnLemzivnjWFTf0CFgLWGt67slM0GA3iN
+	 O+DOfREDsXwDVrXs1/4zbRGX31/uxODgGze8sQTgCivlzEqwpeqZd2iYBrbZ4w4b6D
+	 oWhXPFQfuPSNQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BD13822D59;
-	Thu,  1 May 2025 19:10:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE3E3822D59;
+	Thu,  1 May 2025 19:10:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,75 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: btusb: Add new VID/PID 13d3/3630 for MT7925
+Subject: Re: [PATCH BlueZ v2 0/2] fix build error with --enable-hid and
+ --enable-hog options
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <174612662826.3052720.2548130502833643921.git-patchwork-notify@kernel.org>
-Date: Thu, 01 May 2025 19:10:28 +0000
-References: <20250429101605.2862004-1-jiande.lu@mediatek.com>
-In-Reply-To: <20250429101605.2862004-1-jiande.lu@mediatek.com>
-To: Jiande Lu <jiande.lu@mediatek.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- sean.wang@mediatek.com, chris.lu@mediatek.com, will-cy.lee@mediatek.com,
- ss.wu@mediatek.com, steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
+ <174612663154.3052720.4219537316370232114.git-patchwork-notify@kernel.org>
+Date: Thu, 01 May 2025 19:10:31 +0000
+References: <20250501163536.1283827-1-thomas.perale@mind.be>
+In-Reply-To: <20250501163536.1283827-1-thomas.perale@mind.be>
+To: Thomas Perale <thomas.perale@mind.be>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 29 Apr 2025 18:16:05 +0800 you wrote:
-> Add VID 13d3 & PID 3630 for MediaTek MT7925 USB Bluetooth chip.
+On Thu,  1 May 2025 18:35:34 +0200 you wrote:
+> This patch series fixes build failures when --enable-hid and --enable-hog
+> are not enabled together. The issue is documented in the following ticket:
 > 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
+> https://github.com/bluez/bluez/issues/1228.
 > 
-> T:  Bus=07 Lev=01 Prnt=01 Port=10 Cnt=02 Dev#=  2 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3630 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> Compiling with the --enable-hid --disable-hog option would give an
+> error because the HID plugin relied on functions defined in the HoG
+> plugin:
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: btusb: Add new VID/PID 13d3/3630 for MT7925
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c03e896217f7
+  - [BlueZ,v2,1/2] input: fix HID compilation w/o HoG
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b111b5e15eb7
+  - [BlueZ,v2,2/2] input: fix HoG compilation w/o HID
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9c52188d7530
 
 You are awesome, thank you!
 -- 
