@@ -1,83 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A250C125DF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 13:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60641DFDE
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 13:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746107394; cv=none; b=OFb8QYRVQtiZegfb3mfsAqUhsg8spwFVLw6w7GC7iedBfrFI/Cg2Dkz7LW7LLhri6AOrYJlI5tnWejJveYgP5l0Gwq4zrqDxNu289ZYCqjenHPy9eKsTKcgLSa7Ca5XeysJLpZPjx5yFhk5DohHSL4c0LaIrpPBN45C4KtrRqlE=
+	t=1746107722; cv=none; b=OONTNzupwOrE3W1X4FHQSqacyASaEuj7+8UOd6Ny3k4mp7KMklk1SyUrJGLtILUSygVlp7obMtIrC+UDttZ8nGhjI7rNuYSinZevn2HdrjRo4+AlYfDesakdlAPZTCrPkf2VQtSR470iIOmj9MdVB8Q7L9u09MNUmpBOScoodok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746107394; c=relaxed/simple;
-	bh=VuCxj/EXsIAwyf8b+9Z0XdXlK4eFiGUviWx/nRkSq/4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NvPz4NGPUqGY9cxw1zPMTP/io1YIw80FO1Rd6EvjSwJzcL5mST0ctf64HzLYMxsdOvr9lbf4P3/NWJJkdgRFy1OF2J4pSwWpkswdTauhESw5UdMMjYXxG3KnKrHJuN8+cweGzRjS08GIQ0wRRiw6RqYEtgDSeI1M7yCnxsFm+tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGFmCVDm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746107722; c=relaxed/simple;
+	bh=Ufx/HkRJKfzdjm3VR7adFhIIb0kmOOwr+dL15WZABm4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=l/yp82jRqVGSIDCyLozDqdWNb0Q8w4v+AqJ+5aU9keUL228ffXub4OPLjr/uLpK21NfVsEiiSXvX3VO90LuLbvn0mCMjTeorqtoJBZT87ebHIbWfPs5lfG82ceo7qVBnMEY7M8FPTLuGANs/iI3/HXGo5pQKBfLZjEPjJaE2BsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XT7/SsSM; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGFmCVDm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28FD9C4CEF0;
-	Thu,  1 May 2025 13:49:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746107394;
-	bh=VuCxj/EXsIAwyf8b+9Z0XdXlK4eFiGUviWx/nRkSq/4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fGFmCVDmi8F+qJxISDRtgyoTjlCDpUbPQ57ZhLBqxoUVfNd0cFTDd3GFUYv5odpfM
-	 LXv/WctQZh3OOn5S3DpJOY/CkyzLSwWZT2JM4VsoUSYChrg8ZY5EqtYpoNF/Fb1yKB
-	 Eng+sEZj104FGwUkZRJ9kmQb+q56aiOn0SAzclzN4b/AQZ+eMi6h3pEWMqAYP8PFQR
-	 2NlCLwNiGiaOEcSRD7jqF2PmmYWrCFiw4roKDmpmKlr+yXZR8Rc9/8rQe8qWHEpOuv
-	 rxUj5EEtQM5BDdmJQLjrUhXogA2j3Oq3RD8K0jGsc1+hQfbecK80HewvSLafq8lX7U
-	 VpABUmcy8ly6g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D233822D59;
-	Thu,  1 May 2025 13:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XT7/SsSM"
+Received: from github.com (hubbernetes-node-8313f33.va3-iad.github.net [10.48.149.35])
+	by smtp.github.com (Postfix) with ESMTPA id DE4004E044B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 May 2025 06:55:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1746107719;
+	bh=GRuQqGgln50vw8QcP+o31HLiAyB+eg0mvxJNRaDRIMw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=XT7/SsSMA1B3pBDYXo/MZpVWfgSFe4Q/e5EJ+xHfvVy64E0rwZn9C/8mfuJaP089/
+	 TeCFO3ZomopEEKrfdj6sbhZiFP+lAZI1ndqyFNOfSmO//oSmH2pEVjGSsrOORNhCmG
+	 kMjrmgNysYizWiflE8lUAPCsU1JnLE/KC1ISgF54=
+Date: Thu, 01 May 2025 06:55:19 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/958531/771c0d-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v6 0/3] obexd: unregister profiles when the user is
- inactive
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174610743298.2986402.2691498734604978766.git-patchwork-notify@kernel.org>
-Date: Thu, 01 May 2025 13:50:32 +0000
-References: <20250430131648.1291354-1-kernel.org@pileofstuff.org>
-In-Reply-To: <20250430131648.1291354-1-kernel.org@pileofstuff.org>
-To: Andrew Sayers <kernel.org@pileofstuff.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, pav@iki.fi
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/958531
+  Home:   https://github.com/bluez/bluez
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Wed, 30 Apr 2025 14:13:59 +0100 you wrote:
-> This is a follow-up to "obexd: only run one instance at once".
-> Instead of refusing to run parallel services, it unregisters
-> profiles when the user is inactive.  This avoids the need
-> for tmpfiles, and avoids issues where the user with the
-> obex service logs out, leaving obex disabled altogether.
-> 
-> Luiz previously suggested moving this to systemd, but I haven't had much
-> luck getting the systemd devs to accept changes, and Pauli's mention of
-> elogind (i.e. logind without systemd) suggests it's probably better
-> to avoid the dependency anyway.
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v6,1/3] obexd: Unregister profiles when the user is inactive
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=765356e80262
-  - [BlueZ,v6,2/3] obexd: Support sd_login_monitor_get_timeout()
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8b29b5a46cdc
-  - [BlueZ,v6,3/3] Revert "obexd: only run one instance at once"
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f8d0dc114036
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
