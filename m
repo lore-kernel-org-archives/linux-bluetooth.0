@@ -1,70 +1,104 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D765267393
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 May 2025 16:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0EA2550CD
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 May 2025 16:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746204045; cv=none; b=lD1iA35c81h0zpMv83KKGYwGz+I/o57pQlwMhoNMoNVm/d9NxDoEb4MVNuxzaTrYd0gavEKF5GwrxXZpUZ5WrsvdRenZh42tfDi+2gW9D9QfNnINgjbQ0knO4EuYfx4sBzyK8VV3ObTPpXT85rrWOwp9qOZoWxGlr/YCLXyBoac=
+	t=1746205107; cv=none; b=ORkWD/WXST89AQn8iPCYRBYSZQ/GyhqtoUBDbuIN5wTZtAfeHQpOg39Ix36nXRScz74i3lKq6kpf4Zuxd/kWyaBcNmqvSe/ZDIOI5TOM+m+2ER+W+I3Zezyk5OiL8fz6i04U8zN0Onx9so08gc0NJu24PYW5NSyhw8/58qacl6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746204045; c=relaxed/simple;
-	bh=0cUKiWPJf3Bo3tL2PP8Q2hEMqtzmrk0y0SH162EFXlM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GyZz3qaxGmJjQ3bykTYnUBLwVai92/yhDShVmdxymDH909QJP7EunI0tA33rg4eOT75smP50IG2pp0TPJaOZJCvHDJsPUg7fy5LhzXH9QhMoPSIpNqCVeJi3Kky9UgG/Ta4BTA+liLoZq3ORu6dmvIU5xFITBwQi0diT8Yx+Hhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=a2SMHj80; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1746205107; c=relaxed/simple;
+	bh=JxfbPSjX1sSQidwd/C36UPYyz030B8Vf7d2A9Rk/hds=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=RPA3j62saijinVsnaRdReOCWwQf9cc1//gKKcNAEeBLHbJr/7kyethA2KjfhSmepnmuKVXfSSUyoAXvQSNCCXDYcBSgTldVo4RVigDIS+Uae2Op5GwOFiTtybUKnb+Unfa2LmRhh2SiXcurc2UFdyFmFpslKcNhl/QRkshSVmgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cTwvqI9n; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="a2SMHj80"
-Received: from github.com (hubbernetes-node-d98ef1c.va3-iad.github.net [10.48.141.18])
-	by smtp.github.com (Postfix) with ESMTPA id 9A3E54E0A16
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 May 2025 09:40:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1746204041;
-	bh=ci2tvLDyJv+Enq+Q9qm8bZZlEGrAP9LZ6gJH7aXUxhw=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=a2SMHj80jxbrzW9oXhPqth2ArQiUDVdV/zdOCFC9GiLIbt/TTsjeUsjhGdJ8Qp62q
-	 EqiwMq8N2ZhdLZznKt9lGW6suiHeIlH26jANFmdepbVCsQPRe90OYAyr09ZYCxZ8r0
-	 LyKol+twUvlMa5uMvzR1SEl7EZCsGVLys2ZxYjBI=
-Date: Fri, 02 May 2025 09:40:41 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTwvqI9n"
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4c315dd9252so1390334137.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 May 2025 09:58:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746205104; x=1746809904; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1xlm0kHmw7L9D6cork0kMctA4GhiQsZB2MFZVOT3bAY=;
+        b=cTwvqI9niieYWfjQad1/aLReTyO5CHmG+kek8/nWd1uyAAKlkNj4/bYsfWXnAriGxh
+         bsk0axbEGOwVz0FqFkl+vykB30ik54GgM2YzHKzaBbwPsPVXd+n5HuBNP7fSxPR5pxik
+         qVwtBsMJP12mWHls6A1uWaKVHza3DRQ01bn3boHJfWlNowoTE+1NN0JFgIuPVdNWsQDC
+         yCkoB4x/RE4agwGlCaXb7qOg7OxWFpsb5B9KGiOl8ej/H0vPG7+kWSPiVN438fc1mrjq
+         DAXhDsG2PYK1S16N7MiUNBq+mh2gip8GidS12IXQAAkLPwD1uSXJFH0qRwlSPGhEaztK
+         cjrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746205104; x=1746809904;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1xlm0kHmw7L9D6cork0kMctA4GhiQsZB2MFZVOT3bAY=;
+        b=ZC4yTD85YkLhzpFKdA/+WQP4yq13T41RGNaFxEe3687efN4tAbH+UefYdyewYDyxAr
+         NttletJSSyRkuKa4YyB0jHfzx6KGluIgY61qcJp6MNFCNELsxcqlXFbiGlfEJM3Wkmkl
+         cDyj1tU6IMGEzbenlzQUYDXlqgxqf72Yjyw4x6AaQnNIuIxoqVsyPCSszaR5sy0GXPLR
+         9j7DTPJ+m2nRb8bA9GFnABhTz34pKU60Q7EK3+jKSiR7mfKYovd7yGUK214KiArGieEg
+         /dwoD9YmG5uRL2GLnNfyWncPkqT+tYyqWeeJIDrddvybGj7oZSC9tk21kNSI6R2epFPG
+         Z7yw==
+X-Gm-Message-State: AOJu0YzEG40Qh8CCwwafERpXwi99fVJkR9gyX9bVgWE+zgayfH0P7GWA
+	RrDCahNCxgo6v6PvVqxeHq+KXiUUldaaboxxCHbE7xomXMcXkeUaei7yUUld0nU=
+X-Gm-Gg: ASbGncuwcuPxWRzYBT4r1tTtY/Yc+cAii3HcrtcM7fjhDNsJWiBci+A1SHTKlIlGAIN
+	lKv2IkpbIytA+DffoGeQMSZ89QgZBPdB4RK6YcomddbsMuS6MmMoWA4W/n4QFPTDkfzfNo7JhcP
+	c2ba1TIs5Y/Lva0hqJ3uD+cd+LASMPEHcz2K3KtrSN20qUSqRX/fVhgiOJ+mYerEfweHWWR3A6Z
+	NaMgtFfHRGY9kJrRvjtuv/bVW5A+j6PGXzwsys54jSMsot2Mbi8u5dxkhmBimjQQAnKFGRn4g8x
+	qod6YLYeu2RFLVUoe0GZ/4iUwaNvG3HRozg5kZp4V+DHU26QfiS7l8i0yMTlYdAHE2yDiFTn49C
+	BBdc6oSmv5w==
+X-Google-Smtp-Source: AGHT+IHFPZofTbMFreZMx8zlW7cjJHCHrz59yiG7wXog0hNqV20+3M7H5gur1nkII7zKBQn+DmgRUg==
+X-Received: by 2002:a05:6102:668:b0:4c3:243:331a with SMTP id ada2fe7eead31-4dae8a41a61mr4477593137.6.1746205103967;
+        Fri, 02 May 2025 09:58:23 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8780b09bc2fsm335860241.21.2025.05.02.09.58.22
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 May 2025 09:58:23 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/959149/000000-571b64@github.com>
-Subject: [bluez/bluez] 571b64: mainloop: Only connect to NOTIFY_SOCKET if
- STATUS=...
+Subject: [PATCH BlueZ v1] input/device: Fix not sending virtual cable unplug
+Date: Fri,  2 May 2025 12:58:21 -0400
+Message-ID: <20250502165821.2753353-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/959149
-  Home:   https://github.com/bluez/bluez
-  Commit: 571b643cfb11348feda2f526279526168b2d726b
-      https://github.com/bluez/bluez/commit/571b643cfb11348feda2f526279526168b2d726b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-02 (Fri, 02 May 2025)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M src/shared/mainloop-glib.c
-    M src/shared/mainloop-notify.c
-    M src/shared/mainloop.c
+When using udev HIDP_CTRL_VIRTUAL_CABLE_UNPLUG must be sent directly
+since it is not handled internally like when utilizing kernel hidp
+module.
 
-  Log Message:
-  -----------
-  mainloop: Only connect to NOTIFY_SOCKET if STATUS=Starting up
+Fixes: https://github.com/bluez/bluez/issues/1173
+---
+ profiles/input/device.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-This makes the handling of NOYIFY_SOCKET conditional to only when
-application attempts to set STATUS=Starting up which means it is
-intentionally requiring it.
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 3642cc3267be..f21a69f57529 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -1154,8 +1154,13 @@ static int connection_disconnect(struct input_device *idev, uint32_t flags)
+ 		shutdown(sock, SHUT_WR);
+ 	}
+ 
+-	if (flags & (1 << HIDP_VIRTUAL_CABLE_UNPLUG))
++	if (flags & (1 << HIDP_VIRTUAL_CABLE_UNPLUG)) {
+ 		idev->virtual_cable_unplug = true;
++		if (idev->uhid)
++			hidp_send_ctrl_message(idev, HIDP_TRANS_HID_CONTROL |
++						HIDP_CTRL_VIRTUAL_CABLE_UNPLUG,
++						NULL, 0);
++	}
+ 
+ 	if (idev->uhid)
+ 		return uhid_disconnect(idev, false);
+-- 
+2.49.0
 
-Fixes: https://github.com/bluez/bluez/issues/996
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
