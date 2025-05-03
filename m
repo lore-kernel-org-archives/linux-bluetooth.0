@@ -1,75 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AF1214236
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 May 2025 21:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59304153598
+	for <linux-bluetooth@vger.kernel.org>; Sat,  3 May 2025 03:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746222804; cv=none; b=o/pYS7CdI8BYjfS8jAQlBeSIrAhmfaVfn/4l0MoqZRTCusKXPa5NfrmKovZemugUBm38kUJhBcC1p4qQCEKHlHWyR4qwxJqHZTbUnF2x/+qRwE9SFNhOSQb2UKTJbth38PR7bNa4/lg+8FI6VmE+OO8KcZsnt5MNplbbC890Chg=
+	t=1746244666; cv=none; b=cFTi9U333LHpHJvQhf/EefLAzy06Mhwu8wrcw6z5ebo2IRZfE4EaMOefSwi8QuW8yeYep/no1qpLzx0B57BpMK58JJOTEOEbLxL2zmvoUuu1m5l7xpnEGNIWGusM3MwqfAzltMKTzZAU3CZNF56eYC2T6iroLuyI6rj+bp+UnbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746222804; c=relaxed/simple;
-	bh=Z7jolS1SYvR356j/6JF5jD9wW/SN08wy8GP8TfAWJ8A=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Kg+nGvFO7tdv987jm5us8VW+Av2sXQTAHB0BHAaDicd0umbFLwknBIxoy7uHrJbnpOIVNfGDdFo4NJePqJHrUGMXPzXRr4v104Lfqls0NHBVX6oszEwXe9R3mFOVrM9Y/mPL/f8NdSypA2PU6RXW7TN3kcRav+okSjhHhky6aaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OGOyjO6r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746244666; c=relaxed/simple;
+	bh=MlnjgWSPsjYc1RguVO5qgV2WA5qs0nk0/tk4M1pAu5o=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=r2go6K1qKpD4SE4E/orSsUffPwbeuwiMbHYshzG83AuzVcURI6GLo6lwpoR3KpjJk/I46FWFRaaBZGijB0jK1rQmaRltQu+yLaJYBFIahilSdllmHwJgQsb8TWW07lY48h/pg8DvoUBntH2kEJNGrF1lM6sfIwT693QqlxrLYzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NHC1fDQl; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OGOyjO6r"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C3354C4CEEB
-	for <linux-bluetooth@vger.kernel.org>; Fri,  2 May 2025 21:53:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746222803;
-	bh=Z7jolS1SYvR356j/6JF5jD9wW/SN08wy8GP8TfAWJ8A=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=OGOyjO6rsO0INxILrJwq0czULHkhJE33/k2FJMtBr1ZU/9A4z6l8jRbFP56lBmMrz
-	 I36fDjPamxQRzYx5fXdoTgX0YKe2WW7SW8uZntbbe2mgcKToaPUD/VGZ0ltLwcH9RW
-	 Yos63I2hU3cqHk3T6SB4BRFnZaMTPGBJw0Wf+BYeHa+OYBCQzKq8uz16zkKJ3gWTA0
-	 wNUCWUz3ufBKD4m7LqLBukjVZlVOkc5qVKBwdmSb2H2QxvJIKoKHAcbCdLYFwNiQm0
-	 EJUdmHQufCa8brSPWR2a60muBKpRmLsi0gwQZOkeSxHvLyhcWchgXJl1T0j7pPrFmI
-	 m/pYxw8MJMWBA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id B7C05C53BBF; Fri,  2 May 2025 21:53:23 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NHC1fDQl"
+Received: from github.com (hubbernetes-node-e259917.va3-iad.github.net [10.48.154.33])
+	by smtp.github.com (Postfix) with ESMTPA id 4A5F84E04B9
+	for <linux-bluetooth@vger.kernel.org>; Fri,  2 May 2025 20:57:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1746244664;
+	bh=SV0UuBae+wrY7owH8Ej5JAocHSO1vj3P1c09qrTiOmQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=NHC1fDQltBW0rgMpLV8+KdZGgJtlD2y9rITZkPOW40Rg/FL+5K9ZqnJKqBcGLwCpq
+	 uSZTdIrezdzUDN99WN1DG6cR+r3IkBjjJ3Kk9L/38mJNlLQC41oOnxqShEUUpSW3nR
+	 QR6oEJuVSNbtILmi+63nZxycq77mUe3y0kCSzRn8=
+Date: Fri, 02 May 2025 20:57:44 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220061] [REGRESSION, BISECTED] Multiple Bluetooth devices
- cannot be paired under Linux 6.14.4
-Date: Fri, 02 May 2025 21:53:23 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: sandroid@posteo.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220061-62941-LQgswhU1cP@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220061-62941@https.bugzilla.kernel.org/>
-References: <bug-220061-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/949647/8c0f0a-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220061
+  Branch: refs/heads/949647
+  Home:   https://github.com/bluez/bluez
 
---- Comment #13 from Sandro Forster (sandroid@posteo.net) ---
-With v3 it is working flawlessly now. Thank you very much for working on th=
-is!
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
