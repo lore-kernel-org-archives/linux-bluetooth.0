@@ -1,130 +1,99 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805AC801
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 May 2025 20:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AF02853FC;
+	Mon,  5 May 2025 22:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746478241; cv=none; b=tlU3EOKrPJ1MgwV+oq8kSnGXqYbHusMmRdvVrQBh6ur/mGu1ZDACyn+Xu6KzDp/srLnSy8/BkwkgpjLpP7LLIeZ3+13eiDib29+GGA5nen+paMkZtLLGEwjCxJCMElwnXjCdZP3hAU3jSDH6uf3lMHFdZC0ycoBSIAOvQYZigsA=
+	t=1746483342; cv=none; b=Tx1IM48+ZP1Ywl3/LeP9ZBYyBfspId6sRCRXLzdm00jjb+qR/0NTj+jvNoBZdsEzLhRRFkEOgZCFfGk8matFFdM8UraIO+shFnITuQEJ6juYG4D37JkhWSznO8jrIC/+aDoEmc+hMBKADf2+3KX4+l+8x8iaJgaiI3yZ1zMrcVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746478241; c=relaxed/simple;
-	bh=nRZWbQ1i7iB4tD2+lZSVtnsMWICtGSICoNS1oSmpG4Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=TlEmMjhVFsq76p1gc5djBib5SRqVE4AXOiWuZBSU6vDH8C3+pQSJGLK8UJLoNk/39NDQNDtHgllG6ku/My6xlq81wHLVVufGcjAcSWfIMB7iXYlWMn0BVMIVed45xW3iPyskxLNDc9f3MigQMCSYrz1NmDUdt7fjRAKFmayHTx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZnU8+x1; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1746483342; c=relaxed/simple;
+	bh=46rfAidHetS8cBL29WXOKNNYtOLFJa/GrAJQc/Fxh7E=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EzQE9vPjwoiHOslF7O8S0pMl/o6O17wVLWLJqCBuxzFMqW4m+PY9fQEEHfR+H3KfnS8+taFaeLi/0PZaTxq4Vw8OqEdde5f27/grYXaqTF5kducNkezwgQTbWhI9ovWoGuBD+K79LeiMVAkDpsPnqhqkkBTvqmDxlp5B0WM4Hm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0i+0pGl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZnU8+x1"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-223fb0f619dso58418005ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 May 2025 13:50:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746478239; x=1747083039; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7u7nfXf5zg2IH0XFRphR74ED2F+l87Muab8QV0Oatyo=;
-        b=BZnU8+x1eXJiRscy8OOwWfpDr79TnfAi8QZSVGkkuwGr+SkN8PkDm603P7H8UVZZfT
-         k21eS8Kezh7lKnKDk0G7Ke/tLLKqEQF2gFgLm0+lwvdx96nHdO1gnfUcuOQymUS2YbbT
-         jUMl6qTq7e4AyU0XKHfSaktfpJFnGtjL+ssYUPTynds+WDdjrleO1kxB1hb3QsKYmqOf
-         yF+jdyUBiYQLBrbDyfdZT0KNMcAtGLrRdLWkv4jHxDlWSl+RcxJYwG/45wl3rF0RHICl
-         YVtdr37MAv9sNkwCc2S8ZPCvrugdsmoWE8mMP1DD4vPEw/n/2DZxGGsPObIeJpQLXdQT
-         RUow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746478239; x=1747083039;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7u7nfXf5zg2IH0XFRphR74ED2F+l87Muab8QV0Oatyo=;
-        b=R7jnG1so4iDrPWXJa/x7l2pUAYISo4JIySgjuoFqpsQ8u1rRM6X5oiZ78B2iCG7yCz
-         IHK0bu6d1jvEH8y+PBvhVYH67JI/aOPoDKrovygUy7i70IGwUbartNJtt5+LmRj6TgMN
-         /0sRQiVq70B4cbbZalSeXUHQmCztwPn7owpXFOfmgYzMwLv4slL+Q/3kgWQsWOY46VaV
-         cQiz3Pb0Y0RDrtFnmd3fK0liFTbV2CWbxo7zelam34NAoTfkGlhUeONkVFMSSLy0foLd
-         69JOJkegItdBp4Q9NhsepkJv3e6UhVZ2BVhM7TBYM4JggjqPjUmlgQWPcJAxIfbSfRpS
-         /5dQ==
-X-Gm-Message-State: AOJu0YzfPnVWqn04unPzVFu7ZYLmKhQaMDsswEva9XP6Qs6ReXw5e5Jj
-	mbOXDZk/Oy1vSbNew5w/1EgV/fbxXrlp3HSQkwS0Mh/NlYgyg/MzftsSTg==
-X-Gm-Gg: ASbGncvyHDhpX3yNgmz3gzrW+tvZWsLpEYLA75wza0txEJYyRuX765PlvSHZRgiIpyn
-	wH8nAgTtRocpMV2aVXBl5vasxhngLGKkN9UTBMxmocO8DK+y5lBOQNH6FeOnbjwwqii9Hn4rjv3
-	M8cFt+fVcXjMDmJg6pcNK554BbMfcidstCpi3RmEzfjJ9/fNzi89magPOoHjx0QXOYVuf0tcHEl
-	vpSvF2JC1NE6By5D5cwAxURoufajfXR0NNLHxH0rIQ7jzvF6G4OYVmiGTFzbQDscJCvTqBjKQea
-	fj45iVwEe4kFyL1UwEEk97QhSYjGvhrOlWzLUI7ZynYsraSrLgNxlwwl
-X-Google-Smtp-Source: AGHT+IHzTpbDlBew031hO46MwvYQ+OmUnCQhWLWgd44ULx6GdQ11y/QWcjTxl5r/8DTQrkB1ElR9OA==
-X-Received: by 2002:a17:903:17c3:b0:223:26da:4b8e with SMTP id d9443c01a7336-22e102b8506mr212264655ad.4.1746478239471;
-        Mon, 05 May 2025 13:50:39 -0700 (PDT)
-Received: from [172.17.0.2] ([20.169.14.12])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e15229474sm59684385ad.184.2025.05.05.13.50.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 13:50:39 -0700 (PDT)
-Message-ID: <6819249f.170a0220.24b086.9e90@mx.google.com>
-Date: Mon, 05 May 2025 13:50:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2027604784046174176=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0i+0pGl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B574C4CEE4;
+	Mon,  5 May 2025 22:15:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746483341;
+	bh=46rfAidHetS8cBL29WXOKNNYtOLFJa/GrAJQc/Fxh7E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=G0i+0pGloDIEGN49GFcOTBHbIJoYk8lTCwO4fH0iXZ0+lp7RXpJrEWc3kcmqhYfpD
+	 h/XI9BtStxjvLHmTWcXZy25b8FIDqhMxQImQVBTa8r/Wzpq0i5wbK8dlwBBwXOur3b
+	 soLOdA9M0tqHr+9lSrWe9pXXqceo9mEvHHscWxoMY8jzwcPTKhlNJEKUW0ZlGceRXt
+	 LGB/eGGftNIxassEbdc8rmRoyMLur87gRzJpwxOcF3MVvidFogxFH5oOeFgBF/IAaj
+	 iubY81ha5Oo9CceUBbxTJX68mkL2XGsZmtqqrkYrVmWZrWZBQGCO5rbSQPZlRIkTcx
+	 Z11OqKMaC2fyQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Sean Wang <sean.wang@mediatek.com>,
+	Pedro Tsai <pedro.tsai@mediatek.com>,
+	Felix Freimann <felix.freimann@mediatek.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.14 043/642] Bluetooth: btmtksdio: Prevent enabling interrupts after IRQ handler removal
+Date: Mon,  5 May 2025 18:04:19 -0400
+Message-Id: <20250505221419.2672473-43-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
+References: <20250505221419.2672473-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/bap: Fix handling of ASCS_Codec_Config
-In-Reply-To: <20250505192336.3191098-1-luiz.dentz@gmail.com>
-References: <20250505192336.3191098-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.14.5
+Content-Transfer-Encoding: 8bit
 
---===============2027604784046174176==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Sean Wang <sean.wang@mediatek.com>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit 6ac4233afb9a389a7629b7f812395d1d1eca5a83 ]
 
-Dear submitter,
+Ensure interrupts are not re-enabled when the IRQ handler has already been
+removed. This prevents unexpected IRQ handler execution due to stale or
+unhandled interrupts.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=959755
+Modify btmtksdio_txrx_work to check if bdev->func->irq_handler exists
+before calling sdio_writel to enable interrupts.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.27 seconds
-BuildEll                      PASS      20.70 seconds
-BluezMake                     PASS      2872.27 seconds
-MakeCheck                     PASS      20.90 seconds
-MakeDistcheck                 PASS      205.69 seconds
-CheckValgrind                 PASS      284.64 seconds
-CheckSmatch                   WARNING   310.23 seconds
-bluezmakeextell               PASS      132.14 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      939.96 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:315:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:315:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:315:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Co-developed-by: Pedro Tsai <pedro.tsai@mediatek.com>
+Signed-off-by: Pedro Tsai <pedro.tsai@mediatek.com>
+Co-developed-by: Felix Freimann <felix.freimann@mediatek.com>
+Signed-off-by: Felix Freimann <felix.freimann@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btmtksdio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index bd5464bde174f..edd5eead1e93b 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -610,7 +610,8 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 	} while (int_status || time_is_before_jiffies(txrx_timeout));
+ 
+ 	/* Enable interrupt */
+-	sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
++	if (bdev->func->irq_handler)
++		sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
+ 
+ 	sdio_release_host(bdev->func);
+ 
+-- 
+2.39.5
 
---===============2027604784046174176==--
