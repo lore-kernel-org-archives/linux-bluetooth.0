@@ -1,47 +1,52 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC612882C5;
-	Mon,  5 May 2025 22:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC89351830;
+	Mon,  5 May 2025 22:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483344; cv=none; b=MJrvvVE3S5jXTRI/3mADCqGzps1TMPLqulWGBMvXwWcDYmm6c6IlD5FzdS0EQsU9tVtDzO0TMgfSYZlEzd0+Uj3P+RIh8NdhqMJV9LN78QhbvhE1fRVCDZubNyTx14YiYAEXNiUL9kzxP2NwUfAYTBNxpn9fgf+8/Z7K7Diz7J4=
+	t=1746484837; cv=none; b=XTIxE+0LL7aoHAccOAq1KlmGm+XUJPiFMxy16BaOWyiBrW4WhttIvR9nWVXxs3eO1LEtruSqM3Gh1PlaZW2h/aXLIOkg3C5N9HpacNi8Y20Dj7Dce1zI0Rx6NVU8xsON9Poq1tWE3cM9uErAXtheZxpQL/LuqDhEugWIH23pXqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483344; c=relaxed/simple;
-	bh=T4emcv9UCK38JyLGZpfgRsXa/UJf9WjXoVPBejbJkwQ=;
+	s=arc-20240116; t=1746484837; c=relaxed/simple;
+	bh=bvXbAwZuQg22ns0JxMDE41OePW9+9SN2J/jJtCw8lVs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B6uylbG3sOQsm+OoJ6ANUFiLvI+85gS02RFNcDh74xl8YZO6NPOj/547S3hnMCVYtEaKSHq2ltT6mMVnc6QOWXBwhvUzvHd7lTLqaGC86SzB9nL54loJnh9Lm4W+D+qPPhJYJ9L/MhPCmnSe4JWA50Go0DZq4Z5johCBahkTFfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LvDF/ev6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=tH90eGJnDifim/J7FqUtgGvt39ZvlwZ8iELntiXHwTqDvSg7kaRMx9AlG3BJGttW7qAGMPcp95fDx+wEQrdPKhKmTB+3Pa6hS3PRYKKVL7Rvbmm4NvIaG5rSMt4ruSWRxbpToqZhsJStRyVZkucH/Eanc8MyAZ6Vl6kqM/NtvwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uK91PWci; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LvDF/ev6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86DF6C4CEED;
-	Mon,  5 May 2025 22:15:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uK91PWci"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D41C4CEEF;
+	Mon,  5 May 2025 22:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483344;
-	bh=T4emcv9UCK38JyLGZpfgRsXa/UJf9WjXoVPBejbJkwQ=;
+	s=k20201202; t=1746484837;
+	bh=bvXbAwZuQg22ns0JxMDE41OePW9+9SN2J/jJtCw8lVs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LvDF/ev6JY4mS+xCDW561idfG42USUpuIuMiA3nuoc/mxQpCdovBOA8HRX+aixOjH
-	 oRlLWWaNSw3xL79J1/h4WaZ1KZ8dtoBeanYLGXW1xf8b2DPvA1PywwWXwqu/Wvp1AV
-	 uxhK0R4llm0Xx+J33g3coYSZ6JH23mzmegYbWBGUfdVHFGPCVOxjYhAiKE2Fzt+KwL
-	 CaS6q7rdlVz+W5OJ3+NL0Ip31OLYvhLXl7bJj5lUome4aI9TsoHYDRr+GcSqMB9mtD
-	 bNLivLhVDqZuDmGcUprTqAtuPVeBHIpYEeevx0OF5FVRsQ4fsgldRgPw/R7NEWN4xR
-	 vRV7swSa6fJiQ==
+	b=uK91PWci/810fdqb6BtneZ4X9u+2pcfR7RbRkbShgcJgjuKfkgaWwd4zMWbdD+TGL
+	 fy+G6KKfvh5zskXrWs+duS1c+pGSVcGqZKM6cVG59tVBynEHlwQpv5DyXycUdsG065
+	 tJP5UrpCvxBddtuIjyudAvsMwb6OzlKNF1O6r9wvf+UdHyUqbkduLAZHBaJyN6WGN7
+	 pSJCgnAoZSvvOv+BN/PjeCu3P8cYdb6YCsOn2DbCUFruvHIVDg9uUTGrBJ4ZPu1ek3
+	 mzI5MiNqpz/XZ3nLjSsH+HLROM5eq0d1WZzoGcQs8N5/BxBvp3aJk9y51dFPFH0IL3
+	 gnkjuN6QUZHiw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Pedro Nishiyama <nishiyama.pedro@gmail.com>,
+Cc: Sean Wang <sean.wang@mediatek.com>,
+	Pedro Tsai <pedro.tsai@mediatek.com>,
+	Felix Freimann <felix.freimann@mediatek.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 045/642] Bluetooth: Disable SCO support if READ_VOICE_SETTING is unsupported/broken
-Date: Mon,  5 May 2025 18:04:21 -0400
-Message-Id: <20250505221419.2672473-45-sashal@kernel.org>
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.12 039/486] Bluetooth: btmtksdio: Prevent enabling interrupts after IRQ handler removal
+Date: Mon,  5 May 2025 18:31:55 -0400
+Message-Id: <20250505223922.2682012-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
-References: <20250505221419.2672473-1-sashal@kernel.org>
+In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
+References: <20250505223922.2682012-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,36 +55,44 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14.5
+X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Pedro Nishiyama <nishiyama.pedro@gmail.com>
+From: Sean Wang <sean.wang@mediatek.com>
 
-[ Upstream commit 14d17c78a4b1660c443bae9d38c814edea506f62 ]
+[ Upstream commit 6ac4233afb9a389a7629b7f812395d1d1eca5a83 ]
 
-A SCO connection without the proper voice_setting can cause
-the controller to lock up.
+Ensure interrupts are not re-enabled when the IRQ handler has already been
+removed. This prevents unexpected IRQ handler execution due to stale or
+unhandled interrupts.
 
-Signed-off-by: Pedro Nishiyama <nishiyama.pedro@gmail.com>
+Modify btmtksdio_txrx_work to check if bdev->func->irq_handler exists
+before calling sdio_writel to enable interrupts.
+
+Co-developed-by: Pedro Tsai <pedro.tsai@mediatek.com>
+Signed-off-by: Pedro Tsai <pedro.tsai@mediatek.com>
+Co-developed-by: Felix Freimann <felix.freimann@mediatek.com>
+Signed-off-by: Felix Freimann <felix.freimann@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_event.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/btmtksdio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 20d3cdcb14f6c..fa318f9ef40ec 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -930,6 +930,9 @@ static u8 hci_cc_read_buffer_size(struct hci_dev *hdev, void *data,
- 		hdev->sco_pkts = 8;
- 	}
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index 11d33cd7b08fc..d4ea1ff07b3e7 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -610,7 +610,8 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 	} while (int_status || time_is_before_jiffies(txrx_timeout));
  
-+	if (!read_voice_setting_capable(hdev))
-+		hdev->sco_pkts = 0;
-+
- 	hdev->acl_cnt = hdev->acl_pkts;
- 	hdev->sco_cnt = hdev->sco_pkts;
+ 	/* Enable interrupt */
+-	sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
++	if (bdev->func->irq_handler)
++		sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
+ 
+ 	sdio_release_host(bdev->func);
  
 -- 
 2.39.5
