@@ -1,254 +1,98 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FFC1474B8;
-	Tue,  6 May 2025 08:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43068F7D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  6 May 2025 14:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746521195; cv=none; b=ELze8D3bpm18Dj/pwKod1RLNT/7VbMZ+oe/8r42vepLZg4H92r1uSFPS3ejOqE094JUqEGtZMUdm4eUx5aVTqzohXJhjJ4JUr4eVdOShOFexuzvejbofRJA0DYSqwOWpj7MqstpFYKcBw9D0EZ6k5lkwYXLznki60c3PP+O5L78=
+	t=1746542901; cv=none; b=TfqEjeyou4IXIxHZvXKmoMN2udmeOH/aCfTkPY1SemZSS2rV5d+0Jlxd8ffSdVpMaukUTnCJNV54I4Kq4lODxGd1HNa4rbVK8/d1l/w0gxRmEol3HXd5ZZrUCtQofvk/oUE57zwN+wuy6fdcbaWYeAPw9/OFz8WsNVH8eUoSR4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746521195; c=relaxed/simple;
-	bh=PVPsgcOG043Kdu+Dupo7Lq60xO+Aootenjj+ovUQstY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=enf5d9ffHvy7rNxhpTrgch9yfG7pEkG47xlTSjFz4ydCsyjDqxv5yiysWJHMgOZML3qxrsbIGVd5i8CSh5Iy4K/jL8oxqVHMAuyowjtJsB691jIqE68viDBXZHpOKFLkeH8R6avuBcJdM9TYbvv8GdvtVUnU0kEw8u54phNx9hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EA09A61EA193D;
-	Tue, 06 May 2025 10:46:13 +0200 (CEST)
-Message-ID: <aa095579-84d3-4157-91fc-23613ae30448@molgen.mpg.de>
-Date: Tue, 6 May 2025 10:46:13 +0200
+	s=arc-20240116; t=1746542901; c=relaxed/simple;
+	bh=icU5PsDYBes2DKqDbnf1HYywgEsHxtnc1ddCAYZ4Yv8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=VUqGqUfiojJsC3heE3NDglxIeutnFOM/9guoTlMGe6OCE6AG8ZqI3QH/Od7L9gWsn34C1IImrDHdB99zNqSfTeFfeXISDma2kTtvqFNw03bV40JI7GMe2D3qpCsx+DNarDkZSCSLQURcQmIWuGb1wvT2mkgdEE8kf9s3oPQGslw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MOWqGccS; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MOWqGccS"
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-524168b16d3so3777605e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 May 2025 07:48:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746542897; x=1747147697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uz2X/jn1Af0DiWOdEMUL2nWTSLBccD0zDvS3LPIHg8k=;
+        b=MOWqGccSd883Kz1wGtIAA2bJrgNRjN54D/XIRE6E1MNx+4jDqBYj6cpgJHcSzbF8z6
+         p6iagz9/Cm01268H3O+vqdkB+LXkJ1DCBwgEQ2jiVUd5/eKyI+tm7fPzmQhkMlhk3UIB
+         p2qsO08EcGYZG9KQyhiWysWmVR9bLSstr5ZhlmVhfBxE3MS4q11vc17Q7eEomGYq2/7u
+         36IldTC/0zUZizfqAvamXI+47F2c1o+YriTH4Qc/5RsNcZIOAz8Cypu82RBFAxHZUW9v
+         sXET84jD1mRptGeUAYcuHesiVGSYKXTM4tGsSNnCsuo9fbetaCCIhoh9DkSSu60Jh5Fq
+         Ce5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746542897; x=1747147697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uz2X/jn1Af0DiWOdEMUL2nWTSLBccD0zDvS3LPIHg8k=;
+        b=nH7dsKaIsbHj0SOCd0QibYOi7xZSgluFdRRBk7KvdOsOcjGTORoEzbs7+koHZZa9h6
+         2sAYS5cjFwTwbIZKpcTgU8oQ1zX7VG76pxugCIARFruNWvcQKdDXIdXZN3Rmqbiqy8az
+         Re7YRgEM7lKJHrX4eeIWlez7M6qKdRnSboSP2biVe7LWYDxRbJ47E3LFqqabF0z/1mg4
+         jsVPhw9p59pG1TZt/62TFdbl0MmUebZKqUgzY7IZ5sRKufRe7KOt5GbFKiEo05nH8U3T
+         UBcRL+1alTf1692/CMuWAxV6w8aXF72g7qNUVzgtkblHZHR7597mPaeOngOWaTlJ/WFQ
+         uG2g==
+X-Gm-Message-State: AOJu0YzjeCMaYmsRvvnbWzQ+4NftTU10ZU5zpcpxGcAsgOh/Dxh1C7Cv
+	tlojRPTdmYpxawEheWKleLyaMm72v1VqHAMZ5Q4hTHsYBhueq/d1DooKeQ==
+X-Gm-Gg: ASbGnctzgcxvyiqamZyZA0EXbb0e9o+0Lf97ZlBZWsv+LUowYAC8dqFyUYFkoULeulW
+	6IjbkAlAdI52zFWfvKEvvMaB39eAeAxpeiDX9f4ngKJz5dlluA/VSwGx9C06q+VmrKs+pSNTqEi
+	DYBKfNKiGQ0p4y6p/vzaEgSHW4spJyhfPJjMUhXuVhSFm33Tfa6kfyFOQNlwfFe7Zm4YWfyDD0b
+	StBfzZTE/m9Qm/tN9Md7Rep0Ns33GyRLzAe/sYzcJsZNAocmII6DLR8X0vzSr9fH7YW4/Yfh7ja
+	o49H7OeiWs/I5u7B8PwKLXXomwC/OQEyXV8+BEQZkwaXYgZDciE3zmZ11VSV6TqcUSRb8zG2LP1
+	n3itCLJcUvg==
+X-Google-Smtp-Source: AGHT+IEXXg/LPNqQ5rjcKaIvJNzCubpcYkcQ6qJ3m+ZTaDTG08s1QU/9TVMQpU2UzrS2XPB86hEfjQ==
+X-Received: by 2002:a05:6122:920:b0:520:61ee:c821 with SMTP id 71dfb90a1353d-52b06889a5dmr6505440e0c.3.1746542897303;
+        Tue, 06 May 2025 07:48:17 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52ae419d6b0sm1946454e0c.38.2025.05.06.07.48.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 07:48:15 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] main.conf: Fix documentation of TemporaryTimeout=0
+Date: Tue,  6 May 2025 10:48:14 -0400
+Message-ID: <20250506144814.49996-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: use skb_pull to avoid unsafe access in
- QCA dump handling
-To: En-Wei Wu <en-wei.wu@canonical.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_tjiang@quicinc.com
-References: <20250506024822.327776-1-en-wei.wu@canonical.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250506024822.327776-1-en-wei.wu@canonical.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Dear En-Wei,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Setting TemporaryTimeout to 0 never enables temporary_timer which means
+device_disappeared will never be called and the device will remain
+temporary forever (until the service is restarted).
 
-Thank you for your patch.
+Fixes: https://github.com/bluez/bluez/issues/1100
+---
+ src/main.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Am 06.05.25 um 04:48 schrieb En-Wei Wu:
-> Use skb_pull() and skb_pull_data() to safely parse QCA dump packets.
-> 
-> This avoids direct pointer math on skb->data, which could lead to
-> invalid access if the packet is shorter than expected.
-
-Please add a Fixes: tag.
-
-Also, how did you test this?
-
-> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
-> ---
->   drivers/bluetooth/btusb.c | 99 ++++++++++++++++-----------------------
->   1 file changed, 41 insertions(+), 58 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 357b18dae8de..17136924a278 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2979,9 +2979,8 @@ static void btusb_coredump_qca(struct hci_dev *hdev)
->   static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
->   {
->   	int ret = 0;
-> +	int skip = 0;
-
-`unsigned int`, as the signature is:
-
-     include/linux/skbuff.h:void *skb_pull(struct sk_buff *skb, unsigned 
-int len);
-
->   	u8 pkt_type;
-> -	u8 *sk_ptr;
-> -	unsigned int sk_len;
->   	u16 seqno;
->   	u32 dump_size;
->   
-> @@ -2990,18 +2989,14 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
->   	struct usb_device *udev = btdata->udev;
->   
->   	pkt_type = hci_skb_pkt_type(skb);
-> -	sk_ptr = skb->data;
-> -	sk_len = skb->len;
-> -
-> -	if (pkt_type == HCI_ACLDATA_PKT) {
-> -		sk_ptr += HCI_ACL_HDR_SIZE;
-> -		sk_len -= HCI_ACL_HDR_SIZE;
-> -	}
-> +	if (pkt_type == HCI_ACLDATA_PKT)
-> +		skip = sizeof(struct hci_acl_hdr) + sizeof(struct hci_event_hdr);
-> +	else
-> +		skip = sizeof(struct hci_event_hdr);
-
-Maybe write it as below:
-
-     skip = sizeof(struct hci_event_hdr);
-
-     if (pkt_type == HCI_ACLDATA_PKT)
-     	skip += sizeof(struct hci_acl_hdr);
-
-
-Kind regards,
-
-Paul
-
-
->   
-> -	sk_ptr += HCI_EVENT_HDR_SIZE;
-> -	sk_len -= HCI_EVENT_HDR_SIZE;
-> +	skb_pull(skb, skip);
-> +	dump_hdr = (struct qca_dump_hdr *)skb->data;
->   
-> -	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
->   	seqno = le16_to_cpu(dump_hdr->seqno);
->   	if (seqno == 0) {
->   		set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
-> @@ -3021,16 +3016,15 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
->   
->   		btdata->qca_dump.ram_dump_size = dump_size;
->   		btdata->qca_dump.ram_dump_seqno = 0;
-> -		sk_ptr += offsetof(struct qca_dump_hdr, data0);
-> -		sk_len -= offsetof(struct qca_dump_hdr, data0);
-> +
-> +		skb_pull(skb, offsetof(struct qca_dump_hdr, data0));
->   
->   		usb_disable_autosuspend(udev);
->   		bt_dev_info(hdev, "%s memdump size(%u)\n",
->   			    (pkt_type == HCI_ACLDATA_PKT) ? "ACL" : "event",
->   			    dump_size);
->   	} else {
-> -		sk_ptr += offsetof(struct qca_dump_hdr, data);
-> -		sk_len -= offsetof(struct qca_dump_hdr, data);
-> +		skb_pull(skb, offsetof(struct qca_dump_hdr, data));
->   	}
->   
->   	if (!btdata->qca_dump.ram_dump_size) {
-> @@ -3050,7 +3044,6 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
->   		return ret;
->   	}
->   
-> -	skb_pull(skb, skb->len - sk_len);
->   	hci_devcd_append(hdev, skb);
->   	btdata->qca_dump.ram_dump_seqno++;
->   	if (seqno == QCA_LAST_SEQUENCE_NUM) {
-> @@ -3078,68 +3071,58 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
->   /* Return: true if the ACL packet is a dump packet, false otherwise. */
->   static bool acl_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *skb)
->   {
-> -	u8 *sk_ptr;
-> -	unsigned int sk_len;
-> -
->   	struct hci_event_hdr *event_hdr;
->   	struct hci_acl_hdr *acl_hdr;
->   	struct qca_dump_hdr *dump_hdr;
-> +	struct sk_buff *clone = skb_clone(skb, GFP_ATOMIC);
-> +	bool is_dump = false;
->   
-> -	sk_ptr = skb->data;
-> -	sk_len = skb->len;
-> -
-> -	acl_hdr = hci_acl_hdr(skb);
-> -	if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
-> +	if (!clone)
->   		return false;
->   
-> -	sk_ptr += HCI_ACL_HDR_SIZE;
-> -	sk_len -= HCI_ACL_HDR_SIZE;
-> -	event_hdr = (struct hci_event_hdr *)sk_ptr;
-> -
-> -	if ((event_hdr->evt != HCI_VENDOR_PKT) ||
-> -	    (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
-> -		return false;
-> +	acl_hdr = skb_pull_data(clone, sizeof(*acl_hdr));
-> +	if (!acl_hdr || (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE))
-> +		goto out;
->   
-> -	sk_ptr += HCI_EVENT_HDR_SIZE;
-> -	sk_len -= HCI_EVENT_HDR_SIZE;
-> +	event_hdr = skb_pull_data(clone, sizeof(*event_hdr));
-> +	if (!event_hdr || (event_hdr->evt != HCI_VENDOR_PKT))
-> +		goto out;
->   
-> -	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
-> -	if ((sk_len < offsetof(struct qca_dump_hdr, data)) ||
-> -	    (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
-> -	    (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
-> -		return false;
-> +	dump_hdr = skb_pull_data(clone, sizeof(*dump_hdr));
-> +	if (!dump_hdr || (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
-> +	   (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
-> +		goto out;
->   
-> -	return true;
-> +	is_dump = true;
-> +out:
-> +	consume_skb(clone);
-> +	return is_dump;
->   }
->   
->   /* Return: true if the event packet is a dump packet, false otherwise. */
->   static bool evt_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *skb)
->   {
-> -	u8 *sk_ptr;
-> -	unsigned int sk_len;
-> -
->   	struct hci_event_hdr *event_hdr;
->   	struct qca_dump_hdr *dump_hdr;
-> +	struct sk_buff *clone = skb_clone(skb, GFP_ATOMIC);
-> +	bool is_dump = false;
->   
-> -	sk_ptr = skb->data;
-> -	sk_len = skb->len;
-> -
-> -	event_hdr = hci_event_hdr(skb);
-> -
-> -	if ((event_hdr->evt != HCI_VENDOR_PKT)
-> -	    || (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
-> +	if (!clone)
->   		return false;
->   
-> -	sk_ptr += HCI_EVENT_HDR_SIZE;
-> -	sk_len -= HCI_EVENT_HDR_SIZE;
-> +	event_hdr = skb_pull_data(clone, sizeof(*event_hdr));
-> +	if (!event_hdr || (event_hdr->evt != HCI_VENDOR_PKT))
-> +		goto out;
->   
-> -	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
-> -	if ((sk_len < offsetof(struct qca_dump_hdr, data)) ||
-> -	    (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
-> -	    (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
-> -		return false;
-> +	dump_hdr = skb_pull_data(clone, sizeof(*dump_hdr));
-> +	if (!dump_hdr || (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
-> +	   (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
-> +		goto out;
->   
-> -	return true;
-> +	is_dump = true;
-> +out:
-> +	consume_skb(clone);
-> +	return is_dump;
->   }
->   
->   static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/src/main.conf b/src/main.conf
+index e9c7552a2c2d..ada9b9b5ebf1 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -104,7 +104,7 @@
+ 
+ # How long to keep temporary devices around
+ # The value is in seconds. Default is 30.
+-# 0 = disable timer, i.e. never keep temporary devices
++# 0 = disable timer, i.e. temporary devices stay around forever
+ #TemporaryTimeout = 30
+ 
+ # Enables the device to issue an SDP request to update known services when
+-- 
+2.49.0
 
