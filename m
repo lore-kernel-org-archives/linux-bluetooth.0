@@ -1,70 +1,73 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183BD1E3DDB
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 May 2025 20:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FAF1E22E9
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 May 2025 20:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746650846; cv=none; b=idl6baWxfW7ariWjmMnIClC1/wL2X//dmzTuLNaYbpJBkgc0RxzMy17A0CU2OXsTu/2O69EjhCXSgkzg54C0cR/afmkDg9WjeFGDdNcaFM7hdPYgzrl/aWsls9V+5BTtvQ3L1uMv2kDjm0BxmW8xblJLSKBFxsd224pXM/pvUbg=
+	t=1746650989; cv=none; b=mRJJFyOxNBt6jPXRRfieI1rnz/JhRw3dpFOC/E0G0WhxS3o30/CtrTH033INsc2AUTxgIeGI+NAeHW/cPE7OUg02MtYhaczc357o/9a6x8RFtlaepPfdbRiYkg8GYlyxM0QHEDt7WO/XyuFBiQfBiLTRlViNkKOyxNuSo+dEhQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746650846; c=relaxed/simple;
-	bh=wfK/qH+2mkfOoy8499ymzLTxNmXmi3tlWCdibyd4Kdk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=mdRgQ77D99B9i68YIwqC8Lwboct+ghQQkyXd22/1y59yI1Kx0B35rttKcSX1fKlCeVjCZUg08Q0q6nBnI6BySXGJpy/GDHoWljJPXMTAPzi3iNZvzw9zuo+bIZxYXGufULnbYVRmUGtDyc9UfhQ5L2ttNavbsRXRwwDua/P6hzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WYaqPx+Y; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1746650989; c=relaxed/simple;
+	bh=VfUQMRyVio2YQnZpPgPRM0ZbYD/T40ON/ecBwLReAAM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=majEio33V6nGwrGNm7mvWwxW8eYCv3jop3hBnoT/TNpYDN0iS+89xxRliFzafPPwLuAc/mnK88mLbdWvUpEou+7KhZfGZioayIYK+7wqrOXX3Ztf3Ra7QSILMZnZhF/Jf5SKF7A5qLy6SpOrQP7RMa2WOB8j3mWiXl8getjvYIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAy0MNBM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WYaqPx+Y"
-Received: from github.com (hubbernetes-node-bc9b7c8.ac4-iad.github.net [10.52.132.39])
-	by smtp.github.com (Postfix) with ESMTPA id 17EA270028E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 May 2025 13:47:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1746650844;
-	bh=RF2V2uP1TJdUeYukPdcytjIxmNDJSD3YMBw70E8bmu0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=WYaqPx+YlqVWAovGI3nky5ct1YTBw6h3kf4dcGFCYZ58IIFxppCLFeYHMhTFBanAk
-	 sYQEpk5wxB/7UfXy2rOx2TtndUVXOVkXbdydB67T1BLfypI5dCP5eJiBtWz+n4VxKf
-	 s9JO1CKHTKmeyCliz68qgPQ80hkUIfTbDPSApIJI=
-Date: Wed, 07 May 2025 13:47:24 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/960647/000000-786b11@github.com>
-Subject: [bluez/bluez] 786b11: avdtp: Fix setting in_use flag for local seps
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAy0MNBM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A17FBC4CEE7;
+	Wed,  7 May 2025 20:49:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746650989;
+	bh=VfUQMRyVio2YQnZpPgPRM0ZbYD/T40ON/ecBwLReAAM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gAy0MNBMFzbAkfcDFoY/chDv1DdjlM2bQSxpyMHXMQ85wHBfg6NjKmXb7CRmV+dft
+	 tVILXJDroztA9/4kP38smtOjxag5d1/V/kIxJiPaLcdEa3BAAL91ALwoy8UqsfGMW2
+	 FAWipJlVJ1m++IXBJ1n3JC107xDOidN1Jy3N+54vIcontEgHzYN6OImhSyQmNKCwAb
+	 DpesaJY/W48/5iB7uji0d0BdoAJh52GAp+neUJD9ojbaYXjR1borKpx2fc1Arumw1K
+	 lvAIVhIwzCUccGciRPFpXRxRtl7zBUvs8yPFJkYZd9qu4PZw7uRk2ABAog9IPqV/Ja
+	 maqvjSOW9VwfA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE88380AA70;
+	Wed,  7 May 2025 20:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] btio: Fix not being able to set security level 4
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174665102850.2360863.5235116857355206235.git-patchwork-notify@kernel.org>
+Date: Wed, 07 May 2025 20:50:28 +0000
+References: <20250507162923.226716-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250507162923.226716-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/960647
-  Home:   https://github.com/bluez/bluez
-  Commit: 786b11d384db0e8bfe8e96d2a5bf01411ff4557c
-      https://github.com/bluez/bluez/commit/786b11d384db0e8bfe8e96d2a5bf01411ff4557c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-07 (Wed, 07 May 2025)
+Hello:
 
-  Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/avdtp.c
-    M profiles/audio/avdtp.h
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  avdtp: Fix setting in_use flag for local seps
+On Wed,  7 May 2025 12:29:23 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds support for BT_IO_SEC_FIPS which shall represent the security
+> level 4.
+> ---
+>  btio/btio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This removes the assumption that only 1 stream can be configured per
-local sep which prevents multipoint setups where different devices can
-be using the same local endpoint.
+Here is the summary with links:
+  - [BlueZ,v1] btio: Fix not being able to set security level 4
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=72dddc80def4
 
-Fixes: https://github.com/bluez/bluez/issues/1037
-Fixes: https://github.com/bluez/bluez/issues/1064
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
