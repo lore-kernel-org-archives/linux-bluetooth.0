@@ -1,505 +1,305 @@
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E1E1A29A
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 May 2025 00:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00F47261D
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 May 2025 05:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746579088; cv=none; b=jz4w84ppnL57kBs53FuVyPd+4bnfLT5EAWpKBuJMZcp3mFFVjd2opP4pLuUEWjxuvp25fdRCSptz5HFFAKNaBPQNmBvCSdm01SUuqdGDVmu3kAW/Qfb9S363u04965tmzIuGgidQFvebhEc2nKNWsIsCPwRKPafQ93bxbDnxPzI=
+	t=1746595781; cv=none; b=QsJWwjNRMzBJnf92ysbzEq+83FGjBxlfdrnZc1Gv7aBXjOJywMA4TAhgNm77fbOszAuxqxU0DGfFZM34BP1J08IElGiKmeO94TxolEeaBTdLKKzPPaPa0EhptQNfN7LRWxiWAlFGqqTbWb9CM+/TyoUL0ps/WUOtds34DNSXCKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746579088; c=relaxed/simple;
-	bh=+n7BLbn2ptFLmjJapcF7sG1/fwuqDq+wwGBd5iLh3GA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WOcadi5WrDHwL2LvCSoEFdVoD56mNnL+E4SvL8PfiFpAZSrTjZJ9RgMs96hB30e5PehmF4kWWpUtaRP3ItELKTy7LtjfhJzQXHT+8Gk2G1x5oneV713L46sdjVsEUr91Fe6BmXMBHSaLtGJSokiaGb++EVVEEjDWnvVcmLKT/5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3da7584d395so37955ab.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 May 2025 17:51:26 -0700 (PDT)
+	s=arc-20240116; t=1746595781; c=relaxed/simple;
+	bh=truV7W7wlCOvdh092fGH9J3IXopt6Qfp8wO/hTOTXtk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T7C9X1SDds3Jey05lKclpdccLAI23gRSEjHfbuxqLLWYK9dMV9Xk7d/hjrZvN3QaiCSVL8mRe8AQVzEhlq69Vf/BpFikvJcs4P9Iq8Q9g+wyYcDjgy9YAv7Br3EgWxXo5iS5L+lslX3RyxBTGu6raI3PfWp+7eUPwspOqsXWE1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Pynzaafz; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Pynzaafz"
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 7B6CC3F128
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 May 2025 05:29:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1746595771;
+	bh=TNhEsCLkvQ4FMv7Oa0gFx/Y+6zdX7PN6tyOXag8sK+A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=PynzaafzCk0UUsT2dmVeM62i0F2WsMDUs69KllRngEjbGH+yU+9PoYZ12KIfxve23
+	 t/68s6KjqsecNoZRaCDHdehSM/DSg57A3iGpOm+GdZ7OqjNRsbrRNfYX9LZ5X3Kwaq
+	 TSz3uGZa9a9bArxL2rZ9e6u4HGddb++4NpnJlsqRlUGr60FI+4BmyqvMwSkTAVY2Kb
+	 p0xNnFLHew17Mfywp6kumIFSK9WojWDIEqRssyHHTy8QmoJNqASDzOwWHDiWa1bXyR
+	 x78fC5fxIEkgDx4bJNTLOQhKsCsnVe6sd7OxRh44VP5SfGu7WR5gpLCf81Ml6chzyG
+	 FSJ4tMJJSKP7w==
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39d917b1455so1839412f8f.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 May 2025 22:29:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746579085; x=1747183885;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=snlOmYc9GT0G7ViuqOxb4q3+tOmRsRDISQ2me6OFseg=;
-        b=ZX3YkckbafMEumEXHeRwI+ggfzFXN5DnYOToMTvVlilbRL9jpB5jyv5jBmQt+GmrUC
-         yA6uUv1ZBwjYM0ddGrgkLXy/ciNvMx0mN/oBuwxEGYc+Cktk244sD1BZdEqumdY26/DE
-         XMre1/NE7CDLLOVv5TF24ERH2xLQ6adkKIMeboCV8WKHxrECtlILTQLbzd2/94ep9Gxq
-         FeuIwij3+YVjQqgrkr99IXWiflJnNagR290QNo4fhuXXYSJpdefybY0Sa1oU6tnv6k/s
-         5qxA41adVn7oIckuIIE9mcTydulmz82JWEEgnz/563uzk86ioVmzwE3EMCdvmDSJ46+d
-         90pw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrYCGEN+TXMnwehn4y0jbVR/EmKyFQsJBUvkJXez/JEXVdj1azaQ9sb7rPFLydSILKQ4ub5urv/PFrQv4S/AE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMw7GrRGcs32IFaM8uhB6kV14g1Bhg2M6A9tHk6bOiYtPayjLi
-	fMMi7i04/6G/JnxhdISajJKfx81qQPWgEolpu7/P298gWo969HybqmhD1BAEDjfBt+Dht6H+Fou
-	0jjduG9g/Cg8C70yHiWhtSmx2A3h+bJSLcbyPBXdD1IbsG9UdU8MzHrc=
-X-Google-Smtp-Source: AGHT+IHuieqrpRyIukG/VEnttGfvSHdqGhO5irKuLfa2q2wUDQRcGi7wzi32OEi0s/mufYleXH1iaNKMZySFeuuqRToAIlY8Itx2
+        d=1e100.net; s=20230601; t=1746595771; x=1747200571;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TNhEsCLkvQ4FMv7Oa0gFx/Y+6zdX7PN6tyOXag8sK+A=;
+        b=mjJgi8/HJb8d616hQJe4sLJZxHOlStZE5ejZlyYVB1Zioue9gHWOjoQnEFY2YDMDPQ
+         xbHg8GJ0eE//CyKUwQSzePMrt7RFDOLd1guToS6Fhc/wJ39+3y8gW0gJUydzAlxFz/OB
+         fyIJVw8YjzipxpJQhcJ7wWbaS+jq4mGJ78nw0LEkqNOwJhuQcH4FvDu/xxAcZv0trJ+K
+         MGAxkd1F52ZhXQe22Z0/V/3ua0YAuyYF4LM6QPAvbwz8Mfiahu1n26XiCafSdakAHiSe
+         PHg2phVJv0RmH2+UhJ11G/uklP43osK26fPuYv+DrEXPxdYw+lUuhFFyYBABilDHr/lL
+         wptA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQjKbpgl4AHRZ0ukDsLwSV8ijVriNevJhuRwqsqAMvILfr0U4aGWC9mT/9Qbew6887vNaj3UBvJvViQXqWYAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9XDkZHREU2IcMz3oQlRO17HgK0ZZ2WlmNj/BWRXK6UYikUxDz
+	V4gWx2unzVyTgIYm/53OiPMGzLlWq/rxtqoWGeriBXiZU6H4A563up4IVmkE4NjShaEiK8LVMev
+	ds2+/js3JyxRDa8sQsYJCGqVAtFWjf5jbaSygzsuqBIqDVRZPoabwtsMKkhjxW4UjvZa6BxWMum
+	5SCFYRArMZ2io6hbxijClXHtALo++PlMUYsOXMrFUxHTkfvRKaD2RKJHvT1TI7B7DtqUY=
+X-Gm-Gg: ASbGncuojUu7vQ9fWkdCmGXYXhkBtUBq9PKmmSuKJf67ZtDL/VJDOg31Hfby6q4FXnj
+	NXxt9v54AELXNp46bE4EKlbXs88PGPEAdTP9/4YtB3oyfrPWtOmAPNfd8ssXu9bMiwwJXLA==
+X-Received: by 2002:a05:6000:2403:b0:3a0:9dd8:420c with SMTP id ffacd0b85a97d-3a0b4a68446mr1259501f8f.50.1746595770768;
+        Tue, 06 May 2025 22:29:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFqT9u8XjENyEQqWitZKedyb5RQ38lYlKAhClgAvkpr8bKVbVOkcWNQRydq4AfPS7g/QSH/KXSp4k6wCd4Kdbw=
+X-Received: by 2002:a05:6000:2403:b0:3a0:9dd8:420c with SMTP id
+ ffacd0b85a97d-3a0b4a68446mr1259490f8f.50.1746595770374; Tue, 06 May 2025
+ 22:29:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:258f:b0:3d6:d162:be54 with SMTP id
- e9e14a558f8ab-3da73930313mr12427765ab.14.1746579085492; Tue, 06 May 2025
- 17:51:25 -0700 (PDT)
-Date: Tue, 06 May 2025 17:51:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <681aae8d.050a0220.a19a9.0018.GAE@google.com>
-Subject: [syzbot] [bluetooth?] INFO: task hung in hci_remote_features_evt (2)
-From: syzbot <syzbot+547f5c9fd46cba52fbbf@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20250506024822.327776-1-en-wei.wu@canonical.com> <aa095579-84d3-4157-91fc-23613ae30448@molgen.mpg.de>
+In-Reply-To: <aa095579-84d3-4157-91fc-23613ae30448@molgen.mpg.de>
+From: En-Wei WU <en-wei.wu@canonical.com>
+Date: Wed, 7 May 2025 13:29:19 +0800
+X-Gm-Features: ATxdqUEjR_05HLch-lZLYWyoz6bul3SrZ6GzETTZm2iF6PHiEBGsR5yxOR-nbzU
+Message-ID: <CAMqyJG3v9rcBZD-ZFhzC4_Do+Etry9svctgVz-LKh9X27vq98Q@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: use skb_pull to avoid unsafe access in
+ QCA dump handling
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, quic_tjiang@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Hi Paul,
 
-syzbot found the following issue on:
+> Also, how did you test this?
+I triggered the device coredump by `$ echo 1` to the file named
+"coredump" in the sysfs device node of the hci device. The symbolic
+link of the file can be found at
+/sys/class/bluetooth/hci*/device/coredump.
+After triggering the coredump, the core dump file can be found at
+/sys/class/devcoredump.
 
-HEAD commit:    ebd297a2affa Merge tag 'net-6.15-rc5' of git://git.kernel...
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=14ec539b980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a9a25b7a36123454
-dashboard link: https://syzkaller.appspot.com/bug?extid=547f5c9fd46cba52fbbf
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=126ebf74580000
+Kind regards,
+En-Wei
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f47c8f69bf24/disk-ebd297a2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/34c92acc0f27/vmlinux-ebd297a2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4c13962a94ad/bzImage-ebd297a2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+547f5c9fd46cba52fbbf@syzkaller.appspotmail.com
-
-INFO: task kworker/u9:1:5138 blocked for more than 143 seconds.
-      Not tainted 6.15.0-rc4-syzkaller-00147-gebd297a2affa #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u9:1    state:D stack:25808 pid:5138  tgid:5138  ppid:2      task_flags:0x4208060 flags:0x00004000
-Workqueue: hci1 hci_rx_work
-
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5382 [inline]
- __schedule+0x16e2/0x4cd0 kernel/sched/core.c:6767
- __schedule_loop kernel/sched/core.c:6845 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6860
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6917
- __mutex_lock_common kernel/locking/mutex.c:678 [inline]
- __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:746
- hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
- hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
- hci_event_func net/bluetooth/hci_event.c:7486 [inline]
- hci_event_packet+0x7fb/0x1270 net/bluetooth/hci_event.c:7538
- hci_rx_work+0x46a/0xe80 net/bluetooth/hci_core.c:4020
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-INFO: task syz-executor:5939 blocked for more than 144 seconds.
-      Not tainted 6.15.0-rc4-syzkaller-00147-gebd297a2affa #0
-      Blocked by coredump.
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D
- stack:21192 pid:5939  tgid:5939  ppid:1      task_flags:0x40054c flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5382 [inline]
- __schedule+0x16e2/0x4cd0 kernel/sched/core.c:6767
- __schedule_loop kernel/sched/core.c:6845 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6860
- schedule_timeout+0x9a/0x270 kernel/time/sleep_timeout.c:75
- do_wait_for_common kernel/sched/completion.c:95 [inline]
- __wait_for_common kernel/sched/completion.c:116 [inline]
- wait_for_common kernel/sched/completion.c:127 [inline]
- wait_for_completion+0x2bf/0x5d0 kernel/sched/completion.c:148
- __flush_work+0x9b9/0xbc0 kernel/workqueue.c:4244
- __cancel_work_sync+0xbe/0x110 kernel/workqueue.c:4364
- hidp_session_remove+0x62/0x260 net/bluetooth/hidp/core.c:1169
- l2cap_unregister_all_users net/bluetooth/l2cap_core.c:1747 [inline]
- l2cap_conn_del+0x23a/0x680 net/bluetooth/l2cap_core.c:1776
- hci_disconn_cfm include/net/bluetooth/hci_core.h:2067 [inline]
- hci_conn_hash_flush+0x10a/0x230 net/bluetooth/hci_conn.c:2534
- hci_dev_close_sync+0xaef/0x1330 net/bluetooth/hci_sync.c:5225
- hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
- hci_unregister_dev+0x206/0x500 net/bluetooth/hci_core.c:2678
- vhci_release+0x80/0xd0 drivers/bluetooth/hci_vhci.c:665
- __fput+0x449/0xa70 fs/file_table.c:465
- task_work_run+0x1d1/0x260 kernel/task_work.c:227
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0x8d6/0x2550 kernel/exit.c:953
- do_group_exit+0x21c/0x2d0 kernel/exit.c:1102
- get_signal+0x125e/0x1310 kernel/signal.c:3034
- arch_do_signal_or_restart+0x95/0x780 arch/x86/kernel/signal.c:337
- exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x8b/0x120 kernel/entry/common.c:218
- do_syscall_64+0x103/0x210 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa39118d5ca
-RSP: 002b:00007ffebcef3640 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: 00007fa39118d5ca
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007ffebcef369c R08: 00007ffebcef2f9c R09: 00007ffebcef33a7
-R10: 00007ffebcef3020 R11: 0000000000000293 R12: 0000000000000258
-R13: 00000000000927c0 R14: 0000000000044f5f R15: 00007ffebcef36f0
- </TASK>
-INFO: task khidpd_699e5505:5983 blocked for more than 145 seconds.
-      Not tainted 6.15.0-rc4-syzkaller-00147-gebd297a2affa #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:khidpd_699e5505 state:D stack:29576 pid:5983  tgid:5983  ppid:2      task_flags:0x208040 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5382 [inline]
- __schedule+0x16e2/0x4cd0 kernel/sched/core.c:6767
- __schedule_loop kernel/sched/core.c:6845 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6860
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6917
- __mutex_lock_common kernel/locking/mutex.c:678 [inline]
- __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:746
- l2cap_unregister_user+0x6a/0x1b0 net/bluetooth/l2cap_core.c:1727
- hidp_session_thread+0x3c9/0x410 net/bluetooth/hidp/core.c:1304
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-INFO: task syz.0.616:6598 blocked for more than 145 seconds.
-      Not tainted 6.15.0-rc4-syzkaller-00147-gebd297a2affa #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.0.616       state:D
- stack:27288 pid:6598  tgid:6598  ppid:6585   task_flags:0x400140 flags:0x00000004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5382 [inline]
- __schedule+0x16e2/0x4cd0 kernel/sched/core.c:6767
- __schedule_loop kernel/sched/core.c:6845 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6860
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6917
- __mutex_lock_common kernel/locking/mutex.c:678 [inline]
- __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:746
- l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
- l2cap_sock_connect+0x5c5/0x7a0 net/bluetooth/l2cap_sock.c:256
- __sys_connect_file net/socket.c:2038 [inline]
- __sys_connect+0x313/0x440 net/socket.c:2057
- __do_sys_connect net/socket.c:2063 [inline]
- __se_sys_connect net/socket.c:2060 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2060
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fcdca38e969
-RSP: 002b:00007ffc640a4188 EFLAGS: 00000246
- ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007fcdca5b5fa0 RCX: 00007fcdca38e969
-RDX: 000000000000000e RSI: 0000200000000100 RDI: 0000000000000005
-RBP: 00007fcdca410ab1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fcdca5b5fa0 R14: 00007fcdca5b5fa0 R15: 0000000000000003
- </TASK>
-
-Showing all locks held in the system:
-8 locks held by kworker/0:0/9:
-1 lock held by khungtaskd/32:
- #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6764
-4 locks held by kworker/u9:0/56:
- #0: ffff88807b843948 ((wq_completion)hci8#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
- #0: ffff88807b843948 ((wq_completion)hci8#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: 
-ffffc9000122fc60
- (
-(work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
-(work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: ffff88806f800078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: ffffffff8f45a448 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
- #3: ffffffff8f45a448 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-4 locks held by kworker/u9:1/5138:
- #0: ffff88807b8de148 ((wq_completion)hci1#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
- #0: ffff88807b8de148 ((wq_completion)hci1#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: ffffc9000e5d7c60 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
- #1: ffffc9000e5d7c60 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: ffff88802ff5c078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: 
-ffffffff8f45a448
- (
-hci_cb_list_lock
-){+.+.}-{4:4}
-, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
-, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-2 locks held by getty/5583:
- #0: ffff8880342fa0a0 (&tty->ldisc_sem
-){++++}-{0:0}
-, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: 
-ffffc90002ffe2f0
- (
-&ldata->atomic_read_lock
-){+.+.}-{4:4}, at: n_tty_read+0x43e/0x1400 drivers/tty/n_tty.c:2222
-4 locks held by kworker/u9:2/5884:
- #0: ffff88807f519948 ((wq_completion)hci2#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
- #0: ffff88807f519948 ((wq_completion)hci2#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: ffffc900042dfc60 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
- #1: ffffc900042dfc60 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: ffff8880767e8078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: ffffffff8f45a448 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
- #3: ffffffff8f45a448 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-5 locks held by syz-executor/5939:
- #0: 
-ffff88807b378d80
- (
-&hdev->req_lock){+.+.}-{4:4}, at: hci_dev_do_close net/bluetooth/hci_core.c:481 [inline]
-&hdev->req_lock){+.+.}-{4:4}, at: hci_unregister_dev+0x1fe/0x500 net/bluetooth/hci_core.c:2678
- #1: ffff88807b378078 (&hdev->lock){+.+.}-{4:4}
-, at: hci_dev_close_sync+0x66a/0x1330 net/bluetooth/hci_sync.c:5213
- #2: 
-ffffffff8f45a448
- (
-hci_cb_list_lock
-){+.+.}-{4:4}
-, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:2064 [inline]
-, at: hci_conn_hash_flush+0xa1/0x230 net/bluetooth/hci_conn.c:2534
- #3: 
-ffff88807ba5ab38
- (
-&conn->lock
-#2
-){+.+.}-{4:4}
-, at: l2cap_conn_del+0x70/0x680 net/bluetooth/l2cap_core.c:1761
- #4: 
-ffffffff8f483070
- (
-hidp_session_sem
-){++++}-{4:4}
-, at: hidp_session_remove+0x2c/0x260 net/bluetooth/hidp/core.c:1165
-1 lock held by khidpd_699e5505/5983:
- #0: 
-ffff88807b378078
- (
-&hdev->lock
-){+.+.}-{4:4}, at: l2cap_unregister_user+0x6a/0x1b0 net/bluetooth/l2cap_core.c:1727
-1 lock held by syz.0.616/6598:
- #0: ffff88802ff5c078 (&hdev->lock){+.+.}-{4:4}, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-4 locks held by kworker/u9:3/6603:
- #0: ffff88807d86f948 ((wq_completion)hci3#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
- #0: ffff88807d86f948 ((wq_completion)hci3#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: ffffc90003357c60 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3214 [inline]
-, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: 
-ffff88806cdb8078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: 
-ffffffff8f45a448
- (
-hci_cb_list_lock
-){+.+.}-{4:4}
-, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
-, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-1 lock held by syz.1.617/6615:
- #0: 
-ffff8880767e8078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-4 locks held by kworker/u9:4/6620:
- #0: 
-ffff88802f890948
- ((wq_completion)hci4#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
- ((wq_completion)hci4#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: 
-ffffc900033f7c60
- (
-(work_completion)(&hdev->rx_work)
-){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3214 [inline]
-, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: 
-ffff88806c944078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: 
-ffffffff8f45a448
- (
-hci_cb_list_lock
-){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
-){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-1 lock held by syz.2.618/6631:
- #0: ffff88806cdb8078 (&hdev->lock){+.+.}-{4:4}, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-4 locks held by kworker/u9:5/6635:
- #0: ffff88806117f148 ((wq_completion)hci5#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
- #0: ffff88806117f148 ((wq_completion)hci5#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: 
-ffffc900042bfc60
- (
-(work_completion)(&hdev->rx_work)
-){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3214 [inline]
-, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: 
-ffff888024344078
- (
-&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: 
-ffffffff8f45a448
- (
-hci_cb_list_lock
-){+.+.}-{4:4}
-, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
-, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-1 lock held by syz.3.619/6648:
- #0: 
-ffff88806c944078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-1 lock held by syz.4.620/6670:
- #0: 
-ffff888024344078
- (&hdev->lock){+.+.}-{4:4}, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-4 locks held by kworker/u9:7/6674:
- #0: ffff88807768d148 ((wq_completion)hci6#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
- #0: ffff88807768d148 ((wq_completion)hci6#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: ffffc90002ed7c60
- (
-(work_completion)(&hdev->rx_work)
-){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3214 [inline]
-, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: 
-ffff88807bef8078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: 
-ffffffff8f45a448 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
-ffffffff8f45a448 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-1 lock held by syz.5.621/6692:
- #0: ffff88807bef8078 (&hdev->lock){+.+.}-{4:4}, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-4 locks held by kworker/u9:8/6702:
- #0: ffff888032e8e148 ((wq_completion)hci7#2){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3213 [inline]
-, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: ffffc9000d097c60 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3214 [inline]
-, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: ffff888026bd4078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: 
-ffffffff8f45a448
- (
-hci_cb_list_lock
-){+.+.}-{4:4}
-, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
-, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-1 lock held by syz.6.622/6721:
- #0: ffff888026bd4078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-4 locks held by kworker/u9:9/6724:
- #0: 
-ffff888011644948
- (
-(wq_completion)hci9
-#2
-){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3213 [inline]
-, at: process_scheduled_works+0x9b1/0x17a0 kernel/workqueue.c:3319
- #1: 
-ffffc9000d107c60
- (
-(work_completion)(&hdev->rx_work)
-){+.+.}-{0:0}
-, at: process_one_work kernel/workqueue.c:3214 [inline]
-, at: process_scheduled_works+0x9ec/0x17a0 kernel/workqueue.c:3319
- #2: 
-ffff88807befc078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3702
- #3: 
-ffffffff8f45a448
- (
-hci_cb_list_lock
-){+.+.}-{4:4}
-, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2049 [inline]
-, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3736
-1 lock held by syz.7.623/6743:
- #0: 
-ffff88806f800078
- (
-&hdev->lock
-){+.+.}-{4:4}
-, at: l2cap_chan_connect+0x102/0xe30 net/bluetooth/l2cap_core.c:6955
-2 locks held by kworker/u8:2/6744:
- #0: ffff8880b8939b58 (
-&rq->__lock
-){-.-.}-{2:2}
-, at: raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:605
- #1: 
-ffff8880b8923b08
- (
-&per_cpu_ptr(group->pcpu, cpu)->seq
-){-.-.}-{0:0}
-, at: psi_task_switch+0x39e/0x6d0 kernel/sched/psi.c:987
-3 locks held by syz-executor/6746:
- #0: ffffffff8ea8dfe0 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #0: ffffffff8ea8dfe0 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #0: ffffffff8ea8dfe0 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
- #1: ffffffff8f2f4248 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #1: ffffffff8f2f4248 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #1: ffffffff8f2f4248 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4064
- #2: ffffffff8df41338 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:304 [inline]
- #2: ffffffff8df41338 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x2f4/0x730 kernel/rcu/tree_exp.h:998
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 32 Comm: khungtaskd Not tainted 6.15.0-rc4-syzkaller-00147-gebd297a2affa #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/19/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+On Tue, 6 May 2025 at 16:46, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> Dear En-Wei,
+>
+>
+> Thank you for your patch.
+>
+> Am 06.05.25 um 04:48 schrieb En-Wei Wu:
+> > Use skb_pull() and skb_pull_data() to safely parse QCA dump packets.
+> >
+> > This avoids direct pointer math on skb->data, which could lead to
+> > invalid access if the packet is shorter than expected.
+>
+> Please add a Fixes: tag.
+>
+> Also, how did you test this?
+>
+> > Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+> > ---
+> >   drivers/bluetooth/btusb.c | 99 ++++++++++++++++-----------------------
+> >   1 file changed, 41 insertions(+), 58 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 357b18dae8de..17136924a278 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -2979,9 +2979,8 @@ static void btusb_coredump_qca(struct hci_dev *hdev)
+> >   static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+> >   {
+> >       int ret = 0;
+> > +     int skip = 0;
+>
+> `unsigned int`, as the signature is:
+>
+>      include/linux/skbuff.h:void *skb_pull(struct sk_buff *skb, unsigned
+> int len);
+>
+> >       u8 pkt_type;
+> > -     u8 *sk_ptr;
+> > -     unsigned int sk_len;
+> >       u16 seqno;
+> >       u32 dump_size;
+> >
+> > @@ -2990,18 +2989,14 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+> >       struct usb_device *udev = btdata->udev;
+> >
+> >       pkt_type = hci_skb_pkt_type(skb);
+> > -     sk_ptr = skb->data;
+> > -     sk_len = skb->len;
+> > -
+> > -     if (pkt_type == HCI_ACLDATA_PKT) {
+> > -             sk_ptr += HCI_ACL_HDR_SIZE;
+> > -             sk_len -= HCI_ACL_HDR_SIZE;
+> > -     }
+> > +     if (pkt_type == HCI_ACLDATA_PKT)
+> > +             skip = sizeof(struct hci_acl_hdr) + sizeof(struct hci_event_hdr);
+> > +     else
+> > +             skip = sizeof(struct hci_event_hdr);
+>
+> Maybe write it as below:
+>
+>      skip = sizeof(struct hci_event_hdr);
+>
+>      if (pkt_type == HCI_ACLDATA_PKT)
+>         skip += sizeof(struct hci_acl_hdr);
+>
+>
+> Kind regards,
+>
+> Paul
+>
+>
+> >
+> > -     sk_ptr += HCI_EVENT_HDR_SIZE;
+> > -     sk_len -= HCI_EVENT_HDR_SIZE;
+> > +     skb_pull(skb, skip);
+> > +     dump_hdr = (struct qca_dump_hdr *)skb->data;
+> >
+> > -     dump_hdr = (struct qca_dump_hdr *)sk_ptr;
+> >       seqno = le16_to_cpu(dump_hdr->seqno);
+> >       if (seqno == 0) {
+> >               set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
+> > @@ -3021,16 +3016,15 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+> >
+> >               btdata->qca_dump.ram_dump_size = dump_size;
+> >               btdata->qca_dump.ram_dump_seqno = 0;
+> > -             sk_ptr += offsetof(struct qca_dump_hdr, data0);
+> > -             sk_len -= offsetof(struct qca_dump_hdr, data0);
+> > +
+> > +             skb_pull(skb, offsetof(struct qca_dump_hdr, data0));
+> >
+> >               usb_disable_autosuspend(udev);
+> >               bt_dev_info(hdev, "%s memdump size(%u)\n",
+> >                           (pkt_type == HCI_ACLDATA_PKT) ? "ACL" : "event",
+> >                           dump_size);
+> >       } else {
+> > -             sk_ptr += offsetof(struct qca_dump_hdr, data);
+> > -             sk_len -= offsetof(struct qca_dump_hdr, data);
+> > +             skb_pull(skb, offsetof(struct qca_dump_hdr, data));
+> >       }
+> >
+> >       if (!btdata->qca_dump.ram_dump_size) {
+> > @@ -3050,7 +3044,6 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+> >               return ret;
+> >       }
+> >
+> > -     skb_pull(skb, skb->len - sk_len);
+> >       hci_devcd_append(hdev, skb);
+> >       btdata->qca_dump.ram_dump_seqno++;
+> >       if (seqno == QCA_LAST_SEQUENCE_NUM) {
+> > @@ -3078,68 +3071,58 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+> >   /* Return: true if the ACL packet is a dump packet, false otherwise. */
+> >   static bool acl_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *skb)
+> >   {
+> > -     u8 *sk_ptr;
+> > -     unsigned int sk_len;
+> > -
+> >       struct hci_event_hdr *event_hdr;
+> >       struct hci_acl_hdr *acl_hdr;
+> >       struct qca_dump_hdr *dump_hdr;
+> > +     struct sk_buff *clone = skb_clone(skb, GFP_ATOMIC);
+> > +     bool is_dump = false;
+> >
+> > -     sk_ptr = skb->data;
+> > -     sk_len = skb->len;
+> > -
+> > -     acl_hdr = hci_acl_hdr(skb);
+> > -     if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
+> > +     if (!clone)
+> >               return false;
+> >
+> > -     sk_ptr += HCI_ACL_HDR_SIZE;
+> > -     sk_len -= HCI_ACL_HDR_SIZE;
+> > -     event_hdr = (struct hci_event_hdr *)sk_ptr;
+> > -
+> > -     if ((event_hdr->evt != HCI_VENDOR_PKT) ||
+> > -         (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
+> > -             return false;
+> > +     acl_hdr = skb_pull_data(clone, sizeof(*acl_hdr));
+> > +     if (!acl_hdr || (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE))
+> > +             goto out;
+> >
+> > -     sk_ptr += HCI_EVENT_HDR_SIZE;
+> > -     sk_len -= HCI_EVENT_HDR_SIZE;
+> > +     event_hdr = skb_pull_data(clone, sizeof(*event_hdr));
+> > +     if (!event_hdr || (event_hdr->evt != HCI_VENDOR_PKT))
+> > +             goto out;
+> >
+> > -     dump_hdr = (struct qca_dump_hdr *)sk_ptr;
+> > -     if ((sk_len < offsetof(struct qca_dump_hdr, data)) ||
+> > -         (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
+> > -         (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
+> > -             return false;
+> > +     dump_hdr = skb_pull_data(clone, sizeof(*dump_hdr));
+> > +     if (!dump_hdr || (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
+> > +        (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
+> > +             goto out;
+> >
+> > -     return true;
+> > +     is_dump = true;
+> > +out:
+> > +     consume_skb(clone);
+> > +     return is_dump;
+> >   }
+> >
+> >   /* Return: true if the event packet is a dump packet, false otherwise. */
+> >   static bool evt_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *skb)
+> >   {
+> > -     u8 *sk_ptr;
+> > -     unsigned int sk_len;
+> > -
+> >       struct hci_event_hdr *event_hdr;
+> >       struct qca_dump_hdr *dump_hdr;
+> > +     struct sk_buff *clone = skb_clone(skb, GFP_ATOMIC);
+> > +     bool is_dump = false;
+> >
+> > -     sk_ptr = skb->data;
+> > -     sk_len = skb->len;
+> > -
+> > -     event_hdr = hci_event_hdr(skb);
+> > -
+> > -     if ((event_hdr->evt != HCI_VENDOR_PKT)
+> > -         || (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
+> > +     if (!clone)
+> >               return false;
+> >
+> > -     sk_ptr += HCI_EVENT_HDR_SIZE;
+> > -     sk_len -= HCI_EVENT_HDR_SIZE;
+> > +     event_hdr = skb_pull_data(clone, sizeof(*event_hdr));
+> > +     if (!event_hdr || (event_hdr->evt != HCI_VENDOR_PKT))
+> > +             goto out;
+> >
+> > -     dump_hdr = (struct qca_dump_hdr *)sk_ptr;
+> > -     if ((sk_len < offsetof(struct qca_dump_hdr, data)) ||
+> > -         (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
+> > -         (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
+> > -             return false;
+> > +     dump_hdr = skb_pull_data(clone, sizeof(*dump_hdr));
+> > +     if (!dump_hdr || (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS) ||
+> > +        (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
+> > +             goto out;
+> >
+> > -     return true;
+> > +     is_dump = true;
+> > +out:
+> > +     consume_skb(clone);
+> > +     return is_dump;
+> >   }
+> >
+> >   static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
+>
