@@ -1,207 +1,240 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from TYDPR03CU002.outbound.protection.outlook.com (mail-japaneastazon11023099.outbound.protection.outlook.com [52.101.127.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2421F5F6;
-	Wed,  7 May 2025 07:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746603999; cv=none; b=tV6tsGGg9/luEb4oUKrShmAuRTDZvTqT/aZrtkSikTf6PHRMHdren3izaVi6PICpYvy2V+3wv9e4i3J4g6kKPObBlw0gfz4d9TqKUlp52xVPBlmNznJ414+/3mo8JeRgmGP4icry0NclGAxMDaPOx8y24ftGw6s4oAJrpFn39fI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746603999; c=relaxed/simple;
-	bh=CSJbBMxbiFZ9Dwrizn0+7PYBa9x5P9Q4GNd96rnCSSk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qrIX0g1lBhxbUyLqifpNTSy5goNmWc9tfR3BRUgthw96Q7kFPtbzn+hDbfiLx+kX1flvmGsfIkV8/oC604N1Mpejyp95z9ow4lG5+n4dhaa+PlRZhduTfux2TMW9uAColLaFnm65+IukPUYJ32pSRaYy4T5gFsfPVsvfILCCvMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af47d.dynamic.kabel-deutschland.de [95.90.244.125])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D000161EA1BF8;
-	Wed, 07 May 2025 09:46:24 +0200 (CEST)
-Message-ID: <98f52c3b-349f-4a32-9a47-443996c95bd5@molgen.mpg.de>
-Date: Wed, 7 May 2025 09:46:24 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370C8273F9
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 May 2025 07:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.127.99
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746604248; cv=fail; b=ZJ6KkAEhGn7vJb3Qal3OEbLC9B+rjPb7Gf3MO80grSMjx4F145u148+8r6phory45LOcVbTdGbAev9uVnQ4rFboo5OkUg3xpHMKoLZQT3BaIAsVFWHmJBAc8iTQxZg/emFH+y5KX9DMJhbgafyPhrWeYWIZW56ls1lY4jt7x80Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746604248; c=relaxed/simple;
+	bh=CrVRhran7kvw9Vqnru61B+HU8OaVqzkIYQ0m4XmQzcc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=nVETjTNDMplpfdutDK3HhXS/l1IiDGsF6TLPpXFj9LHYtRzomFZpedPM+B4U8knR3nDGRI7CWlRrvu9BhF3A+HVG5U9N+uAhLvzZ1Fo7sVPCZ7LbG2kH+gK+c+wkP+AADLro4tivCK0fIsdrCmUfEYHP99QlfSDieD0sJy6YWd0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=PJ6Rz3VJ; arc=fail smtp.client-ip=52.101.127.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="PJ6Rz3VJ"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CbxA2oEmrS6ZLpTMqCtWj6k6jx9QOZoBucisB7akGuiWc6nIKtAhlAoBCM5lo4306DMiYJYACZ7NaWizZvbHI7XpS9U5JUHuvALPJtFQjUj5KnJArl3npz9RMKt6uPSGanha1qQ9HC+s6eEhFns13Wiuons+L4wYpp5KYmw9hu6mXtqgUiZsPFDlg3CcqZrs+ZuEpkrULptZkzuE02RgpMmA2nnGXOFODLXualgK8N9DPe8SD30QQ17Ab9L7qR1psJTz/dcutNQTQcmsBX3RhjFKYgNMA3g4Ws38ZFfT2j2hscR0I2vctGB0Uvgj7ek2Kk6avCnrH2P5YE7SvXlYoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gu/5sXG1zPA/F+JVRnQR2Dksxia5UA0msWDaeACN0aQ=;
+ b=NY8dQCZwC/Q5bDfC+cLdsz/Z5g0CvR0N5gu6keFUpqShrmkHCgS+q7selltUGs3reGBQ0q6l9Go8Xyz+7NuLeosqLsh5lhFb3pf/7EUoX50Ea092BfIOtnYl/cZHboDnTvcdlU3B9yAmIhNPTIwpt4MCWNhuRrT9qA2RXgTYrmFaIBjeKvyC21Y1POAKyTAaQQNzN6RW5ebrBuUpGbDPp48I1L1t798glVHG/GhQyHwcH6SatIpbISJoJDMfs/V5pXgSwRXcmmJwpcZrYTJ7cU0q44jaWj8r2Sfq0xH1nN2PWVnIKxd9Av7NiRnQdF2kzRPGMnwlInHbvIQIVKQLfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
+ dkim=pass header.d=amlogic.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gu/5sXG1zPA/F+JVRnQR2Dksxia5UA0msWDaeACN0aQ=;
+ b=PJ6Rz3VJdp6rQpXkHty/kT7ExvMfH+DD3PwUbhHtSD4UdPOoImjgei3wLT+cpzAtWzUrimW/a/vmh9w2XhZXLIWWOu8xasH2mrI7E2ZeMCsZ2XeSczi02TgHlkv8d62Zs7Mycoj7vZeKQ8ThIf5M0xKCqqx1t0GxdP6rrac6VlxnWw/jBXQAwz2jnVTBk2LlFE9C3uI/GtJTrxro9pbMniRKSaZk+3EjzPQeqgJQUuDZfu9qSbvgE9DABvbrH9zMTgtwpMu7Z7XhXhFfTep0S6silsp6iiFolYvyeRePGU4WYVdICSRuC+nesdFLeo48rF3JiZjmclix1Ky8Cy1GEQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amlogic.com;
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+ by SEZPR03MB7049.apcprd03.prod.outlook.com (2603:1096:101:e0::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Wed, 7 May
+ 2025 07:50:41 +0000
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd%5]) with mapi id 15.20.8699.026; Wed, 7 May 2025
+ 07:50:41 +0000
+Message-ID: <f1eced24-89c9-459a-8253-42de7aacfe9b@amlogic.com>
+Date: Wed, 7 May 2025 15:50:20 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ bluez v2] bass: Set the service connection flag when
+ BASS connected
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+References: <20250403-bass-v2-1-7925bb16468a@amlogic.com>
+ <CABBYNZKW23-P_8OZGTz-bQ2b2vZX_SbxA_hEJ=BAbk6Bkmwsrw@mail.gmail.com>
+ <bfb733a1-b39a-4a33-bd3a-aa9d25339cc1@amlogic.com>
+Content-Language: en-US
+From: Yang Li <yang.li@amlogic.com>
+In-Reply-To: <bfb733a1-b39a-4a33-bd3a-aa9d25339cc1@amlogic.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TYCPR01CA0150.jpnprd01.prod.outlook.com
+ (2603:1096:400:2b7::19) To JH0PR03MB7468.apcprd03.prod.outlook.com
+ (2603:1096:990:16::12)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: fix socket matching ambiguity between BIS and
- CIS
-To: Yang Li <yang.li@amlogic.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250507-iso-v1-1-6f60d243e037@amlogic.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250507-iso-v1-1-6f60d243e037@amlogic.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|SEZPR03MB7049:EE_
+X-MS-Office365-Filtering-Correlation-Id: 40635c60-2429-496d-6b2c-08dd8d3bdcfe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aXNWTFpoY3czUmErM0FVd05zQVVMYnBIdFdoSnR2TmpzRExrR2NqUjJucWJj?=
+ =?utf-8?B?ZGZJNjhYdFRNL1h5dDBEN1dLU1lyY2JGQTdPazBTRFVMQlp5OGhwZWZsVHg4?=
+ =?utf-8?B?K1VwQjN1ei9FS09KdEgxbHdPeXpSMEVTT2Ryc1Q2NGJyTjZiU2pLc3FNY3kr?=
+ =?utf-8?B?S0x0Y01GcUZSdWJXMjB0emlYMll3K2YzTE52cTd3VVBvMk1BbWlvYWVJQW5S?=
+ =?utf-8?B?c2VJanZoQmd3dXk1eUF0Rnc3eWFodnM2eWs4WlVYOFpJcDN4K09EMmpEN29E?=
+ =?utf-8?B?SjhpUXZSTGNoa0M2S0NEZS9tS2tkY2xVVGNrWGNCK3RYbTJoUHl6OGFqcllO?=
+ =?utf-8?B?TFc2RmZKMUIwK3VWZFBRbktuN1lmV242ams3M2tEcng1QkNtNnhtVU1QdGs5?=
+ =?utf-8?B?NFVyT2tFZ0wxbkt1enUxcytvNHpMM3hNcjhURFR3VzVMNFk1WjVXWW1rbEFs?=
+ =?utf-8?B?d2ljc25YN29nbmREUUVpeW1yWEE4K2dWLzBGeHVSOG1VQnRTaEhhRTEwZDFj?=
+ =?utf-8?B?Sm5NSWs0Q25wbHRTNVFqd0NDT3FkQWp1d1hSbzh3SlAzZHJwMDFUY3FYUFZi?=
+ =?utf-8?B?Mlg5dHo5TDFTbTZlc1EvSndtMGhSZ3JpM21KZ25BSGlITGpKcW9UNUtUaFNm?=
+ =?utf-8?B?OUljV2RDWWNmNXJMWFRNNXZTNmxNMUwvbXlLYXJQeHEwWGVIVmk2c01XWFM0?=
+ =?utf-8?B?VmlNQWNnVmxiU2kzMCtPVThaWENmL1RBbC84emRZN3BBQkVGajFjUkRKcDY0?=
+ =?utf-8?B?akFLM0pUMmZSbTNiWjRDbzBSZ2hKK2RsSjQ5T3lSQzdYbUZ6ZnpPcnJFdnNw?=
+ =?utf-8?B?a1dMWFVuRmx4MEZtNlRnc2x5WEtvYmYydVJwZnp3akJSY1oyNzg3MXlHZHVL?=
+ =?utf-8?B?UlVqRHZmUFRsZ0kzT1FqRzJ0dWlReTh2bnU2YUl4SUdiVGx6UnpkVzVEbkNO?=
+ =?utf-8?B?NHc5MXRDUTVuR2cwTTVubVpLNUpoN3AxWVc0djQ0QVpGQTlRd241Yi81bG84?=
+ =?utf-8?B?b3VvZWhIUGptYnZobnl5K2x1UHBuM0J1dkVsMWttUkkrOXA0RGc0RXNmeVY2?=
+ =?utf-8?B?bzdPK094ZFpQczJaTmozL1JhMmlKUXAwT1lkTGJ4K0o3UVBxQ3ZoMnlpZjh0?=
+ =?utf-8?B?NHRSeFl1WGhSem5KWmx3TWNIdTZUbi82RUU0NWppWHhlN0NaTEJLa2NnSC93?=
+ =?utf-8?B?eEl6TC9qa2poWjZUVDdBVXM5UHNtQnl1OTZBTTlON2ZPeTlxb2VuY3dFYnNN?=
+ =?utf-8?B?bGE1b0VjVkEya1hzalZYdmhrMFBMY1k4aWs4Ry91YWVWMURwYUZUbWxwYXNs?=
+ =?utf-8?B?UmtHWklpL25GRUhWWHdoeFJ1dHE0K0JXTXJsMnFUMU0zNW84c0xZRzlURG96?=
+ =?utf-8?B?SThhazVkL3hSNmI5dy9Bazd3OEF2UEo4dVczc2FSVlFYck1DVncrYlNuSjlP?=
+ =?utf-8?B?RmVKNk0ycmRjVnV5cmc1eXN4cnpLYy91RTk4dGpPc0p4QXl3Wm1oTlJyVG5q?=
+ =?utf-8?B?R05OaVlJSUhibTJwdWhZeHJ0UnRqWk85MHVvMkxiZUJvbFhVNHE4Znp5bnRn?=
+ =?utf-8?B?amZCUllaNnJuS0V0SVZqbjNEeHplNlF6REhSTnphb1VLL1JnV3VXSlNmZ01E?=
+ =?utf-8?B?YVdySm1pNkJ3Rldzc3FnOVFEWlpJa0lVeG1KMzRvdFYvVE5OaXpQK3hMdERr?=
+ =?utf-8?B?ejcvMkF2N2FWYUJPeStTTERCTmJ6b2tMb241b2NjVUVHWDg3UGpTUlJDY29v?=
+ =?utf-8?B?R29OSE93bi94QzNtZTRjSWNpQmIxUFZSTGMzQ3d6QmtpdTk3dk5tejhnWXl1?=
+ =?utf-8?Q?NB+rk/DJN29onmVTfX1CJHZnK/TBvfPrXocv8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?a3laWGl1NFJtVmFGa0NkS3pKR2UrUzBsbXg5UklINFNwMHNxOXFueVJ3c1lv?=
+ =?utf-8?B?Mithc1BIcTJMZklpM0MrQ3d4Uyt5Q0JIUC9MeGlDcnNXd2dmMks1c0ZmSWw3?=
+ =?utf-8?B?RUpQOFFTUlc5UFl0VitnNEtZc1BhQWJGWFVIckZRSUFrRDZvWC9pZGJTcXU0?=
+ =?utf-8?B?dVJiR3Y2bDVYc2lyVHh6d2ZwR1VoblA0Nnh5aDJmUngrNTc4RjcvQ0dDOGVF?=
+ =?utf-8?B?dk1SRmVkZy9VT2RkUHRCbHFUNEI3dDRDeDI1OWplM0ZhMUo0eG43QnhUbDdm?=
+ =?utf-8?B?Tld0MkNJZ2xUYnBHQlZaRXpqQWRvcVVGaVJDbW4zYkVEaXd6NkVWSE1DQnV1?=
+ =?utf-8?B?cUhxNDhzKytZSUltbEdwMGdKVUFGZUY2UUdxQkZxR0psM0U4Ui8xMEg2SUph?=
+ =?utf-8?B?bm85YUh2Q1MzdXloWWVXL1U2UnM1QVZLQ1BVa01HYUlhVVptdk5uVDZ6K3Iv?=
+ =?utf-8?B?cThQNzVjeXRaTXBpa0w4R3RHc3JpV0grQWZlZWpNR3phdnIwLytNZ0JuM05w?=
+ =?utf-8?B?N2U1ZEV3U01rVUltaFc2MlhNVkt5RHlHM0Q0UFRLZ0tHZTlPcjFpTi9qVVdk?=
+ =?utf-8?B?SkZyQ2JZbFpBS1RCbEtybHhjNis5ZVpxV1YxRUUyckRGaEdtdDY3eEdleGFi?=
+ =?utf-8?B?Yk4ybEU2bkU4aUk0NmRDNHNMdllEVmpzZ0xuZ0RoWEdOT0RvbTZUcjVrb1g4?=
+ =?utf-8?B?dS9TSkpFVk51YmVYeHZRWXFoa2I0b0REOHVpbmw4bWcxVGtnVzMwa0pnNmtk?=
+ =?utf-8?B?RlBZWlVMU2l4ZUg4YWVwaExmdzAwdUJCVWhQL1N0Mzc4QlM5M0FCclVpaG9n?=
+ =?utf-8?B?MFVLRXBzdDNmQVFWUlpCT25sYlNuQ1o5bmsyK01SYW1DZmM4cFZaMTNzQTdx?=
+ =?utf-8?B?YUJNUEcvWHpJY2lxcTdHbW4zcjF5T0VCbk43ZXFPYmpPWG91MU5MaTJoNDRN?=
+ =?utf-8?B?bldRalVLa0ErcnF3RTdlbkZ2eStlTFBTdDVXdTdySzZIVVVrYzdCS1diOEJJ?=
+ =?utf-8?B?YzMvYnNKV1FvYUltTUpKNTdVZk03YUxPdHowVTJ2MSsvamhadmR0S20vemdM?=
+ =?utf-8?B?Q2VCL256Nzl5VVBxUVZYVmhHQzdBNFc0K25HZ3NEVU1halgxZGdJTkFxNjQ0?=
+ =?utf-8?B?TXhxQ0JDa0l2bFc4Tkw4LzEwR3p3TTVONHduZHdYYXdxdDRlcnE0a285bXRX?=
+ =?utf-8?B?ajdUN2pCZCt4TDhZY2pOSHBlVkRKRWp2WFNoUFlNQ2dEaWFvY1BuU1ExdmNJ?=
+ =?utf-8?B?cDZaZWEzNWRwdkJtdEUyMEFxTDJ2THJVU05Vei8xbUJ1YXVMaEEvbEo4dkNs?=
+ =?utf-8?B?STVOUFdZSVZNR1drS2xycUVuMUhHT1BORWtyZW1jOGcwNUdsekJTM3RvbmNJ?=
+ =?utf-8?B?UGhGM25ieDlPbjhBekhWb25JeTlRS1hGSXZMVFkxeWFQT2FJOUxxdVRDbHdC?=
+ =?utf-8?B?dEhPVklXYUQ0Z2NOSlFhWWRtTHVaNWJDbWJHZVlWMTVtdjByVE1TdVA3QjE5?=
+ =?utf-8?B?NkMvK0tTTTFCZ0E0ZWZEeDdLancxcGZjVmllYWR3MElGUGlOL2tSVUp0YVNk?=
+ =?utf-8?B?WXh5d0gzSzRmckZneTBaaFArVkd6U2dRZklxK3dIUXhFcm1jcWkrakRWTGhx?=
+ =?utf-8?B?cjZaRnI0ejhORngxSWpaWVB4V2pkUjV1Tkh0MFFOK29ZU0F3cFlHb1FWMTU3?=
+ =?utf-8?B?OEZId0UrbjFFeExQZlQrZWN4NnpJNDFjdXJLMDlEZmFCRGJ5a1NiTEdVVXB2?=
+ =?utf-8?B?Nk8yYldsNDZKSTdwNk5TUHN3cWdQeGhEV09GT3UydkNIUm5FUUtDNjcwaDM3?=
+ =?utf-8?B?MUJrRCt0c2hPcVh3NW5IME95ODMrenUrMXl4eStYQ2lXYXVGNGlZcmZHaDJO?=
+ =?utf-8?B?dzNQTjgzaXFMRnVZMklsTE14K3FacXJtSlhGR0YvTnd2N2VTWmV5YlpaYmpV?=
+ =?utf-8?B?TTJKNDU0RWE3aVlhSlNxa2ptdS85SkQyTG1aSFBkbjhtMldoeFcycHQ2S1Rl?=
+ =?utf-8?B?VFN2d3AxMno4SW55a0craytPYlloeHA4S1FRRFEyYkdNelVCRHNYMzNHc3Jn?=
+ =?utf-8?B?L2hrR2NON2pIS29LblV4Uk5MdU1PbXpZODFEMzU3dFphUFdJQy9ER1M1Q2pU?=
+ =?utf-8?Q?p+35/tIx3eeleCELfzpKsGP+S?=
+X-OriginatorOrg: amlogic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40635c60-2429-496d-6b2c-08dd8d3bdcfe
+X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2025 07:50:41.0544
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zeDiwH7YTnPaHInrdS5x2sWqbZJk+4X9zUSxoECah1avObVI/QbQ9RW4DIsE2T1IwNGUMwFh5zJa+D5wC4sYXA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR03MB7049
 
-Dear Yang,
+Hi Luiz,
+A gentle ping, thanks.
+
+> Hi Luiz,
+>
+>
+>> [ EXTERNAL EMAIL ]
+>>
+>> Hi Yang,
+>>
+>> On Wed, Apr 2, 2025 at 11:37 PM Yang Li via B4 Relay
+>> <devnull+yang.li.amlogic.com@kernel.org> wrote:
+>>> From: Yang Li <yang.li@amlogic.com>
+>>>
+>>> When BASS serice connected, set the service states to
+>>> BTD_SERVICE_STATE_CONNECTED. Otherwise, the device will
+>>> timeout and be removed, triggering the automatic termination
+>>>   of BIG.
+>>>
+>>> issue: https://github.com/bluez/bluez/issues/1144
+>>>
+>>> Signed-off-by: Yang Li <yang.li@amlogic.com>
+>>> ---
+>>> Changes in v2:
+>>> - Set the BASS service connection success flag in the connect_cb 
+>>> function.
+>>> - Link to v1: 
+>>> https://patch.msgid.link/20250402-bass-v1-1-3e753841faa5@amlogic.com
+>>> ---
+>>>   profiles/audio/bass.c | 2 ++
+>>>   1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+>>> index c36f43277..c28d9d1ad 100644
+>>> --- a/profiles/audio/bass.c
+>>> +++ b/profiles/audio/bass.c
+>>> @@ -321,6 +321,8 @@ static void connect_cb(GIOChannel *io, GError 
+>>> *err, void *user_data)
+>>>          if (bt_bap_stream_set_io(stream, fd)) {
+>>>                  g_io_channel_set_close_on_unref(io, FALSE);
+>>>          }
+>>> +
+>>> + btd_service_connecting_complete(setup->dg->service, 0);
+>> Ok, do we mark it as disconnected when the BIS is disconnected?
+>
+> Yes, the service will be marked as disconnected after the BASS service 
+> is disconnected.
+>
+> static int bass_disconnect(struct btd_service *service)
+> {
+>     ......
+>     btd_service_disconnecting_complete(service, 0);
+>
+>     return 0;
+> }
+>
+>> In
+>> case we are acting as assistante then there is probably no reason to
+>> keep the device object around after it has been pushed to the remote
+>> sink.
+> I don't think so. As an Assistant, the mobile phone needs to record 
+> the source information configured for the BIS sink. The record of the 
+> source device will only be cleared when the BIS source is removed.
+>>>   }
+>>>
+>>>   static bool link_enabled(const void *data, const void *match_data)
+>>>
+>>> ---
+>>> base-commit: 0efa20cbf3fb5693c7c2f14ba8cf67053ca029e5
+>>> change-id: 20250402-bass-66200bb7eba1
+>>>
+>>> Best regards,
+>>> -- 
+>>> Yang Li <yang.li@amlogic.com>
+>>>
+>>>
+>>>
+>>
+>> -- 
+>> Luiz Augusto von Dentz
 
 
-Thank you for your patch.
-
-Am 07.05.25 um 09:30 schrieb Yang Li via B4 Relay:
-> From: Yang Li <yang.li@amlogic.com>
-
-It’d be great if you could start by describing the problem.
-
-> The iso_get_sock function adds dst address matching to
-> distinguish BIS and CIS sockets.
-> 
-> Link: https://github.com/bluez/bluez/issues/1224
-
-How can this patch be tested?
-
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
->   net/bluetooth/hci_event.c | 35 ++++++++++++++++++++---------------
->   net/bluetooth/iso.c       | 12 +++++++++---
->   2 files changed, 29 insertions(+), 18 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 66052d6aaa1d..c1f32e98ef8a 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -6413,6 +6413,8 @@ static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
->   
->   	conn->sync_handle = le16_to_cpu(ev->handle);
->   	conn->sid = HCI_SID_INVALID;
-> +	conn->dst = ev->bdaddr;
-> +	conn->dst_type = ev->bdaddr_type;
->   
->   	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, BIS_LINK,
->   				      &flags);
-> @@ -6425,7 +6427,8 @@ static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
->   		goto unlock;
->   
->   	/* Add connection to indicate PA sync event */
-> -	pa_sync = hci_conn_add_unset(hdev, BIS_LINK, BDADDR_ANY,
-> +
-
-Why the extra blank line?
-
-> +	pa_sync = hci_conn_add_unset(hdev, BIS_LINK, &ev->bdaddr,
->   				     HCI_ROLE_SLAVE);
->   
->   	if (IS_ERR(pa_sync))
-
-
-Kind regards,
-
-Paul
-
-
-> @@ -6456,13 +6459,6 @@ static void hci_le_per_adv_report_evt(struct hci_dev *hdev, void *data,
->   
->   	hci_dev_lock(hdev);
->   
-> -	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, BIS_LINK, &flags);
-> -	if (!(mask & HCI_LM_ACCEPT))
-> -		goto unlock;
-> -
-> -	if (!(flags & HCI_PROTO_DEFER))
-> -		goto unlock;
-> -
->   	pa_sync = hci_conn_hash_lookup_pa_sync_handle
->   			(hdev,
->   			le16_to_cpu(ev->sync_handle));
-> @@ -6470,6 +6466,13 @@ static void hci_le_per_adv_report_evt(struct hci_dev *hdev, void *data,
->   	if (!pa_sync)
->   		goto unlock;
->   
-> +	mask |= hci_proto_connect_ind(hdev, &pa_sync->dst, ISO_LINK, &flags);
-> +	if (!(mask & HCI_LM_ACCEPT))
-> +		goto unlock;
-> +
-> +	if (!(flags & HCI_PROTO_DEFER))
-> +		goto unlock;
-> +
->   	if (ev->data_status == LE_PA_DATA_COMPLETE &&
->   	    !test_and_set_bit(HCI_CONN_PA_SYNC, &pa_sync->flags)) {
->   		/* Notify iso layer */
-> @@ -6993,6 +6996,8 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
->   			set_bit(HCI_CONN_PA_SYNC, &bis->flags);
->   
->   		bis->sync_handle = conn->sync_handle;
-> +		bis->dst = conn->dst;
-> +		bis->dst_type = conn->dst_type;
->   		bis->iso_qos.bcast.big = ev->handle;
->   		memset(&interval, 0, sizeof(interval));
->   		memcpy(&interval, ev->latency, sizeof(ev->latency));
-> @@ -7038,13 +7043,6 @@ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
->   
->   	hci_dev_lock(hdev);
->   
-> -	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, BIS_LINK, &flags);
-> -	if (!(mask & HCI_LM_ACCEPT))
-> -		goto unlock;
-> -
-> -	if (!(flags & HCI_PROTO_DEFER))
-> -		goto unlock;
-> -
->   	pa_sync = hci_conn_hash_lookup_pa_sync_handle
->   			(hdev,
->   			le16_to_cpu(ev->sync_handle));
-> @@ -7054,6 +7052,13 @@ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
->   
->   	pa_sync->iso_qos.bcast.encryption = ev->encryption;
->   
-> +	mask |= hci_proto_connect_ind(hdev, &pa_sync->dst, ISO_LINK, &flags);
-> +	if (!(mask & HCI_LM_ACCEPT))
-> +		goto unlock;
-> +
-> +	if (!(flags & HCI_PROTO_DEFER))
-> +		goto unlock;
-> +
->   	/* Notify iso layer */
->   	hci_connect_cfm(pa_sync, 0);
->   
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index 6e2c752aaa8f..1dc233f04dbe 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -641,11 +641,12 @@ static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
->   			continue;
->   
->   		/* Exact match. */
-> -		if (!bacmp(&iso_pi(sk)->src, src)) {
-> +		if (!bacmp(&iso_pi(sk)->src, src)
-> +		     && !bacmp(&iso_pi(sk)->dst, dst)
-> +			){
->   			sock_hold(sk);
->   			break;
->   		}
-> -
->   		/* Closest match */
->   		if (!bacmp(&iso_pi(sk)->src, BDADDR_ANY)) {
->   			if (sk1)
-> @@ -1962,7 +1963,7 @@ static void iso_conn_ready(struct iso_conn *conn)
->   		}
->   
->   		if (!parent)
-> -			parent = iso_get_sock(&hcon->src, BDADDR_ANY,
-> +			parent = iso_get_sock(&hcon->src, &hcon->dst,
->   					      BT_LISTEN, NULL, NULL);
->   
->   		if (!parent)
-> @@ -2203,6 +2204,11 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
->   	} else {
->   		sk = iso_get_sock(&hdev->bdaddr, BDADDR_ANY,
->   				  BT_LISTEN, NULL, NULL);
-> +		if (!sk)
-> +			sk = iso_get_sock(&hdev->bdaddr, bdaddr,
-> +					  BT_LISTEN, NULL, NULL);
-> +		else
-> +			iso_pi(sk)->dst = *bdaddr;
->   	}
->   
->   done:
