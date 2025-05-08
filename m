@@ -1,64 +1,48 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from m.b4.vu (m.b4.vu [203.16.231.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E897195FE8;
-	Thu,  8 May 2025 06:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3650F2248A6;
+	Thu,  8 May 2025 07:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.16.231.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746687272; cv=none; b=Q1tEKhyolTEBQ90L+6m8D09ao3FeJ/6qZfFQ1miXoaSrYFEdfm35yINMSRKJA1yiDHUgMf7X9eUXIAXU54n6OHZPj7ReubgHwrGo+z4GjhFapCe7kpBQP+dNIUCq6c85nLZ6iM4Vu/h8leuz60uV8j3njPg1flSQQHjOawdTHwU=
+	t=1746689830; cv=none; b=pv7F02Xgnjx7or3QfSqaEmfD+U9cA6ktM2Qycjo1RDuH7OQmXD7Ar8mshu3Pzukdia0I2eLSJZVGOiZ5kxD9hq9Z6pzvk6NrUeFzCAeYQIuXRK6infCb21tGSOlN/Xrn93WvOUuzyxnuuBefqe6Ctmymajmcj10UFeImQqsYCSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746687272; c=relaxed/simple;
-	bh=eRZIKtysuS6oTcrjeE85a1+Xwq0Zc6EtWiLFsCUxq20=;
+	s=arc-20240116; t=1746689830; c=relaxed/simple;
+	bh=PDN/gK0e9nksO/e0fMKNuCkmsVxa4j1m/bDsuxAY8dU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qDjecmCmr/WH9mEGasg71pS8Nx1yvnun0InMNQwXVQ2WqlC8KEovoIg9bKsXBgy/nKMntPHHYRgp2TLWPUeVRK/EeAqPl9lla/RusyvyFQQswslt7D5Q2K6BxRZqlvLSjZSW/GTc+5MvoD1hYp0g5j5HETA/pGxKqTQd19KUW9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ccndsvSv; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=j8x3HRnLSNoscuDsjfhEzN1uRO4wJUhvOMAD78JhT3MAygWnG2G8fbqOtqW1ipEgesJMmg0JzjTZbFZhJ7PM4qZEBAp8DYbvW7iihyVNUpEZe+7XK8ImKFxLJpZhAQxQH3sgNyVH+sl/bk6cOOzPtD3RcRd8xsyDJeZgeqLouqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=b4.vu; spf=pass smtp.mailfrom=b4.vu; dkim=pass (2048-bit key) header.d=b4.vu header.i=@b4.vu header.b=Um7yZ+3/; arc=none smtp.client-ip=203.16.231.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=b4.vu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=b4.vu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ccndsvSv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746687272; x=1778223272;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eRZIKtysuS6oTcrjeE85a1+Xwq0Zc6EtWiLFsCUxq20=;
-  b=ccndsvSvvu9PSlOKL16573hY9QpfCgyfX8tFjDCqItOn0loAw416PosA
-   8doaatKMyoV9UmIlk7USWmeB5ZeyRNHe3TQrFZQBjk/CKCUlcAapmK50U
-   G5lpwmLOLGFWtGFQNfn3Yh6hlPXtEr34sfm7t6s/H2eYkE2lPTPyPqC4W
-   dJHVsvw9tdD9lK/p4CiwnH9rZo+CgI4Jn5l30DxqU1sQZS7vw2MBf0kR1
-   Oyiv6MW/GzIu9OO22X/dIPX1tAiKSw5DaOSe+wfFGIcIbUqUn4bxX3l0x
-   YDzfLRT0GJnXzkzkzq/Folzs0SPOUNuN8IzsvrmteIPck6UrjTmOp1vO+
-   A==;
-X-CSE-ConnectionGUID: ImxGJ9MBTZmvOn0yc7+4Aw==
-X-CSE-MsgGUID: yTe75xBXQkCCAMmkL+zR5A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="59441404"
-X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
-   d="scan'208";a="59441404"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 23:54:31 -0700
-X-CSE-ConnectionGUID: zjAAhvi/SFCAlbDqxA/ZUQ==
-X-CSE-MsgGUID: 9XKYUGeJRBOc703HN88BZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
-   d="scan'208";a="137130582"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 07 May 2025 23:54:28 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uCv9G-000Aip-0g;
-	Thu, 08 May 2025 06:54:26 +0000
-Date: Thu, 8 May 2025 14:54:25 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-Subject: Re: [PATCH] Bluetooth: fix socket matching ambiguity between BIS and
- CIS
-Message-ID: <202505081427.1Y3wyo7v-lkp@intel.com>
-References: <20250507-iso-v1-1-6f60d243e037@amlogic.com>
+	dkim=pass (2048-bit key) header.d=b4.vu header.i=@b4.vu header.b="Um7yZ+3/"
+Received: by m.b4.vu (Postfix, from userid 1000)
+	id E15EE6698FAF; Thu,  8 May 2025 17:00:44 +0930 (ACST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 m.b4.vu E15EE6698FAF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=b4.vu; s=m1;
+	t=1746689444; bh=6UXt1BLwGoaNZgKxHK1YJO3spw1jLrC52dMEz3YS0QI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Um7yZ+3/iqSsjao6eljDCKxaWAD+DncNagXdz3mFXGIxRezqt6Knlx0GrD3xHWfXP
+	 qxq6un9Z/s2RkIqLMR11NyVmddaS1QKCYLZKdz/Tr5PFIGf7rXuSFH/xhauV/BhCdo
+	 zwuZ8/uAd5P/K9NSfxGKkOUjh5cplYywUU7UOmBX29KU/SH8tzFBWhr98vSP2P9zw9
+	 5gdKanB0U5oNavB7LnwEbfp9X7DWHmW1xA3TdThKMO2bBijagCZ54pvxws8neVWaUz
+	 IKu2WmvL2PONMkvIGrMTQ8ZOGKST2wzya6qhZc8Y4R0a+S252X3zHZIO1y1x81EiaB
+	 bi2te+GomZUIA==
+Date: Thu, 8 May 2025 17:00:44 +0930
+From: "Geoffrey D. Bennett" <g@b4.vu>
+To: stable@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Hao Qin <hao.qin@mediatek.com>
+Cc: linux-bluetooth@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>,
+	Chris Lu <chris.lu@mediatek.com>, linux-sound@vger.kernel.org,
+	Benedikt Ziemons <ben@rs485.network>, pmenzel@molgen.mpg.de,
+	tiwai@suse.de, geraldogabriel@gmail.com,
+	regressions@lists.linux.dev, gregkh@linuxfoundation.org
+Subject: [STABLE 6.12/6.14] Bluetooth MediaTek controller reset fixes
+Message-ID: <aBxdpIabalg073AU@m.b4.vu>
+References: <Z+W6dmZFfC7SBhza@m.b4.vu>
+ <Z+XN2a3141NpZKcb@m.b4.vu>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -67,85 +51,128 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250507-iso-v1-1-6f60d243e037@amlogic.com>
+In-Reply-To: <Z+XN2a3141NpZKcb@m.b4.vu>
 
-Hi Yang,
+Hi stable@vger.kernel.org,
 
-kernel test robot noticed the following build errors:
+Could you please apply:
 
-[auto build test ERROR on f3daca9b490154fbb0459848cc2ed61e8367bddc]
+1. Commit a7208610761ae ("Bluetooth: btmtk: Remove resetting mt7921
+before downloading the fw") to v6.12.x (it's already in
+v6.14).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yang-Li-via-B4-Relay/Bluetooth-fix-socket-matching-ambiguity-between-BIS-and-CIS/20250507-153347
-base:   f3daca9b490154fbb0459848cc2ed61e8367bddc
-patch link:    https://lore.kernel.org/r/20250507-iso-v1-1-6f60d243e037%40amlogic.com
-patch subject: [PATCH] Bluetooth: fix socket matching ambiguity between BIS and CIS
-config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20250508/202505081427.1Y3wyo7v-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250508/202505081427.1Y3wyo7v-lkp@intel.com/reproduce)
+2. Commit 33634e2ab7c6 ("Bluetooth: btmtk: Remove the resetting step
+before downloading the fw") to v6.12.x and v6.14.x.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505081427.1Y3wyo7v-lkp@intel.com/
+These fixes address an issue with some audio interfaces failing to
+initialise during boot on kernels 6.11+. As noted in my original
+analysis below, the MediaTek Bluetooth controller reset increases the
+device setup time from ~200ms to ~20s and can interfere with other USB
+devices on the bus.
 
-All errors (new ones prefixed by >>):
+Thanks,
+Geoffrey.
 
-   net/bluetooth/hci_event.c: In function 'hci_le_per_adv_report_evt':
->> net/bluetooth/hci_event.c:6469:60: error: 'ISO_LINK' undeclared (first use in this function); did you mean 'SCO_LINK'?
-    6469 |         mask |= hci_proto_connect_ind(hdev, &pa_sync->dst, ISO_LINK, &flags);
-         |                                                            ^~~~~~~~
-         |                                                            SCO_LINK
-   net/bluetooth/hci_event.c:6469:60: note: each undeclared identifier is reported only once for each function it appears in
-   net/bluetooth/hci_event.c: In function 'hci_le_big_info_adv_report_evt':
-   net/bluetooth/hci_event.c:7055:60: error: 'ISO_LINK' undeclared (first use in this function); did you mean 'SCO_LINK'?
-    7055 |         mask |= hci_proto_connect_ind(hdev, &pa_sync->dst, ISO_LINK, &flags);
-         |                                                            ^~~~~~~~
-         |                                                            SCO_LINK
-
-
-vim +6469 net/bluetooth/hci_event.c
-
-  6449	
-  6450	static void hci_le_per_adv_report_evt(struct hci_dev *hdev, void *data,
-  6451					      struct sk_buff *skb)
-  6452	{
-  6453		struct hci_ev_le_per_adv_report *ev = data;
-  6454		int mask = hdev->link_mode;
-  6455		__u8 flags = 0;
-  6456		struct hci_conn *pa_sync;
-  6457	
-  6458		bt_dev_dbg(hdev, "sync_handle 0x%4.4x", le16_to_cpu(ev->sync_handle));
-  6459	
-  6460		hci_dev_lock(hdev);
-  6461	
-  6462		pa_sync = hci_conn_hash_lookup_pa_sync_handle
-  6463				(hdev,
-  6464				le16_to_cpu(ev->sync_handle));
-  6465	
-  6466		if (!pa_sync)
-  6467			goto unlock;
-  6468	
-> 6469		mask |= hci_proto_connect_ind(hdev, &pa_sync->dst, ISO_LINK, &flags);
-  6470		if (!(mask & HCI_LM_ACCEPT))
-  6471			goto unlock;
-  6472	
-  6473		if (!(flags & HCI_PROTO_DEFER))
-  6474			goto unlock;
-  6475	
-  6476		if (ev->data_status == LE_PA_DATA_COMPLETE &&
-  6477		    !test_and_set_bit(HCI_CONN_PA_SYNC, &pa_sync->flags)) {
-  6478			/* Notify iso layer */
-  6479			hci_connect_cfm(pa_sync, 0);
-  6480	
-  6481			/* Notify MGMT layer */
-  6482			mgmt_device_connected(hdev, pa_sync, NULL, 0);
-  6483		}
-  6484	
-  6485	unlock:
-  6486		hci_dev_unlock(hdev);
-  6487	}
-  6488	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On Fri, Mar 28, 2025 at 08:44:49AM +1030, Geoffrey D. Bennett wrote:
+> Hi all,
+> 
+> Sorry, I see that an identical patch has already been applied to
+> bluetooth-next
+> https://lore.kernel.org/linux-bluetooth/20250315022730.11071-1-hao.qin@mediatek.com/
+> 
+> While I'm glad the issue is being addressed, my original patch
+> https://lore.kernel.org/linux-bluetooth/Z8ybV04CVUfVAykH@m.b4.vu/
+> contained useful context and tags that didn't make it into the final
+> commit.
+> 
+> For getting this fix into current kernel releases 6.12/6.13/6.14, I
+> think the patch needs the "Cc: stable@vger.kernel.org" tag that was in
+> my original submission but missing from Hao's. Since this is causing
+> significant issues for users on kernels 6.11+ (audio interfaces
+> failing to work), it's important this gets backported.
+> 
+> Hao, is this something you can do? I think the instructions at
+> https://www.kernel.org/doc/html/v6.14/process/stable-kernel-rules.html#option-3
+> need to be followed, but I've not done this before.
+> 
+> Thanks,
+> Geoffrey.
+> 
+> On Fri, Mar 28, 2025 at 07:22:06AM +1030, Geoffrey D. Bennett wrote:
+> > This reverts commit ccfc8948d7e4d93cab341a99774b24586717d89a.
+> > 
+> > The MediaTek Bluetooth controller reset that was added increases the
+> > Bluetooth device setup time from ~200ms to ~20s and interferes with
+> > other devices on the bus.
+> > 
+> > Three users (with Focusrite Scarlett 2nd Gen 6i6 and 3rd Gen Solo and
+> > 4i4 audio interfaces) reported that since 6.11 (which added this
+> > commit) their audio interface fails to initialise if connected during
+> > boot. Two of the users confirmed they have an MT7922.
+> > 
+> > Errors like this are observed in dmesg for the audio interface:
+> > 
+> >   usb 3-4: parse_audio_format_rates_v2v3(): unable to find clock source (clock -110)
+> >   usb 3-4: uac_clock_source_is_valid(): cannot get clock validity for id 41
+> >   usb 3-4: clock source 41 is not valid, cannot use
+> > 
+> > The problem only occurs when both devices and kernel modules are
+> > present and loaded during system boot, so it can be worked around by
+> > connecting the audio interface after booting.
+> > 
+> > Fixes: ccfc8948d7e4 ("Bluetooth: btusb: mediatek: reset the controller before downloading the fw")
+> > Closes: https://github.com/geoffreybennett/linux-fcp/issues/24
+> > Bisected-by: Benedikt Ziemons <ben@rs485.network>
+> > Tested-by: Benedikt Ziemons <ben@rs485.network>
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Geoffrey D. Bennett <g@b4.vu>
+> > ---
+> > Changelog:
+> > 
+> > v1 -> v2:
+> > 
+> > - Updated commit message with additional information.
+> > - No change to this patch's diff.
+> > - Dropped alternate patch that only reverted for 0x7922.
+> > - Chris, Sean, Hao agreed to reverting the change:
+> >   https://lore.kernel.org/linux-bluetooth/2025031352-octopus-quadrant-f7ca@gregkh/T/#m0b31a9a8e87b9499e1ec3370c08f03e43bfb54bf
+> > 
+> >  drivers/bluetooth/btmtk.c | 10 ----------
+> >  1 file changed, 10 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> > index 68846c5bd4f7..4390fd571dbd 100644
+> > --- a/drivers/bluetooth/btmtk.c
+> > +++ b/drivers/bluetooth/btmtk.c
+> > @@ -1330,13 +1330,6 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+> >  		break;
+> >  	case 0x7922:
+> >  	case 0x7925:
+> > -		/* Reset the device to ensure it's in the initial state before
+> > -		 * downloading the firmware to ensure.
+> > -		 */
+> > -
+> > -		if (!test_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags))
+> > -			btmtk_usb_subsys_reset(hdev, dev_id);
+> > -		fallthrough;
+> >  	case 0x7961:
+> >  		btmtk_fw_get_filename(fw_bin_name, sizeof(fw_bin_name), dev_id,
+> >  				      fw_version, fw_flavor);
+> > @@ -1345,12 +1338,9 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+> >  						btmtk_usb_hci_wmt_sync);
+> >  		if (err < 0) {
+> >  			bt_dev_err(hdev, "Failed to set up firmware (%d)", err);
+> > -			clear_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags);
+> >  			return err;
+> >  		}
+> > 
+> > -		set_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags);
+> > -
+> >  		/* It's Device EndPoint Reset Option Register */
+> >  		err = btmtk_usb_uhw_reg_write(hdev, MTK_EP_RST_OPT,
+> >  					      MTK_EP_RST_IN_OUT_OPT);
+> > --
+> > 2.45.0
+> > 
+> > 
+> > 
