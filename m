@@ -1,226 +1,160 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5B628ECE5;
-	Fri,  9 May 2025 10:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D182686B1
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 May 2025 11:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746785847; cv=none; b=ePGGGfAQ967jQMyFXQG2Z5A5t2Xkd6E+TRzMnCdR4ppz8O0rq0fQG7z17H7Lz551mpif/Elz1corLsOX7M5Ik/er6KjYQqqcJFZVHP6s8ZlK9nM+SfEHsO9eXtQ02PEIjGbf54/2rw4KhlgDEiXpeUiw9E52Rn1tYM0Uh0khGCc=
+	t=1746788543; cv=none; b=TnjO6X08ID1XioVDIhH3Fe/Bt2KrclUK7wyQpwbFF+J7PVjV95aFRyVaxf2TbPguMEJlAKjygCuFpl3ab7qNASxlTzYN+AlRqVMmtTckz02YWiivUsJVjTBNARdogN0t4GAvJjC8N40+x2ym/Qi6uEF0NsHEzue0pm5TYL/LH/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746785847; c=relaxed/simple;
-	bh=ERspbipG51pFX6mV5n2SAd5mBzv3jd1f0WkXC/gFTg0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=EKPp5r/AuRpuJ5yXQ6jplYD03qLRwFs4bROiqu6JJ3JmDTOCJooNEvM1sNvJKYJOZ6h0KbXuLkYJS5h9Yi3QPZm2wcWnMTl0c3w42D9axoT5aSdUcJQhZaLLHPZxjBKJtxNMMwx9P5Dounf1uVsGCQWzO+LZ1+45fxp4LYPe6Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxJgE99x; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1746788543; c=relaxed/simple;
+	bh=HSawhTljW29bnLPv3RXGaHJb/rCTKwH+R1SpxjX95ZM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=gpBpxa5cPM5kl1OZCf5iv3II8lxpFPv7YPkAkpmCoJ9pt90F6EPUBYiZI7R+9Hyt4U3zgAqPkk+uRcTjFyAfHebf/LIde1Iwrq/PhtNkeQe0xA3RlYyMftnQ6m/yJKdAKsCzN0tkCkHUp08HjEHExFfu18QhZS9zV3V7pzyW/Yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mvofHFrD; arc=none smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxJgE99x"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0B03DC4CEE9;
-	Fri,  9 May 2025 10:17:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746785847;
-	bh=ERspbipG51pFX6mV5n2SAd5mBzv3jd1f0WkXC/gFTg0=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=mxJgE99xSSPrlgt6XY1E9bnAItSskRc9megA7f9M0O8711TeJF4+r4r2KxWIWrKx7
-	 IWUBuwHFuG/rD4C3h9ltWEwzhAy+4eK1O0jl7VOkuLfp0utQ6QBw/27iYnNJmG3RRW
-	 Ml2k31ZhNaVVZSQshv1A2U3TGgyYvUCslXsTgVD4IcnyScxwQea8DvJ9AkxFbnZ8FO
-	 gGGVQsS/AddM0Yaby0sNbBXclmUTpokJuCj5Jjx+B0IGv2Gb7kPmwnPzPDiNEGh73M
-	 VIn2/2JOGuXHi3hK51i90Vl1JOW/AFhtrRsls1EkXGj9C21wSNShGUL7OIYQIiqBXH
-	 qjwkq1mF5AH8g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA12C3ABBC;
-	Fri,  9 May 2025 10:17:26 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Fri, 09 May 2025 18:17:04 +0800
-Subject: [PATCH v2] Bluetooth: fix socket matching ambiguity between BIS
- and CIS
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvofHFrD"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-72ec58e45baso1356268a34.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 May 2025 04:02:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746788540; x=1747393340; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wAHSFEaOdQR/EuR7jv7FPB9CgERJ9TSv9cFs5yeLcrM=;
+        b=mvofHFrDgbcPNG8nHS7H0f7ctLw/w67rvkOLQjEVxjrju7QMbKL6lYXBij48nmX16e
+         l90dj9c/UKf/q53BQAcb+AcHZ1/smNvX8UeCfDIiv7+brmSgjvuDareRy5IStjr1GZQ+
+         hAKw3XVE4dLuBTOsikRim4wiE3e3TdPRpD18ipMuQmztP1kVtHZFnRG6o0XKQ9qehVtD
+         RhEF/7CkDLt1mfRYETFftCJxVsC/EOl64BnjJE9j93lMdQskF2tSvXodeJPX0H4ibaNc
+         /G3OT93LDYHxNw6R6yIrkXCUVb0bnP37ceUQXGuqNZv/KMHK9aqKoYDSk3xnJnIN7wMr
+         xvzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746788540; x=1747393340;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wAHSFEaOdQR/EuR7jv7FPB9CgERJ9TSv9cFs5yeLcrM=;
+        b=fkaWxRXFfx9OfT8w1Fp+fqf4tmp5+qeH/itcvjju9TSaXhvukH0xwc99tXvGXFknwF
+         uFJMSxflIJLyEhLy35XMcE6w/Y61Pdni2d4Y35Y/1S7tO4il5MiuqD56l+YeDl3S0MYt
+         SjIj9sbAM5n/+YZD7pGDHApA8bQOgpfK0B/THEIGIJoTT8/nsyXeNcqIPyrwdaRpEj1u
+         YQ2k5ChOl1zN9M8mS0zJ09AGHSuhradjsvs7KF+6+FprY3kfKzUOPswAbQkvaCsbwXyf
+         o3JaOkHOUf7whS2OQ+G6V6GIjGgTk69zgsrVFa/A7/37JfbJn0xyqq7ziEC7pCfyIGcy
+         O+bw==
+X-Gm-Message-State: AOJu0YyI0S4x6UB/Nw+NdpC5dQxaTZcy4vtr1Z4Ls4twxwPOpcWScD2s
+	2XAOuP8syrT+yHWGNlH1aZHKV77qSKUHRvvHD545TEnJh1UxuA+JT1EiVA==
+X-Gm-Gg: ASbGncsuW85L2wq6No4qUtbkMHpybs+HgNIagPggtM/Z5yMiFGvQoWFYZqArCKDFZd+
+	/XC+SHMwsOcu/eU+eqIwyeVY+ubbKfuBevLpOO9F1HrRaURM/9fNGOfke9jzAAP+JzHTSPYw0S2
+	ZZ22sNXcizNhzDiGrlXeqiTUXbEX8mURZv59n0zbQ18PE1rkXTWCMCDdNhSRwxyf0wDSpY1XyKr
+	gnhpYbuq76SofekA/ee/UItFEDyAFtYagFqiLtiw/X2KrHjQd7F5IKKL8Oo+9otI8pSosjXnwS3
+	doKAGyFBXptJMwVozC0FpDLJAgm30hWageW+T51E4lDmiw==
+X-Google-Smtp-Source: AGHT+IEB2qVI1H8t6+Hjz3gCwJl0ANUDMUjBgdCkixsmhc57BY38qds29ZHSMaJcWjMXopLpGUvjew==
+X-Received: by 2002:a05:6830:61ce:b0:727:42aa:e888 with SMTP id 46e09a7af769-73226b6821dmr2065892a34.27.1746788540513;
+        Fri, 09 May 2025 04:02:20 -0700 (PDT)
+Received: from [172.17.0.2] ([13.85.45.118])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-732264d8597sm488616a34.33.2025.05.09.04.02.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 May 2025 04:02:20 -0700 (PDT)
+Message-ID: <681de0bc.050a0220.1b4ddb.530e@mx.google.com>
+Date: Fri, 09 May 2025 04:02:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6584633345982279615=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
+Subject: RE: [v2] Bluetooth: fix socket matching ambiguity between BIS and CIS
+In-Reply-To: <20250509-iso-v2-1-da53bd18c193@amlogic.com>
+References: <20250509-iso-v2-1-da53bd18c193@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6584633345982279615==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250509-iso-v2-1-da53bd18c193@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAB/WHWgC/zWMyw6CMBBFf4XM2po+bFFX/gdhQcsAkwg1rWkwp
- P9ubeLy3NxzDogYCCPcmwMCJorktwLy1IBbhm1GRmNhkFxqrrlhFD0zWujrTVltrYLyfAWcaK+
- Vri+8UHz78KnRJH7r32+rnwQTzEyGj/KikKv2MaxPP5M7O79Cn3P+Ah83fIGYAAAA
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1746785845; l=5072;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=VjVfZ4Q3GK4UA1LAAiFeOM2PfRNRZQCaap54bHro5Y0=;
- b=+duwP9MYf9CGYkQ3dquP8kyUihl8OoaF+YWsMEaJkbD4+niMYXCKvUIp+J79RNyDzSajNaMC8
- TcxAZ2TYNCPBvjqcxsaD93F/itBYSKzFzfG46ydodr2H29obmHEMgob
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+This is automated email and please do not reply to this email!
 
-When the DUT acts as a sink device, and a BIS already exists,
-creating a CIS connection can cause the kernel to incorrectly
-reference the BIS socket. This occurs because the socket
-lookup only checks for state == BT_LISTEN, without
-distinguishing between BIS and CIS socket types.
+Dear submitter,
 
-To fix this, match the destination address (dst addr) during
-ISO socket lookup to differentiate between BIS and CIS sockets
-properly.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=961268
 
-Link: https://github.com/bluez/bluez/issues/1224
+---Test result---
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Changes in v2:
-- Fix compilation errors
-- Improved the problem description for clarity.
-- Link to v1: https://lore.kernel.org/r/20250507-iso-v1-1-6f60d243e037@amlogic.com
----
- net/bluetooth/hci_event.c | 34 +++++++++++++++++++---------------
- net/bluetooth/iso.c       | 12 +++++++++---
- 2 files changed, 28 insertions(+), 18 deletions(-)
+Test Summary:
+CheckPatch                    PENDING   0.37 seconds
+GitLint                       PENDING   0.25 seconds
+SubjectPrefix                 PASS      1.15 seconds
+BuildKernel                   PASS      24.23 seconds
+CheckAllWarning               PASS      26.98 seconds
+CheckSparse                   WARNING   30.38 seconds
+BuildKernel32                 PASS      23.75 seconds
+TestRunnerSetup               PASS      455.29 seconds
+TestRunner_l2cap-tester       PASS      22.12 seconds
+TestRunner_iso-tester         FAIL      41.14 seconds
+TestRunner_bnep-tester        PASS      4.99 seconds
+TestRunner_mgmt-tester        FAIL      121.78 seconds
+TestRunner_rfcomm-tester      PASS      7.71 seconds
+TestRunner_sco-tester         PASS      14.99 seconds
+TestRunner_ioctl-tester       PASS      8.14 seconds
+TestRunner_mesh-tester        PASS      6.38 seconds
+TestRunner_smp-tester         PASS      7.15 seconds
+TestRunner_userchan-tester    PASS      4.90 seconds
+IncrementalBuild              PENDING   0.51 seconds
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 66052d6aaa1d..6b26344ad69f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6413,6 +6413,8 @@ static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
- 
- 	conn->sync_handle = le16_to_cpu(ev->handle);
- 	conn->sid = HCI_SID_INVALID;
-+	conn->dst = ev->bdaddr;
-+	conn->dst_type = ev->bdaddr_type;
- 
- 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, BIS_LINK,
- 				      &flags);
-@@ -6425,7 +6427,7 @@ static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
- 		goto unlock;
- 
- 	/* Add connection to indicate PA sync event */
--	pa_sync = hci_conn_add_unset(hdev, BIS_LINK, BDADDR_ANY,
-+	pa_sync = hci_conn_add_unset(hdev, BIS_LINK, &ev->bdaddr,
- 				     HCI_ROLE_SLAVE);
- 
- 	if (IS_ERR(pa_sync))
-@@ -6456,13 +6458,6 @@ static void hci_le_per_adv_report_evt(struct hci_dev *hdev, void *data,
- 
- 	hci_dev_lock(hdev);
- 
--	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, BIS_LINK, &flags);
--	if (!(mask & HCI_LM_ACCEPT))
--		goto unlock;
--
--	if (!(flags & HCI_PROTO_DEFER))
--		goto unlock;
--
- 	pa_sync = hci_conn_hash_lookup_pa_sync_handle
- 			(hdev,
- 			le16_to_cpu(ev->sync_handle));
-@@ -6470,6 +6465,13 @@ static void hci_le_per_adv_report_evt(struct hci_dev *hdev, void *data,
- 	if (!pa_sync)
- 		goto unlock;
- 
-+	mask |= hci_proto_connect_ind(hdev, &pa_sync->dst, BIS_LINK, &flags);
-+	if (!(mask & HCI_LM_ACCEPT))
-+		goto unlock;
-+
-+	if (!(flags & HCI_PROTO_DEFER))
-+		goto unlock;
-+
- 	if (ev->data_status == LE_PA_DATA_COMPLETE &&
- 	    !test_and_set_bit(HCI_CONN_PA_SYNC, &pa_sync->flags)) {
- 		/* Notify iso layer */
-@@ -6993,6 +6995,8 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 			set_bit(HCI_CONN_PA_SYNC, &bis->flags);
- 
- 		bis->sync_handle = conn->sync_handle;
-+		bis->dst = conn->dst;
-+		bis->dst_type = conn->dst_type;
- 		bis->iso_qos.bcast.big = ev->handle;
- 		memset(&interval, 0, sizeof(interval));
- 		memcpy(&interval, ev->latency, sizeof(ev->latency));
-@@ -7038,13 +7042,6 @@ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
- 
- 	hci_dev_lock(hdev);
- 
--	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, BIS_LINK, &flags);
--	if (!(mask & HCI_LM_ACCEPT))
--		goto unlock;
--
--	if (!(flags & HCI_PROTO_DEFER))
--		goto unlock;
--
- 	pa_sync = hci_conn_hash_lookup_pa_sync_handle
- 			(hdev,
- 			le16_to_cpu(ev->sync_handle));
-@@ -7054,6 +7051,13 @@ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
- 
- 	pa_sync->iso_qos.bcast.encryption = ev->encryption;
- 
-+	mask |= hci_proto_connect_ind(hdev, &pa_sync->dst, BIS_LINK, &flags);
-+	if (!(mask & HCI_LM_ACCEPT))
-+		goto unlock;
-+
-+	if (!(flags & HCI_PROTO_DEFER))
-+		goto unlock;
-+
- 	/* Notify iso layer */
- 	hci_connect_cfm(pa_sync, 0);
- 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 6e2c752aaa8f..1dc233f04dbe 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -641,11 +641,12 @@ static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
- 			continue;
- 
- 		/* Exact match. */
--		if (!bacmp(&iso_pi(sk)->src, src)) {
-+		if (!bacmp(&iso_pi(sk)->src, src)
-+		     && !bacmp(&iso_pi(sk)->dst, dst)
-+			){
- 			sock_hold(sk);
- 			break;
- 		}
--
- 		/* Closest match */
- 		if (!bacmp(&iso_pi(sk)->src, BDADDR_ANY)) {
- 			if (sk1)
-@@ -1962,7 +1963,7 @@ static void iso_conn_ready(struct iso_conn *conn)
- 		}
- 
- 		if (!parent)
--			parent = iso_get_sock(&hcon->src, BDADDR_ANY,
-+			parent = iso_get_sock(&hcon->src, &hcon->dst,
- 					      BT_LISTEN, NULL, NULL);
- 
- 		if (!parent)
-@@ -2203,6 +2204,11 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 	} else {
- 		sk = iso_get_sock(&hdev->bdaddr, BDADDR_ANY,
- 				  BT_LISTEN, NULL, NULL);
-+		if (!sk)
-+			sk = iso_get_sock(&hdev->bdaddr, bdaddr,
-+					  BT_LISTEN, NULL, NULL);
-+		else
-+			iso_pi(sk)->dst = *bdaddr;
- 	}
- 
- done:
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 127, Passed: 122 (96.1%), Failed: 4, Not Run: 1
+
+Failed Test Cases
+ISO Broadcaster Receiver - Success                   Timed out    2.393 seconds
+ISO Broadcaster Receiver SID 0xff - Success          Timed out    1.994 seconds
+ISO Broadcaster Receiver2 - Success                  Timed out    2.010 seconds
+ISO Broadcaster Receiver Encrypted - Success         Timed out    1.986 seconds
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 482 (98.4%), Failed: 4, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.202 seconds
+LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.149 seconds
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.157 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.198 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
-base-commit: f3daca9b490154fbb0459848cc2ed61e8367bddc
-change-id: 20250506-iso-6515893b5bb3
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
+Regards,
+Linux Bluetooth
 
 
+--===============6584633345982279615==--
