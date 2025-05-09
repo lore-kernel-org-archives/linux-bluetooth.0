@@ -1,95 +1,64 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983A022D9E3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 May 2025 20:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0251E47C7
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 May 2025 20:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746824042; cv=none; b=HIyzprVMeWeXLRjwjpggQtKHeq5fawerEAnfk9xJwBkN9n4NkEWNDVot8tQY52Pg14a6akyicyYw1Wxg6jzRRiEH8kcfnXf3PfDNH2W5hYXk6jyyd+dWcl8bOSOWaW+y87WWjtjCgKwvm77RCucmrN16a+nw1MgaypT18MFtf2w=
+	t=1746824380; cv=none; b=M0XC67wmRlwF+DjJqU6mgZqxby8MqNBA3/6Zgd+JT326D8EJqem7g0VEcYXUcpXeJTIh4pXrRbC5UdnAa1a+Ul5VcskUWsT97gQmjChWcrfXckyCFi91FwWZw6uZY70ZLRbgnItPz26DaoRMwjEUhNH55NFgH47OusAR2Lx9mrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746824042; c=relaxed/simple;
-	bh=02S5GCPMbSn+qM9QQLIzeCgm8S1NSA0as6shqasZp/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sUQSXTB0gqAWRiOrID+SHE9TSgv/VcDkEluBe0HglzhhX96Tc7pRnZQJI78vnCCmOAA69IJ5Hx5vuCeCaTEV/81hmNy5avXZEnMtRUt9M46ichlGgMAjL4scFbpkCN01T8GARh+CnT5wuwqH63n+61wpns41ByOKtpWnjPQLe0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=bi89Kukl; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	s=arc-20240116; t=1746824380; c=relaxed/simple;
+	bh=jT7U1728cEiuH5ymGlV5Q8cf6XH7u/sebDO+CMYgYDc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Kz92RTHWQF7XVQgTLjC8Z/8cknJIVM8KcOGI/1e5WSHeDdYphiRqtIK9PMRcg3S9u6ODfV+VlmmBeisr3U39lunfk9LzD7kVhmMddn1VXW5Vj0Rw1Hy0wHyBFIZOT1MQ0T/Jur36vZZBh/DtgwKCHI1aa4UQvMt3i/X41JIAfLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HeXR24E8; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="bi89Kukl"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6f2c45ecaffso26202166d6.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 May 2025 13:54:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1746824039; x=1747428839; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ztjNrSBaY3P5WyFQyux5qSIUKkFCQR/l4SZOwbof7J8=;
-        b=bi89KuklxJQUqHLxvF6AxpbGyjRwr+UHQ54Vx0BxlrfBDNNzlco3P+9/f3Qb46XGxx
-         WcIvjgMo92XdZ5Rcz73MEFUgDyjU0MEDkGiptp2pBo9ihpFLiKlXxpA8vHpCRFXSF9wq
-         s+CRr67BqwfICjqXU7B9dhmodJKgDwGDo1XiTdbV5lTQcjruwE/mM3BJcTHtKQVxHCbH
-         CLuqgC5VM19/IFxhVLopnys9fZrMojPSbJB2/ue/f0bODsjKaOuoj6esI+ja9UbGBb1U
-         Obi7jxHIdHtciaWFvvcjv88GpLFFPkyzMKQMmnUrrNjjXvrT8E5kL5YaWNngy902bVTE
-         Ktnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746824039; x=1747428839;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ztjNrSBaY3P5WyFQyux5qSIUKkFCQR/l4SZOwbof7J8=;
-        b=azcKela5HLBvhC6lPYMNiw3FNljmj8ItY04d1fyfTq/NGBDpWhQM7fHxJaDQ/JCWAR
-         Kmmxi3gRNMC5B0ouhChCrf3y7T98EBIt+m59IWM4F1hHect11ia7r2bbaKpiyyn6ZgXu
-         2uhEKjgmhEwwebwb1p72ltUMrjy1DdGJGzewy2gCe72uHcWI2I6wrIRQA9C7mVa3iDUY
-         Pbx6WyqBtVh6HIkhJG0uqZEGCWO3UpiI1QJHHIcWox7IalGgSLfsxl9NCsUCY3DNAaTw
-         7CcqfMt+lfobTzKOoYY+MdkaBg2WGhcSLduDRJVQ8g+c2FcZoOxyg9Ug7ek3ApLEDVMA
-         VLmQ==
-X-Gm-Message-State: AOJu0Yx1o4ma5GBizGLnQ+Y+hEaSwwzbnuFrI4kh/IMBRie9MFwTHgpD
-	Y7+m4LPxHtLESVBKgm7wTqow/umGg4xgfcgri+W/0RMIyE1NmZNWfYHYdjxhGF8wRZJoulPlOx1
-	t
-X-Gm-Gg: ASbGncvX7inpIv9snEGVvLgSJNTa5OncYQaghSWw0VmlCXMxbhou8C+NvfcEmb+LBgC
-	zbmB6u/60ZU/D/WYPaYBhjmodyZEuoFd7pLsv359RP7pAQGd2eDhyxuTBZ4hENEC1gs/Uox8gOz
-	tO95qODfcyjUKAjhwt2NhVzM/vuWFRrl4gijnbGI/QotuuhQCTVQZfXufDPDgoUbNlqcGtyVVn6
-	mOhWg/xEz4VEvhSgasjXdFcPUqDIkeKkyWVpeWEbmt/WQxt4tPtaRQ/ou+zKCTkuyQQVQbloIYn
-	THjYVpvDLZlQagsaaSixzkTXo5/iT/s/2j06bjR7O0tRJYt0nRTSmfkTe2jVsZLcQKCDxQ==
-X-Google-Smtp-Source: AGHT+IHVqKlV8RDaQHJ6q6bE0VZspdWvg+VGl/1KK35/eCEeWbIVFA7vBd1iCLYABG063270TJ6iAQ==
-X-Received: by 2002:ad4:4eaf:0:b0:6f5:421b:623c with SMTP id 6a1803df08f44-6f6e47e868cmr69531506d6.25.1746824039122;
-        Fri, 09 May 2025 13:53:59 -0700 (PDT)
-Received: from andromeda.llama-bortle.ts.net ([74.15.46.18])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f6e3a472easm18439646d6.86.2025.05.09.13.53.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 May 2025 13:53:58 -0700 (PDT)
-From: Arun Raghavan <arun@asymptotic.io>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HeXR24E8"
+Received: from github.com (hubbernetes-node-87ff4d4.ac4-iad.github.net [10.52.181.48])
+	by smtp.github.com (Postfix) with ESMTPA id 17106700AB4
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 May 2025 13:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1746824378;
+	bh=0Werhk2aH7T4nfJ4uCy0hO8H2MahEN1z5pUr63AiqxU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=HeXR24E8v+Fc8m9bPeGOec7Rt02PwB8RO0gyMtRBtqpmUIepSGOYtQfwyWsGeXfoU
+	 JFaf/vvO6nJ/kFl7+VfvYn0VYdUSnJ5gNjg6Ls4pPAeBqT3i3YuiyuBvdJABpjvMlF
+	 eQu4y6sW9pLtYpepffNvbK5n0ay0ncBy0PIxwxYM=
+Date: Fri, 09 May 2025 13:59:38 -0700
+From: Arun Raghavan <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@asymptotic.io>,
-	sanchayan@asymptotic.io
-Subject: [PATCH BlueZ] shared/asha: Fix bad parens in a comparison
-Date: Fri,  9 May 2025 16:53:41 -0400
-Message-ID: <20250509205341.557936-1-arun@asymptotic.io>
-X-Mailer: git-send-email 2.49.0
+Message-ID: <bluez/bluez/push/refs/heads/961533/000000-31e40b@github.com>
+Subject: [bluez/bluez] 31e40b: shared/asha: Fix bad parens in a comparison
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/961533
+  Home:   https://github.com/bluez/bluez
+  Commit: 31e40b3db9c282ea1b0603f9a44ebbb2fc6ab2a0
+      https://github.com/bluez/bluez/commit/31e40b3db9c282ea1b0603f9a44ebbb2fc6ab2a0
+  Author: Arun Raghavan <arun@asymptotic.io>
+  Date:   2025-05-09 (Fri, 09 May 2025)
+
+  Changed paths:
+    M src/shared/asha.c
+
+  Log Message:
+  -----------
+  shared/asha: Fix bad parens in a comparison
 
 The last parameter to the memcmp was incorrectly the result of the
 comparison rather than the sizeof()'s value.
----
- src/shared/asha.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/asha.c b/src/shared/asha.c
-index 3e1673488..69906fcc5 100644
---- a/src/shared/asha.c
-+++ b/src/shared/asha.c
-@@ -348,7 +348,7 @@ static void check_probe_done(struct bt_asha *asha)
- 
- 	/* Once we have ROPs & PSM, we should be good to go */
- 	if (asha->psm == 0 || memcmp(asha->hisyncid, zeroes,
--					sizeof(zeroes) == 0))
-+					sizeof(zeroes)) == 0)
- 		return;
- 
- 	if (asha->attach_cb) {
--- 
-2.49.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
