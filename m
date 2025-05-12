@@ -1,131 +1,97 @@
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.7])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228E13FC2;
-	Mon, 12 May 2025 02:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.7
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B97151985
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 May 2025 03:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747017079; cv=none; b=g9epfA0LpeKeump9STJyarY6Hfx+MP+sUpFRJ0A7wD2se74zxB0JPlZmzF2Vckfr2ZqCZO3iNLZywyh5GN3ux4X3K/XJxPXlpw9Y2aaJTnzQoaE8VaojISMKz3SejpfLuVhTGAS2Ay6FBS5qgjqmsH2Fz/FW7wPAiMwS8HlLmk4=
+	t=1747018806; cv=none; b=Rh4ZXNVR2KDzH+L7+hrdFOEX7aa3kXyo6zyf19y3UykUR863OBsvg1cA/2AcTvJioxAVEQV3yHXxhvJM0IXqITKgozwxr2VR/bnD6NK/WsF7daF0Jf+r+MMQWwdQqpEsMFvGj34OmjsipRoX6tmYDXqwwZVouWorrXD7I1bJttA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747017079; c=relaxed/simple;
-	bh=y5PLBRoJK1+ORusmip2HSah/WsWVT44ZrYMSyb5l1Dg=;
-	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=V9x+73l91ODow9ur4oOwqPvzuE/aJlfeuPIOVk0feGXMQzgvqh305s07tFOr6tfNFhSXOkeXG+BMCGLxF0+yQrGu5iW6lF/yTrYjCRQHPDIeICZS7FhjMzznhxSFQF1G9ng5JKyCLR9FSNQKV2/VH9LLflSu7Oe/TIK3Wfv4J3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=fail (1024-bit key) header.d=126.com header.i=@126.com header.b=O9WjdJl9 reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+	s=arc-20240116; t=1747018806; c=relaxed/simple;
+	bh=LZEbYGQ0XcScbZvetMdTFq4Le8BIVtqKcFZyWXsa3gw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Zmzs3keA2wZoVBp/z4OYTkLbLaBNO18v5wt6kCLdk0H9DCTJhv/SPqky/3JCt40At+esMgjAfvkexEp2u6mTAL/AoUg9cKhs9akdOwz0OdnfW0+qJsCGOUsHaXzkr8dlbVodXMr83xyBQ9mVICelieKyzvhSUdX3+2zb9II/bZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NlqnnBoS; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=126.com header.i=@126.com header.b="O9WjdJl9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=0QMExuBa32/6fSfbL/oZA0XrI8wG2vulsg/XaDQxxW0=; b=O
-	9WjdJl9nTFDjGljbzSzr9nYPAnvTeO17/NBOAiILmMyFcM0pZTEnJlJwyiULt7kH
-	T+8IP+N/3jAfnuy7/G7ZiPdOaYskJ6TGB1hragJ2wvRquPaoD/2RPTcEA3B/zmZh
-	N6ZtzkpszFLri4rehZdDDnwjP/P+SAv8V1LfaoDY4M=
-Received: from sunliweis$126.com ( [113.57.237.75] ) by
- ajax-webmail-wmsvr-41-109 (Coremail) ; Mon, 12 May 2025 10:31:03 +0800
- (CST)
-Date: Mon, 12 May 2025 10:31:03 +0800 (CST)
-From: "Liwei Sun" <sunliweis@126.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>,
-	"Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add new VID/PID 13d3/3584 for MT7922
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20240801(9da12a7b)
- Copyright (c) 2002-2025 www.mailtech.cn 126com
-X-NTES-SC: AL_Qu2fBfyauEgt5SiZbekfmUwWhOc+Xcuxufgk2Y5TP5F4jD3j2R8LU2RzJ0TH3NCFCSWdtyinehxLzftBeJBYQZ0pzjC+xsjcTIGABVjB1XB+sQ==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NlqnnBoS"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c597760323so446127885a.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 11 May 2025 20:00:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747018803; x=1747623603; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LZEbYGQ0XcScbZvetMdTFq4Le8BIVtqKcFZyWXsa3gw=;
+        b=NlqnnBoSNVLyUkn4Dzlf0eJBmM1cLddDJon4bAYyaizC5c8Z6/O3JORut6qWLpgxsz
+         motakcn1eFjetEX91m+7qgBdDy5/Zyx0m5ezDlSaOaEwgf0m0SIcIW8UQhOLCCy0fSBT
+         CBvoxwvNxr5p0+4rukLBpuY5Es2sFQI3L0MhRwfkzWCxbcgSCEACXxhtBQmJUvrI3E78
+         FwqY6rOuuhg4D9Wvpf+vNaMYiVP95WRkbee/F3OaMq25qvvoyzJASJczZ4tdSRMGJlMV
+         FhnLD+y5Dj4QwGq4AQ310MS17bFxD9pi2SjgO+3QMIykCip3zThMR+2OqHWGENmGgMdd
+         qd1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747018803; x=1747623603;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LZEbYGQ0XcScbZvetMdTFq4Le8BIVtqKcFZyWXsa3gw=;
+        b=ZDK1mL1pmEUY7TJouqy+kQG0t23ZjQ3Q5a4HgXYcyXe1XsPJz516WjUl75piWho0Of
+         SzBB+ymgbS/QwQGqAShTEg4mGBxRXi7eyYPOp5JuwAKWGJb7pIS4QCCVYTeRIUTKEqQK
+         18Nc3xyqGfmawe4fveR+oQSeL0hsKL9S2ed1bI/WU43dR8nEDvvbN59ivgTxtBthcvfr
+         UKbXk9Nh2Ypx6G4fMVtE+AWSKcBdeKr2elWZWcwFg+we5eR8pLzw4mU7AXpxPRHnKEgA
+         5tRUyi+dO7PEkS4RPdRygHAvncfwdQzUuxswjhQgkmB9QWODEuQGRhVGVmHHAIEn2kpp
+         Lm5w==
+X-Gm-Message-State: AOJu0YynJYUTPGzahFpgHPjpIYOW4QAqEX67ICPrUZhGGhzij4swh4xN
+	qMm9vWrlacBoc3ZPXa9g7BMKjDGZv+0omJQDMbB717i5vliGRY5Koks57g==
+X-Gm-Gg: ASbGncuyW09kyPZW5bljfE2anqVruNwSe3GKtzu2SnTCPwlcq93rm1nWXu8douHMnOJ
+	N93k9p8msnnFKlPPxAKea5Ms6mzIOImTugRzDnnKZxq4EdTzSBeqZykOPwwSCAQWffiDpXjmvlB
+	vsMNJszAH8vgG4dA8Nt68q0jYzGyEg/0IfeVbjD599Qm5S557ZAuKTVj7RJIiknDS4zm/enw/pp
+	o54WydGkNiJC3+f5XiEqow626DFBZgcp+GbyBTkOmPypklBSDkjMA9QZBC7b1NChv5UCv+vT+Fr
+	Wz6rlmb81N/e71p0MwR/TB49j/0HtE75FWCb2qxf0Yw4FCsdQPMuis1Kkw==
+X-Google-Smtp-Source: AGHT+IEsG6W7xGP+eTl89cZmpHvdZ0P8Qi+o7B86EMx5Lk5PuYgKLmFRQFp6ZCeBGKFkqn21PkE90w==
+X-Received: by 2002:a05:620a:44d1:b0:7c5:49d6:733a with SMTP id af79cd13be357-7cd010ffad2mr1708820785a.21.1747018803290;
+        Sun, 11 May 2025 20:00:03 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.62.134])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd00fe61d2sm479495085a.99.2025.05.11.20.00.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 May 2025 20:00:02 -0700 (PDT)
+Message-ID: <68216432.050a0220.24f059.77cc@mx.google.com>
+Date: Sun, 11 May 2025 20:00:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3706509534391623581=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <3fbcee73.2408.196c254dd8f.Coremail.sunliweis@126.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:bSkvCgD3H99nXSFoEoECAA--.20470W
-X-CM-SenderInfo: xvxqzxpzhl2qqrswhudrp/1tbiFgxLW2ghUkLLOAAFsl
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, sunliweis@126.com
+Subject: RE: Bluetooth: btusb: Add new VID/PID 13d3/3584 for MT7922
+In-Reply-To: <3fbcee73.2408.196c254dd8f.Coremail.sunliweis@126.com>
+References: <3fbcee73.2408.196c254dd8f.Coremail.sunliweis@126.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-QXBvbG9naWVzIGZvciB0aGlzIHJlLXNlbmQuIEl0IGFwcGVhcnMgbXkgcHJldmlvdXMgYXR0ZW1w
-dCB0byBzZW5kIHRoaXMgcGF0Y2ggZGlkIG5vdCBzdWNjZXNzZnVsbHkgcmVhY2ggdGhlIG1haWxp
-bmcgbGlzdHMgKGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcgYW5kIGxpbnV4LWtlcm5l
-bEB2Z2VyLmtlcm5lbC5vcmcpLCBhbHRob3VnaCBzb21lIG1haW50YWluZXJzIG1heSBoYXZlIHJl
-Y2VpdmVkIGl0IGRpcmVjdGx5LgpJIGFtIHJlc2VuZGluZyBpdCBub3cgdG8gZW5zdXJlIGl0IGlz
-IHByb3Blcmx5IGRpc3RyaWJ1dGVkIHRvIHRoZSBsaXN0cyBmb3IgcmV2aWV3IGFuZCBkaXNjdXNz
-aW9uLgpJZiB0aGlzIG9uZSBzdGlsbCBmYWlscywgSSBtYXkgdHJ5IGFub3RoZXIgd2F5IHRvIHJl
-cG9ydCB0aGUgbmV3IGhhcmR3YXJlIElELgoKCkZyb20gNGJlZTJlYzU2NDhjNDhlYzVmZTYyYjIz
-MGNhZjI2OTg1Mzk4YjBlMCBNb24gU2VwIDE3IDAwOjAwOjAwIDIwMDEKRnJvbTogTGl3ZWkgU3Vu
-IDxzdW5saXdlaXNAMTI2LmNvbT4KRGF0ZTogVGh1LCAxIE1heSAyMDI1IDE3OjI3OjU5ICswODAw
-ClN1YmplY3Q6IFtQQVRDSF0gQmx1ZXRvb3RoOiBidHVzYjogQWRkIG5ldyBWSUQvUElEIDEzZDMv
-MzU4NCBmb3IgTVQ3OTIyCgpBIG5ldyB2YXJpYW50IG9mIE1UNzkyMiB3aXJlbGVzcyBkZXZpY2Ug
-aGFzIGJlZW4gaWRlbnRpZmllZC4KVGhlIGRldmljZSBpbnRyb2R1Y2VzIGl0c2VsZiBhcyBNRURJ
-QVRFSyBNVDc5MjIsCnNvIHRyZWF0IGl0IGFzIE1lZGlhVGVrIGRldmljZS4KV2l0aCB0aGlzIHBh
-dGNoLCBidHVzYiBkcml2ZXIgd29ya3MgYXMgZXhwZWN0ZWQ6ClsgICAgMy4xNTExNjJdIEJsdWV0
-b290aDogQ29yZSB2ZXIgMi4yMgpbICAgIDMuMTUxMTg1XSBCbHVldG9vdGg6IEhDSSBkZXZpY2Ug
-YW5kIGNvbm5lY3Rpb24gbWFuYWdlciBpbml0aWFsaXplZApbICAgIDMuMTUxMTg5XSBCbHVldG9v
-dGg6IEhDSSBzb2NrZXQgbGF5ZXIgaW5pdGlhbGl6ZWQKWyAgICAzLjE1MTE5MV0gQmx1ZXRvb3Ro
-OiBMMkNBUCBzb2NrZXQgbGF5ZXIgaW5pdGlhbGl6ZWQKWyAgICAzLjE1MTE5NF0gQmx1ZXRvb3Ro
-OiBTQ08gc29ja2V0IGxheWVyIGluaXRpYWxpemVkClsgICAgMy4yOTU3MThdIEJsdWV0b290aDog
-aGNpMDogSFcvU1cgVmVyc2lvbjogMHgwMDhhMDA4YSwgQnVpbGQgVGltZTogMjAyNDExMDYxNjM1
-MTIKWyAgICA0LjY3NjYzNF0gQmx1ZXRvb3RoOiBCTkVQIChFdGhlcm5ldCBFbXVsYXRpb24pIHZl
-ciAxLjMKWyAgICA0LjY3NjYzN10gQmx1ZXRvb3RoOiBCTkVQIGZpbHRlcnM6IHByb3RvY29sIG11
-bHRpY2FzdApbICAgIDQuNjc2NjQwXSBCbHVldG9vdGg6IEJORVAgc29ja2V0IGxheWVyIGluaXRp
-YWxpemVkClsgICAgNS41NjA0NTNdIEJsdWV0b290aDogaGNpMDogRGV2aWNlIHNldHVwIGluIDIz
-MjA2NjAgdXNlY3MKWyAgICA1LjU2MDQ1N10gQmx1ZXRvb3RoOiBoY2kwOiBIQ0kgRW5oYW5jZWQg
-U2V0dXAgU3luY2hyb25vdXMgQ29ubmVjdGlvbiBjb21tYW5kIGlzIGFkdmVydGlzZWQsIGJ1dCBu
-b3Qgc3VwcG9ydGVkLgpbICAgIDUuNjE5MTk3XSBCbHVldG9vdGg6IGhjaTA6IEFPU1AgZXh0ZW5z
-aW9ucyB2ZXJzaW9uIHYxLjAwClsgICAgNS42MTkyMDRdIEJsdWV0b290aDogaGNpMDogQU9TUCBx
-dWFsaXR5IHJlcG9ydCBpcyBzdXBwb3J0ZWQKWyAgICA1LjYxOTMwMV0gQmx1ZXRvb3RoOiBNR01U
-IHZlciAxLjIzClsgICAgNi43NDEyNDddIEJsdWV0b290aDogUkZDT01NIFRUWSBsYXllciBpbml0
-aWFsaXplZApbICAgIDYuNzQxMjU4XSBCbHVldG9vdGg6IFJGQ09NTSBzb2NrZXQgbGF5ZXIgaW5p
-dGlhbGl6ZWQKWyAgICA2Ljc0MTI2MV0gQmx1ZXRvb3RoOiBSRkNPTU0gdmVyIDEuMTEKCmxzcGNp
-IG91dHB1dDoKMDQ6MDAuMCBOZXR3b3JrIGNvbnRyb2xsZXI6IE1FRElBVEVLIENvcnAuIE1UNzky
-MiA4MDIuMTFheCBQQ0kgRXhwcmVzcyBXaXJlbGVzcyBOZXR3b3JrIEFkYXB0ZXIKClVTQiBpbmZv
-cm1hdGlvbjoKVDogIEJ1cz0wMSBMZXY9MDEgUHJudD0wMSBQb3J0PTA0IENudD0wMiBEZXYjPSAg
-MyBTcGQ9NDgwICBNeENoPSAwCkQ6ICBWZXI9IDIuMTAgQ2xzPWVmKG1pc2MgKSBTdWI9MDIgUHJv
-dD0wMSBNeFBTPTY0ICNDZmdzPSAgMQpQOiAgVmVuZG9yPTEzZDMgUHJvZElEPTM1ODQgUmV2PSAx
-LjAwClM6ICBNYW51ZmFjdHVyZXI9TWVkaWFUZWsgSW5jLgpTOiAgUHJvZHVjdD1XaXJlbGVzc19E
-ZXZpY2UKUzogIFNlcmlhbE51bWJlcj0wMDAwMDAwMDAKQzoqICNJZnM9IDMgQ2ZnIz0gMSBBdHI9
-ZTAgTXhQd3I9MTAwbUEKQTogIEZpcnN0SWYjPSAwIElmQ291bnQ9IDMgQ2xzPWUwKHdsY29uKSBT
-dWI9MDEgUHJvdD0wMQpJOiogSWYjPSAwIEFsdD0gMCAjRVBzPSAzIENscz1lMCh3bGNvbikgU3Vi
-PTAxIFByb3Q9MDEgRHJpdmVyPWJ0dXNiCkU6ICBBZD04MShJKSBBdHI9MDMoSW50LikgTXhQUz0g
-IDE2IEl2bD0xMjV1cwpFOiAgQWQ9ODIoSSkgQXRyPTAyKEJ1bGspIE14UFM9IDUxMiBJdmw9MG1z
-CkU6ICBBZD0wMihPKSBBdHI9MDIoQnVsaykgTXhQUz0gNTEyIEl2bD0wbXMKSToqIElmIz0gMSBB
-bHQ9IDAgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpF
-OiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAgMCBJdmw9MW1zCkU6ICBBZD0wMyhPKSBB
-dHI9MDEoSXNvYykgTXhQUz0gICAwIEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDEgI0VQcz0gMiBD
-bHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRy
-PTAxKElzb2MpIE14UFM9ICAgOSBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQ
-Uz0gICA5IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDIgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1
-Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9
-ICAxNyBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDE3IEl2bD0xbXMK
-STogIElmIz0gMSBBbHQ9IDMgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERy
-aXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAyNSBJdmw9MW1zCkU6
-ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDI1IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9
-IDQgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAg
-QWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICAzMyBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9
-MDEoSXNvYykgTXhQUz0gIDMzIEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDUgI0VQcz0gMiBDbHM9
-ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAx
-KElzb2MpIE14UFM9ICA0OSBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0g
-IDQ5IEl2bD0xbXMKSTogIElmIz0gMSBBbHQ9IDYgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0w
-MSBQcm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODMoSSkgQXRyPTAxKElzb2MpIE14UFM9ICA2
-MyBJdmw9MW1zCkU6ICBBZD0wMyhPKSBBdHI9MDEoSXNvYykgTXhQUz0gIDYzIEl2bD0xbXMKSTog
-IElmIz0gMiBBbHQ9IDAgI0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZl
-cj1idHVzYgpFOiAgQWQ9OGEoSSkgQXRyPTAzKEludC4pIE14UFM9ICA2NCBJdmw9MTI1dXMKRTog
-IEFkPTBhKE8pIEF0cj0wMyhJbnQuKSBNeFBTPSAgNjQgSXZsPTEyNXVzCkk6KiBJZiM9IDIgQWx0
-PSAxICNFUHM9IDIgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9YnR1c2IKRTog
-IEFkPThhKEkpIEF0cj0wMyhJbnQuKSBNeFBTPSA1MTIgSXZsPTEyNXVzCgpTaWduZWQtb2ZmLWJ5
-OiBMaXdlaSBTdW4gPHN1bmxpd2Vpc0AxMjYuY29tPgotLS0KIGRyaXZlcnMvYmx1ZXRvb3RoL2J0
-dXNiLmMgfCAyICsrCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0
-IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMK
-aW5kZXggNTAxMmI1ZmY5MmM4Li45ODUwMjcyZTgzZWYgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvYmx1
-ZXRvb3RoL2J0dXNiLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYwpAQCAtNjc4LDYg
-KzY3OCw4IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCBxdWlya3NfdGFibGVb
-XSA9IHsKIAkJCQkJCSAgICAgQlRVU0JfV0lERUJBTkRfU1BFRUNIIH0sCiAJeyBVU0JfREVWSUNF
-KDB4MTNkMywgMHgzNTY4KSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfTUVESUFURUsgfAogCQkJCQkJ
-ICAgICBCVFVTQl9XSURFQkFORF9TUEVFQ0ggfSwKKwl7IFVTQl9ERVZJQ0UoMHgxM2QzLCAweDM1
-ODQpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9NRURJQVRFSyB8CisJCQkJCQkgICAgIEJUVVNCX1dJ
-REVCQU5EX1NQRUVDSCB9LAogCXsgVVNCX0RFVklDRSgweDEzZDMsIDB4MzYwNSksIC5kcml2ZXJf
-aW5mbyA9IEJUVVNCX01FRElBVEVLIHwKIAkJCQkJCSAgICAgQlRVU0JfV0lERUJBTkRfU1BFRUNI
-IH0sCiAJeyBVU0JfREVWSUNFKDB4MTNkMywgMHgzNjA3KSwgLmRyaXZlcl9pbmZvID0gQlRVU0Jf
-TUVESUFURUsgfAotLSAKMi40OS4wCgo=
+--===============3706509534391623581==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3706509534391623581==--
