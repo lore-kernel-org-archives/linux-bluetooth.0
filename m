@@ -1,72 +1,119 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4541C42A82
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 May 2025 11:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582E22741D3
+	for <linux-bluetooth@vger.kernel.org>; Wed, 14 May 2025 11:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747221913; cv=none; b=nMQROz/Cd+HaHbSiNkpdtL7Vnqbf3rNeupVRPZ1n/gVgcnAhYry5kQsFnSpRmMJhTPRIj+fy7CN12w2o5GP4inO8mopgI3cuJALMLFN4Y6VTBXmj+xraZ7EqD/1U8cLwZUUDpWP37gUaxYv1lb7YOIbDwU1bt5KmEYgnBCjlsDU=
+	t=1747222311; cv=none; b=P8QGHjcWTRSiGmkrXDSmdSNsgrwzbRLNBPLVna2PBcak4IDBlJSUit2nuvlARCkbPK5zXyF9KTr2jp82yTZmRLsTKwLdIn0U4W0BmjNSIBEz7t0S5WJgcrVcrpSwwaTKp6gkddpxlKmQN34Cw3gf181sjdQcFPOr+4L+lewEWSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747221913; c=relaxed/simple;
-	bh=VTDFES4vSJYtHCnfpjxmcYRtHXhaOh76zwmXg0eHFZ0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=eegalATzYCtzSVy6tD7Kn55qqPF/6GWOeJHt3MlSlDMprgIn6d1MvozPvkptkZuekNY8+vDhCtC+v6DKjDbEXtkpdqXwzZRFnTHNeWenkkTFN8s4po6EhaYcMi50Z7oaKTp/SMc6vfjZiKVB9XfO1z/r4loktbV04IMi01EaFzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RbdnfB72; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RbdnfB72"
-Received: from github.com (hubbernetes-node-a9cd48c.va3-iad.github.net [10.48.142.31])
-	by smtp.github.com (Postfix) with ESMTPA id 5DBD2E0A11
-	for <linux-bluetooth@vger.kernel.org>; Wed, 14 May 2025 04:25:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1747221911;
-	bh=iDiEPMLqYdMK22drNrAKEPiX5IhzFgVadDBoMrj2hN8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RbdnfB727TWMtclieDhiIZEMNqfVFQMN2r4I3H+cjk80bQ0Ii3ce8OSnUqLoFYeCH
-	 06vv+pyCThKVBy9XRP+m8Bmz4ewvvpgi0E4OTz2huzZzrCzP+5zKKyprl6oMqrGnbt
-	 AK8NkxOhOgcIv09Ptdr0G40IbJ3CMXH7Kr6dd1V0=
-Date: Wed, 14 May 2025 04:25:11 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/962794/000000-774258@github.com>
-Subject: [bluez/bluez] 774258: device: Reply br-connection-key-missing on
- connect...
+	s=arc-20240116; t=1747222311; c=relaxed/simple;
+	bh=1mAyGT46vAMvbIfXfPX0Wgy80QzjkGiAqmPxIPDp220=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=FOc4j0riyPB/qPN9AHDAOdv63jkfOeE4rBqxJ/GsZv6BonzfZ3XVrjHx6SE0+MZJFPqLnQ2w9Ke6kiZhCzQaUwyy9ZeFR5CkUTPxVVXwnlCnKCPJYVcYfjwknQGkyN/rQdqWpcpq3yDswzEfeoi8EzsFxwgHffGr3ROPFcT6mBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id DFDBF61E6479A;
+	Wed, 14 May 2025 13:31:29 +0200 (CEST)
+Message-ID: <601601d6-c2ab-4bd9-917c-1831651cfca6@molgen.mpg.de>
+Date: Wed, 14 May 2025 13:31:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ] device: Reply br-connection-key-missing on
+ connection bonding error
+To: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+References: <20250514112050.17438-1-frederic.danis@collabora.com>
+Content-Language: en-US
+Cc: linux-bluetooth@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250514112050.17438-1-frederic.danis@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/962794
-  Home:   https://github.com/bluez/bluez
-  Commit: 774258b7f0342514bf5c15a71012516f8410f2f0
-      https://github.com/bluez/bluez/commit/774258b7f0342514bf5c15a710125=
-16f8410f2f0
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-14 (Wed, 14 May 2025)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Reply br-connection-key-missing on connection bonding error
-
-Currently when connection is removed while the client is waiting for
-Connect() the failed message is br-connection-canceled, even if this
-is due to bonding error.
-
-This commit reply br-connection-key-missing when connection request
-fails due to bonding error, allowing the client to differentiate
-connection failure reasons.
+Dear Frédéric,
 
 
+Am 14.05.25 um 13:20 schrieb Frédéric Danis:
+> Currently when connection is removed while the client is waiting for
+> Connect() the failed message is br-connection-canceled, even if this
+> is due to bonding error.
+> 
+> This commit reply br-connection-key-missing when connection request
+> fails due to bonding error, allowing the client to differentiate
+> connection failure reasons.
 
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+This sentence is hard to parse for me. Maybe:
+
+Implement to reply with br-connection-key-missing, when the connection 
+request fails due to a bonding error, ….
+
+Also, it’d be great if you added the steps, how to reproduce and test this.
+
+> ---
+>   src/device.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/src/device.c b/src/device.c
+> index c364d72c3..816282eab 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -246,6 +246,7 @@ struct btd_device {
+>   	struct browse_req *browse;		/* service discover request */
+>   	struct bonding_req *bonding;
+>   	struct authentication_req *authr;	/* authentication request */
+> +	uint8_t		bonding_status;
+>   	GSList		*disconnects;		/* disconnects message */
+
+disconnects → disconnect
+
+>   	DBusMessage	*connect;		/* connect message */
+>   	DBusMessage	*disconnect;		/* disconnect message */
+> @@ -3636,6 +3637,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
+>   	DBusMessage *reply;
+>   	bool remove_device = false;
+>   	bool paired_status_updated = false;
+> +	uint8_t bonding_status = device->bonding_status;
+>   
+>   	if (!state->connected)
+>   		return;
+> @@ -3643,6 +3645,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
+>   	state->connected = false;
+>   	state->initiator = false;
+>   	device->general_connect = FALSE;
+> +	device->bonding_status = 0;
+>   
+>   	device_set_svc_refreshed(device, false);
+>   
+> @@ -3658,6 +3661,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
+>   	if (device->connect) {
+>   		DBG("connection removed while Connect() is waiting reply");
+>   		reply = btd_error_failed(device->connect,
+> +				bonding_status ? ERR_BREDR_CONN_KEY_MISSING :
+>   						ERR_BREDR_CONN_CANCELED);
+>   		g_dbus_send_message(dbus_conn, reply);
+>   		dbus_message_unref(device->connect);
+> @@ -6763,6 +6767,8 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+>   
+>   	DBG("bonding %p status 0x%02x", bonding, status);
+>   
+> +	device->bonding_status = status;
+> +
+>   	if (auth && auth->agent)
+>   		agent_cancel(auth->agent);
+>   
+
+
+Kind regards,
+
+Paul
