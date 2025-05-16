@@ -1,35 +1,35 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA432C9A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 May 2025 20:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A324322CBE6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 May 2025 20:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747427485; cv=none; b=VF2fL+OwSb9O3etabf7vppBoy7JaOTQtUP7nLQ/HU/UDN3GGSSeskUWVWKs0Z8mYTW6iDYGEEQWXMhdSGtB7siAnr+ybV/X0g7jkmP1guF9u8ItjQbTAzofdWDsYiwwdqS/lMXDEOvBEnm1OUBJHabk6Kex0QrHSnvo6snNjqtM=
+	t=1747427539; cv=none; b=Nce7NfjbAgbA/L3BZtAaP+Kh+TEqtQMqvnZP6/Eeg/BZLgQDjx1tPaMMMcj+DeP/0EvgxlRlAGn8+NTTzYUrw+2o/PYvXkVbXWStgCcC3w38K72pSW+rcaMhs57F//waZ6jnNH34S72TZPfaErfTI3XuT4c7ke9p81e2LKB8rW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747427485; c=relaxed/simple;
-	bh=LoQV2TQMUnydPz3U0MYNCFd/U9zZr1seWoMINrPvLX0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hy5tKGvC/gV7NgwFcCz+yGsJSoo3AChqTHGyJBAYX9ouXYC3SsUaP/hxPh4XwIRNlqGhwm1SwAQIcC9Vo6Rvy4XyI+rTqVex5iBTACKeNWNvvrK+06oqDfoAqczH+J7HjCZ25jo9yAl7y3hQJtgtJ1o2vl/g7u8e7ZOE1RqNcXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZIyy1lGR; arc=none smtp.client-ip=192.30.252.200
+	s=arc-20240116; t=1747427539; c=relaxed/simple;
+	bh=bPYYZZg+OX9gkLxzyXeSsM45ypYsTg+iVhIftoAPNWY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JrnDZJ1C7MpMsvjDu7abTbN+WczUR1bjhVpxQ+FoBygIiu0VaDMiWKy1qGTHpM7upiy9yJdaZ+J0yUOzVLEvOeKhqG/SvaNNo8muJRNtvnVOpNOVTIoKVsaT+mG16cmim3orR1nwFHRf7Ynxyk8Z2DO2gQa32prG0qiSiWThylw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ja6zyttv; arc=none smtp.client-ip=192.30.252.209
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZIyy1lGR"
-Received: from github.com (hubbernetes-node-dbac0ba.va3-iad.github.net [10.48.133.41])
-	by smtp.github.com (Postfix) with ESMTPA id 994954E02B6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 May 2025 13:31:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ja6zyttv"
+Received: from github.com (hubbernetes-node-ad85c6c.ash1-iad.github.net [10.56.191.32])
+	by smtp.github.com (Postfix) with ESMTPA id A0B3D60111F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 May 2025 13:32:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1747427483;
-	bh=FpY/js9tVt1hCR8ktJs0glcmlI6WNyDYOPXXkr9IO0Q=;
+	s=pf2023; t=1747427536;
+	bh=6BFJ5Jbw152Vx9MKqi/3Z2nUQd/HvgyKegQo4xxRvK0=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ZIyy1lGRz/6tMTbrlXiHY0TU81cbqlWIWBnXYj1PXDaRs79+PKX6KlmnpS6u9gLSD
-	 sKi00h476pNiAbW2tLl8pPBk36xbtmGtsFJZWO8/TyN4feZPYv2GmB/HkXONhRepIY
-	 IO7WkNSws8p1zuERE0z1W67xQPvwoTWRzCUpp/W4=
-Date: Fri, 16 May 2025 13:31:23 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	b=Ja6zyttvKhabd0rtzC5UUwk+0mV9dlwzhS9FAU80r6+HdNJl7cCHPCBsPUMb1USlg
+	 AXdwKFUQa4JbFBG6J+XQ6t8RqiAuSKBdoDjfivXmOWf+dPmuKgLUIE/orlDSK5AOlr
+	 U1mjFggcH0xr5gPznHcgY+VLUrPwx59xIdGyuSSg=
+Date: Fri, 16 May 2025 13:32:16 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/00969b-05f8bd@github.com>
-Subject: [bluez/bluez] 665f35: avdtp: Fix setting in_use flag for local seps
+Message-ID: <bluez/bluez/push/refs/heads/963746/c4c314-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,51 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/963746
   Home:   https://github.com/bluez/bluez
-  Commit: 665f35180ff20ceb994f857bd11f1b31742faf80
-      https://github.com/bluez/bluez/commit/665f35180ff20ceb994f857bd11f1b31742faf80
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-15 (Thu, 15 May 2025)
-
-  Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/avdtp.c
-    M profiles/audio/avdtp.h
-
-  Log Message:
-  -----------
-  avdtp: Fix setting in_use flag for local seps
-
-This removes the assumption that only 1 stream can be configured per
-local sep which prevents multipoint setups where different devices can
-be using the same local endpoint.
-
-
-  Commit: 05f8bd489fd1fbf27dfdc4828bb15aeece3a50a3
-      https://github.com/bluez/bluez/commit/05f8bd489fd1fbf27dfdc4828bb15aeece3a50a3
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-16 (Fri, 16 May 2025)
-
-  Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/a2dp.h
-    M profiles/audio/media.c
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  a2dp: Fix a2dp_sep mapping to a single stream
-
-This removes the assumption that only 1 stream can be configured per
-local sep which prevents multipoint setups where different devices can
-be using the same local endpoint.
-
-Fixes: https://github.com/bluez/bluez/issues/1037
-Fixes: https://github.com/bluez/bluez/issues/1064
-Fixes: https://github.com/bluez/bluez/issues/597
-
-
-Compare: https://github.com/bluez/bluez/compare/00969bdb17ea...05f8bd489fd1
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
