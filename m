@@ -1,192 +1,85 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E261253B59
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 May 2025 18:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902AD1A0BF1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 May 2025 18:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747419616; cv=none; b=XLIgi0PmkKOEV4/slskJLQhQ4hIQxQ4XlSAvMTqqltMEWQIwgek89hpMrjCeVy1poxOZYQlwAaxcB964Hw+LUok5N4TgJu4heU3LKtSAJl+6+lYbsyddXSF1crKdBsTUrOrTRk4aY+AnNhhJNWHbSCAW9GUrze5tn83ha1wFwIQ=
+	t=1747420836; cv=none; b=El6UMhfTqr5djpksZc+xyIDsAa5gtLB8I7UZivnj2TSxWiucGSZSTKKh6TQBQ+JHOaI1d8Aeveqw6+8c8qGDb05kvKb9ePInXqwL/E5u74CQkPX4DS4VIpiI+lGN+QTmUrX/bdI9A2sZjsgZozcmTn4YtKrA99gC1/Ph4ULkVE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747419616; c=relaxed/simple;
-	bh=gysaUbNR+EyljFkS+Rf9WcVwplODwAX9bfcYAFLUZQo=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=bZxixKJS2F3Q98VokvjMWggVyAP6NqpyTSXuT7BVi+6wBwR8otXXQmq90a3u9MgxEAm517UXa1HbF1O5gyxd8aycTQ48VNnrtZzaPJt781QbcMXZQmw+wAywkmmEYfKAZVPTCFw0Obi9339eZEE7zfpwBZey9ZOvU1awa4Z9S8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jMSYCe1Z; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1747420836; c=relaxed/simple;
+	bh=Sw2hW75AGVid0kWO3J8E54DedVYzScQI8x1oxmgBfcw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=aLfZZRwznmYA3hPubcoTUI5H+vwHvGEzt5Ob6Pb0qJV5uQAnUEFlNraS/aKt5/9SnDNgYZA76BSwxr7MYLwpwT1bRkVi1Q1rpKEVjIKALyD7Hcy+WlI/AS5FtJYS7LEmenBLbwJwIU0MjcsSBxw68NaZqw936XUEOGK60Ic7cjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Z2dcwEH4; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jMSYCe1Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747419614; x=1778955614;
-  h=date:from:to:cc:subject:message-id;
-  bh=gysaUbNR+EyljFkS+Rf9WcVwplODwAX9bfcYAFLUZQo=;
-  b=jMSYCe1ZjxT0mS44Y9rZDhxDj5vtPVsjTPNEXei3f2aoIoiwGEnidUaU
-   u8bjbgOr/t1u4LaRKaw9ErriH3WP/ig1ERJwI404jPzieIvHa9e0fxwxP
-   HiScnWt/P2eFNjJmbVDYKCqWMCvDa7nwqZSQzUNGo2NY222WEGNfNfYDR
-   HRnSCwBPwpKLTx8oEyz8aPj3JCF//fowLLvBwqedy3/+i55cisblnMji9
-   tInYgx3EudnjwvcsTrIaxODZsovYMXiYj1y5lgk9lgdYJM/cyUb8l+LtG
-   RxsmSa8kkSpc1OHZCvqjMX5udXhvXg6wXv+to/Sadnm7Qv7535JHs9Tor
-   w==;
-X-CSE-ConnectionGUID: DaPwGo8LSj6CJEArY3Lamg==
-X-CSE-MsgGUID: ePWRc/nCRnSyj59XvtiNTg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11435"; a="49469272"
-X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
-   d="scan'208";a="49469272"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 11:20:13 -0700
-X-CSE-ConnectionGUID: B+MRII54QoGdDd+Ap+RwOQ==
-X-CSE-MsgGUID: O10RiwDuSgGdLLG6oA2ITw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
-   d="scan'208";a="139647993"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 16 May 2025 11:20:13 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uFzfG-000Jbd-2A;
-	Fri, 16 May 2025 18:20:10 +0000
-Date: Sat, 17 May 2025 02:19:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 72d82f47a0190243ceacaec6f2dadf80650075ad
-Message-ID: <202505170213.g5OR5SXo-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Z2dcwEH4"
+Received: from github.com (hubbernetes-node-3780ffb.ash1-iad.github.net [10.56.15.56])
+	by smtp.github.com (Postfix) with ESMTPA id 9DC3260137A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 May 2025 11:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1747420834;
+	bh=OvIxKO/SCBsuYmumyBivSibt+8/Y0tIudqc+adhlvz8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Z2dcwEH4tDmU8TfLvmh67incEyOSDcgdBSPaAzzaggHSkDTxPNNGO50tKeCg1dbL5
+	 qa774vCh2Rg60z0OxeUiSRbQXSwwEhk2Sjc+Olnl9EApxsT/dYXRm3P/0lV4tc0wzB
+	 tYnDl1DL4n6W53b82z+wjevI4Hp3OptclCeHtnHA=
+Date: Fri, 16 May 2025 11:40:34 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/963725/000000-a851eb@github.com>
+Subject: [bluez/bluez] 800b67: org.bluez.Device: Add last-used option to
+ Preferre...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 72d82f47a0190243ceacaec6f2dadf80650075ad  Bluetooth: btusb: Add new VID/PID 13d3/3584 for MT7922
+  Branch: refs/heads/963725
+  Home:   https://github.com/bluez/bluez
+  Commit: 800b67f21c0b86bad6048d1524c3bf7d342821e4
+      https://github.com/bluez/bluez/commit/800b67f21c0b86bad6048d1524c3bf7d342821e4
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-05-16 (Fri, 16 May 2025)
 
-elapsed time: 1446m
+  Changed paths:
+    M doc/org.bluez.Device.rst
+    M doc/settings-storage.txt
 
-configs tested: 115
-configs skipped: 3
+  Log Message:
+  -----------
+  org.bluez.Device: Add last-used option to PreferredBearer
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+This adds last-used option to PreferredBearer which when set would
+make Connect to use the last used bearer first.
 
-tested configs:
-alpha                             allnoconfig    gcc-14.2.0
-alpha                            allyesconfig    gcc-14.2.0
-arc                               allnoconfig    gcc-14.2.0
-arc                         haps_hs_defconfig    gcc-14.2.0
-arc                   randconfig-001-20250516    gcc-13.3.0
-arc                   randconfig-002-20250516    gcc-13.3.0
-arm                               allnoconfig    clang-21
-arm                           imxrt_defconfig    clang-21
-arm                          moxart_defconfig    gcc-14.2.0
-arm                         mv78xx0_defconfig    clang-19
-arm                   randconfig-001-20250516    gcc-7.5.0
-arm                   randconfig-002-20250516    clang-21
-arm                   randconfig-003-20250516    clang-21
-arm                   randconfig-004-20250516    clang-21
-arm                             rpc_defconfig    clang-18
-arm                           sama5_defconfig    gcc-14.2.0
-arm                           sama7_defconfig    clang-21
-arm64                             allnoconfig    gcc-14.2.0
-arm64                 randconfig-001-20250516    gcc-9.5.0
-arm64                 randconfig-002-20250516    gcc-9.5.0
-arm64                 randconfig-003-20250516    gcc-5.5.0
-arm64                 randconfig-004-20250516    gcc-9.5.0
-csky                              allnoconfig    gcc-14.2.0
-csky                                defconfig    gcc-14.2.0
-csky                  randconfig-001-20250516    gcc-14.2.0
-csky                  randconfig-002-20250516    gcc-14.2.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-21
-hexagon                          allyesconfig    clang-21
-hexagon               randconfig-001-20250516    clang-19
-hexagon               randconfig-002-20250516    clang-21
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250516    clang-20
-i386        buildonly-randconfig-002-20250516    gcc-12
-i386        buildonly-randconfig-003-20250516    clang-20
-i386        buildonly-randconfig-004-20250516    clang-20
-i386        buildonly-randconfig-005-20250516    clang-20
-i386        buildonly-randconfig-006-20250516    gcc-12
-i386                                defconfig    clang-20
-loongarch                        allmodconfig    gcc-14.2.0
-loongarch                         allnoconfig    gcc-14.2.0
-loongarch             randconfig-001-20250516    gcc-14.2.0
-loongarch             randconfig-002-20250516    gcc-14.2.0
-m68k                             allmodconfig    gcc-14.2.0
-m68k                              allnoconfig    gcc-14.2.0
-m68k                             allyesconfig    gcc-14.2.0
-m68k                            mac_defconfig    gcc-14.2.0
-microblaze                       allmodconfig    gcc-14.2.0
-microblaze                        allnoconfig    gcc-14.2.0
-microblaze                       allyesconfig    gcc-14.2.0
-microblaze                      mmu_defconfig    gcc-14.2.0
-mips                              allnoconfig    gcc-14.2.0
-mips                          ath25_defconfig    clang-21
-nios2                             allnoconfig    gcc-14.2.0
-nios2                 randconfig-001-20250516    gcc-13.3.0
-nios2                 randconfig-002-20250516    gcc-13.3.0
-openrisc                          allnoconfig    gcc-14.2.0
-openrisc                         allyesconfig    gcc-14.2.0
-openrisc                            defconfig    gcc-14.2.0
-parisc                           allmodconfig    gcc-14.2.0
-parisc                            allnoconfig    gcc-14.2.0
-parisc                           allyesconfig    gcc-14.2.0
-parisc                randconfig-001-20250516    gcc-10.5.0
-parisc                randconfig-002-20250516    gcc-12.4.0
-parisc64                         alldefconfig    gcc-14.1.0
-powerpc                          allmodconfig    gcc-14.2.0
-powerpc                           allnoconfig    gcc-14.2.0
-powerpc                   currituck_defconfig    clang-21
-powerpc               randconfig-001-20250516    gcc-5.5.0
-powerpc               randconfig-002-20250516    gcc-5.5.0
-powerpc               randconfig-003-20250516    clang-17
-powerpc                     tqm8541_defconfig    clang-21
-powerpc64             randconfig-001-20250516    clang-21
-powerpc64             randconfig-002-20250516    clang-21
-powerpc64             randconfig-003-20250516    clang-21
-riscv                             allnoconfig    gcc-14.2.0
-riscv                 randconfig-001-20250516    gcc-7.5.0
-riscv                 randconfig-002-20250516    gcc-14.2.0
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-14.2.0
-s390                  randconfig-001-20250516    gcc-7.5.0
-s390                  randconfig-002-20250516    gcc-7.5.0
-sh                               allmodconfig    gcc-14.2.0
-sh                                allnoconfig    gcc-14.2.0
-sh                               allyesconfig    gcc-14.2.0
-sh                          polaris_defconfig    gcc-14.2.0
-sh                    randconfig-001-20250516    gcc-7.5.0
-sh                    randconfig-002-20250516    gcc-9.3.0
-sparc                            allmodconfig    gcc-14.2.0
-sparc                             allnoconfig    gcc-14.2.0
-sparc                 randconfig-001-20250516    gcc-8.5.0
-sparc                 randconfig-002-20250516    gcc-8.5.0
-sparc64               randconfig-001-20250516    gcc-12.4.0
-sparc64               randconfig-002-20250516    gcc-14.2.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-21
-um                               allyesconfig    gcc-12
-um                    randconfig-001-20250516    clang-21
-um                    randconfig-002-20250516    gcc-12
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250516    clang-20
-x86_64      buildonly-randconfig-002-20250516    gcc-12
-x86_64      buildonly-randconfig-003-20250516    clang-20
-x86_64      buildonly-randconfig-004-20250516    clang-20
-x86_64      buildonly-randconfig-005-20250516    gcc-12
-x86_64      buildonly-randconfig-006-20250516    gcc-12
-x86_64                              defconfig    gcc-11
-x86_64                          rhel-9.4-rust    clang-18
-xtensa                            allnoconfig    gcc-14.2.0
-xtensa                randconfig-001-20250516    gcc-10.5.0
-xtensa                randconfig-002-20250516    gcc-10.5.0
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+  Commit: a851ebf39c6737f0b71e2ae18739c20f2aedca64
+      https://github.com/bluez/bluez/commit/a851ebf39c6737f0b71e2ae18739c20f2aedca64
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-05-16 (Fri, 16 May 2025)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Implement PreferredBearer=last-used
+
+This implementas PreferredBearer=last-use which enables Device.Connect
+to use last used bearer first.
+
+Fixes: https://github.com/bluez/bluez/issues/986
+
+
+Compare: https://github.com/bluez/bluez/compare/800b67f21c0b%5E...a851ebf39c67
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
