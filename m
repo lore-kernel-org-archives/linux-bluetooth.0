@@ -1,121 +1,127 @@
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1602874FA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 May 2025 17:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8B3288C2E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 May 2025 17:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747675652; cv=none; b=UcqnNFdNbbDqjTqoZ1N4RCFYYa+KduRCS/WKz/5HVCHal6fAdBwYuIOUt6LeiUJ6EYpkchPChgVFH4qoG5DnPOZeo2t2t1ZVceNM5LL1TpzLzYNJMh0KaBeyT1ejMh1+TKsxuEEzMntcigMlb9l3us9PzEKFsVlERi9fRXPTjyM=
+	t=1747677351; cv=none; b=XaSqWdIWwNL7dXuvPsswoeOTpcQhxl/J2J98ywtCXZnGQXbouZFU10NpVhAFeNx5P/QGKFrO8BAuPSlUJy6nhhyViEdtPaazldgW/UPgIcb+qt4bhDwLfSUNGNs9sirWIvA5JEK0GttnIUMPodr1wrNq2zRRUPMfiKUfgs0XBaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747675652; c=relaxed/simple;
-	bh=0kAB772pePIEa78fYStfll0cavrQWzChCajzTBxnhsQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=O2bv9OSNxHGxoAr6kAcf9Ijrqj0isbB0m476/j0mexzJ5k03DTX8T/VRVXuIg52EeLuiniqmqPtSMhG3TtB97nTZdQisu45f6xLVInTosjkNhjae+0e4fjJEm3u05ANjSxWom8Vm5wBA+wrjKwXRrBa8aP8kdtEW9K137R9BxVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85e310ba2f9so368963439f.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 May 2025 10:27:30 -0700 (PDT)
+	s=arc-20240116; t=1747677351; c=relaxed/simple;
+	bh=lKxaL20oePCv2sFpFvvHCRuTKgfHvhloMG8dCtAyTd4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Ml6JptiPWzB6teFywR6OAmeTPZThK1YEQtRH247obxutkB45r75SDCceG8xfvNheS2ugJKkmpkmDOiYhCN7fKszFcLZXc8v8fYi0yUbwOIne9RnG0wbRCg8v04Qu7B1q7YklGoTKA9grfgpz84HrZXR/QI7kKMBCwTHUiVBcnJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XydYtKxL; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XydYtKxL"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-74019695377so3718119b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 May 2025 10:55:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747677348; x=1748282148; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sKX0qFCazqK+sqPKqdarJX3eV/xPw53izpe4xOOXTKY=;
+        b=XydYtKxLtumGP/THRnQ9ORhAydblCwy/JAF/2uXbBllVWNhYRxtSpehmaW96Y6C4xu
+         D3or6PY/f4kR+R7qkHCN4lsjrlKEeps0SUQZfpOA6/t/uS9iZDKdmw4DYJb15MujZsiA
+         r+/eLWkO/fGmFxP7hHTLJ62a1F2Wqrrsd2fo56FOHKmntVsOUwX5y0vRCA71BQaMB6WE
+         K2Xt2mSiWh4+V52Wk6qQRCGdWYN4z4wpefGe5SDOVzQAbx7YfJ0ftLsojI+UIAY90ss8
+         OZC3+ykhoEczBxrh37o35e1FPoZSX75t3KXrWCoOjqMe+Rtt3Wkh5QNn76VD/5hpU5Xr
+         6beQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747675650; x=1748280450;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6HQddT6eWN3F0IWqabdJeWfb4X02qL99QSl4DYJc82Q=;
-        b=s8b7+ucbN7mDixKGYnQKb6M97dRCudJN7QfNDpMbfgzher+X7CRsNPmtW9kaqRzT8D
-         fKxq++I8/5vcRabmuhSGBCODKBEwt5zYpd5hF9jXCNRYFwUT08LEflvkvfpbRANjb0L0
-         iLkWaMREbYd93PETVkYAjGTlTDUanFqatmu2z1GG+Zj5gTr2q7ZSpAJ+3+jhvwVsByKF
-         25UAk1O6BJmf5j7Lm0T2NJOGYcj5NW7Bhd8qsMt/KcUN7F8nV8LPo7zPxSVa02ziqvge
-         I1UrDabEuk/HB9iuzpHk0UIhnDvSlvmCHQsJWePG0iwfhyDupWXInawGc3Yj3y8og1Eu
-         5Lsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXb23S6DaxE39+zKmKrttNhAEPArpNtil0XqfFjm8cEIcega2pSjD5ygyPfX6Ma5szt7CQsFRzbtTuABGp3fAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzckWHNQrimMu8LSpiDZjt7dGTDQx2VvbevMAjZ3SbpfDhUSzeU
-	6mmVAVdUu3XFDTVS+OVm9jIkoiy9KMvPBJ7E6DbOr8Nv/kMvarjWEbsbMJ3jmP5tcMuq4aaFvhR
-	0J04KMjseZpGGK7oJYtHG06IMPYGC2EvKm+zHvMkUtPV1Qbo7wTWNVXF235w=
-X-Google-Smtp-Source: AGHT+IGc1hnJlRHNmLmirDP3e2VP+yy7wOrWXyz45hSuNyE0nDypeGZmPFZ3T31SkgWTsMJMf60s2nANLUVPWGUPncVETPB0UfKu
+        d=1e100.net; s=20230601; t=1747677348; x=1748282148;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sKX0qFCazqK+sqPKqdarJX3eV/xPw53izpe4xOOXTKY=;
+        b=H/E4DehOerJ8zgyCqb1pMeyfnp0PvJQuRGib8yVdbx1zlmfFeVc5FY4miWS/mb2mc4
+         hwl8bFexLirTqQaqg0kzhi3dOkWmFSV0rk5QCIPhFprPj5Ni1qHfgyABPh3qzSRV/HUz
+         1Q4kNuwZM3ZGeLJclKLGT1bR8HQwX9/Kw1GybAMtaHCVOJTD8fmiq6ILweT+jw7KOpNX
+         R4hJ7860rv8pH1Ku/lDGZTav+SFXhCmrK21ix3dCN0Osm5xqj38PV88untxJNa8jCZkq
+         5W5a45G4OhKFNztaMRHV9wcLXbq8wZtMDUILBWc9UJxB4KYoV+K4Ti/u29qU0QWSv+J2
+         RI6A==
+X-Gm-Message-State: AOJu0YxeTMT4tvOgEFcML5Dr+im60TEwzrCsvxNktu+P2VwSXek/162v
+	EvpAxFhANa+XTGZ+Fb+xCALCehsyQFx1J4utK0UQ2+dfuR8qLGkRMgW5PxXJiKKoEYr7Eh3mheL
+	TgXhydh+SxVIYnsPlNP5vah0MAZY4eJolaO6sSDQ=
+X-Gm-Gg: ASbGncsYSCXNt9BPUBmg7ITA4pznIox5znqbJhpkxud/P+BG3ArGBr9GzyinaMQ4xio
+	jrXU0kOg+8TWyHsHi9cm07b1vRMyfk5PMwQ077mxxFgLi7Bo4IJo8EJ86zglyDpFoP42i6pO1Y7
+	LpKROu9I2eAO9Q2kKoglAFVo2vF6cv6nOCobYri54z8awqF2hE1W0NRzQznzGhdhR0
+X-Google-Smtp-Source: AGHT+IHeSIjhdAVrRtyXebhIw5dWmDk+er1kBl1hu9TZ2RPoXuKEgawI12bmdwOwXHFTSls76xJDWsrzFGgJ7k97K18=
+X-Received: by 2002:a17:90b:3e8e:b0:2ee:ab29:1a63 with SMTP id
+ 98e67ed59e1d1-30e7d507dd1mr19623791a91.3.1747677348369; Mon, 19 May 2025
+ 10:55:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3805:b0:867:6680:cfd with SMTP id
- ca18e2360f4ac-86a2316ec56mr1866755439f.1.1747675650006; Mon, 19 May 2025
- 10:27:30 -0700 (PDT)
-Date: Mon, 19 May 2025 10:27:29 -0700
-In-Reply-To: <00000000000052c1d00616feca15@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <682b6a01.a00a0220.7a43a.0078.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] WARNING in hci_recv_frame
-From: syzbot <syzbot+3e07a461b836821ff70e@syzkaller.appspotmail.com>
-To: hdanton@sina.com, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+From: mokshraj <mokshraj20@gmail.com>
+Date: Mon, 19 May 2025 23:25:37 +0530
+X-Gm-Features: AX0GCFvbXiOtZIjZ5eSSKzkoFNtxgJ0th6Ym7VGrbcLSHgq9ezJ8H8THC20r2a8
+Message-ID: <CAJRNte7O33P24v5o9C3K=tpwtP_h2Ohg2arYguF=C6-4Ga8pRA@mail.gmail.com>
+Subject: [PATCH] Bluetooth (btusb): Add quirk for Realtek USB device
+ (0x13d3:0x3601) for proper detection and connection
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot has found a reproducer for the following issue on:
+From: mokshraj <mokshraj20@gmail.com>
+Date: Mon, 19 May 2025 20:07:26 +0530
 
-HEAD commit:    a5806cd506af Linux 6.15-rc7
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14bd52d4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6c2cd7998c108ba7
-dashboard link: https://syzkaller.appspot.com/bug?extid=3e07a461b836821ff70e
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12bd52d4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=170ab1f4580000
+Dear Linux Bluetooth Maintainers,
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-a5806cd5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/114e439a107e/vmlinux-a5806cd5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/28859a387c14/bzImage-a5806cd5.xz
+I am experiencing an issue with my Bluetooth USB adapter after
+installing Linux on my Acer Aspire Lite AL15-41 laptop. While
+Bluetooth can be turned on and is visible in settings, my system is
+unable to detect other Bluetooth devices, and other devices cannot
+detect or connect to my system.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3e07a461b836821ff70e@syzkaller.appspotmail.com
+My Bluetooth adapter has the USB ID 0x13d3:0x3601, which appears to be
+a Realtek chipset.
 
-------------[ cut here ]------------
-workqueue: cannot queue hci_rx_work on wq hci0
-WARNING: CPU: 0 PID: 7345 at kernel/workqueue.c:2258 __queue_work+0xd62/0xfe0 kernel/workqueue.c:2256
-Modules linked in:
-CPU: 0 UID: 0 PID: 7345 Comm: syz-executor130 Not tainted 6.15.0-rc7-syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:__queue_work+0xd62/0xfe0 kernel/workqueue.c:2256
-Code: 42 80 3c 20 00 74 08 4c 89 ef e8 89 de 96 00 49 8b 75 00 49 81 c7 78 01 00 00 48 c7 c7 40 cc 69 8b 4c 89 fa e8 9f 40 f9 ff 90 <0f> 0b 90 90 e9 f1 f4 ff ff e8 00 e4 34 00 90 0f 0b 90 e9 dd fc ff
-RSP: 0018:ffffc9000f4d7a88 EFLAGS: 00010046
-RAX: 701780e79c022b00 RBX: 0000000000000000 RCX: ffff88803d9a0000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000002
-RBP: 1ffff110022be938 R08: ffff88801fe23e93 R09: 1ffff11003fc47d2
-R10: dffffc0000000000 R11: ffffed1003fc47d3 R12: dffffc0000000000
-R13: ffff8880437f0a98 R14: ffff88803d9a0000 R15: ffff8880115f4978
-FS:  00007f9904bca6c0(0000) GS:ffff88808d6c2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000040 CR3: 000000004012c000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- queue_work_on+0x181/0x270 kernel/workqueue.c:2392
- queue_work include/linux/workqueue.h:662 [inline]
- hci_recv_frame+0x5ad/0x700 net/bluetooth/hci_core.c:2926
- vhci_get_user drivers/bluetooth/hci_vhci.c:512 [inline]
- vhci_write+0x358/0x4a0 drivers/bluetooth/hci_vhci.c:608
- new_sync_write fs/read_write.c:591 [inline]
- vfs_write+0x548/0xa90 fs/read_write.c:684
- ksys_write+0x145/0x250 fs/read_write.c:736
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9905433a6f
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 d9 6b 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 2c 6c 02 00 48
-RSP: 002b:00007f9904bca1e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f99054bf3f8 RCX: 00007f9905433a6f
-RDX: 0000000000000007 RSI: 0000200000000040 RDI: 00000000000000ca
-RBP: 0000200000000040 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000293 R12: 00007f99054bf3f0
-R13: 00007f99054bf3fc R14: 0000000000000040 R15: 00007ffdd9006d98
- </TASK>
+Here is some information about my system:
 
+Problem: Bluetooth is enabled but cannot detect other devices or be
+detected by them.
+When it started: Immediately after installing Linux.
+Bluetooth Adapter USB ID: USB_DEVICE(0x13d3, 0x3601)
+Computer: Acer Aspire Lite AL15-41
+Linux Distribution and Version: OS: CachyOS x86_64
+Kernel Version: 6.10.2-rt14-arch1-6-rt
+BlueZ Version: 5.82
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Through some investigation, I found a potential fix which involves
+adding a quirk for my specific USB device ID to the btusb.c driver.
+The suggested patch is as follows:
+
+Diff
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -555,6 +555,8 @@ static const struct usb_device_id quirks
+  BTUSB_WIDEBAND_SPEECH },
+  { USB_DEVICE(0x13d3, 0x3572), .driver_info = BTUSB_REALTEK |
+  BTUSB_WIDEBAND_SPEECH },
++ { USB_DEVICE(0x13d3, 0x3601), .driver_info = BTUSB_REALTEK |
++ BTUSB_WIDEBAND_SPEECH },
+
+  /* Realtek 8852BT/8852BE-VT Bluetooth devices */
+  { USB_DEVICE(0x0bda, 0x8520), .driver_info = BTUSB_REALTEK |
+
+This patch adds my device ID (0x13d3:0x3601) to the list of Realtek
+devices that require the BTUSB_WIDEBAND_SPEECH flag. Applying this
+patch manually has resolved the issue on my system, allowing Bluetooth
+to detect and connect to other devices.
+
+I understand that the individual who provided this patch does not have
+the time to create a DKMS module for Arch Linux users. Therefore, I am
+submitting this patch for inclusion in the btusb.c driver. I believe
+this would benefit other users with the same Bluetooth adapter by
+providing a default fix.
+
+For further information about my device, you can refer to this Linux
+Hardware Probe URL: https://linux-hardware.org/?probe=b58f50ee34
+
+Thank you for your time and consideration.
+
+Sincerely,
+
+Baymax(moskhraj)
