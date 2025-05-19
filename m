@@ -1,95 +1,130 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C094979FE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 May 2025 19:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AF91F12FB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 19 May 2025 19:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747682579; cv=none; b=IEjpn4RswGJGwt+SNiYwfGoIQJztc/ASBijbQWIYYZA8McUyu302rro5tsOZJHfao2/RReURIqvPt7gSHwcoMKtU7cJPTcweSKAUhDQv6vwLSou5WUgjzWjjeqOcQ4fGSfMjBiAbYdQwNLzLB9tlIcunVb6rhWfxNtkaiZ/SKIA=
+	t=1747682706; cv=none; b=dlj4GYNXZTEQ6eUa6jNHTzW1bdshUgRLTxMFkSr4Rvie8T52kWvOzoHS3BCXZK+hi21Y9p60yl8O90k85K8lBnMwDaJV6q5uHrJ/XEAyeDskkdPl8niNwP/IQ3mJ6uDlVAAU6L+NvKBJyLPAfAGKPQN7JeTAtHCrzsHy8656WhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747682579; c=relaxed/simple;
-	bh=i0JXAlxpcnrfCn32HdsQoH4KPC5oSzqF3llZGvlW0cQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IOhdv1sGLoa79IZEePD1/OscDq74ZNriHys1iud/4uBCAsnHNNf146BN6t7EOdPzrzeJZgu/meWoMENSP2WzAFvA1xvQyz1eokLBPcJLeA9FtmHjrszjDk7w57hxBuj7fVkeQfy34CIohL8mCib6/rp8U9jo4e1oJLRolh/nlgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7DAF5440DD;
-	Mon, 19 May 2025 19:22:54 +0000 (UTC)
-Message-ID: <d4c4cb4cc03b23f21ac9e9c5041937ccfc3f81f5.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 2/3] doc/device: Add Disconnected signal
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
-	 <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 19 May 2025 21:22:54 +0200
-In-Reply-To: <CABBYNZL2LBBSMvBDONLf6H8-re26YHKBxsnQwNbX8kNuiq8m_Q@mail.gmail.com>
-References: <20250519161412.107904-1-frederic.danis@collabora.com>
-	 <20250519161412.107904-3-frederic.danis@collabora.com>
-	 <CABBYNZL2LBBSMvBDONLf6H8-re26YHKBxsnQwNbX8kNuiq8m_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+	s=arc-20240116; t=1747682706; c=relaxed/simple;
+	bh=XlGorKDq2GqCXsZmwkxPEx5MiX4QwUtt+77L7zfKhW4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=NE94rsJgA1pdOGo4b0E7bNWcJXN/aa5fJUthEj3LVf6OH+jQTZ0wCIz0QfrEIc8aoG0g1qExi+yxktgGi2YeWYjed860t35j9/UTV2v5T8+gjZRELfoxrk3PlEUiWOsqTt5gkZaqc3/Z7RF2p70sKfZtD9P+V1QfHrPsFpQ88l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OQkSDZwy; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQkSDZwy"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-30f0d85a092so1127439a91.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 May 2025 12:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747682704; x=1748287504; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3Ff3XGEc5N8FPLjv7ILKdZqBZcmaJWGQrz3XK25oW/I=;
+        b=OQkSDZwy47fWofS6FjbMzqtyu2q8xCdgjUjfGEUWaUGifHe3iWvtCNb3BobaJNXdvJ
+         rjyIpRBO64ONbDRiQmT+9npBZyM2WwZH/kMIbdPeSQwCp6+Rz2nUaKlvcd22eMy9fX+w
+         VZgb+ZvJYpkSzRt6M7RBM0Dw+q52dmAE9SuUsizX+sDqnUpJpulTGIgyOqXdMxXwhUfP
+         vS7cjctvOepP9T/y/zsztO27V+opTHj89TTWuxE6xdjiTdzCmwTR/jCaBWW+y+EL3pUP
+         USEIutKaxw7/4odwqzDtlP8c4B3FGZVx2aLV6bgeUsNiVnlJzWnCp3dCtqJYupkIo627
+         qIBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747682704; x=1748287504;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3Ff3XGEc5N8FPLjv7ILKdZqBZcmaJWGQrz3XK25oW/I=;
+        b=BDplcTk5cX3Ox/sT7f8IVM0ZlXVmU0sAtl7G1btCZ8TX2kUf1f7eQiKaWhXoHc+mdp
+         lfuzTplDqApqHVItlO8gOuOyFB3NgzvqVTFbxUpfjy+unUGEH3CVRWIVBqjgZkC6/UPu
+         kGhL3mEIi9dV+Z9zt+/CDu/WH9G37OF7dWoWwLQyQ5tlKEiDV5PLywUfN0NZ6M45lial
+         SBy2Fm0HcEh62WKDbKDnpfrziKyUMo+BJ5dNCDIIUdi8DEOTkWUYylyK6MOjHk6s2hJG
+         sL5zfXalEMzoisuRtIXtqxmK1BRQs3yFHP1crXaz+DlRhLcxKXKcqdI5o+jfX/5Lsh1E
+         RNMQ==
+X-Gm-Message-State: AOJu0YzQJSOVZVUzQjFeAXnVBrQhVI58wFT3Ndayw05AdJOVWpBmAnAI
+	vV1mORSBXQJ96pd3Sh0T+kP2Nu+CadaOeNeRXz3z6OQjIWaHd/Btzt8PQxhAOsGa0rBACVh7uLr
+	OwYWomDqEyspT1LOhvD4Xd8lxJM10dNnGu0J0oS8=
+X-Gm-Gg: ASbGncv4By9QTOcTKvNBoO0Qri80F/XmKrGo9ix6F/mkOHWhG01UbuZvdq0yN7u6+pj
+	W5Us0/PkN1MPbkuEBBwTVH8v49pKpMbUek6uaqdkzvJdPuxda+Du0L9P35E83O3Ww2lCbD8Z8QP
+	p2qfBT6lC/r6ClkVJ7kj1D/9CsxZAtpKvbeqot2A1AOVqHePnZpTEi9ptLQrmjqoRB0sh52Wu/l
+	4I=
+X-Google-Smtp-Source: AGHT+IH+OlFG4pnxXbLUgztM7BeIQ3dtXlUyo6+32yxEVsts5JlIcsMdnObmAqBrZleKvSrwNq2qrxlfMi86/6LtgwA=
+X-Received: by 2002:a17:90b:570d:b0:309:fe2b:306f with SMTP id
+ 98e67ed59e1d1-30e7d5a8b14mr18079497a91.26.1747682704036; Mon, 19 May 2025
+ 12:25:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefvddvvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepieffgfehtedtgefgjeeggfffgeeuvdegveekveejfeekkedujeehteffueefffeunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpnhgspghrtghpthhtohepfedprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehfrhgvuggvrhhitgdruggrnhhishestgholhhlrggsohhrrgdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhot
- hhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: hadess@hadess.net
+From: mokshraj <mokshraj20@gmail.com>
+Date: Tue, 20 May 2025 00:54:53 +0530
+X-Gm-Features: AX0GCFujv-AzvwlF8VWZxxzu9z3yu6G0yBD4tvROySvajESqfLmpmaYuudlMvwE
+Message-ID: <CAJRNte4YKufb12O7AUH02s6_ia9X=41nYvFOp1v-UUxfMQ-WHQ@mail.gmail.com>
+Subject: [PATCH] Bluetooth (btusb): Add quirk for Realtek USB device
+ (0x13d3:0x3601) for proper detection and connection
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2025-05-19 at 12:44 -0400, Luiz Augusto von Dentz wrote:
-> Hi Fr=C3=A9d=C3=A9ric,
->=20
-> On Mon, May 19, 2025 at 12:18=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
-> <frederic.danis@collabora.com> wrote:
-> >=20
-> > ---
-> > =C2=A0doc/org.bluez.Device.rst | 17 +++++++++++++++++
-> > =C2=A01 file changed, 17 insertions(+)
-> >=20
-> > diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
-> > index 80501eddd..6229f95ad 100644
-> > --- a/doc/org.bluez.Device.rst
-> > +++ b/doc/org.bluez.Device.rst
-> > @@ -155,6 +155,23 @@ array{array{byte}} GetServiceRecords()
-> > [experimental]
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :org.bluez.Error.NotConnecte=
-d:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :org.bluez.Error.DoesNotExis=
-t:
-> >=20
-> > +Signals
-> > +-------
-> > +
-> > +void Disconnected(string reason)
-> > +````````````````````````````````
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 This signal is launched when a de=
-vice is disconnected with
-> > the reason of
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the disconnection.
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Possible reasons:
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-unknown:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-timeout:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-local-host:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-remote:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-local-suspend:
->=20
-> Perhaps it would be better to use to the actual HCI code instead of
-> converting it to string, since I suspect application using this
-> signal
-> may want to recover the actual error to do some sort of reconnecting
-> policy, etc, or having them both in case the client just wants to
-> print it.
+From: mokshraj <mokshraj20@gmail.com>
+Date: Mon, 19 May 2025 20:07:26 +0530
 
-If there are applications using those signals (I'm guessing, Bluetooth
-settings apps), whatever the format of the error, could we have an
-expected behaviour associated with individual error types?
+Dear Linux Bluetooth Maintainers,
+
+I am experiencing an issue with my Bluetooth USB adapter after
+installing Linux on my Acer Aspire Lite AL15-41 laptop. While
+Bluetooth can be turned on and is visible in settings, my system is
+unable to detect other Bluetooth devices, and other devices cannot
+detect or connect to my system.
+
+My Bluetooth adapter has the USB ID 0x13d3:0x3601, which appears to be
+a Realtek chipset.
+
+Here is some information about my system:
+
+Problem: Bluetooth is enabled but cannot detect other devices or be
+detected by them.
+When it started: Immediately after installing Linux.
+Bluetooth Adapter USB ID: USB_DEVICE(0x13d3, 0x3601)
+Computer: Acer Aspire Lite AL15-41
+Linux Distribution and Version: OS: CachyOS x86_64
+Kernel Version: 6.10.2-rt14-arch1-6-rt
+BlueZ Version: 5.82
+
+Through some investigation, I found a potential fix which involves
+adding a quirk for my specific USB device ID to the btusb.c driver.
+The suggested patch is as follows:
+
+Diff
+diff --git a/btusb.c b/btusb_patch.c
+index a42dedb..3789e03 100644
+--- a/btusb.c
++++ b/btusb_patch.c
+@@ -564,6 +564,8 @@ static const struct usb_device_id quirks_table[] = {
+                              BTUSB_WIDEBAND_SPEECH },
+     { USB_DEVICE(0x13d3, 0x3591), .driver_info = BTUSB_REALTEK |
+                              BTUSB_WIDEBAND_SPEECH },
++    { USB_DEVICE(0x13d3, 0x3601), .driver_info = BTUSB_REALTEK |
++                             BTUSB_WIDEBAND_SPEECH },
+     { USB_DEVICE(0x0489, 0xe123), .driver_info = BTUSB_REALTEK |
+                              BTUSB_WIDEBAND_SPEECH },
+     { USB_DEVICE(0x0489, 0xe125), .driver_info = BTUSB_REALTEK |
+
+This patch adds my device ID (0x13d3:0x3601) to the list of Realtek
+devices that require the BTUSB_WIDEBAND_SPEECH flag. Applying this
+patch manually has resolved the issue on my system, allowing Bluetooth
+to detect and connect to other devices.
+
+I understand that the individual who provided this patch does not have
+the time to create a DKMS module for Arch Linux users. Therefore, I am
+submitting this patch for inclusion in the btusb.c driver. I believe
+this would benefit other users with the same Bluetooth adapter by
+providing a default fix.
+
+For further information about my device, you can refer to this Linux
+Hardware Probe URL: https://linux-hardware.org/?probe=b58f50ee34
+
+Thank you for your time and consideration.
+
+Sincerely,
+
+Baymax(moskhraj)
