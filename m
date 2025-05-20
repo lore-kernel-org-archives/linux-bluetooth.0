@@ -1,77 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC5425CC49
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 21:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFD0171D2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 21:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747775394; cv=none; b=gjx1T71DrJN/o6cJdryfFr3l1YAGY9G76MsAs3xJ7ff1VD54+fToT5qtmhSC/fb4/WaFmUdDHwnHoXCZq6SslDWhQRaExhdH9uqa90WsHFBhyxozfFRZ0w1o9R0Bul/Pc0s/jXlLQzgll4pcH6pHzNmAH1SpWdonHuDo0VD3irE=
+	t=1747775631; cv=none; b=djG3drk5QBoReI3twGR2Xxqe/5OuQObEXtJiKkrS5KC+7ZaaOhhd0Q9wTvU9NpaH4unE9OD2P4LxtdBLoV5hAJgWJnDqqFpKTEJJ2BIr+FfpGZSiA8WWwFN0eogG/YU/LQvd/N/rwRva82+Zt1gb7HJHM5guNdECvs04D1ppWyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747775394; c=relaxed/simple;
-	bh=8/by4BZ2wl3EbOxrJxlZvEFqpSbbe3snfmjcJci7ZZM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qLfeQPAezvQT6wLG8XusVa86O4KCoo8ExH8yE2fKbAKNsAj4ybm9HekdpmL6ZbYBau4cnpLqT3O052Yhs3Up0HGAks9jtOY9n70iyESL8Q+JCgQvwMlDMjdD480VXEV5j1JkCh+eXKaGVkolIe6E3FlCxt5RQvJUmwIiBalLmus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hAoFHiAF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747775631; c=relaxed/simple;
+	bh=Kk2+PeHnr2lNuCoOnaT+dPM79rZ+3fnaNsPSyJJ5awI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lSpyN6iRcW0Q35mID+er1hPAKf00wDAM+6xpoVDLfozsGEFT7C4upfA/QZBJWUFiB+eKszWXEAlCKhEw1tyBRK9qEWBd+0lxm4jiw5Way1Yg+bU2roQfwXpW6B4nTmp7xxoH829B6/ZMxhNfGsgaxynMsfZDfHlMAY9jWVi290A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=LdIcaVjw; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAoFHiAF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17E7FC4CEE9;
-	Tue, 20 May 2025 21:09:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747775394;
-	bh=8/by4BZ2wl3EbOxrJxlZvEFqpSbbe3snfmjcJci7ZZM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hAoFHiAF+tTX5Q636V+CqQYzM9uzyjvH9467R7S2rdLIoGm9zHhCK1lAfPIidCzVe
-	 2inubqefmyewETTD4r7oeiPiDGzZdXAk2kvdotUb/lpryEA+feQf9O/FZZyDD8Esed
-	 MPIMhWMM85PCmTybWsdRLTeTY7Zfweq0URmEDycUjnLRdfsxn4oQwsnCn8T6ZcpvEs
-	 kIM9nweEy4Wk9eGT3IhoNT8jabAaySeSrskni6B19QFdqoEJobnjnFQklyPmyQK2WR
-	 mcmA/p3vS1qpPsNpV1ClV4ExdzDvOe1ULCMzmG12nxthTfyDySmt3npHcQKzp3I52+
-	 7TvCV94k4YEdw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34678380AA70;
-	Tue, 20 May 2025 21:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="LdIcaVjw"
+Received: from github.com (hubbernetes-node-2b5064d.va3-iad.github.net [10.48.124.72])
+	by smtp.github.com (Postfix) with ESMTPA id 4F7C7E0BEA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 14:13:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1747775629;
+	bh=fcMoPzrvK8qhlvxgYzK86wC1pJ+5oBnjqehhfhVRq3M=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=LdIcaVjw28p7DVYf+a1xoQluC4+23MmcHJhRT2JOyVidDzLwo7QUPz5UY212KWy2U
+	 EUlm+5O3GVQpHBFkZHsg7vnQIv5LXAJKyPLCIFhQ6kNyWoTffpnDEiFtP5/xzDGQSm
+	 pYbDPzTgbYawNqLKbRBlnd8pL3UpskB1PBprcr9Y=
+Date: Tue, 20 May 2025 14:13:49 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/f39b3e-0402c0@github.com>
+Subject: [bluez/bluez] 0402c0: doc: Convert mgmt-api.txt to mgmt.rst
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] org.bluez.Device: Add last-used option to
- PreferredBearer
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174777543000.1463763.3509561458197622406.git-patchwork-notify@kernel.org>
-Date: Tue, 20 May 2025 21:10:30 +0000
-References: <20250516181731.1967217-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250516181731.1967217-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 0402c06746449b44b67568df058f4d466b542653
+      https://github.com/bluez/bluez/commit/0402c06746449b44b67568df058f4d466b542653
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-05-20 (Tue, 20 May 2025)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M Makefile.am
+    A doc/mgmt.rst
 
-On Fri, 16 May 2025 14:17:30 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds last-used option to PreferredBearer which when set would
-> make Connect to use the last used bearer first.
-> ---
->  doc/org.bluez.Device.rst | 8 ++++++--
->  doc/settings-storage.txt | 2 +-
->  2 files changed, 7 insertions(+), 3 deletions(-)
+  Log Message:
+  -----------
+  doc: Convert mgmt-api.txt to mgmt.rst
 
-Here is the summary with links:
-  - [BlueZ,v1,1/2] org.bluez.Device: Add last-used option to PreferredBearer
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=940717e9fad4
-  - [BlueZ,v1,2/2] device: Implement PreferredBearer=last-used
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f39b3ec12e8f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This converts from pure text mgmt-api.txt to restructured markup
+language and then use rst2man to generate a proper manpage (mgmt.7).
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
