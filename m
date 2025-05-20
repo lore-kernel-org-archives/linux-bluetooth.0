@@ -1,149 +1,115 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72F125E46A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 09:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747732018; cv=none; b=sbnoG2lHLx0grz+olRFuq14Uh2wD6cXx97AKVQDtctBs4RYzhJt8U4C8rnDXJvTKLt2kQHuJoYl6JAgkfBPMJUtLi76tMIhV2KdwDkaN+HhzsdCznyXWpShNP7qRg31lKtc0N5zevt69hbzdk+wEgDUfQtEgy/oenL/BRd42JYM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747732018; c=relaxed/simple;
-	bh=8tQP0o1RI6YuxO7SlLkziJc3Qvy7s2cL8Q0Ad9G6VgE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=H1L9YNnd0o+lbzdZbmn7pecKkxG4xJDEMkbg0GylmdBU5gwpQh4B3IBEUrik1JhKRtSjkxYeFhdD6Eob/qOJRR0gThPQ3A9niGea4SQZx8Vb6SEc/OK4vEeHYQI1UFqej3L/1aplF0YyHtPnWoUsWg5vKjFYXrr4FxfLVmWxRyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cjgbf91m; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA29262FF8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 09:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747733204; cv=pass; b=s1skk9Qu7W4lUnw62fzX7ITzdtmBNFwqT1m3PSJZw/Sb0FHcJzKxXnpNAmIubAqala/46LqXWcAlDRzN+dwSOBBaJJIT7G2S8sL92OEnqb8wo2DAo0rFKUeqDJ7Fd/t9uzFfGkPfh330a8oluGKfZBqet9sVdDQbPGodpIq0c58=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747733204; c=relaxed/simple;
+	bh=6Zd9W5yZ52twaCByoKu7OQXwbuX2iDUIO55qKGf4fXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p+Z8k6M/ZGuWypHw49if+7yxC7PkSHi5qsr9CZuYNE+6tnE2YRe204ZaXVXhp5nQ5CCVBpnuw5bTHf+p03uUISRL/XqQd8B3lDkxPXk8Mppep0AgGHDnkWSZ43S599Vpel/vv8pT1PLXwxX1DOXIseG5vvCiZUM82qYjkZCkCt8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=koFSFO+m; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cjgbf91m"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c53b9d66fdso761653885a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 02:06:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747732015; x=1748336815; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DG1lVOR8AxBIpKjSuIhLm+FUA6TdOrydQGZ6rFraKLY=;
-        b=cjgbf91m7UFMTeGYysT3THqp+JWCWvAUvhzKbUEEVJ043YVmFXDKXySieyN7lnFA27
-         54oX8WI0U07CSWo909wPWr98hTO8m8MAK2kPyS8R3yWtW6HVPYqf1RaQIIOIfAO9geuH
-         gzJeK6B98JQBJRIgAHb3gTB7nDK3bg5CRlAlXEXHAb1qQEQtSEI5200wBQ/073MLNah4
-         DCmb+Z8POPWNUGzggKF20xkmtjfWZ9nb+ORF1NErZmrp28aGiC52pv+kvMAObLQHrwQt
-         M4ORxjziKaIsXLM0Vt7c+Xxdt5mGo+ztQ6aYPn1FWmRmAAPc5kxgZKsqcXlzrX+MCftI
-         lrOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747732015; x=1748336815;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DG1lVOR8AxBIpKjSuIhLm+FUA6TdOrydQGZ6rFraKLY=;
-        b=eHm6ivZeNnPIAa8v/F2niHzzoMrx8r129/3HF+j1+3+WerD+Qr1YEouLx1t2+U7ZER
-         NI6lJJDKmmMWFlofVtT74X8MNQvaYZFrHGbHInWHDexuHZH+nFWb39eERvC3QkhqujfK
-         mzJtniZvQ4kKAXAt4K0ZdvMpcyErXY75MG4LVnY0iHRfJYUdm7blO5gdZ36uZWSzn7kl
-         PNSYoeZol7qeSY7EBpf8uw0SHGopVm+VEkBLPgwjn9jlxAoy+5bc0fZeY38ze5MkBjGg
-         AwhuvXd74zkNeKCeLZdepw2TKuCcBJHR9quheP3k969UVgIzCG1hJh4LLcLq2gHYMMEl
-         lGDA==
-X-Gm-Message-State: AOJu0YzTKZ8TuYC32ueE4C96nv+E/fYXWkXW7ZTUivuCjGwIGYmFm4uk
-	yLTZCosYNQG/VD8epBqhzEYPfB2R6oMs3xBqLGnV265YtyKcsZCbsjG0TFGqRw==
-X-Gm-Gg: ASbGncsVKtA3RCJOGuqOD2SSo7UyGzwcUcO9R6qBXccCvhKzELibP++Tl3j5Qjd8/9N
-	FS8EjZ14BKp8GagQf4siV1+Bd1StnoabpnA0OjMk1x94z603yIfkum9eSSJRh9rap2zRTGon5uq
-	6vwzT245Uom09zidhpZANX5XRk0RFE2i27vJcmHW0mERLoseRvn1B5Kmuu3nlrlj3jlDnxioz+H
-	vJbE1aXIu9j1yk+RsqaOu94P5FJKI+IU/D+CbdO6c2CysdqdJ/2Gqfw5OaAuJNV4I8buSQHk+o3
-	qeFoUk0u6NgMdgYaNTusF6KSrTzTcEDUHLULq4x8R24CbOZ2qvD0J0iOMdM=
-X-Google-Smtp-Source: AGHT+IGbw4og10nnv8RPfBxMV29x1vWu9P3EogvpBuHuOfvw2HAEyZoK3LBbAA8/QhO4NmSptiK7bg==
-X-Received: by 2002:a05:620a:3945:b0:7c5:3c0a:ab77 with SMTP id af79cd13be357-7cd47ef13b3mr2676803885a.4.1747732015348;
-        Tue, 20 May 2025 02:06:55 -0700 (PDT)
-Received: from [172.17.0.2] ([135.237.129.65])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd47c2d217sm688460085a.92.2025.05.20.02.06.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 02:06:54 -0700 (PDT)
-Message-ID: <682c462e.050a0220.3c295f.9fba@mx.google.com>
-Date: Tue, 20 May 2025 02:06:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0905720361001881077=="
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="koFSFO+m"
+ARC-Seal: i=1; a=rsa-sha256; t=1747733199; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=GwrjGkXVmd/ExDoNby6fGbYXMvEVKAzh4fzzSSJbf12nTBok4ehniXRRSsO2JK/LIWMXdMJMVk/9GM3iUJjjpkrY+mkNOQTw7ZuIJ3eHmvFX3J+hukx8CbLHXR8ghk05Fz97XKmJ0ZbHI6Vrjj4dM2fjh5zn3wiVsD6dZDO0BGo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1747733199; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Cwih+sax39Gtxf73pXttE4Gmks+c2MgNp7e2EozBbD8=; 
+	b=R8oZtsvoBsWwoaMaVtIhV/f+qugQ3ZLGVHKTK8G6zfn0GZVHhfRe6WWtTu5S3bM9WvqjbZAN6iAksxkOwKenuYJImjMgGprdw+CZbvrizqQAesC7iPIL/u0pxxVI6k8ghs7q3o+Q5hE1Yx1lmZngInyj3aTpmPuoKTi5tLFsugQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
+	dmarc=pass header.from=<frederic.danis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1747733199;
+	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=Cwih+sax39Gtxf73pXttE4Gmks+c2MgNp7e2EozBbD8=;
+	b=koFSFO+mkoyA74YmI5n9hOEtJah2DneTIqlUHfKHpvRriVhnSzUC29LkYzEHkDPF
+	J96v4RAuqAvqsrsQ2rQ7nGI65IQk4iVlxQIHWNyxptjhgVfvYCW6BqTmaPJiGzoplop
+	DryYSQ/fyq7mb5kuftkTMyc5YtuvbcoZF8QTp5sQ=
+Received: by mx.zohomail.com with SMTPS id 1747733197452725.1006077921454;
+	Tue, 20 May 2025 02:26:37 -0700 (PDT)
+Message-ID: <2f5f021c-5e62-4af0-abcc-3c46ba898c53@collabora.com>
+Date: Tue, 20 May 2025 11:26:35 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, dmantipov@yandex.ru
-Subject: RE: Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach()
-In-Reply-To: <20250520084230.502667-1-dmantipov@yandex.ru>
-References: <20250520084230.502667-1-dmantipov@yandex.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ 2/3] doc/device: Add Disconnected signal
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20250519161412.107904-1-frederic.danis@collabora.com>
+ <20250519161412.107904-3-frederic.danis@collabora.com>
+ <CABBYNZL2LBBSMvBDONLf6H8-re26YHKBxsnQwNbX8kNuiq8m_Q@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+In-Reply-To: <CABBYNZL2LBBSMvBDONLf6H8-re26YHKBxsnQwNbX8kNuiq8m_Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
---===============0905720361001881077==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On 19/05/2025 18:44, Luiz Augusto von Dentz wrote:
+> Hi Frédéric,
+>
+> On Mon, May 19, 2025 at 12:18 PM Frédéric Danis
+> <frederic.danis@collabora.com> wrote:
+>> ---
+>>   doc/org.bluez.Device.rst | 17 +++++++++++++++++
+>>   1 file changed, 17 insertions(+)
+>>
+>> diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
+>> index 80501eddd..6229f95ad 100644
+>> --- a/doc/org.bluez.Device.rst
+>> +++ b/doc/org.bluez.Device.rst
+>> @@ -155,6 +155,23 @@ array{array{byte}} GetServiceRecords() [experimental]
+>>          :org.bluez.Error.NotConnected:
+>>          :org.bluez.Error.DoesNotExist:
+>>
+>> +Signals
+>> +-------
+>> +
+>> +void Disconnected(string reason)
+>> +````````````````````````````````
+>> +
+>> +       This signal is launched when a device is disconnected with the reason of
+>> +       the disconnection.
+>> +
+>> +       Possible reasons:
+>> +
+>> +       :disconnection-unknown:
+>> +       :disconnection-timeout:
+>> +       :disconnection-local-host:
+>> +       :disconnection-remote:
+>> +       :disconnection-local-suspend:
+> Perhaps it would be better to use to the actual HCI code instead of
+> converting it to string, since I suspect application using this signal
+> may want to recover the actual error to do some sort of reconnecting
+> policy, etc, or having them both in case the client just wants to
+> print it.
 
-Dear submitter,
+I will update the patch to use the numerical value.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=964481
+But, the reason provided by MGMT_EV_DEVICE_DISCONNECTED is not the
+HCI code but a mgmt value translated in net/bluetooth/hci_event.c
+(https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_event.c#L3366)
 
----Test result---
+-- 
+Frédéric Danis
+Senior Software Engineer
 
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.23 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      24.58 seconds
-CheckAllWarning               PASS      27.41 seconds
-CheckSparse                   PASS      31.05 seconds
-BuildKernel32                 PASS      25.19 seconds
-TestRunnerSetup               PASS      461.99 seconds
-TestRunner_l2cap-tester       PASS      22.44 seconds
-TestRunner_iso-tester         PASS      28.91 seconds
-TestRunner_bnep-tester        PASS      4.89 seconds
-TestRunner_mgmt-tester        FAIL      118.96 seconds
-TestRunner_rfcomm-tester      PASS      7.88 seconds
-TestRunner_sco-tester         PASS      13.06 seconds
-TestRunner_ioctl-tester       PASS      8.39 seconds
-TestRunner_mesh-tester        FAIL      6.27 seconds
-TestRunner_smp-tester         PASS      7.23 seconds
-TestRunner_userchan-tester    PASS      5.04 seconds
-IncrementalBuild              PENDING   0.85 seconds
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+Registered in England & Wales, no. 5513718
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.135 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 2                               Failed       0.119 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0905720361001881077==--
