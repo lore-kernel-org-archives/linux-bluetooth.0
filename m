@@ -1,111 +1,178 @@
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149ED2676F8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 10:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1496622D794
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 13:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747736538; cv=none; b=H/TO6g3Lu5PtCIrfw++LthovO5Wdl/3rIb8DvbLlaJ4tJvx5CActMc/+7izx++ekMpUv3mZ4uXqnoGhaJn8NDi2Ud2XcKW4zyOiR4nG/CoFHMytUBqO72nO4o9ehWZOc6bSqDrL8RYblKP8eePqn1bpubPoOK63NMnWmixZ07dE=
+	t=1747747658; cv=none; b=WveL1h9R4Pkb3GKi4SI9hjkXLDef6kd/kOyF9hR/xBlggHqhiyLxNE4cVwDje2U6caKeRFrjlaYqRJI8Th+Td0cjXAnHdHgm1B+QZbJ9B1JYYQ0GNFFHYcLdlPBI4mmFF3c/37k5d1ytuuixMQv3q1B3xFpxxR5dBp/uE+GFhwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747736538; c=relaxed/simple;
-	bh=PqZqh5F9ykycOgUiC938WZV4eQjN1x0YidwCuC/yAfI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CIfszsS1Qd/+ntWip0zsMnNvBOMuxWqy69rCHais/8MsBn2Vx5O/32YSVxevi6m0xFlRbLPBsRIqi7OOZg+z60BdZ+qXViFVLEKtaZuvDOHZgO3gZJGrWnSxDptwbMun4Q7s5mP8HOjbH+ssu0Aiy790c7Ja+UI1DNm1eS+vl0c=
+	s=arc-20240116; t=1747747658; c=relaxed/simple;
+	bh=9gmKhuZ8BmjU8wEpq26PBWx+Zm0yTHLuPJqRTTpwAXU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=naPd77MvLjDvcYi9VCBWxLeo8mw4aqZQORAc7t4VsyLiK0t9eh1hjeYrz5JzYo/tSwKiATS36EEf63FAaFaD5RSuWUqycID/YE97KFomAvoQ0cQ2RJoq4JB1IzeN3PpJ+xmiF79zDqNAs/U9A0sNTvMVgo7XP6qqe/OpGkfO2m8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BF194439A8;
-	Tue, 20 May 2025 10:22:06 +0000 (UTC)
-Message-ID: <a449a563d74a2df27dd6f0c95365ea4e97053b9e.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 2/3] doc/device: Add Disconnected signal
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1528843A21;
+	Tue, 20 May 2025 13:27:33 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis@collabora.com>, 
- Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 20 May 2025 12:22:06 +0200
-In-Reply-To: <6acf1b43-77f6-4484-8af6-5fe492e6ec6e@collabora.com>
-References: <20250519161412.107904-1-frederic.danis@collabora.com>
-	 <20250519161412.107904-3-frederic.danis@collabora.com>
-	 <CABBYNZL2LBBSMvBDONLf6H8-re26YHKBxsnQwNbX8kNuiq8m_Q@mail.gmail.com>
-	 <d4c4cb4cc03b23f21ac9e9c5041937ccfc3f81f5.camel@hadess.net>
-	 <6acf1b43-77f6-4484-8af6-5fe492e6ec6e@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH BlueZ v3 1/4] client: Add client-side error decoding
+Date: Tue, 20 May 2025 15:26:33 +0200
+Message-ID: <20250520132733.1746996-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefvdegtddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfevffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepieffgfehtedtgefgjeeggfffgeeuvdegveekveejfeekkedujeehteffueefffeunecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpnhgspghrtghpthhtohepfedprhgtphhtthhopehfrhgvuggvrhhitgdruggrnhhishestgholhhlrggsohhrrgdrtghomhdprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhot
- hhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdeffecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeffteektdejuddvhfdtfedtvdetgeeileethfetgfdtheekvefgueeifffhvefhfeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefpdhhvghlohepohhlihhmphhitgdrrddpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhrgguvghssheshhgruggvshhsrdhnvght
 X-GND-Sasl: hadess@hadess.net
 
-On Tue, 2025-05-20 at 11:32 +0200, Fr=C3=A9d=C3=A9ric Danis wrote:
-> Hi Bastien,
->=20
-> On 19/05/2025 21:22, Bastien Nocera wrote:
-> > On Mon, 2025-05-19 at 12:44 -0400, Luiz Augusto von Dentz wrote:
-> > > Hi Fr=C3=A9d=C3=A9ric,
-> > >=20
-> > > On Mon, May 19, 2025 at 12:18=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
-> > > <frederic.danis@collabora.com> wrote:
-> > > > ---
-> > > > =C2=A0=C2=A0doc/org.bluez.Device.rst | 17 +++++++++++++++++
-> > > > =C2=A0=C2=A01 file changed, 17 insertions(+)
-> > > >=20
-> > > > diff --git a/doc/org.bluez.Device.rst
-> > > > b/doc/org.bluez.Device.rst
-> > > > index 80501eddd..6229f95ad 100644
-> > > > --- a/doc/org.bluez.Device.rst
-> > > > +++ b/doc/org.bluez.Device.rst
-> > > > @@ -155,6 +155,23 @@ array{array{byte}} GetServiceRecords()
-> > > > [experimental]
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :org.bluez.Error.N=
-otConnected:
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :org.bluez.Error.D=
-oesNotExist:
-> > > >=20
-> > > > +Signals
-> > > > +-------
-> > > > +
-> > > > +void Disconnected(string reason)
-> > > > +````````````````````````````````
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 This signal is launched when =
-a device is disconnected
-> > > > with
-> > > > the reason of
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the disconnection.
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Possible reasons:
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-unknown:
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-timeout:
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-local-host:
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-remote:
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :disconnection-local-suspend:
-> > > Perhaps it would be better to use to the actual HCI code instead
-> > > of
-> > > converting it to string, since I suspect application using this
-> > > signal
-> > > may want to recover the actual error to do some sort of
-> > > reconnecting
-> > > policy, etc, or having them both in case the client just wants to
-> > > print it.
-> > If there are applications using those signals (I'm guessing,
-> > Bluetooth
-> > settings apps), whatever the format of the error, could we have an
-> > expected behaviour associated with individual error types?
->=20
-> This could be used by client apps like Bluetooth setting to try to
-> reconnect to the device in case of timeout or unknown disconnection,
-> or to try to connect to another device depending on internal policy.
+The D-Bus errors returned in a number of cases aren't in human-readable
+form, but instead exist as "codes" (listed in src/error.h).
 
-I meant having that information in the docs :)
+This new function will allow us to split a specifically formatted string
+into a human-readable message and an error code.
+---
+ Makefile.tools       |  2 +
+ client/error-parse.c | 89 ++++++++++++++++++++++++++++++++++++++++++++
+ client/error-parse.h | 12 ++++++
+ 3 files changed, 103 insertions(+)
+ create mode 100644 client/error-parse.c
+ create mode 100644 client/error-parse.h
 
-Cheers
+diff --git a/Makefile.tools b/Makefile.tools
+index e60c31b1d907..27346f1368a2 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -10,6 +10,8 @@ client_bluetoothctl_SOURCES = client/main.c \
+ 					client/advertising.c \
+ 					client/adv_monitor.h \
+ 					client/adv_monitor.c \
++					client/error-parse.h \
++					client/error-parse.c \
+ 					client/gatt.h client/gatt.c \
+ 					client/admin.h client/admin.c \
+ 					client/player.h client/player.c \
+diff --git a/client/error-parse.c b/client/error-parse.c
+new file mode 100644
+index 000000000000..782d63f625f9
+--- /dev/null
++++ b/client/error-parse.c
+@@ -0,0 +1,89 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2025 Bastien Nocera <hadess@hadess.net>
++ *
++ *
++ */
++
++#include <stddef.h>
++#include <glib.h>
++#include "src/error.h"
++#include "error-parse.h"
++
++const char *error_codes[] = {
++	ERR_BREDR_CONN_ALREADY_CONNECTED,
++	ERR_BREDR_CONN_PAGE_TIMEOUT,
++	ERR_BREDR_CONN_PROFILE_UNAVAILABLE,
++	ERR_BREDR_CONN_SDP_SEARCH,
++	ERR_BREDR_CONN_CREATE_SOCKET,
++	ERR_BREDR_CONN_INVALID_ARGUMENTS,
++	ERR_BREDR_CONN_ADAPTER_NOT_POWERED,
++	ERR_BREDR_CONN_NOT_SUPPORTED,
++	ERR_BREDR_CONN_BAD_SOCKET,
++	ERR_BREDR_CONN_MEMORY_ALLOC,
++	ERR_BREDR_CONN_BUSY,
++	ERR_BREDR_CONN_CNCR_CONNECT_LIMIT,
++	ERR_BREDR_CONN_TIMEOUT,
++	ERR_BREDR_CONN_REFUSED,
++	ERR_BREDR_CONN_ABORT_BY_REMOTE,
++	ERR_BREDR_CONN_ABORT_BY_LOCAL,
++	ERR_BREDR_CONN_LMP_PROTO_ERROR,
++	ERR_BREDR_CONN_CANCELED,
++	ERR_BREDR_CONN_KEY_MISSING,
++	ERR_BREDR_CONN_UNKNOWN,
++	ERR_LE_CONN_INVALID_ARGUMENTS,
++	ERR_LE_CONN_ADAPTER_NOT_POWERED,
++	ERR_LE_CONN_NOT_SUPPORTED,
++	ERR_LE_CONN_ALREADY_CONNECTED,
++	ERR_LE_CONN_BAD_SOCKET,
++	ERR_LE_CONN_MEMORY_ALLOC,
++	ERR_LE_CONN_BUSY,
++	ERR_LE_CONN_REFUSED,
++	ERR_LE_CONN_CREATE_SOCKET,
++	ERR_LE_CONN_TIMEOUT,
++	ERR_LE_CONN_SYNC_CONNECT_LIMIT,
++	ERR_LE_CONN_ABORT_BY_REMOTE,
++	ERR_LE_CONN_ABORT_BY_LOCAL,
++	ERR_LE_CONN_LL_PROTO_ERROR,
++	ERR_LE_CONN_GATT_BROWSE,
++	ERR_LE_CONN_KEY_MISSING,
++	ERR_LE_CONN_UNKNOWN
++};
++
++#define MIN_ERROR_MSG_LEN 4
++
++/* Parse formatted combined error code + user-readable error
++ * string into its components.
++ * Format is ":code:message" */
++const char *detailed_error_parse(const char  *error_msg,
++				 const char **error_code)
++{
++	const char *second_colon;
++	unsigned int i;
++
++	if (error_msg == NULL)
++		goto out;
++
++	if (*error_msg != ':')
++		goto out;
++	if (strlen(error_msg) < MIN_ERROR_MSG_LEN)
++		goto out;
++
++	second_colon = strchr(error_msg + 1, ':');
++	if (second_colon == NULL)
++		goto out;
++
++	for (i = 0; i < G_N_ELEMENTS(error_codes); i++) {
++		if (strncmp(error_codes[i], error_msg + 1, (size_t)(second_colon - 1 - error_msg)) == 0) {
++			if (error_code != NULL)
++				*error_code = error_codes[i];
++			return second_colon + 1;
++		}
++	}
++
++out:
++	return error_msg;
++}
+diff --git a/client/error-parse.h b/client/error-parse.h
+new file mode 100644
+index 000000000000..c983982232f1
+--- /dev/null
++++ b/client/error-parse.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2025 Bastien Nocera <hadess@hadess.net>
++ *
++ *
++ */
++
++const char *detailed_error_parse(const char  *error_msg,
++				 const char **error_code);
+-- 
+2.49.0
+
