@@ -1,58 +1,58 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01E12512D1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 15:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0753E1DC075
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 15:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747753530; cv=none; b=Zno08jG60sTg2JEkUu7SHvZYWgpJS3vX5BdSR82AhCSIWWTfU9VKllLpC/av4uXqCguHTlh8FGuQvNtNAV/fFY4ZYw7v/ugh0DTAu2Dk3aEQ6D/nUohIdZE3D1a4N3SwsAysYSCkpC0P4CkavgyBOx3LnqgXk8cHipWRBr5JMRQ=
+	t=1747755114; cv=none; b=gy+p7WDhs6MX0VSwriWm53Xh55vLTUTq928Sm9OcKrXDM9YItxgxMmT/M49HEutRI515bRHB8ns6sjlV/j+QrAUXCYRzlpSsyt4B0k/u/MElHODyqnm01sUySsEHNNFOPFxIp0GUjtUBeV/ryh/iHSBQqQBZwGDv0vL8fAJXhiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747753530; c=relaxed/simple;
-	bh=4bericE7cT+oAcUXNe4F9GqKhoeCjdFDglCf+1174hY=;
+	s=arc-20240116; t=1747755114; c=relaxed/simple;
+	bh=cS2GEG/SEfNDit7E8UmqRLcooLHbri0ul3wH82ja4hE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=js70UWOTKYXG/rWJf3C+eDH8IwQzTPpf8KtRRizL9vZvhfnRTqxMnomkkLqnwfmjELAHnuHlApYjf0VUt0+jA6FHcRMJLN3ZQ6TkLvfLmLPP8F95cu8NeR8hGBvFvIRvsUZttDpRT3s305ExAFYfKNeAyksKRgyfIiZ0/XEyS7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NfxpI/y6; arc=none smtp.client-ip=209.85.167.43
+	 To:Cc:Content-Type; b=QMbeIWixKS6h0MjVhphlyE1ryNomKDTeSAKjIyugxaGQdZSxp0Gf6fqaIZM2iiORKxb9RK2jj5gDfIKXU9KRR8HQbar+8M91nMuqEaRr7DN33h/PEiBJ74Ox7dydOwanOZb7572e8YlNln994DENKJMbbvCe2/owLeSEIO9VEN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hgafDCXV; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfxpI/y6"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-551f0072119so2875126e87.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 08:05:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgafDCXV"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-3292aad800aso8564031fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 08:31:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747753527; x=1748358327; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747755110; x=1748359910; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ox+weY4MZkWHUKLxSkQVPahvj/Ax3utyHvi06Ktk+ZQ=;
-        b=NfxpI/y6vfhQUhT56HkkDoX00/HpEPQXqFPTVtY1RJiZleKx7xYx7/RtVqTn4VmAs7
-         K5mBaDNRZb+0Ib1TMjy2TjM9UBHRtQVsYfgFOWFYMh/mj+QE3ZsjaPbJxRIhIuJYGoKQ
-         ZW+yRZvT3xAm5r6x0a4kB8pSkTsG0wSb0sFMkgUVQ5OWWHXQX2FcmP9E4tySPg/6GtF8
-         vtiLmVI20RfPt43H6wcUzMI+5QYmXsxglLZmF7pBsp1pgirx3e02VyYC7SgfasebhEYQ
-         n/APLWjmA7jJPMCHbFbgz8hsjDyA7g+60wk68SOnB7Ksei9ZjHAQKxyOodU+7gB6X5Km
-         JrJg==
+        bh=+iQQitNpI1d9W11Y+ybk4KncC+8fTtkCJu4tqTZMSmk=;
+        b=hgafDCXVa/PixLW4d0eLNUOYwL6qTXoLNzklo516/gCN0iieRc2ehtGTP1aTWOY+bi
+         kMrn0vzXfkxa1Tgk5d752ByxvxeGWwQ8gUC+0J8MXX23tBozIBHxNwTH4ZYrttx/MLKh
+         Ma3Cmby847sHoQ3+hwqhbpjSoH4DNJJ2+sdizRARjJ7Pj1hV7EAg0ki0oFMWZB4osFk+
+         nQroX5+wYhUAB7SFOq1CZ1J2tjQ6W5ueklVdwgRMD2VUBZuzO/HgbkMMPS0kVGjGnFL8
+         Z2//kl4C+/2qair+sl9yYGA6KOjv4LGcx1oim9KkmWXsen0aHWKr7uNdLfNzQF7gEULl
+         JE+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747753527; x=1748358327;
+        d=1e100.net; s=20230601; t=1747755110; x=1748359910;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ox+weY4MZkWHUKLxSkQVPahvj/Ax3utyHvi06Ktk+ZQ=;
-        b=uYz4oz5Fhp+0RdB8MURr6PCm85JTdI5vkLxUUnnrp+tYGgaSZquo8ZJXBpVJDlWzUy
-         T12/+PyZWMhnnzBA/v3KYPr5vleGObUarlUhf65312cyA8AmxaJLpoUPdD2XZu+aXke8
-         bxcYkpVo+9WjBdwQ3J1D6H1ROrY0tlH2iNtxWx6Bb/TkYLEtNKAo9Hknx9Mbm5LNSS5k
-         wJMTzGjnSrTpYFKfyhqdQcfIW7aMXqC7jAkM90B3hnBc7mg9J2vI5rQHY61htpvPaoyh
-         xulE6nATRr5NtWw+NTWr4A7i7N9kN2WkjSCyG0U9mzhn65x/GAtv2RIdQo6TKd4I39Tn
-         tbtw==
-X-Forwarded-Encrypted: i=1; AJvYcCVu+1/MBWPANJECnIBd7+mH/qKm7H0eS7RfBmMfeJc68rxRkvj3UaXWOyDjBcIBfuBqkRj6hoRJcRJBQB3n+bM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXF4jTz3lFsMDLS9M9cHLIdgcRSmRaIF82uxZEivqMwiDNrnBg
-	/Il7mSUs7YYodwxrdIE8oeuNinZ4855CV1/kA6E9nX8XI1Lmc+BVgCbaMz2Av0ci15f4rBji1js
-	4Tfjbf/kTMZpAytMlfh4zWKvU5ljYCTe2tAY5p40=
-X-Gm-Gg: ASbGncuV90RZyxtovNqFsri4K645egVyC/tOg9UpMcdVEEJ7HwKmJnX6nOtTaF7jgod
-	pBR+Q+ztoiPqXu5YU6HgYZL/5r96TmG3YRiQZEcLGJ1a2AWoxG7iCD3AyuSU4Z+JDhzpcokbsw5
-	8TnurjW8B9O5Ypsls3iheip0qVjYhCxr1fm+bdAdfj1A==
-X-Google-Smtp-Source: AGHT+IE7mb67mwjqoLIgO7l30zd/GYUrzAU8IPQqLCgmHuvX6My1DU5g+ULtLLK0gGyJ3z2NFnH+cs3anBwJkTsoY60=
-X-Received: by 2002:a05:651c:19a4:b0:30b:a4f6:bb3f with SMTP id
- 38308e7fff4ca-3280848cf69mr50157831fa.16.1747753515285; Tue, 20 May 2025
- 08:05:15 -0700 (PDT)
+        bh=+iQQitNpI1d9W11Y+ybk4KncC+8fTtkCJu4tqTZMSmk=;
+        b=wu+H6pwtmEoLEm9BLmhatADaqEtQ6ciLaZlMXLYVSMP0CUZaqBvjgRfG8MngFfA9Pg
+         6DBVMDrbpZJUUYdCNtFXFcnrTYDjxgBvuKFuJN7Nzxiz1Z/oaFPaBmStiDeP4I+tVImf
+         lGF92hEW0oc2yqMIlYugCQSayztSJHAUULNa1lhZr18T1722rbRP6nNlw1JwjAv347E/
+         QOVEy0wh673NE54PGAHuAcAsmtlTwcAPD39qA1Vm3ouf1SFPifn+Yu2LYbxu808VKPTf
+         xV2fQhE1kCeTpFbXefK2kp1fzf82N/M+fqg8JiW8xL3o5wzwOrqd2AfnkMWZHllImcFw
+         EBig==
+X-Forwarded-Encrypted: i=1; AJvYcCUT/3DZB/3J4z5SzN07Uuc+fF95cojM8+OtreBfbATPlLrvxBySCMSKTumJXYrFxqUU0KmP14EODINuKnDJnpU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1BgITyrtwBgwn2c5giO17N+7mRaQKFt27VFBG46MKS+p4wk5f
+	jBhpPqTOY1791GHxJNwgm0gm4GixLM52z2mxGLuGDEeMQwUT0CoZa4gQSCtS0SWZm0BXk+71dKF
+	+4H20LlsjSGpF1LrGJ4jcYY1YoU9vycU=
+X-Gm-Gg: ASbGnctEZzhTwFa3D1twCDEGI9G2v01PVb31ciodrfXVu4eUnrPlDBmTPzRzx0xHQ9B
+	E8LUoaJOiBnOaAHG8/4ZvNQr+lkJGxg0nJBYluuImV2FKm6v6Z9JCwap2a/yE1zVsupwiBEH+f7
+	8X1twPErJn2VZpC1HkOB9ubG/A29yYNwk=
+X-Google-Smtp-Source: AGHT+IF6D6ijr5Og/3hKzLkaKvRRn1IeK2yuUjuenmboaFmLdkwUkreith6biTp0fAuli/mlYj5bxnPyB94NvUDyOq4=
+X-Received: by 2002:a05:651c:1b12:b0:30c:1aa6:5565 with SMTP id
+ 38308e7fff4ca-328084c30cdmr49240331fa.20.1747755109818; Tue, 20 May 2025
+ 08:31:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,9 +63,9 @@ References: <CABBYNZLJGwmPSe9Me+OLpr8WLGOenRrwJt_JxVmWfPO_X1YWJg@mail.gmail.com>
  <20250520144935.595774-1-dmantipov@yandex.ru>
 In-Reply-To: <20250520144935.595774-1-dmantipov@yandex.ru>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 20 May 2025 11:05:02 -0400
-X-Gm-Features: AX0GCFudvqN8O6QC-epLdKnu9WGQDIZvYU-1gQD3munVkawHZAhS-tO40AkZ198
-Message-ID: <CABBYNZJro0EnJcvAro0KXATgOHJULeFzOuTXgkKjL6dNFd=Tzw@mail.gmail.com>
+Date: Tue, 20 May 2025 11:31:36 -0400
+X-Gm-Features: AX0GCFtQL0gOLUSwdD8nkZFzzQkYb3OnA4Q7GRk-8tFJDdIxHPEdWYrVbtCfWpU
+Message-ID: <CABBYNZ+i56pg+Rs=mu8HvJ1LC+aeyDAt7=pYJ3ksNOrehj0ZUQ@mail.gmail.com>
 Subject: Re: [PATCH RFC] Bluetooth: use RCU-protected list to process mgmt commands
 To: Dmitry Antipov <dmantipov@yandex.ru>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
@@ -364,14 +364,6 @@ ck *sk, u16 opcode,
 > +                       sock_put(old->sk);
 > +                       call_rcu(&old->head, mgmt_pending_delayed_free);
 > +               }
-
-This part I don't quite follow, why are you trying to iterate over the
-existing items and clean them up if deleted? Besides if we need to
-protect with a mutex the the RCU sort of becomes more of a hassle to
-handle, so I was expecting just a direct conversion from list_add_tail
-to list_add_tail_rcu, at least that how other part of the bluetooth
-code were written.
-
 > +
 > +       list_add_tail_rcu(&cmd->list, &hdev->mgmt_pending);
 > +       mutex_unlock(&hdev->mgmt_lock);
@@ -385,6 +377,20 @@ code were written.
 > -       list_del(&cmd->list);
 > -       mgmt_pending_free(cmd);
 > +       atomic_set(&cmd->deleted, 1);
+
+I'm afraid you were not looking into other places of the code
+regarding this, what you should have done is:
+
+list_del_rcu
+synchronize_rcu
+free
+
+synchronize_rcu will wait the threads holding rcu_read_lock so by the
+time it returns we can proceed to free because all existing readers
+should be done already and if in the meantime another thread attempts
+to iterate in the list that shall already been update given that
+list_del_rcu has updated the list.
+
 >  }
 >
 >  void mgmt_mesh_foreach(struct hci_dev *hdev,
