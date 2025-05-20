@@ -1,75 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4338D2517B9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 21:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA0021CFFA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 21:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747775997; cv=none; b=FCw6VXkijgsyjFsXaFglir5l59KXqNN+Yt7ExRQ4RgdMAwD308s6pidhIi49hCrBfKsgR0KKElgF1aslQvf6CZxJMMfrFkhHuieZevWL5puDBdbNsgSrDb/rJhN4mLjkU7Rhl/HGOpCgEUj3nMfH6ppvyblE0FmqvnidK3Iczz0=
+	t=1747776526; cv=none; b=gJdqz2MWKQykMS2W1B5p20NXYxePeEtquFl/Ngwf3Pz8VA1RDCxsZm2QrOr4qZzFwcmyYEGd+4XAvqp/fWKTKZ7npWnh9snmkUpJeRGGP1Wa/LlTrb9v4JlfBdxp/sk/SXDdr0PxXqXifQlJ9JKFcQSKgukfy9E1jorkL6QecfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747775997; c=relaxed/simple;
-	bh=7YsmCsYdZw8fCE+L1JHnCURPaNvkuWgFCBTeB7ItqfY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PA92nZk5bevf86bRVo6iigVaucu5Cwgvl1Tnzojv6j0+yDrGXETbP+uN56RrqQi/vW3w6tyhZffh8eZ34F7F/P5wXPVXs7gsQUzbzGEzKNbAkr3GbR76Fhz1GWWKESFu3PBcPvhxT/k4p4sTy0AVOdzep+5uX7xM/LQVQlM8c+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qOuYZlIF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747776526; c=relaxed/simple;
+	bh=ivHid/e+pILPnfOXraP4zTFpTczek9s90op63rdZYy0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=kdyESm/q1iwhM+mEtW7BQzSY5LuPcSD1bEc2xfHFs1vcFpDACfTpDgZqaXYxlY5oWRoys2CoOyE2LiaEgV8D4EoenBO6ACJnKBrBizsDe0DkxTNu6Cc2+JQFFKISXF66SYcwyK9VwJZg0xaRcathLYafg4ggNxeU9K/HkorN12s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DigwZoTs; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qOuYZlIF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F360C4CEE9;
-	Tue, 20 May 2025 21:19:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747775997;
-	bh=7YsmCsYdZw8fCE+L1JHnCURPaNvkuWgFCBTeB7ItqfY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qOuYZlIFBIru3VfGCIOADs5+1fvvL7XDo7boCFiHFuP8gvgeIrermxIQuj5TAO5fS
-	 LLuuZEdFi2eS4qoLcdR2k6uQfBLKwckvE4Z5nxh4Xvr5FRvl+x1N+nQuO11hw9GMeG
-	 DgkemFksrbvk/gI7IVGj1KJBWQZ3p5GcVs8Ebxk4taMPsL0gF5MtNwaBFKbrPbTmP0
-	 aJhmEIk9Wzzaa5+t38rTpWoN4RTy17+Y4CZoQ9HfZ5ZL6jjphmFVFWSr3aL74udxZ4
-	 xD49oge5GbnPbD0pwoOucebcscOWnehU0gkC3YL19GSyObqyVHwYIjCLqZgzxZW0Ep
-	 zuZt6PlgoQGYw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F2C380AA70;
-	Tue, 20 May 2025 21:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DigwZoTs"
+Received: from github.com (hubbernetes-node-551cb05.va3-iad.github.net [10.48.220.22])
+	by smtp.github.com (Postfix) with ESMTPA id 84F25E066D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 May 2025 14:28:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1747776524;
+	bh=mtV6DQVQZwhPWtpIX672fprTqENzT440rzReXQI51qo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=DigwZoTsfJ6hWN9owiBNkAjpoa3M7TxktKn2I3oGSYxB5SYj66zM1MrrA7jhQM03A
+	 xUzHKmC7WIuFSudLvbM9GaKXJEqGr53ij+T0RVpV2ONNu57B5OmopBh6XEvQ3Yc1RF
+	 ZdOLhVxfZkJFHYAfNyzgCYik4tQMZvpp9OwdvxB8=
+Date: Tue, 20 May 2025 14:28:44 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/964317/c3826f-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] doc: Convert mgmt-api.txt to mgmt.rst
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174777603274.1466863.11582993422585420581.git-patchwork-notify@kernel.org>
-Date: Tue, 20 May 2025 21:20:32 +0000
-References: <20250519193349.2536890-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250519193349.2536890-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/964317
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Mon, 19 May 2025 15:33:49 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This converts from pure text mgmt-api.txt to restructured markup
-> language and then use rst2man to generate a proper manpage (mgmt.7).
-> ---
->  Makefile.am  |    6 +-
->  doc/mgmt.rst | 5377 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 5380 insertions(+), 3 deletions(-)
->  create mode 100644 doc/mgmt.rst
-
-Here is the summary with links:
-  - [BlueZ,v2] doc: Convert mgmt-api.txt to mgmt.rst
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0402c0674644
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
