@@ -1,201 +1,197 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BCA2957AC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 May 2025 20:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EE129B22A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 May 2025 20:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747859213; cv=none; b=q5ROUMkQwY3NPCEyvrB1lFYwOu5bTG/qKMpPTyr7SMnQMCF3i6kZ/kZklhyo8jKB7fIDG64mMEt4RR7sDihm+FlfRqtHWTVifLrxUulWZshMFrgG5Ws2eiizTV/KPnHyhBEBtSG/0QwFSxqbD/T2EHVzevAacCNc2xQqm8Kt+3U=
+	t=1747859511; cv=none; b=QGJh8YQBaFABFod+WhFzpVUO1msMXb8NUJKfMVa8cmZU/J06SDerO5o4fTTVtdP30jWlR06dJ1p2vOMhrfZ9S+YUJYalDV43nh0Pr22ih0rX0Vt8kIbRRdCG7F6aRHvadNVZ/o0irOnYuMsY5aD3vPGUNBXNkcgXlAKqUAdMM8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747859213; c=relaxed/simple;
-	bh=YQBCK7SDaIwpo/lMHZJ5QX3JT6xHGtdw23hjg0aybN8=;
+	s=arc-20240116; t=1747859511; c=relaxed/simple;
+	bh=6fKuLvp2jnsYn6Ei2cXQZOjSUtTCPnB2o25WnxzXmN4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ARgsoRyJ4w8QhcALU/OywtbkgHpgjOQojDiW6rPWzXKe50+C5GwR5DQTzCnHwRndlHHvPZza2M3pk/arZpZyNvOxLd1pMWOfrSn29JZh8AmlmKM0Du5Ul9FAnZGHm4E3sOILQUHd2B8YISfZHuZEg02MTbzBlUWY62ogeamOUw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HsF9Zfva; arc=none smtp.client-ip=209.85.208.178
+	 To:Cc:Content-Type; b=mSfKRCAdXemL0Qpj7gZp8Lgio+PuAQMGLHdmjnsJrR/zgxs2eOn0tA4JtyWLzHAFyhHYh+xWpvf9L9KBlajaPs3wSIjHDPTjNbVvmvto5oR5FOFI/ZASZGHUaO5yjoSMvNjCo40j936T+xgeXV2/AOX8BHC2E+RyGW5kR0kzFvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9NCr25I; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsF9Zfva"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-329107e3f90so44339061fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 May 2025 13:26:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9NCr25I"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-54d6f93316dso8635241e87.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 May 2025 13:31:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747859210; x=1748464010; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747859508; x=1748464308; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NR53ao2AFoeZ/KVwtUA3XL196FAon3W5U6KRe4cSaIU=;
-        b=HsF9ZfvaXw/Krf9P6n23Cwaa4wZH+OBUOs49LsJBdOseqzRYb5OIq11oQ2eb5p48iS
-         /CwI9eeFQUy8hR1MXUVIKf+OZU8uPzbZGN49ganNuxKMfKWINpww8blmWkmQD5k1a/yf
-         wPvfO8mjSemQHfaPGyf7640egt+Hxre584h+PpVtbo4arkAigFITp0wxwVMI0N0uS40X
-         tetJ9F09bRzz3VbsWpfGz9aaF5uQgtIVcAS1Vu59C3MfFla7+MPA6IrOf1mZWoI7ixDa
-         9ZvviFTBqXsym1qELihJ2E23XsNt7g6mzTr47wuZYvRcVu1Omw8ULscpy7G6I7njRzwt
-         FK8w==
+        bh=P9Z65ytnuBoIzSFdWSzq/aPulc+S8yiPLWdsb3TyjM0=;
+        b=a9NCr25I4XMHTTP1fmFhUGiJh588itg3T+nEuFbGqQ4n1r5oWygfjj+8ND4eiIKoX6
+         Mkdp2ArhBDJGssjnjA08AOEBm55ahjNL6zWTeA1iOsC8/bZu5EliRihnYXgX2bLrZwX1
+         UFsLckG2fse53Ga9DInIw3D9lL63qSo1uHpulTNvIqsQ0syAWpckuf2WL5snBnvbJ+pG
+         OtLEWxph49OQpLKGk2SOTFCXJQIUAOvPLskHowle+BT+IsX72y7W31/5cAmrexfaGkXq
+         HcmSUnfv4dl6BdNoCijg+7MX/Iwgmvqy5d+FU5Rc7DMRY7DWK7L/Z3sk/Mdm9GS0inCr
+         lrtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747859210; x=1748464010;
+        d=1e100.net; s=20230601; t=1747859508; x=1748464308;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NR53ao2AFoeZ/KVwtUA3XL196FAon3W5U6KRe4cSaIU=;
-        b=sAMT8MwKQ17IsvciC7SGGLs84TTDtwOFH6MoUHNTJNVp+AX5Sp7izsqrydAsEmrIsE
-         v1pnPaglXXXXADPulX5oHm29x2wMLbJtsuZT1/GFLNrCUlElHUiUuwK0jIZCrS+1b+Gy
-         SMN3VYz7r4cZqdmCb3Mrq77IqXjFCVG8u5Fvs05Zho2XsMORS9f5lK1XAdnhsl0aK/90
-         MJflrH9khehIJLpzmDRKhTnpjJqYzfC/JztzUhcgYRtDB0W0ohLxEB2neSZwbNcOwv4E
-         8D73PwbTAK68aRStHvD4VhOpSR2GWtG7zWMtLHHN5YioCFR135uo8Fh4m7UmYjFTzI90
-         K5VQ==
-X-Gm-Message-State: AOJu0YxW3emIqjkdEpjLi4bVT2tORhuROEZPE9IfJlZMeqrOFNtBNvAZ
-	dfYiRINbwYIyEVRJmyFjiqlEpvSZg/6aq69w0UhdF+8nvoZKrW/QAuJcpW8xMzhaTjMOdpIqoj1
-	3wdi/9WOaCgv6fvsJDtZ+vfnaqTAY7bg=
-X-Gm-Gg: ASbGncs7fg5yVBoRqWwzQdPL48wXD+Zfazna6HoRex/4e4Gt9PlWWci3n0zU2XqUAVw
-	XpMTRkca4uhxuwYS7QNcfWR9ILYD+zpjbT99H4DJEvAUUjdwifFq8lJg92kyTRbE+DZT7olQcSr
-	w8kLjrs7m8MBqLJ2Xlqd6fJG4ilbD3GBo=
-X-Google-Smtp-Source: AGHT+IFZN0C/0ZRfNMcY/beALNmxarz49bEoklSknJ9dREF8PU/t1lWpKBwmFYFB7AOqhKlzhmENALybZLHWmXVNaN0=
-X-Received: by 2002:a05:651c:e18:b0:30c:2590:124c with SMTP id
- 38308e7fff4ca-328096b5d66mr63144361fa.11.1747859209275; Wed, 21 May 2025
- 13:26:49 -0700 (PDT)
+        bh=P9Z65ytnuBoIzSFdWSzq/aPulc+S8yiPLWdsb3TyjM0=;
+        b=LLV2UlbEJzAyrJUf1QoWlKCtyQdUEqCY8t3ZvMo5gNfiWjTp/UtaH4PRruxBKebkFm
+         lheIG30v1CalHaeJmQempPL8CyOrxStPlHAiD7ULyO0pZJukZ34YcnRLBj7WPUK7j7xt
+         zXPxLKstwJaExWWlCI/zurLsvlGpKfC4TGCfhfr+m8+DycuDOKD2tEF/AgM4cxDUiqn6
+         A4ZzQwig2ATTvBqhI8rSkiCfrFPwWp72op9MirmEyjd2BGmg8xrxdqebB8jdR/DrRij4
+         f/jwRWOuyzqLEMlVQainJVl4TMEGoKJWY+amJI2mV5LKeT2xcUUBbcFhLfRfv81L+TDz
+         +WBQ==
+X-Gm-Message-State: AOJu0YytLoVroXG5o1dN4t2qlHRmOXtMEP7bg08/rm9V5Td0m1B/lavm
+	vDjLJ5meZ9UOHYTf6Tmaff5onryXv4V609EJT1PBD9QofqFM8xpbLoyDmu7zJNWxPTp2feJrQd2
+	Inhf3zHXht6xk0qxeUrO1NfH7l6MjVw5Kf7Xg
+X-Gm-Gg: ASbGncv7/ifLBh588DiYsd2eWP/+ybB9pP5jDTDNOK2YEL+aff+ftTIH09ZLuD3BzXZ
+	sUS6bM260R/ZurMR+bhzM3vZYK1O4vl6smv7OXC5p3P5aa4x9tXK1Dgi5Jw2Xr1TcdkCw2TNafT
+	ZTDfZvb8k4DdJgJrn0NWxY3uSgarMd9JLCJ3+mVZTDtw==
+X-Google-Smtp-Source: AGHT+IGqY6ZpsuGsHC1Im1gLqoT8m518vX+5JPSrqE+t4q56G7u4A07CN89coJ/G87tuNdSna4ZoEiBotVbMS9Gplek=
+X-Received: by 2002:a05:6512:2916:b0:54b:ed9:2cf8 with SMTP id
+ 2adb3069b0e04-550e7198ea2mr6830616e87.10.1747859507341; Wed, 21 May 2025
+ 13:31:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250520162621.190769-1-frederic.danis@collabora.com>
- <20250520162621.190769-2-frederic.danis@collabora.com> <CABBYNZ+jMjs2Nj-9LiREM31cwhhT4O9Fv0nay_qFY4JfJKszuw@mail.gmail.com>
- <edf37243-acd4-493c-9074-f3bcfe6dc05a@collabora.com>
-In-Reply-To: <edf37243-acd4-493c-9074-f3bcfe6dc05a@collabora.com>
+References: <20250520132733.1746996-1-hadess@hadess.net> <20250520132733.1746996-4-hadess@hadess.net>
+ <CABBYNZ+MRhSyLokT6e=EykokK0S=Sy+hxoC3sqoPp3maUtZ6rA@mail.gmail.com> <e5a212501ffb9447c6d3668759a6af1571983bd7.camel@hadess.net>
+In-Reply-To: <e5a212501ffb9447c6d3668759a6af1571983bd7.camel@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 21 May 2025 16:26:36 -0400
-X-Gm-Features: AX0GCFuoFl9uUqwj25FPN5s-9sKDOkQUl9Ek-ABHGBoTGT2MAMNrggzG_VSF77Q
-Message-ID: <CABBYNZK7ik+ut0D7dydkMzDz6uMkc4MxKXUOV0R3S93oEhS5aA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/3] src/device: Add Disconnected signal to
- propagate disconnection reason
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Date: Wed, 21 May 2025 16:31:35 -0400
+X-Gm-Features: AX0GCFs8xsNyBRRDp7f_ooAJ3JIen6ACmVzhqwKVuAhwSqkZwwqNZrk9Oaq0tG8
+Message-ID: <CABBYNZKY=Q45PiOm8fs+vFMWLWmyX41pzjq=wswoGzJ+zc6DLg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 4/4] device: Add user-readable messages for a
+ number of errors
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Fr=C3=A9d=C3=A9ric,
+Hi Bastien,
 
-On Wed, May 21, 2025 at 4:49=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
+On Wed, May 21, 2025 at 5:34=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
+wrote:
 >
-> Hi Luiz,
+> On Tue, 2025-05-20 at 10:36 -0400, Luiz Augusto von Dentz wrote:
+> > Hi Bastien,
+> >
+> > On Tue, May 20, 2025 at 9:27=E2=80=AFAM Bastien Nocera <hadess@hadess.n=
+et>
+> > wrote:
+> > >
+> > > ---
+> > >  src/device.c | 10 ++++++----
+> > >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/src/device.c b/src/device.c
+> > > index 0797e5ff5bb8..d1023f762474 100644
+> > > --- a/src/device.c
+> > > +++ b/src/device.c
+> > > @@ -1922,9 +1922,9 @@ void device_request_disconnect(struct
+> > > btd_device *device, DBusMessage *msg)
+> > >                 DBusMessage *reply;
+> > >
+> > >                 if (device->bonding_status =3D=3D
+> > > MGMT_STATUS_AUTH_FAILED)
+> > > -                       err_str =3D ERR_BREDR_CONN_KEY_MISSING;
+> > > +                       err_str =3D ":" ERR_BREDR_CONN_KEY_MISSING
+> > > ":Link key missing";
+> > >                 else
+> > > -                       err_str =3D ERR_BREDR_CONN_CANCELED;
+> > > +                       err_str =3D ":" ERR_BREDR_CONN_CANCELED
+> > > ":Connection canceled";
+> > >                 reply =3D btd_error_failed(device->connect, err_str);
+> > >                 g_dbus_send_message(dbus_conn, reply);
+> > >                 dbus_message_unref(device->connect);
+> > > @@ -2545,7 +2545,8 @@ static DBusMessage *connect_profiles(struct
+> > > btd_device *dev, uint8_t bdaddr_type
+> > >
+> > >         if (!btd_adapter_get_powered(dev->adapter)) {
+> > >                 return btd_error_not_ready_str(msg,
+> > > -
+> > > ERR_BREDR_CONN_ADAPTER_NOT_POWERED);
+> > > +                                       ":"
+> > > ERR_BREDR_CONN_ADAPTER_NOT_POWERED
+> > > +                                       ":Adapter not powered");
+> > >         }
+> > >
+> > >         btd_device_set_temporary(dev, false);
+> > > @@ -2564,7 +2565,8 @@ static DBusMessage *connect_profiles(struct
+> > > btd_device *dev, uint8_t bdaddr_type
+> > >                                 return
+> > > dbus_message_new_method_return(msg);
+> > >                         } else {
+> > >                                 return
+> > > btd_error_not_available_str(msg,
+> > > -
+> > > ERR_BREDR_CONN_PROFILE_UNAVAILABLE);
+> > > +                                       ":"
+> > > ERR_BREDR_CONN_PROFILE_UNAVAILABLE ":"
+> > > +                                       "Exhausted the list of
+> > > BR/EDR profiles to connect to");
+> > >                         }
+> > >                 }
+> > >
+> > > --
+> > > 2.49.0
+> >
+> > I was afraid we would need to change these string again, also if we
+> > need to encode more than human readable errors on on the message
+> > something is already quite wrong, so I wonder if we shall instead
+> > expand the error code itself e.g.:
+> >
+> > DBusMessage *btd_error_profile_unavailable_str(DBusMessage *msg,
+> > const
+> > char *str)
+> > {
+> >     return g_dbus_create_error(msg, ERROR_INTERFACE
+> > ".ProfileUnavailable", str);
+> > }
+> >
+> > That in my opinion uses the error reply better since we can isolate
+> > what is considered a fixed string, and therefore part of the stable
+> > API, and what could be considered a free format which is the error
+> > message.
 >
-> On 20/05/2025 18:41, Luiz Augusto von Dentz wrote:
+> So, for this example, a new error code
+> org.bluez.Error.ProfileUnavailable to be added to
+> doc/org.bluez.Device.rst right?
 >
-> Hi Fr=C3=A9d=C3=A9ric,
->
-> On Tue, May 20, 2025 at 12:26=E2=80=AFPM Fr=C3=A9d=C3=A9ric Danis
-> <frederic.danis@collabora.com> wrote:
->
-> Currently a client application is informed of the disconnection by the
-> update of the Connected property to false.
-> This sends a Disconnected signal with the disconnection reason before
-> the property is updated.
->
-> This helps client application to know the reason for the disconnection
-> and to take appropriate action.
-> ---
-> v1->v2: Propagate numerical reason instead of text one
->
->  src/adapter.c | 13 ++++++++-----
->  src/device.c  | 16 ++++++++++++++--
->  src/device.h  |  3 ++-
->  3 files changed, 24 insertions(+), 8 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index fd425e6d2..a10721489 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7549,7 +7549,8 @@ struct agent *adapter_get_agent(struct btd_adapter =
-*adapter)
->
->  static void adapter_remove_connection(struct btd_adapter *adapter,
->                                                 struct btd_device *device=
-,
-> -                                               uint8_t bdaddr_type)
-> +                                               uint8_t bdaddr_type,
-> +                                               uint8_t reason)
->  {
->         bool remove_device =3D false;
->
-> @@ -7560,7 +7561,7 @@ static void adapter_remove_connection(struct btd_ad=
-apter *adapter,
->                 return;
->         }
->
-> -       device_remove_connection(device, bdaddr_type, &remove_device);
-> +       device_remove_connection(device, bdaddr_type, &remove_device, rea=
-son);
->
->         device_cancel_authentication(device, TRUE);
->
-> @@ -7601,9 +7602,11 @@ static void adapter_stop(struct btd_adapter *adapt=
-er)
->                 struct btd_device *device =3D adapter->connections->data;
->                 uint8_t addr_type =3D btd_device_get_bdaddr_type(device);
->
-> -               adapter_remove_connection(adapter, device, BDADDR_BREDR);
-> +               adapter_remove_connection(adapter, device, BDADDR_BREDR,
-> +                                               MGMT_DEV_DISCONN_UNKNOWN)=
-;
->                 if (addr_type !=3D BDADDR_BREDR)
-> -                       adapter_remove_connection(adapter, device, addr_t=
-ype);
-> +                       adapter_remove_connection(adapter, device, addr_t=
-ype,
-> +                                               MGMT_DEV_DISCONN_UNKNOWN)=
-;
->         }
->
->         g_dbus_emit_property_changed(dbus_conn, adapter->path,
-> @@ -8551,7 +8554,7 @@ static void dev_disconnected(struct btd_adapter *ad=
-apter,
->
->         device =3D btd_adapter_find_device(adapter, &addr->bdaddr, addr->=
-type);
->         if (device) {
-> -               adapter_remove_connection(adapter, device, addr->type);
-> +               adapter_remove_connection(adapter, device, addr->type, re=
-ason);
->                 disconnect_notify(device, reason);
->         }
->
-> diff --git a/src/device.c b/src/device.c
-> index d230af0a8..00a0fbfc7 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3417,6 +3417,12 @@ static const GDBusMethodTable device_methods[] =3D=
- {
->         { }
->  };
->
-> +static const GDBusSignalTable device_signals[] =3D {
-> +       { GDBUS_SIGNAL("Disconnected",
-> +                       GDBUS_ARGS({ "reason", "y" })) },
->
-> Ive changed my mind regarding this, this should actually have the same
-> format as Device.Connect error reply, so we use the same domain of
-> errors org.bluez.Error.{Name} followed by its message.
->
-> I'm not sure to understand this point as some of the possible reason are =
-not errors
-> like MGMT_DEV_DISCONN_LOCAL_HOST or MGMT_DEV_DISCONN_REMOTE, and so org.b=
-luez.Error.{Name}
-> seems inappropriate to me here.
+> Or would org.bluez.Error.Failed.ProfileUnavailable make it easier for
+> front-ends to parse? gnome-bluetooth doesn't (currently) have any code
+> to differentiate those, so it's not a problem on my side.
 
-We can do something like org.bluez.Error.None for these, or use a
-different domain like org.bluez.Reason.Local, that still is a fixed
-string that client can match, rather than a free format string, note
-that sometimes an error can cause a clean disconnect but in that case
-we want to capture the error not the disconnect reason.
+Don't think it adds anything to include a subdomain as
+org.bluez.Error.Failed, except if you are saying that is going to
+break if application don't except errors other than what is currently
+documented, I would consider that a bug since otherwise we can't
+really add any new errors.
 
-> To be more similar to other methods, the Disconnected signal may provide =
-the reason as text
-> and numerical value, which can be useful in case of 'disconnection-unknow=
-n' text.
+> What about the human-readable strings, would you want bluetoothctl to
+> translate the error code to something human-readable, or should we have
+> a human-readable message right in src/device.c in this case.
+>
+> In short, does this work for you?
+>
+> DBusMessage *btd_error_failed_profile_unavailable(DBusMessage *msg)
+> {
+>     return g_dbus_create_error(msg, ERROR_INTERFACE
+> ".Failed.ProfileUnavailable", "Exhausted the list of
+> BR/EDR profiles to connect to");
+> }
 
-But we are already masking the numerical reason, besides for D-Bus it
-sort of makes more sense to use a domain name to describe errors.
+Except for the error just being .ProfileUnavailable that sounds good to me.
+
+> >
+> > >
+> >
+
+
 
 --=20
 Luiz Augusto von Dentz
