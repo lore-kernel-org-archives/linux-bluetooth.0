@@ -1,96 +1,114 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85D128A70A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 May 2025 12:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747918710; cv=none; b=c2AYc9UXZM4hpAnjvY5fj9TWhdJAyF5u03t0ADibtjON9bRx5KNtTRXokB89v2y717KqpOwnQc28icjkE4KvGSInmi91iRqm1lYfR48bPoBzcjOLGfi4bp3/O8+ffBdVN+j7i9eLFLTWeCNYPniJoT7mXmSOGEq52L3U9rUW8v0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747918710; c=relaxed/simple;
-	bh=UDczc3FisTkVeRDDzqDOpcVpYiRhEazsS1cFvyXtad4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GmXNKR0cL2RvVt89jvQUZHZ2I9fkpUoPUjsa7tr5UTUxaCL/CpGzLitePCywM94lQtKI3a5n8/BVFcA/u/j3l3dS22ugj6N4RjQvvSHbJg3rAOS8Fim/yPDXvZ20EUCXs2tpZJq9GCQZdnhw/NgD8HjUOwPk9dSfBHZAlMrJUHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3dc8ab0ac67so20949735ab.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 May 2025 05:58:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747918708; x=1748523508;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=evFQw6Ly28nLSPr8OHYJcRMP6jYsr4DR4nvjV9TG/KA=;
-        b=L46f++qP7IknpMq+MnTykVS8AzmOrVCzCWaKaD2hBbAZ5ZKT/Fl48tJKH8N93am8so
-         f7g0bed9wSYv3wV1dWBo8UzpyUYDyzSZFy0GwaBJydc2XigDK4w+1PgzAc6EOHdjC3zh
-         t5C4iI8bzp1d7Sv4C7fB1a7hvZwrNtcq7oBkDfVM2z4MaW3w6bfS/BemdKBMnppu6gYD
-         Jj//1Iax6RwJfhu6sTVT7W3Q8543+F6MDh2Gzq7a3KVFXFHJSnZjdceMtyr3ejLWudw5
-         nkI2/4I6ZPckZMo/fhVCmzWNML4lZ09tQI00g5eAU0BAsWpg6A8Mm4iw9Tfol3joR+k9
-         zLxQ==
-X-Gm-Message-State: AOJu0YwbIGs8NpoYZZHWDtKbDqfl6w9x+wcCydp5hhSfMTgLUQtxEvlM
-	I2/cHTI+T/W1vlOis4+RsOADZ9IU4xM4vvv3RwsigsoAYwpTOcovuUrnQeNkP9CSsZz31dtcyGR
-	r9hfwLFf4nlT8+7cICtxkJa5mDTaRtpvwG0oevYP4ZR2mz9+ix7Tn3pT4m4k=
-X-Google-Smtp-Source: AGHT+IHJpKTNdTBFFSf8GIPQKvpRt+Fclj8eCecvR0dijP9DBJg4xB617rRg96Ja0wUShpDZuUsfdPJMisn/af7Tkn+adWMAkBqq
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6C328C86F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 May 2025 14:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747925744; cv=pass; b=THdBDgANIVvoxhvwFr/RKME0KEXWXe49tKJm/ZTgW8R7JlcxnEWjnpherZzSkTWS79IS/WLhIFWqrPwAr/ZnrNSniHylMaF4VrI6KSKE4vv63azxYp2ikEF0GtQNf8JonuFDfK7ha4PVsGiB/dyv7E+YboTpBr2GJzti2ZXf/SI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747925744; c=relaxed/simple;
+	bh=wO13b0dilFPE4eoL9gqsgHtqST8Mh+2p65q69inTdDo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c592VZZ4bTdhGoCfMpr8J3IBnmCpzpxbgde7MRScWh7Jp744Cu03UM4hxY4F7GXvTeMSaDbGPtQI/gP/O6Rosz3IDtm+cowAaBCVji2LZ2J4H+/PQ7Xs0ZUMiLLq5CvOlSb11RAHGBxv1gLrv+o71TlvuMl9ObH8njCDldrq3Kw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=Vx6qkP5u; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="Vx6qkP5u"
+ARC-Seal: i=1; a=rsa-sha256; t=1747925727; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Tip0w5lqcvtFxgVj1FowWnlF9FgcBxE5KyGb6D3IfSQSHC02E9GTgfUJAoWFvVzl7HUGQ9TNH92IU27eDltRWsniHeD+NWnrprsqvRcsCd5hQKRDDbZASEMkslHqeACWP6zLM2RGYtNovGfK5H9jw1tsaDyg7djmu+2h+zA4lGU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1747925727; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=5cd1tK8ryDQ+w80rRSHRfRc1rDWsujdACTVfL9Vsf94=; 
+	b=Kz0OQriVpsJHsG4sewel6P1FYRc9F3lO9zNiz30BrMxIx4ntJf37cEYdbyt2c+Pjf5+BF6yoYHs8IWjRX2t8YqBVvsRyiY7La3wpcu96a5NxcF5oEPVEg+plYk1fsluy2li8DdFqT9U7FY/162PXRXT5tlGUro+9zqk3Ow3g9tc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
+	dmarc=pass header.from=<frederic.danis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1747925727;
+	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=5cd1tK8ryDQ+w80rRSHRfRc1rDWsujdACTVfL9Vsf94=;
+	b=Vx6qkP5uHNqAGWKeKQTnJJ2GDj5l5BA1yGviso9jUTqjmwliz3Fk9hvGPT05sbLu
+	NFtaVu3UHOPPC2SdiatjAsgEp1L4en1W6yRl5iReQGFhW+QG6WFI1pumh3PofZ+Auzp
+	/IEyM8vxdRuKIcZLpy/vkQmmGw78IVtD7u75Y06A=
+Received: by mx.zohomail.com with SMTPS id 1747925724933510.570269543818;
+	Thu, 22 May 2025 07:55:24 -0700 (PDT)
+Message-ID: <333ad76e-0aba-4f93-b141-8e69fb47535f@collabora.com>
+Date: Thu, 22 May 2025 16:55:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:184c:b0:3db:754c:63b with SMTP id
- e9e14a558f8ab-3db842de1b9mr296437205ab.12.1747918707767; Thu, 22 May 2025
- 05:58:27 -0700 (PDT)
-Date: Thu, 22 May 2025 05:58:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <682f1f73.a00a0220.2a3337.0019.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (May 2025)
-From: syzbot <syzbot+list28053b3b886a5c3dd091@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v6 1/3] obexd: Unregister profiles when the user is
+ inactive
+To: Andrew Sayers <kernel.org@pileofstuff.org>
+Cc: luiz.dentz@gmail.com, pav@iki.fi, linux-bluetooth@vger.kernel.org
+References: <20250430131648.1291354-1-kernel.org@pileofstuff.org>
+ <20250430131648.1291354-2-kernel.org@pileofstuff.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+In-Reply-To: <20250430131648.1291354-2-kernel.org@pileofstuff.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-Hello bluetooth maintainers/developers,
+Hi Andrew,
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+On 30/04/2025 15:14, Andrew Sayers wrote:
 
-During the period, 5 new issues were detected and 1 were fixed.
-In total, 52 issues are still open and 83 have already been fixed.
+> Obexd is usually run as a user service, and can exhibit surprising
+> behaviour if two users are logged in at the same time.
+>
+> Unregister profiles when the user is detected to be off-seat.
+>
+> It may be impossible to detect whether a user is on-seat in some cases.
+> For example, a version of obexd compiled with systemd support might be
+> run outside of a systemd environment.  Warn and leave services
+> registered if that happens.
+>
+> Obexd can be run as a system service, in which case this check makes no
+> sense.  Disable this check when called with `--system-bus`.
+>
+> Obexd can also be run by a user that does not have an active session.
+> For example, someone could use `ssh` to access the system.  There might
+> be a use case where someone needs Bluetooth access but can't log in with
+> a keyboard, or there might be a security issue with doing so.  This isn't
+> handled explicitly by this patch, but a future patch could add support
+> by calling `logind_set(FALSE)` in the same way as is currently done
+> with `--system-bus`.
+>
+> Unregister profiles by closing private connections instead of sending
+> UnregisterProfile on the shared connection.  Pipewire has apparently
+> found the latter to cause long shutdown delays, because bluetoothd
+> may be shutting down and unable to handle this message.
+>
+> Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+> https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+>
+> Other services are likely to need similar functionality,
+> so I have created a gist to demonstrate the basic technique:
+> https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+>
+> Suggested-by: Pauli Virtanen <pav@iki.fi>
+> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
 
-Some of the still happening issues:
+I have a problem to connect PBAP profile using obexctl, using upstream
+bluetoothd and obexd built on Ubuntu 24.04, the org.bluez.obex.PhonebookAccess1
+interface doesn't appear.
 
-Ref  Crashes Repro Title
-<1>  37884   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
-                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
-<2>  6736    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<3>  2362    Yes   general protection fault in lock_sock_nested
-                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-<4>  682     Yes   KASAN: vmalloc-out-of-bounds Read in hci_devcd_dump
-                   https://syzkaller.appspot.com/bug?extid=ac3c79181f6aecc5120c
-<5>  443     Yes   WARNING in hci_conn_timeout (2)
-                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
-<6>  399     Yes   general protection fault in h5_recv
-                   https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
-<7>  347     Yes   KASAN: slab-use-after-free Read in force_devcd_write
-                   https://syzkaller.appspot.com/bug?extid=bc71245e56f06e3127b7
-<8>  278     Yes   general protection fault in bcsp_recv
-                   https://syzkaller.appspot.com/bug?extid=4ed6852d4da4606c93da
-<9>  249     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
-                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-<10> 220     No    WARNING in l2cap_chan_del
-                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+After bisecting I found that this commit cause this issue.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+Frédéric Danis
+Senior Software Engineer
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+Registered in England & Wales, no. 5513718
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
