@@ -1,76 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2CD2951B5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 14:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18A443AA8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 14:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748011196; cv=none; b=D6FLBbsn8nPDpC6xpiMjomG3QuTzRerL2Afl+O4Bkh8MfK8lAd1TpS+QE43PI29PnClURVR5ddV8arup3hTTZCDnjCmcjom7WAT26PFFkRidgHEs91dT4mKfHNntGBX6B8PHHHYqVW/6yekYiDtUQsKWHyZ9gSQvw3NoSI4UCjE=
+	t=1748012294; cv=none; b=ZGY69QAooGpXAfDNaQfBT2vMFwoqhSSDnBOVXutQb8J2AYfvypl/IvwgbCR+HW6DHLI3/JQWBkIwOw30bvwROagP/UsbLb+SSYVZsKJHI7xkL+k/jRA7uKQBQCt1eGIA/Yx8/u8oGjOTOOh1RuTDaMH1N1m7Um9Dn/XNX02SgcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748011196; c=relaxed/simple;
-	bh=zv3doc5crphIDH8hfl5HlibT7dZ8PfGTufWU8/BcY/E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QSV0mDPR94tJZ9df+0+9WAUYeQ539l/fcU3Oqp87gseGn4CN7V5XrEbCBz+Q4cTtYZ0fsd0qk6JAGOkuMc4RZEySRVqfF4vlfD5tAEP8NsOqfAx298WzCp2sxLToAN8yNP8/3jtq+yZ6gwPw0/fzHm/rM/HpJ+FKXV+MhRiKcQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TwbdZwT/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748012294; c=relaxed/simple;
+	bh=VG+f4T3m957ySWXwJmX3IXMWjBCw1BWzxo/xpd/nQuE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=K8Y+JBRZGNGQQ6vw8mDJ6aecKKa3ucEVyFmwjCBuYx11zeYhwvvxtQfzy2hHiPaL9X31u8t4/5nJknPQvkYL5T+ou0DnkIBgIKG3ODrC2yeLSDZ4P67TQ42wY6r5v5l/AGNDypyEtTZblk+/tBk7CFG5s0olJcKYU8wMsRPbrfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HQlvi7RM; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TwbdZwT/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF3A9C4CEE9;
-	Fri, 23 May 2025 14:39:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748011195;
-	bh=zv3doc5crphIDH8hfl5HlibT7dZ8PfGTufWU8/BcY/E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TwbdZwT/1nfpltL+j2uia9jQH2PZb/5+ms8YTr65Cg6GYhZekC4Yn49EhgQ1qPE+e
-	 7ses7EsnAHyqUX7TskWqeV5x8hp7pit4vXC4KxFQhBGre5D6T5MSMfGvz3nJiA4Bfz
-	 fmltNY5JVXSM6mvCzimsRSMROs/gnDR4hBZNuPDjy+WG0lIsJpBOsOjRvWJ9Uean0t
-	 VB9Y/VONVb8d4fVDQ5UABRKbi0SZVJZeJCiJdZUctAnYfkmHyZreZiCyp7t2ihtb5m
-	 8rNc9yxSUrNxu8EpLMgJCFsUbpqiZJxGhYZ+zkdPXeJCjyn5J1anS28ggj7dJ+6cOU
-	 6QACpX4bUv3qw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EE93810902;
-	Fri, 23 May 2025 14:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HQlvi7RM"
+Received: from github.com (hubbernetes-node-87edd45.ac4-iad.github.net [10.52.206.19])
+	by smtp.github.com (Postfix) with ESMTPA id A9E5A640B3C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 07:58:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1748012291;
+	bh=aAX2Y3qqXthAd/E+pIII10HCw03ekwo8srIm4uIPdqU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=HQlvi7RMsXPcY/HYi+b2knczPlwM6takuE2uo0Sju6taIx6hEA3tzKWJsKgrec+kk
+	 C6/CT9KsZvIzqHO4RLYu0idN07Zqx+rb+AnJVVfothTvKFhvnVQoqHKQsW5YfNFmSR
+	 qXRvEYk95VmKLRzA/1pyKBXlYrShhJjWtcJCB81k=
+Date: Fri, 23 May 2025 07:58:11 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/965496/9e97cb-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: MGMT: reject malformed HCI_CMD_SYNC commands
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174801123101.3616952.16066745120197261789.git-patchwork-notify@kernel.org>
-Date: Fri, 23 May 2025 14:40:31 +0000
-References: <20250522181602.908248-1-dmantipov@yandex.ru>
-In-Reply-To: <20250522181602.908248-1-dmantipov@yandex.ru>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org,
- syzbot+5fe2d5bfbfbec0b675a0@syzkaller.appspotmail.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/965496
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Thu, 22 May 2025 21:16:02 +0300 you wrote:
-> In 'mgmt_hci_cmd_sync()', check whether the size of parameters passed
-> in 'struct mgmt_cp_hci_cmd_sync' matches the total size of the data
-> (i.e. 'sizeof(struct mgmt_cp_hci_cmd_sync)' plus trailing bytes).
-> Otherwise, large invalid 'params_len' will cause 'hci_cmd_sync_alloc()'
-> to do 'skb_put_data()' from an area beyond the one actually passed to
-> 'mgmt_hci_cmd_sync()'.
-> 
-> [...]
-
-Here is the summary with links:
-  - Bluetooth: MGMT: reject malformed HCI_CMD_SYNC commands
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2ab3abab237b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
