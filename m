@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43F121C165
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 07:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F47220F46
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 07:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747985219; cv=none; b=Cuj4lI/Uh76lw5BgwIzC8kO1poR6oyhxc57LIYxcIV1y1RRNfdHQO4vrN6/goAlDmZoeKs3fcIkmFv8u0jtwOvVaTSYKR6JJ+72biCfD4xRf0ZyjaNGn1rknoIWPtMWrChE8d/IA0QmyiZd9NXE0JYDLdRIsumaZAnD07eT4yyY=
+	t=1747985220; cv=none; b=TlpLQYHmZwpFifMsVg7ZSJLBpSRPIfcVx0Q4PbPzVyA9pLaS2RSUgIlvXP3X1uveQYsDJJFO3VRok9HXvz7XGg7L0w8d4ieDeCuc3osM8MsMClw+SL3Qe64kSAO/jBrwwO5emOnH81zjiezphXEneXIGGYgfK1qq2hPf/djKbwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747985219; c=relaxed/simple;
-	bh=gMPhv2EjuENxbmAmgoPUY+4fJQ0qcJb1+Vn9841bydk=;
+	s=arc-20240116; t=1747985220; c=relaxed/simple;
+	bh=vVPxUDfLT+zq80E6y7maiE1cuSQVEa2zPhJsfchN3yo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mU+RwHPihFbtF1dtPS1eCsyd8m4EFFdwhmBSMcTPoYWPIMA/J1XuPVwOuU5SRxSeMyTKHmkero/lkDfIFhZTRDRduq8BaDoM/H3+iIeIJKDhwTjY1N3kP39170zNuL8ODNylcwaCW9UME6MEaqQUxAOQ6/1y7/53auHgkmVpVyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=C6wOrimY; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=TUjhnYGjnKUFYRy1pTaT6DKuQi1FgD2a/YfFzDfGbKamby6/o9IhC/+U3Zb3o3FTCdCO+Ck5mFof1BWqxPex+//qVXjUDdFg86csKG+pkKu9UxXcb5urefj/PQkfk1xew79yYtntodD4dUBtoabwMX0H1dxIaoVoDeZIEoNvgZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=nxCJIKyk; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="C6wOrimY"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="nxCJIKyk"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1747985215;
-	bh=gMPhv2EjuENxbmAmgoPUY+4fJQ0qcJb1+Vn9841bydk=;
+	s=mail; t=1747985216;
+	bh=vVPxUDfLT+zq80E6y7maiE1cuSQVEa2zPhJsfchN3yo=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=C6wOrimYRJhE4/Q+EInvcp+PZ8uqMNrQZIJUQoNsf4ncuTvc57jKKlh+9er52ZQ7L
-	 VuFfE2DHwWg4KdHSInsFlUs9/iRrWuZfakCVclyUM3Es0PN3e6IjuqvZUutbPC8AhM
-	 epP/6oHGLGtp4IBgeswkte9qrcNuT9n+WMSpspqdPOBjv0k7AyjozHMNe8flLUC5eP
-	 TJxebw5/u8t+sGOYmlli+adilK7IhBjOZ+ZAP+rKV6m1YNFO9rK6oUI6fwZET+1kEm
-	 z8h3DRnST30M1Z3oevb5HvZLaLS2OMHrBeSAsg8fkBDEXWhzq15Sgvv8UbS6wObRi0
-	 N9WEXN6SCHZdA==
+	b=nxCJIKyku+6cjMzS80qOinQVcFqpZdsLxfK9OX8CvXIvOPQsWS6hGhOlowdNvQx91
+	 l5w7azGMiRgj85FjJ5EHRByHq0px/D/exzLs1NMbbnYN/HvyABLj3p3CNlIlU/D1rY
+	 Y7PvueXhDM6ykErDAWzH2qggSUYX9QqT9TgBISv6ZnFyKG53QhDbjLOJBVyNyxCVT2
+	 W3QV2thesIA9S7aZwI9fp6cTZ1GUIEvtOXQGmichBCHonCVqTIjQpMpPiSbvIkD09W
+	 KgCg1WH6RsmbHMG4xkoKPOFQI24cj6LeGNyV2uVL0a6M/ZBW9xYrTGenhzH8vNfSah
+	 esQ2CydlIuzJQ==
 Received: from fdanis-ThinkPad-X1.. (2A02-8428-aF44-1001-83a4-18CE-8675-8031.rev.sfr.net [IPv6:2a02:8428:af44:1001:83a4:18ce:8675:8031])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id B2E1E17E1569
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 09:26:55 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 58A4D17E15A7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 09:26:56 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 1/4] lib/mgmt: Add MGMT_DEV_DISCONN_AUTH_FAILURE define
-Date: Fri, 23 May 2025 09:26:44 +0200
-Message-ID: <20250523072647.689324-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v4 3/4] doc/device: Add Disconnected signal
+Date: Fri, 23 May 2025 09:26:46 +0200
+Message-ID: <20250523072647.689324-4-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250523072647.689324-1-frederic.danis@collabora.com>
 References: <20250523072647.689324-1-frederic.danis@collabora.com>
@@ -51,21 +51,65 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 ---
- lib/mgmt.h | 1 +
- 1 file changed, 1 insertion(+)
+v1->v2: Replace text reason by numerical reason
+	Improve documentation
+v2->v3: Replace numerical reason by name and message
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 6af82fc4a..2b45010d1 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -870,6 +870,7 @@ struct mgmt_ev_device_connected {
- #define MGMT_DEV_DISCONN_TIMEOUT	0x01
- #define MGMT_DEV_DISCONN_LOCAL_HOST	0x02
- #define MGMT_DEV_DISCONN_REMOTE		0x03
-+#define MGMT_DEV_DISCONN_AUTH_FAILURE	0x04
- #define MGMT_DEV_DISCONN_LOCAL_HOST_SUSPEND	0x05
+ doc/org.bluez.Device.rst | 41 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+
+diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
+index 205f65761..39e51f79c 100644
+--- a/doc/org.bluez.Device.rst
++++ b/doc/org.bluez.Device.rst
+@@ -155,6 +155,47 @@ array{array{byte}} GetServiceRecords() [experimental]
+ 	:org.bluez.Error.NotConnected:
+ 	:org.bluez.Error.DoesNotExist:
  
- #define MGMT_EV_DEVICE_DISCONNECTED	0x000C
++Signals
++-------
++
++void Disconnected(string name, string message)
++``````````````````````````````````````````````
++
++	This signal is launched when a device is disconnected, with the reason of
++	the disconnection.
++
++	This could be used by client application, depending on internal policy, to
++	try to reconnect to the device in case of timeout or unknown disconnection,
++	or to try to connect to another device.
++
++	Possible reasons:
++
++	:org.bluez.Reason.Unknown:
++
++	:org.bluez.Reason.Timeout:
++
++		The link supervision timeout has expired for a connection or the
++		synchronization timeout has expired for a broadcast.
++
++	:org.bluez.Reason.Local:
++
++		The local device terminated the connection, terminated synchronization
++		with a broadcaster, or terminated broadcasting packets.
++
++	:org.bluez.Reason.Remote:
++
++		This disconnection can be due to:
++			- the user on the remote device either terminated the connection
++			  or stopped broadcasting packets,
++			- the remote device terminated the connection because of low
++			  resources,
++			- the remote device terminated the connection because the device
++			  is about to power off.
++
++	:org.bluez.Reason.Authentication:
++
++	:org.bluez.Reason.LocalSuspend:
++
+ Properties
+ ----------
+ 
 -- 
 2.43.0
 
