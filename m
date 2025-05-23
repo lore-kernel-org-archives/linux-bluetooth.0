@@ -1,68 +1,68 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076E8295526
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 14:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF612957B2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 14:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748010314; cv=none; b=TFc6svNCKZ5fEgMjqaiXmr7qxtdpUzMiSF6H8GkKdtOzyAJVaagjT8IAtB8dsMoMQVxx4hOhpaaz/0k+QnYAayXUpRbLRuR9B/zuZ7jncIdBYQClPkF9S6bqXoBsh2LKdASrlDMx1itWYUL6y8EVm1RYOd3KRlq8zFItS4uJ7wY=
+	t=1748010327; cv=none; b=H3BIXe9wiRisrWpfZ2rhveW7DBbWBEGyQypj8ckPx8PIK1s4zRoKJ73U8iYYYWfYKlgc+H5n+fiwzQ6F2TZZJYKCILGwoiOWZ3noZyy6kZf8xhNxj4L2EvzX9eTm5bYvYG10oxznWf46RpWlxbqBLfxALDx2azOwHzZpbEC2Izs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748010314; c=relaxed/simple;
-	bh=0zfn4PR/Y5CMobKW+1V/z3/4kbKC0j5legYS79Kj5Uo=;
+	s=arc-20240116; t=1748010327; c=relaxed/simple;
+	bh=V9moyCEvcreBrmKtmYS+DmumWNR2WbQ6dAJHdwX3Rp4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hdhg5ePCao/WUHmziXkIbHukXMqCNirJIo8cCsPx+FyyKUQ6wdoUJbiuiXQ+4Q065GW4GSfTDFMISMTlCz4Rv0G/ztzr+hTVyaHEf6Te51SeLqZNjMn1oLXNfna7gTdXzOdKX6p1DAMxp82q8fQJHpkce5ajCZnFmaAg+kIWOms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dx9UOnzd; arc=none smtp.client-ip=209.85.222.178
+	 MIME-Version; b=FscljD94tCvMW5BlYTVyGVM86tz8mk2JvYMRmujG/bx97SgQdGBM2xtxMIhm0ZoD+CWxyqD3dphlL8+JKJhcZrkMfoDIVJyhZwtrk3LWSZqe4RXQqqcaf+8aFFSKjVAS8acYqxGI22xCQagpwfkhJyzyuglRmJ1xwQh5HxJMI30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BTzBV8nI; arc=none smtp.client-ip=209.85.210.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dx9UOnzd"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c922169051so547681585a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 07:25:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BTzBV8nI"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-72c14235af3so5938972a34.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 07:25:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748010311; x=1748615111; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748010324; x=1748615124; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vTX9XGekTSoAvyl2aY5CMKiQTOBRj8sVZ1WkC7YfVoc=;
-        b=Dx9UOnzdipWeRkJDfk4RgJTE7pQ/UKdewTZufGaqKvktYrdoPxNpICzXFfnimq+KeV
-         sYavs4+q+XpLVHZIXRL5RxX+kuBOLam0b8pfOZqG7LheE1to7JMba4jMBykmN8QG9sKa
-         rAVNgkH4aWZ0fV3jWJKgZr7k+fsc+DxVivMeYVvQ/EipE2d7ncpBngExnXvXS9CWcmQ+
-         zKW1Q7HCpb43R0cPrLf3+M4wy7ilyQa6wvSRHAhlCjdkvZ/5huPjQQqZUcwXBeCRyTK/
-         j6yVsPtuS+iQKJCXcGpeEQhvqUDdCKncIfMiNiN5AUd1yKDTwc8eG9p0K2AaZcf+snya
-         49Gw==
+        bh=9m4+0OIIskS7vHvSoBI6wzMv5zKIWeD/uVc6SDRQhLc=;
+        b=BTzBV8nILmxNXIVzRKnxtJc+vSW4quD4cNHaI3Iq6Xx7bS7OBJKMBJ/KGLa9GNlHLP
+         NEkYWw/L5w2s4e689GW2Js6C7vGSaQyFmtuyqUMWp4YmP/CGpO49iAHexe5le48TFJUI
+         OV1xPx3NZ/pMBDtO0HTma1bTTH4aX0n38GPEon5yMiqKgSHADpb6UtV7pCN02ggeYulR
+         QnLpkQw7t5Sw+xZ4cyFPkWMFmWfk6mHOlec5vTbupItmgfagQDITHKzudd31wdR8Q2vk
+         rqUr9DchRdWRi/XorHn/Rot/5XO2hWoBe8lMGCrnh8iykuR+adFuaxGb/yglXHeMkcQl
+         pQLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748010311; x=1748615111;
+        d=1e100.net; s=20230601; t=1748010324; x=1748615124;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vTX9XGekTSoAvyl2aY5CMKiQTOBRj8sVZ1WkC7YfVoc=;
-        b=Nf927KfnGlRKZ2UT9D9HYO/axK1IsgRSpQyd0RLrkIdnLBdeWyr56zLKd1ml3saR/k
-         QgpnwrAiQbMEmOTU+uviQfwzOJHT00Nd7L8qQE8IazuTwwJjWBZKj3gXY/jM24MPvv4i
-         CHaKdCQc5/EmN0kyAoJL1n/wLl6kEGJ/xP9/zHHoXQPmPaqriWod0wH8xFzW3TO4YEWo
-         en8tsXTEhdFhohQIHv+xoMJOGdj5DJNxrc0DTNc+uq4JLide28JSp0nNDEr2abqzhG2d
-         IR1up51Nw1MnwEf20BSgcV+Nqo6Qs8dvK2CUe+xS9CmUu4t/8FKMu4KkRoEMfsOdp3X3
-         U55A==
-X-Gm-Message-State: AOJu0YwAH0OtvEtbgJJmzvWmPBB3ES0iuXjRXv6vyHF0oSZtw2/kd/97
-	EJgUOgRW1mnnLkMtJGsWEGqnuFzXuckmzdBsacgUq2sajA0Rs+/jei7QykC6yHZc
-X-Gm-Gg: ASbGncv1OfrFHhbDL4XFYvW0y4V1P2hcGJ9bdiCRJIPZNtL4oVDfSfo4GiQ6a8kY167
-	I06EhVxX24p0Aq90wRd2YfWdkO79/ucxCml7jXmd0giJbndT5dETeEWAM3DuGj0hnWLyKJGCVCc
-	FyfJmGCK5P4fXmoMI44MFXCJhRADg98yEsPiVoTIMefCAdM9XlzvUd78K0Cgz8MHlnHcBibj62h
-	QnlSRB1iC1mf3dw+NrB43FjbXB/RtytPFVyLxTX1vhfA8xAFeL6NOiq6dgNXAcSjQqHSn5SLN2n
-	2Bp+JY4PAb1kUiGUYIu2k9Lsi2ptueaTj4et5YEUdEBPdlUsMW+EDQuzHU/B4BGx99ovs9x0RSD
-	Bpa90aSHAeu3VrhHIc5k+
-X-Google-Smtp-Source: AGHT+IEGQGewZAQQOj0iPgnU1lm9ZVAdXLzK0st4wqEZ8Xp0+lIpHX0RNEb1dr43292MKDIqo9mWDg==
-X-Received: by 2002:a05:620a:2488:b0:7c5:5670:bd77 with SMTP id af79cd13be357-7cee3280ee3mr485366085a.55.1748010311062;
-        Fri, 23 May 2025 07:25:11 -0700 (PDT)
+        bh=9m4+0OIIskS7vHvSoBI6wzMv5zKIWeD/uVc6SDRQhLc=;
+        b=HGGfKXv1ejYnYJk1u+62VWVi3pxfDTH+wdlWYy4ZAdrH5Dt6/qAvwSTNgwYc5VRppE
+         C9/ZUuOLoNbTpJnViwH61itH28zlE7aQIVE0baNZ+17sivfyXAVJHxtD7Eo3ALrg8Mgh
+         qC7cLYm45+R+tC64yh5VDLlxkdGDfja9vHuQWcfwNyQ+N0mQtS6oWAt5hXlsLyWdI9/0
+         U1ow9qGOFfJdRobvh27RrfFuoxN397uJRK4gKPDqegGXWiy6/zAuBOi1VmhuBX6SBdWv
+         T/sb9Sb97RqZemlh5n7P6SR1fFlqzfIxbWBHfOacByWdfgz1HKU/NmnWCT5oHCGY/19U
+         143w==
+X-Gm-Message-State: AOJu0YwH1kds0qupShsa9ZsEjO8rM1rfMNWfKVOFJoR9MQob3OMxYXK5
+	nAq+TLJL2gfSCQXbqMSZtLC/upvTghnv4/i4ZgT9Z1/1ZBI2YmfF0DWl5TBX22rT
+X-Gm-Gg: ASbGnctGQiGxBtlBgqEkKh3u0ZFqt78tlTIT3E1YJVNIY8Ox+hW7BMLX01eEeK+gtQd
+	xSDqJTYdzPNJls71i5RdZal7TpXGXYYXB6woEWXBxNNivr5R7FZWkZKkG9gq0QAwv2itWh1xctV
+	UuAgysCBwe+6QuSI94BzeAepUF7dL7dO6qdb63phUe2PMhjLJQgddIO9BUFj5xV3SyQARA0G42F
+	qQ+en4EjCIzDDIpiCSpaJvAcZluf+iDjYm7TEUKrwlHgU332i9N9XrN4yu8hCLa2m//l2/B8774
+	dfFNeq2Jy7ivvzrYnNwiXlEfJOpPl7uFvm/6e5b3Unj9f+7FY+0Pt+Gz2eaWx5aR5PnApjyec5m
+	pYqGbw0AJfoKR+QVS0TeTkbLycULrzYw=
+X-Google-Smtp-Source: AGHT+IEfFjjD0RGWur3/pvu2hmT/75fPRSIHZaTpngMEaLX25qcMh/1neRyDpMzLZbQ1pei8gyU0Fw==
+X-Received: by 2002:a05:620a:bd6:b0:7c9:269f:b654 with SMTP id af79cd13be357-7cd47f5a35bmr4317772685a.27.1748010312707;
+        Fri, 23 May 2025 07:25:12 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87bec027524sm12246308241.0.2025.05.23.07.25.09
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87bec027524sm12246308241.0.2025.05.23.07.25.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 May 2025 07:25:09 -0700 (PDT)
+        Fri, 23 May 2025 07:25:11 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/4] client: Add scan.auto-connect command
-Date: Fri, 23 May 2025 10:25:04 -0400
-Message-ID: <20250523142505.3476436-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/4] bluetoothctl-scan: Add documentation for auto-connect command
+Date: Fri, 23 May 2025 10:25:05 -0400
+Message-ID: <20250523142505.3476436-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250523142505.3476436-1-luiz.dentz@gmail.com>
 References: <20250523142505.3476436-1-luiz.dentz@gmail.com>
@@ -76,102 +76,32 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[bluetoothctl]> scan.auto-connect --help
-Set/Get auto-connect filter
-Usage:
-	 auto-connect [on/off]
+This adds documentation for auto-connect command.
 ---
- client/main.c | 40 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+ client/bluetoothctl-scan.rst | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/client/main.c b/client/main.c
-index 5d53a7be11e4..46687c6dd944 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -161,6 +161,7 @@ static struct set_discovery_filter_args {
- 	size_t uuids_len;
- 	dbus_bool_t duplicate;
- 	dbus_bool_t discoverable;
-+	dbus_bool_t auto_connect;
- 	bool set;
- 	bool active;
- 	unsigned int timeout;
-@@ -1253,9 +1254,14 @@ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
- 						DBUS_TYPE_BOOLEAN,
- 						&args->discoverable);
+diff --git a/client/bluetoothctl-scan.rst b/client/bluetoothctl-scan.rst
+index b4b8315926a2..cee255131622 100644
+--- a/client/bluetoothctl-scan.rst
++++ b/client/bluetoothctl-scan.rst
+@@ -122,6 +122,16 @@ When set, it disregards device discoverable flags.
+ :Usage: **> pattern [value]**
  
--	if (args->pattern != NULL)
-+	if (args->pattern != NULL) {
- 		g_dbus_dict_append_entry(&dict, "Pattern", DBUS_TYPE_STRING,
- 						&args->pattern);
-+		if (args->auto_connect)
-+			g_dbus_dict_append_entry(&dict, "AutoConnect",
-+						DBUS_TYPE_BOOLEAN,
-+						&args->auto_connect);
-+	}
  
- 	dbus_message_iter_close_container(iter, &dict);
- }
-@@ -1492,6 +1498,29 @@ static void cmd_scan_filter_pattern(int argc, char *argv[])
- 		set_discovery_filter(false);
- }
++auto-connect
++------------
++
++Set/Get auto-connect filter.
++
++Connect to discovered devices automatically if pattern filter has been set and
++it matches the device address or name and the device is connectable.
++
++:Usage: **> auto-connect [on/off]**
++
+ clear
+ -----
  
-+static void cmd_scan_filter_auto_connect(int argc, char *argv[])
-+{
-+	if (argc < 2 || !strlen(argv[1])) {
-+		bt_shell_printf("AutoConnect: %s\n",
-+				filter.auto_connect ? "on" : "off");
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
-+	if (!strcmp(argv[1], "on"))
-+		filter.auto_connect = true;
-+	else if (!strcmp(argv[1], "off"))
-+		filter.auto_connect = false;
-+	else {
-+		bt_shell_printf("Invalid option: %s\n", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	filter.set = false;
-+
-+	if (filter.active)
-+		set_discovery_filter(false);
-+}
-+
- static void filter_clear_uuids(void)
- {
- 	g_strfreev(filter.uuids);
-@@ -1531,6 +1560,11 @@ static void filter_clear_pattern(void)
- 	filter.pattern = NULL;
- }
- 
-+static void filter_auto_connect(void)
-+{
-+	filter.auto_connect = false;
-+}
-+
- struct clear_entry {
- 	const char *name;
- 	void (*clear) (void);
-@@ -1544,6 +1578,7 @@ static const struct clear_entry filter_clear[] = {
- 	{ "duplicate-data", filter_clear_duplicate },
- 	{ "discoverable", filter_clear_discoverable },
- 	{ "pattern", filter_clear_pattern },
-+	{ "auto-connect", filter_auto_connect },
- 	{}
- };
- 
-@@ -3219,6 +3254,9 @@ static const struct bt_shell_menu scan_menu = {
- 	{ "pattern", "[value]", cmd_scan_filter_pattern,
- 				"Set/Get pattern filter",
- 				NULL },
-+	{ "auto-connect", "[on/off]", cmd_scan_filter_auto_connect,
-+				"Set/Get auto-connect filter",
-+				NULL },
- 	{ "clear",
- 	"[uuids/rssi/pathloss/transport/duplicate-data/discoverable/pattern]",
- 				cmd_scan_filter_clear,
 -- 
 2.49.0
 
