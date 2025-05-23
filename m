@@ -1,117 +1,76 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED6C1CB518
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 14:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2CD2951B5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 14:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748010887; cv=none; b=o05u2Wp9WIqsiezMbiixWjHa4+krwJuS/veMDfS5gcsyCRnr/O8fXgz3UtLRAb173xZIhLSsvdhmmlmh/fz18nS+VG78/zmBASn9LCTq31hsg1DwR7st2md29KhexenAt+O8aWP7l52xly/mGdFj4tHmWokgXGb9d+w5rsoo3iA=
+	t=1748011196; cv=none; b=D6FLBbsn8nPDpC6xpiMjomG3QuTzRerL2Afl+O4Bkh8MfK8lAd1TpS+QE43PI29PnClURVR5ddV8arup3hTTZCDnjCmcjom7WAT26PFFkRidgHEs91dT4mKfHNntGBX6B8PHHHYqVW/6yekYiDtUQsKWHyZ9gSQvw3NoSI4UCjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748010887; c=relaxed/simple;
-	bh=Gs7ctD9W4lhQwLn/zypWqB1ysG8Ne8RDGIGDfRAb3z4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=CyoIDb+zsVrI6sKnZv/lpkOTC4nBI9XSdV4eg8qq2bpV0k0S2wOx/cK9fb39YLhgG10zS78e5yoxfhc/NkgXgxbXuwtEchlylm10pAMRMKBCpBlct9avXSwV7utmCrxGtYE8GAOqRl6DzoAczbuoN4bpfpxTKRe1r5nwn58g+7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=hi9mOejE; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1748011196; c=relaxed/simple;
+	bh=zv3doc5crphIDH8hfl5HlibT7dZ8PfGTufWU8/BcY/E=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QSV0mDPR94tJZ9df+0+9WAUYeQ539l/fcU3Oqp87gseGn4CN7V5XrEbCBz+Q4cTtYZ0fsd0qk6JAGOkuMc4RZEySRVqfF4vlfD5tAEP8NsOqfAx298WzCp2sxLToAN8yNP8/3jtq+yZ6gwPw0/fzHm/rM/HpJ+FKXV+MhRiKcQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TwbdZwT/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="hi9mOejE"
-Received: from github.com (hubbernetes-node-05fbcf7.ac4-iad.github.net [10.52.135.36])
-	by smtp.github.com (Postfix) with ESMTPA id ADD6B640930
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 07:34:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1748010884;
-	bh=LdIAHdJFW0dQb9e+Yi4eMslRlAc81DyKCWgalOlVMeM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=hi9mOejEO54TaIRkmRazwto6Sb9msCEMKc8VVAnC6nLoApy9hzOo98I0APonv+QYq
-	 p6VrVH0BWZKeHJl6dgHMeS0r8XT8S102HTwDgs/LURGGfxVtmDhabmxTIyrL2ufQ5A
-	 tobpsso4bWL80TTcdyNLo6jdCLcp9ihFEZ4tWyU0=
-Date: Fri, 23 May 2025 07:34:44 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/965873/000000-2b0e76@github.com>
-Subject: [bluez/bluez] 429bd3: org.bluez.Adapter: Add AutoConnect to
- SetDiscovery...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TwbdZwT/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF3A9C4CEE9;
+	Fri, 23 May 2025 14:39:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748011195;
+	bh=zv3doc5crphIDH8hfl5HlibT7dZ8PfGTufWU8/BcY/E=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TwbdZwT/1nfpltL+j2uia9jQH2PZb/5+ms8YTr65Cg6GYhZekC4Yn49EhgQ1qPE+e
+	 7ses7EsnAHyqUX7TskWqeV5x8hp7pit4vXC4KxFQhBGre5D6T5MSMfGvz3nJiA4Bfz
+	 fmltNY5JVXSM6mvCzimsRSMROs/gnDR4hBZNuPDjy+WG0lIsJpBOsOjRvWJ9Uean0t
+	 VB9Y/VONVb8d4fVDQ5UABRKbi0SZVJZeJCiJdZUctAnYfkmHyZreZiCyp7t2ihtb5m
+	 8rNc9yxSUrNxu8EpLMgJCFsUbpqiZJxGhYZ+zkdPXeJCjyn5J1anS28ggj7dJ+6cOU
+	 6QACpX4bUv3qw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EE93810902;
+	Fri, 23 May 2025 14:40:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: MGMT: reject malformed HCI_CMD_SYNC commands
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174801123101.3616952.16066745120197261789.git-patchwork-notify@kernel.org>
+Date: Fri, 23 May 2025 14:40:31 +0000
+References: <20250522181602.908248-1-dmantipov@yandex.ru>
+In-Reply-To: <20250522181602.908248-1-dmantipov@yandex.ru>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org,
+ syzbot+5fe2d5bfbfbec0b675a0@syzkaller.appspotmail.com
 
-  Branch: refs/heads/965873
-  Home:   https://github.com/bluez/bluez
-  Commit: 429bd39f5a4ff0d2bbf66eea244a1f1898c306b0
-      https://github.com/bluez/bluez/commit/429bd39f5a4ff0d2bbf66eea244a1f1898c306b0
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-23 (Fri, 23 May 2025)
+Hello:
 
-  Changed paths:
-    M doc/org.bluez.Adapter.rst
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  org.bluez.Adapter: Add AutoConnect to SetDiscoveryFilter
+On Thu, 22 May 2025 21:16:02 +0300 you wrote:
+> In 'mgmt_hci_cmd_sync()', check whether the size of parameters passed
+> in 'struct mgmt_cp_hci_cmd_sync' matches the total size of the data
+> (i.e. 'sizeof(struct mgmt_cp_hci_cmd_sync)' plus trailing bytes).
+> Otherwise, large invalid 'params_len' will cause 'hci_cmd_sync_alloc()'
+> to do 'skb_put_data()' from an area beyond the one actually passed to
+> 'mgmt_hci_cmd_sync()'.
+> 
+> [...]
 
-This adds AutoConnect filter option to SetDiscoveryFilter which can be
-used by application to automatically connect devices found matching a
-pattern.
+Here is the summary with links:
+  - Bluetooth: MGMT: reject malformed HCI_CMD_SYNC commands
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2ab3abab237b
 
-
-  Commit: d58b1887c71c9e4d5d89fbfd5fedacfce7d91d4d
-      https://github.com/bluez/bluez/commit/d58b1887c71c9e4d5d89fbfd5fedacfce7d91d4d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-23 (Fri, 23 May 2025)
-
-  Changed paths:
-    M src/adapter.c
-    M src/device.c
-
-  Log Message:
-  -----------
-  adapter: Implement SetFilterPolicy AutoConnect filter
-
-This implements AutoConnect filter option in SetFilterPolicy method
-according to its documentation.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 8b676f6c89dc617cba5f5106b37b4f3fa500ba5c
-      https://github.com/bluez/bluez/commit/8b676f6c89dc617cba5f5106b37b4f3fa500ba5c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-23 (Fri, 23 May 2025)
-
-  Changed paths:
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Add scan.auto-connect command
-
-[bluetoothctl]> scan.auto-connect --help
-Set/Get auto-connect filter
-Usage:
-	 auto-connect [on/off]
-
-
-  Commit: 2b0e7615825ee550289658bfd0597e09c465c47c
-      https://github.com/bluez/bluez/commit/2b0e7615825ee550289658bfd0597e09c465c47c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-05-23 (Fri, 23 May 2025)
-
-  Changed paths:
-    M client/bluetoothctl-scan.rst
-
-  Log Message:
-  -----------
-  bluetoothctl-scan: Add documentation for auto-connect command
-
-This adds documentation for auto-connect command.
-
-
-Compare: https://github.com/bluez/bluez/compare/429bd39f5a4f%5E...2b0e7615825e
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
