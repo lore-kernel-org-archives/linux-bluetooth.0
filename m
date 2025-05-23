@@ -1,125 +1,106 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E021494DF
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 08:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0C7189919
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 10:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747990014; cv=none; b=EqckPbqyK6rY7N6U8/HKoLriZZO3fvkCbYvt221ZvH4jetkU/wiJwyE5GrBq3+Sp9D+SibI3IitsZ9oh5pvHKXKXNBuQEgpkCPQosvPbbvQUOoseHq2G+ZmD9Wiaaw0U1Yr3sobuJowY0gcKaQWSROGq2PR7jaOCA2c8AWTiI6o=
+	t=1747996453; cv=none; b=hp08FdoABZCDV0Q8UOp3x45Cjhy7bod8qh8qA3DE+PNG4JJi0oA39uyCxuyBrUGoWrnwya0fWeKagPyRixGVV4MytLm58HtdAl/QYgBwdDQf2oiW8/gjgPd59DeewDlEC5mtXTL/QnumdjlkIBOqWrqc/iL3ZHxnuc/ZFOFevpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747990014; c=relaxed/simple;
-	bh=cZ9QR6QMb0xmvLi0zprbZNqlURgjX2tskQRWqEtafA4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=I9/5Ss17d+9vXvYXHDzar1yZYU+SuUMTXf9qRHNLJ6CjIrJjjdhqu9bBWtxu2CV3XXkHCpaKGILyNhoInEE8gg0tytF4lQ7ivkvngaaiOrDeaJNBqMdHOPSCNJXB+0WXlpcOfuYU8dTUmnkg7+t5mQ7YiUze3Qi76ZnfY2bt/bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bBzczScu; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bBzczScu"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b1fb650bdf7so5085757a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 May 2025 01:46:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747990012; x=1748594812; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ULTtN5M+0rU0yOqBAnckvro5Xb9yFBftIDzYFHDDYAQ=;
-        b=bBzczScu7r/NSVJcl48F64OaNFUSWIduZFLuOjLORbfuGV28Ket42ypfUFG8X93YzL
-         aIwzuTffDMa6dYyYpzMFHncXnZR8jrZbNVpy93uloHYBKffpGMX5Hi6V26PjpgITnI+G
-         5dH5mI/OelVJwiyHry4ZUdeaSIsNUorLcr2VKyQFZPjtGR/rJW1G1kDK/zTHzmAB9sFq
-         vq31GRBx6MDAGzpE28ibJcLILq31RUmVUWLVnSo64/5s30epo3/iCMlifO0hWVR+fVEg
-         /oDd+FqOlZSn9BLYfQJWLHdTd4ACkwKXSfOqGvtL6mXkDWgEoTg/A2fQS1/V14rfqvgl
-         vFxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747990012; x=1748594812;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ULTtN5M+0rU0yOqBAnckvro5Xb9yFBftIDzYFHDDYAQ=;
-        b=wiLI52rRGPx1mBczCsn4k0u/ITSwcZu6wrnJbmufkMH2oS/StAZxf+tWnYjyujbL16
-         lHMGWNQso4+BkxJP2yQZTu6Ci3JzE9323CWApAN1No57fMFPKX3+0wfRu7lrGtNkGiIq
-         wxG2nkeAwIYxIqzevxfxCriU6K6qnSFcfXfCjbBVSVizew1hziAWBMMenJZ+vg6qFJBe
-         nDvvE8tg2bGKtiFjk06d52XTTGHeaNEm/GqC0WL9aBse85FRBPyLpsUJuM+kDytrkYh4
-         rYrlUrBnZ3EjD6GYPQHpRktJhakZMV0Z27IKcMK5xLIUVjm22iQewleEtO4VJebZeXF7
-         KYfg==
-X-Gm-Message-State: AOJu0Yw1FTqOSkJj2XGipMcRSXOB/QDlBy0pz0CvVXLDqX1ze8mwWAXn
-	0yswPPd44drT1+kuj8YcJngcA13oXoaZ9791aQkK9U52P4HOn7rCVB/Ho0TcrsP+
-X-Gm-Gg: ASbGncvut5pIFX/uJNlgXkjMMLiNd/s40rwACIfO8ThNgrGeoUQQTldqdlUY8kbsoBd
-	baWSj53mS8ALYjPfBAS/s49blTYbMMwtbPVatNHbf978IPhXrdAt8I656o7AxX8whoiFsLkYYyR
-	KCrWC+JRLjhQHVZcHW+utDbNNBM2XRu1ivqMdvqotjO0NP9vtPN7EIRFb+mV2Z48wHMZBkhNahD
-	PlSNuUEJhcttec2RccE2wV8s/td3gHWR6aAarFEKuUymaay/p/xoAUbtbUfW4k19MEORPxsG5y8
-	mK+EJP7J4uyp0OG+1IJ6ifYq9CbJk9CpeUnG+0FrPcj8yhVY5U/QPkvk
-X-Google-Smtp-Source: AGHT+IFY+eaCs3cQCsNJr/3slDQMyxO7jNzjbgq5AN+3uRDTx7+4vDg9iIPj483JhlDDMuKaaXMoug==
-X-Received: by 2002:a17:903:58c:b0:232:5872:f00a with SMTP id d9443c01a7336-23258730137mr203596485ad.43.1747990011993;
-        Fri, 23 May 2025 01:46:51 -0700 (PDT)
-Received: from [172.17.0.2] ([13.87.241.12])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4ac9256sm119989205ad.35.2025.05.23.01.46.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 May 2025 01:46:51 -0700 (PDT)
-Message-ID: <683035fb.170a0220.35d608.3e79@mx.google.com>
-Date: Fri, 23 May 2025 01:46:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3832595195497354867=="
+	s=arc-20240116; t=1747996453; c=relaxed/simple;
+	bh=1ev01/LLEnIbQC6U+gj8swXpDcOsVQ6qw6CPxLD/Mzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C1gJYFrbvi8nwD3YawZ4wN9t7xEhYBwwMj0rl86sX5wPNYYqS/94YFjm7NdpO2KYU5v4ZIywKajzzQEQsx52eTVd21/f+9bPPAa7cMGGlPgJFpN2P3z4cWkjrCvYgl4g4zsbfBNqahfdfHjWAfz6Gs5itcVuwPDueX7gAwzqYpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
+Received: from 5.5.b.7.3.b.f.b.f.e.2.7.1.c.8.c.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:c8c1:72ef:bfb3:7b55] helo=andrews-2024-laptop.sayers)
+	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
+	(envelope-from <kernel.org@pileofstuff.org>)
+	id 1uIPj6-003EUr-15;
+	Fri, 23 May 2025 11:34:08 +0100
+Date: Fri, 23 May 2025 11:33:44 +0100
+From: Andrew Sayers <kernel.org@pileofstuff.org>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis@collabora.com>
+Cc: luiz.dentz@gmail.com, pav@iki.fi, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v6 1/3] obexd: Unregister profiles when the user is
+ inactive
+Message-ID: <aDBPCM8f0dpkJ7ob@andrews-2024-laptop.sayers>
+References: <20250430131648.1291354-1-kernel.org@pileofstuff.org>
+ <20250430131648.1291354-2-kernel.org@pileofstuff.org>
+ <333ad76e-0aba-4f93-b141-8e69fb47535f@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: Propagate disconnection reason
-In-Reply-To: <20250523072647.689324-2-frederic.danis@collabora.com>
-References: <20250523072647.689324-2-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <333ad76e-0aba-4f93-b141-8e69fb47535f@collabora.com>
 
---===============3832595195497354867==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, May 22, 2025 at 04:55:22PM +0200, Frédéric Danis wrote:
+> Hi Andrew,
+> 
+> On 30/04/2025 15:14, Andrew Sayers wrote:
+> 
+> > Obexd is usually run as a user service, and can exhibit surprising
+> > behaviour if two users are logged in at the same time.
+> > 
+> > Unregister profiles when the user is detected to be off-seat.
+> > 
+> > It may be impossible to detect whether a user is on-seat in some cases.
+> > For example, a version of obexd compiled with systemd support might be
+> > run outside of a systemd environment.  Warn and leave services
+> > registered if that happens.
+> > 
+> > Obexd can be run as a system service, in which case this check makes no
+> > sense.  Disable this check when called with `--system-bus`.
+> > 
+> > Obexd can also be run by a user that does not have an active session.
+> > For example, someone could use `ssh` to access the system.  There might
+> > be a use case where someone needs Bluetooth access but can't log in with
+> > a keyboard, or there might be a security issue with doing so.  This isn't
+> > handled explicitly by this patch, but a future patch could add support
+> > by calling `logind_set(FALSE)` in the same way as is currently done
+> > with `--system-bus`.
+> > 
+> > Unregister profiles by closing private connections instead of sending
+> > UnregisterProfile on the shared connection.  Pipewire has apparently
+> > found the latter to cause long shutdown delays, because bluetoothd
+> > may be shutting down and unable to handle this message.
+> > 
+> > Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+> > https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+> > 
+> > Other services are likely to need similar functionality,
+> > so I have created a gist to demonstrate the basic technique:
+> > https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+> > 
+> > Suggested-by: Pauli Virtanen <pav@iki.fi>
+> > Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+> 
+> I have a problem to connect PBAP profile using obexctl, using upstream
+> bluetoothd and obexd built on Ubuntu 24.04, the org.bluez.obex.PhonebookAccess1
+> interface doesn't appear.
+> 
+> After bisecting I found that this commit cause this issue.
 
-This is automated email and please do not reply to this email!
+Hmm, my guess is that seat detection isn't working properly.
+Could you try this gist?  You should get "Active: 1" when it starts,
+"Active: 0" when you switch away from your current screen, and "Active: 1"
+when you switch back.
 
-Dear submitter,
+https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=965695
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.39 seconds
-GitLint                       PENDING   0.31 seconds
-BuildEll                      PASS      20.53 seconds
-BluezMake                     PASS      2611.25 seconds
-MakeCheck                     PASS      20.20 seconds
-MakeDistcheck                 PASS      201.22 seconds
-CheckValgrind                 PASS      277.99 seconds
-CheckSmatch                   PASS      305.14 seconds
-bluezmakeextell               PASS      130.37 seconds
-IncrementalBuild              PENDING   0.30 seconds
-ScanBuild                     PASS      927.61 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3832595195497354867==--
+> 
+> -- 
+> Frédéric Danis
+> Senior Software Engineer
+> 
+> Collabora Ltd.
+> Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+> Registered in England & Wales, no. 5513718
+> 
+> 
