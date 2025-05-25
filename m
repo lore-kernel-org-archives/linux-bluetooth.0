@@ -1,142 +1,127 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0159872605
-	for <linux-bluetooth@vger.kernel.org>; Sun, 25 May 2025 10:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F70E3FE5
+	for <linux-bluetooth@vger.kernel.org>; Sun, 25 May 2025 19:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748169179; cv=none; b=S0MsmdbX/q/0THaq2v4kRPleuSTnzTIrovRgIT6sZr31WHblU0xD7csTY/0/RA/XtIkUDoS287zeu4vsFO8AzMp8TT1++B6+ZG1rqwI3zSTm7i9E25WlTGfivCg6RPFeiusAlkpXzokrYvzrXHy7khdEzrtvZtvIb/N86VQciUw=
+	t=1748199632; cv=none; b=iHsR9GL1RPt4bVgA4qmtJ85Emoz1QG+MPQ28nkzvUNEy87kEiUzoV0SCSKcB7t7QuN0hJ9W0ETZNgCrsDosPTxuN8MWf2jM7pc66ybOvz4r5OF9dpez8S0kzIDWErE9E0bcPOYBQbv0bvdedyK6kIHgSL+CTNxL51u/a7EXzWtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748169179; c=relaxed/simple;
-	bh=AN7258j0rMdqqdynMHWo/iDYZves99oYkasDa6SJ0Nw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lDHMs2iDWb25oJwBQs5zos9LWnVVdO+vFNE+F4Z/CaaRPj9v91j9Ss+WDMb3SPx9ZaW91hkd0A0jC+SIV65QXm8Q+agSHLw4iXcyXEXadg23LuExZ8LcqKrB/Taqo0GaxmYhuLx6d55ZSr3W1jNnZZH7FQXJPAxrUgrL4kgv9B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=joENa+XU; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748199632; c=relaxed/simple;
+	bh=B85VVTyqk8cVv2J2dpmt2w8VDVRnFq3MXX/CJMWFGXo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=faIawJCdAiZQIY0FDgZGmRG4pJHCGGlfcOssCzMRpWTUZye11Z8SF+at3/MBqACiGlkkCxvDQusAsOQIc6738/yclKyJTxwnifvemnqY/F5jkyoLlPbUkPmiCbIQGFy6Z4sXINoFe74rp+st8hhgs9rWZq7LKywA7pkGR/eoDVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pl6BnKoA; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joENa+XU"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6f0c30a1ca3so14098916d6.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 May 2025 03:32:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pl6BnKoA"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-44069f5f3aaso2464975e9.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 May 2025 12:00:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748169177; x=1748773977; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oQJd82D70nQ+AuIrty0yltfThwZqNW6foGatpWvigyg=;
-        b=joENa+XUDONQfATgLgnUwCU6hGHe7SxexQaxxwhF7vhJ+Gpd5CI577XHlKfKzd54YT
-         tLv4laLz7vw9NMGNzXJty+iD1gtgyc/VTSAUgnvyLGQpU0EzTTkY26lcfWBfU9Ntf56d
-         7EcMaEYYPDNMIE5UfLpd/wdNBRUaeGu7GL3zCWM2SeK9GShdJpQZXVP476WjTFbv+BXe
-         gRFlpHfkbBPr7GCdUKy6Rj5AB0MZYfLleK9tW7qXiDO31h/SFX54l1gjYfDklev2RoEK
-         5n8jU1B1p2bd/Skd+dRAV830vOGiRsE3tbIfp6pqdczm57CGJooZ8jB2NMGjQJRlZv3s
-         H9UA==
+        d=linaro.org; s=google; t=1748199629; x=1748804429; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RjLFxqY7XnLccRUOwo/zYDqB3IdQnhxagjUTUuoSWKI=;
+        b=pl6BnKoAvoIVj5IENAreM0exl9AdT2uP+LLBKx84D+a7UNYesyVkf7aOvzMtThKjAB
+         Ry8f7J0BTCuibh9l4Ye6znQ6JzBkXqjcp4pUtQcuRjbh+5SH8OiDJrfSfMNt1wBmjUjL
+         EOSibsadJLloRnkVfhxcjfFsKnEBr9m7Jij5L6z1IKDfuzS0i0YqJXzIAm/ucdnyqbAg
+         fv8eUWCgKNKirjEthnE5NC+sobgF8AVwLINIf08sQNo2nU765W9mgWNl0KKGjVJrzHoX
+         aQGvF/jqWqX7KFjJEamSKwPpp+rsJHIPYHaw+zBB2YESkpANHy+nGkWsow27DwBGOdcx
+         HGHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748169177; x=1748773977;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1748199629; x=1748804429;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oQJd82D70nQ+AuIrty0yltfThwZqNW6foGatpWvigyg=;
-        b=Ta8QCUDjBWyGzmisNSTHUWRRnlZ77WWANtPD8iwSn+IEfo/cfuiBrIvbQGTgg1nqXW
-         T+FZACzTvJbIaVa4rULcHdjp8hW1UZBTH9DJGOFRZHgdLWQl4+n//i25ee8yYktLt4Il
-         0V/RrR26W1nS7/Obw0djnJtwH/vJ3HKOGxcI76JDVz6tkfYQN5Agp0AqZqZe0dd8f4vv
-         s9GzIa3SJ4hlhMsbA3o0bXwsp7W56Q1hDhh5zBu55pbL95ZHDdh9SKiB5WFT65o1qnd4
-         Cue+scTFKcjasAeL9yp5qJ98MFgHrqBS8z+AzvBQxtzg464V+ojR5i+Fp2L/gBgSvybA
-         uaqg==
-X-Gm-Message-State: AOJu0Yw6HThfPMgxFGSf+muQgWWUXwpMZQD5ROVhDfExH0cIpk7AKiE/
-	lbOtj6Aptb8FnGD0rzAdUd9+Pe0jRXJoG+7X0nRBTPd5/hjsFLR3w4LVn4w8uw==
-X-Gm-Gg: ASbGncsFn2afYoFBkGID4GD22Qj+VXAq8GG67peyY3oKfzps0WOvdXVqis1WoMMcr/g
-	MSofYeM6Ract0LS1mvzF9InZO2sBy6KhuDnD0u3bl+ZHTSWoU2dAGxd63Bp2QPGcWZwskFRBAU8
-	W6XYFgQzkw29aMHk2FwqzCQqdjAIhuRcwjWhJHvXoPnW7AtyCrVfIHMGVd+M4xodr8MzCYx4OLV
-	6V+hT5+iVrj/e/kuehOajAA6iEGLr8imvlNK2oV0TrTjkW6jpNmvQ/YU/Q3S1ak6vErba0oaxD7
-	Tk28lTsmf8Mfrz6PATH+GQB6o30DCC8ku6ePyvAGAsfyW4wwoSiVVxYZ+A==
-X-Google-Smtp-Source: AGHT+IEq3o0YrM9LFTM6Hbv/qrr4ufWGXH5m0hnWKd1RwaPL2GAZdmeiFNTSvkn1S3B6EfZTSSJWNA==
-X-Received: by 2002:a05:6214:3013:b0:6f5:117c:76cf with SMTP id 6a1803df08f44-6fa9d2dca14mr93535886d6.40.1748169176600;
-        Sun, 25 May 2025 03:32:56 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.54.70])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fa9e11d873sm21515406d6.85.2025.05.25.03.32.55
+        bh=RjLFxqY7XnLccRUOwo/zYDqB3IdQnhxagjUTUuoSWKI=;
+        b=grnQem8gLiYuRLfrszi2vj7ppLoAApmU3j9FmAtltnemLXdgQOqIJHD+9zZ5F8ogus
+         lQALZsZlxaRGhOTCracShU8iMbePC0qVTty/7LVem31T/WJfjsXeIir/xvaJ8GwWg43N
+         1Y0DI5x2Radg5iagO1biGIEtU6c2uKMDcXp3OeFkJygwCoF50entPy6dpiEcJOoYzzf+
+         j/s/jSgphbT4Kz12lOhiNsrTCnrGCkA/4Plfxk6T7lyfByGI0KSDL4oisXlzQ8KAMAKs
+         k/1+LKlu3Khq5xP9j3Hi1Y4eiHECtwU2VnMJOgMqTifKZ3EBv1F95WtiRyeHL01p/IbA
+         YqkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVU2elNASFhvMsQgFkw9mrX6lYXIL16cWJPR62n7MQcQz7xBcHwDCtbCFf3lHccRt+vSBkYIWrC+jGUM/+AamU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmuftuSTZqmD7/qSZ2pT60EXFYO+RLEQK5BWSQiOqnHcEVSa58
+	xwoj9WMcgFEAz7XSutXEGowzBaBzhyJsVWnVAvfnQ4MMMsB0nzZur+A8H9gwP4G2xSc=
+X-Gm-Gg: ASbGncsHmPnRWA2ZaBM3BY0I7Nl/4VvsWJjahrd+/xFJlJDx0W/QuAFMBDlD29He+jR
+	JYgw42HxSEyAmVUZIKq95kmed4k0stPMTnHHHYRACN+4/ls0l3SAp2rV7FVsbWS0+TXt38MXbx0
+	b6aXV+vn7e+LabiAcqF3sXijJZn/cXiVJiyWWqaodQ3lpZGNccsRFea9TDJPmGy841yrKrEC0jp
+	onmKUtnmJTIXLh+s2ferqu734HfBHE6LblyHqn+UPLlhUkN7ywNTtwKqfZ/H9GYXFM7NPaHgL0f
+	JuYcxLWaGSiI1poNqL2lRmLymfhYILxVpKUWhE0EkkP8BSou9AyGL2FpuOktSxl7MtBFDDp5
+X-Google-Smtp-Source: AGHT+IGcJtSyI6HBYQjTOimW44zIP6UUiFecVnILao/qEPMGVovWt4I3ZyyZO/nyuRGDWyrSto3LBQ==
+X-Received: by 2002:a5d:40ce:0:b0:3a4:d8b6:ca78 with SMTP id ffacd0b85a97d-3a4d8b6ce1amr319886f8f.16.1748199628644;
+        Sun, 25 May 2025 12:00:28 -0700 (PDT)
+Received: from kuoka.. ([178.197.223.125])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d74843b2sm1629864f8f.53.2025.05.25.12.00.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 May 2025 03:32:56 -0700 (PDT)
-Message-ID: <6832f1d8.d40a0220.160896.4647@mx.google.com>
-Date: Sun, 25 May 2025 03:32:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8917223754812087232=="
+        Sun, 25 May 2025 12:00:27 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Neeraj Kale <neeraj.sanjaykale@nxp.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH] Bluetooth: btnxpuart: Fix missing devm_request_irq() return value check
+Date: Sun, 25 May 2025 21:00:21 +0200
+Message-ID: <20250525190020.27286-2-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2,1/2] Bluetooth: btintel_pcie: Fix potential race condition in firmware download
-In-Reply-To: <20250525101619.530255-1-kiran.k@intel.com>
-References: <20250525101619.530255-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1183; i=krzysztof.kozlowski@linaro.org;
+ h=from:subject; bh=B85VVTyqk8cVv2J2dpmt2w8VDVRnFq3MXX/CJMWFGXo=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoM2jEi82njqFcOjm2ocR19/nY4zOaTn8/mG2Vy
+ BgID+c/ufuJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaDNoxAAKCRDBN2bmhouD
+ 1/j3D/4tNb9p4+zQ6Hy51btWhPjOGB3zxCxwZYTIz2whrJZiQ0sV4AHtn2jBjw1sOIJYf32h/Yi
+ +LSNA+ITgfNYVhw1Ye02CL7nCchSnKJ0Lslhih42WkuZo/EAolSglMtvK0AT1I8mYRCNWQi0547
+ v1ur1tv9oEDNyQ0ADBScIZXLMVGeLP6x0RhPItq75iCUcpsPK4o4nXwa4CRY/f2uO8waUPhhA/t
+ S4Fy0E3uELhWvYTRm7WQkqRZwfeGLfLHqqj6CiNK6TNHvF5Kl79mobzMQawlrOpBekG5dUTwBrT
+ yaf4myzQohHYey6aJo/3FV4hV30Zl6BP3/7xm90HnAkHc0PAJ0cstilFgZy6BZP33680diRZ2Vj
+ YhGrHZnoq+D2Y/fLGQBP16kvnpSRVvGabhVZssF5tnvq6gFrR2gnn37rGRJ+lqzXg2F7cNtg1NG
+ Gcqn7Rkvtcs54N7cjdLnQcZf/oWi8+yo61nF07wL/AanSZ4a2dOWsKpX0VsDbHuJ7QCAbuvjsED
+ JFGVMuAnaeJsMv61vo0jzk3tlY/cgEvp9OxPBljFaEIgcIQkBkdm37tJ7Ut+Td6HHNV5b37YAOL
+ wUzV4v8MeqGdDoDX1Pw8H+BjiL3csva7JinarnOyRnzUEUUj+keVYkyIMRyX/GEj+fRogJyQko2 V2f8Xhttd+LsepQ==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Transfer-Encoding: 8bit
 
---===============8917223754812087232==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Return value of devm_request_irq() must be checked (function is even
+annotated) and without it clang W=1 complains:
 
-This is automated email and please do not reply to this email!
+  btnxpuart.c:494:6: error: unused variable 'ret' [-Werror,-Wunused-variable]
 
-Dear submitter,
+Setting up wakeup IRQ handler is not really critical, because the
+handler is empty, so just log the informational message so user could
+submit proper bug report and silences the clang warning.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=966204
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.18 seconds
-SubjectPrefix                 PASS      0.18 seconds
-BuildKernel                   PASS      24.31 seconds
-CheckAllWarning               PASS      26.64 seconds
-CheckSparse                   PASS      30.17 seconds
-BuildKernel32                 PASS      23.88 seconds
-TestRunnerSetup               PASS      454.99 seconds
-TestRunner_l2cap-tester       PASS      25.38 seconds
-TestRunner_iso-tester         PASS      39.81 seconds
-TestRunner_bnep-tester        PASS      5.78 seconds
-TestRunner_mgmt-tester        FAIL      131.41 seconds
-TestRunner_rfcomm-tester      PASS      9.34 seconds
-TestRunner_sco-tester         PASS      14.64 seconds
-TestRunner_ioctl-tester       PASS      10.02 seconds
-TestRunner_mesh-tester        PASS      7.19 seconds
-TestRunner_smp-tester         PASS      8.50 seconds
-TestRunner_userchan-tester    PASS      6.15 seconds
-IncrementalBuild              PENDING   0.38 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 3 (AL is full)               Failed       0.230 seconds
-LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.166 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: c50b56664e48 ("Bluetooth: btnxpuart: Implement host-wakeup feature")
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btnxpuart.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index b34623a69b8a..6b13feed06df 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -533,6 +533,8 @@ static int ps_setup(struct hci_dev *hdev)
+ 					ps_host_wakeup_irq_handler,
+ 					IRQF_ONESHOT | IRQF_TRIGGER_FALLING,
+ 					dev_name(&serdev->dev), nxpdev);
++		if (ret)
++			bt_dev_info(hdev, "error setting wakeup IRQ handler, ignoring\n");
+ 		disable_irq(psdata->irq_handler);
+ 		device_init_wakeup(&serdev->dev, true);
+ 	}
+-- 
+2.45.2
 
---===============8917223754812087232==--
