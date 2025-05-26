@@ -1,66 +1,61 @@
-Received: from e2i340.smtp2go.com (e2i340.smtp2go.com [103.2.141.84])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD22B3C465
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 19:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.2.141.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D10D1F418B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 19:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748289123; cv=none; b=kJlUooFOBNgw23/Lxg1yoOxFZ2hyVWdt55ex6MtUoOUEWIrr99FR0RSufJoaFk9Gf06OC5A5Ow3AfSOnuYXc04X1Pb04u32Uz9q3vjXNJR+36WD3tfJQUYNiax+jg9YF4eW35nXA8Chxp4cbbw/CIUPn1bOK19SQCwPAXmFfOuI=
+	t=1748289441; cv=none; b=URF9FKMa7eU7KNL4DIB7pvIljdpGtx8RAMx6pFNzMWQ+zNHLPQwi/KUhbzrMecB+Y6ZNFaylidKBVtBKVWbhelm1PhJ2Scpc8dKdzlR5e0CGXtPXspv/599Bgcv05dOf7630ew4U6m+AEHhKgS4YSEBOdPryBrlEFBrVBVqjZ1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748289123; c=relaxed/simple;
-	bh=D00RHDlNrTVIa7DyjZChMl8PaTVB9iTiGbaKs9HxIQ0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U4qJfQNc+RJqsZBYj6HuzDqVe3lwxmRo34o+nu+YurzQ2I2oTgF564KimB8ht0ka/TMjpnyxts2GsOX27dyZNRGIRlyrNkW8y5Ktcr092CYhVFGubHs2hdwWWZ20vigRZUq2l4f2r2iKXQJIs4rhxZQxsabfvjFbrV98o4167Tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=triplefau.lt; spf=pass smtp.mailfrom=em510616.triplefau.lt; dkim=fail (0-bit key) header.d=smtpservice.net header.i=@smtpservice.net header.b=GiS+DkiJ reason="unknown key version"; dkim=pass (2048-bit key) header.d=triplefau.lt header.i=@triplefau.lt header.b=CIC7p9Mo; arc=none smtp.client-ip=103.2.141.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=triplefau.lt
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=em510616.triplefau.lt
+	s=arc-20240116; t=1748289441; c=relaxed/simple;
+	bh=c8WJnjp6t+vVGDV940aMGN4H68Kw1YOAIb/JIJxKQZ4=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HEj13W2TN6qpcB/dGIv34mh2BZAzLMlryXgVHZNTZrPvf+fIor1j6f84Erot3IVCjXUGklDi/VIZS4OZOWK1NtFNaO8SvWDdvfFzC0Yimmf2wErGIivGmwYG2RNSJl0qMc2jLtJhBB3APUT9p+SJCnSoqAuF27XRgUKCxd6CNUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=m3ZjmPul; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="unknown key version" (0-bit key) header.d=smtpservice.net header.i=@smtpservice.net header.b="GiS+DkiJ";
-	dkim=pass (2048-bit key) header.d=triplefau.lt header.i=@triplefau.lt header.b="CIC7p9Mo"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=smtpservice.net; s=maxzs0.a1-4.dyn; x=1748290020; h=Feedback-ID:
-	X-Smtpcorp-Track:Message-Id:Date:Subject:To:From:Reply-To:Sender:
-	List-Unsubscribe:List-Unsubscribe-Post;
-	bh=XPNHOD4qOBhSlprrx0fS+dkW80t98f7p2v/qxbkcPHc=; b=GiS+DkiJPzj1ZdJkEO6H2yjh67
-	YnsnghXhNQEMgEW+rDYp2uxktm8JEY9JfcxgzxVvAHJx9eqN2NF4HsytaA62q3lpoBTECUPgY839X
-	uEQAGErWdoHCy1Fm3+z2alrAKJnF/eS1p25thi1BuWOEDe9BKcDGFGosP0DdiDCDGYIwAL9Np4aH9
-	nMpZ/YPcrsm2ynI3TGjnLGpQ2EzQHW85Bq6FkiE1b9zc7eXkN+sLEOF9irtOsYtHJHKWMc1onvT3C
-	u3zvq8Cj5vCrhrZxy0MbbjxgHW97w2c+ofPXfd2GtgK9FPqwPVStwJBGrDErsIL6DPJ4JsRTwlx6n
-	4nddwb8A==;
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=triplefau.lt;
- i=@triplefau.lt; q=dns/txt; s=s510616; t=1748289120; h=from : subject
- : to : message-id : date;
- bh=XPNHOD4qOBhSlprrx0fS+dkW80t98f7p2v/qxbkcPHc=;
- b=CIC7p9MoqVEgrqYxzxFUWCZGfMv32aHTdWmtSclbhkXAtuWjYALOLdA0zrbSRqTj6dLe/
- BxGBuQJiAn/JzMo6w3K5ZR7LkhxIpQjOFte5WjVX3c8YM5zNHYycJ/LO2NPYqRJIE4NtpDS
- vTSgPdccA1oS53ohVw8HV40F37kghUwAZhF0A33V1DLTJge+IoTucbMqtuaFXJXLJaxcKNE
- tbw68CQSsQqaDZzF8yP5k+ZzGDVecL+6kJ2p8hcEli5snSYQlqnZ7gvAYTprdsew/tJol5A
- jKeW8PX7IIFucFMFJ4HYTq2CJo4xwvgXvpGY9LzCAYf5yoJIAfPMlz9qkD/g==
-Received: from [10.172.233.45] (helo=SmtpCorp) by smtpcorp.com with esmtpsa
- (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.94.2-S2G) (envelope-from <repk@triplefau.lt>)
- id 1uJdrY-TRk4cP-GK; Mon, 26 May 2025 19:51:56 +0000
-Received: from [10.12.239.196] (helo=localhost) by smtpcorp.com with esmtpsa
- (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.97.1-S2G) (envelope-from <repk@triplefau.lt>)
- id 1uJdrY-AIkwcC8mNqC-HZWi; Mon, 26 May 2025 19:51:56 +0000
-From: Remi Pommarel <repk@triplefau.lt>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="m3ZjmPul"
+Received: from github.com (hubbernetes-node-79f8c1b.ash1-iad.github.net [10.56.191.28])
+	by smtp.github.com (Postfix) with ESMTPA id 59E8B140C61
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 12:57:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1748289439;
+	bh=TD7kp+SQpnG4OlbzLppSvd34Nka8UQQg7mZTIm3E9ug=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=m3ZjmPulKTOK4RJusXLFFqwPH/SUxcv5jkLF9t2+mSYkR781DiteKnhw7k97xyFVh
+	 FUzWHgD9EhHZ6utQQjyyS2p0xFILkdvPKIKW1Qkk2wiltTBgmASEREHdc2kHab6Pyr
+	 L6layZaqLihS0L73GesL+pb+ZNJSlco0GgHaz1XM=
+Date: Mon, 26 May 2025 12:57:19 -0700
+From: Remi Pommarel <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Remi Pommarel <repk@triplefau.lt>
-Subject: [PATCH BlueZ] policy: Fix reset Control/Target/HS retry counters
-Date: Mon, 26 May 2025 21:43:28 +0200
-Message-Id: <20250526194328.15875-1-repk@triplefau.lt>
-X-Mailer: git-send-email 2.40.0
+Message-ID: <bluez/bluez/push/refs/heads/966495/000000-c56e70@github.com>
+Subject: [bluez/bluez] c56e70: policy: Fix reset Control/Target/HS retry
+ counters
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Smtpcorp-Track: kHNM3QcIv54n.s059qfr0OLkM.xT4_RgnM9Kr
-Feedback-ID: 510616m:510616apGKSTK:510616sd9kuJY7Mo
-X-Report-Abuse: Please forward a copy of this message, including all headers,
- to <abuse-report@smtp2go.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/966495
+  Home:   https://github.com/bluez/bluez
+  Commit: c56e70c7e1f66b95e064e3952fb56415de4d704e
+      https://github.com/bluez/bluez/commit/c56e70c7e1f66b95e064e3952fb56415de4d704e
+  Author: Remi Pommarel <repk@triplefau.lt>
+  Date:   2025-05-26 (Mon, 26 May 2025)
+
+  Changed paths:
+    M plugins/policy.c
+
+  Log Message:
+  -----------
+  policy: Fix reset Control/Target/HS retry counters
 
 Control and Target retries counter were reset when service state
 goes from CONNECTED to DISCONNECTED, but usually an extra DISCONNECTING
@@ -70,56 +65,7 @@ initialize on next connection. HS retry counter was only reset when
 limit is reached.
 
 Reset the counter as soon as CONNECTED state is reached to avoid that.
----
- plugins/policy.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/policy.c b/plugins/policy.c
-index 0e533ba1f..02ce16f67 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -383,6 +383,7 @@ static void hs_cb(struct btd_service *service, btd_service_state_t old_state,
- 		else if (btd_service_get_state(sink) !=
- 						BTD_SERVICE_STATE_CONNECTED)
- 			policy_set_sink_timer(data);
-+		data->hs_retries = 0;
- 		break;
- 	case BTD_SERVICE_STATE_DISCONNECTING:
- 		break;
-@@ -537,8 +538,6 @@ static void controller_cb(struct btd_service *service,
- 				timeout_remove(data->ct_timer);
- 				data->ct_timer = 0;
- 			}
--		} else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
--			data->ct_retries = 0;
- 		}
- 		break;
- 	case BTD_SERVICE_STATE_CONNECTING:
-@@ -548,6 +547,7 @@ static void controller_cb(struct btd_service *service,
- 			timeout_remove(data->ct_timer);
- 			data->ct_timer = 0;
- 		}
-+		data->ct_retries = 0;
- 		break;
- 	case BTD_SERVICE_STATE_DISCONNECTING:
- 		break;
-@@ -587,8 +587,6 @@ static void target_cb(struct btd_service *service,
- 				timeout_remove(data->tg_timer);
- 				data->tg_timer = 0;
- 			}
--		} else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
--			data->tg_retries = 0;
- 		}
- 		break;
- 	case BTD_SERVICE_STATE_CONNECTING:
-@@ -598,6 +596,7 @@ static void target_cb(struct btd_service *service,
- 			timeout_remove(data->tg_timer);
- 			data->tg_timer = 0;
- 		}
-+		data->tg_retries = 0;
- 		break;
- 	case BTD_SERVICE_STATE_DISCONNECTING:
- 		break;
--- 
-2.40.0
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
