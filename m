@@ -1,411 +1,215 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE1E156F3C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 07:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFC71EA7CE
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 09:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748244861; cv=none; b=Ao+Kz0ZkZxZIZn3JtpmLoNOKjwWjG5VgtyUaELEssg9FL5SJTlEEcAG7Sl94F6jou3sOlTZtPq9br/Ie+J8qsI87NEN0CQrX/z2R/+7OBsQdIIGGsqzk1r+a1Fb9mMiOBAh5gx1y+ftVnD15SsQJTKZQwT1xP8IbRUvBrQ6DKDs=
+	t=1748250495; cv=none; b=OYsh4+TawaFTeP7Tf0kxYs9A1Q+UQEoNMWtgLMb7z5ujH3vHHHxM2sUq2Apgwz4qunuIiLKTiBX3piw/GoSdGh4Eec21wHg/OfKDFGReZ7DgNgg7uJA4mHCnqzb17xQUpKV2PNotFj0K6gAXTw/AxoNZTYoKj17+Fn2FascciLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748244861; c=relaxed/simple;
-	bh=iJ41gj5SEfF+pDBb17RaSeerkYEyvjvyniGON0t8VMM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JD0076EGkViSDbGQ5d+AueKpU9qhp0sJONCFC/Phkx43qwZTaQ1AU2ZtlfdfGm7agAnSAU3qvZP/2srRbaVfE+sRYK3AzJuDwvVDI3NrEeVFByTZp18HD6Q2itPbOAo6jZd+BddRGBObjT3ObZQrA+pm+Y48KF+Mpz1Oid3rSR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.107] (p5dc5559d.dip0.t-ipconnect.de [93.197.85.157])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3513561E6486B;
-	Mon, 26 May 2025 09:33:53 +0200 (CEST)
-Message-ID: <d63f80e1-382e-41d2-a0be-82a0ffc6bea9@molgen.mpg.de>
-Date: Mon, 26 May 2025 09:33:52 +0200
+	s=arc-20240116; t=1748250495; c=relaxed/simple;
+	bh=rQLCS0NzEVtAXYWJfv0wdU/NlhZ3Zr6pZ82E+EJyvk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SVBpul/78Bnu5cvKT+qyLmWidvHY/T6RH3Zj7eefTklvK4pVLOkRMKqhOWnKBBjQSVk3wjsK3WuC5+NtU2VriHrLNEStpHTrpzYU+dzt2Pl2AqFSasFrBLs4QkWQCb9lte2Hm8eVusP6bRC0D0VTeDADriv+Vlam/NZLYXC1taE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
+Received: from f.1.f.f.b.f.9.6.1.7.f.9.8.f.8.3.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:38f8:9f71:69fb:ff1f] helo=andrews-2024-laptop.sayers)
+	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
+	(envelope-from <kernel.org@pileofstuff.org>)
+	id 1uJToY-007KgU-0n;
+	Mon, 26 May 2025 10:08:09 +0100
+Date: Mon, 26 May 2025 10:07:48 +0100
+From: Andrew Sayers <kernel.org@pileofstuff.org>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis@collabora.com>
+Cc: luiz.dentz@gmail.com, pav@iki.fi, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v6 1/3] obexd: Unregister profiles when the user is
+ inactive
+Message-ID: <aDQvZH19fabvw2Fh@andrews-2024-laptop.sayers>
+References: <20250430131648.1291354-1-kernel.org@pileofstuff.org>
+ <20250430131648.1291354-2-kernel.org@pileofstuff.org>
+ <333ad76e-0aba-4f93-b141-8e69fb47535f@collabora.com>
+ <aDBPCM8f0dpkJ7ob@andrews-2024-laptop.sayers>
+ <8b4ed19b-0042-426a-83ea-04947edd8f0b@collabora.com>
+ <aDCi5XGOajXmBDug@andrews-2024-laptop.sayers>
+ <e33ed3c3-fc23-4318-94f2-7ade41f82258@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] Bluetooth: btintel_pcie: Support Function level
- reset
-To: Kiran K <kiran.k@intel.com>,
- Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, vijay.satija@intel.com
-References: <20250525101619.530255-1-kiran.k@intel.com>
- <20250525101619.530255-2-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250525101619.530255-2-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e33ed3c3-fc23-4318-94f2-7ade41f82258@collabora.com>
 
-Dear Kiran, dear Chandrashekar,
-
-
-Thank you for your patch.
-
-Am 25.05.25 um 12:16 schrieb Kiran K:
-> From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+On Fri, May 23, 2025 at 07:27:51PM +0200, Frédéric Danis wrote:
+> Hi Andrew,
 > 
-> Support function level reset (flr) on hardware exception to recover
-> controller. Driver also implements the back-off time of 5 seconds and
-> the maximum number of retries are limited to 5 before giving up.
-
-Could you elaborate on the implementation, and detail how this can be 
-tested?
-
-> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->   drivers/bluetooth/btintel_pcie.c | 234 ++++++++++++++++++++++++++++++-
->   drivers/bluetooth/btintel_pcie.h |   4 +-
->   2 files changed, 235 insertions(+), 3 deletions(-)
+> On 23/05/2025 18:31, Andrew Sayers wrote:
 > 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index 74a957784525..6779a2cfa75d 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -41,6 +41,13 @@ static const struct pci_device_id btintel_pcie_table[] = {
->   };
->   MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
->   
-> +struct btintel_pcie_dev_restart_data {
-> +	struct list_head list;
-> +	u8 restart_count;
-> +	time64_t last_error;
-> +	char name[];
-> +};
-> +
->   /* Intel PCIe uses 4 bytes of HCI type instead of 1 byte BT SIG HCI type */
->   #define BTINTEL_PCIE_HCI_TYPE_LEN	4
->   #define BTINTEL_PCIE_HCI_CMD_PKT	0x00000001
-> @@ -62,6 +69,9 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
->   #define BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER	0x17A2
->   #define BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT		0x1E61
->   
-> +#define BTINTEL_PCIE_RESET_OK_TIME_SECS		5
-> +#define BTINTEL_PCIE_FLR_RESET_MAX_RETRY	5
-> +
->   /* Alive interrupt context */
->   enum {
->   	BTINTEL_PCIE_ROM,
-> @@ -99,6 +109,14 @@ struct btintel_pcie_dbgc_ctxt {
->   	struct btintel_pcie_dbgc_ctxt_buf bufs[BTINTEL_PCIE_DBGC_BUFFER_COUNT];
->   };
->   
-> +struct btintel_pcie_removal {
-> +	struct pci_dev *pdev;
-> +	struct work_struct work;
-> +};
-> +
-> +static LIST_HEAD(btintel_pcie_restart_data_list);
-> +static DEFINE_SPINLOCK(btintel_pcie_restart_data_lock);
-> +
->   /* This function initializes the memory for DBGC buffers and formats the
->    * DBGC fragment which consists header info and DBGC buffer's LSB, MSB and
->    * size as the payload
-> @@ -1927,6 +1945,9 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
->   	u32 type;
->   	u32 old_ctxt;
->   
-> +	if (test_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags))
-> +		return -ENODEV;
-> +
->   	/* Due to the fw limitation, the type header of the packet should be
->   	 * 4 bytes unlike 1 byte for UART. In UART, the firmware can read
->   	 * the first byte to get the packet type and redirect the rest of data
-> @@ -2187,9 +2208,204 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
->   		}
->   		btintel_pcie_start_rx(data);
->   	}
-> +
-> +	if (!err)
-> +		set_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags);
->   	return err;
->   }
->   
-> +static struct btintel_pcie_dev_restart_data *btintel_pcie_get_restart_data(struct pci_dev *pdev,
-> +									   struct device *dev)
-> +{
-> +	struct btintel_pcie_dev_restart_data *tmp, *data = NULL;
-> +	const char *name = pci_name(pdev);
-> +	struct hci_dev *hdev = to_hci_dev(dev);
-> +
-> +	spin_lock(&btintel_pcie_restart_data_lock);
-> +	list_for_each_entry(tmp, &btintel_pcie_restart_data_list, list) {
-> +		if (strcmp(tmp->name, name))
-> +			continue;
-> +		data = tmp;
-> +		break;
-> +	}
-> +	spin_unlock(&btintel_pcie_restart_data_lock);
-> +
-> +	if (data) {
-> +		bt_dev_dbg(hdev, "Found restart data for BDF:%s", data->name);
+> > On Fri, May 23, 2025 at 01:17:22PM +0200, Frédéric Danis wrote:
+> > > Hi Andrew,
+> > > 
+> > > On 23/05/2025 12:33, Andrew Sayers wrote:
+> > > 
+> > > > On Thu, May 22, 2025 at 04:55:22PM +0200, Frédéric Danis wrote:
+> > > > > Hi Andrew,
+> > > > > 
+> > > > > On 30/04/2025 15:14, Andrew Sayers wrote:
+> > > > > 
+> > > > > > Obexd is usually run as a user service, and can exhibit surprising
+> > > > > > behaviour if two users are logged in at the same time.
+> > > > > > 
+> > > > > > Unregister profiles when the user is detected to be off-seat.
+> > > > > > 
+> > > > > > It may be impossible to detect whether a user is on-seat in some cases.
+> > > > > > For example, a version of obexd compiled with systemd support might be
+> > > > > > run outside of a systemd environment.  Warn and leave services
+> > > > > > registered if that happens.
+> > > > > > 
+> > > > > > Obexd can be run as a system service, in which case this check makes no
+> > > > > > sense.  Disable this check when called with `--system-bus`.
+> > > > > > 
+> > > > > > Obexd can also be run by a user that does not have an active session.
+> > > > > > For example, someone could use `ssh` to access the system.  There might
+> > > > > > be a use case where someone needs Bluetooth access but can't log in with
+> > > > > > a keyboard, or there might be a security issue with doing so.  This isn't
+> > > > > > handled explicitly by this patch, but a future patch could add support
+> > > > > > by calling `logind_set(FALSE)` in the same way as is currently done
+> > > > > > with `--system-bus`.
+> > > > > > 
+> > > > > > Unregister profiles by closing private connections instead of sending
+> > > > > > UnregisterProfile on the shared connection.  Pipewire has apparently
+> > > > > > found the latter to cause long shutdown delays, because bluetoothd
+> > > > > > may be shutting down and unable to handle this message.
+> > > > > > 
+> > > > > > Based in large part on the wireplumber code mentioned by Pauli Virtanen:
+> > > > > > https://gitlab.freedesktop.org/pipewire/wireplumber/-/blob/master/modules/module-logind.c#L52
+> > > > > > 
+> > > > > > Other services are likely to need similar functionality,
+> > > > > > so I have created a gist to demonstrate the basic technique:
+> > > > > > https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+> > > > > > 
+> > > > > > Suggested-by: Pauli Virtanen <pav@iki.fi>
+> > > > > > Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+> > > > > I have a problem to connect PBAP profile using obexctl, using upstream
+> > > > > bluetoothd and obexd built on Ubuntu 24.04, the org.bluez.obex.PhonebookAccess1
+> > > > > interface doesn't appear.
+> > > > > 
+> > > > > After bisecting I found that this commit cause this issue.
+> > > > Hmm, my guess is that seat detection isn't working properly.
+> > > > Could you try this gist?  You should get "Active: 1" when it starts,
+> > > > "Active: 0" when you switch away from your current screen, and "Active: 1"
+> > > > when you switch back.
+> > > > 
+> > > > https://gist.github.com/andrew-sayers/1c4a24f86a9a4c1b1e38d109f1bd1d1e
+> > > > 
+> > > It seems to work:
+> > > $ ./user-on-seat
+> > > Active: 1
+> > > Active: 0
+> > > Active: 1
+> > > 
+> > > But the problem occurred while I didn't try any "seat" change.
+> > Yeah, I was hoping you'd get e.g. 0 / 0 / 1 as output, suggesting it was
+> > inactive at first but changing seats worked around the problem.
+> > Sorry, but this means it'll be harder to debug.  Can you...
+> 
+> I manually start bluetoothd and obexd, i.e. I stopped them from systemctl (disable and stop) and start them using cli:
+> $ src/bluetoothd -nd -E
+> $ obexd/src/obexd -nd
+> 
+> > 1. Check whether PBAP is registered with bluetoothctl:
+> > 
+> >         bluetoothctl show | grep 0000112e-0000-1000-8000-00805f9b34fb
+> > 
+> >     You should see one line, like:
+> > 
+> >         UUID: Phonebook Access Client   (0000112e-0000-1000-8000-00805f9b34fb)
+> 
+> got:
+> $ client/bluetoothctl show | grep 0000112e-0000-1000-8000-00805f9b34fb
+> 	UUID: Phonebook Access Client   (0000112e-0000-1000-8000-00805f9b34fb)
+> 
+> > 2. Tail the bluetooth and obex logs in another terminal:
+> > 
+> >         sudo journalctl -f SYSLOG_IDENTIFIER=bluetoothd SYSLOG_IDENTIFIER=obexd
+> > 
+> >     Steps below will ask you to "make a note" in the log
+> >     (e.g. append "about to do XYZ" to the file) - this will tell me
+> >     which messages were triggered by which events.
+> > 
+> > 3. Make a note in the log, then stop the obex service:
+> > 
+> >         systemctl --user stop obex.service
+> > 
+> > 4. Check PBAP again:
+> > 
+> >         bluetoothctl show | grep 0000112e-0000-1000-8000-00805f9b34fb
+> > 
+> >     You should not see any output.
+> 
+> Yes, no output
+> 
+> > 5. Make another note in the log, then start the obex service:
+> > 
+> >         systemctl --user start obex.service
+> > 
+> > 6. Check PBAP again:
+> > 
+> >         bluetoothctl show | grep 0000112e-0000-1000-8000-00805f9b34fb
+> > 
+> >     You should see the same as in step 1.
+> 
+> Yes:
+> $ client/bluetoothctl show | grep 0000112e-0000-1000-8000-00805f9b34fb
+> 	UUID: Phonebook Access Client   (0000112e-0000-1000-8000-00805f9b34fb)
+> 
+> > 8. Make a final note in the log, then try ctrl+alt+F{7,8}.
+> > 
+> > 9. Send me the full log with notes, or at least anything that jumps out at you
+> > 
+> > Note: the instructions above only print things that are likely to show
+> > problems, and unlikely to contain anything that can't go in an e-mail.  You're
+> > welcome to do `sudo journalctl -f` and or `bluetoothctl show` in another
+> > terminal and go looking for trouble :)
+> 
+> I added the logs for pbap connection.
+> 
+> You can find the log at https://gist.github.com/fdanis-oss/eb6fba440c6b07e9ed5a266672bdbcf3
 
-Add a space after the colon?
+Quick update:
 
-> +		return data;
-> +	}
-> +
-> +	/* First time allocate */
-> +	data = kzalloc(struct_size(data, name, strlen(name) + 1), GFP_ATOMIC);
-> +	if (!data)
-> +		return NULL;
-> +
-> +	strscpy_pad(data->name, name, strlen(name) + 1);
-> +	spin_lock(&btintel_pcie_restart_data_lock);
-> +	list_add_tail(&data->list, &btintel_pcie_restart_data_list);
-> +	spin_unlock(&btintel_pcie_restart_data_lock);
-> +
-> +	return data;
-> +}
-> +
-> +static void btintel_pcie_free_restart_list(void)
-> +{
-> +	struct btintel_pcie_dev_restart_data *tmp;
-> +
-> +	while ((tmp = list_first_entry_or_null(&btintel_pcie_restart_data_list,
-> +					       typeof(*tmp), list))) {
-> +		list_del(&tmp->list);
-> +		kfree(tmp);
-> +	}
-> +}
-> +
-> +static void btintel_pcie_inc_restart_count(struct pci_dev *pdev,
-> +					   struct device *dev)
-> +{
-> +	struct btintel_pcie_dev_restart_data *data;
-> +	struct hci_dev *hdev = to_hci_dev(dev);
-> +	time64_t retry_window;
-> +
-> +	data = btintel_pcie_get_restart_data(pdev, dev);
-> +	if (!data)
-> +		return;
-> +
-> +	retry_window = ktime_get_boottime_seconds() - data->last_error;
-> +	if (data->restart_count == 0) {
-> +		/* First iteration initialise the time and counter */
+The above was enough to replicate the bug - thanks!
+I'm working on a fix, but am unlikely to have a patch before next week.
 
-initialises
+Long update:
 
-But with the debug print below, the comment is not needed, in my opinion.
+Changing `g_dbus_setup_private()` to `g_dbus_setup()` in pbap.c seems to
+fix this problem (but introduces other problems).  I think obexctl is
+sending a request that gets received by the normal DBus connection,
+which no longer routes the message through to PBAP.  But I'm not yet
+confident enough with the codebase to be sure that's what's happening.
 
-> +		data->last_error = ktime_get_boottime_seconds();
-> +		data->restart_count++;
-> +		bt_dev_dbg(hdev, "First iteration initialise. last_error:%lld seconds restart_count:%d",
+If I'm right, the solution is probably to either revisit the idea of
+(un)registering things in the normal connection, or to listen for
+messages on PBAP's private connection.  But I'm not yet confident enough
+with DBus to properly assess either solution.
 
-Please add a space after the colon.
+Neither of the above should take a *huge* amount of time, but will need
+a larger block of focussed attention than I'm likely to have this week.
+I might get lucky and have a patch by mid-week, but the safer assumption
+is that it'll be top of next week's todo list.
 
-> +			   data->last_error, data->restart_count);
-> +	} else if (retry_window < BTINTEL_PCIE_RESET_OK_TIME_SECS &&
-> +		   data->restart_count <= BTINTEL_PCIE_FLR_RESET_MAX_RETRY) {
-> +		/* FLR triggered still within the Max retry time so
-> +		 * increment the counter
-> +		 */
-> +		data->restart_count++;
-> +		bt_dev_dbg(hdev, "flr triggered still within the max retry time so increment the restart_count:%d",
-> +			   data->restart_count);
-
-Space after colon.
-
-> +	} else if (retry_window > BTINTEL_PCIE_RESET_OK_TIME_SECS) {
-> +		/* FLR triggered out of the retry window so reset */
-> +		bt_dev_dbg(hdev, "flr triggered out of retry window. last_error:%lld seconds restart_count:%d",
-
-Space after colons.
-
-> +			   data->last_error, data->restart_count);
-> +		data->last_error = 0;
-> +		data->restart_count = 0;
-> +	}
-> +}
-> +
-> +static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data);
-> +
-> +static void btintel_pcie_removal_work(struct work_struct *wk)
-> +{
-> +	struct btintel_pcie_removal *removal =
-> +		container_of(wk, struct btintel_pcie_removal, work);
-> +	struct pci_dev *pdev = removal->pdev;
-> +	struct btintel_pcie_data *data;
-> +	int err;
-> +
-> +	pci_lock_rescan_remove();
-> +
-> +	if (!pdev->bus)
-> +		goto error;
-> +
-> +	data = pci_get_drvdata(pdev);
-> +
-> +	btintel_pcie_disable_interrupts(data);
-> +	btintel_pcie_synchronize_irqs(data);
-> +	flush_workqueue(data->workqueue);
-> +
-> +	bt_dev_dbg(data->hdev, "Release bluetooth interface");
-> +	btintel_pcie_release_hdev(data);
-> +
-> +	err = pci_reset_function(pdev);
-> +	if (err) {
-> +		BT_ERR("Failed resetting the pcie device (%d)", err);
-> +		goto error;
-> +	}
-> +
-> +	btintel_pcie_enable_interrupts(data);
-> +	btintel_pcie_config_msix(data);
-> +
-> +	err = btintel_pcie_enable_bt(data);
-> +	if (err) {
-> +		BT_ERR("Failed to enable bluetooth hardware after reset (%d)",
-> +		       err);
-
-What should the user reading this error do?
-
-> +		goto error;
-> +	}
-> +
-> +	btintel_pcie_reset_ia(data);
-> +	btintel_pcie_start_rx(data);
-> +	data->flags = 0;
-> +
-> +	err = btintel_pcie_setup_hdev(data);
-> +	if (err) {
-> +		BT_ERR("Failed registering hdev (%d)", err);
-> +		goto error;
-> +	}
-> +error:
-> +	pci_dev_put(pdev);
-> +	pci_unlock_rescan_remove();
-> +	kfree(removal);
-> +}
-> +
-> +static void btintel_pcie_reset(struct hci_dev *hdev)
-> +{
-> +	struct btintel_pcie_removal *removal;
-> +	struct btintel_pcie_data *data;
-> +
-> +	data = hci_get_drvdata(hdev);
-> +
-> +	if (!test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags))
-> +		return;
-> +
-> +	removal = kzalloc(sizeof(*removal), GFP_ATOMIC);
-> +	if (!removal)
-> +		return;
-> +
-> +	flush_work(&data->rx_work);
-> +	flush_work(&hdev->dump.dump_rx);
-> +
-> +	removal->pdev = data->pdev;
-> +	INIT_WORK(&removal->work, btintel_pcie_removal_work);
-> +	pci_dev_get(removal->pdev);
-> +	schedule_work(&removal->work);
-> +}
-> +
-> +static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
-> +{
-> +	struct  btintel_pcie_dev_restart_data *data;
-> +	struct btintel_pcie_data *dev_data = hci_get_drvdata(hdev);
-> +	struct pci_dev *pdev = dev_data->pdev;
-> +	time64_t retry_window;
-> +
-> +	if (code == 0x13) {
-> +		bt_dev_err(hdev, "Encountered top exception");
-> +		return;
-> +	}
-> +
-> +	data = btintel_pcie_get_restart_data(pdev, &hdev->dev);
-> +	if (!data)
-> +		return;
-> +
-> +	retry_window = ktime_get_boottime_seconds() - data->last_error;
-> +
-> +	/* If within 5 seconds max 5 attempts have already been made
-> +	 * then stop any more retry and indicate to user for cold boot
-> +	 */
-
-The messages below should be improved, and the comment above can be 
-removed then.
-
-> +	if (retry_window < BTINTEL_PCIE_RESET_OK_TIME_SECS &&
-> +	    data->restart_count >= BTINTEL_PCIE_FLR_RESET_MAX_RETRY) {
-> +		bt_dev_err(hdev, "Max recovery retries(%d)  exhausted.",
-
-Please add a space before (, exactly one space before *exhausted*. What 
-should the user do?
-
-> +			   BTINTEL_PCIE_FLR_RESET_MAX_RETRY);
-> +		bt_dev_dbg(hdev, "Boot time:%lld seconds first_flr at:%lld seconds restart_count:%d",
-
-Spaces after colons.
-
-> +			   ktime_get_boottime_seconds(), data->last_error,
-> +			   data->restart_count);
-> +		return;
-> +	}
-> +	btintel_pcie_inc_restart_count(pdev, &hdev->dev);
-> +	btintel_pcie_reset(hdev);
-> +}
-> +
->   static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
->   {
->   	int err;
-> @@ -2211,9 +2427,10 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
->   	hdev->send = btintel_pcie_send_frame;
->   	hdev->setup = btintel_pcie_setup;
->   	hdev->shutdown = btintel_shutdown_combined;
-> -	hdev->hw_error = btintel_hw_error;
-> +	hdev->hw_error = btintel_pcie_hw_error;
->   	hdev->set_diag = btintel_set_diag;
->   	hdev->set_bdaddr = btintel_set_bdaddr;
-> +	hdev->reset = btintel_pcie_reset;
->   
->   	err = hci_register_dev(hdev);
->   	if (err < 0) {
-> @@ -2361,7 +2578,20 @@ static struct pci_driver btintel_pcie_driver = {
->   	.driver.coredump = btintel_pcie_coredump
->   #endif
->   };
-> -module_pci_driver(btintel_pcie_driver);
-> +
-> +static int __init btintel_pcie_init(void)
-> +{
-> +	return pci_register_driver(&btintel_pcie_driver);
-> +}
-> +
-> +static void __exit btintel_pcie_exit(void)
-> +{
-> +	pci_unregister_driver(&btintel_pcie_driver);
-> +	btintel_pcie_free_restart_list();
-> +}
-> +
-> +module_init(btintel_pcie_init);
-> +module_exit(btintel_pcie_exit);
->   
->   MODULE_AUTHOR("Tedd Ho-Jeong An <tedd.an@intel.com>");
->   MODULE_DESCRIPTION("Intel Bluetooth PCIe transport driver ver " VERSION);
-> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-> index 21b964b15c1c..62b6bcdaf10f 100644
-> --- a/drivers/bluetooth/btintel_pcie.h
-> +++ b/drivers/bluetooth/btintel_pcie.h
-> @@ -117,7 +117,9 @@ enum {
->   enum {
->   	BTINTEL_PCIE_CORE_HALTED,
->   	BTINTEL_PCIE_HWEXP_INPROGRESS,
-> -	BTINTEL_PCIE_COREDUMP_INPROGRESS
-> +	BTINTEL_PCIE_COREDUMP_INPROGRESS,
-> +	BTINTEL_PCIE_RECOVERY_IN_PROGRESS,
-> +	BTINTEL_PCIE_SETUP_DONE
->   };
->   
->   enum btintel_pcie_tlv_type {
-
-
-Kind regards,
-
-Paul
+> 
+> -- 
+> Frédéric Danis
+> Senior Software Engineer
+> 
+> Collabora Ltd.
+> Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+> Registered in England & Wales, no. 5513718
+> 
+> 
