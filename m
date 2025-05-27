@@ -1,153 +1,150 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22638C2ED
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 12:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F72926B94F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 13:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748350131; cv=none; b=KL+0gyqaquctqFgQkBdrEff5tr0YokKwOSX/dB16AGoMZ/vz1FR09Cis/tmloEVWnXmkPpJuEYNTdrWpe+aT6hxcCedlCo5ECKwBjOC1UvVXmpvV0JaoK65pqCsBVgJHRKjW/T+O1T3iaot7NMr6OxIlrK4zD0ZGfi7Cv9m8bvI=
+	t=1748350869; cv=none; b=CqQydL+6OXOspu1Fo4aSqQASBBorSGBaYh4kFZsr88XcIc+nSUHw6FN31PmxvY5DbYjx5vJDeQEySl1XN5vn3x5Rn6T+SHPm3VftALnfdQsAgvTOjEWgU+qMp4AI10+ZQY++y7uh6AL2jU946zkr4TL+karK+7IVcX4vq3I03oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748350131; c=relaxed/simple;
-	bh=UeJ0WqBWcoxEkGGAKm4L4fEczw8lK5WTJMTXAdat050=;
+	s=arc-20240116; t=1748350869; c=relaxed/simple;
+	bh=YSA3lrBeRCtMPXTf+o+1ZMgeJVH8dFWO93RM767RG3k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WvXvxc6D51HsDx7LKI/SnTMxgq8TO0e57n0+Qvn1Dw92HHKMSRHmn9/iwr4bdUShIOTzHVgQz4R/ky5mhXq4I/oOkdD8D+XAYRsaHfWo4t4rTGUvWuK9P1is2AB86Il1uGuwHzwRR7x/eIotK+9eWhV8Uh+Gweurs+OFprzvJKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpEDMaxJ; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=ZH2Fo6pdJT6XCEQZXAPJG4LhAk8hZeuH+GaJJGI+dM70IWNXfgYTZ24RNzrKpvoIP0sNsmfQSwl9tPf8OGyzYfdkPQt+XytzAhiRIUPMiT4u043xLU8vhAuVPTiUalNR66bmzMDtxzA7s6PrLN+lAHZS7KA1eRu7CIpjMyBzyMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vf1IeQuw; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpEDMaxJ"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-54afb5fcebaso4217983e87.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 05:48:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vf1IeQuw"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-310447fe59aso35656841fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 06:01:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748350128; x=1748954928; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748350864; x=1748955664; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=viauIbR/LL1dSDn8UcbxcCO6wVaapG27zEPjZH9eYN4=;
-        b=lpEDMaxJvCU6x2nuLGbJ9FQEg3aQMlICKP8wCND9sesh42CZKTv5IB8Dh4nHMsvY1p
-         y1MViaI5yvTJZu6cjmU7Fg8gDmQyrbR4hCM2o5N/G+RHgu1GvwB+QV05WlrQb1NC0jRM
-         qu4zqneyve3qifNRKVZKAVfACdSJPslKPmystgdsOLbmG7E/tbbYV+Vyqg5+QGz3fFJ0
-         /FGObyna8McoLT5sssVndj/cNpqqwIQs/VN7st7Tp+hUzWlkZsnExebgRhvTt5Ty7qE8
-         V8M0m724jcBwjagtYwThEJ7JPUS/bA314+736+ToJ2EEy8HdjYhJbfipJ2sviYFQXnce
-         4FcA==
+        bh=6qSGdUsU8DnHUcblDU2uWTFnvGIDMXFFFlgA+QVGQgs=;
+        b=Vf1IeQuwCXfKCMYFsVzHfdRKjQmbGQbqNVD1cOiul1WxGQORtXzh/hVil3ZQtRDCRi
+         AKyKGjjYtLnOlb0/OGMPiKLtACqCHUwfhQrsFr/K7BFRF/EriVcMNDjRZaJ2k1R+Ujbk
+         8gjbZU2avPDJu1/bbQrw1ELGPe5fJyT+4enmufIV6oMmFKQMBCmNlxTyfyHURXPud3iQ
+         v9lsBhmzOPoG2oY+VxyLuIXc+AxF/0qTP9FSq4VgSpWK+jYUx/xUgTFNs19I0uw1iVwn
+         zrbKd0mBiwc8Xto1AZxhBGBatcuRQKkL2NkGT8fQ7k5v1D69A3TmDzfddk0uwd1d+42V
+         Rukw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748350128; x=1748954928;
+        d=1e100.net; s=20230601; t=1748350864; x=1748955664;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=viauIbR/LL1dSDn8UcbxcCO6wVaapG27zEPjZH9eYN4=;
-        b=po/vxHT2Y5BCDIKsg5p3ultnuG9VfR8kVLJ25DOpZ+zbwLO8Buz9LWZ55o5Cel0+8K
-         zBJ0795LpN25QIQr0JyUGmf0gjezOP3S32QVsPDH+wgLWWSO12X1Xax4rWsbaRLic5D8
-         2o8PSvQ3piyvJsGlvVwKHuSietFUoQ1vGNr/DPrjalu7fU607t6+0/grgqeEItba1MOe
-         NYFvcEs9e5e7wymKgmKmNE/ZaC4I8V6HePt2zcSqL0A8t9env9gKvdd2VSIf0zQ3ynnB
-         SFlmZhuN+GIhuBYeYAMZi4HTOvKwAC8f+zdjLqg8EeWvUhzJWh8YfleBpRzEOwHHtnoo
-         xcig==
-X-Gm-Message-State: AOJu0Yxlxjo98oMbpnngNXGSQumXDuDn8ZbgSj7/wjJGBAzl8C3WtkD3
-	Z9S87UWScRqBOj09pSZ81sfJFZzk8cvjXI9IJfuVVCLD9UfKd/fhCfDDda4RR4z0WSqi3KshQSL
-	YAbQwpB42WkYeviUNqBTqlQ/3QGz/LDFwdyJXGJI=
-X-Gm-Gg: ASbGnctn8mXauilYT75gZU8HuwihxrCRqn+e4TdXDHUmhL9nAmgacJmIFC+2G46O3qD
-	o7HJM2W9HltQ1qJbMrW8WqU9c6KojFxT4ido8K1jor6PMsv3ICUVGE3HLYz/f2kX8QbTxj9sAni
-	gwFuLxLz4rKHBXcCza9UUD81c1QkLVnGET5BcvU8sZwA==
-X-Google-Smtp-Source: AGHT+IG+hIXvl6V/ZLDGKWcLA9jeOtslr2HAp6WLjXZp6w2fihL10Pv9eC1tnLMnX6j6AQi21uTkOPPuRBUY6mvt/l8=
-X-Received: by 2002:a05:651c:325b:b0:32a:6aa0:217c with SMTP id
- 38308e7fff4ca-32a6aa0242bmr12542841fa.34.1748350127808; Tue, 27 May 2025
- 05:48:47 -0700 (PDT)
+        bh=6qSGdUsU8DnHUcblDU2uWTFnvGIDMXFFFlgA+QVGQgs=;
+        b=XrIm7n3TAJgoztYFEmWQJWr5GKN2T6zZkPOGd5jfgkBpCNhhzklDYnUNuckAV76YUG
+         kfOHXKvlBtS2/cNQ48vNwmvxIHLEbzpd34oUcCRDXFfpyxLnf8AarfE0S2De+zjIvD+m
+         kk1ZyPQNePnAIpqJ0jtua0U29oAGjnUJ5Q1uagWNjRT+akdDWzn4Fwpio5OCIEN8M30D
+         RPTfr5KYX8G4BZOi+GJtvh7VXY3EctJYKC9XbbYYoHc66Zmy35oiNIDf2xnwlSb11xil
+         FhOTHQDyuTO9uFMMrnmtc82S2uDAjU/n1T2VxWbShN40bEOq0TQDUY5YcPZiNA+5LPxa
+         e2aA==
+X-Gm-Message-State: AOJu0YyJdSePCNYLOikdCr3Sl9UENRZqBS3sudM9hVZqN1bJLcb8cnLn
+	Z+HIovAFK+Xmp/hNSmo0/yAJGH9O6Xxc3JqZD7EYCacu9X/GDBhNjp8OLoNiGVRZ/2m+tlSSEHk
+	RmFuIK59zTSzDPi0S9It+Huecsuhi9Lj5GYSW7FE=
+X-Gm-Gg: ASbGnctoA/KLBDtozMcOg+tAY68w78AwiVNkmrgwalVmLVW6VsXKJ8GS5ABfeC+ugcx
+	TliK/kQQnXNfJR9vcEt0AtfryGdjNXdVNXt+b9JzfGofsdMV+FQCXfvfvgQ4IAMeb+xrO8Ihnnz
+	u/RPd44zBVo3tMdkuayzQmWowlclmDdoI=
+X-Google-Smtp-Source: AGHT+IE9qA84QSSMZ/Pg4vR4mYvL6nGQINbY3xcZFj8mBoWHRUA3J7bidRJESZAjSysuQs7gWdXucL+xunmzMrs/Xag=
+X-Received: by 2002:a05:651c:19a1:b0:30b:c96a:750 with SMTP id
+ 38308e7fff4ca-3295b9aaa34mr40416351fa.1.1748350863796; Tue, 27 May 2025
+ 06:01:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527-att-read-blob-rsp-err-v2-1-23c7f749e8d8@amlogic.com>
-In-Reply-To: <20250527-att-read-blob-rsp-err-v2-1-23c7f749e8d8@amlogic.com>
+References: <20250526194328.15875-1-repk@triplefau.lt>
+In-Reply-To: <20250526194328.15875-1-repk@triplefau.lt>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 27 May 2025 08:48:35 -0400
-X-Gm-Features: AX0GCFvtAf6WkeyYtFOxQNTcImaTEB4FfNK2Yr-oUxUu0bWlVQPUx-OC8Q6Bd_Q
-Message-ID: <CABBYNZ+hpnZ-1SzDKFNrUkqssDQANNUf7nOKE89RzKetcUDAfQ@mail.gmail.com>
-Subject: Re: [PATCH bluez v2] shared/gatt-db: Add read offset to record the
- progress of att read blob request
-To: ye.he@amlogic.com
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Tue, 27 May 2025 09:00:51 -0400
+X-Gm-Features: AX0GCFv8fjL0V1-V1nOfTqMbbbJCaQQmk7CMA6YzvaYTgF28trWGx3Cf3slu9Qs
+Message-ID: <CABBYNZLzaOJAQROkLCMWv1_OF6JOFcDN2+Aa=f_Rt9ZS7GJCQg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] policy: Fix reset Control/Target/HS retry counters
+To: Remi Pommarel <repk@triplefau.lt>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Remi,
 
-On Tue, May 27, 2025 at 4:13=E2=80=AFAM Ye He via B4 Relay
-<devnull+ye.he.amlogic.com@kernel.org> wrote:
+On Mon, May 26, 2025 at 3:52=E2=80=AFPM Remi Pommarel <repk@triplefau.lt> w=
+rote:
 >
-> From: Ye He <ye.he@amlogic.com>
+> Control and Target retries counter were reset when service state
+> goes from CONNECTED to DISCONNECTED, but usually an extra DISCONNECTING
+> state is reach before going to DISCONNECTED. This causes retry counter
+> to not being reset in this case, leading to service not being able to
+> initialize on next connection. HS retry counter was only reset when
+> limit is reached.
 >
-> When processing the att read blob request packet sent
-> by the mobile phone, Bluez ignores the offset and the
-> payload of each att read blob response is the same.
->
-> This patch add read offset to record the progress of
-> att read blob request.
->
-> Fixes: https://github.com/bluez/bluez/issues/1294
->
-> Signed-off-by: Ye He <ye.he@amlogic.com>
-> ---
-> Changes in v2:
-> - Fix build error.
-> - Link to v1: https://patch.msgid.link/20250527-att-read-blob-rsp-err-v1-=
-1-75d3bc498862@amlogic.com
-> ---
->  src/shared/gatt-db.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 8951079beef1a8af7e46e87043f320640d4109f7..06af4f65bacaac39cdf9641e4=
-0fac902653c4b9c 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -109,6 +109,7 @@ struct gatt_db_attribute {
->         uint32_t permissions;
->         uint16_t value_len;
->         uint8_t *value;
-> +       uint16_t read_offset;
->
->         gatt_db_read_t read_func;
->         gatt_db_write_t write_func;
-> @@ -151,7 +152,8 @@ static void pending_read_result(struct pending_read *=
-p, int err,
->         if (p->timeout_id > 0)
->                 timeout_remove(p->timeout_id);
->
-> -       p->func(p->attrib, err, data, length, p->user_data);
-> +       p->func(p->attrib, err, data + p->attrib->read_offset,
-> +                       length - p->attrib->read_offset, p->user_data);
->
->         free(p);
->  }
-> @@ -2126,6 +2128,8 @@ bool gatt_db_attribute_read(struct gatt_db_attribut=
-e *attrib, uint16_t offset,
->         if (!attrib || !func)
->                 return false;
->
-> +       attrib->read_offset =3D offset;
-> +
->         /* Check boundaries if value_len is set */
->         if (attrib->value_len && offset > attrib->value_len) {
->                 func(attrib, BT_ATT_ERROR_INVALID_OFFSET, NULL, 0, user_d=
-ata);
+> Reset the counter as soon as CONNECTED state is reached to avoid that.
 
-This is not quite right, first there is the problem that you are
-storing it in the gatt_db_attribute itself, so it will affect
-subsequent requests, rather than storing the offset at pending_read,
-but even then this would be wrong since the intention is that the
-offset is handled by the read_func otherwise we wouldn't bother
-passing the offset to the it.
+Looks correct, but shouldn't we update for other services as well? Not
+just HS and CT and TG.
 
 > ---
-> base-commit: c888c682fbd4e02dce6bf4c1f9a47328ceb02716
-> change-id: 20250527-att-read-blob-rsp-err-c30db15efd30
+>  plugins/policy.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 >
-> Best regards,
+> diff --git a/plugins/policy.c b/plugins/policy.c
+> index 0e533ba1f..02ce16f67 100644
+> --- a/plugins/policy.c
+> +++ b/plugins/policy.c
+> @@ -383,6 +383,7 @@ static void hs_cb(struct btd_service *service, btd_se=
+rvice_state_t old_state,
+>                 else if (btd_service_get_state(sink) !=3D
+>                                                 BTD_SERVICE_STATE_CONNECT=
+ED)
+>                         policy_set_sink_timer(data);
+> +               data->hs_retries =3D 0;
+>                 break;
+>         case BTD_SERVICE_STATE_DISCONNECTING:
+>                 break;
+> @@ -537,8 +538,6 @@ static void controller_cb(struct btd_service *service=
+,
+>                                 timeout_remove(data->ct_timer);
+>                                 data->ct_timer =3D 0;
+>                         }
+> -               } else if (old_state =3D=3D BTD_SERVICE_STATE_CONNECTED) =
+{
+> -                       data->ct_retries =3D 0;
+>                 }
+>                 break;
+>         case BTD_SERVICE_STATE_CONNECTING:
+> @@ -548,6 +547,7 @@ static void controller_cb(struct btd_service *service=
+,
+>                         timeout_remove(data->ct_timer);
+>                         data->ct_timer =3D 0;
+>                 }
+> +               data->ct_retries =3D 0;
+>                 break;
+>         case BTD_SERVICE_STATE_DISCONNECTING:
+>                 break;
+> @@ -587,8 +587,6 @@ static void target_cb(struct btd_service *service,
+>                                 timeout_remove(data->tg_timer);
+>                                 data->tg_timer =3D 0;
+>                         }
+> -               } else if (old_state =3D=3D BTD_SERVICE_STATE_CONNECTED) =
+{
+> -                       data->tg_retries =3D 0;
+>                 }
+>                 break;
+>         case BTD_SERVICE_STATE_CONNECTING:
+> @@ -598,6 +596,7 @@ static void target_cb(struct btd_service *service,
+>                         timeout_remove(data->tg_timer);
+>                         data->tg_timer =3D 0;
+>                 }
+> +               data->tg_retries =3D 0;
+>                 break;
+>         case BTD_SERVICE_STATE_DISCONNECTING:
+>                 break;
 > --
-> Ye He <ye.he@amlogic.com>
->
+> 2.40.0
 >
 >
 
