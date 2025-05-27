@@ -1,153 +1,120 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F72926B94F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 13:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFAF139E;
+	Tue, 27 May 2025 13:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748350869; cv=none; b=CqQydL+6OXOspu1Fo4aSqQASBBorSGBaYh4kFZsr88XcIc+nSUHw6FN31PmxvY5DbYjx5vJDeQEySl1XN5vn3x5Rn6T+SHPm3VftALnfdQsAgvTOjEWgU+qMp4AI10+ZQY++y7uh6AL2jU946zkr4TL+karK+7IVcX4vq3I03oA=
+	t=1748351995; cv=none; b=I2KTqJeV4H1ptRx/tgQJHSrOSJJpojeMBzQrIo3zMOwXKd2efN0IhNpY7c1dyrI8vb8i8vpx2MOSlxqC4OHI/H3Swbxc88/DxjtvI5apiNVZhr+yV1ohjFVMmqCp7Xjnu8NjeZ3pYbO92vyVb7hdGYaPpjMhxPQmUCnqzFCb0J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748350869; c=relaxed/simple;
-	bh=YSA3lrBeRCtMPXTf+o+1ZMgeJVH8dFWO93RM767RG3k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZH2Fo6pdJT6XCEQZXAPJG4LhAk8hZeuH+GaJJGI+dM70IWNXfgYTZ24RNzrKpvoIP0sNsmfQSwl9tPf8OGyzYfdkPQt+XytzAhiRIUPMiT4u043xLU8vhAuVPTiUalNR66bmzMDtxzA7s6PrLN+lAHZS7KA1eRu7CIpjMyBzyMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vf1IeQuw; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748351995; c=relaxed/simple;
+	bh=M4XbxB728daJwQckqZMnCDk8GrjCwlrgBra1xDznme0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rwa7k1GRdHLmHfdXtPhLgu/Ou5PrTgN5KDeMH8HYrlYwhqQsIFRpnd+/a6NzYB7/d4lvhu+1rybbM/nl47haULZ+NbpqEH3j5s8iMilaeA+RQlUhQ55sVdlrLC2XDM/8soAicmsdhASR1uFwf9IgyWECtk8KBq0c83Wia9QxKwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HAWi7hRI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vf1IeQuw"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-310447fe59aso35656841fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 06:01:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748350864; x=1748955664; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6qSGdUsU8DnHUcblDU2uWTFnvGIDMXFFFlgA+QVGQgs=;
-        b=Vf1IeQuwCXfKCMYFsVzHfdRKjQmbGQbqNVD1cOiul1WxGQORtXzh/hVil3ZQtRDCRi
-         AKyKGjjYtLnOlb0/OGMPiKLtACqCHUwfhQrsFr/K7BFRF/EriVcMNDjRZaJ2k1R+Ujbk
-         8gjbZU2avPDJu1/bbQrw1ELGPe5fJyT+4enmufIV6oMmFKQMBCmNlxTyfyHURXPud3iQ
-         v9lsBhmzOPoG2oY+VxyLuIXc+AxF/0qTP9FSq4VgSpWK+jYUx/xUgTFNs19I0uw1iVwn
-         zrbKd0mBiwc8Xto1AZxhBGBatcuRQKkL2NkGT8fQ7k5v1D69A3TmDzfddk0uwd1d+42V
-         Rukw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748350864; x=1748955664;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6qSGdUsU8DnHUcblDU2uWTFnvGIDMXFFFlgA+QVGQgs=;
-        b=XrIm7n3TAJgoztYFEmWQJWr5GKN2T6zZkPOGd5jfgkBpCNhhzklDYnUNuckAV76YUG
-         kfOHXKvlBtS2/cNQ48vNwmvxIHLEbzpd34oUcCRDXFfpyxLnf8AarfE0S2De+zjIvD+m
-         kk1ZyPQNePnAIpqJ0jtua0U29oAGjnUJ5Q1uagWNjRT+akdDWzn4Fwpio5OCIEN8M30D
-         RPTfr5KYX8G4BZOi+GJtvh7VXY3EctJYKC9XbbYYoHc66Zmy35oiNIDf2xnwlSb11xil
-         FhOTHQDyuTO9uFMMrnmtc82S2uDAjU/n1T2VxWbShN40bEOq0TQDUY5YcPZiNA+5LPxa
-         e2aA==
-X-Gm-Message-State: AOJu0YyJdSePCNYLOikdCr3Sl9UENRZqBS3sudM9hVZqN1bJLcb8cnLn
-	Z+HIovAFK+Xmp/hNSmo0/yAJGH9O6Xxc3JqZD7EYCacu9X/GDBhNjp8OLoNiGVRZ/2m+tlSSEHk
-	RmFuIK59zTSzDPi0S9It+Huecsuhi9Lj5GYSW7FE=
-X-Gm-Gg: ASbGnctoA/KLBDtozMcOg+tAY68w78AwiVNkmrgwalVmLVW6VsXKJ8GS5ABfeC+ugcx
-	TliK/kQQnXNfJR9vcEt0AtfryGdjNXdVNXt+b9JzfGofsdMV+FQCXfvfvgQ4IAMeb+xrO8Ihnnz
-	u/RPd44zBVo3tMdkuayzQmWowlclmDdoI=
-X-Google-Smtp-Source: AGHT+IE9qA84QSSMZ/Pg4vR4mYvL6nGQINbY3xcZFj8mBoWHRUA3J7bidRJESZAjSysuQs7gWdXucL+xunmzMrs/Xag=
-X-Received: by 2002:a05:651c:19a1:b0:30b:c96a:750 with SMTP id
- 38308e7fff4ca-3295b9aaa34mr40416351fa.1.1748350863796; Tue, 27 May 2025
- 06:01:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HAWi7hRI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F31C4CEE9;
+	Tue, 27 May 2025 13:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748351994;
+	bh=M4XbxB728daJwQckqZMnCDk8GrjCwlrgBra1xDznme0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HAWi7hRI7u7qrntI2T4mSJdCzH2TW2G5vpcmihi0HjLq9qEJ2SEkcvLzgf3ArWqNh
+	 MBKXg/FhibFiT6AcjgvnDNYrIBLAAlbL+VaJHnBbuoy0DRW62YjJgd8o4fJZ4tWTCP
+	 RoQEyIUua7tRNqDFGjob3bbBtVSFYf19W1/Eq20VWdEXPslbPaD43nvG/3Qlp4kcHj
+	 0v297DVChvsaFu+COzZtQtTeU5VipDzVq+Er1Q899Dk94woVGaUEUryasj3iTQEeEc
+	 yUQmlFcXdDYe0k986yUdxXer9jwReKva3c65Cy3OyvyItYr97HRLmox1bvVSD0kkVO
+	 u3Ek6V83x/+fg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C8E380AAE2;
+	Tue, 27 May 2025 13:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250526194328.15875-1-repk@triplefau.lt>
-In-Reply-To: <20250526194328.15875-1-repk@triplefau.lt>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 27 May 2025 09:00:51 -0400
-X-Gm-Features: AX0GCFv8fjL0V1-V1nOfTqMbbbJCaQQmk7CMA6YzvaYTgF28trWGx3Cf3slu9Qs
-Message-ID: <CABBYNZLzaOJAQROkLCMWv1_OF6JOFcDN2+Aa=f_Rt9ZS7GJCQg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] policy: Fix reset Control/Target/HS retry counters
-To: Remi Pommarel <repk@triplefau.lt>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: btusb: Add USB ID 3625:010b for TP-LINK Archer
+ TX10UB Nano
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174835202898.1634553.17396092504323562306.git-patchwork-notify@kernel.org>
+Date: Tue, 27 May 2025 13:20:28 +0000
+References: <20250521013020.1983-1-zenmchen@gmail.com>
+In-Reply-To: <20250521013020.1983-1-zenmchen@gmail.com>
+To: Zenm Chen <zenmchen@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ pkshih@realtek.com, max.chou@realtek.com, hildawu@realtek.com,
+ rtl8821cerfe2@gmail.com, usbwifi2024@gmail.com, stable@vger.kernel.org
 
-Hi Remi,
+Hello:
 
-On Mon, May 26, 2025 at 3:52=E2=80=AFPM Remi Pommarel <repk@triplefau.lt> w=
-rote:
->
-> Control and Target retries counter were reset when service state
-> goes from CONNECTED to DISCONNECTED, but usually an extra DISCONNECTING
-> state is reach before going to DISCONNECTED. This causes retry counter
-> to not being reset in this case, leading to service not being able to
-> initialize on next connection. HS retry counter was only reset when
-> limit is reached.
->
-> Reset the counter as soon as CONNECTED state is reached to avoid that.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Looks correct, but shouldn't we update for other services as well? Not
-just HS and CT and TG.
+On Wed, 21 May 2025 09:30:20 +0800 you wrote:
+> Add USB ID 3625:010b for TP-LINK Archer TX10UB Nano which is based on
+> a Realtek RTL8851BU chip.
+> 
+> The information in /sys/kernel/debug/usb/devices about the Bluetooth
+> device is listed as the below:
+> 
+> T: Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 9 Spd=480 MxCh= 0
+> D: Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=3625 ProdID=010b Rev= 0.00
+> S: Manufacturer=Realtek
+> S: Product=802.11ax WLAN Adapter
+> S: SerialNumber=00e04c000001
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
+> A: FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+> E: Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> I: If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 63 Ivl=1ms
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 63 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 8 Cls=ff(vend.) Sub=ff Prot=ff Driver=rtl8851bu
+> E: Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=09(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=0a(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=0b(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E: Ad=0c(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> 
+> [...]
 
-> ---
->  plugins/policy.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/plugins/policy.c b/plugins/policy.c
-> index 0e533ba1f..02ce16f67 100644
-> --- a/plugins/policy.c
-> +++ b/plugins/policy.c
-> @@ -383,6 +383,7 @@ static void hs_cb(struct btd_service *service, btd_se=
-rvice_state_t old_state,
->                 else if (btd_service_get_state(sink) !=3D
->                                                 BTD_SERVICE_STATE_CONNECT=
-ED)
->                         policy_set_sink_timer(data);
-> +               data->hs_retries =3D 0;
->                 break;
->         case BTD_SERVICE_STATE_DISCONNECTING:
->                 break;
-> @@ -537,8 +538,6 @@ static void controller_cb(struct btd_service *service=
-,
->                                 timeout_remove(data->ct_timer);
->                                 data->ct_timer =3D 0;
->                         }
-> -               } else if (old_state =3D=3D BTD_SERVICE_STATE_CONNECTED) =
-{
-> -                       data->ct_retries =3D 0;
->                 }
->                 break;
->         case BTD_SERVICE_STATE_CONNECTING:
-> @@ -548,6 +547,7 @@ static void controller_cb(struct btd_service *service=
-,
->                         timeout_remove(data->ct_timer);
->                         data->ct_timer =3D 0;
->                 }
-> +               data->ct_retries =3D 0;
->                 break;
->         case BTD_SERVICE_STATE_DISCONNECTING:
->                 break;
-> @@ -587,8 +587,6 @@ static void target_cb(struct btd_service *service,
->                                 timeout_remove(data->tg_timer);
->                                 data->tg_timer =3D 0;
->                         }
-> -               } else if (old_state =3D=3D BTD_SERVICE_STATE_CONNECTED) =
-{
-> -                       data->tg_retries =3D 0;
->                 }
->                 break;
->         case BTD_SERVICE_STATE_CONNECTING:
-> @@ -598,6 +596,7 @@ static void target_cb(struct btd_service *service,
->                         timeout_remove(data->tg_timer);
->                         data->tg_timer =3D 0;
->                 }
-> +               data->tg_retries =3D 0;
->                 break;
->         case BTD_SERVICE_STATE_DISCONNECTING:
->                 break;
-> --
-> 2.40.0
->
->
+Here is the summary with links:
+  - Bluetooth: btusb: Add USB ID 3625:010b for TP-LINK Archer TX10UB Nano
+    https://git.kernel.org/bluetooth/bluetooth-next/c/59d081048c15
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
