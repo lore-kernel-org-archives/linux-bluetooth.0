@@ -1,125 +1,101 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF4E376
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 21:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826362F43
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 06:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748294006; cv=none; b=dsCpKfWS3lPZvfuLnklgvEnNFEuw+C3ZPOTLMWlVNP1A5DyUgR+5/WIXDFl9LPgsDeQYndRqf74nsqKovL7KuoQq6tPLSQPFSMfx8dJIaPaQOFdChNCUx9bI0Hbc24qEMEV/uXB5b5s51kz7r/lNqkyyYBQS35A3NbIn+Y2JHYE=
+	t=1748328385; cv=none; b=FCXfho3cqqvWc5ltqctrQKjDrvESdokyIXneSbAyoXPJpXL/GNOxzDB1TVyHgL2Ypt/s3wHpjt4/PBaLBDrk4GwQwJDlFIES8/pFSbeVWHQIYx/8fMAPMVw+rHydHM+Xgzu4KiMWJ88yMZNkgnIYC6IeucvPGTqJiQ//4/CaFV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748294006; c=relaxed/simple;
-	bh=SwFF8DnP2b5HYaQyf60WH3SFUu1qSQa2jlIIoDf73cE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ES9Mn9Pw/8F4m3epKHqh1uM8QGzU+cefmebpq0OfEbDmQJLn5cUQ7RyKhb8HIKsVuEZAuvLKIcLUeSFFGyLwCmEIK9m8kIdZCMo1qa3+PCDidMnTMIZK/aavZmjvPUK2EpgnXoNGu3vgtdKsyn52b6S918faFz1WOmJqzoYsfK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jKJ/U7N1; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748328385; c=relaxed/simple;
+	bh=n4RDWhFiY4mGYhOrEEJVQUOfOjuT964c80/JLiHTH0g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=leycfAOUeEX3sgkmyX5RuBQJdE5ZKgi35oqzzpnkHw4mPixbGqq6J6z6wIHdaCWWRsu9mifuMx7a4nqvonOuYq2x62xq/lRv4fJTTp1X5+GZoRHjzZl7dUXZh+CeUq9nVasi95XcwTjoX7uQPzfqHE7WIjV56Y5eW5yLlm/KodU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VOJYPi7d; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKJ/U7N1"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-879d2e419b9so1670432a12.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 14:13:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748294004; x=1748898804; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yDfiDs5e0ywOg68U7Zt1wbbjHsdvlTT0MoaCXr6OFo4=;
-        b=jKJ/U7N1rKLUSeode3Hqg8IZs55SM2x+3+BoMGkD1QoliUkukiueNPw9wILll+UKLB
-         py3Gb5yQSktoqO7k+qYj9qbn7Y4Nl+Vhd2wOO5C3GghqZsl6AJNw/0+jlryYuDrwEfTX
-         Qqv5iG+Q14JIa+oKOggTVltm6ZlBbxu3Q1zjiEfiXCpQ29gNoTX4Hd7efPlW/iclKrfG
-         fMbG/M4Wvw+gWcrV63IXgwNzMNC19/nC1SleC2D0FoanYgHwmhg/Z4YDziLZEiD/Vu2L
-         AVdiYgi8tdGnXUmwkaGwsvV9RxzqrW0DxF7tEALShUFy1WSc/+oA02E3Vun+f4sHB7/c
-         hmYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748294004; x=1748898804;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yDfiDs5e0ywOg68U7Zt1wbbjHsdvlTT0MoaCXr6OFo4=;
-        b=mGU31BrF+dSiF70UovPYbXenh7IgRrVHyLFF5y7YlFLNTTwrPlohsGrcALttQfD/ka
-         wfJxvvR4nQHGXgosEhfhUOctpStw3yFe0xpgX+VoyJLf8AL8QBxhydeG8vjpDB1UC0Qe
-         zmkNwStrI/yYJpqKH7hYSiiXtjFzyChKEbGuQPFuu1UvG7QL9a+JWXQhzoHspjjzuU5d
-         aITbqq6OGdTiMpMoLTtWfdaRRf5JLgNROqMlBevatwf5Za2Uz24elhMp1CXJ5t5KaKLP
-         1Ly+XaLOa9Pb9ZJosamVwU4XBDX1eWK6j0bty27joxS7sueA/kGjDnGWWMuzPsQj32xY
-         SuWg==
-X-Gm-Message-State: AOJu0YxmnaLU7uYLuDtL2Z3XSvkZVIA1NfEAiE4CH1W0tq/qbp/JSOMj
-	c32iVt7s113wiO74sXVPXOnKFHX8DbME56YrBNFvoYLFSJXb+oDHeeX68Uq8xg==
-X-Gm-Gg: ASbGncvHJjPzladmlcbQ6T5/9U0mGk3qaAdgyC3IezS5Qcr7JrmucMj3QoFaASwBhso
-	hep6ZEp9DjcZNv6xxIj2qmlmF0z7F6xz9D1UkfE+eH3ti7fJUmhxkHnLcjy0p7bD1AkUB8Ny7ei
-	6me7HIS9LC4iy+etA4UqPjuTEXsDXVszo9PgMPD8ye9Tkxcrb77wurqAMmkfxkh4Ibtk0xfuvZI
-	vDWGZz4QbsSTPi6/Pseozyd/d8BkdBexHKyCISnfeBV78K+CFybo86YBt416zjBODsRq3TsmpXr
-	IToRooUe0OjUKbhZ9uaiUJbP1LP4gZ09eLLS5H3QZoEupZ5jA+frDLo2QM0wOfHDSQ==
-X-Google-Smtp-Source: AGHT+IHxqWRsdikAz20gSrvqsxr3QROZtZhs7fy3kVuZz+Tjivi0lPl613oJ5f1qb5SfaTY9qEbYRQ==
-X-Received: by 2002:a17:90b:1d88:b0:30e:823f:ef3a with SMTP id 98e67ed59e1d1-31111a46bc4mr12404014a91.30.1748294004120;
-        Mon, 26 May 2025 14:13:24 -0700 (PDT)
-Received: from [172.17.0.2] ([4.227.85.54])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2c3b85d967sm1338597a12.61.2025.05.26.14.13.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 14:13:23 -0700 (PDT)
-Message-ID: <6834d973.630a0220.1327fc.387c@mx.google.com>
-Date: Mon, 26 May 2025 14:13:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6959550509221336940=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VOJYPi7d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1748328381;
+	bh=n4RDWhFiY4mGYhOrEEJVQUOfOjuT964c80/JLiHTH0g=;
+	h=From:To:Subject:Date:From;
+	b=VOJYPi7dn5gZjW7itARDefspzau+At7AYHI3dj6cUyZb//G9BNa6J9cACUf0j3pw6
+	 K3TuO/iGhoUxQ7g8xNhO5RmvHx9pM35RH0FFHd1CQkUmnhrpGJXYCVPeWIiURqiJhT
+	 qf0/+vjINat+8URGok2lSzu3R9+bh62/vDJUfXTyqZQ6HxuNnftwinDCA4qP5gOdNg
+	 S5BfyIed3zzD1fVISS8FN9AxEER/gtMDA9qL8NWV1vOLLL8yfrdHLaXBAUQO29sDC7
+	 M80R8CgFcSq2TsWI0JiRCK7Fl5WbofBXNUxnLLQ2d7V7NDRG2eAVc2TAGPkbHNwOw1
+	 1pM0tfXa96cXg==
+Received: from fdanis-ThinkPad-X1.. (2a02-8428-Af44-1001-2F37-b1f9-024a-369A.rev.sfr.net [IPv6:2a02:8428:af44:1001:2f37:b1f9:24a:369a])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3F93517E1560
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 08:46:21 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] audio/player: Update track duration if previously set to 0
+Date: Tue, 27 May 2025 08:46:15 +0200
+Message-ID: <20250527064615.125970-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, repk@triplefau.lt
-Subject: RE: [BlueZ] policy: Fix reset Control/Target/HS retry counters
-In-Reply-To: <20250526194328.15875-1-repk@triplefau.lt>
-References: <20250526194328.15875-1-repk@triplefau.lt>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============6959550509221336940==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Sometimes some stacks may set the track duration to 0 in GetItemAttributes
+before updating it in GetPlayStatus.
 
-This is automated email and please do not reply to this email!
+Currently the track duration is updated only if it has never been set
+before. To fix the issue this also checks that the current value is
+not 0.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=966495
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.25 seconds
-BuildEll                      PASS      20.17 seconds
-BluezMake                     PASS      2674.35 seconds
-MakeCheck                     PASS      20.15 seconds
-MakeDistcheck                 PASS      199.75 seconds
-CheckValgrind                 PASS      275.98 seconds
-CheckSmatch                   PASS      301.13 seconds
-bluezmakeextell               PASS      128.24 seconds
-IncrementalBuild              PENDING   0.24 seconds
-ScanBuild                     PASS      907.68 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+> ACL Data RX: Handle 11 flags 0x02 dlen 102                                                                                                                                                                             #287 [hci0] 4.537033
+      Channel: 71 len 98 ctrl 0x0202 [PSM 27 mode Enhanced Retransmission (0x03)] {chan 7}
+      I-frame: Unsegmented TxSeq 1 ReqSeq 2
+      AVCTP Browsing: Response: type 0x00 label 1 PID 0x110e
+        AVRCP: GetItemAttributes: len 0x0058
+...
+          AttributeID: 0x00000007 (Track duration)
+          CharsetID: 0x006a (UTF-8)
+          AttributeLength: 0x0001 (1)
+          AttributeValue: 0
+...
+> ACL Data RX: Handle 11 flags 0x02 dlen 26                                                                                                                                                                              #296 [hci0] 4.589649
+      Channel: 68 len 22 [PSM 23 mode Basic (0x00)] {chan 4}
+      AVCTP Control: Response: type 0x00 label 9 PID 0x110e
+        AV/C: Stable: address 0x48 opcode 0x00
+          Subunit: Panel
+          Opcode: Vendor Dependent
+          Company ID: 0x001958
+          AVRCP: GetPlayStatus pt Single len 0x0009
+            SongLength: 0x000255a8 (153000 miliseconds)
+            SongPosition: 0x00009256 (37462 miliseconds)
+            PlayStatus: 0x02 (PAUSED)
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/player.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 0f72d7601..52844c9c0 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -1320,9 +1320,9 @@ void media_player_set_duration(struct media_player *mp, uint32_t duration)
+ 	if (g_hash_table_size(mp->track) == 0)
+ 		return;
+ 
+-	/* Ignore if duration is already set */
++	/* Ignore if duration is already set to value > 0 */
+ 	curval = g_hash_table_lookup(mp->track, "Duration");
+-	if (curval != NULL)
++	if (curval != NULL && atoi(curval) != 0)
+ 		return;
+ 
+ 	value = g_strdup_printf("%u", duration);
+-- 
+2.43.0
 
---===============6959550509221336940==--
