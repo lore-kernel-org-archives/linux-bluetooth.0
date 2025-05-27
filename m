@@ -1,35 +1,35 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EC913633F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 20:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F961D63F7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 21:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748379401; cv=none; b=UXOnULoMF8p5+A23V5YOLozt08++YM4oDra+XRBWYkJ34FdBqcW0FhaSRLCKNQoJ0X4zSo+eb2/8yUFGLo2fo2fteHXz/igWrTXqlVMy3ja/oVFY8ZmRzELpxw0g57zRT6TMk0s657MUtuyNhxcHIzDP457PEm+z43aly7q36hw=
+	t=1748380374; cv=none; b=QWy/UCnpSGM+lgYDdsHjwZlclouLYgqB7TqfZ45wfu3kvz+ACC4eWe7ZcFTjz/KVyrhBRmBJmRvRtMmxdA9AK65RwiPWBd1fY2MuYrvz+Fvu4VpPx/NZyWhWIJIT/ZZLmoupCq4B46P6xZ7gFIzLbyf1s7dMqVH2Hr9Ks+AdPe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748379401; c=relaxed/simple;
-	bh=IiErNbraeMSZKc2f46uNukgAe9JO7xWE0nWdtZGSAgY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=au1vK+Q9s88EOgzjFuxhRuV/pVwMBrRo2eaCzUwVVENTl6Ou7FMWgVjtHqjf+OebeRGs+fmQQWtmCfV+i0lojTpwcI+EWdtweuRsQnBtbAiUW2M9glcpyswghAWIQh1rfu7aBsCR9WFpRBLElQZ+14zQ0Kc9zhNtynzX0XEPbIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Kl380Adg; arc=none smtp.client-ip=192.30.252.211
+	s=arc-20240116; t=1748380374; c=relaxed/simple;
+	bh=1zMaZtsx1BDUwtcfKH8XX05s054uPmDR7Kg5enyHS68=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=CqgNV7sOsPyXN4SzBDS3S/PwUiSL4afoyZOP+gNx5mRXR8Z8hCjx+Yn2OlGZXLNEe285Mg2LxC8/HTlzJTG53uIcLsgdPLopaJuw3waoloWjmjgXs2lyRpqOT4/w2KqCH6rejFSs6Lw9O/hVxhudi0gsBL/2yrWYnby+jLgmkzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=B+GNIWz2; arc=none smtp.client-ip=192.30.252.210
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Kl380Adg"
-Received: from github.com (hubbernetes-node-c2335c2.ash1-iad.github.net [10.56.172.10])
-	by smtp.github.com (Postfix) with ESMTPA id 30C03920AEC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 13:56:39 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="B+GNIWz2"
+Received: from github.com (hubbernetes-node-5475eda.ash1-iad.github.net [10.56.164.44])
+	by smtp.github.com (Postfix) with ESMTPA id 5927860092C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 14:12:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1748379399;
-	bh=zAiVQJ9G/naqgWpYHzu6vvicq/LrTs/mEFq/0hqFyNU=;
+	s=pf2023; t=1748380372;
+	bh=aT68KxmSt2OuioRsGsaT9NUANzJJ4oMemtozYDZxwBQ=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Kl380Adgx8HWx5aH968BOLwNETOBiQOLScK+y0DJH1DqCwnVhEJHVr66HMsYnfaUK
-	 +VWU59+dHCV1LNQW6t0VQLlTsgE4WS3PF2nMZwR6G/k2M4HKWT5IDBYaV1uY+dCbVz
-	 Fn+MHPJ+LEsPEMt1nxCWHtQQvszVNwVB5MNEnCkA=
-Date: Tue, 27 May 2025 13:56:39 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	b=B+GNIWz2Tbte+7bdhzny0K5rVN/g8zoChm49Csd2PuQrTlNIeuC+dCc5i9/GW8f5m
+	 oB4e6ey7x2FrxzwfftUeRSWY1z8/CfLKHxk3jvjv1eBZf2yeL+sm6sMrpoBfj48J9h
+	 PrPC63JM9RiuCNluoppnKdt4PizNZEvjuhZRByz4=
+Date: Tue, 27 May 2025 14:12:52 -0700
+From: Remi Pommarel <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/f8c669-b14bfe@github.com>
-Subject: [bluez/bluez] 05967f: mgmt: Add revision information for fields
+Message-ID: <bluez/bluez/push/refs/heads/master/b14bfe-2a552b@github.com>
+Subject: [bluez/bluez] 088de1: shared/bap: Fix not handling read offset
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -44,39 +44,53 @@ X-Auto-Response-Suppress: All
 
   Branch: refs/heads/master
   Home:   https://github.com/bluez/bluez
-  Commit: 05967f5650a37013fbc63b1ecd996c64f06e2011
-      https://github.com/bluez/bluez/commit/05967f5650a37013fbc63b1ecd996c64f06e2011
+  Commit: 088de118d17c017d66030384d772395e0e26345d
+      https://github.com/bluez/bluez/commit/088de118d17c017d66030384d772395e0e26345d
   Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2025-05-27 (Tue, 27 May 2025)
 
   Changed paths:
-    M doc/mgmt.rst
+    M src/shared/bap.c
 
   Log Message:
   -----------
-  mgmt: Add revision information for fields
+  shared/bap: Fix not handling read offset
 
-This adds revision information for fields that were added/updated
-causing them to be different then the revision of the command
-itself.
+Some attributes may need to handle offset other than 0 in case read long
+procedure is used, so this properly handles that for PAC_SINK_CHRC_UUID
+and PAC_SOURCE_CHRC_UUID.
+
+In addition to PAC record this also uses
+gatt_db_attribute_set_fixed_length for attributes that are considered of
+fixed size so gatt_db can handle offset directly.
+
+Fixes: https://github.com/bluez/bluez/issues/1294
 
 
-  Commit: b14bfe90ae4ecf632bde3ba826be64030a60979f
-      https://github.com/bluez/bluez/commit/b14bfe90ae4ecf632bde3ba826be64030a60979f
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: 2a552b93de8b319a8350b1057be4a53c025ab28e
+      https://github.com/bluez/bluez/commit/2a552b93de8b319a8350b1057be4a53c025ab28e
+  Author: Remi Pommarel <repk@triplefau.lt>
   Date:   2025-05-27 (Tue, 27 May 2025)
 
   Changed paths:
-    R doc/mgmt-api.txt
+    M plugins/policy.c
 
   Log Message:
   -----------
-  mgmt-api: Remove text only documentation
+  policy: Fix service retry counters reset
 
-This removes mgmt-api.txt since all its information is covered in
-mgmt.rst.
+Control and Target retries counter were reset when service state
+goes from CONNECTED to DISCONNECTED, but usually an extra DISCONNECTING
+state is reached before going to DISCONNECTED. This causes retry counter
+to not being reset in this case, leading to service not being able to
+initialize on next connection. Source, sink and HS retry counter were
+only reset when limit was reached, moreover HS timer was not removed on
+CONNECTED state.
+
+Reset all service retry counter as soon as CONNECTED state is reached to
+avoid that. Also remove hs timer to match other services.
 
 
-Compare: https://github.com/bluez/bluez/compare/f8c6693139de...b14bfe90ae4e
+Compare: https://github.com/bluez/bluez/compare/b14bfe90ae4e...2a552b93de8b
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
