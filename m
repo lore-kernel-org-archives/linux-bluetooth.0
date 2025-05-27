@@ -1,151 +1,125 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E4A1CDFAC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 09:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1311F582A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 09:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748336723; cv=none; b=bTkFsxRQmPBR8B4SFzzPnx9gDgMtP6Z29IhM/JpKtRa+UsSI0Z1EPlwPLYmE1aiLN21+1+NJwqnLJFzNYB7hWvfnnnCD3VrNhxoknHyhjja90FK+t/L17aDwwUfNUoUXAuEjmR/AbgKT7DfatHnduC/8oQS0OZfZM4huCooD8NM=
+	t=1748338323; cv=none; b=oN7GC0D9TMkUC2sMq34K9ahcfp6tQQSwpMS4i4ktfRIGeiZwG5bPuL8NCZH5Wzixlg6Z/Pq4qS5lV4V/5GFGbmT9Qe+92jfsZ/RcSkKYFfRdrql4HjsQu3Vjj/WI/QNxCdJ2/FkjkMsobhIxLwROjxVMEW4qfPsB0evevUH4RqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748336723; c=relaxed/simple;
-	bh=CRpfTBPGsU/+tqdI9xlMiEq0T70swRutbZRigIjFYyc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hs0ydnjCdTax8JqD6SFmtcfM2eVXnsrwq45eU5qJWE8kl8MV00xwgCM1GgrzkXSSq7LDhFfjvfe61UOKjWzDzMylPHsoXS/hrsL14GytM6xk6Owc6Cxiv0nAo4hvLtpqY+utfzuP78B+J0SQVIA4iR3Jqa/ryxTKiE9+qVyR89E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nLOg2s6X; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1748338323; c=relaxed/simple;
+	bh=DyN5mbaCk5UZHfNtBYvgil/iOrmoX6a54ETZDHZqosU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=AdJ5okxGZwooZfY8dXiXO9AUwVDIYqv/bhiI5PGcWxaglOuNDDIU8Rw2hNqYQNZotyF0GfRB/Aq25fmto5y3+8+y5HfUMgx7JKRy6IXlC1ya6hA+D91OnlU8ffS0Ly3uFiinEit81pWqbaioic3yWfr+lzlXz12bGVdnzf3SUNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDQhTTcH; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nLOg2s6X"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e7d998f5f8dso1605221276.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 02:05:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDQhTTcH"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6f0ad74483fso27724536d6.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 02:32:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748336720; x=1748941520; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LTZd01UwRRbxtjj6Iv0AjAyRW61W+KGsLF4BZOeCQNY=;
-        b=nLOg2s6XbZ+9gRzR1FyfkX+jn5Zwk+lbSOdqo2W3guvUk9F6dWNBPLJ+XcZU/FE6JA
-         f3bqa1dUHmANelb1y7Iu6k1dISLzsJwdVi82JX6A5bE9nuzXNjyxH0gh9e/kLazaTGvt
-         QeOEsqtE01frCgz7NROoVzevM+vQTuLc7AUYlu6+KQ7lftZQb+cZLaW1dywWEua6HgyK
-         TfM/Aaeqvk6zOUdM+8BDWVrb3eLjrz5czR7FCLX2kS/OPyHvhvCyWZm8/uOskc8PPUFN
-         XDrr95m13CZXYrex+TcUOSsxQ5vqqYOWl9HPYGfJX+pEQwOK9wmzYg/xEWqgbJ6GRBd5
-         SfLQ==
+        d=gmail.com; s=20230601; t=1748338320; x=1748943120; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fzUfmc5mRQzpUfiCDLUeqRNRsPr2neYrVyriJILtjiQ=;
+        b=BDQhTTcHKTKLmcAWngOc30UhJXz+GvdlRoPWvgHk4c9ycUDwebFbBcQEaGpN8YAAjT
+         GOn0//QX0TrqAIhwvWSD2bC6XpO4pDJsaDgKIjfEFoWHZCFTbQLcw/Rjp1q3gUULtdH2
+         fjHZ9pcq2mF/OrthE9XM5Kl1CIfiPcAunSxLIh++5S2dz/7VNUs1DuVPX9Y4FAUoJABx
+         8vlciuCLVLAqiKRkk5jnEN4ugOvynVxN0ce1TDMChjkIIVT852S91HQit+T7Z1bNlJQy
+         1NVqZ9TxEVxTXLZnx1UHILtGeaeS4SmxUuVyEyQ/wmzDbvt6t3XVNnBjFLN3WmIgmYdg
+         foZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748336720; x=1748941520;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LTZd01UwRRbxtjj6Iv0AjAyRW61W+KGsLF4BZOeCQNY=;
-        b=gMBaAIoB8pP6ctOzIorIfN88nVMVaFb9jW2TvrdNPzFwz/uqDoOpBIJsC2+VYqpFZq
-         3D/IWg3U3turI3KCbYj6nALCJ9J8K7p0888Rs96jOI5rAt+/tJr7vDP5DJVxJt6bt0Ut
-         h9hwUd8BSZ5zeERvb6y5i+g7E/f/GXaeUKacWq+5L6EOj9H1bUbj5XnRgmrDIZmCAluN
-         J2zt28EpuKCXZvK86t3hYjo+9j3Qq4xwWEZY0CSUs7MygRFlgyzxcTu1C8sgngQtIfJ9
-         ll4zwyHvNRQjvFcOFGEePFeAe0l6z2C5Hpx0k7+zkwdM4aztvbeQEqtYEaABK5oDH2NM
-         mHjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfxY/iZXZZoNhGu2xnFf2brVm4B5ex7WOUU9AlYsKJJWTT8QTRMSsBXeBx1ugYHRyTyX2+oznJMxZipvlu5Os=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDEUNuSDQBN+H24KPHryoxC0fo8dhnGoqH1xsbhWDKWEvjab6o
-	1LzsuJ2m3jy4t3Zti3AEafYxCWaeQSALxG53AcLJDnoueHSl76pjiXcoNHgb+s92e75MjZnwQDf
-	qo0eDwzSyMCtBKXBDTK3g2OrlpAHQAf97PcdCgmJ2jJlSFxvslR5RBYMLQog=
-X-Gm-Gg: ASbGncu0xZWWtYiWqMBVKzR/VomWrasMi0G7fdZ0Mc1qwXHDiyOzrKMB4bIO0DrjhG9
-	NL6sCedhy7Tftj5OHmM47kFYlRO1w1Sy70ZNqZ6SCKS3RIkWVdDObjYUoz3V51AJjazpfIuyTag
-	KaOphHuvwHkvj4b6cKHIiFoOfrjBH95zKdpkwEAAFwAq+rNxjZzrJitGA=
-X-Google-Smtp-Source: AGHT+IFKMIHWgeFu3xBM1RWDE/WEs3TcahlWcU3GOovHQ5dAwRv/prvQiF+8ccGJ492KAiRXV4sznqZrP7KO0+OOKwU=
-X-Received: by 2002:a05:6902:6c09:b0:e7d:81c7:3291 with SMTP id
- 3f1490d57ef6-e7d912e0c0fmr11236246276.0.1748336719732; Tue, 27 May 2025
- 02:05:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748338320; x=1748943120;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fzUfmc5mRQzpUfiCDLUeqRNRsPr2neYrVyriJILtjiQ=;
+        b=KuYqfLBOhnvu8LWPiAIEIhUCD58EdYCFSNhl3iM+HjipllKaiZXnXWZ5BuGc9IMZeO
+         F6jFWnRlydlLpKgLJ6Xh1txwiyYEKD56QzFQwsfo5UjcHD3AEpzy4gVBgEoRzI0ydLew
+         60Rta60W836n4l7LwzBZuhBGGPiOG2KOQgbMpnu39xMyfOR4MxVsy39MxJ4vunV7WwM9
+         S6L1TKwY7vpBa9osqPwnWzcqnU6soscI0rcdiURp08twELN4y2SboWWvfSu5qRDBX1Ev
+         sI3NC8CrxncEUtfKLDW58r2bny4nSp2Sm6hALcuuh83G2WVM+YmuQ0fJIwH+wy7fqIFU
+         N0AQ==
+X-Gm-Message-State: AOJu0YwXsPOlBtHcImDXPmYVbNHJX3sDDpW1sUE5nGEaZMq4enjKOKre
+	T1/cmbWjr65DwQuhQwbyjUqCz6NEt4wd0uLwBUfocEQrpFyAfZTU+gDKckmEA719
+X-Gm-Gg: ASbGncvYloYBCz7Z6z2yHLzZ9iSjwlOaqHluQhgtqf9U1JsGoTkQkFg+nFFP8HAAMOl
+	n+51zrCemsTN1qkYPLRYNO7hkSyolyi5ByRNPIhgj87orexFKtJKIj6YAblVWLh6o5p0868KeNb
+	llN62SjtWzgDH9Ieq32kpvhemYic6ZlAbSKIZOku5YD7LFsPK8aiGHfiSXmdR49LG+5Bion/HYf
+	Q0r4UdjsIFJJ1P82FbQZe2dcjMzpf0bWmTgFo7R/TM75ItLemtazKMOZywn+YHfUmfNjmmPxSAz
+	qVkmXd776YNTBZSBk1GTmpVL/SfueawqCO2Y7IHHIrA8j/4WCm6kBJ9OIQ+oNXrwazA=
+X-Google-Smtp-Source: AGHT+IFv67y6BMFw10/Oyc27fDXVXsUl5UBqvbKscn5+HmXCVFaPQEoMWd5ybKSJEmPZO23hPfJYzQ==
+X-Received: by 2002:ad4:4ea6:0:b0:6d8:a8e1:b57b with SMTP id 6a1803df08f44-6fa9d296bb2mr228669836d6.36.1748338320558;
+        Tue, 27 May 2025 02:32:00 -0700 (PDT)
+Received: from [172.17.0.2] ([20.230.64.34])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6faa75185b1sm30853566d6.16.2025.05.27.02.31.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 02:32:00 -0700 (PDT)
+Message-ID: <68358690.050a0220.294dc.8cdb@mx.google.com>
+Date: Tue, 27 May 2025 02:32:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3999288579603978596=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527074737.21641-1-brgl@bgdev.pl>
-In-Reply-To: <20250527074737.21641-1-brgl@bgdev.pl>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Tue, 27 May 2025 17:04:42 +0800
-X-Gm-Features: AX0GCFt06KcqokYcO9FSO7kQTD9JduQQO9FBuLb_nJmBU7e9JKNOWhA7JnDhj40
-Message-ID: <CADg1FFdVu7BjLi+Jr4KaHnkQBJCShOCpc7veXmqKN0nYkdhAYg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_qca: move the SoC type check to the right place
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	Balakrishna Godavarthi <bgodavar@qti.qualcomm.com>, Jiating Wang <jiatingw@qti.qualcomm.com>, 
-	Vincent Chuang <vincentch@google.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ye.he@amlogic.com
+Subject: RE: [bluez,v2] shared/gatt-db: Add read offset to record the progress of att read blob request
+In-Reply-To: <20250527-att-read-blob-rsp-err-v2-1-23c7f749e8d8@amlogic.com>
+References: <20250527-att-read-blob-rsp-err-v2-1-23c7f749e8d8@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, May 27, 2025 at 3:47=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.pl>=
- wrote:
->
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> Commit 3d05fc82237a ("Bluetooth: qca: set power_ctrl_enabled on NULL
-> returned by gpiod_get_optional()") accidentally changed the prevous
+--===============3999288579603978596==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-typo: previous
+This is automated email and please do not reply to this email!
 
-> behavior where power control would be disabled without the BT_EN GPIO
-> only on QCA_WCN6750 and QCA_WCN6855 while also getting the error check
-> wrong. We should treat every IS_ERR() return value from
-> devm_gpiod_get_optional() as a reason to bail-out while we should only
-> set power_ctrl_enabled to false on the two models mentioned above. While
-> at it: use dev_err_probe() to save a LOC.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 3d05fc82237a ("Bluetooth: qca: set power_ctrl_enabled on NULL retu=
-rned by gpiod_get_optional()")
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index e00590ba24fdb..a2dc39c005f4f 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -2415,14 +2415,14 @@ static int qca_serdev_probe(struct serdev_device =
-*serdev)
->
->                 qcadev->bt_en =3D devm_gpiod_get_optional(&serdev->dev, "=
-enable",
->                                                GPIOD_OUT_LOW);
-> -               if (IS_ERR(qcadev->bt_en) &&
-> -                   (data->soc_type =3D=3D QCA_WCN6750 ||
-> -                    data->soc_type =3D=3D QCA_WCN6855)) {
-> -                       dev_err(&serdev->dev, "failed to acquire BT_EN gp=
-io\n");
-> -                       return PTR_ERR(qcadev->bt_en);
-> -               }
-> +               if (IS_ERR(qcadev->bt_en))
-> +                       return dev_err_probe(&serdev->dev,
-> +                                            PTR_ERR(qcadev->bt_en),
-> +                                            "failed to acquire BT_EN gpi=
-o\n");
->
-> -               if (!qcadev->bt_en)
-> +               if (!qcadev->bt_en &&
-> +                   (data->soc_type =3D=3D QCA_WCN6750 ||
-> +                    data->soc_type =3D=3D QCA_WCN6855))
->                         power_ctrl_enabled =3D false;
->
->                 qcadev->sw_ctrl =3D devm_gpiod_get_optional(&serdev->dev,=
- "swctrl",
-> --
-> 2.48.1
->
+Dear submitter,
 
-Thanks for the fix!
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=966581
 
-Tested on a Chromebook device with WCN3991 chip.
-Without the patch the hdev->reset callback would make the HCI device
-unrecoverable, and with the patch the callback can reset the HCI
-device smoothly.
+---Test result---
 
-Tested-by: Hsin-chen Chuang <chharry@chromium.org>
-Reviewed-by: Hsin-chen Chuang <chharry@chromium.org>
+Test Summary:
+CheckPatch                    PENDING   0.25 seconds
+GitLint                       PENDING   0.27 seconds
+BuildEll                      PASS      20.28 seconds
+BluezMake                     PASS      2579.39 seconds
+MakeCheck                     PASS      20.27 seconds
+MakeDistcheck                 PASS      198.02 seconds
+CheckValgrind                 PASS      275.29 seconds
+CheckSmatch                   PASS      300.30 seconds
+bluezmakeextell               PASS      128.35 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      903.27 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Best Regards,
-Hsin-chen
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3999288579603978596==--
