@@ -1,128 +1,150 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815851F4624
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 07:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CB2186E2E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 08:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748332076; cv=none; b=Ck7/Sqgrn8cL/0FEeb3Xc/ASc8Ad5P+7JKbz6hGB1Fy1AorpEFiJcGcKbaiE4ez6NNPWgr/LQg2eE8qhxhdcQAAMFdkcbrFsNv0qJLJ9oRS4FQ49zRSgjCrFwgtwC6ty6m+HEY08URUCmomfaiNVkBjA/QWQ4FRVat/yGMROrOo=
+	t=1748332954; cv=none; b=mQQgvXMjZC836gKTvguF41QirnX4Wsw3sSWKgSA75JhMJ4IwkXuWRT15TcwAIlSXmqI1APNWkkvD03q6kVxeFTp5T8TYtdkrSJoBMVWsHFuy2so/lYy3CI1elF9tW6b/9U80AHZnkaimrGP7LWsYAQu2Rg28F6q0XTlAvYlvHPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748332076; c=relaxed/simple;
-	bh=8inumT2GzLnLF6ATSYii0P0+BsCxZazCz1tzjBacIdU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jUyYuJjo7FvdpUVhbSAIOtnR0cicSOccCZXs5mJB9LAto/kfklMBGEedwmJC/02fYi95dRg07uBlux6eg9ML7WVc+Edsd81nY8IveSVY8QEHRh4B7/qJ1o7LAEaxfoxoR6d7jmJ93QbHwf0DP+UIphiOQOpw5gkaKUVRhEdUIWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=IGdmhQuU; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1748332954; c=relaxed/simple;
+	bh=EFsqzRCZ8ePp1PM1ihVHdbx19gT/fR4vZ8gVTQC6W1I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sZFTfoC3/xPvGYjX2BDnc7wGPl06Gce+8TFWwxm6GjRstlxq4DBnLAQFf1/Golg2JYxzAzw9rHuOS51Gtxo9eeENCvtK6DAdSJSzb6XPVD4k1uA3edWnD8OXg2+bQ52DJTy6HDafzt8Vbdhdgp/FmmcqyJtGGf3bhO6EJECma3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pLkjcxiD; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="IGdmhQuU"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a375e72473so1888538f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 00:47:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pLkjcxiD"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6047d11fa5cso235974a12.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 01:02:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1748332072; x=1748936872; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bRignQG26Y8syh2NX5Cw/ROaM7UDkzL0aqEqvQ0ZPb4=;
-        b=IGdmhQuUqWtqr8aJZUEWGsmzNHT9qC1OPRehOW9dHxHGGppc+/J+5TxIsDj6tdf19o
-         7WhMFIfa3iLLoP2DHgRdnu/y1x5PveV6c5p/r6aUSVJ4kaX1JqsQQBRCRkG/5nc068SS
-         7B36Xt6Qcz+xUQDgQSH5ghfeO4l4RnlDwHYDkiDmg6hehX3iAwlK8Qpq65uTmcNbv+rj
-         dro/UOwpHcVRm5iFU1qHnHyhGZZFOpvId58DUR10ypkNkZ339JEWYN5hXsCxUYiElm/g
-         gbFFvDAPVdT3y1RHFql2O94XKMdwnI5dMykCWlvMxn2H4k3DlAEPHDDOFBYERRtisO0d
-         VBAw==
+        d=linaro.org; s=google; t=1748332949; x=1748937749; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zZdYklQjuqTcptyM6fEwz69fIzQVNbHtd0JSSB/QcCU=;
+        b=pLkjcxiDdd3SmdBCmtEn+2KneExCEBtRk/FsBMIDIG0UtTus7SmjbfkywLrQdViLFv
+         DimvsKGBJ5JDKNBxG66OR+WOqIUv5B9W0oeKQ2TEFUva8AzY9UNzLAW1g+DV2ZSmA2zL
+         NzCzDmXusooyywFx4uG+WnCQN77BLxyL4reLkJg0adyxshvxSRmAf05EBg94Y+6knOta
+         9Wso7GLfyu3RIDyoFLoJk5XECxCjH9dKdrRLW/wKdEl/FTCE/U/J8tFP9Gy/hQs4p5TF
+         l5IOiBI/6hN5qFjrMMUnaLYcVrIS+N/zZU2XyTECct1EgDBLWYQXgewC5Ggv6GXQf9Hx
+         cdCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748332072; x=1748936872;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bRignQG26Y8syh2NX5Cw/ROaM7UDkzL0aqEqvQ0ZPb4=;
-        b=uMYI/OY2OIWk77dC/XTT9pgvwJEhfGRkxl6YNJ74PEnsnhvvwOlnK//L2zsHoZDlzk
-         qCkKSHkc9if7eQhTnE3QGlSKOvlB1EFKHL9xbsCTT2FE6EVD+o4ro32GUuEsTAeXVL9g
-         5QM2uF+cOj7il7EPHGhedbEWWl1pvfDypTfxwLjw5SDzq3dWma90HpvQtvdsNyzuMzZY
-         tyng1zkxo8Uz1GWw94lv4gxwTkpgQGwAZAkYRS1lx6EnFM5xMCIpme6ZFs15sElZRDHB
-         k5TO9fmIh8tcp3Izr5vwqu1xonWEgqSuvTyBcnLcYbjpJ1reSjiV0c+xnmsznuwJMAwR
-         EsOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTYj0rTcV3CW50FVFio73D3T+XqSimPjWJBwZ6Q7renRdky4HAKpXS3hVlq59dID5ww7XHnsqWrcMdKn8EOAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSHzMbL0WVIbZpEbDxn11e35fKOe6bWuBubdIOgVSpQuolFUtb
-	Vxd8p6oaSAWbKDg6x5lGt6c0VObQH2xG0b+XtdCMSZR+kiV5eXBxCRcXENiTYWGvpjA=
-X-Gm-Gg: ASbGnctv3CFlTGGFhrcCuNhbXiHpzGND/T+7xtytnfn3h9mPHmH1Ddu3N1BIUaDE+m3
-	06Fwi1xUKMBgctxiRT5N16n1SWeuOt8eD8IFPnfow4ErgJqdkNdTpwtgUoLphy1XHXxQpXHy59x
-	X3k70VMBXNmoHL0ufvVHiUKZzBFGqnkxffM9BHqlVzCnuvJvGPXpO2QP2JLLytq2zFQ1XA08svp
-	OnujuEW+K66JkFkdkG7uMLfmRK9n+8kSRSkaE6VofZJSLfqHYjPrQIyPcnWeX3+wgwTVnTahOAQ
-	4Z2FTljCTONliCZ34WDHqTlQXdrDXd5T+TZBxf1ZGCXZOWlabxs=
-X-Google-Smtp-Source: AGHT+IGsoZw2nAtnHF/LZfbLWN76/RtG8pfqU0DqC0oaErakHj1u3x87Kp6fGEtqLxyX4EMwo4KKWw==
-X-Received: by 2002:a05:6000:188f:b0:3a3:6f1a:b8f9 with SMTP id ffacd0b85a97d-3a4cb443a5bmr8364347f8f.15.1748332071512;
-        Tue, 27 May 2025 00:47:51 -0700 (PDT)
-Received: from brgl-build.home ([2a01:cb1d:dc:7e00:a230:a0af:b6be:8a46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f3ce483bsm257422165e9.33.2025.05.27.00.47.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 00:47:51 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Hsin-chen Chuang <chharry@google.com>,
-	Balakrishna Godavarthi <bgodavar@qti.qualcomm.com>,
-	Jiating Wang <jiatingw@qti.qualcomm.com>,
-	Vincent Chuang <vincentch@google.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_qca: move the SoC type check to the right place
-Date: Tue, 27 May 2025 09:47:37 +0200
-Message-ID: <20250527074737.21641-1-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.48.1
+        d=1e100.net; s=20230601; t=1748332949; x=1748937749;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zZdYklQjuqTcptyM6fEwz69fIzQVNbHtd0JSSB/QcCU=;
+        b=kKdiiQDz7+0unXYdouSuW0y67HhVvAXu6ECXzWJJ//bv278phjwW7OVlVdP6NsFzIA
+         wD0IeMMOKYYkTfx3DOzM6cdbH1aXldP4b8djmRDX4n2rM8HXN+lSyCSA8cblRYm3lLBd
+         60MnoxhtVj9L6cuADgmw7XHETACqnkxZJjX2jKdvMXuMj7FE17/xrf9iQu0PFYIZRr4t
+         6HowC51cfSFBElGnddWbCRvnr/Deuov2aHbAeRMhtRBfc26SRSgP8+BJ29OhDO2OmK+1
+         Sc/0zrHNMApC24HmzzfvMXFQmkQlcSvQ+Py5kjma+0VGtMIU3Wa9Ucn1AHhQHvPElu+t
+         G8jA==
+X-Forwarded-Encrypted: i=1; AJvYcCUS59OeY/XiQm1WcXXQUdQxWzHaO9bxuzojEmvODXJ44e5JfUeg138qdVvLXGA0xqTsrHFh46STHWbMzrO5zc0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvYsWdv8MXtdgnElY3AWGzxRLquPdFRODvqVzW5tl3PxlXMmLP
+	HtKzYRp9XkKFkkEM25W5aBF9cbsBSdYVMKrBnUWv2ChIBQOMyeo+1PcAQVpHbJQMzEGOc0sy0LP
+	gTLli
+X-Gm-Gg: ASbGncuVpLm3KyTKQuPJ4DGV/KPTmIxypb6zVImI4wqrTSxagDnG2T09WIVbyKi6KUV
+	rrHwi3g9frP4C7e80w2As64qEhjbpn+1CuWbQi/7bLqx8XyZjxU01m8PZ2cLyp+R+uCpQSttUw1
+	WLYKibcfegROmbX44pNJAPKVZbwnwzJOh/1w+h1kWRcOTRgRiWLMgcZtWz5dvq3mxMQehWP6TfL
+	78MBbkpusyzN/PCCRtQpBxbf2xpc9pQCobzrw9fp7t/7Jvh6kDDm644Nqdj7qSY4fdRXLdh3wGw
+	RRl27N6ujitkWJn8r3azdLMS11o0/7IXMTfd6K+uSKjG2GQ61XKOToyS7YXufy3z0FLfilw=
+X-Google-Smtp-Source: AGHT+IFOoikQuzl2sjvQi67mzdQkPUbTkaKcMh95YzCvEYyHDcauQWWOyuVFb9fxSQsI1sfVsZP94Q==
+X-Received: by 2002:a50:f69b:0:b0:602:e002:dadd with SMTP id 4fb4d7f45d1cf-602e002dbc5mr3049695a12.10.1748332949273;
+        Tue, 27 May 2025 01:02:29 -0700 (PDT)
+Received: from [192.168.1.29] ([178.197.223.125])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d27192dsm1807445066b.71.2025.05.27.01.02.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 May 2025 01:02:28 -0700 (PDT)
+Message-ID: <e200db90-f886-4519-a772-c1e45084a457@linaro.org>
+Date: Tue, 27 May 2025 10:02:26 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_qca: move the SoC type check to the right
+ place
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Hsin-chen Chuang <chharry@google.com>,
+ Balakrishna Godavarthi <bgodavar@qti.qualcomm.com>,
+ Jiating Wang <jiatingw@qti.qualcomm.com>,
+ Vincent Chuang <vincentch@google.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, stable@vger.kernel.org
+References: <20250527074737.21641-1-brgl@bgdev.pl>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ 2+47PN9NZAOyb771QoVr8A==
+In-Reply-To: <20250527074737.21641-1-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On 27/05/2025 09:47, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Commit 3d05fc82237a ("Bluetooth: qca: set power_ctrl_enabled on NULL
+> returned by gpiod_get_optional()") accidentally changed the prevous
+> behavior where power control would be disabled without the BT_EN GPIO
+> only on QCA_WCN6750 and QCA_WCN6855 while also getting the error check
+> wrong. We should treat every IS_ERR() return value from
+> devm_gpiod_get_optional() as a reason to bail-out while we should only
+> set power_ctrl_enabled to false on the two models mentioned above. While
+> at it: use dev_err_probe() to save a LOC.
 
-Commit 3d05fc82237a ("Bluetooth: qca: set power_ctrl_enabled on NULL
-returned by gpiod_get_optional()") accidentally changed the prevous
-behavior where power control would be disabled without the BT_EN GPIO
-only on QCA_WCN6750 and QCA_WCN6855 while also getting the error check
-wrong. We should treat every IS_ERR() return value from
-devm_gpiod_get_optional() as a reason to bail-out while we should only
-set power_ctrl_enabled to false on the two models mentioned above. While
-at it: use dev_err_probe() to save a LOC.
+... and to fix spamming kernel logs on deferred probe.
 
-Cc: stable@vger.kernel.org
-Fixes: 3d05fc82237a ("Bluetooth: qca: set power_ctrl_enabled on NULL returned by gpiod_get_optional()")
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
----
- drivers/bluetooth/hci_qca.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index e00590ba24fdb..a2dc39c005f4f 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2415,14 +2415,14 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 
- 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
- 					       GPIOD_OUT_LOW);
--		if (IS_ERR(qcadev->bt_en) &&
--		    (data->soc_type == QCA_WCN6750 ||
--		     data->soc_type == QCA_WCN6855)) {
--			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
--			return PTR_ERR(qcadev->bt_en);
--		}
-+		if (IS_ERR(qcadev->bt_en))
-+			return dev_err_probe(&serdev->dev,
-+					     PTR_ERR(qcadev->bt_en),
-+					     "failed to acquire BT_EN gpio\n");
- 
--		if (!qcadev->bt_en)
-+		if (!qcadev->bt_en &&
-+		    (data->soc_type == QCA_WCN6750 ||
-+		     data->soc_type == QCA_WCN6855))
- 			power_ctrl_enabled = false;
- 
- 		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
--- 
-2.48.1
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
+Best regards,
+Krzysztof
