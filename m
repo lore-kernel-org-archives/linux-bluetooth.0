@@ -1,102 +1,119 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1780522A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 06:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7209228E17
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 07:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748328961; cv=none; b=jPJBDtywFMd0t/34lBy+swS3SiVY9I1llSjikddQQsiVlOmcFiyHHq05UUCQuuFvbZ44oEfwcqfUaPahOV99/znQcLBLR/hr8eNPS7uSv2xjrJyTDPXtMsBaMY+QOwDoyWBvnO0OwlUHBmxdoXNq/JUPN8xulsCqs4CpCJ55cLE=
+	t=1748329955; cv=none; b=mrK+8pd5DGVUXCwd0mlPRKrPR0+08VUdtYR89hfhTEBxhFcaiXcDF+GEJzhwS6TCt7TMQ66hmeSv2xlxR7ZyGdoLemolGLIjB+n8UAT7eYED203qMiwQAdr8qtGZu3Azdb7TF+PbD7t0e6ASlZMGuIbkQFpI1qJNBEL8mX1j53g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748328961; c=relaxed/simple;
-	bh=SixY2VLC0PRR5qG+il4TckkqWBJdM5oTdU4mG6zfDfE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hID5x0wm9xuCzLK5PS5dU5jBKrJyPz75QTFeurlygxoQZ70Nb/97E1ildbiimbQfSJAX+v4qzlfFx94MRmFkmMe7D9MfZsz3Ju8p3MM64XS42NtlgzJjT4AslxanidkEHJMNR8Kd19I2Y0bRwkh2XCf9CvjjVj6H+v8X/Mzb6Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=YD+s5Mu1; arc=none smtp.client-ip=192.30.252.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1748329955; c=relaxed/simple;
+	bh=0EPRLyzmpcl0iZs2rVSB+wg10sXC65RyB5a+2lgHCYo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QozYz3RzNf8WGc4bQhFydENPj124I0T6XkB/QBvXPEGeNwk01OSel/0QaJlGCOBsVCcu+N8Ag6J/DOQloMxv3EtWesfGY5/0RDPLLEHLwXCTBXS9nEkRYVaARdeGQrTI3wmL4MBbsUI8qelQ/pFr6sixPSmlKCRoFw/XP/uxaMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGQ7RXsB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="YD+s5Mu1"
-Received: from github.com (hubbernetes-node-b0c1f8f.va3-iad.github.net [10.48.145.23])
-	by smtp.github.com (Postfix) with ESMTPA id AB08BE0527
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 23:55:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1748328958;
-	bh=Q2hs1rzbXfJqrr8eb2yJTdeD+PTQNzFx5OUBD7ZCTbo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=YD+s5Mu1gpEgglcle42MsyzNVFH+da4bDK/CeXSaj1YRSSxKf/UD4aT8h9ka+B5Uh
-	 tDKH5BH9YMw3KcJwv6ZeiP3dI1ot9831UH8KHp23RTOqhlute8njuQ++p9YfhQjjQ0
-	 nkMD2agbTy0NPWchrvfHNKUJUUnVdkpiSv58jayg=
-Date: Mon, 26 May 2025 23:55:58 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/966556/000000-47c788@github.com>
-Subject: [bluez/bluez] 47c788: audio/player: Update track duration if
- previously ...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGQ7RXsB"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D877AC4CEEA;
+	Tue, 27 May 2025 07:12:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748329954;
+	bh=0EPRLyzmpcl0iZs2rVSB+wg10sXC65RyB5a+2lgHCYo=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=jGQ7RXsBJf091rLxhGNJTJIpXNHgmcBGyb3qlYPAq/kK49kI7xFmaaAVTfvSrBcmw
+	 kuYqiILCd5yoNDmkYrCDcICDR9zXcw2L7A0vTYNy2Nadjs8RDf7bDgzX9EmxSlrgOJ
+	 i24i1WrrkrL9Qhyd1j3tmoMB+TMzUsjX7VD50q5lAFIl6N/LG3esf9iklKmXrjNRwa
+	 5JqpXmg8D/6AO4L4XRKkrNZS/tXMxX4QdmbkZlLnhA+03quAo0shWb4w/v6VnI1CDK
+	 LUhM8vx8K809soZrj3+XbljfB0V5j9z7ylBoXGH7n1QOGeZzhKuEeILXl/BNmJ5EYL
+	 +jFerqeF15NMA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A7AC54ED1;
+	Tue, 27 May 2025 07:12:34 +0000 (UTC)
+From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
+Date: Tue, 27 May 2025 15:12:28 +0800
+Subject: [PATCH bluez] shared/gatt-db: Add read offset to record the
+ progress of att read blob request
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250527-att-read-blob-rsp-err-v1-1-75d3bc498862@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIANtlNWgC/x3MywqDMBBG4VeRWXcgRkKhr1Jc5PJrB4LKRIs0+
+ O4NLr/FOZUKVFDo1VVSfKXIujT0j47ixy8zWFIzWWOdcfbJft9Z4ROHvAbWsjFUOQ4mhd5hSoO
+ h1m6KSc77+6aQD/xovK4/x+dYR24AAAA=
+X-Change-ID: 20250527-att-read-blob-rsp-err-c30db15efd30
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1748329953; l=1701;
+ i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
+ bh=vxMhjFj0Gsr/BlBCous8I8eiykh+hZC7t0mFPgCbZIE=;
+ b=ITiq8l3XnZwN7dHDrXlPOkN4cHONQgxviW3vK9zOjlinMlHJFcS+/2IyEJ5/+VOeqq99YjtzO
+ ICoZ5uXtZl3DgobwX234aoJqz2fIhnBlzWTdbrKJj92fJ1AyvJTEsgX
+X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
+ pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
+X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
+ auth_id=348
+X-Original-From: Ye He <ye.he@amlogic.com>
+Reply-To: ye.he@amlogic.com
 
-  Branch: refs/heads/966556
-  Home:   https://github.com/bluez/bluez
-  Commit: 47c788f650733e7a40b589594a6c7f79145ca6b4
-      https://github.com/bluez/bluez/commit/47c788f650733e7a40b589594a6c7=
-f79145ca6b4
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-27 (Tue, 27 May 2025)
+From: Ye He <ye.he@amlogic.com>
 
-  Changed paths:
-    M profiles/audio/player.c
+When processing the att read blob request packet sent
+by the mobile phone, Bluez ignores the offset and the
+payload of each att read blob response is the same.
 
-  Log Message:
-  -----------
-  audio/player: Update track duration if previously set to 0
+This patch add read offset to record the progress of
+att read blob request.
 
-Sometimes some stacks may set the track duration to 0 in GetItemAttribute=
-s
-before updating it in GetPlayStatus.
+Fixes: https://github.com/bluez/bluez/issues/1294
 
-Currently the track duration is updated only if it has never been set
-before. To fix the issue this also checks that the current value is
-not 0.
+Signed-off-by: Ye He <ye.he@amlogic.com>
+---
+ src/shared/gatt-db.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-> ACL Data RX: Handle 11 flags 0x02 dlen 102                             =
-                                                                         =
-                                                                       #2=
-87 [hci0] 4.537033
-      Channel: 71 len 98 ctrl 0x0202 [PSM 27 mode Enhanced Retransmission=
- (0x03)] {chan 7}
-      I-frame: Unsegmented TxSeq 1 ReqSeq 2
-      AVCTP Browsing: Response: type 0x00 label 1 PID 0x110e
-        AVRCP: GetItemAttributes: len 0x0058
-...
-          AttributeID: 0x00000007 (Track duration)
-          CharsetID: 0x006a (UTF-8)
-          AttributeLength: 0x0001 (1)
-          AttributeValue: 0
-...
-> ACL Data RX: Handle 11 flags 0x02 dlen 26                              =
-                                                                         =
-                                                                       #2=
-96 [hci0] 4.589649
-      Channel: 68 len 22 [PSM 23 mode Basic (0x00)] {chan 4}
-      AVCTP Control: Response: type 0x00 label 9 PID 0x110e
-        AV/C: Stable: address 0x48 opcode 0x00
-          Subunit: Panel
-          Opcode: Vendor Dependent
-          Company ID: 0x001958
-          AVRCP: GetPlayStatus pt Single len 0x0009
-            SongLength: 0x000255a8 (153000 miliseconds)
-            SongPosition: 0x00009256 (37462 miliseconds)
-            PlayStatus: 0x02 (PAUSED)
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 8951079beef1a8af7e46e87043f320640d4109f7..7c4127dbaebfa659d010a0595ea13ffbb88edade 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -109,6 +109,7 @@ struct gatt_db_attribute {
+ 	uint32_t permissions;
+ 	uint16_t value_len;
+ 	uint8_t *value;
++	uint16_t read_offet;
+ 
+ 	gatt_db_read_t read_func;
+ 	gatt_db_write_t write_func;
+@@ -151,7 +152,8 @@ static void pending_read_result(struct pending_read *p, int err,
+ 	if (p->timeout_id > 0)
+ 		timeout_remove(p->timeout_id);
+ 
+-	p->func(p->attrib, err, data, length, p->user_data);
++	p->func(p->attrib, err, data + p->attrib->read_offset,
++			length - p->attrib->read_offset, p->user_data);
+ 
+ 	free(p);
+ }
+@@ -2126,6 +2128,8 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 	if (!attrib || !func)
+ 		return false;
+ 
++	attrib->read_offset = offset;
++
+ 	/* Check boundaries if value_len is set */
+ 	if (attrib->value_len && offset > attrib->value_len) {
+ 		func(attrib, BT_ATT_ERROR_INVALID_OFFSET, NULL, 0, user_data);
+
+---
+base-commit: c888c682fbd4e02dce6bf4c1f9a47328ceb02716
+change-id: 20250527-att-read-blob-rsp-err-c30db15efd30
+
+Best regards,
+-- 
+Ye He <ye.he@amlogic.com>
 
 
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
