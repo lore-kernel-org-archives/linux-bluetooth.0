@@ -1,151 +1,138 @@
-Received: from e2i340.smtp2go.com (e2i340.smtp2go.com [103.2.141.84])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2FE2749DB
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 13:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.2.141.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292BB13A41F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 13:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748354027; cv=none; b=GsOHpgdODFkqGAlqdhxKATrTTfDm9vbHdzKOk+ihb8Sz/W0vowex1yQKaz/IZIpR/HWvssuBZCx7huproKNSLdasHLZsntvqpDfoFk/5pGGBDpfDsRQdx0UJdiUEcM/EbqTPn4sor4uZYbwFRRfM56klLSEGjFqveEOHnJzag08=
+	t=1748354271; cv=none; b=h62KYefF8yqNrKa1rq61FJv81ZsXT0m2hso+WgFoYgBS6xVEXNCygHGR1B9LLctEAJ+tgjJbW7Ni8YbcWVayByS/Nv3lZKY77595RIK0XNJt5HrsjRzn+3CYSDt+AjmNEwRjwNOzzOxFnfpWFpRuWoZlvKVdYVV/tdimdwz7kvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748354027; c=relaxed/simple;
-	bh=F2arN47b4bB5mmRnBlyQhUoqXVcPR8q3XjoP1Tlu8l8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a9t87e1BvlDAhYlmpZzXl8+fifjDHiZAoEJd8IL8SldTOVv8sJPQxIPh19bH5oRZu7qSSDs9/QEM/VFGMWGlvQmY71Xpmh44UqLYO8AjVEnrwocV/hX0cYoaQfjb89gU5F+SmVfOOO3NElORs+9ZrCNAEyKg0bP/sdiGe3cXDMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=triplefau.lt; spf=pass smtp.mailfrom=em510616.triplefau.lt; dkim=fail (0-bit key) header.d=smtpservice.net header.i=@smtpservice.net header.b=q9/bk2xL reason="unknown key version"; dkim=pass (2048-bit key) header.d=triplefau.lt header.i=@triplefau.lt header.b=gEB0YFaZ; arc=none smtp.client-ip=103.2.141.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=triplefau.lt
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=em510616.triplefau.lt
+	s=arc-20240116; t=1748354271; c=relaxed/simple;
+	bh=a1WF/iC7x8uJx62p6XgYbJNb+O2/+oSSQLzyq/2RamQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=IBnuAiHLiZ3Zu4wkw9aGj9ZJMzQAIaN+PEBNbsKBZnbfcEnhsxxqOUAGL2WB6r35qXn6IRl9n2NjVFzyzyLKqOssaTp9rjvT7d6sILf0qJhHENstdy/tuO04GeYoS9EnXb6xmWJL1i7qJH3nAeALVuiq0tbV5189B3qC/yMolBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Xts8nY33; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="unknown key version" (0-bit key) header.d=smtpservice.net header.i=@smtpservice.net header.b="q9/bk2xL";
-	dkim=pass (2048-bit key) header.d=triplefau.lt header.i=@triplefau.lt header.b="gEB0YFaZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=smtpservice.net; s=maxzs0.a1-4.dyn; x=1748354924; h=Feedback-ID:
-	X-Smtpcorp-Track:Message-Id:Date:Subject:To:From:Reply-To:Sender:
-	List-Unsubscribe:List-Unsubscribe-Post;
-	bh=2QLsocQqIIE1PjUWYoJN/0gG6O/8Y+rlS3W//d5Z25k=; b=q9/bk2xLDfweXMk1amfBhyUDtc
-	a2Lr37f40G9WWptwuvTMOMPHTH2kcqcxb2Jts4MedDlXjqTKSdIT7WTXLHHhjTsL0o3i7pFq8FzH0
-	IW0UWTQ/P2lQJjipa9jHpbLtfB+7r7VW/McxSV4lDRJmQY8fqiBZCGTjtwfgHyh3hbnNzBmW90Dbe
-	EcuAnCGXGrxeJ4VsQZCMxINimAH14q6mK6o7+ZWgbwK8aeC1dehKMRtuZn9eTQbsQvIJ2x6N+Kw6/
-	YlO2aYPKZF4B62pJonPu8+Vkzq6oTzNmBrahJ6yGFVgf0sLweYw06e2lDN1o2VSG1eH4Tx/OxWqYX
-	8Pw0J0AQ==;
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=triplefau.lt;
- i=@triplefau.lt; q=dns/txt; s=s510616; t=1748354024; h=from : subject
- : to : message-id : date;
- bh=2QLsocQqIIE1PjUWYoJN/0gG6O/8Y+rlS3W//d5Z25k=;
- b=gEB0YFaZvEOBB7NpnW2jNEkllpx+qrkYhs14X0rej/QBEdXsKLJw24BGKBFQuWa1USEbh
- jYjjmRcVxwfdaz63Pz2PzXNAUHGwRQHYQopkzgkp0y4hSVsyvyAE9C4xqrgkz17vOTGEQ8x
- vZ+3GII11wI/iPupgJRj3+JjggUdp/yqXtCyn0IwD2lWDjV3lwvpeyy+H0oErigW6dksfod
- 173zy0DXvRnZi7N6ybOm0gDsVj4xJZFMWzqAaWSrXmIC6xs+kNMX0RWKLrjNM1s2wn1KcfS
- qQfaRt39z9eBYJk9mgiC9YN/LW4V6mkUp7S8z4dGv5pzCX8q3KllDHJAwsow==
-Received: from [10.139.162.187] (helo=SmtpCorp) by smtpcorp.com with esmtpsa
- (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.94.2-S2G) (envelope-from <repk@triplefau.lt>)
- id 1uJukP-TRk3NG-7n; Tue, 27 May 2025 13:53:41 +0000
-Received: from [10.12.239.196] (helo=localhost) by smtpcorp.com with esmtpsa
- (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.97.1-S2G) (envelope-from <repk@triplefau.lt>)
- id 1uJukO-4o5NDgrlFa2-oELH; Tue, 27 May 2025 13:53:41 +0000
-From: Remi Pommarel <repk@triplefau.lt>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Xts8nY33"
+Received: from github.com (hubbernetes-node-8912840.va3-iad.github.net [10.48.175.23])
+	by smtp.github.com (Postfix) with ESMTPA id 46A568C0A9E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 06:57:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1748354269;
+	bh=+GgGUjfS+4VimXdFTOYUdCueF7MwQtt4iUtN4ky11OQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Xts8nY33w4vvRw1J0f25CeDj2ZzqX76BoCUL6X7i8FAGF81G+QeuaHIYUIEUPhCyA
+	 OKsldNnB2JiuYj3nFyruDmq0RQKJXvLMmpeP5aMdENG/vZ4Fn9en96XheqbO9A7RZS
+	 VV88S+O1daIxFjxj2Ocw2ez4HyllwC+7r0etx74I=
+Date: Tue, 27 May 2025 06:57:49 -0700
+From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Remi Pommarel <repk@triplefau.lt>
-Subject: [PATCH BlueZ v2] policy: Fix service retry counters reset
-Date: Tue, 27 May 2025 15:45:21 +0200
-Message-Id: <20250527134521.4942-1-repk@triplefau.lt>
-X-Mailer: git-send-email 2.40.0
+Message-ID: <bluez/bluez/push/refs/heads/master/c888c6-f8c669@github.com>
+Subject: [bluez/bluez] bea5cc: audio/avrcp: fix crash when NowPlaying changes
+ whi...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Smtpcorp-Track: L8cbotX3tUDC.nMtce4RkEwxW.5Tl-0QZ0PpA
-Feedback-ID: 510616m:510616apGKSTK:510616sM14PTLsSF
-X-Report-Abuse: Please forward a copy of this message, including all headers,
- to <abuse-report@smtp2go.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Control and Target retries counter were reset when service state
-goes from CONNECTED to DISCONNECTED, but usually an extra DISCONNECTING
-state is reached before going to DISCONNECTED. This causes retry counter
-to not being reset in this case, leading to service not being able to
-initialize on next connection. Source, sink and HS retry counter were
-only reset when limit was reached, moreover HS timer was not removed on
-CONNECTED state.
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: bea5cc4d12b48edb58c851c7e9ad9640bb7cedee
+      https://github.com/bluez/bluez/commit/bea5cc4d12b48edb58c851c7e9ad9=
+640bb7cedee
+  Author: George Kiagiadakis <george.kiagiadakis@collabora.com>
+  Date:   2025-05-27 (Tue, 27 May 2025)
 
-Reset all service retry counter as soon as CONNECTED state is reached to
-avoid that. Also remove hs timer to match other services.
----
-Changes since v1:
-  - Reset all service retry counter on CONNECTED
-  - Remove hs_timer on CONNECTED
----
- plugins/policy.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+  Changed paths:
+    M profiles/audio/avrcp.c
 
-diff --git a/plugins/policy.c b/plugins/policy.c
-index 0e533ba1f..561e3c089 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -311,6 +311,7 @@ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
- 			timeout_remove(data->sink_timer);
- 			data->sink_timer = 0;
- 		}
-+		data->sink_retries = 0;
- 
- 		/* Try connecting HSP/HFP if it is not connected */
- 		hs = btd_device_get_service(dev, HFP_HS_UUID);
-@@ -375,6 +376,11 @@ static void hs_cb(struct btd_service *service, btd_service_state_t old_state,
- 	case BTD_SERVICE_STATE_CONNECTING:
- 		break;
- 	case BTD_SERVICE_STATE_CONNECTED:
-+		if (data->hs_timer > 0) {
-+			timeout_remove(data->hs_timer);
-+			data->hs_timer = 0;
-+		}
-+		data->hs_retries = 0;
- 		/* Check if service initiate the connection then proceed
- 		 * immediately otherwise set timer
- 		 */
-@@ -489,6 +495,7 @@ static void source_cb(struct btd_service *service,
- 			timeout_remove(data->source_timer);
- 			data->source_timer = 0;
- 		}
-+		data->source_retries = 0;
- 
- 		/* Check if service initiate the connection then proceed
- 		 * immediatelly otherwise set timer
-@@ -537,8 +544,6 @@ static void controller_cb(struct btd_service *service,
- 				timeout_remove(data->ct_timer);
- 				data->ct_timer = 0;
- 			}
--		} else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
--			data->ct_retries = 0;
- 		}
- 		break;
- 	case BTD_SERVICE_STATE_CONNECTING:
-@@ -548,6 +553,7 @@ static void controller_cb(struct btd_service *service,
- 			timeout_remove(data->ct_timer);
- 			data->ct_timer = 0;
- 		}
-+		data->ct_retries = 0;
- 		break;
- 	case BTD_SERVICE_STATE_DISCONNECTING:
- 		break;
-@@ -587,8 +593,6 @@ static void target_cb(struct btd_service *service,
- 				timeout_remove(data->tg_timer);
- 				data->tg_timer = 0;
- 			}
--		} else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
--			data->tg_retries = 0;
- 		}
- 		break;
- 	case BTD_SERVICE_STATE_CONNECTING:
-@@ -598,6 +602,7 @@ static void target_cb(struct btd_service *service,
- 			timeout_remove(data->tg_timer);
- 			data->tg_timer = 0;
- 		}
-+		data->tg_retries = 0;
- 		break;
- 	case BTD_SERVICE_STATE_DISCONNECTING:
- 		break;
--- 
-2.40.0
+  Log Message:
+  -----------
+  audio/avrcp: fix crash when NowPlaying changes while list_items is in p=
+rogress
 
+The media_item objects are owned by the player and while we keep
+temporary pointers to them in pending_list_items, clearing the player's
+playlist destroys them and we will end up crashing in the next call to
+avrcp_list_items_rsp(). The crash is racy and can only be observed
+when skipping tracks very quickly in an Apple Music station (where the
+playlist changes on every next song)
+
+
+  Commit: bcababe6050d043f871703750657332497ff535d
+      https://github.com/bluez/bluez/commit/bcababe6050d043f8717037506573=
+32497ff535d
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-05-27 (Tue, 27 May 2025)
+
+  Changed paths:
+    M profiles/audio/player.c
+
+  Log Message:
+  -----------
+  audio/player: Update track duration if previously set to 0
+
+Sometimes some stacks may set the track duration to 0 in GetItemAttribute=
+s
+before updating it in GetPlayStatus.
+
+Currently the track duration is updated only if it has never been set
+before. To fix the issue this also checks that the current value is
+not 0.
+
+> ACL Data RX: Handle 11 flags 0x02 dlen 102
+      Channel: 71 len 98 ctrl 0x0202 [PSM 27 mode Enhanced Retransmission=
+ (0x03)] {chan 7}
+      I-frame: Unsegmented TxSeq 1 ReqSeq 2
+      AVCTP Browsing: Response: type 0x00 label 1 PID 0x110e
+        AVRCP: GetItemAttributes: len 0x0058
+...
+          AttributeID: 0x00000007 (Track duration)
+          CharsetID: 0x006a (UTF-8)
+          AttributeLength: 0x0001 (1)
+          AttributeValue: 0
+...
+> ACL Data RX: Handle 11 flags 0x02 dlen 26
+      Channel: 68 len 22 [PSM 23 mode Basic (0x00)] {chan 4}
+      AVCTP Control: Response: type 0x00 label 9 PID 0x110e
+        AV/C: Stable: address 0x48 opcode 0x00
+          Subunit: Panel
+          Opcode: Vendor Dependent
+          Company ID: 0x001958
+          AVRCP: GetPlayStatus pt Single len 0x0009
+            SongLength: 0x000255a8 (153000 miliseconds)
+            SongPosition: 0x00009256 (37462 miliseconds)
+            PlayStatus: 0x02 (PAUSED)
+
+
+  Commit: f8c6693139de446efaf98a30117eb9fd1ac7ceb2
+      https://github.com/bluez/bluez/commit/f8c6693139de446efaf98a30117eb=
+9fd1ac7ceb2
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-05-27 (Tue, 27 May 2025)
+
+  Changed paths:
+    M obexd/client/transfer.c
+
+  Log Message:
+  -----------
+  obexd/transfer: Send Transferred property on transfer completion
+
+Currently the Transferred property is sent each second and not on
+transfer completion, this leads to get no transferred size info or
+without the last packet size(s).
+
+
+Compare: https://github.com/bluez/bluez/compare/c888c682fbd4...f8c6693139=
+de
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
