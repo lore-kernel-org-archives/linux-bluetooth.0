@@ -1,124 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1581188715
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 08:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73CA4188715
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 08:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748333581; cv=none; b=AHQDnVTzKE6z0ZN0cRVP9XtImeQAlM7VQN16yeWCBXS8itrqZXWfwEHHc03OcsoIvo0ZWS/qg55xDDGO8KxlybwYUtTpYvUibOynzzz/qGDJD2UrQxDc6ys+Lpb3/hy83XEfebCRuyXfbh4/GJdSTlMj7j9ft4fn3VrOJpbkSbU=
+	t=1748333593; cv=none; b=MmWIgMhznVuP9elw7SUGQdmLc+3YXsfZr3BHYfz1afNEyn9hk6M5Ul7DkacyOidWsXiZsatF1oSMganTFg4hrcP9AZtTvdzyJUUPY2pp0DwaxyDSZdztaJO51WiEitL+vto5AYcsiLePz9YO7OoOtltWPFDy8jtvYe7RWc7MBoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748333581; c=relaxed/simple;
-	bh=vRXCTahCbPNi7Gpo/oSb3d1o5RfZc0lRWZgPXj+ow1A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iFbjKHpEFwBzOiV0PzMETGYZ1niRzqOKIrG4um3fRowYs0hbpH/eHr2u/aKgyB3mL+e60RNVLOB9PY6jHYUQQy0a2ewoXxG5gOzkUIj8M0ttzchz1+Kx+pQMi2tyjQNSxQxMcalpuQ3LqJxYmL/VbVnt8HVGC98w+iA0HjO8FLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j9cEJjlw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748333593; c=relaxed/simple;
+	bh=Xaxm3Rhg2WPrXBeOi9YMg/STT8La8PEGkxrC7K1VXpA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=juBMJHIHnl5XEzC1P9o8rUBGtSz9lnQyyTUh/w/5ePfCvkyc3O2im8P2UQbHwO9ypMTfBRjRXiteif9XwuqKn8l474ANZXPQYgj9A6X4iR7QNQDVaBa9xBCy8tdciWGzKVP8jTy+0Po9jOgcS+9P5Zc4VsihOZfHCZ2aM023mGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SAHM2/ks; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j9cEJjlw"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DB5DC4CEE9;
-	Tue, 27 May 2025 08:13:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748333581;
-	bh=vRXCTahCbPNi7Gpo/oSb3d1o5RfZc0lRWZgPXj+ow1A=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=j9cEJjlwguZAG8LR0kO0tdjpyeK/stFM6nMMUE87YygQvvPskAjB66xKTfHWkuq8H
-	 zuaOONB5PYmA7VVYPpUMlVjCVlGpuw4vYMjCttfBPiqvpZtcZLl6vsmcprDzlAnFhI
-	 Pr7LDS+XBFiWW58YBvGjXXPDMqUWH1rhMbw92yd8xlC1AHZXDh9TmgpAf363KHfk1U
-	 /kriRmGQX85LY7O2sY+CcrDttlg/cZ9fWs2rWun1XLjjj5sXYOoPX/7fX+QumbkGPE
-	 36guYwbdsnp6QKoXzxqHxsNZFxqhtczjJkj5X2WkEqe0hCRcJTUmADBLKRqBeuW0lw
-	 7t3xf5r8PkNfQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A045C54ED1;
-	Tue, 27 May 2025 08:13:01 +0000 (UTC)
-From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
-Date: Tue, 27 May 2025 16:12:59 +0800
-Subject: [PATCH bluez v2] shared/gatt-db: Add read offset to record the
- progress of att read blob request
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SAHM2/ks"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-23229fdaff4so33269315ad.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 01:13:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748333591; x=1748938391; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=b8PsQDoUK0u2puVaMFDgYvaVKhUM7SgGVNKZ4QbgSx0=;
+        b=SAHM2/ksy0IdBk7IKXVuAGPifUVEN3rIwdtFhBn5p9O2cpOihuIOqYm9YQwPViELB6
+         5ROTuAp90h7zl4z5KgKPtKge/33tkIPxU1wG8P7snXUKzXtW4i7rMQTLQWT5DkQfRtwW
+         nLGuO5oBICaRJgLWlQrfhueGLLSljBcjXykkl8B2IegYFRE2a1kUyjH2YVhQNxUnsElW
+         /oOnJ1oEF5vzNrUCLjUfkzn+/q2tgxbf0n+YSsZGz5pBZhxPxQR+7ki6Q5bwx8AN9SsX
+         Ohx5ZfOiQ4ti4tj/T4NWRhKnl/ImeV+5dUvEknxiezKRmE254kqBRpJ3OJA68hH0szlA
+         FvJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748333591; x=1748938391;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b8PsQDoUK0u2puVaMFDgYvaVKhUM7SgGVNKZ4QbgSx0=;
+        b=hUMT3HC8bqykgggHguGddSSoSzJgSGyvucD03Hf319hIPZXqQENrwg/rTqvWryzv0f
+         tVFpO0UZYu/viiFKOYAoEc5KovyKzPdcsLqf5AhOpiLTKJux/Q2pwPgJdWFZ9DH3vf4D
+         TXlRFF0hF13xp8IF4lt9RaoYa4JaQwvLzXaCUJbLdEAbcs/RzMo6Sc4ND899EOQjZDHL
+         cjBcef8jiIndfemNCPy1FaW0Z8jZE3U76QlEpx0rFlVg59QnQC4KNdxoT05blMh7LP4U
+         Gr2LZZeZwsV/iDkPpXmJgCLu6bzBFC/dyUwTRtHTAl6OfSGXqATIRKeYLaUpaT+qnFDu
+         5UTg==
+X-Gm-Message-State: AOJu0YwGFJ2ii6JW2ja6NFUnjZr0wE+AYTmAHGQ3KWrN7SR3ZYrp7ECP
+	t+8ftYzVZwczgC5D1gHK1IS3BXJWEf/743gNPTa4tKAuGOmuENJwnM8a+CKtG8Xs
+X-Gm-Gg: ASbGncuir02P8KM1YTF9J7hjYrWz6Ab/MHeV5pLok7wVnxbrFj8LydpVLf4vmx0sH08
+	Q/B5DvFjNcLTtNW85Hlwa1LGdYKNC+Cs+KB5LHMkUQd29gZcxOeOf3oRtSU0C5F+HPY9d5QV/3f
+	kZNlwS2O7bHRYgYCCl2NU4ME+wWw6p8/pOjFGRvQLwTVQ+f3hLKTs2WeKC2M1M8DCcXjnI5Wb4i
+	VC4zy/0p8+pH0AArCtFp6oSyNK9oFSyXQGo0T/svUBe7aQ5ldNdMj8WsydRcojSmhS84mkwoAxT
+	BO48x3ih1WW6VQlDuQrv5ccRV1nyPwdjik4GXx6m4Yj6X6B5jfGgRGrquzU=
+X-Google-Smtp-Source: AGHT+IFxNMK/rKmmDj/tO2jX+D103HB231RWB4diRxarG7MRjZjO7SsoSb/CEDqRpcKwlLKs7eNAfg==
+X-Received: by 2002:a17:903:3c2b:b0:22e:3c2:d477 with SMTP id d9443c01a7336-23414f9127dmr199157105ad.25.1748333591409;
+        Tue, 27 May 2025 01:13:11 -0700 (PDT)
+Received: from [172.17.0.2] ([104.45.228.246])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b26eb084980sm18281676a12.58.2025.05.27.01.13.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 01:13:10 -0700 (PDT)
+Message-ID: <68357416.630a0220.20f56b.b523@mx.google.com>
+Date: Tue, 27 May 2025 01:13:10 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4288350778650026200=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ] audio/player: Update track duration if previously set to 0
+In-Reply-To: <20250527064615.125970-1-frederic.danis@collabora.com>
+References: <20250527064615.125970-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============4288350778650026200==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250527-att-read-blob-rsp-err-v2-1-23c7f749e8d8@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAAp0NWgC/4WNTQ6CMBCFr0Jm7Zi2WEFX3sOw6M8ATYCSKRKVc
- HcbLuDyey/vexsk4kAJ7sUGTGtIIU4Z1KkA15upIww+MyihtNCqQrMsyGQ82iFa5DQjMaMrhbd
- SU+tLAXk7M7XhfXifYIcXfaHJcR/SEvlzvK3yKP+IV4kSK+1L6y63ur6qhxmH2AV3dnGEZt/3H
- /1clUTDAAAA
-X-Change-ID: 20250527-att-read-blob-rsp-err-c30db15efd30
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Ye He <ye.he@amlogic.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1748333579; l=1844;
- i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
- bh=QBewF9n7q8M+QSBW+utFpCumWyJUTCjQVXc/v2VXmeQ=;
- b=RzCIs/F0DNe+eH8D3yuztRCawPXqNwmLYW9r1DoZPGvkD5qJvdNd04gyIQ5zRXIOgS8DqbvfX
- 8H47Pyf9uMOAY6lwcDTAI/P2PLL5PRw6I7D+2jujmEe/FcWXmQEmDIl
-X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
- pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
-X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
- auth_id=348
-X-Original-From: Ye He <ye.he@amlogic.com>
-Reply-To: ye.he@amlogic.com
 
-From: Ye He <ye.he@amlogic.com>
+This is automated email and please do not reply to this email!
 
-When processing the att read blob request packet sent
-by the mobile phone, Bluez ignores the offset and the
-payload of each att read blob response is the same.
+Dear submitter,
 
-This patch add read offset to record the progress of
-att read blob request.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=966556
 
-Fixes: https://github.com/bluez/bluez/issues/1294
+---Test result---
 
-Signed-off-by: Ye He <ye.he@amlogic.com>
----
-Changes in v2:
-- Fix build error.
-- Link to v1: https://patch.msgid.link/20250527-att-read-blob-rsp-err-v1-1-75d3bc498862@amlogic.com
----
- src/shared/gatt-db.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Test Summary:
+CheckPatch                    PENDING   0.36 seconds
+GitLint                       PENDING   0.32 seconds
+BuildEll                      PASS      20.56 seconds
+BluezMake                     PASS      2736.73 seconds
+MakeCheck                     PASS      20.46 seconds
+MakeDistcheck                 PASS      200.00 seconds
+CheckValgrind                 PASS      274.75 seconds
+CheckSmatch                   PASS      301.36 seconds
+bluezmakeextell               PASS      128.05 seconds
+IncrementalBuild              PENDING   0.29 seconds
+ScanBuild                     PASS      910.76 seconds
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 8951079beef1a8af7e46e87043f320640d4109f7..06af4f65bacaac39cdf9641e40fac902653c4b9c 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -109,6 +109,7 @@ struct gatt_db_attribute {
- 	uint32_t permissions;
- 	uint16_t value_len;
- 	uint8_t *value;
-+	uint16_t read_offset;
- 
- 	gatt_db_read_t read_func;
- 	gatt_db_write_t write_func;
-@@ -151,7 +152,8 @@ static void pending_read_result(struct pending_read *p, int err,
- 	if (p->timeout_id > 0)
- 		timeout_remove(p->timeout_id);
- 
--	p->func(p->attrib, err, data, length, p->user_data);
-+	p->func(p->attrib, err, data + p->attrib->read_offset,
-+			length - p->attrib->read_offset, p->user_data);
- 
- 	free(p);
- }
-@@ -2126,6 +2128,8 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
- 	if (!attrib || !func)
- 		return false;
- 
-+	attrib->read_offset = offset;
-+
- 	/* Check boundaries if value_len is set */
- 	if (attrib->value_len && offset > attrib->value_len) {
- 		func(attrib, BT_ATT_ERROR_INVALID_OFFSET, NULL, 0, user_data);
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
-base-commit: c888c682fbd4e02dce6bf4c1f9a47328ceb02716
-change-id: 20250527-att-read-blob-rsp-err-c30db15efd30
-
-Best regards,
--- 
-Ye He <ye.he@amlogic.com>
+Regards,
+Linux Bluetooth
 
 
+--===============4288350778650026200==--
