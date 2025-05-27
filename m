@@ -1,61 +1,77 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826362F43
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 06:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1780522A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 06:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748328385; cv=none; b=FCXfho3cqqvWc5ltqctrQKjDrvESdokyIXneSbAyoXPJpXL/GNOxzDB1TVyHgL2Ypt/s3wHpjt4/PBaLBDrk4GwQwJDlFIES8/pFSbeVWHQIYx/8fMAPMVw+rHydHM+Xgzu4KiMWJ88yMZNkgnIYC6IeucvPGTqJiQ//4/CaFV8=
+	t=1748328961; cv=none; b=jPJBDtywFMd0t/34lBy+swS3SiVY9I1llSjikddQQsiVlOmcFiyHHq05UUCQuuFvbZ44oEfwcqfUaPahOV99/znQcLBLR/hr8eNPS7uSv2xjrJyTDPXtMsBaMY+QOwDoyWBvnO0OwlUHBmxdoXNq/JUPN8xulsCqs4CpCJ55cLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748328385; c=relaxed/simple;
-	bh=n4RDWhFiY4mGYhOrEEJVQUOfOjuT964c80/JLiHTH0g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=leycfAOUeEX3sgkmyX5RuBQJdE5ZKgi35oqzzpnkHw4mPixbGqq6J6z6wIHdaCWWRsu9mifuMx7a4nqvonOuYq2x62xq/lRv4fJTTp1X5+GZoRHjzZl7dUXZh+CeUq9nVasi95XcwTjoX7uQPzfqHE7WIjV56Y5eW5yLlm/KodU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=VOJYPi7d; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1748328961; c=relaxed/simple;
+	bh=SixY2VLC0PRR5qG+il4TckkqWBJdM5oTdU4mG6zfDfE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hID5x0wm9xuCzLK5PS5dU5jBKrJyPz75QTFeurlygxoQZ70Nb/97E1ildbiimbQfSJAX+v4qzlfFx94MRmFkmMe7D9MfZsz3Ju8p3MM64XS42NtlgzJjT4AslxanidkEHJMNR8Kd19I2Y0bRwkh2XCf9CvjjVj6H+v8X/Mzb6Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=YD+s5Mu1; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VOJYPi7d"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1748328381;
-	bh=n4RDWhFiY4mGYhOrEEJVQUOfOjuT964c80/JLiHTH0g=;
-	h=From:To:Subject:Date:From;
-	b=VOJYPi7dn5gZjW7itARDefspzau+At7AYHI3dj6cUyZb//G9BNa6J9cACUf0j3pw6
-	 K3TuO/iGhoUxQ7g8xNhO5RmvHx9pM35RH0FFHd1CQkUmnhrpGJXYCVPeWIiURqiJhT
-	 qf0/+vjINat+8URGok2lSzu3R9+bh62/vDJUfXTyqZQ6HxuNnftwinDCA4qP5gOdNg
-	 S5BfyIed3zzD1fVISS8FN9AxEER/gtMDA9qL8NWV1vOLLL8yfrdHLaXBAUQO29sDC7
-	 M80R8CgFcSq2TsWI0JiRCK7Fl5WbofBXNUxnLLQ2d7V7NDRG2eAVc2TAGPkbHNwOw1
-	 1pM0tfXa96cXg==
-Received: from fdanis-ThinkPad-X1.. (2a02-8428-Af44-1001-2F37-b1f9-024a-369A.rev.sfr.net [IPv6:2a02:8428:af44:1001:2f37:b1f9:24a:369a])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3F93517E1560
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 08:46:21 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="YD+s5Mu1"
+Received: from github.com (hubbernetes-node-b0c1f8f.va3-iad.github.net [10.48.145.23])
+	by smtp.github.com (Postfix) with ESMTPA id AB08BE0527
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 May 2025 23:55:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1748328958;
+	bh=Q2hs1rzbXfJqrr8eb2yJTdeD+PTQNzFx5OUBD7ZCTbo=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=YD+s5Mu1gpEgglcle42MsyzNVFH+da4bDK/CeXSaj1YRSSxKf/UD4aT8h9ka+B5Uh
+	 tDKH5BH9YMw3KcJwv6ZeiP3dI1ot9831UH8KHp23RTOqhlute8njuQ++p9YfhQjjQ0
+	 nkMD2agbTy0NPWchrvfHNKUJUUnVdkpiSv58jayg=
+Date: Mon, 26 May 2025 23:55:58 -0700
+From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio/player: Update track duration if previously set to 0
-Date: Tue, 27 May 2025 08:46:15 +0200
-Message-ID: <20250527064615.125970-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+Message-ID: <bluez/bluez/push/refs/heads/966556/000000-47c788@github.com>
+Subject: [bluez/bluez] 47c788: audio/player: Update track duration if
+ previously ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Sometimes some stacks may set the track duration to 0 in GetItemAttributes
+  Branch: refs/heads/966556
+  Home:   https://github.com/bluez/bluez
+  Commit: 47c788f650733e7a40b589594a6c7f79145ca6b4
+      https://github.com/bluez/bluez/commit/47c788f650733e7a40b589594a6c7=
+f79145ca6b4
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-05-27 (Tue, 27 May 2025)
+
+  Changed paths:
+    M profiles/audio/player.c
+
+  Log Message:
+  -----------
+  audio/player: Update track duration if previously set to 0
+
+Sometimes some stacks may set the track duration to 0 in GetItemAttribute=
+s
 before updating it in GetPlayStatus.
 
 Currently the track duration is updated only if it has never been set
 before. To fix the issue this also checks that the current value is
 not 0.
 
-> ACL Data RX: Handle 11 flags 0x02 dlen 102                                                                                                                                                                             #287 [hci0] 4.537033
-      Channel: 71 len 98 ctrl 0x0202 [PSM 27 mode Enhanced Retransmission (0x03)] {chan 7}
+> ACL Data RX: Handle 11 flags 0x02 dlen 102                             =
+                                                                         =
+                                                                       #2=
+87 [hci0] 4.537033
+      Channel: 71 len 98 ctrl 0x0202 [PSM 27 mode Enhanced Retransmission=
+ (0x03)] {chan 7}
       I-frame: Unsegmented TxSeq 1 ReqSeq 2
       AVCTP Browsing: Response: type 0x00 label 1 PID 0x110e
         AVRCP: GetItemAttributes: len 0x0058
@@ -65,7 +81,10 @@ not 0.
           AttributeLength: 0x0001 (1)
           AttributeValue: 0
 ...
-> ACL Data RX: Handle 11 flags 0x02 dlen 26                                                                                                                                                                              #296 [hci0] 4.589649
+> ACL Data RX: Handle 11 flags 0x02 dlen 26                              =
+                                                                         =
+                                                                       #2=
+96 [hci0] 4.589649
       Channel: 68 len 22 [PSM 23 mode Basic (0x00)] {chan 4}
       AVCTP Control: Response: type 0x00 label 9 PID 0x110e
         AV/C: Stable: address 0x48 opcode 0x00
@@ -76,26 +95,8 @@ not 0.
             SongLength: 0x000255a8 (153000 miliseconds)
             SongPosition: 0x00009256 (37462 miliseconds)
             PlayStatus: 0x02 (PAUSED)
----
- profiles/audio/player.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 0f72d7601..52844c9c0 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -1320,9 +1320,9 @@ void media_player_set_duration(struct media_player *mp, uint32_t duration)
- 	if (g_hash_table_size(mp->track) == 0)
- 		return;
- 
--	/* Ignore if duration is already set */
-+	/* Ignore if duration is already set to value > 0 */
- 	curval = g_hash_table_lookup(mp->track, "Duration");
--	if (curval != NULL)
-+	if (curval != NULL && atoi(curval) != 0)
- 		return;
- 
- 	value = g_strdup_printf("%u", duration);
--- 
-2.43.0
 
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
