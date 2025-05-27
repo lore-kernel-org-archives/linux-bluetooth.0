@@ -1,150 +1,124 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CB2186E2E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 08:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1581188715
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 08:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748332954; cv=none; b=mQQgvXMjZC836gKTvguF41QirnX4Wsw3sSWKgSA75JhMJ4IwkXuWRT15TcwAIlSXmqI1APNWkkvD03q6kVxeFTp5T8TYtdkrSJoBMVWsHFuy2so/lYy3CI1elF9tW6b/9U80AHZnkaimrGP7LWsYAQu2Rg28F6q0XTlAvYlvHPY=
+	t=1748333581; cv=none; b=AHQDnVTzKE6z0ZN0cRVP9XtImeQAlM7VQN16yeWCBXS8itrqZXWfwEHHc03OcsoIvo0ZWS/qg55xDDGO8KxlybwYUtTpYvUibOynzzz/qGDJD2UrQxDc6ys+Lpb3/hy83XEfebCRuyXfbh4/GJdSTlMj7j9ft4fn3VrOJpbkSbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748332954; c=relaxed/simple;
-	bh=EFsqzRCZ8ePp1PM1ihVHdbx19gT/fR4vZ8gVTQC6W1I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sZFTfoC3/xPvGYjX2BDnc7wGPl06Gce+8TFWwxm6GjRstlxq4DBnLAQFf1/Golg2JYxzAzw9rHuOS51Gtxo9eeENCvtK6DAdSJSzb6XPVD4k1uA3edWnD8OXg2+bQ52DJTy6HDafzt8Vbdhdgp/FmmcqyJtGGf3bhO6EJECma3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pLkjcxiD; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1748333581; c=relaxed/simple;
+	bh=vRXCTahCbPNi7Gpo/oSb3d1o5RfZc0lRWZgPXj+ow1A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iFbjKHpEFwBzOiV0PzMETGYZ1niRzqOKIrG4um3fRowYs0hbpH/eHr2u/aKgyB3mL+e60RNVLOB9PY6jHYUQQy0a2ewoXxG5gOzkUIj8M0ttzchz1+Kx+pQMi2tyjQNSxQxMcalpuQ3LqJxYmL/VbVnt8HVGC98w+iA0HjO8FLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j9cEJjlw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pLkjcxiD"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6047d11fa5cso235974a12.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 May 2025 01:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1748332949; x=1748937749; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZdYklQjuqTcptyM6fEwz69fIzQVNbHtd0JSSB/QcCU=;
-        b=pLkjcxiDdd3SmdBCmtEn+2KneExCEBtRk/FsBMIDIG0UtTus7SmjbfkywLrQdViLFv
-         DimvsKGBJ5JDKNBxG66OR+WOqIUv5B9W0oeKQ2TEFUva8AzY9UNzLAW1g+DV2ZSmA2zL
-         NzCzDmXusooyywFx4uG+WnCQN77BLxyL4reLkJg0adyxshvxSRmAf05EBg94Y+6knOta
-         9Wso7GLfyu3RIDyoFLoJk5XECxCjH9dKdrRLW/wKdEl/FTCE/U/J8tFP9Gy/hQs4p5TF
-         l5IOiBI/6hN5qFjrMMUnaLYcVrIS+N/zZU2XyTECct1EgDBLWYQXgewC5Ggv6GXQf9Hx
-         cdCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748332949; x=1748937749;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zZdYklQjuqTcptyM6fEwz69fIzQVNbHtd0JSSB/QcCU=;
-        b=kKdiiQDz7+0unXYdouSuW0y67HhVvAXu6ECXzWJJ//bv278phjwW7OVlVdP6NsFzIA
-         wD0IeMMOKYYkTfx3DOzM6cdbH1aXldP4b8djmRDX4n2rM8HXN+lSyCSA8cblRYm3lLBd
-         60MnoxhtVj9L6cuADgmw7XHETACqnkxZJjX2jKdvMXuMj7FE17/xrf9iQu0PFYIZRr4t
-         6HowC51cfSFBElGnddWbCRvnr/Deuov2aHbAeRMhtRBfc26SRSgP8+BJ29OhDO2OmK+1
-         Sc/0zrHNMApC24HmzzfvMXFQmkQlcSvQ+Py5kjma+0VGtMIU3Wa9Ucn1AHhQHvPElu+t
-         G8jA==
-X-Forwarded-Encrypted: i=1; AJvYcCUS59OeY/XiQm1WcXXQUdQxWzHaO9bxuzojEmvODXJ44e5JfUeg138qdVvLXGA0xqTsrHFh46STHWbMzrO5zc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvYsWdv8MXtdgnElY3AWGzxRLquPdFRODvqVzW5tl3PxlXMmLP
-	HtKzYRp9XkKFkkEM25W5aBF9cbsBSdYVMKrBnUWv2ChIBQOMyeo+1PcAQVpHbJQMzEGOc0sy0LP
-	gTLli
-X-Gm-Gg: ASbGncuVpLm3KyTKQuPJ4DGV/KPTmIxypb6zVImI4wqrTSxagDnG2T09WIVbyKi6KUV
-	rrHwi3g9frP4C7e80w2As64qEhjbpn+1CuWbQi/7bLqx8XyZjxU01m8PZ2cLyp+R+uCpQSttUw1
-	WLYKibcfegROmbX44pNJAPKVZbwnwzJOh/1w+h1kWRcOTRgRiWLMgcZtWz5dvq3mxMQehWP6TfL
-	78MBbkpusyzN/PCCRtQpBxbf2xpc9pQCobzrw9fp7t/7Jvh6kDDm644Nqdj7qSY4fdRXLdh3wGw
-	RRl27N6ujitkWJn8r3azdLMS11o0/7IXMTfd6K+uSKjG2GQ61XKOToyS7YXufy3z0FLfilw=
-X-Google-Smtp-Source: AGHT+IFOoikQuzl2sjvQi67mzdQkPUbTkaKcMh95YzCvEYyHDcauQWWOyuVFb9fxSQsI1sfVsZP94Q==
-X-Received: by 2002:a50:f69b:0:b0:602:e002:dadd with SMTP id 4fb4d7f45d1cf-602e002dbc5mr3049695a12.10.1748332949273;
-        Tue, 27 May 2025 01:02:29 -0700 (PDT)
-Received: from [192.168.1.29] ([178.197.223.125])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d27192dsm1807445066b.71.2025.05.27.01.02.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 May 2025 01:02:28 -0700 (PDT)
-Message-ID: <e200db90-f886-4519-a772-c1e45084a457@linaro.org>
-Date: Tue, 27 May 2025 10:02:26 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j9cEJjlw"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DB5DC4CEE9;
+	Tue, 27 May 2025 08:13:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748333581;
+	bh=vRXCTahCbPNi7Gpo/oSb3d1o5RfZc0lRWZgPXj+ow1A=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=j9cEJjlwguZAG8LR0kO0tdjpyeK/stFM6nMMUE87YygQvvPskAjB66xKTfHWkuq8H
+	 zuaOONB5PYmA7VVYPpUMlVjCVlGpuw4vYMjCttfBPiqvpZtcZLl6vsmcprDzlAnFhI
+	 Pr7LDS+XBFiWW58YBvGjXXPDMqUWH1rhMbw92yd8xlC1AHZXDh9TmgpAf363KHfk1U
+	 /kriRmGQX85LY7O2sY+CcrDttlg/cZ9fWs2rWun1XLjjj5sXYOoPX/7fX+QumbkGPE
+	 36guYwbdsnp6QKoXzxqHxsNZFxqhtczjJkj5X2WkEqe0hCRcJTUmADBLKRqBeuW0lw
+	 7t3xf5r8PkNfQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A045C54ED1;
+	Tue, 27 May 2025 08:13:01 +0000 (UTC)
+From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
+Date: Tue, 27 May 2025 16:12:59 +0800
+Subject: [PATCH bluez v2] shared/gatt-db: Add read offset to record the
+ progress of att read blob request
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_qca: move the SoC type check to the right
- place
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Hsin-chen Chuang <chharry@google.com>,
- Balakrishna Godavarthi <bgodavar@qti.qualcomm.com>,
- Jiating Wang <jiatingw@qti.qualcomm.com>,
- Vincent Chuang <vincentch@google.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, stable@vger.kernel.org
-References: <20250527074737.21641-1-brgl@bgdev.pl>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- 2+47PN9NZAOyb771QoVr8A==
-In-Reply-To: <20250527074737.21641-1-brgl@bgdev.pl>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250527-att-read-blob-rsp-err-v2-1-23c7f749e8d8@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAAp0NWgC/4WNTQ6CMBCFr0Jm7Zi2WEFX3sOw6M8ATYCSKRKVc
+ HcbLuDyey/vexsk4kAJ7sUGTGtIIU4Z1KkA15upIww+MyihtNCqQrMsyGQ82iFa5DQjMaMrhbd
+ SU+tLAXk7M7XhfXifYIcXfaHJcR/SEvlzvK3yKP+IV4kSK+1L6y63ur6qhxmH2AV3dnGEZt/3H
+ /1clUTDAAAA
+X-Change-ID: 20250527-att-read-blob-rsp-err-c30db15efd30
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1748333579; l=1844;
+ i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
+ bh=QBewF9n7q8M+QSBW+utFpCumWyJUTCjQVXc/v2VXmeQ=;
+ b=RzCIs/F0DNe+eH8D3yuztRCawPXqNwmLYW9r1DoZPGvkD5qJvdNd04gyIQ5zRXIOgS8DqbvfX
+ 8H47Pyf9uMOAY6lwcDTAI/P2PLL5PRw6I7D+2jujmEe/FcWXmQEmDIl
+X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
+ pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
+X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
+ auth_id=348
+X-Original-From: Ye He <ye.he@amlogic.com>
+Reply-To: ye.he@amlogic.com
 
-On 27/05/2025 09:47, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> Commit 3d05fc82237a ("Bluetooth: qca: set power_ctrl_enabled on NULL
-> returned by gpiod_get_optional()") accidentally changed the prevous
-> behavior where power control would be disabled without the BT_EN GPIO
-> only on QCA_WCN6750 and QCA_WCN6855 while also getting the error check
-> wrong. We should treat every IS_ERR() return value from
-> devm_gpiod_get_optional() as a reason to bail-out while we should only
-> set power_ctrl_enabled to false on the two models mentioned above. While
-> at it: use dev_err_probe() to save a LOC.
+From: Ye He <ye.he@amlogic.com>
 
-... and to fix spamming kernel logs on deferred probe.
+When processing the att read blob request packet sent
+by the mobile phone, Bluez ignores the offset and the
+payload of each att read blob response is the same.
 
+This patch add read offset to record the progress of
+att read blob request.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Fixes: https://github.com/bluez/bluez/issues/1294
+
+Signed-off-by: Ye He <ye.he@amlogic.com>
+---
+Changes in v2:
+- Fix build error.
+- Link to v1: https://patch.msgid.link/20250527-att-read-blob-rsp-err-v1-1-75d3bc498862@amlogic.com
+---
+ src/shared/gatt-db.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 8951079beef1a8af7e46e87043f320640d4109f7..06af4f65bacaac39cdf9641e40fac902653c4b9c 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -109,6 +109,7 @@ struct gatt_db_attribute {
+ 	uint32_t permissions;
+ 	uint16_t value_len;
+ 	uint8_t *value;
++	uint16_t read_offset;
+ 
+ 	gatt_db_read_t read_func;
+ 	gatt_db_write_t write_func;
+@@ -151,7 +152,8 @@ static void pending_read_result(struct pending_read *p, int err,
+ 	if (p->timeout_id > 0)
+ 		timeout_remove(p->timeout_id);
+ 
+-	p->func(p->attrib, err, data, length, p->user_data);
++	p->func(p->attrib, err, data + p->attrib->read_offset,
++			length - p->attrib->read_offset, p->user_data);
+ 
+ 	free(p);
+ }
+@@ -2126,6 +2128,8 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 	if (!attrib || !func)
+ 		return false;
+ 
++	attrib->read_offset = offset;
++
+ 	/* Check boundaries if value_len is set */
+ 	if (attrib->value_len && offset > attrib->value_len) {
+ 		func(attrib, BT_ATT_ERROR_INVALID_OFFSET, NULL, 0, user_data);
+
+---
+base-commit: c888c682fbd4e02dce6bf4c1f9a47328ceb02716
+change-id: 20250527-att-read-blob-rsp-err-c30db15efd30
 
 Best regards,
-Krzysztof
+-- 
+Ye He <ye.he@amlogic.com>
+
+
