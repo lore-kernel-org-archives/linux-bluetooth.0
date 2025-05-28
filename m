@@ -1,204 +1,133 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C30E152E02
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 09:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1436022ACD6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 10:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748424101; cv=none; b=it8b31Xsy/6mPwysjoR3SAhUsRbHHNXDGyqKbweKASgZ1jFU9+bNRvMmAszAQhhZ9OkF+PVpBVlmhTSseZ2FXsVm1Sd0MfG5OE3VTdlAhAfDU8kuxtRbW/UG9N1MnD8UEBTgzSume3ZbDMy1B+G6qcf3mU+JpM9dsjomtJpDXXs=
+	t=1748428416; cv=none; b=tDMX1/tWYlfKwcr/g5+g8sQWfTl1qRRs4wsDswRXWsAkRZJ7KN2bNDocaU/Ml4jeJRW6PNC6rJxgC5Kq1LExdWxURsWSaVmU+7Ri/bl3CBvKZBjzZQDVLiKeUtV0xWvFWnAsLp6sU0az8pBajYJbKZ5n4sOGoahEhONeoE5+cHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748424101; c=relaxed/simple;
-	bh=5Vc4OXwjZTyl4wK4KRe1F1ylLXOELgB8lxn/CxtZaiM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=N6N+wqmY8nzb6QGPuGgSpQ+HeuPe8rw9Q7cqClY5BxbTC7h73C7Ilq9K32b45AULDDDHV0KKZAacivJT0q4mJmds4p99c/kGWDOoJhOkxOzHz/zS+0xKtNdEigGugI/ohCyULGdTojplavg8k8XISPQKbISN85uFmV+M4+22Z3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lP/s9Sx9; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1748428416; c=relaxed/simple;
+	bh=yd4Hx2ZbE/8g8BznEePcLPCadI8a7fJ1KKFgagxf/VY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=j2fCqB7pKyypiV1QHp5ck6PG8WAdFseiSVlB/zEsx/Ic6VDnAHXBDlTFH90jobnBLKbZvLRKEOAEZ0KByV/rKXGeRUIjWIJSJwTBseSiD0o80ccJ0H+IVZsW2zSczzAuBNkpindI7FvGhaZWjRv2fy+nx5LpTVB27R9S3EriAJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLwN8TNR; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lP/s9Sx9"
-Received: from github.com (hubbernetes-node-4151e64.ash1-iad.github.net [10.56.206.77])
-	by smtp.github.com (Postfix) with ESMTPA id 4AF1A600C72
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 02:21:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1748424099;
-	bh=OYu+EXzCpEzN3qOdEdpz2NuKv/RISxFXOAm1U9ptnjA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=lP/s9Sx9tUXnaZfGr5vjssTLDdaqoGi+3ZTLlmNlOuL5vdWl6g+7uCqHtUAUY7X3c
-	 rTXG/UStKKtFI7HjYQTybIPzsa5ERA3C0jCXSOR7HxN20S6ePgkuQi4pWaInQqGg1x
-	 ZNT+N60w5eFpmdC9RK3IDWbom2DFNlA3T/nuXyBo=
-Date: Wed, 28 May 2025 02:21:39 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/966926/000000-cf0bd7@github.com>
-Subject: [bluez/bluez] ad0031: doc: Add new telephony related profiles
- interfaces
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLwN8TNR"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-867355d9c4eso94443239f.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 03:33:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748428413; x=1749033213; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wExCDflCTUpF/JsB4Qjg9le6PwoSqvLEuGvf4Nfkq48=;
+        b=fLwN8TNRjISJotLo98VOpxAmj3NOBHjhY3mAQ/cUEWrY2u2tXaCrqDYZUo3IiaOOJt
+         iU7PinGoO4C2zUbq/W9OphNqlL25HhXW/Q/WWYBuTCXRYAPzierNi44Ef2Pn1NcTzheD
+         35BW6Z2ZPcBImvB2Myof4c6AjEmg/2qEyJmKWluhKKhXoRz+9haTOjyHR85R+Y0lnf/8
+         4Sxl6RtlhEAqIR1+GwHb7l+iEhlt9AphdJHT26U+lD4pTn/Uowk4XcgXHx4mFbkn5s6d
+         fRR10P2MsdgSezjewXK+vw0kL64dP5CKYibdToXteHUJCC2bx94dhb3GhegwlQCCzsDX
+         uJYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748428413; x=1749033213;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wExCDflCTUpF/JsB4Qjg9le6PwoSqvLEuGvf4Nfkq48=;
+        b=MWbkpESc3tdtnqq48qk5453czc9eU1UjmFC3e7JON9W26dCS54WelY7Z4RLNiaiEG4
+         buzeUp8viIvpTjj79CdmLZB1Q226xycLwhLyodfsG1kWKxjp2gFLp8ofW52/Vbzl0Zzz
+         eo3gHgh979ZmtYzHqL37eknqH5cK8pkr9EuxrQAihJp/pb2ZgZNnfkigh9cX4rHBmzCm
+         dPYlvQWuKeUbZbcIwzHWKUc1ENM/i4zqd1qcgz/I57wT5CiN9qN9E+VZKO7W/GnJ7Ms1
+         tIErV5NeXtkY7rGfKmwZfYsNogKn5aeZmtvZbUc2rhJXbHoqycaMP6prsL2+fOWeeRD3
+         orwQ==
+X-Gm-Message-State: AOJu0YyG+/QA+JcBc3hQmZkbUApFSVq6ADUOuLzR/FXEE/1p17MGUsje
+	Jivzp1iviuNLq6CePnpYCYgVBOep5QtXZuVxYtQiuLFC8qJPD79zMARZ7C44YwYK
+X-Gm-Gg: ASbGncsueQ2awF+hCsxkQFjIsvn9OB+uy+YZqfp7S9Pa2yCAw2PT4pn3hKTFecj+1xl
+	5TI6a8AX669SXg4tMPMTTnFMhF+mhGzs7ilwPB2E4btvauG8G7bUKpaLJBv1iCK8MHBXwsSLA+/
+	hqyywPs25KmrQCqfMEobbTgQVLTxssrLx68BZIfCyynpbpUNnYRuuCOFCBNda7dN5CdXH7rdJom
+	eYnxjxxVmOulWtUxT5/QRYGV9Y7eT8g9phiMw2d5iPJHUrAKvgM+vqSKu/MwEDqpgn7U4/BTJzk
+	qsgkyhdxhChS+CUSuCHQGtJqekp0IU4RRdZ7u5cUSzqyxVcyI2YnMmD1uw==
+X-Google-Smtp-Source: AGHT+IEoyOxFrqbD6pRRpEVnvaQwOHegXPBaz8fJ0g62Io/y4/j5yy7ZegtZPrTUEH9QKPYnZzNvOQ==
+X-Received: by 2002:a05:6e02:1787:b0:3dc:746b:5455 with SMTP id e9e14a558f8ab-3dc9b689ce3mr125416875ab.13.1748428412076;
+        Wed, 28 May 2025 03:33:32 -0700 (PDT)
+Received: from [172.17.0.2] ([40.122.144.68])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdbd495bfdsm170496173.7.2025.05.28.03.33.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 May 2025 03:33:31 -0700 (PDT)
+Message-ID: <6836e67b.050a0220.269783.028e@mx.google.com>
+Date: Wed, 28 May 2025 03:33:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7835128106811512336=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: New Telephony interface for HSP, HFP and CCP
+In-Reply-To: <20250528085930.227816-2-frederic.danis@collabora.com>
+References: <20250528085930.227816-2-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/966926
-  Home:   https://github.com/bluez/bluez
-  Commit: ad00313e0c6f830380eac292446432ec2cacfd38
-      https://github.com/bluez/bluez/commit/ad00313e0c6f830380eac29244643=
-2ec2cacfd38
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
+--===============7835128106811512336==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M Makefile.am
-    A doc/org.bluez.TelephonyAg.rst
-    A doc/org.bluez.TelephonyCall.rst
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  doc: Add new telephony related profiles interfaces
+Dear submitter,
 
-These are interfaces are meant to be generic to the telephony related
-"headset" profiles like HSP HS, HFP HF, and CCP.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=966926
 
+---Test result---
 
-  Commit: c3a727151928c43a30f74cfaea2b196fbc374b9a
-      https://github.com/bluez/bluez/commit/c3a727151928c43a30f74cfaea2b1=
-96fbc374b9a
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.30 seconds
+BuildEll                      PASS      20.18 seconds
+BluezMake                     PASS      2624.40 seconds
+MakeCheck                     PASS      20.41 seconds
+MakeDistcheck                 FAIL      8.76 seconds
+CheckValgrind                 PASS      275.83 seconds
+CheckSmatch                   PASS      302.61 seconds
+bluezmakeextell               PASS      128.49 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      897.49 seconds
 
-  Changed paths:
-    A profiles/audio/telephony.c
-    A profiles/audio/telephony.h
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Log Message:
-  -----------
-  audio/telephony: Add shared interfaces implementation
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
+##############################
+Test: MakeDistcheck - FAIL
+Desc: Run Bluez Make Distcheck
+Output:
 
-  Commit: 6832e10ad2f29713bf4e66d93483381ab0058ec8
-      https://github.com/bluez/bluez/commit/6832e10ad2f29713bf4e66d934833=
-81ab0058ec8
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
-
-  Changed paths:
-    M Makefile.plugins
-    M configure.ac
-    A profiles/audio/hfp-hf.c
-
-  Log Message:
-  -----------
-  audio/telephony: Add skeleton for HFP profile
-
-
-  Commit: e45b3da83101bcc5ed3b03c10db17a061b33fa5e
-      https://github.com/bluez/bluez/commit/e45b3da83101bcc5ed3b03c10db17=
-a061b33fa5e
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
-
-  Changed paths:
-    M profiles/audio/hfp-hf.c
-
-  Log Message:
-  -----------
-  audio/hfp-hf: Add HFP SLC connection and event support
+make[2]: *** No rule to make target 'doc/mgmt-api.txt', needed by 'distdir-am'.  Stop.
+make[1]: *** [Makefile:12236: distdir] Error 2
+make: *** [Makefile:12312: dist] Error 2
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: dd6fcdb4bd0785e0a45e684222562f81b51c9b51
-      https://github.com/bluez/bluez/commit/dd6fcdb4bd0785e0a45e684222562=
-f81b51c9b51
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
 
-  Changed paths:
-    M profiles/audio/hfp-hf.c
-
-  Log Message:
-  -----------
-  audio/hfp-hf: Add dial support
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 4e3f6631e41afc9e3c5c9560fe4ca257576c921b
-      https://github.com/bluez/bluez/commit/4e3f6631e41afc9e3c5c9560fe4ca=
-257576c921b
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
-
-  Changed paths:
-    M profiles/audio/hfp-hf.c
-
-  Log Message:
-  -----------
-  audio/hfp-hf: Add hangup all calls support
-
-
-  Commit: 583f0999ac665ebfd10b5efe7c0fa95c44be5b68
-      https://github.com/bluez/bluez/commit/583f0999ac665ebfd10b5efe7c0fa=
-95c44be5b68
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
-
-  Changed paths:
-    M profiles/audio/hfp-hf.c
-
-  Log Message:
-  -----------
-  audio/hfp-hf: Add answer a specific call support
-
-
-  Commit: 5c9a157d8fb6e7d7eeef5f3144b66d9ef1c2acc8
-      https://github.com/bluez/bluez/commit/5c9a157d8fb6e7d7eeef5f3144b66=
-d9ef1c2acc8
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
-
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-telephony.rst
-    M client/main.c
-    A client/telephony.c
-    A client/telephony.h
-
-  Log Message:
-  -----------
-  client/telephony: Add new submenu
-
-
-  Commit: 25a77c37baef52e0f424b6d478fffde7b17fca19
-      https://github.com/bluez/bluez/commit/25a77c37baef52e0f424b6d478fff=
-de7b17fca19
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
-
-  Changed paths:
-    M profiles/audio/hfp-hf.c
-
-  Log Message:
-  -----------
-  audio/hfp-hf: Remove call interface during profile disconnection
-
-
-  Commit: cf0bd7155f214c81d41c0462ee1c306732f4bd2e
-      https://github.com/bluez/bluez/commit/cf0bd7155f214c81d41c0462ee1c3=
-06732f4bd2e
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-05-28 (Wed, 28 May 2025)
-
-  Changed paths:
-    M profiles/audio/hfp-hf.c
-
-  Log Message:
-  -----------
-  audio/hfp-hf: Create existing call during SLC phase
-
-
-Compare: https://github.com/bluez/bluez/compare/ad00313e0c6f%5E...cf0bd71=
-55f21
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============7835128106811512336==--
