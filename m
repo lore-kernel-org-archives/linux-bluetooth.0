@@ -1,133 +1,120 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1436022ACD6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 10:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9975277816;
+	Wed, 28 May 2025 12:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748428416; cv=none; b=tDMX1/tWYlfKwcr/g5+g8sQWfTl1qRRs4wsDswRXWsAkRZJ7KN2bNDocaU/Ml4jeJRW6PNC6rJxgC5Kq1LExdWxURsWSaVmU+7Ri/bl3CBvKZBjzZQDVLiKeUtV0xWvFWnAsLp6sU0az8pBajYJbKZ5n4sOGoahEhONeoE5+cHE=
+	t=1748434054; cv=none; b=UjX2IRjQRH2reE/hkPW39lahzfNV5iBOUghKBnkH/oV7GySLI5kplUrBU6G06yh5/kFvfvyxikgCehKxztepI/luKHZ+37u580OwSreFdVKiR/r/13NlBLkbKDb0ayZ+AUGedsGBL8l9RB/rh0NGQD9lo3gWxlMD5RepL/Ia7Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748428416; c=relaxed/simple;
-	bh=yd4Hx2ZbE/8g8BznEePcLPCadI8a7fJ1KKFgagxf/VY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=j2fCqB7pKyypiV1QHp5ck6PG8WAdFseiSVlB/zEsx/Ic6VDnAHXBDlTFH90jobnBLKbZvLRKEOAEZ0KByV/rKXGeRUIjWIJSJwTBseSiD0o80ccJ0H+IVZsW2zSczzAuBNkpindI7FvGhaZWjRv2fy+nx5LpTVB27R9S3EriAJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLwN8TNR; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748434054; c=relaxed/simple;
+	bh=nqxUSx2y7ieoQY1FNXOZ4tknl2q0hN4mg0ilBAT41n0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TQA4yHB9tV1ew57EmrLmsldk3GHNAHKN1oANVFis8GKa4o+FFjX3DziISEpBZ0m1CaXkb299gjUvGnUoJ0WViHLGJCX1IeLTfKcLnb+JKxBRcDv/wx7ik85iZbfEwA30STz/JD/CcUxI1PBnXk1duubYSh0lEgzTlVfGDLJZZao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tX+T6gsY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLwN8TNR"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-867355d9c4eso94443239f.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 03:33:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748428413; x=1749033213; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wExCDflCTUpF/JsB4Qjg9le6PwoSqvLEuGvf4Nfkq48=;
-        b=fLwN8TNRjISJotLo98VOpxAmj3NOBHjhY3mAQ/cUEWrY2u2tXaCrqDYZUo3IiaOOJt
-         iU7PinGoO4C2zUbq/W9OphNqlL25HhXW/Q/WWYBuTCXRYAPzierNi44Ef2Pn1NcTzheD
-         35BW6Z2ZPcBImvB2Myof4c6AjEmg/2qEyJmKWluhKKhXoRz+9haTOjyHR85R+Y0lnf/8
-         4Sxl6RtlhEAqIR1+GwHb7l+iEhlt9AphdJHT26U+lD4pTn/Uowk4XcgXHx4mFbkn5s6d
-         fRR10P2MsdgSezjewXK+vw0kL64dP5CKYibdToXteHUJCC2bx94dhb3GhegwlQCCzsDX
-         uJYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748428413; x=1749033213;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wExCDflCTUpF/JsB4Qjg9le6PwoSqvLEuGvf4Nfkq48=;
-        b=MWbkpESc3tdtnqq48qk5453czc9eU1UjmFC3e7JON9W26dCS54WelY7Z4RLNiaiEG4
-         buzeUp8viIvpTjj79CdmLZB1Q226xycLwhLyodfsG1kWKxjp2gFLp8ofW52/Vbzl0Zzz
-         eo3gHgh979ZmtYzHqL37eknqH5cK8pkr9EuxrQAihJp/pb2ZgZNnfkigh9cX4rHBmzCm
-         dPYlvQWuKeUbZbcIwzHWKUc1ENM/i4zqd1qcgz/I57wT5CiN9qN9E+VZKO7W/GnJ7Ms1
-         tIErV5NeXtkY7rGfKmwZfYsNogKn5aeZmtvZbUc2rhJXbHoqycaMP6prsL2+fOWeeRD3
-         orwQ==
-X-Gm-Message-State: AOJu0YyG+/QA+JcBc3hQmZkbUApFSVq6ADUOuLzR/FXEE/1p17MGUsje
-	Jivzp1iviuNLq6CePnpYCYgVBOep5QtXZuVxYtQiuLFC8qJPD79zMARZ7C44YwYK
-X-Gm-Gg: ASbGncsueQ2awF+hCsxkQFjIsvn9OB+uy+YZqfp7S9Pa2yCAw2PT4pn3hKTFecj+1xl
-	5TI6a8AX669SXg4tMPMTTnFMhF+mhGzs7ilwPB2E4btvauG8G7bUKpaLJBv1iCK8MHBXwsSLA+/
-	hqyywPs25KmrQCqfMEobbTgQVLTxssrLx68BZIfCyynpbpUNnYRuuCOFCBNda7dN5CdXH7rdJom
-	eYnxjxxVmOulWtUxT5/QRYGV9Y7eT8g9phiMw2d5iPJHUrAKvgM+vqSKu/MwEDqpgn7U4/BTJzk
-	qsgkyhdxhChS+CUSuCHQGtJqekp0IU4RRdZ7u5cUSzqyxVcyI2YnMmD1uw==
-X-Google-Smtp-Source: AGHT+IEoyOxFrqbD6pRRpEVnvaQwOHegXPBaz8fJ0g62Io/y4/j5yy7ZegtZPrTUEH9QKPYnZzNvOQ==
-X-Received: by 2002:a05:6e02:1787:b0:3dc:746b:5455 with SMTP id e9e14a558f8ab-3dc9b689ce3mr125416875ab.13.1748428412076;
-        Wed, 28 May 2025 03:33:32 -0700 (PDT)
-Received: from [172.17.0.2] ([40.122.144.68])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdbd495bfdsm170496173.7.2025.05.28.03.33.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 03:33:31 -0700 (PDT)
-Message-ID: <6836e67b.050a0220.269783.028e@mx.google.com>
-Date: Wed, 28 May 2025 03:33:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7835128106811512336=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tX+T6gsY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A1BDC4CEE7;
+	Wed, 28 May 2025 12:07:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748434054;
+	bh=nqxUSx2y7ieoQY1FNXOZ4tknl2q0hN4mg0ilBAT41n0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tX+T6gsYdTiwTZeh/McCgMZ3KbIV1yrn8WtIbQc359BHRWGzQhnm/ZV4j6i1qSNdW
+	 h684k7lz5z0K7A89CsaPBZSVJ03vrYKEZHe9K8PsMZ3aa67lwl55hQuU8JxKB0dX7/
+	 8WLb2TyCTYu7jyeVlipIic0tMfRVkes44TQAE/uSzZrGrSsxQVlKG7RpgBTEUy1Uk2
+	 tinQ62Qnqst7zQieLXL7GJbtI6QXBldpg+XXXly98STBvaWWlnQph6CMTHGNNXfTEC
+	 Kt3341bH7sl+rRMiq0exP3/R3p48zcrX+I0mafDgi20Y+WzABjMRVX8Wf2A3heJTCc
+	 9LBX7tdQx1p1g==
+Message-ID: <5a430a69-6182-4a34-b5df-5fd557411b68@kernel.org>
+Date: Wed, 28 May 2025 14:07:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: New Telephony interface for HSP, HFP and CCP
-In-Reply-To: <20250528085930.227816-2-frederic.danis@collabora.com>
-References: <20250528085930.227816-2-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7835128106811512336==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: BT Driver: mediatek: add gpio pin to reset bt
+To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Von Dentz <luiz.dentz@gmail.com>
+Cc: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
+ Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+ Steve Lee <steve.lee@mediatek.com>,
+ linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ linux-mediatek <linux-mediatek@lists.infradead.org>
+References: <20250528070323.14902-1-ot_zhangchao.zhang@mediatek.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250528070323.14902-1-ot_zhangchao.zhang@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 28/05/2025 09:03, Zhangchao Zhang wrote:
+> +
+> +static int btmtk_reset_by_gpio(struct hci_dev *hdev)
+> +{
+> +	struct btmtk_data *data = hci_get_priv(hdev);
+> +	struct btmtk_reset_gpio *reset_gpio_data;
+> +	struct device_node *node;
+> +	int reset_gpio_number;
+> +
+> +	node = of_find_compatible_node(NULL, NULL, "mediatek,usb-bluetooth");
 
-Dear submitter,
+There is no such compatible. Just git grep for it.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=966926
+> +	if (node) {
+> +		reset_gpio_number = of_get_named_gpio(node, "reset-gpios", 0);
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.26 seconds
-GitLint                       PENDING   0.30 seconds
-BuildEll                      PASS      20.18 seconds
-BluezMake                     PASS      2624.40 seconds
-MakeCheck                     PASS      20.41 seconds
-MakeDistcheck                 FAIL      8.76 seconds
-CheckValgrind                 PASS      275.83 seconds
-CheckSmatch                   PASS      302.61 seconds
-bluezmakeextell               PASS      128.49 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      897.49 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-make[2]: *** No rule to make target 'doc/mgmt-api.txt', needed by 'distdir-am'.  Stop.
-make[1]: *** [Makefile:12236: distdir] Error 2
-make: *** [Makefile:12312: dist] Error 2
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Where is the ABI documented? Anyway, you should not pick GPIOs from
+random devices.
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7835128106811512336==--
+Best regards,
+Krzysztof
