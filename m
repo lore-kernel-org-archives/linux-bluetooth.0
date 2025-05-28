@@ -1,219 +1,133 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECBA22339
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 15:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A634174420
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 15:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748445280; cv=none; b=oqV1paoqhaH3UcSKp8At7Fxq3kOKw6uDorxkzqGtJHOGV9EZs3RUdXfyc84Hihpi4PZiQInTOAOEoo/X/6y0ilI6f7fSsxsSiKCUIdbSzPoaVDb3gAL7+FomAHGuC4BJYhcd8Y5k1NFbpDUo+zFIeQ+JKw/F9aEuLe6TsLlYaXg=
+	t=1748447537; cv=none; b=q6neUsKlHQTmGin/vonlloVvbi3l0G7T+fzsGCEAzLDTNMhmdzP2Gew4H5D2Jk1pF3jXarTs4/5D4NLiWYSy0eNKR4SYRiKi2D4ZjoRndFU5MMp+NR7Fan5XGpR+7bsj6jueZHf9bOY6Dfw/4txIMv6WfEUx+K1o5HmRO0f8DHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748445280; c=relaxed/simple;
-	bh=23f6BBvKkT54ae44zDWg08x2I7rNnQJgFNMp9ytf1/o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=inKme5EASTmBS73D39wRD7APV5rssxKrrmsZ6JpZCOcA0LnlpUAWKPwHCNBpx3MDEaKGig2310W8mef5fPK8WmymXd2YuUNFJfmqK6H7JK8IPtzKkhWnlE/7ItR8DRrOCOVmSfkVb2dkLUPd6p3MHp2YCNTXZpYbq42hafGVDLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O77p3dmw; arc=none smtp.client-ip=209.85.208.177
+	s=arc-20240116; t=1748447537; c=relaxed/simple;
+	bh=5qAMCSaKwBwCrPF+fBomF2puCukMLyIl8raAykz3bt8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Jpa1eLlkZXiyEIjXnqlKMs0jQdsgUAKt7OeyIoQu73FMQ3BXLcTsbuiWu1/ebusHKYOZZUqC/Fgw8NJCD3GtLBydiqlgjxaegJ0AtGlQ4+IMrpbzq1xw64Aq0N0FjQAXi1HOHgb6iIlUALYD5MhfHWapI8JAp8zJR+tkaSdIQX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1SAHhTv; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O77p3dmw"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30effbfaf4aso50703361fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 08:14:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1SAHhTv"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-234b9dfb842so21635ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 08:52:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748445277; x=1749050077; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rzfyYbJYzo+Rj8D21h5V2G8c7Htw/xSYCfLv2HO+8SE=;
-        b=O77p3dmwgAmxJhxoRqa4e7hShAin5pP2GmDvM0FUhV4ivaVlYsYjDfZV0GO/xPiMVI
-         00RtuiaLQmCmYoiO9GZh5z03YGfmhhS5iY4XEOO0hRVbch8ug/H4orsBoutmNTP4cLqL
-         ibWYIlKn3bQZj2OeSZqWLcMwC95ZMio39hB1+awkqgCjj3SHJ+1nvRejTY3yqJbOUpdb
-         7djY1UecKVgJ4B979kB3QRnsjcUm6/pg+bK9MvdO9qpGRxFOmf0AsFb+CEAlgaT7A10W
-         PaghMPXfdlder6uJrE70Ft1/7P3H4IZDgLGASl/g2KrYjEV8uulRMq5e0obd8Y9sG6N0
-         9nuw==
+        d=gmail.com; s=20230601; t=1748447535; x=1749052335; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=gw8zSeFszHNEHKz/A702wIXvjKEYmURWSC+hbpQLQrg=;
+        b=L1SAHhTvyxCq3Pui11QRQ4hlGtMIWM0olZrR/w9h/fBQa5pdcNXKj06XZs6f624rse
+         9JklhNPBavdNNm/VMUaPEpVcSo6gkHDhuZYRFogpQdUsTFN8hFSiQUBJg686L60uZEAU
+         oOOSku3DcuWVYAKfBC+RWa2Dgel98vTc0r1MGi7jMDNbtYT04eJp+1juLV6LBXusFO/5
+         eunXOyM4krgGEUUdRmXtXcNDOrhXaMKppVFuCtRRhdhq8DBNdCByYMk/DHP/7/xj3E+d
+         7lt6KZ5oCXM8MRmXdUcjKkDnuM2Nq1pSYBaKIVbyDJ/WTBkTzd1YhIMc5XU9pFdk/2Wu
+         UqoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748445277; x=1749050077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rzfyYbJYzo+Rj8D21h5V2G8c7Htw/xSYCfLv2HO+8SE=;
-        b=BKPsdLq0A6zNDrHoe+3NCD+1KUapNQMj+3CcG8L901Jv98h+yUmp2sg8PbTIG4NGOv
-         1wT+5g0qjeCHR9LXJPjHf/iKGeznkRXnmSyBikPbQt3yNIbFrLH6hn8xV1WPJS/rugdV
-         rShizSzwvcVkrc4guO/ZCNQVSSCS3kRVvUfYQTm4f6UhL3L7XA1NS+wM5HPAEc0NOy+N
-         lqrLtB99QmrRCqMsh7DLmazQTZVFJ5abZBl7q680LnuP4RZllukb4GW4gOcergMZot4A
-         XUkRNon+NhlEawrIONkhXLTejquSvxCPS2yISTggUzAdXxHK6j59FX+A68mRxAkHEynY
-         BZ7Q==
-X-Gm-Message-State: AOJu0Yy2Af5YC+j8MYVBDC+8y/CB1HemriYOsXPasHX/VyEMQQRQqZAW
-	yVWgSc7lOjBXQzfx7BEvBYHbgpSQ1aPCVjund9Zpq4F3QiKc1ztZ2FfaOG0KwaRgAKqioOmZKpC
-	xZJz3dzvED+tOpA+mdRfoStOMicu23TRUAmAc
-X-Gm-Gg: ASbGnctdO/2Qq6m6iocfxADgta4PCqUAmJKhtGWnmERee8TyDfhcRF5RovMw4Zx0FxP
-	X33hbfj5Zb2GwRwoovjQWd0K9h7h38yEK95dQQ+GHL71Bg2waQbQHFc+Me3tl2Hfa4d+ouIBzRd
-	sCpe1jJrgcVu8r7a4rshmnNnj7VGc6MLI=
-X-Google-Smtp-Source: AGHT+IEzxgkRumdyBsncLrK1hNGVYkWZHfO/6UX/we0Dji9ATyG3nw2XRYW1geQqDU6X4QV3tRSEp6e4VfAtS1t6lxs=
-X-Received: by 2002:a05:651c:211f:b0:30b:b987:b68d with SMTP id
- 38308e7fff4ca-3295b991be0mr56296121fa.8.1748445276705; Wed, 28 May 2025
- 08:14:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748447535; x=1749052335;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gw8zSeFszHNEHKz/A702wIXvjKEYmURWSC+hbpQLQrg=;
+        b=wxCuMNxt/bFLipnJiDQK4gnLepSUTdfKdln73AncoTKFPw94SPa32lp/xDfS/U+zJi
+         JZAe9t8BwlDXAjzioE6+4EildgHUicWa2kG/Gzy7avuU1EIYlyrmhbFpIB+vJWb7o5lk
+         RJPXogCperh2DurFOLI4wPHrKNPNrbHQ7BbDOZiLLv0v3EKKbgkbMydmAOXRtdddPzuv
+         GHwml/zjs8V8RK87MxyHfgaTPQNJ2p0mC9QYiUGVCjhdRmBRddQthcY/zB+jg8fM5E4h
+         xppbB/3BX9hfBd4qY22aIGerchgYxUaHy19VgH5EgukgcEDvKpzeW8xR36XYLNkNTQbg
+         NOQA==
+X-Gm-Message-State: AOJu0YzlgtpjcBXM+RRIWU2jCApL8mdRuOwRhG0mxt98fEfMlx/KB7IB
+	LArtSHT5fkjUv9Rl06mYNy60QY1Is4dt6t9b7oH9zAbhB7vAwJjFCZaux/kxIA==
+X-Gm-Gg: ASbGncsgRTwsoC4yUElQBXDVeZPRc6IaUm4OlPoVXE5UTphcUC2FKsIsSCdIcJnHdJe
+	WCoEavnwRlWz5vOI3mSJY/Lp4IFK5r2KQztA6q52Fq9ugmhijnME2cNlt94P1Q6xdomY2aFGTlx
+	euKRmaEFn7SsM+tWKOIOaE+EUPPs6drg4gqqkN7RHx+YlFgUC7tddpp+J03pHrvjUb0e/54Pwp/
+	DtjEeXy7DV/khpxGFhWA86LxpmVCFwhmZnHB5PwyPi9TLrGuca9aVmeSPFHvr16BTxZhzLgqnhG
+	V/dWkoFBAsxr5o1bN4TVyyV/Onulkh1JCyqasJ0Rqx6PmuV6c6jxR8DsQyU=
+X-Google-Smtp-Source: AGHT+IF9nE1/jrCJLOycQTEZSBNXBemGxb1YA/yA83LwbMhe1QeJzTTmmSwIY0pyAtX3QKoxN7Z1Dg==
+X-Received: by 2002:a17:902:ce0e:b0:234:c549:d9f1 with SMTP id d9443c01a7336-234c549dd07mr60113955ad.47.1748447534507;
+        Wed, 28 May 2025 08:52:14 -0700 (PDT)
+Received: from [172.17.0.2] ([138.91.252.108])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-234d35acbb7sm13337265ad.192.2025.05.28.08.52.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 May 2025 08:52:13 -0700 (PDT)
+Message-ID: <6837312d.170a0220.217cb4.89cc@mx.google.com>
+Date: Wed, 28 May 2025 08:52:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7527649425448501676=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527132831.232633-1-luiz.dentz@gmail.com> <bff9098f-ae62-4d3a-8241-45b833055827@amlogic.com>
-In-Reply-To: <bff9098f-ae62-4d3a-8241-45b833055827@amlogic.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 28 May 2025 11:14:23 -0400
-X-Gm-Features: AX0GCFuY9ylDZbHf09OzckuLYAd9iaf-Y6dC49nGjw0WFNMNE0MjBw-y2dqItSs
-Message-ID: <CABBYNZKmahTjjs5Nj+6+JXuDKzt5CYh9WfHO5pw0QPpBhhV_ag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1] shared/bap: Fix not handling read offset
-To: Ye He <ye.he@amlogic.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] audio/player: Fix not being able to register players of different types
+In-Reply-To: <20250528142112.434989-1-luiz.dentz@gmail.com>
+References: <20250528142112.434989-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============7527649425448501676==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 28, 2025 at 1:21=E2=80=AFAM Ye He <ye.he@amlogic.com> wrote:
->
-> Hi Luiz,
->
-> > [ EXTERNAL EMAIL ]
-> >
-> > From: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
-> >
-> > Some attributes may need to handle offset other than 0 in case read lon=
-g
-> > procedure is used, so this properly handles that for PAC_SINK_CHRC_UUID
-> > and PAC_SOURCE_CHRC_UUID.
-> >
-> > In addition to PAC record this also uses
-> > gatt_db_attribute_set_fixed_length for attributes that are considered o=
-f
-> > fixed size so gatt_db can handle offset directly.
-> >
-> > Fixes:https://github.com/bluez/bluez/issues/1294
-> > ---
-> >   src/shared/bap.c | 28 ++++++++++++++++++++++++----
-> >   1 file changed, 24 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/src/shared/bap.c b/src/shared/bap.c
-> > index 4bb6e08b5379..f0c6f64855c4 100644
-> > --- a/src/shared/bap.c
-> > +++ b/src/shared/bap.c
-> > @@ -516,8 +516,15 @@ static void pacs_sink_read(struct gatt_db_attribut=
-e *attrib,
-> >          queue_foreach(bdb->sinks, pac_foreach, &iov);
-> >          queue_foreach(bdb->broadcast_sinks, pac_foreach, &iov);
-> >
-> > -       gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
-> > -                                                       iov.iov_len);
-> > +       if (offset > iov.iov_len) {
-> > +               gatt_db_attribute_read_result(attrib, id,
-> > +                                               BT_ATT_ERROR_INVALID_OF=
-FSET,
-> > +                                               NULL, 0);
-> > +               return;
-> > +       }
-> > +
-> > +       gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base + off=
-set,
-> > +                                                       iov.iov_len - o=
-ffset);
-> >   }
-> >
-> >   static void pacs_sink_loc_read(struct gatt_db_attribute *attrib,
-> > @@ -549,8 +556,15 @@ static void pacs_source_read(struct gatt_db_attrib=
-ute *attrib,
-> >
-> >          queue_foreach(bdb->sources, pac_foreach, &iov);
-> >
-> > -       gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
-> > -                                                       iov.iov_len);
-> > +       if (offset > iov.iov_len) {
-> > +               gatt_db_attribute_read_result(attrib, id,
-> > +                                               BT_ATT_ERROR_INVALID_OF=
-FSET,
-> > +                                               NULL, 0);
-> > +               return;
-> > +       }
-> > +
-> > +       gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base + off=
-set,
-> > +                                                       iov.iov_len - o=
-ffset);
-> >   }
-> >
-> >   static void pacs_source_loc_read(struct gatt_db_attribute *attrib,
-> > @@ -627,6 +641,7 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
-> >                                          BT_GATT_CHRC_PROP_NOTIFY,
-> >                                          pacs_sink_loc_read, NULL,
-> >                                          pacs);
-> > +       gatt_db_attribute_set_fixed_length(pacs->sink_loc, sizeof(uint3=
-2_t));
-> >
-> >          pacs->sink_loc_ccc =3D gatt_db_service_add_ccc(pacs->service,
-> >                                          BT_ATT_PERM_READ | BT_ATT_PERM=
-_WRITE);
-> > @@ -649,6 +664,7 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
-> >                                          BT_GATT_CHRC_PROP_NOTIFY,
-> >                                          pacs_source_loc_read, NULL,
-> >                                          pacs);
-> > +       gatt_db_attribute_set_fixed_length(pacs->source_loc, sizeof(uin=
-t32_t));
-> >
-> >          pacs->source_loc_ccc =3D gatt_db_service_add_ccc(pacs->service=
-,
-> >                                          BT_ATT_PERM_READ | BT_ATT_PERM=
-_WRITE);
-> > @@ -659,6 +675,8 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
-> >                                          BT_GATT_CHRC_PROP_READ |
-> >                                          BT_GATT_CHRC_PROP_NOTIFY,
-> >                                          pacs_context_read, NULL, pacs)=
-;
-> > +       gatt_db_attribute_set_fixed_length(pacs->context,
-> > +                                               sizeof(struct bt_pacs_c=
-ontext));
-> >
-> >          pacs->context_ccc =3D gatt_db_service_add_ccc(pacs->service,
-> >                                          BT_ATT_PERM_READ | BT_ATT_PERM=
-_WRITE);
-> > @@ -671,6 +689,8 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
-> >                                          BT_GATT_CHRC_PROP_NOTIFY,
-> >                                          pacs_supported_context_read, N=
-ULL,
-> >                                          pacs);
-> > +       gatt_db_attribute_set_fixed_length(pacs->supported_context,
-> > +                                               sizeof(struct bt_pacs_c=
-ontext));
-> >
-> >          pacs->supported_context_ccc =3D gatt_db_service_add_ccc(pacs->=
-service,
-> >                                          BT_ATT_PERM_READ | BT_ATT_PERM=
-_WRITE);
-> > --
-> > 2.49.0
-> >
-> >
-> I am concerned about this solution. It can indeed solve the problem of
-> using blob procedure to read sink pacs or source pacs, but if blob
-> procedure is used to read other services, will the problem occur again?
-> I think we should fix the issue at its root.
+This is automated email and please do not reply to this email!
 
-Well Ive already explained that doesn't work since the offset is
-already part of the interface, so both internal and external attribute
-are expected to return that data following the offset:
+Dear submitter,
 
-https://github.com/bluez/bluez/blob/master/doc/org.bluez.GattCharacteristic=
-.rst#arraybyte-readvaluedict-options
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=967039
 
-Also note that although normally the offset means the offset of data
-read with a read long operation I wouldn't be surprised if the vendor
-does use for something else, e.g. as control point index or something
-like that.
+---Test result---
 
-What is perhaps more efficient is to cache the read operations so we
-can detect when it is a read long operation taking place we just use
-the cache to respond, that said Read Blob that doesn't continue from
-previous offset shall still be sent to the callback to respond.
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.34 seconds
+BuildEll                      PASS      20.22 seconds
+BluezMake                     PASS      2812.85 seconds
+MakeCheck                     PASS      20.19 seconds
+MakeDistcheck                 FAIL      8.60 seconds
+CheckValgrind                 PASS      278.49 seconds
+CheckSmatch                   PASS      305.18 seconds
+bluezmakeextell               PASS      128.78 seconds
+IncrementalBuild              PENDING   0.35 seconds
+ScanBuild                     PASS      916.34 seconds
 
---=20
-Luiz Augusto von Dentz
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: MakeDistcheck - FAIL
+Desc: Run Bluez Make Distcheck
+Output:
+
+make[2]: *** No rule to make target 'doc/mgmt-api.txt', needed by 'distdir-am'.  Stop.
+make[1]: *** [Makefile:12179: distdir] Error 2
+make: *** [Makefile:12255: dist] Error 2
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7527649425448501676==--
