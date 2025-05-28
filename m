@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BC4247282
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C39269B07
 	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 08:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748422787; cv=none; b=F+fhzCRc2qFktTpAYgz7SIfpbrDjLWa+ciw3J19YV9bsfnS4glM2rB0k8DQgqABFrNFqSTSIyAYKgepoigvx2uskQcWSrfWOt2euxkIDchJRWJskxC+aINX/TeIBvOceB+2+gw6dZO2h3PlpI44gAGtBgEqpSEOeTmfKWcDuRsM=
+	t=1748422787; cv=none; b=WMdYA6ZUhx+m0K65AzF3TzcsCFQVTptUWL0Fa9P2F87qrA0jgw/bpKBr8oLKP8srYJpx4PyqblguGoFlgFqQrOhj9k7Xd2rZacm0UDowYzDzWmasfEQFYqYlTlwFpeL4o49pQ5Tub4G1vQIhus6LMf1260pmPKDflCqlFvgPeWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1748422787; c=relaxed/simple;
-	bh=6ohVUSG5SOzDJqZBEXIkWvPAwAQ8CvLQSrmXhmfEOKg=;
+	bh=FAGY9oyXKge8vNlaIdWQ8g4F6mqHbL94BdGfWraqxlU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tYBb39iVh3Rohep6DBfK9cxYl/Lh8UizT/IR410xXFbGZnEdu43coukHGmJrHiBX3CjXmBTHp8B9B7xSfMzEGPmrPlQW0gqsiNha3DBF8PWnLdbugMHkGICnJcFCNy+E02Sv1LvC5FQmqT+vkOkSeLqgCcfMfCzPSiIV9Y+7BBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hgt4v/1g; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=ojRCx+34NExtXASdU13MKa3HyFPB4wTPu/SvCxcaBVQP2Zs4MPuFiYNb5vEe8UwDE5bVlHBIlqCuORdU99SP9Q7nS+C7+qfkuMKreokOlYht8XunfRw1BfzewaCa46xXshb+LgXfxJpKf4kSt7C3WHSsHEmemQDXAY9XMtykHS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=MJt6iiY4; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hgt4v/1g"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="MJt6iiY4"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1748422777;
-	bh=6ohVUSG5SOzDJqZBEXIkWvPAwAQ8CvLQSrmXhmfEOKg=;
+	bh=FAGY9oyXKge8vNlaIdWQ8g4F6mqHbL94BdGfWraqxlU=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=hgt4v/1gnRrq1nCdvAUGG7TyQJCExv6pdcx+LhxF4ySrdZYQ/6qIOPhMM0ZUixADs
-	 GjGsD9DIpx7NCzQH9L4W4MQbFAckbiPMeO0quhGGvZh3F31RbhfHMGT/iFd6wHY7Cy
-	 Zo7qaQh0AaxVB9OOt9ru0LUjZa9orkVSmdGxy9/5jNDo/agwTqLajCH7h8ODXieAuM
-	 njGoLW5yUweBWDwfpBNbe0JDG/63CPkJFFO27HGFLd2JJWpgKJMIqTx7wVnjvB7Tf7
-	 resYmHu7YUslEf0dzUe8mIovBdvyw9GXsLd1OIrbdXLHG/nhxCWd5PeyHDsSiRLFmX
-	 jQ98jzxtSFBiQ==
+	b=MJt6iiY4K3UDuT1/S9vNw0mwtvCKw91rJZcKLEf8pggXJKr0baTOaUUA3wtkz5qah
+	 c4H9rf3JZmBrBivY/Ki+GHfIoGu3sC9U1Axy85XGR0kixDRFCHy4QNj17RARqO7wHN
+	 AIIdxMs86tevWt1ir4Q8NwbzQeK95NqeZLGA3M05q055FugsLfldlCFF0xvVfeAmcs
+	 RJjgvWlXTm19VKzw9PII8jIyiwHjVx0DUvbfM0GO0Mn1BAYGH8vEKUaQuURGendfxQ
+	 lw84fmNmqB7c/HttFClWxVKnvzYPMguYXLEfhG01MzCy6gpNfrn71NZL6O+lMG8fh4
+	 fkgddj+QgG5+A==
 Received: from fdanis-ThinkPad-X1.. (2A02-8428-AF44-1001-C79a-7427-1C18-f6a9.rev.sfr.net [IPv6:2a02:8428:af44:1001:c79a:7427:1c18:f6a9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id D653017E096A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 10:59:36 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2E3F617E0FB8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 10:59:37 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 01/10] doc: Add new telephony related profiles interfaces
-Date: Wed, 28 May 2025 10:59:21 +0200
-Message-ID: <20250528085930.227816-2-frederic.danis@collabora.com>
+Subject: [RFC BlueZ 02/10] audio/telephony: Add shared interfaces implementation
+Date: Wed, 28 May 2025 10:59:22 +0200
+Message-ID: <20250528085930.227816-3-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250528085930.227816-1-frederic.danis@collabora.com>
 References: <20250528085930.227816-1-frederic.danis@collabora.com>
@@ -50,401 +50,848 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-These are interfaces are meant to be generic to the telephony related
-"headset" profiles like HSP HS, HFP HF, and CCP.
 ---
- Makefile.am                     |   4 +
- doc/org.bluez.TelephonyAg.rst   | 200 ++++++++++++++++++++++++++++++++
- doc/org.bluez.TelephonyCall.rst | 144 +++++++++++++++++++++++
- 3 files changed, 348 insertions(+)
- create mode 100644 doc/org.bluez.TelephonyAg.rst
- create mode 100644 doc/org.bluez.TelephonyCall.rst
+ profiles/audio/telephony.c | 713 +++++++++++++++++++++++++++++++++++++
+ profiles/audio/telephony.h | 110 ++++++
+ 2 files changed, 823 insertions(+)
+ create mode 100644 profiles/audio/telephony.c
+ create mode 100644 profiles/audio/telephony.h
 
-diff --git a/Makefile.am b/Makefile.am
-index 0f0037d5b..c53970d17 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -388,6 +388,7 @@ man_MANS += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
- 		doc/org.bluez.obex.Message.5 \
- 		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5 \
- 		doc/org.bluez.obex.Image.5
-+man_MANS += doc/org.bluez.TelephonyAg.5 doc/org.bluez.TelephonyCall.5
- endif
- manual_pages += src/bluetoothd.8
- manual_pages += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7
-@@ -422,6 +423,7 @@ manual_pages += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
- 		doc/org.bluez.obex.Message.5 \
- 		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5 \
- 		doc/org.bluez.obex.Image.5
-+manual_pages += doc/org.bluez.TelephonyAg.5 doc/org.bluez.TelephonyCall.5
- 
- EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
- 			src/main.conf profiles/network/network.conf \
-@@ -506,6 +508,8 @@ EXTRA_DIST += doc/org.bluez.obex.Client.rst doc/org.bluez.obex.Session.rst \
- 		doc/org.bluez.obex.AgentManager.rst doc/org.bluez.obex.Agent.rst \
- 		doc/org.bluez.obex.Image.rst
- 
-+EXTRA_DIST += doc/org.bluez.TelephonyAg.rst doc/org.bluez.TelephonyCall.rst
-+
- EXTRA_DIST += doc/pics-opp.txt doc/pixit-opp.txt \
- 		doc/pts-opp.txt
- 
-diff --git a/doc/org.bluez.TelephonyAg.rst b/doc/org.bluez.TelephonyAg.rst
+diff --git a/profiles/audio/telephony.c b/profiles/audio/telephony.c
 new file mode 100644
-index 000000000..e0a78a6a1
+index 000000000..34f690c99
 --- /dev/null
-+++ b/doc/org.bluez.TelephonyAg.rst
-@@ -0,0 +1,200 @@
-+======================
-+org.bluez.TelephonyAg1
-+======================
++++ b/profiles/audio/telephony.c
+@@ -0,0 +1,713 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright © 2025 Collabora Ltd.
++ *
++ *
++ */
 +
-+-----------------------------------------------------
-+BlueZ D-Bus Telephony Audio Gateway API documentation
-+-----------------------------------------------------
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+:Version: BlueZ
-+:Date: May 2025
-+:Manual section: 5
-+:Manual group: Linux System Administration
++#define _GNU_SOURCE
 +
-+Interface
-+=========
++#include <stdlib.h>
++#include <stdio.h>
++#include <errno.h>
++#include <limits.h>
 +
-+:Service:	org.bluez
-+:Interface:	org.bluez.TelephonyAg1
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/{ccp,hfp,hsp}
++#include <stdint.h>
 +
-+Methods
-+-------
++#include <glib.h>
 +
-+object Dial(string number)
-+``````````````````````````
++#include "lib/bluetooth.h"
++#include "bluetooth/sdp.h"
++#include "bluetooth/sdp_lib.h"
++#include "lib/uuid.h"
 +
-+	Call number, if number is void try to call last dialed number.
-+	Initiates a new outgoing call. Returns the object path to the newly
-+	created call.
++#include "gdbus/gdbus.h"
 +
-+	The number must be a string containing the following characters:
-+	`[0-9+*#,ABCD]{1,80}` The character set can contain numbers, `+`, `*`,
-+	`#`, `,` and the letters `A` to `D`. Besides this sanity checking no
-+	further number validation is performed. It is assumed that the gateway
-+	and/or the network will perform further validation.
++#include "btio/btio.h"
++#include "src/adapter.h"
++#include "src/btd.h"
++#include "src/dbus-common.h"
++#include "src/device.h"
++#include "src/error.h"
++#include "src/log.h"
++#include "src/plugin.h"
++#include "src/profile.h"
++#include "src/service.h"
++#include "src/shared/hfp.h"
 +
-+	If number is an empty string, it will try to call last dialed number.
++#include "telephony.h"
 +
-+	NOTE: If an active call (single or multiparty) exists, then it is
-+	automatically put on hold if the dial procedure is successful.
++#define TELEPHONY_AG_INTERFACE "org.bluez.TelephonyAg1"
++#define TELEPHONY_CALL_INTERFACE "org.bluez.TelephonyCall1"
 +
-+	Possible Errors:
++struct telephony {
++	struct btd_service		*service;
++	struct btd_device		*device;
++	char				*path;
++	uint8_t				id;
++	bdaddr_t			src;
++	bdaddr_t			dst;
++	void				*profile_data;
++	struct telephony_callbacks	*cbs;
++	enum connection_state		state;
++	bool				network_service;
++	uint8_t				signal;
++	bool				roaming;
++	uint8_t				battchg;
++};
 +
-+	:org.bluez.Error.InvalidState:
-+	:org.bluez.Error.InvalidArguments:
-+	:org.bluez.Error.NotSupported:
-+	:org.bluez.Error.Failed:
++static const char *state_to_string(enum connection_state state)
++{
++	switch (state) {
++	case CONNECTING:
++		return "connecting";
++	case SLC_CONNECTING:
++		return "slc_connecting";
++	case CONNECTED:
++		return "connected";
++	case DISCONNECTING:
++		return "disconnecting";
++	}
 +
-+void SwapCalls()
-+````````````````
++	return NULL;
++}
 +
-+	Swaps Active and Held calls. The effect of this is that all calls (0 or
-+	more including calls in a multi-party conversation) that were Active
-+	are now Held, and all calls (0 or more) that were Held are now Active.
++static const char *call_state_to_string(enum call_state state)
++{
++	switch (state) {
++	case CALL_STATE_ACTIVE:
++		return "active";
++	case CALL_STATE_HELD:
++		return "held";
++	case CALL_STATE_DIALING:
++		return "dialing";
++	case CALL_STATE_ALERTING:
++		return "alerting";
++	case CALL_STATE_INCOMING:
++		return "incoming";
++	case CALL_STATE_WAITING:
++		return "waiting";
++	case CALL_STATE_DISCONNECTED:
++		return "disconnected";
++	}
 +
-+	GSM specification does not allow calls to be swapped in the case where
-+	Held, Active and Waiting calls exist. Some modems implement this
-+	anyway, thus it is manufacturer specific whether this method will
-+	succeed in the case of Held, Active and Waiting calls.
++	return NULL;
++}
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++struct telephony *telephony_new(struct btd_service *service,
++				void *profile_data,
++				struct telephony_callbacks *cbs)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	const char *path = device_get_path(device);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct btd_profile *p = btd_service_get_profile(service);
++	struct telephony *ag;
 +
-+void ReleaseAndAnswer()
-+```````````````````````
++	ag = g_new0(struct telephony, 1);
++	bacpy(&ag->src, btd_adapter_get_address(adapter));
++	bacpy(&ag->dst, device_get_address(device));
++	ag->service = btd_service_ref(service);
++	ag->device = btd_device_ref(device);
++	ag->path = g_strdup_printf("%s/%s", path, p->name);
++	ag->profile_data = profile_data;
++	ag->cbs = cbs;
 +
-+	Releases currently active call (0 or more) and answers the currently
-+	waiting call. Please note that if the current call is a multiparty
-+	call, then all parties in the multi-party call will be released.
++	return ag;
++}
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++void telephony_free(struct telephony *telephony)
++{
++	g_free(telephony->path);
++	g_free(telephony);
++}
 +
-+void ReleaseAndSwap()
-+`````````````````````
++static DBusMessage *dial(DBusConnection *conn, DBusMessage *msg,
++					void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+	Releases currently active call (0 or more) and activates any currently
-+	held calls. Please note that if the current call is a multiparty call,
-+	then all parties in the multi-party call will be released.
++	if (telephony->cbs && telephony->cbs->dial)
++		return telephony->cbs->dial(conn, msg,
++					telephony->profile_data);
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++	return btd_error_not_supported(msg);
++}
 +
-+void HoldAndAnswer()
-+````````````````````
++static DBusMessage *swap_calls(DBusConnection *conn, DBusMessage *msg,
++					void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+	Puts the current call (including multi-party calls) on hold and answers
-+	the currently waiting call. Calling this function when a user already
-+	has a both Active and Held calls is invalid, since in GSM a user can
-+	have only a single Held call at a time.
++	if (telephony->cbs && telephony->cbs->swap_calls)
++		return telephony->cbs->swap_calls(conn, msg,
++					telephony->profile_data);
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++	return btd_error_not_supported(msg);
++}
 +
-+void HangupAll()
-+````````````````
++static DBusMessage *release_and_answer(DBusConnection *conn, DBusMessage *msg,
++	void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+	Releases all calls except waiting calls. This includes multiparty
-+	calls.
++	if (telephony->cbs && telephony->cbs->release_and_answer)
++		return telephony->cbs->release_and_answer(conn, msg,
++					telephony->profile_data);
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++	return btd_error_not_supported(msg);
++}
 +
-+void HangupActive()
-+```````````````````
++static DBusMessage *release_and_swap(DBusConnection *conn, DBusMessage *msg,
++	void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+	Releases active calls. This includes multiparty active calls.
++	if (telephony->cbs && telephony->cbs->release_and_swap)
++		return telephony->cbs->release_and_swap(conn, msg,
++					telephony->profile_data);
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++	return btd_error_not_supported(msg);
++}
 +
-+void HangupHeld()
-+`````````````````
++static DBusMessage *hold_and_answer(DBusConnection *conn, DBusMessage *msg,
++	void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+	Releases held calls except waiting calls. This includes multiparty
-+	held calls.
++	if (telephony->cbs && telephony->cbs->hold_and_answer)
++		return telephony->cbs->hold_and_answer(conn, msg,
++					telephony->profile_data);
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++	return btd_error_not_supported(msg);
++}
 +
-+array{object} CreateMultiparty()
-+````````````````````````````````
++static DBusMessage *hangup_all(DBusConnection *conn, DBusMessage *msg,
++	void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+	Joins active and held calls together into a multi-party call. If one of
-+	the calls is already a multi-party call, then the other call is added
-+	to the multiparty conversation. Returns the new list of calls
-+	participating in the multiparty call.
++	if (telephony->cbs && telephony->cbs->hangup_all)
++		return telephony->cbs->hangup_all(conn, msg,
++					telephony->profile_data);
 +
-+	There can only be one subscriber controlled multi-party call according
-+	to the GSM specification.
++	return btd_error_not_supported(msg);
++}
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++static DBusMessage *create_multiparty(DBusConnection *conn, DBusMessage *msg,
++	void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+void SendTones(string tones)
-+````````````````````````````
++	if (telephony->cbs && telephony->cbs->create_multiparty)
++		return telephony->cbs->create_multiparty(conn, msg,
++					telephony->profile_data);
 +
-+	Sends the DTMF tones to the network. The tones have a fixed duration.
-+	Tones can be one of: '0' - '9', '*', '#', 'A', 'B', 'C', 'D'. The last
-+	four are typically not used in normal circumstances.
++	return btd_error_not_supported(msg);
++}
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.InvalidArgs
-+	:org.bluez.Error.Failed
++static DBusMessage *send_tones(DBusConnection *conn, DBusMessage *msg,
++	void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+Properties
-+----------
++	if (telephony->cbs && telephony->cbs->send_tones)
++		return telephony->cbs->send_tones(conn, msg,
++					telephony->profile_data);
 +
-+string State [readonly]
-+```````````````````````
++	return btd_error_not_supported(msg);
++}
 +
-+	Contains the state of the current connection.
++static gboolean property_get_state(const GDBusPropertyTable *property,
++					DBusMessageIter *iter,
++					void *user_data)
++{
++	struct telephony *telephony = user_data;
++	const char *string;
 +
-+		Possible values:
++	string = state_to_string(telephony->state);
 +
-+	:"connecting":
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &string);
 +
-+		RFComm connection in progress
++	return TRUE;
++}
 +
-+	:"slc_connecting":
++static gboolean property_get_service(const GDBusPropertyTable *property,
++					DBusMessageIter *iter,
++					void *user_data)
++{
++	struct telephony *telephony = user_data;
++	dbus_bool_t value;
 +
-+		Service Level Connection in progress
++	value = telephony->network_service;
 +
-+	:"connected":
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
 +
-+		RFComm and Service Level Connection are connected
++	return TRUE;
++}
 +
-+	:"disconnecting":
++static gboolean property_get_signal(const GDBusPropertyTable *property,
++					DBusMessageIter *iter,
++					void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+		No further use of this object is allowed, it will be destroyed
-+		shortly
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
++					&telephony->signal);
 +
-+boolean Service [readonly]
-+``````````````````````````
++	return TRUE;
++}
 +
-+	Network service availability.
++static gboolean property_get_roaming(const GDBusPropertyTable *property,
++					DBusMessageIter *iter,
++					void *user_data)
++{
++	struct telephony *telephony = user_data;
++	dbus_bool_t value;
 +
-+byte Signal [readonly]
-+``````````````````````
++	value = telephony->roaming;
 +
-+	Network level signal from 0 to 5.
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
 +
-+boolean Roaming [readonly]
-+``````````````````````````
++	return TRUE;
++}
 +
-+	Network roaming usage.
++static gboolean property_get_battchg(const GDBusPropertyTable *property,
++					DBusMessageIter *iter,
++					void *user_data)
++{
++	struct telephony *telephony = user_data;
 +
-+byte BattChg [readonly]
-+```````````````````````
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
++					&telephony->battchg);
 +
-+	Battery level from 0 to 5.
-diff --git a/doc/org.bluez.TelephonyCall.rst b/doc/org.bluez.TelephonyCall.rst
++	return TRUE;
++}
++
++static const GDBusMethodTable telephony_methods[] = {
++	{ GDBUS_ASYNC_METHOD("Dial", GDBUS_ARGS({"number", "s"}), NULL,
++						dial) },
++	{ GDBUS_ASYNC_METHOD("SwapCalls", NULL, NULL, swap_calls) },
++	{ GDBUS_ASYNC_METHOD("ReleaseAndAnswer", NULL, NULL,
++						release_and_answer) },
++	{ GDBUS_ASYNC_METHOD("ReleaseAndSwap", NULL, NULL,
++						release_and_swap) },
++	{ GDBUS_ASYNC_METHOD("HoldAndAnswer", NULL, NULL,
++						hold_and_answer) },
++	{ GDBUS_ASYNC_METHOD("HangupAll", NULL, NULL, hangup_all) },
++	{ GDBUS_ASYNC_METHOD("CreateMultiparty", NULL,
++						GDBUS_ARGS({ "calls", "ao" }),
++						create_multiparty) },
++	{ GDBUS_ASYNC_METHOD("SendTones", GDBUS_ARGS({"number", "s"}), NULL,
++						send_tones) },
++	{ }
++};
++
++static const GDBusPropertyTable telephony_properties[] = {
++	{ "State", "s", property_get_state },
++	{ "Service", "b", property_get_service },
++	{ "Signal", "y", property_get_signal },
++	{ "Roaming", "b", property_get_roaming },
++	{ "BattChg", "y", property_get_battchg },
++	{ }
++};
++
++static void path_unregister(void *data)
++{
++	struct telephony *telephony = data;
++
++	DBG("Unregistered interface %s on path %s",  TELEPHONY_AG_INTERFACE,
++						telephony->path);
++}
++
++int telephony_register_interface(struct telephony *telephony)
++{
++	if (telephony->cbs == NULL)
++		return -EINVAL;
++
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++			telephony->path,
++			TELEPHONY_AG_INTERFACE,
++			telephony_methods, NULL,
++			telephony_properties, telephony,
++			path_unregister)) {
++		return -EINVAL;
++	}
++
++	DBG("Registered interface %s on path %s", TELEPHONY_AG_INTERFACE,
++						telephony->path);
++
++	return 0;
++}
++
++void telephony_unregister_interface(struct telephony *telephony)
++{
++	g_dbus_unregister_interface(btd_get_dbus_connection(), telephony->path,
++					TELEPHONY_AG_INTERFACE);
++}
++
++struct btd_service *telephony_get_service(struct telephony *telephony)
++{
++	return telephony->service;
++}
++
++struct btd_device *telephony_get_device(struct telephony *telephony)
++{
++	return telephony->device;
++}
++
++const char *telephony_get_path(struct telephony *telephony)
++{
++	return telephony->path;
++}
++
++bdaddr_t telephony_get_src(struct telephony *telephony)
++{
++	return telephony->src;
++}
++
++bdaddr_t telephony_get_dst(struct telephony *telephony)
++{
++	return telephony->dst;
++}
++
++void *telephony_get_profile_data(struct telephony *telephony)
++{
++	return telephony->profile_data;
++}
++
++void telephony_set_state(struct telephony *telephony,
++				enum connection_state state)
++{
++	char address[18];
++
++	if (telephony->state == state)
++		return;
++
++	ba2str(&telephony->dst, address);
++	DBG("device %s state %s -> %s", address,
++				state_to_string(telephony->state),
++				state_to_string(state));
++
++	telephony->state = state;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					telephony->path, TELEPHONY_AG_INTERFACE,
++					"State");
++}
++
++enum connection_state telephony_get_state(struct telephony *telephony)
++{
++	return telephony->state;
++}
++
++void telephony_set_network_service(struct telephony *telephony, bool service)
++{
++	char address[18];
++
++	if (telephony->network_service == service)
++		return;
++
++	ba2str(&telephony->dst, address);
++	DBG("device %s network service %u -> %u", address,
++					telephony->network_service,
++					service);
++
++	telephony->network_service = service;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++			telephony->path, TELEPHONY_AG_INTERFACE,
++			"Service");
++}
++
++bool telephony_get_network_service(struct telephony *telephony)
++{
++	return telephony->network_service;
++}
++
++void telephony_set_signal(struct telephony *telephony, uint8_t signal)
++{
++	char address[18];
++
++	if (telephony->signal == signal)
++		return;
++
++	ba2str(&telephony->dst, address);
++	DBG("device %s signal %u -> %u", address, telephony->signal, signal);
++
++	telephony->signal = signal;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++			telephony->path, TELEPHONY_AG_INTERFACE,
++			"Signal");
++}
++
++uint8_t telephony_get_signal(struct telephony *telephony)
++{
++	return telephony->signal;
++}
++
++void telephony_set_roaming(struct telephony *telephony, bool roaming)
++{
++	char address[18];
++
++	if (telephony->roaming == roaming)
++		return;
++
++	ba2str(&telephony->dst, address);
++	DBG("device %s roaming %u -> %u", address,
++					telephony->roaming,
++					roaming);
++
++	telephony->roaming = roaming;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++			telephony->path, TELEPHONY_AG_INTERFACE,
++			"Roaming");
++}
++
++bool telephony_get_roaming(struct telephony *telephony)
++{
++	return telephony->roaming;
++}
++
++void telephony_set_battchg(struct telephony *telephony, uint8_t battchg)
++{
++	char address[18];
++
++	if (telephony->battchg == battchg)
++		return;
++
++	ba2str(&telephony->dst, address);
++	DBG("device %s battchg %u -> %u", address, telephony->battchg, battchg);
++
++	telephony->battchg = battchg;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++			telephony->path, TELEPHONY_AG_INTERFACE,
++			"BattChg");
++}
++
++uint8_t telephony_get_battchg(struct telephony *telephony)
++{
++	return telephony->battchg;
++}
++
++struct call *telephony_new_call(struct telephony *telephony,
++				enum call_state state,
++				void *user_data)
++{
++	struct call *call;
++
++	call = g_new0(struct call, 1);
++	call->device = telephony;
++	call->state = state;
++	call->idx = telephony->id++;
++	call->path = g_strdup_printf("%s/call%u", telephony->path, call->idx);
++
++	return call;
++}
++
++void telephony_free_call(struct call *call)
++{
++	if (call->pending_msg)
++		dbus_message_unref(call->pending_msg);
++
++	g_free(call->name);
++	g_free(call->incoming_line);
++	g_free(call->line_id);
++	g_free(call->path);
++	g_free(call);
++}
++
++static DBusMessage *call_answer(DBusConnection *conn, DBusMessage *msg,
++	void *call_data)
++{
++	struct call *call = call_data;
++	struct telephony *telephony = call->device;
++
++	return telephony->cbs->call_answer(conn, msg, call_data);
++}
++
++static DBusMessage *call_hangup(DBusConnection *conn, DBusMessage *msg,
++	void *call_data)
++{
++	struct call *call = call_data;
++	struct telephony *telephony = call->device;
++
++	return telephony->cbs->call_hangup(conn, msg, call_data);
++}
++
++static gboolean call_line_id_exists(const GDBusPropertyTable *property,
++	void *data)
++{
++	struct call *call = data;
++
++	return call->line_id != NULL;
++}
++
++static gboolean call_property_get_line_id(
++	const GDBusPropertyTable *property,
++	DBusMessageIter *iter, void *data)
++{
++	struct call *call = data;
++
++	if (call->line_id == NULL)
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &call->line_id);
++
++	return TRUE;
++}
++
++static gboolean call_incoming_line_exists(const GDBusPropertyTable *property,
++	void *data)
++{
++	struct call *call = data;
++
++	return call->incoming_line != NULL;
++}
++
++static gboolean call_property_get_incoming_line(
++	const GDBusPropertyTable *property,
++	DBusMessageIter *iter, void *data)
++{
++	struct call *call = data;
++
++	if (call->incoming_line == NULL)
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++		&call->incoming_line);
++
++	return TRUE;
++}
++
++static gboolean call_name_exists(const GDBusPropertyTable *property,
++	void *data)
++{
++	struct call *call = data;
++
++	return call->name != NULL;
++}
++
++static gboolean call_property_get_name(const GDBusPropertyTable *property,
++	DBusMessageIter *iter, void *data)
++{
++	struct call *call = data;
++
++	if (call->name == NULL)
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &call->name);
++
++	return TRUE;
++}
++
++static gboolean call_property_get_multiparty(
++	const GDBusPropertyTable *property,
++	DBusMessageIter *iter, void *data)
++{
++	struct call *call = data;
++	dbus_bool_t value;
++
++	value = call->multiparty;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
++
++	return TRUE;
++}
++
++static gboolean call_property_get_state(const GDBusPropertyTable *property,
++	DBusMessageIter *iter, void *data)
++{
++	struct call *call = data;
++	const char *string;
++
++	string = call_state_to_string(call->state);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &string);
++
++	return TRUE;
++}
++
++static const GDBusMethodTable telephony_call_methods[] = {
++	{ GDBUS_ASYNC_METHOD("Answer", NULL, NULL, call_answer) },
++	{ GDBUS_ASYNC_METHOD("Hangup", NULL, NULL, call_hangup) },
++	{ }
++};
++
++static const GDBusPropertyTable telephony_call_properties[] = {
++	{ "LineIdentification", "s", call_property_get_line_id, NULL,
++			call_line_id_exists },
++	{ "IncomingLine", "s", call_property_get_incoming_line, NULL,
++			call_incoming_line_exists },
++	{ "Name", "s", call_property_get_name, NULL, call_name_exists },
++	{ "Multiparty", "b", call_property_get_multiparty },
++	{ "State", "s", call_property_get_state },
++	{ }
++};
++
++static void call_path_unregister(void *user_data)
++{
++	struct call *call = user_data;
++
++	DBG("Unregistered interface %s on path %s",  TELEPHONY_CALL_INTERFACE,
++			call->path);
++
++	telephony_free_call(call);
++}
++
++int telephony_call_register_interface(struct call *call)
++{
++	if (call->device->cbs == NULL)
++		return -EINVAL;
++
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++			call->path,
++			TELEPHONY_CALL_INTERFACE,
++			telephony_call_methods, NULL,
++			telephony_call_properties, call,
++			call_path_unregister)) {
++		return -EINVAL;
++	}
++
++	DBG("Registered interface %s on path %s", TELEPHONY_CALL_INTERFACE,
++						call->path);
++
++	return 0;
++}
++
++void telephony_call_unregister_interface(struct call *call)
++{
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++					call->path,
++					TELEPHONY_CALL_INTERFACE);
++}
++
++void telephony_set_call_state(struct call *call, enum call_state state)
++{
++	if (call->state == state)
++		return;
++
++	DBG("%s state %s -> %s", call->path, call_state_to_string(call->state),
++					call_state_to_string(state));
++
++	call->state = state;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++			call->device->path, TELEPHONY_CALL_INTERFACE,
++			"State");
++}
++
++enum call_state telephony_get_call_state(struct call *call)
++{
++	return call->state;
++}
+diff --git a/profiles/audio/telephony.h b/profiles/audio/telephony.h
 new file mode 100644
-index 000000000..63f862378
+index 000000000..362b163ab
 --- /dev/null
-+++ b/doc/org.bluez.TelephonyCall.rst
-@@ -0,0 +1,144 @@
-+========================
-+org.bluez.TelephonyCall1
-+========================
++++ b/profiles/audio/telephony.h
+@@ -0,0 +1,110 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright © 2025 Collabora Ltd.
++ *
++ *
++ */
 +
-+--------------------------------------------
-+BlueZ D-Bus Telephony Call API documentation
-+--------------------------------------------
++enum connection_state {
++	CONNECTING = 0,
++	SLC_CONNECTING,
++	CONNECTED,
++	DISCONNECTING
++};
 +
-+:Version: BlueZ
-+:Date: May 2025
-+:Manual section: 5
-+:Manual group: Linux System Administration
++enum call_state {
++	CALL_STATE_ACTIVE = 0,
++	CALL_STATE_HELD,
++	CALL_STATE_DIALING,
++	CALL_STATE_ALERTING,
++	CALL_STATE_INCOMING,
++	CALL_STATE_WAITING,
++	CALL_STATE_DISCONNECTED,
++};
 +
-+Interface
-+=========
++struct telephony;
 +
-+:Service:	org.bluez
-+:Interface:	org.bluez.TelephonyCall1
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/{ccp,hfp,hsp}/callX
++struct telephony_callbacks {
++	DBusMessage *(*dial)(DBusConnection *conn, DBusMessage *msg,
++					void *profile_data);
++	DBusMessage *(*swap_calls)(DBusConnection *conn, DBusMessage *msg,
++					void *profile_data);
++	DBusMessage *(*release_and_answer)(DBusConnection *conn,
++					DBusMessage *msg,
++					void *profile_data);
++	DBusMessage *(*release_and_swap)(DBusConnection *conn,
++					DBusMessage *msg,
++					void *profile_data);
++	DBusMessage *(*hold_and_answer)(DBusConnection *conn,
++					DBusMessage *msg,
++					void *profile_data);
++	DBusMessage *(*hangup_all)(DBusConnection *conn, DBusMessage *msg,
++					void *profile_data);
++	DBusMessage *(*create_multiparty)(DBusConnection *conn,
++					DBusMessage *msg,
++					void *profile_data);
++	DBusMessage *(*send_tones)(DBusConnection *conn, DBusMessage *msg,
++					void *profile_data);
 +
-+Methods
-+-------
++	DBusMessage *(*call_answer)(DBusConnection *conn, DBusMessage *msg,
++					void *call_data);
++	DBusMessage *(*call_hangup)(DBusConnection *conn, DBusMessage *msg,
++					void *call_data);
++	const char *(*call_get_line_id)(void *call_data);
++	const char *(*call_get_incoming_line)(void *call_data);
++	const char *(*call_get_name)(void *call_data);
++	bool (*call_get_multiparty)(void *call_data);
++	enum call_state (*call_get_state)(void *call_data);
++};
 +
-+void Answer()
-+`````````````
++struct call {
++	struct telephony	*device;
++	char			*path;
++	uint8_t			idx;
 +
-+	Answers an incoming call. Only valid if the state of the call is
-+	"incoming".
++	char			*line_id;
++	char			*incoming_line;
++	char			*name;
++	bool			multiparty;
++	enum call_state		state;
 +
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
++	DBusMessage		*pending_msg;
++};
 +
-+void Hangup()
-+`````````````
++struct telephony *telephony_new(struct btd_service *service,
++				void *profile_data,
++				struct telephony_callbacks *cbs);
++void telephony_free(struct telephony *telephony);
++int telephony_register_interface(struct telephony *telephony);
++void telephony_unregister_interface(struct telephony *telephony);
 +
-+	Hangs up the call.
++struct btd_service *telephony_get_service(struct telephony *telephony);
++struct btd_device *telephony_get_device(struct telephony *telephony);
++const char *telephony_get_path(struct telephony *telephony);
++bdaddr_t telephony_get_src(struct telephony *telephony);
++bdaddr_t telephony_get_dst(struct telephony *telephony);
++void *telephony_get_profile_data(struct telephony *telephony);
++void telephony_set_state(struct telephony *telephony,
++				enum connection_state state);
++enum connection_state telephony_get_state(struct telephony *telephony);
++void telephony_set_network_service(struct telephony *telephony, bool service);
++bool telephony_get_network_service(struct telephony *telephony);
++void telephony_set_signal(struct telephony *telephony, uint8_t signal);
++uint8_t telephony_get_signal(struct telephony *telephony);
++void telephony_set_roaming(struct telephony *telephony, bool roaming);
++bool telephony_get_roaming(struct telephony *telephony);
++void telephony_set_battchg(struct telephony *telephony, uint8_t battchg);
++uint8_t telephony_get_battchg(struct telephony *telephony);
 +
-+	For an incoming call, the call is hung up using ATH or equivalent. For
-+	a waiting call, the remote party is notified by using the User
-+	Determined User Busy (UDUB) condition. This is generally implemented
-+	using CHLD=0.
++struct call *telephony_new_call(struct telephony *telephony,
++	enum call_state state,
++	void *user_data);
++void telephony_free_call(struct call *call);
++int telephony_call_register_interface(struct call *call);
++void telephony_call_unregister_interface(struct call *call);
 +
-+	Please note that the GSM specification does not allow the release of a
-+	held call when a waiting call exists. This is because 27.007 allows
-+	CHLD=1X to operate only on active calls. Hence a held call cannot be
-+	hung up without affecting the state of the incoming call (e.g. using
-+	other CHLD alternatives). Most manufacturers provide vendor extensions
-+	that do allow the state of the held call to be modified using CHLD=1X
-+	or equivalent. It should be noted that Bluetooth HFP specifies the
-+	classic 27.007 behavior and does not allow CHLD=1X to modify the state
-+	of held calls.
-+
-+	Based on the discussion above, it should also be noted that releasing a
-+	particular party of a held multiparty call might not be possible on
-+	some implementations. It is recommended for the applications to
-+	structure their UI accordingly.
-+
-+	NOTE: Releasing active calls does not produce side-effects. That is the
-+	state of held or waiting calls is not affected. As an exception, in the
-+	case where a single active call and a waiting call are present,
-+	releasing the active call will result in the waiting call transitioning
-+	to the 'incoming' state.
-+
-+	Possible Errors:
-+	:org.bluez.Error.InvalidState
-+	:org.bluez.Error.Failed
-+
-+Properties
-+----------
-+
-+string LineIdentification [readonly]
-+````````````````````````````````````
-+
-+	Contains the Line Identification information returned by the network,
-+	if present. For incoming calls this is effectively the CLIP. For
-+	outgoing calls this attribute will hold the dialed number, or the COLP
-+	if received by the audio gateway.
-+
-+	Please note that COLP may be different from the dialed number. A
-+	special "withheld" value means the remote party refused to provide
-+	caller ID and the "override category" option was not provisioned for
-+	the current subscriber.
-+
-+string IncomingLine [readonly, optional]
-+````````````````````````````````````````
-+
-+	Contains the Called Line Identification information returned by the
-+	network.
-+	This is only available for incoming calls and indicates the local
-+	subscriber number which was dialed by the remote party. This is useful
-+	for subscribers which have a multiple line service with their network
-+	provider and would like to know what line the call is coming in on.
-+
-+string Name [readonly]
-+``````````````````````
-+
-+	Contains the Name Identification information returned by the network,
-+	if present.
-+
-+boolean Multiparty [readonly]
-+`````````````````````````````
-+
-+	Contains the indication if the call is part of a multiparty call or
-+	not.
-+
-+	Notifications if a call becomes part or leaves a multiparty call are
-+	sent.
-+
-+string State [readonly]
-+```````````````````````
-+
-+	Contains the state of the current call.
-+
-+		Possible values:
-+
-+	:"active":
-+
-+		The call is active
-+
-+	:"held":
-+
-+		The call is on hold
-+
-+	:"dialing":
-+
-+		The call is being dialed
-+
-+	:"alerting":
-+
-+		The remote party is being alerted
-+
-+	:"incoming":
-+
-+		Incoming call in progress
-+
-+	:"waiting":
-+
-+		Call is waiting
-+
-+	:"disconnected":
-+
-+		No further use of this object is allowed, it will be
-+		destroyed shortly
++void telephony_set_call_state(struct call *call, enum call_state state);
++enum call_state telephony_get_call_state(struct call *call);
 -- 
 2.43.0
 
