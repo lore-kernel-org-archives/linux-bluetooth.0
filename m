@@ -1,92 +1,94 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8155125DF;
-	Wed, 28 May 2025 07:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4099A125DF
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 07:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748416094; cv=none; b=UBbAyYAuQ5J/FeSEBcp0C0dZvSuYNHMniW4K8MRyOnI5l6RBio/l9LIlaWdrDTjJKFYxVaXvGL4LXmlig/qjaw6tQGpONNL61mMZrdUbcaVSd9vsdIXFjwZE6GWa3n9vJ4+EhbsA7+RGDI+tXDly2pwMY8RqjCQGnpCy7zTtHuE=
+	t=1748416308; cv=none; b=jZe+seYAy4uYNlGwX6nLvHh3+KHDumkFeIf/KXOHN5U1zdfCRAmn4HD/xI0N2Z1a0Bw9bntF+63OiTovZjiqWWbWrJ6RTBv7KxflbNUogKiMgCEdICvm+IFqJBZQtYT33NjSoEa4OVbyxzgo+gJvkEOH7CdnJ+x2LTpKXIqZzzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748416094; c=relaxed/simple;
-	bh=5d3E9NSUDjdC6JOq/ogmX74FGiGbrM5Qw8kYaUwJB2k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TQzM3MHSX/5tbO60XWIQVvmfXd8CGSuE4CJrIxS9PbO+NO8Cw9HTX9aLpSv8X0t9KdbQiRoIAf78othtuxNNm4WDp0/r7iHKynHdxLd04yqoBvoICZRILJjDN7ASqqUFWnT1eeoJ0opBWqSdFMQo50/dlOy4ggZJ76vCyDNJvGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af669.dynamic.kabel-deutschland.de [95.90.246.105])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AE289601EEA61;
-	Wed, 28 May 2025 09:07:21 +0200 (CEST)
-Message-ID: <afe65c91-9120-4327-84a0-faf2d341ebb0@molgen.mpg.de>
-Date: Wed, 28 May 2025 09:07:21 +0200
+	s=arc-20240116; t=1748416308; c=relaxed/simple;
+	bh=/7cRzgA6iwNrezdjnK9ktEcuskaqrULeN6yXsMXFZ2Q=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qyqyFJwlnyhwyAYlIgLcFfKWismMC+gUmhmdm1u7+XXeL6JrufiFu7ISBg3HkhEchrQ3JHwK9BfAp5uYNrsmjABbZPkx889w2UaHWcdogyIy3PfQq/ypVHRDvDRsZ6PzasMqClrwXEOlR9MPvEu8Re3kZhKlhgdCgqpybx2zVow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rflFylrE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rflFylrE"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A514EC4CEE7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 May 2025 07:11:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748416307;
+	bh=/7cRzgA6iwNrezdjnK9ktEcuskaqrULeN6yXsMXFZ2Q=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=rflFylrE2uKbDh8pUDcFTmSmXF76A/hvJtAkikb1w8CsFh3/7IQb3JxZYHlUDmfem
+	 I1bWjQJEcrps/y66aflFVxX6znUoFLUnkHIOgvaJjmNWaO7OzbM0bJA1wynWk7/DXP
+	 oEKKFQ7IrygCIlp8lQfk5dWwQhtOYepsyflrwzhkdOzMNQa4Bl1gnMY9yfb0PQdKcc
+	 8vF5aChC0siMrQjAmmJqSIE+5ZHQ6aTiMbbBloJErH0dIloHaJ5JqdbwAsTNnqHmhe
+	 z69OBOh75IcDFBnQCqTBCDACizseiKsoERl+zf19g2mu/M5obMcs/76ZyswpGuQ7Iu
+	 pPXD+nQplpbdw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 9B416C4160E; Wed, 28 May 2025 07:11:47 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 121221] Unable to pair / use Genius Navigator 900 Pro mouse
+Date: Wed, 28 May 2025 07:11:47 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: minthaylanaminthay@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-121221-62941-6MKb0naKys@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-121221-62941@https.bugzilla.kernel.org/>
+References: <bug-121221-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] mediatek MT7925: update bluetooth firmware to
- 20250526153203
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Josh Boyer <jwboyer@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
- Ben Hutchings <ben@decadent.org.uk>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Jiande Lu <jiande.lu@mediatek.com>,
- Will Lee <will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>,
- Steve Lee <steve.lee@mediatek.com>, linux-firmware@kernel.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org
-References: <20250528064625.533578-1-chris.lu@mediatek.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250528064625.533578-1-chris.lu@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Dear Chris,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D121221
 
+robal (minthaylanaminthay@gmail.com) changed:
 
-Thank you for updating the firmware file
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |minthaylanaminthay@gmail.co
+                   |                            |m
 
+--- Comment #9 from robal (minthaylanaminthay@gmail.com) ---
+I can't even shutdown anymore if I don't use the -n option. The whole system
+basically goes down the drain."
 
-Am 28.05.25 um 08:46 schrieb Chris Lu:
-> Update binary firmware for MT7925 BT devices.
-> 
-> File: mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin
-> Version: 20250526153203
+Affected cards:=20
 
-It’d be great if you could add some kind of change-log compared to the 
-previous version 20250425073330.
+* Belkin F5D8053 N Wireless USB Adapter
+* Trendnet USB stick
 
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> ---
->   WHENCE                                        |   2 +-
->   .../mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin     | Bin 459695 -> 459887 bytes
->   2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/WHENCE b/WHENCE
-> index 93f849c4..c653db09 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -6225,7 +6225,7 @@ Licence: Redistributable. See LICENCE.mediatek for details.
->   Driver: mt7925 - MediaTek MT7925 bluetooth chipset
->   
->   File: mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin
-> -Version: 20250425073330
-> +Version: 20250526153203
->   
->   Licence: Redistributable. See LICENCE.mediatek for details.
->   
-> diff --git a/mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin b/mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin
-> index cce1ddaeefac5a70d7ac9172ef78ce6043bf1334..9263027786aa73ad3de420ff14131492ad7f16a6 100644
+Fix:
 
-[…]
+* downgrade to 2.6.29
+* or use the v2.1.2.0 drivers from
+http://www.ralinktech.com.tw/data/drivers/2009_0521_RT2870_Linux_STA_V2.1.2=
+.0.tgz
+https://snowrider3d.com
 
+--=20
+You may reply to this email to add a comment.
 
-Kind regards,
-
-Paul
+You are receiving this mail because:
+You are the assignee for the bug.=
