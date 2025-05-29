@@ -1,125 +1,103 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192E2136347
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 19:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5263647
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 19:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748545670; cv=none; b=nGSkNTzCsvZ+xbgy9puhbIiaMGRyzkVjz9vHYilDH3O33YwqDkMhIo5GP6sYlViV68B8GkYTix7dtnOsRAiM1+Lntt+fwDK2zdTyoWlsBIZuNCMZTxcTszhlH+rZQ08+zIWS0qhoC70zv2NOEjeIexB6vrEHSOFwVOOIAYstHbc=
+	t=1748547372; cv=none; b=ikZUJcRZwHzJn2pQ1eUJN/tg7xlD3dR/1B1gdIyZd4hRfGwV5sdyUBh7KDwWYw+BchQ9HiP4EDMmd7aq0N55DSN07ugDC9c6K5G0qIyDecjyew1G/NQ2sodVfcOCz6dLMJ6Al9XBzOlvcX2eI2lCqmCwYwiw9BeyOe/V8pK2LBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748545670; c=relaxed/simple;
-	bh=Wu8akzzquWOlAw3q63sNTS1FmIlZCDdujUgoksw4i0M=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rQal7bHsr/dfm1syHIqC6nhg41Jo27HRVU4mN3BWeFXSpAlTDQtfqtQ3BDrLX4OGsDvFEnybZk/+JLGHZEEqcpySAL2McGTO4FMKsJZTGaOD6Lf9sARxK7WOMQzuVSZ1hM8p+SgkLLpQWDaXCGia4lq04NVLiMO9pLu+qo6q0R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gT4g8y2E; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748547372; c=relaxed/simple;
+	bh=Cl5f7+V6/TptMj3zlz5KHebtZm9NyJonx8JvpBWvZlc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qa+1o3kjV1+xEBaz8sqBYMTWfqCb2Wim2dZCRLDi1/pTsbTwxssWXT6L8NY57ejVqY+8STIqwIXrrZ+iEiMS5yceD6GLwD+NLf2k5vlwipnKZNTBWGnP4nRGeq9ccVijGsc7DpcBNQT2lrrG/08kk7k7FMBDo0i3vcx/SkO1e/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=b8uWt2VM; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gT4g8y2E"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6face43dfbfso3659786d6.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 12:07:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748545668; x=1749150468; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wqLzRSqDD4/iNiMxKevWTAOzFi99tg+8yy9VkA9VE0E=;
-        b=gT4g8y2EBCbHt05z2beGJfSWxD8iJwZvOE+JZilv5yS5uoorHH9dm3sWBPdxcD38Qk
-         7yMMh9GixZ/rD5ef5nnfMojn/Ap/o7ueS0FG1BLRUpbrKMLeOxopZwf8G5tmhp1zI4IR
-         nVihHXy6vaRI2AZdvgWoSs1Oete4xxI2AGJVLw+0l8c7+IIdjyJHjTy9u30xGbc77ts7
-         VHCCIVpjO6thxpi517nE4U22qyvWqPPOY6qYFuv1V7KIqbOF5CyZBwfna4B7OeDw93LS
-         I0/3oomcX4cNdRUFk8xcn5HUrCz/tS8uC1odRSYlEH1sSTheLLKr2GSwr0Kp2NbGvhke
-         aKKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748545668; x=1749150468;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wqLzRSqDD4/iNiMxKevWTAOzFi99tg+8yy9VkA9VE0E=;
-        b=DFxVDlZmxysTTviSbtFEJUyll78+mk9vYr9UbssEyw6uB8qj8dXTKlR66C9dJonzAY
-         h0fFJbdBdb1jEgH0mrTKa0+f1Ug5y9bEfPCoJkRvEctIotoISpeq/Xl321sfRRakDj0g
-         +R/7qOFkassuoAGQpI59bkVqEm8kgXhR3KTeTJLyBazRnIWzmK+RstfQ1YTatVs2P3di
-         PW4ZOqQeV4MEu47uHWHJyMfOe6G29q5a09FVYSi5xo2JtQ1BTUQRRoOrcYSV9h2G0wIw
-         vub0xf4ySwvcEGZVSz0zvnmSyIDwzzDBgv+bi8iRLWnZsUljk+/ltIZRWaxh7btnMuVU
-         rIyQ==
-X-Gm-Message-State: AOJu0Yzv0AdrZbEWQndsIl/Fz6qxsJ1GO5cl/9gxTwJ0XJ4LudpT2J8O
-	fxYnQdsMcBpyRb/OSGzcN5un86npWHlhQ7VsvG8cTHvbE/s1cQU/47XnLp0iEw==
-X-Gm-Gg: ASbGncuxubK34BJAkQVs00gDmNgsu6eh/eL1KNWjn1+E7zFI9m+2hl+UHhBUHkLEKpV
-	sxpmKV2AuFFshfE+rpI8kWHF97Kpb//kNih0AC3XszTzdEV0ddQc4gMy603loOklJDvfTN+QTGR
-	xThJPoTqT6f5raX6gn3pRJmlThVlOjmrb7hJoZaSsvH+uWHsJkYdvc1V0Rk7193CeWvDT50kDY8
-	skM/fLxQpC14fG1dH/JnJ9ajEFxTX7OsbLGivVH3z/41Mmul51Ml4+/BUDNKhaHjMG59qw1dsug
-	NuA8iQPbGDBSla/QtBVOPJAo3CwSoVXdrUpcdO9ffE1bLKQisuiPF9DW1vP0
-X-Google-Smtp-Source: AGHT+IEZihkApnFVPbPDPtRydoAFUfwXxedeVptMxgFh1XHyjge3bajvgdBrTiCw1RbWZrudOl5AWw==
-X-Received: by 2002:a05:6214:ccb:b0:6fa:cd9e:7fe1 with SMTP id 6a1803df08f44-6faced44d0dmr10675946d6.24.1748545667551;
-        Thu, 29 May 2025 12:07:47 -0700 (PDT)
-Received: from [172.17.0.2] ([172.214.146.155])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fac6d4d6b6sm12570266d6.44.2025.05.29.12.07.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 12:07:47 -0700 (PDT)
-Message-ID: <6838b083.d40a0220.92eb8.4f6c@mx.google.com>
-Date: Thu, 29 May 2025 12:07:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5454667090117261592=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="b8uWt2VM"
+Received: from github.com (hubbernetes-node-e8a60f3.ac4-iad.github.net [10.52.158.15])
+	by smtp.github.com (Postfix) with ESMTPA id D967B20834
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 12:36:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1748547368;
+	bh=wFDO0rP4lG6ot3yD0dOzRKW1zevFcV3bB83ybHGJz1M=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=b8uWt2VM8LssDxWz/L7pW+xHBmKT/G710UgLUDyOEVzdgjq63QQvNUITsjPo/XGV5
+	 JZR+ftBMt9tnNleZrFYnx+fXFsigWZYazOJEkNCfb/Ufj67HyWxJ0xooxwjgIq0zp6
+	 zwVPyZ/zFZvZ09wtlsAyGa0fAAL8SFf2B1ZgeP1Y=
+Date: Thu, 29 May 2025 12:36:08 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/760c6c-aed494@github.com>
+Subject: [bluez/bluez] 5ad6ec: bass: Fix not using SID from BT_BASS_ADD_SRC
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] bass: Fix not setting SID for assistant objects
-In-Reply-To: <20250529174349.197433-1-luiz.dentz@gmail.com>
-References: <20250529174349.197433-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5454667090117261592==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5ad6ec151c61d3a573362cd33414ba4d6ffa9695
+      https://github.com/bluez/bluez/commit/5ad6ec151c61d3a573362cd33414ba4d6ffa9695
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-05-29 (Thu, 29 May 2025)
 
-Dear submitter,
+  Changed paths:
+    M profiles/audio/bass.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=967405
+  Log Message:
+  -----------
+  bass: Fix not using SID from BT_BASS_ADD_SRC
 
----Test result---
+BT_BASS_ADD_SRC command does actually have the SID of the broadcast
+source which must be set otherwise the kernel would assume it to be
+0x00 which may not always be the case.
 
-Test Summary:
-CheckPatch                    PENDING   0.26 seconds
-GitLint                       PENDING   0.30 seconds
-BuildEll                      PASS      20.23 seconds
-BluezMake                     PASS      2664.28 seconds
-MakeCheck                     PASS      20.77 seconds
-MakeDistcheck                 PASS      199.12 seconds
-CheckValgrind                 PASS      283.47 seconds
-CheckSmatch                   PASS      317.76 seconds
-bluezmakeextell               PASS      131.19 seconds
-IncrementalBuild              PENDING   0.24 seconds
-ScanBuild                     PASS      945.53 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Fixes: https://github.com/bluez/bluez/issues/1282
 
 
+  Commit: a805bae3dbc2ad62292780f3f11c32d77e5210e7
+      https://github.com/bluez/bluez/commit/a805bae3dbc2ad62292780f3f11c32d77e5210e7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-05-29 (Thu, 29 May 2025)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  bass: Fix not setting SID for assistant objects
+
+The assistant objects shall contain the SID so it can properly be sent
+with MediaAssistant.Push/BT_BASS_ADD_SRC.
 
 
---===============5454667090117261592==--
+  Commit: aed4948cd3c072fb2f8dada49c41f59882ad3a06
+      https://github.com/bluez/bluez/commit/aed4948cd3c072fb2f8dada49c41f59882ad3a06
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-05-29 (Thu, 29 May 2025)
+
+  Changed paths:
+    M doc/org.bluez.MediaAssistant.rst
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  MediaAssistant: Refactor object path
+
+This includes the SID as part of the object path, also rework the order
+of order of the terms to first show the device object path and later the
+broadcast source address so device_get_path can be used instead of doing
+another conversion.
+
+
+Compare: https://github.com/bluez/bluez/compare/760c6c2ec14a...aed4948cd3c0
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
