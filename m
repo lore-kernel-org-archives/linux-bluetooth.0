@@ -1,77 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C779718DB03
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 11:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E664B1AAA1E;
+	Thu, 29 May 2025 12:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748519443; cv=none; b=gy4rWiqOS5u9XvZld/4JTttaez34XqZDduvb+grlGcTYAA5TO7Bq/VFiwDZ+rsR7trRxR9CMbaGC+f+DjqNj16fzEN458yu1vunFPYheZrJ2OX9SSCImYY6WUNSWCA3+NujCGbG9ltYkIMFcZ8XXevdC3SIPv2ydlVVD1tfpews=
+	t=1748522915; cv=none; b=iORBy9A82URJw7dGvsa9xWmVwI8RBv0lkocT8B1duVWVMx84V36AJuTjpldXcN1rLMQoHGZM10QIspiArt2mFCRFf2KBKAkCMQk47sBYWWpw1IPwQFLzprmf275WNo252iU75dy31G83gb1nb1olKMWbtVrbu2kmNwAsXrLQ5HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748519443; c=relaxed/simple;
-	bh=EwnDoAVTMehqL2EaHnBlkmLIdIZBw9jWKBmIJojAFgc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oHoL8WkaOQrppl2d/YN0ELTU0h7eHCf2we/CnmcLY5PQw6sRf3jbBNlxve+WM2MiNE1ZXNvIb5nWgix9fj6lpWLubXObmlbCtMsj+4zVerqX6n7NdSUgKYnCtdyMvrevitMdUUM2wvsWhZL7NH5GMXMHP1zAQAA9s0Osqm3VkTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iSf4So66; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748522915; c=relaxed/simple;
+	bh=EkOjDiJqp7bgZqfwMuQBEMhV9BdRvI212Oqa8uR7MR8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b3mUNUNRoVXVXntvkgM/+gGDhd/T7KosHHOi8fnMfveKEBL3/3LsJuFr8xTITXszhyxEDhG0F88/4HXKJ/TyiPgekajtOQ3uJ6An5pvxAekmDbqZ4YWmWAKMdnrrnaSKAFaI3L/yecFcux2BoTqziTj+sLfIeyizisFOhHpGYU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=YFI8TjEt; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iSf4So66"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 41ED9C4CEE7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 11:50:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748519443;
-	bh=EwnDoAVTMehqL2EaHnBlkmLIdIZBw9jWKBmIJojAFgc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=iSf4So66GDsfR0qoo9yxRNfGoSj1+icg+lGjcMjbWxXr2+7+fNM8YJU/R4ihxDD6q
-	 fCL3uXZkvN7dJmWuxt4PjXPIDLtRUB5Oa6MEhfS2MXgzRxBjIhPLocRvDSIHRpmwsM
-	 vnW3oDn6OtCXHlOotfpgxPECt/vmQuL5bn5l99nv8fgS+ztogi8yWQiSWUsTaDIq3L
-	 6Kf4X/6+AdfE0ldv6F7vZ8E7qXyGwez7kORk1tQ27K1NNucVJVGDytljH15F6WsPU7
-	 TVpfnCHd29uXjZgtihfMcbpqjF+LhkiPwao929tVQGlX4DoyI2KvebPCEbXsXRgI7E
-	 WjJIb8jcVqdzQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 314FEC3279F; Thu, 29 May 2025 11:50:43 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220173] Bluetooth: hci0: command 0x1004 tx timeout
-Date: Thu, 29 May 2025 11:50:43 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: INSUFFICIENT_DATA
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-220173-62941-RfxYzPW1Fz@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220173-62941@https.bugzilla.kernel.org/>
-References: <bug-220173-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="YFI8TjEt"
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54TCmNW611428904, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1748522903; bh=IcZcHV+H3hSA05dZW49D/moT4cc8nYBTH69gzkx5uFc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=YFI8TjEt6ZeQocAWNBuAy59gwcg3ATQyFTr40+1jEem4z5DZO13PfKc6kDjAzX4+z
+	 TRZTBB5KKWH/j7A+tDz5GKATFHkX5E36acF8NQ4+czxNPfMWFEr6f65xPLJsObtbef
+	 0+g+Cfi0vc8jkbkZ1ioRYXk42x4eDbmFjSEC0DdLS8q7CZg2c1ocW+W24CTkmcQ8qp
+	 zMS5Yd3fgGgAN+xBpStjTrisJLiOINHFdjoAdaNIzhVmmHfEmNplIoczy0AmCfMzUG
+	 xXXWEMka6TPM0cRoDGCsmAsCxNFSJsY4WdOXTjKrSbPBMjJf/0KgphopmMlN7gpziP
+	 Po6+ZWmz0g9nw==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54TCmNW611428904
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 29 May 2025 20:48:23 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 29 May 2025 20:48:23 +0800
+Received: from localhost.localhost (172.21.132.53) by RTEXDAG02.realtek.com.tw
+ (172.21.6.101) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 29 May
+ 2025 20:48:23 +0800
+From: Hilda Wu <hildawu@realtek.com>
+To: <marcel@holtmann.org>
+CC: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <max.chou@realtek.com>,
+        <alex_lu@realsil.com.cn>
+Subject: [PATCH 0/2] Bluetooth: Add support for RTK firmware version 3 and enhanced ACL-based download acceleration
+Date: Thu, 29 May 2025 20:48:14 +0800
+Message-ID: <20250529124816.4186320-1-hildawu@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXDAG02.realtek.com.tw (172.21.6.101)
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220173
+Dear Maintainers,
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+I am submitting a patch for the Bluetooth that introduces support for RTK
+firmware version 3 and implements an enhanced download mechanism through
+ACL to improve firmware loading times.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |INSUFFICIENT_DATA
+Patch Overview:
 
---=20
-You may reply to this email to add a comment.
+1. Bluetooth: btrtl: Firmware format v3 support
+   - This addition ensures the latest RTK chipsets with firmware version 3
+     are fully supported. It includes necessary modifications to
+     accommodate new firmware structure changes.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+2. Bluetooth: btrtl: Add enhanced download support
+   - By leveraging ACL links for firmware transmission, the download
+     process is significantly accelerated, reducing the overall time and
+     enhancing performance.
+
+Testing and Validation:
+
+- The implementation has been tested on various RTK chipsets under Linux
+  based distribution.
+
+Impact and Benefits:
+
+These enhancements are beneficial for future firmware v3 chips and
+compatible with previous firmware versions. Users can expect shortened
+initialization times.
+
+Your feedback and suggestions are welcome to further refine these changes.
+Thank you for considering these enhancements.
+
+Best regards,
+Hilda
+
+Hilda Wu (2):
+  Bluetooth: btrtl: Firmware format v3 support
+  Bluetooth: btrtl: Add enhanced download support
+
+ drivers/bluetooth/btrtl.c | 871 +++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btrtl.h | 102 +++++
+ drivers/bluetooth/btusb.c |   3 +
+ 3 files changed, 968 insertions(+), 8 deletions(-)
+
+-- 
+2.34.1
+
