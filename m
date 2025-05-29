@@ -1,142 +1,139 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3959F1A5B8F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 17:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41D6B67F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 17:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748538449; cv=none; b=tXocBHLl+8QM6XNhi/PTSCqRkf6iwsvOut6TH7ir0HZeUMKX/0wA1Di3I4Z2hJbAs//zjn4p+tYyzwzPPh37TsF/wnT/03UEWyJKJEYRDq+LQ4Lj2ksNxvp7xCkx+aWXhJlL5/UyXMBGyGCH851evPmEdQ9+PkC1/azYQQ7bsDA=
+	t=1748540635; cv=none; b=D9lJvtkKUJqly+dXDvnwV8LbnoPavIIoBXaDpxW1ocbH5ctqZ8kZBSh/t2fLgBQ/1EPIDsYKuDWs8je1RwMt8/6lPNjQt+Ot8n0UBS2JwVFOVev7xbOXneLzYCU94XJNkj+ZvnVPI8bKiQ3Ub67fUofiu7fRPVt1EAKGoYxJ0eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748538449; c=relaxed/simple;
-	bh=kx0oQ3n/FzSvrV03CXrP41ncsUraEAeJ8ET8ZcwYEvo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=YsUGh+aI22iwnaXdccOJyI4vB6doEmzVu0h6CwQ7avtcu6VyeOvLfkrHAACnpT3Ae0j/T2fDKD2FEZjERp2o4wWwM9merCPYGFdCpfekrVuZAtUr2KIEyPwInzDKjO9vvf0xivDby97FU4L9NY0D+0wSkscXqDvlv73J5jkgqKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ct3rcgj2; arc=none smtp.client-ip=209.85.160.171
+	s=arc-20240116; t=1748540635; c=relaxed/simple;
+	bh=N40gmw0QUTZ8jE+4DynqfF/ANR6DPYWl9m7/PStStO0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Pf3fDoB5Co9yQIRVMGR1U3GcSPuaJISqTkw2KGKHNAbNaOqzU0N4m0v9/JhcYKlnq6VTvvF86RYt8P3Y73F/NJrD6pLgB18zJHNzUtTA69kaGiMiQBkJ6CNyOtgCnP4+1LUcGPmwYaVPaVHtzJYl2l3rZLHQu+sKKeAEB+XP6YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UWtpAF/i; arc=none smtp.client-ip=209.85.217.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ct3rcgj2"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4769aef457bso14963091cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 10:07:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UWtpAF/i"
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-4c4ecf86e8bso348906137.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 10:43:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748538447; x=1749143247; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=j6tt5aR7+b53PF45NjDz8pe2WX9ac7PjZ6jQoRFLMDw=;
-        b=Ct3rcgj29Z2FxMLNHx+h8K+z8PFkIyD9SvYfB7fgnjG7F1mtbPPtH3L9v2POEtVxIC
-         oF/1ctKcUZlK91ehK7FCZ4xecOaNsx319rxSQm3yF9Lh1ztaa5+2i2tBvqATpKWGiCpf
-         qLe+Uli4Yuu2R7vjmOCRTqEHtH5gGBPr7/Zn/G9l57wDdvGYF8tWZkW9xQxAbmSQkK2e
-         Z8nUwstll7jWgwEMPafrhGfV1yDilnRiU3E6+gRHH/w2/H2Ihg9cogvZ+0qUFJtyxSGz
-         5TkCxkb9dFgVJKJ9Iu+fMmCZlG2DxHCvDePND9SjNw8eHDfOSkZdA7ZW+yfyC/LbsAcW
-         KyLA==
+        d=gmail.com; s=20230601; t=1748540632; x=1749145432; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cIUzonX4smoR/N8dUFIME/b6c2aZwD5TKA88S95sE7U=;
+        b=UWtpAF/i0KrtRDsJTkxNrjnFeZLxti0mEjRFPs3Dwc370estFtkvZf0LIlisnXziJl
+         oG69RoP29Z29a2qB5o7HAom3HYpP7cwd0CwBFSmK2J+0RSCK2N62OnQElmpx4sqkhbe7
+         5gHju+thC+dj3e2BAGpoNfQHLxj47btEW/Wshws6zw4KqFbeqZ/FaxCVr5NFlKIh+I62
+         mxAHbKvJT0xXRwenZbn1VfQewK6xn3A04ziwqEGPAbYo4o9jLlVa4j4r/huPMSyAiKWu
+         BGaYLalOdrk9TcaNx/kkzLmT9rSe9Pyrfzu7Q1NPsZUdi2/JC0d0RDX2FrU6cWulX3Mg
+         chwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748538447; x=1749143247;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j6tt5aR7+b53PF45NjDz8pe2WX9ac7PjZ6jQoRFLMDw=;
-        b=NOQOKQZvwkwMr8u0NEGM+RLdGXq+t2/OKXir+gEJWnV1A1aNp2zWLRvtTD9dLVDwB/
-         Jd7Of4QAA3qHNh2NwPLhk37Ep9ZIA/IylCfTAjM6GFeF2AM4AvYQ8W1QyE3exvJp7sqk
-         HHMh0ZdwOgXoRLEJNIzhO2JgVtYh4mwPpvu1ndadyFEzTTdApK5oKqWVACPHTLurzfyj
-         oe+EvkYquyUuuDtY5ian40/rDGRdr/EOMYqpZpQiKDXZ5uHNZVWYdskFI53wKqGz5V2t
-         tUZKwBy4ZeYb1X41pfKh3/OHSWcAlFbOPVO2rhvVAzcbuZybs33N5DNRuJ5FXyNsbxEA
-         +NgQ==
-X-Gm-Message-State: AOJu0YzvP0gJ0TYPacbg3IRUM/lr4rFtI4GT9lXoIcrJ6Dw7EFj8B+z7
-	zg8bts+BKFiT6n5VAFCShrO9iryEL3EPMPzTnZf11AX45KEY+rvxnFF8e78wmw==
-X-Gm-Gg: ASbGncs77KqazvYrOwnvya/UjiG8lrv5AkuIzybHwueE9tVTDLbwEkqkdeg7sbnovs2
-	Z1fgbewY7VVwPm0l2aquuIivaS7gSuOItTiEw0XEITXAbSSfigYCY9sXVmoy5bHVHhRQBrDWb3K
-	fIU+a1gjYnecjjcgHzeuNp2jgH6Fgee2Cw4QC64TtQeGDa1p7o3hQTzVOR8O7LkfRcsH23+U00P
-	9jYtjt+VzPh3tFyogKs0/5gcMODRAQsSjuJ+cr3rMpuO/v+pZJe1oXkAlRGhS9EYOvCNc2PV/Qv
-	n3ZJkabiAQNE482TqaGXW6uOzZqIW2x32DxiR4Wm/5Zg/pykzWEvLLx8
-X-Google-Smtp-Source: AGHT+IG/0O3GT8VAznbZzBdjFavq/VjsjTJmvhAoNgtNWCXgjxWnVEaCWAexqUJ6e/uh03FgM00lXA==
-X-Received: by 2002:a05:622a:2b44:b0:4a4:2f42:a668 with SMTP id d75a77b69052e-4a440074ea4mr6988661cf.31.1748538446506;
-        Thu, 29 May 2025 10:07:26 -0700 (PDT)
-Received: from [172.17.0.2] ([20.246.78.55])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a435a371dfsm9749191cf.63.2025.05.29.10.07.25
+        d=1e100.net; s=20230601; t=1748540632; x=1749145432;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cIUzonX4smoR/N8dUFIME/b6c2aZwD5TKA88S95sE7U=;
+        b=YFfwLB9m2lSNz9AgxzyWOytMlv9CIrmnwYs8+37hddRS+thIKqDUMV5HiU5sgSgiBy
+         VNc4eXn4OeWjgQndYZZQ+9S5ALmA+dKj0RWiuDAPqtGvD+FtsVnsZbTFU/q0Jpm8aFeJ
+         SD2rmvJKaLur64G1jooWUJ03G/Vels7ysHVJ5c0gpZyr8uZxtzQYCcOv3FMNp19Eq4w/
+         uv0BnqbGu03gUnw7+UEEOzoWRVJnkyHS0y2MS7YDproIEzW/jaj6NojEbcNjUxUti0TI
+         DpIUY7moUsjItrp9zwM7Kz5pjO5kZGU1+UjACvEyIZkXVHYnxcDnIeCCoqLsmUkT6CdI
+         1N1g==
+X-Gm-Message-State: AOJu0Yyh6fgKuVc9WCEEii/Bc7dlfwhtlgxU84f5DsArU4zaVuw2UTLi
+	K4PadVfWDT/UpLyDeJN+NqqXNdshtzBSuGLtG6cwt49kLv2AciIu5rp/W2NdF+Lq
+X-Gm-Gg: ASbGnctoI6O+syNZjFY2Ztai3Ag0hMo7DQ79n6/uW+XGyFdgY2JJTv5KQrER2ZsRVix
+	ZFijYKeMDQvfvXQ4XSbbg/A4oo9dviGb1zAJqMmjJhimx0Fsr8yx9u90GiyDp2XBPMnwaAv87ct
+	yuXmaY7Qw/O/zKtZazayC8Ta5cYzUpwbkI0NYHfaqWExHf1Lz9d2f6jr3/QjYC/GkQ3XB4YtJTC
+	BZtfencR9EvgXY2HReQx6Tu6TnuL2wnJH3N221gZMmx8+ZjRpI5hFRRTRHbeeJDckPJca5qxi6y
+	Wqx9FuIvWjE2HjDITbsKC+MudY8KC92AaWzj2MQ9ZyUrS/7OciCnJ0ocs0bpOijN9dsWSSG9UOW
+	o3ZRKhYLLVAVCllEJ7Bpo
+X-Google-Smtp-Source: AGHT+IE2sOecN+suHLTVXs+ZElqZf/jGK3RAus41Ikr+6/B7yVGQFc17CPk1s2jpGbGuOzkNqQC0Jw==
+X-Received: by 2002:a05:6102:1625:b0:4e6:d784:3f7 with SMTP id ada2fe7eead31-4e6e40fce09mr676801137.15.1748540631681;
+        Thu, 29 May 2025 10:43:51 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87e2a2c28d8sm1379732241.15.2025.05.29.10.43.50
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 10:07:26 -0700 (PDT)
-Message-ID: <6838944e.050a0220.a5dcd.3b62@mx.google.com>
-Date: Thu, 29 May 2025 10:07:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8383926425107015543=="
+        Thu, 29 May 2025 10:43:51 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] bass: Fix not setting SID for assistant objects
+Date: Thu, 29 May 2025 13:43:49 -0400
+Message-ID: <20250529174349.197433-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ukleinek@debian.org
-Subject: RE: Bluetooth: btusb: Add support for variant of RTL8851BE (USB ID 13d3:3601)
-In-Reply-To: <20250529162333.462753-2-ukleinek@debian.org>
-References: <20250529162333.462753-2-ukleinek@debian.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8383926425107015543==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=967387
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.22 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      25.57 seconds
-CheckAllWarning               PASS      26.48 seconds
-CheckSparse                   PASS      29.87 seconds
-BuildKernel32                 PASS      23.76 seconds
-TestRunnerSetup               PASS      452.54 seconds
-TestRunner_l2cap-tester       PASS      25.20 seconds
-TestRunner_iso-tester         PASS      43.47 seconds
-TestRunner_bnep-tester        PASS      5.88 seconds
-TestRunner_mgmt-tester        FAIL      133.87 seconds
-TestRunner_rfcomm-tester      PASS      9.93 seconds
-TestRunner_sco-tester         PASS      14.59 seconds
-TestRunner_ioctl-tester       PASS      9.85 seconds
-TestRunner_mesh-tester        PASS      7.30 seconds
-TestRunner_smp-tester         PASS      8.41 seconds
-TestRunner_userchan-tester    PASS      6.03 seconds
-IncrementalBuild              PENDING   0.41 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.206 seconds
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.173 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+The assistant objects shall contain the SID so it can properly be sent
+with MediaAssistant.Push/BT_BASS_ADD_SRC.
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/bass.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index 417b7b72ff9b..2d4a86619ed8 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -90,6 +90,7 @@ struct bass_assistant {
+ 	struct btd_device *device;	/* Broadcast source device */
+ 	struct bass_data *data;		/* BASS session with peer device */
+ 	uint8_t sgrp;
++	uint8_t sid;
+ 	uint8_t bis;
+ 	uint32_t bid;
+ 	struct bt_bap_qos qos;
+@@ -913,6 +914,7 @@ static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
+ 		params.addr_type = BT_BASS_ADDR_RANDOM;
+ 
+ 	bacpy(&params.addr, device_get_address(assistant->device));
++	params.sid = assistant->sid;
+ 	put_le24(assistant->bid, params.bid);
+ 	params.pa_sync = PA_SYNC_NO_PAST;
+ 	params.pa_interval = PA_INTERVAL_UNKNOWN;
+@@ -1069,7 +1071,7 @@ static void src_ad_search_bid(void *data, void *user_data)
+ 
+ static struct bass_assistant *assistant_new(struct btd_adapter *adapter,
+ 		struct btd_device *device, struct bass_data *data,
+-		uint8_t sgrp, uint8_t bis, struct bt_bap_qos *qos,
++		uint8_t sgrp, uint8_t sid, uint8_t bis, struct bt_bap_qos *qos,
+ 		struct iovec *meta, struct iovec *caps)
+ {
+ 	struct bass_assistant *assistant;
+@@ -1085,6 +1087,7 @@ static struct bass_assistant *assistant_new(struct btd_adapter *adapter,
+ 	assistant->device = device;
+ 	assistant->data = data;
+ 	assistant->sgrp = sgrp;
++	assistant->sid = sid;
+ 	assistant->bis = bis;
+ 	assistant->qos = *qos;
+ 
+@@ -1100,8 +1103,8 @@ static struct bass_assistant *assistant_new(struct btd_adapter *adapter,
+ 	ba2str(device_get_address(device), src_addr);
+ 	ba2str(device_get_address(data->device), dev_addr);
+ 
+-	assistant->path = g_strdup_printf("%s/src_%s/dev_%s/bis%d",
+-		adapter_get_path(adapter), src_addr, dev_addr, bis);
++	assistant->path = g_strdup_printf("%s/src_%s/dev_%s/sid%d/bis%d",
++		adapter_get_path(adapter), src_addr, dev_addr, sid, bis);
+ 
+ 	g_strdelimit(assistant->path, ":", '_');
+ 
+@@ -1148,7 +1151,7 @@ static void bis_probe(uint8_t sid, uint8_t bis, uint8_t sgrp,
+ 		DBG("%s data %p BIS %d", addr, data, bis);
+ 
+ 		assistant = assistant_new(adapter, device, data, sgrp,
+-							bis, qos, meta, caps);
++						sid, bis, qos, meta, caps);
+ 
+ 		if (g_dbus_register_interface(btd_get_dbus_connection(),
+ 						assistant->path,
+-- 
+2.49.0
 
---===============8383926425107015543==--
