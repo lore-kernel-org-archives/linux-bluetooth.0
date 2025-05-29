@@ -1,75 +1,66 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1106117CA17
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 16:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE68347B4
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 16:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748536645; cv=none; b=KS1vwHV0CBf+J8V/Hf/EbFwqc7snxECuCndQFBn8lldZD9L22iiNLBw+hPNhi3lUgwFOjFYOsqG25Pfi1Iu3XfFk2R2cDVzPn/7bkAgoVKmy5GDDCngV1G3mkT2VOCozRHgRnMkufJ7BHBHPntP2an/i5wN9HnIgPcu6j4DfzFQ=
+	t=1748536981; cv=none; b=jSnLZ0oAO44xfx4ZrqG0h9C3FhYuPWUCI9d6OsXbsoJul2IiH7hjvNEE3dj8ADWf0BuyWHkShZtEDbcglHpm2CBN12AEa3T1iMril4bu7eKb8K9Jk5dg7HD2ErCB3W76ASNaD2542IETsRhk5ASvMsp3sytGXAW429SfLO9blA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748536645; c=relaxed/simple;
-	bh=36XtsfB/Y/+r/p4PcJpXDCd1enWQ5otOmMPW+JGUpDY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g1FD3z8KI6zVO+1ckTpoeS5nwaLb7AXz0Y2s973i4R3OEobd/cNbOoKVD0IN0vMlPeCyPO5DTX7c/oIgxTfAZs+8bMS7Rafx39zRtXkVXUykAE8Ela32mN/Te8KbsMA1orD+Rj23t/4LbbmRQuvIFbtQ7c/UIpfkL50Wgcu3xSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kali.org; spf=pass smtp.mailfrom=kali.org; dkim=pass (2048-bit key) header.d=kali.org header.i=@kali.org header.b=PuC9zSuv; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kali.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kali.org
+	s=arc-20240116; t=1748536981; c=relaxed/simple;
+	bh=DNkWxCdEjfVGq7c+LiDk9aB22bzxILOPtVUffsk4RPk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=u6xLtM03NVyb+5QOepDzMhHzCws+m1xs0HixrrdmYDlrVrRhCTvZCdPBY60CSDqDOYu+vJjSFYri5NGvk+GON+HJRx+ndJZoArCuHET98Bh3azOu+buKMqMRYb2vAAHs4zxMTEX+Od9PwV5CU2SPH3rVbLBnEKPeLR84MzCh04o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jHf0VtvA; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kali.org header.i=@kali.org header.b="PuC9zSuv"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-73044329768so822261a34.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 09:37:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jHf0VtvA"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-87def66dbceso332704241.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 May 2025 09:43:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1748536643; x=1749141443; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NJbHX8UWtBwYvowVAn6Pcv/J1e4Yt0eXJegAoG1XhWA=;
-        b=PuC9zSuv8gBLVg5UWkbiVhbOpUD6rMAttLSsopnGAxGGAMkIhGNFBhlz8Nav9iFY36
-         TNY0FEO4KcQGdWofGyTHJIMPQcGbOZaK0pVwg9m5rgTPzm4EizY0bTaJ1DUCHTizLbPI
-         xulEfZtZQ2vfYOMV0M00bw0mEB2oXFVuncmphL5+mJ0+E+IQboxk8JHDhI3TYpFUlRSI
-         j/HYd2K43KzeB6XSDK3j6rWFH7wiL4I3PI8aH0l1YkpvsUkt0FgtstCi8G65ApML21XV
-         6ggMqf27Mg9bax3Ff0SVLSekEkPIHnZ+nHJK6Ys6eG3mA53DD2HaXM4m+12DItNSz1u+
-         pieQ==
+        d=gmail.com; s=20230601; t=1748536978; x=1749141778; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CcAVI4IfUXwwYctPq/9iofIw6UFjeTR3M7c+Xw/ivnY=;
+        b=jHf0VtvATho+uohrqC29j526Jhe2B2vwu3zCXJiFQX88WoPPmxq6eESANS3bj1LXlO
+         yoZq6iaDyRjRnWH0LZwDiHa+ZdnM7tjN698K92vPg7Ik1eHXzGR4RRhzC8wFMnpbvmmD
+         EZtCqp41hS44CJ9iXWOnqQmjD1++PbHsecU+NsrO/pKLAX4vRvC8uWuFX8fRLf5mr/JV
+         XwgpauprNl6i3TZdAqSCPIZi5bLJlouR821a1DyKi1bLf/VvpcXlBlqM9FsMc+U6BbNU
+         CM8XF6dCrwzEHdvtMwM9UQUoHotwy+43vSR0sLRDD7RpDmgLVCcGhmKPMD8aQXTVP4FH
+         doKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748536643; x=1749141443;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NJbHX8UWtBwYvowVAn6Pcv/J1e4Yt0eXJegAoG1XhWA=;
-        b=jdH8fuHT6r3pSDkFTczjLxU94t139mIqLCu7RWdUDd25hPTTjR7yzleYTa7LQ8KqVi
-         pbZGgfALKsT9eraZng/zW6ESevpOd4IclB3JAq0j2UPamIMS0iwN32jCiaFPTKg4bxYK
-         7SEV4Hbp+r585XKe//7D9FiPj1ofRaxXY8ER+bRKRow3e/ZAnPcwi8eH6j4aR//10tJD
-         piwmya9gEk0odlatpuvdS3wqgdISQ0BwUg2hPtE8Tyi7Fgk7TRB4Px7iITToBKUMvLeL
-         aziS8/KLruFQCnHUJqogMyHoNNHEuHvVL4XT/WDmAAQPvax0rCUYUFg1uBbaon2pCAzO
-         mmsg==
-X-Gm-Message-State: AOJu0Yy0L//l8Ld6fq1Ba6SD+UCmDZFcYRrmiEoLPoYKc5rY10ASg+Js
-	3kdE+8fSQhVM0IjOLaX2qPmVDxE7izWbgy+hIv9sMAZ8flCCLEAMJqCFwyCU+I69a4816SqCUq0
-	l2935OIg=
-X-Gm-Gg: ASbGncsOuJAIeKctR6K+D4qwNitJdA6qrs5BbIaizuna+kF1JeXYC4P62r0oghUMHql
-	ltljnqC1mqwcLCzMbryggybTSI1d3PHxO7R9rF4ZnGvAXC6kQobww9eYQK0C3nS3YNl2wHhaBis
-	q+6hO2QBYclASbLMW90h5/fNRgiC0JxD8FO7aMz86DWgLMBRP8Tfj9Or0rrRWbtcm5B0EL1uiva
-	RSXarFctgKeutRs6Z0C9X1394BbYIQRH9IGc3t9nzy6nsUbu9A+1UdhBzvusdclNn/QwXw23z37
-	nn1MdjrB6J/TGfMi5qjZZ+cSyfvLbQ1O/3KsnNBsChAD6rhv3T+NDzUp6dY2PCe0UMQNeFFgbHb
-	el1ssC9NrEYXXIyzhbO8=
-X-Google-Smtp-Source: AGHT+IGi9zW66xHGV0ooQgA4CE2RM/TMhTeayWKMwz8Z/b5BCfRRoPEIHimSNVfOYav1Uk6Qofw95Q==
-X-Received: by 2002:a05:6830:6589:b0:72b:940a:a7c9 with SMTP id 46e09a7af769-73670a605c7mr15249a34.27.1748536632389;
-        Thu, 29 May 2025 09:37:12 -0700 (PDT)
-Received: from localhost (104-48-214-220.lightspeed.snantx.sbcglobal.net. [104.48.214.220])
-        by smtp.gmail.com with UTF8SMTPSA id 46e09a7af769-735af85614csm291924a34.26.2025.05.29.09.37.11
+        d=1e100.net; s=20230601; t=1748536978; x=1749141778;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CcAVI4IfUXwwYctPq/9iofIw6UFjeTR3M7c+Xw/ivnY=;
+        b=OxNXsXMPd1HzdbfCyG7w63hfNbEw8MKGObKAJSdjxSsA+l88SqVvZisRtc/tdCi/OC
+         9zI4jl7EWFXbMlaIStOaVxD0f+L6A+8/chIIE48sL8bQry1QOBkTX/Z6a8W/Hz5bhJAm
+         tL994c4mTKpnsW4ZIPKvBNHku4bh/1RttaC/kiJAFNSE4wnr7mC4S5sEbrgxDyDQGILu
+         oXKTXJySWujts3jIP2DGtm46tyBJdKDpDoDqHUoBUoCUO2a6EbNskOUf9WfsUv1oO5Pu
+         CoE33FT0UAZzbu/Ca6Sjgm9+y8StVMf/niJE0jDJl63/Kx6WC5rND8DR+9nLriUw7vx3
+         TqUw==
+X-Gm-Message-State: AOJu0YxkQmkuwO9ZKu+exELj3uOzCA1a6zUpuzj8fpFgU8iy6g3dZHRn
+	FVc4eliN0HKh/DYIGWJ0zWOTb1eR5okrRzsw7R5qGFRutCSmJabepJkHtFBiTs0E
+X-Gm-Gg: ASbGncsvL9LxTaCketLfoFLHuJ0N2lr/8jXn6sGDwjaVNYKaJUU71ha/W56JKIFRxqC
+	PiYqPoOqnvv65zxlj/XSIdMDktQ1gIDiWAPbzVL8efR21I8ANVTRpuXX7wiUmSK/BB0+MTzelK1
+	8LPqqKvCkSxSWbe1dui8Rtd91PkF6JYU3Z9VmgJ5iaXDQ1plSBw2LRg/V8qw5UbE3RYcRfxhbx6
+	xSpqIPJ6TctbTayEiXV3A9Qagz/lBK71+S0f88gNLG1nEQiA9NkHK82fLo83cyrX1d2JkTtzh02
+	Anb+tXqd85iSLSsopahdmwva35BXOZISLYJ7kkMtvYOB0GWHnNJk+3TQF4qvW8EEzkAs53PTUtO
+	lWZWnOdGf/VzDvYHH9Kpr
+X-Google-Smtp-Source: AGHT+IFfNpaxBIZ592dk9e/4/8lC0515daVOhPfYu7ibx1D9qTdINqY3zQ3s8RscjMwDn7haC6AAHA==
+X-Received: by 2002:a05:6102:3c83:b0:4b6:5e0f:6ddc with SMTP id ada2fe7eead31-4e6e410cb2dmr342415137.14.1748536978524;
+        Thu, 29 May 2025 09:42:58 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e644429652sm1351495137.4.2025.05.29.09.42.57
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 09:37:11 -0700 (PDT)
-From: Steev Klimaszewski <steev@kali.org>
-To: quic_chejiang@quicinc.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org
-Subject: Re: [v2] Bluetooth: hci_qca: Drop unused event during BT on
-Date: Thu, 29 May 2025 11:37:11 -0500
-Message-ID: <20250529163711.475128-1-steev@kali.org>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20240821105027.425783-1-quic_chejiang@quicinc.com>
-References: <20240821105027.425783-1-quic_chejiang@quicinc.com>
+        Thu, 29 May 2025 09:42:57 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] bass: Fix not using SID from BT_BASS_ADD_SRC
+Date: Thu, 29 May 2025 12:42:56 -0400
+Message-ID: <20250529164256.188167-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -78,23 +69,53 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I have been looking into a long standing issue on the Thinkpad X13s, which has a
-WCN6855 where every so often would get the following error in dmesg output:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Bluetooth: hci0: unexpected event for opcode 0xfc48
+BT_BASS_ADD_SRC command does actually have the SID of the broadcast
+source which must be set otherwise the kernel would assume it to be
+0x00 which may not always be the case.
 
-I don't get the message super often, 11 times since 16 April, though I do not
-know how many reboots happened in that time.
+Fixes: https://github.com/bluez/bluez/issues/1282
+---
+ profiles/audio/bass.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-I noticed you wrote this patch 9 months ago, and I've applied it locally and in
-my testing, with it applied, I cannot get the unexpected event anymore.  Looking
-in patchwork, it says this patch was superseded, but I can't find what its
-replacement is.
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index 017a5aa75c85..417b7b72ff9b 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -106,6 +106,7 @@ struct bass_delegator {
+ 	struct bt_bap *bap;
+ 	unsigned int state_id;
+ 	unsigned int bcode_id;
++	uint8_t sid;
+ 	uint8_t *bcode;
+ 	unsigned int timeout;
+ 	struct queue *bcode_reqs;
+@@ -646,6 +647,7 @@ static void bap_attached(struct bt_bap *bap, void *user_data)
+ 		btd_device_get_bdaddr_type(device),
+ 		BT_IO_OPT_MODE, BT_IO_MODE_ISO,
+ 		BT_IO_OPT_QOS, &bap_sink_pa_qos,
++		BT_IO_OPT_ISO_BC_SID, dg->sid,
+ 		BT_IO_OPT_INVALID);
+ 	if (!dg->io) {
+ 		error("%s", err->message);
+@@ -1320,6 +1322,7 @@ probe:
+ 
+ 	dg->device = device;
+ 	dg->src = bcast_src;
++	dg->sid = params->sid;
+ 	dg->bcode_reqs = queue_new();
+ 	dg->setups = queue_new();
+ 
+@@ -1460,6 +1463,7 @@ static int handle_mod_src_req(struct bt_bcast_src *bcast_src,
+ 				btd_device_get_bdaddr_type(dg->device),
+ 				BT_IO_OPT_MODE, BT_IO_MODE_ISO,
+ 				BT_IO_OPT_QOS, &bap_sink_pa_qos,
++				BT_IO_OPT_ISO_BC_SID, dg->sid,
+ 				BT_IO_OPT_INVALID);
+ 			if (!dg->io) {
+ 				error("%s", err->message);
+-- 
+2.49.0
 
-Does anyone know if this patch just fell through the cracks?
-
--- steev
-
-Resending due to the previous reply having an empty subject, I am not sure how
-that happened as the subject seemed to move into the body of the email.  Sorry
-for the noise!
