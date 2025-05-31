@@ -1,149 +1,206 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2455C55E69
-	for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 08:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30B7238142
+	for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 11:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748679651; cv=none; b=Eb6p5+wwz47nOkyJM5uBKJAWFaVh1y43jXT23NIaJRUT3burI62c/FwdvkJON+T/hzWULruZUIBbDFTf5y2TWPZtP246dDuU53LXFGs4YTkDxSfvfkDcsejYJ+HCDvsyUsd2nyuhHCpBFzU16JYKrmn4HFiz6br4DHiK2hYJFGg=
+	t=1748691787; cv=none; b=ierpF36HV2S4zbl2+NdAIytK0YGpxWJlDAS1kNijPGbCEx2/o/m2y6Epavd1JeUjk31aMQcKggEmFiy17S2Nitp6VnXx/Yg1V0l/LEW/NPUu0htNUB7a5a/VP/vsEnsvgDx91Y9G0U335e5W0WRj9dF5JslFxNEp2U3BjwMgeqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748679651; c=relaxed/simple;
-	bh=1vlYZmgTa+c6PdcjBOm0bSQCfQ2A0Od0AYLp31vGMqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ccRyKDlpfpIMtylQLl2XrV2oBQEjeJizF0NRjAG3tpQykteNtDabJMXIsZK0fgYJeRId7tziBtC2GOrEE3aApDnyrn6B6b8yZBaUwDMV4USzoOYwGc0Bja2nuUbup+hmjGucHslecFLW9OjOgHyEUu4RSiZsnn7liOOPJkociJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T9cwm8GR; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748691787; c=relaxed/simple;
+	bh=pLgthJHLUn9En+a53x+dfTQP5k5a1fdOiO4b6/0r1Js=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=f7j1t6qnX5wRzY8nB7+OtBOntEIryogBHwNJl2KJgUPQtB7eQNw7nMgki4QXmxJ8W0tvm6sLzQx3vSe97DCrzlAEWr3BUZMCQf8C+ciKGysuFb8RdOHhyLB17NRc7AwNAQdshV+5oEQbaabLeg/AxHqAh+IlQx/hrw9slQk5U/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bxk18yOL; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T9cwm8GR"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ad89d8a270fso796607266b.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 01:20:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748679647; x=1749284447; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4lyyaIlp8Ls0DKLnOXoYHQT1ZRagcGjnJa2msDzsoVc=;
-        b=T9cwm8GRp6I4v6gxBfB3mGHilT7z23r6f3Efc5FGt0ojqeDewMQP0mJ8wsyDGYOxs9
-         2tyFobIfP/wQnCZUBDWSGYOK5glB3kp5mJslx0iJCnNaQq8dq/Nlqher5TlM2O1TiLi4
-         zOZU5wfrLE/ti6zGs0nuJvxdzmQR3YbhIjJBGMA/77D45hK9Vtf3isMD5bfv9KeV+Ud5
-         Uo8iPkPPEhbsC6VSvy2iNZW6UhpoXZu9d8l6S9n6xDcGnaNobL/SbeoPeW045EaqK40K
-         5BVzxW6cKUaIzXzma66i8tkiHkI5aoJeP4UcKfVDaEU28DfEK6+dfUjHQxdnrDMGK/BR
-         luqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748679647; x=1749284447;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4lyyaIlp8Ls0DKLnOXoYHQT1ZRagcGjnJa2msDzsoVc=;
-        b=afyiY5awhmZROwJDLFpiGiNJXhanJ5uFJpQ4B4OaRSqPll7nXCVs0CEBuNiW9+/NMA
-         44nzS58SIfiGM2iSdjttvkyEoC+OTCszToqfwNBUpJBB40GbmbcyHomTNihjw8lvl83x
-         BvipSriOsILXs6fk2svtTGxl9Rox1QBGhdYNxzkTZKX0+zrfchJ+6YIhW/n6MLXJ0BeA
-         9iJyeWHmLsKNvET2o26bfL48M3ooyKNpprqm5xuYKUhF6WnRMfNuAfUZB9gfhcblMbv5
-         OHVmnG/JbpVetUrXJYFDDmv3CRULy4EHLM0t3wjDjJjfV2PWuKBxC1PsEAHSZOGAkApw
-         9P/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWx/jDiLL+PHLa/t3f9RDMW/4884x8UuKI8i81unJDaxHynmECUwAFqQd0qflP5sXx1MCFsRzLI+9AX1bp6RWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3biX5JBHy4TG2ZZ6UnL0AE2Tx+Jh8NhpJY07sQLfBywUKeuKN
-	Zp0KNJkdywHOLqPQAWVah4vLZwjMcAYBvdnHiFMhavQYrez/wiypnn8j
-X-Gm-Gg: ASbGncuBSsNI/46MY6Dp0oP90H2BohLxq+6Z1DuJs5s+LZBM2DX/TRAOR0hB8RYk9gS
-	jXEl3zmZi86m8EXXC+z3Al8iPIgEQpPnSPDtnh9m9OBIQ2LFwl1eSGSOuNWmCuArXR6szS4GLIn
-	tODAueETWP00753ypmaeLI8karF+P8Qp7yRphQG3Z+dtduNPE309XqLmmOjVrxaJ9NrU4U0XQ7T
-	DxlmajpwGFP2tDr9NiU9uxgHSk6gltCtGtOE40TGInAqV13KxP99I+XsV5gCdhAP9gJP+TBaquE
-	35OS8ni+aYur2PeydbbN9FfeAUFKWR+gYifKgf9FP5hWtLZ1uyTQpmIpZN8GAUFNXsupUmNcgoh
-	T1sPnFvYNiUJr+uy4FoQ=
-X-Google-Smtp-Source: AGHT+IEitgMfxpJiEdNjojPC3xeqExcB34APiyjqTynORPOYgV1OpdxWwxPFvvNKTX9Gkwj6bNNwPA==
-X-Received: by 2002:a17:907:6096:b0:ad5:5086:c2c7 with SMTP id a640c23a62f3a-ad8b0d7163cmr995962266b.15.1748679647153;
-        Sat, 31 May 2025 01:20:47 -0700 (PDT)
-Received: from eldamar.lan (c-82-192-244-13.customer.ggaweb.ch. [82.192.244.13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5d84f2easm455062266b.84.2025.05.31.01.20.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 May 2025 01:20:44 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id A64F8BE2DE0; Sat, 31 May 2025 10:20:43 +0200 (CEST)
-Date: Sat, 31 May 2025 10:20:43 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Andrew Sayers <kernel.org@pileofstuff.org>
-Cc: Antonio Russo <aerusso@aerusso.net>,
-	Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Do not start mpris-proxy for root user
-Message-ID: <aDq72xTNkz0kDqpW@eldamar.lan>
-References: <a15e6919-9000-4628-baec-a2d2cc327903@aerusso.net>
- <aCiLTy-IuqV6V7WA@eldamar.lan>
- <aCncrfc7qbtLEpta@andrews-2024-laptop.sayers>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bxk18yOL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748691786; x=1780227786;
+  h=date:from:to:cc:subject:message-id;
+  bh=pLgthJHLUn9En+a53x+dfTQP5k5a1fdOiO4b6/0r1Js=;
+  b=bxk18yOLry/Z5Wnw2e65XGqnRRxwlM9CeTHKcPiLc9oqKOx1cK1wEptu
+   bpYE+XLYWoy1hr9w4VEW9uHer9bkw3caWpKCimtg4vhVNtjjAjVRBurCs
+   DJf7ohHMH74HNuXpyKMU0gOmcDwz5npoRERXJRuu/YUFqpKPeYWhMwuKx
+   7rVG/YHSTigQRFRn18ZwF6XGtlCWuDPFLUp/EENFLFP48eW5kSJyqtFMy
+   BcNqxvHw0ckLbz5SOi9ktfjdyCSQzpbMqeJKHJhcDhRLTPPLC4OTUjLph
+   lnHuVhzDcdb/khIXMukmAoTEUVcKludFnc7zqYe3oja79ULLrcbFDBKpZ
+   A==;
+X-CSE-ConnectionGUID: /RkOtwGSS9SnU9IIq7Dm7g==
+X-CSE-MsgGUID: 8X+wzuyeTQGBQq+L1ED9EA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11450"; a="61030373"
+X-IronPort-AV: E=Sophos;i="6.16,198,1744095600"; 
+   d="scan'208";a="61030373"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2025 04:43:06 -0700
+X-CSE-ConnectionGUID: S1H9qL2WQHCcVYZxRC4U/A==
+X-CSE-MsgGUID: LI5rQ8eGTjywQ7jiw88+XQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,198,1744095600"; 
+   d="scan'208";a="149389449"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 31 May 2025 04:43:05 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uLKcA-000YNA-0W;
+	Sat, 31 May 2025 11:43:02 +0000
+Date: Sat, 31 May 2025 19:42:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ a731614b3044711d3a29556a3a748bd5ff808a79
+Message-ID: <202505311947.fX84Oyf9-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aCncrfc7qbtLEpta@andrews-2024-laptop.sayers>
 
-Hi,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: a731614b3044711d3a29556a3a748bd5ff808a79  Bluetooth: L2CAP: Fix not responding with L2CAP_CR_LE_ENCRYPTION
 
-On Sun, May 18, 2025 at 02:12:41PM +0100, Andrew Sayers wrote:
-> On Sat, May 17, 2025 at 03:12:47PM +0200, Salvatore Bonaccorso wrote:
-> > On Sun, Jan 26, 2025 at 08:04:27AM -0700, Antonio Russo wrote:
-> > > Hello,
-> > > 
-> > > A default installation of bluez results in the systemd user unit
-> > > mpris-proxy.service being started for all users---including root.
-> > > This unnecessarily exposes root to any security vulnerability in
-> > > mpris-proxy.
-> > > 
-> > > Please consider the following trivial patch that changes this
-> > > default behavior.
-> > > 
-> > > Best,
-> > > Antonio Russo
-> > > 
-> > > 
-> > > From d9e02494e661109607c073968fa352c1397a1ffb Mon Sep 17 00:00:00 2001
-> > > From: Antonio Enrico Russo <aerusso@aerusso.net>
-> > > Date: Sun, 26 Jan 2025 08:00:26 -0700
-> > > Subject: [PATCH] Do not start mpris-proxy for root user
-> > > 
-> > > A default installation of bluez results in the systemd user unit
-> > > mpris-proxy.service being started for all users---including root.
-> > > This unnecessarily exposes root to any security vulnerability in
-> > > mpris-proxy.
-> > > 
-> > > Inhibit this default behavior by using ConditionUser=!root.
-> > > 
-> > > Signed-off-by: Antonio Enrico Russo <aerusso@aerusso.net>
-> > > ---
-> > >  tools/mpris-proxy.service.in | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/tools/mpris-proxy.service.in b/tools/mpris-proxy.service.in
-> > > index 5307490..118ed6e 100644
-> > > --- a/tools/mpris-proxy.service.in
-> > > +++ b/tools/mpris-proxy.service.in
-> > > @@ -4,6 +4,7 @@ Documentation=man:mpris-proxy(1)
-> > >  Wants=dbus.socket
-> > >  After=dbus.socket
-> > > +ConditionUser=!root
-> > >  [Service]
-> > >  Type=simple
-> > > -- 
-> > > 2.48.1
-> > 
-> > Looping in all primary involved people for adding or touching the
-> > systemd unit file. Luiz, Guido and Andrew, any opinion on the proposed
-> > change?
-> 
-> It sounds like the same logic would apply to all system accounts.
-> Would "ConditionUser=!@system" make more sense?  For details, see
-> https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#ConditionUser=
+elapsed time: 1030m
 
-Guido, what is your take here? The suggestion sounds sensible to me.
+configs tested: 129
+configs skipped: 5
 
-wonder how we can best move forward here, to have it then as well
-resolved downstream.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-Regards,
-Salvatore
+tested configs:
+alpha                             allnoconfig    gcc-15.1.0
+alpha                            allyesconfig    gcc-15.1.0
+arc                              allmodconfig    gcc-15.1.0
+arc                               allnoconfig    gcc-15.1.0
+arc                              allyesconfig    gcc-15.1.0
+arc                      axs103_smp_defconfig    gcc-15.1.0
+arc                            hsdk_defconfig    gcc-15.1.0
+arc                        nsimosci_defconfig    gcc-15.1.0
+arc                   randconfig-001-20250531    gcc-15.1.0
+arc                   randconfig-002-20250531    gcc-15.1.0
+arm                              allmodconfig    gcc-15.1.0
+arm                               allnoconfig    clang-21
+arm                              allyesconfig    gcc-15.1.0
+arm                            hisi_defconfig    gcc-15.1.0
+arm                        mvebu_v7_defconfig    clang-21
+arm                           omap1_defconfig    gcc-15.1.0
+arm                   randconfig-001-20250531    gcc-13.3.0
+arm                   randconfig-002-20250531    gcc-13.3.0
+arm                   randconfig-003-20250531    gcc-7.5.0
+arm                   randconfig-004-20250531    gcc-7.5.0
+arm64                            allmodconfig    clang-19
+arm64                             allnoconfig    gcc-15.1.0
+arm64                 randconfig-001-20250531    gcc-10.5.0
+arm64                 randconfig-002-20250531    clang-20
+arm64                 randconfig-003-20250531    clang-21
+arm64                 randconfig-004-20250531    clang-21
+csky                              allnoconfig    gcc-15.1.0
+csky                  randconfig-001-20250531    gcc-12.4.0
+csky                  randconfig-002-20250531    gcc-15.1.0
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-21
+hexagon                          allyesconfig    clang-21
+hexagon               randconfig-001-20250531    clang-21
+hexagon               randconfig-002-20250531    clang-21
+i386                             alldefconfig    gcc-12
+i386                             allmodconfig    gcc-12
+i386                              allnoconfig    gcc-12
+i386                             allyesconfig    gcc-12
+i386        buildonly-randconfig-001-20250531    gcc-12
+i386        buildonly-randconfig-002-20250531    gcc-12
+i386        buildonly-randconfig-003-20250531    gcc-12
+i386        buildonly-randconfig-004-20250531    clang-20
+i386        buildonly-randconfig-005-20250531    clang-20
+i386        buildonly-randconfig-006-20250531    clang-20
+i386                                defconfig    clang-20
+loongarch                         allnoconfig    gcc-15.1.0
+loongarch             randconfig-001-20250531    gcc-15.1.0
+loongarch             randconfig-002-20250531    gcc-15.1.0
+m68k                             allmodconfig    gcc-15.1.0
+m68k                              allnoconfig    gcc-15.1.0
+m68k                             allyesconfig    gcc-15.1.0
+m68k                       bvme6000_defconfig    gcc-15.1.0
+microblaze                       allmodconfig    gcc-15.1.0
+microblaze                        allnoconfig    gcc-15.1.0
+microblaze                       allyesconfig    gcc-15.1.0
+mips                              allnoconfig    gcc-15.1.0
+mips                      maltaaprp_defconfig    clang-21
+mips                         rt305x_defconfig    clang-21
+nios2                             allnoconfig    gcc-14.2.0
+nios2                 randconfig-001-20250531    gcc-10.5.0
+nios2                 randconfig-002-20250531    gcc-5.5.0
+openrisc                          allnoconfig    gcc-15.1.0
+openrisc                         allyesconfig    gcc-15.1.0
+openrisc                            defconfig    gcc-15.1.0
+parisc                           allmodconfig    gcc-15.1.0
+parisc                            allnoconfig    gcc-15.1.0
+parisc                           allyesconfig    gcc-15.1.0
+parisc                              defconfig    gcc-15.1.0
+parisc                randconfig-001-20250531    gcc-7.5.0
+parisc                randconfig-002-20250531    gcc-10.5.0
+powerpc                    adder875_defconfig    gcc-15.1.0
+powerpc                          allmodconfig    gcc-15.1.0
+powerpc                           allnoconfig    gcc-15.1.0
+powerpc                          allyesconfig    clang-21
+powerpc                        cell_defconfig    gcc-15.1.0
+powerpc                       ebony_defconfig    clang-21
+powerpc                 mpc836x_rdk_defconfig    clang-21
+powerpc               randconfig-001-20250531    gcc-11.5.0
+powerpc               randconfig-002-20250531    gcc-5.5.0
+powerpc               randconfig-003-20250531    gcc-8.5.0
+powerpc64             randconfig-001-20250531    clang-21
+powerpc64             randconfig-003-20250531    clang-17
+riscv                            allmodconfig    clang-21
+riscv                             allnoconfig    gcc-15.1.0
+riscv                            allyesconfig    clang-16
+riscv                               defconfig    clang-21
+riscv                 randconfig-001-20250531    gcc-15.1.0
+riscv                 randconfig-002-20250531    clang-21
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-21
+s390                             allyesconfig    gcc-15.1.0
+s390                                defconfig    clang-21
+s390                  randconfig-001-20250531    gcc-9.3.0
+s390                  randconfig-002-20250531    clang-21
+sh                               allmodconfig    gcc-15.1.0
+sh                                allnoconfig    gcc-15.1.0
+sh                               allyesconfig    gcc-15.1.0
+sh                                  defconfig    gcc-15.1.0
+sh                    randconfig-001-20250531    gcc-15.1.0
+sh                    randconfig-002-20250531    gcc-10.5.0
+sh                          rsk7269_defconfig    gcc-15.1.0
+sh                           se7206_defconfig    gcc-15.1.0
+sparc                             allnoconfig    gcc-15.1.0
+sparc                 randconfig-001-20250531    gcc-8.5.0
+sparc                 randconfig-002-20250531    gcc-6.5.0
+sparc64                             defconfig    gcc-15.1.0
+sparc64               randconfig-001-20250531    gcc-12.4.0
+sparc64               randconfig-002-20250531    gcc-9.3.0
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-21
+um                               allyesconfig    gcc-12
+um                                  defconfig    clang-21
+um                             i386_defconfig    gcc-12
+um                    randconfig-001-20250531    gcc-12
+um                    randconfig-002-20250531    gcc-11
+um                           x86_64_defconfig    clang-21
+x86_64                            allnoconfig    clang-20
+x86_64                           allyesconfig    clang-20
+x86_64      buildonly-randconfig-001-20250531    clang-20
+x86_64      buildonly-randconfig-002-20250531    gcc-12
+x86_64      buildonly-randconfig-003-20250531    gcc-12
+x86_64      buildonly-randconfig-004-20250531    gcc-12
+x86_64      buildonly-randconfig-005-20250531    clang-20
+x86_64      buildonly-randconfig-006-20250531    clang-20
+x86_64                              defconfig    gcc-11
+x86_64                          rhel-9.4-rust    clang-18
+xtensa                            allnoconfig    gcc-15.1.0
+xtensa                randconfig-001-20250531    gcc-9.3.0
+xtensa                randconfig-002-20250531    gcc-13.3.0
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
