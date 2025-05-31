@@ -1,127 +1,142 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E4C239E79
-	for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 15:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748705128; cv=pass; b=lHSGP0aL2i176uutFeH73VAOYFevFPgkRfxbMoI7KDVQNMNEsI9HohoLOnj/5L+9tF0O1VBYgchrexOGCjw3RsPHHT5Fu4mNJ5QFRaP7BdDgf4SqhOHu7uqm0k1uPHMISS3BiabT7x0UVxzNKRlK0nMPCFqlitu0885mRRHWZQo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748705128; c=relaxed/simple;
-	bh=Ohu28niYx+wAdnqxRBI18sjRku1SvWvvaB7fLxW4kMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aH0NQxejjbRFRNue4BwtfTz9cR4nB5EUPfF6ZXNvHZb1nm50SWNAw7XL8RamXF6IZBHvkT2fpRcoQHCV2Ewr8bppWXOCX2s+CD6hDQk7C3dweZRPz36pgtd4/qrVLR6EPTkqTQrFagx65YUFIF6sBkco2SX1zOHa56/VZt3BarM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=jMBem92V; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=xMvb5BHi; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A8017BB6
+	for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 15:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748707003; cv=none; b=Od8KRXOU0jG/qwi8JT+cmIf6oerRhMdQmKOZ/+AuTDy5VFHPGmwdpqWYmReXjuBaVgLmZFEb78nNXRs+8dacglkawFwCmGjnoOyDL9HymJlZVQbF81WoMP4QlqUrnkcq/WJvOeYhpdsKTw7AIqZGFfyks6X0UBCV8U0XI0wPTmg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748707003; c=relaxed/simple;
+	bh=TnRoqr/5fAaFNAkGTiRwH/e4NUZxcYZGPcPvmkwI6T0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=h3Atq3bBXLVPfHOuDYD9b1vRiRT8ircxBm5b/d1Kv6kgFixWs5LgIQCuzkQWDts5X7fKpsVgcba6U8LCXqqE7ck7c8joJ0tnL5JXHJPjPtlkJj3YFecyul+u4JXMjFSaHSWjTIgOacabcSl08bKicFgULFyKPogfEHFjDPwR8hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JkHpzGCH; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="jMBem92V";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="xMvb5BHi"
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4b8kSS4R1Gz49Q8b
-	for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 18:25:12 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1748705112;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Z4/eIfOoAApJB+M2CTh9B7BsP1KbCNroKII7b2jF6co=;
-	b=jMBem92ViU82aQHY55tHIHr33AHYjnKNs8gIq4AdW9kbXTwhEFLTAGsG5rsC+7Iuw94YFL
-	cwE7y8KZUkQwdqJWz/mQ9vB/hnc9V9wp1BKc1OUdJDRJ0bKq8UC6QV+BmTX96xdpacIU/v
-	NOIcNd43IS+mGeLxoBNHYDEcTzMCd0TBty/y+YkwzILofM91t0GTBUI1VJebYGvt3IsX6J
-	PQsw6PZfKfkU51Yueh4F4oo1E1N4dbqCOBRI8RV65aF7TuHXCPfbeBygIN3EhgAZspk+wu
-	nr1Ci0kM/g/4zzklheBpGU6xjmai18MoCcd3rW9jWhYN7PEVbCqlMoEMvpS+vQ==
-Received: from monolith.lan (unknown [185.77.218.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4b8kSJ0Nd2zyVb;
-	Sat, 31 May 2025 18:25:03 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1748705104;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Z4/eIfOoAApJB+M2CTh9B7BsP1KbCNroKII7b2jF6co=;
-	b=xMvb5BHi737K48dyUV/8rRNLxgLTnridq2EYXiMEw+E307DJNNRGLo/X+FamM4R+qJD/8F
-	buGrYmazTzCw+LeZX8UQP2ad7VCbwJNduFJEVO8mIDCO5Zj/MO2GWv6rrqLDwSB4RsAPRh
-	m5uXp2kR504A1cZgXE8kBf1QM/5VM2o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1748705104;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Z4/eIfOoAApJB+M2CTh9B7BsP1KbCNroKII7b2jF6co=;
-	b=VvE3GhQ0VIn4r1D4jgl0Q/of940lfk36WfMWUFTqqUQU+10uCvTK2/jcxjPekIKYmGyoWp
-	84Dkz5k/RjBwlDI/GotoEvpsv2GKraewMeiUdJc94zax9uWYG+j2meWOoXFFl2tOsXto9J
-	uwg0PLMrmzjtFR2unRnXOyfegwrFyB8=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1748705104; a=rsa-sha256; cv=none;
-	b=o1wjqoErzDD+KfRScu6pOXtA5k/PsbamG3ioOMUENti2QcKgK4/ruvaSjgm/3ftXFlWL7G
-	eyBxGtPp3gYJtj7mIJLF1GSas7SVT4Y1y/YMXdBthwzRJcmdumzSD8AgFcDFERXYv+Xu6d
-	7RXQc7MFWvbec59QJCH2QJaNe3L9NNU=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH] Bluetooth: hci_core: fix list_for_each_entry_rcu usage
-Date: Sat, 31 May 2025 18:24:58 +0300
-Message-ID: <4bfedc6d6edfdbdc7f2bde88da75a8329e78abb4.1748704997.git.pav@iki.fi>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkHpzGCH"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22e16234307so25831705ad.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 08:56:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748707001; x=1749311801; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5BmnYURfYeGdk/uq2EKlrxgKUEfLmdifEfRiWqvJ1qU=;
+        b=JkHpzGCHbT01gNZjQOEngndaevD6aqBHpuaFLG9/HPyCUJFrmU2VcND4EXWCJCSw7N
+         XxR60cFY9lxHyJmBlhJjHotft5h2s3l2KkCf8UQEE0JH7dpvThSkPpeXiu/T5pWAF4h0
+         CpC+fSSW0bjsTo1onaMdRpSKVkHneyAhIRmANN/kTsaD3yXlML95RkyvMT0EfRuuZ4BA
+         68jpfSCpCThfHZv74c2d9s/K+eJjYcS0+ojcxTVnoI9zw/Y9DuicKkBnl3FTaV4VULk1
+         nJMpHts2hhYwJnWvxg+9DMczTiRSeoBZMGgfjfKm4YlYiOxEO6z2nHbIaJW3tYucj1/S
+         dMzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748707001; x=1749311801;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5BmnYURfYeGdk/uq2EKlrxgKUEfLmdifEfRiWqvJ1qU=;
+        b=mL4T17FeJ4HOqWt1GCfi0Q5d+FC+mXNQwKc4PCBi4oZqrpvEPrrpo4NjMvRpzfyPBg
+         tOcWmmCj7ZtgN16fVWH2D3rcV4aBxf4S3madMenhxmYhvncUDZygHcBkYjMQVADiw4rk
+         w8Eu3Ji7zmGYLe20Zoi1O4jlNbd3rSxM/SsmWCCUE/zGbazmmCZijmNm17bVhmp3rlKs
+         uHWu5yWdLEPXZIlHuD5c3F4qvPxYjwVotSAd275D0hcXAsRVS1JprQABs5rQh4UPmbyw
+         3wQQXHiKn2Bxr7CN+oeSjI7cyfN9P6ZAD9OJTvNGzVz2dCWHvo98L+wDqWFn+pp6cm8r
+         m1NA==
+X-Gm-Message-State: AOJu0YxlfQJTDB1kD1emrKPGPZaQmVWuBzvwx9w5CR6x+EKMsEhFLV5i
+	P9Kzcr6JjK6UtXwv2xw/FqTRVnJkVrk6QvkRfR2iVnDepqlfROsP/773ObWYeg==
+X-Gm-Gg: ASbGncsnOwZtDNHG/dCNyh1/yA98WSLerxW/1q2bjj7F9aeEfDjZJcotfI6rgbG77ct
+	bvMkqJDSguMpJ3376QHjRMoHaumuhLg5HU5mGxPuCrVPRpU5WNmWV77BqLgXlrUKajZtowWcnfP
+	fI3FhWp9r0x+JHLEUpR5Rp6rBFJcDR3MIwL0ltiMkbfwlN8hH+ReI+bYMopwE4OxzBgKA/aIEj7
+	LjlT6iC9zrnSbBHjwi0vTJ9Kj8HWM0EUERTDjGTF5rH5sgTOngmr1iB2TfL/+tWQrPHxcVDCW+u
+	5LOQNkr3BmHh/e/5mfOJVVpZRvRyl17tG6mH9ljJnql7Q7eTQtD8RIpbHA==
+X-Google-Smtp-Source: AGHT+IGI0iHGqbQlpYBx3VVtswkYXYHxf6HfMaRoSb1KnGRQhufkgAbbh916cd+ZaxxpbWT72q5stg==
+X-Received: by 2002:a17:902:f607:b0:231:ad5a:fe9c with SMTP id d9443c01a7336-2352b06d3e7mr97625095ad.15.1748707000794;
+        Sat, 31 May 2025 08:56:40 -0700 (PDT)
+Received: from [172.17.0.2] ([52.225.77.176])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cf9543sm44155265ad.209.2025.05.31.08.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 May 2025 08:56:40 -0700 (PDT)
+Message-ID: <683b26b8.170a0220.24050a.b786@mx.google.com>
+Date: Sat, 31 May 2025 08:56:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1717934838012590845=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: hci_core: fix list_for_each_entry_rcu usage
+In-Reply-To: <4bfedc6d6edfdbdc7f2bde88da75a8329e78abb4.1748704997.git.pav@iki.fi>
+References: <4bfedc6d6edfdbdc7f2bde88da75a8329e78abb4.1748704997.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Releasing + re-acquiring RCU lock inside list_for_each_entry_rcu() loop
-body is not correct.
+--===============1717934838012590845==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix by taking the update-side hdev->lock instead.
+This is automated email and please do not reply to this email!
 
-Fixes: c7eaf80bfb0c ("Bluetooth: Fix hci_link_tx_to RCU lock usage")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=967792
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.28 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      23.89 seconds
+CheckAllWarning               PASS      25.97 seconds
+CheckSparse                   PASS      29.37 seconds
+BuildKernel32                 PASS      23.39 seconds
+TestRunnerSetup               PASS      447.61 seconds
+TestRunner_l2cap-tester       PASS      26.72 seconds
+TestRunner_iso-tester         PASS      41.31 seconds
+TestRunner_bnep-tester        PASS      5.78 seconds
+TestRunner_mgmt-tester        FAIL      128.21 seconds
+TestRunner_rfcomm-tester      PASS      9.13 seconds
+TestRunner_sco-tester         PASS      14.49 seconds
+TestRunner_ioctl-tester       PASS      9.73 seconds
+TestRunner_mesh-tester        PASS      7.14 seconds
+TestRunner_smp-tester         PASS      8.34 seconds
+TestRunner_userchan-tester    PASS      6.04 seconds
+IncrementalBuild              PENDING   0.48 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.216 seconds
+LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.156 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/hci_core.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 3b49828160b7..04845ff3ad57 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3417,23 +3417,18 @@ static void hci_link_tx_to(struct hci_dev *hdev, __u8 type)
- 
- 	bt_dev_err(hdev, "link tx timeout");
- 
--	rcu_read_lock();
-+	hci_dev_lock(hdev);
- 
- 	/* Kill stalled connections */
--	list_for_each_entry_rcu(c, &h->list, list) {
-+	list_for_each_entry(c, &h->list, list) {
- 		if (c->type == type && c->sent) {
- 			bt_dev_err(hdev, "killing stalled connection %pMR",
- 				   &c->dst);
--			/* hci_disconnect might sleep, so, we have to release
--			 * the RCU read lock before calling it.
--			 */
--			rcu_read_unlock();
- 			hci_disconnect(c, HCI_ERROR_REMOTE_USER_TERM);
--			rcu_read_lock();
- 		}
- 	}
- 
--	rcu_read_unlock();
-+	hci_dev_unlock(hdev);
- }
- 
- static struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
--- 
-2.49.0
 
+--===============1717934838012590845==--
