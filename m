@@ -1,47 +1,48 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01953C13D
-	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Jun 2025 03:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A572DCBE2
+	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Jun 2025 03:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748747513; cv=none; b=cfjKPojn+UZH3ATq3Qt49DCWee+2tyGyX58YxmNRCwrMlxWWjfl5/Rt4KdYlQKBE/9344P+JzEGXgE15hrqwS2pgcGssqPZ1hNg6ja+ATiGC6YeqY1N8PX65MNOBwSjHhFyJ4WlYYN7tocuzA/KU5Sn65QXpuullrzkvl+iOOFU=
+	t=1748747515; cv=none; b=V9rUl4tVRoJc8t0La1fzaxBEd8B88JS9N6lHInLFs3jty1+TV22G+uK/ivXTDQvL6Vgw0Tsm04SA47NyUNCEROknfTHwomcblpaL0FwF/6H3oe/f6hjnH3PB1KP8elj7hMf3XgZFr+XGhj2I+e/c376lNqJiNYHE+HkTF0wd5gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748747513; c=relaxed/simple;
-	bh=jTUWuMstUPVXBnRto1gbfvICEJwSdNlzWV7TItHNmGc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WEDIObYjbUyjOqPsD6lat47owNgsdAaNJMpmS3RoASqaDnQAk61YkTBeXNKwVhYdyC78vqs3ePDSuL+thlwTS2Nub/50YSHlwMzG03BMz//C8y1aTJyRkqaqvLBS25W9Pb8FZg0dxLRgFM8HhYK/4Xrdxk5Kae0AUAa4o4MrDJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dwahW0oM; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1748747515; c=relaxed/simple;
+	bh=lYBo94Xo2bpWjux4JX9arPShTTWJLPpbtaCncIv9qMU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f+Bm2fDiq7oFuBnRxK0TJ+g1U6KanqND6n7OUTNeRuM5ZW7v8ITg9NRMrrWrwQXa7OUfhPFqIg2DF3Hs6/dVNSf0GMtQ85VXPppugUIST+QWhtRttCt+M3I9gGoRKpv6Xt5Sljki320CqObZApoiAJglPDOUqUMHx7FO4DxDsoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MqTjypFA; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dwahW0oM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MqTjypFA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748747511; x=1780283511;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jTUWuMstUPVXBnRto1gbfvICEJwSdNlzWV7TItHNmGc=;
-  b=dwahW0oMFCm8ZCICDUx01ot+5p7dm+J5VrsCQmWs/rGCKmnPCWo/bJ4g
-   lY+bJUuhx7tgfc6hZTDSOWZWn7o5bbDKcpMvQQsQQp2sHfMtDSAXqbE4d
-   YLoFQTY1ub/ekONdZP30UsgpOQrE1xfPZIcT5dXU16+aMqa4C6y0aHpxP
-   aj6624IB5dEKbsDdeJM+FVMbOPhS02EtYNXczXqDwRqGfyptleyC6GTGT
-   WLfn5lt3rS+0cHeD+Rp2UT0FpjDSLk6/eK0lHC3+GYfP0GVD8KlMKK0zZ
-   B+0SyEH4RzH88YhyEy2DOZC23TP40LAYeg1IoQjs018F+6RuYnRRZCy7j
+  t=1748747513; x=1780283513;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=lYBo94Xo2bpWjux4JX9arPShTTWJLPpbtaCncIv9qMU=;
+  b=MqTjypFAQG/DOiNKoEz1yM60t4UbMc1kGMj3iaIv+7z1IfIZoAbw14rw
+   vjt7843ob+OsJJdadRbvwE0ZoOXpnSbriIEEQKJX4xwvgG6aSytNyVo0Y
+   FOa+P6X5Do0sMuCS6zOKNOGXIluGoWni1QgJrTf4IcR/54+vHdBcM57B5
+   FXmKFaV7/H2BEqq61npjs9iixw6LqNXaRYTI1Uql2dIvLUYnCq/GPEkan
+   WbHIkN6I6R9hJLQwCzVPt/KIV1u8sWFiX15A3plYqrd9VhqgN0T6OX8us
+   ESuUHNm+02OfZkDG6i9R4YPp3IdhWJXjoumOMsWxzIlNwhzab0SC3vUOj
    g==;
-X-CSE-ConnectionGUID: QBtRAklWSwKgBFMNMZ+qbw==
-X-CSE-MsgGUID: VeiB5RItT5Kyqy2MFBoc9Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11450"; a="50491214"
+X-CSE-ConnectionGUID: kvzOqroWQIyRK8pXlFrs9Q==
+X-CSE-MsgGUID: KLkChgaORqCB/osoR9DgRg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11450"; a="50491217"
 X-IronPort-AV: E=Sophos;i="6.16,200,1744095600"; 
-   d="scan'208";a="50491214"
+   d="scan'208";a="50491217"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2025 20:11:50 -0700
-X-CSE-ConnectionGUID: xP8m4QFuSfukM73Qdy2wnQ==
-X-CSE-MsgGUID: /5zLCZBpTU24eESOIxNHxA==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2025 20:11:52 -0700
+X-CSE-ConnectionGUID: A4+o9LYDQe6gyeS89N0UdA==
+X-CSE-MsgGUID: wY79+QULSfu5/Y2ETCJbnw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,200,1744095600"; 
-   d="scan'208";a="145214760"
+   d="scan'208";a="145214765"
 Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by fmviesa009.fm.intel.com with ESMTP; 31 May 2025 20:11:48 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 31 May 2025 20:11:50 -0700
 From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: ravishankar.srivatsa@intel.com,
@@ -49,83 +50,114 @@ Cc: ravishankar.srivatsa@intel.com,
 	chandrashekar.devegowda@intel.com,
 	vijay.satija@intel.com,
 	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 1/3] Bluetooth: btintel_pcie: Fix driver not posting maximum rx buffers
-Date: Sun,  1 Jun 2025 08:58:22 +0530
-Message-ID: <20250601032824.572001-1-kiran.k@intel.com>
+Subject: [PATCH v2 2/3] Bluetooth: btintel_pcie: Increase the tx and rx descriptor count
+Date: Sun,  1 Jun 2025 08:58:23 +0530
+Message-ID: <20250601032824.572001-2-kiran.k@intel.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250601032824.572001-1-kiran.k@intel.com>
+References: <20250601032824.572001-1-kiran.k@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The driver was posting only 6 rx buffers, despite the maximum rx buffers
-being defined as 16. Having fewer RX buffers caused firmware exceptions
-in HID use cases when events arrived in bursts.
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 
-Exception seen on android 6.12 kernel.
-
-E Bluetooth: hci0: Received hw exception interrupt
-E Bluetooth: hci0: Received gp1 mailbox interrupt
-D Bluetooth: hci0: 00000000: ff 3e 87 80 03 01 01 01 03 01 0c 0d 02 1c 10 0e
-D Bluetooth: hci0: 00000010: 01 00 05 14 66 b0 28 b0 c0 b0 28 b0 ac af 28 b0
-D Bluetooth: hci0: 00000020: 14 f1 28 b0 00 00 00 00 fa 04 00 00 00 00 40 10
-D Bluetooth: hci0: 00000030: 08 00 00 00 7a 7a 7a 7a 47 00 fb a0 10 00 00 00
-D Bluetooth: hci0: 00000000: 10 01 0a
-E Bluetooth: hci0: ---- Dump of debug registers —
-E Bluetooth: hci0: boot stage: 0xe0fb0047
-E Bluetooth: hci0: ipc status: 0x00000004
-E Bluetooth: hci0: ipc control: 0x00000000
-E Bluetooth: hci0: ipc sleep control: 0x00000000
-E Bluetooth: hci0: mbox_1: 0x00badbad
-E Bluetooth: hci0: mbox_2: 0x0000101c
-E Bluetooth: hci0: mbox_3: 0x00000008
-E Bluetooth: hci0: mbox_4: 0x7a7a7a7a
+This change addresses latency issues observed in HID use cases where
+events arrive in bursts. By increasing the Rx descriptor count to 64,
+the firmware can handle bursty data more effectively, reducing latency
+and preventing buffer overflows.
 
 Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 Signed-off-by: Kiran K <kiran.k@intel.com>
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
 ---
-changes from v1->v2:
-- Update commit message
-- Add dmesg snipped related firmware exception
-
- drivers/bluetooth/btintel_pcie.c | 3 ++-
- drivers/bluetooth/btintel_pcie.h | 3 ---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btintel_pcie.c | 24 ++++++++++++------------
+ drivers/bluetooth/btintel_pcie.h |  7 +++++--
+ 2 files changed, 17 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 50fe17f1e1d1..2c7731803c9f 100644
+index 2c7731803c9f..03f13de4a723 100644
 --- a/drivers/bluetooth/btintel_pcie.c
 +++ b/drivers/bluetooth/btintel_pcie.c
-@@ -396,8 +396,9 @@ static int btintel_pcie_submit_rx(struct btintel_pcie_data *data)
- static int btintel_pcie_start_rx(struct btintel_pcie_data *data)
- {
- 	int i, ret;
-+	struct rxq *rxq = &data->rxq;
+@@ -1783,8 +1783,8 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
+ 	 *  + size of index * Number of queues(2) * type of index array(4)
+ 	 *  + size of context information
+ 	 */
+-	total = (sizeof(struct tfd) + sizeof(struct urbd0) + sizeof(struct frbd)
+-		+ sizeof(struct urbd1)) * BTINTEL_DESCS_COUNT;
++	total = (sizeof(struct tfd) + sizeof(struct urbd0)) * BTINTEL_PCIE_TX_DESCS_COUNT;
++	total += (sizeof(struct frbd) + sizeof(struct urbd1)) * BTINTEL_PCIE_RX_DESCS_COUNT;
  
--	for (i = 0; i < BTINTEL_PCIE_RX_MAX_QUEUE; i++) {
-+	for (i = 0; i < rxq->count; i++) {
- 		ret = btintel_pcie_submit_rx(data);
- 		if (ret)
- 			return ret;
+ 	/* Add the sum of size of index array and size of ci struct */
+ 	total += (sizeof(u16) * BTINTEL_PCIE_NUM_QUEUES * 4) + sizeof(struct ctx_info);
+@@ -1809,36 +1809,36 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
+ 	data->dma_v_addr = v_addr;
+ 
+ 	/* Setup descriptor count */
+-	data->txq.count = BTINTEL_DESCS_COUNT;
+-	data->rxq.count = BTINTEL_DESCS_COUNT;
++	data->txq.count = BTINTEL_PCIE_TX_DESCS_COUNT;
++	data->rxq.count = BTINTEL_PCIE_RX_DESCS_COUNT;
+ 
+ 	/* Setup tfds */
+ 	data->txq.tfds_p_addr = p_addr;
+ 	data->txq.tfds = v_addr;
+ 
+-	p_addr += (sizeof(struct tfd) * BTINTEL_DESCS_COUNT);
+-	v_addr += (sizeof(struct tfd) * BTINTEL_DESCS_COUNT);
++	p_addr += (sizeof(struct tfd) * BTINTEL_PCIE_TX_DESCS_COUNT);
++	v_addr += (sizeof(struct tfd) * BTINTEL_PCIE_TX_DESCS_COUNT);
+ 
+ 	/* Setup urbd0 */
+ 	data->txq.urbd0s_p_addr = p_addr;
+ 	data->txq.urbd0s = v_addr;
+ 
+-	p_addr += (sizeof(struct urbd0) * BTINTEL_DESCS_COUNT);
+-	v_addr += (sizeof(struct urbd0) * BTINTEL_DESCS_COUNT);
++	p_addr += (sizeof(struct urbd0) * BTINTEL_PCIE_TX_DESCS_COUNT);
++	v_addr += (sizeof(struct urbd0) * BTINTEL_PCIE_TX_DESCS_COUNT);
+ 
+ 	/* Setup FRBD*/
+ 	data->rxq.frbds_p_addr = p_addr;
+ 	data->rxq.frbds = v_addr;
+ 
+-	p_addr += (sizeof(struct frbd) * BTINTEL_DESCS_COUNT);
+-	v_addr += (sizeof(struct frbd) * BTINTEL_DESCS_COUNT);
++	p_addr += (sizeof(struct frbd) * BTINTEL_PCIE_RX_DESCS_COUNT);
++	v_addr += (sizeof(struct frbd) * BTINTEL_PCIE_RX_DESCS_COUNT);
+ 
+ 	/* Setup urbd1 */
+ 	data->rxq.urbd1s_p_addr = p_addr;
+ 	data->rxq.urbd1s = v_addr;
+ 
+-	p_addr += (sizeof(struct urbd1) * BTINTEL_DESCS_COUNT);
+-	v_addr += (sizeof(struct urbd1) * BTINTEL_DESCS_COUNT);
++	p_addr += (sizeof(struct urbd1) * BTINTEL_PCIE_RX_DESCS_COUNT);
++	v_addr += (sizeof(struct urbd1) * BTINTEL_PCIE_RX_DESCS_COUNT);
+ 
+ 	/* Setup data buffers for txq */
+ 	err = btintel_pcie_setup_txq_bufs(data, &data->txq);
 diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 21b964b15c1c..5ddd6d7d8d45 100644
+index 5ddd6d7d8d45..7dad4523236c 100644
 --- a/drivers/bluetooth/btintel_pcie.h
 +++ b/drivers/bluetooth/btintel_pcie.h
-@@ -177,9 +177,6 @@ enum {
- /* Doorbell vector for TFD */
- #define BTINTEL_PCIE_TX_DB_VEC	0
+@@ -154,8 +154,11 @@ enum msix_mbox_int_causes {
+ /* Default interrupt timeout in msec */
+ #define BTINTEL_DEFAULT_INTR_TIMEOUT_MS	3000
  
--/* Number of pending RX requests for downlink */
--#define BTINTEL_PCIE_RX_MAX_QUEUE	6
--
- /* Doorbell vector for FRBD */
- #define BTINTEL_PCIE_RX_DB_VEC	513
+-/* The number of descriptors in TX/RX queues */
+-#define BTINTEL_DESCS_COUNT	16
++/* The number of descriptors in TX queues */
++#define BTINTEL_PCIE_TX_DESCS_COUNT	32
++
++/* The number of descriptors in RX queues */
++#define BTINTEL_PCIE_RX_DESCS_COUNT	64
  
+ /* Number of Queue for TX and RX
+  * It indicates the index of the IA(Index Array)
 -- 
 2.43.0
 
