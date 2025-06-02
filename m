@@ -1,133 +1,146 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from steward.aerusso.net (steward.aerusso.net [208.87.133.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA69C9460
-	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Jun 2025 03:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989CC1991CB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Jun 2025 00:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.87.133.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748749058; cv=none; b=Q6hkKjRVPTqcFPP5yxt6ouYQmuEpykNPOu0H0TuvPFnzkZ5efXlLpiidMeQf0El/k419HqTnvqSMKFmTHGHRt4ngT49sdfeHEl6cxWhMMgV43tRISCYCXWa0oOHpTSV4yiqlqjsHZYDKX/3BMIBUikuuJ7PadXKSNuuUFXbBHd4=
+	t=1748824755; cv=none; b=uZ2rS1HrVdZw1wmuuaN55XZ/qJ6oYumUpK017H3M/hSAujD0MAt3rXwpPub8XhBq4sGDV1DE1kdkGyX/bp+clrVaSmc5AAii6IGAX0szx+Neh8HmwF20DmcO5/zZfWzHi7c6wdxud/4lYrzcFPfd+Ag5ZY7MIBaxAIrrhPxZk3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748749058; c=relaxed/simple;
-	bh=Ldlv633dqdgB4Akon6TH29rnx+zDe26MYJqMCJrIY4w=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rhhXxAwcr+WK5kVR2IiuYhGWdcIK8WO80kQW4N9M4U1Ku5DimCer77Lych+TA4HySFFtDnLdVD8jAJPat1j4ODE1IZX5UBDd9JRwbWtK4uRcLsBQzbqYuHugM24boyNmwUfNneXhga+mGeSQppVKIE1ZdmH+UI3CNAq04lkw20Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Toxsfvu1; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748824755; c=relaxed/simple;
+	bh=O+0YN91HakDHiU0p5mXNULLv+Ms81NC3fh9VS6YebVI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VoEuOpE4uLHJxy1Yk1v17JxpYhD7jM8Fg1IYbuozxNfCjZuq9FGadXKAU64bgMF0j6pZuAytHQ0aXS9+lCAabqtxggASq3GNI7u5bInb0NprBSH9wRs8iUWtnVlnfbleZn+xCwZG6H9KQb7eecdUMftAnGWbgHFOioQJG0MXhkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aerusso.net; spf=pass smtp.mailfrom=aerusso.net; dkim=pass (2048-bit key) header.d=aerusso.net header.i=@aerusso.net header.b=bCglrV1o; arc=none smtp.client-ip=208.87.133.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aerusso.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aerusso.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Toxsfvu1"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f0c30a1ca3so33951726d6.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 31 May 2025 20:37:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748749055; x=1749353855; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/sVeHRk/K5y07RqXKdBuHIa0zqNgJyzx3C60NkRluDY=;
-        b=Toxsfvu1sMBsKxABLOIpeDpk38Dt6ae9AuB6kdDRLq3AhPl+ZFagBQ5ZwupP16VVdy
-         ccQn2APyZvLF1YbV2v352uIEgvc5XY0u5qpNKymTgHbUDz8OwONMEc8l+E+gtc33B+Mc
-         KOTPdrkTBLQFX9iRdqCTW1HM6hszzL4FDkvUKvX4H/8EEF79fzhkjx9Ab+HHyh3I0mR3
-         T6DxKsftuy97ZCSA7TPZsO52zLY2JVRBPtmTIpBjbVVJNIrde76InR61XNg37IWZxgTn
-         3IBgnCwvBPVfubaJYFNcus1IVdL8hwm/TYvW2T2uAqMgNnchX5zu5T4+Mwzn50D0FZWL
-         ouCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748749055; x=1749353855;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/sVeHRk/K5y07RqXKdBuHIa0zqNgJyzx3C60NkRluDY=;
-        b=vEv3ERuts0dS8RKCn5NvqdPBmlqsNHtJZtXsHCLUDyqwEWsiA4uaC2RiQV43zr8gb7
-         x5RwYOWE+IvXoNPbSlj6bNkvlmkCBkhI8J0JVpQyp0VIM7U4wnmhDv/Fn2oqSwoFKFJU
-         /3kGElki7Jaw4UojEwY4yVew77ZlbBHvSKTNYRZKsq59C6Ey5/AVrS3erWofDLUOpvu7
-         FtYRN6NH+9Klvmve/Jmq76A/r1P4zUeslHj1C9d2KTTJwuRLmKOiO53H9e/STjfJsiR9
-         kC7gtGxl3CjKK0CQ+2sqzc/TIx7ZuSSdSjENrRLZ6DdsS2pXURyaAOrfhPTp98RP8fDQ
-         Kpyw==
-X-Gm-Message-State: AOJu0YxhJfBX3Ax24kBSxnbDB59EcP7V4h5Qjf7qoVA6rzMV3NBLPjIl
-	kDkVCg+eEwSTotHZRFFo2Ebu2KjmGX/Jze/MYnUDPMKVI8+cpJh9A3PsuW/ssw==
-X-Gm-Gg: ASbGnctN+DHU5bCn1BPbdAtOudzeG/Edc1feT3VmXqIUgfFJIn0948EmS/3ZSYzeWFv
-	8Z5mesHB/KjIm2fgA40MFNhJ309iRhP9jdoQqmES0pBZUsZyeuuB+okIQmPxn2XGAx3UCvPJwQI
-	9HQCxgSupxaHngyDGp5V8XZ6r/IuwKA1bdq39IJldEE4lbjbMJXdKJjHREWOvUEocIsPr93h06l
-	dMmOZ4kD6e7kRZuK5/YfR2OAYytHSB1IOk75zp86GzqcKhEpxr6TFUw/umZmb46kb0eQG4Rbqod
-	GAst+72/F6aEZaQcaGwPhtkZJSSzS9YVqwtL7ftriGXhmMXKGLtBaQYAqSgyf6Kyjg==
-X-Google-Smtp-Source: AGHT+IHvRP0KpprzJsMpjK9nrxMkA2V4CDwHWZ/VnQC/kUMy+66ctMJ8TdQtD/Yy0eAbmO5rReatgA==
-X-Received: by 2002:a05:6214:27ec:b0:6f4:c824:9d4a with SMTP id 6a1803df08f44-6faceb8046amr160150096d6.13.1748749055399;
-        Sat, 31 May 2025 20:37:35 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.14.22])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fac6e01434sm43537136d6.81.2025.05.31.20.37.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 May 2025 20:37:34 -0700 (PDT)
-Message-ID: <683bcafe.050a0220.1816ba.f115@mx.google.com>
-Date: Sat, 31 May 2025 20:37:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0888541376081897518=="
+	dkim=pass (2048-bit key) header.d=aerusso.net header.i=@aerusso.net header.b="bCglrV1o"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aerusso.net; s=default;
+	t=1748824170;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=kMhMBT3fyKvzlGtBv8pI08lG7WGebg6TMcKN02JXnbY=;
+	b=bCglrV1okC475kJoB2hPdVjXkJV8D+6olDrAeSrvkjTF8Xd+NYzq89nImLpcBxkj1GQBDS
+	+Fbslss4RGtYZacY3Myw5j1kCu13cy2QLUrCvN4C+B/DKbmIf0BsvQFXDfnVaC5n44Ryfl
+	GlBSloyP5k/2UjLlnwKmkVFKn1Mdv3pmKVHiVCeFhoVOSie7tbvMcELFRxSazNReKvsQpH
+	LalMPJZwMTgTIeOoOpCKoc/xHYX4GnmbIPSGY+SP49Y4b7gHZwhHdxRkHpneJnJfK6c3YD
+	dGmjrLnCeYzfnhCiLedBm7RU8+PxFs0wtpk+Q7qp+0zMzmD1NMIqCjfL1sxb9Q==
+Message-ID: <30a9641a-05fa-4a44-af58-6b155dc7ecfc@aerusso.net>
+Date: Sun, 1 Jun 2025 18:29:24 -0600
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2,1/3] Bluetooth: btintel_pcie: Fix driver not posting maximum rx buffers
-In-Reply-To: <20250601032824.572001-1-kiran.k@intel.com>
-References: <20250601032824.572001-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Subject: Re: Do not start mpris-proxy for root user
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrew Sayers <kernel.org@pileofstuff.org>,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ Salvatore Bonaccorso <carnil@debian.org>, =?UTF-8?Q?Guido_G=C3=BCnther?=
+ <agx@sigxcpu.org>
+References: <a15e6919-9000-4628-baec-a2d2cc327903@aerusso.net>
+ <aCiLTy-IuqV6V7WA@eldamar.lan> <aCncrfc7qbtLEpta@andrews-2024-laptop.sayers>
+ <aDq72xTNkz0kDqpW@eldamar.lan> <aDtHoRCof-iND3Td@quark2.heme.sigxcpu.org>
+Content-Language: en-US
+From: Antonio Russo <aerusso@aerusso.net>
+Autocrypt: addr=aerusso@aerusso.net; keydata=
+ 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
+ 83d/owu8
+In-Reply-To: <aDtHoRCof-iND3Td@quark2.heme.sigxcpu.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============0888541376081897518==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 2025-05-31 12:17, Guido Günther wrote:
+> 
+> Sounds good to me. The system users include users running the login
+> managers which can have more components on e.g. mobile (for emergency
+> calls, etc) but I don't think they'd need the mpris-proxy.
+> 
+>> wonder how we can best move forward here, to have it then as well
+>> resolved downstream.
+> 
+> I *think* the patch needs a respin by Antonio and once applied we could
+> cherry-pick to Debian?
 
-This is automated email and please do not reply to this email!
+Here's an updated version of the patch with the @system condition.
 
-Dear submitter,
+I do not know how to properly acknowledge Andrew Sayers, so please add
+whatever trailer is appropriate for that.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=967825
+ From eabbcf86ddfff98bf15b32e65c8d385d3e85f14c Mon Sep 17 00:00:00 2001
+From: Antonio Enrico Russo <aerusso@aerusso.net>
+Date: Sun, 1 Jun 2025 18:10:49 -0600
+Subject: [PATCH] Do not start mpris-proxy for system users
 
----Test result---
+A default installation of bluez results in the systemd user unit
+mpris-proxy.service being started for all users---including root.
+This unnecessarily exposes system users to any security
+vulnerabilities in mpris-proxy.
 
-Test Summary:
-CheckPatch                    PENDING   0.21 seconds
-GitLint                       PENDING   0.20 seconds
-SubjectPrefix                 PASS      0.35 seconds
-BuildKernel                   PASS      24.36 seconds
-CheckAllWarning               PASS      26.61 seconds
-CheckSparse                   PASS      29.99 seconds
-BuildKernel32                 PASS      23.87 seconds
-TestRunnerSetup               PASS      453.04 seconds
-TestRunner_l2cap-tester       PASS      24.98 seconds
-TestRunner_iso-tester         PASS      43.65 seconds
-TestRunner_bnep-tester        PASS      5.80 seconds
-TestRunner_mgmt-tester        PASS      146.57 seconds
-TestRunner_rfcomm-tester      PASS      9.35 seconds
-TestRunner_sco-tester         PASS      14.55 seconds
-TestRunner_ioctl-tester       PASS      9.70 seconds
-TestRunner_mesh-tester        PASS      7.22 seconds
-TestRunner_smp-tester         PASS      8.44 seconds
-TestRunner_userchan-tester    PASS      6.08 seconds
-IncrementalBuild              PENDING   0.83 seconds
+Inhibit this default behavior by using ConditionUser=!@system.
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Antonio Enrico Russo <aerusso@aerusso.net>
 ---
-Regards,
-Linux Bluetooth
+  tools/mpris-proxy.service.in | 1 +
+  1 file changed, 1 insertion(+)
 
+diff --git a/tools/mpris-proxy.service.in b/tools/mpris-proxy.service.in
+index c49d255..6ae56c6 100644
+--- a/tools/mpris-proxy.service.in
++++ b/tools/mpris-proxy.service.in
+@@ -4,6 +4,7 @@ Documentation=man:mpris-proxy(1)
+  
+  Wants=dbus.socket
+  After=dbus.socket dbus.service
++ConditionUser=!@system
+  
+  [Service]
+  Type=simple
+-- 
+2.49.0
 
---===============0888541376081897518==--
