@@ -1,70 +1,126 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29DC1991C9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 03:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C920B2C3244
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 05:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748922790; cv=none; b=ProwHZW3KSxTyH67Xnj1jUqKx2ckXg2ecGLr/BOeu8tA7tJYZ8vo+yNrKkkMo/rAnTo0sjf6Cs5tIQjje5qpcazzdEXQiPL5/QI+Cux4zuX+PyDqxT96caQ7AENdxUeKbSXGG23j+62Q79amsd2O0lHKbzLjcw2vdwwp69Q67lM=
+	t=1748927420; cv=none; b=rBx0Jbop1smOjVnweqKtniEIGlqTGXUlUBb6+0iejjp4U16Q/tsFgN5d13qAOq06Bd6cLpIwRyXZjc6I8FjmJY6B9uW405NshXXaDIKjVZ2d+KnsY5ihtDkriQ2ScmzIBkkcKbGCp3GgnLfdd77oloeu8wnD8O29Pq79w//Jno0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748922790; c=relaxed/simple;
-	bh=/w/OBRpGALz9BuUCKENGFen1MUjUtLH1atY6H9Ks4kw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Dqb1ZZMUZn23A6KgZ9pmsXd3wIORZB/shXNa9DoUmG0rtotGjo7x/mBLBj6ateXdx+eUQ5rOqKkyGmxVwur39UmI0T0kkJTnSGEg8fiZFORAfdjea67TMJ0MEuHCd20/2kxqD2ZalupKr5UKlM188HlnyZU1lzpOTdDa1dr7VQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=mELrLFds; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1748927420; c=relaxed/simple;
+	bh=cPnhdvOx30gSD3rI0ydJgy1GeRyEoR/Ti4q2CTYaYuk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=teYKa/wGo66FDabnL2TSspAUmgpwpBcV+s874dHfjM0XHcsfKfjFKHQoAel67HKfdJULwsD6TyZVGYjSi97T44vrxDjxzK8GLGOqPdRw17szR+tPLx+ro6djiF89S2bg6fZ0r0OYEICwlAY60iN4oqelDhAI0Fo233qIux6ggMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZcNzFJ4r; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="mELrLFds"
-Received: from github.com (hubbernetes-node-0f6c2b1.ash1-iad.github.net [10.56.167.41])
-	by smtp.github.com (Postfix) with ESMTPA id AFEF99205DB
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Jun 2025 20:53:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1748922787;
-	bh=e1ccQr3x4z51UgWh2c29Y+ANAtE71W4jIQHbVPGTKC8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=mELrLFdsaWWcuhSzT/4Qi/0LYtWGXjkiBJ11NgTZ34/hLj1EETwkzOmGD6Hy4JAbL
-	 oqAIwIsVO8IZoM3nYVPGD0lpYpx0dZPNTYI+vIEVcU/wEngmwWKXoSj0fU4YaH/+X2
-	 Al/erPHwpHN4Msycv+oghsGAskXNzHko8y3LhV1E=
-Date: Mon, 02 Jun 2025 20:53:07 -0700
-From: Antonio Russo <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/968153/000000-b60af4@github.com>
-Subject: [bluez/bluez] b60af4: Do not start mpris-proxy for system users
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZcNzFJ4r"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7d2107eb668so96650185a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Jun 2025 22:10:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748927417; x=1749532217; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HYQIY8lIK42xS/L8Q9XcNAK4r3SkeLLidaJ0qUvDkcs=;
+        b=ZcNzFJ4rzNyjZ8C9IX56wX6HQcr0HBlpomO2Zo6/ji73bg3QBWXNKYm+o+RsqpBw3c
+         AeVq7BmktPb4WRCD5E0ZO0PDG+fRRLTyXZICMJ1ncOxEI4UBrVt3gOT1vYGlquiJHChR
+         VIFbeIckXMA5pdBXv2AKhWLKpvLWQ3MaMGHQ+D4Y2zTdm4Aovh1mnj+44aPZ8gUMjHCe
+         fLvYT/1oziU6h1Ikam6qaF56noFN/nFv9x+nSbIBM3TdXUimlsTYwVwpR+tCO+/WHa8W
+         pFgYPdIGBZkdIj3IIC9SPJk4mlRdUsjEfe9hen/5Kj5KiT5vX0GOiqg/SP2nKYGUbOMj
+         ESSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748927417; x=1749532217;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HYQIY8lIK42xS/L8Q9XcNAK4r3SkeLLidaJ0qUvDkcs=;
+        b=UMTN1wk6FfKxpfHYQUXfbWSCGHkfLbvqPiP6fpSDJCKzqa+h+zjEpAf6BjO06mbS0T
+         f+JH858qCayYiH0BjWB6vZtZbbdjHlA5ue2ANGzgeqoOzMAKrBrZ6AF+h4IIoifiAF+H
+         hT7r5GjO4r3nph+HKi1R5Rnnp4Kl8IRMdV/JU9Nk1HLXr/YCbVWUPnZDnGqAoWlQlrFw
+         HFML+TLJIiHn0j4TMmkS2hi2Ru1tog8JgXD9SCD5/6OA3USBE5sqhZlkR+Hi7NzZkA5n
+         gU0jR1RH9Y8UWF7Oam9p+S+RcrYxcs74nGHl/OC4R0/7KApsBOXPNokUSN1dPuRFHmSn
+         AMrg==
+X-Gm-Message-State: AOJu0YzvaXzeY1Xyvd+nPOHPelQZZoE52pFVAhw+MB4qNo1u/mR6lMuW
+	2iSUI0VLlEGJbbYAJyGBJXarV0VxoWykp0GF6p392O3/+mQH5F20Ah+zmW0rIRW4
+X-Gm-Gg: ASbGncvibJjF79wXRGHHqFlH0sOWnpW5f7Ns0Z/qGQHLm/ou7urraO6blOVlaufOzsU
+	GEuAvPbMRninrxfqX6rinld6J/Vpl5b5HTMHM77jYHuRfHtWjVUFOVgDpoy8cILUpnkGPxpXpD8
+	21SO2yjH2zLfBebeYFkef5bCGuIb1Fr8mvUrmOhDk3K0N95zjuFAMUahefpHSUNodLVvWjSP9Ke
+	+Xv+7CD4cfBtcbjjecyZkjgK3mYrR8Xd67TmRYswAvZXG69eOcknZnv1Z0AKD4dxLL2BrpXHmPR
+	qzmIZ+M3PkkTYX7Ns77huO2CfuUlX9PGzSYux92GNuLrWWVrHLPCSq2if8HWnwILZmcY9GC2xOQ
+	mnw==
+X-Google-Smtp-Source: AGHT+IHxfSC/5JlcrUJjg1rVEDinlskMRSe+TEfny8UlJlat7q94T/yff36CSKrdS9nZV0FEtZlaWg==
+X-Received: by 2002:a05:620a:248b:b0:7c3:c9f4:522 with SMTP id af79cd13be357-7d0a4af5fcemr2045529485a.14.1748927417144;
+        Mon, 02 Jun 2025 22:10:17 -0700 (PDT)
+Received: from [172.17.0.2] ([52.179.127.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d09a0e59b0sm775580785a.23.2025.06.02.22.10.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Jun 2025 22:10:16 -0700 (PDT)
+Message-ID: <683e83b8.050a0220.1d7745.9686@mx.google.com>
+Date: Mon, 02 Jun 2025 22:10:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5586947650042459737=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, aerusso@aerusso.net
+Subject: RE: Do not start mpris-proxy for system users
+In-Reply-To: <9d7984b8-79c6-478e-95c8-28a6d4a7ba9b@aerusso.net>
+References: <9d7984b8-79c6-478e-95c8-28a6d4a7ba9b@aerusso.net>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5586947650042459737==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/968153
-  Home:   https://github.com/bluez/bluez
-  Commit: b60af47078b8cd864bb0735f875f073f584be3b4
-      https://github.com/bluez/bluez/commit/b60af47078b8cd864bb0735f875f073f584be3b4
-  Author: Antonio Russo <aerusso@aerusso.net>
-  Date:   2025-06-03 (Tue, 03 Jun 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M tools/mpris-proxy.service.in
+Dear submitter,
 
-  Log Message:
-  -----------
-  Do not start mpris-proxy for system users
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=968153
 
-A default installation of bluez results in the systemd user unit
-mpris-proxy.service being started for all users---including root.
-This unnecessarily exposes system users to any security
-vulnerabilities in mpris-proxy.
+---Test result---
 
-Inhibit this default behavior by using ConditionUser=!@system.
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.22 seconds
+BuildEll                      PASS      20.39 seconds
+BluezMake                     PASS      2746.97 seconds
+MakeCheck                     PASS      20.67 seconds
+MakeDistcheck                 PASS      198.66 seconds
+CheckValgrind                 PASS      275.81 seconds
+CheckSmatch                   PASS      302.33 seconds
+bluezmakeextell               PASS      127.98 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      906.58 seconds
 
-Signed-off-by: Antonio Enrico Russo <aerusso@aerusso.net>
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5586947650042459737==--
