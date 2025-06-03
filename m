@@ -1,100 +1,66 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D8049659
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 08:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB86127FD46
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 09:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748940856; cv=none; b=UT2yVRvtC7k7TfE5cICkEEt9IW8V72OHlceIq4iEuC0tHtdYsJM1eY02APgSx+/lS2SIqDJVbgvh/6t7MIXlKeAID5ta4/WH3sdiNqIhtLJ00ZKveMoSQ1HqflqFIA47HHXXl2E8jTlrcPhLxw6ZwlhnRoPDY4hzYm1eDseGCzc=
+	t=1748942086; cv=none; b=gWS5f1WEf12zKaZnK5KbEcXeQf384MOMWd7vtHKFyzHRxXh7HOjZkRCMYC4I/Lf3iDoHitBURIvr99k0oiTIPNDeh9G3HFDgxc5u7cxHFa6KtjaxABW7B5mMFgRZ2qumN3Wy8bVQ7xgvBrekwRCi/c7o6NXeGdHmZVMrexq7bQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748940856; c=relaxed/simple;
-	bh=Jmbn9FKn0ok8sGgVoqY3qtPe94Odyq/GLVKAqsWx3GQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oPBLyDsLWNMZzy7bHYUFpsvu39NdKY8U+qUffOD0pctsjO2MxQn0MR5y4Amht0X+fLzuqOfAL0WDiB6xshaX9ZnB3OGk8PPPIQvr/9D0r1smFHrScXsfeDdUn+rtUrInCDOClo1Es+yhPCP8w42VQ7+TfOO8xjSoI0RQLFF/zt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl; spf=pass smtp.mailfrom=codecoup.pl; dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b=I+uALB1q; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codecoup.pl
+	s=arc-20240116; t=1748942086; c=relaxed/simple;
+	bh=o77PrscGkxAd6CVj2J64OhaoZDT7WHD7jQQHxp+L3II=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Oz5aXhsLiQaQUfs1DkcDv+i88cK1u5zsCg3Vevme6DxCtMlFWeuC6QfvRteUvWPhaS+plgTG9rwP1UmZRaYHSzC3fSrC+dFE57jaUV6bjFrOboakXlr25YBU7rUP+77H5Xl7u+H555fU/7MepbU6UZGhCOx7GVYqKxIz/BXHugs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FETgs91m; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b="I+uALB1q"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-60410a9c6dcso68293a12.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Jun 2025 01:54:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20230601.gappssmtp.com; s=20230601; t=1748940852; x=1749545652; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eVInuKL9ig8LdauoSC54cVMi6mpCZDxCkLHbsXtjBmQ=;
-        b=I+uALB1qxUEMXyojPSpnUxi/2Y4Z46ult4MVTdJLmYtMt6qwoU9vpklxJQl5YsiH5T
-         mF91h/5QsQVG73vxcBFmsFKi05WPqwYwcN8OOeXGLdZ2U86Esb+R8jYyxtizlTE8LHsl
-         Y+2ND7R3NGsY27Vf8I3z58yVxwIDhbLOlsIsfmFZZ7LpcWk+lPmiInSM++GvP/0c8MN4
-         Sk7XyNhhrMuIopn0r3HRq0Q+GIWGMnJSbwJK991wTC+QtKT+AIEig76zkx/G5f9ObY8Y
-         fHGpa5x/hf2+SNQEZUUzExw18F+/36mks1WSZ0rKumMIq9Zfkqz+zJhhr1O/peCjGhkc
-         6j/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748940852; x=1749545652;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eVInuKL9ig8LdauoSC54cVMi6mpCZDxCkLHbsXtjBmQ=;
-        b=ksU9waf6Gh6hhsYgbqO3K+jOycr6tC/Q+2acxwJ9HB5hYrYx7Q2iuzK1r+wpWLTlgJ
-         8AoXA1MApF+mSNXBPmKnZe9fPMlTw+Ybwn5SDSdRa2GUa+LiT7urrOKILIySb2lLZyKh
-         6qBh1uL0eDYbqJOLtA1W3FJFaGlCYpumhi0XvhSGNCRR9ex6EN4mWIwIVFcF4YoTBxJu
-         JABtAYmy6P0zqiMbg7sbgGFpRc+WAZL4qRsRZb0/eJJaqnqwZrbxe/orii/c+uTSUELG
-         basujlMpQd5DpXIOuQgPJx+M5dlYXTvdqq0d/DsfVrh9ZOqt92yVwQX8hbMBsqRzSB+j
-         T64Q==
-X-Gm-Message-State: AOJu0YxO77LzmXCDpweCxpzVa1nCisnUcQOAcxsgztPapWIO7U+/ycZz
-	MgzuZSAGvvlRLKMHCye0dXc/K+YfxhzFAD399TT4Y1dc3YUAoTn6TRvJgVzzwW5o+lRdu24Ed+S
-	0aFxIePE=
-X-Gm-Gg: ASbGnctZ2z9bJIxAsaeyvoAYE6W7SWwgX4Rqeku4TdoOX4Y8v3czxg3xQvXCovsSMb0
-	brVnM7DRlBrPEfvkIsrl8+lFqwF/9Q2IpkBnhyPrXthVEPnKVYr/iLRdjA54cyr96zKV6/CzU+G
-	W+CQmh5gx6nVzsv0T96f4S3y+ZvJBNrSD/YeS29jx+Snk2hxLp3OiDhzKEKmEX4MWTyYd3kkVDu
-	CnF5HP6i8aj6SlXq5zuGlHkkAIgAxJnFCP1OVq504t/IMB+fxKE2J19L7GfnvGWWa6AMaWjhjCk
-	bugUtF6TRRfYgsZZllHD1ca8F1OxfOR2OYqq7OTbvvYWXhMuAz0lMekCdSnZvBrxVJZJcxxmjA=
-	=
-X-Google-Smtp-Source: AGHT+IG+K1LUDc1cXDAllpL8QkZHOqK8PaRXunC7Af9L63JZl5EXlNscqn3FQvSPxX/sO+XzJDeLEA==
-X-Received: by 2002:aa7:cf92:0:b0:606:a08e:b8d6 with SMTP id 4fb4d7f45d1cf-606a08eb951mr2728045a12.22.1748940841481;
-        Tue, 03 Jun 2025 01:54:01 -0700 (PDT)
-Received: from ThinkPad-Ryzen7.. ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-606add9c4afsm777366a12.4.2025.06.03.01.54.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jun 2025 01:54:01 -0700 (PDT)
-From: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FETgs91m"
+Received: from github.com (hubbernetes-node-39f410b.ash1-iad.github.net [10.56.186.31])
+	by smtp.github.com (Postfix) with ESMTPA id D06A19212F0
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 02:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1748942083;
+	bh=a6HhUThEA76DQrqQ9NkDHWUZXgfsSOFG34zAN8gnFeI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FETgs91mz7UnXrwa+ohOyX5MvXW4IaWZSOVJmPXRn5zaLBFIEtx5+pr1iEQFeMiti
+	 ArOW/xLJjkGvaGgYsIVXQJwtvQm6sIOAMUiYYnvJE6WRzhQXfD5uAHlDMqw5CYrOl8
+	 Q5uQkx+whoo9tniN94y1fURUrWyOfsAegilHv+dY=
+Date: Tue, 03 Jun 2025 02:14:43 -0700
+From: mkasenberg <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-Subject: [PATCH BlueZ 1/1] monitor: Fix bit for HCI_LE_Read_ISO_Link_QUALITY
-Date: Tue,  3 Jun 2025 10:53:52 +0200
-Message-Id: <20250603085352.1297099-2-magdalena.kasenberg@codecoup.pl>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250603085352.1297099-1-magdalena.kasenberg@codecoup.pl>
-References: <20250603085352.1297099-1-magdalena.kasenberg@codecoup.pl>
+Message-ID: <bluez/bluez/push/refs/heads/968220/000000-1c0528@github.com>
+Subject: [bluez/bluez] 1c0528: monitor: Fix bit for
+ HCI_LE_Read_ISO_Link_QUALITY
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/968220
+  Home:   https://github.com/bluez/bluez
+  Commit: 1c0528d5a8f34dff9f386ee35a92f2c9e663faeb
+      https://github.com/bluez/bluez/commit/1c0528d5a8f34dff9f386ee35a92f2c9e663faeb
+  Author: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
+  Date:   2025-06-03 (Tue, 03 Jun 2025)
+
+  Changed paths:
+    M monitor/bt.h
+
+  Log Message:
+  -----------
+  monitor: Fix bit for HCI_LE_Read_ISO_Link_QUALITY
 
 Fix the bit ID of the HCI_LE_Read_ISO_Link_QUALITY command to match
 the assigned value defined in Supported_Commands table in the Bluetooth
 Core Specification.
----
- monitor/bt.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/bt.h b/monitor/bt.h
-index bc84d6b94..dd67750dc 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -2920,7 +2920,7 @@ struct bt_hci_cmd_le_set_host_feature {
- } __attribute__ ((packed));
- 
- #define BT_HCI_CMD_LE_READ_ISO_LINK_QUALITY	0x2075
--#define BT_HCI_BIT_LE_READ_ISO_LINK_QUALITY	BT_HCI_CMD_BIT(45, 1)
-+#define BT_HCI_BIT_LE_READ_ISO_LINK_QUALITY	BT_HCI_CMD_BIT(44, 2)
- struct bt_hci_cmd_le_read_iso_link_quality {
- 	uint16_t handle;
- } __attribute__ ((packed));
--- 
-2.34.1
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
