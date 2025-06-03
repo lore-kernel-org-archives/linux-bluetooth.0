@@ -1,127 +1,251 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91D3140E34
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 15:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854332C325E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 16:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748965104; cv=none; b=KQgCHFon01dhW7ieLXSxFWwjUjkJ9ndmJh6vH/WcsQ2nmjHfwNbD4utZA9wJOz5WFIqXsUGCYky/yXua1b/j7cj7+pDabrRXXgHf+kA64jotQKh0v+rsidolYsAwvBgsPDdC8BcvGz50gq9E8ZWi7qVchUZzBM658pj3w3S9Vy4=
+	t=1748966485; cv=none; b=ZtLX1Hqu3I3PXVLfZSfds5rOKlkP2S4FNZ0RiBF4erjlyJ8ercpLAwJUIMTrtGUm+wcZgqr2G0q13Vxd3bGjU+cYqzQMikd8pMntNz0US+IB2NWnYymlyVsBChYZAfmgSHjV7E40TABUzpUM83CMknLCpwi9eszFBNswvsTLDRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748965104; c=relaxed/simple;
-	bh=0LwzbAkH5cO/0mQZjuNeh0TuA++xGZPXXu9rVncrRmI=;
+	s=arc-20240116; t=1748966485; c=relaxed/simple;
+	bh=qYJZAasVWKPC1hiBO0Gf2AAdFXRGkmrsMp1car4CKg0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nBmQ/uUrnsuMCCD06nzny20AkgPHhRUHsLjZfLIZ7IAOPss1U+FNcg5QVL31Qfu+XJQkD9WpRlItxdhFoG6pCFoOhKKad7hCZht7QMH5NOFUlErRZkPWimj9VQboK6AlmzLLrbUcQzMjDiuu0dKMCe0k8TWdjg7yBuggvZO6cLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGRHTJQ6; arc=none smtp.client-ip=209.85.208.180
+	 To:Cc:Content-Type; b=rEe+4KDaz5oqG+YwnfeB+pSvWQgu4zQfjS6FAbsre+PhwATmbYpzTjKXi+Arn29w3zt/rEbW9VTbj0s/F5QU79513wXtqG+wtbRbccZ4TQ5ELCG9LcXOsMYWjtHQR+Srk824m+TwDZn3qBMSw5zphdOqgaQiYrA1QI9Wj0szV/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AvOGl9At; arc=none smtp.client-ip=209.85.208.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGRHTJQ6"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-310447fe59aso58809971fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Jun 2025 08:38:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvOGl9At"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32a7a5ab797so49883041fa.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Jun 2025 09:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748965101; x=1749569901; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748966481; x=1749571281; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8w/M4MMqTkGnP+AIZmQ5iTc3WubUJ9lE/+eMQjKUeFc=;
-        b=gGRHTJQ6KPrMxY1mEI8Xn8bumoDElaChr56qzUr1SLzEYk2DLYzBfA/fB7a8c2FlOI
-         djVQ3WR0HK5hYdZdzERv2+yK0KCWN/mxuGoOmC+myC3nWhgf7tP5Fq+OuOPefO9hQGMe
-         ftpSRQ4UrTbxvpiFce6713lD7kznM1h+No10jadNZBwfnrml0oilng0Aav0hMlo0cAz9
-         9YJ5wifUDiJJVpQeFPcWxxXwAUhz2YfyauFUt3dUUJTcLCTZkRTn0Kcx8hST9/1T9mF3
-         xGiFYfoWXwfdjzc+0T76ixivKyf8c6sT9d2p6jra37f2oITNyvXtJbpo/fi1FXg4DuYF
-         jZJg==
+        bh=Nh4MAzP2kKoXG5e6+vC1rtk61loH3TMmdXt1aY/bFW0=;
+        b=AvOGl9AtEzoNOH4kOsy6FLexXbMhJmWfJJErOXHW1CV0+EanNHNd0kA2ABlRV8IltJ
+         6nFqV549CuTc9c99F/4tOjoBUKT5xy6H53YdKc3XgrE5s1GBkoYcnHG8OiO2M/RtbMRK
+         9fwUHU93b+1bRYZM1jUqk3B+1rFItulBHuinvOV5XlaEE4a0I9QFMHBAIs+ybodxnmQV
+         aK+CP0qJ2v9zh0sckVfXlsB/ibF59mgcmM9DW6aURXgn1fP8suwCn4Z4f4KFBTgU3sci
+         7FVvx7Q1QCVR6QjXnJwqLOyFeR53fPFacgowEKyx2gLkBUDI+pECFid7I4iev8BqnQHy
+         205g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748965101; x=1749569901;
+        d=1e100.net; s=20230601; t=1748966481; x=1749571281;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8w/M4MMqTkGnP+AIZmQ5iTc3WubUJ9lE/+eMQjKUeFc=;
-        b=Geze7sUpMwRUBinmZACB2YCvs0xRTUQ5Bgi0+LCGgm8MZCI9n3Tu8rnzUBIGcV6vGN
-         Nu7NS/uN0mJkdQoQbff0PJx2k2d4Qvvdi/nHtGA2/Wo2kFIqJxHJTqkOclyQm6SDxiU4
-         jZya4bvtAheuooFNsSN15TbTHBgQ/267oWZPo8G4kv/T0yV7b//SXalyZ9JTrUn8Pv6s
-         j/oTkgCtqygHQ3Qi/3Z3urGg8f/oMPdKokKRsd9GX/J5m+u95ppD74Sbx+MREEgGC7CV
-         WRN0gwva4CUaa1idWSH7y2+TsbyWyrrnjrtPJtD86pzWQ0UyBymE9Z4M3NMuLep2976h
-         uLdA==
-X-Gm-Message-State: AOJu0YwWfFXaRuMVOM24dbPsng8aYy3hTQynzm6JsHSLk9wa6PO0rMmG
-	qQjrjqxeWpxkVacAzKaYHAdZLZigDQ9PEwRZQGWC8PNlL5F6V9Wl6tOybHZf0rWp/qTurrH/Fub
-	/9WjWl60GQMqfGhIvg3ueutQmSlT1HE8PzESkgAo=
-X-Gm-Gg: ASbGnctigjykyRmKRvXser7EVzLR0b6T0LvPqqy5vRKSk2bxkDMS5dHKyDrb9VcEaAl
-	QmmRxk17rEr4Uu/15Sp0loB5Qu++DyhdzhU8AdszhkiKGYjIEV8ApXMTM4CIAoKLG0xGPz2T1GG
-	zn+aD4CWAPf3kc+HYUtHqb0q264rcK5H4=
-X-Google-Smtp-Source: AGHT+IEQ5wMclTS9GU7xmGWtOMO16kVMcxJY4R/Fv7pJ3K7UDgJaXwpdIPX3d279ld/9laNmmMXnaCq5RGYNNSFOGwE=
-X-Received: by 2002:a2e:b8c3:0:b0:30b:c91d:35cb with SMTP id
- 38308e7fff4ca-32a9e99b9c5mr36339351fa.4.1748965100484; Tue, 03 Jun 2025
- 08:38:20 -0700 (PDT)
+        bh=Nh4MAzP2kKoXG5e6+vC1rtk61loH3TMmdXt1aY/bFW0=;
+        b=V4xHcX3/nP0Ca5TFKRS8TNPKXaFXPuOYI9g6sqJkEVmZPMyW3VZoBLUSuO1gIRiIBP
+         qa4OBepod10d337ABgmL4dOnCBgRRCEHFzv4OBZNGCiuS2Ke86s3xi/K6Fe/lW7PEuwg
+         tjShdHt/djHTIAs+AGp7OqEfohT9CLQSDgqzI8NmnSBsIRkjZiWDHt6wFG2IAah/Gd6s
+         V6GKDTy8NC9HBuWajXuy93eRaXwjKBsV5Mx1gWVv0WTzp9oANsSx9fNdC7XKL4Abt85v
+         RCRdMooRUEwUySwvvVosiDOlu04uKpDEvI3uaZlFpvCx7AUPs3s/iCb0iKT/7S6csa8X
+         ZH+Q==
+X-Gm-Message-State: AOJu0YwyibaJOFsbqDwjcMh10FKgw6LRsMepTvB6QxUCUNJRRod+NizO
+	u4A/x5w3uQ/Kto2xIKkMVoRyW3o4stV0x34QKMnBcP2VePx0gFBxoKurWmRIa7UeLJZlpp+6byD
+	HzgUkIbovBIgspd2x6AQCarZUgRRdw4E=
+X-Gm-Gg: ASbGncsfmLxg9KQXk70B/vvxe8LgC6d3mbJjgD6WAxc32y7xlzQKNRBO1X1hxTKABDp
+	D6YBnchvNzbFHDFthStxKhUcr/0oT8lN6PaoVqCDHE7GEsFobFlNtgphctoqpNoAOff8Pjrd1eR
+	UAw0hoN4aHat9aChuL2pnWC+vxsJZhD/8=
+X-Google-Smtp-Source: AGHT+IGoarH8DBOJDU2o14Um9Qst6XK+QOnfVjdBkicbtzdW2W43uOg/7eJvJp7r+cU+835P0Act/ex4n822xnF9D+U=
+X-Received: by 2002:a2e:a584:0:b0:32a:6c39:8938 with SMTP id
+ 38308e7fff4ca-32a906893f8mr47806131fa.13.1748966481107; Tue, 03 Jun 2025
+ 09:01:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603095617.92785-1-sdoregor@sdore.me> <20250603095617.92785-3-sdoregor@sdore.me>
- <CABBYNZJYwKurqo+HDUKYtFx0+-rNquj=OHgpcZRZYVmAxDzqpA@mail.gmail.com> <c8b55be8b9abdb73bc57e8a2d455770199a2b21b.camel@sdore.me>
-In-Reply-To: <c8b55be8b9abdb73bc57e8a2d455770199a2b21b.camel@sdore.me>
+References: <20250603151651.1080923-1-kernel.org@pileofstuff.org> <20250603151651.1080923-2-kernel.org@pileofstuff.org>
+In-Reply-To: <20250603151651.1080923-2-kernel.org@pileofstuff.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 3 Jun 2025 11:38:07 -0400
-X-Gm-Features: AX0GCFsYbtff6nLWn-PWXkRF_gcnj5lp_DNkwmP5I_KKri3ZvBCYQTRGXXHCIoY
-Message-ID: <CABBYNZKL2gYmWPfP1owAUSAieWgt4ARaFp0-T5+vQ+rgjWnNHw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] plugins/sixaxis: Implement cable pairing for DualSense
-To: sdoregor@sdore.me
-Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 3 Jun 2025 12:01:08 -0400
+X-Gm-Features: AX0GCFvAKe8iLYAE0wVGi-HvrkITGjymkSo_wFXCE8jSUU8VRK63USyVXcEnDb4
+Message-ID: <CABBYNZ+FgroEZmbj1SoBGfJrMscMeAkC-Z9==h0H30mrFVk0GQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] obexd: Pass at_(un)register value to logind callbacks
+To: Andrew Sayers <kernel.org@pileofstuff.org>
+Cc: linux-bluetooth@vger.kernel.org, pav@iki.fi, frederic.danis@collabora.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Egor,
+Hi Andrew,
 
-On Tue, Jun 3, 2025 at 10:55=E2=80=AFAM Egor Vorontsov <sdoregor@sdore.me> =
-wrote:
+On Tue, Jun 3, 2025 at 11:17=E2=80=AFAM Andrew Sayers
+<kernel.org@pileofstuff.org> wrote:
 >
-> On Tue, 2025-06-03 at 10:40 -0400, Luiz Augusto von Dentz wrote:
-> > > +       /* TODO: we could put the key here but
-> > > +          there is no way to force a re-loading
-> > > +          of link keys to the kernel from here. */
-> >
-> > Not quite following, what key are you talking about? I thought the
-> > link keys are still generated over Bluetooth, or are you talking about
-> > passkeys here?
+> Logind (un)registers callbacks that it calls when the user's state change=
+s.
+> Callbacks may also be called during (un)registration.
+> Clients may need to handle those initial/final calls specially.
 >
-> Hi Luiz, thank you for the quick response!
+> Pass an argument indicating whether this is being called during
+> (un)registration, and modify existing callbacks to ignore that argument.
 >
-> If you look a little bit upper, in the `ds4_set_central_bdaddr', you'll
-> see the exact same comment. As I pointed out, I decided to just
-> duplicate the code for now, as a proper general implementation might
-> require some further refactoring of somewhat unrelated code.
+> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+> ---
+>  obexd/client/pbap.c       |  6 ++++--
+>  obexd/plugins/bluetooth.c |  6 ++++--
+>  obexd/src/logind.c        | 14 +++++++-------
+>  obexd/src/logind.h        |  8 ++++----
+>  4 files changed, 19 insertions(+), 15 deletions(-)
 >
-> From my understanding of the original author's thoughts combined with
-> the experimentation I've done, it is about the possibility to directly
-> provide a generated link key, completely skipping the usual BT bonding
-> process (that, I positively tested with my script by writing directly
-> to BlueZ's device `/info' file), instead of writing all zeros and
-> relying on (I assume?) Just Works repairing on the following connect.
+> diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+> index 51b523592..64bb8ff72 100644
+> --- a/obexd/client/pbap.c
+> +++ b/obexd/client/pbap.c
+> @@ -1455,8 +1455,9 @@ static struct obc_driver pbap =3D {
+>         .remove =3D pbap_remove
+>  };
+>
+> -static int pbap_init_cb(void)
+> +static int pbap_init_cb(gboolean at_register)
+>  {
+> +       (void)at_register;
+>         int err;
+>
+>         DBG("");
+> @@ -1482,8 +1483,9 @@ static int pbap_init_cb(void)
+>         return 0;
+>  }
+>
+> -static void pbap_exit_cb(void)
+> +static void pbap_exit_cb(gboolean at_unregister)
+>  {
+> +       (void)at_unregister;
+>         DBG("");
+>
+>         g_dbus_remove_watch(system_conn, listener_id);
+> diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+> index 7ff27a8a8..ad37e636d 100644
+> --- a/obexd/plugins/bluetooth.c
+> +++ b/obexd/plugins/bluetooth.c
+> @@ -427,8 +427,9 @@ static const struct obex_transport_driver driver =3D =
+{
+>
+>  static unsigned int listener_id =3D 0;
+>
+> -static int bluetooth_init_cb(void)
+> +static int bluetooth_init_cb(gboolean at_register)
+>  {
+> +       (void)at_register;
+>         connection =3D g_dbus_setup_private(DBUS_BUS_SYSTEM, NULL, NULL);
+>         if (connection =3D=3D NULL)
+>                 return -EPERM;
+> @@ -439,8 +440,9 @@ static int bluetooth_init_cb(void)
+>         return obex_transport_driver_register(&driver);
+>  }
+>
+> -static void bluetooth_exit_cb(void)
+> +static void bluetooth_exit_cb(gboolean at_unregister)
+>  {
+> +       (void)at_unregister;
+>         GSList *l;
+>
+>         g_dbus_remove_watch(connection, listener_id);
+> diff --git a/obexd/src/logind.c b/obexd/src/logind.c
+> index a0eb62b1e..b4279b209 100644
+> --- a/obexd/src/logind.c
+> +++ b/obexd/src/logind.c
+> @@ -43,13 +43,13 @@ static void call_init_cb(gpointer data, gpointer user=
+_data)
+>  {
+>         int res;
+>
+> -       res =3D ((struct callback_pair *)data)->init_cb();
+> +       res =3D ((struct callback_pair *)data)->init_cb(FALSE);
+>         if (res)
+>                 *(int *)user_data =3D res;
+>  }
+>  static void call_exit_cb(gpointer data, gpointer user_data)
+>  {
+> -       ((struct callback_pair *)data)->exit_cb();
+> +       ((struct callback_pair *)data)->exit_cb(FALSE);
+>  }
+>
+>  static int update(void)
+> @@ -229,7 +229,7 @@ int logind_register(logind_init_cb init_cb, logind_ex=
+it_cb exit_cb)
+>         struct callback_pair *cbs;
+>
+>         if (!monitoring_enabled)
+> -               return init_cb();
+> +               return init_cb(TRUE);
+>         if (callbacks =3D=3D NULL) {
+>                 int res;
+>
+> @@ -237,23 +237,23 @@ int logind_register(logind_init_cb init_cb, logind_=
+exit_cb exit_cb)
+>                 if (res) {
+>                         error("logind_init(): %s - login detection disabl=
+ed",
+>                                 strerror(-res));
+> -                       return init_cb();
+> +                       return init_cb(TRUE);
+>                 }
+>         }
+>         cbs =3D g_new(struct callback_pair, 1);
+>         cbs->init_cb =3D init_cb;
+>         cbs->exit_cb =3D exit_cb;
+>         callbacks =3D g_slist_prepend(callbacks, cbs);
+> -       return active ? init_cb() : 0;
+> +       return active ? init_cb(TRUE) : 0;
+>  }
+>  void logind_unregister(logind_init_cb init_cb, logind_exit_cb exit_cb)
+>  {
+>         GSList *cb_node;
+>
+>         if (!monitoring_enabled)
+> -               return exit_cb();
+> +               return exit_cb(TRUE);
+>         if (active)
+> -               exit_cb();
+> +               exit_cb(TRUE);
+>         cb_node =3D g_slist_find_custom(callbacks, init_cb, find_cb);
+>         if (cb_node !=3D NULL)
+>                 callbacks =3D g_slist_delete_link(callbacks, cb_node);
+> diff --git a/obexd/src/logind.h b/obexd/src/logind.h
+> index eb3ff8d7b..3cdb03338 100644
+> --- a/obexd/src/logind.h
+> +++ b/obexd/src/logind.h
+> @@ -8,8 +8,8 @@
+>   *
+>   */
+>
+> -typedef int (*logind_init_cb)(void);
+> -typedef void (*logind_exit_cb)(void);
+> +typedef int (*logind_init_cb)(gboolean at_register);
+> +typedef void (*logind_exit_cb)(gboolean at_unregister);
+>
+>  #ifdef SYSTEMD
+>
+> @@ -22,12 +22,12 @@ int logind_set(gboolean enabled);
+>  static inline int logind_register(logind_init_cb init_cb,
+>                                         logind_exit_cb exit_cb)
+>  {
+> -       return init_cb();
+> +       return init_cb(TRUE);
+>  }
+>  static inline void logind_unregister(logind_init_cb init_cb,
+>                                         logind_exit_cb exit_cb)
+>  {
+> -       return exit_cb();
+> +       return exit_cb(TRUE);
+>  }
+>  static inline int logind_set(gboolean enabled)
+>  {
+> --
+> 2.49.0
 
-Well except if there is some sort of OOB to generate the link key I
-don't that is possible, note that we don't mark the device as paired
-so the process of doing CablePairing is just creating a device, then
-by the time it first connects it will then do the regular pairing.
-Perhaps it is possible to write the link keys directly via cable but
-then we need the OOB data, etc, to generate the keys which in my
-opinion it just extra work that doesn't really add anything if just
-works, or autopair, is used.
-
-> My knowledge in terms of Kernel Bluetooth subsystem doesn't go so far
-> to actually tackle the problem; it might require implementing a key
-> reloading ABI in the kernel. On the other hand, there's `btmgmt keys'
-> command which, I assume, does pretty much that, but I didn't have any
-> success using it in my testing -- only a full restart of `bluetoothd'
-> did the thing.
->
-> I'm up to further investigation of this nitpick, as I'd love to see a
-> seamless pairing process just like it was intended, but I'd need some
-> assistance in locating the appropriate showstoppers mentioned in that
-> comment. That said, I don't see this as a stopper for the patch itself.
-
-Is it not seamless right now? Doesn't it use 'just works'/autopair?
-
+This is not going very well in my opinion, it looks like we missed the
+opportunity to integrate the logind directly into obc_driver so we
+don't have to duplicate code for each coded, so we keep just doing
+plugin_init->obc_driver_register/plugin_exit->obc_driver_unregister
+and that internally can detect when it shall be registered with the
+Bluetoothd, etc, plugin_exit->obc_driver_unregister can actually be
+assumed to be exit rather than just D-Bus unregister which happens
+when seat is not longer active.
 
 --=20
 Luiz Augusto von Dentz
