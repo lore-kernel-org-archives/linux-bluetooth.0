@@ -1,86 +1,290 @@
-Received: from b-painless.mh.aa.net.uk (b-painless.mh.aa.net.uk [81.187.30.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC341DB366
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 14:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D067617A2EA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 14:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748961393; cv=none; b=ADrjK7zZedvNRWbUME2oWY573ARb2am0SS6O+Db2+zB2cgruLtin1KCH3g9YatoNLDPbeRPe6v7qGTmQXqNeQM5Rlslfg16+3UPm4Yl1MiKYP0YUFrcEKauYtOtsaJPWU/4auzOo4Z83AP09EYPa+pjvfXssbLtfkIvae0g7DBQ=
+	t=1748961627; cv=none; b=O+AJDijayrluGIRCnCqwCrI3F8ybcO5uZvgGVfOozmEFp0QThUaafQH0INrOGVDSrWhjy6Dp0abHFaIhVsbSK7Jdpj0rl+QHb0iIt9L0bTXRDzrmNpEheLa73yMHZZmbKnESEWsfXTU8EzFlVcHFg4aq0bOSKgGNPYkXPFzbd3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748961393; c=relaxed/simple;
-	bh=Au8tohT63CIXSOc9lZCc0ErS2ZogOdRmosGaoLKYWKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IUX2HgGi8/K1cUJRExFq/riZ5/RZvwiXYAcAwCjOtzfsRlYDcSG89F/ULE+T23tiUWDp82Na84+Ci6EKz33cqW0bD4WzEtHmevUsKYl9i9AGcSPgylY9SEwu0qiQhl6Ha9RTwqBbs5IBXbSwZDBO5Tz8tH9WVgcr/gazJ+eqpgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
-Received: from b.c.7.5.4.6.c.0.5.9.b.5.4.1.5.6.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:6514:5b95:c64:57cb] helo=andrews-2024-laptop.sayers)
-	by painless-b.tch.aa.net.uk with smtp (Exim 4.96)
-	(envelope-from <kernel.org@pileofstuff.org>)
-	id 1uMSkd-001rq3-0K;
-	Tue, 03 Jun 2025 15:36:27 +0100
-Date: Tue, 3 Jun 2025 15:35:43 +0100
-From: Andrew Sayers <kernel.org@pileofstuff.org>
-To: Antonio Russo <aerusso@aerusso.net>
-Cc: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Salvatore Bonaccorso <carnil@debian.org>,
-	Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
-Subject: Re: [PATCH] Do not start mpris-proxy for system users
-Message-ID: <aD8IP-un7nkRdUDv@andrews-2024-laptop.sayers>
-References: <a15e6919-9000-4628-baec-a2d2cc327903@aerusso.net>
- <aCiLTy-IuqV6V7WA@eldamar.lan>
- <aCncrfc7qbtLEpta@andrews-2024-laptop.sayers>
- <aDq72xTNkz0kDqpW@eldamar.lan>
- <aDtHoRCof-iND3Td@quark2.heme.sigxcpu.org>
- <30a9641a-05fa-4a44-af58-6b155dc7ecfc@aerusso.net>
- <CABBYNZLQ+HkEm0koVtwJGgxaOTxiy=UTOtc2Do1n0q3CRXEm7w@mail.gmail.com>
- <9d7984b8-79c6-478e-95c8-28a6d4a7ba9b@aerusso.net>
+	s=arc-20240116; t=1748961627; c=relaxed/simple;
+	bh=A7CCVglTDU101rwNYEsR2liVRbLX6z45SVyzXY8yph8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VVlOeWdP+tTte/jJ7fbtIh6Sp9+Q8CyoyQLGLpNbj9fvjXoDpXSpLI28d49npBtaQNBHtV9XsIvd/DpTd2h3e0MZwzvWRNhixMBdNPsxecY3Z2wxi+/jLh+4Bw08/oErctAqtECYYaSxtxW6rIJl5cnJp/JDb3XDAlcVnzzZiqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZQSt0is5; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQSt0is5"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32a6a91f0easo20632861fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Jun 2025 07:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748961624; x=1749566424; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IRuw5WKcmAlsAR+ayNFh6QB6S3WLZRZGkoOeIym2dug=;
+        b=ZQSt0is56aAWQOwNmk7AEhVpgMYdvIajonRvJsw6V3VdzSorSEyD5dQm3a5ku03rpd
+         KlfqPo2l89fK2orUbkt/UsDdK8/IAlLM6zANC9nQjgJcurwowAwadgMr/9cKfh9Q9/sV
+         yGhjrsSoGJfzpjXh/Jbj8hGBMILwiH5beASIGTTUecCD6axUOuWUNeKH09P94xDP7USw
+         EFGvlDwwLwIRzIFstPJsSTG3ZvUWLNJyFKf2nebuj0PLtl/6kfiOhyR4XitY2gGzzaFf
+         A4nFyQ6+Q34r/VtOqll89he5+4SESiXb6DQS99nmAtda9lDHOxahZDa0IiX628uc4a0Z
+         cJ3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748961624; x=1749566424;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IRuw5WKcmAlsAR+ayNFh6QB6S3WLZRZGkoOeIym2dug=;
+        b=XHN6Wt9HTTbpEYkdtCdKhwypSC5kGXLOZT0jUPZ1TNPU+FmoBqc/ogyraN9VwLYb7t
+         JZwVC+2N42ykKeMKUspm8Y/gnJ5XuNGaijRdJZiRzWE3iWa8dTgxbqtUVng2vh7AzwaQ
+         v2NVxVu723XzkYNp5/ppZgLyor6faxVZ71IE0rGDgP5hUkD1GbVqWxgvb/Qr76deM4vV
+         JPw5/8+P4pXHMIG05lNlAyiJ2CXlASjRPETf2L92/bWchtrVEyPmawpEbPzS3UCNFxhz
+         Jye2CPHAGxsQQMOLfhsVwI/7X8ZE8GAbUEfaq6yxehHRhh4KFwPCBB01vGCKuA8P00Zg
+         QnYg==
+X-Gm-Message-State: AOJu0YwQVIXU8tTprCJzgUsgeCIEfbaAqUR8D3NN2TNqFsWlYwRQ4q9x
+	94E4EcXakG2Iz2HaX9sUXt3ZguoIFns864wVs8ofPHI6YQeYEri44/zsG+jqvvC0N7TRjPgMBzA
+	cFFNo/JbHxEMgDXe1GZEchnvBR2LVf/kLu/nXqLw=
+X-Gm-Gg: ASbGnct8vAXZecP0+WfluZHe0S8A3IvOC7eqZZ/MTYbE5FIwPCNI8OAGJLSfCPtXZPn
+	Nl0P/xPwixQP7ws7P1rW+36YNzTy6Ji/WUVdRvtevoDLyXCmvavz+SbJ3PqhWITdjWOY3ZAx0TA
+	TwCFxK8hvFsLRqDjCaJXtPY1OsGC9zbwk=
+X-Google-Smtp-Source: AGHT+IGl7yspY1w0edG59cnrTL8iaAOMVanYUvqTYCnfomjrj/CAipUkQxSoB9SDHsBESJzITrlBhtSvKFZ/qV81474=
+X-Received: by 2002:a05:651c:30c7:b0:32a:6af3:aead with SMTP id
+ 38308e7fff4ca-32a906cf358mr57098031fa.16.1748961623530; Tue, 03 Jun 2025
+ 07:40:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d7984b8-79c6-478e-95c8-28a6d4a7ba9b@aerusso.net>
+References: <20250603095617.92785-1-sdoregor@sdore.me> <20250603095617.92785-3-sdoregor@sdore.me>
+In-Reply-To: <20250603095617.92785-3-sdoregor@sdore.me>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 3 Jun 2025 10:40:10 -0400
+X-Gm-Features: AX0GCFtHX1FoOc6ivQgEdZdwWU-oY2DcUFwj1hPX0k5E0KzutGi5V7KHVto_JAk
+Message-ID: <CABBYNZJYwKurqo+HDUKYtFx0+-rNquj=OHgpcZRZYVmAxDzqpA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] plugins/sixaxis: Implement cable pairing for DualSense
+To: Egor Vorontsov <sdoregor@sdore.me>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 02, 2025 at 09:37:20PM -0600, Antonio Russo wrote:
-> A default installation of bluez results in the systemd user unit
-> mpris-proxy.service being started for all users---including root.
-> This unnecessarily exposes system users to any security
-> vulnerabilities in mpris-proxy.
-> 
-> Inhibit this default behavior by using ConditionUser=!@system.
-> 
-> Signed-off-by: Antonio Enrico Russo <aerusso@aerusso.net>
+Hi Egor,
+
+On Tue, Jun 3, 2025 at 6:05=E2=80=AFAM Egor Vorontsov <sdoregor@sdore.me> w=
+rote:
+>
+> The code is very similar to that for DS4, but I found it's better
+> to separate the matters instead of generalizing it via constants.
+>
+> Also added a request to enable Bluetooth on the controller to initiate
+> pairing without the need to disconnect it and power on again wirelessly,
+> basically emulating what PS itself does. Only for DualSense family now,
+> but can be expanded to DS4 too (I don't have one at hand to test this).
 > ---
->  tools/mpris-proxy.service.in | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tools/mpris-proxy.service.in b/tools/mpris-proxy.service.in
-> index c49d255..6ae56c6 100644
-> --- a/tools/mpris-proxy.service.in
-> +++ b/tools/mpris-proxy.service.in
-> @@ -4,6 +4,7 @@ Documentation=man:mpris-proxy(1)
->  
->  Wants=dbus.socket
->  After=dbus.socket dbus.service
-> +ConditionUser=!@system
->  
->  [Service]
->  Type=simple
+>  plugins/sixaxis.c | 107 ++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 104 insertions(+), 3 deletions(-)
+>
+> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> index 1fab8ae59..a583c8b82 100644
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -131,12 +131,36 @@ static int ds4_get_device_bdaddr(int fd, bdaddr_t *=
+bdaddr)
+>         return 0;
+>  }
+>
+> +static int dualsense_get_device_bdaddr(int fd, bdaddr_t *bdaddr)
+> +{
+> +       uint8_t buf[20];
+> +       int ret;
+> +
+> +       memset(buf, 0, sizeof(buf));
+> +
+> +       buf[0] =3D 0x09;
+> +
+> +       ret =3D ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+> +       if (ret < 0) {
+> +               error("sixaxis: failed to read DualSense device address (=
+%s)",
+> +                     strerror(errno));
+> +               return ret;
+> +       }
+> +
+> +       /* address is little-endian on DualSense */
+> +       bacpy(bdaddr, (bdaddr_t*) (buf + 1));
+> +
+> +       return 0;
+> +}
+> +
+>  static int get_device_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType =
+type)
+>  {
+>         if (type =3D=3D CABLE_PAIRING_SIXAXIS)
+>                 return sixaxis_get_device_bdaddr(fd, bdaddr);
+>         else if (type =3D=3D CABLE_PAIRING_DS4)
+>                 return ds4_get_device_bdaddr(fd, bdaddr);
+> +       else if (type =3D=3D CABLE_PAIRING_DUALSENSE)
+> +               return dualsense_get_device_bdaddr(fd, bdaddr);
+>         return -1;
+>  }
+>
+> @@ -183,12 +207,36 @@ static int ds4_get_central_bdaddr(int fd, bdaddr_t =
+*bdaddr)
+>         return 0;
+>  }
+>
+> +static int dualsense_get_central_bdaddr(int fd, bdaddr_t *bdaddr)
+> +{
+> +       uint8_t buf[20];
+> +       int ret;
+> +
+> +       memset(buf, 0, sizeof(buf));
+> +
+> +       buf[0] =3D 0x09;
+> +
+> +       ret =3D ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
+> +       if (ret < 0) {
+> +               error("sixaxis: failed to read DualSense central address =
+(%s)",
+> +                     strerror(errno));
+> +               return ret;
+> +       }
+> +
+> +       /* address is little-endian on DualSense */
+> +       bacpy(bdaddr, (bdaddr_t*) (buf + 10));
+> +
+> +       return 0;
+> +}
+> +
+>  static int get_central_bdaddr(int fd, bdaddr_t *bdaddr, CablePairingType=
+ type)
+>  {
+>         if (type =3D=3D CABLE_PAIRING_SIXAXIS)
+>                 return sixaxis_get_central_bdaddr(fd, bdaddr);
+>         else if (type =3D=3D CABLE_PAIRING_DS4)
+>                 return ds4_get_central_bdaddr(fd, bdaddr);
+> +       else if (type =3D=3D CABLE_PAIRING_DUALSENSE)
+> +               return dualsense_get_central_bdaddr(fd, bdaddr);
+>         return -1;
+>  }
+>
+> @@ -230,6 +278,26 @@ static int ds4_set_central_bdaddr(int fd, const bdad=
+dr_t *bdaddr)
+>         return ret;
+>  }
+>
+> +static int dualsense_set_central_bdaddr(int fd, const bdaddr_t *bdaddr)
+> +{
+> +       uint8_t buf[27];
+> +       int ret;
+> +
+> +       buf[0] =3D 0x0A;
+> +       bacpy((bdaddr_t*) (buf + 1), bdaddr);
+> +       /* TODO: we could put the key here but
+> +          there is no way to force a re-loading
+> +          of link keys to the kernel from here. */
 
-Reviewed-by: Andrew Sayers <kernel.org@pileofstuff.org>
+Not quite following, what key are you talking about? I thought the
+link keys are still generated over Bluetooth, or are you talking about
+passkeys here?
 
-There was a question earlier in the thread about how to acknowledge me.
-I believe the protocol is to use "Suggested-By:" when I haven't replied,
-and I assume the "Reviewed-By" line *replaces* it now I have.
-But I could be wrong, and don't personally have any important requirements.
-
-> -- 
+> +       memset(buf + 7, 0, 16);
+> +
+> +       ret =3D ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
+> +       if (ret < 0)
+> +               error("sixaxis: failed to write DualSense central address=
+ (%s)",
+> +                     strerror(errno));
+> +
+> +       return ret;
+> +}
+> +
+>  static int set_central_bdaddr(int fd, const bdaddr_t *bdaddr,
+>                                         CablePairingType type)
+>  {
+> @@ -237,6 +305,32 @@ static int set_central_bdaddr(int fd, const bdaddr_t=
+ *bdaddr,
+>                 return sixaxis_set_central_bdaddr(fd, bdaddr);
+>         else if (type =3D=3D CABLE_PAIRING_DS4)
+>                 return ds4_set_central_bdaddr(fd, bdaddr);
+> +       else if (type =3D=3D CABLE_PAIRING_DUALSENSE)
+> +               return dualsense_set_central_bdaddr(fd, bdaddr);
+> +       return -1;
+> +}
+> +
+> +static int dualsense_set_bluetooth_state(int fd, bool state)
+> +{
+> +       uint8_t buf[48];
+> +       int ret;
+> +
+> +       buf[0] =3D 0x08;
+> +       buf[1] =3D state?1:2;
+> +
+> +       ret =3D ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
+> +       if (ret < 0)
+> +               error("sixaxis: failed to set DualSense Bluetooth state (=
+%s)",
+> +                     strerror(errno));
+> +
+> +       return ret;
+> +}
+> +
+> +static int set_bluetooth_state(int fd, CablePairingType type,
+> +                                       bool state)
+> +{
+> +       if (type =3D=3D CABLE_PAIRING_DUALSENSE)
+> +               return dualsense_set_bluetooth_state(fd, state);
+>         return -1;
+>  }
+>
+> @@ -297,12 +391,13 @@ static void agent_auth_cb(DBusError *derr, void *us=
+er_data)
+>         remove_device =3D false;
+>         btd_device_set_temporary(closure->device, false);
+>
+> -       if (closure->type =3D=3D CABLE_PAIRING_SIXAXIS) {
+> +       if (closure->type =3D=3D CABLE_PAIRING_SIXAXIS)
+>                 btd_device_set_record(closure->device, HID_UUID,
+>                                                  SIXAXIS_HID_SDP_RECORD);
+>
+> +       if (closure->type =3D=3D CABLE_PAIRING_SIXAXIS ||
+> +                               closure->type =3D=3D CABLE_PAIRING_DUALSE=
+NSE) {
+>                 device_set_cable_pairing(closure->device, true);
+> -
+>                 server_set_cable_pairing(adapter_bdaddr, true);
+>         }
+>
+> @@ -312,6 +407,11 @@ static void agent_auth_cb(DBusError *derr, void *use=
+r_data)
+>         DBG("remote %s old_central %s new_central %s",
+>                                 device_addr, central_addr, adapter_addr);
+>
+> +       if (closure->type =3D=3D CABLE_PAIRING_DUALSENSE) {
+> +               DBG("Enabling Bluetooth connection on the device");
+> +               set_bluetooth_state(closure->fd, closure->type, true);
+> +       }
+> +
+>  out:
+>         g_hash_table_steal(pending_auths, closure->sysfs_path);
+>
+> @@ -432,7 +532,8 @@ static void device_added(struct udev_device *udevice)
+>
+>         cp =3D get_pairing_type_for_device(udevice, &bus, &sysfs_path);
+>         if (!cp || (cp->type !=3D CABLE_PAIRING_SIXAXIS &&
+> -                               cp->type !=3D CABLE_PAIRING_DS4)) {
+> +                               cp->type !=3D CABLE_PAIRING_DS4 &&
+> +                               cp->type !=3D CABLE_PAIRING_DUALSENSE)) {
+>                 g_free(sysfs_path);
+>                 return;
+>         }
+> --
 > 2.49.0
-> 
-> 
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
