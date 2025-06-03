@@ -1,23 +1,23 @@
 Received: from b-painless.mh.aa.net.uk (b-painless.mh.aa.net.uk [81.187.30.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA882151991
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE07323099F
 	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jun 2025 15:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748963856; cv=none; b=XGOzUyWjMN2Cls2/z0cy1y4/LnnMKi+Qf36cRCX+HlRVcviXVpbP513Gm6bSuzwzYEFuhJTG0Uw4wuF9ONpri1I/lUEKEw0FOfYZ18nbgg3fxt4/oJHbh538Myt7g7eu/Gh4hvFbMvFebnXvT1DvS5lX2wCj0Ex3Mg4wyAaPtsI=
+	t=1748963857; cv=none; b=iMH+OdAzBk3KIfoa3x+27qUR/8mLp1W6pDi2Fa75gfhsBsl8UwRe9YmbazssJA595t6UgSAi458uI5rQTiLz+4jppldMDnl5eUmnnV1NRsyy4Nqpsa7WiMQHM5FfScwuENniLdVw0H4HQUgX9ynFwGKwvi9fNdL+T1qVpb8A8Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748963856; c=relaxed/simple;
-	bh=rcI6apwog9Mw2MG2lck4CuLhnmizK+GIbVaWR9+QXYM=;
+	s=arc-20240116; t=1748963857; c=relaxed/simple;
+	bh=Yec/nPySt+JalAFQ9pvInBq8u4b2OvzGO9SkgyxMRbY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WCFbul/gZXFfqFhg7ZmQisufHNImprxSyCvcTLP3UAcy7S17ORsM2mixOQzaUo9aDcTYSu3je+9IqGFmLgo/5OzhmZFka6YWXxX5/q3J8O4PMD7IJjQthM4YUoQNvJQwT/IhdSWEGoSo15f6TW6WKpdyNlfdM6iu7Dy9iRL7e38=
+	 MIME-Version; b=mf3IKZaU9LDIWUxHQ4zwrrxggIUtWGTYg5ljXO+GWXEmEDZ7nlVw0nxg8VjOUoLgcE+oKdRHNL1QlTnq/y3cho75IHLjZE7zHguEFftBdWgIcdqmt0m/b54g+c5YkwpJL4QQCyyATWvy4umE/mX4OuW8uXIduzKdp7Gg8wyOQjg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
 Received: from c.2.f.1.6.8.1.3.8.c.d.1.f.3.3.d.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:d33f:1dc8:3186:1f2c] helo=andrews-2024-laptop.lan)
 	by painless-b.tch.aa.net.uk with esmtp (Exim 4.96)
 	(envelope-from <kernel.org@pileofstuff.org>)
-	id 1uMTOO-001uWv-0Y;
+	id 1uMTOO-001uWv-12;
 	Tue, 03 Jun 2025 16:17:32 +0100
 From: Andrew Sayers <kernel.org@pileofstuff.org>
 To: linux-bluetooth@vger.kernel.org
@@ -25,9 +25,9 @@ Cc: luiz.dentz@gmail.com,
 	pav@iki.fi,
 	frederic.danis@collabora.com,
 	Andrew Sayers <kernel.org@pileofstuff.org>
-Subject: [PATCH BlueZ 2/3] pbap: use the public DBus connection
-Date: Tue,  3 Jun 2025 16:13:30 +0100
-Message-ID: <20250603151651.1080923-3-kernel.org@pileofstuff.org>
+Subject: [PATCH BlueZ 3/3] Revert "obexd: Support creating private system/session bus connections"
+Date: Tue,  3 Jun 2025 16:13:31 +0100
+Message-ID: <20250603151651.1080923-4-kernel.org@pileofstuff.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250603151651.1080923-1-kernel.org@pileofstuff.org>
 References: <20250603151651.1080923-1-kernel.org@pileofstuff.org>
@@ -37,84 +37,48 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-PBAP must not use its own private DBus connection, as it needs to
-receive messages sent to the bus name of the public connection.
+This reverts commit 237d818ef294e22be87fba69b3cdd79c75c201e7,
+which encouraged the use of private DBus connections.
+Doing so caused a bug, so it's better to remove the temptation for now
+and re-add it if a legitimate use case is ever found.
 
-PBAP must not unregister itself when the program is exiting, as it might
-cause a long delay.  Unregistering at exit is redundant anyway, as the
-service will be implicitly unregistered when the connection is closed.
-
-But PBAP must unregister itself when the user becomes inactive mid-session,
-so systems with multiple users logged in at once can share bluetooth.
-
-Use the public DBus connection instead of a private one,
-and explicitly unregister the profile if appropriate.
-
-Thanks Pauli Virtanen for pointing out the exit issue:
-https://lore.kernel.org/linux-bluetooth/ae15a9fa4bf0bd509dd3d44f1f364e241e50956c.camel@iki.fi/
-
-Reported-by: Frédéric Danis <frederic.danis@collabora.com>
-Closes: https://lore.kernel.org/linux-bluetooth/333ad76e-0aba-4f93-b141-8e69fb47535f@collabora.com/
-Suggested-by: Pauli Virtanen <pav@iki.fi>
 Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
 ---
- obexd/client/pbap.c | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
+ obexd/src/main.c  | 8 --------
+ obexd/src/obexd.h | 2 --
+ 2 files changed, 10 deletions(-)
 
-diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
-index 64bb8ff72..0bd4e10df 100644
---- a/obexd/client/pbap.c
-+++ b/obexd/client/pbap.c
-@@ -1462,7 +1462,7 @@ static int pbap_init_cb(gboolean at_register)
+diff --git a/obexd/src/main.c b/obexd/src/main.c
+index df150973e..6837f0d73 100644
+--- a/obexd/src/main.c
++++ b/obexd/src/main.c
+@@ -254,14 +254,6 @@ DBusConnection *obex_setup_dbus_connection(const char *name,
+ 	return connection;
+ }
  
- 	DBG("");
- 
--	conn = obex_setup_dbus_connection_private(NULL, NULL);
-+	conn = obex_get_dbus_connection();
- 	if (!conn)
- 		return -EIO;
- 
-@@ -1485,9 +1485,28 @@ static int pbap_init_cb(gboolean at_register)
- 
- static void pbap_exit_cb(gboolean at_unregister)
+-DBusConnection *obex_setup_dbus_connection_private(const char *name,
+-					DBusError *error)
+-{
+-	return g_dbus_setup_private(option_system_bus ?
+-				DBUS_BUS_SYSTEM : DBUS_BUS_SESSION,
+-				name, error);
+-}
+-
+ int main(int argc, char *argv[])
  {
--	(void)at_unregister;
-+	DBusMessage *msg;
-+	DBusMessageIter iter;
-+	char *uuid = PBAP_CLIENT_UUID;
-+
- 	DBG("");
- 
-+	if (!at_unregister) {
-+		client_path = g_strconcat("/org/bluez/obex/", uuid, NULL);
-+		g_strdelimit(client_path, "-", '_');
-+
-+		msg = dbus_message_new_method_call("org.bluez", "/org/bluez",
-+							"org.bluez.ProfileManager1",
-+							"UnregisterProfile");
-+
-+		dbus_message_iter_init_append(msg, &iter);
-+
-+		dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
-+								&client_path);
-+
-+		g_dbus_send_message(system_conn, msg);
-+	}
-+
- 	g_dbus_remove_watch(system_conn, listener_id);
- 
- 	unregister_profile();
-@@ -1499,7 +1518,6 @@ static void pbap_exit_cb(gboolean at_unregister)
- 	}
- 
- 	if (conn) {
--		dbus_connection_close(conn);
- 		dbus_connection_unref(conn);
- 		conn = NULL;
- 	}
+ 	GOptionContext *context;
+diff --git a/obexd/src/obexd.h b/obexd/src/obexd.h
+index 560db29ce..5e5edc4de 100644
+--- a/obexd/src/obexd.h
++++ b/obexd/src/obexd.h
+@@ -33,5 +33,3 @@ const char *obex_option_capability(void);
+ DBusConnection *obex_get_dbus_connection(void);
+ DBusConnection *obex_setup_dbus_connection(const char *name,
+ 					DBusError *error);
+-DBusConnection *obex_setup_dbus_connection_private(const char *name,
+-					DBusError *error);
 -- 
 2.49.0
 
