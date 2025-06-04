@@ -1,80 +1,112 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599C12397B0
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 13:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5D028DB61
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 13:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749044944; cv=none; b=N9HuBUrhHpWVRKUN5pdASLy7UmXD8o8sm7jQWhp8Gs+yWMYE0cEU9CM+N2BDfMC1Ylv/+SaCwWo+wTJAnwcUUJz48lhst5qF/jjY4ydZPyCRTRdkBsNaggJIxeHac4v5+zaOvQd2TofZn8facUad+PnCMCLdcpsmfRHRoguihJw=
+	t=1749045178; cv=none; b=g/nnfCmGamT0FKjKqMf0S/yiPF8tuHMr64Pze8HCkO/KJv6No/4tW9iNjXyrAoI61Vhp1L81scXnCLt8nd2BO4UicJ0Vf7C1U3pOGKc1gQmICZU0EwMFbVeV9ojfBKwQRzi6WwcYRHtaeT/JxuU2+cGzIeOFdgRYBIxUQK+2j5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749044944; c=relaxed/simple;
-	bh=E6AjJsZoQR7ATw1vqbUKxXWRnlc6fN/YqQrTu5Fj2JM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=B0y8mhK64KU31cu/31ZqGzvb8U+BSKg77nkqOpJuuoQ7xuyh4WQ9gx4OW1Ba/RXzxp6uX0tYoIZlb+u6ZznRH2B/lSaBWNVE9YkxHJIyFgDgRxDgQ/IWID4+5Q6cvJXljBPjrtd1TJqSBUEm5mw0bMVcRzEeLCtkWVw7oynaAuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3dc854af016so75200265ab.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Jun 2025 06:49:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749044942; x=1749649742;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N11uxGJUKeG559sG4Xn+XEgkd5khL+2AZw1RyfROMGw=;
-        b=LYJL0sr+vWvH8OEZj5DmPcsz3aSqI0Cbm3mQXl2R3jtHQG6tLKt90vRl6x+ovMCcOQ
-         h3+eixqPX9S7nP0Z/RZdZH3tp6OVDs9a+pVRRQfDHjuVW+yFEJ1emrXUmdeJJ0Nj3NdU
-         ecvV5PtjNnM5KhEEjGdSr5y3wcm+0nLQHIdinllxvRTHdx0bNj4nCo+4juhqWEmh2e1O
-         INY6tMBMcdXwBxsdc+5XDk6j0JkWkK6CrmEyAI7qO+3oBVGaZiUO1il2NqZjy+dmYnEe
-         yltE3idgj300oIXZtwsc8lUwJE8d28EcEJC8tttdSiYaa8q1DWvqnQ+MaNwwADDDmg7I
-         /xTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrDvb4MJY7h+LH0scc2KSpc4ShsfrZ+i9T4JZFp7tKRfiq21IL+cHufHdurbGYmgvz7dZh0Qee2xtyNtb3BB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrag+IL1iviEsjtrEL4jRfM/lBklo8DWKB80wbCXqk+RDkp8Hg
-	lADm93P2gmzVKQ6igfCn6NNtsQW46l6N6F+4c02mRhamM+T4f1xvt0WZH89a6Znk80NsYwuUYsi
-	ANLPHIYdL/0p2xQS49gPbzOv8dSLGFvb+kU+JxCmEostfEaaPTm/ojZ/aJdI=
-X-Google-Smtp-Source: AGHT+IHSSnUkFWqcgI/NtYmboP9G/XGenJErYrL412ddFEKsEXLA6AoH8cnZsc6pVZ4n+njQnEYpd/Nxew4+Rj19uLZbUqzVeV+R
+	s=arc-20240116; t=1749045178; c=relaxed/simple;
+	bh=tCRsh4i/qFBwxf1gxWNMIlO8VNBJWhH29EoM4uoVv4I=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=s6ZfJt2mHLcXJ93/NTFnxxsviZYQU8zKm5qoHrjNDwBTlX3wQVfo/NqjQLZ/zGsWuJj2hm9+15Flj7XyZwYran+YC8c/4LOKrUx64dMcCgqoaF31NtrpF/Lr6U8j8L5cXFsBcEaxTRuEav2V4PFPOAufNkCkP7LraIx8ToSxtzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WQKUz3Bu; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WQKUz3Bu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749045177; x=1780581177;
+  h=date:from:to:cc:subject:message-id;
+  bh=tCRsh4i/qFBwxf1gxWNMIlO8VNBJWhH29EoM4uoVv4I=;
+  b=WQKUz3BuiH7H/n0OBOeIAvsBByC2wS4lt1ofx1wWdAb54hNY+Q8K1/9p
+   WJPw1FKoNZOk7v0FLuuZcBprAf6PH74C0vIjgyvLwa6IHSVhJ94tAzw8M
+   lVa/N/Rb2m842K+2AxbGa4MoWP4V17C7zkr6hHbltxvnjkiOoB5u48aYf
+   oEvjI/NRvIfT8FSTd4OuG7B6UKBK8N3wf6Li+jz1XXHgltcHbFi/n0Sqy
+   3Khq6E6nVz/UXtDk8+y4X2AmLM72iM96qkmEdXuI8/SDS6BsGpkN096WR
+   T7HbesZo6cAjV+3dRhuFrwEkcoZRw8HYjUdi3tiIveMBO/NvfuJ58u8MS
+   A==;
+X-CSE-ConnectionGUID: u3GFsCRKRy2e1L0CrdXNgA==
+X-CSE-MsgGUID: 8dThV5xER5q3v4ZX18AS2Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="61394285"
+X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
+   d="scan'208";a="61394285"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 06:52:57 -0700
+X-CSE-ConnectionGUID: /+SFsRwSS0KEYE4H3Jys/g==
+X-CSE-MsgGUID: plaINk0nSZq4or+EXwsovQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
+   d="scan'208";a="182368336"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 04 Jun 2025 06:52:56 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uMoY1-0003B7-1z;
+	Wed, 04 Jun 2025 13:52:53 +0000
+Date: Wed, 04 Jun 2025 21:52:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ fa2c8bfe6794411c18231d94213484122c3bff50
+Message-ID: <202506042118.wBWkZmzS-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12cc:b0:3dd:8663:d19e with SMTP id
- e9e14a558f8ab-3ddbee3d578mr27737905ab.10.1749044942381; Wed, 04 Jun 2025
- 06:49:02 -0700 (PDT)
-Date: Wed, 04 Jun 2025 06:49:02 -0700
-In-Reply-To: <66f7eee8.050a0220.4a974.0006.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68404ece.a00a0220.d4325.000d.GAE@google.com>
-Subject: Re: [syzbot] [mm?] INFO: rcu detected stall in vhci_release
-From: syzbot <syzbot+46c3d1706c2d2688baba@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, bigeasy@linutronix.de, bsegall@google.com, 
-	dietmar.eggemann@arm.com, edumazet@google.com, juri.lelli@redhat.com, 
-	kerneljasonxing@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, luiz.dentz@gmail.com, 
-	marcel@holtmann.org, mgorman@suse.de, mingo@kernel.org, mingo@redhat.com, 
-	pabeni@redhat.com, peterz@infradead.org, rostedt@goodmis.org, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
-	vincent.guittot@linaro.org, vschneid@redhat.com
-Content-Type: text/plain; charset="UTF-8"
 
-syzbot suspects this issue was fixed by commit:
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: fa2c8bfe6794411c18231d94213484122c3bff50  Bluetooth: btintel_pcie: Reduce driver buffer posting to prevent race condition
 
-commit 6d71a9c6160479899ee744d2c6d6602a191deb1f
-Author: Peter Zijlstra <peterz@infradead.org>
-Date:   Thu Jan 9 10:59:59 2025 +0000
+elapsed time: 1397m
 
-    sched/fair: Fix EEVDF entity placement bug causing scheduling lag
+configs tested: 35
+configs skipped: 1
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15a9780c580000
-start commit:   abf2050f51fd Merge tag 'media/v6.12-1' of git://git.kernel..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2a8c36c5e2b56016
-dashboard link: https://syzkaller.appspot.com/bug?extid=46c3d1706c2d2688baba
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10564c80580000
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-If the result looks correct, please mark the issue as fixed by replying with:
+tested configs:
+alpha        allyesconfig    gcc-15.1.0
+arc          allmodconfig    gcc-15.1.0
+arc          allyesconfig    gcc-15.1.0
+arm          allmodconfig    gcc-15.1.0
+arm          allyesconfig    gcc-15.1.0
+arm64        allmodconfig    clang-19
+hexagon      allmodconfig    clang-17
+hexagon      allyesconfig    clang-21
+i386         allmodconfig    gcc-12
+i386          allnoconfig    gcc-12
+i386         allyesconfig    gcc-12
+i386            defconfig    clang-20
+loongarch    allmodconfig    gcc-15.1.0
+m68k         allmodconfig    gcc-15.1.0
+m68k         allyesconfig    gcc-15.1.0
+microblaze   allmodconfig    gcc-15.1.0
+microblaze   allyesconfig    gcc-15.1.0
+openrisc     allyesconfig    gcc-15.1.0
+parisc       allmodconfig    gcc-15.1.0
+parisc       allyesconfig    gcc-15.1.0
+powerpc      allmodconfig    gcc-15.1.0
+powerpc      allyesconfig    clang-21
+riscv        allmodconfig    clang-21
+riscv        allyesconfig    clang-16
+s390         allmodconfig    clang-18
+s390         allyesconfig    gcc-15.1.0
+sh           allmodconfig    gcc-15.1.0
+sh           allyesconfig    gcc-15.1.0
+sparc        allmodconfig    gcc-15.1.0
+um           allmodconfig    clang-19
+um           allyesconfig    gcc-12
+x86_64        allnoconfig    clang-20
+x86_64       allyesconfig    clang-20
+x86_64          defconfig    gcc-11
+x86_64      rhel-9.4-rust    clang-18
 
-#syz fix: sched/fair: Fix EEVDF entity placement bug causing scheduling lag
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
