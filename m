@@ -1,112 +1,79 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5D028DB61
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 13:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2CF18E1F
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 14:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749045178; cv=none; b=g/nnfCmGamT0FKjKqMf0S/yiPF8tuHMr64Pze8HCkO/KJv6No/4tW9iNjXyrAoI61Vhp1L81scXnCLt8nd2BO4UicJ0Vf7C1U3pOGKc1gQmICZU0EwMFbVeV9ojfBKwQRzi6WwcYRHtaeT/JxuU2+cGzIeOFdgRYBIxUQK+2j5k=
+	t=1749049197; cv=none; b=VYo3XZgv/vXF+Nsj4VpYgm9B+FyK8qHeYdXap+b/JR7jQ2RliJ0brnnYki9tBc88QKNLo2guRPVOYMGcDvIic120sl/9SgtB0DBEmAgastdrv7EPPhP3gh0boOpaXRfPqdHQkHLM4/neyZRYpAJ4UflMCcx4mnbBjaCcoXRK7lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749045178; c=relaxed/simple;
-	bh=tCRsh4i/qFBwxf1gxWNMIlO8VNBJWhH29EoM4uoVv4I=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=s6ZfJt2mHLcXJ93/NTFnxxsviZYQU8zKm5qoHrjNDwBTlX3wQVfo/NqjQLZ/zGsWuJj2hm9+15Flj7XyZwYran+YC8c/4LOKrUx64dMcCgqoaF31NtrpF/Lr6U8j8L5cXFsBcEaxTRuEav2V4PFPOAufNkCkP7LraIx8ToSxtzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WQKUz3Bu; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1749049197; c=relaxed/simple;
+	bh=yV9VEQThKhCYrq4zVC1jydhuexeG7aHwmdkuhL8PQFM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cmVD6GfH+CLCCTwr4+RA6lVdOaI0BQT/JPA71+r0RLAM0h1T7zffS8Es+8q+hhexj34crv4FePPUNv2X6OXpMSNIO31KJDEwSs5svhRx8ksSNL/SyBNuvL5KgLDTVdi9MWidtuI5MREYSjdHNLyZZehm7g6TLjU9zkzoIKIWA+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FWaAukwY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WQKUz3Bu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749045177; x=1780581177;
-  h=date:from:to:cc:subject:message-id;
-  bh=tCRsh4i/qFBwxf1gxWNMIlO8VNBJWhH29EoM4uoVv4I=;
-  b=WQKUz3BuiH7H/n0OBOeIAvsBByC2wS4lt1ofx1wWdAb54hNY+Q8K1/9p
-   WJPw1FKoNZOk7v0FLuuZcBprAf6PH74C0vIjgyvLwa6IHSVhJ94tAzw8M
-   lVa/N/Rb2m842K+2AxbGa4MoWP4V17C7zkr6hHbltxvnjkiOoB5u48aYf
-   oEvjI/NRvIfT8FSTd4OuG7B6UKBK8N3wf6Li+jz1XXHgltcHbFi/n0Sqy
-   3Khq6E6nVz/UXtDk8+y4X2AmLM72iM96qkmEdXuI8/SDS6BsGpkN096WR
-   T7HbesZo6cAjV+3dRhuFrwEkcoZRw8HYjUdi3tiIveMBO/NvfuJ58u8MS
-   A==;
-X-CSE-ConnectionGUID: u3GFsCRKRy2e1L0CrdXNgA==
-X-CSE-MsgGUID: 8dThV5xER5q3v4ZX18AS2Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="61394285"
-X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
-   d="scan'208";a="61394285"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 06:52:57 -0700
-X-CSE-ConnectionGUID: /+SFsRwSS0KEYE4H3Jys/g==
-X-CSE-MsgGUID: plaINk0nSZq4or+EXwsovQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
-   d="scan'208";a="182368336"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 04 Jun 2025 06:52:56 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uMoY1-0003B7-1z;
-	Wed, 04 Jun 2025 13:52:53 +0000
-Date: Wed, 04 Jun 2025 21:52:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- fa2c8bfe6794411c18231d94213484122c3bff50
-Message-ID: <202506042118.wBWkZmzS-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FWaAukwY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B87EC4CEE4;
+	Wed,  4 Jun 2025 14:59:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749049197;
+	bh=yV9VEQThKhCYrq4zVC1jydhuexeG7aHwmdkuhL8PQFM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FWaAukwYYgxUFVMRCSBxrNEPmKkhgRsDxXQ1zESrCCA+Qc7BBJUNBrD+T2/XH9RtQ
+	 JVQU6zbH6qDx/CaJbEss70OmELiiKhI3W8SQXdQiS9+4Vu4aoUC/QgtgBwqFwFjDXb
+	 6zgaStCiP/P1NQk+1nsDJZQhg85AH16dQmiHyiOj9zUI6YO0zuy143I/X6Mhnc35Ea
+	 NvpxJq4wiwgcGyxQhVwBa5qBOXtPVZAXk9oa3+JFAjVs/I6w3K1lAuVJRDHm7kS3Gu
+	 UChmAyGlolOrFVmVGtdmo1ZyikED2KvspeUYKkuQ0Ujf7eXkn/G/Q52MQvv1Ul/Q31
+	 uMoSf2k8ZhjgQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEF238111E5;
+	Wed,  4 Jun 2025 15:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 1/2] Bluetooth: MGMT: Fix UAF on
+ mgmt_remove_adv_monitor_complete
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174904922923.2320923.17814377626102914152.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Jun 2025 15:00:29 +0000
+References: <20250603202921.267083-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250603202921.267083-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: fa2c8bfe6794411c18231d94213484122c3bff50  Bluetooth: btintel_pcie: Reduce driver buffer posting to prevent race condition
+Hello:
 
-elapsed time: 1397m
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-configs tested: 35
-configs skipped: 1
+On Tue,  3 Jun 2025 16:29:20 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This reworks MGMT_OP_REMOVE_ADV_MONITOR to not use mgmt_pending_add to
+> avoid crashes like bellow:
+> 
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_complete+0xe5/0x540 net/bluetooth/mgmt.c:5406
+> Read of size 8 at addr ffff88801c53f318 by task kworker/u5:5/5341
+> 
+> [...]
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Here is the summary with links:
+  - [v4,1/2] Bluetooth: MGMT: Fix UAF on mgmt_remove_adv_monitor_complete
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5db6a9a0d444
+  - [v4,2/2] Bluetooth: MGMT: Protect mgmt_pending list with its own lock
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f60dca4b11df
 
-tested configs:
-alpha        allyesconfig    gcc-15.1.0
-arc          allmodconfig    gcc-15.1.0
-arc          allyesconfig    gcc-15.1.0
-arm          allmodconfig    gcc-15.1.0
-arm          allyesconfig    gcc-15.1.0
-arm64        allmodconfig    clang-19
-hexagon      allmodconfig    clang-17
-hexagon      allyesconfig    clang-21
-i386         allmodconfig    gcc-12
-i386          allnoconfig    gcc-12
-i386         allyesconfig    gcc-12
-i386            defconfig    clang-20
-loongarch    allmodconfig    gcc-15.1.0
-m68k         allmodconfig    gcc-15.1.0
-m68k         allyesconfig    gcc-15.1.0
-microblaze   allmodconfig    gcc-15.1.0
-microblaze   allyesconfig    gcc-15.1.0
-openrisc     allyesconfig    gcc-15.1.0
-parisc       allmodconfig    gcc-15.1.0
-parisc       allyesconfig    gcc-15.1.0
-powerpc      allmodconfig    gcc-15.1.0
-powerpc      allyesconfig    clang-21
-riscv        allmodconfig    clang-21
-riscv        allyesconfig    clang-16
-s390         allmodconfig    clang-18
-s390         allyesconfig    gcc-15.1.0
-sh           allmodconfig    gcc-15.1.0
-sh           allyesconfig    gcc-15.1.0
-sparc        allmodconfig    gcc-15.1.0
-um           allmodconfig    clang-19
-um           allyesconfig    gcc-12
-x86_64        allnoconfig    clang-20
-x86_64       allyesconfig    clang-20
-x86_64          defconfig    gcc-11
-x86_64      rhel-9.4-rust    clang-18
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
