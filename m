@@ -1,127 +1,80 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3F31E522
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 12:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599C12397B0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 13:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749040911; cv=none; b=SxNxz9erlLxoKYBrII7zUIPuZZTflNziJx5IUyytlKgFC+faRNLfFnrb6JMQco+LNKCnRwCA73OO3BeJj9Vwal/b5jfKVc9m1MIcyCFmMYlr0ZUtf59GZsgmG+/IKuendJvyYGoijNaoBiMQX6civcyNK316BDaoZd550AaoV6A=
+	t=1749044944; cv=none; b=N9HuBUrhHpWVRKUN5pdASLy7UmXD8o8sm7jQWhp8Gs+yWMYE0cEU9CM+N2BDfMC1Ylv/+SaCwWo+wTJAnwcUUJz48lhst5qF/jjY4ydZPyCRTRdkBsNaggJIxeHac4v5+zaOvQd2TofZn8facUad+PnCMCLdcpsmfRHRoguihJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749040911; c=relaxed/simple;
-	bh=f5d+H4V4HoWe8DREbkJGpvTv+FdmgGAcByb457S0PL0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Da9CuWzTIMhtxJ4UMQgTi5NkSJnufHhy3zGimgTuHurXAe2uAtEc40VBOsdwdPuz5gCKv6ZFhzhnu/4R0DRFfM13E/c3LWzcO5e/NbbKMYq6gq+fn91qUfmcSBZQMFIvDGG/hPAW44DrLRqk5fX8t7bSFCzejOhIpNHLMPLrq0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTbaZOP4; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTbaZOP4"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32a63ff3bdfso55734191fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Jun 2025 05:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749040908; x=1749645708; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f5d+H4V4HoWe8DREbkJGpvTv+FdmgGAcByb457S0PL0=;
-        b=VTbaZOP4b3/ZbwHa58jYYkvvajER8mXNR9ugpzstDzKEeUJUfpBOkxWGMy9Agw3AxT
-         kFZ+qw86tbsK57WKMMo9yq2UCl+OVwq9jzOPJ99AmDrmODL9lJTCsPWts0ngZ4WRQQfR
-         80OWdhDJyLxTrUDyLzzTBPBieW12gbSMWxno4d2Jmr0OAc0priaa5Gv9TvsGEhWyatux
-         tsdoRvXEi9QsS74ZUsn0p875OnRRfvRAnFOUPWw+Ns611T5RUbkFpceMEHFKBfqgI3WJ
-         2BlxCTbPhospg7dA6cVTIPF1RMQYzvN6yLSw7krfxNpP1uw6PFouflSzZT0g6dyM/2rN
-         uP0Q==
+	s=arc-20240116; t=1749044944; c=relaxed/simple;
+	bh=E6AjJsZoQR7ATw1vqbUKxXWRnlc6fN/YqQrTu5Fj2JM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=B0y8mhK64KU31cu/31ZqGzvb8U+BSKg77nkqOpJuuoQ7xuyh4WQ9gx4OW1Ba/RXzxp6uX0tYoIZlb+u6ZznRH2B/lSaBWNVE9YkxHJIyFgDgRxDgQ/IWID4+5Q6cvJXljBPjrtd1TJqSBUEm5mw0bMVcRzEeLCtkWVw7oynaAuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3dc854af016so75200265ab.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Jun 2025 06:49:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749040908; x=1749645708;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f5d+H4V4HoWe8DREbkJGpvTv+FdmgGAcByb457S0PL0=;
-        b=fC2aPN1DO2hBefHTYOK7wdUrXyxqTQrbS/0OATmWm+5M5DfO7jLr3D24aML5gvj+UU
-         mdk0mB5+DPc4Tub0gzd17LfoWA5peogRADgfmKOfF5XgdQIeHGx8Qoqb59NsUa9qdzqf
-         fyOsatkZXHlWEe0VbynSYNfLYg2Eg/MkYIKsmV0gDQN09HasR65b9Kvux5jP71tnGpoF
-         GqRLLMkToXAK3SsJy7SRxGTuqEKix+gezUnnL/YyYFd41bLRJGJaty9h08YBi+g9Cuc6
-         e1NIc7aDUgxNsOHDER1DVgtCNIjSVKxM/dP88FkSF2nFXGVmgkxbyrjaElxlUytpFkdr
-         Cbig==
-X-Gm-Message-State: AOJu0YzilglQNG+Ee6G5S9EnI1ay29D9fs4zEyrzJqWe5zU3y7B6ipio
-	us3J3QvwBrjminO38oztJWZebTrMBVBRqS4mDvYcwwF6s+gtPiXRZiJ4+XK39YjEE/PIiSWe4HA
-	pryW4WdtovqxGnbwYgWEu66fyaNC7XOYfHnsUwZo=
-X-Gm-Gg: ASbGnct8TIDVZIygPPONXLdD6EmVkUF3BikHx+YcSGBMfbvP91llxWEKtSh3F+mKReQ
-	Sej1t/spb0xYXn9nB6SUkX1I0Ud5A7aLSa+I49jlJxSjc+3wpzWPseLCEAKnkbHnY6IxDcFN7HQ
-	fxLF/MLqTJynl7IUr3Zico00HcevJvn7s=
-X-Google-Smtp-Source: AGHT+IGJHCqhd/A06HrJyX1aYGiNaG0YannS6ePSSWH5W6hwjr+r9tpb8I0Xpe24IMaCK2eFlqMUbRn5kNlxD6tfD7w=
-X-Received: by 2002:a2e:a586:0:b0:32a:6731:7995 with SMTP id
- 38308e7fff4ca-32ac729d05amr7386741fa.38.1749040907619; Wed, 04 Jun 2025
- 05:41:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749044942; x=1749649742;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N11uxGJUKeG559sG4Xn+XEgkd5khL+2AZw1RyfROMGw=;
+        b=LYJL0sr+vWvH8OEZj5DmPcsz3aSqI0Cbm3mQXl2R3jtHQG6tLKt90vRl6x+ovMCcOQ
+         h3+eixqPX9S7nP0Z/RZdZH3tp6OVDs9a+pVRRQfDHjuVW+yFEJ1emrXUmdeJJ0Nj3NdU
+         ecvV5PtjNnM5KhEEjGdSr5y3wcm+0nLQHIdinllxvRTHdx0bNj4nCo+4juhqWEmh2e1O
+         INY6tMBMcdXwBxsdc+5XDk6j0JkWkK6CrmEyAI7qO+3oBVGaZiUO1il2NqZjy+dmYnEe
+         yltE3idgj300oIXZtwsc8lUwJE8d28EcEJC8tttdSiYaa8q1DWvqnQ+MaNwwADDDmg7I
+         /xTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrDvb4MJY7h+LH0scc2KSpc4ShsfrZ+i9T4JZFp7tKRfiq21IL+cHufHdurbGYmgvz7dZh0Qee2xtyNtb3BB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyrag+IL1iviEsjtrEL4jRfM/lBklo8DWKB80wbCXqk+RDkp8Hg
+	lADm93P2gmzVKQ6igfCn6NNtsQW46l6N6F+4c02mRhamM+T4f1xvt0WZH89a6Znk80NsYwuUYsi
+	ANLPHIYdL/0p2xQS49gPbzOv8dSLGFvb+kU+JxCmEostfEaaPTm/ojZ/aJdI=
+X-Google-Smtp-Source: AGHT+IHSSnUkFWqcgI/NtYmboP9G/XGenJErYrL412ddFEKsEXLA6AoH8cnZsc6pVZ4n+njQnEYpd/Nxew4+Rj19uLZbUqzVeV+R
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603095617.92785-1-sdoregor@sdore.me> <20250603095617.92785-3-sdoregor@sdore.me>
- <CABBYNZJYwKurqo+HDUKYtFx0+-rNquj=OHgpcZRZYVmAxDzqpA@mail.gmail.com>
- <c8b55be8b9abdb73bc57e8a2d455770199a2b21b.camel@sdore.me> <CABBYNZKL2gYmWPfP1owAUSAieWgt4ARaFp0-T5+vQ+rgjWnNHw@mail.gmail.com>
- <4c6bec3c1c02243cf57e1618d1fd35a2f12bdf22.camel@sdore.me>
-In-Reply-To: <4c6bec3c1c02243cf57e1618d1fd35a2f12bdf22.camel@sdore.me>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 4 Jun 2025 08:41:34 -0400
-X-Gm-Features: AX0GCFt5G_SBveykXcOBsZWO135iFe8ztdQvU4dO1FAvwfF6VvuT0rq2I8_gepw
-Message-ID: <CABBYNZL++r5p=opkw-saPK8yqKQWEPrU-AvcQvPK_x+0yXEUkQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] plugins/sixaxis: Implement cable pairing for DualSense
-To: sdoregor@sdore.me
-Cc: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6e02:12cc:b0:3dd:8663:d19e with SMTP id
+ e9e14a558f8ab-3ddbee3d578mr27737905ab.10.1749044942381; Wed, 04 Jun 2025
+ 06:49:02 -0700 (PDT)
+Date: Wed, 04 Jun 2025 06:49:02 -0700
+In-Reply-To: <66f7eee8.050a0220.4a974.0006.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68404ece.a00a0220.d4325.000d.GAE@google.com>
+Subject: Re: [syzbot] [mm?] INFO: rcu detected stall in vhci_release
+From: syzbot <syzbot+46c3d1706c2d2688baba@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, bigeasy@linutronix.de, bsegall@google.com, 
+	dietmar.eggemann@arm.com, edumazet@google.com, juri.lelli@redhat.com, 
+	kerneljasonxing@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, luiz.dentz@gmail.com, 
+	marcel@holtmann.org, mgorman@suse.de, mingo@kernel.org, mingo@redhat.com, 
+	pabeni@redhat.com, peterz@infradead.org, rostedt@goodmis.org, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
+	vincent.guittot@linaro.org, vschneid@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Egor,
+syzbot suspects this issue was fixed by commit:
 
-On Tue, Jun 3, 2025 at 2:35=E2=80=AFPM Egor Vorontsov <sdoregor@sdore.me> w=
-rote:
->
-> On Tue, 2025-06-03 at 11:38 -0400, Luiz Augusto von Dentz wrote:
-> > Perhaps it is possible to write the link keys directly via cable but
-> > then we need the OOB data, etc, to generate the keys which in my
-> > opinion it just extra work that doesn't really add anything if just
-> > works, or autopair, is used.
->
-> In my experimental PoC I just generated a random 128-bit string and
-> used it as the link key for both sides (placed into `LinkKey=3D' in
-> BlueZ's `/info' and sent to DualSense over USB), which showed to be
-> working perfectly.
+commit 6d71a9c6160479899ee744d2c6d6602a191deb1f
+Author: Peter Zijlstra <peterz@infradead.org>
+Date:   Thu Jan 9 10:59:59 2025 +0000
 
-Hmm, not so sure this is secure though, I mean it could be a rogue USB
-device pretending to be a controller so it would automatically be
-considered paired if we just self generate the keys without asking for
-user confirmation.
+    sched/fair: Fix EEVDF entity placement bug causing scheduling lag
 
-> > Is it not seamless right now? Doesn't it use 'just works'/autopair?
->
-> It is kind of seamless, but you still have to accept the pairing
-> manually (e.g. be discoverable and with an active agent). In terms of
-> security I'd say this behavior is indeed preferable (otherwise one
-> could spoof the VID:PID and zero-click bond with the host), but it
-> still requires two separate confirmations.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15a9780c580000
+start commit:   abf2050f51fd Merge tag 'media/v6.12-1' of git://git.kernel..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2a8c36c5e2b56016
+dashboard link: https://syzkaller.appspot.com/bug?extid=46c3d1706c2d2688baba
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10564c80580000
 
-Yeah, the zero-click bond might be a security concern though, so I
-think having the user do a confirmation for each step is sort of
-assuring he knows (or at least pretend) what is going on.
+If the result looks correct, please mark the issue as fixed by replying with:
 
-> If we could generate a static key, place it to both devices BUT at the
-> same time mark the device as unconfirmed/untrusted/etc. locally, so
-> that it is still going to trigger one and only one interactive pairing
-> confirmation, that'd be the intended design at least in my view.
+#syz fix: sched/fair: Fix EEVDF entity placement bug causing scheduling lag
 
-When would we generate the confirmation though? I sort of trust more
-the Bluetooth process to generate and exchange keys.
-
-> Another possible way would be to automatically accept the first, dummy
-> pairing request that doesn't bear a link key yet -- so no security risk
-> there, but still more seamless experience for the user.
->
-> --
-> Egor Vorontsov <sdoregor@sdore.me>
-
-
-
---=20
-Luiz Augusto von Dentz
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
