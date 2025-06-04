@@ -1,400 +1,244 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from alt2.a-painless.mh.aa.net.uk (alt2.a-painless.mh.aa.net.uk [81.187.30.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA7D25B69B;
-	Wed,  4 Jun 2025 00:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CEE224B01
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 09:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.30.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748998778; cv=none; b=Yw4zk85GzsSE5Eyr6nR1f/oTdrHMFUH0brk7Rp/AOZXJaOIjhwe/sCm9rDnu/47Qi+vTmRZyXszwHOejuzDSXu0ocHsRjkim+PMg4Y/lhVb910vWKqkjeXEnN+rmRW3LtrmLt+qScweyr6FVTcKgN28ujiAeRHFClWaB6kckur4=
+	t=1749027850; cv=none; b=ImoW97DWTRFx4bYqIHbaH7Iw1Bo4ipR6hSJ3B8Sp8uQq31UkVExekKJDfj9E4CkITwLo1bWb0XLSAnoL93syOtW8warBfggZh0rGnm+LtC3eyiOZGOiJFaR/fxFMIfeS+FrfZOfQmfMRZxlEa0d3RZdZXZPewtagyWxLA9kYk6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748998778; c=relaxed/simple;
-	bh=vferUOU+Irk4i7zWsNAguxSvA9ChjNKEKL7Yn6D4G0g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=No26nHKZPNUSLJFkntrYibc9GGgzm9kdD0A7JzeYO25LQTqoTbPhhFhTxtozoMkXUAVz4ClCfEwfkLZ+aHmvpMLBWihFRPImi9nqlYaOBD1e3g5qG5SZSFo566bBMX+cG1DisBm4qr0/r1uUFlSjF7k+m7Qh98IGvF1kU01/Qjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p62PpEvL; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p62PpEvL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2435CC4CEED;
-	Wed,  4 Jun 2025 00:59:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748998778;
-	bh=vferUOU+Irk4i7zWsNAguxSvA9ChjNKEKL7Yn6D4G0g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p62PpEvLS23yIR2Iznt6E5F5enLMe5e1bMC//b/Tm8+9aRKuwoDHCbc8XVY64RZmK
-	 H76GZ5rmcK1iV/mcxgVfxkGc0TCt2UVTvLdMUm9sMcM22KAVwOiCI6SGDyyqM3bB30
-	 xR0l3XTVZH6+XPIWXw+6aUs4fDbDKd8ZscCP+ISHaLoCcP6dcUzv/f346fGQG+mNRt
-	 6nGT8npamBL+S3XJ6cC07o+MDby6+WwoXj3NpTOl1ssVcqARgT+PnIBLWcaXe2rIvJ
-	 0v/tYuVoo3xhfskJe49EmREW2950aNwDhmfPpoVB4TMhxWb7ttNd49reoHoYtydmF6
-	 O/OKRyVIkfrNw==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 11/93] Bluetooth: ISO: Fix not using SID from adv report
-Date: Tue,  3 Jun 2025 20:57:57 -0400
-Message-Id: <20250604005919.4191884-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250604005919.4191884-1-sashal@kernel.org>
-References: <20250604005919.4191884-1-sashal@kernel.org>
+	s=arc-20240116; t=1749027850; c=relaxed/simple;
+	bh=AogfzXuDey045VXDxgiFd8Hr0Kqk2qrnE3b2zhEdLAU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kV1FSVi8K3Dd4wJ9dd+IB6b/687HtprSe6D2Kz+quM4DvYzZVzIQyXdb/N3ogipGhSFpW22HrKdvYI/goaIz6uckE4mHPrHAJTt8EWV4OadoAwrTj8POXopvbggPN648cIQWdzUEpJknGBohT01r8Dy1IftKU6kKmQXqejTL5h0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org; spf=pass smtp.mailfrom=pileofstuff.org; arc=none smtp.client-ip=81.187.30.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pileofstuff.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pileofstuff.org
+Received: from f.0.1.b.8.8.6.e.3.0.e.e.8.5.9.9.0.5.8.0.9.1.8.0.0.b.8.0.1.0.0.2.ip6.arpa ([2001:8b0:819:850:9958:ee03:e688:b10f] helo=andrews-2024-laptop.sayers)
+	by painless-a.thn.aa.net.uk with esmtp (Exim 4.96)
+	(envelope-from <kernel.org@pileofstuff.org>)
+	id 1uMk2U-003Kye-1v;
+	Wed, 04 Jun 2025 10:04:02 +0100
+Date: Wed, 4 Jun 2025 10:03:31 +0100
+From: Andrew Sayers <kernel.org@pileofstuff.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, pav@iki.fi,
+	frederic.danis@collabora.com
+Subject: Re: [PATCH BlueZ 1/3] obexd: Pass at_(un)register value to logind
+ callbacks
+Message-ID: <aEAL4wsfqR44Z-Vt@andrews-2024-laptop.sayers>
+References: <20250603151651.1080923-1-kernel.org@pileofstuff.org>
+ <20250603151651.1080923-2-kernel.org@pileofstuff.org>
+ <CABBYNZ+FgroEZmbj1SoBGfJrMscMeAkC-Z9==h0H30mrFVk0GQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.31
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZ+FgroEZmbj1SoBGfJrMscMeAkC-Z9==h0H30mrFVk0GQ@mail.gmail.com>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, Jun 03, 2025 at 12:01:08PM -0400, Luiz Augusto von Dentz wrote:
+> Hi Andrew,
+> 
+> On Tue, Jun 3, 2025 at 11:17 AM Andrew Sayers
+> <kernel.org@pileofstuff.org> wrote:
+> >
+> > Logind (un)registers callbacks that it calls when the user's state changes.
+> > Callbacks may also be called during (un)registration.
+> > Clients may need to handle those initial/final calls specially.
+> >
+> > Pass an argument indicating whether this is being called during
+> > (un)registration, and modify existing callbacks to ignore that argument.
+> >
+> > Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
+> > ---
+> >  obexd/client/pbap.c       |  6 ++++--
+> >  obexd/plugins/bluetooth.c |  6 ++++--
+> >  obexd/src/logind.c        | 14 +++++++-------
+> >  obexd/src/logind.h        |  8 ++++----
+> >  4 files changed, 19 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+> > index 51b523592..64bb8ff72 100644
+> > --- a/obexd/client/pbap.c
+> > +++ b/obexd/client/pbap.c
+> > @@ -1455,8 +1455,9 @@ static struct obc_driver pbap = {
+> >         .remove = pbap_remove
+> >  };
+> >
+> > -static int pbap_init_cb(void)
+> > +static int pbap_init_cb(gboolean at_register)
+> >  {
+> > +       (void)at_register;
+> >         int err;
+> >
+> >         DBG("");
+> > @@ -1482,8 +1483,9 @@ static int pbap_init_cb(void)
+> >         return 0;
+> >  }
+> >
+> > -static void pbap_exit_cb(void)
+> > +static void pbap_exit_cb(gboolean at_unregister)
+> >  {
+> > +       (void)at_unregister;
+> >         DBG("");
+> >
+> >         g_dbus_remove_watch(system_conn, listener_id);
+> > diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+> > index 7ff27a8a8..ad37e636d 100644
+> > --- a/obexd/plugins/bluetooth.c
+> > +++ b/obexd/plugins/bluetooth.c
+> > @@ -427,8 +427,9 @@ static const struct obex_transport_driver driver = {
+> >
+> >  static unsigned int listener_id = 0;
+> >
+> > -static int bluetooth_init_cb(void)
+> > +static int bluetooth_init_cb(gboolean at_register)
+> >  {
+> > +       (void)at_register;
+> >         connection = g_dbus_setup_private(DBUS_BUS_SYSTEM, NULL, NULL);
+> >         if (connection == NULL)
+> >                 return -EPERM;
+> > @@ -439,8 +440,9 @@ static int bluetooth_init_cb(void)
+> >         return obex_transport_driver_register(&driver);
+> >  }
+> >
+> > -static void bluetooth_exit_cb(void)
+> > +static void bluetooth_exit_cb(gboolean at_unregister)
+> >  {
+> > +       (void)at_unregister;
+> >         GSList *l;
+> >
+> >         g_dbus_remove_watch(connection, listener_id);
+> > diff --git a/obexd/src/logind.c b/obexd/src/logind.c
+> > index a0eb62b1e..b4279b209 100644
+> > --- a/obexd/src/logind.c
+> > +++ b/obexd/src/logind.c
+> > @@ -43,13 +43,13 @@ static void call_init_cb(gpointer data, gpointer user_data)
+> >  {
+> >         int res;
+> >
+> > -       res = ((struct callback_pair *)data)->init_cb();
+> > +       res = ((struct callback_pair *)data)->init_cb(FALSE);
+> >         if (res)
+> >                 *(int *)user_data = res;
+> >  }
+> >  static void call_exit_cb(gpointer data, gpointer user_data)
+> >  {
+> > -       ((struct callback_pair *)data)->exit_cb();
+> > +       ((struct callback_pair *)data)->exit_cb(FALSE);
+> >  }
+> >
+> >  static int update(void)
+> > @@ -229,7 +229,7 @@ int logind_register(logind_init_cb init_cb, logind_exit_cb exit_cb)
+> >         struct callback_pair *cbs;
+> >
+> >         if (!monitoring_enabled)
+> > -               return init_cb();
+> > +               return init_cb(TRUE);
+> >         if (callbacks == NULL) {
+> >                 int res;
+> >
+> > @@ -237,23 +237,23 @@ int logind_register(logind_init_cb init_cb, logind_exit_cb exit_cb)
+> >                 if (res) {
+> >                         error("logind_init(): %s - login detection disabled",
+> >                                 strerror(-res));
+> > -                       return init_cb();
+> > +                       return init_cb(TRUE);
+> >                 }
+> >         }
+> >         cbs = g_new(struct callback_pair, 1);
+> >         cbs->init_cb = init_cb;
+> >         cbs->exit_cb = exit_cb;
+> >         callbacks = g_slist_prepend(callbacks, cbs);
+> > -       return active ? init_cb() : 0;
+> > +       return active ? init_cb(TRUE) : 0;
+> >  }
+> >  void logind_unregister(logind_init_cb init_cb, logind_exit_cb exit_cb)
+> >  {
+> >         GSList *cb_node;
+> >
+> >         if (!monitoring_enabled)
+> > -               return exit_cb();
+> > +               return exit_cb(TRUE);
+> >         if (active)
+> > -               exit_cb();
+> > +               exit_cb(TRUE);
+> >         cb_node = g_slist_find_custom(callbacks, init_cb, find_cb);
+> >         if (cb_node != NULL)
+> >                 callbacks = g_slist_delete_link(callbacks, cb_node);
+> > diff --git a/obexd/src/logind.h b/obexd/src/logind.h
+> > index eb3ff8d7b..3cdb03338 100644
+> > --- a/obexd/src/logind.h
+> > +++ b/obexd/src/logind.h
+> > @@ -8,8 +8,8 @@
+> >   *
+> >   */
+> >
+> > -typedef int (*logind_init_cb)(void);
+> > -typedef void (*logind_exit_cb)(void);
+> > +typedef int (*logind_init_cb)(gboolean at_register);
+> > +typedef void (*logind_exit_cb)(gboolean at_unregister);
+> >
+> >  #ifdef SYSTEMD
+> >
+> > @@ -22,12 +22,12 @@ int logind_set(gboolean enabled);
+> >  static inline int logind_register(logind_init_cb init_cb,
+> >                                         logind_exit_cb exit_cb)
+> >  {
+> > -       return init_cb();
+> > +       return init_cb(TRUE);
+> >  }
+> >  static inline void logind_unregister(logind_init_cb init_cb,
+> >                                         logind_exit_cb exit_cb)
+> >  {
+> > -       return exit_cb();
+> > +       return exit_cb(TRUE);
+> >  }
+> >  static inline int logind_set(gboolean enabled)
+> >  {
+> > --
+> > 2.49.0
+> 
+> This is not going very well in my opinion, it looks like we missed the
+> opportunity to integrate the logind directly into obc_driver so we
+> don't have to duplicate code for each coded, so we keep just doing
+> plugin_init->obc_driver_register/plugin_exit->obc_driver_unregister
+> and that internally can detect when it shall be registered with the
+> Bluetoothd, etc, plugin_exit->obc_driver_unregister can actually be
+> assumed to be exit rather than just D-Bus unregister which happens
+> when seat is not longer active.
+> 
+> -- 
+> Luiz Augusto von Dentz
+> 
 
-[ Upstream commit e2d471b7806b09744d65a64bcf41337468f2443b ]
+If I understand correctly, you want something like this:
 
-Up until now it has been assumed that the application would be able to
-enter the advertising SID in sockaddr_iso_bc.bc_sid, but userspace has
-no access to SID since the likes of MGMT_EV_DEVICE_FOUND cannot carry
-it, so it was left unset (0x00) which means it would be unable to
-synchronize if the broadcast source is using a different SID e.g. 0x04:
+ static struct obc_driver pbap = {
+ 	.service = "PBAP",
+ 	.uuid = PBAP_UUID,
+ 	.target = OBEX_PBAP_UUID,
+ 	.target_len = OBEX_PBAP_UUID_LEN,
+ 	.supported_features = pbap_supported_features,
+ 	.probe = pbap_probe,
+ 	.remove = pbap_remove,
++ 	.seated = pbap_seated,
++ 	.unseated = pbap_unseated
+ };
 
-> HCI Event: LE Meta Event (0x3e) plen 57
-      LE Extended Advertising Report (0x0d)
-        Num reports: 1
-        Entry 0
-          Event type: 0x0000
-            Props: 0x0000
-            Data status: Complete
-          Address type: Random (0x01)
-          Address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-          Primary PHY: LE 1M
-          Secondary PHY: LE 2M
-          SID: 0x04
-          TX power: 127 dBm
-          RSSI: -55 dBm (0xc9)
-          Periodic advertising interval: 180.00 msec (0x0090)
-          Direct address type: Public (0x00)
-          Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
-          Data length: 0x1f
-        06 16 52 18 5b 0b e1 05 16 56 18 04 00 11 30 4c  ..R.[....V....0L
-        75 69 7a 27 73 20 53 32 33 20 55 6c 74 72 61     uiz's S23 Ultra
-        Service Data: Broadcast Audio Announcement (0x1852)
-        Broadcast ID: 14748507 (0xe10b5b)
-        Service Data: Public Broadcast Announcement (0x1856)
-          Data[2]: 0400
-        Unknown EIR field 0x30[16]: 4c75697a27732053323320556c747261
-< HCI Command: LE Periodic Advertising Create Sync (0x08|0x0044) plen 14
-        Options: 0x0000
-        Use advertising SID, Advertiser Address Type and address
-        Reporting initially enabled
-        SID: 0x00 (<- Invalid)
-        Adv address type: Random (0x01)
-        Adv address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-        Skip: 0x0000
-        Sync timeout: 20000 msec (0x07d0)
-        Sync CTE type: 0x0000
+That's fine, but it sounds like version 2.  Would it be better to get this
+bugfix ready to commit first, then talk about architecture in another thread?
+I only see a couple of mistakes from bluez test bot (both "mixed declarations
+and code"), but the new architecture will take a lot of work and may not be
+right first time.  Having a commit with no known bugs will make bisecting
+easier, and having a fix out sooner will help users.
 
-So instead this changes now allow application to set HCI_SID_INVALID
-which will make hci_le_pa_create_sync to wait for a report, update the
-conn->sid using the report SID and only then issue PA create sync
-command:
-
-< HCI Command: LE Periodic Advertising Create Sync
-        Options: 0x0000
-        Use advertising SID, Advertiser Address Type and address
-        Reporting initially enabled
-        SID: 0x04
-        Adv address type: Random (0x01)
-        Adv address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-        Skip: 0x0000
-        Sync timeout: 20000 msec (0x07d0)
-        Sync CTE type: 0x0000
-> HCI Event: LE Meta Event (0x3e) plen 16
-      LE Periodic Advertising Sync Established (0x0e)
-        Status: Success (0x00)
-        Sync handle: 64
-        Advertising SID: 0x04
-        Advertiser address type: Random (0x01)
-        Advertiser address: 0B:82:E8:50:6D:C8 (Non-Resolvable)
-        Advertiser PHY: LE 2M (0x02)
-        Periodic advertising interval: 180.00 msec (0x0090)
-        Advertiser clock accuracy: 0x05
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-**YES** This commit should be backported to stable kernel trees. Here's
-my detailed analysis: ## Critical Functional Bug Fix This commit
-addresses a **fundamental interoperability issue** in the Bluetooth ISO
-(Isochronous) subsystem that completely breaks Bluetooth LE Audio
-broadcast functionality for devices using non-zero SIDs (Set
-Identifiers). ### Problem Analysis **Core Issue**: The code incorrectly
-assumed userspace applications could manually specify the advertising
-SID in `sockaddr_iso_bc.bc_sid`, but userspace has no access to SID
-values since management events like `MGMT_EV_DEVICE_FOUND` cannot carry
-this information. **Impact**: Applications default to SID 0x00, causing
-connection failures when broadcast sources use different SIDs (e.g.,
-0x04 as shown in the commit message). ### Code Changes Analysis The fix
-is well-contained within the Bluetooth subsystem across 5 files: 1.
-**`net/bluetooth/iso.c`**: - Line 941-947: Allows `HCI_SID_INVALID` in
-validation (`sa->iso_bc->bc_sid != HCI_SID_INVALID`) - Line 2029-2047:
-Implements SID matching with fallback (`if (iso_pi(sk)->bc_sid ==
-HCI_SID_INVALID) return true;`) - Line 2078-2094: Updates SID from sync
-established event (`iso_pi(sk)->bc_sid = ev1->sid;`) 2.
-**`net/bluetooth/hci_event.c`**: - Adds SID extraction from advertising
-reports when PA sync is pending - Updates connection SID when `conn->sid
-== HCI_SID_INVALID` 3. **`net/bluetooth/hci_sync.c`**: - Implements
-waiting mechanism for SID discovery when `conn->sid == HCI_SID_INVALID`
-- Adds proper scanning control to enable passive scanning for SID
-discovery 4. **`net/bluetooth/hci_conn.c`**: Adds debug logging 5.
-**`net/bluetooth/hci_core.c`**: Improves command sync handling ###
-Backporting Assessment **✅ Meets Stable Tree Criteria:** 1. **Important
-Bug Fix**: Fixes complete failure of Bluetooth LE Audio broadcast
-functionality 2. **Minimal Risk**: Changes are confined to Bluetooth
-subsystem with clear error handling 3. **No Architectural Changes**:
-Uses existing HCI event mechanisms and infrastructure 4. **Standards
-Compliance**: Enables proper Bluetooth LE Audio specification compliance
-**✅ Wide Impact**: Affects all kernels since Linux 6.0 where Bluetooth
-ISO support was introduced **✅ Low Regression Risk**: - Uses existing
-`HCI_SID_INVALID` constant (0xff) already defined in kernel - Adds
-fallback logic that maintains backward compatibility - Changes are
-defensive - if SID discovery fails, behavior reverts to previous state
-### Historical Context Looking at the similar commits provided: -
-**Similar Commit #2** (Backport Status: YES) shows a pattern of
-backporting Bluetooth management/event handling fixes - This commit
-follows the same pattern of fixing critical Bluetooth functionality
-without architectural changes ### Technical Verification The fix
-properly handles the SID discovery flow: 1. Application sets `bc_sid =
-HCI_SID_INVALID` (0xff) to request automatic SID discovery 2. Kernel
-enables passive scanning and waits for advertising reports 3. When
-extended advertising report contains SID, it updates `conn->sid` 4. PA
-create sync command then uses the discovered SID value 5. Successful
-synchronization occurs with correct SID **Recommendation: YES - High
-Priority** This commit should be backported to all stable kernels from
-6.0.y onwards as it fixes a critical functional regression that prevents
-Bluetooth LE Audio devices from working properly with the Linux kernel.
-
- net/bluetooth/hci_conn.c  |  2 ++
- net/bluetooth/hci_core.c  | 13 ++++++-----
- net/bluetooth/hci_event.c | 16 ++++++++++++-
- net/bluetooth/hci_sync.c  | 49 +++++++++++++++++++++++++++++++++++----
- net/bluetooth/iso.c       |  9 +++++--
- 5 files changed, 75 insertions(+), 14 deletions(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ae66fa0a5fb58..c6c1232db4e28 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2067,6 +2067,8 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- {
- 	struct hci_conn *conn;
- 
-+	bt_dev_dbg(hdev, "dst %pMR type %d sid %d", dst, dst_type, sid);
-+
- 	conn = hci_conn_add_unset(hdev, ISO_LINK, dst, HCI_ROLE_SLAVE);
- 	if (IS_ERR(conn))
- 		return conn;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 72439764186ed..743b63287a18f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4071,10 +4071,13 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 	}
- 
--	err = hci_send_frame(hdev, skb);
--	if (err < 0) {
--		hci_cmd_sync_cancel_sync(hdev, -err);
--		return;
-+	if (hci_skb_opcode(skb) != HCI_OP_NOP) {
-+		err = hci_send_frame(hdev, skb);
-+		if (err < 0) {
-+			hci_cmd_sync_cancel_sync(hdev, -err);
-+			return;
-+		}
-+		atomic_dec(&hdev->cmd_cnt);
- 	}
- 
- 	if (hdev->req_status == HCI_REQ_PEND &&
-@@ -4082,8 +4085,6 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
- 		kfree_skb(hdev->req_skb);
- 		hdev->req_skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
- 	}
--
--	atomic_dec(&hdev->cmd_cnt);
- }
- 
- static void hci_cmd_work(struct work_struct *work)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8894633403519..5c4c3d04d8b93 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6333,6 +6333,17 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
- 			info->secondary_phy &= 0x1f;
- 		}
- 
-+		/* Check if PA Sync is pending and if the hci_conn SID has not
-+		 * been set update it.
-+		 */
-+		if (hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
-+			struct hci_conn *conn;
-+
-+			conn = hci_conn_hash_lookup_create_pa_sync(hdev);
-+			if (conn && conn->sid == HCI_SID_INVALID)
-+				conn->sid = info->sid;
-+		}
-+
- 		if (legacy_evt_type != LE_ADV_INVALID) {
- 			process_adv_report(hdev, legacy_evt_type, &info->bdaddr,
- 					   info->bdaddr_type, NULL, 0,
-@@ -7136,7 +7147,8 @@ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
- 
- 	/* Only match event if command OGF is for LE */
- 	if (hdev->req_skb &&
--	    hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) == 0x08 &&
-+	   (hci_opcode_ogf(hci_skb_opcode(hdev->req_skb)) == 0x08 ||
-+	    hci_skb_opcode(hdev->req_skb) == HCI_OP_NOP) &&
- 	    hci_skb_event(hdev->req_skb) == ev->subevent) {
- 		*opcode = hci_skb_opcode(hdev->req_skb);
- 		hci_req_cmd_complete(hdev, *opcode, 0x00, req_complete,
-@@ -7492,8 +7504,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		goto done;
- 	}
- 
-+	hci_dev_lock(hdev);
- 	kfree_skb(hdev->recv_event);
- 	hdev->recv_event = skb_clone(skb, GFP_KERNEL);
-+	hci_dev_unlock(hdev);
- 
- 	event = hdr->evt;
- 	if (!event) {
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 6597936fbd51b..59011f45906a1 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6890,20 +6890,37 @@ int hci_le_conn_update_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 
- static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- {
-+	struct hci_conn *conn = data;
-+	struct hci_conn *pa_sync;
-+
- 	bt_dev_dbg(hdev, "err %d", err);
- 
--	if (!err)
-+	if (err == -ECANCELED)
- 		return;
- 
-+	hci_dev_lock(hdev);
-+
- 	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
- 
--	if (err == -ECANCELED)
--		return;
-+	if (!hci_conn_valid(hdev, conn))
-+		clear_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags);
- 
--	hci_dev_lock(hdev);
-+	if (!err)
-+		goto unlock;
- 
--	hci_update_passive_scan_sync(hdev);
-+	/* Add connection to indicate PA sync error */
-+	pa_sync = hci_conn_add_unset(hdev, ISO_LINK, BDADDR_ANY,
-+				     HCI_ROLE_SLAVE);
- 
-+	if (IS_ERR(pa_sync))
-+		goto unlock;
-+
-+	set_bit(HCI_CONN_PA_SYNC_FAILED, &pa_sync->flags);
-+
-+	/* Notify iso layer */
-+	hci_connect_cfm(pa_sync, bt_status(err));
-+
-+unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -6917,9 +6934,23 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 	if (!hci_conn_valid(hdev, conn))
- 		return -ECANCELED;
- 
-+	if (conn->sync_handle != HCI_SYNC_HANDLE_INVALID)
-+		return -EINVAL;
-+
- 	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
- 		return -EBUSY;
- 
-+	/* Stop scanning if SID has not been set and active scanning is enabled
-+	 * so we use passive scanning which will be scanning using the allow
-+	 * list programmed to contain only the connection address.
-+	 */
-+	if (conn->sid == HCI_SID_INVALID &&
-+	    hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
-+		hci_scan_disable_sync(hdev);
-+		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+	}
-+
- 	/* Mark HCI_CONN_CREATE_PA_SYNC so hci_update_passive_scan_sync can
- 	 * program the address in the allow list so PA advertisements can be
- 	 * received.
-@@ -6928,6 +6959,14 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- 
- 	hci_update_passive_scan_sync(hdev);
- 
-+	/* SID has not been set listen for HCI_EV_LE_EXT_ADV_REPORT to update
-+	 * it.
-+	 */
-+	if (conn->sid == HCI_SID_INVALID)
-+		__hci_cmd_sync_status_sk(hdev, HCI_OP_NOP, 0, NULL,
-+					 HCI_EV_LE_EXT_ADV_REPORT,
-+					 conn->conn_timeout, NULL);
-+
- 	memset(&cp, 0, sizeof(cp));
- 	cp.options = qos->bcast.options;
- 	cp.sid = conn->sid;
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 72bf9b1db2247..a08a0f3d5003c 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -938,7 +938,7 @@ static int iso_sock_bind_bc(struct socket *sock, struct sockaddr *addr,
- 
- 	iso_pi(sk)->dst_type = sa->iso_bc->bc_bdaddr_type;
- 
--	if (sa->iso_bc->bc_sid > 0x0f)
-+	if (sa->iso_bc->bc_sid > 0x0f && sa->iso_bc->bc_sid != HCI_SID_INVALID)
- 		return -EINVAL;
- 
- 	iso_pi(sk)->bc_sid = sa->iso_bc->bc_sid;
-@@ -1963,6 +1963,9 @@ static bool iso_match_sid(struct sock *sk, void *data)
- {
- 	struct hci_ev_le_pa_sync_established *ev = data;
- 
-+	if (iso_pi(sk)->bc_sid == HCI_SID_INVALID)
-+		return true;
-+
- 	return ev->sid == iso_pi(sk)->bc_sid;
- }
- 
-@@ -2009,8 +2012,10 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 	if (ev1) {
- 		sk = iso_get_sock(&hdev->bdaddr, bdaddr, BT_LISTEN,
- 				  iso_match_sid, ev1);
--		if (sk && !ev1->status)
-+		if (sk && !ev1->status) {
- 			iso_pi(sk)->sync_handle = le16_to_cpu(ev1->handle);
-+			iso_pi(sk)->bc_sid = ev1->sid;
-+		}
- 
- 		goto done;
- 	}
--- 
-2.39.5
-
+As an example of the problems to discuss in version 2 - bluetooth.c uses
+obex_transport_driver instead of obc_driver, so the changes would need to go there too.  
+Getting that right will take more time and discussion, and could lead to some knock-on
+change that adds more again.
