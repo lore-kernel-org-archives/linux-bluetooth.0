@@ -1,71 +1,68 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3701ACED1
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 15:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E76442C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 16:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749137004; cv=none; b=e5HWEdkdrUfbqilaKk0fxfkRaCX6ZkLWXKdHBeVDSM7jqANb+2qM+hGyLzUIRm6UiOD/78MtgN3mIn6EHoMtANVpNxEuWZNFfWyYXiD0OxPVvsEjMheMFu/taPp9rzLDSu1oSJSYM0vWRtrmj+saRVt6cmw7sIY0uVDTfFha56U=
+	t=1749139236; cv=none; b=rpdb1dAN4AxqgLgfYdcCAqn1Ojv64R/Oqxxng2EJJNlIZBcUYLA97wPSDQw/I1LSlB2dAlq6phL0VOSKiMDsM2G6CnVzp/ZnsRPKKW7aFCmB0k/D0W323az290sxOqJEzA2NUkbIc5VUa9lZjQjUXXaf9e4rWIbsluLu1A/higE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749137004; c=relaxed/simple;
-	bh=1sXVytO4AgmvvW3FXHX6AiP+MXqIXqXOyqpOcxD4wps=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DSbm3X8Axz1ZL0gAUECYn90R1VmLr7LuuP8ekPiqKz7Rb6LQ2O/xKzZBO4tNtdUrOY+U8o0kvJCmtXAYV9TB8AhIGIJaGHZHI/LvbVFBgS4sixLKEI4Np3c/T7RKImFpozX5ECC2eygp0EmgzbAi+p3ciFfucn+qNpbMZm2lSRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KNHFmdFJ; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749139236; c=relaxed/simple;
+	bh=NOg7wsddRmLLRsICd2Lrj1qhvzgmQOHrRlfHUyzQVsw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W7Edlgqqa5137N4fO19brBhH0HX8Iy596cTfwbekvmyN0b02o9UFE+mqHLHuNTNj7QX12kNsgqHe5cQl2f6PynXsQGgHugTdcy8X62ke/FQV+ILZKmr89MHffiE7AO3OPglHbAcM4Eij3oV7vDRr9qCl9bXP8tsFADj4WbsghDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl; spf=pass smtp.mailfrom=codecoup.pl; dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b=WiHTWdQC; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codecoup.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNHFmdFJ"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7cd0a7b672bso81313085a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 08:23:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b="WiHTWdQC"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ad89ee255easo201552066b.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 09:00:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749137001; x=1749741801; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YXtR5IH4CZVEeszZdxWCc9TBQY7TQNNdMZJJvY4yULw=;
-        b=KNHFmdFJiJmcxybyBkwSh8EKVZnaDltOFVGt3ozxA3ioxC82d2BbZlRYxA67d1YP6i
-         Set4Ez29ZEOfDgYhx2ztI+q37Idq7gdF1OACMpH3jXu9KU2fiYO3tkqIjWPHnPO0g890
-         PkWynn8i/zYFCzftZosrwGZF7YrGe5H1Lx4zpylnXt6CSXKppm3Scm9B/q5uhuDKfC8d
-         J1ms+lENxMfxxDIRjWRwfdQYS+go+000VKu8OG82uJtiSnpcj4Gz5mpGSi91xMEvvL1Y
-         hJ/TW7b5Rqe+DavGYmv7xEn/nJM3ZFdG+Go8gF6JXeJkttPJxkmwTq+t2NSB+jqQVFsj
-         0fWA==
+        d=codecoup-pl.20230601.gappssmtp.com; s=20230601; t=1749139232; x=1749744032; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9cquwdv0Jqr6sYMS+rQDTEnIj08C8GZptYkVygHzkLk=;
+        b=WiHTWdQCovQiAURqnKCsoJk9z7xr/ve6L3mjIazqJpJERk2Gbu9uWGKM0BD6jPgmK7
+         AayEi/zTKigbFCvl+lBjkZZWTc9ZkRCngPgUXuDQCqaZKjCkPBpW05n9WbYAzBNf4rAD
+         aD7uurNxN2Bv7WKYbxfLGw1MROA53JU5FpoLfxlVhlxkS3QDu/MaarpOUgNWvYR88hey
+         g0yOSWLhXPbeEwsUqEpRU85QC7tbtJOoTAyxrrRVxS2RMKH7ilvRTFxhBTg6pUMbJpE/
+         M1qmCD9o/z+YpnPugz00P+bTT0scobGYn6R1umRiTvP6gyJdV9OSIR78ho/Sb2EomKCj
+         8vOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749137001; x=1749741801;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YXtR5IH4CZVEeszZdxWCc9TBQY7TQNNdMZJJvY4yULw=;
-        b=Z2dkpGP6rBwgdhvkmM1qJ25DR8BGn5DUub6vllpK4uj7qnDGVcxpcOMTdRymSenFNw
-         kQSrXpJlmr+lmhgf8SsP2ytg1p9xzBG+i2xKZtLqG4j0Dgru2fZCNKcAp70hUvP1HVeP
-         twmOif/JoY/i/ESM2pUK+JuxyWIJK7FMVpXAst5hNGOo4ORll6uru9JsDpeOfAuQ9Cjd
-         EEi728EV4gQtagx/q0hSYvq8eMX4t6fxuDItJ25ya2FQDsKUElsw1WPpHZUNPIqx/OLs
-         17deOm3c3+Lys/Wj0weefw2yq/MYSvmPN+7J8sowrur1XmRRfqHc8uqsQmj5R+E+Wx0M
-         p92g==
-X-Gm-Message-State: AOJu0YwqVhgLl+K/xW2ymC9jpSBA7rfVvIRTL9cEpvykrxlv6CsP/83F
-	6nUvxNO8/1TCXzAuOHYuZtusooNi9EIWGpMldheqGf2M8BmT1YMoFx/+ksQMdMt3pr8=
-X-Gm-Gg: ASbGncsX6TRiduSB2e20SClmtX66N+/0Z2Z6GO1n4nTOEBFpc2Qek038YTmEe9Ir4t0
-	pyQE8/Oo4FkOFMjsANOkC/Lp1HZXjhqTqfsrzSnrRxmNP51pKYmc9RfMw0SjCTkIG+ZMUsc3jAO
-	s4znR4eRqlQOgqj21nIGg4SMTLOSKCAC67FqMpB1CT+odqK8ohL2AKSONXrHFrMID2NAqB6OgCp
-	36hjYo04lsdhiC9su/VLVOALE1+6GfkeUDR5fJ0ysvzZoQfoBTREKKuAgcbyfhkiXeFBjPIr/ig
-	6KQJD2/jt2QqhiHBBkzKNP6MF0htgdqqWlOlbowiSK7hzsPdbxWWISeeQpyqmAWDUfTQZq/GXMp
-	HQFDYHYC6hizGH/M6CtVb
-X-Google-Smtp-Source: AGHT+IHeMBef17GieO/WBu2pzMF4n4JZfriIiswuVSdYUJ9YrrrXC/ebcKMWT05LWT4Z6ccDqrLC9w==
-X-Received: by 2002:a05:620a:2a05:b0:7c5:e2a0:4e64 with SMTP id af79cd13be357-7d2198e1b63mr1047389585a.51.1749137000600;
-        Thu, 05 Jun 2025 08:23:20 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ea70e5ac1sm2295592241.17.2025.06.05.08.23.19
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1749139232; x=1749744032;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9cquwdv0Jqr6sYMS+rQDTEnIj08C8GZptYkVygHzkLk=;
+        b=OSlXOkg6LMta+1AZ5+SsfR+EnfgJe9UvJBqotke5cLksI4YHU7Vz1dfCf1618E0Qcu
+         NWBHcG641HSt1gZli6RgBYcvBZ9yiN/isUEADueEl+2Vj2b5hTp/vn10QDhyfwnsKjit
+         Cnzu9eDqUPNGEW/dlkLQqVn9Lgz2AurAHjXTGGV54+mF6RrE2BzeQkF2lAI4em7rQAPg
+         OYpVkwS68l8zaszIXmICSxeOO4PwzljXnAmfNARhyyBRqeTkpVhfBCkYDVMJOYlZspGA
+         81PU8UY4YXv96OqMZdbQVuHmDzVmW32UJdC40qWyM7M+wR8VxVx1hPKJzfs8uI8pf5+2
+         RILg==
+X-Gm-Message-State: AOJu0YzhqP8OJwLZzQihkstTju9EdAw16+ZlsJlgvyUdiH6SvVZUCEdx
+	VHAHbAwU7RyYcfGnYJJ6CzgkNjTLWR6vqZKOEcpe09AWg68tsMMRoFUh+FRsptQXSB/9hwsoKNp
+	cI37Hz5s=
+X-Gm-Gg: ASbGncsSKPoJ6Jy/YJmvqRmzSImwoUxk7+wNwDpilhhx6MhI9mo+eS72zbTxCgVp1oO
+	NaM5LAsqqdj5FmJkTl5uzi27fbKTO9ttKBWZVjK9NvB2AhVpBmorfq73xC4TNSGh1smUsFiQruV
+	VaisTCOLGPer0OiSFQpcp5ZoLyu4fDHdUwPDV36e/B0kIkkHo9b3CCr1MOamcbZCq21F5Aa0ZdN
+	NWJB3OMjDrIxsF9Njj5D31rAkjKcLQUeRg+3MxJjr5RTU30JS+LcijUPvF6lKN1UbggSTpHLTBp
+	R4G0iPZ2Z61T0dXXaTgKCCR0KOIIx+jKZwgo8N6EJL5MLSWLF7m1e5R1qySNOBoCBksMiTVu4tj
+	k5wvm1c2A
+X-Google-Smtp-Source: AGHT+IEmIv5KKA4Ry6eolLW8eP5vauWwdJamuJcOV16aomcAjryBnNIG9GDNWRL/EyVnTYYr56CuPw==
+X-Received: by 2002:a17:907:d1b:b0:adb:7f8:9ec2 with SMTP id a640c23a62f3a-addf8fb2d1dmr664108666b.53.1749139232203;
+        Thu, 05 Jun 2025 09:00:32 -0700 (PDT)
+Received: from ThinkPad-Ryzen7.. ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adb318db274sm1116034466b.162.2025.06.05.09.00.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jun 2025 08:23:19 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Thu, 05 Jun 2025 09:00:31 -0700 (PDT)
+From: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 2/2] Bluetooth: hci_sync: Fix broadcast/PA when using an existing instance
-Date: Thu,  5 Jun 2025 11:23:16 -0400
-Message-ID: <20250605152316.807664-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250605152316.807664-1-luiz.dentz@gmail.com>
-References: <20250605152316.807664-1-luiz.dentz@gmail.com>
+Cc: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
+Subject: [PATCH BlueZ v2 0/1] monitor: Add support for decoding Channel Sounding
+Date: Thu,  5 Jun 2025 18:00:01 +0200
+Message-Id: <20250605160002.1652091-1-magdalena.kasenberg@codecoup.pl>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -74,64 +71,50 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello,
 
-When using and existing adv_info instance for broadcast source it
-needs to be updated to periodic first before it can be reused, also in
-case the existing instance already have data hci_set_adv_instance_data
-cannot be used directly since it would overwrite the existing data so
-this reappend the original data after the Broadcast ID, if one was
-generated.
+This patch adds initial support for decoding commands and events of
+Channel Sounding, a new feature introduced in Bluetooth Core
+Specification Version 6.0 | Vol 1, Part A, Section 9 "Channel
+Sounding Using Bluetooth Low Energy".
 
-Link: https://github.com/bluez/bluez/issues/1117
-Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_sync.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+Testing:
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 62d1ff951ebe..54140f4acdb0 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1559,7 +1559,8 @@ static int hci_enable_per_advertising_sync(struct hci_dev *hdev, u8 instance)
- static int hci_adv_bcast_annoucement(struct hci_dev *hdev, struct adv_info *adv)
- {
- 	u8 bid[3];
--	u8 ad[4 + 3];
-+	u8 ad[HCI_MAX_EXT_AD_LENGTH];
-+	u8 len;
- 
- 	/* Skip if NULL adv as instance 0x00 is used for general purpose
- 	 * advertising so it cannot used for the likes of Broadcast Announcement
-@@ -1585,7 +1586,8 @@ static int hci_adv_bcast_annoucement(struct hci_dev *hdev, struct adv_info *adv)
- 
- 	/* Generate Broadcast ID */
- 	get_random_bytes(bid, sizeof(bid));
--	eir_append_service_data(ad, 0, 0x1852, bid, sizeof(bid));
-+	len = eir_append_service_data(ad, 0, 0x1852, bid, sizeof(bid));
-+	memcpy(ad + len, adv->adv_data, adv->adv_data_len);
- 	hci_set_adv_instance_data(hdev, adv->instance, sizeof(ad), ad, 0, NULL);
- 
- 	return hci_update_adv_data_sync(hdev, adv->instance);
-@@ -1603,8 +1605,15 @@ int hci_start_per_adv_sync(struct hci_dev *hdev, u8 instance, u8 data_len,
- 
- 	if (instance) {
- 		adv = hci_find_adv_instance(hdev, instance);
--		/* Create an instance if that could not be found */
--		if (!adv) {
-+		if (adv) {
-+			/* Turn it into periodic advertising */
-+			adv->periodic = true;
-+			adv->per_adv_data_len = data_len;
-+			if (data)
-+				memcpy(adv->per_adv_data, data, data_len);
-+			adv->flags = flags;
-+		} else if (!adv) {
-+			/* Create an instance if that could not be found */
- 			adv = hci_add_per_instance(hdev, instance, flags,
- 						   data_len, data,
- 						   sync_interval,
+To test the feature you need a hardware that supports Channel Sounding.
+Channel Sounding can be tested using Nordic Semiconductor's sample
+applications for the Initiator and Reflector roles, which are available
+as part of the nRF Connect SDK and require an nRF54L15 development kit.
+
+Initiator sample:
+https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/channel_sounding_ras_initiator/README.html
+
+Reflector sample:
+https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/channel_sounding_ras_reflector/README.html
+
+On Android, testing is also possible using the ChannelSoundingTestApp
+available in beta builds on Pixel 9 devices:
+https://cs.android.com/android/platform/superproject/main/+/main:packages/modules/Bluetooth/android/ChannelSoundingTestApp/
+
+Additionally, Channel Sounding support is being developed for Apache
+MyNewt NimBLE and tested using the nRF54L15.
+https://github.com/apache/mynewt-nimble
+
+Changes in v2:
+- Updated commit message with instructions on how to test this feature
+- Fixed parsing of Mode 2 result fields
+- Applied a suggestion provided by GitHub Copilot
+- Added parsing support for additional bitmap parameters
+
+Best regards,
+Magda
+
+Magdalena Kasenberg (1):
+  monitor: Add support for decoding Channel Sounding
+
+ monitor/bt.h     |  321 +++++++++++++
+ monitor/packet.c | 1200 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 1521 insertions(+)
+
 -- 
-2.49.0
+2.34.1
 
