@@ -1,124 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D766A182D7;
-	Thu,  5 Jun 2025 14:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACF1198A2F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 15:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749134295; cv=none; b=N2xZhRBFlwY+xWo5S9zzQLyKMCcUywQtlZtihb+8TbqcOIbTLP7GkNGgSiRaC1rVvWoks0zCq7h3T0CjEKkafMh7Be20x3qO9dkh/Tr6sgmCeuBExOLiTkOO84KRaZEydMAcgiT1rVWMvuEylEhIaI4SIBJN2G/Ax5+voO3aFNU=
+	t=1749137002; cv=none; b=DvjPTkudvSds5kgV6pNQB4tLw1SzeceE36rVf2EiKJJRhLKIx9YFqxNhP8ufym/Khx+e5JxDPRo7IeSrO8jyB4Gw3YY5aIG8yD7j+LeVocZGGbw9g4Cpooa7STMcGUghce2zqbnPQ95xIidGKUUEV5TD9bp4D9GjCUTOJkETJSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749134295; c=relaxed/simple;
-	bh=2wQoiEp/25lDUsgFjzKAQF/FgvhWHF6Ofd14vJ+/6h8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z0DkAFlb71jz2Q8Nyo1fJzRl3s+zz0kTRfat735dDnbQPOm3XiD3B3WToobDwko4vdkzmr54UJ4tVmy/6pbD2NlpowTeJUSIMJ42c5BSMOd4ClpURxj6Tl76i/DQfRZkm9t51+rBHf0mw1CDT2KI7cQk36j/Wv80iGbSuhYZ1r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yh5Ye/5K; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749137002; c=relaxed/simple;
+	bh=UDVnVovEJNMlIbhNwqAgQ2c4zHn/UjcWlVHTl8CCXMU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CSwJKA8Dtn0zi/BXMu7lgTA5QAa5NUH+2TOtLeCzMMgddHd6nUwInMyPO9ryYkIn7iKzMufsHyHAMTXuFJPmzMkC5b8Bt2PWVbsYA2gpKyzpx77K0ey494OjzV60T7cChkH57tinas4Rgt5S30PIPTXyd3BHLqTYFklZXL5UFao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QvJab3QC; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yh5Ye/5K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C1A1C4CEE7;
-	Thu,  5 Jun 2025 14:38:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749134295;
-	bh=2wQoiEp/25lDUsgFjzKAQF/FgvhWHF6Ofd14vJ+/6h8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Yh5Ye/5KwiX0dBesrH4zRrzoVDYJwOgKG2ClLfgWI3k7kvHT9UOB35XDIF2niC6Cp
-	 ObmU4UBR+JhXH0RZ+9D0e2YAO9dd1P/LUW/HIRA0Kabk81LYD6OxunCRip7A4ZVuoA
-	 SmcQUKwXzZku10LW+BBQwjpOzdqj6wYuGrllMEHsHnMB1s4NFzrPHWsAm574kWozxm
-	 j6hR01wt2rPcF58zmdCFro/+6iLHcJybBv8USbBVQkKTo57rN9InGNYFby1UEQKBnQ
-	 o/07NhHYg8XTdRpzHiiXyqvNU+QOsxFf5e6Rtx7nCE/4c+miyY/KjJn1WQVnpbl2NJ
-	 ysPReQZ6H4yTw==
-Message-ID: <9c3fd179-f59e-452b-a7a9-5326d78f4741@kernel.org>
-Date: Thu, 5 Jun 2025 16:38:10 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QvJab3QC"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-605fda00c30so690760eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 08:23:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749136999; x=1749741799; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QuAev6ItmI0AfTnXcTojR28G9ub7l9Nn1BZH8GEVQPs=;
+        b=QvJab3QCIVEktkDFXZiRseqt0cb9XuEZSi/U+GFJoz2LBJ9yqC3maImVpFPrA+xYZ5
+         vDIkKYPCaxWQwA7DFlxpAfnhx2u9qJYwe+qZLVfVyYPYo4h9zPQEhP2tjy8vPBufFL4i
+         oFTVMDShquvT56tCZEBj2F9JU178CgbgmYeXF+OZETjMUBSGEuB4XMBWFBGw5dmR7Kn7
+         kQRDRrH5dqcuqkwMUbOVSwGmhyzaZqzoI5Uyh9gYvVQTZiniGzu8aZchYUlkvbQ9XRcU
+         saOBV6iW5+mLkCUPIswH4Hx0N22efQhRAnXL9BAKiqU1unLOl8NReCoLuKxCVYBTZIa6
+         JGkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749136999; x=1749741799;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QuAev6ItmI0AfTnXcTojR28G9ub7l9Nn1BZH8GEVQPs=;
+        b=pZNNjs/nSqSk6VE0HM6S7GbKdQxZmTkBQHbnSHYKCeq9/gtgYPfpJN8DlCWgqqoDr2
+         DJsuq+T4ib6uJwJbSoZPLe5mXgA+gLXjtJF55RdniEREZrbeL/pyrNQAYB6ATn/T+FsZ
+         soNEf2GHAdD9EZDrWGLvsLSAJIfNBIf9pZ4srKddBzJ8yxdquU9J+Uw+fDgw2gRxW+9V
+         WhH40mK+nqcudtRfaOj4aH1DYwWiKyiXEBz+6EqKZvrVRYAIyriKZaAlkcnArh1PDQwA
+         Hn/4UxbIjyKUyC1x3mi7qHzKAtehx8s9I9V0TMjlV8kj8ezEOVQwn3LlnB//P3C2FW5P
+         0Fww==
+X-Gm-Message-State: AOJu0YxnAo4y1CTV0t7y7tt/lRw/7E1xUbNvnN+ZB4M78KwgMgREgNd0
+	R84yXq/SvvSzAoPe+6t0/w3Jhf+EzUpGoOfExH4UISB9CCZQNOFajmx6Y9vD6IZIfsI=
+X-Gm-Gg: ASbGncvQh2Kj8FazL8OsoOzPye1x9/fE6clUv2UCw/99oT/29eXQbftSKjw1qk6AEgu
+	Va8fLnhDafww4kLAaPpJflWO+PC+I7YOfu6Pn6I4+6of+lFuzMMu17NLb+NuGM0xIDiPrEMQbr1
+	q3bokm984Pt9C4V2w+WoRM/mVyRAGc3MCWxvj8wbZvin8/ID8eebg0HtEGBc3LDIgOYhuPFWJu4
+	DC9cWA8LbiMwZu7ZibM4TNT2UgVtWZYfr9haJH3y0/RFEu92HY9JYN0DtsRz2XZMEqgVh6UcCyd
+	TF6p9h8tFPfKlNCuO7clLrlWLain6ci044LITS+A/CEMmyFD/lagP0UrJ/mN6iWzUkkjtA0pt3q
+	V+pZLTXsKjPtcfyphcgy3
+X-Google-Smtp-Source: AGHT+IHCczaJ7AF09Xa9MDrOxBIQFfuqGrNJuq0RMc58XMd7hs/nEjjXYdlVB/GTGsXhv6ErKIeykA==
+X-Received: by 2002:a05:6871:287:b0:2d5:4b92:a787 with SMTP id 586e51a60fabf-2e9bf4ce8f5mr4698467fac.18.1749136998700;
+        Thu, 05 Jun 2025 08:23:18 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ea70e5ac1sm2295592241.17.2025.06.05.08.23.17
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 08:23:17 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1 1/2] Bluetooth: Fix NULL pointer deference on eir_get_service_data
+Date: Thu,  5 Jun 2025 11:23:15 -0400
+Message-ID: <20250605152316.807664-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: BT Driver: mediatek: add gpio pin to reset
- bt
-To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Von Dentz <luiz.dentz@gmail.com>
-Cc: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
- Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
- Hao Qin <Hao.qin@mediatek.com>,
- linux-bluetooth <linux-bluetooth@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- linux-mediatek <linux-mediatek@lists.infradead.org>
-References: <20250605095300.22989-1-ot_zhangchao.zhang@mediatek.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250605095300.22989-1-ot_zhangchao.zhang@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 05/06/2025 11:53, Zhangchao Zhang wrote:
-> This patch provides two methods btmtk_reset_by_gpio,
-> btmtk_reset_by_gpio_work for mediatek controller,
-> it has been tested locally many times and can reset normally.
-> 
-> The pin is configured in dts files, bluetooth is reset by pulling
-> the pin, when exception or coredump occurs, the above methods will
-> be used to reset the bluetooth, if the pin is not found, it also can
-> reset bluetooth successfully by software reset.
-> 
-> Co-develop-by Hao Qin <hao.qin@mediatek.com>
-> Co-develop-by Chris LU <chris.lu@mediatek.com>
-> Co-develop-by Jiande Lu <jiande.lu@mediatek.com>
-> Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-> ---
->  drivers/bluetooth/btmtk.c | 60 +++++++++++++++++++++++++++++++++++++++
->  drivers/bluetooth/btmtk.h |  5 ++++
->  2 files changed, 65 insertions(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-You just sent the same without any changes, any changelog, any improvements.
+The len parameter is considered optional so it can be NULL so it cannot
+be used for skipping to next entry of EIR_SERVICE_DATA.
 
-Respond to previous feedback and them implement it.
+Fixes: 8f9ae5b3ae80 ("Bluetooth: eir: Add helpers for managing service data")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/eir.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 1bc51e2b05a3..3e1713673ecc 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -366,17 +366,19 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 
+ void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len)
+ {
+-	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, len))) {
++	size_t dlen;
++
++	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, &dlen))) {
+ 		u16 value = get_unaligned_le16(eir);
+ 
+ 		if (uuid == value) {
+ 			if (len)
+-				*len -= 2;
++				*len = dlen - 2;
+ 			return &eir[2];
+ 		}
+ 
+-		eir += *len;
+-		eir_len -= *len;
++		eir += dlen;
++		eir_len -= dlen;
+ 	}
+ 
+ 	return NULL;
+-- 
+2.49.0
+
