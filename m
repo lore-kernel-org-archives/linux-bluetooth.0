@@ -1,109 +1,90 @@
-Received: from sdore.me (unknown [95.165.1.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627FF10E9
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Jun 2025 22:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.165.1.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19D11DED51
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 07:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749077413; cv=none; b=kat9nCfVoNrRVX5f2GiDITOl66N4PqQMt6ElT1Pql2gaGM8DfhEemVuv/+KPn6X8L9WwzarW10zZvAU7u0IPNIDnpIC+Xl0oMH6djS9xnan2yhpTmxGWP176zEQqV0n8kjvzsYqVy6161GCX8NIdnKmLhzRS2yDtJumGE9lSz6U=
+	t=1749106820; cv=none; b=flpRZSh8Qmlmxtc5OBslIprSqtVPv13OdSHnIWvNPtbKnqanhMuWc+SqLvBdFsILBpslJHv9ghuC/yJkjDu4NzZBTJTPrBgFeDPZcUNEoE+zFYsMEI6PpvZqSJLP0oai7zARlfiy8euUV0VtxVcx4QPmgMReVVdXFciMpTZ8Pr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749077413; c=relaxed/simple;
-	bh=UYxDd3jzSeD0BQcOEp3rTrjCmYpfh9xUEzlDBhLx/WA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=txFPYDIkMWZ6E8HO9BAQoIH2NNMqwQii1ZICj+ql6vyj9Vict1cktC6SJSBFcOuZm5hAgH6KNrnYKw53pKv6l9cnI1BHwwh6BVsCwYOytqKenFAoQ5VtsChiXwQ462iXbGkL9ekFOqgx8ZU20QwQyJeHrs9wKQwD6waK/0NcE3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sdore.me; spf=pass smtp.mailfrom=sdore.me; dkim=pass (1024-bit key) header.d=sdore.me header.i=@sdore.me header.b=iot/V3h7; arc=none smtp.client-ip=95.165.1.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sdore.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdore.me
+	s=arc-20240116; t=1749106820; c=relaxed/simple;
+	bh=WlCg6NZToqvICj6oEc6pOdoO34QK2zKEWuO/sU+7QWc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uNwy1J6P5BeSSmpVLB20xvA0N/gDnAkjgHpuyXHRkp5ZvRIp+ieawKEaoFm7ZUnQtgW3toxzprQJMn3SNMpnZrlOhy/e8yFwaWucvP+YLYji0PI7uxCP5sG4Mn2QJiPrpZX3OpJCQc9eEYmjMQFiR9Lzwacoi6iuhBYWRZ6YdPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl; spf=pass smtp.mailfrom=codecoup.pl; dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b=ZbkbuFCA; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codecoup.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sdore.me header.i=@sdore.me header.b="iot/V3h7"
-Received: from [192.168.1.2] (Beast.lan [192.168.1.2])
-	by sdore.me (Postfix) with ESMTPSA id 508071044945AE;
-	Thu, 05 Jun 2025 01:50:00 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=sdore.me; s=SERV;
-	t=1749077400; bh=UYxDd3jzSeD0BQcOEp3rTrjCmYpfh9xUEzlDBhLx/WA=;
-	h=Subject:From:Reply-To:To:Cc:Date:In-Reply-To:References;
-	b=iot/V3h73URtDps3RmUCmQU/V1hfZcW84iS+qVwoLazgKShW7Hg1/y6vtpfYe0tMv
-	 kZmWlwGhvrn6Cst5Bvt8Rs87WkkPBr/ik7SJq5iPr1tYFoLMBBYCzVhlzdGdaJVzbo
-	 dhs/4mGP0Y3OlQqgixfPc72ZZ5zpIBwac/rnhmbk=
-Message-ID: <5284d0fedf1e044e40aa6839d39f010626e6f637.camel@sdore.me>
-Subject: Re: [PATCH BlueZ 2/2] plugins/sixaxis: Implement cable pairing for
- DualSense
-From: Egor Vorontsov <sdoregor@sdore.me>
-Reply-To: sdoregor@sdore.me
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 05 Jun 2025 01:50:00 +0300
-In-Reply-To: <CABBYNZL++r5p=opkw-saPK8yqKQWEPrU-AvcQvPK_x+0yXEUkQ@mail.gmail.com>
-References: <20250603095617.92785-1-sdoregor@sdore.me>
-	 <20250603095617.92785-3-sdoregor@sdore.me>
-	 <CABBYNZJYwKurqo+HDUKYtFx0+-rNquj=OHgpcZRZYVmAxDzqpA@mail.gmail.com>
-	 <c8b55be8b9abdb73bc57e8a2d455770199a2b21b.camel@sdore.me>
-	 <CABBYNZKL2gYmWPfP1owAUSAieWgt4ARaFp0-T5+vQ+rgjWnNHw@mail.gmail.com>
-	 <4c6bec3c1c02243cf57e1618d1fd35a2f12bdf22.camel@sdore.me>
-	 <CABBYNZL++r5p=opkw-saPK8yqKQWEPrU-AvcQvPK_x+0yXEUkQ@mail.gmail.com>
-Autocrypt: addr=sdoregor@sdore.me; prefer-encrypt=mutual;
- keydata=mQINBGDSFnMBEADfvtLiuRL6CHdMzETKrux7sNHWG+eJ2+pgRZ3Nc9pH/YWqjoed8OpFx
- OLeUxr9YSQ3uMD//JEe3+Sgte29Z3PAAHVkCwKBIucCnhHpXbcQZgC9xYMCd6GWR5+DpXN9szOIyb
- kvnEtuqTddz6Q7fYsaFDs0pH3jUUWmSAyCn2JCIRfT22XgO44B/yoqnM3JXHAayeHbEAQOzMe81q3
- deauI9W7SC9ScRT6VkgLuc+SxqH99el/OkiKTe/QpO6I6cVS8leesqnOGffkRPos/o2eRonqgDu0e
- Mw4YTu0x5iNr8Lbr4TefU2W1l6M3MNwOsLmI+58+3fK1vh0QqZ70NC4eyD9UEXk3mJyV7epfNU6fY
- 0mFJbAhGV1TXomcy2MlOD1rDixw85zdK5uUwp0tfEkpxqKtihJmrTdApOTTVed303CLzgDsMokTIe
- aUOPqVZoWFDkvOzq6IppBkApJHBf1lcLlgwEn3cLQlGpYRSSi5NY3+UYtcOEZLDbF3TO6ncY8W2h3
- yQH/sAcSllfKKvkhdqEz4/Mha3GbZQXWgjrLy9BcISsQFj+DBN54I6a6kLm2n5wXH99sOp7s3jMeN
- zSU6PtuxZq4Gkt2K5JGT8yrIdfJfOH7yRUVm+8JqKNKqd6oczlDKV+lzRk9M/kjb8VQivaNSNwTo9
- 3NxEuft0+tZgwARAQABtCJFZ29yIFZvcm9udHNvdiA8c2RvcmVnb3JAc2RvcmUubWU+iQJOBBMBCA
- A4FiEEXlTCjXwaPBiJP3U33a9iH2xv60MFAmDSFnMCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4A
- ACgkQ3a9iH2xv60OquRAAgbgenXi+Ud0tYoAz6giuFKYqzuEYuoSVkjxYvZq90ODrzbu7EdvMVuKA
- qNqYjs3VRBPBMHXhJKEftKbX4bZwCoC2o2wB5oV5O13jVN083r49FTLCxmOoufCkaqscBBxi/X2T6
- +i0n5Nqx5NLBL0kE4NMTk1jxEEyuEjv7bBMs196G/d3EpNJT3YGkLXBUibpaSaVjE6zBr3UygieLD
- 2QXNkRJubx2d0FoD8TezSt5hsHWg9FOElsW6ZImRI+5q+ptL39K3cpjxHMKyhmo7xypD5XNWdmsmV
- 1+STnK7R+id18xs7JUDxHBtG7Z/3K6txgF5CPbPvtaEi9fB3K/uS03BnIzsY2/cY3r9UHHrHa/sP6
- DhDwj9dr2xIFG5w6ZNh4mUTHEJoWKEEsYKwXy2eJCB3XvP7GURAm8fXdIapONbHDYj7XX49Mj+LBr
- s4PNBuKaZTFgGQ6RSc7LpAR56xaEDR93m7zNy84mQtpab/owaox1A+BEujzKK/vEDvj9f8EWlWZRa
- DH2auNNAxdr2ACR8RzkojcFDCErAgc5sFQrgVUlvNmMdn3VL0CWmndzEQxsOdgVk9SwoHHYpHf4Cg
- gtchq3pTQ5XSRaP/wxOtQpzqJWq5uFERBTLU8WRXYv3mM3KMdvtTJadF8+P+KSSnn+/yHahR0HKVx
- PtHSH7Px/vI=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20230601.gappssmtp.com header.i=@codecoup-pl.20230601.gappssmtp.com header.b="ZbkbuFCA"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-adb47e0644dso158157566b.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 00:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20230601.gappssmtp.com; s=20230601; t=1749106816; x=1749711616; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bpNqTnsHh2J9UcATk2IxRvfk5rLlDzrVhzcnEhLFB98=;
+        b=ZbkbuFCArwSVMWcSxx4xGUrry7JTsk+MN5xPaiUTfZjD+xupQFn1Qqohf9f3p7aqfr
+         NBThUK/HV405sZEJlXjQrh9YP9C/CUDRCeGtG18UI1EwHAK81knYU37ZaGvZHjCNx1fl
+         0+I3mwbxhl7kYYPKmhU4psL2UBhVs5y6M45Tbrzp4E3pWu0cn+wkVkil6etLOUXE5Bv+
+         VJiF/9x38Vf4is/rD7boKvrXFZlzt8yYFaffUv0QrNWCeM6LNc4JnuYkGFrUUP4XYhjW
+         +LXTrgG3u8Ld70U2fALd78QhqIs+NHg6pL4oFA6RgYF7N6rmeyhGJSWrUm1d19OJBwoc
+         ReYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749106816; x=1749711616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bpNqTnsHh2J9UcATk2IxRvfk5rLlDzrVhzcnEhLFB98=;
+        b=QF8Lvp9rYg2BOji1oMsNmrpqfEzk4VPrH8uZ3MIFUFVsyUMun56HfmFwNm3lY+F/MG
+         IfzYPExUYheZ47wJUdhEfyKnRPeA68OkhjtX9M/JyrEUe6IfJU4GC8SfCtpBpy5qPgRz
+         /3Sb+chUXIaKw+D2gQtvMIKwoiE7i4fXfsdFjLttE0tYnMx/OAl742N6fHnvBk7N2+kJ
+         C25VzDn8N653pNLCyeO0ff5zt+wGRqssCfClQk6uVEu4uH3K7jAF/jjUt76+B9tNXIXR
+         nJWzupz19NtBPlL+gcvHePvSCaQC47nMaj5a10PryYN0ES85TUBQztroW5SxJ+bjFCgo
+         V6Pg==
+X-Gm-Message-State: AOJu0YwGGrKfNAG7y0O5BVZp2D0OTao/qhR7BiLKUOaDr24+7uXY3Rrk
+	CWIsnpdWZcBAHvb14EKAWWz7clkVX4oJEnnaFjpL9/F7oJrT5/PgLzfj5GGqCG6kO8mmGQT/xcq
+	l1wmfE0A=
+X-Gm-Gg: ASbGncuYKhvP86SZsy/8/e8X45cIz/i0eEKUA//dyss4qMga6oc0gimHNesAOPaXCJT
+	J1/i8DPKOsXU8K6HVBk8aa7cta0FmM0cIIhmSDgiaq4hjbE1GhrZ1RJzJVth1vovEl9QQU5W1JS
+	W4UkG+WSlvcvwOPlsD8mJGyKGqQNqPzc4/KEjMpBoVI0gvD6swA5aVjPwVhILJkm4UYS9Stk02e
+	ntyRoBKbHAhqgt9k78PXgsFPZAgKVHOOxytU3LmTVXEMpfecV0BJMOMo5+Jr2OTDzH86tgK8E/+
+	oIBWDSVidHfUHVPISYAA/nNR9y5aWuW5Vm+iPHL9dHT8t9PWurDMHSLkmcavUvxKe+odFo/+cg=
+	=
+X-Google-Smtp-Source: AGHT+IENZztZaYnbdQSMxT3SuTPuv92NIdst+HwNY11tKkq6zkwo8yykQMOalWyQYzqm0SSmiT9DVQ==
+X-Received: by 2002:a17:907:940e:b0:ad8:5595:ce07 with SMTP id a640c23a62f3a-ade07823bf4mr199758366b.19.1749106815968;
+        Thu, 05 Jun 2025 00:00:15 -0700 (PDT)
+Received: from ThinkPad-Ryzen7.. ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adb497704a5sm825746666b.83.2025.06.05.00.00.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 00:00:15 -0700 (PDT)
+From: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
+Subject: [PATCH BlueZ 0/1] monitor: Add support for decoding Channel Sounding
+Date: Thu,  5 Jun 2025 08:59:12 +0200
+Message-Id: <20250605065913.1446880-1-magdalena.kasenberg@codecoup.pl>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 2025-06-04 at 08:41 -0400, Luiz Augusto von Dentz wrote:
-> Hmm, not so sure this is secure though, I mean it could be a rogue USB
-> device pretending to be a controller so it would automatically be
-> considered paired if we just self generate the keys without asking for
-> user confirmation.
+Hello,
 
-We can generate whatever we want, unless BlueZ will treat the key as
-bonded no question asked. Read on to see what I mean.
+This patch adds initial support for decoding commands and events of Channel Sounding, a new feature introduced in Bluetooth 6 specification.
 
-> Yeah, the zero-click bond might be a security concern though, so I
-> think having the user do a confirmation for each step is sort of
-> assuring he knows (or at least pretend) what is going on.
+Best regards,
+Magda
 
-I strongly believe you only should confirm once. Especially since the
-first one doesn't actually pair or trust anything, instead it just
-creates the device record for it to be able to initiate a bonding
-connection to us without discoverable being on (as far as I understand
-it).
+Magdalena Kasenberg (1):
+  monitor: Add support for decoding Channel Sounding
 
-The painful re-re-pairing process is so strongly tied with Bluetooth in
-our minds, so I really don't want to further increase its awkwardness.
+ monitor/bt.h     | 321 ++++++++++++++++
+ monitor/packet.c | 978 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 1299 insertions(+)
 
-> When would we generate the confirmation though? I sort of trust more
-> the Bluetooth process to generate and exchange keys.
+-- 
+2.34.1
 
-That's exactly what I'd love to hear from someone, honestly :)
-
-I see a possible solution where we trigger agent on the first connect,
-even though the link key is already established. It might be a special
-flag for the device, or even just another value in the `LinkKey.Type'
-field -- meaning, "key was generated by us, should reconfirm pairing".
-
---=20
-Egor Vorontsov <sdoregor@sdore.me>
