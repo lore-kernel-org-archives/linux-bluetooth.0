@@ -1,66 +1,71 @@
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACF1198A2F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 15:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3701ACED1
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 15:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749137002; cv=none; b=DvjPTkudvSds5kgV6pNQB4tLw1SzeceE36rVf2EiKJJRhLKIx9YFqxNhP8ufym/Khx+e5JxDPRo7IeSrO8jyB4Gw3YY5aIG8yD7j+LeVocZGGbw9g4Cpooa7STMcGUghce2zqbnPQ95xIidGKUUEV5TD9bp4D9GjCUTOJkETJSo=
+	t=1749137004; cv=none; b=e5HWEdkdrUfbqilaKk0fxfkRaCX6ZkLWXKdHBeVDSM7jqANb+2qM+hGyLzUIRm6UiOD/78MtgN3mIn6EHoMtANVpNxEuWZNFfWyYXiD0OxPVvsEjMheMFu/taPp9rzLDSu1oSJSYM0vWRtrmj+saRVt6cmw7sIY0uVDTfFha56U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749137002; c=relaxed/simple;
-	bh=UDVnVovEJNMlIbhNwqAgQ2c4zHn/UjcWlVHTl8CCXMU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CSwJKA8Dtn0zi/BXMu7lgTA5QAa5NUH+2TOtLeCzMMgddHd6nUwInMyPO9ryYkIn7iKzMufsHyHAMTXuFJPmzMkC5b8Bt2PWVbsYA2gpKyzpx77K0ey494OjzV60T7cChkH57tinas4Rgt5S30PIPTXyd3BHLqTYFklZXL5UFao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QvJab3QC; arc=none smtp.client-ip=209.85.161.51
+	s=arc-20240116; t=1749137004; c=relaxed/simple;
+	bh=1sXVytO4AgmvvW3FXHX6AiP+MXqIXqXOyqpOcxD4wps=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DSbm3X8Axz1ZL0gAUECYn90R1VmLr7LuuP8ekPiqKz7Rb6LQ2O/xKzZBO4tNtdUrOY+U8o0kvJCmtXAYV9TB8AhIGIJaGHZHI/LvbVFBgS4sixLKEI4Np3c/T7RKImFpozX5ECC2eygp0EmgzbAi+p3ciFfucn+qNpbMZm2lSRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KNHFmdFJ; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QvJab3QC"
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-605fda00c30so690760eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 08:23:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNHFmdFJ"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7cd0a7b672bso81313085a.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 08:23:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749136999; x=1749741799; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QuAev6ItmI0AfTnXcTojR28G9ub7l9Nn1BZH8GEVQPs=;
-        b=QvJab3QCIVEktkDFXZiRseqt0cb9XuEZSi/U+GFJoz2LBJ9yqC3maImVpFPrA+xYZ5
-         vDIkKYPCaxWQwA7DFlxpAfnhx2u9qJYwe+qZLVfVyYPYo4h9zPQEhP2tjy8vPBufFL4i
-         oFTVMDShquvT56tCZEBj2F9JU178CgbgmYeXF+OZETjMUBSGEuB4XMBWFBGw5dmR7Kn7
-         kQRDRrH5dqcuqkwMUbOVSwGmhyzaZqzoI5Uyh9gYvVQTZiniGzu8aZchYUlkvbQ9XRcU
-         saOBV6iW5+mLkCUPIswH4Hx0N22efQhRAnXL9BAKiqU1unLOl8NReCoLuKxCVYBTZIa6
-         JGkw==
+        d=gmail.com; s=20230601; t=1749137001; x=1749741801; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YXtR5IH4CZVEeszZdxWCc9TBQY7TQNNdMZJJvY4yULw=;
+        b=KNHFmdFJiJmcxybyBkwSh8EKVZnaDltOFVGt3ozxA3ioxC82d2BbZlRYxA67d1YP6i
+         Set4Ez29ZEOfDgYhx2ztI+q37Idq7gdF1OACMpH3jXu9KU2fiYO3tkqIjWPHnPO0g890
+         PkWynn8i/zYFCzftZosrwGZF7YrGe5H1Lx4zpylnXt6CSXKppm3Scm9B/q5uhuDKfC8d
+         J1ms+lENxMfxxDIRjWRwfdQYS+go+000VKu8OG82uJtiSnpcj4Gz5mpGSi91xMEvvL1Y
+         hJ/TW7b5Rqe+DavGYmv7xEn/nJM3ZFdG+Go8gF6JXeJkttPJxkmwTq+t2NSB+jqQVFsj
+         0fWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749136999; x=1749741799;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QuAev6ItmI0AfTnXcTojR28G9ub7l9Nn1BZH8GEVQPs=;
-        b=pZNNjs/nSqSk6VE0HM6S7GbKdQxZmTkBQHbnSHYKCeq9/gtgYPfpJN8DlCWgqqoDr2
-         DJsuq+T4ib6uJwJbSoZPLe5mXgA+gLXjtJF55RdniEREZrbeL/pyrNQAYB6ATn/T+FsZ
-         soNEf2GHAdD9EZDrWGLvsLSAJIfNBIf9pZ4srKddBzJ8yxdquU9J+Uw+fDgw2gRxW+9V
-         WhH40mK+nqcudtRfaOj4aH1DYwWiKyiXEBz+6EqKZvrVRYAIyriKZaAlkcnArh1PDQwA
-         Hn/4UxbIjyKUyC1x3mi7qHzKAtehx8s9I9V0TMjlV8kj8ezEOVQwn3LlnB//P3C2FW5P
-         0Fww==
-X-Gm-Message-State: AOJu0YxnAo4y1CTV0t7y7tt/lRw/7E1xUbNvnN+ZB4M78KwgMgREgNd0
-	R84yXq/SvvSzAoPe+6t0/w3Jhf+EzUpGoOfExH4UISB9CCZQNOFajmx6Y9vD6IZIfsI=
-X-Gm-Gg: ASbGncvQh2Kj8FazL8OsoOzPye1x9/fE6clUv2UCw/99oT/29eXQbftSKjw1qk6AEgu
-	Va8fLnhDafww4kLAaPpJflWO+PC+I7YOfu6Pn6I4+6of+lFuzMMu17NLb+NuGM0xIDiPrEMQbr1
-	q3bokm984Pt9C4V2w+WoRM/mVyRAGc3MCWxvj8wbZvin8/ID8eebg0HtEGBc3LDIgOYhuPFWJu4
-	DC9cWA8LbiMwZu7ZibM4TNT2UgVtWZYfr9haJH3y0/RFEu92HY9JYN0DtsRz2XZMEqgVh6UcCyd
-	TF6p9h8tFPfKlNCuO7clLrlWLain6ci044LITS+A/CEMmyFD/lagP0UrJ/mN6iWzUkkjtA0pt3q
-	V+pZLTXsKjPtcfyphcgy3
-X-Google-Smtp-Source: AGHT+IHCczaJ7AF09Xa9MDrOxBIQFfuqGrNJuq0RMc58XMd7hs/nEjjXYdlVB/GTGsXhv6ErKIeykA==
-X-Received: by 2002:a05:6871:287:b0:2d5:4b92:a787 with SMTP id 586e51a60fabf-2e9bf4ce8f5mr4698467fac.18.1749136998700;
-        Thu, 05 Jun 2025 08:23:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749137001; x=1749741801;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YXtR5IH4CZVEeszZdxWCc9TBQY7TQNNdMZJJvY4yULw=;
+        b=Z2dkpGP6rBwgdhvkmM1qJ25DR8BGn5DUub6vllpK4uj7qnDGVcxpcOMTdRymSenFNw
+         kQSrXpJlmr+lmhgf8SsP2ytg1p9xzBG+i2xKZtLqG4j0Dgru2fZCNKcAp70hUvP1HVeP
+         twmOif/JoY/i/ESM2pUK+JuxyWIJK7FMVpXAst5hNGOo4ORll6uru9JsDpeOfAuQ9Cjd
+         EEi728EV4gQtagx/q0hSYvq8eMX4t6fxuDItJ25ya2FQDsKUElsw1WPpHZUNPIqx/OLs
+         17deOm3c3+Lys/Wj0weefw2yq/MYSvmPN+7J8sowrur1XmRRfqHc8uqsQmj5R+E+Wx0M
+         p92g==
+X-Gm-Message-State: AOJu0YwqVhgLl+K/xW2ymC9jpSBA7rfVvIRTL9cEpvykrxlv6CsP/83F
+	6nUvxNO8/1TCXzAuOHYuZtusooNi9EIWGpMldheqGf2M8BmT1YMoFx/+ksQMdMt3pr8=
+X-Gm-Gg: ASbGncsX6TRiduSB2e20SClmtX66N+/0Z2Z6GO1n4nTOEBFpc2Qek038YTmEe9Ir4t0
+	pyQE8/Oo4FkOFMjsANOkC/Lp1HZXjhqTqfsrzSnrRxmNP51pKYmc9RfMw0SjCTkIG+ZMUsc3jAO
+	s4znR4eRqlQOgqj21nIGg4SMTLOSKCAC67FqMpB1CT+odqK8ohL2AKSONXrHFrMID2NAqB6OgCp
+	36hjYo04lsdhiC9su/VLVOALE1+6GfkeUDR5fJ0ysvzZoQfoBTREKKuAgcbyfhkiXeFBjPIr/ig
+	6KQJD2/jt2QqhiHBBkzKNP6MF0htgdqqWlOlbowiSK7hzsPdbxWWISeeQpyqmAWDUfTQZq/GXMp
+	HQFDYHYC6hizGH/M6CtVb
+X-Google-Smtp-Source: AGHT+IHeMBef17GieO/WBu2pzMF4n4JZfriIiswuVSdYUJ9YrrrXC/ebcKMWT05LWT4Z6ccDqrLC9w==
+X-Received: by 2002:a05:620a:2a05:b0:7c5:e2a0:4e64 with SMTP id af79cd13be357-7d2198e1b63mr1047389585a.51.1749137000600;
+        Thu, 05 Jun 2025 08:23:20 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ea70e5ac1sm2295592241.17.2025.06.05.08.23.17
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ea70e5ac1sm2295592241.17.2025.06.05.08.23.19
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jun 2025 08:23:17 -0700 (PDT)
+        Thu, 05 Jun 2025 08:23:19 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 1/2] Bluetooth: Fix NULL pointer deference on eir_get_service_data
-Date: Thu,  5 Jun 2025 11:23:15 -0400
-Message-ID: <20250605152316.807664-1-luiz.dentz@gmail.com>
+Subject: [PATCH v1 2/2] Bluetooth: hci_sync: Fix broadcast/PA when using an existing instance
+Date: Thu,  5 Jun 2025 11:23:16 -0400
+Message-ID: <20250605152316.807664-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250605152316.807664-1-luiz.dentz@gmail.com>
+References: <20250605152316.807664-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,43 +76,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The len parameter is considered optional so it can be NULL so it cannot
-be used for skipping to next entry of EIR_SERVICE_DATA.
+When using and existing adv_info instance for broadcast source it
+needs to be updated to periodic first before it can be reused, also in
+case the existing instance already have data hci_set_adv_instance_data
+cannot be used directly since it would overwrite the existing data so
+this reappend the original data after the Broadcast ID, if one was
+generated.
 
-Fixes: 8f9ae5b3ae80 ("Bluetooth: eir: Add helpers for managing service data")
+Link: https://github.com/bluez/bluez/issues/1117
+Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/eir.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_sync.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
-index 1bc51e2b05a3..3e1713673ecc 100644
---- a/net/bluetooth/eir.c
-+++ b/net/bluetooth/eir.c
-@@ -366,17 +366,19 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr)
- 
- void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len)
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 62d1ff951ebe..54140f4acdb0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1559,7 +1559,8 @@ static int hci_enable_per_advertising_sync(struct hci_dev *hdev, u8 instance)
+ static int hci_adv_bcast_annoucement(struct hci_dev *hdev, struct adv_info *adv)
  {
--	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, len))) {
-+	size_t dlen;
-+
-+	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, &dlen))) {
- 		u16 value = get_unaligned_le16(eir);
+ 	u8 bid[3];
+-	u8 ad[4 + 3];
++	u8 ad[HCI_MAX_EXT_AD_LENGTH];
++	u8 len;
  
- 		if (uuid == value) {
- 			if (len)
--				*len -= 2;
-+				*len = dlen - 2;
- 			return &eir[2];
- 		}
+ 	/* Skip if NULL adv as instance 0x00 is used for general purpose
+ 	 * advertising so it cannot used for the likes of Broadcast Announcement
+@@ -1585,7 +1586,8 @@ static int hci_adv_bcast_annoucement(struct hci_dev *hdev, struct adv_info *adv)
  
--		eir += *len;
--		eir_len -= *len;
-+		eir += dlen;
-+		eir_len -= dlen;
- 	}
+ 	/* Generate Broadcast ID */
+ 	get_random_bytes(bid, sizeof(bid));
+-	eir_append_service_data(ad, 0, 0x1852, bid, sizeof(bid));
++	len = eir_append_service_data(ad, 0, 0x1852, bid, sizeof(bid));
++	memcpy(ad + len, adv->adv_data, adv->adv_data_len);
+ 	hci_set_adv_instance_data(hdev, adv->instance, sizeof(ad), ad, 0, NULL);
  
- 	return NULL;
+ 	return hci_update_adv_data_sync(hdev, adv->instance);
+@@ -1603,8 +1605,15 @@ int hci_start_per_adv_sync(struct hci_dev *hdev, u8 instance, u8 data_len,
+ 
+ 	if (instance) {
+ 		adv = hci_find_adv_instance(hdev, instance);
+-		/* Create an instance if that could not be found */
+-		if (!adv) {
++		if (adv) {
++			/* Turn it into periodic advertising */
++			adv->periodic = true;
++			adv->per_adv_data_len = data_len;
++			if (data)
++				memcpy(adv->per_adv_data, data, data_len);
++			adv->flags = flags;
++		} else if (!adv) {
++			/* Create an instance if that could not be found */
+ 			adv = hci_add_per_instance(hdev, instance, flags,
+ 						   data_len, data,
+ 						   sync_interval,
 -- 
 2.49.0
 
