@@ -1,36 +1,36 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1593E2185A6
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 18:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA3220012C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 18:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749149689; cv=none; b=FkZwbMM0hkUjsuJsa0ZC7hZW3LxR8bprPtI9Mt9qAj4T/uLUjqjMVTzLaLh56B+2JCIq955b89c9jX0/HGd9pF6WPNrcYZF/zWUYYq7RdoWcNiIZPaNRvxteMcuIQEeqpJS8VGV1xDrv9URpCkXPXqyaVILfjyX+ONBx3zYw2H8=
+	t=1749149690; cv=none; b=loJMiojqj5TJuG/sbkQMALE1e5Q3lKuNEeOEXKGMOBJmbF7oxIOLubvJecldXr/5xrNp7zKorAWuW4Q29cj/UkgykLkb1a6PP4ya11y+avmlAJ0TlVxcegi8tovoJCICwFJAIqm9mIJNkWRU6vrfLpBCnC1wm6wKgxjOiLJisU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749149689; c=relaxed/simple;
-	bh=QW2izeEP5B/C0UlxvS70OrX+2t0ssDqRqQhZqucbaSo=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Sftf98jaVrxrDwdl2aqxJvbkn0VwgdbPejWp4qbjIBRlXyuR++39nw6AvUkqfovJ45kMXdN7nSHAMdkXXcwZkJIOwjnvvIFp5kYlJ/sk6MFmnU6Yxj4wxrejy/6G86VEGu4txrMyNRicnjN5JgZZad1dJvRJyFxnXdar9ophNi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Enh1dsxb; arc=none smtp.client-ip=192.30.252.210
+	s=arc-20240116; t=1749149690; c=relaxed/simple;
+	bh=hkTSDJqHI2hoSIYF5X1rTkjcrdpmvIG78PoFlimhBQk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DSQr0sgvf8E/xghEYrZAER3o2wFHznwgwqYaK0s/W7CZ4tLIU+0ge63/LHwM7UhEx1vlq6ilrpnq2e+hEf+vg+uFIskBSsHjHYh7PPzOF72NKhQZTomVBFzWwrsDuTP2fcTWD2tzEdPYcypC3iHV4h9SSV9x+zGfb3nKNdOYl+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=R830dFPB; arc=none smtp.client-ip=192.30.252.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Enh1dsxb"
-Received: from github.com (hubbernetes-node-a670f64.ash1-iad.github.net [10.56.163.31])
-	by smtp.github.com (Postfix) with ESMTPA id 06E25601372
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 11:54:47 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="R830dFPB"
+Received: from github.com (hubbernetes-node-f291013.va3-iad.github.net [10.48.205.52])
+	by smtp.github.com (Postfix) with ESMTPA id 6F2D2E1126
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 11:54:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749149687;
-	bh=eCOQ25cycoE6Ai614wqLyrNfZPczaHSW1UdQ9u1tduI=;
+	s=pf2023; t=1749149688;
+	bh=0WXFsN32gcz2UPb6N3diHeaHlIQT6KCZoZK4HQua5bk=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Enh1dsxbfwzsNyY23qjU3jIU8KZuPHwW9UxIL9X7Nf3U3NeIF5jw8pxxbCWAMVm6y
-	 LxYdJPjo7AGJV5jGW0rAxoMsceF6vW52wcVdRUVqQMc8nHTJle7AJJOIycXCU9VzL9
-	 B1Ba/KY1M3CgkAT3Om7G4EvQrT/hGXxNshBSJ9Uo=
-Date: Thu, 05 Jun 2025 11:54:47 -0700
+	b=R830dFPBEdfSCPZeHUw0lylA/Gd3n+oZ0ppK+sKNQnsxD8omzA9i6gOiLFl88Mm/q
+	 dgwp7QBT/BEFCZkU9CLeGd3zUWdn15eYS/lRVoxBWYVqngcMosvN3eMzT4PuaGFqcD
+	 3sODGkHstUgnmNEJhx0OyyRTOwSVL1ETEmhMeyyI=
+Date: Thu, 05 Jun 2025 11:54:48 -0700
 From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/969025/000000-07a45e@github.com>
-Subject: [bluez/bluez] 3c38d1: adapter: Fix exposing coordinate sets if LE
- Audio ...
+Message-ID: <bluez/bluez/push/refs/heads/969028/000000-f0f469@github.com>
+Subject: [bluez/bluez] 0c3aba: shared/shell: Add support for -EINPROGRESS to
+ bt_s...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,69 +43,44 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/969025
+  Branch: refs/heads/969028
   Home:   https://github.com/bluez/bluez
-  Commit: 3c38d1c73ae8c2bbb2b62ab330657f0e5f816e4c
-      https://github.com/bluez/bluez/commit/3c38d1c73ae8c2bbb2b62ab330657f0e5f816e4c
+  Commit: 0c3abae5900eae0b6abbcf84afef197f32deb933
+      https://github.com/bluez/bluez/commit/0c3abae5900eae0b6abbcf84afef197f32deb933
   Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2025-06-05 (Thu, 05 Jun 2025)
 
   Changed paths:
-    M src/adapter.c
+    M src/shared/shell.c
 
   Log Message:
   -----------
-  adapter: Fix exposing coordinate sets if LE Audio is disabled
+  shared/shell: Add support for -EINPROGRESS to bt_shell_noninteractive_quit
 
-This fixes exposing non-discoverable coordinate set members if LE Audio
-is disabled since it may lead system device setting showing them to user
-that may attempt to pair them and end up not working.
+This enables commands to call bt_shell_noninteractive_quit with status
+set to -EINPROGRESS to indicate their execution is in progress and shall
+not exit in case of MODE_NONINTERACTIVE but it can proceed to the next
+command for MODE_INTERACTIVE.
 
-Fixes: https://github.com/bluez/bluez/issues/523
 
-
-  Commit: eb5ddecbaff013d08cb5c5840ff25bdc7ac0b21d
-      https://github.com/bluez/bluez/commit/eb5ddecbaff013d08cb5c5840ff25bdc7ac0b21d
+  Commit: f0f469bcca9572c6f25d436fd2d5ba89edeb6f55
+      https://github.com/bluez/bluez/commit/f0f469bcca9572c6f25d436fd2d5ba89edeb6f55
   Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2025-06-05 (Thu, 05 Jun 2025)
 
   Changed paths:
-    M client/assistant.c
-    M client/bluetoothctl-assistant.rst
+    M client/advertising.c
+    M client/main.c
 
   Log Message:
   -----------
-  client: Add assistant.list
+  client: Use -EINPROGRESS with scan and advertise command
 
-This adds assistant.list command:
-
-assistant.list --help
-List available assistants
-Usage:
-	 list
+This uses -EINPROGRESS with commands scan and advertise since they need
+to keep running in the background so they don't exit but shouldn't block
+other command from executing in case they are invoked from a script.
 
 
-  Commit: 07a45e579ce26967cbf1a434bec4fec95acf6e88
-      https://github.com/bluez/bluez/commit/07a45e579ce26967cbf1a434bec4fec95acf6e88
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-06-05 (Thu, 05 Jun 2025)
-
-  Changed paths:
-    M client/assistant.c
-    M client/bluetoothctl-assistant.rst
-
-  Log Message:
-  -----------
-  client: Add assistant.show
-
-This adds assistant.show command:
-
-assistant.show --help
-Assistant information
-Usage:
-	 show [assistant]
-
-
-Compare: https://github.com/bluez/bluez/compare/3c38d1c73ae8%5E...07a45e579ce2
+Compare: https://github.com/bluez/bluez/compare/0c3abae5900e%5E...f0f469bcca95
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
