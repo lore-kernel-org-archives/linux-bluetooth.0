@@ -1,71 +1,66 @@
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F2D27A92F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 18:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DB23B19A
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 18:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749147185; cv=none; b=ixlcHIBsJbyQwkJsIgY+08Ij8Vx2a3nAiH4ZARgIHyLw5W56XQhNX3v+biUJU8i+mbFV7+LSiuXK250tr+kxy4STFZEfnKsf8nGhsV7mLqWjdcDEIuMZSf7+8DxaJ/Qi4uSTEvFN+xeFpYgR9AVhGd2IuqXc7BroncVcWa9Uy44=
+	t=1749147348; cv=none; b=G/QaolDhAZDA8pfEkUy8f+o/lA8fo6Mlzd830Nyw9Td4INP+SKt5juy71VHjfHhjs7h676qf3sBSuZTZy7FMBHiN8VXpNuZILlNpbLbqmXO/nMR0X/KVRhh+8ZzmTfIxSi5FNKBE3dIWj6EXcRlZO6t+O05NNEhJDAZpQHlTaYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749147185; c=relaxed/simple;
-	bh=0IvHSsHi3DjQJPzo9HfduelrISAOAg98OPQkjvkh6XQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NMRFugVAWC04qvrRcNIMoL4G3Y/DhedOg8OcfQh0vKCpnhrckoe9lNsL0p/0wG/ax/z+VTpVB5Ntv2b8WLwFLhc7L+qer7Le+NSlDo8UZh0aKX5fzUmx7hJ1lqzy5FQXMlZ7BN5LMU6YTr0M4sz/yK9+CFPuLV9BjEGEA58+1hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NmGff1Ao; arc=none smtp.client-ip=209.85.221.172
+	s=arc-20240116; t=1749147348; c=relaxed/simple;
+	bh=1zyrLZLlBovAE0zfs5zgFr/vCRp3dszXgwSWERtapjQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DuYuuXNIe9vv/InxwNLIVmEdoUS5w3H68djTUIfKBwcNwiKzqOTAUGCNJtqcPv902DWz6iN8qy7FEVED6I2O1exK23GkO8WaTjh8pWZpxh4rbqgs3gRJU3LdGmYx9UsMhJc9C7Li95mqNOkT+mZWvQmw5500P9u8mHoIPzJgCtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ReZWW44I; arc=none smtp.client-ip=209.85.217.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NmGff1Ao"
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-528ce9730cfso397187e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 11:13:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ReZWW44I"
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-4e58d28ebb0so437041137.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 11:15:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749147182; x=1749751982; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Bh+BXn9teY/u/PqYZ8naxpjYF8CEwfqXlnH+SsUluSI=;
-        b=NmGff1Aoe8iXV0SmLH8qkAC7rFZTKJqR6n1ooV5HsoHyOlFc8VjPw0hhFqxTWxz0GE
-         FDutsL+rMJSjlqR0TldbUqadbzNGQ55Zoy1wplBGCeTzBn9aiPdne0M5r6TNQmfSFaHL
-         ZaUxvGY7LHGoVBmcRXi2wtfJjN/YzpVjnXiE2lStLDh7aUPZqhOQ1ArYxz2+5JZ9TbSO
-         r0K7brUVznVWjLHRWsIbzN4uAHnnJkH6h15ndvQAMQv9kfgfpnIz6c1p2IDDgGgUFZXt
-         5cybvASUDhcLVmtaPKrD85fQPmHVGJtz9iOcB6565Z66iswGidymTxiIPhUxMSMWfoNs
-         jJNQ==
+        d=gmail.com; s=20230601; t=1749147345; x=1749752145; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gXA3dWbMYjMPkgl5Sx056TR7FaPIbzEG883Ro/fZ5qA=;
+        b=ReZWW44ISiXl4LaZqwba37jGtPjWvTIbrWR3K2mDvWY8s9j2AR8OlQIGW+sI8z0t7r
+         lyjJ0L7DI/Y3pFvy9mur4dz1z1RkT8xNCJ2V75tSMsTPFyegd375qHNGGwlEGGTXHZeU
+         5iE8uuylgzUok/sMgSnh0BSnKEfJBwwD9ygB5i23YtA8AtxWf7RNOdtbryHX244Qo+fA
+         ndVTZSKOrSSCiA+WdHA4T/WV1N1MefPSvNzyeW/oe8qd2Ru5+3k4yJOh3+yqHCZZ4yTY
+         NQY6oH+SXVVqdwfGMl8Oq2l0ZmxDAwQ9HE+ZEbE3IB4Sb0hSV5xg5cWuJkhCfoklYH9T
+         YZFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749147182; x=1749751982;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bh+BXn9teY/u/PqYZ8naxpjYF8CEwfqXlnH+SsUluSI=;
-        b=TnDuaANLm3fGtNdVOW5n/WEU14zbCFHdjRhbdXcJNK8LR1u2bc3NQ5WW9PADErE4jF
-         gz7lURrSs77zaYdka5mXTXS1Nmhv070u2d5e89ScMWKz0W0kJ/YyzzklEe4A/fEMHCjq
-         mHoC5An5wWFRFj6Y7yzgcyoy3QTFahHTYs/wIjOtXk/AWHfQKs5+RcT9ZAaDAcE9oQXX
-         Tk/1s1VU4GAx0vnBKjzaLuW9B+5MeQ5MWDAcZOJ57MlRjFnEm8cJk6quRdbbdUm5cN8f
-         FDUD1HY9361iNSRi8GkGR1xA1uchymznnyn8eyVbOI3yVgL/EAWqwzADsoU1pzeUcONt
-         3xtw==
-X-Gm-Message-State: AOJu0Yy85K6r/P3iH81edgf4pSWNzN7lV1WiMoboMSChfuU16enH1AN4
-	wptp1Shb2wFhPI5bNqYObwUA6+yRIJtH0Mbu8aMzrAipxYZgGx2zONeOun2Av/EYoZw=
-X-Gm-Gg: ASbGncu+NRr3Cym1ai+otFNFCNmVKoB698EfDWsr7RCzRBckC600h+U7AhR4mmJ+W5z
-	8QfAcRdSq4FYwIMWUZxcZBisvIfx6trWQ0XXYJOwvK0E0cDeymLMe0v+P2QWR9DUg2zjsuSjQvp
-	dWbMMs0f+Vk6XETondF1WVzDFxKYVpCXG3Cl5S55ixr2DMYOuN0EiEz9zi96EAHXH9ZoNVe/Ukj
-	CtQutqOg5QLdLJbEwYtlI7e8jhyXbKidBvZpX4B1m75qbRXQ/iGL9jLM+HiyT2E27R2tS9y8G81
-	SBklbH36KItArVCL63K+SfrFoQ06L/yd0Rum6UQAY0arJx64STC5Vw9amAojO4uN/WoVbCfFkz9
-	ABvR6J9on1sjzNEsisab1
-X-Google-Smtp-Source: AGHT+IGY8BlzKOc7G2pti9vgA9R/epdYpXhnXhfZSCwMax2DIg+iR9fzTm6A5OERAMwaCjvINPyt3w==
-X-Received: by 2002:a05:6102:548b:b0:4e5:958d:4962 with SMTP id ada2fe7eead31-4e772882c16mr457692137.2.1749147182073;
-        Thu, 05 Jun 2025 11:13:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749147345; x=1749752145;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gXA3dWbMYjMPkgl5Sx056TR7FaPIbzEG883Ro/fZ5qA=;
+        b=HQXJKiQMSBuB5c0PI9sJJ/AS9w3GM+EYDtmJq4qBdfKGbiZNGem+oFK1ngkZM39I24
+         utw+24CIj/fB72QA5pqpvmpPsIsCAgLIF12YVbd9WXrMQPA2Gj7d0Y1MqGbkrWeLGqgo
+         eR99v2YpoivjtfWbbqCW2su6jtar8zEUqnxHhshwljAVuGWwLGSdhbU7bQ8xgl3FcbNM
+         Io3xHfJCAWSXy+n5odsAP5M4XSkPmtGylJFnTTT22wWSwyk6UKGepTz/LUl7yvdHwm74
+         LeWropRJbC08IVF4R4rQsWvhhunvweN0Zf4SLEhFP3jwVdTLnkxWPFl+fpVhO7eNzTuf
+         pS0Q==
+X-Gm-Message-State: AOJu0YwgnvHh2NPmAWC8/OrXYARurARNH0m7dFu0Hvsn2w2hCibQjhrP
+	ilKMl8nGKcfv7t6f6xfPj+6tFoi6HcFWmhY0F+sHxzN46r72vVLTSMXlelXb5cHCIvs=
+X-Gm-Gg: ASbGncsA5IVCuuoNim7yRh9EpHh2As7Pjb1LkjThWVNK1CC64AeIiLadjS3YSAIaOnk
+	64zzk60Aq6DKO/PAO1d9UCycrq9oig2Qf6fg74thfH4a3lHOBBSXxDq7kC3CTeU6/cJsDCZAf1R
+	wPUV37TsB1FT6GtNahSMb8oHns53pD35hXYz2RucUPq0V637PWcvEKxGVuHOi0l7uU/ruJ6JRHd
+	69XZWrTnTvV0BUaZqbmifClxWDP27fI0KPYU4ix2o66pKVY/q3efffdd4SZHCLeMqd1Bqp768id
+	x97fUhOodqECinIbeLcGw7iNirTAg8FDX9Iuh3DufZHe2pCRuWcSnCrcatDDk0CKkeX8SeT/L5m
+	KLl2EHZaa64dbLzgbvUJV
+X-Google-Smtp-Source: AGHT+IHwhHZ8vkhU4bFxzGcxrnTXsWcBaZb1WcqGQcmk4xkt0lPH5gxNLzVWh/aQwzg0sc9ipX5SJQ==
+X-Received: by 2002:a05:6102:809e:b0:4e6:a33d:9925 with SMTP id ada2fe7eead31-4e7728cd541mr483644137.5.1749147345057;
+        Thu, 05 Jun 2025 11:15:45 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ebd194c7bsm4173241.3.2025.06.05.11.13.00
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e64e9f7ff2sm11932499137.27.2025.06.05.11.15.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jun 2025 11:13:00 -0700 (PDT)
+        Thu, 05 Jun 2025 11:15:44 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/3] client: Add assistant.show
-Date: Thu,  5 Jun 2025 14:12:56 -0400
-Message-ID: <20250605181256.853484-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 1/2] shared/shell: Add support for -EINPROGRESS to bt_shell_noninteractive_quit
+Date: Thu,  5 Jun 2025 14:15:41 -0400
+Message-ID: <20250605181542.854629-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250605181256.853484-1-luiz.dentz@gmail.com>
-References: <20250605181256.853484-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -76,114 +71,30 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds assistant.show command:
-
-assistant.show --help
-Assistant information
-Usage:
-	 show [assistant]
+This enables commands to call bt_shell_noninteractive_quit with status
+set to -EINPROGRESS to indicate their execution is in progress and shall
+not exit in case of MODE_NONINTERACTIVE but it can proceed to the next
+command for MODE_INTERACTIVE.
 ---
- client/assistant.c                | 63 +++++++++++++++++++++++++++++--
- client/bluetoothctl-assistant.rst |  7 ++++
- 2 files changed, 67 insertions(+), 3 deletions(-)
+ src/shared/shell.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/client/assistant.c b/client/assistant.c
-index ffefa25baf9b..88795cdd3cd3 100644
---- a/client/assistant.c
-+++ b/client/assistant.c
-@@ -395,15 +395,72 @@ static void cmd_list_assistant(int argc, char *argv[])
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 3e5959fc1868..6b4f7a7ef503 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -1560,6 +1560,12 @@ void bt_shell_noninteractive_quit(int status)
+ 		return;
+ 	}
+ 
++	/* Ignore EINPROGRESS as it is meant for commands that need to stay
++	 * running.
++	 */
++	if (status == -EINPROGRESS)
++		return;
++
+ 	bt_shell_quit(status);
  }
- 
-+static void print_assistant_properties(GDBusProxy *proxy)
-+{
-+	bt_shell_printf("Transport %s\n", g_dbus_proxy_get_path(proxy));
-+
-+	print_property(proxy, "State");
-+	print_property(proxy, "Metadata");
-+	print_property(proxy, "QoS");
-+}
-+
-+static void print_assistants(void *data, void *user_data)
-+{
-+	print_assistant_properties(data);
-+}
-+
-+static char *generic_generator(const char *text, int state, GList *source)
-+{
-+	static int index = 0;
-+
-+	if (!source)
-+		return NULL;
-+
-+	if (!state)
-+		index = 0;
-+
-+	return g_dbus_proxy_path_lookup(source, &index, text);
-+}
-+
-+static char *assistant_generator(const char *text, int state)
-+{
-+	return generic_generator(text, state, assistants);
-+}
-+
-+static void cmd_show_assistant(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+
-+	/* Show all transports if no argument is given */
-+	if (argc != 2) {
-+		g_list_foreach(assistants, print_assistants, NULL);
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
-+	proxy = g_dbus_proxy_lookup(assistants, NULL, argv[1],
-+					MEDIA_ASSISTANT_INTERFACE);
-+	if (!proxy) {
-+		bt_shell_printf("Assistant %s not found\n", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	print_assistant_properties(proxy);
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
- static const struct bt_shell_menu assistant_menu = {
- 	.name = "assistant",
- 	.desc = "Media Assistant Submenu",
- 	.pre_run = assistant_menu_pre_run,
- 	.entries = {
--	{ "list",         NULL,    cmd_list_assistant,
--						"List available assistants" },
-+	{ "list", NULL, cmd_list_assistant, "List available assistants" },
-+	{ "show", "[assistant]", cmd_show_assistant,
-+					"Assistant information",
-+					assistant_generator },
- 	{ "push", "<assistant>", cmd_push_assistant,
--					"Send stream information to peer" },
-+					"Send stream information to peer",
-+					assistant_generator },
- 	{} },
- };
- 
-diff --git a/client/bluetoothctl-assistant.rst b/client/bluetoothctl-assistant.rst
-index 75166a6e7928..33fbcbc764cf 100644
---- a/client/bluetoothctl-assistant.rst
-+++ b/client/bluetoothctl-assistant.rst
-@@ -28,6 +28,13 @@ List available assistants.
- 
- :Usage: **> list**
- 
-+show
-+----
-+
-+Show assistant information.
-+
-+:Usage: **> show [assistant]**
-+
- push
- ----
  
 -- 
 2.49.0
