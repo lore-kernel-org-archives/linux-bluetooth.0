@@ -1,130 +1,106 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F12927A907
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 17:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6270227A465
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jun 2025 18:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749146298; cv=none; b=etl5HJVRu2Aya0qFyoV4zn3sKlc0qAW9VDw9D/QU/u2O7KOmqznE3jywpxrH7uGGFbkIa+NDa7XX+fvmD4gH0w/cPZ9862gto4j2jeVAmIaqpUTaX04XgDD+ejdj1YD43W3gjynDr58zuhQ9nvYdR8XK5gW9AWpQZEbuZxjYGgQ=
+	t=1749147181; cv=none; b=lmZYRsknBvRCPGZhZcbSvuGypZONsM8vomdbLSbW2ejDa+7hAYqiToSpW2v5VKPrgxH+paSvIYJuddRZPHpbzPP4aO4W62/JusxicudwQAEJYVds5DL7a0+o6xDX83SCp1lJYhsH4+YqFtoPR+zd8xr8MhfMjPdCW5+GMuE4TYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749146298; c=relaxed/simple;
-	bh=Z0I3htkPiI18KXwN3fR2DU4uXAqkHqTZk8OaPxH1IXg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lBFGb72rCGKz9enn7NMnDdDwQiHU5geAfBfghlKYg7bdfyeiPP3cnxY90cltvWIQF0aoXX65qD9RoYu/UbTkTr9iLV8wm85IQtbBANNrPtMPBdRJqcsSezBQD10yQlRKNdYqouVWBtn2LyvsO07OMDokw+cDDfhzcCn8xfpmvys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dTcGtQwV; arc=none smtp.client-ip=209.85.222.175
+	s=arc-20240116; t=1749147181; c=relaxed/simple;
+	bh=bLV94iYs5sO8hKgnOAlnI1xhbQCFsJ2Z6RSmyGPiG9M=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=O8+UjGGf53FxGrsW7IjztDtfY9rGbcpNVZxqDXmwb+nf4Rn95tGPKUWwdPQ3DyfBHK52WFZVK7MYurkQ3llkRELIlkuGQs9UpCtBDLmIEI+PB5pL39JLCKZ7JaCrPg84A0xrtpRzHJ0fL574cixgp91c6lXVEiifbZDJknV5qnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ISAPyLcE; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dTcGtQwV"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7c5f720c717so267914385a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 10:58:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ISAPyLcE"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-530807a8669so450257e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jun 2025 11:13:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749146294; x=1749751094; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ij+Hdtv2D3QS1BFgCbuB7YGrSAgcmr5ocvROKYup72g=;
-        b=dTcGtQwVEFOuEzf9HksBhNx4JmKE9uWqtqCThWgtHQ16ffnOlKDIwBM/qLdcGMo31D
-         ugbYydp5y5elzGxz1LC0tJgIxmXjBvwPQTLx2d8tF8QG+yt0deqr5e6Ov9JrrgusbjUX
-         Xo2kfRspEsZ0YH6a+V3Dq655BmYZqxtJVXevfdcmGO38wCV1eOlwHpW1LBKtVxhY5E0L
-         I0h01g8vdhV3QtXST2Gxq1vap9aQygWWB0eFa5iB5U6r5iAoQYQ/+1QSZLbmw2A8RhDT
-         Gakw91Rly7RWKP/iQhlixZF15cvU5g7u4upKCRuvpmxt5iOS1Zvp8my5sfKlDKLpNF8T
-         pOoA==
+        d=gmail.com; s=20230601; t=1749147178; x=1749751978; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GNiopItGaUkyF0iI7mVuCgT2YA7k5qfRx5jo7k/7fOo=;
+        b=ISAPyLcEQ/wNPSK5d2BYdWg9Z0jfnY8yy+udOLd3FRaUvzgHOZPmaIgWesKywU+/Mf
+         bunbsCW4arFIJMEL29ljLX6rpe1QjkBzpmQ4xjjfVbOaJHKVuIsVIGTsFxKNHVdMJLA8
+         NhF4bgksiPPN7pLg7dbqpy7oWOWNlxtWHCAJ12ZiISCoHjkmD64kmOaZhrz5dquKauLN
+         auw80mpreN4OnzygoPR3vlYRXUE2jQIimBbE376QLgMsptp7/hlpSI95uv3yX9/E4UvV
+         GwMuNLlqQccPB96dTPsByv8HiQRrr3aR9oLIXtkv0NWH8F8iVtMi/GbLDEDp6t5RAgNE
+         6ZrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749146294; x=1749751094;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ij+Hdtv2D3QS1BFgCbuB7YGrSAgcmr5ocvROKYup72g=;
-        b=ODO7VM6hTfz475U2rLC6EnQSOwB8oHrA7uuUgaD2T+Uq6Kk8Ivf7iIi9pVmAEcRGLZ
-         scobhoJuPTnH4Qt+K11pc8j4Vq2JRmbCjEcskYdpLjUjcKL2+7yQb8486XstJ4M8qStK
-         U9n84FMIrI72ZlfWIbtTKMRsa9JEKT69pi9WwgwOrRGNTCaHEgd3CKe8ltltX/D+kgch
-         xeSPo+deQxsjaUsWsGwpq20Yb7SoKuAf49K6RTQmlZfgjPSrZwmcu8haLcGTu/MVFLIt
-         bIqtBI3T65NH8QXdHcG/Uiy9zjz2xrbklKweOFh7ozkV1LNHRFB42WTlii8A/eWqZzp8
-         5fYQ==
-X-Gm-Message-State: AOJu0YxJ4ONKdZqW9YKQHygEuGu0Zh64BPNT/qgUlEcgshCmrNE/QpNU
-	/PHGVtlDtEUlQEBIbNtbBQtNZzQ2CZJMaRaOyx5iRHAklu4r00QpaqIbQLgY7T9a
-X-Gm-Gg: ASbGncvds4uwoUI2npmQYqc8wQTLoOyhAnowI4J5y09E66J5n08xOL0Ou35voJPjT0J
-	BdYuJ1mDPO3sdqVxz3RUQSv1kze19U8sKJ6u2V6WWtnFfLGWynu4Yik9scU90U+oywh3ROk6eWP
-	g0gXivttcdDleI43fLgT2TdZ+LucG9hDTbUVDmeEJRaUbSaHlzyjyIZLohkswt+ex4jvfQ1StIV
-	7YoKqgderWd+5ZiyoU6XVmf3eTTklnd2UISSBcLjAaoconmgU86QldKoUfviNUfopeAHSj3NVha
-	UKf+hdvAC+B8WuOVPmq+WJF9khK9ri6f6RexOFwKivNsMewPXOAgH3vjmw==
-X-Google-Smtp-Source: AGHT+IElReH1hHAbvpPW/9D2UAGstapfSc5gR50oHcuLmk5i8wyeL4Dx6Z15PzwyuoI3x+Z0dzoyNg==
-X-Received: by 2002:a05:620a:4688:b0:7d2:189a:5949 with SMTP id af79cd13be357-7d22bfbe0eemr15626385a.28.1749146294021;
-        Thu, 05 Jun 2025 10:58:14 -0700 (PDT)
-Received: from [172.17.0.2] ([20.122.95.151])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d09a0f9940sm1289744685a.44.2025.06.05.10.58.13
+        d=1e100.net; s=20230601; t=1749147178; x=1749751978;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GNiopItGaUkyF0iI7mVuCgT2YA7k5qfRx5jo7k/7fOo=;
+        b=XA09CT32DqZ2RzMnRaM3pFtZYAwELORfT0UAg+ZA7UKSznCUnzoce4jkovI/tmqO9D
+         w5JcP9k4Ah/q/DmgtxSCcL9HTnZokZtxT6J8X0WEdPJRY2orZk+76jlaspIvTOQrEMUV
+         ioXu7TcKK890t6Nvt6H2q+LyzwL6djMM6f1cmmVG1yKL9vg2sAfcf5gOBtK5Uixuq8QO
+         hxdvrhevPwnqDS52Mc7cNFXAi8oYu734XjeMrPUFGxmfV/FloUhw2AhbaAX0hAAukxh+
+         EqWg+Sd9FeK73IojLVyvPMoAJo6HO3V9OhtV8OEQQIr3O/muy/uyaHsg4SgrrNyz9UV9
+         PT2A==
+X-Gm-Message-State: AOJu0YzEHslYb6d9S/Z9GWCM5hEFIBYgpyuSBGEdom7sS2X7e8u3+2O4
+	A8S2qUvKSLZpLSRhsd+19aPs7+s4uwNBupZUBAoWqjcjblxQhY1WM0jpvpyqwraKn0E=
+X-Gm-Gg: ASbGncsY/Jda8vziLrZULgj+60SXpLRr5JSdSO0iLhiRBUft0oWw9AJ0MJDjeBa9kDc
+	7irVA/gA02DxqN1ah24FnJxhIuYODfXTBrHdqXDbzEEQlAWr7OFsPzoZye2fn685hyVCQ9s5AKq
+	Mcq++4Gvj/QvNrALPtdNZq+BpGbqGwGmaI3zY1SQZ2tQJ1vfxBI1VEL7iVM6Oi8lCXTKvMSlANM
+	LNEoJ1nlHzcKjoMG5rP8A2p3XEHnzM7R74WtbUbZy9OKlSSAH/lx7njYg7Rm2FT65oapocsyjoR
+	4UH8V8iqru7PedRh/Iw94qcRxFRjhFprkS+V02/2uqjKmcbRc0HS3I7xjK3wtMnBmPUaqrGNALe
+	VjBWK+u2ddp3cfJfTwdLp
+X-Google-Smtp-Source: AGHT+IEHCVAlLuJ2gBDlRTIPpyKcy5AfSKQzXYwtObK2cjYUftuvV+Z7CdfnjmODEUPHnF+hce167A==
+X-Received: by 2002:a05:6102:809e:b0:4e7:3d55:5212 with SMTP id ada2fe7eead31-4e7729f4214mr485445137.11.1749147178493;
+        Thu, 05 Jun 2025 11:12:58 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ebd194c7bsm4173241.3.2025.06.05.11.12.57
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jun 2025 10:58:13 -0700 (PDT)
-Message-ID: <6841dab5.050a0220.26674a.7c4d@mx.google.com>
-Date: Thu, 05 Jun 2025 10:58:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6130335317063346274=="
+        Thu, 05 Jun 2025 11:12:57 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/3] adapter: Fix exposing coordinate sets if LE Audio is disabled
+Date: Thu,  5 Jun 2025 14:12:54 -0400
+Message-ID: <20250605181256.853484-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, magdalena.kasenberg@codecoup.pl
-Subject: RE: monitor: Add support for decoding Channel Sounding
-In-Reply-To: <20250605160002.1652091-2-magdalena.kasenberg@codecoup.pl>
-References: <20250605160002.1652091-2-magdalena.kasenberg@codecoup.pl>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6130335317063346274==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This fixes exposing non-discoverable coordinate set members if LE Audio
+is disabled since it may lead system device setting showing them to user
+that may attempt to pair them and end up not working.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=968983
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.24 seconds
-BuildEll                      PASS      20.16 seconds
-BluezMake                     PASS      2666.37 seconds
-MakeCheck                     PASS      20.71 seconds
-MakeDistcheck                 PASS      198.84 seconds
-CheckValgrind                 PASS      276.29 seconds
-CheckSmatch                   WARNING   304.60 seconds
-bluezmakeextell               PASS      127.76 seconds
-IncrementalBuild              PENDING   0.23 seconds
-ScanBuild                     PASS      913.41 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1876:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3822:52: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: https://github.com/bluez/bluez/issues/523
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 2417e3cea960..70141e1542d7 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7356,11 +7356,12 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 				MGMT_SETTING_ISO_SYNC_RECEIVER))
+ 			monitoring = true;
+ 
+-		/* Monitor Devices advertising RSI since those can be
+-		 * coordinated sets not marked as visible but their object are
+-		 * needed.
++		/* If ISO  Socket is enabled, monitor Devices advertising RSI
++		 * since those can be coordinated sets not marked as visible but
++		 * their object are needed.
+ 		 */
+-		if (eir_data.rsi)
++		if (btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET) &&
++						eir_data.rsi)
+ 			monitoring = true;
+ 
+ 		if (!discoverable && !monitoring) {
+-- 
+2.49.0
 
---===============6130335317063346274==--
