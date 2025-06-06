@@ -1,103 +1,162 @@
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D449728A1C5
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Jun 2025 16:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749229116; cv=pass; b=Bu3SCcmjwdAhUbMG7ZcUcciaV+Lbbf0uEesZ/Cm3hUmxXKSNUT6G+2LxUykzXW4UjYinPh6obUWP0oPBB1lTTk7tBt8FRv3anIGVfcUBF+AmVdOTmo+UVuaozMMJAmaRz6CuloiRhanvPSBbx/e/3IC87v9IdyFVPD5W7GeQXGs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749229116; c=relaxed/simple;
-	bh=2VNVZ2Cy8FA09AKu7mM/bjfqMZcXbynOLaqRdYNbYz8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qkvmpDYoRrE/fhREH3v3oaqHjVH2Ihuw+AaKea9R6JOmrlJUbWTxXLJWWkrj88buI5ejBr859nBcPAFFWMNY4VhY7rlOp37qEpWJSDi0u86yPtMyFEppkZ7s2IsAFtf5FkTbfAqtHtSSLpW6z7w/2wMkSH6RLksBQ3F38/oYxp8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=NfI8Pheg; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0961A9B3D
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Jun 2025 18:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749235410; cv=none; b=lEd0wRn1oywRpiGBdpUNDX7dJPrq84RKt6i3PDQ89ltfAleT0TvHSAEk2idEe4rD4jUbQGvefeq+Bh4iTS2Cnz5QKcwHmmY6XT5bTexbZKBVVoodz6OD4ZFz3b395VnPs9MzRrBm/rWl8wgBXkA0kzsH8/FRRe4xNlebh25aLak=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749235410; c=relaxed/simple;
+	bh=l//rGjECMYkMrgyQQZXi0/SJlWVZP0fcDRV7g6s9WKU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=U8xWkmLPXvkfnoGYMf+OGpqCmyn0ziDPzhT6T4Mgc9On7NJCrBF2apVsUTS8gcEOTVf+xPYxwB7AYZg3byL6S7bYHKi86ImI2fqHr046gXxXDWoF7ZFS+euA0XjujGbRpv4WX5gQtRpkz/YdDhsphQUkuSC3m6kPgQKC3uFvl5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CXVdRGRz; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="NfI8Pheg"
-ARC-Seal: i=1; a=rsa-sha256; t=1749229099; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=dc0gl3pBTYy+ERKDqjxepGfXhyB/KAi4jxSEo4B10N0gGURg4CXWJuCvlC91gKcgCepWgIJKGOoEwqCmHqSOwDKQiZT0tAA+K+l4XDlkr+rpc3DnjvEFduRXR45hpaJ+HjTASc2R2WYHKZl8DxW1lkDy/jGivKjbtSUJ0zHK3l0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1749229099; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=OksVMcScG6B6icR+jYB0kVDNKG8YF00gX9IG+lT2wWY=; 
-	b=Kjwzv3/1jOLrEj+FAtymdvuCU45/VJjaZiOD4XyXDcUfrkmY3cIqU4f8hhFXr1m1k6YNjEbOy4e/fn1y77pgJvCyo2xfgwDpnFYRWG77wwjMb4ArXXVgngtMv+gaTXXDQvAoVktU7Wum3lqp7PyilepbyJqjeMF3ZBz7k/FVTLk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
-	dmarc=pass header.from=<frederic.danis@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749229099;
-	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=OksVMcScG6B6icR+jYB0kVDNKG8YF00gX9IG+lT2wWY=;
-	b=NfI8PhegXv36p8wSgOksS1IAs4GziIYG1ZSyVhtgr8kuUBPVKERMdR/MIf5Wh3gz
-	MVUc2hanNcXavS6RbvBby91H8KODf25YQZLIzIGk1xU/OOjzUAXK+ZKktwsO47A453D
-	FwkN8kmj/hRap2WEnDfFETvA04JXvdgphD70Q8Qk=
-Received: by mx.zohomail.com with SMTPS id 1749229097849236.62750923477233;
-	Fri, 6 Jun 2025 09:58:17 -0700 (PDT)
-Message-ID: <3aeca122-2119-460a-9e4b-64fc6628a35a@collabora.com>
-Date: Fri, 6 Jun 2025 18:58:15 +0200
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CXVdRGRz"
+Received: from github.com (hubbernetes-node-ab3b86b.va3-iad.github.net [10.48.138.25])
+	by smtp.github.com (Postfix) with ESMTPA id 614ED4E051A
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Jun 2025 11:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1749235408;
+	bh=8Y/s6r+lpnpvD83lUUpnqyGpdQGgnMr8Ip1Z1rl8FtQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=CXVdRGRzp1jnhzVB9SAOrL2HTn91Lq090+76nQJT9OskoVT40cGRg03IhHLVdRm7v
+	 xkOEldLLQz08GEHl5xeVcqy1zFufTSqwFindbvLEYG29PBhEiHv1cy6dsfnula+tES
+	 fvFXhXAtyVmiAMVL7NhbhS0IOM8Bo6vbbdQx83Zc=
+Date: Fri, 06 Jun 2025 11:43:28 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/8ad12f-bbd10b@github.com>
+Subject: [bluez/bluez] 4a7ee3: adapter: Fix exposing coordinate sets if LE
+ Audio ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 0/3] pbap: use the public DBus connection
-To: Andrew Sayers <kernel.org@pileofstuff.org>,
- linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, pav@iki.fi
-References: <20250603151651.1080923-1-kernel.org@pileofstuff.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <20250603151651.1080923-1-kernel.org@pileofstuff.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Andrew,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 4a7ee30978da919cc820116be6ced323b35e4ebd
+      https://github.com/bluez/bluez/commit/4a7ee30978da919cc820116be6ced323b35e4ebd
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-06-04 (Wed, 04 Jun 2025)
 
-On 03/06/2025 17:13, Andrew Sayers wrote:
-> DBus requests are received by the public DBus connection, because it
-> registers the relevant bus name.  My previous patches told PBAP to
-> listen on a private connection, but DBus doesn't let connections share
-> bus names, so it needs to listen on the public connection instead.
->
-> This adds a little more complexity to the logind callbacks, to avoid
-> unregistering profiles during shutdown.  It also removes an API I
-> previously added, which is no longer used and would only encourage the
-> next person to make the same mistake.
->
-> Reported-by: Frédéric Danis <frederic.danis@collabora.com>
-> Closes: https://lore.kernel.org/linux-bluetooth/333ad76e-0aba-4f93-b141-8e69fb47535f@collabora.com/
-> Suggested-by: Pauli Virtanen <pav@iki.fi>
-> Signed-off-by: Andrew Sayers <kernel.org@pileofstuff.org>
-> ---
->
-> Andrew Sayers (3):
->        obexd: Pass at_(un)register value to logind callbacks
->        pbap: use the public DBus connection
->        Revert "obexd: Support creating private system/session bus connections"
->
->   obexd/client/pbap.c       | 28 ++++++++++++++++++++++++----
->   obexd/plugins/bluetooth.c |  6 ++++--
->   obexd/src/logind.c        | 14 +++++++-------
->   obexd/src/logind.h        |  8 ++++----
->   obexd/src/main.c          |  8 --------
->   obexd/src/obexd.h         |  2 --
->   6 files changed, 39 insertions(+), 27 deletions(-)
->
+  Changed paths:
+    M src/adapter.c
 
-Except 2 simple build errors, this allows me to connect the pbap profile.
-Thanks
+  Log Message:
+  -----------
+  adapter: Fix exposing coordinate sets if LE Audio is disabled
 
--- 
-Frédéric Danis
-Senior Software Engineer
+This fixes exposing non-discoverable coordinate set members if LE Audio
+is disabled since it may lead system device setting showing them to user
+that may attempt to pair them and end up not working.
 
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
-Registered in England & Wales, no. 5513718
+Fixes: https://github.com/bluez/bluez/issues/523
 
+
+  Commit: 04c32f3d312905bf7bece70735e6b2ca4bf3ca05
+      https://github.com/bluez/bluez/commit/04c32f3d312905bf7bece70735e6b2ca4bf3ca05
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-06-04 (Wed, 04 Jun 2025)
+
+  Changed paths:
+    M client/assistant.c
+    M client/bluetoothctl-assistant.rst
+
+  Log Message:
+  -----------
+  client: Add assistant.list
+
+This adds assistant.list command:
+
+assistant.list --help
+List available assistants
+Usage:
+	 list
+
+
+  Commit: f09f33199858d103489c7064b7488209d02b9ce8
+      https://github.com/bluez/bluez/commit/f09f33199858d103489c7064b7488209d02b9ce8
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-06-04 (Wed, 04 Jun 2025)
+
+  Changed paths:
+    M client/assistant.c
+    M client/bluetoothctl-assistant.rst
+
+  Log Message:
+  -----------
+  client: Add assistant.show
+
+This adds assistant.show command:
+
+assistant.show --help
+Assistant information
+Usage:
+	 show [assistant]
+
+
+  Commit: 7d59391bb783c60f15803f97860094a6817894b2
+      https://github.com/bluez/bluez/commit/7d59391bb783c60f15803f97860094a6817894b2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-06-05 (Thu, 05 Jun 2025)
+
+  Changed paths:
+    M src/shared/shell.c
+
+  Log Message:
+  -----------
+  shared/shell: Add support for -EINPROGRESS to bt_shell_noninteractive_quit
+
+This enables commands to call bt_shell_noninteractive_quit with status
+set to -EINPROGRESS to indicate their execution is in progress and shall
+not exit in case of MODE_NONINTERACTIVE but it can proceed to the next
+command for MODE_INTERACTIVE.
+
+
+  Commit: 5499681bc63226c03984e3493eebd0dc4cd2243f
+      https://github.com/bluez/bluez/commit/5499681bc63226c03984e3493eebd0dc4cd2243f
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-06-05 (Thu, 05 Jun 2025)
+
+  Changed paths:
+    M client/advertising.c
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Use -EINPROGRESS with scan and advertise command
+
+This uses -EINPROGRESS with commands scan and advertise since they need
+to keep running in the background so they don't exit but shouldn't block
+other command from executing in case they are invoked from a script.
+
+
+  Commit: bbd10bb9bc5e3504b24dc65132d65b34d6188d69
+      https://github.com/bluez/bluez/commit/bbd10bb9bc5e3504b24dc65132d65b34d6188d69
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-06-06 (Fri, 06 Jun 2025)
+
+  Changed paths:
+    A client/scripts/broadcast-source-pbp.bt
+
+  Log Message:
+  -----------
+  client: Add script to PBP
+
+This adds a client script for testing Public Broadcast Profile.
+
+
+Compare: https://github.com/bluez/bluez/compare/8ad12fe7b4b9...bbd10bb9bc5e
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
