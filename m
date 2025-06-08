@@ -1,68 +1,68 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B814256C89
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jun 2025 21:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77702571D3
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jun 2025 21:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749418362; cv=pass; b=pO2OQ48+I+dtdhCYUnXdsT7ODqW2ZxBQzckQ2plM8FvLmbcGWNm4jUVxof8zZDCns6WCAYBSvXX6dwhaDcHLSepHc+Ocvof57lXedfHllrHXIPtqyu/tNd1y0ZlzyAPlb+hqNqqX9bx8o18v8AxbCXWw15kJ7UKE5DuaiGRh1Js=
+	t=1749418362; cv=pass; b=jcXOHNqFoF+tfJDAdjxRIKaLnyU+wn+ohNeqck4wSbbkoDasdm3udUIy2bTokHBcCpnM0Oz/tIe6fnw/6PiBtdu2HbOUPSs9NSc98JGf51DzKWs9pJcZhHQXIO8YaTrlBMDbhlqSXBr7J/MccfwlzxcepO/Lp/K8rbBdL7dY4kg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749418362; c=relaxed/simple;
-	bh=VYcrhD2CIDXWa3QLlfZyvykpAIfwSE5fTbvTx1gHWRo=;
+	bh=wjeMxImG7C+0/4S16/iNKFzc9rQDTGQ0jsKBm7gcpGw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z7MgH1dQYBwCCB6942DDk3k3F0kUjiv6E64czviYnv+8xliEf7BArrRXVd8qAT9o3/xskIUnrcWRnTegmtkjgMimKlVCF/8y86gW4meJS3RN8J73XshyhDPfALLCD8IPSPl7KarIGMIrz0qHrF5eide7JXjdSz6uUb4y2SjHwls=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=CHsviPHg; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=MHRL8BkdXfAWDSfKiWXkh6wxHCIaMYL4vZmD8DINYl/k80Di3vj2sWSz/2VhdBqLwjPbsUQs3CBIHY6+8tjOtFTv/rHnXEqpbilqiJAUFGGtFcOqA8dLwFxDK76Ow41zavbaOe9lAJDWBT88BVnpD+8FfwAw3HnFaPaWWDp+2Ks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=qcSwSG9/; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="CHsviPHg"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="qcSwSG9/"
 Received: from monolith.lan (unknown [185.77.218.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bFpDk2HDtz49Q4L;
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bFpDk6mN2z49QDQ;
 	Mon,  9 Jun 2025 00:32:38 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1749418358;
+	t=1749418359;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B29qcsl4V3dNGkC00Sv+rhKeW0H6rzDD+JKT5VVGUfg=;
-	b=CHsviPHgQFzce7Uz9KqyD1LB3D2/rjDIFjwMqXqWFJDx7DmAmpbaGpN6jKvcwlqegNHw6i
-	bisqNImdklA2NasgBq07frUOh8deoJvTz+i/yl1KOS3DYVywFcMMvtPk25Pi+ImE/NpQFf
-	d6CDn+m/7mb8XicYYelMBL9c6POSmZ+ZrATmhAJZa2Rc3pc5JIZz1uD2qJYyGVGuCPlLRI
-	QbTODM4nDvj6+SIzIvrkN8H7NUfDlNSNIJH86czsego+9VQjq8mAxNy9UBVxZ+ti3SZnkU
-	c/OhFp2unoZwbzID6JXHu3I6NrK4EB3xWzfxbDAlYucurx1eEEgVQhL0RUHTpQ==
+	bh=HoJmzq7OhMpOGw2PKm4tHlv/psytaH8sFRggaR5pp8Q=;
+	b=qcSwSG9/FTTatto/mVLgXIg6RLU/ZTIFdlsalRAh2BKYade24N8K93aRtZJa1OlBreLk5b
+	W0jvXVWpQ9ZX0iQAaVsl9ryhKuT7R3bstXUvS6I3a+iB9lF48leTEeJazr6yWeXM4OiyDn
+	vhVYkcFp+8cFQ5xB7dn45sOC92RWpkm7e3MgrhK/mueuqs3U6OaEoeKpw/MuJ4j2s902Lz
+	eUpKwSYiHTfymUPHGdvU72kJJxQBtDn0Grx84PPxRDmfvIsD07fq8Is5MY+Kr/9EP5pjHH
+	mfSRfkjunfHtw5iHrc09DGlWp6PWCHt/9GqGVEqY4VAbaqKp3gKuI4io7A93QA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1749418358;
+	s=lahtoruutu; t=1749418359;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B29qcsl4V3dNGkC00Sv+rhKeW0H6rzDD+JKT5VVGUfg=;
-	b=URpzUNkLkZKTHVgyola9xUKN8K42JFkq2XwnsQr4fL9Iv7JffwK2lsYzajocGyO23qP24S
-	cKdZBbsqfKHpvDn2rU3OUJreCOPex+OBSSRfDh8HLatMicqjaJMezTo+/x+VVY4Gmg5EgH
-	GkBm/6aRzetPmhj4DnICN3pArmV305iv3d00uD56J4NYXXImLoLCBZU9Fq7g9Uho9owniH
-	vIk29nPclO9STlHLK4ZTQ/b+ltvRmLk24tvd9FsHXKlXUxYarjx8jC0Kt/Jejkj//bWGEX
-	aMgjGYsDFi+/uzBvTSvIiqncE3mU3pI6MhSyDpl5JmHTn4Dv+lHOfm2NESoUzw==
+	bh=HoJmzq7OhMpOGw2PKm4tHlv/psytaH8sFRggaR5pp8Q=;
+	b=hFsYF0XRbJQ3bpydZlF4JxGAzD5o3KFlRG73z3yIG4ToTKLflRNpiDc0ziPZbqxhxd0nSM
+	ct09colVsXkF9fTmqL84eOyFhgacVdxvpdupDY4M1UPqyGEHVYH/1w8tj7GtokUfJwNzav
+	WWdRYkh2x2QO7JP+Uz6N8fRdSylpy1DBL0vpEZ+mrdlW8L5X6GnQOOhvh6t+7v5cmACSXv
+	kjJkz14pK7W+qBmj9RKRP/XAGyeP/82NLmQfNxUw5P99JFZTNx/e1vaEnCdxijBBwP7Vt5
+	NxtN6CtrBP/6uIzS9GDdsXyJNCla+xHjceSV7nuIfcXKfLUsY6fLTwEL92C1Wg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1749418358; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1749418359; a=rsa-sha256;
 	cv=none;
-	b=QovO8v7EgA3Cyl9IYK0trvUBdeNMpFLhDP8I9xRDd7xx8P3j7kJbp94b11eLV+ZKDUseGZ
-	npf2gCBJuPvW/9i08ae2Kqe2AnuukzhwKuHlwWxVQ8npzt6ea/octMKz6MJ10lFTfKNvqV
-	iHL6QiQD8zGZjxp7ZemuHmDWdeKtb0LqBoO4hX/TPbDuXvSxSopbyC5aTczD661K0pWQfT
-	vozi5f6Bhtncr1Glh72/saEmyHPKH0X74OqDV/FOwPBwaSZYYMISrT37cDqLRrAibHVAQT
-	YDTyCMrnc4U5SE1///Xt5zqpHSVnmrNbDqBSIPFrcG2wmVJF1tc4vgS3H2NpGg==
+	b=dcnzWHGssR1mMEaoE5j66jtkGpjOvDy8IPhGIZfaRVpzqdKmFakqJ9Dkxo2b3z3hfc9Pr7
+	eoL/ua8RjnmOcf3i9+VzhXGKglccQYQ5YxxipTPiGbDAV8zAGHf7W5Mhz6TFVcYnIVo3rn
+	7ef/bi/SM4Fp/fhZOAL4+GE2/uVq6bFO6Pb5TMIRURMyaYyyE4ErL+HBPnUWxAsvJP7WqN
+	sfnYeE/5x0NJHhxYLEOhIusaRbXC7xO1BFvBHxR8jarOPE/bPYxoauAgq7IO9gsvWaP3XF
+	iAtIoOlpiMHpLhmBh/LZSkWTfJ3D44thSWusfuzNmBraIPods7vXnc1dUBJQaw==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 03/10] shared/bap: add client ASE reuse and upper level stream locking
-Date: Mon,  9 Jun 2025 00:32:15 +0300
-Message-ID: <36b7af1db42e5fad73161a535146d2b16381b3bf.1749418319.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 05/10] bap: add ready callback for setup configuration
+Date: Mon,  9 Jun 2025 00:32:17 +0300
+Message-ID: <78eb44f996c6a0f5729415beb989e494d3624738.1749418319.git.pav@iki.fi>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1749418319.git.pav@iki.fi>
 References: <cover.1749418319.git.pav@iki.fi>
@@ -74,251 +74,337 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Change ucast client stream design so that:
-
-* upper level locks streams to indicate which ones it is using
-* unused streams are reused when upper level wants a new stream
-* only locked streams are used for bidi CIS linking
-* streams (still) correspond 1-to-1 to non-idle ASEs
-
-This fixes some issues:
-
-* bap_ucast_stream_new() could pick a stream upper level is already
-  using if lpac & rpac match (can occur with multi-stream AC 6(ii) etc)
-* Avoids assuming ASE enters idle state at end of stream life cycle.
-  This is False for some devices like Sony headsets, which always cache
-  codec config so RELEASING -> CONFIG always, never RELEASING -> IDLE,
-  so ASE never go IDLE again.
-* Allows reconfiguring an ASE with different codec in this case.
-* Allows upper level to only QoS some of the streams.
-
-Reconfiguring ASE in QOS/CONFIG state with different codec here results
-to need_reconfig=true state, where ASE and stream configs do not match,
-and upper level needs to do bt_bap_stream_config() to sync them.
+Operations like SetConfiguration need to wait until setup configuration
+finishes. Abstract this to a setup_config() callback emitted on QoS
+completion or failure, instead of hardcoding DBus reply.
 ---
- src/shared/bap.c | 133 ++++++++++++++++++++++++++++++-----------------
- src/shared/bap.h |   3 ++
- 2 files changed, 89 insertions(+), 47 deletions(-)
+ profiles/audio/bap.c | 179 +++++++++++++++++++++++++++----------------
+ 1 file changed, 112 insertions(+), 67 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index fda1e3560..1c15a4ecb 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -296,6 +296,8 @@ struct bt_bap_stream {
- 	struct queue *pending_states;
- 	bool no_cache_config;
- 	bool client;
-+	bool locked;
-+	bool need_reconfig;
- 	void *user_data;
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 6be6ff8fd..b39314fa9 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -63,6 +63,11 @@
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
+ #define MEDIA_INTERFACE "org.bluez.Media1"
+ 
++struct bap_setup;
++
++typedef void (*bap_setup_ready_func_t)(struct bap_setup *setup, int code,
++						uint8_t reason, void *data);
++
+ struct bap_setup {
+ 	struct bap_ep *ep;
+ 	struct bap_data *data;
+@@ -76,11 +81,13 @@ struct bap_setup {
+ 	bool cig_active;
+ 	uint8_t sid;
+ 	bool config_pending;
++	bool readying;
+ 	struct iovec *caps;
+ 	struct iovec *metadata;
+ 	unsigned int id;
+ 	struct iovec *base;
+-	DBusMessage *msg;
++	bap_setup_ready_func_t ready_cb;
++	void *ready_cb_data;
+ 	void (*destroy)(struct bap_setup *setup);
  };
  
-@@ -1925,6 +1927,9 @@ static unsigned int bap_ucast_qos(struct bt_bap_stream *stream,
- 	if (!stream->client)
- 		return 0;
+@@ -116,6 +123,10 @@ struct bap_data {
  
-+	if (stream->need_reconfig)
-+		return 0;
+ static struct queue *sessions;
+ 
++static int setup_config(struct bap_setup *setup, bap_setup_ready_func_t cb,
++							void *user_data);
 +
- 	memset(&qos, 0, sizeof(qos));
++
+ static bool bap_data_set_user_data(struct bap_data *data, void *user_data)
+ {
+ 	if (!data)
+@@ -697,28 +708,32 @@ fail:
+ 	return -EINVAL;
+ }
  
- 	/* TODO: Figure out how to pass these values around */
-@@ -2327,7 +2332,6 @@ static unsigned int bap_ucast_release(struct bt_bap_stream *stream,
- 	/* If stream does not belong to a client session, clean it up now */
- 	if (!bap_stream_valid(stream)) {
- 		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
--		stream = NULL;
- 		return 0;
++static void setup_ready(struct bap_setup *setup, int code,
++							uint8_t reason)
++{
++	if (!setup->readying)
++		return;
++
++	setup->readying = false;
++
++	if (setup->ready_cb) {
++		setup->ready_cb(setup, code, reason, setup->ready_cb_data);
++		setup->ready_cb = NULL;
++		setup->ready_cb_data = NULL;
++	}
++}
++
+ static void qos_cb(struct bt_bap_stream *stream, uint8_t code, uint8_t reason,
+ 					void *user_data)
+ {
+ 	struct bap_setup *setup = user_data;
+-	DBusMessage *reply;
+ 
+ 	DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
+ 
+ 	setup->id = 0;
+ 
+-	if (!setup->msg)
+-		return;
+-
+-	if (!code)
+-		reply = dbus_message_new_method_return(setup->msg);
+-	else
+-		reply = btd_error_failed(setup->msg, "Unable to configure");
+-
+-	g_dbus_send_message(btd_get_dbus_connection(), reply);
+-
+-	dbus_message_unref(setup->msg);
+-	setup->msg = NULL;
++	if (code)
++		setup_ready(setup, code, reason);
+ }
+ 
+ static void setup_create_io(struct bap_data *data, struct bap_setup *setup,
+@@ -766,26 +781,19 @@ static void config_cb(struct bt_bap_stream *stream,
+ 					void *user_data)
+ {
+ 	struct bap_setup *setup = user_data;
+-	DBusMessage *reply;
++	int err = 0;
+ 
+ 	DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
+ 
+ 	setup->id = 0;
+ 
+-	if (!code) {
+-		if (!setup->config_pending)
+-			setup_qos(setup);
+-		return;
+-	}
++	if (code)
++		err = code;
++	else if (!setup->config_pending)
++		err = setup_qos(setup);
+ 
+-	if (!setup->msg)
+-		return;
+-
+-	reply = btd_error_failed(setup->msg, "Unable to configure");
+-	g_dbus_send_message(btd_get_dbus_connection(), reply);
+-
+-	dbus_message_unref(setup->msg);
+-	setup->msg = NULL;
++	if (err)
++		setup_ready(setup, err, reason);
+ }
+ 
+ static void setup_io_close(void *data, void *user_data)
+@@ -875,22 +883,16 @@ static void release_stream(struct bt_bap_stream *stream)
+ static void setup_free(void *data)
+ {
+ 	struct bap_setup *setup = data;
+-	DBusMessage *reply;
+ 
+ 	DBG("%p", setup);
+ 
++	setup_ready(setup, -ECANCELED, 0);
++
+ 	if (setup->stream && setup->id) {
+ 		bt_bap_stream_cancel(setup->stream, setup->id);
+ 		setup->id = 0;
  	}
  
-@@ -2610,6 +2614,9 @@ static int bap_ucast_io_link(struct bt_bap_stream *stream,
- 			stream->ep->dir == link->ep->dir)
- 		return -EINVAL;
- 
-+	if (stream->client && !(stream->locked && link->locked))
-+		return -EINVAL;
-+
- 	if (!stream->links)
- 		stream->links = queue_new();
- 
-@@ -5073,6 +5080,8 @@ static void ep_status_config(struct bt_bap *bap, struct bt_bap_endpoint *ep,
- 		ep->stream->cc = new0(struct iovec, 1);
- 
- 	util_iov_memcpy(ep->stream->cc, cfg->cc, cfg->cc_len);
-+
-+	ep->stream->need_reconfig = false;
- }
- 
- static void bap_stream_config_cfm_cb(struct bt_bap_stream *stream, int err)
-@@ -5980,43 +5989,6 @@ bool bt_bap_pac_bcast_is_local(struct bt_bap *bap, struct bt_bap_pac *pac)
- 	return false;
- }
- 
--static bool find_ep_unused(const void *data, const void *user_data)
--{
--	const struct bt_bap_endpoint *ep = data;
--	const struct match_pac *match = user_data;
--
--	if (ep->stream)
--		return false;
--
--	if (match->rpac)
--		return ep->dir == match->rpac->type;
--	else
--		return true;
--}
--
--static bool find_ep_pacs(const void *data, const void *user_data)
--{
--	const struct bt_bap_endpoint *ep = data;
--	const struct match_pac *match = user_data;
--
--	if (!ep->stream)
--		return false;
--
--	if (ep->stream->lpac != match->lpac)
--		return false;
--
--	if (ep->stream->rpac != match->rpac)
--		return false;
--
--	switch (ep->state) {
--	case BT_BAP_STREAM_STATE_CONFIG:
--	case BT_BAP_STREAM_STATE_QOS:
--		return true;
+-	if (setup->msg) {
+-		reply = btd_error_failed(setup->msg, "Canceled");
+-		g_dbus_send_message(btd_get_dbus_connection(), reply);
+-		dbus_message_unref(setup->msg);
+-		setup->msg = NULL;
 -	}
 -
--	return false;
--}
--
- static bool find_ep_source(const void *data, const void *user_data)
- {
- 	const struct bt_bap_endpoint *ep = data;
-@@ -6196,6 +6168,48 @@ static struct bt_bap_stream *bap_bcast_stream_new(struct bt_bap *bap,
- 	return stream;
+ 	if (setup->ep)
+ 		queue_remove(setup->ep->setups, setup);
+ 
+@@ -987,6 +989,29 @@ static bool setup_mismatch_qos(const void *data, const void *user_data)
+ 	return !match_bcast_qos(&setup->qos.bcast, &match->qos.bcast);
  }
  
-+static bool find_ep_ucast(const void *data, const void *user_data)
++struct set_configuration_data {
++	struct bap_setup *setup;
++	DBusMessage *msg;
++};
++
++static void set_configuration_ready(struct bap_setup *setup, int code,
++						uint8_t reason, void *user_data)
 +{
-+	const struct bt_bap_endpoint *ep = data;
-+	const struct match_pac *match = user_data;
++	struct set_configuration_data *data = user_data;
++	DBusMessage *reply;
 +
-+	if (ep->stream) {
-+		if (!ep->stream->client)
-+			return false;
-+		if (ep->stream->locked)
-+			return false;
-+		if (!queue_isempty(ep->stream->pending_states))
-+			return false;
++	if (!code)
++		reply = dbus_message_new_method_return(data->msg);
++	else if (code == -ECANCELED)
++		reply = btd_error_failed(data->msg, "Canceled");
++	else
++		reply = btd_error_failed(data->msg, "Unable to configure");
 +
-+		switch (ep->stream->state) {
-+		case BT_BAP_STREAM_STATE_IDLE:
-+		case BT_BAP_STREAM_STATE_CONFIG:
-+		case BT_BAP_STREAM_STATE_QOS:
-+			break;
-+		default:
-+			return false;
-+		}
-+	}
-+
-+	if (ep->dir != match->rpac->type)
-+		return false;
-+
-+	switch (match->lpac->type) {
-+	case BT_BAP_SOURCE:
-+		if (ep->dir != BT_BAP_SINK)
-+			return false;
-+		break;
-+	case BT_BAP_SINK:
-+		if (ep->dir != BT_BAP_SOURCE)
-+			return false;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	return true;
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	dbus_message_unref(data->msg);
++	free(data);
 +}
 +
- static struct bt_bap_stream *bap_ucast_stream_new(struct bt_bap *bap,
- 					struct bt_bap_pac *lpac,
- 					struct bt_bap_pac *rpac,
-@@ -6213,20 +6227,26 @@ static struct bt_bap_stream *bap_ucast_stream_new(struct bt_bap *bap,
- 	match.lpac = lpac;
- 	match.rpac = rpac;
+ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+@@ -994,6 +1019,7 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
+ 	struct bap_setup *setup;
+ 	const char *path;
+ 	DBusMessageIter args, props;
++	struct set_configuration_data *cbdata;
  
--	/* Check for existing stream */
--	ep = queue_find(bap->remote_eps, find_ep_pacs, &match);
-+	/* Get free ASE */
-+	ep = queue_find(bap->remote_eps, find_ep_ucast, &match);
- 	if (!ep) {
--		/* Check for unused ASE */
--		ep = queue_find(bap->remote_eps, find_ep_unused, &match);
--		if (!ep) {
--			DBG(bap, "Unable to find unused ASE");
--			return NULL;
--		}
-+		DBG(bap, "Unable to find usable ASE");
-+		return NULL;
+ 	dbus_message_iter_init(msg, &args);
+ 
+@@ -1028,36 +1054,23 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
+ 			return btd_error_invalid_args(msg);
+ 		}
+ 
+-	setup->stream = bt_bap_stream_new(ep->data->bap, ep->lpac, ep->rpac,
+-						&setup->qos, setup->caps);
+-	bt_bap_stream_lock(setup->stream);
+-	bt_bap_stream_set_user_data(setup->stream, ep->path);
+-	setup->config_pending = true;
+-	setup->id = bt_bap_stream_config(setup->stream, &setup->qos,
+-						setup->caps, config_cb, setup);
+-	if (!setup->id) {
++	cbdata = new0(struct set_configuration_data, 1);
++	cbdata->setup = setup;
++
++	if (setup_config(setup, set_configuration_ready, cbdata)) {
+ 		DBG("Unable to config stream");
+ 		setup_free(setup);
++		free(cbdata);
+ 		return btd_error_invalid_args(msg);
  	}
  
- 	stream = ep->stream;
--	if (!stream)
-+	if (stream) {
-+		/* Replace lpac: the stream generally needs to be reconfigured
-+		 * after this, otherwise things like codec config not match.
-+		 */
-+		bap_stream_clear_cfm(stream);
-+		stream->lpac = lpac;
-+		util_iov_free(stream->cc, 1);
-+		stream->cc = util_iov_dup(data, 1);
-+		stream->need_reconfig = true;
-+	} else {
- 		stream = bap_stream_new(bap, ep, lpac, rpac, data, true);
-+	}
+-	if (setup->metadata && setup->metadata->iov_len)
+-		bt_bap_stream_metadata(setup->stream, setup->metadata, NULL,
+-								NULL);
++	cbdata->msg = dbus_message_ref(msg);
  
- 	return stream;
- }
-@@ -6247,6 +6267,25 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
- 	return bap_bcast_stream_new(bap, lpac, pqos, data);
+ 	switch (bt_bap_stream_get_type(setup->stream)) {
+-	case BT_BAP_STREAM_TYPE_UCAST:
+-		setup->msg = dbus_message_ref(msg);
+-		break;
+ 	case BT_BAP_STREAM_TYPE_BCAST:
+-		/* No message sent over the air for broadcast */
+-		setup->id = 0;
+-		setup->config_pending = false;
+-
+ 		if (ep->data->service)
+ 			service_set_connecting(ep->data->service);
+-
+-		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++		break;
+ 	}
+ 
+ 	return NULL;
+@@ -1436,11 +1449,14 @@ static struct bap_ep *ep_register(struct btd_service *service,
+ 	return ep;
  }
  
-+void bt_bap_stream_lock(struct bt_bap_stream *stream)
-+{
-+	if (!stream || !stream->client)
-+		return;
-+
-+	/* Reserve stream ASE for use by upper level, so it won't get
-+	 * reallocated
-+	 */
-+	stream->locked = true;
-+}
-+
-+void bt_bap_stream_unlock(struct bt_bap_stream *stream)
-+{
-+	if (!stream || !stream->client)
-+		return;
-+
-+	stream->locked = false;
-+}
-+
- struct bt_bap *bt_bap_stream_get_session(struct bt_bap_stream *stream)
+-static void setup_config(void *data, void *user_data)
++static int setup_config(struct bap_setup *setup, bap_setup_ready_func_t cb,
++								void *user_data)
  {
- 	if (!stream)
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index d10581428..fba8b6b17 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -183,6 +183,9 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
- 					struct bt_bap_qos *pqos,
- 					struct iovec *data);
+-	struct bap_setup *setup = data;
+ 	struct bap_ep *ep = setup->ep;
  
-+void bt_bap_stream_lock(struct bt_bap_stream *stream);
-+void bt_bap_stream_unlock(struct bt_bap_stream *stream);
++	if (setup->readying)
++		return -EBUSY;
 +
- struct bt_bap *bt_bap_stream_get_session(struct bt_bap_stream *stream);
- uint8_t bt_bap_stream_get_state(struct bt_bap_stream *stream);
+ 	DBG("setup %p caps %p metadata %p", setup, setup->caps,
+ 						setup->metadata);
  
+@@ -1454,27 +1470,49 @@ static void setup_config(void *data, void *user_data)
+ 		bt_bap_stream_lock(setup->stream);
+ 	}
+ 
+-	setup->config_pending = true;
++	bt_bap_stream_set_user_data(setup->stream, ep->path);
+ 	setup->id = bt_bap_stream_config(setup->stream, &setup->qos,
+ 						setup->caps, config_cb, setup);
+-	if (!setup->id) {
+-		DBG("Unable to config stream");
+-		setup_free(setup);
+-		return;
++	if (!setup->id)
++		return -EINVAL;
++
++	switch (bt_bap_stream_get_type(setup->stream)) {
++	case BT_BAP_STREAM_TYPE_UCAST:
++		setup->config_pending = true;
++		break;
++	case BT_BAP_STREAM_TYPE_BCAST:
++		/* Broadcast does not call the callback */
++		setup->id = 0;
++		break;
+ 	}
+ 
+ 	if (setup->metadata && setup->metadata->iov_len)
+ 		bt_bap_stream_metadata(setup->stream, setup->metadata, NULL,
+ 								NULL);
+ 
+-	bt_bap_stream_set_user_data(setup->stream, ep->path);
++	setup->readying = true;
++	setup->ready_cb = cb;
++	setup->ready_cb_data = user_data;
++
++	return 0;
++}
++
++static void bap_config_setup(void *data, void *user_data)
++{
++	struct bap_setup *setup = data;
++
++	if (setup_config(setup, NULL, NULL)) {
++		DBG("Unable to config stream");
++		setup_free(setup);
++		return;
++	}
+ }
+ 
+ static void bap_config(void *data, void *user_data)
+ {
+ 	struct bap_ep *ep = data;
+ 
+-	queue_foreach(ep->setups, setup_config, NULL);
++	queue_foreach(ep->setups, bap_config_setup, NULL);
+ }
+ 
+ static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
+@@ -2240,11 +2278,18 @@ static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
+ 	case BT_BAP_STREAM_STATE_CONFIG:
+ 		if (setup) {
+ 			setup->config_pending = false;
+-			setup_qos(setup);
++			if (!setup->id) {
++				int err = setup_qos(setup);
++
++				if (err)
++					setup_ready(setup, err, 0);
++			}
+ 		}
+ 		break;
+ 	case BT_BAP_STREAM_STATE_QOS:
+-			setup_create_io(data, setup, stream, true);
++		setup_create_io(data, setup, stream, true);
++		if (setup)
++			setup_ready(setup, 0, 0);
+ 		break;
+ 	case BT_BAP_STREAM_STATE_ENABLING:
+ 		if (setup)
 -- 
 2.49.0
 
