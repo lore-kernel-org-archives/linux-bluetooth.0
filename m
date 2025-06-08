@@ -1,104 +1,65 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1691EFF8F
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jun 2025 20:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749414683; cv=pass; b=b8p9/JVgw1JMs3umixlP6riKi2b+9OvjIMnwdk3uYTGViNFoaeU9bgIXIRIwbydINjrhukbiaaFUc2P287CNq+0WKz6ByqnG42f4NrB13/X+wdqRu/jXHlGhYaOWxZJ8Qpay3J9i5U/iJNrfx+xg93TyJqg++/ytxN88VLw9KD4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749414683; c=relaxed/simple;
-	bh=0HwmpkA4JFS4W7vhP3UPqc7wMc+UuVugWxgEUJYG734=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZgoeI6ICNKJ+cDw29yd8Dp4wO3JP6sXScOHVYMYJkGkEjorq1Ec5GZAvOTqz57h1wwOs7amcrTUVx/9TruIBQH4/zFJkkvXeHJcLsmBwTpRUppzXoeC2towjnkTHW7OFYrxHGfWi+hZJfbfCGHFhCZV5dccYHzErhKEyXpZhx7U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=q3ABRJWq; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106EF224FA
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jun 2025 20:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749415284; cv=none; b=fRtl3dZbNR3X6Z1tP6DmYwPddv0uf4iJ4fcbCc4nDi6RvhPQeI+dNnIdsz50o6U6BtFHVs1UNjY3b6C15XfwHsx5hlOIlpyU78ljVCNVP5TzqMuUHg6DCMY37I9GhJP/fFZVUnGGwYxP3pQj8/8qf3vTdnpgBa/UfNADtltUY9g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749415284; c=relaxed/simple;
+	bh=Q0fq5vZ+qh/i6jXOvFe3y4t3boI5Wu8QNB3ivl+9GoE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=aSs+vQsv6kgk/9apA06ZUi4AYC46fx6pBgkjCQ6Jl11tgItjbdACtd2kfpDEL38rs6nWccj7+Av7fgirewg4ER0gw9E1logVNF9aZyIG3qMO8niWKCEvUfn+2XXHurprxLCv9GMrGfLtcPM7CJ5Vp4tpGkgr5k4UF6WmR5sHSRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=merdhCc4; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="q3ABRJWq"
-Received: from monolith.lan (unknown [185.77.218.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bFmsl1hzQz49Pxn;
-	Sun,  8 Jun 2025 23:31:06 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1749414667;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3J60QF7H/vSUR5MC9syxfGXfFGiU8KzZIWZTUGnDSP0=;
-	b=q3ABRJWqFTSU4FbMr+rJZJvp3fwJCMGvbTz81/scUXU6SBFCblt+1+gHA+C4jx89FseD4Q
-	/sCSe3+UuVWLU/MJktKNY4gDhHVCjIx9DijWoGCYhAuvRc0Fd/fy/D3NlsLYcyrrFK4j3F
-	fZF3/hB26PzCchN+17AbI1rq1z3bFm+IUEw+78J+6v7HD4GxULnbxAdbTfszpiu/x0oaC+
-	/FKn1sWF9VlgIyuaYs5fGg/6+qJFzIwKkf/oefhkGYlP+WWlbp33IRwtNYQ9PnLqKT+AaI
-	A2C8dJctCAKWXKDmN3yWk6dBAYcdFIz6vrozaQ56DDCC402vZe9N8Ngytmvd5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1749414667;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3J60QF7H/vSUR5MC9syxfGXfFGiU8KzZIWZTUGnDSP0=;
-	b=PcvDLQmg6kwoN7G+N2KiuDPQ1rlYkHLlxdZ5ov8jCNvC2U+flbbA4ILXr76l54uwt9BgUF
-	b+5zMNkYFWISZy25HHMNWHo2z5PKWvq9L0UB8cQjhymCotstPTlkkm/ib2tSS0dYPF34mW
-	urHAbjtDSq3/gy2/Ke7XryAm7TjYEt03sjQ3IumcIBOvoieLBayPYF6uV00pdXSns8jJ+j
-	M9qGZdoHSEDhgi4Ni2tB1H6pEl3X0KWSDNgxXo4ilkpd4Fw1WVxFhulLsi5FT5WNFUXDGB
-	bJEgcDJvMwbxUXrJpenWZkOIH+QXkyRU4ued9sP3+6XvQjpeaIUoFLDlcO/jiQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1749414667; a=rsa-sha256;
-	cv=none;
-	b=aLV9bC1G1nR5uye5uHThOnZwgWJhwo3EySouaWibGj7iorkzIElbEreGxwmz1UxW53FVU7
-	z3fCiLD6SKvJsDbrcXEYPcPaDSj5mGreFH5Xb1XHLP2wTnomIibI6AwEca+XF+g/7PqGRm
-	gD4NbDM9s9MT1hGUU7L8cJHvd3hapOunJDCQvjkH3mtJTbnUie8RpB/QrFBRKWSmtJQU8I
-	K0OP8xDN9XbOzHfDxvg28NmGyrevPdYqG4YHWpNuEZ5YExZrv7Pymg6X9ueBZupGSDTdyx
-	zAlViyYrf4WUAwXlP4EOedB5Yk+7piFtaN7VXOEDuThqMiK8aJibIzOfHrNpVQ==
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="merdhCc4"
+Received: from github.com (hubbernetes-node-3c06efd.ash1-iad.github.net [10.56.182.38])
+	by smtp.github.com (Postfix) with ESMTPA id 1439F140849
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jun 2025 13:41:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1749415282;
+	bh=02SP+y6HfiSwvHvdUNzKIEXs/hP8GbHC2PeMYo6YfGM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=merdhCc4PmbiaWV44GXQ62Jw/EVzhhi5PZLwpfaUhMOzZH+Halt/9XeEAXOMzYBSV
+	 mz6F2H0I0k1DuEh1gnGUBCceonAyFRVIkcoe6w9Tl/uijxZQnrZMmS3TzCcrBk8uia
+	 AJ1b5CbgN1QEFYBjq7bkP62xQCUEpM7omsc61thM=
+Date: Sun, 08 Jun 2025 13:41:22 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] shared/bap: check lpac type in bap_bcast_stream_new()
-Date: Sun,  8 Jun 2025 23:31:03 +0300
-Message-ID: <33226743ac1dc2803c5a90a1c0cdbfc97e3ecfec.1749414200.git.pav@iki.fi>
-X-Mailer: git-send-email 2.49.0
+Message-ID: <bluez/bluez/push/refs/heads/969619/000000-a2652a@github.com>
+Subject: [bluez/bluez] a2652a: shared/bap: check lpac type in
+ bap_bcast_stream_new()
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/969619
+  Home:   https://github.com/bluez/bluez
+  Commit: a2652a7f4b23bb6e98c0e8451c715f8b2e324fab
+      https://github.com/bluez/bluez/commit/a2652a7f4b23bb6e98c0e8451c715f8b2e324fab
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-08 (Sun, 08 Jun 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: check lpac type in bap_bcast_stream_new()
 
 bap_bcast_stream_new() shall refuse to create streams if lpac is not of
 broadcast type.
----
 
-Notes:
-    I ran across an unreproducible crash, where during connection dropping a
-    crash occurred IIRC due to stream->rpac == NULL, as if bt_bap_stream_new()
-    had produced a bcast stream for unicast lpac.
-    
-    Not sure if it is actually possible that bt_bap_stream_new() is called
-    from unicast setup when bt_bap_get_att(bap) == false (via
-    gatt_client_ready callback?), but it's probably better to check the lpac
-    type here regardless.
 
- src/shared/bap.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index f0c6f6485..854855f6b 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -6155,6 +6155,8 @@ static struct bt_bap_stream *bap_bcast_stream_new(struct bt_bap *bap,
- 		ep = queue_find(bap->remote_eps, find_ep_source, NULL);
- 		if (!ep)
- 			return NULL;
-+	} else if (lpac->type != BT_BAP_BCAST_SINK) {
-+		return NULL;
- 	}
- 
- 	if (!stream)
--- 
-2.49.0
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
