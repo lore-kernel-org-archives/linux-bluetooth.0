@@ -1,68 +1,68 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811DA211A00
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED87F254AF2
 	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jun 2025 21:32:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749418373; cv=pass; b=mhf52pC1Vx3Gh/Hwe/IaDD1Sk7kfxXxTHYtUzwABjLWL0VdQV6Oo0GCo+BpSsm4W2zWxrRuKJxgPbLJNEYoabN1SqafMumFloY1VEjgc0zF/HNiyT92R0HWNYq3K5oOw6/jcQ997iFfNvoy9EFFaKqM9Qglzv6pySQ6R07MLvkw=
+	t=1749418373; cv=pass; b=ozPQ1Pr8aA168/t+ZzMKw3gRDaweVPc9SUB0MR5g/QmQ6101KsqTAslGAZ7ttBz6UBJUA3YeRCV8JheqMUYkZBIBUvnUb8ufRYNIHv6UP1gNs9x41PWv9A4vo2182EKWNfa3qoDNucAdrIDuKO/temmRQtKOnBIo5avDbWkEDXo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749418373; c=relaxed/simple;
-	bh=51EMIrfUn94N+Jo0OX0Ye+Mn7qIAD3wd85U2ky6F5QQ=;
+	bh=HTM9M2q3CJGUyGC1bEZ5nSgybpP2oPEcPoqAqOGValk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TqcNV9LTO5/2RZT5ZIuwv0TopguqTA6J6d1D2bEyXRfJj7BOQvlVmtR/Jv8oY/U2bSSL/6sxF+znmFDgrhTokNaGlZnkP8S4VMRddqmUVzotc84unoMbh8IfCx7q4kex9h5w4mK1MNxRBAbAD4dYSl+st0drxdJhEa+CNMCfKdk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=hZjImpIu; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=tzyABMtOKd365TAG/mE8ZtpTrv7VFJus65m5DxX0w00B36gBIqdimT9++c55CGZosFIzFml32oIk+QqTO+dYyvPIiZekiHJqlaCaSzzJEVATl8kGooOnupycjdN37IyoXkjReUHI0HHmgiecdD3XBi4F67Jvz1lTC5Lp0zY7LbQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=SrB/B+cS; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="hZjImpIu"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="SrB/B+cS"
 Received: from monolith.lan (unknown [185.77.218.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bFpDr4cTfz49Q4L;
-	Mon,  9 Jun 2025 00:32:44 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bFpDx6ypSz49Q4w;
+	Mon,  9 Jun 2025 00:32:49 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1749418364;
+	t=1749418370;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=z7pY43i1Ld2Pbs6x0tJ3ZvdyX6YIK7PovpeYrCUqAEw=;
-	b=hZjImpIup/973Mv04HRkHkSomBnFPV91fP52dVfNKFU++ar7lnbMUd1HrO79l9ZpiS5DcO
-	27wMTqvHRJidsqoC5UdgBdULI8Gp0mKGbqx5ZtV3JzQIxOC/4Qm+3DiPenizfuBf665NqN
-	XgNrTKJfO+dUEAp3A8PtMbkk2UQy5hAn0j8iqwbUtTX6qw0z519CJshTAsNIIFPKc8sEEA
-	WODwLESKJXv/8D+ZYAfmkwNQPyq5KBbLlYlNKBj5hfLUtDgthcYD3xZiXv1yd9dNy01kOZ
-	krxg0by3N6OusIFaTC8bT1gtvdK6A7V+oG428Ty3rnNy4gZiElSl9COAbJU+uQ==
+	bh=fl7YqeCE9fz2VmTYEZ94uccGrNXQAYOlyZkZhJEKq5w=;
+	b=SrB/B+cSFbvdJXlpqWN4TMAH2QdW7pmJXVcGHHoHP8SskphE/G8z74SRGFO8OmRN9N5uaw
+	CaYmqXSS1uUqtovsZ+uGlbzbNlUtyQGn17EFzhrhWJxy3vftyMFfUr+2fOLMexUbz5LBqZ
+	0Aa/LKEC+LgSSW6P24P/ml/vD8RpyHJ5cLPr9JJZyBBf6hgJnSdHYk9auZhWFivY/pNEha
+	ugimVBpR3m+omJUW12Nb12ruBR4S+gEe/hYvEFP7R25uEk/wlXo+H2dJxH3/zLKz9ApWYt
+	GLfsnGXn2/kQV8HhVvITxkzruEzPCx+OwmGYbolqOs74K+pAyuXhB10F0+dBUw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1749418364;
+	s=lahtoruutu; t=1749418370;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=z7pY43i1Ld2Pbs6x0tJ3ZvdyX6YIK7PovpeYrCUqAEw=;
-	b=e2D0R9zGF7apQMES+UTaGlH6oscEtl2orEs78uN6M6Yel6yH40yVpywiYZm52xKDeKrySA
-	lhMxp/9AXvz2jBmYOs3FOruadWkgJy8ZWnXl4KCINrLR5emiYxQCxTTCrogTdtqyCdgryC
-	Xv4w1lLlWYDbY0OHfdsWvw+sfBmUVWuBWXflBLuEjYpaK7NCYONh4nB8W5SlcDXSzdX/QM
-	bjzYXcyJo1WPO96eUEMNE5Si4HZ+f3F8c0SUQwSRBFDJWhDcCKENvMAn8K8xmFGYe8KL+3
-	KfbTeLGwCzLvsrJS41iRZ+/Jjron4RUsxtfTT4Y0g9rTXYnyFjyXFXYDNmBLsA==
+	bh=fl7YqeCE9fz2VmTYEZ94uccGrNXQAYOlyZkZhJEKq5w=;
+	b=Jd91d3wtBPoN0ldqzreMiRJzv7bdWcxovTi902IaF2FKwLVM3t1lfpnfD6Sxly8/Gm2yD/
+	d7iMyRn/h8ICjvbSGtWcwm6/dhTcppTMT9J2IIIng9WjbXR3tk1rvWvid4pqujXM/muz7j
+	TQwHjRVFLCcgUbJtjzB/e+D/rl2BomY02r+pB+TIYXKMqP2/x0/SoE6mtTvV/fpuJD29r4
+	mPhLK4StkCAPdwWknCcGChV1LqXsjeTBkFMpbOICB+Z4NNz7H9OhXsN+WO81ADG7s4lhcN
+	ZLaLCcTwyprHi2tIJ56LWc2JSGNH7zFQuaT/sJP5acy1XG1LN+/Mm8w8LsYlxQ==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1749418364; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1749418370; a=rsa-sha256;
 	cv=none;
-	b=gLPjUfW1LR68/DhgGuebmNQM6NboQebGE0D3khXzJ/ZXSO3Cs7IoVa2DB7QIA9mTVInPN5
-	lVEOxj8kgJt9NENxo2wwRrTncA66X/NipmxK8ZGKQcfWDJBXH7wEZTw2EuQC5yJJQ2dF8q
-	xLubxb0UemQTPehuFaCYjxagrrW+EBUJIuz/uBJNDN+V82+0yv3aYBNLqT3MnKkj/GAx6F
-	osahjndhEB0lC8Xd03neOlXjn8G6tAi8a2J+KeXCjNhsREYJE2zjGMk4iJtExMU1ZHDkkf
-	TwCQuEyb1bbUt2QDQZXfZrGl3K6YT3i8L/vxY14WMWQ2A+8D8ThWo27FDPO1/A==
+	b=vGHrzltn10CMZo35kdUh829EJGzHv1/ceBsa9HRedGPMEfTuMAHC9qcAq6yDcS3iTsVx6A
+	vRBhVSWZzixuM4keTxN/kLqhXZuG7wyKzmY0iBBqb+4jOwXTi+caxoHIqA7OKriqJzn0B7
+	IvuSq2swzu4L8D0w1HEqF1Dtp6v4Rau5ZiWWiMgxwjutbyKvS0HPFnTRlBYZ7zZyE7Zn8H
+	JXozeOBJfa3KfTmPxubF3Ttij8F8sTBioq0KAiZ9KA0/dMn+GkjAIaWWUyC8u5vrpwCYrH
+	etZv6bAla9EmefBy6P4HHRkqEZtwmBZXI/YbQ2gzgLBwiseMaxcUgfgGzQ+Vig==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 07/10] bap: add callback at the end of ucast client select/config
-Date: Mon,  9 Jun 2025 00:32:19 +0300
-Message-ID: <387785e3c6111858e48e786d09b0f7895e4bb8b8.1749418319.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 08/10] bap: implement Reconfigure()
+Date: Mon,  9 Jun 2025 00:32:20 +0300
+Message-ID: <ce95c29f2034992414dbb1a84cdfc2558df171b0.1749418319.git.pav@iki.fi>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1749418319.git.pav@iki.fi>
 References: <cover.1749418319.git.pav@iki.fi>
@@ -74,294 +74,238 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Restructure pac_select() and add a callback that is called when all
-setups reach QoS.
+Add Reconfigure() on a BAP unicast endpoint, which triggers its
+reconfiguration or marks it for reconfiguration.
+
+First, all associated streams are closed. After that, endpoints marked
+for reconfiguration are reconfigured using the same flow as in the
+initial configuration.
 ---
- profiles/audio/bap.c | 172 +++++++++++++++++++++++++++++++++----------
- 1 file changed, 133 insertions(+), 39 deletions(-)
+ profiles/audio/bap.c | 151 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 146 insertions(+), 5 deletions(-)
 
 diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 648acbf30..c08a0a645 100644
+index c08a0a645..2d8b7aa91 100644
 --- a/profiles/audio/bap.c
 +++ b/profiles/audio/bap.c
-@@ -70,6 +70,7 @@ struct bap_setup;
- typedef void (*bap_setup_ready_func_t)(struct bap_setup *setup, int code,
- 						uint8_t reason, void *data);
- typedef void (*bap_setup_close_func_t)(struct bap_setup *setup, void *data);
-+typedef void (*bap_select_done_t)(int err, void *data);
- 
- struct bap_setup {
- 	struct bap_ep *ep;
-@@ -97,6 +98,15 @@ struct bap_setup {
- 	void (*destroy)(struct bap_setup *setup);
- };
- 
-+struct bap_select {
-+	struct bap_data *data;
-+	struct queue *eps;
-+	int remaining;
-+	int err;
-+	bap_select_done_t done_cb;
-+	void *done_cb_data;
-+};
-+
- struct bap_ep {
- 	char *path;
+@@ -101,6 +101,7 @@ struct bap_setup {
+ struct bap_select {
  	struct bap_data *data;
-@@ -106,6 +116,7 @@ struct bap_ep {
- 	uint16_t supported_context;
+ 	struct queue *eps;
++	bool reconfigure;
+ 	int remaining;
+ 	int err;
+ 	bap_select_done_t done_cb;
+@@ -117,6 +118,7 @@ struct bap_ep {
  	uint16_t context;
  	struct queue *setups;
-+	struct bap_select *select;
+ 	struct bap_select *select;
++	bool reconfigure;
  };
  
  struct bap_data {
-@@ -123,7 +134,6 @@ struct bap_data {
- 	struct queue *server_streams;
- 	GIOChannel *listen_io;
- 	unsigned int io_id;
--	int selecting;
- 	void *user_data;
- };
+@@ -141,7 +143,8 @@ static struct queue *sessions;
  
-@@ -1637,14 +1647,37 @@ static int setup_config(struct bap_setup *setup, bap_setup_ready_func_t cb,
- 	return 0;
+ static int setup_config(struct bap_setup *setup, bap_setup_ready_func_t cb,
+ 							void *user_data);
+-
++static int bap_select_all(struct bap_data *data, bool reconfigure,
++					bap_select_done_t cb, void *user_data);
+ 
+ static bool bap_data_set_user_data(struct bap_data *data, void *user_data)
+ {
+@@ -1222,6 +1225,132 @@ static DBusMessage *clear_configuration(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
  }
  
--static void bap_config_setup(void *data, void *user_data)
-+static void bap_config_setup_cb(struct bap_setup *setup, int code,
-+						uint8_t reason, void *user_data)
- {
--	struct bap_setup *setup = data;
-+	struct bap_select *select = user_data;
- 
--	if (setup_config(setup, NULL, NULL)) {
-+	select->remaining--;
-+
-+	DBG("setup %p code %d remain %d", setup, code, select->remaining);
-+
-+	if (code)
-+		select->err = code;
-+
-+	if (select->remaining)
-+		return;
-+
-+	if (select->done_cb)
-+		select->done_cb(select->err, select->done_cb_data);
-+
-+	free(select);
-+}
-+
-+static void bap_config_setup(void *item, void *user_data)
++static int reconfigure_parse(DBusMessageIter *props, bool *defer)
 +{
-+	struct bap_setup *setup = item;
-+	struct bap_select *select = user_data;
++	const char *key;
 +
-+	select->remaining++;
-+	if (setup_config(setup, bap_config_setup_cb, select)) {
- 		DBG("Unable to config stream");
- 		setup_free(setup);
--		return;
-+		select->remaining--;
- 	}
- }
- 
-@@ -1652,7 +1685,37 @@ static void bap_config(void *data, void *user_data)
- {
- 	struct bap_ep *ep = data;
- 
--	queue_foreach(ep->setups, bap_config_setup, NULL);
-+	queue_foreach(ep->setups, bap_config_setup, user_data);
-+}
++	if (dbus_message_iter_get_arg_type(props) != DBUS_TYPE_DICT_ENTRY)
++		return -EINVAL;
 +
-+static void pac_select_clear_ep(void *data)
-+{
-+	struct bap_ep *ep = data;
++	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter value, entry;
++		int var;
 +
-+	ep->select = NULL;
-+}
++		dbus_message_iter_recurse(props, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
 +
-+static void bap_select_complete_select(struct bap_select *select)
-+{
-+	select->remaining--;
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
 +
-+	DBG("selecting %d", select->remaining);
++		var = dbus_message_iter_get_arg_type(&value);
 +
-+	if (select->remaining)
-+		return;
++		if (!strcasecmp(key, "Defer")) {
++			dbus_bool_t flag;
 +
-+	DBG("configure (err %d)", select->err);
++			if (var != DBUS_TYPE_BOOLEAN)
++				goto fail;
 +
-+	queue_destroy(select->eps, pac_select_clear_ep);
++			dbus_message_iter_get_basic(&value, &flag);
++			*defer = flag;
++		}
 +
-+	select->remaining++;
-+
-+	if (!select->err) {
-+		queue_foreach(select->data->srcs, bap_config, select);
-+		queue_foreach(select->data->snks, bap_config, select);
++		dbus_message_iter_next(props);
 +	}
 +
-+	bap_config_setup_cb(NULL, 0, 0, select);
- }
- 
- static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
-@@ -1660,11 +1723,11 @@ static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
- 				void *user_data)
++	return 0;
++
++fail:
++	DBG("Failed parsing %s", key);
++
++	return -EINVAL;
++}
++
++struct reconfigure_data {
++	int remaining;
++	struct bap_data *data;
++	DBusMessage *msg;
++};
++
++static void reconfigure_select_cb(int err, void *user_data)
++{
++	struct reconfigure_data *data = user_data;
++	DBusMessage *reply;
++
++	if (!err)
++		reply = dbus_message_new_method_return(data->msg);
++	else
++		reply = btd_error_failed(data->msg, "Failed to configure");
++
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	dbus_message_unref(data->msg);
++	free(data);
++}
++
++static void reconfigure_close_cb(int count, void *user_data)
++{
++	struct reconfigure_data *data = user_data;
++
++	data->remaining--;
++
++	DBG("remain %d", data->remaining);
++
++	if (data->remaining)
++		return;
++
++	bap_select_all(data->data, true, reconfigure_select_cb, data);
++}
++
++static void ep_close_if_reconfigure(void *obj, void *user_data)
++{
++	struct bap_ep *ep = obj;
++	struct reconfigure_data *data = user_data;
++
++	if (ep->reconfigure) {
++		data->remaining++;
++		ep_close(ep, NULL, reconfigure_close_cb, data);
++	}
++}
++
++static DBusMessage *reconfigure(DBusConnection *conn, DBusMessage *msg,
++								void *user_data)
++{
++	struct bap_ep *ep = user_data;
++	struct bap_data *data = ep->data;
++	struct reconfigure_data *cbdata;
++	bool defer = false;
++	DBusMessageIter args, props;
++
++	switch (bt_bap_pac_get_type(ep->lpac)) {
++	case BT_BAP_SOURCE:
++	case BT_BAP_SINK:
++		break;
++	default:
++		return btd_error_invalid_args(msg);
++	}
++
++	dbus_message_iter_init(msg, &args);
++	dbus_message_iter_recurse(&args, &props);
++	if (reconfigure_parse(&props, &defer))
++		return btd_error_invalid_args(msg);
++
++	DBG("%s defer %d", ep->path, (int)defer);
++
++	ep->reconfigure = true;
++	if (defer)
++		return dbus_message_new_method_return(msg);
++
++	cbdata = new0(struct reconfigure_data, 1);
++	cbdata->data = ep->data;
++	cbdata->msg = dbus_message_ref(msg);
++	cbdata->remaining = 1;
++
++	queue_foreach(data->snks, ep_close_if_reconfigure, cbdata);
++	queue_foreach(data->srcs, ep_close_if_reconfigure, cbdata);
++
++	reconfigure_close_cb(0, cbdata);
++	return NULL;
++}
++
+ static bool stream_io_unset(const void *data, const void *user_data)
  {
- 	struct bap_ep *ep = user_data;
-+	struct bap_select *select = ep->select;
- 	struct bap_setup *setup;
+ 	struct bt_bap_stream *stream = (struct bt_bap_stream *)data;
+@@ -1398,6 +1527,10 @@ static const GDBusMethodTable ep_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("ClearConfiguration",
+ 					GDBUS_ARGS({ "transport", "o" }),
+ 					NULL, clear_configuration) },
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("Reconfigure",
++					GDBUS_ARGS(
++						{ "properties", "a{sv}" }),
++					NULL, reconfigure) },
+ 	{ },
+ };
  
- 	if (err) {
- 		error("err %d", err);
--		ep->data->selecting--;
- 		goto done;
- 	}
- 
-@@ -1673,38 +1736,15 @@ static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
- 	setup->metadata = util_iov_dup(metadata, 1);
- 	setup->qos = *qos;
- 
--	DBG("selecting %d", ep->data->selecting);
--	ep->data->selecting--;
--
- done:
--	if (ep->data->selecting)
--		return;
--
--	queue_foreach(ep->data->srcs, bap_config, NULL);
--	queue_foreach(ep->data->snks, bap_config, NULL);
--	queue_foreach(ep->data->bcast, bap_config, NULL);
--}
--
--static bool pac_register(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
--							void *user_data)
--{
--	struct btd_service *service = user_data;
--	struct bap_ep *ep;
--
--	DBG("lpac %p rpac %p", lpac, rpac);
--
--	ep = ep_register(service, lpac, rpac);
--	if (!ep)
--		error("Unable to register endpoint for pac %p", rpac);
--
--	return true;
-+	bap_select_complete_select(select);
- }
- 
- static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 							void *user_data)
- {
--	struct btd_service *service = user_data;
--	struct bap_data *data = btd_service_get_user_data(service);
-+	struct bap_select *select = user_data;
-+	struct bap_data *data = select->data;
- 	struct match_ep match = { lpac, rpac };
- 	struct queue *queue;
- 	struct bap_ep *ep;
-@@ -1726,9 +1766,57 @@ static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+@@ -1771,6 +1904,11 @@ static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
  		return true;
  	}
  
-+	if (ep->select && ep->select != select) {
-+		select->err = -EBUSY;
++	if (select->reconfigure && !ep->reconfigure)
 +		return true;
-+	}
++
++	ep->reconfigure = false;
 +
  	/* TODO: Cache LRU? */
--	if (btd_service_is_initiator(service))
--		bt_bap_select(lpac, rpac, &ep->data->selecting, select_cb, ep);
-+
-+	if (!ep->select) {
-+		ep->select = select;
-+		queue_push_tail(select->eps, ep);
-+	}
-+
-+	bt_bap_select(lpac, rpac, &select->remaining, select_cb, ep);
-+
-+	return true;
-+}
-+
-+static int bap_select_all(struct bap_data *data, bap_select_done_t cb,
-+								void *user_data)
-+{
-+	struct bap_select *select;
-+
-+	if (!btd_service_is_initiator(data->service))
-+		return -EINVAL;
-+
-+	select = new0(struct bap_select, 1);
-+	select->remaining = 1;
-+	select->data = data;
-+	select->eps = queue_new();
-+	select->done_cb = cb;
-+	select->done_cb_data = user_data;
-+
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SOURCE, pac_select, select);
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SINK, pac_select, select);
-+
-+	bap_select_complete_select(select);
-+
-+	return 0;
-+}
-+
-+static bool pac_register(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+							void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+	struct bap_ep *ep;
-+
-+	DBG("lpac %p rpac %p", lpac, rpac);
-+
-+	ep = ep_register(service, lpac, rpac);
-+	if (!ep)
-+		error("Unable to register endpoint for pac %p", rpac);
  
+ 	if (!ep->select) {
+@@ -1783,15 +1921,18 @@ static bool pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
  	return true;
  }
-@@ -1746,9 +1834,16 @@ static bool pac_cancel_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- static void ep_cancel_select(struct bap_ep *ep)
- {
- 	struct bt_bap *bap = ep->data->bap;
-+	struct bap_select *select;
  
- 	bt_bap_foreach_pac(bap, BT_BAP_SOURCE, pac_cancel_select, ep);
- 	bt_bap_foreach_pac(bap, BT_BAP_SINK, pac_cancel_select, ep);
+-static int bap_select_all(struct bap_data *data, bap_select_done_t cb,
+-								void *user_data)
++static int bap_select_all(struct bap_data *data, bool reconfigure,
++					bap_select_done_t cb, void *user_data)
+ {
+ 	struct bap_select *select;
+ 
+ 	if (!btd_service_is_initiator(data->service))
+ 		return -EINVAL;
+ 
++	DBG("data %p reconfig %d", data, (int)reconfigure);
 +
-+	select = ep->select;
-+	if (select) {
-+		queue_remove(select->eps, ep);
-+		ep->select = NULL;
-+	}
- }
- 
- static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-@@ -1775,6 +1870,7 @@ static bool pac_found_bcast(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- static void bap_ready(struct bt_bap *bap, void *user_data)
- {
- 	struct btd_service *service = user_data;
-+	struct bap_data *data = btd_service_get_user_data(service);
- 
- 	DBG("bap %p", bap);
- 
-@@ -1784,8 +1880,7 @@ static void bap_ready(struct bt_bap *bap, void *user_data)
+ 	select = new0(struct bap_select, 1);
++	select->reconfigure = reconfigure;
+ 	select->remaining = 1;
+ 	select->data = data;
+ 	select->eps = queue_new();
+@@ -1880,7 +2021,7 @@ static void bap_ready(struct bt_bap *bap, void *user_data)
  	bt_bap_foreach_pac(bap, BT_BAP_SOURCE, pac_register, service);
  	bt_bap_foreach_pac(bap, BT_BAP_SINK, pac_register, service);
  
--	bt_bap_foreach_pac(bap, BT_BAP_SOURCE, pac_select, service);
--	bt_bap_foreach_pac(bap, BT_BAP_SINK, pac_select, service);
-+	bap_select_all(data, NULL, NULL);
+-	bap_select_all(data, NULL, NULL);
++	bap_select_all(data, false, NULL, NULL);
  }
  
  static bool match_setup_stream(const void *data, const void *user_data)
-@@ -2742,8 +2837,7 @@ static void pac_added(struct bt_bap_pac *pac, void *user_data)
+@@ -2837,7 +2978,7 @@ static void pac_added(struct bt_bap_pac *pac, void *user_data)
  	bt_bap_foreach_pac(data->bap, BT_BAP_SOURCE, pac_register, service);
  	bt_bap_foreach_pac(data->bap, BT_BAP_SINK, pac_register, service);
  
--	bt_bap_foreach_pac(data->bap, BT_BAP_SOURCE, pac_select, service);
--	bt_bap_foreach_pac(data->bap, BT_BAP_SINK, pac_select, service);
-+	bap_select_all(data, NULL, NULL);
+-	bap_select_all(data, NULL, NULL);
++	bap_select_all(data, false, NULL, NULL);
  }
  
  static void pac_added_broadcast(struct bt_bap_pac *pac, void *user_data)
