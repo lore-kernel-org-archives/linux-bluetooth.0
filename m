@@ -1,116 +1,92 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B18C21D587
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 18:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2B520EB
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 19:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749494590; cv=none; b=FPVDq8e6rgci+PH04NM7P17TVaYfjIX00ttQaJsR+Ie/yHSBNyMeGPXgnQi1r4deZ4opWOEM5HkqWhfBElvl2MzfAjNmtTfk33YoOi00eeQhgnNxY/GLmFSXmfQODpnceqA/IhDhRrokiKkwwA1nfC5nj2m+U04VfKqlWK7cVyM=
+	t=1749495893; cv=none; b=PI7UoJmQKLmvlwyuBPpJlEShYPIIhq8Xn2+jQX7c/tFOpKbOBKW5Qotm00MX3tWABGJ2175lXpx96TQCjTIIC3wRCU+LRXuIEWLgToHUMSlD6Qw3tWI4rXqGeZhT21lCtfVW3shUkmV8306BUbkK6/Vcw7WqGCUssRMGu5ygEts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749494590; c=relaxed/simple;
-	bh=ddPskVUlsu/UzKub5oOeB3XY/vk0uPpnMtSFx3iHAN4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PwrRHiCyBhkyY8FZ5uwdRfgEtDC88jqx+amZEtSb/ZoK9HtXGzEd4M1h2LPyV8aOFFjIeretRPKNcq9F3D+SbEyKhXKHVZLjAHBBC1R89zx1fc+0KUyt5VjouB9YuXOUAqHnkmizPJDyIqeyMjedPcKK/CU6/LNtekfOZ0wXqDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FLFa66jH; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1749495893; c=relaxed/simple;
+	bh=Wn70VptxxJAd4mzNxBsu1e5HQHbBdBxJaQ9eH8pk6dw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MiimO3VCXnfNquLobsNAqpkDGyM926G8I9ztXbSyDsiPF7NHtFlmgEVjaPbMIIrq7Y2M/9CJQutGb15y5FrJEHFU+M/5DI2bDPLxkd5V0VdC8Jie+3Nel/4pgST7TSJgYxZTOfCgUWC+4OBF4KFDoOwxp+Fx4H6xNCk2GRtN+98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JHVqmH4w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FLFa66jH"
-Received: from github.com (hubbernetes-node-2a1a643.ash1-iad.github.net [10.56.207.90])
-	by smtp.github.com (Postfix) with ESMTPA id 58511921117
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 11:43:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749494588;
-	bh=ewz/4qEBelL4qh7NSL/iJ0nSbSQPwoHqr9Byz//BYQM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=FLFa66jHNrm//XtHMJJdEfzyWHv9uRYIFoUzZD2k6uwlsvs9NdtpCv68xttFl0Tgt
-	 ml9JO59MIEYAX2q31K/GzKNNAQw02szrxGeRS44sPuf5rPkI1dLBkkGbkcr9GiIFKs
-	 7yJQG5S31hlp696QTpI6Kuk7xi7KS+HwgXkREB7A=
-Date: Mon, 09 Jun 2025 11:43:08 -0700
-From: Dmitry Sharshakov <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7feff4-dd83c2@github.com>
-Subject: [bluez/bluez] 964585: btdev: implement extended advertising
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JHVqmH4w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82FE3C4CEEB;
+	Mon,  9 Jun 2025 19:04:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749495892;
+	bh=Wn70VptxxJAd4mzNxBsu1e5HQHbBdBxJaQ9eH8pk6dw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JHVqmH4wiSxdnNpoDHSTOvtgZ+IkQ2mNnjTx5J9bi3+6rhfxpJYnJf3J/6NB2DsSX
+	 UJratdcOR23lMcwl6UjIzgx889VEOGPZJ9zLA+PtEM/S5Uu3+avME+ZdePy2TyYjqr
+	 /NRR0QA5UtshK6wSFtcEFPvFo4rxpWaXnjLJIkFDffogrpVsmdD9ClmZMY2x18qZrw
+	 6Ds7pOZj6rn/AbdAAV0U0SN5BcKiE15BF2ACsbD8KG5JVM/p5AZVbLdZFWbM8PfI0i
+	 0J4H42AAeUmHh7Bj/8bdDYDu+qxGQW1VoH5OobriKCrYwcGFxucegeyFoeoIx/okLZ
+	 wwceNmiS31Nhw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D6A3822D49;
+	Mon,  9 Jun 2025 19:05:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v3 00/10] BAP stream reconfiguration
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174949592323.1356526.392113193265628757.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Jun 2025 19:05:23 +0000
+References: <cover.1749418319.git.pav@iki.fi>
+In-Reply-To: <cover.1749418319.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 964585e3b352e05d4162ea4cad66d380b44c4192
-      https://github.com/bluez/bluez/commit/964585e3b352e05d4162ea4cad66d380b44c4192
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
+Hello:
 
-  Changed paths:
-    M emulator/btdev.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  btdev: implement extended advertising
+On Mon,  9 Jun 2025 00:32:12 +0300 you wrote:
+> Implement ClearConfiguration() and Reconfigure() for BAP unicast
+> MediaEndpoints.
+> 
+> v3:
+> 
+> - Add bt_bap_stream_lock(), instead of bt_bap_stream_discard()
+> 
+> [...]
 
-Increase maximum advertising data length and implement
-LE Read Maximum Advertising Data Length command.
+Here is the summary with links:
+  - [BlueZ,v3,01/10] bap: do not try QoS before links are updated & io created
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7d8eaa56b8cb
+  - [BlueZ,v3,02/10] shared/bap: detach ucast io on RELEASING and unlink streams
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2f853e4d86d8
+  - [BlueZ,v3,03/10] shared/bap: add client ASE reuse and upper level stream locking
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d1eb496cc605
+  - [BlueZ,v3,04/10] bap: lock streams when used
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=40b91712b932
+  - [BlueZ,v3,05/10] bap: add ready callback for setup configuration
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ebed99caa7a1
+  - [BlueZ,v3,06/10] bap: support removing streams with ClearConfiguration()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9e0dc968de50
+  - [BlueZ,v3,07/10] bap: add callback at the end of ucast client select/config
+    (no matching commit)
+  - [BlueZ,v3,08/10] bap: implement Reconfigure()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=128b0695e2b5
+  - [BlueZ,v3,09/10] bap: don't show error when releasing stream
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1d3907561f8e
+  - [BlueZ,v3,10/10] bap: delay QoS & IO creation if CIG is busy or setups configuring
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7feff47a9fbe
 
-As expected by Zephyr BAP Server
-
-
-  Commit: 0f5f6cad205c42752f41dbaf008cb6773dd633ad
-      https://github.com/bluez/bluez/commit/0f5f6cad205c42752f41dbaf008cb6773dd633ad
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  btdev: fix LE Remove ISO Data Path command
-
-Fix errors in BAP server
-
-
-  Commit: bb614960501b66fd5c26387b84521141df13d610
-      https://github.com/bluez/bluez/commit/bb614960501b66fd5c26387b84521141df13d610
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
-
-  Changed paths:
-    M emulator/main.c
-    M emulator/server.c
-    M emulator/server.h
-
-  Log Message:
-  -----------
-  emulator: add option to listen on TCP
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: dd83c2d670dd9578bc8410ee07becd74469c6e8c
-      https://github.com/bluez/bluez/commit/dd83c2d670dd9578bc8410ee07becd74469c6e8c
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
-
-  Changed paths:
-    M emulator/server.c
-    M lib/hci.h
-
-  Log Message:
-  -----------
-  emulator: server: handle ISO, use BR/EDR+LE 5.2 by default
-
-Allow passing of ISO packets via the socket by parsing their header.
-
-Set version to 5.2 to expose ISO/CIS and other LE Audio related
-features when using server mode.
-
-
-Compare: https://github.com/bluez/bluez/compare/7feff47a9fbe...dd83c2d670dd
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
