@@ -1,75 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8449119992D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 15:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D573202C3A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 15:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749483584; cv=none; b=e/ptlOALiILuZR8sUzUrU9X9altuayqMny43ultJTnKFVGMbZ3A4Kb5wxk53R/ldKZ4C/qVDWzVPGrdwf53lislAIaBIMflwUfJtsP0v5DJYj4gS0XP03DKY5tUeoznrnEu6HX8zwN7l9SMXofyKhgnkbqjnoOZU9xxS4wFjVeU=
+	t=1749484140; cv=none; b=I4acle5FJuGSTmEdtapZq49JUj3qwJLxctoQm1+2t7tMf7Qo1fE/GLkkJUS43fSzEshmPuEBdp2HFxp/4RNJCikVW0XmjOvfJnc0wULuW1sZjCzEWuJzes12Qu8xu5hHBLzUEByvymXVQDHqPm7Y37QQ2DEuVQHTU5ebY7DbuxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749483584; c=relaxed/simple;
-	bh=tY51ZhEegJT5E3pbIbZOpiBTblQ4aCuba7TqslrEmkk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=alihZULx6sjXTMiQZor5SH3g8U7slhHQWqd/eZ6YK2YPvwTkRiU9kZ7i8iQmL0Znzgn/NQo/ALLpvWEnB8iOzEVzxKrBPEm/Mx6GwY4rT2xQpwpjOyTxnvCSu3kyPNVYNe+kUzdMmTi1SZR0hcWdmH6JVYvS4sYLA6pF5atHHlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=toCsy4Hq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749484140; c=relaxed/simple;
+	bh=ewF/ugwyRmw+0Kz++V8ZdgE/V+owxQARf38G1rD0Vaw=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=m4yY0TbtP7iJjY4ZfOeyxCdUQy9TbdLxEd1Luj21xf9uZanRbtv+YT9djls6hQOkqrtGLwEVhMtdEyI4Nzq+Jci1v5yU/pbvMfoX9BVp6fifrN0hEWPYjRmRmp7I+zjiX+J0kS/f+Ji5Ut9eFP20aL5ZjFMuNgCUDvr0biwx78M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ra4Ko4wa; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toCsy4Hq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA6E6C4CEEB;
-	Mon,  9 Jun 2025 15:39:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749483583;
-	bh=tY51ZhEegJT5E3pbIbZOpiBTblQ4aCuba7TqslrEmkk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=toCsy4Hqzvgxoh4vEDhREP/f0dF/c4diBam6eaCQjEjrOvKBgF9Tn4Y3EEVY+N63c
-	 0GKhcZi+sPVLJTM5Mqhmc2xw+dxa/3J6Oav/bDLUa35Fck3oLN22tlnR9tkJW1k1nh
-	 lSEF/lgqtUt70B0qmdV1YnEJXv25ncEhLF2Lwv4kmtrGtMElf1Yb23bq6Zqttw+DBS
-	 X7tbhtuPRzdPy8rRl+hYTW/9AjmiufXeAWHC8EE0TC/cJzfE7R/ROln7wzsXAbAkzQ
-	 a1Zbr0sUk9f87eEA15Izi4at8wYjRu5663xx9YXA7mziJPceQtinRd+RBG4MbdEwMa
-	 WZ7fcgLUFHsqQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE412380DBE9;
-	Mon,  9 Jun 2025 15:40:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ra4Ko4wa"
+Received: from github.com (hubbernetes-node-6bb5c22.ash1-iad.github.net [10.56.208.48])
+	by smtp.github.com (Postfix) with ESMTPA id 9A4F0920B85
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 08:48:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1749484138;
+	bh=43mZ0BFAty5KZM/uIJeTJFYl8RJ6AREjQQd3CfN6Jv4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Ra4Ko4wa9j8vxNd2mpfzXw4BUziCmPVaUnQW+Ln1vtydRpsAx0VqPqcG1DxdoLxUU
+	 UZ5seXGW1vbWwtmyhuo+d8Qk2eGPSGu/vpWdW8nqWg1qIQuwyv0G0G/Tth1KktdWMt
+	 OuYr5WSBEx2Pbxqd6U9dkbQ3wjcFLz05132a9hSQ=
+Date: Mon, 09 Jun 2025 08:48:58 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/969781/d69c12-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 0/1] monitor: Add support for decoding Channel
- Sounding
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174948361348.1126847.810400440128654403.git-patchwork-notify@kernel.org>
-Date: Mon, 09 Jun 2025 15:40:13 +0000
-References: <20250609104716.1814089-1-magdalena.kasenberg@codecoup.pl>
-In-Reply-To: <20250609104716.1814089-1-magdalena.kasenberg@codecoup.pl>
-To: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/969781
+  Home:   https://github.com/bluez/bluez
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Mon,  9 Jun 2025 12:47:15 +0200 you wrote:
-> Hello,
-> 
-> This patch adds initial support for decoding commands and events of
-> Channel Sounding, a new feature introduced in Bluetooth Core
-> Specification Version 6.0 | Vol 1, Part A, Section 9 "Channel
-> Sounding Using Bluetooth Low Energy".
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v3,1/1] monitor: Add support for decoding Channel Sounding
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b39c37d2179f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
