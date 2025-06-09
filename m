@@ -1,130 +1,291 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7404182BD
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 16:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B151719258E
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 18:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749485226; cv=none; b=guvD5JsHGweUWd48iOwtJTw22gl+CnI+LCFTxCJ0Y+Vcv8Isp7j1zqi/u+zoDQirt8eTbugKG72HwuVOy7BUR/aXTngSz9MIqp0pknbPBPEFA0iELMfXdRHDTrk2W6BhRHlHY2cYk5eIMnizcPiNoOkjJNyPZx4XBdDju+ci43k=
+	t=1749492943; cv=none; b=enp3rETo8Jy311xjiwU1J3A+dC8WvLJnEylPG/UVmPUBSW7abvJKM3n+ySB8nQCegFX14XM5q3lSco1kF3v69Fzy8/OfPt4QhJbKN5Sa/Ffgf42jnY7dNoxWdQ1WbwHbrdHN7AS+fVEhZCZu9EFo073bhmUaXBe6GA8VCyLsck4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749485226; c=relaxed/simple;
-	bh=KbbC37IMFdi165DYe0QHm27VNQY/4lcQ6eMbG2xFg8s=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IhvLO5WdI0O8wlBas0E2v4GKsHUg/GbuT1HdWC3oXt71GbBYDxG0ZysJVvBIqKZ2FmuZhXj3NF7OhcphSmU0Acc4DMtHP7DRIfdyEr2PvO1fRGC3gdScVEHaGlwRUGzlKP7EV9IfP3X9wOVdZU7XTjojo5UH+t+YylIzf/PSAPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A+h26Uzd; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749492943; c=relaxed/simple;
+	bh=/EurZ1nNojCYgLSSP2bWAbndwC+5jrMecRLA2/7FhBk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ODMsSJJTPbkoQGQHRzUyGeL6X0iyVVUich5M2y6aqAsj1KH13l2LbiIYy0X6zvrQSHlwUI3OwvaFRf2apaEJb+NAJX/Z3LcQ7wC2Knj8drffuX6hUPymUFqEAj2Ytt4tBdNkn9713lgKhyoAt18XZs5u09/MgXMqox4q2VozGBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dKcbhN/Z; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A+h26Uzd"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7d38d1eae03so137389685a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 09:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749485223; x=1750090023; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5RrQW6Xrp1JCuI9vGwLDU4ZAo4NrlCvZFOPE+VCSakA=;
-        b=A+h26Uzd6M7kU0RtENWJYtCGNr5SwDgPuvHpEtlRNosNaaX5F/7doqbL+7p6TrYuN1
-         opaC1BJnpzXAlneiEwuxn8PuN+yrVRUtOniHCMvPo82vqhcbA9LpcjXkVLdGXdLdV9vy
-         d9YKP5nCffUnH4VVcfCsJAOAuAmGOO5VKSt9KhUB1C7ZD5pG/e0qPj0GdBCDAf3R/xV3
-         Foaur2qe/AFDFcSBmqXv4L2othyHGkqtrnG8w5U+6AT1nTUQzwSG08ZilBqKr+KZHWSq
-         yHNlgxZ2XugoRTNvhOs/EcSeM3v8gzEI7ZywM/bEueDRM4lC3knXO7KiFI/TtZJQOzr7
-         KABw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749485223; x=1750090023;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5RrQW6Xrp1JCuI9vGwLDU4ZAo4NrlCvZFOPE+VCSakA=;
-        b=bfHcnTK6os25spIcZZaVg8Qixq8JsGX/LS7L+BYLfUf/U2ABGraWnaMzAgXdvwuIRV
-         kJIBswZXrKcsyMm7Iu3jmnbiSGVx0TK9KUOdGftns9YvwyE+4iWpEEErD6IhLXNJ19Rr
-         6gUw5y2/vKZYzBhTPOgtf/mf3AVQkDt+MBRg1ww6fU3A6uUOl5xkHE/Mg7b018LPHbtI
-         jK4PERGRBp6gBGKNBIUvrmjg2g0u8etGTCGK9HSGn7F7Kb7RXN0VFfJ3Z8oIWvAy/Pno
-         s+a+3GMd4kmCgQlbUTNnNArOzPg/f0S0bjslbmT2tyE05smu5Eg11o+ZxEOKL40UWVgZ
-         mG0w==
-X-Gm-Message-State: AOJu0YxuzRTeOv15db/H2XCK195sqaXOp5HysT0pI8RNwGoedKFZX2Ku
-	egvnD4/Oz0lOrK2xxKOmQaNpCx/Kh/CmiLX2B1FJhwl3cAYi0Df+nZ+D11d+3paC
-X-Gm-Gg: ASbGncvVMvnvNsw2Ep1/XitV2e7j/pPIYhjJ5+vp1YILWvEHqdTYpJCnSh53Wc7gN7u
-	fmXyf5HDj5o0aFeyETIF11joAVS42loD8Muw/GfJAPClHglA7oz5ajhw22i6VaMxttA08pNqHsM
-	RnhLpx+7jZGAxNRVFPYjC7j60/b5Pl0EJq6yRrqzoijIPOBn0uAxZPSjUy1RC9QGClMGp0U/GZQ
-	/whST/EThqTqthWabYho91zaTKfzi1G3ZUGA3Aoayv9vuiP0IONO+fYsmtOYfkY3lPD4krCGc4x
-	vMSdO/si8djVQ+DPk3lzMLhEn5eUETmv4ztV0TKKSR9c9buWowviCdiily3DJ+w6FzA=
-X-Google-Smtp-Source: AGHT+IFTKVWWy2CFXG4KUK0ZARjXUaCe3IltVssCLD7ujngpeXXBtBlv/S9FMnlpA+PleGibg3dqLA==
-X-Received: by 2002:a05:620a:1a05:b0:7d0:96e8:478d with SMTP id af79cd13be357-7d2298ec3eemr1815356085a.39.1749485223383;
-        Mon, 09 Jun 2025 09:07:03 -0700 (PDT)
-Received: from [172.17.0.2] ([20.44.105.21])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d25a61a889sm562914885a.83.2025.06.09.09.07.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 09:07:02 -0700 (PDT)
-Message-ID: <684706a6.050a0220.2ed797.a81c@mx.google.com>
-Date: Mon, 09 Jun 2025 09:07:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8119712203222303647=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dKcbhN/Z"
+Received: from github.com (hubbernetes-node-741fd13.va3-iad.github.net [10.48.160.18])
+	by smtp.github.com (Postfix) with ESMTPA id CA13E4E0978
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 11:15:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1749492940;
+	bh=V0hEo2xTfGAOVXPh1lMdlapt9BNfMybkZd4Qn+YazDk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=dKcbhN/Z9AnA2cotK7YDRgMsqU/tZT4jsrxkabFN7U3UtAOVvMCdG0TOJ41aiMjSs
+	 PhQYWmkORQDwg+4ipM+c8/1i8kgwOHw7ckl5kejaq9N4xzeNgIqF910jD/avu7BS9u
+	 G5ILWpIsiEAOS/0mDlcbPshE388K3VhDz2r54zlo=
+Date: Mon, 09 Jun 2025 11:15:40 -0700
+From: Pauli Virtanen <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/b39c37-7feff4@github.com>
+Subject: [bluez/bluez] 7d8eaa: bap: do not try QoS before links are updated &
+ io ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, d3dx12.xx@gmail.com
-Subject: RE: btvirt improvements for LE Audio
-In-Reply-To: <20250609143811.566331-2-d3dx12.xx@gmail.com>
-References: <20250609143811.566331-2-d3dx12.xx@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
---===============8119712203222303647==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 7d8eaa56b8cb8f2981476590e8ec210eacb0c91b
+      https://github.com/bluez/bluez/commit/7d8eaa56b8cb8f2981476590e8ec2=
+10eacb0c91b
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M profiles/audio/bap.c
 
-Dear submitter,
+  Log Message:
+  -----------
+  bap: do not try QoS before links are updated & io created
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=969870
+In setup config, QoS must be done after corresponding bap_state
+callback, because stream links are updated only at that point.  If the
+ASE was in CONFIG state before reconfiguration, this gets done in wrong
+order.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   1.29 seconds
-BuildEll                      PASS      20.47 seconds
-BluezMake                     PASS      2720.79 seconds
-MakeCheck                     PASS      20.21 seconds
-MakeDistcheck                 PASS      201.55 seconds
-CheckValgrind                 PASS      276.85 seconds
-CheckSmatch                   WARNING   304.40 seconds
-bluezmakeextell               PASS      129.18 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      922.29 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:456:29: warning: Variable length array is used.emulator/btdev.c:456:29: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Track explicitly that bap_state() is done after bt_bap_stream_config(),
+before proceeding to QoS.
 
 
+  Commit: 2f853e4d86d887a37750ae09c91f59344df5a5e7
+      https://github.com/bluez/bluez/commit/2f853e4d86d887a37750ae09c91f5=
+9344df5a5e7
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: detach ucast io on RELEASING and unlink streams
+
+When RELEASING, ucast stream QoS becomes invalid and client stream
+transport can no longer be acquired.  Client shall close the CIS when
+ASE is RELEASING (BAP v1.0.2 =C2=A75.6.6).
+
+As client, detach IO when RELEASING. Clear the stream links, as the QoS
+is no longer valid. Even if caching config the ASE may be reused for
+different purpose, and stream will anyway be reconfigured & re-linked as
+needed.
+
+Also clear the stream transport, as it's not in acquirable state, and
+its configuration may change after this. This makes BAP Client to have
+existing transports only for streams that are >=3D QOS.  (BAP Server is
+not changed here.)
 
 
---===============8119712203222303647==--
+  Commit: d1eb496cc605fed41ad5bc1899fb1642a4b8abb5
+      https://github.com/bluez/bluez/commit/d1eb496cc605fed41ad5bc1899fb1=
+642a4b8abb5
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/bap.h
+
+  Log Message:
+  -----------
+  shared/bap: add client ASE reuse and upper level stream locking
+
+Change ucast client stream design so that:
+
+* upper level locks streams to indicate which ones it is using
+* unused streams are reused when upper level wants a new stream
+* only locked streams are used for bidi CIS linking
+* streams (still) correspond 1-to-1 to non-idle ASEs
+
+This fixes some issues:
+
+* bap_ucast_stream_new() could pick a stream upper level is already
+  using if lpac & rpac match (can occur with multi-stream AC 6(ii) etc)
+* Avoids assuming ASE enters idle state at end of stream life cycle.
+  This is False for some devices like Sony headsets, which always cache
+  codec config so RELEASING -> CONFIG always, never RELEASING -> IDLE,
+  so ASE never go IDLE again.
+* Allows reconfiguring an ASE with different codec in this case.
+* Allows upper level to only QoS some of the streams.
+
+Reconfiguring ASE in QOS/CONFIG state with different codec here results
+to need_reconfig=3Dtrue state, where ASE and stream configs do not match,=
+
+and upper level needs to do bt_bap_stream_config() to sync them.
+
+
+  Commit: 40b91712b93294f68f8f52b88358ef4f08037a86
+      https://github.com/bluez/bluez/commit/40b91712b93294f68f8f52b88358e=
+f4f08037a86
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: lock streams when used
+
+Indicate to lower layer when we are using the streams.
+
+When setup is freed, make sure the corresponding stream is released
+after unlocking.
+
+
+  Commit: ebed99caa7a10818c7b67b72a33d923ce90d1cb7
+      https://github.com/bluez/bluez/commit/ebed99caa7a10818c7b67b72a33d9=
+23ce90d1cb7
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: add ready callback for setup configuration
+
+Operations like SetConfiguration need to wait until setup configuration
+finishes. Abstract this to a setup_config() callback emitted on QoS
+completion or failure, instead of hardcoding DBus reply.
+
+
+  Commit: 9e0dc968de5081106343949d2ba2947aba675c17
+      https://github.com/bluez/bluez/commit/9e0dc968de5081106343949d2ba29=
+47aba675c17
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+    M profiles/audio/transport.c
+    M profiles/audio/transport.h
+
+  Log Message:
+  -----------
+  bap: support removing streams with ClearConfiguration()
+
+Implement removing streams via ClearConfiguration().
+
+
+  Commit: bb63339e4b43dc96d7cddbd3f66d289a91cd3896
+      https://github.com/bluez/bluez/commit/bb63339e4b43dc96d7cddbd3f66d2=
+89a91cd3896
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: add callback at the end of ucast client select/config
+
+Restructure pac_select() and add a callback that is called when all
+setups reach QoS.
+
+
+  Commit: 128b0695e2b5941f84099cee98e9d4318ccfced6
+      https://github.com/bluez/bluez/commit/128b0695e2b5941f84099cee98e9d=
+4318ccfced6
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: implement Reconfigure()
+
+Add Reconfigure() on a BAP unicast endpoint, which triggers its
+reconfiguration or marks it for reconfiguration.
+
+First, all associated streams are closed. After that, endpoints marked
+for reconfiguration are reconfigured using the same flow as in the
+initial configuration.
+
+
+  Commit: 1d3907561f8e67a71b378ecfd2c770a5fc1766d5
+      https://github.com/bluez/bluez/commit/1d3907561f8e67a71b378ecfd2c77=
+0a5fc1766d5
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  bap: don't show error when releasing stream
+
+When stream is released, just set transport to not playing and don't
+show error about missing io.
+
+
+  Commit: 7feff47a9fbe84604d24642ccb7285c8a0eabb20
+      https://github.com/bluez/bluez/commit/7feff47a9fbe84604d24642ccb728=
+5c8a0eabb20
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-06-09 (Mon, 09 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: delay QoS & IO creation if CIG is busy or setups configuring
+
+Unicast Client IO creation / activation should be done synchronously for
+whole adapter, as active CIG has to be removed before it can be
+reconfigured (Core v6.0 Sec 4.5.14.3).  Some adapters support only one
+active CIG.
+
+Move related logic to bap_update_cig*() which does QoS and IO creation
+as needed by current state.
+
+If CIG is active or setups are being configured or closed, delay
+transitions to QoS and IO recreation until that completes.  Also delay
+activating CIG (=3D enabling CIS) until setups have finished readying or
+closing.
+
+Operations are delayed within the same CIG, with the exception that
+streams with unassigned CIG delay every CIG. This is because such
+streams are likely meant to go to some existing CIG, so we must wait
+them to be configurable before asking kernel to assign IDs.
+
+Fixes race conditions:
+
+* setup starts readying while CIG is active
+* CIG is activated while a setup is readying
+* new stream creates IO before old stream IO is recreated
+
+These result to kernel assigning new streams to a different CIG
+(problematic on controllers that can do only one) or CIS ID conflicts.
+
+
+Compare: https://github.com/bluez/bluez/compare/b39c37d2179f...7feff47a9f=
+be
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
