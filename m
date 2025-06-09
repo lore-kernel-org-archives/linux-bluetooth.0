@@ -1,68 +1,68 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D6325CC47
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 14:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3165425DCFD
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 14:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749479924; cv=none; b=eZEyv71SkOLWL1bb+NIgug4PToBg+BfKz9uNc2JXlNtKki3jc/0May1sddXnACmTOYOp6ubqPTBu8AJIZHfsRl1gtwUY7biazXPfK831baa3mhVB18CIOyj5baTdvmt322SsxsMC5Y7eUFNvS3GnXyadsdWW08pSMX6O3Doc4GI=
+	t=1749479925; cv=none; b=jB1xEf87MWhUrwErFgjmR6v7djVaPjEk3uCsc/FWQYtuSUh0wmECagRqZL9TtDgO5CmVEiirFMIAb369hIfyBOJpuJTQOZj2YhSv0NMQuN3dGxNv3eQ7yO9CDkKx+pGuidJRkbBkBIakHEX29lzx7WiT/+kqV28N2Ijf9URAIe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749479924; c=relaxed/simple;
-	bh=dkYezuD9DVTD1jDAbkDk8WX+WPoA8yiGVjz3xXMQfd8=;
+	s=arc-20240116; t=1749479925; c=relaxed/simple;
+	bh=XLVpsgnf502PuJA/EKpENm5FX1SEnHTPOXj/uKv+kVk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cyOTVfiVBvIoc47KG0c0w7B6Ylf+2mPw1RlaATvuZY3zRaHa/2atfdJCeRZPQhx0s9L5DtIpcjO8SMPWujHBXR11jYAyvvi11qFHDjRAMYjvnejyJCA7aB4lah+3yfO5bkPnk1qBRXFtUk0t6LeVuux9u2ZugFq++dpRMXUhAnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DJDmAijm; arc=none smtp.client-ip=209.85.218.48
+	 MIME-Version; b=NRzfWj6CVXYI0BCmYVk7ORhTyg1OOR9OYBQNVR1gG9yaoy9h8db79Ow5yxLjZnm67KpJKysbggyx9rMZnB0ot4SUBYzPu7fRMhbjpJVtkqiEZn54sgZtQE2klwJc1sREA/wTY2/9b08Af+fYpg64GnZll3uy8yMUBW5ELYfP4Ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLxWBWhk; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJDmAijm"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-adb4e36904bso852076266b.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 07:38:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLxWBWhk"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ade30256175so529524766b.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 07:38:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749479921; x=1750084721; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749479922; x=1750084722; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e9IKKzuBJsN4xaI8I7pHyZieW0xYgtEgESKs0w0VwH0=;
-        b=DJDmAijmdgNFWJ+9QWSaqeGTXaswTKzqRps3rzVBE1Rar1hH5vNr6mqk33OjFbe9m4
-         bBS9qKxRr8T1mNyog/rYWW1p5uEe2AmsKr/HsoRPPWP/aUMeQfkAQ3/YaV3dLNux2d62
-         1XCEsHZttGHCHfbmTZoCZ6GXYFaN1yA16vLrXdVk743RdpsgUnz7uzpLMYOaJyJBVgGO
-         Q1TCZ2FoQLAO7RbwClZM6SWrhP08UTBf7OznGhLLhs0j0xvcbtWCCsRJh4j1zBOW9bmE
-         oesqUr8FMyNyTU8F0qA+j5NVUnJe3XXWFMjrTVPw7lGmXnp1TdRO3GrTervjH65Lg2Up
-         GyRQ==
+        bh=WD6gevOLd8eK8I8WfRmarBD3Imp7HhIMM16g6xn3oHQ=;
+        b=VLxWBWhkV429ZXdTwFrJQI8hQvzRv84tarW9lcWqhnXKbhHECLxZLcyTQj34eq7Vr6
+         xdG4VgyQz2jh1IWPSwciYoAj9LEfx5gQHw7Hl1wElL89HRapUiMfexwNN9tT5UdJQNeF
+         WV0iudv9pyzfLGTOCU47Su6SxtAWmEjO5bXmSXFAoukrhf6tbM1QolxoKTD0x82LiSWf
+         AsMES/fuQQdLMS/QLRxPyfZ8hj++AECKzNWYmIDFtDOXEgSps9I97c/jQjsMEPOp/aud
+         +SJjR6RgtSQQk+i8Wk2tVmq0z0REt5OQhRhczFRTT7IPPzvh8rkDOThXC9OxFP6hyK/5
+         pZpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749479921; x=1750084721;
+        d=1e100.net; s=20230601; t=1749479922; x=1750084722;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e9IKKzuBJsN4xaI8I7pHyZieW0xYgtEgESKs0w0VwH0=;
-        b=IaQE/Ctj1cusewhACV9vn3ixVCn3tGMbJ4o6elyxbODgk3/CAel58ZU63kE7MIyg8D
-         OvXGaG8FrgN2YpcfCqb1MlVxGzL3DmId7TUuroBFsbZ+1MvMPB8nM3NLqlaAD0yNR0sZ
-         1f3kSPZMewWg/lbtGIDvfHaFT01CAr5p4iIPIkG553Eu9sKrguPe28yOc0SiC/clk/62
-         MowkhRW5o5ejP1xRPda6CbeHTZurkVI5p1dHUCHW2xMeZU8ArZE5fumkxghOVV9wHa9w
-         KtK6PXaXvW+qBmVAln0dpFGzfH8mDAZdwv3+7fUIrQaSXBF9EsypAGLG6bcbQOzCxm/N
-         pGIw==
-X-Gm-Message-State: AOJu0YwhCjCf61Y7t/Fy6dXj5fySS1lx33lU3YotmRHQRYg5qxN+5fz8
-	EICYIf73TNa0PHDv5Gbt6b8QiAEf1OS4DKeLYFBf61SYL1hbwfHpERNzcMNfhw==
-X-Gm-Gg: ASbGncukMLObexynamM3tsJ49ugoIU0iwFPElav/xTUYurXLOQExlLHp08WKfPhoWT1
-	DrcJplkJ+nU2jNf71ZBeJoDEnuHP6NgYcoYplh9JlnO+Ud7YQ809y2mK9hk4xdw6sHJP8idY4MQ
-	faHWP0o4E7o6yUJtNo5PcKg014BbsngAQ2CVtv2hfiF3VXHLiGcmMMbgQ2ZmUwe78Omzervtu1p
-	2w9U/RcTxxXiKDGNsB+ogS4S6dPQxVkRoeHq5iL4beWCYK5u3yr3Qupm7m4bfAnOZecKeYf9S/J
-	MxQMJ655C976dtsA1+7lICBlngohRGhrcAYBxThUPpfIuf2qmf95lmkNgqWjAE2BPVvzzLf+fh3
-	5R159ShSK1vZhgT8WCtg=
-X-Google-Smtp-Source: AGHT+IGyCqTSmEWZiZoDWrPB3R8JzfmhxBdVy62xZNoptwGmv3Yv4NkvrVqW/UjfdlqR9kGKF70dtA==
-X-Received: by 2002:a17:907:8687:b0:ad8:93a3:299d with SMTP id a640c23a62f3a-ade1a9227fdmr1026402666b.30.1749479920769;
-        Mon, 09 Jun 2025 07:38:40 -0700 (PDT)
+        bh=WD6gevOLd8eK8I8WfRmarBD3Imp7HhIMM16g6xn3oHQ=;
+        b=BUP40I1mr3LmEQL9hAQlUW7UizC15L6UAaPVKbd9rulrsdhBsuZ/7I80PagCLlBMA2
+         39zAhwke1+mUy+QDREX33cD3nosMfn6hn13GsPZ4KtOB631PHWmT+RMuBQ8chXb5Wq+N
+         X7ms+gyqxFZ+Zo7MkIKgnLuHCq4c6JlgSK6AJzMmLb7pkzcRxZRRg3OkGVLqAZlGxM13
+         ElWdyIIKg0rd3uyoJJUFXbH/jtD45cCC63giglpTJz5h3LDOfM/RAbxdEmxVnyLp7tBs
+         LNR66/ck/M8mpXzzkTb7mXJvYYVXXDOFaZPWvhRzApOIsypw25B5Gyp94UMaXOBcW699
+         q5Pw==
+X-Gm-Message-State: AOJu0YwWdy5tEDE06ADUw06FIHjcAk950Ou5BKtIpI06X7evzg+b8izP
+	2N9R23vwa5YUvRKuBB39sgFsZG5TBk4XsWLaCLBvz/aysWyI92doleDxbpffkA==
+X-Gm-Gg: ASbGnct0CMx0Xh6JEz0c9dCEzA/QOp1VH+OX96k7ZJndR5jI1dQYXfQQk6k96yPKbCH
+	01bC91jjnBYRSTOAv5bQy/ViNLWIA/0Qwii1K4sGnozgoyljLUEyQZ/inPtTcuKdLMF/KjJqBIX
+	Pn7+279C8HBVov78baCQyn3cH2mTzfCRE52e01myZFzT4WTCCO+jDgFBIPs0NxmP0FiHU5JZmqx
+	H7gyOekip47YJmQfHCw4aA9OB/gHDGXlXMeMi04HB2mylb1FnvKpUimgdtgTdCplzNBY3H1jy0G
+	0nOQWtvPuPZRL9o7Rgqvs2ffqLmH9D5JUUDtnXC7PoOVOcgxib1SWgpxOmyPw2P3VqH0YPrpj8d
+	0+9tNJlbYd2PhhliwtJg=
+X-Google-Smtp-Source: AGHT+IGiPFnq9c3pMzqiDzHLbRtCHjfkCdFpF/QgvAX6bOVws86icpQR74QXjvjfHeCLVY5qQQdCqA==
+X-Received: by 2002:a17:907:9627:b0:ad2:4fa0:88cd with SMTP id a640c23a62f3a-ade1a9161d5mr1204272266b.9.1749479921920;
+        Mon, 09 Jun 2025 07:38:41 -0700 (PDT)
 Received: from hyperion.tail59961f.ts.net (B-228.ahl.uni-linz.ac.at. [193.171.46.128])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade34ea5adesm452017866b.80.2025.06.09.07.38.40
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade34ea5adesm452017866b.80.2025.06.09.07.38.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 07:38:40 -0700 (PDT)
+        Mon, 09 Jun 2025 07:38:41 -0700 (PDT)
 From: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-Subject: [PATCH BlueZ 3/4] emulator: add option to listen on TCP
-Date: Mon,  9 Jun 2025 16:38:10 +0200
-Message-ID: <20250609143811.566331-4-d3dx12.xx@gmail.com>
+Subject: [PATCH BlueZ 4/4] emulator: server: handle ISO, use BR/EDR+LE 5.2 by default
+Date: Mon,  9 Jun 2025 16:38:11 +0200
+Message-ID: <20250609143811.566331-5-d3dx12.xx@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250609143811.566331-1-d3dx12.xx@gmail.com>
 References: <20250609143811.566331-1-d3dx12.xx@gmail.com>
@@ -74,135 +74,69 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
----
- emulator/main.c   | 20 ++++++++++++++++++--
- emulator/server.c |  8 ++++----
- emulator/server.h |  2 +-
- 3 files changed, 23 insertions(+), 7 deletions(-)
+Allow passing of ISO packets via the socket by parsing their header.
 
-diff --git a/emulator/main.c b/emulator/main.c
-index 928588254..0d2f1e34f 100644
---- a/emulator/main.c
-+++ b/emulator/main.c
-@@ -47,6 +47,7 @@ static void usage(void)
- 		"\t-d                    Enable debug\n"
- 		"\t-S                    Create local serial port\n"
- 		"\t-s                    Create local server sockets\n"
-+		"\t-t[port=45550]        Create a TCP server\n"
- 		"\t-l[num]               Number of local controllers\n"
- 		"\t-L                    Create LE only controller\n"
- 		"\t-U[num]               Number of test LE controllers\n"
-@@ -60,6 +61,7 @@ static const struct option main_options[] = {
- 	{ "debug",   no_argument,       NULL, 'd' },
- 	{ "serial",  no_argument,       NULL, 'S' },
- 	{ "server",  no_argument,       NULL, 's' },
-+	{ "tcp",     optional_argument, NULL, 't' },
- 	{ "local",   optional_argument, NULL, 'l' },
- 	{ "le",      no_argument,       NULL, 'L' },
- 	{ "bredr",   no_argument,       NULL, 'B' },
-@@ -86,6 +88,7 @@ int main(int argc, char *argv[])
- 	struct server *server5;
- 	bool debug_enabled = false;
- 	bool server_enabled = false;
-+	uint16_t tcp_port = 0;
- 	bool serial_enabled = false;
- 	int letest_count = 0;
- 	int vhci_count = 0;
-@@ -97,7 +100,7 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "dSsl::LBAU::T::vh",
-+		opt = getopt_long(argc, argv, "dSst::l::LBAU::T::vh",
- 						main_options, NULL);
- 		if (opt < 0)
- 			break;
-@@ -112,6 +115,12 @@ int main(int argc, char *argv[])
- 		case 's':
- 			server_enabled = true;
- 			break;
-+		case 't':
-+			if (optarg)
-+				tcp_port = atoi(optarg);
-+			else
-+				tcp_port = 45550;
-+			break;
- 		case 'l':
- 			if (optarg)
- 				vhci_count = atoi(optarg);
-@@ -145,7 +154,7 @@ int main(int argc, char *argv[])
- 	}
- 
- 	if (letest_count < 1 && vhci_count < 1 && !server_enabled &&
--						!serial_enabled) {
-+						!tcp_port && !serial_enabled) {
- 		fprintf(stderr, "No emulator specified\n");
- 		return EXIT_FAILURE;
- 	}
-@@ -213,5 +222,12 @@ int main(int argc, char *argv[])
- 			fprintf(stderr, "Failed to open monitor server\n");
- 	}
- 
-+	if (tcp_port) {
-+		struct server *tcp_server = server_open_tcp(SERVER_TYPE_BREDRLE, tcp_port);
-+		if (!tcp_server)
-+			fprintf(stderr, "Failed to open TCP port\n");
-+		fprintf(stderr, "Listening TCP on 127.0.0.1:%d\n", tcp_port);
-+	}
-+
- 	return mainloop_run_with_signal(signal_callback, NULL);
- }
+Set version to 5.2 to expose ISO/CIS and other LE Audio related
+features when using server mode.
+---
+ emulator/server.c | 11 +++++++++--
+ lib/hci.h         |  6 ++++++
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
 diff --git a/emulator/server.c b/emulator/server.c
-index ceb417a40..0ca7d42a3 100644
+index 0ca7d42a3..d86342601 100644
 --- a/emulator/server.c
 +++ b/emulator/server.c
-@@ -311,7 +311,7 @@ struct server *server_open_unix(enum server_type type, const char *path)
- 	return server;
- }
+@@ -118,6 +118,7 @@ again:
+ 	while (count > 0) {
+ 		hci_command_hdr *cmd_hdr;
+ 		hci_acl_hdr *acl_hdr;
++		hci_iso_hdr *iso_hdr;
  
--static int open_tcp(void)
-+static int open_tcp(uint16_t port)
- {
- 	struct sockaddr_in addr;
- 	int fd, opt = 1;
-@@ -332,7 +332,7 @@ static int open_tcp(void)
- 	addr.sin_family = AF_INET;
- 	addr.sin_addr.s_addr = INADDR_ANY;
- 	addr.sin_addr.s_addr = inet_addr("127.0.0.1");
--	addr.sin_port = htons(45550);
-+	addr.sin_port = htons(port);
+ 		if (!client->pkt_data) {
+ 			client->pkt_type = ptr[0];
+@@ -140,8 +141,14 @@ again:
+ 				client->pkt_data = malloc(client->pkt_expect);
+ 				client->pkt_len = 0;
+ 				break;
++			case HCI_ISODATA_PKT:
++				iso_hdr = (hci_iso_hdr*)(ptr + 1);
++				client->pkt_expect = HCI_ISO_HDR_SIZE + iso_hdr->dlen + 1;
++				client->pkt_data = malloc(client->pkt_expect);
++				client->pkt_len = 0;
++				break;
+ 			default:
+-				printf("packet error\n");
++				printf("packet error, unknown type: %d\n", client->pkt_type);
+ 				return;
+ 			}
  
- 	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		perror("Failed to bind server socket");
-@@ -349,7 +349,7 @@ static int open_tcp(void)
- 	return fd;
- }
+@@ -218,7 +225,7 @@ static void server_accept_callback(int fd, uint32_t events, void *user_data)
  
--struct server *server_open_tcp(enum server_type type)
-+struct server *server_open_tcp(enum server_type type, uint16_t port)
- {
- 	struct server *server;
+ 	switch (server->type) {
+ 	case SERVER_TYPE_BREDRLE:
+-		type = BTDEV_TYPE_BREDRLE;
++		type = BTDEV_TYPE_BREDRLE52;
+ 		break;
+ 	case SERVER_TYPE_BREDR:
+ 		type = BTDEV_TYPE_BREDR;
+diff --git a/lib/hci.h b/lib/hci.h
+index c39a72cef..96733efc1 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -2311,6 +2311,12 @@ typedef struct {
+ } __attribute__ ((packed))	hci_msg_hdr;
+ #define HCI_MSG_HDR_SIZE	6
  
-@@ -361,7 +361,7 @@ struct server *server_open_tcp(enum server_type type)
- 	server->type = type;
- 	server->id = 0x43;
- 
--	server->fd = open_tcp();
-+	server->fd = open_tcp(port);
- 	if (server->fd < 0) {
- 		free(server);
- 		return NULL;
-diff --git a/emulator/server.h b/emulator/server.h
-index 294e86525..7d6b7be74 100644
---- a/emulator/server.h
-+++ b/emulator/server.h
-@@ -22,5 +22,5 @@ enum server_type {
- struct server;
- 
- struct server *server_open_unix(enum server_type type, const char *path);
--struct server *server_open_tcp(enum server_type type);
-+struct server *server_open_tcp(enum server_type type, uint16_t port);
- void server_close(struct server *server);
++typedef struct {
++	uint16_t	handle;
++	uint16_t	dlen;
++} __attribute__ ((packed))	hci_iso_hdr;
++#define HCI_ISO_HDR_SIZE	4
++
+ /* Command opcode pack/unpack */
+ #define cmd_opcode_pack(ogf, ocf)	(uint16_t)((ocf & 0x03ff)|(ogf << 10))
+ #define cmd_opcode_ogf(op)		(op >> 10)
 -- 
 2.49.0
 
