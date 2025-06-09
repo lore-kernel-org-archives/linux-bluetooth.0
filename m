@@ -1,116 +1,79 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EEB1990D9
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 14:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84436CA5A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 15:39:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749480596; cv=none; b=SCnkGwntRvyvXwb5ENjFYv9C48nBR974319yUqEdS/GVdsxSfwIYGm3JC1wejD4Pk70bhmcoVIAYneKuRt8nE2MTARmJ1LLkkR2b+lci/Xr/D8Rzo0reId+8ao2BA6Mdjz95gLFIeU4BOiTkfoknWDSBA+g31yYBSNniMKDOd9A=
+	t=1749483584; cv=none; b=KJMzLW3Mf2jXkKShIECft0ZbAyovEM9jXFDGGg1WcElwbl4bx3lJ4ZoxafC6bwJuBiIqZH9CYkYOkAuZEWkgTz4RidF1Pt4s1BVHCpzSlEuPdfZ0OtIMenir7Hq4BB4thAf8enGbqmAD1xRnYcdzsdqhuVSD+yYPwcC+UoSeguk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749480596; c=relaxed/simple;
-	bh=pyuEN8cR42Iy/aftkaZHtnx2lK+afrOfA7Bsi8mbwIs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZBsx4PfWHk3xi2Apf7LoyKrH1KiPvGwXkDuVFJjTpAZvg+7HJM4DxN6wUAmReckOCyTpl0Cv3c0FfBeso/ByUJP1vWGfIyCdd2u/PiR+ZfQ7nkLPlimeWipTtD0JEmAb/J/PsciOAKVufkQ3IHjw5ortMl+0hAgALlS26uAOMhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=QWFsIslk; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1749483584; c=relaxed/simple;
+	bh=mn6tDnA2iYTEdxP0vKSkz9Ndtt+AvE/koviqzWV/OXg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qfYQnpiO25sNABg2q68Iju6IMVvJUJMBvfnmVZ2071GZTfl6nEkRI17czLbRfp0nXxp7psynMv9bOKKX7ib66JzoyAIlqPxWDZ9Fc48xl0sR41aTxRHt9kn8o2hcILazvb1UYXhN8QzmWrt3jJhur9ElQ3gSrdvvJGVgxPyiQY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=muHk8zYO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="QWFsIslk"
-Received: from github.com (hubbernetes-node-a19dd88.ac4-iad.github.net [10.52.139.34])
-	by smtp.github.com (Postfix) with ESMTPA id 247007009E8
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 07:49:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749480594;
-	bh=2PVDHtzXh3nbQXesZ01TbaAeTmXJgDesBn/B+oaEQa0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=QWFsIslkk016nRzxlfZ7E6onuslOJIQk2IXLYEDOj7RBY6Jb6QaJE3VDRgjt2qW3m
-	 1KIGscuiS98NAWY8MlJ2YhGSM3SsnxzwfQSHNQ5sQGQEX+VNp5ogidaFlQcfdMp31q
-	 M9sYk2u2AewDCaoba6QeoGEn6M6pCiSv5SxBTaLU=
-Date: Mon, 09 Jun 2025 07:49:54 -0700
-From: Dmitry Sharshakov <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/969870/000000-3ba7e4@github.com>
-Subject: [bluez/bluez] 96efce: btdev: implement extended advertising
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="muHk8zYO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 316A4C4CEEF;
+	Mon,  9 Jun 2025 15:39:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749483584;
+	bh=mn6tDnA2iYTEdxP0vKSkz9Ndtt+AvE/koviqzWV/OXg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=muHk8zYOXorfa028jEs5YXGN/+WXy57oxckT25No62bhD+apUq+r/t5Mq1ci0nx2G
+	 JdkM/R35yiE9h6PI31ahTtKzkZnpVGQVN/6COVkEyqVRKH4U92m7eya1VgCWmYf+1G
+	 ovt0jP0FcPR4wDLQqdNQ0ht0BPyDJnx9aP0jFXhJgNY50zcsT1C0Sx9W1JWIzCSkGc
+	 geR8j0N4T5PiKXBA7RksYOhBrPYd+uL3PPB6g+qirBuI11JeRyawP6bvLAZ1/lw0rj
+	 ycoIsh71WBRFbJvHo0KB7O7bru4kd7S7ByjIpj82J22WP/AzgQzlm40saqt4WluCw0
+	 HSNPBh6mQZBpQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 35397380DBE9;
+	Mon,  9 Jun 2025 15:40:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] shared/bap: check lpac type in
+ bap_bcast_stream_new()
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174948361474.1126847.9883235314562695577.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Jun 2025 15:40:14 +0000
+References: 
+ <33226743ac1dc2803c5a90a1c0cdbfc97e3ecfec.1749414200.git.pav@iki.fi>
+In-Reply-To: 
+ <33226743ac1dc2803c5a90a1c0cdbfc97e3ecfec.1749414200.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/969870
-  Home:   https://github.com/bluez/bluez
-  Commit: 96efced991dd3d3b6b01aeb0007ba2695928f76e
-      https://github.com/bluez/bluez/commit/96efced991dd3d3b6b01aeb0007ba2695928f76e
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
+Hello:
 
-  Changed paths:
-    M emulator/btdev.c
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  btdev: implement extended advertising
+On Sun,  8 Jun 2025 23:31:03 +0300 you wrote:
+> bap_bcast_stream_new() shall refuse to create streams if lpac is not of
+> broadcast type.
+> ---
+> 
+> Notes:
+>     I ran across an unreproducible crash, where during connection dropping a
+>     crash occurred IIRC due to stream->rpac == NULL, as if bt_bap_stream_new()
+>     had produced a bcast stream for unicast lpac.
+> 
+> [...]
 
-Increase maximum advertising data length and implement
-LE Read Maximum Advertising Data Length command.
+Here is the summary with links:
+  - [BlueZ] shared/bap: check lpac type in bap_bcast_stream_new()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=45734349087e
 
-As expected by Zephyr BAP Server
-
-
-  Commit: 569cce3a98713a1092c573996419c8cee85b3bcf
-      https://github.com/bluez/bluez/commit/569cce3a98713a1092c573996419c8cee85b3bcf
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  btdev: fix LE Remove ISO Data Path command
-
-Fix errors in BAP server
-
-
-  Commit: cd489c31880a04ee70d8204e827498e7a2118a35
-      https://github.com/bluez/bluez/commit/cd489c31880a04ee70d8204e827498e7a2118a35
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
-
-  Changed paths:
-    M emulator/main.c
-    M emulator/server.c
-    M emulator/server.h
-
-  Log Message:
-  -----------
-  emulator: add option to listen on TCP
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 3ba7e4396bc50bcf11fc1a35f9e81525390eabce
-      https://github.com/bluez/bluez/commit/3ba7e4396bc50bcf11fc1a35f9e81525390eabce
-  Author: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
-
-  Changed paths:
-    M emulator/server.c
-    M lib/hci.h
-
-  Log Message:
-  -----------
-  emulator: server: handle ISO, use BR/EDR+LE 5.2 by default
-
-Allow passing of ISO packets via the socket by parsing their header.
-
-Set version to 5.2 to expose ISO/CIS and other LE Audio related
-features when using server mode.
-
-
-Compare: https://github.com/bluez/bluez/compare/96efced991dd%5E...3ba7e4396bc5
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
