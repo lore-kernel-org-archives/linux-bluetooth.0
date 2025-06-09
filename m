@@ -1,140 +1,128 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12E37E9
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 10:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2F317A2EF
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 10:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749466273; cv=none; b=oOFGIZqmUd5voY3cmi/ZIn0SkbvpBIeBiaTlCL3JpTFfDJv8b+O57RdOlN2dqTc4D230d5vdOdaZb2invV60uHvH+X40cb9A18fvBWNWNxyD9VCB2JxrxJBbzG3tf7ctv/PtT9Im0W1xnPPPIEQAzm249tR2tNZk+ayC3dR4GU8=
+	t=1749466510; cv=none; b=WQlehfBLfjJ2q+WPqtHV8HXWRqP2daJd8VkXI3LzG0w8/d8o8iPovaS/Rk/ntJ2r+ocGM1jYuYOdpOx9/e9AGisZT5X6mefXh+9nMw+MhS29yqyGPFwLpG5E/3tYO08WKqmVu6gCvuOGX1JUup7JQM9CYdwdoN5pqa02FLbOoUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749466273; c=relaxed/simple;
-	bh=LPA7xCYMv13s+EWfgcMRQxZQBRnRKV4eEPP40TTYxhs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=gU3CVQoYopqAXQ4RovACu2341WkYZpsyhtL/Nb3s99mTcZlBrAH+rS5pt9HpaqhwGMY/RQEy5DUao58qQc6j6uF+ajBijAxf1TgUi0o7pfn5MAgY9NdGC3Zhvjpc9e5StyZKMhs5oIQRzLkBfMiWQyqtNjLOIcT+x7paPAm82n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XFm6VTIR; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1749466510; c=relaxed/simple;
+	bh=Is6jgqGlnVbEu9KMHJ6jRXrIhdh2rdpl8OvmCKnAy/A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aJ3PzDx/cEPg7fS+E5OrXuIyh96Q+1yQccUmZ+aCCAYRLTwt6CbuSPvxYELe6S+cv7ZOQT6Ggujrq1fvl74IAxioTM7CITFHEqM63zhaKcQKEc+MPaICHPRR3qqhAzlVBFnVtfMiHIVQbELOFZ/JU2l3ZFH2rGgNBaCl6VqFYi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Q7tGno+c; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XFm6VTIR"
-Received: from github.com (hubbernetes-node-004ce96.ac4-iad.github.net [10.52.182.41])
-	by smtp.github.com (Postfix) with ESMTPA id C97E4700388
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 03:51:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749466269;
-	bh=34Cy2VFccN5fylCafolbsX0qaRaQKQVcvrOnboCyQDk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=XFm6VTIRKix5jCxs8XS/eq8r2YoAWRio9ZZe/ZNuNlIQsKqBmgMzy2+y2vn/HptQI
-	 ZZyY3w7Gr8oVbDfU1sJzXG4olkjwK9wxvugyRFCjbJHYkbbrz0OjmFLMWRvrE6kaM2
-	 meKnwB6P9VpXEY1WNHBtAFiI+IDruKZD/8yyB7jo=
-Date: Mon, 09 Jun 2025 03:51:09 -0700
-From: mkasenberg <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Q7tGno+c"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55935BR7020195
+	for <linux-bluetooth@vger.kernel.org>; Mon, 9 Jun 2025 10:55:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=ZGPz6Mgb1Cgl1GuHklcbylQWtyfEHk3fSU/
+	0+8/ElgA=; b=Q7tGno+c/RdqJFo8xs19KlZRFaXUJvNUSg264r5lYfln4xd3gLG
+	0X3B1uO6Z6JcIBGfevi2k4hUkQOzgsTmyE15ADRpZv4n/hnsGzJ986/nKBvtO4F0
+	w/Nm3kDJb2KM8q+2qxyZrja7zeKjOv9G6Why0Kr7j0m2yM+KwVi5j+G6HmGrCbOj
+	KCFKvFlbmTwEyoWqa8zJet/iC6eWkUzUn7KCgou6TQjCB6AsgkvHE5AH0t2dbvbB
+	1PgJWP9AIVJKyqswF+vHyD5/vDuIcwDInADH52inZk3xqAbBF6JAGMHmUKQZAQjX
+	mLAix0Jku8KJ8WXWoXN1mIUIo27wApnIkkA==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 475qcts690-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 10:55:07 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 559At4GK013081
+	for <linux-bluetooth@vger.kernel.org>; Mon, 9 Jun 2025 10:55:04 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 474egksaeg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 10:55:04 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 559At4g8013078
+	for <linux-bluetooth@vger.kernel.org>; Mon, 9 Jun 2025 10:55:04 GMT
+Received: from bt-iot-sh01-lnx.qualcomm.com ([10.253.136.182])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 559At4bl013071
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Jun 2025 10:55:04 +0000
+Received: by bt-iot-sh01-lnx.qualcomm.com (Postfix, from userid 4467449)
+	id 6EDE5529; Mon,  9 Jun 2025 18:55:03 +0800 (CST)
+From: Shuai Zhang <quic_shuaz@quicinc.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/969781/000000-d69c12@github.com>
-Subject: [bluez/bluez] d69c12: monitor: Add support for decoding Channel
- Sounding
+Cc: quic_bt@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
+Subject: [PATCH v1] driver: bluetooth: hci_qca:fix unable to load the BT driver
+Date: Mon,  9 Jun 2025 18:55:00 +0800
+Message-Id: <20250609105500.4083963-1-quic_shuaz@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 57OVhq3FHjspoWStye489msF_vGBX7bk
+X-Authority-Analysis: v=2.4 cv=Lco86ifi c=1 sm=1 tr=0 ts=6846bd8b cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=6IFa9wvqVegA:10 a=COk6AnOGAAAA:8 a=yfn8_VlG4_yacJM8_nIA:9
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDA4MyBTYWx0ZWRfX57UeJgdEUXUS
+ /kK26A2MVMJ6y75E7jrJT7jcWCqpLkNEzK0ErXOqkNLql6JHpl+QdUDW66kfwdMUecgpVlcKVEv
+ ZhXwo6V0qYSW7qp8TfM5OFhCNs2s2Xc+UlneEyUGq87tWT+NjEYr+6Jk6+qQcZvHRjQ/DaVKOMr
+ x2mBB2yXxSHL3Xmim2ZKg23vf18+URaerXmF5LsMis3ux6tq0T/mg84jzOOjGZF2k51eA4q65zq
+ pSQeJIEjRLC6QGtGybrVadpC86R9NeCJBz/8RbY04fbr7LFRyGx9VcFVfzmAa7s7LMdK/APf+Bd
+ GIkFQzqm0It8PXvq5uap8IO1MsoLVXC57slNnkk+s+tLH/Kh+Zsp7QF1Utz6oaytyiCpfJxOH+p
+ aLH+QQTEXiefdSFdHz87SsTNOV44Yhn4vV8lM4WI1Vma2vgVBT1Kf55ysNEmd4n8eA1O3f/7
+X-Proofpoint-ORIG-GUID: 57OVhq3FHjspoWStye489msF_vGBX7bk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-09_04,2025-06-05_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 priorityscore=1501 suspectscore=0 clxscore=1015
+ impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=902 mlxscore=0
+ bulkscore=0 adultscore=0 lowpriorityscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2506090083
 
-  Branch: refs/heads/969781
-  Home:   https://github.com/bluez/bluez
-  Commit: d69c129e9f0a18b3217f4625182a212ed55530ce
-      https://github.com/bluez/bluez/commit/d69c129e9f0a18b3217f4625182a212ed55530ce
-  Author: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
+Some modules have BT_EN enabled via a hardware pull-up,
+meaning it is not defined in the DTS and is not controlled
+through the power sequence. In such cases, fall through
+to follow the legacy flow.
 
-  Changed paths:
-    M monitor/bt.h
-    M monitor/packet.c
+Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+---
+ drivers/bluetooth/hci_qca.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-  Log Message:
-  -----------
-  monitor: Add support for decoding Channel Sounding
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index a2dc39c00..976ec88a0 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2392,10 +2392,17 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 			 */
+ 			qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->dev,
+ 								   "bluetooth");
+-			if (IS_ERR(qcadev->bt_power->pwrseq))
+-				return PTR_ERR(qcadev->bt_power->pwrseq);
+ 
+-			break;
++			/*
++			 * Some modules have BT_EN enabled via a hardware pull-up,
++			 * meaning it is not defined in the DTS and is not controlled
++			 * through the power sequence. In such cases, fall through
++			 * to follow the legacy flow.
++			 */
++			if (IS_ERR(qcadev->bt_power->pwrseq))
++				qcadev->bt_power->pwrseq = NULL;
++			else
++				break;
+ 		}
+ 		fallthrough;
+ 	case QCA_WCN3950:
+-- 
+2.34.1
 
-Add initial support for decoding commands and events of Channel
-Sounding, a new feature introduced in Bluetooth Core Specification
-Version 6.0 | Vol 1, Part A, Section 9 "Channel Sounding Using
-Bluetooth Low Energy".
-
-Testing:
-
-To test the feature you need a hardware that supports Channel Sounding.
-Channel Sounding can be tested using Nordic Semiconductor's sample
-applications for the Initiator and Reflector roles, which are available
-as part of the nRF Connect SDK and require an nRF54L15 development kit.
-See tutorials:
-https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/channel_sounding_ras_initiator/README.html
-https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/channel_sounding_ras_reflector/README.html
-
-Example output from btmon:
-> HCI Event: LE Meta Event (0x3e) plen 250                        #102 7.954000
-      LE CS Subevent Result (0x31)
-        Connection handle: 0
-        Config ID: 0
-        Start ACL Conn Event Counter: 53
-        Procedure Counter: 0
-        Frequency Compensation: 49152
-        Reference Power Level: 237
-        Procedure Done Status: Partial results with more to follow for the CS procedure (0x01)
-        Subevent Done Status: Partial results with more to follow for the CS subevent (0x01)
-        Abort reason: 0x00
-          Procedure: Report with no abort (0x00)
-          Subevent: Report with no abort (0x00)
-        Num Antenna Paths: 1
-        Num Steps Reported: 22
-        Steps data: [234]: 00e801024709000702f4000aa2f420022e0900d05df900d0edf820021009007251e400e27f001201100600ffe8f8ff01022d0900c5fd0200c7fd0220023c090029b11d0015911e2002030900bc002200e8effe1201030600ffe7f6ff01022b0900646f220041bf2120022c0900a75f23000820fe1202210900d93ee1001d80001202230900e00ee10000dfdf2001230600ffe71c0001023d090029d2fa00e24f0012021f0900c04d0100c18d022002050900674023005780232001050600ffe80f0001020e090077b0dc005c60dc20022209001f3eec00fcff01120000000000000f0003000005082800
-        Step 0
-          Mode: 0
-          Channel: 3
-          Step data len: 3
-          Raw step data: [3]: 00e801
-          Packet Quality: 0x00
-            CS Access Address check is successful, and all bits match the expected sequence
-            Bit errors: 0
-          Packet RSSI: -24
-          Packet Antenna: 1
-...
-        Step 3
-          Mode: 2
-          Channel: 71
-          Step data len: 9
-          Raw step data: [9]: 000702f4000aa2f420
-          Antenna Permutation Index: 0
-          Path 0
-            PCT: 0xf40207
-              I: 0x207
-              Q: 0xf40
-            Tone quality indicator: 0x00
-              Tone quality is high (0x00)
-              Not tone extension slot (0x00)
-          Path 1
-            PCT: 0xf4a20a
-              I: 0x20a
-              Q: 0xf4a
-            Tone quality indicator: 0x20
-              Tone quality is high (0x00)
-              Tone extension slot; tone expected to be present (0x02)
-...
-        Step 6
-          Mode: 1
-          Channel: 16
-          Step data len: 6
-          Raw step data: [6]: 00ffe8f8ff01
-          Packet Quality: 0x00
-            CS Access Address check is successful, and all bits match the expected sequence
-            Bit errors: 0
-          Packet NADM: Unknown NADM (0xff)
-          Packet RSSI: -24
-          ToA_ToD: 0xfffffff8
-          Packet Antenna: 1
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
