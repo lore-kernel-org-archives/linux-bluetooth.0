@@ -1,79 +1,79 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C91C191F89
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 19:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362E6E571
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 19:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749496617; cv=none; b=q7/O2+0wDRqQkC3h3nQ1x8s+Dv2BvlstKJojOkjDbFOEJrw78sUdtLI6acpwQN1rOZDDqxb6Sns7YhwCARoyjQRKXjc/0EhtbkNEoJA/OyPD/IF23DdGlDVhFN4OTWlTIETZ+Xsp/Toe0NsvJdS4QtlrTFRygV65NjWulHQgSBw=
+	t=1749496812; cv=none; b=EfG/fp+qMn+c/ZnjMOw5PodvS1CQM58xvJWmLr5XwgaGHZ+yecPbD6vg6INX5ws08I3z6TcAnLVkJpF76kCHbJIqhDCZpgMQw/6ZQ+EWvv6Iln25PZ8p8hQeJdcvqS6+qEVArQHY41Rqn1xvxzMg81R67dyRQcjrxCkeLp/I0kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749496617; c=relaxed/simple;
-	bh=AFiJvv833a0SXBndPQN/b+KKKUS92I2ASl4Y/FpDjIs=;
+	s=arc-20240116; t=1749496812; c=relaxed/simple;
+	bh=zncZBQUKxTXQF5YvyTuzKefl0+/Kq1ljUch1K4MlRG8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rh0GJSS7OUW1MZ64ppRjn6y7Wy3pp06IAEC6w3qvjUpHxAvVFy0bFd8Okmw7y0THUirEFGU/T3rMlc87H15JuZbs9K0sPwIQFV+Tr9XmG4OycXF/v6iUwQFREM3m6vLj8EfG5OccUZEqgJoOBBOJNTwNIfGs3Y4tQ6FZ7g9BvoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W1dT8ZGG; arc=none smtp.client-ip=209.85.208.170
+	 To:Cc:Content-Type; b=BCQ72e9lEQQeP0Goa0/vf8Mfq/6EYHYcQ/2zfyoa0gIotVfExUc6QSN9pkOYeormpctcom0FyHeUAc+3v5a21J59ABJbBYzNv8ns2CxHEE9TaUe8r6fbjxOyyisiokoRDp/5ifZt9keEJNrzfr3vj5lr7TEdpSrIDq9quXTz0zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ho9gPZuy; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1dT8ZGG"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-3106217268dso37884971fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 12:16:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ho9gPZuy"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-3106217268dso37912881fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 12:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749496614; x=1750101414; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749496809; x=1750101609; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6hop0CfgC25a9tU9Le5qQjCf5hDiBcRiMQYYxY1us/U=;
-        b=W1dT8ZGG0cbirO8Z9bk3wp/DheHRetVxEGm+injbiZhAthKX66EopxXeIgyLRXkNTN
-         3KaSPbHsD4vUPBGYbN7AGYvYXpsXJ/L70M3g3zgqAGcM39DKwC1VqvHmbgGa89zL8dHV
-         Hz5mQQlfVgxIDwWMkabDPm4mTXsVnLlfV88Upqtl1GuV6NcYrDjyV4EVYUDywUSWnJzE
-         EI0G1qtxMzVmLusuniz4St1Z6gRba2xSGjdDBQRcuJvlOCPag3mqXA+xrVaGMoxJyLmd
-         1FVakpThAXw4S/jCJTQS6A2kbSrGTKDe9yY2cmXJkbEHVXIlr3dquPZ1WLlY5cEql68e
-         HKVw==
+        bh=yG388MIQDyWlP58npx4tS0eL0dTASv/pBaGKUwqVunY=;
+        b=Ho9gPZuy6Do1rVtt0s6iO8GAb2HDA4Iv+DY092mLpxP85WxyH2bROzvm3NxHX7q646
+         BAX/tJIvPclYy07BIRbtrP7070qEdFlr+wZj4zgTz1QWtxr+g8J0OVu3A9LnEybCbfoJ
+         dUfshcKbZAkP4Ae8c8MiPvRt/Hig93ykDv10oh4abaGkmbisneAnCXbfT5Kpg+Mv8ZUP
+         RLyYy5C9DQpcCJHz3w4S0RGZwjfxKEACJmORALteKURoCZeuNMD1gstu0GXv9jcg7tXw
+         L1XKPzip/v9LTOAsHy3SEqOtB5AZGXFTaFi4UW8DVRV2d83+b+VPuPK1efsyOaEdas20
+         vHbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749496614; x=1750101414;
+        d=1e100.net; s=20230601; t=1749496809; x=1750101609;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6hop0CfgC25a9tU9Le5qQjCf5hDiBcRiMQYYxY1us/U=;
-        b=fuluLjoUkob4eYf7SzBbAPRS4YFQExbDDqXSxxYZ1Hz9I1sQllLNsVpmRa0K4mBcxD
-         MbAMmRHfEniQOW6OG2jhhVRlXtXPZOBTcmRU86Xfh5qbV1NarOOvk/0kmDNGv+/h1KBx
-         cqRCcRMsi9MzYF8+CetfJ4dRBOxjRYF5R2iiwFucUQ18fhG58wdTfjMjzWfRoHUCmQKb
-         lu3vIyTQBH6g2Qk/fx8e4//XYIXlekyxGZiSoYLUz1EyncKfec5HVFVxp0AeBnE3ZZTI
-         J7PZhq4rM73cs10uxZZmVQF9ZTBA9F6AE6DHMBk8Y+O8CHlgR2h9dX5GlnWIP1l4Hp1e
-         79vw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ9XDw4ynTDmYoD7+ORLO27vqyWCHkTpO9Tcrty66N3MqJy3j1HWkj0lXVWX8NLkjMzij8ujtxh6YdMgtnY4s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY/81hQL4ApnxuhNLJLsRwk8p6jNS3qMCq4NKMD/p9OasHM7Q/
-	t6Cciu+geNIqIiPRmdYUPJpI2/YpQLXGI1EkRqZAI2eFkoc23P+7U9IO0URhEGJaFGvur11osDu
-	+vyeoINq/llb7DWEdYV8kT3LfeNfSPTo=
-X-Gm-Gg: ASbGncu1q9Zj1CrvHSDwCxSW7Y5Upbf2KiJsw3ENRNVN8Pjtu4KgFVr3Xb68pLaR9KE
-	DcxHKhWGm/nK9wUYVjsbMGCakf/WZ7AyCENE6m/HEraTY7bSOG29gXh2P4ALxNxyxqGGD+3lj+z
-	OpC6Y08bTFd5tJpbUpVf/h3gfXvel0jSgqi9tch/akkw==
-X-Google-Smtp-Source: AGHT+IFMv0zVYmOW7wNZyc8n0Skn4JOacncf9O47RKJem6mWnsubS3xOUe2BNyvIBvzS3jLpzraUUfE52PfNGK0zcR8=
-X-Received: by 2002:a2e:a585:0:b0:32a:6b23:d3cc with SMTP id
- 38308e7fff4ca-32adfe22891mr41729281fa.25.1749496613279; Mon, 09 Jun 2025
- 12:16:53 -0700 (PDT)
+        bh=yG388MIQDyWlP58npx4tS0eL0dTASv/pBaGKUwqVunY=;
+        b=TgRrFdMvKsqa+FTMJNJaMKXpGqVZdEj05+r96ZRyi5aTBAygxKLCQWqxJrb6/Up/pJ
+         373fOJ+QbnxuT/Lo5GCNMdBPGLkCwNVPw2SualOX6nF8nVZBDD5ntyz2wlYePYQ751Lz
+         xVL6B4vmNILGAcWHZL/JUAUqSAxoaH0iqJiYAGEC+AVwdqfimJnvddiOMJunTBiJa9wa
+         i/BNeknQs6V9mNqfk6uc3h+JGqjHoPL2OC3n0rK0En78Bhc3AizuirOY86hwSND4YFxx
+         a+5A6oXpKsvm1WcUpPhvtriMrycMXM/o+F9OU12CJTcV/11BZYqO0O9jSwXTSoHerpKg
+         IGWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEF2HWEuVFOnWVoJRocV1sW0QcbI4Xht3JYmT9PAVFPZyR+JM4EPPrBmGu3kHxkBBVfbjKI3oh+qHdV6mRVos=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8a/HI+VYqDoDWZ6BcSm1lpQjhIf4szuojMuDrMjGZAIC0CxSU
+	xWp8225/7/iXvzn4zhG9upOacEeDw8WAZL538phxh0Brn6L/up3QNIe/2haEVKFocMGBRW1AcsE
+	EMTTnyCHaFivGIpj9Ay6CL6k3ptGtf4A=
+X-Gm-Gg: ASbGncs5fZatyaEDgZZp2BecIb+1jZUV1UerSp6JIRzhujRSw5JVWmRgqkxpVQii2hy
+	RJOvhL8eS0Q+Pc4V2kD0BlDp6Z06luO0eUEnXriGgV59pcXL5GlijaqNQccGqOVz6lUaC3btgWd
+	bGsxxmp4esLsQqYc/7IdKdwdBCtU5uAgx3smNPyZzx3g==
+X-Google-Smtp-Source: AGHT+IGxoXFG/eaDaC4G23NnEPMc60WwLymd/IHkoRfLLyoafqOQrNaSNKR5ylXrlikWYhRUIq3Z6/sDq7HiPBV/Z9E=
+X-Received: by 2002:a2e:bc16:0:b0:30b:cacd:fd7b with SMTP id
+ 38308e7fff4ca-32adfd259f1mr32171411fa.12.1749496809005; Mon, 09 Jun 2025
+ 12:20:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749418319.git.pav@iki.fi> <174949592323.1356526.392113193265628757.git-patchwork-notify@kernel.org>
-In-Reply-To: <174949592323.1356526.392113193265628757.git-patchwork-notify@kernel.org>
+References: <20250609143811.566331-1-d3dx12.xx@gmail.com> <174949592448.1356526.15327081211524527340.git-patchwork-notify@kernel.org>
+In-Reply-To: <174949592448.1356526.15327081211524527340.git-patchwork-notify@kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 9 Jun 2025 15:16:41 -0400
-X-Gm-Features: AX0GCFs36H9Rzi5OeqGwSMVVYMKv21N9H3cBIRRLEeTZ9BhDRKGZHaszDccNbDo
-Message-ID: <CABBYNZ+cSSjMiF-CLRaCujNtm+aJQKvfk9A_w6cFN-kq823beA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 00/10] BAP stream reconfiguration
+Date: Mon, 9 Jun 2025 15:19:55 -0400
+X-Gm-Features: AX0GCFvDMjce7hLqxZuZOZKnsJ_PoLrRnTziMfyRO0uuCiD9NxK0Sny8gI9xEfk
+Message-ID: <CABBYNZ+EbiWRZGh8YPhnJuP+MrXoxb6LbvQfodOwKXJeVH+S1Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/4] btvirt improvements for LE Audio
 To: patchwork-bot+bluetooth@kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
+Cc: Dmitrii Sharshakov <d3dx12.xx@gmail.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+Hi Dmitrii,
 
-On Mon, Jun 9, 2025 at 3:04=E2=80=AFPM <patchwork-bot+bluetooth@kernel.org>=
+On Mon, Jun 9, 2025 at 3:05=E2=80=AFPM <patchwork-bot+bluetooth@kernel.org>=
  wrote:
 >
 > Hello:
@@ -81,48 +81,35 @@ On Mon, Jun 9, 2025 at 3:04=E2=80=AFPM <patchwork-bot+bluetooth@kernel.org>=
 > This series was applied to bluetooth/bluez.git (master)
 > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 >
-> On Mon,  9 Jun 2025 00:32:12 +0300 you wrote:
-> > Implement ClearConfiguration() and Reconfigure() for BAP unicast
-> > MediaEndpoints.
+> On Mon,  9 Jun 2025 16:38:07 +0200 you wrote:
+> > This patch series improves some bits around btvirt, its interfaces,
+> > advertising and isochronous channel handling.
 > >
-> > v3:
+> > These changes enable btvirt to be used for simulation testing of
+> > Zephyr Bluetooth stack implementation of BAP server for LE Audio.
 > >
-> > - Add bt_bap_stream_lock(), instead of bt_bap_stream_discard()
+> > Dmitrii Sharshakov (4):
+> >   btdev: implement extended advertising
+> >   btdev: fix LE Remove ISO Data Path command
+> >   emulator: add option to listen on TCP
+> >   emulator: server: handle ISO, use BR/EDR+LE 5.2 by default
 > >
 > > [...]
 >
 > Here is the summary with links:
->   - [BlueZ,v3,01/10] bap: do not try QoS before links are updated & io cr=
-eated
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D7d8eaa56b8cb
->   - [BlueZ,v3,02/10] shared/bap: detach ucast io on RELEASING and unlink =
-streams
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D2f853e4d86d8
->   - [BlueZ,v3,03/10] shared/bap: add client ASE reuse and upper level str=
-eam locking
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dd1eb496cc605
->   - [BlueZ,v3,04/10] bap: lock streams when used
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D40b91712b932
->   - [BlueZ,v3,05/10] bap: add ready callback for setup configuration
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Debed99caa7a1
->   - [BlueZ,v3,06/10] bap: support removing streams with ClearConfiguratio=
-n()
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D9e0dc968de50
->   - [BlueZ,v3,07/10] bap: add callback at the end of ucast client select/=
-config
+>   - [BlueZ,1/4] btdev: implement extended advertising
+>     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D964585e3b352
+>   - [BlueZ,2/4] btdev: fix LE Remove ISO Data Path command
+>     (no matching commit)
+>   - [BlueZ,3/4] emulator: add option to listen on TCP
+>     (no matching commit)
+>   - [BlueZ,4/4] emulator: server: handle ISO, use BR/EDR+LE 5.2 by defaul=
+t
 >     (no matching commit)
 
-Did a minor change to this one:
-%s/bap_select_complete_select/bap_select_complete
+Did some minor changes to coding style. Btw, I wonder if we could do
+some cross testing with this, so testing zephyr vs bluez.
 
->   - [BlueZ,v3,08/10] bap: implement Reconfigure()
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D128b0695e2b5
->   - [BlueZ,v3,09/10] bap: don't show error when releasing stream
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D1d3907561f8e
->   - [BlueZ,v3,10/10] bap: delay QoS & IO creation if CIG is busy or setup=
-s configuring
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D7feff47a9fbe
->
 > You are awesome, thank you!
 > --
 > Deet-doot-dot, I am a bot.
