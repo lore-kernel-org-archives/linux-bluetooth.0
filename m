@@ -1,157 +1,94 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B703225A63D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 13:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD443FF1
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 14:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749476766; cv=none; b=uLVdGNTL5pG4xyHi8v690TVc/NWU2F4DmncEwuIgkyxx7B6Xh9QsnEGd5dKTVvMGimvwNxB1ucg0JK7bVfxUGOgYQ3laRpQKiUb0UGCX9NHPBizXmWziwLbyjcZgpTCWDz+LPXn4inkodK1HOGezI+ZJO8xIV2hipin4FGCBhOk=
+	t=1749479900; cv=none; b=NbBl6Ao1hk0J427vo95scsbs5/DblpsuSCmqJPGXXLbTQQX46ylOHYHXrl76VJ+nERWGWAxLY59kw13ivVPEYwy8iv9C+lHvXNSkDEcCfUjsLpelexWFqVZd0qVwfuvUK/YgR6+4x1UlCWtfq6SlvyVSPEKj3ULLgOjHEiviKRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749476766; c=relaxed/simple;
-	bh=wHDOEtWyRkIlCnR4Koo6LFS5OX/FU44tnK9biuEDKxE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=KQHp+scEmAJJVN5yJBBDSdHfNUtmkzKWm/dOjfGw1j35T5xfH6T77o7hGGMT28J1viWYmnxNXEkhq47IMg23kZKlqqIC8OCduTenHEuffKqDOrOYsOnzRd9BdgicSQ/99JiLZwPwDasA/U2Z1bKdNmxTfCAMYriXTGVvVa/vUNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UgMxI63N; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1749479900; c=relaxed/simple;
+	bh=a1iNGVoEE31jAT7yCH2uLWU5W951WNpJ0Rgf7oOjPok=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fXvZO37I/erGNrcm7hAXPDMD+c+d58gSxkm5sIAfmVPkEF1UdrZPGdXCOBq2quKMEYgLhv8blNN8BurRbqLdVXHsmh5LuhtIRLCUKT3Ilfa/3DUOhUbmVU3Y7mpXrt4Ow9/RRhFQ4zMbxS00pE9GpH1hy9TtO6fyhItrIow8VpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3WqlbA2; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UgMxI63N"
-Received: from github.com (hubbernetes-node-9f6e463.ash1-iad.github.net [10.56.185.35])
-	by smtp.github.com (Postfix) with ESMTPA id DC25E6006B4
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jun 2025 06:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749476763;
-	bh=L6WrYd2mmDKXDGP+dCYuy8olk1d4FGh7fPVIyNN3LQ0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=UgMxI63N2lFOthg4q1TNrkM3ltUjs0fguIFeZtWkQfCEXdWgeSIXOGfYdFBvdTwlq
-	 kG2D5boUUuJbF0IyvJsDMT1BHE6WZVkeRMiknBlKdwFMFI2WfxfTQJpvSzIMzOlpQN
-	 0f5sdiM09Y16Frbb9hX2XLBkv39Qlvzi70OlJUjc=
-Date: Mon, 09 Jun 2025 06:46:03 -0700
-From: mkasenberg <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C3WqlbA2"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-606b58241c9so7144462a12.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jun 2025 07:38:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749479897; x=1750084697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a09EzeqPLWZjlEN9/3f0lsAYK7bd8TDMIpaQpzGUXis=;
+        b=C3WqlbA2LuWZTOrZ5xUgB2JxQ6mxVnar60sfoB0Ksa41VttF7Q9t1R0vp/8zt/mFMv
+         jvHRtavbclXgCfpy/D1XLzasY79mAyTMHuIqIB397BRaZhny1ybNevQ48btcYR2+Div2
+         kF1qgY6NYuFmIYxhLhx3PltR7kpKbsULwJr1kdooW5aWRK+rD3n+c1iz24l4fA7EhyG8
+         Z5xa8sHK2uHkibseQQKlESzlnqj/bF1GlOwk8mnhdKzKQZQI4IcrUITre6cQIHQgiPXs
+         F8vb5zVHPA5oy/L2fRqbO2IgUm9FFNHyZVBRHhYWeR+7oNKTmItjTTk2DMb+7twJGRRN
+         +45g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749479897; x=1750084697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a09EzeqPLWZjlEN9/3f0lsAYK7bd8TDMIpaQpzGUXis=;
+        b=vaQlYMONGz2MUGXcRIqHxQN0CxIOYPw0ip7HJH31GPharQUZk6K3ahVn4ODto7bG47
+         7mLiEQKUYER9ONp7dXyPXkn9CXeu/RftackXq3xLL5HSYhzlp8w0QAJLGXF26lktzFGf
+         LmyAwEVkhqiEXxIItTwWR4VuSNfyZbewssVKKWaP1sK/XjxeQe2EUsxGJihc7KyVFKWb
+         6VgxCgZJeiUnK8HCFAJGfVON24TuAgCO/KBmkatifO5dhDwdI/juOKEO054+BwL8Z3PJ
+         MwO8/33oZ0sO3GEBHDtKFUvDOAVXXBPU2XEVDzv6S1/GeZgObXYMn4CXHhGzql0kmPix
+         mEQQ==
+X-Gm-Message-State: AOJu0YwF7zb4g7Uhf39Fe5pvPt38N2ZUOuZZEYnz2MM6L7uu74JpSHDL
+	uBFAY5FMjZ/XpnWd8cnmz6PriwZJnx2g5/859PU9HKUXz5XuADnnAQf8YAnRbg==
+X-Gm-Gg: ASbGnctzByMRDncXMuLXFVn218oemz9bv8pne7jaJI8Nzfq0OfqePGVih2rUZTVtdzi
+	nhnKHSSTV5rYZKCCGPrfCkEssGMqmFZ1wRXvJmpN41SXUYWPwuORAP17VQpqwcikgx7KqsG86Ep
+	H/ouiikoNcWJFAWCCKJlmc+nKiADG5L1R/v1hP2KCgkATHYA09BlKLRVXSUqhcFEqPida/SStYY
+	Cpbix/jDVFi2XJ/kLZdDV3QTkXI+tc8GEndwBp17wbwMBlWKrBr0SXxsk8qgEnezDVi7mJ8vCZU
+	K4aBZh5hV3i0H7Oze1ogqbIBwOZQWtOAnEe7uh2ltxF2/XpeBP/1O8CRoqcQzhPAMFzeiuvCl1h
+	OIjNlFNISuphK+XhuIPY/2cbcsXHyBg==
+X-Google-Smtp-Source: AGHT+IHkJrEdIYvtAsoh8Fz495hGIgaAUEKtvtx3ZvKgq9yKv1ntuMV50mAl8FbP1TRlKQsDOzdq2w==
+X-Received: by 2002:a17:907:7ea2:b0:ade:7513:5471 with SMTP id a640c23a62f3a-ade75135516mr35745266b.39.1749479896521;
+        Mon, 09 Jun 2025 07:38:16 -0700 (PDT)
+Received: from hyperion.tail59961f.ts.net (B-228.ahl.uni-linz.ac.at. [193.171.46.128])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade34ea5adesm452017866b.80.2025.06.09.07.38.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jun 2025 07:38:16 -0700 (PDT)
+From: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/bbd10b-b39c37@github.com>
-Subject: [bluez/bluez] 457343: shared/bap: check lpac type in
- bap_bcast_stream_new()
+Cc: Dmitrii Sharshakov <d3dx12.xx@gmail.com>
+Subject: [PATCH BlueZ 0/4] btvirt improvements for LE Audio
+Date: Mon,  9 Jun 2025 16:38:07 +0200
+Message-ID: <20250609143811.566331-1-d3dx12.xx@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 45734349087e909aa5cfb7149da2dd6c1d739bb9
-      https://github.com/bluez/bluez/commit/45734349087e909aa5cfb7149da2dd6c1d739bb9
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
+This patch series improves some bits around btvirt, its interfaces,
+advertising and isochronous channel handling.
 
-  Changed paths:
-    M src/shared/bap.c
+These changes enable btvirt to be used for simulation testing of
+Zephyr Bluetooth stack implementation of BAP server for LE Audio.
 
-  Log Message:
-  -----------
-  shared/bap: check lpac type in bap_bcast_stream_new()
+Dmitrii Sharshakov (4):
+  btdev: implement extended advertising
+  btdev: fix LE Remove ISO Data Path command
+  emulator: add option to listen on TCP
+  emulator: server: handle ISO, use BR/EDR+LE 5.2 by default
 
-bap_bcast_stream_new() shall refuse to create streams if lpac is not of
-broadcast type.
+ emulator/btdev.c  | 52 +++++++++++++++++++++++++++++++----------------
+ emulator/main.c   | 20 ++++++++++++++++--
+ emulator/server.c | 19 +++++++++++------
+ emulator/server.h |  2 +-
+ lib/hci.h         |  6 ++++++
+ 5 files changed, 72 insertions(+), 27 deletions(-)
 
+-- 
+2.49.0
 
-  Commit: b39c37d2179ff63f4d2ced3de7065a4c6616faf5
-      https://github.com/bluez/bluez/commit/b39c37d2179ff63f4d2ced3de7065a4c6616faf5
-  Author: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-  Date:   2025-06-09 (Mon, 09 Jun 2025)
-
-  Changed paths:
-    M monitor/bt.h
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Add support for decoding Channel Sounding
-
-Add initial support for decoding commands and events of Channel
-Sounding, a new feature introduced in Bluetooth Core Specification
-Version 6.0 | Vol 1, Part A, Section 9 "Channel Sounding Using
-Bluetooth Low Energy".
-
-Testing:
-
-To test the feature you need a hardware that supports Channel Sounding.
-Channel Sounding can be tested using Nordic Semiconductor's sample
-applications for the Initiator and Reflector roles, which are available
-as part of the nRF Connect SDK and require an nRF54L15 development kit.
-See tutorials:
-https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/channel_sounding_ras_initiator/README.html
-https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/bluetooth/channel_sounding_ras_reflector/README.html
-
-Example output from btmon:
-> HCI Event: LE Meta Event (0x3e) plen 250                        #102 7.954000
-      LE CS Subevent Result (0x31)
-        Connection handle: 0
-        Config ID: 0
-        Start ACL Conn Event Counter: 53
-        Procedure Counter: 0
-        Frequency Compensation: 49152
-        Reference Power Level: 237
-        Procedure Done Status: Partial results with more to follow for the CS procedure (0x01)
-        Subevent Done Status: Partial results with more to follow for the CS subevent (0x01)
-        Abort reason: 0x00
-          Procedure: Report with no abort (0x00)
-          Subevent: Report with no abort (0x00)
-        Num Antenna Paths: 1
-        Num Steps Reported: 22
-        Steps data: [234]: 00e801024709000702f4000aa2f420022e0900d05df900d0edf820021009007251e400e27f001201100600ffe8f8ff01022d0900c5fd0200c7fd0220023c090029b11d0015911e2002030900bc002200e8effe1201030600ffe7f6ff01022b0900646f220041bf2120022c0900a75f23000820fe1202210900d93ee1001d80001202230900e00ee10000dfdf2001230600ffe71c0001023d090029d2fa00e24f0012021f0900c04d0100c18d022002050900674023005780232001050600ffe80f0001020e090077b0dc005c60dc20022209001f3eec00fcff01120000000000000f0003000005082800
-        Step 0
-          Mode: 0
-          Channel: 3
-          Step data len: 3
-          Raw step data: [3]: 00e801
-          Packet Quality: 0x00
-            CS Access Address check is successful, and all bits match the expected sequence
-            Bit errors: 0
-          Packet RSSI: -24
-          Packet Antenna: 1
-...
-        Step 3
-          Mode: 2
-          Channel: 71
-          Step data len: 9
-          Raw step data: [9]: 000702f4000aa2f420
-          Antenna Permutation Index: 0
-          Path 0
-            PCT: 0xf40207
-              I: 0x207
-              Q: 0xf40
-            Tone quality indicator: 0x00
-              Tone quality is high (0x00)
-              Not tone extension slot (0x00)
-          Path 1
-            PCT: 0xf4a20a
-              I: 0x20a
-              Q: 0xf4a
-            Tone quality indicator: 0x20
-              Tone quality is high (0x00)
-              Tone extension slot; tone expected to be present (0x02)
-...
-        Step 6
-          Mode: 1
-          Channel: 16
-          Step data len: 6
-          Raw step data: [6]: 00ffe8f8ff01
-          Packet Quality: 0x00
-            CS Access Address check is successful, and all bits match the expected sequence
-            Bit errors: 0
-          Packet NADM: Unknown NADM (0xff)
-          Packet RSSI: -24
-          ToA_ToD: 0xfffffff8
-          Packet Antenna: 1
-
-
-Compare: https://github.com/bluez/bluez/compare/bbd10bb9bc5e...b39c37d2179f
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
