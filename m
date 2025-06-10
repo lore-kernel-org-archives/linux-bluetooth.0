@@ -1,48 +1,78 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375B8256C6A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jun 2025 18:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80EC263C7F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jun 2025 19:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749581791; cv=none; b=Fx8TSlHQW7x83N2xKNsy3U0qNXqOjlaRbIYq2lSA1TXOjp0yAHu6wmrRqRv3M9LfOdkV09qIolbGdQL6nGhQh8gwZu34vLmzvg/fyqYkVILJ6EvWUgO7A8Cu9xa/UMiJBOkFxYQzXbRAI7souORrqNCP2pvAgpZfSk49D8K3274=
+	t=1749583198; cv=none; b=JRq0HYfXJhOlQeM36sdEvlALreDTPLCMILbjK8Z57SQrCxqx/gHViTVch7MdQFPejc6YIvFzizZScKemrIw8QN8+/YIouD+eOM+ncu9UzorItj8MXFvmFQ2JBjoZV++8KfzdYPsF95JfoE9VcMTYM8n/+zw8V+9wI38MGJurizw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749581791; c=relaxed/simple;
-	bh=kr9EX3+obOCbFGkDK1eyosClYE9iw898cHJLU2QY9qs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=V7PSnv4Rh96p94a7mb40SKoDZY8pPILKZUNlchrqxAQNDdIjEayYywBT/T6fHEfnCoSikvu3ecBp4bb4hdLc/ZTgvvdOJGEhdj4wVYFmrz+sPWRRXlH1cf35hmMfMDAqDIL+MBpMOJiyejdg0Pgq5Hk1EpMA6YkF2CHGIkKz7uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=JV7/1h6S; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1749583198; c=relaxed/simple;
+	bh=TkEy2SXW0wvmrJ/ByzFVj7hGHeDVnoUBskDIRzgolPc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=C8IH/Sano2N1QBpUb2gQBhb/L68+5EDWPbbYK1xSyquLj/kibxK5e+3lyO5ZzlHqDLlod1eDI0B3T0oG/w13BvSjSl4H7PYndjO5PlGYVy+7HUn3dXFzjqjHf8MmkVQiotj13E3Lbm6B2d1c03ZDuqjWDV2xJIq/XIAkPNjPEBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbmOY4R+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="JV7/1h6S"
-Received: from github.com (hubbernetes-node-cd72301.va3-iad.github.net [10.48.148.31])
-	by smtp.github.com (Postfix) with ESMTPA id 46A8DE03E1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jun 2025 11:56:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749581789;
-	bh=a5whPmCG3bCgU5WN7eyb5jgScfphLlZEqkqtZUE5qlU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=JV7/1h6Sm4hdztldsf+pj/t8/QBEVUjxgY0G1eRmQj7V4mU2ZgajUKt4WbXyKI9AN
-	 zTfsIJq0i+ZQYEcRgy8H/XuOuiok5rpH6ps7DzwqvOtdskx9m0GH6Gnmy61FkGQQX5
-	 25dzrcFySmSFSK7+p5YgH5jnqarIXuIPRRdD0AC0=
-Date: Tue, 10 Jun 2025 11:56:29 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/970417/ff3f31-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbmOY4R+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52D20C4CEED;
+	Tue, 10 Jun 2025 19:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749583198;
+	bh=TkEy2SXW0wvmrJ/ByzFVj7hGHeDVnoUBskDIRzgolPc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rbmOY4R+C0WNgjhGGj3HqhutmPMu/vkJ3muzItrmw/lSd16oHgIu9nyQcbpIETZBP
+	 U/CJyI2Yvkmu9uGp4LcwLreYWmRbWuLAdTuXh9h7HJt+q6d3q34Wb5Gr5oiG0Ec21A
+	 cnymraEjdyzvRoSdaJkDXynWmh4hFytg7r4V8FxrZRxkEKfhgjxB/OEW2Vkbpw2qW+
+	 fZwxWAZLqv8LaqqRuZDst6NbYvUT1UdKke4f/SCdtGhsOieIPlJnR6V58/uSrIhZaq
+	 s7WpGldgv2TjBgGLBBdsNVNYjn7pZGbuBKQGHgbnHgMYyN9LtYyAj5P6NRPT+98mwA
+	 z5pp+piAk+iEg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD9839D6540;
+	Tue, 10 Jun 2025 19:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 1/2] Bluetooth: ISO: Fix using BT_SK_PA_SYNC to detect
+ BIS
+ sockets
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174958322875.2576109.4791071003354252665.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Jun 2025 19:20:28 +0000
+References: <20250610180359.1133739-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250610180359.1133739-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/970417
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Tue, 10 Jun 2025 14:03:58 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> BT_SK_PA_SYNC is only valid for Broadcast Sinks which means socket used
+> for Broadcast Sources wouldn't be able to use the likes of getpeername
+> to read out the sockaddr_iso_bc fields which may have been update (e.g.
+> bc_sid).
+> 
+> [...]
+
+Here is the summary with links:
+  - [v1,1/2] Bluetooth: ISO: Fix using BT_SK_PA_SYNC to detect BIS sockets
+    https://git.kernel.org/bluetooth/bluetooth-next/c/618cabed8257
+  - [v1,2/2] Bluetooth: ISO: Fix not using bc_sid as advertisement SID
+    https://git.kernel.org/bluetooth/bluetooth-next/c/dcd2b35c9b56
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
