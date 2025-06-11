@@ -1,82 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6974228851A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 14:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60BE2BB04
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 14:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749653401; cv=none; b=m5GbxqiebJLhVMEVQtxlASeORUf8amget2kYZq1OarBbdg4xMycQ2jbaqjug80pvKlUYVxmZzvLMJo8VGpl5IxlLtiN9pZE5PyuQ7dDQY50JcU527t8axqIJRaIdrphrlXm9otwLLazrloAxcQniUH8rGi6hvSs3jcowpO6eRPQ=
+	t=1749653436; cv=none; b=qToYqffDi9ioskUq+vueExWmav0x9PgQwLw5Vqp4LgRLw+eY/XW2mfko76ZXE+cM8WDi39m2U8t4kr4eCuT+z//0QSxF+/wRep7d1DFTOwwfbcYVFCCLAasWMaxN111Fvsa+Y0Yy9CQj6EUjYTfC5HL2OjuAzMLblzyxKfGDXic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749653401; c=relaxed/simple;
-	bh=9NqVvsw313EbnpHz72HWpzXmIBGkMVGKU/kFKwbYPfU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aQzX3Mo4AKZJQzRGIyi+30vjJ8m4+PU1bp+EcpvEIGsMC5L3fqizWpIQRuUaMSAuo5m2uVhJI7uEwF4YXev0hoD4+cnqaCD1DiQDXsH5lsxzOp5Nw0ff7j4F8mBcEK9eoUwL6dBbNLd8xWL/e67fcZHNRwidxidgM5XZfO+J78Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pP6lX2id; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749653436; c=relaxed/simple;
+	bh=W+9oHHJOPTQIeYoUJx67XT/Pezl+jUoEcHKiA96tdWs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qJTe5t5ERyfxR3YEnrpGetB1nqBJMj85xFZmEHLC59Wb62gjt/rOPoo31CzE6T5Yk/DNuNbE5VDQMMxgl7yd9OOECsxc3EhOOla0sp9UdUpZ7FAFWGBYztE8rSyteHO9HoYwW1ClvJHxzfa3ohlrfl+W4lxpZIkw7C8uTVTeqxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=exJsZ7F/; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pP6lX2id"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E929C4CEE3;
-	Wed, 11 Jun 2025 14:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749653401;
-	bh=9NqVvsw313EbnpHz72HWpzXmIBGkMVGKU/kFKwbYPfU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pP6lX2idQL28CV3MsVdPhjOToIwDKsJCLCw2Ye0xPw0qCevmWX37KN/oIH7Sx2Udp
-	 1DeycvLFHQ8l4wriItjwCOMvjAHviQ01Ng+If11H9k2gGkiNxozg/a5xw5qzUZeGzU
-	 jjXEUmo6gm7qoxgN25jYkzFhJDigRd+oX0MMzSH/oWqV7DDC2AEyEZVMp1y0Ojk4cy
-	 +7D/mEUFBKjkaZ4+pQp9FfprV+h3Oe9+sUvRHk2BCkhB9nx6CvnoHq/sgeufONhH9p
-	 WG8knEKxR2DikeJOqh4iYOsCxpduhQ3z2VD/Jw4rdefeRTnixi42tv2VLs3jq0gxRm
-	 LHwDEhowmRxog==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7539EFFC5;
-	Wed, 11 Jun 2025 14:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="exJsZ7F/"
+Received: from github.com (hubbernetes-node-7e508d7.ash1-iad.github.net [10.56.224.74])
+	by smtp.github.com (Postfix) with ESMTPA id C9186921271
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 07:50:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1749653433;
+	bh=qzOpFgnZhxjG+UYbpeJiiFBpJ7CJol6dMHqzZi4CK/Q=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=exJsZ7F/FTvKgOiae2h0kCGIWCZHwACUHHS8DZf4tZInIH3Kzq1TEN1qKCsY86YzU
+	 qVI+5Cc3YaluiCzsl2H3ucHFuibPUCuXLK4QQ2uPJgjIyWGpi7DVvsGNNH37WX+S8H
+	 Em6TO4Lm7DuplJmRgeHfDpZa4eO3L8cW2Gqh2xEg=
+Date: Wed, 11 Jun 2025 07:50:33 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/970839/60476c-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 0/3] pbap: use the public DBus connection
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174965343098.3352496.12893471046688485261.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Jun 2025 14:50:30 +0000
-References: <20250611131125.450039-1-kernel.org@pileofstuff.org>
-In-Reply-To: <20250611131125.450039-1-kernel.org@pileofstuff.org>
-To: Andrew Sayers <kernel.org@pileofstuff.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, pav@iki.fi,
- frederic.danis@collabora.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/970839
+  Home:   https://github.com/bluez/bluez
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Wed, 11 Jun 2025 14:06:12 +0100 you wrote:
-> DBus requests are received by the public DBus connection, because it
-> registers the relevant bus name.  My previous patches told PBAP to
-> listen on a private connection, but DBus doesn't let connections share
-> bus names, so it needs to listen on the public connection instead.
-> 
-> This adds a little more complexity to the logind callbacks, to avoid
-> unregistering profiles during shutdown.  It also removes an API I
-> previously added, which is no longer used and would only encourage the
-> next person to make the same mistake.
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v2,1/3] obexd: Pass at_(un)register value to logind callbacks
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=883c1c11c644
-  - [BlueZ,v2,2/3] pbap: use the public DBus connection
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=df0036d9e41f
-  - [BlueZ,v2,3/3] Revert "obexd: Support creating private system/session bus connections"
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aea0f46f173f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
