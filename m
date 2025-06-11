@@ -1,346 +1,418 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477632E6111;
-	Wed, 11 Jun 2025 11:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FCB2749E2
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 12:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749640429; cv=none; b=Or+Pba2WPH03kykklLVYQmJ70+dcq8etfmdmCWN3+0mAsw2PZ9ZnpmaDkjGJg3o4jqONTGvkU4s0vdt9iq3yanBVPqL6d9qlvzKqwpQ3jFTQEiVfP5MBUDa55w4WAuQtCfkXexcQ902sWLy4Mi+h3SKRI0xDmJRN8daLXjMigXs=
+	t=1749645461; cv=none; b=q6ioynHglOqJHzhJ+oHKg64wzJxqmM+sNtejuQhr4jyLgktKZDPg9UpEpXcFUUb9V2julaJo7fq9HO0wk1D2tLzymRwkWqYc8R6zygfY613HBcM72HMKi8+TDyL+9Xnh8YshfMWm3ENKhIWtxnqMScilHCtHrCzWInEObq/2Zwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749640429; c=relaxed/simple;
-	bh=y9GGlsXxjBj48ApOolUX4b6+EXIItyfsLaqQPJBnoVo=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=GX4KB9+w4/Sqatk5qGA8JAXH04LXgp+xLmI1d73q65eac1NsI+TGoxtKb6QcVDYHFtbFcLvV0UysL7p9bH4hMps3j2fQGE3GDcZXZXsqm+S2NBjnMlBTZ1VE7830jpZ7wQyA0WgrfgJpCqortBsufnEWY5bTQez4xhI6KS+VNRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iqQZEXKO; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iqQZEXKO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749640428; x=1781176428;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=y9GGlsXxjBj48ApOolUX4b6+EXIItyfsLaqQPJBnoVo=;
-  b=iqQZEXKO/sQePw7IXyLcAQJMTZHZBYW2JrxyX6GEG3bbm6jSMg47ROQO
-   KGm2DIz04aCBK8VrGQ1O67AVkbesIAaJJG4YbAJKoZFNK2cPkCxWRLv75
-   hxYr22QD5PNiakQVH27LDYU5UUYfZjndytkvYw/aHa0F1HQMmCQszj+du
-   MYJhryhcW7qHsdu++20QSPFrtznR31n8SH9cZ7rAqt+DycFlLT7D5DeLa
-   v807vy79zSOdCkbk9ip9Y4NqqxCqZmAoTfSZORt6zHdR7poUK/kKd6QFg
-   x0/TfqJvXHLSywmQfpyctqflc9/43sZ66GCztZbAgGlg+qZx4EHfJXgjP
-   g==;
-X-CSE-ConnectionGUID: srexPTHvQh2viwSsGlTGzg==
-X-CSE-MsgGUID: XgUSetpHTH+gbAWDY7dEhQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="55583759"
-X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="55583759"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 04:13:45 -0700
-X-CSE-ConnectionGUID: 71MhQGstSJKGgyIv3b1JpQ==
-X-CSE-MsgGUID: Qend955UQrqXqlwECABGaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="170341644"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.183])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 04:13:39 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Wed, 11 Jun 2025 14:13:35 +0300 (EEST)
-To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-    linux-serial <linux-serial@vger.kernel.org>, 
-    LKML <linux-kernel@vger.kernel.org>, Karsten Keil <isdn@linux-pingi.de>, 
-    David Lin <dtwlin@gmail.com>, Johan Hovold <johan@kernel.org>, 
-    Alex Elder <elder@kernel.org>, Oliver Neukum <oneukum@suse.com>, 
-    Marcel Holtmann <marcel@holtmann.org>, 
-    Johan Hedberg <johan.hedberg@gmail.com>, 
-    Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-    Netdev <netdev@vger.kernel.org>, greybus-dev@lists.linaro.org, 
-    linux-staging@lists.linux.dev, linux-usb@vger.kernel.org, 
-    linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 01/33] tty: introduce and use tty_port_tty_vhangup()
- helper
-In-Reply-To: <20250611100319.186924-2-jirislaby@kernel.org>
-Message-ID: <b23d566c-09dc-7374-cc87-0ad4660e8b2e@linux.intel.com>
-References: <20250611100319.186924-1-jirislaby@kernel.org> <20250611100319.186924-2-jirislaby@kernel.org>
+	s=arc-20240116; t=1749645461; c=relaxed/simple;
+	bh=2HLrDOPNZdq62ucQ+Y1DQnr/AJVuu/EHwUGnBo+PDyw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CeTE9N0VEpj1e/fNXYhglR3vEmRcgke+VQ6c9Fd7cAnKVWD2tzeQsop/RXyGvwQVijhAZJD/CJ8f+TsKvPJDlpZs5vSlrP8FA72DO5JgeI0dZKGwsnP7gNs5OsGptbYxpk0P9HcIGHJAxDAODUPXwDM8VZ7hWUOBbBVUVlWgaKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddbb34fc1cso77044405ab.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 05:37:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749645457; x=1750250257;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yXiKq8/RoTR7rMaHJR0kvL3hXyFSCdnBgFNfuKjvLE4=;
+        b=wDn1UkwgcGiixNhF1bSibHIhNbwLktp/5OwuiYYuWAFjRS5uNW3ZiqfBrfbQWlk2+a
+         Gv+aKl2U9dSfvxyEL84m3w9H3i1UYbYPaV4uVOCYw/CtrWV+VTMlZRMMLbaZ57p5aKIk
+         so+ysvOCVxFDit+k1YEKXJvb1mRd1qCffFkvcxzsVvyXZ7L6epSmxIzc/eMSCc8a1YMl
+         7JI1i7fj8pP66m6xMyv833AYS8n7EW/XZj/w0mMSQeOEPL067t/6vy0qRaK3jP50/b6r
+         qocdX8GMT/1vjmgtuBNyVNCQkT8E3nkfedHQKP24rf3yXOAfIgFI46Qzzmo0zWe8dX/h
+         37xA==
+X-Forwarded-Encrypted: i=1; AJvYcCX4ajfSzSH85Wz3WXmmTU2Q/k/l4pIZokQVxqdyBczOsu/7YYIqlf1mBKMQ6lrDtrEHUwaXYkK98BVc6WrTjx8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDNxdjmHIUhH1RGxVZpjTbXeM5UQCkYG5LMIiucLcwqsPw/jLN
+	OmuXf+G9tqvQ0c7r/DxOnBfcdtTv+pOSPUSFIwhdpwzQbodIAv9A3ziC/HBtuVkOIvMgBk1n5dk
+	GKI2UgxtOpIB6LppssFUGC0/daWr7yCNTrxi1WNnAm/hs89CBxaQMsDvnd6Q=
+X-Google-Smtp-Source: AGHT+IHMOigKajXwdHFiIom5SBGfHro+cI+OsEtKjDpxYftd4NyAq65+1wk2XnKnfG2wVEFnuAaNHrro7HSCMRkznXit6KMuipNs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-1095312045-1749640415=:957"
+X-Received: by 2002:a05:6e02:1525:b0:3dc:8423:5440 with SMTP id
+ e9e14a558f8ab-3ddf4147fbbmr30528415ab.0.1749645456921; Wed, 11 Jun 2025
+ 05:37:36 -0700 (PDT)
+Date: Wed, 11 Jun 2025 05:37:36 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68497890.050a0220.33aa0e.036d.GAE@google.com>
+Subject: [syzbot] [bluetooth?] INFO: task hung in hci_conn_failed (4)
+From: syzbot <syzbot+54284733aab8a9e6afcf@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hello,
 
---8323328-1095312045-1749640415=:957
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+syzbot found the following issue on:
 
-On Wed, 11 Jun 2025, Jiri Slaby (SUSE) wrote:
+HEAD commit:    8630c59e9936 Merge tag 'kbuild-v6.16' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1301120c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fd0cea6d0f67318f
+dashboard link: https://syzkaller.appspot.com/bug?extid=54284733aab8a9e6afcf
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12f53570580000
 
-> This code (tty_get -> vhangup -> tty_put) is repeated on few places.
-> Introduce a helper similar to tty_port_tty_hangup() (asynchronous) to
-> handle even vhangup (synchronous).
->=20
-> And use it on those places.
->=20
-> In fact, reuse the tty_port_tty_hangup()'s code and call tty_vhangup()
-> depending on a new bool parameter.
->=20
-> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-> Cc: Karsten Keil <isdn@linux-pingi.de>
-> Cc: David Lin <dtwlin@gmail.com>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: Alex Elder <elder@kernel.org>
-> Cc: Oliver Neukum <oneukum@suse.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-8630c59e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/79b02179fbaf/vmlinux-8630c59e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2abed662b9c4/bzImage-8630c59e.xz
 
-Nice cleanup. I'm not sure if it's important enough to be mentioned in
-Documentation/driver-api/tty/tty_port.rst .
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+54284733aab8a9e6afcf@syzkaller.appspotmail.com
 
-Reviewed-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
+INFO: task kworker/u5:0:45 blocked for more than 175 seconds.
+      Not tainted 6.15.0-syzkaller-13743-g8630c59e9936 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u5:0    state:D stack:26520 pid:45    tgid:45    ppid:2      task_flags:0x4208060 flags:0x00004000
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5396 [inline]
+ __schedule+0x16f5/0x4d00 kernel/sched/core.c:6785
+ __schedule_loop kernel/sched/core.c:6863 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6878
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6935
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:747
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+ hci_abort_conn_sync+0x5d1/0xdf0 net/bluetooth/hci_sync.c:5620
+ hci_cmd_sync_work+0x210/0x3a0 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+INFO: task kworker/u5:4:5760 blocked for more than 175 seconds.
+      Not tainted 6.15.0-syzkaller-13743-g8630c59e9936 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u5:4    state:D stack:27496 pid:5760  tgid:5760  ppid:2      task_flags:0x4208060 flags:0x00004000
+Workqueue: hci1 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5396 [inline]
+ __schedule+0x16f5/0x4d00 kernel/sched/core.c:6785
+ __schedule_loop kernel/sched/core.c:6863 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6878
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6935
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:747
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+ hci_abort_conn_sync+0x5d1/0xdf0 net/bluetooth/hci_sync.c:5620
+ hci_cmd_sync_work+0x210/0x3a0 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+INFO: task kworker/u5:5:5769 blocked for more than 175 seconds.
+      Not tainted 6.15.0-syzkaller-13743-g8630c59e9936 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u5:5    state:D stack:27528 pid:5769  tgid:5769  ppid:2      task_flags:0x4208060 flags:0x00004000
+Workqueue: hci2 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5396 [inline]
+ __schedule+0x16f5/0x4d00 kernel/sched/core.c:6785
+ __schedule_loop kernel/sched/core.c:6863 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6878
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6935
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:747
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+ hci_abort_conn_sync+0x5d1/0xdf0 net/bluetooth/hci_sync.c:5620
+ hci_cmd_sync_work+0x210/0x3a0 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
---=20
- i.
+Showing all locks held in the system:
+1 lock held by khungtaskd/26:
+ #0: ffffffff8e13f060 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8e13f060 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #0: ffffffff8e13f060 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6770
+5 locks held by kworker/u5:0/45:
+ #0: ffff88803f230948 ((wq_completion)hci0){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88803f230948 ((wq_completion)hci0){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc90000a27bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc90000a27bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888055b48d80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d4/0x3a0 net/bluetooth/hci_sync.c:331
+ #3: ffff888055b48078 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0x1eb/0xdf0 net/bluetooth/hci_sync.c:5601
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+5 locks held by kworker/u5:1/4680:
+ #0: ffff888011ab1148 ((wq_completion)hci4){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888011ab1148 ((wq_completion)hci4){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000225fbc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000225fbc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888011b6cd80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d4/0x3a0 net/bluetooth/hci_sync.c:331
+ #3: ffff888011b6c078 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0x1eb/0xdf0 net/bluetooth/hci_sync.c:5601
+ #4: ffffffff8e144b78 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:336 [inline]
+ #4: ffffffff8e144b78 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x3b9/0x730 kernel/rcu/tree_exp.h:998
+2 locks held by getty/5120:
+ #0: ffff8880384b90a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc9000018e2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x43e/0x1400 drivers/tty/n_tty.c:2222
+3 locks held by kworker/0:4/5428:
+ #0: ffff88801a474d48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88801a474d48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc90002857bc0 (free_ipc_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc90002857bc0 (free_ipc_work){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffffffff8e144b78 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:336 [inline]
+ #2: ffffffff8e144b78 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x3b9/0x730 kernel/rcu/tree_exp.h:998
+6 locks held by kworker/u5:3/5441:
+ #0: ffff888053f23148 ((wq_completion)hci3){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888053f23148 ((wq_completion)hci3){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc90002a1fbc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc90002a1fbc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888052104d80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d4/0x3a0 net/bluetooth/hci_sync.c:331
+ #3: ffff888052104078 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0x1eb/0xdf0 net/bluetooth/hci_sync.c:5601
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+ #5: ffff8880559fa338 (&conn->lock#2){+.+.}-{4:4}, at: l2cap_conn_del+0x70/0x680 net/bluetooth/l2cap_core.c:1762
+3 locks held by syz-executor/5452:
+ #0: ffff888011fa4d80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_dev_do_close net/bluetooth/hci_core.c:481 [inline]
+ #0: ffff888011fa4d80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_unregister_dev+0x1fe/0x500 net/bluetooth/hci_core.c:2678
+ #1: ffff888011fa4078 (&hdev->lock){+.+.}-{4:4}, at: hci_dev_close_sync+0x66a/0x1330 net/bluetooth/hci_sync.c:5213
+ #2: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:2062 [inline]
+ #2: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_hash_flush+0xa1/0x230 net/bluetooth/hci_conn.c:2543
+3 locks held by kworker/0:8/5706:
+ #0: ffff88801a474d48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88801a474d48 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d38fbc0 (deferred_process_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d38fbc0 (deferred_process_work){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: switchdev_deferred_process_work+0xe/0x20 net/switchdev/switchdev.c:104
+1 lock held by syz.0.31/5718:
+2 locks held by syz.3.36/5728:
+5 locks held by kworker/u5:4/5760:
+ #0: ffff888055a1c948 ((wq_completion)hci1){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888055a1c948 ((wq_completion)hci1){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d7a7bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d7a7bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888055b4cd80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d4/0x3a0 net/bluetooth/hci_sync.c:331
+ #3: ffff888055b4c078 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0x1eb/0xdf0 net/bluetooth/hci_sync.c:5601
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+5 locks held by kworker/u5:5/5769:
+ #0: ffff888044202948 ((wq_completion)hci2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888044202948 ((wq_completion)hci2){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d827bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d827bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888052108d80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d4/0x3a0 net/bluetooth/hci_sync.c:331
+ #3: ffff888052108078 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0x1eb/0xdf0 net/bluetooth/hci_sync.c:5601
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+4 locks held by kworker/u5:6/5785:
+ #0: ffff88805083e948 ((wq_completion)hci7#8){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88805083e948 ((wq_completion)hci7#8){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d8c7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d8c7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888047e64078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+4 locks held by kworker/u5:7/5786:
+ #0: ffff88804f7c5948 ((wq_completion)hci10#8){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88804f7c5948 ((wq_completion)hci10#8){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d847bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d847bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff88805964c078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+4 locks held by kworker/u5:8/5790:
+ #0: ffff8880599b8148 ((wq_completion)hci9#10){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff8880599b8148 ((wq_completion)hci9#10){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d777bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d777bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff8880339b0078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+5 locks held by kworker/u5:9/5797:
+ #0: ffff888011f7c948 ((wq_completion)hci11){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888011f7c948 ((wq_completion)hci11){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d917bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d917bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888044048d80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d4/0x3a0 net/bluetooth/hci_sync.c:331
+ #3: ffff888044048078 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0x1eb/0xdf0 net/bluetooth/hci_sync.c:5601
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+4 locks held by kworker/u5:10/5804:
+ #0: ffff8880337a1948 ((wq_completion)hci6#12){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff8880337a1948 ((wq_completion)hci6#12){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d957bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d957bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888050900078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+4 locks held by kworker/u5:11/5806:
+ #0: ffff88805933b948 ((wq_completion)hci16#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88805933b948 ((wq_completion)hci16#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d8e7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d8e7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888059e18078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+2 locks held by syz-executor/5843:
+ #0: ffffffff8f503c10 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x304/0x4d0 net/core/net_namespace.c:570
+ #1: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: ops_exit_rtnl_list net/core/net_namespace.c:174 [inline]
+ #1: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: ops_undo_list+0x2a4/0x990 net/core/net_namespace.c:249
+5 locks held by kworker/u5:12/5861:
+ #0: ffff88805081a148 ((wq_completion)hci8#3){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88805081a148 ((wq_completion)hci8#3){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000da57bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000da57bc0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff88804404cd80 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x1d4/0x3a0 net/bluetooth/hci_sync.c:331
+ #3: ffff88804404c078 (&hdev->lock){+.+.}-{4:4}, at: hci_abort_conn_sync+0x1eb/0xdf0 net/bluetooth/hci_sync.c:5601
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #4: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_conn_failed+0x165/0x310 net/bluetooth/hci_conn.c:1275
+4 locks held by kworker/u5:13/5866:
+ #0: ffff888052da7148 ((wq_completion)hci12#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888052da7148 ((wq_completion)hci12#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000d8b7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000d8b7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888059648078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+2 locks held by syz-executor/5893:
+4 locks held by kworker/u5:14/5897:
+ #0: ffff88801f51d148 ((wq_completion)hci14#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff88801f51d148 ((wq_completion)hci14#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000daf7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000daf7bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff88804f218078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+4 locks held by kworker/u5:15/5902:
+ #0: ffff888056efe948 ((wq_completion)hci18#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888056efe948 ((wq_completion)hci18#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000da87bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000da87bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff88804f568078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+3 locks held by syz-executor/5909:
+ #0: ffffffff8fa14ac8 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8fa14ac8 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #0: ffffffff8fa14ac8 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
+ #1: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #1: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+ #1: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4054
+ #2: ffffffff8dfe5a68 (wq_pool_mutex){+.+.}-{4:4}, at: apply_wqattrs_lock kernel/workqueue.c:5181 [inline]
+ #2: ffffffff8dfe5a68 (wq_pool_mutex){+.+.}-{4:4}, at: __alloc_workqueue+0x9eb/0x1b70 kernel/workqueue.c:5736
+2 locks held by syz-executor/5914:
+ #0: ffffffff8f503c10 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x304/0x4d0 net/core/net_namespace.c:570
+ #1: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: ip_tunnel_init_net+0x2ab/0x800 net/ipv4/ip_tunnel.c:1160
+4 locks held by kworker/u5:16/5918:
+ #0: ffff888000dbc148 ((wq_completion)hci15#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888000dbc148 ((wq_completion)hci15#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000db57bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000db57bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff8880593a4078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+4 locks held by kworker/u5:17/5920:
+ #0: ffff888059687148 ((wq_completion)hci13#4){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888059687148 ((wq_completion)hci13#4){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000db77bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000db77bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff88803f300078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+1 lock held by syz-executor/5931:
+ #0: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
+ #0: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: inet_rtm_newaddr+0x3b0/0x18b0 net/ipv4/devinet.c:979
+4 locks held by kworker/u5:18/5936:
+ #0: ffff888053d3f148 ((wq_completion)hci17#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3213 [inline]
+ #0: ffff888053d3f148 ((wq_completion)hci17#2){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3321
+ #1: ffffc9000dc17bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3214 [inline]
+ #1: ffffc9000dc17bc0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3321
+ #2: ffff888059e1c078 (&hdev->lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x9b/0x8e0 net/bluetooth/hci_event.c:3713
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2047 [inline]
+ #3: ffffffff8f678828 (hci_cb_list_lock){+.+.}-{4:4}, at: hci_remote_features_evt+0x516/0x8e0 net/bluetooth/hci_event.c:3747
+1 lock held by syz-executor/5953:
+ #0: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
+ #0: ffffffff8f510808 (rtnl_mutex){+.+.}-{4:4}, at: inet_rtm_newaddr+0x3b0/0x18b0 net/ipv4/devinet.c:979
+1 lock held by dhcpcd/5978:
+ #0: ffff88804ff74258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff88804ff74258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3252
+1 lock held by dhcpcd/5979:
+ #0: ffff88804ff70258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff88804ff70258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3252
+1 lock held by dhcpcd/5980:
+ #0: ffff888011ccc258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff888011ccc258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3252
+1 lock held by dhcpcd/5981:
+ #0: ffff888011e66258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff888011e66258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3252
+1 lock held by dhcpcd/5982:
+ #0: ffff888011e60258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff888011e60258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3252
+1 lock held by dhcpcd/5983:
+ #0: ffff88801148e258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff88801148e258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3252
+1 lock held by dhcpcd/5984:
+ #0: ffff888000bfe258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
+ #0: ffff888000bfe258 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3252
 
-> ---
-> Cc: netdev@vger.kernel.org
-> Cc: greybus-dev@lists.linaro.org
-> Cc: linux-staging@lists.linux.dev
-> Cc: linux-usb@vger.kernel.org
-> Cc: linux-bluetooth@vger.kernel.org
+=============================================
 
-> ---
->  drivers/isdn/capi/capi.c         |  8 +-------
->  drivers/staging/greybus/uart.c   |  7 +------
->  drivers/tty/serial/serial_core.c |  7 +------
->  drivers/tty/tty_port.c           | 12 ++++++++----
->  drivers/usb/class/cdc-acm.c      |  7 +------
->  drivers/usb/serial/usb-serial.c  |  7 +------
->  include/linux/tty_port.h         | 12 +++++++++++-
->  net/bluetooth/rfcomm/tty.c       |  7 +------
->  8 files changed, 25 insertions(+), 42 deletions(-)
->=20
-> diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
-> index 70dee9ad4bae..78e6e7748fb9 100644
-> --- a/drivers/isdn/capi/capi.c
-> +++ b/drivers/isdn/capi/capi.c
-> @@ -306,15 +306,9 @@ static void capincci_alloc_minor(struct capidev *cde=
-v, struct capincci *np)
->  static void capincci_free_minor(struct capincci *np)
->  {
->  =09struct capiminor *mp =3D np->minorp;
-> -=09struct tty_struct *tty;
-> =20
->  =09if (mp) {
-> -=09=09tty =3D tty_port_tty_get(&mp->port);
-> -=09=09if (tty) {
-> -=09=09=09tty_vhangup(tty);
-> -=09=09=09tty_kref_put(tty);
-> -=09=09}
-> -
-> +=09=09tty_port_tty_vhangup(&mp->port);
->  =09=09capiminor_free(mp);
->  =09}
->  }
-> diff --git a/drivers/staging/greybus/uart.c b/drivers/staging/greybus/uar=
-t.c
-> index 308ed1ca9947..10df5c37c83e 100644
-> --- a/drivers/staging/greybus/uart.c
-> +++ b/drivers/staging/greybus/uart.c
-> @@ -916,7 +916,6 @@ static void gb_uart_remove(struct gbphy_device *gbphy=
-_dev)
->  {
->  =09struct gb_tty *gb_tty =3D gb_gbphy_get_data(gbphy_dev);
->  =09struct gb_connection *connection =3D gb_tty->connection;
-> -=09struct tty_struct *tty;
->  =09int ret;
-> =20
->  =09ret =3D gbphy_runtime_get_sync(gbphy_dev);
-> @@ -929,11 +928,7 @@ static void gb_uart_remove(struct gbphy_device *gbph=
-y_dev)
->  =09wake_up_all(&gb_tty->wioctl);
->  =09mutex_unlock(&gb_tty->mutex);
-> =20
-> -=09tty =3D tty_port_tty_get(&gb_tty->port);
-> -=09if (tty) {
-> -=09=09tty_vhangup(tty);
-> -=09=09tty_kref_put(tty);
-> -=09}
-> +=09tty_port_tty_vhangup(&gb_tty->port);
-> =20
->  =09gb_connection_disable_rx(connection);
->  =09tty_unregister_device(gb_tty_driver, gb_tty->minor);
-> diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial=
-_core.c
-> index 1f7708a91fc6..d6485714eb0f 100644
-> --- a/drivers/tty/serial/serial_core.c
-> +++ b/drivers/tty/serial/serial_core.c
-> @@ -3209,7 +3209,6 @@ static void serial_core_remove_one_port(struct uart=
-_driver *drv,
->  =09struct uart_state *state =3D drv->state + uport->line;
->  =09struct tty_port *port =3D &state->port;
->  =09struct uart_port *uart_port;
-> -=09struct tty_struct *tty;
-> =20
->  =09mutex_lock(&port->mutex);
->  =09uart_port =3D uart_port_check(state);
-> @@ -3228,11 +3227,7 @@ static void serial_core_remove_one_port(struct uar=
-t_driver *drv,
->  =09 */
->  =09tty_port_unregister_device(port, drv->tty_driver, uport->line);
-> =20
-> -=09tty =3D tty_port_tty_get(port);
-> -=09if (tty) {
-> -=09=09tty_vhangup(port->tty);
-> -=09=09tty_kref_put(tty);
-> -=09}
-> +=09tty_port_tty_vhangup(port);
-> =20
->  =09/*
->  =09 * If the port is used as a console, unregister it
-> diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
-> index 4af1fbf73f51..903eebdbe12d 100644
-> --- a/drivers/tty/tty_port.c
-> +++ b/drivers/tty/tty_port.c
-> @@ -396,15 +396,19 @@ EXPORT_SYMBOL(tty_port_hangup);
->   * @port: tty port
->   * @check_clocal: hang only ttys with %CLOCAL unset?
->   */
-> -void tty_port_tty_hangup(struct tty_port *port, bool check_clocal)
-> +void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, boo=
-l async)
->  {
->  =09struct tty_struct *tty =3D tty_port_tty_get(port);
-> =20
-> -=09if (tty && (!check_clocal || !C_CLOCAL(tty)))
-> -=09=09tty_hangup(tty);
-> +=09if (tty && (!check_clocal || !C_CLOCAL(tty))) {
-> +=09=09if (async)
-> +=09=09=09tty_hangup(tty);
-> +=09=09else
-> +=09=09=09tty_vhangup(tty);
-> +=09}
->  =09tty_kref_put(tty);
->  }
-> -EXPORT_SYMBOL_GPL(tty_port_tty_hangup);
-> +EXPORT_SYMBOL_GPL(__tty_port_tty_hangup);
-> =20
->  /**
->   * tty_port_tty_wakeup - helper to wake up a tty
-> diff --git a/drivers/usb/class/cdc-acm.c b/drivers/usb/class/cdc-acm.c
-> index c2ecfa3c8349..f9171fbedf5c 100644
-> --- a/drivers/usb/class/cdc-acm.c
-> +++ b/drivers/usb/class/cdc-acm.c
-> @@ -1571,7 +1571,6 @@ static int acm_probe(struct usb_interface *intf,
->  static void acm_disconnect(struct usb_interface *intf)
->  {
->  =09struct acm *acm =3D usb_get_intfdata(intf);
-> -=09struct tty_struct *tty;
->  =09int i;
-> =20
->  =09/* sibling interface is already cleaning up */
-> @@ -1598,11 +1597,7 @@ static void acm_disconnect(struct usb_interface *i=
-ntf)
->  =09usb_set_intfdata(acm->data, NULL);
->  =09mutex_unlock(&acm->mutex);
-> =20
-> -=09tty =3D tty_port_tty_get(&acm->port);
-> -=09if (tty) {
-> -=09=09tty_vhangup(tty);
-> -=09=09tty_kref_put(tty);
-> -=09}
-> +=09tty_port_tty_vhangup(&acm->port);
-> =20
->  =09cancel_delayed_work_sync(&acm->dwork);
-> =20
-> diff --git a/drivers/usb/serial/usb-serial.c b/drivers/usb/serial/usb-ser=
-ial.c
-> index 7266558d823a..c78ff40b1e5f 100644
-> --- a/drivers/usb/serial/usb-serial.c
-> +++ b/drivers/usb/serial/usb-serial.c
-> @@ -1176,7 +1176,6 @@ static void usb_serial_disconnect(struct usb_interf=
-ace *interface)
->  =09struct usb_serial *serial =3D usb_get_intfdata(interface);
->  =09struct device *dev =3D &interface->dev;
->  =09struct usb_serial_port *port;
-> -=09struct tty_struct *tty;
-> =20
->  =09/* sibling interface is cleaning up */
->  =09if (!serial)
-> @@ -1191,11 +1190,7 @@ static void usb_serial_disconnect(struct usb_inter=
-face *interface)
-> =20
->  =09for (i =3D 0; i < serial->num_ports; ++i) {
->  =09=09port =3D serial->port[i];
-> -=09=09tty =3D tty_port_tty_get(&port->port);
-> -=09=09if (tty) {
-> -=09=09=09tty_vhangup(tty);
-> -=09=09=09tty_kref_put(tty);
-> -=09=09}
-> +=09=09tty_port_tty_vhangup(&port->port);
->  =09=09usb_serial_port_poison_urbs(port);
->  =09=09wake_up_interruptible(&port->port.delta_msr_wait);
->  =09=09cancel_work_sync(&port->work);
-> diff --git a/include/linux/tty_port.h b/include/linux/tty_port.h
-> index 08f89a598366..021f9a8415c0 100644
-> --- a/include/linux/tty_port.h
-> +++ b/include/linux/tty_port.h
-> @@ -232,7 +232,7 @@ bool tty_port_carrier_raised(struct tty_port *port);
->  void tty_port_raise_dtr_rts(struct tty_port *port);
->  void tty_port_lower_dtr_rts(struct tty_port *port);
->  void tty_port_hangup(struct tty_port *port);
-> -void tty_port_tty_hangup(struct tty_port *port, bool check_clocal);
-> +void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, boo=
-l async);
->  void tty_port_tty_wakeup(struct tty_port *port);
->  int tty_port_block_til_ready(struct tty_port *port, struct tty_struct *t=
-ty,
->  =09=09struct file *filp);
-> @@ -251,4 +251,14 @@ static inline int tty_port_users(struct tty_port *po=
-rt)
->  =09return port->count + port->blocked_open;
->  }
-> =20
-> +static inline void tty_port_tty_hangup(struct tty_port *port, bool check=
-_clocal)
-> +{
-> +=09__tty_port_tty_hangup(port, check_clocal, true);
-> +}
-> +
-> +static inline void tty_port_tty_vhangup(struct tty_port *port)
-> +{
-> +=09__tty_port_tty_hangup(port, false, false);
-> +}
-> +
->  #endif
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index 21a5b5535ebc..827dfbe66085 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -438,7 +438,6 @@ static int __rfcomm_release_dev(void __user *arg)
->  {
->  =09struct rfcomm_dev_req req;
->  =09struct rfcomm_dev *dev;
-> -=09struct tty_struct *tty;
-> =20
->  =09if (copy_from_user(&req, arg, sizeof(req)))
->  =09=09return -EFAULT;
-> @@ -464,11 +463,7 @@ static int __rfcomm_release_dev(void __user *arg)
->  =09=09rfcomm_dlc_close(dev->dlc, 0);
-> =20
->  =09/* Shut down TTY synchronously before freeing rfcomm_dev */
-> -=09tty =3D tty_port_tty_get(&dev->port);
-> -=09if (tty) {
-> -=09=09tty_vhangup(tty);
-> -=09=09tty_kref_put(tty);
-> -=09}
-> +=09tty_port_tty_vhangup(&dev->port);
-> =20
->  =09if (!test_bit(RFCOMM_TTY_OWNED, &dev->status))
->  =09=09tty_port_put(&dev->port);
->=20
---8323328-1095312045-1749640415=:957--
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 26 Comm: khungtaskd Not tainted 6.15.0-syzkaller-13743-g8630c59e9936 #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x39e/0x3d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x17a/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:158 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:307 [inline]
+ watchdog+0xfee/0x1030 kernel/hung_task.c:470
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
