@@ -1,300 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFCB26463A;
-	Wed, 11 Jun 2025 10:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20729271A9D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 10:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749636207; cv=none; b=aKSYiPNb2J2bAbZandYCCZ4jYSE4ZMXL4gFlWe9a+vJKWPE+n2cGLnFc7Cri2RJl0et5hfnJPhEBUbnqiwFOC2LObVxThUZufRcOBMr39+nbdAwlLsxZksEGDiaYg8+i0pFU/oswyrsV6Pq/CB5dBLjY/6flO81ESFccVV5uB/E=
+	t=1749637958; cv=none; b=NL3G8j8kX8T/Co3EJHpi69lgdobCIeMXCkuQpgIdsh6aEqMo13n5hu2glt9o0hnl5GrR/Lyu0hUSgETR51iHN8/lF6AmJkk09siKf6XndS+fD9uUyQRaMf1IwkfZjWwdv+6q+S0oXYOqnAlDB9D6fBZg1lfufYk+DFO4+UfOv78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749636207; c=relaxed/simple;
-	bh=KpqxD4POGHfy23PplJeilT9uuVSTNzfSBk37cW0+nQs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QDlNdixQpjPhkbTYGbuSJxMzJU70g+25Z7vCDQOMSXOsi2eUzNKeHy+nWMRc7y6pCmjbhBZ7rplHV8k4md09iDSr+PeFFWMp2Lzv4B97IMXlUJXoW/8849nVSdyUp79FB61M2884WNBeA7qO2tmEknffsPPV+ySQxc4PdL1Ae5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rU7fDQ+5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749637958; c=relaxed/simple;
+	bh=Gy5zNe1kOSHcPu6sBy8hURoJx4CngNWArR7Yz8v4jBo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=b/Euhi3s3gxORQqleJJ7CP3Fq/lUG7rLhNi/MmFHB/ju9QtY35wcm8KyhnGtHo9bN7hjNvwpWmtxts4rVVrLrknMLXnnVbJbCKLe6JDKTdrp9kxmlvUMw9Zb7hBVMp2gEFI0h/dRT+a9JGon8ZAKV4HIVjdqisDL2EmKu5BQB6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhUEZp7o; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rU7fDQ+5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A41EC4CEF4;
-	Wed, 11 Jun 2025 10:03:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749636206;
-	bh=KpqxD4POGHfy23PplJeilT9uuVSTNzfSBk37cW0+nQs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rU7fDQ+5pTYxH0ytcyrwQgoHOCsVbLm5NnmPR4QFM0EM7EYgtNRw+LFFxwP/Hhvao
-	 RIt1V9+ZnGAgKnDI6H/E4rtFQMXK/OetCGUZs/5SVxBGM3dOb202foEfio4q9rZdM8
-	 /9O1Q0cFZ39DFXyVVZ9SHjAtKdBm9c4dRuuf2uOdhp6eKCde1oiDfHR1ENgAK1nG8C
-	 yXw+d0dOokqHgp6SFTQPGfBbmouyYt6/EtfGIqbM3KdlFyrIEEaieGuf750zrtL3+Q
-	 xe4o9rTBfWY92n/+czgIgmUxYeaQUROIjdvAi5IkXrVpA5nAA/Kd5+4no3uz4J2TAB
-	 r3iVHsKUHwmXg==
-From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-To: gregkh@linuxfoundation.org
-Cc: linux-serial@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	David Lin <dtwlin@gmail.com>,
-	Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>,
-	Oliver Neukum <oneukum@suse.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	netdev@vger.kernel.org,
-	greybus-dev@lists.linaro.org,
-	linux-staging@lists.linux.dev,
-	linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/33] tty: introduce and use tty_port_tty_vhangup() helper
-Date: Wed, 11 Jun 2025 12:02:47 +0200
-Message-ID: <20250611100319.186924-2-jirislaby@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250611100319.186924-1-jirislaby@kernel.org>
-References: <20250611100319.186924-1-jirislaby@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhUEZp7o"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-86cf3a3d4ccso578910839f.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 03:32:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749637956; x=1750242756; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NLNBwTu/FG+bWw88ieq946HVnGtIuj0kZe16lcQX4uo=;
+        b=hhUEZp7omD3HVKBoWP/lUJaI7QfDJ85847ZR3IKjgH1GE8iJaxcGTWEdWcG4k87R8I
+         esdv7m3+6KSU2nEizCnkiaWGbyCWetdxabVAI3VqA8EEnL9eOHLEl2ax9O9cCr9b0NFh
+         7ypRVSL7JWKOGVeVYzSsW2i/2WI5HEh0/vdOvtvrUeQn3p4ZeSdBUyHuOjE/a8G/Zur2
+         Ur8XGva4wrTi2mknWT0W+r9ICjqlyyRIEU2p0jZBM+22LFLeG82iuTvDeiw0YtNbhmUo
+         PKHm+MEjmj8hPae4jFZcPsNB2ceWr0KqFWymIcUGeFiNwAOt//eKvzu3ibVFpA5wCeFd
+         hG4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749637956; x=1750242756;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NLNBwTu/FG+bWw88ieq946HVnGtIuj0kZe16lcQX4uo=;
+        b=C5JZQj/hb2OcLnSEPS7+DnFjwRaEFluAJtS2BiVM1AbD/fME+woP4Mmpe7ohJS/SVk
+         XSyJU7L3wvXPev5hvAUo4+zIrXoRq9+66OYri4WTXw8uri1qmJ9h1o89O8y5u7US++GR
+         Nqqm3VGZaw7willxSpu2CLMJ2D0si7VxT6R+1ax5umPLsgwTI2dgNlnPCWwcC9RtSFfM
+         0GLiYt23nC6MdCC5fFvxJkNPM3geEHVlCn7S9q64aGejSX/UJziYLGCnCIlzxUXcW6Qy
+         957DCx7j3utiDEB6G2EVXkjDTaJThpt6cEqk/6BFI2jkpS5weTWiX2ZKyyEcMN32zUxe
+         JScg==
+X-Gm-Message-State: AOJu0Yy9ASSrb6P37YO87FlfZujLEo2nHdYt09DSdmwLmVxmdlzJ68ee
+	3EJNTPWpK69CSsbf07NsdRpi7l4nCGxGJyIiooWDe9wsKWxXvTuDkCaZthQ/jw==
+X-Gm-Gg: ASbGncuQFUlsnTjZ8OTawagVzI7iMaO/lkJI6+dcrK+Nuj2beTBxhfi9YsId05dbIIq
+	zd6Pm98tzKa8q3ARBqEGxnyRXBL1VmS+ZlnL0eqNHg0BNmzUmFBydLiILV8hwja1R7P8Jd8hQ7D
+	Wsu6XKg1po9RYOMOI6YDoiE8u+iVMqg57PP2qlfdqriubtw3EJDnx6jUI5CE1YJe9r2Cs4i9s6R
+	mq45Yk9CPH2zv+X0qmOX8e6we7NB0Pg874Zj8XdnhEjOln7yDQ+Gmk8M5oum1h8C6Iisp0qtm/G
+	3bxdqubUw8OFojQ8bXkDXzaDag7OHVo9uOlXlA20TX30ES/nSaeN2nHM56cKhKOrc0sU
+X-Google-Smtp-Source: AGHT+IF766cTCGwFKEZHWsswlDSDKT1RToNjeXyxwP6EgIpO0N6oxnHf/vMzEjOS7XWnn97ukOxtuw==
+X-Received: by 2002:a05:6602:3805:b0:867:8ef:69e8 with SMTP id ca18e2360f4ac-875bc42334cmr354553739f.3.1749637955841;
+        Wed, 11 Jun 2025 03:32:35 -0700 (PDT)
+Received: from [172.17.0.2] ([40.78.129.163])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-875bc5b0998sm34699039f.11.2025.06.11.03.32.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 03:32:35 -0700 (PDT)
+Message-ID: <68495b43.050a0220.327805.0761@mx.google.com>
+Date: Wed, 11 Jun 2025 03:32:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4208397450546098793=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
+Subject: RE: [BlueZ,bluez] BASS: support for encrypted broadcast source
+In-Reply-To: <20250611-bass_for_encrypted_broadcast_source-v1-1-69b8b156488c@amlogic.com>
+References: <20250611-bass_for_encrypted_broadcast_source-v1-1-69b8b156488c@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This code (tty_get -> vhangup -> tty_put) is repeated on few places.
-Introduce a helper similar to tty_port_tty_hangup() (asynchronous) to
-handle even vhangup (synchronous).
+--===============4208397450546098793==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-And use it on those places.
+This is automated email and please do not reply to this email!
 
-In fact, reuse the tty_port_tty_hangup()'s code and call tty_vhangup()
-depending on a new bool parameter.
+Dear submitter,
 
-Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-Cc: Karsten Keil <isdn@linux-pingi.de>
-Cc: David Lin <dtwlin@gmail.com>
-Cc: Johan Hovold <johan@kernel.org>
-Cc: Alex Elder <elder@kernel.org>
-Cc: Oliver Neukum <oneukum@suse.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=970719
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.25 seconds
+GitLint                       PENDING   0.29 seconds
+BuildEll                      PASS      20.15 seconds
+BluezMake                     PASS      2890.44 seconds
+MakeCheck                     PASS      20.50 seconds
+MakeDistcheck                 PASS      200.93 seconds
+CheckValgrind                 PASS      278.59 seconds
+CheckSmatch                   PASS      307.60 seconds
+bluezmakeextell               PASS      129.13 seconds
+IncrementalBuild              PENDING   0.25 seconds
+ScanBuild                     PASS      927.82 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
-Cc: netdev@vger.kernel.org
-Cc: greybus-dev@lists.linaro.org
-Cc: linux-staging@lists.linux.dev
-Cc: linux-usb@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
----
- drivers/isdn/capi/capi.c         |  8 +-------
- drivers/staging/greybus/uart.c   |  7 +------
- drivers/tty/serial/serial_core.c |  7 +------
- drivers/tty/tty_port.c           | 12 ++++++++----
- drivers/usb/class/cdc-acm.c      |  7 +------
- drivers/usb/serial/usb-serial.c  |  7 +------
- include/linux/tty_port.h         | 12 +++++++++++-
- net/bluetooth/rfcomm/tty.c       |  7 +------
- 8 files changed, 25 insertions(+), 42 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
-index 70dee9ad4bae..78e6e7748fb9 100644
---- a/drivers/isdn/capi/capi.c
-+++ b/drivers/isdn/capi/capi.c
-@@ -306,15 +306,9 @@ static void capincci_alloc_minor(struct capidev *cdev, struct capincci *np)
- static void capincci_free_minor(struct capincci *np)
- {
- 	struct capiminor *mp = np->minorp;
--	struct tty_struct *tty;
- 
- 	if (mp) {
--		tty = tty_port_tty_get(&mp->port);
--		if (tty) {
--			tty_vhangup(tty);
--			tty_kref_put(tty);
--		}
--
-+		tty_port_tty_vhangup(&mp->port);
- 		capiminor_free(mp);
- 	}
- }
-diff --git a/drivers/staging/greybus/uart.c b/drivers/staging/greybus/uart.c
-index 308ed1ca9947..10df5c37c83e 100644
---- a/drivers/staging/greybus/uart.c
-+++ b/drivers/staging/greybus/uart.c
-@@ -916,7 +916,6 @@ static void gb_uart_remove(struct gbphy_device *gbphy_dev)
- {
- 	struct gb_tty *gb_tty = gb_gbphy_get_data(gbphy_dev);
- 	struct gb_connection *connection = gb_tty->connection;
--	struct tty_struct *tty;
- 	int ret;
- 
- 	ret = gbphy_runtime_get_sync(gbphy_dev);
-@@ -929,11 +928,7 @@ static void gb_uart_remove(struct gbphy_device *gbphy_dev)
- 	wake_up_all(&gb_tty->wioctl);
- 	mutex_unlock(&gb_tty->mutex);
- 
--	tty = tty_port_tty_get(&gb_tty->port);
--	if (tty) {
--		tty_vhangup(tty);
--		tty_kref_put(tty);
--	}
-+	tty_port_tty_vhangup(&gb_tty->port);
- 
- 	gb_connection_disable_rx(connection);
- 	tty_unregister_device(gb_tty_driver, gb_tty->minor);
-diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
-index 1f7708a91fc6..d6485714eb0f 100644
---- a/drivers/tty/serial/serial_core.c
-+++ b/drivers/tty/serial/serial_core.c
-@@ -3209,7 +3209,6 @@ static void serial_core_remove_one_port(struct uart_driver *drv,
- 	struct uart_state *state = drv->state + uport->line;
- 	struct tty_port *port = &state->port;
- 	struct uart_port *uart_port;
--	struct tty_struct *tty;
- 
- 	mutex_lock(&port->mutex);
- 	uart_port = uart_port_check(state);
-@@ -3228,11 +3227,7 @@ static void serial_core_remove_one_port(struct uart_driver *drv,
- 	 */
- 	tty_port_unregister_device(port, drv->tty_driver, uport->line);
- 
--	tty = tty_port_tty_get(port);
--	if (tty) {
--		tty_vhangup(port->tty);
--		tty_kref_put(tty);
--	}
-+	tty_port_tty_vhangup(port);
- 
- 	/*
- 	 * If the port is used as a console, unregister it
-diff --git a/drivers/tty/tty_port.c b/drivers/tty/tty_port.c
-index 4af1fbf73f51..903eebdbe12d 100644
---- a/drivers/tty/tty_port.c
-+++ b/drivers/tty/tty_port.c
-@@ -396,15 +396,19 @@ EXPORT_SYMBOL(tty_port_hangup);
-  * @port: tty port
-  * @check_clocal: hang only ttys with %CLOCAL unset?
-  */
--void tty_port_tty_hangup(struct tty_port *port, bool check_clocal)
-+void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, bool async)
- {
- 	struct tty_struct *tty = tty_port_tty_get(port);
- 
--	if (tty && (!check_clocal || !C_CLOCAL(tty)))
--		tty_hangup(tty);
-+	if (tty && (!check_clocal || !C_CLOCAL(tty))) {
-+		if (async)
-+			tty_hangup(tty);
-+		else
-+			tty_vhangup(tty);
-+	}
- 	tty_kref_put(tty);
- }
--EXPORT_SYMBOL_GPL(tty_port_tty_hangup);
-+EXPORT_SYMBOL_GPL(__tty_port_tty_hangup);
- 
- /**
-  * tty_port_tty_wakeup - helper to wake up a tty
-diff --git a/drivers/usb/class/cdc-acm.c b/drivers/usb/class/cdc-acm.c
-index c2ecfa3c8349..f9171fbedf5c 100644
---- a/drivers/usb/class/cdc-acm.c
-+++ b/drivers/usb/class/cdc-acm.c
-@@ -1571,7 +1571,6 @@ static int acm_probe(struct usb_interface *intf,
- static void acm_disconnect(struct usb_interface *intf)
- {
- 	struct acm *acm = usb_get_intfdata(intf);
--	struct tty_struct *tty;
- 	int i;
- 
- 	/* sibling interface is already cleaning up */
-@@ -1598,11 +1597,7 @@ static void acm_disconnect(struct usb_interface *intf)
- 	usb_set_intfdata(acm->data, NULL);
- 	mutex_unlock(&acm->mutex);
- 
--	tty = tty_port_tty_get(&acm->port);
--	if (tty) {
--		tty_vhangup(tty);
--		tty_kref_put(tty);
--	}
-+	tty_port_tty_vhangup(&acm->port);
- 
- 	cancel_delayed_work_sync(&acm->dwork);
- 
-diff --git a/drivers/usb/serial/usb-serial.c b/drivers/usb/serial/usb-serial.c
-index 7266558d823a..c78ff40b1e5f 100644
---- a/drivers/usb/serial/usb-serial.c
-+++ b/drivers/usb/serial/usb-serial.c
-@@ -1176,7 +1176,6 @@ static void usb_serial_disconnect(struct usb_interface *interface)
- 	struct usb_serial *serial = usb_get_intfdata(interface);
- 	struct device *dev = &interface->dev;
- 	struct usb_serial_port *port;
--	struct tty_struct *tty;
- 
- 	/* sibling interface is cleaning up */
- 	if (!serial)
-@@ -1191,11 +1190,7 @@ static void usb_serial_disconnect(struct usb_interface *interface)
- 
- 	for (i = 0; i < serial->num_ports; ++i) {
- 		port = serial->port[i];
--		tty = tty_port_tty_get(&port->port);
--		if (tty) {
--			tty_vhangup(tty);
--			tty_kref_put(tty);
--		}
-+		tty_port_tty_vhangup(&port->port);
- 		usb_serial_port_poison_urbs(port);
- 		wake_up_interruptible(&port->port.delta_msr_wait);
- 		cancel_work_sync(&port->work);
-diff --git a/include/linux/tty_port.h b/include/linux/tty_port.h
-index 08f89a598366..021f9a8415c0 100644
---- a/include/linux/tty_port.h
-+++ b/include/linux/tty_port.h
-@@ -232,7 +232,7 @@ bool tty_port_carrier_raised(struct tty_port *port);
- void tty_port_raise_dtr_rts(struct tty_port *port);
- void tty_port_lower_dtr_rts(struct tty_port *port);
- void tty_port_hangup(struct tty_port *port);
--void tty_port_tty_hangup(struct tty_port *port, bool check_clocal);
-+void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, bool async);
- void tty_port_tty_wakeup(struct tty_port *port);
- int tty_port_block_til_ready(struct tty_port *port, struct tty_struct *tty,
- 		struct file *filp);
-@@ -251,4 +251,14 @@ static inline int tty_port_users(struct tty_port *port)
- 	return port->count + port->blocked_open;
- }
- 
-+static inline void tty_port_tty_hangup(struct tty_port *port, bool check_clocal)
-+{
-+	__tty_port_tty_hangup(port, check_clocal, true);
-+}
-+
-+static inline void tty_port_tty_vhangup(struct tty_port *port)
-+{
-+	__tty_port_tty_hangup(port, false, false);
-+}
-+
- #endif
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 21a5b5535ebc..827dfbe66085 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -438,7 +438,6 @@ static int __rfcomm_release_dev(void __user *arg)
- {
- 	struct rfcomm_dev_req req;
- 	struct rfcomm_dev *dev;
--	struct tty_struct *tty;
- 
- 	if (copy_from_user(&req, arg, sizeof(req)))
- 		return -EFAULT;
-@@ -464,11 +463,7 @@ static int __rfcomm_release_dev(void __user *arg)
- 		rfcomm_dlc_close(dev->dlc, 0);
- 
- 	/* Shut down TTY synchronously before freeing rfcomm_dev */
--	tty = tty_port_tty_get(&dev->port);
--	if (tty) {
--		tty_vhangup(tty);
--		tty_kref_put(tty);
--	}
-+	tty_port_tty_vhangup(&dev->port);
- 
- 	if (!test_bit(RFCOMM_TTY_OWNED, &dev->status))
- 		tty_port_put(&dev->port);
--- 
-2.49.0
 
+--===============4208397450546098793==--
