@@ -1,231 +1,150 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB1128C2AF
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 14:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FF22836B5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 14:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749653109; cv=none; b=XY1dpYyKVTRNSpt8Z8oQkEyetJ9ggSJYZIWM+mRIBf6EmiAgFkMV+dggD/Ii5t7lcF5cPhpVloHsuAZmhR/AjQNZyfvwmpyW5AjIMD1cuumLUap+2FUtJsws5DlL7WJjpM6HYC9HCruTYKlSQwj7TVuS/cAUFZ379xlkgyy7RQs=
+	t=1749653160; cv=none; b=Zy4WP3JwfkA6BY4E5FNVcx46VRpX8e6T4T1BgFx9vAHI07uO/KMj4OeYYpH8EBYm0PdhhitD9IlYRiRkgXRVAnGoiFq1VJ0EhgCP+3D1ffwasuIn/JmMGLpkfU0+N6syV8rnsn2dWU1XZ5/sf/Gcr5Z0QULutICYGhst48yzqaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749653109; c=relaxed/simple;
-	bh=oqmgWKfWRGHXpk1muxCjroF94TOqNOoX5+nZRYn6mH0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kpm86gPC9a/oIJA2EMN7oHqr3mYGht3i3sMtcF5+MMFxNWPrptVXFQ+U7OJBQ7V7U5aWOjNPzFyi0hFz/HywJ6rvELP8um0S3el4b7DIsY8QtpE0jpjSSFg54rFUScUNkS/J+yObjHdIVBgmjgyfWVubWou3mD7YfudjWgm7+D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BQTQ5WGC; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749653160; c=relaxed/simple;
+	bh=yVgBsb4oWonjeIQHDXpIg+T6xdpiQs/5NSvAsFpmyEk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HaSWEtvTGctpTIpfK4TGzqxf2xBf36FEni4gq5I3gOPqZrQZZIW9pW1vBuWTVex3UY3L7za0EAyUjQnzterM5fW3s6YKvu6MG3MjEornVG3ReJFZxeWEYADCCp6O0SSSyonT/20bISCgisi7C3QpyhW7VK/zsUYpaQ91Wnrlfuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DPqyz5A0; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQTQ5WGC"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-553246e975fso7892796e87.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 07:45:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749653105; x=1750257905; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y5Dj2Tp0zkv/0JPV6iSdx+JQ2yNfo4mLZ2r8Ck2I9DY=;
-        b=BQTQ5WGC+NY0V2Fjd5tj0ZocDuF9llWwbk/mtUVSUYlB0JrxoBRXjF2Jwf6kVHThw2
-         XgyEHJ85lQ2Zx6ghFmA5/h9YIICGcxAhk5rBjrYofZzB5nPS5L7xJa5XQQuCgMx0TWY9
-         s/wpf4jVUdp+yiuo6c6Qb6hEF+7VgBj7uMbK+gGuq5vyO7rdj4D4CtlO66ZG58ch0/in
-         NkUR5SCDiMWGYxq9/2lYuGj9jDw/GTbxrDMu3swUADXGoWFLHhW3tGAUp1fe+YBtmWhT
-         nSyxLA63MGNlmKOC2YQMUePR7cSQZKRqnhB2YrWJrYRF+N/QsiMSH7aOCZczSZdsnZxi
-         XGLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749653105; x=1750257905;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y5Dj2Tp0zkv/0JPV6iSdx+JQ2yNfo4mLZ2r8Ck2I9DY=;
-        b=jlS28OcY+xXI4R23NaU4L7N+8zZCqUFRWlKRO/pGqG+CwnDh/Y+mgX8T9XyxMgbSu5
-         l9wRbjreeOoFfgfBoPsGK5im8d+0IlwuiXmYvXLeWqM6sbjksVIj9XMhKupOV+sAkN+A
-         NhR+I/ZcHJmtJytF4xVoj2x9hz01IbpW4xGezGNbx8Ep/6De7nAkp8vQsPRL8XceNjeY
-         Mljc3JpTe57J4Ve/hom4tXnWxTdQu4woFqIISSU5H+0VLix20tLpadpbkAURAsrR1KUS
-         /fDHD4AoM6hPDrbKgUzTPV7mZmoUZ9EVxGwW4UXSzEgHEGREYj7s4ATn9QkMnTi5DKkx
-         XIAQ==
-X-Gm-Message-State: AOJu0Ywv95mSbjQuzQPvqcmzQuLoAwpbIdUc/9QmU6xDL3hZyp8PUqK0
-	IXixLVoSTic0vokUEm/Jpzt3oS1kA3cYHkkMEuB2wGudbajggsRouxijcYCVfu451JEDRuAUrHr
-	VaudU3wUrGSmJ4sDpayrAEaOeBoB35SMo1Bu8CfGGkw==
-X-Gm-Gg: ASbGncvHKoF6JN7ntfwCSTyJOxHW2887hMzeyvAJ9pl3n265AnxKziks53459q2dKhD
-	4qQEsJygS27KprI7qbm8qS7OZpAMT3ty+kKeh7tpOEGuW0fRHxm2LR9w3Gf9Ha10q/3juxGLM6D
-	Qrk+aYoDxXXZz5OJjGKQuDEKssQjxQl5lJYX9AijmmDQ==
-X-Google-Smtp-Source: AGHT+IFFEppoMMLBW0tgCa5Yag8LxsvIibQK8zO4b7RSO056HquF9cUSR53mNJdGVDhwg9yGVbb+rO4OlZPEI9soC6o=
-X-Received: by 2002:a2e:be9a:0:b0:32a:5e74:5726 with SMTP id
- 38308e7fff4ca-32b224235f8mr10579081fa.38.1749653094053; Wed, 11 Jun 2025
- 07:44:54 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DPqyz5A0"
+Received: from github.com (hubbernetes-node-c7e061a.ac4-iad.github.net [10.52.164.26])
+	by smtp.github.com (Postfix) with ESMTPA id 7D631700703
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 07:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1749653157;
+	bh=agGw3BED/5C52e0HEY3qcocYR1SqPYhY+f/WgPh7bUg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=DPqyz5A0aBfJCKQRlZRzuNC9VJmpZiVcX46Lo2bjEdC+iflB9URl6dqwWxLAlwd5A
+	 1erjhfhL1rCfIeHoRhgft7qF9Qs7r86oLgaHpHk3G0zzXKq11MbVIxGbr8hNZSrfCP
+	 cd3pQIS6s8LCJxuMZBYtpI8WLPHjlJNj4glsnyrA=
+Date: Wed, 11 Jun 2025 07:45:57 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/95b72b-aea0f4@github.com>
+Subject: [bluez/bluez] b7dfcc: doc: sco.rst: BT_PHY is read-only
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250611080044.26730-1-adrian-constantin.dudau@nxp.com> <20250611080044.26730-2-adrian-constantin.dudau@nxp.com>
-In-Reply-To: <20250611080044.26730-2-adrian-constantin.dudau@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 11 Jun 2025 10:44:41 -0400
-X-Gm-Features: AX0GCFt09RgaCb0QHF2qId6-mIyoi6mpn9eDfC8662l6wNZk8nlrage2XP9VaAI
-Message-ID: <CABBYNZL9kX1owOk6PJ3NGjueJBJLKGShzrFZ6KK2mjhQw0MzAg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] tools: Expose the raw advertising data available on
- D-bus to PTS tester
-To: Adrian Dudau <adrian-constantin.dudau@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	andrei.istodorescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Adrian,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: b7dfccf0e52aa4628a731dd555f038d18ddd42fe
+      https://github.com/bluez/bluez/commit/b7dfccf0e52aa4628a731dd555f03=
+8d18ddd42fe
+  Author: ValdikSS <iam@valdikss.org.ru>
+  Date:   2025-06-11 (Wed, 11 Jun 2025)
 
-On Wed, Jun 11, 2025 at 4:01=E2=80=AFAM Adrian Dudau
-<adrian-constantin.dudau@nxp.com> wrote:
->
-> This patch extracts the AdvertisingData property exposed by
-> bluetoothd on D-Bus. It will iterate the variable message structure
-> and will construct the eir buffer in the format described in
-> BLUETOOTH CORE SPECIFICATION Version 6.1 | Vol 3, Part C.
->
-> Signed-off-by: Adrian Dudau <adrian-constantin.dudau@nxp.com>
-> ---
->  tools/btpclient.c | 80 ++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 76 insertions(+), 4 deletions(-)
->
-> diff --git a/tools/btpclient.c b/tools/btpclient.c
-> index 055270edb51b..f80b4532a248 100644
-> --- a/tools/btpclient.c
-> +++ b/tools/btpclient.c
-> @@ -2510,12 +2510,23 @@ static void btp_gap_device_found_ev(struct l_dbus=
-_proxy *proxy)
->  {
->         struct btp_device *device =3D find_device_by_proxy(proxy);
->         struct btp_adapter *adapter =3D find_adapter_by_device(device);
-> +       struct l_dbus_message_iter dict_iter;
-> +       struct l_dbus_message_iter variant_iter;
-> +       struct l_dbus_message_iter array_iter;
-> +       struct btp_device_found_ev *p_ev =3D NULL;
-> +       struct btp_device_found_ev *p_ev_temp =3D NULL;
->         struct btp_device_found_ev ev;
->         struct btp_gap_device_connected_ev ev_conn;
->         const char *str, *addr_str;
->         int16_t rssi;
->         uint8_t address_type;
->         bool connected;
-> +       uint8_t key =3D 0U; /* AD Type will be stored here */
-> +       uint8_t *data =3D NULL; /* AD Data will be stored here */
-> +       uint32_t len =3D 0U; /* Length of the AD Data buffer */
-> +       uint32_t eir_couter =3D 0U; /* Byte count of AD Type, AD Length, =
-AD Data */
-> +
-> +       ev.eir_len =3D  0U;
->
->         if (!l_dbus_proxy_get_property(proxy, "Address", "s", &addr_str) =
-||
->                                         str2ba(addr_str, &ev.address) < 0=
-)
-> @@ -2538,11 +2549,72 @@ static void btp_gap_device_found_ev(struct l_dbus=
-_proxy *proxy)
->                                         BTP_EV_GAP_DEVICE_FOUND_FLAG_AD |
->                                         BTP_EV_GAP_DEVICE_FOUND_FLAG_SR);
->
-> -       /* TODO Add eir to device found event */
-> -       ev.eir_len =3D 0;
-> +       /* dict_iter will contain the variant for AdvertisingData */
-> +       if (l_dbus_proxy_get_property(proxy, "AdvertisingData", "a{yv}", =
-&dict_iter)) {
-> +               /* key will contain the AD Type, variant_iter will contai=
-n the variant
-> +                * for the current elem
-> +                */
-> +               while (l_dbus_message_iter_next_entry(&dict_iter, &key, &=
-variant_iter)) {
-> +                       /* Unpack the variant to get the byte array */
-> +                       if (!l_dbus_message_iter_get_variant(&variant_ite=
-r, "ay", &array_iter))
-> +                               continue;
-> +
-> +                       /* data contains AD Data, len is the length exclu=
-ding the AD Type*/
-> +                       if (!l_dbus_message_iter_get_fixed_array(&array_i=
-ter, &data, &len))
-> +                               continue;
-> +
-> +                       if (len <=3D 0U)
-> +                               continue;
->
-> -       btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_FOUND, adapter->=
-index,
-> -                                               sizeof(ev) + ev.eir_len, =
-&ev);
-> +                       p_ev_temp =3D p_ev;
-> +
-> +                       /* Allocate new buffer, recalculated to sustain n=
-ew data
-> +                        * eir_counter length from previous data,
-> +                        * len is size for new data,
-> +                        * 2U (1Byte AD Type, 1Byte AD Length)
-> +                        */
-> +                       p_ev =3D (struct btp_device_found_ev *)
-> +                                       malloc(sizeof(struct btp_device_f=
-ound_ev) +
-> +                                       eir_couter + len + 2U);
-> +
-> +                       if (!p_ev) {
-> +                               p_ev =3D p_ev_temp;
-> +                               break;
-> +                       }
-> +
-> +                       /* There is AD data elemets to be moved after res=
-ize */
-> +                       if (p_ev_temp && eir_couter !=3D 0U) {
-> +                               memcpy(p_ev, p_ev_temp,
-> +                                       sizeof(struct btp_device_found_ev=
-) + eir_couter);
-> +                               free(p_ev_temp);
-> +                       } else {
-> +                               memcpy(p_ev, &ev, sizeof(struct btp_devic=
-e_found_ev));
-> +                       }
-> +
-> +                       /* Populate buffer with length */
-> +                       p_ev->eir[eir_couter++] =3D len + 1U;
-> +                       /* Populate buffer with AD Type */
-> +                       p_ev->eir[eir_couter++] =3D key;
-> +
-> +                       /* Move the data in the p_ev->eir that will be se=
-nt via btp */
-> +                       for (uint32_t i =3D 0U; i < len; i++)
-> +                               p_ev->eir[eir_couter + i] =3D data[i];
-> +
-> +                       eir_couter +=3D len;
-> +               }
-> +       }
-> +
-> +       if (p_ev) {
-> +               p_ev->eir_len =3D eir_couter;
-> +
-> +               btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_FOUND, a=
-dapter->index,
-> +                sizeof(struct btp_device_found_ev) + eir_couter, p_ev);
-> +
-> +               free(p_ev);
-> +       } else {
-> +               btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_FOUND, a=
-dapter->index,
-> +                sizeof(ev) + ev.eir_len, &ev);
-> +       }
->
->         if (l_dbus_proxy_get_property(proxy, "Connected", "b", &connected=
-) &&
->                                                                 connected=
-) {
-> --
-> 2.45.2
+  Changed paths:
+    M doc/sco.rst
 
-There is quite a lot of lines going over 80 columns:
+  Log Message:
+  -----------
+  doc: sco.rst: BT_PHY is read-only
 
-https://github.com/bluez/bluez/actions/runs/15579687793/job/43871802897?pr=
-=3D1336
+The kernel is missing BT_PHY setsockopt support, as of 6.16-rc1.
 
-Also notice the usage of sizeof(type) rather than just use sizeof(var)
-which normally is a lot shorter and may help staying within 80
-columns.
 
---=20
-Luiz Augusto von Dentz
+  Commit: 883c1c11c6448e7f0ca04e523a5ac2030d7f161c
+      https://github.com/bluez/bluez/commit/883c1c11c6448e7f0ca04e523a5ac=
+2030d7f161c
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-06-11 (Wed, 11 Jun 2025)
+
+  Changed paths:
+    M obexd/client/pbap.c
+    M obexd/plugins/bluetooth.c
+    M obexd/src/logind.c
+    M obexd/src/logind.h
+
+  Log Message:
+  -----------
+  obexd: Pass at_(un)register value to logind callbacks
+
+Logind (un)registers callbacks that it calls when the user's state change=
+s.
+Callbacks may also be called during (un)registration.
+Clients may need to handle those initial/final calls specially.
+
+Pass an argument indicating whether this is being called during
+(un)registration, and modify existing callbacks to ignore that argument.
+
+
+  Commit: df0036d9e41fc4bb0fe8839b7833bac16359396b
+      https://github.com/bluez/bluez/commit/df0036d9e41fc4bb0fe8839b7833b=
+ac16359396b
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-06-11 (Wed, 11 Jun 2025)
+
+  Changed paths:
+    M obexd/client/pbap.c
+
+  Log Message:
+  -----------
+  pbap: use the public DBus connection
+
+PBAP must not use its own private DBus connection, as it needs to
+receive messages sent to the bus name of the public connection.
+
+PBAP must not unregister itself when the program is exiting, as it might
+cause a long delay.  Unregistering at exit is redundant anyway, as the
+service will be implicitly unregistered when the connection is closed.
+
+But PBAP must unregister itself when the user becomes inactive mid-sessio=
+n,
+so systems with multiple users logged in at once can share bluetooth.
+
+Use the public DBus connection instead of a private one,
+and explicitly unregister the profile if appropriate.
+
+Thanks Pauli Virtanen for pointing out the exit issue:
+https://lore.kernel.org/linux-bluetooth/ae15a9fa4bf0bd509dd3d44f1f364e241=
+e50956c.camel@iki.fi/
+
+Reported-by: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+Closes: https://lore.kernel.org/linux-bluetooth/333ad76e-0aba-4f93-b141-8=
+e69fb47535f@collabora.com/
+Suggested-by: Pauli Virtanen <pav@iki.fi>
+
+
+  Commit: aea0f46f173f85a71908452b0c6ed16f647f6117
+      https://github.com/bluez/bluez/commit/aea0f46f173f85a71908452b0c6ed=
+16f647f6117
+  Author: Andrew Sayers <kernel.org@pileofstuff.org>
+  Date:   2025-06-11 (Wed, 11 Jun 2025)
+
+  Changed paths:
+    M obexd/src/main.c
+    M obexd/src/obexd.h
+
+  Log Message:
+  -----------
+  Revert "obexd: Support creating private system/session bus connections"=
+
+
+This reverts commit 237d818ef294e22be87fba69b3cdd79c75c201e7,
+which encouraged the use of private DBus connections.
+Doing so caused a bug, so it's better to remove the temptation for now
+and re-add it if a legitimate use case is ever found.
+
+
+Compare: https://github.com/bluez/bluez/compare/95b72bbf1fe4...aea0f46f17=
+3f
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
