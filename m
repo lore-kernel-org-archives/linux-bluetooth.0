@@ -1,121 +1,126 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8B4186A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 09:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28FA2690F9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 09:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749633154; cv=none; b=A+tPADeldkKeB3LA8qYZg+/hxbUv3llDH3vgG2JYe4XIPY92GgIwYFnoXoqD5KiiW8lrENqUyN1hgv3/jWsgFVnEBwdbtuHKAPjUAccRc/Ds3bmajI9GsuT331zd/CkLzXcZJTXM8B8UIVrs5qKT+aJZV+mnf3XwXgNUa3/OyrQ=
+	t=1749634431; cv=none; b=VwFyY0KnVVeJzGlqpRMyKJC9s0IxEnduM1/gQEn8FLuojSbiRD4LVanawflkjflviwFeKlKQe45CU4w/WzfdV35OoSuHFaUGhxedOHWuPh3E1Dyy3756HT+JI+uWrZGt4YV+qLjf5EUQjIt9v25AAFtGYkscfdF+QkccGmQ0ztQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749633154; c=relaxed/simple;
-	bh=9myNqtUeKOxnmsjdKWxUJ3C54U47XRa3YPEvOoLPB1s=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=FGeDHvHy9tmoUUFg8oWdVuOwP1EoPoVu0+QFnlSHA0Lw72nHd1454jnhWPuj9vWAzecln74xXCPnAZsCioi9DDA+1hwpTk582sRfxtuzAk1xwf+KFv9eBaI1ujvo0/j0kT6lH8GaDcx3G4vj3syyyOf2CxQpRzYfJCyq4TEa7GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=l354mEWn; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1749634431; c=relaxed/simple;
+	bh=o7/Qkj9xaJ/2kU8rcKIRBvL4tiOn4BCONFHeK6jl6VM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LogtMX9tFDIqZmTle83EQj4hZrnwEKjxfCR8yJjWdCPQ8iNiOPpIibIXbtLV5JgaOacBJCs5HCtCXmufqiEgPG988991W7qB7uOTGjGRRwrgHDqTl4yYEEBW/gKH2AjNTrF/4e++xStHRnySDmNbqvyQEGreqcFe48NkTqcD5/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KdXhTrUv; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="l354mEWn"
-Received: from github.com (hubbernetes-node-407bfdf.ash1-iad.github.net [10.56.225.23])
-	by smtp.github.com (Postfix) with ESMTPA id C236E9211D6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 02:12:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749633150;
-	bh=iGguUqkJqQ6x4YyoOPATKY23Is+hjg1ifLkNzyqi7o4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=l354mEWnw8HbqQkeqH9Xlfj/27oRJRVXFJtq6k8aQNqF1lwyV9ju0MDdeqiGbBvtB
-	 8j+Z0Ia4yKJaBFXEtYI1e6IfX0mYZ2IR8SszIDIPyo933KiAhi77qwviQgCW89nROb
-	 ftyo1/YgOIAyl40BBQo15JlFmRiMWQNDIo/+v/sE=
-Date: Wed, 11 Jun 2025 02:12:30 -0700
-From: "github-actions[bot]" <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/970719/000000-4f1054@github.com>
-Subject: [bluez/bluez] 4f1054: BASS: support for encrypted broadcast source
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdXhTrUv"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6facf4d8ea8so67143586d6.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 02:33:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749634428; x=1750239228; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yUnhPHl/eIeNInHL3tcC4zdtvdwdtz3mCDOEVEd/vPs=;
+        b=KdXhTrUvHNKm7nCKl/YI8cIyd5Dypcxdot4vEU+U4AwNcOJjSER6URcApKglNFu1S1
+         g2BGUUrLjs1og/uw7ZH/kzun0dQzp5Tzh9rZn4Htjqrr3J2vXq5OMZadcZM9Sck9yEuB
+         NoI8zx0zgnTMOjgbAzot34Om6peRlvS6/+P6BBI6bKCrDOTjoSXJ8FJBG4PtPECEnZZq
+         4/4Il7nQ444k+XFOBYsn6IaA93OvEHvy7+X9W8SQe3upgm0fDNZ/qjZrcgRr74+kADPr
+         PZWtNhz1TpkEvlxp5mnptm+qneQUzZow9RF771VVeAhSokisMLEJOrhjZFa6bAKP1Gta
+         yZNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749634428; x=1750239228;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yUnhPHl/eIeNInHL3tcC4zdtvdwdtz3mCDOEVEd/vPs=;
+        b=s8d0mPx08GngMVCzs52G3Q/4AnOaNMkfm9qdyLq7D1XYcOTNsoMnfPE1aN1IiKKrAf
+         6ffijd2GwxoZ5rKIF/D5hwGP7dn27kBvBE2aZNs4PacpUZt+uAsEIH+HPdO88PGHZ1/v
+         DlzqeO825k4v8uCO4XKFt6Zg11oF7xeK85bLMNrk4NyCCP/Pb8M7j18dBqd3fBvhWHfq
+         WdVdNfig3OMPQB8QWORGleeeG/JcjCqjBMcELXjjpJCfEt6qsvD05aVvmhqxgAgx91/6
+         puocRHOXLBcalmyRPcWbED/Ca6vEe02VgFZALZDcTDbLSrNPFBJXMLO7l9CUyI2m71qQ
+         aXDA==
+X-Gm-Message-State: AOJu0YwDsEPVfc38CjW43+qmdVli9ocJfPjAgga0m2AtK6R2BNQMAOVn
+	5e7ai/55001g3/Z8Yv9PPjclzJWPYNIOqYnYMFgWmgzYNPN0FKSyVesEzPSkvw==
+X-Gm-Gg: ASbGnctMRttGcWVBggbrP+AnXV8X5wB6KsJdH4KE2vxKyo8OU6DAUnkd2fGFWZc4Ztj
+	g7QAVyvhR8DsNgtQvrRxDqmps+HNvCKa0QoLMKggTJE/YzlXUQGXz2LvlOAfTK3/gM9lmHkiJiH
+	Eoyzed5MlBRDPttbbrxFk3A9OgNoJN2KEIojrWcLV2FOBpkwNLj8r0yi2ka9pmHeyCUpPkozSIq
+	E6JfewPjwVA4t55xZkgdQAFDCsJNtVvXh2vGJhIBC3MqEM9Xv3fLMKo+yRrTKitn56Gi48GmGuJ
+	CuC8JGw3IHyiHnlenMJMGtat4Y0dqyhaQ4BASaBMUGMQdp87ReH1KUqzQoi5OmtQyO8hRwa3obR
+	HKg==
+X-Google-Smtp-Source: AGHT+IFJV3yTX2eVW2aTo6YrpPxQDL/pbxwqx7P4qWWZHXJ2MfMcNpOnzWxo+IpDQeAxyTX5cIRuHQ==
+X-Received: by 2002:a05:6214:62d:b0:6fa:acc1:f077 with SMTP id 6a1803df08f44-6fb2c37278cmr41015226d6.35.1749634428105;
+        Wed, 11 Jun 2025 02:33:48 -0700 (PDT)
+Received: from [172.17.0.2] ([52.167.218.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fb09b1cbb7sm79633706d6.57.2025.06.11.02.33.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 02:33:47 -0700 (PDT)
+Message-ID: <68494d7b.d40a0220.b76fd.128d@mx.google.com>
+Date: Wed, 11 Jun 2025 02:33:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0878765098380604971=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, adrian-constantin.dudau@nxp.com
+Subject: RE: tools: Expose the raw advertising data available on D-bus to PTS tester
+In-Reply-To: <20250611080044.26730-2-adrian-constantin.dudau@nxp.com>
+References: <20250611080044.26730-2-adrian-constantin.dudau@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0878765098380604971==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/970719
-  Home:   https://github.com/bluez/bluez
-  Commit: 4f105421ced5afad0fdb188cbe08ba902be70010
-      https://github.com/bluez/bluez/commit/4f105421ced5afad0fdb188cbe08ba902be70010
-  Author: Yang Li <yang.li@amlogic.com>
-  Date:   2025-06-11 (Wed, 11 Jun 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/bass.c
-    M src/shared/bass.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  BASS: support for encrypted broadcast source
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=970691
 
-If the BIS is encrypted as indicated in the BIG Info Report, the
-broadcast code needs to be requested from the Assistant.
+---Test result---
 
-step 1: Broadcast_Code required
-  > HCI Event: LE Meta Event (0x3e) plen 20                 #631 [hci0] 27.176606
-        LE Broadcast Isochronous Group Info Advertising Report (0x22)
-          Sync Handle: 0x0000
-          Number BIS: 2
-          NSE: 8
-          ISO Interval: 20.00 msec (0x0010)
-          BN: 2
-          PTO: 2
-          IRC: 2
-          Maximum PDU: 60
-          SDU Interval: 10000 us (0x002710)
-          Maximum SDU: 60
-          PHY: LE 2M (0x02)
-          Framing: Unframed (0x00)
-          Encryption: 0x01
-  < ACL Data TX: Handle 16 flags 0x00 dlen 44               #633 [hci0] 27.184478
-        ATT: Handle Value Notification (0x1b) len 39
-          Handle: 0x005f Type: Broadcast Receive State (0x2bc8)
-            Data[37]: 01016698a411bb13019f103b02010100000000110d03506978656c20395f32303938020502
-            Source_ID: 1
-            Source_Address_Type: 1
-            Source_Address: 13:BB:11:A4:98:66
-            Source_Adv_SID: 1
-            Broadcast_ID: 0x3b109f
-            PA_Sync_State: Synchronized to PA
-            BIG_Encryption: Broadcast_Code required
-            Num_Subgroups: 1
-            Subgroup #0:
-              BIS_Sync State: 0x00000000
-              Metadata: #0: len 0x0d type 0x03
-              Metadata:   50 69 78 65 6c 20 39 5f 32 30 39 38              Pixel 9_2098
-              Metadata: #1: len 0x02 type 0x05
-              Metadata:   02
-  > ACL Data RX: Handle 16 flags 0x02 dlen 25               #636 [hci0] 27.455744
-        ATT: Write Command (0x52) len 20
-          Handle: 0x0065 Type: Broadcast Audio Scan Control Point (0x2bc7)
-            Data[18]: 04013a4931614b3a2b7c4b7431722b666724
-              Opcode: Set Broadcast_Code (0x04)
-              Source_ID: 1
-              Broadcast_Code[16]: 3a4931614b3a2b7c4b7431722b666724
+Test Summary:
+CheckPatch                    PENDING   0.24 seconds
+GitLint                       PENDING   0.27 seconds
+BuildEll                      PASS      20.13 seconds
+BluezMake                     PASS      2712.63 seconds
+MakeCheck                     PASS      20.10 seconds
+MakeDistcheck                 PASS      198.89 seconds
+CheckValgrind                 PASS      274.89 seconds
+CheckSmatch                   PASS      304.25 seconds
+bluezmakeextell               PASS      127.76 seconds
+IncrementalBuild              PENDING   0.27 seconds
+ScanBuild                     PASS      907.85 seconds
 
-step 2: Set Broadcast Code when BIG Create Sync
-  < HCI Command: LE Broadcast Isoc.. (0x08|0x006b) plen 26  #641 [hci0] 27.669211
-          BIG Handle: 0x00
-          BIG Sync Handle: 0x0000
-          Encryption: Encrypted (0x01)
-          Broadcast Code[16]: 3a4931614b3a2b7c4b7431722b666724
-          Maximum Number Subevents: 0x00
-          Timeout: 20000 ms (0x07d0)
-          Number of BIS: 2
-          BIS ID: 0x01
-          BIS ID: 0x02
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-Fixes: https://github.com/bluez/bluez/issues/1306
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0878765098380604971==--
