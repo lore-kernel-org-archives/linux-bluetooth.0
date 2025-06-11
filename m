@@ -1,35 +1,35 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F674287519
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 13:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEB927FD49
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 13:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749648021; cv=none; b=Ad4r0q289KaIC02HyQeeSfM0uGYYIYY4CUSB0Kh1w/4W1nGXExlhxsr6jbPbsS1Tgd57NvEEZmljUWUU+KE5AYH6suBFBTrYFdSH6Pxzmdd6M0dgZlgPmDmRj3d1ySEnkowDRCZJ6dEduuIjVgBWPf3g3N8eq0YDLgv8nylhj9I=
+	t=1749650183; cv=none; b=iR7QLJPvgP/FiSOeq+PnrAHBkT0O2bAk873grbuhg6cKLphuP3av/TP2FGbmy6FgtZG/nrPt39vjPuImWcMKTFrxAoxOrfmgChEqXf+bam3ZPU8ZCTtMA3zDQZdHTzu+/X1MQp2qzLzNVJ/AKoAX/t1Yh+2mCWG1cs8/i2aMrpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749648021; c=relaxed/simple;
-	bh=VvFQf+HPuwvxiPO2CciFWT3wBG7LYc3T7itTWZ/gR60=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=oBpOVIJBUYcFtVMDIMNF49/8i8XKnXxdDQFvkVLnwYq8prZiFok94CND/mGnfuIJM803Z0ER+UsXSf/L/vKZ1XiIuKXwPGTCZXlTeIvN6nytefBXZSzZ/DPu1Bs/O0lKdfMXwMit1qxSxGSHLe1zivju4DSqPR6k7pG4RdEpdHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Zhv/cSog; arc=none smtp.client-ip=192.30.252.208
+	s=arc-20240116; t=1749650183; c=relaxed/simple;
+	bh=L3oAA0hqHwi58prT+hhxT1ByIicvBa+bgwwgUIxqoSs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lktyMDopcRM8eieTNZOO4qIH3JzhlcRECgEuYLar86a6ycmpNB9byL4axigwJYTAQYcx1atc54V5phhpbBLTyo21+yMHHKXBVNJN+5Nc4n8cqf8U/ChYsRfNzlcalMBOZN1JxFx3LVGsLeYbjTMXME0rh4MeIlxS0hZYhL7dnm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=I3nqe4XI; arc=none smtp.client-ip=192.30.252.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Zhv/cSog"
-Received: from github.com (hubbernetes-node-b2708b6.ash1-iad.github.net [10.56.146.44])
-	by smtp.github.com (Postfix) with ESMTPA id A3FAC141358
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 06:20:16 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="I3nqe4XI"
+Received: from github.com (hubbernetes-node-a9cd48c.va3-iad.github.net [10.48.142.31])
+	by smtp.github.com (Postfix) with ESMTPA id E90554E12F5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 06:56:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749648016;
-	bh=9l8VzYod/q1reIAyNxk+SdV73RlwfILTXqF8KK56G+0=;
+	s=pf2023; t=1749650180;
+	bh=fZmrS0EEsclZ1zYfJ/jMmgpOwmE1H3IlEOlJp15xbKg=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Zhv/cSog30UZO+NBPu+00qcrk9StRDuy8xd6QOHnFtFSp87myuVQQZ9FtH96GkfpI
-	 TBtTy6kkSDxGVqsHylUGRBmjchr/wZwSgewowiGPPhW8ptyJTI4afRsHw1YyzUVuFI
-	 kIIOruDki+OSTwbcuOsgOCz+Uh3/XpAJD9o464u4=
-Date: Wed, 11 Jun 2025 06:20:16 -0700
-From: ValdikSS <noreply@github.com>
+	b=I3nqe4XI9m6t6YSxw7Pq2KNORRNPVo7u47bUBCuHTnrnJn2mwOhRMaIXxkYVfKCQY
+	 7ZfinqQQcLuknZkjpqphEiTnsDyUxqmTj9JgJl4t6KuzlOAmCx/TdzBLw1cJJPuSeR
+	 sCSiJ7OrKDl8+edgDbGR1kgbKDO7cogMcgxK1/Mc=
+Date: Wed, 11 Jun 2025 06:56:20 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/970839/000000-60476c@github.com>
-Subject: [bluez/bluez] 60476c: doc: sco.rst: BT_PHY is read-only
+Message-ID: <bluez/bluez/push/refs/heads/968319/022aba-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,22 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/970839
+  Branch: refs/heads/968319
   Home:   https://github.com/bluez/bluez
-  Commit: 60476cbfd54697ff3620ad1d86d5c94fc684bade
-      https://github.com/bluez/bluez/commit/60476cbfd54697ff3620ad1d86d5c94fc684bade
-  Author: ValdikSS <iam@valdikss.org.ru>
-  Date:   2025-06-11 (Wed, 11 Jun 2025)
-
-  Changed paths:
-    M doc/sco.rst
-
-  Log Message:
-  -----------
-  doc: sco.rst: BT_PHY is read-only
-
-The kernel is missing BT_PHY setsockopt support, as of 6.16-rc1.
-
-
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
