@@ -1,159 +1,274 @@
-Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [176.109.96.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0501C8632;
-	Wed, 11 Jun 2025 16:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.109.96.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3D0204680
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 19:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749660006; cv=none; b=HNjaWCB4p6eL0yGidCS3l9RMb/6iiPDh0BJznaiethrL/ASVtXLNjxZVBbK8gHx4Xvg1a6qcmpypohrfpQ08fRg4n27IdCdeA9GfL1q1XbrBUJ8A4P0Vavs4cz9FK3wCoBiKMG90LTnrqX0jDO0IWfwBD5Mujds9WSTNt7v6Wh4=
+	t=1749670863; cv=none; b=hkM1uqN5iQtb+R0/XTF6BgCeA492xZ6n7znhXT4+cgsNL/C1C3eJ+lv/lr5cUkiNZ4QyQ31Pncx7RG8zeu4w6T2siF9uMXPdxCMON5KY2zjjePHH78+isrtxuxL1Tq3tSB54snATlN+SO/NQQQfrBM0cUS3/5kNnR4DJvA4Eifc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749660006; c=relaxed/simple;
-	bh=jdwCrklGp8+sWWDiW7jW7zE4A5+X8nE4ppEx6ZGNNcQ=;
-	h=Message-ID:Date:MIME-Version:To:CC:From:Subject:Content-Type; b=GJ99kJrAIFA1UF9UZgTXKHygFmgHfgnRgVJv4iN6v12+ygOAR8n/2A7aolnBxazO0WNtNLciHg6Fdmuch6xlbmi41z+1Z61roqE2N5E/fg+XRsXsC/yaTmI7RSczg6OPkPssiMHyWrMhhN2kPKz6ytLVNudhWfl+GSypRqUfARA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=NguFvGIf; arc=none smtp.client-ip=176.109.96.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1749670863; c=relaxed/simple;
+	bh=bp3154n0jb7J7nhVEM2yFXyRLllzbX+Ibp1a80U+DlM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lbsUiSAYoKk6zU4xBjyqo+mNoP+qx8N+kQ8UAKbBBTI5Wjevn8UJ++CGZjZAmYanA7dmzfWXfAgmPjlmoHpR6g4vjqGDzFvFc8zbhBCo1GKbnwxav2jB4DhDcMQJ+atejbdwvL+j2U2b0VA/++b3IRHDoDsdTL4+IYfFv70SZMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=faj1sqzH; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="NguFvGIf"
-Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx4.sberdevices.ru (Postfix) with ESMTP id B3E9640009;
-	Wed, 11 Jun 2025 19:31:54 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru B3E9640009
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1749659514;
-	bh=OwEpP8eYceRJZneNAm7UT6qBSzcUQ7h5XJGbYSL4PbI=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:From;
-	b=NguFvGIfgegpZOnhKE9yZL+GHEuLnqg6oAHmkx5RDaYqPf6Oz5rd86f2rJHQd+hIu
-	 +uOm06QgwQoB8xltwdZcG1xpkFxRrXq63YPuV5UpawFozgn54ipT98ELONOfqk6zgY
-	 BSbnCe452e0IXEHypKOgkUs9vz6PVHcV+OKl7RGUcOvKD24m0eOvkaxmOydnE6epon
-	 0UJLmU6g/7E8Xge6QbH6vpXPNWRcFnbcO1/ySfD8GYMg1H7RWZhbO+BQ0yDMmlwdLt
-	 04Qyn5gBl9SgpBSDFFaiDzPkYkAErbJEc1eMzBYaF1QIn8Sm7s6u5BoWgsn6P8axIR
-	 qZjd9ztI+lfHg==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R11" (verified OK))
-	by mx4.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 11 Jun 2025 19:31:54 +0300 (MSK)
-Message-ID: <4e1578fb-c81d-fe9c-1aa1-26b6016866eb@salutedevices.com>
-Date: Wed, 11 Jun 2025 19:31:49 +0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="faj1sqzH"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32a696ff4dcso1559571fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 12:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749670859; x=1750275659; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xxJIsxKEKWM0vWgMR0MsjRmtpsx0pt0CqFt6eTWnryA=;
+        b=faj1sqzHg5yD4FLtn9z3yWC4R0RF2AxxMeyFDCHhlUZ7JZ2VsctweK4yWqbFI+fFoi
+         BZWHrJ6SpxeHurzc5HWJV32ogoB1T+gJ3VTlIrY+rTPfWrO8kGYBzFVW053vlbg3z+C6
+         hc29Smxr5kd2Vb+K4TmnDGdNk0718ottRDv0mS4tpTbo2mD/DoGEXiOpJTPJMyobHR0y
+         StSssyUUj82LUhOp7CCqACz6QV5TX5mRNGyWkqF47tEdEhJ8QH4nzMzuq+JM+OqrFZz/
+         8AxcMHJ8Gl5i3zxEY3I22SrCetnOYGkA2j3dv2X5F/MaBvDw0KqfUByTJUPDJz2v90Rv
+         TveA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749670859; x=1750275659;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xxJIsxKEKWM0vWgMR0MsjRmtpsx0pt0CqFt6eTWnryA=;
+        b=O4xsn+qwaMezpqDM4iwpj8inQ3HW4ApiLNK1D/pYciqo5vQUQhig8Ut6tlO0iVmgru
+         Q7lFx7elxGfKgeTcjfXrHpDcGadcyOEJvD7bTMq/ezWbFZ9pVWb7J0ZbVEfWepFbPLTa
+         F2M2SpP8fEXjaNFQgywCiy/RVeX5IsObTRcmq8J8//nUE3hf5nS6dklyW7SBWWa4nzqr
+         onUyTvK5Gx85IdcVOvnldjwUTWSKUtq4PUbBpzY8mukZk/wR9POE/i6/GyLnok/hcXtV
+         32eNM625dYlpr5qKsTc43Tl4kSL4Sm+zgkppBgI72JYl8pdUXVhaErow2V1t/7GsolNg
+         EErg==
+X-Gm-Message-State: AOJu0YwlxU6tRQ53Q+XC3x80QIMZzWIJefgFQgDGKCTgNIQRR0wwL8XL
+	IILSDN9tYVtxNA0yUI1saiko2YPvL1+rdyz07sWTC0psC8Srj7R2yH4yckzKwoGtmx+JZs+RqQ+
+	A9PJ2qdBYavnWNtfAwdTOEIcls0i5aUlaIja4IY0=
+X-Gm-Gg: ASbGncuOWw4QTAHomRGNLntwKJylVBuOPYpj6c5PhG1tJWAzDfiO3cKpwo60lOcyztT
+	QwbrMiy84R1haB8bfiKyzyid25TAGXHoBLEGJRUO80H5vMY5bv72zJj+pZdcbJXk4wzDD4vAqH3
+	hXHsWRmR6nhHKhiE4TbUd/AKM/tT923H/yjwRQgRnyMzYOjcTsGhHL
+X-Google-Smtp-Source: AGHT+IFfZtTqiwDqMNGTSsceVrNdVDLmseuqbWX9/aIaxHq1XTiwluW6dYEIdfIWvfurpLNeYMvP5iQ7tnnkxttaP0s=
+X-Received: by 2002:a2e:a58f:0:b0:32a:69c7:7b0b with SMTP id
+ 38308e7fff4ca-32b21cb6e8amr12828781fa.12.1749670858984; Wed, 11 Jun 2025
+ 12:40:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Content-Language: en-US
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <oxffffaa@gmail.com>, <kernel@salutedevices.com>,
-	<linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Subject: [PATCH v1] Bluetooth: hci_sync: fix double free in
- 'hci_discovery_filter_clear()'
+References: <20250611-bass_for_encrypted_broadcast_source-v1-1-69b8b156488c@amlogic.com>
+In-Reply-To: <20250611-bass_for_encrypted_broadcast_source-v1-1-69b8b156488c@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 11 Jun 2025 15:40:45 -0400
+X-Gm-Features: AX0GCFsxQv78fHvmYofF-_uAwSziiI9Q4MMfgDm-Td4nKWplGyEBCLf7rAnmnZ8
+Message-ID: <CABBYNZK7LdWs1WmrtC1cB3RCZtHJOjH7Pm4Vxf63RegLfLJEhw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ bluez] BASS: support for encrypted broadcast source
+To: yang.li@amlogic.com
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-exch-cas-a-m2.sberdevices.ru (172.24.201.210) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 62 0.3.62 e2af3448995f5f8a7fe71abf21bb23519d0f38c3, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;salutedevices.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 194026 [Jun 11 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/06/11 14:54:00 #27559328
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
+Content-Transfer-Encoding: quoted-printable
 
-Function 'hci_discovery_filter_clear()' frees 'uuids' array and then
-sets it to NULL. There is a tiny chance of the following race:
+Hi,
 
-'hci_cmd_sync_work()'
+On Wed, Jun 11, 2025 at 4:57=E2=80=AFAM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
+>
+> From: Yang Li <yang.li@amlogic.com>
+>
+> If the BIS is encrypted as indicated in the BIG Info Report, the
+> broadcast code needs to be requested from the Assistant.
+>
+> step 1: Broadcast_Code required
+>   > HCI Event: LE Meta Event (0x3e) plen 20                 #631 [hci0] 2=
+7.176606
+>         LE Broadcast Isochronous Group Info Advertising Report (0x22)
+>           Sync Handle: 0x0000
+>           Number BIS: 2
+>           NSE: 8
+>           ISO Interval: 20.00 msec (0x0010)
+>           BN: 2
+>           PTO: 2
+>           IRC: 2
+>           Maximum PDU: 60
+>           SDU Interval: 10000 us (0x002710)
+>           Maximum SDU: 60
+>           PHY: LE 2M (0x02)
+>           Framing: Unframed (0x00)
+>           Encryption: 0x01
+>   < ACL Data TX: Handle 16 flags 0x00 dlen 44               #633 [hci0] 2=
+7.184478
+>         ATT: Handle Value Notification (0x1b) len 39
+>           Handle: 0x005f Type: Broadcast Receive State (0x2bc8)
+>             Data[37]: 01016698a411bb13019f103b02010100000000110d035069786=
+56c20395f32303938020502
+>             Source_ID: 1
+>             Source_Address_Type: 1
+>             Source_Address: 13:BB:11:A4:98:66
+>             Source_Adv_SID: 1
+>             Broadcast_ID: 0x3b109f
+>             PA_Sync_State: Synchronized to PA
+>             BIG_Encryption: Broadcast_Code required
+>             Num_Subgroups: 1
+>             Subgroup #0:
+>               BIS_Sync State: 0x00000000
+>               Metadata: #0: len 0x0d type 0x03
+>               Metadata:   50 69 78 65 6c 20 39 5f 32 30 39 38            =
+  Pixel 9_2098
+>               Metadata: #1: len 0x02 type 0x05
+>               Metadata:   02
+>   > ACL Data RX: Handle 16 flags 0x02 dlen 25               #636 [hci0] 2=
+7.455744
+>         ATT: Write Command (0x52) len 20
+>           Handle: 0x0065 Type: Broadcast Audio Scan Control Point (0x2bc7=
+)
+>             Data[18]: 04013a4931614b3a2b7c4b7431722b666724
+>               Opcode: Set Broadcast_Code (0x04)
+>               Source_ID: 1
+>               Broadcast_Code[16]: 3a4931614b3a2b7c4b7431722b666724
+>
+> step 2: Set Broadcast Code when BIG Create Sync
+>   < HCI Command: LE Broadcast Isoc.. (0x08|0x006b) plen 26  #641 [hci0] 2=
+7.669211
+>           BIG Handle: 0x00
+>           BIG Sync Handle: 0x0000
+>           Encryption: Encrypted (0x01)
+>           Broadcast Code[16]: 3a4931614b3a2b7c4b7431722b666724
+>           Maximum Number Subevents: 0x00
+>           Timeout: 20000 ms (0x07d0)
+>           Number of BIS: 2
+>           BIS ID: 0x01
+>           BIS ID: 0x02
+>
+> Fixes: https://github.com/bluez/bluez/issues/1306
+> ---
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  profiles/audio/bass.c | 29 +++++++++++++++++++++++++++++
+>  src/shared/bass.c     | 29 ++++++++++++++---------------
+>  2 files changed, 43 insertions(+), 15 deletions(-)
+>
+> diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+> index b27a3fc12..53fde43d6 100644
+> --- a/profiles/audio/bass.c
+> +++ b/profiles/audio/bass.c
+> @@ -427,13 +427,42 @@ static void bap_state_changed(struct bt_bap_stream =
+*stream, uint8_t old_state,
+>         }
+>  }
+>
+> +static void bass_req_bcode_cb(void *user_data, int err)
+> +{
+> +       struct bass_setup *setup =3D user_data;
+> +
+> +       if (!err) {
+> +               if (asprintf(&setup->path, "%s/bis%d",
+> +                       device_get_path(setup->dg->device),
+> +                       setup->bis) < 0)
+> +                       return;
+> +
+> +               bt_bap_stream_set_user_data(setup->stream, setup->path);
+> +
+> +               bt_bap_stream_config(setup->stream, &setup->qos,
+> +                               setup->config, NULL, NULL);
+> +               bt_bap_stream_metadata(setup->stream, setup->meta,
+> +                               NULL, NULL);
+> +       }
+> +}
+> +
+>  static void setup_configure_stream(struct bass_setup *setup)
+>  {
+> +       uint8_t empty_bcode[BT_BASS_BCAST_CODE_SIZE] =3D {0};
+> +
+>         setup->stream =3D bt_bap_stream_new(setup->dg->bap, setup->lpac, =
+NULL,
+>                                         &setup->qos, setup->config);
+>         if (!setup->stream)
+>                 return;
+>
+> +       if ((setup->qos.bcast.encryption) &&
+> +           (!memcmp(setup->qos.bcast.bcode->iov_base,
+> +                 empty_bcode,
+> +                 sizeof(empty_bcode)))) {
+> +               bass_req_bcode(setup->stream, bass_req_bcode_cb, setup, N=
+ULL);
+> +               return;
+> +       }
 
- 'update_passive_scan_sync()'
+Let's add a comment on why we should ask for the bcode at this stage.
 
-   'hci_update_passive_scan_sync()'
+> +
+>         if (asprintf(&setup->path, "%s/bis%d",
+>                         device_get_path(setup->dg->device),
+>                         setup->bis) < 0)
+> diff --git a/src/shared/bass.c b/src/shared/bass.c
+> index 7b9e0da63..11ad59e3b 100644
+> --- a/src/shared/bass.c
+> +++ b/src/shared/bass.c
+> @@ -964,6 +964,20 @@ static void bass_handle_set_bcast_code_op(struct bt_=
+bass *bass,
+>
+>         gatt_db_attribute_write_result(attrib, id, 0x00);
+>
+> +       for (entry =3D queue_get_entries(bass->cp_handlers); entry;
+> +                                               entry =3D entry->next) {
+> +               struct bt_bass_cp_handler *cb =3D entry->data;
+> +
+> +               if (cb->handler) {
+> +                       ret =3D cb->handler(bcast_src,
+> +                                       BT_BASS_SET_BCAST_CODE,
+> +                                       params, cb->data);
+> +                       if (ret)
+> +                               DBG(bass, "Unable to handle Set "
+> +                                               "Broadcast Code operation=
+");
+> +               }
+> +       }
+> +
+>         if (!bass_trigger_big_sync(bcast_src)) {
+>                 bcast_src->enc =3D BT_BASS_BIG_ENC_STATE_DEC;
+>
+> @@ -977,21 +991,6 @@ static void bass_handle_set_bcast_code_op(struct bt_=
+bass *bass,
+>
+>                 free(notif->iov_base);
+>                 free(notif);
+> -               return;
+> -       }
+> -
+> -       for (entry =3D queue_get_entries(bass->cp_handlers); entry;
+> -                                               entry =3D entry->next) {
+> -               struct bt_bass_cp_handler *cb =3D entry->data;
+> -
+> -               if (cb->handler) {
+> -                       ret =3D cb->handler(bcast_src,
+> -                                       BT_BASS_SET_BCAST_CODE,
+> -                                       params, cb->data);
+> -                       if (ret)
+> -                               DBG(bass, "Unable to handle Set "
+> -                                               "Broadcast Code operation=
+");
+> -               }
+>         }
+>  }
 
-     'hci_discovery_filter_clear()'
-       kfree(uuids);
+Changes to shared shall be on its own patch, also please add some
+explanation why you are moving the code above on the patch
+description.
 
-       <-------------------------preempted-------------------------------->
-                                           'start_service_discovery()'
+>
+> ---
+> base-commit: 95b72bbf1fe42216d02a5ebb99bd18e9b69b6064
+> change-id: 20250611-bass_for_encrypted_broadcast_source-f68417fdee73
+>
+> Best regards,
+> --
+> Yang Li <yang.li@amlogic.com>
+>
+>
+>
 
-                                             'hci_discovery_filter_clear()'
-                                               kfree(uuids); // DOUBLE FREE
 
-       <-------------------------preempted-------------------------------->
-
-      uuids = NULL;
-
-To fix it let's add locking around call  'hci_update_passive_scan_sync()' in
-'update_passive_scan_sync()'. Otherwise the following backtrace fires:
-
-[ ] ------------[ cut here ]------------
-[ ] kernel BUG at mm/slub.c:547!
-[ ] Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-[ ] CPU: 3 UID: 0 PID: 246 Comm: bluetoothd Tainted: G O 6.12.19-sdkernel #1
-[ ] Tainted: [O]=OOT_MODULE
-[ ] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[ ] pc : __slab_free+0xf8/0x348
-[ ] lr : __slab_free+0x48/0x348
-...
-[ ] Call trace:
-[ ]  __slab_free+0xf8/0x348
-[ ]  kfree+0x164/0x27c
-[ ]  start_service_discovery+0x1d0/0x2c0
-[ ]  hci_sock_sendmsg+0x518/0x924
-[ ]  __sock_sendmsg+0x54/0x60
-[ ]  sock_write_iter+0x98/0xf8
-[ ]  do_iter_readv_writev+0xe4/0x1c8
-[ ]  vfs_writev+0x128/0x2b0
-[ ]  do_writev+0xfc/0x118
-[ ]  __arm64_sys_writev+0x20/0x2c
-[ ]  invoke_syscall+0x68/0xf0
-[ ]  el0_svc_common.constprop.0+0x40/0xe0
-[ ]  do_el0_svc+0x1c/0x28
-[ ]  el0_svc+0x30/0xd0
-[ ]  el0t_64_sync_handler+0x100/0x12c
-[ ]  el0t_64_sync+0x194/0x198
-[ ] Code: 8b0002e6 eb17031f 54fffbe1 d503201f (d4210000) 
-[ ] ---[ end trace 0000000000000000 ]---
-
-Cc: stable@vger.kernel.org
-Fixes: ad383c2c65a5 ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- net/bluetooth/hci_sync.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index e56b1cbedab90..61a9922eb820d 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3167,7 +3167,15 @@ int hci_update_scan(struct hci_dev *hdev)
- 
- static int update_passive_scan_sync(struct hci_dev *hdev, void *data)
- {
--	return hci_update_passive_scan_sync(hdev);
-+	int ret;
-+
-+	hci_dev_lock(hdev);
-+
-+	ret = hci_update_passive_scan_sync(hdev);
-+
-+	hci_dev_unlock(hdev);
-+
-+	return ret;
- }
- 
- int hci_update_passive_scan(struct hci_dev *hdev)
--- 
-2.30.1
-
+--=20
+Luiz Augusto von Dentz
