@@ -1,151 +1,76 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F560770FE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 13:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518661BC2A;
+	Thu, 12 Jun 2025 13:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749734173; cv=none; b=cIlaAu4EXvG7aBKcLrmoXGuy1cfRvK6kNSekQgWKqkyuUF27JXZdWxsuQmaJA0cW5yVkfEdQNpUKBeAPuZjBgYTTosPKc8xuUS1LmpJP41TND/6AncyyRFTLib7qphKEBVolaQRhD0xcaHNlxcPZz6TslIzKbLCGTm8ht4p1i8A=
+	t=1749735599; cv=none; b=frrv6bmwPSgqPbOwuJEoGJroBByJvUXryJCml+B+6lZHTJgndzEKesluLfOF88uhNXoV5XqgRaJncUrJlGDdyMQRz8tokBKUIJxNoVOIxkmRZfK5q4M1K9FQ9YxYDLJCDSjJE5hJovHGTQp6Rcm3iqsdIL1b3/yIWMoOMmRe1p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749734173; c=relaxed/simple;
-	bh=jcA17agKRkTnu6605Q4CJ/hUSsAizO8+BLJ8KnX23po=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VHDt+h5HSbmZKG39GChlresM/iGAg0BnHMY/qsiKmIMKwY4ejvlmXiHif4WgD0pcLL+wdENquruTU3tMPPJcKY28Bn0/Ek1nATtck1VqVfaUY2KTJZ+HAC0b+kkKfQsqa6Oees99mLbJ8L8cUkYHHkEZ9eXHlHzgJe5KTG8z8FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OSwlGRa/; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749735599; c=relaxed/simple;
+	bh=PO6VS+Ipf/QNoHDKTP4/NOCSKfLw8CarcdYSUJogoYg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hU9foso79W61vplqacjnkTuZZ0oeasxwFF7JeUATIUw17VIk2V2fuZkHdLhyqapklvQ64MSKn6WkXHTVWU2hFSY3gAaIYJPp/yv1Twi2qvVHB2NY4GlngZHG22/ZSIh+jiAwhjpE//HMu1puLUo19bICdKmRfiloZ0CTs4835wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cQx5mUj9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OSwlGRa/"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32ae3e94e57so8808641fa.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 06:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749734170; x=1750338970; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3ai5g1RdRxrS95GSsMUyGOb32v4kzD7ueihESqrkbmY=;
-        b=OSwlGRa/4IcYuUPHRRgNOv0XBLSjIaBi6p+V7WP1HUo3AMftTYzsWO/Hv6fGIwU2z1
-         E8Mow6z9P7+VZIa/SsIelUy+E2kmgxz2Z7Cx4hKLV+wR8zv0YqolNYOK6/1fe0w0GuVz
-         ffz0GJiyshkxExLe0WD0/sJmiiqYqMW9B+ITLdIUjdHiRhbqDH86yZ8LAgnN66ZzTkzv
-         k8MCnwnH+cK3Rme0x3rOmutqqFHIc+NYfJeVq0J8mDGp5XsU0KUyPq6n72aeu6sQOdRb
-         rpXqZrXyidXvnQ856lmskxOs5HlyiB4Cuh4wVTHuBMZR9tGDwFx8EmhEIQKch+Xl0W6a
-         OOuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749734170; x=1750338970;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ai5g1RdRxrS95GSsMUyGOb32v4kzD7ueihESqrkbmY=;
-        b=RTi/KQ4Yx07R4SfqcT8ocLxZhLCh0x89qAg6vXQUJXXxCx/pRfuCqOs0FklCzbCj90
-         a0yhlLWgs+4gX+yxI9iSzY8gjHedLfJ/1P/oWlSzh2N+vg+EXsNybaJl5tAAMOhsFntu
-         Ctwu8w8mQa/b5RL6GrKnCPxzemhMDQBkuIOJcIilQCJ72CyPPteP4dhstLdwUKxsOeIM
-         AMrVSqGeS3p+o+Bd+aFQri2FgR0U4DZrN3cNpbobHY9bfq8ga0W7NQmyrdiFGvEVXd2W
-         g9FUmByZD7Z+/d9e9MNiTJWkBXPpJXTjieDZVZOuFtX7nJaKc+KBRhTrB3bLqNobIV5v
-         BZLg==
-X-Gm-Message-State: AOJu0YyrdGR8bGWpe9D1BoHgvfECNXtyjs95CMKE9OSJP4Ty3EsADIu5
-	njQ70jq8nNwpx4oLB/0WjboOd4XdAUzEL+nPhfWO5gC2SFxzC4cBcAycOGbHuwVg3GQ8Kl6tZ8U
-	o37JuG2kDOP608LurW4L1NMtrsjU4HEp/Tw33BJY=
-X-Gm-Gg: ASbGncvlmzKQjzM+OWhq1Zz7VttYQbE6q+mMj5XmGrHFUz4YrT/Q5bxhnWcGc4Y/dXU
-	+Pd1+yf9oKME3f2Yt5ttKyaEJaWVbZMDMD5q0CnPB2mWSjjT4kpOMge2VE17unZXoXzZMadcxHP
-	kJnptY2h7WBFuhKrGfuit31FpsG7XZ6erduXhrbmZ6oKWvlx7l2+iR
-X-Google-Smtp-Source: AGHT+IG4ZV8Uw29jmi5+2hsLWhoSBZO/A1kf1ugf8fTTVW3LqTMx/h9U4HI+LmLOhZ7WCjsm01QD8aJvMTCdEkbc99c=
-X-Received: by 2002:a2e:b88e:0:b0:32a:8ae2:a8c8 with SMTP id
- 38308e7fff4ca-32b3a732e5bmr4053261fa.2.1749734169900; Thu, 12 Jun 2025
- 06:16:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cQx5mUj9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8B23C4CEEA;
+	Thu, 12 Jun 2025 13:39:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749735598;
+	bh=PO6VS+Ipf/QNoHDKTP4/NOCSKfLw8CarcdYSUJogoYg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cQx5mUj9Q3oOsrcAblXewv+xLgn3PT5liMvAeKokpGN5WtW7EAicWI20EqUcQ7KaU
+	 dTsldtN8eZq3MNu2Z4S0I/3c7a/p6XsOohwxsTYKgfXrifVKRdgvXqT65wVYyj+Ofw
+	 07I16RZEzm7daYSKl+7UOSIgyr+STOKu88sTrkiJVK2cOv9MukD6esvbR7qNTZdeRj
+	 q4ODrzueEADIYs+NVpDXtn8BJ/F1QZAkg6SetSL8moodrwU8BDJ5p+X7jNqKAa329U
+	 42G+45g7cfYgnDKLZ/rTa9GLRuA3YX3GYSl7N9oDhmSYe9P3tIgtZYu1IMnvdeLjpt
+	 IJVIgoGcS0Zrw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE6039EFFCF;
+	Thu, 12 Jun 2025 13:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609105553.3756688-1-quic_shuaz@quicinc.com>
-In-Reply-To: <20250609105553.3756688-1-quic_shuaz@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 12 Jun 2025 09:15:57 -0400
-X-Gm-Features: AX0GCFvhY6zn6Q0sYvnAw29DPBk01RPrtUWT5yncZoosZNi23Vra0FnDlOZNwWQ
-Message-ID: <CABBYNZLVB5QC_EeLC=j8sZkSdQQTNxGuAt23EavHB3LPJuH1gw@mail.gmail.com>
-Subject: Re: [PATCH v1] driver: bluetooth: hci_qca: fix ssr fail when BT_EN is
- pulled up by hw
-To: Shuai Zhang <quic_shuaz@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_bt@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: btusb: Add a new VID/PID 2c7c/7009 for MT7925
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <174973562875.4138205.13746264820757572587.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Jun 2025 13:40:28 +0000
+References: <20250606-btusb-mt7925-add-v1-1-9b64bfa86ea4@hexchain.org>
+In-Reply-To: <20250606-btusb-mt7925-add-v1-1-9b64bfa86ea4@hexchain.org>
+To: Haochen Tong <i@hexchain.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Shuai,
+Hello:
 
-On Mon, Jun 9, 2025 at 6:57=E2=80=AFAM Shuai Zhang <quic_shuaz@quicinc.com>=
- wrote:
->
-> If the SoC always enables the bt_en pin via hardware and the driver
-> cannot control the bt_en pin of the SoC chip, then during SSR,
-> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
-> This leads to a reset command timeout failure.
->
-> To address this, clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits
-> after the coredump collection is complete.
-> Also, add msleep delay to wait for controller to complete SSR.
->
-> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-> ---
->  drivers/bluetooth/hci_qca.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index a2dc39c00..1c3df6e30 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1653,6 +1653,22 @@ static void qca_hw_error(struct hci_dev *hdev, u8 =
-code)
->         }
->
->         clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
-> +
-> +       /*If the SoC always enables the bt_en pin via hardware and the dr=
-iver
-> +       * cannot control the bt_en pin of the SoC chip, then during SSR,
-> +       * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be clear=
-ed.
-> +       * This leads to a reset command timeout failure.
-> +       *
-> +       * To address this, clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED b=
-its
-> +       * after the coredump collection is complete.
-> +       * Also, add msleep delay to wait for controller to complete SSR.
-> +       */
-> +       if(!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-> +               clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-> +               clear_bit(QCA_IBS_DISABLED,&qca->flags);
-> +               qca->tx_ibs_state =3D HCI_IBS_TX_AWAKE;
-> +               msleep(50);
-> +       }
->  }
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-WARNING: Block comments should align the * on each line
-#11: FILE: drivers/bluetooth/hci_qca.c:1658:
-+    /*If the SoC always enables the bt_en pin via hardware and the driver
-+    * cannot control the bt_en pin of the SoC chip, then during SSR,
+On Fri, 06 Jun 2025 23:33:03 +0800 you wrote:
+> From: Haochen Tong <i@hexchain.org>
+> 
+> Adds a new entry with VID 2c7c and PID 7009 for MediaTek MT7925
+> Bluetooth chip.
+> 
+> The device information from /sys/kernel/debug/usb/devices is provided
+> below.
+> 
+> [...]
 
-ERROR: space required before the open parenthesis '('
-#19: FILE: drivers/bluetooth/hci_qca.c:1666:
-+    if(!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+Here is the summary with links:
+  - Bluetooth: btusb: Add a new VID/PID 2c7c/7009 for MT7925
+    https://git.kernel.org/bluetooth/bluetooth-next/c/892768493447
 
-ERROR: space required after that ',' (ctx:VxO)
-#21: FILE: drivers/bluetooth/hci_qca.c:1668:
-+        clear_bit(QCA_IBS_DISABLED,&qca->flags);
-                                   ^
-
-ERROR: space required before that '&' (ctx:OxV)
-#21: FILE: drivers/bluetooth/hci_qca.c:1668:
-+        clear_bit(QCA_IBS_DISABLED,&qca->flags);
-                                    ^
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
->  static void qca_reset(struct hci_dev *hdev)
-> --
-> 2.34.1
->
->
-
-
---=20
-Luiz Augusto von Dentz
