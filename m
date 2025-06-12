@@ -1,148 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8924524468A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 13:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AC3268FCD
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 14:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749735601; cv=none; b=Olc1pCv4q6aOIVbvQFUEBPUyOgR+u/7CtIuQfPDLwG84yqC/KdJzWrCDfQXGvI7EjZavGuX79t6DDE6g143C24GOwxHhFcqh8eTrHR/avW6D6LU9Uf/JQ7T23Dw4djKrtJF48vamuDYkXfzlNdMTjaIx6oWCDhkGWt38WaBVYvs=
+	t=1749740150; cv=none; b=BvVroQhxAODYLNwwMT1lz8cwsmJ18iyw2T0QVmvQORhaUhiUAGUWoFqevp8QL4tesjd3pwSnNoZWnOdz8Izj65EOYkBlxphPQeKzf0Z3hqnLLPzN1VeVWB9EI7XSjwe11gkvBvY6xiadZNjok1TQAYusWpJ73PslN/xiIF+DNW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749735601; c=relaxed/simple;
-	bh=qfOw1DMZT1jOfyskikzQAHg4L0hSQEdCPm7kioPtdrw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=icuOutJ/V9GHPBoffmWKh6C9V1H7qKL0Yzdiuh2nVrlxAPRvqnNhAmwPgeBWROHcTcL2iAp3GQa76+3RBNB0c+5GfrOxycFetdaEG9hlOYML0uP+CiYAtJbx1HNjqoYFhJKYeF+SsuBVrXXqmhfaDVYoThRB6fr1fpJSopbvUp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dupxv14O; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749740150; c=relaxed/simple;
+	bh=chUqZNKV10ZLlOiAuPAieSlZw+Lw+s34pt3vipFZAmk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Nzl8N5Wa2anu0DSjQpedNSz62Vm7DpxZ924zlDDv3VLxEbwei5ztKYZYrQqh+kUk2fdy12XZ+i18ZU2v0TKnOJEv5uLKL4MwnEYIRoaYDDJ7umUv34Rp3Qn18MD1P+WXiLJqzniwWAq1M99S7SQZ5aNvT26YjkvUFErz/kqTrQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UnGl9eh2; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dupxv14O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1270CC4CEEE;
-	Thu, 12 Jun 2025 13:40:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749735600;
-	bh=qfOw1DMZT1jOfyskikzQAHg4L0hSQEdCPm7kioPtdrw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Dupxv14OKOv8ql96FbBAsInarrHBEbhptOWK+Xl7N7ax/DPd4NmpfeSCKYQGYhdL8
-	 XHVHlA+jjubn+Ts+p2WpTRxbcROWT2Tj23i3opulbugAZdDKK15Yc5aku0bewQHNHO
-	 KiAVzNk3Hn66mrMO2OejWCt/0tHzqbIn2eAzwo270nHCKOeBKjuJny4kMKvS9w8m6m
-	 uU40aw0q5EVGJuL3ToPyYFZRxd6xgCW1RKcWgGdf6B6wUel+KIPxLi5gWoiSDqvRfW
-	 wkXb9DRTZn6/r89qxxtQtWgZttAVnxnAwFmMDtylWPkkFx18NpDzruO8OaKU1QfcQK
-	 sxaU71swPBcDw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C6A39EFFCF;
-	Thu, 12 Jun 2025 13:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UnGl9eh2"
+Received: from github.com (hubbernetes-node-ab292ff.va3-iad.github.net [10.48.133.44])
+	by smtp.github.com (Postfix) with ESMTPA id CB6114E1004
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 07:55:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1749740147;
+	bh=mo5JvsScAkn+5yreK57l9obTpP29ukcc3TN4oI/xkHc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=UnGl9eh2ZKkZQj30RPb9Vt5o09pc/xepgp1TylZeuiNxXo8UWE3qwdKmoBbkrX2ZV
+	 rLfMaJMaIDOTRTTKefSSI+Sw7sCB7fcMDLmjSJ7dTfJWExevGL2rbk6VM8k26r/qEw
+	 +tPxlc9gMdro3ABEjOPRYZekppIQA3PROSYkRWm0=
+Date: Thu, 12 Jun 2025 07:55:47 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/aea0f4-6bc584@github.com>
+Subject: [bluez/bluez] 39d965: shared/bass: Move cb->handle earlier in the
+ flow
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix L2CAP MTU negotiation
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174973562999.4138205.17376867892051147484.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Jun 2025 13:40:29 +0000
-References: <20250612075034.190194-1-frederic.danis@collabora.com>
-In-Reply-To: <20250612075034.190194-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 39d9651857658811e1d8c0fb6197b281273eef0e
+      https://github.com/bluez/bluez/commit/39d9651857658811e1d8c0fb6197b281273eef0e
+  Author: Yang Li <yang.li@amlogic.com>
+  Date:   2025-06-12 (Thu, 12 Jun 2025)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/bass.c
 
-On Thu, 12 Jun 2025 09:50:34 +0200 you wrote:
-> OBEX download from iPhone is currently slow due to small packet size
-> used to transfer data which doesn't follow the MTU negotiated during
-> L2CAP connection, i.e. 672 bytes instead of 32767:
-> 
->   < ACL Data TX: Handle 11 flags 0x00 dlen 12
->       L2CAP: Connection Request (0x02) ident 18 len 4
->         PSM: 4103 (0x1007)
->         Source CID: 72
->   > ACL Data RX: Handle 11 flags 0x02 dlen 16
->       L2CAP: Connection Response (0x03) ident 18 len 8
->         Destination CID: 14608
->         Source CID: 72
->         Result: Connection successful (0x0000)
->         Status: No further information available (0x0000)
->   < ACL Data TX: Handle 11 flags 0x00 dlen 27
->       L2CAP: Configure Request (0x04) ident 20 len 19
->         Destination CID: 14608
->         Flags: 0x0000
->         Option: Maximum Transmission Unit (0x01) [mandatory]
->           MTU: 32767
->         Option: Retransmission and Flow Control (0x04) [mandatory]
->           Mode: Enhanced Retransmission (0x03)
->           TX window size: 63
->           Max transmit: 3
->           Retransmission timeout: 2000
->           Monitor timeout: 12000
->           Maximum PDU size: 1009
->   > ACL Data RX: Handle 11 flags 0x02 dlen 26
->       L2CAP: Configure Request (0x04) ident 72 len 18
->         Destination CID: 72
->         Flags: 0x0000
->         Option: Retransmission and Flow Control (0x04) [mandatory]
->           Mode: Enhanced Retransmission (0x03)
->           TX window size: 32
->           Max transmit: 255
->           Retransmission timeout: 0
->           Monitor timeout: 0
->           Maximum PDU size: 65527
->         Option: Frame Check Sequence (0x05) [mandatory]
->           FCS: 16-bit FCS (0x01)
->   < ACL Data TX: Handle 11 flags 0x00 dlen 29
->       L2CAP: Configure Response (0x05) ident 72 len 21
->         Source CID: 14608
->         Flags: 0x0000
->         Result: Success (0x0000)
->         Option: Maximum Transmission Unit (0x01) [mandatory]
->           MTU: 672
->         Option: Retransmission and Flow Control (0x04) [mandatory]
->           Mode: Enhanced Retransmission (0x03)
->           TX window size: 32
->           Max transmit: 255
->           Retransmission timeout: 2000
->           Monitor timeout: 12000
->           Maximum PDU size: 1009
->   > ACL Data RX: Handle 11 flags 0x02 dlen 32
->       L2CAP: Configure Response (0x05) ident 20 len 24
->         Source CID: 72
->         Flags: 0x0000
->         Result: Success (0x0000)
->         Option: Maximum Transmission Unit (0x01) [mandatory]
->           MTU: 32767
->         Option: Retransmission and Flow Control (0x04) [mandatory]
->           Mode: Enhanced Retransmission (0x03)
->           TX window size: 63
->           Max transmit: 3
->           Retransmission timeout: 2000
->           Monitor timeout: 12000
->           Maximum PDU size: 1009
->         Option: Frame Check Sequence (0x05) [mandatory]
->           FCS: 16-bit FCS (0x01)
->   ...
->   > ACL Data RX: Handle 11 flags 0x02 dlen 680
->       Channel: 72 len 676 ctrl 0x0202 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
->       I-frame: Unsegmented TxSeq 1 ReqSeq 2
->   < ACL Data TX: Handle 11 flags 0x00 dlen 13
->       Channel: 14608 len 9 ctrl 0x0204 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
->       I-frame: Unsegmented TxSeq 2 ReqSeq 2
->   > ACL Data RX: Handle 11 flags 0x02 dlen 680
->       Channel: 72 len 676 ctrl 0x0304 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
->       I-frame: Unsegmented TxSeq 2 ReqSeq 3
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/bass: Move cb->handle earlier in the flow
 
-Here is the summary with links:
-  - Bluetooth: L2CAP: Fix L2CAP MTU negotiation
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d5c2d5e0f1d3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This change ensures cb->handle is executed even
+if the function returns early in the attribute_notify
+section. It also allows the stream status to be updated
+before notifying the client, improving efficiency.
 
 
+  Commit: 6bc584b11b8b10dbd717ca4012a6c09afb18d1c7
+      https://github.com/bluez/bluez/commit/6bc584b11b8b10dbd717ca4012a6c09afb18d1c7
+  Author: Yang Li <yang.li@amlogic.com>
+  Date:   2025-06-12 (Thu, 12 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  bass: support for encrypted broadcast source
+
+If the BIS is encrypted as indicated in the BIG Info Report, the
+broadcast code needs to be requested from the Assistant.
+
+step 1: Broadcast_Code required
+  > HCI Event: LE Meta Event (0x3e) plen 20                 #631 [hci0] 27.176606
+        LE Broadcast Isochronous Group Info Advertising Report (0x22)
+          Sync Handle: 0x0000
+          Number BIS: 2
+          NSE: 8
+          ISO Interval: 20.00 msec (0x0010)
+          BN: 2
+          PTO: 2
+          IRC: 2
+          Maximum PDU: 60
+          SDU Interval: 10000 us (0x002710)
+          Maximum SDU: 60
+          PHY: LE 2M (0x02)
+          Framing: Unframed (0x00)
+          Encryption: 0x01
+  < ACL Data TX: Handle 16 flags 0x00 dlen 44               #633 [hci0] 27.184478
+        ATT: Handle Value Notification (0x1b) len 39
+          Handle: 0x005f Type: Broadcast Receive State (0x2bc8)
+            Data[37]: 01016698a411bb13019f103b02010100000000110d03506978656c20395f32303938020502
+            Source_ID: 1
+            Source_Address_Type: 1
+            Source_Address: 13:BB:11:A4:98:66
+            Source_Adv_SID: 1
+            Broadcast_ID: 0x3b109f
+            PA_Sync_State: Synchronized to PA
+            BIG_Encryption: Broadcast_Code required
+            Num_Subgroups: 1
+            Subgroup #0:
+              BIS_Sync State: 0x00000000
+              Metadata: #0: len 0x0d type 0x03
+              Metadata:   50 69 78 65 6c 20 39 5f 32 30 39 38              Pixel 9_2098
+              Metadata: #1: len 0x02 type 0x05
+              Metadata:   02
+  > ACL Data RX: Handle 16 flags 0x02 dlen 25               #636 [hci0] 27.455744
+        ATT: Write Command (0x52) len 20
+          Handle: 0x0065 Type: Broadcast Audio Scan Control Point (0x2bc7)
+            Data[18]: 04013a4931614b3a2b7c4b7431722b666724
+              Opcode: Set Broadcast_Code (0x04)
+              Source_ID: 1
+              Broadcast_Code[16]: 3a4931614b3a2b7c4b7431722b666724
+
+step 2: Set Broadcast Code when BIG Create Sync
+  < HCI Command: LE Broadcast Isoc.. (0x08|0x006b) plen 26  #641 [hci0] 27.669211
+          BIG Handle: 0x00
+          BIG Sync Handle: 0x0000
+          Encryption: Encrypted (0x01)
+          Broadcast Code[16]: 3a4931614b3a2b7c4b7431722b666724
+          Maximum Number Subevents: 0x00
+          Timeout: 20000 ms (0x07d0)
+          Number of BIS: 2
+          BIS ID: 0x01
+          BIS ID: 0x02
+
+Fixes: https://github.com/bluez/bluez/issues/1306
+
+
+Compare: https://github.com/bluez/bluez/compare/aea0f46f173f...6bc584b11b8b
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
