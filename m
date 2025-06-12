@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E8F78F4E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E071798F
 	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 05:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749706273; cv=none; b=Euidw6MploWnDB1eDgpxpv2BWTHUnX3SbPQvSIoGzEIZdG4rzzJkwxT59MmxIb12GrOyy9hXCwlbhxA/SbO26MGo4SVvQ8EabX6rmEVE26pTQdsZA3yvAKMOsMoH3IFEgmLo/DDtyFvPgrsf4iO6IWfvqIsgEwvCLc+nX9GdAxI=
+	t=1749706273; cv=none; b=D6RLw2KQpCAvVdYiN0cZebF+9gVvYdfhCi9GTXN/W89pC//9BJ6eAzltaznfW9ClqZnpOo25cBXXVcP768LWhFA4ofyCtgoNANeeFw5aZpKJfuHBS5z9eVJjkAC5mZw9cj0fIU3uCXYdoChOPtaXrCXi6IduwM6KZ8FdDTpRDEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749706273; c=relaxed/simple;
-	bh=2xaDBbW3p/NzxFMw5RbplFMMUhcZCtv2lWoQPaPTm3Q=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hzoJsaOQGtoGepFVAZTuXvevEen7tnG4hbLJBnsjmp7M5wz04lEhb75aKEzkp7CLPOfTZwSOrMvhwfjVNV2QdNyrngETMuhsHt5xGe5Ql9Ahsh+NIRPv+KBf5LGQEh27v3w2YwDhdkEwo+nd0e3Au/oPcuFFE2INyp8YqLTZiTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYk4ZU0p; arc=none smtp.client-ip=10.30.226.201
+	bh=5FZPpUp06QAsKttb8r5t8JfnlbptX7fcGW9WJApaHVA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ZM0dx8HX6yX6Hl0a2RTU1GytvqA/P9dPNSCz/AbzJDGE75JIQTd7UeqlU1eNlBmsoVuZOxNOuy5ev5Xa9Xur3ctz+O2gJuoY3Z59gmQt4Zj8rVkEhJqkeccwctWd9/f0zp26VePyUdnECtXf+sqaBn2eSOj7B0ngzd5WfqzrLzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DoR6ji4W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYk4ZU0p"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94465C4CEEA;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DoR6ji4W"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B2390C4CEEB;
 	Thu, 12 Jun 2025 05:31:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1749706272;
-	bh=2xaDBbW3p/NzxFMw5RbplFMMUhcZCtv2lWoQPaPTm3Q=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=dYk4ZU0pBcGCVZQrIM399a9kETCiPv6mOATesg83taUELUd29RXd1B4ZSkv9NNyVo
-	 omdrAhQP6ZlWw6g/9OjK59gl8BHaQvNOWXQwM6yj0ZzSVRhndsBygIK1f+QgikXLSe
-	 kKdZqQJKzKybt8iFbDUu87OX/gugiaPtmivgftRMi6zJTsMBOxuWvic58pLPjGkUsu
-	 1Fv+4sexDvaf4IUCdETZzWgGsylM3nJ/pg+ELgDBlQQJU7CwNHr9KT62txJbwz6OZ2
-	 XC6VYitTng42Bbmy4qGFZV+6FGonGHkwo88qcOQvuRd5e/0G5cttzYuYhl1Ut9dEwN
-	 m606rJwGiX2lg==
+	bh=5FZPpUp06QAsKttb8r5t8JfnlbptX7fcGW9WJApaHVA=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=DoR6ji4WnQNCUQj5Lw8zfMrNpR+yMd7VA2+GRuD6wH4+YFyAlqzD4nBjCk2qNO/QM
+	 T8Zxft6gqBR+Ehjpcis6eJqpa8DAi6B4NZ3giJBenGi7s7Zvl38a8ph9tnferWeNuw
+	 qurDMUdaTpE3ldy+h5jCYop5/+Gsdk6R+0gmoA3/joIvZQoGf3om/pTJtnuZKkI5AN
+	 6F5EUIMtULA/ZIPy1FMvqablpSg316QZXugSXOhpdDiQJ1/fGwP8kr2allzJiKAU3+
+	 jNj4owaE9iQIfa43L4wnWr0c+GR1rxvwOBBgQdFaKwfeMPDHBX1LcC1egfQlZmwYEx
+	 6JPQ2OHesn3LQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84507C61CE8;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BEDC61CE8;
 	Thu, 12 Jun 2025 05:31:12 +0000 (UTC)
 From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Subject: [PATCH BlueZ bluez v2 0/2] bass: Support for Encrypted Broadcast
- Source
-Date: Thu, 12 Jun 2025 13:31:00 +0800
-Message-Id: <20250612-bass_for_encrypted_broadcast_source-v2-0-9128a437b595@amlogic.com>
+Date: Thu, 12 Jun 2025 13:31:02 +0800
+Subject: [PATCH BlueZ bluez v2 2/2] shared/bass: Move cb->handle earlier in
+ the flow
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -41,18 +41,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABRmSmgC/5WNWwqDMBBFt1LmuynGakz71X0UkTwmGlAjE5Vac
- e8N7qCf5144Z4eI5DHC87ID4eqjD2OC/HoB06mxReZtYsizvMwE50yrGBsXqMHR0DbNaBtNQVm
- j4tzEsJBB5oQseOUsYnWHZJoInf+clTfofsEv1GnufJwDbWd75ef5V2bljDPx0FLzUhRSmpca+
- tB6czNhgPo4jh8I43wV3wAAAA==
+Message-Id: <20250612-bass_for_encrypted_broadcast_source-v2-2-9128a437b595@amlogic.com>
+References: <20250612-bass_for_encrypted_broadcast_source-v2-0-9128a437b595@amlogic.com>
+In-Reply-To: <20250612-bass_for_encrypted_broadcast_source-v2-0-9128a437b595@amlogic.com>
 To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Cc: Yang Li <yang.li@amlogic.com>
 X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1749706270; l=733;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1749706270; l=1602;
  i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=2xaDBbW3p/NzxFMw5RbplFMMUhcZCtv2lWoQPaPTm3Q=;
- b=V+XJYm64c1F1XqC7ASdiFawab3nrp/zbYuh2WhsF9O60camRyQiciel4s7MQyIIVXIWxnbWS1
- rjBPO/yDRM4Aqb8YnEF03INZ5VS7q/TZ0oTPQSwpZsbLvty1i+0EHVw
+ bh=uizwlgQnQ9OZFKNg9Um1+6VAFUiT2zcih49bxU5xeUU=;
+ b=dJ+51dHo2iyOeip4qbM5GpmSZhRboHJtzCMAuH4sq7k2ylztAdpsY8URFxoTVomvIffzqacGq
+ Tbh2h6IB8G+BylTrjyrbZIOIRoiT1VG2/cAXVLpeB2M5MUEr5R17hDw
 X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
  pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
 X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
@@ -60,27 +59,65 @@ X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
 X-Original-From: Yang Li <yang.li@amlogic.com>
 Reply-To: yang.li@amlogic.com
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Changes in v2:
-- Submit shared/bass.c separately.
-- Add necessary comments.
-- Link to v1: https://patch.msgid.link/20250611-bass_for_encrypted_broadcast_source-v1-1-69b8b156488c@amlogic.com
+From: Yang Li <yang.li@amlogic.com>
 
+This change ensures cb->handle is executed even
+if the function returns early in the attribute_notify
+section. It also allows the stream status to be updated
+before notifying the client, improving efficiency.
 ---
-Yang Li (2):
-      bass: support for encrypted broadcast source
-      shared/bass: Move cb->handle earlier in the flow
+ src/shared/bass.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
- profiles/audio/bass.c | 32 ++++++++++++++++++++++++++++++++
- src/shared/bass.c     | 29 ++++++++++++++---------------
- 2 files changed, 46 insertions(+), 15 deletions(-)
----
-base-commit: 95b72bbf1fe42216d02a5ebb99bd18e9b69b6064
-change-id: 20250611-bass_for_encrypted_broadcast_source-f68417fdee73
+diff --git a/src/shared/bass.c b/src/shared/bass.c
+index 7b9e0da63..11ad59e3b 100644
+--- a/src/shared/bass.c
++++ b/src/shared/bass.c
+@@ -964,6 +964,20 @@ static void bass_handle_set_bcast_code_op(struct bt_bass *bass,
+ 
+ 	gatt_db_attribute_write_result(attrib, id, 0x00);
+ 
++	for (entry = queue_get_entries(bass->cp_handlers); entry;
++						entry = entry->next) {
++		struct bt_bass_cp_handler *cb = entry->data;
++
++		if (cb->handler) {
++			ret = cb->handler(bcast_src,
++					BT_BASS_SET_BCAST_CODE,
++					params, cb->data);
++			if (ret)
++				DBG(bass, "Unable to handle Set "
++						"Broadcast Code operation");
++		}
++	}
++
+ 	if (!bass_trigger_big_sync(bcast_src)) {
+ 		bcast_src->enc = BT_BASS_BIG_ENC_STATE_DEC;
+ 
+@@ -977,21 +991,6 @@ static void bass_handle_set_bcast_code_op(struct bt_bass *bass,
+ 
+ 		free(notif->iov_base);
+ 		free(notif);
+-		return;
+-	}
+-
+-	for (entry = queue_get_entries(bass->cp_handlers); entry;
+-						entry = entry->next) {
+-		struct bt_bass_cp_handler *cb = entry->data;
+-
+-		if (cb->handler) {
+-			ret = cb->handler(bcast_src,
+-					BT_BASS_SET_BCAST_CODE,
+-					params, cb->data);
+-			if (ret)
+-				DBG(bass, "Unable to handle Set "
+-						"Broadcast Code operation");
+-		}
+ 	}
+ }
+ 
 
-Best regards,
 -- 
-Yang Li <yang.li@amlogic.com>
+2.42.0
 
 
