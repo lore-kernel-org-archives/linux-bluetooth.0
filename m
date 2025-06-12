@@ -1,139 +1,125 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B452AE6D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 05:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03AA195808
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 07:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749707190; cv=none; b=o8gCZMFZbYiRbKeo5J+rDsHXIZGXw5YpwnLKmf6FDdMESijuTS6GrAfnrwmbbLopcKd5XPQAiVO29gdcG6VkECS45o7eL4f2QvIV8YzbkFWi5c/flWcoQw6lNAdUXQz1Spoulb3ZHRZ2g4atHe8EkYeNkm1xHU7Vrb7YlWccjns=
+	t=1749711629; cv=none; b=IBiZZq4zZSkn+IldFyapDEL0tx2T+WKIcABjGKZ19HoR1LsVcums/3lL6vIn07abpCMn0UgZbIsA5gryBjZItYQP0BTVqKpH2C7LVXqL/Le1LhYNgTGuIzO3Nd7fGGRm69HB2PjUKrdQ8tGR2s07RzdnuuwJoJBAgzrGHVDAR4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749707190; c=relaxed/simple;
-	bh=e4wjWcarrlWwpIQPSRsKVxpcMVNmQqPO5+jvIm83uf0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iVIDdQgSBYR75OHJyaDrGLAib/aO2Mnge9GrfeZpePABq1llCJbIcuGr3pDBg6V7bMwdBOcyRlTjmvdGD3gMWf5pQ+n1VGcgMPVOhPFjRWq+VcMiuMSrqDzo3x2kVGom/SOrlcHH1lL52qHLbYJXZiBAk3zY7KbDair+35MFeLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=LsMpZRn1; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1749711629; c=relaxed/simple;
+	bh=0LNJ3qJ8ZayEFTpSieLidgTLASjnbpY6xzzTTGzyr6I=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qQm6zyHHTzRm4X64Dw0HyTP13lbK9SaXavLr1wBFgFA0c1Ddm6BAQqIVgvj1tQxhBum+3/69Y9TTZKis/AFw9oSY8o15nDlPgKzFBdjGxT64VKpxnh+MuX7xzMMGVdiafwgbb0nyTMPCse2QbzKZi1NEDJQJHeeFczHkRjCYf4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gNzh4b6Q; arc=none smtp.client-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="LsMpZRn1"
-Received: from github.com (hubbernetes-node-6bf96a3.ac4-iad.github.net [10.52.206.50])
-	by smtp.github.com (Postfix) with ESMTPA id DAA9070094E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jun 2025 22:46:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1749707187;
-	bh=oz8hRcdQKgoV0Ox44FJexRQurp8ulNu1uRyzECaLc98=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=LsMpZRn1jzZ6VWSXu9xKullpdeDxQskVft0LufQ6Epbj78C8r0eqQYnMGHQGWgFt/
-	 bW85+Smk5p4aOjWUbBONggphVZeKS7BmqXmmF3twvYpjoEbfDKPNWT9Q2k+zkBiLqe
-	 VfkHnMEBwhTMmpsIZF1+LVKtdm3KhjDdOJk7UruA=
-Date: Wed, 11 Jun 2025 22:46:27 -0700
-From: "github-actions[bot]" <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/971158/000000-5d59e0@github.com>
-Subject: [bluez/bluez] 9603de: bass: support for encrypted broadcast source
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNzh4b6Q"
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-877d7fa49e0so362344241.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 00:00:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749711625; x=1750316425; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rWCU86zB/X9DyQpS3tnEa4lSVyJ1VRwYKYHykF11d/I=;
+        b=gNzh4b6Qo11NyIgPvpj1drTjGFyrxZiFya6u7zCCVo3Mc+RcsG4HJTOqTjZL1kTVIH
+         IRrDyygZQrQ0o+aT4llT+A6n/v93fGIKpHS9/nFNASfWNrVQB6WsxU4jcXqH13zm/b7+
+         /UBWZspSTiBg/1KepeV8MTrWHMlozgwBQJVsG+Jn2iAJQeI49S8Rl3Nc6pJWJcpyJCme
+         RFcz+DDTh/SoZSpESheFavUQ8QxkHtAnRMy6aHILtmiptVffvaedLJjhP+Qh6z3HCNic
+         gglJFD15yZuA8fMt0Zr4SHNW8MjUd8iC8CyOrDB8dSEDQDkYt7ePUHP6LnO53iqBYRB+
+         4qDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749711625; x=1750316425;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rWCU86zB/X9DyQpS3tnEa4lSVyJ1VRwYKYHykF11d/I=;
+        b=j5yEzz3Mc1JyRY7s2ewoHN50HkET8BxgHffinT9xH2bJWIheeMjGJ3ATbKZTWIPr9k
+         +8tKhvf38zpAtkNFnhGXR+rpwXzkZ60eYumiwz46aJgDOkz3Gfe0/cp+FHMwrWX46OxI
+         gpDkB7zlaYqZiWW5npFR92v+LDvmjk+GY3sJWISVxUr+whrVtHCoqm1oI21QNvShh8Op
+         nRDe9B1IBmT41P8YB88F2R4Mvlf2Hh/9UVpv5OUnBF8Wv1voEfzWgx9rc5YV9WRnrOB5
+         B4o2BtFC0UMEFChyiIqU4Y4hBiwIoj8Qd+C0dRfOswAOxXV9cM44H22xXL7lFQcOu72G
+         uvXw==
+X-Gm-Message-State: AOJu0YywQlQNze4sZrd58fy1AWc5anuNaecIwYmHzppDh4xBlcAEFEGA
+	5I8cf6en6XC+TdUMdGeJc1mRNFwbGl3vKn/WkQISsLAGuTheBHBBxj0a7UenM3nm
+X-Gm-Gg: ASbGncuIQ4ovsVohEpcLgPfSt3cn7AwBBHRCswp94ftLMIlIpJpv1c1RV7hIotgVT1r
+	w8OLqkd40/3JO+4b/TIw7u5W6D5/zsHKhX+VdzWuw6962EHtCZA5G6WWGiJ0lP5inlFRfs1CLaj
+	ind5I9JwyGBrGclaSJPUPUgEkF9SN1cxo6QAOPQGbuvzPnTf8cfNyuVvlRTrpetxFzlWoNnB7B9
+	wvQ2Nr+DRxT8Gg90HeOjNEAlpE4rYDMMlYJ1BF2JEnEcps1D4Fgw9zJtKVs7OTMjFJPTRx6QSOk
+	pQ5szHP/43CJFSVpbRGXejfMDW9toNg9BQ458yHybhd/EoVhQvvM15kpNSV0KxHba2nR
+X-Google-Smtp-Source: AGHT+IGUw8hSUocXB2hzP2QYVWM+XhCHJqMEE2F8KY5ldEWv46/Ju4w5n4R/sB4m0D1uDDblz4Y3hA==
+X-Received: by 2002:a05:6214:b63:b0:6fb:33f7:5f34 with SMTP id 6a1803df08f44-6fb34ebe79emr25852476d6.43.1749711612421;
+        Thu, 12 Jun 2025 00:00:12 -0700 (PDT)
+Received: from [172.17.0.2] ([172.178.11.88])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fb35c8511bsm7187836d6.113.2025.06.12.00.00.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 00:00:11 -0700 (PDT)
+Message-ID: <684a7afb.050a0220.367d9d.0c58@mx.google.com>
+Date: Thu, 12 Jun 2025 00:00:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7648541822233193545=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
+Subject: RE: bass: Support for Encrypted Broadcast Source
+In-Reply-To: <20250612-bass_for_encrypted_broadcast_source-v2-1-9128a437b595@amlogic.com>
+References: <20250612-bass_for_encrypted_broadcast_source-v2-1-9128a437b595@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7648541822233193545==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/971158
-  Home:   https://github.com/bluez/bluez
-  Commit: 9603de6e8ec445d4528056957e56c784bd7834d3
-      https://github.com/bluez/bluez/commit/9603de6e8ec445d4528056957e56c784bd7834d3
-  Author: Yang Li <yang.li@amlogic.com>
-  Date:   2025-06-12 (Thu, 12 Jun 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/bass.c
+Dear submitter,
 
-  Log Message:
-  -----------
-  bass: support for encrypted broadcast source
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=971158
 
-If the BIS is encrypted as indicated in the BIG Info Report, the
-broadcast code needs to be requested from the Assistant.
+---Test result---
 
-step 1: Broadcast_Code required
-  > HCI Event: LE Meta Event (0x3e) plen 20                 #631 [hci0] 27.176606
-        LE Broadcast Isochronous Group Info Advertising Report (0x22)
-          Sync Handle: 0x0000
-          Number BIS: 2
-          NSE: 8
-          ISO Interval: 20.00 msec (0x0010)
-          BN: 2
-          PTO: 2
-          IRC: 2
-          Maximum PDU: 60
-          SDU Interval: 10000 us (0x002710)
-          Maximum SDU: 60
-          PHY: LE 2M (0x02)
-          Framing: Unframed (0x00)
-          Encryption: 0x01
-  < ACL Data TX: Handle 16 flags 0x00 dlen 44               #633 [hci0] 27.184478
-        ATT: Handle Value Notification (0x1b) len 39
-          Handle: 0x005f Type: Broadcast Receive State (0x2bc8)
-            Data[37]: 01016698a411bb13019f103b02010100000000110d03506978656c20395f32303938020502
-            Source_ID: 1
-            Source_Address_Type: 1
-            Source_Address: 13:BB:11:A4:98:66
-            Source_Adv_SID: 1
-            Broadcast_ID: 0x3b109f
-            PA_Sync_State: Synchronized to PA
-            BIG_Encryption: Broadcast_Code required
-            Num_Subgroups: 1
-            Subgroup #0:
-              BIS_Sync State: 0x00000000
-              Metadata: #0: len 0x0d type 0x03
-              Metadata:   50 69 78 65 6c 20 39 5f 32 30 39 38              Pixel 9_2098
-              Metadata: #1: len 0x02 type 0x05
-              Metadata:   02
-  > ACL Data RX: Handle 16 flags 0x02 dlen 25               #636 [hci0] 27.455744
-        ATT: Write Command (0x52) len 20
-          Handle: 0x0065 Type: Broadcast Audio Scan Control Point (0x2bc7)
-            Data[18]: 04013a4931614b3a2b7c4b7431722b666724
-              Opcode: Set Broadcast_Code (0x04)
-              Source_ID: 1
-              Broadcast_Code[16]: 3a4931614b3a2b7c4b7431722b666724
+Test Summary:
+CheckPatch                    PENDING   0.25 seconds
+GitLint                       PENDING   0.24 seconds
+BuildEll                      PASS      19.96 seconds
+BluezMake                     PASS      2591.70 seconds
+MakeCheck                     PASS      20.09 seconds
+MakeDistcheck                 PASS      196.51 seconds
+CheckValgrind                 PASS      272.12 seconds
+CheckSmatch                   PASS      296.57 seconds
+bluezmakeextell               PASS      121.05 seconds
+IncrementalBuild              PENDING   0.21 seconds
+ScanBuild                     PASS      881.66 seconds
 
-step 2: Set Broadcast Code when BIG Create Sync
-  < HCI Command: LE Broadcast Isoc.. (0x08|0x006b) plen 26  #641 [hci0] 27.669211
-          BIG Handle: 0x00
-          BIG Sync Handle: 0x0000
-          Encryption: Encrypted (0x01)
-          Broadcast Code[16]: 3a4931614b3a2b7c4b7431722b666724
-          Maximum Number Subevents: 0x00
-          Timeout: 20000 ms (0x07d0)
-          Number of BIS: 2
-          BIS ID: 0x01
-          BIS ID: 0x02
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-Fixes: https://github.com/bluez/bluez/issues/1306
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: 5d59e01b3a664b0ebdc0f86346c7516f736ed51f
-      https://github.com/bluez/bluez/commit/5d59e01b3a664b0ebdc0f86346c7516f736ed51f
-  Author: Yang Li <yang.li@amlogic.com>
-  Date:   2025-06-12 (Thu, 12 Jun 2025)
 
-  Changed paths:
-    M src/shared/bass.c
-
-  Log Message:
-  -----------
-  shared/bass: Move cb->handle earlier in the flow
-
-This change ensures cb->handle is executed even
-if the function returns early in the attribute_notify
-section. It also allows the stream status to be updated
-before notifying the client, improving efficiency.
+---
+Regards,
+Linux Bluetooth
 
 
-Compare: https://github.com/bluez/bluez/compare/9603de6e8ec4%5E...5d59e01b3a66
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============7648541822233193545==--
