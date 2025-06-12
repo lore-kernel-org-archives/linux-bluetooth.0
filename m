@@ -1,267 +1,147 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8385421B18B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 07:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938742222CA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 07:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749714644; cv=none; b=jBbs++lWpR+5gwNN+Dpab3R+ShWXZ5TMbrVW93sPPPGrFobvF3vzucNf6H5rSPsmgarNBZElWQqQQBdG9M1ngubzDEbiehUJ4jzv87l2MMbVaY/2BYk3f2ukzMabXYD33IT/GommjCCyUkVydUTHch2+9Zy5zdT9JO6tHF5mfIg=
+	t=1749715086; cv=none; b=LUytz4MPlOX7cLUc7BTEm0TELJwPDXnf43HKMMlu5DwSdXqc5IfWXesWhvlXGTy2qgXj4OFuB9HPBMG4hhu0UJDh12imYLPw7h9unBHAuJo99rU3MaYki4GBAXU5HzEYgu5o1kbQ7boER7+jK1k5bXO6dbYAYiBrCR6qPc/qFTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749714644; c=relaxed/simple;
-	bh=JKhe/hvaL6dpdK3i8SfVmAbnT/DFACW2oPBkPcCYo6A=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Type; b=JwDdPXY9eNgugI+dazRTcOzNjFLh7p/TTR5R7h9CuGcem7jmPUAEquXjurbZ1Wbdsf44kWWgmHRcARzqsAYHaExno9KMGwvy4RjbbMX2cwlPg5N1E9U0KSyd69Z6e/EHj5ZeU1mnGo9tI9jjRCUQ+spH1/0ayhkeX7aerO9g7+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ct5Uont/; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1749715086; c=relaxed/simple;
+	bh=lm4m62htmQGylXuYlNgMT3m+8BxQpFj8pZFU8jClyDs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=bTxjtV43+4ywYP4ymvwNasrYwwEDqcIkjJ8hNvIylZaG7FAb/jqsQPb6mjhw5tCUjwKyGKqUC5DpqAw6v0w1TAYVJVwu5rG/7VptUzkeokIKobSFRia0vleHwYq6PhbFBGZnJ8nmUdXHsUMe9iAEhTFBYnmiDzU95Q9xmPvY1FM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=POlWwI/U; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ct5Uont/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1749714640;
-	bh=JKhe/hvaL6dpdK3i8SfVmAbnT/DFACW2oPBkPcCYo6A=;
-	h=From:To:Subject:Date:From;
-	b=ct5Uont/Cxknu57B28QnMcLBG2QhTbYgvZOQAgFTzTckSMEO9wk0Xs9PmC0DQ8eww
-	 uxUBwojwsHxaZl7szdohT1H0cF82LxCOlzYIwGGnnpAy4SE/a3Zo+4y+VvTI06tCuU
-	 iZ8BHLmhz5mq6WikDKuKWKHiz8O4Nh4Y3PM383zvxa3DLdzaqpqhYVM8OGY9/dChJt
-	 PG1hfcLEQwGetqKVTPB/sIJ2mrsdccenUmzE6qaCVlpkDET4ttcyfGGzoRE7EHxOBn
-	 lexFTjFx9ZXWHsmm2WrBxtOzfZc0C+JB5VZuNe0Vp0WN4L+dfw9mKc7EH9CDGZA/y9
-	 snIu/e66uckeA==
-Received: from fdanis-ThinkPad-X1.. (2a02-8428-aF44-1001-5541-323A-6132-86Ef.rev.sfr.net [IPv6:2a02:8428:af44:1001:5541:323a:6132:86ef])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 63F3017E1072
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 09:50:40 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix L2CAP MTU negotiation
-Date: Thu, 12 Jun 2025 09:50:34 +0200
-Message-ID: <20250612075034.190194-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POlWwI/U"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4772f48f516so18445551cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 00:58:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749715083; x=1750319883; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y5YBvqQDz22M2l5ryxNQ7I7KKugp4619hoOUwIjZsLE=;
+        b=POlWwI/Uv8XXCxNXG3gZzvsQAp1v/fte0IW53saS7cJzM8dodz7C2oDhncV4LZll5s
+         pmNsnydeDkn9CbsKuDRYkYGp/t7HRtkxLW8fpTZJN/QVfCuxCNEz289jFUitmt3SJPzf
+         s33Q7+DV7eNSfjr/7EEZeSpc6PG9A7tk1B538e9nhA5gbY39RhiIqNImZ1cAqljYDLBJ
+         D9NUdOOF69Wj4vqPnVNcW1DmNYC9EedIf37JmJbxeOohZFaYnG/xADF5TT5L0kiRP6D5
+         3op/LNmHlG3xv/MqPUKF90avEK9FyHRUQXy/P2TOpdEKTZC42vOpdiTmjceNToW2xmAL
+         FA9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749715083; x=1750319883;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y5YBvqQDz22M2l5ryxNQ7I7KKugp4619hoOUwIjZsLE=;
+        b=Wnv+HmDH/B2F5JQq18QsLMQKjaNYIWuFyo3giNf1M+VTXJ5D4LQX5Czq4w+3OvB8PM
+         P7iHA0PH7uiN3tcala0N7qB0a4MDtKNEbVuJX5mJfdG1i/mWA8xQS0VMFjqo9uSVBDYq
+         YFHZDpKERJiB96fDIVMtFIZJPrIf2krwk4/IUpShqC9obZMkwB6FbSRqr94pXshqFMRv
+         G6xi1PZXr7BQgjpyrCr3qM+e4/OPhWkqvHC6DzBp2eXv/ZQlT956unEIGNMUOBXCsp0G
+         MZH9icx+Lj0/j2K6oI6RDCpFCessAMZzlNHzaOa4dOkANDsSK5GcgBL18z98Swt9+gdA
+         nCzQ==
+X-Gm-Message-State: AOJu0YzycORViMPdyHC2fzoe+unz6WHY9GRKon091d1LBlTbaexIDYEH
+	r0wW8hqpEmwGwLcHVLX0g1QzsQz7Q5EYCfeX0QDKiafSmyx8u3yQN1wgeW+CGQ==
+X-Gm-Gg: ASbGncs7xWK+urbQGZ8mRkkVizZDGsb08otVnjTlX8iA9zNoBRaEUhVVFSvNcR4InHN
+	Qu0wGaqET8ly8xRSSzCzggxjNX/CWAjrZs2HWHWpQ26rU10cQrZ+AzLHbcg68bX2EoO3LBfAodE
+	0noYCfpK+SQ1bEoPUKrgk1oL2jn2JI53zeqHmp4nK+WS2xC8j0W0pDIT6q+fkFEW11iLx2gP41t
+	hlzJUtOykBD5nAP69lgFIBQrk0r2OAJw35I8AlXjghEpimpGlPFXA5H4BME5lTDu+AhYt6xGvz3
+	d0bpHUFJvlRA9JgOm+vxnFLwK7pJWUpC9k+jRhhCivm2ngcjpBpuEYBXvtrg9ystEp/IbtEZLw/
+	myDc=
+X-Google-Smtp-Source: AGHT+IEQnxFkFQ0HNHwjoU2pZH5Ljm90eaG6War3kN4CO1sX1+9ZRvFckOj17/PYgnYKg23sUKdwPg==
+X-Received: by 2002:a05:622a:1c18:b0:4a4:31e0:c824 with SMTP id d75a77b69052e-4a7235c3b19mr36734581cf.19.1749715083209;
+        Thu, 12 Jun 2025 00:58:03 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.62.130])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a5201c7sm1355601cf.77.2025.06.12.00.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 00:58:02 -0700 (PDT)
+Message-ID: <684a888a.050a0220.1f42ca.0255@mx.google.com>
+Date: Thu, 12 Jun 2025 00:58:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2218027225819548739=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ot_zhangchao.zhang@mediatek.com
+Subject: RE: [v2] Bluetooth: mediatek: add gpio pin to reset bt
+In-Reply-To: <20250612072230.12537-1-ot_zhangchao.zhang@mediatek.com>
+References: <20250612072230.12537-1-ot_zhangchao.zhang@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-OBEX download from iPhone is currently slow due to small packet size
-used to transfer data which doesn't follow the MTU negotiated during
-L2CAP connection, i.e. 672 bytes instead of 32767:
+--===============2218027225819548739==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  < ACL Data TX: Handle 11 flags 0x00 dlen 12
-      L2CAP: Connection Request (0x02) ident 18 len 4
-        PSM: 4103 (0x1007)
-        Source CID: 72
-  > ACL Data RX: Handle 11 flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 18 len 8
-        Destination CID: 14608
-        Source CID: 72
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
-  < ACL Data TX: Handle 11 flags 0x00 dlen 27
-      L2CAP: Configure Request (0x04) ident 20 len 19
-        Destination CID: 14608
-        Flags: 0x0000
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 32767
-        Option: Retransmission and Flow Control (0x04) [mandatory]
-          Mode: Enhanced Retransmission (0x03)
-          TX window size: 63
-          Max transmit: 3
-          Retransmission timeout: 2000
-          Monitor timeout: 12000
-          Maximum PDU size: 1009
-  > ACL Data RX: Handle 11 flags 0x02 dlen 26
-      L2CAP: Configure Request (0x04) ident 72 len 18
-        Destination CID: 72
-        Flags: 0x0000
-        Option: Retransmission and Flow Control (0x04) [mandatory]
-          Mode: Enhanced Retransmission (0x03)
-          TX window size: 32
-          Max transmit: 255
-          Retransmission timeout: 0
-          Monitor timeout: 0
-          Maximum PDU size: 65527
-        Option: Frame Check Sequence (0x05) [mandatory]
-          FCS: 16-bit FCS (0x01)
-  < ACL Data TX: Handle 11 flags 0x00 dlen 29
-      L2CAP: Configure Response (0x05) ident 72 len 21
-        Source CID: 14608
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 672
-        Option: Retransmission and Flow Control (0x04) [mandatory]
-          Mode: Enhanced Retransmission (0x03)
-          TX window size: 32
-          Max transmit: 255
-          Retransmission timeout: 2000
-          Monitor timeout: 12000
-          Maximum PDU size: 1009
-  > ACL Data RX: Handle 11 flags 0x02 dlen 32
-      L2CAP: Configure Response (0x05) ident 20 len 24
-        Source CID: 72
-        Flags: 0x0000
-        Result: Success (0x0000)
-        Option: Maximum Transmission Unit (0x01) [mandatory]
-          MTU: 32767
-        Option: Retransmission and Flow Control (0x04) [mandatory]
-          Mode: Enhanced Retransmission (0x03)
-          TX window size: 63
-          Max transmit: 3
-          Retransmission timeout: 2000
-          Monitor timeout: 12000
-          Maximum PDU size: 1009
-        Option: Frame Check Sequence (0x05) [mandatory]
-          FCS: 16-bit FCS (0x01)
-  ...
-  > ACL Data RX: Handle 11 flags 0x02 dlen 680
-      Channel: 72 len 676 ctrl 0x0202 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
-      I-frame: Unsegmented TxSeq 1 ReqSeq 2
-  < ACL Data TX: Handle 11 flags 0x00 dlen 13
-      Channel: 14608 len 9 ctrl 0x0204 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
-      I-frame: Unsegmented TxSeq 2 ReqSeq 2
-  > ACL Data RX: Handle 11 flags 0x02 dlen 680
-      Channel: 72 len 676 ctrl 0x0304 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
-      I-frame: Unsegmented TxSeq 2 ReqSeq 3
+This is automated email and please do not reply to this email!
 
-The MTUs are negotiated for each direction. In this traces 32767 for
-iPhone->localhost and no MTU for localhost->iPhone, which based on
-'4.4 L2CAP_CONFIGURATION_REQ' (Core specification v5.4, Vol. 3, Part
-A):
+Dear submitter,
 
-  The only parameters that should be included in the
-  L2CAP_CONFIGURATION_REQ packet are those that require different
-  values than the default or previously agreed values.
-  ...
-  Any missing configuration parameters are assumed to have their
-  most recently explicitly or implicitly accepted values.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=971187
 
-and '5.1 Maximum transmission unit (MTU)':
+---Test result---
 
-  If the remote device sends a positive L2CAP_CONFIGURATION_RSP
-  packet it should include the actual MTU to be used on this channel
-  for traffic flowing into the local device.
-  ...
-  The default value is 672 octets.
+Test Summary:
+CheckPatch                    PENDING   0.23 seconds
+GitLint                       PENDING   0.19 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      26.20 seconds
+CheckAllWarning               PASS      27.87 seconds
+CheckSparse                   PASS      31.47 seconds
+BuildKernel32                 PASS      25.07 seconds
+TestRunnerSetup               PASS      474.83 seconds
+TestRunner_l2cap-tester       PASS      25.41 seconds
+TestRunner_iso-tester         FAIL      7.90 seconds
+TestRunner_bnep-tester        PASS      6.04 seconds
+TestRunner_mgmt-tester        FAIL      135.58 seconds
+TestRunner_rfcomm-tester      PASS      9.31 seconds
+TestRunner_sco-tester         PASS      14.85 seconds
+TestRunner_ioctl-tester       PASS      10.02 seconds
+TestRunner_mesh-tester        PASS      7.36 seconds
+TestRunner_smp-tester         PASS      8.54 seconds
+TestRunner_userchan-tester    PASS      6.12 seconds
+IncrementalBuild              PENDING   0.85 seconds
 
-is set by BlueZ to 672 bytes.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-It seems that the iPhone used the lowest negotiated value to transfer
-data to the localhost instead of the negotiated one for the incoming
-direction.
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-This could be fixed by using the MTU negotiated for the other
-direction, if exists, in the L2CAP_CONFIGURATION_RSP.
-This allows to use segmented packets as in the following traces:
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
 
-  < ACL Data TX: Handle 11 flags 0x00 dlen 12
-        L2CAP: Connection Request (0x02) ident 22 len 4
-          PSM: 4103 (0x1007)
-          Source CID: 72
-  < ACL Data TX: Handle 11 flags 0x00 dlen 27
-        L2CAP: Configure Request (0x04) ident 24 len 19
-          Destination CID: 2832
-          Flags: 0x0000
-          Option: Maximum Transmission Unit (0x01) [mandatory]
-            MTU: 32767
-          Option: Retransmission and Flow Control (0x04) [mandatory]
-            Mode: Enhanced Retransmission (0x03)
-            TX window size: 63
-            Max transmit: 3
-            Retransmission timeout: 2000
-            Monitor timeout: 12000
-            Maximum PDU size: 1009
-  > ACL Data RX: Handle 11 flags 0x02 dlen 26
-        L2CAP: Configure Request (0x04) ident 15 len 18
-          Destination CID: 72
-          Flags: 0x0000
-          Option: Retransmission and Flow Control (0x04) [mandatory]
-            Mode: Enhanced Retransmission (0x03)
-            TX window size: 32
-            Max transmit: 255
-            Retransmission timeout: 0
-            Monitor timeout: 0
-            Maximum PDU size: 65527
-          Option: Frame Check Sequence (0x05) [mandatory]
-            FCS: 16-bit FCS (0x01)
-  < ACL Data TX: Handle 11 flags 0x00 dlen 29
-        L2CAP: Configure Response (0x05) ident 15 len 21
-          Source CID: 2832
-          Flags: 0x0000
-          Result: Success (0x0000)
-          Option: Maximum Transmission Unit (0x01) [mandatory]
-            MTU: 32767
-          Option: Retransmission and Flow Control (0x04) [mandatory]
-            Mode: Enhanced Retransmission (0x03)
-            TX window size: 32
-            Max transmit: 255
-            Retransmission timeout: 2000
-            Monitor timeout: 12000
-            Maximum PDU size: 1009
-  > ACL Data RX: Handle 11 flags 0x02 dlen 32
-        L2CAP: Configure Response (0x05) ident 24 len 24
-          Source CID: 72
-          Flags: 0x0000
-          Result: Success (0x0000)
-          Option: Maximum Transmission Unit (0x01) [mandatory]
-            MTU: 32767
-          Option: Retransmission and Flow Control (0x04) [mandatory]
-            Mode: Enhanced Retransmission (0x03)
-            TX window size: 63
-            Max transmit: 3
-            Retransmission timeout: 2000
-            Monitor timeout: 12000
-            Maximum PDU size: 1009
-          Option: Frame Check Sequence (0x05) [mandatory]
-            FCS: 16-bit FCS (0x01)
-  ...
-  > ACL Data RX: Handle 11 flags 0x02 dlen 1009
-        Channel: 72 len 1005 ctrl 0x4202 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
-        I-frame: Start (len 21884) TxSeq 1 ReqSeq 2
-  > ACL Data RX: Handle 11 flags 0x02 dlen 1009
-        Channel: 72 len 1005 ctrl 0xc204 [PSM 4103 mode Enhanced Retransmission (0x03)] {chan 8}
-        I-frame: Continuation TxSeq 2 ReqSeq 2
+Failed Test Cases
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.200 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
-This has been tested with kernel 5.4 and BlueZ 5.77.
 
-Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+
 ---
- net/bluetooth/l2cap_core.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a5bde5db58ef..40daa38276f3 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3415,7 +3415,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
- 	struct l2cap_conf_efs efs;
- 	u8 remote_efs = 0;
--	u16 mtu = L2CAP_DEFAULT_MTU;
-+	u16 mtu = 0;
- 	u16 result = L2CAP_CONF_SUCCESS;
- 	u16 size;
- 
-@@ -3520,6 +3520,13 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 		/* Configure output options and let the other side know
- 		 * which ones we don't like. */
- 
-+		/* If MTU is not provided in configure request, use the most recently
-+		 * explicitly or implicitly accepted value for the other direction,
-+		 * or the default value.
-+		 */
-+		if (mtu == 0)
-+			mtu = chan->imtu ? chan->imtu : L2CAP_DEFAULT_MTU;
-+
- 		if (mtu < L2CAP_DEFAULT_MIN_MTU)
- 			result = L2CAP_CONF_UNACCEPT;
- 		else {
--- 
-2.43.0
 
+--===============2218027225819548739==--
