@@ -1,139 +1,129 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51EE223DEA
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 08:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADB62356CF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 12:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749717564; cv=none; b=nltBbPrpt8bBX3of9PI4PdKpFzFjOcElWkObLq3Pz5AvHmbLcImP8oLcP3BkvAo1bW6f7+6NeiIEZjbzKrSoQzDXBwgapdjcsu2SCbidBukOfnRRcgvkrMPYTzyMevwsol6s0RPSDbQbBSJcgQ0An18HkODzA9EdoBv3DPDhuJs=
+	t=1749733000; cv=none; b=eZKd/5BpiYnSSL8iwlwiRt5Q83QecDg7+zuVyflsxrj/fcYKn0OmjU6Jq1SPdyEXmqCj7XorSvUDXbtrMxelG0hsOtW8Hyl3sWeK7x8mIbdpelaO0u/S7Xkh1jF/tQA7F6+5BfwgvvJwYZ8kdvz/06L8ZVV0EAWgmgj9P7J6+4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749717564; c=relaxed/simple;
-	bh=tkJCek5zSudCgoYwPzODkQg/osu1ayqruadBgVeXORI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=cHY6/1whdoikn7ZOAYrOIVSL01r4VIXCBJI/qMxH6TXFaTxBJ93rwkakrm51cnX6Cia6EDxYHSHfzjrBJUTABIyrTRnkEaRObOHg39+74YnPf8U5L+h4cbKt9lmzIrLjdnmsoAwn0xAkFmE+CC7Cfz9aa8Rd/dxj8H5krZiGFVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GVO9+fpk; arc=none smtp.client-ip=209.85.210.173
+	s=arc-20240116; t=1749733000; c=relaxed/simple;
+	bh=2f7+W0hy9UTc4rIBHc0BeIZ8PfUCNDLO9J9zm9BlxC8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bNFBv+0eLYl+svSQ7pMRgTGx+1lD9T0mmtpYRpvSAQXOXhebfDWlsOLGS93smwaeuGLRWWxYZH/StzQH2G4QdiveJ9eZt8nJI9gUl3OHqI/t3JNPrbI9bFRRKwc1PtJizxs+ASBKH0KA5w255YNrMlRnx4V2zrymy2QkDP98PN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KmOGs+8q; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GVO9+fpk"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-742c46611b6so896612b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 01:39:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmOGs+8q"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-552206ac67aso841103e87.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jun 2025 05:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749717562; x=1750322362; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+JlUx74RepV7V0ZcEw8NEFRipk6RAFsEPG62bZS3Vvc=;
-        b=GVO9+fpkxuLbSlaE9bAor2B6dSzoZo2yr5JYMYxT2gerlTxv63A0evw1CNyudV9sST
-         4kcvWOxF4Y1Em3ivC2eIaWNtHgDRuXjtCGZc0CrGOvURZTLaCRemhfP/dnAn4oWmicGH
-         kCy2V10dE+OHyl+QXOFR+xdf2UpohjsU/fDy6fbV8tVgc0eKXdAGxRRQzR6Ee0gVxVOH
-         SnOD+2vfAKrmIdIBa3l8ZZseRChncVUtazowTGkpPYFlmx3H0m2W8xpjCnfTyXR9x0ot
-         ea8a/eio+CC4ZLqIZp6HWJXMZUfn0FEAEEDM/v1euH24w8KwrrGOKzpjNIZv0tldyudf
-         zrzQ==
+        d=gmail.com; s=20230601; t=1749732993; x=1750337793; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y8gDjlnvYQL8K+z7FT+uPF9z0sOdB5N3CbytPyoT8po=;
+        b=KmOGs+8qIEaRhfzw56YjgPHQGUKmARMtA4l1i2Mb3y8jzMvWg/MZvZzV7NUfxRtyVS
+         rzbH+Rr41bhUGSlvH7POJCi5GLmUEfJhUkMl5GlOepu+WCHIoC9F+ZuVCrtSQOKkey9H
+         SQUbAr49h8gXaic4Gy0kpTl0JPJDjfZxtUz4SoNO+htYpcjCNw2OjBPhqAcAgLa2treA
+         p9JC4nATsEQBM7UCnVaPQxUL0XhMMRyp3ol1stCE6pz64Zem21GVrNcyz7FOFRcU9rMz
+         UUb/8TONAU6wlL/BbdKK1xMIGoPuAssFfC4t2vMH51iSUdPkKbiVPDaV4TE7bnBTw2TS
+         aDlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749717562; x=1750322362;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+JlUx74RepV7V0ZcEw8NEFRipk6RAFsEPG62bZS3Vvc=;
-        b=t3pfSm3yIPtEKBrSh6oF63Kq6BBNX73MxRnyM1hBdicsHEIC+PUp/C3U/cQfscOmzM
-         DzuH29CIDqpluj7RMfayD75LoUzLgAUC3uux7goGygTLfilD1nOcsvGVvFTwzPzhS34+
-         ZCV2cCbbJenf4GNl6QZBhUlKrFjBLrSOjfDEv00xZqjxNilIPuDYcnW3uPsfwsItKM55
-         JRv5gZQh8dj9aEJK2ZmHKvVTR9HUij0SFUuYRBuvlRDYiirsG62g2feCMYa+OkHBl+/J
-         xwbhzB8cREH+GIkgLBjetycJY9k2beRQKBdsWaq00SIAh2W5Fps8OA8u2rAYYtOiLUnb
-         I4aw==
-X-Gm-Message-State: AOJu0YxIfEGm+5IxPWzPV8n3b2kZ00P8tShOXgHkbI6TqIQA65d76CIh
-	7rpx6jdV8wPqh89nexqyp63agyV/cwKBts4e50wf1zJ/ol5wMmXfThWGDaJb1g==
-X-Gm-Gg: ASbGncveAacfvezc1a6dY1DGA220eDMLK24CaucDZhtCXr+ECA9rYANNGoBDqTtAY6w
-	wPaXIjFMcdvHvsB+NdzUbyIZH3rlm/F7jkC97fwK5+eKOifM/8EfY1u6GwoJ3RtGxl7KuHnU7Vt
-	dZ8N2yew1XpnJwaumMgc5sgQps3ZjZVrYHMEErdKKH64xlD3AAJllkUqqADKJLJNyVaFxpNU3ai
-	lQObRIW1vLuCJKpRfPWxhKugS+UgQcYBwFq33PqjVnPPrUkhnWisov/xd/gMKu/CvSyvbJ18z3R
-	r3fY0Ypbr36hWcFzmYHsBbconw6Cas0l9iTUcbFBKJVFC9yk7EKdid2CPrr9MjL49WpL7iRDzuT
-	GeSiN
-X-Google-Smtp-Source: AGHT+IGZNllGhDyAxGzWzbkgaM/8X8DI/k+gCBZvy4/nkosaXx9P0Nv7oo6U45NbYQqNFUCeISRLJA==
-X-Received: by 2002:a05:6a00:3e29:b0:748:2ff7:5e22 with SMTP id d2e1a72fcca58-7487c239e74mr3565525b3a.10.1749717561804;
-        Thu, 12 Jun 2025 01:39:21 -0700 (PDT)
-Received: from [172.17.0.2] ([52.160.165.132])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-748809d317bsm918236b3a.105.2025.06.12.01.39.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 01:39:21 -0700 (PDT)
-Message-ID: <684a9239.050a0220.3b4bdf.205c@mx.google.com>
-Date: Thu, 12 Jun 2025 01:39:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6078992361993710557=="
+        d=1e100.net; s=20230601; t=1749732993; x=1750337793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y8gDjlnvYQL8K+z7FT+uPF9z0sOdB5N3CbytPyoT8po=;
+        b=AXOQ2td0L0OrEtWCiY1KSXclV8TNw0hPewekHkyacAvWy6GLkuBZJK9mqPm8NdgqRl
+         2HzM5ljGKiPwEGEgwqjneNLesPa/DK9dqlgNQpo+JDjK37UtPWFD+K5tp5tddd3znw2V
+         xlrdV8qSt2LGrF312dCrFDQKeSIGTZZ3YGcjYdfyxiZdoyANi0+0jUolFvkfHhA8icDl
+         SsbLLxI0NX0QEZrqGWdgHoIgTUwgTSnKiP23Ba9CyW09wkYHn71D6qHmJ/ShH/+RFX5r
+         i9OInRhe7Pd6JchZX8T89klfyWZVnTYx7i2ycbdUeNJQO8PvZIJGKKeou3TSgoW9dp2J
+         42Dg==
+X-Gm-Message-State: AOJu0Yz3FS1GweauzLShSAVHQrwf5FnFEM0vrGtZlJXMD1n1ZT0u9G3h
+	EOobJYKoyXEh4a/GWWvWlkPQ2DCe0X4vB97Zu292yKrJ6EWKlDJGUhp3oR+HW9lK4gMw9+GFFA4
+	iy3sGN7dzJKAWGuuYoMTimVCNBO+kwxxm4JFG
+X-Gm-Gg: ASbGncsM02tHPZadrAUZwS1Wj0GcVcKsShFRO3bkOMWvAJG2j8MWhZDy7r4rpIHGjnu
+	wOAoEtfNxhMkg0HQLgUeh2AtGhHU60Mr2Wjhj8XylPcMgz1KsAFGWF36aacB/5X0jrpD1wOcwQA
+	zwbzhYDofnwWA8zBIhakcdhvAl5T5woVIGVoqQHAZMJQ==
+X-Google-Smtp-Source: AGHT+IG9wiQwb9DCTN2e7noQjhrLeyNKRccz0OQQ0VJ2dQuTYrNBfpcCjsgZJHht6GBiXDNw4UknNI029PCmA9EdthI=
+X-Received: by 2002:a05:6512:1052:b0:553:34d6:d67d with SMTP id
+ 2adb3069b0e04-553a55ff9d8mr907222e87.46.1749732992957; Thu, 12 Jun 2025
+ 05:56:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: Bluetooth: L2CAP: Fix L2CAP MTU negotiation
-In-Reply-To: <20250612075034.190194-1-frederic.danis@collabora.com>
-References: <20250612075034.190194-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20250609105538.4090716-1-quic_shuaz@quicinc.com>
+In-Reply-To: <20250609105538.4090716-1-quic_shuaz@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 12 Jun 2025 08:56:20 -0400
+X-Gm-Features: AX0GCFuCo__0qk2QHIqEmcT9ZYPo8vR-lGQZML0qsnLK8gX7Yg28E9HzVRO3emY
+Message-ID: <CABBYNZLQ9y09-F045U15orG6j7WzcU4ov0=s0xxGGnmC7tR0Tw@mail.gmail.com>
+Subject: Re: [PATCH v1] driver: bluetooth: hci_qca: Disable auto_off when
+ BT_EN is pulled up by hw
+To: Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_bt@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6078992361993710557==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Shuai,
 
-This is automated email and please do not reply to this email!
+On Mon, Jun 9, 2025 at 7:00=E2=80=AFAM Shuai Zhang <quic_shuaz@quicinc.com>=
+ wrote:
+>
+> If the BT SoC BT_EN is controlled by hardware, disable the AUTO_OFF
+> feature. Otherwise, BT will close the HCI layer except for the UART
+> after firmware download. However, the SoC remains active. If the SoC
+> sends a packet to the Host after firmware download, the Host cannot
+> respond since the HCI layer is closed, which will cause the firmware
+> to enter an incorrect state.
+>
+> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+> ---
+>  drivers/bluetooth/hci_qca.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index a2dc39c00..0cb70a3cf 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -2483,6 +2483,15 @@ static int qca_serdev_probe(struct serdev_device *=
+serdev)
+>                 set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+>                 hdev->shutdown =3D qca_power_off;
+>         }
+> +       /* If the BT SoC BT_EN is controlled by hardware, disable the AUT=
+O_OFF
+> +        * feature. Otherwise, BT will close the HCI layer except for
+> +        * the UART after firmware download. However, the SoC remains act=
+ive.
+> +        * If the SoC sends a packet to the Host after firmware download,
+> +        * the Host cannot respond since the HCI layer is closed, which w=
+ill
+> +        * cause the firmware to enter an incorrect state.
+> +        */
+> +       else
+> +               hci_dev_clear_flag(hdev, HCI_AUTO_OFF);
 
-Dear submitter,
+This sounds like a bug imo, the driver shouldn't be messing up with
+HCI_AUTO_OFF, if the packet mentioned above is required as part of the
+setup stage then it shall be handled via setup callback otherwise the
+stack will consider the setup as completed and proceed with auto off,
+etc.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=971193
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.74 seconds
-SubjectPrefix                 PASS      0.05 seconds
-BuildKernel                   PASS      24.96 seconds
-CheckAllWarning               PASS      27.33 seconds
-CheckSparse                   PASS      31.12 seconds
-BuildKernel32                 PASS      24.78 seconds
-TestRunnerSetup               PASS      468.50 seconds
-TestRunner_l2cap-tester       PASS      25.63 seconds
-TestRunner_iso-tester         FAIL      8.02 seconds
-TestRunner_bnep-tester        PASS      6.07 seconds
-TestRunner_mgmt-tester        PASS      134.91 seconds
-TestRunner_rfcomm-tester      PASS      9.40 seconds
-TestRunner_sco-tester         PASS      14.84 seconds
-TestRunner_ioctl-tester       PASS      10.14 seconds
-TestRunner_mesh-tester        PASS      7.44 seconds
-TestRunner_smp-tester         PASS      8.67 seconds
-TestRunner_userchan-tester    PASS      6.30 seconds
-IncrementalBuild              PENDING   1.07 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-No test result found
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
+>         if (data) {
+>                 /* Wideband speech support must be set per driver since i=
+t can't
+> --
+> 2.34.1
+>
+>
 
 
---===============6078992361993710557==--
+--=20
+Luiz Augusto von Dentz
