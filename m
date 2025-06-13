@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0192550A4;
-	Fri, 13 Jun 2025 06:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE9B3FE4;
+	Fri, 13 Jun 2025 12:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749795239; cv=none; b=lo4tRgBwNRP7gcw+yERhnfzHKMOpqxwYPL5pk+8pXvHXNSqTwTC3fC8TSqmPB7JMCtuyVphb/uFlfi9HfBawcTOVWGAQ+TGuwDJTiVnGWOZkVD7lSpyOrBYV82Fgm80aA2VKwrOCZ/dy3VbXcfi/iHW0pPE0il88rT5LRg7WSlE=
+	t=1749818787; cv=none; b=XbJPrphsvZZ97YzsJDlk6M5wh0h0YNEgZ1r8neZ2YEn1tSJUSJQHScsRiXEiys+47RFGqPEgScbc5AeS1e4Og5h+0rf3DJ2J9XzcUlmnX63VvFPc+EmDZ4gQh9aIDXElv28atfovk460bv10FO2J18IroJ7gx5xjl0qmTnxdXq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749795239; c=relaxed/simple;
-	bh=s2CjwCTkvEKYGIX42P5S34bwxEMhqXxZ9rUwspKC5dQ=;
+	s=arc-20240116; t=1749818787; c=relaxed/simple;
+	bh=Wh017JZUsC/hx+jpnyGW5nLUGuEDYQLrC2SbjLNSNwg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=suwrtIOWJwskPINIqJsfQBSpu1EaazyIKPIMBbA1Jw08e+xaZc23LnDHdTfMq+a5wLElsMAhBRWlCZk9y3ka8T8/SGak2rQ9zsGZtYri52fVCwhYCRw620NjE5+EP8SaMwWvHIC3mkekJUOCDcSsWuYgEzdZwDdYGwgwinOdEXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eumd1Pd6; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=jeEiaiRm8Y1JJUkhi7LyJBMksDXKIGrztNDbxWLV2jURR3EiB+vAMGZ1Lyf+mpzOVOHA61ZTARWQGJ/Sax2YHwfhOosEsV+2WLsOxPwcSMxBA11kgx3EWog9tFUi7bitcfD3X9IkoIIjuKVfmkfZ5bhCxIqzakLinHBI7oEv7ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KUu1TY7E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eumd1Pd6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93119C4CEE3;
-	Fri, 13 Jun 2025 06:13:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KUu1TY7E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50185C4CEE3;
+	Fri, 13 Jun 2025 12:46:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749795237;
-	bh=s2CjwCTkvEKYGIX42P5S34bwxEMhqXxZ9rUwspKC5dQ=;
+	s=k20201202; t=1749818787;
+	bh=Wh017JZUsC/hx+jpnyGW5nLUGuEDYQLrC2SbjLNSNwg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Eumd1Pd6rWFxIXhB0WmQaxmE6oq4xHwfHKyeO+SkY0fiJCC1tErHIZNvyXOovyDIS
-	 HfX+Y9Ng3AXDkvJ7i2CAFZsFI74CLH1sDd5kTatKX5zBz8EkQdQDKBIRvDFqwKDPEP
-	 +yuGrY7qOnndE2i/PjXG+MboxW6sfZC/u4532jP7q884aCeavdjJDU63IiefGpRy7q
-	 /UAJk2cjvtE9wg7Tf47OXIgIBQ1XnLwOPB0BS5vP6/mMWVCxTArfIf9VRFyuAbtOzh
-	 1KPyGAT76THHoaH5G6Zy+0PIwfVEkjuegtGm8kcmlJg1dSozQsdJVXrCr7kqpFttCm
-	 lsn6WG/TaKNYg==
-Message-ID: <36765047-7b88-4899-966c-e4c4362127ff@kernel.org>
-Date: Fri, 13 Jun 2025 08:13:50 +0200
+	b=KUu1TY7EXu7RFTU42i+qt90dJqh+IBVmAhs2bP+ZhiaJJmJicTwaOXDryQB5P67JV
+	 Y5w3fa+JKLn2F1aTHenVnK91rCwgivyoeGs6252WdXkKxT8mSr19wZyyG4GclSaPne
+	 PiNUeNwmRBY1aIzbdMrTWmL1zDCmlnxHNjWJNxJQ4yN8mPbi+GRfXqKNDAmfeIDNos
+	 931ZUXhfYk+vmRcl/G3ehYkYEcWGTXdNzclJjMFhI6O9uyNAm2aS6CnQ6EI2Jn8JdJ
+	 rBHA09RnsaOJf/+LctE0WWxad6bH9cjLIumb+r5t0xACljyv+0uGfxU4GZHmUbIv6k
+	 gNqjt+X/drO1A==
+Message-ID: <723ae8bc-07d0-47cc-a78c-9293ef6f1a4d@kernel.org>
+Date: Fri, 13 Jun 2025 14:46:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -98,36 +98,16 @@ Content-Transfer-Encoding: 7bit
 
 On 12/06/2025 09:22, Zhangchao Zhang wrote:
 > This V2 patch provides two methods btmtk_reset_by_gpio,
-
-Please do not use "This commit/patch/change", but imperative mood. See
-longer explanation here:
-https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
-
-
-And v2 makes no sense here. Describe the commit, why you are doing this,
-what you are doing here, not your process.
-
 > btmtk_reset_by_gpio_work for mediatek controller,
 > it has been tested locally many times and can reset normally.
 > 
 > The pin is configured in dts files, bluetooth is reset by pulling
-
-That's redundant. Do not explain us how DTS works. We all know it.
-Explain WHY you are doing this, what sort of problem or hardware you are
-dealing here with.
-
 > the pin, when exception or coredump occurs, the above methods will
 > be used to reset the bluetooth, if the pin is not found, it also can
 > reset bluetooth successfully by software reset.
 > 
 > Compared with the previously submitted version, the following
 > information has been revised in version V2
-
-This goes to changelog or cover letter. See submitting patches.
-
-And that's a v3, because you already sent v2.
-
-
 > 1)-Changed the capitalization of co-developer names,
 >    using the correct capitalization of abbreviations and full
 >    name, and corrected obvious spelling errors.
@@ -147,146 +127,27 @@ And that's a v3, because you already sent v2.
 > Co-developed-Chris Lu <chris.lu@mediatek.com>
 > Co-developed-Jiande Lu <jiande.lu@mediatek.com>
 > Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-> ---
->  .../bluetooth/mediatek,mt7925-bluetooth.yaml  | 54 +++++++++++++++
 
-Please run scripts/checkpatch.pl on the patches and fix reported
-warnings. After that, run also 'scripts/checkpatch.pl --strict' on the
-patches and (probably) fix more warnings. Some warnings can be ignored,
-especially from --strict run, but the code here looks like it needs a
-fix. Feel free to get in touch if the warning is not clear.
+<form letter>
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
 
-Please use subject prefixes matching the subsystem. You can get them for
-example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-your patch is touching. For bindings, the preferred subjects are
-explained here:
-https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-patches.html#i-for-patch-submitters
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline) or work on fork of kernel
+(don't, instead use mainline). Just use b4 and everything should be
+fine, although remember about `b4 prep --auto-to-cc` if you added new
+patches to the patchset.
 
->  drivers/bluetooth/btmtk.c                     | 69 +++++++++++++++++++
->  drivers/bluetooth/btmtk.h                     |  5 ++
->  3 files changed, 128 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7925-bluetooth.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7925-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7925-bluetooth.yaml
-> new file mode 100644
-> index 000000000000..bcdb46effdba
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7925-bluetooth.yaml
-> @@ -0,0 +1,54 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7925-bluetooth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek MT7925 Bluetooth
-> +
-> +maintainers:
-> +  - Zhangchao Zhang <zhangchao.zhang@mediatek.com>
-> +
-> +description:
-> +  7925 uses the USB bus to communicate with the host.
-> +  Two methods are used to reset Bluetooth.
-> +  When Bluetooth crashes or core dumps,
-> +  the pin will be pulled low, then held for 200ms,
-> +  and then pulled high again before next probe.
-> +
-> +allOf:
-> +  - $ref: bluetooth-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - mediatek,mt7925-bluetooth
-> +
-> +  reg:
-> +    const: 2
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +    description:
-> +      An active-high reset pin for the Bluetooth core;
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time.
 
-Blank line and drop final ;
+Please kindly resend and include all necessary To/Cc entries.
+</form letter>
 
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    &xhci0 {
-> +      vbus-supply = <&pp5000_usb>;
-> +      usb2-lpm-disable;
-
-Drop node above
-
-> +
-> +      status = "okay";
-
-Drop
-
-> +
-> +      bt_reset: bt-reset{
-
-Messy style, missing space. See DTS coding style.
-
-> +        compatible = "mediatek,usb-bluetooth";
-
-Look at your binding which you *just* wrote.
-
-> +        reset-gpios = <&pio 248 GPIO_ACTIVE_HIGH>;
-
-That's so incomplete... and will fail tests. You need to write COMPLETE
-binding and then COMPLETE example.
-
-> +      };
-> +    };
-> \ No newline at end of file
-
-You have patch warnings.
-
-
-> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index 4390fd571dbd..3e5f3ca6f0d5 100644
-> --- a/drivers/bluetooth/btmtk.c
-> +++ b/drivers/bluetooth/btmtk.c
-> @@ -6,6 +6,8 @@
->  #include <linux/firmware.h>
->  #include <linux/usb.h>
->  #include <linux/iopoll.h>
-> +#include <linux/of.h>
-> +#include <linux/of_gpio.h>
->  #include <linux/unaligned.h>
->  
->  #include <net/bluetooth/bluetooth.h>
-> @@ -109,6 +111,65 @@ static void btmtk_coredump_notify(struct hci_dev *hdev, int state)
->  	}
->  }
->  
-> +static void btmtk_reset_by_gpio_work(struct work_struct *work)
-> +{
-> +	struct btmtk_reset_gpio *reset_gpio_data =
-> +			container_of(work, struct btmtk_reset_gpio, reset_work.work);
-> +
-> +	gpio_direction_output(reset_gpio_data->gpio_number, 1);
-> +	kfree(reset_gpio_data);
-> +}
-> +
-> +static int btmtk_reset_by_gpio(struct hci_dev *hdev)
-> +{
-> +	struct btmtk_data *data = hci_get_priv(hdev);
-> +	struct btmtk_reset_gpio *reset_gpio_data;
-> +	struct device_node *node;
-> +	int reset_gpio_number;
-> +
-> +	node = of_find_compatible_node(NULL, NULL, "mediatek,usb-bluetooth");
-
-Same comment as before. Nothing improved.
 
 Best regards,
 Krzysztof
