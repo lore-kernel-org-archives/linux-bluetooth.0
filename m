@@ -1,125 +1,128 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99C61E51FA
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Jun 2025 15:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A053E2E11B5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Jun 2025 17:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749828530; cv=none; b=JhQmktwnQc0yD6TNwaaaSI3CKK7jdhWDJsiZsEqJg7T7PFjus8MAKNXZts/xFY8hxEG4RURop24IXFqJklTEuu9p2nh3WmpfOAKPqVQ+GidVQGLNJbD0bcs1SI29c5TBJnk+3WrO+HqsLmfv6A0jeOjF4OVdJ/Gt4gUUzE9uxu4=
+	t=1749834738; cv=none; b=MFUVyf5ldjENol5UWrWc1sdwqATnHFxD3tOK9GhOjjCYgu7z2pP48EkQl8gAfaUXcOI2s3wr1yj2cibsx+m9PnN3aPkq+mKnXkaRxQsyTYbJZOXwG37xbd1ptRbuzpfV4Z1MsCZHW0cd+ABgZzPpRKDdQsGcjoYaaChU/KuY/dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749828530; c=relaxed/simple;
-	bh=tcCrvyzC3dRUcc9rOihHAQzv9RMdhFOIHnXHzJ6g7/U=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MXG7DR6OLT00VbC30KFsPbfVpMMV4TaBysAqQE43obCkEUIH/E2eyskrMwrA2ZD7Dk8QQLSLS0XmXeffsvYQEuDibDusGH7LhXHPZKlji6E3s7qNNo/FIwJk5SJHMpa6BhI4qZh0P69CaQFW/FORt8fDvueEAb+tJzOOAaL0xJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O8khptdR; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1749834738; c=relaxed/simple;
+	bh=4hipMal1+fxcdsKHSlHnecU+VDyLGQMrt5rmaBCJdiM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FzhVOaFWdRsgHJxufKXpK40pOL32mg06PtxQuSDrVWDBsFH0vlwhgciLNDSEFRO6ghXzfgC+yTaCbsPgUgF7LXGWVgFk/wuQfFyulvrSRrSZiAXO571eHp3yg3fBHtBeAyBnPdY55C7BeThLDCqtO3toZ8O5CRcGVnoHqKwvWmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tnw4snI+; arc=none smtp.client-ip=209.85.222.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O8khptdR"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-23636167b30so22461025ad.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Jun 2025 08:28:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tnw4snI+"
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-87ec4ec218fso445386241.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Jun 2025 10:12:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749828528; x=1750433328; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AWH6eib/WswPA0Rd30oKn46VgXZTkI6tjsR5g0Cq/c4=;
-        b=O8khptdRqBRT7cW8HyDWBLivOTC/WE0sLFz2WSnugP0n+QnmisjxWCT15+5ige12/D
-         NSwmqsHRfPXRd0qZc3m2Iu0JDKbK3H68Vrpuph5lrXAlqyMraZpNWHVGZvGrgKHGmPuN
-         kxTrau7I5x1uS3CuoYNDgBaWpS28Ht+CHD26cJVAUq3gb0ZM/CFpmDNvt6cPyr3FzkaH
-         9BIWtXHQ1Pott4blaMf34qVg2O7ljMUYt2qT0niQ+pU+w9sbK+Fe/sVEb1sCb3MSjinW
-         nuzN1nfFHTcJ5ky0cppK+OA/BQG5LlV1jEc/DGEfn5Yi5EOE6/ZI9eLjiWAfgYhRsvW8
-         x1fQ==
+        d=gmail.com; s=20230601; t=1749834734; x=1750439534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nh1qZHWUVj2G4iL9X6OIkGR7ZVMgS+cqB0Ge0ckhKCU=;
+        b=Tnw4snI+2CQBsC7q9RFeewQNgWlE9+POvoooXKD8ZvLqNkSeD2j8p4tySE4xpxItMN
+         AfCOwEdVgjOLDOj+5hyjS24JCSUhC/oT4zd1fJkraNWFkoEprNS4T+4L/+WJ1iaHNgO1
+         kWHHX087Q9YSHCS5VSAdH8JeNy03j/uQ8dp6HtQDP80W0ckJyFq5boIe/IVlLJPz0o5B
+         1OwJIBopQL/Us7ruDk9Cf1yijbV7dMiwdSpR8f5EZiEkJHFKJCMj0pv37/KdWXt13voW
+         TFDGIIv4axBmJdznf5W1Lrd/itnONRHt8ABJRjdEMRtp0vheDykhzhM2fBcaco2y/Jqr
+         FDkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749828528; x=1750433328;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AWH6eib/WswPA0Rd30oKn46VgXZTkI6tjsR5g0Cq/c4=;
-        b=vJ2Q9Q+2sJgxijqeKdgp0Vyu8sgut2bM3CThBTZ/McyW2Yp1Dbid1NUtJIt/sVZSXK
-         HQTyEoksQ7z2fpkJ0eCncbhToghX9qhG9sXG9Oequ3uyq81KcGGLxhfJz5m1iHgmTWSp
-         vzMRoM2vdWcxUCS99P9HYqSEyjxdW7Jh/2w+CwvPhocBDvVw+jsQlXWq5s8Ie091v5tT
-         +1SU5M4Lhx5bl3aTTJ+McTVUFyYR3gvErpnHzt2iaSdY8L5XUupHZG0JZF11nGp27f4p
-         LvO0CU+Q88xb7xc9bm9L0VZhTP5wliC4rE5jkT8thxLZCVf9WENP+ujSuD2lSoS2VRpH
-         7F7w==
-X-Gm-Message-State: AOJu0Yx3X97gJNpI317uWI/4uAiJlVRKr0Z1FA5uBFm6+Su/nxb82Pna
-	JfwCc3DHcS7e5L45SaquUUmMzIF52V4B1jhfVs2kVOPe3Bc9xGRPHpLTh11ikQ==
-X-Gm-Gg: ASbGnctV37WaVa4Ed3d/Vg6IofcMqeeJE+I6GtHPFbeF5i7yAE0PzSvm3IRn9k74/Ji
-	knNdCXqj8nykHa14zCkSw5WLvKdChRei82ObLLo1rKuOBGXtxACIMnBSkxKtrdUyB39wKwN9+Zm
-	6e+9AhDJrHRrlxqRwzbBrZ/ITqFmeZCQTozQLwt7EcZl3rOd75XINGX6derxW0bNnO3pdXjhtqr
-	3ayeZgHQfqoYcYZK29DuK70zOPoSLYRMzqWAtanA60vTrhGmDRC2qRsywQCYm4STHZxWbPr0cgP
-	GmCOzJdCakImRE0CzEGP9aitbqRLjp1a80iPb+IMrGUDoElSSJgSbnptf/wCPFdmSQ==
-X-Google-Smtp-Source: AGHT+IFhJ5opLpD89tqIp42/j6YgCfm9uh9cMR2TbvCINLw0yjI40DJp8RtDmDdlZ4u8u1LuIjzbrQ==
-X-Received: by 2002:a17:902:ce8d:b0:235:7c6:ebbf with SMTP id d9443c01a7336-2365dc234d1mr52936035ad.35.1749828527649;
-        Fri, 13 Jun 2025 08:28:47 -0700 (PDT)
-Received: from [172.17.0.2] ([13.64.63.50])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de7827bsm15516915ad.108.2025.06.13.08.28.46
+        d=1e100.net; s=20230601; t=1749834734; x=1750439534;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nh1qZHWUVj2G4iL9X6OIkGR7ZVMgS+cqB0Ge0ckhKCU=;
+        b=Z05rW+MSniYPz5jwiNPMuZ9fyaNjy7cYK/Vb2i10/hqUNXhwVqwscF6jPkBA3vqbKW
+         lV5vjkG0I6LdZfYGRTHtuevURZueOj9x+d+dB5T5O2A33laEcewIr8ZiquGBSHqeI7fs
+         HH7nTGftDMjOSOBY5aeDthF104rg1K68UvqA7n9ONCgO00we35iMJrukg3X38fPd/XA4
+         wOBYOmLj2xQ3En+FmMEdPuKqApp6RNCfz5A91WuQmMXlKWPsco+5FXy96wa7WNz6e7LK
+         xQsTlYeZiLycyW41IWYk5jMc83Y41dOTh3Ic2ZT3lTWOA0Tye+e95B14fBUG3JXzpNK3
+         7y1Q==
+X-Gm-Message-State: AOJu0Yyuxj+QhKew1PA6M05Fe9WywqZhIEwNdSVrG0sWzdcM8Bk0l3rb
+	g+S9V6kBcgNx+0c98z7lKy4hifhPTaEoCCubP2C13P7b5RoNgY9z73h9PA7Yq+fHuNs=
+X-Gm-Gg: ASbGncvnFIUc7UakPLAFutVimujsY1gLWs00IyPhV5h0rdofqcPOOAFoqOVw5r//O68
+	XfQAtV2A9zrapIS1iIvGOVqTwHC2zV1b0+Fw/W1Hu25lD890SAeR+iscJ+6tm4qdgkxI4MKAnYv
+	PL5KiWfz8XK+5tK1IEkLf4Ls0aq9tK8BqYWVU1CKqAAEiewFkaEWka4J9WVosx1skXj3Q0YeDJU
+	775jU013GZHWU1MkCuPWuJZQkZQC/G3wrC76TEqlfiT4LPAXjtdDWWkcWo7FPc1AV+gz0xbwrCH
+	m1P1NRFim2LacbRZEZNOyOKmHSuqB2wHyEHgJJK1fmosHygXJlUko6evj30kRAYPdJTAXlbhImO
+	MOK0XVNQqIvbB4yp1PyebgpsBHcGiM7Q=
+X-Google-Smtp-Source: AGHT+IF1/ilIIK23oAvS77NEpNj8FU9cJ3a0eZIqysjAbPrDLZ12Ue8qtkekNCJoCAq0ztFXDegqaw==
+X-Received: by 2002:a05:6122:458c:b0:530:6bcb:c97f with SMTP id 71dfb90a1353d-53149cc29efmr358881e0c.8.1749834733579;
+        Fri, 13 Jun 2025 10:12:13 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5313e028c88sm303013e0c.32.2025.06.13.10.12.10
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jun 2025 08:28:47 -0700 (PDT)
-Message-ID: <684c43af.170a0220.101772.a0d4@mx.google.com>
-Date: Fri, 13 Jun 2025 08:28:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1264575223522150186=="
+        Fri, 13 Jun 2025 10:12:11 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] client: Add prompt to enter metadata for custom presets
+Date: Fri, 13 Jun 2025 13:12:09 -0400
+Message-ID: <20250613171209.2108815-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/gatt-client: Make bt_gatt_client_read use bt_gatt_client_read_long
-In-Reply-To: <20250613140445.1997694-1-luiz.dentz@gmail.com>
-References: <20250613140445.1997694-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1264575223522150186==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+When adding a custom preset prompt the user to enter metadata for it
+e.g.:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=971855
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.41 seconds
-GitLint                       PENDING   0.31 seconds
-BuildEll                      PASS      20.22 seconds
-BluezMake                     PASS      2720.52 seconds
-MakeCheck                     PASS      20.52 seconds
-MakeDistcheck                 PASS      202.22 seconds
-CheckValgrind                 PASS      279.65 seconds
-CheckSmatch                   PASS      310.39 seconds
-bluezmakeextell               PASS      129.80 seconds
-IncrementalBuild              PENDING   0.38 seconds
-ScanBuild                     PASS      930.49 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+[bluetoothctl]> endpoint.presets 00002bcb-0000-1000-8000-00805f9b34fb 0x06 custom
+[Codec] Enter frequency (Khz): **
+[Codec] Enter frame duration (ms): *
+[Codec] Enter channel allocation: *
+[Codec] Enter frame length: **
+[Metadata] Enter Metadata (value/no): <len> <type> <value...>
 ---
-Regards,
-Linux Bluetooth
+ client/player.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
+diff --git a/client/player.c b/client/player.c
+index 0314cd303e79..2702ea54247b 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -3900,6 +3900,24 @@ fail:
+ 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ }
+ 
++static void custom_metadata(const char *input, void *user_data)
++{
++	struct codec_preset *p = user_data;
++	struct iovec *meta = (void *)&p->meta;
++
++	if (!strcasecmp(input, "n") || !strcasecmp(input, "no"))
++		goto done;
++
++	meta->iov_base = str2bytearray((void *)input, &meta->iov_len);
++	if (!meta->iov_base) {
++		bt_shell_printf("Invalid metadata %s\n", input);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++done:
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ static void custom_delay(const char *input, void *user_data)
+ {
+ 	struct codec_preset *p = user_data;
+@@ -3916,7 +3934,8 @@ static void custom_delay(const char *input, void *user_data)
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	bt_shell_prompt_input("Metadata", "Enter Metadata (value/no):",
++				custom_metadata, user_data);
+ }
+ 
+ static void custom_latency(const char *input, void *user_data)
+-- 
+2.49.0
 
---===============1264575223522150186==--
