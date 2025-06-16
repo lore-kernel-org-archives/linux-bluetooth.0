@@ -1,111 +1,231 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC29228A738
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 20:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B9814D29B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 20:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750105258; cv=none; b=TjNQvpIr+tZuSqw/U9yeP1A7roU1TbL7h8vujqAXVl5QYENWCTpVorayNlBbYjtt2R08ECDWg9obDPAzJmAmPCPpI8mBLvvdX/CJXzfyTAVoSRb6zfJPVHoSG4LykeW6cmHdW/9MdLRRd0mHWLmWrAzmCXDCKuUi5ZktQv/hExg=
+	t=1750106109; cv=none; b=qHFJk2kIhImqsZ7xrYIn5NWSjb6M9lGXGp3XZhBJQmW1Fd7PjxCANZKnHtUQF2zSWLzXIIXVGphi4CdxmRwzq/9+b2SlGCUQ3XZlM1ehR7JcKcOWnxv8172FyslYC3QUB1qXAcolvQxXHK3eKxPi6j5wqNwrkZ/oeQEwUUUd3eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750105258; c=relaxed/simple;
-	bh=6tr6AGGOhj/nQ5mV47SS4AHVN704twpF/NiiVxFmtJE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ceoRVZGJppzt933Ihu6tFOzVzxJHDAwgSZHhHadihjTNaG6HXWQ8/PagQGMHebta+DqjrGgMkeR+1uIvy13SbiR0G8Uch13Q4kOCCiVBKea1pRLnrkL5bCNTl+mISmTEGaxEHUMOKKYCZgTdGWr0OZbRSR1yywlPXn7GXbcNBKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af597.dynamic.kabel-deutschland.de [95.90.245.151])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 63FAC61E647BB;
-	Mon, 16 Jun 2025 22:20:35 +0200 (CEST)
-Message-ID: <8b3aac45-3698-4016-a83d-efaf50ee28d6@molgen.mpg.de>
-Date: Mon, 16 Jun 2025 22:20:33 +0200
+	s=arc-20240116; t=1750106109; c=relaxed/simple;
+	bh=4Z2of0CkK4gfRWO2DVL4U8vEgYhZYLOnZwiVoDEcAM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cLrTM0HDiddNJsXwLUOWe60dkVcKKAn2lIO/8NmrQETDagwneJLzFuQb9eMd+Yy5PltNcJ9turTDS1yJLrctZua+wRW2/mXXqTnlQpUYmY2b06Lu79RSsQiuzL8/yS8Tas4bph+WilIkkHQ2V4cB+jzTYgn+OT4gWtbb2STXdcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lcz54lDQ; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lcz54lDQ"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b2fca9dc5f8so3606698a12.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 13:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750106108; x=1750710908; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FNE2fhfO47U8n3G59hFKCRwQaAxlRamxZo9p5pA09jA=;
+        b=lcz54lDQM7kFbtWtxfzt6BiF7zjSu0t9NuwIxNRTke4SGedPjSiq6TCUsU0gI3h12t
+         5N0vmwm2sAR0rD3WZd9UEGKBUtfsKct+RZth1nYM1XhM+nyHrmkztQ3N9hnG42Ch9UHb
+         iFeqyp/jGol/Ut/BO1RG4w+/becfc8bh5I/DOIgCzQz7j7rXZh3xICCysF0xCZ4ET7m4
+         2Yc3h83Mzriv6n41lqN+mMN0bRzWNlP7SRQ5cBmMuh79YpOYo1qGRJIQzqo2O9X7+Edg
+         sS8k6Mi3eptjxb1t4RiDBfduP0//Qiiw1FPvBxyr/R/mQtgiQqXrk3fu1wN6flYiikX3
+         IMLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750106108; x=1750710908;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FNE2fhfO47U8n3G59hFKCRwQaAxlRamxZo9p5pA09jA=;
+        b=e2nS75yymDHqcy/OHtFyb4aGRo9aL+5WjKBvEcQCWpL3d4UlZCrXYx/ViJ+6ZNlYl3
+         T14ADesMT/oSd4xFOCfXTaLTE3XrxT3QfiWiPxHnpphhiSB36B31TY91YxFJ2rkC22oD
+         o3FafYnqTlfYO/wkL/p6oYPH6OqXK24ftKpk3yrTEg+oBUHOJIKlpLajyypxelHNKZVW
+         Dk0PtONAbyOq6psIQTnw2k6Tf7Dh57Dv4tpF0wzej2/fr0Y16lQN2oSKC4OhIm1+BXO6
+         6PDk7VAQ/vwmN7ERdGfz/IcF1KBUb7r7tuORrg3AWzGzGUcCtUHeMvYw86fLjUtCdoQF
+         OknQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8zpAqq24DKA3Kymt/nWAasTayVseVhKDNuBQWFbz8hpJVSxmKhFAkAjXg1YBE4MQMxDe8sSQyw5Fwi81rsak=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxcn18EYhWz9fZ7G2+TS0yMhw+Kpz2QCkVMeM4Q5g3mCm9zAyUs
+	xIOzeZdiKxB0Di1xlxsQlxeo/qBm1zlMt8VHMWx3QwLYkStRhqvVYg4=
+X-Gm-Gg: ASbGncvTmzdLO5pybZjXm0Z2IIXQoiwTCbx5exXkJwl0jBxoSOl4h5qencdnfJzQ9kY
+	92NP99HXqTA0p701T1nV5kuwjW7OoHIY2L6tLAfcwhrQuEwM2CCBKfnDWY2WlwCvov5+z1cM+lG
+	/j4hE3PRvXC6kF+RkwWxxr3IOpJaeNz3dLYCv2T7K1494yd7kInhyO2nYk9eHW4i661U0u5ttRC
+	9lXA9YN5lMKTh6Y5h+YqYoekkpVZQPH/atmW5TDXSmLLGPj6iSsgOrDIlMdPlXHzna2qgZCWpBA
+	B9ww1SUDNImrOt3jYFTf9a30BSJSMie41wFuVgM=
+X-Google-Smtp-Source: AGHT+IFYxIUJW9OFLCiRXl9WMPQ4BxGHEx1HT4/c1fIeZPgqkhqzy20bi+PDjtU0mBWrGOxGgioxGw==
+X-Received: by 2002:a05:6a21:348b:b0:21f:39c9:2122 with SMTP id adf61e73a8af0-21fbd505f8cmr18598526637.2.1750106107563;
+        Mon, 16 Jun 2025 13:35:07 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7488ffed0c2sm7282355b3a.22.2025.06.16.13.35.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 13:35:07 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: luiz.dentz@gmail.com
+Cc: kuni1840@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	pav@iki.fi,
+	syzbot+2faa4825e556199361f9@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] Bluetooth: hci_core: Fix use-after-free in vhci_flush()
+Date: Mon, 16 Jun 2025 13:33:29 -0700
+Message-ID: <20250616203506.1047396-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <CABBYNZ+j72ZtXGbE2OmOaNfcoO+XMLS--BnXPwAgmWLh9k=5EA@mail.gmail.com>
+References: <CABBYNZ+j72ZtXGbE2OmOaNfcoO+XMLS--BnXPwAgmWLh9k=5EA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btintel: Add support for BlazarIW
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
- aluvala.sai.teja@intel.com
-References: <20250616162633.756567-1-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250616162633.756567-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Dear Kiran,
-
-
-Thank you for your patch. Maybe for the summary/title:
-
-Bluetooth: btintel: Add BlazarIW TLV id
-
-Am 16.06.25 um 18:26 schrieb Kiran K:
-> Add support for Bluetooth core - BlazarIW over USB and PCIe transport.
-
-A statement, that only ids need to be added, and that support exists, 
-would be nice.
-
-Any datasheet reference? Do you have the hardware, and were able to test 
-this?
-
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->   drivers/bluetooth/btintel.c      | 3 +++
->   drivers/bluetooth/btintel_pcie.c | 1 +
->   2 files changed, 4 insertions(+)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 16 Jun 2025 15:30:19 -0400
+> Hi Kuniyuki,
 > 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 55cc1652bfe4..f6805027be0a 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -484,6 +484,7 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
->   	case 0x1d:	/* BlazarU (BzrU) */
->   	case 0x1e:	/* BlazarI (Bzr) */
->   	case 0x1f:      /* Scorpious Peak */
-> +	case 0x22:	/* BlazarIW */
->   		break;
->   	default:
->   		bt_dev_err(hdev, "Unsupported Intel hardware variant (0x%x)",
-> @@ -3253,6 +3254,7 @@ void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
->   	case 0x1d:
->   	case 0x1e:
->   	case 0x1f:
-> +	case 0x22:
->   		hci_set_msft_opcode(hdev, 0xFC1E);
->   		break;
->   	default:
-> @@ -3593,6 +3595,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
->   	case 0x1d:
->   	case 0x1e:
->   	case 0x1f:
-> +	case 0x22:
->   		/* Display version information of TLV type */
->   		btintel_version_info_tlv(hdev, &ver_tlv);
->   
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index cb3cf2b9acea..1004264128e3 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -2137,6 +2137,7 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
->   	switch (INTEL_HW_VARIANT(ver_tlv.cnvi_bt)) {
->   	case 0x1e:	/* BzrI */
->   	case 0x1f:	/* ScP  */
-> +	case 0x22:	/* BlazarIW */
->   		/* Display version information of TLV type */
->   		btintel_version_info_tlv(hdev, &ver_tlv);
->   
+> On Mon, Jun 16, 2025 at 3:20 PM Kuniyuki Iwashima <kuni1840@gmail.com> wrote:
+> >
+> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> > Date: Mon, 16 Jun 2025 14:56:26 -0400
+> > > Hi Pauli, Kuniyuki,
+> > >
+> > > On Mon, Jun 16, 2025 at 2:12 PM Pauli Virtanen <pav@iki.fi> wrote:
+> > > >
+> > > > Hi,
+> > > >
+> > > > ma, 2025-06-16 kello 10:37 -0700, Kuniyuki Iwashima kirjoitti:
+> > > > > From: Kuniyuki Iwashima <kuniyu@google.com>
+> > > > >
+> > > > > syzbot reported use-after-free in vhci_flush() without repro. [0]
+> > > > >
+> > > > [clip]
+> > > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > > > > index 07a8b4281a39..d648b514e2df 100644
+> > > > > --- a/net/bluetooth/hci_core.c
+> > > > > +++ b/net/bluetooth/hci_core.c
+> > > > > @@ -64,9 +64,9 @@ static DEFINE_IDA(hci_index_ida);
+> > > > >
+> > > > >  /* Get HCI device by index.
+> > > > >   * Device is held on return. */
+> > > > > -struct hci_dev *hci_dev_get(int index)
+> > > > > +static struct hci_dev *__hci_dev_get(int index, int *srcu_index)
+> > > > >  {
+> > > > > -     struct hci_dev *hdev = NULL, *d;
+> > > > > +     struct hci_dev *hdev = NULL;
+> > > > >
+> > > > >       BT_DBG("%d", index);
+> > > > >
+> > > > > @@ -74,9 +74,11 @@ struct hci_dev *hci_dev_get(int index)
+> > > > >               return NULL;
+> > > > >
+> > > > >       read_lock(&hci_dev_list_lock);
+> > > > > -     list_for_each_entry(d, &hci_dev_list, list) {
+> > > > > -             if (d->id == index) {
+> > > > > -                     hdev = hci_dev_hold(d);
+> > > > > +     list_for_each_entry(hdev, &hci_dev_list, list) {
+> > > > > +             if (hdev->id == index) {
+> > > > > +                     hci_dev_hold(hdev);
+> > > > > +                     if (srcu_index)
+> > > > > +                             *srcu_index = srcu_read_lock(&hdev->srcu);
+> > > > >                       break;
+> > > > >               }
+> > > > >       }
+> > > > > @@ -84,6 +86,22 @@ struct hci_dev *hci_dev_get(int index)
+> > > > >       return hdev;
+> > > > >  }
+> > > >
+> > > > If no list item has `hdev->id == index`, doesn't this now return the
+> > > > list head -> crash?
+> > >
+> > > Seems wrong to me as well, *d was used to hold the current entry but
+> > > that has been removed so hdev would be used instead which may return a
+> > > valid/non-NULL entry even when its index doesn't match. Btw, are there
+> > > any documentation regarding the usage of SRCU in such cases where
+> > > there are still references?
+> >
+> > I think that's the main use case of SRCU, and basically the use case
+> > is similar to the normal RCU.  There are a bunch of doc under
+> > Documentations/ and I'm not sure what's the best one, but LWN article
+> > would be a nice one to start.
+> >
+> > https://lwn.net/Articles/202847/
+> >
+> > Also, one good example would be rtnl_link_ops_get(), rtnl_link_ops_put(),
+> > and rtnl_link_unregister().
+> 
+> Oh, this indeed looks pretty similar.
+> 
+> >
+> > >
+> > > Usually the hci_unregister_dev is called by the driver to inform the
+> > > hardware has been unplugged from the system, so we do want to be able
+> > > to abort any ongoing usage of the hci_dev so in this particular case
+> > > perhaps it is easier to just check if HCI_UNREGISTER has been set
+> > > before attempting to flush.
+> >
+> > Maybe like below ?
+> >
+> > I think the downside of this approach would be we need to apply this
+> > change to each driver that has the same issue.
+> >
+> > Note that we need to hold mutex here otherwise there is no guarantee
+> > that another thread does not complete kfree().  I'm not sure if touching
+> > unregister_dev in non-bluetooth-core code is something we should avoid.
+> >
+> > What do you think ?
+> >
+> > ---8<---
+> > diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+> > index 59f4d7bdffdc..3dea1292da2d 100644
+> > --- a/drivers/bluetooth/hci_vhci.c
+> > +++ b/drivers/bluetooth/hci_vhci.c
+> > @@ -66,7 +66,10 @@ static int vhci_flush(struct hci_dev *hdev)
+> >  {
+> >         struct vhci_data *data = hci_get_drvdata(hdev);
+> >
+> > -       skb_queue_purge(&data->readq);
+> > +       mutex_lock(&hdev->unregister_lock);
+> > +       if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
+> > +               skb_queue_purge(&data->readq);
+> > +       mutex_unlock(&hdev->unregister_lock);
+> >
+> >         return 0;
+> >  }
+> > ---8<---
+> 
+> Not quite, I was thinking more along this lines:
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 07a8b4281a39..4c8105ad4885 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -548,7 +548,7 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
+>         hci_conn_hash_flush(hdev);
+>         hci_dev_unlock(hdev);
+> 
+> -       if (hdev->flush)
+> +       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) && hdev->flush)
+>                 hdev->flush(hdev);
+
+I think technically there is still a small race window (and it
+could be large enough with _RT kernel).
+
+CPU1                      CPU2
+                          hci_unregister_dev
+hci_dev_get
+hci_dev_test_flag(hdev, HCI_UNREGISTER)
+                            hci_dev_set_flag(hdev, HCI_UNREGISTER)
+                            list_del(&hdev->list)
+                            kfree(vhci_data)
+hdev->flush(hdev)
 
 
-Kind regards,
+I'll keep the current form in v3 to fix the use-after-free
+with the mentioned list head bug fixed.
 
-Paul
+
+> 
+>         hci_dev_clear_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
+> 
+> Note though, the whole hci_dev_do_reset is actually buggy, to do a
+> proper reset we should probably do hci_power_off_sync +
+> hci_power_on_sync so all the states are properly cleared.
