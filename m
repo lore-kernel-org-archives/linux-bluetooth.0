@@ -1,78 +1,134 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58594289E30
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 18:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F517204C1A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 18:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750097744; cv=none; b=i8FLd7NzYO/G5FhGch2yckvgnMwx9zBhwtNX6ii2xLER8u4yaU74EWoTX5p3V/KBaQUQHWIdLgGjfPiDuFw+cT0HbGAfcTLABjCDrmr6wDHRmnXF7p7HUMgTK/XKTNng6mPTvzFnGE29mFHCh8tVGCv9b/0QoGX7sFtJh7zh0Is=
+	t=1750100162; cv=none; b=AVX8PQPLCeeWFzhvrPDxK4/Svfeksmfn5tncC5iu5ltUyKlpaWKj6UVXJ+DcLhNSufiDi2NJ1dwQPNcS8dTcGP7KfcubTD+o0Mzf2w9VdYjZKlGLXQq1GIkySR12JmJ40grKguVMLy12BeW6c6sQG8M/zfXkJI1+ImJYBgUo8WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750097744; c=relaxed/simple;
-	bh=9dWCxoEfxDW1000gOz22Cnc7JNppTLbpqz2gkOc1kmw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JCgUA8AVKDwKZKoh+2WHZYlInbu1wm+LQ3KEqWS4R1SfI/M1vpZHo98fgo6ZJFpPP+CFfs0xdfUGD8KMpRkmG6kkNCogokyWjIhh2dtQytKaRaZDw1wPv4Q560Xe+fmYj/mDSIu5K0Fw33Zt2ruMeoLY4BfzxTia0tLi5h7uGmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TF3tAFLq; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1750100162; c=relaxed/simple;
+	bh=vlo9sbhi7PR5jq4z8W+Pm8UzH6ATPlvIvFqnNTPMVsw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=V8GMwHa298NyDsbe4S/KUzZ4KMYTebHw1ZTce5EyLVV8Bw05rvMyMkpH6fdbSIGH5amhjmUX/C1rRLm+ys0/RFAMzQX9OUTnvHnLawRpKxTmDLQR6lpSdq8iH4U5GXNba04He17jsRj3OGIr7OChDtrwn3fnIiFgIFW/DhyGdEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mMD2Ti8b; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TF3tAFLq"
-Received: from github.com (hubbernetes-node-f89cf90.ac4-iad.github.net [10.52.181.60])
-	by smtp.github.com (Postfix) with ESMTPA id 8A0B7211B0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 11:15:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1750097742;
-	bh=rKHIU69RAEnKNurn4kC891BZ+b+UXXwuhLToX7hMGoY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=TF3tAFLqdbBMHCJ3ksBXhL4lrUrAXKJjShMmbaplqEuoScaZyW5RV0IiV46asr7JP
-	 Di5g9uJaUs1sSNI24IKdrYH/L8wmy6KemYoLCE1pBSjDO2QQoElyw4vjsM6xE19Y6P
-	 3N9fbD/WUAlSZU2sMfLlXgiHeJFQrro2XKx4NhGE=
-Date: Mon, 16 Jun 2025 11:15:42 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/972634/000000-09dfef@github.com>
-Subject: [bluez/bluez] 09dfef: iso-tester: Fix crashing while attemping to
- access...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mMD2Ti8b"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2349f096605so64205285ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 11:56:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750100160; x=1750704960; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L/f4FddS0pQ7NWrVC1kcIP85c5tBr5/IsqIRPI5hoOY=;
+        b=mMD2Ti8bYfDRl07fPpOjhYvA0M1YqCTGU0gktl9ZgCGZFdFQ1nmkOs8E28kbaPiDTy
+         0RzWA9STB9NCmt7hv6IXZIu8FmnCbMsiIupmUcVqoAyhrdSBWyaaYa3b86sd/hRGevLM
+         G4BhfkcVFWaoBhGd9XSeKO9F+aRJsrA4/m/oWEW0+haTnxvJnmC+z3+oHYFXZ79+SNkp
+         fLMTxyN7TJc1aJPiW15V3ZBUlJb6+9ctymIyILrq31hR2pEVzQfyFDVuRQJEpHfpJ2q9
+         SDUe7gvaPhlY9Wh6nZdnk1Oum5FKxIRog8Epi80OoQJC5KqKPTPQ6G2FOKc1JIM2HfLD
+         BCdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750100160; x=1750704960;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L/f4FddS0pQ7NWrVC1kcIP85c5tBr5/IsqIRPI5hoOY=;
+        b=J+AEVmJlc6M0NMssq9YF4VEGi727O8AYkitlpSASyFzSwEMnqfcEsVE3GpOev74b+Y
+         qeHwStPv7F80Bpzmdm6y1VO2h+WdMmTrNN4HS6htRT1L41IA8e4EyB4+lStXYHZOfyWm
+         N5SWDmJS4rn4DiGAhbSUoZpMbLwqrGN55t8xfb9X/RbHSXPtj85Rnac2L6cP449Sbhgj
+         MDlh2w1DtKRBAv6F1LAe1kVVkayLBb3Myv6VnkXL9dRITm7pD754tdT6azaodl0KmOmQ
+         rpe59AjvIpa4BAUm1fE6j9tv2zye1Ow2hfJ/HfEP0krdWxNr8p5l64GiIkIeXe4Guuqq
+         ugWA==
+X-Forwarded-Encrypted: i=1; AJvYcCWLXqBr6QyB31aq8ohHoJ/LepkaJWCbI6if4C2KobbhSRfO5heqf3tYDqFYzlLc4gAG+MiHIq7LsejwW8oeI+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yww1ePSvsipsGGGvloqDkGrAD5dbgosAXp1YZ46lyR+6K03D8jN
+	18tAH0Moef+IhR89/6yJ7lqrxrrZ2icfuLpQrYA+AlW0PMmvdTCFhdM=
+X-Gm-Gg: ASbGncuDyiwSoxxtpKynia/6kqDQd+a8g3MEE6gNcI3dQooyHZGTs8bClxq/j5dSh/9
+	JxyONp4MIspZ8EJ7BzEGWOYueI5qttF6KKKRaVia3yOyARF8EDCHWj/8YxDnJg8VPSwi1ZHKZ5j
+	jjzAmmQ06/ugVXgGoZS2LRi62RWlabZXrtC/W6VRnnVMXV3mvnWml/KsksyTncZTlQmc03W7Hwm
+	NQae0o6VsIeLvsX/OXQaR2TsElZ1OV469T10o2wEwz+T3prtTWSA5ECpSepb/4k4OQ3w32kU8At
+	9fUCzBPXbUcyOp8KqR86zeMPP5gyKtSTKG4CfRk=
+X-Google-Smtp-Source: AGHT+IHhb0dF/RWlHNUTOGhPR4ARKOm7xZsslZhFUnOzshypUDn210X33A/2VJ5ANlqIGK7JwQIhkQ==
+X-Received: by 2002:a17:903:b88:b0:234:8f5d:e3bd with SMTP id d9443c01a7336-2366b3c353amr161855135ad.39.1750100160555;
+        Mon, 16 Jun 2025 11:56:00 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365deca2dasm65047235ad.206.2025.06.16.11.55.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 11:56:00 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: pav@iki.fi
+Cc: kuni1840@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	syzbot+2faa4825e556199361f9@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] Bluetooth: hci_core: Fix use-after-free in vhci_flush()
+Date: Mon, 16 Jun 2025 11:55:56 -0700
+Message-ID: <20250616185558.985414-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <b964dbbad90d2561b28386d6d254048596d0897c.camel@iki.fi>
+References: <b964dbbad90d2561b28386d6d254048596d0897c.camel@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/972634
-  Home:   https://github.com/bluez/bluez
-  Commit: 09dfef8dca7e7ca96feceb4c9fe0dfb6a841ab15
-      https://github.com/bluez/bluez/commit/09dfef8dca7e7ca96feceb4c9fe0dfb6a841ab15
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-06-16 (Mon, 16 Jun 2025)
+From: Pauli Virtanen <pav@iki.fi>
+Date: Mon, 16 Jun 2025 21:12:10 +0300
+> Hi,
+> 
+> ma, 2025-06-16 kello 10:37 -0700, Kuniyuki Iwashima kirjoitti:
+> > From: Kuniyuki Iwashima <kuniyu@google.com>
+> > 
+> > syzbot reported use-after-free in vhci_flush() without repro. [0]
+> > 
+> [clip]
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 07a8b4281a39..d648b514e2df 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -64,9 +64,9 @@ static DEFINE_IDA(hci_index_ida);
+> >  
+> >  /* Get HCI device by index.
+> >   * Device is held on return. */
+> > -struct hci_dev *hci_dev_get(int index)
+> > +static struct hci_dev *__hci_dev_get(int index, int *srcu_index)
+> >  {
+> > -	struct hci_dev *hdev = NULL, *d;
+> > +	struct hci_dev *hdev = NULL;
+> >  
+> >  	BT_DBG("%d", index);
+> >  
+> > @@ -74,9 +74,11 @@ struct hci_dev *hci_dev_get(int index)
+> >  		return NULL;
+> >  
+> >  	read_lock(&hci_dev_list_lock);
+> > -	list_for_each_entry(d, &hci_dev_list, list) {
+> > -		if (d->id == index) {
+> > -			hdev = hci_dev_hold(d);
+> > +	list_for_each_entry(hdev, &hci_dev_list, list) {
+> > +		if (hdev->id == index) {
+> > +			hci_dev_hold(hdev);
+> > +			if (srcu_index)
+> > +				*srcu_index = srcu_read_lock(&hdev->srcu);
+> >  			break;
+> >  		}
+> >  	}
+> > @@ -84,6 +86,22 @@ struct hci_dev *hci_dev_get(int index)
+> >  	return hdev;
+> >  }
+> 
+> If no list item has `hdev->id == index`, doesn't this now return the
+> list head -> crash?
 
-  Changed paths:
-    M tools/iso-tester.c
+Oh right, thanks for catching this!
 
-  Log Message:
-  -----------
-  iso-tester: Fix crashing while attemping to access isodata
+I placed read_lock() outside of __hci_dev_get() and returned
+NULL in v0, probably that's why.
 
-Some tests may not set any isodata causing the following crash:
+I'll keep the *d as is in v3.
 
-Invalid read of size 1
-   at 0x40067A8: setup_powered_callback (iso-tester.c:1691)
-   by 0x40232D5: request_complete (mgmt.c:306)
-   by 0x40242B3: can_read_data (mgmt.c:394)
-   by 0x4028529: watch_callback (io-glib.c:173)
-   by 0x493D87F: ??? (in /usr/lib64/libglib-2.0.so.0.8400.2)
-   by 0x49467A7: ??? (in /usr/lib64/libglib-2.0.so.0.8400.2)
-   by 0x4946A4E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.8400.2)
-   by 0x402ABFD: mainloop_run (mainloop-glib.c:65)
-   by 0x402B1D4: mainloop_run_with_signal (mainloop-notify.c:196)
-   by 0x402A3F5: tester_run (tester.c:1076)
-   by 0x40050FE: main (iso-tester.c:4010)
- Address 0xa8 is not stack'd, malloc'd or (recently) free'd
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Thanks!
