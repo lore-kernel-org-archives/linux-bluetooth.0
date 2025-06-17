@@ -1,586 +1,307 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011012.outbound.protection.outlook.com [52.101.70.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC58E84A3E;
-	Tue, 17 Jun 2025 02:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750128525; cv=none; b=eh6T2aeDTYJxmIzBsZss2DBXwwONkDh/xuFXnbRuJN7XhQnLLYjtXXXebH5T/8Tu9f0IPti5J6bJ6lsnzVTZYBu63cQODpRC+j9l1EKOIreoFK1yeOQcolyPzoBM8qCEAzTD2c2yoekE2LkMM0IZSIv6N9xTMFZWfHTf5yRowqY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750128525; c=relaxed/simple;
-	bh=s1KsivD3GmypnlmpNyd6cA4QIDM/EaAaySIfeEGCcEc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dSuBg58+b/rnChz3UJOatXfwybOKC3+gdhMfMDuy1sNaEgIV8iLKFN6/HIB3vJIsC1kBxW1SSmt7neWKx17itujMhxd3PLP1GfyktoHaBo7bixfyyf4L/hiuKJ6zBnGhxmXp5iYO80Mm4GDacWNi9pIgN4KlAOxYpQ2RXymx/SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bLrq82v17z13MTq;
-	Tue, 17 Jun 2025 10:46:28 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 55B99140154;
-	Tue, 17 Jun 2025 10:48:38 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 17 Jun
- 2025 10:48:37 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <marcel@holtmann.org>, <luiz.dentz@gmail.com>, <yuehaibing@huawei.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH -next] Bluetooth: hci_ll: Introduce hci_ll.h
-Date: Tue, 17 Jun 2025 11:06:16 +0800
-Message-ID: <20250617030616.3642576-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872141DED7B;
+	Tue, 17 Jun 2025 02:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750128799; cv=fail; b=kQ0hZlkSbzAsct4cJY8qu6HajJO2DEKWPpIA2Qmd3NRedWfQbdOfHbNV/hqxv0oeb6MTfQjIq2Uipo6iQaus+YQXqG+IUS3v7Q5/vgIaBF7P9cZodmz5Q+CRfadln3CtG1Uy2T+yksZ+X8x4JTENCfWeslDleK1BRd8jCxiinOM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750128799; c=relaxed/simple;
+	bh=SYGnxl2zqBGqnJd4kuphQ3km/r3V0V9/N6l0gvzOy4I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=S8mrDnT0fvV+xgMuP6Pz27GtHIObyVmHLViP+p+arTu2mQVmi4LvGK122raF8qHN7O0JtsiRKR1bhECnrh6/IWsTvin9wtS1KXHEXqJ9iGPDU+6NdRCZVRimxagCo6HCxPPq0djH8AXywsRoT0HqEyD5dNweG0/oRQhIa4AZPHk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=M4KGdAnW; arc=fail smtp.client-ip=52.101.70.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="M4KGdAnW"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DjxTCezXhDiQgG2NMW9rDv2tygLWIS7feW1ODehE4FxVbUo3Za9kVpitEtIOJXoFVNHmAwIQlSFzwVnQw1+MBvya6XUTo8NnnQz8YV3v+HZx32vhTYm0OhAuKNhw6+mkbpeYvwhykiJBR9yp+3HWHAYGXK2zeXm/LKuw5wGK1qIBEAyu/SFUQxSoMtonhAQlkaiS4oj+skAYcjEdqMDySME9Kvch8qZMsi6ShQX0tBDkjQ8y4U8v7N0+alD4U+cYSjEyorLB6aGBznvWkoMNwnyTGEAmR/IHPyzpnCsvhKrhwFcbuI1kEhutrAdth/d0K/uS4XWDG1I+uAt40OpCcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cCDwXRGDOVPNlM+3pR3kXjgQWX/6DjAw0x8/KOR2QSs=;
+ b=rsn5Se78MlJvMK/O6oGGwcHaGkWRWTUbce4hBvvTMmkrOneEx1oWte8EMyFoihd4uKjYC3gTGukL+AgbmEnIOdBiblRYEs380mR3bfWObKWdTT8Q4JgsSuuppJfItoWTZ6fXviLA0BjqYift3b7+gcVTdByzLfdfS5Dq7QknK5Qofto1ALNhIWIEBSHMDOeveIfZiaug79Cqohe3ESTWCvI1GjrAkeQPCv0P10jTdcG1CkzzvkQWYrOKGbR8ZgnTMb15thGlwtq33vtegQj8eNXzDIPa5XLGSeu//BgnB4bRGkb50l+P3rcRyrUHa9xdiPbI1nZHPeEBfOKfeSP9CQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cCDwXRGDOVPNlM+3pR3kXjgQWX/6DjAw0x8/KOR2QSs=;
+ b=M4KGdAnWYixbHil2kFfc0r4fH0wLsWtSqwR5w0fN6wylbC324hoc+vFXL+6rt1vpW5OP9mOELtVb1ORV8SKwubBEMbZ25F9RrsaTPVU2XCPFY7tedN2R2gPcpQuWczaElVlhWDm+ja4sI2R/gn6c/t4rAkiR3Lk4GGop9DoY4tYYMOeTwbYPCRRHnCOoDKaxjBt7sh2AHi7pfVbTKeH4jHabRlYFj4In/z2Oimzz9XRIA2WOVs4ImT3NE/42v4RmMHTJESDVT97HWgsaSugpw0rB2+UI8XXqnY2Tfx2OUGSWRTkBYSWlnLpmWhDk3d0NTIQI23VAeZi10OHWDwTnKw==
+Received: from DB9PR04MB8429.eurprd04.prod.outlook.com (2603:10a6:10:242::19)
+ by AS8PR04MB7910.eurprd04.prod.outlook.com (2603:10a6:20b:288::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.25; Tue, 17 Jun
+ 2025 02:53:12 +0000
+Received: from DB9PR04MB8429.eurprd04.prod.outlook.com
+ ([fe80::2edf:edc4:794f:4e37]) by DB9PR04MB8429.eurprd04.prod.outlook.com
+ ([fe80::2edf:edc4:794f:4e37%3]) with mapi id 15.20.8813.024; Tue, 17 Jun 2025
+ 02:53:12 +0000
+From: Sherry Sun <sherry.sun@nxp.com>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, "marcel@holtmann.org"
+	<marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Amitkumar Karwar
+	<amitkumar.karwar@nxp.com>, Manjeet Gupta <manjeet.gupta@nxp.com>
+Subject: RE: [PATCH v1 2/2] Bluetooth: btnxpuart: Add support for 4M baudrate
+Thread-Topic: [PATCH v1 2/2] Bluetooth: btnxpuart: Add support for 4M baudrate
+Thread-Index: AQHb3tMpCm8TG0WWEEOlGzN//APNILQGpDKQ
+Date: Tue, 17 Jun 2025 02:53:11 +0000
+Message-ID:
+ <DB9PR04MB8429D531C76CD31AF66864419273A@DB9PR04MB8429.eurprd04.prod.outlook.com>
+References: <20250616150919.8821-1-neeraj.sanjaykale@nxp.com>
+ <20250616150919.8821-2-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20250616150919.8821-2-neeraj.sanjaykale@nxp.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR04MB8429:EE_|AS8PR04MB7910:EE_
+x-ms-office365-filtering-correlation-id: aa4c25ba-7a9b-4b4b-d25e-08ddad4a1984
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?haPSlcNaXAgb4QsPKHl8RJL248yvqbyxDJ5jP9IDpEMwO2svND2fKBuVOw6+?=
+ =?us-ascii?Q?6loDMKJ8a5AiYcvsKehMd3VePYQcnitbLWVcpVJkWk/8ZIsVlmR9B0n0g0KS?=
+ =?us-ascii?Q?NqhGd0zSSYvA+lT6ERUvgm65mCF7XOHi8chzSiCX7QortYZiylFEA6x+mnci?=
+ =?us-ascii?Q?R69CUNirotRpEWbZNZVuvp9Oif9UYWw+zpHsW6R/anU598sbq88ep6Cvqpjp?=
+ =?us-ascii?Q?7Tf+5QTSNJ6BBYo2/TaabOXgeL/cWga8HXwRO+fPHayhp4szUCwlaO/jgWuo?=
+ =?us-ascii?Q?AC+WGI44yTUv9CwX/YpECllEakEQmDFqBss6TL6S0rY5rKZ/3fXRE2yUehnO?=
+ =?us-ascii?Q?UG3iklPg12es7vwLtq+WV4PkDhX9qf/hpGkdbiLlR/dRUNM6aJA8QbZyG4hA?=
+ =?us-ascii?Q?Lt3vwgaTmGwD5zCmsW5OdNWvylRl/vIOFS97CZ3AROO8zeBUTK4e24TqRUCr?=
+ =?us-ascii?Q?LK3bI2hzE5aaavR9hPgyL9rJWrsArNz0+gHp6w6iJW59oAZrzajI1Zk3fvs8?=
+ =?us-ascii?Q?GbbkZscaq/PSkpSI4tM1IlLwB0I7MxPzsNMxnl9HeQqdIMSpdyjR2h2jx8Vz?=
+ =?us-ascii?Q?lNTalUPRduxTveKR3xGO8I1wLLqwmyTpqsyWRbyrldagshTKRHx9tyLi+giL?=
+ =?us-ascii?Q?BSeB4HisiQdJQQmWVOeUgiAZAIPOHq6mVOKUvm6P2f+5W3o2KgMMKIwSdSAl?=
+ =?us-ascii?Q?gLGwGahw23arTAuMl2VC6tI4FF3WQe07ETex+Buw8k9t3hM1ZdPUvaitadfY?=
+ =?us-ascii?Q?Kx89rH1JXdXbdJIlq4ODj3xseZFpOTH0EeKNkfH3EIoqsPeOulOwGBK/yuV+?=
+ =?us-ascii?Q?3z6Q1WYrDIyUZPGRNL5r7r1u2AZXzFPNGhHf1gAC7S8icowrn+QVhi3tegyh?=
+ =?us-ascii?Q?c/DqmeGKA0BzUORN8cj3bBfYGZU/NkVQstnJTFhkxmiwt21jCQhuR5cZQOF0?=
+ =?us-ascii?Q?eoo+O97V5X9TiGGfysd4dY35lrMbfA7QhlinChcgg7aiiRSuae5oN3jd2DMu?=
+ =?us-ascii?Q?X1RDfLuRU2U8cAZm0wfoyWHYURFf4bob73RBToRQAV3bHBjgOhg5Ei1xOYgN?=
+ =?us-ascii?Q?VrrYO5M/EN6cTE2ANAEh0iI/bT/gzAK1L5UhTQMpLSfZik27wbXnVnWPiABH?=
+ =?us-ascii?Q?F0lPALSAMaNBlJvRVzj/5dA6JvsQciEzWik7abIXfD626BtXtT85PK3zzooi?=
+ =?us-ascii?Q?VWSftuWTdEOnOWbNlyHVemfzqMdUP7cvvPz+eW29yGcMB3xTZpoKCOycH0Q7?=
+ =?us-ascii?Q?cubVKbQZ8UkZhpXAMBnQfn/AU26hBjGkbpQcNabDRQPg7mpJP+t9S1QcIhoY?=
+ =?us-ascii?Q?Q8h6EOjvpOewN5pOLTtNznJhNss6SlIyqknYVn6ZyvOFbUMFR+QVpjHdoo6O?=
+ =?us-ascii?Q?3Ci2LUTYj/zJ6TL1v0EuxUHd5DQKA4u+2dqmpkRe0FHDxuPm4X2RFnCdQ5P/?=
+ =?us-ascii?Q?9pZCtcDKP+E8ZC/r2WIYvEqeh9sNXDdokFISZMJf59SzyjzXpHPfNg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB8429.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?GczqLqw8I/NOiWFRF9cCIIc/+369DCdX5vkRkvuiGzInvWeafAn9Mt7FwZGm?=
+ =?us-ascii?Q?8VbpgM5GG4/GZzLLv3FGsn3rEIPJxpwGnSx25VOzl2i49af9HwcAlE61Gkqt?=
+ =?us-ascii?Q?h7eTWzZOl+nxO9zjYq/61nHX4nYH0O9Q58WrTy/hLdLl7YCSq6dmF7m1kvjQ?=
+ =?us-ascii?Q?dBnu516dFDlUnWkP+rgNdob34BXexRUwpvJsi0RnyslJh95plUVEwZZhu/4r?=
+ =?us-ascii?Q?lp4VWm8lif9b6kfKowt4IgAOW7GsamEK/Y5Kt77IK/SVdFOTwbzJo2WCpPK/?=
+ =?us-ascii?Q?TtTwVXXmdg/Y3gifx4N3gtKjNOTfctcCRrDR6nZXb9dYYHXtU9IeCPI1xkR9?=
+ =?us-ascii?Q?8phthHMmBv6aMFAzAeSAXhXHJZy5IDSbkLcQHP0gnbq3cl1mOGVmrsEB60fV?=
+ =?us-ascii?Q?YPxnzsTe8kbGpkrFcxAO67A0I4JXPlWt110XLMzjZlhtCK6PFPBhNIw/rqvs?=
+ =?us-ascii?Q?dZ5wu07fYr+nbX++Zd189wMJWERLw9YhVgNpsfLvLmoWLL86BB+/TgtzA23a?=
+ =?us-ascii?Q?rkQM2SnxDAkVmGJh+y7gq2JaU731EbI2WmdvtKpcrN8CbTWs2sVnjZPA9o+J?=
+ =?us-ascii?Q?2KXkGGorREmHyWgHPOrBspl0rXNrQWmgLtbOXtAOon2MlqQkiuD5D03vdYT0?=
+ =?us-ascii?Q?KRtxUselRMYbQmWSv+i7JV8wiOjuASAVlzZnkw2AOK7YOWbRlxALvwJ7pUfq?=
+ =?us-ascii?Q?rsncCRA0J0TtIkv6lrF7PesdW4facH55SKDh29xyrmtRHJYQzUtpzJ4sTIij?=
+ =?us-ascii?Q?2/6yt9C43NPeVx9RamBMoSw0+asjnsZw0H5dV19ST+lxQ1iXDuNm4G/3fqW8?=
+ =?us-ascii?Q?FzXR2323vOeFrZYfk1AqNnxNydvsgdV97FZF02LKgBeBpAvUetRgo/j7zp9+?=
+ =?us-ascii?Q?NVBsWAKngTILBZIL7nsJogvSrAVoPfVha8j/7a2WaNEoOfN/EJYT8eHp8wXc?=
+ =?us-ascii?Q?gKlr7t4g0CKVQ4/BgHjW7eWHlRTY2YTeFKR/FgWCa5BJsjTSszX8TXyujxRY?=
+ =?us-ascii?Q?v61v0jXPlvLSbhKawQol/JjtpnIEpBIy51XRL/B6Dxi2MxAK0uoSMec+78E/?=
+ =?us-ascii?Q?TVMAJ+Kb3rb9A0WQa5nEdwTpyxh/bKKjUcoCHivKGOfe2mqaSkrlu/V/L403?=
+ =?us-ascii?Q?i3AZ28o+Q9yrIV9qYaK5wxymmZZl9pzecyz4A+EBOYjTRE/FEMojmwpTmRFR?=
+ =?us-ascii?Q?jf0yQ2s6grm2nE3982HHYYBklMef8OqO8CXZsrcF4ncASJMrxv1CBY839yuz?=
+ =?us-ascii?Q?DDw4tJz8a0Q6irwwTddDmHDmibftqsA+mGm5XFF6m708L+wWQ5REnwx6Q4Sr?=
+ =?us-ascii?Q?GT/R3dxDAg4Ut5YAr2BtDulmY01O5us+yCsZKQKnoy261IorXrsas/qR0T6b?=
+ =?us-ascii?Q?JwEWnPHb2IlWZiTf1lhOr51JyFbQgCfEw/VFCMe5/5XKit7bPar5uie3koQu?=
+ =?us-ascii?Q?FboFRM5i6oMf0kjrAlbvAweMvbi/3njaQHvCY8S33viJNTvqKThsgqevNpQT?=
+ =?us-ascii?Q?7E4xfYXYCew0ghCqubx7B9raKa6JcvkuDm3xF78hdaRRbIA6zNlBxFs73mse?=
+ =?us-ascii?Q?QPfJh0PaAjWyXpcAMAM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB8429.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa4c25ba-7a9b-4b4b-d25e-08ddad4a1984
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2025 02:53:12.3348
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /8nEmwZ2X236mfWL0N9IKrMcvm/Fv1cJJOlYSM6nv+Gjjf5P05VxXrPhBwiUzgXRvWjYhzvJgV/c3H/M5tQYAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7910
 
-Since commit 78fe66360ed6 ("misc: ti-st: st_kim: remove the driver")
-ti_wilink_st.h is only used in hci_ll.c, cleanup unused st code
-and move other to hci_ll.h
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- drivers/bluetooth/hci_ll.c   |   2 +-
- drivers/bluetooth/hci_ll.h   |  56 +++++
- include/linux/ti_wilink_st.h | 439 -----------------------------------
- 3 files changed, 57 insertions(+), 440 deletions(-)
- create mode 100644 drivers/bluetooth/hci_ll.h
- delete mode 100644 include/linux/ti_wilink_st.h
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index e19e9bd49555..6c089e6f7c40 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -34,7 +34,6 @@
- #include <linux/of.h>
- #include <linux/serdev.h>
- #include <linux/skbuff.h>
--#include <linux/ti_wilink_st.h>
- #include <linux/clk.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -42,6 +41,7 @@
- #include <linux/gpio/consumer.h>
- #include <linux/nvmem-consumer.h>
- 
-+#include "hci_ll.h"
- #include "hci_uart.h"
- 
- /* Vendor-specific HCI commands */
-diff --git a/drivers/bluetooth/hci_ll.h b/drivers/bluetooth/hci_ll.h
-new file mode 100644
-index 000000000000..b0e525bab64b
---- /dev/null
-+++ b/drivers/bluetooth/hci_ll.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef HCI_LL_H
-+#define HCI_LL_H
-+
-+/*
-+ * BTS headers
-+ */
-+#define ACTION_SEND_COMMAND     1
-+#define ACTION_WAIT_EVENT       2
-+#define ACTION_SERIAL           3
-+#define ACTION_DELAY            4
-+#define ACTION_RUN_SCRIPT       5
-+#define ACTION_REMARKS          6
-+
-+/**
-+ * struct bts_header - the fw file is NOT binary which can
-+ *	be sent onto TTY as is. The .bts is more a script
-+ *	file which has different types of actions.
-+ *	Each such action needs to be parsed by the KIM and
-+ *	relevant procedure to be called.
-+ */
-+struct bts_header {
-+	u32 magic;
-+	u32 version;
-+	u8 future[24];
-+	u8 actions[];
-+} __packed;
-+
-+/**
-+ * struct bts_action - Each .bts action has its own type of
-+ *	data.
-+ */
-+struct bts_action {
-+	u16 type;
-+	u16 size;
-+	u8 data[];
-+} __packed;
-+
-+struct bts_action_delay {
-+	u32 msec;
-+} __packed;
-+
-+/**
-+ * struct hci_command - the HCI-VS for intrepreting
-+ *	the change baud rate of host-side UART, which
-+ *	needs to be ignored, since UIM would do that
-+ *	when it receives request from KIM for ldisc installation.
-+ */
-+struct hci_command {
-+	u8 prefix;
-+	u16 opcode;
-+	u8 plen;
-+	u32 speed;
-+} __packed;
-+
-+#endif /* HCI_LL_H */
-diff --git a/include/linux/ti_wilink_st.h b/include/linux/ti_wilink_st.h
-deleted file mode 100644
-index 10642d4844f0..000000000000
---- a/include/linux/ti_wilink_st.h
-+++ /dev/null
-@@ -1,439 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- *  Shared Transport Header file
-- *	To be included by the protocol stack drivers for
-- *	Texas Instruments BT,FM and GPS combo chip drivers
-- *	and also serves the sub-modules of the shared transport driver.
-- *
-- *  Copyright (C) 2009-2010 Texas Instruments
-- *  Author: Pavan Savoy <pavan_savoy@ti.com>
-- */
--
--#ifndef TI_WILINK_ST_H
--#define TI_WILINK_ST_H
--
--#include <linux/skbuff.h>
--
--/**
-- * enum proto-type - The protocol on WiLink chips which share a
-- *	common physical interface like UART.
-- */
--enum proto_type {
--	ST_BT,
--	ST_FM,
--	ST_GPS,
--	ST_MAX_CHANNELS = 16,
--};
--
--/**
-- * struct st_proto_s - Per Protocol structure from BT/FM/GPS to ST
-- * @type: type of the protocol being registered among the
-- *	available proto_type(BT, FM, GPS the protocol which share TTY).
-- * @recv: the receiver callback pointing to a function in the
-- *	protocol drivers called by the ST driver upon receiving
-- *	relevant data.
-- * @match_packet: reserved for future use, to make ST more generic
-- * @reg_complete_cb: callback handler pointing to a function in protocol
-- *	handler called by ST when the pending registrations are complete.
-- *	The registrations are marked pending, in situations when fw
-- *	download is in progress.
-- * @write: pointer to function in ST provided to protocol drivers from ST,
-- *	to be made use when protocol drivers have data to send to TTY.
-- * @priv_data: privdate data holder for the protocol drivers, sent
-- *	from the protocol drivers during registration, and sent back on
-- *	reg_complete_cb and recv.
-- * @chnl_id: channel id the protocol driver is interested in, the channel
-- *	id is nothing but the 1st byte of the packet in UART frame.
-- * @max_frame_size: size of the largest frame the protocol can receive.
-- * @hdr_len: length of the header structure of the protocol.
-- * @offset_len_in_hdr: this provides the offset of the length field in the
-- *	header structure of the protocol header, to assist ST to know
-- *	how much to receive, if the data is split across UART frames.
-- * @len_size: whether the length field inside the header is 2 bytes
-- *	or 1 byte.
-- * @reserve: the number of bytes ST needs to reserve in the skb being
-- *	prepared for the protocol driver.
-- */
--struct st_proto_s {
--	enum proto_type type;
--	long (*recv) (void *, struct sk_buff *);
--	unsigned char (*match_packet) (const unsigned char *data);
--	void (*reg_complete_cb) (void *, int data);
--	long (*write) (struct sk_buff *skb);
--	void *priv_data;
--
--	unsigned char chnl_id;
--	unsigned short max_frame_size;
--	unsigned char hdr_len;
--	unsigned char offset_len_in_hdr;
--	unsigned char len_size;
--	unsigned char reserve;
--};
--
--extern long st_register(struct st_proto_s *);
--extern long st_unregister(struct st_proto_s *);
--
--
--/*
-- * header information used by st_core.c
-- */
--
--/* states of protocol list */
--#define ST_NOTEMPTY	1
--#define ST_EMPTY	0
--
--/*
-- * possible st_states
-- */
--#define ST_INITIALIZING		1
--#define ST_REG_IN_PROGRESS	2
--#define ST_REG_PENDING		3
--#define ST_WAITING_FOR_RESP	4
--
--/**
-- * struct st_data_s - ST core internal structure
-- * @st_state: different states of ST like initializing, registration
-- *	in progress, this is mainly used to return relevant err codes
-- *	when protocol drivers are registering. It is also used to track
-- *	the recv function, as in during fw download only HCI events
-- *	can occur , where as during other times other events CH8, CH9
-- *	can occur.
-- * @tty: tty provided by the TTY core for line disciplines.
-- * @tx_skb: If for some reason the tty's write returns lesser bytes written
-- *	then to maintain the rest of data to be written on next instance.
-- *	This needs to be protected, hence the lock inside wakeup func.
-- * @tx_state: if the data is being written onto the TTY and protocol driver
-- *	wants to send more, queue up data and mark that there is
-- *	more data to send.
-- * @list: the list of protocols registered, only MAX can exist, one protocol
-- *	can register only once.
-- * @rx_state: states to be maintained inside st's tty receive
-- * @rx_count: count to be maintained inside st's tty receieve
-- * @rx_skb: the skb where all data for a protocol gets accumulated,
-- *	since tty might not call receive when a complete event packet
-- *	is received, the states, count and the skb needs to be maintained.
-- * @rx_chnl: the channel ID for which the data is getting accumalated for.
-- * @txq: the list of skbs which needs to be sent onto the TTY.
-- * @tx_waitq: if the chip is not in AWAKE state, the skbs needs to be queued
-- *	up in here, PM(WAKEUP_IND) data needs to be sent and then the skbs
-- *	from waitq can be moved onto the txq.
-- *	Needs locking too.
-- * @lock: the lock to protect skbs, queues, and ST states.
-- * @protos_registered: count of the protocols registered, also when 0 the
-- *	chip enable gpio can be toggled, and when it changes to 1 the fw
-- *	needs to be downloaded to initialize chip side ST.
-- * @ll_state: the various PM states the chip can be, the states are notified
-- *	to us, when the chip sends relevant PM packets(SLEEP_IND, WAKE_IND).
-- * @kim_data: reference to the parent encapsulating structure.
-- *
-- */
--struct st_data_s {
--	unsigned long st_state;
--	struct sk_buff *tx_skb;
--#define ST_TX_SENDING	1
--#define ST_TX_WAKEUP	2
--	unsigned long tx_state;
--	struct st_proto_s *list[ST_MAX_CHANNELS];
--	bool is_registered[ST_MAX_CHANNELS];
--	unsigned long rx_state;
--	unsigned long rx_count;
--	struct sk_buff *rx_skb;
--	unsigned char rx_chnl;
--	struct sk_buff_head txq, tx_waitq;
--	spinlock_t lock;
--	unsigned char	protos_registered;
--	unsigned long ll_state;
--	void *kim_data;
--	struct tty_struct *tty;
--	struct work_struct work_write_wakeup;
--};
--
--/*
-- * wrapper around tty->ops->write_room to check
-- * availability during firmware download
-- */
--int st_get_uart_wr_room(struct st_data_s *st_gdata);
--/**
-- * st_int_write -
-- * point this to tty->driver->write or tty->ops->write
-- * depending upon the kernel version
-- */
--int st_int_write(struct st_data_s*, const unsigned char*, int);
--
--/**
-- * st_write -
-- * internal write function, passed onto protocol drivers
-- * via the write function ptr of protocol struct
-- */
--long st_write(struct sk_buff *);
--
--/* function to be called from ST-LL */
--void st_ll_send_frame(enum proto_type, struct sk_buff *);
--
--/* internal wake up function */
--void st_tx_wakeup(struct st_data_s *st_data);
--
--/* init, exit entry funcs called from KIM */
--int st_core_init(struct st_data_s **);
--void st_core_exit(struct st_data_s *);
--
--/* ask for reference from KIM */
--void st_kim_ref(struct st_data_s **, int);
--
--#define GPS_STUB_TEST
--#ifdef GPS_STUB_TEST
--int gps_chrdrv_stub_write(const unsigned char*, int);
--void gps_chrdrv_stub_init(void);
--#endif
--
--/*
-- * header information used by st_kim.c
-- */
--
--/* time in msec to wait for
-- * line discipline to be installed
-- */
--#define LDISC_TIME	1000
--#define CMD_RESP_TIME	800
--#define CMD_WR_TIME	5000
--#define MAKEWORD(a, b)  ((unsigned short)(((unsigned char)(a)) \
--	| ((unsigned short)((unsigned char)(b))) << 8))
--
--#define GPIO_HIGH 1
--#define GPIO_LOW  0
--
--/* the Power-On-Reset logic, requires to attempt
-- * to download firmware onto chip more than once
-- * since the self-test for chip takes a while
-- */
--#define POR_RETRY_COUNT 5
--
--/**
-- * struct chip_version - save the chip version
-- */
--struct chip_version {
--	unsigned short full;
--	unsigned short chip;
--	unsigned short min_ver;
--	unsigned short maj_ver;
--};
--
--#define UART_DEV_NAME_LEN 32
--/**
-- * struct kim_data_s - the KIM internal data, embedded as the
-- *	platform's drv data. One for each ST device in the system.
-- * @uim_pid: KIM needs to communicate with UIM to request to install
-- *	the ldisc by opening UART when protocol drivers register.
-- * @kim_pdev: the platform device added in one of the board-XX.c file
-- *	in arch/XX/ directory, 1 for each ST device.
-- * @kim_rcvd: completion handler to notify when data was received,
-- *	mainly used during fw download, which involves multiple send/wait
-- *	for each of the HCI-VS commands.
-- * @ldisc_installed: completion handler to notify that the UIM accepted
-- *	the request to install ldisc, notify from tty_open which suggests
-- *	the ldisc was properly installed.
-- * @resp_buffer: data buffer for the .bts fw file name.
-- * @fw_entry: firmware class struct to request/release the fw.
-- * @rx_state: the rx state for kim's receive func during fw download.
-- * @rx_count: the rx count for the kim's receive func during fw download.
-- * @rx_skb: all of fw data might not come at once, and hence data storage for
-- *	whole of the fw response, only HCI_EVENTs and hence diff from ST's
-- *	response.
-- * @core_data: ST core's data, which mainly is the tty's disc_data
-- * @version: chip version available via a sysfs entry.
-- *
-- */
--struct kim_data_s {
--	long uim_pid;
--	struct platform_device *kim_pdev;
--	struct completion kim_rcvd, ldisc_installed;
--	char resp_buffer[30];
--	const struct firmware *fw_entry;
--	unsigned nshutdown;
--	unsigned long rx_state;
--	unsigned long rx_count;
--	struct sk_buff *rx_skb;
--	struct st_data_s *core_data;
--	struct chip_version version;
--	unsigned char ldisc_install;
--	unsigned char dev_name[UART_DEV_NAME_LEN + 1];
--	unsigned flow_cntrl;
--	unsigned baud_rate;
--};
--
--/**
-- * functions called when 1 of the protocol drivers gets
-- * registered, these need to communicate with UIM to request
-- * ldisc installed, read chip_version, download relevant fw
-- */
--long st_kim_start(void *);
--long st_kim_stop(void *);
--
--void st_kim_complete(void *);
--void kim_st_list_protocols(struct st_data_s *, void *);
--void st_kim_recv(void *disc_data, const u8 *data, size_t count);
--
--
--/*
-- * BTS headers
-- */
--#define ACTION_SEND_COMMAND     1
--#define ACTION_WAIT_EVENT       2
--#define ACTION_SERIAL           3
--#define ACTION_DELAY            4
--#define ACTION_RUN_SCRIPT       5
--#define ACTION_REMARKS          6
--
--/**
-- * struct bts_header - the fw file is NOT binary which can
-- *	be sent onto TTY as is. The .bts is more a script
-- *	file which has different types of actions.
-- *	Each such action needs to be parsed by the KIM and
-- *	relevant procedure to be called.
-- */
--struct bts_header {
--	u32 magic;
--	u32 version;
--	u8 future[24];
--	u8 actions[];
--} __attribute__ ((packed));
--
--/**
-- * struct bts_action - Each .bts action has its own type of
-- *	data.
-- */
--struct bts_action {
--	u16 type;
--	u16 size;
--	u8 data[];
--} __attribute__ ((packed));
--
--struct bts_action_send {
--	u8 data[0];
--} __attribute__ ((packed));
--
--struct bts_action_wait {
--	u32 msec;
--	u32 size;
--	u8 data[];
--} __attribute__ ((packed));
--
--struct bts_action_delay {
--	u32 msec;
--} __attribute__ ((packed));
--
--struct bts_action_serial {
--	u32 baud;
--	u32 flow_control;
--} __attribute__ ((packed));
--
--/**
-- * struct hci_command - the HCI-VS for intrepreting
-- *	the change baud rate of host-side UART, which
-- *	needs to be ignored, since UIM would do that
-- *	when it receives request from KIM for ldisc installation.
-- */
--struct hci_command {
--	u8 prefix;
--	u16 opcode;
--	u8 plen;
--	u32 speed;
--} __attribute__ ((packed));
--
--/*
-- * header information used by st_ll.c
-- */
--
--/* ST LL receiver states */
--#define ST_W4_PACKET_TYPE       0
--#define ST_W4_HEADER		1
--#define ST_W4_DATA		2
--
--/* ST LL state machines */
--#define ST_LL_ASLEEP               0
--#define ST_LL_ASLEEP_TO_AWAKE      1
--#define ST_LL_AWAKE                2
--#define ST_LL_AWAKE_TO_ASLEEP      3
--#define ST_LL_INVALID		   4
--
--/* different PM notifications coming from chip */
--#define LL_SLEEP_IND	0x30
--#define LL_SLEEP_ACK	0x31
--#define LL_WAKE_UP_IND	0x32
--#define LL_WAKE_UP_ACK	0x33
--
--/* initialize and de-init ST LL */
--long st_ll_init(struct st_data_s *);
--long st_ll_deinit(struct st_data_s *);
--
--/**
-- * enable/disable ST LL along with KIM start/stop
-- * called by ST Core
-- */
--void st_ll_enable(struct st_data_s *);
--void st_ll_disable(struct st_data_s *);
--
--/**
-- * various funcs used by ST core to set/get the various PM states
-- * of the chip.
-- */
--unsigned long st_ll_getstate(struct st_data_s *);
--unsigned long st_ll_sleep_state(struct st_data_s *, unsigned char);
--void st_ll_wakeup(struct st_data_s *);
--
--/*
-- * header information used by st_core.c for FM and GPS
-- * packet parsing, the bluetooth headers are already available
-- * at net/bluetooth/
-- */
--
--struct fm_event_hdr {
--	u8 plen;
--} __attribute__ ((packed));
--
--#define FM_MAX_FRAME_SIZE 0xFF	/* TODO: */
--#define FM_EVENT_HDR_SIZE 1	/* size of fm_event_hdr */
--#define ST_FM_CH8_PKT 0x8
--
--/* gps stuff */
--struct gps_event_hdr {
--	u8 opcode;
--	u16 plen;
--} __attribute__ ((packed));
--
--/**
-- * struct ti_st_plat_data - platform data shared between ST driver and
-- *	platform specific board file which adds the ST device.
-- * @nshutdown_gpio: Host's GPIO line to which chip's BT_EN is connected.
-- * @dev_name: The UART/TTY name to which chip is interfaced. (eg: /dev/ttyS1)
-- * @flow_cntrl: Should always be 1, since UART's CTS/RTS is used for PM
-- *	purposes.
-- * @baud_rate: The baud rate supported by the Host UART controller, this will
-- *	be shared across with the chip via a HCI VS command from User-Space Init
-- *	Mgr application.
-- * @suspend:
-- * @resume: legacy PM routines hooked to platform specific board file, so as
-- *	to take chip-host interface specific action.
-- * @chip_enable:
-- * @chip_disable: Platform/Interface specific mux mode setting, GPIO
-- *	configuring, Host side PM disabling etc.. can be done here.
-- * @chip_asleep:
-- * @chip_awake: Chip specific deep sleep states is communicated to Host
-- *	specific board-xx.c to take actions such as cut UART clocks when chip
-- *	asleep or run host faster when chip awake etc..
-- *
-- */
--struct ti_st_plat_data {
--	u32 nshutdown_gpio;
--	unsigned char dev_name[UART_DEV_NAME_LEN]; /* uart name */
--	u32 flow_cntrl; /* flow control flag */
--	u32 baud_rate;
--	int (*suspend)(struct platform_device *, pm_message_t);
--	int (*resume)(struct platform_device *);
--	int (*chip_enable) (struct kim_data_s *);
--	int (*chip_disable) (struct kim_data_s *);
--	int (*chip_asleep) (struct kim_data_s *);
--	int (*chip_awake) (struct kim_data_s *);
--};
--
--#endif /* TI_WILINK_ST_H */
--- 
-2.34.1
+> -----Original Message-----
+> From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> Sent: Monday, June 16, 2025 11:09 PM
+> To: marcel@holtmann.org; luiz.dentz@gmail.com; robh@kernel.org;
+> krzk+dt@kernel.org; conor+dt@kernel.org
+> Cc: linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org;
+> devicetree@vger.kernel.org; Amitkumar Karwar
+> <amitkumar.karwar@nxp.com>; Neeraj Sanjay Kale
+> <neeraj.sanjaykale@nxp.com>; Sherry Sun <sherry.sun@nxp.com>; Manjeet
+> Gupta <manjeet.gupta@nxp.com>
+> Subject: [PATCH v1 2/2] Bluetooth: btnxpuart: Add support for 4M baudrate
+>=20
+> This adds support for 4000000 as secondary baudrate.
+> This value is selected from device tree property "secondary-baudrate"
+> which is then used to download FW chunks, and as operational baudrate
+> after HCI initialization is done.
+>=20
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+>  drivers/bluetooth/btnxpuart.c | 29 ++++++++++++++++++++---------
+>  1 file changed, 20 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.=
+c
+> index 6b13feed06df..e2cd568bdffe 100644
+> --- a/drivers/bluetooth/btnxpuart.c
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -73,7 +73,8 @@
+>  #define FW_AUTH_ENC		0xc0
+>=20
+>  #define HCI_NXP_PRI_BAUDRATE	115200
+> -#define HCI_NXP_SEC_BAUDRATE	3000000
+> +#define HCI_NXP_SEC_BAUDRATE_3M	3000000
+> +#define HCI_NXP_SEC_BAUDRATE_4M	4000000
+>=20
+>  #define MAX_FW_FILE_NAME_LEN    50
+>=20
+> @@ -201,6 +202,7 @@ struct btnxpuart_dev {
+>  	u32 new_baudrate;
+>  	u32 current_baudrate;
+>  	u32 fw_init_baudrate;
+> +	u32 secondary_baudrate;
+>  	enum bootloader_param_change timeout_changed;
+>  	enum bootloader_param_change baudrate_changed;
+>  	bool helper_downloaded;
+> @@ -802,7 +804,10 @@ static bool nxp_fw_change_baudrate(struct hci_dev
+> *hdev, u16 req_len)
+>  		nxpdev->fw_v3_offset_correction +=3D req_len;
+>  	} else if (req_len =3D=3D sizeof(uart_config)) {
+>  		uart_config.clkdiv.address =3D __cpu_to_le32(clkdivaddr);
+> -		uart_config.clkdiv.value =3D __cpu_to_le32(0x00c00000);
+> +		if (nxpdev->new_baudrate =3D=3D HCI_NXP_SEC_BAUDRATE_4M)
+> +			uart_config.clkdiv.value =3D
+> __cpu_to_le32(0x01000000);
+> +		else
+> +			uart_config.clkdiv.value =3D
+> __cpu_to_le32(0x00c00000);
+>  		uart_config.uartdiv.address =3D __cpu_to_le32(uartdivaddr);
+>  		uart_config.uartdiv.value =3D __cpu_to_le32(1);
+>  		uart_config.mcr.address =3D __cpu_to_le32(uartmcraddr); @@
+> -969,9 +974,9 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, stru=
+ct
+> sk_buff *skb)
+>  			if (nxp_fw_change_baudrate(hdev, len)) {
+>  				nxpdev->baudrate_changed =3D changed;
+>  				serdev_device_set_baudrate(nxpdev->serdev,
+> -
+> HCI_NXP_SEC_BAUDRATE);
+> +
+> HCI_NXP_SEC_BAUDRATE_3M);
+>  				serdev_device_set_flow_control(nxpdev-
+> >serdev, true);
+> -				nxpdev->current_baudrate =3D
+> HCI_NXP_SEC_BAUDRATE;
+> +				nxpdev->current_baudrate =3D
+> HCI_NXP_SEC_BAUDRATE_3M;
+>  			}
+>  			goto free_skb;
+>  		}
+> @@ -992,7 +997,7 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev,
+> struct sk_buff *skb)
+>  			nxpdev->helper_downloaded =3D true;
+>  			serdev_device_wait_until_sent(nxpdev->serdev, 0);
+>  			serdev_device_set_baudrate(nxpdev->serdev,
+> -						   HCI_NXP_SEC_BAUDRATE);
+> +
+> HCI_NXP_SEC_BAUDRATE_3M);
+
+Hi Neeraj,
+
+Does this mean that some legacy BT chips using nxp_recv_fw_req_v1() don't s=
+upport 4Mbps?
+If so, please add comments in the commit message.
+
+>  			serdev_device_set_flow_control(nxpdev->serdev,
+> true);
+>  		} else {
+>  			clear_bit(BTNXPUART_FW_DOWNLOADING,
+> &nxpdev->tx_state); @@ -1216,12 +1221,13 @@ static int
+> nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
+>  	}
+>=20
+>  	if (nxpdev->baudrate_changed !=3D changed) {
+> +		nxpdev->new_baudrate =3D nxpdev->secondary_baudrate;
+>  		if (nxp_fw_change_baudrate(hdev, len)) {
+>  			nxpdev->baudrate_changed =3D cmd_sent;
+>  			serdev_device_set_baudrate(nxpdev->serdev,
+> -						   HCI_NXP_SEC_BAUDRATE);
+> +						   nxpdev-
+> >secondary_baudrate);
+>  			serdev_device_set_flow_control(nxpdev->serdev,
+> true);
+> -			nxpdev->current_baudrate =3D
+> HCI_NXP_SEC_BAUDRATE;
+> +			nxpdev->current_baudrate =3D nxpdev-
+> >secondary_baudrate;
+>  		}
+>  		goto free_skb;
+>  	}
+> @@ -1447,8 +1453,8 @@ static int nxp_post_init(struct hci_dev *hdev)
+>  	struct btnxpuart_dev *nxpdev =3D hci_get_drvdata(hdev);
+>  	struct ps_data *psdata =3D &nxpdev->psdata;
+>=20
+> -	if (nxpdev->current_baudrate !=3D HCI_NXP_SEC_BAUDRATE) {
+> -		nxpdev->new_baudrate =3D HCI_NXP_SEC_BAUDRATE;
+> +	if (nxpdev->current_baudrate !=3D nxpdev->secondary_baudrate) {
+> +		nxpdev->new_baudrate =3D nxpdev->secondary_baudrate;
+>  		nxp_set_baudrate_cmd(hdev, NULL);
+>  	}
+>  	if (psdata->cur_h2c_wakeupmode !=3D psdata->h2c_wakeupmode) @@
+> -1773,6 +1779,11 @@ static int nxp_serdev_probe(struct serdev_device
+> *serdev)
+>  	if (!nxpdev->fw_init_baudrate)
+>  		nxpdev->fw_init_baudrate =3D FW_INIT_BAUDRATE;
+>=20
+> +	device_property_read_u32(&nxpdev->serdev->dev, "secondary-
+> baudrate",
+> +				 &nxpdev->secondary_baudrate);
+> +	if (!nxpdev->secondary_baudrate)
+> +		nxpdev->secondary_baudrate =3D
+> HCI_NXP_SEC_BAUDRATE_3M;
+> +
+
+What if the user sets the wrong secondary_baudrate in dts (not 3M or 4M)?
+Need to add the corresponding error handling here. Make sure the value is 3=
+M or 4M, otherwise report an error log.
+
+Best Regards
+Sherry
+
+>  	set_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
+>=20
+>  	crc8_populate_msb(crc8_table, POLYNOMIAL8);
+> --
+> 2.34.1
 
