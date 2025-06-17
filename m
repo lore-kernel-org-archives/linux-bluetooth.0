@@ -1,143 +1,121 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2328BEC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Jun 2025 03:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FA6288A2;
+	Tue, 17 Jun 2025 06:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750130486; cv=none; b=dNvyN9AJv9UrMwyHWX635vulaEBxUZuZbCwn/sRECZrDDCrJOCoQtBbErEFMW+3yfCVjXH231A2OaL9YYuItsIhVQ7XUIgwXvV3IpixGD4W06n46GOTi0hToErDqmA9+nwR82B5oosM0gWvpwF8HJr48AqnJdZIq6vewFH7j//o=
+	t=1750142604; cv=none; b=HUhHzSjJv+x96DknvOG9w4MJgtTgiYwlh9aEG7odOg608jiAA8xvo1TWAexdWjcaE5LvhWtAms/pa6t1gVA1yEGWa65IdUeLhbCvQPO2sBuCTyfK+GoXv+wIqCZpEqALsxCB6MojwegyLbCS4pM4ImMwpu3kiVR42BBa4/CrxZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750130486; c=relaxed/simple;
-	bh=Chq9IOxhWhkJdi/jIyLY4EdBGdC0CuDxQJ/1pWN04IU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Rrv9vzmW20dHRMwvyCBAROBJ31Tp6NInzWAUKahYywAodD4/IzxzNZLC+aXR00nsOWA7m5ji1TdC1W1JjbJ+WmTcrxx0fhSOzhIGseKN7kmRICPQqigpiB3CycdaDm7vu781JRL+310MPpMnkAd1zak3B/0qEZa+i5EvkwG833E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jIl/+dnU; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750142604; c=relaxed/simple;
+	bh=a3FADsAAQQiMcHjdpY+uzKdLXJKiqwgRdPxXOJppQ14=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DaLZMWmpAbHHwXjRw762jVRBhj/GqQobpPEwC4LHbUatiE5RtczBXWO7WoNKYjTtePY9B15It6kK4dJVAMrbE4tLwHXPJ3pOY64kKanGG4L3sWXmEBHx3JypzkCp0I/CIHh8TBeAncu6KpSTltQ600OXXTGFDuO3IPmHYUsmEnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bttwGYcC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jIl/+dnU"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7d38cfa9773so550154585a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Jun 2025 20:21:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750130483; x=1750735283; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7lo51mlh7dZ1cMojc/+qfLcNtUFVjc+m+Tj2jv/ux4Q=;
-        b=jIl/+dnUAxY72AUBpUdMODCMEGqnWPbklnzEU0tJuTmcQlXFVmz4B35HW4avFsLbiy
-         S70PqXVPSLePCwmvmSIpOacGAHx+BTZYP/q/w9FIw6SUG5kxI6105iSzG9YaEQUxvWE8
-         VcPlcKADpaqPMi5jRZg0IeZnApVNpvQ2tYDxxK79jHmdabNnA+FvsuRBmKsc3qrwNBNy
-         rVD4SCEQw/jj4Zo018/1QAs6UelBdwGpdLUd012xHhZFk0XdAZjHkKkGbUe7+qNOyMpY
-         A8kEXKW5fCewlsvPxFy233DPm60fR/N7mZhvWvJNKDoE2f+cnv7H6Wk9Qyvex1aUuKId
-         ndGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750130483; x=1750735283;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7lo51mlh7dZ1cMojc/+qfLcNtUFVjc+m+Tj2jv/ux4Q=;
-        b=G7LgDs+gcJ+vMOWAJP0J7Y3vMJBVPJYYpfYJKwyEfDv1+yEmzmuXuH+Piq90LctqUS
-         jBdiY7PMrbsrDnmmdSZroFj6b5daym7yJQHGBHOghgBb+6WohwOJ5nJIeDIaH0FDIQJ3
-         uYKdurLhwnt4CjQ07AHR3WwfW7lQYl40KjaqZi0hlavQAlcKWfXRPTSuV7wTEeE4/BHq
-         hESaoY2mfhmG66fZc+bdweIz2LexoZm8eG1rjJxGaqV9aot1uYWcKaDMP/gmAXhub+Cd
-         12BtFzyMnwsEXl9BfYh6MjF5vxT+PFnrlMaUIZSTHXyqM9HN0H005/LOdOVYoMf3QruS
-         rcjA==
-X-Gm-Message-State: AOJu0YzYxtp/yCEtq0687Z0234bZORBKOd5zTZ6MN4TPkqvVs3JEIXqw
-	txVSE4QF8uINJu0Cqhzld0Z5vgSBmUzK/aBPqmXtDLHmibQR7Dl5CBdF9G06ug==
-X-Gm-Gg: ASbGncv49L90FGoEWBbS64I5uqhmQ3Smw0KxuPlDEFuX2vqTgRYmoI8rzlYYEaMLpcK
-	LV3iZeM4Wohmg1QBWuBLpYj9I3enj0kHVN1tKVBSTCoGuydtyUxKwNQioNlOszXd74K1ho4eo9y
-	/lcdQxtBIT2MyGutKV3Gk1AikUKAwAyLbupNWU4UQX+jI9Q+5DwxcxeUj+FRGBYXgFB1GQaQO2S
-	PjuP8j+mTPrJvruEIlkkDug5scqXehhMivEUzFqx6HbrusfJT8pFhz+Wfdq/TmYtBOiY8ufUN1F
-	N3Yjs8sAKeaHb6rIAavk520h12LLV7gHw/Bcc9fWXXoOozUnntUmNLWVJAK023HkWwJI
-X-Google-Smtp-Source: AGHT+IEgF3EaVmFcsmozPFn2v8s+7KYxv3X6j+SapWVOGwd2F6tyiIdzhwjLDhcM2o+ulO4HRh6Pow==
-X-Received: by 2002:a05:620a:718e:b0:7d3:d732:d4bc with SMTP id af79cd13be357-7d3d732db45mr597226585a.32.1750130483360;
-        Mon, 16 Jun 2025 20:21:23 -0700 (PDT)
-Received: from [172.17.0.2] ([68.154.31.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3b8eacccfsm601392385a.66.2025.06.16.20.21.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 20:21:22 -0700 (PDT)
-Message-ID: <6850df32.050a0220.1c9752.77d3@mx.google.com>
-Date: Mon, 16 Jun 2025 20:21:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0942202981697724952=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bttwGYcC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB029C4CEE3;
+	Tue, 17 Jun 2025 06:43:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750142603;
+	bh=a3FADsAAQQiMcHjdpY+uzKdLXJKiqwgRdPxXOJppQ14=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bttwGYcCUwO1lIEAjLILkFM9REY5rmD8jiOIgM3Wdl4RIVkrt14M1mWFdcIQbvXzA
+	 C6W62ygC/Auy5VKYL25Vc7w9GFpzphWVexV9azUXNkYcRD4EmeDRcxs6FO8BgkhoKZ
+	 vuNPc8cOokf3hBGm9S3cRTykSnoq0WZbx3JeooYDbCv5rbPZim78iLOgN55FpqNzPN
+	 vRThvNgZeSAS2rqs7ZMvVNfmGTWYOgs2D2TGGnZmQjFnhW/dCV8m9aebhlePQwd/fo
+	 9f82hVwC02ph/O9CSVNTn4iEyioRJDX1JtIKpY3QYU/eExY7oz3OGZf6Knw3Zr2uc4
+	 mHWPsXGOpOzQA==
+Message-ID: <6fe27c9d-4641-4aba-9e34-686a4d7f1fa8@kernel.org>
+Date: Tue, 17 Jun 2025 08:43:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yuehaibing@huawei.com
-Subject: RE: [-next] Bluetooth: hci_ll: Introduce hci_ll.h
-In-Reply-To: <20250617030616.3642576-1-yuehaibing@huawei.com>
-References: <20250617030616.3642576-1-yuehaibing@huawei.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0942202981697724952==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 2/2] Bluetooth: btnxpuart: Add support for 4M baudrate
+To: Sherry Sun <sherry.sun@nxp.com>,
+ Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
+ "marcel@holtmann.org" <marcel@holtmann.org>,
+ "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+ "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+ <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+ Manjeet Gupta <manjeet.gupta@nxp.com>
+References: <20250616150919.8821-1-neeraj.sanjaykale@nxp.com>
+ <20250616150919.8821-2-neeraj.sanjaykale@nxp.com>
+ <DB9PR04MB8429D531C76CD31AF66864419273A@DB9PR04MB8429.eurprd04.prod.outlook.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <DB9PR04MB8429D531C76CD31AF66864419273A@DB9PR04MB8429.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 17/06/2025 04:53, Sherry Sun wrote:
+>> @@ -992,7 +997,7 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev,
+>> struct sk_buff *skb)
+>>  			nxpdev->helper_downloaded = true;
+>>  			serdev_device_wait_until_sent(nxpdev->serdev, 0);
+>>  			serdev_device_set_baudrate(nxpdev->serdev,
+>> -						   HCI_NXP_SEC_BAUDRATE);
+>> +
+>> HCI_NXP_SEC_BAUDRATE_3M);
+> 
+> Hi Neeraj,
+> 
+> Does this mean that some legacy BT chips using nxp_recv_fw_req_v1() don't support 4Mbps?
+> If so, please add comments in the commit message.
 
-Dear submitter,
+If that's true this is implied by compatible and entire property should
+be dropped.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=972761
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.18 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      23.99 seconds
-CheckAllWarning               PASS      27.11 seconds
-CheckSparse                   PASS      30.38 seconds
-BuildKernel32                 PASS      24.39 seconds
-TestRunnerSetup               PASS      455.77 seconds
-TestRunner_l2cap-tester       PASS      28.28 seconds
-TestRunner_iso-tester         PASS      40.31 seconds
-TestRunner_bnep-tester        PASS      6.03 seconds
-TestRunner_mgmt-tester        FAIL      136.72 seconds
-TestRunner_rfcomm-tester      PASS      9.31 seconds
-TestRunner_sco-tester         PASS      14.80 seconds
-TestRunner_ioctl-tester       PASS      10.12 seconds
-TestRunner_mesh-tester        PASS      7.49 seconds
-TestRunner_smp-tester         PASS      8.68 seconds
-TestRunner_userchan-tester    PASS      6.33 seconds
-IncrementalBuild              PENDING   0.49 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.201 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.212 seconds
-LL Privacy - Start Discovery 1 (Disable RL)          Failed       0.206 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0942202981697724952==--
+Best regards,
+Krzysztof
