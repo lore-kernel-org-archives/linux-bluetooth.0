@@ -1,66 +1,71 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C743085D5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 19:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D593085D5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 19:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750273891; cv=none; b=oi5An/T8dwbQzGisBsVnNzXI88EEjxE9dIwJi/r0tj0EgMNivWc2NwYak3nYzu/pmUJLZSGGBh/gW4Pv66Jj769y/KE9/18hNQFHNpuO+MjcT4UN2QIdx5uO06Xmxr6LfJaVbQY9ElGxQ+UERjaM+K5sSIMxO4c4f3xzEQkKq7o=
+	t=1750273894; cv=none; b=NJXnE2kY6vGjBVBdG+XFvAv+d0bivVwCRRwIkI1uMX6GV6snoe7C23fgZA4ZMiRlvFVWh1/YNZwe0My2AfqFTO0tnpAYt2WN5c9isLMVQOOcLqDf97kIuvLATVPO/NQjFZAPkApSfOBQLi8AGU9/ZkD7JZKvMHdwNSosOwJ08i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750273891; c=relaxed/simple;
-	bh=heP0bdooXF2RPqUTfOwgUygYyrvZfXMmhb1Ubh20x8k=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=meP8rasROJUc37u6sPXXLqstXMcgA8LOhyHOWQt956A+MJLnSaqy/oS6LHjURnDqfD/LsiswyS2QqxCbT2m9PL/Nu4nsc0mwHGAmPmOF2t1GDPCdcXwZslV7te5Ly4qlO9PYILdwWvYFTshhlERK21Q8xab0J8KKEjO29rE4ptI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VyN44sin; arc=none smtp.client-ip=209.85.222.41
+	s=arc-20240116; t=1750273894; c=relaxed/simple;
+	bh=fiOJFjrBGbOqPNqiH5be3fXtYSvqcWgMATGBOIuySCE=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NCuUrUZZoqexZKc28GJrcNWJePE0e1h2fUJ2cOMPo0QAdx5txrTC8ZslwjJIyVRr/bTlHW9j842P7D0sKyCFm1HWdYMRvNq/cvCHmQQs/EHckgjgGLB8TAkU4XqBIXB51oDT6Y/e6eymDNlwUb7/H+5FEnlzCHc2wtADsSkPA8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lHYbRhKT; arc=none smtp.client-ip=209.85.217.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyN44sin"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-86d587dbc15so640050241.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 12:11:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lHYbRhKT"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4c6cf5e4cd5so29924137.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 12:11:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750273888; x=1750878688; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+IBy1E1OhQsIOybdc2QQ8aBtyL32UxNvj4l6rw+QEzw=;
-        b=VyN44sinOLsub4lubfgxrgtCGt5f2hVYZf3iqz0nM7d4nPCW/MCqR7/n0yrLWAg4fD
-         IvHAzx4BzN+vbPPiC0G+3V8OBgiY8QyurX3JnjvCQAS+s0XONO6FJ9uk8E+0c+X8TVQF
-         qrdRdDcC2q5muS7EL1YfbwY+2IjYLlQHsi/8vLrWSlT9BvHBUqMSB/DcN3K0r5UtZnW/
-         MBToUS/P4PLrtiZl9F4KLKnKjCFStiCRpLQ9BXHyu5zXnxyuVuZG2p5En00ZmS2JMFJb
-         +1Dak/Ozhi8csAMGlH61xGp2hafV/rVK+/hKmJcL0fvpduSLvctBvgaReTYVbCu8evXa
-         aYSA==
+        d=gmail.com; s=20230601; t=1750273892; x=1750878692; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IMpSw2AHfQaIA/QmKU8ZXukdqO3yvpIkbGZ958bblrs=;
+        b=lHYbRhKTfn65XBzze/997t3EejgYgPt0M8x7itQhzhK/SlRSN4l8SDw7dnqc3CF66c
+         E3gxyWZ6AQvyhwLnZnZbcOSCLt9YXyFRwVE6WcYD8TXRpKvWNB3nr3x7Y/hFKi4ktCeL
+         7k28LLx9JqDfK4+G/iDO/YArqBM3MEfA8+qPNPhXHMkxckg+owGTkr9PHiJniKAJwL58
+         /CTJFRG1ELVGMwHF+QbC+CPIN5kYb32yT58DY1qWIIlgSuWBJcI8AIWQgtn1I6Bp2OIA
+         R+f1GPb0/k3m1JcJEM5z8bKqlxJGgVgn6FIrFlKgq/WYJCveTnmbbt+kDMajaZrqk18F
+         24FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750273888; x=1750878688;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+IBy1E1OhQsIOybdc2QQ8aBtyL32UxNvj4l6rw+QEzw=;
-        b=Syy3N+R+b5TnxApNJXoiHUG4EY9k+VuBoHHY0/zk4rUvsEVPoIGe2YxOcRCnJ7j3Ib
-         Su7sQB5EBGno3I8v7XWnX1Pkmy9DQWKdc7zpI0p0VgADk/3PpuPikeszqGMo+jNPGumQ
-         UtHHOBwzceyNC4nEbNeJC01g4J9eSlUcmVqxdl3PpIJWw4dMXkAy2fw71Nzwuae7V0gD
-         nWbjNnoLUijFbDyVZUUz+L5CZbRZ6CT6BYk7Tn4a38hBJSeGSlqxl4bYiGY6yBJEpAOX
-         7cHCYlSlajpY4tzomGrDR2mdU3xJqOVypIALSf7sz6BYYsibPOoJlfMISnDY7J+FwmvZ
-         /VEw==
-X-Gm-Message-State: AOJu0YzzmIxDREhUICLhZapqUlENY3GeJB1ZYqXUO6DNJvEh9DuY727C
-	qT7WE6EKK1l4uVKrjb3p1yfaI+8vMLfXhlNG/9Axr468VFUbc3bV+IuF2LZCJg==
-X-Gm-Gg: ASbGncvJG1/Dq664CaH/LMylseBo00l2Z+hoUBOBUU6L/Qh849k43yG7/CoWEQfVTrQ
-	5bZBrWfg/ryYqZBYN2yjl4wOTt5RqxUhCseVx46eQwZvxTR0w2F+L19zac/AHud4Uf4ZvNvK9Nb
-	dHiReUrMY6W2kQsD9KXFMxdV+EqM7oSD25zQv/4VKEJ0Z2ZH06GlzxYSnwV5kzrOdUBFmZphWMN
-	tvRKPXJ+JdDqeIxVvnszbi9pdFt6FCtlziVEk2vkFo1mh7FaN/ZFGAQ07z75Q8UflAu7z3oy/gs
-	PVH5GWbb2UPCswp4oIpruwVkOTpxFonQU61hOJ1kXjD04SBdFuXFaUIRRbPM8U8qv4WO/af8SKA
-	jOKfgyLFHeoK0ApVQbCCKBHbCaOxn5Qk=
-X-Google-Smtp-Source: AGHT+IElYgt3crwZeN0cxvEMoiV9M29goLc0VA5R2gOyGILYUH/UuMztzbiu7X0wMK4S8pWIGcIYbw==
-X-Received: by 2002:a05:6102:2ad5:b0:4e5:9608:1298 with SMTP id ada2fe7eead31-4e9acee3a6dmr833008137.9.1750273887913;
-        Wed, 18 Jun 2025 12:11:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750273892; x=1750878692;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IMpSw2AHfQaIA/QmKU8ZXukdqO3yvpIkbGZ958bblrs=;
+        b=W0OQQpOObrH5ahV6N1LlpQ2UA9T2PchAvmO/3Jne12mu0nUPlZhitOxJTbhNkahiHb
+         hJAJYi2nRkujITh5yPYru4mN+nwEIRY3KT+uo4f1eKppk71Kd5JSD7wuS4x5mVTdQVuV
+         nISatmZJufFDw6Nzjn5sZRfjizPVq9kOy7NmeGNkZLSuz0Z+2LpvmJzwooO6vb3M4/C7
+         y64ssFODvhqYJ9IZ/LICYZA4UZmNJlUarA9NhOAezFdJRy+Sadyc34d+jDgXNgDrLLD/
+         n7MASEYx8rHd5nV+5nIX3pG9XX22qUZlLN+zALm/hmpTs3u8jDSDzBir1wX7bL6lyYnd
+         CfxQ==
+X-Gm-Message-State: AOJu0YxLo30eGOuRUzMToT4aJsBGBZztBJllG+GI9UkxjrMpgVlZ1m19
+	542U11l8Wdp5TbryI3OZ8QQ9QWSBCa0gefFc3LU/GA/HIMlyytPXqdZKietVSA==
+X-Gm-Gg: ASbGncsUH2+Ggvw+AiL1LUx6KaSWPwfAgiShZqBZVKoiTeOevED2HuiLOWOnVsFfdWZ
+	pkQrkEqv11uTFGf59inasrxIJiciYVov4mh/tESLSrsnS2H67CO+qpzhjkXaKKLCfo21YiZZ+wV
+	zz5xB3yEw5cFc+FQDt3qj1WLJ32XjxNpy3K97Fm9XCL0SYYoi0/tCCcVfwWuIXCVVlPlQ8tZjmi
+	znVCoeKVD1Ip0BIRT2Ve2M9UFxLS4IpYE6rNIJqqVxAHkRqgjaNC3DLqB2YK8o8FeCouU0Zy+Xu
+	Ij3lXJqkUErcOfehFpUGWmuy3K3aZ8SS6Xo8UROg4lzBpGKKkZNRtLav2x7kZjkEXa7KxRceb6Q
+	V5jIuaISeJaM50kFpPEDfQPaKNXgriVw=
+X-Google-Smtp-Source: AGHT+IFNpv4Nn1Pf9OTelxHtrUoQtfJNvJI2seUn59059o0P1qFu5JlBkt2HUSSJufnck45CEfiayA==
+X-Received: by 2002:a05:6102:cd1:b0:4db:e01:f2db with SMTP id ada2fe7eead31-4e7f5f6d18dmr14498792137.0.1750273891559;
+        Wed, 18 Jun 2025 12:11:31 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e979b63419sm695910137.25.2025.06.18.12.11.26
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e979b63419sm695910137.25.2025.06.18.12.11.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 12:11:26 -0700 (PDT)
+        Wed, 18 Jun 2025 12:11:29 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/3] test-runner: Add -U/--usb option
-Date: Wed, 18 Jun 2025 15:11:23 -0400
-Message-ID: <20250618191125.3123951-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/3] test-runner.rst: Add documentation for USB-passthrough
+Date: Wed, 18 Jun 2025 15:11:24 -0400
+Message-ID: <20250618191125.3123951-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250618191125.3123951-1-luiz.dentz@gmail.com>
+References: <20250618191125.3123951-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,97 +76,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds option to use a host controller plugged over USB:
-
-> tools/test-runner -U "usb-host,vendorid=0x8087,productid=0x0036"... -- /bin/bash
-> dmesg
-[    1.046214] usb 1-1: new full-speed USB device number 2 using xhci_hcd
-[    1.192623] Bluetooth: hci0: Firmware timestamp 2025.18 buildtype 2 build 82364
-[    1.192638] Bluetooth: hci0: Firmware SHA1: 0xa66e016b
-[    1.197362] Bluetooth: hci0: Fseq status: Success (0x00)
-[    1.197368] Bluetooth: hci0: Fseq executed: 00.00.04.196
-[    1.197371] Bluetooth: hci0: Fseq BT Top: 00.00.04.197
-> lsusb
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-Bus 001 Device 002: ID 8087:0036 Intel Corp. BE200 Bluetooth
-Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+This documents the newly added option -U/--usb and adds a dedicated
+section that explains the required the kernel image to build with
+some extra config options to enable passing -device qemu-xhci in order
+to use -device usb-host.
 ---
- tools/test-runner.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ doc/test-runner.rst | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 7c9386d2c3d3..ae4e653e3502 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -57,6 +57,7 @@ static int num_devs = 0;
- static const char *qemu_binary = NULL;
- static const char *kernel_image = NULL;
- static char *audio_server;
-+static char *usb_dev;
+diff --git a/doc/test-runner.rst b/doc/test-runner.rst
+index 423a9379c0ab..1b4eeb9d4c1c 100644
+--- a/doc/test-runner.rst
++++ b/doc/test-runner.rst
+@@ -22,6 +22,7 @@ OPTIONS
+ :-l/--emulator: Start btvirt
+ :-A/-audio[=path]: Start audio server
+ :-u/--unix[=path]: Provide serial device
++:-U/--usb=<qemu_args>: Provide USB device
+ :-q/--qemu=<path>: QEMU binary
+ :-k/--kernel=<image>: Kernel image (bzImage)
+ :-h/--help: Show help options
+@@ -176,3 +177,18 @@ Running shell with host controller using btproxy
+ 	$ tools/btproxy -u [1]
+ 	$ tools/test-runner -u -d -k /pathto/bzImage -- /bin/bash [2]
  
- static const char *qemu_table[] = {
- 	"qemu-system-x86_64",
-@@ -288,7 +289,8 @@ static void start_qemu(void)
- 				testargs);
- 
- 	argv = alloca(sizeof(qemu_argv) +
--				(sizeof(char *) * (6 + (num_devs * 4))));
-+			(sizeof(char *) * (6 + (num_devs * 4))) +
-+			(sizeof(char *) * (usb_dev ? 4 : 0)));
- 	memcpy(argv, qemu_argv, sizeof(qemu_argv));
- 
- 	pos = (sizeof(qemu_argv) / sizeof(char *)) - 1;
-@@ -326,6 +328,13 @@ static void start_qemu(void)
- 		argv[pos++] = serdev;
- 	}
- 
-+	if (usb_dev) {
-+		argv[pos++] = "-device";
-+		argv[pos++] = "qemu-xhci";
-+		argv[pos++] = "-device";
-+		argv[pos++] = usb_dev;
-+	}
++Running shell with host controller USB-passthrough
++--------------------------------------------------
 +
- 	argv[pos] = NULL;
- 
- 	execve(argv[0], argv, qemu_envp);
-@@ -1183,6 +1192,7 @@ static void usage(void)
- 		"\t-l, --emulator         Start btvirt\n"
- 		"\t-A, --audio[=path]     Start audio server\n"
- 		"\t-u, --unix [path]      Provide serial device\n"
-+		"\t-U, --usb [qemu_args]  Provide USB device\n"
- 		"\t-q, --qemu <path>      QEMU binary\n"
- 		"\t-H, --qemu-host-cpu    Use host CPU (requires KVM support)\n"
- 		"\t-k, --kernel <image>   Kernel image (bzImage)\n"
-@@ -1202,6 +1212,7 @@ static const struct option main_options[] = {
- 	{ "qemu-host-cpu", no_argument, NULL, 'H' },
- 	{ "kernel",  required_argument, NULL, 'k' },
- 	{ "audio",   optional_argument, NULL, 'A' },
-+	{ "usb",     required_argument, NULL, 'U' },
- 	{ "version", no_argument,       NULL, 'v' },
- 	{ "help",    no_argument,       NULL, 'h' },
- 	{ }
-@@ -1221,8 +1232,8 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "aubdslmq:Hk:A::vh", main_options,
--								NULL);
-+		opt = getopt_long(argc, argv, "aubdslmq:Hk:A::U:vh",
-+						main_options, NULL);
- 		if (opt < 0)
- 			break;
- 
-@@ -1261,6 +1272,9 @@ int main(int argc, char *argv[])
- 		case 'A':
- 			audio_server = optarg ? optarg : "/usr/bin/pipewire";
- 			break;
-+		case 'U':
-+			usb_dev = optarg;
-+			break;
- 		case 'v':
- 			printf("%s\n", VERSION);
- 			return EXIT_SUCCESS;
++In addition the above kernel config option the following is required:
++
++.. code-block::
++
++	CONFIG_USB=y
++	CONFIG_USB_XHCI_HCD=y
++	CONFIG_USB_XHCI_PLATFORM=y
++
++.. code-block::
++
++	$ tools/test-runner -U "usb-host,vendorid=<0xxxxx>,productid=<0xxxxx>" \
++	-d -k /pathto/bzImage -- /bin/bash
 -- 
 2.49.0
 
