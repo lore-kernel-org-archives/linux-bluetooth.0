@@ -1,94 +1,157 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46986288C25
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 12:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B542F5305;
+	Wed, 18 Jun 2025 13:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750250783; cv=none; b=nuoE4biDw5Tx+ai8aRMAk2DqdWIT5GoGIf9I45R2xBg1dW5d6bQp02AzHr9G5cKzn27NM8B73jfxEUSiMIOTTwC0GH20dkrnKXKIWZCXx81jwh/+J7SqclyB0uSAGYDa9KLUmD4BukpEHRMYTm4RLdg4Nl1yBTJlu+hfxnSwytU=
+	t=1750252010; cv=none; b=O+nxwyIjhIs0OkAyUDYSdyN+6zGKsnRhFeu+Kl454al+EJDMO874Gofaw00YNykJtbLSfhfGqT8tK6Gqg1GwNa5161f+VrkLCbnEzZcwa4ml6/XLKfBI5jquJUAU81mzLyS2434ss+oSJM3TrQZ91DXNinUdZvsmKWlhrufRNOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750250783; c=relaxed/simple;
-	bh=7Mk0JSSs2PvlP2a6M5+CsIKw2CR9loAgbRANbpcxGfQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cSQwIXikNe6Q3Km4lVKvgb9itYTO2ah3NFa+gL5HOF+YCttWIci1EMO+IkRzBHxumpDsTO1hKDqm7UN6wVAOJVQHkncHHmr2+5RNI0kn6QLmY4iHoqAe/dzsGQLRYD7X+TLDdywxD0NXSyKst6rFH8VSZyq5ZUcqlYw1dFn0mpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fj/FSlSz; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1750252010; c=relaxed/simple;
+	bh=tlMWEJilkt2cS5jO2hp7is3uP2AslL9bH22DIQ6vfqM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lTBsR8lghBP19hEqvFWzlKmaJWyLUfGx780bKOGpe08LsHVTJIKeyto/O1JZbt0t816PIIkXnbzHbxnb4l7Oenjb+6rqJFcTMYe0KDxo+LR8NkG5LcFEPaz9CK5QLuTa5dnCxWyMnM8kZ9oCb9BlAcx2F12bXVjzNcAmjgdQv3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QFEJtO4D; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fj/FSlSz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750250781; x=1781786781;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=7Mk0JSSs2PvlP2a6M5+CsIKw2CR9loAgbRANbpcxGfQ=;
-  b=fj/FSlSzDLtNTNz566TuFXvmXh+tX+tAgfHy2KomYr5UrXd0mkRsD+Fp
-   OY+wA8RHAapuLUL4GrAKTvRMyY9tkgdz0NvWQA+w7TQ8tVAEE1NINAK5w
-   ezzsfu3ym2LaXrJj87gUfmkFnVMFjN3YA8FGXTojiFTNGrAz3NnRBEYmo
-   HmqnMGUbf9418vQBii/BWJw89PZVOtaUPbkS8gaXvoMAmsrcLTpkwYmv5
-   cP2geiuTDpOb5vE7WxitpfEiqRaVOjcxe6a+IuJA7bwNrKbMkFb5t7N62
-   ptQy5Drudoj1mnm3l75qKbj0ta314LOhFrQONF2bMQIcOAl0ITLJnwoCV
-   Q==;
-X-CSE-ConnectionGUID: rN+p9P6tSqWudhy5DUpsjg==
-X-CSE-MsgGUID: 1iw34FAmTVaqiBcw+ycWkw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="52384641"
-X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="52384641"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:46:20 -0700
-X-CSE-ConnectionGUID: pHDcxLv4TkSGHTXScdkyHw==
-X-CSE-MsgGUID: QAlT55ddSjyWyoIElmwO+w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="149336654"
-Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by orviesa006.jf.intel.com with ESMTP; 18 Jun 2025 05:46:18 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	aluvala.sai.teja@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: Add support for device 0x4d76
-Date: Wed, 18 Jun 2025 18:32:51 +0530
-Message-ID: <20250618130251.774085-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFEJtO4D"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32ac52f78c1so69202421fa.3;
+        Wed, 18 Jun 2025 06:06:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750252007; x=1750856807; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5IoaHM/RtVhw0m2bgiBxmx6AGN/3kU5yrYxZsQ8EOw0=;
+        b=QFEJtO4D0vFYxhPlgc5M53igIYurq33XdjNskAp6y+Di0W22Llo+AMne3wDBTf/Y24
+         ObEssi0JQPq2JHdAxZb/Mo7qH43aTmXZdNLFqKAS0OtvUlKWvGx8SjuCm3bnFcLwRqk/
+         iba+PYeCAUEzPqubgXjfo7HWhKOYXgJmU20ClgXoVTiboXkXb8f+529p9ITFs7+tPvxq
+         3PFnlNCRzMv5Yw2WH7ntdkQYdcVl2Wphqku94/jy/12oYrfUZtbA0VROTnMB4n5gS/lf
+         0Fx/o/ILn1jC110XC6EJJktjH7lGbB2HcSwrrC+olJiBJ4hVD00FceI4uF52yxyxusHp
+         jDCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750252007; x=1750856807;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5IoaHM/RtVhw0m2bgiBxmx6AGN/3kU5yrYxZsQ8EOw0=;
+        b=R3Uq2FXFhEPKWwjQdKSXdTrWQcX6yPlr1IOjqUqXzBrmwoAEWbiWH4J7Qiat9WZ1dJ
+         EivgWhkj2sZhVIQYFddIsjFx5wTw+CiBoX41J9QhkXyKQJzxcUVxIo0vbWRS1RgfvY4R
+         hhRUb4GtnWDZMRZg7y17TWYh9p0I2Jcg/QOsWbMClacjOUjcIrodP1vnIkzI0PYgXYLz
+         Bq1pQ/uU9gr8L9EeM9fvNCmmC4Bv+xlmjxDVyrEsaOnuv9jg/7moFXVQmSPpR8nINkti
+         IoEJU5zVbFHsgcXQHhw2GG9V7ph7zW3SfK4l9WmgJJkNM6UVLUFIeRTA0Nq6Hf9kLdql
+         7ZIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUs0QD7tjx/gNbc/tLomI3+l5cGNhe82GFxokS8T9yVDWevPu+DRwB3NnFG7jSB2ribxZVWVkh0zQruUPjq@vger.kernel.org, AJvYcCWVsTz7KFd4MHyAybCHtIloLhem6j7ir0U/VkmiFJqpaJQQk81gNbLX97Bqg4UeAySHOo+O7J/BKNqC2skXsqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1Ij1FJ5Zxh2AFr/H5th1nBv4RRjgzTtx8DrhdZNgzIxw7X/lr
+	qx3dfy/yhXkCrxQleYACtKmPeXSa78ExC6Vc1Gr+8fi4/k8wG3OecKv9uuY0HTWKm+i2KVgF/Av
+	a+nNUopih/0TLVTzatIy9fEHY8eiUYUc=
+X-Gm-Gg: ASbGnctqYfXT3mTfweRqBdtRCofWw+VBa2hRBCI/fpooSp9Ty6IX383Dd7sYvoGyTzw
+	iHT8qtmiWSFFLT7lrv5jqK7bBJ5ZvRtqod95hGdF+7bWtn6odw6grGi4/s0ymbg9rPC3li+6oPW
+	wi9AtwcWMJQZLRG5McZ4P+jXPIBU90e6yC0tDX36vh/Q==
+X-Google-Smtp-Source: AGHT+IFW5eg4nDCvWVC3JaKdWEEDmDOfiZXHEF/NsB44p9dKG3WhCdZHPJSSi8VPpN/yO04GE11Mq6EPx0yaVh6w6/c=
+X-Received: by 2002:a2e:b893:0:b0:32a:83b5:34ba with SMTP id
+ 38308e7fff4ca-32b4a4a996bmr51046381fa.20.1750252006463; Wed, 18 Jun 2025
+ 06:06:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250616-bluetooth_adv-v1-1-6876bf4e85b4@amlogic.com>
+In-Reply-To: <20250616-bluetooth_adv-v1-1-6876bf4e85b4@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 18 Jun 2025 09:06:34 -0400
+X-Gm-Features: AX0GCFtcrAqEx8zuj1i_twEve05S-BIMcFl7MlWPA_YLxLwUWdzwUitbSQwORvQ
+Message-ID: <CABBYNZJnakr4Yt8GUVurYkG0G3GJS9-zvZe2CO0LaxS3QZJBVQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Prevent unintended pause by checking if
+ advertising is active
+To: yang.li@amlogic.com
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-lspci -v -d  8086:4d76
-00:14.7 Bluetooth: Intel Corporation Device 4d76
-        Subsystem: Intel Corporation Device 0011
-        Flags: fast devsel, IRQ 255, IOMMU group 12
-        Memory at 13013328000 (64-bit, non-prefetchable) [disabled] [size=16K]
-        Capabilities: [c8] Power Management version 3
-        Capabilities: [d0] MSI: Enable- Count=1/1 Maskable- 64bit+
-        Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
-        Capabilities: [80] MSI-X: Enable- Count=32 Masked-
-        Capabilities: [100] Latency Tolerance Reporting
+Hi Yang,
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 1 +
- 1 file changed, 1 insertion(+)
+On Mon, Jun 16, 2025 at 7:05=E2=80=AFAM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
+>
+> From: Yang Li <yang.li@amlogic.com>
+>
+> When PA Create Sync is enabled, advertising resumes unexpectedly.
+> Therefore, it's necessary to check whether advertising is currently
+> active before attempting to pause it.
+>
+>   < HCI Command: LE Add Device To... (0x08|0x0011) plen 7  #1345 [hci0] 4=
+8.306205
+>                 Address type: Random (0x01)
+>                 Address: 4F:84:84:5F:88:17 (Resolvable)
+>                 Identity type: Random (0x01)
+>                 Identity: FC:5B:8C:F7:5D:FB (Static)
+>   < HCI Command: LE Set Address Re.. (0x08|0x002d) plen 1  #1347 [hci0] 4=
+8.308023
+>                 Address resolution: Enabled (0x01)
+>   ...
+>   < HCI Command: LE Set Extended A.. (0x08|0x0039) plen 6  #1349 [hci0] 4=
+8.309650
+>                 Extended advertising: Enabled (0x01)
+>                 Number of sets: 1 (0x01)
+>                 Entry 0
+>                 Handle: 0x01
+>                 Duration: 0 ms (0x00)
+>                 Max ext adv events: 0
+>   ...
+>   < HCI Command: LE Periodic Adve.. (0x08|0x0044) plen 14  #1355 [hci0] 4=
+8.314575
+>                 Options: 0x0000
+>                 Use advertising SID, Advertiser Address Type and address
+>                 Reporting initially enabled
+>                 SID: 0x02
+>                 Adv address type: Random (0x01)
+>                 Adv address: 4F:84:84:5F:88:17 (Resolvable)
+>                 Identity type: Random (0x01)
+>                 Identity: FC:5B:8C:F7:5D:FB (Static)
+>                 Skip: 0x0000
+>                 Sync timeout: 20000 msec (0x07d0)
+>                 Sync CTE type: 0x0000
+>
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  net/bluetooth/hci_sync.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 6687f2a4d1eb..4ea5a87f017d 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -2481,6 +2481,10 @@ static int hci_pause_advertising_sync(struct hci_d=
+ev *hdev)
+>         int err;
+>         int old_state;
+>
+> +       /* If controller is not advertising we are done. */
+> +       if (!hci_dev_test_flag(hdev, HCI_ADVERTISING))
+> +               return 0;
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index cb3cf2b9acea..1113a6310bd0 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -35,6 +35,7 @@
- 
- /* Intel Bluetooth PCIe device id table */
- static const struct pci_device_id btintel_pcie_table[] = {
-+	{ BTINTEL_PCI_DEVICE(0x4D76, PCI_ANY_ID) },
- 	{ BTINTEL_PCI_DEVICE(0xA876, PCI_ANY_ID) },
- 	{ BTINTEL_PCI_DEVICE(0xE476, PCI_ANY_ID) },
- 	{ 0 }
--- 
-2.43.0
+HCI_ADVERTISING is for directed advertising, it shall probably be
+changed to HCI_LE_ADV like in hci_disable_advertising_sync.
 
+>         /* If already been paused there is nothing to do. */
+>         if (hdev->advertising_paused)
+>                 return 0;
+>
+> ---
+> base-commit: 6c31dab4ff1e1f4e0f3412efb1cfc88033358d1f
+> change-id: 20250616-bluetooth_adv-6496e1ca6165
+>
+> Best regards,
+> --
+> Yang Li <yang.li@amlogic.com>
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
