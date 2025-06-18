@@ -1,154 +1,289 @@
 Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B542F5305;
-	Wed, 18 Jun 2025 13:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF67E13633F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 13:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750252010; cv=none; b=O+nxwyIjhIs0OkAyUDYSdyN+6zGKsnRhFeu+Kl454al+EJDMO874Gofaw00YNykJtbLSfhfGqT8tK6Gqg1GwNa5161f+VrkLCbnEzZcwa4ml6/XLKfBI5jquJUAU81mzLyS2434ss+oSJM3TrQZ91DXNinUdZvsmKWlhrufRNOM=
+	t=1750252736; cv=none; b=F1SMdBoqNRx4OSYdgPF/glYI0tt/6PMwiZTJ+T1xKwPZSGmqMLRkooDmkdzZLjKOl/AU/Iu4+rO+OwKp+iMbkiPIDG8mh0frfzIQbzqiFr88OViEPdPg8VbV8N450SWP9mTyz5JbPEKfQUDJ0GIpyENz06ZJanPlto2VFId9jbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750252010; c=relaxed/simple;
-	bh=tlMWEJilkt2cS5jO2hp7is3uP2AslL9bH22DIQ6vfqM=;
+	s=arc-20240116; t=1750252736; c=relaxed/simple;
+	bh=lvJjAZQXX6LRJce7iZ0wVrJjc6nQ7oysVdSc1qLQ7po=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lTBsR8lghBP19hEqvFWzlKmaJWyLUfGx780bKOGpe08LsHVTJIKeyto/O1JZbt0t816PIIkXnbzHbxnb4l7Oenjb+6rqJFcTMYe0KDxo+LR8NkG5LcFEPaz9CK5QLuTa5dnCxWyMnM8kZ9oCb9BlAcx2F12bXVjzNcAmjgdQv3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QFEJtO4D; arc=none smtp.client-ip=209.85.208.178
+	 To:Cc:Content-Type; b=uRDtlX8eqzfpP6X+0Eu8yUGn3nC050GVR4Pm1wtKuvVXZYCmgnuCrqBjWiEHm+umIcnrECk6jowOGcX7y+Q9uYcjZzWskfelJOzKTEIZW5GxZ5BAIlC4JtUHhZXUgHOSItVC2F9l6gpBZ93xsmN17MgGw1MnlRUXYJuqG33dwOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QIwbsDrG; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFEJtO4D"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32ac52f78c1so69202421fa.3;
-        Wed, 18 Jun 2025 06:06:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QIwbsDrG"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32b5931037eso30589611fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 06:18:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750252007; x=1750856807; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750252732; x=1750857532; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5IoaHM/RtVhw0m2bgiBxmx6AGN/3kU5yrYxZsQ8EOw0=;
-        b=QFEJtO4D0vFYxhPlgc5M53igIYurq33XdjNskAp6y+Di0W22Llo+AMne3wDBTf/Y24
-         ObEssi0JQPq2JHdAxZb/Mo7qH43aTmXZdNLFqKAS0OtvUlKWvGx8SjuCm3bnFcLwRqk/
-         iba+PYeCAUEzPqubgXjfo7HWhKOYXgJmU20ClgXoVTiboXkXb8f+529p9ITFs7+tPvxq
-         3PFnlNCRzMv5Yw2WH7ntdkQYdcVl2Wphqku94/jy/12oYrfUZtbA0VROTnMB4n5gS/lf
-         0Fx/o/ILn1jC110XC6EJJktjH7lGbB2HcSwrrC+olJiBJ4hVD00FceI4uF52yxyxusHp
-         jDCw==
+        bh=eID0HQ/1Xro0W2j92MJSYnoTXclDg+2QhHwvwPeuphU=;
+        b=QIwbsDrGxf0ws4qYc0vTjlmBZTLW3+dNSS0t6O5K+elPAxd3H+wXagpIOspItt8Z76
+         xI1cJdSxDv8O39YlD1yI3E7yuftiyidVVTq+SkD/FEJLO9G8NZIm/NhiisDCLqD2BJGZ
+         AuD4t2tE+Sy53KDDA+bCRlvdfa+yvg/Mo2JgxB9KMLDnYqPEKIZnEEH4iYDFsg4VWI8r
+         4UTNYDhNGxZYb9hPDK6Ln8VYCjVcBfs1CDUijxTpDlOhxMA1aNFDJp/cJfJTZmE476Wl
+         cQs5rzEnCT5UTnULt6kcVW8hMwHtpdZJAwXtXf7QGJr5LhSVtDbMYp0jVuv9w1vR9hrM
+         s5Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750252007; x=1750856807;
+        d=1e100.net; s=20230601; t=1750252732; x=1750857532;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5IoaHM/RtVhw0m2bgiBxmx6AGN/3kU5yrYxZsQ8EOw0=;
-        b=R3Uq2FXFhEPKWwjQdKSXdTrWQcX6yPlr1IOjqUqXzBrmwoAEWbiWH4J7Qiat9WZ1dJ
-         EivgWhkj2sZhVIQYFddIsjFx5wTw+CiBoX41J9QhkXyKQJzxcUVxIo0vbWRS1RgfvY4R
-         hhRUb4GtnWDZMRZg7y17TWYh9p0I2Jcg/QOsWbMClacjOUjcIrodP1vnIkzI0PYgXYLz
-         Bq1pQ/uU9gr8L9EeM9fvNCmmC4Bv+xlmjxDVyrEsaOnuv9jg/7moFXVQmSPpR8nINkti
-         IoEJU5zVbFHsgcXQHhw2GG9V7ph7zW3SfK4l9WmgJJkNM6UVLUFIeRTA0Nq6Hf9kLdql
-         7ZIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUs0QD7tjx/gNbc/tLomI3+l5cGNhe82GFxokS8T9yVDWevPu+DRwB3NnFG7jSB2ribxZVWVkh0zQruUPjq@vger.kernel.org, AJvYcCWVsTz7KFd4MHyAybCHtIloLhem6j7ir0U/VkmiFJqpaJQQk81gNbLX97Bqg4UeAySHOo+O7J/BKNqC2skXsqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1Ij1FJ5Zxh2AFr/H5th1nBv4RRjgzTtx8DrhdZNgzIxw7X/lr
-	qx3dfy/yhXkCrxQleYACtKmPeXSa78ExC6Vc1Gr+8fi4/k8wG3OecKv9uuY0HTWKm+i2KVgF/Av
-	a+nNUopih/0TLVTzatIy9fEHY8eiUYUc=
-X-Gm-Gg: ASbGnctqYfXT3mTfweRqBdtRCofWw+VBa2hRBCI/fpooSp9Ty6IX383Dd7sYvoGyTzw
-	iHT8qtmiWSFFLT7lrv5jqK7bBJ5ZvRtqod95hGdF+7bWtn6odw6grGi4/s0ymbg9rPC3li+6oPW
-	wi9AtwcWMJQZLRG5McZ4P+jXPIBU90e6yC0tDX36vh/Q==
-X-Google-Smtp-Source: AGHT+IFW5eg4nDCvWVC3JaKdWEEDmDOfiZXHEF/NsB44p9dKG3WhCdZHPJSSi8VPpN/yO04GE11Mq6EPx0yaVh6w6/c=
-X-Received: by 2002:a2e:b893:0:b0:32a:83b5:34ba with SMTP id
- 38308e7fff4ca-32b4a4a996bmr51046381fa.20.1750252006463; Wed, 18 Jun 2025
- 06:06:46 -0700 (PDT)
+        bh=eID0HQ/1Xro0W2j92MJSYnoTXclDg+2QhHwvwPeuphU=;
+        b=ilhrkOzXbn88yWwOVFk5NSxI8I575+d9Pmq+5qZYpOUR9FXb+8A396CBkTCLdzKdB8
+         0ET4BvVYQvwDceaM2B0vy1d+0Zkhi0VvE6acgxEgtvc5nNH9pjPHUIUSMIi8sfaBwj0N
+         ux1ilZqsAUKWNZqNQeUaZys905KflwmKeuqwiiBOKoNPf6IUuBzfNk1rsPMLEZCWxNMh
+         W2DTE0+JJQ8rVKjdzsN0YyU+0edjuZKtzsjMPlGSrUlzn2TUiNF3lc0psMqJ7kwkrpKo
+         O+V1+7dOV4igcNg/Nm9pLPk0cVth60NzgQDz+aD4Y39eaEIBn/lyqTF0QYUzrg1Eug8Y
+         ktMQ==
+X-Gm-Message-State: AOJu0Yyy0oLPfhc93qvK0GsSxA9W6DxnXbyr0RxMN5VaFfMOp4O2c8T5
+	Tga68PhM5Zs9PFGCqY/nPjDEkWbsUPxBxtrTxeq1m5c4xvHI/2rtq4K+25CVWKSsms/TcHmthm9
+	ToOvBb9n1F060iokx8Khqr8FFQS3VpFrvoQ==
+X-Gm-Gg: ASbGnctAfbG8geVes9cWt4n1jcVN5rKJkPg02s74DXZRO66PcZImfUjZHCVNqSVQq+r
+	LP/QuXYgOXA/izmx7wSGwOG2JqXat3WTabxrzshJlV4/BqJOz8zDwkFsCbdqw6XX2wOHTJUgSQO
+	bdC4c8LlImXJLXE77//qAik7kiiITuDV8FkkJ149O1VA==
+X-Google-Smtp-Source: AGHT+IG1gv2/JtJLQh9ykATD8sBrrstpU4YhOBwZGIt8TgvSrlCCkjpfXijl7rsDkLMUaHDsqbLHDSkyJNaQNlms3A4=
+X-Received: by 2002:a2e:bb9e:0:b0:30b:f52d:148f with SMTP id
+ 38308e7fff4ca-32b4a4341eemr32105021fa.18.1750252731763; Wed, 18 Jun 2025
+ 06:18:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250616-bluetooth_adv-v1-1-6876bf4e85b4@amlogic.com>
-In-Reply-To: <20250616-bluetooth_adv-v1-1-6876bf4e85b4@amlogic.com>
+References: <20250618-device-bearer-level-conn-state-v1-1-dca5df09c0bd@amlogic.com>
+In-Reply-To: <20250618-device-bearer-level-conn-state-v1-1-dca5df09c0bd@amlogic.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 18 Jun 2025 09:06:34 -0400
-X-Gm-Features: AX0GCFtcrAqEx8zuj1i_twEve05S-BIMcFl7MlWPA_YLxLwUWdzwUitbSQwORvQ
-Message-ID: <CABBYNZJnakr4Yt8GUVurYkG0G3GJS9-zvZe2CO0LaxS3QZJBVQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Prevent unintended pause by checking if
- advertising is active
-To: yang.li@amlogic.com
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Wed, 18 Jun 2025 09:18:38 -0400
+X-Gm-Features: AX0GCFvbzIp_NXh3YqpyPPTXXczWYI3l2NdMotTBPSA7iTny-Rs9p8ktxBrEL8E
+Message-ID: <CABBYNZ+Za+3s75Lo6bZbhghvpS-8yNWV=RcVFa071UTzunMVYg@mail.gmail.com>
+Subject: Re: [PATCH bluez] device: Add bearer info to Connected/Disconnected signals
+To: ye.he@amlogic.com
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Yang,
+Hi,
 
-On Mon, Jun 16, 2025 at 7:05=E2=80=AFAM Yang Li via B4 Relay
-<devnull+yang.li.amlogic.com@kernel.org> wrote:
+On Tue, Jun 17, 2025 at 10:40=E2=80=AFPM Ye He via B4 Relay
+<devnull+ye.he.amlogic.com@kernel.org> wrote:
 >
-> From: Yang Li <yang.li@amlogic.com>
+> From: Ye He <ye.he@amlogic.com>
 >
-> When PA Create Sync is enabled, advertising resumes unexpectedly.
-> Therefore, it's necessary to check whether advertising is currently
-> active before attempting to pause it.
+> This patch add a new Connected(string bearer) signal to indicate which tr=
+ansport
+> (LE or BR/EDR) has connected. Also extend the Disconnected signal to incl=
+ude
+> a bearer argument.
 >
->   < HCI Command: LE Add Device To... (0x08|0x0011) plen 7  #1345 [hci0] 4=
-8.306205
->                 Address type: Random (0x01)
->                 Address: 4F:84:84:5F:88:17 (Resolvable)
->                 Identity type: Random (0x01)
->                 Identity: FC:5B:8C:F7:5D:FB (Static)
->   < HCI Command: LE Set Address Re.. (0x08|0x002d) plen 1  #1347 [hci0] 4=
-8.308023
->                 Address resolution: Enabled (0x01)
->   ...
->   < HCI Command: LE Set Extended A.. (0x08|0x0039) plen 6  #1349 [hci0] 4=
-8.309650
->                 Extended advertising: Enabled (0x01)
->                 Number of sets: 1 (0x01)
->                 Entry 0
->                 Handle: 0x01
->                 Duration: 0 ms (0x00)
->                 Max ext adv events: 0
->   ...
->   < HCI Command: LE Periodic Adve.. (0x08|0x0044) plen 14  #1355 [hci0] 4=
-8.314575
->                 Options: 0x0000
->                 Use advertising SID, Advertiser Address Type and address
->                 Reporting initially enabled
->                 SID: 0x02
->                 Adv address type: Random (0x01)
->                 Adv address: 4F:84:84:5F:88:17 (Resolvable)
->                 Identity type: Random (0x01)
->                 Identity: FC:5B:8C:F7:5D:FB (Static)
->                 Skip: 0x0000
->                 Sync timeout: 20000 msec (0x07d0)
->                 Sync CTE type: 0x0000
+> This allows applications to distinguish transport-specific connection
+> events in dual-mode scenarios.
 >
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> Fixes: https://github.com/bluez/bluez/issues/1350
+>
+> Signed-off-by: Ye He <ye.he@amlogic.com>
 > ---
->  net/bluetooth/hci_sync.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  doc/org.bluez.Device.rst | 33 ++++++++++++++++++++++++++++++++-
+>  src/device.c             | 34 ++++++++++++++++++++++++++--------
+>  2 files changed, 58 insertions(+), 9 deletions(-)
 >
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 6687f2a4d1eb..4ea5a87f017d 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -2481,6 +2481,10 @@ static int hci_pause_advertising_sync(struct hci_d=
-ev *hdev)
->         int err;
->         int old_state;
+> diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
+> index 646e2c77ec2ddcbf7e6897336165d228c349fe00..1022402d95a1cd34dea88103b=
+a66fb06f3007de7 100644
+> --- a/doc/org.bluez.Device.rst
+> +++ b/doc/org.bluez.Device.rst
+> @@ -157,7 +157,26 @@ Possible errors:
+>  Signals
+>  -------
 >
-> +       /* If controller is not advertising we are done. */
-> +       if (!hci_dev_test_flag(hdev, HCI_ADVERTISING))
-> +               return 0;
+> -void Disconnected(string reason, string message)
+> +void Connected(string bearer)
+> +````````````````````````````````````````````````
+> +
+> +This signal is emitted when a device establishes a connection, indicatin=
+g the
+> +bearer (transport type) over which the connection occurred.
+> +
+> +Client applications may use this signal to take actions such as stopping=
+ discovery
+> +or advertising, depending on their internal policy.
+> +
+> +Possible bearer:
+> +
+> +:"le":
+> +
+> +       LE transport is cconnected.
+> +
+> +:"bredr":
+> +
+> +       BR/EDR transport is connected.
+> +
+> +void Disconnected(string reason, string message, string bearer)
+>  ````````````````````````````````````````````````
+>
+>  This signal is launched when a device is disconnected, with the reason o=
+f the
+> @@ -208,6 +227,18 @@ Possible reasons:
+>
+>         Connection terminated by local host for suspend.
+>
+> +The additional 'bearer' field indicates which transport was disconnected=
+.
+> +
+> +Possible bearer:
+> +
+> +:"le":
+> +
+> +       LE transport is disconnected.
+> +
+> +:"bredr":
+> +
+> +       BR/EDR transport is disconnected.
 
-HCI_ADVERTISING is for directed advertising, it shall probably be
-changed to HCI_LE_ADV like in hci_disable_advertising_sync.
+Sometime ago, or perhaps I shall say long time, there was proposal to
+introduce bearer specific interfaces e.g.
+org.bluez.Device.LE/org.bluez.Device.BREDR, I wonder if that wouldn't
+be a better direction, otherwise we may mess up with existing
+interface which may cause API breakage, etc.
 
->         /* If already been paused there is nothing to do. */
->         if (hdev->advertising_paused)
->                 return 0;
+>  Properties
+>  ----------
+>
+> diff --git a/src/device.c b/src/device.c
+> index 902c4aa44d21eb89076eff3a47ffa727420967a8..ae6196eb2e5b6eca10a8e1c33=
+60b85023dcddec2 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -3491,8 +3491,10 @@ static const GDBusMethodTable device_methods[] =3D=
+ {
+>  };
+>
+>  static const GDBusSignalTable device_signals[] =3D {
+> +       { GDBUS_SIGNAL("Connected",
+> +                       GDBUS_ARGS({ "bearer", "s" })) },
+>         { GDBUS_SIGNAL("Disconnected",
+> -                       GDBUS_ARGS({ "name", "s" }, { "message", "s" })) =
+},
+> +                       GDBUS_ARGS({ "name", "s" }, { "message", "s" }, {=
+ "bearer", "s" })) },
+>         { }
+>  };
+>
+> @@ -3676,6 +3678,7 @@ void device_add_connection(struct btd_device *dev, =
+uint8_t bdaddr_type,
+>                                                         uint32_t flags)
+>  {
+>         struct bearer_state *state =3D get_state(dev, bdaddr_type);
+> +       const char *bearer;
+>
+>         device_update_last_seen(dev, bdaddr_type, true);
+>         device_update_last_used(dev, bdaddr_type);
+> @@ -3691,14 +3694,22 @@ void device_add_connection(struct btd_device *dev=
+, uint8_t bdaddr_type,
+>         dev->conn_bdaddr_type =3D dev->bdaddr_type;
+>
+>         /* If this is the first connection over this bearer */
+> -       if (bdaddr_type =3D=3D BDADDR_BREDR)
+> +       if (bdaddr_type =3D=3D BDADDR_BREDR) {
+>                 device_set_bredr_support(dev);
+> -       else
+> +               bearer =3D "bredr";
+> +       } else {
+>                 device_set_le_support(dev, bdaddr_type);
+> +               bearer =3D "le";
+> +       }
+>
+>         state->connected =3D true;
+>         state->initiator =3D flags & BIT(3);
+>
+> +       g_dbus_emit_signal(dbus_conn, dev->path, DEVICE_INTERFACE,
+> +                               "Connected",
+> +                               DBUS_TYPE_STRING, &bearer,
+> +                               DBUS_TYPE_INVALID);
+> +
+>         if (dev->le_state.connected && dev->bredr_state.connected)
+>                 return;
+>
+> @@ -3747,7 +3758,7 @@ static void set_temporary_timer(struct btd_device *=
+dev, unsigned int timeout)
+>                                                                 dev, NULL=
+);
+>  }
+>
+> -static void device_disconnected(struct btd_device *device, uint8_t reaso=
+n)
+> +static void device_disconnected(struct btd_device *device, uint8_t reaso=
+n, const char *bearer)
+>  {
+>         const char *name;
+>         const char *message;
+> @@ -3787,6 +3798,7 @@ static void device_disconnected(struct btd_device *=
+device, uint8_t reason)
+>                                                 "Disconnected",
+>                                                 DBUS_TYPE_STRING, &name,
+>                                                 DBUS_TYPE_STRING, &messag=
+e,
+> +                                               DBUS_TYPE_STRING, &bearer=
+,
+>                                                 DBUS_TYPE_INVALID);
+>  }
+>
+> @@ -3798,10 +3810,16 @@ void device_remove_connection(struct btd_device *=
+device, uint8_t bdaddr_type,
+>         DBusMessage *reply;
+>         bool remove_device =3D false;
+>         bool paired_status_updated =3D false;
+> +       const char *bearer;
+>
+>         if (!state->connected)
+>                 return;
+>
+> +       if (bdaddr_type =3D=3D BDADDR_BREDR)
+> +               bearer =3D "bredr";
+> +       else
+> +               bearer =3D "le";
+> +
+>         state->connected =3D false;
+>         state->initiator =3D false;
+>         device->general_connect =3D FALSE;
+> @@ -3854,15 +3872,15 @@ void device_remove_connection(struct btd_device *=
+device, uint8_t bdaddr_type,
+>                                                 DEVICE_INTERFACE,
+>                                                 "Paired");
+>
+> -       if (device->bredr_state.connected || device->le_state.connected)
+> -               return;
+> -
+>         device_update_last_seen(device, bdaddr_type, true);
+>
+>         g_slist_free_full(device->eir_uuids, g_free);
+>         device->eir_uuids =3D NULL;
+>
+> -       device_disconnected(device, reason);
+> +       device_disconnected(device, reason, bearer);
+> +
+> +       if (device->bredr_state.connected || device->le_state.connected)
+> +               return;
+>
+>         g_dbus_emit_property_changed(dbus_conn, device->path,
+>                                                 DEVICE_INTERFACE, "Connec=
+ted");
 >
 > ---
-> base-commit: 6c31dab4ff1e1f4e0f3412efb1cfc88033358d1f
-> change-id: 20250616-bluetooth_adv-6496e1ca6165
+> base-commit: dc8db3601001de9a085da063e0c5e456074b8963
+> change-id: 20250618-device-bearer-level-conn-state-3e29d56bda88
 >
 > Best regards,
 > --
-> Yang Li <yang.li@amlogic.com>
+> Ye He <ye.he@amlogic.com>
+>
 >
 >
 
