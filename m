@@ -1,260 +1,152 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F89F8635D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 08:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB022F5323;
+	Wed, 18 Jun 2025 11:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750234155; cv=none; b=Trfn9r/lKGgUJNnBqL9CBfH59Vw9CmKpFyGtdAZYcEKIoilA7CP36X03foPbaWruJAuurFK4ZdYOvVo2wJLBYU5FFYjs1RSQWlraaKQ8ItpexOK97z+VJaeyeqxRaw3n1BiputYOJ94wMpt3DtLHrU1hlIf8yDmuzuq20UAUSOc=
+	t=1750247151; cv=none; b=eHNr88SSAIb1TtbBqYSvphYZVP8koRvGhIzazDLKEc1jHJjjYNhiqv9FYzQcNbA7aDrVwV1zZ8v2hjwnCc4wgsD8HI0p+u1+UWBt7GLt/FVc1DQv/iG/jVJ4cVwisLo2FuHhYgYTDri6vZ05rpx5TLYOhBm2cZxQ4K78mA+qOZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750234155; c=relaxed/simple;
-	bh=dkqfmdAE54tr45xNG+ITjMXQwWQBdWMK+ky8j2nH02Y=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LluQmqTMlOQjsfjUriO3q+TwnS1J3ACeDC5bf5VLk7XzijHYhDgzop/9YWE/SnsDgi5AkYamK2F+Ig+Z88JujQJp/lriDsqfNjGQtQl6hEDi4SVRiKeZ9TPKM6CpA9LqXJ8hn+86WId1UzflKrsCJgxpVOOx/gWL5zGN81srYwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0C65C442B2;
-	Wed, 18 Jun 2025 08:09:09 +0000 (UTC)
-Message-ID: <d57fedd0a0889309c217e9e145d302ba8a5bac83.camel@hadess.net>
-Subject: Re: [PATCH bluez] device: Add bearer info to Connected/Disconnected
- signals
-From: Bastien Nocera <hadess@hadess.net>
-To: ye.he@amlogic.com, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Wed, 18 Jun 2025 10:09:09 +0200
-In-Reply-To: <20250618-device-bearer-level-conn-state-v1-1-dca5df09c0bd@amlogic.com>
-References: 
-	<20250618-device-bearer-level-conn-state-v1-1-dca5df09c0bd@amlogic.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+	s=arc-20240116; t=1750247151; c=relaxed/simple;
+	bh=WYJ16Alk09q6fIdfKWEBzJa6GAWM1uSoSPLuY7xDDcI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q1GN5sUk+K6xivIRVbIyfMvHLBxRv6o/YhcdnDNiCkbeETFpzYtEWg+4uU1dQTJ8OlcYpxl1nNTbh2UBebwLnb6TSQgjxlXcBT1mndFYY0tJX1Bq7XlSl/g6gUoYlUISLPAE33MAbu6agdm1jNoMgURYbwf5EIlmoti7xQiRD+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (188.234.0.8) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 18 Jun
+ 2025 14:45:30 +0300
+From: d.privalov <d.privalov@omp.ru>
+To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, Miklos Szeredi <mszeredi@redhat.com>, Dmitriy
+ Privalov <d.privalov@omp.ru>
+Subject: [PATCH 5.10/5.15 1/1] fuse: don't increment nlink in link()
+Date: Wed, 18 Jun 2025 14:44:09 +0300
+Message-ID: <20250618114409.179601-1-d.privalov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvudekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkuffhvfffjghftgfgfgggsehtqhertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpedtheffveefffevtdehtefhjeevleejheehleejhfekveffheeifefhueduudeiveenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffedphhgvlhhopeglkffrvheimedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffegnpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpnhgspghrtghpthhtohepvddprhgtphhtthhopeihvgdrhhgvsegrmhhlohhgihgtrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: hadess@hadess.net
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 06/18/2025 11:27:56
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 194137 [Jun 18 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: d.privalov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 62 0.3.62
+ e2af3448995f5f8a7fe71abf21bb23519d0f38c3
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 188.234.0.8
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/18/2025 11:29:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 6/18/2025 9:13:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, 2025-06-18 at 10:39 +0800, Ye He via B4 Relay wrote:
-> From: Ye He <ye.he@amlogic.com>
->=20
-> This patch add a new Connected(string bearer) signal to indicate
-> which transport
-> (LE or BR/EDR) has connected. Also extend the Disconnected signal to
-> include
-> a bearer argument.
->=20
-> This allows applications to distinguish transport-specific connection
-> events in dual-mode scenarios.
->=20
-> Fixes: https://github.com/bluez/bluez/issues/1350
+From: Miklos Szeredi <mszeredi@redhat.com>
 
-This is an API change, the commit needs to explain when the
-Disconnected signal API was introduced, and probably mention that the
-because it was introduced in 5.82, it didn't have time to be used.
+commit 97f044f690bac2b094bfb7fb2d177ef946c85880 upstream.
 
-It might also be a better idea for both signals to send out a
-dictionary of values, so that the "bearer" can be added without an API
-change, and further info can also be passed without an API change.
+The fuse_iget() call in create_new_entry() already updated the inode with
+all the new attributes and incremented the attribute version.
 
-Cheers
+Incrementing the nlink will result in the wrong count.  This wasn't noticed
+because the attributes were invalidated right after this.
 
->=20
-> Signed-off-by: Ye He <ye.he@amlogic.com>
-> ---
-> =C2=A0doc/org.bluez.Device.rst | 33 ++++++++++++++++++++++++++++++++-
-> =C2=A0src/device.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 | 34 ++++++++++++++++++++++++++--------
-> =C2=A02 files changed, 58 insertions(+), 9 deletions(-)
->=20
-> diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
-> index
-> 646e2c77ec2ddcbf7e6897336165d228c349fe00..1022402d95a1cd34dea88103ba6
-> 6fb06f3007de7 100644
-> --- a/doc/org.bluez.Device.rst
-> +++ b/doc/org.bluez.Device.rst
-> @@ -157,7 +157,26 @@ Possible errors:
-> =C2=A0Signals
-> =C2=A0-------
-> =C2=A0
-> -void Disconnected(string reason, string message)
-> +void Connected(string bearer)
-> +````````````````````````````````````````````````
-> +
-> +This signal is emitted when a device establishes a connection,
-> indicating the
-> +bearer (transport type) over which the connection occurred.
-> +
-> +Client applications may use this signal to take actions such as
-> stopping discovery
-> +or advertising, depending on their internal policy.
-> +
-> +Possible bearer:
-> +
-> +:"le":
-> +
-> +	LE transport is cconnected.
-> +
-> +:"bredr":
-> +
-> +	BR/EDR transport is connected.
-> +
-> +void Disconnected(string reason, string message, string bearer)
-> =C2=A0````````````````````````````````````````````````
-> =C2=A0
-> =C2=A0This signal is launched when a device is disconnected, with the
-> reason of the
-> @@ -208,6 +227,18 @@ Possible reasons:
-> =C2=A0
-> =C2=A0	Connection terminated by local host for suspend.
-> =C2=A0
-> +The additional 'bearer' field indicates which transport was
-> disconnected.
-> +
-> +Possible bearer:
-> +
-> +:"le":
-> +
-> +	LE transport is disconnected.
-> +
-> +:"bredr":
-> +
-> +	BR/EDR transport is disconnected.
-> +
-> =C2=A0Properties
-> =C2=A0----------
-> =C2=A0
-> diff --git a/src/device.c b/src/device.c
-> index
-> 902c4aa44d21eb89076eff3a47ffa727420967a8..ae6196eb2e5b6eca10a8e1c3360
-> b85023dcddec2 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3491,8 +3491,10 @@ static const GDBusMethodTable device_methods[]
-> =3D {
-> =C2=A0};
-> =C2=A0
-> =C2=A0static const GDBusSignalTable device_signals[] =3D {
-> +	{ GDBUS_SIGNAL("Connected",
-> +			GDBUS_ARGS({ "bearer", "s" })) },
-> =C2=A0	{ GDBUS_SIGNAL("Disconnected",
-> -			GDBUS_ARGS({ "name", "s" }, { "message", "s"
-> })) },
-> +			GDBUS_ARGS({ "name", "s" }, { "message", "s"
-> }, { "bearer", "s" })) },
-> =C2=A0	{ }
-> =C2=A0};
-> =C2=A0
-> @@ -3676,6 +3678,7 @@ void device_add_connection(struct btd_device
-> *dev, uint8_t bdaddr_type,
-> =C2=A0							uint32_t
-> flags)
-> =C2=A0{
-> =C2=A0	struct bearer_state *state =3D get_state(dev, bdaddr_type);
-> +	const char *bearer;
-> =C2=A0
-> =C2=A0	device_update_last_seen(dev, bdaddr_type, true);
-> =C2=A0	device_update_last_used(dev, bdaddr_type);
-> @@ -3691,14 +3694,22 @@ void device_add_connection(struct btd_device
-> *dev, uint8_t bdaddr_type,
-> =C2=A0	dev->conn_bdaddr_type =3D dev->bdaddr_type;
-> =C2=A0
-> =C2=A0	/* If this is the first connection over this bearer */
-> -	if (bdaddr_type =3D=3D BDADDR_BREDR)
-> +	if (bdaddr_type =3D=3D BDADDR_BREDR) {
-> =C2=A0		device_set_bredr_support(dev);
-> -	else
-> +		bearer =3D "bredr";
-> +	} else {
-> =C2=A0		device_set_le_support(dev, bdaddr_type);
-> +		bearer =3D "le";
-> +	}
-> =C2=A0
-> =C2=A0	state->connected =3D true;
-> =C2=A0	state->initiator =3D flags & BIT(3);
-> =C2=A0
-> +	g_dbus_emit_signal(dbus_conn, dev->path, DEVICE_INTERFACE,
-> +				"Connected",
-> +				DBUS_TYPE_STRING, &bearer,
-> +				DBUS_TYPE_INVALID);
-> +
-> =C2=A0	if (dev->le_state.connected && dev->bredr_state.connected)
-> =C2=A0		return;
-> =C2=A0
-> @@ -3747,7 +3758,7 @@ static void set_temporary_timer(struct
-> btd_device *dev, unsigned int timeout)
-> =C2=A0								dev,
-> NULL);
-> =C2=A0}
-> =C2=A0
-> -static void device_disconnected(struct btd_device *device, uint8_t
-> reason)
-> +static void device_disconnected(struct btd_device *device, uint8_t
-> reason, const char *bearer)
-> =C2=A0{
-> =C2=A0	const char *name;
-> =C2=A0	const char *message;
-> @@ -3787,6 +3798,7 @@ static void device_disconnected(struct
-> btd_device *device, uint8_t reason)
-> =C2=A0						"Disconnected",
-> =C2=A0						DBUS_TYPE_STRING,
-> &name,
-> =C2=A0						DBUS_TYPE_STRING,
-> &message,
-> +						DBUS_TYPE_STRING,
-> &bearer,
-> =C2=A0						DBUS_TYPE_INVALID);
-> =C2=A0}
-> =C2=A0
-> @@ -3798,10 +3810,16 @@ void device_remove_connection(struct
-> btd_device *device, uint8_t bdaddr_type,
-> =C2=A0	DBusMessage *reply;
-> =C2=A0	bool remove_device =3D false;
-> =C2=A0	bool paired_status_updated =3D false;
-> +	const char *bearer;
-> =C2=A0
-> =C2=A0	if (!state->connected)
-> =C2=A0		return;
-> =C2=A0
-> +	if (bdaddr_type =3D=3D BDADDR_BREDR)
-> +		bearer =3D "bredr";
-> +	else
-> +		bearer =3D "le";
-> +
-> =C2=A0	state->connected =3D false;
-> =C2=A0	state->initiator =3D false;
-> =C2=A0	device->general_connect =3D FALSE;
-> @@ -3854,15 +3872,15 @@ void device_remove_connection(struct
-> btd_device *device, uint8_t bdaddr_type,
-> =C2=A0						DEVICE_INTERFACE,
-> =C2=A0						"Paired");
-> =C2=A0
-> -	if (device->bredr_state.connected || device-
-> >le_state.connected)
-> -		return;
-> -
-> =C2=A0	device_update_last_seen(device, bdaddr_type, true);
-> =C2=A0
-> =C2=A0	g_slist_free_full(device->eir_uuids, g_free);
-> =C2=A0	device->eir_uuids =3D NULL;
-> =C2=A0
-> -	device_disconnected(device, reason);
-> +	device_disconnected(device, reason, bearer);
-> +
-> +	if (device->bredr_state.connected || device-
-> >le_state.connected)
-> +		return;
-> =C2=A0
-> =C2=A0	g_dbus_emit_property_changed(dbus_conn, device->path,
-> =C2=A0						DEVICE_INTERFACE,
-> "Connected");
->=20
-> ---
-> base-commit: dc8db3601001de9a085da063e0c5e456074b8963
-> change-id: 20250618-device-bearer-level-conn-state-3e29d56bda88
->=20
-> Best regards,
+Updating ctime is still needed for the writeback case when the ctime is not
+refreshed.
+
+Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Signed-off-by: Dmitriy Privalov <d.privalov@omp.ru>
+---
+ fs/fuse/dir.c | 29 ++++++++++-------------------
+ 1 file changed, 10 insertions(+), 19 deletions(-)
+
+diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
+index 4488a53a192d..7055fdc1b8ce 100644
+--- a/fs/fuse/dir.c
++++ b/fs/fuse/dir.c
+@@ -807,7 +807,7 @@ void fuse_flush_time_update(struct inode *inode)
+ 	mapping_set_error(inode->i_mapping, err);
+ }
+ 
+-void fuse_update_ctime(struct inode *inode)
++static void fuse_update_ctime_in_cache(struct inode *inode)
+ {
+ 	if (!IS_NOCMTIME(inode)) {
+ 		inode->i_ctime = current_time(inode);
+@@ -816,6 +816,12 @@ void fuse_update_ctime(struct inode *inode)
+ 	}
+ }
+ 
++void fuse_update_ctime(struct inode *inode)
++{
++	fuse_invalidate_attr(inode);
++	fuse_update_ctime_in_cache(inode);
++}
++
+ static int fuse_unlink(struct inode *dir, struct dentry *entry)
+ {
+ 	int err;
+@@ -986,25 +992,10 @@ static int fuse_link(struct dentry *entry, struct inode *newdir,
+ 	args.in_args[1].size = newent->d_name.len + 1;
+ 	args.in_args[1].value = newent->d_name.name;
+ 	err = create_new_entry(fm, &args, newdir, newent, inode->i_mode);
+-	/* Contrary to "normal" filesystems it can happen that link
+-	   makes two "logical" inodes point to the same "physical"
+-	   inode.  We invalidate the attributes of the old one, so it
+-	   will reflect changes in the backing inode (link count,
+-	   etc.)
+-	*/
+-	if (!err) {
+-		struct fuse_inode *fi = get_fuse_inode(inode);
+-
+-		spin_lock(&fi->lock);
+-		fi->attr_version = atomic64_inc_return(&fm->fc->attr_version);
+-		if (likely(inode->i_nlink < UINT_MAX))
+-			inc_nlink(inode);
+-		spin_unlock(&fi->lock);
+-		fuse_invalidate_attr(inode);
+-		fuse_update_ctime(inode);
+-	} else if (err == -EINTR) {
++	if (!err)
++		fuse_update_ctime_in_cache(inode);
++	else if (err == -EINTR)
+ 		fuse_invalidate_attr(inode);
+-	}
+ 	return err;
+ }
+ 
+-- 
+2.34.1
+
