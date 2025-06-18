@@ -1,68 +1,68 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D593085D5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 19:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAC63085D5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 19:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750273894; cv=none; b=NJXnE2kY6vGjBVBdG+XFvAv+d0bivVwCRRwIkI1uMX6GV6snoe7C23fgZA4ZMiRlvFVWh1/YNZwe0My2AfqFTO0tnpAYt2WN5c9isLMVQOOcLqDf97kIuvLATVPO/NQjFZAPkApSfOBQLi8AGU9/ZkD7JZKvMHdwNSosOwJ08i0=
+	t=1750273897; cv=none; b=afh1MiEUu9r8fkZ6AnI5RLUuLciSVUImt8fP4eh0xQ/6mxQTuGvgbOym4z9JgDKY7NFyywlLJMcIp9H6/m569Gd66bMo79UEG3ePVLbdF7mb19wdHtkFBCtNJuJLEKxUnYQ5/Q1qwyg/62/n1BLICPr2a3tgHhGyKYjw/riB/Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750273894; c=relaxed/simple;
-	bh=fiOJFjrBGbOqPNqiH5be3fXtYSvqcWgMATGBOIuySCE=;
+	s=arc-20240116; t=1750273897; c=relaxed/simple;
+	bh=MFfuo+NeJCGbH3n2ZGS+FRLC8WnhSNJ4D6bE1wN2wMg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NCuUrUZZoqexZKc28GJrcNWJePE0e1h2fUJ2cOMPo0QAdx5txrTC8ZslwjJIyVRr/bTlHW9j842P7D0sKyCFm1HWdYMRvNq/cvCHmQQs/EHckgjgGLB8TAkU4XqBIXB51oDT6Y/e6eymDNlwUb7/H+5FEnlzCHc2wtADsSkPA8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lHYbRhKT; arc=none smtp.client-ip=209.85.217.47
+	 MIME-Version; b=omhGSd2f+B29H9w3i1eaI/eR2y/ymtI1eXv1LWOJloedj9z3AtqwblgwjL1emzXKJTxFIplkXt8355sLcSdqATEa589RtfPuW8gOz+gehwAyjsaphe1dieMlac7UyJ6rb7lCYP2ijEbyhdMO51uQJhRIv3FXh4DLOuRaBVyaYdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jrdFWq2q; arc=none smtp.client-ip=209.85.217.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lHYbRhKT"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4c6cf5e4cd5so29924137.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 12:11:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jrdFWq2q"
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-4e7ade16082so17261137.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jun 2025 12:11:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750273892; x=1750878692; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750273894; x=1750878694; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IMpSw2AHfQaIA/QmKU8ZXukdqO3yvpIkbGZ958bblrs=;
-        b=lHYbRhKTfn65XBzze/997t3EejgYgPt0M8x7itQhzhK/SlRSN4l8SDw7dnqc3CF66c
-         E3gxyWZ6AQvyhwLnZnZbcOSCLt9YXyFRwVE6WcYD8TXRpKvWNB3nr3x7Y/hFKi4ktCeL
-         7k28LLx9JqDfK4+G/iDO/YArqBM3MEfA8+qPNPhXHMkxckg+owGTkr9PHiJniKAJwL58
-         /CTJFRG1ELVGMwHF+QbC+CPIN5kYb32yT58DY1qWIIlgSuWBJcI8AIWQgtn1I6Bp2OIA
-         R+f1GPb0/k3m1JcJEM5z8bKqlxJGgVgn6FIrFlKgq/WYJCveTnmbbt+kDMajaZrqk18F
-         24FQ==
+        bh=oK0xQe12UPOKd/MhT2Z0itqiBG9rGHKnKi68QtjQry8=;
+        b=jrdFWq2qUHmFZKkeRbTplRti7gtrL/n1BpsDdFLI+cYoW0tkin3rvVhYSFnnVCsu0c
+         dJIxD0fFTwz01axJV8apAxR8DWQPh1rZ/+BVmRqpRSz67bUqu1ohFiPCZPjHAkIb2Nnf
+         cLxfd3PKnL6NIFG2MBL6xGfISi4jX76fgfd0j/IKkStzOY154cAGPMZJ1oE05KdTRLVU
+         PMrIX7waQtMvUbi8qtyEFh9NePQ8qWqSl0H2sZUCaZ71HRvQp0ePypXTzDRNDokIWXc8
+         731hmxqCjhZsenUOv/V3C14OfMiD2W7yv5iYn+6QA0gzqwtajGLBvUpMT0DM1ghewfbH
+         Qk5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750273892; x=1750878692;
+        d=1e100.net; s=20230601; t=1750273894; x=1750878694;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IMpSw2AHfQaIA/QmKU8ZXukdqO3yvpIkbGZ958bblrs=;
-        b=W0OQQpOObrH5ahV6N1LlpQ2UA9T2PchAvmO/3Jne12mu0nUPlZhitOxJTbhNkahiHb
-         hJAJYi2nRkujITh5yPYru4mN+nwEIRY3KT+uo4f1eKppk71Kd5JSD7wuS4x5mVTdQVuV
-         nISatmZJufFDw6Nzjn5sZRfjizPVq9kOy7NmeGNkZLSuz0Z+2LpvmJzwooO6vb3M4/C7
-         y64ssFODvhqYJ9IZ/LICYZA4UZmNJlUarA9NhOAezFdJRy+Sadyc34d+jDgXNgDrLLD/
-         n7MASEYx8rHd5nV+5nIX3pG9XX22qUZlLN+zALm/hmpTs3u8jDSDzBir1wX7bL6lyYnd
-         CfxQ==
-X-Gm-Message-State: AOJu0YxLo30eGOuRUzMToT4aJsBGBZztBJllG+GI9UkxjrMpgVlZ1m19
-	542U11l8Wdp5TbryI3OZ8QQ9QWSBCa0gefFc3LU/GA/HIMlyytPXqdZKietVSA==
-X-Gm-Gg: ASbGncsUH2+Ggvw+AiL1LUx6KaSWPwfAgiShZqBZVKoiTeOevED2HuiLOWOnVsFfdWZ
-	pkQrkEqv11uTFGf59inasrxIJiciYVov4mh/tESLSrsnS2H67CO+qpzhjkXaKKLCfo21YiZZ+wV
-	zz5xB3yEw5cFc+FQDt3qj1WLJ32XjxNpy3K97Fm9XCL0SYYoi0/tCCcVfwWuIXCVVlPlQ8tZjmi
-	znVCoeKVD1Ip0BIRT2Ve2M9UFxLS4IpYE6rNIJqqVxAHkRqgjaNC3DLqB2YK8o8FeCouU0Zy+Xu
-	Ij3lXJqkUErcOfehFpUGWmuy3K3aZ8SS6Xo8UROg4lzBpGKKkZNRtLav2x7kZjkEXa7KxRceb6Q
-	V5jIuaISeJaM50kFpPEDfQPaKNXgriVw=
-X-Google-Smtp-Source: AGHT+IFNpv4Nn1Pf9OTelxHtrUoQtfJNvJI2seUn59059o0P1qFu5JlBkt2HUSSJufnck45CEfiayA==
-X-Received: by 2002:a05:6102:cd1:b0:4db:e01:f2db with SMTP id ada2fe7eead31-4e7f5f6d18dmr14498792137.0.1750273891559;
-        Wed, 18 Jun 2025 12:11:31 -0700 (PDT)
+        bh=oK0xQe12UPOKd/MhT2Z0itqiBG9rGHKnKi68QtjQry8=;
+        b=JhxUuqH/wzgyWAFakwY3Yo4R1vtbdq8ZBKAybA2yX4XS/Fo+ePc6faXepHLxSkIzwO
+         5u3AtQyEnq/2K5gaISjPCJG2MTxBUgKlbdFQ7g3PrQUzhTTWp+rNaWSGmQ6Og8x1TXGT
+         CnDZIdeNvcq1w/kQpeZiAakgxVqjl0orIJ4nr8U1SH8rSmP5zqeeEM5fw7ehu56tQjGY
+         DnAtW4jL3mnbi5FWKmmKzutOw7xAlM6+S8o7UYzMoMEKp1Dy7WRmvKCMKv07Ns1y1QAY
+         8BVdd81y7L6voAaEEdCU88tBnL8PH/u5xduk/i3o8mR2AnISEcNn0puflrsJ+CB3rOrN
+         Qi4g==
+X-Gm-Message-State: AOJu0Ywm4bHLhW3wDcthN1EH1Z0/pOIcBMozpf2lTc2Ach00qNMaH8o0
+	yhfJ0d09DOjKI95XQ0mqHhxMZWZvKvPI4NzByVJqzmdTKdJve1VoiSjYduGqlg==
+X-Gm-Gg: ASbGncvcxs1kxGVw1r7nVZ8bYTCtZYgeoeNlib2ZFl47iJzEH0j7OQxHK6HU9COJQ+w
+	hBCc99HKcqWK8sMWwQ6zBl74vfnyNe2NW3k1xHpp+QNolrRn/dwTyzH/pAbzXRen8RaadyeedCP
+	3s7y9j5oNnJueHSegzVaRziK67egO/sGuUyRTxY0zGOZx6kMIBl/aQJiaDeI/friytxFfIDoz9p
+	xrlLXJL+rOLRwvCCV7cym7j4ZIzMXeODoLwpFKYwmXnJ6xRfdfsYSgGqj6fwyBNxnvaeC1UD8bf
+	HuAM4p3hZIHIo0GPloRX8933sgnmAW4MbISmibuBI7SegdGyZI4lc7SSa97xGEJlnM8UXPm4GTU
+	B4UXMJoKjZg00XaCpuUu68f+cHCpPIOE=
+X-Google-Smtp-Source: AGHT+IHl7QK1CVKEswhCrEplFgoXspVXM3F1X0EERf5fBoJf9eIkfnfTzsWvlFzqYxmWyKB7ejrS7A==
+X-Received: by 2002:a05:6102:6f03:b0:4e9:9281:85aa with SMTP id ada2fe7eead31-4e9928189ccmr3772619137.1.1750273894365;
+        Wed, 18 Jun 2025 12:11:34 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e979b63419sm695910137.25.2025.06.18.12.11.28
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e979b63419sm695910137.25.2025.06.18.12.11.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 12:11:29 -0700 (PDT)
+        Wed, 18 Jun 2025 12:11:32 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/3] test-runner.rst: Add documentation for USB-passthrough
-Date: Wed, 18 Jun 2025 15:11:24 -0400
-Message-ID: <20250618191125.3123951-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] tester.config: Add config options for USB-passthrough and drivers
+Date: Wed, 18 Jun 2025 15:11:25 -0400
+Message-ID: <20250618191125.3123951-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250618191125.3123951-1-luiz.dentz@gmail.com>
 References: <20250618191125.3123951-1-luiz.dentz@gmail.com>
@@ -76,45 +76,66 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This documents the newly added option -U/--usb and adds a dedicated
-section that explains the required the kernel image to build with
-some extra config options to enable passing -device qemu-xhci in order
-to use -device usb-host.
+This adds the necessary options in order to enable USB-passthrough
+configuration and also enable most of the drivers so they get
+build-tested.
 ---
- doc/test-runner.rst | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ doc/tester.config | 38 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
 
-diff --git a/doc/test-runner.rst b/doc/test-runner.rst
-index 423a9379c0ab..1b4eeb9d4c1c 100644
---- a/doc/test-runner.rst
-+++ b/doc/test-runner.rst
-@@ -22,6 +22,7 @@ OPTIONS
- :-l/--emulator: Start btvirt
- :-A/-audio[=path]: Start audio server
- :-u/--unix[=path]: Provide serial device
-+:-U/--usb=<qemu_args>: Provide USB device
- :-q/--qemu=<path>: QEMU binary
- :-k/--kernel=<image>: Kernel image (bzImage)
- :-h/--help: Show help options
-@@ -176,3 +177,18 @@ Running shell with host controller using btproxy
- 	$ tools/btproxy -u [1]
- 	$ tools/test-runner -u -d -k /pathto/bzImage -- /bin/bash [2]
+diff --git a/doc/tester.config b/doc/tester.config
+index 099eddc79bcb..b5fee30b817e 100644
+--- a/doc/tester.config
++++ b/doc/tester.config
+@@ -34,10 +34,6 @@ CONFIG_BT_MSFTEXT=y
+ CONFIG_BT_AOSPEXT=y
+ CONFIG_BT_FEATURE_DEBUG=y
  
-+Running shell with host controller USB-passthrough
-+--------------------------------------------------
+-CONFIG_BT_HCIUART=y
+-CONFIG_BT_HCIUART_H4=y
+-CONFIG_BT_HCIVHCI=y
+-
+ CONFIG_CRYPTO_CMAC=y
+ CONFIG_CRYPTO_USER_API=y
+ CONFIG_CRYPTO_USER_API_HASH=y
+@@ -57,3 +53,37 @@ CONFIG_PROVE_RCU=y
+ CONFIG_LOCKDEP=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_KASAN=y
 +
-+In addition the above kernel config option the following is required:
++CONFIG_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_PLATFORM=y
 +
-+.. code-block::
-+
-+	CONFIG_USB=y
-+	CONFIG_USB_XHCI_HCD=y
-+	CONFIG_USB_XHCI_PLATFORM=y
-+
-+.. code-block::
-+
-+	$ tools/test-runner -U "usb-host,vendorid=<0xxxxx>,productid=<0xxxxx>" \
-+	-d -k /pathto/bzImage -- /bin/bash
++#
++# Bluetooth device drivers
++#
++CONFIG_BT_INTEL=y
++CONFIG_BT_BCM=y
++CONFIG_BT_RTL=y
++CONFIG_BT_QCA=y
++CONFIG_BT_MTK=y
++CONFIG_BT_HCIBTUSB=y
++CONFIG_BT_HCIBTUSB_POLL_SYNC=y
++CONFIG_BT_HCIBTUSB_BCM=y
++CONFIG_BT_HCIBTUSB_MTK=y
++CONFIG_BT_HCIBTUSB_RTL=y
++CONFIG_BT_HCIUART=y
++CONFIG_BT_HCIUART_SERDEV=y
++CONFIG_BT_HCIUART_H4=y
++CONFIG_BT_HCIUART_LL=y
++CONFIG_BT_HCIUART_3WIRE=y
++CONFIG_BT_HCIUART_QCA=y
++CONFIG_BT_HCIUART_AML=y
++CONFIG_BT_HCIBCM203X=y
++CONFIG_BT_HCIBCM4377=y
++CONFIG_BT_HCIVHCI=y
++CONFIG_BT_MTKSDIO=y
++CONFIG_BT_MTKUART=y
++CONFIG_BT_VIRTIO=y
++CONFIG_BT_NXPUART=y
++CONFIG_BT_INTEL_PCIE=y
++# end of Bluetooth device drivers
 -- 
 2.49.0
 
