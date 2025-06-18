@@ -1,134 +1,154 @@
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011046.outbound.protection.outlook.com [52.101.65.46])
+Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012029.outbound.protection.outlook.com [52.101.71.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396C513957E;
-	Wed, 18 Jun 2025 15:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0732EE974;
+	Wed, 18 Jun 2025 15:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.29
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750259297; cv=fail; b=RkUMFHEkzdjRNPe/8J9EuNYih5/t4Ad7/d5MQ99BE3e3IdNcXoRA2thlDHUfWXvjVCjjkEwzqrlUSE8hzi87PFSHKfbvezYB7Ah3RAIQNWzUZVEHrmnVPp47WoJtpySBMmIoOQqzuRSW38PB15wSKamxvJyqjIymCRokMn4Cw8k=
+	t=1750259475; cv=fail; b=Xiae7QXO5AhxNsVvWwrNNUs0hQcqzPCPXpvyaU8f53Wau4yRQRmL37SMyMGJ1Pd6kiVp66VQxCTbRSdh0CC/tmInr1OFJZtFvdSpjQ5ea8CkP1KOriEoZUxrUfmJ4ZbQVdA1hh5/SJAoY3oBjQfY8peaRHmmokGC3Okm/RC2AM0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750259297; c=relaxed/simple;
-	bh=XTdTazriaK94cMjC7C+CrrGVHY5MXpTy+8kr5L2EFIE=;
+	s=arc-20240116; t=1750259475; c=relaxed/simple;
+	bh=ZOU+KSADkeqVqR9RyBBgPun2vxb8opN8hcwGlMqbyBw=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=iSIbsAXOpANA8elm0CC/5mLabOqClkzvXEMIZ2FndbyViaIoEo/kTNg4Y6ywKquiSnZUXQwhWh/Z9jN3/eoST6pKg+57wFd2aaOpLlf0apVjqYpx/ViuoCDQYCwgOmnwKgtpt8gs4amrbd73S/QWA1LlBXg5XzKgE0J6fUDY2U8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=aiLOpVwx; arc=fail smtp.client-ip=52.101.65.46
+	 Content-Type:MIME-Version; b=kFbXn3y/CB60OveMxaD1A+VkR1uX4U136Ehn4OskYJz342dcwDbualFe5Fe822mNbtt4CL2VydI+mLQZAb0B2l5aeDQLdgJDc9WN0AseJ3/KN1yu8wJFRa1HJEZrWSAI/0b6cK0QkwxcWPQjETeTu1TASMiEzG51EvXvxAoM25k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=IyODrtnp; arc=fail smtp.client-ip=52.101.71.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="aiLOpVwx"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="IyODrtnp"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ajes1GQxb2amVcTBTFLQJu2mHWUFr5n/Fq+RDyTsU78/aqylW6N4nEulHc9ZBGD5uyKxfRL1MQ72LBqpkUntWy2sGhHrSKvD1bF6hDyzoEZsIbmhvskzRrVESu8fJ6zVxcyFD9AFGLAgZ3vnw7Va/0sDp2YtiN6MY/4HLSDXBN86QTi3Z/DQQzERT+K7PJOVzPq5qXwmdHWo9ZQhMdVTPwWnYwcksAHjtPW/YIhjr8koCxONdgCJxpWYpVB0DtYh9wFB6iahq3EG6UeLz+YUVhOSA/VJdGrWefckmNXUfVBkYPkBDC5fVk6Wy2kf7y7huIIEMofRL8dFViTK1x6snw==
+ b=AwEH0pt0hxTiZQ9mIFwct0Ss1KFw3njTQEsVV2fSy4YTGaLs068CAo0XACX8sIv1rtDtIJ5J1CTpRSqaKSOwxuoMvohpwNDqswFJIbMPsKRISCMQByUCyuvB4Tfr0KjfAyqaxEwaBSyh5dDi11RVBAzTmJqrs2l+ba2270qGJQ8tSjehUdQxWIYNUjpq0XtvnFubZ39hvMrGBOBRvLR0EqzPF+0FJ1F9zn+ivOxZhvKxPo2droVtXr5YqiRiEUaVODesp845La8RLnaB0gWGipOlvbH1iANoKJyFBtD+Pp33Iwfm7YykRcrWXUdYb3NsBJ71xzxzarvkmJgNVQv9Ww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tlIi5gzAbub3D121zhtWQ3A10pjudtEiYRQgdpaMzDE=;
- b=fpBJ1GjwtCIaJuILPqzGZ2L4Son7MS0YFwg31WDgUtlTc+OOxkRSKo5tIw624M5zttlMPowx3Ym8b0mrnuOOwBUmq1OCS3YEAV5Oth4F3W/usXcRiqUv8Xg+SAE25JG7KBz3v3GOboCjZZ0yenXUDSNLwwLE69xtkJQdpDT1/t6C0rkzqRTXiNK77/4C+QCcVr697DEKZUPv4x0TIChqlit0f/K0TCXqm0bqfHcCO6MyNynPUD4dafiIAg1IsLn7HwxYZXyuOhhYQyum2LiGNdrudgzMQUktzSECvoVPqwi7gYKeMd0px1lScHuloHARgbnvi24lsXv68EQm8qD7kA==
+ bh=ZOU+KSADkeqVqR9RyBBgPun2vxb8opN8hcwGlMqbyBw=;
+ b=L/Km8X9Sl6ajYrqSWMKo2bev6YDS+FgaoSdMkQRfXuVNnnMKj95ClfsJpAqZs56efDh1BQq2EaHHsS+b2xqn0jflrdCSL49lO4oVB7KTKZm4/hZk0PS2gbRE7d5J8ezxvhu2QINyw52O74NsemWBtIt2ZieN6hY6fLQ8oL1r2awb81zLaJeWRmBpjeBELXMM5r6Kg76m7x5YnhfHSBaZOZrs6BXzuccMxp3/ys7xoXLHQHMZBs3igKi374Dnqmz0O/G8YQI9qPjzfAEIPtHfM2ycuV38eV4/GUXUn1iKHtKknY7jnYbW9d5fX3Oxp6DnjDmVrjdrV2ZFqCoCDp3ULg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tlIi5gzAbub3D121zhtWQ3A10pjudtEiYRQgdpaMzDE=;
- b=aiLOpVwxxqn2Y0Ca/bDSJ0WsMu/6tOnArMYmjPZUdBxokkSgo5ABCYutAyCTOY9EOy1jx6UKnbLXSAyFxlhFHckQ0gIbwiI5gXtRdUMbT6fNiM9QWO9Xzp8pwf2F0j209bQFLIBLemGyKKilUDWCwwk3FMd393ZZv0Hq/1KCREZKt5qF4LcNu3220bc1EvKRTwK9WINzOtf4z0lqHYn5cXgbbo3XBCVpIU3Q3fW2coLLQAjnnnt/YFbFkmmQQktK/Uec4qfnh2JKfurP3pvijDPounDphomiRsI7I7bxuAq+24cyuFzXfz7lVDNtfc4R4yEINe6EqlBVRCAmmiIlQg==
-Received: from DB9PR04MB8429.eurprd04.prod.outlook.com (2603:10a6:10:242::19)
- by PA4PR04MB7935.eurprd04.prod.outlook.com (2603:10a6:102:b8::17) with
+ bh=ZOU+KSADkeqVqR9RyBBgPun2vxb8opN8hcwGlMqbyBw=;
+ b=IyODrtnpXNx93JwSUStJlIWnu/pC24Vny48CPwT6weJb7IxzIMepu3YlBT1QB9cgNflj1V1hANXIhHCCebyWyz6WkrPqN4DiHquvPsA/mEk8e/0iBGPpSvQ2mTDOYq65sSBmVsEIBKbPcfjg8QJ6+3fG6KyAmk0l4Nd2aEuBA0OLC0lQBri2PHO4e3CJQ1tawkU7jbpkTYlwTgHFi4oLujebvOfIrkAEcLYNTjFc7JWeUapSefWOPaKio2u9y/GuVjZVA5/mAe1DJ+cBXm7xvEMXnne/EVcxPoMmJI5rBHUo8u2RAbWtM5RxWCruXt6SkuQ3XKSuCWSONJazOaidfw==
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
+ by AS8PR04MB7672.eurprd04.prod.outlook.com (2603:10a6:20b:23e::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Wed, 18 Jun
- 2025 15:08:12 +0000
-Received: from DB9PR04MB8429.eurprd04.prod.outlook.com
- ([fe80::2edf:edc4:794f:4e37]) by DB9PR04MB8429.eurprd04.prod.outlook.com
- ([fe80::2edf:edc4:794f:4e37%3]) with mapi id 15.20.8857.016; Wed, 18 Jun 2025
- 15:08:12 +0000
-From: Sherry Sun <sherry.sun@nxp.com>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, "marcel@holtmann.org"
-	<marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Amitkumar Karwar
-	<amitkumar.karwar@nxp.com>, Manjeet Gupta <manjeet.gupta@nxp.com>
-Subject: RE: [PATCH v2 2/2] Bluetooth: btnxpuart: Add support for 4M baudrate
-Thread-Topic: [PATCH v2 2/2] Bluetooth: btnxpuart: Add support for 4M baudrate
-Thread-Index: AQHb4F6fPGi2OddfkEKUGdV1tIZ0prQJA/QA
-Date: Wed, 18 Jun 2025 15:08:09 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.20; Wed, 18 Jun
+ 2025 15:11:11 +0000
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299%5]) with mapi id 15.20.8835.027; Wed, 18 Jun 2025
+ 15:11:11 +0000
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com"
+	<luiz.dentz@gmail.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Sherry Sun <sherry.sun@nxp.com>, Manjeet Gupta <manjeet.gupta@nxp.com>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: nxp: Add support for
+ 4M baudrate
+Thread-Topic: [PATCH v2 1/2] dt-bindings: net: bluetooth: nxp: Add support for
+ 4M baudrate
+Thread-Index: AQHb4GM5+QH/LYK3nkmF3zYO4YxFxg==
+Date: Wed, 18 Jun 2025 15:11:11 +0000
 Message-ID:
- <DB9PR04MB8429998862F64A6A07204A939272A@DB9PR04MB8429.eurprd04.prod.outlook.com>
+ <AS4PR04MB9692263405F56AD71E369110E772A@AS4PR04MB9692.eurprd04.prod.outlook.com>
 References: <20250618142012.25153-1-neeraj.sanjaykale@nxp.com>
- <20250618142012.25153-2-neeraj.sanjaykale@nxp.com>
-In-Reply-To: <20250618142012.25153-2-neeraj.sanjaykale@nxp.com>
-Accept-Language: zh-CN, en-US
+ <3fb36656-5aeb-45f4-9460-acc8a2bc3c61@molgen.mpg.de>
+In-Reply-To: <3fb36656-5aeb-45f4-9460-acc8a2bc3c61@molgen.mpg.de>
+Accept-Language: en-IN, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB9PR04MB8429:EE_|PA4PR04MB7935:EE_
-x-ms-office365-filtering-correlation-id: f8e0a3e3-d334-444d-9770-08ddae79f177
+x-ms-traffictypediagnostic: AS4PR04MB9692:EE_|AS8PR04MB7672:EE_
+x-ms-office365-filtering-correlation-id: 8ad832fe-0d27-4bdc-0441-08ddae7a5c29
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7053199007|38070700018;
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
 x-microsoft-antispam-message-info:
- =?us-ascii?Q?BFrLPaOhCB0f83BHTl97lTsPpXY+kyXX5AyJu2eU1yT2+wmBetyTI8zgGEYn?=
- =?us-ascii?Q?nna1/tIjodbFghwWWJWbep9qsGcifkQ8wIfyQV9aLiK75ipHz4HBZ16I0KYt?=
- =?us-ascii?Q?4bu6kll/BwwiFDOVnuZ64pICoP1K7pylFmkb8OG1b/+cL77knxU3z5OC/IkS?=
- =?us-ascii?Q?yGCEfQN4uwqhQFjcofxQbVUhwnnmXs9iFvxVHTkNdCbGvmbsESctD9Tdor34?=
- =?us-ascii?Q?OHA8EFgyvyxdtuculKhthOfmevEr8AJsk0nbtAozHdSXiLTmSVocAhBU2bZL?=
- =?us-ascii?Q?Jla5ldw6j55Yza5zRyVgsTLwBzLYyjlRMSgB4vkQ9IppQ5UFhi0DGN98/frv?=
- =?us-ascii?Q?+6Ca8a1zHtMHr3fCJzjiEJaGHH8e+gzLgXef/EV9kjoWecewxvuGsREFNuPl?=
- =?us-ascii?Q?w6aV0BfwOt3zebepdYvuQEP1d5FftDQcNuUeSEumQLYKJPQfdijX2XkBw0bP?=
- =?us-ascii?Q?7jJHyVsBAT7Fm6a2J6F/sBjqSkCUjeOA5s3ueS+OE8Tff99zS7kHiYjWrMx3?=
- =?us-ascii?Q?JjvfxObbzP2kxJgRGk23lFySsdYIMKPu1wxEHSIyJROSbtazG7RB+q1jrwFq?=
- =?us-ascii?Q?t8nSDp65XSa/5XGGhfpBclk2mN9l75/y6117T0mZ5Thfg9taZrQTEz0T2/XL?=
- =?us-ascii?Q?aqtuxlvU4FBfL6cig8z6pgjzaHGkcUpQs0+QDJYO96nP5PLPOSW1mnKHsTLA?=
- =?us-ascii?Q?niYH5H4tpMGIaiIyfHr30NQHrL75akSI472TZjFKVgOtDoye7wGOcTjyd5xq?=
- =?us-ascii?Q?ly+Yna1OotBCAAH09PfGsrL3oBMN1o4CZ3FphwHEsecnqIguvYGhVIQCddHv?=
- =?us-ascii?Q?fpFzoIdBkBTNbUE6Y9QpNwo6r2mXSf3GK0VC3FlgYHRbmfa/do3x8gcuTlJZ?=
- =?us-ascii?Q?5aO7bJ32fXBkxmScSLkVI96hA79hnnZgrKJSay6Z/gCtbkQV6dLnP4Uxfd56?=
- =?us-ascii?Q?CKRUnL3ATbYyH7r03bwoLPMMiGOq/1R3Xj/ZB8cNdFxumhYIrTFGbYrDrbGV?=
- =?us-ascii?Q?lvrLZXEnyqeoJapWrvUbEynHr/d95Ki/rMRq/cxrMsYsn6vZfC/djKxFbwYa?=
- =?us-ascii?Q?KL9vCVECUrDwWGoI6OFM2QrvCG4DMJaTcI2TJTWB9Xo+OVnnSGCe2Fvo+XUg?=
- =?us-ascii?Q?o7h8Re6gucHzV6qZ4N1lh0rXfMPPidrRVkDnp8gTCGa+2/L4JEOg5tlNTmel?=
- =?us-ascii?Q?W2Rk40/qLPMPFdwP1f5LvhGhDhNJv9pz9vG4UfIx19CTeffkhmbD6EtWrpnH?=
- =?us-ascii?Q?Kd71VmtS+I6tUGymqVyVxdeWMhhtUbKMXyFiU15/7MrFKu8MAOAQ3a69W+1A?=
- =?us-ascii?Q?5xvktJ1QBr5n2o3R19LGlu3aw6bKoZiiu0hGgFSkbSjXrxqsXG9+wbPUU5hG?=
- =?us-ascii?Q?C9xBU9QSVcw+swqlmkUqJIlfB3PT25fdrtkBAnkTb5MsLT3V7TTmHNEKKpAg?=
- =?us-ascii?Q?z+dpy6JjGt4kSB3jlKQRVQhhHJNsjAWNGybqe6r7111hibp3w0R3Hg=3D=3D?=
+ =?utf-8?B?bmxSMnVSck5obEFrTTZKSkZWN1lVNnUveWFFaS9aMitCa2ovOXVCT2t0TzF2?=
+ =?utf-8?B?ckRQWEdHWVZ3VlpSZmJ5eUxDT043VkdJY0dYbXREM2VIZzA0VGV1V2VXWWJs?=
+ =?utf-8?B?VHkzaTY2SDEzUmNBdTgybENXd0EzRFNUY29ESC9tcE85UExOQkhmZFNhSnRB?=
+ =?utf-8?B?QWp3WDBaelV3cEhyK1ljT2oyeEtmR0F4OWFIVjVSWkR6K0FqdUJTRkJObjVU?=
+ =?utf-8?B?RlZKTWVpM1JWbGlnVlpiTFV2eVlMT0VrZ1VZVmh2dEljRUhXcW9Id1lPM1BJ?=
+ =?utf-8?B?L1NudUFOQmJWS0NELzdreTlMb3NsTDlFcGpNc0VsUzBiTEFqSjRtK1RMaXJJ?=
+ =?utf-8?B?WWFpdENNNkV4MWNHZ0ZCTmI5bXVuQndaM0Z1STdWYUdGT1l3UDhrSW40Y2Vl?=
+ =?utf-8?B?cG5tMTVMVWdsWG5hc3pnWnlBejdOQjl4N2ZqbWV1bUZ0dVM0MFhhM0NXb0pL?=
+ =?utf-8?B?VTd4Rnc4Q3FZUXhEVlpFOWs1bWNhYUIrRzVDS2dxRmsxOHRjazM4Wm1xM21w?=
+ =?utf-8?B?TTdnT3lLR2l6VjZtUnBsUkk3M2NXMm0vNExEbWtzcGJtaW00QmRMc1FNNDk2?=
+ =?utf-8?B?WWxPMm9uek9nUi9OWmFEMzZUUEhocFNyK2FGckd2cHlpVHhSNzg0NzNUckt4?=
+ =?utf-8?B?UjFzVTdXMkViaVdMakhiSGN2MFZpWGFidlRKUWtETXFZckh5akhyeHV6WGtz?=
+ =?utf-8?B?d2lET3BtQ2pnc2tNU01XOVFWd1hiYlpTSElHeTZxZkRGQ2tWblIzcCtWMnFa?=
+ =?utf-8?B?dHlDdHlhdzY0dDJPMFdJenYvZG1FdDRLSThYcmZ1c0NHNGNiYUtvQjdqTTVD?=
+ =?utf-8?B?OFZWRnJ1RVg4VmZXdXVpb1BjVkc3dHhUQVBLdzg3eEZ1UUNMZmtDdXNtQTI5?=
+ =?utf-8?B?ZGFsVWlhNnN0dE9EZklHaEJtc21reTRvMWtlRjByRzhkbG9sQ2MrRFBWZ0dy?=
+ =?utf-8?B?dlQxSzIyWnhSV3FtamdiTUJ3V2tRdE1wQ2xhWUd0TUZFWlIxcS90dTNCWWRO?=
+ =?utf-8?B?Y1pGNEpaaFhxNCt5dUZ5aGpvN01paWRTVlRhNlBhSS9IN0JoYnUxWWVzZTZQ?=
+ =?utf-8?B?RlIvKzFHOWZ3bTBVYVc5UDdBekhsbG1BdjkwMXVXN3ZJNmZjRHdZazFjVWtO?=
+ =?utf-8?B?cHVQMERJMTZFWmdjZXVYMU9JRU1Xd253SkpBZUZ6SGxlN2o4ZTREQis1bVUv?=
+ =?utf-8?B?dVovZWI2aGdtaUI1RVg4b2IxYmZDaFUrNUNkMlBvSGc1WE9WZGNrd0duU1ZS?=
+ =?utf-8?B?RDU0dk5XclBJcUNKUXplVlFYN3RISloyR1dLWjloRlJMSmdYMGZmc08rOU1M?=
+ =?utf-8?B?OXVXc2xYRnRkTHR5dUUvY1d1alQ4Z3luQXdLMFJHL05MbkJUSm5tb3JxK0Ns?=
+ =?utf-8?B?K21vblZWSHYxRVdsK2hWU3lGYk9QV3JMRjh5TUk4M3pNdWtBZjhSektYNmJ3?=
+ =?utf-8?B?OS9LV3hWUFh0QUJpcVFCWnFkbk5xeFhEL21aZUtaSDhOclNMM1R3M0dYSmdi?=
+ =?utf-8?B?WG92dkJLL0pJVG9ZVXNhYk5QdHJQa0lmVnMxUTlGWU9hYzNzeVVpdVlLcmVC?=
+ =?utf-8?B?ZDJzVU9MR0xMVTdMSlRCN0FzajdGcDZKdW1FY0JoK2k3MEVzdGRST0MzZkVR?=
+ =?utf-8?B?cDhpZHdxVEZ6SndrY1ZlZnRoeml2Y1BrY0NoWnoyU0hydlVtR3NrZ0FmejZI?=
+ =?utf-8?B?VGpDSEh6WGQ0TFRiUk93dTVnQVpVbGh3SitoTlZBdkpTYnkvVEdwb1FYZGVw?=
+ =?utf-8?B?ck1wbXhjRUw4VUxkdlVTZUVETUFPNWNpbTRmcWRnREtuRUJYcUp1R1dINVZ5?=
+ =?utf-8?B?TXhjMlZKNkFnQXhGVStveFhvblQwQ0RXQ1dTdGdyT3Z0bWJwNWRVUzRZNENw?=
+ =?utf-8?B?Q1FwdHpYS0xTZ2tETnVIQlZEUUMvOGFjeTU1aUx4ZEVXMWhjLzhFVTFqNGNK?=
+ =?utf-8?B?em1VTmRIZ2QybjNtWFVHZ2F4T3pBYWR6R0p2aEo0SnhOZGExNm5rYVhaUEVi?=
+ =?utf-8?B?MFhrUnVIdUlRPT0=?=
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB8429.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Niwcvf6d7Pw71hmw4Fn5YEo8yLl/5cJ8rve3lIc5nHKjLVQimHI/IdLFuGAW?=
- =?us-ascii?Q?LgZj15DFWBwa3QdOxHgX/3jF+/Je4tUn9FoKrEFMVboGnwrrkP9SIu1WTjQ6?=
- =?us-ascii?Q?GTBpmWN16+5QwdUC8T/18tyqaqz4BYmH4ucEo8sfSk0QWvqt+08N6H9s2IRp?=
- =?us-ascii?Q?8a+3+tVplcwS98PwD0k6+1XijfjuiF14ELpVwTXRP7MlIcPpO6V0AKJ5nYgg?=
- =?us-ascii?Q?M9qPIkStpTbkDz9EOdSJqyPG32v9X5WPrXzV+xA57Nau28M0rH6GHANeu4dO?=
- =?us-ascii?Q?KQN3BpY9Hx7GL7mlj0+7J7ULhjHTYdlNfxgvjseGvzdPXyJNKdyEwc9bd8+H?=
- =?us-ascii?Q?TUZ/xeCMPVTY5my270xUOHi5rMp2C6/ty+HA3u7Halxh9ZLdcpd0NE9goBno?=
- =?us-ascii?Q?mxfu+Ucq3AiRjzRiqscWAeWr0AY+Iu+y945nnh2p587EIXvYdtAielVevN/r?=
- =?us-ascii?Q?erNWrafnQiWVxPAtjnj4aFxB8HiAxqOvYXi/FiSztAsL2NXeNE3M+mJFSjys?=
- =?us-ascii?Q?6MR5F9KqvQqkMgXDJyxGy65kzk51nhcQFiYFyW4d/nmy3reoFRinjBlqheAu?=
- =?us-ascii?Q?Y0DrPqQ23NxSl7EHAKJuh+xaB/sC4g48/JJwrpmuL4D0USqHiM0VADHHr/a6?=
- =?us-ascii?Q?S1s2fjjbcY3Bk7eYxfqChiMcZQo4FPqnSbM+Ct0T5r/OMdABIqbcoz+Fw5YF?=
- =?us-ascii?Q?3VnETfTY+aMogSIk5SBlWcI+lArIl05cau/KEYAw4n4x4foHfmO5UdOarO6F?=
- =?us-ascii?Q?l9UHlnUt5SFT9VDYsZNVGdu1uHagHd8ah1ebZlWyKkdS2YV2aDUAHLPsAEcb?=
- =?us-ascii?Q?4ulIt1MgZQ71rWbL2wHLiNoYBoGRxxKot4gm2A/VGCZb4E9NTCeMOeiXuKXY?=
- =?us-ascii?Q?YWCRvY5Mc84w6uvHY1VrKgINKXsLjzlB17ABy57vmWFwN7KyYxUtVw4RRrlV?=
- =?us-ascii?Q?kSf/ZE9oryLjzLwRz2gMS44/bNbQfEc+TPjogQOGEGrB318MY9SX8qjBm7rL?=
- =?us-ascii?Q?OQs1/zZOaSwqAoj/lp8Y89IyARMsyhUAUP1tLdReVLIkjo9wcXVQpNLSYmeN?=
- =?us-ascii?Q?aIfu0l9+ehc+PvA4+zcEr609XSW1c/neG2gGsRm88iZ1xLLh0zXXqT2xHBka?=
- =?us-ascii?Q?MmLN8OP/eUVTwHlG3fdUCy/nJulc9C87Y7vTdL9TOiqwAwSAuYFkyH6XB9Ug?=
- =?us-ascii?Q?JnYTG/0JqvgE1w/7Nvjug9HMO/Hls/wU6OLof0U80KZH4uuLKLwtLTYDbyCz?=
- =?us-ascii?Q?GaSz7RlqlIvEVPkjvEzUW0+5514mz385vQ9W69y/zTEVj36YP2dmcMUAzESm?=
- =?us-ascii?Q?k7zqL/Uv8CpCzeDvOhjwmB+jm4kVNtlm1v+nUJVhcDF6a26kh5evYQGwpCJ3?=
- =?us-ascii?Q?mcyJlT+YIh3bR95f3OTNTH3uvzXrt/of2JmBsFg+43mBpVR0nl9Ys3WJJxZJ?=
- =?us-ascii?Q?G7nXNcF5jr2ssciIyUMVz04u+/Zfiyb5LH2U/RP+YKVnDeEMvb2/+SD0WeOi?=
- =?us-ascii?Q?XnKtPGlXt09IXhX9TAgh8LGpWl7YsBs9qlAy1d5sF+cu6o4MEoBC3P1ypm6Y?=
- =?us-ascii?Q?/D00ke5pVqv1kN2q0dM=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ =?utf-8?B?dUEzb1p4S1AxY1hPY1JyaTNkTUkxdWVPdGJOK1NLWCtOeG5aVHNuclZuZ09t?=
+ =?utf-8?B?QWQ2QjYrbzlQYnY3UGJ5M3ZZUSs2bDlpMkpCcHVtY3dORGFwS3BpSVBhdG96?=
+ =?utf-8?B?VS9hTlNsZ1BzNGkwVXlQVHNza21pNTlTWWU5NGMrMWh1Z1E2NHVxQXplWVVB?=
+ =?utf-8?B?Y0p2bDR4Z2FObmRMUitOSm1EY0VFcXU3Ujh4dGNJaHNBNWN0TGQ0Rk0rQk5K?=
+ =?utf-8?B?TWhWTnhXNEMxaW9PNFlYT1BlVkNxSW1FUG9WQVlFUTlLYXVuWEQxSGxFcldL?=
+ =?utf-8?B?NVl1VFBubnIzU1FKMUpKdnVjNC9qeno3ZTJBdGEzcW5BaDhkellLNGswcXJv?=
+ =?utf-8?B?c2xvcndaUjVuV01ERE0yTUg5djRVSEZQWU0walJmcUc0WU9nUFFDZEJWWWV3?=
+ =?utf-8?B?dUtmYXErclFJOCtpOTVCbVdiT21KejBBSWJHeDRxVVVCbXlRUk9HelVzelNX?=
+ =?utf-8?B?Q3RwUk45cm9hdEJzVndIaHViRVBVZWR3N3dmVEt4ZlVkWVdqN21yNFpnTElG?=
+ =?utf-8?B?dU5tcFQwTWhBTHNrYWd5SExLTGFOb2N0cnFRSUJaeXlIWlZTaSs1RkJUaTVV?=
+ =?utf-8?B?UENFREtLZmlpUjk0YTV6bWVQcUZXYlIybzVVeVBqUWlPL3VseHB2dWJ3a2lB?=
+ =?utf-8?B?UkJjSUprSUtGSHVCcmpVOWtXZkd1MkN4T05jVXFsa3YzNzdqeWd5aEdFclJX?=
+ =?utf-8?B?QmJnZHNuNFhxVnEvUURSaWF1SjA3cERXZ1YzeDFabFgrSnhwbTFlSDJjTWhK?=
+ =?utf-8?B?cGNJUllYRExVaGNZRTd5K2szNjJUUkh6NDFkWU9USmdMNmVyYk1IbSsxK0tl?=
+ =?utf-8?B?L1NzRS81NnpwL050TkZxRHJkeSs1TUJvSEZwQmdCWU1yY2ZTSFFGOUJGdWlL?=
+ =?utf-8?B?UFZFWXVrekkxZ01jT3puclpVb2pYOTFmNXdsbjdSN29ielJDcUw4Y2FCdzg3?=
+ =?utf-8?B?ZjFIcDNIZ05UTmdMUVE0V2Y1cDFxcVZYVk45MVpaQ25ubkJuczRGdkNSUTFq?=
+ =?utf-8?B?SEkwSWlBbUIzdktyQ3BCT1pueGhzQkY5ekVPOVhLcnJUdjFuaGxidjFRYUsx?=
+ =?utf-8?B?YlNDaHVlRGRNSTNhUmVnalJQZnprRXZEcUpCT0wwdUgzRW83ODUvcWYrN24r?=
+ =?utf-8?B?b3pub3p6N2NpNW9WTmRPZmlSZit2bGVOYlI4dUZBMDhiNThVbmY5Q2phMlJz?=
+ =?utf-8?B?V25iYXJ3T0t2QUZXWFZZSjlQTldPSjJUSUQxSUdOd1FaK3l3K0RZL1pZWEp4?=
+ =?utf-8?B?bXB0T25GdTFUd3drK2ZJOGp0NlFFTjB0UUZzVWpwWjhVUEVEbkFPUmJVS3J5?=
+ =?utf-8?B?cWsrNkw3NnVyMlVLUkQyQUVRMS95MGZuTjhnK3ZzRjZ0angzMDRvMXVrbXBn?=
+ =?utf-8?B?cGZRMjQyZ2cySkFsRnY0VThaM3p6VFM0T0kyK2FzbzBQdUV5aGl2ZzlXTHZL?=
+ =?utf-8?B?MFJyUWNNbVNaQjZhOGxiQ2wrWXJQMHMxK0loc2lqdjdwbU15Zlp0Ly92TnV5?=
+ =?utf-8?B?Zm1NZVhIZnRDTTFkK29DQ1pFMjJUeEMrMEJHM01ocDNrZkUvVEFGZVZSK2tH?=
+ =?utf-8?B?ZDRFZk80cGxVamN4TjRXeHN5NFBzbjFFVGNEdllPdkJ1bTBtTk9qRzVteDVi?=
+ =?utf-8?B?dmQ1cG52SzZWODNzZVloeUZycWd3djVVRjl5NU1NMkNCVGgvOUlZeW9pdGNi?=
+ =?utf-8?B?UEc2cmtsdnU3aXRrWVpaeUFGYXZ0N1hHblNMUWxqUW1iNkJQM1lnTGNVSXhy?=
+ =?utf-8?B?QVNpTTFhVG1weUM1YW5mOFNmdnlXa2lCY3RiUWlveCtwYndIbklDQmZPZ3Ny?=
+ =?utf-8?B?NVFyYmgzbFRWeWhIVnl1U21oVlZmd1NXN3cvUmtnMDRlcmZMWXhZK3piVS9H?=
+ =?utf-8?B?UVhIdFlwc25xbFRFSEh0ZWhya1ovbkFQbFAwUEFlZnFBaldkTHRFTHVpa2d2?=
+ =?utf-8?B?Y0wvRmt6ZjVrMzZqS1JxclNkcjhLV0M0aGYvNkF3SUo0UHVvTUovNHFSMXlW?=
+ =?utf-8?B?L2lqa1EvaEx6Mm1vblFuQmR1OFBJRXRUTmg3VEt5TnZqUEhKdWNXRmxhOFg2?=
+ =?utf-8?B?ejV4NCt3b0VMTE0rOGRGSmdMei9tZVk1VEZ2M01STzFXcDZHcTJZS09SSldz?=
+ =?utf-8?Q?qGqz3Qd4Si0rCkfX1zQKnTqOZ?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -137,181 +157,50 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB8429.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8e0a3e3-d334-444d-9770-08ddae79f177
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2025 15:08:12.1819
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ad832fe-0d27-4bdc-0441-08ddae7a5c29
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2025 15:11:11.1074
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Rqd5xYCGN3CKuHdxRU3/Jc7/idhoSqBrCeMs3fdb8f7tyrv7AJ7FIt54D2z/hW7wTkRZsteVIQxfPuiUcrwFwg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7935
+X-MS-Exchange-CrossTenant-userprincipalname: 9nurlYFULd/PR+QJ+QT0lJ50vmiiIVGIBbmy6bhF4dBEh8SvfJ80P/dr6r+2X7pwcqtAUgCNPP34rHo7G+23a8wnOimfuBtSsbhyvqMNoM4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7672
 
-
-
-> -----Original Message-----
-> From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> Sent: Wednesday, June 18, 2025 10:20 PM
-> To: marcel@holtmann.org; luiz.dentz@gmail.com; robh@kernel.org;
-> krzk+dt@kernel.org; conor+dt@kernel.org
-> Cc: linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org;
-> devicetree@vger.kernel.org; Amitkumar Karwar
-> <amitkumar.karwar@nxp.com>; Neeraj Sanjay Kale
-> <neeraj.sanjaykale@nxp.com>; Sherry Sun <sherry.sun@nxp.com>; Manjeet
-> Gupta <manjeet.gupta@nxp.com>
-> Subject: [PATCH v2 2/2] Bluetooth: btnxpuart: Add support for 4M baudrate
->=20
-> This adds support for 4000000 as secondary baudrate.
-> This value is selected from device tree property "max-speed"
-> which is then used to download FW chunks, and as operational baudrate
-> after HCI initialization is done.
->=20
-> This feature is applicable for all new V3 bootloader chips and w8987 V1
-> bootloader chip.
->=20
-> This property does not apply for w8997 compatible device, since it downlo=
-ads
-> a helper.bin FW file that sets secondary baudrate as 3000000 only.
->=20
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
-> v2: Change DT property to 'max-speed'. (Krzysztof)
->     Add support for 4M baudrate to w8987. Update commit message.
-> (Sherry)
-> ---
->  drivers/bluetooth/btnxpuart.c | 30 +++++++++++++++++++++---------
->  1 file changed, 21 insertions(+), 9 deletions(-)
->=20
-> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.=
-c
-> index 6b13feed06df..c9b3e158f438 100644
-> --- a/drivers/bluetooth/btnxpuart.c
-> +++ b/drivers/bluetooth/btnxpuart.c
-> @@ -73,7 +73,8 @@
->  #define FW_AUTH_ENC		0xc0
->=20
->  #define HCI_NXP_PRI_BAUDRATE	115200
-> -#define HCI_NXP_SEC_BAUDRATE	3000000
-> +#define HCI_NXP_SEC_BAUDRATE_3M	3000000
-> +#define HCI_NXP_SEC_BAUDRATE_4M	4000000
->=20
->  #define MAX_FW_FILE_NAME_LEN    50
->=20
-> @@ -201,6 +202,7 @@ struct btnxpuart_dev {
->  	u32 new_baudrate;
->  	u32 current_baudrate;
->  	u32 fw_init_baudrate;
-> +	u32 secondary_baudrate;
->  	enum bootloader_param_change timeout_changed;
->  	enum bootloader_param_change baudrate_changed;
->  	bool helper_downloaded;
-> @@ -802,7 +804,10 @@ static bool nxp_fw_change_baudrate(struct hci_dev
-> *hdev, u16 req_len)
->  		nxpdev->fw_v3_offset_correction +=3D req_len;
->  	} else if (req_len =3D=3D sizeof(uart_config)) {
->  		uart_config.clkdiv.address =3D __cpu_to_le32(clkdivaddr);
-> -		uart_config.clkdiv.value =3D __cpu_to_le32(0x00c00000);
-> +		if (nxpdev->new_baudrate =3D=3D HCI_NXP_SEC_BAUDRATE_4M)
-> +			uart_config.clkdiv.value =3D
-> __cpu_to_le32(0x01000000);
-> +		else
-> +			uart_config.clkdiv.value =3D
-> __cpu_to_le32(0x00c00000);
->  		uart_config.uartdiv.address =3D __cpu_to_le32(uartdivaddr);
->  		uart_config.uartdiv.value =3D __cpu_to_le32(1);
->  		uart_config.mcr.address =3D __cpu_to_le32(uartmcraddr); @@
-> -966,12 +971,13 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev,
-> struct sk_buff *skb)
->  			goto free_skb;
->  		}
->  		if (nxpdev->baudrate_changed !=3D changed) {
-> +			nxpdev->new_baudrate =3D nxpdev-
-> >secondary_baudrate;
->  			if (nxp_fw_change_baudrate(hdev, len)) {
->  				nxpdev->baudrate_changed =3D changed;
->  				serdev_device_set_baudrate(nxpdev->serdev,
-> -
-> HCI_NXP_SEC_BAUDRATE);
-> +							   nxpdev-
-> >secondary_baudrate);
->  				serdev_device_set_flow_control(nxpdev-
-> >serdev, true);
-> -				nxpdev->current_baudrate =3D
-> HCI_NXP_SEC_BAUDRATE;
-> +				nxpdev->current_baudrate =3D nxpdev-
-> >secondary_baudrate;
->  			}
->  			goto free_skb;
->  		}
-> @@ -992,7 +998,7 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev,
-> struct sk_buff *skb)
->  			nxpdev->helper_downloaded =3D true;
->  			serdev_device_wait_until_sent(nxpdev->serdev, 0);
->  			serdev_device_set_baudrate(nxpdev->serdev,
-> -						   HCI_NXP_SEC_BAUDRATE);
-> +
-> HCI_NXP_SEC_BAUDRATE_3M);
->  			serdev_device_set_flow_control(nxpdev->serdev,
-> true);
->  		} else {
->  			clear_bit(BTNXPUART_FW_DOWNLOADING,
-> &nxpdev->tx_state); @@ -1216,12 +1222,13 @@ static int
-> nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
->  	}
->=20
->  	if (nxpdev->baudrate_changed !=3D changed) {
-> +		nxpdev->new_baudrate =3D nxpdev->secondary_baudrate;
->  		if (nxp_fw_change_baudrate(hdev, len)) {
->  			nxpdev->baudrate_changed =3D cmd_sent;
->  			serdev_device_set_baudrate(nxpdev->serdev,
-> -						   HCI_NXP_SEC_BAUDRATE);
-> +						   nxpdev-
-> >secondary_baudrate);
->  			serdev_device_set_flow_control(nxpdev->serdev,
-> true);
-> -			nxpdev->current_baudrate =3D
-> HCI_NXP_SEC_BAUDRATE;
-> +			nxpdev->current_baudrate =3D nxpdev-
-> >secondary_baudrate;
->  		}
->  		goto free_skb;
->  	}
-> @@ -1447,8 +1454,8 @@ static int nxp_post_init(struct hci_dev *hdev)
->  	struct btnxpuart_dev *nxpdev =3D hci_get_drvdata(hdev);
->  	struct ps_data *psdata =3D &nxpdev->psdata;
->=20
-> -	if (nxpdev->current_baudrate !=3D HCI_NXP_SEC_BAUDRATE) {
-> -		nxpdev->new_baudrate =3D HCI_NXP_SEC_BAUDRATE;
-> +	if (nxpdev->current_baudrate !=3D nxpdev->secondary_baudrate) {
-> +		nxpdev->new_baudrate =3D nxpdev->secondary_baudrate;
->  		nxp_set_baudrate_cmd(hdev, NULL);
->  	}
->  	if (psdata->cur_h2c_wakeupmode !=3D psdata->h2c_wakeupmode) @@
-> -1773,6 +1780,11 @@ static int nxp_serdev_probe(struct serdev_device
-> *serdev)
->  	if (!nxpdev->fw_init_baudrate)
->  		nxpdev->fw_init_baudrate =3D FW_INIT_BAUDRATE;
->=20
-> +	device_property_read_u32(&nxpdev->serdev->dev, "max-speed",
-> +				 &nxpdev->secondary_baudrate);
-> +	if (!nxpdev->secondary_baudrate)
-> +		nxpdev->secondary_baudrate =3D
-> HCI_NXP_SEC_BAUDRATE_3M;
-
-Hi Neeraj,
-
-Seems you missed my comment here in V1 patch, attach again.
-What if the user sets the wrong secondary_baudrate/max-speed in dts (not 3M=
- or 4M)?
-Need to add the corresponding error handling here. Make sure the value is 3=
-M or 4M, otherwise report an error.
-
-Best Regards
-Sherry
-> +
->  	set_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
->=20
->  	crc8_populate_msb(crc8_table, POLYNOMIAL8);
-> --
-> 2.34.1
-
+SGkgUGF1bCwNCg0KVGhhbmsgeW91IGZvciByZXZpZXdpbmcgdGhpcyBwYXRjaC4NCj4gDQo+IEFt
+IDE4LjA2LjI1IHVtIDE2OjIwIHNjaHJpZWIgTmVlcmFqIFNhbmpheSBLYWxlOg0KPiA+IEFkZCBz
+dXBwb3J0IGZvciA0MDAwMDAwIGFzIHNlY29uZGFyeSBiYXVkcmF0ZS4NCj4gDQo+IENvdWxkIHlv
+dSBzcGVjaWZ5IGhvdyB5b3UgdGVzdGVkIHRoaXMsIHRoYXQgbWVhbnMsIGhvdyBkaWQgeW91IHNl
+dCB0aGUNCj4gc3BlZWQsIGFuZCB0aGVuIGRvIHRoZSB0ZXN0LCB0aGF0IGl0IGFjdHVhbGx5IHdv
+cmtzIGF0IHRoYXQgc3BlZWQuDQoNClRoZSBkcml2ZXIgc3RhcnRzIGF0IGZ3LWluaXQtYmF1ZHJh
+dGUsIGFuZCBpZiB0aGlzICdtYXgtc3BlZWQnIGJhdWRyYXRlIGlzIGRpZmZlcmVudCwgaXQgc2Vu
+ZHMgYSB2ZW5kb3IgY29tbWFuZCB0byB0aGUgRlcgdG8gc3dpdGNoIHRvIG1heC1zcGVlZC4NCkFm
+dGVyIHRoaXMgcG9pbnQsIGJvdGggZHJpdmVyIGFuZCBjaGlwIGNvbW11bmljYXRlIG92ZXIgNDAw
+MDAwMCBiYXVkcmF0ZS4NCg0KSSBoYXZlIHZlcmlmaWVkIHRoaXMgdXNpbmcgU2FsZWFlIExvZ2lj
+IEFuYWx5emVyLCB3aGVyZSB3ZSBoYXZlIHRvIHNldCB0aGUgYmF1ZHJhdGUgdG8gZGVjb2RlIHRo
+ZSBVQVJUIHBhY2tldHMgcHJvcGVybHkuIA0KDQpJIGNhbiBhZGQgdGhlc2UgZGV0YWlscyBpbiBW
+MyBkcml2ZXIgcGF0Y2guDQoNCj4gDQo+ID4gU2lnbmVkLW9mZi1ieTogTmVlcmFqIFNhbmpheSBL
+YWxlIDxuZWVyYWouc2FuamF5a2FsZUBueHAuY29tPg0KPiA+IC0tLQ0KPiA+IHYyOiBVc2UgdGhl
+IGF2YWlsYWJsZSAnbWF4LXNwZWVkJyBkZXZpY2UgdHJlZSBwcm9wZXJ0eS4gKEtyenlzenRvZikN
+Cj4gPiAtLS0NCj4gPiAgIC4uLi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9ibHVldG9vdGgvbnhw
+LDg4dzg5ODctYnQueWFtbCAgfCA3ICsrKysrKysNCj4gPiAgIDEgZmlsZSBjaGFuZ2VkLCA3IGlu
+c2VydGlvbnMoKykNCj4gPg0KPiA+IGRpZmYgLS1naXQNCj4gPiBhL0RvY3VtZW50YXRpb24vZGV2
+aWNldHJlZS9iaW5kaW5ncy9uZXQvYmx1ZXRvb3RoL254cCw4OHc4OTg3LWJ0LnlhbWwNCj4gPiBi
+L0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9uZXQvYmx1ZXRvb3RoL254cCw4OHc4
+OTg3LWJ0LnlhbWwNCj4gPiBpbmRleCAzYWI2MGM3MDI4NmYuLjRhMWI2ZWE0OGEyZiAxMDA2NDQN
+Cj4gPiAtLS0NCj4gPiBhL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9uZXQvYmx1
+ZXRvb3RoL254cCw4OHc4OTg3LWJ0LnlhbWwNCj4gPiArKysgYi9Eb2N1bWVudGF0aW9uL2Rldmlj
+ZXRyZWUvYmluZGluZ3MvbmV0L2JsdWV0b290aC9ueHAsODh3ODk4Ny1idC55DQo+ID4gKysrIGFt
+bA0KPiA+IEBAIC0zNCw2ICszNCwxMiBAQCBwcm9wZXJ0aWVzOg0KPiA+ICAgICAgICAgVGhpcyBw
+cm9wZXJ0eSBkZXBlbmRzIG9uIHRoZSBtb2R1bGUgdmVuZG9yJ3MNCj4gPiAgICAgICAgIGNvbmZp
+Z3VyYXRpb24uDQo+ID4NCj4gPiArICBtYXgtc3BlZWQ6DQo+ID4gKyAgICBlbnVtOg0KPiA+ICsg
+ICAgICAtIDMwMDAwMDANCj4gPiArICAgICAgLSA0MDAwMDAwDQo+ID4gKyAgICBkZWZhdWx0OiAz
+MDAwMDAwDQo+ID4gKw0KPiA+ICAgICBmaXJtd2FyZS1uYW1lOg0KPiA+ICAgICAgIG1heEl0ZW1z
+OiAxDQo+ID4NCj4gPiBAQCAtNzgsNiArODQsNyBAQCBleGFtcGxlczoNCj4gPiAgICAgICAgICAg
+Ymx1ZXRvb3RoIHsNCj4gPiAgICAgICAgICAgICAgIGNvbXBhdGlibGUgPSAibnhwLDg4dzg5ODct
+YnQiOw0KPiA+ICAgICAgICAgICAgICAgZnctaW5pdC1iYXVkcmF0ZSA9IDwzMDAwMDAwPjsNCj4g
+PiArICAgICAgICAgICAgbWF4LXNwZWVkID0gPDQwMDAwMDA+Ow0KPiA+ICAgICAgICAgICAgICAg
+ZmlybXdhcmUtbmFtZSA9ICJ1YXJ0dWFydDg5ODdfYnRfdjAuYmluIjsNCj4gPiAgICAgICAgICAg
+ICAgIGRldmljZS13YWtldXAtZ3Bpb3MgPSA8JmdwaW8gMTEgR1BJT19BQ1RJVkVfSElHSD47DQo+
+ID4gICAgICAgICAgICAgICBueHAsd2FrZWluLXBpbiA9IC9iaXRzLyA4IDwxOD47DQoNClRoYW5r
+cywNCk5lZXJhag0K
