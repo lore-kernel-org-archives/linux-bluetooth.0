@@ -1,98 +1,206 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15D730E83E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 19:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AD0374D1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 20:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750361934; cv=none; b=J1D98ckG5rRuGS5MFcBQ/5OY3DD2V25kqPUb650CpXXhUYOy9HQdaqRjl7M6burgTMsVXM6WKMkUXpXEegh/6SO/h3tuqFb2lI22mgG+2pF/B04aeQMeaz8EmQppqAPdE0zYL7FD2HPZIS0Xnj+VjFTalGiNaMNk6DePFYIbYWo=
+	t=1750363221; cv=none; b=kE9V+oxeXPwYFroosMvdmOPK6X7zqps7l0b0Ai4nI+O+PPg6v87F+9zOnCYWTJzMqypDqK6U8ljQ8PNFBvf6vO7RrmykDte7/maI2GLjvmRtej2B8VUWzYXfFOoVfF2w//CZqXmGBQH6kP5zoKAs81ZO0/ujHAv0XSQcUsO8Clk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750361934; c=relaxed/simple;
-	bh=7MnfAhJ098mL3RTJIqT+W90hZ/kXzsgLDVmCVVWRUaE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=J9EX+EUD0PvV9JslmlBiFE1wjDzCjF6lDfK2F0WT0b4+n9D/bWrKjNIu7Q/y7D1Ijs/jAFEg48wIJpavxnUtGFlNeZW/x3gEHW2jYYwJvY9LACOf/pycPj0+ga0XwZrCZa+bp5iTzivJMPG3lQn5eMBov/a3rsezDnVz5T8SxLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VaZgvHMm; arc=none smtp.client-ip=209.85.219.47
+	s=arc-20240116; t=1750363221; c=relaxed/simple;
+	bh=vuMJOM2Uf3Wzf4P0gHbgLKOK976lQqbOtDDZXxw9CsQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BTHSDebiJauF2G5W0MXCK2wBrgKh68k2i16/CkCWTLpnGwNIHIOLTzGxs9js+SK0WcmiHbW/wf8P55zAY4Uit7Wl37xcCPIc3OuLdMKq4QIdXVz/J7T99uBz85j+Mlxz0ndBcNtrHW2WpcNMdIoV0SVvl2umpV6aIVxG+2vZF6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JIsgkLvg; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VaZgvHMm"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6fad4e6d949so5954986d6.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 12:38:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JIsgkLvg"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-32b8134ef6aso11156691fa.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 13:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750361931; x=1750966731; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7MnfAhJ098mL3RTJIqT+W90hZ/kXzsgLDVmCVVWRUaE=;
-        b=VaZgvHMmU9S8BnMYjHBN+bUva/A/V1Vn8e1k5Qun/KowImV1b9+KRfVhGE4bZZ+eZa
-         eG1G76PzRxSDN3HdjrJxA3qX7V2uV8IOk4P7NuwX9XNF2durOYhMffyChwZtNh8RJHUN
-         0ZE7Sl4NHaxlzHt+a1BHixBRReSb1its3/3L7qXfcXEx+CxmqyfN8xmJ9seu+Pydd/3G
-         Zn0mhbxP2oe6lRXHhVdFlZFaDSKC8xVZgkdN9CtokR510s5p/XA7xXexAYnxzLHpszAP
-         BDX4X4J2CM2HnwSw3seuM5OHd3pmsWjq4ga5v+4ZO/UWr1YMT0rKhVVUeQLQb06YXvwg
-         20iw==
+        d=gmail.com; s=20230601; t=1750363217; x=1750968017; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RfT5Jya6QLalTqCBOcASmRSlI7kZqCvWjaOxbCF2gE8=;
+        b=JIsgkLvgk0xQC+BmYXYXmRSgf0GLGWqHmJMMDhzXDNVbRxZwY/jqyEYPuqIZ+6Hf6D
+         dm/UGgacj2h8Ne1l9jUr71lj3jJ1PiwXnfYr9JuyT8TdU8+YV5MY+/36x5JNOfnj85vx
+         jyclSfGib7KS/el3ht0ruU6pqN/LLLd6Auz1bh7CQHHjRMuBRAaw1Dre/DhwGb8RF7gQ
+         bhXTiowYsli9O8rUTohwFcegcQgyZF50dsih4Blg4jFjx9TqjRn3u8DLVKdVVZZABMOG
+         uJ6bieHG84wQW6zmebVFEopA2DVbGRlFs4yjPfEEGKtv+hfopwXc2ccVPFYymV+0XHNq
+         Xx+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750361931; x=1750966731;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7MnfAhJ098mL3RTJIqT+W90hZ/kXzsgLDVmCVVWRUaE=;
-        b=oxtPF49kUkUWZjtdkzs5D81Kndfn9JiJXGHgg8m9Zuxd4xW79BVQhJiTnePuIc4BMK
-         nQeeRXZ+XIt7omQzyz5TBiMlS3l+9pBoJjrNeDVMk+7TOU5P7FcK4DZ83mvJ1J0Z+Bdb
-         YhOOO4NRb7XvWW8TrlzFGwKslYVkGAhu56YNU6kZ+mBA8JqQqn9XFxz90tDwGTjhSBQo
-         AXj1lSBIqNU+OWtpYHcqp810VXa2W8lT+guDqSC81bUIsmNRCyNSUgOm43FeWRL0SpBj
-         XQLIpuBCEzz3y9g3whF07zqsIrO/t3pPy0PiEQJ3IkgiHawMTlE+vouZJLWV1gTmscFI
-         bNNg==
-X-Gm-Message-State: AOJu0YxmlJK7Drd2hhIpA9x1XPFT7e7rL8vuAdy/SWAKPuA8yfpyM1Wz
-	uQfhMjXMAfluCCICVHD8ml+SujIjPGUBCC+umj+D7TDWQh+GK9yFLuoJ8xiGzw==
-X-Gm-Gg: ASbGncua/zpnM9PNjCorSNkRdbwEzog/Luf2rWV6whJBofaw+un2pVAHePl16cU7v2g
-	7A/ChzDhuW+182AoaKKb0D/hJEVHxsdF2xsww0hHYJiVefb2kOWPrkLNcP5so1lARDgZiS8fgrY
-	hjAiUed+3Byxj65wYvQ8w/hMajMGUQkLeMpc24qmla2Ib6qR5wgAchOOb2Fd8MCFCdINYxf3ovO
-	wGY9MHq72KE2NUHJ+wGneFpuLYRQKPDLGviiT3xWVDlrmGHCKS2zDh4a/zxjIOHI/zg8CkS5iRu
-	8WxOUGfZpgambCt07D6CPsBVozrrZZwEQ3eQ6xhTToCIgRx1q5MOfIKOtgWvSjbJZBQEVTa3Xq+
-	gB/Msjw==
-X-Google-Smtp-Source: AGHT+IGjAMrkzc+3c94FuGy7RbzThJ1rpy6fXySOLTa6GzHIq5X5DVUBevx5IppL6LW+owHM/zXf2A==
-X-Received: by 2002:a05:6214:5019:b0:6fb:3e25:1dc1 with SMTP id 6a1803df08f44-6fd0a4add19mr7002316d6.13.1750361931149;
-        Thu, 19 Jun 2025 12:38:51 -0700 (PDT)
-Received: from [172.17.0.2] ([172.200.181.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd09593450sm3336206d6.98.2025.06.19.12.38.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 12:38:50 -0700 (PDT)
-Message-ID: <6854674a.050a0220.304a03.1572@mx.google.com>
-Date: Thu, 19 Jun 2025 12:38:50 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3215608923662511913=="
+        d=1e100.net; s=20230601; t=1750363217; x=1750968017;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RfT5Jya6QLalTqCBOcASmRSlI7kZqCvWjaOxbCF2gE8=;
+        b=rMYle07huHzAHjXr3Y8fQLP9dCZzg4aSjvNugXxzhkkltU94l31Aj3Et/xY+Ni2idh
+         WAKVhbXmMQj2FR+7vuidWJe5Vey25K81UNKg90RqWDC9+Wi9zUA5/u25Zeri40ybKvxZ
+         Plu7qVC6r7roeHX5XAD+xoRHnP+EWueQRBCS2qnRCuIuSgliTkyRHI4WD7opLVs0dGEN
+         Ypd4BmjZ+xtne4hCAhSSsx6J731KMhycLKbae4pnLnwc6Sd4AlaTX/gBuuo3gEpNuJaR
+         0+pUBu3bRpKVOvJF79RSkEnMWac0vdtQUKgyaobT36435Mqck/AzxwIRTYAeHjpALUfy
+         know==
+X-Gm-Message-State: AOJu0Ywsq0I4FrhhWwVaa3NCbujX3zr38zPGThJE5lD6CTHFZNwquPfX
+	N2mqycUozKCcIjfGiZ1n7dkCAlRM8NfW+adxiZ1lzChXJjFmIxFd+9UMNUfbEjR99SdWicZAFD3
+	p4U8ZnZaZN5qNcXvmOgfCVVOWjnmfb6zY/mdHktSVtg==
+X-Gm-Gg: ASbGncsM/EkJ8IHmVM9iXVnHjJcoSx0UZHV4Zhs4iW8TZCc1GKvt2rwzC22CoB3W2tR
+	2vA1Jmr36ukQEPoFnyPD2JoTbCQp0NJSUBK703+uzycWDqDG7jbMzKZvNsN+MiMh8Y4rE4IJ6IL
+	VCzHeQS1xo/IyNcrvC4/K0kqlzM65adBYb28llxmyRQw==
+X-Google-Smtp-Source: AGHT+IF8L3Ms2ndiCH9qYXrExZ4WBM+xQNgMw1b7Hqa3h9hqWvQOy8gN3rVN7/8PFp/EvFfgIli5eXg110bNX1d/e2Y=
+X-Received: by 2002:a05:651c:515:b0:32a:69c7:7b0b with SMTP id
+ 38308e7fff4ca-32b98ed83afmr565111fa.12.1750363217099; Thu, 19 Jun 2025
+ 13:00:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sean@starlabs.systems
-Subject: RE: Bluetooth: Revert vendor-specific ISO classification for
-In-Reply-To: <CABtds-1fKyFYvU1jL9njmhfphU0XytO+F5mBhARAzQip+CK6cA@mail.gmail.com>
 References: <CABtds-1fKyFYvU1jL9njmhfphU0XytO+F5mBhARAzQip+CK6cA@mail.gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABtds-1fKyFYvU1jL9njmhfphU0XytO+F5mBhARAzQip+CK6cA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Jun 2025 16:00:04 -0400
+X-Gm-Features: AX0GCFvV7Ogtl2Rgxxb8b-yqp4r2qF6R9nJQ-1lMJ8DnXHxJQq9GaoUvfutn5eo
+Message-ID: <CABBYNZLgWF7m0Lwc+C848-0qgBZfV30F7SE0YcKJCPLV5KbG-Q@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Revert vendor-specific ISO classification for
+To: Sean Rhodes <sean@starlabs.systems>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3215608923662511913==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Sean,
 
-This is an automated email and please do not reply to this email.
+On Thu, Jun 19, 2025 at 3:12=E2=80=AFPM Sean Rhodes <sean@starlabs.systems>=
+ wrote:
+>
+> From 3b5497d0154a58d948ee95900e4c62704399de0a Mon Sep 17 00:00:00 2001
+> From: Sean Rhodes <sean@starlabs.systems>
+> Date: Wed, 2 Apr 2025 09:05:17 +0100
+> Subject: [PATCH] Bluetooth: Revert vendor-specific ISO classification for
+>  non-offload cards
+>
+> This reverts commit f25b7fd36cc3a850e006aed686f5bbecd200de1b.
+>
+> The commit introduces vendor-specific classification of ISO data,
+> but breaks Bluetooth functionality on certain Intel cards that do
+> not support audio offload, such as the 9462. Affected devices are
+> unable to discover new Bluetooth peripherals, and previously paired
+> devices fail to reconnect.
 
-Dear Submitter,
+How it breaks? It doesn't seem there is anything regarding the
+reclassification of the packets that could affect something that
+doesn't support ISO packets, well except if it happens that older
+controllers use the handle range of ISO but btintel_classify_pkt_type
+shouldn't be set for them.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+> This issue does not affect newer cards (e.g., AX201+) that support
+> audio offload. A conditional check using AOLD() could be used in
+> the future to reintroduce this behavior only on supported hardware.
+>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: Ying Hsu <yinghsu@chromium.org>
+> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Signed-off-by: Sean Rhodes <sean@starlabs.systems>
+> ---
+>  drivers/bluetooth/btintel.c      |  7 ++-----
+>  include/net/bluetooth/hci_core.h |  1 -
+>  net/bluetooth/hci_core.c         | 16 ----------------
+>  3 files changed, 2 insertions(+), 22 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 55cc1652bfe4..1a5108cf6517 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -3582,15 +3582,12 @@ static int btintel_setup_combined(struct hci_dev =
+*hdev)
+>                 err =3D btintel_bootloader_setup(hdev, &ver);
+>                 btintel_register_devcoredump_support(hdev);
+>                 break;
+> -       case 0x18: /* GfP2 */
+> -       case 0x1c: /* GaP */
+> -               /* Re-classify packet type for controllers with LE audio =
+*/
+> -               hdev->classify_pkt_type =3D btintel_classify_pkt_type;
+> -               fallthrough;
 
------ Output -----
+9462 seem to be JfP (0x11), so the above code shouldn't even be used for it=
+.
+
+>         case 0x17:
+> +       case 0x18:
+>         case 0x19:
+>         case 0x1b:
+>         case 0x1d:
+> +       case 0x1c:
+>         case 0x1e:
+>         case 0x1f:
+>                 /* Display version information of TLV type */
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 2b261e74e2c4..648ee7e2403f 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -649,7 +649,6 @@ struct hci_dev {
+>         int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
+>                                      struct bt_codec *codec, __u8 *vnd_le=
+n,
+>                                      __u8 **vnd_data);
+> -       u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff *skb=
+);
+>  };
+>
+>  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 3b49828160b7..64ab7702be81 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2868,31 +2868,15 @@ int hci_reset_dev(struct hci_dev *hdev)
+>  }
+>  EXPORT_SYMBOL(hci_reset_dev);
+>
+> -static u8 hci_dev_classify_pkt_type(struct hci_dev *hdev, struct sk_buff=
+ *skb)
+> -{
+> -       if (hdev->classify_pkt_type)
+> -               return hdev->classify_pkt_type(hdev, skb);
+> -
+> -       return hci_skb_pkt_type(skb);
+> -}
+> -
+>  /* Receive frame from HCI drivers */
+>  int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+> -       u8 dev_pkt_type;
+> -
+>         if (!hdev || (!test_bit(HCI_UP, &hdev->flags)
+>                       && !test_bit(HCI_INIT, &hdev->flags))) {
+>                 kfree_skb(skb);
+>                 return -ENXIO;
+>         }
+>
+> -       /* Check if the driver agree with packet type classification */
+> -       dev_pkt_type =3D hci_dev_classify_pkt_type(hdev, skb);
+> -       if (hci_skb_pkt_type(skb) !=3D dev_pkt_type) {
+> -               hci_skb_pkt_type(skb) =3D dev_pkt_type;
+> -       }
+
+This will affect all cards, not just the one you are claiming.
 
 
-Please resolve the issue and submit the patches again.
+>         switch (hci_skb_pkt_type(skb)) {
+>         case HCI_EVENT_PKT:
+>                 break;
+> --
+> 2.48.1
+>
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============3215608923662511913==--
+--
+Luiz Augusto von Dentz
