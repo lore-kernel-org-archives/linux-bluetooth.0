@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEE9230BFD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 15:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F86213259
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 15:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750347263; cv=none; b=N5obbd76r+WM10BhhHAzueD5J4q2y91huk/ehMHcYdCGXS2Ui8hf+9IMgtU9Vi9BH+ngw4W07H7m0V7YQMY05YOJTZyr5KvsKoBm38N05r7rSt2EcletThBsAlUiSwfZW+id711O4GkwVCVXmdyhgKmFzckr2tiGHr8puFhuxQQ=
+	t=1750347277; cv=none; b=sQHIEq2mud2SAhI3Zfoui4D1AqXlp7kbInLIN6Bsyh2BFPtLhzO99qkrwUkB96H+CN6R9VBgXzgOoyjUjol5ryfmrgGMWSrimhOxhwTzgqxAKZWqzcr1a7FJFybP1aSjiYhrpTn/twY1+fpcraMIY5VkT9GqE5+qorR8qVkz4EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750347263; c=relaxed/simple;
-	bh=+wB3mXazRwxh93cu2+h2Ug19A0RZPhgs12DSwXZTxG0=;
+	s=arc-20240116; t=1750347277; c=relaxed/simple;
+	bh=oQ+WdVfhafwUUfmNNZFn81Qa5m55gd3l7cGq0fxFX80=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DRnRWLg2DFNE6uVmEVk87ezUUv0TbPaAtU3UqFECmn3i46y96NYjQdOgpyoSsmF/Fab2SZa5i6JrzsOeoP+MwGFoqL/tLJ6vKoJURvgfNG0Rg0hUctkvDXKfghAfdK+ho4ppi5CG1TVIfpjbb+qZmhY0q/4vzqbN0Yf+T90/wp0=
+	 MIME-Version:Content-Type; b=NGgX0it/ZrYrQw5drb/5JkoDzRUeVMcyCfJxR5Vk/mleDtGtF4Z70H73gQ7GCqZ/mbv7dJiALbs4f4RHxYH8dD4gfIuG2pJlV4TjPLkR4lEKvKf5EFLsYpjMabr0ZuHohvAe47KQ03oFSYAXXmgL458UeLKxEkI3snaPyjK6xlQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst087.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 19 Jun
- 2025 18:34:11 +0300
+ 2025 18:34:25 +0300
 From: Kirill Samburskiy <k.samburskiy@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Kirill Samburskiy <k.samburskiy@omp.ru>
-Subject: [PATCH BlueZ 1/2] shared/tester: add ability to shutdown tester IO
-Date: Thu, 19 Jun 2025 18:31:19 +0300
-Message-ID: <20250619153120.126315-2-k.samburskiy@omp.ru>
+Subject: [PATCH BlueZ 2/2] test-vcp: free server-side bt_vcp on test teardown
+Date: Thu, 19 Jun 2025 18:31:20 +0300
+Message-ID: <20250619153120.126315-3-k.samburskiy@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250619153120.126315-1-k.samburskiy@omp.ru>
 References: <20250619153120.126315-1-k.samburskiy@omp.ru>
@@ -57,7 +57,7 @@ X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
 X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
  dbl.spamhaus.org}
 X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;81.22.207.138:7.1.2;inp1wst087.omp.ru:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+	omp.ru:7.1.1;127.0.0.199:7.1.2;inp1wst087.omp.ru:7.1.1;81.22.207.138:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
 X-KSE-AntiSpam-Info: FromAlignment: s
 X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
 X-KSE-AntiSpam-Info: {DNS response errors}
@@ -76,41 +76,82 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Some tests may require the ability to shutdown IO for proper teardown.
-Add function tester_shutdown_io to accomplish that.
+Shutdown tester IO before freeing bt_att instance to trigger its IO
+disconnection callbacks. This detaches bt_vcp instance created by
+vcp_get_session function, and executes detach callback registered
+through bt_vcp_register that frees memory used by this bt_vcp instance.
+This prevents the test from failing in some environments.
 ---
- src/shared/tester.c | 6 ++++++
- src/shared/tester.h | 1 +
- 2 files changed, 7 insertions(+)
+ unit/test-vcp.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 371ccaced..230e9ef75 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -1047,6 +1047,12 @@ struct io *tester_setup_io(const struct iovec *iov, int iovcnt)
- 	return ios[0];
+diff --git a/unit/test-vcp.c b/unit/test-vcp.c
+index 6a61ea2c4..04254700b 100644
+--- a/unit/test-vcp.c
++++ b/unit/test-vcp.c
+@@ -38,6 +38,7 @@ struct test_data {
+ 	struct queue *ccc_states;
+ 	size_t iovcnt;
+ 	struct iovec *iov;
++	unsigned int vcp_id;
+ };
+ 
+ struct notify {
+@@ -78,9 +79,9 @@ static void print_debug(const char *str, void *user_data)
+ 		tester_debug("%s%s", prefix, str);
  }
  
-+void tester_shutdown_io(void)
-+{
-+	io_shutdown(ios[0]);
-+	io_shutdown(ios[1]);
+-static void test_teardown(const void *user_data)
++static gboolean test_teardown_finish(gpointer user_data)
+ {
+-	struct test_data *data = (void *)user_data;
++	struct test_data *data = user_data;
+ 
+ 	bt_vcp_unref(data->vcp);
+ 	bt_gatt_server_unref(data->server);
+@@ -90,7 +91,16 @@ static void test_teardown(const void *user_data)
+ 
+ 	queue_destroy(data->ccc_states, free);
+ 
++	bt_vcp_unregister(data->vcp_id);
+ 	tester_teardown_complete();
++
++	return FALSE;
 +}
 +
- void tester_io_send(void)
- {
- 	struct test_case *test = tester_get_test();
-diff --git a/src/shared/tester.h b/src/shared/tester.h
-index 1f8138434..dfc1ca3a8 100644
---- a/src/shared/tester.h
-+++ b/src/shared/tester.h
-@@ -81,5 +81,6 @@ void tester_wait(unsigned int seconds, tester_wait_func_t func,
- 							void *user_data);
++static void test_teardown(const void *user_data)
++{
++	tester_shutdown_io();
++	g_idle_add(test_teardown_finish, (void *) user_data);
+ }
  
- struct io *tester_setup_io(const struct iovec *iov, int iovcnt);
-+void tester_shutdown_io(void);
- void tester_io_send(void);
- void tester_io_set_complete_func(tester_data_func_t func);
+ static bool ccc_state_match(const void *a, const void *b)
+@@ -163,6 +173,15 @@ done:
+ 							sizeof(value));
+ }
+ 
++static void vcp_client_attached(struct bt_vcp *vcp, void *user_data)
++{
++}
++
++static void vcp_client_detached(struct bt_vcp *vcp, void *user_data)
++{
++	bt_vcp_unref(vcp);
++}
++
+ static void test_server(const void *user_data)
+ {
+ 	struct test_data *data = (void *)user_data;
+@@ -188,6 +207,9 @@ static void test_server(const void *user_data)
+ 	data->vcp = bt_vcp_new(data->db, NULL);
+ 	g_assert(data->vcp);
+ 
++	data->vcp_id = bt_vcp_register(vcp_client_attached,
++						vcp_client_detached, NULL);
++
+ 	data->server = bt_gatt_server_new(data->db, att, 64, 0);
+ 	g_assert(data->server);
+ 
 -- 
 2.34.1
 
