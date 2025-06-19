@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99083231829
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 15:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEE9230BFD
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jun 2025 15:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750347252; cv=none; b=SStGR3wf2nYwFNfZwfxpt9DHJKS/mm864fZFpaoUfalCv9pcUU7xYIY65FLyDRkGwUuLLfN3AE7X8EvnXqQm6Y4Z0s45EJtBo2CLXYOzusXcFfOlG790ONOFegmkhaNt+4MOX/zIQWGwKUhftz3D5f+FZInYkseMpNEL1R0oY0k=
+	t=1750347263; cv=none; b=N5obbd76r+WM10BhhHAzueD5J4q2y91huk/ehMHcYdCGXS2Ui8hf+9IMgtU9Vi9BH+ngw4W07H7m0V7YQMY05YOJTZyr5KvsKoBm38N05r7rSt2EcletThBsAlUiSwfZW+id711O4GkwVCVXmdyhgKmFzckr2tiGHr8puFhuxQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750347252; c=relaxed/simple;
-	bh=md0uPFNvfJzU+0RQJEjfDIhjWwGsPJM2GDeFP2arGgY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bE9RB2PqrnAW04J0B8+UiwX7Zja0kUIAlxdIdvdobEfYMVdfFj8+42OFUSjRnQneR0RxTF1UfmroXOAbQHJ41nLI88LGscay09u24zUXqhRVSoqc5UZZWi9Oohemji3bTfCagKR7fNBQBR7ouyzLiYx9aukZbeMsGpVb8H8ugZE=
+	s=arc-20240116; t=1750347263; c=relaxed/simple;
+	bh=+wB3mXazRwxh93cu2+h2Ug19A0RZPhgs12DSwXZTxG0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DRnRWLg2DFNE6uVmEVk87ezUUv0TbPaAtU3UqFECmn3i46y96NYjQdOgpyoSsmF/Fab2SZa5i6JrzsOeoP+MwGFoqL/tLJ6vKoJURvgfNG0Rg0hUctkvDXKfghAfdK+ho4ppi5CG1TVIfpjbb+qZmhY0q/4vzqbN0Yf+T90/wp0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst087.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 19 Jun
- 2025 18:33:50 +0300
+ 2025 18:34:11 +0300
 From: Kirill Samburskiy <k.samburskiy@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Kirill Samburskiy <k.samburskiy@omp.ru>
-Subject: [PATCH BlueZ 0/2] test-vcp: Fix test failing in some environments
-Date: Thu, 19 Jun 2025 18:31:18 +0300
-Message-ID: <20250619153120.126315-1-k.samburskiy@omp.ru>
+Subject: [PATCH BlueZ 1/2] shared/tester: add ability to shutdown tester IO
+Date: Thu, 19 Jun 2025 18:31:19 +0300
+Message-ID: <20250619153120.126315-2-k.samburskiy@omp.ru>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250619153120.126315-1-k.samburskiy@omp.ru>
+References: <20250619153120.126315-1-k.samburskiy@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,7 +57,7 @@ X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
 X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
  dbl.spamhaus.org}
 X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;inp1wst087.omp.ru:7.1.1;81.22.207.138:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;81.22.207.138:7.1.2;inp1wst087.omp.ru:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
 X-KSE-AntiSpam-Info: FromAlignment: s
 X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
 X-KSE-AntiSpam-Info: {DNS response errors}
@@ -73,75 +76,41 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-This patch fixes test-vcp failing on some environments. It is done by
-manually shutting down tester IO as a part of test teardown, as well as
-freeing server-side bt_vcp instances.
-
+Some tests may require the ability to shutdown IO for proper teardown.
+Add function tester_shutdown_io to accomplish that.
 ---
-After updating our bluez source code from v5.72 to v5.83 we noticed
-that one of the tests (test-vcp) no longer passes on all environments
-(specifically when building for x86_64 or arm64 architectures). This
-patch resolves the problem, enabling all tests to pass. Here is a
-short extract from test logs:
+ src/shared/tester.c | 6 ++++++
+ src/shared/tester.h | 1 +
+ 2 files changed, 7 insertions(+)
 
-```
-AICS/SR/CP/BV-01-C - init
-AICS/SR/CP/BV-01-C - setup
-AICS/SR/CP/BV-01-C - setup complete
-AICS/SR/CP/BV-01-C - run
-gatt_notify_cb: Failed to send notification
-ERROR:src/shared/tester.c:981:test_io_recv: assertion failed (len == iov->iov_len): (5 == 6)
-```
-
-The reason this test was failing is incomplete test teardown.
-Specifically, bt_vcp instances created by vcp_get_session function
-are not freed and, more importantly, not removed from sessions queue
-(both function and queue are found in shared/vcp.c file).
-
-When a new test case is started, vcp_get_session function may be called
-at some point. This function looks up session object using current
-bt_att object as key. Each test case creates its own bt_att instance,
-however in our case bt_att is always allocated at the same memory
-address. This leads to vcp_get_session function looking up session
-object belonging to the previous test case instead of creating a new
-bt_vcp instance (since both current and previous test cases allocated
-memory for bt_att object at the same address).
-
-Getting the wrong session object leads to using wrong gatt_db, which
-then uses the wrong user_data for CCC callbacks, ultimately leading
-to gatt_notify_cb function from test-vcp.c getting incorrect test_data
-pointer. Finally gatt_notify_cb attempts to send a notification using
-an already freed bt_gatt_server instance, which unsurprisingly fails,
-causing expected data to not be written into tester IO channel.
-
-This patch fixes the issue by doing two things. First, it shuts down
-tester IO as a part of test teardown, triggering disconnection
-callbacks in bt_att object. One of these callbacks is registered in
-vcp_get_session function, specifically vcp_disconnected function.
-This function detaches bt_vcp instance (removes from sessions queue)
-and triggers *_remote_client_detached callbacks. The second part of the
-fix is registering vcp remote client callbacks using bt_vcp_register
-function, with vcp_client_detached function responsible for unrefing
-(and freeing) the detached bt_vcp instance. Since the instance is now
-removed from sessions queue, vcp_get_session function can no longer
-look up a wrong object during the test, allowing it to pass.
-
-The test teardown is now split in two functions. The reason for that is
-that IO disonnection callbacks are executed by main loop, thus after
-io_shutdown functions were executed, we need to return to main loop
-to let them execute before proceeding with teardown and freeing bt_att.
-If bt_att is freed too early, its disconnection callbacks are not going
-to be executed.
-
-Kirill Samburskiy (2):
-  shared/tester: add ability to shutdown tester IO
-  test-vcp: free server-side bt_vcp on test teardown
-
- src/shared/tester.c |  6 ++++++
- src/shared/tester.h |  1 +
- unit/test-vcp.c     | 26 ++++++++++++++++++++++++--
- 3 files changed, 31 insertions(+), 2 deletions(-)
-
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index 371ccaced..230e9ef75 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -1047,6 +1047,12 @@ struct io *tester_setup_io(const struct iovec *iov, int iovcnt)
+ 	return ios[0];
+ }
+ 
++void tester_shutdown_io(void)
++{
++	io_shutdown(ios[0]);
++	io_shutdown(ios[1]);
++}
++
+ void tester_io_send(void)
+ {
+ 	struct test_case *test = tester_get_test();
+diff --git a/src/shared/tester.h b/src/shared/tester.h
+index 1f8138434..dfc1ca3a8 100644
+--- a/src/shared/tester.h
++++ b/src/shared/tester.h
+@@ -81,5 +81,6 @@ void tester_wait(unsigned int seconds, tester_wait_func_t func,
+ 							void *user_data);
+ 
+ struct io *tester_setup_io(const struct iovec *iov, int iovcnt);
++void tester_shutdown_io(void);
+ void tester_io_send(void);
+ void tester_io_set_complete_func(tester_data_func_t func);
 -- 
 2.34.1
 
