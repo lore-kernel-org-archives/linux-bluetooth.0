@@ -1,283 +1,129 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4543A25522D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 08:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A7C224AEE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 08:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750409074; cv=pass; b=tK0nlTGeXIKZYTtFB28rnRjBmrpdYOuJP7EsQVC5Pk6zvJZ56YD1GqW14UU9qtGSgTZsRu/xuihiwzM0Yv/c9OibqcUyaB0/ChKsN3pKJJ0NH0tv7zA0ZSNPMAMf9LjjBrzBG5SGlqSUKxrCJV7ldj8aIvIIPgg/lLCdyjfFpXg=
+	t=1750409962; cv=pass; b=i812kfN/9yPL6IPWqxMA9BudT0B/vw05KrHZVtbGTQwzHVe00k0knwAO9yo4BFpVQAnOdtHug352A58v7S/bTj4lDl+CKMniOrXscudR7VDaDhEf4N6+xzlOhFu03xzjESPjd6AqfIUrNhxDUOxygdJWUZWMKn8Lai2NsKwW838=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750409074; c=relaxed/simple;
-	bh=DS+Mt4G8rn7oHEIw30lAHwFrkslaxJR5atFp9nrSOvA=;
-	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=PkQAT7gaXnCOV9nfLcvMaQzwaswgfnozHKt4+wU53E+7ZuacNseIdWEWNAa2OvP6z26JvONWAEJyDn+cU1NwysOeKmxJrQOYFGQ+NP+X607LiQL+IwoQUe4zMqU77RMucHRb8ppwUKKvAdYREvI8LGu7PeUuwoed0hiAtt7FHks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=GIsjQkRm; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1750409962; c=relaxed/simple;
+	bh=6hQU1tusfOqCBP9PIMpFr/VOB8+HRpoZkpD7NzEIEn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BlJV3pMiHOUfmxVtWv5humV9uYnn/mTVcnRobQkShYdTmRQt9TKYQtGgB0RtZyRMfNM/SfCzO8inVTJfUiICdXrASFrRHVaHVmzVcw7emU/95t5Q2F25J4WBsy5ztdZSpmyh/4AmCt3JeTXD9Qqovup6SIJQwnpszP6sIwsT/oo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=e8E1OKxA; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=VSp9Sbs3; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="GIsjQkRm"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="e8E1OKxA";
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="VSp9Sbs3"
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bNrcm6t85z49Q36
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 11:44:24 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4bNrxs5Ynpz49Q6b
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 11:59:13 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1750409065;
+	t=1750409953;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=tBfBCDgv/rZUFCgb3k+eYcv8brwDlKusoF44TA8YOC4=;
-	b=GIsjQkRm0GIgFTkPZq0f9Xi56x4rJ4BgPsnVT/n5baTBuobW1Mc+cNhEoSqWVLxvg3XFVK
-	28QdRJaVvb79KYr0UlBvFkYMqHUfWKlpL73uYk2zvBw5HWe8OwezapdhflKVUN1BHpfWmX
-	et0Y15MdB3bRwS5ihdF9f93YYfRbKl79mI7uTP0jnxhXVDBejYWLjhvZpmVm+XvPfqmzhp
-	ScH38+jumpxYUgb0CtnDKAczJoCucVh2eO97SU1EJmdOhxWqpx3+PC06HCcpzbhRH4E297
-	I7NPcMGGc1xs7PWL7HoC39m4mv0/lnrrgcEVTH2h+HJV90ybXHjqW1VKaRrv2A==
+	bh=xEepSpen11pGJAAKfHS9Pv9I6hDxwJg51PGYlypXyhU=;
+	b=e8E1OKxAoY2MqY6fQl4HTUeyslYRjC9q+JxDCifQhOp/zR3FLcB+PNxGTZ9O3hzFXcXX+X
+	r3824d+gMRWIBELY+/p8MT6BjZqf6Ih/qxcdc5VdGXLyiuAuchHWXJ2HWVX3z7bxngUoyo
+	BCjlBrQGChy6AFH3Vbnh9shRi1Q3HgvU6caX1CZwJz496VCowFkZ8teGPYtu46Foa0if7O
+	00hsVIy2+AT0HL/Ud8y2TSe/QPkabcjcm/b898GGyqgKRYrybXYUDNF+PzB4c7VEMfKwqz
+	yJ3sP2NwLaN2BSsurzeHXLdoSRV3ki1kELwAdDUtypDLfm/9rtf8D8LboL4sig==
+Received: from monolith.lan (unknown [185.77.218.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4bNrxj5N17zySS;
+	Fri, 20 Jun 2025 11:59:05 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1750409946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xEepSpen11pGJAAKfHS9Pv9I6hDxwJg51PGYlypXyhU=;
+	b=VSp9Sbs34iiPJXxqHjNrAbrBlj8Rx9a24zEcPG9iA8cKN9I6/Qb6Lm5wpWj+vc77OxANI0
+	hfZFZEChaShGsVUC40yxtrhfPZHnviN8CzlK3mq+mSXX4naABeD51qOdXPtVu03K9gIr1K
+	ZGN7oJcTnuBaRXk8l7qC7qrJbcd/n5Y=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1750409065;
+	s=meesny; t=1750409946;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=tBfBCDgv/rZUFCgb3k+eYcv8brwDlKusoF44TA8YOC4=;
-	b=FWsnNoiMQpPcDdCqDO0POoWW8hU4+3S+0t/4A6qs5CDtaMbHv09OUChqDYZ2+BDwmhnhOT
-	BOzcE+WHvb/ktTlWC1z9ytF4cS0Bl0WIkGpufDL4x2H5acsrycoF5G1nsMgNS2e7aoab74
-	b2/6RhlHTR2O0dTsG94lT5zsWhHq1hDPec4c6/LTNKRIPdAhNnpBEYPDSw/Y+vnEngxa5f
-	WefLYkoYhG9OradabavjDQY8x2nPRxgeStJQfHW2DOPpRJWAkXO2SGMKrcKJMtrDKgcpeN
-	PzrIuxkvg8zYiH3DyREHD4P2KiWJA246PhiHXppyY0NBqZm/pbyD4X72RCkBYA==
+	bh=xEepSpen11pGJAAKfHS9Pv9I6hDxwJg51PGYlypXyhU=;
+	b=wlKzckkJyLQzQAjBNrdPosi5zeTmxklJAQetUD59dZaZLjM+JCAEeCBHcA8mbFupXjDHnZ
+	gavbP7os7kPVoufxXVZXn4Vyzz+jxTqphr20GTtZsOpO2kRiPYk2ne6bBIDmvtPRniJltC
+	Sl1aqcmIJ9NP2UjA7yM34hdSLm8EbsQ=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1750409065; a=rsa-sha256;
-	cv=none;
-	b=Ctffd6L+VXsrkAMxm6flXgafns1mcIrM+T3ZamcYDmRbOxUmwTp9MMQ9EJ8J7FpbS7KkE8
-	CAt2h99Ca02RgkZhSOQ2UzRKIaGyzmirX8p9yoeqc8kX0wpYVQblobV5ICZ5H69lgmzqiM
-	UzEaRDdbvqHdv6AoOUF4m/WXVEqVNM54yVYdO5RDx5SsAbbmpwZRkqqgvlWDiyHmnhQl8V
-	HAzKLiGDvKdFRZgW48A+DnfXS2g1KHdnRcjVWxXHLKDReKso79uirgwMhZxjrra/oyzCun
-	U6I7OnYDCZD5pmM/1Fq/yFcgENmIA5P0sU+PNVL8hxQabUTRyevCXFsT0UwoqQ==
-Message-ID: <d501819fc5b854c9dce8e5f28b629787aa65a607.camel@iki.fi>
-Subject: Intel AX210 thinks Disconnected CIS still exists?
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1750409946; a=rsa-sha256; cv=none;
+	b=FYFUH57K0UEQelHD32sCZgXOPTlwM3hrxvalr42KW809VLkwkmEd9GSameMT/PUd5mn7Dh
+	oEUDs9mEKHZtGFX+BYHLvo7zsFAe1bI23VjA3nxdeV+r9hlxFFE9tGIArSGiNooXsHvOT8
+	LXD47AkfagbKGqx1XTD+AWkEMqvOVJ4=
 From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Fri, 20 Jun 2025 11:44:22 +0300
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2] bap: don't pass in stream's own metadata to enable()
+Date: Fri, 20 Jun 2025 11:59:02 +0300
+Message-ID: <c257288ce21dd2c25624d0adda2f42b0428f7a43.1750409838.git.pav@iki.fi>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Stream owned metadata pointers may be invalidated in bt_bap_stream
+operations.  Callers should make copies and not rely on details of their
+invalidation semantics.
 
-I'm seeing some weird behavior with Intel AX210. It's looking somewhat
-like a firmware bug.
+Fixes:
 
-The controller seems to be producing empty ACL data packets for a CIS
-handle even though it already sent "Disconnect Complete" event for the
-handle.
+ERROR: AddressSanitizer: heap-use-after-free
+READ of size 8 at 0x7b86a76f5d18 thread T0
+    #0 0x000000836745 in util_iov_dup src/shared/util.c:353
+    #1 0x0000008ea96b in bap_stream_metadata src/shared/bap.c:1991
+    #2 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
+    #3 0x0000009226e7 in bt_bap_stream_enable src/shared/bap.c:6392
+    #4 0x00000044037d in transport_bap_resume profiles/audio/transport.c:1981
+freed by thread T0 here:
+    #0 0x7f66a92e5bcb in free.part.0 (/lib64/libasan.so.8+0xe5bcb)
+    #1 0x000000837002 in util_iov_free src/shared/util.c:392
+    #2 0x0000008ea94e in bap_stream_metadata src/shared/bap.c:1990
+    #3 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
+---
 
+Notes:
+    The other option is to do like in v1 and specify the semantics.  In that
+    case, it's best to be the same as in the other bt_bap functions, which
+    use util_iov_memcmp.
 
-Reproducer:
-AX210 + Samsung Galaxy Buds2 Pro + BlueZ & Pipewire master branch
-Switch audio profile to duplex for both earbuds using pactl, try to
-play audio. The device rejects ASE configuration for one earbud, and
-BlueZ starts cancelling its CIS connect.
+ profiles/audio/transport.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 9bf3b47ee..62abd83d7 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -1977,9 +1977,10 @@ static guint transport_bap_resume(struct media_transport *transport,
+ 		return bap->resume_id;
+ 	}
+ 
+-	meta = bt_bap_stream_get_metadata(bap->stream);
++	meta = util_iov_dup(bt_bap_stream_get_metadata(bap->stream), 1);
+ 	id = bt_bap_stream_enable(bap->stream, bap->linked, meta,
+ 					bap_enable_complete, owner);
++	util_iov_free(meta, 1);
+ 	if (!id)
+ 		return 0;
+ 
+-- 
+2.49.0
 
-Firmware:
-
-[   27.539905] Bluetooth: hci0: Firmware timestamp 2025.13 buildtype 1 buil=
-d 82008
-[   27.539909] Bluetooth: hci0: Firmware SHA1: 0x47cf9d0e
-[   27.539914] Bluetooth: hci0: No support for _PRR ACPI method
-[   27.552267] Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.=
-sfi
-[   27.552292] Bluetooth: hci0: Boot Address: 0x100800
-[   27.552294] Bluetooth: hci0: Firmware Version: 88-13.25
-[   27.552296] Bluetooth: hci0: Firmware already loaded
-[   27.563226] Bluetooth: hci0: Fseq status: Success (0x00)
-[   27.563231] Bluetooth: hci0: Fseq executed: 00.00.02.41
-[   27.563234] Bluetooth: hci0: Fseq BT Top: 00.00.02.41
-
-
-HCI Command / Status / Complete log & some of ISO/ACL packets:
-
-< HCI Command: LE Create Connected Isochronous Stream (0x08|0x0064) plen 9 =
-  #8711 [hci1] 278.356781
-        Number of CIS: 2
-        CIS Handle: 2304
-        ACL Handle: 2049
-        CIS Handle: 2305
-        ACL Handle: 2048
-
-**CIG with two bidirectional CIS**
-
-> HCI Event: Command Status (0x0f) plen 4   #8712 [hci1] 278.358100
-      LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
-        Status: Success (0x00)
-< HCI Command: Disconnect (0x01|0x0006) plen 3   #8720 [hci1] 278.498169
-        Handle: 2305
-        Reason: Remote User Terminated Connection (0x13)
-
-
-**Core specification 6.0 pp 1920: "If the Host issues
-this command when there is a pending HCI_LE_Create_CIS command for the
-same CIS but before the CIS is created, then this command shall be
-successful and the CIS shall not be created."**
-
-
-> HCI Event: Command Status (0x0f) plen 4   #8721 [hci1] 278.499113
-      Disconnect (0x01|0x0006) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 29   #8722 [hci1] 278.589170
-      LE Connected Isochronous Stream Established (0x19)
-        Status: Success (0x00)
-        Connection Handle: 2305
-        CIG Synchronization Delay: 5400 us (0x001518)
-        CIS Synchronization Delay: 4470 us (0x001176)
-        Central to Peripheral Latency: 5400 us (0x001518)
-        Peripheral to Central Latency: 5400 us (0x001518)
-        Central to Peripheral PHY: LE 2M (0x02)
-        Peripheral to Central PHY: LE 2M (0x02)
-        Number of Subevents: 3
-        Central to Peripheral Burst Number: 1
-        Peripheral to Central Burst Number: 1
-        Central to Peripheral Flush Timeout: 1
-        Peripheral to Central Flush Timeout: 1
-        Central to Peripheral MTU: 60
-        Peripheral to Central MTU: 60
-        ISO Interval: 7.50 msec (0x0006)
-< HCI Command: LE Setup Isochronous Data Path (0x08|0x006e) plen 13   #8723=
- [hci1] 278.589365
-        Handle: 2305
-        Data Path Direction: Input (Host to Controller) (0x00)
-        Data Path: HCI (0x00)
-        Coding Format: Transparent (0x03)
-        Company Codec ID: Ericsson Technology Licensing (0)
-        Vendor Codec ID: 0
-        Controller Delay: 0 us (0x000000)
-        Codec Configuration Length: 0
-        Codec Configuration[0]:=20
-> HCI Event: Command Complete (0x0e) plen 6   #8724 [hci1] 278.590113
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 2305
-> HCI Event: LE Meta Event (0x3e) plen 29   #8725 [hci1] 278.599121
-      LE Connected Isochronous Stream Established (0x19)
-        Status: Success (0x00)
-        Connection Handle: 2304
-        CIG Synchronization Delay: 5400 us (0x001518)
-        CIS Synchronization Delay: 5400 us (0x001518)
-        Central to Peripheral Latency: 5400 us (0x001518)
-        Peripheral to Central Latency: 5400 us (0x001518)
-        Central to Peripheral PHY: LE 2M (0x02)
-        Peripheral to Central PHY: LE 2M (0x02)
-        Number of Subevents: 3
-        Central to Peripheral Burst Number: 1
-        Peripheral to Central Burst Number: 1
-        Central to Peripheral Flush Timeout: 1
-        Peripheral to Central Flush Timeout: 1
-        Central to Peripheral MTU: 60
-        Peripheral to Central MTU: 60
-        ISO Interval: 7.50 msec (0x0006)
-> ISO Data RX: Handle 2304 flags 0x02 dlen 4   #8726 [hci1] 278.599829
-> ISO Data RX: Handle 2304 flags 0x02 dlen 4   #8727 [hci1] 278.607554
-> ISO Data RX: Handle 2304 flags 0x02 dlen 4   #8728 [hci1] 278.614858
-< HCI Command: LE Setup Isochronous Data Path (0x08|0x006e) plen 13   #8729=
- [hci1] 278.615107
-        Handle: 2305
-        Data Path Direction: Output (Controller to Host) (0x01)
-        Data Path: HCI (0x00)
-        Coding Format: Transparent (0x03)
-        Company Codec ID: Ericsson Technology Licensing (0)
-        Vendor Codec ID: 0
-        Controller Delay: 0 us (0x000000)
-        Codec Configuration Length: 0
-        Codec Configuration[0]:=20
-> HCI Event: Command Complete (0x0e) plen 6   #8730 [hci1] 278.616102
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 2305
-< HCI Command: LE Setup Isochronous Data Path (0x08|0x006e) plen 13   #8731=
- [hci1] 278.616126
-        Handle: 2304
-        Data Path Direction: Input (Host to Controller) (0x00)
-        Data Path: HCI (0x00)
-        Coding Format: Transparent (0x03)
-        Company Codec ID: Ericsson Technology Licensing (0)
-        Vendor Codec ID: 0
-        Controller Delay: 0 us (0x000000)
-        Codec Configuration Length: 0
-        Codec Configuration[0]:=20
-> HCI Event: Disconnect Complete (0x05) plen 4   #8732 [hci1] 278.617112
-        Status: Success (0x00)
-        Handle: 2305 Address: 28:3D:C2:4A:7E:DA (Samsung Electronics Co.,Lt=
-d)
-        Reason: Connection Terminated By Local Host (0x16)
-
-**Handle 2305 gets disconnected here**
-
-> HCI Event: Command Complete (0x0e) plen 6   #8733 [hci1] 278.618113
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 2304
-< HCI Command: LE Setup Isochronous Data Path (0x08|0x006e) plen 13   #8734=
- [hci1] 278.618160
-        Handle: 2304
-        Data Path Direction: Output (Controller to Host) (0x01)
-        Data Path: HCI (0x00)
-        Coding Format: Transparent (0x03)
-        Company Codec ID: Ericsson Technology Licensing (0)
-        Vendor Codec ID: 0
-        Controller Delay: 0 us (0x000000)
-        Codec Configuration Length: 0
-        Codec Configuration[0]:=20
-> HCI Event: Command Complete (0x0e) plen 6   #8735 [hci1] 278.619110
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 2304
-> ISO Data RX: Handle 2304 flags 0x02 dlen 4   #8739 [hci1] 278.629825
-> ACL Data RX: Handle 2305 flags 0x02 dlen 4   #8740 [hci1] 278.632832
-        unexpected start frame
-        05 00 00 80                                      ....
-
-**Getting data packets for already disconnected handle?**
-
-> ISO Data RX: Handle 2304 flags 0x02 dlen 4   #8741 [hci1] 278.636842
-> ACL Data RX: Handle 2305 flags 0x02 dlen 4   #8742 [hci1] 278.639839
-> ISO Data RX: Handle 2304 flags 0x02 dlen 4   #8743 [hci1] 278.644857
-> ACL Data RX: Handle 2305 flags 0x02 dlen 4   #8744 [hci1] 278.646832
-        unexpected start frame
-        07 00 00 80                                      ....           =
-=20
-...
-< HCI Command: Disconnect (0x01|0x0006) plen 3   #13597 [hci1] 288.315392
-        Handle: 2304 Address: 28:3D:C2:4A:7D:2A (Samsung Electronics Co.,Lt=
-d)
-        Reason: Remote User Terminated Connection (0x13)
-
-**Handle 2304 disconnects here**
-
-> HCI Event: Command Status (0x0f) plen 4   #13598 [hci1] 288.316110
-      Disconnect (0x01|0x0006) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Disconnect Complete (0x05) plen 4   #13599 [hci1] 288.344136
-        Status: Success (0x00)
-        Handle: 2304 Address: 28:3D:C2:4A:7D:2A (Samsung Electronics Co.,Lt=
-d)
-        Reason: Connection Terminated By Local Host (0x16)
-< HCI Command: LE Remove Connected Isochronous Group (0x08|0x0065) plen 1  =
- #13601 [hci1] 288.360011
-        CIG ID: 0x00
-> HCI Event: Command Complete (0x0e) plen 5   #13602 [hci1] 288.361116
-      LE Remove Connected Isochronous Group (0x08|0x0065) ncmd 1
-        Status: Command Disallowed (0x0c)
-        CIG ID: 0x00
-
-Disconnect Complete has already been received for both CIS.=C2=A0
-This command probably should have succeeded?
-
---=20
-Pauli Virtanen
