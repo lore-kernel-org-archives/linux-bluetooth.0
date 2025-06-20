@@ -1,69 +1,65 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9AD01DC075;
-	Fri, 20 Jun 2025 17:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750442274; cv=none; b=svcjgOHJ/uCVADWGhbXW9hoNjWzuXfqPIyX+fuHDVqIjC1qKk1drdJyqdEOwR4L/8i6Hu2D7U831VG1U7Nw+kiJypMcbAb0BUxGRXrI32NrWWDUIZrnqmtd7dZWtVt9yiCgqICw2CLR6HL061QQalW1oddJrGYThLI4fwlbKyMM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750442274; c=relaxed/simple;
-	bh=EWo+vO7NwXKOqzLI9oD+0pH2eyhzzkeu222Y4Y9iZBw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S7gSHhUi7AvElOgtWNppoK5xXQ8hGGZewOu9oJrmh8y2LvWSrGiUnIgmkHyCFIOSXqAQVf+/bAgQqhErIozsAI8Pq4yu4w747WKM3tQlJlnOtGuDVXTxzM6xTcC2ZkA8/fm3HtR/gGMkQlD2hVJHTbiUrbVtRWgy/GHcwkCzMyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPN/hXpR; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AE91FFC7E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 20:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750452188; cv=pass; b=G9Tvrg2prKN3WZUtpyIJu+++n4k7CUu6ZW/6Bfwm4qSDiDavvEil4+Dj0Mj4UJMpXbgOgCS1QAc6SYLCCaeK8af/3A7ld73KjQgmsvbjrSxZwR4meXUPYuDKG6qBZgPA7GWq9o8GDvddLxLRetHlPSaCUlWRL969ReF3TG/w1sU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750452188; c=relaxed/simple;
+	bh=echAf+1z1SOfCurWpBmzInwfbQ09TeRun4700aR6kVc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HR7wveJp/yuhOfd7vHxIRHz2/mbLoYs+4gYCDqUhSf7H9y7eqxT/fFQR8ETExfpp4o8oZRvKHymrQb04Pxz6zJy7WP7/421moji1CpeZO11x77vJcjz2Ky6C2/b9NzyXov/v/BlnJzGNWa02WfxdmivHnrs2mOgjumanePgUaAE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=krMcOQcO; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPN/hXpR"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-4e79de9da3fso506973137.1;
-        Fri, 20 Jun 2025 10:57:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750442271; x=1751047071; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dTN6QDFSAz7JksbmwGSqIbfMsx5HS2BaC4Jv2w09ciM=;
-        b=jPN/hXpR8wq0xJGcVlEQCUQxQPvbp2jbiMV/qxyCFUUq5jGZVtxEPXfYcu5RpDYTbF
-         MPkw5JMkcSiGh0tfmlJYTFH3M5FL7SAqX0ecMjds8hvKdMkfwL6UpgX2mAcUzAJ0WxWF
-         x47FcP0Jd9q5wg6LTuH5Fe0a6JIy3UiG2rn6SrJvmGZLHLOqmFqt8pI/SltVStVwzrs7
-         fuLRRKakEYOWcPFTggYh4Jw+gmqgJ4ffhSvFxbnjivsQvwNAtZRf4IkYRyJiUp+awdo8
-         kkhTI36vkkETe/XU0VEUQ3+6pJZ7il82T1JaYeFsHr2ZkHrRhaaQxR2Tz8QK2G1rF66A
-         8BYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750442271; x=1751047071;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dTN6QDFSAz7JksbmwGSqIbfMsx5HS2BaC4Jv2w09ciM=;
-        b=gUOT28LV33dSsc7+uxcLojR1nNoe2/EGcfACuk4JE5TVrpgnz/M6nXvqKL83cCqc1I
-         uN7mxA4lvrtAv43+3pH37HzgfTcVFda5r3CJ2rTIA2HtqgTiM9zmAliWNszks8z1X6Dp
-         ts3mroLlnKZktqQoGrIcIE1q6KC9D+y4WscZY8XMzZ+7xa+SsGxzNNnTViLURgCGAA0v
-         9om6G/T/lNQogQ6Q4ZXPH9n2lpa4b5NGi+xmYNI4PcPNRbVXsqMezUkVJj4tIgHAMBka
-         RWMGuZMXvuyIIGxRgkgYhJ9DUQn7TUWeXVmLLB0/8sFhZSgI4L+CyxU3E9PIKVcJTsK2
-         4cTg==
-X-Forwarded-Encrypted: i=1; AJvYcCWo4Rba3nz27KflYTn8g4h6XYtNam1P5oznJwTLTfDp2eT+RcQU4oLpqMPMsLtd3fnNjl1FL1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz806EZ9KpoUxdvctjEAj+IyYh0oroUl8IGUNlD6HuKKgE+Wh+q
-	D7NY2SE38Dgd3payw7TAOPkFlEh+xhlJKwCJKCMfvGPXMZyJG6IS35hnCJWpsR196/s=
-X-Gm-Gg: ASbGnctKB1CkGsTnXOWBeCzubLl7W2SloL0xioIWJURpV5cVpvFSA9vBgYplpcF2QZJ
-	LH6DodUFo05VA/Fk9Dw4mJ6wC7JPIzXKaQqZgKzELHY+F/ZKq4ItUieD7oOy6BaFSRtKs03o334
-	397iX4TyDjPU9tDQD8svomX5npA6XzS1jcCcDOhlf18b7PtVI5DULuAz7+ntEO75nMkO18kEE/g
-	wQLy4eE0l4YPZl7JYTPIQBELBwyx6L/fAnf3N4DxYPN1mleKfn+SiqmrFKcCNN6hHkfQASyD+Z+
-	M3HO3F9Jm2lduyrcd4LOEhQxrKsyKxlL7rLkXzJz+9Bb9y0IFl+rd2fq10E3Ub8z8vTH1pZ2W5R
-	H8zHZmwYuB2qMU8laVQO7RTo89hgI23uPyVc9WJ810Q==
-X-Google-Smtp-Source: AGHT+IFDnm6j+e7QOuqS9u7aoJ5RULG6n5GxY0Hi//6eRRWxY9HrPcZ/qV4T1GmmcSS9kTXZr5ytwA==
-X-Received: by 2002:a05:6102:5706:b0:4e7:7787:1cf8 with SMTP id ada2fe7eead31-4e9c27d2bfbmr2614584137.7.1750442271566;
-        Fri, 20 Jun 2025 10:57:51 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8811ae7b043sm365279241.31.2025.06.20.10.57.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 10:57:50 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-06-20
-Date: Fri, 20 Jun 2025 13:57:47 -0400
-Message-ID: <20250620175748.185061-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="krMcOQcO"
+Received: from monolith.lan (unknown [185.77.218.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bP8Yn122gz49Q30;
+	Fri, 20 Jun 2025 23:42:52 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1750452173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EZdUR1KVwINM/8zJyyfoobd3gR2dkW8mncm8q8IT4rU=;
+	b=krMcOQcOoNKGu8S70jlz70XYgvDN7uEhrJnJcWpPA+UzKC+jjPb7+mIPo8u9HiXf3wwoCE
+	6mpjXexIMtJROgxmLYwG1LAmsISwTkIauRM7K1v2R0HAcdvwTI14+bv2BLpfz2so+itLhe
+	dBBv9VL2v/KXH8tBVvnvR8mwTawI5DYCCw18sMAyi/BdwPmDxY5oM1fwKh1Qhx8KoYnZvi
+	hOhZaAy+pic/PJc7p81tFV+rqLi4KudGN07WB+RXtN0cpOF+bu68BGoEp9+ZBsRyUh6osy
+	1LB/5mGYkzT6dj7iXSKSnKpkcgtvcceWVO/D0fVUMOW7bZq5JKCGo3ICxGN8qA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1750452173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EZdUR1KVwINM/8zJyyfoobd3gR2dkW8mncm8q8IT4rU=;
+	b=BJu70HjgXkRKK9yxt9UlUVZsTRos04FdWOt0II1HLcpUbN16C3TUX8y3MtUgBxgSKF0rC3
+	du7nzWpwi1GnenkKTgSApjdL7zh2RKpMY5aihVFsFh5asKjCNwTa8iAoqObWhsY+CRutqR
+	k9YAHFNk4uE+AhWZ1/T82nraAaCZEgcOGd5DtKq+qAEHoRDYJx3p4+w9qELvWD1M3+OFX3
+	8FWMxR2u6UwuO/cgr54ln8zaiW/NrB5IcHQKCbBLdB+d80NImWNaJUcbLqbXh3pzERf0k1
+	geX1N+abxVGiLcQJxdecOfGFBHb3Q/n4xxURtB+7AduqitgQJGfsuLLR1LYxzg==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1750452173; a=rsa-sha256;
+	cv=none;
+	b=I2lE3oQWkGjQAH2fBJoIxDDuGpl/MrCdf2cHlBxYoXVTOlZfZhtHQ0LjWNMpGSllrBGOXM
+	OU2oeXcasp68cume5m3whWEw4AuOetcxOYi1FnLsvNvOq4ype770jB65hjGMUj5h6bBpse
+	oyBHte+28kY8cuY22REbI6GoGl5yrivBkDxdYlixQI1OIhwZDBLgIsdmDPqLuSa19dD0tv
+	xI4EZNJx7KM09N3C3oVJ9ck6UawEX0DnQyGPsyyODzB87Wm/El+slFmZUVxpD9ENWp2f3C
+	fGnHBJz6zjTLtA1Ny8tPZtFVUj3NnU6zZQYKJsP44rhoZ63PI2lzj9vOdgMJZQ==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v3] bap: don't pass in stream's own metadata to enable()
+Date: Fri, 20 Jun 2025 23:42:48 +0300
+Message-ID: <bbaf5b867f3756fcf72b8e0cd9c2e984d2622eeb.1750451973.git.pav@iki.fi>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -71,45 +67,57 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit e0fca6f2cebff539e9317a15a37dcf432e3b851a:
+Stream owned metadata pointers may be invalidated in bt_bap_stream
+operations. Just pass in NULL to keep the current value.
 
-  net: mana: Record doorbell physical address in PF mode (2025-06-19 15:55:22 -0700)
+Fixes:
 
-are available in the Git repository at:
+ERROR: AddressSanitizer: heap-use-after-free
+READ of size 8 at 0x7b86a76f5d18 thread T0
+    #0 0x000000836745 in util_iov_dup src/shared/util.c:353
+    #1 0x0000008ea96b in bap_stream_metadata src/shared/bap.c:1991
+    #2 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
+    #3 0x0000009226e7 in bt_bap_stream_enable src/shared/bap.c:6392
+    #4 0x00000044037d in transport_bap_resume profiles/audio/transport.c:1981
+freed by thread T0 here:
+    #0 0x7f66a92e5bcb in free.part.0 (/lib64/libasan.so.8+0xe5bcb)
+    #1 0x000000837002 in util_iov_free src/shared/util.c:392
+    #2 0x0000008ea94e in bap_stream_metadata src/shared/bap.c:1990
+    #3 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
+---
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-06-20
+Notes:
+    The other option is to specify semantics as in v1.  In that case,
+    because other bt_bap functions invalidate only if util_iov_memcmp() is
+    different, it's best that it's the same and not only pointer comparison.
 
-for you to fetch changes up to 135c1294c585cf8d0d35f2fd13b8caade4aa1c61:
+ profiles/audio/transport.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-  Bluetooth: hci_core: Fix use-after-free in vhci_flush() (2025-06-20 11:55:16 -0400)
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 9bf3b47ee..4800570d9 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -1957,7 +1957,6 @@ static guint transport_bap_resume(struct media_transport *transport,
+ 				struct media_owner *owner)
+ {
+ 	struct bap_transport *bap = transport->data;
+-	struct iovec *meta;
+ 	guint id;
+ 
+ 	if (!bap->stream)
+@@ -1977,8 +1976,7 @@ static guint transport_bap_resume(struct media_transport *transport,
+ 		return bap->resume_id;
+ 	}
+ 
+-	meta = bt_bap_stream_get_metadata(bap->stream);
+-	id = bt_bap_stream_enable(bap->stream, bap->linked, meta,
++	id = bt_bap_stream_enable(bap->stream, bap->linked, NULL,
+ 					bap_enable_complete, owner);
+ 	if (!id)
+ 		return 0;
+-- 
+2.49.0
 
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - L2CAP: Fix L2CAP MTU negotiation
- - hci_core: Fix use-after-free in vhci_flush()
- - btintel_pcie: Fix potential race condition in firmware download
- - hci_qca: fix unable to load the BT driver
-
-----------------------------------------------------------------
-Frédéric Danis (1):
-      Bluetooth: L2CAP: Fix L2CAP MTU negotiation
-
-Kiran K (1):
-      Bluetooth: btintel_pcie: Fix potential race condition in firmware download
-
-Kuniyuki Iwashima (1):
-      Bluetooth: hci_core: Fix use-after-free in vhci_flush()
-
-Shuai Zhang (1):
-      driver: bluetooth: hci_qca:fix unable to load the BT driver
-
- drivers/bluetooth/btintel_pcie.c | 33 +++++++++++++++++++++++++++++++--
- drivers/bluetooth/hci_qca.c      | 13 ++++++++++---
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         | 32 ++++++++++++++++++++++++++++----
- net/bluetooth/l2cap_core.c       |  9 ++++++++-
- 5 files changed, 79 insertions(+), 10 deletions(-)
