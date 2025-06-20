@@ -1,141 +1,162 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFBA28B40A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 13:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18ED30E850
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 13:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750426028; cv=none; b=nxz6BM3RqbQIXcacYNF1MZsmiJHC36flj+RWvN+1DgMNaoElBe2YXi/kOACjoGvmSaz2Qr0Q0PSnOquj4OjgEV6KrSrNlMPAdZ5NY5IjH3EmgH5JpqxTzvpwF2x4OaPZnqbVD7iGa3bmUF2jc3esPWSC/S9Pg6LjKwOoza9cmXU=
+	t=1750427584; cv=none; b=LdR4nTHd3WQd9V90CmB+bVifKa5Vd4EKDXYxwA72oxrHeGIRG/+3cClJ6Eaw5gfYbDBulL/7owtK193lYlD8mk/TG02XdfFwzY0Etoik1pa/MgLZ+7hAwAzA1MGOBGdDPsiZZNz3S/LtSx+4IBbIyA8vQkFfMf8iD6d+mR7kh6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750426028; c=relaxed/simple;
-	bh=8qQhvUL0VOx1miSWimNVT8mwuTKdOL/HbpNBNfipGF4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=meRJVFIsjG9KWaNpMvGfhdVab/YK5VDJ+Jt6oOzzLaHdENXUn4hWzY6Xn+my4dbS6Pwpw+1o4lbYVR9+1WR8LU8RYjj6hGiEGSwl0afY3gy3dJzy6KfLBtM+q9M1ITGNRFcSPDG6dv9GFPJq7eEXA+xKqU9h3v24RARh587M+iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D0x01vRI; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D0x01vRI"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32b435ef653so16903361fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 06:27:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750426025; x=1751030825; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g/FCaZFDLo72CedfL6avvJnefKCwVwsrdS0z+TrVbv4=;
-        b=D0x01vRIdfwlqQCPPPQi191H8aysH7F2KC49Wr8pihvQTQVb2FglEa/keGE0Xxlxug
-         Ht+IDpwKYIScUtTF7TIb3BIsfQNfmCaqnHdkfVf79rwbgkbseseuE/kA25b0MSDnpRoO
-         U0nMjVY5Vxi/tY7f8GqIzuC+J86Jw/FctcpqmdBmJ6mPsPi6IhbwfD2A83KXSqIskyDT
-         YSTC9vCWUrW4ioHM0zM2RmieCHYT2KbVv4H5Mv7XdOJ2IhEdyvsVMrnPaLD4Kmd1w44G
-         K8yscLh4sciQXV/9CK4kTsJaSUyIzf3AkGSie6shGFzpb64tYVgNzM2SapgZUaVDtKwJ
-         SISw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750426025; x=1751030825;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g/FCaZFDLo72CedfL6avvJnefKCwVwsrdS0z+TrVbv4=;
-        b=nzRrhMD5dBkpyfXY3Gzty8Rm9oft7n+XBGGY55u0FcAS0trsTMzR+vntCi3OUd+IYu
-         K35aKLnB27s/qOlm1R7P+MyTJ/rzaY4QH4Lr97ESWBrskaxJ2miP5oGI9Yh/VDeddg3+
-         UlBmaPsf4j14wThwGws5LWK29n95SElMR9ABXgTlH/9JvbJr+AQSRbfPnZ3mK/k/p01P
-         fmGMvEQgQxwADzXZ8mG2y1P3yGtqdPLJ7CL4YgQd109Go3Y5YPwZIYlnWTtor0WuxV9/
-         rdp3zUsNjy4doM7RnMySY2I6+7OEIEsFWzqU6o2AXxm+oAiO6pyL7CJoAlODIHHqnJ+d
-         1GEg==
-X-Gm-Message-State: AOJu0YyxVg3IObSIjdDIntrEMxj47JTYTmEfRPrHc1Q62svDYzegJixi
-	iFFkjepURM0zQpAVKcO2Zv4+PA5cm+tFoZAZG+lrzxcG6vpUC+rAOJslxSuoJAlAqTDZ1bXg2hr
-	5CVZwX5vtsmGH3W9m54UhhHrq0v4cLWjYNp0Jjpg=
-X-Gm-Gg: ASbGncuSEkxBRfz95oQbc/N8LChPH6VpKgJPwHxBW4td/7ISHTh38JogZ/gnn4YoBit
-	tqH00GOSZBvcs1GMHDQ7IiVKP1Q8v4yB+Ok/wFNn0LtdIN1Vcps7rKBVQ1Espb5PW3s7QD8LtPM
-	E/myR0+2dSfmPfzaMgI95SB7N3aEAwfSOavk8VwDYo8w==
-X-Google-Smtp-Source: AGHT+IGA3Lyo5/nBi7l12PrKCUkQC+Oq7QOK7z1vweJFsX8k+M+JQX5Yp4ZzamsPvTEdzVzGHI5XY/s+BofJnr46oZ8=
-X-Received: by 2002:a05:651c:4189:b0:30c:aae:6d4a with SMTP id
- 38308e7fff4ca-32b9901b993mr8266301fa.26.1750426024860; Fri, 20 Jun 2025
- 06:27:04 -0700 (PDT)
+	s=arc-20240116; t=1750427584; c=relaxed/simple;
+	bh=I0kNiC36PPFcOxZB+SjUymOM+cGIAv0fWb56prSweMg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cbxK9ZwwBJQMlscWCRSGEq88jHUEt42U1D1frz+dqOKeEe5SfOP+pRVz01tJh0ZNp+j51gE9hxXhHA5lAHopTpcsLE9KXV9Z84s8v3aFxkKxQBQ81w2klArqyRXb4SkZaYcWu8ujOBYW8QASOnSNxTXSKNlJjP6Tc5aJybKRvck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=unknown smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=tempfail smtp.mailfrom=omp.ru
+Received: from inp1wst087.omp.ru (81.22.207.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 20 Jun
+ 2025 16:52:27 +0300
+From: Kirill Samburskiy <k.samburskiy@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Kirill Samburskiy <k.samburskiy@omp.ru>
+Subject: [PATCH BlueZ v2 0/4] test-vcp: Fix test failing in some environments
+Date: Fri, 20 Jun 2025 16:51:42 +0300
+Message-ID: <20250620135146.243585-1-k.samburskiy@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c257288ce21dd2c25624d0adda2f42b0428f7a43.1750409838.git.pav@iki.fi>
-In-Reply-To: <c257288ce21dd2c25624d0adda2f42b0428f7a43.1750409838.git.pav@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 20 Jun 2025 09:26:51 -0400
-X-Gm-Features: AX0GCFtF0QbabVA3U527io3jDztjrjGvm16SLSGLJl0bjDQTrVJBqOKHoBMmU_k
-Message-ID: <CABBYNZ+o8v5_QXfXDRHN5NYBiVnFfKJ2NGxRSXYO53D9GqheQg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] bap: don't pass in stream's own metadata to enable()
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 06/20/2025 13:44:21
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 194234 [Jun 20 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: k.samburskiy@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 62 0.3.62
+ e2af3448995f5f8a7fe71abf21bb23519d0f38c3
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	inp1wst087.omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;lore.kernel.org:7.1.1;omp.ru:7.1.1;81.22.207.138:7.1.2;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/20/2025 13:46:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 6/20/2025 9:37:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi Pauli,
+This patch fixes test-vcp failing on some environments. It is done by
+shutting down tester IO before test teardown and registering detach
+callbacks to ensure proper cleanup. Similar changes are introduced to
+test-micp to avoid similar problems in the future.
 
-On Fri, Jun 20, 2025 at 4:59=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Stream owned metadata pointers may be invalidated in bt_bap_stream
-> operations.  Callers should make copies and not rely on details of their
-> invalidation semantics.
->
-> Fixes:
->
-> ERROR: AddressSanitizer: heap-use-after-free
-> READ of size 8 at 0x7b86a76f5d18 thread T0
->     #0 0x000000836745 in util_iov_dup src/shared/util.c:353
->     #1 0x0000008ea96b in bap_stream_metadata src/shared/bap.c:1991
->     #2 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
->     #3 0x0000009226e7 in bt_bap_stream_enable src/shared/bap.c:6392
->     #4 0x00000044037d in transport_bap_resume profiles/audio/transport.c:=
-1981
-> freed by thread T0 here:
->     #0 0x7f66a92e5bcb in free.part.0 (/lib64/libasan.so.8+0xe5bcb)
->     #1 0x000000837002 in util_iov_free src/shared/util.c:392
->     #2 0x0000008ea94e in bap_stream_metadata src/shared/bap.c:1990
->     #3 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
-> ---
->
-> Notes:
->     The other option is to do like in v1 and specify the semantics.  In t=
-hat
->     case, it's best to be the same as in the other bt_bap functions, whic=
-h
->     use util_iov_memcmp.
->
->  profiles/audio/transport.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-> index 9bf3b47ee..62abd83d7 100644
-> --- a/profiles/audio/transport.c
-> +++ b/profiles/audio/transport.c
-> @@ -1977,9 +1977,10 @@ static guint transport_bap_resume(struct media_tra=
-nsport *transport,
->                 return bap->resume_id;
->         }
->
-> -       meta =3D bt_bap_stream_get_metadata(bap->stream);
-> +       meta =3D util_iov_dup(bt_bap_stream_get_metadata(bap->stream), 1)=
-;
->         id =3D bt_bap_stream_enable(bap->stream, bap->linked, meta,
->                                         bap_enable_complete, owner);
-> +       util_iov_free(meta, 1);
+---
+Note: this is the second version of the patch, the original discussion
+can be found at:
+https://lore.kernel.org/all/20250619153120.126315-1-k.samburskiy@omp.ru
+See patch changelog below for changes in the new version.
 
-Oh, that is what was causing the problem, well in this case the
-bt_bap_stream_get_metadata returns the stream->meta but
-bt_bap_stream_enable would already be using it anyway, so I think we
-can just remove this entirely and just pass NULL as metadata, perhaps
-we can remove the argument as well and just leave it up to
-bt_ba_stream_set_metadata to update it.
+After updating our bluez source code from v5.72 to v5.83 we noticed
+that one of the tests (test-vcp) no longer passes on all environments
+(specifically when building for x86_64 or arm64 architectures). This
+patch resolves the problem, enabling all tests to pass. Here is a
+short extract from test logs:
 
->         if (!id)
->                 return 0;
->
-> --
-> 2.49.0
->
->
+```
+AICS/SR/CP/BV-01-C - init
+AICS/SR/CP/BV-01-C - setup
+AICS/SR/CP/BV-01-C - setup complete
+AICS/SR/CP/BV-01-C - run
+gatt_notify_cb: Failed to send notification
+ERROR:src/shared/tester.c:981:test_io_recv: assertion failed (len == iov->iov_len): (5 == 6)
+```
 
+The reason this test was failing is incomplete test teardown.
+Specifically, bt_vcp instances created by vcp_get_session function
+are not freed and, more importantly, not removed from sessions queue
+(both function and queue are found in shared/vcp.c file).
 
---=20
-Luiz Augusto von Dentz
+When a new test case is started, vcp_get_session function may be called
+at some point. This function looks up session object using current
+bt_att object as key. Each test case creates its own bt_att instance,
+however in our case bt_att is always allocated at the same memory
+address. This leads to vcp_get_session function looking up session
+object belonging to the previous test case instead of creating a new
+bt_vcp instance (since both current and previous test cases allocated
+memory for bt_att object at the same address).
+
+Getting the wrong session object leads to using wrong gatt_db, which
+then uses the wrong user_data for CCC callbacks, ultimately leading
+to gatt_notify_cb function from test-vcp.c getting incorrect test_data
+pointer. Finally gatt_notify_cb attempts to send a notification using
+an already freed bt_gatt_server instance, which unsurprisingly fails,
+causing expected data to not be written into tester IO channel.
+
+This patch fixes the issue by doing two things. First, it shuts down
+tester IO as a part of test teardown, triggering disconnection
+callbacks in bt_att object. One of these callbacks is registered in
+vcp_get_session function, specifically vcp_disconnected function.
+This function detaches bt_vcp instance (removes from sessions queue)
+and triggers *_remote_client_detached callbacks. The second part of the
+fix is registering vcp remote client callbacks using bt_vcp_register
+function, with vcp_client_detached function responsible for unrefing
+(and freeing) the detached bt_vcp instance. Since the instance is now
+removed from sessions queue, vcp_get_session function can no longer
+look up a wrong object during the test, allowing it to pass.
+
+---
+v2: tester_shutdown_io is now called from test_result, thus applying to
+    all tests.
+    Removed bt_vcp allocation from test-vcp since it was unnecessary.
+    Added bt_vcp_add_db call to ensure all relevant attributes are
+    still added to gatt_db.
+    Introduced similar changes to test-micp: removed unnecessary
+    bt_micp allocation and added detach callback for freeing bt_micp
+    instance created by micp_get_session.
+    In shared/bap, NULL attach or detach callbacks are now ignored to
+    ensure test-bap does not fail due to introduction of IO shutdown.
+---
+Kirill Samburskiy (4):
+  shared/bap: ignore NULL attach/detach callbacks
+  test-vcp: remove unnecessary bt_vcp allocation
+  test-micp: remove unnecessary bt_micp allocation
+  shared/tester: shutdown tester IO before test teardown
+
+ src/shared/bap.c    |  6 ++++++
+ src/shared/tester.c |  8 ++++++++
+ src/shared/tester.h |  1 +
+ unit/test-micp.c    | 18 ++++++++++++++----
+ unit/test-vcp.c     | 19 +++++++++++++++----
+ 5 files changed, 44 insertions(+), 8 deletions(-)
+
+-- 
+2.34.1
+
