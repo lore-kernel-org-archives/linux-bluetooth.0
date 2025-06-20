@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B9528E578
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 13:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFC428DB53
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 13:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750427607; cv=none; b=FVwYkUWpXV63VU4hYGnuBwKhlLsFGWWUZh910UMzJFMTzxPB8qZUVOAAG/XKpKEzxbqtvYKef6o+zWc/CNnY1oSEHM0bA4O0Ha34t/aeEvA5U3V47EssLi6/5ARNXZhWVw4g/WEtkDQrIB02oFq2WKfambNZ0h+qwQkYNPv4BlQ=
+	t=1750427609; cv=none; b=E/nr66paZE/oIsO8vFetztDXY/+3ezH94IE3hDKAlTY+SLsSNDUzb/vH0YWip9ocIBD/JkYINTEN4K4TxXZy98PNgTbTT9rp9XHCjd4BtkVLCs4KjqxNGABSuAum97Zjod+T4xn2T5u2p6AlZCCk+zbBnn/TLp7f6Wz+g0FI8UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750427607; c=relaxed/simple;
-	bh=6VD5gyFoAOqfGuOKENAOfGP9CPwlGZS9E56CTopWbzk=;
+	s=arc-20240116; t=1750427609; c=relaxed/simple;
+	bh=EU6lsml2KD4z5LUYtsPpZMQu5dzAoOWGCh5yD82rFjI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o1h1bC0Z5kENx28hdmJDMTqlEOg644AebybvlMHr30PXeneqDyHqBgM7Axsqf/vLhaBcY15qoZrnBCuGj8yS2N/+0eDYisuHkpSGjmBZoUqiy14ZB23b4hSQlmrg206B7EVnKo9b7T/gHalzZP6DPoHmWfWPaRJoSdUgdIQh+Qs=
+	 MIME-Version:Content-Type; b=gH/2ppxR9rwIE7ejJ+/AL/tyXIlCZ5rA5bRQs2d4hkaf8wGVJ/Gxmo3ckfnxp/4hBPMA1u5gVhcYMEUYg19rHl0oPFPESoeQ/Rz1Jpci45Yyk3u1Ek6ThdAJELBcSdsgdQwmuBkOOg9MxiKj4iAMGNRKhuiTRy5Rc+Dh6/S8xtI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst087.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 20 Jun
- 2025 16:53:07 +0300
+ 2025 16:53:23 +0300
 From: Kirill Samburskiy <k.samburskiy@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Kirill Samburskiy <k.samburskiy@omp.ru>
-Subject: [PATCH BlueZ v2 3/4] test-micp: remove unnecessary bt_micp allocation
-Date: Fri, 20 Jun 2025 16:51:45 +0300
-Message-ID: <20250620135146.243585-4-k.samburskiy@omp.ru>
+Subject: [PATCH BlueZ v2 4/4] shared/tester: shutdown tester IO before test teardown
+Date: Fri, 20 Jun 2025 16:51:46 +0300
+Message-ID: <20250620135146.243585-5-k.samburskiy@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250620135146.243585-1-k.samburskiy@omp.ru>
 References: <20250620135146.243585-1-k.samburskiy@omp.ru>
@@ -70,71 +70,51 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Do not create bt_micp in test_server since it is not necessary for this
-test. Also register bt_micp detached callback to unref and free
-objects created by micp_get_session.
+Some tests may require shutdown of tester IO for proper teardown.
+Add function tester_shutdown_io to accomplish that and call it
+automatically when test finishes.
 ---
- unit/test-micp.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ src/shared/tester.c | 8 ++++++++
+ src/shared/tester.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/unit/test-micp.c b/unit/test-micp.c
-index a7fc7fb32..87fde8ed0 100644
---- a/unit/test-micp.c
-+++ b/unit/test-micp.c
-@@ -33,12 +33,12 @@
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index 371ccaced..62a14d073 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -654,6 +654,8 @@ static void test_result(enum test_result result)
+ 		test->timeout_id = 0;
+ 	}
  
- struct test_data_mics {
- 	struct gatt_db *db;
--	struct bt_micp *micp;
- 	struct bt_gatt_server *server;
- 	struct bt_gatt_client *client;
- 	struct queue *ccc_states;
- 	size_t iovcnt;
- 	struct iovec *iov;
-+	unsigned int micp_id;
- };
++	tester_shutdown_io();
++
+ 	if (test->result == TEST_RESULT_FAILED)
+ 		result = TEST_RESULT_FAILED;
  
- struct test_data_micp {
-@@ -98,10 +98,10 @@ static void test_teardown_mics(const void *user_data)
- {
- 	struct test_data_mics *data = (void *)user_data;
- 
--	bt_micp_unref(data->micp);
- 	bt_gatt_server_unref(data->server);
- 	util_iov_free(data->iov, data->iovcnt);
- 	gatt_db_unref(data->db);
-+	bt_micp_unregister(data->micp_id);
- 
- 	queue_destroy(data->ccc_states, free);
- 
-@@ -269,6 +269,15 @@ done:
- 	gatt_db_attribute_read_result(attrib, id, ecode, value, len);
+@@ -1047,6 +1049,12 @@ struct io *tester_setup_io(const struct iovec *iov, int iovcnt)
+ 	return ios[0];
  }
  
-+static void micp_attached(struct bt_micp *micp, void *user_data)
++void tester_shutdown_io(void)
 +{
++	io_shutdown(ios[0]);
++	io_shutdown(ios[1]);
 +}
 +
-+static void micp_detached(struct bt_micp *micp, void *user_data)
-+{
-+	bt_micp_unref(micp);
-+}
-+
- static void test_server(const void *user_data)
+ void tester_io_send(void)
  {
- 	struct test_data_mics *data = (void *)user_data;
-@@ -291,8 +300,9 @@ static void test_server(const void *user_data)
- 	gatt_db_ccc_register(data->db, gatt_ccc_read_cb, NULL,
- 					gatt_notify_cb, data);
+ 	struct test_case *test = tester_get_test();
+diff --git a/src/shared/tester.h b/src/shared/tester.h
+index 1f8138434..dfc1ca3a8 100644
+--- a/src/shared/tester.h
++++ b/src/shared/tester.h
+@@ -81,5 +81,6 @@ void tester_wait(unsigned int seconds, tester_wait_func_t func,
+ 							void *user_data);
  
--	data->micp = bt_micp_new(data->db, NULL);
--	g_assert(data->micp);
-+	bt_micp_add_db(data->db);
-+
-+	data->micp_id = bt_micp_register(micp_attached, micp_detached, NULL);
- 
- 	data->server = bt_gatt_server_new(data->db, att, 64, 0);
- 	g_assert(data->server);
+ struct io *tester_setup_io(const struct iovec *iov, int iovcnt);
++void tester_shutdown_io(void);
+ void tester_io_send(void);
+ void tester_io_set_complete_func(tester_data_func_t func);
 -- 
 2.34.1
 
