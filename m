@@ -1,36 +1,36 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7601928033D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 09:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1C830E830
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 09:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750411266; cv=none; b=oU/8xKo6kPMEwcKmtBi4OWvYT6UeyWQAblipM1VIqifPQTBmrUkCNpmL7SVv0vrjentDaJZqZlr1P/a3roUJsTNp2UxOZe+JV1OBROSV2RFXVZ9AVW9ICJ0vcR9wjhbGscnh2ZKKPZ0CkKKe5LpfYawiSrg9wWiZZELX3h6WX9c=
+	t=1750412245; cv=none; b=tWQF+K1G8C8cJGIlazSf31p91wwV71Yxf8wD7ZSu9NwPH9+42h1yaTRENoYUm2CYN7TDTK6kAnBCsYLY7cV9HKa48fm2Tslsp/EBjB1KiM7DwwHGYq4rD6L4SLj4Wtsr7Kg0kOrHE3YUOS9LKJJ3xNmJmmUneyd0Mvwg6BiSPf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750411266; c=relaxed/simple;
-	bh=u7Ed4pZE0snwXaZjC0N0CMgO7zE25Kg8xnT7h4M0imI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Td1N98EY+szOIixc7XX4iMHhzxPwKhRWMhq9oJsU1hanPwwr6erOoXjDGQi+MUnJqM9XZ7OwEURdsEYQyhDRR8BZed8MX8lAhF2T52JCAyQTUyZ5vkJgbut0cPItMG5YotiHISecbbrYsrfKDVIX9LM2EwM1FekRsVyZkygpNYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lrbALSBB; arc=none smtp.client-ip=192.30.252.203
+	s=arc-20240116; t=1750412245; c=relaxed/simple;
+	bh=lE2lsJWmM8SOJTP0WklVcBg23LnBo+9sDjsAh/aMoKI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iH5i7RtV8HcaLNsuLO28DfoGA9wjVvk4rG8grEJWtDpcyN4JmBhSmDxX0zWyzi10Kp5EpfHMsWvCwrROx8+2lwG0Y7ZL9c4LpIw0c/fUjSnJ9m7ZFnWGd3/uMsPK34FAz/0HtMRtkpLEfD8xpzlyRX9jyGF4ZW0ClOjK8zHmiYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RwX3LBng; arc=none smtp.client-ip=192.30.252.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lrbALSBB"
-Received: from github.com (hubbernetes-node-a138743.va3-iad.github.net [10.48.149.33])
-	by smtp.github.com (Postfix) with ESMTPA id 801248C039A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 02:21:04 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RwX3LBng"
+Received: from github.com (hubbernetes-node-e940f9c.ash1-iad.github.net [10.56.176.16])
+	by smtp.github.com (Postfix) with ESMTPA id A1CAD920445
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jun 2025 02:37:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1750411264;
-	bh=QWW43yTKHy4t2cBWIDgPnT6q01Bi6JoSSHCG9XzxOOY=;
+	s=pf2023; t=1750412243;
+	bh=aKkR2Li+LEeOeEV1o6TyTNjndlINJurfNsjgERC5q08=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=lrbALSBBru+Wlt5ey5HZmHwPQrKdq4eIxKB3Z6CqFbdSUCuNi7IbBxAL7B1nFa7G/
-	 zvYsZO7hmyDUpcmZdaWMXNPXpOhNT9wAv+3ISUzpnqqKUKj+FrHnEDDhnWDa08YIhG
-	 vyfIrblKEn7nP2/L1uftL1TihTGFSdFQ4v+0boXc=
-Date: Fri, 20 Jun 2025 02:21:04 -0700
-From: Pauli Virtanen <noreply@github.com>
+	b=RwX3LBngKqvQ9dIYCRpYH7M2jChHJ6RMq1DBsCQqgLUsCJZw2rwpe0x3BMYy9waHj
+	 qVN0ShEnIQlpFWgLtoBY63WORwgOdTJLZfkQOR6ApJhUxpFf9BxxLRtN6Vs+syc84M
+	 GEUIHr1ChHk9bXiPVXzGB5gD5yhVK384eTCP978Y=
+Date: Fri, 20 Jun 2025 02:37:23 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/974152/000000-70b054@github.com>
-Subject: [bluez/bluez] 70b054: bap: don't pass in stream's own metadata to
- enable()
+Message-ID: <bluez/bluez/push/refs/heads/974159/000000-dcb59d@github.com>
+Subject: [bluez/bluez] dcb59d: device: Add bearer info to
+ Connected/Disconnected ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -43,38 +43,38 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/974152
+  Branch: refs/heads/974159
   Home:   https://github.com/bluez/bluez
-  Commit: 70b0544f4f015b83fef9ffe53e078a53b6d145c5
-      https://github.com/bluez/bluez/commit/70b0544f4f015b83fef9ffe53e078a53b6d145c5
-  Author: Pauli Virtanen <pav@iki.fi>
+  Commit: dcb59d21c0d425d2bcffe251f6eb15e489151e29
+      https://github.com/bluez/bluez/commit/dcb59d21c0d425d2bcffe251f6eb15e489151e29
+  Author: Ye He <ye.he@amlogic.com>
   Date:   2025-06-20 (Fri, 20 Jun 2025)
 
   Changed paths:
-    M profiles/audio/transport.c
+    M doc/org.bluez.Device.rst
+    M src/device.c
 
   Log Message:
   -----------
-  bap: don't pass in stream's own metadata to enable()
+  device: Add bearer info to Connected/Disconnected signals
 
-Stream owned metadata pointers may be invalidated in bt_bap_stream
-operations.  Callers should make copies and not rely on details of their
-invalidation semantics.
+This patch adds the Connected signals and updates the Disconnected signals
+to use a dictionary instead of individual arguments, allowing additional
+information to be conveyed in a backward-compatible way.
 
-Fixes:
+Specifically, a new "bearer" key is added to both signals to indicate the
+transport type ("le" or "bredr"). This is useful in dual-mode scenarios
+where it is necessary to distinguish between BR/EDR and LE connections.
 
-ERROR: AddressSanitizer: heap-use-after-free
-READ of size 8 at 0x7b86a76f5d18 thread T0
-    #0 0x000000836745 in util_iov_dup src/shared/util.c:353
-    #1 0x0000008ea96b in bap_stream_metadata src/shared/bap.c:1991
-    #2 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
-    #3 0x0000009226e7 in bt_bap_stream_enable src/shared/bap.c:6392
-    #4 0x00000044037d in transport_bap_resume profiles/audio/transport.c:1981
-freed by thread T0 here:
-    #0 0x7f66a92e5bcb in free.part.0 (/lib64/libasan.so.8+0xe5bcb)
-    #1 0x000000837002 in util_iov_free src/shared/util.c:392
-    #2 0x0000008ea94e in bap_stream_metadata src/shared/bap.c:1990
-    #3 0x0000008ebfbe in bap_ucast_enable src/shared/bap.c:2072
+The original Disconnected signal was introduced in BlueZ 5.82 and has not
+seen widespread usage yet, so this change minimizes the risk of breaking
+existing applications. By adding both signals to a dictionary-based
+format now, future extensions can be added without requiring further API
+changes.
+
+Fixes: https://github.com/bluez/bluez/issues/1350
+
+Signed-off-by: Ye He <ye.he@amlogic.com>
 
 
 
