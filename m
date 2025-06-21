@@ -1,112 +1,100 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp6.goneo.de (smtp6.goneo.de [85.220.129.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951EB19CC29
-	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Jun 2025 07:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12C243AA8
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Jun 2025 10:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.220.129.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750491608; cv=none; b=kkkBfcFwi4RqbU7KpHjlwgsUKSIN8JyLs1W6RkVmj3NzLG9PlQNqw8mNQWHiVGGfPFnmYe9mTfmC52f7dwxlvh7/1ITVLS4a/LMVMjCDA9xzS1OsX2oQaEWq9/NMRbVSGAeiFQPMFY6CpJeJ2d3ZCMSj0viY+E8bKjqoELp3rNM=
+	t=1750503172; cv=none; b=hfg8f5PKkQrcs/UG2r8vcO6ARqDfgqwy4wjowqOBUKZFi2rMlkyPdYOZpp999M4UPuLr0hKbR0+ttTEAT29k853xexAJVSBPu7R4AdnzjbYzUmggD415mDrNld99sMIVUKFebL02Z0e5jKsPTyO/5Eu3Vi9xECFx3kIc3s6U6/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750491608; c=relaxed/simple;
-	bh=86eEb+pTVYjoWV516xDM7e5Z1gbcb4SoelogF8ZpkDE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PeAv8QAPLmvRUYuvVKYg7ZN9CF6MKagsy6xM8sI+/XWO47S76IzHhEbHno6dSc/B1ENtW4xg5Aeyerg2Wh1FNzpcLXX5hUfEAFU/SPeog3dIY7kdkF8rOhQgAFdEAh3PGisQLWDXLg+Y6j2RwLdq0WbizW0mR5dsmLag6Ps9GYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.111] (p5dc5536f.dip0.t-ipconnect.de [93.197.83.111])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1750503172; c=relaxed/simple;
+	bh=LVQ3rKNZ/9T7Nhtl2RkSzWI0MeHvAmAexLdc6W+M5pQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=spZJW5FvJZRC4og1XaCCrmRQDaOvS6VKZ4k9x/u0+7Hlrd6ItiGDJz25A1MGxvNBmqY3y5P19/xVKi4NDZv/ZXl6Vhwwy3FAJc1sivjt9AmlT9Hakn0JwHwiheOtuRLwZo2qbO1pNt96Sk/4eOHaLAJEFvzAI1T09/romqKHlQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=tYEtukEx; arc=none smtp.client-ip=85.220.129.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tk154.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b="tYEtukEx"
+Received: from hub2.goneo.de (hub2.goneo.de [IPv6:2001:1640:5::8:53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 2F12D61E64787;
-	Sat, 21 Jun 2025 09:30:51 +0200 (CEST)
-Message-ID: <ddd4bdb1-e461-4fdf-bddd-9709c45d60d1@molgen.mpg.de>
-Date: Sat, 21 Jun 2025 09:30:50 +0200
+	by smtp6.goneo.de (Postfix) with ESMTPS id 80D44240DD0;
+	Sat, 21 Jun 2025 12:44:39 +0200 (CEST)
+Received: from hub2.goneo.de (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	by hub2.goneo.de (Postfix) with ESMTPS id E56782402EB;
+	Sat, 21 Jun 2025 12:44:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=DKIM001;
+	t=1750502677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xqIeDF/Snihdx30vJaGAzjLFf6KNL5tW1AcENHJ3fEg=;
+	b=tYEtukEx4r+MvFnPMUH1Cr8R5hLSXUkPIp3OpY9P75jIwAwz/vv4Ub7dmT9UQwlDzz6FHI
+	B+xoMyGgj16dWLxOUWuPfcd0GYvdEscwvlZw/KROSIShZJoD55PlNlRN04zQVDZmHVWucE
+	j2RY5tNgUTmqFXUvJipDEH3dvjT/VHoEeaLTPGB4UtzERRVFMCHAXXrGEvgS1R2MlfT/7m
+	+COBlkOTkPfpPSzJCj3iEIB2jB9z1CMDD7AhP2zT7FguQjJ1NXmlu/mFgRgrBgxkfUo/La
+	2fXQSOGxDz2dN8GMbLmRxcJznUc6Z5Zffgh6lldUfc7b8LqbV/ZvqSelFiC9tQ==
+Received: from Til-Notebook.lan (dslb-084-063-142-151.084.063.pools.vodafone-ip.de [84.63.142.151])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by hub2.goneo.de (Postfix) with ESMTPSA id C9EB0240283;
+	Sat, 21 Jun 2025 12:44:36 +0200 (CEST)
+From: Til Kaiser <mail@tk154.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Til Kaiser <mail@tk154.de>
+Subject: [PATCH BlueZ] configure.ac: check for stdarg.h
+Date: Sat, 21 Jun 2025 12:44:15 +0200
+Message-ID: <20250621104415.63416-1-mail@tk154.de>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: btintel_pcie: Add support for device 0x4d76
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
- aluvala.sai.teja@intel.com
-References: <20250621064631.781861-1-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250621064631.781861-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Rspamd-UID: bbb8be
+X-Rspamd-UID: 5dd69a
 
-Dear Kiran,
+Currently, there is the following compile error while
+building with -std=gnu23, which is now default for GCC 15:
 
+src/shared/shell.c: In function 'rl_cleanup':
+src/shared/shell.c:1435:9: error: too many arguments to function 'rl_message'; expected 0, have 2
+ 1435 |         rl_message("%s", "");
+      |         ^~~~~~~~~~ ~~~~
+In file included from src/shared/shell.c:29:
+/usr/include/readline/readline.h:410:12: note: declared here
+  410 | extern int rl_message ();
+      |            ^~~~~~~~~~
 
-Thank you for the third iteration of your patch. Sorry to comment once more.
+This adds a check for stdarg.h inside the configure script so that
+HAVE_STDARG_H gets defined and the correct prototype is picked
+from readline.h.
 
-As this is Wild Cat Lake, please add WCL to the summary too, and mention 
-Wild Cat Lake in the commit message body.
+Signed-off-by: Til Kaiser <mail@tk154.de>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Am 21.06.25 um 08:46 schrieb Kiran K:
-> lspci -v -k -d  8086:4d76
-> 00:14.7 Bluetooth: Intel Corporation Device 4d76
->          Subsystem: Intel Corporation Device 0011
->          Flags: fast devsel, IRQ 255, IOMMU group 12
->          Memory at 13013328000 (64-bit, non-prefetchable) [disabled] [size=16K]
->          Capabilities: [c8] Power Management version 3
->          Capabilities: [d0] MSI: Enable- Count=1/1 Maskable- 64bit+
->          Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
->          Capabilities: [80] MSI-X: Enable- Count=32 Masked-
->          Capabilities: [100] Latency Tolerance Reporting
->          Kernel driver in use: btintel_pcie
->          Kernel modules: btintel_pcie
-> 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
-> changes in v3:
-> - Fix indendtation issue in commit message
-> 
->   drivers/bluetooth/btintel_pcie.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index cb3cf2b9acea..1113a6310bd0 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -35,6 +35,7 @@
->   
->   /* Intel Bluetooth PCIe device id table */
->   static const struct pci_device_id btintel_pcie_table[] = {
-> +	{ BTINTEL_PCI_DEVICE(0x4D76, PCI_ANY_ID) },
->   	{ BTINTEL_PCI_DEVICE(0xA876, PCI_ANY_ID) },
->   	{ BTINTEL_PCI_DEVICE(0xE476, PCI_ANY_ID) },
->   	{ 0 }
+diff --git a/configure.ac b/configure.ac
+index 07aeb46ca..ad03a45e0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,7 +70,7 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
+ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 			AC_MSG_ERROR(dynamic linking loader is required))
+ 
+-AC_CHECK_HEADERS(stdio.h string.h linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h sys/random.h)
++AC_CHECK_HEADERS(stdarg.h stdio.h string.h linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h sys/random.h)
+ 
+ # basename may be only available in libgen.h with the POSIX behavior,
+ # not desired here
+-- 
+2.50.0
 
-Searching for 0x4D76, it’s also present in 
-`drivers/net/wireless/intel/iwlwifi/pcie/trans.c` added in commit 
-9673c35486d4 (wifi: iwlwifi: implement product reset for TOP errors):
-
-		/* on integrated we have to look up by ID (same bus) */
-		static const struct pci_device_id bt_device_ids[] = {
-#define BT_DEV(_id) { PCI_DEVICE(PCI_VENDOR_ID_INTEL, _id) }
-			BT_DEV(0xA876), /* LNL */
-			BT_DEV(0xE476), /* PTL-P */
-			BT_DEV(0xE376), /* PTL-H */
-			BT_DEV(0xD346), /* NVL-H */
-			BT_DEV(0x6E74), /* NVL-S */
-			BT_DEV(0x4D76), /* WCL */
-			BT_DEV(0xD246), /* RZL-H */
-			BT_DEV(0x6C46), /* RZL-M */
-			{}
-		};
-
-Could you add the names as comments in a follow-up commit, and maybe all 
-the other id’s?
-
-
-Kind regards,
-
-Paul
