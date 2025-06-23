@@ -1,90 +1,146 @@
-Received: from outbound.pv.icloud.com (p-west1-cluster2-host1-snip4-5.eps.apple.com [57.103.64.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3162E24BBF0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jun 2025 12:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.64.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79814C6E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jun 2025 13:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750681908; cv=none; b=fvZfWMPp3jNEOFrsv35N8n4TjWsrfh5yZyy+4STTrtxBHJv5MuYCVJLgQT/UhfbTUwZSXx/LJxB8mh9kS56WirttdzSlJJS2zqEhbZsCRnHAH2jhC852ePoeXvhmf41B4S3DV5GkNqqz4aK2bjbIQECeVQjHj+xzHWDZC60t0oM=
+	t=1750685487; cv=none; b=axqvEGa4Geah6BaBgq2JoZdZUD4pcZqDsgkGiIRhIsk6Edal0nGZS1GFAsZS0g1CUCqne4cSJi+JB3o0SNuUVSoXbgFTJ8wmMg2e14mMhX8ilzF3cMlABuojT0kFh2dQSpQEy24QzTaVUKvcjj0lNIit2IqbUc68L7TtGm2kwN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750681908; c=relaxed/simple;
-	bh=u27hfvZPNVdrOyO84MBRvJr2HBDqcDvzO+IV9vUv1XA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nyWMAiYDi2MWBmhjP5U9m40Gvc6Qk/ZsrlEtZZe9L9rrUno1u9wC/pJ5FPgKcJ8GyHEFw9/32M3Hv34WXGSHYBV/82nxiObpbfVbpA9wnmJKZ6vgZV3++4bIQvqigHcENKLxsBu8sPfi7YodczFCjedXk1iSsbyYD7oOEFBgf9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=AxIixocP; arc=none smtp.client-ip=57.103.64.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1750685487; c=relaxed/simple;
+	bh=myin1JTVWzPV9UEvI6KezHmzzinMda0NCbphhcMTalg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qmEIzMvfqY4LNOHJ8TX3yHghX2xwhCfGod9diQ/+u1hqvt0jibMo8wlqzS1by2N06HNTL/aO5LOSPuH0snHuUUtp2GGV9lgtpO7x466SoZvtYDOFoGZ+ELEjyvjqjVN5Yiiu7oEZ3RgaR4vLi0AEQakBUpKbRFO0YMNLF4pjZl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k8MRc2f5; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="AxIixocP"
-Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by outbound.pv.icloud.com (Postfix) with ESMTPS id 877781800ED4;
-	Mon, 23 Jun 2025 12:31:42 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; bh=+kkJTNxFq4wgb7WDvA6T6uZaSbwuO6NcGFlwCeIcFT4=; h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:x-icloud-hme; b=AxIixocPYrARiA45SthyyA+hinZmhlPhnffxqS0OeWP/CPCnmyFen7CiEnMvGXD88ApMPgLUE8CwRCHlMSMKb66aONYjpVhZ5X2rZXZjnSXuRTDSIt75/A2xpvnhJd5FaO9N2B3mxzwpwcWC745dt6Rf60v3btEZHw3487gmSFVDwn/uoUu7r7HnL5yQazeR1JUcYVpS93VWr0e9swBDjlOes5s6G6BQ1ijHJ6TqsKoRBeHBPcfrDrHZDuxcUmMhT0McEDmqC+SYqZYH1fZQhqhtNWcWbgofUqNPoISyllHVbvqs8OQHtQnjeekSdofPZlttCrX+Qhf1+aRhDE+wQw==
-Received: from [192.168.1.26] (pv-asmtp-me-k8s.p00.prod.me.com [17.56.9.36])
-	by outbound.pv.icloud.com (Postfix) with ESMTPSA id 8D8541803774;
-	Mon, 23 Jun 2025 12:31:39 +0000 (UTC)
-From: Zijun Hu <zijun_hu@icloud.com>
-Date: Mon, 23 Jun 2025 20:31:19 +0800
-Subject: [PATCH 4/4] Bluetooth: hci_event: Correct comment about
- HCI_EV_EXTENDED_INQUIRY_RESULT
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8MRc2f5"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-234d366e5f2so54782095ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jun 2025 06:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750685485; x=1751290285; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ChMRCWju8bVXoZYt5hXSm0mW1DP1SJKoLgTWXchsplI=;
+        b=k8MRc2f5rbd29EuGq3kPwMr3yG8yBzJS9uxamlplKW/lbwByDZmI3UL4l9dM3u85jA
+         KA/waTzxACBaCIrQDicCw++WXziCSFhHy/0E4JbmiUIMWa37P+gux6F131sMf76ywrON
+         y0PW7Rb1Ci1Khup0jMRTibkuIwe2BAiqEjPBmpil3c/zFVSz7Jn51585Yvhz90EfRYp+
+         Z/bZqTOOX2qD1c/9BG4CysSoUZGuApPZS4yiWVMWbA1C8+tglcFlO0Uv6rhUc7gMbEOu
+         qOQtcNcfc56mW6jIkZp1Xb8BmMZtN/jzjRh2gP73xs9jUlC+ymD3/Dhy9YeduwkcZNRi
+         mHVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750685485; x=1751290285;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ChMRCWju8bVXoZYt5hXSm0mW1DP1SJKoLgTWXchsplI=;
+        b=a9FGGBYXUxmbIul43iGPAy7wKx5bqEbqIM1Gbzc0j0zT074ZnWKk3mlyb0LDOk6Qof
+         YI3gNdLqlXw4I9rHYd9yHx4XAf9AwAuwzhxggMRE+7emHz2NHMoWLOzzEeEtIMM2UGME
+         /tfMzFpIsz45HYfFaQbo5t5S3MYbI/qOdrxVE0BnEQDPl7yN8lO93w7FzBmzLhc14cYU
+         kMbtpkZI+dHXIXFlgMUsHf00i2V4XDwkAwrsex289U9I/8PLgUEZg8Rhp9Yny+HcuaTm
+         B/+ZAyK+7TiMiqiFHwapNO3svnFOtqMLh8Q+0R/8/sKRUdci4PzC4JRdbHrYMAGchI/F
+         QDVA==
+X-Gm-Message-State: AOJu0YwMYe16TDaKV20ftP0MvEgfnPZJHYHVaVo0ONS/K07nzKRxqoZM
+	ofg7LpFiI4VJCQB5Jsfceqim90y7hdb4xlUIB+iBGKdR0V96ztt/2Cev+FuSbQ==
+X-Gm-Gg: ASbGncs6OcxkD5y6sjYN1mDJThhcllUdtuOTEqM2+siLspkTs3Nh167mTpWd2W3BpUh
+	sCssbHQYhvM7lmh9dHiZHZ7VCPF6NZw2hDQbSLagGOwigIXBd0bXbRC7WW3Q7RJ9kNXWrO+CNUZ
+	UBVeL1+SM0uC+Tr5dLBLhDD1kS4Oc2iZGWD/mpVlBhct6l0O3wEs4+HfhJGRPdYHY0VF4q5Bv40
+	HSbC8qmpCnE/1N3FjALjTaWP3jVlmZNUujqoS0BSkyAuZueGEsuGiA/F6oyB35RbTNA6alYAW8e
+	4cPu8KrxJ0tXxyvQzMZ5gakOiyqmSsrHIGap4At3FFXEA9RfN7nlvheO/uOlOaFb/KZM
+X-Google-Smtp-Source: AGHT+IFvP5aIwJ3z+/leoDpJ79jPlLqaFrL8zNuZfa7lAitg2nHs31CgXOUh2aQIPKngZ3J70IMgTg==
+X-Received: by 2002:a17:902:da8e:b0:235:f078:473e with SMTP id d9443c01a7336-237d9a770cbmr198290435ad.43.1750685484659;
+        Mon, 23 Jun 2025 06:31:24 -0700 (PDT)
+Received: from [172.17.0.2] ([20.43.247.175])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d839357csm85480565ad.6.2025.06.23.06.31.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 06:31:24 -0700 (PDT)
+Message-ID: <6859572c.170a0220.2b1ea5.fe05@mx.google.com>
+Date: Mon, 23 Jun 2025 06:31:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1089631210998281598=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun_hu@icloud.com
+Subject: RE: Bluetooth: Trivial cleanup
+In-Reply-To: <20250623-bt_cleanup-v1-1-5d3d171e3822@oss.qualcomm.com>
+References: <20250623-bt_cleanup-v1-1-5d3d171e3822@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1089631210998281598==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250623-bt_cleanup-v1-4-5d3d171e3822@oss.qualcomm.com>
-References: <20250623-bt_cleanup-v1-0-5d3d171e3822@oss.qualcomm.com>
-In-Reply-To: <20250623-bt_cleanup-v1-0-5d3d171e3822@oss.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Proofpoint-ORIG-GUID: QuZYD2IY1lnqgPnITdud7qNjCE9tSjJ6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjIzMDA3NSBTYWx0ZWRfX+EJoweXz+YDT
- Nw2yR1SfV79NFDIfxFxehD2DPg/DhW5rLVnVF76+gM388cHLHMS5kS4tK8rPGQJAGAXMFLIUMHI
- QWhK5YclZWBuHJn0RiDaJlEzePkI48O3zH5vmqv7InDSB0AJL0LiEiv10nETbMenHYmEwR5COx2
- XiT7aAFvpQ455Loe28wn3DRM+0Cy8I77OHVbO0XHpLoVLVVvM1NJoliMMrO7fXGOPTLaN8XhupI
- DSISwmcuYWZdP4onabYMk0pFhSBWiKH5kGF1VCRuzPs+3Ak1wU0YdQwwi/rRGfFtqv1+BWtpU=
-X-Proofpoint-GUID: QuZYD2IY1lnqgPnITdud7qNjCE9tSjJ6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-23_03,2025-06-23_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
- suspectscore=0 mlxlogscore=999 phishscore=0 bulkscore=0 adultscore=0
- spamscore=0 mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506060001 definitions=main-2506230075
 
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+This is automated email and please do not reply to this email!
 
-HCI_EV_EXTENDED_INQUIRY_RESULT's comment wrongly uses 0x2d as its event
-code.
+Dear submitter,
 
-Use right 0x2f instead.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=974827
 
-Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.35 seconds
+GitLint                       PENDING   0.39 seconds
+SubjectPrefix                 PASS      0.21 seconds
+BuildKernel                   PASS      24.16 seconds
+CheckAllWarning               PASS      26.38 seconds
+CheckSparse                   WARNING   29.93 seconds
+BuildKernel32                 PASS      23.87 seconds
+TestRunnerSetup               PASS      478.54 seconds
+TestRunner_l2cap-tester       PASS      25.60 seconds
+TestRunner_iso-tester         PASS      40.41 seconds
+TestRunner_bnep-tester        PASS      5.91 seconds
+TestRunner_mgmt-tester        FAIL      133.12 seconds
+TestRunner_rfcomm-tester      PASS      9.44 seconds
+TestRunner_sco-tester         PASS      14.52 seconds
+TestRunner_ioctl-tester       PASS      10.00 seconds
+TestRunner_mesh-tester        PASS      7.39 seconds
+TestRunner_smp-tester         PASS      8.46 seconds
+TestRunner_userchan-tester    PASS      6.07 seconds
+IncrementalBuild              PENDING   0.69 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_core.c:85:9: warning: context imbalance in '__hci_dev_get' - different lock contexts for basic blocknet/bluetooth/hci_core.c: note: in included file (through include/linux/notifier.h, include/linux/memory_hotplug.h, include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, include/linux/radix-tree.h, ...):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.201 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 66052d6aaa1d503cfcd542656d0ffbc5824e239f..c4b87bfb4c1a76cd865290ba2bbce7901a6c26ef 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -7433,7 +7433,7 @@ static const struct hci_ev {
- 	/* [0x2c = HCI_EV_SYNC_CONN_COMPLETE] */
- 	HCI_EV(HCI_EV_SYNC_CONN_COMPLETE, hci_sync_conn_complete_evt,
- 	       sizeof(struct hci_ev_sync_conn_complete)),
--	/* [0x2d = HCI_EV_EXTENDED_INQUIRY_RESULT] */
-+	/* [0x2f = HCI_EV_EXTENDED_INQUIRY_RESULT] */
- 	HCI_EV_VL(HCI_EV_EXTENDED_INQUIRY_RESULT,
- 		  hci_extended_inquiry_result_evt,
- 		  sizeof(struct hci_ev_ext_inquiry_result), HCI_MAX_EVENT_SIZE),
 
--- 
-2.34.1
-
+--===============1089631210998281598==--
