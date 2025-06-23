@@ -1,203 +1,142 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF1523BF9C;
-	Mon, 23 Jun 2025 10:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFED9235BEE
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jun 2025 11:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750674323; cv=none; b=trEMIR+i5q5HgpRE9Vcau0E5HerKhiVS4LoJXccVwHluR2Gia/O3vqgLxD2j2q7GjSKmLBHgeco21PAIP4gNs8/hL5Vm4ZYukBWc1KGQkxrCq+w0nutMZxfDizAkaCRkLzbEzFa6amsSDmf8jMSpO7GJlKgmp/1BkPHsA3WMI6A=
+	t=1750676822; cv=none; b=icMnKqAgZZTRTwbLeKXIALbdhIRmKSjWknnT/WcDTeVOaBi9+fd+K/LxqZPjsj6VlFfiucOCqPG10P9+ilNOK/wMquGJl2jQY2JqbjimHdPY8ucOSF3mfa5zTpnhzE/u6wn0EqmFO9i+ikpuF/2P40BxIovuv/RZuLKUktNLeFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750674323; c=relaxed/simple;
-	bh=MtyUi5inSJocAHd2EKxS3QCRGXlAJoY/HwfY58ekLEE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FXFl+TIUKlPD9Q2WmMBkN0JLhCFoyiSmGEal94xnoTOxBnWnfQnzfPCpge6Z2oLmd3Zw1cKRRNa8B9kIyiz9cDZ0U5niQ2VwtsOj31KpXo8DjKOQ9DtLDgHDCij6+Q3tcLLupYgKlZB8l/Xpj4evrKJbZ/rafW/P5f733qcF6W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=VA2aWiyK; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1750676822; c=relaxed/simple;
+	bh=8zC0Bh6y6hXfkXrnYiJwKMmFnZ4xx2ZbPghHUH+4i6c=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=cCyCXZL0utP9TL1BapcLWTLM5w35FpH7b5ADbYjnFZCXGnNvCNQnUH1RZjtZEEH2prhQiVjCpmMYadQ+AvQko7qquTsYN37eBLeGNiM9UeouY7lCkPVC7wf5qyjJ+ue+TC1Nlr6IOlSGElsPOz0fy+1G0i+KQC1VH+W0EKGa874=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DsHVFTpj; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="VA2aWiyK"
-X-UUID: 5a740348501c11f0b33aeb1e7f16c2b6-20250623
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=qvX/P/SG/SFzHP1pyPRjGEyMLB0uWfnXE56q6Nx+TqM=;
-	b=VA2aWiyK/SwUO50OV1CLAbjG5wFwHSFDcoYRBF5REuMFM/zmC5QjLa4LOqxSiYER1q5/lLoh4oWldP19nHi9Xduv3P8y7IXs3EreyW63IrDwVCWHJdop3O/U6IB2nfkz02U8HkowplGSxcnK+d/QyTCnKgBJfD6Bh2JMNUenvTw=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.2,REQID:4638f6c7-591e-4cee-997e-2f23ac2a0030,IP:0,UR
-	L:0,TC:0,Content:0,EDM:-25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-25
-X-CID-META: VersionHash:9eb4ff7,CLOUDID:35f14777-7521-4364-b0ef-cd7d9c0ecbde,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:81|82|102,TC:nil,Content:0|50,EDM:1,
-	IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:
-	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 5a740348501c11f0b33aeb1e7f16c2b6-20250623
-Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
-	(envelope-from <ot_zhangchao.zhang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 225289146; Mon, 23 Jun 2025 18:25:15 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.39; Mon, 23 Jun 2025 18:25:12 +0800
-Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1258.39 via Frontend Transport; Mon, 23 Jun 2025 18:25:12 +0800
-From: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger
-	<matthias.bgg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
-	Chris Lu <chris.lu@mediatek.com>, Hao Qin <Hao.qin@mediatek.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-arm-kernel
-	<linux-arm-kernel@lists.infradead.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Zhangchao Zhang
-	<ot_zhangchao.zhang@mediatek.com>
-Subject: [PATCH v4 1/1] Bluetooth: mediatek: add gpio pin to reset bt
-Date: Mon, 23 Jun 2025 18:23:59 +0800
-Message-ID: <20250623102359.2684-2-ot_zhangchao.zhang@mediatek.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20250623102359.2684-1-ot_zhangchao.zhang@mediatek.com>
-References: <20250623102359.2684-1-ot_zhangchao.zhang@mediatek.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DsHVFTpj"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6faf66905baso62111636d6.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jun 2025 04:07:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750676819; x=1751281619; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qcNSo/NdbNWsZQ4ryDcnLhxJdcv0QbL7uha9jQokN3k=;
+        b=DsHVFTpjOKrCbTY+3nB/o7COEgmcPIMW6JEym7yYRs/KVQbk+d5MsAe26qqS8ngHgw
+         vBk3e232pIIRFMlBb179mmTAbP8RT4EcecIqpliKrbV392pKf3VBWBPUuYbdLpsLEnlO
+         7u2w6SI1So/SlbdndSrcu3lVgJvpYclaQz/fMB4PpLBK0vq6krw2N5Wllo33P7SZ7VOC
+         0DQRewnvoGqoGlgkUNMxTotr2F7BmSh11oozGhkhq3tLb3OW73Ydw6uK3DL6bKa/Q70Z
+         B3SNuq3sN4aPUGMrsVYn+HlVHoxdS+KKHQQI7mV7scIrjwGb9VQxkX33BMpD9FL61fjO
+         95Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750676819; x=1751281619;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qcNSo/NdbNWsZQ4ryDcnLhxJdcv0QbL7uha9jQokN3k=;
+        b=GYOFlU3LeYgoUJEJf1wfc8yROoCJKXxIkLLwppbGzbSe18LR6rhbHTrFoybk+k2e9H
+         rOjBG+6tqFbHo70jdSAAjsNLIQmwBj6ft/NU9hcMyjZJYTjhFudp8t1YpgC8+K4imlPd
+         YltGQShvOekkuWRY4A4MR5FBuDh/ZzDk+zi+8dMUFqVUZhYpFz4vfFSofKI3VddoQmwJ
+         0ALB67cReI0gDC0QbsOm4y22UfxfIKFSdaup6dH5m9iV99Do4QralcuS0Ik39AyaziXF
+         wI+vKSRZ2AJnThMdiohxTXeSMrNct0MUC6u+ilI0pvMsra7dIut3KpKLXW1dpPDN0Tcf
+         rdJA==
+X-Gm-Message-State: AOJu0Yzu/Xsof2GrY5oVuQ2RgOWj4FM+nbNvr6eYOElb9MfY0Xga6Qiy
+	rPYgCemMmFUdxFey78AQj6I12eb/7JofK1mjkmjIe/CjUouC+iKmkOuV7ZFjgg==
+X-Gm-Gg: ASbGncvUPlzequouAtKdLKAJqDMtHMF5dyKkoT01xf1keDPhJ3wgu/DyY4N4QUNVt79
+	Uigltb+x4b8uM8d3+H2xH97BXeXfebMUAIi26cXsf94KCpQiZMHaqpJj20nSBtwaUj9DV7lcHXD
+	09vPB1MnWbLLNt1rZpceQjfCqKAgS7sRJGN5JFLDke+SOG3XsPy6ML5AiVywrfA1wi6yZCAW5tA
+	1HoTCGjhCKyv16wi2VyGOM11tvgpgabcvHJrnmRMyImTsLu2w8S48U5BDrbZeZG28MuzLaAs0o9
+	JxAqnIG2Tonex7vsuaLeEj95bmySkChYKsfPdfWVetQRe1ksHAAKWhIz6CiQocFinoc=
+X-Google-Smtp-Source: AGHT+IH8qDOBgCT/3pIwAbBSb+L5sqkrrz2mOpDWhMYdA9H/IfmcE0MFItckncN8KByVSPk+U01bVA==
+X-Received: by 2002:a05:6214:5bc1:b0:6fa:cc39:67 with SMTP id 6a1803df08f44-6fd0a534a4dmr209138246d6.22.1750676819506;
+        Mon, 23 Jun 2025 04:06:59 -0700 (PDT)
+Received: from [172.17.0.2] ([20.49.15.156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd095381dfsm43434106d6.56.2025.06.23.04.06.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 04:06:59 -0700 (PDT)
+Message-ID: <68593553.d40a0220.1b15e7.d960@mx.google.com>
+Date: Mon, 23 Jun 2025 04:06:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8698354328942636103=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ot_zhangchao.zhang@mediatek.com
+Subject: RE: Bluetooth: mediatek: add gpio pin to reset bt
+In-Reply-To: <20250623102359.2684-2-ot_zhangchao.zhang@mediatek.com>
+References: <20250623102359.2684-2-ot_zhangchao.zhang@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Makes the platform Bluetooth to be reset by hardware pin,
-it provides two methods to do it for mediatek controller,
-and it has been tested locally many times and can reset normally.
+--===============8698354328942636103==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When an exception occurs, resetting Bluetooth by hardware pin
-is more stable than resetting Bluetooth by software.
-If the corresponding pin is not found in dts,
-bluetooth can also be reset successfully.
+This is automated email and please do not reply to this email!
 
-Co-developed: Hao Qin <hao.qin@mediatek.com>
-Co-developed: Chris Lu <chris.lu@mediatek.com>
-Co-developed: Jiande Lu <jiande.lu@mediatek.com>
-Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=974767
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.22 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      25.10 seconds
+CheckAllWarning               PASS      27.13 seconds
+CheckSparse                   PASS      30.74 seconds
+BuildKernel32                 PASS      24.40 seconds
+TestRunnerSetup               PASS      477.26 seconds
+TestRunner_l2cap-tester       PASS      25.48 seconds
+TestRunner_iso-tester         PASS      73.24 seconds
+TestRunner_bnep-tester        PASS      5.93 seconds
+TestRunner_mgmt-tester        FAIL      135.13 seconds
+TestRunner_rfcomm-tester      PASS      9.34 seconds
+TestRunner_sco-tester         PASS      14.72 seconds
+TestRunner_ioctl-tester       PASS      10.00 seconds
+TestRunner_mesh-tester        PASS      7.43 seconds
+TestRunner_smp-tester         PASS      8.60 seconds
+TestRunner_userchan-tester    PASS      6.21 seconds
+IncrementalBuild              PENDING   0.83 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.205 seconds
+LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.171 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btmtk.c | 69 +++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btmtk.h |  5 +++
- 2 files changed, 74 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 4390fd571dbd..3e5f3ca6f0d5 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -6,6 +6,8 @@
- #include <linux/firmware.h>
- #include <linux/usb.h>
- #include <linux/iopoll.h>
-+#include <linux/of.h>
-+#include <linux/of_gpio.h>
- #include <linux/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -109,6 +111,65 @@ static void btmtk_coredump_notify(struct hci_dev *hdev, int state)
- 	}
- }
- 
-+static void btmtk_reset_by_gpio_work(struct work_struct *work)
-+{
-+	struct btmtk_reset_gpio *reset_gpio_data =
-+			container_of(work, struct btmtk_reset_gpio, reset_work.work);
-+
-+	gpio_direction_output(reset_gpio_data->gpio_number, 1);
-+	kfree(reset_gpio_data);
-+}
-+
-+static int btmtk_reset_by_gpio(struct hci_dev *hdev)
-+{
-+	struct btmtk_data *data = hci_get_priv(hdev);
-+	struct btmtk_reset_gpio *reset_gpio_data;
-+	struct device_node *node;
-+	int reset_gpio_number;
-+
-+	node = of_find_compatible_node(NULL, NULL, "mediatek,usb-bluetooth");
-+	if (node) {
-+		reset_gpio_number = of_get_named_gpio(node, "reset-gpios", 0);
-+		if (!gpio_is_valid(reset_gpio_number)) {
-+			bt_dev_warn(hdev, "invalid reset GPIO, use software reset");
-+			return -EINVAL;
-+		}
-+	} else {
-+		bt_dev_warn(hdev, "no reset GPIO, use software reset");
-+		return -ENODEV;
-+	}
-+
-+	/* Toggle the hard reset line. The Mediatek device is going to
-+	 * yank itself off the USB and then replug. The cleanup is handled
-+	 * correctly on the way out (standard USB disconnect), and the new
-+	 * device is detected cleanly and bound to the driver again like
-+	 * it should be.
-+	 */
-+
-+	if (test_and_set_bit(BTMTK_HW_RESET_ACTIVE, &data->flags)) {
-+		bt_dev_err(hdev, "last reset failed? Not resetting again");
-+		return 0;
-+	}
-+
-+	reset_gpio_data = kzalloc(sizeof(*reset_gpio_data), GFP_KERNEL);
-+	if (!reset_gpio_data)
-+		return -ENOMEM;
-+
-+	INIT_DELAYED_WORK(&reset_gpio_data->reset_work, btmtk_reset_by_gpio_work);
-+	reset_gpio_data->gpio_number = reset_gpio_number;
-+
-+	gpio_direction_output(reset_gpio_number, 0);
-+
-+	/* It requires 200ms for mtk bt chip to do reset,
-+	 * although Schedule_delayed_work is asynchronous,
-+	 * it is risk-free. If it is not completed in 200ms,
-+	 * it will only postpone the next probe, which will
-+	 * only make the probe run later. There is no other risk.
-+	 */
-+	schedule_delayed_work(&reset_gpio_data->reset_work, msecs_to_jiffies(200));
-+	return 0;
-+}
-+
- void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
- 			   u32 fw_flavor)
- {
-@@ -364,6 +425,14 @@ void btmtk_reset_sync(struct hci_dev *hdev)
- 	struct btmtk_data *reset_work = hci_get_priv(hdev);
- 	int err;
- 
-+	/* Toggle reset gpio if the platform provieds one,
-+	 * if the compatibility field or pin cannot be found
-+	 * in the dts files, it can still reset bluetooth using
-+	 * software reset.
-+	 */
-+	err = btmtk_reset_by_gpio(hdev);
-+	if (!err)
-+		return;
- 	hci_dev_lock(hdev);
- 
- 	err = hci_cmd_sync_queue(hdev, reset_work->reset_sync, NULL, NULL);
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 5df7c3296624..8a265ce367d1 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -179,6 +179,11 @@ struct btmtk_data {
- 	spinlock_t isorxlock;
- };
- 
-+struct btmtk_reset_gpio {
-+	struct delayed_work reset_work;
-+	int gpio_number;
-+};
-+
- typedef int (*wmt_cmd_sync_func_t)(struct hci_dev *,
- 				   struct btmtk_hci_wmt_params *);
- 
--- 
-2.46.0
 
+--===============8698354328942636103==--
