@@ -1,113 +1,115 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FBF2581;
-	Mon, 23 Jun 2025 13:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E659E545;
+	Mon, 23 Jun 2025 16:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750686638; cv=none; b=UOMqfh0L+Dp/8SQYeJuWWqjYR6RsXYGgRtlvaOClmoPG5yRgT9S/WJLNeVeFdxjd6sqhNJTDUnQkxsjoi5Ei4SVWEh3/Wsv1Gmk4Fve31PvkHR2NvDSfvC76zMsfATrHPAuk24WJfNTepeQhYYVEw0Wnc199Idm7A/nmnirW844=
+	t=1750697652; cv=none; b=hCaXaXzSO940xlMetiTnxFY+wULTeYlyI1qvwpUUWfYaOBpoN/VABoPANY1japLrBFsi4w/87YBCY+gYHaKj132sBpCi2UuP8RHPpel/OpdIhMRhRvwkJBTvbxjFgvNOMyvbZh4Z02lr7Ocgg+1eCg4HUY1/8+mFVtbNekLY+Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750686638; c=relaxed/simple;
-	bh=vFXOM76AVfvtWRF+BsGVPsvQ7eR0S6jfR2Idd/oFAMo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B+0lTeD95ROaxFh8jqSLJutdLaeQ1PYPdPnvekjoBfvAT3MxGNs+2cxFOfnD2AZsf7iXpyJdlonbtUPZV52GY9dGwFHlq/D7heAzrkcGkdl27LyLkjgfDLMQIHb0rLN25Xsf4/2zBl/eMqmj806JBJHmFxZQqqpTQBBMlgryNMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HsPZFyYg; arc=none smtp.client-ip=209.85.216.47
+	s=arc-20240116; t=1750697652; c=relaxed/simple;
+	bh=QGACgowodzUAd1+BGQGmWNi47nMFBl7Bp0w2S6Ud91U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AWY/4SYpL5OX4JxJCNRuUjCpTjD2JHw5KQ+aJQi2ZFvz1zaaWz16ULzE5bD5Zn5wGunjwOAB7ou4NwoZysM0pCw0vGCqsSUqfo58Q+HDYgANIkhUrgRpfc4YJn/21ZSmGELC568iFtrVMwXxa1mf/YObffBNzJlAThqOLoS1W9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cCoVtc5i; arc=none smtp.client-ip=209.85.217.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsPZFyYg"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-312116d75a6so3269298a91.3;
-        Mon, 23 Jun 2025 06:50:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCoVtc5i"
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-4e77d1333aeso1380639137.0;
+        Mon, 23 Jun 2025 09:54:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750686636; x=1751291436; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vsFS8jl30UL5UpuTdcmWwJlZ4p5tlapaAOwbw1RqzeM=;
-        b=HsPZFyYg8+RaUR2PAC4dP4yB7FaSbNSpYo4FaElsIHkIIpS4+pNLSiX1r7FbpXpoe9
-         zY2+teSKNNuhAAX8Ji66ZZ3An+Rn8Kt57ejgJMuhFC/HvX1SkZa4yjM5fnh2tPqrickZ
-         8cBCih54Cq0+UVkrTpkxfa4uK9ACOF7dqOZGCYS8I/ucXUZb+IL5gLFcT6SUspRTrMhH
-         3ljtZ1/SnUJN8k81xo4XSkLb0g3kFEKuqXJxASYXImFi8CSmm1WDFvnRqDX9oyWA2d5K
-         gVXV0cwX4IuWxF4Uzli1C9WKiSFGQtyLIMhiH/++v3ZDCHxU1ER+wAuMnN0lReO/h7Zi
-         tdCQ==
+        d=gmail.com; s=20230601; t=1750697649; x=1751302449; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xOtn28Jy3+kDMzQ8F/wSLD70bYPw/ni/DG4b9MAEBNA=;
+        b=cCoVtc5inhihYaYjf9tX66Tn/p9zIWI18Rr+acoCa96L0rTmGoYzVMsnaE3rxrE7rb
+         iB3PRxLZ5nzPbwPrGgIzbWLqqnKbQvn3HVZLyPin6vyAIYoxBAu3NEFwB8KINrDcx3xi
+         DLQ+iykCCPtElJIm6qKzgMG/l7TUIlDjK+r0LGcxlyafh5SAB1XSaxQHC2CpQABf3xGd
+         ewge5SisIEHZAz7ZX+EDqNrysLbwQXzbhVX7SkO1LvYEZH6Up/SQ9M/EjL+eqQqJrJg+
+         3fu0MJJI1DMWt1KkB56GUlJybaSjFECzbK9uNMwPCu++HGc31xHL8LQfieofMl7wgXoa
+         3eTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750686636; x=1751291436;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vsFS8jl30UL5UpuTdcmWwJlZ4p5tlapaAOwbw1RqzeM=;
-        b=rXo0XnYQNBP7eyuKYap4cSgnQA7eNWg6tnkJKwpdutZNeGch/A5azuh6wnMYa7IoyE
-         eutfCiynP9EAWSNPEo0X0EQgCJI8ZyY4AZ7cWgqw4EjySY0ucyzGkO8HvTXXag0+jkqM
-         Eoi8xFiMD8+TBiwWhfAcAh7tm3GGrHpZMeqFBhmI+l8RYeLFNHTv4fFi6lsp3vzUeVto
-         PGgt8nTP9sroPkrUClriCx7fj/7MTt/I4vLOZuBzZopjr5IfSZuDm/uK6Ofo7cv+JjQK
-         owmsuhk8JyPvSPxWHejniC9AzyCoD7CfXtBN/8NslhHWtO3MZRw27kfsAcwpegcSV6/u
-         sUlw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZtbzRge4+gFPH3Tw5zISJQwPK67BuMHVFXkb5HPekAJbAQMokV8kndn86mMB3yIXSygfIqd1n@vger.kernel.org, AJvYcCUyrYj6+Jp8G5MPFayGAB8gcpTednRcfpqCBIUP4sEMil7UPEu/ziArGh/jObjYUkm7sudptsr6rw0sFB+7RD4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqrKNhhFrvBwXP7Cks8sr/Gh8PWO6I5XPbkWXAZ9GU6qvh4YdF
-	l0pjxeMcB2gWnicFrz2/PsTjLjNehJ8Xq15XCKIC1SheNeRsBV4SofaFWIqcwvmT7fyD8uTk/H0
-	oxX1JLebDp7tmIh08Efh9JgT5ZVYBbF5JhQvENZg=
-X-Gm-Gg: ASbGncspwOA8f7wM5NWQ/X3yHUScdXxlpnvmDnkPg+xHebpjAQmZ+Wl+XSuCOgmCqY/
-	A0M7mWsDWHz+bywh9U0hldnX5HlbbKmLJmshZ58ZEQ+adHkdF1j3s8+3vER9MK0OHj0yDd6lceD
-	IOW3t8lZDIBGiaB8lSFHwIcmmK4OIioYvHSbquPQqXUQ==
-X-Google-Smtp-Source: AGHT+IE8qfVdKu2S7YMcclZns75iU4id5U88uL7T5mf3qJK15gP6xTEFEPSYsKxrnnaD+3dVopa7Lcd70P6OCCrI0h4=
-X-Received: by 2002:a17:90b:3c47:b0:311:b3e7:fb38 with SMTP id
- 98e67ed59e1d1-3159d8c80e3mr16930460a91.19.1750686635521; Mon, 23 Jun 2025
- 06:50:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750697649; x=1751302449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xOtn28Jy3+kDMzQ8F/wSLD70bYPw/ni/DG4b9MAEBNA=;
+        b=J8Tav8J5ynEP8hFCpmm80VKJhsykQCVu1ETed6yR0Zsn8bYxXSM/CpuPeXn4frUc6E
+         NTyCKzfff8Eqdbgqh1mbjFksFIycm3ouvRK0DbncXQ1PDbydHa6x/JMh4Tr/Cg+KKwmq
+         M/rlARDnLZmyv6IibLRcgjDSKKpoF+Pu2cfLK5OdEESmVmqnc4acVDSQCfTNGD4hr63p
+         NlIH5P9NgqztotmHxd1kqD8Dps3W8UHlTjb/P1L7EHm+mVKiPkB0ihdyArzHcid3Te4M
+         AOjoT3JvYVqJHXHhTUBVtKDxrYjC0IQN8QtC8PkXVeLbJkFrPYicV1lJttGSNhBoHP9+
+         CbIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMnhrTugCYPEd4gR0nOZsu5c+jLrRuY2OWJCvnmQqeRe7zKrnyKJtsER/TY9ZOkZwVaplaSHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yylt2G/vIst8PgoS+aEPuSPORknij38jDkaaYlQXXyvALJ9/jeu
+	L+5D3zr4EEB0rNibuECMBiQ3KlOFkV3SQrj/m0zumZdxe8w7hiwi6J8Mb0jVRBbY224=
+X-Gm-Gg: ASbGnctvZ9vwjNnm5LnNh9tJHcUQC3x/hOFVBeFUStsHVmwt7WGnwyhR/0vYJPwOJcy
+	H3D7WrsbNJPtcF7J8sc8IEaKML5+Cjd3jSarguUbZ9jN5cAgsRL85aGjNodoafzncEs9Ds8PGPc
+	KiqQ6E/DmGXbL36nbbZa86svReVPfKwTMaULUsdH8JyZNpSOZEzaUiRV+qcCZaCh0GcinSraYN8
+	5RWBzFYBECzHelIHRDxNwNwydwr0OJa3qG1kEAVFEJkiDw4AUlYNFO/UxHLWUtDpfRXzdQrjAEy
+	w1zfsG5udNMevBl1ANL2bCpHDF7NjJo6vvva8JPgCDK3GiWfCtoDraYSSSvyKoGvI+ONATA7gvm
+	XTmAaSZmgKwczEsp8/9WWU3cO4f2hdXXczk/eH48u4A==
+X-Google-Smtp-Source: AGHT+IHR7s//ffOovYj3ZWD+jmwbd1jKI88SBMxURaUmgQUSoblsNn1ENFs4q6OQq6aRBmZpUHmtow==
+X-Received: by 2002:a05:6102:4b12:b0:4e6:da5d:2c42 with SMTP id ada2fe7eead31-4e9c2f31c43mr8583772137.19.1750697649237;
+        Mon, 23 Jun 2025 09:54:09 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8811ae4f1a1sm1251679241.25.2025.06.23.09.54.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 09:54:08 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-06-23
+Date: Mon, 23 Jun 2025 12:54:04 -0400
+Message-ID: <20250623165405.227619-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250620175748.185061-1-luiz.dentz@gmail.com> <20250621075110.686bbf0f@kernel.org>
-In-Reply-To: <20250621075110.686bbf0f@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 23 Jun 2025 09:50:20 -0400
-X-Gm-Features: AX0GCFtgGGTPX-FaiJaST-6T1HD2F3Clilq1AZIhUvr5fuDoBa3u_NOH7hZXs7Y
-Message-ID: <CABBYNZLQWH5jxKeLAsVyNqBnWNwcGU+Y1hk3XZkBv5chhZ3wxw@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth 2025-06-20
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+The following changes since commit e0fca6f2cebff539e9317a15a37dcf432e3b851a:
 
-On Sat, Jun 21, 2025 at 10:51=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Fri, 20 Jun 2025 13:57:47 -0400 Luiz Augusto von Dentz wrote:
-> > bluetooth pull request for net:
-> >
-> >  - L2CAP: Fix L2CAP MTU negotiation
-> >  - hci_core: Fix use-after-free in vhci_flush()
-> >  - btintel_pcie: Fix potential race condition in firmware download
-> >  - hci_qca: fix unable to load the BT driver
->
-> commit 135c1294c585cf8
->
->         alloc_size =3D sizeof(*hdev);
->         if (sizeof_priv) {
->                 /* Fixme: May need ALIGN-ment? */
->                 alloc_size +=3D sizeof_priv;
->         }
->
->         hdev =3D kzalloc(alloc_size, GFP_KERNEL);
->         if (!hdev)
->                 return NULL;
->
-> +       if (init_srcu_struct(&hdev->srcu))
-> +               return NULL;
-> +
->         hdev->pkt_type  =3D (HCI_DM1 | HCI_DH1 | HCI_HV1);
->
-> Isn't this leaking hdev?
+  net: mana: Record doorbell physical address in PF mode (2025-06-19 15:55:22 -0700)
 
-Yeah looks like we shall free the hdev before returning NULL, will fix
-that and resend.
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-06-23
 
+for you to fetch changes up to 1d6123102e9fbedc8d25bf4731da6d513173e49e:
 
---=20
-Luiz Augusto von Dentz
+  Bluetooth: hci_core: Fix use-after-free in vhci_flush() (2025-06-23 10:59:29 -0400)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - L2CAP: Fix L2CAP MTU negotiation
+ - hci_core: Fix use-after-free in vhci_flush()
+ - btintel_pcie: Fix potential race condition in firmware download
+ - hci_qca: fix unable to load the BT driver
+
+----------------------------------------------------------------
+Frédéric Danis (1):
+      Bluetooth: L2CAP: Fix L2CAP MTU negotiation
+
+Kiran K (1):
+      Bluetooth: btintel_pcie: Fix potential race condition in firmware download
+
+Kuniyuki Iwashima (1):
+      Bluetooth: hci_core: Fix use-after-free in vhci_flush()
+
+Shuai Zhang (1):
+      driver: bluetooth: hci_qca:fix unable to load the BT driver
+
+ drivers/bluetooth/btintel_pcie.c | 33 +++++++++++++++++++++++++++++++--
+ drivers/bluetooth/hci_qca.c      | 13 ++++++++++---
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         | 34 ++++++++++++++++++++++++++++++----
+ net/bluetooth/l2cap_core.c       |  9 ++++++++-
+ 5 files changed, 81 insertions(+), 10 deletions(-)
