@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB6B2D5C8D;
-	Mon, 23 Jun 2025 19:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFD72D5414;
+	Mon, 23 Jun 2025 19:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750705789; cv=none; b=iDBEzRw7AeIMgIQMD5U6xEcw1Nu7KR+ekiVe4L9JJMfLcXnQKwfXXZ4MjCbjmcaUGxQ0yXKQcBWQimdZsrghqh8VhuIH4jUeXGnGmAlG7r/JM3Uwvq2d/5GWCPLzFU+C/wEbQ4D62EeRPkTizTT8a76nHvWe4mYmsYA4kUvPggg=
+	t=1750705791; cv=none; b=Wv3eNjLaJem0fVUj1FzCUQ7xL7fl20SLcKL3vPUsXcqgDfD5W7saQ2eLxJkYgvO0ofMPo7jRq9REMlxeUfXcZyaWDIBRVi/Mwh2puRlUJYBYv4MWhTmDF6vFmjonodZUjuWgkf+MJkhnFR+0U7zeLZL+JZaTxAgQq71UrlNQs1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750705789; c=relaxed/simple;
-	bh=WEqi+uKBMx8lRLCnGSSxXTcZMZKVB27R29HoEuM/T6A=;
+	s=arc-20240116; t=1750705791; c=relaxed/simple;
+	bh=Z4ryaqpooRwv3rGF67NmFW1oy2GEoQ/vH4BOtQ7bvcs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b2s0DFiaFrHCwXv3iPjL3+THkb+yqX3Q2h3aLQQZIa8Hz/bZbuVaG1xCAKSzQv01ezkWROFar8EnAch4dogUH1Aizp5CLL0vTd/bXTivIH8lFP7knFlR8gU17uEKv43vVlRDzyG8vltJLuVoqts4OvdMSVd64WxyXIRdvgGQ/Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uoo5q/kL; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=uJOxB+eth+OgofmJF27hf7jFNdNzCi7JMpT91d7v5UJshgzO6dVnOHN5PruDyaNn2B6zEFDIrp7iZXcb5qEKEVeGfHIybujZgXtNLEqI3zNP+qrwXxxWmL1VtJwEUv8dNGSWCHNL2ZXeejy06kbxtYqraOwoz+6WaEj4kxNbDeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q2BbiC8w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uoo5q/kL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2499EC4CEEA;
-	Mon, 23 Jun 2025 19:09:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q2BbiC8w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC76C4CEEA;
+	Mon, 23 Jun 2025 19:09:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750705789;
-	bh=WEqi+uKBMx8lRLCnGSSxXTcZMZKVB27R29HoEuM/T6A=;
+	s=k20201202; t=1750705790;
+	bh=Z4ryaqpooRwv3rGF67NmFW1oy2GEoQ/vH4BOtQ7bvcs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uoo5q/kLJ0qgQi9ZaMe6zIEiqop6fxK+A33UlqJwXzP8+bJ9tlhRu0XINmD9aMZs/
-	 T8oOHBIv36t9jkWy/BtQSbE7SkBHh68pkr66vuEzVMgU9jOmShv2UgT3dDqSruIY0m
-	 R5mAkm+T2d4n5wdoAH74AU+tvE2nE/4BCWN99rIlsXYPjAr5Mvm1G+PBw5nyMXHPRN
-	 qLnf1d03gu/NnnAMTF0j7cjjnrNo38mmdXAdO9/xUS4q0lCe/vVK8X0li/TiOI1pVW
-	 9dwvp5kuWfoHg0G9/Dr8bKA06jju2TbvZ1pby+t3AdwsCxZalAjvmu7WiNVDFORqZm
-	 3lYQJ2H0lfx1w==
+	b=Q2BbiC8w+SlXnWE84V8jEYo3qtON838QBOl778RjOaZHhYiw7WD2o5UKR0glJVbPR
+	 WQngxhC52wRkHXhrgaVMqEryR92GXU2+rbnBV+Vy5fp3/HlbNd8LMfL4SbSZn0ERHT
+	 q6idH/QDzegWSRq+giNMWIRk39I+iHQEvoiOymlzYgQLQXFmGRssCckri2qr/ZaxFy
+	 T2BsPVNdxgWh13F/uf82huPdUJQMQ+M9XQt3MbrjekzV4P3lSfn+v8alBflA0ZOPKC
+	 tjpX2E2o770YEWWYnHwzlnQ4bIhyVCRbzFuHMbcF+fsqd62kBthm68KmZvYPcsNiKQ
+	 aB69aISQ1ucFw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E3138111DD;
-	Mon, 23 Jun 2025 19:10:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C4E38111DD;
+	Mon, 23 Jun 2025 19:10:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,45 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/4] Bluetooth: Trivial cleanup
+Subject: Re: [PATCH net-next] Bluetooth: Remove hci_conn_hash_lookup_state()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <175070581624.3268784.7052271797439895514.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Jun 2025 19:10:16 +0000
-References: <20250623-bt_cleanup-v1-0-5d3d171e3822@oss.qualcomm.com>
-In-Reply-To: <20250623-bt_cleanup-v1-0-5d3d171e3822@oss.qualcomm.com>
-To: Zijun Hu <zijun_hu@icloud.com>
+ <175070581776.3268784.5701408359871931670.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Jun 2025 19:10:17 +0000
+References: <20250620070345.2166957-1-yuehaibing@huawei.com>
+In-Reply-To: <20250620070345.2166957-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- zijun.hu@oss.qualcomm.com
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 23 Jun 2025 20:31:15 +0800 you wrote:
-> This patch series is to do trivial cleanup for bluetooth core driver.
+On Fri, 20 Jun 2025 15:03:45 +0800 you wrote:
+> Since commit 4aa42119d971 ("Bluetooth: Remove pending ACL connection
+> attempts") this function is unused.
 > 
-> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 > ---
-> Zijun Hu (4):
->       Bluetooth: hci_sock: Reset cookie to zero in hci_sock_free_cookie()
->       Bluetooth: hci_sync: Use bt_dev_err() to log error message in hci_update_event_filter_sync()
->       Bluetooth: hci_core: Eliminate an unnecessary goto label in hci_find_irk_by_addr()
->       Bluetooth: hci_event: Correct comment about HCI_EV_EXTENDED_INQUIRY_RESULT
-> 
-> [...]
+>  include/net/bluetooth/hci_core.h | 20 --------------------
+>  1 file changed, 20 deletions(-)
 
 Here is the summary with links:
-  - [1/4] Bluetooth: hci_sock: Reset cookie to zero in hci_sock_free_cookie()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/6d7d36f62bfd
-  - [2/4] Bluetooth: hci_sync: Use bt_dev_err() to log error message in hci_update_event_filter_sync()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/482e06a993a7
-  - [3/4] Bluetooth: hci_core: Eliminate an unnecessary goto label in hci_find_irk_by_addr()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/88855693e5a0
-  - [4/4] Bluetooth: hci_event: Correct comment about HCI_EV_EXTENDED_INQUIRY_RESULT
-    https://git.kernel.org/bluetooth/bluetooth-next/c/b02c1d6f2df3
+  - [net-next] Bluetooth: Remove hci_conn_hash_lookup_state()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/542f4736837d
 
 You are awesome, thank you!
 -- 
