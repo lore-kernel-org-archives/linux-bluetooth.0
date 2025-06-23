@@ -1,231 +1,144 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23B8BE5E
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Jun 2025 21:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62181EFF9B;
+	Mon, 23 Jun 2025 07:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750629371; cv=none; b=KO+m4bd7f5cWSoT2JvzY2nLW704RZCB0+e67GZhRoQD4oAa3qCxxGXSm7Md60tEKVhi0B7Y5niRU6RCFJFuB+BOtenanQZZ5hMS55ZiAo9WKb6EvVTpeiQYvTZfvQEKZ3rsPkyYyTalV+oiMVrS5tgUjP61JswcwoAZJjpHsanw=
+	t=1750663840; cv=none; b=dWbgnNTOG0d5LhtLbpDOWZFvLhsR3h7oKIM3SBytqtreJODz0PI6T3VXQSBcmUf3adeW+kQ5FnZB6xhkHHOzE3INleTVh259oQ4HK5VlewiMUDMjPkUu7fQ0FeTTuQjDSTRl26e/rmtgvX46689c91+JpVz+44DtqKyeGGYeLyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750629371; c=relaxed/simple;
-	bh=JZUY8eFtSQOrPQOVZXGRY06IWyvcpeyMJONEUYVve6M=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=hP4iWIeksRaNkn0JQ8p5B+QrPN6J2j9VB8fNG+NO4zHUORWywnEFb/G4p+vSYqCBYbXfqA0XgcKFx3Jeo5tC2xIdBW+JDpnB7HE67MaPFTkFJjSklr0qpfapRASjb0/E+TOf1yRyQ6LLzS1AGytkAVA85v1sQE4RHbNIDiJHrTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VAs9aJDp; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750663840; c=relaxed/simple;
+	bh=0fxnIO1ueEKttEOSc6w2pdQ+CTBTO4fMXTnxx3V+1KM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gqH47DzTdOp3KT8O9gYjI8g6CyoJ6Mgp9Z2VV20r6fUTKKL1NMUxf0W0+FTBqxQxBQkrc1AtANukbRCVw0ndjSI1zoxffnZ4JQPjefBX+OC0KpBAle1Rq/2PyT8oTyWCt+9FaHGrkdOodgY8mQO9Z1rHYY/rzqAkhjb+kWhIudk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sN49WEI9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAs9aJDp"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ad883afdf0cso723714466b.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Jun 2025 14:56:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750629368; x=1751234168; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yA+r4oMmmnoEoUyMTC62lg9WA360iTwbvDGiRH9IsQE=;
-        b=VAs9aJDpfj9sFyq3sgCD4pTJAForP5ZUhVSaouq1joMvN+jlqEt3n6uvwtBAi+hRZE
-         +PaHYZZjiVyLDx/sk5tdn3J7gpS8PNddMdSaFGNdoSpVh4A5eZM3RCRuJZl7Xf06eeTj
-         3FpSAHw3hJtsotcZnZvZRJ8FDN3OXb/9i4CdzoUEm+o5yXfs2QLdpQ04AGh1hJWK2q47
-         x3ephQEyNpGcNJEgrt7HHrjylyrIKhMXndpO4cKd5RIp9RnFBCPpPiIDuElGeR+mgLiV
-         3SEg7Mt+B82b/kkS7cDsXqLJFz6LU091tt3osb2g5jqBvqxxZugCpcBs1kbl/cAm4hOA
-         SFyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750629368; x=1751234168;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yA+r4oMmmnoEoUyMTC62lg9WA360iTwbvDGiRH9IsQE=;
-        b=lQK8ggSghoIY7y6YqoyaRWyHAFsGT/yXBdWsqCOPz1vODAZY/DHC8c1XuyYMjnTzhr
-         HjLtP6acOx4B+5vAjhsahaDca5yHAACWaLgQfbC2j2Hzl0OGgoVgUYcRMlkVpXkOLfKP
-         e+nI0qe1LWU/mYMBHpoghedHwHDf1FjdONJ6XWOfZxzxCc/wpYLnO2LbvkGo3d9Qoy7A
-         Z64ShT9Vj/Wx8aeFzr0MhHWGidMAqXblSViQyEjd4853oLwPKe6XBuicPcoWDA/kOFFd
-         LIxqrJ+d/VgF5yv1auxolpR+RllKMMvqhTM1U5toTVZ6Ok7e/xW24gAobYgeyQhHjd0r
-         dRug==
-X-Gm-Message-State: AOJu0Yyq9dI92vnqs8hDVnBtZei+4PaeLAIiIdBX5fTUVWhbne9aCqgK
-	u0yoUMjGsBEWQXYSWEYO4iBqB+EhWYi3r3LztOlGsB4HWsixoZBskYtKmijutm4jubtZGD3JPVU
-	iUL9jOgmdEgKBxVqGGWKer4N8Z50yY0fK+4UF/zE=
-X-Gm-Gg: ASbGncvaqbALr3dr05/fVhUCkbGEvsuBLDk8ZPcKYgbynXqgqN3KClhKRphtK7VRw8J
-	OdbCWNWh5BX2hw6Gnslbu9mf9OllMJeLGxN4Kj3kUupBGdE+U6O5I/xNMIStwsPOzf9wivcZMUQ
-	3ruOLNJcZQmwQtMACPy21+LMRAoDoSUao+0BfFioBQl4CYwz4KF+UWTw==
-X-Google-Smtp-Source: AGHT+IHWXMrE0o/3Czf9tyVga1wCVZN8/TpBxGZyMI1puembu6a5+sHOfdBhloPaLD9M5GRYHGDpHmeUs5NlAISZMwc=
-X-Received: by 2002:a17:907:e2d3:b0:ad8:8689:2cc9 with SMTP id
- a640c23a62f3a-ae057c2510cmr919658566b.56.1750629368154; Sun, 22 Jun 2025
- 14:56:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sN49WEI9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36DC9C4CEED;
+	Mon, 23 Jun 2025 07:30:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750663839;
+	bh=0fxnIO1ueEKttEOSc6w2pdQ+CTBTO4fMXTnxx3V+1KM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sN49WEI9IaAgjMXN9MskZ0qZQWHhvBbTjvPi/yn2Eyd4MImu7PE4n4MX4+hl73U6l
+	 1wXrT0qZOKsLC4XeREcWtsOqQ2mt1gis8otMgG7yMZsudHcgy7Sq74od50firDixoJ
+	 XySW/0y4xrTFxr5/C0wWr9vr33Ch47wMmQuPrYObqZtvjA6i/gacRr3sqaQEewYsXQ
+	 v61cfixtg/mQncS93UrzP+G4whzm9CA5xsPNDrQNHwr54sd75ggVWWCBBcvNu37P9K
+	 sl7PpcYXSkXEq17uNVQvc0DmJ8LxRALeFTErtZHsTSylKnEVS8iLlgH2w02+ZPMYE9
+	 lEo1n+29z70jw==
+Message-ID: <e0a07ca3-447a-4e3d-be0b-49892c945179@kernel.org>
+Date: Mon, 23 Jun 2025 09:30:34 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ivan Kalvachev <ikalvachev@gmail.com>
-Date: Mon, 23 Jun 2025 00:55:28 +0300
-X-Gm-Features: AX0GCFtjQjfIja7zfJsT_GCQnC_le6lJavmB0bxWVdf4S63s3S5lYTwBbVvXQgQ
-Message-ID: <CABA=pqdhsBeabrxHvfXx-uWzSq_-hs9OR16NSs1xuc6aB0s_kQ@mail.gmail.com>
-Subject: Bluez-5.83 is crashing during suspend/resume.
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/33] tty: introduce and use tty_port_tty_vhangup()
+ helper
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-serial <linux-serial@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, Karsten Keil <isdn@linux-pingi.de>,
+ David Lin <dtwlin@gmail.com>, Johan Hovold <johan@kernel.org>,
+ Alex Elder <elder@kernel.org>, Oliver Neukum <oneukum@suse.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Netdev <netdev@vger.kernel.org>, greybus-dev@lists.linaro.org,
+ linux-staging@lists.linux.dev, linux-usb@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
+References: <20250611100319.186924-1-jirislaby@kernel.org>
+ <20250611100319.186924-2-jirislaby@kernel.org>
+ <b23d566c-09dc-7374-cc87-0ad4660e8b2e@linux.intel.com>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <b23d566c-09dc-7374-cc87-0ad4660e8b2e@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The problem started when my distro (Slackware64-current) upgraded to bluez-5.83.
-The current git still has the problem (01f3ef3cd9d69b56554f5ef6d7ac2a5c40e41393)
+On 11. 06. 25, 13:13, Ilpo Järvinen wrote:
+> On Wed, 11 Jun 2025, Jiri Slaby (SUSE) wrote:
+> 
+>> This code (tty_get -> vhangup -> tty_put) is repeated on few places.
+>> Introduce a helper similar to tty_port_tty_hangup() (asynchronous) to
+>> handle even vhangup (synchronous).
+>>
+>> And use it on those places.
+>>
+>> In fact, reuse the tty_port_tty_hangup()'s code and call tty_vhangup()
+>> depending on a new bool parameter.
+>>
+>> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+>> Cc: Karsten Keil <isdn@linux-pingi.de>
+>> Cc: David Lin <dtwlin@gmail.com>
+>> Cc: Johan Hovold <johan@kernel.org>
+>> Cc: Alex Elder <elder@kernel.org>
+>> Cc: Oliver Neukum <oneukum@suse.com>
+>> Cc: Marcel Holtmann <marcel@holtmann.org>
+>> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+>> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> 
+> Nice cleanup. I'm not sure if it's important enough to be mentioned in
+> Documentation/driver-api/tty/tty_port.rst .
 
-Steps to reproduce the crash:
+At minimum I broke tty_port_tty_hangup()'s kernel-doc:
+/**
+  * tty_port_tty_hangup - helper to hang up a tty
+  * @port: tty port
+  * @check_clocal: hang only ttys with %CLOCAL unset?
+  */
+  void __tty_port_tty_hangup(struct tty_port *port, bool check_clocal, 
+bool async)
 
-- Start bluetoothd;
-- Start pipewire;
-- Connect headphones;
-- Play something (!mandatory!),
-- Suspend (pm_test="freeze" is enough).
-- When you resume bluetoothd has crashed.
 
-Running `git bisect` landed me on this commit:
----
-commit cdcdfb4843b485e08f6a1460b5a03a3420453a51
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Fri May 16 17:49:20 2025 -0400
+doc says tty_port_tty_hangup(), code says __tty_port_tty_hangup(). Fix 
+coming, incl. vhangup addition.
 
-    a2dp: Fix not destroying streams when unregistering
-
-    When a2dp_unregister_sep it must destroy the stream queue before freeing
-    the a2dp_sep otherwise it will cause memory leaks.
-
----
-Reverting this commit seems to fix the issue, even for the current git.
-
-I tried to get backtrace from a core-dump, but it was useless, so I
-tried valgrind instead.
-The following is result from `valgrind --tool=memcheck
---redzone-size=256 --freelist-vol=1000000000 --free-fill=0xcc
---undef-value-errors=no --leak-check=no
---log-file=bluetooth.%p.valgrind.log  ./src/bluetoothd`
-
----
-==13728== Invalid read of size 8
-==13728==    at 0x4253DA: release_stream (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x493D36E: g_slist_foreach (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x4233A2: connection_lost (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4260FC: session_cb (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4918FA2: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x491B076: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x491BA6E: g_main_loop_run (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x4DFFF4: mainloop_run (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4E03EE: mainloop_run_with_signal (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x40A6C1: main (in /mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==  Address 0x53ca558 is 24 bytes inside a block of size 40 free'd
-==13728==    at 0x484C78B: free (vg_replace_malloc.c:989)
-==13728==    by 0x424B77: avdtp_unregister_sep (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x41C393: a2dp_unregister_sep (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4AD7F8: proxy_free (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x49163EE: g_list_foreach (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x491641F: g_list_free_full (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x4ACFE6: service_disconnect (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4A8FDB: service_filter (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4A9272: message_filter (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4A350E8: dbus_connection_dispatch (in
-/usr/lib64/libdbus-1.so.3.38.3)
-==13728==    by 0x4A83A7: message_dispatch (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4918FA2: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==  Block was alloc'd at
-==13728==    at 0x4850A5F: calloc (vg_replace_malloc.c:1675)
-==13728==    by 0x4921F65: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x424A26: avdtp_register_sep (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x420A3F: a2dp_add_sep (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x40E22F: endpoint_init_a2dp_source (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4112F4: media_endpoint_create (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4128C9: proxy_added_cb (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4ADB1F: parse_interfaces.part.0 (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4AEE4A: get_managed_objects_reply (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4A35225: dbus_connection_dispatch (in
-/usr/lib64/libdbus-1.so.3.38.3)
-==13728==    by 0x4A83A7: message_dispatch (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4918FA2: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==
-==13728== Invalid read of size 8
-==13728==    at 0x4253E3: release_stream (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x493D36E: g_slist_foreach (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x4233A2: connection_lost (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4260FC: session_cb (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4918FA2: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x491B076: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x491BA6E: g_main_loop_run (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x4DFFF4: mainloop_run (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4E03EE: mainloop_run_with_signal (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x40A6C1: main (in /mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==  Address 0xccccccccccccccfc is not stack'd, malloc'd or
-(recently) free'd
-==13728==
-==13728==
-==13728== Process terminating with default action of signal 11
-(SIGSEGV): dumping core
-==13728==  General Protection Fault
-==13728==    at 0x4253E3: release_stream (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x493D36E: g_slist_foreach (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x4233A2: connection_lost (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4260FC: session_cb (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4918FA2: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x491B076: ??? (in /usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x491BA6E: g_main_loop_run (in
-/usr/lib64/libglib-2.0.so.0.8400.3)
-==13728==    by 0x4DFFF4: mainloop_run (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x4E03EE: mainloop_run_with_signal (in
-/mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==    by 0x40A6C1: main (in /mnt/btr3/tmp/build/bluez/src/bluetoothd)
-==13728==
-==13728== HEAP SUMMARY:
-==13728==     in use at exit: 130,034 bytes in 2,358 blocks
-==13728==   total heap usage: 17,390 allocs, 15,032 frees, 1,298,930
-bytes allocated
-==13728==
----
-
-I used the same options as my distro to build bluez:
-CFLAGS="-Og -ggdb -march=x86-64 -mtune=generic -fPIC"
-./configure \
-  --prefix=/usr \
-  --libdir=/usr/lib64 \
-  --sysconfdir=/etc \
-  --mandir=/usr/man \
-  --localstatedir=/var \
-  --docdir=/usr/doc/bluez-5.83 \
-  --enable-library \
-  --disable-systemd \
-  --enable-deprecated \
-  --build=x86_64-slackware-linux
-
-I hope this helps you diagnose and properly fix the issue.
-
-Best Regards
-   Ivan Kalvachev
+thanks,
+-- 
+js
+suse labs
