@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DB8231A23;
-	Mon, 23 Jun 2025 11:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDFF188CC9;
+	Mon, 23 Jun 2025 11:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750679734; cv=none; b=ryXc4GObt+YPwWOFGFNxtcf68s27d240WG2YOeXJquw8Tp2niRDltASQoHhaUVtIYi4WEFP9izAgRMZfxB/n/4e9gCSbEVnq8wAQe0np/3NCc0zHc33FO+kE5pQ7YfJzWXEm8qAYWq+YBR2xvT8Pfb1lIehKJdrqsPbxZDBMHnI=
+	t=1750679756; cv=none; b=Zi9R8cLGZ5/DbceQ0/M9XUWr6G5zlNvQfjmwnZCzaorZOrI4VcoEXuHoIlQ1V1xibk0YNC/Qk/s5LFUkJY9bhrRl65IQJWjHwC71v1z/FX6Fd8nEVaXq9SypInlp90a3//qm94vHg8KDhIajR6x/Atnq/inTPzqgeI40I8fDloM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750679734; c=relaxed/simple;
-	bh=vkiXm82MD3vKyDWzyUX21uuqwb8oXur+DMopq21TfJ8=;
+	s=arc-20240116; t=1750679756; c=relaxed/simple;
+	bh=gmwcmHOxZpFVUxz9LtBvGtOcwxrdV7w393tCqoXHplU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LMUYsFGxjWn1yiIRMqA5FF7F2AnPUViQZZsSRoFQJ2sIZg4RIBCPpsgh9fjyhmEtyEZN9Z0cGku8GtJUArVdJqvsKMWRReaLsTiGTfn/XJCGZFOySaibGxFVez2QYRxwP76v7EQBD16rsW1+mEwxge+6FU3LcfzdB6Zy6fRD/Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EV9fxhGR; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=gzFlHm24c75qzQgX1QYxz/6icE4J7v5qhn6NOUm6sUltvCcwTMEi+W9ixLWTKo/eoZXM6huHptoN8/MGWX1e/UoJ+Z7HOrUzrFxrKGOVsPnGGwj90s+DpJVoErLGXtVnWIqMrspdbTPwOvYOV0imG5H154+B2aHEunYlzwt66zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZKOBUzWQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EV9fxhGR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8B6BC4CEEA;
-	Mon, 23 Jun 2025 11:55:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZKOBUzWQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB6FC4CEEA;
+	Mon, 23 Jun 2025 11:55:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750679733;
-	bh=vkiXm82MD3vKyDWzyUX21uuqwb8oXur+DMopq21TfJ8=;
+	s=k20201202; t=1750679756;
+	bh=gmwcmHOxZpFVUxz9LtBvGtOcwxrdV7w393tCqoXHplU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EV9fxhGR7CCytT5jL/k9D8KHRJn/1yFnqnZfw1GHuFkmLx2gywmWc2e9Vx4GM7Tnh
-	 8QSbZkB2W3E8LngcigmyP6YgwMYCMpFYZLPHgHqAybGNlRWrjsdmPfwKBgcQ0wgPPO
-	 yDpDJvJ2gv1UmX1aFb4bQgd0t5SddRNiWHMSBX49juQ5goPgl2I4jlz+Es4vEJK1ue
-	 EYbGJeziN60baSEH+3tvVvRW/78pxzdXYs1j8SoccZMt/PTCmF94cmTccowx0Hlv32
-	 s6342HbbObbPg7F64UHT90g5y1FJ/Z/0z8b+f36f2N3RDvuEp6en9w9oWEASGizUri
-	 06K7cnXr83AQw==
-Message-ID: <21dfd397-abd1-42b8-ae89-576a5eadc320@kernel.org>
-Date: Mon, 23 Jun 2025 13:55:28 +0200
+	b=ZKOBUzWQvsmuFOViczK8Vb7yegdYpFcwTgu2XiZvziUfKt+qXWHqa+i+b5EpU0qiG
+	 evvxeymdz3L7XgLQ6S1mIMM5qVGExLsdw4CGay8JBmwOlhDTZ342G+KpPomI/NHvTB
+	 1EJhpM7bu7NzQvzwn2cg6Fld9JUDq3UTMJD0RG5udq/Puc0C2olYyM82fj4mlQTvHw
+	 hKjq85P05bgtF7Ha2Sp31YD+T9FY6HuR+NawcdzK6zApniXnqtlRnq+Xm2jtEJTS9M
+	 7XN3mSNW3MCG+7wtca6vlJnWVi0D0Anr8ANNPdb3XulOZ66q2qhQz7KbvmBXI6K4wW
+	 uzLgCSgoMC2Tw==
+Message-ID: <3df0b3f2-0d73-4116-8bbf-37020892e773@kernel.org>
+Date: Mon, 23 Jun 2025 13:55:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/1] Bluetooth: mediatek: add gpio pin to reset bt
+Subject: Re: [PATCH v4 1/1] Bluetooth: mediatek: add gpio pin to reset bt
 To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>,
  Marcel Holtmann <marcel@holtmann.org>,
  Matthias Brugger <matthias.bgg@gmail.com>,
@@ -48,6 +48,7 @@ Cc: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
  linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
  linux-mediatek <linux-mediatek@lists.infradead.org>
 References: <20250623102359.2684-1-ot_zhangchao.zhang@mediatek.com>
+ <20250623102359.2684-2-ot_zhangchao.zhang@mediatek.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,20 +94,70 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250623102359.2684-1-ot_zhangchao.zhang@mediatek.com>
+In-Reply-To: <20250623102359.2684-2-ot_zhangchao.zhang@mediatek.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 23/06/2025 12:23, Zhangchao Zhang wrote:
-> Reset Bluetooth using hardware pin via dts
+> Makes the platform Bluetooth to be reset by hardware pin,
+> it provides two methods to do it for mediatek controller,
+> and it has been tested locally many times and can reset normally.
 > 
-> Compared with the previously submitted version, the following
-> information are some specific revision histories
+> When an exception occurs, resetting Bluetooth by hardware pin
+> is more stable than resetting Bluetooth by software.
+> If the corresponding pin is not found in dts,
+> bluetooth can also be reset successfully.
 > 
-> V3-->V4 modifications:
-> Modify dt binding format information and
+> Co-developed: Hao Qin <hao.qin@mediatek.com>
+> Co-developed: Chris Lu <chris.lu@mediatek.com>
+> Co-developed: Jiande Lu <jiande.lu@mediatek.com>
+> Signed-off-by: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+> ---
+>  drivers/bluetooth/btmtk.c | 69 +++++++++++++++++++++++++++++++++++++++
+>  drivers/bluetooth/btmtk.h |  5 +++
+>  2 files changed, 74 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> index 4390fd571dbd..3e5f3ca6f0d5 100644
+> --- a/drivers/bluetooth/btmtk.c
+> +++ b/drivers/bluetooth/btmtk.c
+> @@ -6,6 +6,8 @@
+>  #include <linux/firmware.h>
+>  #include <linux/usb.h>
+>  #include <linux/iopoll.h>
+> +#include <linux/of.h>
+> +#include <linux/of_gpio.h>
+>  #include <linux/unaligned.h>
+>  
+>  #include <net/bluetooth/bluetooth.h>
+> @@ -109,6 +111,65 @@ static void btmtk_coredump_notify(struct hci_dev *hdev, int state)
+>  	}
+>  }
+>  
+> +static void btmtk_reset_by_gpio_work(struct work_struct *work)
+> +{
+> +	struct btmtk_reset_gpio *reset_gpio_data =
+> +			container_of(work, struct btmtk_reset_gpio, reset_work.work);
+> +
+> +	gpio_direction_output(reset_gpio_data->gpio_number, 1);
+> +	kfree(reset_gpio_data);
+> +}
+> +
+> +static int btmtk_reset_by_gpio(struct hci_dev *hdev)
+> +{
+> +	struct btmtk_data *data = hci_get_priv(hdev);
+> +	struct btmtk_reset_gpio *reset_gpio_data;
+> +	struct device_node *node;
+> +	int reset_gpio_number;
+> +
+> +	node = of_find_compatible_node(NULL, NULL, "mediatek,usb-bluetooth");
 
-How? There is no binding, so what and how did you modify?
+
+Can you finally respond to the comments you got weeks ago at v1?
+
+NAK and I will keep NAKing your patches because total disregard to
+review is not going to make this patch accepted.
+
 
 Best regards,
 Krzysztof
