@@ -1,126 +1,131 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A53274B2C;
-	Tue, 24 Jun 2025 17:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F3A2EE965
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 19:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750786061; cv=none; b=e1RrAUG7CrcP2nSz72/MMmGRK5f1O/HvEQsF6d4aKdW+LCCV9tOJXZpnJH3/2zyrQE/ZRdHeMehxi41J1axqiZR31yq3ZqLYibAJGq/MR4qWD3z4HeCAuXdy7hJwxT050dLf6r6uJknAOiGQ9/GkCYvtGcqdBHwEKt4UaaZHCOI=
+	t=1750794122; cv=none; b=Pubmc9mrA3TzIBhQnMhr2Hbd4G1SYNUxTudRBzUiNisVrNN7ld6B6zvWOq814Oc/d+5pdvWLzqtCMI9b3iWv2Mrh4oppgAdmzUaHI5jBu3Whx6hNxMyZEAwT6OwzxjEL6brVvNyvvMMP9JPh2vYmr8Abjs9qBMdIOZzNTaWdahc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750786061; c=relaxed/simple;
-	bh=oshLx90C0YrDegIOUStwpIIDSGSg7PKJPRr6TKfFAws=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C38VRR2uhISXRHNv1SaXH511iPKRl3YEpV+fkK16zWyJZg+SUezrbZ8cl9yAKNdkoX74rr1fp5PW3elK13aiMchYpm9/+uNw5SehkxyT323GQVvjEkw7AINVPNUzhHdAO6G4hhEEcMczUQWgvxEnwVikZzT87rYhwoiZrv6TDMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jr9zXGtj; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750794122; c=relaxed/simple;
+	bh=qeOj8SePu9jNexMtXWzFxvYh2R5iwFOa1HVYWc1B+co=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=RhzWlPeIXeoCBXrjawmQ87JfKNwpERjR6R9KNOEz7eHNdjxF391XR8d9Pxi9ziC836Y5RP7nmSdYD4tOSowzLO72Uh7OO3kSFwzD3R8rfnG55NmgELRBo7EjmQSLnKn7zaT3RQgZ/aYMJgrb3bZBuq7PqzkQ1qOqelN6rchc7eE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T97S4Upu; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jr9zXGtj"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-31332cff2d5so770732a91.1;
-        Tue, 24 Jun 2025 10:27:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750786057; x=1751390857; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F5nrAwOBM7dVDDH2BwXUu00PJTBJWmkBmfMiBcNhlPE=;
-        b=jr9zXGtjIv3eYmrA6zutGH8hp/mek9/RQY1g2Tp7//FxcseEJy5c+1i4IEhRIDqHGS
-         tN4qWJaK1XXR9KnFa9PpdV2WoE98pFAhmf8HU6EP9qgzu6Qsg+T9bYEXa2xVYVNvruZH
-         Q/l/2bPGlBw9f39LSBMln0v+A1y5XzEatwGb2XuK9iZnfaaLEGEAoH6rUYG9cGYBczvc
-         v9hypC3uBT4aCj2ADztNnvPXElF0IIbA5H8QcK2e3WBiprR5xUSGtmP3S2a31BcNSc8L
-         UYorRDDm9RJeKcxJsm3nmPq3L91H4cmK6VTJMWWpc/laEWI+yk7408gLr7V3mY/upQJz
-         oEIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750786057; x=1751390857;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F5nrAwOBM7dVDDH2BwXUu00PJTBJWmkBmfMiBcNhlPE=;
-        b=Fn3RciuJPqY8x3oGp7n5hDQqibmlKkAOGONe4nPACNKFTQc66gRdh8LsCe1yhWFGRX
-         UfuUsK4ysOxWC74jwypCJ5WaSfdvfeRpyGTb6rveOMDZhuV2wbrYkyDVmqinQXgqOgb3
-         C/qdCu+kfAtQr2ry+dl6AhWIqMdxA4n/E+1lsGDMNybCfzWKgVa4R0epg6IFDSEWAAuE
-         h8iqetuuCzl/aXcU1JCtEgmgaHzBER15IeRHCITs7G+f6nLGDsptcPx+QjE+gzhJ1ug+
-         HGSgb5nCnmj1UvNdGOPwnBOjl4idOmBJVdNPFvAqUN0yj06djdwNjoy4clH+95uS2lyw
-         PBOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVpcPQVCW6qPqxdYFXEn+uP0bxfB8/YVOSIOfaVg6DLT2xM53fOuY84MOrC5iDTi+sZwsnNZ6e6@vger.kernel.org, AJvYcCXds45VHf8sneyS+PZsiSio49kFOsgOZhll2s0RerITTg9oiR8TFohrwrutfZ9S9YonEo2YaZKI73y4/l2jqvY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW2VRnZtpkuTxIEF/a/aogx8xJV6I81yz3H5HMvHXQxOPtwGcm
-	GYBhxTVQ6eYQBUWz3EBXLu4ur9doHQ6EFlp6npbc5OksPzg3lCIzcRg=
-X-Gm-Gg: ASbGncv0vOiZiumjte+SKM99elgOhCoMi/h3x0LpEjf6fOPtDZr9etlV1lJfIMF2gnn
-	e64zH6l5bfqrECP/hJvEei/Xpc3lid4Dcq8f1+oOblO5FT6TP6c1umO9nI0SN9OfsLRS+QsJ7vU
-	j++GzN5myieuGyHuukouaD0sMACciOdvBC5296Eo+Kfxrzkpe2kIxZfDs9jxF9VtY1kuZ7lbnqh
-	pQBCM7+xntDgspMi5bMYKpymgKQTKR30cA5yIYYwIkqKBa+OCC4OZcrsiKznz+WkGGh9t2Qpnkr
-	1pV2H95xrgCJ9BfVXaRKB7QNvnY9eP2Ibl21OSo=
-X-Google-Smtp-Source: AGHT+IEuCS3d/5YsrevBrQ/hdUuTNTmD0eveveA2d4d4t8z9iyc418TDnkEXiZhaDdnYdY3A7E9Wqw==
-X-Received: by 2002:a17:90b:3b45:b0:313:f6fa:5bc6 with SMTP id 98e67ed59e1d1-3159d8c6ce2mr23563714a91.20.1750786057408;
-        Tue, 24 Jun 2025 10:27:37 -0700 (PDT)
-Received: from fedora.. ([2601:647:6700:3390::a408])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3159e082441sm10894189a91.48.2025.06.24.10.27.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 10:27:36 -0700 (PDT)
-From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: luiz.dentz@gmail.com
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	kuniyu@google.com,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [GIT PULL] bluetooth 2025-06-23
-Date: Tue, 24 Jun 2025 10:27:29 -0700
-Message-ID: <20250624172735.430106-1-kuni1840@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <CABBYNZ+C+HGgxaMg6L+rA4z1dsoSkPG8gSJLt3jvS63_egmSxw@mail.gmail.com>
-References: <CABBYNZ+C+HGgxaMg6L+rA4z1dsoSkPG8gSJLt3jvS63_egmSxw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T97S4Upu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750794120; x=1782330120;
+  h=date:from:to:cc:subject:message-id;
+  bh=qeOj8SePu9jNexMtXWzFxvYh2R5iwFOa1HVYWc1B+co=;
+  b=T97S4UpuxXJSd+147UhKM8b9/N9QM/UaRCP2L6eykegRZTS/amfi0R7e
+   /wpqQ2Uma0ijN3m1XgNS+XaqQpLI3zgNqNkneR5RdJKKgmzYMeH13Kj1T
+   h+CCUzD3uhDCy7C2YthXJfrCbgubZUsbBd0M2L3nJSb9+nGFZhvKKz0e3
+   +e3aVQgEmK1OV19f+nvIg/Zj4sTVx1QxfYUhK/rCnWSR08Gqdtmo1lHPH
+   EPxdQ6wMroVWZXhbNZPKErfioDDk2tHFNZR8eiUXfYJHjUdZdXfsabXqJ
+   vy750Koi+JmGu7zXw+SOkvO9Mrr+DcZu5Yr9FpajBHOndTdrgtZjwLJZi
+   A==;
+X-CSE-ConnectionGUID: V9lN4MIhQf+Md8hUvYtvGg==
+X-CSE-MsgGUID: MCgVB19tSIWdTlxEhqjNDA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="53145793"
+X-IronPort-AV: E=Sophos;i="6.16,263,1744095600"; 
+   d="scan'208";a="53145793"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2025 12:42:00 -0700
+X-CSE-ConnectionGUID: UPLRTf/iT1CSPy1iT3iGQA==
+X-CSE-MsgGUID: bDt81waUQNi8m6s5HABnXA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,263,1744095600"; 
+   d="scan'208";a="157497454"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 24 Jun 2025 12:41:59 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uU9Wm-000SSM-1k;
+	Tue, 24 Jun 2025 19:41:56 +0000
+Date: Wed, 25 Jun 2025 03:41:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 03bddf7c2ed6c02634583fec2526b44ec5e46f84
+Message-ID: <202506250357.mhQv513Q-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 24 Jun 2025 09:01:01 -0400
-> Hi Kuniyuki,
-> 
-> On Tue, Jun 24, 2025 at 6:50 AM Paolo Abeni <pabeni@redhat.com> wrote:
-> >
-> >
-> >
-> > On 6/23/25 6:54 PM, Luiz Augusto von Dentz wrote:
-> > > The following changes since commit e0fca6f2cebff539e9317a15a37dcf432e3b851a:
-> > >
-> > >   net: mana: Record doorbell physical address in PF mode (2025-06-19 15:55:22 -0700)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-06-23
-> > >
-> > > for you to fetch changes up to 1d6123102e9fbedc8d25bf4731da6d513173e49e:
-> > >
-> > >   Bluetooth: hci_core: Fix use-after-free in vhci_flush() (2025-06-23 10:59:29 -0400)
-> > >
-> > > ----------------------------------------------------------------
-> > > bluetooth pull request for net:
-> > >
-> > >  - L2CAP: Fix L2CAP MTU negotiation
-> > >  - hci_core: Fix use-after-free in vhci_flush()
-> >
-> > I think this could use a net-next follow-up adding sparse annotation for
-> > the newly introduced helpers:
-> >
-> > ./net/bluetooth/hci_core.c:85:9: warning: context imbalance in
-> > '__hci_dev_get' - different lock contexts for basic block
-> > ../net/bluetooth/hci_core.c: note: in included file (through
-> > ../include/linux/notifier.h, ../arch/x86/include/asm/uprobes.h,
-> > ../include/linux/uprobes.h, ../include/linux/mm_types.h,
-> > ../include/linux/mmzone.h, ../include/linux/gfp.h, ...):
-> > ../include/linux/srcu.h:400:9: warning: context imbalance in
-> > 'hci_dev_put_srcu' - unexpected unlock
-> >
-> > (not intended to block this PR!)
-> 
-> Can you address the above comments?
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 03bddf7c2ed6c02634583fec2526b44ec5e46f84  Bluetooth: btnxpuart: Add support for 4M baudrate
 
-For sure, will send a followup.
+elapsed time: 1452m
+
+configs tested: 54
+configs skipped: 1
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+tested configs:
+alpha                             allnoconfig    gcc-15.1.0
+alpha                            allyesconfig    gcc-15.1.0
+arc                               allnoconfig    gcc-15.1.0
+arc                   randconfig-001-20250624    gcc-12.4.0
+arc                   randconfig-002-20250624    gcc-15.1.0
+arm                               allnoconfig    clang-21
+arm                   randconfig-001-20250624    gcc-13.3.0
+arm                   randconfig-002-20250624    gcc-8.5.0
+arm                   randconfig-003-20250624    gcc-12.4.0
+arm                   randconfig-004-20250624    clang-17
+arm64                             allnoconfig    gcc-15.1.0
+arm64                 randconfig-001-20250624    clang-21
+arm64                 randconfig-002-20250624    gcc-10.5.0
+arm64                 randconfig-003-20250624    clang-21
+arm64                 randconfig-004-20250624    clang-21
+csky                              allnoconfig    gcc-15.1.0
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-21
+hexagon                          allyesconfig    clang-21
+i386        buildonly-randconfig-001-20250624    clang-20
+i386        buildonly-randconfig-002-20250624    gcc-12
+i386        buildonly-randconfig-003-20250624    clang-20
+i386        buildonly-randconfig-004-20250624    clang-20
+i386        buildonly-randconfig-005-20250624    clang-20
+i386        buildonly-randconfig-006-20250624    gcc-12
+loongarch                         allnoconfig    gcc-15.1.0
+m68k                              allnoconfig    gcc-15.1.0
+microblaze                        allnoconfig    gcc-15.1.0
+mips                              allnoconfig    gcc-15.1.0
+nios2                             allnoconfig    gcc-14.2.0
+openrisc                          allnoconfig    gcc-15.1.0
+parisc                            allnoconfig    gcc-15.1.0
+powerpc                           allnoconfig    gcc-15.1.0
+riscv                             allnoconfig    gcc-15.1.0
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-21
+s390                             allyesconfig    gcc-15.1.0
+sh                               allmodconfig    gcc-15.1.0
+sh                                allnoconfig    gcc-15.1.0
+sh                               allyesconfig    gcc-15.1.0
+sparc                            allmodconfig    gcc-15.1.0
+sparc                             allnoconfig    gcc-15.1.0
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-21
+um                               allyesconfig    gcc-12
+x86_64                            allnoconfig    clang-20
+x86_64      buildonly-randconfig-001-20250624    clang-20
+x86_64      buildonly-randconfig-002-20250624    gcc-12
+x86_64      buildonly-randconfig-003-20250624    clang-20
+x86_64      buildonly-randconfig-004-20250624    clang-20
+x86_64      buildonly-randconfig-005-20250624    clang-20
+x86_64      buildonly-randconfig-006-20250624    gcc-12
+x86_64                              defconfig    gcc-11
+xtensa                            allnoconfig    gcc-15.1.0
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
