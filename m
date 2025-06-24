@@ -1,130 +1,147 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F74123774
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 02:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDD62AEED;
+	Tue, 24 Jun 2025 05:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750732372; cv=none; b=LdQOigJ5rn5RNXYXtur3OKE5ZVuWm1h9OmOTgDGMkzUZqvr2SdUSSJb5HJvt8Zinqxl4JNYXne9nYiTMiwHZ+DAnKmhLdcaYXmZVimBqtQ53WAeV4DMOp4OQvP2HbY398Z3AIEXpaD7UoLHT66GGqc16I4l83vngstNogEzgB2k=
+	t=1750742456; cv=none; b=DCk71IuVsajG8elvIVZlxknJ6mgPgXXdmacQWR7jyR1cInkAgbnky6IJ63zMKISwt08e1Tw14hU20iYvMz081zimlx47JRdCwK/TBTNRxQHURJ7M+U06VDRHXWybOGlp0zkm6n2r+BFhHmIr6X+mAFo5fIjiuDWgv5+wmy9S/cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750732372; c=relaxed/simple;
-	bh=ps1wQ9u9IzCYPzSE37n1DxW4OZu6r+5xSP+KBZNa8tM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ovtq1EFkH2y4sWyxib4i12wzHu7TAvGKijiqSmjvXS3gh7Lo6E0ISCKfeFAQaSobXxgwnrHKnxvxyjCA4Ul6nqkhZGJgehFlaMAh+ZSNO/vdi3JkLWcptUd6PTWwKqT87elHQZR7dlywRcbMK0lEHIbV+bPVOgxER93gnMf2XMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LP7hqsPV; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750742456; c=relaxed/simple;
+	bh=NbMlPU76pDn1qjfo5sXua11VvUTm9H84TOJbZoaoR4Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=sN25zmw/Cgi+VimLECg/cJQLPU5wO1CBbCWscOXjoGaezkKlysRtaQUn3K0kZgSnJonwIdhe9RyX6Tjxch7WM5/wW/Z1H6SPjmvdkeXc+eX68sShbkNaMSKfnd+GsKep+zvC1rLloY+XjVignv9xkp4VQsKnUWj15lwp2TBNxoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bl0sBDn/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LP7hqsPV"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3df2822c450so2095145ab.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jun 2025 19:32:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750732370; x=1751337170; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=BUKdfLqoQP4FKscHeJqgX1D5s70+L+wYnNtxE26PLis=;
-        b=LP7hqsPVDnydyrPIIuMODPOl97VRz1ktb5AdVOH7Db0/LJynzfa8oHV9FzxSgp8qht
-         aqB6+g9PYh5CzIGUIJq1TE/aTvqJQmujT2L7Dx3iOGAlfKPypjGDaxmJ2nt/Te0T04Jh
-         064v9/sksZKII5dBj8SWtdtoeq1NSFHhHSEXc3SUrCxg5Nsj0xp5YvgqasC8BUGBQE4k
-         6GnbtZJXImiCQo5pKpJ5it/OWkBX0l0WjULMUWJ6aeR27Ui7D4gqsUgKFL6qn6YJxi+V
-         MGcQJrph8TILr8YU3YUTpQ0WBTyuadYHBYogBkVMvoqoBtxEPOcLzZY/n+nI7lTmISL9
-         MQlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750732370; x=1751337170;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BUKdfLqoQP4FKscHeJqgX1D5s70+L+wYnNtxE26PLis=;
-        b=EAnHT2nM5ZSnmmkOaVuzjtwXycvwbp+4np0uz6x0X+Gi1Mau04I2QMNa3BydhFlzY4
-         hmByiUFyAMslgrnG2qnBRWqqIEJoZvconv5JaccuF02HWSLqPMggDElGUXFeXBQgB8j4
-         ymDHdHtAmYSupg3EW3Qzb8O98wIK0wMH+2zyW/mtH149aFX0KxO3EG3BM4pCABi+YQAc
-         kQva4qY031cyJU+xQBs4VE/BycCx/094JUKEIxOC+0VgMYhAxWuxBq25afefj6AviOoA
-         bgG03phVSX1R5ACHHiccmy3IuE4e+5HiRgd4tQstBFrrMMui52O7Gx2T1tHkhBbwi2Vl
-         iO+A==
-X-Gm-Message-State: AOJu0YwSUEonh3WxtOA+k+ZvBhnobeym9pp6Kfn7eQmbIsaTlvztzanZ
-	YcNaFdCh82sF5e0sULVh9lo5Ui+MKtbq14B/NirXGrVvz46dfQ2E+614+w9kQw==
-X-Gm-Gg: ASbGncue/dGDqC5WPr+YGYAxBVlTgaddyddOYW1xt38ai98vLt0lPX0K/54c3wY/m/7
-	HaoFNJeJfOQsnOk3JCj7bgdrvlbOKdT5NEGVe1I6OqieuNrf5cG9uIYKRjlImcYNDehtRLQSSQW
-	Vw0yVmnMfuNCi2UrKIrcsp62YLaJ0Ra4CaEiNj8RLXpXI0QSsYeg+Ci+2f3IKsdIFa6KwkDRoNu
-	pn+xZlzF88BeEig3UdPHBQju/6CXZkzJi/szn0QJWTIOnNl2AgvFMJBwbefeBg1C5khWOR1dP1r
-	AKnVeBs2nbQlZg1O2WREOX0xamV40I1m75HYJg9l7b180XkEPN/G0IiIg5nwgWTk+7A=
-X-Google-Smtp-Source: AGHT+IF+Pd5yb/TXhMf/8fn2Z1RtwWlDS3cmsLb8tbo9HNHj9pzGPxLkUBbAQI2ozpqiZIVK6BcPCg==
-X-Received: by 2002:a05:6e02:1a61:b0:3dd:bb43:1fc0 with SMTP id e9e14a558f8ab-3df289a6c31mr19128225ab.11.1750732369714;
-        Mon, 23 Jun 2025 19:32:49 -0700 (PDT)
-Received: from [172.17.0.2] ([52.173.88.33])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5019e0cb7b6sm2072582173.135.2025.06.23.19.32.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jun 2025 19:32:48 -0700 (PDT)
-Message-ID: <685a0e50.050a0220.2a40d5.65cb@mx.google.com>
-Date: Mon, 23 Jun 2025 19:32:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0292437200821224007=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bl0sBDn/"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 521A3C4CEF1;
+	Tue, 24 Jun 2025 05:20:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750742456;
+	bh=NbMlPU76pDn1qjfo5sXua11VvUTm9H84TOJbZoaoR4Q=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=bl0sBDn/pqAbO/7vIzlkMYg/9zUVcgBPwZiTbwjrSQ3cBjoaPm5er8QByV5MrDLA7
+	 2EQ9tFebW9ISNw8ubnmi4U2CegsjCw56Dx7wVnvcV9Rwk2iCUnfk5up2DdI5IwAGO2
+	 OBbL9qtWUawUS/S8F+aWcYoieMc1jpNtZcV1JwIXlvN/4NBM6gLXJnIpzQfpSUWYkf
+	 TBcrgogRc0EFVxnqqVZDEk1XeNp/8KiUdFztkLzuSp1iWBI7MNP2VxaVwJfT85eRyY
+	 uv6sIOFmvl3ZQ5vgLnPPXzqtAEKMtu/OtRg/CjeyhHNG4AP4j34BHS93VcgQX45s4z
+	 J8ZJr6UScp1YA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49889C7EE2A;
+	Tue, 24 Jun 2025 05:20:56 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Tue, 24 Jun 2025 13:20:44 +0800
+Subject: [PATCH] Bluetooth: hci_event: Add support for handling LE BIG Sync
+ Lost event
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ronan@rjp.ie
-Subject: RE: [BlueZ] zsh: amend completions
-In-Reply-To: <20250624003551.107489-1-ronan@rjp.ie>
-References: <20250624003551.107489-1-ronan@rjp.ie>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0292437200821224007==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAKs1WmgC/x3M0QpAMBSA4VfRubaaGeJVpMV2cEqjHYm0d7dcf
+ v/F/wJjIGToshcCXsS0+4Qiz8Cuo19QkEsGJVUl60KJFN2GZqLF8OOt2XY+DV7oT6Ft42yty1a
+ OCtLgCDjT/c/7IcYPVSYaKGwAAAA=
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1750742454; l=2539;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=3xOWybT0hvFSOiNGPz4vVsSCR2isMoJtxxrE8KhFyic=;
+ b=32qzfmyTCP2aM6DgE1emIRrsb577fcGy9Zd752E4k1VUKQgvSU5vECllJAWiESugLEAJre9dX
+ db2PB9JhMGYB8NfmtCzmzs1PRBu1I5oMxPdATGC1snm6pvrCx1BJyRz
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-This is automated email and please do not reply to this email!
+From: Yang Li <yang.li@amlogic.com>
 
-Dear submitter,
+When the BIS source stops, the controller sends an LE BIG Sync Lost
+event (subevent 0x1E). Currently, this event is not handled, causing
+the BIS stream to remain active in BlueZ and preventing recovery.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=975068
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ include/net/bluetooth/hci.h |  6 ++++++
+ net/bluetooth/hci_event.c   | 23 +++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.34 seconds
-GitLint                       PENDING   0.28 seconds
-BuildEll                      PASS      20.06 seconds
-BluezMake                     PASS      2635.89 seconds
-MakeCheck                     PASS      19.93 seconds
-MakeDistcheck                 PASS      199.63 seconds
-CheckValgrind                 PASS      276.63 seconds
-CheckSmatch                   WARNING   305.31 seconds
-bluezmakeextell               PASS      128.67 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      909.71 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 82cbd54443ac..48389a64accb 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+ 	__le16  bis[];
+ } __packed;
+ 
++#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
++struct hci_evt_le_big_sync_lost {
++	__u8    handle;
++	__u8    reason;
++} __packed;
++
+ #define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
+ struct hci_evt_le_big_info_adv_report {
+ 	__le16  sync_handle;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 66052d6aaa1d..730deaf1851f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7026,6 +7026,24 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
++					    struct sk_buff *skb)
++{
++	struct hci_evt_le_big_sync_lost *ev = data;
++	struct hci_conn *conn;
++
++	bt_dev_dbg(hdev, "BIG Sync Lost: big_handle 0x%2.2x", ev->handle);
++
++	hci_dev_lock(hdev);
++
++	list_for_each_entry(conn, &hdev->conn_hash.list, list) {
++		if (test_bit(HCI_CONN_BIG_SYNC, &conn->flags))
++			hci_disconn_cfm(conn, HCI_ERROR_REMOTE_USER_TERM);
++	}
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
+ 					   struct sk_buff *skb)
+ {
+@@ -7149,6 +7167,11 @@ static const struct hci_le_ev {
+ 		     hci_le_big_sync_established_evt,
+ 		     sizeof(struct hci_evt_le_big_sync_estabilished),
+ 		     HCI_MAX_EVENT_SIZE),
++	/* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
++	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
++		     hci_le_big_sync_lost_evt,
++		     sizeof(struct hci_evt_le_big_sync_lost),
++		     HCI_MAX_EVENT_SIZE),
+ 	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+ 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+ 		     hci_le_big_info_adv_report_evt,
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
+change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
 
---===============0292437200821224007==--
