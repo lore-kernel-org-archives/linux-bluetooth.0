@@ -1,158 +1,183 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD91E274B47
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 16:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750784109; cv=pass; b=ZlGfwYgrKdbE/rISlmoyPjZxmkZYAVDAO5E5YxXErXNQqoGlMfS27ZllRDTvRZFXgTYqQOkTVqGExnDWC7XXfkeXOKoz7bGnPZIDNdicUloxgiRJAXrcBn/vdcKLl4q5gqwy6xAQqVcozpRwJHrrWvawjFsPL2Rb7nLUZeF1BXs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750784109; c=relaxed/simple;
-	bh=dODMh8OY0oOo2zl/ywZtvWaJ4V3J2NqyFuctBE6/eak=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=L/pyB4esAZr3LK43gW3rd/lkCGPXdMsmalkonKlo23xK5yrwKB/XZ8AYN/fm7WDLZNQl3Xfv4lI3PsH3PoA5lYD05Tj7scsAvpoEsaT49y169fvTq+20O2zZlc+wCmR7MseDc/LOLfQ0SAUnRlqmP+ozTr7Ru7/RpAPsTu3dWPI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=iPMSzLKK; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63FA4C74;
+	Tue, 24 Jun 2025 16:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750784218; cv=none; b=Yh0y4aON/FiYbRJmugC81iLe5NU6/DIKsjHL15npois9FJV28f4ITqoEYHKhKMBbfZ109StK3ioXBQ/WpTboOQMOYysGd9cGaKZ9JalNDHThnV+Ha53Ilu1zzklKmv9lJ8kDL+pvSQDwWPvZX1l5NA2nlAI5OLW8/Z+396h2e1E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750784218; c=relaxed/simple;
+	bh=AgHRWFWxIx9KUKW4HrV9Ys8bNutvq7sqr84rBYc0Nbk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BBuBvueUXB05f0pindx7yXxzRVW2y42tUVSElHFb2a8vg6gu6clJd3pApHBlgSObMFXw0JYwKGcFDEvlQ+Joe9XTAJ2UjJjNoB37yC9m/RLyTtwKUbfa4J+xsk0Om3OqAMkt0m7DhpbXthMFelQx46s8UE72ais8PNWeEjwYEhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RXonvqAg; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="iPMSzLKK"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bRWK00c2sz49Q3m;
-	Tue, 24 Jun 2025 19:54:59 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1750784100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=73LMNCs20CgO0r/t378Ipdkumv0jLUk5UrU7bCgBVbw=;
-	b=iPMSzLKKvodxhC7ybSW3Nym106XATY412iVMpPul1KuoS5ZQjdeJUYDzS2F53oSCJRSHLz
-	wNKZFlUmhHYu+GF5ULJlXO78dUBFz7x/kC6y1hJSaqd1xwzDMsnb+1w9l7ygY6pIqVReM/
-	cNGoN/KP5U7nNu0GfRiPpNhoM9oPHpK1yR92AWawAiKjNOXC8T6kOPFpTVLZvTo91u9FCx
-	eex5h3a84VH9QgqSFW/+e+4x8Ix6CZlPSzzHDqnejIBafIVLePSm2tlWDXiZWFafwrqctW
-	Dfh7vT2oSOvJ6hk55+40cFW+Al7EXdpsXwIXIRhKqN1EUxhk/mamnJ81c72jCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1750784100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=73LMNCs20CgO0r/t378Ipdkumv0jLUk5UrU7bCgBVbw=;
-	b=NwhsjWZ4XEaEHTsJRS0aHpqqTSDgFUVp9fjw4B+wAbyqvwmfDsvf9vBYor/0JixoMs13L/
-	QhMm7RX2XrB7Lc7iXrI5uPjgHmf+dhybFaPGYmMeTQbR6aT43YaLJ6mcPn/0RkYio7EEPy
-	DkCyIH0RI8LUq3o/6cYtCqsZxnhZJqjeo9A91SSd2JtvwCAd01FugrjG8CqqqptqlRFHmv
-	FNkjmX6oN+Gedcc0lzNsBvYFiMLAvY8VsVM2Dkveis2gwePx+lwdj0rQJyzpFwc9Fk5+Gr
-	EVLtiKGejggY9NYVMH78u7v47r3PyT7PMlGnZpo0QUArpF9++QOQH1V3zQUc3g==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1750784100; a=rsa-sha256;
-	cv=none;
-	b=lLgT3WK9JIo4EDY9kKyPSLWKNns0Q4I/GVZetcseqt9EOyT15E/2UVMEWViUO0LNDsqgK4
-	hDfFFRo6wL+FIl0Z5pf13lObff5YNPe67zTTYSfTiM+gd6MP2oiRpOjahXUCSsELFgzq3e
-	e0h+6zvwVtYQX1ht1f2ztk+6FU8vjjFlEBDgKE2xAI205fT4HClFLxt0ulmUnFhj/HPhvU
-	u/BjO95IlMfbq9W1I8lMbNq+ZKgpqBv07SHfthU8wHGK2Q1+UKpOF0khCG4MGNerfsrZ47
-	bQ2+YY+rPYduE+nu7HYJvl9aDmcRyiA57SbdkZC0TDertcmblQJ2iDD+ohDOFA==
-Message-ID: <b6b051caafbcdbb00b3a78b8a5982466435d0e28.camel@iki.fi>
-Subject: Re: [PATCH BlueZ 1/1] obexd: Fix failure to register bt transport
-From: Pauli Virtanen <pav@iki.fi>
-To: Pete Beardmore <pete.beardmore@msn.com>, linux-bluetooth@vger.kernel.org
-Cc: Andrew Sayers <kernel.org@pileofstuff.org>
-Date: Tue, 24 Jun 2025 19:54:58 +0300
-In-Reply-To: <DBBPR05MB6283E530AA7B8138A19DAA008A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
-References: 
-	<DBBPR05MB62836AA5E235A13B44F962C88A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
-	 <DBBPR05MB6283E530AA7B8138A19DAA008A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RXonvqAg"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32b910593edso5983531fa.1;
+        Tue, 24 Jun 2025 09:56:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750784215; x=1751389015; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3VoQhHpan+D63Bosvv29YyZ4TMwKoS/MmYILKEYS0J4=;
+        b=RXonvqAgYCTCKoXHlPhOKNPVAuUZVsq5zg7JKlnOJL5HB7HNFLSfDCt0NyB1jF7xMK
+         ieUD9PXFhPee+WRZT8XtFBG0RgsJVg3NPzSDfM/dFTQQULCP0zSeoOb9whEvoi0hq8kU
+         8pbiDObOwh3jPHr8uVNH3L63i74vQ2DoJ/etMAeZvCzyE/0az5NrvCdii0UcTTMc1yj9
+         E2uLMLCoO+AROF6roohmwFlQiTbsjK5FODqlnDZPjYMmm/bzYksAxB72xn08GyC7KrhT
+         Te2ykYFEb6oxrX4VIlkUgfYmijeCTY5BCmICZZ5LeuUVXkQrgcVY6v9/rO8Q73CX8IkY
+         jkIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750784215; x=1751389015;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3VoQhHpan+D63Bosvv29YyZ4TMwKoS/MmYILKEYS0J4=;
+        b=EOoFcNIz5FWCzOcl5iy6RUcwCAt/2+Lbn7Ti+ACHnjW1QjOpLZptzfKEMLXaH9WiKS
+         OOk/Nm42wK7963q2HOrHCF+cc2kEbMhQiNX9UkWSjs+FJScMDQe1mFe43+uBh1TPlSEg
+         S5mtUu4eCIUOQKs3ZJwRB2gkDqibzYTwm1YoUlAYGK86ip9d6N1KP6TIqPQkRgfxog6Y
+         bcfHil35rGeWHvKjE/btJ6UTdSCLpKhrUdp9FXvx0Ni+C4eP5N/zaeHV9ovK1cQHdnnJ
+         p8qJPNep8cRbum3i0I1evKFB2l0zZ6OQ78xApYwCSVxYuzstfbjSmIyJu0uDJiYSjQhM
+         hbEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWKpdMd4ZRTKMBWsKMxO6u5moNKr2zlbGzC2LOcq7OUps1ArS3f54YOsOrn0bV3Hf9yEowUNyL@vger.kernel.org, AJvYcCXe2iDiNlQY02r0r/WMhjfRTZNY782lePG30zLEgwynBY3TraqalD65ov+ej4BqBmDt54D2p+mmAQwzHQdST60=@vger.kernel.org, AJvYcCXxFAX7axo4B6ueitXGwR/tEIt/6PymgtSAI33UG35hietuF3j87XUCzQ1+KNojqmCRw9vwFnIFEAbBZpO7@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeuG5ZFImxkC6jzeZh6N/oQBiaMj9nMmZ1YPwSAgxn/mUIYUwN
+	QFCkta6a+Uf16vvAF+3rw5memprPpZ/6lBMA2eZptXqmVxPChaC2ehTbrLwhdXS/yOHWddtyIBY
+	C0MtvPuvE46UqzIT/0VVic+yLW7wWIIw=
+X-Gm-Gg: ASbGncs3VQVWKBBj+pfE+u5+vczS/NSwYehEtG7bTIAjGEOLzVmjmQ4jEwBQlGjSvcx
+	kdnewkaS0KfUlESTzjcoqubanh7k6MOOmAh7Uz8m4TVJdILXQcWgIbbJ0gjKZlVxa0hI0dXF0vQ
+	98hKkac4880wdjxLxRUkMQ5Kc+3AmeEIyOEE4cf0QUBA==
+X-Google-Smtp-Source: AGHT+IF9tlG/Gv4Lk4VPNnSQdf0XriXwGuTEEIpNivagx5btkou/+ZjKG+079WltVHyDDGPW391ut8kUgJSDubGtay4=
+X-Received: by 2002:a05:651c:1a0a:b0:30b:b987:b6a7 with SMTP id
+ 38308e7fff4ca-32b98d274cdmr49886061fa.0.1750784214368; Tue, 24 Jun 2025
+ 09:56:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
+In-Reply-To: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 24 Jun 2025 12:56:42 -0400
+X-Gm-Features: Ac12FXwfD8-7gKRlIL52DwzZvy4dFplbLmxCSBpOC3BkWgzU9Tbie0wrLyB5g3Q
+Message-ID: <CABBYNZKhTOWGXRWe5EYP0Mp3ynO5TmV-zgE43AVmNgm-=01gbg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: Add support for handling LE BIG
+ Sync Lost event
+To: yang.li@amlogic.com
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-ti, 2025-06-24 kello 15:23 +0100, Pete Beardmore kirjoitti:
-> On initial logind update, the internal 'active' state is FALSE. Where
-> querying the current state (`sd_uid_get_state`) returns 'active' we do
-> NOT want to short-circuit the update to the internal state value and
-> ultimate transport initialisation.
+Hi,
+
+On Tue, Jun 24, 2025 at 1:20=E2=80=AFAM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
+>
+> From: Yang Li <yang.li@amlogic.com>
+>
+> When the BIS source stops, the controller sends an LE BIG Sync Lost
+> event (subevent 0x1E). Currently, this event is not handled, causing
+> the BIS stream to remain active in BlueZ and preventing recovery.
+>
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
 > ---
->  obexd/src/logind.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/obexd/src/logind.c b/obexd/src/logind.c
-> index b4279b209..e681dd39f 100644
-> --- a/obexd/src/logind.c
-> +++ b/obexd/src/logind.c
-> @@ -68,7 +68,7 @@ static int update(void)
->  		return res;
-> =20
->  	if (state_is_active) {
-> -		if (!active)
-> +		if (active)
->  			return 0;
->  	} else {
->  		res =3D sd_uid_get_seats(uid, 1, NULL);
+>  include/net/bluetooth/hci.h |  6 ++++++
+>  net/bluetooth/hci_event.c   | 23 +++++++++++++++++++++++
+>  2 files changed, 29 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 82cbd54443ac..48389a64accb 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+>         __le16  bis[];
+>  } __packed;
+>
+> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
+> +struct hci_evt_le_big_sync_lost {
+> +       __u8    handle;
+> +       __u8    reason;
+> +} __packed;
+> +
+>  #define HCI_EVT_LE_BIG_INFO_ADV_REPORT 0x22
+>  struct hci_evt_le_big_info_adv_report {
+>         __le16  sync_handle;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 66052d6aaa1d..730deaf1851f 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -7026,6 +7026,24 @@ static void hci_le_big_sync_established_evt(struct=
+ hci_dev *hdev, void *data,
+>         hci_dev_unlock(hdev);
+>  }
+>
+> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
+> +                                           struct sk_buff *skb)
+> +{
+> +       struct hci_evt_le_big_sync_lost *ev =3D data;
+> +       struct hci_conn *conn;
+> +
+> +       bt_dev_dbg(hdev, "BIG Sync Lost: big_handle 0x%2.2x", ev->handle)=
+;
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       list_for_each_entry(conn, &hdev->conn_hash.list, list) {
+> +               if (test_bit(HCI_CONN_BIG_SYNC, &conn->flags))
+> +                       hci_disconn_cfm(conn, HCI_ERROR_REMOTE_USER_TERM)=
+;
+> +       }
 
-Just above this line there appears to be
+Let's start with the obvious problems:
 
-	state_is_active =3D g_strcmp0(state, "active");
+1. This does not use the handle, instead it disconnects all the
+connections with HCI_CONN_BIG_SYNC
+2. It doesn't use the reason either
+3. hci_disconnect_cfm should be followed with hci_conn_del to free the hci_=
+conn
 
-which looks like it's inverted too.
+So this does tell me you don't fully understand what you are doing, I
+hope I am not dealing with some AI generated code otherwise I would
+just do it myself.
 
-What this function probably should do is to make it simpler and
-something like
+> +       hci_dev_unlock(hdev);
+> +}
+> +
+>  static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *d=
+ata,
+>                                            struct sk_buff *skb)
+>  {
+> @@ -7149,6 +7167,11 @@ static const struct hci_le_ev {
+>                      hci_le_big_sync_established_evt,
+>                      sizeof(struct hci_evt_le_big_sync_estabilished),
+>                      HCI_MAX_EVENT_SIZE),
+> +       /* [0x1e =3D HCI_EVT_LE_BIG_SYNC_LOST] */
+> +       HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
+> +                    hci_le_big_sync_lost_evt,
+> +                    sizeof(struct hci_evt_le_big_sync_lost),
+> +                    HCI_MAX_EVENT_SIZE),
+>         /* [0x22 =3D HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+>         HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+>                      hci_le_big_info_adv_report_evt,
+>
+> ---
+> base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
+> change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+>
+> Best regards,
+> --
+> Yang Li <yang.li@amlogic.com>
+>
+>
 
-	state_is_active =3D (g_strcmp0(state, "active") =3D=3D 0);
-
-	/* if active but no seat, consider as not active */
-	if (state_is_active && sd_uid_get_seats(uid, 1, NULL) =3D=3D 0)
-		state_is_active =3D FALSE;
-
-	if (state_is_active =3D=3D active)
-		return;
-
-	active =3D state_is_active;
-	emit callbacks;
 
 --=20
-Pauli Virtanen
+Luiz Augusto von Dentz
