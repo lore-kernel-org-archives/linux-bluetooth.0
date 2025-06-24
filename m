@@ -1,125 +1,158 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9137281370
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 15:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750780762; cv=none; b=kef0yZC4HdVhHJARLo+aK1jomfY/pXrmk4BOcRi5AEG9AnmqJV8AO43veVew12xbeXDDGkKCmo0v7FeNRqVS2RKl8YgeYM0OEvCf3g3rWLAwUoem4cpLxLVhz1xHt2nzAic6Wng5v8qMwKPQWiD1XgqIXI3uInqVhM4QJokR99g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750780762; c=relaxed/simple;
-	bh=AT8lKrjultLn5tp4JOWqj3DwSX1mMal1bYQBSoPyWww=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=i3RziG6dGtEM7U8+wjsjdUqeG8Qd4yGmZ0tkhH6dBN2FTvymyHC4QH0oOPnjEX+VIu+Ar4bhcDY2t+h8ok2MssiMOV4i0WBxCpxz9dAT1PaJ4oyFPLtf7jvj+O83i+yzpjhbKKSNldUQCUji8VLKKLCfKchkYrS0mCDAID9B+5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j/EGfg6R; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD91E274B47
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 16:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750784109; cv=pass; b=ZlGfwYgrKdbE/rISlmoyPjZxmkZYAVDAO5E5YxXErXNQqoGlMfS27ZllRDTvRZFXgTYqQOkTVqGExnDWC7XXfkeXOKoz7bGnPZIDNdicUloxgiRJAXrcBn/vdcKLl4q5gqwy6xAQqVcozpRwJHrrWvawjFsPL2Rb7nLUZeF1BXs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750784109; c=relaxed/simple;
+	bh=dODMh8OY0oOo2zl/ywZtvWaJ4V3J2NqyFuctBE6/eak=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=L/pyB4esAZr3LK43gW3rd/lkCGPXdMsmalkonKlo23xK5yrwKB/XZ8AYN/fm7WDLZNQl3Xfv4lI3PsH3PoA5lYD05Tj7scsAvpoEsaT49y169fvTq+20O2zZlc+wCmR7MseDc/LOLfQ0SAUnRlqmP+ozTr7Ru7/RpAPsTu3dWPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=iPMSzLKK; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/EGfg6R"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3da82c6c5d4so55085615ab.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 08:59:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750780759; x=1751385559; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8BMeevNSzD1TJ6IJP221zdGno3wa4jMycBw4swvHykg=;
-        b=j/EGfg6RqoERUb0VnRcQZv4IxqT8UhBcseiCJv15oGhKVdJHQ3KXQfTJMW7RqEebut
-         bywascEXe/b1X2kZfDs6H9mqZG2evtEblQgLeJWFc4rkNOTZVcysWqrt4zSjQlennn5v
-         g3IRqCdPPAWl5EyeYyuVPKwWE9JHdEaT9FxfHcX6WvnxCAsUWc/NNPpvi2h+tbaJQyy5
-         krxiDyjyokpInA45bQ4flkfKR0ratuj7jVUYtEfgaKyu43ub6ChoQub2mEiG6MUcvBvI
-         2blGq9kTHpn4VVP9KAXXDKzY2GDh7iIXKRR+Excd9icSLFz0k+CDNpwSWWNc0WyGPsAH
-         ZAkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750780759; x=1751385559;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8BMeevNSzD1TJ6IJP221zdGno3wa4jMycBw4swvHykg=;
-        b=EqjrqsC5LH1EZgzsduXDi2KtrgJHzhWmWRX1Q/yR895QIcYmXzg902chspuVFz60Aq
-         5RcnNxG2lCKiHbm2z3WGsVlPFt4jBEv7DEvG88U871hyEzQ9tH+JRWhoU/gNPZ9eh+++
-         muaJJFWODBVFCuauyIZ9gECB6UBI148op4eJ8qgk7MDTeYDinRbSdfGge9kJscugXA2e
-         lQMYF7H/ot8hHWb5dtEyS6W1fhYdqO8koi2OL5XdqmUqSe46KCLN89w4Oez93uIZixbX
-         iZ8vDcWkQNphd3xBbQ08Q3vmSV2rJtzcIJBEu2pn2Teg+ck/6NdOjNBpJxaT5be2aOFL
-         oDeQ==
-X-Gm-Message-State: AOJu0Yz0jT+t8GXRYxBltQwTm56j0W8VI5HowfzZKIX8B/ixcGqlsNPo
-	oOCSt+eKVxG9qWm0V4P17JIOPO4cvhiTK6iaqQ8Dx+Vnj95fHEvH3JAC+f2JWQ==
-X-Gm-Gg: ASbGncvEbV6V3Qt5suK61IzOpu+BZOAwa3dwZ/ZlINaIDAtsIxX5rzAqQcJA4+b6/Dj
-	vKqFqAh0P8+jVh/hYgrkIHwiMIEA/7nPYbU25yK5kiVjRvkZ/tH/ttaLEGTcMOkTlLaDtAz0PLB
-	rlmfiLm+Cdoyyj0WVc9ehGKEWt2WF2J8CMHpyWRDUd8kvrWycox/EgTfC8qPMst9Vb0+oNdJS/E
-	r5U6S6OBoEdxZDcfqNi+647z5F+uprhZ30pXotdQNUYYlQj4xM+fTbgx4zJJUqPc2cKVtVZc7fG
-	lMAFWb3FF6/LdYy63cY3XPcNzfF86sxnHpDIFcInn29zOst+tO+lX1WU+nEKOPvB95cf
-X-Google-Smtp-Source: AGHT+IHGseW83Fg6wHXcOlM4lgempnl0D8kkheTujSYIhmvJyR767uBtiYfzCLehRMFZVUEruSW2mA==
-X-Received: by 2002:a05:6e02:1887:b0:3dd:cacb:b88d with SMTP id e9e14a558f8ab-3de38ca2f1dmr177420285ab.14.1750780759472;
-        Tue, 24 Jun 2025 08:59:19 -0700 (PDT)
-Received: from [172.17.0.2] ([168.61.208.12])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5019deaa0e2sm2267694173.28.2025.06.24.08.59.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 08:59:19 -0700 (PDT)
-Message-ID: <685acb57.050a0220.3abe6b.7127@mx.google.com>
-Date: Tue, 24 Jun 2025 08:59:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4321164801457189810=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="iPMSzLKK"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bRWK00c2sz49Q3m;
+	Tue, 24 Jun 2025 19:54:59 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1750784100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=73LMNCs20CgO0r/t378Ipdkumv0jLUk5UrU7bCgBVbw=;
+	b=iPMSzLKKvodxhC7ybSW3Nym106XATY412iVMpPul1KuoS5ZQjdeJUYDzS2F53oSCJRSHLz
+	wNKZFlUmhHYu+GF5ULJlXO78dUBFz7x/kC6y1hJSaqd1xwzDMsnb+1w9l7ygY6pIqVReM/
+	cNGoN/KP5U7nNu0GfRiPpNhoM9oPHpK1yR92AWawAiKjNOXC8T6kOPFpTVLZvTo91u9FCx
+	eex5h3a84VH9QgqSFW/+e+4x8Ix6CZlPSzzHDqnejIBafIVLePSm2tlWDXiZWFafwrqctW
+	Dfh7vT2oSOvJ6hk55+40cFW+Al7EXdpsXwIXIRhKqN1EUxhk/mamnJ81c72jCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1750784100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=73LMNCs20CgO0r/t378Ipdkumv0jLUk5UrU7bCgBVbw=;
+	b=NwhsjWZ4XEaEHTsJRS0aHpqqTSDgFUVp9fjw4B+wAbyqvwmfDsvf9vBYor/0JixoMs13L/
+	QhMm7RX2XrB7Lc7iXrI5uPjgHmf+dhybFaPGYmMeTQbR6aT43YaLJ6mcPn/0RkYio7EEPy
+	DkCyIH0RI8LUq3o/6cYtCqsZxnhZJqjeo9A91SSd2JtvwCAd01FugrjG8CqqqptqlRFHmv
+	FNkjmX6oN+Gedcc0lzNsBvYFiMLAvY8VsVM2Dkveis2gwePx+lwdj0rQJyzpFwc9Fk5+Gr
+	EVLtiKGejggY9NYVMH78u7v47r3PyT7PMlGnZpo0QUArpF9++QOQH1V3zQUc3g==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1750784100; a=rsa-sha256;
+	cv=none;
+	b=lLgT3WK9JIo4EDY9kKyPSLWKNns0Q4I/GVZetcseqt9EOyT15E/2UVMEWViUO0LNDsqgK4
+	hDfFFRo6wL+FIl0Z5pf13lObff5YNPe67zTTYSfTiM+gd6MP2oiRpOjahXUCSsELFgzq3e
+	e0h+6zvwVtYQX1ht1f2ztk+6FU8vjjFlEBDgKE2xAI205fT4HClFLxt0ulmUnFhj/HPhvU
+	u/BjO95IlMfbq9W1I8lMbNq+ZKgpqBv07SHfthU8wHGK2Q1+UKpOF0khCG4MGNerfsrZ47
+	bQ2+YY+rPYduE+nu7HYJvl9aDmcRyiA57SbdkZC0TDertcmblQJ2iDD+ohDOFA==
+Message-ID: <b6b051caafbcdbb00b3a78b8a5982466435d0e28.camel@iki.fi>
+Subject: Re: [PATCH BlueZ 1/1] obexd: Fix failure to register bt transport
+From: Pauli Virtanen <pav@iki.fi>
+To: Pete Beardmore <pete.beardmore@msn.com>, linux-bluetooth@vger.kernel.org
+Cc: Andrew Sayers <kernel.org@pileofstuff.org>
+Date: Tue, 24 Jun 2025 19:54:58 +0300
+In-Reply-To: <DBBPR05MB6283E530AA7B8138A19DAA008A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
+References: 
+	<DBBPR05MB62836AA5E235A13B44F962C88A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
+	 <DBBPR05MB6283E530AA7B8138A19DAA008A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pete.beardmore@msn.com
-Subject: RE: Fix failure to register bt transport
-In-Reply-To: <DBBPR05MB6283E530AA7B8138A19DAA008A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
-References: <DBBPR05MB6283E530AA7B8138A19DAA008A78A@DBBPR05MB6283.eurprd05.prod.outlook.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============4321164801457189810==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ti, 2025-06-24 kello 15:23 +0100, Pete Beardmore kirjoitti:
+> On initial logind update, the internal 'active' state is FALSE. Where
+> querying the current state (`sd_uid_get_state`) returns 'active' we do
+> NOT want to short-circuit the update to the internal state value and
+> ultimate transport initialisation.
+> ---
+>  obexd/src/logind.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/obexd/src/logind.c b/obexd/src/logind.c
+> index b4279b209..e681dd39f 100644
+> --- a/obexd/src/logind.c
+> +++ b/obexd/src/logind.c
+> @@ -68,7 +68,7 @@ static int update(void)
+>  		return res;
+> =20
+>  	if (state_is_active) {
+> -		if (!active)
+> +		if (active)
+>  			return 0;
+>  	} else {
+>  		res =3D sd_uid_get_seats(uid, 1, NULL);
 
-This is automated email and please do not reply to this email!
+Just above this line there appears to be
 
-Dear submitter,
+	state_is_active =3D g_strcmp0(state, "active");
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=975328
+which looks like it's inverted too.
 
----Test result---
+What this function probably should do is to make it simpler and
+something like
 
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.29 seconds
-BuildEll                      PASS      20.72 seconds
-BluezMake                     PASS      3037.97 seconds
-MakeCheck                     PASS      19.96 seconds
-MakeDistcheck                 PASS      202.42 seconds
-CheckValgrind                 PASS      279.52 seconds
-CheckSmatch                   PASS      307.19 seconds
-bluezmakeextell               PASS      129.87 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      928.37 seconds
+	state_is_active =3D (g_strcmp0(state, "active") =3D=3D 0);
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+	/* if active but no seat, consider as not active */
+	if (state_is_active && sd_uid_get_seats(uid, 1, NULL) =3D=3D 0)
+		state_is_active =3D FALSE;
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+	if (state_is_active =3D=3D active)
+		return;
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+	active =3D state_is_active;
+	emit callbacks;
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4321164801457189810==--
+--=20
+Pauli Virtanen
