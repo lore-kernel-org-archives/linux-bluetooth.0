@@ -1,137 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E2529CE1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 06:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F50F158218
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 06:04:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750745061; cv=none; b=XGqd7VRwkIKCoC7TjIbAouCZ9ouFVAQvpNSjf/abTpKwQURZl8XljlYE1Jsi6lwcoTUPHFzsln71u3QeVcnPHVTkgG0E5Wqwx1wYLb9Ba4qSNxM9chlistm71ZsDDSJwca8g/g5Vbtk/ljwk1dPsiaXWWn2KHJSG9Byv0tdzDho=
+	t=1750745077; cv=none; b=glDyP6BhcMOBtPFweUUyBgJ+dvxuu0lcCdaxIMOVqesvslw/zOcTlRu9LtjgwDxpwRJsiqVzn2QxTe+rRL/knixbACci2IMhIA3jsOEdEUX1m1/Kwv1Eanu+H+EVffLqjFytfI7dMB5aLV8E+6gbvlA5wmtHH2yRP9fGFO+v4W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750745061; c=relaxed/simple;
-	bh=538LgiZ7VUVHUSGwV/O/7r87Y1kzfFtDfURJIN/qg70=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=axsiQVxw2wFnC7VY4MVA8yNX3iKYKMHdqKVWYOZofi69dCY+lz0GIsrtqwQBaM73nBmf8eigMjGmQernvW7SeVgyCVy300zCCYYhQreMWIHW+7fBLtp7K+mzj3il4vdyP/x5ksq3cPuMK5N4nMxtvsgXNP+BDBsZ5FLtRPdzLDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sxo1a0o9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750745077; c=relaxed/simple;
+	bh=9KVVYtPNWl/cwWE+bzQ3ccQQ1M+BIvywrP0P6EZeVVc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qZCV1Rq3TDNay1nekbVowo9orbowgUUoI5LK4ygK0agA0sLBPucZhdrnLpAKs3mpZ9+gQkXm9EHxWUXWNxA54TsPz7NtVxWi3HF9FaPAToRG1wG5We89VZvQq6KYqaPaB+0VH43sbY8zVKtSxOnQoKTs6OYpCHa+nNMb79ovkCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mTvQd+I3; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sxo1a0o9"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2183AC4CEE3;
-	Tue, 24 Jun 2025 06:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750745061;
-	bh=538LgiZ7VUVHUSGwV/O/7r87Y1kzfFtDfURJIN/qg70=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=Sxo1a0o9lJG1IqO4lDhvkfMTCSCO2cSNzRe8JEDR7LvWQzMgp5jyRacqmX4Z9hcEO
-	 bN3UbZ1Jh7IQ4jzFpoR10soxLzCRsUNzpqZj/Wvvizs6zx9lo1X6ZULJX3f72ceOqw
-	 eQYERMJhH4oLU/JL+rsghGJEcv8pBsmtaMY3PdpRrcVwOrD3HJGyNw3H0Bcp/Y849j
-	 6SNWIukU6NHtzM6p3Wx2und/j9aztciK0GOCjEkoQ/4Jv1yThhMTajAel8MNql8L9M
-	 PDZAfRpKWOb79I9bsX+Shzsrog5tDnZr8cc48BHgvuMzMLcMf2tRSnBv4Hbm1YY4pp
-	 YAfAGLQPAkvAQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FACDC77B7C;
-	Tue, 24 Jun 2025 06:04:21 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Tue, 24 Jun 2025 14:04:17 +0800
-Subject: [PATCH BlueZ bluez] shared/bap: Set stream to idle when I/O is
- disconnected
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mTvQd+I3"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6faf66905baso74902436d6.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jun 2025 23:04:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750745075; x=1751349875; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=a633PEmI68MDvV7oekWfRMZ4wh+5vd3gskiFjo+7JNY=;
+        b=mTvQd+I3eZt6T6TEEE0L5xKIvqG2R2p2y9ddTiIoomYME4mg5gM3OmTCnXqplWVpyt
+         s7sQoQ3r5nyxX174HrAJTnaRNiPIiDqYSCKuFOs4X+UeGcTHmhxaTYQrY6N4mvtIvPWY
+         L5O6Uh+jEyNG8GrtOFSoRN06FxSOx27L4NRsMDt509NW1axVEy1CB+LCy/6p4FxFMN+l
+         Nibdix5pr+R/4a+hNuOjzX4ognQsZpKJcOCB2T87ByM8HzOGyTQPm09SgtAVy45vyXCj
+         NANvPjpxoV6XL3Pe5wQGgUt5dsSyA99deQ+4TidamWHBiTINs2j57rk+UTSYf7tFDqOy
+         N5Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750745075; x=1751349875;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a633PEmI68MDvV7oekWfRMZ4wh+5vd3gskiFjo+7JNY=;
+        b=pDZuPlRBNUsbkftCbPJERnLi/0LfYk4ZffLrkBW14CjJpBo6QShTheKkdl8Jrlbk0j
+         f6N4xdPR1tFaeV8WDlt6eZ0vznFyj+ptIFyspidHyNufp9V2gkXUv1hemjHwJ97wepTj
+         LbxuHONYg1AAYGOioxCdUtUl6dmqcK61NUfg0YDKhhPeVbr9piZ74OntyVFxBVb+DRim
+         6EfWEaH2N+HmkQUNGV6xdOShpCbLlxTlFV2s8ySEplzFmgJFJVREOCsDvIBmwuNdq9pB
+         zwE2cpbE0HQhh5hoj8SQnmzXoggUv2iSCFs045A9w20mj8ExjM9FFRyKbL8a8rCvoi76
+         bZDA==
+X-Gm-Message-State: AOJu0YzV3bG+T5/iuJDD7run5uClEyYoCbwUiEPUTgjdci93+gjeCPXi
+	zhY+F/LOM62SxZ9hVeMENrmAS6JVhZxz14/k7KoF/QiESQg/TKRo8wfD0BiwbQ==
+X-Gm-Gg: ASbGncvTEZnhaQJw85GX+aXZixRIRmDtwmMKoHset1UnVw9vjz2OJyrghHyHJYDPJGX
+	6VGGA0F1BaXRIFsnF3BC779VkZc/Ykpr5GGMdd44/NKkvaGvsmUJKFUa6xZuzaJtQYq8PPDlY9N
+	4t4tr1CFX/9OCHpAuF/22BjD8qf03Memw5ztOMJ16vxOMQMoDrczlWd6Bj4Esqum8VzFJjD1VuQ
+	15iDR/i8QDsBPMgujqoPX96FpVXYzyJjpHlDs3qqEMJxFLcRZnmeQfCf9NHdFGy05oFyWVFqsFX
+	A74wUkcLL3Z/Xiqm+lQX3jvLBRchepKSNH++3yW2wwckcQr1Q6e480KX/OjugVAaECT+OMSZCEe
+	LfX4=
+X-Google-Smtp-Source: AGHT+IHJWBB1XigqccesPmlSK6STapGxdLdWfUvl4xTWP6C+z1DbKwna6dRcJaylLjSHFDbRvplcAw==
+X-Received: by 2002:a05:6214:5b81:b0:6f2:d45c:4a35 with SMTP id 6a1803df08f44-6fd0a5c09ddmr278073436d6.37.1750745074842;
+        Mon, 23 Jun 2025 23:04:34 -0700 (PDT)
+Received: from [172.17.0.2] ([68.154.31.203])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd09593450sm53352286d6.98.2025.06.23.23.04.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jun 2025 23:04:34 -0700 (PDT)
+Message-ID: <685a3ff2.050a0220.304a03.19c9@mx.google.com>
+Date: Mon, 23 Jun 2025 23:04:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2589696669638360599=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
+Subject: RE: Bluetooth: hci_event: Add support for handling LE BIG Sync Lost event
+In-Reply-To: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
+References: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2589696669638360599==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAOA/WmgC/x3MQQqDMBBA0avIrA1oqpF6FSkhE0c7IIlkbNGKd
- 29w+Rb/nyCUmAT64oREXxaOIaMuC/BvF2ZSPGaDrnRbGd0odKudYrLIs5UjeLtE2ZR5NJ3xpnu
- OiJDbNdHE+/0dAJcP/eB1XX8TtvK4bgAAAA==
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1750745059; l=3551;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=NnW6oCsp7Gte23sNn8PxIxPN0k6NBhSjprOBezp/bpQ=;
- b=geP9VZMgorkMMNCVVZ1CXDo8OloIkJzCS1Q0kLPEe+L3ZiQEcvFbr5nd36JFz39kRaelW9Znl
- dXAf08jHfhsArzKB8bcb4CNZi8qrhsei18iMKyEY8AS8DArPujqleIz
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+This is automated email and please do not reply to this email!
 
-When the CIS link is disconnected, the ASE status transitions from Releasing to
-Idle.
+Dear submitter,
 
-  > HCI Event: Disconnect Complete (0x05) plen 4           #1484 [hci0] 67.947425
-  		Status: Success (0x00)
-  		Handle: 512 Address: 5C:B1:E1:2F:01:B9 (Resolvable)
-  		Identity type: Random (0x01)
-  		Identity: E8:D5:2B:59:57:A6 (Static)
-  		Reason: Remote User Terminated Connection (0x13)
-  = bluetoothd: src/shared/bap.c:stream_io_disconnected() stream 0x..   67.948018
-  = bluetoothd: src/shared/bap.c:bap_ucast_set_state() stream 0xdff..   67.948145
-  = bluetoothd: src/shared/bap.c:stream_notify() stream 0xdffda8 st..   67.948275
-  = bluetoothd: src/gatt-database.c:send_notification_to_device() G..   67.948525
-  = bluetoothd: profiles/audio/bap.c:bap_state() stream 0xdffda8: r..   67.948679
-  = bluetoothd: profiles/audio/transport.c:bap_state_changed() stre..   67.948967
-  = bluetoothd: profiles/audio/transport.c:transport_update_playing..   67.949061
-  = bluetoothd: profiles/audio/transport.c:media_transport_remove_o..   67.949106
-  = bluetoothd: profiles/audio/transport.c:media_owner_free() Owner..   67.949149
-  = bluetoothd: profiles/audio/transport.c:media_transport_suspend(..   67.949375
-  = bluetoothd: profiles/audio/transport.c:transport_set_state() St..   67.949423
-  = bluetoothd: src/shared/bap.c:bap_ucast_detach() stream 0xdffda8..   67.949574
-  = bluetoothd: profiles/audio/media.c:pac_clear() endpoint 0xdd2d2..   67.949710
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=975118
 
-When BIG sync is lost, the stream status transitions from Streaming to Idle.
+---Test result---
 
-  > HCI Event: LE Meta Event (0x3e) plen 3                #3189 [hci0] 118.870863
-  	LE Broadcast Isochronous Group Sync Lost (0x1e)
-  		BIG Handle: 0x00
-  		Reason: Remote User Terminated Connection (0x13)
-  = bluetoothd: src/shared/bap.c:stream_io_disconnected() stream 0..   118.871183
-  = bluetoothd: src/shared/bap.c:bap_bcast_set_state() stream 0xdf..   118.871227
-  = bluetoothd: profiles/audio/bap.c:bap_state_bcast_sink() stream..   118.871258
-  = bluetoothd: profiles/audio/bass.c:bap_state_changed() stream 0..   118.871307
-  = bluetoothd: src/gatt-database.c:send_notification_to_device()...   118.871384
-  = bluetoothd: profiles/audio/transport.c:bap_state_changed() str..   118.871452
-  = bluetoothd: profiles/audio/transport.c:transport_bap_update_li..   118.871509
-  = bluetoothd: profiles/audio/transport.c:transport_update_playin..   118.871555
-  = bluetoothd: profiles/audio/transport.c:transport_set_state() S..   118.871610
-  = bluetoothd: src/shared/bap.c:bap_bcast_sink_detach() stream 0x..   118.871660
-  = bluetoothd: profiles/audio/media.c:pac_clear() endpoint 0xdd25..   118.871689
+Test Summary:
+CheckPatch                    PENDING   0.31 seconds
+GitLint                       PENDING   0.21 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      24.80 seconds
+CheckAllWarning               PASS      27.16 seconds
+CheckSparse                   WARNING   30.70 seconds
+BuildKernel32                 PASS      24.35 seconds
+TestRunnerSetup               PASS      473.69 seconds
+TestRunner_l2cap-tester       PASS      25.59 seconds
+TestRunner_iso-tester         PASS      42.43 seconds
+TestRunner_bnep-tester        PASS      5.99 seconds
+TestRunner_mgmt-tester        FAIL      135.12 seconds
+TestRunner_rfcomm-tester      PASS      9.42 seconds
+TestRunner_sco-tester         PASS      14.95 seconds
+TestRunner_ioctl-tester       PASS      10.09 seconds
+TestRunner_mesh-tester        PASS      7.56 seconds
+TestRunner_smp-tester         PASS      8.65 seconds
+TestRunner_userchan-tester    PASS      6.34 seconds
+IncrementalBuild              PENDING   1.02 seconds
 
-Fixes: https://github.com/bluez/bluez/issues/1343
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- src/shared/bap.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index bccbc73ff..d51f3106e 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -6584,10 +6584,8 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
- 
- 	DBG(stream->bap, "stream %p io disconnected", stream);
- 
--	if (stream->ep->state == BT_ASCS_ASE_STATE_RELEASING)
--		stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
-+	stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
- 
--	bt_bap_stream_set_io(stream, -1);
- 	return false;
- }
- 
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.231 seconds
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.155 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
-base-commit: ae1b7f6ba805f82742bbc32ff275e268248ef9f8
-change-id: 20250624-bap_for_big_sync_lost-63476c679dbb
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
+Regards,
+Linux Bluetooth
 
 
+--===============2589696669638360599==--
