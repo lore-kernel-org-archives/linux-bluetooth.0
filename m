@@ -1,166 +1,130 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57247335BA;
-	Tue, 24 Jun 2025 07:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0398E253951
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 07:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750749172; cv=none; b=rrcw7g/CPqKqC0Y4XbJfxLLR+IMh3gNWoJsUPbvb8cTdhT8k5HEbY1yFfg6Ssg7pnkEAGJzw8AUk9OpZvo4tLvkLDOL54+d8DcbB7ycx2guEcrb86l7MzPUNVhBnHn8zUjNPK6kP2CFuR6rkwiJqC5q6oobJO2it7qu9DRU/LYs=
+	t=1750750795; cv=none; b=f9qZ+MiE3edYAZFhval2jxXbPwv2doh0qrcob9NUiPnpZYfHeHUhcYQp2XJ/4ZP24tnro5vUIC1EcFZi68Nnl/4/YcrtjsWCQuY8zYn7BmjDHeP2mN6ur09nd2BcEahs79BCgUhql7BFtqSCNjomV03gRxJKmfh5pDQimrdjCnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750749172; c=relaxed/simple;
-	bh=hvXeIw6z9bErYdCZo9+wLIAsbPFrMgVsPaWrxP3rMsE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xc+szPRhT8/IBVB4XSkHVPX+CbyWLRfEDpugp64ClB9V7P0WKVl8ewfj3aE3FNeITqnQw1uFaKUMb5q1SQraYdIV2Vrv9T+qOUDbbFiAjTJ7xX+MJQLTsF7mT8LAWBgmJzdXHFsf3wCimabtGlP6IdRA+pqMtLBpilBvnIPDSrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 62A9761E647A8;
-	Tue, 24 Jun 2025 09:12:20 +0200 (CEST)
-Message-ID: <c92dd95b-3986-4b0c-807e-62c203a656df@molgen.mpg.de>
-Date: Tue, 24 Jun 2025 09:12:18 +0200
+	s=arc-20240116; t=1750750795; c=relaxed/simple;
+	bh=R5Q02VsgiHEoNxx9DgWILRvv4trANQM1E77GVpizRGQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=HFJ6Sk4uwnwV5djIay8A6T4/I3wVBXZBMWJAYjsvR/uwQGDJ6gPxAWpik49HwmOPa7tjBd8AQXAYkhQUtz8t0wZ9J9de1sBEbH6YzA9sqr2UrcWaZpqOiAIwYrnZr3V5Gvem4NbWlQw1+5zBTRhKy74pCF8uq0LXJD72uXeKI6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgIy0crc; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgIy0crc"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2350fc2591dso43382375ad.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jun 2025 00:39:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750750793; x=1751355593; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vndS9y65s5slLA38GHuD2QBPQdLnIDM69Rf/uhZmGyY=;
+        b=XgIy0crcwqp8uCjdSGC3QrGu+zAI2R3yRFePwv5Q8lS0WKRwMtHedGm+8u+X66Es9s
+         ygWQmnJ4INNg5imNofLwzjF0R9dk6MbE4PROlbTTglV4QuHqgk3oRQKuKIOlbxxxUr3B
+         p6Qo0EW7SEje/tZ254ZNcQXccp2YJnz0qBKRUKio1WidDh8nPZPjSa52z3kbEble7b2o
+         lPvHwgWIcTEPQwFch03jNrwbDlmd/Rw+6EXz7Ut0bNbwoTP5ZIsWjtqqyTcOo62537rt
+         4Gk12jKJoh8gzpNqWwJteMGeuzpmNRO8kuZQivXt0j2B826dP30r/br+W8mBknVImGdd
+         AhrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750750793; x=1751355593;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vndS9y65s5slLA38GHuD2QBPQdLnIDM69Rf/uhZmGyY=;
+        b=wlfu/oeGKW5teTbKk46vTShBdOOZxmW9IoEaPLemJ6GE0ddnYk1PYsEXUMoekNsRTx
+         StCTt5jw+m2MOE3UafKs7WRedd/hzBA0MQ7s5HM/8o+keXy+Nwx2n5Wqdu8Wh3HINyGN
+         xtZFWNDON7o84Nk4JFkRNX8nDqVLIOd4mSynhDFFYvCBkfzpZjbJ8GPQrzUhXBOcQuV9
+         3dNLYX+g502vGyJDHTbZkMhaMeMUyHtzbHSyb+2fmP1gdUF4KpBH001nwIMDqteEtemV
+         G2Yg5hCzPdLWCnKrmdUNdyjBPEDi+mVHDuYAJBkjQiiLmVp809Pjkk49imUU3ls3UQxi
+         ZFYQ==
+X-Gm-Message-State: AOJu0YzAeu23Nypufwk8mwqMwudnFhnOwrzWkN+6w7YatF0cpu72fWIa
+	x0CMOKHhPQMR3RR/x26RJ/26GjfKKPMyTv0/SHhDKWCIZXnUpn2mOBcvjsdDZA==
+X-Gm-Gg: ASbGncuFIpr95ZwzsZPaC111HXA1CsePGdwbvlCLZEzEhzsXEY3z39c4PUP0VbPe73R
+	LKOSzpKWZmrT1LZ7OSiz4HM8UdS8mb8rm7RJMLS/j6Sd8DZjtb2kU25Sl3O4MLW7G16uDzKYUcZ
+	oYsDLiY5j77oISrmAjlFMTSNvyZJUo5TACX0N+Re+PIKsfNTx60Qg6PuAqcnPBszk5hGxd5n7AZ
+	Nvy5eBpLVBTng73wdbxKaT10v+STFFWGf2Q1ZsNJJG9u2Da5/agZzV2qHiYWYgVtZb1fdyiU/He
+	BWofZ5BOo/hQQbiwEjAbHoxx+Mcq3rJo3vf9mv8vAAbuuIMqMA7Je8xgj5u6MfiY38SD
+X-Google-Smtp-Source: AGHT+IEcxGPL2PtwIDA9kjLdHWK+AqF7ENR+epelGL6jH3eyQ1XWaJ9v+2Qv8XXFcg8/BBZ+ApG8Pg==
+X-Received: by 2002:a17:903:b8f:b0:234:adce:3eb8 with SMTP id d9443c01a7336-23802471f97mr41358355ad.12.1750750792812;
+        Tue, 24 Jun 2025 00:39:52 -0700 (PDT)
+Received: from [172.17.0.2] ([13.93.150.123])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d866b5d3sm103072185ad.164.2025.06.24.00.39.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jun 2025 00:39:52 -0700 (PDT)
+Message-ID: <685a5648.170a0220.87390.b4c9@mx.google.com>
+Date: Tue, 24 Jun 2025 00:39:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6206763613914317000=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_event: Add support for handling LE BIG
- Sync Lost event
-To: Li Yan <yang.li@amlogic.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com>
- <4db45281-9943-4ed7-80c6-04b39c3e9a5e@molgen.mpg.de>
- <d3ca7e7e-720a-42ef-b32e-19cd84d208a7@amlogic.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <d3ca7e7e-720a-42ef-b32e-19cd84d208a7@amlogic.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
+Subject: RE: [BlueZ,bluez] shared/bap: Set stream to idle when I/O is disconnected
+In-Reply-To: <20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com>
+References: <20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Li,
+--===============6206763613914317000==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=975123
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.39 seconds
+GitLint                       PENDING   0.30 seconds
+BuildEll                      PASS      20.22 seconds
+BluezMake                     PASS      2596.17 seconds
+MakeCheck                     PASS      19.83 seconds
+MakeDistcheck                 PASS      199.48 seconds
+CheckValgrind                 PASS      277.04 seconds
+CheckSmatch                   WARNING   306.05 seconds
+bluezmakeextell               PASS      128.05 seconds
+IncrementalBuild              PENDING   0.30 seconds
+ScanBuild                     PASS      908.89 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Thank you for your immediate reply.
 
-Am 24.06.25 um 08:26 schrieb Yang Li:
+---
+Regards,
+Linux Bluetooth
 
->> Am 24.06.25 um 07:20 schrieb Yang Li via B4 Relay:
->>> From: Yang Li <yang.li@amlogic.com>
->>>
->>> When the BIS source stops, the controller sends an LE BIG Sync Lost
->>> event (subevent 0x1E). Currently, this event is not handled, causing
->>> the BIS stream to remain active in BlueZ and preventing recovery.
->>
->> How can this situation be emulated to test your patch?
-> 
-> My test environment is as follows:
-> 
-> I connect a Pixel phone to the DUT and use the phone as a BIS source for 
-> audio sharing. The DUT synchronizes with the audio stream from the phone.
-> After I pause the music on the phone, the DUT's controller reports a BIG 
-> Sync Lost event.
 
-Excuse my ignorance, but it might be good to have documented. How do you 
-connect the Pixel phone to the DUT? Pairing is not needed for BIS 
-(Broadcast Isochronous Stream), and using wireless technology no 
-connection is needed?
-
-What app do you use on the Android phone?
-
-> I believe this scenario can also be reproduced using the isotest tool. 
-> For example:
->   - Use Board A as the BIS source.
->   - Use Board B to execute scan on.
->   - Once Board B synchronizes with Board A, exit isotest on Board A.
->   - Board B should then receive the BIG Sync Lost event as well.
-
-Thank you for sharing this idea.
-
-> Additionally, the following BlueZ patch is required for proper handling 
-> of this event:
-> https://lore.kernel.org/all/20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com/
-
-Yes, I saw it. Thank you.
-
->>> Signed-off-by: Yang Li <yang.li@amlogic.com>
->>> ---
->>>   include/net/bluetooth/hci.h |  6 ++++++
->>>   net/bluetooth/hci_event.c   | 23 +++++++++++++++++++++++
->>>   2 files changed, 29 insertions(+)
->>>
->>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>> index 82cbd54443ac..48389a64accb 100644
->>> --- a/include/net/bluetooth/hci.h
->>> +++ b/include/net/bluetooth/hci.h
->>> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
->>>       __le16  bis[];
->>>   } __packed;
->>>
->>> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
->>> +struct hci_evt_le_big_sync_lost {
->>> +     __u8    handle;
->>> +     __u8    reason;
->>> +} __packed;
->>> +
->>>   #define HCI_EVT_LE_BIG_INFO_ADV_REPORT      0x22
->>>   struct hci_evt_le_big_info_adv_report {
->>>       __le16  sync_handle;
->>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>> index 66052d6aaa1d..730deaf1851f 100644
->>> --- a/net/bluetooth/hci_event.c
->>> +++ b/net/bluetooth/hci_event.c
->>> @@ -7026,6 +7026,24 @@ static void 
->>> hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
->>>       hci_dev_unlock(hdev);
->>>   }
->>>
->>> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
->>> +                                         struct sk_buff *skb)
->>> +{
->>> +     struct hci_evt_le_big_sync_lost *ev = data;
->>> +     struct hci_conn *conn;
->>> +
->>> +     bt_dev_dbg(hdev, "BIG Sync Lost: big_handle 0x%2.2x", ev->handle);
->>> +
->>> +     hci_dev_lock(hdev);
->>> +
->>> +     list_for_each_entry(conn, &hdev->conn_hash.list, list) {
->>> +             if (test_bit(HCI_CONN_BIG_SYNC, &conn->flags))
->>> +                     hci_disconn_cfm(conn, HCI_ERROR_REMOTE_USER_TERM);
->>> +     }
->>> +
->>> +     hci_dev_unlock(hdev);
->>> +}
->>> +
->>>   static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, 
->>> void *data,
->>>                                          struct sk_buff *skb)
->>>   {
->>> @@ -7149,6 +7167,11 @@ static const struct hci_le_ev {
->>>                    hci_le_big_sync_established_evt,
->>>                    sizeof(struct hci_evt_le_big_sync_estabilished),
->>>                    HCI_MAX_EVENT_SIZE),
->>> +     /* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
->>> +     HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
->>> +                  hci_le_big_sync_lost_evt,
->>> +                  sizeof(struct hci_evt_le_big_sync_lost),
->>> +                  HCI_MAX_EVENT_SIZE),
->>>       /* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
->>>       HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
->>>                    hci_le_big_info_adv_report_evt,
-
-Kind regards,
-
-Paul
+--===============6206763613914317000==--
