@@ -1,74 +1,77 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCC9263F40
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 15:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7232DA752;
+	Wed, 25 Jun 2025 15:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750864252; cv=pass; b=biLlQcujGLA5Se5nDA1sG4Wf4IEpX510ohi+qKGo6wFMN+BguVsFWbSrhqtPBHd1u6TSsxVp9kc/P+siIdnLQDVk3zJtn1gQ2WsHHRiYY7XB3DEfZ9VYHv3sIKkF+OfgxD2ZDlnW3Z8tCndq6mXDA+riqkS/+qoFwM/4u/mFzIY=
+	t=1750865005; cv=pass; b=PiLCVpAB5iCqS1mBRIn+svNd837SUPR4eFIxM1u47HK6fU4pXzujG144wvlJi9dpBnYvAlCXtxtTNLU0FHRDTM0kLUtZbwIlxUxhjrUgrk4uL9GxZrWut5oGyi6byFvx369m859wittX0XEZf/EsrxXFu3McmA/rkAwWG2/q7n0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750864252; c=relaxed/simple;
-	bh=ThUOcCvy7asTWNQRdP+hWV5MhWER9orAu/sfmtgAeCo=;
+	s=arc-20240116; t=1750865005; c=relaxed/simple;
+	bh=dbm6Ij9s2O8swfUZzR1v4IH0cSSPUEclfNNYbKRETwE=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tvX77abD9Xu2Wl8qt7nQtzPUVtMhpNZ/gNZFd0dgnA0OlmuUTZKrhWNO8xso0YkmgBVzs0mnL1uVU2RGNmR/Q/Pne649jzbW8laRxO6QPLptGAcD0olmetICFlUikI/JOmViWQpQ3zfKjI32y9AQ1JSlmoEF+KDt3yPFXxw5plA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=mXujWy7A; arc=pass smtp.client-ip=185.185.170.37
+	 Content-Type:MIME-Version; b=vC/Jt2aw9b2HeQZCX/jJc0yb8/mz9iAgtTQMw9d0o7PJFIzGizVrbY+4avGDgJlIr973kXYlO5D5kUkCVETIcf2sEugx6G6nSBkkRE3ttgavZnOcgvcWmb7liMYA2nlC9VM3k16LNjn/dj+j4ujm4/Mv0aYAEXUb1HQ1s0kNRLc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=MDfinMof; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="mXujWy7A"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="MDfinMof"
 Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bS4yB5qGyz49PyY;
-	Wed, 25 Jun 2025 18:10:42 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bS5Df2y1rz49Q47;
+	Wed, 25 Jun 2025 18:23:14 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1750864243;
+	t=1750864996;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ThUOcCvy7asTWNQRdP+hWV5MhWER9orAu/sfmtgAeCo=;
-	b=mXujWy7AQr2BC9P3e40l2yhTrt1Wr3M6XKbOF4PM/SUDDob2BCY/Yglw+CdtRmC3jaOT6n
-	HnO3sprwUgqEaeHp3jFe53XWjUyOoywrngYFfWbrhBdkwxE8qt9Q+SsI5KYR3QipFj1GfV
-	3/vlhOwP4y+HqNTbdJq+5bwnad0ZF7fcZnB6SB5rRN1AUKtvABWj0cAztTzIn3voaUh4dR
-	PTa+oDEtyOndsDbFf1fBkMjGDpqYKKdErc2YT3TQtVd5RUv+m7HLd1bwWfMqWZH2KmXHEM
-	XVepuooYuv5Y+pk+lRWQTyfj3KmOFufuoGK2SpwePxwRxI5SZX7iEkfC34DLRQ==
+	bh=psSAEbA6GBc3e7dUMsn95jE0RdMTFhIo/mTHBwvBzf4=;
+	b=MDfinMofByz7XZhDK2T0GeJzfEZ8fZQq3Iu0ZILTmHhoNia+VXLg5ExlXPFz2wVs1qkm4d
+	pL5l9mMgRAiZ0wpyftZPyk0DjAZsWvLsFmznVT1B6qfokdA2ac0tQY3u3MVt6lFxE8/kud
+	30blGJ9BTvCCF4X5vdtiJGngAfp8K8owc5Jz77IzQI6jnlEDKI8n6OguFqUygJKtgtkbrW
+	brjZ/010A58/Zl2DBeSC5drzhoRfNmg+kF/w9m1pQ0I1yjhaPPNzXMsq4vylHSOYFA1qDz
+	Wn+F6x8ndXpQU0EWNKdymQlicaLAJygrtAFGQVbKpIFJukPv7coDDE/qtPQBLQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1750864243;
+	s=lahtoruutu; t=1750864996;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ThUOcCvy7asTWNQRdP+hWV5MhWER9orAu/sfmtgAeCo=;
-	b=pzaTd/kkoFrffVzn5ZiMSFU6uVzUTT3KW2Z3UAdFoDYpClx+FfB2CjbOLIYNRCzishTfx9
-	yZY5sBfGJQgqRuWhjGIaJxrA8FzqypB2YDp+ja+wSCfHjRnpMpgfVh2cmiFkDcoAblAI2f
-	uT8jXXQ5uZdE+bxgoBvroBwr4y0bHT4Vh2ihC5Rcktx024yaRG7OtEGYkRruSUv9nGxdwC
-	JmHGjvsvXGiRMySzOl+CxV58oDozJegqldrU7flJO1WlyFBXcQx3RAfGYPw+rWWP7UX1ci
-	GnbVl+uQloGKqQxlcPoNRj33zqFHh+hSkWDGsAN6bR7GdiiIhqH428j+BP/BFg==
+	bh=psSAEbA6GBc3e7dUMsn95jE0RdMTFhIo/mTHBwvBzf4=;
+	b=vCjqnD3FcXf/2mMvCcfeyDA6vg4BjiRQ4lJyaP75swsfKXZGhAHyX/it/7MYSRInA/jPJH
+	G/wuUo8IF5AAJ7EeO/EXiNmCKZcMg3b9edc7Y9gSs7i8C8BOi7TzakfZKZoKaPG0yZHaQ+
+	SlNAME7nBJqs6LBDfoOjWugcPfdW5oLKqfraw97Kt0ydk3RKsJk4KfvakpwdStsWVfx/Sd
+	L+vF6qf61X/R6ZXlbxrs0P99EPza9oSMYTTLW2122JtdDnb46Q9TN6YaC6MoEPayw+mBkf
+	SYtdFBkBGnHf/2Tn5XekmcQ7w9kTR17jKBm/+tV1wfys+PsnZHFA/smeRxyTNg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1750864243; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1750864996; a=rsa-sha256;
 	cv=none;
-	b=a/09BEP1bHtHdzSOnZhD1JlMOMBd3ugIHA4LyX/2yFdHqEVFPPKtQ+cq3KiIu8VaDz8tah
-	59reOQURHyvaNUUqHb/tb0QRewOw/lnBDGD4aaavfFqa/cT94yfwakQNdejZJ9+KdIqxl3
-	oreLWexIGGIlOjab1lYKGq21o9LwOTslYrTmeF4uCcbH6OU/P99tTE7BlaZ3W24vgR5gl2
-	lwF5SCb/+dJNRyJssa7GWLxFUxcGcVavoCbkioTuoMZkt7iEJNAvqxcmU0nHA+qt8O5t7b
-	BMcJ3OeaUopNMiYeb5RyHg5PHC2HmZK1RA7U7Mss/H9r4TJZqz7Y4fuCQVqy7A==
-Message-ID: <3ac16d0a7c5569bce0b28f18bc2245bef8ab64c2.camel@iki.fi>
-Subject: Re: [PATCH BlueZ bluez] shared/bap: Set stream to idle when I/O is
- disconnected
+	b=IXNg2LDtngA7UtAuMRAmck9XgZUJR38EbTfbA9OPGjTvS8M7BlxwKuuWwhlTzUkcGVjvuB
+	cX2oFohH26IvXLzxSKPMD6UTbCF8obcwKSslu9VNcS3IHMjhCNzc+RaXlZBbVi5IkZV5er
+	jMru5gFkxsIbazPW+WtVP7nc16om8l+pZyVu50XfzOnzmjfEI28Jt50c9Nj/2qLupkWMnw
+	ulL0eNoNxErqXUzAt4XYqdQJwMguUKYISygCsj1YdJ9H2zj6FNiwq7QX9YXNJvWJpSCUBe
+	Rfo4E3MucIgvlGbmdJU8CEBWv3ZtxLyM0pkLi5zI6rO89nD1eQJxedzy2ehzbw==
+Message-ID: <1306a61f39fd92565d1e292517154aa3009dbd11.camel@iki.fi>
+Subject: Re: [PATCH v2] Bluetooth: hci_event: Add support for handling LE
+ BIG Sync Lost event
 From: Pauli Virtanen <pav@iki.fi>
-To: Yang Li <yang.li@amlogic.com>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Wed, 25 Jun 2025 18:10:40 +0300
-In-Reply-To: <1f2fe697-6437-4000-8aa3-d09bb7090a46@amlogic.com>
-References: <20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com>
-	 <CABBYNZK=5-N8wcHhSp5ii8FmM5CzPFqKheKHOcCs8brNhVp_ww@mail.gmail.com>
-	 <1f2fe697-6437-4000-8aa3-d09bb7090a46@amlogic.com>
+To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>, Johan
+ Hedberg	 <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>,  "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Wed, 25 Jun 2025 18:23:13 +0300
+In-Reply-To: <20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com>
+References: 
+	<20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com>
 Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
  keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
  ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
@@ -103,7 +106,7 @@ Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
  WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
  bzyGkKh2h8XdrYhtDjw9LmrprPQ==
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -112,145 +115,119 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-SGksCgprZSwgMjAyNS0wNi0yNSBrZWxsbyAxMzoyNCArMDgwMCwgWWFuZyBMaSBraXJqb2l0dGk6
-Cgo+IApbY2xpcF0KPiBXaGVuIG11c2ljIGlzIHBhdXNlZCBvbiB0aGUgcGl4ZWwgOSBwaG9uZSwg
-dGhlIENJUyBsaW5rIGdldHMgCj4gZGlzY29ubmVjdGVkLiBBcyB0aGUgdHJhbnNwb3J0IHN0YXRl
-IGNoYW5nZXMgZnJvbSBBQ1RJVkUgdG8gSURMRSwgdGhlIAo+IHN0cmVhbSBzdGF0ZSB0cmFuc2l0
-aW9ucyBmcm9tIGNvbmZpZyB0byBxb3MuCj4gCj4gIMKgID4gSENJIEV2ZW50OiBEaXNjb25uZWN0
-IENvbXBsZXRlICgweDA1KSBwbGVuIDTCoMKgwqDCoMKgwqDCoMKgwqDCoCAjMTQyNSBbaGNpMF0g
-Cj4gNDkuNTcyMDg5Cj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDAp
-Cj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBIYW5kbGU6IDUxMiBBZGRyZXNzOiA2QTpBQjo1MTo0Nzoz
-Qjo4MCAoUmVzb2x2YWJsZSkKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBJZGVudGl0eSB0eXBl
-OiBSYW5kb20gKDB4MDEpCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgSWRlbnRpdHk6IEU4OkQ1
-OjJCOjU5OjU3OkE2IChTdGF0aWMpCj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBSZWFzb246IFJlbW90
-ZSBVc2VyIFRlcm1pbmF0ZWQgQ29ubmVjdGlvbiAoMHgxMykKPiAgwqAgYmx1ZXRvb3RoZFsyMzEz
-XTogc3JjL3NoYXJlZC9iYXAuYzpzdHJlYW1faW9fZGlzY29ubmVjdGVkKCkgc3RyZWFtIAo+IDB4
-MWY5ZmMyMCBpbyBkaXNjb25uZWN0ZWQKPiAgwqAgYmx1ZXRvb3RoZFsyMzEzXTogc3JjL3NoYXJl
-ZC9iYXAuYzpiYXBfdWNhc3Rfc2V0X3N0YXRlKCkgc3RyZWFtIAo+IDB4MWY5ZmMyMCBkaXIgMHgw
-MTogcmVsZWFzaW5nIC0+IGNvbmZpZwo+ICDCoCBibHVldG9vdGhkWzIzMTNdOiBzcmMvc2hhcmVk
-L2JhcC5jOnN0cmVhbV9ub3RpZnkoKSBzdHJlYW0gMHgxZjlmYzIwIAo+IHN0YXRlIDEKPiAgwqAg
-Ymx1ZXRvb3RoZFsyMzEzXTogcHJvZmlsZXMvYXVkaW8vdHJhbnNwb3J0LmM6YmFwX3N0YXRlX2No
-YW5nZWQoKSAKPiBzdHJlYW0gMHgxZjlmYzIwOiByZWxlYXNpbmcoNikgLT4gY29uZmlnKDEpCj4g
-IMKgIGJsdWV0b290aGRbMjMxM106IAo+IHByb2ZpbGVzL2F1ZGlvL3RyYW5zcG9ydC5jOnRyYW5z
-cG9ydF91cGRhdGVfcGxheWluZygpIAo+IC9vcmcvYmx1ZXovaGNpMC9kZXZfNkFfQUJfNTFfNDdf
-M0JfODAvZmQxIFN0YXRlPVRSQU5TUE9SVF9TVEFURV9BQ1RJVkUgCj4gUGxheWluZz0wCj4gIMKg
-IGJsdWV0b290aGRbMjMxM106IAo+IHByb2ZpbGVzL2F1ZGlvL3RyYW5zcG9ydC5jOm1lZGlhX3Ry
-YW5zcG9ydF9yZW1vdmVfb3duZXIoKSBUcmFuc3BvcnQgCj4gL29yZy9ibHVlei9oY2kwL2Rldl82
-QV9BQl81MV80N18zQl84MC9mZDEgT3duZXIgOjEuMQo+ICDCoCBibHVldG9vdGhkWzIzMTNdOiBw
-cm9maWxlcy9hdWRpby90cmFuc3BvcnQuYzptZWRpYV9vd25lcl9mcmVlKCkgT3duZXIgCj4gOjEu
-MQo+ICDCoCBibHVldG9vdGhkWzIzMTNdOiAKPiBwcm9maWxlcy9hdWRpby90cmFuc3BvcnQuYzpt
-ZWRpYV90cmFuc3BvcnRfc3VzcGVuZCgpIFRyYW5zcG9ydCAKPiAvb3JnL2JsdWV6L2hjaTAvZGV2
-XzZBX0FCXzUxXzQ3XzNCXzgwL2ZkMSBPd25lcgo+ICDCoCBibHVldG9vdGhkWzIzMTNdOiBwcm9m
-aWxlcy9hdWRpby90cmFuc3BvcnQuYzp0cmFuc3BvcnRfc2V0X3N0YXRlKCkgCj4gU3RhdGUgY2hh
-bmdlZCAvb3JnL2JsdWV6L2hjaTAvZGV2XzZBX0FCXzUxXzQ3XzNCXzgwL2ZkMTogCj4gVFJBTlNQ
-T1JUX1NUQVRFX0FDVElWRSAtPiBUUkFOU1BPUlRfU1RBVEVfSURMRQo+ICDCoCBibHVldG9vdGhk
-WzIzMTNdOiBzcmMvc2hhcmVkL2JhcC5jOnN0cmVhbV9kaXNhYmxlKCkgc3RyZWFtIDB4MWY5ZmMy
-MAoKQUZBSUNTIHRoZSBidWcgYXBwZWFycyB0byBiZToKCi0gYmFwLmM6c3RyZWFtX2Rpc2FibGUo
-KSBzaG91bGQgZG8gbm90aGluZyBpZiBzdHJlYW0gaXMKICBub3TCoEVOQUJMSU5HIG9yIFNUUkVB
-TUlORwoKc2luY2UgaXQncyBjYWxsZWQgZnJvbSBidF9iYXBfc3RyZWFtX2Rpc2FibGUoKSB3aGlj
-aCBpcyBjYWxsZWQgb24KdHJhbnNwb3J0IHN1c3BlbmQgd2hpY2ggc2hvdWxkIGJlIG5vb3AgZm9y
-IEJBUCBzZXJ2ZXIgaWYgc3RyZWFtIGlzCmFscmVhZHkgZ29uZS4KCj4gIMKgIGJsdWV0b290aGRb
-MjMxM106IHNyYy9zaGFyZWQvYmFwLmM6YmFwX3VjYXN0X3NldF9zdGF0ZSgpIHN0cmVhbSAKPiAw
-eDFmOWZjMjAgZGlyIDB4MDE6IGNvbmZpZyAtPiBxb3MKPiAgwqAgQVRUYmx1ZXRvb3RoZFsyMzEz
-XTogPCBBQ0wgRGF0YSBUWDogSC4uIGZsYWdzIDB4MDAgZGxlbiA1MSAjMTQyNiAKPiBbaGNpMF0g
-NDkuNTg1NjU2Cj4gIMKgwqDCoMKgwqAgQVRUOiBIYW5kbGUgVmFsdWUgTm90aWZpY2F0aW9uICgw
-eDFiKSBsZW4gNDYKPiAgwqDCoMKgwqDCoMKgwqAgSGFuZGxlOiAweDAwN2IgVHlwZTogU2luayBB
-U0UgKDB4MmJjNCkKPiAgwqDCoMKgwqDCoMKgwqDCoMKgIERhdGFbNDRdOiAKPiAwMTAxMDAwMjA1
-MGEwMDIwNGUwMDQwOWMwMDIwNGUwMDQwOWMwMDA2MDAwMDAwMDAxMzAyMDEwMzAyMDIwMTA1MDMw
-MzAwMDAwMDAzMDQyODAwMDIwNTAxCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQVNFIElEOiAx
-Cj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgU3RhdGU6IENvZGVjIENvbmZpZ3VyZWQgKDB4MDEp
-Cj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgRnJhbWluZzogVW5mcmFtZWQgUERVcyBzdXBwb3J0
-ZWQgKDB4MDApCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUEhZOiAweDAyCj4gIMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgTEUgMk0gUEhZIHByZWZmZXJlZCAoMHgwMikKPiAgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBSVE46IDUKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBNYXggVHJhbnNwb3J0
-IExhdGVuY3k6IDEwCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUHJlc2VudGF0aW9uIERlbGF5
-IE1pbjogMjAwMDAgdXMKPiAgwqAgLi4uCj4gIMKgIGJsdWV0b290aGRbMjMxM106IDwgQUNMIERh
-dGEgVFg6IEguLiBmbGFncyAweDAwIGRsZW4gMjQgIzE0MjcgW2hjaTBdIAo+IDQ5LjU4NTcyNQo+
-ICDCoMKgwqDCoMKgIEFUVDogSGFuZGxlIFZhbHVlIE5vdGlmaWNhdGlvbiAoMHgxYikgbGVuIDE5
-Cj4gIMKgwqDCoMKgwqDCoMKgIEhhbmRsZTogMHgwMDdiIFR5cGU6IFNpbmsgQVNFICgweDJiYzQp
-Cj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBEYXRhWzE3XTogMDEwMjAxMDAxMDI3MDAwMDAyNTAwMDA1
-MGEwMDIwNGUwMAo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEFTRSBJRDogMQo+ICDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIFN0YXRlOiBRb1MgQ29uZmlndXJlZCAoMHgwMikKPiAgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBDSUcgSUQ6IDB4MDEKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBDSVMg
-SUQ6IDB4MDAKPiAgwqAgLi4uCj4gCj4gd2hlbiBwbGF5YmFjayByZXN1bWVzIG9uIHRoZSBwaG9u
-ZSwgaXQgYXR0ZW1wdHMgdG8gc2V0IHRoZSBBU0Ugc3RhdGUgdG8gCj4gQ29kZWMuIEhvd2V2ZXIs
-IHNpbmNlIHRoZSBzdHJlYW0gaGFzIGFscmVhZHkgdHJhbnNpdGlvbmVkIGZyb20gY29uZmlnIHRv
-IAo+IHFvcywgdGhlIHBob25lIGVuZHMgdXAgZGlzY29ubmVjdGluZyB0aGUgY29ubmVjdGlvbi4K
-PiAKPiAgwqAgYmx1ZXRvb3RoZFsyMzEzXTogPCBBQ0wgRGF0YSBUWDogSC4uIGZsYWdzIDB4MDAg
-ZGxlbiAxMsKgICMxNDMzIFtoY2kwXSAKPiA2MC4yMTYwMDQKPiAgwqDCoMKgwqDCoCBBVFQ6IEhh
-bmRsZSBWYWx1ZSBOb3RpZmljYXRpb24gKDB4MWIpIGxlbiA3Cj4gIMKgwqDCoMKgwqDCoMKgIEhh
-bmRsZTogMHgwMDg3IFR5cGU6IEFTRSBDb250cm9sIFBvaW50ICgweDJiYzYpCj4gIMKgwqDCoMKg
-wqDCoMKgwqDCoCBEYXRhWzVdOiAwMTAxMDEwMDAwCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-T3Bjb2RlOiBDb2RlYyBDb25maWd1cmF0aW9uICgweDAxKQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIE51bWJlciBvZiBBU0Uocyk6IDEKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBBU0U6ICMw
-Cj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQVNFIElEOiAweDAxCj4gIMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgQVNFIFJlc3BvbnNlIENvZGU6IFN1Y2Nlc3MgKDB4MDApCj4gIMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgQVNFIFJlc3BvbnNlIFJlYXNvbjogTm9uZSAoMHgwMCkKPiAgwqAgYmx1ZXRv
-b3RoZFsyMzEzXTogPCBBQ0wgRGF0YSBUWDogSC4uIGZsYWdzIDB4MDAgZGxlbiA1MSAjMTQzNCBb
-aGNpMF0gCj4gNjAuMjI2MDg2Cj4gIMKgwqDCoMKgwqAgQVRUOiBIYW5kbGUgVmFsdWUgTm90aWZp
-Y2F0aW9uICgweDFiKSBsZW4gNDYKPiAgwqDCoMKgwqDCoMKgwqAgSGFuZGxlOiAweDAwN2IgVHlw
-ZTogU2luayBBU0UgKDB4MmJjNCkKPiAgwqDCoMKgwqDCoMKgwqDCoMKgIERhdGFbNDRdOiAKPiAw
-MTAxMDAwMjA1MGEwMDIwNGUwMDQwOWMwMDIwNGUwMDQwOWMwMDA2MDAwMDAwMDAxMzAyMDEwMzAy
-MDIwMTA1MDMwMzAwMDAwMDAzMDQyODAwMDIwNTAxCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-QVNFIElEOiAxCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgU3RhdGU6IENvZGVjIENvbmZpZ3Vy
-ZWQgKDB4MDEpCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgRnJhbWluZzogVW5mcmFtZWQgUERV
-cyBzdXBwb3J0ZWQgKDB4MDApCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUEhZOiAweDAyCj4g
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTEUgMk0gUEhZIHByZWZmZXJlZCAoMHgwMikKPiAgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBSVE46IDUKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBNYXgg
-VHJhbnNwb3J0IExhdGVuY3k6IDEwCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUHJlc2VudGF0
-aW9uIERlbGF5IE1pbjogMjAwMDAgdXMKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBQcmVzZW50
-YXRpb24gRGVsYXkgTWF4OiA0MDAwMCB1cwo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFByZWZl
-cnJlZCBQcmVzZW50YXRpb24gRGVsYXkgTWluOiAyMDAwMCB1cwo+ICDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIFByZWZlcnJlZCBQcmVzZW50YXRpb24gRGVsYXkgTWF4OiA0MDAwMCB1cwo+ICDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIENvZGVjOiBMQzMgKDB4MDYpCj4gIMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgQ29kZWMgU3BlY2lmaWMgQ29uZmlndXJhdGlvbjogIzA6IGxlbiAweDAyIHR5cGUgMHgw
-MQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBTYW1wbGluZyBGcmVxdWVuY3k6IDE2IEto
-eiAoMHgwMykKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBDb2RlYyBTcGVjaWZpYyBDb25maWd1
-cmF0aW9uOiAjMTogbGVuIDB4MDIgdHlwZSAweDAyCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIEZyYW1lIER1cmF0aW9uOiAxMCBtcyAoMHgwMSkKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBDb2RlYyBTcGVjaWZpYyBDb25maWd1cmF0aW9uOiAjMjogbGVuIDB4MDUgdHlwZSAweDAzCj4g
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgIExvY2F0aW9uOiAweDAwMDAwMDAzCj4gIMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIEZyb250IExlZnQgKDB4MDAwMDAwMDEpCj4gIMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIEZyb250IFJpZ2h0ICgweDAwMDAwMDAyKQo+ICDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIENvZGVjIFNwZWNpZmljIENvbmZpZ3VyYXRpb246ICMzOiBsZW4gMHgwMyB0eXBlIDB4
-MDQKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgRnJhbWUgTGVuZ3RoOiA0MCAoMHgwMDI4
-KQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIENvZGVjIFNwZWNpZmljIENvbmZpZ3VyYXRpb246
-ICM0OiBsZW4gMHgwMiB0eXBlIDB4MDUKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgRnJh
-bWUgQmxvY2tzIHBlciBTRFU6IDEgKDB4MDEpCj4gCj4gIMKgIC4uLgo+IAo+ICDCoCA+IEhDSSBF
-dmVudDogRGlzY29ubmVjdCBDb21wbGV0ZSAoMHgwNSkgcGxlbiA0wqDCoMKgwqDCoMKgwqDCoMKg
-wqAgIzE0NDUgW2hjaTBdIAo+IDYzLjY1MTQ5Nwo+ICDCoMKgwqDCoMKgwqDCoCBTdGF0dXM6IFN1
-Y2Nlc3MgKDB4MDApCj4gIMKgwqDCoMKgwqDCoMKgIEhhbmRsZTogMTYgQWRkcmVzczogNkE6QUI6
-NTE6NDc6M0I6ODAgKFJlc29sdmFibGUpCj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBJZGVudGl0eSB0
-eXBlOiBSYW5kb20gKDB4MDEpCj4gIMKgwqDCoMKgwqDCoMKgwqDCoCBJZGVudGl0eTogRTg6RDU6
-MkI6NTk6NTc6QTYgKFN0YXRpYykKPiAgwqDCoMKgwqDCoMKgwqAgUmVhc29uOiBSZW1vdGUgVXNl
-ciBUZXJtaW5hdGVkIENvbm5lY3Rpb24gKDB4MTMpCj4gCj4gSW50cm9kdWNpbmcgYSBjaGVjayBp
-biB0aGUgc3RyZWFtIGxvZ2ljIHRvIGRpc3Rpbmd1aXNoIGJldHdlZW4gVW5pY2FzdCAKPiBhbmQg
-QnJvYWRjYXN0IHdvdWxkIGluZGVlZCBtYWtlIGl0IGVhc2llciB0byBoYW5kbGUgZGlmZmVyZW50
-IHN0cmVhbSAKPiB0eXBlcyBjbGVhbmx5Lgo+IEhvd2V2ZXIsIGlmIHdlIHRlbXBvcmFyaWx5IGln
-bm9yZSBVbmljYXN0IGNhY2hpbmcsIGEgc2ltcGxlciBhbmQgY2xlYW5lciAKPiBhcHByb2FjaCB3
-b3VsZCBiZSB0byB0cmFuc2l0aW9uIHRoZSBzdHJlYW0gZGlyZWN0bHkgdG8gSURMRSB3aGVuIEkv
-TyBpcyAKPiBkaXNjb25uZWN0ZWQuCgpUaGlzIGRpc2Nvbm5lY3QgY2FsbGJhY2sgaXMgdXNlZCBm
-b3IgYWxsIHRoZSByb2xlczogdW5pY2FzdCBjbGllbnQsCnVuaWNhc3Qgc2VydmVyLCBicm9hZGNh
-c3QuIEFsbCBvZiB0aG9zZSByZXF1aXJlIGRpZmZlcmVudCBoYW5kbGluZywgc28KaXQncyBwcm9i
-YWJseSBtb3N0IGNsZWFyIHRvIHNwbGl0IGl0LgoKCkZvciB1bmljYXN0IHNlcnZlcjoKClRoZSBi
-ZWhhdmlvciBoYXMgdG8gZm9sbG93IEJBUCB2MS4wLjIgU2VjLiA1LjYuOCBhbmQgQVNDUyBUYWJs
-ZSAzLjIuClRyYW5zaXRpb24gdG8gSURMRSBpcyBvbmx5IGFsbG93ZWQgZnJvbSBSRUxFQVNJTkcg
-LS0tIGJ1dCBvbmUgY2FuIGFzCndlbGwgZ28gdG8gQ09ORklHIGxpa2UgaXQgaXMgaW4gY3VycmVu
-dCBtYXN0ZXIuCgpDSVMgbG9zcyBmcm9tIFNUUkVBTUlORyBzaG91bGQgZ28gdG8gUU9TLCBhbmQg
-SSB0aGluayBpdCBjdXJyZW50bHkgZG9lcwpzbywgdmlhIGJhcF9zdHJlYW1fc2V0X2lvLgoKRnJv
-bSBhIGJyaWVmIGxvb2ssIHRoZSBjdXJyZW50IHZlcnNpb24gaW4gbWFzdGVyIGlzIG1heWJlIE9L
-LCBhbHRob3VnaApvbmUgY291bGQgdGVzdCB0aGUgYWJvdmUgY2FzZSBhZ2FpbiB3aXRoIHN0cmVh
-bV9kaXNhYmxlKCkgZml4LgoKCkZvciB1bmljYXN0IGNsaWVudDoKClRoZSBjdXJyZW50IHZlcnNp
-b24gaW4gbWFzdGVyIGlzIHByb2JhYmx5IE9LLCBhbHRob3VnaCBvbmUgY291bGQgZG91YmxlCmNo
-ZWNrIGl0IGFnYWluLgoKPiAKPiBPbmNlIHRoZSBVbmljYXN0IGNhY2hpbmcgaXNzdWUgaXMgcHJv
-cGVybHkgcmVzb2x2ZWQsIHdlIGNhbiByZXZpc2l0IGFuZCAKPiBpbnRyb2R1Y2Ugc3RyZWFtLXR5
-cGUtYmFzZWQgaGFuZGxpbmcgYWNjb3JkaW5nbHkuCj4gCj4gPiA+ICsgICAgICAgc3RyZWFtX3Nl
-dF9zdGF0ZShzdHJlYW0sIEJUX0JBUF9TVFJFQU1fU1RBVEVfSURMRSk7Cj4gPiA+IAo+ID4gPiAt
-ICAgICAgIGJ0X2JhcF9zdHJlYW1fc2V0X2lvKHN0cmVhbSwgLTEpOwo+ID4gPiAgICAgICAgICBy
-ZXR1cm4gZmFsc2U7Cj4gPiA+ICAgfQo+ID4gPiAKPiA+ID4gCj4gPiA+IC0tLQo+ID4gPiBiYXNl
-LWNvbW1pdDogYWUxYjdmNmJhODA1ZjgyNzQyYmJjMzJmZjI3NWUyNjgyNDhlZjlmOAo+ID4gPiBj
-aGFuZ2UtaWQ6IDIwMjUwNjI0LWJhcF9mb3JfYmlnX3N5bmNfbG9zdC02MzQ3NmM2NzlkYmIKPiA+
-ID4gCj4gPiA+IEJlc3QgcmVnYXJkcywKPiA+ID4gLS0KPiA+ID4gWWFuZyBMaSA8eWFuZy5saUBh
-bWxvZ2ljLmNvbT4KPiA+ID4gCj4gPiA+IAo+ID4gPiAKPiA+IAo+ID4gLS0KPiA+IEx1aXogQXVn
-dXN0byB2b24gRGVudHoKCi0tIApQYXVsaSBWaXJ0YW5lbgo=
+Hi,
 
+ke, 2025-06-25 kello 16:42 +0800, Yang Li via B4 Relay kirjoitti:
+> From: Yang Li <yang.li@amlogic.com>
+>=20
+> When the BIS source stops, the controller sends an LE BIG Sync Lost
+> event (subevent 0x1E). Currently, this event is not handled, causing
+> the BIS stream to remain active in BlueZ and preventing recovery.
+>=20
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+> Changes in v2:
+> - Matching the BIG handle is required when looking up a BIG connection.
+> - Use ev->reason to determine the cause of disconnection.
+> - Call hci_conn_del after hci_disconnect_cfm to remove the connection ent=
+ry
+> - Delete the big connection
+> - Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_eve=
+nt-v1-1-c32ce37dd6a5@amlogic.com
+> ---
+>  include/net/bluetooth/hci.h |  6 ++++++
+>  net/bluetooth/hci_event.c   | 31 +++++++++++++++++++++++++++++++
+>  2 files changed, 37 insertions(+)
+>=20
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 82cbd54443ac..48389a64accb 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+>  	__le16  bis[];
+>  } __packed;
+> =20
+> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
+> +struct hci_evt_le_big_sync_lost {
+> +	__u8    handle;
+> +	__u8    reason;
+> +} __packed;
+> +
+>  #define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
+>  struct hci_evt_le_big_info_adv_report {
+>  	__le16  sync_handle;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 66052d6aaa1d..d0b9c8dca891 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -7026,6 +7026,32 @@ static void hci_le_big_sync_established_evt(struct=
+ hci_dev *hdev, void *data,
+>  	hci_dev_unlock(hdev);
+>  }
+> =20
+> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
+> +					    struct sk_buff *skb)
+> +{
+> +	struct hci_evt_le_big_sync_lost *ev =3D data;
+> +	struct hci_conn *bis, *conn;
+> +
+> +	bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	list_for_each_entry(bis, &hdev->conn_hash.list, list) {
+
+This should check bis->type =3D=3D BIS_LINK too.
+
+> +		if (test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags) &&
+> +		    (bis->iso_qos.bcast.big =3D=3D ev->handle)) {
+> +			hci_disconn_cfm(bis, ev->reason);
+> +			hci_conn_del(bis);
+> +
+> +			/* Delete the big connection */
+> +			conn =3D hci_conn_hash_lookup_pa_sync_handle(hdev, bis->sync_handle);
+> +			if (conn)
+> +				hci_conn_del(conn);
+
+Problems:
+
+- use after free
+
+- hci_conn_del() cannot be used inside list_for_each_entry()=C2=A0
+  of the connection list
+
+- also list_for_each_entry_safe() allows deleting only the iteration
+  cursor, so some restructuring above is needed
+
+
+> +		}
+> +	}
+> +
+> +	hci_dev_unlock(hdev);
+> +}
+> +
+>  static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *d=
+ata,
+>  					   struct sk_buff *skb)
+>  {
+> @@ -7149,6 +7175,11 @@ static const struct hci_le_ev {
+>  		     hci_le_big_sync_established_evt,
+>  		     sizeof(struct hci_evt_le_big_sync_estabilished),
+>  		     HCI_MAX_EVENT_SIZE),
+> +	/* [0x1e =3D HCI_EVT_LE_BIG_SYNC_LOST] */
+> +	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
+> +		     hci_le_big_sync_lost_evt,
+> +		     sizeof(struct hci_evt_le_big_sync_lost),
+> +		     HCI_MAX_EVENT_SIZE),
+>  	/* [0x22 =3D HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+>  	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+>  		     hci_le_big_info_adv_report_evt,
+>=20
+> ---
+> base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
+> change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+>=20
+> Best regards,
+
+--=20
+Pauli Virtanen
