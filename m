@@ -1,125 +1,134 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5F617B425
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 15:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE6825BF18
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 17:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750865986; cv=none; b=RpDRZCqNgVuwX3Grt9TxI7XiEwAYcM8dHm0kxSYAVJwNQuw4VTBmINiOF0/iVnZ7QmwsXS2eq9r7vPR3ZZXNpoSQlOEYTwHnUV5XOqv9TSTfDx/dmp8HgXLB7I8O8opIAtS9pX6Pzelqc+lKG85xetT+kCImEYEpN2VfRd8+lw0=
+	t=1750871669; cv=none; b=rQ9QVqbdCQmyyVwoxbWQK9f+gVE6HMEIpfLK44pBIFcYnQF6VhLpSrEkM5sca3IKpgEcXgos72Z8EaLimx9XexRMSb9lTf7xg6O2ZjIZZ8rp1W6oCryiQHYl7N4Lu02qMjkZZwl9xU/pXkVnQcxya2riM79J5sVsuRZ9SqZc+Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750865986; c=relaxed/simple;
-	bh=D1cZoFm03dvREJ9RkeLWJad5F4WWo7KqgSf5uNT9yp8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=FzUKXMn9jRjfpwHMTQvw30FaM3/wkYjdaXktKoldosBj1h7V4egjwxaCo3LiO3js8VFtzr/nuxUqqTnacOfOPS4SQQVSaLgdLmoqh+3MCGIml/Liib3lxF7zcFA1Sxbhg67haYDU3XdMwx1CGAFu1Gc/o1YF4qMSGpQXQDPb29A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRY4aMgs; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRY4aMgs"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6fada2dd785so865366d6.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 08:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750865984; x=1751470784; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7fzAn//EPLmyCKvB/viA4SeCzr+g/KvUklPdUnofSPY=;
-        b=KRY4aMgsSKOhRY0nMPXAqTEfjE3MYHZqGBIx5STwNemes8KWZflTne11uDXPT0YCTS
-         lJkPEyJ14umVn0pNMjzBWLK8XwHltb1W3okOrDBrm976C36vtwDF6cBfcaWrytnuWlAn
-         5neesjIAUm/pHcUK/E7iAwTz+tA3W0ENHh0knHOW1YvQg5z3zpKVVgNYufmUA819T7mE
-         mmsStP7T4m/YDkqIlj/DuBAgWy/59th4mXiWBfjhOKzZKve3QFhBBgEwV9nAJd0obzEW
-         BVIkJocjfNf45Yz0odbvNhtTsZ2qxWOm1buA1eXFvoyqlg70Yn3ihClextXR/LYAy9wt
-         Xlcw==
+	s=arc-20240116; t=1750871669; c=relaxed/simple;
+	bh=YKkvkQ+DdOVsLHQyaBRqdlrsotAQLSDlyoY+RWNqYVA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Cm+tYCuwU8DLAcL9TYhQfrG95FUSPiQnbt/wQaWCuA9zgNKrA3LJrtWDyUJVlvKqwQ3sj2hINZ64kVOxAFA3lJO5yGH1m3oPxCzaKzgpSfuigSWEdOAte0xqOzHsSWDCg3egeDXSWedkobcJZjGSF1xgG0sLjp3LZAcSI1FvxZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddd5311fd3so840465ab.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 10:14:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750865984; x=1751470784;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7fzAn//EPLmyCKvB/viA4SeCzr+g/KvUklPdUnofSPY=;
-        b=Trr41sgOxmmPmv71vkD9cJOLciwxjTtRq+qw6tVNEv4NUbeeLkh7YL3UFA/LboIteq
-         dCqpFVtPa4lyUOIFOFHKKVUItaTIVYYlu490SpF7O7z4nZockRG5EV2g1oLzK0cEl29e
-         2CBOQshwKoPFCi8S0bl45dohsDiYdo6/02jP18q31Y6IJv24jMUJya87fJ7OAVp/JOo+
-         KO+Bzf3uSM2AMwhWPg9AQmNE+5MN1+gx8wHNvprr5GrxtYY5kRDAeOFJqjdUIAXyrhUB
-         V9u15eQQk5u90pNvZ35CWiN7Oll8oPhOwis82sRhLacqYICi3yv7OTf6iTq5QC7TaHWs
-         u/yg==
-X-Gm-Message-State: AOJu0YygT27psR9t0Eo//oX0vAk2qZdXw317Qbfnz0qXKegNXy5Ylsli
-	CxSGrMaUxGHth/rVflQScCkiNPyE0paNXmLG914/zXTRFTV6Yjf9iO8D5p43Ybyw
-X-Gm-Gg: ASbGncsk3xX77r2uDRnJYeh23bHuNkDUP02cWYSjJJ1mI+588kFtzJbzWeNGl8Q+4ol
-	P3+9rJn52ixZORMSZHbDB5VYKdoDybCJkxH2ejSU8dKCDIv0SAXoUaW2jLyVcTd0pULgJKTEDjx
-	/MWgAlGns7vy3p3UtdoswuPisk+Rkck8/Hy29TUVV9/si5zR6PI5ziUGeH93OA9LFppArmX4VCm
-	qE5gWPfIbL4OuNBjwKuvhhySC7ALbyY2bt0JaSpTfyuRRERBAM8vVIBYhleBdCPsd8ftRs+UBTu
-	lXLU86+nhWiuxvOzpW2kYIMV1oCFV0OwEgUNoF4S0oVzZIqKTY/YusBx8WgZmR0GgDHf
-X-Google-Smtp-Source: AGHT+IGX3+tmeRwE+1DHEoUMtVrxZz4KIgQBkbiJXzDyyG8CIx2QiCR7CIsPz3SKQhuOPLt2uzBsEA==
-X-Received: by 2002:a05:6214:54c6:b0:6fb:4e82:6e8 with SMTP id 6a1803df08f44-6fd5ef454f2mr59316666d6.14.1750865983599;
-        Wed, 25 Jun 2025 08:39:43 -0700 (PDT)
-Received: from [172.17.0.2] ([52.237.143.10])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd09538227sm69720536d6.72.2025.06.25.08.39.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 08:39:43 -0700 (PDT)
-Message-ID: <685c183f.d40a0220.1b15b0.8f2b@mx.google.com>
-Date: Wed, 25 Jun 2025 08:39:43 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5661409996796160232=="
+        d=1e100.net; s=20230601; t=1750871667; x=1751476467;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L/l8xFjBHoux/yvwL6aD3x2VUCTiy+iKK29WrV0pdFY=;
+        b=UXEX+WQ2Ff3ocZhWenI7TOUuJa4gWeEp76cVue8/8ZFH9M3C5teLIlN+1VWzAJ+iPX
+         /4umqGt1fh6+PUAgB5ie2UkMpKwYAavzaAO0K6k7p3SGcXjFdkENKIO9wW4Z5q4USbXl
+         Pt/cQ4mVWpHJCAvN/d7DtL/aFNU573OALlGBfqQ0aKTwL9fRq9t82/fc7ffTCUFzYsDP
+         fWOSdkbA0WltHIyy5W+YCy53Zc8ROgkEFaigzbiOMDw4BqAVaoo8iuVYfC53I/kNEEsQ
+         /DdR6nXJCO8c//9kal+vf8IeM4VDgIPwqVrqEyzjXqAapPuh/Y8nJb4Z73YbjDsNeGd5
+         p8KQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6eV4n99/bwVgeAjnPxsRUrMXDD6PXVftLmj7eq79GrS5RuXqOW4RZNdMfdey0+dCpZJIZK1De9En/YdrfGpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9HaabFOVbg/u2QN0DDid/Y+Sl8uRBBwcBMr+bboubD5Q57Qwk
+	8AGn2kSiAW0eSBr884F/KABXTuStkvcMWPuMzzM6ZK7tU1GKhMle/3Z4Ih5TYLs0v9HRlmbq36Q
+	lPmxYmHf4kGZN7/X6bngVyWKyBCH6TfMKnxNVBCWgrL2as3+ifaXM4qfEaLw=
+X-Google-Smtp-Source: AGHT+IF4tP1NNueFUshXhU6NYNM5uEbLto+Lt8hRij3Xfkqi9ZOuPSh5aKmlJA6qZF1oxSHP+VCuV0Smkd6mHXvR22rrt5aSAQgc
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andreas@kemnade.info
-Subject: RE: gatt-client: avoid UAF after acquire notify failure
-In-Reply-To: <20250625140545.1610812-1-andreas@kemnade.info>
-References: <20250625140545.1610812-1-andreas@kemnade.info>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6e02:218a:b0:3dd:b808:be59 with SMTP id
+ e9e14a558f8ab-3df3297dea6mr56177245ab.21.1750871667166; Wed, 25 Jun 2025
+ 10:14:27 -0700 (PDT)
+Date: Wed, 25 Jun 2025 10:14:27 -0700
+In-Reply-To: <66f6c6e7.050a0220.38ace9.0024.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <685c2e73.050a0220.2303ee.004c.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] BUG: corrupted list in _hci_cmd_sync_cancel_entry
+From: syzbot <syzbot+01fdb2cc3f0b4ddcfcf1@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============5661409996796160232==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+syzbot has found a reproducer for the following issue on:
 
-This is automated email and please do not reply to this email!
+HEAD commit:    7595b66ae9de Merge tag 'selinux-pr-20250624' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10ed4f0c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=641bc01f4fbdccd4
+dashboard link: https://syzkaller.appspot.com/bug?extid=01fdb2cc3f0b4ddcfcf1
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bc9b70580000
 
-Dear submitter,
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/86576f060f6f/disk-7595b66a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/051ad595d63b/vmlinux-7595b66a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e72740ea313a/bzImage-7595b66a.xz
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=975818
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+01fdb2cc3f0b4ddcfcf1@syzkaller.appspotmail.com
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.34 seconds
-GitLint                       PENDING   0.26 seconds
-BuildEll                      PASS      21.42 seconds
-BluezMake                     PASS      3050.39 seconds
-MakeCheck                     PASS      20.88 seconds
-MakeDistcheck                 PASS      214.61 seconds
-CheckValgrind                 PASS      292.86 seconds
-CheckSmatch                   PASS      315.51 seconds
-bluezmakeextell               PASS      129.49 seconds
-IncrementalBuild              PENDING   0.25 seconds
-ScanBuild                     PASS      926.90 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
+Bluetooth: hci4: command 0x0406 tx timeout
+ non-paged memory
+list_del corruption, ffff88802932b700->next is LIST_POISON1 (dead000000000100)
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:56!
+Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
+CPU: 1 UID: 0 PID: 51 Comm: kworker/u9:0 Not tainted 6.16.0-rc3-syzkaller-00044-g7595b66ae9de #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: hci4 hci_conn_timeout
+RIP: 0010:__list_del_entry_valid_or_report+0x121/0x200 lib/list_debug.c:56
+Code: 48 c7 c7 e0 7e 15 8c e8 1d 41 b9 fc 90 0f 0b 4c 89 e7 e8 02 f3 1d fd 4c 89 e2 48 89 de 48 c7 c7 40 7f 15 8c e8 00 41 b9 fc 90 <0f> 0b 48 89 ef e8 e5 f2 1d fd 48 89 ea 48 89 de 48 c7 c7 a0 7f 15
+RSP: 0018:ffffc90000bb7b78 EFLAGS: 00010282
+RAX: 000000000000004e RBX: ffff88802932b700 RCX: ffffffff819b00b9
+RDX: 0000000000000000 RSI: ffffffff819b7f46 RDI: 0000000000000005
+RBP: dead000000000122 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: dead000000000100
+R13: dffffc0000000000 R14: ffff88802f118618 R15: ffff88802932b700
+FS:  0000000000000000(0000) GS:ffff888124852000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c007642020 CR3: 000000007e2b4000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del include/linux/list.h:229 [inline]
+ _hci_cmd_sync_cancel_entry.constprop.0+0x80/0x1d0 net/bluetooth/hci_sync.c:647
+ hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:851 [inline]
+ hci_cmd_sync_dequeue_once net/bluetooth/hci_sync.c:870 [inline]
+ hci_cancel_connect_sync+0xfa/0x2b0 net/bluetooth/hci_sync.c:6903
+ hci_abort_conn+0x15a/0x340 net/bluetooth/hci_conn.c:2919
+ hci_conn_timeout+0x1a2/0x210 net/bluetooth/hci_conn.c:580
+ process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3321 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
+ kthread+0x3c2/0x780 kernel/kthread.c:464
+ ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__list_del_entry_valid_or_report+0x121/0x200 lib/list_debug.c:56
+Code: 48 c7 c7 e0 7e 15 8c e8 1d 41 b9 fc 90 0f 0b 4c 89 e7 e8 02 f3 1d fd 4c 89 e2 48 89 de 48 c7 c7 40 7f 15 8c e8 00 41 b9 fc 90 <0f> 0b 48 89 ef e8 e5 f2 1d fd 48 89 ea 48 89 de 48 c7 c7 a0 7f 15
+RSP: 0018:ffffc90000bb7b78 EFLAGS: 00010282
+RAX: 000000000000004e RBX: ffff88802932b700 RCX: ffffffff819b00b9
+RDX: 0000000000000000 RSI: ffffffff819b7f46 RDI: 0000000000000005
+RBP: dead000000000122 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: dead000000000100
+R13: dffffc0000000000 R14: ffff88802f118618 R15: ffff88802932b700
+FS:  0000000000000000(0000) GS:ffff888124852000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd6f9b7e2d8 CR3: 000000007b2b4000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
 
 ---
-Regards,
-Linux Bluetooth
-
-
---===============5661409996796160232==--
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
