@@ -1,98 +1,163 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FB815A86B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 08:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5EB27F187;
+	Wed, 25 Jun 2025 08:42:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750839748; cv=none; b=Ftxyq69/OnmyZ42UC8p9oX9C5xJN5+x/ogtY7wDgZUHK1QkMHlUCAkVhNkfM4N/c8PPgt/jhnHladAWzkoRh3CNS8tnlTVZd1rYQbSkOq5p60jZ+GLkt3RD0JwAJ4RfsTBuF6WhNaIaoS5qfpcmTAkDZ11Id1DNzSx90ByHo65s=
+	t=1750840973; cv=none; b=jRB4mZP7yj7qbrbKTbRKPPSxlf1B5X+OjQMTD2tRkCVYxOM3SQ7EZMti7VTcelyAlTu3Miq6md/Ziq/LlzpwzITngOuUc1sIVplrF0VYxNF7W3HbL2Cb8hMLDrLY/8iPkTQKW3mSp1EcYZaWX4rD8NBTyhsVdCNkAXUeUUjBDEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750839748; c=relaxed/simple;
-	bh=x/RgigVbTKjHOXadICwTZDVqMyatOolVQB0fSUrkOtQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ur+IrkeNL4zTpvOQJJpiTa+jJfp9JqRah+LUB77ty4h2pKyim3r+P7jTqaJAkQlxIWCP8JgFDp17tQ3HzOs23SMrj2Qpgv2SEuWm9UHa0gLABwY9FvmRhQFKRzWYsjQi09Q7Zvsnxx6iLafbj+djItVa9r2+Ea6v95I7cjPirqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I2pgWNsq; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1750840973; c=relaxed/simple;
+	bh=8RyD8b+dB6zF43UCsVGSQk0jUPuIhhPSK+qvKJ7Em2A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=J9oLRC0nxyJfbGcuzqWagmqnBq+4v7Cdu2866qylzz10kueLLt5igKjrpuq/V/0gla37/rJvWv1GM2f4rO/uzMkHomc6s4jylceD5U60XxvVE+8/iuvNxoAWqN/t3rRfIsjQeEN6LAfETzBBqqWkTAjZ652CCt9HH0ttiaI3gGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSh0yxt3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I2pgWNsq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750839747; x=1782375747;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=x/RgigVbTKjHOXadICwTZDVqMyatOolVQB0fSUrkOtQ=;
-  b=I2pgWNsqc0rEKrwj0GohA4O2s42w6cS7fPqnf/mwygw6nXXGNJgjY92e
-   ipslnid5oowtnoHMQzmtSNfitryeyZvuI1lCFIZUOTcCMEJSs4PvZjalO
-   kuLZU9NTz04zd6rZwoxu62Ngdu1z9l507ucApgkk3Q7Cq5gzDZwrImaPs
-   r9Ltk96jW6vTEY3L4AVepyNrcAVsioo/+eqKbpPvWCcNvMj1NZXmOQky3
-   GwCWl9hSfhc+g9sq82ph7uFYMRgBuEAHvZVCo8goXjMtGOQPMNZIiEVao
-   szKLsnMMs1eh0amSBCaxP6VIHR1/eEA3D/PXLpLc9xiIjPFn6v3vWc7/m
-   w==;
-X-CSE-ConnectionGUID: TcO/4I4FQoiwDgZjkdy3fg==
-X-CSE-MsgGUID: iUYxPEk6SDK9rFs4eXtrbA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="63788281"
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="63788281"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 01:22:26 -0700
-X-CSE-ConnectionGUID: mAL/VRKNQSytETtIN3+L1Q==
-X-CSE-MsgGUID: bTizEfGfTkKuwiios/bfMw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="156554008"
-Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by orviesa003.jf.intel.com with ESMTP; 25 Jun 2025 01:22:24 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	aluvala.sai.teja@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v4] Bluetooth: btintel_pcie: Add support for device 0x4d76
-Date: Wed, 25 Jun 2025 14:09:01 +0530
-Message-ID: <20250625083901.822922-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSh0yxt3"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C0E80C4CEEA;
+	Wed, 25 Jun 2025 08:42:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750840972;
+	bh=8RyD8b+dB6zF43UCsVGSQk0jUPuIhhPSK+qvKJ7Em2A=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=sSh0yxt3Bl4Lr9AkqrAkd34sEsrpkvyQGaD9owIXHN04JGR6xAwClsAQkoKiIxKso
+	 pRdjBbM0n+2wOb1Nj2sVPzFLOEgBCY7UCnLJss9lkw8UH5bok5usFozt6swIZNgYH7
+	 3lIWcVhD5BhvlXCw0mdLFLr3jowqboxN3Ln0WOwkdEDCLvs1YbvWX3JGcOmci/lPh7
+	 cVy+UmoAc3qrraWtuMrKamzTdGnT40/Iyq3urtMoukIPZUf+JkdZhHlKIp5y9eVvsD
+	 qDLj1tlYYkSvxVorvIg99nwCRHrF53Q2Ndc5UGv4OkhBRZ5n0/2TusyF0cmjm/Wgua
+	 q33L0WBCFCy/w==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0F9C7EE30;
+	Wed, 25 Jun 2025 08:42:52 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Wed, 25 Jun 2025 16:42:49 +0800
+Subject: [PATCH v2] Bluetooth: hci_event: Add support for handling LE BIG
+ Sync Lost event
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAIi2W2gC/33NywrCMBCF4VcpWRtppjd05XtICXEytgNtIkkJl
+ tJ3NxbXLv+z+M4mIgWmKK7FJgIljuxdDjgVAkfjBpJscwsooSlbBTKPdiL94EHH1aGefFw0JXK
+ LrLGz2NbVpTQgMvAK9OT3gd/73CPHxYf1+Erqu/5YqP+xSUklsQKkqrO2Nc3NzJMfGM/oZ9Hv+
+ /4B3kTbpMYAAAA=
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1750840971; l=3131;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=+z+dUqdDyldE5nsJD9/hOCyoQSkymotIIMTtOBNS5rQ=;
+ b=adqKAGMBBzMjHlYTHEQ8EceIJGHCS/cRUiqWAz/PvVVp+OFw2uzyYJdzKA9vYV14Jf4AZLuai
+ j6eY1JBCXx5AdJKvtPM892IgAmUYV47Cw+z4SiHEKQ2th6MAvm5nKPK
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-Wildcat Lake platorm supports Whale Peak2. Add pcie device of Whale Peak2.
+From: Yang Li <yang.li@amlogic.com>
 
-lspci -v -k -d  8086:4d76
-00:14.7 Bluetooth: Intel Corporation Device 4d76
-        Subsystem: Intel Corporation Device 0011
-        Flags: fast devsel, IRQ 255, IOMMU group 12
-        Memory at 13013328000 (64-bit, non-prefetchable) [disabled] [size=16K]
-        Capabilities: [c8] Power Management version 3
-        Capabilities: [d0] MSI: Enable- Count=1/1 Maskable- 64bit+
-        Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
-        Capabilities: [80] MSI-X: Enable- Count=32 Masked-
-        Capabilities: [100] Latency Tolerance Reporting
-        Kernel driver in use: btintel_pcie
-        Kernel modules: btintel_pcie
+When the BIS source stops, the controller sends an LE BIG Sync Lost
+event (subevent 0x1E). Currently, this event is not handled, causing
+the BIS stream to remain active in BlueZ and preventing recovery.
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Yang Li <yang.li@amlogic.com>
 ---
- drivers/bluetooth/btintel_pcie.c | 1 +
- 1 file changed, 1 insertion(+)
+Changes in v2:
+- Matching the BIG handle is required when looking up a BIG connection.
+- Use ev->reason to determine the cause of disconnection.
+- Call hci_conn_del after hci_disconnect_cfm to remove the connection entry
+- Delete the big connection
+- Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com
+---
+ include/net/bluetooth/hci.h |  6 ++++++
+ net/bluetooth/hci_event.c   | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index cb3cf2b9acea..2ae00332085c 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -35,6 +35,7 @@
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 82cbd54443ac..48389a64accb 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+ 	__le16  bis[];
+ } __packed;
  
- /* Intel Bluetooth PCIe device id table */
- static const struct pci_device_id btintel_pcie_table[] = {
-+	{ BTINTEL_PCI_DEVICE(0x4D76, PCI_ANY_ID) }, /* Wildcat Lake */
- 	{ BTINTEL_PCI_DEVICE(0xA876, PCI_ANY_ID) },
- 	{ BTINTEL_PCI_DEVICE(0xE476, PCI_ANY_ID) },
- 	{ 0 }
++#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
++struct hci_evt_le_big_sync_lost {
++	__u8    handle;
++	__u8    reason;
++} __packed;
++
+ #define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
+ struct hci_evt_le_big_info_adv_report {
+ 	__le16  sync_handle;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 66052d6aaa1d..d0b9c8dca891 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7026,6 +7026,32 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
++					    struct sk_buff *skb)
++{
++	struct hci_evt_le_big_sync_lost *ev = data;
++	struct hci_conn *bis, *conn;
++
++	bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
++
++	hci_dev_lock(hdev);
++
++	list_for_each_entry(bis, &hdev->conn_hash.list, list) {
++		if (test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags) &&
++		    (bis->iso_qos.bcast.big == ev->handle)) {
++			hci_disconn_cfm(bis, ev->reason);
++			hci_conn_del(bis);
++
++			/* Delete the big connection */
++			conn = hci_conn_hash_lookup_pa_sync_handle(hdev, bis->sync_handle);
++			if (conn)
++				hci_conn_del(conn);
++		}
++	}
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
+ 					   struct sk_buff *skb)
+ {
+@@ -7149,6 +7175,11 @@ static const struct hci_le_ev {
+ 		     hci_le_big_sync_established_evt,
+ 		     sizeof(struct hci_evt_le_big_sync_estabilished),
+ 		     HCI_MAX_EVENT_SIZE),
++	/* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
++	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
++		     hci_le_big_sync_lost_evt,
++		     sizeof(struct hci_evt_le_big_sync_lost),
++		     HCI_MAX_EVENT_SIZE),
+ 	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+ 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+ 		     hci_le_big_info_adv_report_evt,
+
+---
+base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
+change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+
+Best regards,
 -- 
-2.43.0
+Yang Li <yang.li@amlogic.com>
+
 
