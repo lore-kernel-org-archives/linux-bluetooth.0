@@ -1,44 +1,61 @@
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F68E25E806
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 14:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995FC1E87B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 14:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750860361; cv=none; b=Nu2jKwRVabudxyXbGt9B5mJAKjCdfi5O4U++kG8ZQXO1Ub9Hc+QNTQjuqnP7wzc2l/UHNA6FyC8lAc/mga11bnfOLEpSA0DfGWxouKyOjj95N2LcSlmvT9eFBvIvqTdKSc3N9TFHm7SFQaaRZm2wHY/FI+tHDBSef7aVzNc+0dE=
+	t=1750860975; cv=none; b=Xtkbj5r6Ngu0JYQOm/Xs3ViFDRdTnn9TNIQBMFF9kmLGkymEXQDShSYG+Sxv6f66KLsPoqqrkBPd9ZfcTJBKv+MHtQIG44J5emtQIBnKM63ER0GltsX+THvMe1BlhTVvq64+7HhPUN8DE1XVOWsOkrTXhYYYeCxyiaZ3ktDWWXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750860361; c=relaxed/simple;
-	bh=yRrgrDBR78n8Ln1znVzbD/oKnXostvZBavuQE2k2TuU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eO8uW7oeXzlJfrLjBWGQd8hhP9Ixftt+0meteZj4/00hfVtYRCyLQ+6wa1aneAVMivPdnR3m4V33Lhafw3fgSBBgYR/ye3zD8z+0u/PMWbQJXbqJylbTu9+eoLjqJfExgG2TyTM8Mszy9p6/QBLTQnleaLSzAjlGBYlAcVo1Lig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=GOKev6yp; arc=none smtp.client-ip=178.238.236.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
+	s=arc-20240116; t=1750860975; c=relaxed/simple;
+	bh=uFwg1FxYbLXJklEL0ol1xxV7y/UXL/FD3SDQHissFQ8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=tBTBqBg0Fl6wnAR88OL+ZLGEJM4kaw9vGFp+m2A4pAHqJ0rr1xeEzalfoW7WxK3EYrI8QeuI7m16dxkmy+rMgcKo6/r9WUTq+eyM3BfsnnosnEFmCTddQqPjDkAbWNYpHZhqTXlrjLa6uirukSwUOEIoLt8iKJn8ZkiWAiucJEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=OlB1EVx0; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="GOKev6yp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=Cc:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=wAKTzfeuFHMggSX/FDbC0FfHlm1qb5olGqR+0neFYnE=; b=GOKev6ypaVuFqFwVzqExlUpJiD
-	fC6+3TiZ+ahF3cF5iGfTC9WZFJfkEJ+liaE8mTt9rcFBAymRt5dC/Zf0Q6ZEM2YmvbDelsMbPhPuC
-	FEr6VEQjaQLxvNNIHuHDxkXlyVozHpX/KhQiaaPx37DvPdURNa5JAzp6lO4VzUQlhoeHEwtwwiTuA
-	EdO4U5/uB+TP4alL2g5Wrow9/IGDlkKbYcchgDABspg9nxD0m9YEOshLRYle7Oizr7EywgC+yHpA3
-	y5mjoxtvJ8zNNLnT11fJI00GNH0jiCsRPmqZEvAXV4u4hHJ5rZoXMezPIg0E74XMT4W+9jnCdwkXO
-	c/QDWNcQ==;
-From: Andreas Kemnade <andreas@kemnade.info>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="OlB1EVx0"
+Received: from github.com (hubbernetes-node-44c2c22.va3-iad.github.net [10.48.141.16])
+	by smtp.github.com (Postfix) with ESMTPA id 9F6EDE0B1D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 07:16:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1750860972;
+	bh=xHU0q1JJ9NiqQGxPATonP1kj+rgKKPvwS4tYOD369Dg=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=OlB1EVx01EOSgs3MF84ueuVHECV/T1XAiu8XbWC4LWxatYj08I8GI1WQFmLeXgW4l
+	 i4M5V+1ZXdjDXCvJk0fziuqUKoc3w358uZocosLLPCrxFvQa1RSJ54Qkyj2NY/YXA3
+	 KGTD9SrIMO67CAdDJFdz+ApZNzE7IqqOS8Wxj5ic=
+Date: Wed, 25 Jun 2025 07:16:12 -0700
+From: Andreas Kemnade <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andreas Kemnade <andreas@kemnade.info>
-Subject: [PATCH] gatt-client: avoid UAF after acquire notify failure
-Date: Wed, 25 Jun 2025 16:05:45 +0200
-Message-Id: <20250625140545.1610812-1-andreas@kemnade.info>
-X-Mailer: git-send-email 2.39.5
+Message-ID: <bluez/bluez/push/refs/heads/975818/000000-c9acde@github.com>
+Subject: [bluez/bluez] c9acde: gatt-client: avoid UAF after acquire notify
+ failure
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/975818
+  Home:   https://github.com/bluez/bluez
+  Commit: c9acde78c668eaf28a41d58926031c3c02c8602f
+      https://github.com/bluez/bluez/commit/c9acde78c668eaf28a41d58926031c3c02c8602f
+  Author: Andreas Kemnade <andreas@kemnade.info>
+  Date:   2025-06-25 (Wed, 25 Jun 2025)
+
+  Changed paths:
+    M src/gatt-client.c
+
+  Log Message:
+  -----------
+  gatt-client: avoid UAF after acquire notify failure
 
 If a disconnect happens during AcquireNotify dbus calls, a lot of
 debris is left over. Subsequent calls to AcquireNotify will return
@@ -94,24 +111,7 @@ bluetoothd[26032]: [:1.74:method_call] > org.bluez.GattCharacteristic1.StopNotif
 ==26032==    by 0x1CBCEF: message_dispatch (mainloop.c:59)
 ==26032==    by 0x48BF61E: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
 ==26032==    by 0x48BF9D7: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
----
- src/gatt-client.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 3c31a422e..a146d52cb 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1539,8 +1539,7 @@ static void register_notify_io_cb(uint16_t att_ecode, void *user_data)
- 	struct bt_gatt_client *gatt = chrc->service->client->gatt;
- 
- 	if (att_ecode) {
--		queue_remove(chrc->notify_clients, client);
--		notify_client_free(client);
-+		destroy_sock(chrc, chrc->notify_io->io);
- 		return;
- 	}
- 
--- 
-2.39.5
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
