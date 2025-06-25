@@ -1,83 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B981F4297;
-	Wed, 25 Jun 2025 20:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EF520F098
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 21:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750885180; cv=none; b=aqvQsdFvM79r92o0oP7Wq0qeqE6n8IyRijxxGd+Mdbg/2mTFVHbTchRkw8xNshiaDiXTcMF1K+jvmVQfwmYDtJomqDpU7wyynSWmq0HSv8kTSEr60NAxwxZT9WwDPYapPtIIhssf4vm2N7KwDndAOaaUBgT9iT5opUotcE8HzRc=
+	t=1750886950; cv=none; b=Yl2CrEwCHRS6RHoqUMsvEF3twjzxcUDewHkfE6Y6aFqVSHutf68o0M7Mb3LuxyKf/xrDGHnrAyh967cc3BQTwJ8ehF2/LMvknNbxGEHgu3gz6K/jB5xBz0sJtdzRA1Acbi6OxsLZDty4BnIdx5q3BywxMIaBBb3F46iUp5Qi1jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750885180; c=relaxed/simple;
-	bh=Rvcc4lTctp09M9xQwfdOzq30dweR+tr4oerHDDndRyc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pZSROpNQfoghI/h0zbYzJVtYjNNw6GKaQLhrlJ8mFpTW2dsYXEKy/xaW3lTffqm4ux2SwskI3RFGeeO0qjrvCR5SlzPbny+zNk+UXPTtI7krjj0ojm4T1+tDTewn9q4cM2T8n4OiS3lfqRWh7lRNK6cZ/IWD2Vo7bYXh/lPYr68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpP9Xsbh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750886950; c=relaxed/simple;
+	bh=a1bWDVPH6JJc6FIkCzsA1IjHoETLTv2ybfMV2NNtjMo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=GxAWnjVFNyLC3T0Pawu2h22IbZnpUjXrhY3wpL1QjBbf3HZRqVR99JGwsdiRc64bgn/YyqIurqvjKsgOwIf4pLKWGD2D59ZZzDbw9TzrMuWvaHXReAoR8fT+eBoQq2fswlBoN8s984zZTIdAh7nGYu4lE4aZ9cW4ya6VMfRcyVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FZA7kasl; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpP9Xsbh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C0ACC4CEEA;
-	Wed, 25 Jun 2025 20:59:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750885179;
-	bh=Rvcc4lTctp09M9xQwfdOzq30dweR+tr4oerHDDndRyc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KpP9XsbhrXQh27NcbG2R4YtDnyZk5UWtVVNHLGvMnCMQX8OgmqmarwFO1b3XulvpD
-	 8mRT0ldhCr0jpHefOkX1YTl6b1VXrFMx9gmzpHMPPgB3J7Vh6FcvSDu4+bjdBPtyVL
-	 r7znAuGsNRnwLSV960ZlsMNkBkB5+4CnpjeXoyGpmp++aIdbht3sIqyE6tipIOyZMy
-	 UGr68lXtUQ83ItIT+bfL3B9mfM8TL+IsgyoJY1fqFNHq0Tgbcn3xO7Rp3nsp3U8we9
-	 OlVDxWIwltUVVk1hlLh+hCiktjie6fgISOlMe0MKtANwR8i0ytFZ5ABJ63WsqwBu5T
-	 omeZR/3O5LG/g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E583A40FCB;
-	Wed, 25 Jun 2025 21:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZA7kasl"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-60780d74c85so409251a12.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 14:29:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750886947; x=1751491747; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SVdH8yKBz0jZfArEpKg5npuDdaFrtm5jzQHPpKmFt2s=;
+        b=FZA7kaslTjTY2a1T+vsmwV5XiTO04w8i71Wkabt0DAhS03sk+2bpCGfr7AaZV+NtHV
+         iYVTJKlfWWkZsftWFNaLiC04qauKpv96rXzxRMjiIJGdiZhUZXcCe5xgIfQuImRodvKY
+         01CiQeGLttNibraugXEsnFLyiwN39Jm1wyPPfUU3R3mWXerkZzouUM9B96vqFpn+mCMw
+         rsGJNMcGBqKY6ub+tSrRCvt4qL3c5cnf4Lwv0JmivyPccXgYcyoxU9Ykvyge0UyyI40v
+         sF6E9t32HcJE/JkMs0oc4Y793d1XsRmMCOlRDQnFVw0ETg+KeNfc2TJWjvoMg1AUL0RC
+         hD1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750886947; x=1751491747;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SVdH8yKBz0jZfArEpKg5npuDdaFrtm5jzQHPpKmFt2s=;
+        b=FxoU5l3BjLD8gcy8XsoSALWV4zSgDfGCuqSAWWBMvQlZ7KIko0woxgnYul/ESc4MbZ
+         j2xmQALdtGH2iU0XbPw6sMBlCGzw9qqWJEudytLs9c1FYNPvsxd7koZkqf/kJPE9dfrq
+         js7dvxxxyQqvbIoP1MvJPA5lrnFTmE5z2VsuZgG1CYwP56VwjFm/hsXp9GqVjgVbbtby
+         hdCqJzDOAob3CSZBY4UHom6Jv6mS6AVyRxF0BQ3HilfdzUg/SjynupUIcSc9f3F5JgmG
+         GzrNEjY/24KnF6wswMdS8ufhi1QgTpxrDYpGTFZYJOfF0IynYNrA0Qs1i5AGBu5A0qvo
+         GN4A==
+X-Gm-Message-State: AOJu0YwPbjVOybZTl5YVbbqsnlfXXCL95Og5fF20Qx3fsZVX2Lj8yjPM
+	eOtfQJw+V9KyHmTEfrROF9U8bcCOPZ9g8kn1MhkNX2r9Wpp9HwS5ZjYmQtZle0cnuUbHLWNVF85
+	Ei3fM/PsmWLQxWK6gMYSWmVbesKBLEkUKqdDVuNY=
+X-Gm-Gg: ASbGnct+Jaq6A+LvBVZs5HQBbWC85rezMxaNr5n9PwF8ye59OaAZpeLOm3bBnR4LSjM
+	pUwsNnViwZB5F3DdM921ys8Yz5SB6mL+CWSSuNnmNho44ck+F2rs7DQbhcl5UmJ/Z/FvZDqpySJ
+	Qyh3CFFDy0bS3zw/tAeQBgW0QJCbLlXK4+rElBI0BjLJgy3/QXZ0R2fw==
+X-Google-Smtp-Source: AGHT+IGDcINNY5/zDjmSg7NBPpIlb3RZbGaQKQsUxwIDSz8dG9iWnCYxeWB+MvRhfFyH7DEl01opAlubpIQA4dQrq5o=
+X-Received: by 2002:a17:907:2da9:b0:add:f62e:a300 with SMTP id
+ a640c23a62f3a-ae0bebe8ff6mr498391566b.2.1750886946560; Wed, 25 Jun 2025
+ 14:29:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/3] Bluetooth: hci_sync: revert some mesh modifications
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175088520600.619994.15667708350334111089.git-patchwork-notify@kernel.org>
-Date: Wed, 25 Jun 2025 21:00:06 +0000
-References: <20250625130931.19064-1-ceggers@arri.de>
-In-Reply-To: <20250625130931.19064-1-ceggers@arri.de>
-To: Christian Eggers <ceggers@arri.de>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- brian.gix@intel.com, inga.stotland@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+References: <CABA=pqdhsBeabrxHvfXx-uWzSq_-hs9OR16NSs1xuc6aB0s_kQ@mail.gmail.com>
+In-Reply-To: <CABA=pqdhsBeabrxHvfXx-uWzSq_-hs9OR16NSs1xuc6aB0s_kQ@mail.gmail.com>
+From: Ivan Kalvachev <ikalvachev@gmail.com>
+Date: Thu, 26 Jun 2025 00:28:16 +0300
+X-Gm-Features: Ac12FXynncTLpOzCKogN9Wcqi-ySWjGGPz0bnk9TlZOXZOjjfmpo3ijmr74P1Uo
+Message-ID: <CABA=pqdUnLwPBUjSCiwTDUNaLJtz+hCxAP2--uG_d-U7pHQszQ@mail.gmail.com>
+Subject: Re: Bluez-5.83 is crashing during suspend/resume.
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Apparently I've missed a mandatory step to reproduce the crash.
+You have to stop pipewire before suspend.
+So the step to reproduce the crash are:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+ - Start bluetoothd;
+ - Start pipewire;
+ - Connect headphones;
+ - Play something (!mandatory!);
+ - Stop pipewire;
+ - Suspend (pm_test="freeze" is enough);
+ - When you resume bluetoothd has crashed.
 
-On Wed, 25 Jun 2025 15:09:29 +0200 you wrote:
-> This reverts minor parts of the changes made in commit b338d91703fa
-> ("Bluetooth: Implement support for Mesh"). It looks like these changes
-> were only made for development purposes but shouldn't have been part of
-> the commit.
-> 
-> Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Christian Eggers <ceggers@arri.de>
-> 
-> [...]
+Pipewire often causes hangs preventing suspend,
+so I have to stop it upfront. The hangs don't seem to be
+bluetooth related. I suspect amdgpu-audio.
 
-Here is the summary with links:
-  - [1/3] Bluetooth: hci_sync: revert some mesh modifications
-    https://git.kernel.org/bluetooth/bluetooth-next/c/1984453983fd
-  - [2/3] Bluetooth: MGMT: set_mesh: update LE scan interval and window
-    https://git.kernel.org/bluetooth/bluetooth-next/c/41d630621be1
-  - [3/3] Bluetooth: MGMT: mesh_send: check instances prior disabling advertising
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8dcd9b294572
+I found that's mandatory step because I hit another very similar bug.
+I also get a crash if the Bluetooth USB dongle is unplugged instead of
+doing suspend.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Apparently stuff is properly freed on pipewire shutdown,
+but is still referenced somewhere and double-freed on
+occasions.
 
+The bisect of the new crash landed me on
+05f8bd489fd1fbf27dfdc4828bb15aeece3a50a3
+and I don't think reverting that is viable workaround.
 
+Best Regards
+   Ivan Kalvachev
