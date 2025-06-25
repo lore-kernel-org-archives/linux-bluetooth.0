@@ -1,143 +1,117 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9592D126BFA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 13:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F68E25E806
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 14:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750858270; cv=none; b=CqqJgvOb205QVnu5lxKRChQG7se4bXSuQ+nkniMlcy8ZTpgu0jYU9AkvsHF3tfDp+ULB3MAPvu5JYaE5IAhKuhOBE8EPpwvrzwsjGhA32FJQktJ//5G2lCOo6YtPeT8r1knh4R6N7hT40C40kJaOY3MODW5glCMjX7a0heyLlyU=
+	t=1750860361; cv=none; b=Nu2jKwRVabudxyXbGt9B5mJAKjCdfi5O4U++kG8ZQXO1Ub9Hc+QNTQjuqnP7wzc2l/UHNA6FyC8lAc/mga11bnfOLEpSA0DfGWxouKyOjj95N2LcSlmvT9eFBvIvqTdKSc3N9TFHm7SFQaaRZm2wHY/FI+tHDBSef7aVzNc+0dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750858270; c=relaxed/simple;
-	bh=7xdU/Tuketz32UV3MMNHGf7SJCX1DCWsBLnOnJyAUsg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DuzJNRmHIVCLzUgMHIn9gtQ5HG2RepqT7Eiy0ZvajoW2nn/tg9vdi2ZcBFaSeqLzpMMLDwuVAZEwCGZdWzKMNB3dOX/v5kA+fO1zZgjxWg0KTiy+sZFjP3M7p7CvQ6mSH21qb/KfZjV60vc46NCcNOgU+LYM2blMi5/rvUekRAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HWgk8psV; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750860361; c=relaxed/simple;
+	bh=yRrgrDBR78n8Ln1znVzbD/oKnXostvZBavuQE2k2TuU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eO8uW7oeXzlJfrLjBWGQd8hhP9Ixftt+0meteZj4/00hfVtYRCyLQ+6wa1aneAVMivPdnR3m4V33Lhafw3fgSBBgYR/ye3zD8z+0u/PMWbQJXbqJylbTu9+eoLjqJfExgG2TyTM8Mszy9p6/QBLTQnleaLSzAjlGBYlAcVo1Lig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=GOKev6yp; arc=none smtp.client-ip=178.238.236.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HWgk8psV"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-23508d30142so91793175ad.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jun 2025 06:31:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750858267; x=1751463067; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gQOSXwfwWcZXMx4o2eMIfKKjZW0xCp6OhwLszLte2DQ=;
-        b=HWgk8psVdFK03O2GMxAX6eKutN3McWvjrI7ug1EHfc3KRQy/SMig6iiI157f4nkpAu
-         hOvsGf7sqKN7d7ePoTH3WJ1zebuu2PZC/aOzs/c5VlUnt16PK5LShwQJROSJAUqQHlBS
-         GCAb/R/9xIDccC4VgArN5HuAKRDfAICjF6VB+KB8qd/v0C9xBYkQlAw9km3p6npQHT4W
-         yCSJri/LwNzZZbcMw8/E4YmDgLGWswT+ksZzUcG4AqLZ3FFilTt1z5aK2/2dHZQ6esYV
-         K/5tvS+PulhpdqnYR2nPOrFj6keeWO8ypUIpBGI54h/J2QetkOY0VyiTJnHAjtowMsiq
-         Q0yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750858267; x=1751463067;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gQOSXwfwWcZXMx4o2eMIfKKjZW0xCp6OhwLszLte2DQ=;
-        b=n4f04i9g/aq5phTh8CUuh95bBlh0JDGW2TuAnD0+vCHoJgnNBXhTgKd47FwFwrG4fw
-         DQAJ0yhjZEc0pNjZQigKtCAEXNvYSA4IAUzuYKvFGj8XHDhvWN4VjKDlcmjdqLGT2hZ7
-         eDGvCuyhsyLQiXJR/i09sNfUw0hlo1rexPNJ3Qy+LiElQCFpemlND1vThG15Lm35ajtv
-         8hhWG/uyPpT7e9YkVSqcttKwTNO2nm3XS41djA4BK7GmSYp8SV7klssswIpea6lyodqV
-         OL/rspzvvBlFBTuB9OkX+UL24D9kKgftEifKJUNOzY3769vvu9lf1fOrEInFC6Mu+3v8
-         c2mQ==
-X-Gm-Message-State: AOJu0YyRK0/4gYEw4Zx2RLm1/eQp+myfUWng+giHXLPRnHp4BNKg3Mdy
-	DDiJMB5J/0VPWO4T/4DLwdUo2Yp7uu/YsKolci/VwAmUJrZIMtTDgeMp/gUsJg==
-X-Gm-Gg: ASbGncssl1ZfbBNqjK9OjWw71J7uuGjGJYhoZDzgZ2va/bP8VErOC24oUwh3wHQFAE4
-	2/zoJSjJ44xAapxSkXalySSo/7x0F9TkbMFKYs643DbuSLQldSJyQIQZJazpWmpK/vle2bCFOCH
-	3Pm6O7GNCTQ//h8gDXHNaSmYDAYLHPHEtFuZAuZASITam0EpVUnohKzPm7s8ExPD6uMkuhZ/12f
-	nDFKHoG7bhVyjsiudbxqWYywZppzmFV3Yc0/3fa7qJBlWPzHcvi+eH8wq6Lmuy4szVV4r+fUPrl
-	4/aphUtaov3nIQkZOiC6b+lyFZua9Jp7+j5ywxc5/6/Nz9qxXkQd8C7a/12yklbBW3mTGqcWlut
-	DVA==
-X-Google-Smtp-Source: AGHT+IFmYqTUHblw5IuEK1fxDc8Hz9y4l8BE5ZPQ1h75+ZIQm4H/0oyaokg3AjnW/V2wCJrzNMj5+w==
-X-Received: by 2002:a17:902:f544:b0:235:f4f7:a654 with SMTP id d9443c01a7336-23823fdeef0mr61822975ad.22.1750858267419;
-        Wed, 25 Jun 2025 06:31:07 -0700 (PDT)
-Received: from [172.17.0.2] ([20.169.14.30])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d8398dcbsm132463845ad.48.2025.06.25.06.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 06:31:07 -0700 (PDT)
-Message-ID: <685bfa1b.170a0220.381f2e.cd49@mx.google.com>
-Date: Wed, 25 Jun 2025 06:31:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0678456767363027097=="
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="GOKev6yp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=kemnade.info; s=20220719; h=Cc:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=wAKTzfeuFHMggSX/FDbC0FfHlm1qb5olGqR+0neFYnE=; b=GOKev6ypaVuFqFwVzqExlUpJiD
+	fC6+3TiZ+ahF3cF5iGfTC9WZFJfkEJ+liaE8mTt9rcFBAymRt5dC/Zf0Q6ZEM2YmvbDelsMbPhPuC
+	FEr6VEQjaQLxvNNIHuHDxkXlyVozHpX/KhQiaaPx37DvPdURNa5JAzp6lO4VzUQlhoeHEwtwwiTuA
+	EdO4U5/uB+TP4alL2g5Wrow9/IGDlkKbYcchgDABspg9nxD0m9YEOshLRYle7Oizr7EywgC+yHpA3
+	y5mjoxtvJ8zNNLnT11fJI00GNH0jiCsRPmqZEvAXV4u4hHJ5rZoXMezPIg0E74XMT4W+9jnCdwkXO
+	c/QDWNcQ==;
+From: Andreas Kemnade <andreas@kemnade.info>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andreas Kemnade <andreas@kemnade.info>
+Subject: [PATCH] gatt-client: avoid UAF after acquire notify failure
+Date: Wed, 25 Jun 2025 16:05:45 +0200
+Message-Id: <20250625140545.1610812-1-andreas@kemnade.info>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ceggers@arri.de
-Subject: RE: [1/3] Bluetooth: hci_sync: revert some mesh modifications
-In-Reply-To: <20250625130931.19064-1-ceggers@arri.de>
-References: <20250625130931.19064-1-ceggers@arri.de>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0678456767363027097==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+If a disconnect happens during AcquireNotify dbus calls, a lot of
+debris is left over. Subsequent calls to AcquireNotify will return
+NotPermitted and StopNotify leads to an UAF, crashing bluetoothd.
 
-This is automated email and please do not reply to this email!
+Fix that by also clean up the socket stuff on failure.
 
-Dear submitter,
+This was provoked by putting the device into some RF shielding bag
+and open and close it quickly.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=975791
+Valgrind output:
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.53 seconds
-GitLint                       PENDING   0.28 seconds
-SubjectPrefix                 PASS      0.20 seconds
-BuildKernel                   PASS      24.59 seconds
-CheckAllWarning               PASS      26.67 seconds
-CheckSparse                   PASS      30.61 seconds
-BuildKernel32                 PASS      24.00 seconds
-TestRunnerSetup               PASS      469.78 seconds
-TestRunner_l2cap-tester       PASS      25.07 seconds
-TestRunner_iso-tester         PASS      36.43 seconds
-TestRunner_bnep-tester        PASS      5.84 seconds
-TestRunner_mgmt-tester        PASS      134.01 seconds
-TestRunner_rfcomm-tester      PASS      9.31 seconds
-TestRunner_sco-tester         PASS      14.75 seconds
-TestRunner_ioctl-tester       PASS      9.96 seconds
-TestRunner_mesh-tester        FAIL      11.44 seconds
-TestRunner_smp-tester         PASS      8.47 seconds
-TestRunner_userchan-tester    PASS      6.13 seconds
-IncrementalBuild              PENDING   1.02 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.098 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+bluetoothd[26032]: [:1.126:method_call] > org.bluez.GattCharacteristic1.AcquireNotify [#145]
+bluetoothd[26032]: [:1.126:error] < org.bluez.Error.NotPermitted [#145]
+bluetoothd[26032]: [:1.74:method_call] > org.freedesktop.DBus.Properties.GetAll [#895]
+bluetoothd[26032]: [:1.74:method_return] < [#895]
+bluetoothd[26032]: [:1.74:method_call] > org.bluez.GattCharacteristic1.StopNotify [#896]
+==26032== Invalid read of size 8
+==26032==    at 0x1A5721: notify_io_destroy (gatt-client.c:1562)
+==26032==    by 0x1A7290: sock_io_destroy (gatt-client.c:1171)
+==26032==    by 0x1A7290: destroy_sock (gatt-client.c:1192)
+==26032==    by 0x1A73D6: characteristic_stop_notify (gatt-client.c:1698)
+==26032==    by 0x1CF478: process_message (object.c:293)
+==26032==    by 0x49CB71B: ??? (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
+==26032==    by 0x49BB62A: dbus_connection_dispatch (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
+==26032==    by 0x1CBCEF: message_dispatch (mainloop.c:59)
+==26032==    by 0x48BF61E: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
+==26032==    by 0x48BF9D7: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
+==26032==    by 0x48BFC8E: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
+==26032==    by 0x202114: mainloop_run (mainloop-glib.c:65)
+==26032==    by 0x202501: mainloop_run_with_signal (mainloop-notify.c:196)
+==26032==  Address 0x5a7a430 is 0 bytes inside a block of size 32 free'd
+==26032==    at 0x484417B: free (vg_replace_malloc.c:872)
+==26032==    by 0x1DEC0F: complete_notify_request (gatt-client.c:1663)
+==26032==    by 0x1DEC0F: enable_ccc_callback (gatt-client.c:1735)
+==26032==    by 0x1DB8FF: disc_att_send_op (att.c:464)
+==26032==    by 0x1DB8FF: disconnect_cb (att.c:676)
+==26032==    by 0x2017A4: watch_callback (io-glib.c:173)
+==26032==    by 0x48BF61E: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
+==26032==    by 0x48BF9D7: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
+==26032==    by 0x48BFC8E: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
+==26032==    by 0x202114: mainloop_run (mainloop-glib.c:65)
+==26032==    by 0x202501: mainloop_run_with_signal (mainloop-notify.c:196)
+==26032==    by 0x12E60C: main (main.c:1535)
+==26032==  Block was alloc'd at
+==26032==    at 0x48417B4: malloc (vg_replace_malloc.c:381)
+==26032==    by 0x1D2F4D: util_malloc (util.c:46)
+==26032==    by 0x1A5DD3: notify_client_create (gatt-client.c:1426)
+==26032==    by 0x1A5EFC: characteristic_acquire_notify (gatt-client.c:1588)
+==26032==    by 0x1CF478: process_message (object.c:293)
+==26032==    by 0x49CB71B: ??? (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
+==26032==    by 0x49BB62A: dbus_connection_dispatch (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
+==26032==    by 0x1CBCEF: message_dispatch (mainloop.c:59)
+==26032==    by 0x48BF61E: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
+==26032==    by 0x48BF9D7: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
 ---
-Regards,
-Linux Bluetooth
+ src/gatt-client.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 3c31a422e..a146d52cb 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1539,8 +1539,7 @@ static void register_notify_io_cb(uint16_t att_ecode, void *user_data)
+ 	struct bt_gatt_client *gatt = chrc->service->client->gatt;
+ 
+ 	if (att_ecode) {
+-		queue_remove(chrc->notify_clients, client);
+-		notify_client_free(client);
++		destroy_sock(chrc, chrc->notify_io->io);
+ 		return;
+ 	}
+ 
+-- 
+2.39.5
 
---===============0678456767363027097==--
