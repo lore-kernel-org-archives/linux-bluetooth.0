@@ -1,312 +1,472 @@
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022115.outbound.protection.outlook.com [52.101.126.115])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010010.outbound.protection.outlook.com [52.101.84.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294521922FB;
-	Thu, 26 Jun 2025 05:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBE54C81;
+	Thu, 26 Jun 2025 11:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750917264; cv=fail; b=goCsICBehRuTuzy/3b2e+kpiv2LkdmkCIZ8x7ByVVPqU2LSVywxPJqymgM+r4YhNy3y6oUZDeirHL4d3CWGPNEkVWuofRYC4RSTjNaj+qYRwhF8FPLpfIwwVcO6O+23Y65uu4Swz1mBliKcgob9Z5J/1IP2wcu6GvLGWbAFoYK0=
+	t=1750938758; cv=fail; b=Wwl0ee+6DGyTfJ+T4j86z9YUfSqJALRnY/zeBdaYgi4zCPi0eObBg3dULP/kAlLdzgqOXA0wfgn+PI/PT6Hrtd4lvWtYZeaA+sMAuH/mnZay4n+rNlctbyoxpbpW6cmJ8tDiq9XIWjR05sFFSxCgig/D3gWS1snsv6IITLE+Fxw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750917264; c=relaxed/simple;
-	bh=MswKia+H+xLtWHcnD6B0zw1Vt4oSFbkwenJHlik687c=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ElXv5zsLd/WhB1B9N7vkRy1lHDo40NP2dWAm744jrljR7vIp9B0sz5bp8SBG/wBEOxhc7hJvp/jIl4K9tIk6RkzllE3wTRLrNHBiTr+2Do8y8Mh8sZEdgwkxABbYjfRHX2npH5ZkoMe8khyr0WgMJyUsAf3gRhHv8/oBFKbt2qc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=DFDR/7/a; arc=fail smtp.client-ip=52.101.126.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
+	s=arc-20240116; t=1750938758; c=relaxed/simple;
+	bh=v60pAHgQF9p8BwK4KxOcttdB+fkOUn2RWM1ZxYuJBF0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eIdCMT+z+kKTHC249KxaEpkQE0cuU3VPRX1kDb5gEuH79Dm6rbNqmT0KiO8Xd6d1E5UsmEv1oB4QJPaUNgKTtvbNZk7dDUrAWIbiKad6lgkoMcyp8TgvcTN9bf7SzC7c6PQYLpapUH2opf95weD1+2l4BiPXQeaqYmnREU54TPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=utXnEQnO; arc=fail smtp.client-ip=52.101.84.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="DFDR/7/a"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="utXnEQnO"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KglrdJNPc3AY7rKtbeDMzf7zXFPQJB2qjsbR5PUx9n8TIaoXw0SRgu02V2iIKjHwtX+w6GcyYYj/DPijZzBBkfKUCw9tcZEmo0m5Wx/K1+d7qjn9yeg7ufP81zFzew8zGAhsZmszgRusnPRmDLW9fCxKfR2BWSwL28mgXyUG5UxDmAMtbcEQC/G144Usx74U7llimjlpanaqyNLBhqTikDXu3NmDpiIybhVFwowQJgO+E5LOCK2IzJeEAUWL6E4FWtGNckbMGokv3GO7jpjzzt8Z3ndg6IqoKYr+lj/7Bm5852zGVafYr1Y3+xR+O8dbDbY6S9lcB1vpzXwveX4Z3w==
+ b=nH6JWDmwj5/RCtJ72xyufBvqoNZxNHY2TYDJXtvPHj1yC8kFzpzSs4G75eef+PfU4j4A7wQZwFwi51kavmqndz5ALz25+0maUALlVo44W84fdpqsrqJz90GJVeM/6Ujfwfirvg00p2HhCr9XF3GgqVFZKRNz/D5+ZqfKDIAttiAm5WfQGi7TtQmOuwO72bauLKsjXeG4xJNwoXz98YWVHKwG6QvdEcZxkK8fI4lhj1Ka4dXakC1BRvJRjp2wPCKpBnlWTvA9waiXELzmakwuKyidxoVXhh/PVDaHR+XLVor5amedHZXuRwEYSnRTpJJYNAJs28eOuI1MWLFSzsKFlQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CiSi62jw2/RJ8vh4/SXtvMj2MadV0ZiHulqD/26NFA0=;
- b=HMr5Vp+480m64SdnajMs+HvBaoj1zKMVB/bqJ6wrBWZeWQO080XX6DwaNQ2skmPqRv/6G80lPO20xFD+rUZ2KziR5RyKgkOB4GrXth8q57VudwAO1OPWhEdvrylX5eMpvrZCkWxk3MdE4wicxfPplVWlo7Siva0SXpPtn8pHxT6gq4mRGfBAQBx/HJIcqHkdYmchwuzbddXX5SiqnOit/Tvbjb3YSrOKXgkiR0UA5dQnmCNZdigrnpkT+zhP2yzUTt7/cIdYG4n4qzmQEFd5wnr+34nX+gxgZZEni2DkXrA2UwJKaVt3+iK/lebBrh7D3fZPC+pk51keiz+B4rp64w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
+ bh=88wpuiJEIZFceLk091o/GhGyAD3IYNyqpPsypgndQ0g=;
+ b=VNiTzdC52mDkAtPNuz4ts9JPcayYJKBAh3pjjv+D7zskOa8ZKpiHz9qMbqgbdqfprFTeD9XRgfkaePnnS3ug0vjIjsTY94R7bZjaJvgdeth5QdzNCaBTR510Jl0VestGlcdmNaTmOARzCRx5exMO8Y6c1xo/5G7v2ZVd508ECUfWEmvqGdDmVPDZeTMUC0LD58M/XiDYFqPsFkGa+EGHVikS02SpNvdNHN689jKjyWlKfb+oH1z3wktlIGwSvWmlq44QXopUGMdyTpwXoCdFzFFvwUTKGEmBsHgEVVdnf5MuYjav/j2BXKU6x8RrGjGxsjb/m+HHUnhhpRGf1lijUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=holtmann.org smtp.mailfrom=arri.de;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CiSi62jw2/RJ8vh4/SXtvMj2MadV0ZiHulqD/26NFA0=;
- b=DFDR/7/ayczDy833QfcXL84zq6E/LOrxZt/Yw/Ts+2dAV43t5GNTieFAzafGX5zf/ZFnluCZy2npgfGdW6aFAHJePX2XQ8qkfaN9iXUFxqTFWXVYbAeOGiL1WAmE1qHuMpcA7i2ETacnP0qWx0cO5pISbJ0Oeyodq8XOVDWM/dyJJV9Uw1VxwdGgsNUXq1BzKKKudAFA/FSEEWvjwrzG1LtNZtxqjCPAYwCHSFAOhRz8R5h8tL2OYsRS/Z4IBi9Lmc0+RQbVwtmHjN85TtLJJfTxIXUWXgOAS4+OA89k7EezOBg7iqXh+q+MloQQ4mEElpdZLSK4ex7BqhLWXEH4hg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
- by JH0PR03MB7880.apcprd03.prod.outlook.com (2603:1096:990:34::5) with
+ bh=88wpuiJEIZFceLk091o/GhGyAD3IYNyqpPsypgndQ0g=;
+ b=utXnEQnOhN3qBZ58gOPBlG00moO+gqnS+8jR9i+BB1p62u7Y2i+EZMgkOYXau/EOjZC5BzIjN9p8fokgD7vgAf8g5ZFTQNRhsuNqdXaN/z7TbVqLoZrkqVRSNETwTRUu4JF2D1p8zzo2q6KsPXZFlC1zt2OPbTW/0kBF6GSjE0w=
+Received: from AM0PR02CA0193.eurprd02.prod.outlook.com (2603:10a6:20b:28e::30)
+ by GV1PR03MB8688.eurprd03.prod.outlook.com (2603:10a6:150:90::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.29; Thu, 26 Jun
- 2025 05:54:16 +0000
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd%6]) with mapi id 15.20.8835.023; Thu, 26 Jun 2025
- 05:54:15 +0000
-Message-ID: <1842c694-045e-4014-9521-e95718f32037@amlogic.com>
-Date: Thu, 26 Jun 2025 13:53:53 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: hci_event: Add support for handling LE BIG
- Sync Lost event
-To: Pauli Virtanen <pav@iki.fi>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com>
- <1306a61f39fd92565d1e292517154aa3009dbd11.camel@iki.fi>
-Content-Language: en-US
-From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <1306a61f39fd92565d1e292517154aa3009dbd11.camel@iki.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2P153CA0033.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::21) To JH0PR03MB7468.apcprd03.prod.outlook.com
- (2603:1096:990:16::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.18; Thu, 26 Jun
+ 2025 11:52:29 +0000
+Received: from AMS0EPF00000196.eurprd05.prod.outlook.com
+ (2603:10a6:20b:28e:cafe::cc) by AM0PR02CA0193.outlook.office365.com
+ (2603:10a6:20b:28e::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.17 via Frontend Transport; Thu,
+ 26 Jun 2025 11:52:29 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ AMS0EPF00000196.mail.protection.outlook.com (10.167.16.217) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8880.14 via Frontend Transport; Thu, 26 Jun 2025 11:52:28 +0000
+Received: from N9W6SW14.arri.de (10.30.5.30) by mta.arri.de (10.10.18.5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Thu, 26 Jun
+ 2025 13:52:28 +0200
+From: Christian Eggers <ceggers@arri.de>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Christian Eggers <ceggers@arri.de>,
+	<stable@vger.kernel.org>
+Subject: [PATCH v2] Bluetooth: HCI: Set extended advertising data synchronously
+Date: Thu, 26 Jun 2025 13:52:08 +0200
+Message-ID: <20250626115209.17839-1-ceggers@arri.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|JH0PR03MB7880:EE_
-X-MS-Office365-Filtering-Correlation-Id: 69323f84-2d13-437f-05a6-08ddb475e217
+X-MS-TrafficTypeDiagnostic: AMS0EPF00000196:EE_|GV1PR03MB8688:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8504c419-f96f-4d22-6663-08ddb4a7ed22
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YzFtdkVtNmVKT2NrRjc5d2o2QTNHNEtHVTBlU0ZGam5pQ0RPTGd0cGN4ZWFq?=
- =?utf-8?B?VVJiSUhIZ0IvdGtoQ2pabjJtYVZOUWw1VGtsUHVPMUg4clRvd0Vid3ZqRC94?=
- =?utf-8?B?eVFrcExVRWU1eTFRY1dFZFJ3b3EvZW5yV3loNFhvcXBvMXJFSHJtREw4d21W?=
- =?utf-8?B?alJGU3dDRk5jbkhtS1Q3VUFWR2dFbGJ5SUhOMWV6V2JOZFNOT3VicmJwSGVt?=
- =?utf-8?B?a3UzYXl2Qmw2dDVKdEFvTXBnRkxoK2dOaWZIUFZJZWFoOUluVms3Mmx5ekdU?=
- =?utf-8?B?Y0F6Qi9ESnZRUk9ha3pXMmt3VGYzdUZwZTZEUGlWTmxVOWFjWGRxb3JCU3ZP?=
- =?utf-8?B?N1NBL3JkazVKbU02djBpejdXcU5UOVZRdCt0NzdPbWZaWEkzN3ZFYTdTdFNX?=
- =?utf-8?B?Y0U1NWIzN3dpWEhhK2lzL2hzMmxoQ3NUaGVyUjBadENiR0FtUjg5VTl0Qy9j?=
- =?utf-8?B?UTR2dHBteGhITDJTdS9qN3lBWU1vanhZZE9NVTBReVBmazcwODU4bERUVDZ2?=
- =?utf-8?B?QWZoZmRDamc5eGxqb2NFS2JMQ1N5TlVTV3hudi9WZmNobmJoRW93Wjd5cXNM?=
- =?utf-8?B?UW4zUTlsN2htMTRETzhMN0lUWEh4UndGaDJ4Smt1bkx1S054aU94MnV3Vzg2?=
- =?utf-8?B?eStWRUJGbmhROWE5cXRlZjhQU3B1Z2Zjc3pUTythb3A3SmNmQkx6N2ZOUWhB?=
- =?utf-8?B?YnArM0Q3U0dDTkZpY1FTMjRvYlVCS3JBQUV6bWRWdStrVWUyTHU2QjFTbDRO?=
- =?utf-8?B?ZlIxZmw1elk3ZlpMc3dYQXVaRHA2Wkd4UGxPbUxEenJqa1pnU3Q0d21WNDZm?=
- =?utf-8?B?SkI1anlSVW5sc0phd05yUzJRb3VOSTN2YUtLbWZLNnNwVW1DRkw0UUhIODNh?=
- =?utf-8?B?N1U5R2xaOU00Q3BOVkhRZk84dWpOQmFKTkE1eU10Zld4RkJMUUY3dHlJOTNm?=
- =?utf-8?B?NFpQcTE2YStlSk9mbHlBWURFU0RCVmEvVzdQQ1hXZ3BkOWhDMnJxZTZ2V2lq?=
- =?utf-8?B?b21ad1lmTGhBd1Vqd2dPV1ZqeEVjTEdXbXJKVWVKeHdRY2MvRk9VTlQzRy9w?=
- =?utf-8?B?b3UyNVdGMWwrdmxuNEpmelZ0T3BmK0RiRFRncjFnSzR5bSs4bElLWTNLbzd3?=
- =?utf-8?B?T2tJeXFtbmhoZUdVdEZUNXQxa09tTFNscHo5YVJBM1JwbFhiKzhCZkh1R0Yr?=
- =?utf-8?B?NW5PeDZBV3lobzByY2h0SkRwOExxT3dnd0l0OVlDbG5pSWlvTkc5OG5BbHBO?=
- =?utf-8?B?NFpzenlHYTVuaURVdFIzS1B3TDlJRXBMVWFGRmozdkE1eDJ4U1VJcWF2Mml3?=
- =?utf-8?B?MktJQSt1VWpQRitzRVpNOGUrWE1pRnlKdG5qS2YrNDZLTU1jdzRvd3RoVXYw?=
- =?utf-8?B?RU1Ydi9aNHFLNUlFaWc4S1J0QVI4UzZHbW9qOWdFRFlBZkRjSzlkMVh0cXdL?=
- =?utf-8?B?TGRzeUFwUE1Fblp5RWNaVGN0TXFsa0NIWCs2aDVUbDI5ZHkrY1lyQXg5WXVV?=
- =?utf-8?B?Tm1GOHoydWNmNVorUjI0dW9MaG4rZVJGQmg1MGtibTVoUHBtbWdwUnp2MDlI?=
- =?utf-8?B?NWlWUVBEVGUraXhpOXYzRGd6SzF1alVkeHIwUnRUZEM0Qzl3TkRkRjZLTmZp?=
- =?utf-8?B?bmtpc3lBdVVrbjZLWWgzQ0pQR09wQS94K0Z5bkErcWdtU2hhdDBBbGc3eTl5?=
- =?utf-8?B?UnNTY3JFWThyUUNaZ2pKRGFjb09mWTNaNmIyNzZpVFVJK0ViTE1Zc3hSL1hr?=
- =?utf-8?B?K2ZXNTk1ZEUrRUE5b2t4eklyN1JSZjM0NFEvZkpLZERMalpSdUkxK2d2M2Fi?=
- =?utf-8?B?QzJWbE5DYVFJU1Z6L28vZ3JzOWFsbHp6RWQ4RVN1bGkyR3JiUEVMR2sxRmxW?=
- =?utf-8?B?Vlo1dTBCWVA5cXl0WGZYVzBGOHo3QmhmcC96VnRSRlQvUVBiTWd6MHhDa0hR?=
- =?utf-8?Q?tNnYaSBY9tM=3D?=
+	=?us-ascii?Q?VTPEIFspmamzt5ZJS+WGxTkTBuuHZiZwxFtoeV7On3Qnobis/h5mDKAfcIz1?=
+ =?us-ascii?Q?TvlagH2XAtdz9WugZNvCflYDuaWYYqmlhmfCOQYMEJ6cMKyst5wVnbd1YPbh?=
+ =?us-ascii?Q?2QoKbz3R4CoqQUQEik7ZCLRmabeaVFu8iV5Y20aN7bKW5gJ0YQ+uS3bMBORw?=
+ =?us-ascii?Q?KaTwB7b/eVde3S/YVSMAEW0fW0uebJ703W3/343EcK5V9pH4tYtaG5NBlpM3?=
+ =?us-ascii?Q?WDpGNcWbsTuXVd/TkOMYvte/D3IE97FRBuKaC7yHnuAUFiENFrJ3lHgTyooo?=
+ =?us-ascii?Q?dAUnNpFFy10DWJ4rVE6MB56fttKhKYc4kBOJQ5Vckbw8d7mFqlHhOxuFDNSz?=
+ =?us-ascii?Q?VBt+q2Gamd93GxryixpfeIv2XjH+quBH1q1tcWyHuLfaFq0yATB6ieam/byw?=
+ =?us-ascii?Q?4vxkVfxOV6Fvstyg30qgnDf1xeRpLi6cZV2jrX1nTzB6AgaXkYkUL8+f5Saj?=
+ =?us-ascii?Q?BXrmx6lm4C/mtSkMaGvQI0pouEka8WUVwzLBgDnKmm2gJKgQT6Q+m3tKDlNP?=
+ =?us-ascii?Q?Cnkg7hQszn9GtxcWwwhoyoe/n1lhvab3OSnXcBxm+nxYFiR3BOry9bdTKuzI?=
+ =?us-ascii?Q?4tTMJxbqsCHLw5d3/TNEsyiWu7MYyTNAOtLIJkd0zsIV4tTenDh9HXitxFN+?=
+ =?us-ascii?Q?rXQBF9XM/Hwqkjnor4PkKvl5NndCNLF5yLspeAngvoXnAHld/B4lGv+5vDoE?=
+ =?us-ascii?Q?OQcbrIYlw0NGL7S4kDs57jaJnEMWcXSSylxzEHPN7pEojy+U6vU6rpA//dGu?=
+ =?us-ascii?Q?njPCE3IqA8YHeF/9OMVSsiRTmby8L2g76DTRKGsswWVSY92hMDvSkmokkZFz?=
+ =?us-ascii?Q?gf2DExIIJoQ43pZ1TuZjUGTsgMKXr4rI+AO4h0wdr2YwASXwBssaxhnyFx4Y?=
+ =?us-ascii?Q?/BVYgwyTAmqfeOFD30XksS7whIJ0w5ucoqEjEIFTZWgcdqsJ7LJEJP2SvJ7Z?=
+ =?us-ascii?Q?QssckBXlz2dBDvE10SYxlzwabfaCju6YvXyS0ELKP2koIcAIA59qnjLHclUK?=
+ =?us-ascii?Q?+9F1KbqXV8t0DOPC85GUbc7+fjumTSBTW0Xq97ZS0Iq2VoMyNt4NKGDnUfUn?=
+ =?us-ascii?Q?02MBIoXC6DVAE9vpQjBZd3bC0nC9h4/inu57/IXulDgCTdj4Dv6WT1p66YRc?=
+ =?us-ascii?Q?WlrLOEqFg61u3BZuAWDxnSKPfSjK9fX+JYozsH2XLBUkwQrXIt6986REDj3X?=
+ =?us-ascii?Q?5XflcXhz+a8/zXsKp4o2Eu0n3/ghqBSvyvaptdW5hN0x2epC2Eb5+5OtTc6U?=
+ =?us-ascii?Q?AQ8C0sEyt9jVxNvaVsT7BZ4BKVXlbhDsyMAyCVqcnj/cpGiWFSGdJ5kQRZEN?=
+ =?us-ascii?Q?vu7O2KhmDPdmdWpbtCsfEe3x/XKbsG6xtTJZEhvCtWdXY5sH85xNdMEc7RWe?=
+ =?us-ascii?Q?bBvmt9S7EP64aWB82ZITsv11GenpY7In5MxnYuHG3W8QzicQLGzNuKtP6Sku?=
+ =?us-ascii?Q?4Yc1bUxRfJN3iY4f4KT7ZiLc9dgybFoyvHa7ulSLN7SviGBJTYGCwuFjp07h?=
+ =?us-ascii?Q?w8f+fhm/qWPV9P38J9Pmwyw+vOxcwFd5FfR6jfQMAiHRNzkCwnRvpvg+gw?=
+ =?us-ascii?Q?=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SGo5dTNtNHRqQXZHSENoQzMxZ3Y1UEZUYjNnNW1TU0tXTE4zMzJtcjluMmda?=
- =?utf-8?B?dUtKMHlneEx4VXlpOFBnbnBmdkthYnNEL3o5M1o4TWJkc3ljc3VnQjVUbUVI?=
- =?utf-8?B?cWNxL2phRERTa3BYaWZMWFJxeDh5ZGhHRlc0Y2l3T0F0TUFLcDcwSkVSMENy?=
- =?utf-8?B?bjVYSDBjdk81aGlBZUljTzZBUy90TGJxUmxmcmhkNU0zUXpZV0hJSFA2Vmhv?=
- =?utf-8?B?ZFhEaWVGQTZIWXRZRTJpN1FKaldLRFRscnBOcUl6ZUdqZ3Y1WDVwVnhDSmYw?=
- =?utf-8?B?bkFBM1RBY2hSaDdORlVEMzM2SkFoUmMvbVYrZ1BIV3FodjdHa3lSb0pHb1NU?=
- =?utf-8?B?dHBhcXVIQktRNU10eHlNaUtaRDIwbzl1WWI0SjZSUXNVNTRHVHpDVERLbkhu?=
- =?utf-8?B?WnRnbnluR2x5UTBZYXdaQ2pLTE4zcFVqUGdDaGV5azF0dlZ6TlRxdTd1RWJx?=
- =?utf-8?B?eTZpNmMvOGJZSmFhZGdBMzZDZzFYNU1zNzVRZG4zd0JOVElXNS8zRlRBWHlT?=
- =?utf-8?B?MFVJbGdOSEJOc1hYbnptbnFVOURxWEhVSzNpSGs4WWtDamlTUTYrTWUzOGVR?=
- =?utf-8?B?L1p6RGJvNys2c2VHV3RNanRKa0pudWtsbmtjOE5LeDU5K1FyVE9UdkFJRFR1?=
- =?utf-8?B?S0s4dVF0ZXIzZXZrNW9EczNKSWMzSG4zNkF6UTQ3SHFMQmIvMy8wVmIwQzRs?=
- =?utf-8?B?U2pWSDhocytqNjFMU3c3RWNpeCt4V3VRN2tpOTdYeFB2V1o1Z01CWEFuWDNt?=
- =?utf-8?B?cEdheHQxTG10d0FPaUNtcE9GUEdQYXdlUmp2Q2FBTkNydDE3dEhzbXc0SzBi?=
- =?utf-8?B?bjQ3alAzUHliYmFFS2RNVTh1NHkyVGxYVldRU0l2dmRiSysrUmhTRi96QUdr?=
- =?utf-8?B?QWR3ZTJ1QS8vRXg0YStwb3hsZEJFRmV1dTE0S0RycStYZy9NTDVkRUxDakpZ?=
- =?utf-8?B?akZPVDlSMlNkSEg5djVxbUpvNC9USU81RGthc3JWTjJicjhTNWVRNG5rQ2pL?=
- =?utf-8?B?S25taXFOZGFGamNzd29NbS90ZWhiNFZkMDl4MzJLRG4zOHBpM2crVVpkOGx4?=
- =?utf-8?B?K0JZb0czamwvUG9TRXVsbjk5dGV2czJQZWUwbzdRNnBzM1oxL1RWUmYvRlNm?=
- =?utf-8?B?cTYyZnJEcUZKaEtmVnV3dFgyaDRzcHlBeUFLeS9ZWU5Kek5QaFd4Zzh3b3BM?=
- =?utf-8?B?UkFCYWkyUXl1Zm9pV2E3SCtaM2E5SFcvS3V1YmVjWC9GdUNKWVcvZ1gyYkh2?=
- =?utf-8?B?WVpBaXJ4bnl2eWU0WnFKV1JneXJ4RVNmTW5kOFJiVkpqTHBzcjR3Mis5MDdy?=
- =?utf-8?B?NS93YWxJYzNNU3drZWdqOXE5dFRhZjlDUytRcmlvNklzRnVNTHRTUkhDWDl5?=
- =?utf-8?B?eDQyYWdnczNoODVhNW14Q1Nyd1BrR2ZSb0Y3NXA3Zzk0YXo2aVExTytobnJo?=
- =?utf-8?B?cjJkL25mc2NEampCT2thaWRLVGVVRFA3TW1wSzMvRlZNRDlkZTFTckdFVGxD?=
- =?utf-8?B?bVJyMXRSL1ZzOXJkL0lPektISFJlVnRuQjZBSUYycG00RmIwZlF0bEhIRTU4?=
- =?utf-8?B?NE9LRWYrVUNZMVM5UFlSTWQrNzdUQ3Q3ZkZaL3BYTVVHY0ExbGpsUi9zZkJv?=
- =?utf-8?B?YUF2Q0tpcXhhbjl6bjNSamJaVFh3RjFRQVhwUnBxbHdFNHVJNDNRa0dWUnhi?=
- =?utf-8?B?Y0dybjhVOGxKQzZrN3ZBUHlRMHZRcjY3YS9MQk1EMHI0Y0hCc3oySjg0cWRO?=
- =?utf-8?B?cEJ4N1UweG5lZlhqbks5T2JXZU5xQk5tekYzSXg3VmVBcERLOG1nZmtoRmNs?=
- =?utf-8?B?YTBuaXIvS012NU9Ud040ZG9RNFFQVFZoTmlSbmpUekV0TEVDOVhCMm0vbUxn?=
- =?utf-8?B?WHVlM3NlNE1GVXFxaFYzSHloeENOc1lweEp2WXpKazMwUUNkbjJ4cXVGdmtO?=
- =?utf-8?B?OCtrNExPRU9PcGVBbDE5THBpajc4anovZDg2VW02YlNkR3dXMEJFamtTL3My?=
- =?utf-8?B?a3BmcGRGWTlJVy9zVmRWdnR6OFR2UDFjVnBNV0p3OGJnODVUQ0VvVzZzZjhj?=
- =?utf-8?B?b2JpV3l3ampUNFJHNGtOOE5NaXM2Y2xKR3laZ2xVNnBEZmZiWndIcFBZcCs5?=
- =?utf-8?Q?ic6m+DzaHzanV3BwBonhlttlN?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 69323f84-2d13-437f-05a6-08ddb475e217
-X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2025 05:54:15.6898
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2025 11:52:28.7096
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gQO/hBfE2wxnRi8jL5VXlbrpstbVL53+6ST39rMjvN6KaM9hNBViZzsGwohVmoFSUsExnmV6xAlu2MPWiDb6Lw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR03MB7880
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8504c419-f96f-4d22-6663-08ddb4a7ed22
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF00000196.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR03MB8688
 
-Hi Pauli,
-> [ EXTERNAL EMAIL ]
->
-> Hi,
->
-> ke, 2025-06-25 kello 16:42 +0800, Yang Li via B4 Relay kirjoitti:
->> From: Yang Li <yang.li@amlogic.com>
->>
->> When the BIS source stops, the controller sends an LE BIG Sync Lost
->> event (subevent 0x1E). Currently, this event is not handled, causing
->> the BIS stream to remain active in BlueZ and preventing recovery.
->>
->> Signed-off-by: Yang Li <yang.li@amlogic.com>
->> ---
->> Changes in v2:
->> - Matching the BIG handle is required when looking up a BIG connection.
->> - Use ev->reason to determine the cause of disconnection.
->> - Call hci_conn_del after hci_disconnect_cfm to remove the connection entry
->> - Delete the big connection
->> - Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com
->> ---
->>   include/net/bluetooth/hci.h |  6 ++++++
->>   net/bluetooth/hci_event.c   | 31 +++++++++++++++++++++++++++++++
->>   2 files changed, 37 insertions(+)
->>
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index 82cbd54443ac..48389a64accb 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
->>        __le16  bis[];
->>   } __packed;
->>
->> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
->> +struct hci_evt_le_big_sync_lost {
->> +     __u8    handle;
->> +     __u8    reason;
->> +} __packed;
->> +
->>   #define HCI_EVT_LE_BIG_INFO_ADV_REPORT       0x22
->>   struct hci_evt_le_big_info_adv_report {
->>        __le16  sync_handle;
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 66052d6aaa1d..d0b9c8dca891 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -7026,6 +7026,32 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
->>        hci_dev_unlock(hdev);
->>   }
->>
->> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
->> +                                         struct sk_buff *skb)
->> +{
->> +     struct hci_evt_le_big_sync_lost *ev = data;
->> +     struct hci_conn *bis, *conn;
->> +
->> +     bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
->> +
->> +     hci_dev_lock(hdev);
->> +
->> +     list_for_each_entry(bis, &hdev->conn_hash.list, list) {
-> This should check bis->type == BIS_LINK too.
-Will do.
->
->> +             if (test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags) &&
->> +                 (bis->iso_qos.bcast.big == ev->handle)) {
->> +                     hci_disconn_cfm(bis, ev->reason);
->> +                     hci_conn_del(bis);
->> +
->> +                     /* Delete the big connection */
->> +                     conn = hci_conn_hash_lookup_pa_sync_handle(hdev, bis->sync_handle);
->> +                     if (conn)
->> +                             hci_conn_del(conn);
-> Problems:
->
-> - use after free
->
-> - hci_conn_del() cannot be used inside list_for_each_entry()
->    of the connection list
->
-> - also list_for_each_entry_safe() allows deleting only the iteration
->    cursor, so some restructuring above is needed
+Currently, for controllers with extended advertising, the advertising
+data is set in the asynchronous response handler for extended
+adverstising params. As most advertising settings are performed in a
+synchronous context, the (asynchronous) setting of the advertising data
+is done too late (after enabling the advertising).
 
-Following your suggestion, I updated the hci_le_big_sync_lost_evt function.
+Move setting of adverstising data from asynchronous response handler
+into synchronous context to fix ordering of HCI commands.
 
-+static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
-+                                           struct sk_buff *skb)
+Signed-off-by: Christian Eggers <ceggers@arri.de>
+Fixes: a0fb3726ba55 ("Bluetooth: Use Set ext adv/scan rsp data if controller supports")
+Cc: stable@vger.kernel.org
+v1: https://lore.kernel.org/linux-bluetooth/20250625130510.18382-1-ceggers@arri.de/
+---
+v2: convert setting of adv data into synchronous context (rather than moving
+more methods into asynchronous response handlers).
+- hci_set_ext_adv_params_sync: new method
+- hci_set_ext_adv_data_sync: move within source file (no changes)
+- hci_set_adv_data_sync: dito
+- hci_update_adv_data_sync: dito
+- hci_cc_set_ext_adv_param: remove (performed synchronously now)
+
+On Wednesday, 25 June 2025, 15:26:58 CEST, Luiz Augusto von Dentz wrote:
+> That said for the likes of MGMT_OP_ADD_EXT_ADV_DATA you will still
+> need to detect if the instance has already been enabled then do
+> disable/re-enable logic if the quirk is set.
+
+The critical opcode (HCI_OP_LE_SET_EXT_ADV_DATA) is only used in
+hci_set_ext_adv_data_sync(). Two of the callers already ensure that
+the advertising instance is disabled, so only hci_update_adv_data_sync()
+may need a quirk. I suggest doing this in a separate patch.
+
+regards,
+Christian
+
+ net/bluetooth/hci_event.c |  36 -------
+ net/bluetooth/hci_sync.c  | 209 ++++++++++++++++++++++++--------------
+ 2 files changed, 132 insertions(+), 113 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 66052d6aaa1d..4d5ace9d245d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2150,40 +2150,6 @@ static u8 hci_cc_set_adv_param(struct hci_dev *hdev, void *data,
+ 	return rp->status;
+ }
+ 
+-static u8 hci_cc_set_ext_adv_param(struct hci_dev *hdev, void *data,
+-				   struct sk_buff *skb)
+-{
+-	struct hci_rp_le_set_ext_adv_params *rp = data;
+-	struct hci_cp_le_set_ext_adv_params *cp;
+-	struct adv_info *adv_instance;
+-
+-	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
+-
+-	if (rp->status)
+-		return rp->status;
+-
+-	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS);
+-	if (!cp)
+-		return rp->status;
+-
+-	hci_dev_lock(hdev);
+-	hdev->adv_addr_type = cp->own_addr_type;
+-	if (!cp->handle) {
+-		/* Store in hdev for instance 0 */
+-		hdev->adv_tx_power = rp->tx_power;
+-	} else {
+-		adv_instance = hci_find_adv_instance(hdev, cp->handle);
+-		if (adv_instance)
+-			adv_instance->tx_power = rp->tx_power;
+-	}
+-	/* Update adv data as tx power is known now */
+-	hci_update_adv_data(hdev, cp->handle);
+-
+-	hci_dev_unlock(hdev);
+-
+-	return rp->status;
+-}
+-
+ static u8 hci_cc_read_rssi(struct hci_dev *hdev, void *data,
+ 			   struct sk_buff *skb)
+ {
+@@ -4164,8 +4130,6 @@ static const struct hci_cc {
+ 	HCI_CC(HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS,
+ 	       hci_cc_le_read_num_adv_sets,
+ 	       sizeof(struct hci_rp_le_read_num_supported_adv_sets)),
+-	HCI_CC(HCI_OP_LE_SET_EXT_ADV_PARAMS, hci_cc_set_ext_adv_param,
+-	       sizeof(struct hci_rp_le_set_ext_adv_params)),
+ 	HCI_CC_STATUS(HCI_OP_LE_SET_EXT_ADV_ENABLE,
+ 		      hci_cc_le_set_ext_adv_enable),
+ 	HCI_CC_STATUS(HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 1f8806dfa556..2a09b2cb983e 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1205,9 +1205,116 @@ static int hci_set_adv_set_random_addr_sync(struct hci_dev *hdev, u8 instance,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+ 
++static int
++hci_set_ext_adv_params_sync(struct hci_dev *hdev,
++			    const struct hci_cp_le_set_ext_adv_params *cp,
++			    struct hci_rp_le_set_ext_adv_params *rp)
 +{
-+       struct hci_evt_le_big_sync_lost *ev = data;
-+       struct hci_conn *bis, *conn, *n;
++	struct sk_buff *skb;
 +
-+       bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
++	skb = __hci_cmd_sync(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(*cp),
++			     cp, HCI_CMD_TIMEOUT);
 +
-+       hci_dev_lock(hdev);
++	/* If command return a status event, skb will be set to -ENODATA */
++	if (skb == ERR_PTR(-ENODATA))
++		return 0;
 +
-+       /* Delete the pa sync connection */
-+       bis = hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->handle);
-+       if (bis) {
-+               conn = hci_conn_hash_lookup_pa_sync_handle(hdev, 
-bis->sync_handle);
-+               if (conn)
-+                       hci_conn_del(conn);
-+       }
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Opcode 0x%4.4x failed: %ld",
++			   HCI_OP_LE_SET_EXT_ADV_PARAMS, PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
 +
-+       /* Delete each bis connection */
-+       list_for_each_entry_safe(bis, n, &hdev->conn_hash.list, list) {
-+               if (bis->type == BIS_LINK &&
-+                   bis->iso_qos.bcast.big == ev->handle &&
-+                   test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags)) {
-+                       hci_disconn_cfm(bis, ev->reason);
-+                       hci_conn_del(bis);
-+               }
-+       }
++	if (skb->len != sizeof(*rp)) {
++		bt_dev_err(hdev, "Invalid response length for "
++			   "HCI_OP_LE_SET_EXT_ADV_PARAMS: %u", skb->len);
++		kfree_skb(skb);
++		return -EIO;
++	}
 +
-+       hci_dev_unlock(hdev);
++	memcpy(rp, skb->data, sizeof(*rp));
++	kfree_skb(skb);
++
++	return rp->status;
 +}
++
++static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
++{
++	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
++		    HCI_MAX_EXT_AD_LENGTH);
++	u8 len;
++	struct adv_info *adv = NULL;
++	int err;
++
++	if (instance) {
++		adv = hci_find_adv_instance(hdev, instance);
++		if (!adv || !adv->adv_data_changed)
++			return 0;
++	}
++
++	len = eir_create_adv_data(hdev, instance, pdu->data,
++				  HCI_MAX_EXT_AD_LENGTH);
++
++	pdu->length = len;
++	pdu->handle = adv ? adv->handle : instance;
++	pdu->operation = LE_SET_ADV_DATA_OP_COMPLETE;
++	pdu->frag_pref = LE_SET_ADV_DATA_NO_FRAG;
++
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
++				    struct_size(pdu, data, len), pdu,
++				    HCI_CMD_TIMEOUT);
++	if (err)
++		return err;
++
++	/* Update data if the command succeed */
++	if (adv) {
++		adv->adv_data_changed = false;
++	} else {
++		memcpy(hdev->adv_data, pdu->data, len);
++		hdev->adv_data_len = len;
++	}
++
++	return 0;
++}
++
++static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
++{
++	struct hci_cp_le_set_adv_data cp;
++	u8 len;
++
++	memset(&cp, 0, sizeof(cp));
++
++	len = eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.data));
++
++	/* There's nothing to do if the data hasn't changed */
++	if (hdev->adv_data_len == len &&
++	    memcmp(cp.data, hdev->adv_data, len) == 0)
++		return 0;
++
++	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
++	hdev->adv_data_len = len;
++
++	cp.length = len;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
++{
++	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
++		return 0;
++
++	if (ext_adv_capable(hdev))
++		return hci_set_ext_adv_data_sync(hdev, instance);
++
++	return hci_set_adv_data_sync(hdev, instance);
++}
++
+ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ {
+ 	struct hci_cp_le_set_ext_adv_params cp;
++	struct hci_rp_le_set_ext_adv_params rp;
+ 	bool connectable;
+ 	u32 flags;
+ 	bdaddr_t random_addr;
+@@ -1316,8 +1423,20 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ 		cp.secondary_phy = HCI_ADV_PHY_1M;
+ 	}
+ 
+-	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
+-				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	err = hci_set_ext_adv_params_sync(hdev, &cp, &rp);
++	if (err)
++		return err;
++
++	hdev->adv_addr_type = own_addr_type;
++	if (!cp.handle) {
++		/* Store in hdev for instance 0 */
++		hdev->adv_tx_power = rp.tx_power;
++	} else if (adv) {
++		adv->tx_power = rp.tx_power;
++	}
++
++	/* Update adv data as tx power is known now */
++	err = hci_set_ext_adv_data_sync(hdev, cp.handle);
+ 	if (err)
+ 		return err;
+ 
+@@ -1822,79 +1941,6 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+ 
+-static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
+-{
+-	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
+-		    HCI_MAX_EXT_AD_LENGTH);
+-	u8 len;
+-	struct adv_info *adv = NULL;
+-	int err;
+-
+-	if (instance) {
+-		adv = hci_find_adv_instance(hdev, instance);
+-		if (!adv || !adv->adv_data_changed)
+-			return 0;
+-	}
+-
+-	len = eir_create_adv_data(hdev, instance, pdu->data,
+-				  HCI_MAX_EXT_AD_LENGTH);
+-
+-	pdu->length = len;
+-	pdu->handle = adv ? adv->handle : instance;
+-	pdu->operation = LE_SET_ADV_DATA_OP_COMPLETE;
+-	pdu->frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+-
+-	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
+-				    struct_size(pdu, data, len), pdu,
+-				    HCI_CMD_TIMEOUT);
+-	if (err)
+-		return err;
+-
+-	/* Update data if the command succeed */
+-	if (adv) {
+-		adv->adv_data_changed = false;
+-	} else {
+-		memcpy(hdev->adv_data, pdu->data, len);
+-		hdev->adv_data_len = len;
+-	}
+-
+-	return 0;
+-}
+-
+-static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
+-{
+-	struct hci_cp_le_set_adv_data cp;
+-	u8 len;
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	len = eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.data));
+-
+-	/* There's nothing to do if the data hasn't changed */
+-	if (hdev->adv_data_len == len &&
+-	    memcmp(cp.data, hdev->adv_data, len) == 0)
+-		return 0;
+-
+-	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
+-	hdev->adv_data_len = len;
+-
+-	cp.length = len;
+-
+-	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
+-				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+-}
+-
+-int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
+-{
+-	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
+-		return 0;
+-
+-	if (ext_adv_capable(hdev))
+-		return hci_set_ext_adv_data_sync(hdev, instance);
+-
+-	return hci_set_adv_data_sync(hdev, instance);
+-}
+-
+ int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 				   bool force)
+ {
+@@ -6269,6 +6315,7 @@ static int hci_le_ext_directed_advertising_sync(struct hci_dev *hdev,
+ 						struct hci_conn *conn)
+ {
+ 	struct hci_cp_le_set_ext_adv_params cp;
++	struct hci_rp_le_set_ext_adv_params rp;
+ 	int err;
+ 	bdaddr_t random_addr;
+ 	u8 own_addr_type;
+@@ -6310,8 +6357,16 @@ static int hci_le_ext_directed_advertising_sync(struct hci_dev *hdev,
+ 	if (err)
+ 		return err;
+ 
+-	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
+-				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	err = hci_set_ext_adv_params_sync(hdev, &cp, &rp);
++	if (err)
++		return err;
++
++	hdev->adv_addr_type = own_addr_type;
++	/* Store in hdev for instance 0 */
++	hdev->adv_tx_power = rp.tx_power;
++
++	/* Update adv data as tx power is known now */
++	err = hci_set_ext_adv_data_sync(hdev, cp.handle);
+ 	if (err)
+ 		return err;
+ 
+-- 
+2.44.1
 
->
->> +             }
->> +     }
->> +
->> +     hci_dev_unlock(hdev);
->> +}
->> +
->>   static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
->>                                           struct sk_buff *skb)
->>   {
->> @@ -7149,6 +7175,11 @@ static const struct hci_le_ev {
->>                     hci_le_big_sync_established_evt,
->>                     sizeof(struct hci_evt_le_big_sync_estabilished),
->>                     HCI_MAX_EVENT_SIZE),
->> +     /* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
->> +     HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
->> +                  hci_le_big_sync_lost_evt,
->> +                  sizeof(struct hci_evt_le_big_sync_lost),
->> +                  HCI_MAX_EVENT_SIZE),
->>        /* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
->>        HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
->>                     hci_le_big_info_adv_report_evt,
->>
->> ---
->> base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
->> change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
->>
->> Best regards,
-> --
-> Pauli Virtanen
