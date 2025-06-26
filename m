@@ -1,60 +1,84 @@
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89A52ECD22
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jun 2025 15:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B35B2EBBBB
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jun 2025 15:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750951206; cv=none; b=S8nYAoa8DTmeAhu0trqje7qdX14qTVSbtMLybUWEMALCCBAmQYTX/ejhhWm1elwWx6tHym7RvN6yLsbk6myb7i5rlzHcR7rGeMABnrf0jV6Tr4VqkKp6ns+HWqkSkQWMfEPVD0f43d2/lxnLcQIwjdvbTUM/w+Hli/bDKj4Q44U=
+	t=1750953514; cv=none; b=Re42NZlHsm9mib/FXQOnrL1V4vnBeCdpuw+bpuG8JvoDqPBowcGH0TiWxgfGdeR4mYkdAwxMcwo0v0myzlt7eJ2iV9JRFM1kXG4wovGHG6Kr0N2DClAsOaNlZI/37diudD+pxztx3xeIqRr4snpWcMV2rFwCtvKMYpxBH+Cs+AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750951206; c=relaxed/simple;
-	bh=VgmFhMir7pFtE7XkwqO5yOuQjit2wMbmfTDCrhYM5lo=;
-	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ajb6vFF/VEk42AqUiz+kUmSOUGhi2eMkloMAF4J8F99ehO4+NjxY6jSsBG87GJ4GqoapaUCY+ZyLFvMu9ERCbXeVUNoxqTk4cE6zOwEgN/zcfI2uZK4JrddIRKDnkvQGWoTopNvq/eEDa2zBH95fY/zl/mV0O1vmLAPDdP1qrGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=5TaJakmu; arc=none smtp.client-ip=178.238.236.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
+	s=arc-20240116; t=1750953514; c=relaxed/simple;
+	bh=AtpTJpZictm9k2cmMXI9cKxVRJBOpiDFDxAfgEwzNKk=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XnxGx5Ky1KelUe2z1qm/altkYTzb03RrCkkHLbt/ChdRipA+tgJH/PEXzT7fBASVDp7kpiLbZEc69ta+fp61SE6XuDby15YboHbGXXUs9dT95VucJHxQrzx0s44VecJ2S25CtlWzNVCTBRPxKlIrAXGTTDTsp22Jj9Z4eeksJQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CwtqTMuQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="5TaJakmu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=References:In-Reply-To:From:Sender:Reply-To:Cc:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=iMm4FLia4o7yEtV9yv6ac4fzuOoIUPChBBlkelkuqSA=; b=5TaJakmugaslb7CbTRD0JOBXVK
-	s/aTkCjslnNBbAV+6tOpMpPo9vOibY49wPnc3Anl0O7WFCEPWCImzCy/HzF2Hb6+OLnCIXmcnzWTV
-	WouSdp+eDoNZJHyTvwLSxjKt/0r3z3EbQDWUvy1kQ4xL+ZlLiSa0nCEvd5wiQk73Js04EFjDSvjp8
-	O5YiHuBBuq1P9pSnPJVL0DnDO149Y8G2vOCBe/vzSaDuZj2lX6wrfS4jQDTHxfcGez7Lyr5WgUeb3
-	/7YrzuWWnVwzhZIVSa4XNrQKk+2sdsYYFZ1lwV63qot/wj8rTe02HZAx+W9RLvruw5jsndq0vip/+
-	OyMtLCgA==;
-Date: Thu, 26 Jun 2025 17:19:55 +0200
-From: Andreas Kemnade <andreas@kemnade.info>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CwtqTMuQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 863CBC4CEF9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jun 2025 15:58:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750953513;
+	bh=AtpTJpZictm9k2cmMXI9cKxVRJBOpiDFDxAfgEwzNKk=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=CwtqTMuQBAzQ+A0o3tZNNjIS4VBenwv8SWZvuetSvQGhpY/D6hdOvRJBGLlKgpQsV
+	 UFaWG4s6oxMJaCkSKrnXtnKkGQJ1u5gYjhkPWC8JNNKKRGYNzMjGZxIeQtzzULiINq
+	 A29/l1YesvAHqZDJo+Ka2JhcL6+RhRh8gHcSnZzdLyDuHVUntHDtCPHPHLP4IqERS2
+	 64ogwbSSF9D3yt6PyGdxMwRzVUnU8d2vlbGzFgtvpPkJQ/OyZegxHTtciRpJtK/WoY
+	 mdYxN/ajZCD8wTqeR0u3r4iBeWPa+qXQEy7oWuxgPCooMHIfbdqw4QwO80ozgKykOZ
+	 T4CZiFcSswz6A==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 7E439C53BC5; Thu, 26 Jun 2025 15:58:33 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] gatt-client: avoid UAF after acquire notify failure
-Message-ID: <20250626171955.42cca18f@akair>
-In-Reply-To: <20250625140545.1610812-1-andreas@kemnade.info>
-References: <20250625140545.1610812-1-andreas@kemnade.info>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date: Thu, 26 Jun 2025 15:58:30 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: nishiyama.pedro@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-yW99b8VA8l@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-Am Wed, 25 Jun 2025 16:05:45 +0200
-schrieb Andreas Kemnade <andreas@kemnade.info>:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-> If a disconnect happens during AcquireNotify dbus calls, a lot of
-> debris is left over. Subsequent calls to AcquireNotify will return
-> NotPermitted and StopNotify leads to an UAF, crashing bluetoothd.
-> 
-> Fix that by also clean up the socket stuff on failure.
-> 
-Hmm, I should rather send a dbus answer, too instead of letting the app
-waiting for timeout.
-I will send an extended version (then with the correct subj prefix)
+Pedro Nishiyama (nishiyama.pedro@gmail.com) changed:
 
-Regards,
-Andreas
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |nishiyama.pedro@gmail.com
+
+--- Comment #280 from Pedro Nishiyama (nishiyama.pedro@gmail.com) ---
+Hello,
+
+If anyone is still trying to use one of these devices, try kernel 6.15. A f=
+ix
+for a subset of these devices has been merged.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
