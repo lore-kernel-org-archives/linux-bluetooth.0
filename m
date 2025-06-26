@@ -1,451 +1,259 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38CD2E1729;
-	Thu, 26 Jun 2025 12:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023CFBA53;
+	Thu, 26 Jun 2025 13:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750942659; cv=none; b=HARNagRvJP2f1JAM745CkUCD3ZY5/9Uz3cHso8IqDOJu4HPnMobLLwpWw2JlV/VcyRCZ1mEnbWnCPmk1RJjRfJcrX6lNdahkno19SyZLBazW8BzY7HWCl2HoJ+b8UuqAhkFiHeI7JXZJoLs2/nbXgaz156Q9X+V3s0yy2eHdRyI=
+	t=1750943696; cv=none; b=usMRzCRQRbaJLOy4Uudv7CY/zYb0gonnRTYV3BGZ5XCA8kBjaEYF+MItgR39/jmWvDSKBaqdBETDXq3Ybx8yO4ef2cnHY+SQ6fraK5dl9FMgGdrI6fhTGY7Rhgp1id3URXAnFQLgMezRzcyMHcVR0GZZMrv4KQB3Y02ZAffe58Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750942659; c=relaxed/simple;
-	bh=Z5XIQXQlazJbc/jPqjX37W6puWm6Ny0RQLBxIS6zP9g=;
+	s=arc-20240116; t=1750943696; c=relaxed/simple;
+	bh=1CEaKdy1TOG3I9LzmMkTnI5kzN0ZIN0cpolnrxRYvOI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DInjxeROLlQTpr/FITcnrmWE/lT30JXi0Dn15RdA0go6ZwfId56ehf1yKSVXxPW3vt6Lo2oE/szZBSLT3JTWAtPhi54BH2vTklk8xeaVrMxFOlw0PBCTt3GINwqXIqL6qBZVHLMdtmFgHC0d31eUE6aUOJqsBMddvjojUvZoQQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nT51aSI6; arc=none smtp.client-ip=209.85.208.178
+	 To:Cc:Content-Type; b=aXB/8Ox9lHPC27+oaFS4SZ6yAxd2SDDJArAnwIAalezf1CX1ZCGUbii2LrsKTG1BP7yTI0uEyaEzJF28x3Tf/aaWz49ll0kbUCzXTb0Z6ioIF/txZrlHTg4u8Eqqh03sWWZL6IqHxbH8qh3gEs3+WJigGEo8XGoCOalD8Pe5iiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nP/sruRc; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nT51aSI6"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32addf54a00so7793281fa.1;
-        Thu, 26 Jun 2025 05:57:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nP/sruRc"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32ade3723adso10387291fa.0;
+        Thu, 26 Jun 2025 06:14:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750942655; x=1751547455; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750943693; x=1751548493; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hbDBF1m4ND8ODEViRH7eWaeCoVkwsjO8vjNuWncwojs=;
-        b=nT51aSI6bIDaE6LQVthN9Uv6ONBsZlAsM193v/vA/ZpkDTZj70iD+rl3uD9W6/N+fG
-         EAMS+UDfI25GZ0pRyK764WNgydAGGFyvW3pxLkyP59LuhX6upu3cIH5ENc2+rjlpDIY9
-         u5O4HBIcqzJjSDxN5uM0IEFQlJwuL/TJ9wQ82UEwu08S2ocGMhuvhiSFSKmYbbidWj9F
-         gv4E5/Jfn4MBj8GVe88GUVzjUklvPu1i9Ax+mko918PBSaXdCQXTS8u6KKcQsbg/9REU
-         exciRbpOyC5nfIIu3zTVVorLygS3cUVMy/BxguLymRgxiCvYZrBkOlpdkOCQPorwM8PL
-         R1uA==
+        bh=5lnf8dy7gqziu3el989oNu2CQe5RMJbnDd94a6NU/JI=;
+        b=nP/sruRc2aXgC0JdCnspy1WocPkNMawYDIXHviUO4f3kSLfgrb32pswfeACrzVEAWD
+         Ex19oxFZCWRnwpMg2Ac5hBrqat5yX1NcF8BUInOpT9D2Wtl9ukLEoa+J/0YwGwvb9YRH
+         fp6GOKoJNDPuXEv2xBCVPo10joXkSfQwhORX2yi164AdOZ2ojqAjaDQwHCvxBiW5piDa
+         36iE7DJ5z+6UID1zQNrgomrN2hoQ20jRsVheQB6i+6KeeZ/KxES+GyG/zjAog22w2FV+
+         Csu8a4f1IKuhNraFmuT0GkP3cP1Cnqc5/SEZxJ2J19UlOaVBVgE1YgtoXVkYhtFlNgi3
+         bblQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750942655; x=1751547455;
+        d=1e100.net; s=20230601; t=1750943693; x=1751548493;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hbDBF1m4ND8ODEViRH7eWaeCoVkwsjO8vjNuWncwojs=;
-        b=PzAXrubu1iw6tsx5kShaOltZLbWZaXP3zpMAoCHnKqirqiEUA6/wJ4hrvnoG9JIraH
-         DNBtZgIWaFMtCKdoeFabhx/dy1d5OraPWCgRdmRPP3kecfR8wrVMXNvOJmCjluFpM/r1
-         8Gxjh2bjVhCJ8rYbDgROtnSrUiM5zWAMvK5I+zGsogMF+GAd0FWsCZQuDDP/OvdOLu9I
-         KhPjxscNo+3bDJW9xBENXRD0XYXtzt/RCz5UwWb301/UsOiQaD1Ods2rb2rgSYBuWKwQ
-         LU2ftyDS4v80kt0yo5EloOBWYZelx7kNI+14Mp1oVaWewGCH5jK37IunEZ55HF+l1Gpm
-         8XxA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0Ft8RoAdArsTW9mypwj17w4SGwbRhTcSjlkhINuiOgsovJgvByooT0EHPVMc2z/aWjhKHfnwU@vger.kernel.org, AJvYcCVIqcTlwGvR0uak3sEB6VRmW61LPGuwOw7c4+9+c2p9Gm1Qfl6Kwlsu/J8nWHaA+5mU4HdZb581@vger.kernel.org, AJvYcCW/fVOTrWGp5c3ggKhDKSl7tq4vkCdRNG9mSD4h2EpxeQcchUHY89ze6XYxopT1Ddy3JW5al1fDVYZKJwT5t9Y=@vger.kernel.org, AJvYcCWIi2LxRg5rqmAZeH2gQA1d2UnoWKj7PpueEAAk1PwiaeBIDaye5AniGBe3YAQc1GXQ1lICHfxzkSW6RXdn@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhcFDMXBx+XF2uz1ENevHdgwqfAUz8+E+ew1HG18LMUxfNnYPb
-	to+6LtuiIifN7f7PtHUo3xxXDsZ7cN4fYBJojUPBgSFYOACa8q2zvhVQfnm9UV8qrU+w7DNByss
-	o6WcNbBqqzuS/o4s3T9/3Eks0rQzt35g2KGMX8U0Jcw==
-X-Gm-Gg: ASbGncu4W9LJ1Siy8xLcrOFLXNm1pFWDzr4DEgnLxI9EmT8HXzTaQyoJbuaYEO6zFGv
-	BzAEl8kOj6DtnOESHI6VQ7SSGmi53GUN7kALLYILfmo8CsKCdpBSEo0toVgpSYcdpMP1aym9JrT
-	J72fjVDtvFYZzBwirp7v0ujqBp5PWK83q1WAEMxSbslg==
-X-Google-Smtp-Source: AGHT+IF2Wqjq+z5Kekhx8NTddyZTPh0HFQb8SRZurjGuP33M/t0OWBh1RC07DUJS9Qf8Npu4yJAd8K2ViTlWgwhM72s=
-X-Received: by 2002:a05:651c:3045:b0:32b:7165:d0 with SMTP id
- 38308e7fff4ca-32cc643d074mr16874431fa.10.1750942654696; Thu, 26 Jun 2025
- 05:57:34 -0700 (PDT)
+        bh=5lnf8dy7gqziu3el989oNu2CQe5RMJbnDd94a6NU/JI=;
+        b=ZMqGjKwssbGerV7D3wWJvBb9hAZpSHNdhNZ30JPG9rrhZ8/bXGh7vfSABf9HIrTFLr
+         UxndAYBbXmgltViKAN7yNMMw4lvuDvT7lAMqVwedgid4LcQJq0v/AWTIvTpFkH0jFZud
+         XdZpINJBzkQrl36ooOZQfjo9aMeHXrKZ/PzxhyIxXKml4KWZJS31JLpkEabKvbq2Qc48
+         OJGLczhMPZkOUsq/ZHwOvSU+qvWItisXQHEKe3zxOnG7dsdHHtpWuAqGN588Fvy1lnDM
+         pQOjsYz59C+I9nGcbY3yv3bak4iO5AL6N3LT+SVgjaL7Mxmvihm4hrSBiFf9YfBNZEDc
+         mDCg==
+X-Forwarded-Encrypted: i=1; AJvYcCUEDy4zmWGYsMqttaqi0WDrdMtn7+WiOr1AUS8UUndAsFwE9HTRxDtQjhE9F/PFAtZNelBQWtMWDW1tHV3l@vger.kernel.org, AJvYcCVKNrURyXp0DqVSP6wc6JNO7NCl3rSAWY73akJjcffLp2PAb+xz8M3vV9qBhg7aizhaxWdYqBiTS2MC0q0rBgo=@vger.kernel.org, AJvYcCVqSAzbQYlaGgg83TePRBemDO2jeMBfQ5dGw/49kMqnDyrwl35+Atea4GjMyIC+qOS1pW95xgT0@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwlyrzIcvRTm/wxZ7fn0CE4hRBPGx9Fs91fUZsutQqReS4vu5v
+	0mjGWwDSfHXoX6DoHzlrZJs49VbR5NAy/lVQK8jjC3IC2uvar87/EH+O5E4bgosp13U04yXYtWF
+	zn0yWehqCjd9TxnSQjl5WUsHbnbpgcbI=
+X-Gm-Gg: ASbGncvVMbbVURJyFo19Rux0yw5tm3690dTmBOBHhwQuZRCcM6yGUyaGQh32X1pp7tT
+	xYJIpeRVqHTCQdFz/Yw/NLw4FYCJLp1JHln/rOej9UmCmCkY8Lwo95mOccw6N3CXmuBECzfTddD
+	XgZnVB5ssQE3KOS7rrXZ1kSZvVKIP2vU70B7oV7ygtFg==
+X-Google-Smtp-Source: AGHT+IGE8RpqcSJalWopzSPMD6gmtxmQMZZk8w6T2SLCJ0icJVZoYy+rFvK8hokg31uZA75ITTysdg/W64MRaXJYPtc=
+X-Received: by 2002:a2e:b754:0:b0:32b:47be:e1a5 with SMTP id
+ 38308e7fff4ca-32cc65c1285mr14373901fa.39.1750943692808; Thu, 26 Jun 2025
+ 06:14:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250626115209.17839-1-ceggers@arri.de>
-In-Reply-To: <20250626115209.17839-1-ceggers@arri.de>
+References: <20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com>
+ <1306a61f39fd92565d1e292517154aa3009dbd11.camel@iki.fi> <1842c694-045e-4014-9521-e95718f32037@amlogic.com>
+In-Reply-To: <1842c694-045e-4014-9521-e95718f32037@amlogic.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 26 Jun 2025 08:57:22 -0400
-X-Gm-Features: Ac12FXwbphIiiUdCuEqIOLqT54dhAb91jK5k-PvTjulolO7Gvgbeo-8mmls3-Gg
-Message-ID: <CABBYNZLfDqh=49qtC2M6F+f+rmgZ-hQGnABseqWyk0H4QDGTqQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: HCI: Set extended advertising data synchronously
-To: Christian Eggers <ceggers@arri.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Jaganath Kanakkassery <jaganath.k.os@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Date: Thu, 26 Jun 2025 09:14:40 -0400
+X-Gm-Features: Ac12FXyiFO_dBm7V7r6zYY31bmSDmDlgXR2PMhxLYRZlfXCNtBk2c9BYbH8_4KU
+Message-ID: <CABBYNZJYeYdggm7WEoz4iPM5UAp3F-BOTrL2yTcTfSrgSnQ2ww@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_event: Add support for handling LE BIG
+ Sync Lost event
+To: Yang Li <yang.li@amlogic.com>
+Cc: Pauli Virtanen <pav@iki.fi>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Christian,
+Hi Yang,
 
-On Thu, Jun 26, 2025 at 7:52=E2=80=AFAM Christian Eggers <ceggers@arri.de> =
-wrote:
+On Thu, Jun 26, 2025 at 1:54=E2=80=AFAM Yang Li <yang.li@amlogic.com> wrote=
+:
 >
-> Currently, for controllers with extended advertising, the advertising
-> data is set in the asynchronous response handler for extended
-> adverstising params. As most advertising settings are performed in a
-> synchronous context, the (asynchronous) setting of the advertising data
-> is done too late (after enabling the advertising).
->
-> Move setting of adverstising data from asynchronous response handler
-> into synchronous context to fix ordering of HCI commands.
->
-> Signed-off-by: Christian Eggers <ceggers@arri.de>
-> Fixes: a0fb3726ba55 ("Bluetooth: Use Set ext adv/scan rsp data if control=
-ler supports")
-> Cc: stable@vger.kernel.org
-> v1: https://lore.kernel.org/linux-bluetooth/20250625130510.18382-1-cegger=
-s@arri.de/
-> ---
-> v2: convert setting of adv data into synchronous context (rather than mov=
-ing
-> more methods into asynchronous response handlers).
-> - hci_set_ext_adv_params_sync: new method
-> - hci_set_ext_adv_data_sync: move within source file (no changes)
-> - hci_set_adv_data_sync: dito
-> - hci_update_adv_data_sync: dito
-> - hci_cc_set_ext_adv_param: remove (performed synchronously now)
->
-> On Wednesday, 25 June 2025, 15:26:58 CEST, Luiz Augusto von Dentz wrote:
-> > That said for the likes of MGMT_OP_ADD_EXT_ADV_DATA you will still
-> > need to detect if the instance has already been enabled then do
-> > disable/re-enable logic if the quirk is set.
->
-> The critical opcode (HCI_OP_LE_SET_EXT_ADV_DATA) is only used in
-> hci_set_ext_adv_data_sync(). Two of the callers already ensure that
-> the advertising instance is disabled, so only hci_update_adv_data_sync()
-> may need a quirk. I suggest doing this in a separate patch.
->
-> regards,
-> Christian
->
->  net/bluetooth/hci_event.c |  36 -------
->  net/bluetooth/hci_sync.c  | 209 ++++++++++++++++++++++++--------------
->  2 files changed, 132 insertions(+), 113 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 66052d6aaa1d..4d5ace9d245d 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2150,40 +2150,6 @@ static u8 hci_cc_set_adv_param(struct hci_dev *hde=
-v, void *data,
->         return rp->status;
->  }
->
-> -static u8 hci_cc_set_ext_adv_param(struct hci_dev *hdev, void *data,
-> -                                  struct sk_buff *skb)
-> -{
-> -       struct hci_rp_le_set_ext_adv_params *rp =3D data;
-> -       struct hci_cp_le_set_ext_adv_params *cp;
-> -       struct adv_info *adv_instance;
-> -
-> -       bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-> -
-> -       if (rp->status)
-> -               return rp->status;
-> -
-> -       cp =3D hci_sent_cmd_data(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS);
-> -       if (!cp)
-> -               return rp->status;
-> -
-> -       hci_dev_lock(hdev);
-> -       hdev->adv_addr_type =3D cp->own_addr_type;
-> -       if (!cp->handle) {
-> -               /* Store in hdev for instance 0 */
-> -               hdev->adv_tx_power =3D rp->tx_power;
-> -       } else {
-> -               adv_instance =3D hci_find_adv_instance(hdev, cp->handle);
-> -               if (adv_instance)
-> -                       adv_instance->tx_power =3D rp->tx_power;
-> -       }
-> -       /* Update adv data as tx power is known now */
-> -       hci_update_adv_data(hdev, cp->handle);
-> -
-> -       hci_dev_unlock(hdev);
-> -
-> -       return rp->status;
-> -}
-> -
->  static u8 hci_cc_read_rssi(struct hci_dev *hdev, void *data,
->                            struct sk_buff *skb)
->  {
-> @@ -4164,8 +4130,6 @@ static const struct hci_cc {
->         HCI_CC(HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS,
->                hci_cc_le_read_num_adv_sets,
->                sizeof(struct hci_rp_le_read_num_supported_adv_sets)),
-> -       HCI_CC(HCI_OP_LE_SET_EXT_ADV_PARAMS, hci_cc_set_ext_adv_param,
-> -              sizeof(struct hci_rp_le_set_ext_adv_params)),
->         HCI_CC_STATUS(HCI_OP_LE_SET_EXT_ADV_ENABLE,
->                       hci_cc_le_set_ext_adv_enable),
->         HCI_CC_STATUS(HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 1f8806dfa556..2a09b2cb983e 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -1205,9 +1205,116 @@ static int hci_set_adv_set_random_addr_sync(struc=
-t hci_dev *hdev, u8 instance,
->                                      sizeof(cp), &cp, HCI_CMD_TIMEOUT);
->  }
->
-> +static int
-> +hci_set_ext_adv_params_sync(struct hci_dev *hdev,
-> +                           const struct hci_cp_le_set_ext_adv_params *cp=
+> Hi Pauli,
+> > [ EXTERNAL EMAIL ]
+> >
+> > Hi,
+> >
+> > ke, 2025-06-25 kello 16:42 +0800, Yang Li via B4 Relay kirjoitti:
+> >> From: Yang Li <yang.li@amlogic.com>
+> >>
+> >> When the BIS source stops, the controller sends an LE BIG Sync Lost
+> >> event (subevent 0x1E). Currently, this event is not handled, causing
+> >> the BIS stream to remain active in BlueZ and preventing recovery.
+> >>
+> >> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> >> ---
+> >> Changes in v2:
+> >> - Matching the BIG handle is required when looking up a BIG connection=
+.
+> >> - Use ev->reason to determine the cause of disconnection.
+> >> - Call hci_conn_del after hci_disconnect_cfm to remove the connection =
+entry
+> >> - Delete the big connection
+> >> - Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_=
+event-v1-1-c32ce37dd6a5@amlogic.com
+> >> ---
+> >>   include/net/bluetooth/hci.h |  6 ++++++
+> >>   net/bluetooth/hci_event.c   | 31 +++++++++++++++++++++++++++++++
+> >>   2 files changed, 37 insertions(+)
+> >>
+> >> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> >> index 82cbd54443ac..48389a64accb 100644
+> >> --- a/include/net/bluetooth/hci.h
+> >> +++ b/include/net/bluetooth/hci.h
+> >> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+> >>        __le16  bis[];
+> >>   } __packed;
+> >>
+> >> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
+> >> +struct hci_evt_le_big_sync_lost {
+> >> +     __u8    handle;
+> >> +     __u8    reason;
+> >> +} __packed;
+> >> +
+> >>   #define HCI_EVT_LE_BIG_INFO_ADV_REPORT       0x22
+> >>   struct hci_evt_le_big_info_adv_report {
+> >>        __le16  sync_handle;
+> >> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> >> index 66052d6aaa1d..d0b9c8dca891 100644
+> >> --- a/net/bluetooth/hci_event.c
+> >> +++ b/net/bluetooth/hci_event.c
+> >> @@ -7026,6 +7026,32 @@ static void hci_le_big_sync_established_evt(str=
+uct hci_dev *hdev, void *data,
+> >>        hci_dev_unlock(hdev);
+> >>   }
+> >>
+> >> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data=
 ,
-> +                           struct hci_rp_le_set_ext_adv_params *rp)
-> +{
-> +       struct sk_buff *skb;
-> +
-> +       skb =3D __hci_cmd_sync(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof=
-(*cp),
-> +                            cp, HCI_CMD_TIMEOUT);
-> +
-> +       /* If command return a status event, skb will be set to -ENODATA =
-*/
-> +       if (skb =3D=3D ERR_PTR(-ENODATA))
-> +               return 0;
-> +
-> +       if (IS_ERR(skb)) {
-> +               bt_dev_err(hdev, "Opcode 0x%4.4x failed: %ld",
-> +                          HCI_OP_LE_SET_EXT_ADV_PARAMS, PTR_ERR(skb));
-> +               return PTR_ERR(skb);
-> +       }
-> +
-> +       if (skb->len !=3D sizeof(*rp)) {
-> +               bt_dev_err(hdev, "Invalid response length for "
-> +                          "HCI_OP_LE_SET_EXT_ADV_PARAMS: %u", skb->len);
-> +               kfree_skb(skb);
-> +               return -EIO;
-> +       }
-> +
-> +       memcpy(rp, skb->data, sizeof(*rp));
-> +       kfree_skb(skb);
-> +
-> +       return rp->status;
-> +}
-> +
-> +static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +       DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
-> +                   HCI_MAX_EXT_AD_LENGTH);
-> +       u8 len;
-> +       struct adv_info *adv =3D NULL;
-> +       int err;
-> +
-> +       if (instance) {
-> +               adv =3D hci_find_adv_instance(hdev, instance);
-> +               if (!adv || !adv->adv_data_changed)
-> +                       return 0;
-> +       }
-> +
-> +       len =3D eir_create_adv_data(hdev, instance, pdu->data,
-> +                                 HCI_MAX_EXT_AD_LENGTH);
-> +
-> +       pdu->length =3D len;
-> +       pdu->handle =3D adv ? adv->handle : instance;
-> +       pdu->operation =3D LE_SET_ADV_DATA_OP_COMPLETE;
-> +       pdu->frag_pref =3D LE_SET_ADV_DATA_NO_FRAG;
-> +
-> +       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
-> +                                   struct_size(pdu, data, len), pdu,
-> +                                   HCI_CMD_TIMEOUT);
-> +       if (err)
-> +               return err;
-> +
-> +       /* Update data if the command succeed */
-> +       if (adv) {
-> +               adv->adv_data_changed =3D false;
-> +       } else {
-> +               memcpy(hdev->adv_data, pdu->data, len);
-> +               hdev->adv_data_len =3D len;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +       struct hci_cp_le_set_adv_data cp;
-> +       u8 len;
-> +
-> +       memset(&cp, 0, sizeof(cp));
-> +
-> +       len =3D eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.da=
-ta));
-> +
-> +       /* There's nothing to do if the data hasn't changed */
-> +       if (hdev->adv_data_len =3D=3D len &&
-> +           memcmp(cp.data, hdev->adv_data, len) =3D=3D 0)
-> +               return 0;
-> +
-> +       memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> +       hdev->adv_data_len =3D len;
-> +
-> +       cp.length =3D len;
-> +
-> +       return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
-> +                                    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +}
-> +
-> +int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +       if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
-> +               return 0;
-> +
-> +       if (ext_adv_capable(hdev))
-> +               return hci_set_ext_adv_data_sync(hdev, instance);
-> +
-> +       return hci_set_adv_data_sync(hdev, instance);
-> +}
-> +
->  int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
->  {
->         struct hci_cp_le_set_ext_adv_params cp;
-> +       struct hci_rp_le_set_ext_adv_params rp;
->         bool connectable;
->         u32 flags;
->         bdaddr_t random_addr;
-> @@ -1316,8 +1423,20 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev=
- *hdev, u8 instance)
->                 cp.secondary_phy =3D HCI_ADV_PHY_1M;
->         }
+> >> +                                         struct sk_buff *skb)
+> >> +{
+> >> +     struct hci_evt_le_big_sync_lost *ev =3D data;
+> >> +     struct hci_conn *bis, *conn;
+> >> +
+> >> +     bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+> >> +
+> >> +     hci_dev_lock(hdev);
+> >> +
+> >> +     list_for_each_entry(bis, &hdev->conn_hash.list, list) {
+> > This should check bis->type =3D=3D BIS_LINK too.
+> Will do.
+> >
+> >> +             if (test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags) &=
+&
+> >> +                 (bis->iso_qos.bcast.big =3D=3D ev->handle)) {
+> >> +                     hci_disconn_cfm(bis, ev->reason);
+> >> +                     hci_conn_del(bis);
+> >> +
+> >> +                     /* Delete the big connection */
+> >> +                     conn =3D hci_conn_hash_lookup_pa_sync_handle(hde=
+v, bis->sync_handle);
+> >> +                     if (conn)
+> >> +                             hci_conn_del(conn);
+> > Problems:
+> >
+> > - use after free
+> >
+> > - hci_conn_del() cannot be used inside list_for_each_entry()
+> >    of the connection list
+> >
+> > - also list_for_each_entry_safe() allows deleting only the iteration
+> >    cursor, so some restructuring above is needed
 >
-> -       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
-> -                                   sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +       err =3D hci_set_ext_adv_params_sync(hdev, &cp, &rp);
-> +       if (err)
-> +               return err;
+> Following your suggestion, I updated the hci_le_big_sync_lost_evt functio=
+n.
+>
+> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
+> +                                           struct sk_buff *skb)
+> +{
+> +       struct hci_evt_le_big_sync_lost *ev =3D data;
+> +       struct hci_conn *bis, *conn, *n;
 > +
-> +       hdev->adv_addr_type =3D own_addr_type;
-> +       if (!cp.handle) {
-> +               /* Store in hdev for instance 0 */
-> +               hdev->adv_tx_power =3D rp.tx_power;
-> +       } else if (adv) {
-> +               adv->tx_power =3D rp.tx_power;
+> +       bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       /* Delete the pa sync connection */
+> +       bis =3D hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->handle)=
+;
+> +       if (bis) {
+> +               conn =3D hci_conn_hash_lookup_pa_sync_handle(hdev,
+> bis->sync_handle);
+> +               if (conn)
+> +                       hci_conn_del(conn);
+> +       }
+> +
+> +       /* Delete each bis connection */
+> +       list_for_each_entry_safe(bis, n, &hdev->conn_hash.list, list) {
+> +               if (bis->type =3D=3D BIS_LINK &&
+> +                   bis->iso_qos.bcast.big =3D=3D ev->handle &&
+> +                   test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags)) {
+> +                       hci_disconn_cfm(bis, ev->reason);
+> +                       hci_conn_del(bis);
+> +               }
 > +       }
 
-We can probably move the above code into hci_set_ext_adv_params_sync
-so we guarantee the tx_power is updated whenever it is used, if there
-are differences between the likes of directed advertisements, etc,
-that can probably be handled internally as well, although I think it
-doesn't seem to need a special handling since we restrict directected
-advertisements to handle 0x00 only.
+Id follow the logic in hci_le_create_big_complete_evt, so you do something =
+like:
 
-> +       /* Update adv data as tx power is known now */
-> +       err =3D hci_set_ext_adv_data_sync(hdev, cp.handle);
->         if (err)
->                 return err;
->
-> @@ -1822,79 +1941,6 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev=
-, u8 handle, u8 reason)
->                                      sizeof(cp), &cp, HCI_CMD_TIMEOUT);
->  }
->
-> -static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -       DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
-> -                   HCI_MAX_EXT_AD_LENGTH);
-> -       u8 len;
-> -       struct adv_info *adv =3D NULL;
-> -       int err;
-> -
-> -       if (instance) {
-> -               adv =3D hci_find_adv_instance(hdev, instance);
-> -               if (!adv || !adv->adv_data_changed)
-> -                       return 0;
-> -       }
-> -
-> -       len =3D eir_create_adv_data(hdev, instance, pdu->data,
-> -                                 HCI_MAX_EXT_AD_LENGTH);
-> -
-> -       pdu->length =3D len;
-> -       pdu->handle =3D adv ? adv->handle : instance;
-> -       pdu->operation =3D LE_SET_ADV_DATA_OP_COMPLETE;
-> -       pdu->frag_pref =3D LE_SET_ADV_DATA_NO_FRAG;
-> -
-> -       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
-> -                                   struct_size(pdu, data, len), pdu,
-> -                                   HCI_CMD_TIMEOUT);
-> -       if (err)
-> -               return err;
-> -
-> -       /* Update data if the command succeed */
-> -       if (adv) {
-> -               adv->adv_data_changed =3D false;
-> -       } else {
-> -               memcpy(hdev->adv_data, pdu->data, len);
-> -               hdev->adv_data_len =3D len;
-> -       }
-> -
-> -       return 0;
-> -}
-> -
-> -static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -       struct hci_cp_le_set_adv_data cp;
-> -       u8 len;
-> -
-> -       memset(&cp, 0, sizeof(cp));
-> -
-> -       len =3D eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.da=
-ta));
-> -
-> -       /* There's nothing to do if the data hasn't changed */
-> -       if (hdev->adv_data_len =3D=3D len &&
-> -           memcmp(cp.data, hdev->adv_data, len) =3D=3D 0)
-> -               return 0;
-> -
-> -       memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> -       hdev->adv_data_len =3D len;
-> -
-> -       cp.length =3D len;
-> -
-> -       return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
-> -                                    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> -}
-> -
-> -int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -       if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
-> -               return 0;
-> -
-> -       if (ext_adv_capable(hdev))
-> -               return hci_set_ext_adv_data_sync(hdev, instance);
-> -
-> -       return hci_set_adv_data_sync(hdev, instance);
-> -}
-> -
->  int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
->                                    bool force)
->  {
-> @@ -6269,6 +6315,7 @@ static int hci_le_ext_directed_advertising_sync(str=
-uct hci_dev *hdev,
->                                                 struct hci_conn *conn)
->  {
->         struct hci_cp_le_set_ext_adv_params cp;
-> +       struct hci_rp_le_set_ext_adv_params rp;
->         int err;
->         bdaddr_t random_addr;
->         u8 own_addr_type;
-> @@ -6310,8 +6357,16 @@ static int hci_le_ext_directed_advertising_sync(st=
-ruct hci_dev *hdev,
->         if (err)
->                 return err;
->
-> -       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
-> -                                   sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +       err =3D hci_set_ext_adv_params_sync(hdev, &cp, &rp);
-> +       if (err)
-> +               return err;
+    while ((conn =3D hci_conn_hash_lookup_big_state(hdev, ev->handle,
+                              BT_CONNECTED)))...
+
+That way we don't operate on the list cursor, that said we may need to
+add the role as parameter to hci_conn_hash_lookup_big_state, because
+the BIG id domain is role specific so we can have clashes if there are
+Broadcast Sources using the same BIG id the above would return them as
+well and even if we check for the role inside the while loop will keep
+returning it forever.
+
 > +
-> +       hdev->adv_addr_type =3D own_addr_type;
-> +       /* Store in hdev for instance 0 */
-> +       hdev->adv_tx_power =3D rp.tx_power;
-> +
-> +       /* Update adv data as tx power is known now */
-> +       err =3D hci_set_ext_adv_data_sync(hdev, cp.handle);
->         if (err)
->                 return err;
+> +       hci_dev_unlock(hdev);
+> +}
 >
-> --
-> 2.44.1
->
+> >
+> >> +             }
+> >> +     }
+> >> +
+> >> +     hci_dev_unlock(hdev);
+> >> +}
+> >> +
+> >>   static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, voi=
+d *data,
+> >>                                           struct sk_buff *skb)
+> >>   {
+> >> @@ -7149,6 +7175,11 @@ static const struct hci_le_ev {
+> >>                     hci_le_big_sync_established_evt,
+> >>                     sizeof(struct hci_evt_le_big_sync_estabilished),
+> >>                     HCI_MAX_EVENT_SIZE),
+> >> +     /* [0x1e =3D HCI_EVT_LE_BIG_SYNC_LOST] */
+> >> +     HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
+> >> +                  hci_le_big_sync_lost_evt,
+> >> +                  sizeof(struct hci_evt_le_big_sync_lost),
+> >> +                  HCI_MAX_EVENT_SIZE),
+> >>        /* [0x22 =3D HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+> >>        HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+> >>                     hci_le_big_info_adv_report_evt,
+> >>
+> >> ---
+> >> base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
+> >> change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+> >>
+> >> Best regards,
+> > --
+> > Pauli Virtanen
+
 
 
 --=20
