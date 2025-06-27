@@ -1,46 +1,46 @@
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010042.outbound.protection.outlook.com [52.101.69.42])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013049.outbound.protection.outlook.com [40.107.162.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AA223182B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 08:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE65922D4C5
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 08:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751011336; cv=fail; b=RXIZ8WZwl13lDiPQPLL/FSrt2J3iaruHDLf+fhfGxJx/I//1hJIydWJwD2FBiDoTt+8PJv0SjLZpNGYBRJIl+g0/cBzlqCiLEczvxheQOgbRKKBjPDZSrMqpu5JepkmTRmpvPif43iSguglvgOuP9/l1Rdfro9F+AA2lmD8idqE=
+	t=1751011356; cv=fail; b=n1hDm8cVYyjLUbEfDUTSM0JAzL0JCFYpUIFs7ZPOggVK7vzLXYG/t6swVDczdEnImdctfyf9elb1wJ2UTD+ciD3CNQD5bbW6jkqGpOSAciDcTcba5Da5jaw/CEiOVFEVzUGFAOBGc4PoK8akv7K7DrH/VjH05sF0vsM/9T2pRgY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751011336; c=relaxed/simple;
-	bh=TDH/GiqfwOhH5aOrDpSOyXaiuml1ZU8SyiER50j9vSo=;
+	s=arc-20240116; t=1751011356; c=relaxed/simple;
+	bh=Wf2CR+Tg+v0RC2Hr1r+wTTbFngsXTdjO2evZEPqR9F4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tIN58cVWAhpbA8ztNhXeOHl9FNPH2pK3LG6taWAhM4sOWPF/Y3WVhe2tMX7DJ/MABdPDfM8TePdd+FlfYZQ7bCbW9FMDDz8qk7tycFVvz6S/TvwgB8R6ybpNvfgUlWW1uF27f4BFWFTYX0Nhix6W9Z0UO+L3g37Bwf0SCStV6SI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=aG1WaQbR; arc=fail smtp.client-ip=52.101.69.42
+	 MIME-Version:Content-Type; b=AkaVL9f1indtoEdcLhHA2SnjQ68sOB0s9SfC6SyLBKOXJkLSiwpiswjgmjPH1Uv2V72F5QwhrAMeOZr98qvALKMLYj3hnhZtenmUfZke5eF1pDQooCh3PlGEAV2nYIIBWk2501n3nZ/xAMb2DhkIjuRtbd2UsAUauKxAHFeni1k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=oC2iuJ3g; arc=fail smtp.client-ip=40.107.162.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="aG1WaQbR"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="oC2iuJ3g"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FZbv/v+HDHdc2g84RzlHPAlJhOOBdRzBwTSRLs0gwlpbO7CLsELjxxcY4K3KLlugfbVApgxE9KY2UjbRiFXxloRsQ2yCmrfMu8BAePOCnOymtzEM3omAY+dx3/hOPQQEAAu2ZzY2oPihIG8mQcyi/P0Fe0YuwZZz2cIPL9sd5dmWYD+yBWAqcksGcSTORmCSBz9NXbHMUEvCbc5AgtV5r95TlsYN7ic0u2Yj1rFaGS/xLNpsO6/6XtB/x42ryvixDc128LGw5tJGdmrvIJ/ZdWCGYuix512GZZstfLKCpCfi+LDVM0NoY9qC3sbfLL2iPY256YXnKKGH6ZbMf0G7RA==
+ b=FnfI6alb1zdO9UwzvDQAaJqTo5xSOpL6+fWMSsAObczNe9TEeh9V4BT8aBjOpS/dJx565VCEA9ycmSLew+FfE+SPGkdN39ICxIv2l7YwefTfE8tsH+MKGbeLAMrwxkjMJeZbapZCjAhHQU7px86gW/uWAKaEgfdFT+DDo84jzr3G3uLRBNkxB+3T2wjNPXPY8C6z4YRNCjgXvGB5Wbdumm7ImDrvv0ENx6aJannHhKh/HJS0Wx/LOvdLAO0OJE/RDbhEgyPsgG4f4U2Qadd5fLpP0XQA1Gn6OA1eVUO5s5XJE4yvgwDPyleGET0f44XuI7t4O1BXgmdZwSgg5i2MHw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mEOHep2BRCwPj2DhW6lgMOsSnfUa3BJt64vJdI3MUg4=;
- b=CBdTUiMhHtNO9Nk23zhG9aK1Z+3H/w8rryReNzpmid/EAQj4FZYPfkipEMWAkiKXwUGkoH9shDXAPGl5vQ3ZiKQmyFh2hh1E4vY1AnrwdM8TgiqtKvM+9nuA/cq/3dkENcAaKx6OFNoZ1ufR1XSUy3QajC347lsXxBnNj+mrV7lFOMTCyxaDJ13KpsK3NO9yt+9onngsHV+xpudW3VhtOXcETRw4oD0LGv8o4kNBABdPNimOaCJwA6HR+PKA2qva62xKkf+gD2KZb/yrYJeCrRVWajcf6Ikze2DQhylrQEua+DB4IXa84cYA6MZJyz/R0+KNuyEW7TbvocSQyIlE/g==
+ bh=2GkkFsZW59sJTK6EGY2uxJpT8nXaI+CiLkT9stiTrRY=;
+ b=q2Jh4mNs4Ih5L5AOTIGvndEdj3v9XHOqrP360gp4J9GeavbnyoJk2CGyZ4ww7/FBK3+IqMCtcYiMXSQqpkBJ/liCSN8zXh8zszeTTnLXkY+v3RwlNQQp5HNolpsJDtMyyUIzTUb0zTUiglzc6QEkQGQVb1tu7jOfmmp0DEptBGXWNq01flXnJbTN73i6dwUb1YdIbk/ubrjFwpKuq9RX5BJILgBJ5/NXoqGkAOTQ2gBTSdTNmp0qzIm91CbL0v76JZn6WPIiqdgHV2nXh7W4LbVnUWE/CBtiNJUPGc9iB17cefbBw/yxhVP8sADFDfPEihAcMenLzFuysq0XoUi38g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mEOHep2BRCwPj2DhW6lgMOsSnfUa3BJt64vJdI3MUg4=;
- b=aG1WaQbRxs286rILsEnjXAX62CXtDyE+31WBr6ZFgZDOg/OOuJQulBs1u9U8LDEHr1dWEQD9wjqH+FWq8FYT/bSPur31KfUh2T86Qt/az7pD3VZDuDDf1BOvDkcE+YTBmk0VyxFkvWLQ0xlqTfrq778zp7DwfejXWcV8hf1j7mg=
-Received: from CWLP265CA0429.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1d7::15)
- by DU4PR03MB10622.eurprd03.prod.outlook.com (2603:10a6:10:58a::5) with
+ bh=2GkkFsZW59sJTK6EGY2uxJpT8nXaI+CiLkT9stiTrRY=;
+ b=oC2iuJ3gQPnlhwX5WwbmM7bFiiS4QyEPmDO5U73/HpeWEzv5WuW43OG6tZnWfYBe6UQUhLpzOWT0IaB3UlTIEoTCk6wzktMARFuDcAHrH+15EBUdMV/ykKuLaaXGCGlUMUTZotpANOiUTxP8BCBqVTIk/mVAyxW2foz5yajpp8Q=
+Received: from AM4PR0302CA0011.eurprd03.prod.outlook.com (2603:10a6:205:2::24)
+ by AM9PR03MB6961.eurprd03.prod.outlook.com (2603:10a6:20b:280::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.18; Fri, 27 Jun
- 2025 08:02:10 +0000
-Received: from AMS1EPF00000040.eurprd04.prod.outlook.com
- (2603:10a6:400:1d7:cafe::5d) by CWLP265CA0429.outlook.office365.com
- (2603:10a6:400:1d7::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.17 via Frontend Transport; Fri,
- 27 Jun 2025 08:02:10 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.29; Fri, 27 Jun
+ 2025 08:02:31 +0000
+Received: from AMS1EPF00000045.eurprd04.prod.outlook.com
+ (2603:10a6:205:2:cafe::3c) by AM4PR0302CA0011.outlook.office365.com
+ (2603:10a6:205:2::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.18 via Frontend Transport; Fri,
+ 27 Jun 2025 08:02:31 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,19 +48,19 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- AMS1EPF00000040.mail.protection.outlook.com (10.167.16.37) with Microsoft
+ AMS1EPF00000045.mail.protection.outlook.com (10.167.16.42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8880.14 via Frontend Transport; Fri, 27 Jun 2025 08:02:10 +0000
+ 15.20.8880.14 via Frontend Transport; Fri, 27 Jun 2025 08:02:30 +0000
 Received: from N9W6SW14.arri.de (10.30.5.30) by mta.arri.de (10.10.18.5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Fri, 27 Jun
- 2025 10:02:10 +0200
+ 2025 10:02:30 +0200
 From: Christian Eggers <ceggers@arri.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Christian Eggers <ceggers@arri.de>
-Subject: [PATCH BlueZ 8/9] net: packet_received: avoid unnecessary copying
-Date: Fri, 27 Jun 2025 09:59:27 +0200
-Message-ID: <20250627075928.19788-8-ceggers@arri.de>
+Subject: [PATCH BlueZ 9/9] tools: parser: fix printf format errors
+Date: Fri, 27 Jun 2025 09:59:28 +0200
+Message-ID: <20250627075928.19788-9-ceggers@arri.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250627075928.19788-1-ceggers@arri.de>
 References: <20250627075928.19788-1-ceggers@arri.de>
@@ -74,108 +74,82 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS1EPF00000040:EE_|DU4PR03MB10622:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a47bc19-db14-4f00-2d67-08ddb550eb4e
+X-MS-TrafficTypeDiagnostic: AMS1EPF00000045:EE_|AM9PR03MB6961:EE_
+X-MS-Office365-Filtering-Correlation-Id: 108267f7-32b2-41a8-3ea6-08ddb550f73a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eQq6gZrAnD/CqQe6uGvfs0wqml1g3q7Y85y0BHbQNPEGXS5ey0OBjBlBJE4W?=
- =?us-ascii?Q?wBwqeV0cOxSdZEY5sumiyqDBntXWhXvbukXSi9BnD06q5/M56xyJIQXQO1UO?=
- =?us-ascii?Q?JCZqJpVouzCML8/eEU+6YfQcROpDc2BuYg32oXMW6bf6oXomrGxZcCbHRliO?=
- =?us-ascii?Q?NZTfXBFBOKhIs1QeTHuOXIBJRO1zYkndZFDXVY26+yB6axgWJvJupoNA/pK3?=
- =?us-ascii?Q?8j/bTz1SA8y+82RM/+kY/1ZwA4rmG5v46WMflq61BlImVbC/F1OYF6KYdkS9?=
- =?us-ascii?Q?SpMEU8wla23UaKivxZbHcXa/pTAf1qMn3z7RKgzMuQpSJlxR4A9mKyW5sLmq?=
- =?us-ascii?Q?1m30l/xP5iupwShnOVCksUrYci13W6AYOzwWTjH41pckHRYiua0TtI4HxhgU?=
- =?us-ascii?Q?pseF4eyv0kkose1r6nD1Q0TjcdZRtDNtORBOrACo1OxC5qOMgjUU6EEqVaRc?=
- =?us-ascii?Q?8ksUJ3+teboaybiCzZFQIum4ID9AM8GQhTao7W/poQlAq2oriHv0cQzq0guk?=
- =?us-ascii?Q?L4znQV+z0wvo/0O8wUNzkypfnRc2yCKGE4ZmLo4rS2hWk8Y8G2QK5NGuO9Kz?=
- =?us-ascii?Q?CBowTvcg3otoCN8maRRmFXX0FOe2A+Tt+OA+Ux/ng5Vy5u6h3AZsujuUeZsj?=
- =?us-ascii?Q?ibuvQTKvvu1XrUuO4hDnoIlf5DFlNOPt0UT6xJTLvvOg6RlbJjrsfywZ+IoH?=
- =?us-ascii?Q?pfy+VwHLpg4bAdBMe0pDQUqxA55KvMYV/kiE7EYP+onaUuVagllG9kKczaxL?=
- =?us-ascii?Q?w72/V1dJgAv9PfSDDXhhFhW0AXKwjH2SrA8UCnlMo5FSkbmTW0czSjrg1jfR?=
- =?us-ascii?Q?QW/ZYYmT8+4Vkyr3bLZp2e516wHlyOcLAvLBvrrL+E5CA2c10qtgIkzKArHc?=
- =?us-ascii?Q?7DcVwdhKtt6MZn04KqL6XaWy7WO+PAE97gnUMtCn9jt0HhYj6kUlugKGAQPR?=
- =?us-ascii?Q?enkqnD3YWpWgMWuSdvS8uLRhZvtKJWtar/VYBfxNnzZrToHOluagFrGb9OrG?=
- =?us-ascii?Q?qqQIZGX86Hl/yOtLWRwuuO/qCm+02HtE1Ofdejy/YcKghrUOuXgWXZ0c84Mb?=
- =?us-ascii?Q?ly578Csz++OD1v3DeXMY3Wr7VOvoIrFp+Lw7qV3pmCTfSAkAUtNuks6N8ubF?=
- =?us-ascii?Q?9bBHDhLEU9ml0Jnjm31s64S6n6wpfRyRM3udIVybQ4P/bbnYq/JxlOVXaWOh?=
- =?us-ascii?Q?4CYEY4Eo3rfNhyTacJAAIyxrk8ZGSPwraFCEmtJMG1WMGM63PSrUrWO+PkUh?=
- =?us-ascii?Q?yINsLJKUDG77niesXkw6w2Tmpe5wmPZrv6Hd0z0naglkuxiFJ94mSmPm+MBY?=
- =?us-ascii?Q?f7W8hojeL9XZItKDnq9Cct1ohPZmwv2AkvBRz8OuYvyEhUdE9VkAUTRx+Qzl?=
- =?us-ascii?Q?Hf6of/32+X/+ZGYEzFVzp9VTgauRHN2feAErhLL+xqCkx23cU9vbX7qZcccI?=
- =?us-ascii?Q?pYitKWGfvVOH60ithrX2SrLZnq6DHaOWQ839/pMhdq8Inb4xnSKwij535Pfn?=
- =?us-ascii?Q?713wUHxoHwB7J0bLeRcZLdMA8sJEzuV49dMP?=
+	=?us-ascii?Q?0eTA22W+mtQra/oIQjyqmZ2cw2DidjStmmE8x9068Z8v1Y5eeU99mMi+wb8m?=
+ =?us-ascii?Q?Mkyu0HzPIlb44yNhiEAAmqtKFWS/VWOz73Or88tHXo7jp7/uq1mFAWdlYNp5?=
+ =?us-ascii?Q?7pj4xyXOJFSO7Jk5nRn+HA3YZCBYxxoH8rQNsX0bv0pgRAfL3TM2YS95Rd+L?=
+ =?us-ascii?Q?mXKcSn9ifrtvTOMchCNsUgtcEkA3Z2B1Zbh+XEd13eQP9QmNrhnUq+vSboKg?=
+ =?us-ascii?Q?+P5JnHVHStKrUEu4J/N8q19QJP0vKa27ky8pcMtSCk8cda3r634BLRPdgC14?=
+ =?us-ascii?Q?SO4qlzfWEqcHfv47hy3S2kJJpKiK56Oi63QEYjxQgsk04oJM1RpOPF0Np75d?=
+ =?us-ascii?Q?LPFg45WYd2UJasQB0sYVoM8jAxS9jr7VKTIo0gmV1Xfpfhw1CbWN83XpUDy0?=
+ =?us-ascii?Q?zS06zEIWDjgmCH+UNhw1dVoVLW3Y15T5SlzyUKpejvD936aAtrn7FFYNzoGq?=
+ =?us-ascii?Q?9qbvANHh3xgMtlgLw9AyOw4R4QlvT56AYdK/FnPoDXwnxxxOyh5ERf2SS0nd?=
+ =?us-ascii?Q?JTlqNoLYhMIvZ4qtBEC2js6zIMrCZiznMNIi75EtxH7rkpfvPlm1GghFop4q?=
+ =?us-ascii?Q?zcMVB1SKylWDO/H8ZFDrZNla+cGNkEi1CfTvb632snQrJlPucghga4or8YuL?=
+ =?us-ascii?Q?QMEwzazWJtimfKKz3+E1dsBaHx9gP5Rw+hCNg8w0DHcKBWaFBPg2GJnDPxG5?=
+ =?us-ascii?Q?MXUw0FXk5tJHuN6128v6lGIZMkgG/xP1iG/gZJ4zedEUUWquYyJXH2djO+Vn?=
+ =?us-ascii?Q?8xd7yv15hR2nllUe8KqlUvYmxHY3qgSQy4nQGyqnKXyVvLORjOBJvAcbxdE9?=
+ =?us-ascii?Q?3GMUv1wWDpEBSZR/ObkTli8NyS0VsQHcr3R888vuqhJ5AWwLsb1dANOUPbp7?=
+ =?us-ascii?Q?8vEK483rj4pdJpsWI2x9qX58Xw6P/H5CVjPPdH5/qNZfHOx+lv+fFD+NNoFf?=
+ =?us-ascii?Q?zq1FPFn5ZDuFapY5Ey8JvEJ2ogCsv9t82aeXYgPz+0I1tsaeeVE+9AeOHC4F?=
+ =?us-ascii?Q?YDfUg0p1jqwfm592ygrEKHwcrZVLuczeWaFijuKVIC+lR5Nz0gjnx7aGdQIo?=
+ =?us-ascii?Q?lzDjWfvJMQMcTqyXqXjyk4Z+HzBOZX0b9GwoEtqHds4HOXvy57om9TprMUjN?=
+ =?us-ascii?Q?zlVXN4CXQN+pS1PVTWC7S/3S+NVGldi7cdDz8o5hTyR7OIGrWkTO01d3Ux3z?=
+ =?us-ascii?Q?59QtO2e89F8+Al8+y30C/XsmxtwNCDsYaIyNZcv4984yhJA+6A9+BD1D23oT?=
+ =?us-ascii?Q?kTvpM7Cxtn5RobfO8WAbZGlTFtFxPvkvZPOz+okTc2ONGoWJ9FwTlRH/RvZi?=
+ =?us-ascii?Q?kYKCHNhHy4sBtxPIC2SzCa9JSBDdf9FGyB1s/0JyTlt+Key3+F1vcl0u8I95?=
+ =?us-ascii?Q?WNekt5hsCyNKCekgZ79LlZR4ST6rGuazftK+Em1fsKwCsvNuIt3TDNpZOwA6?=
+ =?us-ascii?Q?zXC6Ncon+VQQ+vcL+EiH7jLW/wcxedLOTnNwlpOoYf0RcB/O3mX5uSmTuL1r?=
+ =?us-ascii?Q?kigFhFjs6E8zIn3p6f9f2qKGdBx6ooR6coFu?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2025 08:02:10.5849
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2025 08:02:30.5867
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a47bc19-db14-4f00-2d67-08ddb550eb4e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 108267f7-32b2-41a8-3ea6-08ddb550f73a
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AMS1EPF00000040.eurprd04.prod.outlook.com
+	AMS1EPF00000045.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR03MB10622
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB6961
 
-Since cca48f305b60 ("mesh: Fix Relaying for multiple nodes"), the packet
-for relaying is assembled within send_relay_pkt(). So we do not need to
-assemble a full packet within packet_received().
-
-Additionally remove misleading initialization of 'msg' variable, the
-value is assigned in all possible branches of
-mesh_crypto_packet_parse().
+struct timeval members can be 32 or 64 bits which results in "long long
+int" on some platforms. As there are no printf conversion specifiers for
+time types, cast them to the longest possible types.
 ---
- mesh/net.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ tools/parser/parser.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/mesh/net.c b/mesh/net.c
-index f26a63f178c2..1cf74c892ca0 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -2324,25 +2324,21 @@ static void send_msg_pkt(struct mesh_net *net, uint8_t cnt, uint16_t interval,
- 	l_idle_oneshot(send_msg_pkt_oneshot, tx, NULL);
- }
- 
--static enum _relay_advice packet_received(void *user_data,
-+static enum _relay_advice packet_received(struct mesh_net *net,
- 				uint32_t net_key_id, uint16_t net_idx,
- 				bool frnd, uint32_t iv_index,
--				const void *data, uint8_t size, int8_t rssi)
-+				const uint8_t *data, uint8_t size, int8_t rssi)
- {
--	struct mesh_net *net = user_data;
--	const uint8_t *msg = data;
-+	const uint8_t *msg;
- 	uint8_t app_msg_len;
- 	uint8_t net_ttl, key_aid, net_segO, net_segN, net_opcode;
- 	uint32_t net_seq, cache_cookie;
- 	uint16_t net_src, net_dst, net_seqZero;
--	uint8_t packet[31];
- 	bool net_ctl, net_segmented, net_szmic, net_relay;
- 
--	memcpy(packet + 2, data, size);
--
--	print_packet("RX: Network [clr] :", packet + 2, size);
-+	print_packet("RX: Network [clr] :", data, size);
- 
--	if (!mesh_crypto_packet_parse(packet + 2, size, &net_ctl, &net_ttl,
-+	if (!mesh_crypto_packet_parse(data, size, &net_ctl, &net_ttl,
- 					&net_seq, &net_src, &net_dst,
- 					&cache_cookie, &net_opcode,
- 					&net_segmented, &key_aid, &net_szmic,
-@@ -2418,7 +2414,7 @@ static enum _relay_advice packet_received(void *user_data,
- 				if (net_ttl >= 2) {
- 					friend_seg_rxed(net, iv_index, net_ttl,
- 						net_seq, net_src, net_dst,
--						l_get_be32(packet + 2 + 9),
-+						l_get_be32(data + 9),
- 						msg, app_msg_len);
- 				}
- 			} else {
+diff --git a/tools/parser/parser.h b/tools/parser/parser.h
+index 5f65f1689447..cd6268acb893 100644
+--- a/tools/parser/parser.h
++++ b/tools/parser/parser.h
+@@ -120,11 +120,14 @@ static inline void p_indent(int level, struct frame *f)
+ 				struct tm tm;
+ 				time_t t = f->ts.tv_sec;
+ 				localtime_r(&t, &tm);
+-				printf("%04d-%02d-%02d %02d:%02d:%02d.%06lu ",
++				printf("%04d-%02d-%02d %02d:%02d:%02d.%06lld ",
+ 					tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+-					tm.tm_hour, tm.tm_min, tm.tm_sec, f->ts.tv_usec);
++					tm.tm_hour, tm.tm_min, tm.tm_sec,
++					(long long int)f->ts.tv_usec);
+ 			} else
+-				printf("%8lu.%06lu ", f->ts.tv_sec, f->ts.tv_usec);
++				printf("%8lld.%06lld ",
++						(long long int)f->ts.tv_sec,
++						(long long int)f->ts.tv_usec);
+ 		}
+ 		printf("%c ", (f->in ? '>' : '<'));
+ 		parser.state = 1;
 -- 
 2.43.0
 
