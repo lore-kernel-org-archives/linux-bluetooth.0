@@ -1,151 +1,106 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B7F2EAD00
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 17:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C031E0B91
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 18:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751043977; cv=none; b=in3lcizzPZ/TN0gxrZIlplsq07590S3HMAtvhYESYwEj55FErcsKEt2dN0ffHPKo5jZ+MWEFRuN640D7WCltPSbSddiF5lPrJCjAFmIUIAMmOOZeYseZM+hLUeovYZ2kohgpGumjl2kbO++mX6DLhznkCbZ2GOMdzum5o1vds2A=
+	t=1751048156; cv=none; b=JvLRm5btCIYhoVzPiYyA4k+55eh81B7p1qy9TYJyaxMNn+gawXDeGVdfQ79O+GWCUxMwJn85ra1B9m3KGlsX2JdA+eSpu1SFRHculfWyGPKh91c8QBYVGzC7J39AhM7hrLrTscdaukQg9MSBBV/u9zrvcQ7C/HqBRlSG3Z9t1dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751043977; c=relaxed/simple;
-	bh=63A/M0HRB7x15t0dvHR4aDURKf9CbB7LrYHeSykfPgo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ifw1ppnO2ZI7CxdGJ9ahPvi/hLL3KoaWgxCjWWu0AcBM4PIJ8n0sCzm+HKaP4DvGoQ/EOMQ0rcTSy05SpCxCAQgo+2WyAjSC/rfC13p7GPA68sgTinPrrJdzqjJhNpyrNtklzpLKZpUCTgFdWrZs8CBX6b8HhjVQOqaY0V8C4Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f+k5GFVF; arc=none smtp.client-ip=209.85.219.43
+	s=arc-20240116; t=1751048156; c=relaxed/simple;
+	bh=cWfp2bVZlb5/JYVLvEWhQVG2ghTf0X5peEWW2OHHyNA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SdXCCLMYFoPs09PGUaAz2/RprbCaxPAPBsACUnldBSgPuXnFitWEPOds7eOtYHeDxmImYWZoEjyUs/U/DmkKbcom59JYOqy8+TuE2YwVm9bpQFSYos/LrUVBZCOctJduZskb2P92q/BS0zWuFRbq6DeJygKlfO/33TutTMx1Y7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VMqtjy/K; arc=none smtp.client-ip=209.85.217.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f+k5GFVF"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6f8aa9e6ffdso25584576d6.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 10:06:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMqtjy/K"
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4e770bb7b45so640429137.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 11:15:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751043975; x=1751648775; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JHFtQo8oaTzcayYG+6OXtDlxOTozpVmSj7eUg6zOPkg=;
-        b=f+k5GFVFK49lYycVC4WyFDL/ZeRtHoQW49qwOWCKmJWvI7+FaHy8aXlf3wbTjVvS2u
-         WQghAWCXUm0Zexh+CNP6eYzHfnx93JSYqdEhj8q49WR1w2zAdn3GOSRwpnu3F20VvHgl
-         TlA8I8ymQCFGBUOpms2o3vYiuF4aWPRSMVJIjwdr+wAwfE+Fi5Q0fqBk45zbL4uGO1BF
-         wTTcL26X5+d+nOmPhOK74jzKkNjATyEPy0m1sjUa+PBt/QVJoG1QGEKqOAsAx3uTLZz4
-         Kr7tEuZT1voiY6aRzt0ZQ9aPn58W5oxzk3cr02yV2quz4dxKiRZ2tfqHO/X7CESDO6JM
-         5H+Q==
+        d=gmail.com; s=20230601; t=1751048153; x=1751652953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OREOvp6OrkVWubltBXib1I/xwDpMOns70Qw+MvbSJy8=;
+        b=VMqtjy/KPE9l+dffkaXeptQi3OhokBIsOGJyT7w3L8Lt7JyaYVBVCpWj+Xw6iZ6uzl
+         090twaGvTATrn3LUli5floETWBg/fA4yMwUQxVnvdPUYYJm0uRJNamBOjCVM+7ESn2Fw
+         F0QzEl/bC9uMWyxMMoKZhHLSGgDpOOoXXDsrllKVXTNgqspW/hnepKo6dn17rWCFEPjV
+         86BfhJh/qxNs+R58RtojiZxIlAC+a26ZSbOnR/LfBPoG+jXtCfNF3I3n5z4HCgOpW8os
+         roEuotdKJe0R8YSUJ2Qlt3B/xb2IpZ3J3TQFr/6KIqsjWutGVdtRUwz48zX39/ezZYze
+         ODfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751043975; x=1751648775;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JHFtQo8oaTzcayYG+6OXtDlxOTozpVmSj7eUg6zOPkg=;
-        b=aqTPyR7q0yZyfCSRqt5IM/QDFPnkidnTYGd9YTt9xKVvOOY/uORC4s/ByZpa61Uguu
-         FNjfqqBaX59KBgldPXhI+znTHpakj8gxYgACxxfZ+YS5Myjw8hZZjDcRx54xsZoI6H9t
-         2wPPCzUKJSR5BO4JIuIVmDkKw6Qp6+yitIdAJaIpOjk5XTYkiDBd5qz8MJbsgtZvpc6s
-         7Ib5w1jbGvWuy63SIWLNBjT6uzOFYV+UTvmfCqCsXYohuf52SizQk09ZyZKv1OfJ6GsF
-         bNr1/iFyLH50aC6hsdvJ8kSSD59O6UUDwOvX1wpqJIvxdilQaJXu+vtIg+7cOZRu3JFy
-         NawA==
-X-Gm-Message-State: AOJu0YzvbQca8b9oEYSVtJT323KRYfTCy8S/bzwH+J9T1x57qjdjz8lz
-	QVOWXzHLpdH+S4ht8aCLmpOfRr32PeQ+wAxhucD7P7uEN+sdhtM4hNyyIQMO1Q==
-X-Gm-Gg: ASbGnctcVe+R8XyQAKvFQ3VaVgTaVSuAHIS+oakgoQgacLh2HeySQYVeuqBJEslTBkW
-	ocCfbKCwLGWmC+456L7Ah19+ILQ6xj0tNx0Hw9NteFTzjMn48Xt7/rBqJj6WahRdrfFQhRUbazZ
-	CYDV2Jf9LgV5RtUv3s2pWAcbkKmeacn7eRo1z9iFxRYe6yIx4pam5RU2DCgDSqlwDNoYJPyinVv
-	K7KEEfBunaWFOYuv5jP2Vg/y0YeMQby6YEuhwe1p0Pf1HOlwCmaiAKuemmxvkp/rure5ijhtQux
-	FS7JhtNnG2IOP3yyBuP8bm6RhO3/1ygUkCwHuejY+aK51j67D/kw9lSIDAcMR3AoUjmG1Q==
-X-Google-Smtp-Source: AGHT+IFZ076UVSv6U/GKrpowTPC759QFLZwkN/LtCUmufSczVYOwDzlOnju0dusWmQAyhrO1ebD/NA==
-X-Received: by 2002:a05:6214:21ea:b0:6fd:5cf4:cbb0 with SMTP id 6a1803df08f44-70012de5f96mr73851166d6.25.1751043974616;
-        Fri, 27 Jun 2025 10:06:14 -0700 (PDT)
-Received: from [172.17.0.2] ([172.203.175.14])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd771abd15sm24161116d6.29.2025.06.27.10.06.13
+        d=1e100.net; s=20230601; t=1751048153; x=1751652953;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OREOvp6OrkVWubltBXib1I/xwDpMOns70Qw+MvbSJy8=;
+        b=MYQklgBwcu9Il3VziicM9algIYADXvszy//sUTv8BmigvFz5fzXbUiN9B4ptZWeB8L
+         O+EQeoUR8OohSEgO4UU2y6i3yLlNzeGGZDw6QmiMYb4fFCsmLXQy8r3NEA6ZFYjspPql
+         Ybj73lPApb3hLswS4GH1GIkLp3F4OtgKfpaIkL3e/llMvqXl2Sm7BAjjhTZUJiP4MtYv
+         FNJwuXwC1rJuPGR4vnm1cUDZMw//pBe4oC26Bv7X1Rvkr+KLPOO/QNASKb0VVjowa7io
+         iSMtzbb5VwGS+FcwOVuXuDyb7e2svLJq5F73tR/cz+hwrnk5O2VAYoyhpxbupzEHFizD
+         LpMg==
+X-Gm-Message-State: AOJu0YxUvjmD6zyte9TInWaHU2eq5zU+MBAAzJ3YzwXlRPPpvdGK42CH
+	BUJyILg7FnP9P/eCgwn46uACpZKIFs9Co8k3nOTQLmcBzwalAXngiCHowJtVe4JL
+X-Gm-Gg: ASbGnctTyC08GdQHPOh9HgaT2peWm+9yU6iYM5gjWMHx0n3gDBAx0g/y/zo7RFEWufO
+	RplOCuVvAOVkAnbtahHkpxDKUHJpq8tJ+tvLuZ87TdxhBwHzWhw5mHN8XuYbB51pnp5W9F8OoM/
+	Ey//zyYVmg2j8gPqnnfSJdvQyJIgXSqfYxXerM8ZKUd1WVCJuLFBQk6p3eL/ajpDAwtzy19CRtw
+	N+VmTuuVzAlQjIsZBJbdKkYVMB8ZVMsLCremSFTDFDpV/f8EnVmFbFPU9ylpnkSG1/SKMxGLC6x
+	TtPBiFVZQ+5kAfpg7YI+GU95j0CeOj5sBvMd5DmTNF9BT+68lbVmMk4RaiJTtFSyJ7LITV54rBP
+	WxPioVvHKl2r9pIhnYKNMsAcz+AeHd2s=
+X-Google-Smtp-Source: AGHT+IH23DMtuZWAXGqtmr6hsFGkNRalf/GTJTD22djDjk5V607/lf8l8q+Qg3zMoaeqRaHMJhIjqQ==
+X-Received: by 2002:a05:6102:5109:b0:4dd:b82d:e0de with SMTP id ada2fe7eead31-4ee4f766856mr3650257137.17.1751048153449;
+        Fri, 27 Jun 2025 11:15:53 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-884d5224562sm569388241.34.2025.06.27.11.15.52
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jun 2025 10:06:13 -0700 (PDT)
-Message-ID: <685ecf85.d40a0220.207b8.8d13@mx.google.com>
-Date: Fri, 27 Jun 2025 10:06:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5850105461496113558=="
+        Fri, 27 Jun 2025 11:15:52 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-06-27
+Date: Fri, 27 Jun 2025 14:15:51 -0400
+Message-ID: <20250627181551.520358-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: hci_sync: Fix not disabling advertising instance
-In-Reply-To: <20250627163133.430614-1-luiz.dentz@gmail.com>
-References: <20250627163133.430614-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5850105461496113558==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The following changes since commit e34a79b96ab9d49ed8b605fee11099cf3efbb428:
 
-This is automated email and please do not reply to this email!
+  Merge tag 'net-6.16-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-26 09:13:27 -0700)
 
-Dear submitter,
+are available in the Git repository at:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=976739
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-06-27
 
----Test result---
+for you to fetch changes up to 89fb8acc38852116d38d721ad394aad7f2871670:
 
-Test Summary:
-CheckPatch                    PENDING   0.26 seconds
-GitLint                       PENDING   0.21 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      24.88 seconds
-CheckAllWarning               PASS      27.37 seconds
-CheckSparse                   PASS      30.87 seconds
-BuildKernel32                 PASS      24.84 seconds
-TestRunnerSetup               PASS      486.23 seconds
-TestRunner_l2cap-tester       PASS      26.24 seconds
-TestRunner_iso-tester         PASS      37.76 seconds
-TestRunner_bnep-tester        PASS      6.15 seconds
-TestRunner_mgmt-tester        FAIL      139.43 seconds
-TestRunner_rfcomm-tester      PASS      9.59 seconds
-TestRunner_sco-tester         PASS      15.05 seconds
-TestRunner_ioctl-tester       PASS      10.46 seconds
-TestRunner_mesh-tester        FAIL      11.30 seconds
-TestRunner_smp-tester         PASS      8.70 seconds
-TestRunner_userchan-tester    PASS      6.36 seconds
-IncrementalBuild              PENDING   0.38 seconds
+  Bluetooth: HCI: Set extended advertising data synchronously (2025-06-27 14:01:20 -0400)
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+----------------------------------------------------------------
+bluetooth pull request for net:
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+ - MGMT: set_mesh: update LE scan interval and window
+ - MGMT: mesh_send: check instances prior disabling advertising
+ - hci_sync: revert some mesh modifications
+ - hci_sync: Set extended advertising data synchronously
+ - hci_sync: Prevent unintended pause by checking if advertising is active
 
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+----------------------------------------------------------------
+Christian Eggers (4):
+      Bluetooth: hci_sync: revert some mesh modifications
+      Bluetooth: MGMT: set_mesh: update LE scan interval and window
+      Bluetooth: MGMT: mesh_send: check instances prior disabling advertising
+      Bluetooth: HCI: Set extended advertising data synchronously
 
-Failed Test Cases
-LL Privacy - Add Device 3 (AL is full)               Failed       0.249 seconds
-LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.179 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+Yang Li (1):
+      Bluetooth: Prevent unintended pause by checking if advertising is active
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.865 seconds
-Mesh - Send cancel - 2                               Timed out    1.991 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5850105461496113558==--
+ net/bluetooth/hci_event.c |  36 --------
+ net/bluetooth/hci_sync.c  | 227 ++++++++++++++++++++++++++++------------------
+ net/bluetooth/mgmt.c      |  25 ++++-
+ 3 files changed, 162 insertions(+), 126 deletions(-)
