@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D369E2E8E0D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F188A2E92BD
 	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 14:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751035920; cv=none; b=c4qD1cX2925kKYZdhb245ugmBbJkRgvFFeYmNj7eQc/0iRB9Phhk5WZFNLRA9n0+llNeDPdFrXGZMMxe1sT6MMx6Cihqrd9ZnYLItSThVTpBy8lsz+qq05lHapGrNoRewoA8hxz4BVnaIFmH5O/FNJ3vHtKf0KALJYw7DKeAqnQ=
+	t=1751035920; cv=none; b=BEbodIilGDcho2XuWUNLp1PtoCAJ0PTVGisSWML8zrtq9GHM75bZH+jjytiqieC0mLAjIK9jjZfM9jtJbzDLz03HT/UFRs87ujpjqJ1jN9dTSLZkHCT1TOnvipjNaoN9mLu4aM4+XVlm/7Nc0HHrUUG1ukX9kjTbRNIMaJ8izI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751035920; c=relaxed/simple;
-	bh=QYjsqyxW+d+/TL1kkIr1vG/pv1MF6DrRbo375lHz++I=;
+	bh=lMeScscwfTxMOUGzu+/9edBarOFw8BAUInA0zkZ8WnY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ku3CdBPUlm3n6taR8x6B+gOlE/t0NH9QEbGE8qd4gKFoAessH+WIUab2iYKme0WtTan3VkIzYVf0g9sA6VRjMKI/85mPrzBju4+hDQyFLVSN+Dgyg049OCxf0eT/AsS1SBYGmCxsyvCwjiwV8Q5Qjc1eo7m3JB20JmMhzl8F09A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=drb767NE; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=WC1ZqMsUEza8NxaJuXQMZwJabU3mmGECY7hmoVhl9jA2W4/lyn5ch/nH9ws/n5GQtPrd6wqwBCCZhIEFLWuL7uZc3LWDFpDgcaWZPCP0lrhmy/dqrG4qcrvsjR/TNFb4mHEE+Mu4Uo0AuRfdS27Xdv8Rd3NI2Zn82/iwWdUNyCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=YOE5xZvP; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="drb767NE"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YOE5xZvP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1751035907;
-	bh=QYjsqyxW+d+/TL1kkIr1vG/pv1MF6DrRbo375lHz++I=;
+	s=mail; t=1751035908;
+	bh=lMeScscwfTxMOUGzu+/9edBarOFw8BAUInA0zkZ8WnY=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=drb767NEEI7YHzAMzk+o/jnStpRWL+Cbots9PtNYmcU2sA9D/2W4dB00d92xiNah9
-	 bm+jfBZRUgUSJq2r782jqHaqgdaWxoYmlpDDZMiq3s0gEaaf4+kA0aDFs7kOE5+dAm
-	 yzcC3u6Yf52AvTaclHQFjHxOhSZ36M6Fv92OfFTh6iZZ0+xLCS5BQnd0BXK6MzM6lN
-	 siY89K54ODWq+FxXB34ADTBBXHlLCuQo/jhq7rsS7niM315BcQj/5TlW0Kpx7mu41Y
-	 u3IISCdGxkbor9UU2fxd0CZU6IxBwxN+vFJUzGEZA/9q94aIj2ZPegwYQt2plIPYMJ
-	 vCOzLeTDywFkw==
+	b=YOE5xZvPCf1ZIV8bWKOlSwG6uG/iJPAXVKDkcAWL41Bfh8RldWn30ZAM8czQsuy3/
+	 Nxjx+7tMORKw00MA9Yhmxxs1qwJxnA6TDZewJz7AoMckHzORG87eXURBWJ9n/PFqFO
+	 koOLGBNLXiIhCl6+ZEYFjm5eAk7pMLpRGdKerJfFMpnqa2e0USb86OqwxGK8w9MHhu
+	 QZCDWf+qM9h2bS6z5uVpXbGnetxiXF1jxCaiUZDUUhFjS7sY1K8d18jp+dqQxhkya/
+	 lNvHLbVXNF6Re5v2766u1ThwZimFLcBwJM100xG8ii9w9dzxePuv+2bnDS6bPpdLd+
+	 aNDGVp7Y3x5Xw==
 Received: from fdanis-ThinkPad-X1.. (2A02-8428-Af44-1001-81C9-67b7-a328-2001.rev.sfr.net [IPv6:2a02:8428:af44:1001:81c9:67b7:a328:2001])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5AAB717E0B84
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id ED27C17E0B8C
 	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 16:51:47 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ v2 18/27] audio/telephony: Remove IncomingLine
-Date: Fri, 27 Jun 2025 16:51:27 +0200
-Message-ID: <20250627145136.421853-19-frederic.danis@collabora.com>
+Subject: [RFC BlueZ v2 20/27] audio/hfp-hf: Add operator name support
+Date: Fri, 27 Jun 2025 16:51:29 +0200
+Message-ID: <20250627145136.421853-21-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250627145136.421853-1-frederic.danis@collabora.com>
 References: <20250627145136.421853-1-frederic.danis@collabora.com>
@@ -50,75 +50,85 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This property has been removed from the documentation.
+This adds the AT+COPS command.
 ---
- profiles/audio/telephony.c | 26 --------------------------
- profiles/audio/telephony.h |  1 -
- 2 files changed, 27 deletions(-)
+ profiles/audio/hfp-hf.c | 48 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/audio/telephony.c b/profiles/audio/telephony.c
-index 2a4c19a58..5e88240e6 100644
---- a/profiles/audio/telephony.c
-+++ b/profiles/audio/telephony.c
-@@ -616,7 +616,6 @@ void telephony_free_call(struct call *call)
- 		dbus_message_unref(call->pending_msg);
+diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
+index b49d40a43..ebe87d8db 100644
+--- a/profiles/audio/hfp-hf.c
++++ b/profiles/audio/hfp-hf.c
+@@ -107,6 +107,8 @@
+ 				HFP_HF_FEAT_ENHANCED_CALL_STATUS |\
+ 				HFP_HF_FEAT_ESCO_S4_T2)
  
- 	g_free(call->name);
--	g_free(call->incoming_line);
- 	g_free(call->line_id);
- 	g_free(call->path);
- 	g_free(call);
-@@ -662,29 +661,6 @@ static gboolean call_property_get_line_id(
- 	return TRUE;
++#define MAX_OPERATOR_NAME_LEN 17
++
+ enum hfp_indicator {
+ 	HFP_INDICATOR_SERVICE = 0,
+ 	HFP_INDICATOR_CALL,
+@@ -354,6 +356,49 @@ static void ciev_cb(struct hfp_context *context, void *user_data)
+ 	}
  }
  
--static gboolean call_incoming_line_exists(const GDBusPropertyTable *property,
--	void *data)
--{
--	struct call *call = data;
--
--	return call->incoming_line != NULL;
--}
--
--static gboolean call_property_get_incoming_line(
--	const GDBusPropertyTable *property,
--	DBusMessageIter *iter, void *data)
--{
--	struct call *call = data;
--
--	if (call->incoming_line == NULL)
--		return FALSE;
--
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
--		&call->incoming_line);
--
--	return TRUE;
--}
--
- static gboolean call_name_exists(const GDBusPropertyTable *property,
- 	void *data)
++static void cops_cb(struct hfp_context *context, void *user_data)
++{
++	struct hfp_device *dev = user_data;
++	unsigned int format;
++	char name[MAX_OPERATOR_NAME_LEN];
++
++	DBG("");
++
++	/* Not interested in mode */
++	hfp_context_skip_field(context);
++
++	if (!hfp_context_get_number(context, &format))
++		return;
++
++	if (format != 0) {
++		warn("hf-client: Not correct string format in +COPS");
++		return;
++	}
++
++	if (!hfp_context_get_string(context, name, MAX_OPERATOR_NAME_LEN)) {
++		error("hf-client: incorrect +COPS response");
++		return;
++	}
++
++	telephony_set_operator_name(dev->telephony, name);
++}
++
++static void cops_resp(enum hfp_result result, enum hfp_error cme_err,
++							void *user_data)
++{
++	struct hfp_device *dev = user_data;
++
++	DBG("");
++
++	if (result != HFP_RESULT_OK) {
++		error("hf-client: COPS error: %d", result);
++		return;
++	}
++
++	if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, dev, "AT+COPS?"))
++		info("hf-client: Could not send AT+COPS?");
++}
++
+ static void slc_completed(struct hfp_device *dev)
  {
-@@ -742,8 +718,6 @@ static const GDBusMethodTable telephony_call_methods[] = {
- static const GDBusPropertyTable telephony_call_properties[] = {
- 	{ "LineIdentification", "s", call_property_get_line_id, NULL,
- 			call_line_id_exists },
--	{ "IncomingLine", "s", call_property_get_incoming_line, NULL,
--			call_incoming_line_exists },
- 	{ "Name", "s", call_property_get_name, NULL, call_name_exists },
- 	{ "Multiparty", "b", call_property_get_multiparty },
- 	{ "State", "s", call_property_get_state },
-diff --git a/profiles/audio/telephony.h b/profiles/audio/telephony.h
-index b02111264..3f7580e80 100644
---- a/profiles/audio/telephony.h
-+++ b/profiles/audio/telephony.h
-@@ -70,7 +70,6 @@ struct call {
- 	uint8_t			idx;
+ 	int i;
+@@ -376,8 +421,9 @@ static void slc_completed(struct hfp_device *dev)
+ 	/* TODO: register unsolicited results handlers */
  
- 	char			*line_id;
--	char			*incoming_line;
- 	char			*name;
- 	bool			multiparty;
- 	enum call_state		state;
+ 	hfp_hf_register(dev->hf, ciev_cb, "+CIEV", dev, NULL);
++	hfp_hf_register(dev->hf, cops_cb, "+COPS", dev, NULL);
+ 
+-	if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, NULL, "AT+COPS=3,0"))
++	if (!hfp_hf_send_command(dev->hf, cops_resp, dev, "AT+COPS=3,0"))
+ 		info("hf-client: Could not send AT+COPS=3,0");
+ }
+ 
 -- 
 2.43.0
 
