@@ -1,141 +1,256 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006AA1DF980
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jun 2025 21:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E38123DE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 03:02:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750974533; cv=none; b=Yektc2ZPCJjFjSsG8chhPwaJ1PAw3x5q5wnIl+0yPqZGFfwmfxvBWgpzNRAGSAVXsEP9wkN4O9tEKr3qvJM0LHQ/LqnbzTczTwlu3cGDAVDmHCJv5DjKhto3agZWdcYKa71/Ri9n4LxjucQd1yZjWGWR5mZobnDbt8c0pQun0Lw=
+	t=1750993361; cv=none; b=etV3fet1B7KvGHnlz4fqdAGm+yt00OD0OB3t0dPVdVb2xRrNGpJR5nKZTeGmJFjJ/RXORJQ6S1vJkbBont14qC+Ej38lDt7M8X7/Yf4snT9cWlDvQ7W6fp8ZhzUWmIl6e8Ko0yjVZCXkROkAapJlVzVavSGO1eJrpeJ8107rHmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750974533; c=relaxed/simple;
-	bh=QzkrBq2pmItU5nclfjpVteMKcLMt9fLT6tVDqd6eo2k=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=d5yIoTsudlR3OmAkUBlyr0mw/k1+PhWWEoYHtRgElC5qKpYhxHRI5RB1N/Qacmrns/NzHYp2Dm+Z6KBXLElYXpVslHk3gh1SRh6k2+OmM1uzvZiezuo2iFJbv8wC+CUJmRayEQLaRSTSrfdyB2Rfe6lSSeUt/XP6diCZBofmqG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b+E9RQ4V; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1750993361; c=relaxed/simple;
+	bh=98tRSPK+RoSkthxkJnOi8slzkcO+ey7JNfkItdkQLqw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=KotXV3qimVfRr4Dtxky9nfo6g/ym4YaMlcVk/fu9uXPkO7sxtRCM6KQ2QSfyTykdeml6Y1byhHvGDD+41PngiKGTGK7t6m6xWvqZ7UjITFv0fOHjT1hiyvwYJQZcQQK5rcdziCZNdCoIFGBO8xV7ZxMDTDS1s8hW+HlVzsECnuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=XE/WHOPK; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b+E9RQ4V"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750974532; x=1782510532;
-  h=date:from:to:cc:subject:message-id;
-  bh=QzkrBq2pmItU5nclfjpVteMKcLMt9fLT6tVDqd6eo2k=;
-  b=b+E9RQ4VqdcsWP9X1yuafGm9zj1BrbFGFEOsgFM3iBsl/0WsOdyC6RHP
-   tv7oKOQYLJcSaQfpcK5D7x1KGBsHe9ZoxN2VQCkGAXfZQ68wROsF+erXy
-   Vrim5ASPWgsUSfHXpAjZ5KsQ7TyQSU+vuEO+CAbLfQi3LIO9B4Xwmt5t3
-   /W4lsH1uQNDC6721/VCG/raMiTgOMUK/WX1WtJParNi2I4h3GpC6jfBOO
-   2OLpFp8k4JbyTy9BSc4us5WWGQHeol5jOvDdQiOdqQzmfrPEsd2bTl5U1
-   wniYR+R3LN84Z4Z9iZ8hRlK3ZgYfQv09k8hy17bvSFTcdML7Wy70Bju3Y
-   Q==;
-X-CSE-ConnectionGUID: DrFngAgcSy6vPN+Yx/i1Cw==
-X-CSE-MsgGUID: DUWhdB1xR42isxbo7j9NKw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11476"; a="57092051"
-X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
-   d="scan'208";a="57092051"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 14:48:51 -0700
-X-CSE-ConnectionGUID: 06WJYoxHS2S+ZtrmpBYVWQ==
-X-CSE-MsgGUID: qoQmUCRFSFGQOgRw1ePQ/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
-   d="scan'208";a="157010843"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 26 Jun 2025 14:48:51 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uUuSd-000VYo-2D;
-	Thu, 26 Jun 2025 21:48:47 +0000
-Date: Fri, 27 Jun 2025 05:48:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 8dcd9b294572b6cf5ce780bd7f436dfa8a1c579a
-Message-ID: <202506270555.fAN07se6-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XE/WHOPK"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55QLZ27N008202
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 03:02:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=O7/yg8B/h+6SX7ha0PpqMr
+	R/ZbUyrZFYX7g5nACx5oc=; b=XE/WHOPKVMvLt61X+6tkmh5jicRfMi6ed5ml/2
+	Q8CWcr4NNqEbsjYRv5NVLbA/OnzecmYDegpBCv5dZivTu4fo3h9gM+PqdO0q+5i0
+	BVp8QyF1H0gm5Pa9fObIh7PdQ3gw6hIz1zo08CjeeKtPYQ6O98ZQiwe+HqfYpjvT
+	Tb+/P4bABJGPeOnIvZzCaole4Bxi1/drBeoxfdp8T/g17XjtMew3GtXQLkvNlgTT
+	FlUoxBy+gXaGRfyXce4NIFV+7BjNYYMEbgkFTIgpMcnRKZ+xFy1fwqJZPd6VwWs/
+	maCpHRMjTDkX1VAWu/aLTrG8dxGVUeO92oioBy3uAN+E/JoA==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47fbhqup8d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 03:02:36 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 55R32XQI006071
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 03:02:33 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 47dntmp13w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 03:02:33 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55R32WgO006065
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 03:02:32 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 55R32W8V006063
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Jun 2025 03:02:32 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
+	id B1B1F22998; Fri, 27 Jun 2025 11:02:31 +0800 (CST)
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: quic_bt@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
+Subject: [PATCH v1] net: bluetooth: add callback to exe l2cap when read_security uncompleted
+Date: Fri, 27 Jun 2025 11:02:29 +0800
+Message-Id: <20250627030229.1720287-1-quic_shuaz@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: JMCN85UtPvII7SXJTW7_E-lf9Cxtsxwo
+X-Authority-Analysis: v=2.4 cv=Id+HWXqa c=1 sm=1 tr=0 ts=685e09cc cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=COk6AnOGAAAA:8 a=HPSoKVYdNdeX-JuY4BoA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: JMCN85UtPvII7SXJTW7_E-lf9Cxtsxwo
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI3MDAyNCBTYWx0ZWRfX2xYOy5dqsbKp
+ xQC61U21bPoMLK0OTvVpgulJJI8HTsE0jAgk/Guu5/58W0d+CVeV1j50kIgFSKV2mHETt9rQnHZ
+ bhDHCH8cf0qnZzg+nnNsPWhYinzLXvGT4Y1C1QfVdjHNrYudUHDyJhxo0ELImTsgdRbC1pmam4U
+ WIG6LzvqnhwWVCcc7n4wjgLmJ5D4MvmZiySzsgq6FA05pjCoxgZV95l1QPqxkJlWykDsx+03XHe
+ 7RRR9YwFM0tXU36eEW7l7gfC6wC2X+OYew6SbsE3MH5N2IXGb+Z1vGmh5JPS65vajdmI6JTdN94
+ qG4G+klB71DjRjZlNfXVNlhARylLABidVn7A4ShTjEwcvVYPfraJeUs3Et/pobW/JtI4H3vs3ja
+ bpIGAso4jDw7FrNxxV7cIss/tXv3p+pEvr5XzuU1uYdAbRGFlNIFY8TMy4cit5+669+oPaCZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-27_01,2025-06-26_05,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0 bulkscore=0
+ clxscore=1011 impostorscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506270024
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 8dcd9b294572b6cf5ce780bd7f436dfa8a1c579a  Bluetooth: MGMT: mesh_send: check instances prior disabling advertising
+When the DUT receives a remote L2CAP Connection Request during the Read
+Encryption Key Size procedure, if it fails to complete reading the
+Encryption Key Size while processing the request, it will respond with
+a Connection Response – Refused (security block), resulting in the
+disconnection of the remote device.
 
-elapsed time: 1452m
+Use HCI_CONN_ENC_KEY_READY to determine whether
+l2cap_connect_request is pending.
 
-configs tested: 64
-configs skipped: 1
+When l2cap_connect occurs before the read_enc_key_size event, it will
+be pending because HCI_CONN_ENC_KEY_READY has not yet been set.
+The connection request will be processed once the read_enc_key_size
+event completes.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+---
+ include/net/bluetooth/hci_core.h |  3 +++
+ include/net/bluetooth/l2cap.h    | 10 +++++++++-
+ net/bluetooth/hci_event.c        | 16 ++++++++++++++++
+ net/bluetooth/l2cap_core.c       | 30 ++++++++++++++++++++++++++++++
+ 4 files changed, 58 insertions(+), 1 deletion(-)
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                            allyesconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                   randconfig-001-20250626    gcc-12.4.0
-arc                   randconfig-002-20250626    gcc-13.3.0
-arm                               allnoconfig    clang-21
-arm                   randconfig-001-20250626    clang-21
-arm                   randconfig-002-20250626    clang-20
-arm                   randconfig-003-20250626    gcc-10.5.0
-arm                   randconfig-004-20250626    clang-21
-arm64                             allnoconfig    gcc-15.1.0
-arm64                 randconfig-001-20250626    clang-21
-arm64                 randconfig-002-20250626    clang-17
-arm64                 randconfig-003-20250626    gcc-6.5.0
-arm64                 randconfig-004-20250626    clang-21
-csky                              allnoconfig    gcc-15.1.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-21
-hexagon                          allyesconfig    clang-21
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    gcc-12
-i386        buildonly-randconfig-001-20250626    clang-20
-i386        buildonly-randconfig-002-20250626    clang-20
-i386        buildonly-randconfig-003-20250626    clang-20
-i386        buildonly-randconfig-004-20250626    clang-20
-i386        buildonly-randconfig-005-20250626    clang-20
-i386        buildonly-randconfig-006-20250626    clang-20
-i386                                defconfig    clang-20
-loongarch                        allmodconfig    gcc-15.1.0
-loongarch                         allnoconfig    gcc-15.1.0
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    gcc-15.1.0
-microblaze                       allmodconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                       allyesconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-nios2                             allnoconfig    gcc-14.2.0
-openrisc                          allnoconfig    gcc-15.1.0
-parisc                            allnoconfig    gcc-15.1.0
-powerpc                           allnoconfig    gcc-15.1.0
-riscv                             allnoconfig    gcc-15.1.0
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-15.1.0
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    gcc-15.1.0
-sparc                            allmodconfig    gcc-15.1.0
-sparc                             allnoconfig    gcc-15.1.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-21
-um                               allyesconfig    gcc-12
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250626    clang-20
-x86_64      buildonly-randconfig-002-20250626    clang-20
-x86_64      buildonly-randconfig-003-20250626    clang-20
-x86_64      buildonly-randconfig-004-20250626    clang-20
-x86_64      buildonly-randconfig-005-20250626    clang-20
-x86_64      buildonly-randconfig-006-20250626    clang-20
-x86_64                              defconfig    gcc-11
-x86_64                          rhel-9.4-rust    clang-18
-xtensa                            allnoconfig    gcc-15.1.0
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b47c74080..db329abbf 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -767,6 +767,8 @@ struct hci_conn {
+ 
+ 	struct bt_codec codec;
+ 
++	struct l2cap_pending_connect *pending_connect;
++
+ 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
+ 	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
+ 	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
+@@ -970,6 +972,7 @@ enum {
+ 	HCI_CONN_CREATE_PA_SYNC,
+ 	HCI_CONN_PA_SYNC,
+ 	HCI_CONN_PA_SYNC_FAILED,
++	HCI_CONN_ENC_KEY_READY,
+ };
+ 
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 4bb0eaedd..b1ccd56bd 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -679,6 +679,13 @@ struct l2cap_user {
+ 	void (*remove) (struct l2cap_conn *conn, struct l2cap_user *user);
+ };
+ 
++struct l2cap_pending_connect {
++	struct l2cap_conn *conn;
++	struct l2cap_cmd_hdr cmd;
++	u8 data[sizeof(struct l2cap_conn_req)];
++	u8 rsp_code;
++};
++
+ #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
+ #define L2CAP_INFO_FEAT_MASK_REQ_SENT	0x04
+ #define L2CAP_INFO_FEAT_MASK_REQ_DONE	0x08
+@@ -976,5 +983,6 @@ void l2cap_conn_put(struct l2cap_conn *conn);
+ 
+ int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user);
+ void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user);
+-
++void l2cap_process_pending_connect(struct l2cap_conn *conn,
++				   struct l2cap_cmd_hdr *cmd, u8 *data, u8 rsp_code);
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c4b87bfb4..6c992f83e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -32,6 +32,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
++#include <net/bluetooth/l2cap.h>
+ 
+ #include "hci_debugfs.h"
+ #include "hci_codec.h"
+@@ -766,10 +767,23 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
+ 		/* Update the key encryption size with the connection one */
+ 		if (key_enc_size && *key_enc_size != conn->enc_key_size)
+ 			*key_enc_size = conn->enc_key_size;
++		set_bit(HCI_CONN_ENC_KEY_READY, &conn->flags);
+ 	}
+ 
+ 	hci_encrypt_cfm(conn, status);
+ 
++	/*Defer l2cap_connect here if it's triggered before key size is read.*/
++	if (conn->pending_connect) {
++		struct l2cap_pending_connect *pc = conn->pending_connect;
++
++		conn->pending_connect = NULL;
++
++		bt_dev_dbg(hdev, "Defer l2cap_connect");
++		l2cap_process_pending_connect(pc->conn, &pc->cmd, pc->data, pc->rsp_code);
++
++		kfree(pc);
++	}
++
+ done:
+ 	hci_dev_unlock(hdev);
+ 
+@@ -3396,6 +3410,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+ 	if (!conn)
+ 		goto unlock;
+ 
++	clear_bit(HCI_CONN_ENC_KEY_READY, &conn->flags);
++
+ 	if (ev->status) {
+ 		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+ 				       conn->dst_type, ev->status);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 40daa3827..c4cb60e65 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3982,6 +3982,30 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 	struct l2cap_chan *chan = NULL, *pchan = NULL;
+ 	int result, status = L2CAP_CS_NO_INFO;
+ 
++	/* If encryption is requested, but the key size is not ready yet,
++	 * we need to wait for the key size to be ready before we can
++	 * proceed with the connection. We do this by deferring the
++	 * connection request until the key size is ready. This is done
++	 * by storing the connection request in the hcon->pending_connect
++	 * field. The connection request will be retried when the key size
++	 * is ready.
++	 */
++	if (test_bit(HCI_CONN_ENCRYPT, &conn->hcon->flags) &&
++	    !test_bit(HCI_CONN_ENC_KEY_READY, &conn->hcon->flags)) {
++		struct l2cap_pending_connect *pc;
++
++		pc = kzalloc(sizeof(*pc), GFP_KERNEL);
++		if (!pc)
++			return;
++		pc->conn = conn;
++		memcpy(&pc->cmd, cmd, sizeof(*cmd));
++		memcpy(pc->data, data, sizeof(struct l2cap_conn_req));
++		pc->rsp_code = rsp_code;
++		BT_DBG("store request and retried when keysize is ready");
++		conn->hcon->pending_connect = pc;
++		return;
++	}
++
+ 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
+ 	__le16 psm = req->psm;
+ 
+@@ -4105,6 +4129,12 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 	l2cap_chan_put(pchan);
+ }
+ 
++void l2cap_process_pending_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
++				   u8 *data, u8 rsp_code)
++{
++	l2cap_connect(conn, cmd, data, rsp_code);
++}
++
+ static int l2cap_connect_req(struct l2cap_conn *conn,
+ 			     struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+ {
+-- 
+2.34.1
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
