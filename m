@@ -1,165 +1,155 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591481F3BA9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 06:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617FB2F3E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 06:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751005041; cv=none; b=Vao8y+BKxeRfarGqKtv0YZUu/9X0PF5nihBUyTSW8iFVZhOW+oFUfAlb+vWbDcKOtnBGiZnCYJdwv1dweb261Waei8eGyjse1OO52wLPycKjbPp/xsVd4be1jJKk74bxLg69GY3hFHkYK3V/fdsuwrE56NW9nytLiObN1AHaZx0=
+	t=1751006541; cv=none; b=ZqFzyAEnLCB5eMqck1BMRohzQT9w9HA5Orc3OMWJ2hzZeo7PTFqSRb/mdViaquWhjkQN1cXzaDtSk2I2BLBddpQdKfE1Wwm+STeMakI3DtvYLxPxplXJ5zFBRxOnFmxPCr3/bfdo6EzNLGLxSF+UO4dUOYaEN7bgHO//v3b8Y4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751005041; c=relaxed/simple;
-	bh=loeA2n+Yy99mLOPlKIykJvz+cuUTnTkE0VqunEc+eIE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=VONWyGBZmfbrGj4FNsFHdI2hrUQtXCTuqkzqnkctd53ltA8IkF90Teyl5Nn69UqvsIvCQUlOUcczv9YSQ5ZNfWbmtg9TrEMbohDVjo1cyAzfacg4Pgsh3z3UOhcojSmGiCfd5bFmzSUhkDJ3H9ehsJ+DgV/ipDKVaR5DUU+No/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=oIDJRWaC; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1751006541; c=relaxed/simple;
+	bh=N2FwxIb7MO7daxPIpY0kVH78C/iaNj9aZhnrJFCGq9U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=F8s61vrwor0tCKGdpK5YEzX36dogJgcVSvilEJIA5/YN743GyYJGkQqfcmupaIbydjazZ/B/pv96L05PuRG5nis75/m4sCygMSBeQAyJaGdjEJbZSSEGW8EsVo+4QqHSLdef4heqq35HyQliOuOyeB1kNMEFZCHR30ok8xmZhr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l4nUbybN; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oIDJRWaC"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55R4DEek009881
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 06:17:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=khca9vf4A70dyJB8Tgyz7I
-	ICflnjSE/1I8XrjYlT0FM=; b=oIDJRWaCzSWg4IOyfKYauxV8ZirMYHjEFkT5P/
-	53EOGjrfCV+FKDcyU1NX681yPxRe0TADL/m51kpktd0+w+XOFXRTY9dKQBMRm1sd
-	HyIWVYQGG1yYhcpU85vP7uBNI40MRnXSWVCHQSTF/qGBjwLLIoH32QkQ7++CWQ+k
-	Jo1v16B3x2g75qbR8eatr2nrvtxYQWxcTf/GzsBOl5Z/rqIkgnvT+NHIcDh8hFSq
-	/YgsL7Rm2E7IlcA7OTDhlwZY4NqFDMwjsOTuq4/883By03/1Zgr0YWhpktrf/Yji
-	34BGKT+o0qNLtGAi+xTfUA7og0yFLAIr4LMFIy7JUFNo9A3Q==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47g88ffd63-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 06:17:16 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 55R6HDpu010081
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 06:17:13 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 47dntmpvuq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 06:17:13 +0000
-Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55R6HCod010076
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 06:17:12 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 55R6HC7J010075
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 27 Jun 2025 06:17:12 +0000
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
-	id B10D92295C; Fri, 27 Jun 2025 14:17:11 +0800 (CST)
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: quic_bt@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
-Subject: [PATCH v2] driver: bluetooth: hci_qca: fix ssr fail when BT_EN is pulled up by hw
-Date: Fri, 27 Jun 2025 14:17:07 +0800
-Message-Id: <20250627061707.3631422-1-quic_shuaz@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4nUbybN"
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6f0ad74483fso17579336d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jun 2025 23:42:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751006539; x=1751611339; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=X33QDPpK+gqC08aJgsP8RdoXMW35qlQM1PJEoy01aHI=;
+        b=l4nUbybNzD4DhuLDrMxxSzXSWZcrfqMQDEQQEj9fR8ooQ6m8Ektb1eXMRc+HGSOXLp
+         yzu0SUKrCSYo/qvor9TQ5vUaqBOR/PdZ2AT30w/xZlog3bPGTaTepZbOUyTcMkvhtXBn
+         ESVkiLGaI9BvhPMl0FNtGLPhLNFJSENvhFxhmFzuZV+SfPrPU9FWpBAgWtDZluA6sep/
+         MljVYZ9r06LBJIGaznD6ei/avNWv7UyYbeJFHUjDrg1PpD0c6dzEwY6n5REZgRh0RVzA
+         V1FUe5cEqz/7Uc/SaTusOfWyQOSdXLl4IkkpnjHO2R7kk/xF55o+o6h3sEASZKIlHa2L
+         VF1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751006539; x=1751611339;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X33QDPpK+gqC08aJgsP8RdoXMW35qlQM1PJEoy01aHI=;
+        b=UZ6RBLMnDcwSfPzqN8KgvHKbx9SNP9ZDyiMMfj5QMPUAljin2Kk9hqNeEsmVrv2xCF
+         ef2NcchtTXTsm1mhqjKVVi02GeFSmuB7lN8ZQDPqqHyt7tCAFsQALro2JFzTPgK3K8B0
+         0U0GpZo373Sgc2w2THScpPW6TyDbZ1/TJIgn0pJddSd5tYDixIZ3W/8DF2CoHtNgGOoA
+         kPdcuZJg3WMzr1aa7fnHJz/KBUc6h4o2+47yUHuMgAaBC2h6CQyMVuQxcAtFrdtf8acz
+         QLNoBBuInhtjgSmyNkNnvF7upOu58vGQQ/4bGq2B/Gr4TcQDCwMdvz0fTA1bCmM/O6hq
+         xvpg==
+X-Gm-Message-State: AOJu0YwesLZRaNQ5JsV3kqg+2z1orl1teR8URK2As5CjNLklEuqvBMDr
+	btN4bpKxsoQGfCuTmBMDDsIrOZft//ql/xNc+WBb8Ipvw0mfwkTkEBksux5QQw==
+X-Gm-Gg: ASbGncv1DoZ084PH2VaF660lnzHpVV7bpXSNoiNCFn7LGR5u8g7o/WsyYP3CYv9CmTD
+	7I1aWtPtcI3x5amgYteAoGMa9WDCfVjZMpckxKf8jhnQAsGnRvwYF0pGnW7rau/dYWl69dNJkYk
+	5EOxisgaBSSK2Y/KLTyXHO2OQ0kLeikad4yvVj0/XbE8iIOmIRUZgi53nXu/U9n7HIZmoYiuJAF
+	p2F65qTs/gcdqmdO7rFCmq4nliiKUB3DZzjMJY87ygmHI70iJjYbPz/TvWH3Z8mK8iGyS2So9kM
+	dsBWTwQp3kJchD70JZKDfxnSO+pPbb3nXsEeSjuk6FQHDT5sXp/JjNNQBfK1EUq8Nw==
+X-Google-Smtp-Source: AGHT+IGQp8r6X0RwA8/utUfnPN369VYJHqOBnRllTaH7+6Z1nwsC1hsd/wxNeP309V3HwOu1Ik84xg==
+X-Received: by 2002:a05:6214:2e86:b0:700:bad0:1c48 with SMTP id 6a1803df08f44-700bad02330mr16616946d6.20.1751006538778;
+        Thu, 26 Jun 2025 23:42:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.25.193.3])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd772e34a8sm15744056d6.63.2025.06.26.23.42.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jun 2025 23:42:18 -0700 (PDT)
+Message-ID: <685e3d4a.050a0220.267deb.50b8@mx.google.com>
+Date: Thu, 26 Jun 2025 23:42:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8151388373879906143=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI3MDA0NyBTYWx0ZWRfX1bs0EraRTzXA
- BQ0su+zoYSImbjIcmJ0eARxx71IOa5lH8rBMsgzc5RLr4WumC44HdqWCopOoV+Fhqz5XD10D66K
- XIaPxzguyH3DlZpPHKB2zcwXsQ7HP1ceGeNx2pg7VhrhlTu3AKst96glZm3gzPez9bid13aJVH7
- BrjkU6OUS8DfSEASO0PNOeDxEqRXOz5f7lf2nOMqt+8w4BKM6hziIEddPTKj+SY5kAPDBYI5so5
- e5YFWzxyUl89i0XzM8hX0FHthK9Kn4QlJKo6mFp+bjbSZf9eIGQFQN1Zcuc04zxqL+NqF8+LSVu
- aMc2z9Sh48e+b21/2tw64XtK5w/HPQHsQMFBItsaSq+MvG/ex4Uy76xsCuqCadnBq2wHLGcOH4q
- pGa2MbwxchdOYff+zAykDLR+T0n19opVh/ACEMPcdPnYIyrp+EVHFwwoMORm3elQXGfF8NtY
-X-Proofpoint-ORIG-GUID: MZAh6TOm8SD0jDoNy_GpURkcT_TEZXKy
-X-Proofpoint-GUID: MZAh6TOm8SD0jDoNy_GpURkcT_TEZXKy
-X-Authority-Analysis: v=2.4 cv=LNNmQIW9 c=1 sm=1 tr=0 ts=685e376d cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
- a=mRmbbomOM4DXTVd2v6UA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-27_02,2025-06-26_05,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 mlxscore=0 clxscore=1015 adultscore=0 priorityscore=1501
- lowpriorityscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2506270047
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ot_zhangchao.zhang@mediatek.com
+Subject: RE: Bluetooth: mediatek: add gpio pin to reset bt
+In-Reply-To: <20250627055924.7716-2-ot_zhangchao.zhang@mediatek.com>
+References: <20250627055924.7716-2-ot_zhangchao.zhang@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Q1：
-If the SoC always enables the bt_en pin via hardware and the driver
-cannot control the bt_en pin of the SoC chip, then during SSR,
-the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
-This leads to a reset command timeout failure.
+--===============8151388373879906143==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix1：
-To address this, clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits
-after the coredump collection is complete.
-Also, add msleep delay to wait for controller to complete SSR.
+This is automated email and please do not reply to this email!
 
-Q2:
-When the SSR (Sub-System Restart) duration exceeds 2 seconds, it triggers
-host tx_idle_timeout, which sets host TX state to sleep. due to the
-hardware pulling up bt_en, the firmware is not downloaded after the SSR.
-As a result, the controller does not enter sleep mode. Consequently,
-when the host sends a command afterward, it sends 0xFD to the controller,
-but the controller does not respond, leading to a command timeout.
+Dear submitter,
 
-Fix2:
-Reset the tx_idle_timer after SSR (Sub-System Restart).
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=976464
 
-Changes in v2:
-- Modified the format.
-- Add changes to fix tx_idle_timeout
-- Link to v1: https://lore.kernel.org/all/20250609105553.3756688-1-quic_shuaz@quicinc.com/
+---Test result---
 
-Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 FAIL      0.39 seconds
+BuildKernel                   PASS      24.36 seconds
+CheckAllWarning               PASS      26.65 seconds
+CheckSparse                   PASS      30.16 seconds
+BuildKernel32                 PASS      24.13 seconds
+TestRunnerSetup               PASS      472.21 seconds
+TestRunner_l2cap-tester       PASS      25.23 seconds
+TestRunner_iso-tester         PASS      39.91 seconds
+TestRunner_bnep-tester        PASS      6.01 seconds
+TestRunner_mgmt-tester        FAIL      135.17 seconds
+TestRunner_rfcomm-tester      PASS      9.46 seconds
+TestRunner_sco-tester         PASS      15.03 seconds
+TestRunner_ioctl-tester       PASS      10.25 seconds
+TestRunner_mesh-tester        FAIL      11.47 seconds
+TestRunner_smp-tester         PASS      8.68 seconds
+TestRunner_userchan-tester    PASS      6.28 seconds
+IncrementalBuild              PENDING   0.78 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.215 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.050 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/hci_qca.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 4e56782b0..d415a3f31 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1653,6 +1653,24 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 		skb_queue_purge(&qca->rx_memdump_q);
- 	}
- 
-+	/* If the SoC always enables the bt_en pin via hardware and the driver
-+	 * cannot control the bt_en pin of the SoC chip, then during SSR,
-+	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
-+	 * This leads to a reset command timeout failure.
-+	 *
-+	 * To address this, clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits
-+	 * after the coredump collection is complete.
-+	 * Also, add msleep delay to wait for controller to complete SSR.
-+	 */
-+	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-+		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-+		clear_bit(QCA_IBS_DISABLED, &qca->flags);
-+		mod_timer(&qca->tx_idle_timer, jiffies +
-+			  msecs_to_jiffies(qca->tx_idle_delay));
-+		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
-+		msleep(50);
-+	}
-+
- 	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- }
- 
-@@ -2478,7 +2496,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 			return PTR_ERR(qcadev->susclk);
- 		}
- 	}
--	
-+
- 	err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
- 	if (err) {
- 		BT_ERR("serdev registration failed");
--- 
-2.34.1
 
+--===============8151388373879906143==--
