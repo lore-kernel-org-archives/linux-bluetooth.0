@@ -1,99 +1,80 @@
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562F11C8610
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 16:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7CBEEDE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 16:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751041900; cv=none; b=WlxcWhEKjH3iTcEz8ETm9gXdtDuxFGDhKG5XUs6uQhWRSiG6Mm7U+Ak2irzmUVyLgs8qUdZjQECiiZ6LFQFKCmx1m3ybLgd+0XKXFJOPUUkmZc/doYrAjPKjHexDJ7H2kb0dboNXPLkWdTPKeAy+Y9tzxeEydH7Wq4yglyzIYmE=
+	t=1751042241; cv=none; b=UrMnWiKxQhQmgu3UyfYmY9srdv6lklJM7RfBz1P1QGISyhiUJyzbjRZpQuc0NXJYBQURT+o6cBrjnrDRPUPjn4zTl+S2pbTLni7eVv0HlfVf9YR3q7HaZHeGif72Te1aahpUlG4GDMTdQWvf5Z8HlhNG9fjYUivSKIEql2F3wLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751041900; c=relaxed/simple;
-	bh=/85KL4ImGbZviomsFG+TOrThUiC2D+yWFkrcKh1Nj3M=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FeUf62Hjx1cxW/H5he2qSPIs20P4UFCFvaflqPO1ch2Yqsf+0NqYnl3xqBaU2mhyv5PS5GG3bstfSjMg85m6CajW7vCfOY2jn4Y3kWFITLPKhkOcC5pXyMbF+xseBrdvBhmS4oRnwSlA+o3IzXhBVivRbgIQhP1UX57FPdK/X4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cD6ALvNd; arc=none smtp.client-ip=209.85.221.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751042241; c=relaxed/simple;
+	bh=xU/T+yGsn8BmlZS653Z4OMbvP1tGkNilzt9h6pztVEc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=pnSuehq4K3rQxbzfOlNY+RFqRT+vBcp/sy2koOpjhgABS3bDjXsLOTTZhB7MXGy8JdcTs67UGyWIZ4LVVCCVKYw/us72oAcqc5QhwWUM6KpgnzlqnjFFKZBN8pCZdwvzgyGtINGdHv3Ku9uUOQ4WvJz7Rhky1xQj2FIvgbVgegQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=i15TkHh7; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cD6ALvNd"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-51eb1a714bfso1387739e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 09:31:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751041897; x=1751646697; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1tYKn0fuShqbgXr9EJoDQ0YXHZwtLE19V7iD4avubAs=;
-        b=cD6ALvNd/5UTaRCYvyofmlBHM05zzeKiqk/zEBhnk1Bha7nViWbyYYAGWpZ6h5Rhkg
-         FMN3y6wVJMaRQRyy6IcgOrSnCVMMH47T4gpCzv2oyBjtUke1DCsajmNSmMaDybgp3r+f
-         QG/jrggkJreP6QgrZTAjmMussSg6boUdHRpwW6hY+Y29BGg6EE+MO96dgsTpYc0eCnTJ
-         shnWrR/ibuu78SOpkhhyF4rBBal+JCWTh9aaAdx8tpVIRghIbJizomWOIm+/JUXmb8FZ
-         PYwGH7tBMUcCsbGadP6XOs4kTWeDPO5q5q97FR2NErxIm0U5n0yh3gex8b3DnkVClROL
-         yvPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751041897; x=1751646697;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1tYKn0fuShqbgXr9EJoDQ0YXHZwtLE19V7iD4avubAs=;
-        b=NuF5mcs9ClvMEbYaXaFiM7uBLUx8LsMxmjOeyDdSIQj2QX/mUGPS75J31x266qbl6V
-         t1qQwuGXpbgMHDFsDS7T4yLu8pVaMDraqz1G2QncfOU2hfxIDTaCrlpLGDzuMLvEb8nL
-         O54MPlFPXQA9aRSVpADZ+pYhTEJaUNMaBRmgs1YQ1ynmLst5XXWkvTF1vLUFzNfz8Ct2
-         0nvZm7praHrJY2ZW7/GSBGIKrEypFnWOzpSwEtKZpb/3cxlVzg8kBbOqpWLYm8StWSzN
-         KUNeGpDZG9YO4TyGwoSPsLCo4WzikwOj6Ng/LKBuXKz9FadRq/Nbj4IjHCgA9UDEx4Vm
-         k+Hg==
-X-Gm-Message-State: AOJu0YzBqV6W+MxjSBzYkwHK09AO1ajJDO9ILyMocodK6ISiBZ7HTFFn
-	POXu8LGuHXwmrqn/MGVVX3PalNvVwwhFSvq+c01NKiqlwdZvkPB7KwxuYeAXoOwA
-X-Gm-Gg: ASbGncsGms+tgbCFRsAg5FtssZRr236ohltac5nt8oC8JEOzw8cw2RX6zKIke5KsNVR
-	P/ooQzTf4a24h5ZRZz+Khumx/t5fX0JhS0ORH1OEJJOxiCTvfQJLvrNm/6YU6Mkx+Z2xnpHo+5C
-	uYs83j2Q0NSkYjAMUq/3DD1tvhsiWAB671fyddEqAujgD0L1Wqo5I743luPvWADsTjgdmi4HVwr
-	TYeqRKJ3Ws7j1vGRiU0mJoGCeT+5mzlUY6wULcwIdt98/SLKPVeoQJljxMoWTSUs45K/EBu8Dkq
-	efpWQEeoQzSDf+gofqNoTfVC3ebae+bwQCvTjaiEiM8KC/b9RxUPDCEasnAIey20ZBTeQoXkoLn
-	QTCOhdE0AJxcmP6v1FbZqFCXig8hekbU=
-X-Google-Smtp-Source: AGHT+IG70kJaocvknW0DUMlnvicdHg8ANW0DNkA8mGwtoafPyIPNXXm96FzKTrp4wzSSvkzpqxDpGg==
-X-Received: by 2002:a05:6122:2027:b0:531:3a00:211b with SMTP id 71dfb90a1353d-5330bfb42c1mr3448228e0c.7.1751041895391;
-        Fri, 27 Jun 2025 09:31:35 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-533091f00a4sm413598e0c.37.2025.06.27.09.31.34
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jun 2025 09:31:34 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="i15TkHh7"
+Received: from github.com (hubbernetes-node-9fa3970.va3-iad.github.net [10.48.175.16])
+	by smtp.github.com (Postfix) with ESMTPA id B54FEE0A63
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 09:37:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751042239;
+	bh=xotNT8KqH+atwKEqeo0oxrWYEog+l/BkcZ6WJmZh0ZE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=i15TkHh7mXEsrsrKGJT4rMI9X9AfGnEbQX71plD+2/ahMmD6x4n7r4xvVfp4LwoX3
+	 jRAGVA1dnWalTmL6R8NmhE9rfHZxwQuEdztoPwxU40JzWusVIsjZ0nAMFGegoR0+CT
+	 0o2Wue0pANEYPzrD2bG3KGSErlBz4hnoXvzbWpY4=
+Date: Fri, 27 Jun 2025 09:37:19 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_sync: Fix not disabling advertising instance
-Date: Fri, 27 Jun 2025 12:31:33 -0400
-Message-ID: <20250627163133.430614-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
+Message-ID: <bluez/bluez/push/refs/heads/master/ae1b7f-dc7ca0@github.com>
+Subject: [bluez/bluez] dc7ca0: monitor: Print buffer pool information
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: dc7ca0e3b4156a16e7294c63b246f6b07d1b13f9
+      https://github.com/bluez/bluez/commit/dc7ca0e3b4156a16e7294c63b246f6b07d1b13f9
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
 
-As the code comments on hci_setup_ext_adv_instance_sync suggests the
-advertising instance needs to be disabled in order to update its
-parameters, but it was wrongly checking that !adv->pending.
+  Changed paths:
+    M monitor/packet.c
 
-Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_sync.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Log Message:
+  -----------
+  monitor: Print buffer pool information
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 2e0e532384c3..13ebd1a380fd 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1228,7 +1228,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
- 	 * Command Disallowed error, so we must first disable the
- 	 * instance if it is active.
- 	 */
--	if (adv && !adv->pending) {
-+	if (adv) {
- 		err = hci_disable_ext_adv_instance_sync(hdev, instance);
- 		if (err)
- 			return err;
--- 
-2.49.0
+This prints the number of buffers in transit and total information:
 
+< ISO Data TX: Handle 2304 [1/8] flags 0x02 dlen 64 #1363
+< ISO Data TX: Handle 2304 [2/8] flags 0x02 dlen 64 #1364
+< ISO Data TX: Handle 2304 [3/8] flags 0x02 dlen 64 #1365
+< ISO Data TX: Handle 2304 [4/8] flags 0x02 dlen 64 #1367
+< ISO Data TX: Handle 2304 [5/8] flags 0x02 dlen 64 #1368
+< ISO Data TX: Handle 2304 [6/8] flags 0x02 dlen 64 #1369
+< ISO Data TX: Handle 2304 [7/8] flags 0x02 dlen 64 #1370
+< ISO Data TX: Handle 2304 [8/8] flags 0x02 dlen 64 #1371
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 2304 Address: FC:6D:77:BA:CF:A6 (Intel Corporate)
+        Count: 1
+        Buffers: 7/8
+        #1363: len 64 (39 Kb/s)
+        Latency: 13 msec (13-13 msec ~13 msec)
+< ISO Data TX: Handle 2304 [8/8] flags 0x02 dlen 64
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
