@@ -1,197 +1,85 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1955AEEDE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 16:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8BCEEDE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 16:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751043486; cv=none; b=tHWMLgW9YjvKjEcwbCuIQEO9QVU+FYCqv6LdOthCpnTvfSf/dM87P0UqwvQ4BbgkQTK0F6GE/G0fwl9ewB9JhhYspnByZJIHIyHy3wcq62/E/i92rkYk+M4TNF4VYa5scKBsdQiIzU5Cnpoe0J77KonvPal90TkXbLXWyGLijtg=
+	t=1751043582; cv=none; b=TrtoxlXpQeSt4J5q/fBT79x+1JM+DGi11/B0pgD2IHZaKm64LinL4YjhWllorHHtgHIdiYLvxJ5kgTpCR9pM00nLlUgGdpi7mTesqi81acfl1orYifHGu289f5MhkwJLDmh3tgd2F9phX+eMjFlsTs9YNA9ogo0bsDx13rnbOoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751043486; c=relaxed/simple;
-	bh=mdTj+LjqGJ9kpTRIu429XzclAR068FSgig2azdXbB9s=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=di/uf9c4O5K8QQXcG9WtgUSjMJR2EQvH0cTYPVTPe78U4CfIvEjvjG/oDGEcQrawtuaWn7b/CdaUp0+2P7E7CItZ1G5cWbeiYCuezmpgLYv7+v12s7PTiih1fPdL/n9Gj/SyzlEYEvvZ+o9Qoo2o4+383pAX4VTdW0meU0aowa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KRMGPVIQ; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1751043582; c=relaxed/simple;
+	bh=f6ZYn4WSjnlTUnorEw1pOaiVo6andwnVBgkXq/72YVM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=o+EWIrJt2iT5s4ENLOOc1rcF6of4NKaEuC6qN3jvuLOMclpW9fAqPugcEQfWt99im7PAiA5TtFTNsIK4DP9p5M4ycaJNfY6NYUTFM4GNMXtq7G4eF0d8SBHBjEGYzVwPf98I6alCEqMKf458bYB3yQ3+ZBkFo9UbU+H6/EwcEiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nrS5k+rG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KRMGPVIQ"
-Received: from github.com (hubbernetes-node-86730cb.va3-iad.github.net [10.48.155.33])
-	by smtp.github.com (Postfix) with ESMTPA id 36551E126D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 09:58:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1751043484;
-	bh=+8QNnvXHINnnT6tnZlH5vJAQdAadc/Iyzp3fxutJqXM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=KRMGPVIQtW6KqrINhXUKGJZALHGFYzZpcfW+7HLY6I5SsxamGi+I5PacZxkhKgRVC
-	 xagDqtj7kKpxW7fp5E91L4LIbpIv+YSKhciNnco4Z1NPeC9AuVFx2ilGuI07e/mFLJ
-	 jdKNk/YYpDnzO+9SuZiefS3reuNYyp3qaawaByAs=
-Date: Fri, 27 Jun 2025 09:58:04 -0700
-From: Christian Eggers <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/dc7ca0-8e2425@github.com>
-Subject: [bluez/bluez] 6983c9: doc: mesh-api: minor copy&paste fix
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nrS5k+rG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 701E1C4CEE3;
+	Fri, 27 Jun 2025 16:59:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751043581;
+	bh=f6ZYn4WSjnlTUnorEw1pOaiVo6andwnVBgkXq/72YVM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nrS5k+rGfc+oHKM1BT+iYSJLYql96hPyqzp/Yj9tLzHgC0h99TPFaaIL84/13bodJ
+	 dHGHF6XbkPa+YHMf3wpoI1dLnCuH4YiyjnvamVCKGm9dQgdnZ7ghS6oTgvcvAaua7t
+	 jZ0MHHFRKtv+fH6kSyUKDpfyELICXozWuzvK177joPn8yOpbChnBtGhJjC7jse/Mtp
+	 A8WkWhKt4CEpYANvb3HQT+CzBdyNzz/kcAjzMawFyjV/qxZlQvvyOVPAzoCK4UzObE
+	 KGSmnUOSt1PPEsKjzxl4+iF8enKcpcghwClXaOvLZACuOtsCC+36Rzf+FYfzrMrYQO
+	 dlayQINqyrBjA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC6C380DBEE;
+	Fri, 27 Jun 2025 17:00:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/9] doc: mesh-api: minor copy&paste fix
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175104360724.1996502.15314023353118607724.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Jun 2025 17:00:07 +0000
+References: <20250627075928.19788-1-ceggers@arri.de>
+In-Reply-To: <20250627075928.19788-1-ceggers@arri.de>
+To: Christian Eggers <ceggers@arri.de>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 6983c985e08a8126bf75fde701a884450728be98
-      https://github.com/bluez/bluez/commit/6983c985e08a8126bf75fde701a884450728be98
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
+Hello:
 
-  Changed paths:
-    M doc/mesh-api.txt
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  doc: mesh-api: minor copy&paste fix
+On Fri, 27 Jun 2025 09:59:20 +0200 you wrote:
+> ---
+>  doc/mesh-api.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Here is the summary with links:
+  - [BlueZ,1/9] doc: mesh-api: minor copy&paste fix
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6983c985e08a
+  - [BlueZ,2/9] mesh: keyring: constify
+    (no matching commit)
+  - [BlueZ,3/9] mesh: mesh-config: constify
+    (no matching commit)
+  - [BlueZ,4/9] mesh: util: constify
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b913bd1b92a4
+  - [BlueZ,5/9] mesh: mesh_net_transport_send: simplify
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=725a72ea654c
+  - [BlueZ,6/9] mesh: node_add_pending_local: use concrete type
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2874aeb4d056
+  - [BlueZ,7/9] mesh: remove unused function typedef
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2a40b2f8e07a
+  - [BlueZ,8/9] net: packet_received: avoid unnecessary copying
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2251e6d79620
+  - [BlueZ,9/9] tools: parser: fix printf format errors
+    (no matching commit)
 
-  Commit: 5651fc8bf55cc687c13bd08309c1d9fd26968503
-      https://github.com/bluez/bluez/commit/5651fc8bf55cc687c13bd08309c1d9fd26968503
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M mesh/keyring.c
-    M mesh/keyring.h
-
-  Log Message:
-  -----------
-  mesh: keyring: constify
-
-
-  Commit: eb8ffa0f972144163576402aee59de6035f7701f
-      https://github.com/bluez/bluez/commit/eb8ffa0f972144163576402aee59de6035f7701f
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M mesh/mesh-config-json.c
-    M mesh/mesh-config.h
-
-  Log Message:
-  -----------
-  mesh: mesh-config: constify
-
-removing 2 prototypes where an implementation never existed
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: b913bd1b92a4ce1fe710972b4b453aa2d5feb509
-      https://github.com/bluez/bluez/commit/b913bd1b92a4ce1fe710972b4b453aa2d5feb509
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M mesh/util.c
-    M mesh/util.h
-
-  Log Message:
-  -----------
-  mesh: util: constify
-
-
-  Commit: 725a72ea654c2966f6d220ee39bbfca0369f1171
-      https://github.com/bluez/bluez/commit/725a72ea654c2966f6d220ee39bbfca0369f1171
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M mesh/net.c
-
-  Log Message:
-  -----------
-  mesh: mesh_net_transport_send: simplify
-
-No need for internal copy of 'seq'.
-
-
-  Commit: 2874aeb4d05679b1d96009d84a13882ca34c3eac
-      https://github.com/bluez/bluez/commit/2874aeb4d05679b1d96009d84a13882ca34c3eac
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M mesh/manager.c
-    M mesh/mesh.c
-    M mesh/node.c
-    M mesh/node.h
-    M mesh/provision.h
-    M mesh/remprv-server.c
-
-  Log Message:
-  -----------
-  mesh: node_add_pending_local: use concrete type
-
-No need for using a void pointer here. Add const qualifier to passed
-mesh_prov_node_info.
-
-
-  Commit: 2a40b2f8e07a8b9bf564fd59a5d1847d9a46fb57
-      https://github.com/bluez/bluez/commit/2a40b2f8e07a8b9bf564fd59a5d1847d9a46fb57
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M mesh/mesh-io.h
-
-  Log Message:
-  -----------
-  mesh: remove unused function typedef
-
-mesh_io_recv_ext_func_t has been introduced in
-6a6fe856a900 ("mesh: rework incoming advertisement filtering").
-According to 'git log -p <rev> master' it has never been used.
-
-
-  Commit: 2251e6d796209258b15f95ccbfdf63ebd96b5752
-      https://github.com/bluez/bluez/commit/2251e6d796209258b15f95ccbfdf63ebd96b5752
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M mesh/net.c
-
-  Log Message:
-  -----------
-  net: packet_received: avoid unnecessary copying
-
-Since cca48f305b60 ("mesh: Fix Relaying for multiple nodes"), the packet
-for relaying is assembled within send_relay_pkt(). So we do not need to
-assemble a full packet within packet_received().
-
-Additionally remove misleading initialization of 'msg' variable, the
-value is assigned in all possible branches of
-mesh_crypto_packet_parse().
-
-
-  Commit: 8e2425dc2b2553803157d4bee52261e2f4d1ae73
-      https://github.com/bluez/bluez/commit/8e2425dc2b2553803157d4bee52261e2f4d1ae73
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-06-27 (Fri, 27 Jun 2025)
-
-  Changed paths:
-    M tools/parser/parser.h
-
-  Log Message:
-  -----------
-  tools: parser: fix printf format errors
-
-struct timeval members can be 32 or 64 bits which results in "long long"
-on some platforms. As there are no printf conversion specifiers for
-time types, cast them to the longest possible types.
-
-
-Compare: https://github.com/bluez/bluez/compare/dc7ca0e3b415...8e2425dc2b25
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
