@@ -1,356 +1,458 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2EF2E8886
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 14:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C7F2E92AD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 14:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751035922; cv=none; b=DeLPSw0OWj5kEKn+W6NElJ2sXX9a+9O3zZqYRftuoY26o9LIewnG0qS1drGtQp7vr/9T8AuHu5WO6s2YknVwvQcTl0EijQAMaGAhai5dFkAkvBpgs9URMT3IXutctWY4tzUbMs6Gb4vlfqNCyc4tzOvRYG2AtbF5V2GjE8JVOng=
+	t=1751036393; cv=none; b=ZF6zCDKMEn3kfMTuSpKqmS8e5aLYW3jhSq5Is1JPZvn78sgTWZDQPZzxi3zMAjv3K+++TRUgg4lXXsgr93dXR0iPpqerNZcXzEWyM7OQ9AEUKFJ/dHJXWaXGhf9vkvdJ0jHPkuM+DmA1EN6YV8HGRdakE3AT4we4D145oJdZVu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751035922; c=relaxed/simple;
-	bh=ydXHlf665v7gNNWw4kSDl0wPv5I8j/adBDEKRp+M5bQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OFCCE5ouCjWN8n/wtlBGiZmk+K49LfxIFxA3WNKO3K7iT9DH4/rbmWzFUfu9TQDWoEpL8OPuSHn60PtCobFqMb9ez1qprJtrdDc9CZ4SRY5A2SH7Cp95nNqUhqVa8V3o6Ur6z7sWsDKMOWHTRZV3GDcL1TKflwvjrw/4ucqvrkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=K0kzpD+Q; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1751036393; c=relaxed/simple;
+	bh=hvVXV8cOnAam8RBWyKLvzP9DmIwPtQ/ppBFnTTsHWHU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JXisaZfE3cFHnUTnfpGJTIHOnusTa7aSvYNmZup4jSmVHJ2NhpajN+yNeBKrSD88Y5/vrKfuUFN80HKGzkuRZUBtOsDRlGRAr10l/jWloBk8d2kNAepq88SkjkTQOzpMWLvHIis+REVKun29bj3EpvnZsZe6dR4mbycxGrOEFGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dRpVu0Lu; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="K0kzpD+Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1751035910;
-	bh=ydXHlf665v7gNNWw4kSDl0wPv5I8j/adBDEKRp+M5bQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=K0kzpD+QpyZOj6PJGI/+5KijcYIJCiAaYgt8wuTlgn7PYKZvSq+1H0J6GsRGZztUq
-	 zkhnilwXYtzonJeiFn760kF0LqxR7x0HxIJ/20Ust3m9t06UxpowM40wHK2eDi+STn
-	 ACtaNRaekz4BuUmfqf7OKXOsNtee3Oqk0MxejGrQgktKxd+FDjekhngNbrIJ6x9h+g
-	 b9FQ5DoeHNW7d+DzqvrUfFoq/sdnkDy1CY11OHWQkz+coqtWoBoCurkIr9xit3oZE9
-	 Jrp/pr8XVPdqUF3vDU30J0OChqvrHDITN47z/PQQbdaACnv2ZbjgpjZe9DNeHBWNsk
-	 gkxECpSIcz8UA==
-Received: from fdanis-ThinkPad-X1.. (2A02-8428-Af44-1001-81C9-67b7-a328-2001.rev.sfr.net [IPv6:2a02:8428:af44:1001:81c9:67b7:a328:2001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 115F617E0CF6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 16:51:50 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dRpVu0Lu"
+Received: from github.com (hubbernetes-node-2dd38b4.ac4-iad.github.net [10.52.148.41])
+	by smtp.github.com (Postfix) with ESMTPA id C0ABD7007A3
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jun 2025 07:59:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751036390;
+	bh=7kSSc2zQaeSr8HAiDkLM7Kj3iYpBwGd3qIYMfvupCDE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=dRpVu0LucZm1KNfsm0yugDecgOUG4oCPJPcO1UwQj1btQUU97bVv73J9eSkvm407p
+	 5GBpNuREOqpDoA55UNt7pN0NCnUnIz2ze3RJolume9KsH/OvJ9WwZbmp7p+s5dEM5/
+	 4P9iI7GlPIWRyFsK5kfPkep/Mr395MyW7NpfD7z4=
+Date: Fri, 27 Jun 2025 07:59:50 -0700
+From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ v2 27/27] audio/hfp-hf: Enable enhanced call status if supported by remote AG
-Date: Fri, 27 Jun 2025 16:51:36 +0200
-Message-ID: <20250627145136.421853-28-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250627145136.421853-1-frederic.danis@collabora.com>
-References: <20250627145136.421853-1-frederic.danis@collabora.com>
+Message-ID: <bluez/bluez/push/refs/heads/976686/000000-15a4e9@github.com>
+Subject: [bluez/bluez] 8d5d2e: doc: Add new telephony related profiles
+ interfaces
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/976686
+  Home:   https://github.com/bluez/bluez
+  Commit: 8d5d2ea9668840b46ee4e6b1b66e2519cf8e5d9a
+      https://github.com/bluez/bluez/commit/8d5d2ea9668840b46ee4e6b1b66e2=
+519cf8e5d9a
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M Makefile.am
+    A doc/org.bluez.Call.rst
+    A doc/org.bluez.TelephonyAg.rst
+
+  Log Message:
+  -----------
+  doc: Add new telephony related profiles interfaces
+
+These are interfaces are meant to be generic to the telephony related
+"headset" profiles like HSP HS, HFP HF, and CCP.
+
+
+  Commit: e0266dd91bb7a5570b0342c1fb6aaed6771ee4fe
+      https://github.com/bluez/bluez/commit/e0266dd91bb7a5570b0342c1fb6aa=
+ed6771ee4fe
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    A profiles/audio/telephony.c
+    A profiles/audio/telephony.h
+
+  Log Message:
+  -----------
+  audio/telephony: Add shared interfaces implementation
+
+
+  Commit: 8f1559c7721c9d197dd4c95135c92cc8d9fda6d0
+      https://github.com/bluez/bluez/commit/8f1559c7721c9d197dd4c95135c92=
+cc8d9fda6d0
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M Makefile.plugins
+    M configure.ac
+    A profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/telephony: Add skeleton for HFP profile
+
+
+  Commit: 8fe346c6770b1ffc719aa0c80ad6608c53f2fd74
+      https://github.com/bluez/bluez/commit/8fe346c6770b1ffc719aa0c80ad66=
+08c53f2fd74
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add HFP SLC connection and event support
+
+
+  Commit: c6257a2b4b7e039aed629e7054709ed1c07cc8f5
+      https://github.com/bluez/bluez/commit/c6257a2b4b7e039aed629e7054709=
+ed1c07cc8f5
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add dial support
+
+
+  Commit: fe0396196a13f95657f721fb7df8591101d1df22
+      https://github.com/bluez/bluez/commit/fe0396196a13f95657f721fb7df85=
+91101d1df22
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add hangup all calls support
+
+
+  Commit: f8897395ebdc632dc563c4b7c61ca90238a4b058
+      https://github.com/bluez/bluez/commit/f8897395ebdc632dc563c4b7c61ca=
+90238a4b058
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add answer a specific call support
+
+
+  Commit: a1477f34538b5654c829bb3a75f512626e7b6cb8
+      https://github.com/bluez/bluez/commit/a1477f34538b5654c829bb3a75f51=
+2626e7b6cb8
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-telephony.rst
+    M client/main.c
+    A client/telephony.c
+    A client/telephony.h
+
+  Log Message:
+  -----------
+  client/telephony: Add new submenu
+
+
+  Commit: ada916d72159848b75d58212651fccb50e7ac443
+      https://github.com/bluez/bluez/commit/ada916d72159848b75d58212651fc=
+cb50e7ac443
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Remove call interface during profile disconnection
+
+
+  Commit: 3c2d347a8511ba7106bf5460658896c64f43cb42
+      https://github.com/bluez/bluez/commit/3c2d347a8511ba7106bf546065889=
+6c64f43cb42
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Create existing call during SLC phase
+
+
+  Commit: de88d6e01dd93903b3fede19297740cdecd92d12
+      https://github.com/bluez/bluez/commit/de88d6e01dd93903b3fede1929774=
+0cdecd92d12
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/telephony.c
+    M profiles/audio/telephony.h
+
+  Log Message:
+  -----------
+  audio/telephony: Add hangup_active and hangup_held functions
+
+
+  Commit: 5a3f65f98a157cae5f9be453f240099cf4cec397
+      https://github.com/bluez/bluez/commit/5a3f65f98a157cae5f9be453f2400=
+99cf4cec397
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add hangup_active and hangup_held support
+
+
+  Commit: bc94b61c152899d79399dfc016ba5d47223aed9f
+      https://github.com/bluez/bluez/commit/bc94b61c152899d79399dfc016ba5=
+d47223aed9f
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M client/telephony.c
+
+  Log Message:
+  -----------
+  client/telephony: Add hangup_active and hangup_held support
+
+
+  Commit: 97bc41aba305b676896d190326295e6f9f160c70
+      https://github.com/bluez/bluez/commit/97bc41aba305b676896d190326295=
+e6f9f160c70
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add SendTones support
+
+
+  Commit: 0fd51e35cfd5800869b51c3daddc42431e57fe39
+      https://github.com/bluez/bluez/commit/0fd51e35cfd5800869b51c3daddc4=
+2431e57fe39
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis.oss@gmail.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M client/telephony.c
+
+  Log Message:
+  -----------
+  client/telephony: Add SendTones support
+
+
+  Commit: f15377a039409e8f6bfe50a3a887149b6eb0ed27
+      https://github.com/bluez/bluez/commit/f15377a039409e8f6bfe50a3a8871=
+49b6eb0ed27
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M doc/org.bluez.Call.rst
+    M doc/org.bluez.TelephonyAg.rst
+
+  Log Message:
+  -----------
+  doc: Make telephony docs more generic
+
+Remove HFP specific parts or explicitly point it.
+
+
+  Commit: 8dbb360de530e0b0db299095ed13e986a0d67320
+      https://github.com/bluez/bluez/commit/8dbb360de530e0b0db299095ed13e=
+986a0d67320
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M client/telephony.c
+
+  Log Message:
+  -----------
+  client/telephony: Remove IncomingLine
+
+This property has been removed from the documentation.
+
+
+  Commit: ef48dd690776d1398456d0bbd1c10e90176bf7ac
+      https://github.com/bluez/bluez/commit/ef48dd690776d1398456d0bbd1c10=
+e90176bf7ac
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/telephony.c
+    M profiles/audio/telephony.h
+
+  Log Message:
+  -----------
+  audio/telephony: Remove IncomingLine
+
+This property has been removed from the documentation.
+
+
+  Commit: 9d706dd645ea935aa51254d29704f4b7743e3110
+      https://github.com/bluez/bluez/commit/9d706dd645ea935aa51254d29704f=
+4b7743e3110
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add HFP HF server and SDP record
+
+
+  Commit: 21b57f18a6239fb8ba17391ac650477d4d6ccbab
+      https://github.com/bluez/bluez/commit/21b57f18a6239fb8ba17391ac6504=
+77d4d6ccbab
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add operator name support
+
+This adds the AT+COPS command.
+
+
+  Commit: 3f6fd4d7cd550297b546839f44ca26624e70b678
+      https://github.com/bluez/bluez/commit/3f6fd4d7cd550297b546839f44ca2=
+6624e70b678
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/telephony.c
+    M profiles/audio/telephony.h
+
+  Log Message:
+  -----------
+  audio/telephony: Add call line identication property support
+
+
+  Commit: 7baeefce86e1deb2e95ab094d69d47bfceec5477
+      https://github.com/bluez/bluez/commit/7baeefce86e1deb2e95ab094d69d4=
+7bfceec5477
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Add call line idenfication support
+
+
+  Commit: 77222588fdb356ea3fd2c4a407cb35b862809323
+      https://github.com/bluez/bluez/commit/77222588fdb356ea3fd2c4a407cb3=
+5b862809323
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Disable NREC during connection setup
+
+
+  Commit: e47f0dd200509bdaeca8962810646b70d7cc0c36
+      https://github.com/bluez/bluez/commit/e47f0dd200509bdaeca8962810646=
+b70d7cc0c36
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Enable waiting call if supported by remote AG
+
+
+  Commit: 5eb250b9ce7279d63fbbc24bc3416f439a48c7ec
+      https://github.com/bluez/bluez/commit/5eb250b9ce7279d63fbbc24bc3416=
+f439a48c7ec
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Enable extended error if supported by remote AG
+
+
+  Commit: 2ef1979b629c465edbc334fc8a2246aad496d4f2
+      https://github.com/bluez/bluez/commit/2ef1979b629c465edbc334fc8a224=
+6aad496d4f2
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/telephony.c
+    M profiles/audio/telephony.h
+
+  Log Message:
+  -----------
+  audio/telephony: Add call multiparty property support
+
+
+  Commit: 15a4e9b961364d5b2e9e282b1078a03573ac84d6
+      https://github.com/bluez/bluez/commit/15a4e9b961364d5b2e9e282b1078a=
+03573ac84d6
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-06-27 (Fri, 27 Jun 2025)
+
+  Changed paths:
+    M profiles/audio/hfp-hf.c
+
+  Log Message:
+  -----------
+  audio/hfp-hf: Enable enhanced call status if supported by remote AG
 
 On reception of OK result from AT+CLCC command, and based on the calls
 listed by +CLCC results, this updates, removes or creates calls.
----
- profiles/audio/hfp-hf.c | 197 ++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 191 insertions(+), 6 deletions(-)
 
-diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
-index 5542bce96..5f03556dd 100644
---- a/profiles/audio/hfp-hf.c
-+++ b/profiles/audio/hfp-hf.c
-@@ -147,6 +147,15 @@ struct indicator {
- 	ciev_func_t cb;
- };
- 
-+struct clcc_entry {
-+	uint8_t idx;
-+	uint8_t direction;
-+	uint8_t status;
-+	uint8_t mode;
-+	uint8_t multiparty;
-+	char *number;
-+};
-+
- struct hfp_device {
- 	struct telephony	*telephony;
- 	uint16_t		version;
-@@ -161,6 +170,8 @@ struct hfp_device {
- 	enum call_setup		call_setup;
- 	enum call_held		call_held;
- 	GSList			*calls;
-+	bool			clcc_in_progress;
-+	GSList			*clcc_entries;
- };
- 
- struct hfp_server {
-@@ -334,6 +345,92 @@ static uint8_t next_index(struct hfp_device *dev)
- 	return 0;
- }
- 
-+static void clcc_update_call(gpointer data, gpointer user_data)
-+{
-+	struct call *call = data;
-+	struct hfp_device *dev = user_data;
-+	GSList *l;
-+
-+	for (l = dev->clcc_entries; l; l = l->next) {
-+		struct clcc_entry *entry = l->data;
-+
-+		if (call->idx == entry->idx) {
-+			telephony_call_set_state(call, entry->status);
-+			telephony_call_set_multiparty(call,
-+					entry->multiparty);
-+			telephony_call_set_line_id(call, entry->number);
-+			dev->clcc_entries = g_slist_remove(dev->clcc_entries,
-+					entry);
-+			g_free(entry->number);
-+			g_free(entry);
-+			return;
-+		}
-+	}
-+
-+	telephony_call_set_state(call, CALL_STATE_DISCONNECTED);
-+	dev->calls = g_slist_remove(dev->calls, call);
-+	telephony_call_unregister_interface(call);
-+}
-+
-+static void clcc_resp(enum hfp_result result, enum hfp_error cme_err,
-+							void *user_data)
-+{
-+	struct hfp_device *dev = user_data;
-+	GSList *l;
-+
-+	DBG("");
-+
-+	dev->clcc_in_progress = false;
-+
-+	if (result != HFP_RESULT_OK) {
-+		error("hf-client: CLCC error: %d", result);
-+		return;
-+	}
-+
-+	g_slist_foreach(dev->calls, clcc_update_call, dev);
-+
-+	/* Remaining calls should be added */
-+	for (l = dev->clcc_entries; l; l = dev->clcc_entries) {
-+		struct clcc_entry *entry = l->data;
-+		struct call *call;
-+
-+		call = telephony_new_call(dev->telephony, entry->idx,
-+						entry->status,
-+						NULL);
-+		call->multiparty = entry->multiparty;
-+		if (entry->number)
-+			call->line_id = g_strdup(entry->number);
-+
-+		if (telephony_call_register_interface(call))
-+			telephony_free_call(call);
-+		else
-+			dev->calls = g_slist_append(dev->calls, call);
-+
-+		dev->clcc_entries = g_slist_remove(dev->clcc_entries, entry);
-+		g_free(entry->number);
-+		g_free(entry);
-+	}
-+}
-+
-+static bool request_calls_update(struct hfp_device *dev)
-+{
-+	if (!(dev->hfp_hf_features & HFP_HF_FEAT_ENHANCED_CALL_STATUS) ||
-+		!(dev->features & HFP_AG_FEAT_ENHANCED_CALL_STATUS) ||
-+		(telephony_get_state(dev->telephony) != CONNECTED))
-+		return false;
-+
-+	if (dev->clcc_in_progress)
-+		return true;
-+
-+	if (!hfp_hf_send_command(dev->hf, clcc_resp, dev, "AT+CLCC")) {
-+		info("hf-client: Could not send AT+CLCC");
-+		return false;
-+	}
-+
-+	dev->clcc_in_progress = true;
-+	return true;
-+}
-+
- static void ccwa_cb(struct hfp_context *context, void *user_data)
- {
- 	struct hfp_device *dev = user_data;
-@@ -359,6 +456,9 @@ static void ccwa_cb(struct hfp_context *context, void *user_data)
- 		}
- 	}
- 
-+	if (request_calls_update(dev))
-+		return;
-+
- 	if (!found) {
- 		struct call *call;
- 		uint8_t idx = next_index(dev);
-@@ -400,6 +500,58 @@ static void ciev_cb(struct hfp_context *context, void *user_data)
- 	}
- }
- 
-+static void clcc_cb(struct hfp_context *context, void *user_data)
-+{
-+	struct hfp_device *dev = user_data;
-+	struct clcc_entry *entry;
-+	unsigned int val;
-+	char number[MAX_NUMBER_LEN];
-+
-+	DBG("");
-+
-+	entry = g_new0(struct clcc_entry, 1);
-+
-+	if (!hfp_context_get_number(context, &val)) {
-+		error("hf-client: Could not get index");
-+		goto failed;
-+	}
-+	entry->idx = val;
-+
-+	if (!hfp_context_get_number(context, &val) || val > 1) {
-+		error("hf-client: Could not get direction");
-+		goto failed;
-+	}
-+	entry->direction = val;
-+
-+	if (!hfp_context_get_number(context, &val) ||
-+			val > CALL_STATE_DISCONNECTED) {
-+		error("hf-client: Could not get callstate");
-+		goto failed;
-+	}
-+	entry->status = val;
-+
-+	if (!hfp_context_get_number(context, &val)) {
-+		error("hf-client: Could not get mode");
-+		goto failed;
-+	}
-+	entry->mode = val;
-+
-+	if (!hfp_context_get_number(context, &val)) {
-+		error("hf-client: Could not get multiparty");
-+		goto failed;
-+	}
-+	entry->multiparty = val;
-+
-+	if (hfp_context_get_string(context, number, MAX_NUMBER_LEN))
-+		entry->number = g_strdup(number);
-+
-+	dev->clcc_entries = g_slist_append(dev->clcc_entries, entry);
-+	return;
-+
-+failed:
-+	g_free(entry);
-+}
-+
- static void clip_cb(struct hfp_context *context, void *user_data)
- {
- 	struct hfp_device *dev = user_data;
-@@ -450,6 +602,23 @@ static void cops_cb(struct hfp_context *context, void *user_data)
- 	telephony_set_operator_name(dev->telephony, name);
- }
- 
-+static void cmee_resp(enum hfp_result result, enum hfp_error cme_err,
-+							void *user_data)
-+{
-+	struct hfp_device *dev = user_data;
-+
-+	DBG("");
-+
-+	if (result != HFP_RESULT_OK) {
-+		error("hf-client: CMEE error: %d", result);
-+		return;
-+	}
-+
-+	if (dev->features & HFP_AG_FEAT_ENHANCED_CALL_STATUS) {
-+		request_calls_update(dev);
-+	}
-+}
-+
- static void ccwa_resp(enum hfp_result result, enum hfp_error cme_err,
- 							void *user_data)
- {
-@@ -463,9 +632,10 @@ static void ccwa_resp(enum hfp_result result, enum hfp_error cme_err,
- 	}
- 
- 	if (dev->features & HFP_AG_FEAT_EXTENDED_RES_CODE) {
--		if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, dev,
--								"AT+CMEE=1"))
-+		if (!hfp_hf_send_command(dev->hf, cmee_resp, dev, "AT+CMEE=1"))
- 			info("hf-client: Could not send AT+CMEE=1");
-+	} else if (dev->features & HFP_AG_FEAT_ENHANCED_CALL_STATUS) {
-+		request_calls_update(dev);
- 	}
- }
- 
-@@ -485,9 +655,10 @@ static void nrec_resp(enum hfp_result result, enum hfp_error cme_err,
- 		if (!hfp_hf_send_command(dev->hf, ccwa_resp, dev, "AT+CCWA=1"))
- 			info("hf-client: Could not send AT+CCWA=1");
- 	} else if (dev->features & HFP_AG_FEAT_EXTENDED_RES_CODE) {
--		if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, dev,
--								"AT+CMEE=1"))
-+		if (!hfp_hf_send_command(dev->hf, cmee_resp, dev, "AT+CMEE=1"))
- 			info("hf-client: Could not send AT+CMEE=1");
-+	} else if (dev->features & HFP_AG_FEAT_ENHANCED_CALL_STATUS) {
-+		request_calls_update(dev);
- 	}
- }
- 
-@@ -512,9 +683,13 @@ static void clip_resp(enum hfp_result result, enum hfp_error cme_err,
- 		if (!hfp_hf_send_command(dev->hf, ccwa_resp, dev, "AT+CCWA=1"))
- 			info("hf-client: Could not send AT+CCWA=1");
- 	} else if (dev->features & HFP_AG_FEAT_EXTENDED_RES_CODE) {
--		if (!hfp_hf_send_command(dev->hf, cmd_complete_cb, dev,
--								"AT+CMEE=1"))
-+		if (!hfp_hf_send_command(dev->hf, cmee_resp, dev, "AT+CMEE=1"))
- 			info("hf-client: Could not send AT+CMEE=1");
-+	} else if (dev->features & HFP_AG_FEAT_ENHANCED_CALL_STATUS) {
-+		request_calls_update(dev);
-+	}
-+}
-+
- static void cops_status_resp(enum hfp_result result, enum hfp_error cme_err,
- 							void *user_data)
- {
-@@ -570,6 +745,7 @@ static void slc_completed(struct hfp_device *dev)
- 
- 	hfp_hf_register(dev->hf, ccwa_cb, "+CCWA", dev, NULL);
- 	hfp_hf_register(dev->hf, ciev_cb, "+CIEV", dev, NULL);
-+	hfp_hf_register(dev->hf, clcc_cb, "+CLCC", dev, NULL);
- 	hfp_hf_register(dev->hf, clip_cb, "+CLIP", dev, NULL);
- 	hfp_hf_register(dev->hf, cops_cb, "+COPS", dev, NULL);
- 
-@@ -793,6 +969,9 @@ static void ciev_call_cb(uint8_t val, void *user_data)
- 		return;
- 	}
- 
-+	if (request_calls_update(dev))
-+		return;
-+
- 	if (dev->call == val)
- 		return;
- 
-@@ -854,6 +1033,9 @@ static void ciev_callsetup_cb(uint8_t val, void *user_data)
- 		return;
- 	}
- 
-+	if (request_calls_update(dev))
-+		return;
-+
- 	if (dev->call_setup == val)
- 		return;
- 
-@@ -935,6 +1117,9 @@ static void ciev_callheld_cb(uint8_t val, void *user_data)
- 		return;
- 	}
- 
-+	if (request_calls_update(dev))
-+		return;
-+
- 	dev->call_held = val;
- 
- 	if (dev->call_held == CIND_CALLHELD_NONE) {
--- 
-2.43.0
 
+Compare: https://github.com/bluez/bluez/compare/8d5d2ea96688%5E...15a4e9b=
+96136
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
