@@ -1,151 +1,84 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF62C2FB
-	for <linux-bluetooth@vger.kernel.org>; Sat, 28 Jun 2025 10:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7101799F;
+	Sat, 28 Jun 2025 12:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751106873; cv=none; b=Cv4QMdJE9U8KXHQrQbUp0l+YayK0yi5H9w7R6WpxZthfLyjzVx0Y0CKRndKFR7WcVT+QKJeiHSyruqIFJpa4k6thVY6n3jdRTTjr0TsqATvTKeFMyWnZEwxpd9Xwgm09IKfp4PfoQ0vAetnOT2ju6ywKcVYMIEmBUpBzvDa84/I=
+	t=1751112221; cv=none; b=KtNei/OdqB89LHe0RF3uRW7Yq+JYXnpV107GoH66pPuXz7fydHDzsMVVwToiFkeHIttwOMJmMHZ0/IDW3Y/kr7+kenIjXkdG0cM1sON+n297Hk9TMAFmm852nFGb/irxheJ0PjbOT+5fWZpYksLkGrQk5t/+JEPzy7qHGJ2n7pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751106873; c=relaxed/simple;
-	bh=sDzMy7F/h1cN1J7RIPdc0Lc+Iy+gc0t3s8R9hiCIykA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=GUr7dxjAYwkc4M3Nr7In9oEjQrK2F0LgKCNwPkYsV9jY+j5pCK1YTwcfl4WGwZa7veoWIVb76XkCKZSzO/jQVqPdYnPJt+Wua+a1g1LHPTrz0dVlKAuO0S3iovPXUVvlMkxBldAcWWWuFZIWD3GKL+KVNsf0qnXmXnaG6fpCNAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XIVhJT51; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751112221; c=relaxed/simple;
+	bh=adw4vx0RKecc9InMMlHCSaFcrV1lp2SGd+hRdGVjNEE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMc40r03z11zfMqkeOniHqCakiJj6DwZV3lgXGc2zbjbyO61hOwFzvtxCxn1/XTQr6E84bckFCmMoimPOSy39dQih8bi3EykmOJTNNYt4vo6FuD4eHjqI7/XPSeoLexOd7oBJSoeuEXnO9qK9YhSnE5YirhhSuPMmzYPCA+wjRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pOY5riDH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIVhJT51"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-700c7f0d9f1so1042426d6.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Jun 2025 03:34:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751106871; x=1751711671; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=CLbqce8t7qNQoYifl2F6PrXwFF/Lh1poNfolwfHki4Y=;
-        b=XIVhJT51MMeXq1yROnD7KFwJHITXFAe5TPJkpRaqEPZNdb2i6tOsBjH4zJgth+ViZ6
-         PqAKZ6j/rypcUwaKpRJsClYrSpI7iuR+UQpUTuWM60nhnh+6aaM8WrCXmVhNqhcvrUBf
-         ehtdXsAECA9CJrbN7DMjYRpmxwLjUf03V099QXjERn1D2VqUqHPtHuoQlUOTkhuhNI7d
-         ULNflJO7Xxz949AFBot5SHIw74aCk7KYtgwq3z7iDbcN20H0+oz+0IAvwWO8gSrgtPvd
-         4ANCtm4m/JWJ+xJcyQ6B/DSkva676e1lK4AkeDyXVry8AnJCRhdswgVaTTX/Z807Is6V
-         TDAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751106871; x=1751711671;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CLbqce8t7qNQoYifl2F6PrXwFF/Lh1poNfolwfHki4Y=;
-        b=YM2AuSh5RuG8rPKkLNp6wuh0qqzTqMOi+rzNM9OUOWS53RADXjNGwM8dmEU5CZPiNh
-         X/2DxSms5CC9x4kHPs88wBE0pkGh9j4YwcPFHLxEyKMsdWJH8rfaLSCStiquNmTmXQCB
-         Wn1u0YbJXcGKZ0XJfiANiJjx1kDrikg+VDPrvSFQByl0Ce6nUqOlG06ehg+2ZsU4onjq
-         QkzZ720mHrr0A8Dff3QLtdb9VRbCNusLeX2Em2KMIt/gnD/0RGfT/9IvwQQC0Jm8vAfP
-         QneCOJjajoI2NT4y8GHWzfyS0+WAUtszF5UFTlRZ6lgEtGfgY8jF9trxQkZZWaTjFvNS
-         zA6Q==
-X-Gm-Message-State: AOJu0YwlpERyE/kQxavcX4lZkRobO+OQDNddBGxMoBpByh5SRnntoOUS
-	ozn2PgaVyX0/G2uCmo7dcCYPMQ75MN40BdMM4TthRKRSmrlu66siM3e1E1TLxw==
-X-Gm-Gg: ASbGncs5G20blxhGAJvCQhGWPimonux2ZuAm0fKGzHK8iaK2qof6cxu3ZJL8/k2v5Sd
-	i9PA9lX6InVVK+5piM9rtGXAIor9NeFvqdTcjjYcR/5y8b8Eu0qMLNGu+vdO3U1b6Sz7r7seSar
-	sFTiaLGbOqoIPCTZywSxoctzcncxQGwk6ogZEKrMYvAYYXJuHddm4tQZI0nIhRUqnlTtgV0PL4A
-	HZfrurQV/FZ5NeNZJj7N+mjpD4g+WvET1BGu7Zd4ooUdMPr2QtoOWvsTnht8YP+l9PKT7MejocE
-	eVipVfM2UqKq1WL/r4TopTonNZdw3kOBRLwOUyUUx2mptA6LU0m9u7klus6E1xdbMAbb
-X-Google-Smtp-Source: AGHT+IG+DNRERz4okvDf/rhjxFaGUvwwNVstdpxS9QVyjqB4fDQZNEAUJDm48oEBFwPNDyFuCHZwnQ==
-X-Received: by 2002:a05:6214:ca7:b0:6fa:a5f6:ffce with SMTP id 6a1803df08f44-6fd753f2875mr183706466d6.19.1751106870872;
-        Sat, 28 Jun 2025 03:34:30 -0700 (PDT)
-Received: from [172.17.0.2] ([172.203.175.0])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd7718da94sm35000136d6.24.2025.06.28.03.34.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Jun 2025 03:34:30 -0700 (PDT)
-Message-ID: <685fc536.d40a0220.3810.b9eb@mx.google.com>
-Date: Sat, 28 Jun 2025 03:34:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2645237528928628149=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOY5riDH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1EFCC4CEEA;
+	Sat, 28 Jun 2025 12:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751112220;
+	bh=adw4vx0RKecc9InMMlHCSaFcrV1lp2SGd+hRdGVjNEE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pOY5riDHCyJcLDukUB55YL5gK3oqVWjFCbmkYdYK7e54zPYE57O2LiQnCJEHUyIZ6
+	 jYAJdWIGUutBqp5pd7yGYpxj/9Nr0qs4AKHQJhtlt1bSI7n6YciivHChzylsHbb4xT
+	 y23B3KC2VvnIPUO3h91ylFVjg5G0i35vp7pYNw8303y2PULTBXv8ImwxbDKkotixCa
+	 KmEA27B9ehtFzsNmsLt0IRL9Xib+dN4s4DO9jZ4UGHjAa9YvRDr60wZokJGx2EtSAR
+	 tzqLfa+7OpEK3cEMdWqo/WIjO836yZrXXExZezeiG1FmxDWZ1EwP3U+xfaRmtT323Y
+	 Jw4IolTZijbFQ==
+Date: Sat, 28 Jun 2025 14:03:36 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Zhangchao Zhang <ot_zhangchao.zhang@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Rob Herring <robh@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Sean Wang <sean.wang@mediatek.com>, 
+	Jiande Lu <jiande.lu@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>, 
+	Chris Lu <chris.lu@mediatek.com>, Hao Qin <Hao.qin@mediatek.com>, 
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-mediatek <linux-mediatek@lists.infradead.org>, 
+	devicetree <devicetree@vger.kernel.org>
+Subject: Re: [PATCH v5 0/2] Bluetooth: mediatek: add gpio pin to reset bt
+Message-ID: <rthuekbpdfszo2mw4b4zgjlv2nd45zbzzpxdjjxf6gpkrc5g5l@m7kfo7s4ltqv>
+References: <20250627055924.7716-1-ot_zhangchao.zhang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yuehaibing@huawei.com
-Subject: RE: [net-next] Bluetooth: btrtl: Fix passing zero to 'ERR_PTR'
-In-Reply-To: <20250628103105.211049-1-yuehaibing@huawei.com>
-References: <20250628103105.211049-1-yuehaibing@huawei.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250627055924.7716-1-ot_zhangchao.zhang@mediatek.com>
 
---===============2645237528928628149==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Jun 27, 2025 at 01:59:22PM +0800, Zhangchao Zhang wrote:
+> The enhanced BT reset feature builds upon the previous software-based
+> BT reset by adding support for hardware pin resets.
+> To maintain compatibility with existing projects that
+> still use the software BT reset, both methods are supported.
+> 
+> When performing a BT reset, the system first checks whether the
+> Device Tree Source (DTS) is configured with the appropriate settings.
+> If the specified compatible and BT reset GPIO are defined in the DTS,
+> the system will pull the designated GPIO pin low for at least 200ms,
+> then pull it high to trigger the BT reset. If these settings are not
+> configured, the system will fall back to the original software
+> BT reset methods.
+> 
+> Compared with the previously submitted version, the following
+> information are some specific revision histories
+> 
+> V4-->V5 modifications:
+> -Modify the comments mentioned in v1.
 
-This is automated email and please do not reply to this email!
+What? This is so vague, means nothing.
 
-Dear submitter,
+> -Modify dt_binding files and 
+>    make dt binding a separate patch.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=976902
+This means nothing. Everything is "modify". Your changelog is terribly
+uninforming. This must be detailed.
 
----Test result---
+Best regards,
+Krzysztof
 
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.21 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      24.53 seconds
-CheckAllWarning               PASS      26.96 seconds
-CheckSparse                   PASS      30.49 seconds
-BuildKernel32                 PASS      24.28 seconds
-TestRunnerSetup               PASS      473.69 seconds
-TestRunner_l2cap-tester       PASS      25.26 seconds
-TestRunner_iso-tester         PASS      38.34 seconds
-TestRunner_bnep-tester        PASS      6.11 seconds
-TestRunner_mgmt-tester        FAIL      135.36 seconds
-TestRunner_rfcomm-tester      PASS      9.49 seconds
-TestRunner_sco-tester         PASS      14.84 seconds
-TestRunner_ioctl-tester       PASS      10.43 seconds
-TestRunner_mesh-tester        FAIL      11.47 seconds
-TestRunner_smp-tester         PASS      8.63 seconds
-TestRunner_userchan-tester    PASS      6.32 seconds
-IncrementalBuild              PENDING   0.44 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.184 seconds
-LL Privacy - Remove Device 3 (Disable RL)            Failed       0.254 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.012 seconds
-Mesh - Send cancel - 2                               Timed out    1.999 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2645237528928628149==--
