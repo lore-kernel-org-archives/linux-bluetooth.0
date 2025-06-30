@@ -1,78 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5006218FDBE;
-	Mon, 30 Jun 2025 14:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E6D2AF1B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jun 2025 14:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751293785; cv=none; b=bo54EqEA2S6SHg0lwBrqveQ2rDt5hwnP+NI448Qt5HcnQyoLAGm7dEAaD3RzXym8b+IVJCy+S6CctwZYpiduEtNTUPfCXkSxejLiHWNTv9chr1q9rGRdLMePsQ7YWeXsgcLnV1gT8WLYvy1MoNoRvXt4k+tRVXAH5WIlEt+dOb8=
+	t=1751294120; cv=none; b=d+63GcPC60zgBjEeEWZc1oiCVd3BRdSXSlLRCBOCWCyntGEoFqmClUkOGKkVhpTxZzmzy2eU+IWcQBN42uoRpxCG7VT6F39LaH30dkNXQHXhjFnzK1XW/cqp6IfZfoQNVWWoDa7DiwsqqdmVIWo7xOix0VJDCcEEAhOPdCNGtMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751293785; c=relaxed/simple;
-	bh=LiBFZaqfXZuYTsBTBH2ULjzAIDtzQXyKkx6tEetHjqc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rY281NL/35GLUt8JF5xKF66WbPDE2wm0akMTaRpE03smRV8HBriMhI5t+WxGo+oGo8J4QJvhrIKBPT3pMLbTbvMInFM6dzPjjGt0/LcjC9blIXiGhssiILaNhIVwu/I3XTP9dvrFR2zycEApM+jikbGBQrADm6OmIxiU5/lPgWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GxL45HdI; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GxL45HdI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1CC9C4CEE3;
-	Mon, 30 Jun 2025 14:29:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751293784;
-	bh=LiBFZaqfXZuYTsBTBH2ULjzAIDtzQXyKkx6tEetHjqc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GxL45HdI06gzqzqj9bgi9Fpxw8BzrDahNjX21wsZhgdUDZha7Or1gVTUbnXH3rTGM
-	 IdQRIpDaMKoAqyw5XWB9E8mcZSxBh+na9kONK5PLWEPZIbeGdF0zaEDCEdAZ26l04U
-	 9b26A8xFFbF9JSUIv020653bGXD/CMzcXAk3FGu/hzh6QBUo91DnZaNxr4MEmGO1sn
-	 UEaMw1eAyYRF9/ZiX7l4MloWEM+iHK9+U7TFgwT4QhNDWwrfRr1l6buko8EvC/Ty4+
-	 gSfiOSruclMXrYKrl+re/WJ01H6VqmjxDfFXeiMX5DeLjP6Vkaa1a1XGgxIwobSZM8
-	 KrGBnnWUjeLTg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FA5383BA00;
-	Mon, 30 Jun 2025 14:30:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1751294120; c=relaxed/simple;
+	bh=yMsRlDYU0Slyzd86pWCzc1LQasub4rDD5B74noCEiz4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u1kM7piLSCRCuij1MtqJNu3ob2ZTMmCcZ7u7bWSdpicHQTaZ1MCxDJzcuUz+WEmoJ+EdEycsEV1TZHsbaQ4YZ56N+p8bOv64iLGop0hRhZUiIndltzP9c2GrjavynyYwaryNizx2d7urhEK0/SXvMHEJo92Iu1Kih9sQdcfIG8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7fe.dynamic.kabel-deutschland.de [95.90.247.254])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E9ED061DB0C02;
+	Mon, 30 Jun 2025 16:35:08 +0200 (CEST)
+Message-ID: <3f6297ee-5953-4835-a1e3-26642dfa1df7@molgen.mpg.de>
+Date: Mon, 30 Jun 2025 16:35:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: HCI: fix disabling of adv instance before
- updating
- params
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175129380974.3403730.2401095205165807740.git-patchwork-notify@kernel.org>
-Date: Mon, 30 Jun 2025 14:30:09 +0000
-References: <20250630075848.14857-1-ceggers@arri.de>
-In-Reply-To: <20250630075848.14857-1-ceggers@arri.de>
-To: Christian Eggers <ceggers@arri.de>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] obexd: reject to accept file when replying any error
+ message
+To: Chengyi Zhao <zhaochengyi@uniontech.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20250630135421.740-1-zhaochengyi@uniontech.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250630135421.740-1-zhaochengyi@uniontech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+[Cc: -stable@, as obexd is not part of the Linux kernel]
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Dear Chengyi,
 
-On Mon, 30 Jun 2025 09:58:48 +0200 you wrote:
-> struct adv_info::pending doesn't tell whether advertising is currently
-> enabled. This is already checked in hci_disable_ext_adv_instance_sync().
-> 
-> Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2")
-> Signed-off-by: Christian Eggers <ceggers@arri.de>
+
+Thank you for your patch.
+
+Am 30.06.25 um 15:54 schrieb Chengyi Zhao:
+> For security reasons, it will reject the file when the obex
+
+Could you please elaborate on the attack?
+
+> agent replies with any error message, and accept the file
+> when the obex agent replies with the new file name.
 > ---
->  net/bluetooth/hci_sync.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Here is the summary with links:
-  - Bluetooth: HCI: fix disabling of adv instance before updating params
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2a0ae2f6cd36
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>   obexd/src/manager.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
 
 
+Kind regards,
+
+Paul
+
+
+> 
+> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+> index 5a6fd9b4b..cecf9f90a 100644
+> --- a/obexd/src/manager.c
+> +++ b/obexd/src/manager.c
+> @@ -658,6 +658,8 @@ static void agent_reply(DBusPendingCall *call, void *user_data)
+>   				agent->new_name = g_strdup(slash + 1);
+>   			agent->new_folder = g_strndup(name, slash - name);
+>   		}
+> +
+> +		agent->auth_reject = FALSE;
+>   	}
+>   
+>   	dbus_message_unref(reply);
+> @@ -703,7 +705,7 @@ int manager_request_authorization(struct obex_transfer *transfer,
+>   	dbus_message_unref(msg);
+>   
+>   	agent->auth_pending = TRUE;
+> -	agent->auth_reject  = FALSE;
+> +	agent->auth_reject  = TRUE;
+>   	got_reply = FALSE;
+>   
+>   	/* Catches errors before authorization response comes */
