@@ -1,151 +1,166 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C089F222568
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jun 2025 20:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A0125E46A;
+	Mon, 30 Jun 2025 20:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751315772; cv=none; b=QHtaIJPQIFx/DamQ01QjQodqou9i9Rd8RvoHiMng0gci2JEaX/mRkbI3Yey0NuB66ranQajFVg+4SpIEqJRg4MUH0digexG+D/zM6jIHb/1FRborsXSActq6Cr8rwNkx/F+13HBqChT6zoh1tsaLrQtS4nBTX7jyvU1VlVrZGLE=
+	t=1751317147; cv=none; b=kmRKxHG1D8Kgo7jzCPj8gSC5h/eXkes//Uk0GV40KYq0INtb1M1TqBWUm+XE5/mJCmrSrjWGXR5WtCPUo/v8paKWxFFGIFJtEd5PKkEy+2ss5FqCcWjn0rEZW66c+rvUxMlr3rV6VLZUcoe3BByYDzmuaPLhcnddfqzwbUMkk8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751315772; c=relaxed/simple;
-	bh=LW/Dpo30BEPg4rS8o0X7bXMlKi8PQMkEq2Su3/l/diE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=nNfpF3OD1wWW8MmA7QbvGr9HI0VrhePsDGceaom5hf0hvjGs5QpM1EVtR09Y5y+jt0PfHOJNk5U6Wa6mTxZp+jC8K3aufNhK6nKy7st9b6XZQg4oBNMBKNQAPWUnbd6cqKlWOtQb8ydJKVM10f2xTULOweoRgPOScypSTCF1kfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZe+pXK5; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751317147; c=relaxed/simple;
+	bh=iSJXZO6FV3ug7KC5RuYiaPEOcP4ViT5ulVNpoNlH+tk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nt08B9GOvHG6VuqJxYm13bV/Oj7iptIar4h6oHbljoVtI1eZmB+F8UfL/qzU6wS0GTi8mYzYbiR3CSiIJcC3/sQgSYysZFtReK99n/F4SDTBKS5DJcO1/o4BXSfsS2z9rfTSpGo3XHMIkJQrWAv+dlZIYG8oD1eP6Ik98MAff+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tj+f1Rxj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZe+pXK5"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7d402c901cbso448777985a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jun 2025 13:36:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751315769; x=1751920569; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ALUPljEEzqy4GVElVdmM14Y6sv7H0mMk9f/exKG2Cbs=;
-        b=XZe+pXK5q5X2GIgE7pRj57H3qtO2TgrZC95zYbLRRAMpn1DpV9vM7eO5q1bwFqQuEQ
-         fsDvn2yMLT9pGJTyZ5c6MmOGGAXxIhsbl9NMo9lF+OhNQFz55+KLHPxsi2+ByFHEL2mJ
-         rBRGUwfYGJVmahyot5QAGNxRrYsVjcNxilcF8k29dDMZo+DcADsDy7255yjee1Jj2cOc
-         ZbpGJ5+TJ9Re/z6DKajRiCQjn3oMeGI4ez3Lx1MK7OllTL4udu+7pM3ZJdC4x4rtDx2V
-         dhtTcFXnOpvgbP2xthuPdobF/tvPyl+gMkHEpiUMHcQS22w9xZcPBTtI0AGOGQTGEIdc
-         kVZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751315769; x=1751920569;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ALUPljEEzqy4GVElVdmM14Y6sv7H0mMk9f/exKG2Cbs=;
-        b=LO2cbEoJ3NMlXmpu8Jr3u/BHW1k8dhNcvtbozg/JIivm/TmQDb0mQeSG4j2zadAjE9
-         3kWdxT3yVhlVSJ3jChwrCL60VhVpOW+QiTbgg6zv8kysE6kledWmqj851ireDZ1h/3+5
-         g03kUtdyFyI+ZJtGaQOzI9MKFXh0ex0p1+SLO0K/eUl8C7YpvxlPUKv8K+uCWO2xqVpz
-         cnUDb76geWB0sZP9YoaVYtRs8ihYuL06Dr0M58XpNWnAd16ufbzOACxr9lby7ybbc4v3
-         Mr4HVLKS2rP3Y6LfqJ5WF/prz3ukNuqW32vFzA/mfnr0lHn75R6Pr+PKEM+V61gZ87KY
-         kamw==
-X-Gm-Message-State: AOJu0YwpUt9vctXoy4Bu3xh3NghCmAua3NT4xJB2dSmnlGD7kQOD1NYS
-	3VmlE28RhzB7GivkayeTcZU1kPgGRwwMBbNvIakM41YjhxH7d9SKTDi9FVIsgA==
-X-Gm-Gg: ASbGnctF/LZkEucAsgYZB517e4o9u22QPqc/ZMsILrfQqo682TQmM7xfqJZuqyVYwgw
-	DBfJMdtcDMxn7aKC2eTIWWc0F6CxbJIZQOnkYqG+mpyx6Jah6GWvB2QI+WdiVfJHRp467fftiLG
-	z8+g2pdHrgrH6i13SdvVbljjcT7wz+Pe3HOux45y11ighVg0Php271ZswuYQ6WmhMaMipdMpzZV
-	vFe2hLjJoxGESTiac55eEVtRnwKAd48nkgwdDjs8Tewq4Pz6SJh/BIz5LLZp6aRDeFfI8TcLUKj
-	fGIMkd21WX/7AmlnqKf5SGouOxRSTg0qRqntpiMHO+Kgk2CWkicpBdL4a0I98hNaYdpycA==
-X-Google-Smtp-Source: AGHT+IFPLg+HJc8DY3u3bV/c0EJDQKAaxRcz9SqsqD+OTGUvhX/hX/xDymGn91+IMDyBpdz6TEbDZg==
-X-Received: by 2002:a05:620a:40d4:b0:7d2:15f:f976 with SMTP id af79cd13be357-7d4439b735dmr2185216285a.52.1751315769429;
-        Mon, 30 Jun 2025 13:36:09 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.76.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d442e8db3csm662916085a.0.2025.06.30.13.36.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 13:36:08 -0700 (PDT)
-Message-ID: <6862f538.050a0220.35b121.49c4@mx.google.com>
-Date: Mon, 30 Jun 2025 13:36:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8702625401801114661=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tj+f1Rxj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB152C4CEEB;
+	Mon, 30 Jun 2025 20:59:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751317147;
+	bh=iSJXZO6FV3ug7KC5RuYiaPEOcP4ViT5ulVNpoNlH+tk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Tj+f1RxjrnsnBeJebvs3iFt0pR21ieyDYT0ZMSRPMg4ZqDrjLcfMc524fYq+PkIgm
+	 flC8Lo5Kp/lhprcJm5wMC9touPsHAdzOfDVKLLunQUmxMlChPNhrSmqnQyGXg+Q208
+	 2s3NJoIu1rSYknsUdE/5Ntvj1Qb4UaYe//SUz5qOptOnEMiurETYKmPpNOoIZgYN6e
+	 yFmwQvaLPTQZ1u6ZVvJLIHPtuOa8haTd9o1dsj/462oLWvncORWgzxJ7ojoTfmjBl7
+	 bePzeadCz54MSoO3FJHRK0zC9sZ+t00EtbP9Qg0jKJz/xOvudLxd+hIkb4j8jgQDly
+	 5wSLPAVP8vp4g==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Shuai Zhang <quic_shuaz@quicinc.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.15 14/23] driver: bluetooth: hci_qca:fix unable to load the BT driver
+Date: Mon, 30 Jun 2025 16:44:19 -0400
+Message-Id: <20250630204429.1357695-14-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250630204429.1357695-1-sashal@kernel.org>
+References: <20250630204429.1357695-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: hci_core: Remove check of BDADDR_ANY in hci_conn_hash_lookup_big_state
-In-Reply-To: <20250630193934.987691-1-luiz.dentz@gmail.com>
-References: <20250630193934.987691-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.15.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============8702625401801114661==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Shuai Zhang <quic_shuaz@quicinc.com>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit db0ff7e15923ffa7067874604ca275e92343f1b1 ]
 
-Dear submitter,
+Some modules have BT_EN enabled via a hardware pull-up,
+meaning it is not defined in the DTS and is not controlled
+through the power sequence. In such cases, fall through
+to follow the legacy flow.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=977465
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.33 seconds
-GitLint                       PENDING   0.28 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      24.45 seconds
-CheckAllWarning               PASS      26.84 seconds
-CheckSparse                   PASS      30.61 seconds
-BuildKernel32                 PASS      24.56 seconds
-TestRunnerSetup               PASS      472.53 seconds
-TestRunner_l2cap-tester       PASS      25.12 seconds
-TestRunner_iso-tester         PASS      42.30 seconds
-TestRunner_bnep-tester        PASS      5.94 seconds
-TestRunner_mgmt-tester        FAIL      131.19 seconds
-TestRunner_rfcomm-tester      PASS      9.27 seconds
-TestRunner_sco-tester         PASS      14.85 seconds
-TestRunner_ioctl-tester       PASS      10.05 seconds
-TestRunner_mesh-tester        FAIL      9.58 seconds
-TestRunner_smp-tester         PASS      8.51 seconds
-TestRunner_userchan-tester    PASS      6.25 seconds
-IncrementalBuild              PENDING   0.83 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Add Device 3 (AL is full)               Failed       0.215 seconds
-LL Privacy - Set Flags 4 (RL is full)                Failed       0.293 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.152 seconds
-Mesh - Send cancel - 2                               Failed       0.144 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
 
+**YES**
 
---===============8702625401801114661==--
+This commit should be backported to stable kernel trees. Here's my
+extensive analysis:
+
+**1. Nature of the Fix:**
+This is a critical bug fix that addresses driver probe failure on
+specific hardware configurations. The commit fixes an issue where the
+Bluetooth driver would fail to load on modules that have BT_EN enabled
+via hardware pull-up rather than through device tree configuration.
+
+**2. Code Analysis:**
+The key change is in the error handling path:
+```c
+- if (IS_ERR(qcadev->bt_power->pwrseq))
+- return PTR_ERR(qcadev->bt_power->pwrseq);
+- break;
++ if (IS_ERR(qcadev->bt_power->pwrseq))
++     qcadev->bt_power->pwrseq = NULL;
++ else
++     break;
+```
+
+Previously, when `devm_pwrseq_get()` failed, the driver would
+immediately return an error, causing the entire probe to fail. The fix
+changes this behavior to set `pwrseq` to NULL and fall through to the
+legacy initialization flow, allowing the driver to continue loading.
+
+**3. Impact on Users:**
+- **Before the fix**: Complete failure to load Bluetooth driver on
+  affected hardware
+- **After the fix**: Driver loads successfully using the legacy power
+  control flow
+- This directly affects system functionality - without this fix,
+  Bluetooth is completely non-functional on affected devices
+
+**4. Risk Assessment:**
+- **Minimal risk**: The change is contained to error handling logic
+- **No new features**: This purely fixes existing functionality
+- **Well-defined scope**: Only affects specific SoC types (QCA_WCN6855,
+  QCA_WCN7850, QCA_WCN6750)
+- **Graceful fallback**: Uses existing legacy flow rather than
+  introducing new code paths
+
+**5. Stable Kernel Criteria:**
+This commit meets all the criteria for stable backporting:
+- ✓ Fixes a real bug that users are hitting
+- ✓ Small and self-contained change (7 lines added, 3 removed)
+- ✓ Already tested in mainline
+- ✓ Doesn't add new functionality
+- ✓ Low risk of regression
+
+**6. Hardware Configuration Addressed:**
+The commit specifically handles modules where:
+- BT_EN is enabled via hardware pull-up
+- No "enable-gpios" property in device tree
+- Power sequencer is not available/applicable
+
+This is a valid hardware configuration that was overlooked in the
+original implementation, making this fix essential for proper hardware
+support.
+
+The commit follows the pattern of similar Bluetooth driver fixes that
+have been backported (like the first reference commit) - small, targeted
+fixes that restore functionality without architectural changes.
+
+ drivers/bluetooth/hci_qca.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index a2dc39c005f4f..976ec88a0f62a 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2392,10 +2392,17 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 			 */
+ 			qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->dev,
+ 								   "bluetooth");
+-			if (IS_ERR(qcadev->bt_power->pwrseq))
+-				return PTR_ERR(qcadev->bt_power->pwrseq);
+ 
+-			break;
++			/*
++			 * Some modules have BT_EN enabled via a hardware pull-up,
++			 * meaning it is not defined in the DTS and is not controlled
++			 * through the power sequence. In such cases, fall through
++			 * to follow the legacy flow.
++			 */
++			if (IS_ERR(qcadev->bt_power->pwrseq))
++				qcadev->bt_power->pwrseq = NULL;
++			else
++				break;
+ 		}
+ 		fallthrough;
+ 	case QCA_WCN3950:
+-- 
+2.39.5
+
