@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A0125E46A;
-	Mon, 30 Jun 2025 20:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF73429824B;
+	Mon, 30 Jun 2025 21:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751317147; cv=none; b=kmRKxHG1D8Kgo7jzCPj8gSC5h/eXkes//Uk0GV40KYq0INtb1M1TqBWUm+XE5/mJCmrSrjWGXR5WtCPUo/v8paKWxFFGIFJtEd5PKkEy+2ss5FqCcWjn0rEZW66c+rvUxMlr3rV6VLZUcoe3BByYDzmuaPLhcnddfqzwbUMkk8A=
+	t=1751317209; cv=none; b=gIbCyrBxD5AHMoPGnRgWjFB63Rlp7OAUBvLQEATlp+TVhd/Fr1nVaggtDNtgwvIxsl8TEyVoAZZBlcp1vp2B8ZWLI9OT13e2usUxAaGWDNdrOm4zgMH7O2peg4fPw0AjSJRuASUih6aXcl8U95c0renhUpqDFwn38HvkaxB0PO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751317147; c=relaxed/simple;
-	bh=iSJXZO6FV3ug7KC5RuYiaPEOcP4ViT5ulVNpoNlH+tk=;
+	s=arc-20240116; t=1751317209; c=relaxed/simple;
+	bh=9OZiaP+ntj1XdENRNdb/w4rrN6mMC/eq0anYbpV/W+E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nt08B9GOvHG6VuqJxYm13bV/Oj7iptIar4h6oHbljoVtI1eZmB+F8UfL/qzU6wS0GTi8mYzYbiR3CSiIJcC3/sQgSYysZFtReK99n/F4SDTBKS5DJcO1/o4BXSfsS2z9rfTSpGo3XHMIkJQrWAv+dlZIYG8oD1eP6Ik98MAff+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tj+f1Rxj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=J1O5breWBfv03tQz6uEFjmcbG3zB2IIa4hYk757Egx/jHwb2TMTefD9FbqGBhEbslNGEWhfCwP2fw1meiHpzlvuKrtcNzpr/KUlR9SVnMdMha6S7b+ST4Xa1DfVhyGC6U7rifhmyH00NWexaWK32cvtcegQLT0OzMUq4IaIpEGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=moBVHaen; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tj+f1Rxj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB152C4CEEB;
-	Mon, 30 Jun 2025 20:59:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="moBVHaen"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 859FEC4CEEB;
+	Mon, 30 Jun 2025 21:00:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751317147;
-	bh=iSJXZO6FV3ug7KC5RuYiaPEOcP4ViT5ulVNpoNlH+tk=;
+	s=k20201202; t=1751317209;
+	bh=9OZiaP+ntj1XdENRNdb/w4rrN6mMC/eq0anYbpV/W+E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Tj+f1RxjrnsnBeJebvs3iFt0pR21ieyDYT0ZMSRPMg4ZqDrjLcfMc524fYq+PkIgm
-	 flC8Lo5Kp/lhprcJm5wMC9touPsHAdzOfDVKLLunQUmxMlChPNhrSmqnQyGXg+Q208
-	 2s3NJoIu1rSYknsUdE/5Ntvj1Qb4UaYe//SUz5qOptOnEMiurETYKmPpNOoIZgYN6e
-	 yFmwQvaLPTQZ1u6ZVvJLIHPtuOa8haTd9o1dsj/462oLWvncORWgzxJ7ojoTfmjBl7
-	 bePzeadCz54MSoO3FJHRK0zC9sZ+t00EtbP9Qg0jKJz/xOvudLxd+hIkb4j8jgQDly
-	 5wSLPAVP8vp4g==
+	b=moBVHaen8tCSqpropj+Z5jDCZxIFXs4IvD2hvf9VtUOlkr5DwFcXaIRhOe+c1TTy9
+	 LWFee/j4xOok/orEC8i+2sb+SnsLeBQw8UlUw3VQE/p8cG3njTBb0OVTXw8bSXRRiQ
+	 ZUhVvNuz/uzbx9AdTcl+l7ghGIANYT/KYi9+BFYdYcR62IIb/mESimL6HLxB664+pn
+	 6Tn5CSmDIfJxHF+ImMEhsz/sgDEm9WwTRpIql4liA8nLxqqeWpbw4EsulT8LslAp93
+	 /0xIEK8HHX8Guna7GqjyeQ2S5PjFCZ2vHfJCzowO1UN70LbcrdkLeeYNyGUG6o9cuG
+	 zKQnroCz8ATXQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Shuai Zhang <quic_shuaz@quicinc.com>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.15 14/23] driver: bluetooth: hci_qca:fix unable to load the BT driver
-Date: Mon, 30 Jun 2025 16:44:19 -0400
-Message-Id: <20250630204429.1357695-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 12/21] driver: bluetooth: hci_qca:fix unable to load the BT driver
+Date: Mon, 30 Jun 2025 16:45:27 -0400
+Message-Id: <20250630204536.1358327-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250630204429.1357695-1-sashal@kernel.org>
-References: <20250630204429.1357695-1-sashal@kernel.org>
+In-Reply-To: <20250630204536.1358327-1-sashal@kernel.org>
+References: <20250630204536.1358327-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.15.4
+X-stable-base: Linux 6.12.35
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
@@ -137,10 +137,10 @@ fixes that restore functionality without architectural changes.
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index a2dc39c005f4f..976ec88a0f62a 100644
+index 025b9a07c0875..e6ad01d5e1d5d 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -2392,10 +2392,17 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+@@ -2363,10 +2363,17 @@ static int qca_serdev_probe(struct serdev_device *serdev)
  			 */
  			qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->dev,
  								   "bluetooth");
@@ -160,7 +160,7 @@ index a2dc39c005f4f..976ec88a0f62a 100644
 +				break;
  		}
  		fallthrough;
- 	case QCA_WCN3950:
+ 	case QCA_WCN3988:
 -- 
 2.39.5
 
