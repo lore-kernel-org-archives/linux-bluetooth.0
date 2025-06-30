@@ -1,189 +1,453 @@
-Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [176.109.96.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34292243374;
-	Mon, 30 Jun 2025 11:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.109.96.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACC51CA84;
+	Mon, 30 Jun 2025 13:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751282105; cv=none; b=Us3kyBqz8ND9DWK9wBZb/wUbhNGVOF3DbVQnIkcG7aQajNceBZVKY3MInW/MstusbxzTDObw/iAcul7sSDETmgMbDiplGaf5wBuCi7mO2a356NT8RLAUJyBgjetGlbipvzUUNQHyt0ct1u0YiHC5E5JK8zlZqOIMNqqzQd0JeN8=
+	t=1751289421; cv=none; b=Y39OKLT+lEgSwZ+A7i5/9Xd1zjmyVaIW6xJxZBAzeHPgLh5sJrLXNDr5045V1Wim+2EjuPdfJf+GvPHvjayyL7nlKjc4PbhgC9B4lao4ko/wub67CmLHYrUm5caMBrg6mAOUGoJI/d9R+gEAq1tCeV6l68tslsc8YJI6BGJElW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751282105; c=relaxed/simple;
-	bh=Q0l7pRFn/Hpil+GNatpzNs27sw0JQemNi0WKnp3ZKcg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bTozF/deiJuU8WGNzsvrDRTZVG9DpTMfjEVJ/DP3PLJOqLZA8ehK78lKhk+gN2dZQUUA7jpGMmvhLIvDuqiWObr+Fwn4pvNLrfhKJkr7AnWE+orGqmQviWP7AUZLB2XpSWCiANPEQ3XMm51SJURk98Wl75X8nCV/IX1Prh5tgxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=dhTNKC3k; arc=none smtp.client-ip=176.109.96.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1751289421; c=relaxed/simple;
+	bh=yn9mLE0idjEt7iWU6ZybaCqJqoHhTQtY902q4jfHEmg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d9cOctYIxryZ7z8PDoNgwug3s/m23z662pI84Tj0OA62SP7ewmzsgHtAJMeF7rmacqSId1RNAQd34OIPZldPT/ZNUERF9o3xqHk5DtSMpTYsNzvmA2VjxYQJkjSzWF2ZUzpzPaYZMgDyRk67HopV0O220zm8HQEaCX8QrYLMQfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KU5gWg65; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="dhTNKC3k"
-Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx4.sberdevices.ru (Postfix) with ESMTP id 8A8BC4000D;
-	Mon, 30 Jun 2025 14:08:33 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 8A8BC4000D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1751281713;
-	bh=coMh+HPpf6Z2LXQPp9a5SvOkL0aEzi478gES793Dsn8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=dhTNKC3ky06vVQ1aWoX5mZaYY1OhtQ3ZGG6nSRDnWz7YqHp4WOxZVnwZIycpyY7sR
-	 FJ1ESuZ0hA4DkY8uDD1B40TwKk9KLkDn6j0lEI0En/gGM8+A1vJiKBrzMGKKduxZjd
-	 fkqg/aU2UxIfSTIf6ogkulhtksggaC6vQ6MQTmPuHwfLG9FwMqcmLI4B7Tab8o/IJw
-	 zvvx13e4y7B7JBqlBXVhQdQXFdsU65BmBNf1Q4dDwTK9fZULKKRlP9Q6e/aGLQf5i/
-	 OiqS3B4j/Ku+Wd3pILe2BrNLsBQhjiDA4FbSW7SQ5oCmcJaX89mCkWs0G+9UlD1IhD
-	 xgbDncSa1uuCQ==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R11" (verified OK))
-	by mx4.sberdevices.ru (Postfix) with ESMTPS;
-	Mon, 30 Jun 2025 14:08:33 +0300 (MSK)
-Message-ID: <a408927c-3743-71de-b806-87fd404bb9a2@salutedevices.com>
-Date: Mon, 30 Jun 2025 14:08:02 +0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KU5gWg65"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32b4876dfecso51561081fa.1;
+        Mon, 30 Jun 2025 06:16:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751289416; x=1751894216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4wsGBAomzjNcEfdABu2y6WPn9Ln3RqBcR9gn0wE3fUw=;
+        b=KU5gWg65WmLz8L0eYyaSZtQGTUf8e+ubDUDKyVGXl+ETb+/+Lxyj/P55AQ7cRppekb
+         tkvu7C4aUoS7q956fW+qG3BsSm/tGXv941KUrHTOYiVZIj7/2+CGR/4CmI6mXmp4fpXU
+         V44MBPthhcadOWwCbL7Cisj3WbG3vVsZHbKPLIn0vb/ttVCNe4+CpdPLWyPiWbVTqIqC
+         qeq0OhQLrtEygRvX+RfDzjS/t6fI+AqXEeCBWueo2iq3XkQOUCCdJotBEw071K32KI78
+         hn/aQtorZ4qMJ3JiKhii5dbMJ3c08bcqmASOjOccDYvNW+IhAPD2kzs8keqXOcnekIPX
+         wNRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751289416; x=1751894216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4wsGBAomzjNcEfdABu2y6WPn9Ln3RqBcR9gn0wE3fUw=;
+        b=TOVzE7/SKkGE2Uenwa8tLFBocS5ETUeH+zRrzzrMVdBA/cy3L3MrD/Aehii87Wn5kf
+         wnCakkbEUUzRrZfkHHR3WI3Ziw/+xqXd6BIAanFDKJ2e/QZT1ZNonxP1WL5pzbW6/GRY
+         jFGApJ22l5MjxMLJ2EpXjdiQsVYEHQUHRsos4Er5gJulJwRVsb/nyxFbYiahqEVGBdeB
+         SV/vB0+AnsbVqiV9UKLyLOvNLkisqMteSuBFybOGDY9fAeZ9v997bUgn06mjg/aSiz8a
+         iZZxNf/6SDY6CvbzuQ4XX/FiBIiiRkLoH5jipsCsUryu9xAngCNOoIsjuwHQpu9ByNuX
+         cGsA==
+X-Forwarded-Encrypted: i=1; AJvYcCVIYKzwXQQSo4ZF9lZdb4/2W5vBgwHo+YGg2GRgdsTUHgrI9StoZSo8WqqseTTy7/xJ/L42zlzEAf1wAtx6@vger.kernel.org, AJvYcCWXIJsXgD7P8JM9fW0gB784dvNO+4LcGhngTxoskymFydpPmco0o1Fo3k+FEPxtyXzIt5vLYxHH@vger.kernel.org, AJvYcCXr+f6D2pPloHzy5bOkBaYf6M2MU0xRDNemZLmiCZdoyMZLZQ68Y6048vnHdceKSOqiwo2hAxYXBz2pFQlHlS0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEpuOAnDcDLlfu9Nw8FlJGQz8nURNRpuM7+XfPVMzMdCqEgtga
+	9HnEZOQgKYB7wdlhL+nRwH/fFSOpNX2XSO0I28CcSdCHB8+s23oHF1W33q7w5rQFm0FrkJU7Cv6
+	Gjr4wMXn15vsP3BE++v+NmOWUCkhci+U=
+X-Gm-Gg: ASbGncsQ2dgoCPxFBTCLzwCOdPYzFHH1962mPxDNogM9prHfd99L/Bp862q8JJ+v1ws
+	fSHeX1XBcniZQ0wp2Sz6FBiAobhwPR7d8yxYK1qCOEsGB5tEATzs4xfdV02+xc32U3iZjAPXKjw
+	C2O82Vd5HJH7L8Wj+fGvq6rLLYN9fMfrLT3IcFMEJh/5OqPOdH9YUO
+X-Google-Smtp-Source: AGHT+IHqfrVrXjAmxTwPAB2MERp3GBklfRdsTgjaQs/AFCkdE3CkTwnnHiu26810eLpCjQcbX41neMSggFC8FpSJF5w=
+X-Received: by 2002:a2e:a4b8:0:b0:329:1550:1446 with SMTP id
+ 38308e7fff4ca-32cd007663bmr38314581fa.0.1751289415953; Mon, 30 Jun 2025
+ 06:16:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v3] Bluetooth: hci_sync: fix double free in
- 'hci_discovery_filter_clear()'
-Content-Language: en-US
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <oxffffaa@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@salutedevices.com>
-References: <257a13b8-6d60-21b3-c714-c6cb74b7b091@salutedevices.com>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <257a13b8-6d60-21b3-c714-c6cb74b7b091@salutedevices.com>
+References: <20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com>
+ <1306a61f39fd92565d1e292517154aa3009dbd11.camel@iki.fi> <1842c694-045e-4014-9521-e95718f32037@amlogic.com>
+ <CABBYNZJYeYdggm7WEoz4iPM5UAp3F-BOTrL2yTcTfSrgSnQ2ww@mail.gmail.com>
+ <312a1cc3-bf55-443e-baad-fd35fede40c8@amlogic.com> <CABBYNZJu-LY1kBQCa6cMJyxMQ2PU8PGT-B_qgy56quZAFSjChg@mail.gmail.com>
+ <45469157-ff75-4c4f-953e-09ec6b399071@amlogic.com>
+In-Reply-To: <45469157-ff75-4c4f-953e-09ec6b399071@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 30 Jun 2025 09:16:43 -0400
+X-Gm-Features: Ac12FXwQgFMalu4oplE6JZRfJbfZ2yMDNTR_9GRO6kTGNc5r5AwJwwkpTiKpVKw
+Message-ID: <CABBYNZKBDiftD_C6LHYpWxrduHe-jNYJp=y+AZo1xXreec1O-g@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_event: Add support for handling LE BIG
+ Sync Lost event
+To: Yang Li <yang.li@amlogic.com>
+Cc: Pauli Virtanen <pav@iki.fi>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-exch-cas-a-m1.sberdevices.ru (172.24.201.216) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 62 0.3.62 e2af3448995f5f8a7fe71abf21bb23519d0f38c3, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 194428 [Jun 30 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/06/30 10:00:00 #27605487
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
+Content-Transfer-Encoding: quoted-printable
 
-Hi, sorry, 2 weeks, pls ping
+Hi,
 
-Thanks
+On Mon, Jun 30, 2025 at 2:15=E2=80=AFAM Yang Li <yang.li@amlogic.com> wrote=
+:
+>
+> Hi,
+> > [ EXTERNAL EMAIL ]
+> >
+> > Hi,
+> >
+> > On Fri, Jun 27, 2025 at 7:31=E2=80=AFAM Yang Li <yang.li@amlogic.com> w=
+rote:
+> >> Hi Luiz,
+> >>> [ EXTERNAL EMAIL ]
+> >>>
+> >>> Hi Yang,
+> >>>
+> >>> On Thu, Jun 26, 2025 at 1:54=E2=80=AFAM Yang Li <yang.li@amlogic.com>=
+ wrote:
+> >>>> Hi Pauli,
+> >>>>> [ EXTERNAL EMAIL ]
+> >>>>>
+> >>>>> Hi,
+> >>>>>
+> >>>>> ke, 2025-06-25 kello 16:42 +0800, Yang Li via B4 Relay kirjoitti:
+> >>>>>> From: Yang Li <yang.li@amlogic.com>
+> >>>>>>
+> >>>>>> When the BIS source stops, the controller sends an LE BIG Sync Los=
+t
+> >>>>>> event (subevent 0x1E). Currently, this event is not handled, causi=
+ng
+> >>>>>> the BIS stream to remain active in BlueZ and preventing recovery.
+> >>>>>>
+> >>>>>> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> >>>>>> ---
+> >>>>>> Changes in v2:
+> >>>>>> - Matching the BIG handle is required when looking up a BIG connec=
+tion.
+> >>>>>> - Use ev->reason to determine the cause of disconnection.
+> >>>>>> - Call hci_conn_del after hci_disconnect_cfm to remove the connect=
+ion entry
+> >>>>>> - Delete the big connection
+> >>>>>> - Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_l=
+ost_event-v1-1-c32ce37dd6a5@amlogic.com
+> >>>>>> ---
+> >>>>>>     include/net/bluetooth/hci.h |  6 ++++++
+> >>>>>>     net/bluetooth/hci_event.c   | 31 +++++++++++++++++++++++++++++=
+++
+> >>>>>>     2 files changed, 37 insertions(+)
+> >>>>>>
+> >>>>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/h=
+ci.h
+> >>>>>> index 82cbd54443ac..48389a64accb 100644
+> >>>>>> --- a/include/net/bluetooth/hci.h
+> >>>>>> +++ b/include/net/bluetooth/hci.h
+> >>>>>> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+> >>>>>>          __le16  bis[];
+> >>>>>>     } __packed;
+> >>>>>>
+> >>>>>> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
+> >>>>>> +struct hci_evt_le_big_sync_lost {
+> >>>>>> +     __u8    handle;
+> >>>>>> +     __u8    reason;
+> >>>>>> +} __packed;
+> >>>>>> +
+> >>>>>>     #define HCI_EVT_LE_BIG_INFO_ADV_REPORT       0x22
+> >>>>>>     struct hci_evt_le_big_info_adv_report {
+> >>>>>>          __le16  sync_handle;
+> >>>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> >>>>>> index 66052d6aaa1d..d0b9c8dca891 100644
+> >>>>>> --- a/net/bluetooth/hci_event.c
+> >>>>>> +++ b/net/bluetooth/hci_event.c
+> >>>>>> @@ -7026,6 +7026,32 @@ static void hci_le_big_sync_established_evt=
+(struct hci_dev *hdev, void *data,
+> >>>>>>          hci_dev_unlock(hdev);
+> >>>>>>     }
+> >>>>>>
+> >>>>>> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *=
+data,
+> >>>>>> +                                         struct sk_buff *skb)
+> >>>>>> +{
+> >>>>>> +     struct hci_evt_le_big_sync_lost *ev =3D data;
+> >>>>>> +     struct hci_conn *bis, *conn;
+> >>>>>> +
+> >>>>>> +     bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+> >>>>>> +
+> >>>>>> +     hci_dev_lock(hdev);
+> >>>>>> +
+> >>>>>> +     list_for_each_entry(bis, &hdev->conn_hash.list, list) {
+> >>>>> This should check bis->type =3D=3D BIS_LINK too.
+> >>>> Will do.
+> >>>>>> +             if (test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flag=
+s) &&
+> >>>>>> +                 (bis->iso_qos.bcast.big =3D=3D ev->handle)) {
+> >>>>>> +                     hci_disconn_cfm(bis, ev->reason);
+> >>>>>> +                     hci_conn_del(bis);
+> >>>>>> +
+> >>>>>> +                     /* Delete the big connection */
+> >>>>>> +                     conn =3D hci_conn_hash_lookup_pa_sync_handle=
+(hdev, bis->sync_handle);
+> >>>>>> +                     if (conn)
+> >>>>>> +                             hci_conn_del(conn);
+> >>>>> Problems:
+> >>>>>
+> >>>>> - use after free
+> >>>>>
+> >>>>> - hci_conn_del() cannot be used inside list_for_each_entry()
+> >>>>>      of the connection list
+> >>>>>
+> >>>>> - also list_for_each_entry_safe() allows deleting only the iteratio=
+n
+> >>>>>      cursor, so some restructuring above is needed
+> >>>> Following your suggestion, I updated the hci_le_big_sync_lost_evt fu=
+nction.
+> >>>>
+> >>>> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *da=
+ta,
+> >>>> +                                           struct sk_buff *skb)
+> >>>> +{
+> >>>> +       struct hci_evt_le_big_sync_lost *ev =3D data;
+> >>>> +       struct hci_conn *bis, *conn, *n;
+> >>>> +
+> >>>> +       bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+> >>>> +
+> >>>> +       hci_dev_lock(hdev);
+> >>>> +
+> >>>> +       /* Delete the pa sync connection */
+> >>>> +       bis =3D hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->ha=
+ndle);
+> >>>> +       if (bis) {
+> >>>> +               conn =3D hci_conn_hash_lookup_pa_sync_handle(hdev,
+> >>>> bis->sync_handle);
+> >>>> +               if (conn)
+> >>>> +                       hci_conn_del(conn);
+> >>>> +       }
+> >>>> +
+> >>>> +       /* Delete each bis connection */
+> >>>> +       list_for_each_entry_safe(bis, n, &hdev->conn_hash.list, list=
+) {
+> >>>> +               if (bis->type =3D=3D BIS_LINK &&
+> >>>> +                   bis->iso_qos.bcast.big =3D=3D ev->handle &&
+> >>>> +                   test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flag=
+s)) {
+> >>>> +                       hci_disconn_cfm(bis, ev->reason);
+> >>>> +                       hci_conn_del(bis);
+> >>>> +               }
+> >>>> +       }
+> >>> Id follow the logic in hci_le_create_big_complete_evt, so you do some=
+thing like:
+> >>>
+> >>>       while ((conn =3D hci_conn_hash_lookup_big_state(hdev, ev->handl=
+e,
+> >>>                                 BT_CONNECTED)))...
+> >>>
+> >>> That way we don't operate on the list cursor, that said we may need t=
+o
+> >>> add the role as parameter to hci_conn_hash_lookup_big_state, because
+> >>> the BIG id domain is role specific so we can have clashes if there ar=
+e
+> >>> Broadcast Sources using the same BIG id the above would return them a=
+s
+> >>> well and even if we check for the role inside the while loop will kee=
+p
+> >>> returning it forever.
+> >> I updated the patch according to your suggestion; however, during test=
+ing, it resulted in a system panic.
+> > What is the backtrace?
+> >
+> >> hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u=
+16 state)
+> >>
+> >>           list_for_each_entry_rcu(c, &h->list, list) {
+> >>                   if (c->type !=3D BIS_LINK || bacmp(&c->dst, BDADDR_A=
+NY) ||
+> >> +                       c->role !=3D HCI_ROLE_SLAVE ||
+> >>                       c->state !=3D state)
+> >>                           continue;
+> > It needs to be passed as an argument not just change the role
+> > internally otherwise it will break the existing users of it.
+>
+> After testing, I found that the dst addr of the two BIS connections
+> under BIG sync is the address of the BIS source, so I added separate
+> checks for MASTER and SLAVE roles.
+>
+> [  268.202466][1 T1962  d.] lookup big: 00000000736585c7, addr
+> 21:97:07:b1:9f:66, type 131, handle 0x0100, state 1, role 1
+> [  268.203806][1 T1962  d.] lookup big: 0000000041894659, addr
+> 21:97:07:b1:9f:66, type 131, handle 0x0101, state 1, role 1
+>
+> I updated as below,
+>
+> -hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,
+> __u16 state)
+> +hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,
+> +                                                 __u16 state, __u8 role)
+>   {
+>          struct hci_conn_hash *h =3D &hdev->conn_hash;
+>          struct hci_conn  *c;
+> @@ -1335,10 +1336,18 @@ hci_conn_hash_lookup_big_state(struct hci_dev
+> *hdev, __u8 handle,  __u16 state)
+>          rcu_read_lock();
+>
+>          list_for_each_entry_rcu(c, &h->list, list) {
+> -               if (c->type !=3D BIS_LINK || bacmp(&c->dst, BDADDR_ANY) |=
+|
+> -                       c->role !=3D HCI_ROLE_SLAVE ||
+> -                   c->state !=3D state)
+> -                       continue;
+> +               if (role =3D=3D HCI_ROLE_MASTER) {
+> +                       if (c->type !=3D BIS_LINK || bacmp(&c->dst,
+> BDADDR_ANY) ||
+> +                               c->state !=3D state || c->role !=3D role)
+> +                               continue;
+> +               } else {
+> +                       if (c->type !=3D BIS_LINK ||
+> +                               c->state !=3D state ||
+> +                               c->role !=3D role)
+> +                               continue;
+> +               }
+>
+> >
+> >> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data=
+,
+> >> +                                           struct sk_buff *skb)
+> >> +{
+> >> +       struct hci_evt_le_big_sync_lost *ev =3D data;
+> >> +       struct hci_conn *bis, *conn;
+> >> +
+> >> +       bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+> >> +
+> >> +       hci_dev_lock(hdev);
+> >> +
+> >> +       /* Delete the pa sync connection */
+> >> +       bis =3D hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->hand=
+le);
+> >> +       if (bis) {
+> >> +               conn =3D hci_conn_hash_lookup_pa_sync_handle(hdev, bis=
+->sync_handle);
+> >> +               if (conn)
+> >> +                       hci_conn_del(conn);
+> >> +       }
+> >> +
+> >> +       /* Delete each bis connection */
+> >> +       while ((bis =3D hci_conn_hash_lookup_big_state(hdev, ev->handl=
+e,
+> >> +                                                       BT_CONNECTED))=
+) {
+> >> +               clear_bit(HCI_CONN_BIG_SYNC, &bis->flags);
+> >> +               hci_disconn_cfm(bis, ev->reason);
+> >> +               hci_conn_del(bis);
+> >> +       }
+> >> +
+> >> +       hci_dev_unlock(hdev);
+> >> +}
+> >>
+> >> However, during testing, I encountered some issues:
+> >>
+> >> 1. The current BIS connections all have the state BT_OPEN (2).
+> > Hmm, that doesn't sound right, if the BIG Sync has been completed the
+> > BIS connection shall be moved to BT_CONNECTED. Looks like we are not
+> > marking it as connected:
+> >
+> > hci_le_big_sync_established_evt (Broadcast Sink):
+> >
+> >          set_bit(HCI_CONN_BIG_SYNC, &bis->flags);
+> >         hci_iso_setup_path(bis);
+> >
+> > hci_le_create_big_complete_evt (Broadcast Source):
+> >
+> >          conn->state =3D BT_CONNECTED;
+> >          set_bit(HCI_CONN_BIG_CREATED, &conn->flags);
+> >          hci_debugfs_create_conn(conn);
+> >          hci_conn_add_sysfs(conn);
+> >          hci_iso_setup_path(conn);
+>
+> Yes, in addition, state =3D BT_CONNECTED also needs to be set in
+> hci_cc_le_setup_iso_path.
+>
+> I will update the patch again.
+>
+> @@ -3890,7 +3890,7 @@ static u8 hci_cc_le_setup_iso_path(struct hci_dev
+> *hdev, void *data,
+>                  hci_conn_del(conn);
+>                  goto unlock;
+>          }
+> -
+> +     conn->state =3D BT_CONNECTED;
 
-On 15.06.2025 20:17, Arseniy Krasnov wrote:
-> Function 'hci_discovery_filter_clear()' frees 'uuids' array and then
-> sets it to NULL. There is a tiny chance of the following race:
-> 
-> 'hci_cmd_sync_work()'
-> 
->  'update_passive_scan_sync()'
-> 
->    'hci_update_passive_scan_sync()'
-> 
->      'hci_discovery_filter_clear()'
->        kfree(uuids);
-> 
->        <-------------------------preempted-------------------------------->
->                                            'start_service_discovery()'
-> 
->                                              'hci_discovery_filter_clear()'
->                                                kfree(uuids); // DOUBLE FREE
-> 
->        <-------------------------preempted-------------------------------->
-> 
->       uuids = NULL;
-> 
-> To fix it let's add locking around 'kfree()' call and NULL pointer
-> assignment. Otherwise the following backtrace fires:
-> 
-> [ ] ------------[ cut here ]------------
-> [ ] kernel BUG at mm/slub.c:547!
-> [ ] Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-> [ ] CPU: 3 UID: 0 PID: 246 Comm: bluetoothd Tainted: G O 6.12.19-kernel #1
-> [ ] Tainted: [O]=OOT_MODULE
-> [ ] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> [ ] pc : __slab_free+0xf8/0x348
-> [ ] lr : __slab_free+0x48/0x348
-> ...
-> [ ] Call trace:
-> [ ]  __slab_free+0xf8/0x348
-> [ ]  kfree+0x164/0x27c
-> [ ]  start_service_discovery+0x1d0/0x2c0
-> [ ]  hci_sock_sendmsg+0x518/0x924
-> [ ]  __sock_sendmsg+0x54/0x60
-> [ ]  sock_write_iter+0x98/0xf8
-> [ ]  do_iter_readv_writev+0xe4/0x1c8
-> [ ]  vfs_writev+0x128/0x2b0
-> [ ]  do_writev+0xfc/0x118
-> [ ]  __arm64_sys_writev+0x20/0x2c
-> [ ]  invoke_syscall+0x68/0xf0
-> [ ]  el0_svc_common.constprop.0+0x40/0xe0
-> [ ]  do_el0_svc+0x1c/0x28
-> [ ]  el0_svc+0x30/0xd0
-> [ ]  el0t_64_sync_handler+0x100/0x12c
-> [ ]  el0t_64_sync+0x194/0x198
-> [ ] Code: 8b0002e6 eb17031f 54fffbe1 d503201f (d4210000) 
-> [ ] ---[ end trace 0000000000000000 ]---
-> 
-> Fixes: ad383c2c65a5 ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
-> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> ---
->  Changelog v1->v2:
->  * Don't call 'hci_dev_lock()' in 'update_passive_scan_sync()' as it
->    triggers deadlock. Instead of that - add spinlock which protects
->    freeing code.
->  Changelog v2->v3:
->  * Rebase on current 'bluetooth' repo due to fuzz.
-> 
->  include/net/bluetooth/hci_core.h | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 54bfeeaa09959..f8eeb15acdcfa 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -29,6 +29,7 @@
->  #include <linux/idr.h>
->  #include <linux/leds.h>
->  #include <linux/rculist.h>
-> +#include <linux/spinlock.h>
->  
->  #include <net/bluetooth/hci.h>
->  #include <net/bluetooth/hci_drv.h>
-> @@ -92,6 +93,7 @@ struct discovery_state {
->  	u16			uuid_count;
->  	u8			(*uuids)[16];
->  	unsigned long		name_resolve_timeout;
-> +	spinlock_t		lock;
->  };
->  
->  #define SUSPEND_NOTIFIER_TIMEOUT	msecs_to_jiffies(2000) /* 2 seconds */
-> @@ -878,6 +880,7 @@ static inline void iso_recv(struct hci_conn *hcon, struct sk_buff *skb,
->  
->  static inline void discovery_init(struct hci_dev *hdev)
->  {
-> +	spin_lock_init(&hdev->discovery.lock);
->  	hdev->discovery.state = DISCOVERY_STOPPED;
->  	INIT_LIST_HEAD(&hdev->discovery.all);
->  	INIT_LIST_HEAD(&hdev->discovery.unknown);
-> @@ -892,8 +895,11 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
->  	hdev->discovery.report_invalid_rssi = true;
->  	hdev->discovery.rssi = HCI_RSSI_INVALID;
->  	hdev->discovery.uuid_count = 0;
-> +
-> +	spin_lock(&hdev->discovery.lock);
->  	kfree(hdev->discovery.uuids);
->  	hdev->discovery.uuids = NULL;
-> +	spin_unlock(&hdev->discovery.lock);
->  }
->  
->  bool hci_discovery_active(struct hci_dev *hdev);
+Ive submitted a fix addressing this already:
+
+https://patchwork.kernel.org/project/bluetooth/patch/20250627151902.421666-=
+1-luiz.dentz@gmail.com/
+
+> >> [  131.813237][1 T1967  d.] list conn 00000000fd2e0fb2, handle 0x0010,
+> >> state 1 #LE link
+> >> [  131.813439][1 T1967  d.] list conn 00000000553bfedc, handle 0x0f01,
+> >> state 2  #PA link
+> >> [  131.814301][1 T1967  d.] list conn 0000000074213ccb, handle 0x0100,
+> >> state 2 #bis1 link
+> >> [  131.815167][1 T1967  d.] list conn 00000000ee6adb18, handle 0x0101,
+> >> state 2 #bis2 link
+> >>
+> >> 2. hci_conn_hash_lookup_big_state() fails to find the corresponding BI=
+S
+> >> connection even when the state is set to OPEN.
+> >>
+> >> Therefore, I=E2=80=99m considering reverting to the original patch, bu=
+t adding a
+> >> role check as an additional condition.
+> >> What do you think?
+> >>
+> >> +       /* Delete each bis connection */
+> >> +       list_for_each_entry_safe(bis, n, &hdev->conn_hash.list, list) =
+{
+> >> +               if (bis->type =3D=3D BIS_LINK &&
+> >> +                   bis->role =3D=3D HCI_ROLE_SLAVE &&
+> >> +                   bis->iso_qos.bcast.big =3D=3D ev->handle &&
+> >> +                   test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags)=
+) {
+> >> +                       hci_disconn_cfm(bis, ev->reason);
+> >> +                       hci_conn_del(bis);
+> >> +               }
+> >> +       }
+> >>
+> >>>> +
+> >>>> +       hci_dev_unlock(hdev);
+> >>>> +}
+> >>>>
+> >>>>>> +             }
+> >>>>>> +     }
+> >>>>>> +
+> >>>>>> +     hci_dev_unlock(hdev);
+> >>>>>> +}
+> >>>>>> +
+> >>>>>>     static void hci_le_big_info_adv_report_evt(struct hci_dev *hde=
+v, void *data,
+> >>>>>>                                             struct sk_buff *skb)
+> >>>>>>     {
+> >>>>>> @@ -7149,6 +7175,11 @@ static const struct hci_le_ev {
+> >>>>>>                       hci_le_big_sync_established_evt,
+> >>>>>>                       sizeof(struct hci_evt_le_big_sync_estabilish=
+ed),
+> >>>>>>                       HCI_MAX_EVENT_SIZE),
+> >>>>>> +     /* [0x1e =3D HCI_EVT_LE_BIG_SYNC_LOST] */
+> >>>>>> +     HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
+> >>>>>> +                  hci_le_big_sync_lost_evt,
+> >>>>>> +                  sizeof(struct hci_evt_le_big_sync_lost),
+> >>>>>> +                  HCI_MAX_EVENT_SIZE),
+> >>>>>>          /* [0x22 =3D HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+> >>>>>>          HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+> >>>>>>                       hci_le_big_info_adv_report_evt,
+> >>>>>>
+> >>>>>> ---
+> >>>>>> base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
+> >>>>>> change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+> >>>>>>
+> >>>>>> Best regards,
+> >>>>> --
+> >>>>> Pauli Virtanen
+> >>>
+> >>> --
+> >>> Luiz Augusto von Dentz
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+
+
+
+--=20
+Luiz Augusto von Dentz
