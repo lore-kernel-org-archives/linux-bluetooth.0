@@ -1,46 +1,46 @@
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010023.outbound.protection.outlook.com [52.101.69.23])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010004.outbound.protection.outlook.com [52.101.84.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD61027603B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 14:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39AD1B0F0A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 14:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.4
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751381281; cv=fail; b=okgxE8bYHz3zm1ULJ0p8IhTGS1n9XiPMK/ZpkuJfxEzysJNuLS56dcIHTigk6nLXzE7RH1XKR6k/qD54FvKfjtOngeVRrCCZ2KYJmpTUkAMQb+T31JI80ellY9YSQU+1eS/F0YFoQIKoWvs8gbKsQN/0qquCFnMp8Vkv9jiv8aY=
+	t=1751381309; cv=fail; b=RXJLClC5qy5T0SL+4qf4Ba8YZYlOOu0ibDL2NVzVBohWwSiH5wzUNjf7xOex46JqpV+/VPz56NXIRfDfvTAZ2ge1u8kqkE1Vcar3dR9YXsUwQFJsDViMB7+j02Hk+Snef8PalNGxhpHB+7ddnqYHREn29KTcvamGU2Wic0sO224=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751381281; c=relaxed/simple;
-	bh=IAh7Em/4RJi4uN70Q2q7noChwGiz3XNn1MdtmOEjHjA=;
+	s=arc-20240116; t=1751381309; c=relaxed/simple;
+	bh=j/4L+l3HUJ/+ffHJ/Z05jFIECZs75SSNk+pSbqTgxTs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pT3rUG6wvuEzA3g8MtNQIjqobsGGeyBzy+QAOWnOJ2Mrb3iaP5XEeCN6GO9vopyWRGN6EZHZYjrTYLmYm+dsrUi5uhdgtsfpAKwuje6O6nInvqXQ7n1W0ZCx7/+LpxTJEYmxbUNfsv7rQe8R30PIj8qiKJy/6cW0B1BikjoohwE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=F7Trq8kc; arc=fail smtp.client-ip=52.101.69.23
+	 MIME-Version:Content-Type; b=R6caqrXkhs+JYk+kRch4XfpO3qiX7CvuN4VbNyIT3NiOK1qZXCQtTJAoC8bs8HIylCCpuIFrvhJSqQqj67wzdOGbpuep8aMox2vYknAOUsLxZ5lGm0mYFfKBFg9F3h6UaxSjT04MoSnKMgTY8NBM36qhOf2632wuRA/Co3JnxLc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=OE59Oe2K; arc=fail smtp.client-ip=52.101.84.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="F7Trq8kc"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="OE59Oe2K"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YK2gZMmqNfVl2tdnaEkno+3Nb6W7t+NmZsgz7juiEsybQM/bTB35vT7Rf+DrAWBAX/Ruo8/Q2F+/qpCZKEElf1DL1Frg+29Tw12KmTI14y2SolHco/HT2E+rMJ0gZgjvfV3hocD8rrZGMysixHEt7gJVmyAWbANrYhDVD4aZVe6XwvUaOhcjXPLMBBRZLQHu3SNNJ9z+wRORsVC0SOK+jau6jWjWKgqylMeEChmXQ4u5d6S1PqLCzgsqfXaHhad/NsFwWy20nZQcDQeUdIfayQhCPcCvcroyPlRI9X0ZALo1POPRbjCOH3PSAjzhsY7UYLXml8eQga7DRePDNyasQA==
+ b=StvQm4pZjkdpMmesJmPqiWevsmb+jq2Dy0XEmt7TU7YFaZrXO2XUTcTTe3w1dqV5WQTznRrDWeNHEOqCHKWheJ0+3oRDL2l1IRsGFZz7W+mJb1Wu5C2z8++1zhTMI3KpH2Run9t08z8n749usG18MYZ1tLjud9rZkKKejLJeO+yrlmJz92FjxWi5YIwcvnOWhQPwjw2lwJd2cRpdr9p9AdcTgHC2Nu0Wrk31karfATj/vn2sheCy3/gsXpl1oIPknlSLpsZsCj8yJihlLIcHUVL8FLSPYPD/Q4wvi+SZVhl3dxD6fD9QWUd2Ln44m8E8HFCQvOiR/A43Slhv40GgmQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mDhgiiJ66Wh3QU4eunYzzeczRbYmuTzAOiU/WHKHvIo=;
- b=HiVdu1DTHfDd87UP8qt2/aGEtlrffR2tNqgpMmlu5qJsNMqUVvMKT2ubPsrIdTfwb/1E7xhNi3yA7Do6cJQgDuaJih02BqzgfGr1mfq2wJ1v0dOraEb0yIiZyrWPLbcVx163hoRkE/E1KLVywi2+31z9bzDLy2t1rdigz7bKAtEVejeSu3Mm10c39xTkj2wiRGAtH1WOAKld77bmTyW4jwLD6+LQWd6KtMgMR/vJqttYO6u4ltvyGCmDAYhnMaa1afW1/e46Ogx8wdTLcINgKAkDpLMP7NHLi1GUHicTuqLwbgXUJ/HJvxnOJO1RbY3adUmUP85N+v6IooPuZQ60zA==
+ bh=zgn9b61VfVVlYwdRzqcLDAcCGEEUMFEFCnK2fqXRtjE=;
+ b=X/Tyuv2a2s+k0/W8P2Vd5VxrnIZPcXavvROphil38SRxFE1vfSj2EmFSOGBFrjtIrAEqWSJfokBGaUJZ4t6qIj34swbez/xnwb5WKqGPsWVrH1t7TCqOQQZh1BSG8T5cKhqFxxh6gM3Bug8pPbxyJyQUPQYmNA9jUhAODPS2mEA7U958MxIabd8JCh4uDE9D+cXeDg83E2ju8S9V7y+FY3O5BGeb04hM07BxWq1texoKYWpjte21I/1unpo/uhGRlT3lqAXFgiX4pJXdPqKMFnEXKGgNf9WnYgjFm8s+RQBCpMINw9tFCpI/Up876F0LhYfY0rekOdeXBYM2Hp+COA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mDhgiiJ66Wh3QU4eunYzzeczRbYmuTzAOiU/WHKHvIo=;
- b=F7Trq8kcLQrB3lCQQa1sjSv2yj5p95bRrxmbRVYWxhP8ynQZ8mxUBHMrlk/0D77vqs+Y96fcRKdws5PhQWGwlvVsfQaScswfHn2Nx07VwRL4LAs5lTjycl+boFixdAbR6cQAv3+cI+fAEFiMhDjJIw9wICvqf1EvczvVH6NXXH0=
-Received: from AM6P194CA0085.EURP194.PROD.OUTLOOK.COM (2603:10a6:209:8f::26)
- by PA4PR03MB7055.eurprd03.prod.outlook.com (2603:10a6:102:ea::15) with
+ bh=zgn9b61VfVVlYwdRzqcLDAcCGEEUMFEFCnK2fqXRtjE=;
+ b=OE59Oe2KGGUUs/mSrZoAS3N+JPyJsyImeLHf05PnWGRrLHLj5l4+wgj08KLxRbFcqGFgbw2u/xyPYzmIl1l1tR1r3R3iqSIWHpyJYFlNp08S8ym/wh95rTGiKBTwFxWWlWSp+ve9ie+KWKzxUrjK2y+aOD/WHJcHn9krnVVXK64=
+Received: from AS4P190CA0005.EURP190.PROD.OUTLOOK.COM (2603:10a6:20b:5de::17)
+ by DU6PR03MB10965.eurprd03.prod.outlook.com (2603:10a6:10:5c4::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.30; Tue, 1 Jul
- 2025 14:47:51 +0000
-Received: from AM4PEPF00025F9B.EURPRD83.prod.outlook.com
- (2603:10a6:209:8f:cafe::22) by AM6P194CA0085.outlook.office365.com
- (2603:10a6:209:8f::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.19 via Frontend Transport; Tue,
- 1 Jul 2025 14:47:51 +0000
+ 2025 14:48:20 +0000
+Received: from AMS0EPF000001AD.eurprd05.prod.outlook.com
+ (2603:10a6:20b:5de:cafe::f2) by AS4P190CA0005.outlook.office365.com
+ (2603:10a6:20b:5de::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.32 via Frontend Transport; Tue,
+ 1 Jul 2025 14:48:20 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,20 +48,20 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- AM4PEPF00025F9B.mail.protection.outlook.com (10.167.16.10) with Microsoft
+ AMS0EPF000001AD.mail.protection.outlook.com (10.167.16.153) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.1 via Frontend Transport; Tue, 1 Jul 2025 14:47:49 +0000
+ 15.20.8901.15 via Frontend Transport; Tue, 1 Jul 2025 14:48:20 +0000
 Received: from N9W6SW14.arri.de (10.30.5.30) by mta.arri.de (10.10.18.5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Tue, 1 Jul
- 2025 16:47:49 +0200
+ 2025 16:48:19 +0200
 From: Christian Eggers <ceggers@arri.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Brian Gix <brian.gix@gmail.com>, Inga Stotland <inga.stotland@gmail.com>,
 	Christian Eggers <ceggers@arri.de>
-Subject: [RFC PATCH BlueZ 2/4] mesh: add support for provisioning via GATT
-Date: Tue, 1 Jul 2025 16:22:22 +0200
-Message-ID: <20250701144647.19572-5-ceggers@arri.de>
+Subject: [RFC PATCH BlueZ 3/4] mesh: add GATT proxy service
+Date: Tue, 1 Jul 2025 16:22:23 +0200
+Message-ID: <20250701144647.19572-6-ceggers@arri.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250701144647.19572-2-ceggers@arri.de>
 References: <20250701144647.19572-2-ceggers@arri.de>
@@ -75,93 +75,89 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00025F9B:EE_|PA4PR03MB7055:EE_
-X-MS-Office365-Filtering-Correlation-Id: c4882159-c466-4304-72fb-08ddb8ae4042
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001AD:EE_|DU6PR03MB10965:EE_
+X-MS-Office365-Filtering-Correlation-Id: 23c5ccf3-2186-4bb1-69d5-08ddb8ae5271
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?RX3WZU2VRFraxUUUY6UMtfbw9UzxdwUDgXywvAQT5Bchtfxq3OtJMJuOgSHU?=
- =?us-ascii?Q?vGAvMqisa4nCGaUphxrqHBxmJ6IYx6z8jtUyZKVVCtyERpBQR8Z6s56Qlhij?=
- =?us-ascii?Q?KoYs2KN24LITqQIFBuc1wKlNNmVPD7M7MI22OKhe0XA1xJV1JsAZHCp+Btdb?=
- =?us-ascii?Q?e22mZ63a9iG75CTm3kZcpjbnojMbWRPWz5qMJHuEDqF+o/OdIkUbhBWwZJOw?=
- =?us-ascii?Q?bMoMSA81PxrGw7Li/1CD+lF5p1H4RWiI/t3AqYDaJuvrHtdKN1pDU5qK4yaQ?=
- =?us-ascii?Q?nJcc8ah5ss/esbUa+Y+7zj9ypJPjY+Z7m4wI8Zgd3uE8LYWRSRb0QXUooyJP?=
- =?us-ascii?Q?vybJQfj5+WviY4SUswxYuGzdxdZp72Y69FVPizcS6uQUtvj9zNHa+DTtlnDi?=
- =?us-ascii?Q?CHOEZI2ViwROOJvEtv8fCBexcMABybsAAani5zzst1UwWJ/k+T3YaSl+FF2t?=
- =?us-ascii?Q?FGT437nptuuQWqekQjmtcMwtDks6lF7wI/7YpiC8JEQnt6WteDSLxGQuWTNX?=
- =?us-ascii?Q?K8fNVZhekyx5Wr0q6DEaMwqs+qy7JDgS/7d5aBsMe7QYNuXpQYNdp00LqXn+?=
- =?us-ascii?Q?d4FRZzQmZc/MZRsgTjuCTK7+KJe79neQCgylB2u72xIzoSP3KdBSrexqul+8?=
- =?us-ascii?Q?Jks5J43PG/q3jf4rrRrVMvb36jcNYkRPx/ucjONhd8u1IC594NCR1DC8rQTN?=
- =?us-ascii?Q?J9pRpAQMZ1C60bkGcqnIhDckHiXwES8oBnnGJipoVczRcCdHa0k2oPss2bE7?=
- =?us-ascii?Q?QM2MgzzE/Ta4ofWvfBL0NOaGWM6IxxGGwXaOvFVQllZ37kgWqoEmVxwIaBCp?=
- =?us-ascii?Q?m/hA2UAI9DM8+oh1ArF3/RbJYHnui2Vkg/gZBfnA81ANsyo6qdtFtLED+rt/?=
- =?us-ascii?Q?m9SoAW8kCv7CCAQ/QA9PfM8r4JEVhueslCeHhwpYpeJLlT9TtPxVyBZkHWYL?=
- =?us-ascii?Q?2xzDeyxhy0M/mWR+APJblKSU8gylegSJd5m5T7HrrI0pU1rOGC/aAupuyXvi?=
- =?us-ascii?Q?0jjT3cI0Yjdi/1nsIYTokAR1brUrEYpOsbtekVTR5F9hzt4fnSYPfWyWUFC9?=
- =?us-ascii?Q?55Wr8Li1Wa5BKltFJC02Fz+Bu2FgxtcuseUDrp+ovCTGRIyxS/sIbFgz6PEy?=
- =?us-ascii?Q?O5XhRYllqL1k1ZeHQSp0vnuRHTK6m28wix4xvDBbbTXSkvHl0rUnitaIh2Xh?=
- =?us-ascii?Q?h8K6iByLM1FFVOyPK53m4i3IKWqEpG4rDiAz+WqU/nOgHAez3lqflDlTtoJs?=
- =?us-ascii?Q?KK4FtwRc/NQr/JC5D+BOKExWnh7lAiWRYvtJ2qQ6MAlTI4bdmmVovkxhzbeL?=
- =?us-ascii?Q?BBNJlRdqm5pNPBbGM2APuFCQnddrzFEMKDAHJwjpkyS6ckwyhkr5KBGF6R3X?=
- =?us-ascii?Q?jCYE1PHjDMWmsPH7i5OfH07YOIV1msHmJnVm/GlizMVSegzXhjsdtC2Lvvfv?=
- =?us-ascii?Q?V2AJqaQfjD0bTCqh25r/IhoUAKvwfoM8Oo4Xs1RgKF07FJRcE0Gll9UVQjh2?=
- =?us-ascii?Q?LzPDdxaOKJRkUbGjkrdygG3vsqqHJsoIVPCI?=
+	=?us-ascii?Q?m1HCjl5AXj1MQ0qhKZqZUc/q+zWENq1ONWUINgmZxXvV4cxVxO/v7o1pOcWB?=
+ =?us-ascii?Q?cb+Q7OS4dX5mxTE3mW2s9PKJDczq/Fcjz/5g/zn0yZznoXNr1rU/AAaqlK1k?=
+ =?us-ascii?Q?ti/PaZvLxdD4Z/+tQVNa2Eo/7nObSuXMsqfu2kScOY3Yr/W5ejh9STxiuamG?=
+ =?us-ascii?Q?QyTEJmLivrqDJyaJLHJvtJca0qg/CMOOkJvfaqb1hiAUuPmTocntlNBC2erc?=
+ =?us-ascii?Q?a2pSE1nldGT8ru7p5cDz4pd5YFZDMtV1WrJ4ugSnaEe9b6pBok6sE+IG0S7l?=
+ =?us-ascii?Q?6n8yybF31quwJo3PUC4inqnJua57CyNMRZZ6+lLzx0jY/jkdNDWQfqWvnTQ+?=
+ =?us-ascii?Q?FxJqB8YCmWj0T+kESHmFdKtEoTtMpaJNNBFXNdsTB0+fnIoSXT1eWlwhGnnO?=
+ =?us-ascii?Q?lRNQppZ6bF+z+fgADsv7NCEbJHQeyR5ht7Sun4f7fBRvuJMxXPw9pwXgPzmn?=
+ =?us-ascii?Q?VovZO0JudB4loN5RlvfUVWcQxfwzgAy0zberBBkygw1uRMAXqgzkUmtepip9?=
+ =?us-ascii?Q?M6WlmYYv3ExpgxskpaDesORkIXLIk1ODN9d72xO3h1jmxpBJ5FK3KpSmlSz9?=
+ =?us-ascii?Q?2jyxxt+pGNNZFQGft3I3OhE9CuY13eGTf1pwn03+cgLUxUJmIoGplSeXOc7B?=
+ =?us-ascii?Q?GyQscudd4uySpRy7uBscJIac13zN1Y0T5YlwKp8U+q0/a1vTFrQYkD8B7jv0?=
+ =?us-ascii?Q?2J6nfyxn2r6qtEV3UW9weIayFMsTfgG8L5UVeZvvFKNAqAfFz1D920k0sNgO?=
+ =?us-ascii?Q?P1hzBnC7q8SNNy4wpd+nQlzRCc99bpR4hkpwz+1qJL/X0hWydjYLnW4CShdp?=
+ =?us-ascii?Q?b4eEqtm6casqdlGEUT6Es2L1VJHrO7qYAXeNu/MZ6SI0IlHqpuwi5bT3cGG0?=
+ =?us-ascii?Q?pxfND5gs2SfCE6NLjR7dO/nijJCwK7oOgv8ltLhbafMJ/J+TuhmxYgVXRu6J?=
+ =?us-ascii?Q?PDfeQpt/HdUW/XU1V63+FEO7Pz8V1+taMJUEatKIkdOjq3WuFFsJqoA+CIEO?=
+ =?us-ascii?Q?lZiPdxejUKL/6kpHK97f/LC2XDZTCl1+os2eOG3E2a4FcvBpbn5bjjfub0cZ?=
+ =?us-ascii?Q?XvQEglNfuT6vwaw8pzxdd4aN33k/i30dxdusu2R9jhFNRV5ecsqBqJuqJ8P8?=
+ =?us-ascii?Q?KY++5LXCfi+RT/6a7vzdH4cwPPUXTnTZNMnsdhHzBnpmEGy4faXAdy17hVW4?=
+ =?us-ascii?Q?ChlwIvqYuJWd9D/1ePNBw+P60ZOUlqLGD0WMyf7F2klNTLS5snLM32hIQdW5?=
+ =?us-ascii?Q?YDUjCI2IWh21p/cJzE3ORYyO1/MGyJJCkEEH8Dx1mLHexMSwb7Nhik4siSkD?=
+ =?us-ascii?Q?1lYKFkYksmV2QM+dpfwhtuyVg3/ZJuKN6jskzTgomGJz+EzvvKsErTl8kxGD?=
+ =?us-ascii?Q?56uubosHZPfHG/Kz+FCeghQ1ZQcsZAGdFq9xBgn+o6zYQobmCJZwtZ3IP7JV?=
+ =?us-ascii?Q?3Y1fEsGmYLL9bI/wkPYArmQja8TwLLuIaxu1/16B5Q+9QbpjFERbE5q3Y4cB?=
+ =?us-ascii?Q?XFRRfIKQwK61RItYMe7kYQihckXC2us7jr5B?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 14:47:49.8023
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 14:48:20.3073
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4882159-c466-4304-72fb-08ddb8ae4042
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23c5ccf3-2186-4bb1-69d5-08ddb8ae5271
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F9B.EURPRD83.prod.outlook.com
+	AMS0EPF000001AD.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR03MB7055
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU6PR03MB10965
 
-ToDo: Consider moving dbus_client instance into separate singleton, so
-that no destruction/construction is necessary when switching from GATT
-provisioning service to GATT proxy service (see next commit).
+FIXME: net.c: determine whether data shall be sent via mesh_io or
+gatt_proxy
 ---
- Makefile.mesh        |    4 +-
- mesh/gatt-service.c  | 1178 ++++++++++++++++++++++++++++++++++++++++++
- mesh/gatt-service.h  |   53 ++
- mesh/pb-gatt.c       |  173 +++++++
- mesh/pb-gatt.h       |   20 +
- mesh/prov-acceptor.c |    6 +
- 6 files changed, 1433 insertions(+), 1 deletion(-)
- create mode 100644 mesh/gatt-service.c
- create mode 100644 mesh/gatt-service.h
- create mode 100644 mesh/pb-gatt.c
- create mode 100644 mesh/pb-gatt.h
+ Makefile.mesh         |   3 +-
+ mesh/gatt-proxy-svc.c | 294 ++++++++++++++++++++++++++++++++++++++++++
+ mesh/gatt-proxy-svc.h |  29 +++++
+ mesh/main.c           |   3 +
+ mesh/net-keys.c       |  61 +++++++++
+ mesh/net-keys.h       |   4 +
+ mesh/net.c            |  21 ++-
+ mesh/net.h            |   4 +
+ mesh/prov-acceptor.c  |  26 +++-
+ 9 files changed, 440 insertions(+), 5 deletions(-)
+ create mode 100644 mesh/gatt-proxy-svc.c
+ create mode 100644 mesh/gatt-proxy-svc.h
 
 diff --git a/Makefile.mesh b/Makefile.mesh
-index e4c9fa6a32e6..700d64fe9293 100644
+index 700d64fe9293..8a190f75de9d 100644
 --- a/Makefile.mesh
 +++ b/Makefile.mesh
-@@ -35,10 +35,12 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/prov-acceptor.c mesh/prov-initiator.c \
- 				mesh/manager.h mesh/manager.c \
- 				mesh/pb-adv.h mesh/pb-adv.c \
-+				mesh/pb-gatt.h mesh/pb-gatt.c \
- 				mesh/keyring.h mesh/keyring.c \
+@@ -40,7 +40,8 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
  				mesh/rpl.h mesh/rpl.c \
  				mesh/prv-beacon.h mesh/prvbeac-server.c \
--				mesh/mesh-defs.h
-+				mesh/mesh-defs.h \
-+				mesh/gatt-service.h mesh/gatt-service.c
+ 				mesh/mesh-defs.h \
+-				mesh/gatt-service.h mesh/gatt-service.c
++				mesh/gatt-service.h mesh/gatt-service.c \
++				mesh/gatt-proxy-svc.h mesh/gatt-proxy-svc.c
  pkglibexec_PROGRAMS += mesh/bluetooth-meshd
  
  mesh/mesh.$(OBJEXT): ell/internal
-diff --git a/mesh/gatt-service.c b/mesh/gatt-service.c
+diff --git a/mesh/gatt-proxy-svc.c b/mesh/gatt-proxy-svc.c
 new file mode 100644
-index 000000000000..8f3ace178f9d
+index 000000000000..e24543de718c
 --- /dev/null
-+++ b/mesh/gatt-service.c
-@@ -0,0 +1,1178 @@
++++ b/mesh/gatt-proxy-svc.c
+@@ -0,0 +1,294 @@
 +// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
 + *
@@ -172,1418 +168,296 @@ index 000000000000..8f3ace178f9d
 + *
 + */
 +
-+#include <errno.h>
++#include <stdbool.h>
 +#include <stdlib.h>
-+#include <string.h>			// memcpy(), strerror()
-+#include <sys/socket.h>			// SOCK_SEQPACKET, SOCK_NONBLOCK,
-+					// AF_UNIX, SOCK_CLOEXEC, MSG_NOSIGNAL,
-+					// struct msghdr,
-+					// socketpair(), sendmsg()
-+#include <sys/types.h>			// struct iovec
-+#include <unistd.h>			// close()
++#include <string.h>			// memcpy()
 +
 +#include <ell/dbus.h>
-+#include <ell/dbus-client.h>
-+#include <ell/dbus-service.h>
-+#include <ell/idle.h>
-+#include <ell/io.h>
-+#include <ell/log.h>
-+#include <ell/util.h>			// L_ARRAY_SIZE(),
-+					// l_new(), l_free()
++#include <ell/queue.h>
++#include <ell/timeout.h>
++#include <ell/util.h>			// ell_new(), l_free(), l_malloc()
 +
-+#include "mesh/dbus.h"			// dbus_get_bus(),
-+					// dbus_append_byte_array(),
-+					// dbus_error()
-+#include "mesh/error.h"			// MESH_ERROR_INVALID_ARGS
-+#include "mesh/util.h"			// print_packet()
 +#include "mesh/gatt-service.h"
++#include "mesh/mesh-io.h"		// mesh_io_recv_func_t
++#include "mesh/net.h"			// mesh_net_attach_gatt(),
++					// mesh_net_detach_gatt()
++#include "mesh/net-keys.h"		// net_key_fill_adv_service_data(),
++					// net_key_get_next_id()
++#include "mesh/util.h"			// print_packet()
++#include "mesh/gatt-proxy-svc.h"
 +
-+#define GATT_SERVICE_IFACE "org.bluez.GattService1"
-+#define BLUEZ_MESH_GATT_PATH BLUEZ_MESH_PATH "/gatt"
-+#define BLUEZ_MESH_SERVICE_PATH BLUEZ_MESH_GATT_PATH "/service"
-+#define BLUEZ_MESH_CHRC_DATA_IN_PATH BLUEZ_MESH_SERVICE_PATH "/data_in"
-+#define BLUEZ_MESH_CHRC_DATA_OUT_PATH BLUEZ_MESH_SERVICE_PATH "/data_out"
-+/*
-+ * Advertising should NOT be handled by provisioning's object manager, so
-+ * we cannot use a child element of BLUEZ_MESH_GATT_PATH.
-+ */
-+#define BLUEZ_MESH_GATT_ADV_PATH BLUEZ_MESH_PATH "/gatt_adv"
++#define MESH_GATT_PROXY_SVC_UUID "0x1828"
++#define MESH_GATT_PROXY_CHRC_DATA_IN  "0x2ADD"
++#define MESH_GATT_PROXY_CHRC_DATA_OUT "0x2ADE"
 +
-+#define GATT_MGR_IFACE "org.bluez.GattManager1"
-+#define GATT_SERVICE_IFACE "org.bluez.GattService1"
-+#define GATT_CHRC_IFACE "org.bluez.GattCharacteristic1"
++#define MAX_PROXY_PDU_LEN 66  /* MshPRT_v1.1, section 7.2.2.2.7 */
 +
-+#define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
-+#define LE_ADVERTISEMENT_IFACE "org.bluez.LEAdvertisement1"
-+
-+#define GATT_MTU 23
-+
-+struct gatt_service;
-+struct characterstic
-+{
-+	const char *uuid;
-+	const char * const *flags;
-+	struct gatt_service *service;
-+};
-+
-+enum write_value_type {
-+	WRITE_VALUE_TYPE_COMMAND,
-+	WRITE_VALUE_TYPE_REQUEST,
-+	WRITE_VALUE_TYPE_RELIABLE
-+};
-+
-+enum link_type {
-+	LINK_TYPE_BR_EDR,
-+	LINK_TYPE_LE
-+};
-+
-+struct write_value_options {
-+	const char *device;
-+	enum link_type link;
-+	enum write_value_type type;
-+	uint16_t offset;
-+	uint16_t mtu;
-+	bool prepare_authorize;
-+};
-+
-+struct acquire_notify_options {
-+	const char *device;
-+	enum link_type link;
-+	uint16_t mtu;
-+};
-+
-+/* MshPRT_v1.1, section 6.3.1, SAR field */
-+enum proxy_pdu_sar {
-+	PROXY_PDU_SAR_CMPLT_MSG = 0x00,
-+	PROXY_PDU_SAR_1ST_SEG   = 0x01,
-+	PROXY_PDU_SAR_CONT_SEG  = 0x02,
-+	PROXY_PDU_SAR_LAST_SEG  = 0x03,
-+};
-+
-+struct gatt_service {
-+	const char *svc_uuid;
-+	uint8_t max_pdu_len;
-+
-+	gatt_service_notify_acquired_cb notify_acquired_cb;
-+	gatt_service_notify_stopped_cb notify_stopped_cb;
-+	gatt_service_rx_cb rx_cb;
-+	gatt_service_tx_cmplt_cb tx_cmplt_cb;
-+	gatt_service_fill_adv_service_data_cb fill_adv_service_data_cb;
-+	struct characterstic chrc_data_in;
-+	struct characterstic chrc_data_out;
-+
-+	struct l_dbus_client *dbus_client;
-+	struct l_dbus_proxy *dbus_proxy_gatt_mgr;
-+	struct l_dbus_proxy *dbus_proxy_le_adv_mgr;
-+
-+	/*
-+	 * ToDo: Check whether acceptors timeout complies with MshPRT_v1.1,
-+	 * section 5.2.2
-+	 */
-+	struct l_io *notify_io;
-+	uint16_t mtu;
-+	uint8_t *sar;
-+	uint8_t *sar_out;
-+	uint8_t msg_type;
-+	uint8_t sar_len;
++struct gatt_io_reg {
++	mesh_io_recv_func_t cb;
 +	void *user_data;
-+
-+	gatt_destroy_cb svc_deinit_cb;
-+	gatt_destroy_cb adv_deinit_cb;
-+
-+	gatt_destroy_cb destroy_cb;
-+	void *destroy_data;
++	enum proxy_msg_type msg_type;
 +};
 +
-+static struct gatt_service *gatt_service = NULL;
++struct gatt_proxy_service {
++	struct gatt_service *gatt_service;
++	uint32_t current_adv_key_id;
++	struct l_timeout *adv_key_cycle_to;
++	bool txing;
++	struct l_queue *tx_deferred;
++	struct l_queue *rx_regs;
++};
 +
-+static bool notify_write(struct l_io *io, void *user_data)
++struct process_data {
++	enum proxy_msg_type msg_type;
++	const uint8_t *data;
++	uint8_t len;
++};
++
++static struct gatt_proxy_service *gatt_proxy_service;
++
++struct tx_deferred {
++	enum proxy_msg_type msg_type;
++	uint16_t len;
++	uint8_t data[];
++};
++
++static struct gatt_io_reg *find_by_filter(struct l_queue *rx_regs,
++						enum proxy_msg_type msg_type)
 +{
-+	struct gatt_service *service = user_data;
-+	unsigned int remaining = (service->sar + service->sar_len)
-+						- service->sar_out;
-+	unsigned max_size = service->mtu - 5;
-+	struct iovec iov[2];
-+	struct msghdr msg;
-+	bool more = false;
-+	uint8_t sar_type;
-+	int i, count;
++	const struct l_queue_entry *entry;
 +
-+	/* Note: One extra byte is required for sar_type */
-+	if (service->sar_len < max_size) {
-+		sar_type = PROXY_PDU_SAR_CMPLT_MSG;
-+		count = service->sar_len;
++	entry = l_queue_get_entries(rx_regs);
++
++	for (; entry; entry = entry->next) {
++		struct gatt_io_reg *rx_reg = entry->data;
++
++		if (rx_reg->msg_type == msg_type)
++			return rx_reg;
 +	}
-+	else if (service->sar_out == service->sar) {
-+		sar_type = PROXY_PDU_SAR_1ST_SEG;
-+		count = max_size - 1;
-+		more = true;
-+	}
-+	else if (remaining < max_size) {
-+		sar_type = PROXY_PDU_SAR_LAST_SEG;
-+		count = remaining;
-+	}
-+	else {
-+		sar_type = PROXY_PDU_SAR_CONT_SEG;
-+		count = max_size - 1;
-+		more = true;
-+	}
-+
-+	sar_type <<= 6;
-+	sar_type |= service->msg_type;
-+
-+	l_info("remaining=%u, count=%u, sar_type=0x%02x", remaining, count, sar_type);
-+	print_packet("notify_write", service->sar_out, count);
-+
-+	iov[0].iov_base = &sar_type;
-+	iov[0].iov_len = sizeof(sar_type);
-+	iov[1].iov_base = service->sar_out;
-+	iov[1].iov_len = count;
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iov;
-+	msg.msg_iovlen = L_ARRAY_SIZE(iov);
-+
-+	if (sendmsg(l_io_get_fd(service->notify_io), &msg, MSG_NOSIGNAL) < 0)
-+		l_error("Cannot write notification data: %s", strerror(errno));
-+
-+	service->sar_out += count;
-+
-+	if (!more)
-+		more = service->tx_cmplt_cb(service->user_data);
-+
-+	return more;
-+}
-+
-+void gatt_service_tx(struct gatt_service *service, uint8_t msg_type,
-+						const void *data, uint16_t len)
-+{
-+	if (!service || gatt_service != service)
-+		return;
-+
-+	if (len > service->max_pdu_len) {
-+		l_error("Frame too long");
-+		return;
-+	}
-+
-+	memcpy(service->sar, data, len);
-+	service->sar_len = len;
-+	service->sar_out = service->sar;
-+	service->msg_type = msg_type;
-+	print_packet("TX", service->sar, service->sar_len);
-+	l_io_set_write_handler(service->notify_io, notify_write, service, NULL);
-+}
-+
-+static bool svc_uuid_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	struct gatt_service *service = user_data;
-+
-+//	l_info("svc_uuid_getter");
-+	return l_dbus_message_builder_append_basic(builder, 's',
-+							service->svc_uuid);
-+}
-+
-+static bool svc_primary_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	bool primary = true;
-+
-+//	l_info("svc_primary_getter");
-+	return l_dbus_message_builder_append_basic(builder, 'b', &primary);
-+}
-+
-+static void setup_gatt_svc_interface(struct l_dbus_interface *iface)
-+{
-+	l_dbus_interface_property(iface, "UUID", 0, "s", svc_uuid_getter, NULL);
-+	l_dbus_interface_property(iface, "Primary", 0, "b", svc_primary_getter,
-+									NULL);
-+}
-+
-+static bool parse_write_value_options(struct l_dbus_message_iter *itr,
-+					struct write_value_options *opts)
-+{
-+	const char *key;
-+	struct l_dbus_message_iter var;
-+
-+	opts->device = NULL;
-+	opts->link = LINK_TYPE_BR_EDR;
-+	opts->type = WRITE_VALUE_TYPE_COMMAND;
-+	opts->offset = 0;
-+	opts->mtu = 0;
-+	opts->prepare_authorize = false;
-+
-+	while (l_dbus_message_iter_next_entry(itr, &key, &var)) {
-+		if (!strcmp(key, "device")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "o",
-+								&opts->device))
-+				return false;
-+		} else if (!strcmp(key, "link")) {
-+			const char *link;
-+
-+			if (!l_dbus_message_iter_get_variant(&var, "s", &link))
-+				return false;
-+
-+			if (!strcmp(link, "BR/EDR"))
-+				opts->link = LINK_TYPE_BR_EDR;
-+			else if (!strcmp(link, "LE"))
-+				opts->link = LINK_TYPE_LE;
-+			else
-+				return false;
-+		} else if (!strcmp(key, "type")) {
-+			const char *type;
-+
-+			if (!l_dbus_message_iter_get_variant(&var, "s", &type))
-+				return false;
-+
-+			if (!strcmp(type, "command"))
-+				opts->type = WRITE_VALUE_TYPE_COMMAND;
-+			else if (!strcmp(type, "request"))
-+				opts->type = WRITE_VALUE_TYPE_REQUEST;
-+			else if (!strcmp(type, "reliable"))
-+				opts->type = WRITE_VALUE_TYPE_RELIABLE;
-+			else
-+				return false;
-+		} else if (!strcmp(key, "offset")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "q",
-+								&opts->offset))
-+				return false;
-+		} else if (!strcmp(key, "mtu")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "q",
-+								&opts->mtu))
-+				return false;
-+		} else if (!strcmp(key, "prepare-authorize")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "b",
-+						&opts->prepare_authorize))
-+				return false;
-+		}
-+	}
-+
-+	return true;
-+}
-+
-+static struct l_dbus_message *chrc_write_value_call(struct l_dbus *,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	struct characterstic *chr = user_data;
-+	struct gatt_service *service = chr->service;
-+	struct l_dbus_message_iter iter_data, dict;
-+	struct write_value_options opts;
-+	enum proxy_pdu_sar sar;
-+	uint8_t msg_type;
-+	uint8_t *data;
-+	uint32_t len;
-+	int i;
-+
-+	if (!l_dbus_message_get_arguments(msg, "aya{sv}", &iter_data, &dict))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (!parse_write_value_options(&dict, &opts))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (!l_dbus_message_iter_get_fixed_array(&iter_data, &data, &len) ||
-+					!len || len > service->max_pdu_len)
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
-+							"Incorrect data");
-+
-+	l_info("chrc_write_value_call(type=%u, offset=%u, mtu=%u)", opts.type, opts.offset, opts.mtu);
-+	print_packet("WriteValue", data, len);
-+
-+	if (len < 1)
-+		return l_dbus_message_new_method_return(msg);
-+
-+	sar = (data[0] >> 6) & 0x03;
-+	msg_type = data[0] & 0x3F;
-+
-+	switch (sar)  {
-+		case PROXY_PDU_SAR_CMPLT_MSG:
-+			service->rx_cb(service->user_data, msg_type, data, len);
-+			break;
-+
-+		case PROXY_PDU_SAR_1ST_SEG:
-+			if (len > service->max_pdu_len) {
-+				l_debug("Length exceeded: %d", len);
-+				break;
-+			}
-+
-+			memcpy(service->sar, data, len);
-+			service->sar_len = len;
-+			break;
-+
-+		case PROXY_PDU_SAR_CONT_SEG:
-+		case PROXY_PDU_SAR_LAST_SEG: {
-+			if (len - 1 > service->max_pdu_len - service->sar_len) {
-+				l_debug("Length exceeded: %d", len);
-+				break;
-+			}
-+
-+			memcpy(service->sar + service->sar_len,
-+							data + 1, len - 1);
-+			service->sar_len += len - 1;
-+
-+			if (sar == PROXY_PDU_SAR_LAST_SEG) {
-+				uint8_t sar_len = service->sar_len;
-+
-+				/* reused by gatt_service_tx */
-+				service->sar_len = 0;
-+				service->rx_cb(service->user_data, msg_type,
-+							service->sar, sar_len);
-+			}
-+
-+			break;
-+		}
-+	}
-+
-+	return l_dbus_message_new_method_return(msg);
-+}
-+
-+static bool parse_acquire_notify_options(struct l_dbus_message_iter *itr,
-+					struct acquire_notify_options *opts)
-+{
-+	const char *key;
-+	struct l_dbus_message_iter var;
-+
-+	opts->device = NULL;
-+	opts->link = LINK_TYPE_BR_EDR;
-+	opts->mtu = 0;
-+
-+	while (l_dbus_message_iter_next_entry(itr, &key, &var)) {
-+		if (!strcmp(key, "device")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "o",
-+								&opts->device))
-+				return false;
-+		} else if (!strcmp(key, "link")) {
-+			const char *link;
-+
-+			if (!l_dbus_message_iter_get_variant(&var, "s", &link))
-+				return false;
-+
-+			if (!strcmp(link, "BR/EDR"))
-+				opts->link = LINK_TYPE_BR_EDR;
-+			else if (!strcmp(link, "LE"))
-+				opts->link = LINK_TYPE_LE;
-+			else
-+				return false;
-+		} else if (!strcmp(key, "mtu")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "q",
-+								&opts->mtu))
-+				return false;
-+		}
-+	}
-+
-+	return true;
-+}
-+
-+static void notify_disconnected(struct l_io *io, void *user_data)
-+{
-+	struct gatt_service *service = user_data;
-+
-+	if (service != gatt_service)
-+		return;
-+
-+	l_info("notify_disconnected");
-+
-+	if (!service->notify_io)
-+		return;
-+
-+	if (service->notify_stopped_cb)
-+		service->notify_stopped_cb(service->user_data);
-+}
-+
-+static struct l_dbus_message *chrc_acquire_notify_call(struct l_dbus *,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	struct characterstic *chr = user_data;
-+	struct gatt_service *service = chr->service;
-+	struct l_dbus_message_iter dict;
-+	struct acquire_notify_options opts;
-+	struct l_dbus_message *reply;
-+	int fds[2];
-+
-+	l_info("AcquireNotify");
-+
-+	if (!l_dbus_message_get_arguments(msg, "a{sv}", &dict))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (!parse_acquire_notify_options(&dict, &opts))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (socketpair(AF_UNIX,
-+			SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC,
-+							0, fds) == -1)
-+		return dbus_error(msg, MESH_ERROR_FAILED,
-+						"Cannot create socket");
-+
-+	service->notify_io = l_io_new(fds[0]);
-+	l_io_set_close_on_destroy(service->notify_io, true);
-+	l_io_set_disconnect_handler(service->notify_io, notify_disconnected,
-+								service, NULL);
-+	service->mtu = opts.mtu;
-+	l_info("AcquireNotify: mtu=%u", opts.mtu);
-+
-+	if (service->notify_acquired_cb)
-+		service->notify_acquired_cb(service->user_data);
-+
-+	reply = l_dbus_message_new_method_return(msg);
-+
-+	/* l_dbus_message_builder_append_basic() cannot append UNIX FDs */
-+	l_dbus_message_set_arguments(reply, "hq", fds[1], service->mtu);
-+	/*
-+	 * file descriptor for bluetoothd has just been dup'ed and must be
-+	 * closed here in order to get disconnect event after GATT notifications
-+	 * notifications have been disabled.
-+	 */
-+	close(fds[1]);
-+
-+	return reply;
-+}
-+
-+static bool chrc_uuid_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	const struct characterstic *chr = user_data;
-+
-+	const char *path = l_dbus_message_get_path(msg);
-+	const char *interface = l_dbus_message_get_interface(msg);
-+	const char *member = l_dbus_message_get_member(msg);
-+
-+//	l_info("chrc_uuid_getter(path=%s, interface=%s, member=%s)", path, interface, member);
-+	return l_dbus_message_builder_append_basic(builder, 's', chr->uuid);
-+}
-+
-+static bool chrc_service_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+//	l_info("chrc_service_getter");
-+	return l_dbus_message_builder_append_basic(builder, 'o',
-+						BLUEZ_MESH_SERVICE_PATH);
-+}
-+
-+static bool chrc_notify_acquired_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	const struct characterstic *chr = user_data;
-+	const struct gatt_service *service = chr->service;
-+	bool notifying = !!service->notify_io;
-+
-+//	l_info("chrc_notify_acquired_getter");
-+
-+	return l_dbus_message_builder_append_basic(builder, 'b', &notifying);
-+}
-+
-+static bool chrc_flags_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	const struct characterstic *chr = user_data;
-+	const char * const *flag = chr->flags;
-+
-+//	l_info("chrc_flags_getter");
-+
-+	l_dbus_message_builder_enter_array(builder, "s");
-+
-+	while (*flag)
-+		l_dbus_message_builder_append_basic(builder, 's', *flag++);
-+
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	return true;
-+}
-+
-+static void setup_gatt_chrc_interface(struct l_dbus_interface *iface)
-+{
-+	/* Note: "ReadValue" method is not supported. */
-+	l_dbus_interface_method(iface, "WriteValue" , 0, chrc_write_value_call,
-+							"", "aya{sv}",
-+							"value", "options");
-+	l_dbus_interface_method(iface, "AcquireNotify", 0,
-+							chrc_acquire_notify_call,
-+							"hq", "a{sv}",
-+							"fd", "mtu",
-+							"options");
-+	l_dbus_interface_property(iface, "UUID"   , 0, "s", chrc_uuid_getter,
-+									NULL);
-+	l_dbus_interface_property(iface, "Service", 0, "o", chrc_service_getter,
-+									NULL);
-+	l_dbus_interface_property(iface, "NotifyAcquired", 0, "b",
-+					chrc_notify_acquired_getter, NULL);
-+	l_dbus_interface_property(iface, "Flags"  , 0, "as", chrc_flags_getter,
-+									NULL);
-+}
-+
-+static void register_app_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct l_dbus_message_builder *builder;
-+
-+//	l_info("register_app_setup");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+
-+	/* Object path */
-+	l_dbus_message_builder_append_basic(builder, 'o', BLUEZ_MESH_GATT_PATH);
-+
-+	/* Options (empty) */
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+	l_dbus_message_builder_leave_dict(builder);
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void register_app_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+//	l_info("register_app_reply");
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *error;
-+
-+		l_dbus_message_get_error(result, &error, NULL);
-+
-+		l_error("Registration of GATT application failed: %s", error);
-+	}
-+}
-+
-+static bool gatt_svc_init(struct l_dbus *dbus, struct l_dbus_proxy *dbus_proxy,
-+					struct gatt_service *service)
-+{
-+	if (!l_dbus_register_interface(dbus, GATT_SERVICE_IFACE,
-+						setup_gatt_svc_interface,
-+						NULL, false)) {
-+		l_error("Cannot register " GATT_SERVICE_IFACE " interface");
-+		goto error_return;
-+	}
-+
-+	if (!l_dbus_register_interface(dbus, GATT_CHRC_IFACE,
-+						setup_gatt_chrc_interface,
-+						NULL, false)) {
-+		l_error("Cannot register " GATT_CHRC_IFACE " interface");
-+		goto error_unregister_svc_iface;
-+	}
-+
-+	if (!l_dbus_object_add_interface(dbus, BLUEZ_MESH_SERVICE_PATH,
-+						GATT_SERVICE_IFACE, service)) {
-+		l_error("Cannot add GATT service");
-+		goto error_unregister_chrc_iface;
-+	}
-+
-+	if (!l_dbus_object_add_interface(dbus, BLUEZ_MESH_CHRC_DATA_IN_PATH,
-+						GATT_CHRC_IFACE,
-+						&service->chrc_data_in)) {
-+		l_error("Cannot add GATT Data In characteristic");
-+		goto error_remove_svc;
-+	}
-+
-+	if (!l_dbus_object_add_interface(dbus, BLUEZ_MESH_CHRC_DATA_OUT_PATH,
-+						GATT_CHRC_IFACE,
-+						&service->chrc_data_out)) {
-+		l_error("Cannot add GATT Data Out characteristic");
-+		goto error_remove_data_in_chrc;
-+	}
-+
-+	if (!l_dbus_object_manager_enable(dbus, BLUEZ_MESH_GATT_PATH)) {
-+		l_error("Cannot enable object manager");
-+		goto error_remove_data_out_chrc;
-+	}
-+
-+	if (!l_dbus_proxy_method_call(dbus_proxy, "RegisterApplication",
-+						register_app_setup,
-+						register_app_reply,
-+						NULL, NULL)) {
-+		l_error("Cannot register GATT application");
-+		goto error_disable_object_manager;
-+	}
-+
-+	return true;
-+
-+error_disable_object_manager:
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_PATH,
-+					L_DBUS_INTERFACE_OBJECT_MANAGER);
-+
-+error_remove_data_out_chrc:
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_CHRC_DATA_OUT_PATH,
-+							GATT_CHRC_IFACE);
-+
-+error_remove_data_in_chrc:
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_CHRC_DATA_IN_PATH,
-+							GATT_CHRC_IFACE);
-+
-+error_remove_svc:
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_SERVICE_PATH,
-+							GATT_SERVICE_IFACE);
-+
-+error_unregister_chrc_iface:
-+	l_dbus_unregister_interface(dbus, GATT_CHRC_IFACE);
-+
-+error_unregister_svc_iface:
-+	l_dbus_unregister_interface(dbus, GATT_SERVICE_IFACE);
-+
-+error_return:
-+	return false;
-+}
-+
-+static void unregister_app_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct l_dbus_message_builder *builder;
-+
-+//	l_info("unregister_app_setup");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+
-+	/* Object path */
-+	l_dbus_message_builder_append_basic(builder, 'o', BLUEZ_MESH_GATT_PATH);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void unregister_app_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+	struct gatt_service *service = user_data;
-+	struct l_dbus *dbus = dbus_get_bus();
-+//	l_info("unregister_app_reply");
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *error;
-+
-+		l_dbus_message_get_error(result, &error, NULL);
-+
-+		l_error("Unregistration of GATT application failed: %s", error);
-+	}
-+
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_PATH,
-+					L_DBUS_INTERFACE_OBJECT_MANAGER);
-+
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_CHRC_DATA_OUT_PATH,
-+							GATT_CHRC_IFACE);
-+
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_CHRC_DATA_IN_PATH,
-+							GATT_CHRC_IFACE);
-+
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_SERVICE_PATH,
-+							GATT_SERVICE_IFACE);
-+
-+	l_dbus_unregister_interface(dbus, GATT_CHRC_IFACE);
-+	l_dbus_unregister_interface(dbus, GATT_SERVICE_IFACE);
-+
-+	if (service->svc_deinit_cb)
-+		service->svc_deinit_cb(service);
-+}
-+
-+static void gatt_svc_deinit(struct gatt_service *service, gatt_destroy_cb cb)
-+{
-+	service->svc_deinit_cb = cb;
-+
-+	if (!l_dbus_proxy_method_call(service->dbus_proxy_gatt_mgr,
-+							"UnregisterApplication",
-+							unregister_app_setup,
-+							unregister_app_reply,
-+							service, NULL)) {
-+		l_error("Cannot unregister GATT application");
-+	}
-+}
-+
-+static struct l_dbus_message *adv_release_call(struct l_dbus *,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	l_info("ADV Release");
 +
 +	return NULL;
 +}
 +
-+static bool adv_type_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
++void gatt_proxy_service_register_recv_cb(struct gatt_proxy_service *gatt_proxy,
++					enum proxy_msg_type msg_type,
++					mesh_io_recv_func_t cb,
 +					void *user_data)
 +{
-+//	l_info("adv_type_getter");
++	struct gatt_io_reg *rx_reg;
 +
-+	return l_dbus_message_builder_append_basic(builder, 's', "peripheral");
-+}
-+
-+static bool adv_svc_uuids_getter(struct l_dbus *dbus,
-+					struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	const struct gatt_service *service = user_data;
-+
-+//	l_info("adv_svc_uuids_getter");
-+	l_dbus_message_builder_enter_array(builder, "s");
-+	l_dbus_message_builder_append_basic(builder, 's', service->svc_uuid);
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	return true;
-+}
-+
-+static bool adv_svc_data_getter(struct l_dbus *dbus,
-+					struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	const struct gatt_service *service = user_data;
-+
-+//	l_info("adv_svc_data_getter");
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+	l_dbus_message_builder_append_basic(builder, 's', service->svc_uuid);
-+	l_dbus_message_builder_enter_variant(builder, "ay");
-+
-+	if (!service->fill_adv_service_data_cb(service->user_data, builder))
-+		return false;
-+
-+	l_dbus_message_builder_leave_variant(builder);
-+	l_dbus_message_builder_leave_dict(builder);
-+
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	return true;
-+}
-+
-+static bool adv_local_name_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	uint16_t max_interval_ms = 1000;
-+	uint16_t duration = 1 * max_interval_ms;
-+
-+//	l_info("adv_local_name_getter");
-+
-+	return l_dbus_message_builder_append_basic(builder, 's', "Test");
-+}
-+
-+static bool adv_duration_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	uint16_t max_interval_ms = 1000;
-+	uint16_t duration = 1 * max_interval_ms;
-+
-+//	l_info("adv_duration_getter");
-+
-+	return l_dbus_message_builder_append_basic(builder, 'q', &duration);
-+}
-+
-+static bool adv_timeout_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	uint16_t timeout = 1000;
-+
-+//	l_info("adv_timeout_getter");
-+
-+	return l_dbus_message_builder_append_basic(builder, 'q', &timeout);
-+}
-+
-+static bool adv_min_interval_getter(struct l_dbus *dbus,
-+					struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	uint32_t min_interval_ms = 1000;
-+
-+//	l_info("adv_min_interval_getter");
-+
-+	return l_dbus_message_builder_append_basic(builder, 'u',
-+							&min_interval_ms);
-+}
-+
-+static bool adv_max_interval_getter(struct l_dbus *dbus,
-+					struct l_dbus_message *msg,
-+					struct l_dbus_message_builder *builder,
-+					void *user_data)
-+{
-+	uint32_t max_interval_ms = 1000;
-+
-+//	l_info("adv_max_interval_getter");
-+
-+	return l_dbus_message_builder_append_basic(builder, 'u',
-+							&max_interval_ms);
-+}
-+
-+static void setup_le_adv_interface(struct l_dbus_interface *iface)
-+{
-+	l_dbus_interface_method(iface, "Release", 0, adv_release_call,
-+						"", "");
-+	l_dbus_interface_property(iface, "Type", 0, "s",
-+						adv_type_getter, NULL);
-+	l_dbus_interface_property(iface, "ServiceUUIDs", 0, "as",
-+						adv_svc_uuids_getter, NULL);
-+	l_dbus_interface_property(iface, "ServiceData", 0, "a{sv}",
-+						adv_svc_data_getter, NULL);
-+	l_dbus_interface_property(iface, "LocalName", 0, "s",
-+						adv_local_name_getter, NULL);
-+	l_dbus_interface_property(iface, "Duration", 0, "q",
-+						adv_duration_getter, NULL);
-+	l_dbus_interface_property(iface, "Timeout", 0, "q",
-+						adv_timeout_getter, NULL);
-+	l_dbus_interface_property(iface, "MinInterval", 0, "u",
-+						adv_min_interval_getter, NULL);
-+	l_dbus_interface_property(iface, "MaxInterval", 0, "u",
-+						adv_max_interval_getter, NULL);
-+}
-+
-+static void register_adv_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct l_dbus_message_builder *builder;
-+
-+//	l_info("register_adv_setup");
-+	builder = l_dbus_message_builder_new(msg);
-+
-+	/* Object path */
-+	l_dbus_message_builder_append_basic(builder, 'o',
-+						BLUEZ_MESH_GATT_ADV_PATH);
-+
-+	/* Options (empty) */
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+	l_dbus_message_builder_leave_dict(builder);
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void register_adv_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+//	l_info("register_adv_reply");
-+	if (l_dbus_message_is_error(result)) {
-+		const char *error;
-+
-+		l_dbus_message_get_error(result, &error, NULL);
-+
-+		l_error("Registration of LE advertising failed: %s", error);
-+	}
-+}
-+
-+static bool gatt_adv_init(struct l_dbus *dbus, struct l_dbus_proxy *dbus_proxy,
-+					struct gatt_service *service)
-+{
-+	if (!l_dbus_register_interface(dbus, LE_ADVERTISEMENT_IFACE,
-+							setup_le_adv_interface,
-+							NULL, false)) {
-+		l_error("Cannot register " LE_ADVERTISEMENT_IFACE " interface");
-+		goto error_return;
-+	}
-+
-+	if (!l_dbus_object_add_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+						LE_ADVERTISEMENT_IFACE,
-+						service)) {
-+		l_error("Cannot add provisioner LE advertising service");
-+		goto error_unregister_le_adv_iface;
-+	}
-+
-+	if (!l_dbus_object_manager_enable(dbus, BLUEZ_MESH_GATT_ADV_PATH)) {
-+		l_error("Cannot enable object manager");
-+		goto error_remove_le_adv;
-+	}
-+
-+	/*
-+	 * org.freedesktop.DBus.Properties is required for building
-+	 * propertiesChanged signals
-+	 */
-+	if (!l_dbus_object_add_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+					L_DBUS_INTERFACE_PROPERTIES, NULL)) {
-+		l_error("Cannot add LE advertising properties");
-+		goto error_disable_object_manager;
-+	}
-+
-+	if (!l_dbus_proxy_method_call(dbus_proxy, "RegisterAdvertisement",
-+						register_adv_setup,
-+						register_adv_reply,
-+						NULL, NULL)) {
-+		l_error("Cannot register LE advertisement");
-+		goto error_remove_properties_iface;
-+	}
-+
-+	return true;
-+
-+error_remove_properties_iface:
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+						L_DBUS_INTERFACE_PROPERTIES);
-+
-+error_disable_object_manager:
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+					L_DBUS_INTERFACE_OBJECT_MANAGER);
-+
-+error_remove_le_adv:
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+					LE_ADVERTISEMENT_IFACE);
-+
-+error_unregister_le_adv_iface:
-+	l_dbus_unregister_interface(dbus, LE_ADVERTISEMENT_IFACE);
-+
-+error_return:
-+	return false;
-+}
-+
-+static void unregister_adv_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct l_dbus_message_builder *builder;
-+
-+//	l_info("unregister_adv_setup");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+
-+	/* Object path */
-+	l_dbus_message_builder_append_basic(builder, 'o', BLUEZ_MESH_GATT_ADV_PATH);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void unregister_adv_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+	struct gatt_service *service = user_data;
-+	struct l_dbus *dbus = dbus_get_bus();
-+//	l_info("unregister_adv_reply");
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *error;
-+
-+		l_dbus_message_get_error(result, &error, NULL);
-+
-+		l_error("Unregistration of LE advertisement failed: %s", error);
-+	}
-+
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+						L_DBUS_INTERFACE_PROPERTIES);
-+
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+					L_DBUS_INTERFACE_OBJECT_MANAGER);
-+
-+	l_dbus_object_remove_interface(dbus, BLUEZ_MESH_GATT_ADV_PATH,
-+					LE_ADVERTISEMENT_IFACE);
-+
-+	l_dbus_unregister_interface(dbus, LE_ADVERTISEMENT_IFACE);
-+
-+	if (service->adv_deinit_cb)
-+		service->adv_deinit_cb(service);
-+}
-+
-+static void gatt_adv_deinit(struct gatt_service *service, gatt_destroy_cb cb)
-+{
-+	service->adv_deinit_cb = cb;
-+
-+	if (!l_dbus_proxy_method_call(service->dbus_proxy_le_adv_mgr,
-+							"UnregisterAdvertisement",
-+							unregister_adv_setup,
-+							unregister_adv_reply,
-+							service, NULL)) {
-+		l_error("Cannot unregister LE advertisement");
-+	}
-+}
-+
-+static void dbus_proxy_added(struct l_dbus_proxy *dbus_proxy, void *user_data)
-+{
-+	const char *interface = l_dbus_proxy_get_interface(dbus_proxy);
-+	const char *path = l_dbus_proxy_get_path(dbus_proxy);
-+	struct gatt_service *service = user_data;
-+
-+	l_info("Proxy added: %s (%s)", interface, path);
-+
-+	if (!strcmp(interface, GATT_MGR_IFACE)) {
-+		service->dbus_proxy_gatt_mgr = dbus_proxy;
-+		gatt_svc_init(dbus_get_bus(), dbus_proxy, service);
-+	} else if (!strcmp(interface, LE_ADVERTISING_MGR_IFACE)) {
-+		service->dbus_proxy_le_adv_mgr = dbus_proxy;
-+		gatt_adv_init(dbus_get_bus(), dbus_proxy, service);
-+	}
-+}
-+
-+static void dbus_proxy_removed(struct l_dbus_proxy *proxy, void *user_data)
-+{
-+	const char *interface = l_dbus_proxy_get_interface(proxy);
-+	const char *path = l_dbus_proxy_get_path(proxy);
-+	struct gatt_service *service = user_data;
-+
-+	l_info("Proxy removed: %s (%s)", interface, path);
-+
-+	if (!strcmp(interface, GATT_MGR_IFACE))
-+		service->dbus_proxy_gatt_mgr = NULL;
-+	else if (!strcmp(interface, LE_ADVERTISING_MGR_IFACE))
-+		service->dbus_proxy_le_adv_mgr = NULL;
-+}
-+
-+struct gatt_service *
-+gatt_service_create(
-+		const char *svc_uuid,
-+		const char *chrc_data_in_uuid,
-+		const char *chrc_data_out_uuid,
-+		uint8_t max_pdu_len,
-+		gatt_service_notify_acquired_cb notify_acquired_cb,
-+		gatt_service_notify_stopped_cb notify_stopped_cb,
-+		gatt_service_rx_cb rx_cb,
-+		gatt_service_tx_cmplt_cb tx_cmplt_cb,
-+		gatt_service_fill_adv_service_data_cb fill_adv_service_data_cb,
-+		void *user_data)
-+{
-+	static const char *flags_data_in[] = {"write-without-response", NULL};
-+	static const char *flags_data_out[] = {"notify", NULL};
-+
-+	/* Only one GATT service may exist at a time (MshPRT_v1.1, chapter 7) */
-+	if (gatt_service)
-+		return NULL;
-+
-+	gatt_service = l_new(struct gatt_service, 1);
-+	gatt_service->svc_uuid = svc_uuid;
-+	gatt_service->max_pdu_len = max_pdu_len;
-+	gatt_service->sar = l_malloc(max_pdu_len);
-+
-+	gatt_service->notify_acquired_cb = notify_acquired_cb;
-+	gatt_service->notify_stopped_cb = notify_stopped_cb;
-+	gatt_service->rx_cb = rx_cb;
-+	gatt_service->tx_cmplt_cb = tx_cmplt_cb;
-+	gatt_service->fill_adv_service_data_cb = fill_adv_service_data_cb;
-+	gatt_service->user_data = user_data;
-+	gatt_service->mtu = GATT_MTU;
-+
-+	gatt_service->chrc_data_in.uuid = chrc_data_in_uuid;
-+	gatt_service->chrc_data_in.flags = flags_data_in;
-+	gatt_service->chrc_data_in.service = gatt_service;
-+
-+	gatt_service->chrc_data_out.uuid = chrc_data_out_uuid;
-+	gatt_service->chrc_data_out.flags = flags_data_out;
-+	gatt_service->chrc_data_out.service = gatt_service;
-+
-+	gatt_service->dbus_client = l_dbus_client_new(dbus_get_bus(),
-+						"org.bluez", "/org/bluez");
-+
-+	l_dbus_client_set_proxy_handlers(gatt_service->dbus_client,
-+						dbus_proxy_added,
-+						dbus_proxy_removed,
-+						NULL,
-+						gatt_service, NULL);
-+
-+	return gatt_service;
-+}
-+
-+static void gatt_svc_destroy(void *user_data)
-+{
-+	struct gatt_service *service = user_data;
-+	gatt_destroy_cb destroy_cb;
-+	void *destroy_data;
-+
-+	if (!gatt_service || gatt_service != service)
++	if (gatt_proxy != gatt_proxy_service || !cb)
 +		return;
 +
-+	destroy_cb = service->destroy_cb;
-+	destroy_data = service->destroy_data;
++	rx_reg = find_by_filter(gatt_proxy->rx_regs, msg_type);
 +
-+	l_dbus_client_destroy(service->dbus_client);
-+	l_io_destroy(service->notify_io);
-+	l_free(service->sar);
-+	l_free(service);
-+	gatt_service = NULL;
++	l_free(rx_reg);
++	l_queue_remove(gatt_proxy->rx_regs, rx_reg);
 +
-+	if (destroy_cb)
-+		destroy_cb(destroy_data);
++	rx_reg = l_malloc(sizeof(struct gatt_io_reg));
++	rx_reg->cb = cb;
++	rx_reg->msg_type = msg_type;
++	rx_reg->user_data = user_data;
++
++	l_queue_push_head(gatt_proxy->rx_regs, rx_reg);
 +}
 +
-+static void gatt_svc_deinit_finished(void *user_data)
++void
++gatt_proxy_service_deregister_recv_cb(struct gatt_proxy_service *gatt_proxy,
++						enum proxy_msg_type msg_type)
 +{
-+	struct gatt_service *service = user_data;
++	struct gatt_io_reg *rx_reg;
 +
-+	if (!gatt_service || gatt_service != service)
++	if (gatt_proxy != gatt_proxy_service)
 +		return;
 +
-+	/* l_dbus_client_destroy() must not be called from dbus context */
-+	l_idle_oneshot(gatt_svc_destroy, service, NULL);
++	rx_reg = find_by_filter(gatt_proxy->rx_regs, msg_type);
++
++	l_queue_remove(gatt_proxy->rx_regs, rx_reg);
++	l_free(rx_reg);
 +}
 +
-+static void gatt_adv_deinit_finished(void *user_data)
++void gatt_proxy_service_send(enum proxy_msg_type msg_type,
++						const void *data, uint8_t len)
 +{
-+	struct gatt_service *service = user_data;
-+
-+	if (!gatt_service || gatt_service != service)
++	if (!gatt_proxy_service)
 +		return;
 +
-+	gatt_svc_deinit(service, gatt_svc_deinit_finished);
++	if (!gatt_proxy_service->txing) {
++		gatt_proxy_service->txing = true;
++		gatt_service_tx(gatt_proxy_service->gatt_service, msg_type,
++								data, len);
++	} else {
++		struct tx_deferred *tx_deferred;
++
++//		print_packet("TX-Defer", data, len);
++		tx_deferred = l_malloc(len + sizeof(struct tx_deferred));
++		tx_deferred->msg_type = msg_type;
++		tx_deferred->len = len;
++		memcpy(tx_deferred->data, data, len);
++		l_queue_push_tail(gatt_proxy_service->tx_deferred, tx_deferred);
++	}
 +}
 +
-+void gatt_service_destroy(struct gatt_service *service,
-+				gatt_destroy_cb destroy_cb, void *user_data)
++static void process_rx_callbacks(void *a, void *b)
 +{
-+	if (!gatt_service || gatt_service != service)
-+		return;
++	struct gatt_io_reg *rx_reg = a;
++	struct process_data *rx = b;
 +
-+	/* avoid recursion */
-+	l_io_set_disconnect_handler(service->notify_io, NULL, NULL, NULL);
-+
-+	service->destroy_cb = destroy_cb;
-+	service->destroy_data = user_data;
-+	gatt_adv_deinit(service, gatt_adv_deinit_finished);
++	if (rx->msg_type == rx_reg->msg_type)
++		rx_reg->cb(rx_reg->user_data, NULL, rx->data, rx->len);
 +}
 +
-+void gatt_service_adv_updated(struct gatt_service *service)
-+{
-+	if (!gatt_service || gatt_service != service)
-+		return;
-+
-+	l_dbus_property_changed(dbus_get_bus(), BLUEZ_MESH_GATT_ADV_PATH,
-+					LE_ADVERTISEMENT_IFACE, "ServiceData");
-+}
-diff --git a/mesh/gatt-service.h b/mesh/gatt-service.h
-new file mode 100644
-index 000000000000..a37966ec15f6
---- /dev/null
-+++ b/mesh/gatt-service.h
-@@ -0,0 +1,53 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2025  ARRI Lighting. All rights reserved.
-+ *
-+ *
-+ */
-+
-+#include <stdbool.h>
-+#include <stdint.h>
-+
-+/* MshPRT_v1.1, section 6.3.1 */
-+enum proxy_msg_type {
-+	PROXY_MSG_TYPE_NETWORK_PDU = 0x00,
-+	PROXY_MSG_TYPE_MESH_BEACON = 0x01,
-+	PROXY_MSG_TYPE_PROXY_CFG   = 0x02,
-+	PROXY_MSG_TYPE_PROV_PDU    = 0x03
-+};
-+
-+typedef void (*gatt_service_notify_acquired_cb)(void *user_data);
-+typedef void (*gatt_service_notify_stopped_cb)(void *user_data);
-+typedef void (*gatt_service_rx_cb)(void *user_data,
-+					enum proxy_msg_type messageType,
-+					const void *data, uint16_t len);
-+typedef bool (*gatt_service_tx_cmplt_cb)(void *user_data);
-+typedef bool (*gatt_service_fill_adv_service_data_cb)(void *user_data,
-+					struct l_dbus_message_builder *builder);
-+
-+typedef void (*gatt_destroy_cb)(void *user_data);
-+
-+struct gatt_service;
-+
-+struct gatt_service *
-+gatt_service_create(
-+		const char *svc_uuid,
-+		const char *chrc_data_in_uuid,
-+		const char *chrc_data_out_uuid,
-+		uint8_t max_pdu_len,
-+		gatt_service_notify_acquired_cb notify_acquired_cb,
-+		gatt_service_notify_stopped_cb notify_stopped_cb,
-+		gatt_service_rx_cb rx_cb,
-+		gatt_service_tx_cmplt_cb tx_cmplt_cb,
-+		gatt_service_fill_adv_service_data_cb fill_adv_service_data_cb,
-+		void *user_data);
-+
-+void gatt_service_destroy(struct gatt_service *service,
-+				gatt_destroy_cb destroy_cb, void *user_data);
-+
-+void gatt_service_tx(struct gatt_service *service, uint8_t msg_type,
-+						const void *data, uint16_t len);
-+void gatt_service_adv_updated(struct gatt_service *service);
-diff --git a/mesh/pb-gatt.c b/mesh/pb-gatt.c
-new file mode 100644
-index 000000000000..797dd7361ee1
---- /dev/null
-+++ b/mesh/pb-gatt.c
-@@ -0,0 +1,173 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2025  ARRI Lighting. All rights reserved.
-+ *
-+ *
-+ */
-+
-+#include <string.h>			// memcpy()
-+#include <sys/types.h>			// struct timeval [required by prov.h]
-+
-+#include <ell/dbus.h>
-+//#include <ell/log.h>
-+//#include <ell/timeout.h>
-+#include <ell/util.h>			// l_new(), l_free()
-+
-+#include "mesh/gatt-service.h"
-+#include "mesh/net.h"			// mesh_net_prov_caps, required by prov.h
-+#include "mesh/prov.h"			// mesh_prov_open_func_t,
-+					// mesh_prov_close_func_t,
-+					// mesh_prov_receive_func_t
-+#include "mesh/provision.h"		// PB_GATT
-+#include "mesh/pb-gatt.h"
-+
-+#define MESH_GATT_PROV_SVC_UUID "0x1827"
-+#define MESH_GATT_PROV_CHRC_DATA_IN  "0x2ADB"
-+#define MESH_GATT_PROV_CHRC_DATA_OUT "0x2ADC"
-+#define MAX_PROXY_PROV_PDU_LEN 66  /* MshPRT_v1.1, section 7.1.3.1 / 7.1.3.2 */
-+
-+struct pb_gatt_session {
-+	mesh_prov_open_func_t open_cb;
-+	mesh_prov_close_func_t close_cb;
-+	mesh_prov_receive_func_t rx_cb;
-+	mesh_prov_ack_func_t ack_cb;
-+//	struct l_timeout *tx_timeout;
-+	uint8_t uuid[16];
-+	uint16_t oob_info;
-+
-+	struct gatt_service *gatt_service;
-+	void *user_data;
-+
-+	pb_gatt_destroy_cb destroy_cb;
-+	void *destroy_data;
-+};
-+
-+static struct pb_gatt_session *pb_session = NULL;
-+
-+static void pb_gatt_tx(void *user_data, const void *data, uint16_t len)
-+{
-+	struct pb_gatt_session *session = user_data;
-+
-+	gatt_service_tx(session->gatt_service, PROXY_MSG_TYPE_PROV_PDU, data, len);
-+}
-+
-+static void gatt_notify_acquired_cb(void *user_data)
-+{
-+	struct pb_gatt_session *session = user_data;
-+
-+	/*
-+	 * MshPRT_v1.1, section 5.2.2: The link is opened on a PB-GATT
-+	 * bearer when the PB-GATT Client enables notifications.
-+	 */
-+	session->open_cb(session->user_data, pb_gatt_tx, session, PB_GATT);
-+}
-+
-+static void gatt_notify_stopped_cb(void *user_data)
-+{
-+	struct pb_gatt_session *session = user_data;
-+
-+	session->close_cb(session->user_data, PROV_ERR_UNEXPECTED_ERR);
-+}
-+
-+static void gatt_rx_cb(void *user_data, enum proxy_msg_type msg_type,
++static void gatt_service_rx(void *user_data, enum proxy_msg_type msg_type,
 +						const void *data, uint16_t len)
 +{
-+	struct pb_gatt_session *session = user_data;
++	struct gatt_proxy_service *gatt_proxy = user_data;
++	struct process_data rx = {
++		.msg_type = msg_type,
++		.data = data,
++		.len = len,
++	};
 +
-+	if (msg_type == PROXY_MSG_TYPE_PROV_PDU)
-+		session->rx_cb(session->user_data, data + 1, len - 1);
++	if (gatt_proxy != gatt_proxy_service)
++		return;
++
++	print_packet("RX", data, len);
++	l_queue_foreach(gatt_proxy->rx_regs, process_rx_callbacks, &rx);
 +}
 +
-+static bool gatt_tx_cmplt_cb(void *user_data)
++static bool gatt_service_tx_cmplt(void *user_data)
 +{
-+	struct pb_gatt_session *session = user_data;
++	struct gatt_proxy_service *gatt_proxy = user_data;
++	struct tx_deferred *tx_deferred;
 +
-+	session->ack_cb(session->user_data, 0 /* don't care */);
-+	return false;
++//	l_info("gatt_service_tx_cmplt");
++
++	if (gatt_proxy_service != gatt_proxy)
++		return false;
++
++	if (!gatt_proxy->txing)
++		return false;
++
++	gatt_proxy->txing = false;
++
++	tx_deferred = l_queue_pop_head(gatt_proxy->tx_deferred);
++	if (!tx_deferred)
++		return false;
++
++	gatt_proxy_service_send(tx_deferred->msg_type,
++					tx_deferred->data, tx_deferred->len);
++	l_free(tx_deferred);
++	return true;
 +}
 +
-+static bool gatt_fill_adv_service_data_cb(void *user_data,
++static bool gatt_service_fill_adv_service_data(void *user_data,
 +					struct l_dbus_message_builder *builder)
 +{
-+	struct pb_gatt_session *session = user_data;
-+	uint8_t oob_info[2];
-+	int i;
++	struct gatt_proxy_service *gatt_service = user_data;
 +
-+	l_dbus_message_builder_enter_array(builder, "y");
++	if (gatt_service != gatt_proxy_service)
++		return false;
 +
-+	for (i = 0; i < sizeof(session->uuid); i++)
-+		l_dbus_message_builder_append_basic(builder, 'y',
-+							&(session->uuid[i]));
-+	l_put_be16(session->oob_info, oob_info);
-+	for (i = 0; i < sizeof(oob_info); i++)
-+		l_dbus_message_builder_append_basic(builder, 'y',
-+							&(oob_info[i]));
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	return true;
++	return net_key_fill_adv_service_data(gatt_service->current_adv_key_id,
++								builder);
 +}
 +
-+bool pb_gatt_reg(mesh_prov_open_func_t open_cb, mesh_prov_close_func_t close_cb,
-+		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
-+		const uint8_t *uuid, uint16_t oob_info, void *user_data)
++static void gatt_proxy_service_cycle_adv(struct l_timeout *timeout,
++						void *user_data)
 +{
-+	pb_session = l_new(struct pb_gatt_session, 1);
++	struct gatt_proxy_service *gatt_proxy = user_data;
++	uint32_t next_adv_key_id;
 +
-+	pb_session->open_cb = open_cb;
-+	pb_session->close_cb = close_cb;
-+	pb_session->rx_cb = rx_cb;
-+	pb_session->ack_cb = ack_cb;
++	if (gatt_proxy_service != gatt_proxy)
++		return;
 +
-+	memcpy(pb_session->uuid, uuid, 16);
-+	pb_session->user_data = user_data;
++	next_adv_key_id = net_key_get_next_id(gatt_proxy->current_adv_key_id);
++	if (!next_adv_key_id)
++		return;
 +
-+	pb_session->gatt_service = gatt_service_create(MESH_GATT_PROV_SVC_UUID,
-+						MESH_GATT_PROV_CHRC_DATA_IN,
-+						MESH_GATT_PROV_CHRC_DATA_OUT,
-+						MAX_PROXY_PROV_PDU_LEN,
-+						gatt_notify_acquired_cb,
-+						gatt_notify_stopped_cb,
-+						gatt_rx_cb, gatt_tx_cmplt_cb,
-+						gatt_fill_adv_service_data_cb,
-+						pb_session);
-+	if (!pb_session->gatt_service) {
-+		l_free(pb_session);
-+		pb_session = NULL;
-+		return false;
++	if (gatt_proxy->current_adv_key_id != next_adv_key_id) {
++		gatt_proxy->current_adv_key_id = next_adv_key_id;
++		gatt_service_adv_updated(gatt_proxy_service->gatt_service);
 +	}
 +
-+	return true;
++	l_timeout_modify(gatt_proxy->adv_key_cycle_to, 3);
 +}
 +
-+static void gatt_destroy_finished(void *user_data)
++void gatt_proxy_service_set_current_adv_key(uint32_t id)
 +{
-+	pb_gatt_destroy_cb destroy_cb;
-+	void *destroy_data;
-+
-+	if (!pb_session || pb_session != user_data)
++	if (!gatt_proxy_service)
 +		return;
 +
-+	destroy_cb = pb_session->destroy_cb;
-+	destroy_data = pb_session->destroy_data;
-+
-+	l_free(pb_session);
-+	pb_session = NULL;
-+
-+	if (destroy_cb)
-+		destroy_cb(destroy_data);
++	gatt_proxy_service->current_adv_key_id = id;
++	gatt_service_adv_updated(gatt_proxy_service->gatt_service);
 +}
 +
-+void pb_gatt_unreg(void *user_data, pb_gatt_destroy_cb destroy_cb,
-+							void *destroy_data)
++void gatt_proxy_service_start(void)
 +{
-+	if (!pb_session || pb_session->user_data != user_data)
++	if (!gatt_proxy_service || gatt_proxy_service->gatt_service)
 +		return;
 +
-+	pb_session->destroy_cb = destroy_cb;
-+	pb_session->destroy_data = destroy_data;
-+	gatt_service_destroy(pb_session->gatt_service, gatt_destroy_finished,
-+								pb_session);
++	gatt_proxy_service->gatt_service = gatt_service_create(
++					MESH_GATT_PROXY_SVC_UUID,
++					MESH_GATT_PROXY_CHRC_DATA_IN,
++					MESH_GATT_PROXY_CHRC_DATA_OUT,
++					MAX_PROXY_PDU_LEN,
++					NULL, NULL,
++					gatt_service_rx,
++					gatt_service_tx_cmplt,
++					gatt_service_fill_adv_service_data,
++					gatt_proxy_service);
++
++	gatt_proxy_service->adv_key_cycle_to = l_timeout_create(3,
++						gatt_proxy_service_cycle_adv,
++						gatt_proxy_service, NULL);
++
++	mesh_net_attach_gatt(gatt_proxy_service);
 +}
-diff --git a/mesh/pb-gatt.h b/mesh/pb-gatt.h
++
++void gatt_proxy_service_stop(void)
++{
++	if (!gatt_proxy_service || !gatt_proxy_service->gatt_service)
++		return;
++
++	mesh_net_detach_gatt(gatt_proxy_service);
++	l_timeout_remove(gatt_proxy_service->adv_key_cycle_to);
++	gatt_service_destroy(gatt_proxy_service->gatt_service, NULL, NULL);
++}
++
++void gatt_proxy_service_create(void)
++{
++	if (gatt_proxy_service)
++		return;
++
++	gatt_proxy_service = l_new(struct gatt_proxy_service, 1);
++	gatt_proxy_service->tx_deferred = l_queue_new();
++	gatt_proxy_service->rx_regs = l_queue_new();
++
++	/* Check whether we have at least one key */
++	if (!net_key_get_next_id(0))
++		return;
++
++	gatt_proxy_service_start();
++}
++
++void gatt_proxy_service_destroy(void)
++{
++	if (!gatt_proxy_service)
++		return;
++
++	gatt_proxy_service_stop();
++
++	l_queue_destroy(gatt_proxy_service->rx_regs, l_free);
++	l_queue_destroy(gatt_proxy_service->tx_deferred, l_free);
++	l_free(gatt_proxy_service);
++	gatt_proxy_service = NULL;
++}
+diff --git a/mesh/gatt-proxy-svc.h b/mesh/gatt-proxy-svc.h
 new file mode 100644
-index 000000000000..49d95974c4ae
+index 000000000000..5c640dc2c8ef
 --- /dev/null
-+++ b/mesh/pb-gatt.h
-@@ -0,0 +1,20 @@
++++ b/mesh/gatt-proxy-svc.h
+@@ -0,0 +1,29 @@
 +/* SPDX-License-Identifier: LGPL-2.1-or-later */
 +/*
 + *
@@ -1594,47 +468,295 @@ index 000000000000..49d95974c4ae
 + *
 + */
 +
-+#include <stdbool.h>
 +#include <stdint.h>
 +
-+typedef void (*pb_gatt_destroy_cb)(void *user_data);
++enum proxy_msg_type;
++struct gatt_proxy_service;
 +
-+bool pb_gatt_reg(mesh_prov_open_func_t open_cb, mesh_prov_close_func_t close_cb,
-+		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
-+		const uint8_t *uuid, uint16_t oob_info, void *user_data);
-+void pb_gatt_unreg(void *user_data, pb_gatt_destroy_cb destroy_cb,
-+							void *destroy_data);
++void gatt_proxy_service_create(void);
++void gatt_proxy_service_destroy(void);
++void gatt_proxy_service_start(void);
++void gatt_proxy_service_stop(void);
++void gatt_proxy_service_set_current_adv_key(uint32_t id);
++void gatt_proxy_service_register_recv_cb(struct gatt_proxy_service *gatt_proxy,
++					enum proxy_msg_type msg_type,
++					mesh_io_recv_func_t cb,
++					void *user_data);
++void
++gatt_proxy_service_deregister_recv_cb(struct gatt_proxy_service *gatt_proxy,
++						enum proxy_msg_type msg_type);
++void gatt_proxy_service_send(enum proxy_msg_type msg_type,
++						const void *data, uint8_t len);
+diff --git a/mesh/main.c b/mesh/main.c
+index 5b8af4bc7345..b423fe70b8bd 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -31,6 +31,7 @@
+ #include "mesh/crypto.h"
+ #include "mesh/dbus.h"
+ #include "mesh/mesh-io.h"
++#include "mesh/gatt-proxy-svc.h"
+ #include "mesh/util.h"
+ 
+ static const char *storage_dir;
+@@ -94,6 +95,8 @@ static void mesh_ready_callback(void *user_data, bool success)
+ 		l_error("Failed to initialize mesh D-Bus resources");
+ 		l_main_quit();
+ 	}
++
++	gatt_proxy_service_create();
+ }
+ 
+ static void request_name_callback(struct l_dbus *dbus, bool success,
+diff --git a/mesh/net-keys.c b/mesh/net-keys.c
+index 42d498ce0ede..62ea4208af98 100644
+--- a/mesh/net-keys.c
++++ b/mesh/net-keys.c
+@@ -20,6 +20,7 @@
+ #include "mesh/util.h"
+ #include "mesh/crypto.h"
+ #include "mesh/mesh-io.h"
++#include "mesh/gatt-proxy-svc.h"
+ #include "mesh/net.h"
+ #include "mesh/net-keys.h"
+ 
+@@ -29,6 +30,12 @@
+ /* This allows daemon to skip decryption on recently seen beacons */
+ #define BEACON_CACHE_MAX	10
+ 
++/* MshPRT_v1.1, section 7.2.2.2.1 */
++#define IDENTIFICATION_TYPE_NETWORK_ID     0x00
++#define IDENTIFICATION_TYPE_NODE_ID        0x01
++#define IDENTIFICATION_TYPE_PRV_NETWORK_ID 0x02
++#define IDENTIFICATION_TYPE_PRV_NODE_ID    0x03
++
+ struct beacon_rx {
+ 	uint8_t data[28];
+ 	uint32_t id;
+@@ -144,6 +151,9 @@ uint32_t net_key_add(const uint8_t flooding[16])
+ 		goto fail;
+ 
+ 	key->id = ++last_flooding_id;
++	if (l_queue_isempty(keys))
++		gatt_proxy_service_start();
++
+ 	l_queue_push_tail(keys, key);
+ 	return key->id;
+ 
+@@ -196,6 +206,9 @@ void net_key_unref(uint32_t id)
+ 			l_timeout_remove(key->observe.timeout);
+ 			l_queue_remove(keys, key);
+ 			l_free(key);
++
++			if (l_queue_isempty(keys))
++				gatt_proxy_service_stop();
+ 		}
+ 	}
+ }
+@@ -663,6 +676,7 @@ bool net_key_beacon_refresh(uint32_t id, uint32_t ivi, bool kr, bool ivu,
+ 			return false;
+ 
+ 		print_packet("Set SNB to", key->snb, 23);
++		gatt_proxy_service_set_current_adv_key(key->id);
+ 	}
+ 
+ 	l_debug("Set Beacon: IVI: %8.8x, IVU: %d, KR: %d", ivi, ivu, kr);
+@@ -798,3 +812,50 @@ void net_key_cleanup(void)
+ 	l_queue_destroy(beacons, l_free);
+ 	beacons = NULL;
+ }
++
++bool net_key_fill_adv_service_data(uint32_t id,
++					struct l_dbus_message_builder *builder)
++{
++	uint8_t identification_type = IDENTIFICATION_TYPE_NETWORK_ID;
++	struct net_key *key;
++	int i;
++
++	key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
++	if (!key)
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "y");
++	l_dbus_message_builder_append_basic(builder, 'y', &identification_type);
++
++	for (i = 0; i < sizeof(key->net_id); i++)
++		l_dbus_message_builder_append_basic(builder, 'y',
++							&(key->net_id[i]));
++	l_dbus_message_builder_leave_array(builder);
++
++	return true;
++}
++
++uint32_t net_key_get_next_id(uint32_t id)
++{
++	const struct l_queue_entry *entry;
++	struct net_key *key;
++	bool found = false;
++
++	/* Try to find next key (after the given key id) */
++	for (entry = l_queue_get_entries(keys); entry; entry = entry->next) {
++		key = entry->data;
++
++		if (!found)
++			if (key->id == id)
++				found = true;
++		else
++			return key->id;
++	}
++
++	/* If not found, return id of first key */
++	key = l_queue_peek_head(keys);
++	if (key)
++		return key->id;
++
++	return 0;
++}
+diff --git a/mesh/net-keys.h b/mesh/net-keys.h
+index e73812481ddb..5a9d7868ab48 100644
+--- a/mesh/net-keys.h
++++ b/mesh/net-keys.h
+@@ -37,3 +37,7 @@ bool net_key_beacon_refresh(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
+ void net_key_beacon_enable(uint32_t id, bool mpb, uint8_t refresh_count);
+ void net_key_beacon_disable(uint32_t id, bool mpb);
+ uint32_t net_key_beacon_last_seen(uint32_t id);
++
++bool net_key_fill_adv_service_data(uint32_t id,
++					struct l_dbus_message_builder *builder);
++uint32_t net_key_get_next_id(uint32_t id);
+diff --git a/mesh/net.c b/mesh/net.c
+index 1cf74c892ca0..a64cfbde6f4e 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -27,6 +27,8 @@
+ #include "mesh/net.h"
+ #include "mesh/mesh-io.h"
+ #include "mesh/friend.h"
++#include "mesh/gatt-service.h"		// PROXY_MSG_TYPE_NETWORK_PDU
++#include "mesh/gatt-proxy-svc.h"	// gatt_proxy_service_send()
+ #include "mesh/mesh-config.h"
+ #include "mesh/model.h"
+ #include "mesh/appkey.h"
+@@ -2306,7 +2308,9 @@ static void send_msg_pkt_oneshot(void *user_data)
+ 	/* No extra randomization when sending regular mesh messages */
+ 	info.u.gen.max_delay = DEFAULT_MIN_DELAY;
+ 
+-	mesh_io_send(net->io, &info, tx->packet, tx->size);
++//	mesh_io_send(net->io, &info, tx->packet, tx->size);
++	gatt_proxy_service_send(PROXY_MSG_TYPE_NETWORK_PDU,
++						tx->packet + 1, tx->size - 1);
+ 	l_free(tx);
+ }
+ 
+@@ -3065,6 +3069,21 @@ struct mesh_io *mesh_net_detach(struct mesh_net *net)
+ 	return io;
+ }
+ 
++void mesh_net_attach_gatt(struct gatt_proxy_service *gatt_proxy)
++{
++	gatt_proxy_service_register_recv_cb(gatt_proxy,
++						PROXY_MSG_TYPE_NETWORK_PDU,
++						net_msg_recv, NULL);
++}
++
++void mesh_net_detach_gatt(struct gatt_proxy_service *gatt_proxy)
++{
++//	mesh_io_send_cancel(net->io, &type, 1);
++
++	gatt_proxy_service_deregister_recv_cb(gatt_proxy,
++						PROXY_MSG_TYPE_NETWORK_PDU);
++}
++
+ bool mesh_net_iv_index_update(struct mesh_net *net)
+ {
+ 	if (net->iv_upd_state != IV_UPD_NORMAL)
+diff --git a/mesh/net.h b/mesh/net.h
+index d385ba16efdd..1389e5c78d15 100644
+--- a/mesh/net.h
++++ b/mesh/net.h
+@@ -14,6 +14,8 @@
+ 
+ struct mesh_io;
+ struct mesh_node;
++struct mesh_io_recv_info;
++struct gatt_proxy_service;
+ 
+ #define DEV_ID	0
+ 
+@@ -258,6 +260,8 @@ bool mesh_net_get_key(struct mesh_net *net, bool new_key, uint16_t idx,
+ 							uint32_t *net_key_id);
+ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io);
+ struct mesh_io *mesh_net_detach(struct mesh_net *net);
++void mesh_net_attach_gatt(struct gatt_proxy_service *gatt_proxy);
++void mesh_net_detach_gatt(struct gatt_proxy_service *gatt_proxy);
+ struct l_queue *mesh_net_get_app_keys(struct mesh_net *net);
+ 
+ void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
 diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-index 78304515ed16..f483c330953b 100644
+index f483c330953b..1d30f3593d3a 100644
 --- a/mesh/prov-acceptor.c
 +++ b/mesh/prov-acceptor.c
-@@ -26,6 +26,7 @@
+@@ -21,6 +21,8 @@
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+ #include "mesh/crypto.h"
++#include "mesh/mesh-io.h"
++#include "mesh/gatt-proxy-svc.h"
+ #include "mesh/net.h"
+ #include "mesh/prov.h"
  #include "mesh/provision.h"
- #include "mesh/remprv.h"
- #include "mesh/pb-adv.h"
-+#include "mesh/pb-gatt.h"
- #include "mesh/mesh.h"
- #include "mesh/agent.h"
+@@ -88,6 +90,11 @@ struct mesh_prov_acceptor {
  
-@@ -99,6 +100,7 @@ static void acceptor_free(void)
+ static struct mesh_prov_acceptor *prov = NULL;
+ 
++static void gatt_unreg_finished(void *user_data)
++{
++	gatt_proxy_service_create();
++}
++
+ static void acceptor_free(void)
+ {
+ 	if (!prov)
+@@ -100,7 +107,7 @@ static void acceptor_free(void)
  	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
  
  	pb_adv_unreg(prov);
-+	pb_gatt_unreg(prov, NULL, NULL);
+-	pb_gatt_unreg(prov, NULL, NULL);
++	pb_gatt_unreg(prov, gatt_unreg_finished, NULL);
  
  	l_free(prov);
  	prov = NULL;
-@@ -801,6 +803,10 @@ bool acceptor_start(uint8_t num_ele, uint8_t *uuid,
- 		/* Always register for PB-ADV */
+@@ -704,8 +711,13 @@ failure:
+ cleanup:
+ 	l_timeout_remove(prov->timeout);
+ 
+-	/* Give PB Link 5 seconds to end session */
+-	prov->timeout = l_timeout_create(5, prov_to, prov, NULL);
++	if (prov->transport == PB_ADV) {
++		/* Give PB Link 5 seconds to end session */
++		prov->timeout = l_timeout_create(5, prov_to, prov, NULL);
++	} else {
++		prov->timeout = NULL;
++		prov_to(NULL, prov);
++	}
+ }
+ 
+ static void acp_prov_ack(void *user_data, uint8_t msg_num)
+@@ -804,6 +816,14 @@ bool acceptor_start(uint8_t num_ele, uint8_t *uuid,
  		result = pb_adv_reg(false, acp_prov_open, acp_prov_close,
  					acp_prov_rx, acp_prov_ack, uuid, prov);
+ 
++		/*
++		 * MeshPRT_v1.1, chapter 7: "A device may support the Mesh
++		 * Provisioning Service or the Mesh Proxy Service or both. If
++		 * both are supported, only one of these services shall be
++		 * exposed in the GATT database at a time."
++		 */
++		gatt_proxy_service_destroy();
 +
-+		result = pb_gatt_reg(acp_prov_open, acp_prov_close,
-+					acp_prov_rx, acp_prov_ack, uuid,
-+					caps->oob_info, prov);
- 	} else {
- 		/* Run Device Key Refresh Procedure */
- 		result = register_nppi_acceptor(acp_prov_open, acp_prov_close,
+ 		result = pb_gatt_reg(acp_prov_open, acp_prov_close,
+ 					acp_prov_rx, acp_prov_ack, uuid,
+ 					caps->oob_info, prov);
 -- 
 2.43.0
 
