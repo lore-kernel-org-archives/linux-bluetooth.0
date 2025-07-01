@@ -1,57 +1,58 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DDA280A47
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 19:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0272472AB
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 19:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751397110; cv=none; b=kuRlTUUcq2wRSTnG63h8OKbe6LyJS7S9UEgV0rMhbPgmamKHwq1jlRA4i8ZhUd1AvDC9ZvlLd1VP5tB3ZM6MeAT/rKVIwUwiIpAHdrW3u70oaobuqI4HkcrZRibVKVDt0CJmR136fJG2evVelBbJBFWpDVOD3oyggfrJYosaR5I=
+	t=1751397445; cv=none; b=nx3XazpcvjFGTRKOQbtw3Jwmd4Cb1BA8ywKXRnF3X12AtxXuIbEQzUNvIzIZFj6wiQZlmDBSpENJVqMua1N1th1TKfMWk8yCSGUTpvHqG7ErfEywVxVOMK95SzRLhU67H4utphFSBg2MoLB4L5YK5oJjM3+tKRhphf3Itel1b98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751397110; c=relaxed/simple;
-	bh=OpBZzJdf2pGt/4R3plQr962qAPwOscxUQdUGACY6Flc=;
+	s=arc-20240116; t=1751397445; c=relaxed/simple;
+	bh=Ts+bP6tNh1SEHsJEnWUZjK94w5+0Z23I7ohV73mi434=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PIyOqBSmmuCS0qbJzMWid2/EnRHZ5TT91qjAZmAywDPCaWBuQY1rMWkMUCqBTxVnzaZS6iN2vPCF4Dc+v0eAH1XKZJpkvto6rlFqq+o0pmRwB2E8fBX28z4YPxDzkvxXqRsmXz29/jUNJ3JwLO32hJARBkPav2vSehwbvwjdTEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MNRUNMFu; arc=none smtp.client-ip=209.85.208.172
+	 To:Cc:Content-Type; b=n3efVC737RUvuKpHH2AuS5Ie+zS5S4WNytFp+S3+RxCUWIhRxWyh1JTMtwJzyYnCD3gQWGDwt+SXIwxyAHacAcPAq8eQMLV7cZLwhb9nAnHo/yXPODe3trjmwZfJ1axIgibumu/+7g9UXXay8Uh0XfcGnZz4NvPGpnyEYeahVV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/hmQK03; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MNRUNMFu"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32aabfd3813so37428871fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jul 2025 12:11:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/hmQK03"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a169bso6396569a12.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jul 2025 12:17:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751397105; x=1752001905; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751397441; x=1752002241; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tBH8M0nW3cQ0fgu9gr80IwDsx/xT9zUIqXnycQVcytc=;
-        b=MNRUNMFuTezq2rh4XBe4bVJFlcDIorXxP4vM8PAeK8qlqrsjw4lIIPf7PDOSCvumR1
-         cCyiuVzUYQh3x2gSldvE2ZUxQ1vPwBBlbkM+e2p34nE8kfBG285wTjZGsQjl39tdYy/H
-         L5dAKpAuEHSsAr+PYrMflP2jMMqnP5IbT7k7lixSWK93hCojo8TvMOyYh66Ybmnr0peT
-         4W0luysy1Q3uojrvxImBhktBMOhFqQNCzXbcHnGxNLF8o4IYvKwsWEAZoWoevUg5Ky+G
-         eDo0odNnp4xd/6HTPmGMc5Lm7e389qsfZZquqXeRYl322ppPmQ4WMD90ra6ZLgZ+Qy9l
-         1SuQ==
+        bh=ork46AdHLg9l5jNZjtYPe6Q8ukSd6Ew0REyeAHNkjnE=;
+        b=l/hmQK0391ECJUf3SEZIiceGJAphVJ1PB99QK+5gTjcGU3qUZte6m/UQjcIIxb9wcy
+         afnSDtszVJr8XuWap2o5bmYJqNESMj9AbIYFoGd8ytPiIFBctZ+SeRsBFIJWON9N0gtc
+         Fq0So9XlpEC1QupagClsAF/qA2uwZiKcx2ENUjP9sSusrsPxaSEUWr6VnQyOKa22lar4
+         E8IeAJwLBhykhnR5OuX4+ds6j+1zO9fQBcLl3PvpHSTOBFOEd08avmeBs9zrdSz/98Ek
+         L2+bqGTTVf5rGXTmYwETafcSYhH+nbx+4pHrnky2CcnvGfZThtka/QgNBO68EX5Z763y
+         2q0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751397105; x=1752001905;
+        d=1e100.net; s=20230601; t=1751397441; x=1752002241;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tBH8M0nW3cQ0fgu9gr80IwDsx/xT9zUIqXnycQVcytc=;
-        b=irVF5GZOFtc7Z2tY9I+kj5aUrezm4/oWOxitGfFK7T9O03B3XNkhjU44UWBAxH6MMC
-         +XK24n5V35YC9Jbbg6F82czPMnJjOURJPIww1Gz4akQEtq/UXbvFUdFu/mHuy6513vI6
-         WTBCnEOhpy3oEb2SD2kJSgJdK4Ax/C/ROMf0utL+8A1FXgEPuhVkFdsjCY7VqxGTGycu
-         kmv7XmzEjXdQGpHZM+RPVhbm/nN+pgxcCXQRWRWb6AMSsaQksuV6fyG2C8iR8vxkSvY8
-         DYaQP8dVFkluE0jWeEZk8JvvOWeFFEIxI/p91SmmbW3mxoj3hhq6ZlrC4sHL400Woq2c
-         2CVg==
-X-Gm-Message-State: AOJu0YwWJDZnvuRAUI1Z0534hme/RRP/FA++oMgn6Dkd1/4IGcpnCs8H
-	78H9JRwKV8NPZlJG0rL6amHS2ZdtBO/4RCIggsFZ1l40Psu57Gs4zC8jEcV+HDvhhZMbLaaTckd
-	FhBcTlFKWAkg18Yt1YhDT2SGtGV/p9zQ=
-X-Gm-Gg: ASbGncscOMi48mtH899eLhWe6U3OR6HtuXfQBm4peIevQAqjSKUj5ixRVeQPqaBR1YA
-	9ikoMy+sj4dVcTSJ7S76h76kGT054k1h1UDzsv87NydoKsKLc4O5KGIrBRtTE3Yc+udQjr/ltjb
-	tTNRBV8bBbgig8/fG8DdzKFwtNJ7UuK0/7sezGRN7CWQ==
-X-Google-Smtp-Source: AGHT+IESJnCzJxvryDUPjquElcZiTVkTzw2Cqv891B7S4886+IB35R5bHYDqUFJbbi4KhHKUihSGrp4AwA1mXwdc6AU=
-X-Received: by 2002:a05:651c:1115:b0:32a:6606:a58 with SMTP id
- 38308e7fff4ca-32e000d7a52mr643951fa.35.1751397104784; Tue, 01 Jul 2025
- 12:11:44 -0700 (PDT)
+        bh=ork46AdHLg9l5jNZjtYPe6Q8ukSd6Ew0REyeAHNkjnE=;
+        b=j0Lu/F5voocahw8WzbHd4s9Y6D2r4GWS7h8ePnBZPyWLHvhBhLo0L+Ju97rMqifsit
+         SWawrY0ohmqLmReJqpIbv9Qry6Y7/O1fpMGcqotcxyWs7DXwVv1kWhRkZhVTr4JgzDf+
+         h5NfL5cKOHyf1kvxCEU+gpyaMVunCsdGIoHNvwkyxhBOrSNj3FWlOKcVX6/4M0wGmbZV
+         +XGdwI4OTilfphoG9AGfio1UepP1/bwY4eVGf58cU5VL8IsFxMNPJslFDcyLLEURA6Mr
+         Tc1jc8IuIf4z8N0NcT4lprLeG7HCXCuRBXLLn3DRkQjGAd2pYoeM1DjN3UYfzh1XhFyW
+         VFWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWo6iM1oyUQD1+nxfSlzquA4ETRSYRaLeox/4cxBHcCsimHSyRHVlcC9646dPX4jRtSYOyUkn17aJEOdOeeWok=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1Ao1st0E82H6j916Wqk7SrbkT+0TIFtrIul8XdhV8NLWHvn3r
+	tRaR9EETaba5aB9K4YskLojy58WG5E/dQW0OrYxfvs5eHnMXhH3pnWfx7mUmXQQhVSM02aoaJVY
+	8Kl43lfcK/Y3Mm9TH/4UtGPzoTmoVTjH76A==
+X-Gm-Gg: ASbGnctxxRDEmvkGE/4foezEjscVdCs8kZXd8YLTx74FlZUI4ADuH0yKYnPEcD/GHs3
+	bXx1n0H1zVxjdeM7vY8bG0wbEpt8I5JbOLtg/FYOhUgfbX4RKN8FaU7T4JRRbDKIYwzCUIk4P29
+	gPbr1G/3LBOPt4PMBt8/6USIXMPkAq0TXBkdwY4hyO94c=
+X-Google-Smtp-Source: AGHT+IHLZctPq/DsWsqp0OGAMWMix0t/Nh/B61pZZgCtVv+EDlNol8Fr2fif5arKBGehozM0uqMitw3noc8zb4Ic4S0=
+X-Received: by 2002:a17:907:2daa:b0:add:fb01:c64a with SMTP id
+ a640c23a62f3a-ae3500fa6a3mr1939641366b.43.1751397440909; Tue, 01 Jul 2025
+ 12:17:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,21 +62,19 @@ MIME-Version: 1.0
 References: <20250701144647.19572-2-ceggers@arri.de> <CABBYNZLUu3KnXBOeCkWHtpG_es+yF7vzXjd-fOsHv-S_UMWU2A@mail.gmail.com>
  <2308158.vFx2qVVIhK@n9w6sw14>
 In-Reply-To: <2308158.vFx2qVVIhK@n9w6sw14>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 1 Jul 2025 15:11:32 -0400
-X-Gm-Features: Ac12FXw5tg_7SEPIhWZbbNa9etYDO-fiuTNDdZkB-6qeAt1ljbneFBGANTRAa2w
-Message-ID: <CABBYNZK-FtXiFxUgJNc5wOO-1=oQ6o9rpoW9=-LuwLW=OYvg9g@mail.gmail.com>
+From: Brian Gix <brian.gix@gmail.com>
+Date: Tue, 1 Jul 2025 12:17:10 -0700
+X-Gm-Features: Ac12FXyNuXd7IRRtUyRHiZOtD66elobUTtEhe-JdaDYiayk4yWnEY537nh5kLJ8
+Message-ID: <CABUQxGwc49GMW56GzUX=0zzzpcxKzdcrGi7u35-BfgGWntAADA@mail.gmail.com>
 Subject: Re: [RFC PATCH BlueZ 0/4] Initial support for GATT Proxy Service
 To: Christian Eggers <ceggers@arri.de>
-Cc: linux-bluetooth@vger.kernel.org, Brian Gix <brian.gix@gmail.com>, 
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, 
 	Inga Stotland <inga.stotland@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Christian,
-
-On Tue, Jul 1, 2025 at 12:38=E2=80=AFPM Christian Eggers <ceggers@arri.de> =
-wrote:
+On Tue, Jul 1, 2025 at 9:38=E2=80=AFAM Christian Eggers <ceggers@arri.de> w=
+rote:
 >
 > Hi Luiz,
 >
@@ -136,9 +135,7 @@ l
 > implements the GATT Proxy Client. Having a deprecated test program is muc=
 h
 > better than having nothing :-).
-
-Yep
-
+>
 > Although I haven't checked for this, I guess that meshctl could become co=
 mpletely
 > obsolete if GATT Proxy Client support was added to bluetooth-meshd. In th=
@@ -146,11 +143,17 @@ is
 > case, provision would be done by mesh-cfgclient regardless whether the
 > link established by bluetooth-meshd is using ADV or GATT.
 
-Yeah, we should probably integrate all the roles into mesh, now about
-mesh-cfgclient I wonder if we wouldn't be better off integrating it
-into bluetoothctl directly though, so one can control all daemon with
-that instead of resorting to different clients.
+Proxy-Client should never be added to bluetooth-meshd. As you point out, a
+deprecated GATT proxy client is probably "better than nothing" for
+testing a GATT
+proxy server.
 
+We had hoped that the need for GATT Proxy Mesh would dissipate over
+time, because
+point-to-point ACL connections within the mesh ecosystem is disruptive, and
+not really "mesh".
+
+>
 > My patch series mainly makes bluetooth-meshd a client of bluetoothd (whic=
 h
 > normally operate independently). As bluetoothd is (exclusively?) responsi=
@@ -159,9 +162,16 @@ ble
 t
 > to use the D-Bus interfaces provided by bluetoothd.
 
-Yeah, that is intentional so we don't have to replicate the GATT and
-LE advertisement handling on meshd.
+This answers one of my questions from an earlier (perhaps suppressed) respo=
+nse
+I made...  This is the correct architecture for adding a Proxy Server
+to bluetooth-meshd.
 
+I am officially a retiree now, but I will try to review this patch set
+this week, or next
+week at the latest. Between holiday trips.
+
+>
 > >
 > > > What maybe added later:
 > > > - Proper selection of the output interface (GATT vs. ADV) when sendin=
@@ -187,7 +197,3 @@ m
 > > >
 >
 >
-
-
---=20
-Luiz Augusto von Dentz
