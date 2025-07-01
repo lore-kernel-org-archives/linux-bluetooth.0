@@ -1,27 +1,27 @@
 Received: from relay16.mail.gandi.net (relay16.mail.gandi.net [217.70.178.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C91270579
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09073270EA4
 	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 10:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751364934; cv=none; b=i0Y83dlQdscJ2bYSnnke6YdhWiscSilRF66MapUgoPgAb2EIC91qzGoYqO7lERWAzJQncU7L4UCUHuWUSeIwZ4+t+Z8uSlfttAhA9uILzkm1bbtUM84R4k3YV51dLoFNDE7MJV3JInuWSW25sb82LN/gnZJr9PeJKvwtCBhHW4A=
+	t=1751364934; cv=none; b=RGucK56PT6YAcjHghR8fFD6eceP8xxoKHQegfvyEXgqW7ztofD7uvD6438CWB/etORilS3cgcrBF2V4m7LtWU2K1sjIquITYgPi8DcPU4/i3f07XWJieanVMa/qkw8WUKUKf0t79LLMdTiU54htU/qw1RxnGXsSDF4f5C8dojmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751364934; c=relaxed/simple;
-	bh=ypn+hbLXP32dfmjZBVF15OhfSbOcS2tmuhR5lrDAk/k=;
+	bh=jhGeWnL9fii5twYLz1Lf4teEGR2Cl9PQTN4FA9NFt2E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gxx+T+SyVmbzZn68DQIh3689ApnxMosU/VSVFMIxTDQNuuCNEKWHoYCqri/0Ry+Ar/DRfAMAbdor3dygHYv2DRtKOOQzkf3OjT/Wp4qWwNVxkr7kRJ+AObKK1SCzEoJhDTfLrVHFJJmwU08GnnHf5Js6Rdvwy2rUF/BF7oPECnA=
+	 MIME-Version; b=CVTSBoBqXNvrSAf9RD/LeAkNyODJ6uRrHKz+xQHNbNSBMbeOnB1FmGdxKOWgCnvaOX/M95wiRqmJLeTky4GWXk33ag/XzB1CDHxQjkl37WVnRYspxhSSoY1zL62hdgIGRQ0+bdsCoGtwQO/a4fOAY0ynTJ6o88dnODDQ26cknDo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.236
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DE695438D3;
-	Tue,  1 Jul 2025 10:15:30 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 38A9D43981;
+	Tue,  1 Jul 2025 10:15:31 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH BlueZ v4 5/8] device: Better error when no BR/EDR profiles can be connected to
-Date: Tue,  1 Jul 2025 12:14:26 +0200
-Message-ID: <20250701101520.459452-6-hadess@hadess.net>
+Subject: [PATCH BlueZ v4 6/8] device: Better "Connect" debug
+Date: Tue,  1 Jul 2025 12:14:27 +0200
+Message-ID: <20250701101520.459452-7-hadess@hadess.net>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250701101520.459452-1-hadess@hadess.net>
 References: <20250701101520.459452-1-hadess@hadess.net>
@@ -36,115 +36,106 @@ X-GND-State: clean
 X-GND-Score: 0
 X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugedvjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeevtefhleevjeffteekleehheeujeelhfdvheethefggefhkefgvdefhfegkeeiteenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhrgguvghssheshhgruggvshhsrdhnvght
 
-Add a more precise error when there are no BR/EDR profiles to connect
-to. This is useful when trying to connect to a particular device, and
-there are no relevant profiles to connect to on the bearer.
+Output clearer debug information so that it's possible to follow the
+decisions made by the bluetoothd daemon when a client such as
+bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
+device.
 ---
- doc/org.bluez.Device.rst |  2 ++
- src/device.c             |  3 +--
- src/error.c              | 19 +++++++++++++++----
- src/error.h              |  3 +--
- 4 files changed, 19 insertions(+), 8 deletions(-)
+ src/device.c | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
 
-diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
-index 646e2c77ec2d..b36a49eabdd5 100644
---- a/doc/org.bluez.Device.rst
-+++ b/doc/org.bluez.Device.rst
-@@ -49,6 +49,7 @@ Possible errors:
- :org.bluez.Error.Failed:
- :org.bluez.Error.InProgress:
- :org.bluez.Error.AlreadyConnected:
-+:org.bluez.Error.ProfileUnavailable:
- 
- void Disconnect()
- `````````````````
-@@ -80,6 +81,7 @@ Possible errors:
- :org.bluez.Error.InProgress:
- :org.bluez.Error.InvalidArguments:
- :org.bluez.Error.NotAvailable:
-+:org.bluez.Error.ProfileUnavailable:
- :org.bluez.Error.NotReady:
- 
- void DisconnectProfile(string uuid)
 diff --git a/src/device.c b/src/device.c
-index 5c80fedd7dc6..99c0aa67ec0c 100644
+index 99c0aa67ec0c..d7a859f9df3f 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -2685,8 +2685,7 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
+@@ -2683,6 +2683,7 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
+ 							"Connect") &&
+ 				find_service_with_state(dev->services,
  						BTD_SERVICE_STATE_CONNECTED)) {
++				DBG("Already connected to services");
  				return dbus_message_new_method_return(msg);
  			} else {
--				return btd_error_not_available_str(msg,
--					ERR_BREDR_CONN_PROFILE_UNAVAILABLE);
-+				return btd_error_profile_unavailable(msg);
- 			}
- 		}
+ 				return btd_error_profile_unavailable(msg);
+@@ -2694,8 +2695,10 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
  
-diff --git a/src/error.c b/src/error.c
-index 74b8f80e63c5..8070bc6107ae 100644
---- a/src/error.c
-+++ b/src/error.c
-@@ -128,6 +128,14 @@ DBusMessage *btd_error_not_ready_str(DBusMessage *msg, const char *str)
- 					"%s", str);
+ 	err = connect_next(dev);
+ 	if (err < 0) {
+-		if (err == -EALREADY)
++		if (err == -EALREADY) {
++			DBG("Already connected");
+ 			return dbus_message_new_method_return(msg);
++		}
+ 		return btd_error_bredr_conn_from_errno(msg, err);
+ 	}
+ 
+@@ -2718,14 +2721,24 @@ resolve_services:
+ 	return NULL;
  }
  
-+DBusMessage *btd_error_profile_unavailable(DBusMessage *msg)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE
-+					".ProfileUnavailable",
-+					"Exhausted the list of BR/EDR "
-+					"profiles to connect to");
-+}
++static const char *bdaddr_type_strs[] = {
++	"BR/EDR",
++	"LE public",
++	"LE random"
++};
 +
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
+ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
+ 							void *user_data)
  {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE
-@@ -142,8 +150,6 @@ static const char *btd_error_str_bredr_conn_from_errno(int errno_code)
- 		return ERR_BREDR_CONN_ALREADY_CONNECTED;
- 	case EHOSTDOWN:
- 		return ERR_BREDR_CONN_PAGE_TIMEOUT;
--	case ENOPROTOOPT:
--		return ERR_BREDR_CONN_PROFILE_UNAVAILABLE;
- 	case EIO:
- 		return ERR_BREDR_CONN_CREATE_SOCKET;
- 	case EINVAL:
-@@ -220,8 +226,13 @@ static const char *btd_error_str_le_conn_from_errno(int errno_code)
+ 	struct btd_device *dev = user_data;
+ 	uint8_t bdaddr_type;
  
- DBusMessage *btd_error_bredr_conn_from_errno(DBusMessage *msg, int errno_code)
- {
--	return btd_error_failed(msg,
--				btd_error_str_bredr_conn_from_errno(errno_code));
-+	switch (-errno_code) {
-+	case ENOPROTOOPT:
-+		return btd_error_profile_unavailable(msg);
-+	default:
-+		return btd_error_failed(msg,
-+					btd_error_str_bredr_conn_from_errno(errno_code));
+-	if (dev->bonding)
++	DBG("Calling \"Connect\" for device %s", dev->path);
++
++	if (dev->bonding) {
++		DBG("Bonding in progress");
+ 		return btd_error_in_progress(msg);
 +	}
- }
  
- DBusMessage *btd_error_le_conn_from_errno(DBusMessage *msg, int errno_code)
-diff --git a/src/error.h b/src/error.h
-index 0fa3975cff7c..f4ad81e5daa5 100644
---- a/src/error.h
-+++ b/src/error.h
-@@ -19,8 +19,6 @@
- #define ERR_BREDR_CONN_ALREADY_CONNECTED	"br-connection-already-"\
- 						"connected"
- #define ERR_BREDR_CONN_PAGE_TIMEOUT		"br-connection-page-timeout"
--#define ERR_BREDR_CONN_PROFILE_UNAVAILABLE	"br-connection-profile-"\
--						"unavailable"
- #define ERR_BREDR_CONN_SDP_SEARCH		"br-connection-sdp-search"
- #define ERR_BREDR_CONN_CREATE_SOCKET		"br-connection-create-socket"
- #define ERR_BREDR_CONN_INVALID_ARGUMENTS	"br-connection-invalid-"\
-@@ -85,6 +83,7 @@ DBusMessage *btd_error_no_such_adapter(DBusMessage *msg);
- DBusMessage *btd_error_agent_not_available(DBusMessage *msg);
- DBusMessage *btd_error_not_ready(DBusMessage *msg);
- DBusMessage *btd_error_not_ready_str(DBusMessage *msg, const char *str);
-+DBusMessage *btd_error_profile_unavailable(DBusMessage *msg);
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_bredr_conn_from_errno(DBusMessage *msg, int errno_code);
- DBusMessage *btd_error_le_conn_from_errno(DBusMessage *msg, int errno_code);
+ 	if (dev->bredr_state.connected) {
+ 		/*
+@@ -2734,23 +2747,35 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
+ 		 */
+ 		if (dev->bredr_state.svc_resolved &&
+ 			find_service_with_state(dev->services,
+-						BTD_SERVICE_STATE_CONNECTED))
++						BTD_SERVICE_STATE_CONNECTED)) {
+ 			bdaddr_type = dev->bdaddr_type;
+-		else
++			DBG("Selecting address type %s, as BR/EDR services are resolved "
++			    " and connected", bdaddr_type_strs[dev->bdaddr_type]);
++		} else {
+ 			bdaddr_type = BDADDR_BREDR;
+-	} else if (dev->le_state.connected && dev->bredr)
++			DBG("Selecting address type BR/EDR, as services not resolved "
++			    "or not connected");
++		}
++	} else if (dev->le_state.connected && dev->bredr) {
+ 		bdaddr_type = BDADDR_BREDR;
+-	else
++		DBG("Selecting address type BR/EDR, as LE already connected");
++	} else {
+ 		bdaddr_type = select_conn_bearer(dev);
++		DBG("Selecting address type %s", bdaddr_type_strs[dev->bdaddr_type]);
++	}
+ 
+ 	if (bdaddr_type != BDADDR_BREDR) {
+ 		int err;
+ 
+-		if (dev->connect)
++		if (dev->connect) {
++			DBG("Device already connecting");
+ 			return btd_error_in_progress(msg);
++		}
+ 
+-		if (dev->le_state.connected)
++		if (dev->le_state.connected) {
++			DBG("Device already connected through LE");
+ 			return dbus_message_new_method_return(msg);
++		}
+ 
+ 		btd_device_set_temporary(dev, false);
+ 
 -- 
 2.50.0
 
