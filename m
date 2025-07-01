@@ -1,197 +1,187 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC53026E6EA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 10:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118EA26D4CA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 10:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751365153; cv=none; b=S1wojrRheX4buKYdwODGtUDwFEtGbpgWmWuyNYl1z7le6grpB1oOBn1JxYyeXk7o2uKmzo0qTx8Yksh4ajcdAzkPvpeEi+uePCWRtJOPFUw55voRfuPNuxg2HzArBVzSNzVXy6yx3wDLgIg5fXyxhODYqRdy9kxO6pA6FpYXRiY=
+	t=1751365317; cv=none; b=HF6N7b/babDxv9iGAe9Z6vQK+qDwiO0+9CqYRx5fMvCT6kv7ToeFKAUi55xfg/GLZwV7f6AyK1IdjXx2jtYuz8BqAgHn65Snw4OIOVIp0mI5V+iQnV/gUf5PTyDJwJX/4TOoIlaOrtxrtCkLsAR9NjL+kI2G5BgQNcyOImj9jRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751365153; c=relaxed/simple;
-	bh=W9YoF9Kp5rJ1bvTmlultW3By1ztNSAkABCrciOsy5xc=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=TSRdmOYIKlZ2XYnn2y4BqesLl5sHLWzgfiil9/cNs7Qg53+RQ5BJeKEbbMJKsAzx3EmT150mObVfQQfbxaxwBX3Z5bITzKDsf3KXHugJHvaxMRQOI9l4CqU4ifzjb4jLfLYrq/tTmvBa4wZ4CBXRx7jAjRifRNdHGQRvVWhcBPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jz+7FtKN; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1751365317; c=relaxed/simple;
+	bh=ZFeiQgXsMFg2hxSVQvFGm1t/SSNy1Xt2YSoW+cGH9dc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hemfrE1LFzA5py9eqV7lA7utuJZDS03NEU7Wh3OCzI/p0bdSQDuhe6TMY5p/TpLYluT5Fe3ALrYsxf/3yxFTggg2LUOKOX4vNeDyrDxnrTb5gn769lU82gRnKiW3CklmI3YmQHTD/bkrnaZ1JenAFIhOng4NrpkvhcfgEJHwtNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RwoQKQYl; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jz+7FtKN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751365151; x=1782901151;
-  h=date:from:to:cc:subject:message-id;
-  bh=W9YoF9Kp5rJ1bvTmlultW3By1ztNSAkABCrciOsy5xc=;
-  b=Jz+7FtKNA1XmkAH5QesaCGhGwzTrwij+5mRrFe27KJY9L4t6SzhwUW9S
-   TalD2Rn9nmW6hpmXFZL8Q7HsyTnyLHVjvAj1+bHRqJkzbwuMnF9+YVYUV
-   kKVis0+4PpQ/dGjMicZbGMEevSOj6Id+8A0IBF6wOdXb+P9CTFK5ESGr3
-   fLvNKXUnuld2HLihLXvyOHf2nqJYpYN786BxGzE8OXgbtZD1220uh1EpX
-   e612s2E7zwjnlBkHJte7FQA2/1dLJJR42P/9p7y5t0/X8xSEYhiYGMnss
-   pBzt6wa2P+lnKn2w1SWZMWJ9rUQarYRkHDPrKJReUsy066uMyxRnAV1P0
-   g==;
-X-CSE-ConnectionGUID: oKYm/02IR+K9aSrH0f2g8A==
-X-CSE-MsgGUID: asD/wLLXSxyNOoRO1ikdBA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="65071002"
-X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="65071002"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 03:19:11 -0700
-X-CSE-ConnectionGUID: 3x0TMi97RZKHeHRjcgbKdw==
-X-CSE-MsgGUID: acniTzSvQv6OvZwTR3lbyw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="177394800"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 01 Jul 2025 03:19:07 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uWY4v-000a0U-24;
-	Tue, 01 Jul 2025 10:19:05 +0000
-Date: Tue, 01 Jul 2025 18:18:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 2a0ae2f6cd36497496b71b83b1af55e8eb5a799b
-Message-ID: <202507011802.A7kAxPIM-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RwoQKQYl"
+Received: from github.com (hubbernetes-node-e1f146c.ac4-iad.github.net [10.52.14.41])
+	by smtp.github.com (Postfix) with ESMTPA id 1296A21249
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 03:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751365315;
+	bh=RfdDA7P2A3MtBMwVfgYaKy/Sj2i7B60GgaGXdDRoKG0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=RwoQKQYlU6nBi0mNxYVYWzaTgSe9jcuOHb8L/YJhaMuSuDQjs2j7cQrmokJUdkbJv
+	 90XVyRR9LWCDvEyajaKRZZd6b/xBmyJefH6rM99mS12pTToiEcpQ2cIUUe1vy1vaJa
+	 AKcgJ1v67pY4NePvmpYzh+gT+9jwpL4QoUj6fLrQ=
+Date: Tue, 01 Jul 2025 03:21:55 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/977659/000000-c2b027@github.com>
+Subject: [bluez/bluez] d4d636: error: Rename device error helper to match
+ retval
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 2a0ae2f6cd36497496b71b83b1af55e8eb5a799b  Bluetooth: hci_sync: Fix not disabling advertising instance
+  Branch: refs/heads/977659
+  Home:   https://github.com/bluez/bluez
+  Commit: d4d636b22d08d70937febad2fcb0038ca32a8e68
+      https://github.com/bluez/bluez/commit/d4d636b22d08d70937febad2fcb0038ca32a8e68
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
 
-elapsed time: 1168m
+  Changed paths:
+    M src/device.c
+    M src/error.c
+    M src/error.h
 
-configs tested: 120
-configs skipped: 2
+  Log Message:
+  -----------
+  error: Rename device error helper to match retval
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Rename the helper to show that it outputs a string, and not an error
+DbusMessage as the other functions do.
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                            allyesconfig    gcc-15.1.0
-arc                              allmodconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                              allyesconfig    gcc-15.1.0
-arc                   randconfig-001-20250630    gcc-10.5.0
-arc                   randconfig-002-20250630    gcc-12.4.0
-arm                              allmodconfig    gcc-15.1.0
-arm                               allnoconfig    clang-21
-arm                              allyesconfig    gcc-15.1.0
-arm                      integrator_defconfig    clang-21
-arm                        mvebu_v7_defconfig    clang-21
-arm                   randconfig-001-20250630    clang-21
-arm                   randconfig-002-20250630    gcc-12.4.0
-arm                   randconfig-003-20250630    gcc-14.3.0
-arm                   randconfig-004-20250630    clang-21
-arm                         wpcm450_defconfig    gcc-15.1.0
-arm64                            allmodconfig    clang-19
-arm64                             allnoconfig    gcc-15.1.0
-arm64                 randconfig-001-20250630    gcc-9.5.0
-arm64                 randconfig-002-20250630    gcc-14.3.0
-arm64                 randconfig-003-20250630    clang-21
-arm64                 randconfig-004-20250630    clang-21
-csky                              allnoconfig    gcc-15.1.0
-csky                  randconfig-001-20250701    gcc-11.5.0
-csky                  randconfig-002-20250701    gcc-10.5.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-21
-hexagon                          allyesconfig    clang-21
-hexagon               randconfig-001-20250701    clang-21
-hexagon               randconfig-002-20250701    clang-21
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20250701    gcc-12
-i386        buildonly-randconfig-002-20250701    gcc-12
-i386        buildonly-randconfig-003-20250701    gcc-12
-i386        buildonly-randconfig-004-20250701    gcc-12
-i386        buildonly-randconfig-005-20250701    gcc-12
-i386        buildonly-randconfig-006-20250701    clang-20
-i386                                defconfig    clang-20
-loongarch                        allmodconfig    gcc-15.1.0
-loongarch                         allnoconfig    gcc-15.1.0
-loongarch             randconfig-001-20250701    gcc-13.3.0
-loongarch             randconfig-002-20250701    gcc-15.1.0
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    gcc-15.1.0
-m68k                           sun3_defconfig    gcc-15.1.0
-microblaze                       allmodconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                       allyesconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-mips                           ip27_defconfig    gcc-15.1.0
-nios2                             allnoconfig    gcc-14.2.0
-nios2                 randconfig-001-20250701    gcc-14.2.0
-nios2                 randconfig-002-20250701    gcc-13.3.0
-openrisc                          allnoconfig    gcc-15.1.0
-openrisc                         allyesconfig    gcc-15.1.0
-openrisc                 simple_smp_defconfig    gcc-15.1.0
-parisc                           allmodconfig    gcc-15.1.0
-parisc                            allnoconfig    gcc-15.1.0
-parisc                           allyesconfig    gcc-15.1.0
-parisc                randconfig-001-20250701    gcc-14.3.0
-parisc                randconfig-002-20250701    gcc-10.5.0
-powerpc                    adder875_defconfig    gcc-15.1.0
-powerpc                          allmodconfig    gcc-15.1.0
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc                          allyesconfig    clang-21
-powerpc               randconfig-001-20250701    gcc-13.3.0
-powerpc               randconfig-002-20250701    clang-21
-powerpc               randconfig-003-20250701    clang-21
-powerpc                     sequoia_defconfig    clang-17
-powerpc64             randconfig-001-20250701    clang-21
-powerpc64             randconfig-002-20250701    clang-21
-powerpc64             randconfig-003-20250701    gcc-10.5.0
-riscv                            allmodconfig    clang-21
-riscv                             allnoconfig    gcc-15.1.0
-riscv                            allyesconfig    clang-16
-riscv                 randconfig-001-20250701    gcc-14.3.0
-riscv                 randconfig-002-20250701    gcc-10.5.0
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-15.1.0
-s390                          debug_defconfig    gcc-15.1.0
-s390                  randconfig-001-20250701    gcc-9.3.0
-s390                  randconfig-002-20250701    clang-17
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    gcc-15.1.0
-sh                        edosk7705_defconfig    gcc-15.1.0
-sh                    randconfig-001-20250701    gcc-5.5.0
-sh                    randconfig-002-20250701    gcc-13.3.0
-sh                             sh03_defconfig    gcc-15.1.0
-sh                        sh7763rdp_defconfig    gcc-15.1.0
-sh                  sh7785lcr_32bit_defconfig    gcc-15.1.0
-sparc                            allmodconfig    gcc-15.1.0
-sparc                             allnoconfig    gcc-15.1.0
-sparc                 randconfig-001-20250701    gcc-10.3.0
-sparc                 randconfig-002-20250701    gcc-15.1.0
-sparc64               randconfig-001-20250701    gcc-8.5.0
-sparc64               randconfig-002-20250701    gcc-12.4.0
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-21
-um                               allyesconfig    gcc-12
-um                    randconfig-001-20250701    gcc-12
-um                    randconfig-002-20250701    gcc-12
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250701    gcc-12
-x86_64      buildonly-randconfig-002-20250701    gcc-12
-x86_64      buildonly-randconfig-003-20250701    gcc-12
-x86_64      buildonly-randconfig-004-20250701    gcc-12
-x86_64      buildonly-randconfig-005-20250701    clang-20
-x86_64      buildonly-randconfig-006-20250701    clang-20
-x86_64                              defconfig    gcc-11
-x86_64                          rhel-9.4-rust    clang-18
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                randconfig-001-20250701    gcc-15.1.0
-xtensa                randconfig-002-20250701    gcc-13.3.0
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+  Commit: 660d04f0a95be83c1f8dc79e1ebe9ffcb62a7a14
+      https://github.com/bluez/bluez/commit/660d04f0a95be83c1f8dc79e1ebe9ffcb62a7a14
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
+
+  Changed paths:
+    M src/error.c
+    M src/error.h
+
+  Log Message:
+  -----------
+  error: Add helper to return DbusMessage errors from errno
+
+This will allow us to start adding more precise errors instead of
+"Failed" with a string if we're parsing an errno.
+
+
+  Commit: 2f6b814a499f347c15e36cd0d1fa327ea11d4d5d
+      https://github.com/bluez/bluez/commit/2f6b814a499f347c15e36cd0d1fa327ea11d4d5d
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Use new DbusMessage error helper
+
+
+  Commit: 9b00d10c55113f75ab5684f0fdd00996a9ce4a80
+      https://github.com/bluez/bluez/commit/9b00d10c55113f75ab5684f0fdd00996a9ce4a80
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
+
+  Changed paths:
+    M src/error.c
+    M src/error.h
+
+  Log Message:
+  -----------
+  error: Make errno to string helpers private
+
+We're not using them outside the error code itself.
+
+
+  Commit: 898da922298745920209885fa84afaf174a99e4d
+      https://github.com/bluez/bluez/commit/898da922298745920209885fa84afaf174a99e4d
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
+
+  Changed paths:
+    M doc/org.bluez.Device.rst
+    M src/device.c
+    M src/error.c
+    M src/error.h
+
+  Log Message:
+  -----------
+  device: Better error when no BR/EDR profiles can be connected to
+
+Add a more precise error when there are no BR/EDR profiles to connect
+to. This is useful when trying to connect to a particular device, and
+there are no relevant profiles to connect to on the bearer.
+
+
+  Commit: d030c498000202554f2dab4413a809f7140f158a
+      https://github.com/bluez/bluez/commit/d030c498000202554f2dab4413a809f7140f158a
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Better "Connect" debug
+
+Output clearer debug information so that it's possible to follow the
+decisions made by the bluetoothd daemon when a client such as
+bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
+device.
+
+
+  Commit: c76080b99af6fe1d41c1bc34b6ed18eede4275e5
+      https://github.com/bluez/bluez/commit/c76080b99af6fe1d41c1bc34b6ed18eede4275e5
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
+
+  Changed paths:
+    M doc/org.bluez.Device.rst
+    M src/device.c
+    M src/error.c
+    M src/error.h
+
+  Log Message:
+  -----------
+  device: Better error when the link key is missing
+
+Add a more precise error when the link key is missing for a
+profile or device we're trying to connect to.
+
+
+  Commit: c2b027956baea12d9c6d9f1dd025a326617fcd56
+      https://github.com/bluez/bluez/commit/c2b027956baea12d9c6d9f1dd025a326617fcd56
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-01 (Tue, 01 Jul 2025)
+
+  Changed paths:
+    M doc/org.bluez.Device.rst
+    M src/device.c
+    M src/error.c
+    M src/error.h
+
+  Log Message:
+  -----------
+  device: Better error when the adapter is not powered
+
+
+Compare: https://github.com/bluez/bluez/compare/d4d636b22d08%5E...c2b027956bae
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
