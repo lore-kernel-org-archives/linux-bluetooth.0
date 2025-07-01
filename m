@@ -1,200 +1,213 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1458B28A407
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 20:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1512E611E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 20:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751401139; cv=none; b=apYz6OrxvEZppyplujzrrZF6DIWoAVd2D9bVLsFQQwQsg5YbUv+2oZeBw/BEd2Byf9ll/jHu6S8J6R8CxkW7OySQC1yNREhy8P+Td+tNcMARH+l/3Rl5xMp7XAnBVsMNPQOgZDnlfIw4tp4UcZAkJiUHV8VNa76yxJJ1ELJ8ObY=
+	t=1751401172; cv=none; b=FUE74CtxmVMZznFOt3s7s4PxSkUlwb11h68Qkcy+PVpQp2mfw3TuVpYEJTHEKiTN0KOP3HDR6h0gEUs5pWU/STkyEuV8GYjYUkHV3n9bgfzusB0HOp44v8uyc5M58AGsmFPEqUPRGlXyS3u9OFfRHthbOeO0bDSgxIRV7cxRnAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751401139; c=relaxed/simple;
-	bh=uKJi2asZrU8KhK5DqC0NZiS+Yn3yN8q4ts6pKbDDXGE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ayNrD2cafvJbIQ6vKsmmstihhZkqfNcWt40l7kyC+uDyT7LzDRT+qF/twoWRV/q+uhrxYkT5n/rd6BjzRRLqwbfkJyWB0YToE/wNgRxUIgaPHrHA+FfeGAOdzTZ8rVG/inBRAgGGp2gQSQeWkRpOXk9v6YBeL1TvC+2luXjxbhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AEy9KJmv; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1751401172; c=relaxed/simple;
+	bh=FuyM8KVRBqbRhRhsFnr148PLbXKBaebtvp5Om6vrQb8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dgt+WF8zxHc1+pk2rUeTXmkL3KPplnY1nMOzBN4Go7oJivOF8Qi0BMp8A12X/AK8XpMk7Y96IwMOt1r4Z0mdWBN5NrqaloznEyYEFI3ZJSTcOLQEEBbjqH4IJHllPKh35xMKbm6/er6tCBjGhACk7XKDRBIKNeW0TS7RMub9Rgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bIdciWql; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AEy9KJmv"
-Received: from github.com (hubbernetes-node-1a06fa6.va3-iad.github.net [10.48.149.36])
-	by smtp.github.com (Postfix) with ESMTPA id 4970D4E0C8F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 13:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1751401137;
-	bh=8pXIon1R/YYIrjvdKJhHjlELEdarmjF9/xm4Xhj7iSQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=AEy9KJmv+Ytv2WwXSl7dhlysv4ewrpoEssrtSUJC43DZcXh7bzgalz6wpWN5oqq2g
-	 p2U69k8pw8C2jLUt/iGWeykceyUf5X6f8RczBJJ1YYb7AVdn1xGtCUG7QE3psQHKo0
-	 uqvgkT18sArFtkhZmKySUy5sVguYq3x+TMPC6cS0=
-Date: Tue, 01 Jul 2025 13:18:57 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/822037-55a676@github.com>
-Subject: [bluez/bluez] 476ae8: gatt-client: avoid UAF after acquire notify
- failure
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIdciWql"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32b3a3a8201so34301911fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jul 2025 13:19:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751401168; x=1752005968; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g0aE0O2/2xOdWTSN5JeE2ypPwLen7yJfiXzhJDysxRE=;
+        b=bIdciWql7KKeT0ecfQQL+wwYOGbJvrGskldiSeprm+XknOfhJuGk772QqSbR6jd4Dc
+         mIXn5x/WF9ogz803MCCc1LiRwhZjxkabliLp+K/XNjjZSdZpzMrjGU8a/5HTSvdZhL6/
+         apfgjr5/BriiOr7f3m1aWIuLk3V2VruhA1ghj1qRpSiAO1BGvRrTAMmILtR5v75XpPX+
+         WQRZozqUM7TOESAamXfgzcqw9z5Km3/cPsoHKPJ2d08qhnRcWqJtEVhbg0/04xg45j8m
+         6mMvikWVJXPu/Ae8h6IfIwG99HDoFVgFU5OuiAWqFI9Uk8oTkAh5nfvbpm/xukHaAKJT
+         5ZLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751401168; x=1752005968;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g0aE0O2/2xOdWTSN5JeE2ypPwLen7yJfiXzhJDysxRE=;
+        b=oMgd2TJxQjN4PGY4zdx97b5EYUGEho/u7y81RAmMgdxlla0HYLUJU1v/OkCx7Ei0rB
+         dhdaWEaBTqKlWNUXZzP9OclEJn7lD2zbRg3hUjfNHVuwCHu9Zb8phXM7EJYIGw0AJSKM
+         WBR2MwHD8xRJ9Vb24ql4wyKBs4qvh0QzaHe63GOOwmGFiuX71HM+JGbZw2NbjDe1OJnE
+         Ema4uQnjhwmJYGewPAQ8PLG7BGJUtt+PAQQmCimkA7TW5tDenmwduWARhM5NXqPGtV8W
+         pTS/0k7HRKN5oYOiuKqdOCJA4QmcPUwTFBCX520Z4j70IVCy2h+VXj0UNDlg+/+hhUr5
+         2OVg==
+X-Gm-Message-State: AOJu0YzNzwvDxlQWxB8+/Hpxb0CwFMzUYmWC0/OfXIG61aFQUxOga60P
+	YD5foo4vi51hHC4Pm1UGqKrHFqgLrAHZkDCK6KfFarTzPOCErhGPP/uUoaaefliNzIIYOABir17
+	N/F/9D8C/71E/GjwyQfSbAoTo4l1izVfOwYTVO60=
+X-Gm-Gg: ASbGncvwc86m2GeL82NI4hGwgZfDfwPwFaAc25RX3EzcXaKKU7ilfTkjPhtS6ZgQzoI
+	IFXpReu1F0QSsWkyVlitYpYWCO91Wdyl2n8Ko6FGj7DZOPMbV2ha35kkh5Ipzn3B+l7nBqnk/rv
+	Z8a+6nrvLkIGLNG6x1kKlzWZkxBs5gOHFFwyYP660hsw==
+X-Google-Smtp-Source: AGHT+IGnXO+jDLYK5biM+GlarI7lkFLD6YjPgwbUS74Se8OwTtBRCk+7qGQ197axNQqk7ScMJFaDqk7nwHBtBYbkR6M=
+X-Received: by 2002:a2e:9b86:0:b0:32b:76fe:134e with SMTP id
+ 38308e7fff4ca-32e000693cdmr1094651fa.23.1751401167982; Tue, 01 Jul 2025
+ 13:19:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20250701101520.459452-1-hadess@hadess.net> <20250701101520.459452-7-hadess@hadess.net>
+In-Reply-To: <20250701101520.459452-7-hadess@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 1 Jul 2025 16:19:15 -0400
+X-Gm-Features: Ac12FXxDMRpGxrJ9LBlPTXlZI3_xA8s96DaXNmFApYoK_I1dGMNEylXBp7-77zY
+Message-ID: <CABBYNZLZLDmERYGxr1+z1t5p9gesVRF5KwOVSbp6nVvKe2VY_g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v4 6/8] device: Better "Connect" debug
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 476ae809a27ef2a3e3cf4f448ea3e50dbaca41f3
-      https://github.com/bluez/bluez/commit/476ae809a27ef2a3e3cf4f448ea3e50dbaca41f3
-  Author: Andreas Kemnade <andreas@kemnade.info>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
+Hi Bastien,
 
-  Changed paths:
-    M src/gatt-client.c
+On Tue, Jul 1, 2025 at 6:20=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
+rote:
+>
+> Output clearer debug information so that it's possible to follow the
+> decisions made by the bluetoothd daemon when a client such as
+> bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
+> device.
 
-  Log Message:
-  -----------
-  gatt-client: avoid UAF after acquire notify failure
+Well this will only output to syslog though, so the client won't
+necessarily see any of this, and this actually requires the daemon to
+be running with debug enabled.
 
-If a disconnect happens during AcquireNotify dbus calls, a lot of
-debris is left over. Subsequent calls to AcquireNotify will return
-NotPermitted and StopNotify leads to an UAF, crashing bluetoothd.
+> ---
+>  src/device.c | 41 +++++++++++++++++++++++++++++++++--------
+>  1 file changed, 33 insertions(+), 8 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 99c0aa67ec0c..d7a859f9df3f 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2683,6 +2683,7 @@ static DBusMessage *connect_profiles(struct btd_dev=
+ice *dev, uint8_t bdaddr_type
+>                                                         "Connect") &&
+>                                 find_service_with_state(dev->services,
+>                                                 BTD_SERVICE_STATE_CONNECT=
+ED)) {
+> +                               DBG("Already connected to services");
+>                                 return dbus_message_new_method_return(msg=
+);
+>                         } else {
+>                                 return btd_error_profile_unavailable(msg)=
+;
+> @@ -2694,8 +2695,10 @@ static DBusMessage *connect_profiles(struct btd_de=
+vice *dev, uint8_t bdaddr_type
+>
+>         err =3D connect_next(dev);
+>         if (err < 0) {
+> -               if (err =3D=3D -EALREADY)
+> +               if (err =3D=3D -EALREADY) {
+> +                       DBG("Already connected");
+>                         return dbus_message_new_method_return(msg);
+> +               }
+>                 return btd_error_bredr_conn_from_errno(msg, err);
+>         }
+>
+> @@ -2718,14 +2721,24 @@ resolve_services:
+>         return NULL;
+>  }
+>
+> +static const char *bdaddr_type_strs[] =3D {
+> +       "BR/EDR",
+> +       "LE public",
+> +       "LE random"
+> +};
+> +
+>  static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
+>                                                         void *user_data)
+>  {
+>         struct btd_device *dev =3D user_data;
+>         uint8_t bdaddr_type;
+>
+> -       if (dev->bonding)
+> +       DBG("Calling \"Connect\" for device %s", dev->path);
 
-Fix that by also clean up the socket stuff on failure.
+We do have D-Bus message logging so this seems excessive to me.
 
-This was provoked by putting the device into some RF shielding bag
-and open and close it quickly.
+> +
+> +       if (dev->bonding) {
+> +               DBG("Bonding in progress");
+>                 return btd_error_in_progress(msg);
+> +       }
+>
+>         if (dev->bredr_state.connected) {
+>                 /*
+> @@ -2734,23 +2747,35 @@ static DBusMessage *dev_connect(DBusConnection *c=
+onn, DBusMessage *msg,
+>                  */
+>                 if (dev->bredr_state.svc_resolved &&
+>                         find_service_with_state(dev->services,
+> -                                               BTD_SERVICE_STATE_CONNECT=
+ED))
+> +                                               BTD_SERVICE_STATE_CONNECT=
+ED)) {
+>                         bdaddr_type =3D dev->bdaddr_type;
+> -               else
+> +                       DBG("Selecting address type %s, as BR/EDR service=
+s are resolved "
+> +                           " and connected", bdaddr_type_strs[dev->bdadd=
+r_type]);
+> +               } else {
+>                         bdaddr_type =3D BDADDR_BREDR;
+> -       } else if (dev->le_state.connected && dev->bredr)
+> +                       DBG("Selecting address type BR/EDR, as services n=
+ot resolved "
+> +                           "or not connected");
+> +               }
+> +       } else if (dev->le_state.connected && dev->bredr) {
+>                 bdaddr_type =3D BDADDR_BREDR;
+> -       else
+> +               DBG("Selecting address type BR/EDR, as LE already connect=
+ed");
+> +       } else {
+>                 bdaddr_type =3D select_conn_bearer(dev);
+> +               DBG("Selecting address type %s", bdaddr_type_strs[dev->bd=
+addr_type]);
 
-Valgrind output:
+Don't really like this many calls for something so simple, beside we
+now have the likes of PreferredBearer for the client to indicate what
+bearer it wants to connect, otherwise if we have to explain every
+decision we make we basically need to log the entire code, so we
+better log what not why.
 
-bluetoothd[26032]: [:1.126:method_call] > org.bluez.GattCharacteristic1.AcquireNotify [#145]
-bluetoothd[26032]: [:1.126:error] < org.bluez.Error.NotPermitted [#145]
-bluetoothd[26032]: [:1.74:method_call] > org.freedesktop.DBus.Properties.GetAll [#895]
-bluetoothd[26032]: [:1.74:method_return] < [#895]
-bluetoothd[26032]: [:1.74:method_call] > org.bluez.GattCharacteristic1.StopNotify [#896]
-==26032== Invalid read of size 8
-==26032==    at 0x1A5721: notify_io_destroy (gatt-client.c:1562)
-==26032==    by 0x1A7290: sock_io_destroy (gatt-client.c:1171)
-==26032==    by 0x1A7290: destroy_sock (gatt-client.c:1192)
-==26032==    by 0x1A73D6: characteristic_stop_notify (gatt-client.c:1698)
-==26032==    by 0x1CF478: process_message (object.c:293)
-==26032==    by 0x49CB71B: ??? (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
-==26032==    by 0x49BB62A: dbus_connection_dispatch (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
-==26032==    by 0x1CBCEF: message_dispatch (mainloop.c:59)
-==26032==    by 0x48BF61E: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-==26032==    by 0x48BF9D7: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-==26032==    by 0x48BFC8E: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-==26032==    by 0x202114: mainloop_run (mainloop-glib.c:65)
-==26032==    by 0x202501: mainloop_run_with_signal (mainloop-notify.c:196)
-==26032==  Address 0x5a7a430 is 0 bytes inside a block of size 32 free'd
-==26032==    at 0x484417B: free (vg_replace_malloc.c:872)
-==26032==    by 0x1DEC0F: complete_notify_request (gatt-client.c:1663)
-==26032==    by 0x1DEC0F: enable_ccc_callback (gatt-client.c:1735)
-==26032==    by 0x1DB8FF: disc_att_send_op (att.c:464)
-==26032==    by 0x1DB8FF: disconnect_cb (att.c:676)
-==26032==    by 0x2017A4: watch_callback (io-glib.c:173)
-==26032==    by 0x48BF61E: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-==26032==    by 0x48BF9D7: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-==26032==    by 0x48BFC8E: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-==26032==    by 0x202114: mainloop_run (mainloop-glib.c:65)
-==26032==    by 0x202501: mainloop_run_with_signal (mainloop-notify.c:196)
-==26032==    by 0x12E60C: main (main.c:1535)
-==26032==  Block was alloc'd at
-==26032==    at 0x48417B4: malloc (vg_replace_malloc.c:381)
-==26032==    by 0x1D2F4D: util_malloc (util.c:46)
-==26032==    by 0x1A5DD3: notify_client_create (gatt-client.c:1426)
-==26032==    by 0x1A5EFC: characteristic_acquire_notify (gatt-client.c:1588)
-==26032==    by 0x1CF478: process_message (object.c:293)
-==26032==    by 0x49CB71B: ??? (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
-==26032==    by 0x49BB62A: dbus_connection_dispatch (in /usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4)
-==26032==    by 0x1CBCEF: message_dispatch (mainloop.c:59)
-==26032==    by 0x48BF61E: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-==26032==    by 0x48BF9D7: ??? (in /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.7400.6)
-
-
-  Commit: 0ff45df8546775bb920a98a2b0ecd76b84ebc20a
-      https://github.com/bluez/bluez/commit/0ff45df8546775bb920a98a2b0ecd76b84ebc20a
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M src/device.c
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  error: Rename device error helper to match retval
-
-Rename the helper to show that it outputs a string, and not an error
-DbusMessage as the other functions do.
-
-
-  Commit: 33226a0ad9030a0b67b7fe5f49ef40000deae861
-      https://github.com/bluez/bluez/commit/33226a0ad9030a0b67b7fe5f49ef40000deae861
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  error: Add helper to return DbusMessage errors from errno
-
-This will allow us to start adding more precise errors instead of
-"Failed" with a string if we're parsing an errno.
-
-
-  Commit: 74f3733e707b1463f21b720984e7421e8f8f008e
-      https://github.com/bluez/bluez/commit/74f3733e707b1463f21b720984e7421e8f8f008e
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Use new DbusMessage error helper
-
-
-  Commit: 2d7f67d8b94de6293886af49a369dffb1d3f4d12
-      https://github.com/bluez/bluez/commit/2d7f67d8b94de6293886af49a369dffb1d3f4d12
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  error: Make errno to string helpers private
-
-We're not using them outside the error code itself.
-
-
-  Commit: 55a6763cde8a2309fd23a96479ee4cf2fc23a442
-      https://github.com/bluez/bluez/commit/55a6763cde8a2309fd23a96479ee4cf2fc23a442
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  device: Better error when no BR/EDR profiles can be connected to
-
-Add a more precise error when there are no BR/EDR profiles to connect
-to. This is useful when trying to connect to a particular device, and
-there are no relevant profiles to connect to on the bearer.
+> +       }
+>
+>         if (bdaddr_type !=3D BDADDR_BREDR) {
+>                 int err;
+>
+> -               if (dev->connect)
+> +               if (dev->connect) {
+> +                       DBG("Device already connecting");
+>                         return btd_error_in_progress(msg);
+> +               }
+>
+> -               if (dev->le_state.connected)
+> +               if (dev->le_state.connected) {
+> +                       DBG("Device already connected through LE");
+>                         return dbus_message_new_method_return(msg);
+> +               }
+>
+>                 btd_device_set_temporary(dev, false);
+>
+> --
+> 2.50.0
+>
+>
 
 
-Compare: https://github.com/bluez/bluez/compare/822037fe7450...55a6763cde8a
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
