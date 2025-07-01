@@ -1,187 +1,125 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118EA26D4CA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 10:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD852737F0
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 11:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751365317; cv=none; b=HF6N7b/babDxv9iGAe9Z6vQK+qDwiO0+9CqYRx5fMvCT6kv7ToeFKAUi55xfg/GLZwV7f6AyK1IdjXx2jtYuz8BqAgHn65Snw4OIOVIp0mI5V+iQnV/gUf5PTyDJwJX/4TOoIlaOrtxrtCkLsAR9NjL+kI2G5BgQNcyOImj9jRA=
+	t=1751370083; cv=none; b=LY32uO1zoqzTZ9xs32B6zOuIWHRLUeQ4Q9XWfjgpwwPmR8ExXJExELIXqPMtvg0LULaGjd70bGd06b9x5mA7hh7Sh+X+BH9VOoxF+uXqM8xo9fT35HOaoLmCqQOygM41uKwFscfiCY58jK/YMABOMr6BjSl0LBVGs7K16pVUk3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751365317; c=relaxed/simple;
-	bh=ZFeiQgXsMFg2hxSVQvFGm1t/SSNy1Xt2YSoW+cGH9dc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hemfrE1LFzA5py9eqV7lA7utuJZDS03NEU7Wh3OCzI/p0bdSQDuhe6TMY5p/TpLYluT5Fe3ALrYsxf/3yxFTggg2LUOKOX4vNeDyrDxnrTb5gn769lU82gRnKiW3CklmI3YmQHTD/bkrnaZ1JenAFIhOng4NrpkvhcfgEJHwtNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RwoQKQYl; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1751370083; c=relaxed/simple;
+	bh=MFPL2JXpLGNBgmmnk8LaL6DGsfVGx44LdZaqnrvl14Y=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Y1FJ9eaDwpGDlMZwC+ubCyLiQ8p8jv/4auIrfp+AfTXbUHfBZSRU/C99eLatzLw7bnhqrRea6MbWL8+WHNS6CHhsDZslmahMHv0zfc8H6tPeVknpvjyJTXKSWvjbWSbW3rp2qAeGzSGH1jc58RKpDHGjSNEcjouh+DLj5cqOhsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NJlGwMQj; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RwoQKQYl"
-Received: from github.com (hubbernetes-node-e1f146c.ac4-iad.github.net [10.52.14.41])
-	by smtp.github.com (Postfix) with ESMTPA id 1296A21249
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 03:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1751365315;
-	bh=RfdDA7P2A3MtBMwVfgYaKy/Sj2i7B60GgaGXdDRoKG0=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RwoQKQYlU6nBi0mNxYVYWzaTgSe9jcuOHb8L/YJhaMuSuDQjs2j7cQrmokJUdkbJv
-	 90XVyRR9LWCDvEyajaKRZZd6b/xBmyJefH6rM99mS12pTToiEcpQ2cIUUe1vy1vaJa
-	 AKcgJ1v67pY4NePvmpYzh+gT+9jwpL4QoUj6fLrQ=
-Date: Tue, 01 Jul 2025 03:21:55 -0700
-From: hadess <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/977659/000000-c2b027@github.com>
-Subject: [bluez/bluez] d4d636: error: Rename device error helper to match
- retval
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJlGwMQj"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so2820925a12.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jul 2025 04:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751370081; x=1751974881; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CcRtX+xc76fV168A/5zFLwgqyq+5aJ4pIaMi5yhp2XE=;
+        b=NJlGwMQjViuZRpP60rW5LiwuaYUcG85lkO9JjdtgWaKSX5SsCrjHWPDHtqYyvw0RJk
+         +QPuEP2XWk+MY68V8DqyJSpeNLavQ1P9TpntjYTu2ZsLES0GMVXtjiEslwKc0lbqCcjf
+         dFmzlepGkafIqk9I07OyfINNuHP4Per7PZryAjV/ScbNzSAXdg8fcokDlU8wA0cVWpbG
+         6TPtxP/3u7+KR3t5JrPH7slWtYAk66o9cWBs0XI9UBk6XmW4ZGdGYcLvx4HW5yWD9guO
+         pyBLpasfOZOXK5PeR1aQK3a4P7Swifj6auAAWNCXLPk/wZKX37XKSWuRlhJaQATgPfta
+         2Irw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751370081; x=1751974881;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CcRtX+xc76fV168A/5zFLwgqyq+5aJ4pIaMi5yhp2XE=;
+        b=nIeTQMAY0GECKycVkUptuFVvkF/0uNPFpuu8OXkyXQ6GDBLFG5Mo1DW/Yxg8azjryY
+         gY5+lTWzFQLPm3evDOTP84vBeQQGsCJuKxaaNs7Iz+ou4i6osmfiIZUTeCI04buPdNzQ
+         Ob1RrVvbKqUXcz4uMF+WwkFZiDVqdNz6Y72n1I8snKMu/TuiTxnii76nOr/VREKqeaoK
+         ks4EA70Fqn7fm86jnUmNgFeJIIP0+q71I1nIqRp625BrBtGDNf3i226BbypIUe2AvFKH
+         5fICIlm+Knl2uccgHWJRBSDAYG26a22F5WOfUzasKWblVajfKYBwjulciJtwe5fOF5uj
+         srQg==
+X-Gm-Message-State: AOJu0YyYovoDWLAvrofqY3mxznbv2x3zu0uRCvkMaEIvcQ3/jxf8Se1E
+	FTjX7EQJKMEUwRrsqf5QC4bZrk5jjKlqJRKS9HcyDNx8NHXVTsG7k/5qbfImHO9v
+X-Gm-Gg: ASbGncvNz84erkY/9rT3G5i8y/TvID4FEs06GIDlwUq1tKxuXBSTzJJWyfpF/Tw57LZ
+	ZfnLZAYOH4YFTl0sq3NHIsQxsYBheRpaFpLWOzib3TXcCRZwoX/hkWgYdjq7YWX8prsSSkp5apL
+	ktDUGHOxE6SMdT0nREWxMrsXFn4m16suNTKxQ3LRRJTkV2QyH/mlgwulRhGmtgLzt6hVwGaJHKg
+	NU6WOzAfCeR7c7mn2UOXzHyP1ebRNT6ao+peGyknE4SrIir2jF+MMYPQxD2wLJjW0fxiHvi8BmW
+	Vo2FAujOgxy5d7jToPQfCGQi3WPjrQ1GIph83CT46PtJlPbdrW/Nyirwaz7UghNbpQ==
+X-Google-Smtp-Source: AGHT+IGMBiPi7kwlDdwz9lg3Am1FMRra2RGd4E6W8cUIq+iux41fX79Agk6Ng3Ef2TpPQm/Uud2k1w==
+X-Received: by 2002:a17:90b:3e84:b0:313:1a8c:c2d3 with SMTP id 98e67ed59e1d1-318c923baacmr20689787a91.22.1751370080969;
+        Tue, 01 Jul 2025 04:41:20 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.52.17])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-318c13a3a26sm11923722a91.19.2025.07.01.04.41.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Jul 2025 04:41:20 -0700 (PDT)
+Message-ID: <6863c960.170a0220.1f1e5.1bde@mx.google.com>
+Date: Tue, 01 Jul 2025 04:41:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5035389765620595884=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: Better connect debug and error reporting
+In-Reply-To: <20250701101520.459452-2-hadess@hadess.net>
+References: <20250701101520.459452-2-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============5035389765620595884==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/977659
-  Home:   https://github.com/bluez/bluez
-  Commit: d4d636b22d08d70937febad2fcb0038ca32a8e68
-      https://github.com/bluez/bluez/commit/d4d636b22d08d70937febad2fcb0038ca32a8e68
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M src/device.c
-    M src/error.c
-    M src/error.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  error: Rename device error helper to match retval
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=977659
 
-Rename the helper to show that it outputs a string, and not an error
-DbusMessage as the other functions do.
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.38 seconds
+GitLint                       PENDING   0.36 seconds
+BuildEll                      PASS      22.05 seconds
+BluezMake                     PASS      2777.64 seconds
+MakeCheck                     PASS      20.08 seconds
+MakeDistcheck                 PASS      216.08 seconds
+CheckValgrind                 PASS      284.01 seconds
+CheckSmatch                   PASS      310.02 seconds
+bluezmakeextell               PASS      133.02 seconds
+IncrementalBuild              PENDING   0.32 seconds
+ScanBuild                     PASS      961.27 seconds
 
-  Commit: 660d04f0a95be83c1f8dc79e1ebe9ffcb62a7a14
-      https://github.com/bluez/bluez/commit/660d04f0a95be83c1f8dc79e1ebe9ffcb62a7a14
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M src/error.c
-    M src/error.h
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  error: Add helper to return DbusMessage errors from errno
-
-This will allow us to start adding more precise errors instead of
-"Failed" with a string if we're parsing an errno.
-
-
-  Commit: 2f6b814a499f347c15e36cd0d1fa327ea11d4d5d
-      https://github.com/bluez/bluez/commit/2f6b814a499f347c15e36cd0d1fa327ea11d4d5d
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Use new DbusMessage error helper
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: 9b00d10c55113f75ab5684f0fdd00996a9ce4a80
-      https://github.com/bluez/bluez/commit/9b00d10c55113f75ab5684f0fdd00996a9ce4a80
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
 
-  Changed paths:
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  error: Make errno to string helpers private
-
-We're not using them outside the error code itself.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 898da922298745920209885fa84afaf174a99e4d
-      https://github.com/bluez/bluez/commit/898da922298745920209885fa84afaf174a99e4d
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M doc/org.bluez.Device.rst
-    M src/device.c
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  device: Better error when no BR/EDR profiles can be connected to
-
-Add a more precise error when there are no BR/EDR profiles to connect
-to. This is useful when trying to connect to a particular device, and
-there are no relevant profiles to connect to on the bearer.
-
-
-  Commit: d030c498000202554f2dab4413a809f7140f158a
-      https://github.com/bluez/bluez/commit/d030c498000202554f2dab4413a809f7140f158a
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Better "Connect" debug
-
-Output clearer debug information so that it's possible to follow the
-decisions made by the bluetoothd daemon when a client such as
-bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
-device.
-
-
-  Commit: c76080b99af6fe1d41c1bc34b6ed18eede4275e5
-      https://github.com/bluez/bluez/commit/c76080b99af6fe1d41c1bc34b6ed18eede4275e5
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M doc/org.bluez.Device.rst
-    M src/device.c
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  device: Better error when the link key is missing
-
-Add a more precise error when the link key is missing for a
-profile or device we're trying to connect to.
-
-
-  Commit: c2b027956baea12d9c6d9f1dd025a326617fcd56
-      https://github.com/bluez/bluez/commit/c2b027956baea12d9c6d9f1dd025a326617fcd56
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2025-07-01 (Tue, 01 Jul 2025)
-
-  Changed paths:
-    M doc/org.bluez.Device.rst
-    M src/device.c
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  device: Better error when the adapter is not powered
-
-
-Compare: https://github.com/bluez/bluez/compare/d4d636b22d08%5E...c2b027956bae
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============5035389765620595884==--
