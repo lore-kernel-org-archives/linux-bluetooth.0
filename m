@@ -1,152 +1,197 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A602626CE10
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 08:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AF7223327;
+	Tue,  1 Jul 2025 08:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751359269; cv=none; b=XGVYlfhKwLW+qbkaPejn4h7uvudms6lbc5SYxgn4h1FwKwWRGX8qAh/iFfydrfLTy7dRpxMIZ98kx5ZjxxOgSEAb1R/sgbn0YSRV73TeEs/xfFGp7j6VAR16Hr2iIfbuPZIBtBByp2apoUgJ6idqgOR3U87ccl/Ikq9p7vVkcts=
+	t=1751359649; cv=none; b=L9EghG0Oya9lox2iwZWLDqHrCIYVx7oEFs09Vy8630XV18v+JV95Znhe+kT1yta/Htpdd1IbI1vbj1mGumUfoUnnhqoKezHPyZPByZbtdL5yW5TO/U7luGoXASmElevA5T51aqZ3IvHYYtENqijYZeODVqWzs+NiiJIta7X6R0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751359269; c=relaxed/simple;
-	bh=gXobPw5+U23vDGPPYCVp8Vr+kYuMWxJQesksIOfr354=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IR1WfaG3lqEwC0o09zG0XziWX85aRBb4W8qzv5oN/aO1vazvF6hYPicX97oXXSDG3GQ7cwKybVPTFO4QXqvv7ELeD7vaxzcIsItsgKmzZzUCAYr5NVCtHRP9xf1vb+2MC5xtclvrvreXZnBtFdYITZ1yjPFr0RJQKlY8hY55h0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WglDK1nv; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751359649; c=relaxed/simple;
+	bh=XQ+f6cDEDaX5fw9hlM7XL9SW1PnvQSB/e3VpIAkFu8k=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dmoCIJxFFxGoi3NZYWX98tUhHdhgt28KIfxNAcIkBIqbf9vCEjiceErCQr2VsRdgbGa7DgC2riPDxu9rcXAxqPfmh/nlCWcmhi0tKU6RMsYXztSBV7O/oiZkcW0lwi5Zy3wOBudbpy72pPv2/+3Cz6gpWAYEs9s2JfF3bzuay/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nB+wXDpJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WglDK1nv"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313bb9b2f5bso5642003a91.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jul 2025 01:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751359267; x=1751964067; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OWT/z68nTZ3hey4v0wjyqeZRlgZcygDuULMd+56HEnA=;
-        b=WglDK1nvTEmMDMAjGKZOuPjUPsbGtD4SrZCPOtToYUamF7lfYxku3lH1vpQkpU0nuR
-         MdAH9s4huWOZVEzA9SQwf8zNml8NyPi3V98wcMS6I6xD69iTrw/LRueiEZYNfaE2JsMF
-         5jvOaJFY5mTYjvwiEYuibPmAn31FgAR7XLgiHiEAKeKCO2RD86+7EAYhI9NS94cndFdf
-         5z3lUzdNAtNaXMZ3Y45V+PQL5h4524+NCmMO4GWSXa7SOA+I/+qQUnG6xdvArsXT3rUp
-         3UWJrCwCfMB6xLvwJkc9XrgTkDNbc+o7Ks98IyxHkxna6w9cOwYYiEf487g6osy505L8
-         iuPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751359267; x=1751964067;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OWT/z68nTZ3hey4v0wjyqeZRlgZcygDuULMd+56HEnA=;
-        b=vdfTjjMSfKOaFTBGcEc9Va94LNKMGr0VmGwRv24Thq9gol3VOz3OkeDnJg1Gq4ceMV
-         QZMlp1VqbACVzubyLxNzn9PF1skG28/El5K68m2obLIjsfTbNjyLmSNA3kQ6DFKhbQxX
-         aIP41ecr2WuwGTnSo1kdzLYChnju+W2L3iRNL2hnxYV6j3B/rU00mRHBcaR/eAHmz2al
-         l/YGyjT845BAf1S0LZsXzufX1uSjnhrObv8zsAqWzHJqvzv7dyEPB4pmcGSEfoXsIOTl
-         Z+I64Qr0Ock6vIS1mkDjgYGVCh9xrRB9x+QW37cI/IzfiSlOzfQApP3hpoTl/+ooZLvp
-         YGIw==
-X-Gm-Message-State: AOJu0YxIT+7XuIopRIv+ULzjLwZaIwcuQfaFOCCMWZPyx5L+c7s5rKks
-	A+Aph/Cn0+86EXwxHsWa0fgsyUrUsM4RgDmzoluALnhT6Dsjizg7P03XN+yOvA==
-X-Gm-Gg: ASbGncuKk8tw91F4OVKfFlqR6Eas/61ZS68IPzaOK8hAV7l2YtPk3jQxRYreyuWmmg6
-	c+GzqizYbMH+XIR0tdF7G2LayuzjVmCAjTpjaF+1tghRG40paAOtGJ3niLkJ/x30gCij6kISLj6
-	GU9zKEeEFf81bQrB5co/JvVU9/S9WR/ET7exhi7YmClrklvgHL6Hi+F1JEYJzj8RqXmuu3Ul4F3
-	OevhmnLO7t4eFiWKNFs0+s1HltgPIJhUK9RwfY1mmyQZbjafO09VK9L+NKYaQWE9FmSEmVK3dvE
-	ZtI7uAxAd/I2VKX/YLIv8QDDKr1vzxffLa8ZxQzb67RZj9p2ZXmWrEaesY4iQz0A3VEt
-X-Google-Smtp-Source: AGHT+IG5ItW2fVn7rIGxySnlT/DiSEfKVftFzMgtSFeBaLHThMdMUKbaQ2zYQNO8DZOtWVHKpMaHoA==
-X-Received: by 2002:a17:90b:4f4b:b0:311:f05b:86a5 with SMTP id 98e67ed59e1d1-318c8ce555fmr28631182a91.0.1751359266537;
-        Tue, 01 Jul 2025 01:41:06 -0700 (PDT)
-Received: from [172.17.0.2] ([20.43.247.174])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f5426bfbsm15213936a91.24.2025.07.01.01.41.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 01:41:06 -0700 (PDT)
-Message-ID: <68639f22.170a0220.14b53b.67fe@mx.google.com>
-Date: Tue, 01 Jul 2025 01:41:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8743996257013293323=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nB+wXDpJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CA6A3C4CEEB;
+	Tue,  1 Jul 2025 08:47:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751359648;
+	bh=XQ+f6cDEDaX5fw9hlM7XL9SW1PnvQSB/e3VpIAkFu8k=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=nB+wXDpJubGkHZYNFTDtLCZQztEiAPPQbudMKb9tC/JJJpzTiPhXJoifF15D6Jfk8
+	 JboAljYIltUiH9BN5Oe8d5IqVX9bRAUiQrcg0xV7rDXgBJ9fYHUOUef764JNTRfaNm
+	 Ncp16a8wT+4lRRlYPlM3ypFxr14sS/X8g/vUm/CgR39g+z8eCi6+eP4DOsd/01Mo6T
+	 6YVbKYRGojxy52EWScqoWUR8FM5BYrWtMVjfm1fwR3MwPy8bYU99btJr54TRCSbhoa
+	 e/YV0DccePtp8jS8GXavPfVKLdGL7EhzLYbH5gnCq0TPzv4+Z+M6M5jxhHJLdsDlCL
+	 JJPoBnFnnWApQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B378CC8302F;
+	Tue,  1 Jul 2025 08:47:28 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Tue, 01 Jul 2025 16:47:26 +0800
+Subject: [PATCH] Bluetooth: Fix spelling mistakes
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
-Subject: RE: [v4] Bluetooth: hci_event: Add support for handling LE BIG Sync Lost event
-In-Reply-To: <20250701-handle_big_sync_lost_event-v4-1-f0ed2d77c203@amlogic.com>
-References: <20250701-handle_big_sync_lost_event-v4-1-f0ed2d77c203@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20250701-fix_typos-v1-1-090f06fdfaea@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAJ2gY2gC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDcwND3bTMiviSyoL8Yl1LC2Mj00QTEzPzRFMloPqColSgJNis6NjaWgB
+ oh1BFWwAAAA==
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751359647; l=5289;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=VQIDv2I4hUGURzA15ufBv8DnkunpA/1+l0Qi7aaRxGw=;
+ b=/K6FSfTrL0eD/O5Jjt0xg/7Swn27fMtrIeOCy5Inv13sPcG45X3L7zuicjdW2I/wiJWvn8PYd
+ yPoJ3lrSEQQDlkYO6gTY1L1n6KBRq+F7T5KD5sarBJUatMilfRSdBwr
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
---===============8743996257013293323==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Yang Li <yang.li@amlogic.com>
 
-This is automated email and please do not reply to this email!
+Correct the misspelling of “estabilished” in the code.
 
-Dear submitter,
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ include/net/bluetooth/hci.h |  2 +-
+ net/bluetooth/hci_event.c   | 12 ++++++------
+ net/bluetooth/iso.c         |  8 ++++----
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=977610
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.34 seconds
-GitLint                       PENDING   0.36 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      24.59 seconds
-CheckAllWarning               PASS      26.87 seconds
-CheckSparse                   WARNING   30.62 seconds
-BuildKernel32                 PASS      24.37 seconds
-TestRunnerSetup               PASS      476.04 seconds
-TestRunner_l2cap-tester       PASS      25.32 seconds
-TestRunner_iso-tester         FAIL      42.08 seconds
-TestRunner_bnep-tester        PASS      5.94 seconds
-TestRunner_mgmt-tester        PASS      132.49 seconds
-TestRunner_rfcomm-tester      PASS      9.38 seconds
-TestRunner_sco-tester         PASS      15.08 seconds
-TestRunner_ioctl-tester       PASS      10.08 seconds
-TestRunner_mesh-tester        FAIL      11.41 seconds
-TestRunner_smp-tester         PASS      8.67 seconds
-TestRunner_userchan-tester    PASS      6.28 seconds
-IncrementalBuild              PENDING   0.90 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-No test result found
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.906 seconds
-Mesh - Send cancel - 2                               Timed out    2.002 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index fe932ca3bc8c..887db7b4edd9 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2767,7 +2767,7 @@ struct hci_evt_le_create_big_complete {
+ } __packed;
+ 
+ #define HCI_EVT_LE_BIG_SYNC_ESTABILISHED 0x1d
+-struct hci_evt_le_big_sync_estabilished {
++struct hci_evt_le_big_sync_established {
+ 	__u8    status;
+ 	__u8    handle;
+ 	__u8    latency[3];
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a487f9df8145..3f939a3cdb86 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6335,7 +6335,7 @@ static int hci_le_pa_term_sync(struct hci_dev *hdev, __le16 handle)
+ 	return hci_send_cmd(hdev, HCI_OP_LE_PA_TERM_SYNC, sizeof(cp), &cp);
+ }
+ 
+-static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
++static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
+ 					    struct sk_buff *skb)
+ {
+ 	struct hci_ev_le_pa_sync_established *ev = data;
+@@ -6652,7 +6652,7 @@ static void hci_le_phy_update_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
++static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
+ 					struct sk_buff *skb)
+ {
+ 	struct hci_evt_le_cis_established *ev = data;
+@@ -6875,7 +6875,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 					    struct sk_buff *skb)
+ {
+-	struct hci_evt_le_big_sync_estabilished *ev = data;
++	struct hci_evt_le_big_sync_established *ev = data;
+ 	struct hci_conn *bis;
+ 	int i;
+ 
+@@ -7030,7 +7030,7 @@ static const struct hci_le_ev {
+ 		     HCI_MAX_EVENT_SIZE),
+ 	/* [0x0e = HCI_EV_LE_PA_SYNC_ESTABLISHED] */
+ 	HCI_LE_EV(HCI_EV_LE_PA_SYNC_ESTABLISHED,
+-		  hci_le_pa_sync_estabilished_evt,
++		  hci_le_pa_sync_established_evt,
+ 		  sizeof(struct hci_ev_le_pa_sync_established)),
+ 	/* [0x0f = HCI_EV_LE_PER_ADV_REPORT] */
+ 	HCI_LE_EV_VL(HCI_EV_LE_PER_ADV_REPORT,
+@@ -7041,7 +7041,7 @@ static const struct hci_le_ev {
+ 	HCI_LE_EV(HCI_EV_LE_EXT_ADV_SET_TERM, hci_le_ext_adv_term_evt,
+ 		  sizeof(struct hci_evt_le_ext_adv_set_term)),
+ 	/* [0x19 = HCI_EVT_LE_CIS_ESTABLISHED] */
+-	HCI_LE_EV(HCI_EVT_LE_CIS_ESTABLISHED, hci_le_cis_estabilished_evt,
++	HCI_LE_EV(HCI_EVT_LE_CIS_ESTABLISHED, hci_le_cis_established_evt,
+ 		  sizeof(struct hci_evt_le_cis_established)),
+ 	/* [0x1a = HCI_EVT_LE_CIS_REQ] */
+ 	HCI_LE_EV(HCI_EVT_LE_CIS_REQ, hci_le_cis_req_evt,
+@@ -7054,7 +7054,7 @@ static const struct hci_le_ev {
+ 	/* [0x1d = HCI_EV_LE_BIG_SYNC_ESTABILISHED] */
+ 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_ESTABILISHED,
+ 		     hci_le_big_sync_established_evt,
+-		     sizeof(struct hci_evt_le_big_sync_estabilished),
++		     sizeof(struct hci_evt_le_big_sync_established),
+ 		     HCI_MAX_EVENT_SIZE),
+ 	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+ 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index cc055b952ce6..706a47357363 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1728,7 +1728,7 @@ struct iso_list_data {
+ 
+ static bool iso_match_big(struct sock *sk, void *data)
+ {
+-	struct hci_evt_le_big_sync_estabilished *ev = data;
++	struct hci_evt_le_big_sync_established *ev = data;
+ 
+ 	return ev->handle == iso_pi(sk)->qos.bcast.big;
+ }
+@@ -1742,7 +1742,7 @@ static void iso_conn_ready(struct iso_conn *conn)
+ {
+ 	struct sock *parent = NULL;
+ 	struct sock *sk = conn->sk;
+-	struct hci_ev_le_big_sync_estabilished *ev = NULL;
++	struct hci_ev_le_big_sync_established *ev = NULL;
+ 	struct hci_ev_le_pa_sync_established *ev2 = NULL;
+ 	struct hci_ev_le_per_adv_report *ev3 = NULL;
+ 	struct hci_conn *hcon;
+@@ -1844,7 +1844,7 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 		hci_conn_hold(hcon);
+ 		iso_chan_add(conn, sk, parent);
+ 
+-		if ((ev && ((struct hci_evt_le_big_sync_estabilished *)ev)->status) ||
++		if ((ev && ((struct hci_evt_le_big_sync_established *)ev)->status) ||
+ 		    (ev2 && ev2->status)) {
+ 			/* Trigger error signal on child socket */
+ 			sk->sk_err = ECONNREFUSED;
+@@ -1900,7 +1900,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	 * proceed to establishing a BIG sync:
+ 	 *
+ 	 * 1. HCI_EV_LE_PA_SYNC_ESTABLISHED: The socket may specify a specific
+-	 * SID to listen to and once sync is estabilished its handle needs to
++	 * SID to listen to and once sync is established its handle needs to
+ 	 * be stored in iso_pi(sk)->sync_handle so it can be matched once
+ 	 * receiving the BIG Info.
+ 	 * 2. HCI_EVT_LE_BIG_INFO_ADV_REPORT: When connect_ind is triggered by a
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: df8c0b8a03e871431587a13a6765cb4c601e1573
+change-id: 20250701-fix_typos-98325a4467a5
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
 
---===============8743996257013293323==--
