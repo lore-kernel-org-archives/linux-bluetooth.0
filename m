@@ -1,181 +1,197 @@
-Received: from relay16.mail.gandi.net (relay16.mail.gandi.net [217.70.178.236])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6269D270EB9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 10:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.236
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC53026E6EA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 10:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751364935; cv=none; b=kj6ZOyOD92Y//ArmZoQip0edNYAaV4+XOhPIUs2irw7OAqPdi/STjFWerJo2XuYYNnqoNhFzbJ2VKL/YMUiA3dOyHS4QIDUfM5TqJgVjaDlNS20lK9RZJKpUz2srWBpotUkx1gvbrycQMpZbT2F9jtBXV0tkjs0lDD6rMnRjWUs=
+	t=1751365153; cv=none; b=S1wojrRheX4buKYdwODGtUDwFEtGbpgWmWuyNYl1z7le6grpB1oOBn1JxYyeXk7o2uKmzo0qTx8Yksh4ajcdAzkPvpeEi+uePCWRtJOPFUw55voRfuPNuxg2HzArBVzSNzVXy6yx3wDLgIg5fXyxhODYqRdy9kxO6pA6FpYXRiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751364935; c=relaxed/simple;
-	bh=AJhaeRaADyWAB119v1ZI+u1BuKN1is70jZKand0wFX4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jq/xMh7h/JnpATnPaphWOHpRsXxxGCkUbI2K4hfGnUZM3kThG+G50eCB5oyPAsUW5u2PtYLT9GD9v73GUcnfDzampcNqguhQyH21lsDJDhWWaKOevLbGKHaHRYt/tn+eVc+GlHY576/lycc064pxIaOPJGE67/PYLMsiutNqP48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.236
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8562D438D5;
-	Tue,  1 Jul 2025 10:15:31 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH BlueZ v4 7/8] device: Better error when the link key is missing
-Date: Tue,  1 Jul 2025 12:14:28 +0200
-Message-ID: <20250701101520.459452-8-hadess@hadess.net>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250701101520.459452-1-hadess@hadess.net>
-References: <20250701101520.459452-1-hadess@hadess.net>
+	s=arc-20240116; t=1751365153; c=relaxed/simple;
+	bh=W9YoF9Kp5rJ1bvTmlultW3By1ztNSAkABCrciOsy5xc=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=TSRdmOYIKlZ2XYnn2y4BqesLl5sHLWzgfiil9/cNs7Qg53+RQ5BJeKEbbMJKsAzx3EmT150mObVfQQfbxaxwBX3Z5bITzKDsf3KXHugJHvaxMRQOI9l4CqU4ifzjb4jLfLYrq/tTmvBa4wZ4CBXRx7jAjRifRNdHGQRvVWhcBPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jz+7FtKN; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jz+7FtKN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751365151; x=1782901151;
+  h=date:from:to:cc:subject:message-id;
+  bh=W9YoF9Kp5rJ1bvTmlultW3By1ztNSAkABCrciOsy5xc=;
+  b=Jz+7FtKNA1XmkAH5QesaCGhGwzTrwij+5mRrFe27KJY9L4t6SzhwUW9S
+   TalD2Rn9nmW6hpmXFZL8Q7HsyTnyLHVjvAj1+bHRqJkzbwuMnF9+YVYUV
+   kKVis0+4PpQ/dGjMicZbGMEevSOj6Id+8A0IBF6wOdXb+P9CTFK5ESGr3
+   fLvNKXUnuld2HLihLXvyOHf2nqJYpYN786BxGzE8OXgbtZD1220uh1EpX
+   e612s2E7zwjnlBkHJte7FQA2/1dLJJR42P/9p7y5t0/X8xSEYhiYGMnss
+   pBzt6wa2P+lnKn2w1SWZMWJ9rUQarYRkHDPrKJReUsy066uMyxRnAV1P0
+   g==;
+X-CSE-ConnectionGUID: oKYm/02IR+K9aSrH0f2g8A==
+X-CSE-MsgGUID: asD/wLLXSxyNOoRO1ikdBA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="65071002"
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="65071002"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 03:19:11 -0700
+X-CSE-ConnectionGUID: 3x0TMi97RZKHeHRjcgbKdw==
+X-CSE-MsgGUID: acniTzSvQv6OvZwTR3lbyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="177394800"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 01 Jul 2025 03:19:07 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uWY4v-000a0U-24;
+	Tue, 01 Jul 2025 10:19:05 +0000
+Date: Tue, 01 Jul 2025 18:18:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 2a0ae2f6cd36497496b71b83b1af55e8eb5a799b
+Message-ID: <202507011802.A7kAxPIM-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugedvjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeevtefhleevjeffteekleehheeujeelhfdvheethefggefhkefgvdefhfegkeeiteenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhrgguvghssheshhgruggvshhsrdhnvght
 
-Add a more precise error when the link key is missing for a
-profile or device we're trying to connect to.
----
- doc/org.bluez.Device.rst |  2 ++
- src/device.c             | 12 ++++++------
- src/error.c              | 27 ++++++++++++++++++++++-----
- src/error.h              |  3 +--
- 4 files changed, 31 insertions(+), 13 deletions(-)
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 2a0ae2f6cd36497496b71b83b1af55e8eb5a799b  Bluetooth: hci_sync: Fix not disabling advertising instance
 
-diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
-index b36a49eabdd5..d4de78a47239 100644
---- a/doc/org.bluez.Device.rst
-+++ b/doc/org.bluez.Device.rst
-@@ -50,6 +50,8 @@ Possible errors:
- :org.bluez.Error.InProgress:
- :org.bluez.Error.AlreadyConnected:
- :org.bluez.Error.ProfileUnavailable:
-+:org.bluez.Error.BrConnectionKeyMissing:
-+:org.bluez.Error.LeConnectionKeyMissing:
- 
- void Disconnect()
- `````````````````
-diff --git a/src/device.c b/src/device.c
-index d7a859f9df3f..3bad7fb2c77c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1982,14 +1982,14 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
- 	}
- 
- 	if (device->connect) {
--		const char *err_str;
- 		DBusMessage *reply;
- 
--		if (device->bonding_status == MGMT_STATUS_AUTH_FAILED)
--			err_str = ERR_BREDR_CONN_KEY_MISSING;
--		else
--			err_str = ERR_BREDR_CONN_CANCELED;
--		reply = btd_error_failed(device->connect, err_str);
-+		if (device->bonding_status == MGMT_STATUS_AUTH_FAILED) {
-+			reply = btd_error_br_connection_key_missing(device->connect);
-+		} else {
-+			reply = btd_error_failed(device->connect,
-+						ERR_BREDR_CONN_CANCELED);
-+		}
- 		g_dbus_send_message(dbus_conn, reply);
- 		dbus_message_unref(device->connect);
- 		device->bonding_status = 0;
-diff --git a/src/error.c b/src/error.c
-index 8070bc6107ae..596ea4280991 100644
---- a/src/error.c
-+++ b/src/error.c
-@@ -136,6 +136,20 @@ DBusMessage *btd_error_profile_unavailable(DBusMessage *msg)
- 					"profiles to connect to");
- }
- 
-+DBusMessage *btd_error_br_connection_key_missing(DBusMessage *msg)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE
-+					".BrConnectionKeyMissing",
-+					"BR/EDR Link Key missing");
-+}
-+
-+static DBusMessage *btd_error_le_connection_key_missing(DBusMessage *msg)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE
-+					".LeConnectionKeyMissing",
-+					"LE Link Key missing");
-+}
-+
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
- {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE
-@@ -177,8 +191,6 @@ static const char *btd_error_str_bredr_conn_from_errno(int errno_code)
- 		return ERR_BREDR_CONN_ABORT_BY_LOCAL;
- 	case EPROTO:
- 		return ERR_BREDR_CONN_LMP_PROTO_ERROR;
--	case EBADE:
--		return ERR_BREDR_CONN_KEY_MISSING;
- 	default:
- 		return ERR_BREDR_CONN_UNKNOWN;
- 	}
-@@ -217,8 +229,6 @@ static const char *btd_error_str_le_conn_from_errno(int errno_code)
- 		return ERR_LE_CONN_ABORT_BY_LOCAL;
- 	case EPROTO:
- 		return ERR_LE_CONN_LL_PROTO_ERROR;
--	case EBADE:
--		return ERR_LE_CONN_KEY_MISSING;
- 	default:
- 		return ERR_LE_CONN_UNKNOWN;
- 	}
-@@ -227,6 +237,8 @@ static const char *btd_error_str_le_conn_from_errno(int errno_code)
- DBusMessage *btd_error_bredr_conn_from_errno(DBusMessage *msg, int errno_code)
- {
- 	switch (-errno_code) {
-+	case EBADE:
-+		return btd_error_br_connection_key_missing(msg);
- 	case ENOPROTOOPT:
- 		return btd_error_profile_unavailable(msg);
- 	default:
-@@ -237,6 +249,11 @@ DBusMessage *btd_error_bredr_conn_from_errno(DBusMessage *msg, int errno_code)
- 
- DBusMessage *btd_error_le_conn_from_errno(DBusMessage *msg, int errno_code)
- {
--	return btd_error_failed(msg,
-+	switch (-errno_code) {
-+	case EBADE:
-+		return btd_error_le_connection_key_missing(msg);
-+	default:
-+		return btd_error_failed(msg,
- 				btd_error_str_le_conn_from_errno(errno_code));
-+	}
- }
-diff --git a/src/error.h b/src/error.h
-index f4ad81e5daa5..96b7a7122457 100644
---- a/src/error.h
-+++ b/src/error.h
-@@ -41,7 +41,6 @@
- #define ERR_BREDR_CONN_LMP_PROTO_ERROR		"br-connection-lmp-protocol-"\
- 						"error"
- #define ERR_BREDR_CONN_CANCELED			"br-connection-canceled"
--#define ERR_BREDR_CONN_KEY_MISSING		"br-connection-key-missing"
- #define ERR_BREDR_CONN_UNKNOWN			"br-connection-unknown"
- 
- /* LE connection failure reasons */
-@@ -62,7 +61,6 @@
- #define ERR_LE_CONN_LL_PROTO_ERROR	"le-connection-link-layer-protocol-"\
- 					"error"
- #define ERR_LE_CONN_GATT_BROWSE		"le-connection-gatt-browsing"
--#define ERR_LE_CONN_KEY_MISSING		"le-connection-key-missing"
- #define ERR_LE_CONN_UNKNOWN		"le-connection-unknown"
- 
- DBusMessage *btd_error_invalid_args(DBusMessage *msg);
-@@ -84,6 +82,7 @@ DBusMessage *btd_error_agent_not_available(DBusMessage *msg);
- DBusMessage *btd_error_not_ready(DBusMessage *msg);
- DBusMessage *btd_error_not_ready_str(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_profile_unavailable(DBusMessage *msg);
-+DBusMessage *btd_error_br_connection_key_missing(DBusMessage *msg);
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_bredr_conn_from_errno(DBusMessage *msg, int errno_code);
- DBusMessage *btd_error_le_conn_from_errno(DBusMessage *msg, int errno_code);
--- 
-2.50.0
+elapsed time: 1168m
 
+configs tested: 120
+configs skipped: 2
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+tested configs:
+alpha                             allnoconfig    gcc-15.1.0
+alpha                            allyesconfig    gcc-15.1.0
+arc                              allmodconfig    gcc-15.1.0
+arc                               allnoconfig    gcc-15.1.0
+arc                              allyesconfig    gcc-15.1.0
+arc                   randconfig-001-20250630    gcc-10.5.0
+arc                   randconfig-002-20250630    gcc-12.4.0
+arm                              allmodconfig    gcc-15.1.0
+arm                               allnoconfig    clang-21
+arm                              allyesconfig    gcc-15.1.0
+arm                      integrator_defconfig    clang-21
+arm                        mvebu_v7_defconfig    clang-21
+arm                   randconfig-001-20250630    clang-21
+arm                   randconfig-002-20250630    gcc-12.4.0
+arm                   randconfig-003-20250630    gcc-14.3.0
+arm                   randconfig-004-20250630    clang-21
+arm                         wpcm450_defconfig    gcc-15.1.0
+arm64                            allmodconfig    clang-19
+arm64                             allnoconfig    gcc-15.1.0
+arm64                 randconfig-001-20250630    gcc-9.5.0
+arm64                 randconfig-002-20250630    gcc-14.3.0
+arm64                 randconfig-003-20250630    clang-21
+arm64                 randconfig-004-20250630    clang-21
+csky                              allnoconfig    gcc-15.1.0
+csky                  randconfig-001-20250701    gcc-11.5.0
+csky                  randconfig-002-20250701    gcc-10.5.0
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-21
+hexagon                          allyesconfig    clang-21
+hexagon               randconfig-001-20250701    clang-21
+hexagon               randconfig-002-20250701    clang-21
+i386                             allmodconfig    gcc-12
+i386                              allnoconfig    gcc-12
+i386                             allyesconfig    gcc-12
+i386        buildonly-randconfig-001-20250701    gcc-12
+i386        buildonly-randconfig-002-20250701    gcc-12
+i386        buildonly-randconfig-003-20250701    gcc-12
+i386        buildonly-randconfig-004-20250701    gcc-12
+i386        buildonly-randconfig-005-20250701    gcc-12
+i386        buildonly-randconfig-006-20250701    clang-20
+i386                                defconfig    clang-20
+loongarch                        allmodconfig    gcc-15.1.0
+loongarch                         allnoconfig    gcc-15.1.0
+loongarch             randconfig-001-20250701    gcc-13.3.0
+loongarch             randconfig-002-20250701    gcc-15.1.0
+m68k                             allmodconfig    gcc-15.1.0
+m68k                              allnoconfig    gcc-15.1.0
+m68k                             allyesconfig    gcc-15.1.0
+m68k                           sun3_defconfig    gcc-15.1.0
+microblaze                       allmodconfig    gcc-15.1.0
+microblaze                        allnoconfig    gcc-15.1.0
+microblaze                       allyesconfig    gcc-15.1.0
+mips                              allnoconfig    gcc-15.1.0
+mips                           ip27_defconfig    gcc-15.1.0
+nios2                             allnoconfig    gcc-14.2.0
+nios2                 randconfig-001-20250701    gcc-14.2.0
+nios2                 randconfig-002-20250701    gcc-13.3.0
+openrisc                          allnoconfig    gcc-15.1.0
+openrisc                         allyesconfig    gcc-15.1.0
+openrisc                 simple_smp_defconfig    gcc-15.1.0
+parisc                           allmodconfig    gcc-15.1.0
+parisc                            allnoconfig    gcc-15.1.0
+parisc                           allyesconfig    gcc-15.1.0
+parisc                randconfig-001-20250701    gcc-14.3.0
+parisc                randconfig-002-20250701    gcc-10.5.0
+powerpc                    adder875_defconfig    gcc-15.1.0
+powerpc                          allmodconfig    gcc-15.1.0
+powerpc                           allnoconfig    gcc-15.1.0
+powerpc                          allyesconfig    clang-21
+powerpc               randconfig-001-20250701    gcc-13.3.0
+powerpc               randconfig-002-20250701    clang-21
+powerpc               randconfig-003-20250701    clang-21
+powerpc                     sequoia_defconfig    clang-17
+powerpc64             randconfig-001-20250701    clang-21
+powerpc64             randconfig-002-20250701    clang-21
+powerpc64             randconfig-003-20250701    gcc-10.5.0
+riscv                            allmodconfig    clang-21
+riscv                             allnoconfig    gcc-15.1.0
+riscv                            allyesconfig    clang-16
+riscv                 randconfig-001-20250701    gcc-14.3.0
+riscv                 randconfig-002-20250701    gcc-10.5.0
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-21
+s390                             allyesconfig    gcc-15.1.0
+s390                          debug_defconfig    gcc-15.1.0
+s390                  randconfig-001-20250701    gcc-9.3.0
+s390                  randconfig-002-20250701    clang-17
+sh                               allmodconfig    gcc-15.1.0
+sh                                allnoconfig    gcc-15.1.0
+sh                               allyesconfig    gcc-15.1.0
+sh                        edosk7705_defconfig    gcc-15.1.0
+sh                    randconfig-001-20250701    gcc-5.5.0
+sh                    randconfig-002-20250701    gcc-13.3.0
+sh                             sh03_defconfig    gcc-15.1.0
+sh                        sh7763rdp_defconfig    gcc-15.1.0
+sh                  sh7785lcr_32bit_defconfig    gcc-15.1.0
+sparc                            allmodconfig    gcc-15.1.0
+sparc                             allnoconfig    gcc-15.1.0
+sparc                 randconfig-001-20250701    gcc-10.3.0
+sparc                 randconfig-002-20250701    gcc-15.1.0
+sparc64               randconfig-001-20250701    gcc-8.5.0
+sparc64               randconfig-002-20250701    gcc-12.4.0
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-21
+um                               allyesconfig    gcc-12
+um                    randconfig-001-20250701    gcc-12
+um                    randconfig-002-20250701    gcc-12
+x86_64                            allnoconfig    clang-20
+x86_64                           allyesconfig    clang-20
+x86_64      buildonly-randconfig-001-20250701    gcc-12
+x86_64      buildonly-randconfig-002-20250701    gcc-12
+x86_64      buildonly-randconfig-003-20250701    gcc-12
+x86_64      buildonly-randconfig-004-20250701    gcc-12
+x86_64      buildonly-randconfig-005-20250701    clang-20
+x86_64      buildonly-randconfig-006-20250701    clang-20
+x86_64                              defconfig    gcc-11
+x86_64                          rhel-9.4-rust    clang-18
+xtensa                            allnoconfig    gcc-15.1.0
+xtensa                randconfig-001-20250701    gcc-15.1.0
+xtensa                randconfig-002-20250701    gcc-13.3.0
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
