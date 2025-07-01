@@ -1,45 +1,46 @@
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012016.outbound.protection.outlook.com [52.101.66.16])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011061.outbound.protection.outlook.com [52.101.65.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873D327584E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 14:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE11E275111
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 14:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751381246; cv=fail; b=WcGnE+gz/G2XhA0OTkMyWklU2SxT+WIuJUg7wTPDfUG8yS+az97DiAZJVIbxjuwE1SnrfF4Yarme6DSbU7tApnfPH5ng1NuE0Ro4BwUD5C1oNm1yYkTxO93ewX081c/9n+y1E6Zk+85PqsFD7eegRQW1/ftiZMk6Jc9/KVD61P0=
+	t=1751381265; cv=fail; b=b9y3/Ks14Z7e9xZZgK7A0kaNsStHwu6G6n+vqkeHU8ICt1wzix9ZB149tcTNGVYg/Z+3zXEzL8eDDec1PbF+PUo3GiGb15ijUXCIxm6UhGB9mBxegrOnxvG7nEwE9m3gRrk9pv9ioaJaEwG35TUoIW4H9SH/uX5Mh5sQ0aZfQ3M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751381246; c=relaxed/simple;
-	bh=Vkc4V6CJAESZRZrmf/JLUMsGYfJaFHZmxGwYXxvPS0w=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AXtpuqp4ckBf1R8En7Z4aonQAH7G47CgHo+47aT3Trv12GRysUwRx4cT7u3gXvU6NIFVVnkSr/S2i9buby/CxSMxM02nWUPYQO10ZpYvzmkxq3TQXIYIwfeUGildSSiPBGXedL7kdEIPht5GAELxthjmOVMeXSHUt+bBu7pWm1U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=b9BpxOIS; arc=fail smtp.client-ip=52.101.66.16
+	s=arc-20240116; t=1751381265; c=relaxed/simple;
+	bh=Gi1cUytfPRmek5X0tmKp7gPloW3XO0yPDYBxUiCWxpc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=quJpsmsDKmoYPnvVKsnSDSieV3q4F+R1ToEyN8oAKXLVl5l6gIu/jpTAXT3Xxq8MBncaGpKKzjWSsNW8KMo7az0HD4OIETTvBLY4PWN3ojF+dPBuye7/UofMefkN9ShRM2MyChJjTsQTrV2bK0AV9BWDjeMR/KkXnW+gWZnBtpg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=YFM6VW6r; arc=fail smtp.client-ip=52.101.65.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="b9BpxOIS"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="YFM6VW6r"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uqGXQXVZG8qN+zYF4RoCGOxMBugOMSwM0uvdJ8pEAEad9tfjmn4RbGkXFhPqWwoBG5cNyBDlwIUXtPuIn9vbvLQWL15sIVGMVjG9NZFqMznbqk+Leh2+JBECDsvGBOobVL270ZSKQF9p2pfWdX8I20HHYE8NUNBF8Y6fXkxZ6IfyfvRc4WbJ/fp9WCttB4r1OGHxeGBDvXGLqNe/5HeylsYN791LbrJsrpcbzmrnTRmIfHoVXNYMJOufalQNOPTC+WjhhKJyyOSnu9+RF+2CHDobSgMkGkjxirAUqSDRyjyOlPfn83HYNzoPzYyeZFxH/CBB0WQme1EuBSwzq4aKpg==
+ b=T/lF/ZVqzTFJodxgUfzQ6yegSD4UY6eM51uo0SrUeZt9XM4F6no6VCHvFiPbh7wfxbIO3boR+1O9Y3SvCB+3PsHT7C1YzTrbHuvedjWS6NqQTDj/vXZvd+CccKUJeRVIF3q3K8jY0DJTzQdZ2qvPJiDmbPKUqXR7/b9V9V/258O4fOHZ8cs5Hhg5H6AdpwTSBmVIMykC1XN8yFTnXUmM1cbK6c2nqliJQ4DI2ZYe0G4t3ZrpaHYCuG0LvygFABlbqV7dUi1oqhkKrq9DoFIQwkMT8ATwOm+jnaxAOEmjtol0itr3u6E7+2qfIq6GvZsKzslqLr7yYqXwQ+VBdAI2Aw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MPpCiXMUcyq+yYShkdP6P8Vknfq4MjKoIwmmmETaOrk=;
- b=sDds16lNetlMpKpI7Wc0NDxha7+h8VL9+d4cGPEYAzRpplV1P/m2msJkufjntcXjldfcHdzLcwhaCar8vDcrqxSnbrgnnNt6H9qweV1aTfBgqeM1LE17IiECm49holgiywI8ee09qfIRnB3R9rey06gqe1JFTE/m6sgMV0ziX3vOe+0+QP5devLGj/1yU7h+8YOxj8MPzjI1iP3GsbkO27IhAF9PGb4TRwTZ9Nu6EORTJTYufgtL9DGkBBL7VvGk4oD69lqYuQTnntpLEsi8g32pQPtc0L3jddD+OgHaJmyYhtUDcUTlxsaz0hIxsppLK9oMUSzoQJ4mhiwl+TNLJw==
+ bh=zdqN2fefsmXGtz6Om4HGKWjyvUOg9D+NnI1pxZdwRTs=;
+ b=nah9gDKuTVLB7gQ8/dXJKNwTeJAM7rjtjUTgy8CVegazEAUwArRv4RE8t1l0XLT2lU2jnsG92EpH0s7Ddjk8SO4gNd4TrIYM5A0rVVsiBOukAtTkjp98GO314BmjFivMYQJ4iAvUnnlD+i3W7stD8/O4WZoH72HdFOoyqbdUGiQU1dYb7itwm/kZ3EbKUqm3QD+YjpmwHiGClf9iUS+/rsYq3O6myGWGv7LqMY5XEUa7rO+q2BwGUK1UJLyNiXOVsKqh3dHGizy/TrQjnmAlUIsZIdaBIbofS3JlYSXE0gJX940LZFYuNtDgIA8aDobRU+paLyWDhe1eZnfKWbGxOA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MPpCiXMUcyq+yYShkdP6P8Vknfq4MjKoIwmmmETaOrk=;
- b=b9BpxOISmfjJlTV+TgenSjm74t+pa9rw87GRT11JSauaMxeMXyIIhXBS3v1Ib/l84hECJVupBBX5uuR8DncqBwRxsxpDCSWBVBMBhbrJgPkdTLGRsWL5YgyCw33bXRwpHtUR3Fd9g9VJ/vUfCofdm/8RDubgNfyoVAHl11WvJk8=
-Received: from PR3P195CA0021.EURP195.PROD.OUTLOOK.COM (2603:10a6:102:b6::26)
- by PA4PR03MB8246.eurprd03.prod.outlook.com (2603:10a6:102:26f::11) with
+ bh=zdqN2fefsmXGtz6Om4HGKWjyvUOg9D+NnI1pxZdwRTs=;
+ b=YFM6VW6rV2Gz+RqlFCCr8lL4axf78tM1nfOd69gd5FPxcUq8dTtfkzqa3PWTWYDSiFylD7/qf6L5LCozaM6oo4Hyer99uPvdbdlpoxRWXw6AM5B2M3rjaAQkfaqR2+LzKylQFtTlgZTlyPSIOaA67Vml9WjDiF8aYMvdSrtcjdU=
+Received: from PA7P264CA0517.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:3db::27)
+ by AM9PR03MB7646.eurprd03.prod.outlook.com (2603:10a6:20b:413::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.19; Tue, 1 Jul
- 2025 14:47:18 +0000
-Received: from AM4PEPF00025F99.EURPRD83.prod.outlook.com
- (2603:10a6:102:b6:cafe::af) by PR3P195CA0021.outlook.office365.com
- (2603:10a6:102:b6::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.32; Tue, 1 Jul
+ 2025 14:47:38 +0000
+Received: from AM4PEPF00025F97.EURPRD83.prod.outlook.com
+ (2603:10a6:102:3db:cafe::e1) by PA7P264CA0517.outlook.office365.com
+ (2603:10a6:102:3db::27) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.19 via Frontend Transport; Tue,
- 1 Jul 2025 14:47:18 +0000
+ 1 Jul 2025 14:47:38 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -47,21 +48,23 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- AM4PEPF00025F99.mail.protection.outlook.com (10.167.16.8) with Microsoft SMTP
+ AM4PEPF00025F97.mail.protection.outlook.com (10.167.16.6) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.1 via Frontend Transport; Tue, 1 Jul 2025 14:47:17 +0000
+ 15.20.8922.1 via Frontend Transport; Tue, 1 Jul 2025 14:47:37 +0000
 Received: from N9W6SW14.arri.de (10.30.5.30) by mta.arri.de (10.10.18.5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Tue, 1 Jul
- 2025 16:47:17 +0200
+ 2025 16:47:37 +0200
 From: Christian Eggers <ceggers@arri.de>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Brian Gix <brian.gix@gmail.com>, Inga Stotland <inga.stotland@gmail.com>,
 	Christian Eggers <ceggers@arri.de>
-Subject: [RFC PATCH BlueZ 0/4] Initial support for GATT Proxy Service
-Date: Tue, 1 Jul 2025 16:22:19 +0200
-Message-ID: <20250701144647.19572-2-ceggers@arri.de>
+Subject: [RFC PATCH BlueZ 1/4] mesh: acceptor: increase interval for unprovisioned device beacon
+Date: Tue, 1 Jul 2025 16:22:21 +0200
+Message-ID: <20250701144647.19572-4-ceggers@arri.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250701144647.19572-2-ceggers@arri.de>
+References: <20250701144647.19572-2-ceggers@arri.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,85 +75,78 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00025F99:EE_|PA4PR03MB8246:EE_
-X-MS-Office365-Filtering-Correlation-Id: 64000f35-5f32-47ad-dfc6-08ddb8ae2ce4
+X-MS-TrafficTypeDiagnostic: AM4PEPF00025F97:EE_|AM9PR03MB7646:EE_
+X-MS-Office365-Filtering-Correlation-Id: 105bc071-a0fa-444c-4c66-08ddb8ae3910
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?juQSIGb6DNaI684vCNPSsJMk9FkTijOVai4fZdd5zqvNr3X1bYwxYoD0aDN4?=
- =?us-ascii?Q?Ukp4rByA3Jwke7cayS9q8fP0ocHp7Y1cVuUKR/nu1usdE1z013vo9FI5HzEt?=
- =?us-ascii?Q?UvG41aqGeyAz+L5JlVHTizLfzHYmID7kUxREJxc4w3f9uJFfr+HKj4Yw5vqG?=
- =?us-ascii?Q?BeWsWDVRIJZYW1TBxDanbOxN2Erf1qZjGurRsvC2C+jzFD70FCAuFmOsOnCh?=
- =?us-ascii?Q?9BPAEDWUalDwKLa4yG/+nQbRjfwzyYLXXPlgVm4Mcgpuu6rebz11AogegyEJ?=
- =?us-ascii?Q?xvocSQCtisieG0fVcXTY8/8oAKRyYQt9ucu5t8Ow67A+TpCd4ntJbkqkFwQx?=
- =?us-ascii?Q?4Zdk0YVAtdMzq0ljVA9BqCyPGlmq7kX69F0EETeGaWQVllzM1gGM2FK+W+qz?=
- =?us-ascii?Q?PWdpOaoDKJiLOkSGBWUc9FSLaC5/FdLx8RhCA2KN3nb3hM3TXKWY9ghfZwzF?=
- =?us-ascii?Q?VBw8QztfhNGVShInITibvxm5bgMRzAs9nrtPQfUJsjb96BNu2/HnKOBsbxYx?=
- =?us-ascii?Q?brD0IzqwbBwxEtX9B7ZWX4XGyLsNmyq8vnWB7qz1VbTpFSs5V3g3On/W10aX?=
- =?us-ascii?Q?bjwTddpWRE8oEjO/H6kBvHDL2csQtL+aFw9wtoiZDSL6gTgxQ0ck2gFHRtr6?=
- =?us-ascii?Q?mXAWhfQq6rZhAR7QgwzmZLibuXP1W6kOXIDpnAf0g0Fqxe81ucxW07QxFChm?=
- =?us-ascii?Q?GKjULGAAtz/rJyi1K6BIW24avkT7KXYNf47nOeV2Rllv3bfsswb05WgY+pjq?=
- =?us-ascii?Q?A2yOo/TwFhROsAp9gSt1x0d6xaqhHqZ0PbIUFfWitcINdvlSezICCxEwgLgO?=
- =?us-ascii?Q?ozeLijRBT/ITXpp92o8KPmLorQFFAY/sLSA9Z0tt6ELzExJzAQHxFbbNMR2l?=
- =?us-ascii?Q?gRHu0CauD3XItk9cEOXCyqGaSkhljm1BVkD+raI2wF6KdLGP5aTkb7UClxP7?=
- =?us-ascii?Q?UdNVSL/cqGG43bB8gO5ax5+sH1CGTkJ2BDixEquZcfGQ4bzP3RKwPMxtYuuT?=
- =?us-ascii?Q?OwYuussc6tANJr43uROLuI0ziIZ707isD2AicOwRurItk5swKROMjgXJQhmx?=
- =?us-ascii?Q?gAixJjomg44C44JJiA+djjw6rTn6Kpr8EIbgKUSctQAPW9Fc0cplKHXGlulJ?=
- =?us-ascii?Q?yCdlcxjnp2nlQ3sNd9qDTORE7H9kTPlq90una4cxFZFEA66vu0qe/+2ikOMt?=
- =?us-ascii?Q?eCH+JtJ91Oi/TvspI40775WRMa73FbtvLdBuhyQqcJebmKp6L9RAJmcELRpz?=
- =?us-ascii?Q?qEMg8eV1A8rdw9an48Or0yYRng8Pw931wBxIz7bx2LaoAl/qQQpb9qvNcGtB?=
- =?us-ascii?Q?3ld3EZNiDl9mOmTe8ygTfAZ918f04TpRlSXiScu49y0aY2WWUuZxlu4SZ5yS?=
- =?us-ascii?Q?ALVBMAUdrYSvOnmWr4mi/XzU3dPks5dViHEkTfb2MrkLeoZ838VUxZJw8lgC?=
- =?us-ascii?Q?h731br3DQPmu5LetQiW9iCmj5owODK9l0RA9FUM4+d3ueP6zssZOFrjYkKNB?=
- =?us-ascii?Q?C1CEuz5rBvIexW/Y5n7hgnc7HsQrIWz41gXz?=
+	=?us-ascii?Q?/gEfY+NvvwX0BwLSEWdjYA5a8WZuCXJpQeaDqgHjVMdRzpQQAZCWNo0FH6gI?=
+ =?us-ascii?Q?XzvBS/Dr6kwDK8zvbxKMPK9mCWId2hAN7ULxFb0MQ3SawBcCdReCA6pnPw5z?=
+ =?us-ascii?Q?3g4TXTUNUEQkTG4YhaclF0b2R6a+ZxAmDHtn6nvves5etFaL3Z7Tmb0mnSGc?=
+ =?us-ascii?Q?wDdDTVxQJTJDHW7ZUI23ifpTBew1PhwY8HStoCwHgu1/sHDnZ7wpWUNaPFG4?=
+ =?us-ascii?Q?nLx77OqQrIDsldqgjT6qfHY2aX++CE1WxiwrzUs0HTbtEoGs+BBwXsJl3iYA?=
+ =?us-ascii?Q?glJKHGh+BMK8Di+Vy9KIUqO0zkDJ8jJmMO/60ezsKi8XG5poJzd65wtw5xl6?=
+ =?us-ascii?Q?RmTSkgmahIi348/qez7CKD37c7jWJItpLccMM3LR+dhEbO+pDHXYsyhc+BNf?=
+ =?us-ascii?Q?XsyV/aOJ8h4Ho1qDyLP/MpjyuXKcE0xbnb1UzKyFY1AXPBy6EIWRoms/aYzO?=
+ =?us-ascii?Q?nvjS/HjRuqLvoxYrJq58+KSwDAJgr+IUHcsMH1D1eEE8q0nIzVGm4mrkIE8a?=
+ =?us-ascii?Q?ibN3Tse5XxkNvj8T6xJ7XWJ7Z4l6DkVukWVLFlWP2jnTkFigyGK293vjbYT1?=
+ =?us-ascii?Q?V9cXepaKxDQIRQtnUwH1xOUa02yDIlPvK800YHM8MP0+S52Li+UIn/yV1Qh4?=
+ =?us-ascii?Q?LzoBBgTJoKFObASFpU5q4QmFpYf02J9lb4VMOuTKuZdLXVdQsI9nWMBb/1Xx?=
+ =?us-ascii?Q?UlqixKKwZ1UTqlgRbd6n5CjCHTt2mLvt7DRi9lLBi//tpbsypignBhpZbZqK?=
+ =?us-ascii?Q?Cpgor4n7zsDEk4M5/QEZ/qvAHuSZ+1wh2YWiOXjvc9Yg/3FUYthHXnfnK2cQ?=
+ =?us-ascii?Q?oFBGdwSBitd8boBkV5MrffcPYmsOtlenZ44Y0CYQCkr14kShLxWQ0giwfWMN?=
+ =?us-ascii?Q?rZj04MfhCjZ0kIRVJNvYRWDYF2BKoxMBZn88taKE8QWiYiqu/hUo2Oy0IEqq?=
+ =?us-ascii?Q?usak6Ew7olKZp/j3gc+WPMH2qvklA8stu26OuNlMEtq1QUg1SYopsGqCKLlo?=
+ =?us-ascii?Q?tPglTfy+waBNs5ZXlTiVlVFkdk+AaoJQjqMkVmXoO4BlKHLo+SmEUuJIbde0?=
+ =?us-ascii?Q?f6P/4QPA6aNhjOcH+369DlkSolf5VgId+ibVDQ4c2GNWZrcYK9eWcsOpSFnz?=
+ =?us-ascii?Q?l2EgAcfA+4DD+m9AcKhmZEafDrF8GQJaE6ZVL2zGmTOsSOFp6umy7VbKJqPc?=
+ =?us-ascii?Q?n6J+d3oPz9PzhSwv2iJd027aHrC7P+KBaOoBK0F0MdDweqNfVGBdaS++BGpd?=
+ =?us-ascii?Q?JxJNMI3RfB3g/b7mHdW7P989MWsVsiDKK5rLKau8gpLUj0B7EqFzRUIeYtx9?=
+ =?us-ascii?Q?fuvQQ7e6GSCIb8P3poiHk76vQbW5aOhKCpUAUC9V0ce2kd/W0NGc+GUSSADZ?=
+ =?us-ascii?Q?ihlCEOH0N0REajAVtg3MdIDnBVIxRcjYerLC+x4ifxjxGULdopJIhNdg23vC?=
+ =?us-ascii?Q?m2gan44DOMy5qJevV+HvnJW0jKg5cmET3t8tAsHc4gF/LEOIbjpWzS+2/OMI?=
+ =?us-ascii?Q?ZRJEtUVrrV63HWRaGDGdGlGOdrrlVTIjMT/f?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 14:47:17.3088
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 14:47:37.7288
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64000f35-5f32-47ad-dfc6-08ddb8ae2ce4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 105bc071-a0fa-444c-4c66-08ddb8ae3910
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F99.EURPRD83.prod.outlook.com
+	AM4PEPF00025F97.EURPRD83.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR03MB8246
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB7646
 
-This series adds initial support for the GATT Proxy Service feature.
-This allows provision and management of MESH devices from mobile phones.
+I cannot find a specific interval for sending unprovisioned device
+beacons in MshPRT_v1.1, section 3.10.2/5.2.1. The current interval of
+500 ms seems to cause interferience with normal advertising messages,
+maybe this is controller dependent (seen on RTL8761BU).
 
-Before continuing, I would be happy to get some feedback about this initial
-part (and about what has to be done in order to mainline it). Any help for 
-doing the missing features (e.g. relaying between GATT and ADV) would be 
-highly appreciated.
+A beacon interval of 1000 ms should be sufficient for scanning (e.g. by
+a provisioner) while allowing normal advertising messages to be
+transmitted.
+---
+ mesh/prov-acceptor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-What seems to work:
-- Provisioning from another Linux computer via meshctl (sometimes I need
-  to repeatedly enter 'discover-unprovisioned on' and 'provision <uuid>'
-  if it doesn't work on the first try).
-- Reading the composition (composition-get in meshctl). It looks like
-  meshctl tries to connect to the GATT Proxy Service automatically after
-  provisioning, but I have to enter 'connect' several times in order to
-  get a connection. You also need to manually set the target unicast
-  address ('target' command in 'config' menu).
-- Adding extra network keys (Advertising for GATT Proxy Service cycles
-  between different network ids every 3 seconds).
-- Transferring and binding of application keys.
-- Using the OnOff client in meshctl (you again have to set the unicast
-  address in the 'onoff' menu).
-- Provisioning and configuration of an OnOff device from iOS (using
-  the SMART+ app from Ledvance). This app requires at least basic
-  support for proxy configuration messages (patch 4/4).
+diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+index 27d4964316b3..78304515ed16 100644
+--- a/mesh/prov-acceptor.c
++++ b/mesh/prov-acceptor.c
+@@ -793,7 +793,7 @@ bool acceptor_start(uint8_t num_ele, uint8_t *uuid,
+ 		memcpy(beacon + 2, uuid, 16);
+ 
+ 		/* Infinitely Beacon until Canceled, or Provisioning Starts */
+-		result = mesh_send_pkt(0, 500, beacon, len);
++		result = mesh_send_pkt(0, 1000, beacon, len);
+ 
+ 		if (!result)
+ 			goto error_fail;
+-- 
+2.43.0
 
-What maybe added later:
-- Proper selection of the output interface (GATT vs. ADV) when sending
-  messages.
-- Relaying of network messages / beacons between GATT and ADV
-  interfaces (in order to access further devices via the proxy).
-
-Note: I don't use the test-join script, because python3-pygobject is
-(currently) not available on my (embedded) system. Instead, I use a
-custom C++ program for the 'Join' and 'Attach' D-Bus calls.
