@@ -1,235 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12F11E51EB;
-	Tue,  1 Jul 2025 07:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A602626CE10
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jul 2025 08:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751356588; cv=none; b=NNhoCnpfRuAVpHOpRP1CiWSe4Kw80b6wJ1deuZf660gC/OttZvSgsWj8sohGmhb4yxiRh5tdPHIkcSb2fv9rf7/x2Bg8eQfR1NoXNizlMdUGFy0jJ0mqVOSwd26xLUJB1VfXKuEMane6lg2LIt2VpBrBuoPYReUy7Sr2yZ4nCmw=
+	t=1751359269; cv=none; b=XGVYlfhKwLW+qbkaPejn4h7uvudms6lbc5SYxgn4h1FwKwWRGX8qAh/iFfydrfLTy7dRpxMIZ98kx5ZjxxOgSEAb1R/sgbn0YSRV73TeEs/xfFGp7j6VAR16Hr2iIfbuPZIBtBByp2apoUgJ6idqgOR3U87ccl/Ikq9p7vVkcts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751356588; c=relaxed/simple;
-	bh=ghofPNa9c7NhRKlEjAFogqLFD2G4KZ+5gCkEvh+/XdM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tKNV/cSi59YM05l8hdncp5KzEWtRVh2eaonSa2EUAAsddPu0aOpUX0K/cxzaUUNbyNDmBl9apLdL/WDbx9hiCp7JAxKUf1OdDNvtsCvTqED9xIH99KU6gWs2Fxkfe2xL4pIn4qyfBEyO9JzlrvdWFgAERtI/O7JdcyPa0eyC+aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GX5gZq/c; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751359269; c=relaxed/simple;
+	bh=gXobPw5+U23vDGPPYCVp8Vr+kYuMWxJQesksIOfr354=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=IR1WfaG3lqEwC0o09zG0XziWX85aRBb4W8qzv5oN/aO1vazvF6hYPicX97oXXSDG3GQ7cwKybVPTFO4QXqvv7ELeD7vaxzcIsItsgKmzZzUCAYr5NVCtHRP9xf1vb+2MC5xtclvrvreXZnBtFdYITZ1yjPFr0RJQKlY8hY55h0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WglDK1nv; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GX5gZq/c"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E120C4CEEB;
-	Tue,  1 Jul 2025 07:56:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751356587;
-	bh=ghofPNa9c7NhRKlEjAFogqLFD2G4KZ+5gCkEvh+/XdM=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=GX5gZq/cvzr4VxiKPHcdYjUdRTPMkH9s4cG/QsZZh/iU5+7yA+MfoaVxrjXuca445
-	 N/ArwdXAsa3mJVb2lFRg9+FVmQ6IOSIeP1pkb4bX6GHafbA17zXKOd29TK0980ao+j
-	 dwF7bvCeiWv4owruDCLhG6FLGITwiSzDhbFZ4totwBOhJf35tpbNjR+6HauJ6ZlP3e
-	 ENDkvkKKjjZkhEIuF1ylQigXa9sALarmI6Jvwg3RX/z6oyY8GwiDjYYMV8BCHOI8rP
-	 d7bFNZCUpAqdaHZWxXDO4l6GVaN3z/OrL5SwJv+BA1MCO2Y/j6oTyD1A71rr44DlXB
-	 RNK5vvmruRlVg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 683C2C83038;
-	Tue,  1 Jul 2025 07:56:27 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Tue, 01 Jul 2025 15:56:22 +0800
-Subject: [PATCH v4] Bluetooth: hci_event: Add support for handling LE BIG
- Sync Lost event
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WglDK1nv"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313bb9b2f5bso5642003a91.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jul 2025 01:41:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751359267; x=1751964067; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OWT/z68nTZ3hey4v0wjyqeZRlgZcygDuULMd+56HEnA=;
+        b=WglDK1nvTEmMDMAjGKZOuPjUPsbGtD4SrZCPOtToYUamF7lfYxku3lH1vpQkpU0nuR
+         MdAH9s4huWOZVEzA9SQwf8zNml8NyPi3V98wcMS6I6xD69iTrw/LRueiEZYNfaE2JsMF
+         5jvOaJFY5mTYjvwiEYuibPmAn31FgAR7XLgiHiEAKeKCO2RD86+7EAYhI9NS94cndFdf
+         5z3lUzdNAtNaXMZ3Y45V+PQL5h4524+NCmMO4GWSXa7SOA+I/+qQUnG6xdvArsXT3rUp
+         3UWJrCwCfMB6xLvwJkc9XrgTkDNbc+o7Ks98IyxHkxna6w9cOwYYiEf487g6osy505L8
+         iuPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751359267; x=1751964067;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OWT/z68nTZ3hey4v0wjyqeZRlgZcygDuULMd+56HEnA=;
+        b=vdfTjjMSfKOaFTBGcEc9Va94LNKMGr0VmGwRv24Thq9gol3VOz3OkeDnJg1Gq4ceMV
+         QZMlp1VqbACVzubyLxNzn9PF1skG28/El5K68m2obLIjsfTbNjyLmSNA3kQ6DFKhbQxX
+         aIP41ecr2WuwGTnSo1kdzLYChnju+W2L3iRNL2hnxYV6j3B/rU00mRHBcaR/eAHmz2al
+         l/YGyjT845BAf1S0LZsXzufX1uSjnhrObv8zsAqWzHJqvzv7dyEPB4pmcGSEfoXsIOTl
+         Z+I64Qr0Ock6vIS1mkDjgYGVCh9xrRB9x+QW37cI/IzfiSlOzfQApP3hpoTl/+ooZLvp
+         YGIw==
+X-Gm-Message-State: AOJu0YxIT+7XuIopRIv+ULzjLwZaIwcuQfaFOCCMWZPyx5L+c7s5rKks
+	A+Aph/Cn0+86EXwxHsWa0fgsyUrUsM4RgDmzoluALnhT6Dsjizg7P03XN+yOvA==
+X-Gm-Gg: ASbGncuKk8tw91F4OVKfFlqR6Eas/61ZS68IPzaOK8hAV7l2YtPk3jQxRYreyuWmmg6
+	c+GzqizYbMH+XIR0tdF7G2LayuzjVmCAjTpjaF+1tghRG40paAOtGJ3niLkJ/x30gCij6kISLj6
+	GU9zKEeEFf81bQrB5co/JvVU9/S9WR/ET7exhi7YmClrklvgHL6Hi+F1JEYJzj8RqXmuu3Ul4F3
+	OevhmnLO7t4eFiWKNFs0+s1HltgPIJhUK9RwfY1mmyQZbjafO09VK9L+NKYaQWE9FmSEmVK3dvE
+	ZtI7uAxAd/I2VKX/YLIv8QDDKr1vzxffLa8ZxQzb67RZj9p2ZXmWrEaesY4iQz0A3VEt
+X-Google-Smtp-Source: AGHT+IG5ItW2fVn7rIGxySnlT/DiSEfKVftFzMgtSFeBaLHThMdMUKbaQ2zYQNO8DZOtWVHKpMaHoA==
+X-Received: by 2002:a17:90b:4f4b:b0:311:f05b:86a5 with SMTP id 98e67ed59e1d1-318c8ce555fmr28631182a91.0.1751359266537;
+        Tue, 01 Jul 2025 01:41:06 -0700 (PDT)
+Received: from [172.17.0.2] ([20.43.247.174])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f5426bfbsm15213936a91.24.2025.07.01.01.41.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Jul 2025 01:41:06 -0700 (PDT)
+Message-ID: <68639f22.170a0220.14b53b.67fe@mx.google.com>
+Date: Tue, 01 Jul 2025 01:41:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8743996257013293323=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, yang.li@amlogic.com
+Subject: RE: [v4] Bluetooth: hci_event: Add support for handling LE BIG Sync Lost event
+In-Reply-To: <20250701-handle_big_sync_lost_event-v4-1-f0ed2d77c203@amlogic.com>
+References: <20250701-handle_big_sync_lost_event-v4-1-f0ed2d77c203@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8743996257013293323==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250701-handle_big_sync_lost_event-v4-1-f0ed2d77c203@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAKWUY2gC/33NSwrCMBSF4a1IxkaSm0fVkfsQKfHmtgZqI00JF
- unejeJAETr8z+A7D5ZoCJTYfvVgA+WQQuxL6PWK4cX1LfHgSzMQYISVwMvoO6rPoa3T1GPdxTT
- WlKkfucbKo9VqJxywAtwGasL9jR9PpS8hjXGY3l9ZvtYPC3qJzZJLjgqQVOW9debgrl1sA24wX
- tkLzvCNmUUMCraVjbRKmMqB/MfUF6bEIqYK5jQ25txYwi38YvM8PwGJKgjOYAEAAA==
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1751356584; l=5953;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=g1GzVxQHwngpNT6ZeSBkKOq4Yr48SHOPUOISO/Exh7Q=;
- b=ASkTPKkn++TcIRapJtQuWCDLKYl2l9dJb5WEnxeK+okAqqmcRmHx7mNDDUc3Momz96l5ZRNpA
- Ozxtcq8WMOXDtCmkgbyGUw2/yOEVo7SNeTI223Rr6SGik+lbrM/+k8X
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+This is automated email and please do not reply to this email!
 
-When the BIS source stops, the controller sends an LE BIG Sync Lost
-event (subevent 0x1E). Currently, this event is not handled, causing
-the BIS stream to remain active in BlueZ and preventing recovery.
+Dear submitter,
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Changes in v4:
-- Rebase the code and improve it
-- Link to v3: https://lore.kernel.org/r/20250630-handle_big_sync_lost_event-v3-1-a4cf5bf6ec82@amlogic.com
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=977610
 
-Changes in v3:
-- Delete the PA sync connection separately.
-- Add state and role check when lookup BIS connections
-- Link to v2: https://lore.kernel.org/r/20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com
+---Test result---
 
-Changes in v2:
-- Matching the BIG handle is required when looking up a BIG connection.
-- Use ev->reason to determine the cause of disconnection.
-- Call hci_conn_del after hci_disconnect_cfm to remove the connection entry
-- Delete the big connection
-- Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com
----
- include/net/bluetooth/hci.h      |  6 ++++++
- include/net/bluetooth/hci_core.h |  8 +++++---
- net/bluetooth/hci_conn.c         |  3 ++-
- net/bluetooth/hci_event.c        | 38 +++++++++++++++++++++++++++++++++++++-
- 4 files changed, 50 insertions(+), 5 deletions(-)
+Test Summary:
+CheckPatch                    PENDING   0.34 seconds
+GitLint                       PENDING   0.36 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      24.59 seconds
+CheckAllWarning               PASS      26.87 seconds
+CheckSparse                   WARNING   30.62 seconds
+BuildKernel32                 PASS      24.37 seconds
+TestRunnerSetup               PASS      476.04 seconds
+TestRunner_l2cap-tester       PASS      25.32 seconds
+TestRunner_iso-tester         FAIL      42.08 seconds
+TestRunner_bnep-tester        PASS      5.94 seconds
+TestRunner_mgmt-tester        PASS      132.49 seconds
+TestRunner_rfcomm-tester      PASS      9.38 seconds
+TestRunner_sco-tester         PASS      15.08 seconds
+TestRunner_ioctl-tester       PASS      10.08 seconds
+TestRunner_mesh-tester        FAIL      11.41 seconds
+TestRunner_smp-tester         PASS      8.67 seconds
+TestRunner_userchan-tester    PASS      6.28 seconds
+IncrementalBuild              PENDING   0.90 seconds
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 82cbd54443ac..48389a64accb 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
- 	__le16  bis[];
- } __packed;
- 
-+#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
-+struct hci_evt_le_big_sync_lost {
-+	__u8    handle;
-+	__u8    reason;
-+} __packed;
-+
- #define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
- struct hci_evt_le_big_info_adv_report {
- 	__le16  sync_handle;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b47c74080b9e..d555042fc39c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1342,7 +1342,8 @@ hci_conn_hash_lookup_big_sync_pend(struct hci_dev *hdev,
- }
- 
- static inline struct hci_conn *
--hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16 state)
-+hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,
-+			       __u16 state, __u8 role)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
- 	struct hci_conn  *c;
-@@ -1350,8 +1351,9 @@ hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16 state)
- 	rcu_read_lock();
- 
- 	list_for_each_entry_rcu(c, &h->list, list) {
--		if (c->type != BIS_LINK || bacmp(&c->dst, BDADDR_ANY) ||
--		    c->state != state)
-+		if (c->type != BIS_LINK ||
-+			c->state != state ||
-+			c->role != role)
- 			continue;
- 
- 		if (handle == c->iso_qos.bcast.big) {
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4f379184df5b..6bb1ab42db39 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2146,7 +2146,8 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
- 	struct hci_link *link;
- 
- 	/* Look for any BIS that is open for rebinding */
--	conn = hci_conn_hash_lookup_big_state(hdev, qos->bcast.big, BT_OPEN);
-+	conn = hci_conn_hash_lookup_big_state(hdev, qos->bcast.big,
-+					     BT_OPEN, HCI_ROLE_MASTER);
- 	if (conn) {
- 		memcpy(qos, &conn->iso_qos, sizeof(*qos));
- 		conn->state = BT_CONNECTED;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a66013418488..c1c870c19e13 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3869,6 +3869,8 @@ static u8 hci_cc_le_setup_iso_path(struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
-+	conn->state = BT_CONNECTED;
-+
- 	switch (cp->direction) {
- 	/* Input (Host to Controller) */
- 	case 0x00:
-@@ -6877,7 +6879,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	/* Connect all BISes that are bound to the BIG */
- 	while ((conn = hci_conn_hash_lookup_big_state(hdev, ev->handle,
--						      BT_BOUND))) {
-+					BT_BOUND, HCI_ROLE_MASTER))) {
- 		if (ev->status) {
- 			hci_connect_cfm(conn, ev->status);
- 			hci_conn_del(conn);
-@@ -6993,6 +6995,35 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
-+				     struct sk_buff *skb)
-+{
-+	struct hci_evt_le_big_sync_lost *ev = data;
-+	struct hci_conn *bis, *conn;
-+
-+	bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
-+
-+	hci_dev_lock(hdev);
-+
-+	/* Delete the pa sync connection */
-+	bis = hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->handle);
-+	if (bis) {
-+		conn = hci_conn_hash_lookup_pa_sync_handle(hdev, bis->sync_handle);
-+		if (conn)
-+			hci_conn_del(conn);
-+	}
-+
-+	/* Delete each bis connection */
-+	while ((bis = hci_conn_hash_lookup_big_state(hdev, ev->handle,
-+						BT_CONNECTED, HCI_ROLE_SLAVE))) {
-+		clear_bit(HCI_CONN_BIG_SYNC, &bis->flags);
-+		hci_disconn_cfm(bis, ev->reason);
-+		hci_conn_del(bis);
-+	}
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
- 					   struct sk_buff *skb)
- {
-@@ -7116,6 +7147,11 @@ static const struct hci_le_ev {
- 		     hci_le_big_sync_established_evt,
- 		     sizeof(struct hci_evt_le_big_sync_estabilished),
- 		     HCI_MAX_EVENT_SIZE),
-+	/* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
-+	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
-+		     hci_le_big_sync_lost_evt,
-+		     sizeof(struct hci_evt_le_big_sync_lost),
-+		     HCI_MAX_EVENT_SIZE),
- 	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
- 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
- 		     hci_le_big_info_adv_report_evt,
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+No test result found
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.906 seconds
+Mesh - Send cancel - 2                               Timed out    2.002 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
-base-commit: 2a0ae2f6cd36497496b71b83b1af55e8eb5a799b
-change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
+Regards,
+Linux Bluetooth
 
 
+--===============8743996257013293323==--
