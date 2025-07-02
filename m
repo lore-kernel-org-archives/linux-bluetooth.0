@@ -1,35 +1,35 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5334E2F50B2
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 17:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEEF2F50B2
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 17:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751477570; cv=none; b=oPdSlW7H7aD5qmCEfgWaa7wyjGfB/he5/6QKoNebckUIwwIl+qbey494TnG3uiIXq+XVgXCoNszSmFl1SsS1vAhTYiEIWlR3ZhbHINXoaiUYWxMOeSeW2ixRz8YHkPFlYuDVlQIOyjJhmw1EBFGhp2a5zNsUjjI5JFsCifwoQ6k=
+	t=1751477622; cv=none; b=fK18ZEIVacemjt9Vr+Sog+FJka8bfKDc3o7/mkZp+O6kT+KaDB/4vEHl730SjDe2rp7iYvjQzFRAu5XX61xrQwnHxznc9+gbWTsGYdvErJvDFT2tp31VE9b9vt4DiSCuBtKmQo3MCrjtsUFPSiwMIpeiT89Ic0x8EOdlQYNtO3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751477570; c=relaxed/simple;
-	bh=xX+5skLSCXI9D7+oacXhsc5Erv7fAUId07G1tp9chqI=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=YMP1ngV6/lEu46MEq2xi64Ybdy2Ihmmypg7qLrJbmCHanG3qEzd7H9SC9FuaBcuyfVesBPU/g788K4evboAEir029bP9oNj9AqrjyXJETsuCzNZIQz/BGra1bCHAMC9j0SnRuHZTYJ27qIFMYUcYPzFgJ4Hnj5Rua8rjL1o41pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DzY0zKzw; arc=none smtp.client-ip=192.30.252.200
+	s=arc-20240116; t=1751477622; c=relaxed/simple;
+	bh=eXr9HpSHFL8ej992uFQUmO+s1vs72jHr/HTASGK1atg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=LyCgqpkghoIde5DJbFS8lds5ZyKXpM87bQkv5/PkAA+GzixOK4jebigkz0Ufug5MyXeBORn8mYD1z8EB/bqI36xiHD+eEarEOzyYUxcnY4oivRVIEM/VxylPvIYIeTDvYVniEJg7LlJqgs4Sfl8FphKrvNN58xl8wPbrQnQb7/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=l9U+tIZX; arc=none smtp.client-ip=192.30.252.208
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DzY0zKzw"
-Received: from github.com (hubbernetes-node-02ad76b.va3-iad.github.net [10.48.174.52])
-	by smtp.github.com (Postfix) with ESMTPA id 810D74E0401
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 10:32:48 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="l9U+tIZX"
+Received: from github.com (hubbernetes-node-4dc9df4.ash1-iad.github.net [10.56.128.39])
+	by smtp.github.com (Postfix) with ESMTPA id 76206141256
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 10:33:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1751477568;
-	bh=Y5F12PHgya3tbDECJoXuIVsp/rdR8ow26gKHkw0J5/k=;
+	s=pf2023; t=1751477620;
+	bh=apc6G3kpw7Y9B0IUNScEHZG3EHQvtK6hSD7uf9sli88=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=DzY0zKzwhknw0bCQ5cPB9urrqVQ/MlvUD0noDAcIG8/U57h4dctSKo05N3VhNVDbU
-	 9LoBcUnZummVJ4jegdCNjKDjw6j6zegkY6G0kdjiBhqoVqDay/4+EOl/+1/thi5X9D
-	 irXymqESewst6C1Pf1txUmheB1QEAfGQvrdrAIQg=
-Date: Wed, 02 Jul 2025 10:32:48 -0700
-From: Christian Eggers <noreply@github.com>
+	b=l9U+tIZXY7YR6HhvDxQRYSECFXyY7HQE/rI0W9V3FPCgFLO7Q/8pbFZ7VAq3qeI6V
+	 bDxaM06xSwGHB2oayfxv8s9st3gMzW8SpfucRSeBZs6+VWdRw7enjMB4iaFAtedYEq
+	 uhJ+n8gTNP9F86z3vo9WQUCwxpFD9XkB7RS+hROo=
+Date: Wed, 02 Jul 2025 10:33:40 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/248a67-50fb90@github.com>
-Subject: [bluez/bluez] 90e229: advertising: client_remove: use concrete type
+Message-ID: <bluez/bluez/push/refs/heads/977745/e71481-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,39 +42,7 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/977745
   Home:   https://github.com/bluez/bluez
-  Commit: 90e2296ee45959d286c7520f51d163360fb7c387
-      https://github.com/bluez/bluez/commit/90e2296ee45959d286c7520f51d163360fb7c387
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-07-02 (Wed, 02 Jul 2025)
-
-  Changed paths:
-    M src/advertising.c
-
-  Log Message:
-  -----------
-  advertising: client_remove: use concrete type
-
-No need for using a void pointer here.
-
-
-  Commit: 50fb9042e1ad471115e21ed83daebae278594aa7
-      https://github.com/bluez/bluez/commit/50fb9042e1ad471115e21ed83daebae278594aa7
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2025-07-02 (Wed, 02 Jul 2025)
-
-  Changed paths:
-    M mesh/node.h
-
-  Log Message:
-  -----------
-  mesh: node: remove dead function declaration
-
-node_attach_io() has been removed in 7cdc215ff5a1 ("mesh: Add
-finalization of a newly created node")
-
-
-Compare: https://github.com/bluez/bluez/compare/248a671e5185...50fb9042e1ad
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
