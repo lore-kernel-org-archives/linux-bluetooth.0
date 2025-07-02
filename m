@@ -1,174 +1,99 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E0D2DCF54;
-	Wed,  2 Jul 2025 15:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751470273; cv=pass; b=kzoKNnkit66spH9W6TShud5VH11k4KwQyHEXr91YAgrF5I+LKWFWeFsSGFX6aKZpd2XRAB22JPsPQCQJbVSZpIngqw77iOV0Sb2+dTquoviEEKD+75ZhbeUzCRN+rG48HivVvWIFoCqnnTgPVaFqq2TMOniWMmYyg5Y/olhupy4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751470273; c=relaxed/simple;
-	bh=MPn4dwWS4SsgFUv2ktEgYlMmldSTWVa0DGbq8Yo9njs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U/Hu5pdoRc9WXhYJgWrhEJuA7MF7OA1D//qGG/5G69JC7bIzB4btGbCNmoCO9vM7bwgeu8WN0HRmwWjyVyVjhxa3dcViWHNyicrYwAde5qaQg5bJniLYLCyeFJ/2OvnQdl6lpUy+4h39kj3xfz9DTIXdEKzoWWQlj8T/CC41cTc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=qwCmYvbl; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB842F5460
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 16:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751473414; cv=none; b=RVgQUVChPlIzk1nGvshQt+Do1X0HjS0JwAHlqWXtR+VAttB+jKAV2693vPBrrxRY3xt1hs4N/FOmPc2EER/Ju3ZXn/6wSM0E6opfS+irT8rCP2hq6BrUzXVBf04wxpKLCwquWcWUqDraxyrSZpu9Z4a20C0C5651S4OlzmdU2Uw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751473414; c=relaxed/simple;
+	bh=y1ebhXQshilV4Q3ycoOro05ND0OGgLvp9P/TKKZTrFc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=eHe625YvKl/v/YsqpDDkL0Wrfmjaiw1rT7+uNlUw6EKJwICjZ5FRjYvqgw0M6RxqjEtvOdeqo1534fXZL9KOILdYlDuTJjCxJ3VP+2wOaXvjOWqwdvAYtX0wwxJVzSaq4zKq7J5DCDPBnJ68zkYU/GCaSNCQuvP+ujK3X/vNlmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aAMfyYgg; arc=none smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="qwCmYvbl"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bXNv66SDgz49Q1w;
-	Wed,  2 Jul 2025 18:22:58 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1751469781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=74URfcO5JqEqPB6bVC6qfZC838MIsWWJe/PpASUbCcg=;
-	b=qwCmYvblW1ha/yOsewISSpkENjgZG6kjiLfwgD0E+sVtnNzh7Zr2APWtQjd75KzRr4ENID
-	bREMQTMzIGyQq7GVpw0pWWqcKKMdAgslFC2A6NPz2cYwlBY6lQ+Z6XSyoG2bebOhh3hGbR
-	yzxJghasL1SVrZw0yElS2xcort6THfuzb0NWrF95KsPt01HEXhdNSluFnPci+PsrcU3jeg
-	CkTQKPb/sDydrKGVVGDFVxEvtxnYpTRD5pyrBHOLLY1c0Jv8IWsr/Oi1JFoSFuJRk64k6d
-	nxI5+9DuJrSsWWuw2EqbJ/GqWCZxaVeikWDhLI++PbAGa10N5/mIvIThj5dZqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1751469781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=74URfcO5JqEqPB6bVC6qfZC838MIsWWJe/PpASUbCcg=;
-	b=Bv+zQLY/uODqENaM6A+8FpHCZeTVMohTR+6yB6cacaQUKKREpAdN4s86urYViTDo+sYBgi
-	P1tFQrjn7ks7/8ZtC6i9GYh5r+X/CCUVubuWHEBi6zLdSYK2OLSWuIrue5GZ/iYgeQ+asE
-	/e5p9W6wrQbFlBd5RWDivSqEZCYpI2qpUyN7b36rcgnUWKa6V3GIcknISLH+iU9N4g5s3/
-	8mJRLrtS0Yhec1VZUbXs7U5WeZJwHVf6303Sj6Ifoa/qdBNg9CUTtCTRPq/O6qiBQqpgrA
-	RVr/N+EyUAdyEoUMX3hmWRD4JNUaWTs0ruomOJ/FwsrSI8S+T/o/u+ZhsiiTyQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1751469781; a=rsa-sha256;
-	cv=none;
-	b=Un44gB7xX3oHblb63J1ZUJcaxwh9h1IM/GXh/z3WacNRJoluk3xC/FZdg8sMXiWE3fKARu
-	rwMhFyPesxQWyabrE/grEPy3rW7F556dvD487yqFxyUN8AKFHOZQgoIjHgeWeNlxMFq1HP
-	IIQB+tI+B1ApF8GG+3L0yLiCl/Nel4TRfvLezNuMwf2Ea6QiMrMEHcuRn6k39rWnIbqql1
-	+ffCgM61X2xXFvdjV3GTZiDvx7s40ovSl4QX21Hz4fueFT36s4pWFJCxifa4SUbaR4mjbQ
-	0kfuv4T60XWlFAN45QjQ1MnOrOz6NtNiFzU40/C45S5XYpQSr6nkdrNfwxDoBg==
-Message-ID: <d6906cfb7fae090b9fe0c1c5b8708182eb939b42.camel@iki.fi>
-Subject: Re: [PATCH v2] Bluetooth: ISO: Support SOCK_RCVTSTAMP via CMSG for
- ISO sockets
-From: Pauli Virtanen <pav@iki.fi>
-To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>, Johan
- Hedberg	 <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>,  "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Date: Wed, 02 Jul 2025 18:22:56 +0300
-In-Reply-To: <20250702-iso_ts-v2-1-723d199c8068@amlogic.com>
-References: <20250702-iso_ts-v2-1-723d199c8068@amlogic.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aAMfyYgg"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-4e9a7b4a412so2988948137.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jul 2025 09:23:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751473410; x=1752078210; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tGadUCVwNNT8WE0o5GTKQ9Wt3rpRzQNy0qwMnAN7g8U=;
+        b=aAMfyYggYwU9wV5XEwvIKg9419jjSo7EUIITrHDap7WzaywL56bd3SKSn76F5fWduk
+         ssYTgezg4T17D73mr2bs8IDvxL7q30RAN+fLdtePlpNgz9V/321AvU0r6f6V3G5k37bn
+         dgqEw8b9r+kvbSK7PLtHQAYmXftfMJtzVxVuHPFKqmUEP8RhU5zwWYEtzaJA03Oj++W0
+         /zGcG58Jg+9H/7xDLNUguaEI0bbPTBUWwYPHGg78MIQWXk5ewGd326Brj1HsdbnvMjvP
+         jfrrgSe4P9Q8TGMnLN6tDX1s/ah3V1Q8z6bUM3AlM+a9QdxlkqHWl2QBr4tdM1gETkUY
+         DprQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751473410; x=1752078210;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tGadUCVwNNT8WE0o5GTKQ9Wt3rpRzQNy0qwMnAN7g8U=;
+        b=ImGyIar6YRkNcxtYGxSlbHNv02xX5cX4ZeKJlJ55/spJCVidGYy2YhM+vdenYag2OJ
+         y/KvuO1a8fTbwO8G0O2BRHCL0ndYFk4UE1X0nyeof8bxrUXPS4CsP3lTNYGdTy5Rlwyu
+         LITqk8BRxpgy4Uqvibx5vfOL4X8v73Rtw3MOrUGs24/7nwOBWuJobpdeGoCqFy6espDp
+         QGx0uZCM7ndJaN7UVANKBpdT+wvYYALANOtn8dhmrsCLNOj3dGLETXhXWQnzG01qMhzu
+         dag7lPHYiEFiIJu+B2PNXg72BNN1ttTzq+begAeCBYqq9PZ6rw3VVq3fJwsrE3iy8qt0
+         NdNA==
+X-Gm-Message-State: AOJu0Yz9kfFCkYXSOoQN09ZYsMBKxljA6qGnXHlFU9REHjbcdFkLfZQk
+	d4PtplnlVXO6Rcl/f45I+TNTZvjudSwFcbTQ85ut3PAbfD0hKHJAZa9vnCx0BwFYaGQ=
+X-Gm-Gg: ASbGnctBFchw+qbZjrPujZabmZ+O6MR3ECdLe5VIfDuG6JIhCKclsekFW2aagTcEtdI
+	QwgOYbQQjQWewIMEziGdqG/K+pINXlJJi2qe7XAPKp9y2xLj6Qh9VfrSrulcbUBe7I6073eku/N
+	pSlgY17Ncp4es0no2/pzzkg/aXSFAeuHxbzvWPiAa6KEHy1P/g8C0ec/YSHD9cU8drmmUoYH0Fs
+	NFcT4RN6xoU2ORuurj8nz1aG8aZcOWFXhaBZpA3HTMECe6AIIM9lDpMFlaw4YoKrf814Uu1vT/j
+	eZggBk2eE2I4D7EAQOaShktqPN5/50EfaKdq5bHyZbB5QmCgmveqgHQbqMYu9MmJrXFs1mOVCV+
+	zOfEIN0VynYuGZzDGK0/jN+EomffYu7Y=
+X-Google-Smtp-Source: AGHT+IHAuVGfXpb+P/WpE9VpqbYd5miAz6jHxichuVcJYK7VlunEHOmB7iC8DBSBy87fwsQMHsBx9A==
+X-Received: by 2002:a05:6102:2c06:b0:4e5:f673:7da4 with SMTP id ada2fe7eead31-4f16110a759mr2393868137.8.1751473409880;
+        Wed, 02 Jul 2025 09:23:29 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4ee4c7e774csm1932811137.8.2025.07.02.09.23.27
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 09:23:27 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_core: Remove check of BDADDR_ANY in hci_conn_hash_lookup_big_state
+Date: Wed,  2 Jul 2025 12:23:26 -0400
+Message-ID: <20250702162326.1373840-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ke, 2025-07-02 kello 19:35 +0800, Yang Li via B4 Relay kirjoitti:
-> From: Yang Li <yang.li@amlogic.com>
->=20
-> User-space applications (e.g., PipeWire) depend on
-> ISO-formatted timestamps for precise audio sync.
->=20
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
-> Changes in v2:
-> - Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
-> - Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6cb=
-@amlogic.com
-> ---
->  net/bluetooth/iso.c | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index fc22782cbeeb..6927c593a1d6 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -2308,6 +2308,9 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff=
- *skb, u16 flags)
->  				goto drop;
->  			}
-> =20
-> +			/* Record the timestamp to skb*/
-> +			skb->skb_mstamp_ns =3D le32_to_cpu(hdr->ts);
+The check for destination to be BDADDR_ANY is no longer necessary with
+the introduction of BIS_LINK.
 
-Hardware timestamps are supposed to go in
+Fixes: 23205562ffc8 ("Bluetooth: separate CIS_LINK and BIS_LINK link types")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-	skb_hwtstamps(skb)->hwtstamp
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b47c74080b9e..4342faf43484 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1350,8 +1350,7 @@ hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16 state)
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+-		if (c->type != BIS_LINK || bacmp(&c->dst, BDADDR_ANY) ||
+-		    c->state != state)
++		if (c->type != BIS_LINK || c->state != state)
+ 			continue;
+ 
+ 		if (handle == c->iso_qos.bcast.big) {
+-- 
+2.49.0
 
-See Documentation/networking/timestamping.rst
-"3.1 Hardware Timestamping Implementation: Device Drivers" and how it
-is done in drivers/net/
-
-This documentation also explains how user applications can obtain the
-hardware timestamps.
-
-AFAIK, skb->tstamp (skb->skb_mstamp_ns is union for it) must be in
-system clock. The hdr->ts is in some unsynchronized controller clock,
-so they should go to HW timestamps.
-
-> +
->  			len =3D __le16_to_cpu(hdr->slen);
->  		} else {
->  			struct hci_iso_data_hdr *hdr;
->=20
-> ---
-> base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
-> change-id: 20250421-iso_ts-c82a300ae784
->=20
-> Best regards,
-
---=20
-Pauli Virtanen
