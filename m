@@ -1,105 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322211D516A;
-	Wed,  2 Jul 2025 11:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4431D516A
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 11:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751456152; cv=none; b=GSPJeqYQNmhWup7nD1ECp9CFqiX2QoNe1Vu5g7onrI4eTWXB+TsHENxeWN8aeBbI19hL2subtl6ds94+AkPwB4duaeQAs3CcskUTiPIj/59F49z7//dKIw7Nr1NlsIHHMsDJWDsjd/vfhMRE4DM7QFg5lwgwMLE473c1EmVsKc0=
+	t=1751456225; cv=none; b=SHUP2kpQueIndJ5vMp+dov81otruRlPe5XIp9XveK0YSTMVDTLPDBTwcte4V66rOet4F2I/PnQHjf0hFeLwt0x6zL8szkbhYw16nT5QIZvsxlV/V9YjS+//MoN6opPlwCIcRAzh9kO+q8ISB+PrJ47hRaDrhvT8ZkNZls3H06Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751456152; c=relaxed/simple;
-	bh=75tX/3HUrOf8+9xyDRzjBq3cba5xi1dbfPz2qmejVzQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=cHWccnyiVz+KIaTSUZV0SYI+qlkhnvik1OcP3QrJ0Mr2T3DS8WEmSWo6V4i2PA+VurlrSlggoFeyuq48XX1iveCUnFtHy9+KKrfVoFoliPdl/PfblWJ0XSHXw3GBnP5Rpnh6+kdjz531OXp0VRhK1UUeVQFJIcWkFgLTx21MsLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VEOZQmII; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751456225; c=relaxed/simple;
+	bh=mITTeI+bc0L5+UywrvtHnC5Kv0gdsngT2umj0mn2+nM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=isxXBJa4y6shbBVp441qf7hzGWFwM1i+bvONn/4lW5orwQFSYv0MAYfnmtB6WpXMFm1ikCdGX+H5zrn7JqB7y7GUxAsk7NLbk98l446sSH5MGhFArpuMXU8BzlRrjoyviYIvnXqeNuv7XGOe/Eg/AF+LGtI97H+tBwwpH8f8vig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EWbizNnM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VEOZQmII"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8FD69C4CEF2;
-	Wed,  2 Jul 2025 11:35:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWbizNnM"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A3444C4CEED
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 11:37:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751456151;
-	bh=75tX/3HUrOf8+9xyDRzjBq3cba5xi1dbfPz2qmejVzQ=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=VEOZQmIIaiaKvRQd40Um4F8toPmxvD0ygHZOzMNUcGANXbNTX4Nx9IaPpgJtfMClD
-	 YDUwmoc+sPhKhgPpDtPk+g//uySdT8I5o83FbnsJvg8Eavmm6O6C+S8NDrtrUEU/0c
-	 BTKWFA71Dwodr8Xj0UKgnowse7P2j3A3uWL2UKu7tc8jzOOvNNYTVpRO1QKbLp2k2I
-	 TfAYBUo5UqMa4NBYrNhgJ4F+ArrTTIRJv6jcbTFweIQdl+RWEAngSZl2aVxJNV+uwn
-	 MzwiBfAq/SIhE4xYih5aswvAn4YL7bCdt6OFz6slHHirZ1Apd1VE6SnmU0dGRWaX5t
-	 Z20RDr7KUQ3XA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D04FC83013;
-	Wed,  2 Jul 2025 11:35:51 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Wed, 02 Jul 2025 19:35:48 +0800
-Subject: [PATCH v2] Bluetooth: ISO: Support SOCK_RCVTSTAMP via CMSG for ISO
- sockets
+	s=k20201202; t=1751456224;
+	bh=mITTeI+bc0L5+UywrvtHnC5Kv0gdsngT2umj0mn2+nM=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=EWbizNnMySwK7uSNlI0esrgOKyuUSZXXvSjc8aZGKF/AmzeRdZaNv67LKzZYUiTUs
+	 QdwqyBo+W7YVTckx7ZJaK9q6itde7mEGr+v+jqCqAfmOSuAxDaHH3ZSFg8TrON707f
+	 RgXCza59GasJMzl22hdoE//SPmA0H29xfqTx+DPLwKihlnfTS6CzHPrvwSxexxntpV
+	 Zyc00J7W6Sannbdlla2C0elFiI+KupzIHMxd2ZVpdv2YZtmXT+UWql8hnRfcTTfEYH
+	 X166mcGL3sv++sCoQxfBrbzBkXjNfogz6dKYrJ5tSEvg+vOk3h/fmiVQ4WwwdKbKH5
+	 HEpTCRbkoCyAQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 9D428C3279F; Wed,  2 Jul 2025 11:37:04 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date: Wed, 02 Jul 2025 11:37:00 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: galcian79@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-z5a866SMvp@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250702-iso_ts-v2-1-723d199c8068@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAJMZZWgC/zXMywrCMBCF4VcpszaSpBdjV76HFInptB2wjWRKU
- Ere3Vjo8j8cvg0YAyFDW2wQMBKTX3LoUwFussuIgvrcoKWuZaWVIPaPlYUz2pZSWryYCvL5HXC
- gzw7du9wT8erDd3ej+q8HcT2IqIQSWJtmKGWPjXve7PzyI7mz8zN0KaUfJqRCPZ4AAAA=
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1751456149; l=982;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=KHMGQKsMq1ealL3OXyoBth/L4LOJjuWSriffKLAfOLM=;
- b=/XSCa4bHVCWY+eq/QxDxP2198DpIAxIIYl+i0/OLzyiR//vXWJO4ymOsMxYq+VWerTZC7XiS5
- fr079bqjNMVCLDw9rVIMzKlGfuxrsKYSwq4LMm4pJjo7jybc0sEvAE+
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-User-space applications (e.g., PipeWire) depend on
-ISO-formatted timestamps for precise audio sync.
+Fulvio Magni (galcian79@gmail.com) changed:
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Changes in v2:
-- Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
-- Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com
----
- net/bluetooth/iso.c | 3 +++
- 1 file changed, 3 insertions(+)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |galcian79@gmail.com
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index fc22782cbeeb..6927c593a1d6 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2308,6 +2308,9 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 				goto drop;
- 			}
- 
-+			/* Record the timestamp to skb*/
-+			skb->skb_mstamp_ns = le32_to_cpu(hdr->ts);
-+
- 			len = __le16_to_cpu(hdr->slen);
- 		} else {
- 			struct hci_iso_data_hdr *hdr;
+--- Comment #281 from Fulvio Magni (galcian79@gmail.com) ---
+My device started to behave incorrectly since Linux 6.13 and my DS4 control=
+ler
+lagged randomly. With every kernel major version bump the situation kept
+getting worse, now being unusable on 6.15. Reversing to 6.12 fixed the issu=
+e.
 
----
-base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
-change-id: 20250421-iso_ts-c82a300ae784
+--=20
+You may reply to this email to add a comment.
 
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
-
-
+You are receiving this mail because:
+You are the assignee for the bug.=
