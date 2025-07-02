@@ -1,66 +1,71 @@
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926B9101DE
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 16:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216932F4A1E
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 16:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751473440; cv=none; b=UoDBo8+L0dqMrepi/Z7HGEMA+YFCpC7JizXjiXlGMiZ7SocWbIhPFmDODH7TLBRz+hfk0/4/kNkXfr0FOctZHtxLLb0h97bM3x/qIWlh5B8wyuaC+24k8aBiWV9j5QfEN4Cxm66BfxhCFM5mQFadkD+dyKqN5c+MZ47CJaC8cbo=
+	t=1751473441; cv=none; b=u5OpE17DRfhT32AZr17jIEmi7BDGOk0f5CbVpkeGb/+rNkSZIWKW8Qx7LzZW4eNhyaF8q2pL4cGtTErRitAzXMXkr8jCDuGKoJBHXmLJHXvZ4VF8c7HghEj+Cg0hmN8+2BBbyFHyG6biYMEH2wWYcoQdxEUrzJKdXpiPm8pRI0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751473440; c=relaxed/simple;
-	bh=n0tcHVRfxebu3iqSFYUuQC1iNV6Ezy189hK2LiwLhEE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=I25q5jkO80BTj0AGzMwwD249r03BSLT7YzkdO3BZUDILcfhoDndSrDpXfyU+mcY4yEFhcueC+372CqxjEeqrog+OgqPeZzBEEe0fwHslUcK9U6bmM4qoyRW6qX2jBzQsGZ0jARRTOShu4tSQNR6Z2OEy02zHt5vxEFbJL6AZMKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L5dB78rI; arc=none smtp.client-ip=209.85.217.45
+	s=arc-20240116; t=1751473441; c=relaxed/simple;
+	bh=as7dBlSgsDU34WcZwi9pAnKDYkTIOl/VW/XK+Dg4Dwg=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UzRdCyjGPFHGMNkKClDNbhI6NnFJ8v5I9Nhnkp/sZcEcCwC+V+WsVh6y/GjQYGBUWzR8DNeCHQl6929TwafAzSZ3UPFp5NwQ8Jop195EiDl287f1sO+YQZ0Cjjd1EK+q1+5O+bPRU81mSmdd2p+1L6jwYHtprcBduInoQC4m1cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l81IbYNy; arc=none smtp.client-ip=209.85.217.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5dB78rI"
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-4e7fb730078so1454007137.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jul 2025 09:23:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l81IbYNy"
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4e9a284c225so2169719137.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jul 2025 09:23:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751473436; x=1752078236; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kU7mIV672lIKYY137K9kRm2KjXPzelDi4EmsCNARJQc=;
-        b=L5dB78rIKZQXopMUDdJzbS0xkrsVV4NyH7MYFxdUOlilfpsUHc0ivvyXp6zHDs1cce
-         oh8dYNyb7MdXsPqoI/ZPmDiwh20qLg6iCkv5QVs7fjQlZxjvF0bwIZHXfyemJ7rdtpI4
-         bMxLjGByYIlz6R4LNQxRZbYZ7CxVv9RHssLqB8e+ijGlaLAyIeq3q1Ob3akjF5jugQy5
-         XYcwoN0J/nm4bRq4ogj+ArYqGK2HxpjHE0P3CF9tAmQgSFO6vQB0iOmLEUIzvCTAZdDe
-         uVBKo444QuBZW8uWMZLIFaAoEJpUDCRqFSDk3fWiRp9z6AzMjDsPXYcaXL1Pnrzh+Cnp
-         4pjQ==
+        d=gmail.com; s=20230601; t=1751473438; x=1752078238; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/JidpwyheK+hWopPybCwIXOG+0YPslBVn95pJLHaSAQ=;
+        b=l81IbYNycWhDhXMKnFYD8D05kHZeWYjY0Czn04rvGJ6wpinwk7Ab56r7rw7shag1no
+         /yqexJqcvNgGNGKSGSrb+PU6NMIvYhcINlGgqwAW8rVvjyp7jZnrWf9cBDceVqT4IH8t
+         Rk6rWRSLALpn7jGMEeTIBtS+Z6saH1xZLilsK2Ktpod3qGYzzgya0DnTOYuoIPGwgrlC
+         oYuHG2KfR0/YZTiKmwri5jXnjWKuXExr8ctvo7VtQl0JJ6E2CI29BHjNWj1GtHYNRK8G
+         4NNnLRfnnmW7IMIeLg7m8sBXaKRv03tfLIT6XlcmYDOUURAGVpirVfeS+X41/8HFCihc
+         noWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751473436; x=1752078236;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kU7mIV672lIKYY137K9kRm2KjXPzelDi4EmsCNARJQc=;
-        b=OzMZgRgz7fml/z7asf8q+YFot0/EqpROYMkFE8FaaDkMnQNt88LkBxMOuPjhRleL8C
-         Ug9P2N+TKi0emaLwj/Wx4q2a1Nxlhxp5e16SqF1nNlUFtp0vPdPH6YEMmiIymluvhMjG
-         yTrnQEqevjuZPuEZDHVFEl8JoxvK3PhtTHYzPg6g4lLZ68uxhmewuD2zpLPsxsOKrNoq
-         BKPuG3etMsN3zxZK5KsvcbItGtqgaTmby6M/3RCQWDZABl3J3ER5NeE3G49aWnax4Rb2
-         LzoyGWjcZ4tY/la5hDasgW5BOSkNpWm9BkRI0+9Zr6MCgvhkyagtwk5WODlFOLWx6ZAg
-         VxXw==
-X-Gm-Message-State: AOJu0Yz+oIPA1k0oGsFlya0/HJW9MQll5AdB1XK/9ONCvj99+PHc80Bz
-	sJBsJQ8y5+2r+UHdq3u/xxxpRXYWvwtocXp15BZEsEFV7LkmRYjMtw1fuYJKa2BVaJE=
-X-Gm-Gg: ASbGncuG8ildlCTWwK+gwLZPYR7ELGiTzCKT9sJ3lcQQI0OL3FI9XiUNdcP8tqz55HG
-	l0mY8QRTPbllmQMolpQplrb8vT0drZIHqCpMGJdKuVU91QK8jqYp4OvqiDwJ8WLWIPD6xIvL8BD
-	TD4MQBbBtnc9nTNGL05YHmVum9PPDwV8AvOyXZoxreIpzSGOxxY6F/vMGAfLt0neqZsyd54APeX
-	1dHWM5cWmmwaXIj2ZNX7olJuk+6FS/sm6uA3wRXY8v1EhSBpDHQYtlerYbymd+BSyBLDwExTKZB
-	qwE9uHZ19n9b69HiWBMWhhDW+YNfIBCVkZh3HAbODMDLQ1VPbwuevkDxbPCmrk51tNFRXOveg7E
-	bQfql8vaiPYZkNcDiVmzAa1fr8K/bHD4=
-X-Google-Smtp-Source: AGHT+IFC8DRh3DOst1jXun/TQzqT7MBxgJU4H9MOv0OZEq83ALBFj6V3D/AzC54jNRdMpOqilRUvRQ==
-X-Received: by 2002:a05:6102:160d:b0:4e6:a338:a421 with SMTP id ada2fe7eead31-4f1747d4abemr234959137.6.1751473436049;
-        Wed, 02 Jul 2025 09:23:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751473438; x=1752078238;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/JidpwyheK+hWopPybCwIXOG+0YPslBVn95pJLHaSAQ=;
+        b=aUbbsI3Y6wSHfu+T/g5vqKmq6euKt9pmFo+TMewjYOI1R6EW7QWFK4+lGTq4N1pR/4
+         PPxzVCpPV5cT6ilTwaGuj10BfuxgNS1VrgIXhFLFyEbTwXY0Rjlky31KDpiGe4gSOPoa
+         M/e1S1v7Vi0roWaE8iFryx0jChiKjgN8T2eXMI5LkhAehUpyuAY50iJtsBmzTcDH/i2g
+         prDBNAO6ZZYTtdv3qGhD7KVsxGtecL7SZBB5iTBzKFSMHLo7Kck8NxgwXaFcv6FBmGbN
+         zZNJYKoZzONsbtJRWJmozQ8SFPqAuqmHz1CbNrTdd/xoSBZY+Ae7WxqaKLGSur/l2sjP
+         hXhw==
+X-Gm-Message-State: AOJu0YxsR+OjdxfPLnm8RWBcuJFo1pEKH2ly3inr0C7IsZVY9iTaMj4B
+	AutVIeKkiK9R9WbbxrYdgo+07MX98Tmoo2VSTInWJZD7PSVZlH9KxSma8mnQCada3cg=
+X-Gm-Gg: ASbGncvX8s5AUrpPWpYm77td1m5ptEO6DAXicybzL1X+FyhnVPCNU61c54vP4T15JIT
+	FkcNZ8SMgDkj8g8+WrVnN7CqKTrtsElDj2rg4de8Nq/Pqc1sHoURgJ+xnvHFwvNNA9nPdsAQHV0
+	p1UvdtGAcxA56lbP+khtsJNGnEsNHcHNqmF2z8Q1Cvoe5YfwHSXAAQKHMbbb9up+axL8Nozts/2
+	BWOCR1fCNoXyCX1VOfP0yXIRvBg0MZGGhpxrLpRqDBBpkRPbJu6fbkI1Fw1bCC9+uH9lu5a0Z8p
+	NjyLUx+kQ/Rp0XzFQqOv9RNh+vflx6NBeUMyMVpqvr/TunBQorli5Soz2/6Yrb7a0TBykmuOdSn
+	s7oX6D7YRelgOyaRq1iBwW2P1s6p8YQI=
+X-Google-Smtp-Source: AGHT+IEJYJwZgh/Cej+E5Y5ZnIQ6ERIi53aBIHTiKis/On6YKfUMTY36YvZOnc/u0pUSfnGVB5/OmQ==
+X-Received: by 2002:a05:6102:943:b0:4e9:a2bd:b456 with SMTP id ada2fe7eead31-4f174758ac1mr250174137.12.1751473438384;
+        Wed, 02 Jul 2025 09:23:58 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-884d1c458c2sm2476733241.13.2025.07.02.09.23.54
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-884d1c458c2sm2476733241.13.2025.07.02.09.23.56
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 09:23:55 -0700 (PDT)
+        Wed, 02 Jul 2025 09:23:57 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: SMP: If an unallowed command is received consider it a failure
-Date: Wed,  2 Jul 2025 12:23:51 -0400
-Message-ID: <20250702162352.1374119-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
+Date: Wed,  2 Jul 2025 12:23:52 -0400
+Message-ID: <20250702162352.1374119-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250702162352.1374119-1-luiz.dentz@gmail.com>
+References: <20250702162352.1374119-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,81 +76,30 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If a command is received while a bonding is ongoing consider it a
-pairing failure so the session is cleanup properly and the device is
-disconnected immediately instead of continuing with other commands that
-may result in the session to get stuck without ever completing such as
-the case bellow:
+This replaces the usage of HCI_ERROR_REMOTE_USER_TERM, which as the name
+suggest is to indicate a regular disconnection initiated by an user,
+with HCI_ERROR_AUTH_FAILURE to indicate the session has timeout thus any
+pairing shall be considered as failed.
 
-> ACL Data RX: Handle 2048 flags 0x02 dlen 21
-      SMP: Identity Information (0x08) len 16
-        Identity resolving key[16]: d7e08edef97d3e62cd2331f82d8073b0
-> ACL Data RX: Handle 2048 flags 0x02 dlen 21
-      SMP: Signing Information (0x0a) len 16
-        Signature key[16]: 1716c536f94e843a9aea8b13ffde477d
-Bluetooth: hci0: unexpected SMP command 0x0a from XX:XX:XX:XX:XX:XX
-> ACL Data RX: Handle 2048 flags 0x02 dlen 12
-      SMP: Identity Address Information (0x09) len 7
-        Address: XX:XX:XX:XX:XX:XX (Intel Corporate)
-
-According to the Core 6.1 for commands used for key distribution "Key
-Rejected" can be used:
-
-  '3.6.1. Key distribution and generation
-
-  A device may reject a distributed key by sending the Pairing Failed command
-  with the reason set to "Key Rejected".
-
-Fixes: b28b4943660f ("Bluetooth: Add strict checks for allowed SMP PDUs")
+Fixes: 1e91c29eb60c ("Bluetooth: Use hci_disconnect for immediate disconnection from SMP")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/smp.c | 19 ++++++++++++++++++-
- net/bluetooth/smp.h |  1 +
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 47f359f24d1f..a3a4ffee25c8 100644
+index a3a4ffee25c8..8115d42fc15b 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -2977,8 +2977,25 @@ static int smp_sig_channel(struct l2cap_chan *chan, struct sk_buff *skb)
- 	if (code > SMP_CMD_MAX)
- 		goto drop;
+@@ -1379,7 +1379,7 @@ static void smp_timeout(struct work_struct *work)
  
--	if (smp && !test_and_clear_bit(code, &smp->allow_cmd))
-+	if (smp && !test_and_clear_bit(code, &smp->allow_cmd)) {
-+		/* If there is a context and the command is not allowed consider
-+		 * it a failure so the session is cleanup properly.
-+		 */
-+		switch (code) {
-+		case SMP_CMD_IDENT_INFO:
-+		case SMP_CMD_IDENT_ADDR_INFO:
-+		case SMP_CMD_SIGN_INFO:
-+			/* 3.6.1. Key distribution and generation
-+			 *
-+			 * A device may reject a distributed key by sending the
-+			 * Pairing Failed command with the reason set to
-+			 * "Key Rejected".
-+			 */
-+			smp_failure(conn, SMP_KEY_REJECTED);
-+			break;
-+		}
- 		goto drop;
-+	}
+ 	bt_dev_dbg(conn->hcon->hdev, "conn %p", conn);
  
- 	/* If we don't have a context the only allowed commands are
- 	 * pairing request and security request.
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index 87a59ec2c9f0..c5da53dfab04 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -138,6 +138,7 @@ struct smp_cmd_keypress_notify {
- #define SMP_NUMERIC_COMP_FAILED		0x0c
- #define SMP_BREDR_PAIRING_IN_PROGRESS	0x0d
- #define SMP_CROSS_TRANSP_NOT_ALLOWED	0x0e
-+#define SMP_KEY_REJECTED		0x0f
+-	hci_disconnect(conn->hcon, HCI_ERROR_REMOTE_USER_TERM);
++	hci_disconnect(conn->hcon, HCI_ERROR_AUTH_FAILURE);
+ }
  
- #define SMP_MIN_ENC_KEY_SIZE		7
- #define SMP_MAX_ENC_KEY_SIZE		16
+ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
 -- 
 2.49.0
 
