@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3AD3C30
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 01:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF7B3C30;
+	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751418950; cv=none; b=PusuVLMYg1xU7lulpURQhWkUUEwZilsJRy+VxzFg+E6GVkRgUOZWIZ2n38v9HiUqsLEXW7vqKZC9DY/765d8FHm3L6nFTSHtdeP2mC1vIp3s/PCMh5xHCuX0T8oheDbkiB3+5QPqk8iPmjMOykQ6QJq/ud3jNBRy0/ng2+uXkoE=
+	t=1751419124; cv=none; b=PAJjm1cBr5hoa61/DeMzmmGy8rmOMV1PZuVUMjBNx9UiTpEHTB6BZ41JuRNAUNPvfxbF9/ekNFfxvT1dPD1jgninnLWFN2Eq8kJ8V7Z+fx4mZU5YFWRzF2SLve+38fld9NOprMMkrB9P4KbotoDpB4h4u7kiAM9cXWQzYRszEDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751418950; c=relaxed/simple;
-	bh=3yWGUG/nKLU3YOKevyOpcCito/St79BH0C9W/Puu5vI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WO1Tkq8kttOBkq1mMFV/R1YYVmItONyBnhbS5aa36D+bb+ON1eUHS8+Q1nY6cBpFcWnpUjhM1iESSUfxqXXx7bN+LBOJG69NbhP+vClCvXuwZ/6NzCBWQaDwD5Hl/AdoWdC0Kto1yEwdbamjVJDa39xT2KqamgQn+uwg4X+5Mkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xd3j/1r7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751419124; c=relaxed/simple;
+	bh=Q3ZlQcXLusGO7or5b6gbAN76N6KRrX9bFVhn/AXPoDQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tQk+3EIcjh8guQEXY+i6QVOtF+HZfDM0MpADhhXc23fN1LLu+nIhhUXMgZTsuiHk1+PlkxwhYsJ+ZYQWvfoPDuzP27SjFpd0jy3zWE2jkkzVgmo2xGIlRKR2sg8C5hUhJg/219R0dpwWJxW/lerGw1zhaXIq5GGD8KwqvKYD/GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvoeSzGM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xd3j/1r7"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BCBEAC4CEEB;
-	Wed,  2 Jul 2025 01:15:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvoeSzGM"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C881C4CEEB;
+	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751418949;
-	bh=3yWGUG/nKLU3YOKevyOpcCito/St79BH0C9W/Puu5vI=;
+	s=k20201202; t=1751419124;
+	bh=Q3ZlQcXLusGO7or5b6gbAN76N6KRrX9bFVhn/AXPoDQ=;
 	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=Xd3j/1r7vCMAPELUwRqHDR5ENhaMOrpSY9KGOxpKvvSvdLhDdcx3Zs86jHmMpozLJ
-	 vO+zJDpj6n3YO1S70uNCnKcOwK1vMS1NKrhsOKHxlBtivCUOV1T9AKmDpp/B0MZwQe
-	 PUySO4MeiPVzvpKrvj0wIEmRN8vr6BSa6Vd9+rhOPuke6m1pOzYhonHMkMlx22G5Cr
-	 xmNRMKVRekeNRsltl10jUh7o0sNWkpoQ44/aKvb35MCBmNG8OqyCa6RWmbbV5iP0ar
-	 HSXtr4gYVtODK0z5/L1HlmcvE7mksHdwg1xiI5MwFNVGPER60Sf9apr1K5aqHDmGxV
-	 RodgeeMSIcV1g==
+	b=IvoeSzGMjkbTzs0OeT9pXsMaTabkeloJwgX2wcUdGzxUBxcm35JbpaDV/P7Aev0Ko
+	 clmqIktb3nuNauaNRqv4wjxWTyPiUGyH0UQ3a3NwFI5Z5323Xx3wwDjVjKmKvae+DU
+	 ErraIGxYRnfNTaNjwApvEqdpODrO+2IEH0OD/zLCReh7RJmqOKo9MjX8++ByP7I1M8
+	 oTCqT1L6O5DDK1U2z2vRfWts3nuXSTKZ1XnoxULF5pwSX+5agAXcJNST2hb37u/vs/
+	 v1TiDnffzf23FO9VTF4eGb7x/vunKnnEAJI8Wz9vkJ6x661or9hAzGr7sJDmlyuh+v
+	 T+C4KwqvBy3+A==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D26C8303D;
-	Wed,  2 Jul 2025 01:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F31C7EE30;
+	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
 From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Wed, 02 Jul 2025 09:15:45 +0800
-Subject: [PATCH BlueZ bluez v3] shared/bap: Add stream state check in
- stream_disable
+Date: Wed, 02 Jul 2025 09:18:42 +0800
+Subject: [PATCH] Bluetooth: hci_core: lookup pa sync need check BIG sync
+ state
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,19 +40,24 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250702-bap_for_big_sync_lost-v3-1-d314b60abf7a@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAECIZGgC/4XNTQ6CMBAF4KuYWVszLVDElfcwhvQXmgAlLRKRc
- HdJV7owLt+8zPdWiCY4E+FyWCGY2UXnhz1kxwOoVgyNIU7vGRiyAjnLiRRjbX2opWvquAyq7ny
- cCM/ykiteVlpK2H/HYKx7JvcGsnuYF9z3c+vi5MOS1maayj/wTAklqG2FAm1RaLyKvvONUyfl+
- 2TO7MPJ8JfDCBKaV1RyPCstim9n27Y3oWchXgsBAAA=
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
+Message-Id: <20250702-pa_sync-v1-1-7a96f5c2d012@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAPGIZGgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDcwND3YLE+OLKvGRdo7Rk87RkyzRTS6NkJaDqgqLUtMwKsEnRsbW1AGv
+ pFS1ZAAAA
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
 X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1751418945; l=2119;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751419122; l=1160;
  i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=Li/oG8Hx4idNZ2lePbfz9FOElYrLqbI0dzXwuZBAwXI=;
- b=HBPMJPbCqpIcvpCHxZOQKOt6PknxpqcevJw8a+ImqiIZ+eZ2UKFTdoCDNGhqL0gcxFAFBafD2
- JN1+zfkUcz+D7cnGRPZfuhoqEJ5gsXAQLzCB1E/kxSsWcYnuiOMfDkG
+ bh=GHF9U6GehkWVyzq0OzaU+JceT54aR44ovVM4Bx+2rpk=;
+ b=eXovFOziL0YnMbRRQ5YVkV12C93VSCnu6TecapyGQ2OjfXYA8mgRc/OPiy0TVXdTOs0FztD/E
+ qjG/4wvabekCKCj+qnJaf73QtkMQbVoB6oNjkiZn2XkfU256Ep1Eq37
 X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
  pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
 X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
@@ -62,66 +67,37 @@ Reply-To: yang.li@amlogic.com
 
 From: Yang Li <yang.li@amlogic.com>
 
-Add a state check so that stream_disable() is a no-op when the stream
-is not in ENABLING or STREAMING state. This prevents unexpected state
-transitions or redundant operations during cleanup.
+Ignore the big sync connections, we are looking for the PA
+sync connection that was created as a result of the PA sync
+established event.
 
 Signed-off-by: Yang Li <yang.li@amlogic.com>
 ---
-Changes in v3:
-- Optimizing the code
-- Link to v2: https://patch.msgid.link/20250630-bap_for_big_sync_lost-v2-0-1491b608cda5@amlogic.com
+ include/net/bluetooth/hci_core.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-bap for big sync lost
-
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Signed-off-by: Yang Li <yang.li@amlogic.com>
-
-Changes in v2:
-- Add state check in stream_disable.
-- Add type check in stream_io_disconnected.
-- Link to v1: https://patch.msgid.link/20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com
----
- src/shared/bap.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
-
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 40e1c974b..1790b277b 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2131,14 +2131,20 @@ static uint8_t stream_disable(struct bt_bap_stream *stream, struct iovec *rsp)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3ce1fb6f5822..646b0c5fd7a5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1400,6 +1400,13 @@ hci_conn_hash_lookup_pa_sync_handle(struct hci_dev *hdev, __u16 sync_handle)
+ 		if (c->type != BIS_LINK)
+ 			continue;
  
- 	ascs_ase_rsp_success(rsp, stream->ep->id);
- 
--	/* Sink can autonomously transit to QOS while source needs to go to
--	 * Disabling until BT_ASCS_STOP is received.
--	 */
--	if (stream->ep->dir == BT_BAP_SINK)
--		stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
--
--	if (stream->ep->dir == BT_BAP_SOURCE)
--		stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING);
-+	switch (stream->ep->state) {
-+		case BT_ASCS_ASE_STATE_ENABLING:
-+		case BT_ASCS_ASE_STATE_STREAMING:
-+			if (stream->ep->dir == BT_BAP_SINK)
-+				stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
-+			else if (stream->ep->dir == BT_BAP_SOURCE)
-+				/* Sink can autonomously transit to QOS while source needs to go to
-+				* Disabling until BT_ASCS_STOP is received.
-+				*/
-+				stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING);
-+			break;
-+		default:
-+			break;
-+	}
- 
- 	return 0;
- }
++		/* Ignore the big sync connections, we are looking
++		 * for the PA sync connection that was created as
++		 * a result of the PA sync established event.
++		 */
++		if (test_bit(HCI_CONN_BIG_SYNC, &c->flags))
++			continue;
++
+ 		/* Ignore the listen hcon, we are looking
+ 		 * for the child hcon that was created as
+ 		 * a result of the PA sync established event.
 
 ---
-base-commit: 55a6763cde8a2309fd23a96479ee4cf2fc23a442
-change-id: 20250624-bap_for_big_sync_lost-63476c679dbb
+base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
+change-id: 20250701-pa_sync-2fc7fc9f592c
 
 Best regards,
 -- 
