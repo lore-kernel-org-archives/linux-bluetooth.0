@@ -1,164 +1,160 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956122749E5
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 17:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF792F7CFD
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 19:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751478624; cv=none; b=OeibASTXq6ubsHALFXUS4eQJjMvpJ78l4wOdo22psCy0UDdX8uQMJGPKUMKAp32KkFo7bS04K3F7BQ0yAl7ahE5fVfOiNEQF92i16YLkwQp8PLY6bSMK1ecAtayE94Tv/UYAOd9xWWCof5nhqnheq1vnn00Jvr+rp3kwbc+/Tms=
+	t=1751484377; cv=none; b=n1j3cuvkQxEjV976Z1EuE87xeBRgy3oNMRy/FU1F54TK3aLTea5hZ0iYUhsvDdUGnngSZwugRqA3M1epjtT+F6oIakl3Omza6hJ3PuPkyoqAcLN0OVmWU6zdAkDqmizAbmo7JpV56qX59ZQI4x6gjIaTHBl+GKHjGNR/A9I6bq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751478624; c=relaxed/simple;
-	bh=O100KrnznUaXHfIEao3W6dn9Cm+6YOzIdsGvhzSyHFM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VFa0ZgRneNksCHC8V5EqfzYvFDKKkKBCwCnUKMOrcsWEYn2y/hkrR+7uilOxHLbi/wd1NrxafoeXUhE3/0LiJPUh98CZVcBIIHZSa9cHDO8SdhQds5Om6nO+hyBVdPgh2o14QheJnrFj6dc0CxvlRhjbpv/3wqUSxuSt29kGBEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPVMhIK/; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1751484377; c=relaxed/simple;
+	bh=Tdvas4OpeAgZ1cTOALymDlrj2F/3rJhLcUniW0TZdNc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XKiHFvBL3q96JnGsolXhsI+bs/vfdn7roNzTc4aXdcmSN8ZP+xpUYKFr7QLIs3th3TtYsG7L0gehkCfDnmcwu9dICV2y8Vk7MkvfYYTpSsg56BBW/Fsljq9LVRMMNXOosbQHIOyys01ssLMPOVEypN/AvlnOH44PCgtMNN0RtC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Baob1uuQ; arc=none smtp.client-ip=209.85.222.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPVMhIK/"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32b7fd20f99so2037691fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jul 2025 10:50:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Baob1uuQ"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-88173565536so133951241.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jul 2025 12:26:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751478621; x=1752083421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hFbZfVkfL9biQ4u2OZbG8XRfvNiivievAxu0tzPV9m0=;
-        b=DPVMhIK/0fWfOVknxsnF9v0ftEO2p3eP2xxllUtJZjjFlVMFL/oi8kaTOttQZtUMpz
-         OKa+bnOOyc6V7UvQwjjgShsbuC7MdwyTBkS+Rn25xfCQxmaIWFarB26KUd7XLGXcTXFO
-         p8rgNknpjT1cA37Ng+aRQHhAJEBHZK9o2pYuY6HWxeO8ef+mcu+AQmqK2nhS0WGfrKpY
-         GDsnvBo4B3qIreRr/xy5siHB/Ow37anZ5D//1QIWG8TXRLpXQAYvmycaxSdKqq+KqbIy
-         f5z4NdvsyOilRZnC/Ni7XxDZxLXBYoGhwJpsnpmP+np2pvqguDj6XkOAXtqsK7hHse4d
-         39ow==
+        d=gmail.com; s=20230601; t=1751484373; x=1752089173; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CVduHayMJEdgNegyfnABaqCXn0WhHoQLGwvHR4ZsVD0=;
+        b=Baob1uuQZaJCGz+pAmnwOekYouTM9XdqhVp/+PAsKabTAv5PQbsFC6mNsMurjv16GI
+         CKQex9whLeA1HShNn1a8I95e3yyHSw54G4xTRJoFDntNOqwcyCC+5KcpihAxUof1ct85
+         OYmPXdCxNrZ+PYC54lNRJI2AJ1Vnzm1Dblj228oun7/ojEG2te+dTFlFdt6jbIFSi9yV
+         l2Oe5aPBXqP+B4tXHjsjzZO3IPR4grHL8KmJn3sdWjkOT09vzLFEdFDp90uTM3kworNm
+         0OorLNfJfqQjjjPAXyLlkJ681EevIMC5T49Mp5gJv3zX87VCD0jzZQ63Xiv7hb3JcoPs
+         KqyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751478621; x=1752083421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hFbZfVkfL9biQ4u2OZbG8XRfvNiivievAxu0tzPV9m0=;
-        b=Ckk9oVKNvOG1B68BLcc2VbinU+2oKRL62qAg1+fEFlYLypcVAku1v94qI1tPyIDejk
-         Z78pXpJQx37TORMrCi/rjf7rCTMzpMQMLd2eBq3AkQsov9n/E3w6oI6AoLKiaDdapEdn
-         U3OGbxRdsXesOHiGDzPoHJqTjFTcUYM+Xv2RsD1wjAjgyrBUWIbgZz0pBiblR3JYrd7x
-         1HDmtHQ4nAJzTfvRm3CGo3cTBsEropWpc+gjhfOzC4PTFyREFbYMUNzoBX0i6TWPO6DO
-         okq3mmxgJeQOp2qO3oQ7zocZvMy76/Whn9uuxkjsHU/DyEmFrtTR2mDQ7vlR0ySj/+LJ
-         /Jgw==
-X-Gm-Message-State: AOJu0YzSuQvTPs6QFWumrKQanEjvUEhI4K4wtrh34odhVbwPO/3SJkck
-	ZP1yXJ8150Tsi1s6gCL9Dtfr8ICCSlM/ZWja1AJgQlRgaEA8floY0B58tKtNABTo7poOmOeu9wN
-	Fyslv9M8CbPEJSJD9TPKiTFF3C//pIhIvaRX4iMg=
-X-Gm-Gg: ASbGnctbfwzfXc10EupqnQR82/mISzmod9pBwuMrZC6I1hWgQqXIqPdkvSDkB3jr1Bn
-	A+PM5ZROm+o74CATYyQ3kHOP7vG87ux+5RX0PEhDVf8Qj/myYf9J9TjntT8l0CQBlBV0nm3ApAz
-	o3IsM1suoxgyW/Av/HomEFAezNzH+9w5l5KgHQKNUd0Q==
-X-Google-Smtp-Source: AGHT+IGEarX+bguEI+DVMbHK6ri/XLOuBTiKlaOTDSZfr7uPCwV3vlLSqRr0uBW1zAoXKottjxQ4xPhmVBHVrWj7u7c=
-X-Received: by 2002:a05:651c:1106:b0:32b:7614:5722 with SMTP id
- 38308e7fff4ca-32e0d4e6364mr1801511fa.13.1751478620479; Wed, 02 Jul 2025
- 10:50:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751484373; x=1752089173;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CVduHayMJEdgNegyfnABaqCXn0WhHoQLGwvHR4ZsVD0=;
+        b=hRgam5tu6iR0Cxn2Klzyp7wNkzgD/Qt4nlOrMRaU3Xs/cpxsVukf1PicpcRQuPNtzA
+         jRaHlcRPsLhOuND8z77EaTZWc8mYeY7VJj70DtXgTr95HMdQUeURCjPpm+AojfBeCYkr
+         k1atv5STgnZtktTtndSGCCgq2lRSYNcSA30+f/wEbAx0FU3+vXXIE3OAm9igNEIrxUs7
+         C2fjrMKVWrw7FK+iKDwwXxitdr8ON11dwc084VULshVzZzI+eIW4JQnTK8TCMERi0ElI
+         ny3dUSIxKC64IZpjKEsbjA7LsNas//KG2wyvlPuG4tpah/TbicmOh1XKEQY/Xo3zoJjd
+         MSmg==
+X-Gm-Message-State: AOJu0YyW17TUCbmQX7zpxqGx02FSEGh2bpovsTi5UOBL0hEoSOSq9I1T
+	QwIo0KoGluimXPsGR9bsE7N9KFQhQAZc2wh+n0JifmyDUr02OAw0wUjDK5h61VLjKe0=
+X-Gm-Gg: ASbGncuqSEDfO2G/PEYbsJcBnGFRNITHYOpSZ9RpzwSXN846hkv/npar+DFBXjqzeTU
+	lHDT36KLNOTnjcWfZz3c0U8k5mpSfuAFiOKqYYFOIDjwBqxzgSuwyumwIfkP/PhgumGa+73sLzb
+	Hnx2Erd8Uzw3ki8FLIYD1cYTnO9btTDyykwESR9P9vVmwbpUTCDxFrtXdnLZdHw7qV2x/kAvGre
+	8KgvpEBjDXBC0dQiUob0KzB8wwlVlV4Gv4X7W2w3AITVeuDeAVwJr8U5k09sSaLzmAKzEFzztkh
+	pxb8kkWE014GaVtdTq7EpD6d7Lzxp8kW0vord8KXiqUAFDvr1y3qX2HBd9H7a+wh25BBcUkv9WF
+	NVp2dRlLFQdRN2+/1elKcPXkVKW5Z/jU=
+X-Google-Smtp-Source: AGHT+IGMPtXlS7nf2h4ChXGt3P/KKzvkgL0i9NK9CSeaHv6sRj4e6/VzLUwEuw6mlua4ebdOZUU5sA==
+X-Received: by 2002:a05:6122:469b:b0:52d:cc6f:81a2 with SMTP id 71dfb90a1353d-5346603b2ffmr973357e0c.6.1751484373437;
+        Wed, 02 Jul 2025 12:26:13 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5330924154esm2228019e0c.48.2025.07.02.12.26.11
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 12:26:11 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] unit: Remove dependencies to android
+Date: Wed,  2 Jul 2025 15:26:08 -0400
+Message-ID: <20250702192610.1547665-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627145136.421853-1-frederic.danis@collabora.com>
-In-Reply-To: <20250627145136.421853-1-frederic.danis@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 2 Jul 2025 13:50:08 -0400
-X-Gm-Features: Ac12FXySiNRQfKIsp-8P4kA_isTZMrZRciV1JujzTwZQ6Njbe9J2Lo_mkDzLopU
-Message-ID: <CABBYNZ+t+xdrM=__wqBib+QNoT=LecFUTGsdKMRhZB8cYRNS9A@mail.gmail.com>
-Subject: Re: [RFC BlueZ v2 00/27] New Telephony interface for HSP, HFP and CCP
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Fr=C3=A9d=C3=A9ric,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Jun 27, 2025 at 10:52=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> This will introduce a new Telephony interface wich is intended to be
-> shared by the profiles able to control telephony calls.
->
-> The idea is to split the call control interface from the audio streaming,
-> as it is done for AVRCP and A2DP.
-> As for A2DP, the audio part will be delegated to the audio daemon (like
-> PipeWire) by the creation of new endpoints for CVSD and mSBC, LC3 endpoin=
-t
-> already exists.
->
-> The interface is mostly based on the one done for PipeWire's native
-> backend.
->
-> This will simplify the qualification of the telephony related profiles as
-> the qualification will no more depend on external projects, and calls can
-> be controlled from bluetoothctl.
->
-> A first implementation allows to dial or hangup a call using HFP.
->
-> v1->v2:
->   - Rename org.bluez.TelephonyCall1 to org.bluez.Call1
->   - Remove reference to profiles in org.bluez.TelephonyAg1 object path
->   - Add profile UUID property to org.bluez.TelephonyAg1
->   - Add OperatorName property to org.bluez.TelephonyAg1
->   - Rename telephony_set_call_state() to telephony_call_set_state()
->   - Use first available index of call for new call
->   - Fix DBus message memory leak in hfp_dial_cb()
->   - Display UUID and OperatorName in bluetoothctl telephony.show command
->   - Add hangup-active and hangup-held support
->   - Add SendTones support
->   - Remove HFP specific comments in documentation
->   - Add HFP HF server and related SDP record
->   - Add OperatorName support to HFP HF
->   - Add call line identification property support to HFP HF
->   - Disable NREC during HFP HF connection phase
->   - Enable Waiting call event to HFP HF
->   - Enable Extended error support in HFP HF
->   - Add telephony_call_set_multiparty() to telephony API
->   - Enable Enhanced call status support in HFP HF, and use it to update
->     calls status if available on both side
->
-> Fr=C3=A9d=C3=A9ric Danis (27):
->   doc: Add new telephony related profiles interfaces
->   audio/telephony: Add shared interfaces implementation
->   audio/telephony: Add skeleton for HFP profile
->   audio/hfp-hf: Add HFP SLC connection and event support
->   audio/hfp-hf: Add dial support
->   audio/hfp-hf: Add hangup all calls support
->   audio/hfp-hf: Add answer a specific call support
->   client/telephony: Add new submenu
->   audio/hfp-hf: Remove call interface during profile disconnection
->   audio/hfp-hf: Create existing call during SLC phase
->   audio/telephony: Add hangup_active and hangup_held functions
->   audio/hfp-hf: Add hangup_active and hangup_held support
->   client/telephony: Add hangup_active and hangup_held support
->   audio/hfp-hf: Add SendTones support
->   client/telephony: Add SendTones support
->   doc: Make telephony docs more generic
->   client/telephony: Remove IncomingLine
->   audio/telephony: Remove IncomingLine
->   audio/hfp-hf: Add HFP HF server and SDP record
->   audio/hfp-hf: Add operator name support
->   audio/telephony: Add call line identication property support
->   audio/hfp-hf: Add call line idenfication support
->   audio/hfp-hf: Disable NREC during connection setup
->   audio/hfp-hf: Enable waiting call if supported by remote AG
->   audio/hfp-hf: Enable extended error if supported by remote AG
->   audio/telephony: Add call multiparty property support
->   audio/hfp-hf: Enable enhanced call status if supported by remote AG
+This add copies of android specific dependencies used by unit testing.
+---
+ Makefile.am                   | 8 ++++----
+ {android => unit}/avctp.c     | 0
+ {android => unit}/avctp.h     | 0
+ {android => unit}/avdtp.c     | 0
+ {android => unit}/avdtp.h     | 0
+ {android => unit}/avrcp-lib.c | 0
+ {android => unit}/avrcp-lib.h | 0
+ {android => unit}/avrcp.c     | 0
+ {android => unit}/avrcp.h     | 0
+ 9 files changed, 4 insertions(+), 4 deletions(-)
+ copy {android => unit}/avctp.c (100%)
+ copy {android => unit}/avctp.h (100%)
+ copy {android => unit}/avdtp.c (100%)
+ copy {android => unit}/avdtp.h (100%)
+ copy {android => unit}/avrcp-lib.c (100%)
+ copy {android => unit}/avrcp-lib.h (100%)
+ copy {android => unit}/avrcp.c (100%)
+ copy {android => unit}/avrcp.h (100%)
 
-This is sort of too big to review all at once, Id start just with
-documentation so we can nail down the interfaces first, then we can
-proceed to other details, anyway from the brief looking at it some
-things already show in the design:
+diff --git a/Makefile.am b/Makefile.am
+index 02ad23cf2d46..0f5790adcc57 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -583,22 +583,22 @@ unit_tests += unit/test-avdtp
+ 
+ unit_test_avdtp_SOURCES = unit/test-avdtp.c \
+ 				src/log.h src/log.c \
+-				android/avdtp.c android/avdtp.h
++				unit/avdtp.c unit/avdtp.h
+ unit_test_avdtp_LDADD = src/libshared-glib.la $(GLIB_LIBS)
+ 
+ unit_tests += unit/test-avctp
+ 
+ unit_test_avctp_SOURCES = unit/test-avctp.c \
+ 				src/log.h src/log.c \
+-				android/avctp.c android/avctp.h
++				unit/avctp.c unit/avctp.h
+ unit_test_avctp_LDADD = src/libshared-glib.la $(GLIB_LIBS)
+ 
+ unit_tests += unit/test-avrcp
+ 
+ unit_test_avrcp_SOURCES = unit/test-avrcp.c \
+ 				src/log.h src/log.c \
+-				android/avctp.c android/avctp.h \
+-				android/avrcp-lib.c android/avrcp-lib.h
++				unit/avctp.c unit/avctp.h \
++				unit/avrcp-lib.c unit/avrcp-lib.h
+ unit_test_avrcp_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
+ 
+diff --git a/android/avctp.c b/unit/avctp.c
+similarity index 100%
+copy from android/avctp.c
+copy to unit/avctp.c
+diff --git a/android/avctp.h b/unit/avctp.h
+similarity index 100%
+copy from android/avctp.h
+copy to unit/avctp.h
+diff --git a/android/avdtp.c b/unit/avdtp.c
+similarity index 100%
+copy from android/avdtp.c
+copy to unit/avdtp.c
+diff --git a/android/avdtp.h b/unit/avdtp.h
+similarity index 100%
+copy from android/avdtp.h
+copy to unit/avdtp.h
+diff --git a/android/avrcp-lib.c b/unit/avrcp-lib.c
+similarity index 100%
+copy from android/avrcp-lib.c
+copy to unit/avrcp-lib.c
+diff --git a/android/avrcp-lib.h b/unit/avrcp-lib.h
+similarity index 100%
+copy from android/avrcp-lib.h
+copy to unit/avrcp-lib.h
+diff --git a/android/avrcp.c b/unit/avrcp.c
+similarity index 100%
+copy from android/avrcp.c
+copy to unit/avrcp.c
+diff --git a/android/avrcp.h b/unit/avrcp.h
+similarity index 100%
+copy from android/avrcp.h
+copy to unit/avrcp.h
+-- 
+2.49.0
 
-1. The usage of glib function is not recommended on new code, things
-like g_new0/g_free, etc, shall be replaced with util helpers or just
-plain libc function.
-2. There doesn't seem to be anything added to src/shared/hfp.h which
-will make it really tricky to do unit testing since a lot of things
-seems to be done in plugin, if the idea is to really have something
-that is qualifiable Id look into expanding test-hfp to handle HFP
-testing spec test cases which should enable us to determine what needs
-to be inside shared/hfp and what doesn't.
-
---=20
-Luiz Augusto von Dentz
