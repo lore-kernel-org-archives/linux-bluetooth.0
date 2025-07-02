@@ -1,315 +1,130 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E51224B01
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 19:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C242DE6FD
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 20:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751485178; cv=none; b=n2k7Yh5XqJaQztzuDe4g63GOqVhSF3NGk+jdbUUIZcmW3Aoe5iubDX7nu7dc47/+ndl1MWE6tdqEh2Zrl9gkKXQcafWQ1Drfcyf5uWGkRsgyeuZrH96zhsxhH43EBV6ibRnWK5XMsAgVvixdtKV0i3IiHvKR7q6taUEHmxiacTk=
+	t=1751489722; cv=none; b=btabxuJKOD/DLEARiu1enCO/1bPyAIhWEhlwc2tYXOzWrggu/32ZECJsi20zEFr7k/R4pibIM+Xfzx3KpAFQD0jCe6n4Mf84aZyxdp9VNFA/ItirNya9ODD6uSa7J0Ov0eSDja29qvZh8KhxPjRcO5L1UP8NSAOGz40fqE+zCXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751485178; c=relaxed/simple;
-	bh=SpkOxAqNpjXFim2I53VV254/8wQtq3cSgmzJ/74UrDE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZX4piFUjtIBQKgF4IyN4JA5Sk9zRjhfVwtdZyqoUDuxjzJB8/r9N6CYwU1SaNbxrYHdlt17cwzuRhrsXMbUTq1eCQHGLLvtmrlSKzBW2pIU2yvvkkRSvohmUrNSt968niz3kR5rjdpCRstXF9k0ZriMzhsL3e5R9QdzMb3BzECA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=f2yvCK+S; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1751489722; c=relaxed/simple;
+	bh=R+T1dSHoipYjyfUFMZEhegYpzP3eu34r94qUfnCqMvE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=JMPUpSZcsBZtT3lDoKB43LotO7PfktfcGCwn7vrsMq7uLWYYted1/W0b+9SkRvbCy4DsHpdj89hSqFrGyjah2JEER1fSbAEAaHlND8b4uOQDfrGcolt+H0vHpcA6afPls1y/Pe41a1SiypC5RW+qcKgiiQdh3GnayR+fw9JvEqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOO0RcdO; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="f2yvCK+S"
-Received: from github.com (hubbernetes-node-65f8c29.ash1-iad.github.net [10.56.149.32])
-	by smtp.github.com (Postfix) with ESMTPA id 2AF811404B3
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jul 2025 12:39:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1751485175;
-	bh=YiPsturK+6b5tx8VX4UiGKrhwnRM7g5QuHkpFQP8A5I=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=f2yvCK+S/yqWKQv9atp2j9WjvFCYFSzvJgQEetQplKkpP6NRkqkmI4SabMehzQEoZ
-	 PbJhoFlx58RzVAgrMR27ImRC1EgrcWyjzTVnnKFOcXylcovXctZ+4UNibAK1MtkaB4
-	 RH1t+okqHpDP7nBRijUZVWGeFJEYnqQnNWYHh9yE=
-Date: Wed, 02 Jul 2025 12:39:35 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/978340/000000-ce4b33@github.com>
-Subject: [bluez/bluez] 975448: unit: Remove dependencies to android
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOO0RcdO"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-235f9ea8d08so68161425ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jul 2025 13:55:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751489720; x=1752094520; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=iRtswpth0o4vngqvMTF8fzSJYzctzj1lYioOdoX6vnE=;
+        b=OOO0RcdOjDDscK2XM0PGYiZjU17j7w/rO42b9QBJJpg1tNCIsHkxDk+01ll6ZZdvad
+         +I1JMga3u5bWOYxqcs83+7LtsKu8DtLnEVQvPhq6RWjQf+QoQx9kZq60Z8oJaJJcXZ/F
+         //IHwE7m13LZGNKaCHIyRoRSB8nKiwQzRDiKBqUd66wJkFZ4n4qfDIzCAF80xV2dcJfb
+         6FTrDCLUC8mrm5nepXMFA4bAj9COh/Wo85TvQ3F2d0U7jnh0Lj1859CDMbNm2W6/xkVD
+         QWxMeqBk6BYFJJV0BPehaA/BzievKPD6mpcZqEjhwUE4OLe24Q1O/4FMy4S0XmtH1GJH
+         8h5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751489720; x=1752094520;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iRtswpth0o4vngqvMTF8fzSJYzctzj1lYioOdoX6vnE=;
+        b=ICrGxGlEgc52qd/lYF1STL+Hu6TyvboOTlBxpsV3R69L51gOphag3r5rDYfT+AwDNk
+         +wYgSLLO6Oa3oBSMdGZZRviOfeXq6ObkbDuLbzGr/tHrmPTAm1i6a1POSB8mEvCNGv6K
+         0bS3AOeKVcCnUFhLozwYEsv8TiaQN50AP19bxk1VIhMx73ljbUL37q1DrqELbZuilzG4
+         95xJ6u8gz67AagRzGzeywuvh+wcK+m9BnEeDsPt+HFFOmKL3Ix4XYN0VVrOrs4aI3a/I
+         WRdkNsBKSJLmLmjSyUbOSuZHyIhqeWbnTaMMrrhJhibylMHRrGeHLoWiqJdocx+gF0g4
+         VM1w==
+X-Gm-Message-State: AOJu0Yx+kpOB00GTNhGNyHY1tCsLsRsDgRMc4aASOfcZBgG0wv07XDzv
+	0EqNKZHdj0G9SuVXEIGF8gEcKDyFKXbc7kv3oYg+lnYdSjrZe+zyP+lyOZTQGQ==
+X-Gm-Gg: ASbGncvoR/YRZ9MGcdfQdYdCfY4QsBL3sRQ8r5nsQHYbISAXWwgxFA9L/eTKVVeT+hC
+	cSRUmhbMX+cg/t19IvHsTJDgEvXg7kSGxXsZGea4oMi1Dc72JhXFvdnljzekr2W7JMGlcLEW/uf
+	W/xg2vy0GpBLEYjwvi2nX6JaT8MGxLaMZjcd3b2rLoS1ZFfWstBleYZchXp2RNQyaNuD07rwQ0t
+	kAwqpIfQTuQ1bLM2NZCuCFW7ZdhXdS7XapNqkPZmMqMd5JV+n1RzH1O/f9eQHyGKURWwJwGmB8L
+	nce6Q2f7ucfUmgdRL6kOo1LW5365tTiWVHLsUDuYgbVgWHzXXWSjna5n1cbNThAXIQV3
+X-Google-Smtp-Source: AGHT+IGyW42qEiq6IiW45kbN6/p6WPL47Y3A/sg/+s8lY5yEVkM2WwVrGh74SaKglswggnCxVUuFNQ==
+X-Received: by 2002:a17:903:1b04:b0:234:8a4a:ada5 with SMTP id d9443c01a7336-23c6e5b5d10mr55626085ad.37.1751489719941;
+        Wed, 02 Jul 2025 13:55:19 -0700 (PDT)
+Received: from [172.17.0.2] ([40.118.252.93])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb39bf32sm138666745ad.94.2025.07.02.13.55.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 13:55:19 -0700 (PDT)
+Message-ID: <68659cb7.170a0220.378fe6.2add@mx.google.com>
+Date: Wed, 02 Jul 2025 13:55:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4810102868386794056=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/2] unit: Remove dependencies to android
+In-Reply-To: <20250702192610.1547665-1-luiz.dentz@gmail.com>
+References: <20250702192610.1547665-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============4810102868386794056==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/978340
-  Home:   https://github.com/bluez/bluez
-  Commit: 975448897a574e04daf5685075c21edf968570e1
-      https://github.com/bluez/bluez/commit/975448897a574e04daf5685075c21edf968570e1
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-07-02 (Wed, 02 Jul 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M Makefile.am
-    A unit/avctp.c
-    A unit/avctp.h
-    A unit/avdtp.c
-    A unit/avdtp.h
-    A unit/avrcp-lib.c
-    A unit/avrcp-lib.h
-    A unit/avrcp.c
-    A unit/avrcp.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  unit: Remove dependencies to android
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=978340
 
-This add copies of android specific dependencies used by unit testing.
+---Test result---
 
+Test Summary:
+CheckPatch                    PENDING   0.44 seconds
+GitLint                       PENDING   0.39 seconds
+BuildEll                      PASS      20.49 seconds
+BluezMake                     PASS      2702.29 seconds
+MakeCheck                     PASS      19.93 seconds
+MakeDistcheck                 PASS      187.30 seconds
+CheckValgrind                 PASS      237.04 seconds
+CheckSmatch                   WARNING   306.23 seconds
+bluezmakeextell               PASS      127.86 seconds
+IncrementalBuild              PENDING   0.37 seconds
+ScanBuild                     PASS      912.91 seconds
 
-  Commit: ce4b3344a2224842cbb2de7c6ae83619aa226bdb
-      https://github.com/bluez/bluez/commit/ce4b3344a2224842cbb2de7c6ae83619aa226bdb
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-07-02 (Wed, 02 Jul 2025)
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Changed paths:
-    M Makefile.am
-    R android/Android.mk
-    R android/Makefile.am
-    R android/README
-    R android/a2dp-sink.c
-    R android/a2dp-sink.h
-    R android/a2dp.c
-    R android/a2dp.h
-    R android/audio-ipc-api.txt
-    R android/audio-msg.h
-    R android/audio_utils/resampler.c
-    R android/audio_utils/resampler.h
-    R android/avctp.c
-    R android/avctp.h
-    R android/avdtp.c
-    R android/avdtp.h
-    R android/avdtptest.c
-    R android/avrcp-lib.c
-    R android/avrcp-lib.h
-    R android/avrcp.c
-    R android/avrcp.h
-    R android/bluetooth.c
-    R android/bluetooth.h
-    R android/bluetoothd-snoop.c
-    R android/bluetoothd-wrapper.c
-    R android/bluetoothd.te
-    R android/bluetoothd_snoop.te
-    R android/client/haltest.c
-    R android/client/history.c
-    R android/client/history.h
-    R android/client/if-audio.c
-    R android/client/if-av-sink.c
-    R android/client/if-av.c
-    R android/client/if-bt.c
-    R android/client/if-gatt.c
-    R android/client/if-hf-client.c
-    R android/client/if-hf.c
-    R android/client/if-hh.c
-    R android/client/if-hl.c
-    R android/client/if-main.h
-    R android/client/if-mce.c
-    R android/client/if-pan.c
-    R android/client/if-rc-ctrl.c
-    R android/client/if-rc.c
-    R android/client/if-sco.c
-    R android/client/if-sock.c
-    R android/client/pollhandler.c
-    R android/client/pollhandler.h
-    R android/client/tabcompletion.c
-    R android/client/terminal.c
-    R android/client/terminal.h
-    R android/compat/readline/history.h
-    R android/compat/readline/readline.h
-    R android/compat/wordexp.h
-    R android/cts.txt
-    R android/cutils/properties.h
-    R android/gatt.c
-    R android/gatt.h
-    R android/hal-a2dp-sink.c
-    R android/hal-a2dp.c
-    R android/hal-audio-aptx.c
-    R android/hal-audio-sbc.c
-    R android/hal-audio.c
-    R android/hal-audio.h
-    R android/hal-avrcp-ctrl.c
-    R android/hal-avrcp.c
-    R android/hal-bluetooth.c
-    R android/hal-gatt.c
-    R android/hal-handsfree-client.c
-    R android/hal-handsfree.c
-    R android/hal-health.c
-    R android/hal-hidhost.c
-    R android/hal-ipc-api.txt
-    R android/hal-ipc.c
-    R android/hal-ipc.h
-    R android/hal-log.h
-    R android/hal-map-client.c
-    R android/hal-msg.h
-    R android/hal-pan.c
-    R android/hal-sco.c
-    R android/hal-socket.c
-    R android/hal-utils.c
-    R android/hal-utils.h
-    R android/hal.h
-    R android/handsfree-client.c
-    R android/handsfree-client.h
-    R android/handsfree.c
-    R android/handsfree.h
-    R android/hardware/audio.h
-    R android/hardware/audio_effect.h
-    R android/hardware/bluetooth.h
-    R android/hardware/bt_av.h
-    R android/hardware/bt_gatt.h
-    R android/hardware/bt_gatt_client.h
-    R android/hardware/bt_gatt_server.h
-    R android/hardware/bt_gatt_types.h
-    R android/hardware/bt_hf.h
-    R android/hardware/bt_hf_client.h
-    R android/hardware/bt_hh.h
-    R android/hardware/bt_hl.h
-    R android/hardware/bt_mce.h
-    R android/hardware/bt_pan.h
-    R android/hardware/bt_rc.h
-    R android/hardware/bt_sock.h
-    R android/hardware/hardware.c
-    R android/hardware/hardware.h
-    R android/health.c
-    R android/health.h
-    R android/hidhost.c
-    R android/hidhost.h
-    R android/init.bluetooth.rc
-    R android/ipc-common.h
-    R android/ipc-tester.c
-    R android/ipc.c
-    R android/ipc.h
-    R android/log.c
-    R android/main.c
-    R android/map-client.c
-    R android/map-client.h
-    R android/pan.c
-    R android/pan.h
-    R android/pics-a2dp.txt
-    R android/pics-avctp.txt
-    R android/pics-avdtp.txt
-    R android/pics-avrcp.txt
-    R android/pics-bnep.txt
-    R android/pics-did.txt
-    R android/pics-dis.txt
-    R android/pics-gap.txt
-    R android/pics-gatt.txt
-    R android/pics-gavdp.txt
-    R android/pics-hdp.txt
-    R android/pics-hfp.txt
-    R android/pics-hid.txt
-    R android/pics-hogp.txt
-    R android/pics-hsp.txt
-    R android/pics-iopt.txt
-    R android/pics-l2cap.txt
-    R android/pics-map.txt
-    R android/pics-mcap.txt
-    R android/pics-mps.txt
-    R android/pics-opp.txt
-    R android/pics-pan.txt
-    R android/pics-pbap.txt
-    R android/pics-rfcomm.txt
-    R android/pics-scpp.txt
-    R android/pics-sdp.txt
-    R android/pics-sm.txt
-    R android/pics-spp.txt
-    R android/pixit-a2dp.txt
-    R android/pixit-avctp.txt
-    R android/pixit-avdtp.txt
-    R android/pixit-avrcp.txt
-    R android/pixit-bnep.txt
-    R android/pixit-did.txt
-    R android/pixit-dis.txt
-    R android/pixit-gap.txt
-    R android/pixit-gatt.txt
-    R android/pixit-gavdp.txt
-    R android/pixit-hdp.txt
-    R android/pixit-hfp.txt
-    R android/pixit-hid.txt
-    R android/pixit-hogp.txt
-    R android/pixit-hsp.txt
-    R android/pixit-iopt.txt
-    R android/pixit-l2cap.txt
-    R android/pixit-map.txt
-    R android/pixit-mcap.txt
-    R android/pixit-mps.txt
-    R android/pixit-opp.txt
-    R android/pixit-pan.txt
-    R android/pixit-pbap.txt
-    R android/pixit-rfcomm.txt
-    R android/pixit-scpp.txt
-    R android/pixit-sdp.txt
-    R android/pixit-sm.txt
-    R android/pixit-spp.txt
-    R android/pts-a2dp.txt
-    R android/pts-avctp.txt
-    R android/pts-avdtp.txt
-    R android/pts-avrcp.txt
-    R android/pts-bnep.txt
-    R android/pts-did.txt
-    R android/pts-dis.txt
-    R android/pts-gap.txt
-    R android/pts-gatt.txt
-    R android/pts-gavdp.txt
-    R android/pts-hdp.txt
-    R android/pts-hfp.txt
-    R android/pts-hid.txt
-    R android/pts-hogp.txt
-    R android/pts-hsp.txt
-    R android/pts-iopt.txt
-    R android/pts-l2cap.txt
-    R android/pts-map.txt
-    R android/pts-mcap.txt
-    R android/pts-mps.txt
-    R android/pts-opp.txt
-    R android/pts-pan.txt
-    R android/pts-pbap.txt
-    R android/pts-rfcomm.txt
-    R android/pts-scpp.txt
-    R android/pts-sdp.txt
-    R android/pts-sm.txt
-    R android/pts-spp.txt
-    R android/sco-ipc-api.txt
-    R android/sco-msg.h
-    R android/sco.c
-    R android/sco.h
-    R android/socket-api.txt
-    R android/socket.c
-    R android/socket.h
-    R android/system-emulator.c
-    R android/system/audio.h
-    R android/test-ipc.c
-    R android/tester-a2dp.c
-    R android/tester-avrcp.c
-    R android/tester-bluetooth.c
-    R android/tester-gatt.c
-    R android/tester-hdp.c
-    R android/tester-hidhost.c
-    R android/tester-main.c
-    R android/tester-main.h
-    R android/tester-map-client.c
-    R android/tester-pan.c
-    R android/tester-socket.c
-    R android/utils.h
-    M configure.ac
-    M unit/test-avctp.c
-    M unit/test-avdtp.c
-    M unit/test-avrcp.c
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-  Log Message:
-  -----------
-  Remove android support
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+unit/test-avrcp.c:373:26: warning: Variable length array is used.unit/test-avrcp.c:398:26: warning: Variable length array is used.unit/test-avrcp.c:414:24: warning: Variable length array is used.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Compare: https://github.com/bluez/bluez/compare/975448897a57%5E...ce4b3344a222
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4810102868386794056==--
