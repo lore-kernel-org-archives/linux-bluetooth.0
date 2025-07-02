@@ -1,174 +1,134 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0541C5D62;
-	Wed,  2 Jul 2025 13:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25B2275AE1;
+	Wed,  2 Jul 2025 13:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751461560; cv=none; b=o8Qlw/2Dz6hbIqYurcl5/mm5/IOxdFbbR9QLcVAWYZG8XRLkfOgql3VC6YwEucrfJj5IUTYne3K5DogYSxmTNJUf4slCZGSjLAdEsnbtZDDTEIGbVK7Xlss3jJRDS/BfC6Z8WO8eA3yDMBiaSHyia+xBqnzApMVzUc8JF9z6ktY=
+	t=1751461967; cv=none; b=HLbtpYlOgRkzFT0t28tDqeCykxYb2zFnOrRgj4LHNTwo/QsE3cmtTLDzjftVyln9JvTZs5CHB3Zsq3XTfRO8wPp9u0Jg2Zc1i3l7NT0kigDZrzyWoInCHrGnh25VsGAaJZn7SEoBNiPPXW1cpLpy5VoIG6jRRtdeei2HapLw2co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751461560; c=relaxed/simple;
-	bh=HdgdvIsErRYB55Bx2nUsDKO5isYMPC38e3HOD98FCCY=;
+	s=arc-20240116; t=1751461967; c=relaxed/simple;
+	bh=MgQNz4dEC0SLAEBB3RiBeye3YKmJ4vwfWWZgI0Pp/dM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FwVTGh6+llEYo/nRbETcL10GDur2gaDJGOpLxqkiaijlryBpPiCUrviH68CofDyEP1BH75M4qk7Ve3Upndp4lNa5DtHoDtx4jZ0t41HWp3VvU0CEWea4GvGAEsxBx4zBx2Rbc6tjYX9aGUOFxSq3CbzWUZz9VYo6iwG3mSWY2EQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXPfSYmP; arc=none smtp.client-ip=209.85.216.49
+	 To:Cc:Content-Type; b=HNFCIYWLFy0FUAwGHLXnI6ObQx9kn2ELbVBldca/DmLOp5yG/UrrZUiszKJQYyZdRUMWz5xk700sFF2hBUxhFaVcDHS//KgUO1vOZCWYRunG1XUNcO7TBFFLktPfze75beVw34+u8VRr9gaN6synarsFKXsOu6blxDa7eGs4yHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NJ0G1moi; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXPfSYmP"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-3137c2021a0so5846987a91.3;
-        Wed, 02 Jul 2025 06:05:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJ0G1moi"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-235d6de331fso56329195ad.3;
+        Wed, 02 Jul 2025 06:12:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751461558; x=1752066358; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751461965; x=1752066765; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3sl6m6l7WchtXeiLO8eyqbnD5skRu04k6LyNWNAViEc=;
-        b=WXPfSYmPe0geVK8nvO5z1wJQc7kj6p288uvkNqtp5857LDWMzFGn39aL8Ss21hwHlz
-         VCK89Olhkw+qdeF1mhroyKbzzY21Ikwvv5lRYCvAUnW0FU0HE5dYkbrC5tsESnqWOEh+
-         QoPzsSzUrf1BnoAIQ+YIm5wABZOzVTjudeplbnPlLK6WaAaycRRuIJx7qV1yNk0llri0
-         R0XMrIDeG7Ks55lrAclCA7XcYxAwT8C5F9i2LC9APbuA+sC0KKuJbhpYP9pDFJ+iicRy
-         akRz0vwViJ8QnjVmFyZCJ0+rRvTsVzH1EfY/k2I8ye5crF/HLMHGHpSzMn9iTbBMkZrG
-         UCRQ==
+        bh=zAUdGOTuFlPs8wTSiUvt9x4J/6CDUvI907ibRwBkztU=;
+        b=NJ0G1moiq3wYfnudOSxzPl2zo7OnpozpxYQW+k3sAafFN+TWSW/QtNdP01e0x2N5p1
+         7SRNiJ5KSea4SP9maOV1PmXkDRLbclU7eqCiR94Aju2X0E4iAcMn33UVn7/B/9qbSahi
+         wbwqYsc4wxieEGXBCmaIEdEjwxu1cLsViu96jx0UNl/kotSPdr7QC46Y+Ric0AW/tfan
+         bg7M9qLexDT0XDeVg5TOtRLCkgbYbq05QL+auXXGBH+sP80S6x/KFoSL0Bb48ejziP6Q
+         X9/xe4+vxJ31Rqy0o3aoCCPk5LsLsyGjmHXufbsh3dybslG0FE1dTToNHnanRePhuYH6
+         t1gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751461558; x=1752066358;
+        d=1e100.net; s=20230601; t=1751461965; x=1752066765;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3sl6m6l7WchtXeiLO8eyqbnD5skRu04k6LyNWNAViEc=;
-        b=Q3xU0zpiDlhxjl1mUHUYv0lnzFEr7upZMoyNKCxk+Tc/QCPdHLAJEilliC733eY3S3
-         +ppeMrf52DyRL+dDSmbk/NR4hTatXkNwmbeRQ0f76L5zj8JO5hMghmcU+AAIkO7yuJaB
-         Nxt4TKvPAs9/klo6+hxrSFMFcfvV9oTd2asOcMOKQnCWjsi+AY30WnOIsI1fTExXzIB+
-         czOC77gmtd9icpnRYGtseW4dKKE7pyU+LFWZyycIMj2Bj34vEfsbgZT+3PhW2PB7CX7+
-         uZlUPWMdQ9Q7wchrUUcX4O+6DmscoayagpD24tgbo/WpKr8fuLt321AIJmhn8UgcmnDx
-         MmRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVP7sc5ntcdeyz8PN760P5J5ZDm27j8zfuYNj2VHFh7I/V5N8O0z1pnYNXK3xYql7fJRsTB9kBE/vMIEFl2@vger.kernel.org, AJvYcCXobmATV5N8JlyxipjLZDWtbvFn0JOjiOGcvsY0J1Jn6oNhlF4YT3AqwCkQWXLd/WgDpm+gTa/+RaiAtEwCBlM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygDfG0soiUCoG79Kx4r+2ZqHgS5awAbCq7J3V+zcepkllQoCBX
-	PsFRLHFigGr8+sXg6REW1NbmOPJadx18/Bx93Swavx4tG1Bpw4fY+aUbidpzNrW5Fif+CAcgBug
-	qGuNA6ugp0o+t2HlYsVjr03+H7bg8rhU=
-X-Gm-Gg: ASbGncvHoFYgC0C+lNgQDnz9R3YjBA5+PPosExoMGJ8loswhDrrLtgu9+nQrWKEx/JK
-	2b/YqAxKVgrd1WijNWUV6IFpRvCiAZn3SMrLaC5fgUd+xPRrhyBGZBCwD78TKbELNyuaSZ3xYg3
-	Ol0gf3BMCET+oALS3eZtD65sFxDhskI+5OaKLAOkS3JA==
-X-Google-Smtp-Source: AGHT+IE6oAo1JpcGKMDAjbhxBaddxdPQrbeSqqDdlGEg1cIFpEnuZo1kj/DTMX7hU11oivcuZ0mdaYInt5vFda8BjXo=
-X-Received: by 2002:a17:90b:2f85:b0:311:c5d9:2c70 with SMTP id
- 98e67ed59e1d1-31a90bbbc58mr4844308a91.15.1751461558139; Wed, 02 Jul 2025
- 06:05:58 -0700 (PDT)
+        bh=zAUdGOTuFlPs8wTSiUvt9x4J/6CDUvI907ibRwBkztU=;
+        b=iepebH4sxhEGDrFU8XVdWD1wt+z3E/j7N+t6fxk5xcweUEIb5iPhZAugqojcQ8mGyj
+         HIsOxfIzLzXo8jD8s8hNDukt+c/PeokfB/rEM6VNSV3i7wu7GhsPhIdcVT16FmMCiaW/
+         ccHMJVWoTDXWU7YnQ6XeGXt64JBO7gs7a5u3KO2VbiDEMUC3Cd9St5znrorhfvEDzoQm
+         p85vtcU6+wBljSWhTAy2pymRdQYyZm7FOCK4jBGYmf1SpOnpRCzW1K8eV7BGBAVq9R3h
+         IpuyGeyL81Z3neO7IgpfRnUDE9Em9Kh0s52NzkRIQpNb5ks18d9LaG4ybSBVr9WPjZCW
+         9aOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWyk/3JWYGI1+toeKkdX9QAYF5HfgLMRYsk4SAGC89WRcfwSJKNPKn+91wA2b0PVdF99kY8flLMtYYlcQ+K@vger.kernel.org, AJvYcCX/t/HWGmRzL7oogT3rrksddrLOTlmIScBUz6CEmNZgn1pJ11r0C+UZgEyfa0FCbx46IE2s8szAtFSbyQgGczQ=@vger.kernel.org, AJvYcCXh8iSJVGn0CuMMGmOYPZ9xceZtoZgn3ptm8UdkjPK8CEcj8u69yBgOI9WKIWhbh5iNzpB0YgVZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWW+S0GD039pSeEWz3BCt/vS6k6v2H/YiN9Opkm9Qw/HFblKsK
+	bp+UqOShQeu8S6IpKe2hRozkEKypR/Ywt103bpyu4JuGJU7mmB3NT2C0WLaQSEPHJ0Gu2nB77XT
+	XPOkDqshcHNw2AWvnO/lBZIIZsgDlDRg=
+X-Gm-Gg: ASbGncuIcGZVzQjEu2NJBbsiePaNYPOK6BO0pwP7VmDTJngkAZuz21W+uD8sjFTkdbN
+	cetVzEi7WA1+vcm7aUq4sk9jiO7L1f26z4szL9ChrWrsnu2XYPfE3vQDooahWqwDP26zwciJdD/
+	WNCcxTs3jsf7ySmvH5Vz44kEKUGYZGHsHR6/NQNHcysg==
+X-Google-Smtp-Source: AGHT+IHduoQh6O4l5Z18+1AmchmVOhPxqEfTDtzBghb4I9edO1Fehrb2D9vNnAqhAfRg638dUuT+mlQI8E1DGuiG3j4=
+X-Received: by 2002:a17:90b:4a85:b0:312:e279:9ccf with SMTP id
+ 98e67ed59e1d1-31a90b1a2d9mr4400769a91.5.1751461964833; Wed, 02 Jul 2025
+ 06:12:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250606090559.896242-1-hildawu@realtek.com> <bb5d83c2efa24dd8ad271ce812581d02@realtek.com>
-In-Reply-To: <bb5d83c2efa24dd8ad271ce812581d02@realtek.com>
+References: <20250702-pa_sync-v1-1-7a96f5c2d012@amlogic.com>
+In-Reply-To: <20250702-pa_sync-v1-1-7a96f5c2d012@amlogic.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 2 Jul 2025 09:05:43 -0400
-X-Gm-Features: Ac12FXxK5DRKSYIh__84LUfk7KyFThl1pvNIEPjiZub5MkPnhl9voiddthWtZi4
-Message-ID: <CABBYNZK4a15mEDuRtAaSj+y5WzpP751shTLGi1FJg+0eQft+BA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] Bluetooth: Add support for RTK firmware version 3
- and enhanced ACL-based download acceleration
-To: Hilda Wu <hildawu@realtek.com>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Max Chou <max.chou@realtek.com>, 
-	"alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>
+Date: Wed, 2 Jul 2025 09:12:26 -0400
+X-Gm-Features: Ac12FXxoOT18Fne-l3qVCdnz06AB2wu9x0tMPmHVrMsBAFF-8F_BAPNqGAZZAjs
+Message-ID: <CABBYNZJCsiKVD4F0WkRmES4RXANNSPK1jvfRs-r9J-15fhN7Gg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_core: lookup pa sync need check BIG sync state
+To: yang.li@amlogic.com
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Hilda,
+Hi,
 
-On Tue, Jul 1, 2025 at 11:35=E2=80=AFPM Hilda Wu <hildawu@realtek.com> wrot=
-e:
+On Tue, Jul 1, 2025 at 9:18=E2=80=AFPM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
 >
-> Hi Marcel, Luiz and Maintainers,
+> From: Yang Li <yang.li@amlogic.com>
 >
-> I hope this message finds you well.
->
-> I submitted two patches for the Bluetooth subsystem recently and wanted t=
-o kindly follow up to see if you had a chance to review them:
->
-> - https://patchwork.kernel.org/project/bluetooth/patch/20250606090559.896=
-242-2-hildawu@realtek.com/
-> - https://patchwork.kernel.org/project/bluetooth/patch/20250606090559.896=
-242-3-hildawu@realtek.com/
->
-> These patches address the future chips firmware format enhancement and do=
-wnload firmware improve.
->
-> Please let me know if you need any further info or changes from my side.
-> Thank you very much for your time and consideration.
+> Ignore the big sync connections, we are looking for the PA
+> sync connection that was created as a result of the PA sync
+> established event.
 
-Don't send reminders, just resend the patches, also the kernel test
-bot did respond with an error message, please fix it before resending
-it.
+Were you seeing an issue with this, if you do please describe it and
+add the traces, debug logs, etc.
 
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  include/net/bluetooth/hci_core.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 3ce1fb6f5822..646b0c5fd7a5 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1400,6 +1400,13 @@ hci_conn_hash_lookup_pa_sync_handle(struct hci_dev=
+ *hdev, __u16 sync_handle)
+>                 if (c->type !=3D BIS_LINK)
+>                         continue;
+>
+> +               /* Ignore the big sync connections, we are looking
+> +                * for the PA sync connection that was created as
+> +                * a result of the PA sync established event.
+> +                */
+> +               if (test_bit(HCI_CONN_BIG_SYNC, &c->flags))
+> +                       continue;
+> +
 
-> Best regards,
-> Hilda
->
-> -----Original Message-----
-> From: Hilda Wu <hildawu@realtek.com>
-> Sent: Friday, June 6, 2025 5:06 PM
-> To: marcel@holtmann.org
-> Cc: luiz.dentz@gmail.com; linux-bluetooth@vger.kernel.org; linux-kernel@v=
-ger.kernel.org; Max Chou <max.chou@realtek.com>; alex_lu@realsil.com.cn
-> Subject: [PATCH v2 0/2] Bluetooth: Add support for RTK firmware version 3=
- and enhanced ACL-based download acceleration
->
-> Dear Maintainers,
->
-> I am submitting a patch for the Bluetooth that introduces support for RTK=
- firmware version 3 and implements an enhanced download mechanism through A=
-CL to improve firmware loading times.
->
-> Patch Overview:
->
-> 1. Bluetooth: btrtl: Firmware format v3 support
->    - This addition ensures the latest RTK chipsets with firmware version =
-3
->      are fully supported. It includes necessary modifications to
->      accommodate new firmware structure changes.
->
-> 2. Bluetooth: btrtl: Add enhanced download support
->    - By leveraging ACL links for firmware transmission, the download
->      process is significantly accelerated, reducing the overall time and
->      enhancing performance.
->
-> Testing and Validation:
->
-> - The implementation has been tested on various RTK chipsets under Linux
->   based distribution.
->
-> Impact and Benefits:
->
-> These enhancements are beneficial for future firmware v3 chips and compat=
-ible with previous firmware versions. Users can expect shortened initializa=
-tion times.
->
-> Your feedback and suggestions are welcome to further refine these changes=
-.
-> Thank you for considering these enhancements.
->
-> Best regards,
-> Hilda
+hci_conn_hash_lookup_pa_sync_big_handle does:
+
+        if (c->type !=3D BIS_LINK ||
+            !test_bit(HCI_CONN_PA_SYNC, &c->flags))
+
+>                 /* Ignore the listen hcon, we are looking
+>                  * for the child hcon that was created as
+>                  * a result of the PA sync established event.
 >
 > ---
-> Change in V2:
-> - Move structure to btrtl.h
-> - Fill in the missing symbols
-> - Fix build warnings
+> base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
+> change-id: 20250701-pa_sync-2fc7fc9f592c
 >
-> Hilda Wu (2):
->   Bluetooth: btrtl: Firmware format v3 support
->   Bluetooth: btrtl: Add enhanced download support
->
->  drivers/bluetooth/btrtl.c | 857 +++++++++++++++++++++++++++++++++++++-
->  drivers/bluetooth/btrtl.h | 122 ++++++
->  drivers/bluetooth/btusb.c |   3 +
->  3 files changed, 974 insertions(+), 8 deletions(-)
->
+> Best regards,
 > --
-> 2.34.1
+> Yang Li <yang.li@amlogic.com>
+>
 >
 
 
