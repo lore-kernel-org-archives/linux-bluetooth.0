@@ -1,130 +1,260 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11022075.outbound.protection.outlook.com [40.107.75.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E462E2EEF
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Jul 2025 10:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751538873; cv=none; b=E9bgkixjLx7B6Fnmk1gvVoJp+SX76se+w8JdFFfPHh7bCa6DX+fDNwYxXEBqbAIB2jn4W396V9vJP3AwNeVNWkoM+cSWr6cXuaBWMdtzDtIS/AECFQT2g/CiIF1akXovXXH2LaF8ObqXO/pdyj3GCawqGSZvN4y8Cc61ozc4cMk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751538873; c=relaxed/simple;
-	bh=5EEFD4sNyNfWzc3ejsYRIQEjpeX/Ppos6igqSv/aVxQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fzXXbFSKLIWUzgL8SCy0pZWIOrT/tM0n2kM+kc4OM3/T3KJf4igrgi0qqawXfcwS92kLeu1+A+4yGCXmQ/668q3sN7BOj6cXT3kAt7L2tzEdfuzWLS4U+ieJnxCBs0AbpnIFuyJLlFqWh7jZ2roqd+//19IR8rM8jnKiBVCdyDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGK9Lz62; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BA31B95B;
+	Thu,  3 Jul 2025 10:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751538920; cv=fail; b=O1Zrj+RmczkHxYzkGxqyeMVI57/mA2xPSWKVOBbVdOGeQy9n0REEuKfjyf/RkRgTnysEY+6ybGxZv32VE2qmPvcBTiI65Vb7669YZjpUZ33TBEhlqqc1w8YWroLImjd6aJ/ehwk/ZyGSxBmfqS44s9fLgU0e5PgTHg5VcNw4cwo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751538920; c=relaxed/simple;
+	bh=dt9lLE6WTbdn7QfSyGIfacCkAZiOeNBhuQhcgY8t9lY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GWKU2yOgRtf75Fz+/MqU6SjSH1NNWAgdr32+uEPXr1lWun/y7XK5dr9WWaqPp7gb0mcaBkKDkamjMwWNVf5HGyh6eSWZ9GtYrgJI98qskejWSeAd/hRLq++5nL/1bosRYsqC1gTVxov9cNilf3o2ihlRSOYvCLSz6yF5XbKSpp8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=W/wxJ3vH; arc=fail smtp.client-ip=40.107.75.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGK9Lz62"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7d467a1d9e4so83254985a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Jul 2025 03:34:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751538870; x=1752143670; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IxLyUNbF144HdzXDG+b3MtakAOxVh0qXUqBO9qz+bLE=;
-        b=YGK9Lz62gfW4VS6agcoGap6SK8+t216gKzlX8bS8eGoBk06BacgZdmT6CmpcH1WYXS
-         LE7lOz17viPrVxJMmQOhECvxdd4cq9zCWqfFCfQW8H8ADcWqm90Ob0rvPjYQk31wSE/+
-         hJmWxX/grf32u43PZPz/JaB6Vpp9OH8BqsQFJWcCN2LjPMPDtjw2qqWY4rsdimycww+B
-         2LfpKMSNno0ZcsSK2RtrCgQkwEJz7WO5e6+RvFfHsd/jiV+K/40VFTKuZH/Fx53tcURJ
-         ooWoNsf9QNFbTfx9cZ32LedhrZq0bDdNZXkHWvN/eq1BRBHe4qEbYLF19NmOjbVinKgG
-         DLOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751538870; x=1752143670;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IxLyUNbF144HdzXDG+b3MtakAOxVh0qXUqBO9qz+bLE=;
-        b=QNzaNSpUExpvng9t1w2P0eXfvt5jjHOOOdM0sJkXNsdDKj3GOhuJgvR8ha0qCuOGkR
-         e8Et8NrkCceO7SV6gtCGIwFLavclBXntqyozcgVfaXUlrnG4SDUSdcE+Ra+7eZ7slrW8
-         FCiGdeH9GXl5FIZuDNG2OnDPMyRCudgIU/gLuO1SwwYbwUoxqrChIJs2A+IMjiU5g9qG
-         eMmlALrjlwuhaqQ7OWqEIBZt2JykkJdwUzgRl9DCK5wODyrQ4fhgnCSAmlgFgQYIVegX
-         gpLyGXhBJztvYtexuyCBTMFRGIPfEOeUhzs7UsvVtelhDOUEhWYPRfcmqerl05YWu4Ne
-         9ocA==
-X-Gm-Message-State: AOJu0Ywe8t/4nvJWHhvsz4xvE3u4gw/bBfALnzvzS1EsMk807oF/8eJI
-	cIyKW/un3h09o5LLB4R8/kDEukv9DgpcJph9kgjGmTo8c06er/xaoj///SLE6RCm
-X-Gm-Gg: ASbGncsfgKrH5a5M0ksw87weCRMhY47vsQlmcYJzgI5giNkbv4uBDnk6Xtvyy4OM5Wb
-	zunn7ITexxs61RAsErYrGVGKBjmHCvPg0qBMByReFOlyNAaCD7pK00yxR+t9iERmcCaantxFDBy
-	DF0XnbmjhEcLQvwbtxrVBx1KN5jY+kvg2V5ZxHgCWu/EodRfy8oa8RRHxamVB6RIqmw1+eiqWCW
-	GSXG88NeXKhtkD8Ani6yX5kzdcFUvtvcwYANwyoOyJiQe3ly2prgEcRALVyqf8rq4zEsza91W/W
-	YZYJ2020DdUlJ9U+VrK7oDJZb1fqDC5tZZaTHQCbcBkWegsMXK3EmO+Ka/E4fcLwMWWRNyw=
-X-Google-Smtp-Source: AGHT+IGoqXtNTw/SSLEIWP8Kr0AI02fSQIhK7gd3N7NO1lDxQqtk8Dt3gC7+6h3+/zNJ4/qhW9k7vw==
-X-Received: by 2002:a05:620a:688d:b0:7c0:af6d:a52a with SMTP id af79cd13be357-7d5d443cb63mr164354785a.26.1751538870272;
-        Thu, 03 Jul 2025 03:34:30 -0700 (PDT)
-Received: from [172.17.0.2] ([172.190.134.142])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d44323ef1csm1081026285a.112.2025.07.03.03.34.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 03:34:29 -0700 (PDT)
-Message-ID: <68665cb5.050a0220.1f561d.588b@mx.google.com>
-Date: Thu, 03 Jul 2025 03:34:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2294367704121339442=="
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="W/wxJ3vH"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M6UDrNpvUDfNu07EZIeApXQgE8B4flyZEbVlxryOCyHCQKGJxm5fLDofqjxE/WvXkQZOxN1BgBQF09FZ+zZoJlcXDBfdwREM4OfIR3b1MSmo4JynkQsE8yRIhhLG9Bnuh1uDP4IiF6dq4nv/Yx1Q+4d+tBbJlvunD1/T4kFRapt9ae7b/y3wpQ/0k74I/UBYs48FbfrUjev3xMgkL4WLvAgy2De+YN7QppUMC4QAuBXfVQ02JxpRxz+uGuLJHMwfhuGT2OA5OdLDh6kApN/FOMGcI7yknB918q1JpP2MhoEWPlHnz8F6RunXWCXuU2s/cU6NfHZCxnQlmW+gtns0Hg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lnoEw5PsYN4XEFbcJ8nsfl/2XCgjP/YhwdqzVBkGpM4=;
+ b=Dhxa1ER6oZPNol2AYx0Q1lkLT41ryR5ldHoWVOmiwK6nl/+lVhMsf7nnbDvQ+F8cQxGfh5VlHpc0iw7+g8AI8ECGG8eLs6eV5l0wmtgcD149yykhBcojBZmsUd1uDdArwKLJKR9PrVV9FCaX0UUlEElwL1kKz3WknLKNcp/i2OUH7cei9Hy8v+air/z6qs1SCKeJcyEkAs9aXelTx0q8Ru+M+ms/M/WHQhhJhc2HlmuzcVpgm8Jw1PRIzuPW0HDtz1nOx65/jCnnDI7SXLHz280uJ/Ejsh2JaB//Jbqpumwne244Ouey/0C/D+6IjjmyDwS+Q2n4LDiYaH/DyHD4hw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
+ dkim=pass header.d=amlogic.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lnoEw5PsYN4XEFbcJ8nsfl/2XCgjP/YhwdqzVBkGpM4=;
+ b=W/wxJ3vHEwrcm5qcOaq8soM99yKDOkV6hEJ/JpcwDoO+b4wvf24Ke1ekAvM9h6WRMckvBvbweg/+JUoW6AbCOhYZjprE1l1z9CsrV9T8WH5RjwHt3XBr1Ahe/m/zgCotH9dmCm6Z6BmJmqqTZrG3wtCAs/3eACosaMwsLdZ9ZCN6n3eAce3k9iX92L2DVreKr+yH2aTT97a+jym0ZWUYbJvDmykXMDqsRF2QqIN78gDL0R7SRfyIBFcQqr6sfmgD69jhYeoorcD457j6S1CHw9Cb2kIPcua7baVw1N0RInj4mx0Z6amo69orprWqnRaeirdvBPBBF8rjv94Jt6lYxQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amlogic.com;
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+ by TYZPR03MB7081.apcprd03.prod.outlook.com (2603:1096:400:33b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.20; Thu, 3 Jul
+ 2025 10:35:13 +0000
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd%7]) with mapi id 15.20.8880.021; Thu, 3 Jul 2025
+ 10:35:11 +0000
+Message-ID: <7ea17a93-284d-4e9b-8130-cc46b16a9524@amlogic.com>
+Date: Thu, 3 Jul 2025 18:34:46 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: ISO: Support SOCK_RCVTSTAMP via CMSG for
+ ISO sockets
+To: Pauli Virtanen <pav@iki.fi>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250702-iso_ts-v2-1-723d199c8068@amlogic.com>
+ <d6906cfb7fae090b9fe0c1c5b8708182eb939b42.camel@iki.fi>
+Content-Language: en-US
+From: Yang Li <yang.li@amlogic.com>
+In-Reply-To: <d6906cfb7fae090b9fe0c1c5b8708182eb939b42.camel@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2PR06CA0003.apcprd06.prod.outlook.com
+ (2603:1096:4:186::14) To JH0PR03MB7468.apcprd03.prod.outlook.com
+ (2603:1096:990:16::12)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: Fix typos
-In-Reply-To: <20250703085630.935452-2-hadess@hadess.net>
-References: <20250703085630.935452-2-hadess@hadess.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|TYZPR03MB7081:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2ca675a7-f475-426e-a8e6-08ddba1d4a28
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OXhnNkIrS2UzZGUwUndpUXZJd3F6U0ttb3l0Wm1GbW9hQVJWSzllK01BTnNF?=
+ =?utf-8?B?MVp1Rnc1dHFicGtJRDNUamh0dTRhVFlGTmpVbmtYVGF2YVJlMjBhSkl1VlRV?=
+ =?utf-8?B?eHVBTUR1MGtwS1FpTVRid3JrMTVrRU13SVE0aHVyMEJxVnRtb0xJOFlzcjJQ?=
+ =?utf-8?B?U2J3L3p1U2UrUlhCSGdHT0puNFd6Tk8rMVoraHFhR1pLVWVNQVZhS1VpMWF4?=
+ =?utf-8?B?eWtuOVAzU0FsRmcwY2krb0x5UG1MUmpKMlVlYU5WZjRzVWptQnBQditVWW95?=
+ =?utf-8?B?bXlCbTJVUTN2ZzYxblFLSWl2MXc4WXk2WVBBdXRBdERtS0Z2ZXdBT3pFUkR6?=
+ =?utf-8?B?TzNHZE54a3pMSzZVZGdYUzJhS0ppYXRicmxLWXA1alJ1M3lXNmNVLzV2aWpr?=
+ =?utf-8?B?Tk90VTVYTlpHT0dtSUZKdFRncmd1WVlwcW02dS9jNjJrb2hiRWthT2s5YmxC?=
+ =?utf-8?B?SG5tSytPYzBtZmRtbXI5VW01OWZWTks1RmRLN090L1JOalJhZjAzYmFwOStJ?=
+ =?utf-8?B?Y2dYWkVYcVhyTlZ2emVRYWp4VHJDRXh2anlnOXF0cVlNaEJUdEhqUFE0SzAy?=
+ =?utf-8?B?U21uYjhUR3lWUVdyd1V4OVhHWVBCZWVuUkJyYjlTdWp4S1hYT0g5QlpvdFFP?=
+ =?utf-8?B?RXNTNWI4eG83aFowemRod3poMjVIQkVXQXZhYWRBVkYyVXJhNHFXSGlDYVVo?=
+ =?utf-8?B?bEFkTHR2bW0yaGNNRy9Oak1zVjhQQ3dydUNpU3JTeFNVZnJiZ2ZnY1FaT1VW?=
+ =?utf-8?B?Q0FtM1hIQURvcm9NQlN5SVl1NE5ubkhjUlFHRlcwV0ZRNi80WnFlemNqSkx3?=
+ =?utf-8?B?V0VBdUovWWNDOWV4eDFYZEM1am1kaVIwUjZQV0Vack9wdFVKV3dab1l4WXd1?=
+ =?utf-8?B?bmczb2txU2Q3R0dRRUQyU3F6MWtrOUlUdXdRTkUvTitUQjJ3UkgvQ3JqUUxY?=
+ =?utf-8?B?YkNoOTZzSE1qQ3JWTExUdk4xc25SdVFwQUJpcGs2bHZjeEM1TTVFTmJkODMx?=
+ =?utf-8?B?YkE3bFJtY3FUUjQxK1c1Y1RLSkJ6MHFtZk5rbGM1RHpiWjM4MFROTFQyTTRw?=
+ =?utf-8?B?b0s0MXJjWVJHSGxzSHVYSUZEUG4yazVmWllnaklEbXV4emxHbWhNSVVHbHJU?=
+ =?utf-8?B?eE5JSlNHSkYwUUdobVJzcktDUG44c3JZYXExL01oSmp1MWE1M1FDMXFrZ3E1?=
+ =?utf-8?B?U2g5Sk8zK2hpZVVGcUdkT0dzMTEzVTdrUVgxWEF4WVlVa25sNmhEd3lvMGtl?=
+ =?utf-8?B?disxcW5vL29GRUlnY2FPK3hLT05XZ0xtRHNWdlFWancvZlFqbmcyekVQWllL?=
+ =?utf-8?B?Q0tQMU0rR3BqWXZmSmxRSVJsejhPUS9GL0l5N1FxeHJsQ1hmMm1BbHJKZUdW?=
+ =?utf-8?B?bkhIN3dNdW52dHBDMWVKK0w4b254SUswc0R0endNYzNCa3RNenhibFRack8w?=
+ =?utf-8?B?a0lFQm9qVVJ2eThyQ3hURTJzSDZja3pEM1lpdmtIczF1MTRQYmZEZUtudkJ4?=
+ =?utf-8?B?Y1paSkJiRlRxdkVRSEVrcGtyL0JZdUtIclZmMWlQZ1A3VmxmS2tDNWQvYmdn?=
+ =?utf-8?B?RjUxdVpibTU4SHFaK1hvSFFuaEtibjlDdHBtOGVQVFV6NDdYcHBabjBsUjE5?=
+ =?utf-8?B?KzYyb3JWK3YvaHpiQVorNzJLeXpzWk5xeFBZUHZQbzZkaUpmeWw1VEwvQ0Rq?=
+ =?utf-8?B?Y1lFbjRqcnplUTVpQURGZ3VrTUl1cTJJMHFCa2NoK0V5VjU4ZUVRdWxEVERX?=
+ =?utf-8?B?K2U0UnJFcHRjTmhGRnVFSVYwYjlxMEdmMlhWYmQraGMvNDVEbmFmYlZmbkx5?=
+ =?utf-8?B?N0pycnFaSWh3Z1FXekZtL24yMXZPT09CU3IrWEtrQTZnNUdtZzVxdnMzdGR1?=
+ =?utf-8?B?WGo3QUlkOTBSM3FPcU1xbTNiVTFnQitnRy9XV3ZENmxtZjlhSUgra3cxLzZG?=
+ =?utf-8?Q?UlnPwaiCa0Q=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WTRNaXQ0K0xwcUtTYzdidTU1Z1ZWUU9MUnR4TGZFWExrekhFOFNqeXdJUFVM?=
+ =?utf-8?B?dDFicnJ5bUw3WnNjK3lCa1IrQXpCcE05UlE4c3dFc1lsVmVWV3N0VVVTV2lI?=
+ =?utf-8?B?dUIxSmpONDFKaHE1NFFqK0lBc3AwdHoxb1EvVFAxYTVCMGxSK0pGanIweTlW?=
+ =?utf-8?B?Wk5LSWFBdnZpZEcyY0NmajdmVE02RDdnRERIREhBOG5rOTZQSzN6NzhEQ0FD?=
+ =?utf-8?B?bTB2T0kyeFl2YjRQbTEzaUt4SnNpdlhhZXNKV3VtcWV6SjBRVFBPaFJZdGZ6?=
+ =?utf-8?B?TWYvVmJhMWtOZzgvN0RLeGJzTWVGejMyVzl2dmxsYWhsSmlmM3NuTmNTM3JB?=
+ =?utf-8?B?bkxjV2xzencvN2VQcjdhNHlmTCtRTExxQXBidnBvTnZ3eUx6bU5aNkJFZkZk?=
+ =?utf-8?B?bFVTZnpyS1lrZWJIY3NLYXJ0cWduVTM1MVBKU0RyRmJ4aHFoRG1YWVRrZlRw?=
+ =?utf-8?B?b0xuMjUyVTYzNUFZN0JvVlZPbGpvMTFhZUdXb2g4WS8wL2VaSXl6eTRLdTJY?=
+ =?utf-8?B?eGkxRkVLMXd4Q1BFSDhhV2JzdFloZG4ydCtwNU5PUEliSHVMSU1ucFRLZFZ5?=
+ =?utf-8?B?cmtpNldiT3MwZm1JSUo0N0hiVnc1Zkt0ZG9wWFdDakJiMGVEUVZISTFJd25r?=
+ =?utf-8?B?MVBmRGdLSXYxWHE5YnIyellZcTZtcG1GNks1R0ZRRVlmL0h5NlN5YU5tYjB5?=
+ =?utf-8?B?TTRsQXNvOUgrdUpHNlBrNFFBUy9sVERwVG5XblBNTmJkWk12bmxqYVlBRlU1?=
+ =?utf-8?B?a3JuTW9jSzdIV084UlBtc3g4d1ErMWFHWU81ZFRXdVNHL3JROHl1VkwrTHJK?=
+ =?utf-8?B?ZmRIc2Z1VWVXeTdtM0JtTDdISDRScWJ6alRjVmN2Q0JWZmtkUTc0bmVldHM4?=
+ =?utf-8?B?cnNMY1dGSDNaUzRNMGpQa0hLV2RuOVFXaWllTlNFRlZIM2RoMEZNTlpkV0N6?=
+ =?utf-8?B?UkNEc3oxYmtFaWN5eDY4S25GNGp5MGpFc3JkTE9yRTVUQXJnbUdxVVcyQ1g4?=
+ =?utf-8?B?MU5HZW9sVkhPdy96dXNOeEJXWE9vNk5oRk1GcWRvWG96VG8zbldvcXdUOE1U?=
+ =?utf-8?B?U2tSZ25INTZLZ0NqUTY2b1BQOWFDcEx2bEErMS9FdWJ5STg3eVlxN2R6YXU5?=
+ =?utf-8?B?eC84TDZYQ0s1QjZ4WUtFZ1YzcDVrck5VYk1IK2Zsdi91TjhTVmMvb29tbUx0?=
+ =?utf-8?B?TnF4NndZRVlkcExmbTJHOFNHRUdvQWRZeE5hKy9pbWlENmtCYTZ4NmdtVk43?=
+ =?utf-8?B?WnZyejU1L0RCR004aXI5RkRBZzgyNWVzRERodTYzSnNRNXlRWkFxdzRYNEZB?=
+ =?utf-8?B?b294c2NJcTNhWk5QWEtzL3hwVXhkcExHKzhINi9WWkhTUm92NVZSak16WXdK?=
+ =?utf-8?B?enN4a0JGeElYVzVnK0NlaTBGblkzNk9jdS9hazdnQnJlSGZLdG9wUDhnOUQy?=
+ =?utf-8?B?YnRIb2kyRU03NUpkMTVlUkQveHk4MTJ3TWFLWllFd1ZzZ2kxWFRIMXo5N1Zm?=
+ =?utf-8?B?eFR1cEpZYnlSNXA4TVJhR2h0MUFqa0xqSDZkbjl1QW4xTCtxMjYxNXFVeGxr?=
+ =?utf-8?B?NFdQUTJqT0J1WUtNcTNlVW5DR2JEcTVXQjhvWDZaWG9RbmM2Tm5QS053SDlt?=
+ =?utf-8?B?MzdBYmx2bXRkQTg3SEdyWXcwVGl2SzYyZy9zcDVCRHdIQzAvTTQ3bkRkakpz?=
+ =?utf-8?B?VHJrZXJtc3dXczNGalFueWpjYmo0anBmcnBFcDdaeDl6dzdvWVJUc1BFdWtR?=
+ =?utf-8?B?WTQvYUZ3YlFGWXBTaDdYUGNpWCt3cVhJYU5NakwwdnpYdGxyRklRMmVOMS81?=
+ =?utf-8?B?NkFRMytGR0ExbGZqT3NWeG0wOGV3TFFHWC9WanlEMDZQamM5Y3BSNlo3NUFx?=
+ =?utf-8?B?R0dZK0wyMUtjclVOM25RNmpGdEQ1NVlSYmY2YkVPdm5ZUDR4QUVkS0VHNW1Z?=
+ =?utf-8?B?eklla3VGWUpSNENBajhUeWY3b2NQTDYzNDU3ZjdhN0wzc1VxQVc3dFZUNy9x?=
+ =?utf-8?B?dmhXZFc1WkNCY1VuU3B4UHAvK0dWYk5COSsyb0V6dkFRSzAvc3FMU2NIMVl5?=
+ =?utf-8?B?cnJqMFNZTzJYMDh3SWRUV2lxSlY4MkZDS3YyaUlsSUdUY3hIcjRlS1ZtUlZy?=
+ =?utf-8?Q?cqMx2Ij0jvfxwTlb7G636hjax?=
+X-OriginatorOrg: amlogic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ca675a7-f475-426e-a8e6-08ddba1d4a28
+X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2025 10:35:11.8776
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tKqZRK3jl0CjVvPe1qHd3StpMTW/K50q44j5SnfK6MBjciOBPejdqFFKn31XwEHkydEXiRiq/78KwJpKjZzYdA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR03MB7081
 
---===============2294367704121339442==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=978522
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.28 seconds
-BuildEll                      PASS      20.46 seconds
-BluezMake                     PASS      2789.69 seconds
-MakeCheck                     PASS      20.76 seconds
-MakeDistcheck                 PASS      203.01 seconds
-CheckValgrind                 PASS      280.92 seconds
-CheckSmatch                   WARNING   311.11 seconds
-bluezmakeextell               PASS      131.11 seconds
-IncrementalBuild              PENDING   0.30 seconds
-ScanBuild                     PASS      935.69 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:456:29: warning: Variable length array is used.mesh/mesh-io-mgmt.c:524:67: warning: Variable length array is used.monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/l2cap.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/msft.c: note: in included file:monitor/msft.h:88:44: warning: array of flexible structuresmonitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1918:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3822:52: warning: array of flexible structuresmonitor/bt.h:3810:40: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:618:25: warning: Variable length array is used.src/shared/gatt-server.c:716:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:618:25: warning: Variable length array is used.src/shared/gatt-server.c:716:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:618:25: warning: Variable length array is used.src/shared/gatt-server.c:716:25: warning: Variable length array is used.tools/bneptest.c:634:39: warning: unknown escape sequence: '\%'tools/mesh-gatt/node.c:456:39: warning: non-ANSI function declaration of function 'node_get_local_node'tools/mesh-gatt/prov.c: note: in included file (through /usr/include/readline/readline.h):tools/meshctl.c:324:33: warning: non-ANSI function declaration of function 'forget_mesh_devices'tools/rctest.c:627:33: warning: non-ANSI function declaration of function 'automated_send_recv'
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Hi,
+> [ EXTERNAL EMAIL ]
+>
+> Hi,
+>
+> ke, 2025-07-02 kello 19:35 +0800, Yang Li via B4 Relay kirjoitti:
+>> From: Yang Li <yang.li@amlogic.com>
+>>
+>> User-space applications (e.g., PipeWire) depend on
+>> ISO-formatted timestamps for precise audio sync.
+>>
+>> Signed-off-by: Yang Li <yang.li@amlogic.com>
+>> ---
+>> Changes in v2:
+>> - Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
+>> - Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com
+>> ---
+>>   net/bluetooth/iso.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+>> index fc22782cbeeb..6927c593a1d6 100644
+>> --- a/net/bluetooth/iso.c
+>> +++ b/net/bluetooth/iso.c
+>> @@ -2308,6 +2308,9 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>>                                goto drop;
+>>                        }
+>>
+>> +                     /* Record the timestamp to skb*/
+>> +                     skb->skb_mstamp_ns = le32_to_cpu(hdr->ts);
+> Hardware timestamps are supposed to go in
+>
+>          skb_hwtstamps(skb)->hwtstamp
+>
+> See Documentation/networking/timestamping.rst
+> "3.1 Hardware Timestamping Implementation: Device Drivers" and how it
+> is done in drivers/net/
+>
+> This documentation also explains how user applications can obtain the
+> hardware timestamps.
+>
+> AFAIK, skb->tstamp (skb->skb_mstamp_ns is union for it) must be in
+> system clock. The hdr->ts is in some unsynchronized controller clock,
+> so they should go to HW timestamps.
 
 
+Following your suggestion, I switched to hwtstamp but kept 
+SO_TIMESTAMPNS on the PipeWire side.
 
----
-Regards,
-Linux Bluetooth
++                       struct skb_shared_hwtstamps *hwts = 
+skb_hwtstamps(skb);
++                       if (hwts)
++                               hwts->hwtstamp = 
+us_to_ktime(le32_to_cpu(hdr->ts));
++
+
+The value I get is unexpectedly large and not the same as the timestamp 
+in the ISO data.
+
+read_data: received timestamp: 880608.479272966
+read_data: received timestamp: 880608.479438633
+read_data: received timestamp: 880608.489259466
+read_data: received timestamp: 880608.489434550
+read_data: received timestamp: 880608.499289258
+read_data: received timestamp: 880608.499464550
+read_data: received timestamp: 880608.509278008
+read_data: received timestamp: 880608.509451425
+read_data: received timestamp: 880608.519261175
+read_data: received timestamp: 880608.519438633
+read_data: received timestamp: 880608.529385008
+read_data: received timestamp: 880608.529462133
+read_data: received timestamp: 880608.539273758
+read_data: received timestamp: 880608.539452758
+read_data: received timestamp: 880608.549271258
+read_data: received timestamp: 880608.549450008
+read_data: received timestamp: 880608.559263466
+read_data: received timestamp: 880608.559443216
+read_data: received timestamp: 880608.569257466
 
 
---===============2294367704121339442==--
+Is there any special processing in the application code?
+
+>
+>> +
+>>                        len = __le16_to_cpu(hdr->slen);
+>>                } else {
+>>                        struct hci_iso_data_hdr *hdr;
+>>
+>> ---
+>> base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
+>> change-id: 20250421-iso_ts-c82a300ae784
+>>
+>> Best regards,
+> --
+> Pauli Virtanen
