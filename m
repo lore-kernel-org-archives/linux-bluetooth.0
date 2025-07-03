@@ -1,63 +1,65 @@
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023141.outbound.protection.outlook.com [40.107.44.141])
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023127.outbound.protection.outlook.com [40.107.44.127])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFBE2D0C86
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Jul 2025 08:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E59329AB1A;
+	Thu,  3 Jul 2025 08:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.127
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751532040; cv=fail; b=AEASsJYNviAtiMJEtD9iU1VlzQCAi/QLhi22+o4NLLnwXVb2kC2f6jZlLBzM2e/bbNv+uRZMXX22FKoiTQ96HpL/nImkAeuGOu4C5PXqOAfeSjumcmLVLfBfMUi9DL6fmvwBP8qJo76JywTe0VcQWWXsuYZNPNHH+AmELo5qBVg=
+	t=1751532303; cv=fail; b=b1YThVSwvCRmD6DyRuRIzVqMZ6EDtLt4Kzx/BTCC/X6dyVb8Al7TxZT+yKfCiNJQRZSjq17SzhoTqUFmwIB3zhkjtfZ9sNx6GZK0J7dU6Tg1bpfGpxAILUSeqCsAqfDySrdAm2jYOhHfCljLZ1kg5JA4CweX8jnbmuO80a6Ed/I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751532040; c=relaxed/simple;
-	bh=uhM775dCWKUr515MYbbLXs9HNA3IOGVL7qXpp/p/55Y=;
+	s=arc-20240116; t=1751532303; c=relaxed/simple;
+	bh=FXRIcZIy3ya1Q1PuZGmIc7XEtJGIrsN4d6PDC+wPKzo=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LPpCKBZ38sZU7ybRO0EdXn5w9d7sTt+MS3O8kUktAxCJtHWeNOhDapJk0TbUZ0tz8qhKcoJNKIPmrc1AEjmCJdZ+NAEMx0sKV30Vas9v23KGBhc4Pbyo+QyPEPIf1GmMkeeE78lIgd6BY+pJ0DHVioBMtF1ovP9dobAO8eaAKKA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=wA/0chw3; arc=fail smtp.client-ip=40.107.44.141
+	 Content-Type:MIME-Version; b=ILSR0UnrmygKX4NQGRmFW9iuLumYE1wzhfnzyCCjGzf5Z++rJJMG1MPr4oUdsibGPnHI9kxJ4r7z4W2Op2PJ2vLSUtVAuejd+iSF9tIbAwUmnfeAD+45z0snr7cGjQqGFDew9PLCguggCd1EoCQDLZqsoEDrrxPSW7al+yy3Xws=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=urLAB9rY; arc=fail smtp.client-ip=40.107.44.127
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="wA/0chw3"
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="urLAB9rY"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wOF3Qq0tg+FCzvCywGT2oBvdpGVUysfuraLze9AcD+fl7xjelfxRdRP2twbF+LXRh0PsWIqyOTC4BGgveil0C35whOzAoD2fgXZgUgdpWE6iZMdNoxPx8Z5jQyXAko29BqFrEg3S7EV4h2/0tqcwtEsDwNhJWdu2eOyL5ougImt5Ea9MvBdeU93b3nVxt04YGoCOsIuHsuuT/xwK8ePN4JHTx9FoGO5Y8u99kj7UHfWQ7KgYvkqKpTzjWap7rLQ8vczxdVLFmjwnOQShhFx2m1+z8DIkXW6QuDR4OtAXyA2qpLjagIyG8AthoYppyhnXaZXIlrm8HKTZiJHDkFw9JQ==
+ b=dY0FVpbaOn3f+hEbt4ONzpAYZHDCN4Qw5R9nMkNphptSLoJPGHlgZ3XhHVUY7xAQVSXoaczet52SELMrREzlGudhb9Of9Kn3LBtIHbm2/Iw0LzeGO0s+lvE3OBP5pb4BHXVPnlhEzOQ25OvdJHaqmQEQ0zx8eMOQXauUTf2g8ELW2yPI1MBclwGooPWZU0rJBxrClfVoYWm9DvJGvVHzGreqm2U6A0am3sUTxDhfLltfIE6DTLMt/JREjsXNPK6BkEnk/ywugG/zJHGnEB7P06L278+FR9n/QGqMlTZNouhDVYCHJbg37LfPptN186e+pbCDyFJ4lysE41u/VqaOdw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oElniMKWzvIaC7XgJFK17OdkADP/QwEIHampAD73/1Y=;
- b=or2Rw8v86My6y3QKzB3BSdqbXTW1sKuVtbz6f8QCYwbde0bJ7RzGv6ie6M2Xi6tDqcFAJpS3oF0Z+EnG2KkvKo0IjJPfHbdRUKGj2N6ksbalGb+Ca1qVxGriDJXIuXU3lVjOSNmlmshstHvOHeQ516jnUkULAS0kTEKMH8O1fQbl44OzHFaoVunM07nMVhb4kXBWQSZoltNwO0KK2weLDJkNbnD01OfMdj8MXQHbG8iGohOgqXOsU4Q0kkVFQBxo1y14PDd3J+XcBVc5SHJrB89GSVhRDGVR8sBcl5xbDqiW7omVDhitpgfZySR7NbNiQTOL8B9xzlU9MS233cpXHA==
+ bh=tPKzPME3OkKVgVWDUqmcxZ2pjWgjSx/Z0KRlmEp/oYo=;
+ b=OET0VgPKer5dLxTX/SFpvJzjTs39diSPQDIcrEYDBJwcNEisetobLukjxXlk4QdaJJfjtP2FmAJwt/vimBoWy4S5wcjC549ZlMM9z9iCbc9hyBFMwRZgv7QraXAGAb0tX337/3KcMpXaDrScf0PtHVCrekvbjHNeYBT8OzLWrcFG0OBkUPWQiW8ATOXfg/Za0ya2fGpbniUv0sz3NQuv1JE8mO+InP+XdoGYENuobXfufAwTQb3hdth8ozGoLoyIVsEtEU6SYVRQhoq4gp2woGLRYTKxeXV8wAAQ4zbpM6zEQgmUrIZuZrXovdhD+hVmydYBU2zm0CuYOt4dhFFXfw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
  dkim=pass header.d=amlogic.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oElniMKWzvIaC7XgJFK17OdkADP/QwEIHampAD73/1Y=;
- b=wA/0chw3qbegwwwlOCoKkHBlmEzNc+ITyGx8Ia12MYM0sRZ3spbtirqMU9iadrPuRG0dtbcphIuNzmWiubTE5IWqJw0a0QBnSfsNuHJDQzrjyBLrAf+jQvrxjcNCI+zrSYR+q1avl8ulX4OiIgBxUpgvZOwd3DaarVyOTKUdnPGtPcv0lHbH+UIEnOHtCr7vmir3+Y/nVijDVWjn6gcMjpBO5PQ0QzC+dBgLWX0BlSVmLTR3EpOW8ps/0F3jh67yMuTZtwrCG4qsUKNTwMLKSLNHALteASUFM+tdGt43vvlJ07vKhGS5HXmFKw5QJKCm9cORoANdSU6nrzmht3d0Fg==
+ bh=tPKzPME3OkKVgVWDUqmcxZ2pjWgjSx/Z0KRlmEp/oYo=;
+ b=urLAB9rY45elmorS9gotS/uQTXkhpXibCb+bvzzdMA3rXOuLPnKIDmjO5oDtSKJfzzr9ju8O/gbF2E4vaozfAKv179fkRFMlNpn/gEzbFYqMMRkw/gNiNGYjliiMdvjZncS1ri2EG+qU+ZBGp557WFOJC5j32bLrPOGNtJRBFB1paa+amYg5HKVNs4Wv4dWI7uyUQ9hCGwCTFfyHK8LYIDChWXVDiNOMxGA3MDfaBlmX197CBzjYOZR+UPyIWnTyDVFMacKFSoD7Cb+JgCq1tC2Qj7oUdqkqXWD0NztZ4hmKUT8PtjnZit9x9IA5Ac80ka6HeELO5uhSP2XXLTwYcA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amlogic.com;
 Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
  by SEYPR03MB7533.apcprd03.prod.outlook.com (2603:1096:101:147::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.20; Thu, 3 Jul
- 2025 08:40:33 +0000
+ 2025 08:44:58 +0000
 Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
  ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
  ([fe80::4128:9446:1a0f:11fd%7]) with mapi id 15.20.8880.021; Thu, 3 Jul 2025
- 08:40:32 +0000
-Message-ID: <05dcbdc1-893d-4ea6-8c8c-40abfbb906f4@amlogic.com>
-Date: Thu, 3 Jul 2025 16:40:08 +0800
+ 08:44:58 +0000
+Message-ID: <583badf5-26b0-431f-abe8-e411ef126c26@amlogic.com>
+Date: Thu, 3 Jul 2025 16:44:33 +0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ bluez v3] shared/bap: Add stream state check in
- stream_disable
+Subject: Re: [PATCH] Bluetooth: hci_event: Hold PA sync conn when BIG sync
+ established
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-References: <20250702-bap_for_big_sync_lost-v3-1-d314b60abf7a@amlogic.com>
- <CABBYNZLNdr5kW=AXYohCOp71CCmvir3hjeBungDHYq2gRD0xEg@mail.gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250702-hold_pa_sync-v1-1-3cbdd2c29c41@amlogic.com>
+ <CABBYNZJJJcjhwbDwYZxqxu-RHtyUd9T3Lvf-qEqgNfxfCsk+9w@mail.gmail.com>
 Content-Language: en-US
 From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <CABBYNZLNdr5kW=AXYohCOp71CCmvir3hjeBungDHYq2gRD0xEg@mail.gmail.com>
+In-Reply-To: <CABBYNZJJJcjhwbDwYZxqxu-RHtyUd9T3Lvf-qEqgNfxfCsk+9w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR01CA0044.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::8) To JH0PR03MB7468.apcprd03.prod.outlook.com
+X-ClientProxiedBy: SI1PR02CA0034.apcprd02.prod.outlook.com
+ (2603:1096:4:1f6::10) To JH0PR03MB7468.apcprd03.prod.outlook.com
  (2603:1096:990:16::12)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -67,305 +69,195 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|SEYPR03MB7533:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0018e161-6f6b-46da-02df-08ddba0d45f2
+X-MS-Office365-Filtering-Correlation-Id: 6bb76516-2372-4aa2-a04c-08ddba0de419
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NWNmWU9iMmltaUd5d0ZTWWFqWXVsRjVKd1UwQTR6aWFRZ1pKKzJVc1VJRVFh?=
- =?utf-8?B?MkF3bFM3TUVWRys1VVhCNjZIaEZ6VVRLa0ZTZmQzWG5FVDRWMnpsVkJSdk4z?=
- =?utf-8?B?V1l0WFFwYVMyQU5vMTNPcDB0L2JDU1RvZEZLOXlxK2xMTEVXU2xMcnZvYkdm?=
- =?utf-8?B?eW92V3NKSnNLNjVzNFdEOFZvemp3QTJOblFEbjRFelhzVmcwaFZyZG1Udm5N?=
- =?utf-8?B?dXpuOEVXMVVLZnh2a1JNN2ZFdTdIaXR6ekx0S1RBb3drZi9BYlVWSWhta2dY?=
- =?utf-8?B?Y1lGUXlBV3dXL0dzQjRDb2hSUVM2dWljU1R5TnIvRDIvc2VXaVhZTmptNWRX?=
- =?utf-8?B?eWRqMUZiMjZqSzlQajdPWTA3VTdzMFdvbERLSlZtMWVoZTlyZFpZNTF4YmRm?=
- =?utf-8?B?VUJKRmQrZnNjS3RKN2c4UVdUeExNeVNGcEowTElGdzJxS0NaMjR4UjZJc3hr?=
- =?utf-8?B?NE9lZ0RHeU1MRW5qQVlXMDBKT3VrTHN0cVVsUEJ0aDVMb0RxYXpTUTdmUGJm?=
- =?utf-8?B?MVVYQTM4UXd6L2Y2K1hOcW1lVGZsUW1FOWtOMGloVnJ0eVFOdEJiRVhvRGJn?=
- =?utf-8?B?OWFrQUpvTy81WWtwdjh4bUdvbHExRitpRnd4aHBzQ0pDajVyK1VCYnhsQzRz?=
- =?utf-8?B?Qzk5QnJqQXRUVzhUbTNUVmhVU3gxb01uVFRVbkxwUFlSRHJuSnUyTTRwL0Vn?=
- =?utf-8?B?dWczWlZYVThYTXhSWmdTckk2MjgxSks5WkR1ampvdkJoYU9zbnZsbmhmZEVW?=
- =?utf-8?B?WTRGK3d3U2I5Z2g0bW96dTc3NzJveXpsR3VNK21QRk0rS2wyc1QyMzJHZDBT?=
- =?utf-8?B?dDU4WjVxbzU2TklPcDFCVHhrUW1WUTE4QjRPTHFaMmpQU2NIL08xaEZBNTdq?=
- =?utf-8?B?NWp6Nkt4UnFSZDZxT01rcnVod0lzUnQweXNKKzZGN3VUUGVzNXY2bndPY04x?=
- =?utf-8?B?eThnN2ZNOHJZMmc3aUNZOGZpR3p0eHZBU2swNjBFUlhXOFlVZHFHb2NRZCs5?=
- =?utf-8?B?NDVDVVNuYVhtRlQ1WENoUlpZL3BpRGc2UHJ5WFFITzlDclc1bW1ZakRpaGZK?=
- =?utf-8?B?VERxcGwvamNmNzhveEhCOXpYcWVGb01LTEFtdWxKYytCZFl6TnB4bnNDeUNV?=
- =?utf-8?B?TzN2QThPekkrRDR4UlBLL3N0cm50T1BES1d3eTl6WTFkTS9LT1hXbEZuenFY?=
- =?utf-8?B?a0VyZFJvU3RCNGFoUkhyenVZUlZFajQybHJ0RWVPMlZqSnFLUmtqZ2NOdlB5?=
- =?utf-8?B?cVFvY3JrenA2a0hQOG13Zk5PNEVwSXdPZmFFSjlGclFMNDhtODk4cTNOS3J2?=
- =?utf-8?B?cGFRV0w3OEp2RTJVODExNnhYSEF3eWRNVEZaQzdPazBwZ2R5K3RyR3RweWl5?=
- =?utf-8?B?MS9haWpjZ1VsTU1ETmkvc0NSSktQMFB3MTZueEZJUGN6RVJ0Y2FZYzIvbFU3?=
- =?utf-8?B?VlJ5UVNzcHBlQXhyREQzSFgyRDMySFVZYXRpaTcwL2xGbmVhSXkrWXNUak0z?=
- =?utf-8?B?SHc4NVk4SU1KZUNsRW1RUlRlQVBWVFRRNW9DWmg2QVVIYmxYK1BRcDJ5Vmtu?=
- =?utf-8?B?OGErYWxRem1IdXo5ejAxVlFvNEdUUlNMNmlHSUgwbVNUenB0YjF3NlBDNjRZ?=
- =?utf-8?B?eHZWTUwyM1g2NzBna3hkeThxNmhtRG44TmtVcXpROTBKYktFckh3Y2YreThl?=
- =?utf-8?B?eEZYTUJ5Z3J5SFBSdWNsS2dFQnhrclJTaWJLQ0ttK2VoK3BwSWhoZHcrbXpi?=
- =?utf-8?B?Ulg1TGpRZkNIdlJPNlVDc2ltbzRZK2pzbU5XbUlaWHlieitDQUJZaFU2N0xF?=
- =?utf-8?Q?ChbeCH/GNCIGP1gF1xF9GnEvb4TGyk8eigmKY=3D?=
+	=?utf-8?B?c1Z4dzRTRzlTNElHMlo4M2s3NXFxUktYd3hvazgvWUdodzBPOUZLb0Z3VGo4?=
+ =?utf-8?B?NHhjenZpZ1NZaXdlc2VWT0d5a3Y0MWlrTkVxVWdvV0JUSkNEeU01NjhwOURw?=
+ =?utf-8?B?K0tiL2R5MWdOQVRMVDdxL05rS2lHWTNodEI0d0tPb2Z5SEZNS0lTQzZ4NW1T?=
+ =?utf-8?B?Q05sSzYybmozeXhtTkV1RVpRaHR5U3huaDdFaHFoYnFVQ1NiOVVDb0ZROU04?=
+ =?utf-8?B?cE9GKzNQZGlvNUZFYUVVVnk0c2VQdFZkRk1yTkRadHlMeHhPRTlVWkNUS25G?=
+ =?utf-8?B?MkxwMCszZ2NjaDdiZCszODkzTXIrUU94RmUxVUlyVEFGb0Zhbmk1ZEZoSDV2?=
+ =?utf-8?B?RWxkWVJOTHJNRWlKZkQ3TVNLVSttbTJvYjd0TTRtYW1wb0xoYmVoVWlkczI4?=
+ =?utf-8?B?LytDQWc3Nkc4Qy8wR1cvRzBZZVRNdGxySzV1OThycDQrSzJNQzBqanBNUkYv?=
+ =?utf-8?B?WjNWa0k2ZmRaTTRrNDQycEFrY052VUZKRWl4UlJDTHkwZHNWK2lDQVlGTXJi?=
+ =?utf-8?B?NHM0dUl0d21CUWp1aU1CaUlkb1l4UkVsbURjRXlBdGRNVmozK013a1huOXFu?=
+ =?utf-8?B?WWNDc1FNS29ESU1nSkpCTE5DMVFndkVnU3p0dVZ1STIzN3l3YTVqY2VUUm1y?=
+ =?utf-8?B?VDE5dEdTbUxtcUl6YVVnM2s4ZExXUFEyTHQ3OWVMd054RFhIUHlqeGFyRURq?=
+ =?utf-8?B?L2JaTTcvcTBXbSsySENDK2xHM3B6TG1kcHBsME1PNUNyTEZvUUZSOU8wU29x?=
+ =?utf-8?B?MDgzSGFZS1VEZU1sUExuZVl3bmdHSnh1QlBuMEhqZGZSR3h6bHhpOUlCR2F3?=
+ =?utf-8?B?ZVBncTZVYnFZQ1RiK3I0UmRJZ2VrRDRXcE9HWEJiL214WitlTzNHNld2dkU3?=
+ =?utf-8?B?a2dwZXdVSjRWMEpLNG1QdmtZeWZCRmp5UHl0YTZmK2lsMy9zWmZpd0RzQU1p?=
+ =?utf-8?B?RTBla2NzTG9YZXZrdDBSN0dzQUplSGJ4TlBqM1JOWVhqS3E0Z1lzcmhibW9r?=
+ =?utf-8?B?ekVVTk9NYXRxUUZuMmJkK2t5TDRwbU96Uys5UFQzcXNzK3h3Z2hyWGtqQk9a?=
+ =?utf-8?B?SnFEWGdRR2dVekJSUWtOQnJDdWJHNHo1ZXQ2KzNQY2c5L2duWTlPUnQxdnRK?=
+ =?utf-8?B?VGg1TjUrRTBvZUZVdVF2Z1Rjb051KzVvSS8rQXl3NjdPcW8ybjhwTVpKNE4v?=
+ =?utf-8?B?ejVtMTg5bjBBQk5uS3prNUZOWUQza0pFVDJBU05BZ3ZtS1Zoa3lYVEUwdzRL?=
+ =?utf-8?B?RGsyUnlkV1VEaktIeTFBNkk4RmphSmczNUlldng4WktBWEN1dnJTMWVwNmFl?=
+ =?utf-8?B?RWExNGVjTC9GNENXSk1aVW9VWG0zbnhNUDZiVmJjWGFwMDRIbktDRVcyS2NG?=
+ =?utf-8?B?YkVEWElHdWVSMFYwNnpWWldqUWQxTTJ5K2VtMDNPY0pXU3dJeFZLYWhaTFhO?=
+ =?utf-8?B?VjNTVWZLNEpNNnBhT0crM21CUHo2YVlZVkVoeW9xa096RVNoNTljWEdEcGFG?=
+ =?utf-8?B?eW0xNmF2Rkt0MW43TmNLMWVqbE5iaXlpeDRiOHJlYVNzaUVpUmxmMGdNT0pQ?=
+ =?utf-8?B?UGUzSTRMWXhTRkFWbVBPS0JRRlRsbjN1bFZDaHNRZFZ1bXZ3cEtwTG1QYkFh?=
+ =?utf-8?B?YzJPbitZSWVwVXhLdmJwajVmc2lPQTJ2c1kxWE9iMkhLVmkzODF0Uk9Ncy80?=
+ =?utf-8?B?SlBHSHZOM2M3dm5wczVuK0Y5ZHpkaVcwT3cxa1NSTklKR1MxZFhNbDE0Y1NR?=
+ =?utf-8?B?TjAxcWk2WFJPcmRkaWNnZGNCM3U2V3FqekNmdWlSNFN1azY4Vmd6SWZEMk1x?=
+ =?utf-8?B?TGxvL3V2amVCZXVJMThZK21WK2xMTTc3cDVvRW5Zay81bm1NN0pTcDVkSm82?=
+ =?utf-8?B?UXZtdGlhejcwbUlkZXRneVpkOHhpSXBwb3dla1B0d2R5L1hJQ1kzbUhiV0w1?=
+ =?utf-8?Q?SiOr1sT/yO0=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Tng0S3NCckVoMkVJcnYyTktDWFhPaXhaNzlleXYyZXRsWno5a0s5WitrYUlG?=
- =?utf-8?B?R1ZkYUt4NXJGeTFjZVZ0Q2hBeUY4Y3hvQ0Q5d3JRQkFwekdCT2dCdGltdWFL?=
- =?utf-8?B?ZWcvaWV0UElqaGgwNDdtZkpuWjc4cmhYZEtjNm9WOWpEejFFemsyTWxyeTBt?=
- =?utf-8?B?djhucXppMVU5TlhrMXBWY3dveTAvYWJyUHY0M2UvU0c3dWQ0Vi9zeW5MMW5V?=
- =?utf-8?B?dHdqa0VvY3pDVnpTSXJaUFBlcjZzY0pmbGh4UWNlUlIrWnhtaGQyOWNuZ2FK?=
- =?utf-8?B?NGRnQm9hbm9LYTYxcFY0a01qK2x2SXl2YXJZN2ZuZU9aNCtjQzB5elplZ29G?=
- =?utf-8?B?U0s4M1VJM2dtNkJsUjc1bm5ZK210bzBYVHR2MkVEU1JzUGQwQnZvTVNJTlRQ?=
- =?utf-8?B?dWxKV2ZISG5wWW5jcjZQaVBNMHZjdnVHOStjUzBDcVIxWUZDejcrR0p3bVZy?=
- =?utf-8?B?c1QrcXdadHZ2VzR2eXhsQjd1V0ZkTHhrNTdneHNJRHRrdDFsQ0JJM0thRE9x?=
- =?utf-8?B?TXNyZWJxTy9NNzBMTzMvbkl2TUJiUVhRR20vNDZUeVJaaEloTVZmVWpzVk9T?=
- =?utf-8?B?T1JlRzlVMU9vbWdnSGJZL0VUbHQ1NFlWU3dQbTV2VDRpbGdacEpLUHFLQlV3?=
- =?utf-8?B?OWFOYzloSmROSm9CTGRsZzhETWdvbE9DZkxEV3FKUVR6S1B4cFJ3YWZhQVRi?=
- =?utf-8?B?b2ZPaHUvRTkzeWFHbWNVcnd3azQrdTVtTTBmdzVKdGtjcnpLbEZhTFR6bElZ?=
- =?utf-8?B?SWEyNktEaFVmaU5NUG9wYzkzN0VzbFJUMXQvRWk0Qmc1RjVSYjh3Yjl0dEta?=
- =?utf-8?B?OUFiOWZzUEVSR3E0dzU3b2p6RDZWaTl3RzNXK2JJVTI5VjRWTk1RTEkzc2lT?=
- =?utf-8?B?M3UrZzdxRlhTR2xoWjZ2KzgzdzIxVy9EWGtlbFp2RFc0ZVROVXNaSk83SDNj?=
- =?utf-8?B?N0habU5oaUlQWU1PYXduSkNTcEtxWThsaXNtelZhZ0kzd1QyUGxkcGJZN1R5?=
- =?utf-8?B?QXlEcFYxQ3lPU3YzMUVBUy82RHlFd3FlNDFZekdzd0F6SExnVFJORDB0VGgr?=
- =?utf-8?B?SjV2dWVmdVFPMHVxNk1vOGJMczNXWm9lUmZGYTZ4M1hDUHBqTTVsOENmZ3Fy?=
- =?utf-8?B?aDVJcEZMSXYxcVdYbEd3VlRVYjRzckRzcVVnRDkwS3VYKzQ0bDIrTUNweDlW?=
- =?utf-8?B?czl6TVF3dms4SC9ULzJWTDBaU0VvVnVnYjVpSG5HQUZpMmgzN0R1cWUyMmZE?=
- =?utf-8?B?NjVlN2ZNc2dZcTlVZCtZTEQ2WUFTSFNFV2trOVpBL0psNUtlRFFzYWU5S2dI?=
- =?utf-8?B?NEI1L2pTVXJHaTZsUFdzOVJnV1Jnb3BtT3QwcXNIZExqNXJrSjBIQTV1ZXR5?=
- =?utf-8?B?aW1yZG5yR3hGbjQ3b1BRWHFRN0ttbXZOV09LMzdjdDN2dnorTjR4ZWthQk5K?=
- =?utf-8?B?eEZzQXlGTmN0QnhQV2c3bnlJTldWYmg2bzVaaW5KY0YxNHAzOTF3c0E4TDlR?=
- =?utf-8?B?NnJneEhLajU4Tzg0K0QvcjlZRk0zeTZ0TUkxUUhEVG00a0xSNzVIUUJvYlNP?=
- =?utf-8?B?NnhzSk0vV2FyQ0RCNGhvb1ovaytzb1diQWZtVXFTUzl3TW43NUVCWXZsQXdG?=
- =?utf-8?B?OTVqM2FoWkp0UzZZR0R3NWZhdWlsRVpuYTVHdUlVU2tHSXJiSW5xZlRKYXFn?=
- =?utf-8?B?NW1maE5uNGI4QUYycjJoYU8vbnhsK1dwUitVVlZJdVdqT0swSGJmYzltYW9Z?=
- =?utf-8?B?ckduQzVBaHRVR2NTdDF5S2p5cEdWek1SeUZXVVhFTk1aeHhna2hEWjJTWjht?=
- =?utf-8?B?b0w4eXMrRWNsVWJKNURtMVZFaGZsN0txc1liYnBBcUdSVU03YVNWN1R6bHV3?=
- =?utf-8?B?L2YrbDNtZFN3U0lzWWZseUtOZHkrY0tISktzaTlsZmlKTmFlVzZVOU55OGlO?=
- =?utf-8?B?RTZlZlA4L3pvcHR1U2tIb1FlQjUwSjE1MG51M2tiVUU3VFlqSDNIV1pMc1cw?=
- =?utf-8?B?cnA2YmZpK1BXaFJ6T2xxbmRnU3d5VUJxQWc2enQ5L3BpSkg5TVZLVzNmS1k2?=
- =?utf-8?B?MllSSmd5ZGliM1BQYmVkRXF6MGdoUmhGcmlxZ3l4Mm1mOSt5MkZiU0ZSREt1?=
- =?utf-8?Q?Me+mrs5protXROFRX1KYVTLRF?=
+	=?utf-8?B?KzdmWWdhVUR6bXc5dVlLT2U3Q0c1Zk5XSXM2STZGNGhHUU85dmlMRmE2L1ps?=
+ =?utf-8?B?dWNMcXdCM3RDRFVlN3VicUNXblNnZjB4WnZ3TmVpbWdDVC9OTnBqY0hoQUEw?=
+ =?utf-8?B?eCswcUwrQnRXRUVUQ2xrblkxU05OZVUxWjBrV2ZZd0xUK25Sclc5U3duRW9M?=
+ =?utf-8?B?cnpNY2lsdm9BSnR2RUFnVmRaWEh0dUFsQlo4dEFTUEpzeTJPR2EzeUMxZ0dL?=
+ =?utf-8?B?TkVML1Y1ZDBIYmJEY0ZXNVF2QUo0bGhDck56Y0ovOHkrUXFwVHNCcUdYYmpP?=
+ =?utf-8?B?TFVaSlZSWFBFcVJuV21rNXpVaWw1T2hIQytKQnJLOUR1MzliMnUzTStEVW5Q?=
+ =?utf-8?B?NkZCeFIyYVMzUkNvZHJCYnFiSmgyV3ZQN2xjUUh5ckYyUlZDTGtxWThicSsy?=
+ =?utf-8?B?dzdzRzcra0Z0aExib05ueGEvQVBRd3FaZ01TYzN5THUxNmlTOTkwMW5ac1Rj?=
+ =?utf-8?B?TkZZR25Na0Z4alpCa1Y2UTRodnRQUHR4UkhHeUIrREIvQmVxY2hNaW43c3Aw?=
+ =?utf-8?B?VzNrd3JlODZVT2VSeHhscndVRngwVlFFZmJMaHFpd1JBR3FScS9JcHR6ZDFO?=
+ =?utf-8?B?RkRyRU8yeGpVTmluRUpDRi8rYndyVzFqT0RsUTJENDFuRm1oUmRvMG5LTU9v?=
+ =?utf-8?B?QURLQnpvWEY0SVJhNkhNdlBEcWxRT0tBNEFmUU9KckJabHcxVFl1OVp3WklT?=
+ =?utf-8?B?eFQ2aEJuNjhzaWV6VWdCZXJJT0VQS2o3TkVNWSt5Nnc2TkNqMC9pblQ2VU4r?=
+ =?utf-8?B?Ty9GL1ZHZzh6c0NTa05uVlp2WWM1ZVc1bGl3S1pyM25VaFFtSmE3WGNxZ2JC?=
+ =?utf-8?B?MEJ6OFZiTDJRQXI4aGJmOExKL1NvdVFvcUNEM2Q0a2NSS2Q5VktoN1grU3kw?=
+ =?utf-8?B?U1FBSjA1K2UwdVNWa2ZIY1hvQ2xDTE1PWTFFU1lNZnRrMXdyUjhxTkdtcnd5?=
+ =?utf-8?B?VUJiWWdCbi8ya3BiR3NJUmFJWmNnUjBoaWVWRXFjQUdMWmZIWHp2TXRIaTZi?=
+ =?utf-8?B?K0VUOHB6VklvcUtvcUhIbjJyejFSS0Q4elBUYVQrZjQ0dW4zVkYwTndxL1VD?=
+ =?utf-8?B?M2g0MDJMOFplNzA5dGZLa0dlVDVQR2l2dlhnbGI3VVUyYmlWbFBreHNCN2ZE?=
+ =?utf-8?B?WlpPUS8zTmJubmg4aUZ6Kyt1SCtKTVZJalJGbCt1dG8veGY5bm53eEY1Qm9i?=
+ =?utf-8?B?Y3dQNzgvbUhKdVIxSnBSdjlkaUpPbm5YQnFKVDdQdVRvQlE2SnF0VzNqTlRw?=
+ =?utf-8?B?MXV0RURhNkFjQ2JIb0VpbmUrNitMVXVMQ2daSHdPZWwwT2ROeDM5MzlPZDBD?=
+ =?utf-8?B?RnNtY1kwVitmY1NVa2hOV2xaQnVtV1NCcHBVb09UZnE5cWlmT1AyeTJaWUtJ?=
+ =?utf-8?B?YzI5eXRwWWJvbGZVVmlmbHdqWDVUOVoyYkVxKzBpZW1mbEhWTkdPOWp5MDNm?=
+ =?utf-8?B?dStXSU94NkllVkZLL3J0NFdnYSsrb2JJRE9QK2ZPOVhGQlpmUVpLL0dtenJG?=
+ =?utf-8?B?eEx1UWg4L1JlcCtwN25kRUFUUm44T3JCbmtuUmowQ1oyRDdDaUgzTGhrbloy?=
+ =?utf-8?B?ZmdDU3dkSlRrVG1Db29NdktNZWdDYXNzWUdlcU8rTVJqY082My9KRExGQS85?=
+ =?utf-8?B?dHZyL2VIdk9jRlI3bjdIQXJJWTlWM3NIdzN5cExaSTdadnNERUtNY21FaUFN?=
+ =?utf-8?B?cUoydUo1cHlKd2VZQkI0ZWkxRGZLQlpRM0wxc1p6bDZTc2hxanZIYmpLbjdC?=
+ =?utf-8?B?U2l5Rk51Zy9JdUpIdFpsU0orbzdHK2dWNlhvUzVzYklFRVZuWC8wU1owM0Zu?=
+ =?utf-8?B?S3ZNcnFVNTcra2hGQlV4aGd2NEd3N1ZGNFFtRXM5c1RXZmxDbURneGU2aSt2?=
+ =?utf-8?B?cGJXeEtiS3ZXYTJ0MmJrTVNISnE1RUV6TjlUdHhIbXhqdmQ2TEFncXY2TFhh?=
+ =?utf-8?B?emE0SEM1QS9hWHNzME4reS9zZjVXSnhHUmlaYlVPZnZFdFJOYlVvb2V2V21I?=
+ =?utf-8?B?cFdTUkpzRmhKVTRiRmNTNUhLVDU1VXZZN3V1RGxZM1A0b1NnZ05pajJrWG5Y?=
+ =?utf-8?B?dThMcXNXMnRTcWJEVGhyOWNLR2p1d3dVc1JVSlBOTkZ5NmRvbTRRQk5saEVI?=
+ =?utf-8?Q?4nebIQe9A0N1DzkmO1MavWESN?=
 X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0018e161-6f6b-46da-02df-08ddba0d45f2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bb76516-2372-4aa2-a04c-08ddba0de419
 X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2025 08:40:32.8332
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2025 08:44:58.2120
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ugkppHE0WW4oCRk5g6wnEkfaf//7oW8oxbGTwwGhjdqs0LsjJ3/9U4ihzej7BsIPmEYnhY6nKZVBvHI80LyR1g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: iGFkcLZMWEUM9JuN2DUsH2uUVJ4DzkH+VNpJ6XL9M4lVveev1WRql2Ts9l7cBgvzqrjLg7VGqwuI2JofNe1Mhg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR03MB7533
 
-Hi Luzi,
+Hi Luiz,
 > [ EXTERNAL EMAIL ]
 >
 > Hi,
 >
-> On Tue, Jul 1, 2025 at 9:19 PM Yang Li via B4 Relay
+> On Tue, Jul 1, 2025 at 11:12 PM Yang Li via B4 Relay
 > <devnull+yang.li.amlogic.com@kernel.org> wrote:
 >> From: Yang Li <yang.li@amlogic.com>
 >>
->> Add a state check so that stream_disable() is a no-op when the stream
->> is not in ENABLING or STREAMING state. This prevents unexpected state
->> transitions or redundant operations during cleanup.
-> What is the issue here, do you have traces, debug logs, etc?
+>> Hold PA sync connection to prevent cleanup during hci_conn_timeout.
+> You will need to do a better job explaining what is the issue here.
 
-Regarding the Unicast caching configuration you mentioned, there is
-currently an issue in the code flow. The relevant log is shown below:
 
-When music is paused on the pixel 9 phone, the CIS link gets
-disconnected. As the transport state changes from ACTIVE to IDLE, the
-stream state transitions from config to qos.
+Since the PA sync connection is set to BT_CONNECTED in 
+hci_le_big_sync_established_evt, if its status is BT_CONNECTED when 
+hci_abort_conn_sync is called, hci_disconnect_sync() will be executed, 
+which will cause the PA sync connection to be deleted.
 
- > HCI Event: Disconnect Complete (0x05) plen 4           #1425 [hci0]
-49.572089
-Status: Success (0x00)
-Handle: 512 Address: 6A:AB:51:47:3B:80 (Resolvable)
-Identity type: Random (0x01)
-Identity: E8:D5:2B:59:57:A6 (Static)
-Reason: Remote User Terminated Connection (0x13)
-bluetoothd[2313]: src/shared/bap.c:stream_io_disconnected() stream
-0x1f9fc20 io disconnected
-bluetoothd[2313]: src/shared/bap.c:bap_ucast_set_state() stream
-0x1f9fc20 dir 0x01: releasing -> config
-bluetoothd[2313]: src/shared/bap.c:stream_notify() stream 0x1f9fc20
-state 1
-bluetoothd[2313]: profiles/audio/transport.c:bap_state_changed()
-stream 0x1f9fc20: releasing(6) -> config(1)
-bluetoothd[2313]:
-profiles/audio/transport.c:transport_update_playing()
-/org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1 State=TRANSPORT_STATE_ACTIVE
-Playing=0
-bluetoothd[2313]:
-profiles/audio/transport.c:media_transport_remove_owner() Transport
-/org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1 Owner :1.1
-bluetoothd[2313]: profiles/audio/transport.c:media_owner_free() Owner
-:1.1
-bluetoothd[2313]:
-profiles/audio/transport.c:media_transport_suspend() Transport
-/org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1 Owner
-bluetoothd[2313]: profiles/audio/transport.c:transport_set_state()
-State changed /org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1:
-TRANSPORT_STATE_ACTIVE -> TRANSPORT_STATE_IDLE
-bluetoothd[2313]: src/shared/bap.c:stream_disable() stream 0x1f9fc20
-bluetoothd[2313]: src/shared/bap.c:bap_ucast_set_state() stream
-0x1f9fc20 dir 0x01: config -> qos
-ATTbluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 51 #1426
-[hci0] 49.585656
-ATT: Handle Value Notification (0x1b) len 46
-Handle: 0x007b Type: Sink ASE (0x2bc4)
-Data[44]:
-01010002050a00204e00409c00204e00409c0006000000001302010302020105030300000003042800020501
-ASE ID: 1
-State: Codec Configured (0x01)
-Framing: Unframed PDUs supported (0x00)
-PHY: 0x02
-LE 2M PHY preffered (0x02)
-RTN: 5
-Max Transport Latency: 10
-Presentation Delay Min: 20000 us
+int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 
+reason)
+{
 ...
-bluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 24 #1427 [hci0]
-49.585725
-ATT: Handle Value Notification (0x1b) len 19
-Handle: 0x007b Type: Sink ASE (0x2bc4)
-Data[17]: 0102010010270000025000050a00204e00
-ASE ID: 1
-State: QoS Configured (0x02)
-CIG ID: 0x01
-CIS ID: 0x00
+     switch (conn->state) {
+     case BT_CONNECTED:
+     case BT_CONFIG:
+         err = hci_disconnect_sync(hdev, conn, reason);
+         break;
 ...
 
-when playback resumes on the phone, it attempts to set the ASE state to
-Codec. However, since the stream has already transitioned from config to
-qos, the phone ends up disconnecting the connection.
+stack trace as below:
 
-bluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 12  #1433 [hci0]
-60.216004
-ATT: Handle Value Notification (0x1b) len 7
-Handle: 0x0087 Type: ASE Control Point (0x2bc6)
-Data[5]: 0101010000
-Opcode: Codec Configuration (0x01)
-Number of ASE(s): 1
-ASE: #0
-ASE ID: 0x01
-ASE Response Code: Success (0x00)
-ASE Response Reason: None (0x00)
-bluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 51 #1434 [hci0]
-60.226086
-ATT: Handle Value Notification (0x1b) len 46
-Handle: 0x007b Type: Sink ASE (0x2bc4)
-Data[44]:
-01010002050a00204e00409c00204e00409c0006000000001302010302020105030300000003042800020501
-ASE ID: 1
-State: Codec Configured (0x01)
-Framing: Unframed PDUs supported (0x00)
-PHY: 0x02
-LE 2M PHY preffered (0x02)
-RTN: 5
-Max Transport Latency: 10
-Presentation Delay Min: 20000 us
-Presentation Delay Max: 40000 us
-Preferred Presentation Delay Min: 20000 us
-Preferred Presentation Delay Max: 40000 us
-Codec: LC3 (0x06)
-Codec Specific Configuration: #0: len 0x02 type 0x01
-Sampling Frequency: 16 Khz (0x03)
-Codec Specific Configuration: #1: len 0x02 type 0x02
-Frame Duration: 10 ms (0x01)
-Codec Specific Configuration: #2: len 0x05 type 0x03
-Location: 0x00000003
-Front Left (0x00000001)
-Front Right (0x00000002)
-Codec Specific Configuration: #3: len 0x03 type 0x04
-Frame Length: 40 (0x0028)
-Codec Specific Configuration: #4: len 0x02 type 0x05
-Frame Blocks per SDU: 1 (0x01)
+[   55.154495][0 T1966  d.] CPU: 0 PID: 1966 Comm: kworker/u9:0 Tainted: 
+G           O       6.6.77 #104
+[   55.155721][0 T1966  d.] Hardware name: Amlogic (DT)
+[   55.156336][0 T1966  d.] Workqueue: hci0 hci_cmd_sync_work
+[   55.157018][0 T1966  d.] Call trace:
+[   55.157461][0 T1966  d.]  dump_backtrace+0x94/0xec
+[   55.158056][0 T1966  d.]  show_stack+0x18/0x24
+[   55.158607][0 T1966  d.]  dump_stack_lvl+0x48/0x60
+[   55.159205][0 T1966  d.]  dump_stack+0x18/0x24
+[   55.159756][0 T1966  d.]  hci_conn_del+0x1c/0x12c
+[   55.160341][0 T1966  d.]  hci_conn_failed+0xdc/0x150
+[   55.160958][0 T1966  d.]  hci_abort_conn_sync+0x204/0x388
+[   55.161630][0 T1966  d.]  abort_conn_sync+0x58/0x80
+[   55.162237][0 T1966  d.]  hci_cmd_sync_work+0x94/0x100
+[   55.162877][0 T1966  d.]  process_one_work+0x168/0x444
+[   55.163516][0 T1966  d.]  worker_thread+0x378/0x3f4
+[   55.164122][0 T1966  d.]  kthread+0x108/0x10c
+[   55.164664][0 T1966  d.]  ret_from_fork+0x10/0x20
+[   55.165408][0 T1966  d.] hci0 hcon 000000004f36962c handle 3841 #PA 
+sync connection
 
-...
 
- > HCI Event: Disconnect Complete (0x05) plen 4           #1445 [hci0]
-63.651497
-Status: Success (0x00)
-Handle: 16 Address: 6A:AB:51:47:3B:80 (Resolvable)
-Identity type: Random (0x01)
-Identity: E8:D5:2B:59:57:A6 (Static)
-Reason: Remote User Terminated Connection (0x13)
+btmon trace:
 
-Here is Pauli Virtanen’s analysis and solution:
-https://lore.kernel.org/all/3ac16d0a7c5569bce0b28f18bc2245bef8ab64c2.camel@iki.fi/
+< HCI Command: Disconnect (0x01|0x0006) plen 3             #75 [hci0] 
+14.640630
+         Handle: 3841
+         Reason: Remote User Terminated Connection (0x13)
+ > HCI Event: Command Status (0x0f) plen 4                  #76 [hci0] 
+14.642103
+       Disconnect (0x01|0x0006) ncmd 1
+         Status: Invalid HCI Command Parameters (0x12)
 
-AFAICS the bug appears to be:
 
-- bap.c:stream_disable() should do nothing if stream is
-not ENABLING or STREAMING
+So the current question is whether the PA sync connection, which is 
+marked as BT_CONNECTED, really needs to be disconnected.
+If it does need to be disconnected, then the PA sync terminate command 
+must be executed.
+However, in my opinion, the PA sync connection should not be disconnected.
 
-since it's called from bt_bap_stream_disable() which is called on
-transport suspend which should be noop for BAP server if stream is
-already gone.
-
-Next, I will attach the relevant btmon trace to the commit message.
 >
 >> Signed-off-by: Yang Li <yang.li@amlogic.com>
 >> ---
->> Changes in v3:
->> - Optimizing the code
->> - Link to v2: https://patch.msgid.link/20250630-bap_for_big_sync_lost-v2-0-1491b608cda5@amlogic.com
+>>   net/bluetooth/hci_event.c | 3 +++
+>>   1 file changed, 3 insertions(+)
 >>
->> bap for big sync lost
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index e817c4a77f97..85ae1608e028 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -6968,6 +6968,9 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
 >>
->> To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
->> Signed-off-by: Yang Li <yang.li@amlogic.com>
->>
->> Changes in v2:
->> - Add state check in stream_disable.
->> - Add type check in stream_io_disconnected.
->> - Link to v1: https://patch.msgid.link/20250624-bap_for_big_sync_lost-v1-1-0df90a0f55d0@amlogic.com
->> ---
->>   src/shared/bap.c | 22 ++++++++++++++--------
->>   1 file changed, 14 insertions(+), 8 deletions(-)
->>
->> diff --git a/src/shared/bap.c b/src/shared/bap.c
->> index 40e1c974b..1790b277b 100644
->> --- a/src/shared/bap.c
->> +++ b/src/shared/bap.c
->> @@ -2131,14 +2131,20 @@ static uint8_t stream_disable(struct bt_bap_stream *stream, struct iovec *rsp)
->>
->>          ascs_ase_rsp_success(rsp, stream->ep->id);
->>
->> -       /* Sink can autonomously transit to QOS while source needs to go to
->> -        * Disabling until BT_ASCS_STOP is received.
->> -        */
->> -       if (stream->ep->dir == BT_BAP_SINK)
->> -               stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
->> -
->> -       if (stream->ep->dir == BT_BAP_SOURCE)
->> -               stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING);
->> +       switch (stream->ep->state) {
->> +               case BT_ASCS_ASE_STATE_ENABLING:
->> +               case BT_ASCS_ASE_STATE_STREAMING:
->> +                       if (stream->ep->dir == BT_BAP_SINK)
->> +                               stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
->> +                       else if (stream->ep->dir == BT_BAP_SOURCE)
->> +                               /* Sink can autonomously transit to QOS while source needs to go to
->> +                               * Disabling until BT_ASCS_STOP is received.
->> +                               */
->> +                               stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING);
->> +                       break;
->> +               default:
->> +                       break;
->> +       }
->>
->>          return 0;
->>   }
+>>                  if (!ev->status) {
+>>                          conn->state = BT_CONNECTED;
+>> +                       /* Prevent cleanup in hci_conn_timeout. */
+>> +                       hci_conn_hold(conn);
+>> +
+>>                          set_bit(HCI_CONN_BIG_SYNC, &bis->flags);
+>>                          hci_debugfs_create_conn(conn);
+>>                          hci_conn_add_sysfs(conn);
 >>
 >> ---
->> base-commit: 55a6763cde8a2309fd23a96479ee4cf2fc23a442
->> change-id: 20250624-bap_for_big_sync_lost-63476c679dbb
+>> base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
+>> change-id: 20250702-hold_pa_sync-91ca7a81adf0
 >>
 >> Best regards,
 >> --
 >> Yang Li <yang.li@amlogic.com>
->>
 >>
 >>
 >
