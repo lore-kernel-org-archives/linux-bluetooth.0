@@ -1,61 +1,70 @@
-Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F2320EB;
-	Thu,  3 Jul 2025 15:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.188.205.243
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A4B70823;
+	Thu,  3 Jul 2025 16:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751558231; cv=none; b=sr8xRmOVCg4s85uy14Ni3XCpKOtG+BImFjN/ymUOvBrJBplFvluINy6JxsvPg29Bm8m8QwrDpzUyiLmZIRcUvGWmfljlTazduPvACaRu9Kri05MBk6JdYz7QFlVxUiEKxg5PFGkElkX0BQXDHIdiN3YRXXuEpj7LtHzC6Zr+Jcc=
+	t=1751558656; cv=none; b=cAjJPAWjEB09qFiRMpPpFNZZ8d7RqeUKzhARHnU/Q5wgQmq1RH4jm4LDZYdN6BI21APALr3Z46AbkUhHMgHGPpaS+qRt/UMtRznAOxajeenYt5fuUOk+qrjjiMz6ackgY8KK2WTQ1L3bQsFqkZ4E0wZN+BlyuqWQG9sFkt4zlRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751558231; c=relaxed/simple;
-	bh=/5x31bYLbnmAB83D37kcWKmGopV4qwGGMcLgHfFnwYY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g+XRXib5p6BOhiZcla4Mpo6AhNMf8A8gNuFvenAyVghqi84mH+CHR5zXTbVZk6U2cO1lkto68r6XFvD9bXoR161iCWQ5cgnTPk757gX33izfsYJnvQQhZHQIxIimSesmmTwLgTZyT+2dzwI8DzBCkpePpQiunxT7mOt1WqbpcZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=gr9PokIw; arc=none smtp.client-ip=93.188.205.243
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
+	s=arc-20240116; t=1751558656; c=relaxed/simple;
+	bh=hjQ9tu4dTPOs3IWszuUygMNLcNL7KAiKMkW8RoHf2nE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gS6rvJEhVd3XlbYgQtlcLCmd91ZECAjFgNtiHVhteTXn/A+EWaHIB0vlD7oP8Q5Ia/4P3OykcFKAa/kOhJQFjvspDiI1+YGTn3cte6tQhr4GVj4N5/6iBOnhBRNQ0rwxeyhP8vekh13T6Y9pW8uHeVoY1rnC+hh/JEUYmkVzYUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c8xDFglE; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b="gr9PokIw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
-	s=mail; t=1751558223;
-	bh=/5x31bYLbnmAB83D37kcWKmGopV4qwGGMcLgHfFnwYY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gr9PokIw4mIydopjmsjlW9V00fNc/aOuSYdYpsM6iLdWO/JXrAyvB97mwUZP+1Uoq
-	 +a6gELptkbQ4K0U3gYkSJaYHnNc2KGpf4CIrhTDoDPiBSfMhl6kTMgrJI2OO6h98vr
-	 xB58gK0sZSTYYH+obolVodBju+V5feyUlj2AJz0ZcAuJttgTt9d6ofYSeAT1WU3YdD
-	 6dFX4DHqYhwVMNBz9KC8BNoQZlQR/1ieoMyyPmjNfdV6lNZlbUHduV1pmrzvQczTjd
-	 62C8sdytROg9EIuwQxsYteCbrFNDydAmjDWh2JUBKs4GseXbYjfNuruQ/fcp5Z4eY5
-	 pHkPfc0EyM1Ug==
-Received: from gca-msk-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 5C9D21FA52;
-	Thu,  3 Jul 2025 18:57:03 +0300 (MSK)
-Received: from new-mail.astralinux.ru (unknown [10.177.185.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
-	Thu,  3 Jul 2025 18:57:02 +0300 (MSK)
-Received: from localhost.localdomain (unknown [10.198.59.101])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4bY1bv6HP3z16Hnq;
-	Thu,  3 Jul 2025 18:56:59 +0300 (MSK)
-From: Anastasia Belova <abelova@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Anastasia Belova <abelova@astralinux.ru>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Yake Yang <yake.yang@mediatek.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10] Bluetooth: btmtksdio: fix use-after-free at btmtksdio_recv_event
-Date: Thu,  3 Jul 2025 18:56:56 +0300
-Message-ID: <20250703155657.32865-1-abelova@astralinux.ru>
-X-Mailer: git-send-email 2.47.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c8xDFglE"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5315acf37b6so13574e0c.2;
+        Thu, 03 Jul 2025 09:04:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751558654; x=1752163454; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=05CuIBBS8zDGDQ4x1E3IvGaZPa/o4nS1FWgMBoKotDw=;
+        b=c8xDFglED1O9zOitJIZ+jg3HEm/1zxNbcn65o+QUeD7ZId1gfM5UT4QnDnJAYeVQQl
+         m2zeM2YQuRda8bZy6dXND+PWng3F5Oe/WIQG7uXwN/dkS16ogTdfA8Uu8oLF8VevhivL
+         t/24bs5wmSAI5hNPBcOcXZdjWkXr4GOyXyffkeXO+JPwumqSwqB6x7blC8fhW1GyHAB5
+         LnaPjSHD/yoGDQ60I1tmdhFh/byWnf3XmU8sgqcTZ8Ekm0HXh33KIIT7F9wNYeZxj5G7
+         RizNbASSzqzZjjm0L7Px3qCGKUduo9aaSgoaGSQWpsQ21FRoWRG1IPFjk/RQOmZckWnC
+         hTiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751558654; x=1752163454;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=05CuIBBS8zDGDQ4x1E3IvGaZPa/o4nS1FWgMBoKotDw=;
+        b=XEZuFECfJuMl2PKZAdcGW8h4Wu1UvMtNe6M6+fEcROBSA36yPSn5x3G+YtdcwAJiv3
+         fXdaEjMf3kiQkdkIYcq3izoDmHQwksQdVC6Z51TW+2BsAiAKLVm1bQ800VoqTxfBzMcL
+         YxGpSECLdz1irBKQrrrutIr3INy195bF2lfSIMa8CMflcve5HFd4tc1odoZCD5XOavAI
+         FozELMmsuNhSsnResfMvJkldMDGwPtYfOnfGWSePUsnFKFDaRLcBupRILOXFPbp7Qn5F
+         FnIp+hQTAxn67wT2i5MjA7R6FUEGivW189Ts33B39XhMiJlBWONPVIKX3mwTdpzvrm3w
+         zG2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVr9FOyEEyzb8rmHtjUQmbkUHrzrePA2s2UsB5texCFSsZaqCPbu8bsXpVhILFLjXZ9RiRnhxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEDCzXeagfm2dqB3CSKDiKo6SK0K4OH76S5bON8t4WFxPLHLvN
+	5281JUkpFMfD6HX1SGNPU0u8N6FTjvKJsYZXuQ2o33rHisXVcfXy81Ao
+X-Gm-Gg: ASbGncunt1Spqu7h6o0On/5ECaRN9SK7URma6qQ0YilrzNhgL76JEo6Qg+vB+K+8IT6
+	OmJB3ea1uOSNTLMU9B16vx6ndlnYZkVy7kW5WEl2qXiVozNQlX8mhMcNQfmFv0ZgkzaNbdLjzBM
+	5hOX2JXKcef3Hj2vHSXHXJ+WJ1v2f9dOq1hsPyR9QjJFZCdm0xH4prw3qtE/AF+jl13aFMHOqgX
+	qtF5D9Ho7pewFcIyBiZkql2uuAShwIplbOEy6UZ02judzBKZW7jjOM1OirZPxn8HoXwvkWiRgP2
+	f5UWibcu4s3pfSIv2ZhRXE6rSJgmRoq43eVZTZ0yDRrNkRr/0R7CpWGTQvraiiHIxYAIXdiE403
+	ST/6yA1VciKnQA8JOtD6oCzEBsc8YFVB3ykHm4YR2wA==
+X-Google-Smtp-Source: AGHT+IH0aRnscXqrxXqbElekjvgr+9LzyDv0k+cJU1R1kQvUN78XK7qzsXRhiJJMkhIQP9SteoAgVQ==
+X-Received: by 2002:a05:6122:82aa:b0:531:2906:7519 with SMTP id 71dfb90a1353d-5345813a00fmr6629373e0c.5.1751558653625;
+        Thu, 03 Jul 2025 09:04:13 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-533092120fdsm2555333e0c.44.2025.07.03.09.04.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 09:04:12 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-07-03
+Date: Thu,  3 Jul 2025 12:04:09 -0400
+Message-ID: <20250703160409.1791514-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,102 +72,35 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: abelova@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 63 0.3.63 9cc2b4b18bf16653fda093d2c494e542ac094a39, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;astralinux.ru:7.1.1;127.0.0.199:7.1.2;new-mail.astralinux.ru:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 194547 [Jul 03 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/07/03 14:34:00 #27614855
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
 
-From: Sean Wang <sean.wang@mediatek.com>
+The following changes since commit 223e2288f4b8c262a864e2c03964ffac91744cd5:
 
-[ Upstream commit 0fab6361c4ba17d1b43a991bef4238a3c1754d35 ]
+  vsock/vmci: Clear the vmci transport packet properly when initializing it (2025-07-03 12:52:52 +0200)
 
-We should not access skb buffer data anymore after hci_recv_frame was
-called.
+are available in the Git repository at:
 
-[   39.634809] BUG: KASAN: use-after-free in btmtksdio_recv_event+0x1b0
-[   39.634855] Read of size 1 at addr ffffff80cf28a60d by task kworker
-[   39.634962] Call trace:
-[   39.634974]  dump_backtrace+0x0/0x3b8
-[   39.634999]  show_stack+0x20/0x2c
-[   39.635016]  dump_stack_lvl+0x60/0x78
-[   39.635040]  print_address_description+0x70/0x2f0
-[   39.635062]  kasan_report+0x154/0x194
-[   39.635079]  __asan_report_load1_noabort+0x44/0x50
-[   39.635099]  btmtksdio_recv_event+0x1b0/0x1c4
-[   39.635129]  btmtksdio_txrx_work+0x6cc/0xac4
-[   39.635157]  process_one_work+0x560/0xc5c
-[   39.635177]  worker_thread+0x7ec/0xcc0
-[   39.635195]  kthread+0x2d0/0x3d0
-[   39.635215]  ret_from_fork+0x10/0x20
-[   39.635247] Allocated by task 0:
-[   39.635260] (stack is not available)
-[   39.635281] Freed by task 2392:
-[   39.635295]  kasan_save_stack+0x38/0x68
-[   39.635319]  kasan_set_track+0x28/0x3c
-[   39.635338]  kasan_set_free_info+0x28/0x4c
-[   39.635357]  ____kasan_slab_free+0x104/0x150
-[   39.635374]  __kasan_slab_free+0x18/0x28
-[   39.635391]  slab_free_freelist_hook+0x114/0x248
-[   39.635410]  kfree+0xf8/0x2b4
-[   39.635427]  skb_free_head+0x58/0x98
-[   39.635447]  skb_release_data+0x2f4/0x410
-[   39.635464]  skb_release_all+0x50/0x60
-[   39.635481]  kfree_skb+0xc8/0x25c
-[   39.635498]  hci_event_packet+0x894/0xca4 [bluetooth]
-[   39.635721]  hci_rx_work+0x1c8/0x68c [bluetooth]
-[   39.635925]  process_one_work+0x560/0xc5c
-[   39.635951]  worker_thread+0x7ec/0xcc0
-[   39.635970]  kthread+0x2d0/0x3d0
-[   39.635990]  ret_from_fork+0x10/0x20
-[   39.636021] The buggy address belongs to the object at ffffff80cf28a600
-                which belongs to the cache kmalloc-512 of size 512
-[   39.636039] The buggy address is located 13 bytes inside of
-                512-byte region [ffffff80cf28a600, ffffff80cf28a800)
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-07-03
 
-Fixes: 9aebfd4a2200 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
-Co-developed-by: Yake Yang <yake.yang@mediatek.com>
-Signed-off-by: Yake Yang <yake.yang@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
----
-Backport fix for CVE-2022-49470
- drivers/bluetooth/btmtksdio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+for you to fetch changes up to c7349772c268ec3c91d83cbfbbcf63f1bd7c256c:
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index c41560be39fb..6b31ee1a1dd9 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -331,6 +331,7 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
- 	struct hci_event_hdr *hdr = (void *)skb->data;
-+	u8 evt = hdr->evt;
- 	int err;
- 
- 	/* Fix up the vendor event id with 0xff for vendor specific instead
-@@ -355,7 +356,7 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (err < 0)
- 		goto err_free_skb;
- 
--	if (hdr->evt == HCI_EV_VENDOR) {
-+	if (evt == HCI_EV_VENDOR) {
- 		if (test_and_clear_bit(BTMTKSDIO_TX_WAIT_VND_EVT,
- 				       &bdev->tx_state)) {
- 			/* Barrier to sync with other CPUs */
--- 
-2.43.0
+  Bluetooth: hci_event: Fix not marking Broadcast Sink BIS as connected (2025-07-03 11:37:43 -0400)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - hci_sync: Fix not disabling advertising instance
+ - hci_core: Remove check of BDADDR_ANY in hci_conn_hash_lookup_big_state
+ - hci_sync: Fix attempting to send HCI_Disconnect to BIS handle
+ - hci_event: Fix not marking Broadcast Sink BIS as connected
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (4):
+      Bluetooth: hci_sync: Fix not disabling advertising instance
+      Bluetooth: hci_core: Remove check of BDADDR_ANY in hci_conn_hash_lookup_big_state
+      Bluetooth: hci_sync: Fix attempting to send HCI_Disconnect to BIS handle
+      Bluetooth: hci_event: Fix not marking Broadcast Sink BIS as connected
+
+ include/net/bluetooth/hci_core.h | 3 +--
+ net/bluetooth/hci_event.c        | 3 +++
+ net/bluetooth/hci_sync.c         | 4 ++--
+ 3 files changed, 6 insertions(+), 4 deletions(-)
