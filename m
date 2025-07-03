@@ -1,311 +1,189 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E662E7658
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Jul 2025 13:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187CF21C178;
+	Thu,  3 Jul 2025 13:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751548691; cv=none; b=FdN93PkTJJ57KKFtTp7lxp15DmDUvElJy9yDZccN0URjKWdfdiewXSDvA/8mTouJFzMPUY305L/VH/so9e628UB5MFo4cJJOEfOVrfj+/bl7kCpucYx40Q3pll1HtMp+bQDvJFN1OngrRQrfhgS7WlmNhA8MYKDd1wBCokorCPI=
+	t=1751548901; cv=none; b=Iu5fJP+TZ6l1+c9cRw3h/1NvCu6DbDhfDVcdQHxcM6oKSb0xfp2hdqp6vRrjFGsRXnwd0ISAcMQWl6d9Hcb7x+wLGmMdLW810QrVChJoUYjdKem1misEwN8559umJK8GbH8qI3qdnB33El2lTG5bPLccBL7wk7l2/asp94VFC/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751548691; c=relaxed/simple;
-	bh=JtA3sI0x3avaGHKaDhwLhh+j5BeQy+xzOODfPfgXz8s=;
+	s=arc-20240116; t=1751548901; c=relaxed/simple;
+	bh=cpbU88cxsv+Bt1t9ISQndsNGndQCeB2egi7EX9e2WIg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X6Yel042t80tQ5mbrzhM5TboeziZrBkSOOkS8snzR733i7r9w3IOufIZRa5fu4sT1YD61v4Favy7fcUxZ8ho6rANZYcWvvWIhwg3ZsoPm9gpstaKgmb7g1lNwYKhzfa1gNjZWpldibjmi7MK2Qy1iUpReXnFdp+vehz0QMPF9x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F4EJVQsT; arc=none smtp.client-ip=209.85.167.51
+	 To:Cc:Content-Type; b=lfZBLDd6unLa5wF4dy/MAjsesayIPD272hmiyrjhSI/aXB6Rkvt6gsJL3nuupXRG7xAzlK8014QTWzqKEe3VwnJNKxBwRDryS68zrhLtt6QyjRHSfEIJKgraZPBUlk38rDB3wrTOsay26GNLYO2kEaCxqKweblxzi53NZ/g53IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e/meVeus; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F4EJVQsT"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-553b60de463so6392345e87.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Jul 2025 06:18:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e/meVeus"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32aabfd3813so57054381fa.3;
+        Thu, 03 Jul 2025 06:21:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751548687; x=1752153487; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751548898; x=1752153698; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ajgmCDyw4Q8aRR+BmJ2261iSp9w5VXwjomtBiT4tzyg=;
-        b=F4EJVQsTKJXlxTim0HOOB0TlGmz7fVMGjfDJRKvjHGajajznGsY6wjT4J/PoRzl+Yn
-         FzyoOCQM7NRoT1sLhO2K754DW6N2gEnk2QLTmrmtzQGZ9ChCBtUdzix8XJPkJLZP4/5g
-         wiT2xjMFCtAfNUWn4qE0XsYu6zwC5JYr8LPYF2xZj63ynV2hsE47Ha+oKYqk2xtLObc2
-         NxPxYGlxOiYBqIQvroEE2RD/XrY4cFT8t2jyN2z8DC2jIDqKhbHUpDKS5maPkgiahM6w
-         uLzs/cNvb9nECFyG7gxesXUwaJ/KE29g53PxpQgQt96UzGWn4vRmTtvJrx+DKNjJGOnm
-         48yQ==
+        bh=J3T1H1hRIHpZQdO50cakQfUA0ng9VAFLVYhJJpI2uUY=;
+        b=e/meVeusmw1Ck1axM/nBzX/emnva0Z5Y09vyUcHQNlfexmOodyC6y2z6qL5zHni1Ar
+         PYy6fm3QblsV2GyXiFlulvLn8A2d7l2Xdif9U/8/CxcuRDIc5waTAQGMBSlPpKafwefx
+         fXJwyyu36zcNNA5J0ck55qQpbKzvUvLuB6Bzw83sDQAwL0Lvx7saTq2jTA0xmpfZ3iJI
+         Ass+xOtH1z6tHlmY20nP0GySd4t/OFOT5BM5x9GIlZFfkswtjP5rWzhLCMplcKzYBqVq
+         6jMUxYKXQh3CIFiiYSqF4+gruS0Uj7NGb4+tg4LWqNIz0+PbECypI47ysvDo9XJ23yAl
+         zogg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751548687; x=1752153487;
+        d=1e100.net; s=20230601; t=1751548898; x=1752153698;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ajgmCDyw4Q8aRR+BmJ2261iSp9w5VXwjomtBiT4tzyg=;
-        b=t7Bhd0BRfGbwm2gE1vnL/gLvcqIFA5MhNHao5/UXMFNEV9qQLv82NjtuT75wPg8ihY
-         6vhMg4h+lw9CTAkWcfLp8rPRIngp9LWrKWczfor+fAqq1OaY8mDquJR6u9JcrYZNzGwS
-         0Y+VsRnnnygXWLdid1o2Ubqz8eZ8qk8Gp8im9baR8lYHw/uik1lPJR+7d3OAKYZBvJsa
-         uyXchjmQgaUlm577vJS/OVx7NxGGj3s0ZkQ7W8KkL+maCsCH6X+m1HwCR3XHfkFO48x4
-         i0GSPFPoAygmOVZbocS86TUHIsODQHxFq5m5a2DcSvupSa5YcxRypWi+XYKQgRGJk6cH
-         zlYQ==
-X-Gm-Message-State: AOJu0Yy4HYbvVjEYKQtSV0y0zZ0Y+nTdFKKmvFHn0kOCdXAvgOY+8RAJ
-	QVEzFpiURMYjAmnrT/J8hFjPt8f47a2Zm7kgiIDzygdGm0OKAnPFsV0bvOVMjnXscq7jr1LFdUv
-	sw8UJIUhuhVT/xUhQNls1julZyl+yvlbuGoUEZsBcTw==
-X-Gm-Gg: ASbGncsEFVvV+JnccrjhMvVFPCHJz5PxDUHYj0y7cqnGw1L9mvqzKjPsnn8bD40b503
-	cOK4Qe2fT9c17frO0oI+ywG8pcjjvSBKy4F3iNJ4x7IXFtQxwAzAHOkR/DyOAr+w1lnmD/uL9uO
-	TjfN16t0Zh2b2LJUgFJHV15FUwaySpRPqZcwbnroaIFrhPQFymrSaf
-X-Google-Smtp-Source: AGHT+IFartDO/4T+Ehm3AuNhtxt0ODNcXuipsc6dc2/oSwH3qDkn0hy8m7GjF7bI0ZnzJq7NcReaa/wvSVoyck/QR0M=
-X-Received: by 2002:a05:6512:b89:b0:554:f74b:78ae with SMTP id
- 2adb3069b0e04-5562eed59femr1193089e87.31.1751548686907; Thu, 03 Jul 2025
- 06:18:06 -0700 (PDT)
+        bh=J3T1H1hRIHpZQdO50cakQfUA0ng9VAFLVYhJJpI2uUY=;
+        b=gGOOGoMKzo2qENEYpJFRShHxm5qjEVGyiDLWY7PSkhze5l/XCrY5xxWM0TYFtgy33i
+         fo0SYX3ZEDYwF94pcBkjw6I+Be5WxTUNGKr6dw33Zpi7BWWfJwuBJK5mL0s4UFhtfj5k
+         Nxt3mLvbRgkPrQXiNN6JnzpOfBJllZcIJsRbFP8qvDBAugEwEGCrzF3BjFFuNeHidQbo
+         aN+EgyE5XzEpuWwv9o/Mib+tmMOr8cDOuS2R31G1fAg0M0nlYGxpSGXw0zhqVqNEOJW7
+         uBGHgcysmb4LD1BtU5X0Xj1JZjd1waMDnPX9XnXzOtjnq2KN3WsEsccx/B4xjtuLskEQ
+         H0OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3nqOIpZwVuOxTSVlcqT0RFMwb2M9MY3RoGXdfuZLjaiGdDbOiDYdHt9G/LfWJW5ibOsl80RpAg7CrYrZq@vger.kernel.org, AJvYcCWDY6V0bC+sPKoYctrudjqFZBF1lpPg43e7+U6ygYWj/twtWnCxSoD6ou5iYBs6VlaQE53bF64ntv0Dhwo0ggU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzarHtwc7V45r7ZRjzVljpxFug5WuP22jYSb7BQ4869vm6hhJPZ
+	NjQchJxsfgh3oYMAzaPlHkaad/dUpaFH8ApLQ2CKV59HWEtvvR5Wjow65W2lxI7J3f1/L7bQMtd
+	lMFBDMLp3xGbuwuk6Re4XZ2k+/36FVjGj1lvDQ/Y=
+X-Gm-Gg: ASbGnct+MfH4HuIm11jvfLctnMcYqZflI49XHKNDR5kFPBXI02qPBkZNoRNyFbJ3X6/
+	/yHwm7MyhpW9ykNKMCpHx/KWFaiGJ9Ewopgs24tFOAVoUu9/jFIFOtnldwZPLdVGwH88+AHy7Wt
+	V5PRS72OwqADHHBCIf4KP/lKKetRvsu5Y1x7Slvcb2G82rh91dzsP2
+X-Google-Smtp-Source: AGHT+IGvoIiksXLZVJv+6QV1AoZ+jMU+cHojBnNDcnASFVGjDHykBMwLRTuqg/8od2bAzw+uWXJZ67WOFjZJecNAERM=
+X-Received: by 2002:a2e:8a92:0:b0:32a:8062:69b1 with SMTP id
+ 38308e7fff4ca-32e0cf836a6mr9466161fa.8.1751548897712; Thu, 03 Jul 2025
+ 06:21:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702-bap_for_big_sync_lost-v3-1-d314b60abf7a@amlogic.com>
- <CABBYNZLNdr5kW=AXYohCOp71CCmvir3hjeBungDHYq2gRD0xEg@mail.gmail.com> <05dcbdc1-893d-4ea6-8c8c-40abfbb906f4@amlogic.com>
-In-Reply-To: <05dcbdc1-893d-4ea6-8c8c-40abfbb906f4@amlogic.com>
+References: <20250702-hold_pa_sync-v1-1-3cbdd2c29c41@amlogic.com>
+ <CABBYNZJJJcjhwbDwYZxqxu-RHtyUd9T3Lvf-qEqgNfxfCsk+9w@mail.gmail.com> <583badf5-26b0-431f-abe8-e411ef126c26@amlogic.com>
+In-Reply-To: <583badf5-26b0-431f-abe8-e411ef126c26@amlogic.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 3 Jul 2025 09:17:54 -0400
-X-Gm-Features: Ac12FXzUnJWp8QvNGNkSynwfAEU39ofj7p3ushwZjCNmImKUPOpTu-Og0ohQP6w
-Message-ID: <CABBYNZ+WVE6OKp+Um_g6Ji6CCE1eO+MSuPQz8WLw4QUFCZQ2Aw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ bluez v3] shared/bap: Add stream state check in stream_disable
+Date: Thu, 3 Jul 2025 09:21:24 -0400
+X-Gm-Features: Ac12FXx6WWBOGktjBKpYl5K3cikNqbjUH3zIeA2BwbYcgzbyhSouGSgP1bKxsgg
+Message-ID: <CABBYNZJxtfQUrLxo9chbqXz37dRF00id5sxwDBRHj5HEp2B_Bw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: Hold PA sync conn when BIG sync established
 To: Yang Li <yang.li@amlogic.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Thu, Jul 3, 2025 at 4:40=E2=80=AFAM Yang Li <yang.li@amlogic.com> wrote:
+On Thu, Jul 3, 2025 at 4:45=E2=80=AFAM Yang Li <yang.li@amlogic.com> wrote:
 >
-> Hi Luzi,
+> Hi Luiz,
 > > [ EXTERNAL EMAIL ]
 > >
 > > Hi,
 > >
-> > On Tue, Jul 1, 2025 at 9:19=E2=80=AFPM Yang Li via B4 Relay
+> > On Tue, Jul 1, 2025 at 11:12=E2=80=AFPM Yang Li via B4 Relay
 > > <devnull+yang.li.amlogic.com@kernel.org> wrote:
 > >> From: Yang Li <yang.li@amlogic.com>
 > >>
-> >> Add a state check so that stream_disable() is a no-op when the stream
-> >> is not in ENABLING or STREAMING state. This prevents unexpected state
-> >> transitions or redundant operations during cleanup.
-> > What is the issue here, do you have traces, debug logs, etc?
+> >> Hold PA sync connection to prevent cleanup during hci_conn_timeout.
+> > You will need to do a better job explaining what is the issue here.
 >
-> Regarding the Unicast caching configuration you mentioned, there is
-> currently an issue in the code flow. The relevant log is shown below:
 >
-> When music is paused on the pixel 9 phone, the CIS link gets
-> disconnected. As the transport state changes from ACTIVE to IDLE, the
-> stream state transitions from config to qos.
+> Since the PA sync connection is set to BT_CONNECTED in
+> hci_le_big_sync_established_evt, if its status is BT_CONNECTED when
+> hci_abort_conn_sync is called, hci_disconnect_sync() will be executed,
+> which will cause the PA sync connection to be deleted.
 >
->  > HCI Event: Disconnect Complete (0x05) plen 4           #1425 [hci0]
-> 49.572089
-> Status: Success (0x00)
-> Handle: 512 Address: 6A:AB:51:47:3B:80 (Resolvable)
-> Identity type: Random (0x01)
-> Identity: E8:D5:2B:59:57:A6 (Static)
-> Reason: Remote User Terminated Connection (0x13)
-> bluetoothd[2313]: src/shared/bap.c:stream_io_disconnected() stream
-> 0x1f9fc20 io disconnected
-> bluetoothd[2313]: src/shared/bap.c:bap_ucast_set_state() stream
-> 0x1f9fc20 dir 0x01: releasing -> config
-> bluetoothd[2313]: src/shared/bap.c:stream_notify() stream 0x1f9fc20
-> state 1
-> bluetoothd[2313]: profiles/audio/transport.c:bap_state_changed()
-> stream 0x1f9fc20: releasing(6) -> config(1)
-> bluetoothd[2313]:
-> profiles/audio/transport.c:transport_update_playing()
-> /org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1 State=3DTRANSPORT_STATE_ACTIVE
-> Playing=3D0
-> bluetoothd[2313]:
-> profiles/audio/transport.c:media_transport_remove_owner() Transport
-> /org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1 Owner :1.1
-> bluetoothd[2313]: profiles/audio/transport.c:media_owner_free() Owner
-> :1.1
-> bluetoothd[2313]:
-> profiles/audio/transport.c:media_transport_suspend() Transport
-> /org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1 Owner
-> bluetoothd[2313]: profiles/audio/transport.c:transport_set_state()
-> State changed /org/bluez/hci0/dev_6A_AB_51_47_3B_80/fd1:
-> TRANSPORT_STATE_ACTIVE -> TRANSPORT_STATE_IDLE
-> bluetoothd[2313]: src/shared/bap.c:stream_disable() stream 0x1f9fc20
-> bluetoothd[2313]: src/shared/bap.c:bap_ucast_set_state() stream
-> 0x1f9fc20 dir 0x01: config -> qos
-
-Ok, this indeed is not expected, that said we do have the following
-checks already in place so we might as well update them:
-
-    if (!stream || stream->ep->state =3D=3D BT_BAP_STREAM_STATE_QOS ||
-            stream->ep->state =3D=3D BT_BAP_STREAM_STATE_IDLE)
-        return 0;
-
-> ATTbluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 51 #1426
-> [hci0] 49.585656
-> ATT: Handle Value Notification (0x1b) len 46
-> Handle: 0x007b Type: Sink ASE (0x2bc4)
-> Data[44]:
-> 01010002050a00204e00409c00204e00409c0006000000001302010302020105030300000=
-003042800020501
-> ASE ID: 1
-> State: Codec Configured (0x01)
-> Framing: Unframed PDUs supported (0x00)
-> PHY: 0x02
-> LE 2M PHY preffered (0x02)
-> RTN: 5
-> Max Transport Latency: 10
-> Presentation Delay Min: 20000 us
+> int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8
+> reason)
+> {
 > ...
-> bluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 24 #1427 [hci0]
-> 49.585725
-> ATT: Handle Value Notification (0x1b) len 19
-> Handle: 0x007b Type: Sink ASE (0x2bc4)
-> Data[17]: 0102010010270000025000050a00204e00
-> ASE ID: 1
-> State: QoS Configured (0x02)
-> CIG ID: 0x01
-> CIS ID: 0x00
+>      switch (conn->state) {
+>      case BT_CONNECTED:
+>      case BT_CONFIG:
+>          err =3D hci_disconnect_sync(hdev, conn, reason);
+>          break;
 > ...
 >
-> when playback resumes on the phone, it attempts to set the ASE state to
-> Codec. However, since the stream has already transitioned from config to
-> qos, the phone ends up disconnecting the connection.
+> stack trace as below:
 >
-> bluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 12  #1433 [hci0]
-> 60.216004
-> ATT: Handle Value Notification (0x1b) len 7
-> Handle: 0x0087 Type: ASE Control Point (0x2bc6)
-> Data[5]: 0101010000
-> Opcode: Codec Configuration (0x01)
-> Number of ASE(s): 1
-> ASE: #0
-> ASE ID: 0x01
-> ASE Response Code: Success (0x00)
-> ASE Response Reason: None (0x00)
-> bluetoothd[2313]: < ACL Data TX: H.. flags 0x00 dlen 51 #1434 [hci0]
-> 60.226086
-> ATT: Handle Value Notification (0x1b) len 46
-> Handle: 0x007b Type: Sink ASE (0x2bc4)
-> Data[44]:
-> 01010002050a00204e00409c00204e00409c0006000000001302010302020105030300000=
-003042800020501
-> ASE ID: 1
-> State: Codec Configured (0x01)
-> Framing: Unframed PDUs supported (0x00)
-> PHY: 0x02
-> LE 2M PHY preffered (0x02)
-> RTN: 5
-> Max Transport Latency: 10
-> Presentation Delay Min: 20000 us
-> Presentation Delay Max: 40000 us
-> Preferred Presentation Delay Min: 20000 us
-> Preferred Presentation Delay Max: 40000 us
-> Codec: LC3 (0x06)
-> Codec Specific Configuration: #0: len 0x02 type 0x01
-> Sampling Frequency: 16 Khz (0x03)
-> Codec Specific Configuration: #1: len 0x02 type 0x02
-> Frame Duration: 10 ms (0x01)
-> Codec Specific Configuration: #2: len 0x05 type 0x03
-> Location: 0x00000003
-> Front Left (0x00000001)
-> Front Right (0x00000002)
-> Codec Specific Configuration: #3: len 0x03 type 0x04
-> Frame Length: 40 (0x0028)
-> Codec Specific Configuration: #4: len 0x02 type 0x05
-> Frame Blocks per SDU: 1 (0x01)
+> [   55.154495][0 T1966  d.] CPU: 0 PID: 1966 Comm: kworker/u9:0 Tainted:
+> G           O       6.6.77 #104
+> [   55.155721][0 T1966  d.] Hardware name: Amlogic (DT)
+> [   55.156336][0 T1966  d.] Workqueue: hci0 hci_cmd_sync_work
+> [   55.157018][0 T1966  d.] Call trace:
+> [   55.157461][0 T1966  d.]  dump_backtrace+0x94/0xec
+> [   55.158056][0 T1966  d.]  show_stack+0x18/0x24
+> [   55.158607][0 T1966  d.]  dump_stack_lvl+0x48/0x60
+> [   55.159205][0 T1966  d.]  dump_stack+0x18/0x24
+> [   55.159756][0 T1966  d.]  hci_conn_del+0x1c/0x12c
+> [   55.160341][0 T1966  d.]  hci_conn_failed+0xdc/0x150
+> [   55.160958][0 T1966  d.]  hci_abort_conn_sync+0x204/0x388
+> [   55.161630][0 T1966  d.]  abort_conn_sync+0x58/0x80
+> [   55.162237][0 T1966  d.]  hci_cmd_sync_work+0x94/0x100
+> [   55.162877][0 T1966  d.]  process_one_work+0x168/0x444
+> [   55.163516][0 T1966  d.]  worker_thread+0x378/0x3f4
+> [   55.164122][0 T1966  d.]  kthread+0x108/0x10c
+> [   55.164664][0 T1966  d.]  ret_from_fork+0x10/0x20
+> [   55.165408][0 T1966  d.] hci0 hcon 000000004f36962c handle 3841 #PA
+> sync connection
 >
-> ...
 >
->  > HCI Event: Disconnect Complete (0x05) plen 4           #1445 [hci0]
-> 63.651497
-> Status: Success (0x00)
-> Handle: 16 Address: 6A:AB:51:47:3B:80 (Resolvable)
-> Identity type: Random (0x01)
-> Identity: E8:D5:2B:59:57:A6 (Static)
-> Reason: Remote User Terminated Connection (0x13)
+> btmon trace:
 >
-> Here is Pauli Virtanen=E2=80=99s analysis and solution:
-> https://lore.kernel.org/all/3ac16d0a7c5569bce0b28f18bc2245bef8ab64c2.came=
-l@iki.fi/
+> < HCI Command: Disconnect (0x01|0x0006) plen 3             #75 [hci0]
+> 14.640630
+>          Handle: 3841
+>          Reason: Remote User Terminated Connection (0x13)
+>  > HCI Event: Command Status (0x0f) plen 4                  #76 [hci0]
+> 14.642103
+>        Disconnect (0x01|0x0006) ncmd 1
+>          Status: Invalid HCI Command Parameters (0x12)
 >
-> AFAICS the bug appears to be:
->
-> - bap.c:stream_disable() should do nothing if stream is
-> not ENABLING or STREAMING
->
-> since it's called from bt_bap_stream_disable() which is called on
-> transport suspend which should be noop for BAP server if stream is
-> already gone.
->
-> Next, I will attach the relevant btmon trace to the commit message.
+
+Ok, so this must be fixed and not worked around.
+
+> So the current question is whether the PA sync connection, which is
+> marked as BT_CONNECTED, really needs to be disconnected.
+> If it does need to be disconnected, then the PA sync terminate command
+> must be executed.
+> However, in my opinion, the PA sync connection should not be disconnected=
+.
+
+Why not? The fact that it is not being cleanup properly doesn't mean
+it shouldn't be terminated, otherwise we will have a dangling
+hci_conn.
+
 > >
 > >> Signed-off-by: Yang Li <yang.li@amlogic.com>
 > >> ---
-> >> Changes in v3:
-> >> - Optimizing the code
-> >> - Link to v2: https://patch.msgid.link/20250630-bap_for_big_sync_lost-=
-v2-0-1491b608cda5@amlogic.com
+> >>   net/bluetooth/hci_event.c | 3 +++
+> >>   1 file changed, 3 insertions(+)
 > >>
-> >> bap for big sync lost
+> >> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> >> index e817c4a77f97..85ae1608e028 100644
+> >> --- a/net/bluetooth/hci_event.c
+> >> +++ b/net/bluetooth/hci_event.c
+> >> @@ -6968,6 +6968,9 @@ static void hci_le_big_sync_established_evt(stru=
+ct hci_dev *hdev, void *data,
 > >>
-> >> To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-> >> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> >>
-> >> Changes in v2:
-> >> - Add state check in stream_disable.
-> >> - Add type check in stream_io_disconnected.
-> >> - Link to v1: https://patch.msgid.link/20250624-bap_for_big_sync_lost-=
-v1-1-0df90a0f55d0@amlogic.com
-> >> ---
-> >>   src/shared/bap.c | 22 ++++++++++++++--------
-> >>   1 file changed, 14 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> >> index 40e1c974b..1790b277b 100644
-> >> --- a/src/shared/bap.c
-> >> +++ b/src/shared/bap.c
-> >> @@ -2131,14 +2131,20 @@ static uint8_t stream_disable(struct bt_bap_st=
-ream *stream, struct iovec *rsp)
-> >>
-> >>          ascs_ase_rsp_success(rsp, stream->ep->id);
-> >>
-> >> -       /* Sink can autonomously transit to QOS while source needs to =
-go to
-> >> -        * Disabling until BT_ASCS_STOP is received.
-> >> -        */
-> >> -       if (stream->ep->dir =3D=3D BT_BAP_SINK)
-> >> -               stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
-> >> -
-> >> -       if (stream->ep->dir =3D=3D BT_BAP_SOURCE)
-> >> -               stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING=
-);
-> >> +       switch (stream->ep->state) {
-> >> +               case BT_ASCS_ASE_STATE_ENABLING:
-> >> +               case BT_ASCS_ASE_STATE_STREAMING:
-> >> +                       if (stream->ep->dir =3D=3D BT_BAP_SINK)
-> >> +                               stream_set_state(stream, BT_BAP_STREAM=
-_STATE_QOS);
-> >> +                       else if (stream->ep->dir =3D=3D BT_BAP_SOURCE)
-> >> +                               /* Sink can autonomously transit to QO=
-S while source needs to go to
-> >> +                               * Disabling until BT_ASCS_STOP is rece=
-ived.
-> >> +                               */
-> >> +                               stream_set_state(stream, BT_BAP_STREAM=
-_STATE_DISABLING);
-> >> +                       break;
-> >> +               default:
-> >> +                       break;
-> >> +       }
-> >>
-> >>          return 0;
-> >>   }
+> >>                  if (!ev->status) {
+> >>                          conn->state =3D BT_CONNECTED;
+> >> +                       /* Prevent cleanup in hci_conn_timeout. */
+> >> +                       hci_conn_hold(conn);
+> >> +
+> >>                          set_bit(HCI_CONN_BIG_SYNC, &bis->flags);
+> >>                          hci_debugfs_create_conn(conn);
+> >>                          hci_conn_add_sysfs(conn);
 > >>
 > >> ---
-> >> base-commit: 55a6763cde8a2309fd23a96479ee4cf2fc23a442
-> >> change-id: 20250624-bap_for_big_sync_lost-63476c679dbb
+> >> base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
+> >> change-id: 20250702-hold_pa_sync-91ca7a81adf0
 > >>
 > >> Best regards,
 > >> --
 > >> Yang Li <yang.li@amlogic.com>
-> >>
 > >>
 > >>
 > >
