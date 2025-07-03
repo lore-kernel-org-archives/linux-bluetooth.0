@@ -1,148 +1,152 @@
-Received: from relay16.mail.gandi.net (relay16.mail.gandi.net [217.70.178.236])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A222ED848;
-	Thu,  3 Jul 2025 14:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.236
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B132E7BBE
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Jul 2025 14:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751552775; cv=none; b=PQUX+SZmPfFj9t0XJ5ftPjrsAzLEWRnRtunQwS81VTFiJlD/np6RzDyGaKxcLtJbO0cYL3+xR79bwkmx9JTzHzvWODh3nLp9NdjWvCA9wMX9OJV4TOqLE/IDHNRSD/26dHwxAg3xUHTZreDc5W/G+yS5ncQxu2zh4ebbU3nK9/U=
+	t=1751553308; cv=none; b=try6rYIrUY7frV+vK8wBwDRDMzhN3TKo5S7zIk/M1nGHRoey9DS1FPeHFA0uAQcZch+YKymqF3X/T0f1sbiQp8CnGC5KAsV9F8wpzobZ0+W+8n34AzXUaULAqbVSPloEnE0v3ZTHviYEsO7MbpVXiYN10eJ0d0wJbS+G8Pq/Pxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751552775; c=relaxed/simple;
-	bh=J99JaJ4floWwfZaj+zZ6sO0yTygkK0zGjhShgkmfZFQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MoJjcsnTQkY652qd5v9xfXYF36OSb0UBTJkH4giUkb/FxXiLTFwgy7/5mUZAO76hgdMEcfvZY2lsMqaK2eOlQdeJopiXG74cSYZmSk27W0y2Sx7hcC6b0db2Cka/CdbTnVp6d6TYzigY9SSgYaJhaH1W8dd/hIjxhzN+oUTj7lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.178.236
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 236EB449C8;
-	Thu,  3 Jul 2025 14:26:10 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
-To: trivial@kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Sven Peter <sven@kernel.org>,
-	Janne Grunau <j@jannau.net>,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Neal Gompa <neal@gompa.dev>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bastien Nocera <hadess@hadess.net>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Kees Cook <kees@kernel.org>,
-	Erick Archer <erick.archer@outlook.com>,
-	Chris Lu <chris.lu@mediatek.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	asahi@lists.linux.dev
-Subject: [PATCH 7/7] Bluetooth: Fix typos
-Date: Thu,  3 Jul 2025 16:24:35 +0200
-Message-ID: <20250703142542.985248-8-hadess@hadess.net>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250703142542.985248-1-hadess@hadess.net>
-References: <20250703142542.985248-1-hadess@hadess.net>
+	s=arc-20240116; t=1751553308; c=relaxed/simple;
+	bh=qBuAfKOgYTg29WAxTOo6yFaA9qM5nIcvW0Q+xKS30wQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LKLkdu3v0s6NNvmaa8f09vxn546j2zoYNBLCuqUM8W/x6pP2RSKy8pnsejBEFhVJHGlPZfm8L5o2SPt3mI0rfz041UroZpDmtMcMNrryU0lx0O8LMsbxjVtDG7Bp6S4DoM7SoGiamoZHtXt4CoBZe/d3hn5LYVTe50LbmoL5tZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ERmQCMKI; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERmQCMKI"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6faf66905baso69133386d6.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Jul 2025 07:35:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751553306; x=1752158106; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=noA0P0yjzPL9c1wcFbvc23qX6/bxIen973Dq9KqRz3U=;
+        b=ERmQCMKIDZ+D4whXIHKFPwL6vCqUnCg5xBYPxiRrY/nafXMdRiP4Px/oHrex5481YZ
+         0mwUDllJb18ymC64RuhLXaoAYf5zpUrdlBFpaZjtw04BESWNL2IEQiGDAJJfbLkOjXSv
+         OmDqkcwwOpHR+dk4ogsPddByipZg++dfFZGolAdeZ0th+RCgJ+5LkpsKF1CnlMaOKHH+
+         5PKN1mmJOLO3y2ofR6QPGsfKf/okniPQNMVmApQQCpk6+Z29DybZyg82fetSBKOBmT4t
+         kMTvM49Y2PSoCLt0PACcsg7I3iAt98fxkwThYUl1OJpn63J8FpW2anykxgoU73idE11w
+         50gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751553306; x=1752158106;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=noA0P0yjzPL9c1wcFbvc23qX6/bxIen973Dq9KqRz3U=;
+        b=kmrrnf9rF6Bwlw66P/20NqTRU4UVleNcLlw4YbjmUf8RN29fg1dYSujliIjgQYNvyr
+         wmcazVx9dHXszFwN8JN2XjUhz2G1T6u43IM//1HvcyszXVbHzh4uKaGXG2tqJ8nPURjg
+         D3WHrgdGo2/vy5/ofVfow2pOlSQtaLkFujRgFsAmV1DkDwNDbpLZDl6BjutjpMXEJOzJ
+         aGrWsmefvtggOcgzLpYpTHaijuDtVekMDIZunQ8X1T06mbZshtcmAWtJqIxW0NYDtZ0T
+         5QcXyxxBVeljBVlOI/f9InDOMQYv16un6naYKvZXkJQU/eQ8OyaUcUvUWx4cJyRUDcDs
+         o4ag==
+X-Gm-Message-State: AOJu0Yx73mrIiHGGHS7pXv8pRabN5Q+tNny/WMOAWywaoYPFpuLUx2LI
+	HEjeJ5gXPyFpKFrptm8xie2+mpqtMZq8IvNBdbLuj5O0cRyPPuImdOZJHCk0KA==
+X-Gm-Gg: ASbGnctQDkHOHezMNFhaRPWSEZDOozVgcD8WseeCsE3P34oBZxXesGwhlbMi6U7ka+r
+	bv+RdLe89XXzk5iMTy6XqoTtQoIN/ONUOzjAMfXtT6xEhxHmYfUy9iq00S1GL8NgtqhtrDPBt6S
+	VdyAQWsTOHeje/gEc6+zHF+Spy7sfaJp3lhOlcsGZRdxdioZX7DRRShVj2HFGTr2jMg482hBiLf
+	bSOX4OrcXW/O6Q9fSSaEW71iGlBxe/1PdXbYRiJe2K2QA2yrZ7YFIzlxfTsV0RGLz07r5a+A39R
+	SEqGOk5spDLrL9EpB4VTP3NlDIqwoi4F3UKQ2HgIC2TUOM6uR9iEYoQuWUfNB/9xPEQhre2Bfty
+	qEATuJg==
+X-Google-Smtp-Source: AGHT+IG+q2loZGmtuHyUzkZ9bSRwaw3JaQZvxUr9xnZtgVAVEV0bMbdFYKhQ9x7pMoYEUBBqQNLcWQ==
+X-Received: by 2002:a05:6214:519e:b0:6fb:f19:66f2 with SMTP id 6a1803df08f44-702b1a3e750mr113537396d6.8.1751553305553;
+        Thu, 03 Jul 2025 07:35:05 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.147.234])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd772fcb9dsm118836906d6.88.2025.07.03.07.35.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 07:35:05 -0700 (PDT)
+Message-ID: <68669519.050a0220.24b07b.b3c8@mx.google.com>
+Date: Thu, 03 Jul 2025 07:35:05 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8185284927956915562=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvtdehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeekteetgeettdehieduiedttdetffelleehtdejkeeluedvgfffvdevteetudfhkeenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefnecuvehluhhsthgvrhfuihiivgepieenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvfedprhgtphhtthhopehtrhhivhhirghlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtoheplhhuihiirdguvghnthiisehgmhgrihhlrdgtohhmpdhrtghpthhtohepshgvrghnrdifrghnghesmhgvughirghtvghkrdgtohhmpdhrtghpthhtohepmhgrthhth
- hhirghsrdgsghhgsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnghgvlhhoghhiohgrtggthhhinhhordguvghlrhgvghhnohestgholhhlrggsohhrrgdrtghomhdprhgtphhtthhopehsvhgvnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhesjhgrnhhnrghurdhnvght
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: hci_sync: Fix attempting to send HCI_Disconnect to BIS handle
+In-Reply-To: <20250703135418.1693699-1-luiz.dentz@gmail.com>
+References: <20250703135418.1693699-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Found by codespell.
+--===============8185284927956915562==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=978657
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.26 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      23.97 seconds
+CheckAllWarning               PASS      26.70 seconds
+CheckSparse                   PASS      29.98 seconds
+BuildKernel32                 PASS      23.98 seconds
+TestRunnerSetup               PASS      467.98 seconds
+TestRunner_l2cap-tester       PASS      25.24 seconds
+TestRunner_iso-tester         PASS      36.33 seconds
+TestRunner_bnep-tester        PASS      6.34 seconds
+TestRunner_mgmt-tester        FAIL      132.26 seconds
+TestRunner_rfcomm-tester      PASS      9.40 seconds
+TestRunner_sco-tester         PASS      14.87 seconds
+TestRunner_ioctl-tester       PASS      10.14 seconds
+TestRunner_mesh-tester        FAIL      11.49 seconds
+TestRunner_smp-tester         PASS      8.70 seconds
+TestRunner_userchan-tester    PASS      6.24 seconds
+IncrementalBuild              PENDING   0.50 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 2 (2 Devices to AL)          Failed       0.190 seconds
+LL Privacy - Add Device 3 (AL is full)               Failed       0.223 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.065 seconds
+Mesh - Send cancel - 2                               Timed out    1.996 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/hci_conn.c  | 2 +-
- net/bluetooth/hci_event.c | 4 ++--
- net/bluetooth/hci_sync.c  | 2 +-
- net/bluetooth/lib.c       | 2 +-
- net/bluetooth/smp.c       | 2 +-
- 5 files changed, 6 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4f379184df5b..cb360adbb6ec 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -814,7 +814,7 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, struct hci_conn *c
-  *
-  * Detects if there any BIS left connected in a BIG
-  * broadcaster: Remove advertising instance and terminate BIG.
-- * broadcaster receiver: Teminate BIG sync and terminate PA sync.
-+ * broadcaster receiver: Terminate BIG sync and terminate PA sync.
-  */
- static void bis_cleanup(struct hci_conn *conn)
- {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 66052d6aaa1d..a546cb058e8e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5754,7 +5754,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	conn->state = BT_CONFIG;
- 
- 	/* Store current advertising instance as connection advertising instance
--	 * when sotfware rotation is in use so it can be re-enabled when
-+	 * when software rotation is in use so it can be re-enabled when
- 	 * disconnected.
- 	 */
- 	if (!ext_adv_capable(hdev))
-@@ -7077,7 +7077,7 @@ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
- /* Entries in this table shall have their position according to the subevent
-  * opcode they handle so the use of the macros above is recommend since it does
-  * attempt to initialize at its proper index using Designated Initializers that
-- * way events without a callback function can be ommited.
-+ * way events without a callback function can be omitted.
-  */
- static const struct hci_le_ev {
- 	void (*func)(struct hci_dev *hdev, void *data, struct sk_buff *skb);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 6687f2a4d1eb..febad7922008 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5633,7 +5633,7 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- 	}
- 
- 	/* Cleanup hci_conn object if it cannot be cancelled as it
--	 * likelly means the controller and host stack are out of sync
-+	 * likely means the controller and host stack are out of sync
- 	 * or in case of LE it was still scanning so it can be cleanup
- 	 * safely.
- 	 */
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 43aa01fd07b9..305044a84478 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -54,7 +54,7 @@ EXPORT_SYMBOL(baswap);
-  * bt_to_errno() - Bluetooth error codes to standard errno
-  * @code: Bluetooth error code to be converted
-  *
-- * This function takes a Bluetooth error code as input and convets
-+ * This function takes a Bluetooth error code as input and converts
-  * it to an equivalent Unix/standard errno value.
-  *
-  * Return:
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 47f359f24d1f..5b4ade03bdcc 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3172,7 +3172,7 @@ static void smp_ready_cb(struct l2cap_chan *chan)
- 	/* No need to call l2cap_chan_hold() here since we already own
- 	 * the reference taken in smp_new_conn_cb(). This is just the
- 	 * first time that we tie it to a specific pointer. The code in
--	 * l2cap_core.c ensures that there's no risk this function wont
-+	 * l2cap_core.c ensures that there's no risk this function won't
- 	 * get called if smp_new_conn_cb was previously called.
- 	 */
- 	conn->smp = chan;
--- 
-2.50.0
 
+--===============8185284927956915562==--
