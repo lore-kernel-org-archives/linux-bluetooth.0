@@ -1,100 +1,100 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56798157E99
-	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Jul 2025 16:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E6D231845;
+	Thu,  3 Jul 2025 17:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751559678; cv=none; b=Ui5KvS4rM/L80gOY562X3OUzWEKvYHh0j+wf9UsRQVhbWuisZMB3Mk6xrrm5HJayEP5vnJxFH6RGfTKRUWHz6b6rpXoxK0tLjao2VbyfE0uDPeoNLb0n8VAz/GSFwjG/BiREuFWJkazI4Td6zKoH8uFmr7GUwn4BdeELeHBNho4=
+	t=1751562819; cv=none; b=q6J/CeHavYYO0XStbqlwy9lTIEYQrjpTWSOiHg5BliWK0z7eaf/pjmqO+7uDSgoF+ZeuGykt1NBUd9ubvs4qVVVcP2/Vu7hbjLqKeqZxqyLZ4XT8CB8nTkrCEoG1X4w7ByyKdDXvOBkCsWa9Q8gAG0uBdPFYqEnjeSB8hRrKJ1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751559678; c=relaxed/simple;
-	bh=wRBxpG39WUVrHqcTPvV9xbGHze6Q8q/Kx3SjlFYED8w=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Zv/dkAG5EHVoDo/Xsu0JCcoKzX+D+qEPSRXVEFpV32xDPcd1jUJxKcJ83I0b8nHUsp+rXttZ2tC3IBIgYqJnAch+IoGuf+K5dvS8eFOLcWYOxDy9mGVt8pSwibWcHp/x9XqmAw47fcJ0F4pT6GBlvB1kD1NZ8w2s1hMQxVaJWC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EBVALS2p; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EBVALS2p"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7d098f7bd77so14634085a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Jul 2025 09:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751559676; x=1752164476; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wRBxpG39WUVrHqcTPvV9xbGHze6Q8q/Kx3SjlFYED8w=;
-        b=EBVALS2pKR7+tkIYck6zmKCArfm/tLsjRRAuZFETAd4Pz8MlISQ0sZazoO8VP3dy/w
-         DH3rpIdnpSHONP6KVo/U9KmN4D5mJwHFc7IqR/rdYcJsQ9PZn3uBVsu/1XSRp9cDSqzE
-         6tMrMkz22L179J8AUt15A1PWMnQHMpAnGLkCZ8RNmB1he9O8Oxk6pDzcO1oEh/HpylvW
-         FVKzKHAsFh5ssWTLCh9QcPkJZNWoLEFVzKBHguK0jEI4qyMzekoSVwcy/iuAoBRHn0LI
-         j2qwHm0XDLlCBDKsGs4mfQuwCM2LzPaOEqtsLTerRCIZhCHLiLGpyF18YXjXcGLOQu/+
-         na9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751559676; x=1752164476;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wRBxpG39WUVrHqcTPvV9xbGHze6Q8q/Kx3SjlFYED8w=;
-        b=tot8H3DY9WloJUIGcS5YwaCT2jcKLH/va7zNfAzuMlqgU1tSpaoHrFG8PAOr6jY5j/
-         +uW0FLmtXlsjHfpEcHP25Zy9ShkY2/+M0bitwz0kzSCL65A9NlFgEPlwiA/pVkKd0g4r
-         7BxJR/AEbRuDjvHdf36osPxbMVwltEmsWMdoLui/Wao+i+dwjk0Lh4Z7eQjjkgpYwhNM
-         4wU3ygyGEhFPTBbXUpShOwWfGKEWAqkAUMv4ovvoXmna/WLBDyBnGesAovqbI0TMB+ay
-         A++TlPIUhCSmHNNhEfAZVVCS+HfVUwWr6DTzFvbvDfhnEi9xOZYCln364uD4KixWFOiP
-         yjjQ==
-X-Gm-Message-State: AOJu0Ywj5sV1JK0kUK7sPOf3gJC9kNupoBK2BkrO5s0NNtMqZd45rDMG
-	0H3EtZkK87zzzqNZ1cqV27Hgk6N6eaHc14mmGR6DuR3CLZxgihrRHzEQ+LZEbBq0
-X-Gm-Gg: ASbGncuHD2TmaFygakMnBNHK0nYP/sYQqaMOgchsI2PD3b/rs7nv9fo9PfdN7+n/rTg
-	41Lhf+Gh/liddgv11J/pyGmRLkVsMqy23ITG5J+IgTEdYuLhKiqKbGPQqqABdTJ3klSyy1T0OeR
-	/1A368XbYn22cTV6PCXC/Zb1mYH/+IJKxQVGABxYHKr33DlHTA0V6Q4yUOzL3vsK4PygzQCcc3G
-	AlIP39JDuExPP05jHIPt9ZJGIHkb7J59tmq970RLzIgI5eUqx6xLfqeObVMpaQzNprMLXDMNhbu
-	+YpiOq3pDlt2vFkV7s0G7iwLd/68lA8FfzWK5kSMpEs0iLSmh5tGg3Xp7nUwOslhX2k=
-X-Google-Smtp-Source: AGHT+IHa229+i39Vt8zDk98imPUjvZ2VgcnQbeXGlHuGYuwx2C119AAs14SiTKwXs7ADUiACc00LFg==
-X-Received: by 2002:a05:620a:2590:b0:7d4:67f1:df8d with SMTP id af79cd13be357-7d5d440e910mr392613985a.21.1751559675973;
-        Thu, 03 Jul 2025 09:21:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.254.13.51])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d5dbdbd172sm13854985a.42.2025.07.03.09.21.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 09:21:15 -0700 (PDT)
-Message-ID: <6866adfb.050a0220.160f2a.1673@mx.google.com>
-Date: Thu, 03 Jul 2025 09:21:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5224832857445195001=="
+	s=arc-20240116; t=1751562819; c=relaxed/simple;
+	bh=6FBRIhLw7SoIW6pc+6sf2AmVUL5skHEhgKr+2K3ugFw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cQrtrLCRTXKefAFWUoJggRi+06rbqBIEYkXvB090XIs/FOAgsfQq+IBFUByaP4FMo4HVUaJBtYJ37WBJYTLwVpP5ltHG4kHJlphzA60aKKfQtAxkhBwoemj/x9ziDGRBWxUJ0K82rYmAQ23Q+eqlc8M+ogaRR7Kxoai9nuGtBLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8EEBB444FF;
+	Thu,  3 Jul 2025 17:13:30 +0000 (UTC)
+Message-ID: <ffdf6fcea7730dd24c14404fe219259c9b9768d1.camel@hadess.net>
+Subject: Re: [PATCH 3/7] Bluetooth: btrtl: Fix typo
+From: Bastien Nocera <hadess@hadess.net>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: trivial@kernel.org, Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto
+ von Dentz <luiz.dentz@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Matthias Brugger	 <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno	
+ <angelogioacchino.delregno@collabora.com>, Sven Peter <sven@kernel.org>, 
+ Janne Grunau	 <j@jannau.net>, Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+ Neal Gompa	 <neal@gompa.dev>, Johan Hedberg <johan.hedberg@gmail.com>, Ingo
+ Molnar	 <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Al Viro	
+ <viro@zeniv.linux.org.uk>, Kees Cook <kees@kernel.org>, Erick Archer	
+ <erick.archer@outlook.com>, Chris Lu <chris.lu@mediatek.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	asahi@lists.linux.dev
+Date: Thu, 03 Jul 2025 19:13:29 +0200
+In-Reply-To: <6be1c1c6-8d8a-49e3-bb14-dc8fcbfc2c50@molgen.mpg.de>
+References: <20250703142542.985248-1-hadess@hadess.net>
+	 <20250703142542.985248-4-hadess@hadess.net>
+	 <6be1c1c6-8d8a-49e3-bb14-dc8fcbfc2c50@molgen.mpg.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, abelova@astralinux.ru
-Subject: RE: [5.10] Bluetooth: btmtksdio: fix use-after-free at btmtksdio_recv_event
-In-Reply-To: <20250703155657.32865-1-abelova@astralinux.ru>
-References: <20250703155657.32865-1-abelova@astralinux.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvtdekhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkffuhffvveffjghftgfgfgggsehtqhertddtreejnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpeeifffgheettdeggfejgefgffeguedvgeevkeevjeefkeekudejheetffeufeffueenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvfedprhgtphhtthhopehpmhgvnhiivghlsehmohhlghgvnhdrmhhpghdruggvpdhrtghpthhtohepthhrihhvihgrlheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhgtvghlsehhohhlthhmrghnnhdrohhrghdprhgtp
+ hhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehsvggrnhdrfigrnhhgsehmvgguihgrthgvkhdrtghomhdprhgtphhtthhopehmrghtthhhihgrshdrsghgghesghhmrghilhdrtghomhdprhgtphhtthhopegrnhhgvghlohhgihhorggttghhihhnohdruggvlhhrvghgnhhosegtohhllhgrsghorhgrrdgtohhmpdhrtghpthhtohepshhvvghnsehkvghrnhgvlhdrohhrgh
+X-GND-Sasl: hadess@hadess.net
 
---===============5224832857445195001==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 2025-07-03 at 16:35 +0200, Paul Menzel wrote:
+> Dear Bastien,
+>=20
+>=20
+> Am 03.07.25 um 16:24 schrieb Bastien Nocera:
+> > Found by codespell.
+> >=20
+> > Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> > ---
+> > =C2=A0 drivers/bluetooth/btrtl.c | 2 +-
+> > =C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> > index 7838c89e529e..3d137944c458 100644
+> > --- a/drivers/bluetooth/btrtl.c
+> > +++ b/drivers/bluetooth/btrtl.c
+> > @@ -693,7 +693,7 @@ static int rtlbt_parse_firmware(struct hci_dev
+> > *hdev,
+> > =C2=A0=20
+> > =C2=A0=C2=A0	/* Loop from the end of the firmware parsing instructions,
+> > until
+> > =C2=A0=C2=A0	 * we find an instruction that identifies the "project ID"
+> > for the
+> > -	 * hardware supported by this firwmare file.
+> > +	 * hardware supported by this firmwmare file.
+>=20
+> Without the second m.
 
-This is an automated email and please do not reply to this email.
+*facepalm*
 
-Dear Submitter,
+> > =C2=A0=C2=A0	 * Once we have that, we double-check that project_id is
+> > suitable
+> > =C2=A0=C2=A0	 * for the hardware we are working with.
+> > =C2=A0=C2=A0	 */
+>=20
+>=20
+> Kind regards,
+>=20
+> Paul
+>=20
+>=20
+> PS: Should you resend, it=E2=80=99d be great if you wrote in the
+> summary/title=20
+> if it=E2=80=99s in a comment or in a log string.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btmtksdio.c:331
-error: drivers/bluetooth/btmtksdio.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5224832857445195001==--
+Noted.
