@@ -1,122 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12ACA347D5;
-	Fri,  4 Jul 2025 05:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB03221F17
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Jul 2025 06:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751607367; cv=none; b=Xto/Z7NQn8y9q7zN32ePDaRiOkJmLGI/X6o0BWvTJ0xuAljnRttYbq+2aGpuHz3uq6QYLWOH+ZFinN7uPRciTd0olntKO/5hJjp8vy4WBDTHuPTNjLMNtTglYZpRM5oRsyelT782MvIlPVNeRjy9AUy9nxMw4SPTgx5ljHuFXd0=
+	t=1751608811; cv=none; b=K6wLY1U0jQfXwc/lElubKlBpsCjsWkwoQCVt5btbh2gLRvv1nb1OAvoOeU9EnK0169ZC0Ecld+bvqlUN+pbyGJclnO29GIwmOXzgdtWpqPmvqCVTjSBhKZGsFep9MGL6Ku06Dml5472rnX7l1VtDcK//sFJrqGAMPMAHtXLxiNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751607367; c=relaxed/simple;
-	bh=S6i1vmjbQd/F1a2CosAXojWNB/W1Oq0tSufcWcscSag=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XqRdfllTr1wQogL+uGIfg9U8zLRH2sMyYYcTB82IarBkTjhtTmdaL1oxfBCT6ScGFAiUeR18IETWto8jH14DsgY8JS5CHSpGZEdU7oOskbmdDYEA3gYVPxb98wgOohjeaRV36cF+a+02/N9AvCSOn8HcDUrzSk6Hcc0VYGcyDz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RSAoM6Ja; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751608811; c=relaxed/simple;
+	bh=jKEMWcO4crhMe1B3wan5TV6BnL0kJexZ8dbWHNXxjT0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OTta1zQR7qWB4VRabVMEobZZBxuxpeu+M6ncsULxZAQEzSUlGOrL7ZmX3JiOi1ptnUHBGFSzCnDm0MYtusl+68reV6fNMfCI7CW5ZsS09FN6BzeHFcDFlc+gyGvkhVG8rmMcfI/BD3loE9Zfdo2G5VHWXsnnrwXkn6HJOIvXzZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jBVkkX8E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RSAoM6Ja"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 899C8C4CEE3;
-	Fri,  4 Jul 2025 05:36:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jBVkkX8E"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7F6B0C4CEEF
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Jul 2025 06:00:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751607366;
-	bh=S6i1vmjbQd/F1a2CosAXojWNB/W1Oq0tSufcWcscSag=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=RSAoM6JalaRzoka2JsJrKvd1Y44DVbBnOwfGXbK920ENK97jh6VHToAwCtyWIsVwh
-	 OL07ZOmgnnzGi6DF1kaYLH9VHlGShu9cf3YmSEL/gF3vySVkwLst3Lipo5DQyPXGpY
-	 KmLX55nQjPU/IsD0S121SjIsjh5evK/1M2+noCJhpcOKTUi+G3ocBMDscd40SnBweY
-	 WtlV3guPOdIwbvTYSxUUFN3aOtXChlo+CFxp3bR1Cvl7sRDQa0jA+Vsy4nXOQv622u
-	 ZIJa0Drj8MAyRAmY0svT1daC9Q6Yao8hfZsVhi2ojJ62LTYOa1ZRR7wcJRk2oJ8uSH
-	 XyxY2j9kj7bUA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75191C83F09;
-	Fri,  4 Jul 2025 05:36:06 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Fri, 04 Jul 2025 13:36:04 +0800
-Subject: [PATCH v3] Bluetooth: ISO: Support SCM_TIMESTAMPING for ISO TS
+	s=k20201202; t=1751608810;
+	bh=jKEMWcO4crhMe1B3wan5TV6BnL0kJexZ8dbWHNXxjT0=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=jBVkkX8EsYNcBXMphJSwTUTugzfr0YK7n2sdtfO5P/wCXuFy7LuhlbEUicU7ec2jR
+	 4uubs3XEVOJnyoiaR1/Co92oxtEo5dlpja8179x97kI0v+n+8e5oTuMfWCMJwkp7gP
+	 +uGs89tVz8x1TBq1t61YLHuR4gPuWGXj2rgWz5b+QMxKKMvE6Li6iIPrx5YYcGetOc
+	 QpczL5pF1NjTsF36LX2fQNLQeKAacT/5NVIqqk04wNd8mL/0K9WsINx9t2FCboGSlm
+	 aNNyrbCpBvQScDvzF83ARmK6mwKtYSbeDMgjk8LoT+kKatnqJAS1D/RBT2nYamZYge
+	 5WU38cPQYJriA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 702DEC3279F; Fri,  4 Jul 2025 06:00:10 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220306] Updated ibt-18-16-1.sfi is bugged, "Invalid exception
+ type 03" kernel spam
+Date: Fri, 04 Jul 2025 06:00:10 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cf_regression
+Message-ID: <bug-220306-62941-VgzYY1xtXU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220306-62941@https.bugzilla.kernel.org/>
+References: <bug-220306-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250704-iso_ts-v3-1-2328bc602961@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAENoZ2gC/1WMWwrCMBQFt1LybSS56SP1y32ISExv2wu2kaQEp
- XTvpoUqfs7hzMwsoCcM7JTNzGOkQG5MoA4Zs70ZO+TUJGYgoBA5SE7B3abArQajhDBY6Zyl89N
- jS68tdLkm7ilMzr+3bpTruifqPREllxwLXbZKNFja+9kMD9eRPVo3sDUS4SdWAr4iJLEC1ci6t
- lqU+l9cluUDtrm4ztcAAAA=
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1751607364; l=1653;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=C5WSe4xpxMywiJVuo177OZ9NkV8vydxLCuzzPLrDJ70=;
- b=BPvz/HGiu+RRd/d7DdT0qoLzNUl91lP8saypFLqpEV6DymwgKZT1fwShR0X0vedw8VkPV0hbt
- AsNh/CPpqm9BRqPmei3UxNyNxB7NtYKTfAimIss2qLjyLM4t+n2AXpV
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220306
 
-User-space applications (e.g., PipeWire) depend on
-ISO-formatted timestamps for precise audio sync.
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Changes in v3:
-- Change to use hwtimestamp
-- Link to v2: https://lore.kernel.org/r/20250702-iso_ts-v2-1-723d199c8068@amlogic.com
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+         Regression|No                          |Yes
 
-Changes in v2:
-- Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
-- Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com
----
- net/bluetooth/iso.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+--- Comment #3 from Artem S. Tashkinov (aros@gmx.com) ---
+I've downgraded the firmware and the errors are gone.
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index fc22782cbeeb..67ff355167d8 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -2301,13 +2301,21 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		if (ts) {
- 			struct hci_iso_ts_data_hdr *hdr;
- 
--			/* TODO: add timestamp to the packet? */
- 			hdr = skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SIZE);
- 			if (!hdr) {
- 				BT_ERR("Frame is too short (len %d)", skb->len);
- 				goto drop;
- 			}
- 
-+			/* The ISO ts is based on the controller’s clock domain,
-+			 * so hardware timestamping (hwtimestamp) must be used.
-+			 * Ref: Documentation/networking/timestamping.rst,
-+			 * chapter 3.1 Hardware Timestamping.
-+ 			 */
-+			struct skb_shared_hwtstamps *hwts = skb_hwtstamps(skb);
-+			if (hwts)
-+				hwts->hwtstamp = us_to_ktime(le32_to_cpu(hdr->ts));
-+
- 			len = __le16_to_cpu(hdr->slen);
- 		} else {
- 			struct hci_iso_data_hdr *hdr;
+It's a clear regression caused by the firmware.
 
----
-base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
-change-id: 20250421-iso_ts-c82a300ae784
+--=20
+You may reply to this email to add a comment.
 
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
-
-
+You are receiving this mail because:
+You are the assignee for the bug.=
