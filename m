@@ -1,85 +1,69 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792D029AB1B
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 14:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF233EEDE
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 14:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751898796; cv=none; b=a0iQGYd4eZh3qk3nGF04C2xivLwQSyw5EOguhGCpsk9KFGxbc9VlDpt9QaYwTiJQ9+6PGvxxAJxnyoRIF2kYA6e+DKXp6CUc/sjXb3WgvNSbKZgOMJXiTrC0vKNCl/rDsFt27gch1kxqhq4k0dQIYDkpzGOpWOr/rnR7YtINi4A=
+	t=1751898865; cv=none; b=C4n4zc3vnlRlQfaOtEnkChM94yFdaFokToX7/fIiCf+VWxp7dPi6SykFYIQP7Qaiv1BdF57GrgTsEKj/aHvnESsKS3ZGnkpru1uxPPgTgtACz24S1uVvq/ZpPr4ZMv/9Tuia6hSfS4SOnz6TlbQh/59G5+GLVcNUfaIT7g+iiwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751898796; c=relaxed/simple;
-	bh=6FsrBPNcJunHLOLsRzl4RBZfOiKw/aYQlZqF1FHCpZ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KDasjlQCNFx19eCnqHrN6Uco2tsgyYacdcCG0sMhqk7gn2EqNZOqwNvXdR+2f1kcdq/rpEf0xt9rkbRbFSHittf6HQShDVEq8ljd2ECT12shBc5pFlxNChRo51595mcuZAViT1k9q2Ou03kbYHbWwIpeVsEURAgoXSjS61zvwao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems; spf=pass smtp.mailfrom=starlabs.systems; dkim=pass (2048-bit key) header.d=starlabs-systems.20230601.gappssmtp.com header.i=@starlabs-systems.20230601.gappssmtp.com header.b=Jzz8Tz4A; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=starlabs.systems
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starlabs.systems
+	s=arc-20240116; t=1751898865; c=relaxed/simple;
+	bh=0Oey+d1tOoLyAYwUWTea2NkW8GyaBqDmvcJZZdBYCc0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DrInPcmIcQ/mw03P7LtfuDHLkgfByIqZL4pkcAC5AYLEYG0O26ZjkPUibzlYht869B+5L8tjvrNNfaYlHHj7z36r2v4Wq3Rgg97hEFkuWWStm9R2ZbOv8e2pBW4pRD6uediLNyfrvn6ZfTGv0srMEejN5vtVJc5zGxi6ebW0Vgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=SyjPqKMm; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=starlabs-systems.20230601.gappssmtp.com header.i=@starlabs-systems.20230601.gappssmtp.com header.b="Jzz8Tz4A"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so5207345a12.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 07:33:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=starlabs-systems.20230601.gappssmtp.com; s=20230601; t=1751898791; x=1752503591; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6FsrBPNcJunHLOLsRzl4RBZfOiKw/aYQlZqF1FHCpZ0=;
-        b=Jzz8Tz4A6YF97sAdiRqno4cISstKqxMFzlVaEk6qlP+hGIpP4NjcTzx3xTKc+ybYrk
-         ZFNr4X3HYw1Uj9z7PDBBz9Yd9tdx6iDCVp8zToRlwCtq5kCZ0n13zzGO2oYfABRfxikj
-         RMvS/DMBBmoeKc9oXlwWil9HnmwDCu3nmluS0trSPvDr6/ReSgmJ1VF1AdKPCflYi614
-         /dgSrezpVVfYAEGs991wWUOddFYvZaODMtkqkQNitDoXkY4wXNcFqaioJr0PzEEL18mU
-         AZN+jpS0x3yZFL1wXR0lv+VMdeSXDGAFKSK1GDtQPc9B32/qqUX7sNvERaXVFAi300iE
-         cWNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751898791; x=1752503591;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6FsrBPNcJunHLOLsRzl4RBZfOiKw/aYQlZqF1FHCpZ0=;
-        b=SaHvuoY+qpM3OP6WGUpRHJcl4sF3dQv6KqglhbeT2DSbKt3V4MzZK2BMhaKuH4nOtS
-         /dDkxOfiXSXvBNBjd8aGl9EqPM166lfGLn2M4vSTiLuqofqaX1WLn/OMKYr1KmKtn2el
-         4TakNQCnkc0CA/OXQkNjLUOsbK7QhayE+H14XUx/TjwOd3IYnchKwnCGce0ifIx3B65N
-         HhpJ/0hOj7x6fVkZi36o5Zw7r9PxZCsQrz2+rb/fTPhuO8tflOA17ii8iDfXZJfDtEtg
-         XqISsvAifryo/4IHEyVdCiVdAIKAhrQiSl40GdfZyWIuNYKt1SAhoMMJVRzl0gYNCxeO
-         0eQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVsDKUO4FAM/4Y4QR+0BStHnakDIRNYZuHFVyhA36nl6LgQoSq+m5eEZf1ANJ2L/cY6gIpjK099urqP8XiC8WI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV69rlmAV87msueR67fXCqes2BgmfvlGiSkYWM/+Jl1mw4R3Zd
-	TyaPOE/vJ9S2rij3mAMi46aadb6Y4SoOhZsAiSHCl0WDP2Rvy4UdXz4KcK8hVl6L/nQj25m8vDH
-	Am8sNm51gbNCMwMOsmkuxV9vXssKVhk3dQ/5A2fZT
-X-Gm-Gg: ASbGncvJDjvjcEATp+UcNiV5Iy4ND7okErEMFlSMwPEnFaeSQWZSW0JCkS6mVreJ6Sz
-	Ea6qaiJzY83NRm25jtYLN2QmJc+H+eloTBLbYZc3pjrsmDw5ZKtFohalSmVa4bsy5vFh50al6DD
-	CsIC2Cdap0NpaajPqrzt5K01IsvHGAEFMsxcOPxV7BjpZQ
-X-Google-Smtp-Source: AGHT+IG4YUAf7sSdRmdt7gL94phIR6fcpB3LEVIAxWbdeP+vevCMYFn7wGF382kdk59WLzdrN4t3z92SY3tC8MSz6I8=
-X-Received: by 2002:a05:6402:278a:b0:609:9115:60f8 with SMTP id
- 4fb4d7f45d1cf-60fd6d50643mr10775079a12.21.1751898791254; Mon, 07 Jul 2025
- 07:33:11 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="SyjPqKMm"
+Received: from github.com (hubbernetes-node-6743197.ash1-iad.github.net [10.56.202.72])
+	by smtp.github.com (Postfix) with ESMTPA id 1DC2A9211D2
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 07:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751898863;
+	bh=GEu/LB61Kw2Dqblv+sxTdIznkbPSZwelXsAOK9H5J3s=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=SyjPqKMmfKkd929fkmXyHVZ9q4QarskYr3PhjKO8GP4NhwYRiHYAJk6ZzEGvyebCt
+	 YsEyGxuVyZWStn3fPbrqZiQTh+fTyCRZFWclbMtxfDpcQBBslShnq/MDy7PZMP3WEr
+	 IM9erEIhLWxRNDFF3EALWO+HSVCdGFjfn8O4zWL8=
+Date: Mon, 07 Jul 2025 07:34:23 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/979707/000000-8b7cb1@github.com>
+Subject: [bluez/bluez] 8b7cb1: shared/shell: Fix not running pre_run on
+ MODE_NON_...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CABtds-1fKyFYvU1jL9njmhfphU0XytO+F5mBhARAzQip+CK6cA@mail.gmail.com>
- <CABBYNZLgWF7m0Lwc+C848-0qgBZfV30F7SE0YcKJCPLV5KbG-Q@mail.gmail.com>
- <CABtds-3FMYA1s7n6tFivxNypubKp+D6fjG8aSf-nkRK4Rxh1-w@mail.gmail.com>
- <CABBYNZLPW9PE4qiLaszncFoi3euFba1qfsJB+tU8hszvjFoOoQ@mail.gmail.com>
- <CABtds-2mFsGWU5Qi6CrrhpMeQr4kJ0hZw1A2gw=drNLm_T5tTw@mail.gmail.com>
- <CABBYNZKDxVmcY6uBYvqr=a6Xu=iR76tsb5k4-+MpuVNxpD9jXQ@mail.gmail.com>
- <CABtds-1+zVcnm35VQvwqP0VCXOkuaJszvsqQ-D-etwhm8kMzZA@mail.gmail.com> <CABtds-0SJCdBpipBs0yZ_HGcXtgzGJbtcQTmbdrm7LhVskdv=w@mail.gmail.com>
-In-Reply-To: <CABtds-0SJCdBpipBs0yZ_HGcXtgzGJbtcQTmbdrm7LhVskdv=w@mail.gmail.com>
-From: Sean Rhodes <sean@starlabs.systems>
-Date: Mon, 7 Jul 2025 15:32:59 +0100
-X-Gm-Features: Ac12FXzebMV79aRZCVWgUHpyAhdiAa_PHGXdU-vZF-JBynJ6yvniBQbyfmwELEo
-Message-ID: <CABtds-15rSWR5avQ6X=5M-P+KN1UiDCQCzMUhCWVw1JG3TLu5A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Revert vendor-specific ISO classification for
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org, 
-	Matt DeVillier <matt@starlabs.systems>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi
+  Branch: refs/heads/979707
+  Home:   https://github.com/bluez/bluez
+  Commit: 8b7cb1e3bccc94b51d6a86fc109187ca5fd41bba
+      https://github.com/bluez/bluez/commit/8b7cb1e3bccc94b51d6a86fc109187ca5fd41bba
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-07-07 (Mon, 07 Jul 2025)
 
-Would it be possible to get this revert merged, just to restore functionality?
+  Changed paths:
+    M src/shared/shell.c
 
-Thanks
+  Log Message:
+  -----------
+  shared/shell: Fix not running pre_run on MODE_NON_INTERACTIVE
 
-Sean
+If a command is given to be run in non-interactive mode the code would
+not attempt to execute .pre_run first since some (sub)menus requires that
+in order to properly initialize things.
+
+Fixes: https://github.com/bluez/bluez/issues/1394
+Fixes: https://github.com/bluez/bluez/issues/1317
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
