@@ -1,307 +1,209 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F7218DF62
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 18:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CC522D790
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 18:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751912975; cv=none; b=bdqp/twb0rLRT1Az70tn5Nkn1jfGFoJl2XgeSsyUjGtBtuO1dtnEf71wil/+OYStZoRfFjZgbcRnRj2tHsiZxRRhw51nWDcKJgjG8bgm/fLpFVyYiuyAFBcIROfp06NOeodeECHNQy01c1j2Z6x8791RFYHpP37UDXokhYeEw9w=
+	t=1751913152; cv=none; b=W59XuNrtI8BkYKcn4fNv3mGLNz+Sfz2JYnJqCTF9/oLzqcW9JhWN91coHksK1izSg4O4sh3DODZ55siV2F058fYLVbNs2l4vVRpewm+Zf4XImqGW7Zn+woSOmGrt11SPyj64T/Jj2GLQIP9rne1gSBdGGwg6fycK+VyxIxv4ALY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751912975; c=relaxed/simple;
-	bh=DF42UXqdlsYejBcj9OH9196nEZaXi9Ssz8HoK0g2y+Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Beb3YTmszEz85rBYr5QANmj2Mz3DVEWkkVE2M54KjqxkR3ljeSUjmcA7fsQVWDIAb2QUhNP7wNGmlPbb22FeSdpd4rvn+gwDPhz1pbJ16OsljtQoxPxKZYk15Po0ijjtNnG/qH4QQkOQ6QGUayDdUukkaTk3a9GGMwkYAlWZg9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVEJkstP; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVEJkstP"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32f1763673cso27982851fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 11:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751912971; x=1752517771; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M0enJqYcR2VD/x3PF/GP8oxmq2TC1Q8uZDBdicLVx5o=;
-        b=eVEJkstPqoIfOGd2szxgQH7R+LdpKT8Wd2qTsSz84HvgUhXv2Y7UE3z63lwUHO2lXC
-         QJsI9aWqyjadlD39l0NAdxdxCxCBquGmPEbV/3ezbF28JJVtyFXyHwsYFPNLqufeeOxQ
-         a2rFDMVK5Q60eK+C5q6okKZGkwuf2ucQk/aarWUBj4wXwC6beOQJxs3Yd5iN2sKIX0M8
-         e1aPcuJmKRCKz9/a8w0rJjJSzP1cclvJ3CsRnXstMNMg267PkUMgWuQWFulJlAL42jEL
-         zajHTN+0ItKcSyQqxeKWgmsJozBRg5r9HySv/41lSXkmJDlx1Kqyur4kbM1ApO0vbR1s
-         8cyg==
+	s=arc-20240116; t=1751913152; c=relaxed/simple;
+	bh=8GiBBHQtfHOqzVmO7ETkwvN+twiPkofVYk2vF8hzh38=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=bBBU7eV/vT57qG+ossyT/21gBFlA7743cLNDXKlbr2WIivMMogTGD2Qds7FeXzWnse2IlIinPYQYBn/WPaN/iSPa8j85j/+Er5OGcbb6UhNAPwL5agx3u5jUeZaLUI8rLcC3UAPVgVWvyg65/kH9qTf7zI9fUbuf4eJfx5UER+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-86d126265baso321976439f.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 11:32:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751912971; x=1752517771;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M0enJqYcR2VD/x3PF/GP8oxmq2TC1Q8uZDBdicLVx5o=;
-        b=TrJM3ZyxAnzi4r1vvgbvZ3vubnty4b8VFXS4Is6Ffe+OjzaofHgwgrvUttKFwhY9Lv
-         Os9qCmvv/P6DMoropJYqW1xYJ100l5v7ff3dXvdHcGpVvl0iZ0ZXkyZaaRtYrQ1ZTu9Q
-         kynXElEpFN9DXJQC/Ye/G14GI/Bv3AMj6RUAwfXmS/P0XJM2vyLIt8nRurbgRiHm+iI2
-         E3EBqHi+HO6PrQaqGEK53v2tvD6486f4rHiwjFZWBWfJ+SMao10xo8IwNfFcYTO564xx
-         jG7XW0aqnrZhz+tMiKmvtFxsjXksefVci23Qup260YNGTLQ07iU3jZjVbwt8AuPW1Fla
-         OmGQ==
-X-Gm-Message-State: AOJu0Yy4lzeSu6yfXiIKryuAE791d08sC7wJwQN3r8q2BY3iyw4b0ez8
-	YqhVWMvYXT3sPrjx0Byf456D2juaYd2x6CFkrABHtqKz4i0PXqMyk8prlXJFYSLqHG4pbROxSh8
-	PapDDr9kwA+6CMsSQAJa85BnIN5yUMYc=
-X-Gm-Gg: ASbGnctO7V0vfsR6Iy2rc9dBL7JJrBuP1z22rN5LX3wsGBxQEgXTwCmM5f4wS36rRAN
-	Y/v8mP2umeSSzcTSN+co+81rCsLyin/Myuj29PL45095rnkNx93309qYU4tCPmZWuLdPMdxS/jf
-	Nvc0jwxJ36mg1FyL7wNGaWBoJwmztVbHZw2GyqwZXvSQ==
-X-Google-Smtp-Source: AGHT+IHY05aBkmmuiLLmooJrsrmRj9QeiwyfT+9/LJ/SGdBcw2qMz+tS4EAdbhNg+VaaHyBqdIaU8gQx9DVZQL6kYSI=
-X-Received: by 2002:a05:651c:4114:b0:32b:8778:6f0a with SMTP id
- 38308e7fff4ca-32f092e51bcmr25375841fa.27.1751912970828; Mon, 07 Jul 2025
- 11:29:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751913149; x=1752517949;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HlY8XzQoFKoWs7qfmY3eXvDw2cI1dpWN0OkxWj1+lnw=;
+        b=sNlVXa40kSCwYtBHkxFnXCLS+SrrJ5Q7MlKwUhHKzPCkihqa91CWCYU+auuKFg4/J/
+         BAYXbnJaFv1wrB9+AneFJUZ00ltt/A7RG8vSG37CjaJq3sQszX7jpKY3bh9S3WHXL7Dp
+         Dd03s8njrSW1hoaUSF8E0YuKasJ14V6dcsi8JXep/raWu+ALNhXDmetkAec5CqTLfHyh
+         3U42FfGIuslJ9HRaTYY8n8Yi33ogSdQyHDuiaAcIlKizMsB9nb+/i4nMbsve+aFahawy
+         fD8IzeK9xmN+4Jf8pjuZpzk7tTZ5zb4E5KmMPQ05m1+IgULUW6o1XtDTuvjiomLJGqRJ
+         m8Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWiL0THF3jJ71t/BdcY0LvHDaSSfdxfmYCcm9z/cOmZOoH83Otp5mr1mE7MOP43LC/ZHeiyNJTfkKLghwE0u0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjN2NDUwmjr43nE0ylqpVkBbSyIY1RoaCPLyGU4FNx/nN5yV9J
+	8209PC+IgU47V4EDHudHQhp6Q8HirNtICidDf/lZErF7F0DTiSRCDb5sUVE1w9gTcQa4s0D75v+
+	hhRJPYSbv7h2wssW8+2j3a6QbaiX3+1QW4xa0ZJ4jKbelz07XhOGcbwRt2qw=
+X-Google-Smtp-Source: AGHT+IG6yNnQ72xHq9NTlfxRXNyfzdNtSpzEJBPqaM6dD/lmZSg1jnqnnTf+VrJfGijBrgADT2S8rw8fC1g1TOPJdzRi1uKPNDgY
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627030229.1720287-1-quic_shuaz@quicinc.com>
-In-Reply-To: <20250627030229.1720287-1-quic_shuaz@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 7 Jul 2025 14:29:18 -0400
-X-Gm-Features: Ac12FXyf1XY4X5aDSUCX2bnARnxJbzm_o0mSA61I5Zo9X5PHK19JWkIjofyhoyk
-Message-ID: <CABBYNZK2GqH0__beG1D6PemARXmsMpYxjkJrJLktqP4Keix31w@mail.gmail.com>
-Subject: Re: [PATCH v1] net: bluetooth: add callback to exe l2cap when
- read_security uncompleted
-To: Shuai Zhang <quic_shuaz@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_bt@quicinc.com
+X-Received: by 2002:a05:6602:1587:b0:861:7d39:d4d3 with SMTP id
+ ca18e2360f4ac-8794b431a8amr17982739f.3.1751913149022; Mon, 07 Jul 2025
+ 11:32:29 -0700 (PDT)
+Date: Mon, 07 Jul 2025 11:32:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <686c12bd.a70a0220.29fe6c.0b13.GAE@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: null-ptr-deref Write in
+ l2cap_sock_resume_cb (4)
+From: syzbot <syzbot+e2df3a66f7d16fa6ec55@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Shuai,
+Hello,
 
-On Thu, Jun 26, 2025 at 11:04=E2=80=AFPM Shuai Zhang <quic_shuaz@quicinc.co=
-m> wrote:
->
-> When the DUT receives a remote L2CAP Connection Request during the Read
-> Encryption Key Size procedure, if it fails to complete reading the
-> Encryption Key Size while processing the request, it will respond with
-> a Connection Response =E2=80=93 Refused (security block), resulting in th=
-e
-> disconnection of the remote device.
->
-> Use HCI_CONN_ENC_KEY_READY to determine whether
-> l2cap_connect_request is pending.
->
-> When l2cap_connect occurs before the read_enc_key_size event, it will
-> be pending because HCI_CONN_ENC_KEY_READY has not yet been set.
-> The connection request will be processed once the read_enc_key_size
-> event completes.
->
-> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-> ---
->  include/net/bluetooth/hci_core.h |  3 +++
->  include/net/bluetooth/l2cap.h    | 10 +++++++++-
->  net/bluetooth/hci_event.c        | 16 ++++++++++++++++
->  net/bluetooth/l2cap_core.c       | 30 ++++++++++++++++++++++++++++++
->  4 files changed, 58 insertions(+), 1 deletion(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index b47c74080..db329abbf 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -767,6 +767,8 @@ struct hci_conn {
->
->         struct bt_codec codec;
->
-> +       struct l2cap_pending_connect *pending_connect;
+syzbot found the following issue on:
 
-We have rx_queue for deferring packets, we may need to extend that to
-store requests to channels that require encryption.
+HEAD commit:    7482bb149b9f Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=1597828c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3c06e3e2454512b3
+dashboard link: https://syzkaller.appspot.com/bug?extid=e2df3a66f7d16fa6ec55
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17c4cbd4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d11f70580000
 
->         void (*connect_cfm_cb)  (struct hci_conn *conn, u8 status);
->         void (*security_cfm_cb) (struct hci_conn *conn, u8 status);
->         void (*disconn_cfm_cb)  (struct hci_conn *conn, u8 reason);
-> @@ -970,6 +972,7 @@ enum {
->         HCI_CONN_CREATE_PA_SYNC,
->         HCI_CONN_PA_SYNC,
->         HCI_CONN_PA_SYNC_FAILED,
-> +       HCI_CONN_ENC_KEY_READY,
->  };
->
->  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.=
-h
-> index 4bb0eaedd..b1ccd56bd 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -679,6 +679,13 @@ struct l2cap_user {
->         void (*remove) (struct l2cap_conn *conn, struct l2cap_user *user)=
-;
->  };
->
-> +struct l2cap_pending_connect {
-> +       struct l2cap_conn *conn;
-> +       struct l2cap_cmd_hdr cmd;
-> +       u8 data[sizeof(struct l2cap_conn_req)];
-> +       u8 rsp_code;
-> +};
-> +
->  #define L2CAP_INFO_CL_MTU_REQ_SENT     0x01
->  #define L2CAP_INFO_FEAT_MASK_REQ_SENT  0x04
->  #define L2CAP_INFO_FEAT_MASK_REQ_DONE  0x08
-> @@ -976,5 +983,6 @@ void l2cap_conn_put(struct l2cap_conn *conn);
->
->  int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user=
-);
->  void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *u=
-ser);
-> -
-> +void l2cap_process_pending_connect(struct l2cap_conn *conn,
-> +                                  struct l2cap_cmd_hdr *cmd, u8 *data, u=
-8 rsp_code);
->  #endif /* __L2CAP_H */
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index c4b87bfb4..6c992f83e 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -32,6 +32,7 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->  #include <net/bluetooth/mgmt.h>
-> +#include <net/bluetooth/l2cap.h>
->
->  #include "hci_debugfs.h"
->  #include "hci_codec.h"
-> @@ -766,10 +767,23 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *=
-hdev, void *data,
->                 /* Update the key encryption size with the connection one=
- */
->                 if (key_enc_size && *key_enc_size !=3D conn->enc_key_size=
-)
->                         *key_enc_size =3D conn->enc_key_size;
-> +               set_bit(HCI_CONN_ENC_KEY_READY, &conn->flags);
->         }
->
->         hci_encrypt_cfm(conn, status);
->
-> +       /*Defer l2cap_connect here if it's triggered before key size is r=
-ead.*/
-> +       if (conn->pending_connect) {
-> +               struct l2cap_pending_connect *pc =3D conn->pending_connec=
-t;
-> +
-> +               conn->pending_connect =3D NULL;
-> +
-> +               bt_dev_dbg(hdev, "Defer l2cap_connect");
-> +               l2cap_process_pending_connect(pc->conn, &pc->cmd, pc->dat=
-a, pc->rsp_code);
-> +
-> +               kfree(pc);
-> +       }
-> +
->  done:
->         hci_dev_unlock(hdev);
->
-> @@ -3396,6 +3410,8 @@ static void hci_disconn_complete_evt(struct hci_dev=
- *hdev, void *data,
->         if (!conn)
->                 goto unlock;
->
-> +       clear_bit(HCI_CONN_ENC_KEY_READY, &conn->flags);
-> +
->         if (ev->status) {
->                 mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
->                                        conn->dst_type, ev->status);
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 40daa3827..c4cb60e65 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3982,6 +3982,30 @@ static void l2cap_connect(struct l2cap_conn *conn,=
- struct l2cap_cmd_hdr *cmd,
->         struct l2cap_chan *chan =3D NULL, *pchan =3D NULL;
->         int result, status =3D L2CAP_CS_NO_INFO;
->
-> +       /* If encryption is requested, but the key size is not ready yet,
-> +        * we need to wait for the key size to be ready before we can
-> +        * proceed with the connection. We do this by deferring the
-> +        * connection request until the key size is ready. This is done
-> +        * by storing the connection request in the hcon->pending_connect
-> +        * field. The connection request will be retried when the key siz=
-e
-> +        * is ready.
-> +        */
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f623d741d651/disk-7482bb14.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/483e23ae71b1/vmlinux-7482bb14.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/79b5baaa1b50/Image-7482bb14.gz.xz
 
-This should have been resolved by
-https://github.com/bluez/bluetooth-next/commit/c82b6357a5465a3222780ac5d3ed=
-cdfb02208cc3:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e2df3a66f7d16fa6ec55@syzkaller.appspotmail.com
 
-    /* If the key enc_size is already known, use it as conn->enc_key_size,
-     * otherwise use hdev->min_enc_key_size so the likes of
-     * l2cap_check_enc_key_size don't fail while waiting for
-     * HCI_OP_READ_ENC_KEY_SIZE response.
-     */
-    if (key_enc_size && *key_enc_size)
-        conn->enc_key_size =3D *key_enc_size;
-    else
-        conn->enc_key_size =3D hdev->min_enc_key_size;
+Bluetooth: hci0: unexpected event 0x06 length: 4 > 3
+==================================================================
+BUG: KASAN: null-ptr-deref in instrument_atomic_write include/linux/instrumented.h:82 [inline]
+BUG: KASAN: null-ptr-deref in clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
+BUG: KASAN: null-ptr-deref in l2cap_sock_resume_cb+0xb4/0x17c net/bluetooth/l2cap_sock.c:1711
+Write of size 8 at addr 0000000000000570 by task kworker/u9:0/52
 
-This will use the hci_conn_key_enc_size, then on the command reply we do:
-
-        /* Attempt to check if the key size is too small or if it has
-         * been downgraded from the last time it was stored as part of
-         * the link_key.
-         */
-        if (conn->enc_key_size < hdev->min_enc_key_size ||
-            (key_enc_size && conn->enc_key_size < *key_enc_size)) {
-            /* As slave role, the conn->state has been set to
-             * BT_CONNECTED and l2cap conn req might not be received
-             * yet, at this moment the l2cap layer almost does
-             * nothing with the non-zero status.
-             * So we also clear encrypt related bits, and then the
-             * handler of l2cap conn req will get the right secure
-             * state at a later time.
-             */
-            status =3D HCI_ERROR_AUTH_FAILURE;
-            clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
-            clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-        }
-
-> +       if (test_bit(HCI_CONN_ENCRYPT, &conn->hcon->flags) &&
-> +           !test_bit(HCI_CONN_ENC_KEY_READY, &conn->hcon->flags)) {
-> +               struct l2cap_pending_connect *pc;
-> +
-> +               pc =3D kzalloc(sizeof(*pc), GFP_KERNEL);
-> +               if (!pc)
-> +                       return;
-> +               pc->conn =3D conn;
-> +               memcpy(&pc->cmd, cmd, sizeof(*cmd));
-> +               memcpy(pc->data, data, sizeof(struct l2cap_conn_req));
-> +               pc->rsp_code =3D rsp_code;
-> +               BT_DBG("store request and retried when keysize is ready")=
-;
-> +               conn->hcon->pending_connect =3D pc;
-> +               return;
-> +       }
-> +
->         u16 dcid =3D 0, scid =3D __le16_to_cpu(req->scid);
->         __le16 psm =3D req->psm;
->
-> @@ -4105,6 +4129,12 @@ static void l2cap_connect(struct l2cap_conn *conn,=
- struct l2cap_cmd_hdr *cmd,
->         l2cap_chan_put(pchan);
->  }
->
-> +void l2cap_process_pending_connect(struct l2cap_conn *conn, struct l2cap=
-_cmd_hdr *cmd,
-> +                                  u8 *data, u8 rsp_code)
-> +{
-> +       l2cap_connect(conn, cmd, data, rsp_code);
-> +}
-> +
->  static int l2cap_connect_req(struct l2cap_conn *conn,
->                              struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *=
-data)
->  {
-> --
-> 2.34.1
->
->
+CPU: 1 UID: 0 PID: 52 Comm: kworker/u9:0 Not tainted 6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: hci0 hci_rx_work
+Call trace:
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:501 (C)
+ __dump_stack+0x30/0x40 lib/dump_stack.c:94
+ dump_stack_lvl+0xd8/0x12c lib/dump_stack.c:120
+ print_report+0x58/0x84 mm/kasan/report.c:524
+ kasan_report+0xb0/0x110 mm/kasan/report.c:634
+ check_region_inline mm/kasan/generic.c:-1 [inline]
+ kasan_check_range+0x264/0x2a4 mm/kasan/generic.c:189
+ __kasan_check_write+0x20/0x30 mm/kasan/shadow.c:37
+ instrument_atomic_write include/linux/instrumented.h:82 [inline]
+ clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
+ l2cap_sock_resume_cb+0xb4/0x17c net/bluetooth/l2cap_sock.c:1711
+ l2cap_security_cfm+0x524/0xea0 net/bluetooth/l2cap_core.c:7357
+ hci_auth_cfm include/net/bluetooth/hci_core.h:2092 [inline]
+ hci_auth_complete_evt+0x2e8/0xa4c net/bluetooth/hci_event.c:3514
+ hci_event_func net/bluetooth/hci_event.c:7511 [inline]
+ hci_event_packet+0x650/0xe9c net/bluetooth/hci_event.c:7565
+ hci_rx_work+0x320/0xb18 net/bluetooth/hci_core.c:4070
+ process_one_work+0x7e8/0x155c kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3321 [inline]
+ worker_thread+0x958/0xed8 kernel/workqueue.c:3402
+ kthread+0x5fc/0x75c kernel/kthread.c:464
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:847
+==================================================================
+Unable to handle kernel NULL pointer dereference at virtual address 0000000000000570
+Mem abort info:
+  ESR = 0x0000000096000006
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x06: level 2 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+user pgtable: 4k pages, 48-bit VAs, pgdp=0000000121d3b000
+[0000000000000570] pgd=0800000121d58403, p4d=0800000121d58403, pud=0800000121d81403, pmd=0000000000000000
+Internal error: Oops: 0000000096000006 [#1]  SMP
+Modules linked in:
+CPU: 1 UID: 0 PID: 52 Comm: kworker/u9:0 Tainted: G    B               6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT 
+Tainted: [B]=BAD_PAGE
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: hci0 hci_rx_work
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : __lse_atomic64_andnot arch/arm64/include/asm/atomic_lse.h:131 [inline]
+pc : arch_atomic64_andnot arch/arm64/include/asm/atomic.h:64 [inline]
+pc : raw_atomic64_andnot include/linux/atomic/atomic-arch-fallback.h:3675 [inline]
+pc : raw_atomic_long_andnot include/linux/atomic/atomic-long.h:964 [inline]
+pc : arch_clear_bit include/asm-generic/bitops/atomic.h:25 [inline]
+pc : clear_bit include/asm-generic/bitops/instrumented-atomic.h:42 [inline]
+pc : l2cap_sock_resume_cb+0xc0/0x17c net/bluetooth/l2cap_sock.c:1711
+lr : __lse_atomic64_andnot arch/arm64/include/asm/atomic_lse.h:131 [inline]
+lr : arch_atomic64_andnot arch/arm64/include/asm/atomic.h:64 [inline]
+lr : raw_atomic64_andnot include/linux/atomic/atomic-arch-fallback.h:3675 [inline]
+lr : raw_atomic_long_andnot include/linux/atomic/atomic-long.h:964 [inline]
+lr : arch_clear_bit include/asm-generic/bitops/atomic.h:25 [inline]
+lr : clear_bit include/asm-generic/bitops/instrumented-atomic.h:42 [inline]
+lr : l2cap_sock_resume_cb+0xbc/0x17c net/bluetooth/l2cap_sock.c:1711
+sp : ffff8000991975b0
+x29: ffff8000991975b0 x28: ffff0000d89f6000 x27: dfff800000000000
+x26: ffff700013232ec8 x25: 0000000000000001 x24: ffff80008db6f6c0
+x23: ffff0000d89f6480 x22: dfff800000000000 x21: 0000000000000002
+x20: 0000000000000570 x19: 0000000000000000 x18: 1fffe000337d8876
+x17: 0000000000000000 x16: ffff80008ae642c8 x15: 0000000000000001
+x14: 1ffff000125d90f8 x13: 0000000000000000 x12: 0000000000000000
+x11: ffff7000125d90f9 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : 0000000000000002 x7 : 0000000000000001 x6 : 0000000000000001
+x5 : ffff800099196e18 x4 : ffff80008f766c20 x3 : ffff8000803b80e0
+x2 : 0000000000000001 x1 : 0000000000000000 x0 : 0000000000000000
+Call trace:
+ __lse_atomic64_andnot arch/arm64/include/asm/atomic_lse.h:-1 [inline] (P)
+ arch_atomic64_andnot arch/arm64/include/asm/atomic.h:64 [inline] (P)
+ raw_atomic64_andnot include/linux/atomic/atomic-arch-fallback.h:3675 [inline] (P)
+ raw_atomic_long_andnot include/linux/atomic/atomic-long.h:964 [inline] (P)
+ arch_clear_bit include/asm-generic/bitops/atomic.h:25 [inline] (P)
+ clear_bit include/asm-generic/bitops/instrumented-atomic.h:42 [inline] (P)
+ l2cap_sock_resume_cb+0xc0/0x17c net/bluetooth/l2cap_sock.c:1711 (P)
+ l2cap_security_cfm+0x524/0xea0 net/bluetooth/l2cap_core.c:7357
+ hci_auth_cfm include/net/bluetooth/hci_core.h:2092 [inline]
+ hci_auth_complete_evt+0x2e8/0xa4c net/bluetooth/hci_event.c:3514
+ hci_event_func net/bluetooth/hci_event.c:7511 [inline]
+ hci_event_packet+0x650/0xe9c net/bluetooth/hci_event.c:7565
+ hci_rx_work+0x320/0xb18 net/bluetooth/hci_core.c:4070
+ process_one_work+0x7e8/0x155c kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3321 [inline]
+ worker_thread+0x958/0xed8 kernel/workqueue.c:3402
+ kthread+0x5fc/0x75c kernel/kthread.c:464
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:847
+Code: 977fc1f2 d503201f 977fc0f7 52800048 (f828129f) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	977fc1f2 	bl	0xfffffffffdff07c8
+   4:	d503201f 	nop
+   8:	977fc0f7 	bl	0xfffffffffdff03e4
+   c:	52800048 	mov	w8, #0x2                   	// #2
+* 10:	f828129f 	stclr	x8, [x20] <-- trapping instruction
 
 
---=20
-Luiz Augusto von Dentz
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
