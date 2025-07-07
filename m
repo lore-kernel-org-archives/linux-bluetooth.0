@@ -1,174 +1,137 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC41B21C9EA
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 18:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9436262FFF
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 19:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751913614; cv=none; b=MFKdO8kUQUSqd1rhesAEjKY/iTw5/Xib5v92zaIztX6iiFs6E+4y2soagwx0Pv5dyJRQ6leBJGyTXFfnvMxxHvgEX0acUPYwzxr3mbYcsfmkGfE58jqXsHk0Rf7mDQUJ+IZ/vMQvwuibU77aIVQcIxiVCCmvT9SjXSuzBiPWiZM=
+	t=1751916516; cv=none; b=KlFU20XKz5fHLGZhkyWC7kI0RuQCr0LJt5SJk15k8qJz4fzDky6DxSMF5chSeR3pzeXpDM/3xQ6Q/OoU3Mcp+wYVZ0CkT+uIn1D1xmiMfuAytiMS4EqtR+qlmG8drdumXwF3wsBTkTE02rDxnFM0n/ENly9TAXCxlwh3qKeUziE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751913614; c=relaxed/simple;
-	bh=kIBnwYrf0eS3+QyXPWwf17pQ2sJU2KhxtX8im2c2SyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PfiGkrsst/VCImU7S6VTXCbovFWx5KETDJ/bCLJKFrZu6L48oplFBLCzr1irIPKKAviTXAusF2yf1s4Ji8W2gfhQnI64K6QXEvIBV62pvhYnCKjfDtL0nM5HPEiYlD880VeFXdjv/KZLSykQfRyrgp233d4yIeBLUAxVffi9Eeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A53uOenB; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751916516; c=relaxed/simple;
+	bh=Nc+ss5wJXN0etEVRSYm+qlvGUDMk0Cr55Lp0DbZUqXo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=i20V7KkTF5hCWUdHd9ScNCUuqic2H07j+vycIH/mtKbny/mZ/MSEP+AAxP8bZhPqx4bi275ge+NxU8DQN4Ggqa3VyKJWCjVlXKiuejAF8u6rfIBUfhlCSL/M7kZsTIEgCEa+gun7qpRjgfsSMxmEek8Bc5SCUtfPb26RLHoZiJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sSI64l7B; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A53uOenB"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32b49ac6431so28400851fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 11:40:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sSI64l7B"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74d12fa4619so1086520b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 12:28:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751913611; x=1752518411; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bTD4lVI2GdTpv4qnYDIn2P7k9nPsRxV0CPMYMmASDls=;
-        b=A53uOenB0Qxq9Js5IDxjDa3AWgnRAr5v+Pag9y6c9C5fIviYzbqNrtUrGuo0lx0o4R
-         tM8ZW9I8d0wvV1yi4+0WbNfp+x9sL9LjAV/lOLiByBl4sAZcxH/SKkjz5hF8yLwyg6EY
-         J4EQK+mW8AAI98XDtH7a4GRk5k/bEDE8k9ywafJSS7ObOWhNrNEdteiiF/Z6XAXh3C5J
-         GUxBOJ/BvfB17Jpj7wkHv7J6xlNU88j7waRso7FXZdaCorb8sT/8UowxvxURIRKihF1d
-         /13tVrtSKN4RI+1hHJGUNOPAK8HcspaZIhzXb4AbEzT9qnGpLzi4YqSrN/jNIEpTPsNl
-         umhA==
+        d=google.com; s=20230601; t=1751916514; x=1752521314; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WTe3WY4dFU7lk8Hr4ohTVbCzkrWX3p9PvAxpN+iYtRo=;
+        b=sSI64l7BoK3HolCoJbYE0WT49LGUHqATx4QuuOooiuib0aBDEL78HbdfYoUw/lAJYO
+         PmwDDGal2c3AjdyaTVd/X+YULqzsyr2Nj5hiRawb+47MawzM3Fxq8mu13yOE4HZqaOoI
+         8QPVUltxqF7omuOs2HsJ7YgSjpW4U1gr7OajWl4RZdtvlvYfgAIAIDN6FXkOtNsiEEFd
+         9qC7IpAPrXHV9N4bDou1Ilej+r93ANxoXp6obIoQqKu0lxEMjzjeKbHZepf8dTAwkqYU
+         h3TC7nxV4dbYWp38pVjAvzO0W0GOfTgY2qsgb0VfqL6A/0Yn2C0YoCVamF6OBCKQ/nBU
+         5pUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751913611; x=1752518411;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bTD4lVI2GdTpv4qnYDIn2P7k9nPsRxV0CPMYMmASDls=;
-        b=fAo9NXXOWeE4T42nt5bm4Gow60WSTQNBHpdCWcDzSmaKKPGhfuoD95xEVKFJ8PSO7u
-         C/o4R9mQdQRQBe/32u/29CYta71rNWn6hf/birkj4R+YLXWB0LP1inKAiAt3h/+5Qyg7
-         J03XLbwhMYgZ3ysv2smmggcwEYCWDUgmU/3YI2ogWPtDLTiBZ/1SlrscMAS6r0+QUV6B
-         HLUqL5Ni2ylbvRkZK6Ckw1WDJ/usSJTTO7mWIKVwjVCgFWOHexH5W2nsnjpwytFvyt8o
-         gdfxVr0+a7fvzDcYxBz83Jot4kCP2PwCXKYV590fILqHdgQjR7mNpL/sEO9jsorJUQ5c
-         aONQ==
-X-Gm-Message-State: AOJu0YxUH5aWwfNxmJjTD/Dkf1ws0UrURxvJsNgwZSsc3d2HrVLPsJVA
-	XVvFRDJx2gZgDaGkt7rSJeFE1e6nGZ/UKL9/RB90+1jmNcIa/mE/N2XyRWMiaWeYxaPaO45+1y+
-	It16WSGr0iZeH1wokd/N87fdXbtMWrSUYMB89
-X-Gm-Gg: ASbGnctw2mI9JzfLcrUwjGFGtAGESHeR8KlRUc1D+Jzd1PJnkHsypwQ6OTXUgsE7wUf
-	CIgMWt1z0zb8JoAdsb6acOX5GbWdO/2FyI3khix3lkMRxJmU0w4QkfGU6TUUyUJEL29phweRM5K
-	t52JboppesWtRuEeS1kOpSC7dWaw2jHjfnWpNw+hlaiA==
-X-Google-Smtp-Source: AGHT+IHoXMqLJa4UzaG3JSs3w5K2C+EvtqosZRH0LLDixMfLJwZiHCF6mhB7LE1l0pWWP7wEVnws2V9OtNtdBZJEf1g=
-X-Received: by 2002:a2e:a715:0:b0:32b:7cdb:aa4d with SMTP id
- 38308e7fff4ca-32f19afab70mr21549751fa.31.1751913610750; Mon, 07 Jul 2025
- 11:40:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751916514; x=1752521314;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WTe3WY4dFU7lk8Hr4ohTVbCzkrWX3p9PvAxpN+iYtRo=;
+        b=Xls6Z5GQHmI4RiHL679dCMhJXCissOFO1m0VWTHC10iorS7l8FYczT4279GbLrZflh
+         Uhpw7TC+mjJQlXC34S8YWiYG4d6c+1f3epEYcnV/g+Qsn4LCiNTYSUrA+9GVILgwpDrh
+         C5xzGPnQrl82WTCuKPI58wIltm6Ho3xS8Ur8PagPCyCg3fF15eCUYd722tZPrd8VKqgT
+         8SnqmYCbmbhAHW4yP5qOUQXsShGPwVQ18lscsrRm4oJAicwnhUKTFnFSN5swz8jrzUXW
+         zplhG1Utb77MK+iuMVY/MfQQ2SzKx4sSLigQo4z7pHO2usU/Adz/S7h5KMClc7B9aa8W
+         1P9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVtAs2Wnm7+9SPqzz+qpdTB2JKRxc6ooGbitAzN2tF08s8968jg0S1Sw3xCGuWfV4sJcdgvqP8GvVD5rSBUlH8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6zam1158ZXDkVzUodDVlI5QuZ9kR2twQldSTRj2Tz1dkgMThn
+	pXOSbXxg5LtigMTwZA00Unq+zcFuq6CofDV48NBSEwzQ8vtVbhNSq+yheXaT+9QXtXaTUzsK21/
+	bHf/DGQ==
+X-Google-Smtp-Source: AGHT+IEjebccA0AcwrkhzfmVQnDO+LKRW19FLJzhW4ssqvGSHadrwtadBvMoSiYtLzTL7FTydsdYDSLy9Lo=
+X-Received: from pfbgl7.prod.google.com ([2002:a05:6a00:84c7:b0:748:df06:a477])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1905:b0:749:bc7:1577
+ with SMTP id d2e1a72fcca58-74d24360040mr551884b3a.9.1751916514178; Mon, 07
+ Jul 2025 12:28:34 -0700 (PDT)
+Date: Mon,  7 Jul 2025 19:28:29 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250627061707.3631422-1-quic_shuaz@quicinc.com>
-In-Reply-To: <20250627061707.3631422-1-quic_shuaz@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 7 Jul 2025 14:39:58 -0400
-X-Gm-Features: Ac12FXzLOxIOw6ShjW8bOl8TAhf05I1_LPbHzKxUSTWtL0CpFzieuEF81oGQfWA
-Message-ID: <CABBYNZLZQkz2pamxqOODJ00+TX=c7urYtAmX7v0RJjp4T46w3w@mail.gmail.com>
-Subject: Re: [PATCH v2] driver: bluetooth: hci_qca: fix ssr fail when BT_EN is
- pulled up by hw
-To: Shuai Zhang <quic_shuaz@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_bt@quicinc.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250707192832.3162227-1-kuniyu@google.com>
+Subject: [PATCH] Bluetooth: Fix null-ptr-deref in l2cap_sock_resume_cb()
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "Marcel Holtmann '" <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, 
+	syzbot+e4d73b165c3892852d22@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Shuai,
+syzbot reported null-ptr-deref in l2cap_sock_resume_cb(). [0]
 
-On Fri, Jun 27, 2025 at 2:17=E2=80=AFAM Shuai Zhang <quic_shuaz@quicinc.com=
-> wrote:
->
-> Q1=EF=BC=9A
-> If the SoC always enables the bt_en pin via hardware and the driver
-> cannot control the bt_en pin of the SoC chip, then during SSR,
-> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
-> This leads to a reset command timeout failure.
->
-> Fix1=EF=BC=9A
-> To address this, clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits
-> after the coredump collection is complete.
-> Also, add msleep delay to wait for controller to complete SSR.
+l2cap_sock_resume_cb() has a similar problem that was fixed by commit
+1bff51ea59a9 ("Bluetooth: fix use-after-free error in lock_sock_nested()").
 
-Not sure why you are sending with Q and Fix tags, never seen this
-format being used for kernel patches before, each fix shall be sent
-separately.
+Since both l2cap_sock_kill() and l2cap_sock_resume_cb() are executed
+under l2cap_sock_resume_cb(), we can avoid the issue simply by checking
+if chan->data is NULL.
 
-> Q2:
-> When the SSR (Sub-System Restart) duration exceeds 2 seconds, it triggers
-> host tx_idle_timeout, which sets host TX state to sleep. due to the
-> hardware pulling up bt_en, the firmware is not downloaded after the SSR.
-> As a result, the controller does not enter sleep mode. Consequently,
-> when the host sends a command afterward, it sends 0xFD to the controller,
-> but the controller does not respond, leading to a command timeout.
->
-> Fix2:
-> Reset the tx_idle_timer after SSR (Sub-System Restart).
->
-> Changes in v2:
-> - Modified the format.
-> - Add changes to fix tx_idle_timeout
-> - Link to v1: https://lore.kernel.org/all/20250609105553.3756688-1-quic_s=
-huaz@quicinc.com/
+Let's not access to the killed socket in l2cap_sock_resume_cb().
 
-The version history shouldn't be part of patch description, either add
-it as comments after the description or add a cover letter to capture
-the history.
+[0]:
+BUG: KASAN: null-ptr-deref in instrument_atomic_write include/linux/instrumented.h:82 [inline]
+BUG: KASAN: null-ptr-deref in clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
+BUG: KASAN: null-ptr-deref in l2cap_sock_resume_cb+0xb4/0x17c net/bluetooth/l2cap_sock.c:1711
+Write of size 8 at addr 0000000000000570 by task kworker/u9:0/52
 
-> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-> ---
->  drivers/bluetooth/hci_qca.c | 20 +++++++++++++++++++-
->  1 file changed, 19 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 4e56782b0..d415a3f31 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1653,6 +1653,24 @@ static void qca_hw_error(struct hci_dev *hdev, u8 =
-code)
->                 skb_queue_purge(&qca->rx_memdump_q);
->         }
->
-> +       /* If the SoC always enables the bt_en pin via hardware and the d=
-river
-> +        * cannot control the bt_en pin of the SoC chip, then during SSR,
-> +        * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be clea=
-red.
-> +        * This leads to a reset command timeout failure.
-> +        *
-> +        * To address this, clear QCA_SSR_TRIGGERED and QCA_IBS_DISABLED =
-bits
-> +        * after the coredump collection is complete.
-> +        * Also, add msleep delay to wait for controller to complete SSR.
-> +        */
-> +       if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-> +               clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-> +               clear_bit(QCA_IBS_DISABLED, &qca->flags);
-> +               mod_timer(&qca->tx_idle_timer, jiffies +
-> +                         msecs_to_jiffies(qca->tx_idle_delay));
-> +               qca->tx_ibs_state =3D HCI_IBS_TX_AWAKE;
-> +               msleep(50);
+CPU: 1 UID: 0 PID: 52 Comm: kworker/u9:0 Not tainted 6.16.0-rc4-syzkaller-g7482bb149b9f #0 PREEMPT
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: hci0 hci_rx_work
+Call trace:
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:501 (C)
+ __dump_stack+0x30/0x40 lib/dump_stack.c:94
+ dump_stack_lvl+0xd8/0x12c lib/dump_stack.c:120
+ print_report+0x58/0x84 mm/kasan/report.c:524
+ kasan_report+0xb0/0x110 mm/kasan/report.c:634
+ check_region_inline mm/kasan/generic.c:-1 [inline]
+ kasan_check_range+0x264/0x2a4 mm/kasan/generic.c:189
+ __kasan_check_write+0x20/0x30 mm/kasan/shadow.c:37
+ instrument_atomic_write include/linux/instrumented.h:82 [inline]
+ clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
+ l2cap_sock_resume_cb+0xb4/0x17c net/bluetooth/l2cap_sock.c:1711
+ l2cap_security_cfm+0x524/0xea0 net/bluetooth/l2cap_core.c:7357
+ hci_auth_cfm include/net/bluetooth/hci_core.h:2092 [inline]
+ hci_auth_complete_evt+0x2e8/0xa4c net/bluetooth/hci_event.c:3514
+ hci_event_func net/bluetooth/hci_event.c:7511 [inline]
+ hci_event_packet+0x650/0xe9c net/bluetooth/hci_event.c:7565
+ hci_rx_work+0x320/0xb18 net/bluetooth/hci_core.c:4070
+ process_one_work+0x7e8/0x155c kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3321 [inline]
+ worker_thread+0x958/0xed8 kernel/workqueue.c:3402
+ kthread+0x5fc/0x75c kernel/kthread.c:464
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:847
 
-This is probably racy since it doesn't seem you are able to validate
-SSR has been completed after 50 ms.
+Fixes: d97c899bde33 ("Bluetooth: Introduce L2CAP channel callback for resuming")
+Reported-by: syzbot+e4d73b165c3892852d22@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/686c12bd.a70a0220.29fe6c.0b13.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/bluetooth/l2cap_sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> +       }
-> +
->         clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
->  }
->
-> @@ -2478,7 +2496,7 @@ static int qca_serdev_probe(struct serdev_device *s=
-erdev)
->                         return PTR_ERR(qcadev->susclk);
->                 }
->         }
-> -
-> +
->         err =3D hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
->         if (err) {
->                 BT_ERR("serdev registration failed");
-> --
-> 2.34.1
->
->
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5aa55fa69594..82d943c4cb50 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1703,6 +1703,9 @@ static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk = chan->data;
+ 
++	if (!sk)
++		return;
++
+ 	if (test_and_clear_bit(FLAG_PENDING_SECURITY, &chan->flags)) {
+ 		sk->sk_state = BT_CONNECTED;
+ 		chan->state = BT_CONNECTED;
+-- 
+2.50.0.727.gbf7dc18ff4-goog
 
-
---=20
-Luiz Augusto von Dentz
