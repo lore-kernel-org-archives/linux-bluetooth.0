@@ -1,152 +1,212 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3226929C35B
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 14:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98D52E06D4
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 14:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751898002; cv=none; b=RgXcvX4LIY4Rff6IMfcHmiqSKZftKW/hlFRrc2KejkBwhDCwMkUT07EYzlTdwa3K6BdnYywer1MbvGEcgVzACAdPUoFHpDi+xsOCRbMTdtYVprQh5AdYZcXhte9qtGLYtQ4rOw56dETjZCabSy6nGV6UY9Mh/qgxrzyqHuXGnlk=
+	t=1751898237; cv=none; b=lHCDVUfwqCFWII4pDT0YOIT2VM+w5FpfVg1mN3mFJT7OLGWwQCUy/3WnOj/mB5dQpPETh1/20Twpmi+nyZenv2j7lnbskl62HlCW43w3Hty2HLljcAMzgpv44kJq/9ITb+lufc9K55EWUPnHkiJEWc22B5Likh0zRC2EeBMNkMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751898002; c=relaxed/simple;
-	bh=8Vw6asJHHDqdg58i3u+Dzug/w7Oj82KlIgczcan58mI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KOAW/Otwp7cg43Fo7Xc2qSZ+mqRMK1bZrMok/6m+2eCfRDFTOixCctPu3nkGI3HziVB5jPJeSMolyrDUjn1Cds7Oc1qjfwTkqWqDOtuw+TlONr6VfakzDIw68pd263vwJ6wYuYfkcnTWhaTjJ0RbMv9Fu/6tSrrLZfWhcn//p4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jOMlOUUh; arc=none smtp.client-ip=209.85.208.169
+	s=arc-20240116; t=1751898237; c=relaxed/simple;
+	bh=rGeQqb8ZZxjNlNaRY0Px+0wXaCzKHNTmYCy63eFjd4E=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=qmmIHiPRjiQ5XVcHsODggugD6Yl1zunlRWopfStlopW5Xqfhm2zILt+WXQGlNgaa/njquX+soF2gk7UdQxyg9h8F2BvKfcdR/neclq0yPhr3VhA3YAG4Pay8c7P3n6FxELK8QcphPsFLFfWuLCBXaSXqjfGY2h9B/0c2/okJGXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UTVNW6no; arc=none smtp.client-ip=209.85.222.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jOMlOUUh"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-32b5226e6beso28898541fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 07:19:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UTVNW6no"
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-87f04817bf6so2598022241.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 07:23:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751897998; x=1752502798; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0kXKLT4bdoQCL+3oVI8Lk+yQ1MIWzwcvvLVXRb158vQ=;
-        b=jOMlOUUhagvsfzGGbYLE21AnAt89TA9fPhoYdPeJYYfMR0eYSKa4UEiegOjHjJQo3Q
-         ErfXBJynaZ281ucdKhVFXO6+QC450FMorcTbe8EkDpssMh+WViHAp+qWTYSRRbbA0Zpn
-         2oRyoj24woJvpu06eND2696lV8DXC1W6B+4LTsFee9NU6Q42yUF/2cyHVxFpd53KMSTK
-         MOETip7Nh7xzmDCt3p3JCw++nomXuAgrCPw1sPtPVVDlanFxHOBAlcGL0aF1Crt9CJE5
-         0o1HaQmOUQGR2/wZnQRKjP+ByeXH2v31E3al5qvHvUlAoqQG6mCNx0GzFmpNBSVHNuEy
-         RXwA==
+        d=gmail.com; s=20230601; t=1751898233; x=1752503033; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GENq62yfO52KioGAvTC6cOC1cqrItEeW5r6WyDO59I0=;
+        b=UTVNW6nolVvp5urnzaijAKAMSjSglsHqxFUZqURtMJP/5A9qlN77MrwSNcq/6FpCod
+         48taSAv2nZq74JjrZ9sWw7kO/vtt9ceBcWCsDHKnEiDG75DDk2lVOy3NUJibEoQ3MmSd
+         /txIW3Ba0EQwhjBDEoKsuW/EgN7i4ENbxpamf4t7EbKpKz8wbKo4RShlwC+4IY+K8j5F
+         Nu4G9pvhxNc2ZfMcesb5vVcP9nL25NP4KGIad4Eh2kpXynoHIrkGFLmyH5uCp2wwaUdk
+         HIB4t5x6s14ELbQwjqR58+PN27jWJWLodpOXdwcjEebb7x9xRUQHhvfH6iKyvss+ESeu
+         RDjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751897998; x=1752502798;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0kXKLT4bdoQCL+3oVI8Lk+yQ1MIWzwcvvLVXRb158vQ=;
-        b=w1fGuF0J5aTUdpshkuCkfC7TpzuX+lZoSUHAT/xjuLsLkBNFphhtUcE3AWMOs6pKRI
-         97d7corsjxZsuYcNHQFxppRGUWs4oer1orU1ZSdPsrDviaccX2gMVZbKbSgCAgf1JpPv
-         3yuaVdLPjX68FKBJV3GM0iN2Gef8CU/oja+XnOpVEqSnszwVYhPD3ALkAmkCkeDjTqGh
-         PAGRplJ3jdiMjIeS7hV1SZEqhvyA84coms1Sjb7nsVjOaD7+qCo77vc9vt+kVn+GkBo3
-         tLiuyBxAur5pwVB+yeNw3prhBi7PHv3D1I/tNkSU7JLBvnw++l1/2L/YaRqkS7kpdp56
-         GziQ==
-X-Gm-Message-State: AOJu0Yy9bGJwqffRGWR1bZEt1VD2cyWu6GDTz4qQiyVesQWMRykDOXRi
-	58YndmW73aUfLxlo+G7gAKGx1p2CGo1qmjRB0qwLL1Ob/7wtnqjD81oLjNxoMdO51ci/lm0eGJc
-	06bNwPv/tjHoKvC7Eu1nywfCVJs+gMRr42p3JZJc=
-X-Gm-Gg: ASbGncteVMkNmdf6evq9d8ZaBWlhNT6Mp3sChCEcwTrukA+E7Y1QgcbE7xvUqEDr+Cb
-	sZePnNIG84+rVX/M3WlTLmWIPaZJXVtUWdTPUffxsKzEwBYyIKf1LOQf2EN5gDbxq61XOigo5f/
-	cMUgBCJTBpj53dJ3EahoRa3vZEEsVpus9W6Pl+OTnUZw==
-X-Google-Smtp-Source: AGHT+IFANSIUojIVsSstImYncf6y1BbFL9P9f4qAbNdVnO6cXFcpIl2TwIqPGkAfBKulAISIJgCd136Qp2z4Ndc1WrY=
-X-Received: by 2002:a2e:8a9b:0:b0:32a:778d:be76 with SMTP id
- 38308e7fff4ca-32f092c6cb8mr17002421fa.26.1751897997759; Mon, 07 Jul 2025
- 07:19:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751898233; x=1752503033;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GENq62yfO52KioGAvTC6cOC1cqrItEeW5r6WyDO59I0=;
+        b=Eyw7fRmeehbHjLNvKq+WNxjYBrEh1RDSfQsMs8C5ihM/wpo3b1Xx837vrfl8epOdWX
+         4+6KDjSr9NFSjSMvQxFErM0XpIqsomSBIUNwUw6UsLZjrMmCtnfUvS1iOXjR03bVq7s+
+         m/DzfmQX1PJQkQ2F79mIAd286iGnvvWz8hW1fz+a9BSAJ02mj73NaPR71LZ15NnNGOpX
+         keEpELRT6DuDCwZlg/AJoigWCpFqVUWkRrL9lfGc/lRbsk2OHfPkW38lMKR6dy4b3ymM
+         3ER6ZjAdt6Rn6x/kr2h+tJs8rbvPV2nTAuwES1H3Pppa0CfB6YWxueV9N8Q2BU5eN9hX
+         IfLA==
+X-Gm-Message-State: AOJu0YzVLCcrPPxJ84qcj5og+bxswOHS8OqN32Dw+QFsM3pIYzh2aCZP
+	9pzikz8LYUcPYPQrFAFEiT4NGF7i0YAHdbKgdaoR/kFFKLF+3tTqdwQgeVDUAjWH
+X-Gm-Gg: ASbGnct8wC0cZ44XnecI6ufl243TOp1A0TGA05TOEmK2vh5ifP5lLMwM3wgf86OtAD/
+	7N+hQ3/tnYEtQ1bQcLUOfWYo6Wu8L3NSYxTCnitXGkvWdNVidWTwXPfzhHXxmTtUDjCS3OymgS2
+	ji0zcqOAT4R9i1aQbmY0Iekvpdxv4z1iQDaCiCarnoPPfoLMxBdMgpkUVIBBwY24TtVrvZ8Mgff
+	K1qHEYkdnsJYyqsomySWoPiVo4vppjc+XW/tjNuxJQ9zMJHj0mSlRdPB/9asO3Aug5oh5I55kst
+	viNKLX0NaubAnAUYnNb5b7p9oX6g1tiQv+C1AVWV9ypyuD8TapI30SGyNxbcL6V1SCeyfEMbJhy
+	8Sti72i4xHxZc3qosxcy4lAFIBHOAqt0=
+X-Google-Smtp-Source: AGHT+IFxZ6oai6/4/2xuURLWGHBO94yhDLxvzYivAZIXpG7NM4ZzHz4BdmnnsU2h10/00gRp4GTCZg==
+X-Received: by 2002:a05:6122:54c:b0:530:2c65:5bb9 with SMTP id 71dfb90a1353d-534f668e635mr4809751e0c.8.1751898233206;
+        Mon, 07 Jul 2025 07:23:53 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5347909e054sm1260966e0c.36.2025.07.07.07.23.51
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 07:23:52 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] shared/shell: Fix not running pre_run on MODE_NON_INTERACTIVE
+Date: Mon,  7 Jul 2025 10:23:50 -0400
+Message-ID: <20250707142350.2404116-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707134958.72368-1-frederic.danis@collabora.com>
-In-Reply-To: <20250707134958.72368-1-frederic.danis@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 7 Jul 2025 10:19:44 -0400
-X-Gm-Features: Ac12FXwbqSPe8sp2iEoxMF4WcY_2mA16Ci3ez54HbLX6OPLvCt8Kdc-plq5sbn8
-Message-ID: <CABBYNZL7ZDFJvBZSU041pR5-qMU77fYL46tQbdceMBsA3KrJyw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] audio/avrcp: Fix crash with invalid UTF-8 item name
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Fr=C3=A9d=C3=A9ric,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jul 7, 2025 at 9:51=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> As stated in AVRCP 1.6.2 chapter 6.10.2.3 Media element item, for the
-> Displayable Name Length property, the target device may truncate the
-> item name:
->
->   Length of Displayable Name in octets. The name shall be limited such
->   that a response to a GetFolderItems containing one media player item
->   fits within the maximum size of PDU which can be received by the CT.
->
-> This truncatation may occur in the middle of a multi-byte character,
-> at least with Samsung Music app, which triggers a DBus assertion and
-> crashes bluetoothd:
->
->   profiles/audio/player.c:media_folder_create_item() Din Dhal Jaye
->       Haye with lyrics | "=E0=A4=A6=E0=A4=BF=E0=A4=A8 =E0=A4=A2=E0=A4=B2 =
-=E0=A4=9C=E0=A4=BE=E0=A4=8F
->       =E0=A4=B9=E0=A4=BE=E0=A4=AF" =E0=A4=97=E0=A4=BE=E0=A4=A8=E0=A5=87 =
-=E0=A4=95=E0=A5=87 =E0=A4=AC=E0=A5=8B=EF=BF=BD type audio uid 1
->   profiles/audio/player.c:media_folder_create_item()
->       /org/bluez/hci0/dev_24_24_B7_11_82_6C/player0/NowPlaying/item1
->   profiles/audio/player.c:media_player_set_metadata() Title: Din Dhal
->       Jaye Haye with lyrics | "=E0=A4=A6=E0=A4=BF=E0=A4=A8 =E0=A4=A2=E0=
-=A4=B2 =E0=A4=9C=E0=A4=BE=E0=A4=8F =E0=A4=B9=E0=A4=BE=E0=A4=AF"
->       =E0=A4=97=E0=A4=BE=E0=A4=A8=E0=A5=87 =E0=A4=95=E0=A5=87 =E0=A4=AC=
-=E0=A5=8B=E0=A4=B2 | Guide | Dev Anand, Waheeda Rehman
->   =E2=80=A6
->   arguments to dbus_message_iter_append_basic() were incorrect,
->       assertion "_dbus_check_is_valid_utf8 (*string_p)" failed in
->       file dbus-message.c line 2775.
->   This is normally a bug in some application using the D-Bus library.
-> ---
->  profiles/audio/avrcp.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 831f1dc8b..65b40c57f 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -2598,6 +2598,19 @@ static struct media_item *parse_media_element(stru=
-ct avrcp *session,
->         if (namelen > 0)
->                 memcpy(name, &operands[13], namelen);
->
-> +       /* Truncate name to the last valid UTF-8 character */
-> +       while (!g_utf8_validate(name, namelen, NULL)) {
+If a command is given to be run in non-interactive mode the code would
+not attempt to execute .pre_run first since some (sub)menus requires that
+in order to properly initialize things.
 
-Not really sure why you are doing this on a loop?
+Fixes: https://github.com/bluez/bluez/issues/1394
+Fixes: https://github.com/bluez/bluez/issues/1317
+---
+ src/shared/shell.c | 35 ++++++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 11 deletions(-)
 
-> +               char *end =3D g_utf8_find_prev_char(name, name + namelen)=
-;
-> +
-> +               if (end =3D=3D NULL) {
-> +                       name[0] =3D '\0';
-> +                       break;
-> +               }
-> +
-> +               namelen =3D end - name;
-> +               name[namelen] =3D '\0';
-> +       }
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index ec9e5f7dc984..ea285c72631d 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -423,7 +423,8 @@ static void cmd_script(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+-static const struct bt_shell_menu_entry default_menu[] = {
++static const struct bt_shell_menu default_menu = {
++	.entries = {
+ 	{ "back",         NULL,       cmd_back, "Return to main menu", NULL,
+ 							NULL, cmd_back_exists },
+ 	{ "menu",         "<name>",   cmd_menu, "Select submenu",
+@@ -437,7 +438,7 @@ static const struct bt_shell_menu_entry default_menu[] = {
+ 	{ "export",       NULL,       cmd_export,
+ 						"Print environment variables" },
+ 	{ "script",       "<filename>", cmd_script, "Run script" },
+-	{ }
++	{} },
+ };
+ 
+ static void shell_print_help(void)
+@@ -480,7 +481,7 @@ static void shell_print_menu(void)
+ 		print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
+ 	}
+ 
+-	for (entry = default_menu; entry->cmd; entry++) {
++	for (entry = default_menu.entries; entry->cmd; entry++) {
+ 		if (entry->exists && !entry->exists(data.menu))
+ 			continue;
+ 
+@@ -495,7 +496,7 @@ static void shell_print_menu_zsh_complete(void)
+ 	for (entry = data.menu->entries; entry->cmd; entry++)
+ 		printf("%s:%s\n", entry->cmd, entry->desc ? : "");
+ 
+-	for (entry = default_menu; entry->cmd; entry++) {
++	for (entry = default_menu.entries; entry->cmd; entry++) {
+ 		if (entry->exists && !entry->exists(data.menu))
+ 			continue;
+ 
+@@ -627,9 +628,11 @@ fail:
+ 	return -EINVAL;
+ }
+ 
+-static int menu_exec(const struct bt_shell_menu_entry *entry,
++static int menu_exec(const struct bt_shell_menu *menu,
+ 					int argc, char *argv[])
+ {
++	const struct bt_shell_menu_entry *entry = menu->entries;
++
+ 	for (; entry->cmd; entry++) {
+ 		if (strcmp(argv[0], entry->cmd))
+ 			continue;
+@@ -642,6 +645,9 @@ static int menu_exec(const struct bt_shell_menu_entry *entry,
+ 		if (data.menu == data.main && !strcmp(entry->cmd, "back"))
+ 			continue;
+ 
++		if (data.mode == MODE_NON_INTERACTIVE && menu->pre_run)
++			menu->pre_run(menu);
++
+ 		return cmd_exec(entry, argc, argv);
+ 	}
+ 
+@@ -673,7 +679,7 @@ static int submenu_exec(int argc, char *argv[])
+ 	memmove(argv[0], argv[0] + len + 1, tlen - len - 1);
+ 	memset(argv[0] + tlen - len - 1, 0, len + 1);
+ 
+-	return menu_exec(submenu->entries, argc, argv);
++	return menu_exec(submenu, argc, argv);
+ }
+ 
+ static int shell_exec(int argc, char *argv[])
+@@ -686,9 +692,9 @@ static int shell_exec(int argc, char *argv[])
+ 	if (!argsisutf8(argc, argv))
+ 		return -EINVAL;
+ 
+-	err  = menu_exec(default_menu, argc, argv);
++	err  = menu_exec(&default_menu, argc, argv);
+ 	if (err == -ENOENT) {
+-		err  = menu_exec(data.menu->entries, argc, argv);
++		err  = menu_exec(data.menu, argc, argv);
+ 		if (err == -ENOENT) {
+ 			err = submenu_exec(argc, argv);
+ 			if (err == -ENOENT) {
+@@ -980,7 +986,7 @@ static char *cmd_generator(const char *text, int state)
+ 	}
+ 
+ 	if (default_menu_enabled) {
+-		cmd = find_cmd(text, default_menu, &index);
++		cmd = find_cmd(text, default_menu.entries, &index);
+ 		if (cmd) {
+ 			return cmd;
+ 		} else {
+@@ -1171,8 +1177,8 @@ static char **shell_completion(const char *text, int start, int end)
+ 		if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
+ 			return NULL;
+ 
+-		matches = menu_completion(default_menu, text, w.we_wordc,
+-							w.we_wordv[0]);
++		matches = menu_completion(default_menu.entries, text,
++						w.we_wordc, w.we_wordv[0]);
+ 		if (!matches) {
+ 			matches = menu_completion(data.menu->entries, text,
+ 							w.we_wordc,
+@@ -1449,6 +1455,12 @@ int bt_shell_run(void)
+ 	int status;
+ 	const struct queue_entry *submenu;
+ 
++	/* Check if on non-interactive mode skip pre-run since that is on-demand
++	 * by shell_exec() only for the menu in use.
++	 */
++	if (data.mode == MODE_NON_INTERACTIVE)
++		goto done;
++
+ 	if (data.menu && data.menu->pre_run)
+ 		data.menu->pre_run(data.menu);
+ 
+@@ -1460,6 +1472,7 @@ int bt_shell_run(void)
+ 			menu->pre_run(menu);
+ 	}
+ 
++done:
+ 	status = mainloop_run_with_signal(signal_callback, NULL);
+ 
+ 	bt_shell_cleanup();
+-- 
+2.49.0
 
-This might be a better approach than what the likes of name2utf8 is
-doing so I wonder if we should replace that as well, that said I'd
-suggest we add something built-in e.g. strtoutf8 and then handle the
-truncation in a more generic way.
-
->         count =3D operands[13 + namesize];
->
->         player =3D session->controller->player;
-> --
-> 2.43.0
->
->
-
-
---=20
-Luiz Augusto von Dentz
