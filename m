@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A083C2F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 04:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F522E3716
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 05:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751863808; cv=none; b=fg5nANRraHD+x4LUQQmvrAB0SInWEl1Oon4JpCScpwJ6te/lzUJxe6elVaBiyS7rMxC6uEd2sCdd6IPr3TOsPQH7vWekliaLHCDplLHcWPvK6BZD+f4Jg8WTTyxGbbLvjlRlnUoMpJOcnIdKhEySe8oV1Gi9OmePyIRen9/wUb4=
+	t=1751865982; cv=none; b=S17vm6F8W6Wv6QaUxntbXOq8zskopNSmVnQZ98v/PtCtMjftdsCXDXW2xeDlKawYksbSKEru9ShJRsvfKlD1Fz0Nz1zoCeBpzg+AY0TGcgWxOmJRYY/Eb7I4ekLzkqvj2Bzt3weCd1B+DDxtfg8cRyoKSI4QsKvEGtXcZWjEYGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751863808; c=relaxed/simple;
-	bh=oYiV1GQ6/s4qFT9qwKH0GGZe6EKHi41ok7X0R41aR3E=;
+	s=arc-20240116; t=1751865982; c=relaxed/simple;
+	bh=yVRrdyPMFXr8sUMyrjyHRCnejTEcdFt7ql/FQa+feXw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sDGsHoa8F2bOjMnKDqrcPiuFLc8z1nsHd08DFUy9vs0xEbOzl/eZWpr1xD14RAC0SUkG0ptT4SVH7gN+SC6jOnsMQgkCh/GbYpS+KUHi5bL2fccaa+zTFR2OAyxaDTsBQxMtmQMWmho6t9XAHt4etG4o0ryCalwqQoRynoCWL38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ROFPCqdD; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=uLbBKJq545DMRUysz5IKnfXB5r0yfhYdtfTDPoORoLRjQHiAp6Bmkzqa0JqATzXT4q8t7QGmoVAvFXeAHWrC2XSrKIh3CS51op6nl3S82AEQCGk+9xL00cwSaK/9oZNexd+cvpFnGxa1IzdDM7TUsYDySg8o7bektWrwS0X1j2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqJvypQJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ROFPCqdD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2361EC4CEEE
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 04:50:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqJvypQJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 976C3C4CEF6
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 05:26:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751863808;
-	bh=oYiV1GQ6/s4qFT9qwKH0GGZe6EKHi41ok7X0R41aR3E=;
+	s=k20201202; t=1751865981;
+	bh=yVRrdyPMFXr8sUMyrjyHRCnejTEcdFt7ql/FQa+feXw=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ROFPCqdDNf6m+faJ6LI1ZL2c7P8rTzlKL2KQo21O+Trpf8VGa9hlLKNJhUwoQoUgb
-	 tG8vrydTknMrCU+9i5ddYXWXBThAeTQgxkjHaXzk7N4zY7oJgVavVoQPKBupaibchb
-	 5JCcDvPHwonI9TqESLxIyg0Neu3NKJBegXnOj8TGpE9kvV8vubcL9JpEXIqvMPZahD
-	 Dt5CY9X6NJ/e8ikbATo1oJU9jk4Q++WcaORkvDTVQxt1lzLeZBIoxScLvWOq40IAEw
-	 Vj/pyg+lkldhitneOiPGsmjd41hOx+1BjqCXjEZWPQctuXZg5YMlJAQ/PP/CiA0GrP
-	 ujjB2GoMT3irA==
+	b=sqJvypQJr3SfLRorMQURrWr9bcoZGf3Re3R5oabtQgGNdf9MlSk9N/FJA9K/EETDy
+	 3PTCGpz2Wwn12IDexH9c0rlSwCCOpvnCEkgg4/he1FRI4OviJDoq82DPL7efPlfJiq
+	 ZV4EzhwYz498mPTPT6G3/kDlcRkC7I26AAlJIm+wYqmkyxKZ/OTiCAom4WtpIL4dCl
+	 bxNqUVzO0A6h14OdgaHdOEs3p/mhyInh2ih6MbgMVOFCt2JJfpDfIShHARZ+Wan8hW
+	 JFGK5148Abj6e1Ocns/nA3BWIJZFLBLKVNeXL3a7aXYS5Tihi7D1uGDcj7ZAxXsJnb
+	 h2RxUEDmKO2aQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 179B1C41613; Mon,  7 Jul 2025 04:50:08 +0000 (UTC)
+	id 89CEDC41613; Mon,  7 Jul 2025 05:26:21 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 220306] Updated ibt-18-16-1.sfi is bugged, "Invalid exception
  type 03" kernel spam
-Date: Mon, 07 Jul 2025 04:50:07 +0000
+Date: Mon, 07 Jul 2025 05:26:21 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -41,14 +41,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: aluvala.sai.teja@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-220306-62941-PIgWinZY1I@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-220306-62941-z2rEqoXIqd@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-220306-62941@https.bugzilla.kernel.org/>
 References: <bug-220306-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,19 +64,12 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D220306
 
-Sai Teja Aluvala (aluvala.sai.teja@intel.com) changed:
+Artem S. Tashkinov (aros@gmx.com) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-                 CC|                            |aluvala.sai.teja@intel.com
-
---- Comment #8 from Sai Teja Aluvala (aluvala.sai.teja@intel.com) ---
-Reverted firmware is merged in upstream.
-https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git=
-/commit/?id=3Df534fd76aaa8019b4106f7fad363f52ec40adca4
-
-Regards,
-Sai Teja.
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |CODE_FIX
 
 --=20
 You may reply to this email to add a comment.
