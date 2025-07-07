@@ -1,211 +1,107 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BDC14883F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 13:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C1328ECEA
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 13:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751896198; cv=none; b=Ew2LoJMPEIOftgTxB2csyQlrluZUODLKO2SNOU9wT6+LeZ53IuGv6xfChQuB5MLh/ksCpxeXfKd8KjOBbGpuiI3GeX9+psShm1M/c960Et/Qj7607etkh2vytoHjGOLWtLD+NtcHkse6ctPNwdNIwIR3yiGQl6Qlfo8ySO8azf0=
+	t=1751896208; cv=none; b=huZkiVKI0tTc3k7F98pbfHLfR3YnxS/I6nUSxJl5uG00MaH+sdNiYY+i5OeuTlRKgJRDD8AobzdD8O/pBK7+gSMCePhZDMhHxM+/kRl346BotEt3wAf/FJwcfynJR8zEhOh7rXPzOrI+hheut7E+j4YJfXPZ1kRGJU3HbI1B/Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751896198; c=relaxed/simple;
-	bh=uDj/onimzvEunITZXqhv0n2Je6KXJeIM6UfTKghDB4Y=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=JrhvVy6Qp/QCQsyUbwF5y0GtReZOhIFEue3X+g+Iw1lZgfGULl2WKfSuLg5/GQHfsHmtFxwVJ4T4RlgRNZR7D5V/nRJyxg4ae7f1v2blG9KiWACm/UN1RpmqlKPwCwvp0Fijn6ZlEV/WjOjoPOnbRqF52cna44EYt80E8164NcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N/rqpreZ; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751896208; c=relaxed/simple;
+	bh=9pVpFPwsKOvfeiuUQzLJSl1l1NoBKLzCn2HbQV+hDVE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Type; b=W4uuvNRb8XzVnh17dklIsHMe0fRn20GYQ/E/ZCzdt5tBUD23DjM1iCCy8ZptrRk4ASa1gD8rAfm3uy9ar5WOM9UcAMiIKMhmtpRqSUEwxBqfM/zLILcQj7bmuvqW2Hc5zQCIw87ZWUh/IxoJhtf0zQJYu2Kc85hNxtq9ZLfGheA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ITp/cb/F; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/rqpreZ"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-531426c7143so1085664e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 06:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751896195; x=1752500995; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RpGg8MhX42Vv8ZRaUWedSwENd12DdMAoemdh0caGmH0=;
-        b=N/rqpreZ6Hugj7BWvrn+O5wg1Br52dV/NPIge5RZJMRrgafyVxFNJXTIE3lgGdk/YX
-         OrXyNFw3IGYCRSfQydn5aDb7NSE1e2BIPbNR8uffTruyRQq/RxJPB0Y5lUaS0dN0EyXr
-         oEzQphl79TzzGlPYlQQR0f1HiGE6p3jG4Vqs+aNC4vCk+A54e0rMvsZCf1PBN61F5E1j
-         Oq7oKX+f+jyOp0yxFRFvKx5yWTPh0vRHqpPxkUnRNLxluKNa/8+dcnXH+NosBGw+++PB
-         KS/hX54FlR4UFFXQ18ksvl9ynrpC/8b4pJgSyWuhYcAPODd8AFp/gFWwCHBIgzBnpbXZ
-         7o5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751896195; x=1752500995;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RpGg8MhX42Vv8ZRaUWedSwENd12DdMAoemdh0caGmH0=;
-        b=tJU/vTvILkCU+pD/yhnm//r9oC1ZzZwta/I5j2Eu3S0jvuXc9G3Z6em5dzzBb3LF+p
-         r+ycJtKUMDFxbdGSVKizO4m0s906cE9AIuGcf31PVhNeyduGSeLTiCJg/CP5AtVAkXN/
-         GLpC7CsgpFAFvQnbuvLSi4m5ShhtvCSsthSIa3SsVBOtvUkE3BC6V4IX6NDOYM37eKVo
-         bHx1uzr+HidkEO32FySAuBBSBRliOVKpV00NBP4ZqaBUGU+RvjzKZNDPuEtO/H4tTgrJ
-         iOeCt/+BnL8N0kAY+eDvyE7wUIo5VRQhNBfqVQcMpo4onNnHI2MLXPBGNcP7yBahgflB
-         I9Ag==
-X-Gm-Message-State: AOJu0YwEWnFc0VYesAItTEAiy936zHlwUnE6F/wK4ZIdYLNRX8nZIEmt
-	7wKLcLirNiNOPuf4GYJ8QmrkfrgNh19pwSKCDUzq05xdGL7sPWFSr+A10lcs7U5S
-X-Gm-Gg: ASbGncuCmYTUoXTeuX7jyfo93TZIk0IhVuGm8TlRPTL1HuzYbd/gtoTezx1BfFKbsgG
-	xqCfFF6Nw0ILOFNeVK0QF3sFcGeVWMIjyP1HtgmpwBoD/lqKgiDx+VB1aJQUlcABtKNjVmJiIec
-	WwW7LN2vLMh078itaOLv27PL8xcjUvOe0eTHlLcziIMwmba9R+Z6Klb5msOFPBhQw18Ckec2J69
-	seEcsqFgdKdVODcIT5F8vbNuRTzkfEPVMIzDF+9tvahVOEwvNe8p4/wpfc/vSSe27N1AA10pF8z
-	OGyWZ8evVsTUNGkTl4bJRp0ROL8RbxMGG35cMMdD+c/L5/vD71fn8FC6RRboem47iW1REGZYaCZ
-	fUVwcya1g7ADoXyricSQoWdYA6dVLUbQ=
-X-Google-Smtp-Source: AGHT+IHrVMd5oG4d9ivgCf2+NFcEf9V8qB7YFEpYnaQUIf6l7p7D2Ntrlpw7H3FriZjt/U0BJ7JVNw==
-X-Received: by 2002:a05:6102:4b0e:b0:4e5:93f5:e836 with SMTP id ada2fe7eead31-4f2f25dad9emr7601417137.25.1751896194666;
-        Mon, 07 Jul 2025 06:49:54 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4f2ea6c1a59sm1142282137.19.2025.07.07.06.49.51
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 06:49:53 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ITp/cb/F"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1751896203;
+	bh=9pVpFPwsKOvfeiuUQzLJSl1l1NoBKLzCn2HbQV+hDVE=;
+	h=From:To:Subject:Date:From;
+	b=ITp/cb/FKLMzugAYVAo3itd9ukqpFZBuZRM/nUWXQQFkj0jwKRROmdXbFMldc9HWz
+	 BOsVzh7E+mr8ddSekB3K3m0b16WuF/axjva3/PRS+l3KTGlQVzLSDPjXaTr9b5LJKd
+	 5/VPuoeVrZ/dDPnoVhYMBJKz8Un0osuYh2bUkFKbYhFPK/ZoMvCaYBVLqZjCTNPDt/
+	 5CH4wPwJRpw+vK5Am06JXg9M4ST0MNPEnoEl9U/1FLTG6OM5LSRv2XTS2d4ETmf791
+	 h3Eezryg4PC/Wiidpju0+RTLuqL/v7AeWqvkB75zLeXkXNmHkkiuNtjLP4fi9LDSJq
+	 9s8BfufV+YsZA==
+Received: from fdanis-ThinkPad-X1.. (2A02-8428-Af44-1001-91D6-e0bF-CD53-6106.rev.sfr.net [IPv6:2a02:8428:af44:1001:91d6:e0bf:cd53:6106])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 7C2B317E0657
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 15:50:03 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] shared/shell: Fix not running pre_run on MODE_NON_INTERACTIVE
-Date: Mon,  7 Jul 2025 09:49:50 -0400
-Message-ID: <20250707134950.2395216-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
+Subject: [PATCH BlueZ] audio/avrcp: Fix crash with invalid UTF-8 item name
+Date: Mon,  7 Jul 2025 15:49:58 +0200
+Message-ID: <20250707134958.72368-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+As stated in AVRCP 1.6.2 chapter 6.10.2.3 Media element item, for the
+Displayable Name Length property, the target device may truncate the
+item name:
 
-If a command is given to be run in non-interactive mode the code would
-not attempt to execute .pre_run first since some (sub)menus requires that
-in order to properly initialize things.
+  Length of Displayable Name in octets. The name shall be limited such
+  that a response to a GetFolderItems containing one media player item
+  fits within the maximum size of PDU which can be received by the CT.
 
-Fixes: https://github.com/bluez/bluez/issues/1394
+This truncatation may occur in the middle of a multi-byte character,
+at least with Samsung Music app, which triggers a DBus assertion and
+crashes bluetoothd:
+
+  profiles/audio/player.c:media_folder_create_item() Din Dhal Jaye
+      Haye with lyrics | "दिन ढल जाए
+      हाय" गाने के बो� type audio uid 1
+  profiles/audio/player.c:media_folder_create_item()
+      /org/bluez/hci0/dev_24_24_B7_11_82_6C/player0/NowPlaying/item1
+  profiles/audio/player.c:media_player_set_metadata() Title: Din Dhal
+      Jaye Haye with lyrics | "दिन ढल जाए हाय"
+      गाने के बोल | Guide | Dev Anand, Waheeda Rehman
+  …
+  arguments to dbus_message_iter_append_basic() were incorrect,
+      assertion "_dbus_check_is_valid_utf8 (*string_p)" failed in
+      file dbus-message.c line 2775.
+  This is normally a bug in some application using the D-Bus library.
 ---
- src/shared/shell.c | 35 ++++++++++++++++++++++++-----------
- 1 file changed, 24 insertions(+), 11 deletions(-)
+ profiles/audio/avrcp.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index ec9e5f7dc984..ea285c72631d 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -423,7 +423,8 @@ static void cmd_script(int argc, char *argv[])
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 831f1dc8b..65b40c57f 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2598,6 +2598,19 @@ static struct media_item *parse_media_element(struct avrcp *session,
+ 	if (namelen > 0)
+ 		memcpy(name, &operands[13], namelen);
  
--static const struct bt_shell_menu_entry default_menu[] = {
-+static const struct bt_shell_menu default_menu = {
-+	.entries = {
- 	{ "back",         NULL,       cmd_back, "Return to main menu", NULL,
- 							NULL, cmd_back_exists },
- 	{ "menu",         "<name>",   cmd_menu, "Select submenu",
-@@ -437,7 +438,7 @@ static const struct bt_shell_menu_entry default_menu[] = {
- 	{ "export",       NULL,       cmd_export,
- 						"Print environment variables" },
- 	{ "script",       "<filename>", cmd_script, "Run script" },
--	{ }
-+	{} },
- };
- 
- static void shell_print_help(void)
-@@ -480,7 +481,7 @@ static void shell_print_menu(void)
- 		print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
- 	}
- 
--	for (entry = default_menu; entry->cmd; entry++) {
-+	for (entry = default_menu.entries; entry->cmd; entry++) {
- 		if (entry->exists && !entry->exists(data.menu))
- 			continue;
- 
-@@ -495,7 +496,7 @@ static void shell_print_menu_zsh_complete(void)
- 	for (entry = data.menu->entries; entry->cmd; entry++)
- 		printf("%s:%s\n", entry->cmd, entry->desc ? : "");
- 
--	for (entry = default_menu; entry->cmd; entry++) {
-+	for (entry = default_menu.entries; entry->cmd; entry++) {
- 		if (entry->exists && !entry->exists(data.menu))
- 			continue;
- 
-@@ -627,9 +628,11 @@ fail:
- 	return -EINVAL;
- }
- 
--static int menu_exec(const struct bt_shell_menu_entry *entry,
-+static int menu_exec(const struct bt_shell_menu *menu,
- 					int argc, char *argv[])
- {
-+	const struct bt_shell_menu_entry *entry = menu->entries;
++	/* Truncate name to the last valid UTF-8 character */
++	while (!g_utf8_validate(name, namelen, NULL)) {
++		char *end = g_utf8_find_prev_char(name, name + namelen);
 +
- 	for (; entry->cmd; entry++) {
- 		if (strcmp(argv[0], entry->cmd))
- 			continue;
-@@ -642,6 +645,9 @@ static int menu_exec(const struct bt_shell_menu_entry *entry,
- 		if (data.menu == data.main && !strcmp(entry->cmd, "back"))
- 			continue;
- 
-+		if (data.mode == MODE_NON_INTERACTIVE && menu->pre_run)
-+			menu->pre_run(menu);
++		if (end == NULL) {
++			name[0] = '\0';
++			break;
++		}
 +
- 		return cmd_exec(entry, argc, argv);
- 	}
- 
-@@ -673,7 +679,7 @@ static int submenu_exec(int argc, char *argv[])
- 	memmove(argv[0], argv[0] + len + 1, tlen - len - 1);
- 	memset(argv[0] + tlen - len - 1, 0, len + 1);
- 
--	return menu_exec(submenu->entries, argc, argv);
-+	return menu_exec(submenu, argc, argv);
- }
- 
- static int shell_exec(int argc, char *argv[])
-@@ -686,9 +692,9 @@ static int shell_exec(int argc, char *argv[])
- 	if (!argsisutf8(argc, argv))
- 		return -EINVAL;
- 
--	err  = menu_exec(default_menu, argc, argv);
-+	err  = menu_exec(&default_menu, argc, argv);
- 	if (err == -ENOENT) {
--		err  = menu_exec(data.menu->entries, argc, argv);
-+		err  = menu_exec(data.menu, argc, argv);
- 		if (err == -ENOENT) {
- 			err = submenu_exec(argc, argv);
- 			if (err == -ENOENT) {
-@@ -980,7 +986,7 @@ static char *cmd_generator(const char *text, int state)
- 	}
- 
- 	if (default_menu_enabled) {
--		cmd = find_cmd(text, default_menu, &index);
-+		cmd = find_cmd(text, default_menu.entries, &index);
- 		if (cmd) {
- 			return cmd;
- 		} else {
-@@ -1171,8 +1177,8 @@ static char **shell_completion(const char *text, int start, int end)
- 		if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
- 			return NULL;
- 
--		matches = menu_completion(default_menu, text, w.we_wordc,
--							w.we_wordv[0]);
-+		matches = menu_completion(default_menu.entries, text,
-+						w.we_wordc, w.we_wordv[0]);
- 		if (!matches) {
- 			matches = menu_completion(data.menu->entries, text,
- 							w.we_wordc,
-@@ -1449,6 +1455,12 @@ int bt_shell_run(void)
- 	int status;
- 	const struct queue_entry *submenu;
- 
-+	/* Check if on non-interactive mode skip pre-run since that is on-demand
-+	 * by shell_exec() only for the menu in use.
-+	 */
-+	if (data.mode == MODE_NON_INTERACTIVE)
-+		goto done;
++		namelen = end - name;
++		name[namelen] = '\0';
++	}
 +
- 	if (data.menu && data.menu->pre_run)
- 		data.menu->pre_run(data.menu);
+ 	count = operands[13 + namesize];
  
-@@ -1460,6 +1472,7 @@ int bt_shell_run(void)
- 			menu->pre_run(menu);
- 	}
- 
-+done:
- 	status = mainloop_run_with_signal(signal_callback, NULL);
- 
- 	bt_shell_cleanup();
+ 	player = session->controller->player;
 -- 
-2.49.0
+2.43.0
 
