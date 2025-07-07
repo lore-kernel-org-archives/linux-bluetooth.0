@@ -1,133 +1,48 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D36189919
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 06:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4682E13EFE3
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 06:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751868960; cv=none; b=Y5KkDExbUNCfyld0nyXxM8Zp0ZvP7P+UZ99spVu/Ro9MKoxyEWK0gunN+4oavkp2PfWX6hyN6ARkA0kN/rD6ZngCfv8PVrsQFhvqnV3J7386Bh4+Lmld0eu8SQ8HmWsirJN6WWLKH4q/NUw/KI8CkbcljM52FijRFOWCqDtmE5w=
+	t=1751871368; cv=none; b=Q/y08QIiRX3hTNha+tDwrYhk7sBWctyHx8K8W/Qr25z86GJTG5Wzvd/5+QadgFV09bB/QAmG5yVPKKr1GsUFIMeA9H6+38kAhQ9crccC0B+NamUGA2sNfROUx0wRoo6OTiegaxDTPiYWo4IbGBLoNAqPGwrPXoGPN6JoTiHO3b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751868960; c=relaxed/simple;
-	bh=St/UoVyTdm512zZMcv5ELMiQBZ+k9mSU4AexweSeufs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c+2vWUesCv0TBJUQQamQcHlSE9peRGaQhQEDxeVyAD4ISp2wLMyxZs0BfNLnwD7MF+zpGpTxv7c2N2NoJM9PxuzjTv0GIkbHi4TzWwnYREVOUy4nbX55/XMMJqnwzNemBzNUao48DarI84bwH9CHBMN8LPQMHg4TwXTDTAAQ45o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.196] (p5dc55720.dip0.t-ipconnect.de [93.197.87.32])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E251761E647A3;
-	Mon, 07 Jul 2025 08:15:41 +0200 (CEST)
-Message-ID: <c670c490-04eb-4d5e-921e-e2645489e180@molgen.mpg.de>
-Date: Mon, 7 Jul 2025 08:15:40 +0200
+	s=arc-20240116; t=1751871368; c=relaxed/simple;
+	bh=4x3pkGu18rBAxdy1h+5fbO40k/ryO9Gy8wqtAqo0vaQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=C6Uj/ZBftGmT8fvr+zynysVIaaZRlbxnA+2cwALe4JzEyioMdnHJkhNMaEWPT7r/XPdw9TR5U6JFZUX9lm8kn1F6/inkWXcDAbQaYqMPl+E9y5J4VLJXGkfr2xxYlRl2bzsq/ki9CrMHwPkwQbaBWIhTF4vTMm7hX/wRVtSnKao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=k1bsNiTU; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="k1bsNiTU"
+Received: from github.com (hubbernetes-node-a2a3ea9.va3-iad.github.net [10.48.158.16])
+	by smtp.github.com (Postfix) with ESMTPA id 58DC98C02BE
+	for <linux-bluetooth@vger.kernel.org>; Sun,  6 Jul 2025 23:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751871363;
+	bh=gCqPlGlwfJxxR2NspDbQmJzYjCndEqXOEgWt20OBqCc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=k1bsNiTUtz2R2QAbyHPdk2EpzMn19fWg/5c7KtUPMQJ9ILslS+wpjFsqQWKX1kQ9q
+	 SMnhXCZBVQ3mlmYlT6vwgzySlA6hnUib6Ldvy3JwIi4EMc+Crzp0sVNDXVwEHU+nns
+	 11qn12U/fNo9j9LZjJeDixWRhqWoegfk1cmk2Nbc=
+Date: Sun, 06 Jul 2025 23:56:03 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/977969/21cdde-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] Bluetooth: btintel_pcie: Fix alive context state
- handling
-To: Kiran K <kiran.k@intel.com>, Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Cc: ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
- chandrashekar.devegowda@intel.com, linux-bluetooth@vger.kernel.org
-References: <20250707034657.929092-1-kiran.k@intel.com>
- <20250707034657.929092-2-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250707034657.929092-2-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Dear Kiran, dear Sai,
+  Branch: refs/heads/977969
+  Home:   https://github.com/bluez/bluez
 
-
-Thank you for the patch.
-
-Am 07.07.25 um 05:46 schrieb Kiran K:
-> Firmware raises alive interrpt on sending 0xfc01 command. Alive context
-
-interr*u*pt
-
-(I would have hoped, two developers would spot such a typo, a spell 
-checker also highlights.)
-
-> maintained in driver needs to be updated before sending 0xfc01 (Intel
-> Reset) or 0x03c0 (HCI Reset) to avoid the potential race condition where
-> the context is also updated in threaded irq.
-
-Do you have a reproducer for the issue?
-
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-> Fixes: 05c200c8f029 ("Bluetooth: btintel_pcie: Add handshake between driver and firmware")
-
-I’d add the Fixes tag before the Signed-off-by lines.
-
-> ---
->   drivers/bluetooth/btintel_pcie.c | 25 ++++++++++++++-----------
->   1 file changed, 14 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index f893ad6fc87a..d29103b102e4 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -1988,10 +1988,6 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
->   				btintel_pcie_inject_cmd_complete(hdev, opcode);
->   		}
->   
-> -		/* Firmware raises alive interrupt on HCI_OP_RESET or 0xfc01*/
-> -		if (opcode == HCI_OP_RESET || opcode == 0xfc01)
-> -			data->gp0_received = false;
-> -
->   		hdev->stat.cmd_tx++;
->   		break;
->   	case HCI_ACLDATA_PKT:
-> @@ -2012,6 +2008,20 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
->   	memcpy(skb_push(skb, BTINTEL_PCIE_HCI_TYPE_LEN), &type,
->   	       BTINTEL_PCIE_HCI_TYPE_LEN);
->   
-> +	if (type == BTINTEL_PCIE_HCI_CMD_PKT) {
-> +		/* Firmware raises alive interrupt on HCI_OP_RESET or 0xfc01*/
-> +		if (opcode == HCI_OP_RESET || opcode == 0xfc01) {
-
-Why not keep the form of just one if statement with && in the condition? 
-as below?
-
-> +			data->gp0_received = false;
-> +			old_ctxt = data->alive_intr_ctxt;
-> +			data->alive_intr_ctxt =
-> +				(opcode == 0xfc01 ? BTINTEL_PCIE_INTEL_HCI_RESET1 :
-> +					BTINTEL_PCIE_HCI_RESET);
-> +			bt_dev_dbg(data->hdev, "sending cmd: 0x%4.4x alive context changed: %s  ->  %s",
-> +				   opcode, btintel_pcie_alivectxt_state2str(old_ctxt),
-> +				   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
-> +		}
-> +	}
-> +
->   	ret = btintel_pcie_send_sync(data, skb);
->   	if (ret) {
->   		hdev->stat.err_tx++;
-> @@ -2021,13 +2031,6 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
->   
->   	if (type == BTINTEL_PCIE_HCI_CMD_PKT &&
->   	    (opcode == HCI_OP_RESET || opcode == 0xfc01)) {
-> -		old_ctxt = data->alive_intr_ctxt;
-> -		data->alive_intr_ctxt =
-> -			(opcode == 0xfc01 ? BTINTEL_PCIE_INTEL_HCI_RESET1 :
-> -				BTINTEL_PCIE_HCI_RESET);
-> -		bt_dev_dbg(data->hdev, "sent cmd: 0x%4.4x alive context changed: %s  ->  %s",
-> -			   opcode, btintel_pcie_alivectxt_state2str(old_ctxt),
-> -			   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
->   		ret = wait_event_timeout(data->gp0_wait_q,
->   					 data->gp0_received,
->   					 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
-
-
-Kind regards,
-
-Paul
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
