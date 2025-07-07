@@ -1,403 +1,152 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFA4194094
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 19:53:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410B91AB52D
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 19:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751918015; cv=none; b=DsNGXW1wMHBA+ZschQo4fOd4PW4mEYRIV3Xvjq45HaJJnDRE64Rvb6mVxows+MMtzFWvGT8cOv7qZIG5/AWi8qYOkW9LZtiSZs/s6r5MRD4ILKpeCCQ0xC2c+/GSoUBp/UxHQD/YlJMyPKpsVQWL6DezlvfsGkEy8EA6Oku4YYE=
+	t=1751918251; cv=none; b=Ytnz+ONV1lafLDrXQ63AJTivRFngQTVXpIDzgt7JNSp/MzMC38RNOsaobwDqkeQZtq7VyGsvM1YwD2A+MbyI3xUAYsQrPHGm5vceYpXn8M4YMQMWnE9sX75YU5GFYQ7iJQucqtTNmJ61db2yoVkBm+rmZG6B8qOaknt42V8dka4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751918015; c=relaxed/simple;
-	bh=S/tjsQBr9leYAKPE1nH7q9li1LTGI671QC+SQpsdYFE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=M6R5jlQhZjg5BPVRJKKp1lXtvlz2c/Xe8ogP2CxteRg7s350onx6+ofzUFTkPmFcTqWssPiJujGAw4tP2L9tFUoKvpRQ1a9EKwlGRPO0dJ3nHFwuSFfIz+pSLPgqd+0zhLhTW379ibJzIeXx/+odEvt+i5z+77jAwKrJ6lv4/sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IAzxrWcK; arc=none smtp.client-ip=209.85.222.42
+	s=arc-20240116; t=1751918251; c=relaxed/simple;
+	bh=2Um03InHUyU51ouMSv3wSq5g2Z1vfdYheWINDu8PNFw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=aLfsDQr4H3wJfIB28973lxpIe8aPY5kLO5dMks32UA0pvWYuhztzVG6j3KHn1+kwRG/lFnYziyNFrNr/zWjv/KdaYhnfvtE1cR9OoYHNfqUde2XBqQ0OgMiiPOx7eYnY9/Qaug8MaWKhJ6yP68g4D5wJXjPCqATqath/fuVSx18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PMB4tPRH; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAzxrWcK"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-87ed3b792a2so724225241.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 12:53:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PMB4tPRH"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7d3dd14a7edso571933785a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jul 2025 12:57:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751918011; x=1752522811; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BL3fql8G0KsDfjFnAqFxd9UgceBi0B/Qdqgep9AXpF0=;
-        b=IAzxrWcKwNumFy6Sf4jta1Cpcam63FupZdbtWt3wefD4WXLrdvNRED//sRzXRx+hcW
-         NqDfBzFmDYAYf4Es4y71i3+JsmiDJ8BGQKrLatlK40FCFto7v3Pz5yKiBT6Ff8v9SQhH
-         7+ar+AsR3Psu/Ix1gu/65bZPSIwVeYtruis5lGYxRHTReDT8rrP+KXUROzQaR7p6iowO
-         hp/oVZfOfA4O9aWNg5pdNwLiyFesZbEZXRB+HQJzeZNOKkiYkWHetqMusvSj29XHOBkq
-         Mf4liEgnFblZCTvGuIgtHFnCAtrby+1xf36sU9STg5Esy+w9TNzTlf7bPi598Ab1Y6KS
-         282Q==
+        d=gmail.com; s=20230601; t=1751918249; x=1752523049; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kpXEObVNaXzp58DKfYpXr46G1rWG09zjJeCgcH1zZtM=;
+        b=PMB4tPRHIInMipijzp3HmPm7oVTSEY4SwP1xybTHy4BU/U2+gXoD6eJzlzJM/3uqrB
+         U0AS1cpn9ZKOE1R19NwHmK1vL93dNjx86x9Qh8GMsxa578Fq4Bq1BA/5iF20yE0xD66N
+         P42WuFTE0F25js7b+23UZEP4DwBgjbecBPYxf0AsxPWN2Y7L+fsVqn5ZhG3kMIO9FNa+
+         pItY8Lmdf4ZReBYeM6jAqp7UU8RrZHQwXTY/tomc7rB1mp1Ku+HG8Kg3BouQVc+xzDcf
+         SI5SeBzRHCm98agtYbAr+PtjpeBVQ7ZfpfOfzPCGRq/X9LQuu5RSCKfAxb5gZfEgSi0r
+         cVnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751918011; x=1752522811;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BL3fql8G0KsDfjFnAqFxd9UgceBi0B/Qdqgep9AXpF0=;
-        b=h0YpQCO2Banl1tD/GLDpiVueyFk7pbrv45E7khttYsnjDKqo01g/+VED8roPdYoZbt
-         mVWZp+4i0yCy5eI1Owbv5HNgZpgeX4TvCNk6X6D/uAKaTEn6apKWyoot5BjLijTRsfA2
-         az+J1VUQCFmfqnT1x7lmCBoSUJKrn55evCdxAButTHDJ10g+DVl46lESsFwFLNn4DblF
-         LQuS7ol/FdT6t1reMySo1fFeWxXzvL/GqI8xI4+hHYfZDA+r/Yp5/s8fvmTlj8clcbUv
-         QwrV5KGzAXoVXeFDKiW3bYgvBBUXs+UYVirnnYB4eRKy+JZ+Y+Pzj7CYAeCGE8xG1ejS
-         azKQ==
-X-Gm-Message-State: AOJu0YxvWxsO1hK4/kNZwEOOAb1kTVs28YnAENiOSUpsA3UWt2x0nTzu
-	hcTxTJ/YGjqGSTfCXEVAEmq7QrsSxpbeIgdY8P10xDCl4sBkWbihGYvjJJRKfs7l
-X-Gm-Gg: ASbGncsL9MLdY5NHYKz7XHBPuutczNAGGwcpyKLA0qHx6GVDQ2Lj3I1zsB1XiX1k/+o
-	IRPPmwQ0OFchrELgbS36jX9r1qqw6YOffaz6jjVcQPWqZXr2wEcfB4gWA4krxuX5pznTpThqJhz
-	F2m5+205DVD4G1XwzOPkIbI1/s2Yi3Gsq1I9BkxngM7dsoREhtN30dVmOndR/3Sxzk9jIwqpNkl
-	WTAzxvJKcKnPYS6XCHga3+mJPNYf8eFiplMgYqpIYNVaufYhsEneihF7VVwj2fn2JFiES3cPgqc
-	7JIS7zC5HReidDMpZQqKO/scY4O/wcv2emLTLESNA6I4J5INF+9TELQ0fBf3jHW/Yq0naijsZMs
-	rKQ68icJQg1ZpoQaRM7Xw7ptM7HLcci6F910lVhQ=
-X-Google-Smtp-Source: AGHT+IF0GyIVojIE8R+m+hhwwBU47VqAeLaOnyoxIa2EEGEbH1cNIxTiqI61KtsC439H+2Fnc+A8jQ==
-X-Received: by 2002:a05:6102:30c7:10b0:4ea:d7bf:8b32 with SMTP id ada2fe7eead31-4f2ee257735mr6796364137.21.1751918011019;
-        Mon, 07 Jul 2025 12:53:31 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4f2ea543116sm1190662137.9.2025.07.07.12.53.30
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1751918249; x=1752523049;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kpXEObVNaXzp58DKfYpXr46G1rWG09zjJeCgcH1zZtM=;
+        b=oQ+exr7YQ2F+Hvy9VhCNfhcuTB2FJkftyG79KgoaXe3EyYp51zuqHKvBQMHmUkVCOP
+         BUqtc5TOWVGOjtFDvYajxN/K7GLWIFkqED4vnnRdmN4EOQqu9CXTYLrs5PtjNS0INvPi
+         OPUOmbGTmDQ08TN4Lxk+mYoWNY8xPUHP9pBS5KnNmMnxxmGEPpTP4/9qTPqfTxrhfngX
+         YJe/94yptOk/Lzebcb7VEWkidPDya8HidWq2wuuCTMlWgQKgkasyl2fzjXofN/MiEUHY
+         ai3sK0cp+odbxcQ5q+A3U7RCF91SJu4RXzcbpHE2ZF7DbWwGL8918Z5eZzcNcf6mMP5Q
+         Pk3w==
+X-Gm-Message-State: AOJu0YzAgYsp6WexYKmssdm6KtpDjMm9oWlmZ3R0VgOFgJe+Km8l/aM/
+	B4QVybfyKN4A6cVd6Ds6enhogKbX99oMUCjxedr7L3fh4o2lH5dVcM+T5EQ+0g==
+X-Gm-Gg: ASbGncuNHf0bpjTCsxrqLsZmWWzp5OgKUK2oLwhOTMcxNp3ysRAIk/QVE1zA1MuX7wM
+	2B3A1fz0rDiqUKtCBIWWSXUmYsJ4eo5xhw13I10ib16yGFHmzArorXGW9N8MG5pP27Xh5rThSgi
+	rtDlrTNmMngo5rx67ds70ZGzCrh0G4Wy+KjUzn7nWJV7LEIoCr19tV06zIS0otjylmATCjN/fpl
+	79ka43K2EmHnbg745Rb5HIlRFgfOJ+vuERpbdyFb+Rv4V50bYwbfZjhBB2uNVHyWP9snysMOcL9
+	IaTP1JpHi3IWZtVtVxzR2KHt6VmH+U733yQ5MJysBQLd00PEvkBzdU6pnG0xWtv0tfTT8AsCOeF
+	oVsc=
+X-Google-Smtp-Source: AGHT+IG/HpZzFwcN6E2EbVRISAbQmzJtlLhycZLZ/2dLy0eyRzYP1t/p3fLw3gaem+9K5GBdWPpsrA==
+X-Received: by 2002:a05:620a:440a:b0:7d3:f51e:d775 with SMTP id af79cd13be357-7d5dcc76b24mr1924203285a.24.1751918248656;
+        Mon, 07 Jul 2025 12:57:28 -0700 (PDT)
+Received: from [172.17.0.2] ([23.96.187.180])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d5dbdb38d9sm661791885a.26.2025.07.07.12.57.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 12:53:30 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] doc: Add org.bluez.Device.LE and org.bluez.Device.BREDR
-Date: Mon,  7 Jul 2025 15:53:24 -0400
-Message-ID: <20250707195324.2615368-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.50.0
+        Mon, 07 Jul 2025 12:57:28 -0700 (PDT)
+Message-ID: <686c26a8.050a0220.3b6f8a.8bcf@mx.google.com>
+Date: Mon, 07 Jul 2025 12:57:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1974964498736624940=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kuniyu@google.com
+Subject: RE: Bluetooth: Fix null-ptr-deref in l2cap_sock_resume_cb()
+In-Reply-To: <20250707192832.3162227-1-kuniyu@google.com>
+References: <20250707192832.3162227-1-kuniyu@google.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1974964498736624940==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds bearer specific interfaces so they can properly be operated
-separately.
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/1350
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=979801
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.26 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      23.94 seconds
+CheckAllWarning               PASS      26.39 seconds
+CheckSparse                   PASS      29.65 seconds
+BuildKernel32                 PASS      23.90 seconds
+TestRunnerSetup               PASS      465.98 seconds
+TestRunner_l2cap-tester       PASS      25.07 seconds
+TestRunner_iso-tester         PASS      35.76 seconds
+TestRunner_bnep-tester        PASS      5.84 seconds
+TestRunner_mgmt-tester        FAIL      133.92 seconds
+TestRunner_rfcomm-tester      PASS      9.22 seconds
+TestRunner_sco-tester         PASS      14.65 seconds
+TestRunner_ioctl-tester       PASS      9.93 seconds
+TestRunner_mesh-tester        FAIL      11.34 seconds
+TestRunner_smp-tester         PASS      8.46 seconds
+TestRunner_userchan-tester    PASS      6.20 seconds
+IncrementalBuild              PENDING   0.48 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.221 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.203 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.180 seconds
+Mesh - Send cancel - 2                               Timed out    2.001 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- Makefile.am                    |   3 +
- doc/org.bluez.Device.BREDR.rst | 137 ++++++++++++++++++++++++++++++++
- doc/org.bluez.Device.LE.rst    | 138 +++++++++++++++++++++++++++++++++
- 3 files changed, 278 insertions(+)
- create mode 100644 doc/org.bluez.Device.BREDR.rst
- create mode 100644 doc/org.bluez.Device.LE.rst
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.am b/Makefile.am
-index c4b88d83c962..6d5c6b9eebfc 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -358,6 +358,7 @@ if MANPAGES
- man_MANS += src/bluetoothd.8
- man_MANS += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7
- man_MANS += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
-+		doc/org.bluez.Device.LE.5 doc/org.bluez.Device.BREDR.5 \
- 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
- 		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
- 		doc/org.bluez.Profile.5 doc/org.bluez.NetworkServer.5 \
-@@ -392,6 +393,7 @@ endif
- manual_pages += src/bluetoothd.8
- manual_pages += doc/hci.7 doc/mgmt.7 doc/l2cap.7 doc/rfcomm.7 doc/sco.7
- manual_pages += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
-+		doc/org.bluez.Device.LE.5 doc/org.bluez.Device.BREDR.5 \
- 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
- 		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
- 		doc/org.bluez.Profile.5 doc/org.bluez.NetworkServer.5 \
-@@ -470,6 +472,7 @@ EXTRA_DIST += doc/health-api.txt \
- EXTRA_DIST += doc/hci.rst doc/mgmt.rst doc/l2cap.rst doc/rfcomm.rst doc/sco.rst
- 
- EXTRA_DIST += doc/org.bluez.Adapter.rst doc/org.bluez.Device.rst \
-+		doc/org.bluez.Device.LE.rst doc/org.bluez.Device.BREDR.rst \
- 		doc/org.bluez.DeviceSet.rst doc/org.bluez.AgentManager.rst \
- 		doc/org.bluez.Agent.rst doc/org.bluez.ProfileManager.rst \
- 		doc/org.bluez.Profile.rst doc/org.bluez.NetworkServer.rst \
-diff --git a/doc/org.bluez.Device.BREDR.rst b/doc/org.bluez.Device.BREDR.rst
-new file mode 100644
-index 000000000000..e1aa883b8342
---- /dev/null
-+++ b/doc/org.bluez.Device.BREDR.rst
-@@ -0,0 +1,137 @@
-+======================
-+org.bluez.Device.BREDR
-+======================
-+
-+-------------------------------------------------
-+BlueZ D-Bus Device BREDR bearer API documentation
-+-------------------------------------------------
-+
-+:Version: BlueZ
-+:Date: July 2025
-+:Manual section: 5
-+:Manual group: Linux System Administration
-+
-+Interface
-+=========
-+
-+:Service:	org.bluez
-+:Interface:	org.bluez.Device1
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}
-+
-+Methods
-+-------
-+
-+void Connect() [experimental]
-+`````````````````````````````
-+
-+Connects all BREDR profiles the remote device supports that can be connected to
-+and have been flagged as auto-connectable. If only subset of profiles is already
-+connected it will try to connect currently disconnected ones.
-+
-+If at least one profile was connected successfully this method will indicate
-+success.
-+
-+Possible errors:
-+
-+:org.bluez.Error.NotReady:
-+:org.bluez.Error.Failed:
-+:org.bluez.Error.InProgress:
-+:org.bluez.Error.AlreadyConnected:
-+
-+void Disconnect() [experimental]
-+````````````````````````````````
-+
-+Disconnects all connected profiles and then terminates low-level ACL connection.
-+
-+ACL connection will be terminated even if some profiles were not disconnected
-+properly e.g. due to misbehaving device.
-+
-+This method can be also used to cancel a preceding Connect call before a reply
-+to it has been received.
-+
-+For non-trusted devices connected calling this method will disable incoming
-+connections until Connect method is called again.
-+
-+Possible errors:
-+
-+:org.bluez.Error.NotConnected:
-+
-+Signals
-+-------
-+
-+void Disconnected(string reason, string message) [experimental]
-+```````````````````````````````````````````````````````````````
-+
-+This signal is launched when a device is disconnected, with the reason of the
-+disconnection.
-+
-+This could be used by client application, depending on internal policy, to try
-+to reconnect to the device in case of timeout or unknown disconnection, or to
-+try to connect to another device.
-+
-+Possible reasons:
-+
-+:org.bluez.Reason.Unknown:
-+
-+:org.bluez.Reason.Timeout:
-+
-+	Connection timeout.
-+
-+	The link supervision timeout has expired for a connection or the
-+	synchronization timeout has expired for a broadcast.
-+
-+:org.bluez.Reason.Local:
-+
-+	Connection terminated by local host.
-+
-+	The local device terminated the connection, terminated synchronization
-+	with a broadcaster, or terminated broadcasting packets.
-+
-+:org.bluez.Reason.Remote:
-+
-+	Connection terminated by remote host.
-+
-+	This disconnection can be due to:
-+
-+	- the user on the remote device either terminated the connection or
-+	  stopped broadcasting packets,
-+
-+	- the remote device terminated the connection because of low
-+	  resources,
-+
-+	- the remote device terminated the connection because the device is
-+	  about to power off.
-+
-+:org.bluez.Reason.Authentication:
-+
-+	Connection terminated due to an authentication failure.
-+
-+:org.bluez.Reason.Suspend:
-+
-+	Connection terminated by local host for suspend.
-+
-+Properties
-+----------
-+
-+boolean Paired [readonly, experimental]
-+```````````````````````````````````````
-+
-+Indicates if the remote device is paired to BREDR bearer.
-+
-+Paired means the pairing process where devices exchange the information to
-+establish an encrypted connection has been completed.
-+
-+boolean Bonded [readonly, experimental]
-+```````````````````````````````````````
-+
-+Indicates if the remote device is bonded to BREDR bearer.
-+
-+Bonded means the information exchanged on pairing process has been stored and
-+will be persisted.
-+
-+boolean Connected [readonly, experimental]
-+``````````````````````````````````````````
-+
-+Indicates if the remote device is currently connected to BREDR bearer.
-+
-+A PropertiesChanged signal indicate changes to this status.
-diff --git a/doc/org.bluez.Device.LE.rst b/doc/org.bluez.Device.LE.rst
-new file mode 100644
-index 000000000000..dceec59f565a
---- /dev/null
-+++ b/doc/org.bluez.Device.LE.rst
-@@ -0,0 +1,138 @@
-+===================
-+org.bluez.Device.LE
-+===================
-+
-+----------------------------------------------
-+BlueZ D-Bus Device LE bearer API documentation
-+----------------------------------------------
-+
-+:Version: BlueZ
-+:Date: July 2025
-+:Manual section: 5
-+:Manual group: Linux System Administration
-+
-+Interface
-+=========
-+
-+:Service:	org.bluez
-+:Interface:	org.bluez.Device1
-+:Object path:	[variable prefix]/{hci0,hci1,...}/dev_{BDADDR}
-+
-+Methods
-+-------
-+
-+void Connect() [experimental]
-+`````````````````````````````
-+
-+Connects all LE profiles the remote device supports that can be connected to and
-+have been flagged as auto-connectable. If only subset of profiles is already
-+connected it will try to connect currently disconnected ones.
-+
-+If at least one profile was connected successfully this method will indicate
-+success.
-+
-+Possible errors:
-+
-+:org.bluez.Error.NotReady:
-+:org.bluez.Error.Failed:
-+:org.bluez.Error.InProgress:
-+:org.bluez.Error.AlreadyConnected:
-+
-+void Disconnect() [experimental]
-+````````````````````````````````
-+
-+Disconnects all connected profiles and then terminates low-level ACL-LE
-+connection.
-+
-+ACL-LE connection will be terminated even if some profiles were not disconnected
-+properly e.g. due to misbehaving device.
-+
-+This method can be also used to cancel a preceding Connect call before a reply
-+to it has been received.
-+
-+For non-trusted devices connected calling this method will disable incoming
-+connections until Connect method is called again.
-+
-+Possible errors:
-+
-+:org.bluez.Error.NotConnected:
-+
-+Signals
-+-------
-+
-+void Disconnected(string reason, string message) [experimental]
-+```````````````````````````````````````````````````````````````
-+
-+This signal is launched when a device is disconnected, with the reason of the
-+disconnection.
-+
-+This could be used by client application, depending on internal policy, to try
-+to reconnect to the device in case of timeout or unknown disconnection, or to
-+try to connect to another device.
-+
-+Possible reasons:
-+
-+:org.bluez.Reason.Unknown:
-+
-+:org.bluez.Reason.Timeout:
-+
-+	Connection timeout.
-+
-+	The link supervision timeout has expired for a connection or the
-+	synchronization timeout has expired for a broadcast.
-+
-+:org.bluez.Reason.Local:
-+
-+	Connection terminated by local host.
-+
-+	The local device terminated the connection, terminated synchronization
-+	with a broadcaster, or terminated broadcasting packets.
-+
-+:org.bluez.Reason.Remote:
-+
-+	Connection terminated by remote host.
-+
-+	This disconnection can be due to:
-+
-+	- the user on the remote device either terminated the connection or
-+	  stopped broadcasting packets,
-+
-+	- the remote device terminated the connection because of low
-+	  resources,
-+
-+	- the remote device terminated the connection because the device is
-+	  about to power off.
-+
-+:org.bluez.Reason.Authentication:
-+
-+	Connection terminated due to an authentication failure.
-+
-+:org.bluez.Reason.Suspend:
-+
-+	Connection terminated by local host for suspend.
-+
-+Properties
-+----------
-+
-+boolean Paired [readonly, experimental]
-+```````````````````````````````````````
-+
-+Indicates if the remote device is paired to LE bearer.
-+
-+Paired means the pairing process where devices exchange the information to
-+establish an encrypted connection has been completed.
-+
-+boolean Bonded [readonly, experimental]
-+```````````````````````````````````````
-+
-+Indicates if the remote device is bonded to LE bearer.
-+
-+Bonded means the information exchanged on pairing process has been stored and
-+will be persisted.
-+
-+boolean Connected [readonly, experimental]
-+``````````````````````````````````````````
-+
-+Indicates if the remote device is currently connected to LE bearer.
-+
-+A PropertiesChanged signal indicate changes to this status.
--- 
-2.50.0
 
+--===============1974964498736624940==--
