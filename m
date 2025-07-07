@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570EA29A30A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 14:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260A329A30A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jul 2025 14:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751900300; cv=none; b=uBuyNa8+f7go/3qyltu/e2SOwrbo1wOAEpxU8Ais4U7Wq9GGUH2sBQCQH8yB782DyYXS6FG9JeTNRkxAyMGJcFlm8wRlglNRrPut4mC1Y0WIUtiw9O1VGiN07RJoIPRnFBFLjdZLXf8bGSjYXOdUCr1kczqMkp93pScFBLV7+XI=
+	t=1751900338; cv=none; b=fmfXvZ3RyQ2TodWQFxCpY5F+VF3jQX75NmkAyho7kARVcT89j0fWGL5ruMXwBRhT8gTz/EaTfnSD8vfH2es4v1qtjCUceMW3I9vSDP/j7kq4f2vvo9fF65b6OQvmgCkExLV2ciPruDxIBTJbgiLwYatzCzFmA9c9lVst7MKSKX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751900300; c=relaxed/simple;
-	bh=QTMny4xsj+Z9Cyh/c9f19sBQ91Fgu1V3j12xsUqmhN0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WjAnRjQyLVtlEArcdc5m4dSxWbQv3rNL3gFKt8s2j3pii64S/3+ZwhXZBYTUn092ohtqlUyGLdagIo3gUXq4D3Z1aDvtF3ebOlbe+eV2m3t1cn514vJ5LbMF+M623lcewiYBUyqJfG1nlSHHSMnS/XEVuVU4mc+DA465DfViPD0=
+	s=arc-20240116; t=1751900338; c=relaxed/simple;
+	bh=KkfY6/i2TmUpBCFlrfNOFt/vqWBA3eLnS7GdcXg8YQ4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D5Itn2fs5U5NY2Q85GRdDoofeBHEibcybEG4y0NSUm0kbf1HFpRWCDoFpuYzKetaOjk04UKP4+7y0yN2l0ZwAUYYH4TnpFjA2SQqhihwMw/hfzStZjDVnel+ywbBbse5Vbeft8arVUpa03xzs1Kx7QukModxabCel8MGqXdPSeU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 7 Jul
- 2025 17:57:56 +0300
+ 2025 17:58:45 +0300
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ 0/1] Fix double free in obexd/client.
-Date: Mon, 7 Jul 2025 17:52:41 +0300
-Message-ID: <20250707145242.2356210-1-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ 1/1] obexd/client: prevent double freeing
+Date: Mon, 7 Jul 2025 17:52:42 +0300
+Message-ID: <20250707145242.2356210-2-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250707145242.2356210-1-i.iskakov@omp.ru>
+References: <20250707145242.2356210-1-i.iskakov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,6 +54,8 @@ X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
 X-KSE-AntiSpam-Info: {SMTP from is not routable}
 X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
  b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ dbl.spamhaus.org}
 X-KSE-AntiSpam-Info:
 	omp.ru:7.1.1;127.0.0.199:7.1.2;81.22.207.138:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;inp1wst013.omp.ru:7.1.1
 X-KSE-AntiSpam-Info: FromAlignment: s
@@ -71,17 +76,24 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-This patch fixes double free that could have happened
-when 'contents' in obc_transfer_get_contents could not
-be read. The second free then would've occured in
-image_properties_complete_cb at the end.
-
-Ismagil Iskakov (1):
-  obexd/client: prevent double freeing
-
+image_properties_complete_cb frees 'contents' after a failure.
+However obc_transfer_get_contents does it beforehand.
+---
  obexd/client/transfer.c | 1 +
  1 file changed, 1 insertion(+)
 
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index 668cefa40..a7d00896f 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -971,6 +971,7 @@ int obc_transfer_get_contents(struct obc_transfer *transfer, char **contents,
+ 	if (ret < 0) {
+ 		error("read(): %s(%d)", strerror(errno), errno);
+ 		g_free(*contents);
++		*contents = NULL;
+ 		return -errno;
+ 	}
+ 
 -- 
 2.34.1
 
