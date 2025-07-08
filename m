@@ -1,70 +1,71 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24EB14A60D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 20:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DA27464
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 20:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752006675; cv=none; b=s3Zx0k+pprOhbJCUZdRjKvX/2G5Evm3rUQsJGSyeXVRDspQvnzfabBVkq7TLcGqPyxO6ACQW9KAahGXm2akZu5ejAFcoXswKKhU6Td5YydDCge+w9hFkXm2dBARow5rbywSCMECZJt/exUV6wLFEsDbKwUU3hmHw3+Gld/V/DuU=
+	t=1752007888; cv=none; b=rBAGMC1PHdOKHIFOdwetR753HSUmd8zZRwtFqS93uXqn47YUPelk68qzj+oKXcY5LLLGf3tAS+6/2HwRZthv4UdXORJsBXdojMKHXx1G57zc8L82SeP4EDj/Kh04wgO79jSn/y120p3sEiLyrJI1msunRrOhpQhiXgqzIe3eCmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752006675; c=relaxed/simple;
-	bh=qUhFGZvrq+LhuCvG0B7x8ph7WRstUdG7cF1O2+otdpI=;
+	s=arc-20240116; t=1752007888; c=relaxed/simple;
+	bh=fHeFBr9tW3T6Lins+5h2uibHbjo7hD2BbifBb+JAEpQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cHqHB4I8Y548jNOvdFylTdmoVTI/4VD/+BulXyW4FeVIgkHfirtjwDwV/5AmrI1R3MpCOg8Vl5kV71BVwfLiva+KFqmQHNL1ramIe/tGC0Dht9cRJrivj4ey1bqpm0pSa3OBIxdv5NXohQHpp+IW9stdWqLNGqyxV+MMFpLLS9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4MkDdCe; arc=none smtp.client-ip=209.85.208.170
+	 To:Cc:Content-Type; b=sX5KbgMRcSMLWnHBUqitYiPRlzC+dTIloLwZvfEqkdUE61MoNle5Nzz3GHlFk82dHwLqR7q+CiiOeXjyics6kEEwnKSTPaEyYBZ+P036e79wfAN4Qs2CiOpH8ZMghkqlimvsxovjJP1/7THcZse7bxbFs9MJBHy8gwBSbFSvJxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fCp3DOpZ; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4MkDdCe"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32b7f41d3e6so3781211fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 13:31:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCp3DOpZ"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-32ca160b4bcso54928781fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 13:51:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752006672; x=1752611472; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752007885; x=1752612685; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XqqDGZHQ2aJpw9uwjBLbUmc18OAURm7PrnqdLoLrbI8=;
-        b=R4MkDdCeEiNVwVa5FIN23HThbgt5om04X/TaCNbDRjG5fkXvtDnzkGmFO0FUuCsFOM
-         6vjOiUk5cx2ojMczUkJKyxFb4YHSKc/CHTQECG8T9c/q2XUp5ZHFcKmoDBzJC201254o
-         pJ4m6vjYMdLIVRwEVYhpyMh8y5bvRtB43RwJ6m9Q+Ylsgyg1IRivzUrDR+37no4D9QBv
-         qaHgOmsHoXAm3fVwYmHe2j7hl7WWBYY7T6eG2RCmX8aSLKD58gU5MDOYHNxKBLsVpzwj
-         DAuoihYcxXNXPdeyOvE7TR4PaDfH/eWkK0Z7kOdUxoWHe34KKMLZmVBnyugndzAluPE5
-         hvJg==
+        bh=lxdQ5/EL7z+YsYMLu9hU3/jCkSuh8yJLj1DUssh8zu4=;
+        b=fCp3DOpZUY0LUms9WpeLASCe7Yrvc+WXkAFI6tIs8hqYcB4SYPveCzeVb22p7dvwVd
+         QHkqwBDqlkFD8ERB2zTFVb4EIejS71vQiVN4NCoVGxfivpG0a746mDp80ITW561vcJ8e
+         lfW1wWIp1tJ9PZoSh1hs6sMtdgQ9JT+dZDfGmswDPkg9L9e205UijdaiAoMUvB0O74bS
+         u9ae+y53AcZHxF/Ah0gT09zxGik9uPPt6nBMWbfSm2Fb4j5fPrvU+M2Bqr5vKGe6feBk
+         PPlYWPs9Px66sklp66D46WFSVhSXtaQOlHIot7QV7ehOl6eI/DzNMAT8VSW5m0Rnddkc
+         Zs3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752006672; x=1752611472;
+        d=1e100.net; s=20230601; t=1752007885; x=1752612685;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XqqDGZHQ2aJpw9uwjBLbUmc18OAURm7PrnqdLoLrbI8=;
-        b=UBJCsQTuQkxRKi9EhyKhFW/6oRio17wwnw1uWhUxEcnIyGWQM3L2kNymUyg12aZMA6
-         fCzTAUKUyD79LYKlutw/gBpNO+kQYI4LqwXRsf5pnwLT8FymqZiC5e/ujKoFUgZM2k1L
-         Ynr8ShBYQBQ1/SM58b/D0pRc8KgRXZWSIu8LyIytXIQJItz2O/nl9VpqCBUfYQ6eymUj
-         cU0YLPpLf2Yi313pAT/JfY+qTQHyMYF6G1uqeWNEAokp+L9IXiKx7zWdPMCqs49E+dD/
-         KtEOw8dX4sbLTDmWwi2JLcTgynf5sokCPaj2RjXccl5wmTucSGMgyP6kxK7Y4U7zCr1W
-         uuwA==
-X-Gm-Message-State: AOJu0Yx32RS4rLuM4F/zC/wuMUDV4qRpQMUuIbeEMU1fnFqXimMxXC6Z
-	M7WLwo7aW7N/8gjl/TAfaW4iCuYKVd86v4iWgnDRsuU8Z18czf8YP55s3cqvwn7ynZgfm9HdiJW
-	igzalIpBl7mFJYgZBHtqRXkBmuawae7gw4qh4
-X-Gm-Gg: ASbGnctn/gZJKJt1Kn8ETfl281riqb4s/b+XeY+Q4ao78AdYkC6ABu81MJVtG4IKUTO
-	8gqNoe+WMWV37JXcbsxSH8SwU8ro7GWTKMXgVAiebFh0f9BXxmiPZ0vyh4cm6YtvafEchZRsXJh
-	b4pYAErB9bCJA+b9nhZ7IsDpqTNJnYMlWwCxr42xrKHgBgpdiAXpKkeuSh
-X-Google-Smtp-Source: AGHT+IG9X8Vh9/2CYCp+BrjJ/Sh0XNx+Edc/ehdPzJb43WxhZLCXtVvp74j9Fwm3MQ2dRPo31zlP0t0/BDfeiBo4KHk=
-X-Received: by 2002:a2e:b896:0:b0:32b:4521:73d1 with SMTP id
- 38308e7fff4ca-32f3a0e43bbmr15251861fa.20.1752006671631; Tue, 08 Jul 2025
- 13:31:11 -0700 (PDT)
+        bh=lxdQ5/EL7z+YsYMLu9hU3/jCkSuh8yJLj1DUssh8zu4=;
+        b=c1R9CcEpcMN5cJ2HmhSglHSQjTGL8r3XE5bxCkh3lBLyiYhQRJUrNngtVwgKmUoPhx
+         4zjXZ5Cg3t/ujPbGpn53m0rUeZQcYCIs9Asz28jFPNk9JjYGrncRGspclz2r7/WW7UII
+         r1hfjA9JyvoMqrmkfdnCPVhz4/j0hZb7wm4ozkz4t1ugfhx7xbyIdrrm4+RASwo27bxS
+         2op1V8MwWCSlRULRtN5FtkWeKOtb5AKkjSiPSxz6mhO5Tn65sgc0banNhzfIuXiRy12H
+         b5Uh4y8zkePSrqSKFN+v81UEf5gXD/N18eqQhPqm40SNoiWXLr3DrP8FoyzmFX/K/JMX
+         cfsg==
+X-Gm-Message-State: AOJu0YxycgfDx2Eu+xyMTfGlzSmSInI0KgYLPZQKxCQ951NPjxlXUJ3K
+	e4i1turAB+DWqvvFwoSgj7Gnc1/+jdwUiNidMmZW5xNDWZCkQk4IN/lDLCAYCxd0DqOKwwzO9bM
+	YIYfumVzNuOlwbgjFxycETdMjkH6hhV1DeGs3mCg=
+X-Gm-Gg: ASbGncsUOgsb/4ETHlWSMr9ndjmr/Xd6GHG9ac0p5u964IttRQWrECAG1Tfp9fwATMe
+	9HRNYHh5XBI3FDoA95wtxM7r0Jq4eT8H/0KtUgL2C7Am7b/+CM6YazZgcnRrXxF6QuHXN33Unz4
+	9VSHw24F0BeacdFMVRNi1XmQbYHTZaWb6TZ2P5RtKAXbgvPw==
+X-Google-Smtp-Source: AGHT+IHzkmWB38gywHtaAyAKUtWlhmJXVNrnsByUvZ7eFfTMXEuCIW9O3gZERtgGpDMWJhfiLrY20V8jukYGLmC+bV8=
+X-Received: by 2002:a2e:8a95:0:b0:32b:93fa:2c0b with SMTP id
+ 38308e7fff4ca-32f42d33d09mr2687671fa.11.1752007884391; Tue, 08 Jul 2025
+ 13:51:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707034657.929092-1-kiran.k@intel.com> <20250707034657.929092-2-kiran.k@intel.com>
-In-Reply-To: <20250707034657.929092-2-kiran.k@intel.com>
+References: <20250707034657.929092-1-kiran.k@intel.com>
+In-Reply-To: <20250707034657.929092-1-kiran.k@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 8 Jul 2025 17:30:59 -0300
-X-Gm-Features: Ac12FXxxBuvliIVSjrkt8RLviDichvjYvVXbM_QRLZYEK4jTtqYR2XoWisfW_nU
-Message-ID: <CABBYNZKA70vQ4gpmOe23WweJUU5FY4Y9hcqTDdpMcQns-gGEUw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] Bluetooth: btintel_pcie: Fix alive context state handling
+Date: Tue, 8 Jul 2025 17:51:11 -0300
+X-Gm-Features: Ac12FXzNPOalFnqPVMzWfcah_6otCaSB5e4NV_0qYP5eKYfZ5drEa9JUK61Fr5U
+Message-ID: <CABBYNZLukco6ShSh_9NP4GgpukY7wuYcAX4Xhg00AdkTwOySEQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: btintel_pcie: Make driver wait for
+ alive interrupt
 To: Kiran K <kiran.k@intel.com>
 Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com, 
 	chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com, 
@@ -76,94 +77,99 @@ Hi Kiran,
 
 On Sun, Jul 6, 2025 at 11:30=E2=80=AFPM Kiran K <kiran.k@intel.com> wrote:
 >
-> Firmware raises alive interrpt on sending 0xfc01 command. Alive context
-> maintained in driver needs to be updated before sending 0xfc01 (Intel
-> Reset) or 0x03c0 (HCI Reset) to avoid the potential race condition where
-> the context is also updated in threaded irq.
-
-This should be a little more specific, like explaining what is alive
-interrupt supposed to mean or if we cannot do any communication wheel
-these are pending?
-
-> Signed-off-by: Kiran K <kiran.k@intel.com>
+> Firmware raises an alive interrupt upon receiving the 0xfc01 (Intel
+> reset) command. This change fixes the driver to properly wait for the
+> alive interrupt.
+>
 > Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+> Signed-off-by: Kiran K <kiran.k@intel.com>
 > Fixes: 05c200c8f029 ("Bluetooth: btintel_pcie: Add handshake between driv=
 er and firmware")
 > ---
->  drivers/bluetooth/btintel_pcie.c | 25 ++++++++++++++-----------
->  1 file changed, 14 insertions(+), 11 deletions(-)
+>  drivers/bluetooth/btintel_pcie.c | 27 ++++++++++++++-------------
+>  1 file changed, 14 insertions(+), 13 deletions(-)
 >
 > diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
 _pcie.c
-> index f893ad6fc87a..d29103b102e4 100644
+> index 1113a6310bd0..f893ad6fc87a 100644
 > --- a/drivers/bluetooth/btintel_pcie.c
 > +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -1988,10 +1988,6 @@ static int btintel_pcie_send_frame(struct hci_dev =
-*hdev,
+> @@ -947,11 +947,13 @@ static void btintel_pcie_msix_gp0_handler(struct bt=
+intel_pcie_data *data)
+>         case BTINTEL_PCIE_INTEL_HCI_RESET1:
+>                 if (btintel_pcie_in_op(data)) {
+>                         submit_rx =3D true;
+> +                       signal_waitq =3D true;
+>                         break;
+>                 }
+>
+>                 if (btintel_pcie_in_iml(data)) {
+>                         submit_rx =3D true;
+> +                       signal_waitq =3D true;
+>                         data->alive_intr_ctxt =3D BTINTEL_PCIE_FW_DL;
+>                         break;
+>                 }
+> @@ -1985,8 +1987,9 @@ static int btintel_pcie_send_frame(struct hci_dev *=
+hdev,
+>                         if (opcode =3D=3D 0xfc01)
 >                                 btintel_pcie_inject_cmd_complete(hdev, op=
 code);
 >                 }
->
-> -               /* Firmware raises alive interrupt on HCI_OP_RESET or 0xf=
-c01*/
-> -               if (opcode =3D=3D HCI_OP_RESET || opcode =3D=3D 0xfc01)
-> -                       data->gp0_received =3D false;
-> -
->                 hdev->stat.cmd_tx++;
->                 break;
->         case HCI_ACLDATA_PKT:
-> @@ -2012,6 +2008,20 @@ static int btintel_pcie_send_frame(struct hci_dev =
-*hdev,
->         memcpy(skb_push(skb, BTINTEL_PCIE_HCI_TYPE_LEN), &type,
->                BTINTEL_PCIE_HCI_TYPE_LEN);
->
-> +       if (type =3D=3D BTINTEL_PCIE_HCI_CMD_PKT) {
+> -               /* Firmware raises alive interrupt on HCI_OP_RESET */
+> -               if (opcode =3D=3D HCI_OP_RESET)
+> +
 > +               /* Firmware raises alive interrupt on HCI_OP_RESET or 0xf=
 c01*/
-> +               if (opcode =3D=3D HCI_OP_RESET || opcode =3D=3D 0xfc01) {
-> +                       data->gp0_received =3D false;
-
-This type of flags should really be made into atomic flags so they can
-be checked atomically, anyway this shouldn't block these fixes but
-something I very much look forward to be changed.
-
-> +                       old_ctxt =3D data->alive_intr_ctxt;
-> +                       data->alive_intr_ctxt =3D
-> +                               (opcode =3D=3D 0xfc01 ? BTINTEL_PCIE_INTE=
-L_HCI_RESET1 :
-> +                                       BTINTEL_PCIE_HCI_RESET);
-> +                       bt_dev_dbg(data->hdev, "sending cmd: 0x%4.4x aliv=
-e context changed: %s  ->  %s",
-> +                                  opcode, btintel_pcie_alivectxt_state2s=
-tr(old_ctxt),
+> +               if (opcode =3D=3D HCI_OP_RESET || opcode =3D=3D 0xfc01)
+>                         data->gp0_received =3D false;
+>
+>                 hdev->stat.cmd_tx++;
+> @@ -2025,17 +2028,15 @@ static int btintel_pcie_send_frame(struct hci_dev=
+ *hdev,
+>                 bt_dev_dbg(data->hdev, "sent cmd: 0x%4.4x alive context c=
+hanged: %s  ->  %s",
+>                            opcode, btintel_pcie_alivectxt_state2str(old_c=
+txt),
+>                            btintel_pcie_alivectxt_state2str(data->alive_i=
+ntr_ctxt));
+> -               if (opcode =3D=3D HCI_OP_RESET) {
+> -                       ret =3D wait_event_timeout(data->gp0_wait_q,
+> -                                                data->gp0_received,
+> -                                                msecs_to_jiffies(BTINTEL=
+_DEFAULT_INTR_TIMEOUT_MS));
+> -                       if (!ret) {
+> -                               hdev->stat.err_tx++;
+> -                               bt_dev_err(hdev, "No alive interrupt rece=
+ived for %s",
+> -                                          btintel_pcie_alivectxt_state2s=
+tr(data->alive_intr_ctxt));
+> -                               ret =3D -ETIME;
+> -                               goto exit_error;
+> -                       }
+> +               ret =3D wait_event_timeout(data->gp0_wait_q,
+> +                                        data->gp0_received,
+> +                                        msecs_to_jiffies(BTINTEL_DEFAULT=
+_INTR_TIMEOUT_MS));
+> +               if (!ret) {
+> +                       hdev->stat.err_tx++;
+> +                       bt_dev_err(hdev, "No alive interrupt received for=
+ %s",
 > +                                  btintel_pcie_alivectxt_state2str(data-=
 >alive_intr_ctxt));
-> +               }
-> +       }
-> +
->         ret =3D btintel_pcie_send_sync(data, skb);
->         if (ret) {
->                 hdev->stat.err_tx++;
-> @@ -2021,13 +2031,6 @@ static int btintel_pcie_send_frame(struct hci_dev =
-*hdev,
->
->         if (type =3D=3D BTINTEL_PCIE_HCI_CMD_PKT &&
->             (opcode =3D=3D HCI_OP_RESET || opcode =3D=3D 0xfc01)) {
-> -               old_ctxt =3D data->alive_intr_ctxt;
-> -               data->alive_intr_ctxt =3D
-> -                       (opcode =3D=3D 0xfc01 ? BTINTEL_PCIE_INTEL_HCI_RE=
-SET1 :
-> -                               BTINTEL_PCIE_HCI_RESET);
-> -               bt_dev_dbg(data->hdev, "sent cmd: 0x%4.4x alive context c=
-hanged: %s  ->  %s",
-> -                          opcode, btintel_pcie_alivectxt_state2str(old_c=
-txt),
-> -                          btintel_pcie_alivectxt_state2str(data->alive_i=
-ntr_ctxt));
->                 ret =3D wait_event_timeout(data->gp0_wait_q,
->                                          data->gp0_received,
->                                          msecs_to_jiffies(BTINTEL_DEFAULT=
-_INTR_TIMEOUT_MS));
+> +                       ret =3D -ETIME;
+> +                       goto exit_error;
+
+This should probably go into btintel_pcie_send_sync instead of doing a
+post handling as above, also if I read this right then we have to wait
+on 2 interrupts when it comes to HCI_Reset and 0xfc01?
+btintel_pcie_send_sync already waits on URBD0 this also adds GP0,
+having 2 interrupts means proper ordering needs to be enforced,
+otherwise if GP0 happens before URBD0 this will probably timeout, if
+this is done on purpose let document why we think it is ok to do it.
+
+>                 }
+>         }
+>         hdev->stat.byte_tx +=3D skb->len;
 > --
 > 2.43.0
 >
