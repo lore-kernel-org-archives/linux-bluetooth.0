@@ -1,16 +1,16 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37ECB2989A7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD515298CCD
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751960170; cv=none; b=BSuQOHF8/L4dtZKsFeJhyp4uzEE94XVLGsqOuFTY89djs5Zxs22OhHvy7O/m0w3hbjSdvWeiHC+VJCK1+DW486COvlrgqsZH9EV9lIFeWxscchqGCDt6OpK8EeVsOlbvQJACJrHZPBIHz0RoXgsx08ou8JqyND+kK6KFoeRHisA=
+	t=1751960172; cv=none; b=Hb0jKi3zdA6ewMrEoCPYfUw32YKLgKNOS1+vf3lDZt9VYzEkN/fRzHM5Wbj8bhx3E4hlQRH0tPsv7vcPK7JY1ZiR+aqS662VcGs1zIN7+WMYCsr3j/I2bMB7Z0h2oiGqXZVp7SF39d2ncOs/NCCx8G+BDgv2rbsUvdoNQsTHkyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751960170; c=relaxed/simple;
-	bh=l0l9yZmgVn5jA0BPlgLpkvEzrAJhts9J+wt4lLnYCJQ=;
+	s=arc-20240116; t=1751960172; c=relaxed/simple;
+	bh=vii4Bx7f7q+RMKyTaKqaL7WF6V6Hk8j/GYxR3TtM6pw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j5Xx7BKgZYR3GP+d24joNemCSnEgujHlfl1Hi2BEh2IsgytGtbvgqJpw2ReHaaEPZTHZ5iAL0/bCTL5A+jdXBKyf4xlC642A5YMv9XZr2XYdvckX4HS/ElidvTaF9cPFK8V6zsWjRyi93RTJbpYxGpAcpxfxd+iATroJEqFCP28=
+	 MIME-Version:Content-Type; b=BC/oPG2W07zh+ZjH6wY0d7bqrDBhMhgczTGmOmR+zp5rAURvI+kIh3zOaWRkRtDUQFpibkx0OEeFhCLghgMqxyshRSr8a8Nccpr47Mi91laJk6KD54PZ58f9yZdvHTjSxzN9t2QYZRy23rGvG7Buz+r9gB+k6fsZsG1OWlZhuwQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
@@ -21,9 +21,9 @@ Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ 06/11] profiles/audio: fix memleak of bt_bap
-Date: Tue, 8 Jul 2025 10:33:29 +0300
-Message-ID: <20250708073334.2393559-7-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ 07/11] src/shared: fix memleak
+Date: Tue, 8 Jul 2025 10:33:30 +0300
+Message-ID: <20250708073334.2393559-8-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250708073334.2393559-1-i.iskakov@omp.ru>
 References: <20250708073334.2393559-1-i.iskakov@omp.ru>
@@ -70,59 +70,32 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Make failure branches deallocate memory before leaving.
 ---
- profiles/audio/bap.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ src/shared/bap.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index ee7c8bc49..11e7b1546 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -2954,31 +2954,32 @@ static int bap_bcast_probe(struct btd_service *service)
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
- 	struct bap_data *data;
-+	struct bt_bap *bap;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index a866f4cdc..96fca595b 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -6910,14 +6910,15 @@ static void add_new_subgroup(struct bt_base *base,
+ 			struct bt_bap_stream *stream)
+ {
+ 	struct bt_bap_pac *lpac = stream->lpac;
+-	struct bt_subgroup *sgrp = new0(
+-				struct bt_subgroup, 1);
++	struct bt_subgroup *sgrp;
+ 	uint16_t cid = 0;
+ 	uint16_t vid = 0;
  
- 	if (!btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET)) {
- 		error("BAP requires ISO Socket which is not enabled");
- 		return -ENOTSUP;
- 	}
+ 	if (!lpac)
+ 		return;
  
--	data = bap_data_new(device);
--	data->service = service;
--	data->adapter = adapter;
--	data->device = device;
--	data->bap = bt_bap_new(btd_gatt_database_get_db(database),
-+	bap = bt_bap_new(btd_gatt_database_get_db(database),
- 			btd_gatt_database_get_db(database));
--	if (!data->bap) {
-+	if (!bap) {
- 		error("Unable to create BAP instance");
--		free(data);
- 		return -EINVAL;
- 	}
--	data->bcast_snks = queue_new();
-+	bt_bap_set_user_data(bap, service);
- 
--	bt_bap_set_user_data(data->bap, service);
--
--	if (!bt_bap_attach(data->bap, NULL)) {
-+	if (!bt_bap_attach(bap, NULL)) {
- 		error("BAP unable to attach");
-+		bt_bap_unref(bap);
- 		return -EINVAL;
- 	}
-+	data = bap_data_new(device);
-+	data->service = service;
-+	data->adapter = adapter;
-+	data->device = device;
-+	data->bap = bap;
-+	data->bcast_snks = queue_new();
- 
- 	bap_data_add(data);
- 
++	sgrp = new0(struct bt_subgroup, 1);
++
+ 	bt_bap_pac_get_vendor_codec(lpac, &sgrp->codec.id, &cid,
+ 			&vid, NULL, NULL);
+ 	sgrp->codec.cid = cid;
 -- 
 2.34.1
 
