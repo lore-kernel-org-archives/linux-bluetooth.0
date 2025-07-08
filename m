@@ -1,159 +1,125 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CFD1754B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 18:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7185383
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 18:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751999259; cv=none; b=dGqx/tUgt/kUwDntBeYmMzli4JWnsRrs7HPhvSMHxTxB/uh9ABX3shVifOAmX7MNvGb4L2IhM7o07NDaYix7oWAv2ED+fh+FULj9lTWl2TEeQF7jMX7MxNKf5k/8ZoXRvFL3wycAmGn8WbO6nnEnOMM9/MaeZryh7iaYn2gSnxk=
+	t=1752000340; cv=none; b=FZVYGpsLwUrM0vh7wWLnvaFDciIxSEQNF/mLsz9kKd404yCePoZF7I9jp6UOiEYtGeuve3oEk2yFJBG75cqq7tuG+C2rNalHoi23l4C+aJEekI28y3UzHtuvUmx6vi4fc6kBAxaAfdvW+vurXkOnezWvcBz9YEP3iTFHpu1i91w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751999259; c=relaxed/simple;
-	bh=b9r5jsH+6yRZhRv62n6zR5WXGCRC747EDwuIPsvXM4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TRd29BzGUS92MmtLnCCiU7To9Khityg66QaUINNuOKAw9X29Ojpl4BIspXVBO/nHI6UbRlZxGPIwucRBWxwwp2xMF0vuKex7Th4qFJ8y7FN6vKkYklTEL4aKg3mR+Gb+frh7mkRKm3SUdUQBMU7abAhybaE1mMo2hnQvSx1K3mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A23DB61E647A7;
-	Tue, 08 Jul 2025 20:27:18 +0200 (CEST)
-Message-ID: <c53f34c7-b5cd-44fd-b1cd-8806ec19b89b@molgen.mpg.de>
-Date: Tue, 8 Jul 2025 20:27:18 +0200
+	s=arc-20240116; t=1752000340; c=relaxed/simple;
+	bh=smnsKD3hUhuw1VD0JOeKLEmD0sVO7+TlW71GQaCaEnw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=XhLi59IXW2TEBLjGqwf06suEqYfYBBNGgRkSJwWyxB5iDJsokLBG/+DhwJPkho2Dj7yGNt+O5ZoQ8SKfvkwNRyxGYnCOerOp9liMiiE4HceHa6pB4bgpCdqb36Xr4wdZPdGEwffU4kliMot4acqG/SomAzGc1VdlyijtREVT3WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Op8F8nfQ; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Op8F8nfQ"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-23636167afeso47659765ad.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 11:45:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752000338; x=1752605138; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=RxgQJSaQiTW45tBcYXfLunyr8qQIBw3ElbdqLpxFVTA=;
+        b=Op8F8nfQAUaqEisT48POLSfV872cMnMDelm7xrULZiXYpSZXH8b6pQbACaievexcoQ
+         lL1k5BKiVUSVlmjXf7bH37CwGaK1+r44ey9Ex+e4Wa20A5d38dOorUfs6ePhDVfUeSL/
+         gEpLr1d0mm9b3p2EqrYDkUr2X3xDJcMOx7CHwevtI8QaGmtMxj5P1LK628Og9sEnDIMd
+         1ExY2Z6DSMYNUKoUkOu9sKeL68Y2UEraxvdD9iAxcwWoVGJ3KmjgTPvba96acSwWOhMt
+         NfV8rq3QQIVawp/AXv975O4ofNIAIXW5LvjthG58uFoJadfjtCQD13ahiWCcb48PUxWT
+         4fYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752000338; x=1752605138;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RxgQJSaQiTW45tBcYXfLunyr8qQIBw3ElbdqLpxFVTA=;
+        b=wV6pyBcsM5CT2EBfF6kLUaa+PXmZrKY1MBx8tX6k7o1oGOOheOGB10Eq4Mxst/8etS
+         lW9DLjT+2f1OEV5G4Vfo5Zazay8BWgG6JUbTlSKJPO2Xp/wARXaZ0fdIXQ/8KsOqMIOO
+         0HkOxwoqi1ShQyI9bUuJeYU58PYKBwksFjDBxzN0O1lF9a92RnZG3z/pW+2XuR/YKfmA
+         XWbkxXKnsi8U1KARRG3C/MYHsQjclCHxWZW6WG+H8Kb4wSZ+iY3nz0CUNDqBcso6mMKm
+         Hoe/Yd6L1wFkEbZFTebfVvsPzdX6mIv9gKCz209Axi4s/YmdP0XT0iDnLP6EOPaXQA7J
+         1j7A==
+X-Gm-Message-State: AOJu0YzmnzaUEKPaUAILFua0fUCJsw9PbJSPRs8SmU+wWwXYOX1mq5rA
+	2XnAQHAOOquuxiGvrdsSRgrdgrhN0a9FKTc7g+sbPjnqR9wBhaMSRYDzVcZ+Kw==
+X-Gm-Gg: ASbGncvHhpnUu2nQP4qshNbJmY+zxAAhkPQE/dWSp7WbuIlVclHd9UrpUtN8zK2qOl8
+	/5iOW1WYOLl8l9sq2iu23S6RWBSbIAsBwUu+THkGxViV6Vw/6ZG7fTeb5AUldGB6mJzy4dqNpXF
+	FCmnRoIm4aLfW2Oi58bvumzd10cwjFswGPiUhoxkGAbojGROmH1dShEoNJyN5dHsgySUwyi8Da0
+	6odfj/pPXi4ZZXuW7hlfAPZzRVP/kLVkWpfg3mCaKdQsL72sPGrhT4iSZAgIrE476a8jL20Im2b
+	cj3UYEX8JHI5lQV+O1Ijbcj5qZSsZ/0+OfoGbLBgPcE7SSrhnOxiB12BIrIULBpkdG4=
+X-Google-Smtp-Source: AGHT+IHF6PSQmcxR4yXi9R5GUvl8TrjWJ748375XeE2v5v6ZNiHY65onyVmPInflBr8Z5HQG5z0f4g==
+X-Received: by 2002:a17:902:e5d0:b0:234:c8ec:51b5 with SMTP id d9443c01a7336-23c875e4d89mr248702285ad.53.1752000337747;
+        Tue, 08 Jul 2025 11:45:37 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.164.80])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8457b2cesm117945845ad.157.2025.07.08.11.45.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 11:45:37 -0700 (PDT)
+Message-ID: <686d6751.170a0220.12d250.7c39@mx.google.com>
+Date: Tue, 08 Jul 2025 11:45:37 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5926563624517767474=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] Bluetooth: btintel_pcie: Make driver wait for
- alive interrupt
-To: Kiran K <kiran.k@intel.com>, Aluvala Sai Teja <aluvala.sai.teja@intel.com>
-Cc: Ravishankar Srivatsa <ravishankar.srivatsa@intel.com>,
- Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
- Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
- linux-bluetooth@vger.kernel.org
-References: <20250707034657.929092-1-kiran.k@intel.com>
- <e3bcf617-7b9f-4229-89a0-12ea9e0e001b@molgen.mpg.de>
- <PH0PR11MB7585AF4917BFA37FD1A29AE4F54EA@PH0PR11MB7585.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <PH0PR11MB7585AF4917BFA37FD1A29AE4F54EA@PH0PR11MB7585.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [BlueZ] build: Fix typo in configure option help string
+In-Reply-To: <20250708171411.1927181-1-hadess@hadess.net>
+References: <20250708171411.1927181-1-hadess@hadess.net>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Kiran,
+--===============5926563624517767474==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=980136
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.36 seconds
+GitLint                       PENDING   0.36 seconds
+BuildEll                      PASS      20.07 seconds
+BluezMake                     PASS      2568.49 seconds
+MakeCheck                     PASS      20.14 seconds
+MakeDistcheck                 PASS      185.08 seconds
+CheckValgrind                 PASS      236.13 seconds
+CheckSmatch                   PASS      304.06 seconds
+bluezmakeextell               PASS      130.48 seconds
+IncrementalBuild              PENDING   0.41 seconds
+ScanBuild                     PASS      914.31 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Am 08.07.25 um 14:23 schrieb K, Kiran:
 
->> Subject: Re: [PATCH v1 1/2] Bluetooth: btintel_pcie: Make driver wait for alive interrupt
+---
+Regards,
+Linux Bluetooth
 
->> Am 07.07.25 um 05:46 schrieb Kiran K:
->>> Firmware raises an alive interrupt upon receiving the 0xfc01 (Intel
->>> reset) command. This change fixes the driver to properly wait for the
->>> alive interrupt.
->>
->> What is the consequence of not waiting?
-> 
-> This is an alignment between driver and firmware. If driver doesn’t
-> wait for alive interrupt, then there is chance of stack sending
-> commands before the firmware is ready to accept.
 
-Thank you for elaborating. It’d be great if you added it to the commit 
-message, when you resend.
-
->>> Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
->>> Signed-off-by: Kiran K <kiran.k@intel.com>
->>> Fixes: 05c200c8f029 ("Bluetooth: btintel_pcie: Add handshake between driver and firmware")
-
-I would also put the Fixes: tag above the Signed-off-by line.
-
->>> ---
->>>    drivers/bluetooth/btintel_pcie.c | 27 ++++++++++++++-------------
->>>    1 file changed, 14 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/drivers/bluetooth/btintel_pcie.c
->>> b/drivers/bluetooth/btintel_pcie.c
->>> index 1113a6310bd0..f893ad6fc87a 100644
->>> --- a/drivers/bluetooth/btintel_pcie.c
->>> +++ b/drivers/bluetooth/btintel_pcie.c
->>> @@ -947,11 +947,13 @@ static void btintel_pcie_msix_gp0_handler(struct btintel_pcie_data *data)
->>>    	case BTINTEL_PCIE_INTEL_HCI_RESET1:
->>>    		if (btintel_pcie_in_op(data)) {
->>>    			submit_rx = true;
->>> +			signal_waitq = true;
->>>    			break;
->>>    		}
->>>
->>>    		if (btintel_pcie_in_iml(data)) {
->>>    			submit_rx = true;
->>> +			signal_waitq = true;
->>>    			data->alive_intr_ctxt = BTINTEL_PCIE_FW_DL;
->>>    			break;
->>>    		}
->>> @@ -1985,8 +1987,9 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
->>>    			if (opcode == 0xfc01)
->>>    				btintel_pcie_inject_cmd_complete(hdev, opcode);
->>>    		}
->>> -		/* Firmware raises alive interrupt on HCI_OP_RESET */
->>> -		if (opcode == HCI_OP_RESET)
->>> +
->>> +		/* Firmware raises alive interrupt on HCI_OP_RESET or 0xfc01*/
->>
->> A space is missing before */.
-> Ack.
-> 
->>> +		if (opcode == HCI_OP_RESET || opcode == 0xfc01)
->>
->> Please define a macro for the magic number.
-> 
-> This is vendor specific opcode and is also shared across btintel.c,
-> btusb.c and hci_intel.c. Would it be acceptable to submit a separate
-> patch for this change alone?
-
-Sure. Fine by me.
-
->>>    			data->gp0_received = false;
->>>
->>>    		hdev->stat.cmd_tx++;
->>> @@ -2025,17 +2028,15 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
->>>    		bt_dev_dbg(data->hdev, "sent cmd: 0x%4.4x alive context changed: %s  ->  %s",
->>>    			   opcode, btintel_pcie_alivectxt_state2str(old_ctxt),
->>>    			   btintel_pcie_alivectxt_state2str(data - alive_intr_ctxt));
->>> -		if (opcode == HCI_OP_RESET) {
->>> -			ret = wait_event_timeout(data->gp0_wait_q,
->>> -						 data->gp0_received,
->>> -						 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
->>> -			if (!ret) {
->>> -				hdev->stat.err_tx++;
->>> -				bt_dev_err(hdev, "No alive interrupt received for %s",
->>> -					   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
->>> -				ret = -ETIME;
->>> -				goto exit_error;
->>> -			}
->>> +		ret = wait_event_timeout(data->gp0_wait_q,
->>> +					 data->gp0_received,
->>> +					 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
->>> +		if (!ret) {
->>> +			hdev->stat.err_tx++;
->>> +			bt_dev_err(hdev, "No alive interrupt received for %s",
->>> +				   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
->>
->> In a follow-up patch, the log message could be improved by also adding the
->> timeout value to it.
-> Ack.
-> 
->>> +			ret = -ETIME;
->>> +			goto exit_error;
->>>    		}
->>>    	}
->>>    	hdev->stat.byte_tx += skb->len;
-
-Kind regards,
-
-Paul
+--===============5926563624517767474==--
