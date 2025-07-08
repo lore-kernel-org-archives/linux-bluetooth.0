@@ -1,86 +1,133 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B562E264F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22A72E11DE
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751989401; cv=none; b=Z2oC4lHzA4BcQuNs7DRaddQOxXOecYf3ImBW0hltoxV63SR8NtBoz1yoc5L8BkHhaX4QCdvykV8S6nFRRGiQUMn27seUUOwTtcPnAUHsKJfyWNY6WQKJ8gNr1yhUnVpTDs9hKJwku0x04Hk0MO+6tSLKNYb7xKghFCLMBoFcn8Y=
+	t=1751989407; cv=none; b=bTsCHeinlfXj1REGoo/5o+QM+ppxz2wqNirgoZltEEcDAKqMDzz/RtdhxJhp4pdv4Cb0TwAqECtYwR+mYiza/KDQQkn/1VpAPTKdN/g/iM6aPd1WiXJYJx/RXYlbHzMNcCcRq1md8ORhlAzvO/nk2m8lCLnpG7aMseYJAIJ1VMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751989401; c=relaxed/simple;
-	bh=iKbb/0VhsEjq4xSN3eH9pkLAA+Twkoab/rMPto6+VxA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qj7W3hx2t2fYwcUWTQ+QbFVgsNjZOlKEtlPVRX60+LsBExQNPkN5p2uwDwMlBecQXW4k9ZLuQ0Cdg/8IBkOUtm8IK5QgZ6B+dZQicp2UtX5fNh7+H2xhJQBE7V+qhdCT35dBsQf2k4xx2cve2GZK51c4lhEYDF8GpMtrmtORtqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=IkTtnPSI; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1751989407; c=relaxed/simple;
+	bh=KHDWlh9QgcUcur6yq1+meyYuS7RAp+9/VDElIyB5pYA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XEb2PSlaAPxanNxlM3Xxvx43sCkfdCKBlp4WsRc5rXveywgmvbWUGfTd92BMttBDN+vDXWAxhdDwC/L9DQ2ihYhvLR8CLx4RsKXXHz3tlYMGHPwejDseaPRtEpDof5X0gEUp+RFo+WNER346EmmgIX+6ve8UqGYdmtKTG1npqRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lK0cDNro; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="IkTtnPSI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1751989394;
-	bh=iKbb/0VhsEjq4xSN3eH9pkLAA+Twkoab/rMPto6+VxA=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=IkTtnPSI0SQscp6W0e2l2MifmIDnnURj0y06AgKm1QQ7zaWfA0PS+kAwKpK43D9x0
-	 SZXaq5TsAchk4y0s8NO/Wh6XHLvVgwVCJZOgIVD0JQ6wRVlr7Sdl7Adkj00wa8vTxa
-	 GNIXyVeG9LKm6eVSclenW30k2VUPxxWhfn1VMoUyt/3HwGCMy2qfvMjG8S8Y52zVdl
-	 AnRHcEOSCTJ4SbvPttU3DI7JpxWGKTQTYMuIMiaNpu0UzCMVLvyJPPmty6wAFuhwoM
-	 4u3ZolYrqImEdD5/BgaLhbuKwXBhCUD+e5kOb1xlzaoaOkCQvPv9PA7pNNDHE1NnNT
-	 9QWUI9U5OoBGg==
-Received: from fdanis-ThinkPad-X1.. (2A02-8428-af44-1001-a903-aFF7-d14E-7699.rev.sfr.net [IPv6:2a02:8428:af44:1001:a903:aff7:d14e:7699])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id AA81717E11EE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 17:43:14 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 5/7] eir: Use strtoutf8 for device names
-Date: Tue,  8 Jul 2025 17:43:05 +0200
-Message-ID: <20250708154308.238963-6-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250708154308.238963-1-frederic.danis@collabora.com>
-References: <20250708154308.238963-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lK0cDNro"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-32f1aaf0d60so37202221fa.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 08:43:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751989404; x=1752594204; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Hrhohr+OvIOQbZ5/dR1eoVjnfjA87m+6eJ59YDnqPE=;
+        b=lK0cDNro8yaWJfPRyYrbO7BM4Efj9QcZr+BoHpn0TVmeM4AFsnOAUomqq2FYpthYp8
+         3/AM8P32U+iWbgkgD5XaM5IxuDuK4g6Cn+SQC97fZO8Y5n61aLjPlu6FC08MFEyt+y87
+         nsj060Nt5FLPgXyqXu1SWD/rjwctLXCdQ8xqGww63Pwa9VlDIHGAQPiCQ3a0jOnWyZNi
+         YLVr5Hf4NXTcFchB1BNZ/38HG00QngEpi2ZTSB4oHTQYN03aoQ9JFOIKmjbcx3XtqH6K
+         ssMexUahgKyUybjD2mV+w2XqJocja9rDrFFEFVI1HLTjn1XF8kfuRNVuA0H0f8LbcXcD
+         b0Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751989404; x=1752594204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5Hrhohr+OvIOQbZ5/dR1eoVjnfjA87m+6eJ59YDnqPE=;
+        b=pbfqIYP9+0PkWo40vpDIERc+yAkmr/Jeo5dYLvRyHzjAidfra5+xKrR7R/P6WSvKiq
+         r7r9jEse9kSVawFSaayOVH+iolXVVG8/DuNxe83DNI52kpC2NEhaPYjAgHi2r7GSXg4q
+         lid6iOI3RuOnSxV+bf3JZhUe2l8A6QaQFedblImEi4cBO3bVSfcKZlNoLE2Vi6VwbXNI
+         Elcrvgf767N2qA6IjdvNzFJE4J6/xwJ0DvTB0b6YmYhgjedMYMXw64MtA6uPjFV0cEo3
+         BGM+QYP5fAShYeEOd34L4/1MagAGh4rcA6yhsm71Qby/x0vrrrYZ+QUSHzEGhpGyx/Q/
+         2TSw==
+X-Gm-Message-State: AOJu0YzslKQAe1fwuD0JiL0Ot0so3rNtc0QIAYOqVxicaere6d6Pl55g
+	SaTogDDd3QcK65Xbh9dKkeBP/4TDLNeJooLEvkzufKHVCapuqFgoa7UmpARu5ANdZtJJXXXUcK9
+	z8LB4vVStDQaHEtY88UKG9FEEe3/46mA=
+X-Gm-Gg: ASbGncstv3gcc5vL1d9z/wrt9OwDkSuIaSawu1o9/fqSWh0bo2B0xMl6+Wmjrw7AxL3
+	ZDGbhaVQRhYmmGerHmoHD3ESJfrt4c8ID3duFlQ+1ajwFb6ZEA6yjlplZyWuZmPQj6js7PyZIHw
+	oLaG1zTfZtqi5tOdzJTe/ddezpfx+BmhJ/fHdnCoolfw==
+X-Google-Smtp-Source: AGHT+IEbbzjGuBxmXSRciKaegQt86L4UXL2cKwrkq69svqzwDsQ5xALbdJbTfH/r1/t/HlTKbwc5E1uxrY02BVwwZR8=
+X-Received: by 2002:a2e:ae0c:0:b0:32f:219d:760d with SMTP id
+ 38308e7fff4ca-32f39ad155cmr11006501fa.20.1751989403494; Tue, 08 Jul 2025
+ 08:43:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <BN0PR02MB8304F3E5A337240DDB24BB97E74EA@BN0PR02MB8304.namprd02.prod.outlook.com>
+In-Reply-To: <BN0PR02MB8304F3E5A337240DDB24BB97E74EA@BN0PR02MB8304.namprd02.prod.outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 8 Jul 2025 11:43:10 -0400
+X-Gm-Features: Ac12FXxroWdo0jyUNhetK0V93T0njKF25MtumnPx9Q_4j_mmAtBE2cHtmeXmg2c
+Message-ID: <CABBYNZJ=udxJgqCwAxUhOLLD5WofWvnC+jLD=suMONRGv0u_yA@mail.gmail.com>
+Subject: Re: Query on Periodic Advertising
+To: "Damodar Reddy GangiReddy (QUIC)" <quic_dgangire@quicinc.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Harish Bandi <quic_hbandi@quicinc.com>, 
+	Mohammed Sameer Mulla <quic_mohamull@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Truncate the string to first character before invalid UTF-8 one
-instead of replacing non ascii characters by spaces.
----
- src/eir.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+Hi Damodar,
 
-diff --git a/src/eir.c b/src/eir.c
-index 28b09653c..1e1f76952 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -127,19 +127,10 @@ static void eir_parse_uuid128(struct eir_data *eir, const uint8_t *data,
- static char *name2utf8(const uint8_t *name, uint8_t len)
- {
- 	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
--	int i;
--
--	if (g_utf8_validate((const char *) name, len, NULL))
--		return g_strndup((char *) name, len);
- 
- 	memset(utf8_name, 0, sizeof(utf8_name));
- 	strncpy(utf8_name, (char *) name, len);
--
--	/* Assume ASCII, and replace all non-ASCII with spaces */
--	for (i = 0; utf8_name[i] != '\0'; i++) {
--		if (!isascii(utf8_name[i]))
--			utf8_name[i] = ' ';
--	}
-+	strtoutf8(utf8_name, len);
- 
- 	/* Remove leading and trailing whitespace characters */
- 	g_strstrip(utf8_name);
--- 
-2.43.0
+On Tue, Jul 8, 2025 at 11:21=E2=80=AFAM Damodar Reddy GangiReddy (QUIC)
+<quic_dgangire@quicinc.com> wrote:
+>
+> Hi Luiz ,
+>
+> I am reaching out to you to check about the Periodic Advertising in bluez=
+. I am seeing below in emulator folder but there is no document available i=
+n Doc folder about the periodic advertising.
+> //hci->commands[37] |=3D 0x04;   /* LE Set Periodic Advertising Parameter=
+s */
+>     //hci->commands[37] |=3D 0x08;    /* LE Set Periodic Advertising Data=
+ */
+>     //hci->commands[37] |=3D 0x10;    /* LE Set Periodic Advertising Enab=
+le */
+>     //hci->commands[37] |=3D 0x20;    /* LE Set Extended Scan Parameters =
+*/
+>     //hci->commands[37] |=3D 0x40;    /* LE Set Extended Scan Enable */
+>     //hci->commands[37] |=3D 0x80;    /* LE Extended Create Connection */
+>     //hci->commands[38] |=3D 0x01;    /* LE Periodic Advertising Create S=
+ync */
+>     //hci->commands[38] |=3D 0x02;    /* LE Periodic Advertising Create S=
+ync Cancel */
+>     //hci->commands[38] |=3D 0x04;    /* LE Periodic Advertising Terminat=
+e Sync */
+>     //hci->commands[38] |=3D 0x08;    /* LE Add Device To Periodic Advert=
+iser List */
+>     //hci->commands[38] |=3D 0x10;    /* LE Remove Device From Periodic A=
+dvertiser List */
+>     //hci->commands[38] |=3D 0x20;    /* LE Clear Periodic Advertiser Lis=
+t */
+>     //hci->commands[38] |=3D 0x40;    /* LE Read Periodic Advertiser List=
+ Size */
 
+Yeah, we use those commands with the broadcast test cases under iso-tester.
+
+>
+>
+> In AOSP Stack , Android has provided SDK APIS to enable Periodic Advertis=
+ing but in the latest bluez version there is no option in bluetoothctl to e=
+nable Periodic Advertising.
+> Is there any plan to provide APIS in bluez version ?
+> Is Periodic advertising part of experimental features ?
+> Kind Regards,
+> Damodar.
+
+Currently we only use PA with LE Audio Broadcast, so there is no
+dedicated API for PA alone, broadcast is enabled via experimental
+flags, you can find more information in pipewire regarding the
+main.conf options for LE Audio:
+
+https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/LE-Audio-+-LC3-sup=
+port
+
+If you need PA for something other than Broadcast let us know, we
+might need to extend our MGMT APIs to allow usage of that.
+
+--=20
+Luiz Augusto von Dentz
