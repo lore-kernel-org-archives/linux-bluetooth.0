@@ -1,165 +1,108 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CE3E55B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA13429898B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751959246; cv=none; b=FTYGKYJIk6t39K6IhIq4aXAijUcpxmp7i/Pg8ctSVVWBeWC5fqE02aBUsfRTkgjDA6wppFIGE5jPcBjqRiqiO2YtJIoRw7Qof236uZ50HltseL+Gt7UFpo8h06ARq+JOo1ZdtuxbLFUHLj8Vl5wrcAgizmvRPz48b5q5DZATCMM=
+	t=1751960134; cv=none; b=IlBYsl5KpTvjhgcHMQQSA5kKkJzHN+4xWU9rhdElrUdnKNrMQ7px3ZutTSO0GvoKUyrJWbMOlcc2boaEZns8LU8rigYjXUXxHTFiInBRoG6Qi4RkLXLkj8lgDMRDKK/RuniCzj4RQF1zuT0k9o1xxMTZjAmXpGAWNnXVzuy35kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751959246; c=relaxed/simple;
-	bh=/fvEFy9ewa1NU2sevT1dqljB96K9oLhfqCBtu1o4qrA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Kkk0t38KRi5JZOClIiO0sEgyBfbZc0A0dDL70/9p0bVYiE1cga1vILrtmGLZxmijZ2koRjCcVw+CqI6SUOR07cMrNqJ/yMlIzHvbNMrxsOdtN9lVX5Wu3iwvWmCJmCzKHs8OFJGauwDWHz/ujUbN7w0jga9v9ZALszsLD9aQVsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ld6udfmS; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ld6udfmS"
-Received: from github.com (hubbernetes-node-bebdce1.ash1-iad.github.net [10.56.159.38])
-	by smtp.github.com (Postfix) with ESMTPA id C6BB9140165
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 00:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1751959242;
-	bh=BdPFlTrmrUXeuF955RaxiqWVtQjLRBVUZ+8OFMxLQDI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=Ld6udfmSYN1WvdhSx5PgfmLqpvjPHyRhD3LIiLpxO3khIWYS8mj+jGxEDvR6KxW7V
-	 YtKzEjEf1BadPqukzj63LSYcaV3Yrc01sXZTeqrOEo1AW4jAtFgxedQnEBLQD/sgO6
-	 yoYrsm3kSuMbBiXVMTjegKtjY0/kDJWhyS1TDYHw=
-Date: Tue, 08 Jul 2025 00:20:42 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/979916/000000-1c2af2@github.com>
-Subject: [bluez/bluez] 0590d6: shared/util: Add strtoutf8 function
+	s=arc-20240116; t=1751960134; c=relaxed/simple;
+	bh=8b9O2g/fKZh/97gHFBzf03g/mLI7u459pLQHKAD1tEg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qHwPriCVLsulJNu/95WUy+qwVj3chGhzf8xV68GtbTZqPEuVB6WfzJ6typ0uKId6Cmncg2rVINfkd3saMYiyvCiWfxikSF2ofbZYA9g2BQzJKJ/Z1c03wy3YdGK4swlxv5ILHWYylbciM9J12V6mBz9u269v7tQFcLOJxOUeRq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 8 Jul
+ 2025 10:35:18 +0300
+From: Ismagil Iskakov <i.iskakov@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Ismagil Iskakov <i.iskakov@omp.ru>
+Subject: [PATCH BlueZ 00/11] Fix bugs found by static analysis
+Date: Tue, 8 Jul 2025 10:33:23 +0300
+Message-ID: <20250708073334.2393559-1-i.iskakov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 07/08/2025 07:11:13
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 194600 [Jul 08 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: i.iskakov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 63 0.3.63
+ 9cc2b4b18bf16653fda093d2c494e542ac094a39
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;inp1wst013.omp.ru:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;81.22.207.138:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/08/2025 07:12:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/8/2025 5:27:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-  Branch: refs/heads/979916
-  Home:   https://github.com/bluez/bluez
-  Commit: 0590d61013a5481bcf93876359e8e7df522ea0e9
-      https://github.com/bluez/bluez/commit/0590d61013a5481bcf93876359e8e=
-7df522ea0e9
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
+This patch corrects some of the bugs not connected
+to the functionality but to memory management etc.
+Two exceptions being about fixing the arguments
+order, which also could've caused some trouble.
 
-  Changed paths:
-    M src/shared/util.c
-    M src/shared/util.h
+Ismagil Iskakov (11):
+  btio: fix range validation of security level
+  profiles/audio: add nullity checks
+  src/shared: add nullity checks
+  isotest: close fd after sending when nconn=1
+  obexd/client: fix err condition causing memleak
+  profiles/audio: fix memleak of bt_bap
+  src/shared: fix memleak
+  src/shared: move null checks before dereferencing
+  isotest: remove repeating conditions
+  profiles/audio: fix io_unlink args order
+  src/plugin: fix args order
 
-  Log Message:
-  -----------
-  shared/util: Add strtoutf8 function
+ btio/btio.c                |  2 +-
+ obexd/client/transfer.c    |  2 +-
+ profiles/audio/a2dp.c      | 45 +++++++++++++++++++++++++++++---------
+ profiles/audio/avrcp.c     | 24 +++++++++++++++++---
+ profiles/audio/bap.c       | 23 +++++++++----------
+ profiles/audio/bass.c      |  7 +++++-
+ profiles/audio/transport.c |  2 +-
+ src/plugin.c               |  2 +-
+ src/shared/bap.c           | 42 ++++++++++++++++++++++++++++-------
+ src/shared/gatt-db.c       |  5 ++++-
+ src/shared/vcp.c           |  3 +++
+ tools/isotest.c            |  8 ++++---
+ 12 files changed, 124 insertions(+), 41 deletions(-)
 
-This adds the strtoutf8 function that truncate a string before the
-first non UTF-8 character.
-This truncation is done in place.
+-- 
+2.34.1
 
-
-  Commit: 8074c549df269742300841982c005c070ccc42ba
-      https://github.com/bluez/bluez/commit/8074c549df269742300841982c005=
-c070ccc42ba
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M profiles/audio/avrcp.c
-
-  Log Message:
-  -----------
-  audio/avrcp: Fix crash with invalid UTF-8 item name
-
-As stated in AVRCP 1.6.2 chapter 6.10.2.3 Media element item, for the
-Displayable Name Length property, the target device may truncate the
-item name:
-
-  Length of Displayable Name in octets. The name shall be limited such
-  that a response to a GetFolderItems containing one media player item
-  fits within the maximum size of PDU which can be received by the CT.
-
-This truncatation may occur in the middle of a multi-byte character,
-at least with Samsung Music app, which triggers a DBus assertion and
-crashes bluetoothd:
-
-  profiles/audio/player.c:media_folder_create_item() Din Dhal Jaye
-      Haye with lyrics | "=E0=A4=A6=E0=A4=BF=E0=A4=A8 =E0=A4=A2=E0=A4=B2 =
-=E0=A4=9C=E0=A4=BE=E0=A4=8F
-      =E0=A4=B9=E0=A4=BE=E0=A4=AF" =E0=A4=97=E0=A4=BE=E0=A4=A8=E0=A5=87 =E0=
-=A4=95=E0=A5=87 =E0=A4=AC=E0=A5=8B=EF=BF=BD type audio uid 1
-  profiles/audio/player.c:media_folder_create_item()
-      /org/bluez/hci0/dev_24_24_B7_11_82_6C/player0/NowPlaying/item1
-  profiles/audio/player.c:media_player_set_metadata() Title: Din Dhal
-      Jaye Haye with lyrics | "=E0=A4=A6=E0=A4=BF=E0=A4=A8 =E0=A4=A2=E0=A4=
-=B2 =E0=A4=9C=E0=A4=BE=E0=A4=8F =E0=A4=B9=E0=A4=BE=E0=A4=AF"
-      =E0=A4=97=E0=A4=BE=E0=A4=A8=E0=A5=87 =E0=A4=95=E0=A5=87 =E0=A4=AC=E0=
-=A5=8B=E0=A4=B2 | Guide | Dev Anand, Waheeda Rehman
-  =E2=80=A6
-  arguments to dbus_message_iter_append_basic() were incorrect,
-      assertion "_dbus_check_is_valid_utf8 (*string_p)" failed in
-      file dbus-message.c line 2775.
-  This is normally a bug in some application using the D-Bus library.
-
-
-  Commit: 262d974e1774ca31870186e48800c3b76134828f
-      https://github.com/bluez/bluez/commit/262d974e1774ca31870186e48800c=
-3b76134828f
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M profiles/audio/mcp.c
-
-  Log Message:
-  -----------
-  audio/mcp: Use strtoutf8 for player name and track title
-
-Truncate the string to first character before invalid UTF-8 one
-instead of replacing non ascii characters by spaces.
-
-
-  Commit: 0233c9bb284bdc2e8dd93e21df0b612a1baa894a
-      https://github.com/bluez/bluez/commit/0233c9bb284bdc2e8dd93e21df0b6=
-12a1baa894a
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M profiles/gap/gas.c
-
-  Log Message:
-  -----------
-  audio/gap: Use strtoutf8 for GAP device name
-
-Truncate the string to first character before invalid UTF-8 one
-instead of replacing non ascii characters by spaces.
-
-
-  Commit: 1c2af2b9c6da05f52d36663ec0aa314a96bb24e1
-      https://github.com/bluez/bluez/commit/1c2af2b9c6da05f52d36663ec0aa3=
-14a96bb24e1
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M src/eir.c
-
-  Log Message:
-  -----------
-  eir: Use strtoutf8 for device names
-
-Truncate the string to first character before invalid UTF-8 one
-instead of replacing non ascii characters by spaces.
-
-
-Compare: https://github.com/bluez/bluez/compare/0590d61013a5%5E...1c2af2b=
-9c6da
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
