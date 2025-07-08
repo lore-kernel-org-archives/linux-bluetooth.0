@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BE82E1C65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF34F224B00
 	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751989397; cv=none; b=Xzi7Hs2VLtvmEWoJQYBGstTpBnkwk5t83CkEzCJFxsUHfcToQJpP6SpW8HlBKaOpek/gZbwQEKE4OCIJ3Fywrcbap8CzMo4Kfb+NHlEZQbDaptaKNlnfE+7f0h8OAb9AtPUP7muDYEYoopao59sPQa3DOcVsGNHXWG516sremSI=
+	t=1751989397; cv=none; b=JvR3HkZzJsrBtfpJSsiqqZqcDcuc3HMy2cJgzU2bouYvVfP61YqFceJZHIlNgoo71CiYV5KmiiM8bUYDafgUAflfP/9J4UJoZfkIjmSayE8pSX8OboMTkizhMZWJEGvcQZNjx4NlcV+2BedHkQgyst5pIZZ655Su06Bdqy42k0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751989397; c=relaxed/simple;
-	bh=WD+SsCdGGiHuDo5nYQDWyWYPA/BpfVVTRHxYlb48C2g=;
+	bh=1ES1jRYLfkvRe4K8iITGRVa2kr1ixFCVXXhwWe50ioY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Type; b=m2uAbECQ6gMoKhvOhEuYfJ4M9vRS2Zlc/2MIrYC0cbsRxCWlzOFPOqzfmcy0zwYwG5RX34/OzRcUMkIW1aJkLwddoMPNpTmHi7npozS7qv1ruItAKIJQJhXFmoZ+xwWXRbyUrJieipH5Fdp24aRx5Hg5fUpmUsBBal13argPyPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=aXcwsjpN; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=MoizID88Wlsrk2areSSe5N3i5rQWiq8ad8POcHaPmwC2ZGg1mgcnHqm51SsVdcGXKkZBgdtWBhNgKtkC049wGqApUhe2VKazjsH7ay1GdQNRgcFNmAckfQ4ZHPPauZWUopsppP5XFyszxXvk//FY+N3EgJuZuhvK3fvfoQzczac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=L/5CG7D1; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="aXcwsjpN"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="L/5CG7D1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1751989393;
-	bh=WD+SsCdGGiHuDo5nYQDWyWYPA/BpfVVTRHxYlb48C2g=;
+	s=mail; t=1751989394;
+	bh=1ES1jRYLfkvRe4K8iITGRVa2kr1ixFCVXXhwWe50ioY=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=aXcwsjpNMI81D7AXhNWs4CabAxGKXhvJIpy2dUXAU03geD8NG3SqeTF5u3Ff4Gg3f
-	 OcuXcMRfQeAFG40O8MU2X9XFAxWHZx5AKa0X3HYp2m/r8r3SFlkL1fOPlGFJALRTkf
-	 AHHuknbCO8mHvQw6RgoJnpjU0WXTbsI74odnO+xan0YzXvHhhb39M8Dw78MXm4fNui
-	 EeUbOqSk29UV2Mzr5JZDor5lwowPQKujTDPuLMmYmEzEcsCjLYLyQy2xD+GILsqJeb
-	 AQVuwB4WMys2xHnDleMTMEZo/VXplwmedrN4I3a689IpEUT0QhSaS53drHawBixCQA
-	 pfqsD2rjmk8Ig==
+	b=L/5CG7D1iNoMHxIXM4CmxakA6xuMV8ymG5u+AzfG9OvltDZjYKvdmoijML7E/tDnT
+	 nVOHagBKt+41OwmA4hcDBV3BaW4/zh+vbgI0a7jEnsv1C/DR1bh5Q9rylhmaN1zQ0f
+	 Q/ent7lmCWb+EYFUX2ghuDXy9PIdBsJ5AjdvV5ubrUElTACc4MRm8ZFFrOgc9FxqDq
+	 TDSSFMq4ZNhFCe1sy0nKkzxtGwsMSaoPdkEitv701i69zqu8b6Wild5pVSpWss4Ysw
+	 G8UsigDUQGSpqnSsty/Be4BSaelJ44nqV8FZVAQ6l1x3lo/CtXmD7KajR40L8zFoW2
+	 HXWKEEX+VnI1w==
 Received: from fdanis-ThinkPad-X1.. (2A02-8428-af44-1001-a903-aFF7-d14E-7699.rev.sfr.net [IPv6:2a02:8428:af44:1001:a903:aff7:d14e:7699])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id C3B5D17E1045
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 17:43:13 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 18EA617E11EC
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 17:43:14 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/7] audio/avrcp: Fix crash with invalid UTF-8 item name
-Date: Tue,  8 Jul 2025 17:43:02 +0200
-Message-ID: <20250708154308.238963-3-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 3/7] audio/mcp: Use strtoutf8 for player name and track title
+Date: Tue,  8 Jul 2025 17:43:03 +0200
+Message-ID: <20250708154308.238963-4-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250708154308.238963-1-frederic.danis@collabora.com>
 References: <20250708154308.238963-1-frederic.danis@collabora.com>
@@ -47,55 +47,42 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-As stated in AVRCP 1.6.2 chapter 6.10.2.3 Media element item, for the
-Displayable Name Length property, the target device may truncate the
-item name:
-
-  Length of Displayable Name in octets. The name shall be limited such
-  that a response to a GetFolderItems containing one media player item
-  fits within the maximum size of PDU which can be received by the CT.
-
-This truncatation may occur in the middle of a multi-byte character,
-at least with Samsung Music app, which triggers a DBus assertion and
-crashes bluetoothd:
-
-  profiles/audio/player.c:media_folder_create_item() Din Dhal Jaye
-      Haye with lyrics | "दिन ढल जाए
-      हाय" गाने के बो� type audio uid 1
-  profiles/audio/player.c:media_folder_create_item()
-      /org/bluez/hci0/dev_24_24_B7_11_82_6C/player0/NowPlaying/item1
-  profiles/audio/player.c:media_player_set_metadata() Title: Din Dhal
-      Jaye Haye with lyrics | "दिन ढल जाए हाय"
-      गाने के बोल | Guide | Dev Anand, Waheeda Rehman
-  …
-  arguments to dbus_message_iter_append_basic() were incorrect,
-      assertion "_dbus_check_is_valid_utf8 (*string_p)" failed in
-      file dbus-message.c line 2775.
-  This is normally a bug in some application using the D-Bus library.
+Truncate the string to first character before invalid UTF-8 one
+instead of replacing non ascii characters by spaces.
 ---
- profiles/audio/avrcp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ profiles/audio/mcp.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 831f1dc8b..30997335a 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2595,8 +2595,10 @@ static struct media_item *parse_media_element(struct avrcp *session,
- 	memset(name, 0, sizeof(name));
- 	namesize = get_be16(&operands[11]);
- 	namelen = MIN(namesize, sizeof(name) - 1);
--	if (namelen > 0)
-+	if (namelen > 0) {
- 		memcpy(name, &operands[13], namelen);
-+		strtoutf8(name, namelen);
-+	}
+diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+index d3ccb97c5..5fe7ef82a 100644
+--- a/profiles/audio/mcp.c
++++ b/profiles/audio/mcp.c
+@@ -72,21 +72,12 @@ static void mcp_debug(const char *str, void *user_data)
+ static char *name2utf8(const uint8_t *name, uint16_t len)
+ {
+ 	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+-	int i;
+-
+-	if (g_utf8_validate((const char *) name, len, NULL))
+-		return g_strndup((char *) name, len);
  
- 	count = operands[13 + namesize];
+ 	len = MIN(len, sizeof(utf8_name) - 1);
  
+ 	memset(utf8_name, 0, sizeof(utf8_name));
+ 	strncpy(utf8_name, (char *) name, len);
+-
+-	/* Assume ASCII, and replace all non-ASCII with spaces */
+-	for (i = 0; utf8_name[i] != '\0'; i++) {
+-		if (!isascii(utf8_name[i]))
+-			utf8_name[i] = ' ';
+-	}
++	strtoutf8(utf8_name, len);
+ 
+ 	/* Remove leading and trailing whitespace characters */
+ 	g_strstrip(utf8_name);
 -- 
 2.43.0
 
