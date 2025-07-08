@@ -1,16 +1,16 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036722D9795
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02592D9797
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751973097; cv=none; b=hnXdcz/HO0u7EWTxJGhIs+fHlNbHdRPgn1Im70TLOlcwETr9zbF1CgnC92+ljsZOpJGsO1ChUsn72En7U+B0zVugDv2vl3jCcyX0KjN2ZRsCjO+BIVbWye5TQ0WCWCEEosbGtSfEjR94vTF+xYQrsucaPe8+czTVWSlR074XEnU=
+	t=1751973099; cv=none; b=rbUlg4FRl73AHbHoFXcacgX7L8BLQekcmdMhySJhbaQPeUCZdI8/jgmySd1IEsYcFfdpmC3inYp5t5+HdR650lPLje1JRUaE1TcqUq1TBzUOuGWPY2cKhYlZk873XbgruyBrz7T6hZ2ecbIXhpIraL9rWmbJvenMdZcKTtMX+6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751973097; c=relaxed/simple;
-	bh=kImVzDKQ14AehRi1BFFqGwfVI7w2TZQNFt7JQE/0fog=;
+	s=arc-20240116; t=1751973099; c=relaxed/simple;
+	bh=rLE21kRy1vZN/bH7EJeGp41kr7oj2IDHE2mF5Jit3k4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HezuF3hqXfOnzRLknL8d5dppS7aUZGZh9EJkf06CZ10g0blOGikzClniSFK0CXMtMOKAcRLwKTyetwgyODEiQmfsjY3iFvmFkW8ejuj5uCb7lT2B9kkDh+BJ1eQuV4y7Fn9U2sFUKiqprgfuFd9C4TE+q366APk+JnJhAvtuZuk=
+	 MIME-Version:Content-Type; b=rUdMiNoD7HLF/hTnbQ3oMWShBsodkEH2NZrSXhogKhr5/agnZ80OqHvWEZViMHsGr/UL1lsxQwzhg10lcRytEbeuXDAY0Wu5vUeNXv0m/XAX8rcv2poVHh+eyaR9VWchesm+y834lbFOMldNc8FmM70nG5k7JI2u6uUYsa4Sx7Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
@@ -21,9 +21,9 @@ Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ v2 10/11] profiles/audio: fix io_unlink args order
-Date: Tue, 8 Jul 2025 14:09:08 +0300
-Message-ID: <20250708110909.2626286-11-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ v2 11/11] src/plugin: fix args order
+Date: Tue, 8 Jul 2025 14:09:09 +0300
+Message-ID: <20250708110909.2626286-12-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250708110909.2626286-1-i.iskakov@omp.ru>
 References: <20250708110909.2626286-1-i.iskakov@omp.ru>
@@ -70,39 +70,25 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Seems like a breaking bug. Analogous to bt_bap_stream_io_link,
-but there the order is correct.
+According to other functions and arguments usage, the
+case with external_plugin_init seems to be erroneous.
 ---
- profiles/audio/bass.c      | 2 +-
- profiles/audio/transport.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ src/plugin.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index f617efa2c..e1c05e05a 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -457,7 +457,7 @@ static void stream_unlink(void *data, void *user_data)
- 	struct bt_bap_stream *link = data;
- 	struct bt_bap_stream *stream = user_data;
- 
--	bt_bap_stream_io_unlink(link, stream);
-+	bt_bap_stream_io_unlink(stream, link);
+diff --git a/src/plugin.c b/src/plugin.c
+index a566bd2f4..dcdb1b2db 100644
+--- a/src/plugin.c
++++ b/src/plugin.c
+@@ -141,7 +141,7 @@ static gboolean enable_plugin(const char *name, char **cli_enable,
  }
  
- static void bass_remove_bis(struct bass_setup *setup)
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index a1fdf948b..a355bde24 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -2015,7 +2015,7 @@ static void transport_unlink(void *data, void *user_data)
- 		return;
- 	}
  
--	bt_bap_stream_io_unlink(link, stream);
-+	bt_bap_stream_io_unlink(stream, link);
- 
- 	bap_update_links(transport);
- 
+-static void external_plugin_init(char **cli_disabled, char **cli_enabled)
++static void external_plugin_init(char **cli_enabled, char **cli_disabled)
+ {
+ 	GDir *dir;
+ 	const char *file;
 -- 
 2.34.1
 
