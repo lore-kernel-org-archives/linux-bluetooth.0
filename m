@@ -1,160 +1,108 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDC01DBB2E;
-	Tue,  8 Jul 2025 14:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8EC2E041C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 14:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751984241; cv=none; b=jDWfE7BEhyo3Fsy0lRtmCjudsKzWQlsDbO6ws8L550V7LdvGU83GVvXV9kup7lFJrfSg5b3Mc0fj+dCg1zNIAVBPkDGz6oMRtSxus81Ga4zhiPpgEDxQsADZso+L4WzQQ/CtxtS7ThN2B0W4vWoEne6Y3C3At1wL8pfypJbLP2Y=
+	t=1751984302; cv=none; b=Yk0pDKpjru4QUwjYsUTFgRwKu3CitaWveQPEI8zCh9gOosCCEmq5/UfHjuowyTf5cjbl5WrFy7gVY8SsSAsVTqXgY2GmNLPUxAfqtZ1A2v2qm2pJNEl+Aaf5zao195F39TN651493c1DHbUfrgncGGaEDC5Z6mktwl+XZT5tZDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751984241; c=relaxed/simple;
-	bh=XxA2SQGODxfhsVlrJsj7y3Ianx1ZtElsv48sFWrV1XU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aVq7tV57ejc/gBNKMM7WTf7pee1s4vAz16VrvvJ94x6tfCroEuz14FSheOPsRhTPRWqbUVt7SrtUlQpGnkxyQHZcQMcw2dTTZcaXDRF+zvIjPaB2sSosFJhPHqDAeb2qJR786F8CpgfP0qCKGlnWQOLD79h3d4kkIBADJ2GjQTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMpDTl6i; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1751984302; c=relaxed/simple;
+	bh=aInJlA5ITRKIPcrYdFwwhJE4lxQnOEo8TYNhctukigI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SSjJorrctD3MREr9MZMoR42AeyhpynH6lli0A3Sv7tr9IjryxpYQGySkiaUcXESk7WFqOd6ItAkd7YIjTSkJ+zVcR3JbQhCbczD0O79ZO/lxhi8pzZ569Dx57NIHuzSxCW/EVpQrzelqyqSYacTQHF9VtBcA1zdRSOWHYQ1u74w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l7J4JZf1; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMpDTl6i"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-60707b740a6so6024857a12.0;
-        Tue, 08 Jul 2025 07:17:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7J4JZf1"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-313bb9b2f5bso3996726a91.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 07:18:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751984238; x=1752589038; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YAe2u5Ry38FuECjcK//c2lbSxbhj0bQal/mPso8qrP0=;
-        b=ZMpDTl6ioleroz4CGpb1EgFW+rD1DiKGQPh/2mTyTIwCNHWrkUpYivZ0Nluyuh7Swo
-         06t74pdjpvJhkPpIne/8j4QbUz5rRSsHDNoCoObc4RJLj65ZWj1X5Sidy3uW9fLQRCnA
-         r3jynrBU1C4o7hdNugh0UJ796LYRQSASg4f26mFASSI6XV08lPgqM+sgOCQu/9R2Kmdv
-         OH1lH+wdpft0sP5j1Xgs8Mz/+dqKTsygEbBSpgBFM4iueldTIXbZckesW4kSGTfFJI0y
-         f1e/2maSA8ZzwT6FeDaLQ8I8wZJVmLH2fEh7LX5XlLRNuFnbYFNZbIZ1eHafyRdqnreM
-         gmfw==
+        d=gmail.com; s=20230601; t=1751984300; x=1752589100; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RUsZdi/Ic/TpLADi++riELfsoxiev6KNHSb8HqaIma4=;
+        b=l7J4JZf1QdXBmZlpXcApm54Ju7gKwAApTz+17UpuRvVCjMweCx+hmDqufpsrh0TmYF
+         KIitQdu3wZc80xY5SLpR+6Ck0GhCsfU8cKLKr99f6rU9OCL3CsFUTykHe8VnhqSm7aJz
+         H52BzKbsxnOkhyKWupeyRxeYsXREMAdCvBaMvmoItWOdzizMCM0BBe1CfYcjq5kKSpza
+         CpLWYSfi/UOu2hDRPl9VSshCpIIHG6mhzfnRxQk3yQbTIs7R7gHeAphTM7ZnCjrnbu3R
+         oGxIBVGCBW2D972QdIZSJSV7km/6iQiPMXdiY4rhkH16kAv12OmmKcmQtyf7ZTN2vraT
+         u5Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751984238; x=1752589038;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YAe2u5Ry38FuECjcK//c2lbSxbhj0bQal/mPso8qrP0=;
-        b=JIzS5scnWtD+P0hrIidmdcZkGwRit9gPQbOPZTg61qoWWgY/6LXUmdko0WYAxi4ATZ
-         fK032pBMhmvbkz+4WKgJx1CmVaaEDY8UJfL6Gz6tivSxHlOXAPZXLszoWZyzObJVT7Ho
-         y0ztdLxnTa0+bK51hcUC5i0kkxIpmFMaH1KEaZkWUwLHkHVpR1GKC8OD1MsuDF3+w9M0
-         OPEx8kJU67p4VsjMtKgBC7nQBkO6+wlQ+XIK3wflqtNoGK3ztVyXwNTgYJ2+L8kwESeY
-         bwjK0PcRiPo690g3RmA/PeMtUnwarHHyajE3IBNkHmyBc9mMRDTOZ247PWktliZfqtXk
-         +0UA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDRrqzsvdkXiKLUiTcCiCrFh+tY/FG6k6D3qLDwElkx588jwBI0sZc0cwZgdMu16iJqBYVcdmcfAAX8oc8Uxw=@vger.kernel.org, AJvYcCWFr4rhsKj9g4pdh/E3v8CLKib9EsdSvS/p3JJIs6sb487KLgHDtMOfIb9z4SfL1NL6ViATPYgzdStT5EYy@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCh3QbblgTPViRsxhdiqOrwQYntM8TEschiGD18xQ6O9RJLtZO
-	oEzxe1UZTNuN2Oedo7BSQ/1mWo3Z45ocUMSHenI3qRH5EQp/akouDx4O
-X-Gm-Gg: ASbGncsaK6yzUNX3HdyvJh3Zx/7eAJnLOjTU/05APmSWTYxDplQIRK3tthZKa2lKKhO
-	5rrMUa8JmB2cfDBzH+5S1eOmuEroV0G+HoyMq+z0H7prtZzhBLnP/bBHEuOdVUxUVgwAuwMRAu+
-	qjNT2uaYl2tbGJ4otZXcFg794kEujEOkIzefS4Rh/sE2NxkcUKHbjnQTDO8Aj7mPlSBmP9cFipW
-	Tab0uAh6tTveoTrOfWs6HEqbTno74z6IEo8lc3+9yF7vSiYaDJoDYXqvWSZGCj0d4W2ItSAq5OD
-	LB4uQIrg6FnSuvxon5R02eFKzrm2wNhp2cTgZPOCRbp9tLQgnyhy8sX2rkEeBPwAPbFWSzc4tin
-	2
-X-Google-Smtp-Source: AGHT+IEKgFjK0svm+YInGP+RsM98sKNu7m+gNG2WMQOwlcmxj3AAtdKKcAIJ3pqCIjJNYAxZVCPxzQ==
-X-Received: by 2002:a05:6402:5191:b0:60b:9f77:e514 with SMTP id 4fb4d7f45d1cf-60fd6510ce0mr13951067a12.10.1751984237659;
-        Tue, 08 Jul 2025 07:17:17 -0700 (PDT)
-Received: from yavin ([2001:b07:6474:515f:faac:65ff:fe6a:e677])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60fcb8c6c97sm7266600a12.74.2025.07.08.07.17.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 07:17:17 -0700 (PDT)
-From: Alessandro Gasbarroni <alex.gasbarroni@gmail.com>
-To: marcel@holtmann.org
-Cc: johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alessandro Gasbarroni <alex.gasbarroni@gmail.com>
-Subject: [PATCH] Bluetooth: hci_sync: fix connectable extended advertising when using static random address
-Date: Tue,  8 Jul 2025 16:14:12 +0200
-Message-ID: <20250708141617.3691-2-alex.gasbarroni@gmail.com>
-X-Mailer: git-send-email 2.50.0
+        d=1e100.net; s=20230601; t=1751984300; x=1752589100;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RUsZdi/Ic/TpLADi++riELfsoxiev6KNHSb8HqaIma4=;
+        b=lIx92FW/QbCnG/nTHzpm9uqxI+xFjU7kufzCQfx1daAJYCEnl8R3EJRSIw6rrwTWDF
+         7blmGnm5oeicOVSRwB/vwZ+pGx7xK1uSRSfINFdj/oZpy0yXJZ03CTT3hScle5M3SrZ3
+         ISSxz0JCgm5A0NDkWGjrlyJk4y0WyjFuEIvs2DfyaoZacGPbwNHWbUS26Ct7xORhnan1
+         H02byOmGG1yrTEt9uVi1P1awDaf00gRpaMdQnXQ2UmEuQ2GuCFBD1CqYBwlhjXbfXG+W
+         hyVJWR+Tvo3ZcYLfSD4O3jrCsdRkWZ1zKR2SbvTTqSKgXQBfhmptgWJuOuKaj8sAOA7A
+         73yA==
+X-Gm-Message-State: AOJu0YyGBlwjxP8q+vOwhjNwikqCYPUplzniJILHk9pbYNMyM3U85Bga
+	P+yJieZYeSbrVFGuBogUCAW/R9p0DgrFRJpLLud/d81BByZWD2tW1MmGZGlYb2g/8sKwG8xYX04
+	RZy5uiAVdajj3TPszBJCqzFdIO9psoqH/LddS
+X-Gm-Gg: ASbGnctjkySdJSuKXF+ES5p4HNaamzlLUhdfhmLy1qwfcD0xicWRuuMZwHlPn/9v/dG
+	HHxsXyfs3OGfrLOnD7e7RKAMMUAj6pnS/jiZOO6EkHmFRfZG+kF6HbYAFX38HZpjHQ9iSVoXGzT
+	LYrbxR59czTY7CEhtC7EbII4Q2P1L7T+dd4HAdUUI/JQ==
+X-Google-Smtp-Source: AGHT+IEAQX1BfK/xQuRRYUF4uZF3ixyqr57HfVsonRBNgq9TTPj9iXablhHchCP0Lmd+vVk3aHQk57+nta6U09oECxA=
+X-Received: by 2002:a17:90b:510a:b0:312:1ae9:152b with SMTP id
+ 98e67ed59e1d1-31c21dac882mr3733030a91.23.1751984299483; Tue, 08 Jul 2025
+ 07:18:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250708110909.2626286-1-i.iskakov@omp.ru> <20250708110909.2626286-2-i.iskakov@omp.ru>
+In-Reply-To: <20250708110909.2626286-2-i.iskakov@omp.ru>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 8 Jul 2025 10:18:04 -0400
+X-Gm-Features: Ac12FXwodhiyVvkbHX7j1K-TaGvp_scCQW4EhRdnM3h-E6Xhvt6Q0nPo01kIVes
+Message-ID: <CABBYNZK0YV=4Z3sX5AN8kHtSw0A_d9+iPaR6A-wg1svQysiuag@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 01/11] btio: fix range validation of security level
+To: Ismagil Iskakov <i.iskakov@omp.ru>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Currently, the connectable flag used by the setup of an extended
-advertising instance drives whether we require privacy when trying to pass
-a random address to the advertising parameters (Own Address).
-If privacy is not required, then it automatically falls back to using the
-controller's public address. This can cause problems when using controllers
-that do not have a public address set, but instead use a static random
-address.
+Hi Ismagil,
 
-e.g. Assume a BLE controller that does not have a public address set.
-The controller upon powering is set with a random static address by default
-by the kernel.
+On Tue, Jul 8, 2025 at 7:13=E2=80=AFAM Ismagil Iskakov <i.iskakov@omp.ru> w=
+rote:
+>
+> Arrays inside l2cap_set_lm/rfcomm_set_lm functions are of size 4,
+> but the bounds check allows the value 4 for 'level'.
+> ---
+>  btio/btio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/btio/btio.c b/btio/btio.c
+> index b8afe0580..14f2b700e 100644
+> --- a/btio/btio.c
+> +++ b/btio/btio.c
+> @@ -455,7 +455,7 @@ static gboolean set_sec_level(int sock, BtIOType type=
+, int level, GError **err)
+>         struct bt_security sec;
+>         int ret;
+>
+> -       if (level < BT_SECURITY_LOW || level > BT_SECURITY_FIPS) {
+> +       if (level < BT_SECURITY_LOW || level > BT_SECURITY_HIGH) {
+>                 g_set_error(err, BT_IO_ERROR, EINVAL,
+>                                 "Valid security level range is %d-%d",
+>                                 BT_SECURITY_LOW, BT_SECURITY_HIGH);
+> --
+> 2.34.1
 
-	< HCI Command: LE Set Random Address (0x08|0x0005) plen 6
-        	Address: E4:AF:26:D8:3E:3A (Static)
-	> HCI Event: Command Complete (0x0e) plen 4
-	      LE Set Random Address (0x08|0x0005) ncmd 1
-	        Status: Success (0x00)
+Yeah, while this handles the likes of l2cap_set_lm/rfcomm_set_lm this
+also would disallow FIPS (level 4) security, the right fix here is to
+probably bail out with an error after attempting BT_SECURITY if
+BT_SECURITY_FIPS has been given.
 
-Setting non-connectable extended advertisement parameters in bluetoothctl
-mgmt
 
-	add-ext-adv-params -r 0x801 -x 0x802 -P 2M -g 1
-
-correctly sets Own address type as Random
-
-	< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036)
-	plen 25
-		...
-	    Own address type: Random (0x01)
-
-Setting connectable extended advertisement parameters in bluetoothctl mgmt
-
-	add-ext-adv-params -r 0x801 -x 0x802 -P 2M -g -c 1
-
-mistakenly sets Own address type to Public (which causes to use Public
-Address 00:00:00:00:00:00)
-
-	< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036)
-	plen 25
-		...
-	    Own address type: Public (0x00)
-
-This causes either the controller to emit an Invalid Parameters error or to
-mishandle the advertising.
-
-This patch makes sure that we use the already set static random address
-when requesting a connectable extended advertising when we don't require
-privacy and our public address is not set (00:00:00:00:00:00).
-
-Signed-off-by: Alessandro Gasbarroni <alex.gasbarroni@gmail.com>
----
- net/bluetooth/hci_sync.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 77b3691f3423..012a9e9a4f9b 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6815,8 +6815,19 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
- 		return 0;
- 	}
- 
--	/* No privacy so use a public address. */
--	*own_addr_type = ADDR_LE_DEV_PUBLIC;
-+	/* No privacy
-+	 *
-+	 * Even though no privacy is requested, we have to use the assigned random static address
-+	 * if we don't have a public address.
-+	 */
-+	if (bacmp(&hdev->bdaddr, BDADDR_ANY) == 0 && bacmp(&hdev->static_addr, BDADDR_ANY) != 0) {
-+		/* Re-use the static address if one is set */
-+		bacpy(rand_addr, &hdev->static_addr);
-+		*own_addr_type = ADDR_LE_DEV_RANDOM;
-+	} else {
-+		/* Use a public address. */
-+		*own_addr_type = ADDR_LE_DEV_PUBLIC;
-+	}
- 
- 	return 0;
- }
--- 
-2.50.0
-
+--=20
+Luiz Augusto von Dentz
