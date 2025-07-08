@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33D82248BE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B74298CD1
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751960176; cv=none; b=rEDEHUksAhqLOGiKooZ3sfMa5Gi7/lisC6k0CtiRukX47JI78KiIpX36iQ2Ji8jHfEXYt526anKTqXm8wFT3+Xq05iHvVEIDncPk65LdaSYX15csw3CLa4VXhcTKRmI+vFX78ccy5KyHYukAxrkMRgcLUb9Sx2R95Z9Tf3YrPJU=
+	t=1751960178; cv=none; b=q6AKh+b+IBZUsGnFjfrAzJ/d6VOYJwqeVmJGe1muJ5Gn8q5NrQdqrDqK/nwoRZmFsUjKlRIfzIL6k0kBLG1V40HvgjMd5ZAkuGg1qSGKpVl6Y2rYMmOLSdY2SpsmNEiRpeslSiU8X4FVAXbclJijelvcyrPp+IX59AZYFzYl0tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751960176; c=relaxed/simple;
-	bh=89EJNSYHJ4I0dqx3cOpLPxjtutfhO7Cu1A8nNGLOq80=;
+	s=arc-20240116; t=1751960178; c=relaxed/simple;
+	bh=kImVzDKQ14AehRi1BFFqGwfVI7w2TZQNFt7JQE/0fog=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aLgqH6AV1N/lxbD7oZ2u2EWETFxgyKt7Up8ySKi4wf7xdhNA1Hnbyey4cXM6yBr6q5vr4G3u2NSZgKr+93iT1LytMFnpuRd/X3tGu6rg/f4kFUDTxd1HX80quupfRfD7loQ7lzjFa7mwrTO72GVN3lm+iPL4EyshsVxBVvLNmFA=
+	 MIME-Version:Content-Type; b=IUOyNTP8RBJumY84yIZZdvhXfm6os3yhD1aNIe6Q0O61SssKJJVdndDY1Fs9mp3MXUwECNazS6dwhzG6qFuM2pIBhxr7xwSg31DL9c1nb6821tdSDFQ6Fg9LG/QlTYA0Z+evJTUesje5mx9TUnM0aeBmYAnwR29KmyEnFI3NT+o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 8 Jul
- 2025 10:36:04 +0300
+ 2025 10:36:05 +0300
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ 09/11] isotest: remove repeating conditions
-Date: Tue, 8 Jul 2025 10:33:32 +0300
-Message-ID: <20250708073334.2393559-10-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ 10/11] profiles/audio: fix io_unlink args order
+Date: Tue, 8 Jul 2025 10:33:33 +0300
+Message-ID: <20250708073334.2393559-11-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250708073334.2393559-1-i.iskakov@omp.ru>
 References: <20250708073334.2393559-1-i.iskakov@omp.ru>
@@ -70,26 +70,38 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+Seems like a breaking bug. Analogous to bt_bap_stream_io_link,
+but there the order is correct.
 ---
- tools/isotest.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ profiles/audio/bass.c      | 2 +-
+ profiles/audio/transport.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/isotest.c b/tools/isotest.c
-index 0ced19a9e..924876d35 100644
---- a/tools/isotest.c
-+++ b/tools/isotest.c
-@@ -684,9 +684,9 @@ static void recv_mode(int fd, int sk, char *peer)
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index f617efa2c..e1c05e05a 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -457,7 +457,7 @@ static void stream_unlink(void *data, void *user_data)
+ 	struct bt_bap_stream *link = data;
+ 	struct bt_bap_stream *stream = user_data;
  
- 			r = recv(sk, buf, data_size, 0);
- 			if (r < 0) {
--				if (r < 0)
--					syslog(LOG_ERR, "Read failed: %s (%d)",
--							strerror(errno), errno);
-+				syslog(LOG_ERR, "Read failed: %s (%d)",
-+						strerror(errno), errno);
-+
- 				if (errno != ENOTCONN)
- 					return;
+-	bt_bap_stream_io_unlink(link, stream);
++	bt_bap_stream_io_unlink(stream, link);
+ }
+ 
+ static void bass_remove_bis(struct bass_setup *setup)
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index a1fdf948b..a355bde24 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -2015,7 +2015,7 @@ static void transport_unlink(void *data, void *user_data)
+ 		return;
+ 	}
+ 
+-	bt_bap_stream_io_unlink(link, stream);
++	bt_bap_stream_io_unlink(stream, link);
+ 
+ 	bap_update_links(transport);
  
 -- 
 2.34.1
