@@ -1,142 +1,195 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011030.outbound.protection.outlook.com [40.107.130.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AD11A288
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751987079; cv=none; b=cgp2HUBNcW71tvW+eeM2UzXtRu3lvJmwxKkNP/di1Rb+73Jp3tXeB9e8QqQ80J4wdnyFmmKZtn24pIwGD6fLqJY/gM6ZDZ7fK45W+7X56mGgNP+rZiSksRzDKUCGRYsewrVVWPuC3r71J6/kRnB0+CTDxLQuGrb9LpgnUPezOi0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751987079; c=relaxed/simple;
-	bh=Zp4CNxdW9hvJ7ZCzMyKKFH8g5shcikOB7BE1ojPyw1E=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aIGIJMlK1R0SHfdKteFuzjK+P7LSxrGsyASclf7XpPkXAfD0e8buU0zEdZO5JIKtVR58/iAo2SwmV8DGRHr0T0qqWHthS8qlDdYsl2aO86k0NG5u2RqvHeqljzQKtpFLj+4Nb+k4VAlc8pwZQJOT2ugLt48kQ6Ktageef15GoTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rr2GyVfI; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771DA26563B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751987282; cv=fail; b=Glc7KjptyNZsy8cBq4ZsXZ7kbInblNIK1VYrO+5XHgQO2wMLirDbuvV2290zlHyfbAsxw72tyYKol7lXbZDwGHvs8LcYCUPd2XSwQ1sIt6OCr7bSewlvXvZUpwKBksxsEOvzdJFnU1+7ncbX1bfxQx02EWt1rAbL40EndPtkYfk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751987282; c=relaxed/simple;
+	bh=K6s/tE08q4sjkwWNwEgXCe+X/SyhsVpsS3AP9blBZRw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UseMc8hEGdCVCQpF67QbgWWwVJDp3l5zakTOyDdQHHoOZ25CVlVELMZLJjqR4B10Vi1jrShcrU/8cmtpP1/cUtOyZpGxCgLPgOvMItZywp1FYhRSZQRIACZaXBDfMmv34A4oTT4nI2cr4ZCic1XWI2TEFUYcRIRgqgTTkTDxXy0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=guynxk33; arc=fail smtp.client-ip=40.107.130.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rr2GyVfI"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4a6f3f88613so41242311cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 08:04:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751987077; x=1752591877; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sGZNY6jggceJhnNipSYA0QoqLmGzjkUBJZ1UtGDzvHs=;
-        b=Rr2GyVfIYB2r1KyyKEnMH1Dsu/9roCVxZVT/ZmCQEd6Xj1B3P8kl/NNuqB0LoonTPQ
-         Jc0PLMJkXrBqjdNp93vER9sLFAlkL7qE0BHodPxVd23d3KI8/aoplqn6lmhXX/e+OM1u
-         aRMm3RPs5r7/cpY2bcWqBIQ5V6R+gj7TenEY0IzpxWIOze0wMujHjCTw2szH4OV6vmsD
-         YuNj83cN5Uf5KfS+B4+5cuxZCyrn2QNkhSED+1kcBelatLK1RCBbPgGLc1xJ9RqGHetQ
-         VXMPskWErEgOH59zKQPyUzldmqlr12Y0tm6VsH8/A3hWyLi6j/7scrXdmUNHsiLJLEgy
-         BWeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751987077; x=1752591877;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sGZNY6jggceJhnNipSYA0QoqLmGzjkUBJZ1UtGDzvHs=;
-        b=F1WS1ded6ZgrWoUiX08bxlhF4nJ3/EU/6alTMxTJmwmiTsIkE4XecIx5IMsFl0/j0G
-         X21z+rsLYW56Iye7S2s1u76ROo/b+PAz9FTFEz8QuXHrBOjILEiaCuW8c5lh8RsXCxZ2
-         D48sPbVs1s7iOVeVq4hA4WT2p2nZe2bNJ272Q7uszjKLNgKmbRQgjMwO+WxEg75fwQSw
-         U+SapEla7Wo+m6UNb90q9yon4OQTbRTlhGmO28/CwFg1niSavvQMfHhOsUx5pXrpE58a
-         4u1UiU38DWYH6vrTR1vXrE+loMhxGoZ9drKI9h25MSU1ujwr49M25Rj8ULxAEq+dMgIo
-         iKwQ==
-X-Gm-Message-State: AOJu0YwCg4GxxbjowvKRksRO9jvyy20ONibD2tOC9GFAt8rdLUFQDIsS
-	+J6Af9N8bd13eqLIrZebKCSnO3nMP2Ydormcmpw9X3+s5G1KQEknFivq+yVT4Qqc
-X-Gm-Gg: ASbGncvpsrZiDQLMRq6YInOFUPXSsYOfg36OjtySTLz8/KSnCWw8OoarBOUL7pdvsEP
-	8++MiDEkpL4sChtB3Y7c2e+Ke+3+AeeElxnSHskv3EeRP58neND5pBeNX3lDsjF94K9GfispgFp
-	II6qRuO7nNiC/pARAu8ncwGKR+Nn8Rlqj6keuiQj8JNrxFfTbLlecFl8G4LQ91MWIQroD2uFhQK
-	B/aY7oPLtEjQ3Iow5lS+Rgbm43UAX2Re8Ct1HMx9RIkqITGIKgWh7J1miqTdNb4oG5RX0iSqrh6
-	61PQ1Ycomp0hO+lZE1Wv8jevb9M9sWWgh04T6Ib+0E6qE5JrZ/ORtMHiluJW5+cJskV7
-X-Google-Smtp-Source: AGHT+IE7rdfWvgidGwygMgXqb3VoKOPEKJbtDFDR+mXEl7pu7bXoMDpNwz+jrlFcQlCjMQUiNngzyg==
-X-Received: by 2002:a05:622a:4110:b0:4a7:628d:6cb7 with SMTP id d75a77b69052e-4a9ca59a98bmr69745141cf.45.1751987076644;
-        Tue, 08 Jul 2025 08:04:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.125.218.50])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a994aa88f2sm80594691cf.79.2025.07.08.08.04.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 08:04:36 -0700 (PDT)
-Message-ID: <686d3384.050a0220.1d4732.d32e@mx.google.com>
-Date: Tue, 08 Jul 2025 08:04:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1079372771920980656=="
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="guynxk33"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RaYrTjmNLv+OKRTlCsbL9kub+XUxYZSrwooBXchSq8CtbU3ejTJkMH7Ya77StdM9ct/WIVWp6fG4zsfOnt6jH7d7cpT2p4rbgwYlrUAVKTx0yLJZ39mTxVMNxA7llFk0FYjBvbeYm06SluhmiBaYsNRB7vnnZlMfVA4mzmqWGX33oOFO1mNv0+F1+MhdBtgfmfKD2Ck4iYp9uy9X9kY3b+BigEe9QpLRgrU8yZKzX34uwEP2XhfyKZT9ylCqyXd7f7cs553t5BySGiIMVQz5UZDvUTZf6oq1sDROgeLmyQ8d3ahUkSu13qhEruIkpgAOTYpPDYCCorCtMewDOMftdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=suz/IOsPLb+vmsG+JGw45/FMISCdznfGib+wsKbhAxQ=;
+ b=uIiMi1I3gtO21mSdxxoYBofUgS0hyMtTQMUv74Mmy84x+Tzcapg7QKO16EmLpapKmdlAH6DExosKvekzC+FeF0Oj4niku7IdS9sOZRjtMTtSPuxQcGB/HmatYgtXBPo/y44EW744j0SdrtOpfzP457+PhpDekUCTeyYRT+sCIithZsA5QALzxJr34Ojg9t729Ee5WS7rI+aBT4jraEig7Q/jzo6+SMMh8CFumy3fQnj5x24Y/KiDSf8VMlNbImqLiBKbcJwrqebXHZHC8CzPDeoJdQ+UZTvu0r3Pi8TmIPq7bdBO/Eval9kvmwBFOr2bV0I5PXR3EcRU23e5VYFZXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=gmail.com smtp.mailfrom=arri.de; dmarc=fail
+ (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=suz/IOsPLb+vmsG+JGw45/FMISCdznfGib+wsKbhAxQ=;
+ b=guynxk33ZZ2CLtO4Broc8XSwmh/Z6UEYFiBKoEVdRGrUiO41K/+NcrFqy7D0l/CJGOKD/7TfaVjD+KpjBMGkxQ6Qz4buFZDEDH08IgMKcjvRGeQNWBUbWK76YP/mKTh8GUealAHAUiLJdHabxpMEgoSygYyB3oGcSdLm6xRGfiY=
+Received: from DU7P191CA0006.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:54e::34)
+ by DB8PR03MB6219.eurprd03.prod.outlook.com (2603:10a6:10:134::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.26; Tue, 8 Jul
+ 2025 15:07:55 +0000
+Received: from DB1PEPF000509F9.eurprd02.prod.outlook.com
+ (2603:10a6:10:54e:cafe::98) by DU7P191CA0006.outlook.office365.com
+ (2603:10a6:10:54e::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.27 via Frontend Transport; Tue,
+ 8 Jul 2025 15:07:55 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ DB1PEPF000509F9.mail.protection.outlook.com (10.167.242.155) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8901.15 via Frontend Transport; Tue, 8 Jul 2025 15:07:54 +0000
+Received: from n9w6sw14.localnet (10.30.5.30) by mta.arri.de (10.10.18.5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Tue, 8 Jul
+ 2025 17:07:54 +0200
+From: Christian Eggers <ceggers@arri.de>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 01/15] mesh: crypto: remove dead function declaration
+Date: Tue, 8 Jul 2025 17:07:53 +0200
+Message-ID: <4993053.OV4Wx5bFTl@n9w6sw14>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+In-Reply-To: <CABBYNZ+FuqRN7v_bjjHTnJNvj1FM-m7d9BvyVKpsgNrmAAydxA@mail.gmail.com>
+References: <20250708125947.11988-1-ceggers@arri.de>
+ <CABBYNZ+FuqRN7v_bjjHTnJNvj1FM-m7d9BvyVKpsgNrmAAydxA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, alex.gasbarroni@gmail.com
-Subject: RE: Bluetooth: hci_sync: fix connectable extended advertising when using static random address
-In-Reply-To: <20250708141617.3691-2-alex.gasbarroni@gmail.com>
-References: <20250708141617.3691-2-alex.gasbarroni@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509F9:EE_|DB8PR03MB6219:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a4f727f-4e1b-4604-9595-08ddbe31377f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?L0xobWJSRFVBVEJwUlo2UWV6K0FLU3lMdm1aaXFQSXpHNm9PT0RYTW1LSnlm?=
+ =?utf-8?B?U1AybDVsTUo2Y0VOR0l4UTdkUHUxYmlGV3FraVFnSE1uQ29EOTRIcXk4dmpL?=
+ =?utf-8?B?OTVZWVBwWUlUSnp3Wk5RdmR5MEswZUtPak0xNGhKV0s2L2R1WlIyTXZiUXZq?=
+ =?utf-8?B?N2xEMmZ2T0ZjeXQ5Z0FaQytSMDBpSjhrK0JTTktyQjF3eVdweThkZEhLQ0t4?=
+ =?utf-8?B?TWNlbFhnRGtOYVBCNDBuN0luUGpURGFIdzR6QzNEUHdjV2k1bFpab1YvYjIv?=
+ =?utf-8?B?VDFhbTY0NGJSc2NNaWNEMWhSRjdGT2RTWnExZzdtd1pMbnpaMWh3akZRMzkw?=
+ =?utf-8?B?WmpNRDVwRGhzYTVxL1JRNEZ6QXpyRUxKWVJBTjJWNGFCcWszemdqcVFNc2pW?=
+ =?utf-8?B?K3VJVUViRlA4Q3hMNWdTeTI4R1JGQkg5WEdaTFhXdS9hOWduUGJXUkxwc2Np?=
+ =?utf-8?B?NERxaVZhVnJPdFV1SjVrTGRTK1lRVGNueGlqSzI4YVBLSEZXSFNSRkJscWpp?=
+ =?utf-8?B?YUpCbEd1cHJ3VU1ROFIzTU5QQkV1dkZIcjd4dWY4Qmlac1FJWmRQWlpINXhj?=
+ =?utf-8?B?dktVYUlLNlFreUxDdjQzd0JZalpCVmZBVS80WEwrSGVSTnRIZzIrYTQwTENu?=
+ =?utf-8?B?cis5SUt6L3VKV21RODhhYUlZYy9uUUg3dldPUEVrc3ZBRVZOd2EzMmJSY1RV?=
+ =?utf-8?B?ZnJseTAyUlRCcmthMVZxVDdydlFtY1BrbHkyVkRwMU0vamIxNmd6eHRabHQz?=
+ =?utf-8?B?S0VWSTdibWdoVWZuanp4ZlAxZEJTVjV4RmJPd05mOTE3Sy9YQ25TK2NFeVhr?=
+ =?utf-8?B?bkZyTUZFanB2ZDcvWHBTQ0pyYVhja2QxeG5jM3hpMWpEdlBmNDJZSStZWnpV?=
+ =?utf-8?B?ZVl6VUZRUU1UK2JvRXJ2RWM1RHFWYm1uVFdLRVFOSEs1SFBQS1QyL1BlTXU0?=
+ =?utf-8?B?RGZ3YzIwNldwWDgvbVUyNTRjZ1pJRjIvOHloRXlOMHoya2FVNGJmMVROQ0o5?=
+ =?utf-8?B?cDc4WjRld2tGTytHSGVIR1V6SDhCZkJqNXlha0FKejJzZUhpdE5OdkZVK1JC?=
+ =?utf-8?B?NFRhSG9qT21FbGxTTmZESll3UVdPcy9XZTA5Nzdab2gxQW43aDZRbFlrR3JV?=
+ =?utf-8?B?cmptOE9FUVpHTUlVZWxZQ1YyS1BSQ25FakJRcVk0aUhDcnFwelJrRjh1UGY4?=
+ =?utf-8?B?eDFreU9VWkh2VXpFamZaazJ3QmV6TTlkMkpGY1RLL3JCb1dLMW1BVEZKWWIv?=
+ =?utf-8?B?N0RmTWlGNHZMYy9SK1ZSdXhrcndOcXFFdmN3U2V1aUNZNWNpVUdFSGtXYWpa?=
+ =?utf-8?B?M2JhMTFMeFdpK1hpekVKcnY4Q2F2SE05RTZXSVk1RWU5SkpXTFhpSnVwRHRG?=
+ =?utf-8?B?NXVza3FNbEVjUnVRK2N1azAvbjlSQXJkQ2lETy9IS2pmMFhxdnlrWGdZZGJy?=
+ =?utf-8?B?UXBuWUxmNndyMklDRGhyNkpQd294VkVBZi80ZWdINDFXcjB3b2Vqa2dSMWdy?=
+ =?utf-8?B?TWo2ekttbjhxcm81NExRaVh2bzJ6ZG5GeklETUtxVVJnMExzclRqbUMvRlpJ?=
+ =?utf-8?B?RTVSVEJJRUxPb0x3VVBiUVB6R2pISDNNSVZJbk9ycC95NVFGRVlXVXhVU1gv?=
+ =?utf-8?B?V2ZZQ2lHUE9PRGdWMFdIaStiMGQzS2ZPMWdKMVZuWnlsSHF2K1FHdGxrb0hq?=
+ =?utf-8?B?V0JyRncrdFd6eXBjeDQ2blRZSjBDVHhQQVpiVmVqWVlBWGZwdWhhVitiVHYr?=
+ =?utf-8?B?Y3ZuRmR6elF2am9pV04rbWVkcnVpbUlDK1FkNVJpbDNrOEZlem9EZ2N4SmxP?=
+ =?utf-8?B?R2xNVG9ud3pxUUIrZXR2KzAxQnZ1VTRSQSsvRDV6YzZ2RTNBZ3hoRzFPTU9B?=
+ =?utf-8?B?SXhoR1p1SUV4YTBxb2FqV1h6OHUxR0dyTlZHUVd2ejRrV1V0TzRrdUVrRmtv?=
+ =?utf-8?B?NkJMWWk3UGNMaUxuTmsyKytaL3hGNUUrRnF0d1o0SUNySmNuOGs5WTFwNGdH?=
+ =?utf-8?B?Yk5ENk5Jb3BqcE52MDFKT09XcHNpWCsweis3bVN2cW5zTzNvL3kraGlTeVZ2?=
+ =?utf-8?Q?PJW4/L?=
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2025 15:07:54.9540
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a4f727f-4e1b-4604-9595-08ddbe31377f
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509F9.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR03MB6219
 
---===============1079372771920980656==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On Tuesday, 8 July 2025, 16:59:20 CEST, Luiz Augusto von Dentz wrote:
+> Hi Christian,
+>=20
+> On Tue, Jul 8, 2025 at 9:15=E2=80=AFAM Christian Eggers <ceggers@arri.de>=
+ wrote:
+> >
+> > The implementation of mesh_aes_ecb_one() has been removed in commit
+> > dfed4839463f ("mesh: Convert crypto to use ELL wrappers").
+> > ---
+> >  mesh/crypto.h | 2 --
+> >  1 file changed, 2 deletions(-)
+> >
+> > diff --git a/mesh/crypto.h b/mesh/crypto.h
+> > index 55789886eb0e..3d85785f174c 100644
+> > --- a/mesh/crypto.h
+> > +++ b/mesh/crypto.h
+> > @@ -22,8 +22,6 @@ bool mesh_crypto_aes_ccm_decrypt(const uint8_t nonce[=
+13], const uint8_t key[16],
+> >                                 const void *enc_msg, uint16_t enc_msg_l=
+en,
+> >                                 void *out_msg,
+> >                                 void *out_mic, size_t mic_size);
+> > -bool mesh_aes_ecb_one(const uint8_t key[16],
+> > -                       const uint8_t plaintext[16], uint8_t encrypted[=
+16]);
+> >  bool mesh_crypto_nkik(const uint8_t network_key[16], uint8_t identity_=
+key[16]);
+> >  bool mesh_crypto_nkbk(const uint8_t network_key[16], uint8_t beacon_ke=
+y[16]);
+> >  bool mesh_crypto_nkpk(const uint8_t network_key[16], uint8_t private_k=
+ey[16]);
+> > --
+> > 2.43.0
+>=20
+> Is this set just a cleanup, no logical changes were made? In that case
+> I can probably go ahead and push it myself, otherwise I may ask Brian
+> to step in to review.
+sorry for not adding a cover letter.
 
-Dear submitter,
+Most of the patches only cleanup obsolete function prototypes or unused str=
+ucts.
+Patch #5 fixes a NULL pointer dereference (I think it's trivial), whilst=20
+patch #10 replaces some magic number by preprocessor definitions.=20
+Patches #14 + #15 try to improve readability.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=980080
+I considered CC'ing Brian, but I decided using this limited time for more=20
+important stuff (I hope he can do the initial review of my MESH-GATT RFC
+this week).
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.28 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      23.92 seconds
-CheckAllWarning               PASS      26.39 seconds
-CheckSparse                   PASS      29.64 seconds
-BuildKernel32                 PASS      23.89 seconds
-TestRunnerSetup               PASS      466.10 seconds
-TestRunner_l2cap-tester       PASS      24.91 seconds
-TestRunner_iso-tester         PASS      40.61 seconds
-TestRunner_bnep-tester        PASS      5.94 seconds
-TestRunner_mgmt-tester        PASS      129.85 seconds
-TestRunner_rfcomm-tester      PASS      9.27 seconds
-TestRunner_sco-tester         PASS      14.62 seconds
-TestRunner_ioctl-tester       PASS      10.01 seconds
-TestRunner_mesh-tester        FAIL      11.97 seconds
-TestRunner_smp-tester         PASS      8.53 seconds
-TestRunner_userchan-tester    PASS      6.12 seconds
-IncrementalBuild              PENDING   0.51 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.164 seconds
-Mesh - Send cancel - 2                               Timed out    1.997 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+regards,
+Christian
+>=20
+> >
+>=20
+>=20
+>=20
 
 
 
----
-Regards,
-Linux Bluetooth
 
-
---===============1079372771920980656==--
