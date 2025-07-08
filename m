@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3282D949E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41962D94AA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751973081; cv=none; b=f3zU+4Xb6zkfTO0Ft2VEN+B+HJsbX6eMp/sKYw/37Dl2eVyqVqFBUswikaD7iKr3V2koELYoPTP8XsForMt0kJZJWZQbivnlRNckOwNj302Gm8wQ3oE3cMENRsXJCbhw6bj7FnRXT4MWhnR+hwiNblOuxXgpbtHC+gT7D64QyNY=
+	t=1751973084; cv=none; b=P+D5KRAQwgiqfeMciM+njF8u+MPPGblYFbmob+f/7iKvxV5b8rPgKhQ/L2LvsvjaHlXduDttyYAUZ0Lt2lpsMjwOVT9k1Et2NanYr9jmh/CCY3a7od4NtquUOEEnCPzGxCG3l+rwHuWLlTIt/VaZRFW5o2CRhZ4WjNNHPyFlhaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751973081; c=relaxed/simple;
-	bh=8Pesve9VEDXIZW/SxkmIPGwFKDjasjkHMlSiYTY9hMA=;
+	s=arc-20240116; t=1751973084; c=relaxed/simple;
+	bh=7nxr+AXst2+eymyoT6/Ayr/fWJKv747gwWuud4TLjtw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TsA6R77aCd7UsVZdhzZOtJndpqDL8qIZpbyikSAhWEk5PTqf0j51Vvtf5mfaVs2aEjigwD89X5dCD0TOFUyEt1cX3DASMegdADuHQwk3pCgOkUnUKOXoP2uRUC2lq3AvJVdlW8fR0ntx0xxFrEEqA4swvlcuMt58ZjnBILvop2A=
+	 MIME-Version:Content-Type; b=XKPP8ZhaNr+4xzeezNFsn/lNhs1efJz9m39LdCyYErHRH5M8KRUgcTEx+j3xL4uRi67eXWthGTb9+hcxVCnkpTMbh1leVAFQNgZgnHQKy9xRjkD1CZduliWMDSTnXxtVyv+E9kZ8N7/4wJWDmobSU69rQPZM47wwIPUFjIHwTJA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 8 Jul
- 2025 14:11:14 +0300
+ 2025 14:11:15 +0300
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ v2 04/11] isotest: close fd after sending when nconn=1
-Date: Tue, 8 Jul 2025 14:09:02 +0300
-Message-ID: <20250708110909.2626286-5-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ v2 05/11] obexd/client: fix err condition causing memleak
+Date: Tue, 8 Jul 2025 14:09:03 +0300
+Message-ID: <20250708110909.2626286-6-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250708110909.2626286-1-i.iskakov@omp.ru>
 References: <20250708110909.2626286-1-i.iskakov@omp.ru>
@@ -70,23 +70,24 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+transfer_open returns 0 if an error occurs, condition corrected.
 ---
- tools/isotest.c | 2 ++
- 1 file changed, 2 insertions(+)
+ obexd/client/transfer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/isotest.c b/tools/isotest.c
-index 2cac0e49c..0ced19a9e 100644
---- a/tools/isotest.c
-+++ b/tools/isotest.c
-@@ -973,6 +973,8 @@ static void send_mode(char *filename, char *peer, int i, bool repeat)
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index a7d00896f..b078c1f6c 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -556,7 +556,7 @@ struct obc_transfer *obc_transfer_get(const char *type, const char *name,
+ 	transfer = obc_transfer_create(G_OBEX_OP_GET, filename, name, type);
+ 
+ 	perr = transfer_open(transfer, O_WRONLY | O_CREAT | O_TRUNC, 0600, err);
+-	if (perr < 0) {
++	if (perr == FALSE) {
+ 		obc_transfer_free(transfer);
+ 		return NULL;
  	}
- 
- 	do_send(sk, fd, peer, repeat);
-+	if (fd >= 0)
-+		close(fd);
- }
- 
- static void reconnect_mode(char *peer)
 -- 
 2.34.1
 
