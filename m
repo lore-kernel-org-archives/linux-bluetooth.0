@@ -1,16 +1,16 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5F32D9784
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7F72D8DCA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751973093; cv=none; b=Gv2dOzEcDiABb8mfL3H7gKxtsqBtlNXhBkJlpYUHK8Ftkv26qJwaQQespte/ynkGvy8XEEEUgu1iNVBTMQBROYEPOkxTXwi3HSyv050Yn9VbFas7A+CS//uByX329YSHIAAt+SitE2Kktg5Vhzegt95F9tXTokSScDzkXL8ao/Q=
+	t=1751973095; cv=none; b=VsFvuFZBweeFzaFVK0xj5ReEYH4rTz3BpD50DTPINSVpGADpNLep2jyB131XPEGnAFKmTzf96yP90khmkIGThAyUSMDy702L0oQZTEARHjCZvy9cdtLbn48DBtrChsOcjO1yfWlvH3Bl4aPyQ+xit6R86YMW/qJ3ZNjgYisNevo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751973093; c=relaxed/simple;
-	bh=2PYIXhGC9ubzfYpw4eYnpSTcB/jnzJPCUfaJjhueYh0=;
+	s=arc-20240116; t=1751973095; c=relaxed/simple;
+	bh=89EJNSYHJ4I0dqx3cOpLPxjtutfhO7Cu1A8nNGLOq80=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XVo5GGKoexgN3rvjlC5N82RWmgV2byyfg9g0yxwZqUMlDz6UUFZbq0eok1LL2EMMuKxTwZjeS3brfBUno5DsjcTBzJhtwMqGvY4L2UalMvdpEFihRCxCptA27qqy0TkxXLlCkIY+0F1nGnZODeaGYSEL28oT9VU6hdHX+5Sqnmk=
+	 MIME-Version:Content-Type; b=Y4pno17dWKRtNHBycNIHLMlMv4RXpmQ8Gq3Twf4/CdHXo8Sdy0T7fjx14Ly8kDxeIuba25AjY6P3VQf+PIOEi8prT3/XbTC3u/2BNsmEMxKEKE8utKj+Si3/PRYWds40rNug+yIqH0dfk63pGBdSq9ZwyhDC1sLo9OvRiuZe/Ec=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
@@ -21,9 +21,9 @@ Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ v2 08/11] src/shared: move null checks before dereferencing
-Date: Tue, 8 Jul 2025 14:09:06 +0300
-Message-ID: <20250708110909.2626286-9-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ v2 09/11] isotest: remove repeating conditions
+Date: Tue, 8 Jul 2025 14:09:07 +0300
+Message-ID: <20250708110909.2626286-10-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250708110909.2626286-1-i.iskakov@omp.ru>
 References: <20250708110909.2626286-1-i.iskakov@omp.ru>
@@ -42,7 +42,7 @@ X-KSE-AntiSpam-Interceptor-Info: scan successful
 X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 07/08/2025 10:58:06
 X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
 X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Rate: 19
 X-KSE-AntiSpam-Info: Lua profiles 194611 [Jul 08 2025]
 X-KSE-AntiSpam-Info: Version: 6.1.1.11
 X-KSE-AntiSpam-Info: Envelope from: i.iskakov@omp.ru
@@ -51,11 +51,17 @@ X-KSE-AntiSpam-Info: LuaCore: 63 0.3.63
 X-KSE-AntiSpam-Info: {rep_avail}
 X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
 X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ dbl.spamhaus.org}
 X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;inp1wst013.omp.ru:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;81.22.207.138:7.1.2
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;inp1wst013.omp.ru:7.1.1;81.22.207.138:7.1.2
 X-KSE-AntiSpam-Info: FromAlignment: s
 X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
-X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
 X-KSE-AntiSpam-Info: Status: not_detected
 X-KSE-AntiSpam-Info: Method: none
 X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
@@ -71,83 +77,26 @@ X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
 ---
- src/shared/bap.c     | 12 ++++++++----
- src/shared/gatt-db.c |  5 ++++-
- 2 files changed, 12 insertions(+), 5 deletions(-)
+ tools/isotest.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 96fca595b..2ddd6e1d1 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2571,11 +2571,13 @@ static uint8_t bap_ucast_io_dir(struct bt_bap_stream *stream)
- static uint8_t bap_bcast_io_dir(struct bt_bap_stream *stream)
- {
- 	uint8_t dir;
--	uint8_t pac_type = bt_bap_pac_get_type(stream->lpac);
-+	uint8_t pac_type;
+diff --git a/tools/isotest.c b/tools/isotest.c
+index 0ced19a9e..924876d35 100644
+--- a/tools/isotest.c
++++ b/tools/isotest.c
+@@ -684,9 +684,9 @@ static void recv_mode(int fd, int sk, char *peer)
  
- 	if (!stream)
- 		return 0x00;
- 
-+	pac_type = bt_bap_pac_get_type(stream->lpac);
+ 			r = recv(sk, buf, data_size, 0);
+ 			if (r < 0) {
+-				if (r < 0)
+-					syslog(LOG_ERR, "Read failed: %s (%d)",
+-							strerror(errno), errno);
++				syslog(LOG_ERR, "Read failed: %s (%d)",
++						strerror(errno), errno);
 +
- 	if (pac_type == BT_BAP_BCAST_SINK)
- 		dir = BT_BAP_BCAST_SOURCE;
- 	else
-@@ -6144,7 +6146,7 @@ static struct bt_bap_stream *bap_bcast_stream_new(struct bt_bap *bap,
- 	struct bt_bap_endpoint *ep = NULL;
- 	struct match_pac match;
+ 				if (errno != ENOTCONN)
+ 					return;
  
--	if (!bap)
-+	if (!bap || !lpac)
- 		return NULL;
- 
- 	if (lpac->type == BT_BAP_BCAST_SOURCE) {
-@@ -6153,7 +6155,7 @@ static struct bt_bap_stream *bap_bcast_stream_new(struct bt_bap *bap,
- 		memset(&match.codec, 0, sizeof(match.codec));
- 
- 		bt_bap_foreach_pac(bap, BT_BAP_BCAST_SINK, match_pac, &match);
--		if ((!match.lpac) || (!lpac))
-+		if (!match.lpac)
- 			return NULL;
- 
- 		lpac = match.lpac;
-@@ -6406,11 +6408,13 @@ unsigned int bt_bap_stream_release(struct bt_bap_stream *stream,
- 					void *user_data)
- {
- 	unsigned int id;
--	struct bt_bap *bap = stream->bap;
-+	struct bt_bap *bap;
- 
- 	if (!stream || !stream->ops || !stream->ops->release)
- 		return 0;
- 
-+	bap = stream->bap;
-+
- 	if (!bt_bap_ref_safe(bap))
- 		return 0;
- 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 8951079be..a4fa8aed9 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1391,12 +1391,15 @@ static void find_by_type(struct gatt_db_attribute *attribute, void *user_data)
- {
- 	struct find_by_type_value_data *search_data = user_data;
- 
-+	if (!attribute)
-+		return;
-+
- 	/* TODO: fix for read-callback based attributes */
- 	if (search_data->value) {
- 		if (search_data->value_len != attribute->value_len)
- 			return;
- 
--		if (!attribute || !attribute->value)
-+		if (!attribute->value)
- 			return;
- 
- 		if (memcmp(attribute->value, search_data->value,
 -- 
 2.34.1
 
