@@ -1,94 +1,219 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02592D9797
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E32E2D3209
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 11:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751973099; cv=none; b=rbUlg4FRl73AHbHoFXcacgX7L8BLQekcmdMhySJhbaQPeUCZdI8/jgmySd1IEsYcFfdpmC3inYp5t5+HdR650lPLje1JRUaE1TcqUq1TBzUOuGWPY2cKhYlZk873XbgruyBrz7T6hZ2ecbIXhpIraL9rWmbJvenMdZcKTtMX+6M=
+	t=1751974146; cv=none; b=HwLLj3ttz+LvfzCvjabrSQkc4PXXXorr4Yb3Khq1UNJdW9vMuHnqp6TiVZNyCFGPA9Q/67bOCotpo23kQ711quOJVQOtfDFDIX+3P4N5LRqfmsLmV1tcY46yN+1BogMH8hb+uwjZvSjh/ZfzlZ5bZffgzxRNLjSIGd6HJeh6GEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751973099; c=relaxed/simple;
-	bh=rLE21kRy1vZN/bH7EJeGp41kr7oj2IDHE2mF5Jit3k4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rUdMiNoD7HLF/hTnbQ3oMWShBsodkEH2NZrSXhogKhr5/agnZ80OqHvWEZViMHsGr/UL1lsxQwzhg10lcRytEbeuXDAY0Wu5vUeNXv0m/XAX8rcv2poVHh+eyaR9VWchesm+y834lbFOMldNc8FmM70nG5k7JI2u6uUYsa4Sx7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 8 Jul
- 2025 14:11:22 +0300
-From: Ismagil Iskakov <i.iskakov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ v2 11/11] src/plugin: fix args order
-Date: Tue, 8 Jul 2025 14:09:09 +0300
-Message-ID: <20250708110909.2626286-12-i.iskakov@omp.ru>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250708110909.2626286-1-i.iskakov@omp.ru>
-References: <20250708110909.2626286-1-i.iskakov@omp.ru>
+	s=arc-20240116; t=1751974146; c=relaxed/simple;
+	bh=9ov/C0EmAsqvkZOWNVxvDGP452QoI7Bi6m5jpPsA9RQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=T0GDBLAa+0VAND1QIvErY6LSVRhnbqcnX/ya3Jv30HgdgWUN/zTQu2IzbTvO1X+Uk9IhjPW+7puCfurfohbdud7dSvmaAZbvuITte3hrG5zf+QnVnXiJsq/pk8041yF6U7abKfd55Vpp/k+FVYS3mbUGR6ZvBr9LiTq4IyTH8z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WVYfjdce; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WVYfjdce"
+Received: from github.com (hubbernetes-node-0321d76.va3-iad.github.net [10.48.206.26])
+	by smtp.github.com (Postfix) with ESMTPA id 7414D4E0261
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 04:29:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751974144;
+	bh=w60cc4G228v9ArF4NEiz4tEp6QLLjWN+AihSlgGM36Y=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=WVYfjdcejcIH2EvDCu+Fvjj5kl9v+txxMJLaUzXJ8UEf+38o+u0drExcQVmBaUzEF
+	 2NqrCDl9gcFKya+KiSz/i06XhYAPX/ikSxgn9BEqfjziPTGJjGULcrT4mCWHb40P3k
+	 xNfEwVI/7gX5jSmILgmEQd9tDKADb6yhcFGr0OHA=
+Date: Tue, 08 Jul 2025 04:29:04 -0700
+From: "github-actions[bot]" <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/980014/000000-039865@github.com>
+Subject: [bluez/bluez] f3f409: btio: fix range validation of security level
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 07/08/2025 10:58:06
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 194611 [Jul 08 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: i.iskakov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 63 0.3.63
- 9cc2b4b18bf16653fda093d2c494e542ac094a39
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;inp1wst013.omp.ru:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;81.22.207.138:7.1.2
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/08/2025 10:59:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/8/2025 7:58:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/980014
+  Home:   https://github.com/bluez/bluez
+  Commit: f3f40966eac14590835f2cda2a3116a5c0d76ed4
+      https://github.com/bluez/bluez/commit/f3f40966eac14590835f2cda2a3116a5c0d76ed4
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M btio/btio.c
+
+  Log Message:
+  -----------
+  btio: fix range validation of security level
+
+Arrays inside l2cap_set_lm/rfcomm_set_lm functions are of size 4,
+but the bounds check allows the value 4 for 'level'.
+
+
+  Commit: c74cb330726075e168d40ed23b08d50710a2c537
+      https://github.com/bluez/bluez/commit/c74cb330726075e168d40ed23b08d50710a2c537
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M profiles/audio/a2dp.c
+    M profiles/audio/avrcp.c
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  profiles/audio: add nullity checks
+
+Cover bass_setup unsuccessful search and btd_device_get_service.
+This change is motivated by the other usages where checks for
+NULL exist.
+
+
+  Commit: bc1b7e183ef596eba018df63ebe37cca8c0d3eaa
+      https://github.com/bluez/bluez/commit/bc1b7e183ef596eba018df63ebe37cca8c0d3eaa
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/vcp.c
+
+  Log Message:
+  -----------
+  src/shared: add nullity checks
+
+Check util_iov_pull_mem where iov len is not verified
+beforehand. Check vcp_get_vcs for NULL.
+These changes are based on other usages where those
+checks exist.
+
+
+  Commit: da6d5cc18a1b7b8aaa03e3b6d22d1e45f2c152b1
+      https://github.com/bluez/bluez/commit/da6d5cc18a1b7b8aaa03e3b6d22d1e45f2c152b1
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M tools/isotest.c
+
+  Log Message:
+  -----------
+  isotest: close fd after sending when nconn=1
+
+
+  Commit: 519a30dc04e0df83a44b50ac9284c51b795df67c
+      https://github.com/bluez/bluez/commit/519a30dc04e0df83a44b50ac9284c51b795df67c
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M obexd/client/transfer.c
+
+  Log Message:
+  -----------
+  obexd/client: fix err condition causing memleak
+
+transfer_open returns 0 if an error occurs, condition corrected.
+
+
+  Commit: 8a932a007b77c1200aebb000cc7fe106c5e98c07
+      https://github.com/bluez/bluez/commit/8a932a007b77c1200aebb000cc7fe106c5e98c07
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  profiles/audio: fix memleak of bt_bap
+
+Make failure branches deallocate memory before leaving.
+
+
+  Commit: 6afb456faa035fa745448224094243d8ec03af1a
+      https://github.com/bluez/bluez/commit/6afb456faa035fa745448224094243d8ec03af1a
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  src/shared: fix memleak
+
+
+  Commit: de8ece1c7a04eb1d3e56eac033bdcbf7ceedfeb5
+      https://github.com/bluez/bluez/commit/de8ece1c7a04eb1d3e56eac033bdcbf7ceedfeb5
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/gatt-db.c
+
+  Log Message:
+  -----------
+  src/shared: move null checks before dereferencing
+
+
+  Commit: 7e54a1903f4088fa5fa903f7e945c02beb48f26c
+      https://github.com/bluez/bluez/commit/7e54a1903f4088fa5fa903f7e945c02beb48f26c
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M tools/isotest.c
+
+  Log Message:
+  -----------
+  isotest: remove repeating conditions
+
+
+  Commit: 3cdf1806dbb2db46e41fdea790df67fdc303257b
+      https://github.com/bluez/bluez/commit/3cdf1806dbb2db46e41fdea790df67fdc303257b
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M profiles/audio/bass.c
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  profiles/audio: fix io_unlink args order
+
+Seems like a breaking bug. Analogous to bt_bap_stream_io_link,
+but there the order is correct.
+
+
+  Commit: 0398652761cfe9a6fa41487c2e890592038bda91
+      https://github.com/bluez/bluez/commit/0398652761cfe9a6fa41487c2e890592038bda91
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/plugin.c
+
+  Log Message:
+  -----------
+  src/plugin: fix args order
 
 According to other functions and arguments usage, the
 case with external_plugin_init seems to be erroneous.
----
- src/plugin.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/plugin.c b/src/plugin.c
-index a566bd2f4..dcdb1b2db 100644
---- a/src/plugin.c
-+++ b/src/plugin.c
-@@ -141,7 +141,7 @@ static gboolean enable_plugin(const char *name, char **cli_enable,
- }
- 
- 
--static void external_plugin_init(char **cli_disabled, char **cli_enabled)
-+static void external_plugin_init(char **cli_enabled, char **cli_disabled)
- {
- 	GDir *dir;
- 	const char *file;
--- 
-2.34.1
 
+Compare: https://github.com/bluez/bluez/compare/f3f40966eac1%5E...0398652761cf
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
