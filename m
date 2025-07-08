@@ -1,86 +1,165 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E08255E34
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CE3E55B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751958526; cv=none; b=Js7DUHDk/flNG9d18l/wwmM1D7UIyJN6PN9pvVXE+3l3YJuLaTDIbMybBkWzWKFbrXQgI6fykpvU4ZEHOQ1yrmzIFSbNunEm+VMtyljIE1ovAVlMaqG5k3veSCArh68de+UnjUpJJwsJT/48kN3pPE2sFFhLCEmQhuBcoH58Sac=
+	t=1751959246; cv=none; b=FTYGKYJIk6t39K6IhIq4aXAijUcpxmp7i/Pg8ctSVVWBeWC5fqE02aBUsfRTkgjDA6wppFIGE5jPcBjqRiqiO2YtJIoRw7Qof236uZ50HltseL+Gt7UFpo8h06ARq+JOo1ZdtuxbLFUHLj8Vl5wrcAgizmvRPz48b5q5DZATCMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751958526; c=relaxed/simple;
-	bh=iKbb/0VhsEjq4xSN3eH9pkLAA+Twkoab/rMPto6+VxA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o2x2aGXSTcskt5RbzFM9HW4+iBQxAX0I7XB50vHjbLzyWb4waaw6KVfsAp5tLWOrbO0qmMOtdHS5CDW+1I59UwEYDU6lV0hQ7ckn1LRPMHrcvwZN4oAzdiSUcc4Oft6N6PeoMYhcfZyRR77qML5IuiEL8PXipkDuczlPdCXqEpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=iiTHUCLn; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1751959246; c=relaxed/simple;
+	bh=/fvEFy9ewa1NU2sevT1dqljB96K9oLhfqCBtu1o4qrA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Kkk0t38KRi5JZOClIiO0sEgyBfbZc0A0dDL70/9p0bVYiE1cga1vILrtmGLZxmijZ2koRjCcVw+CqI6SUOR07cMrNqJ/yMlIzHvbNMrxsOdtN9lVX5Wu3iwvWmCJmCzKHs8OFJGauwDWHz/ujUbN7w0jga9v9ZALszsLD9aQVsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ld6udfmS; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="iiTHUCLn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1751958520;
-	bh=iKbb/0VhsEjq4xSN3eH9pkLAA+Twkoab/rMPto6+VxA=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=iiTHUCLne8u1Gge7JFgrbVRqAg4Bcb6s84A5wlhAyFUBnz6JKGUR1OPf7i58vsbeR
-	 ELU/due6AE7rK1ldxpvUuD1OKmChfQ8htARWIVdnqge4tPWbP6pGshrC+BUvGKjBFP
-	 4nfLdoQEQnOtP/+eRP0FmpRbL9VMXdLKKFfSilWnyZJq+ueEiXNB0Emh//ZQTUdAqB
-	 mLO4dcceArA/8vfH+EeKMJakge9uIo9bOK2/dNXbLTrHaFxJVrJfBgJRFOTBqeWZq/
-	 lWOLZn1j8lpdPJ2pgyE/avUK9Kp9sE35fnRb3X+u0MSDVPIyqqS8+GVTbk2KuyHIIW
-	 UFuXdTRXp0PVw==
-Received: from fdanis-ThinkPad-X1.. (2A02-8428-Af44-1001-A903-AfF7-D14E-7699.rev.sfr.net [IPv6:2a02:8428:af44:1001:a903:aff7:d14e:7699])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2BAB217E11EC
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 09:08:40 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ld6udfmS"
+Received: from github.com (hubbernetes-node-bebdce1.ash1-iad.github.net [10.56.159.38])
+	by smtp.github.com (Postfix) with ESMTPA id C6BB9140165
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 00:20:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751959242;
+	bh=BdPFlTrmrUXeuF955RaxiqWVtQjLRBVUZ+8OFMxLQDI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Ld6udfmSYN1WvdhSx5PgfmLqpvjPHyRhD3LIiLpxO3khIWYS8mj+jGxEDvR6KxW7V
+	 YtKzEjEf1BadPqukzj63LSYcaV3Yrc01sXZTeqrOEo1AW4jAtFgxedQnEBLQD/sgO6
+	 yoYrsm3kSuMbBiXVMTjegKtjY0/kDJWhyS1TDYHw=
+Date: Tue, 08 Jul 2025 00:20:42 -0700
+From: fdanis-oss <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 5/5] eir: Use strtoutf8 for device names
-Date: Tue,  8 Jul 2025 09:08:22 +0200
-Message-ID: <20250708070822.185375-6-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250708070822.185375-1-frederic.danis@collabora.com>
-References: <20250708070822.185375-1-frederic.danis@collabora.com>
+Message-ID: <bluez/bluez/push/refs/heads/979916/000000-1c2af2@github.com>
+Subject: [bluez/bluez] 0590d6: shared/util: Add strtoutf8 function
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/979916
+  Home:   https://github.com/bluez/bluez
+  Commit: 0590d61013a5481bcf93876359e8e7df522ea0e9
+      https://github.com/bluez/bluez/commit/0590d61013a5481bcf93876359e8e=
+7df522ea0e9
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/shared/util.c
+    M src/shared/util.h
+
+  Log Message:
+  -----------
+  shared/util: Add strtoutf8 function
+
+This adds the strtoutf8 function that truncate a string before the
+first non UTF-8 character.
+This truncation is done in place.
+
+
+  Commit: 8074c549df269742300841982c005c070ccc42ba
+      https://github.com/bluez/bluez/commit/8074c549df269742300841982c005=
+c070ccc42ba
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M profiles/audio/avrcp.c
+
+  Log Message:
+  -----------
+  audio/avrcp: Fix crash with invalid UTF-8 item name
+
+As stated in AVRCP 1.6.2 chapter 6.10.2.3 Media element item, for the
+Displayable Name Length property, the target device may truncate the
+item name:
+
+  Length of Displayable Name in octets. The name shall be limited such
+  that a response to a GetFolderItems containing one media player item
+  fits within the maximum size of PDU which can be received by the CT.
+
+This truncatation may occur in the middle of a multi-byte character,
+at least with Samsung Music app, which triggers a DBus assertion and
+crashes bluetoothd:
+
+  profiles/audio/player.c:media_folder_create_item() Din Dhal Jaye
+      Haye with lyrics | "=E0=A4=A6=E0=A4=BF=E0=A4=A8 =E0=A4=A2=E0=A4=B2 =
+=E0=A4=9C=E0=A4=BE=E0=A4=8F
+      =E0=A4=B9=E0=A4=BE=E0=A4=AF" =E0=A4=97=E0=A4=BE=E0=A4=A8=E0=A5=87 =E0=
+=A4=95=E0=A5=87 =E0=A4=AC=E0=A5=8B=EF=BF=BD type audio uid 1
+  profiles/audio/player.c:media_folder_create_item()
+      /org/bluez/hci0/dev_24_24_B7_11_82_6C/player0/NowPlaying/item1
+  profiles/audio/player.c:media_player_set_metadata() Title: Din Dhal
+      Jaye Haye with lyrics | "=E0=A4=A6=E0=A4=BF=E0=A4=A8 =E0=A4=A2=E0=A4=
+=B2 =E0=A4=9C=E0=A4=BE=E0=A4=8F =E0=A4=B9=E0=A4=BE=E0=A4=AF"
+      =E0=A4=97=E0=A4=BE=E0=A4=A8=E0=A5=87 =E0=A4=95=E0=A5=87 =E0=A4=AC=E0=
+=A5=8B=E0=A4=B2 | Guide | Dev Anand, Waheeda Rehman
+  =E2=80=A6
+  arguments to dbus_message_iter_append_basic() were incorrect,
+      assertion "_dbus_check_is_valid_utf8 (*string_p)" failed in
+      file dbus-message.c line 2775.
+  This is normally a bug in some application using the D-Bus library.
+
+
+  Commit: 262d974e1774ca31870186e48800c3b76134828f
+      https://github.com/bluez/bluez/commit/262d974e1774ca31870186e48800c=
+3b76134828f
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M profiles/audio/mcp.c
+
+  Log Message:
+  -----------
+  audio/mcp: Use strtoutf8 for player name and track title
 
 Truncate the string to first character before invalid UTF-8 one
 instead of replacing non ascii characters by spaces.
----
- src/eir.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index 28b09653c..1e1f76952 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -127,19 +127,10 @@ static void eir_parse_uuid128(struct eir_data *eir, const uint8_t *data,
- static char *name2utf8(const uint8_t *name, uint8_t len)
- {
- 	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
--	int i;
--
--	if (g_utf8_validate((const char *) name, len, NULL))
--		return g_strndup((char *) name, len);
- 
- 	memset(utf8_name, 0, sizeof(utf8_name));
- 	strncpy(utf8_name, (char *) name, len);
--
--	/* Assume ASCII, and replace all non-ASCII with spaces */
--	for (i = 0; utf8_name[i] != '\0'; i++) {
--		if (!isascii(utf8_name[i]))
--			utf8_name[i] = ' ';
--	}
-+	strtoutf8(utf8_name, len);
- 
- 	/* Remove leading and trailing whitespace characters */
- 	g_strstrip(utf8_name);
--- 
-2.43.0
 
+  Commit: 0233c9bb284bdc2e8dd93e21df0b612a1baa894a
+      https://github.com/bluez/bluez/commit/0233c9bb284bdc2e8dd93e21df0b6=
+12a1baa894a
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M profiles/gap/gas.c
+
+  Log Message:
+  -----------
+  audio/gap: Use strtoutf8 for GAP device name
+
+Truncate the string to first character before invalid UTF-8 one
+instead of replacing non ascii characters by spaces.
+
+
+  Commit: 1c2af2b9c6da05f52d36663ec0aa314a96bb24e1
+      https://github.com/bluez/bluez/commit/1c2af2b9c6da05f52d36663ec0aa3=
+14a96bb24e1
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/eir.c
+
+  Log Message:
+  -----------
+  eir: Use strtoutf8 for device names
+
+Truncate the string to first character before invalid UTF-8 one
+instead of replacing non ascii characters by spaces.
+
+
+Compare: https://github.com/bluez/bluez/compare/0590d61013a5%5E...1c2af2b=
+9c6da
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
