@@ -1,105 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE9820766C
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 14:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714E22E266B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751986785; cv=none; b=rKpBXTIccOvG7VOP11x0pJh6BR72xUZoF7fvccsiPOaukvMIiBqXlYZS2Eil5cIPtCNNNkx/VKVOoqvfOivAbuBu9+LugMM+5Q+/ya4w8YkXdX6nix9MA6duOPl8PGCAkZNAoedFtk5Bn0f2rVT5J1ueWtGeivGdUEzn9GDjrgg=
+	t=1751986831; cv=none; b=G/n2fFEuPVK4zQoTLaKyd5ahIi0N/FQOo3rORJwGG/i06ujviMhT9qCNSKGkfRIY0Rj2CDTmF/+3GA72mgkfzSSF0SSKbd8tNGMt3L4KYDOrZTjpBQ52MNAdYvygEKccvJxWwJmQJRya3XhHw/P7Xc5a6t4uPKJ+Q8kmChWbeX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751986785; c=relaxed/simple;
-	bh=3ljWh/G8TSySe8NLlHi4mOR7Du/zrsdD4SbRPQkGyb4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tHAiFsC+LOZt385dXYZaJ5RvUuVGWX0O8jvyrpaPlHMhTLtXmyJpwViPDYYdpGExhdWmbmf0vYFnVe+S2zzojHrNVHeNtluG4440GSleEC9vla8Jca3c0ARGqpANDaAeYuSDPxouL67Yo/FkKqw8+paDxjUefoh+coYmqJciEIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1WrgIYd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751986831; c=relaxed/simple;
+	bh=7Xn4rwM2IAApKqTp8grkUYQL9uNKSWcQTi1SSMizwwg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=oUSgDWoUsnVFDHoNRw1Zp9oW99MzzDjeSlc0HzOMhOZj1bK4frDwZiLNadv5gf4ThJfE2GxkfZ7Eygma68ol7miYaNikOkTod9/7UFJlWdR5Ow397ac0t8wfWkr6xRJCawWoQPqVT25qmB+/0Ln/r028D2wEw0pt8fzSHP4ftds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Zr0aQs8v; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1WrgIYd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D66A4C4CEF0;
-	Tue,  8 Jul 2025 14:59:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751986784;
-	bh=3ljWh/G8TSySe8NLlHi4mOR7Du/zrsdD4SbRPQkGyb4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y1WrgIYdqXXcIWz8yjTv5yQlH4uWVkEusDsuY5yOR8SdjNvZ0xLel+NserhrSv/0t
-	 TC/fJzO+OF2C3Y97jSXrz7R5o6XwNCcYR/ST6Vow6IeGTZDtf+8H2YUvDUwiWYucfu
-	 p/AfOrclRiB3B1penQLkcfOslMiAup4X+3PIdmeAKi39HFQp+Yjr+orKvopTpve/Lg
-	 wcCxgMctte7PVYqzrq9JhNamCJCjBnGFJaeE0LsU+8v19ltCAGKz4Ndm+H0vaYN4cS
-	 AO3D0RHZyTxsdzvj1Fw8uX8j2mFT9jz+gNOzwRLgTdA4aoJm6/h9z0GQgMZoI7hMZ7
-	 vc35DB8javUNQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBDF4380DBEE;
-	Tue,  8 Jul 2025 15:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Zr0aQs8v"
+Received: from github.com (hubbernetes-node-eb75fd8.ash1-iad.github.net [10.56.200.80])
+	by smtp.github.com (Postfix) with ESMTPA id 7221292166C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 08:00:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751986829;
+	bh=zA1TtUPZUhntUatsIZ11dBjwXhhsO5oltm0pAWgFOF0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Zr0aQs8vbJLGMQo5e4LvYBPr0tTDdi0j8xgBhp7cLSxg8HfNU+c4U4nzR5xOMkXyo
+	 O0WAKnePFsaD/0BqsWykvKaSmfM+L/inkOTAQAgiK3C447oqGMsZZYpZH822JW1FNe
+	 PrKYZh7SRdU07XJfjo5waZuiG5J3DVuHME1JZXGg=
+Date: Tue, 08 Jul 2025 08:00:29 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/a5d517-a7e074@github.com>
+Subject: [bluez/bluez] c1d4c4: bap: fix memleak of bt_bap
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 00/11] Fix bugs found by static analysis
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175198680674.4096274.6120139061940819347.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Jul 2025 15:00:06 +0000
-References: <20250708110909.2626286-1-i.iskakov@omp.ru>
-In-Reply-To: <20250708110909.2626286-1-i.iskakov@omp.ru>
-To: Ismagil Iskakov <i.iskakov@omp.ru>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c1d4c478c40d659f1b76bb7c38034dc161528e3d
+      https://github.com/bluez/bluez/commit/c1d4c478c40d659f1b76bb7c38034dc161528e3d
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/bap.c
 
-On Tue, 8 Jul 2025 14:08:58 +0300 you wrote:
-> This patch corrects some of the bugs not connected
-> to the functionality but to memory management etc.
-> Two exceptions being about fixing the arguments
-> order, which also could've caused some trouble.
-> 
-> Ismagil Iskakov (11):
->   btio: fix range validation of security level
->   profiles/audio: add nullity checks
->   src/shared: add nullity checks
->   isotest: close fd after sending when nconn=1
->   obexd/client: fix err condition causing memleak
->   profiles/audio: fix memleak of bt_bap
->   src/shared: fix memleak
->   src/shared: move null checks before dereferencing
->   isotest: remove repeating conditions
->   profiles/audio: fix io_unlink args order
->   src/plugin: fix args order
-> 
-> [...]
+  Log Message:
+  -----------
+  bap: fix memleak of bt_bap
 
-Here is the summary with links:
-  - [BlueZ,v2,01/11] btio: fix range validation of security level
-    (no matching commit)
-  - [BlueZ,v2,02/11] profiles/audio: add nullity checks
-    (no matching commit)
-  - [BlueZ,v2,03/11] src/shared: add nullity checks
-    (no matching commit)
-  - [BlueZ,v2,04/11] isotest: close fd after sending when nconn=1
-    (no matching commit)
-  - [BlueZ,v2,05/11] obexd/client: fix err condition causing memleak
-    (no matching commit)
-  - [BlueZ,v2,06/11] profiles/audio: fix memleak of bt_bap
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c1d4c478c40d
-  - [BlueZ,v2,07/11] src/shared: fix memleak
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f6dcd1d2bd71
-  - [BlueZ,v2,08/11] src/shared: move null checks before dereferencing
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=47ffe6086f37
-  - [BlueZ,v2,09/11] isotest: remove repeating conditions
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a2d7be18ace6
-  - [BlueZ,v2,10/11] profiles/audio: fix io_unlink args order
-    (no matching commit)
-  - [BlueZ,v2,11/11] src/plugin: fix args order
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a7e0747e21de
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Make failure branches deallocate memory before leaving.
 
 
+  Commit: f6dcd1d2bd71ee8c128673241ff5771d364ba732
+      https://github.com/bluez/bluez/commit/f6dcd1d2bd71ee8c128673241ff5771d364ba732
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: fix memleak
+
+
+  Commit: 47ffe6086f371f023aec4200178f6f1eaa6363f2
+      https://github.com/bluez/bluez/commit/47ffe6086f371f023aec4200178f6f1eaa6363f2
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/gatt-db.c
+
+  Log Message:
+  -----------
+  src/shared: move null checks before dereferencing
+
+
+  Commit: a2d7be18ace6a4721d89511a68f4aaed9962dd6f
+      https://github.com/bluez/bluez/commit/a2d7be18ace6a4721d89511a68f4aaed9962dd6f
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M tools/isotest.c
+
+  Log Message:
+  -----------
+  isotest: remove repeating conditions
+
+
+  Commit: a7e0747e21de73b604e87f6b26355b0781469eb1
+      https://github.com/bluez/bluez/commit/a7e0747e21de73b604e87f6b26355b0781469eb1
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M src/plugin.c
+
+  Log Message:
+  -----------
+  plugin: fix args order
+
+According to other functions and arguments usage, the
+case with external_plugin_init seems to be erroneous.
+
+
+Compare: https://github.com/bluez/bluez/compare/a5d517dd4134...a7e0747e21de
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
