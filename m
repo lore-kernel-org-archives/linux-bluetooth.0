@@ -1,219 +1,215 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F7429B776
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E2A298983
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751960726; cv=none; b=k1tDMlwuMJ/sr+L+tFVsvI/FQb9SxaIdFKY346/6/hakv/uxo5vWkWCaSh+rxFy7Tv9L6uvn//R63F2VNwdHh11dTCvzjKIC1x1DIdLsBxNniF71pKjj/3pL9P/y5Y4SO9dfLczkcuRYdD69tdBbT5oaG8YKd+Rr5Jwlqsj7Lvk=
+	t=1751961081; cv=none; b=pNgaqCJrh4max5dcfpdj3NXTiz8cJLa1jvPoT16e4krtbUU+nsCJnZYI8rBU7f5wiFt0iKEO4uAVzpRGEsIQG6YJh1etmefM2HvWFlAg2OsX/y6Qq5Pgi4vf2vFh3XhuhYidfnhHEIe9y/AAjCfyOw5aBOqvANMhBGPuITdWw00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751960726; c=relaxed/simple;
-	bh=CpUzSzpswSYpthkYODABThKe0xhC5sdK9HioDbgE1Tw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=czpjtljAJyujb8V76/sOJ4stoPJ1sJqDDHN0FcIyK03RyxQddj6D7JFF12oopjHpvKSOXqyU1gZtO/TGhNlnF42+A3HWejarDMYUJi9jpuDYCRl5katr8wB+ScjWWOY+nDo69KgttvAjJ1tBxvnREwC8kEcHxJwpNcFB5fwaBdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KnBCa541; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1751961081; c=relaxed/simple;
+	bh=X62au1xsTiOpeWpQKh1JdvypmzDrjmHdQbFVX2zUSbA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=YXM22lMEga6GaeJoLJ+lEWy8w2YUD/0HXMpBxotKUVC80mF0sH71CIZ261FVZJjHLIjc0e+SJbCpZmOz4AagLZvCHuzG5koVM3cqaOkvBtzwn87SgKPJkxFyT/9cdYi1E/g/W9VwEOoxj1+FkT4xg+pM4DHeVB2/dCw8Apw/F/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nHSl7RF/; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KnBCa541"
-Received: from github.com (hubbernetes-node-75b5bb6.ac4-iad.github.net [10.52.183.49])
-	by smtp.github.com (Postfix) with ESMTPA id 9A937640299
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 00:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1751960723;
-	bh=WDPYxfEOrxJrt5wdPHWOmwSs0faz5qp7V6LIEIJiNNA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=KnBCa541qoNoOpGbiLZjkQxJw9/8G3ZeOTQPyHzLzyAIHPLoEOEBCuGUACB5YTAIv
-	 4gjI2Q+CWheJWftahuXHjQk9poh3VXK1iPizt04wwbG2KCAljg0d3Q93biMWDvPZwZ
-	 kbCKZcsZ3by1Td9ri/BHuGn/6cwCY3+s2ih+wOAk=
-Date: Tue, 08 Jul 2025 00:45:23 -0700
-From: "github-actions[bot]" <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/979927/000000-c74271@github.com>
-Subject: [bluez/bluez] d925af: btio: fix range validation of security level
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHSl7RF/"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7d95b08634fso90038385a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 00:51:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751961079; x=1752565879; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=X62au1xsTiOpeWpQKh1JdvypmzDrjmHdQbFVX2zUSbA=;
+        b=nHSl7RF/oOeIgduqEpnk4TvC5N36nivy7CRQNVeGthax60qKqAOtMluiWT+468A7Uv
+         Ezi24ZZY6TWsxe2OX2aAHRXaYPflEKVz48kWQR9OE4k+3Jowt0AIbsoyKXkJ23W/HoIL
+         8RSeEyDUbDcRozq5B52ov0x+mLVzfPqt6Hp+3iUGs/M1uRht1zUwUCKRyt5/fAHMm5lI
+         utI9pvplJvwZggcAhXyJQ1iP9haNqwX+Y7YVpXES4Am+vNujK663f/9QhQuZvr+5C/y8
+         rW+JYIf+ZCkwhgzFq0beEIUn5vA9ab2/qxiNygoQIO6KPxxigOgvmuvmyVygPkT8Ccci
+         BFfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751961079; x=1752565879;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X62au1xsTiOpeWpQKh1JdvypmzDrjmHdQbFVX2zUSbA=;
+        b=R1RIXJ+8OKMBt+bSKZ1BFy/AGLcWV+xKU4EWNiQW8G/8/IEWVezjxUfEWjTW5HllFb
+         9TtkLiDz8bbLA28eKMLzHm6GaL4qRi95A1kdOQmz8mf/MzUAPc7xTYWlNPNwJ92dBG3I
+         PYhZjQip6Z6BlxbMcj6UrbHDWgi423KXLy1ByibF7Q8pRwyD0JlbKOLU8QBPgOm+VLSN
+         4wcdmC5J/LYe8u8RWRAiogzQDj7Deagq5AjSq3iXpPjH0G9Vkhk5GFGdWbka4J3PBM8j
+         3910NaAnq6+/zGHnQrBw+dFKr/qPZG/tujg9oXMNdT6XRH1mNRVqEvJ5Nb8b30c2iN71
+         Kwbw==
+X-Gm-Message-State: AOJu0YxtMxVvGorhr/2yhkcl1SA2YaY6a4i0C44N2g5lw0Zjh/Bs2F9i
+	yVG75x7NmE3rfxmSBS7nuSAPa4TvUEQS2kfr58s+ogZE39exG0GmbSSguWEIl/GN
+X-Gm-Gg: ASbGnctT1/6QOVH+0IXuAzj/w1FR5dm0SccrS/39vrD2jSzN4v+lL1a8LqxsYu1gol6
+	bABofwNt5/DG/j33eLbM1WsyN0sIBEMi+6dz5QJhYGi6pj54GgTTGQKdOKyRxaPdDVcBfNRo1ri
+	giQJQxNXO9TwY64JaKKp0k5hXRpbUsivgfhqlelps+itZ8sTQQm9YV2HXx9wCv+NIb3h+f6kUd+
+	VXz15V4e2/Zx7KbvaxTb/+Oc5sMTP2LVNXrVGNQZrHh+8zmJfwEdlX0PObHZAQ1yQ91RQ5G+bTy
+	SgXvMf1I6kU4MHLLJIc5yHDMboaMW6bqULds0Bl2HsofhgcKrG4gLVSZ53GbFQepBVxKNA==
+X-Google-Smtp-Source: AGHT+IGo0jvl/1SCA+K29Iw9YxgG14NLPEU9TzU8ouZvdYcpm0nX/XCCBbaAZ52Xte6zI4P7a/pFKw==
+X-Received: by 2002:a05:6214:234f:b0:702:bd47:c83b with SMTP id 6a1803df08f44-702c8cfd274mr258730216d6.45.1751961078429;
+        Tue, 08 Jul 2025 00:51:18 -0700 (PDT)
+Received: from [172.17.0.2] ([172.190.226.41])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d60365sm72627726d6.110.2025.07.08.00.51.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 00:51:18 -0700 (PDT)
+Message-ID: <686ccdf6.050a0220.2dcd85.89da@mx.google.com>
+Date: Tue, 08 Jul 2025 00:51:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4927180385236888403=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, i.iskakov@omp.ru
+Subject: RE: Fix bugs found by static analysis
+In-Reply-To: <20250708073334.2393559-2-i.iskakov@omp.ru>
+References: <20250708073334.2393559-2-i.iskakov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/979927
-  Home:   https://github.com/bluez/bluez
-  Commit: d925aff1485cf33d60557efd44b3db45b2f84241
-      https://github.com/bluez/bluez/commit/d925aff1485cf33d60557efd44b3db45b2f84241
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
+--===============4927180385236888403==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-  Changed paths:
-    M btio/btio.c
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTc5OTI3CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQRU5ESU5HICAgMC4yMSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
+TkRJTkcgICAwLjI4IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDIwLjQ2IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDE5LjA0IHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDMz
+LjQzIHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE4Mi4z
+MSBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNS43MCBz
+ZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyMi4yMCBzZWNv
+bmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICAxMy4xMCBzZWNvbmRz
+CkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBFTkRJTkcgICAwLjI0IHNlY29uZHMKU2Nh
+bkJ1aWxkICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDIyLjY0IHNlY29uZHMKCkRldGFp
+bHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrUGF0Y2ggLSBQRU5E
+SU5HCkRlc2M6IFJ1biBjaGVja3BhdGNoLnBsIHNjcmlwdApPdXRwdXQ6CgojIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0TGludCAtIFBFTkRJTkcKRGVzYzogUnVuIGdpdGxp
+bnQKT3V0cHV0OgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJsdWV6TWFr
+ZSAtIEZBSUwKRGVzYzogQnVpbGQgQmx1ZVoKT3V0cHV0OgoKc3JjL3NoYXJlZC9iYXAuYzogSW4g
+ZnVuY3Rpb24g4oCYYmFwX2JjYXN0X2lvX2RpcuKAmToKc3JjL3NoYXJlZC9iYXAuYzoyNjEyOjI6
+IGVycm9yOiBJU08gQzkwIGZvcmJpZHMgbWl4ZWQgZGVjbGFyYXRpb25zIGFuZCBjb2RlIFstV2Vy
+cm9yPWRlY2xhcmF0aW9uLWFmdGVyLXN0YXRlbWVudF0KIDI2MTIgfCAgdWludDhfdCBkaXI7CiAg
+ICAgIHwgIF5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMK
+bWFrZVsxXTogKioqIFtNYWtlZmlsZTo3NDY5OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9v
+cF9sYS1iYXAubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQg
+am9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0MDMwOiBhbGxdIEVycm9yIDIKIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVjayAtIEZBSUwKRGVzYzogUnVuIEJs
+dWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKc3JjL3NoYXJlZC9iYXAuYzogSW4gZnVuY3Rpb24g4oCY
+YmFwX2JjYXN0X2lvX2RpcuKAmToKc3JjL3NoYXJlZC9iYXAuYzoyNjEyOjI6IGVycm9yOiBJU08g
+QzkwIGZvcmJpZHMgbWl4ZWQgZGVjbGFyYXRpb25zIGFuZCBjb2RlIFstV2Vycm9yPWRlY2xhcmF0
+aW9uLWFmdGVyLXN0YXRlbWVudF0KIDI2MTIgfCAgdWludDhfdCBkaXI7CiAgICAgIHwgIF5+fn5+
+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioq
+IFtNYWtlZmlsZTo3MjI0OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9nbGliX2xhLWJhcC5sb10gRXJy
+b3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjEwNDM1OiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVu
+IEJsdWV6IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6CgpzcmMvc2hhcmVkL2JhcC5j
+OiBJbiBmdW5jdGlvbiDigJhiYXBfYmNhc3RfaW9fZGly4oCZOgpzcmMvc2hhcmVkL2JhcC5jOjI2
+MTI6MjogZXJyb3I6IElTTyBDOTAgZm9yYmlkcyBtaXhlZCBkZWNsYXJhdGlvbnMgYW5kIGNvZGUg
+Wy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0ZXItc3RhdGVtZW50XQogMjYxMiB8ICB1aW50OF90IGRp
+cjsKICAgICAgfCAgXn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVy
+cm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc0Njk6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21h
+aW5sb29wX2xhLWJhcC5sb10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5p
+c2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2VmaWxlOjEwNDM1OiBjaGVja10gRXJyb3IgMgoj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tTbWF0Y2ggLSBGQUlMCkRl
+c2M6IFJ1biBzbWF0Y2ggdG9vbCB3aXRoIHNvdXJjZQpPdXRwdXQ6CgpzcmMvc2hhcmVkL2NyeXB0
+by5jOjI3MToyMTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9z
+aGFyZWQvY3J5cHRvLmM6MjcyOjIzOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMg
+dXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo3Njg6MzE6IHdhcm5pbmc6IFZhcmlhYmxl
+IGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjgzMDozMTog
+d2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1o
+ZWxwZXJzLmM6MTMyMzozMTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQu
+CnNyYy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6MTM1NDoyMzogd2FybmluZzogVmFyaWFibGUgbGVu
+Z3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1zZXJ2ZXIuYzoyNzg6MjU6IHdhcm5p
+bmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2VydmVy
+LmM6NjE4OjI1OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3No
+YXJlZC9nYXR0LXNlcnZlci5jOjcxNjoyNTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5
+IGlzIHVzZWQuCnNyYy9zaGFyZWQvYmFwLmM6MjYxMjo5OiB3YXJuaW5nOiBtaXhpbmcgZGVjbGFy
+YXRpb25zIGFuZCBjb2RlCnNyYy9zaGFyZWQvYmFwLmM6MzE3OjI1OiB3YXJuaW5nOiBhcnJheSBv
+ZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCnNyYy9zaGFyZWQvYmFwLmM6IG5vdGU6IGluIGluY2x1ZGVk
+IGZpbGU6Ci4vc3JjL3NoYXJlZC9hc2NzLmg6ODg6MjU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhp
+YmxlIHN0cnVjdHVyZXMKc3JjL3NoYXJlZC9zaGVsbC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxl
+ICh0aHJvdWdoIC91c3IvaW5jbHVkZS9yZWFkbGluZS9yZWFkbGluZS5oKToKL3Vzci9pbmNsdWRl
+L3JlYWRsaW5lL3JsdHlwZWRlZnMuaDozNToyMzogd2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24g
+ZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ0Z1bmN0aW9uJwovdXNyL2luY2x1ZGUvcmVhZGxpbmUv
+cmx0eXBlZGVmcy5oOjM2OjI1OiB3YXJuaW5nOiBub24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlv
+biBvZiBmdW5jdGlvbiAnVkZ1bmN0aW9uJwovdXNyL2luY2x1ZGUvcmVhZGxpbmUvcmx0eXBlZGVm
+cy5oOjM3OjI3OiB3YXJuaW5nOiBub24tQU5TSSBmdW5jdGlvbiBkZWNsYXJhdGlvbiBvZiBmdW5j
+dGlvbiAnQ1BGdW5jdGlvbicKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMuaDozODoy
+OTogd2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ0NQ
+UEZ1bmN0aW9uJwpzcmMvc2hhcmVkL2JhcC5jOiBJbiBmdW5jdGlvbiDigJhiYXBfYmNhc3RfaW9f
+ZGly4oCZOgpzcmMvc2hhcmVkL2JhcC5jOjI2MTI6MjogZXJyb3I6IElTTyBDOTAgZm9yYmlkcyBt
+aXhlZCBkZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0ZXItc3Rh
+dGVtZW50XQogMjYxMiB8ICB1aW50OF90IGRpcjsKICAgICAgfCAgXn5+fn5+fgpjYzE6IGFsbCB3
+YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc0
+Njk6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWJhcC5sb10gRXJyb3IgMQptYWtl
+WzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2Vm
+aWxlOjQwMzA6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVz
+dDogYmx1ZXptYWtlZXh0ZWxsIC0gRkFJTApEZXNjOiBCdWlsZCBCbHVleiB3aXRoIEV4dGVybmFs
+IEVMTApPdXRwdXQ6CgpzcmMvc2hhcmVkL2JhcC5jOiBJbiBmdW5jdGlvbiDigJhiYXBfYmNhc3Rf
+aW9fZGly4oCZOgpzcmMvc2hhcmVkL2JhcC5jOjI2MTI6MjogZXJyb3I6IElTTyBDOTAgZm9yYmlk
+cyBtaXhlZCBkZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0ZXIt
+c3RhdGVtZW50XQogMjYxMiB8ICB1aW50OF90IGRpcjsKICAgICAgfCAgXn5+fn5+fgpjYzE6IGFs
+bCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxl
+Ojc0Njk6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWJhcC5sb10gRXJyb3IgMQpt
+YWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01h
+a2VmaWxlOjQwMzA6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMK
+VGVzdDogSW5jcmVtZW50YWxCdWlsZCAtIFBFTkRJTkcKRGVzYzogSW5jcmVtZW50YWwgYnVpbGQg
+d2l0aCB0aGUgcGF0Y2hlcyBpbiB0aGUgc2VyaWVzCk91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBTY2FuQnVpbGQgLSBGQUlMCkRlc2M6IFJ1biBTY2FuIEJ1aWxk
+Ck91dHB1dDoKCnNyYy9zaGFyZWQvYmFwLmM6IEluIGZ1bmN0aW9uIOKAmGJhcF9iY2FzdF9pb19k
+aXLigJk6CnNyYy9zaGFyZWQvYmFwLmM6MjYxMjoyOiBlcnJvcjogSVNPIEM5MCBmb3JiaWRzIG1p
+eGVkIGRlY2xhcmF0aW9ucyBhbmQgY29kZSBbLVdlcnJvcj1kZWNsYXJhdGlvbi1hZnRlci1zdGF0
+ZW1lbnRdCiAyNjEyIHwgIHVpbnQ4X3QgZGlyOwogICAgICB8ICBefn5+fn5+CmNjMTogYWxsIHdh
+cm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NzQ2
+OTogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYmFwLmxvXSBFcnJvciAxCm1ha2Vb
+MV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCnNyYy9zaGFyZWQvZ2F0dC1j
+bGllbnQuYzo0NTE6MjE6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQK
+ICAgICAgICBnYXR0X2RiX3VucmVnaXN0ZXIob3AtPmNsaWVudC0+ZGIsIG9wLT5kYl9pZCk7CiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVu
+dC5jOjY5NjoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAg
+ICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBmYWxzZSwgYXR0X2Vjb2RlKTsKICAgICAgICBe
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0
+dC1jbGllbnQuYzo5OTY6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVl
+ZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShvcCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsK
+ICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3Jj
+L3NoYXJlZC9nYXR0LWNsaWVudC5jOjExMDI6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRl
+ciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShvcCwgc3VjY2Vzcywg
+YXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjEyOTY6Mjogd2FybmluZzogVXNlIG9m
+IG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShv
+cCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjEzNjE6Mjogd2Fy
+bmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9v
+cF9jb21wbGV0ZShvcCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5j
+OjE2MzY6Njogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAg
+IGlmIChyZWFkX2RiX2hhc2gob3ApKSB7CiAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn4Kc3Jj
+L3NoYXJlZC9nYXR0LWNsaWVudC5jOjE2NDE6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRl
+ciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyX2FsbChvcCk7CiAgICAgICAgXn5+fn5+fn5+
+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MjE0Nzo2OiB3YXJuaW5nOiBVc2Ugb2Yg
+bWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgaWYgKHJlYWRfZGJfaGFzaChvcCkpIHsK
+ICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MjE1
+NTo4OiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZGlzY292ZXJ5X29w
+X3JlZihvcCksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjMx
+ODA6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGNv
+bXBsZXRlX3dyaXRlX2xvbmdfb3AocmVxLCBzdWNjZXNzLCAwLCBmYWxzZSk7CiAgICAgICAgXn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dh
+dHQtY2xpZW50LmM6MzIwMjoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZy
+ZWVkCiAgICAgICAgcmVxdWVzdF91bnJlZihyZXEpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
+fgoxMiB3YXJuaW5ncyBnZW5lcmF0ZWQuCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDAzMDogYWxsXSBF
+cnJvciAyCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-  Log Message:
-  -----------
-  btio: fix range validation of security level
-
-Arrays inside l2cap_set_lm/rfcomm_set_lm functions are of size 4,
-but the bounds check allows the value 4 for 'level'.
-
-
-  Commit: 0912ffde6a01d5e787b6883201c160c421fd1858
-      https://github.com/bluez/bluez/commit/0912ffde6a01d5e787b6883201c160c421fd1858
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M profiles/audio/a2dp.c
-    M profiles/audio/avrcp.c
-    M profiles/audio/bass.c
-
-  Log Message:
-  -----------
-  profiles/audio: add nullity checks
-
-Cover bass_setup unsuccessful search and btd_device_get_service.
-This change is motivated by the other usages where checks for
-NULL exist.
-
-
-  Commit: 4f17104ab7493de93ee4d1db428ff01c05126496
-      https://github.com/bluez/bluez/commit/4f17104ab7493de93ee4d1db428ff01c05126496
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M src/shared/bap.c
-    M src/shared/vcp.c
-
-  Log Message:
-  -----------
-  src/shared: add nullity checks
-
-Check util_iov_pull_mem where iov len is not verified
-beforehand. Check vcp_get_vcs for NULL.
-These changes are based on other usages where those
-checks exist.
-
-
-  Commit: 1c6ef345ea4bd569959b4333e2dbeee799e398a1
-      https://github.com/bluez/bluez/commit/1c6ef345ea4bd569959b4333e2dbeee799e398a1
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M tools/isotest.c
-
-  Log Message:
-  -----------
-  isotest: close fd after sending when nconn=1
-
-
-  Commit: 7187338cb0f39bc193f11135cb64a5fede8b8126
-      https://github.com/bluez/bluez/commit/7187338cb0f39bc193f11135cb64a5fede8b8126
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M obexd/client/transfer.c
-
-  Log Message:
-  -----------
-  obexd/client: fix err condition causing memleak
-
-transfer_open returns 0 if an error occurs, condition corrected.
-
-
-  Commit: 03ca538c8ff3fc21b734c7d10048007bcecf9cb9
-      https://github.com/bluez/bluez/commit/03ca538c8ff3fc21b734c7d10048007bcecf9cb9
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  profiles/audio: fix memleak of bt_bap
-
-Make failure branches deallocate memory before leaving.
-
-
-  Commit: 0ac037158b21dd0e67c4e337385276089d42bcdb
-      https://github.com/bluez/bluez/commit/0ac037158b21dd0e67c4e337385276089d42bcdb
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  src/shared: fix memleak
-
-
-  Commit: f75df3ae83d1288e3ef68016d18a1550fd0df109
-      https://github.com/bluez/bluez/commit/f75df3ae83d1288e3ef68016d18a1550fd0df109
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M src/shared/bap.c
-    M src/shared/gatt-db.c
-
-  Log Message:
-  -----------
-  src/shared: move null checks before dereferencing
-
-
-  Commit: c9f54bddda9ceb5d057bbc08a7271d71e84dd15b
-      https://github.com/bluez/bluez/commit/c9f54bddda9ceb5d057bbc08a7271d71e84dd15b
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M tools/isotest.c
-
-  Log Message:
-  -----------
-  isotest: remove repeating conditions
-
-
-  Commit: 188ef95b3ffed41e7da72ce0bb09fe2a7a60a777
-      https://github.com/bluez/bluez/commit/188ef95b3ffed41e7da72ce0bb09fe2a7a60a777
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M profiles/audio/bass.c
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  profiles/audio: fix io_unlink args order
-
-Seems like a breaking bug. Analogous to bt_bap_stream_io_link,
-but there the order is correct.
-
-
-  Commit: c74271b46eb791b341aaf9d1fe3dadc9f797557c
-      https://github.com/bluez/bluez/commit/c74271b46eb791b341aaf9d1fe3dadc9f797557c
-  Author: Ismagil Iskakov <i.iskakov@omp.ru>
-  Date:   2025-07-08 (Tue, 08 Jul 2025)
-
-  Changed paths:
-    M src/plugin.c
-
-  Log Message:
-  -----------
-  src/plugin: fix args order
-
-According to other functions and arguments usage, the
-case with external_plugin_init seems to be erroneous.
-
-
-Compare: https://github.com/bluez/bluez/compare/d925aff1485c%5E...c74271b46eb7
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============4927180385236888403==--
