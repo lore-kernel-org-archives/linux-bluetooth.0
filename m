@@ -1,130 +1,110 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5F32E041E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 14:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F9F13957E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 14:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751984486; cv=none; b=EAQpQcAaUxRWtDHKOsiHU5mxKJwLXjXGE5dw4pjKG2LNo4KARjSBrPsMiBZJrcwfUpJUZVPmwnZEGKjfgiVb1uRdqVzeRMvgYXvjdd2uPZuobT7xCUfQjcMMuengqbE2xNy09r0SZXaunuGukFr4SnyJWHMyysQxKYyrVizhyX0=
+	t=1751985197; cv=none; b=ZxwNwLvykJWVK10EM8HDaeI0jD51onf3OwawqkE6Kq69NCU2WKX595yzJ5MXcI4mSea0X2TvAUTQZMXV1MjkXaee89CAWCN7aMFK19tfKjbSIeOdu8zfzkLiFMFeCy7jAkLEtIAhYfImVu1tS+fzOX2xJa8njKPo0qIS/MfaqDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751984486; c=relaxed/simple;
-	bh=UGbsk2AKnpRyZ3udeIO4+vTkMWW7A6wYla7EXNjVFOQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=qAAH6S8TbCnBjOI0ekt5Jc8RLYB4hvxgqwwxVEW4Pjwq0X9byV0Ubr7lnBfWV67MteuM3FfoA51uhdSprH39Wo0htMI1/NPq0tBPO6naDQEbVA/YEb3Pa2xwfctGyCPueVZWdh5wAE0ZztdRB6i8kdWfLiYIFBWGlRqq1Rp7+Qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NhXHpQGT; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751985197; c=relaxed/simple;
+	bh=MWrtgvcgoUfkS3z7NkvkGp2ScahqgjKi2G5tlC0RPr0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=R4gRHXHiltwbaVMPdv5j1BgHkoc3lNIDImJv4QLgtvOse0lhk3MBiCKGLT34+IHlzoq9DKJcZiXgBodJCMtWYn9YWs6UqFIBD1IpfLqXFRhYVAS/prFw5tT3K2SLNdn3JafogHLVUfuwXNpFGXRLwaTZCrgO9+rxpNle2+eVrqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NZwlNMM7; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhXHpQGT"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2350fc2591dso42090015ad.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jul 2025 07:21:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751984484; x=1752589284; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MitjmFCeU0q0GG6p3Bkk0OJsNSTByx7GwB48Jc2MA4M=;
-        b=NhXHpQGTfCasSp+2kBmXe9/0EeJsPlIMhrmhjN/7ysypQaRkboHUZ3awGhd8YpcxcP
-         vmLflZjZjy/IjAwhpjUERLPbjU47yEF4YftotNCZwXvObTArL8E2FVcDiqxwRmWcFsUq
-         nJ4AOFNSWfIcyXYVwu8wHAsyh26iDS4eS12Syq6DxS3Fq2BOrTiSZse0V1gsaeUk0N90
-         QfmunezmrdhSZrB7PMWHzi07wZErhuOckA0CV7ft6ziEzlvfykXpPudNm/Juj6aXovQV
-         /Vw8MZ+TN7+66b8EImM5+DmFvdwfLX8M5tQr6Fi3qCXEg60EA7I/fVIbN3I7OwJj1gZk
-         SCGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751984484; x=1752589284;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MitjmFCeU0q0GG6p3Bkk0OJsNSTByx7GwB48Jc2MA4M=;
-        b=dFAlRcAPiKXpbjQR3xNXx6EQJKMAPxXdAtjRu8Www1inNbb36Ey/IkEnr8hBZ8rtr7
-         jG5MOBzvWCZiu2/qUb07SaGP/1HC4j/h1BUeKQlIm2xx8LP3iF4ruImmlAOi/+wjUBqE
-         FECHndCZ4UAroAcnix13ZHOU6SxWAhh8zr6hBEBxD1GPRuZ7jg2AFQycHXNxLov6uHxN
-         Qv1AuJ8VRyeJtECWIKIC8pv50y8v3G1KqLonxFny5W03mWKnSI18aKUXHM+S9YlaPxtp
-         z/njw7cLAejEldp3Dp7137R7sqSyWVhy/EApXo519ExMB3W8EAw/9/VNZV49uP97BgoT
-         ppbg==
-X-Gm-Message-State: AOJu0YwdLFH9nI5Ln8VH5txOpO9kzGCmHhlyQe6LEAFEi9NOddQGsFuk
-	zJaW1LKKaDM1KcIEfDi5Daps9P67DuLFPoilxEEhQr3mnAbMgrkDpiVKpFz8Dw==
-X-Gm-Gg: ASbGncuHwPPaU7eQTJ0jwPLVdJ6phDEDaZDxWZ1SuKhLV1gbESHJ1Aeeu3B5j9MIlL5
-	tBoOXgKVYQMyrIN2xXtyUiIA4bLanCaNv+HGEXXnNCdyCWx1GRTeJGlpZzedbyQhFe50kW/GOmZ
-	neEZZ254P1RTdg7B4MCsD96QtBdfWSW20fN0I9KaNavx1yS++7UM32BHQBGQvVIuzhtFTLCTvBR
-	/TI4j1ZrHZOChSaytkisGNvjA9aws1tyw+Bi+6MU1dAvGgSWQ6W8KAq9KX0Lm+BTtJ97nwH+RYe
-	9BinUsL7GBpaHO8QDGi2g7ybnLbLZf38P19sTK28RsCjTU0tX50g+D0IWn0mMJGQpA==
-X-Google-Smtp-Source: AGHT+IGoRuxtETcUHsxuaqsxgJg2/TYysHc8hRVxumIjAzohyyvhzMoLTF/BN3BJOrXLNds5qR8Okw==
-X-Received: by 2002:a17:903:2a8f:b0:236:4d78:d528 with SMTP id d9443c01a7336-23dd1cdf6f8mr34977155ad.6.1751984483590;
-        Tue, 08 Jul 2025 07:21:23 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.2.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c84350266sm114829115ad.84.2025.07.08.07.21.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 07:21:23 -0700 (PDT)
-Message-ID: <686d2963.170a0220.1a83c4.1b2b@mx.google.com>
-Date: Tue, 08 Jul 2025 07:21:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5701239218822217365=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NZwlNMM7"
+Received: from github.com (hubbernetes-node-552c987.ac4-iad.github.net [10.52.160.26])
+	by smtp.github.com (Postfix) with ESMTPA id CE1E5640D77
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:33:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1751985194;
+	bh=PeHbzPYrQ2K28tP58ivFELMBF5Sb7VrmYd2JS/8EAos=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=NZwlNMM7eDDDd5jp9L6aQN6PYAL5+7iIgSXuycPWfFz2BU/DLP5360+FFh7coYt+g
+	 cD3B5KqVUTBy+g2UNLYsN65uU45D2vToSNhIe5skbeJbcLuwlo4ta11WEG2yrmVaYB
+	 abIiAcvpRQPVJQOoThAQKAoeAuzqb+pvFYe0pZfg=
+Date: Tue, 08 Jul 2025 07:33:14 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/be8c03-a5d517@github.com>
+Subject: [bluez/bluez] 9fb0e0: doc: Fix extra word in doc string
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ceggers@arri.de
-Subject: RE: [BlueZ,01/15] mesh: crypto: remove dead function declaration
-In-Reply-To: <20250708125947.11988-1-ceggers@arri.de>
-References: <20250708125947.11988-1-ceggers@arri.de>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5701239218822217365==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 9fb0e002fa04242b3890faeb1329bee397c51099
+      https://github.com/bluez/bluez/commit/9fb0e002fa04242b3890faeb1329bee397c51099
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
 
-Dear submitter,
+  Changed paths:
+    M doc/mesh-api.txt
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=980052
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.46 seconds
-GitLint                       PENDING   0.37 seconds
-BuildEll                      PASS      20.75 seconds
-BluezMake                     PASS      2714.98 seconds
-MakeCheck                     PASS      20.33 seconds
-MakeDistcheck                 PASS      186.42 seconds
-CheckValgrind                 PASS      236.01 seconds
-CheckSmatch                   WARNING   307.45 seconds
-bluezmakeextell               PASS      128.36 seconds
-IncrementalBuild              PENDING   0.45 seconds
-ScanBuild                     PASS      922.86 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-mesh/mesh-io-mgmt.c:525:67: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+  Log Message:
+  -----------
+  doc: Fix extra word in doc string
 
 
+  Commit: 18cbebbc7252bf92787a57b129b7b6a3122bf2cf
+      https://github.com/bluez/bluez/commit/18cbebbc7252bf92787a57b129b7b6a3122bf2cf
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M profiles/midi/midi.c
+
+  Log Message:
+  -----------
+  midi: Fix debug string
 
 
---===============5701239218822217365==--
+  Commit: f3db585b5f6f920975e0a331c562d65a199b49c7
+      https://github.com/bluez/bluez/commit/f3db585b5f6f920975e0a331c562d65a199b49c7
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M bootstrap-configure
+
+  Log Message:
+  -----------
+  build: Remove deleted configure option
+
+Remove this option now that that the supporting code has been
+removed, fixes a configure warning:
+configure: WARNING: unrecognized options: --enable-android
+
+Fixes: f0512114aacf ("Remove android support")
+
+
+  Commit: a5d517dd4134ab5457423e39f839db437a890372
+      https://github.com/bluez/bluez/commit/a5d517dd4134ab5457423e39f839db437a890372
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-07-08 (Tue, 08 Jul 2025)
+
+  Changed paths:
+    M .gitignore
+
+  Log Message:
+  -----------
+  build: Remove deleted files from .gitignore
+
+As all the android support was removed in
+f0512114aacf ("Remove android support").
+
+
+Compare: https://github.com/bluez/bluez/compare/be8c031baaa8...a5d517dd4134
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
