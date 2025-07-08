@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF34F224B00
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E77B2DC35E
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 15:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751989397; cv=none; b=JvR3HkZzJsrBtfpJSsiqqZqcDcuc3HMy2cJgzU2bouYvVfP61YqFceJZHIlNgoo71CiYV5KmiiM8bUYDafgUAflfP/9J4UJoZfkIjmSayE8pSX8OboMTkizhMZWJEGvcQZNjx4NlcV+2BedHkQgyst5pIZZ655Su06Bdqy42k0c=
+	t=1751989398; cv=none; b=VU5czfX9kOy5Ef0MQIsPaVRCEbiO8h9NCZfgVcLzYD1rY45DneZgt3DwgBXHvZlflUUXOwHkFxeLaCeHET2VoQ6kp7/ONlpQYZ7Ipeu7lt2XiDa7ndtcKSsWgii3GmImyhMUdg0jh0dbw0kNOreg+g4i1lchTsWs1X12AHw4qV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751989397; c=relaxed/simple;
-	bh=1ES1jRYLfkvRe4K8iITGRVa2kr1ixFCVXXhwWe50ioY=;
+	s=arc-20240116; t=1751989398; c=relaxed/simple;
+	bh=oRyypm7Es/n9buPgTAMR+IkfesQXaaGSP0olbgPJi+A=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MoizID88Wlsrk2areSSe5N3i5rQWiq8ad8POcHaPmwC2ZGg1mgcnHqm51SsVdcGXKkZBgdtWBhNgKtkC049wGqApUhe2VKazjsH7ay1GdQNRgcFNmAckfQ4ZHPPauZWUopsppP5XFyszxXvk//FY+N3EgJuZuhvK3fvfoQzczac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=L/5CG7D1; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=V3w1KYq9ZrFTeHZ8BNH83Q6lD55KDOLfgI/hE7Wv0FQdsLw3eztPnQSBkjpODdKjMJoti8NP22cqKtyycH6naR6A6YI1a0ApCv+7BJSdZcgMmqnJ694rtH8n0pqvj6E6F/ncylp8ogWb9so9zclFeQBGPKRyLjMrRd9Si1EZnIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=iYVo8AjA; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="L/5CG7D1"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="iYVo8AjA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1751989394;
-	bh=1ES1jRYLfkvRe4K8iITGRVa2kr1ixFCVXXhwWe50ioY=;
+	bh=oRyypm7Es/n9buPgTAMR+IkfesQXaaGSP0olbgPJi+A=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=L/5CG7D1iNoMHxIXM4CmxakA6xuMV8ymG5u+AzfG9OvltDZjYKvdmoijML7E/tDnT
-	 nVOHagBKt+41OwmA4hcDBV3BaW4/zh+vbgI0a7jEnsv1C/DR1bh5Q9rylhmaN1zQ0f
-	 Q/ent7lmCWb+EYFUX2ghuDXy9PIdBsJ5AjdvV5ubrUElTACc4MRm8ZFFrOgc9FxqDq
-	 TDSSFMq4ZNhFCe1sy0nKkzxtGwsMSaoPdkEitv701i69zqu8b6Wild5pVSpWss4Ysw
-	 G8UsigDUQGSpqnSsty/Be4BSaelJ44nqV8FZVAQ6l1x3lo/CtXmD7KajR40L8zFoW2
-	 HXWKEEX+VnI1w==
+	b=iYVo8AjAgRNVy+lxIIOVmRxn4o33Fi6NQX+BxiwU1fhWtdKQKq8N8a5Vl4zHyoJlQ
+	 1hPQOmEjdDywYf+sQpQJb9fphtJHXwL36TFPUPy/Ilrv81Rt2cKgHThYyWT/3LBnxP
+	 7oINq5i7nOolnCIo20+WUIAtNtbCRc2BEZid/Rf9fpbkitYk+zwmA3Gdl5H0drbj7Q
+	 ndINq/mAPThYCiLZFTOwxvPXCOAtY4xL36HMZqZyqnSfsso30pBgNrDWYSTLwuE12l
+	 wB/N4HqGmbf6y+bRJrjsgL1xFuiQxn4iGmhM/1x+/ibmSxXgFmzAxJpHesbg8LeFJ7
+	 gisxPN376tNFA==
 Received: from fdanis-ThinkPad-X1.. (2A02-8428-af44-1001-a903-aFF7-d14E-7699.rev.sfr.net [IPv6:2a02:8428:af44:1001:a903:aff7:d14e:7699])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 18EA617E11EC
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 6320317E11ED
 	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 17:43:14 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 3/7] audio/mcp: Use strtoutf8 for player name and track title
-Date: Tue,  8 Jul 2025 17:43:03 +0200
-Message-ID: <20250708154308.238963-4-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v3 4/7] audio/gap: Use strtoutf8 for GAP device name
+Date: Tue,  8 Jul 2025 17:43:04 +0200
+Message-ID: <20250708154308.238963-5-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250708154308.238963-1-frederic.danis@collabora.com>
 References: <20250708154308.238963-1-frederic.danis@collabora.com>
@@ -53,14 +53,14 @@ Content-Transfer-Encoding: 8bit
 Truncate the string to first character before invalid UTF-8 one
 instead of replacing non ascii characters by spaces.
 ---
- profiles/audio/mcp.c | 11 +----------
+ profiles/gap/gas.c | 11 +----------
  1 file changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-index d3ccb97c5..5fe7ef82a 100644
---- a/profiles/audio/mcp.c
-+++ b/profiles/audio/mcp.c
-@@ -72,21 +72,12 @@ static void mcp_debug(const char *str, void *user_data)
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 08aaf19cb..74dabf41f 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -69,21 +69,12 @@ static void gas_free(struct gas *gas)
  static char *name2utf8(const uint8_t *name, uint16_t len)
  {
  	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
