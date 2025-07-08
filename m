@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA13429898B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FB62248BE
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751960134; cv=none; b=IlBYsl5KpTvjhgcHMQQSA5kKkJzHN+4xWU9rhdElrUdnKNrMQ7px3ZutTSO0GvoKUyrJWbMOlcc2boaEZns8LU8rigYjXUXxHTFiInBRoG6Qi4RkLXLkj8lgDMRDKK/RuniCzj4RQF1zuT0k9o1xxMTZjAmXpGAWNnXVzuy35kY=
+	t=1751960139; cv=none; b=jsfY6BbEStps+oFEwmzuifm3KhQ41EOm4KlB63IqBQpQ3LPXG+elVaq4KOWU+9u9sOnqgDSWHST48m4idNdaLvykrTKHj1PO79lZ08u6myq6oO6EKVwTYP/rfHA+X9Nd9LA91EYhDcJe7RxoDVwcdHtRQBghXSF+5am1NDalhDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751960134; c=relaxed/simple;
-	bh=8b9O2g/fKZh/97gHFBzf03g/mLI7u459pLQHKAD1tEg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qHwPriCVLsulJNu/95WUy+qwVj3chGhzf8xV68GtbTZqPEuVB6WfzJ6typ0uKId6Cmncg2rVINfkd3saMYiyvCiWfxikSF2ofbZYA9g2BQzJKJ/Z1c03wy3YdGK4swlxv5ILHWYylbciM9J12V6mBz9u269v7tQFcLOJxOUeRq4=
+	s=arc-20240116; t=1751960139; c=relaxed/simple;
+	bh=h1Qli64YpS/amOApOqlajp0J4QB81dZVUvdDrOR8fWo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nK7bXIcfWG5lBvqNohcMqATSeKNsydJ89XOCiRj9JUSomh4xIdT5HCSEpeUIP6vay3mGNF369qpHRdJ2pGI2SMCm2aHzFGu5drzh7Ok54aYlI9e7Dg7tl2MpHDWQL6722RTy5RwpHhlJc02I/qhqYOF+8CSqQ43UeK29xxvfOFs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 8 Jul
- 2025 10:35:18 +0300
+ 2025 10:35:27 +0300
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ 00/11] Fix bugs found by static analysis
-Date: Tue, 8 Jul 2025 10:33:23 +0300
-Message-ID: <20250708073334.2393559-1-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ 01/11] btio: fix range validation of security level
+Date: Tue, 8 Jul 2025 10:33:24 +0300
+Message-ID: <20250708073334.2393559-2-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250708073334.2393559-1-i.iskakov@omp.ru>
+References: <20250708073334.2393559-1-i.iskakov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,8 +54,10 @@ X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
 X-KSE-AntiSpam-Info: {SMTP from is not routable}
 X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
  b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ dbl.spamhaus.org}
 X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;inp1wst013.omp.ru:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;81.22.207.138:7.1.2
+	inp1wst013.omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;81.22.207.138:7.1.2
 X-KSE-AntiSpam-Info: FromAlignment: s
 X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
 X-KSE-AntiSpam-Info: {DNS response errors}
@@ -71,38 +76,25 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-This patch corrects some of the bugs not connected
-to the functionality but to memory management etc.
-Two exceptions being about fixing the arguments
-order, which also could've caused some trouble.
+Arrays inside l2cap_set_lm/rfcomm_set_lm functions are of size 4,
+but the bounds check allows the value 4 for 'level'.
+---
+ btio/btio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ismagil Iskakov (11):
-  btio: fix range validation of security level
-  profiles/audio: add nullity checks
-  src/shared: add nullity checks
-  isotest: close fd after sending when nconn=1
-  obexd/client: fix err condition causing memleak
-  profiles/audio: fix memleak of bt_bap
-  src/shared: fix memleak
-  src/shared: move null checks before dereferencing
-  isotest: remove repeating conditions
-  profiles/audio: fix io_unlink args order
-  src/plugin: fix args order
-
- btio/btio.c                |  2 +-
- obexd/client/transfer.c    |  2 +-
- profiles/audio/a2dp.c      | 45 +++++++++++++++++++++++++++++---------
- profiles/audio/avrcp.c     | 24 +++++++++++++++++---
- profiles/audio/bap.c       | 23 +++++++++----------
- profiles/audio/bass.c      |  7 +++++-
- profiles/audio/transport.c |  2 +-
- src/plugin.c               |  2 +-
- src/shared/bap.c           | 42 ++++++++++++++++++++++++++++-------
- src/shared/gatt-db.c       |  5 ++++-
- src/shared/vcp.c           |  3 +++
- tools/isotest.c            |  8 ++++---
- 12 files changed, 124 insertions(+), 41 deletions(-)
-
+diff --git a/btio/btio.c b/btio/btio.c
+index b8afe0580..14f2b700e 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -455,7 +455,7 @@ static gboolean set_sec_level(int sock, BtIOType type, int level, GError **err)
+ 	struct bt_security sec;
+ 	int ret;
+ 
+-	if (level < BT_SECURITY_LOW || level > BT_SECURITY_FIPS) {
++	if (level < BT_SECURITY_LOW || level > BT_SECURITY_HIGH) {
+ 		g_set_error(err, BT_IO_ERROR, EINVAL,
+ 				"Valid security level range is %d-%d",
+ 				BT_SECURITY_LOW, BT_SECURITY_HIGH);
 -- 
 2.34.1
 
