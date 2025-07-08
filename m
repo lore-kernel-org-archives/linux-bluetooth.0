@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B69B2248BE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A95C29898B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jul 2025 07:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751960150; cv=none; b=ZhHdLf/sAGv2aaZJbgarxmdDbNJB8oHKqqNfQpORwsjYRNiuvtJWEZgW5nPutPJsMDKRTWmxR/6kDfEzGTi26Zsf6sSDTfMlkfRgftJ3KVRYG0ejOhAVD5GjVKyh7KyadjqkwuoY8Nz39XPaJzp/4HwOtCjEcdrCRmuKDj8Mp48=
+	t=1751960156; cv=none; b=UvaR4+SWfWJL+oyXpurBqtgdO50eVKaWVgrbMxfufYazBxJG0P6ZqauShCV8NRpQdfPRxoHlMxymmMlVEdBgYLIvhNSWqYmFeESzNe2t3K9CVbm3oog8sDJ4BZvhD7aWoq0eCy1qL1L4RHEpkGXCtmysq33Ehoh0Cr49b2il+tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751960150; c=relaxed/simple;
-	bh=aV337FlzxXTIr1dhpWM8PGq1nkg6XhrOmYoUnTrgkvQ=;
+	s=arc-20240116; t=1751960156; c=relaxed/simple;
+	bh=lAwfxcQYe13izMbSyuB6wSx9PcvPIQ0B9LUA9vHhiX0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n/opHM1VQ+4c+PVbWMVEqSW0iEvHc3WbOF5rNsTb8ZVw1pLAsJEqOD7xm+UyIXvpdPBjveBq2KR0uCVz3bLplFjSyAuTvm4yuvP2WtX8ES1zusra4hynTnlt94Gl0Ak9qKVGxJJf9lsLWqB2UokUSoUbbpcIE+xyH9pC3nvULD8=
+	 MIME-Version:Content-Type; b=Z58hLovFuw71sw5EZSmbZePeWq3aZq/qy3l25FkJWp5ENNwGDDmrulySAjf0likKG4PeIplzcrZeQMVtpaejLnwKLeDUmqZNEvNQskbOptBgr+Co6d1CtLELISo4uLaSoxBHvURGGq/E9HKrKxKmSD55mN3/8963vsivDaySIEo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 8 Jul
- 2025 10:35:37 +0300
+ 2025 10:35:45 +0300
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ 02/11] profiles/audio: add nullity checks
-Date: Tue, 8 Jul 2025 10:33:25 +0300
-Message-ID: <20250708073334.2393559-3-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ 03/11] src/shared: add nullity checks
+Date: Tue, 8 Jul 2025 10:33:26 +0300
+Message-ID: <20250708073334.2393559-4-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250708073334.2393559-1-i.iskakov@omp.ru>
 References: <20250708073334.2393559-1-i.iskakov@omp.ru>
@@ -76,182 +76,84 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Cover bass_setup unsuccessful search and btd_device_get_service.
-This change is motivated by the other usages where checks for
-NULL exist.
+Check util_iov_pull_mem where iov len is not verified
+beforehand. Check vcp_get_vcs for NULL.
+These changes are based on other usages where those
+checks exist.
 ---
- profiles/audio/a2dp.c  | 45 ++++++++++++++++++++++++++++++++----------
- profiles/audio/avrcp.c | 24 +++++++++++++++++++---
- profiles/audio/bass.c  |  5 +++++
- 3 files changed, 61 insertions(+), 13 deletions(-)
+ src/shared/bap.c | 23 +++++++++++++++++++++++
+ src/shared/vcp.c |  3 +++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 6204006d6..56a035c7e 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -646,6 +646,24 @@ static gboolean auto_config(gpointer data)
- 	struct btd_service *service;
- 	struct a2dp_stream *stream;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 76340d565..a866f4cdc 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -7457,6 +7457,11 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
  
-+	dev = avdtp_get_device(setup->session);
-+
-+	if (setup->sep->type == AVDTP_SEP_TYPE_SOURCE) {
-+		service = btd_device_get_service(dev, A2DP_SINK_UUID);
-+
-+		if (service == NULL) {
-+			error("a2dp sink service not found");
-+			return FALSE;
+ 		codec = util_iov_pull_mem(iov, sizeof(*codec));
+ 
++		if (!codec) {
++			ret = false;
++			goto done;
 +		}
-+	} else {
-+		service = btd_device_get_service(dev, A2DP_SOURCE_UUID);
 +
-+		if (service == NULL) {
-+			error("a2dp source service not found");
-+			return FALSE;
+ 		util_debug(func, NULL, "Codec: ID %d CID 0x%2.2x VID 0x%2.2x",
+ 				codec->id, codec->cid, codec->vid);
+ 
+@@ -7468,6 +7473,12 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
+ 		}
+ 
+ 		l2_cc.iov_base = util_iov_pull_mem(iov, l2_cc_len);
++
++		if (!l2_cc.iov_base) {
++			ret = false;
++			goto done;
 +		}
-+	}
 +
- 	/* Check if configuration was aborted */
- 	stream = queue_find(setup->sep->streams, match_stream, setup->stream);
- 	if (!stream)
-@@ -654,16 +672,12 @@ static gboolean auto_config(gpointer data)
- 	if (setup->err != NULL)
- 		goto done;
+ 		l2_cc.iov_len = l2_cc_len;
  
--	dev = avdtp_get_device(setup->session);
--
- 	avdtp_stream_add_cb(setup->session, setup->stream,
- 				stream_state_changed, setup->sep);
+ 		/* Print Codec Specific Configuration */
+@@ -7482,6 +7493,12 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
+ 		}
  
- 	if (setup->sep->type == AVDTP_SEP_TYPE_SOURCE) {
--		service = btd_device_get_service(dev, A2DP_SINK_UUID);
- 		sink_new_stream(service, setup->session, setup->stream);
- 	} else {
--		service = btd_device_get_service(dev, A2DP_SOURCE_UUID);
- 		source_new_stream(service, setup->session, setup->stream);
- 	}
- 
-@@ -995,10 +1009,25 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	struct btd_service *service;
- 	int ret;
- 
--	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
-+	dev = avdtp_get_device(session);
+ 		meta.iov_base = util_iov_pull_mem(iov, meta_len);
 +
-+	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK) {
- 		DBG("Sink %p: Set_Configuration_Cfm", sep);
--	else
-+		service = btd_device_get_service(dev, A2DP_SOURCE_UUID);
-+
-+		if (service == NULL) {
-+			error("a2dp source service not found");
-+			return;
++		if (!meta.iov_base) {
++			ret = false;
++			goto done;
 +		}
-+	} else {
- 		DBG("Source %p: Set_Configuration_Cfm", sep);
-+		service = btd_device_get_service(dev, A2DP_SINK_UUID);
 +
-+		if (service == NULL) {
-+			error("a2dp sink service not found");
-+			return;
-+		}
-+	}
+ 		meta.iov_len = meta_len;
  
- 	setup = find_setup_by_session(session);
+ 		/* Print Metadata */
+@@ -7512,6 +7529,12 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
  
-@@ -1024,14 +1053,10 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	if (!setup)
- 		return;
- 
--	dev = avdtp_get_device(session);
--
- 	/* Notify D-Bus interface of the new stream */
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SOURCE) {
--		service = btd_device_get_service(dev, A2DP_SINK_UUID);
- 		sink_new_stream(service, session, setup->stream);
- 	} else {
--		service = btd_device_get_service(dev, A2DP_SOURCE_UUID);
- 		source_new_stream(service, session, setup->stream);
- 	}
- 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index ba191e441..08edeac40 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3082,8 +3082,14 @@ static void set_ct_player(struct avrcp *session, struct avrcp_player *player)
- 	if (session->controller->player == player)
- 		goto done;
- 
--	session->controller->player = player;
- 	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
+ 			l3_cc.iov_base = util_iov_pull_mem(iov,
+ 							l3_cc_len);
 +
-+	if (service == NULL) {
-+		error("avrcp target service not found");
++			if (!l3_cc.iov_base) {
++				ret = false;
++				goto done;
++			}
++			
+ 			l3_cc.iov_len = l3_cc_len;
+ 
+ 			/* Print Codec Specific Configuration */
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index c96ad4376..a13b9d953 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -2934,6 +2934,9 @@ static void foreach_vcs_service(struct gatt_db_attribute *attr,
+ 	struct bt_vcp *vcp = user_data;
+ 	struct bt_vcs *vcs = vcp_get_vcs(vcp);
+ 
++	if (!vcs) 
 +		return;
-+	}
 +
-+	session->controller->player = player;
- 	control_set_player(service, player ?
- 			media_player_get_path(player->user_data) : NULL);
+ 	vcs->service = attr;
  
-@@ -4278,12 +4284,18 @@ static void target_init(struct avrcp *session)
- 	if (session->target != NULL)
- 		return;
- 
-+	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
-+
-+	if (service == NULL) {
-+		error("avrcp remote service not found");
-+		return;
-+	}
-+
- 	target = data_init(session, AVRCP_REMOTE_UUID);
- 	session->target = target;
- 
- 	DBG("%p version 0x%04x", target, target->version);
- 
--	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
- 	btd_service_connecting_complete(service, 0);
- 
- 	player = g_slist_nth_data(server->players, 0);
-@@ -4332,6 +4344,13 @@ static void controller_init(struct avrcp *session)
- 	if (session->controller != NULL)
- 		return;
- 
-+	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
-+
-+	if (service == NULL) {
-+		error("avrcp target service not found");
-+		return;
-+	}
-+	
- 	controller = data_init(session, AVRCP_TARGET_UUID);
- 	session->controller = controller;
- 
-@@ -4339,7 +4358,6 @@ static void controller_init(struct avrcp *session)
- 	if (controller->obex_port)
- 		DBG("%p OBEX PSM 0x%04x", controller, controller->obex_port);
- 
--	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
- 	btd_service_connecting_complete(service, 0);
- 
- 	/* Only create player if category 1 is supported */
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index b27a3fc12..f617efa2c 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -349,6 +349,11 @@ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
- 	struct bass_setup *setup = queue_find(dg->setups,
- 				match_setup_stream, stream);
- 
-+	if (setup == NULL) {
-+		error("unable to find setup in delegator");
-+		return;
-+	}
-+
- 	if (dg->bap != bap)
- 		return;
- 
+ 	gatt_db_service_set_claimed(attr, true);
 -- 
 2.34.1
 
