@@ -1,102 +1,156 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41421FC0F3
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 09:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9648128724C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 09:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752052838; cv=none; b=kLS+X76ChOhPK8gcYP4DrrrfemKciAQciWDUC+IqKd9Yiny8Oxal/yFb4I65EN2hN5OSOd470yFIWASw7OLfWeg8iAmBTpDGVmY0HtSC3/LoD+vk4ujnzOJCzEgwrU0tyQLPd3O7Hm2TMlLq/p8YdRswo+QKsWQ1MseLrWkrySY=
+	t=1752054065; cv=none; b=N3/zer39V6fYYbKaEEhs8i1U958BF87v2/Im2gITOcHUU89hA5HvXQzIiFwN00X2RhviIoPjJFMYcyamQwSByuyaxP2OwLe5fkWOjSLvL8aX1tlQVpETR9hVjTXcm6hmz8gW/r3GlBMzrAgblpWpqU6lrWro4FVEpNzricfi6x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752052838; c=relaxed/simple;
-	bh=pNeHU3S34yB6X9U66n7DL8NDkLFaxDxOYiqPiOqxEYk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mDb8LP2pYuwv/jUEalkQC5UgeAbf9/H5VM0j9w1S4PEkdthi3yXCBLKH4MEfNeF9uKiEZOP+o2B5bQxfbdA43r4DDkUI4TA7Uk8Sv/mvbXcieeszcdiG+KoPCUHXqLgo6wjbUXn9J/3qfL47XK4/s4NQriSvFVMhWvERdfajM8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9MVC3J3; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752054065; c=relaxed/simple;
+	bh=GIAe9ZDxgrMImV9AayOEUbxOaPanPlCS13k+JYJfKfU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kQToXooITndp3ykW8co+ATU3QciKwmhSWlb/fiOo5XGhmPPiXELnIN3jsLji0uQembjxDxLul7tgiLwWZ7H6bjJSC3OK4zs7MdXPWVw1FmDD1odmbeClTWG+fDNQOKyEciXHiLG20BxTXUCVXLLSEaJfx5McTcMIoYBkRz7N4eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=cgTtiu4t; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9MVC3J3"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-749068b9b63so3309612b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jul 2025 02:20:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752052834; x=1752657634; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pNeHU3S34yB6X9U66n7DL8NDkLFaxDxOYiqPiOqxEYk=;
-        b=N9MVC3J3Qw4wWRQNSgEkbCfbsp8bEd1PHlnc59xJNGia6O9lu0u7yngag3A1YATZRo
-         vvXlJCbVS6oNAwmcy+HaWlozlzvU4cGPCSBdQ8lSr/ssQ6c7c2fO+aw7NZVrPgw0dwBI
-         hHQeKTfM84jmvf/lqxuhTh3U9JeF2TdpN6WuuguDJFiaZnN+ix1Q/LY5/epRt4k4onWT
-         VX4qN12fcvs3BHSIxLB6NFBDtmIk4ND2mpFwduvwa1w7HutkUnJTrfOJ779KsNLvsHbP
-         YB7fZdu8UA7kNq1YcClLzxeCk4IbJfhKYRpY/sZMuL8FjO+Sov2nAV+gsaZmrnuH4Ynr
-         7gKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752052834; x=1752657634;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pNeHU3S34yB6X9U66n7DL8NDkLFaxDxOYiqPiOqxEYk=;
-        b=gswypB7MQ/6QNnlPKTKuthy9mNQTNv6yjA1kgBW7uBgnLExpXCg2mnwac8yWivMY5i
-         6xclbpyaQhhQxUCJx8ddnf4RDdn15v/z8ZrlbcZpJXCImjG4nAPT0rI+XjbYb168gzbJ
-         ibucEFIawdryMujfrCghZpGxs5v4D+tkEcg7AQnoQYhEPT6jL0SIJFMcxwFWjGyukatW
-         7ZOLxcGwDfldBeH373WuITzcwgA+bLHUgX0KJbsBJrhLbIWawQt9hkVY7gTEXROnwizo
-         klYZ9lyQkzV9INH2zTJmH9XKkf2m9v7uwbE/1z+xFMzyNLZLj3vKwAy4zcLoBz6jPbS6
-         F7kw==
-X-Gm-Message-State: AOJu0YxwG51MOP2kqeCdPE268FjbL+BFVZYpt/JgbIbnrGoC3a+nmeYv
-	4xW2gEdXtYrfYmczp6uvyLlpjfKZpoxRCyIF0ekBZl99lJEb7JDH/sVBGUlxhw==
-X-Gm-Gg: ASbGncuXJL/NrWvIhBfVDcwhQklUEWZbOh2r98VWcIl83X3YqrqsoUD7ZKmi2IcmbRq
-	OiLXdLmxPAa+6XGGz8/C8wAxRbC7YOKfmb3OJfyj1XXR0y4XfJ9RYA1+GidJ+Ek0ri6b0i255Tn
-	0mWnr7U/J6x4vWjosWAy8Xm2BM+iA/wi3/vDovh+xSYkVQjlC8wvW0Z4KB4JERAkqnZxmjKGfPd
-	btUpzPmsUJbuSLwDX9yMtA9bqxEOxvRlNDLHwxfINJ5at1auXv/9msMXWEFlwqVXxuxri8tzOPW
-	+yN3pbbQFbs/BHzPoukTyed/tGmmkAgKVDaUBkGr6Mta8mD/N2FeM4N3Ex0RYt7Xhuf3XQ==
-X-Google-Smtp-Source: AGHT+IGbVMIijLypWRYvuinfjduvgGpYBQaHDd7MRTv91tkqcWLSD/H0NhmcTZaQXok//79cugBx3w==
-X-Received: by 2002:a05:6300:6141:b0:222:2a34:624b with SMTP id adf61e73a8af0-22cd5dec15fmr2808419637.15.1752052834421;
-        Wed, 09 Jul 2025 02:20:34 -0700 (PDT)
-Received: from [172.17.0.2] ([20.171.103.152])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce4180970sm14055854b3a.93.2025.07.09.02.20.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 02:20:33 -0700 (PDT)
-Message-ID: <686e3461.050a0220.88307.ccf3@mx.google.com>
-Date: Wed, 09 Jul 2025 02:20:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8902729341329555932=="
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="cgTtiu4t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1752054061;
+	bh=GIAe9ZDxgrMImV9AayOEUbxOaPanPlCS13k+JYJfKfU=;
+	h=From:To:Subject:Date:From;
+	b=cgTtiu4t6Szby3rtG8B0OT5GZp/RUKLc6lFfYKu27PX3g56qbMAzg8AgyjktMiYAX
+	 0SaEymz5cye8w1c76ecG9PU88hr+4n8HGXv9RhyCDME/g29DHHnjh2PHhCxBPqkX3p
+	 XT3qSPCqzco3FM3ljWFw90tldyUj9hybY9IKf42R2YanZBFzfUiLl6pPTTuqQqgxrp
+	 bZT396sjUlSpOqKV3qr+N2WHLIB4+qzKqiK3oe6LWweOL9MrBwl9VhidHXyR9KTUeC
+	 iqa9rwqrbPlRcU5d5oCwHJrOl10cjtwVws2x5FWiM1IFeqjhEOik45FzvuRrpBOnRJ
+	 Q0al0rokB3FsA==
+Received: from fdanis-ThinkPad-X1.. (2A02-8428-aF44-1001-DC1D-D4Ab-8E71-B570.rev.sfr.net [IPv6:2a02:8428:af44:1001:dc1d:d4ab:8e71:b570])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9A06D17E04AA
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 11:41:01 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/util: Refactor code from strisutf8 and strtoutf8
+Date: Wed,  9 Jul 2025 11:40:55 +0200
+Message-ID: <20250709094055.516584-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ceggers@arri.de
-Subject: RE: [6.6.y,v2] Bluetooth: HCI: Set extended advertising data synchronously
-In-Reply-To: <20250709090551.9089-2-ceggers@arri.de>
-References: <20250709090551.9089-2-ceggers@arri.de>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
---===============8902729341329555932==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: net/bluetooth/hci_event.c:2139
-error: net/bluetooth/hci_event.c: patch does not apply
-error: patch failed: net/bluetooth/hci_sync.c:1224
-error: net/bluetooth/hci_sync.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Move duplicate code to static validateutf8() and fix boundary access
+on multi-byte character check.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/util.c | 56 +++++++++++++++--------------------------------
+ 1 file changed, 18 insertions(+), 38 deletions(-)
 
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 4780f26b6..36c06188f 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -1909,7 +1909,7 @@ char *strstrip(char *str)
+ 	return str;
+ }
+ 
+-bool strisutf8(const char *str, size_t len)
++static bool validateutf8(const char *str, size_t len, size_t *invalid_index)
+ {
+ 	size_t i = 0;
+ 
+@@ -1928,17 +1928,23 @@ bool strisutf8(const char *str, size_t len)
+ 			size = 3;
+ 		else if ((c & 0xF8) == 0xF0)
+ 			size = 4;
+-		else
++		else {
+ 			/* Invalid UTF-8 sequence */
++			if (invalid_index)
++				*invalid_index = i;
+ 			return false;
++		}
+ 
+ 		/* Check the following bytes to ensure they have the correct
+ 		 * format.
+ 		 */
+ 		for (size_t j = 1; j < size; ++j) {
+-			if (i + j > len || (str[i + j] & 0xC0) != 0x80)
++			if (i + j >= len || (str[i + j] & 0xC0) != 0x80) {
+ 				/* Invalid UTF-8 sequence */
++				if (invalid_index)
++					*invalid_index = i;
+ 				return false;
++			}
+ 		}
+ 
+ 		/* Move to the next character */
+@@ -1948,6 +1954,11 @@ bool strisutf8(const char *str, size_t len)
+ 	return true;
+ }
+ 
++bool strisutf8(const char *str, size_t len)
++{
++	return validateutf8(str, len, NULL);
++}
++
+ bool argsisutf8(int argc, char *argv[])
+ {
+ 	for (int i = 0; i < argc; i++) {
+@@ -1962,42 +1973,11 @@ bool argsisutf8(int argc, char *argv[])
+ 
+ char *strtoutf8(char *str, size_t len)
+ {
+-	size_t i = 0;
+-
+-	while (i < len) {
+-		unsigned char c = str[i];
+-		size_t size = 0;
+-
+-		/* Check the first byte to determine the number of bytes in the
+-		 * UTF-8 character.
+-		 */
+-		if ((c & 0x80) == 0x00)
+-			size = 1;
+-		else if ((c & 0xE0) == 0xC0)
+-			size = 2;
+-		else if ((c & 0xF0) == 0xE0)
+-			size = 3;
+-		else if ((c & 0xF8) == 0xF0)
+-			size = 4;
+-		else
+-			/* Invalid UTF-8 sequence */
+-			goto done;
+-
+-		/* Check the following bytes to ensure they have the correct
+-		 * format.
+-		 */
+-		for (size_t j = 1; j < size; ++j) {
+-			if (i + j > len || (str[i + j] & 0xC0) != 0x80)
+-				/* Invalid UTF-8 sequence */
+-				goto done;
+-		}
++	size_t invalid_index = 0;
+ 
+-		/* Move to the next character */
+-		i += size;
+-	}
++	if (!validateutf8(str, len, &invalid_index))
++		/* Truncate to the longest valid UTF-8 string */
++		memset(str + invalid_index, 0, len - invalid_index);
+ 
+-done:
+-	/* Truncate to the longest valid UTF-8 string */
+-	memset(str + i, 0, len - i);
+ 	return str;
+ }
+-- 
+2.43.0
 
---===============8902729341329555932==--
