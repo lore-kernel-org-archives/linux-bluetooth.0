@@ -1,125 +1,119 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B92C225A37
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 11:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE852DA76A
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 12:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752059021; cv=none; b=mhce2Nn9RLGvqRo91hjOz8dxTDNNQv5DzQaiUXecpR+TPCBiQfKsJ4vObNMu7/terlRGNnDmtuFRZJu/RllwKsy8J96+W+Y/IXSpgT9aERHmc+7H7geh+cRzit1JeUJzFrgN6oYDFFoIunWpADyJrs11XP3ayl2Hl9uq2Yb3NwY=
+	t=1752063654; cv=none; b=E5WG4/1/8INGacq9LeEiTANAhd25TF1y+Z0V0wTEyCDVWk82PDVwRE2/rSvD6UtZH3gAcXcCFSAuSw559rDwNe7AeDJj3vGXE6Ogj+Q52gnxGhH8qy8I2McP2y8ghrIAUtPVnYV5dLOfLX3y7A7WDLK8kACMwWO8Gx4kLUetCWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752059021; c=relaxed/simple;
-	bh=A80KjQQmIIxNHmc6yrvYPN5bW5UMdASfdVbFUngvf64=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=GEhoOYVtr5t7gc8ZxNuf6ASuDzJIKe73/n6ywK/Vp3XGGk9Hz3EQmJttBeWD2iw4m9Gm2AZWo1QmTjdwMV4wzVcY4Dnl+uOIe8TbGXdir735skagUvJne1v99IvK5bsZqJL3ewylr08+OdhKsJZCjOsgt89EHtJbP5jbO2eLyks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mTIbYrTd; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mTIbYrTd"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-876231b81d5so435422339f.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jul 2025 04:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752059015; x=1752663815; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xRk0BGiGBD2LMyBPRbWQBsFMAC9KCVJ/6UsYCGn2LdY=;
-        b=mTIbYrTd4juTxeb7Kd8WpmHoMXCfGFKXNQ0mriPFmvGUDnwWeH7pX1KptUwb2C3qRg
-         kEgJL3ktosZGwYS9J/on4FesXVLix6HzbApxwo+vlTL8+2k3ukSr3ViIVjOBaxAqQsap
-         sUi2gTs6AHDNjZol/QgNReYHCrBv3F4jOa0Z0oeuBql8KkTCM6VDg0qPouORnWb1LOjf
-         XLfidYPHTjWz6lZy8r7cO49Mw8TLFnz6KH8X9MswR1xfCgKXlgrmidND+J/yWFuHbEAa
-         srZ9qsO7AeMxhKP4ou8MEjwQdIZq1M2GaILHq5OUISXK/oF1pp5larndo71cIbJIL6Ox
-         u1FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752059015; x=1752663815;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xRk0BGiGBD2LMyBPRbWQBsFMAC9KCVJ/6UsYCGn2LdY=;
-        b=xPV4azwiwqcH88kyVkyRD+t+tHU9MmfBB2at9lhlHb+JBFRrS2097zbKelf1aac3ms
-         CFaPk64t32R3brz2EIzCLdG5y6KA70AB3P54NWzrxCOUVcxZB49IFmwOyOMZnfl5RVTP
-         apnFc9kpIygskLwxSuCceSIc40igkVBI2NX8ri8f9uAvVpt2h0T9EXP2woiZvBXbl2qO
-         utA6+bUcemvPqBlElRsn8gv56L9ppL6pWRFsejvPoQHxjzPTB0oG445wFrw0TkXRl20t
-         4cyaJGId1saiNdjGLH0fVXrjYDHqYvKYEs+AW4W9yQNRHb7xnG1C7q/fpPvJ3mREZZnd
-         QICw==
-X-Gm-Message-State: AOJu0Yx9RWbDdYYt7n8tOQYbED+Iq01VDGaRJNZ8ACds+UbjS9/t8p9G
-	o0SpRyGPzgc9Hrs3IZhQOBLGFePSaQJvshNw8YhsRgjD4mQQhoPMyUdoXa9Y5Q==
-X-Gm-Gg: ASbGnctT0PAV7E2N8p5pQKn5I39FUy0TBqtwS8NoWsy7DdH9vwZHrYdleb6pAFnLA8y
-	gpBZT8DltV6fkHk8TXZqW12XzakivsnwqAQ1JcFCDhCxFGlPLxff4TqbUMyyfMtpbrGFS95b4Rc
-	NufOfHR8id2xBgx0KV0ZV/7/P1af+dfuQxEKK5rwNj6vEOaAfQFwq/3hMvJ1+w4aTMuuaY/SK9U
-	lA5uh0cKSUPChuckx7yBjVfzWNCl1DNLB8xpR0OwmLXSOEPJb60BVqA7eXAHYIBRHux2zrujg5S
-	ZXA3goas1FWmM2diuuT2FhxqH3PQdO9Jenx/rG492Hz8fGpribmrq+e48M3w8F2IJeAm
-X-Google-Smtp-Source: AGHT+IE0AGT6Nfyn94wAsI/Yes86VCcjI3hNoHRjJUn1LFbHa74HS01l6Qi8MvDIsuUsqcNNXlpX7A==
-X-Received: by 2002:a05:6602:3586:b0:867:8ef:69e8 with SMTP id ca18e2360f4ac-8795b088fc8mr238046639f.3.1752059015185;
-        Wed, 09 Jul 2025 04:03:35 -0700 (PDT)
-Received: from [172.17.0.2] ([13.67.183.124])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-503b5a29eb4sm2632537173.57.2025.07.09.04.03.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 04:03:34 -0700 (PDT)
-Message-ID: <686e4c86.050a0220.14a0e8.470e@mx.google.com>
-Date: Wed, 09 Jul 2025 04:03:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0736444544745039224=="
+	s=arc-20240116; t=1752063654; c=relaxed/simple;
+	bh=lSyqDSxwAxQrFBNhzNWGYYME90KU9v0bgcph5wgGPds=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lQ/Z9wgZKc3HvNevNq4qCEYaEKZzJBZl72Lz6Sh/fbwAR17zRcmNTuJNLZPIcyfCvzX9OpuKADcOn7qFm5yeJnhJy9t/komni2vgdDcHTYQrWuLXGiOEbG44/j8l7WALjB21+pjqXca+1ebHuvB8yLdyGZ0LiTl9nIAuHl7nzD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 9 Jul
+ 2025 15:20:34 +0300
+From: Ismagil Iskakov <i.iskakov@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Ismagil Iskakov <i.iskakov@omp.ru>
+Subject: [PATCH BlueZ v3 0/4] Fix bugs found by static analysis
+Date: Wed, 9 Jul 2025 15:18:48 +0300
+Message-ID: <20250709121852.2811885-1-i.iskakov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] shared/util: Refactor code from strisutf8 and strtoutf8
-In-Reply-To: <20250709094055.516584-1-frederic.danis@collabora.com>
-References: <20250709094055.516584-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 07/09/2025 12:13:06
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 194672 [Jul 09 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: i.iskakov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 63 0.3.63
+ 9cc2b4b18bf16653fda093d2c494e542ac094a39
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	inp1wst013.omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;81.22.207.138:7.1.2;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/09/2025 12:15:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/9/2025 11:17:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
---===============0736444544745039224==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+btio: fix range validation of security level
+Expression is used as an index for accessing
+an array's element in function 'l2cap_set_lm'.
+This expression can have value 4, which is out
+of range, as indicated by a preceding
+conditional expression.
 
-This is automated email and please do not reply to this email!
+profiles/audio: add nullity checks
+Return value of a function 'btd_device_get_service'
+is dereferenced without checking for NULL, but it
+is usually checked for this function (28/35).
+Return value of a function 'queue_find' is
+dereferenced without checking for NULL, but it
+is usually checked for this function (182/183).
 
-Dear submitter,
+src/shared: add nullity checks
+Return value of a function 'util_iov_pull_mem'
+is dereferenced without checking for NULL, but it
+is usually checked for this function (64/80).
+Return value of a function 'vcp_get_vcs' is
+dereferenced without checking for NULL, but it is
+usually checked for this function (4/5).
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=980429
+obexd/client: fix err condition causing memleak
+Dynamic memory, referenced by 'err', is allocated
+by calling function 'obc_transfer_get' and lost
+at bip.c:139.
 
----Test result---
+Ismagil Iskakov (4):
+  btio: fix range validation of security level
+  profiles/audio: add nullity checks
+  src/shared: add nullity checks
+  obexd/client: fix err condition causing memleak
 
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.55 seconds
-BuildEll                      PASS      20.07 seconds
-BluezMake                     PASS      2575.82 seconds
-MakeCheck                     PASS      20.22 seconds
-MakeDistcheck                 PASS      182.18 seconds
-CheckValgrind                 PASS      233.93 seconds
-CheckSmatch                   PASS      302.45 seconds
-bluezmakeextell               PASS      126.73 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      899.39 seconds
+ btio/btio.c             |  6 ++++++
+ obexd/client/transfer.c |  2 +-
+ profiles/audio/a2dp.c   | 35 +++++++++++++++++++++++++----------
+ profiles/audio/avrcp.c  | 24 +++++++++++++++++++++---
+ profiles/audio/bass.c   |  3 +++
+ src/shared/bap.c        | 23 +++++++++++++++++++++++
+ src/shared/vcp.c        |  3 +++
+ 7 files changed, 82 insertions(+), 14 deletions(-)
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+-- 
+2.34.1
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0736444544745039224==--
