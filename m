@@ -1,93 +1,131 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B56A2E0B64
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17E022B8D0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068321; cv=none; b=CKZOqR5oEopfjJ0XF6/nfA9EJuw4+VuV0ehytslmdOSEOMM2Rckjm916u5ClKP60Odh3FWfZTGOu0673GHdipbu8Ip2bfM6eRgeAvCtH58nf7QWJ+UK7IMt2eN8DjPtGIlx3vvOR1tR9Z1/RMKiBFndTg6/iNLBeqbesBcA4Qcg=
+	t=1752068455; cv=none; b=YzMe19tkkIXDJTUqganAw9PwrHKLlSmeIcQT/yLYC2czDKOT4eNGF7z3Rd+Z11qYIghR3wHn8oFCwXtccvrxLhie82xhX0AZ2lZGql72Obe3OfpkJR9H3vR6vKufYLwIwLZk6V1f6Zt1Mvv9o6cqIsgUj9JuGcd2nuoe2mJZ9gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068321; c=relaxed/simple;
-	bh=D5EUCKt2Bvf5eiaGBbyMqM+CBiV5xqjtrexw2B3AJD8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O3ZsdF/touHgSFHSUNN7mLKBsJDcRKEjTknFMAfRxjbfSwlq5pzvR+DuJU8sE5F9sSMyQDOEE5k6/IkG/IMfFG4QDd/JEPXTZcJe1TpcKAyC28Yl6xyuw1QKwqSV7ERqHorlD2AGQ4WF/ggWUgH4zVuu4D/IS/rSrYsH6+RY0JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 9 Jul
- 2025 16:38:22 +0300
-From: Ismagil Iskakov <i.iskakov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ v4 4/4] obexd/client: fix err condition causing memleak
-Date: Wed, 9 Jul 2025 16:36:22 +0300
-Message-ID: <20250709133622.2819849-5-i.iskakov@omp.ru>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250709133622.2819849-1-i.iskakov@omp.ru>
-References: <20250709133622.2819849-1-i.iskakov@omp.ru>
+	s=arc-20240116; t=1752068455; c=relaxed/simple;
+	bh=SlFwh5Yor8Tf3cB+TQeJvEDAYu8g2gbhdar+CgBbj3w=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VOTJJ8UemMM0YQylmmC1s1HW0c7mHsbQO3ap+7YTpfUhFBPVdiUhuUEUFo3R0P5MQ2g9kvKaQOk006ilBVthfsazyY8apDmeSs2knxHnWCiUCAGDCG6mFqTqCORTujxHfXvh1N0AN6V+JZw77JI1ckQgGis4Yc2ybcwrYXXG3Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mg3wOiqu; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mg3wOiqu"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4a774209cf0so60269501cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jul 2025 06:40:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752068452; x=1752673252; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1BqdRLr73D1+mT2K+rOG3XWlAjO4gatYgum5Uk6/XYw=;
+        b=mg3wOiqubAEyZt2K6z0FuS1Mo7XBP4XWlljXzG4GFkI06ASrIuHtuurb+kkJGOTmoX
+         yQTRqvJK6645b/ufatvx0smt+OItIrgA1aLJ/eVpStmU2+eyichRVyit9u1FvEv7Q8Y/
+         TmtW6E8zWmv0+pbr1uh46RA5cvqj/tSmTRXwi9vV5wOIykSccSkZkO4Q5P6W178zbzVm
+         m1mPeOA90yL9gHBTQgqjJnZbwTUJ3RzG5vZjSYGx9ghRjdPSW5kWWfICxBJxV9tmkP/c
+         N5bBrvcDScnrLZqeOlK9H/zStV6+pS7tt/ZbTY+M8GYPm0p9fsG0Q9MxklfBwJf9fsdI
+         DamA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752068452; x=1752673252;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1BqdRLr73D1+mT2K+rOG3XWlAjO4gatYgum5Uk6/XYw=;
+        b=JyJ52lyJPE/1scxuZ5fiGaqMWop1X162CxP25wI3xsnHrs642UED2fbPjlj/N0Q1U7
+         oo1p+PvSi7L5rdsZyV8wGzYVE8zKBUQkuB/A0084+dg7zEZub/aVl6DEpKK4jDonDrFj
+         VN+8ELAvBlvnn8wFBo0brqM9laj+82fLwHfByQ0UtRl2DcJDhg6MuxYGPTf10eWo+gtd
+         YyfTy/jsMI4LzmuGI1b1On1zlEB84XBHNmJMKbxDyavQ7i5IBudyxidJ6eqB66PKllqt
+         NK3/yu+MdbA1PPnkcdvww8dmuMAij3VAD46iqYHN22wbKuUh0Xk9Z6okVv9N65sgwAE5
+         jUTw==
+X-Gm-Message-State: AOJu0YwFZeQYE0VE4roYEERJ7uDAGy2sX88hk5BIR4emqiDJYwYEKDUZ
+	JWyxdf28SQM8owqoV+u1UVnQN06GFw/9YJ6VeF3l30T4Rwe5En+TJiYYkkCodw==
+X-Gm-Gg: ASbGncs+KMrj4J1pGzLptqciXAOTDW6v8lPeZQt3ejm4a5caXQ/97jRgi+5T/5C4FI7
+	DMP18G1HTeFDEO7OJ0lWQmLIYxLao664FPqVdbUqkc2rvuNeO0knotwFZ9Uw56RqDBvUPcygOoQ
+	U9B5iRoL9N+AzzKm9+5jfrAO8sRm3kQ7UaNsnfmJpnEE7VqFKqzVLWtXMx/lUQQhniRs0DMsy48
+	lbH9nQqwzuK1JO8cQw4VIGxqNgFarELs8gVp5QPQMPI1UwhdK9RLoiVTYP/MUaCKUvTve3Pgbqb
+	iv1bIOKAGD2HrHC/k1vWq2JwccQ7EICGtihIOOH9y9jXXdqTbeJZR6A63FIJluOXQdPjKSNAtlD
+	AwzE=
+X-Google-Smtp-Source: AGHT+IG66vWwv94Ygslvs3zK1SlivtQRFsAiCmiqHpVntgwfbLmJ/WBkbmJwU/EYkSKRiRE7FwW5Ng==
+X-Received: by 2002:a05:622a:2d1:b0:4a4:2fad:7cdd with SMTP id d75a77b69052e-4a9ded015e0mr28554791cf.24.1752068452351;
+        Wed, 09 Jul 2025 06:40:52 -0700 (PDT)
+Received: from [172.17.0.2] ([157.55.140.81])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a994a785b4sm99557501cf.44.2025.07.09.06.40.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 06:40:51 -0700 (PDT)
+Message-ID: <686e7163.050a0220.1051b8.4b75@mx.google.com>
+Date: Wed, 09 Jul 2025 06:40:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6496189321174121015=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 07/09/2025 13:27:26
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 194682 [Jul 09 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: i.iskakov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 63 0.3.63
- 9cc2b4b18bf16653fda093d2c494e542ac094a39
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;inp1wst013.omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;81.22.207.138:7.1.2
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/09/2025 13:29:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/9/2025 11:17:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, i.iskakov@omp.ru
+Subject: RE: Fix bugs found by static analysis
+In-Reply-To: <20250709121852.2811885-2-i.iskakov@omp.ru>
+References: <20250709121852.2811885-2-i.iskakov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-transfer_open returns 0 if an error occurs, condition corrected.
+--===============6496189321174121015==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=980500
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.27 seconds
+BuildEll                      PASS      20.71 seconds
+BluezMake                     PASS      2771.19 seconds
+MakeCheck                     PASS      20.05 seconds
+MakeDistcheck                 PASS      184.73 seconds
+CheckValgrind                 PASS      235.29 seconds
+CheckSmatch                   WARNING   307.39 seconds
+bluezmakeextell               PASS      129.11 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      934.68 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- obexd/client/transfer.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
-index a7d00896f..d8ecb60d3 100644
---- a/obexd/client/transfer.c
-+++ b/obexd/client/transfer.c
-@@ -556,7 +556,7 @@ struct obc_transfer *obc_transfer_get(const char *type, const char *name,
- 	transfer = obc_transfer_create(G_OBEX_OP_GET, filename, name, type);
- 
- 	perr = transfer_open(transfer, O_WRONLY | O_CREAT | O_TRUNC, 0600, err);
--	if (perr < 0) {
-+	if (!perr) {
- 		obc_transfer_free(transfer);
- 		return NULL;
- 	}
--- 
-2.34.1
 
+--===============6496189321174121015==--
