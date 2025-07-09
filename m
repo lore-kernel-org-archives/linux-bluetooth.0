@@ -1,35 +1,35 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7272DE217
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E992E611B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068470; cv=none; b=qyEbOICVaH+6XB/gBNAuhrN8aFDY8iKXPhji5kzbxBk4GbLXlBr8j6Mp9TPjuFU3lBbAjSjTTaaJX08nRaC5jhmW9tS7JfZRySLKNCkgSsiU4Gkf/QdZH3C2EnmGf4MtOF+kDHDPpZ6McTmZbEGCb+u/mjPyvffOpgCISPIMLSY=
+	t=1752069236; cv=none; b=iMqBbT9We4DVF/mFKs9DVEecQa8koSpIHojLB95bpJO1KPJbJ5nxg/HawxpVT9I16O4EduSEpsHJeupwF+vxLHN/9lQTIVn8FYekWrdfcKR2y91iNpcO+uI6Isn9oIZxjlUnq+iQQKW2hIAmzKwDgYtRQZA9/alD1ulqB11ZIDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068470; c=relaxed/simple;
-	bh=NPLLJDkZxgDLSSGvrSQK7eYLdkOPX7Acxe/2WPWy5bU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Bk+/WbbxQxliwttyUIzaxvlyBjZlBfZM93d+K2lMqOppbLbBdxXPxv+bMuhFfYHt57dgOYbn2BMiIbl0KA027ZiZYq/HOxi9Y84XXGF4fCDSD5rHP3OyJs5MZDDC4UElYF87xgqsY+vrFTIWOtvse8HQA2GIe5Y98gHVxm5rGBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=PMC3GolF; arc=none smtp.client-ip=192.30.252.200
+	s=arc-20240116; t=1752069236; c=relaxed/simple;
+	bh=loHKDWmtnjvWw6AAccnXXhxBzpkZb7aRhLRniQS1yzA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=j2Q3OkevXMYQzJdwhetn0WMyQ4uXRpjvfyUIVl2E7eMlABuU7MU+4lZsOea5vTAagXpZ9WW2Slbr1jzg84du8KV7wraLSeu0P+vajWaom53f0wF6PJxrbxH21ey6L5SfXKj3ucpjh/EWCF/yH7nfBb8y+JqeLAegn8Eol0yM7vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dPdDPeTs; arc=none smtp.client-ip=192.30.252.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="PMC3GolF"
-Received: from github.com (hubbernetes-node-b2eb4aa.va3-iad.github.net [10.48.210.101])
-	by smtp.github.com (Postfix) with ESMTPA id DB8504E14EC
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 06:41:07 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dPdDPeTs"
+Received: from github.com (hubbernetes-node-4ecc5c8.va3-iad.github.net [10.48.176.37])
+	by smtp.github.com (Postfix) with ESMTPA id 38E14E1135
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 06:53:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1752068467;
-	bh=b2nRgcCPS3DXB4WzfNMQDuyT/kuLN/bfCuVR2I3UL9s=;
+	s=pf2023; t=1752069234;
+	bh=t49GxS1vSsadwB/WnQr5banLpqMYBPJsmu4SEhEx3wU=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=PMC3GolFmgzdDejFsUTXRqZzPiK7L9x/Zy17bp+9m0e/RRyuLSyQKoApfH+/l+05Z
-	 OV3fXM3LGGgRPwCGe38LrWOM4yL3NMEO3Fu5+/LvIOK4J/b6w1KMbblNGuI0y9+8eN
-	 5q33dXhfNUz16NcYSB5+F3yNu9VUgFeIQc6ovlYE=
-Date: Wed, 09 Jul 2025 06:41:07 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	b=dPdDPeTs7uPlWKSdc9GbTCo34//nJiUIEkSAasMPy8ifdKv1J1m5LNMvGFVOfQxZs
+	 uLjdqXFXLGo/Pn6eqrI98WNQ0fINumK6eOzbPJEUzft45TnG2XljEWJUiRqNJdfR4K
+	 BUvJubKNMM3ORj16FgRkHTeTQhXbCZu0OAiZx5c8=
+Date: Wed, 09 Jul 2025 06:53:54 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/980525/000000-086150@github.com>
-Subject: [bluez/bluez] 086150: shared/util: Introduce strnlenutf8
+Message-ID: <bluez/bluez/push/refs/heads/master/a3824b-09212f@github.com>
+Subject: [bluez/bluez] 80a6b9: btio: fix range validation of security level
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,25 +42,77 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/980525
+  Branch: refs/heads/master
   Home:   https://github.com/bluez/bluez
-  Commit: 0861503351ffcefcb2ed690f71f9a332de204f45
-      https://github.com/bluez/bluez/commit/0861503351ffcefcb2ed690f71f9a332de204f45
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: 80a6b91d758ac94d6b6d40250d68f06cd4a06097
+      https://github.com/bluez/bluez/commit/80a6b91d758ac94d6b6d40250d68f06cd4a06097
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
   Date:   2025-07-09 (Wed, 09 Jul 2025)
 
   Changed paths:
-    M src/shared/util.c
-    M src/shared/util.h
+    M btio/btio.c
 
   Log Message:
   -----------
-  shared/util: Introduce strnlenutf8
+  btio: fix range validation of security level
 
-This introduces strnlenutf8 which works similarly to strnlen but return
-only the number of valid bytes of UTF-8 encoded string then replace the
-other copies of similar code.
+Arrays inside l2cap_set_lm/rfcomm_set_lm functions are of size 4,
+but the bounds check allows the value 4 for 'level'.
 
 
+  Commit: 77932f2dac1af0506e289703e43e057d21c40fce
+      https://github.com/bluez/bluez/commit/77932f2dac1af0506e289703e43e057d21c40fce
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-09 (Wed, 09 Jul 2025)
+
+  Changed paths:
+    M profiles/audio/a2dp.c
+    M profiles/audio/avrcp.c
+    M profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  profiles/audio: add nullity checks
+
+Cover bass_setup unsuccessful search and btd_device_get_service.
+This change is motivated by the other usages where checks for
+NULL exist.
+
+
+  Commit: 9432bfe81afd177be2778c65b640658f88b7ef28
+      https://github.com/bluez/bluez/commit/9432bfe81afd177be2778c65b640658f88b7ef28
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-09 (Wed, 09 Jul 2025)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/vcp.c
+
+  Log Message:
+  -----------
+  src/shared: add nullity checks
+
+Check util_iov_pull_mem where iov len is not verified
+beforehand. Check vcp_get_vcs for NULL.
+These changes are based on other usages where those
+checks exist.
+
+
+  Commit: 09212f9d110e268332041c6038895e581d73d4bd
+      https://github.com/bluez/bluez/commit/09212f9d110e268332041c6038895e581d73d4bd
+  Author: Ismagil Iskakov <i.iskakov@omp.ru>
+  Date:   2025-07-09 (Wed, 09 Jul 2025)
+
+  Changed paths:
+    M obexd/client/transfer.c
+
+  Log Message:
+  -----------
+  obexd/client: fix err condition causing memleak
+
+transfer_open returns 0 if an error occurs, condition corrected.
+
+
+Compare: https://github.com/bluez/bluez/compare/a3824b4aac0e...09212f9d110e
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
