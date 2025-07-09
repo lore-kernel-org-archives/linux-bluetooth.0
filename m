@@ -1,35 +1,35 @@
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E992E611B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D3828DF1B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752069236; cv=none; b=iMqBbT9We4DVF/mFKs9DVEecQa8koSpIHojLB95bpJO1KPJbJ5nxg/HawxpVT9I16O4EduSEpsHJeupwF+vxLHN/9lQTIVn8FYekWrdfcKR2y91iNpcO+uI6Isn9oIZxjlUnq+iQQKW2hIAmzKwDgYtRQZA9/alD1ulqB11ZIDw=
+	t=1752069287; cv=none; b=ZpwLfj++Hs4mh5uQq4kpPM9IVdgoAzG+7y/FjLPjn+YXcePZ21K8CCqApTMknxn+zQApRMeGSfb0/SHveq66Q/6jCdfaQRqhZ+bI4KkX6mBgx7LPzWoIKVJjcwKAIRbl9HYrF8uxu0bvR61q2O0bKrh7AtliAjqv/iWx9A5hKSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752069236; c=relaxed/simple;
-	bh=loHKDWmtnjvWw6AAccnXXhxBzpkZb7aRhLRniQS1yzA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=j2Q3OkevXMYQzJdwhetn0WMyQ4uXRpjvfyUIVl2E7eMlABuU7MU+4lZsOea5vTAagXpZ9WW2Slbr1jzg84du8KV7wraLSeu0P+vajWaom53f0wF6PJxrbxH21ey6L5SfXKj3ucpjh/EWCF/yH7nfBb8y+JqeLAegn8Eol0yM7vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=dPdDPeTs; arc=none smtp.client-ip=192.30.252.201
+	s=arc-20240116; t=1752069287; c=relaxed/simple;
+	bh=zYd9NX2jlGYk/T17KN/3+G3Da896fh8u9BanyGQO+RY=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=WLmMkkMc2t7nBy+h08ffJimzHnEaOd+QhWpsjTEaKSFedlylfg8st56wmOYGDbxZoLuj3mXAz+pRsRwFZ0SmBHq3Vjz+oFQ/vcDXmyNyEtNoE4HwvDkte1gg7VPN1D0lIi/32WdJ8tbUBMwmkmVnIPzgXHAs/KTxZtPJMZ5FT9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lGPwgmwg; arc=none smtp.client-ip=192.30.252.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="dPdDPeTs"
-Received: from github.com (hubbernetes-node-4ecc5c8.va3-iad.github.net [10.48.176.37])
-	by smtp.github.com (Postfix) with ESMTPA id 38E14E1135
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 06:53:54 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lGPwgmwg"
+Received: from github.com (hubbernetes-node-5430fb2.ac4-iad.github.net [10.52.136.22])
+	by smtp.github.com (Postfix) with ESMTPA id CB8F670091E
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 06:54:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1752069234;
-	bh=t49GxS1vSsadwB/WnQr5banLpqMYBPJsmu4SEhEx3wU=;
+	s=pf2023; t=1752069284;
+	bh=cgrkxGy2WJ/gi+681JdnhDAGm7s+UD48py0jn/G3N8I=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=dPdDPeTs7uPlWKSdc9GbTCo34//nJiUIEkSAasMPy8ifdKv1J1m5LNMvGFVOfQxZs
-	 uLjdqXFXLGo/Pn6eqrI98WNQ0fINumK6eOzbPJEUzft45TnG2XljEWJUiRqNJdfR4K
-	 BUvJubKNMM3ORj16FgRkHTeTQhXbCZu0OAiZx5c8=
-Date: Wed, 09 Jul 2025 06:53:54 -0700
-From: BluezTestBot <noreply@github.com>
+	b=lGPwgmwg4cvutFQ87b2Yh69vbRr1bb+ISshT+FusgixuplXfqIoatSSsEyZ2jMUQg
+	 Sy8iPtCAeotF3/4jaUJGnm0qzfGoLeZRXcOL2K5ikTUv16xsabhGa699Oxw6hhLZXZ
+	 qz0kZWxOzdoog0sn9uMAziX479wdXN3HBzU1PndI=
+Date: Wed, 09 Jul 2025 06:54:44 -0700
+From: "github-actions[bot]" <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/a3824b-09212f@github.com>
-Subject: [bluez/bluez] 80a6b9: btio: fix range validation of security level
+Message-ID: <bluez/bluez/push/refs/heads/980540/000000-b00403@github.com>
+Subject: [bluez/bluez] 340fde: btio: fix range validation of security level
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,10 +42,10 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
+  Branch: refs/heads/980540
   Home:   https://github.com/bluez/bluez
-  Commit: 80a6b91d758ac94d6b6d40250d68f06cd4a06097
-      https://github.com/bluez/bluez/commit/80a6b91d758ac94d6b6d40250d68f06cd4a06097
+  Commit: 340fde776e00622969c475989ad8a1badc2c075b
+      https://github.com/bluez/bluez/commit/340fde776e00622969c475989ad8a1badc2c075b
   Author: Ismagil Iskakov <i.iskakov@omp.ru>
   Date:   2025-07-09 (Wed, 09 Jul 2025)
 
@@ -60,8 +60,8 @@ Arrays inside l2cap_set_lm/rfcomm_set_lm functions are of size 4,
 but the bounds check allows the value 4 for 'level'.
 
 
-  Commit: 77932f2dac1af0506e289703e43e057d21c40fce
-      https://github.com/bluez/bluez/commit/77932f2dac1af0506e289703e43e057d21c40fce
+  Commit: 29361026d98a59655d4810873a7aff5e5f868d7b
+      https://github.com/bluez/bluez/commit/29361026d98a59655d4810873a7aff5e5f868d7b
   Author: Ismagil Iskakov <i.iskakov@omp.ru>
   Date:   2025-07-09 (Wed, 09 Jul 2025)
 
@@ -79,8 +79,8 @@ This change is motivated by the other usages where checks for
 NULL exist.
 
 
-  Commit: 9432bfe81afd177be2778c65b640658f88b7ef28
-      https://github.com/bluez/bluez/commit/9432bfe81afd177be2778c65b640658f88b7ef28
+  Commit: c653ac1fb8725f9d0a0c3eb0a0a94d4d8365df8d
+      https://github.com/bluez/bluez/commit/c653ac1fb8725f9d0a0c3eb0a0a94d4d8365df8d
   Author: Ismagil Iskakov <i.iskakov@omp.ru>
   Date:   2025-07-09 (Wed, 09 Jul 2025)
 
@@ -98,8 +98,8 @@ These changes are based on other usages where those
 checks exist.
 
 
-  Commit: 09212f9d110e268332041c6038895e581d73d4bd
-      https://github.com/bluez/bluez/commit/09212f9d110e268332041c6038895e581d73d4bd
+  Commit: b004030371dbf83e35c4b6638db5cfd289f159ba
+      https://github.com/bluez/bluez/commit/b004030371dbf83e35c4b6638db5cfd289f159ba
   Author: Ismagil Iskakov <i.iskakov@omp.ru>
   Date:   2025-07-09 (Wed, 09 Jul 2025)
 
@@ -113,6 +113,6 @@ checks exist.
 transfer_open returns 0 if an error occurs, condition corrected.
 
 
-Compare: https://github.com/bluez/bluez/compare/a3824b4aac0e...09212f9d110e
+Compare: https://github.com/bluez/bluez/compare/340fde776e00%5E...b004030371db
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
