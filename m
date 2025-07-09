@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1FB18DB03
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171BF2BF002
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068308; cv=none; b=ecCWt27/HrUGB5gIzNMCSQstUQeH66mBSCGBW5YaMjZjWk5VZZ+1TlmSZtJiV7dgV4lBuQs6GBV+hmXFuOa/sd/gfjSQ3D9L4tuXLyrNcrk2vNFXBmunN8MBWg5R+Q0diWajvHBhtwCXVoIVRgU8VJKqQgLOTo7s8V/DkQEDzLc=
+	t=1752068312; cv=none; b=GicLH//sufdXYK2jI+ZeGQeo9T3XZ/FFbIkf97luRNrcVqyy8ZdGsp1iZ50iMqWZG3iqpheCoqqxE2ncR42Yjeo4YH1A1RpTJi3Ds0RaX6bmj8pTmxf5h+XmGLnFF6KYnoNV8ZJbjZZ4xnsJsEDjAdHc+k8CdBye8Y2cU6nNs+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068308; c=relaxed/simple;
-	bh=tIg0RORZiSBl9dikfrdmyXzimCtyEUhPqzG88QBc2HE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CWjisKZmNAgEPRRB7g5hoD3v+DJ2pzAJA033HS6lODyoqzWsvQCpTPxAKaLwCF5mdWKQT427j2kG36RLoWTGu5BJlWToIPgwi8W7IWx2cYoevQMB6XrZITNyvvGy/bdLlPdlVS0a8m99FHlyDmfG9tlXPCY40Pldh+tS5XA0Pus=
+	s=arc-20240116; t=1752068312; c=relaxed/simple;
+	bh=bEXRb1L99kj0Dfs8MGz9njNsgnrwIKiwM9vbhFGUBUM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rF6ycStmaoHVRGEyyKqWrVJBCQo0qndoozLZqFIISvp6rT1QVIL7XUYIUtQfXZdrDwzTBpRd3J2ak6AFseAJla0ZAD1zWikf0Nx8vOMtWsemSGVQ0ijZeRCzWoJcGC0JtkLBl2rnouo8e05rhENr1iBGX4NnYEw4GP+4lA/t3wY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 9 Jul
- 2025 16:38:07 +0300
+ 2025 16:38:14 +0300
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ v4 0/4] Fix bugs found by static analysis
-Date: Wed, 9 Jul 2025 16:36:18 +0300
-Message-ID: <20250709133622.2819849-1-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ v4 1/4] btio: fix range validation of security level
+Date: Wed, 9 Jul 2025 16:36:19 +0300
+Message-ID: <20250709133622.2819849-2-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250709133622.2819849-1-i.iskakov@omp.ru>
+References: <20250709133622.2819849-1-i.iskakov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -73,49 +76,29 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-btio: fix range validation of security level
-Expression is used as an index for accessing
-an array's element in function 'l2cap_set_lm'.
-This expression can have value 4, which is out
-of range, as indicated by a preceding
-conditional expression.
+Arrays inside l2cap_set_lm/rfcomm_set_lm functions are of size 4,
+but the bounds check allows the value 4 for 'level'.
+---
+ btio/btio.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-profiles/audio: add nullity checks
-Return value of a function 'btd_device_get_service'
-is dereferenced without checking for NULL, but it
-is usually checked for this function (28/35).
-Return value of a function 'queue_find' is
-dereferenced without checking for NULL, but it
-is usually checked for this function (182/183).
-
-src/shared: add nullity checks
-Return value of a function 'util_iov_pull_mem'
-is dereferenced without checking for NULL, but it
-is usually checked for this function (64/80).
-Return value of a function 'vcp_get_vcs' is
-dereferenced without checking for NULL, but it is
-usually checked for this function (4/5).
-
-obexd/client: fix err condition causing memleak
-Dynamic memory, referenced by 'err', is allocated
-by calling function 'obc_transfer_get' and lost
-at bip.c:139.
-
-Ismagil Iskakov (4):
-  btio: fix range validation of security level
-  profiles/audio: add nullity checks
-  src/shared: add nullity checks
-  obexd/client: fix err condition causing memleak
-
- btio/btio.c             |  6 ++++++
- obexd/client/transfer.c |  2 +-
- profiles/audio/a2dp.c   | 34 ++++++++++++++++++++++++----------
- profiles/audio/avrcp.c  | 24 +++++++++++++++++++++---
- profiles/audio/bass.c   |  3 +++
- src/shared/bap.c        | 23 +++++++++++++++++++++++
- src/shared/vcp.c        |  3 +++
- 7 files changed, 81 insertions(+), 14 deletions(-)
-
+diff --git a/btio/btio.c b/btio/btio.c
+index b8afe0580..bc14199f2 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -474,6 +474,12 @@ static gboolean set_sec_level(int sock, BtIOType type, int level, GError **err)
+ 		return FALSE;
+ 	}
+ 
++	if (level == BT_SECURITY_FIPS) {
++		g_set_error(err, BT_IO_ERROR, EINVAL,
++				"FIPS security level is not supported for L2CAP_LM/RFCOMM_LM");
++		return FALSE;
++	}
++
+ 	if (type == BT_IO_L2CAP)
+ 		ret = l2cap_set_lm(sock, level);
+ 	else
 -- 
 2.34.1
 
