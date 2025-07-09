@@ -1,200 +1,205 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92ECB277804
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D6421CC74
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752066680; cv=none; b=Cmq7QnaeAUkTH/3ihTu1vAL/uo1TCqrfWY8W6Edh2iDVfUNgshTQ6EBRUySmu1rQeiy0xXbrkM037gr1PVu21u3IDn1k6sFKQ7EPmizhsARIL+iaxzNEbMkLJGDellSQQid8kJ79sLeh7ygETjdpl+7I8ldHv5zFwtCpi6TUf90=
+	t=1752066907; cv=none; b=Z3Q6WCMRpeEyVHIBOAolj+d1P9nL0tt+gOP/m2q3X0N++eADDk9XtB9nDzOzn/8GhNO+LsJAj46CQuzKzazYs54ASkPBaPYlf1Pd6S5LNEW1dbBaBREkwauS295YfFrGm8wXA7VuAAPbpovRiotHoRtg7G6z0HTDCy7lj5DClog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752066680; c=relaxed/simple;
-	bh=FbSNMkOFZejcmGAyPVKeOB5/9Ht8pDSMOWI4aMzk93o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DijVWBmbHY2PRAOnmlNLZX4jNPzRMf/pg+VJnE8ID6LOhrVAgnm0/TfnhhH4zdDpQ+Yqi/ny0N826tPzq9DNFIxrhyyDwfo8LuZCmw/BlBDAaX3ajbI67KgarFII8loLq2vuRniKPZWMiCNgjZU4KtVYcs/YFxTqgiheV3f4kiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jDnFzdUu; arc=none smtp.client-ip=209.85.208.176
+	s=arc-20240116; t=1752066907; c=relaxed/simple;
+	bh=oFMq0boicICq+Ck+OSWJCOnB6tDIVR7F3e8SRYRb6dA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=pVFiwWc2/RBT8Ozy1K3EAc7XionIcDYr2l0egsxZdDfVwdCmXYxs9wQ9Kq7tgIcqDP1qJFjXrLleHLXwIQvMEJ9hZgAUGtkrGhVYfFoorsmfHmRLNia+6uLxxnsoRDN5fXCDiIKCEB/b0tJAXgHNghRQfhnFtTYL9kUvlIrV5cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lT5yesnW; arc=none smtp.client-ip=209.85.221.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jDnFzdUu"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32ca160b4bcso61684231fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jul 2025 06:11:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lT5yesnW"
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-531acaddd5eso1660827e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jul 2025 06:15:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752066675; x=1752671475; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WGcGBIR3oE0SPnMchqPvxKgn7Avq25ZjScPyWlfvGXs=;
-        b=jDnFzdUu50V27XsBVatLbmiSwtgyCsGRuu0FdgZAkjolM1kNPClReO3Ak+JUs9VG2v
-         4ZuJGgL1G1T0wmw9zfEPC5kMI/rl6Xf2CAXTTbU6h/4K1MEGr+/9r1pbBtfjwFrW9kIq
-         u20CYUYQZw8sF0RG+AojrFHO3N/socG6qY9lzzmWL0jK1k9kd7AgmWl6Dj944gS5eWpI
-         g31OB2tH684h5SJZeSQWTenw+gBQdC5fY4ZTbVHXqLYf3d3IQb39WkFsPDhrqhN281aM
-         IMaNgKHfMIVvQVBtem+LLsqbUZeLbvnfVezm4v1dBVcMD0JLEU3bLzPgqoC09sBZbUiH
-         9Vng==
+        d=gmail.com; s=20230601; t=1752066904; x=1752671704; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7ErRFR6VsPqe1LtNRoOBgaX4BA4HAVRZRsQ1OHLgYgE=;
+        b=lT5yesnWtC99yFTwkHjzlmYGgk81M1kPJKHeRxxXSvicFhyU5AfZEru0gnBeTueeP6
+         IumQsFe59yBBB6U+1Tgo00Hidpf/DOeQ66d8s58FZn2+iCmlsV0h8ah1RAj6Bm/YgpUN
+         BV67cuWQgizzyf5Q6FMmlaB1xmfyYpEmRgjRZbLRqNSk69eQottrp9RT+TIB7ifqZeCG
+         N7LJXkNsgPZUrNi+pxhJaLDM7OiP5iIYEdhJsK8oCNRkwjW/wNn5NRdbRID7LHGn7cnT
+         oXbf+0xUq8KNii0uEgdpvVOjrZz9R8FzWaLYMa5DS4xZjTnzoIiBjmPgfenw7EzFMUP0
+         UlXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752066675; x=1752671475;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WGcGBIR3oE0SPnMchqPvxKgn7Avq25ZjScPyWlfvGXs=;
-        b=hckZuF0C+QJ5u1qHpo98Yw8SRmH9duxEJVssieCf7UwcQvmSvCDZdWJJtWOt36AQKO
-         TmwHJFayyJFjxQy8+5YIdu2zZoWOqSquwLq4cFaCj/b2uhRvk5kNbXdfNlNvdyAif2G/
-         yS70ZqryhruW9hQz/aaDAyZzeQmDwq+lH1K6xNNSUCWkaDLZn0a/V2PzyoWrtOQPRGpe
-         X2zNxa3LHbUeOcsUSiaWm2lGrUMrHYPH3kfJt3GKbppODByKLK2TIVPCPdLyiOqiZtl5
-         +1LwyZc9Pj2oP5d3cP90EK1+6bfpSS1f6yiEm6KCxiHuS1OxAscP+VNUEYr+4fzoNAQd
-         QkFA==
-X-Gm-Message-State: AOJu0Yyk8Eh3UeVmzFlm8udqyw9Xc4rOHWyjIt4xVPnqI+La8F6uMWZb
-	jgRIPnmHlCBJhLHxI5QRMB6Cm6j2vCOk9OGa4phtFQwIq/Czk1Pxyr5g7SUO4DqRgLixqIA3apn
-	TIYElLo8fDsYpaoBo/xKQr8zVj0YG7wA=
-X-Gm-Gg: ASbGncuQRTyfR41az7rg+GlUPHOCAm239t+gzxiMjsVZez/0Vr4Y+zABQ9i+dmafsEO
-	qE995Yq2YRD/9uTur8C+pnn9bAH/fGYneVYaazoZk6pkyiYbFHfHzo5WNfChF0zwsQodIfFlcDN
-	r4sGwfySk5Gb8n1os8R+Tn4qX/Q0ciipV7c6AdOZsisg==
-X-Google-Smtp-Source: AGHT+IEx7WiFZNa5xZvCdziKE+fHzJT31xaFshtIGO4psldbhF7mW0MocAplQLzE2JGkjoFBPuRFskbPO5qSteBMqQ0=
-X-Received: by 2002:a05:651c:1986:b0:32b:7123:ec4c with SMTP id
- 38308e7fff4ca-32f485a63cbmr6697001fa.38.1752066674503; Wed, 09 Jul 2025
- 06:11:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752066904; x=1752671704;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7ErRFR6VsPqe1LtNRoOBgaX4BA4HAVRZRsQ1OHLgYgE=;
+        b=Zt7Ib4STInfzYiVUgFEqmrpFsEv77ooNAgFfyBTLT7uev+j7v78HfPCJl9PW7jq8zE
+         7TcgcEa7Z873QbdDpWka8oXg9Ec67Oh/qAaKOWSzeZ62rM6TI6+NLqhWs5oQs9TbAx4G
+         rQqVNvXSKd2ZLbGkObHGWFKIGOM9d+RVlvrXW7OAFEIBoJE/KObd/8142LYAY1y3tCm/
+         X0XdLlPNJ3YZbNid9Iv+t8+AoIpr6x3M8CgcE3+jlIOhSg91VIBGFoQCXqf6M1Zk/RHq
+         MCu2Seg/162AKDxM87MVCY4eb0PvSCGuhZ3vpF11ODKTxcw9uB7aZhHAc3wxaYfBPF9D
+         hSDg==
+X-Gm-Message-State: AOJu0Ywtk1l+M4dTMpWiGFqpu9LKQDP2BjhpnT4OGedT5zqvTbsFeMxw
+	WflFEDW6PcaASaRmWqlfuBQ47UQYn/u5ZbFPd9U9L23C8CYfor7FcJUywPoOLjGZfto=
+X-Gm-Gg: ASbGncsvPbdmSX75axD3VnleKsqibyn2pACqvGLFD8Qeeqe+YR+9otHm+nOURyA0hAg
+	x6X0mvHMcLAdBfq93mfJtSiI3c6naTFE/S4+XkVvojY8zzdl/qyP0nsEkbUyHZAcKJQKh3+rX1t
+	U9YbjxmASvbZrBtB1Kw6DMSyi0Ne80OgxszUWgovzVLiFsTRGTxVSpabOLotWZR756dq+ZlPuet
+	LIFXfyVQSW2vgRxiUPufXyTOpdL1FB5Yaqb8gUGCydb7FzhG4zAaGlm0CiK4334xA0sxYI1Ws1F
+	1tKMcg7yUpZCtXeou9N+FQAdrf/vXnVVxaKPQCa8UvD+dGg5EoiwEiM0vP0iUcyuw0yRMeHEAE1
+	vqBY3ZeiI/eo3kkFaGDqTlvEjItZx
+X-Google-Smtp-Source: AGHT+IFmPJVjVSg0+IzpJlRUrgidshpz8u2Tvrsw2//0bFTEW+d8uhqz5gYnX7ttopirwbMULbtq+g==
+X-Received: by 2002:a05:6122:4202:b0:534:8213:af78 with SMTP id 71dfb90a1353d-535d7404c06mr1285852e0c.8.1752066903538;
+        Wed, 09 Jul 2025 06:15:03 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-534790f2a20sm2186569e0c.45.2025.07.09.06.15.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 06:15:02 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2] shared/util: Introduce strnlenutf8
+Date: Wed,  9 Jul 2025 09:14:53 -0400
+Message-ID: <20250709131453.3203903-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709094055.516584-1-frederic.danis@collabora.com>
-In-Reply-To: <20250709094055.516584-1-frederic.danis@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 9 Jul 2025 10:11:01 -0300
-X-Gm-Features: Ac12FXzsiSQPFKCGii5W2XXciif8inpktZ5uKz5f6heX0B7TJte5uZlLfoQ3Hc8
-Message-ID: <CABBYNZL1oPd+VYZKiJqz0RM0Rr8oXXmUTxfTeLvkZxyi3RaGbA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/util: Refactor code from strisutf8 and strtoutf8
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Fr=C3=A9d=C3=A9ric,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jul 9, 2025 at 5:46=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> Move duplicate code to static validateutf8() and fix boundary access
-> on multi-byte character check.
-> ---
->  src/shared/util.c | 56 +++++++++++++++--------------------------------
->  1 file changed, 18 insertions(+), 38 deletions(-)
->
-> diff --git a/src/shared/util.c b/src/shared/util.c
-> index 4780f26b6..36c06188f 100644
-> --- a/src/shared/util.c
-> +++ b/src/shared/util.c
-> @@ -1909,7 +1909,7 @@ char *strstrip(char *str)
->         return str;
->  }
->
-> -bool strisutf8(const char *str, size_t len)
-> +static bool validateutf8(const char *str, size_t len, size_t *invalid_in=
-dex)
->  {
->         size_t i =3D 0;
->
-> @@ -1928,17 +1928,23 @@ bool strisutf8(const char *str, size_t len)
->                         size =3D 3;
->                 else if ((c & 0xF8) =3D=3D 0xF0)
->                         size =3D 4;
-> -               else
-> +               else {
->                         /* Invalid UTF-8 sequence */
-> +                       if (invalid_index)
-> +                               *invalid_index =3D i;
->                         return false;
-> +               }
->
->                 /* Check the following bytes to ensure they have the corr=
-ect
->                  * format.
->                  */
->                 for (size_t j =3D 1; j < size; ++j) {
-> -                       if (i + j > len || (str[i + j] & 0xC0) !=3D 0x80)
-> +                       if (i + j >=3D len || (str[i + j] & 0xC0) !=3D 0x=
-80) {
->                                 /* Invalid UTF-8 sequence */
-> +                               if (invalid_index)
-> +                                       *invalid_index =3D i;
->                                 return false;
-> +                       }
->                 }
->
->                 /* Move to the next character */
-> @@ -1948,6 +1954,11 @@ bool strisutf8(const char *str, size_t len)
->         return true;
->  }
->
-> +bool strisutf8(const char *str, size_t len)
-> +{
-> +       return validateutf8(str, len, NULL);
-> +}
-> +
->  bool argsisutf8(int argc, char *argv[])
->  {
->         for (int i =3D 0; i < argc; i++) {
-> @@ -1962,42 +1973,11 @@ bool argsisutf8(int argc, char *argv[])
->
->  char *strtoutf8(char *str, size_t len)
->  {
-> -       size_t i =3D 0;
-> -
-> -       while (i < len) {
-> -               unsigned char c =3D str[i];
-> -               size_t size =3D 0;
-> -
-> -               /* Check the first byte to determine the number of bytes =
-in the
-> -                * UTF-8 character.
-> -                */
-> -               if ((c & 0x80) =3D=3D 0x00)
-> -                       size =3D 1;
-> -               else if ((c & 0xE0) =3D=3D 0xC0)
-> -                       size =3D 2;
-> -               else if ((c & 0xF0) =3D=3D 0xE0)
-> -                       size =3D 3;
-> -               else if ((c & 0xF8) =3D=3D 0xF0)
-> -                       size =3D 4;
-> -               else
-> -                       /* Invalid UTF-8 sequence */
-> -                       goto done;
-> -
-> -               /* Check the following bytes to ensure they have the corr=
-ect
-> -                * format.
-> -                */
-> -               for (size_t j =3D 1; j < size; ++j) {
-> -                       if (i + j > len || (str[i + j] & 0xC0) !=3D 0x80)
-> -                               /* Invalid UTF-8 sequence */
-> -                               goto done;
-> -               }
-> +       size_t invalid_index =3D 0;
->
-> -               /* Move to the next character */
-> -               i +=3D size;
-> -       }
-> +       if (!validateutf8(str, len, &invalid_index))
-> +               /* Truncate to the longest valid UTF-8 string */
-> +               memset(str + invalid_index, 0, len - invalid_index);
->
-> -done:
-> -       /* Truncate to the longest valid UTF-8 string */
-> -       memset(str + i, 0, len - i);
->         return str;
->  }
-> --
-> 2.43.0
->
+This introduces strnlenutf8 which works similarly to strnlen but return
+only the number of valid bytes of UTF-8 encoded string then replace the
+other copies of similar code.
+---
+ src/shared/util.c | 82 +++++++++++++++++------------------------------
+ src/shared/util.h |  2 ++
+ 2 files changed, 32 insertions(+), 52 deletions(-)
 
-I did something similar yesterday:
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 4780f26b6d59..fa058170e124 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -1909,58 +1909,8 @@ char *strstrip(char *str)
+ 	return str;
+ }
+ 
+-bool strisutf8(const char *str, size_t len)
+-{
+-	size_t i = 0;
++size_t strnlenutf8(const char *str, size_t len)
+ 
+-	while (i < len) {
+-		unsigned char c = str[i];
+-		size_t size = 0;
+-
+-		/* Check the first byte to determine the number of bytes in the
+-		 * UTF-8 character.
+-		 */
+-		if ((c & 0x80) == 0x00)
+-			size = 1;
+-		else if ((c & 0xE0) == 0xC0)
+-			size = 2;
+-		else if ((c & 0xF0) == 0xE0)
+-			size = 3;
+-		else if ((c & 0xF8) == 0xF0)
+-			size = 4;
+-		else
+-			/* Invalid UTF-8 sequence */
+-			return false;
+-
+-		/* Check the following bytes to ensure they have the correct
+-		 * format.
+-		 */
+-		for (size_t j = 1; j < size; ++j) {
+-			if (i + j > len || (str[i + j] & 0xC0) != 0x80)
+-				/* Invalid UTF-8 sequence */
+-				return false;
+-		}
+-
+-		/* Move to the next character */
+-		i += size;
+-	}
+-
+-	return true;
+-}
+-
+-bool argsisutf8(int argc, char *argv[])
+-{
+-	for (int i = 0; i < argc; i++) {
+-		if (!strisutf8(argv[i], strlen(argv[i]))) {
+-			printf("Invalid character in string: %s\n", argv[i]);
+-			return false;
+-		}
+-	}
+-
+-	return true;
+-}
+-
+-char *strtoutf8(char *str, size_t len)
+ {
+ 	size_t i = 0;
+ 
+@@ -1987,7 +1937,7 @@ char *strtoutf8(char *str, size_t len)
+ 		 * format.
+ 		 */
+ 		for (size_t j = 1; j < size; ++j) {
+-			if (i + j > len || (str[i + j] & 0xC0) != 0x80)
++			if (i + j >= len || (str[i + j] & 0xC0) != 0x80)
+ 				/* Invalid UTF-8 sequence */
+ 				goto done;
+ 		}
+@@ -1997,6 +1947,34 @@ char *strtoutf8(char *str, size_t len)
+ 	}
+ 
+ done:
++	return i;
++}
++
++bool strisutf8(const char *str, size_t len)
++{
++	return strnlenutf8(str, len) == len;
++}
++
++bool argsisutf8(int argc, char *argv[])
++{
++	for (int i = 0; i < argc; i++) {
++		if (!strisutf8(argv[i], strlen(argv[i]))) {
++			printf("Invalid character in string: %s\n", argv[i]);
++			return false;
++		}
++	}
++
++	return true;
++}
++
++char *strtoutf8(char *str, size_t len)
++{
++	size_t i = 0;
++
++	i = strnlenutf8(str, len);
++	if (i == len)
++		return str;
++
+ 	/* Truncate to the longest valid UTF-8 string */
+ 	memset(str + i, 0, len - i);
+ 	return str;
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 6fc02a9dcb5a..c480351d6e9f 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -90,6 +90,8 @@ do {						\
+ char *strdelimit(char *str, char *del, char c);
+ int strsuffix(const char *str, const char *suffix);
+ char *strstrip(char *str);
++
++size_t strnlenutf8(const char *str, size_t len);
+ bool strisutf8(const char *str, size_t length);
+ bool argsisutf8(int argc, char *argv[]);
+ char *strtoutf8(char *str, size_t len);
+-- 
+2.50.0
 
-https://patchwork.kernel.org/project/bluetooth/patch/20250708174628.2949030=
--1-luiz.dentz@gmail.com/
-
-Let me know if you have any comments.
-
-
---=20
-Luiz Augusto von Dentz
