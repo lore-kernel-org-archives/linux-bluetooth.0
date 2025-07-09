@@ -1,16 +1,16 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838352D3EFF
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B56A2E0B64
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jul 2025 13:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068318; cv=none; b=QPFINVK4NnwG9BBysrGD+V0S6JWJ7+ellYy4bfpev+6fvOkz1+qwYjEsyFKmNOw7+dSKmcZ96ju31hsIaSy335Du1WFDKwwMg8or7Q15gV9WPGYlHDVBwn11V9U3g81B3V12O1r8k5aybO7zq9OCb7JcQ06Hf4Fp3/Djc5HkFx4=
+	t=1752068321; cv=none; b=CKZOqR5oEopfjJ0XF6/nfA9EJuw4+VuV0ehytslmdOSEOMM2Rckjm916u5ClKP60Odh3FWfZTGOu0673GHdipbu8Ip2bfM6eRgeAvCtH58nf7QWJ+UK7IMt2eN8DjPtGIlx3vvOR1tR9Z1/RMKiBFndTg6/iNLBeqbesBcA4Qcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068318; c=relaxed/simple;
-	bh=bcgJprEhdVrumqPpPJ2OFaadHUsNJo2wNxE9u0lnS10=;
+	s=arc-20240116; t=1752068321; c=relaxed/simple;
+	bh=D5EUCKt2Bvf5eiaGBbyMqM+CBiV5xqjtrexw2B3AJD8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lhkVbphD7aV2LNVlu/AXBo1wxlNyI88hnwKITTj726V1Lhb+mxnZz4sntP0J3LIJW9hZOzSOC734tK2AaqFhJOdm2or3+oF9CllSqVAhW3PlI5QPIx2W5eIJrRCjP3qq5Q0Qwp21OJ/vL+piGJnf8fPiLuKjT14EBBn3b1kqJ4U=
+	 MIME-Version:Content-Type; b=O3ZsdF/touHgSFHSUNN7mLKBsJDcRKEjTknFMAfRxjbfSwlq5pzvR+DuJU8sE5F9sSMyQDOEE5k6/IkG/IMfFG4QDd/JEPXTZcJe1TpcKAyC28Yl6xyuw1QKwqSV7ERqHorlD2AGQ4WF/ggWUgH4zVuu4D/IS/rSrYsH6+RY0JM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
@@ -21,9 +21,9 @@ Received: from inp1wst013.omp.ru (81.22.207.138) by msexch01.omp.ru
 From: Ismagil Iskakov <i.iskakov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Ismagil Iskakov <i.iskakov@omp.ru>
-Subject: [PATCH BlueZ v4 3/4] src/shared: add nullity checks
-Date: Wed, 9 Jul 2025 16:36:21 +0300
-Message-ID: <20250709133622.2819849-4-i.iskakov@omp.ru>
+Subject: [PATCH BlueZ v4 4/4] obexd/client: fix err condition causing memleak
+Date: Wed, 9 Jul 2025 16:36:22 +0300
+Message-ID: <20250709133622.2819849-5-i.iskakov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250709133622.2819849-1-i.iskakov@omp.ru>
 References: <20250709133622.2819849-1-i.iskakov@omp.ru>
@@ -70,84 +70,24 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Check util_iov_pull_mem where iov len is not verified
-beforehand. Check vcp_get_vcs for NULL.
-These changes are based on other usages where those
-checks exist.
+transfer_open returns 0 if an error occurs, condition corrected.
 ---
- src/shared/bap.c | 23 +++++++++++++++++++++++
- src/shared/vcp.c |  3 +++
- 2 files changed, 26 insertions(+)
+ obexd/client/transfer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index ba6f75ff2..8c186e6f1 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -7568,6 +7568,11 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index a7d00896f..d8ecb60d3 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -556,7 +556,7 @@ struct obc_transfer *obc_transfer_get(const char *type, const char *name,
+ 	transfer = obc_transfer_create(G_OBEX_OP_GET, filename, name, type);
  
- 		codec = util_iov_pull_mem(iov, sizeof(*codec));
- 
-+		if (!codec) {
-+			ret = false;
-+			goto done;
-+		}
-+
- 		util_debug(func, NULL, "Codec: ID %d CID 0x%2.2x VID 0x%2.2x",
- 				codec->id, codec->cid, codec->vid);
- 
-@@ -7579,6 +7584,12 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
- 		}
- 
- 		l2_cc.iov_base = util_iov_pull_mem(iov, l2_cc_len);
-+
-+		if (!l2_cc.iov_base) {
-+			ret = false;
-+			goto done;
-+		}
-+
- 		l2_cc.iov_len = l2_cc_len;
- 
- 		/* Print Codec Specific Configuration */
-@@ -7593,6 +7604,12 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
- 		}
- 
- 		meta.iov_base = util_iov_pull_mem(iov, meta_len);
-+
-+		if (!meta.iov_base) {
-+			ret = false;
-+			goto done;
-+		}
-+
- 		meta.iov_len = meta_len;
- 
- 		/* Print Metadata */
-@@ -7623,6 +7640,12 @@ bool bt_bap_parse_base(uint8_t sid, struct iovec *iov,
- 
- 			l3_cc.iov_base = util_iov_pull_mem(iov,
- 							l3_cc_len);
-+
-+			if (!l3_cc.iov_base) {
-+				ret = false;
-+				goto done;
-+			}
-+
- 			l3_cc.iov_len = l3_cc_len;
- 
- 			/* Print Codec Specific Configuration */
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index e614ff61f..be002ad4c 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -2934,6 +2934,9 @@ static void foreach_vcs_service(struct gatt_db_attribute *attr,
- 	struct bt_vcp *vcp = user_data;
- 	struct bt_vcs *vcs = vcp_get_vcs(vcp);
- 
-+	if (!vcs)
-+		return;
-+
- 	vcs->service = attr;
- 
- 	gatt_db_service_set_claimed(attr, true);
+ 	perr = transfer_open(transfer, O_WRONLY | O_CREAT | O_TRUNC, 0600, err);
+-	if (perr < 0) {
++	if (!perr) {
+ 		obc_transfer_free(transfer);
+ 		return NULL;
+ 	}
 -- 
 2.34.1
 
