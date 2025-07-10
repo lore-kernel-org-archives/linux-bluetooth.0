@@ -1,35 +1,35 @@
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DCE234963;
-	Thu, 10 Jul 2025 08:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D9E26E14C;
+	Thu, 10 Jul 2025 08:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752134498; cv=none; b=bIEdKcb8TP+5NzRNoRKtQjEy/z2cvi/XCQ3hF5PnPO+oF87RcnTfKCrlsCfVsh/iDb1fEgbClKD55/zrOYLJ2BWdni6mU+1mzx07WwlXGYhzg2b9x61T1cvpIRfs/lSeQHE6j/rW61oJkt8M6xbJQfP0PHvNzDO8tBy5A1eaxgs=
+	t=1752134797; cv=none; b=fdvN/VUA3Mvx221uynEn8X3QZhAkfeHt2sCOWcDjlGAoMqPQTW7AF6Gy5JgbpehIatZ3DiObfFRkh2lgIDjDfR7js6JZdF4rVZAgoh7VgCH50QRBMLnaiMV/XN+P68wS9tLmYjfNss/g1taOqVhV/R5AZRtP4kb64CLWu7n5Ndg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752134498; c=relaxed/simple;
-	bh=DRXqcTGpVxb73VPyz4tMHlw6YPMLyxqlM+wBlmGLGLs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MtOaXcoWVUCyLFLJTlFCLwZkmctoARsBtvo2uZO5AqSgTXf8xWI+SmC51L3PMpavJhB65w1ZUrTdunef+xsOClgMRl27WjJZLwFiOUrPFjuXQjPMhv8RTUUAO9qt0PoDKUGu7bdFCWwOKJhF2JLdn9PRWbkOIoBRB6otLNpkuuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=CikTtMdx; arc=none smtp.client-ip=54.204.34.129
+	s=arc-20240116; t=1752134797; c=relaxed/simple;
+	bh=g97DMZDtpJ1kJvGWRlR7B3Sn1He/PQJNQ8m/ysttO/g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ud0Zl+mX5vE1wXa+JlybsLx0z8grhsTmn1AYtI1Igi62/1L0e1JhT5A1fg1y45X0I8lSJ9CxJGd8614ThrX36snXVQC2JTawGxWavql/8PYlb1Bg3/UDOvWmdK44gRquqx3utzFC0SNfGOaRdF2G7jfEL/H71tGDis9vtlzcfGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=RfRgkunB; arc=none smtp.client-ip=54.207.19.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="CikTtMdx"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="RfRgkunB"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1752134448;
-	bh=6lKlIi5ajAbS9uOFEmqwayvdHQUIcQAf/tUMGqLl7Hg=;
+	s=onoh2408; t=1752134766;
+	bh=9pBXcmkS5dqa/3ho22UiSkwn1wSVVM4LYCclRvyOeio=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=CikTtMdxIppDqbxA03RcR/6sDOO3PwTSv3X/Aze88mbnHIEimuzL79R4L+IY7KCuU
-	 xziFaVENe5Q/9UIwvg/eg7AqQzzAoq4nxkv/vQKAGcNcLSO4XUXpSKkM3HTlRz5Vmd
-	 3DOJuNoieRNwbTSOh4jmYGqcuU6bs7IAk+kMjZLA=
-X-QQ-mid: zesmtpip3t1752134435ta4efbe0e
-X-QQ-Originating-IP: oH408aLbArq/IBbIuc8rHcUhm8RTX0w0pHU25K5nhuc=
+	b=RfRgkunBEXkLn5qBVgL7STbdUYzbEpwWtEocqsdbtFLHgRjleVd6F2ooPulImH4K3
+	 e+hn1mST27Olbfw8qffAkvzSkOGesaEf3DVKpBfs4ie1/y0yrCLiqMHXz7C1Gxej21
+	 7IIA+YPl88VI6DOBDFtuTvoeS8K5n69IKpQfssmU=
+X-QQ-mid: zesmtpip2t1752134754t8a6fc4e8
+X-QQ-Originating-IP: XrbToqNref8QtDRBTbC3FB7/yHn/WZi2aJS2+w31baM=
 Received: from avenger-e500 ( [localhost])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 10 Jul 2025 16:00:33 +0800 (CST)
+	id ; Thu, 10 Jul 2025 16:05:52 +0800 (CST)
 X-QQ-SSF: 0002000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 6375983909695600124
+X-BIZMAIL-ID: 16189720168025562383
 EX-QQ-RecipientCnt: 9
 From: WangYuli <wangyuli@uniontech.com>
 To: marcel@holtmann.org,
@@ -39,11 +39,11 @@ Cc: linux-bluetooth@vger.kernel.org,
 	zhanjun@uniontech.com,
 	niecheng1@uniontech.com,
 	guanwentao@uniontech.com,
-	WangYuli <wangyuli@uniontech.com>,
-	Hao Li <lihao1@uniontech.com>
-Subject: [PATCH] Bluetooth: btusb: Add RTL8851BE device 0x13d3:0x3601
-Date: Thu, 10 Jul 2025 16:00:28 +0800
-Message-ID: <5D4383E66D4177F3+20250710080028.177664-1-wangyuli@uniontech.com>
+	Hao Li <lihao1@uniontech.com>,
+	WangYuli <wangyuli@uniontech.com>
+Subject: [PATCH] Bluetooth: btusb: Add RTL8852BE device 0x13d3:0x3618
+Date: Thu, 10 Jul 2025 16:05:48 +0800
+Message-ID: <43D87E237D082F39+20250710080548.180268-1-wangyuli@uniontech.com>
 X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -54,32 +54,35 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: M4lPCacZ9YleRM+4rCi0M/hltC8h5TJkLO938qEo/u6FvgkAOpIDsLGr
-	cdgheiiiznNUfk9U92WkEngKYyND2P2swkmJNoxsE0r/1zkHZ5BeK7iDglhS+IhIRmhIC/9
-	LuhO3qjfa2vB01wlM39J+AigMfOClU44rwyOHYidCVoenb7KjMtcvhlFFWg/SgNp4hNoJDZ
-	byvwK8xbctJ/fO2LiVR3cCagQd3qMq0JpwF+BC11oM8BlTdFGRXap0fM4Y/g/5fFo2gJICH
-	fDdxBJQiMRHHBPeN6ysWcGcMQI1QxBgtN5JekMTluTew6QlK4R0cFKSLaRJr+WaY1rPue3r
-	gStddsB2Vh4KUpzQ/YTAheyK1MvDEmOVIFtX6AEizM91U8euWpTc68yyd2Nea9fByPzptW9
-	uwceM9bSOL9swWQpKaG1JK8+sXRAsiMqCc7+Fc2QYE29215DJzN6h0c02GDc5+1hpsE8sQD
-	/Uk6LjxFfkd1QiHsn49rrWoUv32pzI3YWUog70czXtaI+FwyDgfVUoI9UXhwOlpMVAReQqC
-	qIMqsjaZ6SavJoE3ptzBl4eqgBwkxcU43v7XNVkSyaSDxZQ2dwzFMq+aRs/ME4KcGW9ZlBR
-	F4Et7qSs3YnZlr/pST/JBO9umGDEGmr0RWHJI9SfSycV6BLL+zeJDg6MDTktyF5OaHtZB4/
-	eu+eOkCpaIHF2n2E5hnmwuvwKhLjPHt7qTt4dkdzrD8ctzNMGlkGF2SErB0StZFswQNRWTK
-	HjBCqLJiIXhbxvSE+RCvU9P+2Q1ijtgJSOjaNgAHJNYz2gd2HnISMBEyPKjIM3Uahv2c3Or
-	EGUB6U6x5OcTyWwUi330Nqvzyt/J88XboiiokggTRPIj84JT55tCGKsZZzcqUJC+1pVRfDe
-	DTfuR4vzTQopKGh/bJk3UeN4GpK3BupKxaOyoUaXtK8Ouc8fhnjBZ38tCwYP0J0wfhLEReZ
-	MKz5lEJFr5XbBIng0Okxuw6nIEqut2KoLTaCuJ3JxuSMmv86r82ba96Rcz7IbAI3dh80kWc
-	vohP+jvnEKKDneUWb4ATlp8VJshD2198Dgp+KIi/4l8zEwK6rjKf0b4q9aXoz9vmU2gF+dl
-	f7DU/MYW3ic
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-XMAILINFO: NKHXOVLrVQ/Nwpj8NoO9hyBitrKmAcvWpq24LCd95gjz/wpswKcZGq1w
+	boN6ewQYmQR6JNr0bWMjnUGJqUxCJLwAlIaffGNm3BSiCr5ZGlR8t2OLhSCUNzaG7tXuh05
+	8tlJ5zfwYT8HCmMP2reJ5jMlJ1rtmfZDWlyQJ6CFHwIw0Q4I9k/yQnkefCeD9JtKNVnuONK
+	9SCq9z5xxzROdZYmAPF0Z+uXa8s/rBsgL4/7iWpExponIrK676b2ugIZdSlFaGPLNUqPvvb
+	R+Rl2NnK5ZsTWoMkJPEbzhre3vk0DGpdV/y6opSzl8Zzqk0xwNiREjDpgMBZ0P/8+0XUtJx
+	CzgYmxHS2s2paRMAdNlhkenBycOE7tfY+tfzJ2EumAoWAv9zxtnHZosr+Yd0W2RRG6ONtr2
+	hBKHk+okMKQl1MgTSvy/O2ksDk6U92e4l5yLf4bpoWlNbZChRepcKG7eCDjHbkjh9ln/oZd
+	mzjEGrztD06VV0vlHuLYGY07F1btU1ApRHSo+BW3b0lalBq7K6+8aTJJEWxBnAuMMPJWy/j
+	nECU7e6zxWTQFbKIwevBpq5rV4VDuMymjQjMDT6pW8iy+Rme8Hgkz2JzGH7EsX6499hsQ6E
+	loNwWcoNYZKx75MNAuSRDRThcj0TkuopFnyai6J3nUZD2MfUBpCaNl63jqT3OiSDy6GmI/L
+	S3pRusR/24nTZbOZ3ubcXoa2QqL3+PIU9LAo1xa6WXRzjouf7uBtDRX2E1LMilf0P0UYE1k
+	iv4CruQrmgwYXyvOI/L7CDQj7VmEvb48/jiLdeAMIhxziFJFXk8Om/xh+7JFctRDMsYASsK
+	qMpYt/jEZ3OIw1aYtF0FGp7hfHr5gQascgdNZ/9tZ+Gvx2YunuPlax0I3flzOzWk15+XnV+
+	O4p40x7IR1yACLt3AcBwYzKfGmCX7TNjOtPMd6Qc4BFl1YsFDXShilZfG8Wozzw5r/9KRnN
+	EiZ5N6a+oTmYJAkSyE7jsnkRc5c6CzWqR3W6zz/UdqNC+/2gD6nnBd/nzbh6QhPif3G71ZY
+	PGeChMkyTQw6L3jrQCi/X9SCLd9hN1XPNJjvkkFMcQQjevdOHAX+qmUCqr9PUq2y+wWFHVa
+	ciXH3XSc1XL9kmr2eRq0YwpMfB+ks495lUehMxxVdwh6IhwONsmw9LqtbN5WEH6B7zoVkYN
+	DVq2
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
 X-QQ-RECHKSPAM: 0
+
+From: Hao Li <lihao1@uniontech.com>
 
 The information in /sys/kernel/debug/usb/devices about the Bluetooth
 device is listed as the below:
 
-T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
 D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3601 Rev= 0.00
+P:  Vendor=13d3 ProdID=3618 Rev= 0.00
 S:  Manufacturer=Realtek
 S:  Product=Bluetooth Radio
 S:  SerialNumber=00e04c000001
@@ -106,29 +109,26 @@ E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
 I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
-Co-developed-by: Hao Li <lihao1@uniontech.com>
 Signed-off-by: Hao Li <lihao1@uniontech.com>
 Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9ab661d2d1e6..aa7ade6a1866 100644
+index aa7ade6a1866..1ec559fde9e7 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -515,6 +515,7 @@ static const struct usb_device_id quirks_table[] = {
- 	/* Realtek 8851BE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0xb850), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3600), .driver_info = BTUSB_REALTEK },
-+	{ USB_DEVICE(0x13d3, 0x3601), .driver_info = BTUSB_REALTEK },
- 
- 	/* Realtek 8852AE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
+@@ -566,6 +566,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3591), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3618), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe123), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe125), .driver_info = BTUSB_REALTEK |
 -- 
 2.50.0
 
