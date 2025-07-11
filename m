@@ -1,46 +1,46 @@
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013000.outbound.protection.outlook.com [40.107.159.0])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013010.outbound.protection.outlook.com [40.107.159.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BBB2F0059
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 17:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1042F1FD3
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 17:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752255704; cv=fail; b=bGYmSDPGnd6KnyD/glPWoMmeF2siaxfYr+jqeuaBUjc1eeldxjg2pvXKl4JYwmE/kGRA4Jeq2ZRONzXIkWS7AqByP5XpTawdPu71iTzEMeW/d/tzar+rL4iinKkOhAW8lcgjFMBjTCt79nYa2pscI/UXhhuS9JiqIS5RWpyzLVI=
+	t=1752255717; cv=fail; b=tB82x9yGLXiDdOb9xYVE+d8J/4U9Tlao0FQTRfQZSm79VEbC6m5DVs3F4TNazGfBDPya+IptIzkAG4jzQcIkQYsgrV/JPO2jS1aaAsaJNzJlfBiY7Gk/rraWRKVgc9CqIJbWO6WT5TjRSYk4Y1c1pF+Q8OpnR7Ha2cP36dhPQ0g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752255704; c=relaxed/simple;
-	bh=iyWnnMrFw5GwH5MY4NYzRUgE9iphKkU2K83l4OLsmnA=;
+	s=arc-20240116; t=1752255717; c=relaxed/simple;
+	bh=by6tVbSamzkDFbDggvq8zdDtzPAmQOIPU/vzZWffIEw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dZHdAzW8toijhMgUJ7l3ACOEhrRVjhOPjpwXrJLTsAtuJyOsPHtG0MRAprkNx0s92JwMEBjIWL92JY+hKKunjdmEEJ/mrdz23WKa6jKWVUvkuNUaCPydtApONO41WJ8FQ8Q3v4165jtQz17azOjxWUDiSUOdydiDdCJK+9MjSsg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=Ut6ZM7oW; arc=fail smtp.client-ip=40.107.159.0
+	 MIME-Version:Content-Type; b=H1JHe/DqLChEjQQ0CSsCDCNWrz/umQmko1gDmdkTtgx+V4+gQJOyuScDv95JgS3lhFXdVySnGFZHKodF4gVcmSTtWZ/1P+ysr/pnaXG056jgtmSGUcdhbcFiVVgbzudFHjDrV30WfwlQqzuKKmLZO3pljkvetAECPIia5n3oB74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=LL0l2RTd; arc=fail smtp.client-ip=40.107.159.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="Ut6ZM7oW"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="LL0l2RTd"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xn0iM6t8PwY9CSLuOwtPliypj1dkufpZogrmM6jznl6eBrBiBswQzgF2FztxN0sGJykYYkZQDI3osgFOm58nXpKgwzO/gzZzk7KG/182Lk41I7WHZHetGIBhSrPEOQsmapO92wkMLwXFL+yXEKH5JEw2PSSg0S3vVfA00Vj6nh8RFEJNfA6/SNDBnDBxHeHryHf3hSa0tfFo00Vfxml0glCKBN4N7atEepeyjhRbcGozBG23rEP1HBguImhIWhroJzLDtEtpsUduRme039ysKheA9LYXDjCYcA0/Qkx2VVYwEIStHDVxewj0K9i0d11r6VOjjSPnTpJEYPAuDkHz0g==
+ b=S9HPwZ16uLg6CzNpweIqyZ2wrYQ6mz6XhPy4S2tw16TJGJ7GbWSjfC5o9Ql5b0F9IaKdFQyXExgOZkVSNnS1CpwYiMHsxoBKVO6kRswBaQtky4OIKVSCJgcs+tHpHizWMYrFr0x4gFRKkr1J4snRKLp+pkpmwokBFW58WEOk0f1o9yNC32LavhPOT5ijnw8scO3ra8K/Hy3RbJYDht95Cy3YRbz8PnjCidsdCmI/T/RbjA5PcetghhRvYELU9qGmiQekjflms5DdOQM6tDWHxAhsRaZJMHjO1d89SA0oG2ASA31pVclq7V0fJSMh+FWTxwp0KtNGdS/msilgqS1t7Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FIFET7edovHsUjAMoKGJ3fYaGtlt8jzsS7Pi7ytwUm0=;
- b=EkZC6ONtPn3C30O1NCm1vy1hTTe9QrYVeEa9GL72ektY9BIJ/Brn3AbBToVfXhGRg2qlSV6pzxft1zw+Nw358gs80P9USs37UN56Eto68QqCLqxhQtVvLhQaGSjk7c/XfbQl/i7D4nptjaIba0euS8XDSYAJYiK+4aCYtXCO+9MslNOn5/kgQ7oI9YkcIm6ilsp7CuXXh85wlYRGORqf+wRqPE8Lm4nCnkxi2wUTDPP9vJ8J1YyTAyUlduehPBKcuu5kB9/XTqZ4hnZedNe3rTBA4lJb0eFB0XcQeZohRUgJYa4fCAlQMM/kU6K/a1TA/qDuwxYp44J8iDZeBgq87Q==
+ bh=PnYhv/p8R783aDyhqAhQrbhcXHez1W8DxTimyt23RDA=;
+ b=kv83cjoU2IhAajevjdXjDb8/f7FWP9/aTSGnZ3lKCcRydxHy8WasSFzXGmId4iKyDvq1/qQEZ6WrkoT1gAml81DVQH997zy2zE0/ClW+3y/neuy9KGhsK711/hRF/VVdsmrKMjAwdBrcHW4u4fxDRJmzh4GOQJx2pEoKbM+FcWyLcsIonwAPldgVK7+sADZO81uMp1JEImzlJAieI86DRsTI2B5+ELXRpDtHqcPxoF3nEamV6iqp3kGKnRgJKXHpH7JdDoujlLGzYdVBJiQATh+e4ESJrxvcjbUBEwGFHyOV2xln2AKaMYi2IxJaOhP8CHeQJLCiGIaB/eo+DHDF6A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=gmail.com smtp.mailfrom=arri.de; dmarc=fail
  (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
  not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FIFET7edovHsUjAMoKGJ3fYaGtlt8jzsS7Pi7ytwUm0=;
- b=Ut6ZM7oW0DbcWnWrKPSPm//RCgWhXMutwSmmhEw9M7A5uVdhEUduHLPcgJGPanCmY3bKcbRyNrWifmzbozk8OilrcOJan3UTg9D0HhHZvsM9+ytp2i+DXQ5ibsoWMP7h3+veIJkWujf3sdpJV8yIxSusfJVAmZllXsy+gDOWru8=
-Received: from DU2PR04CA0315.eurprd04.prod.outlook.com (2603:10a6:10:2b5::20)
- by DB4PR03MB9338.eurprd03.prod.outlook.com (2603:10a6:10:3fe::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.25; Fri, 11 Jul
- 2025 17:41:34 +0000
-Received: from DU6PEPF00009525.eurprd02.prod.outlook.com
- (2603:10a6:10:2b5:cafe::c9) by DU2PR04CA0315.outlook.office365.com
- (2603:10a6:10:2b5::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.25 via Frontend Transport; Fri,
- 11 Jul 2025 17:41:34 +0000
+ bh=PnYhv/p8R783aDyhqAhQrbhcXHez1W8DxTimyt23RDA=;
+ b=LL0l2RTd0VD4qTr55ApaVcAb3lzr0WajfZSxms0YPJclEupigCT2czntPxt3wCSP9FJz1H/JMBKoQb+qbXyLr6OuodpPHiQj8OSjGDyucNLwuxDnXa7mjX+w8ZRdKnXqAk0AxHWwrgKuLz6ywaU5RD7Z+2TanghpjQkdTN97D5A=
+Received: from DUZPR01CA0135.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4bc::6) by AS8PR03MB8468.eurprd03.prod.outlook.com
+ (2603:10a6:20b:52e::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Fri, 11 Jul
+ 2025 17:41:51 +0000
+Received: from DU6PEPF00009523.eurprd02.prod.outlook.com
+ (2603:10a6:10:4bc:cafe::27) by DUZPR01CA0135.outlook.office365.com
+ (2603:10a6:10:4bc::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.27 via Frontend Transport; Fri,
+ 11 Jul 2025 17:41:09 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,20 +48,20 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- DU6PEPF00009525.mail.protection.outlook.com (10.167.8.6) with Microsoft SMTP
+ DU6PEPF00009523.mail.protection.outlook.com (10.167.8.4) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.22 via Frontend Transport; Fri, 11 Jul 2025 17:41:34 +0000
+ 15.20.8922.22 via Frontend Transport; Fri, 11 Jul 2025 17:41:50 +0000
 Received: from N9W6SW14.arri.de (192.168.54.13) by mta.arri.de (10.10.18.5)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Fri, 11 Jul
- 2025 19:41:33 +0200
+ 2025 19:41:50 +0200
 From: Christian Eggers <ceggers@arri.de>
 To: Brian Gix <brian.gix@gmail.com>, Inga Stotland <inga.stotland@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
 CC: Christian Eggers <ceggers@arri.de>
-Subject: [PATCH BlueZ 3/9] mesh: replace MESH internal defines by shared ones
-Date: Fri, 11 Jul 2025 19:39:19 +0200
-Message-ID: <20250711173958.25689-4-ceggers@arri.de>
+Subject: [PATCH BlueZ 4/9] mesh: net: constify tx path
+Date: Fri, 11 Jul 2025 19:39:20 +0200
+Message-ID: <20250711173958.25689-5-ceggers@arri.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250711173958.25689-1-ceggers@arri.de>
 References: <20250711173958.25689-1-ceggers@arri.de>
@@ -75,429 +75,115 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF00009525:EE_|DB4PR03MB9338:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65a1673a-80c7-4524-7f7d-08ddc0a22dd9
+X-MS-TrafficTypeDiagnostic: DU6PEPF00009523:EE_|AS8PR03MB8468:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41e57570-7d49-4bd3-fb68-08ddc0a237a6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026|30052699003;
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?IZE2b0UakHMwzOa41c7NEwD6A2oOzOuroKSqQH1kdswNAbfe78GNaHUQIsUv?=
- =?us-ascii?Q?hipKlpyCo0v/umyGSO/o8gxOjrp0cakiIG6NnjD8gkghzV++IKs1F3yR6Grr?=
- =?us-ascii?Q?V8+CyHH53ZjT9LJrq8dvChBPxEScS3UkrgvQnF0q1ZfIJSMjr2hiNy8CMg9O?=
- =?us-ascii?Q?ToV429qE7Ilwew10TVDCkoSO1WcNcrTpE82XypdgfKhqzVbLQv1kzbFJkumX?=
- =?us-ascii?Q?+8Y6e7PjwNr1+FukseqR4TEncCJWPffMIr9XBxdHLyqwE9vXue2TZgKsfqlp?=
- =?us-ascii?Q?CfqoXZFl9b5b6voJgwiWhiXLgGUSk+p6Ataq61NSK0AZsgASs2TlGYUdxV+d?=
- =?us-ascii?Q?Iw0Po0+/0SX1DYG17R4g/MJbV4BUeiZLkg/MpmsjpZQohSUnLmBwxUNc9p8I?=
- =?us-ascii?Q?/RLTgVuO18D0Cqy+3HSt2u5akd0FK1iYZgjWK2JOFOrB6ZjkL+5tFb/4Jy41?=
- =?us-ascii?Q?UoOgKs+DKNQw0H89BRHvhc2dqkrUz82xHQfc//apYFWX3rqjLShWBGyWUj0H?=
- =?us-ascii?Q?X6ETZGhc7Bc7CIx2F3qMJ3h0yHlG1Lzomzp6F71Bz6AtnF4QSQRGSZiMyvLc?=
- =?us-ascii?Q?C7RVIt3/u97hJ7OcJxELwRjQTBqV5jzY6a6nf+3y4OMmC+NgM0Har3fbJNhd?=
- =?us-ascii?Q?BUkgDfFYx6B4OscViOgTjXGkpAg4iy8EIwdqNunMBNuPCiwWSVjSQr0fNACz?=
- =?us-ascii?Q?1RUcfSZSmbLZI4/JO7o3cFuKZy9rXJNPuLsMS4JxpAQCV9ZbXtUvXCm27BmP?=
- =?us-ascii?Q?2vAMjpbJRd0q20c6WDhboZX974XAEK0gXMTSpvrP5Pd9DOHLjinshvvTefJO?=
- =?us-ascii?Q?P0qK9kv3iFc45NDwkdXNAWoHCQfohcYOXxowBcHPkxnqj1BF49XRToaNbVWH?=
- =?us-ascii?Q?N4p6ehq0Ovc2G2CVB/HcGjJ69gYPp89cvnGANJVSbuVFENYor8p8w75qZVW/?=
- =?us-ascii?Q?aVRaxyaqYtfD95uq2VI733b9zLlaCtCYAz//m0bneDMM0hrglSzJKp4bgiec?=
- =?us-ascii?Q?5ts2I4sjcfzvE2KPHJ80M+1Ke7sndc1j9m9oCnj0uzgnUFAuFlU6gEudN2ng?=
- =?us-ascii?Q?4iRlmbMxGIUu5s3KAP/AfOKcfvhIaKLsg3BTu9cM9v8A8qG8maNEqoCh+Xtk?=
- =?us-ascii?Q?rh+HIy/BbsXiMBWY6VDDOfmRX67rvQGTvh0Y1N5MErmDms1qyfLtTiuaANZA?=
- =?us-ascii?Q?FryBa/QItgSkU0c5IEUzQycQhVXytTNSYm38v1ePHXq8PiXgbQpL4XAAa1BN?=
- =?us-ascii?Q?6kHrkMOkhsQcs/24sIyJwBgNpvVZnkz5Y3BWwCcVzydTql7ktFo8FpIWXRN+?=
- =?us-ascii?Q?svfM9S5pxvTBXRMn7ZlyoceHXZwZtBwO5+txqnXuDZNWyClbvhqBJQfWTfXM?=
- =?us-ascii?Q?RcRMMz7UsdrtN7Xq2SblOc4S5nOcNDsoyT/RUOPefGP5iyYPktxKNSlTSF8c?=
- =?us-ascii?Q?vEA1ysr0xT164CkZCcnkoDzbjmlQAB+oxSXHU6F5Axy3r+0s76z/aEnb2Xd/?=
- =?us-ascii?Q?ELq+uTFQreB23vDWPlSVKmQ/dhYLwdyINyYa?=
+	=?us-ascii?Q?yiHGkiPDyBU4KFGvniog9BT+Gx5IJph6blJKIrpCpnIK4mzYOTkMNusQKIOT?=
+ =?us-ascii?Q?pbwxOup2B9LGDat8FDwjsoVxdRzkRCUe3/CaFXvmMCHm8aUcMCmG18/xCAe7?=
+ =?us-ascii?Q?elns6qorsdwZvx4o8g3SJbS7ZP4aFJtZRqhEtiDNsfSFTsg/nG87YCfQ+Cdw?=
+ =?us-ascii?Q?3aLOlMpL/MXT+N13xcyTmiAMybdHXIvwx23pXWonKRh5b4DVthKb8kw1K0Og?=
+ =?us-ascii?Q?iNmwWxxql2lbBX3N0conYwgyevP8Ax0VfC5W52VSsguN5/ELugNwcI4Hk7QI?=
+ =?us-ascii?Q?DZftGy923okL++PmY/KunE0lU0syGdz5/Y1TUK0++SiPhLlQfiNADEIiEy1l?=
+ =?us-ascii?Q?OQ7APXdBp64i+R8Hk3iLEyDM/b6sNOfZvMg5a3u38h2okNtsx0NfB38Gfhc7?=
+ =?us-ascii?Q?uDTnVY29EogtEap9ihiBHkIdNf5IkVSNqjoR6siZqhH6PsEkeeQC7nCoAVJq?=
+ =?us-ascii?Q?mA8QJ9IBT+z49q2hDj8MM4QB9aLh+Ga+uV3CutgFv2N0otcc1WREaWJghvvG?=
+ =?us-ascii?Q?suJsqSYUo2rYVgD/c2UoX4ZFgQXlDV5fzoqIaFw/dzgZC+9e3pTdf21oeLjC?=
+ =?us-ascii?Q?biTv8nfPvPne9e7NFGof0Mu7HfqeH8PSLPxCiIoK6xxBCzaj8dAslwLk4qT/?=
+ =?us-ascii?Q?4J+4IG+S5FKo+kNwHwL1vyr9RXPyjraMrF6yqtCtbUrhxaOUXWmk+MtrMs8l?=
+ =?us-ascii?Q?KT9HFAuYm15xtkSrKMn/96WjSwjQA7HvBmTFfKN19XR8JDCt1b49l0xW5IAu?=
+ =?us-ascii?Q?qMLRExwXYO8Drl76H/rzdo6xOo5WofP2Jkul88DASQgG6hSQlanO3bzyUKM2?=
+ =?us-ascii?Q?5FKekbYkEVMPbHiWNeVDSe5FwgjmKduqBKtXN7ihXMLGB6yEeI3KQlhMD/Tg?=
+ =?us-ascii?Q?59Flb1nMxR5ReZd8PwbDC0S3YorguQ9Qk8c0/HnMqZMcy2gaYECaKqXzXg6Q?=
+ =?us-ascii?Q?2MV66CuBjZqyzHG1qNhm0wTD8PKSY5DYcku/Jsyx8mxaekFgtH9fTU0hn36O?=
+ =?us-ascii?Q?uuSG6KSmQMeSdTHmphkfNQzRS+bCtOSOMN+aazQlxjaNIV91HpieWdWcZqj2?=
+ =?us-ascii?Q?np/peFF1i0DplC4pkdWIxFgKomCV9DQlVTyUI2vaMg+2v9b0581hdX9VUDyu?=
+ =?us-ascii?Q?kREp8eAV3yXCXs0xMFQkH1O9OqrPYlUtiPPbDfuBsTsQHWJ894GtM88/01Uh?=
+ =?us-ascii?Q?fNrXfvrc9xeMpo6hQgDwq28vtsCZXmuqUshGwwZ+h8LdAS2X81oYC3KrWJT3?=
+ =?us-ascii?Q?6Ulg3aJlNYNwJnDV7S5WPy6UgUgQZRyatjq6waCInVIY817VW1mhsHqfpBsB?=
+ =?us-ascii?Q?GxNjLPtZU/TYEUyR5PGeVadtIKMe+hhjDTF7AeUXUQEp4VirlkuAXSpUwKiL?=
+ =?us-ascii?Q?bosSeU3vglEL6GvwZvzqWUZzXf5KVJaaS3gmCjjpM1Jzhc6XobUjNWsfhhOu?=
+ =?us-ascii?Q?QYN2cEXWPfSa6DTCxUpdJR29gX0qMS0rs2b7Si1uR/Ev+2aiIhyRzWStg3Ay?=
+ =?us-ascii?Q?z3p7nv1wwyL6WUGA/Aoy8wYQPYIUajYaPTBY?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026)(30052699003);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 17:41:34.2173
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 17:41:50.6669
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65a1673a-80c7-4524-7f7d-08ddc0a22dd9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41e57570-7d49-4bd3-fb68-08ddc0a237a6
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF00009525.eurprd02.prod.outlook.com
+	DU6PEPF00009523.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR03MB9338
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB8468
 
-Replace BT_AD_MESH_* by MESH_AD_TYPE_*.
-
-Both sets of definition have been added almost at the time, so maybe
-it was a 'race condition'.
+Although the first byte of network packets has the same value for all 4
+'send' functions, it feels much more natural to assign this byte at the
+location(s) where the packet is assembled, rather than where it is sent.
+This improves the readability because send_msg_pkt() isn't called with a
+partially uninitialized buffer anymore.
 ---
- mesh/manager.c         |  4 +++-
- mesh/mesh-defs.h       |  4 ----
- mesh/mesh-io-generic.c |  4 ++--
- mesh/mesh-io-mgmt.c    | 17 ++++++++---------
- mesh/mesh-io.c         |  3 ++-
- mesh/mesh.c            |  6 ++++--
- mesh/net-keys.c        |  4 ++--
- mesh/net.c             | 16 ++++++++--------
- mesh/pb-adv.c          | 14 ++++++++------
- mesh/prov-acceptor.c   |  8 ++++----
- mesh/prov-initiator.c  |  3 ++-
- 11 files changed, 43 insertions(+), 40 deletions(-)
+ mesh/net.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/mesh/manager.c b/mesh/manager.c
-index 3786f7a8f4cd..b69866355bd1 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -17,6 +17,8 @@
- #define _GNU_SOURCE
- #include <ell/ell.h>
- 
-+#include "src/shared/ad.h"
-+
- #include "mesh/mesh-defs.h"
- #include "mesh/dbus.h"
- #include "mesh/error.h"
-@@ -57,7 +59,7 @@ struct scan_req {
- 
- static struct l_queue *scans;
- static struct prov_remote_data *prov_pending;
--static const uint8_t prvb[2] = {MESH_AD_TYPE_BEACON, 0x00};
-+static const uint8_t prvb[2] = {BT_AD_MESH_BEACON, 0x00};
- 
- static bool by_scan(const void *a, const void *b)
- {
-diff --git a/mesh/mesh-defs.h b/mesh/mesh-defs.h
-index a12acaf59453..5b0403d1315e 100644
---- a/mesh/mesh-defs.h
-+++ b/mesh/mesh-defs.h
-@@ -8,10 +8,6 @@
-  *
-  */
- 
--#define MESH_AD_TYPE_PROVISION	0x29
--#define MESH_AD_TYPE_NETWORK	0x2A
--#define MESH_AD_TYPE_BEACON	0x2B
--
- /*
-  * MshPRT_v1.1, section 3.3.1 / Core_v5.3, section 2.3.1.3
-  * Maximum length of AdvData without 'Length' field (30)
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 0875a359bd78..f65de9d8d6de 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -353,8 +353,8 @@ static bool find_active(const void *a, const void *b)
- 	/* Mesh specific AD types do *not* require active scanning,
- 	 * so do not turn on Active Scanning on their account.
- 	 */
--	if (rx_reg->filter[0] < MESH_AD_TYPE_PROVISION ||
--			rx_reg->filter[0] > MESH_AD_TYPE_BEACON)
-+	if (rx_reg->filter[0] < BT_AD_MESH_PROV ||
-+			rx_reg->filter[0] > BT_AD_MESH_BEACON)
- 		return true;
- 
- 	return false;
-diff --git a/mesh/mesh-io-mgmt.c b/mesh/mesh-io-mgmt.c
-index 065067fc2821..30d3981bc14f 100644
---- a/mesh/mesh-io-mgmt.c
-+++ b/mesh/mesh-io-mgmt.c
-@@ -156,7 +156,7 @@ static bool filter_dups(const uint8_t *addr, const uint8_t *adv,
- 	if (!addr)
- 		addr = zero_addr;
- 
--	if (adv[1] == MESH_AD_TYPE_PROVISION) {
-+	if (adv[1] == BT_AD_MESH_PROV) {
- 		filter = l_queue_find(pvt->dup_filters, find_by_adv, adv);
- 
- 		if (!filter && addr != zero_addr)
-@@ -215,7 +215,7 @@ static void process_rx(uint16_t index, struct mesh_io_private *pvt, int8_t rssi,
- 	};
- 
- 	/* Accept all traffic except beacons from any controller */
--	if (index != pvt->send_idx && data[0] == MESH_AD_TYPE_BEACON)
-+	if (index != pvt->send_idx && data[0] == BT_AD_MESH_BEACON)
- 		return;
- 
- 	print_packet("RX", data, len);
-@@ -263,8 +263,7 @@ static void event_device_found(uint16_t index, uint16_t length,
- 		if (len > adv_len)
- 			break;
- 
--		if (adv[1] >= MESH_AD_TYPE_PROVISION &&
--					adv[1] <= MESH_AD_TYPE_BEACON)
-+		if (adv[1] >= BT_AD_MESH_PROV && adv[1] <= BT_AD_MESH_BEACON)
- 			process_rx(index, pvt, ev->rssi, instant, addr,
- 							adv + 1, adv[0]);
- 
-@@ -303,8 +302,8 @@ static bool find_active(const void *a, const void *b)
- 	/* Mesh specific AD types do *not* require active scanning,
- 	 * so do not turn on Active Scanning on their account.
- 	 */
--	if (rx_reg->filter[0] < MESH_AD_TYPE_PROVISION ||
--			rx_reg->filter[0] > MESH_AD_TYPE_BEACON)
-+	if (rx_reg->filter[0] < BT_AD_MESH_PROV ||
-+					rx_reg->filter[0] > BT_AD_MESH_BEACON)
- 		return true;
- 
- 	return false;
-@@ -332,8 +331,8 @@ static void ctl_up(uint8_t status, uint16_t length,
- 	int index = L_PTR_TO_UINT(user_data);
- 	uint16_t len;
- 	struct mgmt_cp_set_mesh *mesh;
--	uint8_t mesh_ad_types[] = { MESH_AD_TYPE_NETWORK,
--				MESH_AD_TYPE_BEACON, MESH_AD_TYPE_PROVISION };
-+	uint8_t mesh_ad_types[] = { BT_AD_MESH_DATA, BT_AD_MESH_BEACON,
-+							BT_AD_MESH_PROV };
- 
- 	l_debug("HCI%d is up status: %d", index, status);
- 	if (status)
-@@ -544,7 +543,7 @@ static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
- 	memcpy(send->adv_data + 1, tx->pkt, tx->len);
- 
- 	/* Filter looped back Provision packets */
--	if (tx->pkt[0] == MESH_AD_TYPE_PROVISION)
-+	if (tx->pkt[0] == BT_AD_MESH_PROV)
- 		filter_dups(NULL, send->adv_data, get_instant());
- 
- 	mesh_mgmt_send(MGMT_OP_MESH_SEND, index,
-diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
-index 99c7c2014375..ec5feb9c2714 100644
---- a/mesh/mesh-io.c
-+++ b/mesh/mesh-io.c
-@@ -18,6 +18,7 @@
- 
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-+#include "src/shared/ad.h"
- #include "src/shared/mgmt.h"
- 
- #include "mesh/mesh-defs.h"
-@@ -42,7 +43,7 @@ static const struct mesh_io_table table[] = {
- 	{MESH_IO_TYPE_UNIT_TEST, &mesh_io_unit},
- };
- 
--static const uint8_t unprv_filter[] = { MESH_AD_TYPE_BEACON, 0 };
-+static const uint8_t unprv_filter[] = { BT_AD_MESH_BEACON, 0 };
- 
- static struct mesh_io *default_io;
- static struct l_timeout *loop_adv_to;
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 01a1607b1a31..db77602d37da 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -17,6 +17,8 @@
- #define _GNU_SOURCE
- #include <ell/ell.h>
- 
-+#include "src/shared/ad.h"
-+
- #include "mesh/mesh-io.h"
- #include "mesh/node.h"
- #include "mesh/net.h"
-@@ -139,7 +141,7 @@ static void prov_rx(void *user_data, struct mesh_io_recv_info *info,
- 
- bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data)
- {
--	uint8_t prov_filter[] = {MESH_AD_TYPE_PROVISION};
-+	uint8_t prov_filter[] = {BT_AD_MESH_PROV};
- 
- 	if (mesh.prov_rx && mesh.prov_rx != cb)
- 		return false;
-@@ -153,7 +155,7 @@ bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data)
- 
- void mesh_unreg_prov_rx(prov_rx_cb_t cb)
- {
--	uint8_t prov_filter[] = {MESH_AD_TYPE_PROVISION};
-+	uint8_t prov_filter[] = {BT_AD_MESH_PROV};
- 
- 	if (mesh.prov_rx != cb)
- 		return;
-diff --git a/mesh/net-keys.c b/mesh/net-keys.c
-index 9b11bb7a1da2..338d287a7ef7 100644
---- a/mesh/net-keys.c
-+++ b/mesh/net-keys.c
-@@ -399,7 +399,7 @@ static bool mpb_compose(struct net_key *key, uint32_t ivi, bool kr, bool ivu)
- 						b_data, 5, b_data, NULL, 8))
- 		return false;
- 
--	key->mpb[0] = MESH_AD_TYPE_BEACON;
-+	key->mpb[0] = BT_AD_MESH_BEACON;
- 	key->mpb[1] = BEACON_TYPE_MPB;
- 	memcpy(key->mpb + 2, random, 13);
- 	memcpy(key->mpb + 15, b_data, 13);
-@@ -421,7 +421,7 @@ static bool snb_compose(struct net_key *key, uint32_t ivi, bool kr, bool ivu)
- 		return false;
- 	}
- 
--	key->snb[0] = MESH_AD_TYPE_BEACON;
-+	key->snb[0] = BT_AD_MESH_BEACON;
- 	key->snb[1] = BEACON_TYPE_SNB;
- 	key->snb[2] = 0;
- 
 diff --git a/mesh/net.c b/mesh/net.c
-index cf4f337616d5..b6ff11ffd777 100644
+index b6ff11ffd777..496e4dd7fc04 100644
 --- a/mesh/net.c
 +++ b/mesh/net.c
-@@ -2258,7 +2258,7 @@ static void send_relay_pkt(struct mesh_net *net, uint8_t *data, uint8_t size)
- 		.u.gen.max_delay = DEFAULT_MAX_DELAY
- 	};
- 
--	packet[0] = MESH_AD_TYPE_NETWORK;
-+	packet[0] = BT_AD_MESH_DATA;
- 	memcpy(packet + 1, data, size);
- 
- 	mesh_io_send(io, &info, packet, size + 1);
-@@ -2292,7 +2292,7 @@ static void send_msg_pkt_oneshot(void *user_data)
+@@ -2292,7 +2292,6 @@ static void send_msg_pkt_oneshot(void *user_data)
  		return;
  	}
  
--	tx->packet[0] = MESH_AD_TYPE_NETWORK;
-+	tx->packet[0] = BT_AD_MESH_DATA;
+-	tx->packet[0] = BT_AD_MESH_DATA;
  	info.type = MESH_IO_TIMING_TYPE_GENERAL;
  	info.u.gen.interval = tx->interval;
  	info.u.gen.cnt = tx->cnt;
-@@ -3003,9 +3003,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+@@ -2305,7 +2304,7 @@ static void send_msg_pkt_oneshot(void *user_data)
+ }
  
- 	first = l_queue_isempty(nets);
- 	if (first) {
--		const uint8_t snb[] = {MESH_AD_TYPE_BEACON, 1};
--		const uint8_t mpb[] = {MESH_AD_TYPE_BEACON, 2};
--		const uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
-+		const uint8_t snb[] = {BT_AD_MESH_BEACON, 1};
-+		const uint8_t mpb[] = {BT_AD_MESH_BEACON, 2};
-+		const uint8_t pkt[] = {BT_AD_MESH_DATA};
- 
- 		if (!nets)
- 			nets = l_queue_new();
-@@ -3033,9 +3033,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
- 
- struct mesh_io *mesh_net_detach(struct mesh_net *net)
+ static void send_msg_pkt(struct mesh_net *net, uint8_t cnt, uint16_t interval,
+-						uint8_t *packet, uint8_t size)
++					const uint8_t *packet, uint8_t size)
  {
--	const uint8_t snb[] = {MESH_AD_TYPE_BEACON, 1};
--	const uint8_t mpb[] = {MESH_AD_TYPE_BEACON, 2};
--	const uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
-+	const uint8_t snb[] = {BT_AD_MESH_BEACON, 1};
-+	const uint8_t mpb[] = {BT_AD_MESH_BEACON, 2};
-+	const uint8_t pkt[] = {BT_AD_MESH_DATA};
- 	struct mesh_io *io;
- 	uint8_t type = 0;
+ 	struct oneshot_tx *tx = l_new(struct oneshot_tx, 1);
  
-diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
-index 0b1fd7d577ff..1b80b97ad31c 100644
---- a/mesh/pb-adv.c
-+++ b/mesh/pb-adv.c
-@@ -16,6 +16,8 @@
+@@ -3159,6 +3158,7 @@ static bool send_seg(struct mesh_net *net, uint8_t cnt, uint16_t interval,
+ 	l_debug("segN %d segment %d seg_off %d", segN, segO, seg_off);
  
- #include <ell/ell.h>
+ 	/* TODO: Are we RXing on an LPN's behalf? Then set RLY bit */
++	packet[0] = BT_AD_MESH_DATA;
+ 	if (!mesh_crypto_packet_build(false, msg->ttl, seq_num, msg->src,
+ 					msg->remote, 0, msg->segmented,
+ 					msg->key_aid, msg->szmic,
+@@ -3216,6 +3216,7 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
+ 	l_debug("SEQ0: %6.6x", seq);
+ 	l_debug("segO: %d", segO);
  
-+#include "src/shared/ad.h"
-+
- #include "mesh/mesh-defs.h"
- #include "mesh/crypto.h"
- #include "mesh/net.h"
-@@ -97,7 +99,7 @@ struct idle_rx {
++	packet[0] = BT_AD_MESH_DATA;
+ 	if (!mesh_crypto_packet_build(false, ttl, seq, src, dst, 0,
+ 					segmented, key_aid, szmic,
+ 					seqZero, segO, segN, seg, seg_len,
+@@ -3370,6 +3371,7 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t net_key_id,
+ 	l_put_be32(ack_flags, data + 3);
  
- static struct l_queue *pb_sessions = NULL;
+ 	/* Not Segmented, no Key ID associated, no segO or segN */
++	pkt[0] = BT_AD_MESH_DATA;
+ 	if (!mesh_crypto_packet_build(true, ttl, seq, src, dst,
+ 					NET_OP_SEG_ACKNOWLEDGE, false, 0, false,
+ 					seqZero, 0, 0, data + 1, 6,
+@@ -3457,6 +3459,7 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
+ 			return;
+ 	}
  
--static const uint8_t filter[1] = { MESH_AD_TYPE_PROVISION };
-+static const uint8_t filter[1] = { BT_AD_MESH_PROV };
- 
- static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len);
- 
-@@ -130,7 +132,7 @@ static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
- 							uint16_t size)
- {
- 	uint16_t init_size;
--	uint8_t buf[PB_ADV_MTU + 6] = { MESH_AD_TYPE_PROVISION };
-+	uint8_t buf[PB_ADV_MTU + 6] = { BT_AD_MESH_PROV };
- 	uint8_t max_seg;
- 	uint8_t consumed;
- 	int i;
-@@ -236,7 +238,7 @@ static void pb_adv_tx(void *user_data, const void *data, uint16_t len)
- 
- static void send_open_req(struct pb_adv_session *session)
- {
--	struct pb_open_req open_req = { MESH_AD_TYPE_PROVISION };
-+	struct pb_open_req open_req = { BT_AD_MESH_PROV };
- 
- 	l_put_be32(session->link_id, &open_req.link_id);
- 	open_req.trans_num = 0;
-@@ -251,7 +253,7 @@ static void send_open_req(struct pb_adv_session *session)
- 
- static void send_open_cfm(struct pb_adv_session *session)
- {
--	struct pb_open_cfm open_cfm = { MESH_AD_TYPE_PROVISION };
-+	struct pb_open_cfm open_cfm = { BT_AD_MESH_PROV };
- 
- 	l_put_be32(session->link_id, &open_cfm.link_id);
- 	open_cfm.trans_num = 0;
-@@ -265,7 +267,7 @@ static void send_open_cfm(struct pb_adv_session *session)
- 
- static void send_ack(struct pb_adv_session *session, uint8_t trans_num)
- {
--	struct pb_ack ack = { MESH_AD_TYPE_PROVISION };
-+	struct pb_ack ack = { BT_AD_MESH_PROV };
- 
- 	if (!l_queue_find(pb_sessions, session_match, session))
- 		return;
-@@ -280,7 +282,7 @@ static void send_ack(struct pb_adv_session *session, uint8_t trans_num)
- 
- static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
- {
--	struct pb_close_ind close_ind = { MESH_AD_TYPE_PROVISION };
-+	struct pb_close_ind close_ind = { BT_AD_MESH_PROV };
- 
- 	if (!l_queue_find(pb_sessions, session_match, session))
- 		return;
-diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-index 650309b635cd..0cedc227ad28 100644
---- a/mesh/prov-acceptor.c
-+++ b/mesh/prov-acceptor.c
-@@ -16,6 +16,7 @@
- 
- #include <ell/ell.h>
- 
-+#include "src/shared/ad.h"
- #include "src/shared/ecc.h"
- 
- #include "mesh/mesh-defs.h"
-@@ -50,8 +51,8 @@ struct deferred_cmd {
- 	uint8_t cmd[];
- };
- 
--static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
--static const uint8_t bec_filter[] = {MESH_AD_TYPE_BEACON,
-+static const uint8_t pkt_filter = BT_AD_MESH_PROV;
-+static const uint8_t bec_filter[] = {BT_AD_MESH_BEACON,
- 						BEACON_TYPE_UNPROVISIONED};
- 
- #define MAT_REMOTE_PUBLIC	0x01
-@@ -736,8 +737,7 @@ bool acceptor_start(uint8_t num_ele, uint8_t *uuid,
- 		void *caller_data)
- {
- 	struct mesh_agent_prov_caps *caps;
--	uint8_t beacon[24] = {MESH_AD_TYPE_BEACON,
--						BEACON_TYPE_UNPROVISIONED};
-+	uint8_t beacon[24] = {BT_AD_MESH_BEACON, BEACON_TYPE_UNPROVISIONED};
- 	uint8_t len = sizeof(beacon) - sizeof(uint32_t);
- 	bool result;
- 
-diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
-index dc19d1e9b7a5..c0d2de443ac1 100644
---- a/mesh/prov-initiator.c
-+++ b/mesh/prov-initiator.c
-@@ -16,6 +16,7 @@
- 
- #include <ell/ell.h>
- 
-+#include "src/shared/ad.h"
- #include "src/shared/ecc.h"
- 
- #include "mesh/mesh-defs.h"
-@@ -51,7 +52,7 @@ static const uint16_t expected_pdu_size[] = {
- 
- #define BEACON_TYPE_UNPROVISIONED		0x00
- 
--static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
-+static const uint8_t pkt_filter = BT_AD_MESH_PROV;
- 
- enum int_state {
- 	INT_PROV_IDLE = 0,
++	pkt[0] = BT_AD_MESH_DATA;
+ 	if (!mesh_crypto_packet_build(true, ttl, seq, src, dst, msg[0],
+ 				false, 0, false, 0, 0, 0, msg + 1, msg_len - 1,
+ 				pkt + 1, &pkt_len))
 -- 
 2.43.0
 
