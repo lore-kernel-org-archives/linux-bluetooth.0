@@ -1,46 +1,46 @@
 Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010044.outbound.protection.outlook.com [52.101.84.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6F02F5E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 17:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6357522A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 17:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752255734; cv=fail; b=F28s4WUnZHK+VUZbnbW6339jFEpjSeZe3JJ6CJLclLEP13LYuD7bfTeP9TLXNGMTh96Bbitw+l7+lOK2p3cbUeLbGjZBEeoFhAttOWfxdPlNU9hiK7X7EdxTzY6zbmuBhusFuronzHnnol/ra/u6o39Y0RwmzGpEpFhi7Bz6uk0=
+	t=1752255769; cv=fail; b=bXE0yJb/9YXM6UPyBYdpA7FgHRC+XiVi1m8CHGc221z7E3/rvoYNiifgDEhTJ5K7CQkFkpP1Pc4L0JVmwuKwtihDg2S7tn/wJB+fJk4Uk6zH6HQe8dQeyWxHYCr657b7xKVztncprLZS9kkz7M+1dD6eu0Z/O7bbXaDH30U76LY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752255734; c=relaxed/simple;
-	bh=Gy8XuyEEOCIT2p0LbzhWF/2l5LQ9jASAVlmkp3LgfFc=;
+	s=arc-20240116; t=1752255769; c=relaxed/simple;
+	bh=8As/1xdGrwWjD3FV4KZrZ++VepW1P44sn1VP13dPJNE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D4JdmlV1fiUNle2zhwNdO74dwgMDpOQZU1RReXu4JuwLQZ6HUld3CVItDi0BBC5rh3FrvG5j3FEXVFclhVJdDmBhG3RBvKefZ56nxOGsRA8DrNeVLa04iwYALk4nU2dpNXdxGVsgXjbAo3ZQwjEjUGC4cSSMBFfQyx3ewgxKvVI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=UKYQa7MP; arc=fail smtp.client-ip=52.101.84.44
+	 MIME-Version:Content-Type; b=hch2QA27epHBDqB9u5dnZO3fzf9p4SDiVQGitPPbu7PuCHhGYkPPQroTcBaXBpJgxEjsJjvNEoAryLXNtM/kCS0KdyIUvg5xWy9Kdytkaf+hni/0Iw+kWLZE0JRwWFSZTOAc7Q31wE/pKLgEixM81HNp4Ig12Djm0q+ez/pnGKs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=jsZ45J/K; arc=fail smtp.client-ip=52.101.84.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="UKYQa7MP"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="jsZ45J/K"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f96g2NdVgUqu5tX333OSingIbwXM1zyYh5nJi4A0DaeP9G2FiDpjOEdAKXLUVmbmkJYQnrTJMThFxEZeOBHfShg+pohZuYHe9veNvLfnLtFkV3yQpYAoJb8FrZFKlhl/z2Tqy9rbVi2nguh0WljL6jkOWqhqcvP9oNjyaANhblRhvFI4/DmP7sz4VE2pDALVZumBX1ZgFbqBbWU0e7VqQ55KLRfRmLIPfHndhJ5zrWebUYuBa5d9K5vl1cIrOdjZIaj385iG4WpoSm6MPKeAg1G+6Y+tqabigctlHtnThSUfIIcbJ+TXFzboUBAuADRNkBJf0j8zy982z9b/ADvSYw==
+ b=c2GekPWHdi8IfzC55J3MPB4t8ZNgFBtdfymCB0QknZ6Mdl5klR6p0tx8EdTUlxXzgzQZlW9wCaGBHBzrxLt+x3FRUNMhVmxnJbliaxt2xHfJF5oh8Rfz7vHhHmxjKxVPYwAjTj7mml4jEueGpj1rT8UVviRPtQ8pW6JVmv4lRPGFuGfXrWgzs8mO4kV9SliO4DsIUonc0crmIgaXXPYzmhuQgoABXC77mN4UvMmawf4bw6+YEwyVhD44chpbokDBP/NADOMCFdMBFkf3jm6J1sLd+3X/TL5nGo0Ch2vJUlpeykRZTTGh6Giuq8LfmY6sKQzZhU8SvPfyMvcMSvt9/w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6Vg4O2xlTZFcZwYoXlQ9TK1/E1cZyJB5NYo3xWKlhSk=;
- b=C6ni4A47NcIjNz1OYUpifGPteer6YLbAWQgGUmQZcgXCMr2bM4WUrVVOr8gi5/P/ajsGZF132N84EKcsE30+WXT9uqI3xbIWC/oqF8y33MfR7Vck1cZKLURWMaCH3AwDH3to6F5Xu1Ucs76660b2ieW/TEssdRuA1rN6cTD0DCaUi09c1br+I5VBkozKLt1F3WQR10zl/oqHpJuKKlYH1O3U1Q1HmQvg6MUpQyXZoUT6y0DPx68rOQ3N+rJxcbvHmrLaRqeVZBeqX8v5nY7rvAQi112hWho+M4gjlyZ3qDd9JZJTMEQfHVV+PtQN/aoyXMii4sKLRTsWSLwi84NFHA==
+ bh=1tDTxMuqkRe1LT2aFDhBInTNUMj6ttQA5fslL86AIBQ=;
+ b=ZGlMZsRqnxPj1UlOCdyHCkMJZMJ2+RIWiSnCFQ/7SpHAOnz4Bxkw4llCCKgfGRlI+SKetV7QDsWRyhjbqnK+S4mceGRCJaJCCMk2DHbsDu35MOIvcwtzn8SpcUEpVu+SEqmdI4JEY4In7k8+sedQIGJczo6nPs6EkslKBuWmyij6uTQ4y5jgqOcjNO6YbOb3GJGcJbuBiGnT5ujYSzE5itpJyFmH4IC8ky5Skrl8wZSPtYDxULFHu+Y2J+dOEsCXIXwaxPYpO1NIkoLjRffDIC/sJitdIF9OI7Q5voj4YSTCYLnxugDcp4zyDCQjaQgBrGcba0ah3QzXjM2UmTFiOQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=gmail.com smtp.mailfrom=arri.de; dmarc=fail
  (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
  not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Vg4O2xlTZFcZwYoXlQ9TK1/E1cZyJB5NYo3xWKlhSk=;
- b=UKYQa7MP/5g3jaqtNrVgOIlDVzN6Qx6R1FhroBOv0D1Po6+bWkiegzhmjEL4sM6jmxRT62IoItwJz2UU+2jf8vEVfic+qjX5FKTOlJe+On2kPhYB5UWS9DgmirjheKLORfsu8EFN+VlrFFMu1LCAzGVkH68L+so8gPJpPozK7XI=
-Received: from DU2PR04CA0244.eurprd04.prod.outlook.com (2603:10a6:10:28e::9)
- by AM9PR03MB7395.eurprd03.prod.outlook.com (2603:10a6:20b:270::19) with
+ bh=1tDTxMuqkRe1LT2aFDhBInTNUMj6ttQA5fslL86AIBQ=;
+ b=jsZ45J/KrDmYrXm2wYUDouAsgIA4KWBH3FM3z9PniBt1S4MJ3Ow0jG/C5Al0NFO2tei6lM5iUjuvfymgSBmQutSTSeEzRtqcUQIdLK29yMKAGCAgk3EbQr1K51iCN4lOvCW0Pzb+ZrwmVysRQchVHkq2Tgdido7eK/hHygOgzeQ=
+Received: from DBBPR09CA0008.eurprd09.prod.outlook.com (2603:10a6:10:c0::20)
+ by DBAPR03MB6581.eurprd03.prod.outlook.com (2603:10a6:10:19c::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.25; Fri, 11 Jul
- 2025 17:42:06 +0000
-Received: from DU6PEPF00009529.eurprd02.prod.outlook.com
- (2603:10a6:10:28e:cafe::ea) by DU2PR04CA0244.outlook.office365.com
- (2603:10a6:10:28e::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.23 via Frontend Transport; Fri,
- 11 Jul 2025 17:42:06 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.23; Fri, 11 Jul
+ 2025 17:42:44 +0000
+Received: from DB1PEPF000509F1.eurprd03.prod.outlook.com
+ (2603:10a6:10:c0:cafe::d3) by DBBPR09CA0008.outlook.office365.com
+ (2603:10a6:10:c0::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.25 via Frontend Transport; Fri,
+ 11 Jul 2025 17:42:43 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,20 +48,20 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- DU6PEPF00009529.mail.protection.outlook.com (10.167.8.10) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.22 via Frontend Transport; Fri, 11 Jul 2025 17:42:05 +0000
+ DB1PEPF000509F1.mail.protection.outlook.com (10.167.242.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8922.22 via Frontend Transport; Fri, 11 Jul 2025 17:42:43 +0000
 Received: from N9W6SW14.arri.de (192.168.54.13) by mta.arri.de (10.10.18.5)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Fri, 11 Jul
- 2025 19:42:04 +0200
+ 2025 19:42:43 +0200
 From: Christian Eggers <ceggers@arri.de>
 To: Brian Gix <brian.gix@gmail.com>, Inga Stotland <inga.stotland@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
 CC: Christian Eggers <ceggers@arri.de>
-Subject: [PATCH BlueZ 5/9] mesh: net: remove unused stuff
-Date: Fri, 11 Jul 2025 19:39:21 +0200
-Message-ID: <20250711173958.25689-6-ceggers@arri.de>
+Subject: [PATCH BlueZ 6/9] mesh: net: update comment
+Date: Fri, 11 Jul 2025 19:39:22 +0200
+Message-ID: <20250711173958.25689-7-ceggers@arri.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250711173958.25689-1-ceggers@arri.de>
 References: <20250711173958.25689-1-ceggers@arri.de>
@@ -75,113 +75,72 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF00009529:EE_|AM9PR03MB7395:EE_
-X-MS-Office365-Filtering-Correlation-Id: 40ab8963-ed52-4098-2bc7-08ddc0a2404e
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509F1:EE_|DBAPR03MB6581:EE_
+X-MS-Office365-Filtering-Correlation-Id: fea5b3a8-e4e0-4be9-29bd-08ddc0a2573e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Bsmdv7A4AVfEgfXdJIYGxkmVjJie/RfES/fwO2nqwZM8zToZmNaU/SizLpr3?=
- =?us-ascii?Q?O09lRRUXhVUCW6i2/s/lEa+/xcHZr7QRRQharxBf2jJ0Towe2e95GqJ/r699?=
- =?us-ascii?Q?69dnDuDXXj+LbzEVEHroXJFPY76s7hoa83ukE3KaOqtObZ9CLBMc1bE2QO0n?=
- =?us-ascii?Q?G+XJ8r1vyRnFwlmsG4WPmztE0iUE+692YBU48BiKTNOb1qZK+9frlPKnD4zS?=
- =?us-ascii?Q?QceJDUPvK7fb2jjBMZY3/h0ARlY0dE0+Hrjubsg+JWw6Iuqp7M+EletI4w8L?=
- =?us-ascii?Q?+Gs6jxaZunG8zuhrkrnX43v6g9wky7FCra+dW95aG3z/Inrh/sEwqAJB4T1t?=
- =?us-ascii?Q?CX8wU7/h0sCJpEUfYSNRaC02a1UYDmHEvAS/RE1WYUYvTiADH3+dYB37pLwI?=
- =?us-ascii?Q?kidMKTA4jf4onlZaTcpWft0TQBltl9t9BCuehaSpLfhoPxO8oV6hKAWdr7K5?=
- =?us-ascii?Q?a7FFJaTXFy46KF+n4RsbYZY7Vy5zGbxMB55bCXh115SbDHR+N2hmUYlf7Jv6?=
- =?us-ascii?Q?CP4KXrrHwtJdBGm8WsBwRsHl7dby7CcI3vGHNMxr0gmE6fbafSQUE/OlNmEQ?=
- =?us-ascii?Q?v608mhXx8dn2E3zyjCDByo5tvsKuBxeiV1nUAhZi45doA7c8KmkNgQVnJwCy?=
- =?us-ascii?Q?A3rbKYU4I6JSTqISrCTvFYxNDDLNj+xj1ZO8gDrCAduTluAcV1Qto3PWO7PN?=
- =?us-ascii?Q?ByzQu1oaC51nlvnRcVXVDhGvtZD3kNvLNev6uUyF/exptsdjxTj/MBshSH7o?=
- =?us-ascii?Q?DgFEDJbY23nWQEKUIpeeHMORgrjx7OS7AaVckALGD8ZXM8GbI3wl47ZWiu9L?=
- =?us-ascii?Q?yzupnkxB6Z6fClwyLxp5rR/+Rs1VQBiH4AxQdUaRJNl44TiMKNkVEEiZQCvE?=
- =?us-ascii?Q?QDqDRjFL7k4j0pI9sbBM/fZdRqF0zJ7KtkTWIuBnwtB7w/Y0PQ6ZavE6bF6k?=
- =?us-ascii?Q?N7qh39Ns6hHSyFmhqnRpaQtDvOfFxk+rr7U6jgD62X+oqwq1bix81Pa3Pa2Q?=
- =?us-ascii?Q?JfZS2/+b0MXi/SIj2Oz7kLPV8gn0/8Lry7b7MCDsRaUizTlHavSFoNgNXYaW?=
- =?us-ascii?Q?nbWJ3AcCucyI2CnsAdD+qeQzZRG0JGW7VgvaZagVa5jKGFTqpVVLcUo0y3Qm?=
- =?us-ascii?Q?yW3PLnY0/mQB/J8ZN4NoIGWhYc8jEqdijox+pPhsA0YFF+VNgPj213BXdeMU?=
- =?us-ascii?Q?yr1eBrwEqHochjj6EiupTg2clMav5l3vf8uoJbH7PWyM5SvxNfZhQ57kwNd7?=
- =?us-ascii?Q?q5mF4TraE7eFs7P+lmqrageouuAKtCzyjZbfTtCwuPZOJn3antThJOiNymKn?=
- =?us-ascii?Q?ALQ2X2SIq0jhnPAKWpy/oY35tfdMxNkb/AFVKv1sEJzSGNlt+yIhJpSrQgdr?=
- =?us-ascii?Q?K5/MQpxPktm8sVKjqsA1XXPK2q5UtDQN7e1xDzA4hgxhhXqTSAuh92ebSQPB?=
- =?us-ascii?Q?O6evJFQW42WQ2F7cG0Z8VmG9EWP885Q8ibJKyT5zVWHOUj3/iB8uVywiZLjZ?=
- =?us-ascii?Q?bCrUWQE6WcUuCLRLimz3Fyaw56CdDyVTSA51?=
+	=?us-ascii?Q?UYaj8HMInNtEmWvdchLNYDC9W74tapqwi74UyJdP5AYY2I22y9POl7UELm9o?=
+ =?us-ascii?Q?RppC7z9W0FdC576MWdZwS9JaYCSRtuv+P1wI/0PA8Uah8qoMyM13+FGViU/L?=
+ =?us-ascii?Q?y6CS1eFjBrcYjX+48erN54JPskPMWN2GAXqL2TxSFBEqFaPmQnhBOqd1N1Jr?=
+ =?us-ascii?Q?rvNRCjjtqdgLjEpi/CIUvBRahmD53vfOMTy5cz1mncJutdlJKTMjvQQepCTA?=
+ =?us-ascii?Q?Q9F2zQaCBSOPtAfRV8fPv0hfLzHKBgVaxtBOn2fnNtl6xnE9Dj/VYmoKn2oL?=
+ =?us-ascii?Q?rj+ypcJXhV4niP1jSvBs1TlliydSN1peRgtKnZw3WvZLBvIEz1byTnvA5hnb?=
+ =?us-ascii?Q?kANbiAWhsWWq3LV+oEs3ZroCDRgdfhpxaqtkYSSJzBwE3tD5mYLK5AViD7P3?=
+ =?us-ascii?Q?sck4VCtIPR/tUGGAR47rC9xIOgLcuZ2hnJjOlm4mem7X76exadbDuHhTOx2s?=
+ =?us-ascii?Q?/nFsP7TXtrcBbUAEOybB8vGCSPyALpdIPBw2uoLYMZF9ZGVal06B3JLvwAc2?=
+ =?us-ascii?Q?ygUyImkmnv65n9H3jUQTRHIzdFagsvTEDGLPPKpjAxiWmrErLaX9n1R4P6pz?=
+ =?us-ascii?Q?5DxAt/URoPJWN/EiDvSZ1EKC/WDHGsb3ufF17ALWgRHnPTdG+0YagytgMU64?=
+ =?us-ascii?Q?/RGH2c2OzOOxD7nssmDNr9B2EJKQ6WRbO7MIdkC2X9ShTkcc5LlWYFZjxz+i?=
+ =?us-ascii?Q?HI27IRt77ewd8ZusgYdUuscClLEudmD3iEphXNkUyb1Ki/JwkUIkbBhvVCYa?=
+ =?us-ascii?Q?vmAHuTJnvwMNEKiw+VU0isTpq41bk+06WXhEAFLsjwTSoRryNZhRVn1kpxlv?=
+ =?us-ascii?Q?QZN6PTLf0wwv33pIRqN95M9+8XJ0kAp/2zkR6c7IS/D3MskQYwz0VxNQhL8E?=
+ =?us-ascii?Q?4xtupHtDjqi1EgAfcmJ21JGi0WESDaVEjoJnlt+P/J0bML3WcZvcYlNeYL9L?=
+ =?us-ascii?Q?ULTtLcdpOE+pjiqafESFafBhyDGKRFjHtXMficO9xb4Y0X2/VrI7DMs1/Vun?=
+ =?us-ascii?Q?L9KPXMVnGQFSzHAyHoDbm1ksB10sWLo6dGQe9P12wITnR86H/2/zMqDiihit?=
+ =?us-ascii?Q?/6ucl1lMUdI167pLeUbPT/sX7OA0YYMgHxPJw541fCSqT1ct9FXe6hIi+mRH?=
+ =?us-ascii?Q?fPsi8XmkUHot1FCoNQwHf/DCoxHelk830cy6GIDHxcFFaZB1in0etVmnr12L?=
+ =?us-ascii?Q?arzQWn2qWarNR2CLdDbVGpKJc8O4VDNtMs4n3sl6ocvmhZCjqmnmsHq1AcZ5?=
+ =?us-ascii?Q?8Nus6Gtv+n1hwZTCEiwCpAUrt7qzSLiSudNDTKKcPEy37p1GLYOkJn4Y7wuK?=
+ =?us-ascii?Q?M1pGaBAyHuvLL4Y/VO0NPF9ipbdZOddtZS8ILzJzWJPj0foX8pS8RbLQLBcn?=
+ =?us-ascii?Q?3bod1vrDMfAjjp0aN//y6aWaipd83EUCCxYvwkOdZq0A/iCU/MvAP+hl6i+t?=
+ =?us-ascii?Q?dOEAruFVRS7znRSfM1jh38bKgw6oK0F2iT7Of4jZH7+3SytzKWj3G9JQiyrz?=
+ =?us-ascii?Q?RGQd6ZDfT+ePsbuwnBBLG6jBAsNUOV0M5Bdj?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 17:42:05.1801
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 17:42:43.6675
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40ab8963-ed52-4098-2bc7-08ddc0a2404e
+X-MS-Exchange-CrossTenant-Network-Message-Id: fea5b3a8-e4e0-4be9-29bd-08ddc0a2573e
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF00009529.eurprd02.prod.outlook.com
+	DB1PEPF000509F1.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB7395
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR03MB6581
 
-'struct mesh_key_set' and 'struct net_decode' arent't used anymore since
-commit 994932b740c7 ("mesh: Refactor friend.c and net.c for central key
-DB").
-
-'mesh_status_func_t' isn't used anymore since commit c4bf0626fb62
-("mesh: Replace storage_save_config with mesh_config_save_config").
+term 'master credentials' has been replaced by 'flooding credentials' in
+commit 09f87c80f1d5 ("mesh: Inclusive language changes")
 ---
- mesh/net.c | 11 -----------
- mesh/net.h |  9 ---------
- 2 files changed, 20 deletions(-)
+ mesh/net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mesh/net.c b/mesh/net.c
-index 496e4dd7fc04..3a93f6624e8c 100644
+index 3a93f6624e8c..b29e24f5d4a9 100644
 --- a/mesh/net.c
 +++ b/mesh/net.c
-@@ -176,17 +176,6 @@ struct mesh_destination {
- 	uint16_t ref_cnt;
- };
- 
--struct net_decode {
--	struct mesh_net *net;
--	struct mesh_friend *frnd;
--	struct mesh_key_set *key_set;
--	uint8_t *packet;
--	uint32_t iv_index;
--	uint8_t size;
--	uint8_t nid;
--	bool proxy;
--};
--
- struct net_queue_data {
- 	struct mesh_io_recv_info *info;
- 	struct mesh_net *net;
-diff --git a/mesh/net.h b/mesh/net.h
-index bdb797e1249b..5200beb2fada 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -143,13 +143,6 @@ struct mesh_net_heartbeat_pub {
- 	uint8_t ttl;
- };
- 
--struct mesh_key_set {
--	bool frnd;
--	uint8_t nid;
--	uint8_t enc_key[16];
--	uint8_t privacy_key[16];
--};
--
- struct friend_neg {
- 	int8_t rssi;
- 	bool clearing;
-@@ -219,8 +212,6 @@ struct mesh_friend_msg {
- 	} u;
- };
- 
--typedef void (*mesh_status_func_t)(void *user_data, bool result);
--
- struct mesh_net *mesh_net_new(struct mesh_node *node);
- void mesh_net_free(void *net);
- void mesh_net_cleanup(void);
+@@ -2487,7 +2487,7 @@ static void net_rx(void *net_ptr, void *user_data)
+ 	if (relay_advice > data->relay_advice) {
+ 		/*
+ 		 * If packet was encrypted with friendship credentials,
+-		 * relay it using master credentials
++		 * relay it using flooding credentials
+ 		 */
+ 		if (frnd && !mesh_net_get_key(net, false, net_idx, &net_key_id))
+ 			return;
 -- 
 2.43.0
 
