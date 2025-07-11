@@ -1,46 +1,46 @@
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011006.outbound.protection.outlook.com [52.101.70.6])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011018.outbound.protection.outlook.com [52.101.70.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A052F2C50
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 17:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D512F2374
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 18:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752256799; cv=fail; b=lSedaZ7p5DTrbwImDJDa8OiY0i44MYJMefRfKx1f+aoLYkGk/D7LZheYTGfCemAhU0qbmrCNAzqd0xj95ZAnhGTxfwW42nAqNDTn0dh5Eq6SbOFqzxGhv7j0P6oF8B+gEe4ssTyat3xQIWhTgIQ+yVe52uVVZtfsVpZ2CMoZvCw=
+	t=1752256813; cv=fail; b=KpdMQNmFmy8zD6j5TOeYZgmpR2Dxd44F0+1YwhZlKOLtabd+WOD6HKlCFiqzeVlGb0hKFaFN8QPCcvCI5bHjCb5dTvqElFG+AcPlVEftlMlq39rd9Fl7rCS++3s7SdWNPJo7eoZqt7peFEPZ6EXosQafIbXP/0vD2YarZB2DUqQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752256799; c=relaxed/simple;
-	bh=phXAwev8AVhL2IasNlrOPMIrH7t7nPStnwQDlZCRS9g=;
+	s=arc-20240116; t=1752256813; c=relaxed/simple;
+	bh=N5VX0ZGZCaGKH3x6+5zsoIZeLej3BTUGRGqC8Av1TCo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mnxifft7Lgg1CuhpOm9baQ/7SD1exu3/ZGT46L/9uqbO4ZKw/ujdR2j+zju5A9VY9pO5IEiC8a7XMFfc1z9qwGQR0hLVzzMKnqhI8xlDbtHbR1kl7DcyKVRYvXpDcKjP6TicI1nKdst9yugREFnG2W3lFPrV5kIOffwR18GGRE4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=qk/HDEjd; arc=fail smtp.client-ip=52.101.70.6
+	 MIME-Version:Content-Type; b=l03M9HQkG8/frujoCDFDUNX2LUZj63+Wft/wuUhI3mUuI5gxuUMOIOFp6H1zzlwJwVHlP+96wRtRtQf8wSd1zx5slyQKfYWYfa4pCYArCaX0Ux1W8TFZVuUjSNFL/q8RVty6+DQH1zzuOQNdukLODci6FKfkjCzR8DrGDYN3O98=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=nYP1SWUR; arc=fail smtp.client-ip=52.101.70.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="qk/HDEjd"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="nYP1SWUR"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Mzg02BWjPzALI9u/RwcCZtY15dZBC5KdeDcSvjdrUG3vu0FCAAy0L4+ekwliRJNkI9CLigeAEYAYbynQnULgAnpUIwPzTME8GvxPwoJDCRS7FomNsUdB0uysdgja1xiMvEb5vonwzhZN/ks4X2nab8US4ycgx6s8cKNlBiY34rFLsoUyR4YRFFdn2w4WWNSX8Yja13YM0176BAR0wQj1Wp60L41miPSMeeL3SwJ/WTG0Ikvv0kz3OpJ/GkCIcyyW/M5jc8VbchLLrJ1d6tkIvwgyvmctJM+62AJcUqNqfkkvfK4pllNtPEf1PT0bthPoJN+ylyH6Hh9+yly6mLIv1g==
+ b=qfSwtv2GLiSdFgq8cDqvoPAvO9M6aN7k+mQcXHlpTlu+S80urwM/vhi3aT+fyqdKYR7piiZIW//4F3UtmIU1mmlskCko0LaeHBek7F9q2YgDdnXRsJPwlAadZgJ1ZtMBs32ZmDlnFeZsK/Wg47rj5z5AWOfF4kRGdxH7h0sHdkx18Vi/iH33GqvB4dHptBIKntpSmjGdFBa/xuAuCYzn9qMBXQPyx41DRXCMEzSMJY8apVaHdgjYTqRTwChxBcqVnMyH79t27LbuJ4yCoeKYErNAdRZ2TVUL/bN8sYtCuLPuVrSCltL2da8SO9LGlrW3EDIl8lz05Lq8XjS3KniaVQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tCrPeqy2Q/EAc959r7PK6nfNn+oAYkxcL1pRXr1uUhQ=;
- b=LXUmHpYV05+qHednE0VJ/kBf+TU35oDPL/42+NUWCpnm3PClkedPsQ0y213m8N1FZ2Cum0BgXgp62nphCBl7bmZETzZxPPEvdj1QVh4T8lAhjvTn02xZ42i0hvrcIQoxh55f3tO8baieDq/J4C+I7e7b8TwExpqZc48vP0lAV8DNBd/fUdOjPw2s3JM6deTBpGD7JmDroSUI4R+QHc7eaP0j/5bpTDlWstQeUvcSDWnshmkf76xYzUf8QkjAosCKx+beZrWsGUenJ2RLWJGLtseSUPYaystTOSMpRhBgED3oIqEkVBwGn3UciEEgVKCleLFP0zcihfQEvndKaUpp2w==
+ bh=x4oWG1QFo+8daxAWcnyZzLW3eTvJUk/3YKhMiMFms1w=;
+ b=xuagFyCkJdY3LGyMYPq+v7W996bjE/XsldKVYqxUfy3G6SAYsQEcNHEYXeBeXZsEd53Tm2Wt8cITFU6Rpq/FcAhRiUc3pXXhExaHIEVbezAUnLrPQrvORieeMdz6iwEetbt6pPl54ZPeo4BSJKRTFAd8jwwPzRV2cqFlJeWMkb2w+A03sfKMmOaKhxgCqamI4FsVUyUUEwhhje0UjJli1rZ9rORd3V3IgeXs0f/hRdt/VfW2gljRkJFtll3vYmNfMbNvfcPdhnOytaKhbZy45o+hO7CIzvTnluA/EVLVpQlw7CcL038bb6QlhDRw43JUceS4GmTJdkS1JN+ke7IcmQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=gmail.com smtp.mailfrom=arri.de; dmarc=fail
  (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
  not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tCrPeqy2Q/EAc959r7PK6nfNn+oAYkxcL1pRXr1uUhQ=;
- b=qk/HDEjdPfS5u5j/bL86hzNJp+4YkmAj91JUwZJ604dDUhDjiBpBaemJqIsux0RIPO4wlZWnrlNjR8l73uAN6FYc0qXI5HCknv6nTdmSzu4fgONQPqfjjjD+DEW/i/UUknDmj8v9ZAbwrCq8+GwHiJTmgaQWvY5J1nfoXUVJncc=
-Received: from PR2P264CA0030.FRAP264.PROD.OUTLOOK.COM (2603:10a6:101:1::18) by
- AS8PR03MB9242.eurprd03.prod.outlook.com (2603:10a6:20b:5b1::16) with
+ bh=x4oWG1QFo+8daxAWcnyZzLW3eTvJUk/3YKhMiMFms1w=;
+ b=nYP1SWURsSs9u1jf1oqvCxljc91BUvyDv8qAqNQ3p8lAeibyoEPLMUA+hgebmRZG+OARwTk5lJHMId3CpYOhe6PQDzS33qIQBxA5BX2/Bi33R9AfTDFjG8sy+yseldmIjZjIWxWn3SUHRQwH+lUUvR06EDwak8zbjNRPGBRCgAA=
+Received: from AM0PR08CA0002.eurprd08.prod.outlook.com (2603:10a6:208:d2::15)
+ by AS4PR03MB8723.eurprd03.prod.outlook.com (2603:10a6:20b:58e::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.25; Fri, 11 Jul
- 2025 17:59:54 +0000
-Received: from AMS0EPF000001AD.eurprd05.prod.outlook.com
- (2603:10a6:101:1:cafe::76) by PR2P264CA0030.outlook.office365.com
- (2603:10a6:101:1::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.20; Fri, 11 Jul
+ 2025 18:00:06 +0000
+Received: from AMS0EPF000001AB.eurprd05.prod.outlook.com
+ (2603:10a6:208:d2:cafe::f8) by AM0PR08CA0002.outlook.office365.com
+ (2603:10a6:208:d2::15) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.25 via Frontend Transport; Fri,
- 11 Jul 2025 17:59:54 +0000
+ 11 Jul 2025 18:00:06 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -48,20 +48,20 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- AMS0EPF000001AD.mail.protection.outlook.com (10.167.16.153) with Microsoft
+ AMS0EPF000001AB.mail.protection.outlook.com (10.167.16.151) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.22 via Frontend Transport; Fri, 11 Jul 2025 17:59:52 +0000
+ 15.20.8922.22 via Frontend Transport; Fri, 11 Jul 2025 18:00:06 +0000
 Received: from N9W6SW14.arri.de (192.168.54.13) by mta.arri.de (10.10.18.5)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Fri, 11 Jul
- 2025 19:59:51 +0200
+ 2025 20:00:05 +0200
 From: Christian Eggers <ceggers@arri.de>
 To: Brian Gix <brian.gix@gmail.com>, Inga Stotland <inga.stotland@gmail.com>,
 	<linux-bluetooth@vger.kernel.org>
 CC: Christian Eggers <ceggers@arri.de>
-Subject: [RFC PATCH BlueZ v2 3/7] mesh: add GATT proxy service
-Date: Fri, 11 Jul 2025 19:56:53 +0200
-Message-ID: <20250711175842.28860-4-ceggers@arri.de>
+Subject: [RFC PATCH BlueZ v2 4/7] mesh: gatt-proxy: support for proxy configuration messages and filtering
+Date: Fri, 11 Jul 2025 19:56:54 +0200
+Message-ID: <20250711175842.28860-5-ceggers@arri.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250711175842.28860-1-ceggers@arri.de>
 References: <20250701144647.19572-2-ceggers@arri.de>
@@ -76,94 +76,704 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF000001AD:EE_|AS8PR03MB9242:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e5e88f0-4fee-4be2-8e2b-08ddc0a4bc3d
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001AB:EE_|AS4PR03MB8723:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8389c218-8218-4297-8867-08ddc0a4c4cf
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?MtU48htePVaFrPIqHUzZl0ClQholKlJf/7+qJFLun23YLK62lsK2uJbqwPkF?=
- =?us-ascii?Q?yRhDgqF2lCUbK6jcfk+MC+MNwO8+CmHDRgo0Hu9Ga/md1cudtIbzu4Mk3bis?=
- =?us-ascii?Q?wOq3YRBuV35DdhgdbdH4IAloCRLKqHqm7FYGP/VcFEjSJRhVzDvLhQyiVqP6?=
- =?us-ascii?Q?iACw7iME3j3H2d4nRRl11jE0CWnInMp+3NEh4va4TFYrGb/X6tiEP1cuxDpY?=
- =?us-ascii?Q?vVnRYvd7rdUKGIYL5hVl9jko9FWr4sjl24HHCT4+Fo75kI9OhV1E5Ax1B64D?=
- =?us-ascii?Q?kWkli1ZVGnRVkf2dVUISOAiKdsx2RWytJ2ViJo507Klqga+hlYjAehY9WPCn?=
- =?us-ascii?Q?xbXjJM+ZHYvPCSKFaygSiKDHBv3aMvKT0n1jFmqPusY5Jj8UTTtG7h/o0ZAq?=
- =?us-ascii?Q?EDhp2iso4iKDhf1Htxqh3tjC+zR/kCtTbwtKgvE20C5vHmkBV/T+eZ1dORpX?=
- =?us-ascii?Q?zWqTD9TUNm5xLsFScv23wlJlo4a8/rYyu9I8LFeyv2WKIREN7kN53Jkd+HGc?=
- =?us-ascii?Q?7Up6z7NIHc1YprMHWnrhgM/jiC+1IGc0AxzylkfGg7iDDddnLnxAxi3Y48jT?=
- =?us-ascii?Q?r53WQ4IjFkXoRN41Gqqdj/95wI+tPOs2mE+dasxCdFG5E/+cNjeGd2gqNoXf?=
- =?us-ascii?Q?oyCd0M3CkTOTqytLVXRX/xmYcSN74uME5MryrrhVssD/H4W9wK5WuPeQrWdy?=
- =?us-ascii?Q?tu+KW5VYyve3MofLUog6NzRr+5E/nE0CoN3JiYbjs9tWDC3AlhlgR0vGlz1C?=
- =?us-ascii?Q?vAeodVXr17Nupxj13qcICnUuu/BdXKvptN/xxM+akXf5i62RFKZXPaCij10K?=
- =?us-ascii?Q?jwCi5Vcvfqxq0yBK7l2segmr4gKSfG4x8Uz/blsedivXfPx935bTBLYbhUF+?=
- =?us-ascii?Q?mYbatZEeHnfb2cYHi7RmS2QxND0cPrpxZB7iLHzW8YqyqsaUHI/hAowcm8C1?=
- =?us-ascii?Q?cxOdxOQtH/jCvs/l939IFTw92iVWQFATT4GUX4x2j5cDjgX/WtpjCaV2jUKb?=
- =?us-ascii?Q?NMw8D/mr9yehOk5qGuPyX6UPHoK3a73Mb1C6p5Lc/1rhd2/fV1yWINyRv8Wr?=
- =?us-ascii?Q?xJMZH4V0+sUOY8Qu0p+B9hlX76eaQuLJDPYgfsj5YGz3rCTDKPQI8lrR9+DK?=
- =?us-ascii?Q?n713LIaxRz7j9meUQ3b6Gw1N/Wskgv5Fto0WCpI2fBb5EWKj0zSz/BU2kLqy?=
- =?us-ascii?Q?/uUQe+8+iJXmG/PQAKpCd5D7AbvL5lszhm2O7m2cSo3pfvYYfEJj0aJvvBXN?=
- =?us-ascii?Q?K6fc2rQYEJj0Ph9gXAMV63Lmd50GW+R6tn4acSv3lmlKqD7dJ31Ma6JIvC8U?=
- =?us-ascii?Q?Rp61OWO0O1HCBEcHx9jZn99UA088y6JikrC7UF8yjl1eeqVT3Mf0pxoVRBI6?=
- =?us-ascii?Q?HgIIf5qqjG/YysFsIegcfnjtjBzQQ7Zz73sTI0u9iofDBc3PhwVOJ4+2MUJP?=
- =?us-ascii?Q?LiwWQuHZvAq84HCx4GDP2lVTMbPwI7DRMLQV9robH9MhKArTOnfxZvVyXJ1I?=
- =?us-ascii?Q?UtoNC1lBYBAE9Dwy212sImwZ1cGCIR82n1qN?=
+	=?us-ascii?Q?gXDM34hG2i8/YUGePOYhevXErfAvpiD0TTJwxdmBRo7BNB59QP7pIsxdGjHP?=
+ =?us-ascii?Q?QRwQDYc80dCfhNESFpW/c0MaZrHsYBXQ4A9Op/mtB+1TaHY5S5ABmhubxKzP?=
+ =?us-ascii?Q?3+6m29b7tdIsHTY3Bvknn9RaR7SxFy2aTAHMzK0gkSXapYAFWONfepkXT/yN?=
+ =?us-ascii?Q?dGu3W+ar1ajSCrW8miRSRSTWQ3u4B3a8SLhCLYRhrR9rxL6T6vnCwFpGvM5q?=
+ =?us-ascii?Q?5wYCO82ISQkbkjIy866+WUHyEWMbU+cEnODvFgnPbKNY85KF5f95bKq+07cr?=
+ =?us-ascii?Q?tkKcOZfIFCx669MhT/Ur1zhWKv6I/dCl8TmST7ecp0Q+gBW+FjonvHX7j2BU?=
+ =?us-ascii?Q?aPLfbWPe6i+EKWzAMmhK0OjJOZUvogayBbfhe5pFPgJX+S0ZcGz6FXCrdxHI?=
+ =?us-ascii?Q?5HpQpuAzomqN1QcJiSWI2piYFFof2bSpa6sy32ARcSwfYmnH+45I28W+oS9k?=
+ =?us-ascii?Q?gg13I1RgnuMgE1oEZPhlEJjmRL8Z8Bv75BYB4FrKqqHBMTPeqKFhImWHFXz6?=
+ =?us-ascii?Q?frlHvwiXnn/Q/78kOBa/2yDnFCkJNE4/ZLpKx+37I/+h/0nZW/5l/Q2FRUeC?=
+ =?us-ascii?Q?Qj1p7CwoQ+zDr9jnz33KpDuz2dDfT04KefgFX0pad+56sNtvYSmMuwDAyPrL?=
+ =?us-ascii?Q?MIwljufwe9eF5oBi6WvQ9mTyb8kUZILqlAcNvz+V/mGq2gpR7S5t/tv/wj04?=
+ =?us-ascii?Q?duyRKwm70kZXeP737/bUIRtZRERK5uymfjwZFEogxF/P9/uvQ/E6EGdoJntZ?=
+ =?us-ascii?Q?9JHzdljJuyIcev6w/d7QPW2XjzgbAQQcgtAJc6V5xRGvJSabELXH398+EPRv?=
+ =?us-ascii?Q?z6/ZHO4fcmK5+wjehG6AXXLY78nZg+aT5MARgE/3jyn+xVqPNOwvWQKblGkh?=
+ =?us-ascii?Q?2MSCXHl5bhuVuZkiY3SKlprVbneUfSQaVmdUQmFCoLd4eMAovSQbKvNMmoBY?=
+ =?us-ascii?Q?DE1m1tiFEDlfLOMP8KvQIYKWBEzW4/PiK4VL1fuV1uOy9OSGoxZiNC4L1Bfz?=
+ =?us-ascii?Q?/aY9kIJoNVJOkmYX/062Xv6RzmUvNtAMddH4C4FU5khP0RVSDGecBid8Jt4p?=
+ =?us-ascii?Q?OdG4W1EVJtGkGOzWypYB0e1NMimKDAXV4LwcGPMXzMVAqTKltOM4qN8xnPgp?=
+ =?us-ascii?Q?eRbSckJVgXtcCtd2W9PFIBkJhZPeuVZe7QDFa7l6adRNGdFZPjnCXY7RfWDi?=
+ =?us-ascii?Q?7ABfnjoUn8LDFS4yOtwaMeFmzt/EgN3od8jvOX+AXalvaGYTa6t0KWOp2TuS?=
+ =?us-ascii?Q?80Ygori4YUJB4uE5eWFYhZ9dvEWljyB3ABIMszPVLPp4fyKJ1YNB9Qp2Ig7x?=
+ =?us-ascii?Q?a08szuR1IS7Fgoj2XI4Vsz+oLM5lV5u0R9whrO7s4kpD12hzKeWDUO2GVzUT?=
+ =?us-ascii?Q?tuCzSMGVwycYXknSOQ6ooLiZ0z333emLqXz6h12ReCRDixUreGemQp4u6sz0?=
+ =?us-ascii?Q?vQAB65WBbK6c8bkpSdcTZO8NPbM/l/eIfefX144HH571oC93Wps09Kz6bMib?=
+ =?us-ascii?Q?1CP2/B4zxF5QfWrOeOLfY3nXyzjt/wbmu+Do?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 17:59:52.1412
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2025 18:00:06.5081
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e5e88f0-4fee-4be2-8e2b-08ddc0a4bc3d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8389c218-8218-4297-8867-08ddc0a4c4cf
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF000001AD.eurprd05.prod.outlook.com
+	AMS0EPF000001AB.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB9242
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR03MB8723
 
-MeshPRT_v1.1, chapter 7 states that GATT provisioning service and GATT
-proxy service must NOT be active simultaneously.
-
-This patch only implements the GATT proxy itself (so that a GATT proxy
-client can exchange network messages with server). Relaying /
-retransmission of network messages and propagation of beacons will be
-handled in later patches.
+Implement reception / responses for Proxy Configuration Messages
+(MshPRT_v1.1, section 6.6) and proxy filtering (sections 6.4 and 6.7).
 ---
  Makefile.mesh         |   3 +-
- mesh/gatt-proxy-svc.c | 327 ++++++++++++++++++++++++++++++++++++++++++
- mesh/gatt-proxy-svc.h |  28 ++++
- mesh/main.c           |   3 +
- mesh/net-keys.c       |  61 ++++++++
- mesh/net-keys.h       |   4 +
- mesh/net.c            |  72 +++++++++-
- mesh/net.h            |   3 +
- mesh/prov-acceptor.c  |  26 +++-
- 9 files changed, 518 insertions(+), 9 deletions(-)
- create mode 100644 mesh/gatt-proxy-svc.c
- create mode 100644 mesh/gatt-proxy-svc.h
+ mesh/crypto.c         |   6 +-
+ mesh/crypto.h         |   3 +
+ mesh/gatt-proxy-svc.c | 182 +++++++++++++++++++++++++++++++++++++++++-
+ mesh/gatt-proxy-svc.h |  16 +++-
+ mesh/net-keys.c       |  56 +++++++++++++
+ mesh/net-keys.h       |   3 +
+ mesh/net.c            | 104 +++++++++++++++++++++---
+ mesh/proxy-cfg.c      | 168 ++++++++++++++++++++++++++++++++++++++
+ mesh/proxy-cfg.h      |  19 +++++
+ 10 files changed, 541 insertions(+), 19 deletions(-)
+ create mode 100644 mesh/proxy-cfg.c
+ create mode 100644 mesh/proxy-cfg.h
 
 diff --git a/Makefile.mesh b/Makefile.mesh
-index 700d64fe9293..8a190f75de9d 100644
+index 8a190f75de9d..d39bb17eca70 100644
 --- a/Makefile.mesh
 +++ b/Makefile.mesh
-@@ -40,7 +40,8 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/rpl.h mesh/rpl.c \
+@@ -41,7 +41,8 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
  				mesh/prv-beacon.h mesh/prvbeac-server.c \
  				mesh/mesh-defs.h \
--				mesh/gatt-service.h mesh/gatt-service.c
-+				mesh/gatt-service.h mesh/gatt-service.c \
-+				mesh/gatt-proxy-svc.h mesh/gatt-proxy-svc.c
+ 				mesh/gatt-service.h mesh/gatt-service.c \
+-				mesh/gatt-proxy-svc.h mesh/gatt-proxy-svc.c
++				mesh/gatt-proxy-svc.h mesh/gatt-proxy-svc.c \
++				mesh/proxy-cfg.h mesh/proxy-cfg.c
  pkglibexec_PROGRAMS += mesh/bluetooth-meshd
  
  mesh/mesh.$(OBJEXT): ell/internal
+diff --git a/mesh/crypto.c b/mesh/crypto.c
+index 451be81d2fb3..a98836349517 100644
+--- a/mesh/crypto.c
++++ b/mesh/crypto.c
+@@ -590,7 +590,7 @@ bool mesh_crypto_packet_build(bool ctl, uint8_t ttl,
+ 	return true;
+ }
+ 
+-static bool network_header_parse(const uint8_t *packet, uint8_t packet_len,
++bool mesh_crypto_network_header_parse(const uint8_t *packet, uint8_t packet_len,
+ 				bool *ctl, uint8_t *ttl, uint32_t *seq,
+ 				uint16_t *src, uint16_t *dst)
+ {
+@@ -630,7 +630,7 @@ bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
+ 	uint16_t this_dst;
+ 	bool is_segmented;
+ 
+-	if (!network_header_parse(packet, packet_len,
++	if (!mesh_crypto_network_header_parse(packet, packet_len,
+ 					ctl, ttl, seq, src, &this_dst))
+ 		return false;
+ 
+@@ -843,7 +843,7 @@ bool mesh_crypto_packet_encode(uint8_t *packet, uint8_t packet_len,
+ 	uint16_t src;
+ 	uint16_t dst;
+ 
+-	if (!network_header_parse(packet, packet_len,
++	if (!mesh_crypto_network_header_parse(packet, packet_len,
+ 						&ctl, &ttl, &seq, &src, &dst))
+ 		return false;
+ 
+diff --git a/mesh/crypto.h b/mesh/crypto.h
+index e4bbe4343223..43d4ffaa5023 100644
+--- a/mesh/crypto.h
++++ b/mesh/crypto.h
+@@ -74,6 +74,9 @@ bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
+ 				bool *szmic, bool *relay, uint16_t *seqZero,
+ 				uint8_t *segO, uint8_t *segN,
+ 				const uint8_t **payload, uint8_t *payload_len);
++bool mesh_crypto_network_header_parse(const uint8_t *packet, uint8_t packet_len,
++				bool *ctl, uint8_t *ttl, uint32_t *seq,
++				uint16_t *src, uint16_t *dst);
+ bool mesh_crypto_payload_encrypt(uint8_t *aad, const uint8_t *payload,
+ 				uint8_t *out, uint16_t payload_len,
+ 				uint16_t src, uint16_t dst, uint8_t key_aid,
 diff --git a/mesh/gatt-proxy-svc.c b/mesh/gatt-proxy-svc.c
-new file mode 100644
-index 000000000000..27cc22c0572a
---- /dev/null
+index 27cc22c0572a..4100578a9f0a 100644
+--- a/mesh/gatt-proxy-svc.c
 +++ b/mesh/gatt-proxy-svc.c
-@@ -0,0 +1,327 @@
+@@ -10,17 +10,21 @@
+ 
+ #include <stdbool.h>
+ #include <stdlib.h>
+-#include <string.h>			// memcpy()
++#include <string.h>			// memcpy(), memmove()
+ 
+ #include <ell/dbus.h>
+ #include <ell/log.h>			// l_warn()
+ #include <ell/queue.h>
+ #include <ell/timeout.h>
+-#include <ell/util.h>			// ell_new(), l_free(), l_malloc()
++#include <ell/util.h>			// ell_new(), l_free(), l_malloc(),
++					// L_ARRAY_SIZE
+ 
++#include "mesh/mesh-defs.h"		// UNASSIGNED_ADDRESS
+ #include "mesh/gatt-service.h"
+ #include "mesh/mesh-io.h"		// mesh_io_recv_func_t
+-#include "mesh/net.h"			// mesh_net_attach_gatt(),
++#include "mesh/net.h"			// PROXY_FILTER_ACCEPT_LIST,
++					// PROXY_FILTER_REJECT_LIST
++					// mesh_net_attach_gatt(),
+ 					// mesh_net_detach_gatt()
+ #include "mesh/net-keys.h"		// net_key_fill_adv_service_data(),
+ 					// net_key_get_next_id()
+@@ -47,6 +51,9 @@ struct gatt_proxy_svc {
+ 	bool txing;
+ 	struct l_queue *tx_deferred;
+ 	struct l_queue *rx_regs;
++	uint8_t filter_type;
++	uint16_t filter_addrs[32];
++	unsigned filter_count;
+ };
+ 
+ struct process_data {
+@@ -117,6 +124,136 @@ void gatt_proxy_svc_deregister_recv_cb(struct gatt_proxy_svc *gatt_proxy,
+ 	l_free(rx_reg);
+ }
+ 
++void gatt_proxy_svc_filter_set_type(struct gatt_proxy_svc *gatt_proxy,
++							uint8_t filter_type)
++{
++	if (!gatt_proxy || gatt_proxy != gatt_proxy_svc)
++		return;
++
++	/* Behavior not specified in MshPRT, section 6.7 */
++	if (filter_type != PROXY_FILTER_ACCEPT_LIST &&
++					filter_type != PROXY_FILTER_REJECT_LIST)
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++	 * If a Proxy Server receives a Set Filter Type message, it shall set
++	 * the proxy filter type as requested in the message parameter, and it
++	 * shall clear the proxy filter list.
++	 */
++	gatt_proxy->filter_type = filter_type;
++	gatt_proxy->filter_count = 0;
++}
++
++void gatt_proxy_svc_filter_add(struct gatt_proxy_svc *gatt_proxy,
++								uint16_t addr)
++{
++	int i;
++
++	if (!gatt_proxy || gatt_proxy != gatt_proxy_svc)
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++	 * If the AddressArray field contains the unassigned address, the Proxy
++	 * Server shall ignore that address.
++	 */
++	if (addr == UNASSIGNED_ADDRESS)
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++	 * If the Proxy Server runs out of space in the proxy filter list,
++	 * the Proxy Server shall not add these addresses.
++	 */
++	if (gatt_proxy->filter_count == L_ARRAY_SIZE(gatt_proxy->filter_addrs))
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++	 * If one or more addresses contained in the message are already in the
++	 * list, the Proxy Server shall not add these addresses.
++	 */
++	for (i = 0; i < gatt_proxy->filter_count; i++)
++		if (gatt_proxy->filter_addrs[i] == addr)
++			return;
++
++	gatt_proxy->filter_addrs[gatt_proxy->filter_count++] = addr;
++}
++
++void gatt_proxy_svc_filter_remove(struct gatt_proxy_svc *gatt_proxy,
++								uint16_t addr)
++{
++	int i;
++
++	if (!gatt_proxy || gatt_proxy != gatt_proxy_svc)
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++	 * If the AddressArray field contains the unassigned address, the Proxy
++	 * Server shall ignore that address.
++	 */
++	if (addr == UNASSIGNED_ADDRESS)
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++	 * If one or more addresses contained in the message were not in the
++	 * list, the Proxy Server shall ignore these addresses.
++	 */
++	for (i = 0; i < gatt_proxy->filter_count; i++)
++		if (gatt_proxy->filter_addrs[i] == addr)
++			break;
++
++	if (i == gatt_proxy->filter_count)
++		return;
++
++	memmove(gatt_proxy->filter_addrs + i, gatt_proxy->filter_addrs + i + 1,
++			gatt_proxy->filter_count - i - 1);
++	gatt_proxy->filter_count--;
++}
++
++unsigned gatt_proxy_svc_filter_count(struct gatt_proxy_svc *gatt_proxy,
++							uint8_t *filter_type)
++{
++	if (!gatt_proxy || gatt_proxy != gatt_proxy_svc)
++		return 0;
++
++	*filter_type = gatt_proxy->filter_type;
++
++	return gatt_proxy->filter_count;
++}
++
++void gatt_proxy_svc_filter_pdu_rcvd(struct gatt_proxy_svc *gatt_proxy,
++								uint16_t src)
++{
++	if (!gatt_proxy || gatt_proxy != gatt_proxy_svc)
++		return;
++
++	if (gatt_proxy->filter_type == PROXY_FILTER_ACCEPT_LIST) {
++		/*
++		 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++		 * If the proxy filter is an accept list filter, upon receiving
++		 * a Proxy PDU containing a valid Network PDU from the Proxy
++		 * Client, the Proxy Server shall add the unicast address
++		 * contained in the SRC field of the Network PDU to the accept
++		 * list.
++		 */
++		gatt_proxy_svc_filter_add(gatt_proxy, src);
++	} else {
++		/*
++		 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++		 * If the proxy filter is a reject list filter, upon receiving a
++		 * Proxy PDU containing a valid Network PDU from the Proxy
++		 * Client, the Proxy Server shall remove the unicast address
++		 * contained in the SRC field of the Network PDU from the reject
++		 * list.
++		 */
++		gatt_proxy_svc_filter_remove(gatt_proxy, src);
++	}
++}
++
+ static void gatt_proxy_svc_send(enum proxy_msg_type msg_type, const void *data,
+ 								uint8_t len)
+ {
+@@ -144,11 +281,40 @@ static void gatt_proxy_svc_send(enum proxy_msg_type msg_type, const void *data,
+ 	}
+ }
+ 
+-void gatt_proxy_svc_send_net(const void *data, uint8_t len)
++void gatt_proxy_svc_send_net(uint16_t dst, const void *data, uint8_t len)
+ {
++	int i;
++
++	if (!gatt_proxy_svc)
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 6.4 - Proxy filtering
++	 * The output filter of the network interface (see Section 3.4.5) [...]
++	 * can be configured by the Proxy Client. This allows the Proxy Client
++	 * to explicitly request to receive only mesh messages with certain
++	 * *destination* addresses.
++	 */
++	for (i = 0; i < gatt_proxy_svc->filter_count; i++)
++		if (gatt_proxy_svc->filter_addrs[i] == dst)
++			break;
++
++	if (gatt_proxy_svc->filter_type == PROXY_FILTER_ACCEPT_LIST) {
++		if (i == gatt_proxy_svc->filter_count)  // not found
++			return;
++	} else {  /* PROXY_FILTER_REJECT_LIST */
++		if (i != gatt_proxy_svc->filter_count)  // found
++			return;
++	}
++
+ 	gatt_proxy_svc_send(PROXY_MSG_TYPE_NETWORK_PDU, data, len);
+ }
+ 
++void gatt_proxy_svc_send_proxy_cfg(const void *data, uint8_t len)
++{
++	gatt_proxy_svc_send(PROXY_MSG_TYPE_PROXY_CFG, data, len);
++}
++
+ static void gatt_service_notify_acquired(void *user_data)
+ {
+ 	struct gatt_proxy_svc *gatt_proxy = user_data;
+@@ -157,6 +323,14 @@ static void gatt_service_notify_acquired(void *user_data)
+ 		return;
+ 
+ 	gatt_proxy->connected = true;
++
++	/*
++	 * MshPRT_v1.1, section 6.7 - Proxy Server behavior
++	 * Upon connection, the Proxy Server shall initialize the proxy filter
++	 * as an accept list filter and the accept list shall be empty.
++	 */
++	gatt_proxy->filter_type = PROXY_FILTER_ACCEPT_LIST;
++	gatt_proxy->filter_count = 0;
+ }
+ 
+ static void gatt_service_notify_stopped(void *user_data)
+diff --git a/mesh/gatt-proxy-svc.h b/mesh/gatt-proxy-svc.h
+index 2b0c9d7ec21b..0abb85d7109f 100644
+--- a/mesh/gatt-proxy-svc.h
++++ b/mesh/gatt-proxy-svc.h
+@@ -24,5 +24,17 @@ void gatt_proxy_svc_register_recv_cb(struct gatt_proxy_svc *gatt_proxy,
+ 					void *user_data);
+ void gatt_proxy_svc_deregister_recv_cb(struct gatt_proxy_svc *gatt_proxy,
+ 						enum proxy_msg_type msg_type);
+-void gatt_proxy_svc_send_net(const void *data, uint8_t len);
+-								
++
++void gatt_proxy_svc_filter_set_type(struct gatt_proxy_svc *gatt_proxy,
++							uint8_t filter_type);
++void gatt_proxy_svc_filter_add(struct gatt_proxy_svc *gatt_proxy,
++								uint16_t addr);
++void gatt_proxy_svc_filter_remove(struct gatt_proxy_svc *gatt_proxy,
++								uint16_t addr);
++unsigned gatt_proxy_svc_filter_count(struct gatt_proxy_svc *gatt_proxy,
++							uint8_t *filter_type);
++void gatt_proxy_svc_filter_pdu_rcvd(struct gatt_proxy_svc *gatt_proxy,
++								uint16_t src);
++
++void gatt_proxy_svc_send_net(uint16_t dst, const void *data, uint8_t len);
++void gatt_proxy_svc_send_proxy_cfg(const void *data, uint8_t len);
+diff --git a/mesh/net-keys.c b/mesh/net-keys.c
+index ab724f9cfa1e..1a2cd39421c1 100644
+--- a/mesh/net-keys.c
++++ b/mesh/net-keys.c
+@@ -78,6 +78,15 @@ struct net_key {
+ 	bool ivu;
+ };
+ 
++struct proxy_cfg_msg {
++	const uint8_t *data;
++	uint8_t len;
++	uint8_t *plain;
++	uint8_t plain_len;
++	uint32_t iv_index;
++	uint32_t key_id;
++};
++
+ static struct l_queue *beacons;
+ static struct l_queue *keys;
+ static uint32_t last_flooding_id;
+@@ -255,6 +264,29 @@ static void decrypt_net_pkt(void *a, void *b)
+ 	}
+ }
+ 
++static void decrypt_proxy_cfg_msg(void *a, void *b)
++{
++	const struct net_key *key = a;
++	struct proxy_cfg_msg *proxy_cfg = b;
++	bool result;
++
++	if (proxy_cfg->key_id || !key->ref_cnt ||
++					(proxy_cfg->data[0] & 0x7f) != key->nid)
++		return;
++
++	result = mesh_crypto_packet_decode(proxy_cfg->data, proxy_cfg->len,
++							true,
++							proxy_cfg->plain,
++							proxy_cfg->iv_index,
++							key->enc_key,
++							key->prv_key);
++
++	if (result) {
++		proxy_cfg->key_id = key->id;
++		proxy_cfg->plain_len = proxy_cfg->len;
++	}
++}
++
+ uint32_t net_key_decrypt(uint32_t iv_index, const uint8_t *pkt, size_t len,
+ 					uint8_t **plain, size_t *plain_len)
+ {
+@@ -284,6 +316,30 @@ done:
+ 	return cache_id;
+ }
+ 
++uint32_t net_key_decrypt_proxy_cfg_msg(uint32_t iv_index,
++					const uint8_t *pkt, size_t len,
++					uint8_t *plain, size_t *plain_len)
++{
++	struct proxy_cfg_msg proxy_cfg = {
++		.data = pkt,
++		.len = len,
++		.plain = plain,
++		.iv_index = iv_index,
++	};
++
++	/* MshPRT_v1.1, section 6.6: Proxy configuration messages have CTL=1 */
++	if (!(pkt[1] & CTL))
++		return 0;
++
++	/* Try all network keys known to us */
++	l_queue_foreach(keys, decrypt_proxy_cfg_msg, &proxy_cfg);
++
++	if (proxy_cfg.key_id)
++		*plain_len = proxy_cfg.plain_len;
++
++	return proxy_cfg.key_id;
++}
++
+ bool net_key_encrypt(uint32_t id, uint32_t iv_index, uint8_t *pkt, size_t len)
+ {
+ 	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
+diff --git a/mesh/net-keys.h b/mesh/net-keys.h
+index 512347521547..b43157df29bc 100644
+--- a/mesh/net-keys.h
++++ b/mesh/net-keys.h
+@@ -26,6 +26,9 @@ uint32_t net_key_frnd_add(uint32_t flooding_id, uint16_t lpn, uint16_t frnd,
+ void net_key_unref(uint32_t id);
+ uint32_t net_key_decrypt(uint32_t iv_index, const uint8_t *pkt, size_t len,
+ 					uint8_t **plain, size_t *plain_len);
++uint32_t net_key_decrypt_proxy_cfg_msg(uint32_t iv_index,
++					const uint8_t *pkt, size_t len,
++					uint8_t *plain, size_t *plain_len);
+ bool net_key_encrypt(uint32_t id, uint32_t iv_index, uint8_t *pkt, size_t len);
+ uint32_t net_key_network_id(const uint8_t network[8]);
+ uint32_t net_key_beacon(const uint8_t *data, uint16_t len, uint32_t *ivi,
+diff --git a/mesh/net.c b/mesh/net.c
+index 911f781ef75c..9a04aa5120c4 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -27,6 +27,7 @@
+ #include "mesh/net-keys.h"
+ #include "mesh/node.h"
+ #include "mesh/net.h"
++#include "mesh/proxy-cfg.h"
+ #include "mesh/mesh-io.h"
+ #include "mesh/friend.h"
+ #include "mesh/gatt-service.h"		// PROXY_MSG_TYPE_NETWORK_PDU
+@@ -192,8 +193,20 @@ struct net_queue_data {
+ 	bool seen;
+ };
+ 
++struct net_queue_data_proxy_cfg {
++	struct gatt_proxy_svc *gatt_proxy;
++	struct mesh_net *net;
++	const uint8_t *data;
++	uint8_t *out;
++	size_t out_size;
++	uint32_t net_key_id;
++	uint32_t iv_index;
++	uint16_t len;
++};
++
+ struct oneshot_tx {
+ 	struct mesh_net *net;
++	uint16_t net_dst;
+ 	uint16_t interval;
+ 	bool frnd;
+ 	uint8_t cnt;
+@@ -2303,17 +2316,20 @@ static void send_msg_pkt_oneshot(void *user_data)
+ 	 */
+ 	mesh_io_send(net->io, &info, tx->packet, tx->size);
+ 	if (!tx->frnd)
+-		gatt_proxy_svc_send_net(tx->packet + 1, tx->size - 1);
++		gatt_proxy_svc_send_net(tx->net_dst, tx->packet + 1,
++								tx->size - 1);
+ 	l_free(tx);
+ }
+ 
+-static void send_msg_pkt(struct mesh_net *net, uint8_t cnt, uint16_t interval,
++static void send_msg_pkt(struct mesh_net *net, uint16_t dst, uint8_t cnt,
++					uint16_t interval,
+ 					const uint8_t *packet, uint8_t size,
+ 								bool frnd)
+ {
+ 	struct oneshot_tx *tx = l_new(struct oneshot_tx, 1);
+ 
+ 	tx->net = net;
++	tx->net_dst = dst;
+ 	tx->interval = interval;
+ 	tx->frnd = frnd;
+ 	tx->cnt = cnt;
+@@ -2324,6 +2340,7 @@ static void send_msg_pkt(struct mesh_net *net, uint8_t cnt, uint16_t interval,
+ }
+ 
+ static enum _relay_advice packet_received(struct mesh_net *net,
++				struct gatt_proxy_svc *gatt_proxy,
+ 				uint32_t net_key_id, uint16_t net_idx,
+ 				bool frnd, uint32_t iv_index,
+ 				const uint8_t *data, uint8_t size, int8_t rssi)
+@@ -2347,7 +2364,9 @@ static enum _relay_advice packet_received(struct mesh_net *net,
+ 		return RELAY_NONE;
+ 	}
+ 
+-	if (net_dst == 0) {
++	gatt_proxy_svc_filter_pdu_rcvd(gatt_proxy, net_src);
++
++	if (net_dst == UNASSIGNED_ADDRESS) {
+ 		l_error("illegal parms: DST: %4.4x Ctl: %d TTL: %2.2x",
+ 						net_dst, net_ctl, net_ttl);
+ 		return RELAY_NONE;
+@@ -2508,7 +2527,8 @@ static void net_rx(void *net_ptr, void *user_data)
+ 	if (data->gatt_proxy && frnd)
+ 		return;
+ 
+-	relay_advice = packet_received(net, net_key_id, net_idx, frnd,
++	relay_advice = packet_received(net, data->gatt_proxy, net_key_id,
++						net_idx, frnd,
+ 						iv_index, out, out_size, rssi);
+ 	if (relay_advice > data->relay_advice) {
+ 		/*
+@@ -2527,6 +2547,48 @@ static void net_rx(void *net_ptr, void *user_data)
+ 	}
+ }
+ 
++static void net_proxy_cfg_msg_rx(void *net_ptr, void *user_data)
++{
++	struct net_queue_data_proxy_cfg *data = user_data;
++	struct mesh_net *net = net_ptr;
++	uint8_t out[MESH_NET_MAX_PDU_LEN];
++	size_t out_size;
++	uint32_t net_key_id;
++	uint16_t net_idx;
++	bool frnd;
++	bool ivi_net = !!(net->iv_index & 1);
++	bool ivi_pkt = !!(data->data[0] & 0x80);
++
++	/* if IVI flag differs, use previous IV Index */
++	uint32_t iv_index = net->iv_index - (ivi_pkt ^ ivi_net);
++
++	net_key_id = net_key_decrypt_proxy_cfg_msg(iv_index,
++							data->data, data->len,
++							out, &out_size);
++
++	if (!net_key_id)
++		return;
++
++	net_idx = key_id_to_net_idx(net, net_key_id, &frnd);
++
++	if (net_idx == NET_IDX_INVALID)
++		return;
++
++	/*
++	 * MshPRT_v1.1, section 3.4.5.1 - Interface input filter
++	 * The input filter of the interface connected to the GATT bearer shall
++	 * drop all Network PDUs that have been secured using the friendship
++	 * security credentials.
++	 */
++	if (frnd)
++		return;
++
++	print_packet("RX: ProxyCfg [enc] :", data->data, data->len);
++
++	proxy_cfg_msg_received(data->gatt_proxy, net, net_key_id, iv_index, out,
++								out_size);
++}
++
+ static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
+ 					const uint8_t *data, uint16_t len)
+ {
+@@ -2566,6 +2628,25 @@ static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
+ 	}
+ }
+ 
++static void
++net_proxy_cfg_msg_recv(void *user_data, struct mesh_io_recv_info *info,
++					const uint8_t *data, uint16_t len)
++{
++	struct gatt_proxy_svc *gatt_proxy = user_data;
++	struct net_queue_data_proxy_cfg net_data = {
++		.gatt_proxy = gatt_proxy,
++		.data = data + 1,
++		.len = len - 1,
++	};
++
++	if (len < 9)
++		return;
++
++	l_queue_foreach(nets, net_proxy_cfg_msg_rx, &net_data);
++
++	/* Proxy configuration messages are not relayed */
++}
++
+ static void iv_upd_to(struct l_timeout *upd_timeout, void *user_data)
+ {
+ 	struct mesh_net *net = user_data;
+@@ -3080,6 +3161,9 @@ void mesh_net_attach_gatt(struct gatt_proxy_svc *gatt_proxy)
+ 	gatt_proxy_svc_register_recv_cb(gatt_proxy, PROXY_MSG_TYPE_NETWORK_PDU,
+ 							net_msg_recv,
+ 							gatt_proxy);
++	gatt_proxy_svc_register_recv_cb(gatt_proxy, PROXY_MSG_TYPE_PROXY_CFG,
++							net_proxy_cfg_msg_recv,
++							gatt_proxy);
+ }
+ 
+ void mesh_net_detach_gatt(struct gatt_proxy_svc *gatt_proxy)
+@@ -3088,6 +3172,8 @@ void mesh_net_detach_gatt(struct gatt_proxy_svc *gatt_proxy)
+ 
+ 	gatt_proxy_svc_deregister_recv_cb(gatt_proxy,
+ 						PROXY_MSG_TYPE_NETWORK_PDU);
++	gatt_proxy_svc_deregister_recv_cb(gatt_proxy,
++						PROXY_MSG_TYPE_PROXY_CFG);
+ }
+ 
+ bool mesh_net_iv_index_update(struct mesh_net *net)
+@@ -3214,8 +3300,8 @@ static bool send_seg(struct mesh_net *net, uint8_t cnt, uint16_t interval,
+ 		return false;
+ 	}
+ 
+-	send_msg_pkt(net, cnt, interval, packet, packet_len + 1, false);
+-
++	send_msg_pkt(net, msg->remote, cnt, interval, packet, packet_len + 1,
++									false);
+ 	msg->last_seg = segO;
+ 
+ 	return true;
+@@ -3268,7 +3354,7 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
+ 		return;
+ 	}
+ 
+-	send_msg_pkt(net, net->tx_cnt, net->tx_interval, packet,
++	send_msg_pkt(net, dst, net->tx_cnt, net->tx_interval, packet,
+ 							packet_len + 1, frnd);
+ 
+ 	l_debug("TX: Friend Seg-%d %04x -> %04x : len %u) : TTL %d : SEQ %06x",
+@@ -3433,7 +3519,7 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t net_key_id,
+ 		return;
+ 	}
+ 
+-	send_msg_pkt(net, net->tx_cnt, net->tx_interval, pkt, pkt_len + 1,
++	send_msg_pkt(net, dst, net->tx_cnt, net->tx_interval, pkt, pkt_len + 1,
+ 									frnd);
+ 
+ 	l_debug("TX: Friend ACK %04x -> %04x : len %u : TTL %d : SEQ %06x",
+@@ -3522,7 +3608,7 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
+ 	}
+ 
+ 	if (!(IS_UNASSIGNED(dst)))
+-		send_msg_pkt(net, net->tx_cnt, net->tx_interval, pkt,
++		send_msg_pkt(net, dst, net->tx_cnt, net->tx_interval, pkt,
+ 							pkt_len + 1, frnd);
+ }
+ 
+diff --git a/mesh/proxy-cfg.c b/mesh/proxy-cfg.c
+new file mode 100644
+index 000000000000..5a9439f4d941
+--- /dev/null
++++ b/mesh/proxy-cfg.c
+@@ -0,0 +1,168 @@
 +// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
 + *
@@ -175,767 +785,188 @@ index 000000000000..27cc22c0572a
 + */
 +
 +#include <stdbool.h>
-+#include <stdlib.h>
-+#include <string.h>			// memcpy()
 +
 +#include <ell/dbus.h>
-+#include <ell/log.h>			// l_warn()
-+#include <ell/queue.h>
-+#include <ell/timeout.h>
-+#include <ell/util.h>			// ell_new(), l_free(), l_malloc()
++#include <ell/log.h>
++#include <ell/util.h>			// l_get_be16(), l_put_be16()
 +
-+#include "mesh/gatt-service.h"
-+#include "mesh/mesh-io.h"		// mesh_io_recv_func_t
-+#include "mesh/net.h"			// mesh_net_attach_gatt(),
-+					// mesh_net_detach_gatt()
-+#include "mesh/net-keys.h"		// net_key_fill_adv_service_data(),
-+					// net_key_get_next_id()
++#include "src/shared/ad.h"
++
++#include "mesh/crypto.h"		// mesh_crypto_network_header_parse()
++#include "mesh/mesh-io.h"		// mesh_io_recv_func_t, required by gatt-proxy-svc.h
++#include "mesh/gatt-proxy-svc.h"	// gatt_proxy_svc_filter_set_type(),
++					// gatt_proxy_svc_filter_add(),
++					// gatt_proxy_svc_filter_remove(),
++					// gatt_proxy_svc_filter_count(),
++					// gatt_proxy_svc_send()
++#include "mesh/mesh-defs.h"		// UNASSIGNED_ADDRESS
++#include "mesh/net.h"			// PROXY_OP_SET_FILTER_TYPE,
++					// PROXY_OP_FILTER_ADD,
++					// PROXY_OP_FILTER_DEL,
++					// PROXY_OP_FILTER_STATUS,
++					// mesh_net_next_seq_num(),
++					// mesh_net_get_address()
++#include "mesh/net-keys.h"		// net_key_encrypt(),
++					// net_key_decrypt_proxy_cfg_msg()
 +#include "mesh/util.h"			// print_packet()
-+#include "mesh/gatt-proxy-svc.h"
++#include "mesh/proxy-cfg.h"
 +
-+#define MESH_GATT_PROXY_SVC_UUID "0x1828"
-+#define MESH_GATT_PROXY_CHRC_DATA_IN  "0x2ADD"
-+#define MESH_GATT_PROXY_CHRC_DATA_OUT "0x2ADE"
-+
-+#define MAX_PROXY_PDU_LEN 66  /* MshPRT_v1.1, section 7.2.2.2.7 */
-+
-+struct gatt_io_reg {
-+	mesh_io_recv_func_t cb;
-+	void *user_data;
-+	enum proxy_msg_type msg_type;
-+};
-+
-+struct gatt_proxy_svc {
-+	struct gatt_service *gatt_service;
-+	uint32_t current_adv_key_id;
-+	struct l_timeout *adv_key_cycle_to;
-+	bool connected;
-+	bool txing;
-+	struct l_queue *tx_deferred;
-+	struct l_queue *rx_regs;
-+};
-+
-+struct process_data {
-+	enum proxy_msg_type msg_type;
-+	const uint8_t *data;
-+	uint8_t len;
-+};
-+
-+static struct gatt_proxy_svc *gatt_proxy_svc;
-+
-+struct tx_deferred {
-+	enum proxy_msg_type msg_type;
-+	uint16_t len;
-+	uint8_t data[];
-+};
-+
-+static struct gatt_io_reg *find_by_filter(struct l_queue *rx_regs,
-+						enum proxy_msg_type msg_type)
++void proxy_cfg_msg_received(struct gatt_proxy_svc *gatt_proxy,
++					struct mesh_net *net,
++					uint32_t net_key_id, uint32_t iv_index,
++					const uint8_t *data, uint8_t size)
 +{
-+	const struct l_queue_entry *entry;
++	const uint8_t *msg;
++	uint8_t cfg_msg_len;
++	uint8_t net_ttl;
++	uint32_t net_seq;
++	uint16_t net_src, net_dst;
++	bool net_ctl;
++	uint8_t rsp[4];  // length of PROXY_OP_FILTER_STATUS
++	uint8_t rsp_len = 0;
 +
-+	entry = l_queue_get_entries(rx_regs);
++	print_packet("RX: ProxyCfg [clr] :", data, size);
 +
-+	for (; entry; entry = entry->next) {
-+		struct gatt_io_reg *rx_reg = entry->data;
-+
-+		if (rx_reg->msg_type == msg_type)
-+			return rx_reg;
-+	}
-+
-+	return NULL;
-+}
-+
-+void gatt_proxy_svc_register_recv_cb(struct gatt_proxy_svc *gatt_proxy,
-+					enum proxy_msg_type msg_type,
-+					mesh_io_recv_func_t cb,
-+					void *user_data)
-+{
-+	struct gatt_io_reg *rx_reg;
-+
-+	if (gatt_proxy != gatt_proxy_svc || !cb)
-+		return;
-+
-+	rx_reg = find_by_filter(gatt_proxy->rx_regs, msg_type);
-+
-+	l_free(rx_reg);
-+	l_queue_remove(gatt_proxy->rx_regs, rx_reg);
-+
-+	rx_reg = l_malloc(sizeof(struct gatt_io_reg));
-+	rx_reg->cb = cb;
-+	rx_reg->msg_type = msg_type;
-+	rx_reg->user_data = user_data;
-+
-+	l_queue_push_head(gatt_proxy->rx_regs, rx_reg);
-+}
-+
-+void gatt_proxy_svc_deregister_recv_cb(struct gatt_proxy_svc *gatt_proxy,
-+						enum proxy_msg_type msg_type)
-+{
-+	struct gatt_io_reg *rx_reg;
-+
-+	if (gatt_proxy != gatt_proxy_svc)
-+		return;
-+
-+	rx_reg = find_by_filter(gatt_proxy->rx_regs, msg_type);
-+
-+	l_queue_remove(gatt_proxy->rx_regs, rx_reg);
-+	l_free(rx_reg);
-+}
-+
-+static void gatt_proxy_svc_send(enum proxy_msg_type msg_type, const void *data,
-+								uint8_t len)
-+{
-+	if (!gatt_proxy_svc)
-+		return;
-+
-+	if (!gatt_proxy_svc->connected) {
-+		l_warn("Not connected, dropping TX message...");
++	if (!mesh_crypto_network_header_parse(data, size, &net_ctl, &net_ttl,
++					&net_seq, &net_src, &net_dst)) {
++		l_error("Failed to parse packet content");
 +		return;
 +	}
 +
-+	if (!gatt_proxy_svc->txing) {
-+		gatt_proxy_svc->txing = true;
-+		gatt_service_tx(gatt_proxy_svc->gatt_service, msg_type,
-+								data, len);
-+	} else {
-+		struct tx_deferred *tx_deferred;
-+
-+//		print_packet("TX-Defer", data, len);
-+		tx_deferred = l_malloc(len + sizeof(struct tx_deferred));
-+		tx_deferred->msg_type = msg_type;
-+		tx_deferred->len = len;
-+		memcpy(tx_deferred->data, data, len);
-+		l_queue_push_tail(gatt_proxy_svc->tx_deferred, tx_deferred);
-+	}
-+}
-+
-+void gatt_proxy_svc_send_net(const void *data, uint8_t len)
-+{
-+	gatt_proxy_svc_send(PROXY_MSG_TYPE_NETWORK_PDU, data, len);
-+}
-+
-+static void gatt_service_notify_acquired(void *user_data)
-+{
-+	struct gatt_proxy_svc *gatt_proxy = user_data;
-+
-+	if (gatt_proxy != gatt_proxy_svc)
++	/*
++	 * MshPRT_v1.1, section 6.6:
++	 * - The CTL field shall be set to 1. [already checked]
++	 * - The TTL field shall be set to 0.
++	 * - The DST field shall be set to the unassigned address.
++	 */
++	if (net_dst != UNASSIGNED_ADDRESS || net_ttl) {
++		l_error("illegal parms: DST: %4.4x Ctl: %d TTL: %2.2x",
++						net_dst, net_ctl, net_ttl);
 +		return;
-+
-+	gatt_proxy->connected = true;
-+}
-+
-+static void gatt_service_notify_stopped(void *user_data)
-+{
-+	struct gatt_proxy_svc *gatt_proxy = user_data;
-+
-+	if (gatt_proxy != gatt_proxy_svc)
-+		return;
-+
-+	gatt_proxy->connected = false;
-+	gatt_proxy->txing = false;
-+	l_queue_clear(gatt_proxy->tx_deferred, l_free);
-+}
-+
-+static void process_rx_callbacks(void *a, void *b)
-+{
-+	struct gatt_io_reg *rx_reg = a;
-+	struct process_data *rx = b;
-+
-+	if (rx->msg_type == rx_reg->msg_type)
-+		rx_reg->cb(rx_reg->user_data, NULL, rx->data, rx->len);
-+}
-+
-+static void gatt_service_rx(void *user_data, enum proxy_msg_type msg_type,
-+						const void *data, uint16_t len)
-+{
-+	struct gatt_proxy_svc *gatt_proxy = user_data;
-+	struct process_data rx = {
-+		.msg_type = msg_type,
-+		.data = data,
-+		.len = len,
-+	};
-+
-+	if (gatt_proxy != gatt_proxy_svc)
-+		return;
-+
-+	l_queue_foreach(gatt_proxy->rx_regs, process_rx_callbacks, &rx);
-+}
-+
-+static bool gatt_service_tx_cmplt(void *user_data)
-+{
-+	struct gatt_proxy_svc *gatt_proxy = user_data;
-+	struct tx_deferred *tx_deferred;
-+
-+//	l_info("gatt_service_tx_cmplt");
-+
-+	if (gatt_proxy_svc != gatt_proxy)
-+		return false;
-+
-+	if (!gatt_proxy->connected || !gatt_proxy->txing)
-+		return false;
-+
-+	gatt_proxy->txing = false;
-+
-+	tx_deferred = l_queue_pop_head(gatt_proxy->tx_deferred);
-+	if (!tx_deferred)
-+		return false;
-+
-+	gatt_proxy_svc_send(tx_deferred->msg_type, tx_deferred->data,
-+							tx_deferred->len);
-+	l_free(tx_deferred);
-+	return true;
-+}
-+
-+static bool gatt_service_fill_adv_service_data(void *user_data,
-+					struct l_dbus_message_builder *builder)
-+{
-+	struct gatt_proxy_svc *gatt_service = user_data;
-+
-+	if (gatt_service != gatt_proxy_svc)
-+		return false;
-+
-+	return net_key_fill_adv_service_data(gatt_service->current_adv_key_id,
-+								builder);
-+}
-+
-+static void gatt_proxy_svc_cycle_adv(struct l_timeout *timeout,
-+						void *user_data)
-+{
-+	struct gatt_proxy_svc *gatt_proxy = user_data;
-+	uint32_t next_adv_key_id;
-+
-+	if (gatt_proxy_svc != gatt_proxy)
-+		return;
-+
-+	next_adv_key_id = net_key_get_next_id(gatt_proxy->current_adv_key_id);
-+	if (!next_adv_key_id)
-+		return;
-+
-+	if (gatt_proxy->current_adv_key_id != next_adv_key_id) {
-+		gatt_proxy->current_adv_key_id = next_adv_key_id;
-+		gatt_service_adv_updated(gatt_proxy_svc->gatt_service);
 +	}
 +
-+	l_timeout_modify(gatt_proxy->adv_key_cycle_to, 3);
-+}
++	l_debug("RX: ProxyCfg %04x -> %04x : TTL 0x%02x : IV : %8.8x SEQ 0x%06x",
++			net_src, net_dst, net_ttl, iv_index, net_seq);
 +
-+void gatt_proxy_svc_set_current_adv_key(uint32_t id)
-+{
-+	if (!gatt_proxy_svc)
++	msg = data + 9;
++	cfg_msg_len = size - 9 - 8 /* NetMIC */;
++
++	if (!cfg_msg_len)
 +		return;
 +
-+	gatt_proxy_svc->current_adv_key_id = id;
-+	gatt_service_adv_updated(gatt_proxy_svc->gatt_service);
++	/* process request */
++	switch (msg[0]) {
++		case PROXY_OP_SET_FILTER_TYPE:
++			if (cfg_msg_len >= 2) {
++				uint8_t filter_type;
++
++				filter_type = msg[1];
++				gatt_proxy_svc_filter_set_type(gatt_proxy,
++								filter_type);
++			}
++			break;
++
++		case PROXY_OP_FILTER_ADD:
++			if (cfg_msg_len & 0x1) {
++				int num_filters = (cfg_msg_len - 1) / 2, i;
++				uint16_t addr;
++
++				for (i = 0; i < num_filters; i++) {
++					addr = l_get_be16(msg + 2 * i + 1);
++					gatt_proxy_svc_filter_add(gatt_proxy,
++									addr);
++				}
++			}
++			break;
++
++		case PROXY_OP_FILTER_DEL:
++			if (cfg_msg_len & 0x1) {
++				int num_filters = (cfg_msg_len - 1) / 2, i;
++				uint16_t addr;
++
++				for (i = 0; i < num_filters; i++) {
++					addr = l_get_be16(msg + 2 * i + 1);
++					gatt_proxy_svc_filter_remove(gatt_proxy,
++									addr);
++				}
++			}
++			break;
++
++		default:
++			break;
++	}
++
++	/* prepare response */
++	switch (msg[0]) {
++		case PROXY_OP_SET_FILTER_TYPE:
++		case PROXY_OP_FILTER_ADD:
++		case PROXY_OP_FILTER_DEL: {
++			uint8_t filter_type;
++			uint16_t num_filters =
++				gatt_proxy_svc_filter_count(gatt_proxy,
++								&filter_type);
++			rsp[0] = PROXY_OP_FILTER_STATUS;
++			rsp[1] = filter_type;
++			l_put_be16(num_filters, &rsp[2]);
++			rsp_len = 4;
++			break;
++		}
++
++		/*
++		 * MshPRT_v1.1, section 6.7:
++		 * Upon receiving a proxy configuration message with the Opcode
++		 * field set to a value that is Reserved for Future Use, the
++		 * Proxy Server shall ignore this message.
++		 */
++		default:
++			break;
++	}
++
++	if (rsp_len) {
++		uint8_t pkt[MESH_NET_MAX_PDU_LEN];
++		uint8_t pkt_len;
++
++		net_seq = mesh_net_next_seq_num(net);
++		if (!mesh_crypto_packet_build(true, 0/*TTL*/, net_seq,
++					mesh_net_get_address(net)/*src*/,
++					UNASSIGNED_ADDRESS/*dst*/, rsp[0],
++					false, 0, false, 0, 0, 0,
++					rsp + 1, rsp_len - 1, pkt, &pkt_len))
++			return;
++
++		if (!net_key_encrypt(net_key_id, iv_index, pkt, pkt_len)) {
++			l_error("Failed to encode packet");
++			return;
++		}
++
++		gatt_proxy_svc_send_proxy_cfg(pkt, pkt_len);
++	}
 +}
-+
-+void gatt_proxy_svc_start(void)
-+{
-+	if (!gatt_proxy_svc || gatt_proxy_svc->gatt_service)
-+		return;
-+
-+	gatt_proxy_svc->gatt_service = gatt_service_create(
-+					MESH_GATT_PROXY_SVC_UUID,
-+					MESH_GATT_PROXY_CHRC_DATA_IN,
-+					MESH_GATT_PROXY_CHRC_DATA_OUT,
-+					MAX_PROXY_PDU_LEN,
-+					gatt_service_notify_acquired,
-+					gatt_service_notify_stopped,
-+					gatt_service_rx,
-+					gatt_service_tx_cmplt,
-+					gatt_service_fill_adv_service_data,
-+					gatt_proxy_svc);
-+
-+	gatt_proxy_svc->adv_key_cycle_to = l_timeout_create(3,
-+						gatt_proxy_svc_cycle_adv,
-+						gatt_proxy_svc, NULL);
-+
-+	mesh_net_attach_gatt(gatt_proxy_svc);
-+}
-+
-+void gatt_proxy_svc_stop(void)
-+{
-+	if (!gatt_proxy_svc || !gatt_proxy_svc->gatt_service)
-+		return;
-+
-+	mesh_net_detach_gatt(gatt_proxy_svc);
-+	l_timeout_remove(gatt_proxy_svc->adv_key_cycle_to);
-+	gatt_service_destroy(gatt_proxy_svc->gatt_service, NULL, NULL);
-+}
-+
-+void gatt_proxy_svc_create(void)
-+{
-+	if (gatt_proxy_svc)
-+		return;
-+
-+	gatt_proxy_svc = l_new(struct gatt_proxy_svc, 1);
-+	gatt_proxy_svc->tx_deferred = l_queue_new();
-+	gatt_proxy_svc->rx_regs = l_queue_new();
-+
-+	/* Check whether we have at least one key */
-+	if (!net_key_get_next_id(0))
-+		return;
-+
-+	gatt_proxy_svc_start();
-+}
-+
-+void gatt_proxy_svc_destroy(void)
-+{
-+	if (!gatt_proxy_svc)
-+		return;
-+
-+	gatt_proxy_svc_stop();
-+
-+	l_queue_destroy(gatt_proxy_svc->rx_regs, l_free);
-+	l_queue_destroy(gatt_proxy_svc->tx_deferred, l_free);
-+	l_free(gatt_proxy_svc);
-+	gatt_proxy_svc = NULL;
-+}
-diff --git a/mesh/gatt-proxy-svc.h b/mesh/gatt-proxy-svc.h
+diff --git a/mesh/proxy-cfg.h b/mesh/proxy-cfg.h
 new file mode 100644
-index 000000000000..2b0c9d7ec21b
+index 000000000000..b41cbd512c05
 --- /dev/null
-+++ b/mesh/gatt-proxy-svc.h
-@@ -0,0 +1,28 @@
++++ b/mesh/proxy-cfg.h
+@@ -0,0 +1,19 @@
 +/* SPDX-License-Identifier: LGPL-2.1-or-later */
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2025  ARRI Lighting. All rights reserved.
++ *  Copyright (C) 2015  ARRI Lighting. All rights reserved.
 + *
 + *
 + */
 +
 +#include <stdint.h>
 +
-+enum proxy_msg_type;
 +struct gatt_proxy_svc;
++struct mesh_net;
 +
-+void gatt_proxy_svc_create(void);
-+void gatt_proxy_svc_destroy(void);
-+void gatt_proxy_svc_start(void);
-+void gatt_proxy_svc_stop(void);
-+void gatt_proxy_svc_set_current_adv_key(uint32_t id);
-+void gatt_proxy_svc_register_recv_cb(struct gatt_proxy_svc *gatt_proxy,
-+					enum proxy_msg_type msg_type,
-+					mesh_io_recv_func_t cb,
-+					void *user_data);
-+void gatt_proxy_svc_deregister_recv_cb(struct gatt_proxy_svc *gatt_proxy,
-+						enum proxy_msg_type msg_type);
-+void gatt_proxy_svc_send_net(const void *data, uint8_t len);
-+								
-diff --git a/mesh/main.c b/mesh/main.c
-index 5b8af4bc7345..079b3cbcad36 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -31,6 +31,7 @@
- #include "mesh/crypto.h"
- #include "mesh/dbus.h"
- #include "mesh/mesh-io.h"
-+#include "mesh/gatt-proxy-svc.h"
- #include "mesh/util.h"
- 
- static const char *storage_dir;
-@@ -94,6 +95,8 @@ static void mesh_ready_callback(void *user_data, bool success)
- 		l_error("Failed to initialize mesh D-Bus resources");
- 		l_main_quit();
- 	}
-+
-+	gatt_proxy_svc_create();
- }
- 
- static void request_name_callback(struct l_dbus *dbus, bool success,
-diff --git a/mesh/net-keys.c b/mesh/net-keys.c
-index 98e6d23d3f87..ab724f9cfa1e 100644
---- a/mesh/net-keys.c
-+++ b/mesh/net-keys.c
-@@ -22,6 +22,7 @@
- #include "mesh/util.h"
- #include "mesh/crypto.h"
- #include "mesh/mesh-io.h"
-+#include "mesh/gatt-proxy-svc.h"
- #include "mesh/net.h"
- #include "mesh/net-keys.h"
- 
-@@ -31,6 +32,12 @@
- /* This allows daemon to skip decryption on recently seen beacons */
- #define BEACON_CACHE_MAX	10
- 
-+/* MshPRT_v1.1, section 7.2.2.2.1 */
-+#define IDENTIFICATION_TYPE_NETWORK_ID		0x00
-+#define IDENTIFICATION_TYPE_NODE_ID		0x01
-+#define IDENTIFICATION_TYPE_PRV_NETWORK_ID	0x02
-+#define IDENTIFICATION_TYPE_PRV_NODE_ID		0x03
-+
- struct beacon_rx {
- 	uint8_t data[BEACON_LEN_MAX];
- 	uint32_t id;
-@@ -146,6 +153,9 @@ uint32_t net_key_add(const uint8_t flooding[16])
- 		goto fail;
- 
- 	key->id = ++last_flooding_id;
-+	if (l_queue_isempty(keys))
-+		gatt_proxy_svc_start();
-+
- 	l_queue_push_tail(keys, key);
- 	return key->id;
- 
-@@ -198,6 +208,9 @@ void net_key_unref(uint32_t id)
- 			l_timeout_remove(key->observe.timeout);
- 			l_queue_remove(keys, key);
- 			l_free(key);
-+
-+			if (l_queue_isempty(keys))
-+				gatt_proxy_svc_stop();
- 		}
- 	}
- }
-@@ -662,6 +675,7 @@ bool net_key_beacon_refresh(uint32_t id, uint32_t ivi, bool kr, bool ivu,
- 			return false;
- 
- 		print_packet("Set SNB to", key->snb, BEACON_LEN_SNB);
-+		gatt_proxy_svc_set_current_adv_key(key->id);
- 	}
- 
- 	l_debug("Set Beacon: IVI: %8.8x, IVU: %d, KR: %d", ivi, ivu, kr);
-@@ -797,3 +811,50 @@ void net_key_cleanup(void)
- 	l_queue_destroy(beacons, l_free);
- 	beacons = NULL;
- }
-+
-+bool net_key_fill_adv_service_data(uint32_t id,
-+					struct l_dbus_message_builder *builder)
-+{
-+	uint8_t identification_type = IDENTIFICATION_TYPE_NETWORK_ID;
-+	struct net_key *key;
-+	int i;
-+
-+	key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
-+	if (!key)
-+		return false;
-+
-+	l_dbus_message_builder_enter_array(builder, "y");
-+	l_dbus_message_builder_append_basic(builder, 'y', &identification_type);
-+
-+	for (i = 0; i < sizeof(key->net_id); i++)
-+		l_dbus_message_builder_append_basic(builder, 'y',
-+							&(key->net_id[i]));
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	return true;
-+}
-+
-+uint32_t net_key_get_next_id(uint32_t id)
-+{
-+	const struct l_queue_entry *entry;
-+	struct net_key *key;
-+	bool found = false;
-+
-+	/* Try to find next key (after the given key id) */
-+	for (entry = l_queue_get_entries(keys); entry; entry = entry->next) {
-+		key = entry->data;
-+
-+		if (!found)
-+			if (key->id == id)
-+				found = true;
-+		else
-+			return key->id;
-+	}
-+
-+	/* If not found, return id of first key */
-+	key = l_queue_peek_head(keys);
-+	if (key)
-+		return key->id;
-+
-+	return 0;
-+}
-diff --git a/mesh/net-keys.h b/mesh/net-keys.h
-index 49e01132cbf2..512347521547 100644
---- a/mesh/net-keys.h
-+++ b/mesh/net-keys.h
-@@ -38,3 +38,7 @@ bool net_key_beacon_refresh(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
- void net_key_beacon_enable(uint32_t id, bool mpb, uint8_t refresh_count);
- void net_key_beacon_disable(uint32_t id, bool mpb);
- uint32_t net_key_beacon_last_seen(uint32_t id);
-+
-+bool net_key_fill_adv_service_data(uint32_t id,
-+					struct l_dbus_message_builder *builder);
-+uint32_t net_key_get_next_id(uint32_t id);
-diff --git a/mesh/net.c b/mesh/net.c
-index b29e24f5d4a9..911f781ef75c 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -29,6 +29,8 @@
- #include "mesh/net.h"
- #include "mesh/mesh-io.h"
- #include "mesh/friend.h"
-+#include "mesh/gatt-service.h"		// PROXY_MSG_TYPE_NETWORK_PDU
-+#include "mesh/gatt-proxy-svc.h"	// gatt_proxy_svc_send_net()
- #include "mesh/mesh-config.h"
- #include "mesh/model.h"
- #include "mesh/appkey.h"
-@@ -177,6 +179,7 @@ struct mesh_destination {
- };
- 
- struct net_queue_data {
-+	struct gatt_proxy_svc *gatt_proxy;
- 	struct mesh_io_recv_info *info;
- 	struct mesh_net *net;
- 	const uint8_t *data;
-@@ -192,6 +195,7 @@ struct net_queue_data {
- struct oneshot_tx {
- 	struct mesh_net *net;
- 	uint16_t interval;
-+	bool frnd;
- 	uint8_t cnt;
- 	uint8_t size;
- 	uint8_t packet[MESH_AD_MAX_LEN];
-@@ -2288,17 +2292,30 @@ static void send_msg_pkt_oneshot(void *user_data)
- 	/* No extra randomization when sending regular mesh messages */
- 	info.u.gen.max_delay = DEFAULT_MIN_DELAY;
- 
-+	/*
-+	 * MshPrt_v1.1, section 3.4.6.4 - Transmitting a network PDU
-+	 * If [...], and the Network PDU is secured using the friendship
-+	 * security credentials, the Network PDU shall be delivered to the
-+	 * advertising bearer network interface.
-+	 * If [...], and the Network PDU is not secured using the friendship
-+	 * security credentials, the Network PDU shall be delivered to all
-+	 * network interfaces.
-+	 */
- 	mesh_io_send(net->io, &info, tx->packet, tx->size);
-+	if (!tx->frnd)
-+		gatt_proxy_svc_send_net(tx->packet + 1, tx->size - 1);
- 	l_free(tx);
- }
- 
- static void send_msg_pkt(struct mesh_net *net, uint8_t cnt, uint16_t interval,
--					const uint8_t *packet, uint8_t size)
-+					const uint8_t *packet, uint8_t size,
-+								bool frnd)
- {
- 	struct oneshot_tx *tx = l_new(struct oneshot_tx, 1);
- 
- 	tx->net = net;
- 	tx->interval = interval;
-+	tx->frnd = frnd;
- 	tx->cnt = cnt;
- 	tx->size = size;
- 	memcpy(tx->packet, packet, size);
-@@ -2482,6 +2499,15 @@ static void net_rx(void *net_ptr, void *user_data)
- 	if (net_idx == NET_IDX_INVALID)
- 		return;
- 
-+	/*
-+	 * MshPRT_v1.1, section 3.4.5.1 - Interface input filter
-+	 * The input filter of the interface connected to the GATT bearer shall
-+	 * drop all Network PDUs that have been secured using the friendship
-+	 * security credentials.
-+	 */
-+	if (data->gatt_proxy && frnd)
-+		return;
-+
- 	relay_advice = packet_received(net, net_key_id, net_idx, frnd,
- 						iv_index, out, out_size, rssi);
- 	if (relay_advice > data->relay_advice) {
-@@ -2506,7 +2532,9 @@ static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
- {
- 	uint64_t hash;
- 	bool isNew;
-+	struct gatt_proxy_svc *gatt_proxy = user_data;
- 	struct net_queue_data net_data = {
-+		.gatt_proxy = gatt_proxy,
- 		.info = info,
- 		.data = data + 1,
- 		.len = len - 1,
-@@ -3047,6 +3075,21 @@ struct mesh_io *mesh_net_detach(struct mesh_net *net)
- 	return io;
- }
- 
-+void mesh_net_attach_gatt(struct gatt_proxy_svc *gatt_proxy)
-+{
-+	gatt_proxy_svc_register_recv_cb(gatt_proxy, PROXY_MSG_TYPE_NETWORK_PDU,
-+							net_msg_recv,
-+							gatt_proxy);
-+}
-+
-+void mesh_net_detach_gatt(struct gatt_proxy_svc *gatt_proxy)
-+{
-+//	mesh_io_send_cancel(net->io, &type, 1);
-+
-+	gatt_proxy_svc_deregister_recv_cb(gatt_proxy,
-+						PROXY_MSG_TYPE_NETWORK_PDU);
-+}
-+
- bool mesh_net_iv_index_update(struct mesh_net *net)
- {
- 	if (net->iv_upd_state != IV_UPD_NORMAL)
-@@ -3171,7 +3214,7 @@ static bool send_seg(struct mesh_net *net, uint8_t cnt, uint16_t interval,
- 		return false;
- 	}
- 
--	send_msg_pkt(net, cnt, interval, packet, packet_len + 1);
-+	send_msg_pkt(net, cnt, interval, packet, packet_len + 1, false);
- 
- 	msg->last_seg = segO;
- 
-@@ -3191,6 +3234,7 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
- 	uint16_t seqZero = (hdr >> SEQ_ZERO_HDR_SHIFT) & SEQ_ZERO_MASK;
- 	uint8_t segO = (hdr >> SEGO_HDR_SHIFT) & SEG_MASK;
- 	uint8_t segN = (hdr >> SEGN_HDR_SHIFT) & SEG_MASK;
-+	bool frnd;
- 
- 	/*
- 	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
-@@ -3219,8 +3263,13 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
- 		return;
- 	}
- 
-+	if (key_id_to_net_idx(net, net_key_id, &frnd) == NET_IDX_INVALID) {
-+		l_error("Failed to determine friend security material");
-+		return;
-+	}
-+
- 	send_msg_pkt(net, net->tx_cnt, net->tx_interval, packet,
--								packet_len + 1);
-+							packet_len + 1, frnd);
- 
- 	l_debug("TX: Friend Seg-%d %04x -> %04x : len %u) : TTL %d : SEQ %06x",
- 					segO, src, dst, packet_len, ttl, seq);
-@@ -3345,6 +3394,7 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t net_key_id,
- 	uint8_t data[7];
- 	uint8_t pkt_len;
- 	uint8_t pkt[MESH_AD_MAX_LEN];
-+	bool frnd;
- 
- 	/*
- 	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
-@@ -3378,7 +3428,13 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t net_key_id,
- 		return;
- 	}
- 
--	send_msg_pkt(net, net->tx_cnt, net->tx_interval, pkt, pkt_len + 1);
-+	if (key_id_to_net_idx(net, net_key_id, &frnd) == NET_IDX_INVALID) {
-+		l_error("Failed to determine friend security material");
-+		return;
-+	}
-+
-+	send_msg_pkt(net, net->tx_cnt, net->tx_interval, pkt, pkt_len + 1,
-+									frnd);
- 
- 	l_debug("TX: Friend ACK %04x -> %04x : len %u : TTL %d : SEQ %06x",
- 					src, dst, pkt_len, ttl, seq);
-@@ -3394,6 +3450,7 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
- 	uint8_t pkt_len;
- 	uint8_t pkt[MESH_AD_MAX_LEN];
- 	bool result = false;
-+	bool frnd;
- 
- 	if (!net->src_addr)
- 		return;
-@@ -3459,9 +3516,14 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
- 		return;
- 	}
- 
-+	if (key_id_to_net_idx(net, net_key_id, &frnd) == NET_IDX_INVALID) {
-+		l_error("Failed to determine friend security material");
-+		return;
-+	}
-+
- 	if (!(IS_UNASSIGNED(dst)))
- 		send_msg_pkt(net, net->tx_cnt, net->tx_interval, pkt,
--								pkt_len + 1);
-+							pkt_len + 1, frnd);
- }
- 
- int mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t idx,
-diff --git a/mesh/net.h b/mesh/net.h
-index 5200beb2fada..af581478412c 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -14,6 +14,7 @@
- 
- struct mesh_io;
- struct mesh_node;
-+struct gatt_proxy_svc;
- 
- #define DEV_ID	0
- 
-@@ -249,6 +250,8 @@ bool mesh_net_get_key(struct mesh_net *net, bool new_key, uint16_t idx,
- 							uint32_t *net_key_id);
- bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io);
- struct mesh_io *mesh_net_detach(struct mesh_net *net);
-+void mesh_net_attach_gatt(struct gatt_proxy_svc *gatt_proxy);
-+void mesh_net_detach_gatt(struct gatt_proxy_svc *gatt_proxy);
- struct l_queue *mesh_net_get_app_keys(struct mesh_net *net);
- 
- void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
-diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-index b3c538359a66..a374abb92083 100644
---- a/mesh/prov-acceptor.c
-+++ b/mesh/prov-acceptor.c
-@@ -22,6 +22,8 @@
- #include "mesh/mesh-defs.h"
- #include "mesh/util.h"
- #include "mesh/crypto.h"
-+#include "mesh/mesh-io.h"
-+#include "mesh/gatt-proxy-svc.h"
- #include "mesh/net.h"
- #include "mesh/prov.h"
- #include "mesh/provision.h"
-@@ -89,6 +91,11 @@ struct mesh_prov_acceptor {
- 
- static struct mesh_prov_acceptor *prov = NULL;
- 
-+static void gatt_unreg_finished(void *user_data)
-+{
-+	gatt_proxy_svc_create();
-+}
-+
- static void acceptor_free(void)
- {
- 	if (!prov)
-@@ -101,7 +108,7 @@ static void acceptor_free(void)
- 	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
- 
- 	pb_adv_unreg(prov);
--	pb_gatt_unreg(prov, NULL, NULL);
-+	pb_gatt_unreg(prov, gatt_unreg_finished, NULL);
- 
- 	l_free(prov);
- 	prov = NULL;
-@@ -705,8 +712,13 @@ failure:
- cleanup:
- 	l_timeout_remove(prov->timeout);
- 
--	/* Give PB Link 5 seconds to end session */
--	prov->timeout = l_timeout_create(5, prov_to, prov, NULL);
-+	if (prov->transport == PB_ADV) {
-+		/* Give PB Link 5 seconds to end session */
-+		prov->timeout = l_timeout_create(5, prov_to, prov, NULL);
-+	} else {
-+		prov->timeout = NULL;
-+		prov_to(NULL, prov);
-+	}
- }
- 
- static void acp_prov_ack(void *user_data, uint8_t msg_num)
-@@ -804,6 +816,14 @@ bool acceptor_start(uint8_t num_ele, uint8_t *uuid,
- 		result = pb_adv_reg(false, acp_prov_open, acp_prov_close,
- 					acp_prov_rx, acp_prov_ack, uuid, prov);
- 
-+		/*
-+		 * MeshPRT_v1.1, chapter 7: "A device may support the Mesh
-+		 * Provisioning Service or the Mesh Proxy Service or both. If
-+		 * both are supported, only one of these services shall be
-+		 * exposed in the GATT database at a time."
-+		 */
-+		gatt_proxy_svc_destroy();
-+
- 		result = pb_gatt_reg(acp_prov_open, acp_prov_close,
- 					acp_prov_rx, acp_prov_ack, uuid,
- 					caps->oob_info, prov);
++void proxy_cfg_msg_received(struct gatt_proxy_svc *gatt_proxy,
++					struct mesh_net *net,
++					uint32_t net_key_id, uint32_t iv_index,
++					const uint8_t *data, uint8_t size);
 -- 
 2.43.0
 
