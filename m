@@ -1,48 +1,78 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DF92222D6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jul 2025 21:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CB739ACC;
+	Fri, 11 Jul 2025 00:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752183289; cv=none; b=dRZ4WjjzBN+XRjiyqChetAGUbfVWj+IUB28h3aHftlBWNFeROl87gwW0V2rR3eqszBLWagTjwHHJzME80wj8az25Ns6sy9rpoTA2B04Csjtw7WYtk3Q1U7ahnI2p0AW9llKiQNIu8Jyl1s+UyUyl5d/6B8icwhBgghz8P5hkvRM=
+	t=1752193845; cv=none; b=sKG2A7nqw/9ytkTM4T2MtxINCs0MQZp2lHk+dOVOsaxDTQ+eipW8cHrzOHHrZh7LrxldTMYzDyhXy3JCrqrDcyRInwX/5Fr21Wj5hVfriaMgWXcvUSmBgEvUu09oWROpuVwD6rFCG+fw6LzDQyabb995+Z40tG7q+KcO8icjp/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752183289; c=relaxed/simple;
-	bh=9qT5wv8s51iH76Hj0Bhl7c34K6bYkIcemEWEeZu0tNE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OfC/W2eubwQsPFpk5EWgRIuDdcpF89PtWw9Ylq6lt3dQbjRzo/Xi+7pfrurjwj3zSEx+sMXJR0DotSGJdv991/OP4UNedWZLfX+XJRdHiKHIzfk3oszQrwZjgg1P0n+t0OulB3Q1hpR2U5tWeIIACE83sV3lZ+C4L6mlx5bdG+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=anKioakU; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1752193845; c=relaxed/simple;
+	bh=4TcUQRKoGXD7lDinYTHq6z5jiftadbgG7wdz5mhdvsQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=llzLjpAjeihNIWDkZXVdr/tA0EC5QHikASzTFXeVnb//3YxXjho5HNwQU1TNZCt+xMkMtLzHfrBju0yrW0kG28HLSZcb6PAz5JWMpuq/uqpkqGwU7PB78xFxtUY4Z1a6MgdqLo+CpXfBnzBloEWw5tdCeixiISpjpHdmzcfXG7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lsj1gscz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="anKioakU"
-Received: from github.com (hubbernetes-node-0b6599d.va3-iad.github.net [10.48.164.55])
-	by smtp.github.com (Postfix) with ESMTPA id 03D384E06AF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jul 2025 14:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1752183287;
-	bh=xZBZImdc1ln8WiibfVkzH2OLrshXfGi+05iusg5kvLk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=anKioakUEBFLRRoBBvGRhPOVO3uiDIfBMDfVHoYZFD2QQXWmjZ5CVNGpmuUuUtYjD
-	 Q+PYZNIpzFhQkj926Pdpk7OUYDyjXtmPnq40c1RY6UuCRKpUJrh8aEsNED3Rcy9RrD
-	 FJxViY2DzXt/R6zNHN7TEGNNCKMgNO1NiT0U1+S4=
-Date: Thu, 10 Jul 2025 14:34:47 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/980136/c60f55-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lsj1gscz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C1D8C4CEE3;
+	Fri, 11 Jul 2025 00:30:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752193844;
+	bh=4TcUQRKoGXD7lDinYTHq6z5jiftadbgG7wdz5mhdvsQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Lsj1gsczFIMUMLfnOrCeoOjNxR0+SFVyGpnX2etxaDdyJNppZIcdb5jz0JKcXJMzC
+	 Gp9swqJ2Ajsd7A6ZhaN2KRNcNsvABZCsUo8BfdJrj22sXG0rs5PRZ2BH4fQ9a/bCzh
+	 lrsrJutyU+uEXczsFdblK41OLhK6ax+bcdowAvtTRETlMw6IAt7ebhLjqhJJdQF6dD
+	 o0ZxrNAW31UROQe23Hg5BW35iC7Eg4xzlJ5GwZlSbpK2qAPotN9PMZKrNh/jPY4ZJJ
+	 4NokIKWxHSQ/o5Cf0u9mLONB4ixEHqVO1OaMF/NqdEiqnPa0wHuoDy3duCZT6ps2W6
+	 ku8DoxZZxfh6w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACFE383B266;
+	Fri, 11 Jul 2025 00:31:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] net: replace ND_PRINTK with dynamic debug
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175219386649.1715084.6809706721646089401.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Jul 2025 00:31:06 +0000
+References: <20250708033342.1627636-1-wangliang74@huawei.com>
+In-Reply-To: <20250708033342.1627636-1-wangliang74@huawei.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
+ dsahern@kernel.org, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 
-  Branch: refs/heads/980136
-  Home:   https://github.com/bluez/bluez
+Hello:
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 8 Jul 2025 11:33:42 +0800 you wrote:
+> ND_PRINTK with val > 1 only works when the ND_DEBUG was set in compilation
+> phase. Replace it with dynamic debug. Convert ND_PRINTK with val <= 1 to
+> net_{err,warn}_ratelimited, and convert the rest to net_dbg_ratelimited.
+> 
+> Suggested-by: Ido Schimmel <idosch@idosch.org>
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3] net: replace ND_PRINTK with dynamic debug
+    https://git.kernel.org/netdev/net-next/c/96698d1898bc
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
