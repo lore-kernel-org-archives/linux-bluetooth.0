@@ -1,114 +1,95 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61EE1DDA24
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 13:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5382AD21;
+	Fri, 11 Jul 2025 13:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752241570; cv=none; b=TMM9rkIhhnXyVmO+gIF68uCA/HB7JUF8eqSMDcnq/QFFBAcEwTXdeLf15iQKmEumoaZIOb1iJLxiHYWundlPV6ggzlmi0G/rkDwYwUPxB4tyzDiHUaHXTmgN4aEtwTBJxNiUNwEu9UjZfy5YfzZfnXVSmHfhBHCCZKbUB+t3uKI=
+	t=1752241786; cv=none; b=qLUHGZsAHG0QXrknaz7rM/BxqjyPjODPRsueLE+rpZ43BZ7oZ8gHNjyVXw4hnAORktMUDvhjx81Dl1BbbfxR0zRoRLkW4KJ6Ub4QcNUAqVQR4QAPEEIxD8/E8VcC5DXNMrLj1qYi7Hfn0iajGid5oVjLx+3TZvIpb/FY6l6LuRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752241570; c=relaxed/simple;
-	bh=RS6rqzmv5+SQCY5vDmlk5PNSTu8xO6Zd7fN/Jo0ORGE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IEBnqb4y1DbqEBAHscN2zW0gxgPlzNmskKxOPPTCeY3lMUnF+Xi7ec2vvIBOLK4/NT00/WxOhxEearf97BDvZI75WaEfcgo+tDivmbGLy9/xVyhxQJnw3ekana2em6K2oCvt48saLnISaIsrobdqiq6UNosLxetfyeW39EsVqJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=qDDA7Kl9; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1752241786; c=relaxed/simple;
+	bh=UFDdrcPLJ6i3OpdTDDcWFXhe3Rcu0dfIq/WI277FTg8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=W8JDpHdK5bNuyhLaKs8q2/sBfHv4kEtJM3Onv2KtKXFEbxH229n7ET1FXUNb+KuYmYmqFHzFAczBC38//VXSOWzS+HimxKtJOKmRG5DM2KUIDpPqlCoRx5E/dvV5rlv6hBSR3/tSOq99huqHVZ+EnUIQOFMxS3sPNOqD+4ndI8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pYGeJrjW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="qDDA7Kl9"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32b5226e6beso20358811fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 06:46:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1752241567; x=1752846367; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RS6rqzmv5+SQCY5vDmlk5PNSTu8xO6Zd7fN/Jo0ORGE=;
-        b=qDDA7Kl99MIRkuCwaoiHq5LCmKUhosMbYLojn/mVatUIZQtlui8AiDc0YMrg1wsKr+
-         cLYSKjg1zhZ2Qi5E1btN9sA85PL6UWKyG5/0fBsMAk4fXo+CSHPBchJV79yaKLCcPbda
-         qkllj5/iHthsWkNXstFRturg/3TS7SJ2BeXKIMOSxQAzE1OhQr1Y2hJV1IIqwIQZZKaj
-         Uyxuwa+0wKElZsHDuowCni5/W01CDXQBx2HnlkRuPmpp+YfPdFMRayQJxz31C49JUoqX
-         NJKybXn5Wy1PFv9bpxgQJDRQiFojbQIDWadHG1Zivg1knNkxrC01QUqBf+odeqvWViQI
-         7nbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752241567; x=1752846367;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RS6rqzmv5+SQCY5vDmlk5PNSTu8xO6Zd7fN/Jo0ORGE=;
-        b=tB2F70dxGUeJMyLq02a2aPuASOWBoRZWdb2JUHv/LWvjaZgl2U5Tw0khIwga5Rcmm9
-         fjg3mhvkdOkF5IhrdFbHvx8pqqqSVx7BufiRJGGKMwpU+L/zmY7nAEg2VOqtBb3kGwBd
-         s/rgnobX99VjRCkurpd4UKIZ/69dk6km7zrnADyTc8scgbF/oFMXCIMM1S/5ljF/52H7
-         OvAb+SvauLPRfx9S4C3fd3EHhawfFtpqlDPhKJxUeQRnyJRFGijuYzDSCmS1+y2MUwrG
-         7omxgEYzlq9fBCA14S//LA83K8QXvLn5UpLUUvAwZRXRiGn7BoXt1txTCj5zKL/gwAEr
-         51Kw==
-X-Forwarded-Encrypted: i=1; AJvYcCWp4/34x0mg30qMNt3EEJAz2VAWOdgTGOQObcygomy5LhZwZY+zUpZyZ7stSr3lmb9Ap+9Z03Tsh9QXD2ljpMg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyopnCC3spNP/RRsJzvbTrGxRp6GdHXCdr9HnHtKV+R0THbMPVJ
-	j+W5NmKU0UHnvswAOOWWuFHj4iI6E2IyOk5GumDJhDb5mh202xe9KPH4ahoIA6g5kjcEKks5CyG
-	CssCShdujurp/1+wBJdzMNxwrVNYRY7ICpx2+BbHdzQ==
-X-Gm-Gg: ASbGncuj13im3bSkBxZufa8JWmIlZ5KXx6jAH3jVFJkVmvghZ4K4vEw0myX82c0SPwE
-	YuuaZLlTGRSCtYAy3YTcO6QQ1ag4gb20DiIIZQaiyUOmxut6KxtFsgXdbxGBQcDPGqwtQGvZ24q
-	ixbZ1p2x4f6Pj4+oO1pv5rc1DBe8akBORcT+z9TWEzB/jhc/4/7CMbo7+vAsVbncfwgaSIgXZul
-	+2blEyYM3J3qyypV3nHV31i4VZinEIfdKVBZA==
-X-Google-Smtp-Source: AGHT+IHEGaw8tTnlp6CdLR1SRLYnHtpW9Tqiv8Bmjbybq/YFpqHC8SrsIenAMtBVvvwRmkHzXm0r7d0/ZJz6EJ7QiBw=
-X-Received: by 2002:a2e:be89:0:b0:32a:864a:46eb with SMTP id
- 38308e7fff4ca-33052f808aamr11555081fa.0.1752241566646; Fri, 11 Jul 2025
- 06:46:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pYGeJrjW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D79C4CEED;
+	Fri, 11 Jul 2025 13:49:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752241785;
+	bh=UFDdrcPLJ6i3OpdTDDcWFXhe3Rcu0dfIq/WI277FTg8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pYGeJrjWQVIu+bKZ0c0vIUzaOvxTuILhU0KhapNdUtv1MTN6U13fHW/wuQiFhwD2I
+	 /Xjq7f6hES4/vGj4NHJmGsx01bLRWX5LsvDlhsWcDAzYavBEqcPhYfIka2rQWJdKTf
+	 Osf+b0isdeIEr2VuDC8alh9nTnawn0/72ZQfUmrD453me1m8QifPMGnmaG7PHet+PP
+	 0u6OjAUn2n9tv0ebc9B9YQQ8I0mA1pZvzyuxD8Cc3w9fUYjIcf3MUMJl8R2ruuboUz
+	 mP7AgJRu/80QHpzDTc7KQ0N76hGk/NsglE1jLpgtabdjAYREJcF/NSXzysJG1lKxWS
+	 N3k566Gvm9Ywg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id DD392383B275;
+	Fri, 11 Jul 2025 13:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250709144728.43313-1-brgl@bgdev.pl> <141abf1f-2739-4ccf-8a2b-3451c299ef49@oss.qualcomm.com>
- <CAMRc=McYqNm4gVgDir=Er_TdOCFUknapFx8a7q4cdyY63sb-0A@mail.gmail.com> <CABBYNZJQrHEWGBaNy77NqTbNn8jU=iRi0wsnvPqDb6rA9E5-7g@mail.gmail.com>
-In-Reply-To: <CABBYNZJQrHEWGBaNy77NqTbNn8jU=iRi0wsnvPqDb6rA9E5-7g@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 11 Jul 2025 15:45:55 +0200
-X-Gm-Features: Ac12FXwhzHd3z42_4j5xIwbpjRzvBPpx5E2MsjZkS61xbXOEn8EPEdDvT2JOmZI
-Message-ID: <CAMRc=Md0FCfqAxqLN98QbMFeACbq8DU6o9k6j+bnF6jPY=KGdQ@mail.gmail.com>
-Subject: Re: [PATCH v2] MAINTAINERS: add a sub-entry for the Qualcomm
- bluetooth driver
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, Jeff Johnson <jeff.johnson@oss.qualcomm.com>, 
-	Shuai Zhang <quic_shuaz@quicinc.com>, Stephan Gerhold <stephan.gerhold@linaro.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, linux-bluetooth@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/7] Bluetooth: Fix typos
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175224180783.2277896.14693656286247860875.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Jul 2025 13:50:07 +0000
+References: <20250703171815.1011001-1-hadess@hadess.net>
+In-Reply-To: <20250703171815.1011001-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: trivial@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, sven@kernel.org, j@jannau.net,
+ alyssa@rosenzweig.io, neal@gompa.dev, johan.hedberg@gmail.com,
+ mingo@kernel.org, tglx@linutronix.de, viro@zeniv.linux.org.uk,
+ kees@kernel.org, erick.archer@outlook.com, chris.lu@mediatek.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ asahi@lists.linux.dev
 
-On Fri, Jul 11, 2025 at 3:42=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Bartosz,
->
-> On Thu, Jul 10, 2025 at 10:22=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.=
-pl> wrote:
-> >
-> > On Wed, Jul 9, 2025 at 7:06=E2=80=AFPM Konrad Dybcio
-> > <konrad.dybcio@oss.qualcomm.com> wrote:
-> > >
-> > > On 7/9/25 4:47 PM, Bartosz Golaszewski wrote:
-> > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > > >
-> > > > Patches modifying drivers/bluetooth/hci_qca.c should be Cc'ed to th=
-e
-> > > > linux-arm-msm mailing list so that Qualcomm maintainers and reviewe=
-rs
-> > > > can get notified about proposed changes to it. Add a sub-entry that=
- adds
-> > > > the mailing list to the list of addresses returned by get_maintaine=
-r.pl.
->
-> Should this go via bluetooth-next or arm-msm has its own dedicated
-> tree? If we continue using bluetooth-next let's agree to have someone
-> from linux-arm-msm signing-off the patches for these drivers before we
-> merge them in bluetooth-next, including this change.
->
+Hello:
 
-I think this should go through bluetooth-next. Let's wait for Konrad
-or Bjorn to Ack this then.
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Bart
+On Thu,  3 Jul 2025 19:16:54 +0200 you wrote:
+> Found using codespell.
+> 
+> Probably best taken in through the Bluetooth tree.
+> 
+> Changes since v1:
+> - Added whether typos were in comments or log strings
+> - Fix typo in typo fix ("btrtl: Fix typo")
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,1/7] Bluetooth: btintel: Fix typo in comment
+    https://git.kernel.org/bluetooth/bluetooth-next/c/728beb9bb8b3
+  - [v2,2/7] Bluetooth: btmtk: Fix typo in log string
+    https://git.kernel.org/bluetooth/bluetooth-next/c/03b2d5bf4881
+  - [v2,3/7] Bluetooth: btrtl: Fix typo in comment
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5d12ca753070
+  - [v2,4/7] Bluetooth: hci_bcm4377: Fix typo in comment
+    https://git.kernel.org/bluetooth/bluetooth-next/c/aa0d0b408a5a
+  - [v2,5/7] Bluetooth: aosp: Fix typo in comment
+    https://git.kernel.org/bluetooth/bluetooth-next/c/033ea129991b
+  - [v2,6/7] Bluetooth: RFCOMM: Fix typos in comments
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b14c362ad112
+  - [v2,7/7] Bluetooth: Fix typos in comments
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c819e415efb3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
