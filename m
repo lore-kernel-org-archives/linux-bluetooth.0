@@ -1,131 +1,106 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE7B78F29
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 23:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10791DFD96
+	for <linux-bluetooth@vger.kernel.org>; Sat, 12 Jul 2025 09:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752276417; cv=none; b=fiK75TdzvxKyyYGe2GxJnhtYWwFGT0oVcL8pYNi+0srzcs23MkGxNHo75AQUPjeWMyNv73qAXuyzRin/r8T+j3InpzeJzPvNotBJjQm9X6MRj+Wy7/6izBcrroN8WPpgp8E2x/dlpYZ4gE/WrrzdpoFfxKD+zZUatGL+IoEWbt8=
+	t=1752312227; cv=none; b=qZbvj7+vrEjtirGmybpt5nKtRvuG7sK0UbfVJT823ZNbmUCPqrPavGVwEqL11LNzWckhmXedC9btjRzywxP0IZPbp1LvcPgGiOJhqGE+VfsecdiEzU09XsZITAdvZ2O/8Xsez8jvxvlM8n60OVdH0bom+eLgTaDTk9j1RJpcIq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752276417; c=relaxed/simple;
-	bh=ap5NI9vdA6rXsXyavakM6a0/KwpA5UcQdJP8jAw3Lvs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=uSJdRvEyyg9pq0HBEgBBhRUbdeIHm295dkisdt//3LOf3i+iFFxpbSrPyb8h1V8BoLIaISfF7IuJEiFZPLI2dtRYCAiZDAGlwy9AHYTJ/iF+VpsCIjUvuxnkh8CkpEuLc7hIBs4Rj2NMi3hRe/P6zqPobPElZDw8aiq0J5NY7xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WWWfjwCF; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752312227; c=relaxed/simple;
+	bh=/5iL7YuIub1w0lJ4x9gVyIkWyrzYJsMfdZb0LpjPDkE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ent/sIFtTtf1l1xFcgDDzSY2nVwI0uw5XOgf02UyF2CvqO1ZeeBqmCy8X0l1Tjd0IRdWpFMiJLiAaHbK0NjcfuYgu+sspFuBLq5LQL5dORfBNBl1jdV7y693moXtnxm9P7QdoauVstn3awSThfK3GZfYwzy9ideNFPkiC9/DCmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=onth3qXj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWWfjwCF"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-315b0050bb5so2024096a91.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jul 2025 16:26:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752276415; x=1752881215; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jR6n6i4csY02MGb6du3dKuUmubA+nRAlcdIIF7O8Tf8=;
-        b=WWWfjwCFEB4ojVyTz7Wf/rpuuLq1yjc6syFNjkW7Q0viZwUPxiJOMyPmLK7t5Q97RL
-         JZmuohzscIJYWlBkifp7p5qzPu9TuEVFQ5SrIY3Jd52y5gUA8GltE0NIWXM7atO/LA+o
-         oPtEnEv87vpL+vBopuyfCYYFYKtx3J0ZVSheDIAtDcU8TFLFJESf1nuYiBsm+490UQu5
-         FvDdE4zGeilNciMmeuhW4RzzfqLrqv6WQWRnYSSRmKV/j6H20hvDABd/t5Snjedpq5B4
-         tAp7qnGr5mdfsOArB2QKWQAhNXVntR/EbHwkKp6O9BhXi703XasvdQ+jjslPxYB/Irvs
-         XqNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752276415; x=1752881215;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jR6n6i4csY02MGb6du3dKuUmubA+nRAlcdIIF7O8Tf8=;
-        b=rcjZGtAHdCPKMs+9k7NDmp4xOMLlGdA0yBjY5+LQmcIZFB0UIFfEiEGaTeLjQ5Tq+l
-         +pVTEV/THpN8nJnIWvosy+5+DspwpK7TFVzZmYRmBhH3EQg/Wz2f+s8R2gMn9ydbsXJc
-         hI4aNi2oBqPn/e29ZRS/ghMBh0LKh9Ks8lZ5B69venxmMrD4HZsleHE2DLJTTY25i92R
-         2TO8twFoHef/wH7y1pNrAtIz8JXF4m2FZKshtmaWcirj0/0XWgNX7SXnh7z26vHDmxjH
-         b1CYRNZdVqO2VEa7DviWjGTKMVwsvytZWgRNNVG1a/UnQD8JwNvh3TEwWir8NTa44rdi
-         Sqfw==
-X-Gm-Message-State: AOJu0Yz8qZFiL2V2U/mfrDduX69X+PrM2ZXqozVnWGiUIw2yrVbF0fY1
-	ESPCIsKcGEq8Qu2MSHJHGhrJp5g574VzGCI2rtvBrWYNNScse4/HICJR94Q4FX7c
-X-Gm-Gg: ASbGncu96KZx6Z80zbAE6eH/4RXPt6HZgCUBo1KD6e3um1yORDKMFfrtrSPWikRAMK8
-	EWVXmxVMPQwo5nSTdVb5VVybXua2s8VyIwJB1s28X2Y5PVhHikScoOMnA7/h7txGEeG8/43n6GA
-	DxH1A0cqxXTsfAcknOFVPEbsRN/2dda5ddr0X9nzUJ/5DvXaLhcANqaq/kx7KoCes1aV/SFTBeE
-	J1A4PwsUgPIhU7p4/Fm/h12bf90h286s2/YQzvA806/sG73EC8wYhgQFzHvmFqp2dog0y0EcQXC
-	y/qWYdOuM0GkpuZWqfauroS76ekDOwrRgXDaQxz0CAR692bbgLtwitmcgPxBP8RiwtN5EEqJPmX
-	q2zpJDBVbfP9Af+5TFNTA/URjATM=
-X-Google-Smtp-Source: AGHT+IHEFjr+pPXN9zN8z/fFBnT23FDL3P4HSBO3UZmMhpCqt0wj13nr9EgSNKzonxbbaaJK+QU+jw==
-X-Received: by 2002:a17:90b:3bc8:b0:315:aa28:9501 with SMTP id 98e67ed59e1d1-31c4cd9a2dbmr7869899a91.24.1752276415429;
-        Fri, 11 Jul 2025 16:26:55 -0700 (PDT)
-Received: from [172.17.0.2] ([13.91.33.161])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3003faa6sm9183701a91.4.2025.07.11.16.26.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jul 2025 16:26:54 -0700 (PDT)
-Message-ID: <68719dbe.170a0220.3a4a61.76dc@mx.google.com>
-Date: Fri, 11 Jul 2025 16:26:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8181037945489479284=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="onth3qXj"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 63BCAC4CEEF;
+	Sat, 12 Jul 2025 09:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752312226;
+	bh=/5iL7YuIub1w0lJ4x9gVyIkWyrzYJsMfdZb0LpjPDkE=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=onth3qXj4tX0sKcTW6uTVbhqGclUCmr0fNfvBhfJsmGFKVYoMGUwWHt4nyXLa+wfT
+	 po2t/WLk5YdeZ9Hk2YC0Fbv18tM0RKwgD9458Kkx4bkXPHZEPLLyKEfliWoMo2HAWb
+	 TjZ/l4LGmuf0z1KWCSu6GadzAx16r8PvVUkXkYcYMp7G3PuPBYlEUU/04Vnd/xuaNP
+	 SfDY9QUdXlPHXfbX3AB1hXVA+lrgDdqvGeJw/CoSkxjRCOHDK5EDeU22KC2gzW7INd
+	 vccdBDuYmKyYGf9+d/cWjcC1ZDykCcvAIWDQfvOluBs9NTwQus0+pGUn/+vGDBevnO
+	 pWqiE0g383GfA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5313DC83F21;
+	Sat, 12 Jul 2025 09:23:46 +0000 (UTC)
+From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
+Date: Sat, 12 Jul 2025 17:23:42 +0800
+Subject: [PATCH bluez] src/adapter: Fix RemoveDevice timeout when device
+ already disconnected
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ceggers@arri.de
-Subject: RE: mesh: cleanups and a bugfix for relay packets
-In-Reply-To: <20250711220035.10065-2-ceggers@arri.de>
-References: <20250711220035.10065-2-ceggers@arri.de>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8181037945489479284==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250712-adapter-rm-device-v1-1-808603331f92@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAJ0pcmgC/x2MwQrCQAwFf6XkbKAJrIK/UjzE7qsGbC1ZLWLpv
+ 3fpcWBmVioIR6Frs1Jg8eLvqYKcGuqfNj3AniuTtpraiyhbtvmD4Bg5V78Hi5ohnZNoEqrdHBj
+ 8dzw7ur+++NNt23bErRXXagAAAA==
+X-Change-ID: 20250712-adapter-rm-device-12aae5651251
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752312224; l=1576;
+ i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
+ bh=DARVIHJtGfNwayJXs1VwNVtAfrL1/3+G/NK64yrR1eo=;
+ b=8cOsQ+c0aVHpyDp/4ySaNDXnI3/7X/KIIz5KvpSSAK2v2HywmteDz2wZTy9WDEux9qNs9Kin6
+ +MFwjRIITV7BPpZqZGQ43ciEhg5X1wPVgLbZ42xQOvLb6zDJliO5o8A
+X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
+ pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
+X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
+ auth_id=348
+X-Original-From: Ye He <ye.he@amlogic.com>
+Reply-To: ye.he@amlogic.com
 
-This is automated email and please do not reply to this email!
+From: Ye He <ye.he@amlogic.com>
 
-Dear submitter,
+When attempting to use RemoveDevice to delete a BIS source device that
+was synchronized by the BIS sink scan delegator, the kernel marks the
+device as disconnected due to PA sync termination. However, BlueZ is not
+notified of this disconnection and still proceeds to send MGMT Disconnect
+command. The kernel responds with MGMT_STATUS_DISCONNECTED, which BlueZ
+does not currently handle as a successful case. As a result, the RemoveDevice
+call never completes and no D-Bus reply is returned.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=981661
+Fixes: https://github.com/bluez/bluez/issues/1421
 
----Test result---
+Signed-off-by: Ye He <ye.he@amlogic.com>
+---
+This patch fix org.bluez.Adapter1.RemoveDevice method call timeout
+when device already disconnected.
+---
+ src/adapter.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.35 seconds
-BuildEll                      PASS      20.11 seconds
-BluezMake                     PASS      2544.29 seconds
-MakeCheck                     PASS      20.37 seconds
-MakeDistcheck                 PASS      185.20 seconds
-CheckValgrind                 PASS      234.67 seconds
-CheckSmatch                   WARNING   305.40 seconds
-bluezmakeextell               PASS      127.19 seconds
-IncrementalBuild              PENDING   0.36 seconds
-ScanBuild                     PASS      908.82 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-mesh/mesh-io-mgmt.c:525:67: warning: Variable length array is used.mesh/mesh-io-mgmt.c:525:67: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 79802300bedf4b25cb7c6bc3ea659c122a01efcb..5d68fa4c7dea251af4ff3b05a1ad66204c847c37 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -8619,7 +8619,8 @@ static void disconnect_complete(uint8_t status, uint16_t length,
+ 	const struct mgmt_rp_disconnect *rp = param;
+ 	struct btd_adapter *adapter = user_data;
+ 
+-	if (status == MGMT_STATUS_NOT_CONNECTED) {
++	if (status == MGMT_STATUS_NOT_CONNECTED ||
++		status == MGMT_STATUS_DISCONNECTED) {
+ 		btd_warn(adapter->dev_id,
+ 				"Disconnecting failed: already disconnected");
+ 	} else if (status != MGMT_STATUS_SUCCESS) {
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 806dd732fcda584fa6c44322a74373d2b739c781
+change-id: 20250712-adapter-rm-device-12aae5651251
+
+Best regards,
+-- 
+Ye He <ye.he@amlogic.com>
 
 
---===============8181037945489479284==--
