@@ -1,162 +1,214 @@
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010038.outbound.protection.outlook.com [52.101.69.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3849225FA0F;
-	Mon, 14 Jul 2025 17:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.38
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752512963; cv=fail; b=GO6v6wNJZrF66/BS5ScusnifpeKaTmFdctmK9/MND64PpfUxAP+2zGOz0Hj8ze9xabCTXx7H0zyUjMgWq1l3MZMfRcU+t+4tMDd2bUxqLwUVqQ3Djf7Fr9AfPFg3N/w8Sl3loyqXbwObEeqCCA2rTBhRvAkrHQQr/JVASd4Jjk8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752512963; c=relaxed/simple;
-	bh=JVEUIjl6BzaFMZMT2UJrjuWhoyg480Kg0xhPaVqfrSo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mPocWM5/3JS61/puJLgcwjP7mg35Rhn5EsbHd9dBENiEVmZjlxwEashXSXzpY3rP1RmpikjoEg2sl8L1T6sBewM0s0go/EIh/dZln6D/kWD8/7/x7aeZPBs8SYnjIEng/s5TcYBEqYrpK26ZV/u7BKoQg7BH6F5quMqATmuJti8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=NXOkYl1L; arc=fail smtp.client-ip=52.101.69.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="NXOkYl1L"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tG1dEmfX9xoCeOt/gsdteKiK9V/iqHeqw8Mp52pMecfOYrghOyNj9bmw7+N0JjhBsglY21QIpji3/y5Y/0TPiiNPWzHHGFvNB74mFyCXbsGu1ld6KKHJTGifWW50uVpMYfyGq84sgvSCrVLyMbVy0/E2sOsojB+rWob3Mj/9wwE+i+LkkZjivAgqzqjBJyB7BJnYblXPUMFEGQyXTa5P7NeUVYK9j4TIoCTsxhCt5ga4Fgpsdcnz0ALIB6DaASMg/lKjLdc6uRugacGWZOZG5dinohNDtkANWr9y3t16DFHV2+dP2Nw0WVUS9CUSVuKKp+uvhxr5TZurUQxwj7agZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nwzAqJjI7GMz2oKsMUx+VMw5+vWskdT2Tl95UuN8fsc=;
- b=E7gCu6OpM2J59V/NfPpwBckfCI5eUr99U2lHDYknSUGkWtisUZ9iyftcM+CNwrmLbhfXRbaDWJlNKXFveuSyEI810kRBw17uuIjDpojdiuh0IlbQrhGaR0v9bMsz2O1nPZ3Pk6ukwEuWREr2zGLSraXbgPOxf0PeSxbx7KBdbBobiZIUHXkfDCKKccuIfhXXWPx3V+wCygDRc0t0fXQuf5zImqUNAgXrWsJIdt+N6xHMMPW1RjpB7I8lTUmkzwgBM3r67ITLExWCM0b6cAwzBbbiK8uAP51YxJNALCSEMhwn1JI1vqME4RgCUMBayedLZ+FY5yNTJExBpuYV64blSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nwzAqJjI7GMz2oKsMUx+VMw5+vWskdT2Tl95UuN8fsc=;
- b=NXOkYl1Lk4sCvyZu9rrGeV8lUa1CH9tWqdtZG/uT1AZQW5dc4JQUerIbXPmtiTD1/550Ew2Gz8hyLPehN506L34dd3LgJpvIfYtTAEGir+qVNqgCDD7GbL78HvMu+05H71wBXJVJrpzHwtqrqsv666AqODJvF7wtBLP4ft0/waM=
-Received: from AM6P195CA0082.EURP195.PROD.OUTLOOK.COM (2603:10a6:209:86::23)
- by DU0PR03MB9398.eurprd03.prod.outlook.com (2603:10a6:10:419::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.29; Mon, 14 Jul
- 2025 17:09:11 +0000
-Received: from AM4PEPF00025F99.EURPRD83.prod.outlook.com
- (2603:10a6:209:86:cafe::e0) by AM6P195CA0082.outlook.office365.com
- (2603:10a6:209:86::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.32 via Frontend Transport; Mon,
- 14 Jul 2025 17:09:11 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- AM4PEPF00025F99.mail.protection.outlook.com (10.167.16.8) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8964.1 via Frontend Transport; Mon, 14 Jul 2025 17:09:11 +0000
-Received: from n9w6sw14.localnet (192.168.54.13) by mta.arri.de (10.10.18.5)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Mon, 14 Jul
- 2025 19:09:11 +0200
-From: Christian Eggers <ceggers@arri.de>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>
-Subject: struct hci_dev::quirks is running out of bits on 32-bit platforms
-Date: Mon, 14 Jul 2025 19:09:10 +0200
-Message-ID: <22185131.4csPzL39Zc@n9w6sw14>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4082D2609E3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 17:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752512974; cv=none; b=d7wlHBlQi55N4BgfEYlGTlTkGJoR2y4NT32UOxy2m3q8gwbYp2YcVERNehElcqrQIzfy9TfhQrt8HeP3qkL6FYSbvzkILmPGh/wHuHKwi0ix/5so7H74mO3GVK8j7CGXQIZvNVgWYhULNHJGt8G5WafTmQopkUfHr2gN8frRHSQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752512974; c=relaxed/simple;
+	bh=AoYcGZMRKn774E02RpjgqBq806G5BNmE8J7tHutpv78=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZCqtfM6p0v7wMrAty8iH6IBBt355EQvEYTThZQCNV4MEcYTRtxXKwaA3kh4g/eH346Ec5uiA2hIY5783P/rbiY6WzGEpQfIiKZPyJsu76EVmBoYTgw07MWNQ84fS33foKSbpyv3CR8kdcP3xF2WPsYiEuZM5zYKInLf75ZUX6zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-8760733a107so511897139f.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 10:09:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752512971; x=1753117771;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ph4jwtVPUY38p2br9m/79m3kUk8POab4D/QRBPRr/uY=;
+        b=ByJQg4+J71ZxQB/0GrpHbIfsp4NplRwcqQN9c1fQpSPrw3LjJoITgc7pdF4UuDFkIy
+         aWwBna/lyvP4JfcCkMc5u6nwX/ElThZjvg3EALxDR2qU3x7ZgeVYi3HAF8zOlKJfb8+S
+         UBIq9xyX24F6ZmrB+VfuVPCLFNV9DC5tREYjjussjJnWHMUkliuRzftDO3fWs728IryG
+         ZDvPL1oHugOUa3VzgWupuREZL4NC0Zh5aRDL0lFIbjh/PoEN/m6T32nRRsjry7YyJtXL
+         sFO/h/7ZNPNNY8vJZp6uKVy1tkzaAHQnqKklL7W24gfxqvHU6NcZ2SQ3kByP+J+ruHwa
+         Qcsw==
+X-Forwarded-Encrypted: i=1; AJvYcCXD0nFzYKeDAyNIdSM6XeK1d0S8XCT5aeLbAjL9+XqjHobTsW2bIaT72aCH1GO2S4N6VtFAMZpc1K5P+3RX3QQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOVHBVzmNDbf6UPDO0EQl7kFnJrB8wVys6WNwLSP78VSsdpufg
+	SE/eADjkYJ4+GtLL+pbEglDIZZG2COBtxU+JBqGgMFV2HgzpagAYxBVkVURlsOCOQMf5FRmwBXC
+	pCzhv8HKa1udQR9jaqhyYIPfByrdw6s1rP/+K3Vmk8ctVuk13jSb410ie2pk=
+X-Google-Smtp-Source: AGHT+IFZdc52eJhvwKb+D6XHgS/ZI3aYVyMikJlI3OhRdWsiEdoTqDXSkHHnj9t8WGOc8SqONfbnlB0xh5+JUa/TSbGSQGB3iW6c
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00025F99:EE_|DU0PR03MB9398:EE_
-X-MS-Office365-Filtering-Correlation-Id: 52647c18-06a0-407a-db95-08ddc2f92707
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?pceIeMXFNC1GY7GXlhAmvIAQ049GHm5RVVqJxk6r28J8/JpBsHHz5faEB9g0?=
- =?us-ascii?Q?o/8eth+iRA01eEIDHBY4x5cvdF5ctDLdhJav+1VLnByMALd/uJwOTchKneP5?=
- =?us-ascii?Q?6e7QEQoSQ3skr818qjtT1k6QsI0BIop8ix9iUwdbeY1X+rE6uSkjL7uQ91oB?=
- =?us-ascii?Q?PwpomdGABJbdC3fQ+ZK8G1Z4J60Dj+VAQIX8QHd9RADaft4qD5gJ76XJR1D1?=
- =?us-ascii?Q?q0TPulQiOmzk8oswD1YYEvxIJSn72nHMvQVbygyuqvKEv1Yo9dI8VYnWbwwb?=
- =?us-ascii?Q?wJcBZxlpDQRl2etkTREJGc3mLpgGGhz3VWAt8xU7Sntg+zN8qnKGOk9ZvJ2D?=
- =?us-ascii?Q?U82Vmo6+u+MJBH/lHCHs0/i+tO3DE881MIyF2PorE6SHVq+HE21aoidkep5p?=
- =?us-ascii?Q?CGvzb+QAy6uOYjoSpa3CKv6dx1PxUK48gGchFV/B6n98EiHU9T0PrmjF4VOj?=
- =?us-ascii?Q?JD0EnERvtGyIj9an7yxXkNbJ/sUWIdlDUp7iLgF29orwQc1FXqpiDhozWnL8?=
- =?us-ascii?Q?cEekmg1Jt5ZczZplkviW6YJkSrP+YqYf5LuTkGMkja80Rh/ocH/3i/H+6SYY?=
- =?us-ascii?Q?4uA5fLvasJUW8EdAanNEx8/NRcBSSrr1jZEWfU3czIY20iDQQPkc1ff2I1mC?=
- =?us-ascii?Q?BeV0VAfeJcdeQBPgUzd0cYJJRLhYxy2wNEvTlGcXWJCAT8lxqoG7sMhcUfYZ?=
- =?us-ascii?Q?MvXNNE/LpsVLRZZx5XZ7wj12DD/FxLjdrolODTCVzDmKRI0zPR2q1YVe1nCD?=
- =?us-ascii?Q?tmyMRG1d+Pc+MKBchLNQBrXHm2o7ayoisMEBW2X0EPfpSUHF3dh4YDXTAefU?=
- =?us-ascii?Q?Ltd4qpyCBl8XjW8GmKtl7YgwbLntLdNIsx2o1P/+zz9PhKzbSgPKefKaTm+w?=
- =?us-ascii?Q?Pg7p2IA7MI2SMAHe97qKiXpaNQhOEtlgpIqKYupv9BD6F3UqyiuZmRBkjMK3?=
- =?us-ascii?Q?X3coUU+2Rlx9wRoGYJPYUOgEAGn1DbzzP53xfBXO+WXshnl5cXRAtlanyPIo?=
- =?us-ascii?Q?k0w4Puun0HHZdiw085mGR5ZooauhX3KBf27TB35x6g1GXWC96Nk99XiVctZE?=
- =?us-ascii?Q?d9UaiwQgZCPvvvE+HWXvdy58cnveP8m62eob86+Ufs5Be0ufE21N8bLfMNqf?=
- =?us-ascii?Q?sG1qbXA/Gj4h5CXUq90ZKgJsevxS29tFJusKi8dqhm/WvjRQqR7H/ZdT6cxp?=
- =?us-ascii?Q?oMTSIH53Ed16xOAPvMc3GipcYoiXfhLXoEhSeILoExqIm9gqy8jABhnwfHzR?=
- =?us-ascii?Q?7HzHxV3/gcqFZsHRwoCa+GW+IGFRo6RgK3B24TwcI8EXRwFRI4Bxo5NLvUQY?=
- =?us-ascii?Q?KQpa0Nd+vK9DF1KUPnM7k9PPQglKSWqZha2ovGospB/xarwnANWwXRqBqvHX?=
- =?us-ascii?Q?oWg7d+ANxSbpF/zcoJIK4CdPxPJRUEdB6gy+7/JQj8WJhuue1q2yb3Vceut+?=
- =?us-ascii?Q?tX9TSO/evnJnV3VZicgqXLlSzan/8Z8VGp7Xbn5Xs6TkLVNekVXnEmBPQKEL?=
- =?us-ascii?Q?Qq26JeBdNeUepNclvgoKBV803G2QPYLs3UzN?=
-X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 17:09:11.3581
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52647c18-06a0-407a-db95-08ddc2f92707
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F99.EURPRD83.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR03MB9398
+X-Received: by 2002:a05:6602:60c6:b0:86a:84f:7a45 with SMTP id
+ ca18e2360f4ac-87977f8bfa8mr1510833139f.8.1752512971430; Mon, 14 Jul 2025
+ 10:09:31 -0700 (PDT)
+Date: Mon, 14 Jul 2025 10:09:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <687539cb.a70a0220.18f9d4.0005.GAE@google.com>
+Subject: [syzbot] [bluetooth?] [bcachefs?] KASAN: slab-use-after-free Read in hci_uart_write_work
+From: syzbot <syzbot+fde6bd779f78e6e0992e@syzkaller.appspotmail.com>
+To: kent.overstreet@linux.dev, linux-bcachefs@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-I just tried to introduce another quirk for Realtek Bluetooth controllers 
-when I recognized that the underlying data type (unsigned long) has already
-run out available bits on system where sizeof(unsigned long) == 4.
-The number of entries in the (anonymous) quirks enum has already reached 34 
-in the latest kernels.
+Hello,
 
-My first temptation was to simply change the data type to something like __u64,
-but this is not as easy as it seems. The test_bit() macro used almost everywhere
-for assigning quirks is guaranteed to be atomic and my platform (ARMv7) seems
-not to have support for atomic operations on __u64.
+syzbot found the following issue on:
 
-I mainly see two options:
+HEAD commit:    3f31a806a62e Merge tag 'mm-hotfixes-stable-2025-07-11-16-1..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=174b07d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
+dashboard link: https://syzkaller.appspot.com/bug?extid=fde6bd779f78e6e0992e
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=127ece8c580000
 
-1. Introducing a 'quirks2' member (bad)
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-3f31a806.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7304d62ced97/vmlinux-3f31a806.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4913df6ab730/bzImage-3f31a806.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/bb03f46b9e61/mount_5.gz
 
-This obviously would work, but requires another enum and will (I think)
-introduce stupid bugs if the wrong quirks member is exercised.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fde6bd779f78e6e0992e@syzkaller.appspotmail.com
 
-2. Switch to using __64 with non atomic operations
+==================================================================
+BUG: KASAN: slab-use-after-free in hci_uart_write_work+0x2ca/0x550 drivers/bluetooth/hci_ldisc.c:165
+Read of size 8 at addr ffff8880555a35d8 by task kworker/0:7/5631
 
-About 99% of write accesses to the quirks member happen from probe() or
-setup() routines which should (I hope) not allow simultaneous access from other
-contexts. I found 2 exceptions (as of linux-6.12):
+CPU: 0 UID: 0 PID: 5631 Comm: kworker/0:7 Not tainted 6.16.0-rc5-syzkaller-00266-g3f31a806a62e #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events hci_uart_write_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x230 mm/kasan/report.c:480
+ kasan_report+0x118/0x150 mm/kasan/report.c:593
+ hci_uart_write_work+0x2ca/0x550 drivers/bluetooth/hci_ldisc.c:165
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-a. btusb_setup_qca() is called from 'struct hci_dev::open()' (maybe uncritical).
-b. Two quirks (strict_duplicate_filter, simultaneous_discovery) can be toggled 
-   via debugfs.
+Allocated by task 54:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
+ unpoison_slab_object mm/kasan/common.c:319 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:345
+ kasan_slab_alloc include/linux/kasan.h:250 [inline]
+ slab_post_alloc_hook mm/slub.c:4148 [inline]
+ slab_alloc_node mm/slub.c:4197 [inline]
+ kmem_cache_alloc_node_noprof+0x1bb/0x3c0 mm/slub.c:4249
+ __alloc_skb+0x112/0x2d0 net/core/skbuff.c:660
+ alloc_skb include/linux/skbuff.h:1336 [inline]
+ h5_prepare_pkt+0x184/0x530 drivers/bluetooth/hci_h5.c:702
+ h5_dequeue+0x197/0x790 drivers/bluetooth/hci_h5.c:761
+ hci_uart_dequeue drivers/bluetooth/hci_ldisc.c:107 [inline]
+ hci_uart_write_work+0x24a/0x550 drivers/bluetooth/hci_ldisc.c:161
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-So it looks like using non atomic operations can also introduce trouble if
-not well reviewed. But as the 'strict_duplicate_filter' and 
-'simultaneous_discovery' quirks are only used at very few locations, maybe
-these should be moved to a new member for "atomic quirks", allowing to
-convert the remaining ones to non atomic.
+The buggy address belongs to the object at ffff8880555a3500
+ which belongs to the cache skbuff_head_cache of size 240
+The buggy address is located 216 bytes inside of
+ freed 240-byte region [ffff8880555a3500, ffff8880555a35f0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x555a3
+flags: 0x4fff00000000000(node=1|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 04fff00000000000 ffff8880304e0b40 dead000000000100 dead000000000122
+raw: 0000000000000000 00000000000c000c 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5474, tgid 5474 (syz-executor), ts 183992405509, free_ts 181552341552
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1704
+ prep_new_page mm/page_alloc.c:1712 [inline]
+ get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3669
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:4959
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2419
+ alloc_slab_page mm/slub.c:2451 [inline]
+ allocate_slab+0x8a/0x3b0 mm/slub.c:2619
+ new_slab mm/slub.c:2673 [inline]
+ ___slab_alloc+0xbfc/0x1480 mm/slub.c:3859
+ __slab_alloc mm/slub.c:3949 [inline]
+ __slab_alloc_node mm/slub.c:4024 [inline]
+ slab_alloc_node mm/slub.c:4185 [inline]
+ kmem_cache_alloc_node_noprof+0x280/0x3c0 mm/slub.c:4249
+ __alloc_skb+0x112/0x2d0 net/core/skbuff.c:660
+ alloc_skb include/linux/skbuff.h:1336 [inline]
+ nlmsg_new include/net/netlink.h:1041 [inline]
+ inet_netconf_notify_devconf+0x173/0x240 net/ipv4/devinet.c:2210
+ __devinet_sysctl_register+0x3f6/0x470 net/ipv4/devinet.c:2684
+ devinet_sysctl_register+0x187/0x200 net/ipv4/devinet.c:2718
+ inetdev_init+0x2b4/0x500 net/ipv4/devinet.c:291
+ inetdev_event+0x301/0x15b0 net/ipv4/devinet.c:1591
+ notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
+ call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
+ call_netdevice_notifiers net/core/dev.c:2282 [inline]
+ register_netdevice+0x1608/0x1ae0 net/core/dev.c:11143
+ team_newlink+0x114/0x160 drivers/net/team/team_core.c:2231
+page last free pid 5407 tgid 5407 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1248 [inline]
+ __free_frozen_pages+0xc71/0xe70 mm/page_alloc.c:2706
+ vfree+0x25a/0x400 mm/vmalloc.c:3434
+ kcov_put kernel/kcov.c:439 [inline]
+ kcov_close+0x28/0x50 kernel/kcov.c:535
+ __fput+0x449/0xa70 fs/file_table.c:465
+ task_work_run+0x1d1/0x260 kernel/task_work.c:227
+ exit_task_work include/linux/task_work.h:40 [inline]
+ do_exit+0x6b5/0x22e0 kernel/exit.c:964
+ do_group_exit+0x21c/0x2d0 kernel/exit.c:1105
+ get_signal+0x1286/0x1340 kernel/signal.c:3034
+ arch_do_signal_or_restart+0x9a/0x750 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop+0x75/0x110 kernel/entry/common.c:111
+ exit_to_user_mode_prepare include/linux/entry-common.h:330 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:414 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:449 [inline]
+ do_syscall_64+0x2bd/0x3b0 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff8880555a3480: 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc
+ ffff8880555a3500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff8880555a3580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
+                                                    ^
+ ffff8880555a3600: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
+ ffff8880555a3680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
-Are there any alternatives? Anything I missed?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-regards,
-Christian
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
