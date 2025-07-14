@@ -1,137 +1,83 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A952E370F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 20:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323BF2309B3;
+	Mon, 14 Jul 2025 20:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752526446; cv=none; b=c6paKNQHIv8FC2NEZpjigkvn/7xnKvbH0uPojXGaCtYLH4HqoKLVyZ4ZO+wjXw4QF6wCUuEHdZXZpbyIVJCH4RwOtooEjdqKEpJarKgIZM9D4CEQRp5QhKGwEIU8D6v5DWaO+I3PiwhGCdaS7FGZzcY2mvWuPHB0dYGL9FO+h8E=
+	t=1752526786; cv=none; b=jy0meB6wfgBTlF4oXYAPDxrqQAmadyninB44wxpheC0dVLj2vJo1O94T/oHx6V6EvVZuguJNB8JeTCz2RA4xiiyKTrU+FJQnbQupey4B8zvkI1x9JpIpz3gmMzbEbRCkk7EzGKCWHencY5DrpWXg6lCdQIXrExe8iZNv1oCke00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752526446; c=relaxed/simple;
-	bh=gfIa1nbux0YOaXQKcPLTUGHRJaw2nIjG0JcYSMp0SWA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qujcRK2QY831nxA+llBlZkJuEXFEkmCpDxXhui032oJxAbZcctZ0whfCF4X5aaqWYuRvO4MQ1Gyt6AzW0J+DAjcaxk48Fq8sk3GGrn5JICR3nkJVlgkrcbpWvU+395qKlfnLxjlF7kb6+lClFah49Ame8KRDHBwWIY+qW38qqzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gBq4jSzx; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1752526786; c=relaxed/simple;
+	bh=AKg3u/1beg9ku7KUMG0/joiB9u+EyqGoTep9cjfVYkA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qhFjWDVSH/39MjHZ4f5GW2c+Bww5Hx9WahaTnsH4LFcGB9LOFkJc7isk9VCxkS8wxnLLCp1DN02uemXtjkqBGMKZGhSLgilCQYqPmL8Q7Uyf2CZuBsJVi10+VdIg3GCF1tdJMy58Tusp+wJe3t9LsKt6jYKpWZGS94u98qZOqZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gc2/GmZu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gBq4jSzx"
-Received: from github.com (hubbernetes-node-c9acc27.ac4-iad.github.net [10.52.171.46])
-	by smtp.github.com (Postfix) with ESMTPA id CF7566410D3
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 13:54:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1752526443;
-	bh=cuQdXPpH4+OTE2PKzTSSSV5NVeOstoyMKK/LTAzc4bQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=gBq4jSzxzKMeVY/xdDEAT+jHaXjQIaoB+h8SHvz83hrW0fdbwV6eYtf0ywESY2fyb
-	 x1TtGa4o45FanyGbWjaotxer0aQwBK6WCrVwiQSHe07VbOCMetWYOq7v1z9F+qJI6H
-	 1s0+n5OLkgr+2cnWzmbaUmycz6GkODsuQz9N8B84=
-Date: Mon, 14 Jul 2025 13:54:03 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/806dd7-b0a138@github.com>
-Subject: [bluez/bluez] 468c58: monitor: Add sequence number and SDU length to
- ISO...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gc2/GmZu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 976DEC4CEED;
+	Mon, 14 Jul 2025 20:59:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752526785;
+	bh=AKg3u/1beg9ku7KUMG0/joiB9u+EyqGoTep9cjfVYkA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gc2/GmZupd273ndF9fZ++59H3lKj1CVkT6bBnevagiuTfX/RGF1xSotpgYN5oMLRP
+	 //GTOR9z7UW2mkNcH7UPnqGF16eJ+aFrYACgRbMzl962cfLrrkpRMZoXBBsdkBhFOF
+	 bTQiz4SkvEq7Jf/olxaRxdy52re7lfSqQZ+XOjDgnxN6TTVXpqhRTB1x93RVcriD/5
+	 Q5DWWeWmyO7vk7+42WZHoI0hwSF/UYsPZAxeY+VsNtFKB3K1mHq9lxF2olt0zIXSLR
+	 l26G1Le1GkDXoPHtdi71OTEWK04r7oTYtHklQAROpJTSLofLaCB46+MPpr0QxQ1EQH
+	 JXVS6ZB8floRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD5D383B276;
+	Mon, 14 Jul 2025 21:00:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: ISO: add socket option to report packet
+ seqnum
+ via CMSG
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175252680551.3985397.8458330929215889889.git-patchwork-notify@kernel.org>
+Date: Mon, 14 Jul 2025 21:00:05 +0000
+References: 
+ <712e0e6752a8619bdde98d55af0a9e672aa290c2.1752511130.git.pav@iki.fi>
+In-Reply-To: 
+ <712e0e6752a8619bdde98d55af0a9e672aa290c2.1752511130.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 468c5877c3badced2c18e765d4a68d8b5d89e759
-      https://github.com/bluez/bluez/commit/468c5877c3badced2c18e765d4a68d8b5d89e759
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-07-14 (Mon, 14 Jul 2025)
+Hello:
 
-  Changed paths:
-    M lib/hci.h
-    M monitor/packet.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  monitor: Add sequence number and SDU length to ISO packets
+On Mon, 14 Jul 2025 19:40:37 +0300 you wrote:
+> User applications need a way to track which ISO interval a given SDU
+> belongs to, to properly detect packet loss. All controllers do not set
+> timestamps, and it's not guaranteed user application receives all packet
+> reports (small socket buffer, or controller doesn't send all reports
+> like Intel AX210 is doing).
+> 
+> Add socket option BT_PKT_SEQNUM that enables reporting of received
+> packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
+> 
+> [...]
 
-This prints sequence number and SDU length of ISO packets:
+Here is the summary with links:
+  - [v2] Bluetooth: ISO: add socket option to report packet seqnum via CMSG
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b3a08d3efd5c
 
-> ISO Data RX: Handle 2304 SN 48 flags 0x02 dlen 64 slen 60
-
-
-  Commit: 893a47e5beb1aa1391fddb8614245d9f277920c0
-      https://github.com/bluez/bluez/commit/893a47e5beb1aa1391fddb8614245d9f277920c0
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-07-14 (Mon, 14 Jul 2025)
-
-  Changed paths:
-    M doc/l2cap.rst
-    M doc/sco.rst
-
-  Log Message:
-  -----------
-  doc: explain SCO and L2CAP timestamping related socket features
-
-Add explanations and examples for SCO and L2CAP timestamping-related
-features.
-
-
-  Commit: db061936394d6e625c33d4e34a9f639cd3df1328
-      https://github.com/bluez/bluez/commit/db061936394d6e625c33d4e34a9f639cd3df1328
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-07-14 (Mon, 14 Jul 2025)
-
-  Changed paths:
-    M lib/bluetooth.h
-    M src/shared/util.c
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  lib: tools: remove POLL_ERRQUEUE
-
-This experimental feature did not land to mainline kernel, and probably
-would need to be done differently.
-
-Remove defines and tests for it.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 9e117ebee13f591a7a0376f31229c715348860b0
-      https://github.com/bluez/bluez/commit/9e117ebee13f591a7a0376f31229c715348860b0
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-07-14 (Mon, 14 Jul 2025)
-
-  Changed paths:
-    M lib/bluetooth.h
-
-  Log Message:
-  -----------
-  lib: add BT_PKT_SEQNUM and BT_SCM_PKT_SEQNUM
-
-Socket options and CMSG identifier for ISO packet sequence numbers.
-
-
-  Commit: b0a1386f98c25af7db83c7ca42a13878e55e1365
-      https://github.com/bluez/bluez/commit/b0a1386f98c25af7db83c7ca42a13878e55e1365
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-07-14 (Mon, 14 Jul 2025)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: add tests for BT_PKT_SEQNUM
-
-Add test
-
-ISO Receive Packet Seqnum - Success
-
-
-Compare: https://github.com/bluez/bluez/compare/806dd732fcda...b0a1386f98c2
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
