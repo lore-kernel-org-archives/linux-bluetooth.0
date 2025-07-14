@@ -1,126 +1,162 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011020.outbound.protection.outlook.com [52.101.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B734C13D531
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 19:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752519721; cv=none; b=lqdiH9CKOTHHNfYpz1ccLh44lIQwSjkQHjPHTruA7jBmgNE4NcJ7XcQurjrgAjKy8OYaMW+7FmLDTgitQBvojDT0AqztqS6h+XDn28s6xfVCk/T+fFsrb3+wVCuBkakeFqEXqckVuyi5+4NfoQI7wWVNbH9d/jJlzvMQZugmR3c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752519721; c=relaxed/simple;
-	bh=EljlR3l7iwWdWQKXwmxhYCdUQ9GPgRyhxJkiX4nnroQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Cigilr6R6dRcCgpOlKyjqRMFquBJpfCmYIUex2C6AUjCU2GF85YdiFturrzsNa3JqVF0cow84zFEtzDKqVWy7knZ0rWkzHUZoIt2CwoIwFUsiWOO92hMpF8OFvxoTfDvHa+LtkdMm9ZTt8vDP4yohLjZBd/8pzV84OfTTf+P2XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FBALAZ/o; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5C423ABB5;
+	Mon, 14 Jul 2025 20:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752524929; cv=fail; b=I3RM7aLqS3Uegy4u35ATIVWWQlkj2rq+i1X9Afetbc9+z7Dpa3CynrpKfF3L/YCLuB09RvAjCKEU2qcMyMLkhpdOvPYrL/8YehWU5JgBxzKYwe0c6xcZo9qxY3dI/XpGorOWJNoyvBw9yb1tu3vIsokjs1Szr9dw9aRGb1sIjIE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752524929; c=relaxed/simple;
+	bh=ANuXX3ZO4K4UX9gP9jJbn3fFB0RBLplU32fxg0Mx/Vk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jpBobPCei2jgneNNzp50wIGhYGM6+qo24YjmLXG9Cl/hc4za4Z29NLTyZJzuMpEPIr5/egMyI70KIhkOooEUOgXtqnKOXdG79KaPuyoimb3TLPM4vfvIrBaKevT5Sv+XBMjru9nXvTpVoiHaTMPQZ9pxyU1EqNECt8h0ufNvwuI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=lRT7mq2Y; arc=fail smtp.client-ip=52.101.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FBALAZ/o"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-704cb8b1314so8319876d6.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 12:01:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752519718; x=1753124518; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKLRHQFlXVtZUSErHDFLxLc71CH0iUq/TabhaWyZmF0=;
-        b=FBALAZ/ogiQZzxs3U942jVRSoi4UJU634mziqdIo8w8v54D35Zsu+vpsLgUjT6d5FV
-         uTZbrqVm5bu0hQpiYhtG08KBCc5HN0ua77rOxRnMpGMKVcCgE8PeDZe6LwFGBgN/TWw7
-         Bnpmg9qtRLDDxGxd05TVZVZ0GqSfBthF9bLXmV0EW8Xs+XXqVimgEwU/AW0H3/G8QVCz
-         yPH9eGaYG1OWfldY4K4O1aSj9zBo4xyQDJBHSvPtrXCZ3NgrBhKGL7Z0CF/eX54+ywlG
-         LBIOCb0nhu3SHQZWY8SkfJvtWrK1KEZYy17ZaVedO5EbOpPGnZtrYaAR5OGeLSEJ6S3d
-         x1iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752519718; x=1753124518;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gKLRHQFlXVtZUSErHDFLxLc71CH0iUq/TabhaWyZmF0=;
-        b=AKfeL2btXpscA2I9bf41X00N6WYU+SKvEeM2ap9ngbCERvIQDm8ogC9RBGxAiym9qN
-         CytPQLW4ux3MWsRxypyGRDXpqnI9kvm7iPv/nFVKYbYtAhfZX3ln/sB4hk7TkM3BWsaw
-         aTYHEAlhKwp6ckPZscTCytr4OPGHm6kt+Df2B+1mOvRgrmmbdNgdyPWcPdT6Uh9aYTvT
-         9qWAsTZQBxyjD2YbsijbjD7sw4RJ5TwUfUjVnozKtfMZD7VR9fBWMba0n0MOvWI6YH6y
-         +Rv8LJFq9u25PIeDdcLmQG+h5Lue9ObBd+RRLwp8+xa8jpiZtOUkoP/aHy6MglDQXMZa
-         NtMg==
-X-Gm-Message-State: AOJu0Yy1zxckYXwV1lfu1rxG2GPjYGJiYbiUkJOdyPTHzeSfGAJZEaJm
-	jlUsPyxtXBoQHMoyl+Rp5bS6GMtQc1VBLZyZi18d+qGIUC/ka3qkCO5MzrnuEA==
-X-Gm-Gg: ASbGncsqVN5v/KtbjZefMjnh24OYpyoH9Vw/LAsrCLN02yMRLmcLbizI1ZXFW5gNt1l
-	W3DRQGskJIFo6uan8bEpzMFXevLu1mxyq+PWxk1MwisZbej58i8ugWJWqzyAJTVJQABPA6Vwlyw
-	ZkcoHSir6Mz8ZmPzjg8C/uUY54F4SWBMM7AlS6ao5/s7Ln+KHDKPTu4JIa75EQrsx9Zwmt7uWZY
-	NPiQ7r8Mm5VcBh+d+1mdo8Gw2mrg5V271SstHoOAY1LcH7IHbgRpSH4dctR4QQbm2T53s4FmM5b
-	QnQ4BY1P4HGiW1zHFE4s7r3vfGQPCuWfqaxjLS5aBaEv2NQukSe2XfimPQbL9rbm7nlntmLqfcb
-	TrTblL1t/UGhclHtK1tCeyFPCWhI=
-X-Google-Smtp-Source: AGHT+IHJZ43ljZsbfOJEMsp3aJPyjfXqjxcR83D32QuFxYZHIYrDRCqdGGb4sOTzXJlIa+S+B2kLGw==
-X-Received: by 2002:a05:6214:400c:b0:702:d634:1d03 with SMTP id 6a1803df08f44-704a42d8f42mr230734816d6.32.1752519718110;
-        Mon, 14 Jul 2025 12:01:58 -0700 (PDT)
-Received: from [172.17.0.2] ([20.241.105.9])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70497d396e6sm49881746d6.57.2025.07.14.12.01.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 12:01:57 -0700 (PDT)
-Message-ID: <68755425.d40a0220.21ddd3.3744@mx.google.com>
-Date: Mon, 14 Jul 2025 12:01:57 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6156684015087428547=="
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="lRT7mq2Y"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QVujhpmw2uFfNSHfLaCkVNRYqUPclLi1vTRciYOxJhMvMH9aoENmF92OOMByXMO06nLsmvOmPiaCT7l7laTL04sc7kQb96yU7tRV+6xCqtATIIvJOPPkyc1/JklwjlF2e6yQNfRqu1Iz1W/BrwHd1f1LYyzw8LQjKGn84pmPuqJ0LqQZAl0PDf9LAQCuR8nOVLafOPsq3serzIXbH+4O9F7jzIpGYF/FIwSqydLJu5HUBZRDvkNVxgK5bhFVT4rgDC7QaYKLs87BsMkOqbLlV+j8thRz916DYJ6KRCEulqniOACNio4fvHsp4vO+5rBNzriMPSjjf4VpBARJDsqEaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T2txVBWpSxQdy3Fcrxbij62RZ7YTlFf2Ww55k0vS1/0=;
+ b=YcMHtFGoHZoMRN1cmzZ8N+uOWzDHlshbFR6L9yXAmZBhzXu9fEL4yEHxpDeZds3tzF+LCV9313YpFPWR0YD/qXJWzd6sd2kfM/BTNLYi10XbOcMYoNSkzmYZKoABp6J9ehgmcQti25UAkrafN5XyxpMO7hcITRqGMk4I+A8+D4LWBviUP4QMVgp1uAV0RfZ0noNH3p8kNCrNUdFOjWptWZElx57xFgY9bU9FKgxHf6z1Tzd0CBEH17q672vafLtdUDGKNLHyyDEfotQtmaeL36wRrHE58+hLvlSwUZnN0xT2+pQ8f2RyGRimlY57pHa/8dOwsWjP3MzQcA6wNhznGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=holtmann.org smtp.mailfrom=arri.de;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T2txVBWpSxQdy3Fcrxbij62RZ7YTlFf2Ww55k0vS1/0=;
+ b=lRT7mq2YjQI3aUNhfAK4in8v3gYv4hmfol59LrQ7LVP880N6pDPuuuOXtBWNA07b187lmjgkwW0ez8JFSVNigqEkXWpK0f6i8ObnYghtbdepIT84Xru0N83BseklUJOZG6ofjpPBunZJlE8h0QK88IdLz1m2fhyBOp4Kmj4vqbs=
+Received: from DB8PR06CA0014.eurprd06.prod.outlook.com (2603:10a6:10:100::27)
+ by DU0PR03MB9056.eurprd03.prod.outlook.com (2603:10a6:10:464::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.25; Mon, 14 Jul
+ 2025 20:28:40 +0000
+Received: from DU2PEPF00028D02.eurprd03.prod.outlook.com
+ (2603:10a6:10:100:cafe::9b) by DB8PR06CA0014.outlook.office365.com
+ (2603:10a6:10:100::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.32 via Frontend Transport; Mon,
+ 14 Jul 2025 20:28:40 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ DU2PEPF00028D02.mail.protection.outlook.com (10.167.242.186) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8922.22 via Frontend Transport; Mon, 14 Jul 2025 20:28:39 +0000
+Received: from N9W6SW14.arri.de (192.168.54.14) by mta.arri.de (10.10.18.5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Mon, 14 Jul
+ 2025 22:28:38 +0200
+From: Christian Eggers <ceggers@arri.de>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>, Johan Hedberg
+	<johan.hedberg@gmail.com>
+CC: Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Sean Wang
+	<sean.wang@mediatek.com>, Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	"Neeraj Kale" <neeraj.sanjaykale@nxp.com>, Yang Li <yang.li@amlogic.com>,
+	Sven Peter <sven@svenpeter.dev>, Janne Grunau <j@jannau.net>, Alyssa
+ Rosenzweig <alyssa@rosenzweig.io>, Neal Gompa <neal@gompa.dev>,
+	<linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-arm-msm@vger.kernel.org>, <asahi@lists.linux.dev>,
+	<netdev@vger.kernel.org>, Christian Eggers <ceggers@arri.de>
+Subject: [PATCH 1/3] Bluetooth: hci_core: fix typos in macros
+Date: Mon, 14 Jul 2025 22:27:43 +0200
+Message-ID: <20250714202744.11578-2-ceggers@arri.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] doc: explain SCO and L2CAP timestamping related socket features
-In-Reply-To: <8968b3ef55340c6d7b16c33685aa87e3368b526f.1752514576.git.pav@iki.fi>
-References: <8968b3ef55340c6d7b16c33685aa87e3368b526f.1752514576.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PEPF00028D02:EE_|DU0PR03MB9056:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e161f26-55a5-4ba4-bb41-08ddc31504d4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|7416014|1800799024|376014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Gz/dlVafk5R7I/Fpl+RNxKASHbNrgJ+sGsW7HX7uiQOV+IRKIkkGGmTA2tcB?=
+ =?us-ascii?Q?vdzIeB8rGysgysWa1pC5ixKi19R8nwtjm8xGri821k2ifrZVgwtI5TpEyJn3?=
+ =?us-ascii?Q?/LrsMy1LiKMQXbpJUrwZqtD0tsifLD6E0elbqjv2HyGi2v2F40OB1Djip5xc?=
+ =?us-ascii?Q?8iGz8IbrW/H66JeTzdrJaJ12UvYvAfKVhadwupqQyTqo3PZ4uZ++UOvaslG8?=
+ =?us-ascii?Q?8Xdxn5c8obAHNhUqqntUzBbQm/PFv9UhRUBGqACOwlWgxkq2YEw0cBxenvxS?=
+ =?us-ascii?Q?scO0v5vJtj4/fhFg0T5JNrO5ZMPch6Hle7GAGulGa8dHgXy9UJvJLn2rFMd9?=
+ =?us-ascii?Q?yEGl4GJ9bhtD52OyMGA1+9egHY1qIhqpchpSJnF8a8sGTofhpgNircKOOJel?=
+ =?us-ascii?Q?/+OKoLrs77NQX533kjgkWwhl5KKvy//0yplz8N9ukXYwhED/KIYLQYsOBrnx?=
+ =?us-ascii?Q?Eg63VkTOW6zQ5kvSStpVEbc+42VDLFDw9rw9VuXa9ONAOB68jY+7tkB1+LeP?=
+ =?us-ascii?Q?QDpfus1rD4sJ8X6ShXjOx4K35Zkw9jMt0KNdDmK/4aWiLInINvh/uo8L6pRN?=
+ =?us-ascii?Q?r/zGcEeuURgJCsA/hrPZYhEFnLCgpiLTA7aQO5BeRRNeeSh07SvNCplGUCup?=
+ =?us-ascii?Q?iv/uI3dc6GwwzQkh/mJWEwIPZq66paXEKocJg/ryYUzYrX8z5Nj2TGsBhU54?=
+ =?us-ascii?Q?y1jXHFM2RSI2hu3XdY7Pd05ceyGwB6u54760od+dDa2phye+bCHf1aBTo9pq?=
+ =?us-ascii?Q?VbBIvpSYJH7Pi+51GZSTrPJ2efWZwPkQPNWsiDgiyE61n7ufkq3x6RMk9zGP?=
+ =?us-ascii?Q?IgzyJaVKJIVIAYvYSKzjtQcGzjYiUp0gEXX+xjZtKX+snzXalIms56wYh39B?=
+ =?us-ascii?Q?3DI3WGkOcP5At7XoQGEOJl1e2NeMaAoSytrJhGZ0bs0Su+efvp1WrpdZ9BcG?=
+ =?us-ascii?Q?Ygy/mLkmHOs6v3RqIy0/Lc0q/lPL4jYBRcYbcTawJdkz4NA37494FgFsuICH?=
+ =?us-ascii?Q?pDeDnX/wvbSZUnKi5ukWBu5LflJI59hL309rurg5GlOqNgt4xRkaXdOUKeM1?=
+ =?us-ascii?Q?M5RpDl2N0HxsaE/Z8B94Yn08UH8qnvTui+0wlq6DXI1HwAg/SDqByqRQQV8c?=
+ =?us-ascii?Q?Iv9iOksYm2aYYsNFUeQ8YUdV87XkVCGMKCik5wLv+icDmG4xWOQy1K2iafuM?=
+ =?us-ascii?Q?Hagy/FCXC+afgkBlssbLJcaix/0aF0o1F5elLXPW6lWE83t6B3ratXQQF8hC?=
+ =?us-ascii?Q?82GVo7Mbp2uTM1eOUz2Q4GDKyIKJF+xwF5/hnNPTN0+Orc0S5WByFTFGbmfN?=
+ =?us-ascii?Q?km+BiIhl59m1IKE3FxE1ARqJAZ9bleDlAQiphp6lte+chsLcXgZ4WeP8tk2W?=
+ =?us-ascii?Q?/cALc5YQ0bCQ7mrdKoRizuc7yXezGY8NFeLlWaOzfQK55UpNdk7kfFfT0xLo?=
+ =?us-ascii?Q?DXDNYwtIM9wbM0lTM2u7h+MPhNIkpUJ9wBairSK9sub+xp+myvtaYevI4w1J?=
+ =?us-ascii?Q?L4zDnmFb3rRnmq1Z/zFi1QGZeTnPfnQW9DAO?=
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2025 20:28:39.8537
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e161f26-55a5-4ba4-bb41-08ddc31504d4
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU2PEPF00028D02.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR03MB9056
 
---===============6156684015087428547==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The provided macro parameter is named 'dev' (rather than 'hdev', which
+may be a variable on the stack where the macro is used).
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=982181
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.29 seconds
-GitLint                       PENDING   0.23 seconds
-BuildEll                      PASS      20.21 seconds
-BluezMake                     PASS      2543.70 seconds
-MakeCheck                     PASS      19.83 seconds
-MakeDistcheck                 PASS      183.41 seconds
-CheckValgrind                 PASS      234.04 seconds
-CheckSmatch                   PASS      304.47 seconds
-bluezmakeextell               PASS      127.37 seconds
-IncrementalBuild              PENDING   0.29 seconds
-ScanBuild                     PASS      906.02 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: a9a830a676a9 ("Bluetooth: hci_event: Fix sending HCI_OP_READ_ENC_KEY_SIZE")
+Fixes: 6126ffabba6b ("Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY device flag")
+Signed-off-by: Christian Eggers <ceggers@arri.de>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_core.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3ce1fb6f5822..acaaad55e75a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1921,11 +1921,11 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define ll_privacy_capable(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
+ 
+ #define privacy_mode_capable(dev) (ll_privacy_capable(dev) && \
+-				   (hdev->commands[39] & 0x04))
++				   ((dev)->commands[39] & 0x04))
+ 
+ #define read_key_size_capable(dev) \
+ 	((dev)->commands[20] & 0x10 && \
+-	 !test_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks))
++	 !test_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &(dev)->quirks))
+ 
+ #define read_voice_setting_capable(dev) \
+ 	((dev)->commands[9] & 0x04 && \
+-- 
+2.43.0
 
---===============6156684015087428547==--
