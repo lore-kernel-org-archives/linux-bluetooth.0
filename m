@@ -1,68 +1,68 @@
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D7723717C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 20:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5857A2367C0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 20:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752525339; cv=none; b=IhXvZ1Aynf3FMojoS0ENrEOxf+uB8Q/CLMJC29uKiunEaFqsKEaH2tzgwq2ZZ+jBLt0QieI7T6Gh125Ul+QcMOHmavLkfhy5CAddgV2bMxfKuUdQKANFaSnBPF3YZZZZ/waFjAGTUIP/FW975vN8fR5V4hJWNPr7Mk/XuNQxbzo=
+	t=1752525340; cv=none; b=Ha+hrOzxFx66MMu+SMNPypeJzkW4MPGUwZk66qFwUFcLgCjyK8JEYX1dWRpK3QmoU9Y3cVkKFeya/N5iEtabAHQAFjBaBIVzotTBOwerKmAeEfCc3Ke3miRbMaMwkWSZHihrRP7eMl0qbB4WDycfBGqz0M7+c+9VHn2b3R9PCHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752525339; c=relaxed/simple;
-	bh=Vj4FN4JbnQXWonZycy3KE7yDLl9S5K6z5YvEXcIPx7g=;
+	s=arc-20240116; t=1752525340; c=relaxed/simple;
+	bh=SxJZHzZg7hm1aACpU3oO17u/Hu8g4VUoMUKUdadpyBI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eZNOoyYaO0+5x9HJx8qhTQzY4XUbIGYK/en5ZGCE7py/MHrUkN8WY64cOArjXZn9N/wg8SVGTDcAI/xuY3cHle1F1uLPvgFn6qLx2x44tc50ZnFQ7HnwIFtGQQ2kGst5eycZaFPHdpVGfSd8e1L8ULJjEPd1v+XZycw9bYq0zkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CTSgnX7D; arc=none smtp.client-ip=209.85.222.47
+	 MIME-Version; b=spp3ebflTMfloqBS7mtoCMJU4a+/LnNzqy/3rJbTQdZX7WeHKWQ4CtNJ+JMNUhHx+cszdA15WZgBGZDj3XXwHLrClbuktSoMxNtl36H300j04K4A1wr+nQc12oRMONM6l9AyqN0w4r+wpeRR9Q3GhZLibVwke38ZGZSMt1yy5d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=avR+qmGo; arc=none smtp.client-ip=209.85.222.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CTSgnX7D"
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-87f4c8e9cdcso1974492241.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 13:35:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="avR+qmGo"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-86fea8329cdso2697589241.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 13:35:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752525334; x=1753130134; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752525336; x=1753130136; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nZDhYtBuavK4sULNgKBwvI4z2pQ1PJefjE7Dvd2pLiw=;
-        b=CTSgnX7DHMj8xbMYsISgKjuDG6LOzAVwS+l0gPs4Eb+U2/bGF1XzWd6jyrHb7NlA1p
-         y4057rnJtcAdAPDSOoqKTN638CeM9LUcROHB+dZ864OKHDtBc3T/tkSq1Y4kfSWAdfT7
-         MzsiHsszbLq5JTCicDbD+kNzY3Jo6grwdKWOMdWb+TePbLv0tLEtfZWv5HeXkc8IxQqn
-         cQZMpopg1RIz8KCJW332xOUge0Oep8FYSD+uitZxYtOioEs2rZnoboaSq8woqm0ArjTB
-         I6Kf+pG6pT8YQtcLUFsIcFRlFlVJSEU5ekhOPqCHyCrublbHM0QTgOfhO+OWEe5MfrfD
-         aiow==
+        bh=hDmQlZxao2kvU7S3sNffYC8jFdndBkxzbJvSWiVx+qU=;
+        b=avR+qmGoCKGxtMqCFBQqhmFnHkXtV2dWI3ajPmqK5zTnHBFc4q8L4DYniQUqm+s9H8
+         gBNCSCwW/c2xHZpfE1c8A0BBXVRfH76lJrXw65XsSfskYXo8g38hVxG/lyKMDwgJRs8P
+         aRRikHvgJgUBr3Qmd5Ta/+pjoZR9IbzT114WbdGGCWXo1OZ7d+1oJ4LEXAHZyw3lGP6P
+         CJrBUj/UHPU0ZquvAka5z16bwxFqBGoWuHAxRzDDkgUZBm+7dtYGCWKd06oTBzPBHok2
+         kDgCeqd4b88Wa7lHdafcyvoiyT9rRlI29j9fDx8c14oKYWTCFEnWTzJqQGpLczt3ccz3
+         12Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752525334; x=1753130134;
+        d=1e100.net; s=20230601; t=1752525336; x=1753130136;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nZDhYtBuavK4sULNgKBwvI4z2pQ1PJefjE7Dvd2pLiw=;
-        b=XMszmZhnSwfEpyhV0KQ2ug9E5BoYpzCGYqn5uCU5bBtplSSwGHBjbnVI0d+QHz7X4l
-         G4ACwB5NhBoMJ+7yjOGsLAhsm/T2L4bti7KklZ1Q6jRNK74KSNqTJ6bCCdFIRJCYu4I8
-         1aVDBky3uH/1N/csEO5CjIps34JWjGnveaHBmBz4WqjNHfDT3OYTdvmXPmxq6puAWM53
-         Q5GIqwJbDCzpFxPm20V3yOlUMtPtYXHXBe83Wz1gSDZNNk/TOzo1kb/l6SDyJTI5dfn/
-         Qu7HCgnVtDPRRw+fb2a1PHVwPVl+RKE4wKGswOuL0N7jY0rbsoz9oLpQGTGECgm7Q6X3
-         ARjg==
-X-Gm-Message-State: AOJu0YymTmIcRnuSAyE9TD+liSSo4NfdnQIhKZaoLnkrgFGyfop7Gz9R
-	7BdkCFc4bGZEU3pPLJUQWkKQ6O+TG8HsB8qVO57dGOXAd8vnNd2tAUk82M+WcMLD
-X-Gm-Gg: ASbGncuiQQPQ/8YfOTyzat1zFHcL20lPvtfcNC+SgCBMhMwQNC0cCSAKjgUS7uuFatS
-	veJUxgmGRW4KN6U6pa6k5QynXdBrU6heswYgBrCTY1QH6AfWvbBDMqzDqKv0kT5n0EFlnz4AGzz
-	BZo2jE2rO7SgRTLsEcZV3VZcKdGv6fFNItRgSRBYPYwCm0WjTb4u8oNUXENKB9/kKUITHhL2Hlt
-	qGfv0FEPg6MZefRKFcuxpkYQCmGmDCQ22uIzAjN6geRvDhmJOZWut5ZVXxoXHcKlTYN2nm7VrXj
-	drFs7BMXnd4gQtxY2fSy2SxWB5g7JkH6R2dWjvxrtEpWuN9pLV4ysM21NEBpf5ip8TwG7NmF+qQ
-	oP3a9ztfy2yRbQhyJxr/LPTEgPWnLzQ6mxjTd4D/4vYdiWTAjChs/NshBML7uddKk
-X-Google-Smtp-Source: AGHT+IHsy8Pwp3FIkQTD/GgoUrXykU5gafny6QBhllm1RhGaOLW9DkABAJ+P0M+45R8NwyQBcbwYMg==
-X-Received: by 2002:a05:6102:50a8:b0:4e5:980a:d164 with SMTP id ada2fe7eead31-4f6403c47bbmr8929348137.0.1752525333711;
-        Mon, 14 Jul 2025 13:35:33 -0700 (PDT)
+        bh=hDmQlZxao2kvU7S3sNffYC8jFdndBkxzbJvSWiVx+qU=;
+        b=MVam1Ol4NqfcBfN3muI3t1llNIh5FI1Db22XgU5hSJ2UHFJmkb+VDZJeqCRz08fc/w
+         moq+a8//SIiL3/78mAiL7x/5H3YorwQCwGEs+gtZ4fV7i8UxZkHYNmNMcTtsiQx/6P4q
+         KnFfcrtMcygV1HEX4830Om9YitVuSdqjPL9fIh5iTdvOa2sOyqonoAzF7sLsmgcUSOby
+         jHRdogHTrOSS3IYGuLxEiEEtwic+S3A0pxq1wYA4UtIt5PMQWmiDGWatTg+I7IQLVZ/X
+         DlIsOiFVBEgJ6Sqr1rEwvqo3J0hQXVDFHvpo45lfXo9n1wUIGKnBxSwkjvZE8tp7k4fX
+         lt0g==
+X-Gm-Message-State: AOJu0Ywe+mPr+uRQ68ZQH9IQOJTj/h28Ylq0XWQh9BVI0MJ5AYRc2u2v
+	YASMiNA/2lWTGg7aMIWCj4Vltgaf8zWC56KqBl542EhicYppttMUFMZvHYDwRG3j
+X-Gm-Gg: ASbGncvwjaoyxlZa8d6OPVD+oDreRzHPC5T+vIzMY4Wl6DcsNQpRQslkqiTLIOrV6Zb
+	C91zG8f1mg82+5jgCh44a3mjHPSCZywQj/qTD9Pd5YkTElvkfMnZIfX9ONMUGg16OYj/XQVBr8W
+	Frh5BnAUfbnppLjF+LxuKVexKnJ1+A7ZjHb+37HIOieSzPi2GRUkutckyOoE1VwlRbCMXXIK1y8
+	YnVfNlPnsgRJNoxnWxnbmcGJ2PLMPuKgO1lBxvakNkwSaCEYVOj1U5bNKXsroodSTzaHOXTKZIi
+	EbAzXhjfNe8U7VEthRFFPWHUz6IX2mTJwCcfs5BLiNwCGrGyVUGXA8nD9hcrtDvLZl+22EGBnK2
+	Q4HhqarUmHbCLcpwn2ViZm4x37LoyxtTpss76zx+IMHcF3ycABlYQTwruWCxl7Y1n
+X-Google-Smtp-Source: AGHT+IGlZQOo64pptBUtMDCWFdweMsBzrXjFriwN5bYquijxx7IP/PBChlmYmp04l9+vXI58/Wt//g==
+X-Received: by 2002:a05:6102:5801:b0:4e4:f503:6675 with SMTP id ada2fe7eead31-4f7f110fb1cmr28882137.18.1752525336248;
+        Mon, 14 Jul 2025 13:35:36 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-888ec44a6f6sm1887177241.24.2025.07.14.13.35.32
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-888ec44a6f6sm1887177241.24.2025.07.14.13.35.33
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 13:35:33 -0700 (PDT)
+        Mon, 14 Jul 2025 13:35:34 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/5] client: Add support for org.bluez.Bearer.{BREDR, LE}1
-Date: Mon, 14 Jul 2025 16:35:18 -0400
-Message-ID: <20250714203519.345226-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 5/5] client: Rework handling of Disconnected signal
+Date: Mon, 14 Jul 2025 16:35:19 -0400
+Message-ID: <20250714203519.345226-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250714203519.345226-1-luiz.dentz@gmail.com>
 References: <20250714203519.345226-1-luiz.dentz@gmail.com>
@@ -76,234 +76,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for printing properties related to
-org.bluez.Bearer.{BREDR, LE}1:
-
-> info XX:XX:XX:XX:XX:XX
-...
-	BREDR.Paired: yes
-	BREDR.Bonded: yes
-	BREDR.Connected: no
-	LE.Paired: yes
-	LE.Bonded: yes
-	LE.Connected: no
-...
-[CHG] BREDR XX:XX:XX:XX:XX:XX Connected: yes
+Print with color the signal to indicate there is a change, also rework
+the order of the parameters and use bearer specific suffix if the signal
+comes from org.bluez.Bearer.*.
 ---
- client/main.c | 124 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 122 insertions(+), 2 deletions(-)
+ client/main.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
 diff --git a/client/main.c b/client/main.c
-index d99a5158e35a..09df7b37c46f 100644
+index 09df7b37c46f..0a928efaa9bb 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -58,6 +58,7 @@ struct adapter {
- 	GDBusProxy *adv_monitor_proxy;
- 	GList *devices;
- 	GList *sets;
-+	GList *bearers;
- };
- 
- static struct adapter *default_ctrl;
-@@ -452,6 +453,36 @@ static void set_added(GDBusProxy *proxy)
- 	bt_shell_set_env(g_dbus_proxy_get_path(proxy), proxy);
- }
- 
-+static void print_bearer(GDBusProxy *proxy, const char *label,
-+					const char *description)
-+{
-+	bt_shell_printf("%s%s%s%s %s\n",
-+				description ? "[" : "",
-+				description ? : "",
-+				description ? "] " : "",
-+				label,
-+				g_dbus_proxy_get_path(proxy));
-+}
-+
-+static void bearer_added(GDBusProxy *proxy)
-+{
-+	struct adapter *adapter = find_parent(proxy);
-+
-+	if (!adapter)
-+		return;
-+
-+	adapter->bearers = g_list_append(adapter->bearers, proxy);
-+
-+	if (!strcmp(g_dbus_proxy_get_interface(proxy),
-+			"org.bluez.Bearer.BREDR1"))
-+		print_bearer(proxy, "BREDR", COLORED_NEW);
-+	else if (!strcmp(g_dbus_proxy_get_interface(proxy),
-+			"org.bluez.Bearer.LE1"))
-+		print_bearer(proxy, "LE", COLORED_NEW);
-+
-+	bt_shell_set_env(g_dbus_proxy_get_path(proxy), proxy);
-+}
-+
- static void proxy_added(GDBusProxy *proxy, void *user_data)
+@@ -806,7 +806,11 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ static void message_handler(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
  {
- 	const char *interface;
-@@ -489,6 +520,10 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 		admon_manager_added(proxy);
- 	} else if (!strcmp(interface, "org.bluez.DeviceSet1")) {
- 		set_added(proxy);
-+	} else if (!strcmp(interface, "org.bluez.Bearer.BREDR1")) {
-+		bearer_added(proxy);
-+	} else if (!strcmp(interface, "org.bluez.Bearer.LE1")) {
-+		bearer_added(proxy);
- 	}
- }
+-	if (!strcmp(dbus_message_get_member(message), "Disconnected")) {
++	const char *iface = dbus_message_get_interface(message);
++	const char *member = dbus_message_get_member(message);
++
++	if (!strcmp(member, "Disconnected")) {
++		const char *label;
+ 		const char *name;
+ 		const char *msg;
  
-@@ -540,6 +575,7 @@ static void adapter_removed(GDBusProxy *proxy)
- 			ctrl_list = g_list_remove_link(ctrl_list, ll);
- 			g_list_free(adapter->devices);
- 			g_list_free(adapter->sets);
-+			g_list_free(adapter->bearers);
- 			g_free(adapter);
- 			g_list_free(ll);
- 			return;
-@@ -560,6 +596,19 @@ static void set_removed(GDBusProxy *proxy)
- 	bt_shell_set_env(g_dbus_proxy_get_path(proxy), NULL);
- }
+@@ -816,16 +820,22 @@ static void message_handler(DBusConnection *connection,
+ 					DBUS_TYPE_INVALID))
+ 			goto failed;
  
-+static void bearer_removed(GDBusProxy *proxy)
-+{
-+	struct adapter *adapter = find_parent(proxy);
+-		bt_shell_printf("[SIGNAL] %s.%s %s %s\n",
+-					dbus_message_get_interface(message),
+-					dbus_message_get_member(message),
+-					name, msg);
++		if (!strcmp(iface, "org.bluez.Bearer.BREDR1"))
++			label = "BREDR.Disconnected";
++		else if (!strcmp(iface, "org.bluez.Bearer.LE1"))
++			label = "LE.Disconnected";
++		else
++			label = "Disconnected";
 +
-+	if (!adapter)
-+		return;
-+
-+	adapter->bearers = g_list_remove(adapter->bearers, proxy);
-+
-+	print_set(proxy, COLORED_DEL);
-+	bt_shell_set_env(g_dbus_proxy_get_path(proxy), NULL);
-+}
-+
- static void proxy_removed(GDBusProxy *proxy, void *user_data)
- {
- 	const char *interface;
-@@ -602,6 +651,10 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 		adv_monitor_remove_manager(dbus_conn);
- 	} else if (!strcmp(interface, "org.bluez.DeviceSet1")) {
- 		set_removed(proxy);
-+	} else if (!strcmp(interface, "org.bluez.Bearer.BREDR1")) {
-+		bearer_removed(proxy);
-+	} else if (!strcmp(interface, "org.bluez.Bearer.LE1")) {
-+		bearer_removed(proxy);
- 	}
- }
- 
-@@ -619,6 +672,20 @@ static struct adapter *find_ctrl(GList *source, const char *path)
- 	return NULL;
- }
- 
-+static GDBusProxy *find_proxies_by_path(GList *source, const char *path)
-+{
-+	GList *list;
-+
-+	for (list = g_list_first(source); list; list = g_list_next(list)) {
-+		GDBusProxy *proxy = list->data;
-+
-+		if (strcmp(g_dbus_proxy_get_path(proxy), path) == 0)
-+			return proxy;
-+	}
-+
-+	return NULL;
-+}
-+
- static void property_changed(GDBusProxy *proxy, const char *name,
- 					DBusMessageIter *iter, void *user_data)
- {
-@@ -703,6 +770,36 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 
- 		print_iter(str, name, iter);
- 		g_free(str);
-+	} else if (!strcmp(interface, "org.bluez.Bearer.BREDR1") ||
-+			!strcmp(interface, "org.bluez.Bearer.LE1")) {
-+		if (default_ctrl &&
-+				proxy_is_child(proxy, default_ctrl->proxy)) {
-+			DBusMessageIter addr_iter;
-+			GDBusProxy *dev;
-+			char *str;
-+			bool le = !strcmp(interface, "org.bluez.Bearer.LE1");
-+
-+			dev = find_proxies_by_path(default_ctrl->devices,
-+						g_dbus_proxy_get_path(proxy));
-+			if (!dev)
-+				return;
-+
-+			if (g_dbus_proxy_get_property(dev, "Address",
-+							&addr_iter)) {
-+				const char *address;
-+
-+				dbus_message_iter_get_basic(&addr_iter,
-+								&address);
-+				str = g_strdup_printf("[" COLORED_CHG
-+							"] %s %s ",
-+							le ? "LE" : "BREDR",
-+							address);
-+			} else
-+				str = g_strdup("");
-+
-+			print_iter(str, name, iter);
-+			g_free(str);
-+		}
- 	}
- }
- 
-@@ -753,14 +850,17 @@ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
- 	return NULL;
- }
- 
--static GDBusProxy *find_proxies_by_path(GList *source, const char *path)
-+static GDBusProxy *find_proxies_by_iface(GList *source, const char *path,
-+							const char *iface)
- {
- 	GList *list;
- 
- 	for (list = g_list_first(source); list; list = g_list_next(list)) {
- 		GDBusProxy *proxy = list->data;
- 
--		if (strcmp(g_dbus_proxy_get_path(proxy), path) == 0)
-+		if (!strcmp(g_dbus_proxy_get_path(proxy), path) &&
-+				!strcmp(g_dbus_proxy_get_interface(proxy),
-+					iface))
- 			return proxy;
++		bt_shell_printf("[" COLOR_YELLOW "SIGNAL" COLOR_OFF"] "
++					"%s - %s, %s\n",
++					label, name, msg);
+ 		return;
  	}
  
-@@ -1728,6 +1828,7 @@ static void cmd_info(int argc, char *argv[])
- {
- 	GDBusProxy *proxy;
- 	GDBusProxy *battery_proxy;
-+	GDBusProxy *bearer;
- 	DBusMessageIter iter;
- 	const char *address;
- 
-@@ -1779,6 +1880,25 @@ static void cmd_info(int argc, char *argv[])
- 	print_property_with_label(battery_proxy, "Percentage",
- 					"Battery Percentage");
- 
-+	bearer = find_proxies_by_iface(default_ctrl->bearers,
-+				      g_dbus_proxy_get_path(proxy),
-+				      "org.bluez.Bearer.BREDR1");
-+	if (bearer) {
-+		print_property_with_label(proxy, "Paired", "BREDR.Paired");
-+		print_property_with_label(proxy, "Bonded", "BREDR.Bonded");
-+		print_property_with_label(proxy, "Connected",
-+							"BREDR.Connected");
-+	}
-+
-+	bearer = find_proxies_by_iface(default_ctrl->bearers,
-+				      g_dbus_proxy_get_path(proxy),
-+				      "org.bluez.Bearer.LE1");
-+	if (bearer) {
-+		print_property_with_label(proxy, "Paired", "LE.Paired");
-+		print_property_with_label(proxy, "Bonded", "LE.Bonded");
-+		print_property_with_label(proxy, "Connected", "LE.Connected");
-+	}
-+
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ failed:
+-	bt_shell_printf("[SIGNAL] %s.%s\n", dbus_message_get_interface(message),
+-					dbus_message_get_member(message));
++	bt_shell_printf("[" COLOR_YELLOW "SIGNAL" COLOR_OFF"] %s.%s\n",
++					iface, member);
  }
  
+ static struct adapter *find_ctrl_by_address(GList *source, const char *address)
 -- 
 2.50.0
 
