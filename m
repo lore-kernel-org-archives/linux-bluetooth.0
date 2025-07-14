@@ -1,35 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF0E267B00
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 15:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6767265293
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 15:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752506985; cv=none; b=Sp0acuqcO0k+iRG3vsWj/hJQ9Yuak/6FyQYE6IHvu5jMk5CUZZhNjgoXnvgs03StlsMvfABg3YI+fLaHCuZ4SDrUvwCLDKPtqLShyZQWtHESOmy0VGaHvQY9WfPwd0jLiaHOoE6lzv2oudjEN3Gcs/MPPiTRgbMrtDrtHc5DQPE=
+	t=1752507397; cv=none; b=BHZ5bIqAT4uXvIpeFAwIE89Fh68L8GVTyWVhCtE+8hge1W6EDdC8dVgZFeO8bInbC3yZh3ftCjHezn7RrXRZs+FwQXPkYVW9FLkXYYI+9y9EtZJT+F4QdRO6phlIWcObqJ6RLSQ4N80ZP+i4RpISrn9j2eaPRK8A2r7R1/kVb8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752506985; c=relaxed/simple;
-	bh=3Zjkh4k7F+QirDPYiqQYAcclHVE4nknNheLqr8wS7Ik=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LuWlriDWWY3OV0rdulsZzQvKPBLbUBMmHBbob7gdIekyTcfktAw4lD47cW3CpXC6XD1uEQDoOddw/Qwngbalsn4iJo8L0kaV3geqedp2k+kqfVtA+/dui0vf8JImOWRsL3e5zkjU4refbYXmzNMNkYQUVFLjsK9DmOFN1CFfwUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HaLT2FTQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752507397; c=relaxed/simple;
+	bh=LSDMnEQ+CXCsDUQU7j0bN8mvwohi4i3JOuJVJ3ydQT4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=HRyXaB3EmMu6ir84VmbjyMhlCoAUQjmPYTGAa8XK2BBwP+6m0BKEoM9CKv3zhgp/P5k/IdwPWVTZsJP09qbGkyxmAUCxGziom+cL1b8EXseZKQQMj4MpWs+0GDcng+MV64PfMv+rpFqUn3Yf4gh/mMNfKltejC/giMmBMYcbs5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cj30tT9q; arc=none smtp.client-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HaLT2FTQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0619BC4CEED;
-	Mon, 14 Jul 2025 15:29:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752506985;
-	bh=3Zjkh4k7F+QirDPYiqQYAcclHVE4nknNheLqr8wS7Ik=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HaLT2FTQgyX2Zgen2F4aDjzw/j2lkjzoAdPlWEpvd5BoqrUdn5oMW/rjPo5uytPa/
-	 3ODQeEyklbvWcxWTVrvywItLXWASTxCD6TnTR+Y1822UySky36gynlj2DMXP9jWvXf
-	 Ru0DgCj8mkFHTjMZEVsf0I28/eyb+1XwzeE5vPDyS196H4Oh/+s9uH1GYeK7bIfVi8
-	 4mSnHsTjJ/2W7+m72GKv7ZzoAqoAojZfPhYhVMJghTYs7U0MKEbsB1CP+/Ivysk+P6
-	 l4mBq9jEKYFVxSmPgD8dHhDk2fXhVoEZHa/0WYUOBbIUszZktIB5dezbsezxFeDClC
-	 7O0QddhK6X4fw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C98383B276;
-	Mon, 14 Jul 2025 15:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cj30tT9q"
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-532de49b7e2so1960978e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 08:36:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752507394; x=1753112194; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0eHqJqHR8/jEmFnqR4sH3dS3AuLUeA9F9ZPhZKPROqY=;
+        b=cj30tT9qocmnHXwZ9RuX3Ea04J+3nnwLV+c7YrZCRJxSUwgMV2tlvZ6wH3VwzYvuwF
+         Xxy2R/kztXqUhDxrtolLMRNiVJumhnXLIeZc9qqx8Fqs1Wpf1AW/cJ55SoOi8BTWifee
+         nUSMwwkycN9L4zJ+l9iqrnHDS3P8T3ahJNm/0HXlH2TPx/XLVKVytYzTestNpxRAzuGG
+         uSdnnDEA41KQFpLoYolEKqVsQWstFFHHza2eqOgvg1BAI8aGy+vikQENdEGWNtLofYGM
+         d0GhmOLtf6NALGU86rZXpJ/IyvW5I/Oangx6DBaeZMeE+JSSmw2QujA0nkFZVu6JTEHS
+         MGcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752507394; x=1753112194;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0eHqJqHR8/jEmFnqR4sH3dS3AuLUeA9F9ZPhZKPROqY=;
+        b=TsbvtPyHkNiHYySvpWYotFKLMHPzaxs52cegx3sjcbqJBNoR/cSMTPYS8sPtVT6gsx
+         ythR0bP3fnse8HQDEhRNJlgk1Rh/NydscyLudhqBRDaGQTisUxrAeTIZ7r94VC/HsXB+
+         IVPo7UUO7nb2fEB6z/eoBICQK6cm7+++kFaZJjSsHOAW63j6XQo54ocbbrOxkz3/Fv7P
+         waVUdIylgrzhpuunfXt0B6g2EiXjs5+s2gyjSge3+XwUr/8hBPdbp//DW4t7Ae8+t3EY
+         l8WyfBtN/8LesVAL2bthinb1rAMvOHBdKMREg85qFj0ysgc2Faimr3mZOU7A/rSVY+to
+         sKQQ==
+X-Gm-Message-State: AOJu0Yx1slxo8l5r8CqaLvVjnYWkB5rQW06PhmcFc/GBnJXD5KG0JmEO
+	hmlcpOIBBliaXt2DysPOBMIATMcsz06QQ/07DZLkjzvMb99hDwcSaRu1T4EPyMRxTQg=
+X-Gm-Gg: ASbGncukozlzvyBBzcIBffa8+iRuqrTX/Bru3qYdnHYiF5MQTRb4SN75hfN9SSf603J
+	js2HcHm4IpfKrziJZqTT7XmlM8UAyaqOy3e6m+rPOEjupxtWG15isagfrDU2hj+t25mwfjZ12F9
+	CQSkh0D3V4NwWaw/47UgfoimV7Ljw3wf3vOA2Y2Zv3+irm+e/hi9WqnkVJ4R7gDfg8KYypVCchf
+	lsu9SJQ2R8BYadYv364pLmJHrRwYHHoQECMdNRb1G0gftwK5YKs8sSwq+PW+J3q6xVJRQ0k3oYY
+	2IixyCO+j25ikVYQ7v8u4Vi94BIzWtPpUrO9O/+X+tT8q8ENF8NWmZJlUo8dFljWTyRgYUZ4PSo
+	Hc28FiiMn598X/ubzDrTZXQw89Orjw0QKN1mx4Yp3o/gxvpadvP30CP/NDj1Imjqa
+X-Google-Smtp-Source: AGHT+IHf/Nsaj6jS28fueQztYWZNzJ5rbLgb9uK7w55knDDW9pgzL84I6ls6zXfR2aMUY4WXl0/TgA==
+X-Received: by 2002:a05:6122:32d0:b0:534:7a8d:dcd4 with SMTP id 71dfb90a1353d-535f4557f49mr7107503e0c.0.1752507393779;
+        Mon, 14 Jul 2025 08:36:33 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-535e7248b75sm1812208e0c.19.2025.07.14.08.36.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jul 2025 08:36:33 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] monitor: Add sequence number and SDU length to ISO packets
+Date: Mon, 14 Jul 2025 11:36:23 -0400
+Message-ID: <20250714153623.251489-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,43 +68,116 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: btintel: Define a macro for Intel Reset
- vendor
- command
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175250700601.3894116.15910683547125707575.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Jul 2025 15:30:06 +0000
-References: <20250711100725.956159-1-kiran.k@intel.com>
-In-Reply-To: <20250711100725.956159-1-kiran.k@intel.com>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chandrashekar.devegowda@intel.com
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This prints sequence number and SDU length of ISO packets:
 
-On Fri, 11 Jul 2025 15:37:25 +0530 you wrote:
-> Use macro for Intel Reset command (0xfc01) instead of hard coded value.
-> 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->  drivers/bluetooth/btintel.c      |  4 ++--
->  drivers/bluetooth/btintel.h      |  2 ++
->  drivers/bluetooth/btintel_pcie.c | 12 ++++++------
->  drivers/bluetooth/btusb.c        |  8 ++++----
->  drivers/bluetooth/hci_intel.c    | 10 +++++-----
->  5 files changed, 19 insertions(+), 17 deletions(-)
+> ISO Data RX: Handle 2304 SN 48 flags 0x02 dlen 64 slen 60
+---
+ lib/hci.h        |  5 +++++
+ monitor/packet.c | 51 ++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 39 insertions(+), 17 deletions(-)
 
-Here is the summary with links:
-  - [v1] Bluetooth: btintel: Define a macro for Intel Reset vendor command
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5578eec92cbb
-
-You are awesome, thank you!
+diff --git a/lib/hci.h b/lib/hci.h
+index 96733efc1e3b..8f59a535a7fa 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -2327,6 +2327,11 @@ typedef struct {
+ #define acl_handle(h)		(h & 0x0fff)
+ #define acl_flags(h)		(h >> 12)
+ 
++/* ISO handle and flags pack/unpack */
++#define iso_flags_pb(f)		(f & 0x0003)
++#define iso_flags_ts(f)		((f >> 2) & 0x0001)
++#define iso_flags_pack(pb, ts)	((pb & 0x03) | ((ts & 0x01) << 2))
++
+ #endif /* _NO_HCI_DEFS */
+ 
+ /* HCI Socket options */
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 21df067b19ce..90a82b1af4ff 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -14050,9 +14050,10 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 				bool in, const void *data, uint16_t size)
+ {
+ 	const struct bt_hci_iso_hdr *hdr = data;
++	const struct bt_hci_iso_data_start *start;
+ 	uint16_t handle = le16_to_cpu(hdr->handle);
+ 	uint8_t flags = acl_flags(handle);
+-	char handle_str[22], extra_str[32];
++	char handle_str[36], extra_str[33];
+ 	struct index_buf_pool *pool = &index_list[index].iso;
+ 
+ 	if (index >= MAX_INDEX) {
+@@ -14062,27 +14063,32 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 
+ 	index_list[index].frame++;
+ 
+-	if (size < sizeof(*hdr)) {
+-		if (in)
+-			print_packet(tv, cred, '*', index, NULL, COLOR_ERROR,
+-				"Malformed ISO Data RX packet", NULL, NULL);
+-		else
+-			print_packet(tv, cred, '*', index, NULL, COLOR_ERROR,
+-				"Malformed ISO Data TX packet", NULL, NULL);
+-		packet_hexdump(data, size);
+-		return;
+-	}
++	if (size < sizeof(*hdr))
++		goto malformed;
+ 
+ 	data += sizeof(*hdr);
+ 	size -= sizeof(*hdr);
+ 
+-	if (!in && pool->total)
+-		sprintf(handle_str, "Handle %d [%u/%u]", acl_handle(handle),
+-			++pool->tx, pool->total);
+-	else
+-		sprintf(handle_str, "Handle %d", acl_handle(handle));
++	/* Detect if timestamp field is preset */
++	if (iso_flags_ts(flags)) {
++		if (size < sizeof(uint32_t))
++			goto malformed;
+ 
+-	sprintf(extra_str, "flags 0x%2.2x dlen %d", flags, hdr->dlen);
++		data += sizeof(uint32_t);
++		size -= sizeof(uint32_t);
++	}
++
++	start = data;
++
++	if (!in && pool->total)
++		sprintf(handle_str, "Handle %d [%u/%u] SN %u",
++			acl_handle(handle), ++pool->tx, pool->total, start->sn);
++	else
++		sprintf(handle_str, "Handle %u SN %u", acl_handle(handle),
++			start->sn);
++
++	sprintf(extra_str, "flags 0x%2.2x dlen %u slen %u", flags, hdr->dlen,
++		start->slen);
+ 
+ 	print_packet(tv, cred, in ? '>' : '<', index, NULL, COLOR_HCI_ISODATA,
+ 				in ? "ISO Data RX" : "ISO Data TX",
+@@ -14101,6 +14107,17 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 
+ 	if (filter_mask & PACKET_FILTER_SHOW_ISO_DATA)
+ 		packet_hexdump(data, size);
++
++	return;
++
++malformed:
++	if (in)
++		print_packet(tv, cred, '*', index, NULL, COLOR_ERROR,
++				"Malformed ISO Data RX packet", NULL, NULL);
++	else
++		print_packet(tv, cred, '*', index, NULL, COLOR_ERROR,
++				"Malformed ISO Data TX packet", NULL, NULL);
++	packet_hexdump(data, size);
+ }
+ 
+ void packet_ctrl_open(struct timeval *tv, struct ucred *cred, uint16_t index,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.0
 
