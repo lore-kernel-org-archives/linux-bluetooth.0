@@ -1,177 +1,126 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D14924886A;
-	Mon, 14 Jul 2025 18:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752516189; cv=pass; b=G349ynmegvliEciMOZaEOHDMEgkU4Aw2vpLLcg0tDjZ/wFfn9TYlKV7D5t3VTZaSNyF7L9Uj1tZqaxmbl0h3ZqD+N5JcelG0/dHPnQiVt8S+mztatxHjU0fi/G21f3czySdPHASbJP2SHF4WU00Bhn6gxvSmdArjKMUQzp17Ie8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752516189; c=relaxed/simple;
-	bh=Aaj5bi2iGaSdPMLsdzQ71K2CzWOCsTf4rwaa3YuS1go=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=u+dVOWuhJj2+7nM7XrakOhVys8z9S5mhSxfbX08XqTa2kBrLLIVFyF6JpZKZlSN8ZXeUT7+u/goj5fpCmwJQ0yp2lmclX2XoTbNspr1Ox1J5bjV9WZTyRjXmCDk7X7dj0r+v09tm/LkBiDiMrjLeC90eo+IOul1G+AxZvVD6upM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=iOlfDSrr; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9549270ECB
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 18:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752516863; cv=none; b=h+HJA0i8YrVjLlYGyqLxTT18aBNYLFcVqHR7tgcnYvP+aJqZBer9ayWAKDVfgcpFn2m7TEEbQzZGJLkTt2kUzO5SDQfJeVWwYJQpBRtnWRnRlY1epwfzV8x/FXrrH81UFyXCXKkutoIw0CgKs2mpUhTdPQFCjiAq4mgNg4qiFHI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752516863; c=relaxed/simple;
+	bh=s1k36tLoS+KzwimH7yorPRNc+syZCwfs2Pu5dHEM8zs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=r84Vl6J0NOEznsXzm7gLq/D7ojCZil+urZK8vcamBUrHh4/BQWOUbdaq7LHMMgB4q5X66Xw4aupEm92QPSM/uG1zSGY4EYGa0XwDKG6iU8INU/zjDwfNxSubbcChGB/bAlElZqLk6oGhSZb7/8rOdDeFtFmiIgrSIJXcV0801Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jhS16EUu; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="iOlfDSrr"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:4::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bgqtB3ZdBz49Px4;
-	Mon, 14 Jul 2025 21:02:58 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1752516179;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=JoAEW3dPfmTmw+yh1yZuX1ysxv8VcKrgQe1cUgKWvPA=;
-	b=iOlfDSrrLzPS4vvD0d/2GW4F7SHv6yaT7ka/TgMO+rhmF04Pfhquc1s1svMYDAEpnGmJ8h
-	amkOuUZf+xuo6MDQvdLX+/JlJhG/3e5v2Pf2w7n+gg2KSsp5pj892l3UWRY4ytXeojFAXP
-	Us73/bRvEH63LoDGTmZyfB57Y9DUF81pKSJw2nOHAro0jc9vDA6nkp+gPLkUhH0EaeI6vy
-	nLMF5Do5yw1vjfuSQ3D+8w3uTMeij5sWU1bNv+aAAfZmgFLEvuq3deELUj1OP5yoIH/gcQ
-	5EjrFkTQGd9VvOs9CcOaLGiDXnd/hFar3wqVBrf03ZBJNNjKODIerbwCQJ2CbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1752516179;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=JoAEW3dPfmTmw+yh1yZuX1ysxv8VcKrgQe1cUgKWvPA=;
-	b=Eo4ikBjl52Z5LTb1cMBwR06Mp46wLhD4JPlKMJrrG/vJAqdsVf8vGZ0l33r63I2skkweEa
-	m4Cc20xO/E/oEwF5ELDKyDlH1LNf3X+EF68iykJmwrcFTZEpCwl8L63MkICRPVPHh4aPzZ
-	Smh4XOJ113+hlivEjhIuckCztIs4n5ArmxJ8HUh6BRuwAbsy+rIa1ymgItCLuNtSdNlgV4
-	Cl1fJFN47DsWYb/LJud7Qny7qgRm5HlopZP2WIkKfDG5Yl+P/YOal+Uxqp5McBDG7SqRFr
-	zEIQYWXMZ3Fo7jLPB9YxG3s4/4SSr8rc+7p4oLq3AZNadyZIdKNZpt+MFPB4xA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1752516179; a=rsa-sha256;
-	cv=none;
-	b=cawJOHc/Fek0lIDpY3gStnLo9AcYdhCft+pnqxPNEipqcZwXjpobtMEoyP63ogJ0YD+Y1C
-	QhA98WNuMYJs6z5z/CordH/t2hjI24DsV73uw9aoFNnNB+N5erHpWVJmjEq2e7MrFmpTOA
-	sS8RarlKYO2X940cYWKGyXE3ArgXLMZnzSvQg+iE/MD25pklOLXoR2EpxmDfMR4tqx/jk9
-	iIl9cYSBT/xeq983B9BXusdVquQZkjdywYwiPNCnz98sa/dTYTw8qaxHmqbNb03WT5a2WK
-	8E0E+/C3QNEv12SDfRuJ9bs6E2vKXq+DYmwecAJk7M3pXQx1RrBgiJD5AzxU6g==
-Message-ID: <f14e501d2d478604554cc5280d863caabf6d5e94.camel@iki.fi>
-Subject: Re: struct hci_dev::quirks is running out of bits on 32-bit
- platforms
-From: Pauli Virtanen <pav@iki.fi>
-To: Christian Eggers <ceggers@arri.de>, linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Date: Mon, 14 Jul 2025 21:02:56 +0300
-In-Reply-To: <22185131.4csPzL39Zc@n9w6sw14>
-References: <22185131.4csPzL39Zc@n9w6sw14>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhS16EUu"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7dfff5327fbso406236385a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 11:14:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752516860; x=1753121660; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PenJw1uMd+gmWgPqpc3mW+INfD3qhKlyeJ4geZ28UEg=;
+        b=jhS16EUuayuf01Fr/wxefR6EXkSPhalVb+NQjHS1FUPFeGZ/nFctHLwGf8Lzw1+tfQ
+         8aNbNd4vXgqm5BI5t5oTfgATzmJjEuT0Ezs0tlOYzBPbqFrH4SgPG8PFGal1+q9YxjfT
+         aqnHOD5cPqEfLtGWtCMmuCipPY+NIi3jphSmgUvEC6a7Vpu2byI6GPH+b5ew2jBCmTIf
+         C1act+RAyd2ygigUkfn3usR2SJXGhT3zhh9yFWkuCNxfXrpjeb72RCg+SYlWHVLJwlNT
+         bWgIYLYuzYtj7PNlWN9nvdj+8GicJyIvjYNRBpadNlR+8NXOeMNzLt4BgBhzXmch8Aw2
+         /WGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752516860; x=1753121660;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PenJw1uMd+gmWgPqpc3mW+INfD3qhKlyeJ4geZ28UEg=;
+        b=TmaN7MVRl+s5kIyVGp15sJKNmwVD1vsCrg0sgpeuWD2wgIXOp+OKPGYSHG2tnvUMX7
+         CPIwRjSxW4iaxPfHF78MudRuO81U2h6gjnqLePZIG8T00EqA5SXFGxz6IGmnovi0Evpn
+         WtqvvT2dFl7IEW0JS8z6b37cST0PYmA1Byl1HR15qtQG+ctnJJxI9BzfqDmNCIWkbFXg
+         DvvdxRhJm+vqZYpCdebbA5JZD7n4gglKjOYk73mqBHuNfFJiThx/LYaxNB9GPQJsp5Tr
+         YD7bUVtxBW9vmql0Ar8tnn8HRHXbLzxdg0/Xx9x26IKyya6H3jfBMO/Evu5G6p7lAvN5
+         RYjw==
+X-Gm-Message-State: AOJu0Yx3GdHgtZUs+zvfp8RMzl1CIJTciUtHIkBBCERn2ggwAgT3ipZk
+	nQVTaUqqlnDx0ZdoK1k8z1CNFmrI2/cMiphKe9etHGfk9Dk1hvDCRn27o/Algg==
+X-Gm-Gg: ASbGncvCtC1PNSeMh8cVWAm1R+jNVZp94T0pbgCi7rm4T7nnd7lIVexjruh+/bBhw+n
+	Pc09VyBCUABLEKunMzOfV2chxZpvFgLEF3ktLTqKn3lKlLVzAPPLIBIxuER65p1vkxb95qKCeud
+	9Lw6EccJ0gJu8bsp9v6TLsQhlghqIXcuATaeaW2iFECm//Xv+4siWS8JJYO2V/QvtPh5fmz4U/e
+	vD7p/b+lGxrYqZn4Faxjxv79LK5gPyZ/SoZP5q5BMLSiSzhXJ+jPlrUp5ipxNtP7vWp/5dPSwy4
+	tZ1dd0mLfp5+aNk3ZEiS8V1z2ZcQH+OEcqq8mpDXXwChJe/c6FRH8fop9eBcPuiLlQTqfB3qY0D
+	I9ZmSXE6pJqWE68xBAAIhOd3xuFD8rd0=
+X-Google-Smtp-Source: AGHT+IHyXN+Ti9bxCrpEco3y2e8wojY2Mo9cZmmTnxv2aenzmxFXwPfl7Z2SfLoOSs4OKqVASHSmWA==
+X-Received: by 2002:a05:620a:171f:b0:7e3:3419:6176 with SMTP id af79cd13be357-7e334196b14mr282363485a.31.1752516860338;
+        Mon, 14 Jul 2025 11:14:20 -0700 (PDT)
+Received: from [172.17.0.2] ([172.190.226.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7049799ed04sm49895156d6.6.2025.07.14.11.14.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jul 2025 11:14:19 -0700 (PDT)
+Message-ID: <687548fb.050a0220.2c7ec1.33d0@mx.google.com>
+Date: Mon, 14 Jul 2025 11:14:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5860066956055114228=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,v2..,1/3] lib: tools: remove POLL_ERRQUEUE
+In-Reply-To: <2ffec6539fe38318c713b48985aaddda9671f258.1752511478.git.pav@iki.fi>
+References: <2ffec6539fe38318c713b48985aaddda9671f258.1752511478.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-ma, 2025-07-14 kello 19:09 +0200, Christian Eggers kirjoitti:
-> I just tried to introduce another quirk for Realtek Bluetooth controllers=
-=20
-> when I recognized that the underlying data type (unsigned long) has alrea=
-dy
-> run out available bits on system where sizeof(unsigned long) =3D=3D 4.
-> The number of entries in the (anonymous) quirks enum has already reached =
-34=20
-> in the latest kernels.
->=20
-> My first temptation was to simply change the data type to something like =
-__u64,
-> but this is not as easy as it seems. The test_bit() macro used almost eve=
-rywhere
-> for assigning quirks is guaranteed to be atomic and my platform (ARMv7) s=
-eems
-> not to have support for atomic operations on __u64.
->=20
-> I mainly see two options:
->=20
-> 1. Introducing a 'quirks2' member (bad)
->=20
-> This obviously would work, but requires another enum and will (I think)
-> introduce stupid bugs if the wrong quirks member is exercised.
+--===============5860066956055114228==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The pattern used for hci_dev::dev_flags is
+This is automated email and please do not reply to this email!
 
-	struct hci_dev {
-		DECLARE_BITMAP(quirk_flags, __HCI_NUM_QUIRKS);
-		...
-	}
-	#define hci_set_quirk(hdev, nr) set_bit((nr), (hdev)->quirk_flags)
-	#define hci_clear_quirk(hdev, nr) clear_bit((nr), (hdev)->quirk_flags)
-	#define hci_test_quirk(hdev, nr) test_bit((nr), (hdev)->quirk_flags)
+Dear submitter,
 
-> 2. Switch to using __64 with non atomic operations
->=20
-> About 99% of write accesses to the quirks member happen from probe() or
-> setup() routines which should (I hope) not allow simultaneous access from=
- other
-> contexts. I found 2 exceptions (as of linux-6.12):
->=20
-> a. btusb_setup_qca() is called from 'struct hci_dev::open()' (maybe uncri=
-tical).
-> b. Two quirks (strict_duplicate_filter, simultaneous_discovery) can be to=
-ggled=20
->    via debugfs.
->=20
-> So it looks like using non atomic operations can also introduce trouble i=
-f
-> not well reviewed. But as the 'strict_duplicate_filter' and=20
-> 'simultaneous_discovery' quirks are only used at very few locations, mayb=
-e
-> these should be moved to a new member for "atomic quirks", allowing to
-> convert the remaining ones to non atomic.
->=20
->=20
-> Are there any alternatives? Anything I missed?
->=20
-> regards,
-> Christian
->=20
->=20
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=982161
 
---=20
-Pauli Virtanen
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.34 seconds
+GitLint                       PENDING   0.28 seconds
+BuildEll                      PASS      20.47 seconds
+BluezMake                     PASS      2663.57 seconds
+MakeCheck                     PASS      20.16 seconds
+MakeDistcheck                 PASS      186.55 seconds
+CheckValgrind                 PASS      235.33 seconds
+CheckSmatch                   PASS      308.40 seconds
+bluezmakeextell               PASS      129.17 seconds
+IncrementalBuild              PENDING   0.22 seconds
+ScanBuild                     PASS      932.27 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5860066956055114228==--
