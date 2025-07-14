@@ -1,277 +1,220 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EBB259C9F;
-	Mon, 14 Jul 2025 14:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752505165; cv=none; b=j8UJyLBAt8pvSZdaXV5BWSZ8GuC7V/ninnTD9vpSYf2N6/s783hBW9l46IF2hQ/L//aRBDGfLt+yHm3jzmag1drMfcLzhP+QIfMC7ttZSoHJg6hIh8DAsgEjsnODTW/CwSFITyScX+12Xi+AFetUlP9iIMJS+FUHyEw3cYXjbi0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752505165; c=relaxed/simple;
-	bh=LoJlg3EAlbipWWqeMfoaXHl8EBht7nYYHONIWaDbPlg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fHKtXImslIIn6yTRB/b3oUkiAeYcsQq9wFGpaKnl8Eg5z0hyMmoIQJOXgTf/qfNsuQiXF3V0jKb1p8YPAmgNt84xcB33ipdnHRtcCvYbVJlIMgu8SCI6u+JbrEyd9wwVIwBHdByeG+2oUa2MGJHTlkUUnX77TQb5QIH3G0bY3fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E37325FA10
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 15:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752506449; cv=pass; b=hhaaDwZrf6dRs3Tz5UrN6wjZ16xaPFWMoB1PLp/Yj5puwszeRXyS7rANQ9oyVIoPqaWLX5PEim2Je040FpwGGUYALSMg9E537VAZ8WbjK46NVqiRp+GlqZUYdl0HvUWsUx0dMOOZprgjLLH3E1x2Qzd/JIwhcZ5mj5TyMTzIqyg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752506449; c=relaxed/simple;
+	bh=mlb9riwRJGxmiq4APkZRYf8OKdwEDxf0wR8mnsSEumk=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KQxpNT1gv/5G2n/zrakLKbc6kkDefVTXMJ9++F7jTrK3GPxnVX8xgGX/orSBfUKQJDVjmRfjmVhQriudNggbVuINXq4ONPadund1ymc3/5NfchkeGsshRvXh8PTS70l3GnIi97wW/H1SUJKiWAerK84ZwgJqXojN1ICm8GJDmK4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=StU2KCY2; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="StU2KCY2"
+Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:4::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C11E161E64847;
-	Mon, 14 Jul 2025 16:58:58 +0200 (CEST)
-Message-ID: <21eded54-3460-4000-baba-815522012e02@molgen.mpg.de>
-Date: Mon, 14 Jul 2025 16:58:58 +0200
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bgmGv6WYtz49PvR
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 18:20:39 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1752506440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PfKg65hjqUiMG+ZlKUNwf1u4sMsYP7T3rPBgPr6768M=;
+	b=StU2KCY2dI0qPX321e+Gyby3GNUn4PfiO8KUmvyottdJ4f9NvmNFQj6IXnYHTK4P9jrkkQ
+	ELGhVt6s1yFBrmDh2I33zBQe5khKof738aHzUzVC035C+NlgzKQR//eQKZjQJBtg/BSRL/
+	07ZShqWY17SPaokNavoP62GP26gBZbmqN9Krm8iQ9GuQjYl8aIuQ6GgKP6Vjjq31gK6myY
+	6VV1Xo4IEgJkTqXPXWS+kxzLSlB1mPK0hEVyW91jixt6xuVO4ho4u7KyBCnBV3nPWJxlhb
+	wU3/JuJKWJRNWNSDPGcceYk101DNnAO1WIqcA4iY7YaTgCdPL7EuSi57jEmvOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1752506440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PfKg65hjqUiMG+ZlKUNwf1u4sMsYP7T3rPBgPr6768M=;
+	b=YfZtvwT6TS8KhFWQmmAhkAk3UUJXBldsn6/9E0bs/PKHMAQNqRVkRcOfPwg6yCDjBiFLlC
+	iQ7QLNQTWWg74tXihGkC+GxVK2K8QylFPRTcndUzCi/iScI9dTRm6zUPjRCf/dpw+MD3Z1
+	hOkQyg2M6j0Rd5XdI+rWjgbiVjqB+3jqyRxybaJ0Mo51NsWpKKfDvPITAt8ojc12UXP70g
+	YYZj6rfndMo9haGjzppNDtTOopL19UBfFMBsoGCxkkuXaulLEcXEpQKnkhKKqAPQ9qSIZW
+	8YqFAubkANQfAKNWOPhpoyIZG0vQHcgVLbx9GTllvMbOaPRlmpTGJ1khCzGE0Q==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1752506440; a=rsa-sha256;
+	cv=none;
+	b=BFje4BByhcK+q+YafDLC+5jPHOQYqe1Fq7gszBGiLaMbWvOe39dZKWqb2xq14gzbRfV2xK
+	fw6mumLubjWz2vwm4rjFQ3ZCVSmQViygCupSpWCYJPwLmTBpX5uQJedYaHfbVrYA1XIzz/
+	gKx+Xy6fdWsbcNpDbmBfBLn5FUid6c71ffmt5gVggD20WOh4rTSyaiGScSB1PS9bdgs3T+
+	H/uiciWqPQXYDYbxIkeWW6DESk/oygJwfII2i65eRDb8fNTIO7VuZpHBO0ouoBgshiWSRC
+	gSDF3pPJzMwvGuWmd5wfAeFfOB3BAVnjsAuOQn0/Fa6tylRB3v4R6DlOlcLWzw==
+Message-ID: <bedffb635f1d612adb07e1c314176f5f18484652.camel@iki.fi>
+Subject: Re: Bluetooth: ISO: add socket option to report packet seqnum via
+ CMSG
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Date: Mon, 14 Jul 2025 18:20:37 +0300
+In-Reply-To: <68751613.170a0220.216844.5d68@mx.google.com>
+References: 
+	<474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
+	 <68751613.170a0220.216844.5d68@mx.google.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: ISO: add socket option to report packet seqnum
- via CMSG
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
- <bbdbe42b-614c-4f66-8712-f0ab8d54b490@molgen.mpg.de>
- <e647579c99fcbfeb0c89f041ea5ea61e608be099.camel@iki.fi>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <e647579c99fcbfeb0c89f041ea5ea61e608be099.camel@iki.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Dear Pauli,
+ma, 2025-07-14 kello 07:37 -0700, bluez.test.bot@gmail.com kirjoitti:
+> This is automated email and please do not reply to this email!
+>=20
+> Dear submitter,
+>=20
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D982=
+088
+>=20
+> ---Test result---
+>=20
+> Test Summary:
+> CheckPatch                    PENDING   0.44 seconds
+> GitLint                       PENDING   0.34 seconds
+> SubjectPrefix                 PASS      0.07 seconds
+> BuildKernel                   PASS      24.06 seconds
+> CheckAllWarning               PASS      26.92 seconds
+> CheckSparse                   WARNING   29.90 seconds
+> BuildKernel32                 PASS      24.59 seconds
+> TestRunnerSetup               PASS      482.03 seconds
+> TestRunner_l2cap-tester       PASS      28.08 seconds
+> TestRunner_iso-tester         FAIL      41.16 seconds
+> TestRunner_bnep-tester        PASS      5.95 seconds
+> TestRunner_mgmt-tester        FAIL      134.62 seconds
+> TestRunner_rfcomm-tester      PASS      9.35 seconds
+> TestRunner_sco-tester         PASS      14.66 seconds
+> TestRunner_ioctl-tester       PASS      9.96 seconds
+> TestRunner_mesh-tester        FAIL      11.50 seconds
+> TestRunner_smp-tester         PASS      9.74 seconds
+> TestRunner_userchan-tester    PASS      6.10 seconds
+> IncrementalBuild              PENDING   0.59 seconds
+>=20
+> Details
+> ##############################
+> Test: CheckPatch - PENDING
+> Desc: Run checkpatch.pl script
+> Output:
+>=20
+> ##############################
+> Test: GitLint - PENDING
+> Desc: Run gitlint
+> Output:
+>=20
+> ##############################
+> Test: CheckSparse - WARNING
+> Desc: Run sparse tool with linux kernel
+> Output:
+> net/bluetooth/af_bluetooth.c:248:25: warning: context imbalance in 'bt_ac=
+cept_enqueue' - different lock contexts for basic blocknet/bluetooth/iso.c:=
+2322:28: warning: incorrect type in assignment (different base types)net/bl=
+uetooth/iso.c:2322:28:    expected unsigned short [usertype] snnet/bluetoot=
+h/iso.c:2322:28:    got restricted __le16 [usertype] snnet/bluetooth/iso.c:=
+2333:28: warning: incorrect type in assignment (different base types)net/bl=
+uetooth/iso.c:2333:28:    expected unsigned short [usertype] snnet/bluetoot=
+h/iso.c:2333:28:    got restricted __le16 [usertype] sn
+> ##############################
+> Test: TestRunner_iso-tester - FAIL
+> Desc: Run iso-tester with test-runner
+> Output:
+> Total: 130, Passed: 127 (97.7%), Failed: 2, Not Run: 1
+>=20
+> Failed Test Cases
+> ISO Send - TX Timestamping                           Failed       0.233 s=
+econds
+> ISO Send - TX CMSG Timestamping                      Failed       0.236 s=
+econds
 
+These are false positives, they fail since the test is trying to use
+BT_POLL_ERRQUEUE socket option which does not exist in kernel, but has
+same value as the new BT_PTK_SEQNUM.
 
-Thank you for your prompt reply.
+The following patch removes the references to the non-existing kernel
+feature:
 
+https://lore.kernel.org/linux-bluetooth/2ffec6539fe38318c713b48985aaddda967=
+1f258.1752501450.git.pav@iki.fi/
 
-Am 14.07.25 um 16:53 schrieb Pauli Virtanen:
-
-> ma, 2025-07-14 kello 16:15 +0200, Paul Menzel kirjoitti:
-
->> Am 14.07.25 um 16:02 schrieb Pauli Virtanen:
->>> User applications need a way to track which ISO interval a given SDU
->>> belongs to, to properly detect packet loss. All controllers do not set
->>> timestamps, and it's not guaranteed user application receives all packet
->>> reports (small socket buffer, or controller doesn't send all reports
->>> like Intel AX210 is doing).
->>>
->>> Add socket option BT_PKT_SEQNUM that enables reporting of received
->>> packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
->>
->> Are there user applications already supporting this, so it can be tested?
-> 
-> I sent the associated tests to linux-bluetooth list
-> 
-> https://lore.kernel.org/linux-bluetooth/c9a75585e3640d8a1efca0bf96158eec1ca25fdc.1752501450.git.pav@iki.fi/
-
-Awesome. Can this be referenced in the commit message?
-
->>> Signed-off-by: Pauli Virtanen <pav@iki.fi>
->>> ---
->>>
->>> Notes:
->>>       Intel AX210 is not sending all reports:
->>>       
->>>       $ btmon -r dump.btsnoop -I -C90|grep -A1 'ISO Data RX: Handle 2304'
->>>       ...
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1713 [hci0] 22.567744
->>>               dd 01 3c 00 6d 08 e9 14 1e 3b 85 7b 35 c2 25 0b  ..<.m....;.{5.%.
->>>       --
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1718 [hci0] 22.573745
->>>               de 01 3c 00 41 65 22 4f 99 9b 0b b6 ff cb 06 00  ..<.Ae"O........
->>>       --
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1727 [hci0] 22.587933
->>>               e0 01 3c 00 8b 6e 33 44 65 51 ee d7 e0 ee 49 d8  ..<..n3DeQ....I.
->>>       --
->>>       > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1732 [hci0] 22.596742
->>>               e1 01 3c 00 a7 48 54 a7 c1 9f dc 37 66 fe 04 ab  ..<..HT....7f...
->>>       ...
->>>       
->>>       Here, report for packet with sequence number 0x01df is missing.
->>
->> Sorry, but where are the sequence number in the trace?
-> 
-> It's the first two bytes, see Core specification Vol 4E Sec 5.4.5 "HCI
-> ISO Data packets".
-
-Now I see it. Thank you!
-
->>>       
->>>       This may be spec violation by the controller, see Core v6.1 pp. 3702
->>>       
->>>           All SDUs shall be sent to the upper layer including the indication
->>>           of validity of data. A report shall be sent to the upper layer if
->>>           the SDU is completely missing.
->>>       
->>>       Regardless, it will be easier for user applications to see the HW
->>>       sequence numbers directly, so they don't have to count packets and it's
->>>       in any case more reliable if packets get dropped due to socket buffer
->>>       size.
->>
->> I wouldn’t mind to have the note in the commit message.
-> 
-> I'm not sure it's a spec violation --- the text in the specification is
-> not fully clear what "All SDUs" means in the context here --- so I
-> don't really want to say so in the commit message.
-> 
-> The limited socket buffer and that AX210 drops some reports is mentioned
-> in the commit message.
-
-True.
-
->>>    include/net/bluetooth/bluetooth.h |  9 ++++++++-
->>>    net/bluetooth/af_bluetooth.c      |  7 +++++++
->>>    net/bluetooth/iso.c               | 21 ++++++++++++++++++---
->>>    3 files changed, 33 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->>> index 114299bd8b98..0e31779a3341 100644
->>> --- a/include/net/bluetooth/bluetooth.h
->>> +++ b/include/net/bluetooth/bluetooth.h
->>> @@ -244,6 +244,10 @@ struct bt_codecs {
->>>    
->>>    #define BT_ISO_BASE		20
->>>    
->>> +#define BT_PKT_SEQNUM		21
->>> +
->>> +#define BT_SCM_PKT_SEQNUM	0x05
->>> +
->>>    __printf(1, 2)
->>>    void bt_info(const char *fmt, ...);
->>>    __printf(1, 2)
->>> @@ -391,7 +395,8 @@ struct bt_sock {
->>>    enum {
->>>    	BT_SK_DEFER_SETUP,
->>>    	BT_SK_SUSPEND,
->>> -	BT_SK_PKT_STATUS
->>> +	BT_SK_PKT_STATUS,
->>> +	BT_SK_PKT_SEQNUM,
->>>    };
->>>    
->>>    struct bt_sock_list {
->>> @@ -475,6 +480,7 @@ struct bt_skb_cb {
->>>    	u8 pkt_type;
->>>    	u8 force_active;
->>>    	u16 expect;
->>> +	u16 pkt_seqnum;
->>
->> Excuse my ignorance, just want to make sure, the type is big enough.
-> 
-> The hardware sequence number is also 16 bits.
-
-Understood.
-
->>>    	u8 incoming:1;
->>>    	u8 pkt_status:2;
->>>    	union {
->>> @@ -488,6 +494,7 @@ struct bt_skb_cb {
->>>    
->>>    #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
->>>    #define hci_skb_pkt_status(skb) bt_cb((skb))->pkt_status
->>> +#define hci_skb_pkt_seqnum(skb) bt_cb((skb))->pkt_seqnum
->>>    #define hci_skb_expect(skb) bt_cb((skb))->expect
->>>    #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
->>>    #define hci_skb_event(skb) bt_cb((skb))->hci.req_event
->>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
->>> index 6ad2f72f53f4..44b7acb20a67 100644
->>> --- a/net/bluetooth/af_bluetooth.c
->>> +++ b/net/bluetooth/af_bluetooth.c
->>> @@ -364,6 +364,13 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->>>    			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_STATUS,
->>>    				 sizeof(pkt_status), &pkt_status);
->>>    		}
->>> +
->>> +		if (test_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags)) {
->>> +			u16 pkt_seqnum = hci_skb_pkt_seqnum(skb);
->>> +
->>> +			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_SEQNUM,
->>> +				 sizeof(pkt_seqnum), &pkt_seqnum);
->>> +		}
->>>    	}
->>>    
->>>    	skb_free_datagram(sk, skb);
->>> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
->>> index fc22782cbeeb..469450bb6b6c 100644
->>> --- a/net/bluetooth/iso.c
->>> +++ b/net/bluetooth/iso.c
->>> @@ -1687,6 +1687,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
->>>    			clear_bit(BT_SK_PKT_STATUS, &bt_sk(sk)->flags);
->>>    		break;
->>>    
->>> +	case BT_PKT_SEQNUM:
->>> +		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
->>> +		if (err)
->>> +			break;
->>> +
->>> +		if (opt)
->>> +			set_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
->>> +		else
->>> +			clear_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
->>> +		break;
->>> +
->>>    	case BT_ISO_QOS:
->>>    		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
->>>    		    sk->sk_state != BT_CONNECT2 &&
->>> @@ -2278,7 +2289,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
->>>    void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    {
->>>    	struct iso_conn *conn = hcon->iso_data;
->>> -	__u16 pb, ts, len;
->>> +	__u16 pb, ts, len, sn;
->>
->> Use `seqnum` for consistency with the parts above.
->>
->>>    
->>>    	if (!conn)
->>>    		goto drop;
->>> @@ -2308,6 +2319,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    				goto drop;
->>>    			}
->>>    
->>> +			sn = hdr->sn;
->>>    			len = __le16_to_cpu(hdr->slen);
->>>    		} else {
->>>    			struct hci_iso_data_hdr *hdr;
->>> @@ -2318,18 +2330,20 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    				goto drop;
->>>    			}
->>>    
->>> +			sn = hdr->sn;
->>>    			len = __le16_to_cpu(hdr->slen);
->>>    		}
->>>    
->>>    		flags  = hci_iso_data_flags(len);
->>>    		len    = hci_iso_data_len(len);
->>>    
->>> -		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", len,
->>> -		       skb->len, flags);
->>> +		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x sn %d",
->>> +		       len, skb->len, flags, sn);
->>>    
->>>    		if (len == skb->len) {
->>>    			/* Complete frame received */
->>>    			hci_skb_pkt_status(skb) = flags & 0x03;
->>> +			hci_skb_pkt_seqnum(skb) = sn;
->>>    			iso_recv_frame(conn, skb);
->>>    			return;
->>>    		}
->>> @@ -2352,6 +2366,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
->>>    			goto drop;
->>>    
->>>    		hci_skb_pkt_status(conn->rx_skb) = flags & 0x03;
->>> +		hci_skb_pkt_seqnum(conn->rx_skb) = sn;
->>>    		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
->>>    					  skb->len);
->>>    		conn->rx_len = len - skb->len;
-
-Kind regards,
-
-Paul
+> ##############################
+> Test: TestRunner_mgmt-tester - FAIL
+> Desc: Run mgmt-tester with test-runner
+> Output:
+> Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+>=20
+> Failed Test Cases
+> LL Privacy - Add Device 3 (AL is full)               Failed       0.228 s=
+econds
+> ##############################
+> Test: TestRunner_mesh-tester - FAIL
+> Desc: Run mesh-tester with test-runner
+> Output:
+> Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+>=20
+> Failed Test Cases
+> Mesh - Send cancel - 1                               Timed out    2.061 s=
+econds
+> Mesh - Send cancel - 2                               Timed out    1.997 s=
+econds
+> ##############################
+> Test: IncrementalBuild - PENDING
+> Desc: Incremental build with the patches in the series
+> Output:
+>=20
+>=20
+>=20
+> ---
+> Regards,
+> Linux Bluetooth
