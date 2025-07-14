@@ -1,131 +1,451 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890271EB5DA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 17:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752513292; cv=none; b=I1LFuKMxR+yUGl3B/PyizeO2fibOxo1uytc1AtaC07Qiu8u6KxUoMiIZ5fa9IraPJBMJh5rKU3eKVW6UzAEnt0Bb3DPggtHpNnRUDuWGdZXp6+WFIZVXs2cbtStFOWxWEo0j2zNni/SzUBmEQnp5UfJgrr8QoPPYObKn5SXyZ8Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752513292; c=relaxed/simple;
-	bh=mX3J5Mp10cXCBAJnAUe1tlJyDJoO4IUBD0uoxHTMfoQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=bx2nUjitFyMwaLHq4KHgMu4miSo42FpfTGDqlJuTyIHF4Iceipe0UDpUfZIB2BNc0oQiedDUtntvypCVsFO/qOiykF1rwYFhOx1uTfBWh3Z/1v65VA1OmIlnxuNOXTQwZxNXoYWPyZt+8SfduJH2b9HuAXPYGC+hb7sH6YWTlAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lZnFiKiF; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AED226528B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 17:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752514608; cv=pass; b=XUOU8js5wp3zYg5KxYxqUXcg6CX854KmRZmWuSsXU/XsPJ7IxXzk4R1KORvKc+e1XPozwQFdMYv9W9cDHq91YkvO4LTDdC/mjRYBSjdYafhLJVfENcam0RhBaJhsL+tAfsvBtqdYKuZGPlqoGZSgUeJndW0R/t00PAAc/VIYa34=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752514608; c=relaxed/simple;
+	bh=JQHw1zEfuppHRu47jnwlJUJNrf9i4wVDsWtc8hPWBLM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C4VeF/i6l02YyPShPQNQHJSjZ9MqEMLOTdRwv6jgZTwjNoflGTwQpm/YJ0BhJqNUh7eXGkFDu22HOHLUxNC1NC83z/RKzFULQQkEz1Hes35kR/fAdby7zvqviNF8RTr/kvyYihaKf+ovV4svst3Vf9S6O4DVB7GSLpsq55uvtS8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=flLzHeza; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lZnFiKiF"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7df981428abso493448785a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 10:14:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752513289; x=1753118089; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yegcnbFJ2I3eC+O7Xd6bWhr8blbfptntd+W5u0BUrGs=;
-        b=lZnFiKiFKCtu5ti3XRzfL6NoErGrgpLclk6xSyjvdqFdI6dwaBvzwMVQG6VTxM6cCE
-         fvFL20iJV0h521IBQqYJWasfr+LcOhZo3Tj/DwEBqmQWq9kASaVMPSNuosPRSGhTVt+b
-         FjSQdd6hWrI2l4PyU4D1akA9Hv1gsuYJRk/0YUN9v/iEET+LHQpAo9psRg3I41I7fmEf
-         lzqD8UydXuQuPb/nbtI6/A6rutrQPrKBw/zzAyG8KESSUGHTnDAdF/F2V5HZ4FoSm0jQ
-         LMSKAPYKYmUITyw+hu4dV84yCST7C2al3S4W9E3dV/d5hWhmjGXPKZxyFSXY+QtfUcf/
-         Htqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752513289; x=1753118089;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yegcnbFJ2I3eC+O7Xd6bWhr8blbfptntd+W5u0BUrGs=;
-        b=YKAfYG2497VfkuKjMqU43TcLnMY7AYBh8PDva/3D8woWaK+MWgw0xVJb6c8925oYX4
-         lCWB0B0nn9++9hL5fu9qh5ZbqcnZ9w2svwKnnmxXUyITXIUBlwbBfSs4XIqeXX8wTc5t
-         IlHzIQtsFZQgZlKG+ugD/TaZ1IZqbJJ4h+JPzwiuTdHmcv0r7CfcC15z4e49LitDAj8N
-         U02Z6tJzAiZwnyqJYZCCc+IMIRqoMwhW7KO+JpfYC10y8HYCAHdHHmxwfUGy4ujPyZQa
-         uRYKcpK61Kx8Gkgqpze+cMH763xVAjuZJK1QuA+YX+iJYd4AryBQJTzsXH+6/nWuX2AC
-         zmxg==
-X-Gm-Message-State: AOJu0YxIa8otABb19EbrUFuCl3ilb8yatzJ2E6wjs2N9rGmlxWn/a563
-	ipgdb4mrF943M3gHaguvjTty1bhDc3IJpp2L5t1o8E6ihvJqQKeXINOPfrahLA==
-X-Gm-Gg: ASbGncu1BlzVh3etX5c+l8Fhp9KFlhw0Ch/WBjJAk6tTGIyFz7n3YtbWLkiccgJq1u+
-	6bj1/RwpzbSuzOO5t2HEPWAoS/lY19L4W1vgjG6OI9UAqcRHhqdu6bSz5OSO3pWZ6NP6hDBvWpy
-	Hfu6LLPbRfdsU/TgeIUJWiOUCPSJGF+fSTlTte9G0lmcrC5ui8wxBXjrdJzoyBYy0kIyYb67YkJ
-	wytXTBSlnU5HG5LoGKe8sNy6Fgz3lfMwq4lyE4E6kmv96lYGed9Nva/KvPghXB8xXtN6E83glSq
-	Adzny4uTRFK1WhmgHQfxXKMM06W6pVyxn/hv9xjJLdsiqjN+p6P5MfHlF9ruybAgVpaYhHu6tRy
-	1Q9YOWjc0Qp67ESflVv61i1uOVz4qzg==
-X-Google-Smtp-Source: AGHT+IF+jxXiMX8HV2WHYlJDCHmGHTxeYFzox4jK4gNq2pUthAXMRhkIwaWP+ItOp8JFAduhpZpGVw==
-X-Received: by 2002:a05:620a:192a:b0:7e3:3682:6dea with SMTP id af79cd13be357-7e336827285mr89120485a.15.1752513289170;
-        Mon, 14 Jul 2025 10:14:49 -0700 (PDT)
-Received: from [172.17.0.2] ([52.170.237.181])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70497d3973esm49281316d6.67.2025.07.14.10.14.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 10:14:48 -0700 (PDT)
-Message-ID: <68753b08.050a0220.2393d.2e1e@mx.google.com>
-Date: Mon, 14 Jul 2025 10:14:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2499880756408525348=="
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="flLzHeza"
+Received: from monolith.lan (unknown [193.138.7.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bgqHq2mp8z49Psw;
+	Mon, 14 Jul 2025 20:36:39 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1752514599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=y5TyKPfHbT1qIyz5HHgp54Vs/U3Wcjwm4BtCN8Sh1DQ=;
+	b=flLzHeza/pIZLORmhyaJYkR9PQkrKHaDWGn3pv5kQWQhr9yTt5qGM/6Mkg2JWJCWGdFyed
+	eZdyV+2N75wuFVeNRns6TLGeVElF2JjCDPooKTu2sdusNpP3Svn+GKYsfAIat83u9rcNRP
+	hMLaw6ODqOrFGtyl/yqaGNSjbmX1qt3nzCRhOznlNk48X9TEL1gmVUKt8W+XrPxjiW1LnI
+	1OHDw0S9TUcHFbvbZyL+vg8wAlNed8lFdpp/6XUJ/d00hamjJyuS2Q8fIjM9Ikh8UBcqkR
+	ExL8snW8myNlH+GCWQpc4K5q0nCgYr4x7pksAUsUagtZ/geyDXQB9gb347apbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1752514599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=y5TyKPfHbT1qIyz5HHgp54Vs/U3Wcjwm4BtCN8Sh1DQ=;
+	b=WEwFXWf7ORjDkSo8o2/wuL8F+mKYlUH4cXgXbIMDwqTk5/YRdXPvJfcjsYzSXx6IQDVHIh
+	mhXIjfi8L/Tn/kKLvHbgz7H+GYtpUj6P29FBRDcDKBUeDec7EzWoLf3fVOET/pSr9j40d3
+	R8388cWUCpZUrq085O0hKRjsDarbJf/Cj3aNrTot5BKLKqom+E3y3BxVuLmTv2gJy6/D9K
+	lKO7xA6qnz3a3VfWVfGvAJPhua9wUWjuaFDRjvB36kX8XYo0Ku+KnwkB8fsXzOCVrmK045
+	Qnn7TS7H+kpkbHebjYWvmd5aCvskN23xekX/OC3kkP4/opL/TNyBncMGlagSjQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1752514599; a=rsa-sha256;
+	cv=none;
+	b=DCvpVP5i9j2/zuRktt+/7NgHgG9sfDb6QyVW5qlpq0uAUxR0ODIEVm4GKk/o9V7Xm9c8gs
+	WZyBO4MRXaXg2uve/FSw/WbpNNaX7OQC3JcKSvUqW9KdOF/DfI9kmnPYIpT0mXGp9aTpP3
+	QxbrT+7lVPAwVV4pPFn8VNfIVy55WgfFPF6nfOX4F1HlH9hxAiuI+kAKJ31HK8PwpTNYWc
+	JKzxFxWmc5tgTubyHPnooPnR/36NS/sDnOBgLVlOnitrPOjIn4db9Fj/8gjXmysYj9yjSk
+	Zd7V78dbYVaH0W1V9tUzSsEwfNn4GyZYLY9WT/4VHqrElCx3Ba8OJEjVenn2eA==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] doc: explain SCO and L2CAP timestamping related socket features
+Date: Mon, 14 Jul 2025 20:36:35 +0300
+Message-ID: <8968b3ef55340c6d7b16c33685aa87e3368b526f.1752514576.git.pav@iki.fi>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] monitor: Add sequence number and SDU length to ISO packets
-In-Reply-To: <20250714153623.251489-1-luiz.dentz@gmail.com>
-References: <20250714153623.251489-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2499880756408525348==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=982133
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.27 seconds
-GitLint                       PENDING   0.30 seconds
-BuildEll                      PASS      20.95 seconds
-BluezMake                     PASS      3160.57 seconds
-MakeCheck                     PASS      20.24 seconds
-MakeDistcheck                 PASS      185.29 seconds
-CheckValgrind                 PASS      240.59 seconds
-CheckSmatch                   WARNING   305.79 seconds
-bluezmakeextell               PASS      130.22 seconds
-IncrementalBuild              PENDING   0.25 seconds
-ScanBuild                     PASS      934.23 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1918:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3822:52: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Add explanations and examples for SCO and L2CAP timestamping-related
+features.
 ---
-Regards,
-Linux Bluetooth
+ doc/l2cap.rst | 166 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ doc/sco.rst   | 168 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 330 insertions(+), 4 deletions(-)
 
+diff --git a/doc/l2cap.rst b/doc/l2cap.rst
+index 0b6f1bb99..d53438924 100644
+--- a/doc/l2cap.rst
++++ b/doc/l2cap.rst
+@@ -67,8 +67,8 @@ Example:
+ 
+     addr.l2_bdaddr_type = bdaddr_type;
+ 
+-SOCKET OPTIONS
+-==============
++SOCKET OPTIONS (SOL_BLUETOOTH)
++==============================
+ 
+ The socket options listed below can be set by using **setsockopt(2)** and read
+ with **getsockopt(2)** with the socket level set to SOL_BLUETOOTH.
+@@ -242,6 +242,168 @@ Channel Mode, possible values:
+     **BT_MODE_LE_FLOWCTL**, 0x03, Credit based flow control mode, LE
+     **BT_MODE_EXT_FLOWCTL**, 0x04, Extended Credit based flow control mode, Any
+ 
++
++SOCKET OPTIONS (SOL_SOCKET)
++===========================
++
++``SOL_SOCKET`` level socket options that modify generic socket
++features (``SO_SNDBUF``, ``SO_RCVBUF``, etc.) have their usual
++meaning, see **socket(7)**.
++
++The ``SOL_SOCKET`` level L2CAP socket options that have
++Bluetooth-specific handling in kernel are listed below.
++
++SO_TIMESTAMPING, SO_TIMESTAMP, SO_TIMESTAMPNS
++---------------------------------------------
++
++See https://docs.kernel.org/networking/timestamping.html
++
++For L2CAP sockets, software RX timestamps are supported.  Software TX
++timestamps (SOF_TIMESTAMPING_TX_SOFTWARE,
++SOF_TIMESTAMPING_TX_COMPLETION) are supported since Linux 6.15.
++
++The software RX timestamp is the time when the kernel received the
++packet from the controller driver.
++
++The ``SCM_TSTAMP_SND`` timestamp is emitted when packet is sent to the
++controller driver.  The ``SCM_TSTAMP_COMPLETION`` timestamp is emitted
++when controller reports the packet completed.  Other TX timestamp
++types are not supported.
++
++You can use ``SIOCETHTOOL`` to query supported flags.
++
++The timestamps are in ``CLOCK_REALTIME`` time.
++
++Example (Enable RX timestamping):
++
++.. code-block::
++
++   int flags = SOF_TIMESTAMPING_SOFTWARE |
++       SOF_TIMESTAMPING_RX_SOFTWARE;
++   setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
++
++Example (Read packet and its RX timestamp):
++
++.. code-block::
++
++   char data_buf[256];
++   union {
++       char buf[CMSG_SPACE(sizeof(struct scm_timestamping))];
++       struct cmsghdr align;
++   } control;
++   struct iovec data = {
++       .iov_base = data_buf,
++       .iov_len = sizeof(data_buf),
++   };
++   struct msghdr msg = {
++       .msg_iov = &data,
++       .msg_iovlen = 1,
++       .msg_control = control.buf,
++       .msg_controllen = sizeof(control.buf),
++   };
++   struct scm_timestamping tss;
++
++   res = recvmsg(fd, &msg, MSG_ERRQUEUE | MSG_DONTWAIT);
++   if (res < 0)
++       goto error;
++
++   for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++       if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_TIMESTAMPING)
++           memcpy(&tss, CMSG_DATA(cmsg), sizeof(tss));
++   }
++
++   tstamp_clock_realtime = tss.ts[0];
++
++Example (Enable TX timestamping):
++
++.. code-block::
++
++   int flags = SOF_TIMESTAMPING_SOFTWARE |
++       SOF_TIMESTAMPING_TX_SOFTWARE |
++       SOF_TIMESTAMPING_TX_COMPLETION |
++       SOF_TIMESTAMPING_OPT_ID;
++   setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
++
++Example (Read TX timestamps):
++
++.. code-block::
++
++   union {
++       char buf[2 * CMSG_SPACE(sizeof(struct scm_timestamping))];
++       struct cmsghdr align;
++   } control;
++   struct iovec data = {
++       .iov_base = NULL,
++       .iov_len = 0
++   };
++   struct msghdr msg = {
++       .msg_iov = &data,
++       .msg_iovlen = 1,
++       .msg_control = control.buf,
++       .msg_controllen = sizeof(control.buf),
++   };
++   struct cmsghdr *cmsg;
++   struct scm_timestamping tss;
++   struct sock_extended_err serr;
++   int res;
++
++   res = recvmsg(fd, &msg, MSG_ERRQUEUE | MSG_DONTWAIT);
++   if (res < 0)
++       goto error;
++
++   for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++       if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_TIMESTAMPING)
++           memcpy(&tss, CMSG_DATA(cmsg), sizeof(tss));
++       else if (cmsg->cmsg_level == SOL_BLUETOOTH && cmsg->cmsg_type == BT_SCM_ERROR)
++           memcpy(&serr, CMSG_DATA(cmsg), sizeof(serr));
++   }
++
++   tstamp_clock_realtime = tss.ts[0];
++   tstamp_type = serr->ee_info;      /* SCM_TSTAMP_SND or SCM_TSTAMP_COMPLETION */
++   tstamp_seqnum = serr->ee_data;
++
++
++IOCTLS
++======
++
++The following ioctls with operation specific for L2CAP sockets are
++available.
++
++SIOCETHTOOL (since Linux 6.16-rc1)
++----------------------------------
++
++Supports only command `ETHTOOL_GET_TS_INFO`, which may be used to
++query supported `SOF_TIMESTAMPING_*` flags.  The
++`SOF_TIMESTAMPING_OPT_*` flags are always available as applicable.
++
++Example:
++
++.. code-block::
++
++   #include <linux/ethtool.h>
++   #include <linux/sockios.h>
++   #include <net/if.h>
++   #include <sys/socket.h>
++   #include <sys/ioctl.h>
++
++   ...
++
++   struct ifreq ifr = {};
++   struct ethtool_ts_info cmd = {};
++   int sk;
++
++   snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "hci0");
++   ifr.ifr_data = (void *)&cmd;
++   cmd.cmd = ETHTOOL_GET_TS_INFO;
++
++   sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
++   if (sk < 0)
++       goto error;
++   if (ioctl(sk, SIOCETHTOOL, &ifr))
++       goto error;
++
++   sof_available = cmd.so_timestamping;
++
+ RESOURCES
+ =========
+ 
+diff --git a/doc/sco.rst b/doc/sco.rst
+index a8fe3e87f..766a1bf1e 100644
+--- a/doc/sco.rst
++++ b/doc/sco.rst
+@@ -55,8 +55,8 @@ Example:
+     addr.sco_family = AF_BLUETOOTH;
+     bacpy(&addr.sco_bdaddr, bdaddr);
+ 
+-SOCKET OPTIONS
+-==============
++SOCKET OPTIONS (SOL_BLUETOOTH)
++==============================
+ 
+ The socket options listed below can be set by using **setsockopt(2)** and read
+ with **getsockopt(2)** with the socket level set to SOL_BLUETOOTH.
+@@ -244,6 +244,170 @@ Example:
+         return 1;
+     }
+ 
++
++SOCKET OPTIONS (SOL_SOCKET)
++===========================
++
++``SOL_SOCKET`` level socket options that modify generic socket
++features (``SO_SNDBUF``, ``SO_RCVBUF``, etc.) have their usual
++meaning, see **socket(7)**.
++
++The ``SOL_SOCKET`` level SCO socket options that have
++Bluetooth-specific handling in kernel are listed below.
++
++SO_TIMESTAMPING, SO_TIMESTAMP, SO_TIMESTAMPNS
++---------------------------------------------
++
++See https://docs.kernel.org/networking/timestamping.html
++
++For SCO sockets, software RX timestamps are supported.  Software TX
++timestamps (SOF_TIMESTAMPING_TX_SOFTWARE) are supported since
++Linux 6.15.
++
++The software RX timestamp is the time when the kernel received the
++packet from the controller driver.
++
++The ``SCM_TSTAMP_SND`` timestamp is emitted when packet is sent to the
++controller driver.
++
++The ``SCM_TSTAMP_COMPLETION`` timestamp is emitted when controller
++reports the packet completed.  Completion timestamps are only
++supported on controllers that have SCO flow control.  Other TX
++timestamp types are not supported.
++
++You can use ``SIOCETHTOOL`` to query supported flags.
++
++The timestamps are in ``CLOCK_REALTIME`` time.
++
++Example (Enable RX timestamping):
++
++.. code-block::
++
++   int flags = SOF_TIMESTAMPING_SOFTWARE |
++       SOF_TIMESTAMPING_RX_SOFTWARE;
++   setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
++
++Example (Read packet and its RX timestamp):
++
++.. code-block::
++
++   char data_buf[256];
++   union {
++       char buf[CMSG_SPACE(sizeof(struct scm_timestamping))];
++       struct cmsghdr align;
++   } control;
++   struct iovec data = {
++       .iov_base = data_buf,
++       .iov_len = sizeof(data_buf),
++   };
++   struct msghdr msg = {
++       .msg_iov = &data,
++       .msg_iovlen = 1,
++       .msg_control = control.buf,
++       .msg_controllen = sizeof(control.buf),
++   };
++   struct scm_timestamping tss;
++
++   res = recvmsg(fd, &msg, MSG_ERRQUEUE | MSG_DONTWAIT);
++   if (res < 0)
++       goto error;
++
++   for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++       if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_TIMESTAMPING)
++           memcpy(&tss, CMSG_DATA(cmsg), sizeof(tss));
++   }
++
++   tstamp_clock_realtime = tss.ts[0];
++
++Example (Enable TX timestamping):
++
++.. code-block::
++
++   int flags = SOF_TIMESTAMPING_SOFTWARE |
++       SOF_TIMESTAMPING_TX_SOFTWARE |
++       SOF_TIMESTAMPING_OPT_ID;
++   setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
++
++Example (Read TX timestamps):
++
++.. code-block::
++
++   union {
++       char buf[CMSG_SPACE(sizeof(struct scm_timestamping))];
++       struct cmsghdr align;
++   } control;
++   struct iovec data = {
++       .iov_base = NULL,
++       .iov_len = 0
++   };
++   struct msghdr msg = {
++       .msg_iov = &data,
++       .msg_iovlen = 1,
++       .msg_control = control.buf,
++       .msg_controllen = sizeof(control.buf),
++   };
++   struct cmsghdr *cmsg;
++   struct scm_timestamping tss;
++   struct sock_extended_err serr;
++   int res;
++
++   res = recvmsg(fd, &msg, MSG_ERRQUEUE | MSG_DONTWAIT);
++   if (res < 0)
++       goto error;
++
++   for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++       if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_TIMESTAMPING)
++           memcpy(&tss, CMSG_DATA(cmsg), sizeof(tss));
++       else if (cmsg->cmsg_level == SOL_BLUETOOTH && cmsg->cmsg_type == BT_SCM_ERROR)
++           memcpy(&serr, CMSG_DATA(cmsg), sizeof(serr));
++   }
++
++   tstamp_clock_realtime = tss.ts[0];
++   tstamp_type = serr->ee_info;      /* SCM_TSTAMP_SND or SCM_TSTAMP_COMPLETION */
++   tstamp_seqnum = serr->ee_data;
++
++
++IOCTLS
++======
++
++The following ioctls with operation specific for SCO sockets are
++available.
++
++SIOCETHTOOL (since Linux 6.16-rc1)
++----------------------------------
++
++Supports only command `ETHTOOL_GET_TS_INFO`, which may be used to
++query supported `SOF_TIMESTAMPING_*` flags.  The
++`SOF_TIMESTAMPING_OPT_*` flags are always available as applicable.
++
++Example:
++
++.. code-block::
++
++   #include <linux/ethtool.h>
++   #include <linux/sockios.h>
++   #include <net/if.h>
++   #include <sys/socket.h>
++   #include <sys/ioctl.h>
++
++   ...
++
++   struct ifreq ifr = {};
++   struct ethtool_ts_info cmd = {};
++   int sk;
++
++   snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "hci0");
++   ifr.ifr_data = (void *)&cmd;
++   cmd.cmd = ETHTOOL_GET_TS_INFO;
++
++   sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
++   if (sk < 0)
++       goto error;
++   if (ioctl(sk, SIOCETHTOOL, &ifr))
++       goto error;
++
++   sof_available = cmd.so_timestamping;
++
+ RESOURCES
+ =========
+ 
+-- 
+2.50.1
 
---===============2499880756408525348==--
