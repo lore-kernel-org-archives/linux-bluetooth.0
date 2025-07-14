@@ -1,77 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9711DF985;
-	Mon, 14 Jul 2025 15:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B7023D29D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 15:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752507973; cv=none; b=FafTEpVegq1rczPVT4LnzTF+bniNIc8KDODiu9kY/hlAKNmYR2rqclZNmnr7eMS9ByZH6c7J11iDVqO2SZa7S1m2WK8w6SFw3MWwN4SdMNiaybguIubAr1YZwq3liQHmHrSHWvcs+4f3R5oGljXQMawNdiUucJvO0k4wXfbB33k=
+	t=1752508264; cv=none; b=pHJyI7cASZshwO5O83AHE64RH6XNptIQd8CnqvXJelJHfDXRmWURvm0YjbGNGKo3+uTTVRi7GXnSyR+U87U8LfKUDIGxjQouo3PFZF83gJ3FVIj73uDU8WERSesQcyQ0iOFM+7nJtHsyK6AG4HslsWEUwerCCJoDdMjaVbbtQcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752507973; c=relaxed/simple;
-	bh=lGlHwINKmDtZDP+RNzG1kSdCoH7nf9v7DpZThUTtKcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X+Jsmi4L/DP6hi23AveEB/hfoRClI3wMfyHsxjpi3Co7HyjcbtkKnxStdnZRvdjnug2XvkEVaFf/37Sx9H9kA1sTDueSigyDeaXS1EKze7SFcjoeAusK1DE46yRGF6fr8UTwB23zyvTWhKmJEwhYGn9kZs/NsKkJ2Ii5KDMDlsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Db+7UqAd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752508264; c=relaxed/simple;
+	bh=kaa9YLKyC1HwlKseN1hlcX5uDYI/r5lLw6gS80ZtWZg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=IcE+xcWgRZro0F4v+dW2FoG8U6S+WoGG+PVFoNNKtWGsheaPRLGzZjpcNI6a5KnfAVdXt8QA7BR916FlWHKt9NhUJ3tU+HXcWwn0leyAQiBPR9tcxpI/ekctVWHJffZUfnRwJz3HVZCSwOOYtRPGZeObfQdYWTmHvbm5mRR1iIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RXZVpJh4; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Db+7UqAd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAA17C4CEED;
-	Mon, 14 Jul 2025 15:46:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752507972;
-	bh=lGlHwINKmDtZDP+RNzG1kSdCoH7nf9v7DpZThUTtKcY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Db+7UqAd1KorwPuzo+Nu5KYrt4KyNnRuAlZqv7mmhA/obONsmroNk5f+SQ9RiaiH7
-	 jLtSs/TYS/FZfAwf8TmzE06dpcN73uT0i/tiTskzWdJwexXF7fHgmhDopwxp+u2rCd
-	 jAbBzSMFYKqy/MyN9mB2MkapxxzjHSgvqFVjH3V7Gk8ReiKxNUnhqRwgQv6tdlvzbe
-	 CyRJTv6ymIRDDWFIkcSWZkboEPDGZzYv4zd32eR8rGGZ2E1BuyHVUZWgqbEm+dA/OY
-	 goh4I0+JuoM+A+u3exfqIA1czLoRlzv/IiGNGfeszHBEk3uvo2pID3qd3LKvOoIyY/
-	 /a4izg/4OZn6w==
-Date: Mon, 14 Jul 2025 16:46:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: ISO: add socket option to report packet
- seqnum via CMSG
-Message-ID: <20250714154608.GP721198@horms.kernel.org>
-References: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RXZVpJh4"
+Received: from github.com (hubbernetes-node-0f8d89c.va3-iad.github.net [10.48.201.23])
+	by smtp.github.com (Postfix) with ESMTPA id 5A39A8C08ED
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 08:51:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1752508262;
+	bh=VYCxdUORMsO039cXm0Y9wYzFG+V7WPZz1hYQFD8TiyY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=RXZVpJh42Wd66kEMT7m852Y0RZOYSWmZ4JOPjRqZ0uTkRO+pvLdaHw1f7vQDf7vBI
+	 Ip+2wuF+PEOArVam/kku8BnpDyvnimfDNRYKKTirYAsPDL6ehhXhn+1S4n0V0YwvUO
+	 i6YDADNmGv9xdxcy9Gr4f+omzIXGE0r0xGd8xYMA=
+Date: Mon, 14 Jul 2025 08:51:02 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/982133/000000-2ef05e@github.com>
+Subject: [bluez/bluez] 2ef05e: monitor: Add sequence number and SDU length to
+ ISO...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Mon, Jul 14, 2025 at 05:02:57PM +0300, Pauli Virtanen wrote:
-> User applications need a way to track which ISO interval a given SDU
-> belongs to, to properly detect packet loss. All controllers do not set
-> timestamps, and it's not guaranteed user application receives all packet
-> reports (small socket buffer, or controller doesn't send all reports
-> like Intel AX210 is doing).
-> 
-> Add socket option BT_PKT_SEQNUM that enables reporting of received
-> packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
-> 
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+  Branch: refs/heads/982133
+  Home:   https://github.com/bluez/bluez
+  Commit: 2ef05e5521731cf6ac6168c06848f46f4afd19e3
+      https://github.com/bluez/bluez/commit/2ef05e5521731cf6ac6168c06848f46f4afd19e3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-07-14 (Mon, 14 Jul 2025)
 
-Hi Pauli,
+  Changed paths:
+    M lib/hci.h
+    M monitor/packet.c
 
-Some minor feedback from my side.
+  Log Message:
+  -----------
+  monitor: Add sequence number and SDU length to ISO packets
 
-The byte order annotations around the sequence number seem inconsistent.
-And my guess is that __le16 should be consistently used to hold the sequence
-number.
+This prints sequence number and SDU length of ISO packets:
 
-Sparse says:
+> ISO Data RX: Handle 2304 SN 48 flags 0x02 dlen 64 slen 60
 
-  net/bluetooth/iso.c:2322:28: warning: incorrect type in assignment (different base types)
-  net/bluetooth/iso.c:2322:28:    expected unsigned short [usertype] sn
-  net/bluetooth/iso.c:2322:28:    got restricted __le16 [usertype] sn
-  net/bluetooth/iso.c:2333:28: warning: incorrect type in assignment (different base types)
-  net/bluetooth/iso.c:2333:28:    expected unsigned short [usertype] sn
-  net/bluetooth/iso.c:2333:28:    got restricted __le16 [usertype] sn
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
