@@ -1,68 +1,58 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0714625332E;
-	Mon, 14 Jul 2025 14:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51031FDA94
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 14:04:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752501800; cv=pass; b=YmBMgX6rceICNtJZvEPHYJ9AmV0lkwuksk9J6Z2wphIUCYIGnJ3HsxDrbCOQyN8SkmXN7PkA0XwwR9RfDtKB23IeJhuE8969eYxZ9H2WdAJ6qdDBEt92BxckuOyF2GAMw1DZKXYpXk4uAuvZGP873u4gDdUP6R0w1Y0M4W6eIdQ=
+	t=1752501895; cv=pass; b=IekK1i9q0z2UDMxlBvkGnEhKZ0K7yu07L7YNeAEIibPRpiea2GRr2lMdCkKW0Slg/hp8g85xZxIOmhRub3kx+/g+2Ez3dZ628eAFI8jWXrRVERhlLhnBhninzJ3FFNL414B3VtSIm/LBfVgS1Kmy2MryP6OdLO1IJIGYosAQ8Ac=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752501800; c=relaxed/simple;
-	bh=XhqpgxRLTI2G38XPOETojzoF8wUzYzAAaiZd6w5Vu1I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TyAfoHgoy8dQJ7mmEBiWF1SLot+hAZfKVfOVnNcgTy2ybjSObhWAZqaBp2M8HDdBTbVbAWum6oTWUv7H5dh0I4YDo9lN6setj1yLCGcmCii13YzMQ7+RcemZnM5UewXX243ryftdUEtgCfCrsoGo6YjEeCYlRd2GXdLq8DEeGPs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=pjBZLqtT; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1752501895; c=relaxed/simple;
+	bh=BnJE6BCJiCKi9ahdTXfQe/LSCxMjGyEzTxxyIJbeKSw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jNl8jJir4DXI6dGprvJvuIMBS0pyQhnITWj8P7zuIa5EbB4tcdOfZOzD9Q5EipSXsSS4mIOJkCgRPSv2A4m3KOsfo678EtkpjdTdH2kIHbP7Sokoadrfii2uMguKTwn8Ai2nb0Iid03iBKOZM142PjK5e7ilaztURuKGgXMQWkQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=FVMcXjX3; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="pjBZLqtT"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="FVMcXjX3"
 Received: from monolith.lan (unknown [193.138.7.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4bgkYP5Tr3zySF;
-	Mon, 14 Jul 2025 17:03:05 +0300 (EEST)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4bgkbR1RT0zyVd;
+	Mon, 14 Jul 2025 17:04:51 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1752501788;
+	t=1752501891;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=EEa6HnWbQ2p07TGZOlrDqqHKYisSPERO0/iEcWBFJbY=;
-	b=pjBZLqtTrcM5mZIJkFFLctCpit5e52nIb8+KZOSZrog793QZqaAyYHd3H41UHtEzWvIYHD
-	6HXlMxR31SNOWihKlw0Vbog4ehaOmB0Y4+ogAKKGUIYMCBIMH8ysruPe7FBqjfNWlcTA6z
-	XC22IKKCoXfKphmoMKOOCOJ/lcvZziI=
+	bh=q9FqoJ0N3ofCsSESWqPVLfk0nlfmV8KmWFyvRiH6ims=;
+	b=FVMcXjX3nN0YRdO1mzlXu7guUYfK9HTauP/SXu65mwloCOXCcT4rsCcbKbsRe6PqtxkqVs
+	4aIUF81VkQYg/dpmtVrvtUVr8e/ZZsNeE38mn7u1pdSnLQCbBV0zl9LMQSwREeSjMSA7sU
+	Jc4UZqCGG7ASNVinl6ztrvYnfIK6ER4=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1752501788;
+	s=meesny; t=1752501891;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=EEa6HnWbQ2p07TGZOlrDqqHKYisSPERO0/iEcWBFJbY=;
-	b=ZAGYNmJAtFyi5io33edYnUgQvTJxEFnoa6KE6nl2nFIgNZig8tt0xgvNpNT0xRho32uYnQ
-	wGNeBbQLCKMwE7fG6ZhUv67u1SQnu6ClQEbi3tUmXe1QOuEzLSkFdtPfbkcbjKwl1Q2tpn
-	zUZuXxwzgqLxGOedKiLEd9ikZAnr5xY=
+	bh=q9FqoJ0N3ofCsSESWqPVLfk0nlfmV8KmWFyvRiH6ims=;
+	b=VHpsrEfwTj667ItVkGF3xd/raAGlcGiLJnKpEuoTiAK2OGAK7O+KsXn4SfY2CIJCUkQmU8
+	iiSohYNe2mbK+fESd5cxmU/YhcvkpiOqYt0o+B59X2TfdEiVVgbHa16w7VKP/OzN6OPlhw
+	qDQQA1Rhb66lZToW+DZb0BR2400pl2E=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1752501788; a=rsa-sha256; cv=none;
-	b=qzCuAZohwkHhNKumzizoBxZGfTdj24RIHyPXCcm8eYbpsofUsNi1qD4junUrVyKB3LGxQR
-	Azu7If+L0vCEyRd6N0UMLyXFQlGSU/gzNQhU8SejFptnht/GAKRHtk+kJ4KdbKD8KxtBtf
-	g6ze6yPQc4BHQA86m9y8BH4rLck9J9A=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1752501891; a=rsa-sha256; cv=none;
+	b=TBF8eAKYaDWYc4l06+D/GrhQhorjJzMyn2jOOL5wRGcEhKTrgIK/vZLIsw6lfABny7fd4X
+	DAcZ+5HVo0LTPt6uY/fpEr2WuKAvsbCK4BxK+KitzoULYL+cWN6ru2UGMZdI5UVxY0u/+9
+	rxIxwJv6sXmBMdukdRti45bmEk86Z/U=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: ISO: add socket option to report packet seqnum via CMSG
-Date: Mon, 14 Jul 2025 17:02:57 +0300
-Message-ID: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 1/3] lib: tools: remove POLL_ERRQUEUE
+Date: Mon, 14 Jul 2025 17:04:44 +0300
+Message-ID: <2ffec6539fe38318c713b48985aaddda9671f258.1752501450.git.pav@iki.fi>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -72,183 +62,244 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-User applications need a way to track which ISO interval a given SDU
-belongs to, to properly detect packet loss. All controllers do not set
-timestamps, and it's not guaranteed user application receives all packet
-reports (small socket buffer, or controller doesn't send all reports
-like Intel AX210 is doing).
+This experimental feature did not land to mainline kernel, and probably
+would need to be done differently.
 
-Add socket option BT_PKT_SEQNUM that enables reporting of received
-packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
-
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Remove defines and tests for it.
 ---
+ lib/bluetooth.h    |   2 -
+ src/shared/util.c  |   2 -
+ tools/iso-tester.c | 127 +--------------------------------------------
+ 3 files changed, 1 insertion(+), 130 deletions(-)
 
-Notes:
-    Intel AX210 is not sending all reports:
-    
-    $ btmon -r dump.btsnoop -I -C90|grep -A1 'ISO Data RX: Handle 2304'
-    ...
-    > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1713 [hci0] 22.567744
-            dd 01 3c 00 6d 08 e9 14 1e 3b 85 7b 35 c2 25 0b  ..<.m....;.{5.%.
-    --
-    > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1718 [hci0] 22.573745
-            de 01 3c 00 41 65 22 4f 99 9b 0b b6 ff cb 06 00  ..<.Ae"O........
-    --
-    > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1727 [hci0] 22.587933
-            e0 01 3c 00 8b 6e 33 44 65 51 ee d7 e0 ee 49 d8  ..<..n3DeQ....I.
-    --
-    > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1732 [hci0] 22.596742
-            e1 01 3c 00 a7 48 54 a7 c1 9f dc 37 66 fe 04 ab  ..<..HT....7f...
-    ...
-    
-    Here, report for packet with sequence number 0x01df is missing.
-    
-    This may be spec violation by the controller, see Core v6.1 pp. 3702
-    
-        All SDUs shall be sent to the upper layer including the indication
-        of validity of data. A report shall be sent to the upper layer if
-        the SDU is completely missing.
-    
-    Regardless, it will be easier for user applications to see the HW
-    sequence numbers directly, so they don't have to count packets and it's
-    in any case more reliable if packets get dropped due to socket buffer
-    size.
-
- include/net/bluetooth/bluetooth.h |  9 ++++++++-
- net/bluetooth/af_bluetooth.c      |  7 +++++++
- net/bluetooth/iso.c               | 21 ++++++++++++++++++---
- 3 files changed, 33 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 114299bd8b98..0e31779a3341 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -244,6 +244,10 @@ struct bt_codecs {
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 9b6b54d5d..150679d72 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -253,8 +253,6 @@ enum {
  
  #define BT_ISO_BASE		20
  
-+#define BT_PKT_SEQNUM		21
-+
-+#define BT_SCM_PKT_SEQNUM	0x05
-+
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-@@ -391,7 +395,8 @@ struct bt_sock {
- enum {
- 	BT_SK_DEFER_SETUP,
- 	BT_SK_SUSPEND,
--	BT_SK_PKT_STATUS
-+	BT_SK_PKT_STATUS,
-+	BT_SK_PKT_SEQNUM,
+-#define BT_POLL_ERRQUEUE	21
+-
+ /* Byte order conversions */
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ #define htobs(d)  (d)
+diff --git a/src/shared/util.c b/src/shared/util.c
+index fa058170e..c2cf2bf72 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -1677,8 +1677,6 @@ static const struct {
+ 	{ "a6695ace-ee7f-4fb9-881a-5fac66c629af", "BlueZ Offload Codecs"},
+ 	{ "6fbaf188-05e0-496a-9885-d6ddfdb4e03e",
+ 		"BlueZ Experimental ISO Socket"},
+-	{ "69518c4c-b69f-4679-8bc1-c021b47b5733",
+-		"BlueZ Experimental Poll Errqueue"},
+ 	{ }
  };
  
- struct bt_sock_list {
-@@ -475,6 +480,7 @@ struct bt_skb_cb {
- 	u8 pkt_type;
- 	u8 force_active;
- 	u16 expect;
-+	u16 pkt_seqnum;
- 	u8 incoming:1;
- 	u8 pkt_status:2;
- 	union {
-@@ -488,6 +494,7 @@ struct bt_skb_cb {
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index 56550882e..2c674171d 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -515,9 +515,6 @@ struct iso_client_data {
+ 	 * Used for testing TX timestamping OPT_ID.
+ 	 */
+ 	unsigned int repeat_send;
+-
+-	/* Disable BT_POLL_ERRQUEUE before enabling TX timestamping */
+-	bool no_poll_errqueue;
+ };
  
- #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
- #define hci_skb_pkt_status(skb) bt_cb((skb))->pkt_status
-+#define hci_skb_pkt_seqnum(skb) bt_cb((skb))->pkt_seqnum
- #define hci_skb_expect(skb) bt_cb((skb))->expect
- #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
- #define hci_skb_event(skb) bt_cb((skb))->hci.req_event
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 6ad2f72f53f4..44b7acb20a67 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -364,6 +364,13 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_STATUS,
- 				 sizeof(pkt_status), &pkt_status);
- 		}
-+
-+		if (test_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags)) {
-+			u16 pkt_seqnum = hci_skb_pkt_seqnum(skb);
-+
-+			put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_SEQNUM,
-+				 sizeof(pkt_seqnum), &pkt_seqnum);
-+		}
- 	}
+ typedef bool (*iso_defer_accept_t)(struct test_data *data, GIOChannel *io,
+@@ -654,18 +651,6 @@ static const uint8_t reset_iso_socket_param[] = {
+ 	0x00,						/* Action - disable */
+ };
  
- 	skb_free_datagram(sk, skb);
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index fc22782cbeeb..469450bb6b6c 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1687,6 +1687,17 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
- 			clear_bit(BT_SK_PKT_STATUS, &bt_sk(sk)->flags);
- 		break;
- 
-+	case BT_PKT_SEQNUM:
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
-+		if (err)
-+			break;
-+
-+		if (opt)
-+			set_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
-+		else
-+			clear_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
-+		break;
-+
- 	case BT_ISO_QOS:
- 		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
- 		    sk->sk_state != BT_CONNECT2 &&
-@@ -2278,7 +2289,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
- void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+-static const uint8_t set_poll_errqueue_param[] = {
+-	0x33, 0x57, 0x7b, 0xb4, 0x21, 0xc0, 0xc1, 0x8b, /* UUID */
+-	0x79, 0x46, 0x9f, 0xb6, 0x4c, 0x8c, 0x51, 0x69,
+-	0x01,						/* Action - enable */
+-};
+-
+-static const uint8_t reset_poll_errqueue_param[] = {
+-	0x33, 0x57, 0x7b, 0xb4, 0x21, 0xc0, 0xc1, 0x8b, /* UUID */
+-	0x79, 0x46, 0x9f, 0xb6, 0x4c, 0x8c, 0x51, 0x69,
+-	0x00,						/* Action - disable */
+-};
+-
+ static void set_iso_socket_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	struct iso_conn *conn = hcon->iso_data;
--	__u16 pb, ts, len;
-+	__u16 pb, ts, len, sn;
+@@ -677,26 +662,9 @@ static void set_iso_socket_callback(uint8_t status, uint16_t length,
+ 	tester_print("ISO socket feature is enabled");
+ }
  
- 	if (!conn)
- 		goto drop;
-@@ -2308,6 +2319,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 				goto drop;
- 			}
+-static void set_poll_errqueue_callback(uint8_t status, uint16_t length,
+-					const void *param, void *user_data)
+-{
+-	if (status != MGMT_STATUS_SUCCESS) {
+-		tester_print("Poll Errqueue feature could not be enabled");
+-		return;
+-	}
+-
+-	tester_print("Poll Errqueue feature is enabled");
+-}
+-
+ static void test_pre_setup(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+-	const struct iso_client_data *isodata = test_data;
+-
+-	if (isodata && isodata->no_poll_errqueue) {
+-		if (tester_pre_setup_skip_by_default())
+-			return;
+-	}
  
-+			sn = hdr->sn;
- 			len = __le16_to_cpu(hdr->slen);
- 		} else {
- 			struct hci_iso_data_hdr *hdr;
-@@ -2318,18 +2330,20 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 				goto drop;
- 			}
+ 	data->mgmt = mgmt_new_default();
+ 	if (!data->mgmt) {
+@@ -712,13 +680,6 @@ static void test_pre_setup(const void *test_data)
+ 		  sizeof(set_iso_socket_param), set_iso_socket_param,
+ 		  set_iso_socket_callback, NULL, NULL);
  
-+			sn = hdr->sn;
- 			len = __le16_to_cpu(hdr->slen);
- 		}
+-	if (isodata && isodata->no_poll_errqueue) {
+-		mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, MGMT_INDEX_NONE,
+-			  sizeof(set_poll_errqueue_param),
+-			  set_poll_errqueue_param,
+-			  set_poll_errqueue_callback, NULL, NULL);
+-	}
+-
+ 	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0, NULL,
+ 					read_index_list_callback, NULL, NULL);
+ }
+@@ -726,19 +687,11 @@ static void test_pre_setup(const void *test_data)
+ static void test_post_teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+-	const struct iso_client_data *isodata = test_data;
  
- 		flags  = hci_iso_data_flags(len);
- 		len    = hci_iso_data_len(len);
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, MGMT_INDEX_NONE,
+ 		  sizeof(reset_iso_socket_param), reset_iso_socket_param,
+ 		  NULL, NULL, NULL);
  
--		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", len,
--		       skb->len, flags);
-+		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x sn %d",
-+		       len, skb->len, flags, sn);
+-	if (isodata && isodata->no_poll_errqueue) {
+-		mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, MGMT_INDEX_NONE,
+-			  sizeof(reset_poll_errqueue_param),
+-			  reset_poll_errqueue_param,
+-			  NULL, NULL, NULL);
+-	}
+-
+ 	hciemu_unref(data->hciemu);
+ 	data->hciemu = NULL;
+ }
+@@ -1085,16 +1038,6 @@ static const struct iso_client_data connect_send_tx_cmsg_timestamping = {
+ 	.cmsg_timestamping = true,
+ };
  
- 		if (len == skb->len) {
- 			/* Complete frame received */
- 			hci_skb_pkt_status(skb) = flags & 0x03;
-+			hci_skb_pkt_seqnum(skb) = sn;
- 			iso_recv_frame(conn, skb);
- 			return;
- 		}
-@@ -2352,6 +2366,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 			goto drop;
+-static const struct iso_client_data connect_send_tx_no_poll_timestamping = {
+-	.qos = QOS_16_2_1,
+-	.expect_err = 0,
+-	.send = &send_16_2_1,
+-	.so_timestamping = (SOF_TIMESTAMPING_SOFTWARE |
+-					SOF_TIMESTAMPING_TX_COMPLETION),
+-	.repeat_send = 1,
+-	.no_poll_errqueue = true,
+-};
+-
+ static const struct iso_client_data listen_16_2_1_recv = {
+ 	.qos = QOS_16_2_1,
+ 	.expect_err = 0,
+@@ -2319,37 +2262,6 @@ static gboolean iso_recv_errqueue(GIOChannel *io, GIOCondition cond,
+ 	return FALSE;
+ }
  
- 		hci_skb_pkt_status(conn->rx_skb) = flags & 0x03;
-+		hci_skb_pkt_seqnum(conn->rx_skb) = sn;
- 		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
- 					  skb->len);
- 		conn->rx_len = len - skb->len;
+-static gboolean iso_fail_errqueue(GIOChannel *io, GIOCondition cond,
+-							gpointer user_data)
+-{
+-	struct test_data *data = user_data;
+-
+-	tester_warn("Unexpected POLLERR");
+-	tester_test_failed();
+-
+-	data->io_id[3] = 0;
+-	return FALSE;
+-}
+-
+-static gboolean iso_timer_errqueue(gpointer user_data)
+-{
+-	struct test_data *data = user_data;
+-	GIOChannel *io;
+-	gboolean ret;
+-
+-	io = queue_peek_head(data->io_queue);
+-	g_assert(io);
+-
+-	ret = iso_recv_errqueue(io, G_IO_IN, data);
+-	if (!ret) {
+-		if (data->io_id[3])
+-			g_source_remove(data->io_id[3]);
+-		data->io_id[3] = 0;
+-	}
+-
+-	return ret;
+-}
+-
+ static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
+ {
+ 	const struct iso_client_data *isodata = data->test_data;
+@@ -2370,39 +2282,7 @@ static void iso_tx_timestamping(struct test_data *data, GIOChannel *io)
+ 
+ 	sk = g_io_channel_unix_get_fd(io);
+ 
+-	if (isodata->no_poll_errqueue) {
+-		uint32_t flag = 0;
+-
+-		err = setsockopt(sk, SOL_BLUETOOTH, BT_POLL_ERRQUEUE,
+-							&flag, sizeof(flag));
+-		if (err < 0) {
+-			tester_warn("setsockopt BT_POLL_ERRQUEUE: %s (%d)",
+-						strerror(errno), errno);
+-			tester_test_failed();
+-			return;
+-		}
+-
+-		if (!data->io_queue)
+-			data->io_queue = queue_new();
+-		queue_push_head(data->io_queue, g_io_channel_ref(io));
+-
+-		data->io_id[2] = g_timeout_add(100, iso_timer_errqueue, data);
+-		data->io_id[3] = g_io_add_watch(io, G_IO_ERR, iso_fail_errqueue,
+-									data);
+-	} else {
+-		uint32_t flag = 1;
+-
+-		err = setsockopt(sk, SOL_BLUETOOTH, BT_POLL_ERRQUEUE,
+-							&flag, sizeof(flag));
+-		if (err >= 0) {
+-			tester_warn("BT_POLL_ERRQUEUE available");
+-			tester_test_failed();
+-			return;
+-		}
+-
+-		data->io_id[2] = g_io_add_watch(io, G_IO_ERR, iso_recv_errqueue,
+-									data);
+-	}
++	data->io_id[2] = g_io_add_watch(io, G_IO_ERR, iso_recv_errqueue, data);
+ 
+ 	if (isodata->cmsg_timestamping)
+ 		so &= ~TS_TX_RECORD_MASK;
+@@ -3763,11 +3643,6 @@ int main(int argc, char *argv[])
+ 			&connect_send_tx_cmsg_timestamping, setup_powered,
+ 			test_connect);
+ 
+-	/* Test TX timestamping and disabling POLLERR wakeup */
+-	test_iso("ISO Send - TX No Poll Timestamping",
+-			&connect_send_tx_no_poll_timestamping, setup_powered,
+-			test_connect);
+-
+ 	test_iso("ISO Receive - Success", &listen_16_2_1_recv, setup_powered,
+ 							test_listen);
+ 
 -- 
 2.50.1
 
