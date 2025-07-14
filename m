@@ -1,224 +1,301 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE55253F1D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 14:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752501897; cv=pass; b=lsL+XJnYZSS6S5v+BCSCdgbmCNTeNBvHCJpgePjZmkfA6A3nQzuKiSBxg2oogBH2ZHGFCM2Xwsmzxk3jGuutqmeMpXHeGJJo9vo+b83NwFhFwCzsiQ4VCiDLfbz/107fC8oivHSSEHKBSRjG6bvkERWTzhMv11tcGUlALCwc54o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752501897; c=relaxed/simple;
-	bh=XDwqLkunv18KD30JCOsPRnQUluEwhZiPRF6RIQOJ2QI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=afPF/12Fua0z7xulCri8sYjC7jL/e9F5aTmDc3/dtD8OPg7rek0GJSRuT8VwRQ9fPxX+3gu+52LQ+3dyDHPK1kW1CL1RwEKVfr5o0t+OyB68x8YGEmICaTAA+80BYcZNNW5Tg6L8FGhpmCCqVYIgjYc1ioWCNy9ZzSg4NQ1QDGM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=naEeeoU9; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D3C2550DD;
+	Mon, 14 Jul 2025 14:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752502550; cv=none; b=SOZIboBJvSvKDGO55TxQvmOfad+vSrmhc5ZxolIK21kWCQls1oe/bncR5dN35+CVNt1Fc+Gda5/H6Nx9M6iizLTZddoF3mpYp59bl6ygNWSqcYGuKd4ssUaOMAfCRp8y5bsVRwY2AROAho1WsHBS9uXqYHyjNjprtdcOLi5J6g0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752502550; c=relaxed/simple;
+	bh=E/M4rhGhFfnxw7bPtRF9RqwLFdfY9maeG5yJOOca5GE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pXNoM/LMCMqBjGrgOYoww9mRjVKc0pJXWIdMNG+//tDSzQeG5eW8yJp3wLSVs8u2D2chZi3s4PPvI4jTZtzYrw8/+sgWSFIpf+KKB+kBtrwhsOVhp2FM4alKO9YFBZVkjz2zeBSvpVBnbcOibbz0QlQWrxL4M0mSoxmYcg/oWTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VcX3T5Eq; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="naEeeoU9"
-Received: from monolith.lan (unknown [193.138.7.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4bgkbT45tHzyZL;
-	Mon, 14 Jul 2025 17:04:53 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1752501894;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uHkDQ04IJvRQUpilHYAr/2FYonwTeL2uUyLBFmdhnzM=;
-	b=naEeeoU92MtLWet43Q6gG8LtLEpHcoVU97hbgkqfLKKcNtTmVQPcAS688+lyRZM3TPUQLv
-	SQ9yH44mGwEzqEPpoG+U57hKbHwOcpscDx/lH0pWaJPoEnL0gDYJ6J3SkW037GPyemV4K1
-	EvPHGI/G6SHYCBXbyFqqO1KKy0oasD0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1752501894;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uHkDQ04IJvRQUpilHYAr/2FYonwTeL2uUyLBFmdhnzM=;
-	b=s5I7pSoDVwdhDLdDMbzXj/+xuI+DI7raf16HkBYyvh9giNYlvfiLVNCoU7z0HTAFdAmRcK
-	xy0Gm1SqHZUTwXLR3m6kE7Bmu3XVuW3w96NuZ9tB1/3zCgi+6JfOmbHmJWHcm3s6CvhsAX
-	AU4603XAeaJg4PXZdbBbhzhD7BzUIOw=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1752501894; a=rsa-sha256; cv=none;
-	b=K1i930fgwPa+lfAElk/x4BQaXJSt/ZlI7M5EI+MOFbpi7/KteelWgsbY1NkVxtEV0RdJC+
-	3kUHdcKiSwl4667ECbDe44U2J8KNTg4QUXkodjrLhSHUe68Sd+1DRK2jlEdvvqciNuR/XV
-	4T0wvCrGpLBVbUkpIqOz7DygCyIRDdA=
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 3/3] iso-tester: add tests for BT_PKT_SEQNUM
-Date: Mon, 14 Jul 2025 17:04:46 +0300
-Message-ID: <c9a75585e3640d8a1efca0bf96158eec1ca25fdc.1752501450.git.pav@iki.fi>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <2ffec6539fe38318c713b48985aaddda9671f258.1752501450.git.pav@iki.fi>
-References: <2ffec6539fe38318c713b48985aaddda9671f258.1752501450.git.pav@iki.fi>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcX3T5Eq"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-32b435ef653so34236081fa.2;
+        Mon, 14 Jul 2025 07:15:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752502547; x=1753107347; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HJMP8UBbwSy0FLOvH5KG+nh1mXruEi32ylVnTk7hBpw=;
+        b=VcX3T5EqMe2Yi6jXllNXrm4iW+B80sto0ZX0PnB5hH0w8pDuKS205Nxv7u3pjA15zh
+         IGL8hbXE2EJ1ai6G8N/yT/BORE5RiX8jo58tkzs4SvyCMgLqg4pw5AXf3LXpkWi2aBS2
+         aJmRfqhfLExCdadN9nxfYMzcKg4vmvs870KhpCgVPZPfZ/NgwlNZqUpEkbU17SYnjUJZ
+         m8AiT/kj9V5QBxN7S+8m59SZj1HQgB0oONAo77E8A5rtqa3y51f99VQTSClGTOo8rc59
+         7CMcf345GamHfWUHhVqshWhQCu05Nzgfia8DlAJYaByIOyD619adgeUw5c5x9PvQSp9D
+         tU2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752502547; x=1753107347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HJMP8UBbwSy0FLOvH5KG+nh1mXruEi32ylVnTk7hBpw=;
+        b=PIweU9g1Bo51Dpk7oPUbjUhWamZfCwL4nk1rshPKUlv3A2TGVOSl8ksKE2UqbHwUIY
+         NorVy+BXdFrx0UEfNG5ez/znX2b3vLVpcwhrxL5WkqafIdVUOeYPMGVBmMJEXkMPhwQo
+         ZUMuzdde2V2yB9QnsDDUvR968xLaS43qdMwNRQkQ0TRqv05v2w1rAyL1UTXeKKVHr8Sj
+         EgfXTYnXPuQZvXoQp4Ls60PLhDNPQPfgdjMU2iZ9/KYH0nIXTIJKCm6dpyVy1cq94nIW
+         6rK3hG8hE7davnpazirDXTREu8H6EWXEDss6yqButEpftCXwAAFhKbbinq4dVCSg8fGc
+         Xviw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ9fVrC/pKZGjJ0UrwgaJRuFVei8YrN6vpNNh50osVtkpmwV2VHmltEMLbQAvYMJE9wRhToGevvYjNff8=@vger.kernel.org, AJvYcCXykaFDC4cPT2aYOWDJOyZOV/azt0pghXvAxMFlFg4Ei2ij6bBYiFus4Oy1E7vod9tazz/8oChl@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1BgsRqZQtG6Zg2YQyJ/BsLdkOAHFdzpsMTwSJy24xfCP7tsyl
+	d7wpZBjqmf8mABgzppRycdv/aH0XUsFUMbp+XEh0MXqKH2X4oicfvVexJ7QoNz165/Q3Cum+cY9
+	z3XauvSe7a8z3Ebcs+IVP8tP3UK+qAvY=
+X-Gm-Gg: ASbGncvLCwCwpmassmYaG/4stW2ZLMUpEJcn+uwe0y6bVvmjVkpGLRivLUsOjwCeac1
+	RKtLxyMYbKyKjWtn5nkofUHjiAWgWI2iIbpFVmKMH1cJQu96kxtE6ihAvveeuOwrlHKoSaZVho2
+	kmDMNZfD7xg8np/5gHYRK7GyMiPceX2F2DQAFaTh3g/BriCGHz0qvj70uCt2ZQ4tY6o2OotvN7e
+	5eW6w==
+X-Google-Smtp-Source: AGHT+IEUaE5gFGObzdCuRYpZfGsk182J7MxPdMrBzmOMMtr1Ni7Z3zepZYEbNNPafHgabCMvGQANepuJE5WmX6v9YmQ=
+X-Received: by 2002:a2e:96d1:0:b0:32e:deb2:f75 with SMTP id
+ 38308e7fff4ca-330534669e9mr33153591fa.23.1752502546483; Mon, 14 Jul 2025
+ 07:15:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
+In-Reply-To: <474a5321753aba17ec2819ba59adfd157ecfb343.1752501596.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 14 Jul 2025 10:15:34 -0400
+X-Gm-Features: Ac12FXwSbcDIs1Lgv9_LDVgaN6D5S1j9jFB7Rcef-B_YHU65F9CZ2tLxbwrw4JM
+Message-ID: <CABBYNZL0FjLf6NZ1U0Wo4cOyCfH=17FkN_6-CT1RqNdJVyMfZA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: ISO: add socket option to report packet seqnum
+ via CMSG
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, 
+	johan.hedberg@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add test
+Hi Pauli,
 
-ISO Receive Packet Seqnum - Success
----
- tools/iso-tester.c | 80 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 78 insertions(+), 2 deletions(-)
+On Mon, Jul 14, 2025 at 10:03=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> User applications need a way to track which ISO interval a given SDU
+> belongs to, to properly detect packet loss. All controllers do not set
+> timestamps, and it's not guaranteed user application receives all packet
+> reports (small socket buffer, or controller doesn't send all reports
+> like Intel AX210 is doing).
+>
+> Add socket option BT_PKT_SEQNUM that enables reporting of received
+> packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
+>
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> ---
+>
+> Notes:
+>     Intel AX210 is not sending all reports:
+>
+>     $ btmon -r dump.btsnoop -I -C90|grep -A1 'ISO Data RX: Handle 2304'
+>     ...
+>     > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1=
+713 [hci0] 22.567744
+>             dd 01 3c 00 6d 08 e9 14 1e 3b 85 7b 35 c2 25 0b  ..<.m....;.{=
+5.%.
+>     --
+>     > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1=
+718 [hci0] 22.573745
+>             de 01 3c 00 41 65 22 4f 99 9b 0b b6 ff cb 06 00  ..<.Ae"O....=
+....
+>     --
+>     > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1=
+727 [hci0] 22.587933
+>             e0 01 3c 00 8b 6e 33 44 65 51 ee d7 e0 ee 49 d8  ..<..n3DeQ..=
+..I.
+>     --
+>     > ISO Data RX: Handle 2304 flags 0x02 dlen 64                      #1=
+732 [hci0] 22.596742
+>             e1 01 3c 00 a7 48 54 a7 c1 9f dc 37 66 fe 04 ab  ..<..HT....7=
+f...
+>     ...
+>
+>     Here, report for packet with sequence number 0x01df is missing.
+>
+>     This may be spec violation by the controller, see Core v6.1 pp. 3702
+>
+>         All SDUs shall be sent to the upper layer including the indicatio=
+n
+>         of validity of data. A report shall be sent to the upper layer if
+>         the SDU is completely missing.
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 2c674171d..6aefb5196 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -477,6 +477,7 @@ struct test_data {
- 	bool reconnect;
- 	bool suspending;
- 	struct tx_tstamp_data tx_ts;
-+	int seqnum;
- };
- 
- struct iso_client_data {
-@@ -500,6 +501,9 @@ struct iso_client_data {
- 	bool pa_bind;
- 	bool big;
- 
-+	/* Enable BT_PKT_SEQNUM for RX packet sequence numbers */
-+	bool pkt_seqnum;
-+
- 	/* Enable SO_TIMESTAMPING with these flags */
- 	uint32_t so_timestamping;
- 
-@@ -1061,6 +1065,14 @@ static const struct iso_client_data listen_16_2_1_recv_pkt_status = {
- 	.pkt_status = 0x02,
- };
- 
-+static const struct iso_client_data listen_16_2_1_recv_pkt_seqnum = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.recv = &send_16_2_1,
-+	.server = true,
-+	.pkt_seqnum = true,
-+};
-+
- static const struct iso_client_data listen_16_2_1_recv_rx_timestamping = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -2204,11 +2216,51 @@ static gboolean iso_recv_data(GIOChannel *io, GIOCondition cond,
- 		return FALSE;
- 	}
- 
-+	if (isodata->pkt_seqnum) {
-+		struct cmsghdr *cmsg;
-+		uint16_t pkt_seqnum = 0;
-+
-+		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
-+					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-+			if (cmsg->cmsg_level != SOL_BLUETOOTH)
-+				continue;
-+
-+			if (cmsg->cmsg_type == BT_SCM_PKT_SEQNUM) {
-+				memcpy(&pkt_seqnum, CMSG_DATA(cmsg),
-+						sizeof(pkt_seqnum));
-+				tester_debug("BT_SCM_PKT_SEQNUM = 0x%2.2x",
-+							pkt_seqnum);
-+				break;
-+			}
-+		}
-+
-+		if (data->seqnum < 0)
-+			data->seqnum = pkt_seqnum;
-+		else
-+			data->seqnum++;
-+
-+		if (pkt_seqnum != data->seqnum) {
-+			tester_warn("isodata->pkt_seqnum 0x%2.2x != 0x%2.2x "
-+					"pkt_seqnum", pkt_seqnum, data->seqnum);
-+			tester_test_failed();
-+			return FALSE;
-+		}
-+	}
-+
- 	if (isodata->so_timestamping & SOF_TIMESTAMPING_RX_SOFTWARE)
- 		rx_timestamp_check(&msg);
- 
-+	if (data->step) {
-+		data->step--;
-+	} else {
-+		tester_test_failed();
-+		return FALSE;
-+	}
-+
- 	if (memcmp(buf, isodata->recv->iov_base, ret))
- 		tester_test_failed();
-+	else if (data->step)
-+		return TRUE;
- 	else
- 		tester_test_passed();
- 
-@@ -2220,6 +2272,7 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
- 	const struct iso_client_data *isodata = data->test_data;
- 	struct bthost *host;
- 	static uint16_t sn;
-+	int j, count;
- 
- 	tester_print("Receive %zu bytes of data", isodata->recv->iov_len);
- 
-@@ -2234,8 +2287,13 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
- 		return;
- 
- 	host = hciemu_client_get_host(data->hciemu);
--	bthost_send_iso(host, data->handle, isodata->ts, sn++, 0,
--				isodata->pkt_status, isodata->recv, 1);
-+
-+	count = isodata->pkt_seqnum ? 2 : 1;
-+	for (j = 0; j < count; ++j) {
-+		bthost_send_iso(host, data->handle, isodata->ts, sn++, 0,
-+					isodata->pkt_status, isodata->recv, 1);
-+		data->step++;
-+	}
- 
- 	data->io_id[0] = g_io_add_watch(io, G_IO_IN, iso_recv_data, data);
- }
-@@ -3093,6 +3151,20 @@ static gboolean iso_accept(GIOChannel *io, GIOCondition cond,
- 		}
- 	}
- 
-+	if (isodata->pkt_seqnum) {
-+		int opt = 1;
-+
-+		data->seqnum = -1;
-+
-+		if (setsockopt(new_sk, SOL_BLUETOOTH, BT_PKT_SEQNUM, &opt,
-+							sizeof(opt)) < 0) {
-+			tester_print("Can't set socket BT_PKT_SEQNUM option: "
-+					"%s (%d)", strerror(errno), errno);
-+			tester_test_failed();
-+			return false;
-+		}
-+	}
-+
- 	ret = iso_connect(new_io, cond, user_data);
- 
- 	g_io_channel_unref(new_io);
-@@ -3654,6 +3726,10 @@ int main(int argc, char *argv[])
- 						&listen_16_2_1_recv_pkt_status,
- 						setup_powered, test_listen);
- 
-+	test_iso("ISO Receive Packet Seqnum - Success",
-+						&listen_16_2_1_recv_pkt_seqnum,
-+						setup_powered, test_listen);
-+
- 	test_iso("ISO Receive - RX Timestamping",
- 					&listen_16_2_1_recv_rx_timestamping,
- 					setup_powered, test_listen);
--- 
-2.50.1
+We may want to report this to Intel, let me check internally.
 
+>     Regardless, it will be easier for user applications to see the HW
+>     sequence numbers directly, so they don't have to count packets and it=
+'s
+>     in any case more reliable if packets get dropped due to socket buffer
+>     size.
+>
+>  include/net/bluetooth/bluetooth.h |  9 ++++++++-
+>  net/bluetooth/af_bluetooth.c      |  7 +++++++
+>  net/bluetooth/iso.c               | 21 ++++++++++++++++++---
+>  3 files changed, 33 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index 114299bd8b98..0e31779a3341 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -244,6 +244,10 @@ struct bt_codecs {
+>
+>  #define BT_ISO_BASE            20
+>
+> +#define BT_PKT_SEQNUM          21
+> +
+> +#define BT_SCM_PKT_SEQNUM      0x05
+> +
+>  __printf(1, 2)
+>  void bt_info(const char *fmt, ...);
+>  __printf(1, 2)
+> @@ -391,7 +395,8 @@ struct bt_sock {
+>  enum {
+>         BT_SK_DEFER_SETUP,
+>         BT_SK_SUSPEND,
+> -       BT_SK_PKT_STATUS
+> +       BT_SK_PKT_STATUS,
+> +       BT_SK_PKT_SEQNUM,
+>  };
+>
+>  struct bt_sock_list {
+> @@ -475,6 +480,7 @@ struct bt_skb_cb {
+>         u8 pkt_type;
+>         u8 force_active;
+>         u16 expect;
+> +       u16 pkt_seqnum;
+
+We may also need the status or are you planning on reusing the
+existing pkt_status? In any case we may want to add something to
+iso-tester to confirm this is working as intended and catch possible
+regressions.
+
+>         u8 incoming:1;
+>         u8 pkt_status:2;
+>         union {
+> @@ -488,6 +494,7 @@ struct bt_skb_cb {
+>
+>  #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
+>  #define hci_skb_pkt_status(skb) bt_cb((skb))->pkt_status
+> +#define hci_skb_pkt_seqnum(skb) bt_cb((skb))->pkt_seqnum
+>  #define hci_skb_expect(skb) bt_cb((skb))->expect
+>  #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
+>  #define hci_skb_event(skb) bt_cb((skb))->hci.req_event
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index 6ad2f72f53f4..44b7acb20a67 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -364,6 +364,13 @@ int bt_sock_recvmsg(struct socket *sock, struct msgh=
+dr *msg, size_t len,
+>                         put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_STATUS,
+>                                  sizeof(pkt_status), &pkt_status);
+>                 }
+> +
+> +               if (test_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags)) {
+> +                       u16 pkt_seqnum =3D hci_skb_pkt_seqnum(skb);
+> +
+> +                       put_cmsg(msg, SOL_BLUETOOTH, BT_SCM_PKT_SEQNUM,
+> +                                sizeof(pkt_seqnum), &pkt_seqnum);
+> +               }
+
+In case we want to reuse the pkt_status then perhaps the order shall
+be pk_seqnum followed by pkt_status otherwise we need a struct that
+holds them both.
+
+>         }
+>
+>         skb_free_datagram(sk, skb);
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index fc22782cbeeb..469450bb6b6c 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -1687,6 +1687,17 @@ static int iso_sock_setsockopt(struct socket *sock=
+, int level, int optname,
+>                         clear_bit(BT_SK_PKT_STATUS, &bt_sk(sk)->flags);
+>                 break;
+>
+> +       case BT_PKT_SEQNUM:
+> +               err =3D copy_safe_from_sockptr(&opt, sizeof(opt), optval,=
+ optlen);
+> +               if (err)
+> +                       break;
+> +
+> +               if (opt)
+> +                       set_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
+> +               else
+> +                       clear_bit(BT_SK_PKT_SEQNUM, &bt_sk(sk)->flags);
+> +               break;
+> +
+>         case BT_ISO_QOS:
+>                 if (sk->sk_state !=3D BT_OPEN && sk->sk_state !=3D BT_BOU=
+ND &&
+>                     sk->sk_state !=3D BT_CONNECT2 &&
+> @@ -2278,7 +2289,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon, =
+__u8 reason)
+>  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>  {
+>         struct iso_conn *conn =3D hcon->iso_data;
+> -       __u16 pb, ts, len;
+> +       __u16 pb, ts, len, sn;
+>
+>         if (!conn)
+>                 goto drop;
+> @@ -2308,6 +2319,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff=
+ *skb, u16 flags)
+>                                 goto drop;
+>                         }
+>
+> +                       sn =3D hdr->sn;
+>                         len =3D __le16_to_cpu(hdr->slen);
+>                 } else {
+>                         struct hci_iso_data_hdr *hdr;
+> @@ -2318,18 +2330,20 @@ void iso_recv(struct hci_conn *hcon, struct sk_bu=
+ff *skb, u16 flags)
+>                                 goto drop;
+>                         }
+>
+> +                       sn =3D hdr->sn;
+>                         len =3D __le16_to_cpu(hdr->slen);
+>                 }
+>
+>                 flags  =3D hci_iso_data_flags(len);
+>                 len    =3D hci_iso_data_len(len);
+>
+> -               BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", =
+len,
+> -                      skb->len, flags);
+> +               BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x sn=
+ %d",
+> +                      len, skb->len, flags, sn);
+>
+>                 if (len =3D=3D skb->len) {
+>                         /* Complete frame received */
+>                         hci_skb_pkt_status(skb) =3D flags & 0x03;
+> +                       hci_skb_pkt_seqnum(skb) =3D sn;
+>                         iso_recv_frame(conn, skb);
+>                         return;
+>                 }
+> @@ -2352,6 +2366,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff=
+ *skb, u16 flags)
+>                         goto drop;
+>
+>                 hci_skb_pkt_status(conn->rx_skb) =3D flags & 0x03;
+> +               hci_skb_pkt_seqnum(conn->rx_skb) =3D sn;
+>                 skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb-=
+>len),
+>                                           skb->len);
+>                 conn->rx_len =3D len - skb->len;
+> --
+> 2.50.1
+>
+
+
+--=20
+Luiz Augusto von Dentz
