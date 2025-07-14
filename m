@@ -1,35 +1,36 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631EA341AA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 20:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A952E370F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 20:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752526081; cv=none; b=QHADG8lsaPMPVf2DAbCs2m1ivronloQGM8wEQzwSsKccRKoZfTiTPGgUoOikJWnFoMLk0Cugo+EK7kXj04fA2adJdi8i1tKcJYaLeY7Fb8mmSkwKYyLNrZkgPRhkIXO0DdTnJYuoFdB1vj2mwBtP4jP/YN5Ge8l2unIshOnsk5Y=
+	t=1752526446; cv=none; b=c6paKNQHIv8FC2NEZpjigkvn/7xnKvbH0uPojXGaCtYLH4HqoKLVyZ4ZO+wjXw4QF6wCUuEHdZXZpbyIVJCH4RwOtooEjdqKEpJarKgIZM9D4CEQRp5QhKGwEIU8D6v5DWaO+I3PiwhGCdaS7FGZzcY2mvWuPHB0dYGL9FO+h8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752526081; c=relaxed/simple;
-	bh=HqGitRDEd3ngFP0PTQGAFoI34FVu8kXeXU8ZJab67UU=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Oaxw1hLk8NjIX+5sJNlY09DxSnhnnNiY43Fs4IdPqhkNIy6tgE5JoAxfMsek0mf4/j6hhl1QL2HKA6RbXHpwQ9yaXmdfmnOhRj+DRmA7OrxyHgzzWkAIwhQwbJC2I9fYNW7Eu26Q7iiJFNZgDKYmHbxjoT694GrlToKUFTymYzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=QrLJtMeB; arc=none smtp.client-ip=192.30.252.200
+	s=arc-20240116; t=1752526446; c=relaxed/simple;
+	bh=gfIa1nbux0YOaXQKcPLTUGHRJaw2nIjG0JcYSMp0SWA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qujcRK2QY831nxA+llBlZkJuEXFEkmCpDxXhui032oJxAbZcctZ0whfCF4X5aaqWYuRvO4MQ1Gyt6AzW0J+DAjcaxk48Fq8sk3GGrn5JICR3nkJVlgkrcbpWvU+395qKlfnLxjlF7kb6+lClFah49Ame8KRDHBwWIY+qW38qqzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gBq4jSzx; arc=none smtp.client-ip=192.30.252.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="QrLJtMeB"
-Received: from github.com (hubbernetes-node-d78fc17.va3-iad.github.net [10.48.142.30])
-	by smtp.github.com (Postfix) with ESMTPA id 429E74E05DB
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 13:47:59 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gBq4jSzx"
+Received: from github.com (hubbernetes-node-c9acc27.ac4-iad.github.net [10.52.171.46])
+	by smtp.github.com (Postfix) with ESMTPA id CF7566410D3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 13:54:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1752526079;
-	bh=hVhxrCO6asAmpdIte10xO5Pk7wCzB+ZPvMF4YSHxsHU=;
+	s=pf2023; t=1752526443;
+	bh=cuQdXPpH4+OTE2PKzTSSSV5NVeOstoyMKK/LTAzc4bQ=;
 	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=QrLJtMeBoOPd3T3vviMz3p+SEA0wj0UA79VU7Pr5LJSmS1Ei1a+AGB8iqWkmAVqug
-	 QnjUA+C/7mSs7sWC6hNQb+hieEiB/bDuGPueqXBlW9f4vButxueJPe0aEPi3vaNXiO
-	 sH60au7FaSyTrLKTwxoZfkmZ/7AhuJaPCZowuqts=
-Date: Mon, 14 Jul 2025 13:47:59 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	b=gBq4jSzxzKMeVY/xdDEAT+jHaXjQIaoB+h8SHvz83hrW0fdbwV6eYtf0ywESY2fyb
+	 x1TtGa4o45FanyGbWjaotxer0aQwBK6WCrVwiQSHe07VbOCMetWYOq7v1z9F+qJI6H
+	 1s0+n5OLkgr+2cnWzmbaUmycz6GkODsuQz9N8B84=
+Date: Mon, 14 Jul 2025 13:54:03 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/982213/000000-e40ecb@github.com>
-Subject: [bluez/bluez] 77cfff: device: Add btd_device_bdaddr_type_connected
+Message-ID: <bluez/bluez/push/refs/heads/master/806dd7-b0a138@github.com>
+Subject: [bluez/bluez] 468c58: monitor: Add sequence number and SDU length to
+ ISO...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,108 +43,95 @@ Content-Transfer-Encoding: 7bit
 X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
 X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/982213
+  Branch: refs/heads/master
   Home:   https://github.com/bluez/bluez
-  Commit: 77cfff3ba001d10369c9844bf01379764758d3a0
-      https://github.com/bluez/bluez/commit/77cfff3ba001d10369c9844bf01379764758d3a0
+  Commit: 468c5877c3badced2c18e765d4a68d8b5d89e759
+      https://github.com/bluez/bluez/commit/468c5877c3badced2c18e765d4a68d8b5d89e759
   Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
   Date:   2025-07-14 (Mon, 14 Jul 2025)
 
   Changed paths:
-    M src/device.c
-    M src/device.h
+    M lib/hci.h
+    M monitor/packet.c
 
   Log Message:
   -----------
-  device: Add btd_device_bdaddr_type_connected
+  monitor: Add sequence number and SDU length to ISO packets
 
-This adds btd_device_bdaddr_type_connected which can return the
-connected state based on the address type.
+This prints sequence number and SDU length of ISO packets:
+
+> ISO Data RX: Handle 2304 SN 48 flags 0x02 dlen 64 slen 60
 
 
-  Commit: 74009521222ddfd7c757ce40f03e5e07ea3fe489
-      https://github.com/bluez/bluez/commit/74009521222ddfd7c757ce40f03e5e07ea3fe489
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: 893a47e5beb1aa1391fddb8614245d9f277920c0
+      https://github.com/bluez/bluez/commit/893a47e5beb1aa1391fddb8614245d9f277920c0
+  Author: Pauli Virtanen <pav@iki.fi>
   Date:   2025-07-14 (Mon, 14 Jul 2025)
 
   Changed paths:
-    M Makefile.am
-    A doc/org.bluez.Bearer.BREDR.rst
-    A doc/org.bluez.Bearer.LE.rst
+    M doc/l2cap.rst
+    M doc/sco.rst
 
   Log Message:
   -----------
-  doc: Add org.bluez.Bearer.LE and org.bluez.Bearer.BREDR
+  doc: explain SCO and L2CAP timestamping related socket features
 
-This adds bearer specific interfaces so they can properly be operated
-separately.
-
-Fixes: https://github.com/bluez/bluez/issues/1350
+Add explanations and examples for SCO and L2CAP timestamping-related
+features.
 
 
-  Commit: 84e94e1a638c35d757ed6625840684fd2f7c0659
-      https://github.com/bluez/bluez/commit/84e94e1a638c35d757ed6625840684fd2f7c0659
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: db061936394d6e625c33d4e34a9f639cd3df1328
+      https://github.com/bluez/bluez/commit/db061936394d6e625c33d4e34a9f639cd3df1328
+  Author: Pauli Virtanen <pav@iki.fi>
   Date:   2025-07-14 (Mon, 14 Jul 2025)
 
   Changed paths:
-    M Makefile.am
-    A src/bearer.c
-    A src/bearer.h
-    M src/device.c
+    M lib/bluetooth.h
+    M src/shared/util.c
+    M tools/iso-tester.c
 
   Log Message:
   -----------
-  bearer: Add initial implementation of org.bluez.Bearer.{BREDR, LE}
+  lib: tools: remove POLL_ERRQUEUE
 
-This adds initial implementation of org.bluez.Bearer{BREDR, LE}(5)
-interfaces.
+This experimental feature did not land to mainline kernel, and probably
+would need to be done differently.
+
+Remove defines and tests for it.
 
 
-  Commit: 8873ae3b92776df520d45e37f3f5d46656f982ac
-      https://github.com/bluez/bluez/commit/8873ae3b92776df520d45e37f3f5d46656f982ac
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: 9e117ebee13f591a7a0376f31229c715348860b0
+      https://github.com/bluez/bluez/commit/9e117ebee13f591a7a0376f31229c715348860b0
+  Author: Pauli Virtanen <pav@iki.fi>
   Date:   2025-07-14 (Mon, 14 Jul 2025)
 
   Changed paths:
-    M client/main.c
+    M lib/bluetooth.h
 
   Log Message:
   -----------
-  client: Add support for org.bluez.Bearer.{BREDR, LE}1
+  lib: add BT_PKT_SEQNUM and BT_SCM_PKT_SEQNUM
 
-This adds support for printing properties related to
-org.bluez.Bearer.{BREDR, LE}1:
-
-> info XX:XX:XX:XX:XX:XX
-...
-	BREDR.Paired: yes
-	BREDR.Bonded: yes
-	BREDR.Connected: no
-	LE.Paired: yes
-	LE.Bonded: yes
-	LE.Connected: no
-...
-[CHG] BREDR XX:XX:XX:XX:XX:XX Connected: yes
+Socket options and CMSG identifier for ISO packet sequence numbers.
 
 
-  Commit: e40ecb4745442b0bc6c5e53616298531b08bf931
-      https://github.com/bluez/bluez/commit/e40ecb4745442b0bc6c5e53616298531b08bf931
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: b0a1386f98c25af7db83c7ca42a13878e55e1365
+      https://github.com/bluez/bluez/commit/b0a1386f98c25af7db83c7ca42a13878e55e1365
+  Author: Pauli Virtanen <pav@iki.fi>
   Date:   2025-07-14 (Mon, 14 Jul 2025)
 
   Changed paths:
-    M client/main.c
+    M tools/iso-tester.c
 
   Log Message:
   -----------
-  client: Rework handling of Disconnected signal
+  iso-tester: add tests for BT_PKT_SEQNUM
 
-Print with color the signal to indicate there is a change, also rework
-the order of the parameters and use bearer specific suffix if the signal
-comes from org.bluez.Bearer.*.
+Add test
+
+ISO Receive Packet Seqnum - Success
 
 
-Compare: https://github.com/bluez/bluez/compare/77cfff3ba001%5E...e40ecb474544
+Compare: https://github.com/bluez/bluez/compare/806dd732fcda...b0a1386f98c2
 
 To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
