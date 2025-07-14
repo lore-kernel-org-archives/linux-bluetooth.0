@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323BF2309B3;
-	Mon, 14 Jul 2025 20:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F9B25FA05
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 20:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752526786; cv=none; b=jy0meB6wfgBTlF4oXYAPDxrqQAmadyninB44wxpheC0dVLj2vJo1O94T/oHx6V6EvVZuguJNB8JeTCz2RA4xiiyKTrU+FJQnbQupey4B8zvkI1x9JpIpz3gmMzbEbRCkk7EzGKCWHencY5DrpWXg6lCdQIXrExe8iZNv1oCke00=
+	t=1752526789; cv=none; b=J5oXNZOlRpTW+xiNLhoOXNODWYbTB4hYq/9VIJHmloy3Kg+syjF8Upx0+TEI0InFtlKRNthzm+4xBNAGnF+R7kS7/pX0r3L0e/RjEbjy9t+d/BQdX3ZnRKV62CA9n22IfkfPWOnLvkn1k29rt3eLT4B38aqv7a3gqzRz6EjJLow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752526786; c=relaxed/simple;
-	bh=AKg3u/1beg9ku7KUMG0/joiB9u+EyqGoTep9cjfVYkA=;
+	s=arc-20240116; t=1752526789; c=relaxed/simple;
+	bh=6kxdVKaC2zdB75NIaMOvkzb8+oFYim6vzVN7sEI05tY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qhFjWDVSH/39MjHZ4f5GW2c+Bww5Hx9WahaTnsH4LFcGB9LOFkJc7isk9VCxkS8wxnLLCp1DN02uemXtjkqBGMKZGhSLgilCQYqPmL8Q7Uyf2CZuBsJVi10+VdIg3GCF1tdJMy58Tusp+wJe3t9LsKt6jYKpWZGS94u98qZOqZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gc2/GmZu; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=etO2X9uVH/4j/9J3nVReQfwBzMhFdtFg9U+5GD/xM0Z3s8g/tazx68oy8rK0og9t7eDFHM1aXXTFjuQ42zSqUoiiZpcwdZEPdUbgEYvRc6i1UspPp+wtoUiaeR/PVpcJQJfnHPp1UlCm69kofbnj7GI8gwzNJAWhQEENNQQ+5bA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=od5L20B1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gc2/GmZu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 976DEC4CEED;
-	Mon, 14 Jul 2025 20:59:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="od5L20B1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 808ACC4CEED;
+	Mon, 14 Jul 2025 20:59:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752526785;
-	bh=AKg3u/1beg9ku7KUMG0/joiB9u+EyqGoTep9cjfVYkA=;
+	s=k20201202; t=1752526788;
+	bh=6kxdVKaC2zdB75NIaMOvkzb8+oFYim6vzVN7sEI05tY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gc2/GmZupd273ndF9fZ++59H3lKj1CVkT6bBnevagiuTfX/RGF1xSotpgYN5oMLRP
-	 //GTOR9z7UW2mkNcH7UPnqGF16eJ+aFrYACgRbMzl962cfLrrkpRMZoXBBsdkBhFOF
-	 bTQiz4SkvEq7Jf/olxaRxdy52re7lfSqQZ+XOjDgnxN6TTVXpqhRTB1x93RVcriD/5
-	 Q5DWWeWmyO7vk7+42WZHoI0hwSF/UYsPZAxeY+VsNtFKB3K1mHq9lxF2olt0zIXSLR
-	 l26G1Le1GkDXoPHtdi71OTEWK04r7oTYtHklQAROpJTSLofLaCB46+MPpr0QxQ1EQH
-	 JXVS6ZB8floRQ==
+	b=od5L20B1kF8f7+F1Nt/EM+47Tn6TUlydT++aCYL0k8+dbyag7WlGLuReKL0EBUJIT
+	 uTwvXGnzsQ7B1myKX6rJtZYDSuoT/QFEx1NSc2qKFZwVW75wDJ/AtXKb0h/AoprsT6
+	 btuZt7j56NWYJhDnOGLYs2p6gvsTrhxzzcBP2kb9Jk9lbiNPk0M7ZvR/LwIuqHO8xo
+	 dlwQF51mkGKkdAr3dVJatbi25TvCfZ6EnzdCP6YSWTwRKc+85T39xYhMy6cXloAX1i
+	 5GEOFOyyhP3C36XTv9aQrLeSoxHhDQEDX0RDcm0UfBQvcD1Kjft0G2PAa7JGCDMPOZ
+	 VLwAdJo715kBw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD5D383B276;
-	Mon, 14 Jul 2025 21:00:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id A17F9383B276;
+	Mon, 14 Jul 2025 21:00:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,43 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: ISO: add socket option to report packet
- seqnum
- via CMSG
+Subject: Re: [PATCH BlueZ] doc: explain SCO and L2CAP timestamping related
+ socket
+ features
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <175252680551.3985397.8458330929215889889.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Jul 2025 21:00:05 +0000
+ <175252680949.3985397.4487302451635893257.git-patchwork-notify@kernel.org>
+Date: Mon, 14 Jul 2025 21:00:09 +0000
 References: 
- <712e0e6752a8619bdde98d55af0a9e672aa290c2.1752511130.git.pav@iki.fi>
+ <8968b3ef55340c6d7b16c33685aa87e3368b526f.1752514576.git.pav@iki.fi>
 In-Reply-To: 
- <712e0e6752a8619bdde98d55af0a9e672aa290c2.1752511130.git.pav@iki.fi>
+ <8968b3ef55340c6d7b16c33685aa87e3368b526f.1752514576.git.pav@iki.fi>
 To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 14 Jul 2025 19:40:37 +0300 you wrote:
-> User applications need a way to track which ISO interval a given SDU
-> belongs to, to properly detect packet loss. All controllers do not set
-> timestamps, and it's not guaranteed user application receives all packet
-> reports (small socket buffer, or controller doesn't send all reports
-> like Intel AX210 is doing).
-> 
-> Add socket option BT_PKT_SEQNUM that enables reporting of received
-> packet ISO sequence number in BT_SCM_PKT_SEQNUM CMSG.
-> 
-> [...]
+On Mon, 14 Jul 2025 20:36:35 +0300 you wrote:
+> Add explanations and examples for SCO and L2CAP timestamping-related
+> features.
+> ---
+>  doc/l2cap.rst | 166 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  doc/sco.rst   | 168 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 330 insertions(+), 4 deletions(-)
 
 Here is the summary with links:
-  - [v2] Bluetooth: ISO: add socket option to report packet seqnum via CMSG
-    https://git.kernel.org/bluetooth/bluetooth-next/c/b3a08d3efd5c
+  - [BlueZ] doc: explain SCO and L2CAP timestamping related socket features
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=893a47e5beb1
 
 You are awesome, thank you!
 -- 
