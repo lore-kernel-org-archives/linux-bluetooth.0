@@ -1,144 +1,111 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D840275B03
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622A31E5018
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752570774; cv=none; b=Eek34q4Z1R9GArGmnJZ2yO2Idb2nGaKUC0DbL5ReRYsh938Y/oXoLIaewIvkB3uSR0hS+9S1wYYqbsOCulbGPsi7+8dfbGX6rD9GAZaRgp6jPjN/vPJ1jv01e/1ca2FN0jzU38HgqXztmsZlkwtW10Nn59d4U0S6uiF7TRoEJfA=
+	t=1752571706; cv=none; b=PhNUluuLWyLgE5dWInBQYjUpc0XgwDSTIqhd4tKhfxSgL2pNv2c582u8f2VPIIt/V7nn6/lomHOOZArVAk/bkShQkR90U1oH2MAwJY4Mjxt7uthh7YTXviyrd3D0t41MgjE5aKEArp5EWcUl9POQe8KHvHz/Av6ldrl5jW6UZLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752570774; c=relaxed/simple;
-	bh=nQBArhL1fpXczSe/0o7z2BgRBvZFm0FMWbtMWPTW/oE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Af9LsvdrkC6Q5+/HEYrMdrR4CRVb3DIgtUSHSjK/7XhL4ipmqzZfrE0el32tw6TQhE5ZYuJRnirzIwG9gvRG8zLTcDlm51zlpa0CdlyBMvITcnkS13fqDCBO172uMddsfvX3hGn1njfi+EXVsD62nzoTievDF5YcQpvsKxByzEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZJtfPuBu; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1752571706; c=relaxed/simple;
+	bh=G0UPft5dIQLFYQN+FRXxj2ezVzZXTGT0e8XAqZRn7f4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=cCjga5E3+E5wrgA2CKRFjGPhkbTq66Nq9g4iBvyXcWzseiM+dcoKPD0GjUdxDgfm54h1/FCs7tHQuJnPpUTS5vZOEcuxGZ2p0U88CKYjg4nLfmpuKOSf2uP+5uS2yj2Gb8ujxd1hdUPtLk8c05oG0q6q6/Jfl5J9f/CJZCDIgsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fD8PcZJr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZJtfPuBu"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56F5c7Co026351
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:12:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	v2rCrP0gitYkz61kp4FaGz7nVfzNXIt3MBJTuyV54Lo=; b=ZJtfPuBuxu4xWIB4
-	TJLMba6vSPa6JAikg6E06A1I+YCdrlTyzUW52BrroqkX9Fh6thGZecK7jJtaS+G5
-	peoKLdOmFzQmqp7ujZMevx9m+UUtXEDujm3KiilxWublRNxI3EtJsnCWzgncEGZc
-	7CI4pxeg2xiqR+yFRIX8gLaAVTxP2FHKFnenMw5VvJfTEpMkgJ1LV1UamEVUPV1u
-	S23C07aOjpSyhoqtqrq0puFzF4Gfvg7RZvN01kfioW0Fp2K2Get3lUfUvs0F+K/J
-	AKQTyii2m6k7f3w/2V+YmUciu36RjpHvvv7ivvAB1o3DzWfPXDK5cwtxS2TEcWDR
-	juTC8g==
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47w5drjbq9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:12:52 +0000 (GMT)
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4ab5e4f4600so2935961cf.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 02:12:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752570771; x=1753175571;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v2rCrP0gitYkz61kp4FaGz7nVfzNXIt3MBJTuyV54Lo=;
-        b=M4xzdIQf9DWUdknX+pj4gbq3B7mpx5ilqttpn5yRwLsoKP2gYQpiWELrZdsbj+RxOn
-         cQMLfI3N+GPR7CPSw/QOQxBxV++o/boiS0uAEHJqqheYBg3C7Y5EtILyGied6wyKDkua
-         J9OqYRPMXKRdH+My0fwYHqhNAzHUPu26nKx+hC/GoxcN6rBwfocQdGymjBN2TqFfJBLF
-         MgQCd39umu+uX+qfp9TiT8Ie4CYVgcuqOu0mEjIrM1dsNFU0QTMczWl+8/+lu1rexeri
-         SCfuPrarv+e2FF53w/8mmhEwEUCPcbSaJnOSIubuqj2Lnkc/5UeWFxhYwtPzDB6GrVTJ
-         ttOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXebug6DWI9pw87M/pXorVbURrFApN+rAP97z6bPf+jafvaktGF8V9BGtE7YoG586zESOwtO/QSycd/sg+9PlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQbQTwyUhLjVuzH6xuBs33Iyf5gNrwzjo384hmL5gecJYQH2d0
-	TuphpNODPysLOIyag31IjnwpQ7nOtY0FD2CrUhGtoMbEBYtbkyBfrr4NoFr4TU3ZfOGOQ+/sCCh
-	TqCds1SDQecIUGn+9LmdFUVUY+/EUfsI4ojnL5FV+p8FvE129sIS9XBuKuKpzHOW08gFZsCE=
-X-Gm-Gg: ASbGncv8crN9jd+KyntYRyZIf/FihKKknokVazh+cDO4EiCuqQm6XU2Mbg+7vgCoD9a
-	Bj6QPFmhljHgB9/CFUGovNBwaqL94yxeY+1cl5tZlzdVit3mNYf+oXVDw4d7a3NDAframpwTO6w
-	hQLqPE88NSUFPHMlUCHkbVHI5qDtCwB++hpGzrFNhVjqMR4vGQsOhtYsldQ8YR6MNICsJCXy6F7
-	hrFc5RjwzuQz5US4zDk7qY8Qf+LgF+IUV5mhymuRCq1LCxj7416pEl2uMaEwbMcUUBlLKwl1Lfc
-	aLxdUOMq0YlZH95WYyKnKq2i/ZZHPFoWABMnLBvEk6kGKtLKNWnAYkrHC6GR42RB1CNGMY1Text
-	LvCFM+ds561RXY6UbFtpF
-X-Received: by 2002:a05:622a:4a08:b0:4ab:635b:a309 with SMTP id d75a77b69052e-4ab86c9cfc2mr5190331cf.0.1752570771099;
-        Tue, 15 Jul 2025 02:12:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGzWwnPodE6Q+Kq7WShiNEjqjIhyPVP6HIt1NVt2xIwm4w220wZPwscEj953VSTSXm27X71GQ==
-X-Received: by 2002:a05:622a:4a08:b0:4ab:635b:a309 with SMTP id d75a77b69052e-4ab86c9cfc2mr5190181cf.0.1752570770632;
-        Tue, 15 Jul 2025 02:12:50 -0700 (PDT)
-Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e82635aasm951769066b.84.2025.07.15.02.12.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 02:12:50 -0700 (PDT)
-Message-ID: <2df40d26-7874-4398-bc18-0122dd197c90@oss.qualcomm.com>
-Date: Tue, 15 Jul 2025 11:12:48 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fD8PcZJr"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F1772C4CEE3;
+	Tue, 15 Jul 2025 09:28:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752571706;
+	bh=G0UPft5dIQLFYQN+FRXxj2ezVzZXTGT0e8XAqZRn7f4=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=fD8PcZJrij86wcfSo/GBKojo2N/TLGzmMFf4OhBAJgOZkpnl0fBI5C+fhn4mpBaq/
+	 rolPrcB+LJwQ+PWnctHtlbtizlCGfUTyMCHAVYzwCCAha1efDaDYBYZt6Mg5ZZtIRc
+	 bzQmp3YweUMdJr4W0/9JM+mtjS5IeXEKQhUo2QVwKGq8TJR4mnBSW1CZGRc+fhJ47R
+	 QR8fFQfnV0+C8qgAydchm43fko8RkkqT+1EPg3GHreL57mNoJQRuoWRxUUzluth4mS
+	 rqh+SKrP5X/r5z15Gt5Ak2A7xSmXnQTQt/EDYzYajaegnb+BNt+IAXc+pCnNHdwSDx
+	 E6NjOOK4yAh3g==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1623C83F1D;
+	Tue, 15 Jul 2025 09:28:25 +0000 (UTC)
+From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
+Date: Tue, 15 Jul 2025 17:28:20 +0800
+Subject: [PATCH bluez v2] adapter: Fix RemoveDevice timeout when device
+ already disconnected
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] driver: bluetooth: hci_qca: Multiple triggers of SSR
- only generate one coredump file
-To: Shuai Zhang <quic_shuaz@quicinc.com>, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Cc: quic_bt@quicinc.com
-References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
- <20250715051618.724475-4-quic_shuaz@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250715051618.724475-4-quic_shuaz@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: O4cqPOH6FgnAd56MIwkVO6GCBds8j47j
-X-Authority-Analysis: v=2.4 cv=D4xHKuRj c=1 sm=1 tr=0 ts=68761b94 cx=c_pps
- a=JbAStetqSzwMeJznSMzCyw==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8 a=SXdkGL_ce-MxmC-6jFEA:9
- a=QEXdDO2ut3YA:10 a=uxP6HrT_eTzRwkO_Te1X:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: O4cqPOH6FgnAd56MIwkVO6GCBds8j47j
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDA4MiBTYWx0ZWRfXxy0IYk9G5W2K
- MT9i+8r8ng1zdMi6YXNZu7IZl2yYUS7Z9Js8Ro0pg53PFSeTE5sbAgYBfZynU7N3gzPc1jxR5xg
- HSf/KFMUu5Tu/xwCEJmgkarEZgGmrdyJTaF6DOeD6HCdISAhQGg5Ls4A+L4ekhB89c/bzVpUQMo
- kWAXb2n72b8T2pw0I0HLtctwA8GL32UBV3ZBfMG3igso+Y2Dn6n/phOPsvzilbwXzs4LEQCx5w0
- VGG8w+yjjwYvzXw98C7Roem5LZ0H2iEgxZN/jePGYG4DfrQ8aOYZGKNSJ5zf2pwAIUgCSk5mqwK
- +HGcsG0tpKmlgh5fNxPErHdFpxvgq8DuHtz9QyAa2u/PZc0MlCUsKGeEB9Tx0CBaWg7B2dI79/+
- UO/dWrOWcLbpdfGgQX6OEY4J/Ts8k1eG/eNZjqK3IvYDQRvfo4KqduQhfBKwAmhIb7u+93Sz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-14_03,2025-07-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxlogscore=999 impostorscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 suspectscore=0 bulkscore=0 mlxscore=0
- priorityscore=1501 phishscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507150082
+Message-Id: <20250715-adapter-rm-device-v2-1-f0ab3cc19391@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIADMfdmgC/32NTQ6CMBCFr0JmbU1nmiK68h6GRS0DTAKUtEhUw
+ t1tOIDL9/e9DRJH4QS3YoPIqyQJUxZ0KsD3bupYSZM1kCarL0jKNW5eOKo4qib3PSsk59iWFsk
+ i5N0cuZX3wXzAc3jxF+ps95KWED/H04pH+Ae6okJV6arUxhhsr3R34xA68WcfRqj3ff8Be2HnA
+ rsAAAA=
+X-Change-ID: 20250712-adapter-rm-device-12aae5651251
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752571703; l=1753;
+ i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
+ bh=aRYY/vO2OoTvt8VDTw7QQrqM9HHCwW+KWQTERufvvx4=;
+ b=3wcmnaUbnZSFcOVFDcuNyv8eJRU2h5ka+AAeuSVCj50G6diYzyf/RcoB9tXcUf1AI0/iylKbo
+ Lf5KXX9lHg5A2HotbN0DLsxXj8sJcD6TePFF9+r7WytPQ1Y3Lc3mgPV
+X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
+ pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
+X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
+ auth_id=348
+X-Original-From: Ye He <ye.he@amlogic.com>
+Reply-To: ye.he@amlogic.com
 
-On 7/15/25 7:16 AM, Shuai Zhang wrote:
-> Multiple triggers of SSR only first generate coredump file,
-> duo to memcoredump_flag no clear.
-> 
-> add clear coredump flag when ssr completed.
-> 
-> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-> ---
->  drivers/bluetooth/hci_qca.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index a17d3f7ae..e836b2c29 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1661,11 +1661,14 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->  	 *
->  	 * Host will not download the firmware after SSR, controller to remain
->  	 * in the IBS_WAKE state, and the host needs to synchronize with it
-> +	 *
-> +	 * clear memcoredump_flag to ensure next submission of coredump date.
->  	 */
->  	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
->  		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
->  		clear_bit(QCA_IBS_DISABLED, &qca->flags);
->  		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
-> +		qca->memdump_state = QCA_MEMDUMP_IDLE;
->  		msleep(50);
+From: Ye He <ye.he@amlogic.com>
 
-Same comment as patch 2
+When attempting to use RemoveDevice to delete a BIS source device that
+was synchronized by the BIS sink scan delegator, the kernel marks the
+device as disconnected due to PA(period adv) sync termination. However, BlueZ is not
+notified of this disconnection and still proceeds to send MGMT Disconnect
+command. The kernel responds with MGMT_STATUS_DISCONNECTED, which BlueZ
+does not currently handle as a successful case. As a result, the RemoveDevice
+call never completes and no D-Bus reply is returned.
 
-Konrad
+Fixes: https://github.com/bluez/bluez/issues/1421
+
+Signed-off-by: Ye He <ye.he@amlogic.com>
+---
+This patch fix org.bluez.Adapter1.RemoveDevice method call timeout
+when device already disconnected.
+---
+Changes in v2:
+- EDITME: modify the title of commit message.
+- Link to v1: https://patch.msgid.link/20250712-adapter-rm-device-v1-1-808603331f92@amlogic.com
+---
+ src/adapter.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 79802300bedf4b25cb7c6bc3ea659c122a01efcb..5d68fa4c7dea251af4ff3b05a1ad66204c847c37 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -8619,7 +8619,8 @@ static void disconnect_complete(uint8_t status, uint16_t length,
+ 	const struct mgmt_rp_disconnect *rp = param;
+ 	struct btd_adapter *adapter = user_data;
+ 
+-	if (status == MGMT_STATUS_NOT_CONNECTED) {
++	if (status == MGMT_STATUS_NOT_CONNECTED ||
++		status == MGMT_STATUS_DISCONNECTED) {
+ 		btd_warn(adapter->dev_id,
+ 				"Disconnecting failed: already disconnected");
+ 	} else if (status != MGMT_STATUS_SUCCESS) {
+
+---
+base-commit: 806dd732fcda584fa6c44322a74373d2b739c781
+change-id: 20250712-adapter-rm-device-12aae5651251
+
+Best regards,
+-- 
+Ye He <ye.he@amlogic.com>
+
+
