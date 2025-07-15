@@ -1,216 +1,169 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FCD2CCC5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 05:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5460E238C1B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752558086; cv=none; b=fu4lCL7sGb5pASiTXxxe9Va05YgWbDGQ5eOl6DCUr57+aHAMOMBngmpJWNPf8fTMISlx/xH+zc8/7RalxDolah1AiKu7Ey74sAc543y5U/7LSrukIdGwJzuGJn7ymF5aedkAyhsGxd5ZYwV6fr6QQbNMwaBjjUnDgfY6kMrNsLU=
+	t=1752570703; cv=none; b=VtlfrzNZCfGUpFfHzHju3r7UgEA4csjv0mRFxh/WzVkRkOJak64lPzv1YzHq7OeUyxyolx7icO99/RELTq5u6nvpbiBylBPAtZDtwk+oJfeHC18gcBOAf6dO53ot3esHwQPzDlQ/8zH3sf4MJIRYFWIZHqVO9oOdfjOnnT8yCgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752558086; c=relaxed/simple;
-	bh=Q1Hv/La1TJ9Ewj61d3z+AUMa5o8IZB9Zdz2AMpg7mz0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mBbjWXZmi8LO1M0IidCjPH5XV61LBoIOxy6HCZ+2r0qZxWyZRYVjR2ZutEPUN1dITRhmeOy2/FlfYNbHtpBymI3WITMZSXhRFVDubZ7xHUcks/lXlQ83qsmMyb7VLIGE85bhC6dGKgkOV1QKZYfIlGTtB6r75Ho2Wfb/rOAGEAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XaXACi8Z; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752570703; c=relaxed/simple;
+	bh=i6H0SoP9g7Mh40PXCCzXn7OVTXXgFzI0ZkVY8YnTY1k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cGyR+p4dsHdp4xA9um8XS+Ftq3wxqJWQXOuhuDvdKWCdaByk6LNtfgBUJGlDo9t3j+X3TalEMC2d1lhwvXb/dIje50KyTvWaoXiHF4Q5mZSeXY8OoPOU0EEs7Teu+PorAjjew+GJj2NCL9m+2og6THxz6I2pXzA24CfShkNFL+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=arVCBPAQ; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XaXACi8Z"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3141b84bf65so4822006a91.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jul 2025 22:41:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752558084; x=1753162884; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q1Hv/La1TJ9Ewj61d3z+AUMa5o8IZB9Zdz2AMpg7mz0=;
-        b=XaXACi8Z7YuSiilKzBftrhfaOnFYJC7ruqvi+wGMdeu9AhcDNO0KM65iOznwoPzJoS
-         o53xKD4c/2OfeDRMIcsXjThfJxC9Ru8bqxCgC4MwQENM69qB7H7v2FJ6Hj4tdMqVPhoX
-         QH2nGEdnvdIrtQXwESNFOS0uIZOfNMweflEGIBZTj42lew0InOBZvBX7hRd7wPPCReu7
-         z4OZKnPlR6VTOIafsbCTmbiHynDH3zi0I3JtTU0dMqXYRBdzP8qY1E/ZKJbgoQw/P+IR
-         gn6oU5GVxv0P5JGwwVm5oEHuDOBrkD13bWPIpmyhsfDIS9pE3c/B9bH+xTB3MdTI2fH8
-         kdUw==
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="arVCBPAQ"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56F5Zd36024354
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:11:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	xHNwrDHf6UIgXAfQcHTDVtmuWUsHZcYOAu9uyV9exEc=; b=arVCBPAQHFFc+Ihe
+	JLN4Ltjj6AY/bXHGHJ8vJ0UqmRM9H4Ql0gmGss0TTlF2rN7MnvnR13fRQdNrPifS
+	BJ1tEgheobAOhYRR4irr3L+1ZQai8KEJQ1dDdADuiDOtbqyZoBC0vMREKCW+pOkL
+	4xkGt32KK2sCOC3rxcRKf2SLFv/V7gtpD9C/wTyfiHYiAnE36H3Bmm86CiMzfuBL
+	6anSk/tE2Qyes7LPY2W0tcZgV3E8iiOwMVUxZ88bjzGk3n9/phS0f3gg5Iu6Afyg
+	TJ4nC/wadvdo6sZoaTCxCRcqY47vwgcjPFho0wh4DUGGQhTE4AoWw4j50DPPsvhE
+	2baYZg==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47w5dpabf0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:11:41 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7dfeacb6dbdso21648585a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 02:11:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752558084; x=1753162884;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q1Hv/La1TJ9Ewj61d3z+AUMa5o8IZB9Zdz2AMpg7mz0=;
-        b=QVfkb36pTpuTe8vgNNFbKgGoJeJ8KB5fMi9WFwYWoIbBYMB3sgpTEffMxyzWpuHc1b
-         sAkO2XcSv3XODXMfOqJK5c2pGSQJ9I2Q/wnJOz4ircCMPBLY1aZYVtBCKXHLnlNlbLp+
-         hCt1ZXNTO089MQGjQJZbu4oyeYmMFWil2D0I/QfnlbvyWT+xg0ORY5w6ZwczwXpYlY+V
-         j8GuZN8NwjxZLkzrE4rG+Z/uZ4Y5qV+/FkR5/9PvklWEWSB+GLcBUJrwDObvA9d7oHOx
-         byoHVg4vywp/IE08DzMKagJ/SJclsdxmIL3ewVVfvhmgm+aRWz0u5VuQYvqPNht8Xny/
-         Y+tg==
-X-Gm-Message-State: AOJu0Yy5lGpbD0SBXXnluM2eyzKuk3tvzs7ozMJT+s+m5f5FOSl4q5Is
-	C57t3ok81CId7XMmsy+rZ8SPjFnuHEH4dqFwId+nTQg3a/dnDl21Wyf7Ss0FoQ==
-X-Gm-Gg: ASbGncv0PIP2pe4+8nzc5E+0sHfh6xPXHhzZvrZjE+kDo/r3iG7BsJoKjhvOr7ASsX7
-	/oA3xXZUE8lPTaXWv5GKje5kXphY4mucfG3ioTxtkCGAUwfT83q1lSnYpAXW9d0zJnvSBPvqq4X
-	XTPMKTYky9HkoQv2U1MqsHdMczyTiP7kbQ6YsfdprRNI4XO0lE4YlGZHEcGiI7NpEc12yQ4RYHU
-	nNCXah4Ppyp85UagpfwNAT3XP/+2Sep8GVC5wpMisWwXa5cP+BgNuOI3wnKYdM7uS+NsxyanaHx
-	dbdclKwNweHYTpEkgrTp3/VjxqVC6m0P+C1VuEioq9Ut8STSRlRbUlW5szaFYsvevapo0tDOIRP
-	tSwnDVZ9kYBCCJpmszaq6MMFXsLuEzl7h17tESlM=
-X-Google-Smtp-Source: AGHT+IFBgZxP1Xt3B9IrWtUaNxYbA4k7DpFyR9a4TPaxO/m+sMF3Wl1HIFWzS/lujp7ErAfMRfHkug==
-X-Received: by 2002:a17:90b:1b08:b0:311:c970:c9ce with SMTP id 98e67ed59e1d1-31c4cd09945mr26146903a91.28.1752558084117;
-        Mon, 14 Jul 2025 22:41:24 -0700 (PDT)
-Received: from [172.17.0.2] ([68.220.59.240])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c3019e934sm14330038a91.33.2025.07.14.22.41.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jul 2025 22:41:23 -0700 (PDT)
-Message-ID: <6875ea03.170a0220.2ff8d8.bec5@mx.google.com>
-Date: Mon, 14 Jul 2025 22:41:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4739278864834683468=="
+        d=1e100.net; s=20230601; t=1752570700; x=1753175500;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xHNwrDHf6UIgXAfQcHTDVtmuWUsHZcYOAu9uyV9exEc=;
+        b=Z2nLVfIWu2Yv7rfYyPi4RRai+aoh0fki6uXitn7jTNyJx6SOvv5Vo3SONjug27x3DZ
+         wARmHE8tJj5l5yquV7YmPR8Bc6nCBXoPuaGNNaFKrFYLrB+R+YzXVs6IMCESX/VmAU/F
+         3tXRqPYKpzO/dBcXlfi4pUNij5ZuxSVSViJfts9x70HxdPmbJJNsRfY6SXc09bNpAHHo
+         iubYoMloppZi2J2Zy6LNXsXlP+MEl8h6/5ieTiOvnqu/Wo3lZDd6XRYDU5R4fdQFbQaT
+         nTkAbj8bVMdjpn1FrOihEO4jHo1AlVsoIjaS0GIiI+qJZbZOPgkuf3ms1JNaQ832FYO5
+         vUBg==
+X-Forwarded-Encrypted: i=1; AJvYcCVC07FjBgcVZbMkJ5joTUFt+WRvqRN56xasXRXuxOlniO5BNL/MGhI6FIV0hOO4z9Gq6J7aqG67u8Imd0ik46k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtBFhkRYCSFDspYv8Ds3rS68KMWJJQ4LW8wg08u78n4+W2QK9X
+	eBEOFa9gS3ic03xEcQL7GtQF2ey+knXxBLRj++szerNqjLfRage6zIN81jKE1+DHCG5j/EnRn6y
+	pDLyAHpvT9jD3E4GAyA3uO6VbvYO32DHJxjcNrkyvsegIwAaZA+ofXomNcYO9pP39t4U6wZY=
+X-Gm-Gg: ASbGncuwzYLgTWOO3OTDqKpq6FLPzqr0J2ZpNfqnEB2w8sa2Gii/DFrM9+e6TvQCdR8
+	Bw0pfOC4pqlEAyjmT3cbiUv3kpFWZhg7d8RMqgcROTQmS7EsHC2PwclYXDcBAIU0DeTq094K8Ha
+	CUmtaH6sR4wkazLFv5yZDxuQKhhwAy9kzTc0jZuu62KCaCEwTCtNNRFC+ICVozOVA9SuBwtl7YB
+	bWg7pJ5Gh+oVEcZJkuKfkNDW26Kmh/9xMMB/NoEpaTPFhPJfg+MrOt5fS38KfHdZynUwz8cxitP
+	MdhW3lRJfl3X+OfVclAOCRJo79wVmR1hu/JTmBmfM1FNLyVJ26lSta9JOT7iOFcubmKbTvXwFbI
+	5ayjcButBQPZLI+zJ5ljz
+X-Received: by 2002:a05:620a:269c:b0:7e1:1d2a:1224 with SMTP id af79cd13be357-7e33c7a6355mr40169785a.15.1752570699875;
+        Tue, 15 Jul 2025 02:11:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFR1aw9F8+kXl8naOWf8WjNqzukxHK0EIf4qjUMaJlCHG1KSJuHXl67oTKzisc1bUnW8qs52g==
+X-Received: by 2002:a05:620a:269c:b0:7e1:1d2a:1224 with SMTP id af79cd13be357-7e33c7a6355mr40168185a.15.1752570699481;
+        Tue, 15 Jul 2025 02:11:39 -0700 (PDT)
+Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e826452bsm980325766b.92.2025.07.15.02.11.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Jul 2025 02:11:38 -0700 (PDT)
+Message-ID: <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
+Date: Tue, 15 Jul 2025 11:11:37 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
-Subject: RE: Fix SSR issues caused by BT_EN being pulled up by hardware
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] driver: bluetooth: hci_qca: fix ssr fail when BT_EN
+ is pulled up by hw
+To: Shuai Zhang <quic_shuaz@quicinc.com>, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+Cc: quic_bt@quicinc.com
+References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
+ <20250715051618.724475-2-quic_shuaz@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 In-Reply-To: <20250715051618.724475-2-quic_shuaz@quicinc.com>
-References: <20250715051618.724475-2-quic_shuaz@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDA4MSBTYWx0ZWRfX90SyStZstDRA
+ 00R8kmTD5AANgy/EAxNZqAGcGYnyCo2wB1oany2E8gLu+fFfxBu0nZzFKkgMCK7LimGB/rlbGJR
+ cW8X5paoEcvbhGXLVh21tpQtRYmR1HwgeymK5Iwwrh5vFruvo15xSnjGu7+ix549VFnORYAXjg+
+ hpQvbyDw29LTYDjVXasTysZ+8A/Jq1oKXRbIWl9vYwVYafmu57B1Em6rMPyOJMRDuOLWicEMD4I
+ /pYAEn7/8+c6yg4a5Td8RawmyOLVv7JMpefSIDJGG72u4DC3UqwJBv3eMSinfR0r+eFiBYIoJeH
+ KUqG92yBQBUhkEeeTmh0X0yKYBK27KYUzaZ8tkDj+qRqiJA2msdCDl3AN3DiZ8TFP1Smfw9f86t
+ DT8pxBKR2kh0RTb3ptJl4K5SbFp0TIHTx18eYg2bs/eRU+xeHRt1MZUFYZE8YzKoNY0+V+/T
+X-Proofpoint-GUID: gdkaRMjRsE8KeC9vFY5kHXxzOgHjOhWe
+X-Proofpoint-ORIG-GUID: gdkaRMjRsE8KeC9vFY5kHXxzOgHjOhWe
+X-Authority-Analysis: v=2.4 cv=Y+r4sgeN c=1 sm=1 tr=0 ts=68761b4d cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8 a=W-2Lj9y8xAQPGZupIAAA:9
+ a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-14_03,2025-07-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 mlxlogscore=999 phishscore=0 malwarescore=0 priorityscore=1501
+ adultscore=0 impostorscore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0
+ bulkscore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507150081
 
---===============4739278864834683468==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+On 7/15/25 7:16 AM, Shuai Zhang wrote:
+> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+> This leads to reset command timeout.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTgyMzQyCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQRU5ESU5HICAgMC40MSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
-TkRJTkcgICAwLjM4IHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgRkFJTCAg
-ICAgIDAuNjIgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MTguNTEgc2Vjb25kcwpDaGVja0FsbFdhcm5pbmcgICAgICAgICAgICAgICBGQUlMICAgICAgMjAu
-NDkgc2Vjb25kcwpDaGVja1NwYXJzZSAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMjIuNTgg
-c2Vjb25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTguNDIgc2Vj
-b25kcwpUZXN0UnVubmVyU2V0dXAgICAgICAgICAgICAgICBQQVNTICAgICAgNDY3LjAzIHNlY29u
-ZHMKVGVzdFJ1bm5lcl9sMmNhcC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDI0LjYxIHNlY29uZHMK
-VGVzdFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDM5Ljk2IHNlY29uZHMKVGVz
-dFJ1bm5lcl9ibmVwLXRlc3RlciAgICAgICAgUEFTUyAgICAgIDUuODQgc2Vjb25kcwpUZXN0UnVu
-bmVyX21nbXQtdGVzdGVyICAgICAgICBGQUlMICAgICAgMTMwLjY3IHNlY29uZHMKVGVzdFJ1bm5l
-cl9yZmNvbW0tdGVzdGVyICAgICAgUEFTUyAgICAgIDkuMjcgc2Vjb25kcwpUZXN0UnVubmVyX3Nj
-by10ZXN0ZXIgICAgICAgICBQQVNTICAgICAgMTQuOTMgc2Vjb25kcwpUZXN0UnVubmVyX2lvY3Rs
-LXRlc3RlciAgICAgICBQQVNTICAgICAgOS45MiBzZWNvbmRzClRlc3RSdW5uZXJfbWVzaC10ZXN0
-ZXIgICAgICAgIEZBSUwgICAgICAxMS4zOCBzZWNvbmRzClRlc3RSdW5uZXJfc21wLXRlc3RlciAg
-ICAgICAgIFBBU1MgICAgICA4LjQ5IHNlY29uZHMKVGVzdFJ1bm5lcl91c2VyY2hhbi10ZXN0ZXIg
-ICAgUEFTUyAgICAgIDYuMTEgc2Vjb25kcwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBQ
-RU5ESU5HICAgMC45MCBzZWNvbmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gUEVORElORwpEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBz
-Y3JpcHQKT3V0cHV0OgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExp
-bnQgLSBQRU5ESU5HCkRlc2M6IFJ1biBnaXRsaW50Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIwpUZXN0OiBTdWJqZWN0UHJlZml4IC0gRkFJTApEZXNjOiBDaGVjayBzdWJq
-ZWN0IGNvbnRhaW5zICJCbHVldG9vdGgiIHByZWZpeApPdXRwdXQ6CiJCbHVldG9vdGg6ICIgcHJl
-Zml4IGlzIG5vdCBzcGVjaWZpZWQgaW4gdGhlIHN1YmplY3QKIkJsdWV0b290aDogIiBwcmVmaXgg
-aXMgbm90IHNwZWNpZmllZCBpbiB0aGUgc3ViamVjdAoiQmx1ZXRvb3RoOiAiIHByZWZpeCBpcyBu
-b3Qgc3BlY2lmaWVkIGluIHRoZSBzdWJqZWN0CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IwpUZXN0OiBCdWlsZEtlcm5lbCAtIEZBSUwKRGVzYzogQnVpbGQgS2VybmVsIGZvciBCbHVldG9v
-dGgKT3V0cHV0OgoKZHJpdmVycy9ibHVldG9vdGgvaGNpX2xsLmM6IEluIGZ1bmN0aW9uIOKAmGxs
-X3NldHVw4oCZOgpkcml2ZXJzL2JsdWV0b290aC9oY2lfbGwuYzo2NTI6NDY6IGVycm9yOiDigJhz
-dHJ1Y3QgaGNpX2RlduKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHF1aXJrc+KAmQogIDY1MiB8
-ICAgc2V0X2JpdChIQ0lfUVVJUktfSU5WQUxJRF9CREFERFIsICZodS0+aGRldi0+cXVpcmtzKTsK
-ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpk
-cml2ZXJzL2JsdWV0b290aC9oY2lfbGwuYzo2NTY6NDc6IGVycm9yOiDigJhzdHJ1Y3QgaGNpX2Rl
-duKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHF1aXJrc+KAmQogIDY1NiB8ICAgIHNldF9iaXQo
-SENJX1FVSVJLX0lOVkFMSURfQkRBRERSLCAmaHUtPmhkZXYtPnF1aXJrcyk7CiAgICAgIHwgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1ha2VbNF06ICoq
-KiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDoyMDM6IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sbC5v
-XSBFcnJvciAxCm1ha2VbNF06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1h
-a2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjE6IGRyaXZlcnMvYmx1ZXRvb3Ro
-XSBFcnJvciAyCm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjE6IGRyaXZl
-cnNdIEVycm9yIDIKbWFrZVsyXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
-bWFrZVsxXTogKioqIFsvZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjL01ha2VmaWxlOjIwMDM6IC5d
-IEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToyNDg6IF9fc3ViLW1ha2VdIEVycm9yIDIKIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrQWxsV2FybmluZyAtIEZBSUwK
-RGVzYzogUnVuIGxpbnV4IGtlcm5lbCB3aXRoIGFsbCB3YXJuaW5nIGVuYWJsZWQKT3V0cHV0OgoK
-ZHJpdmVycy9ibHVldG9vdGgvaGNpX2xsLmM6IEluIGZ1bmN0aW9uIOKAmGxsX3NldHVw4oCZOgpk
-cml2ZXJzL2JsdWV0b290aC9oY2lfbGwuYzo2NTI6NDY6IGVycm9yOiDigJhzdHJ1Y3QgaGNpX2Rl
-duKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHF1aXJrc+KAmQogIDY1MiB8ICAgc2V0X2JpdChI
-Q0lfUVVJUktfSU5WQUxJRF9CREFERFIsICZodS0+aGRldi0+cXVpcmtzKTsKICAgICAgfCAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpkcml2ZXJzL2JsdWV0
-b290aC9oY2lfbGwuYzo2NTY6NDc6IGVycm9yOiDigJhzdHJ1Y3QgaGNpX2RlduKAmSBoYXMgbm8g
-bWVtYmVyIG5hbWVkIOKAmHF1aXJrc+KAmQogIDY1NiB8ICAgIHNldF9iaXQoSENJX1FVSVJLX0lO
-VkFMSURfQkRBRERSLCAmaHUtPmhkZXYtPnF1aXJrcyk7CiAgICAgIHwgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1ha2VbNF06ICoqKiBbc2NyaXB0cy9N
-YWtlZmlsZS5idWlsZDoyMDM6IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sbC5vXSBFcnJvciAxCm1h
-a2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjE6IGRyaXZlcnMvYmx1ZXRvb3Ro
-XSBFcnJvciAyCm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjE6IGRyaXZl
-cnNdIEVycm9yIDIKbWFrZVsyXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
-bWFrZVsxXTogKioqIFsvZ2l0aHViL3dvcmtzcGFjZS9zcmMvc3JjL01ha2VmaWxlOjIwMDM6IC5d
-IEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToyNDg6IF9fc3ViLW1ha2VdIEVycm9yIDIKIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrU3BhcnNlIC0gRkFJTApEZXNj
-OiBSdW4gc3BhcnNlIHRvb2wgd2l0aCBsaW51eCBrZXJuZWwKT3V0cHV0OgoKbmV0L2JsdWV0b290
-aC9hZl9ibHVldG9vdGguYzoyNDg6MjU6IHdhcm5pbmc6IGNvbnRleHQgaW1iYWxhbmNlIGluICdi
-dF9hY2NlcHRfZW5xdWV1ZScgLSBkaWZmZXJlbnQgbG9jayBjb250ZXh0cyBmb3IgYmFzaWMgYmxv
-Y2sKZHJpdmVycy9ibHVldG9vdGgvaGNpX2xsLmM6IEluIGZ1bmN0aW9uIOKAmGxsX3NldHVw4oCZ
-Ogpkcml2ZXJzL2JsdWV0b290aC9oY2lfbGwuYzo2NTI6NDY6IGVycm9yOiDigJhzdHJ1Y3QgaGNp
-X2RlduKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHF1aXJrc+KAmQogIDY1MiB8ICAgc2V0X2Jp
-dChIQ0lfUVVJUktfSU5WQUxJRF9CREFERFIsICZodS0+aGRldi0+cXVpcmtzKTsKICAgICAgfCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpkcml2ZXJzL2Js
-dWV0b290aC9oY2lfbGwuYzo2NTY6NDc6IGVycm9yOiDigJhzdHJ1Y3QgaGNpX2RlduKAmSBoYXMg
-bm8gbWVtYmVyIG5hbWVkIOKAmHF1aXJrc+KAmQogIDY1NiB8ICAgIHNldF9iaXQoSENJX1FVSVJL
-X0lOVkFMSURfQkRBRERSLCAmaHUtPmhkZXYtPnF1aXJrcyk7CiAgICAgIHwgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1ha2VbNF06ICoqKiBbc2NyaXB0
-cy9NYWtlZmlsZS5idWlsZDoyMDM6IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sbC5vXSBFcnJvciAx
-Cm1ha2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjE6IGRyaXZlcnMvYmx1ZXRv
-b3RoXSBFcnJvciAyCm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjE6IGRy
-aXZlcnNdIEVycm9yIDIKbWFrZVsyXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4u
-Li4KbmV0L2JsdWV0b290aC9oY2lfY29yZS5jOjg1Ojk6IHdhcm5pbmc6IGNvbnRleHQgaW1iYWxh
-bmNlIGluICdfX2hjaV9kZXZfZ2V0JyAtIGRpZmZlcmVudCBsb2NrIGNvbnRleHRzIGZvciBiYXNp
-YyBibG9jawpuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmM6IG5vdGU6IGluIGluY2x1ZGVkIGZpbGUg
-KHRocm91Z2ggaW5jbHVkZS9saW51eC9ub3RpZmllci5oLCBpbmNsdWRlL2xpbnV4L21lbW9yeV9o
-b3RwbHVnLmgsIGluY2x1ZGUvbGludXgvbW16b25lLmgsIGluY2x1ZGUvbGludXgvZ2ZwLmgsIGlu
-Y2x1ZGUvbGludXgveGFycmF5LmgsIGluY2x1ZGUvbGludXgvcmFkaXgtdHJlZS5oLCAuLi4pOgou
-L2luY2x1ZGUvbGludXgvc3JjdS5oOjQwMDo5OiB3YXJuaW5nOiBjb250ZXh0IGltYmFsYW5jZSBp
-biAnaGNpX2Rldl9wdXRfc3JjdScgLSB1bmV4cGVjdGVkIHVubG9jawpuZXQvYmx1ZXRvb3RoL2hj
-aV9ldmVudC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlICh0aHJvdWdoIGluY2x1ZGUvbmV0L2Js
-dWV0b290aC9oY2lfY29yZS5oKToKLi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmg6MjY1NTo0
-Nzogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlcwouL2luY2x1ZGUvbmV0L2Js
-dWV0b290aC9oY2kuaDoyNzQxOjQzOiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1
-cmVzCm5ldC9ibHVldG9vdGgvaGNpX2NvZGVjLmM6IG5vdGU6IGluIGluY2x1ZGVkIGZpbGU6Ci4v
-aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmg6MTQ5OjM1OiB3YXJuaW5nOiBhcnJheSBv
-ZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCm5ldC9ibHVldG9vdGgvc2NvLmM6IG5vdGU6IGluIGluY2x1
-ZGVkIGZpbGU6Ci4vaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmg6MTQ5OjM1OiB3YXJu
-aW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCm1ha2VbMV06ICoqKiBbL2dpdGh1Yi93
-b3Jrc3BhY2Uvc3JjL3NyYy9NYWtlZmlsZToyMDAzOiAuXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFr
-ZWZpbGU6MjQ4OiBfX3N1Yi1tYWtlXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIwpUZXN0OiBCdWlsZEtlcm5lbDMyIC0gRkFJTApEZXNjOiBCdWlsZCAzMmJpdCBLZXJuZWwg
-Zm9yIEJsdWV0b290aApPdXRwdXQ6Cgpkcml2ZXJzL2JsdWV0b290aC9oY2lfbGwuYzogSW4gZnVu
-Y3Rpb24g4oCYbGxfc2V0dXDigJk6CmRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sbC5jOjY1Mjo0Njog
-ZXJyb3I6IOKAmHN0cnVjdCBoY2lfZGV24oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYcXVpcmtz
-4oCZCiAgNjUyIHwgICBzZXRfYml0KEhDSV9RVUlSS19JTlZBTElEX0JEQUREUiwgJmh1LT5oZGV2
-LT5xdWlya3MpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIF5+CmRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sbC5jOjY1Njo0NzogZXJyb3I6IOKAmHN0
-cnVjdCBoY2lfZGV24oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYcXVpcmtz4oCZCiAgNjU2IHwg
-ICAgc2V0X2JpdChIQ0lfUVVJUktfSU5WQUxJRF9CREFERFIsICZodS0+aGRldi0+cXVpcmtzKTsK
-ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4K
-bWFrZVs0XTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjIwMzogZHJpdmVycy9ibHVldG9v
-dGgvaGNpX2xsLm9dIEVycm9yIDEKbWFrZVszXTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxk
-OjQ2MTogZHJpdmVycy9ibHVldG9vdGhdIEVycm9yIDIKbWFrZVsyXTogKioqIFtzY3JpcHRzL01h
-a2VmaWxlLmJ1aWxkOjQ2MTogZHJpdmVyc10gRXJyb3IgMgptYWtlWzJdOiAqKiogV2FpdGluZyBm
-b3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzFdOiAqKiogWy9naXRodWIvd29ya3NwYWNlL3Ny
-Yy9zcmMvTWFrZWZpbGU6MjAwMzogLl0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjI0ODog
-X19zdWItbWFrZV0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
-VGVzdFJ1bm5lcl9tZ210LXRlc3RlciAtIEZBSUwKRGVzYzogUnVuIG1nbXQtdGVzdGVyIHdpdGgg
-dGVzdC1ydW5uZXIKT3V0cHV0OgpUb3RhbDogNDkwLCBQYXNzZWQ6IDQ4MyAoOTguNiUpLCBGYWls
-ZWQ6IDMsIE5vdCBSdW46IDQKCkZhaWxlZCBUZXN0IENhc2VzCkxMIFByaXZhY3kgLSBBZGQgRGV2
-aWNlIDIgKDIgRGV2aWNlcyB0byBBTCkgICAgICAgICAgRmFpbGVkICAgICAgIDAuMTg5IHNlY29u
-ZHMKTEwgUHJpdmFjeSAtIEFkZCBEZXZpY2UgMyAoQUwgaXMgZnVsbCkgICAgICAgICAgICAgICBG
-YWlsZWQgICAgICAgMC4yMDkgc2Vjb25kcwpMTCBQcml2YWN5IC0gU2V0IEZsYWdzIDIgKEVuYWJs
-ZSBSTCkgICAgICAgICAgICAgICAgIEZhaWxlZCAgICAgICAwLjE2OSBzZWNvbmRzCiMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBUZXN0UnVubmVyX21lc2gtdGVzdGVyIC0gRkFJ
-TApEZXNjOiBSdW4gbWVzaC10ZXN0ZXIgd2l0aCB0ZXN0LXJ1bm5lcgpPdXRwdXQ6ClRvdGFsOiAx
-MCwgUGFzc2VkOiA4ICg4MC4wJSksIEZhaWxlZDogMiwgTm90IFJ1bjogMAoKRmFpbGVkIFRlc3Qg
-Q2FzZXMKTWVzaCAtIFNlbmQgY2FuY2VsIC0gMSAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBUaW1lZCBvdXQgICAgMi4xMjMgc2Vjb25kcwpNZXNoIC0gU2VuZCBjYW5jZWwgLSAyICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIFRpbWVkIG91dCAgICAxLjk5NyBzZWNvbmRzCiMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gUEVORElO
-RwpEZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMK
-T3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+This is a description of what goes wrong in terms of the code of
+this driver, and it doesn't explain why you gate the code addition
+with HCI_QUIRK_NON_PERSISTENT_SETUP, please share more details about
+what you're doing, and more importantly, why.
 
---===============4739278864834683468==--
+> 
+> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+> ---
+>  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 4e56782b0..791f8d472 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1653,6 +1653,18 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+>  		skb_queue_purge(&qca->rx_memdump_q);
+>  	}
+>  
+> +	/* If the SoC always enables the bt_en pin via hardware and the driver
+> +	 * cannot control the bt_en pin of the SoC chip, then during SSR,
+
+What is the "SoC" here? Bluetooth chip? MSM?
+
+What does "enabling the pin via hardware" refer to? Do we ever expect
+that a proper platform description skips the bt_en pin?
+
+Also:
+
+/*
+ * If the..
+
+> +	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+> +	 * This leads to a reset command timeout failure.
+> +	 * Also, add msleep delay to wait for controller to complete SSR.
+
+Googling "bluetooth SSR" yields nothing, so it's fair for me to ask
+you to explain that acronym.. it's used a number of times across the
+driver, so perhaps a comment somewhere at the top in a separate commit
+would be good as well. I'm guessing "subsystem reset"?
+
+Konrad
+
+> +	 */
+> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
+> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
+> +		msleep(50);
+> +	}
+> +
+>  	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+>  }
+>  
