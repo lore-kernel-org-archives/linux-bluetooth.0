@@ -1,73 +1,73 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5460E238C1B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F2F275B03
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752570703; cv=none; b=VtlfrzNZCfGUpFfHzHju3r7UgEA4csjv0mRFxh/WzVkRkOJak64lPzv1YzHq7OeUyxyolx7icO99/RELTq5u6nvpbiBylBPAtZDtwk+oJfeHC18gcBOAf6dO53ot3esHwQPzDlQ/8zH3sf4MJIRYFWIZHqVO9oOdfjOnnT8yCgM=
+	t=1752570762; cv=none; b=lsUV9rABu8cm4f20Zfe3TYe70iyETuzqZ29o3m2Ag+7AuNBnU25UuoFU/pPOKcuxSkyMgMdQe+xLq/wTRAKHQGBMWyQ6qhZMsyB6wK/8rvNT1DO83F8hEccuLvQZs4CKkluYzx+7kyBLW+eTj+Ag7p1yI7YJ8zDKeSCj3A5p1Aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752570703; c=relaxed/simple;
-	bh=i6H0SoP9g7Mh40PXCCzXn7OVTXXgFzI0ZkVY8YnTY1k=;
+	s=arc-20240116; t=1752570762; c=relaxed/simple;
+	bh=lDKZhM7Fc2r3xeeGvaRy/J8DbzQvt7X4L6Km4JLlf2c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cGyR+p4dsHdp4xA9um8XS+Ftq3wxqJWQXOuhuDvdKWCdaByk6LNtfgBUJGlDo9t3j+X3TalEMC2d1lhwvXb/dIje50KyTvWaoXiHF4Q5mZSeXY8OoPOU0EEs7Teu+PorAjjew+GJj2NCL9m+2og6THxz6I2pXzA24CfShkNFL+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=arVCBPAQ; arc=none smtp.client-ip=205.220.168.131
+	 In-Reply-To:Content-Type; b=f/m1KyL0MxvQvICYL8+LCus4h8nx5mU/y92OfbZCUpTLkI6hnTJKuLQwBxJwqTfIDQpp25YBBREcuWtxzISK3B7ENAbXyZwYQ85udf41UOMe9MvVoavQuW83edul+N06ad72vAqiQ5C6FNNKSLqa/PkO/gPfBNj9yExfkjhgIc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=IY/Q2rgb; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="arVCBPAQ"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56F5Zd36024354
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:11:41 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="IY/Q2rgb"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56F65qt9012586
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:12:40 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	xHNwrDHf6UIgXAfQcHTDVtmuWUsHZcYOAu9uyV9exEc=; b=arVCBPAQHFFc+Ihe
-	JLN4Ltjj6AY/bXHGHJ8vJ0UqmRM9H4Ql0gmGss0TTlF2rN7MnvnR13fRQdNrPifS
-	BJ1tEgheobAOhYRR4irr3L+1ZQai8KEJQ1dDdADuiDOtbqyZoBC0vMREKCW+pOkL
-	4xkGt32KK2sCOC3rxcRKf2SLFv/V7gtpD9C/wTyfiHYiAnE36H3Bmm86CiMzfuBL
-	6anSk/tE2Qyes7LPY2W0tcZgV3E8iiOwMVUxZ88bjzGk3n9/phS0f3gg5Iu6Afyg
-	TJ4nC/wadvdo6sZoaTCxCRcqY47vwgcjPFho0wh4DUGGQhTE4AoWw4j50DPPsvhE
-	2baYZg==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47w5dpabf0-1
+	G5idLq9ANx5fFpzc7JrnxCy350z2ew1gS4p9t5ZoJAw=; b=IY/Q2rgbBRSZzYB0
+	ejJWqIC9DMx0pYpmi7VTIhKaW3hmi4QFUxiNPqrcBCSzCIav8uxE3qQLTrycXY8c
+	b/rOHsP/3YBh/Fihr8uHr7db8yg+65x7t0cEuyuM4m/Wf/WpYzMQMgT42Lyfh4/B
+	QNC66F8IIMxdnCbSfsWe+OPT9is4gv+g19Ay75Oq9lZFbgcwN6j62AsGQsHwyzOv
+	zDq5FxMqIgMqmUaC+HcDEv26HwEAVWaGcnQmKZIS9D/wp2KFfjPgd5rivo0zbASC
+	1e16d20SLG68imkfBUpdFoEjsF+8Nl/b22b3YQPp4gQphaLISc41b/HcAmni6kqY
+	SnUfkA==
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47w5dyjbhr-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:11:41 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7dfeacb6dbdso21648585a.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 02:11:41 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 09:12:40 +0000 (GMT)
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4ab7a01c38cso3551991cf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 02:12:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752570700; x=1753175500;
+        d=1e100.net; s=20230601; t=1752570759; x=1753175559;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xHNwrDHf6UIgXAfQcHTDVtmuWUsHZcYOAu9uyV9exEc=;
-        b=Z2nLVfIWu2Yv7rfYyPi4RRai+aoh0fki6uXitn7jTNyJx6SOvv5Vo3SONjug27x3DZ
-         wARmHE8tJj5l5yquV7YmPR8Bc6nCBXoPuaGNNaFKrFYLrB+R+YzXVs6IMCESX/VmAU/F
-         3tXRqPYKpzO/dBcXlfi4pUNij5ZuxSVSViJfts9x70HxdPmbJJNsRfY6SXc09bNpAHHo
-         iubYoMloppZi2J2Zy6LNXsXlP+MEl8h6/5ieTiOvnqu/Wo3lZDd6XRYDU5R4fdQFbQaT
-         nTkAbj8bVMdjpn1FrOihEO4jHo1AlVsoIjaS0GIiI+qJZbZOPgkuf3ms1JNaQ832FYO5
-         vUBg==
-X-Forwarded-Encrypted: i=1; AJvYcCVC07FjBgcVZbMkJ5joTUFt+WRvqRN56xasXRXuxOlniO5BNL/MGhI6FIV0hOO4z9Gq6J7aqG67u8Imd0ik46k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtBFhkRYCSFDspYv8Ds3rS68KMWJJQ4LW8wg08u78n4+W2QK9X
-	eBEOFa9gS3ic03xEcQL7GtQF2ey+knXxBLRj++szerNqjLfRage6zIN81jKE1+DHCG5j/EnRn6y
-	pDLyAHpvT9jD3E4GAyA3uO6VbvYO32DHJxjcNrkyvsegIwAaZA+ofXomNcYO9pP39t4U6wZY=
-X-Gm-Gg: ASbGncuwzYLgTWOO3OTDqKpq6FLPzqr0J2ZpNfqnEB2w8sa2Gii/DFrM9+e6TvQCdR8
-	Bw0pfOC4pqlEAyjmT3cbiUv3kpFWZhg7d8RMqgcROTQmS7EsHC2PwclYXDcBAIU0DeTq094K8Ha
-	CUmtaH6sR4wkazLFv5yZDxuQKhhwAy9kzTc0jZuu62KCaCEwTCtNNRFC+ICVozOVA9SuBwtl7YB
-	bWg7pJ5Gh+oVEcZJkuKfkNDW26Kmh/9xMMB/NoEpaTPFhPJfg+MrOt5fS38KfHdZynUwz8cxitP
-	MdhW3lRJfl3X+OfVclAOCRJo79wVmR1hu/JTmBmfM1FNLyVJ26lSta9JOT7iOFcubmKbTvXwFbI
-	5ayjcButBQPZLI+zJ5ljz
-X-Received: by 2002:a05:620a:269c:b0:7e1:1d2a:1224 with SMTP id af79cd13be357-7e33c7a6355mr40169785a.15.1752570699875;
-        Tue, 15 Jul 2025 02:11:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFR1aw9F8+kXl8naOWf8WjNqzukxHK0EIf4qjUMaJlCHG1KSJuHXl67oTKzisc1bUnW8qs52g==
-X-Received: by 2002:a05:620a:269c:b0:7e1:1d2a:1224 with SMTP id af79cd13be357-7e33c7a6355mr40168185a.15.1752570699481;
-        Tue, 15 Jul 2025 02:11:39 -0700 (PDT)
+        bh=G5idLq9ANx5fFpzc7JrnxCy350z2ew1gS4p9t5ZoJAw=;
+        b=WiC9PruDIj/o5MKdcilvBYxwdCci2ixFN1H7/oL6qXxSwZSWkC28cS47w6RjlUMYck
+         PzCTcl6hSX/peQWAq/1AxOp1FQCiCH1KaCKh9PQqekML5WsW96sVRroxYLBtrbHibjLD
+         aTaw6NC0WeUjJbwOpRwM+QKNPAjhKsTWvMeuvGzOUpmPQqZd8ceS+stjPKglDXE6gy8V
+         w2WYHGpSEeHmBZ9Ed7iGGxmKpePqrpnomTwhczm/J5HD0OuJ7aPw9wpIDRwUVm49FYiQ
+         IWFHsbwl6ryqccOgkR9rurrchDOUDRjWcBms0M1Yit2MsT3clHkpkb6Y7piqnydas38T
+         BWjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXIePfzjOzz8Ks6j9YqSKS1KkAqoBNshxrN+Wqx//zIC1Y+ct5LCg9h75lq3iKHNJdPCyrBVLHivaFgcnFokOM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUJ7navOv++0iYRpwuDHygkzu3L1aG/ws/vcrS88J/zZqQPUMj
+	Qb8U+cnmiLWGFY5YkzuWg0NYOfZ4S/wLurvDoTk9K3Vb/gHPKxb0Jz493du+CGqMx7eYlJFZtdQ
+	7NXLAT72M1l4/4Lu6bykrXMZS6jeHpu89YkyDsx/RucSv/j4BA//jbOptByAQ8vBL8xQvNH8=
+X-Gm-Gg: ASbGncu6qlRp15J0TmZIamEgbfGr5OAlV2gF7BxG6LXIOPDgYrtM64sm1w32cR5nu1q
+	AQQS/FKUhnd2hY9zrG0Pm9nsFihmDAsuGGbdpKFhEQglpY9UX+O/EXhiREEXbe1Kt/XAEGio2LP
+	KwZFjPGBC1KQBwqFi23wCFcN2etqAPk+0lawaHDSpslbMWRKLDVVKWmAjcnfDhG8urjb7awxAjQ
+	CWMfxpEWM6zx4gzTwgpQfAX9Hh896OP7K9ZWJZUEHLTuCXWzNUc/l5xWsMXC0wH9tHrmaAxiifz
+	RrmF2x9M56k/hGETZkJLGiBer0qE0Q0YTE3v5Nvu4qUuFYxOlffx5DWYI/0trv0pSPebx/zmg44
+	3T9nNMCd8qlL3niY/B08S
+X-Received: by 2002:a05:622a:4ac8:b0:4ab:76d2:1981 with SMTP id d75a77b69052e-4ab86ebf803mr4610341cf.5.1752570758768;
+        Tue, 15 Jul 2025 02:12:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGnGsZBIAOn6nc3fROUqaYAWPQIoU0CvWKBzLE3cYYK2sBv/+TA8R6DMWxwMOImdgntLW47XA==
+X-Received: by 2002:a05:622a:4ac8:b0:4ab:76d2:1981 with SMTP id d75a77b69052e-4ab86ebf803mr4610221cf.5.1752570758190;
+        Tue, 15 Jul 2025 02:12:38 -0700 (PDT)
 Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e826452bsm980325766b.92.2025.07.15.02.11.37
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae6e8313c93sm956104466b.183.2025.07.15.02.12.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Jul 2025 02:11:38 -0700 (PDT)
-Message-ID: <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
-Date: Tue, 15 Jul 2025 11:11:37 +0200
+        Tue, 15 Jul 2025 02:12:37 -0700 (PDT)
+Message-ID: <67431c9f-d843-488d-af32-c70aa183ba19@oss.qualcomm.com>
+Date: Tue, 15 Jul 2025 11:12:35 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,95 +75,71 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] driver: bluetooth: hci_qca: fix ssr fail when BT_EN
- is pulled up by hw
+Subject: Re: [PATCH 2/3] driver: bluetooth: hci_qca: fix host IBS state after
+ SSR
 To: Shuai Zhang <quic_shuaz@quicinc.com>, linux-bluetooth@vger.kernel.org,
         linux-arm-msm@vger.kernel.org
 Cc: quic_bt@quicinc.com
 References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
- <20250715051618.724475-2-quic_shuaz@quicinc.com>
+ <20250715051618.724475-3-quic_shuaz@quicinc.com>
 Content-Language: en-US
 From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250715051618.724475-2-quic_shuaz@quicinc.com>
+In-Reply-To: <20250715051618.724475-3-quic_shuaz@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDA4MSBTYWx0ZWRfX90SyStZstDRA
- 00R8kmTD5AANgy/EAxNZqAGcGYnyCo2wB1oany2E8gLu+fFfxBu0nZzFKkgMCK7LimGB/rlbGJR
- cW8X5paoEcvbhGXLVh21tpQtRYmR1HwgeymK5Iwwrh5vFruvo15xSnjGu7+ix549VFnORYAXjg+
- hpQvbyDw29LTYDjVXasTysZ+8A/Jq1oKXRbIWl9vYwVYafmu57B1Em6rMPyOJMRDuOLWicEMD4I
- /pYAEn7/8+c6yg4a5Td8RawmyOLVv7JMpefSIDJGG72u4DC3UqwJBv3eMSinfR0r+eFiBYIoJeH
- KUqG92yBQBUhkEeeTmh0X0yKYBK27KYUzaZ8tkDj+qRqiJA2msdCDl3AN3DiZ8TFP1Smfw9f86t
- DT8pxBKR2kh0RTb3ptJl4K5SbFp0TIHTx18eYg2bs/eRU+xeHRt1MZUFYZE8YzKoNY0+V+/T
-X-Proofpoint-GUID: gdkaRMjRsE8KeC9vFY5kHXxzOgHjOhWe
-X-Proofpoint-ORIG-GUID: gdkaRMjRsE8KeC9vFY5kHXxzOgHjOhWe
-X-Authority-Analysis: v=2.4 cv=Y+r4sgeN c=1 sm=1 tr=0 ts=68761b4d cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8 a=W-2Lj9y8xAQPGZupIAAA:9
- a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: l9HRkHVyO0JbO-Yaf-dImroSEAed4J2W
+X-Authority-Analysis: v=2.4 cv=RtXFLDmK c=1 sm=1 tr=0 ts=68761b88 cx=c_pps
+ a=WeENfcodrlLV9YRTxbY/uA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8 a=jRSd7LoynD_UXNFgLaEA:9
+ a=QEXdDO2ut3YA:10 a=kacYvNCVWA4VmyqE58fU:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE1MDA4MiBTYWx0ZWRfX07XDOMMjXykC
+ zf/KROX2EWGtEFzEaFQM5ilJIXixou2HMRxp0A+HYScuQsoyBKkclkuOcy7gTB9BNx8oxmBMx1K
+ SOuo8odqvz+qn0wzvm8ckthrMUzbALo+L6UXEk7Fz8PzE66XZoTbmn3dQbbGPidsCsxGM5ekOqY
+ t0q/pxo5PJK8eSc4MxGiyztynQwZ88grnTp9cIpgnp77F466RhggDJsTddq+7xKHuiuOOdyOCPU
+ ZD2cGw9M7RmGnfmTgIsq17KpHCxnZsF1mvnbPf4NbT/pwQgkU88g/1HiqJ/oQAmgFimlyQsKzwP
+ k+fvRojpKT4Vita0o0mq1VE83Yl6WJ3DJx0gPC7queYvz5UuU8zgEZPEmYKYWoIU1IUFg9kr5kL
+ QtQAWtrmAXgmdNIkzxycYiKzx1mVwx7tLoX/KeTSf9FMFgifrKP2BeWKQJPfJlPmheuJdrNU
+X-Proofpoint-GUID: l9HRkHVyO0JbO-Yaf-dImroSEAed4J2W
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-07-14_03,2025-07-14_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 mlxlogscore=999 phishscore=0 malwarescore=0 priorityscore=1501
- adultscore=0 impostorscore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507150081
+ adultscore=0 mlxscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
+ priorityscore=1501 phishscore=0 spamscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2507150082
 
 On 7/15/25 7:16 AM, Shuai Zhang wrote:
-> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
-> This leads to reset command timeout.
-
-This is a description of what goes wrong in terms of the code of
-this driver, and it doesn't explain why you gate the code addition
-with HCI_QUIRK_NON_PERSISTENT_SETUP, please share more details about
-what you're doing, and more importantly, why.
-
+> After SSR, host will not download the firmware, causing
+> controller to remain in the IBS_WAKE state. Host needs
+> to synchronize with the controller to maintain proper operation.
 > 
 > Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
 > ---
->  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  drivers/bluetooth/hci_qca.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 4e56782b0..791f8d472 100644
+> index 791f8d472..a17d3f7ae 100644
 > --- a/drivers/bluetooth/hci_qca.c
 > +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1653,6 +1653,18 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->  		skb_queue_purge(&qca->rx_memdump_q);
->  	}
->  
-> +	/* If the SoC always enables the bt_en pin via hardware and the driver
-> +	 * cannot control the bt_en pin of the SoC chip, then during SSR,
+> @@ -1658,10 +1658,14 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+>  	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+>  	 * This leads to a reset command timeout failure.
+>  	 * Also, add msleep delay to wait for controller to complete SSR.
+> +	 *
+> +	 * Host will not download the firmware after SSR, controller to remain
+> +	 * in the IBS_WAKE state, and the host needs to synchronize with it
+>  	 */
+>  	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+>  		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
+>  		clear_bit(QCA_IBS_DISABLED, &qca->flags);
+> +		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
+>  		msleep(50);
 
-What is the "SoC" here? Bluetooth chip? MSM?
+This touches upon the code introduced in the previous patch.
 
-What does "enabling the pin via hardware" refer to? Do we ever expect
-that a proper platform description skips the bt_en pin?
-
-Also:
-
-/*
- * If the..
-
-> +	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
-> +	 * This leads to a reset command timeout failure.
-> +	 * Also, add msleep delay to wait for controller to complete SSR.
-
-Googling "bluetooth SSR" yields nothing, so it's fair for me to ask
-you to explain that acronym.. it's used a number of times across the
-driver, so perhaps a comment somewhere at the top in a separate commit
-would be good as well. I'm guessing "subsystem reset"?
+Any reason they should be separate?
 
 Konrad
-
-> +	 */
-> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
-> +		msleep(50);
-> +	}
-> +
->  	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
->  }
->  
