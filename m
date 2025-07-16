@@ -1,153 +1,296 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022090.outbound.protection.outlook.com [52.101.126.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB13A25393C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 01:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752629654; cv=none; b=bxU//8oNBXT9AAlyIBIdKEjw/0ryIomFsm/tzqOU/iTJkPVsuBsecWF435t6rai/XR0mgFkcrMJUBly0MEQ9sTa+xMJfqJ9wK/9huVRIc6jHCvo8Voe6ZtIBISXpTQJfC6XDxpg3W2HwiAk5/rpDwFUn9HxfDcPQ9BcpWGT2Xac=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752629654; c=relaxed/simple;
-	bh=3qmDt9GcoN3tO7790PJeAmOseIlhKF2pz132ouqjRiQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=E/DQgDvXDWAoIAge8CwgFz5OtuE54l55H14Bq7kT89sDEAPJR7GvwbZUOlARW6Y7EfWnvmRn70ohub1e8S0NxbnUkuvGwgPmbZEjNt7+umlpNcUDPQprx46GmAd0eeCzjXczjJ2U04+OT6/oLSXiZ4Kkng9NCjK+cQ2NB8chF3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B+G2Lzwm; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30BB171CD;
+	Wed, 16 Jul 2025 01:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.90
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752630345; cv=fail; b=Qt2XZL+Te8BQ0d+LvhVYQckzTEjS1opxMNzfoIpW5kIIzTLeJfndCxbrgdr4Wo+xGrAn461n9ooHN7jpvcgwYEV9AW9IcPOlOhSFXmS6ccZAzLrJPwLBB/DrWzYHenGXziv6So4uIp2Tu/AH6hOeV4Sbr2TRqebUHTst8t5qLKw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752630345; c=relaxed/simple;
+	bh=hufels3BR8UsvMJAdWmlxJXYIhHzxrTIGKw6EWow4cs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ugX7JLv+VhaMsRgqcVpEYUjn4MWrA1q8oZU5HfQKc5ZsDxjEj2up0T9cxfL9UTmYHoo1vje202MEePKesX7BzaodqD/qY+wSYccL+spshJpDoHO7EB7KAShIiedMLR4DPvfO6eiFKAQXWs61GwDqfcC2sSdwTqr+/2UmN96yqh0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=myNV5fvU; arc=fail smtp.client-ip=52.101.126.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+G2Lzwm"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-74b52bf417cso3877121b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jul 2025 18:34:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752629651; x=1753234451; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8l5ke5cW6jyaNGiONMLYsuDa8BI5TGlC3S6R1wHbaaY=;
-        b=B+G2LzwmH+O68cwGrvzNzlfiJNPVtoODzJ/jVqEBjLimK8gGZQV16VYXjrFoIh39hX
-         dl0SGBp4Le9KmsTBYMGCpTxyyXlLg5mUckT2dfKWzrhyzeMHy9joBK/OlFXYjV2hwmUe
-         IsSleGJ9VoVdJoNzo1s3rA6t/b63wuhxfsp5PDU1d89ogEpaTkSPZr0qcBRppcntYZbY
-         QWXVfwhrCGzuq9GDqSWpaBfefkxpQa4U0kGEwKJK1+PMfx1Z4OQM07v2f42MBv7qXKaW
-         tTnNiYhddlcyti/Uo+hDeXrIVSp6HIlHvJWBoN+cL23UObCtXdnGIIqK4wqJfUg/U83B
-         gUKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752629651; x=1753234451;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8l5ke5cW6jyaNGiONMLYsuDa8BI5TGlC3S6R1wHbaaY=;
-        b=Uz3hBMKM4oxQ97vroMML8U8tclPgfKhehnqNyqsCN4EppCJy38Pq09pZv2pZQjcpjo
-         zEG2cDRX+xyD9IvKPEsMxHr5dghp8mQIt6m2KLZEMSCzelHaS9t1K5FBvO19KPMvVFbJ
-         jL7iz9mHuWX28w4usnacY3M+NVoGv+nnlqixTR2UskMcQAbY94UEMC4f9+F8cOfNvSg1
-         ib4RuXewNnNOIIl7amRMZYo7ToBObzj0BGWuw6Mhni+yvCDlm1kynKqcm3ieA0+ztf+x
-         PAEHOuJAK5LSTwZC9MVVilEXpKTo/KYYvd1ABnoG+4cLiuMxl0LyBhIgD+rXJzP203o/
-         b2kw==
-X-Gm-Message-State: AOJu0YwKrFoK/fR6jfvi7XigGejRVT2N3wNyLF200v6GIk3YCFXiAhkJ
-	PTY89JlnKI+7YG9eW2vxOFIHRSozeZFQl/F/s0Z9CFETvBU9SskyP5f9xWua0Pp3
-X-Gm-Gg: ASbGncs5QD3qARep6wph3Cb2HCMTXjBXhLUEzHHEXcBuj5b5Tn2LUD75lWnTgef8g77
-	FW+/t+qtulS7n0mOaz82r3umHTK5RNw2+oHWMSJrd44xAbm4rWEPfVZ5kqV0oYhZ7eh4dhlHrEh
-	j+NjLp9+5A9WXTdPes9B70YL+h1iNAL9DQZjg7RqUDGTN1g7T2zmmje3LzZ0FFQ2RmgTXObvECL
-	6yxe0yl2BktLsmDv6kHoXCys16YU94m/Ls9vQNysNZhrIiq4iHQoDsgn6Os6syCUu1qD+YBkTaq
-	qepbMjuvAxC5UfOxvzw9ALGaDmFkSVsdSMVu74u2g++u6IKgxltKPjXNRWOE1QMXU24Attu6lsH
-	HBxV8wPQPlDfjVMbkn1P5YzRsYtB5Bw==
-X-Google-Smtp-Source: AGHT+IHR+uZVbcVDss2DcFwy7bg9OxdQMnq3L4pUSnOPwBAxQVpn6NHgYDRdXeNFvKD2uIjhKcIzmA==
-X-Received: by 2002:a05:6a00:22d0:b0:748:e0ee:dcff with SMTP id d2e1a72fcca58-75723d7d2c8mr1126271b3a.11.1752629651407;
-        Tue, 15 Jul 2025 18:34:11 -0700 (PDT)
-Received: from [172.17.0.2] ([172.182.196.50])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9e06a04sm12058917b3a.44.2025.07.15.18.34.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Jul 2025 18:34:10 -0700 (PDT)
-Message-ID: <68770192.050a0220.346842.7cd3@mx.google.com>
-Date: Tue, 15 Jul 2025 18:34:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6195540799257023679=="
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="myNV5fvU"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lQFhT7RCORX5LPvi769a0gk8X6lVJCVOzFf19zvx7vvzTFQUw+cTz6nJ3w4Xwz4OoPfyVRg36NsrKlvWKhj5eLIA09A1eDNJJpR3P8YPLb8fMMPyr0VuuGiJxnyIlapSoFiaWvAPbHfzZpjMiAbqkGL7a4OUG670h8AOGLhQmPH1lW9uRNSNnYTkZY+FgiiV9e8eJSziRuacW3zAW6tYsA3TQDSuMNor12li04Ny0+jaLC3NjQUs0FxCL4uyKcdAsQHdBs37dV3OMjEXy8DXqRxZzxLOGA/vRatpblM4RWaSQodblQ2y6pLKUIOohC8TguZcxP6vhffWfybKMYlcXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bpOqpOVOP9b89W4Io0FjSt75NFsDb6dnsKH0sPdiu/o=;
+ b=n0eHPVaT1QRhqYRazQerZ6fNtLvzHZDfP3bN5whimAuIYX4CHJfZOlOhv1woyrTw7YPEUvSIm/hkSovk+uEru15565ecRO+/uT0EW57DYmhZStm36z6WM/UEqE31jw04aQHm4iPUKNRsL17v3PgeIep4cXg2zfJavQLkhGfDj19aGtWcjz5PgaAM1smXLDrrPjdF0ECvhWdXwA0FbJmnfK2quH/ZhbnrOp9Ti6+GMi6uT8YXVl1kf0EbWMh1CsBLoNztcAiWM21ghlbMZ8wDN0KLnxsylRvN9lO60ns9WMCtDlPXatN3ba/Agm7Zd0XDLAUCDCorCBhxpVfnct7VMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
+ dkim=pass header.d=amlogic.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bpOqpOVOP9b89W4Io0FjSt75NFsDb6dnsKH0sPdiu/o=;
+ b=myNV5fvUnUhPcpOZVjqSQMIMjG/YjPHiP7IuEzr2QKSf/s9jFLEGAecs5EE9HNDUXuOTvAacswuNwAq8xMxsAqI1i0EM4LS39ngPnc27u7x1WxJX+04o01K9qoel629rudC+EylNXl+I8TnTNQL/n+VEA25yP+MJ1br1czth8vBfFYCQnqqtWnotoDHuX0StEPkTWGM5k9BlHvBLLb8UUxmVycHZdKq0oLpm7hyH7bBvvtg4SstCgMEa4anz5q498/Gvd9sWmsp8BUW/5JnG6HEv4pk9l+SDso9FYJbX/64kxlFigmFYC2ZQKDTJOwgbNENQ/D+hPFbhOgDNGr0jgQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amlogic.com;
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+ by TYZPR03MB8535.apcprd03.prod.outlook.com (2603:1096:405:65::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8922.32; Wed, 16 Jul
+ 2025 01:45:40 +0000
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd%7]) with mapi id 15.20.8922.028; Wed, 16 Jul 2025
+ 01:45:38 +0000
+Message-ID: <6b87db20-4b74-41cf-9900-3237edaaaf81@amlogic.com>
+Date: Wed, 16 Jul 2025 09:45:10 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] Bluetooth: ISO: Support SCM_TIMESTAMPING for ISO TS
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Pauli Virtanen <pav@iki.fi>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250707-iso_ts-v4-1-0f0bb162a182@amlogic.com>
+ <dc9925eceb0abe78f7bafe2ed183b0f90bdb3ac5.camel@iki.fi>
+ <CABBYNZLFnbfdXjRV0taeTNF5bsey-WFf4TFsf_ox0FNuJbEutw@mail.gmail.com>
+ <CABBYNZL1Aicj15eYBgug4_KARK6xcd7eVKnzcE=vUK=mugUM4w@mail.gmail.com>
+Content-Language: en-US
+From: Yang Li <yang.li@amlogic.com>
+In-Reply-To: <CABBYNZL1Aicj15eYBgug4_KARK6xcd7eVKnzcE=vUK=mugUM4w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2PR02CA0050.apcprd02.prod.outlook.com
+ (2603:1096:4:196::11) To JH0PR03MB7468.apcprd03.prod.outlook.com
+ (2603:1096:990:16::12)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ipravdin.official@gmail.com
-Subject: RE: [RESEND] Bluetooth: vhci: Prevent use-after-free by removing debugfs files early
-In-Reply-To: <20250716004252.125466-2-ipravdin.official@gmail.com>
-References: <20250716004252.125466-2-ipravdin.official@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|TYZPR03MB8535:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49803726-e0d8-40e9-1c53-08ddc40a7752
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Y3piV3U4WmRQdmVTTjR0eWNnSmh1VmVVZkVYRTZOZFJhME43bFZQNU5Oenlh?=
+ =?utf-8?B?Y2xoNzdkRWluSXJwc3ovcTFVY0F3UzlBYW56Nm1Ha3dRQldWS1lWMXg4QXRn?=
+ =?utf-8?B?eVVMRzU5cDk2MHYyRWd0clZiRlduMzhKQUlkbE1RMjViQk9rWURpaC93R2ZK?=
+ =?utf-8?B?eDVrWXZZaktuS3hsQ0NwZ1o3WElvWVI0Yi9hVVJjdUdzYWdEZXl5QjRVR3gz?=
+ =?utf-8?B?QUllQ29oZ25aUFZPKzJWYXpKbStYQ3I3TGJJaDgxNVhpWXdVSUdmRXUvbnI2?=
+ =?utf-8?B?TGxaUVlFOFA2dDU3Z1RqR09NYzhsNUFrQ0JEWmlnYUJ5K0htZjVVSmVnMFJx?=
+ =?utf-8?B?R1luYkdnSWFERCtCVnBtNUdBQmZBZFlZcnVlV0R5S1lSYUZMa05sSXBGUUFm?=
+ =?utf-8?B?cllwSVl5UG56KzVJMGpJeWsvdkZ4OFZ1bFlocDlDemIyNGVuNGQrN29UZjcx?=
+ =?utf-8?B?K3lrbCs3bjIwMkVqRUIzeUc1cSt5MVRKQ2lhekdPam1IdkZqZ3NtTWs2eWFp?=
+ =?utf-8?B?MHoyejVsN3BjWlhBTHN0WGVJTDFPeFRISVhmM2hoTXp2L3lEcWNycFlrTnhY?=
+ =?utf-8?B?cXY3bXdTTTZVanhNdVBTTGJ2Q3VDd2ZhY0NYVlh6ZmQyMHcxdlZyZ2RVWURY?=
+ =?utf-8?B?RzRuNFBLZG42ZzNQZGsxQTd3THZwbHRRZUw2TTAvUzRJM2RDZU9Xa0UzWVY2?=
+ =?utf-8?B?TDIwVVIrWE5vbDZ3emZuR0xyMUoyMTBBanFQam16VGtWcUppaTFtdmVSTE1Q?=
+ =?utf-8?B?TlpFTHpmTnhrYnF6M2tlL3VlUUpscmpsaWFrNGMzSXB4VTZqZUlxWGlxTmRV?=
+ =?utf-8?B?S0pzUXFNUjBtMG0wcUF4Y3pJOG5UdjVLR0xjazlsbSs1a2hHUUhuS0pKWXB2?=
+ =?utf-8?B?LzdsMW9hUUlBd2RCbHdlcU9FUmJHcm92d0QvdWVSdCtSTjVtTGVVYmJDSU5q?=
+ =?utf-8?B?VXUrMTdQYXBkZHc5WE5oUnZmRGN1R0FhQlArMUNJcjFoeHR2MGtGMG9ET3BQ?=
+ =?utf-8?B?Ung0K1JrSzZMSnBCcVh1SUs5cnJlaTZqUjhkM3ZkQ1p6dlJScm5Wc0xRQUpF?=
+ =?utf-8?B?UHNyT2lKSmp6RENldG1tTjFGdWp4TEw2NTRySjBZRVFvTmxtbExRV1haeEFS?=
+ =?utf-8?B?bitmVzFjQVJNb2ZFUThBclVaUktlTXdSL0Y3YThxaXdLRE5Cb05UQTdKRWp6?=
+ =?utf-8?B?N0xHek9STkVYVzVzb1VRSWJoQUpNb29sRlBpK09DTW1aSHZGNWJ3YzBxWUVH?=
+ =?utf-8?B?NUNBUmNlRVlWVm45c1NHbExjTTZpZ0pibXB6VHBVdlV3ZkxTMThPbzViRXA2?=
+ =?utf-8?B?eDJDUmI3OXNMWkcyOWhFRTg4WStYQWlmZWFLREk1OWZoVVFERGVLakwxL1h3?=
+ =?utf-8?B?ODMxRTZzbWQxdmtMVmxiWG1memFTb1VyNmgvNnZhZXMwVCtxVnNCelZoOEx4?=
+ =?utf-8?B?RTJQQ29CdnVVWGlJTjFLSWpGZnorT1NiRlNoK0Q1MUJkTjhjUEpuMUh3Qitj?=
+ =?utf-8?B?OFg4NFZONXdTbW9HeStZaE9CYUM1bURiRFc2bG9Sdkl5VWhTaUkyckJXZ05Z?=
+ =?utf-8?B?WHZEZ0lZRXpjeDFWeFJUUnA1cmQwb09hZHRLbTE4eVkzTWZhelBsa3VmcGRu?=
+ =?utf-8?B?alpvS1plWWhsY0JoaVJPdTF2eTRnck5kNnlmQTZCNDJFeTk4N2g1Y09iRU44?=
+ =?utf-8?B?TGdkcjNtNXJUa0VQY1Eyb2hEZVhWMk9YcGtpSUQ0SEs4cU85SWJZbndkYmpl?=
+ =?utf-8?B?OHYrR2xYSUxFc1F1SmtqekZmWDIzUVY3azVnNFZpdFBjbUVld3hMT0Y2V1oy?=
+ =?utf-8?B?OUVZQkRPZEkxRFpmeTRLQXgrMXBtU2QzaHlGL1k3Qkw3dlZyL09xQXVBaFpP?=
+ =?utf-8?B?RFlNOVRvV0g3clJuRnN3RVRva0FsTlRLZG1pa0F4TTB5bVVZRHpRMHlKSHNw?=
+ =?utf-8?Q?t4k2TlzxDSw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R0s0Zy9LeW9DbjAwbVlDdDg1S05YQjhQZzNpOEJmQjZtMkx6L1B1T2t4OTN4?=
+ =?utf-8?B?eVlkQlBzeW83L25HSEY0WjVuTWdUWGgzV1pLOVgvT2Eyb0hKRGhxbmdtRHdu?=
+ =?utf-8?B?YUtWZmxjS0g2VlFHdWtQalZLZTNjKzJrN1BRejJnVkQ5ZmswMWVvTTJISkEx?=
+ =?utf-8?B?MWhYMEhIL2JQaVB1a1kwNDdNRlh6b2pDdGtCM3p3QjhIT2dRMTd4Y2RjN1JC?=
+ =?utf-8?B?OU1jQW1SZUR4TVlhL2lKQXlsN2xtNHc2a1ZPczBobkJPd3hJYVhjekd4T1hF?=
+ =?utf-8?B?SWwzOGtZd0Y3aGdNd0JZWFFScVJtU1hyMW03bS9HWDJnL3FzN0JJRzhVamUy?=
+ =?utf-8?B?M2xEOTBlWlFKenVhY0dzZkN6ME1EVnB0VGowZms1b3Z6YkNsTm1mUGV0bFo0?=
+ =?utf-8?B?Q3lCZDVhYmJPWFVGUmc0azZVeVZsalkrTDVtWjNmbjNIY0Y5UGh1K1VJR2tw?=
+ =?utf-8?B?V0pYdkxmU3BYb3pveU5sWWtPUkRUQk5kQWZOVmJaL2Z3Tkg3N0tEKzErM2dN?=
+ =?utf-8?B?WGFndWF6VmYvdzRnV2x2OWRXR0FnVXRIMndqMlJlY1lFRDZzdlh0ZDk0K1RM?=
+ =?utf-8?B?QXZvaHd6YUU3VThHdjRDcWJQZllzdnVSVHFKTjVEOUNkbkl2cVU2N0V1L1dP?=
+ =?utf-8?B?RmdUTGgyTUJDUEdmZ3J0TlhBL2dBRjV5U3VndFJ5emhSRFdZUDdoWStVZkRK?=
+ =?utf-8?B?TDNCcHRrVnExK2NESlNKSFRGWHhZblRyNUZ0dXFHU3BxRWFEeDRRc0c1MWZ5?=
+ =?utf-8?B?dTRDdS9pd2pFc1dOODk1Qk9NSVAwNGUzQTM3NlU2ZGVZRklqbThwZXNZa1Iv?=
+ =?utf-8?B?ZG5WemNvUGtQWTF5cmttQmJGSXNtTUpuTXRaS3pnajZlY21IUE50MzRYbVIy?=
+ =?utf-8?B?SXZmYm5QQWw5TmdpdnNoeEUrQzhSWjlDZkNhY2hHOS9wN1pqeFk1THJrK2pS?=
+ =?utf-8?B?NDhLdC9VT1NDaCt0b2kzRmRFQ0RieitReXMwZnpPYmh2T0J4RWZXY241YXEr?=
+ =?utf-8?B?RHk5WDU2Z2M0bEs5SVhFRGpyNnJYS0pra2hIQ0VzZ2llSmVIK0k0QVMwQmEv?=
+ =?utf-8?B?a0JuK2Zaam5qcm1JRmhoVzBiZmNoWWZ0cXZuOGNURXRlWnZoaUFGRlp3T0Nx?=
+ =?utf-8?B?Qi8rcERmemp4enU3NWsyNkxJaXgwWExmc1l1L2wxSWZqWE1yZExoYnJabWhN?=
+ =?utf-8?B?MmpFVnF4OHE2R0RtSkVGMEd3c0crdkZyQStTaGNZbGk2OVN1dmd1UmRSbEhY?=
+ =?utf-8?B?M3RnOVZsZW5kY2RNaVlubHVRa3VhOVRka0cwRzE5YjhhRFYwSUhVRytmdW9S?=
+ =?utf-8?B?Mm5ETlpveFJnZ3JGREh6K2xTbzV5MVl6TTF5MWZoT0swN2NTcjhrd3JDV1Vx?=
+ =?utf-8?B?b1NBamw1amg5RnE4SW9rRy9peFF3ejhnek5MY1k2REVDUWVqZmpFc041UHRn?=
+ =?utf-8?B?eGhhVWZWZFZlMUFLQllydHNLZGQvVGVFS256Z0Y5U00yd3BNREZLVGorekJE?=
+ =?utf-8?B?Vmo2YXZnNkhGYW5hdmlwQmdSVlVmUnRsZEt5RnRwa29nMzArREFsSEJhVm4w?=
+ =?utf-8?B?WGJ1MTQ3cGVWelk5VjY1N2hDODhhSUNQbWhhQnFacEMyQk81dUNyc0dsYjZL?=
+ =?utf-8?B?cE5ZOGhabW1VdSt1K1l1WXg5a2c3a09FRHdwVW5oMnBYOG1mTlJhWXhFZmpW?=
+ =?utf-8?B?cExhem1Yd29ZU0JtaHhNSjlvNzc2U3pMc0J2YXRDdmJPZ0R4aXlHT2MzR3R2?=
+ =?utf-8?B?NzRlRzJ4YkFCNkFjYmpIQmM1TFJTT2YzNHdLVkI4RUFyUFVER0FSRWFLYmpx?=
+ =?utf-8?B?WmVPTVprMC9Ha0l5VXRuTi84Mit5d05rY1B3djBGUW5NYlJPaEI5QjFZVFJk?=
+ =?utf-8?B?b0ZXYUUzT20vUTRjd0QyU0pzcWpmME5VU3ZPNFNMeEowNUJzc0tVTjZ3bGtD?=
+ =?utf-8?B?TktQWU4wMlEydXpIMDVOUVNFYVBUYTcxUlpOdVFEN3pBaVRyWmJLVzVGb2dH?=
+ =?utf-8?B?NEp1anJDV1JFdm5ZZ0ZTaHFtaVkzWk1MQjdnREV0K0NxQXpyUG5sU2NSMXlk?=
+ =?utf-8?B?TUtjZGE4QUxCWjFpalZRdEVUb2loZlZ6QVdtVmp5QXh4WkxRWmpLT2xqY1FV?=
+ =?utf-8?Q?F5/a/fgSqTg1fBuKn7d1ACgsJ?=
+X-OriginatorOrg: amlogic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49803726-e0d8-40e9-1c53-08ddc40a7752
+X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2025 01:45:38.8865
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZNjSYwR2JGDEnTEQyudg0plPgLPqeOjss1lSy2KwRBVob/qlyvfoomtPtB0UG5YWuopzgC6xCMPxeJj4E3wy6Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR03MB8535
 
---===============6195540799257023679==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
+> [ EXTERNAL EMAIL ]
+>
+> Hi,
+>
+> On Tue, Jul 15, 2025 at 9:37 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Pauli,
+>>
+>> On Tue, Jul 15, 2025 at 9:30 AM Pauli Virtanen <pav@iki.fi> wrote:
+>>> Hi Yang,
+>>>
+>>> ma, 2025-07-07 kello 10:38 +0800, Yang Li via B4 Relay kirjoitti:
+>>>> From: Yang Li <yang.li@amlogic.com>
+>>>>
+>>>> User-space applications (e.g. PipeWire) depend on
+>>>> ISO-formatted timestamps for precise audio sync.
+>>>>
+>>>> The ISO ts is based on the controller’s clock domain,
+>>>> so hardware timestamping (hwtimestamp) must be used.
+>>>>
+>>>> Ref: Documentation/networking/timestamping.rst,
+>>>> section 3.1 Hardware Timestamping.
+>>>>
+>>>> Signed-off-by: Yang Li <yang.li@amlogic.com>
+>>>> ---
+>>>> Changes in v4:
+>>>> - Optimizing the code
+>>>> - Link to v3: https://lore.kernel.org/r/20250704-iso_ts-v3-1-2328bc602961@amlogic.com
+>>>>
+>>>> Changes in v3:
+>>>> - Change to use hwtimestamp
+>>>> - Link to v2: https://lore.kernel.org/r/20250702-iso_ts-v2-1-723d199c8068@amlogic.com
+>>>>
+>>>> Changes in v2:
+>>>> - Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
+>>>> - Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com
+>>>> ---
+>>>>   net/bluetooth/iso.c | 6 +++++-
+>>>>   1 file changed, 5 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+>>>> index fc22782cbeeb..677144bb6b94 100644
+>>>> --- a/net/bluetooth/iso.c
+>>>> +++ b/net/bluetooth/iso.c
+>>>> @@ -2278,6 +2278,7 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+>>>>   void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>>>>   {
+>>>>        struct iso_conn *conn = hcon->iso_data;
+>>>> +     struct skb_shared_hwtstamps *hwts;
+>>>>        __u16 pb, ts, len;
+>>>>
+>>>>        if (!conn)
+>>>> @@ -2301,13 +2302,16 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>>>>                if (ts) {
+>>>>                        struct hci_iso_ts_data_hdr *hdr;
+>>>>
+>>>> -                     /* TODO: add timestamp to the packet? */
+>>>>                        hdr = skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SIZE);
+>>>>                        if (!hdr) {
+>>>>                                BT_ERR("Frame is too short (len %d)", skb->len);
+>>>>                                goto drop;
+>>>>                        }
+>>>>
+>>>> +                     /*  Record the timestamp to skb*/
+>>>> +                     hwts = skb_hwtstamps(skb);
+>>>> +                     hwts->hwtstamp = us_to_ktime(le32_to_cpu(hdr->ts));
+>>> Several lines below there is
+>>>
+>>>          conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
+>>>          skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb-
+>>>> len),
+>>>                                                    skb->len);
+>>>
+>>> so timestamp should be copied explicitly also into conn->rx_skb,
+>>> otherwise it gets lost when you have ACL-fragmented ISO packets.
+>> Yep, it is not that the code is completely wrong but it is operating
+>> on the original skb not in the rx_skb as you said, that said is only
+>> the first fragment that contains the ts header so we only have to do
+>> it once in case that was not clear.
+> I might just do a fixup myself, something like the following:
+>
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 0a951c6514af..f48fb62e640d 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -2374,6 +2374,13 @@ void iso_recv(struct hci_conn *hcon, struct
+> sk_buff *skb, u16 flags)
+>                  skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
+>                                            skb->len);
+>                  conn->rx_len = len - skb->len;
+> +
+> +               /* Copy timestamp from skb to rx_skb if present */
+> +               if (ts) {
+> +                       hwts = skb_hwtstamps(conn->rx_skb);
+> +                       hwts->hwtstamp = skb_hwtstamps(skb)->hwtstamp;
+> +               }
+> +
+>                  break;
+>
+>          case ISO_CONT:
+>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=982756
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.40 seconds
-GitLint                       PENDING   0.30 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      24.91 seconds
-CheckAllWarning               PASS      27.48 seconds
-CheckSparse                   PASS      31.47 seconds
-BuildKernel32                 PASS      25.09 seconds
-TestRunnerSetup               PASS      485.88 seconds
-TestRunner_l2cap-tester       PASS      26.03 seconds
-TestRunner_iso-tester         PASS      38.66 seconds
-TestRunner_bnep-tester        PASS      6.12 seconds
-TestRunner_mgmt-tester        FAIL      134.57 seconds
-TestRunner_rfcomm-tester      PASS      9.58 seconds
-TestRunner_sco-tester         PASS      15.05 seconds
-TestRunner_ioctl-tester       PASS      10.53 seconds
-TestRunner_mesh-tester        FAIL      11.46 seconds
-TestRunner_smp-tester         PASS      8.80 seconds
-TestRunner_userchan-tester    PASS      6.52 seconds
-IncrementalBuild              PENDING   0.62 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.181 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.184 seconds
-LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.186 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.962 seconds
-Mesh - Send cancel - 2                               Timed out    1.999 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6195540799257023679==--
+Well, that's great!
+Thanks so much for your help.
+>>> It could also be useful to write a simple test case that extracts the
+>>> timestamp from CMSG, see for example how it was done for BT_PKT_SEQNUM:
+>>> https://lore.kernel.org/linux-bluetooth/b98b7691e4ba06550bb8f275cad0635bc9e4e8d2.1752511478.git.pav@iki.fi/
+>>> bthost_send_iso() can take ts=true and some timestamp value.
+>>>
+>>>> +
+>>>>                        len = __le16_to_cpu(hdr->slen);
+>>>>                } else {
+>>>>                        struct hci_iso_data_hdr *hdr;
+>>>>
+>>>> ---
+>>>> base-commit: b8db3a9d4daeb7ff6a56c605ad6eca24e4da78ed
+>>>> change-id: 20250421-iso_ts-c82a300ae784
+>>>>
+>>>> Best regards,
+>>> --
+>>> Pauli Virtanen
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+>
+> --
+> Luiz Augusto von Dentz
