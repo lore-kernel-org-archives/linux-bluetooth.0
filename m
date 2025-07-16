@@ -1,147 +1,157 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FDB2F5491
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 17:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A544A2E3715
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 17:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752686081; cv=none; b=qbzkD3wddQAPg7iadxjEWxwX7I4eduxV3NxWPq6AalKQ+hYGHqKdShNbCOgG0QjkPFc/NahV594kuA5mCtGW4YiT1/I/t4LozBnmsqqRmXxrUwstzk5gwDS5BF5LKYR1ZHllerNBQF16zfGsK+pVUPZPTZ6RKp3e44cpQUaD0Cc=
+	t=1752687422; cv=none; b=UAu/rgOXwCrc+hec0Oa7ML8yKpg17D7wakFEAiR6ilE/Mr24nMdPqZmRIpQ4FxY22PdWkZ9UI4lX69ZfRj7mZF/mtTLUazDJ+cX5AzkoEu2KHE21OCBdZzrF588P2ZPNTYFfgI6oqbDzCr7zsOcHcFPAe/kCMUnXlMG6mY5XWuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752686081; c=relaxed/simple;
-	bh=ejJgDd8MpCT57JoOWrwTBC5xvD/+ns3FTHgTDYirhEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=H5veBPzo7g6aw6dJ/d/AG0vUnkz/6VqxXvtdmWnWxV44+kyC+JQJQZp7vLSQjaGuCJEXsEzoA0xgZfx386kM4eCmXI8jANG4u5kssOLLJL3fmk6XN+Nmygb65pZ9+OE5ZDOjP/b3MhFuLjt+M+tc7A1Izl/zHtgBL9BvRhgu+rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chrisdown.name; spf=pass smtp.mailfrom=chrisdown.name; dkim=pass (1024-bit key) header.d=chrisdown.name header.i=@chrisdown.name header.b=OnWenuOc; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chrisdown.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chrisdown.name
+	s=arc-20240116; t=1752687422; c=relaxed/simple;
+	bh=WyC03OOfGDQudNUqC0Vb44QP171Km+FMYMZ5unN2yRU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=iik5BH8Y7c/bVlAMM+px+3ORPxC9QjZI5qbnbi9JYbxf32UQNO+gBsh2ztoKUy5M+E/sEx90S1CMOUak1e+C62rNgLfYEilRUXGr169WBWvZQlUK411jtP28G6o0eKJ2o+qBKCAHsnF5vB3TMHGQ8SYuiTvv7LfSOoVDjoZBbRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F22QcL5C; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chrisdown.name header.i=@chrisdown.name header.b="OnWenuOc"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7490702fc7cso137045b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 10:14:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F22QcL5C"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ab6646476aso939101cf.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 10:37:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chrisdown.name; s=google; t=1752686078; x=1753290878; darn=vger.kernel.org;
-        h=user-agent:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qeBNGJJp3kyBdCsSWxsDFjNHn9eObMtgXl0SO4K/NyY=;
-        b=OnWenuOcBJ+NscU+EouZSxVEFtZHWBfZh2cjjxJ4qpSGYLLwT2xCaa+vm/dNTPqoCg
-         yZ9R7RKOdwG043L9gWHTCye0Y8JgC/0tuqcF2UOzQEJJtp6bA7K5RgajdBKar93MCkQ8
-         KTZTdLrMxVb4/vs5HXdGIKep5LTLnv0+Sq3ts=
+        d=gmail.com; s=20230601; t=1752687419; x=1753292219; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OaB2whT4oOKDDrJSfO24qVs2feOn5IolaSgkUJAkKoI=;
+        b=F22QcL5CIU7pvuJGGv0XODcgrSsTXNdOUEnXnWMZLKBYhim/TumQJClgLk0eJGo9eH
+         2HQsjbVqwdaIvhQ6igj6ikvr5D2XQGakwXJJZadyKXEHBgbMq1hRj+0G4YndjHUy6QEt
+         DpBkpmhtftdODJbOPLWVjQ2B/7qZjQ6T3QmuevbQBZ9v6VCetla2Mon0BV9sg3XPKE8B
+         c39LYEFe9wvEWJl+WsIejeGZAq0Xm5mY9f+g/hIrmocvaRk7fUmbNX2Zq1ADu8i/q+Fu
+         GLFejdTkIvaYbeutZBrAdJUp+dQVHZZ7DeMuyeLjqZa8GCJWVBGUP7zSPVxKGFCs9NIT
+         jm1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752686078; x=1753290878;
-        h=user-agent:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1752687419; x=1753292219;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qeBNGJJp3kyBdCsSWxsDFjNHn9eObMtgXl0SO4K/NyY=;
-        b=GBYRj6Xu4kYJY0qm1f8q+sfWJp9wMHcjvwYr78OxMHF0aKdetw1p4zbMuqlYOhfI2O
-         +A9zuMwdA5JDDGkVYysGBdFsyQPDkX7wfXn3S0balRbbSBmdbVTn+iIXekQ3Esu+2r/F
-         ldgo0Ilb0Nas2srIC8rmWI8xBNye4TLiLzPIEoX4nyPh4v2BYMVCf0IfwPAJWvd2Rwok
-         MZMW4edRi0NNyhg7Ugj7CdX2Js/ag04OC247dar3l2xbCELsCIDmllcurixQrdZUmWtL
-         VqMNPQDQbql5/ro9RF68XTTgQeSkNrCKYCAJv1GXHNWxFWH6WNvoaSeePjzrNJ3fTrpk
-         08LA==
-X-Gm-Message-State: AOJu0YxcMLryOLkAd5hkFLmmE5CHGSzcsrC6mn9vok4YcgpqEs51ynFe
-	n+6bkX8xJyolgFkjYwukKSClTtdOHVWyXL8M05lC1iWDW0uovGIhCUi/Cn1mqDNFvZcMA71g7qr
-	QuvFeMzUeFg==
-X-Gm-Gg: ASbGncukhZeli7gTy4reTyVJZ5TLvBW5mDTdwX4yQiY30Ww0RJGRrpZKnCL5HvFW11T
-	38SKhLoN8cQDb9/amwSHK9PFOSbvZWOijLsnI9IcUcLk+oRITffkvjv8fs69eCgr40mnv7llOYZ
-	S2jZNv4qBd5kBOtqdDURDeapV75iBlodWvsD3/CHFiMbTtwfj3QOGoN+Mq3P+bx97TQitqiOv/L
-	ISRx6ctLgC2VAQjjJhi8uvLNOBD92dYfcB2a49fs7rUCIQJHj4Ad9G4WBpNrKnDdxAh40A9qhHp
-	+qNfV2TAnH6987ap6lsBGlcdFgJU3vJiIbNIV0szsfzeDT+MoP1HELisojOUcy09PshS8Q3lkps
-	ux38ByPIESzyKLN7BUtkiETVIuCGh/Zg=
-X-Google-Smtp-Source: AGHT+IElKGgfKxTCBTWr/+7lLox2k9YVASZ6P5GjrsMkDgEwyDJzGJJ5DL7tt1YTGHSHLU2xgMgjcg==
-X-Received: by 2002:a05:6a00:92a7:b0:74d:f997:1b45 with SMTP id d2e1a72fcca58-756e81a0b16mr7184541b3a.8.1752686078431;
-        Wed, 16 Jul 2025 10:14:38 -0700 (PDT)
-Received: from localhost ([101.127.220.50])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b3e66e96464sm5253647a12.19.2025.07.16.10.14.37
+        bh=OaB2whT4oOKDDrJSfO24qVs2feOn5IolaSgkUJAkKoI=;
+        b=RGnFaGIVONZULZJUy/Ep8bHnNwdDbBkJTta2H9WQ1G+VobfjSuqnvLTxi2TeQiHDOa
+         uZ3vZ3zU10Ikmw6lnWNSnve5ffMfFnvC1xXRBySKMFfY2gR7rAmmbfq58ageC7j31zFJ
+         3ELKqWCLd4yo10J2pT3Xuhx0sxx8gpxSf5iJ9JPnzBCSnOV/9pdYcd0Zw21AR/dndbkB
+         MWOuXMj1S/mecP/sOywDH1bjm7ju4XJT+3tGsXAP6rygqXyYyuDSIsMbsKzSAbG5rsDa
+         j4ppX5Giem7WAwmZbX7RIBmKnARlFCIBMM3H/kChLKdqKcnhXYPu5t8IRgmsyHkXwmle
+         HVmg==
+X-Gm-Message-State: AOJu0YxcL6oxRaw+fxO7oLw9wjSGueLJ1lHHzQRaUr3PMimKDPp0/WuP
+	R3iL1OrmUjIDHFq42FGZTE/sYkLlBER4A8El9P5SMbZSh4me5P5Sg01r4pxdJw==
+X-Gm-Gg: ASbGncvwTFwLtOHD+g0ceZIi2Vb5jSnqngJT/5P5YWz6/dO03AKoifQXWkFjZrdMmIP
+	9GjOlyNf6a24JzYXjWalAkaY5F4TFgUChEaCAtDkFBLiTwEFWIvgdJ35beQ6GiVze4vfeaYsTNc
+	N8V63r0VuYD6TpzBAN2souJT6kpXafxwY3B/ZiXggGw6+b2rK3nfDRQvHgYhV37+CKABXFGokwv
+	sphEE++O7tFzMJGKjbYDAGC4csRsPDbOaUnLw3t5bmP8eJNFCisThJBI39Hkc+B6iPwtAcUVjnx
+	/zKpxSfzB9FdN5RfVIjuPu/Dsk7B3/SRm5c5ZVQUKCKToNZrsQM+F79kD5Pq06pxcODo4tFpb2c
+	rHkmqvIyd9SfhO0o+HX6ykfAS2NT41os=
+X-Google-Smtp-Source: AGHT+IFLG0uBRQH9ngL/rj66i37R8AB+CurQM1IxJaVl/MuGuDX16Vl6NxK7FxlDWfZZVrSeO+DG+w==
+X-Received: by 2002:a05:6214:440f:b0:702:c4d8:ec02 with SMTP id 6a1803df08f44-704f4aed57amr60826436d6.40.1752687418979;
+        Wed, 16 Jul 2025 10:36:58 -0700 (PDT)
+Received: from [172.17.0.2] ([135.119.132.144])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7049799ed04sm73481216d6.6.2025.07.16.10.36.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Jul 2025 10:14:37 -0700 (PDT)
-Date: Thu, 17 Jul 2025 01:14:36 +0800
-From: Chris Down <chris@chrisdown.name>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel-team@fb.com,
-	Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Subject: [PATCH] Bluetooth: hci_event: Mask data status from LE ext adv
- reports
-Message-ID: <aHfd_H6c9MheDoQP@chrisdown.name>
+        Wed, 16 Jul 2025 10:36:58 -0700 (PDT)
+Message-ID: <6877e33a.050a0220.2c7ec1.f462@mx.google.com>
+Date: Wed, 16 Jul 2025 10:36:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3383490182528354884=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/2.2.14 (516568dc) (2025-02-20)
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, chris@chrisdown.name
+Subject: RE: Bluetooth: hci_event: Mask data status from LE ext adv reports
+In-Reply-To: <aHfd_H6c9MheDoQP@chrisdown.name>
+References: <aHfd_H6c9MheDoQP@chrisdown.name>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The Event_Type field in an LE Extended Advertising Report uses bits 5
-and 6 for data status (e.g. fragmentation), not the PDU type itself.
+--===============3383490182528354884==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The ext_evt_type_to_legacy() function fails to mask these status bits
-before evaluation. This causes valid advertisements with status bits set
-(e.g. a fragmented non-connectable advertisement, which ends up showing
-as PDU type 0x40) to be misclassified as unknown and subsequently
-dropped. This is okay for most checks which use bitwise AND on the
-relevant event type bits, but it doesn't work for non-connectable types,
-which are checked with '== LE_EXT_ADV_NON_CONN_IND' (that is, zero).
+This is automated email and please do not reply to this email!
 
-This patch introduces a PDU type mask to ensure only the relevant bits
-are evaluated, allowing for the correct translation of all valid
-extended advertising packets.
+Dear submitter,
 
-Signed-off-by: Chris Down <chris@chrisdown.name>
-Cc: linux-bluetooth@vger.kernel.org
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=983051
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.19 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      24.17 seconds
+CheckAllWarning               PASS      26.64 seconds
+CheckSparse                   WARNING   30.08 seconds
+BuildKernel32                 PASS      23.90 seconds
+TestRunnerSetup               PASS      471.53 seconds
+TestRunner_l2cap-tester       PASS      25.45 seconds
+TestRunner_iso-tester         PASS      40.15 seconds
+TestRunner_bnep-tester        PASS      6.20 seconds
+TestRunner_mgmt-tester        FAIL      132.04 seconds
+TestRunner_rfcomm-tester      PASS      9.54 seconds
+TestRunner_sco-tester         PASS      14.95 seconds
+TestRunner_ioctl-tester       PASS      10.34 seconds
+TestRunner_mesh-tester        FAIL      11.75 seconds
+TestRunner_smp-tester         PASS      8.82 seconds
+TestRunner_userchan-tester    PASS      6.44 seconds
+IncrementalBuild              PENDING   0.78 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.216 seconds
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.198 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.276 seconds
+Mesh - Send cancel - 2                               Timed out    2.000 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/hci_event.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c0eb03e5cbf8..077c93b5fae0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6237,10 +6237,14 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
-+#define LE_EXT_ADV_DATA_STATUS_MASK GENMASK(6, 5)
-+
- static u8 ext_evt_type_to_legacy(struct hci_dev *hdev, u16 evt_type)
- {
--	if (evt_type & LE_EXT_ADV_LEGACY_PDU) {
--		switch (evt_type) {
-+	u16 pdu_type = evt_type & ~LE_EXT_ADV_DATA_STATUS_MASK;
-+
-+	if (pdu_type & LE_EXT_ADV_LEGACY_PDU) {
-+		switch (pdu_type) {
- 		case LE_LEGACY_ADV_IND:
- 			return LE_ADV_IND;
- 		case LE_LEGACY_ADV_DIRECT_IND:
-@@ -6257,21 +6261,21 @@ static u8 ext_evt_type_to_legacy(struct hci_dev *hdev, u16 evt_type)
- 		goto invalid;
- 	}
- 
--	if (evt_type & LE_EXT_ADV_CONN_IND) {
--		if (evt_type & LE_EXT_ADV_DIRECT_IND)
-+	if (pdu_type & LE_EXT_ADV_CONN_IND) {
-+		if (pdu_type & LE_EXT_ADV_DIRECT_IND)
- 			return LE_ADV_DIRECT_IND;
- 
- 		return LE_ADV_IND;
- 	}
- 
--	if (evt_type & LE_EXT_ADV_SCAN_RSP)
-+	if (pdu_type & LE_EXT_ADV_SCAN_RSP)
- 		return LE_ADV_SCAN_RSP;
- 
--	if (evt_type & LE_EXT_ADV_SCAN_IND)
-+	if (pdu_type & LE_EXT_ADV_SCAN_IND)
- 		return LE_ADV_SCAN_IND;
- 
--	if (evt_type == LE_EXT_ADV_NON_CONN_IND ||
--	    evt_type & LE_EXT_ADV_DIRECT_IND)
-+	if (pdu_type == LE_EXT_ADV_NON_CONN_IND ||
-+	    pdu_type & LE_EXT_ADV_DIRECT_IND)
- 		return LE_ADV_NONCONN_IND;
- 
- invalid:
--- 
-2.49.0
 
+--===============3383490182528354884==--
