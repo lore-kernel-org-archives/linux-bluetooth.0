@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF9C3D544
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 00:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F4A13B58A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 00:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752626481; cv=none; b=H1pMPhKXVtMX8QbkThxAxBqFLfLARpCQzSFBonu/UCogVHPQw+sTiNkmaLy54qOphq0ZRggucUpmrBWVYNxbFS4N9uB77vL77V3uuUX0YO3JDxJAwkl05YYwAmot2whTpfSVdEnwkl5Z8H5gIEX5fEWHXP+klP0tBnvNCsdjw9E=
+	t=1752626709; cv=none; b=Fs9ujpRAijbCR+nrqrH0n+yPT1KaiomXcf6BEAxZWsRZuAy4NUIXeY+R0Raef37us/fD5CwqjcVvuXkNS32obEzWpfJJJPUyFPSSpIs5upYcy96/FqN6PQMD71a5dGPH5yX+6KY9ehWMgRczJAhNEelELAgIeb6oZT9X++Iv/5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752626481; c=relaxed/simple;
-	bh=pQJ2BabFdfVYmBQRorbtC78fEL4VvfciospE5so97g4=;
+	s=arc-20240116; t=1752626709; c=relaxed/simple;
+	bh=D5+FuZrKak9sawr7EgMP0XIAJ7ZtmlNNDfMO5aNKgDw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ox1zXZNlI0tGTBKnjEVAYFnonJvq5msjh2zNmaX73WtZQ/kBUp8JyWmz1kuf94spBf7RYi87gvrRNdkc7ToGopaaw33ArQiyIlJL0M3pi2jitADD0dvlvuPw4GMkY+ehdU21ME/iBAySVeJenJ2LmBMnyTZeFZtb+B2/m4ea2T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ScwnMjk+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=EsYbakpXRyiV6dJqaNKAH69uNSAxB9/iIe4zNorEmRqUGQ4r40NUL2mcWl64duoqJdhqeeyPnRVvIyCFY6UIWA22zzH4gPFPw+ykE9RJ7af4GFw5Z93m3OnEFnA1CzNiGflJmbdu8yd4YunGajv+Tg9P84p1wrjNhPXuBgwkRWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z//k9GyE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ScwnMjk+"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 83234C4CEE3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 00:41:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z//k9GyE"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B11FBC4CEE3
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 00:45:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752626478;
-	bh=pQJ2BabFdfVYmBQRorbtC78fEL4VvfciospE5so97g4=;
+	s=k20201202; t=1752626708;
+	bh=D5+FuZrKak9sawr7EgMP0XIAJ7ZtmlNNDfMO5aNKgDw=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ScwnMjk+ERBtrSDYLVyhQjlDyln/4BRfMQYj8Ef9aRNDfSg+lxT2FgzLU5H6y+seb
-	 yXPHuyisezFZ1MWO44eeWp1OJulJREIEkIXAVQ89ROmv7LZ43D4t2R1VoyeMm5ep7H
-	 PLRC/TxJ/uL0mi4mjhSDBuqkk6lzoJdwyENQDz38nP0V3+jImF1vLmvQGRCxB1TJ9b
-	 1DSNuKK4bYZGBrPxtlGsRXj6e6gnLO6qGOfsFzoY+LkzJoSxLp78w13qvpzCYX+88o
-	 laES2ZdFBq6fSICJSMygt9viZ9bHzb0hdvY/o719esnLOpHYG4Z0/jFRj7Xq5vL4nI
-	 3LjMtmZQ2WICA==
+	b=Z//k9GyE0o+2kFRimlyj6kfaOlilgB5tIagu5LgvGC56ycTwPAgsX3mI+760IlwU6
+	 aOCRsCN1E8VtWxaCHpccxanqfuJROnOGIlbaJuV5mxN7FTyyspqnKKq7Kpcin5jXDV
+	 8ewdZWG619vvYnT5PobIdYWIOZeELM86I8OB70VwUJiOASsMCM87iNvzTSGMygR79n
+	 j0BTORhJZ1e/aPAQfJSpc+6VYTilYqNvW+UpMVrHueNNCkLqyhz8Sti1RkksDVcyYa
+	 CRhuhgEceXdBUN6PNwN7qIKsS0+h2/FtbXTpA0cZpCDthLZTy9lm/tj+a3RAG5sXyC
+	 CO5rY3WA1Zb7g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7885EC41613; Wed, 16 Jul 2025 00:41:18 +0000 (UTC)
+	id A38E6C41613; Wed, 16 Jul 2025 00:45:08 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 220341] Bluetooth crashes about 30-40 minutes after I connect
  my headphones:  "Bluetooth: hci0: Hardware error 0x0a"
-Date: Wed, 16 Jul 2025 00:41:18 +0000
+Date: Wed, 16 Jul 2025 00:45:08 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,8 +47,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-220341-62941-Yrtv66oTcW@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-220341-62941-izjIQuXU3u@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-220341-62941@https.bugzilla.kernel.org/>
 References: <bug-220341-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,21 +64,8 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D220341
 
-sameer (sameeross1994@gmail.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |sameeross1994@gmail.com
-
---- Comment #2 from sameer (sameeross1994@gmail.com) ---
-In your case, Kernel Module Crash happened, Could you please try
-reloading(using modrpobe/insmod) the module without rebooting the system and
-let me know here?.
-
-Also After how much time you are observing this behavior?.=20
-
-Is it happening only in call or it happens in all the cases (For example
-:Listening to Music etc,)
+--- Comment #3 from sameer (sameeross1994@gmail.com) ---
+Time is there in the title, I missed it.
 
 --=20
 You may reply to this email to add a comment.
