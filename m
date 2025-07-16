@@ -1,97 +1,86 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx4.sberdevices.ru (mx5.sberdevices.ru [95.181.183.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA6C2641F9;
-	Wed, 16 Jul 2025 15:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE42526981E;
+	Wed, 16 Jul 2025 15:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.183.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752678850; cv=none; b=hYpJtRhoc+ueey7LL8PUE9hmN3K2A5sZTKgyrplNvs6YWE0zhute7w3C0kzqw7JElm5v66nhEqRCFxVxhUx0BZD15eSx63tybvutp/n/paIz+pEXFsg7il35zIZ3S56z4Nqt6PnlRIGE+82bXfUmlaoIZiVobWS6ZcXcZbGTp/k=
+	t=1752678889; cv=none; b=gWltrnvLufsQ6TdTFmI0eeRB52etZxIcANB+piAiDg41bFHwqKtljNbYm98bEkkTT4uqw2EcV1UnR6XzGkOVXgZGbCkCDFuuNrsIH12JsNgfUsDx5BMSTLISlCjxmda2Z3h3Z+MHGuHwupXd2h3sJkIVJoGb0zmsVjWzw7VfLhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752678850; c=relaxed/simple;
-	bh=Flsd7kS22FIpdj4IHrumyJz1cX39T+xmLof5cwJKtFU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YMkIIFtlyl9QJgQAEkmHZ+vpzW0RBJsattZl448tocBPOTX4734h+XI1A1K7GOQW2ZP6a5u8qoFEKZng0EJ/eE9gG/n+X49v73v5g2CcKSDFdsdmKVXRoL95ZZk7kaasNCuMDkqPmusR66dw596kLHLB0TGsy3UTCOQjheCIeIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qq/ziE8r; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752678889; c=relaxed/simple;
+	bh=Vimbz9+IH1LGVCB8UlGWULOY8ZJ4Ps1bDBLPARU1s0M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=o0OuJHrMktUEwQ5xdQOtk1oQ566h/j6zPI7tEpsrznlGWBQhiqOZDT+GgU/a1iY45We4D/6C++uNJHgiHYNuiJ+ckhJcy+2lxJIOwKTMLgZX1/cZvEmTNusIVQAQlAHgeBbmUMxVc0bFJ8L5o7BS2EgRUzvFbYzzlfR2w0SAqRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=ex3+OCOt; arc=none smtp.client-ip=95.181.183.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qq/ziE8r"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-32f144d0db8so172521fa.0;
-        Wed, 16 Jul 2025 08:14:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752678847; x=1753283647; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Flsd7kS22FIpdj4IHrumyJz1cX39T+xmLof5cwJKtFU=;
-        b=Qq/ziE8rbzwyAfZC86ouRIlgyY9yJp6I1jUWv+pUexrgBsKkhQEEfs4A1AwS5rvJ/o
-         MGS5SF1Iq6l3i0pEhc7hBiEAmK9yc49lnhCNqHRJx2y6Tb+kpQfVYXUPY/Z7vJfDrxSA
-         0YqZDqiRNw+N2+IJvJSkd+bh8gBTrQsN+ZzWWe31f7HXIAZRUCyJ8hCe1iYQnh0BK1bV
-         9rctIsq1VnNGcZuU5dhR8a5yQeSyg0fQ+fIPES8o7nHEfbp3kPZhZ/NYveWHwy7i/u6P
-         ZTT7JZHkgarkZV4TFlRHzisvJXFP71cDetyi0QTFTG9Zu4eS0Z2WgKrOXepQ1J+qz1JK
-         2qUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752678847; x=1753283647;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Flsd7kS22FIpdj4IHrumyJz1cX39T+xmLof5cwJKtFU=;
-        b=mOWUsX7AYdrdugluAsMC1JSDNFCZYKSMSqWfhPe9WFWwuPTlG73z0b7WdM0C3YOkdt
-         5QIP16/SdAA9rWomz8b77YeNo1RGcpzWrS5swbQwzTBvdOk2l6vP3mL/Aw0jqzGgjLAu
-         c+S/oCZ727C1qD+mJ4j8RvAAB+an/BAg8WrVMDhIN/irKi4REeXpKnXTBxxPaTAtGkcx
-         AnsgSlsfTUaLdynj4RkDOLLZjILwL2BycC2ah6+GHNQ2LxGxRae4qW/F+wYue99lcJZ/
-         ShydaFM10IXV5oJovRWdsFdIHWL7e0XfK8brINvSOwoM4VJKjWbYRmoe7SqO6jIbXjIU
-         n2/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUbc1gCtBVxKk+t8M2X9Eo5rLaQ80dHa4z6PL//3dXhFUhdX0cOWsT12Ng+J7kIMn0FDOYcccAF6SEnmivK@vger.kernel.org, AJvYcCWSbir8p8vRcC4RoOBokDa8zCDghzHgsSx1UnWeltspctFDWcduOGLn5WbS05sZzNTsIRQyuiNBkMHGeM3LRh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKcfPeyAySWvy6soBt1E2wptrXh5UjjUvrSql+V78lTKHnv0ex
-	MDu474KuxAjfbYjR3uUh64JhQG4MEvytT+tLc4Tn7iUxzMygdiEOyB+M/70JSUFzXMKwRKAjf8u
-	PBtNVUg5Gd0sBUer5F6ZTOW9YTVGaxkwtdA==
-X-Gm-Gg: ASbGnctYv41l0dB6UNKdeNEr1/Tc4SN1UFclhgn+pp6XA6Of1ak9/OX8vyp8uANSLof
-	QkVadszPXWuGW/M3n3+0n9XlcI7Gh4zC186iCW0jftsfjhKHHW/awy2db1MuE/ryj9j4Cz+mAGu
-	RfrBPGXnJZShYRKvmjhLBBlEcm0+SiwCvX2uqzYnmGxaXoqrO0+qhIG+EZjylSjKeU66kKofiRO
-	FcvSQ==
-X-Google-Smtp-Source: AGHT+IH7KVt8Q4jwGwL7RJPZHFMoXnqqp9Nchj7M3SnUU5u0V9MoRzKGEtGta870O9aM1bF8qvqlbCo5iNHdx/PdJn4=
-X-Received: by 2002:a05:651c:4103:b0:32a:e7b9:1dc9 with SMTP id
- 38308e7fff4ca-33081111813mr17377171fa.3.1752678846264; Wed, 16 Jul 2025
- 08:14:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="ex3+OCOt"
+Received: from p-antispam-ksmg-gc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx4.sberdevices.ru (Postfix) with ESMTP id 4CB92240011;
+	Wed, 16 Jul 2025 18:04:37 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 4CB92240011
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1752678277;
+	bh=NjtOa874GBjFsysgKDCFvsiz4EW20RSMKVAP+2m7PA4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=ex3+OCOtqc5/Ros9fE0y58w9LGGQ8x51U+eWY0SKQ9BKawWd5g0wxFzQWCRiNQftd
+	 PxUmH0OPPeVDgDOjpMsdu2fGghir/tuK9qiuKogpKk5IRVvQzao6PQsD2ZcRIrd1El
+	 V5+a4ARTnwLyFagQ1jZpzxNYuDVtzZD8Uxn29Z17xhlJjFFyzybDKPzMds2oqxhiWH
+	 pWUbVzWXM1dGoFDYGGjQ3mHTdI7GGZBNlf1CPnXZcAz83BAl4Tv2k+jw31JxGNtqN4
+	 zsTBG9i59IRw+1bB7G86h+QgviEusgfH2Nik2kkTX6x63Zx0W9XXKlhcDJcuoJWsG2
+	 EaZHDVnAA3EkA==
+Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "R11" (verified OK))
+	by mx4.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 16 Jul 2025 18:04:36 +0300 (MSK)
+Message-ID: <943f7a75-d1e8-2833-1ae4-f6979008868e@salutedevices.com>
+Date: Wed, 16 Jul 2025 18:04:26 +0300
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v3] Bluetooth: hci_sync: fix double free in
+ 'hci_discovery_filter_clear()'
+Content-Language: en-US
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: <oxffffaa@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@salutedevices.com>
 References: <257a13b8-6d60-21b3-c714-c6cb74b7b091@salutedevices.com>
- <a408927c-3743-71de-b806-87fd404bb9a2@salutedevices.com> <943f7a75-d1e8-2833-1ae4-f6979008868e@salutedevices.com>
-In-Reply-To: <943f7a75-d1e8-2833-1ae4-f6979008868e@salutedevices.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 16 Jul 2025 11:13:53 -0400
-X-Gm-Features: Ac12FXz8v_Uaon-w__2rBCPz8XijJTdtFUJUpRx4dpPUH5_Do4epzTESXv9BjLA
-Message-ID: <CABBYNZKDJ+qmzcVtzDpuMd5McUWKFZWmp7Uv7NcoaQ9MLS=WuA@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: hci_sync: fix double free in 'hci_discovery_filter_clear()'
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, oxffffaa@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel@salutedevices.com
+ <a408927c-3743-71de-b806-87fd404bb9a2@salutedevices.com>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <a408927c-3743-71de-b806-87fd404bb9a2@salutedevices.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-exch-cas-a-m2.sberdevices.ru (172.24.201.210) To
+ p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Info: LuaCore: 63 0.3.63 9cc2b4b18bf16653fda093d2c494e542ac094a39, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 194892 [Jul 16 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/07/16 12:49:00 #27639138
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
 
-Hi Arseniy,
+Hi, sorry, 2 weeks, pls ping
 
-On Wed, Jul 16, 2025 at 11:04=E2=80=AFAM Arseniy Krasnov
-<avkrasnov@salutedevices.com> wrote:
->
+Thanks
+
+On 30.06.2025 14:08, Arseniy Krasnov wrote:
 > Hi, sorry, 2 weeks, pls ping
-
-Just resend.
-
+> 
 > Thanks
->
-> On 30.06.2025 14:08, Arseniy Krasnov wrote:
-> > Hi, sorry, 2 weeks, pls ping
-> >
-> > Thanks
-
-
-
---=20
-Luiz Augusto von Dentz
