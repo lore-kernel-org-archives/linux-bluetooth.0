@@ -1,185 +1,159 @@
-Received: from mx4.sberdevices.ru (mx4.sberdevices.ru [176.109.96.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AAE1D63C7;
-	Wed, 16 Jul 2025 19:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.109.96.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A30F287504;
+	Wed, 16 Jul 2025 19:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752694206; cv=none; b=AYrkqGRXZEJS6PS7LhcbJBKMlnskhOIrkWdP4ypmJf/YvnVALxQ0iYSVjvPi+r8Q8WhTryEij7/N4ONtAvX7QsBMUcQXEnAyHfoyB4dcED2OSdA1wwEWffvzuGCzXjB9d96FLMwcIqmiakmGvXPSyR1dP47dMcv4T/8APvpH+8g=
+	t=1752695501; cv=none; b=kqVwHsDNZVN2YZX0LgGJ4nQagHAaIjk1oOlsWO0egnQCernxsrNDaGKVJypVAKI+hC8S5gTWbrDfdztD44CjrXNlZy8lRRhCh2wyRXMkhjMSJBeUPBlxns355w7/mq+1Hg3ThXHLDZO7ApVmZrE5us9wz/cWl2Mx8m39D7nQ+y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752694206; c=relaxed/simple;
-	bh=hnMESY61LUdiBDqSBTytVZr5JQLx7UhMLgO9o+ndu4Y=;
-	h=Message-ID:Date:MIME-Version:To:CC:From:Subject:Content-Type; b=d71k0H0UIq/BLmVSZDEAqFdFRX15dKyHowXXsCascwDVssz/xfxiTWt/X9ChrlBgXBowTD8FsDLvqlOH7IjCWtpJPYifuUBQv0ZiGfl+KNOwppX4it1wNdtP2kpVPiHOMHcepLBDHCHh1cv3YWTxz5gRtCDeQ8JMoivyIgU2wDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=ZamgAoxD; arc=none smtp.client-ip=176.109.96.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1752695501; c=relaxed/simple;
+	bh=fi6YTS5YlJB8Otr+tskSFRN14pIMoFNkkeZodQb3baY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NQKFyJ96sQQIfAHhavj54hCLqM7lQuMgtSMNJGUHSuyES1XLVmMYBoYB+wbFcYPPG0mRME8uG12YPuUCYv8QHBiZd+E/y3RcIrSJFspca4dMMDY1zNPlwomRbPIU956XdYkHfOUOpvozVuY4CYiI/i2obdAyQD0Vlo0XKsDPhSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lyB9ch9h; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="ZamgAoxD"
-Received: from p-antispam-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx4.sberdevices.ru (Postfix) with ESMTP id 1F3754000E;
-	Wed, 16 Jul 2025 22:24:00 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 1F3754000E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1752693840;
-	bh=HcxKrVAY8DLx+FqQIQRA/Es2dhMC8MRz6HgW+r0XFtE=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:From;
-	b=ZamgAoxDGTr5AwSUlOS0Egg+OpDGkyBmP/sWMJWrSUXsAN1orO920A74jjlmWobCE
-	 oqg7Pa7TExbHhM3qAGvafZQ+zUUTq30L9F9Kg/Azl3l1SCbO1Fx7Rd7tzXc+Cgs9bT
-	 QqFLkm7UpbDxdNXXxm5ivz7KHlqs3MElf8j4j9IoKL+7pJ0pewkF04u6CJzk+ayTp7
-	 OIGKQlVZb9haMXo9R16AMVOZ6dnYB2Y83F28nyrssNFVWjf76yczRS6G0GACxaBXnK
-	 ubw1bWKj31AEYsUZAiDO6VWlRQ+JxFEk+B4gcIXYtLjoC/9c8aEJTMGF0O4wasGuKf
-	 7i1ed65BwW2GA==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R11" (verified OK))
-	by mx4.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 16 Jul 2025 22:23:59 +0300 (MSK)
-Message-ID: <1313ef02-285a-7012-74eb-b6589d471be5@salutedevices.com>
-Date: Wed, 16 Jul 2025 22:23:58 +0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lyB9ch9h"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5315acf37b6so138774e0c.2;
+        Wed, 16 Jul 2025 12:51:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752695497; x=1753300297; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5jgcQxtmTUMKhRITZSclWze+GelDGo0NEF+SK5DcH50=;
+        b=lyB9ch9hCqim8Ph6pOFbxzB9F42OBjMfpbiLxg3Xv4GATFblGuR7Wkp5FuA1UbapkQ
+         ae5O+0M27CLfFd4Fc9bnS0HX862j8Vw2BDBHrrgRYjClkXj4fBuCvIkKAZZq0OW9NqiY
+         ZRR8H1C30iLgvZ+cI2k/dIPSupRuSWTw1Ic8y5fpOh1UZiD5cTd32ZdTjkvwm6jDie/k
+         qEOmr8Ba/XkrkDi7z/ONiutxluaf7ouF2VtD+q0TXofUhDpz6YrVjz0ru/E9lejj5PNl
+         8HIil2Hb5HYIIDzWNmKYcGu4YgiRUmBCS6kH4NskiJnwLtjPVJBUOPKTTDXSNuila9Jc
+         nfrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752695497; x=1753300297;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5jgcQxtmTUMKhRITZSclWze+GelDGo0NEF+SK5DcH50=;
+        b=wwqIlT65Y4+hIB1EfXIfIcAyrYFYMda7RlaKEqC0P28ScLH7wRfIeqvQPtYmYmFgKG
+         3fhWeZUqZsjfgxls6dxf1YGl+awz1HKWekRKNKMwIteFXhFH3iHBxUI5mDSKbq+vtuoN
+         DO5H+wAXPDna9y9tY/klxvTzmxxUSPIKFKd1wXylxsNzj0q+5XW6nPzwEkClSWqBRTDW
+         6Sah01avrfKzIx1Qh+wl0+XSn755YQuVR7bHpvdk35ZhFYKGqmbjxlSXMRlFWyeC4BDg
+         CLz/Os1QhJLcQbrCd03oONy7n1VpalGwbFQViKTq8aGvFwvRW9tKW5NFgNz4rdhtXIjF
+         NwkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVa7E5wAgulR9wrySrQ054vrOgXhgiLmVUOR8UjDWYJx1wOsyGQZMyQtSI+uZE7qIetdGrbRb4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOsXI1rqsvZXM4V767lFF+hCLWc8kZuZC+iobF1t/+lzJszdfO
+	ED38WGKO/s7orvtcxfZqqAVhVgRQpOqB8x81fAoV/vIhXfUKhUl1m0Qi
+X-Gm-Gg: ASbGncszWYviAFZeblSWrZFeHFm8CngRYngGogyWFXrF4pDnwvGJDevLqnlSrwAD+gn
+	9KlFH5kyJZEgF03oRb5oXvyjWK5F1hF07Hh+Ho5M6mVjTsgqdlLOfSn6TjeV7NdX6i02zgH7aMo
+	xAoIAgzBJu75QOzQey+A9wvaKv5xtFHG/khXW88v++j+mmrlqU2Hy1CvEdazpf3gZN4VFr6Ewt+
+	17/KfMV7qdVkDt5J+DVRvFMCdA95Fn/icD0w1IQoKuKNMH7VfQNT2vhdCC6sZLptiOxsLaUXV+m
+	8kTYla8FKlu2nPYjhGODr/SsHmXjBiqGjdd+IEAKpimPcV+yTsWquW9hiqZfZC9CNn9kLf7Kkhf
+	dua4/Vp23SuZ6Rh8EkG5+qnGmf1CZ0Vi9FRtmZUvsx8P/g5BW1KNv81Sym6kqQuml
+X-Google-Smtp-Source: AGHT+IECzjUlvXcQcJgLnDQa8X7kkwHVrGkFWnTcxsdefEQmyhwpylhCt7LMfS+rE3kzgCWbGpFLvQ==
+X-Received: by 2002:a05:6102:32d0:b0:4e1:48ee:6f36 with SMTP id ada2fe7eead31-4f95f41a546mr2095538137.19.1752695496904;
+        Wed, 16 Jul 2025 12:51:36 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-888ec44a701sm3124364241.23.2025.07.16.12.51.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Jul 2025 12:51:36 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-07-16
+Date: Wed, 16 Jul 2025 15:51:24 -0400
+Message-ID: <20250716195124.414683-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Content-Language: en-US
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <oxffffaa@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@salutedevices.com>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Subject: [PATCH v4] Bluetooth: hci_sync: fix double free in
- 'hci_discovery_filter_clear()'
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-exch-cas-a-m1.sberdevices.ru (172.24.201.216) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 63 0.3.63 9cc2b4b18bf16653fda093d2c494e542ac094a39, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 194895 [Jul 16 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/07/16 17:03:00 #27638287
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
+Content-Transfer-Encoding: 8bit
 
-Function 'hci_discovery_filter_clear()' frees 'uuids' array and then
-sets it to NULL. There is a tiny chance of the following race:
+The following changes since commit dae7f9cbd1909de2b0bccc30afef95c23f93e477:
 
-'hci_cmd_sync_work()'
+  Merge branch 'mptcp-fix-fallback-related-races' (2025-07-15 17:31:30 -0700)
 
- 'update_passive_scan_sync()'
+are available in the Git repository at:
 
-   'hci_update_passive_scan_sync()'
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-07-16
 
-     'hci_discovery_filter_clear()'
-       kfree(uuids);
+for you to fetch changes up to c76d958c3a42de72b3ec1813b5a5fd4206f9f350:
 
-       <-------------------------preempted-------------------------------->
-                                           'start_service_discovery()'
+  Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU (2025-07-16 15:38:31 -0400)
 
-                                             'hci_discovery_filter_clear()'
-                                               kfree(uuids); // DOUBLE FREE
+----------------------------------------------------------------
+bluetooth pull request for net:
 
-       <-------------------------preempted-------------------------------->
+ - hci_sync: fix connectable extended advertising when using static random address
+ - hci_core: fix typos in macros
+ - hci_core: add missing braces when using macro parameters
+ - hci_core: replace 'quirks' integer by 'quirk_flags' bitmap
+ - SMP: If an unallowed command is received consider it a failure
+ - SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
+ - L2CAP: Fix null-ptr-deref in l2cap_sock_resume_cb()
+ - L2CAP: Fix attempting to adjust outgoing MTU
+ - btintel: Check if controller is ISO capable on btintel_classify_pkt_type
+ - btusb: QCA: Fix downloading wrong NVM for WCN6855 GF variant without board ID
 
-      uuids = NULL;
+----------------------------------------------------------------
+Alessandro Gasbarroni (1):
+      Bluetooth: hci_sync: fix connectable extended advertising when using static random address
 
-To fix it let's add locking around 'kfree()' call and NULL pointer
-assignment. Otherwise the following backtrace fires:
+Christian Eggers (3):
+      Bluetooth: hci_core: fix typos in macros
+      Bluetooth: hci_core: add missing braces when using macro parameters
+      Bluetooth: hci_dev: replace 'quirks' integer by 'quirk_flags' bitmap
 
-[ ] ------------[ cut here ]------------
-[ ] kernel BUG at mm/slub.c:547!
-[ ] Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-[ ] CPU: 3 UID: 0 PID: 246 Comm: bluetoothd Tainted: G O 6.12.19-kernel #1
-[ ] Tainted: [O]=OOT_MODULE
-[ ] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[ ] pc : __slab_free+0xf8/0x348
-[ ] lr : __slab_free+0x48/0x348
-...
-[ ] Call trace:
-[ ]  __slab_free+0xf8/0x348
-[ ]  kfree+0x164/0x27c
-[ ]  start_service_discovery+0x1d0/0x2c0
-[ ]  hci_sock_sendmsg+0x518/0x924
-[ ]  __sock_sendmsg+0x54/0x60
-[ ]  sock_write_iter+0x98/0xf8
-[ ]  do_iter_readv_writev+0xe4/0x1c8
-[ ]  vfs_writev+0x128/0x2b0
-[ ]  do_writev+0xfc/0x118
-[ ]  __arm64_sys_writev+0x20/0x2c
-[ ]  invoke_syscall+0x68/0xf0
-[ ]  el0_svc_common.constprop.0+0x40/0xe0
-[ ]  do_el0_svc+0x1c/0x28
-[ ]  el0_svc+0x30/0xd0
-[ ]  el0t_64_sync_handler+0x100/0x12c
-[ ]  el0t_64_sync+0x194/0x198
-[ ] Code: 8b0002e6 eb17031f 54fffbe1 d503201f (d4210000)
-[ ] ---[ end trace 0000000000000000 ]---
+Kuniyuki Iwashima (1):
+      Bluetooth: Fix null-ptr-deref in l2cap_sock_resume_cb()
 
-Fixes: ad383c2c65a5 ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- Changelog v1->v2:
- * Don't call 'hci_dev_lock()' in 'update_passive_scan_sync()' as it
-   triggers deadlock. Instead of that - add spinlock which protects
-   freeing code.
- Changelog v2->v3:
- * Rebase on current 'bluetooth' repo due to fuzz.
- Changelog v3->v4:
- * Rebase on current 'bluetooth' repo due patch apply failed.
+Luiz Augusto von Dentz (4):
+      Bluetooth: btintel: Check if controller is ISO capable on btintel_classify_pkt_type
+      Bluetooth: SMP: If an unallowed command is received consider it a failure
+      Bluetooth: SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
+      Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU
 
- include/net/bluetooth/hci_core.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+Zijun Hu (1):
+      Bluetooth: btusb: QCA: Fix downloading wrong NVM for WCN6855 GF variant without board ID
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1ef9279cfd6f..3728495f0819 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -29,6 +29,7 @@
- #include <linux/idr.h>
- #include <linux/leds.h>
- #include <linux/rculist.h>
-+#include <linux/spinlock.h>
- #include <linux/srcu.h>
- 
- #include <net/bluetooth/hci.h>
-@@ -94,6 +95,7 @@ struct discovery_state {
- 	u16			uuid_count;
- 	u8			(*uuids)[16];
- 	unsigned long		name_resolve_timeout;
-+	spinlock_t		lock;
- };
- 
- #define SUSPEND_NOTIFIER_TIMEOUT	msecs_to_jiffies(2000) /* 2 seconds */
-@@ -889,6 +891,7 @@ static inline void iso_recv(struct hci_conn *hcon, struct sk_buff *skb,
- 
- static inline void discovery_init(struct hci_dev *hdev)
- {
-+	spin_lock_init(&hdev->discovery.lock);
- 	hdev->discovery.state = DISCOVERY_STOPPED;
- 	INIT_LIST_HEAD(&hdev->discovery.all);
- 	INIT_LIST_HEAD(&hdev->discovery.unknown);
-@@ -903,8 +906,11 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
- 	hdev->discovery.report_invalid_rssi = true;
- 	hdev->discovery.rssi = HCI_RSSI_INVALID;
- 	hdev->discovery.uuid_count = 0;
-+
-+	spin_lock(&hdev->discovery.lock);
- 	kfree(hdev->discovery.uuids);
- 	hdev->discovery.uuids = NULL;
-+	spin_unlock(&hdev->discovery.lock);
- }
- 
- bool hci_discovery_active(struct hci_dev *hdev);
--- 
-2.43.0
+ drivers/bluetooth/bfusb.c        |   2 +-
+ drivers/bluetooth/bpa10x.c       |   2 +-
+ drivers/bluetooth/btbcm.c        |   8 +--
+ drivers/bluetooth/btintel.c      |  30 ++++----
+ drivers/bluetooth/btintel_pcie.c |   8 +--
+ drivers/bluetooth/btmtksdio.c    |   4 +-
+ drivers/bluetooth/btmtkuart.c    |   2 +-
+ drivers/bluetooth/btnxpuart.c    |   2 +-
+ drivers/bluetooth/btqca.c        |   2 +-
+ drivers/bluetooth/btqcomsmd.c    |   2 +-
+ drivers/bluetooth/btrtl.c        |  10 +--
+ drivers/bluetooth/btsdio.c       |   2 +-
+ drivers/bluetooth/btusb.c        | 148 +++++++++++++++++++++------------------
+ drivers/bluetooth/hci_aml.c      |   2 +-
+ drivers/bluetooth/hci_bcm.c      |   4 +-
+ drivers/bluetooth/hci_bcm4377.c  |  10 +--
+ drivers/bluetooth/hci_intel.c    |   2 +-
+ drivers/bluetooth/hci_ldisc.c    |   6 +-
+ drivers/bluetooth/hci_ll.c       |   4 +-
+ drivers/bluetooth/hci_nokia.c    |   2 +-
+ drivers/bluetooth/hci_qca.c      |  14 ++--
+ drivers/bluetooth/hci_serdev.c   |   8 +--
+ drivers/bluetooth/hci_vhci.c     |   8 +--
+ drivers/bluetooth/virtio_bt.c    |  10 +--
+ include/net/bluetooth/hci.h      |   2 +
+ include/net/bluetooth/hci_core.h |  50 +++++++------
+ net/bluetooth/hci_core.c         |   4 +-
+ net/bluetooth/hci_debugfs.c      |   8 +--
+ net/bluetooth/hci_event.c        |  19 +++--
+ net/bluetooth/hci_sync.c         |  63 ++++++++---------
+ net/bluetooth/l2cap_core.c       |  26 +++++--
+ net/bluetooth/l2cap_sock.c       |   3 +
+ net/bluetooth/mgmt.c             |  38 +++++-----
+ net/bluetooth/msft.c             |   2 +-
+ net/bluetooth/smp.c              |  21 +++++-
+ net/bluetooth/smp.h              |   1 +
+ 36 files changed, 289 insertions(+), 240 deletions(-)
