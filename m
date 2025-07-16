@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AE029C344;
-	Wed, 16 Jul 2025 18:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133571531E8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jul 2025 19:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752692388; cv=none; b=UNnKbDY0bbu+x1mURFsDg6+YaXqlBRVXmV4oZHjPNLdIsHKfFEW850G1Qk13+QNf/zREd4VXqpIQ+Ftk+SX6jKgTN6vCO7KB105953Mma611dtq4lb2OYwQIro8FlqXO7/bviqcANmta+rzmTGZsFIfQ1i743JN4PinfF2Dc7gw=
+	t=1752693587; cv=none; b=CBU6MWWkY1yz7kHWuJF2eImCjbozwaUoQEgjGAe9MawOtnswx6PiWYjBco3ZPmcAFdecn/Yg0VCJ/6Nk07hlpcPaXUMLK80hPt+1Pt+ZDIGWnzw9kXkhE6qTmAx6laJ97DhjYfxMiRxZwEySmD/PbWrJtcfdyBINKlmH5N4RGwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752692388; c=relaxed/simple;
-	bh=GVZLiheKS3VvwUvq6IEg9RgvAOWlR6tbXdTHHhc3raw=;
+	s=arc-20240116; t=1752693587; c=relaxed/simple;
+	bh=G7VKkOW+ZG42umTvlWtD/A7bI4QJi1jx7WweIyqvAyI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mcy40iHwMKWqDQcuNquQX1AzM51Uw7KaPZP46z/Bx2Uxz2tHlOOqWTE1/pVsGrjVs1d/7jBPwkT2698hmwOeVo/monVavY/129RkFNQN3/YfYNTiQ2N6d72ngA0t5zxsr+1MKXCRdX/Jklxi/tXRObvM4OQQ1yrDTX4HEPgQVM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lwMjNj02; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=VRZVr6hp+Dgr69KNTwjvbz6WUdq3RHYw9osATs4P/hxnI6LSSgg3ew9iIN6ihP+5TlXGwK133Q0VCSFph7hUjO82v9/aI16PFRChcrgKQYn8OguC45W4Rd2uQTDtPNQRclXP5jASv8afhdEVvD6r8/6y/s9itLBQIJmct4dkirY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pypLp5YN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lwMjNj02"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB41C4CEF1;
-	Wed, 16 Jul 2025 18:59:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pypLp5YN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C981C4CEE7;
+	Wed, 16 Jul 2025 19:19:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752692387;
-	bh=GVZLiheKS3VvwUvq6IEg9RgvAOWlR6tbXdTHHhc3raw=;
+	s=k20201202; t=1752693585;
+	bh=G7VKkOW+ZG42umTvlWtD/A7bI4QJi1jx7WweIyqvAyI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lwMjNj02mgT8XpiiyCsUI87MwCY8pLQnBjU4RViQqw9PyRI2QfDy/Wzft5jDHi/LT
-	 MqlTaLIV0ZxHgUCNcTywQ2NyHQJvXhOrreFbamqcgygc28fCKPe7bzkWOCMr4WeD9r
-	 Z4veTMz1OkYs6362Tw5HI784oAbYvxObhi1e1Ong6br1Mb1W/XyZDzOIuswcdb7J5S
-	 Prgtnpr8xxtQzDwJrhRz3rr7iOjWfNIgHU4o6zASVLrdayLGtXHfXA5wspcuYcZDCu
-	 qkIZ2g8MeAas6vOFgLH8wF0au13V/TY3lT4r/oizWkOVIOknXA3UKkMcIX2WE9Ugsu
-	 rWXVw+7xFlWKw==
+	b=pypLp5YN7fWeDI67WniYf/pK1SDmaUuN0XHH9NL0vIIQc4F3pl5F9LWCFW26UcUpI
+	 mBbNdYj2d2Eb4c+swoLVA+DSDj7EHCtA1eBEEx4p2ZuazuqYnRnZMKK70s2u/7dLFP
+	 FyRui1KZ2CPVMUzfF+xH9dLOApXYZldf0+g3401b/O5+xlTn7lr4zTYUL6KivM+4rI
+	 q++w09gYom7IC7bdhygcS5YyAACvMZNSVh/bp2HB3ulDW5ZBqPtlMn5BMS/UUU6J/X
+	 mO/zGuVbS1HNBcTFjG5+2sR7cLbQoXMpcfQcXS5Vnsnl125LsrRmMmTStMITwoiT5g
+	 drwqJDiJ/Dk3g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADD3383BA33;
-	Wed, 16 Jul 2025 19:00:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB098383BA3A;
+	Wed, 16 Jul 2025 19:20:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,43 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Bluetooth: btusb: QCA: Fix bug and support
- downloading
- custom firmwares
+Subject: Re: [PATCH v1] Bluetooth: L2CAP: Fix attempting to adjust outgoing
+ MTU
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <175269240774.1291922.12542235441585164888.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Jul 2025 19:00:07 +0000
-References: <20250715-bt_quec-v1-0-c519cf7a0e16@oss.qualcomm.com>
-In-Reply-To: <20250715-bt_quec-v1-0-c519cf7a0e16@oss.qualcomm.com>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, mka@chromium.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- zijun.hu@oss.qualcomm.com
+ <175269360576.1297178.18183542152543701483.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Jul 2025 19:20:05 +0000
+References: <20250716135345.162225-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250716135345.162225-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 15 Jul 2025 20:40:12 +0800 you wrote:
-> This patch series is to:
-> 1) Fix a bug
-> 2) Support downloading custom-made firmwares
+On Wed, 16 Jul 2025 09:53:44 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
-> ---
-> Zijun Hu (2):
->       Bluetooth: btusb: QCA: Fix downloading wrong NVM for WCN6855 GF variant without board ID
->       Bluetooth: btusb: QCA: Support downloading custom-made firmwares
+> Configuration request only configure the incoming direction of the peer
+> initiating the request, so using the MTU is the other direction shall
+> not be used, that said the spec allows the peer responding to adjust:
+> 
+> Bluetooth Core 6.1, Vol 3, Part A, Section 4.5
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] Bluetooth: btusb: QCA: Fix downloading wrong NVM for WCN6855 GF variant without board ID
-    https://git.kernel.org/bluetooth/bluetooth-next/c/672143df3926
-  - [2/2] Bluetooth: btusb: QCA: Support downloading custom-made firmwares
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a69ca4badd13
+  - [v1] Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU
+    https://git.kernel.org/bluetooth/bluetooth-next/c/514f29ce5bf3
 
 You are awesome, thank you!
 -- 
