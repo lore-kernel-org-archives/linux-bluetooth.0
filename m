@@ -1,95 +1,64 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BE135963;
-	Thu, 17 Jul 2025 15:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3792F9490;
+	Thu, 17 Jul 2025 15:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752767285; cv=none; b=TFiMEo9EYYv1yIMZmM4Jewbq2EXPyd5KovLxegnQS8JDIKUMCFvCUeSD8DsHAZG8Jey7L8n+Lv/DDWMbY0JxvZ+4qucFDyd4XXrtsw/lJ9m8nvftVG1bG6b7jwpzG63/KfLdjfbAwu7DvxlKkGCG2vveeiqYrb5j7BxWHiq1rfY=
+	t=1752767686; cv=none; b=Wjx/pMezDnJYlsmSBnBUdleUWlZ95FB1aQZ85hQk8WC4IK/l9Nwa8MJDQsieGuu7f/bq5VYIMTaDbJjxO9+bj2hodgcJhBcXRWlkg9+bJFnOr2tQgcNCR8k84gBylJKhVIbgwBHViBc9sWg4pOWwGAXmqdmAGyDQCIrkTs7ldc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752767285; c=relaxed/simple;
-	bh=OfE8znsgzLAscLOB/5tyPmFGM2y2PcyOzlU2wR7OELo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bB5Oe5xBg/7OpnE/NbVL7qepS++KNDbYfKQaAeMTL1Hvr0gj00WN6Vztx407Zdhh4NyJI1l+7zKofMZQGm3uxpBmvLuUgaGOA2H35Op4D+pqFvmL8TvYn5JFd+NEtfHhSPVNbDg74qCAScJ1KheHg+lhjLC6G7SQTlzZw0bmpBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdprGg7H; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752767686; c=relaxed/simple;
+	bh=CDTLcl/U6J5OTCspCAmB22phRI4HTyhQcezQ0XtNx3g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SwvWtiIhfu1Ih38HDUuKUxcYspwZF8IRm50iHK5YEeQhuaApRBcghT+gQSs2dzjXAtPaTEMYIv93FgIMFAZGNdNWYo7qYI25vn5yqlBWGb5nbfFXoYAz6o/CukLaMFXS6qxra1DPhAS52hloOXUNXDw8DGehlhkeMB4FgfqHCiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aPuQb0OR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdprGg7H"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-555163cd09aso944548e87.3;
-        Thu, 17 Jul 2025 08:48:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752767282; x=1753372082; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t5oZN8AKAZsvHFL9rwr9nKGdeMEi2sbS9c/718nDOV8=;
-        b=HdprGg7HvOBftZctpQl2F+xO4jPbvphIW+AzKr5Ac1Ap8JRNmMQlIeptjgX9pbVWfR
-         3oDYGzLfgT7If37S10El1Wbfe9ZbSoCPrS1ngIf5yL3FK0WMyO5n6XGedSDvbX5TUSOb
-         QUCGKyPDFPEIx/8UTpCVujcjiZO101gLO5Z5pUjqGSqheA8oqyWkOSAhjdfnRmrxlUv/
-         cTVrampUhwQ+TDG/iw5k2i5sC4MrkrlQKSGZNVHiCCgl8nooC9kHV1xUUxm3hZn3JbC3
-         8f2v3PN5hUwSuCGkRx/MXZy1E0e/R6Wa7Z7k6T9WH+VwlqBX6qRHQix+v3/DC5UhaTdU
-         +00w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752767282; x=1753372082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t5oZN8AKAZsvHFL9rwr9nKGdeMEi2sbS9c/718nDOV8=;
-        b=p9lvCUPpF0QlFtGnfLnZrKbO2oE7WUqwsPFeNtpSrcAO7Gm5/pvcKx+DfdTJfkTswI
-         V8V3/qCBZw4GxFs4ZxS3XC3+XarH6iqEy3sLYvOuv9NzKqyix5OwpzXVZLQLIyADwHGD
-         frpTILOkLdTZxToGWKtJ2rLBXNq/hDkLcDRaeShSkc9p6wc1AaLZD92EdPXHOyk5/pmW
-         gGt3JWZFGBH3FrEz8eFQ5lnXmx8Mb/ynpbbekEFkqwdaggkYjrxjkih8E6E/pgnB9FIS
-         UJ4aKknxLDnWPVWiKM3VmRaLtSKqAYJHkbO+XntAJsx0CPS+sdoAYiJSNG0FLZZqZQob
-         qong==
-X-Forwarded-Encrypted: i=1; AJvYcCWRMLHXw5quc4fAhXOX3CYuw/LfoYBMYANDa8UZvGhWDmvK3m+en3VZGVFMQCYFe1xOvjkjOWDHtGsSnZ5VpDw=@vger.kernel.org, AJvYcCX/AxqegEJAyrpG44ZQmILmmGCh5zYdJron4NyKr8pBUpN64KGL6vula5we7HFXGNqpv+H6T+H0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8UqJ52hCEtOE+pDXVEh4gFQ6uJO5759dQxRIO18rAJfz8zJZy
-	YQSE45DirrdWCMHS/HZwNvSTNLWu9rdhQSGWB8DDxxuWYoYmCktaEBIjBQx0ijN1EcTWYS3WUhv
-	GQVrC7udbtLqnm0uJbRsC4xeH3wQXfBFEVv2n
-X-Gm-Gg: ASbGncuLFsz2u+tvaA6QxwNl82kzk82W9ZLywXpYlkZmyG4LqPWEeoFMa8nMjeXiXW0
-	Sy6xbJvLchPfObjm8kTeCxDnwZd/qIn5vVj68giu0/9HVOe01rlneAgrSlCUcH0GxdH39jo8WRM
-	I+6JgLxM92ufostqGIjiQG7BY41gB3TUN6WSFvWYmae5PXlDycO//YseU8DjOT2ETyN0oXN8J9K
-	3KyXg==
-X-Google-Smtp-Source: AGHT+IHebl7pHemxLOC6HcPBjnCrEs4aU7DXAAyHdkbMFoPZtVifEZ96/EKsDI6KaIYbpVZAb5S+ld1aaGnTdAXuET8=
-X-Received: by 2002:a05:6512:3b0d:b0:553:acf9:c430 with SMTP id
- 2adb3069b0e04-55a295a080dmr1037374e87.17.1752767281306; Thu, 17 Jul 2025
- 08:48:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aPuQb0OR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D58F9C4CEE3;
+	Thu, 17 Jul 2025 15:54:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752767686;
+	bh=CDTLcl/U6J5OTCspCAmB22phRI4HTyhQcezQ0XtNx3g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aPuQb0ORPo8kV5gsRMA88+qAz9uOriIDU8ZHDsZUMFDZ50fgOV6+lRPi9hIxmf6Of
+	 TF/Bmz4VXufUoqzdEJMSSjYefEVTDUx+RMmn2CYdVdOUc7dBIZ2tQfrowZBtGUUvsE
+	 siPyOAemb5+oKfesUTnnyuiZ72RwjXhGz6piQtk6/p5MlpBmEOvQadOwMwLtX7i/Vd
+	 ru4+cDpLVDWms9oAaAtY3wkls8sv5C3F3y+YTVMEhmwmYKpNZf+At50KsSELE12SHZ
+	 WpKvtpBltnyL/7PpV2f2MRxm+o/2ebL6tm95oNQeqmX1Y2y5Z0VwgFyFDV5iPjHRTo
+	 uQyOd5xnu52og==
+Date: Thu, 17 Jul 2025 08:54:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [GIT PULL] bluetooth 2025-07-17
+Message-ID: <20250717085444.2847ac02@kernel.org>
+In-Reply-To: <CABBYNZKW8aG=sJP+iwk44ozvJwiv0wPkrPrOBrnFZ=39rA7-CA@mail.gmail.com>
+References: <20250717142849.537425-1-luiz.dentz@gmail.com>
+	<20250717083857.15b8913a@kernel.org>
+	<CABBYNZKW8aG=sJP+iwk44ozvJwiv0wPkrPrOBrnFZ=39rA7-CA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717142849.537425-1-luiz.dentz@gmail.com> <20250717083857.15b8913a@kernel.org>
-In-Reply-To: <20250717083857.15b8913a@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 17 Jul 2025 11:47:49 -0400
-X-Gm-Features: Ac12FXwO3XErC6gJGcfaA689efmIjy2mTC83eLnKwwBa4iU165HTZlkEbnrVmVg
-Message-ID: <CABBYNZKW8aG=sJP+iwk44ozvJwiv0wPkrPrOBrnFZ=39rA7-CA@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth 2025-07-17
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On Thu, 17 Jul 2025 11:47:49 -0400 Luiz Augusto von Dentz wrote:
+> > On Thu, 17 Jul 2025 10:28:49 -0400 Luiz Augusto von Dentz wrote:  
+> > >       Bluetooth: hci_dev: replace 'quirks' integer by 'quirk_flags' bitmap  
+> >
+> > FTR this rename and adding the helpers does not seem to be very
+> > necessary for the fix? I know Greg says that we shouldn't intentionally
+> > try to make fixes small, but there's a fine line between following that
+> > and coincidental code refactoring.  
+> 
+> I should have reworded that commit, it is actually a fix, not just
+> renaming, we run out of bits on a 32 bits system due to usage of int
+> as storage.
 
-On Thu, Jul 17, 2025 at 11:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Thu, 17 Jul 2025 10:28:49 -0400 Luiz Augusto von Dentz wrote:
-> >       Bluetooth: hci_dev: replace 'quirks' integer by 'quirk_flags' bit=
-map
->
-> FTR this rename and adding the helpers does not seem to be very
-> necessary for the fix? I know Greg says that we shouldn't intentionally
-> try to make fixes small, but there's a fine line between following that
-> and coincidental code refactoring.
-
-I should have reworded that commit, it is actually a fix, not just
-renaming, we run out of bits on a 32 bits system due to usage of int
-as storage.
-
---=20
-Luiz Augusto von Dentz
+Right, but I think if the new bitmap was called quirks the existing
+set_bit / test_bit call sites would have been just fine, right?
+The bit ops operate on single ulong and bitmaps all the same.
