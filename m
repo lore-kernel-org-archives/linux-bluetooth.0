@@ -1,188 +1,155 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A60218FC86;
-	Thu, 17 Jul 2025 15:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E7B1E47A5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jul 2025 15:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752765110; cv=none; b=rWIEEobnwhahV1OyUsfJqQhoqAGlQtitWr0TT49wE3N1+YgYKuBWOHxyYiY9BOnh6BASskEsWoHGz/B3ygr3hxVKsAmdsu9xgKZOqTbgkLMyxhKYOPuK9p2fu8QfK9fHVbZLZWeVNSZFUyzP4DbwoCdeEWz+RwQvLdz4sccU6RY=
+	t=1752766648; cv=none; b=O2LrxnGmuSWXzP9ZFvOBn3HBAJuOC4tfPG8DqN9Jo7L9c4M7wF14mn64I7np3pzbOKqbndiNPTk2agH9E0Y33Ay7GepB6VczytNLZDyX1FYuHGUkBJALUgC3K1ohVp3IUbdAM6wsw4zvYsgqtk37jpC3dENUbujk1Pb6pQ6djMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752765110; c=relaxed/simple;
-	bh=RfvJAbGcoePDrvUo8SG41VwGoiTa7Wy/weJXB8JvzmA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qb1iFuo0a4FV78GX056jP0WpkksmxvaaSv9KmiZ/OZajRekUBgKZJrIOcTY4I4R/qSRJ1kWJktfN9zLszjdQ69JdFAKHh1CeNdZbbMEIlxc2LxOQGi6tlyUWY8uXgMXtLtwF9J+wO0+9xdDjfjLlSw2bPEKE4cDQjXWl3BT5LMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sco8B/X0; arc=none smtp.client-ip=209.85.216.52
+	s=arc-20240116; t=1752766648; c=relaxed/simple;
+	bh=5S5r15zJmy+dxZOdd3GBeCSe8TPm3uikHrN/f/nj6FY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=iO7qRzZA99++00TUxaeljZZhdbq3ZhXuT0Cfhhc95guJnMKAYjyhHzTg1bhsCK0t6nwy4BuzBpqPd0hC5HgZsJtwFFsvZ5/Rp0iI+bzvCEDwFsGVkNnzETmT9+yuJ/0i2PJSAluIas2IaZkBTKFC8VVCbwAlxqA34tB74FAZaHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LeW/SCgl; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sco8B/X0"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-311c95ddfb5so919573a91.2;
-        Thu, 17 Jul 2025 08:11:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LeW/SCgl"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a9bff7fc6dso10243701cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jul 2025 08:37:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752765109; x=1753369909; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mhv/Dq8Lxx9kqyTK+rpaOCeKirx9sGRLXSClbZRCh0=;
-        b=Sco8B/X0BeXiojSGlo69ASwf+4dk971X9YT9Ue3F+u7M3D9KAh7+qkG2h+8B0ZxNZO
-         CUs6eKM0hwuYGexasuPtrMQA+l2BR49iNPO+gXbTXiZFjywsKILOYRC9LctROSwMMANC
-         yf1LvxQ3rK/2pYdYRhDy87T7jSZhSxTD2qA9KNUBALVBsWc8/vWWKoE56B4ucLvSHrhY
-         0F1evgErrLIOvn74UrJlL6JsuRAb834VMXqZUYk0rriTcsw/V2QgBcOBwokpgn8ghOsY
-         rFZGPthR0eNTrKV7ZUGNMuz9/xuFqdXvG8rS8NQdr/GGOdfr8CGCDiLLKopq07LZHoyd
-         5wEA==
+        d=gmail.com; s=20230601; t=1752766646; x=1753371446; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sB+7YgliaxoKD8E5fICfsHgwrCU04pDYKYYl/IAofsc=;
+        b=LeW/SCgl99YywgYD9RueS4jms15TAip/JgjYs85iN+zVF29XPSgJQ/LGefsov8Czbz
+         MVS0HFbFfxc0CUTMGIgyLjqxrbTI33IaEnxrB+loFzWv/iBtl1J7GyuFWx1bZ4AVHcJc
+         IhPkerxluHLa2urat40fKjU7omtCq/+JRsTYWL3wk/cePe4xO17478kyGv8W6+fXpOWu
+         kO4VfbWImEY2f7i6i6IxzH0a/60ywj7QJwaVcuowELAmoA3c39qMclQ9z9UHzTT1ePJx
+         A9yA+LHn74OFaDhq4wNfEC6ni7Ktwyl9XpSeRhDREaTwr888kwW3IRVzv99uZ5NFtJ6j
+         yMpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752765109; x=1753369909;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1752766646; x=1753371446;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+mhv/Dq8Lxx9kqyTK+rpaOCeKirx9sGRLXSClbZRCh0=;
-        b=K+6IpQyTotF++KTLzS4ARxlqnml4PIDkWSAFeD+wcOFvdIKgYkOfzxiZgBaxzn0fMQ
-         9Z9IqMITvJy7/oJPSi1S0hpvey6Api+UITuv7T57IplgM+IaFY+yvtyD9b6RDyKdYRQs
-         IgrFvEQQ9uIIc5FnW/uuG/2AmXFAsmfQXNZpLqna2bKFC+VxMZOMo44/LU34b4ThlajX
-         3EVt7MCZ+zPtif2q/o1JhHc5ZO22hJmzds3/xRYDcMykVxJb0cucoSPYbyztszhsVsWF
-         xK8paE8qg5QmujQtwXNGGL5VFx/2Pn/vKqyDhMfT+UaEJ3KQb76HWuBeU1wS6/P0vPpD
-         vpxw==
-X-Forwarded-Encrypted: i=1; AJvYcCUA0gmS5joInRYEHBZaBdD6R1Q5R7UBZd74AAbbt3F2yvyOmVgjUB63PC995OmpVIN2lY5gacZwez6ttjSZ@vger.kernel.org, AJvYcCXSU69UjIKeQoSaizpXj3KOppNu2w4UWBbQsGSRQ7l9G90lmjABRuHI9i8uauBXjA51skah5uR/GET+Um6TKng=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIBz991fsdsv8C5+aY+dikPjtaHH8Y94X9pytnAABmMuoli3l1
-	0xXPTrnkSPTabaa7TZTHSEsTWIb/UeFirvCgdAHwYoXFd0/EuH4bH4Qz52mpLCXh
-X-Gm-Gg: ASbGncuhLrDJ+nvKW3Z0MCLq6oJ2lQ3qRFXID86hE1F7K/vjViuriaz00DjI6JqMO3f
-	SUX1qLdaJL2A+dTm7+eUzmPcC6wmLnLOV4VrO0nbSLNJ8YlhO4jlU/7bSO2MbPdPIjp/loNFjHR
-	6WxSIsKIlImaqh4TO2tUTk8USiuSwocaUSsUamjy1fcHjYrxsGwpFiscTyMxDPsFaN6I9ZoNlwF
-	tFfRE0+5MYGVzZ2WUeoze0DKgvQdkCcFamk6Gd0lV6p5Yo6H1sl2od9yuXZvDNrTFDe0MqZHIuC
-	oeRuLx95GWPhv/94XAbJNEFUJiE9ba6cJQxR2j3XzhISAUNpyGkA8ZoUxdA5i7vEmI9ux2Cvpk3
-	dXJiEbO2AAHL8m/CyqK8zSiuKw0xg229swHqllF4eu3Lpcd/Km+gwaxEf3XZtPRauQwjLyBnX5q
-	Q=
-X-Google-Smtp-Source: AGHT+IGEtiT/Xk6voUrN+8xLP8T2v3jP5vak5oA9+oMU3uzh4q0axPU3LGQNJYEetePB95PTQpuyMg==
-X-Received: by 2002:a17:90b:28c4:b0:311:e8cc:425e with SMTP id 98e67ed59e1d1-31c9e78b707mr9701248a91.31.1752765108294;
-        Thu, 17 Jul 2025 08:11:48 -0700 (PDT)
-Received: from ipravd-Nitro-AN515-55.hsd1.ca.comcast.net ([2601:646:a000:5fc0:cedd:b9ca:8b99:e839])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31cb5cb3f98sm1245049a91.43.2025.07.17.08.11.46
+        bh=sB+7YgliaxoKD8E5fICfsHgwrCU04pDYKYYl/IAofsc=;
+        b=jXa80xHiuldWsMTQ2cS9vaLZ06Sex/LyIXZZ7ZcQvu8OUVTI/g2Ur20lURWET6Jjar
+         PkrhnrDpcdQX+sLmouy+bwzZQtCBEPREUICqyHS+EvItXStWqhVOuMPhJN3Xsthkn4jw
+         QgjN8YbFx8HipFREgjCwj6iGDarcXija/0WvvT5Zrjpvtw5tz+XzUMEPA3MmNihq5IXI
+         HrphfJUlfToTGmPDnjChCsH2m29QP7jQSoCSFW8IrUrWyhej1EWWIb1NZnf+qeNLYuSo
+         gwq9kL85nfMwQQcp6YQSEKAxWL+Y/6GSTFyF13d1VgoUqfc/Mz7hDZnCLsWUCRPjdnm8
+         Z3hg==
+X-Gm-Message-State: AOJu0YzYpUZtD/TTuJVlSdxbrl2S2SYzzFPu8Js+tqsTlQi+d/mEhqUP
+	lYAu+YRkfDQUKtKJaiIjZffVnnQ7inZLFRihwb2mgMJZn+ToQ8/GUMCFPJ0O+g==
+X-Gm-Gg: ASbGncvO4WC2OxstCP6C+ileqSw3QZjUljjYScNYq+wiAQpgptrhSYCiUYMZFnxJWeC
+	lkbI3WYklDYMRlfWW76xfilrjuIBLPweHytu3rt3cnEiPb6RNEGybpBpI41NqTWzxSlD068c0jO
+	XHh/MG/elsKuQ5ngx44Z/n7RCXEM7UIt8gzAVjGlW1taB+X/w9lxZZim/6YLa7MbI707Ogz1gUb
+	aGj60kQyK9KK0VXwT1berAH3048BiFxTKveWahXlCiqDCRwFgVmFKbNqNgbBwv4IT0X5lSFsNuX
+	PwyYPO3WKkE48QKDwcrIsmv6FBuLUVV4ortgERDYXbQ0ls8i+7D12CA6j5h8O2HLjqiA0En9lp1
+	/FsVgzypQkW5gfpRhFuDv7fydbRc=
+X-Google-Smtp-Source: AGHT+IEDVy7U5924wJe6VL2uqmE8e4PsdQhyyG+EFIY3I/e23Wuz8U9/Pk6ZPZ6UqC4PljOOpulwbA==
+X-Received: by 2002:a05:622a:4a14:b0:4aa:105c:a0d5 with SMTP id d75a77b69052e-4abb087e94cmr4999911cf.16.1752766645576;
+        Thu, 17 Jul 2025 08:37:25 -0700 (PDT)
+Received: from [172.17.0.2] ([68.154.38.20])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ab5e847f78sm55730421cf.12.2025.07.17.08.37.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Jul 2025 08:11:47 -0700 (PDT)
-From: Ivan Pravdin <ipravdin.official@gmail.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Ivan Pravdin <ipravdin.official@gmail.com>,
-	syzbot+ac3c79181f6aecc5120c@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: hci_devcd_dump: fix out-of-bounds via dev_coredumpv
-Date: Thu, 17 Jul 2025 11:10:52 -0400
-Message-ID: <20250717151051.195106-2-ipravdin.official@gmail.com>
-X-Mailer: git-send-email 2.45.2
+        Thu, 17 Jul 2025 08:37:25 -0700 (PDT)
+Message-ID: <687918b5.050a0220.84581.6f36@mx.google.com>
+Date: Thu, 17 Jul 2025 08:37:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0383314979924514285=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ipravdin.official@gmail.com
+Subject: RE: Bluetooth: hci_devcd_dump: fix out-of-bounds via dev_coredumpv
+In-Reply-To: <20250717151051.195106-2-ipravdin.official@gmail.com>
+References: <20250717151051.195106-2-ipravdin.official@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Currently both dev_coredumpv and skb_put_data in hci_devcd_dump use
-hdev->dump.head. However, dev_coredumpv can free the buffer. From
-dev_coredumpm_timeout documentation, which is used by dev_coredumpv:
+--===============0383314979924514285==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-    > Creates a new device coredump for the given device. If a previous one hasn't
-    > been read yet, the new coredump is discarded. The data lifetime is determined
-    > by the device coredump framework and when it is no longer needed the @free
-    > function will be called to free the data.
+This is automated email and please do not reply to this email!
 
-If the data has not been read by the userspace yet, dev_coredumpv will
-discard new buffer, freeing hdev->dump.head. This leads to
-vmalloc-out-of-bounds error when skb_put_data tries to access
-hdev->dump.head.
+Dear submitter,
 
-A crash report from syzbot illustrates this:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=983409
 
-    ==================================================================
-    BUG: KASAN: vmalloc-out-of-bounds in skb_put_data
-    include/linux/skbuff.h:2752 [inline]
-    BUG: KASAN: vmalloc-out-of-bounds in hci_devcd_dump+0x142/0x240
-    net/bluetooth/coredump.c:258
-    Read of size 140 at addr ffffc90004ed5000 by task kworker/u9:2/5844
+---Test result---
 
-    CPU: 1 UID: 0 PID: 5844 Comm: kworker/u9:2 Not tainted
-    6.14.0-syzkaller-10892-g4e82c87058f4 #0 PREEMPT(full)
-    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-    Google 02/12/2025
-    Workqueue: hci0 hci_devcd_timeout
-    Call Trace:
-     <TASK>
-     __dump_stack lib/dump_stack.c:94 [inline]
-     dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
-     print_address_description mm/kasan/report.c:408 [inline]
-     print_report+0xc3/0x670 mm/kasan/report.c:521
-     kasan_report+0xe0/0x110 mm/kasan/report.c:634
-     check_region_inline mm/kasan/generic.c:183 [inline]
-     kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
-     __asan_memcpy+0x23/0x60 mm/kasan/shadow.c:105
-     skb_put_data include/linux/skbuff.h:2752 [inline]
-     hci_devcd_dump+0x142/0x240 net/bluetooth/coredump.c:258
-     hci_devcd_timeout+0xb5/0x2e0 net/bluetooth/coredump.c:413
-     process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
-     process_scheduled_works kernel/workqueue.c:3319 [inline]
-     worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
-     kthread+0x3c2/0x780 kernel/kthread.c:464
-     ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
-     ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-     </TASK>
+Test Summary:
+CheckPatch                    PENDING   0.32 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      24.78 seconds
+CheckAllWarning               PASS      27.04 seconds
+CheckSparse                   PASS      30.95 seconds
+BuildKernel32                 PASS      25.50 seconds
+TestRunnerSetup               PASS      491.41 seconds
+TestRunner_l2cap-tester       PASS      25.62 seconds
+TestRunner_iso-tester         PASS      43.07 seconds
+TestRunner_bnep-tester        PASS      6.09 seconds
+TestRunner_mgmt-tester        FAIL      130.91 seconds
+TestRunner_rfcomm-tester      PASS      9.51 seconds
+TestRunner_sco-tester         PASS      15.12 seconds
+TestRunner_ioctl-tester       PASS      10.33 seconds
+TestRunner_mesh-tester        FAIL      11.40 seconds
+TestRunner_smp-tester         PASS      8.66 seconds
+TestRunner_userchan-tester    PASS      6.44 seconds
+IncrementalBuild              PENDING   0.64 seconds
 
-    The buggy address ffffc90004ed5000 belongs to a vmalloc virtual mapping
-    Memory state around the buggy address:
-     ffffc90004ed4f00: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-     ffffc90004ed4f80: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-    >ffffc90004ed5000: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-                       ^
-     ffffc90004ed5080: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-     ffffc90004ed5100: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-    ==================================================================
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-To avoid this issue, reorder dev_coredumpv to be called after
-skb_put_data that does not free the data.
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-Reported-by: syzbot+ac3c79181f6aecc5120c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=ac3c79181f6aecc5120c
-Fixes: b257e02ecc46 ("HCI: coredump: Log devcd dumps into the monitor")
-Tested-by: syzbot+ac3c79181f6aecc5120c@syzkaller.appspotmail.com
-Signed-off-by: Ivan Pravdin <ipravdin.official@gmail.com>
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 481 (98.2%), Failed: 5, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.230 seconds
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.179 seconds
+LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.200 seconds
+LL Privacy - Set Flags 4 (RL is full)                Failed       0.297 seconds
+LL Privacy - Remove Device 3 (Disable RL)            Failed       0.260 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.040 seconds
+Mesh - Send cancel - 2                               Timed out    1.994 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Changes since v2:
- * Updated subject line
- * Updated comment to include more details about the issue
- * Moved dev_coredumpv instead of using temporary buffer
 
-Changes since v1:
- * Changed subject prefix to Bluetooth:
-
-[v2] https://lore.kernel.org/linux-bluetooth/20250716003726.124975-2-ipravdin.official@gmail.com/
-[v1] https://lore.kernel.org/linux-bluetooth/20250614041910.219584-1-ipravdin.official@gmail.com/
-
- net/bluetooth/coredump.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/coredump.c b/net/bluetooth/coredump.c
-index 819eacb38762..720cb79adf96 100644
---- a/net/bluetooth/coredump.c
-+++ b/net/bluetooth/coredump.c
-@@ -249,15 +249,15 @@ static void hci_devcd_dump(struct hci_dev *hdev)
- 
- 	size = hdev->dump.tail - hdev->dump.head;
- 
--	/* Emit a devcoredump with the available data */
--	dev_coredumpv(&hdev->dev, hdev->dump.head, size, GFP_KERNEL);
--
- 	/* Send a copy to monitor as a diagnostic packet */
- 	skb = bt_skb_alloc(size, GFP_ATOMIC);
- 	if (skb) {
- 		skb_put_data(skb, hdev->dump.head, size);
- 		hci_recv_diag(hdev, skb);
- 	}
-+
-+	/* Emit a devcoredump with the available data */
-+	dev_coredumpv(&hdev->dev, hdev->dump.head, size, GFP_KERNEL);
- }
- 
- static void hci_devcd_handle_pkt_complete(struct hci_dev *hdev,
--- 
-2.45.2
-
+--===============0383314979924514285==--
