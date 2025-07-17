@@ -1,127 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D818D20485B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jul 2025 10:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A0F7262E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jul 2025 10:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752747462; cv=none; b=r+EkZxJe+Owa6Zg1qbTuxH+r72nmDLe25ZOpbfQnsoVggf4EIz/qUvOiqoVbiQrCga8Mneu3ARBcNeWOA2PvrZS6AvSnKhqeWZUcTZtvM+u3byZjGeinFnlospdrGBSCZBnZRnOb8G3NV40q2InHZpO4PT9F0/kdsjiu+dPjEtY=
+	t=1752749140; cv=none; b=lnHk6HF0g/SGAEOiNqxhG/R2XmK6qlSV0TrAOHZZ2x+pPFFNvMAzgUbl/z/t0rBUfaaHrS4+h6Okam72BoUKh42+TMwiC7kt6T0b2icyPGBY8n7TQBXs5iNUPVyx+AezffuKMXHsye4EYSS6QdO79e53rADDQ+kELMU2NKNj2zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752747462; c=relaxed/simple;
-	bh=NBt8jkLPn4GumDkHjCWKpe0G2W6zlI3FqivQA32cb7s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GugCTPwOR9nOYwyo0IqU43PXPoKwD68xNFIv3ruOIKBv2xIjMIMJoE6pXk8cKjpIQhGvSOSQXxw/ceIJt6DPoTZMIts5MQWZ1YccLSscnB4k7LKl91zDl1gCG/KwW0pKjMKgpDlO6gPcM41hVnOc0WgAwzB9cmtV338T9KpPE34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LoWr7Etb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752749140; c=relaxed/simple;
+	bh=bcMN6VpF0Vnjv7TNqxnH9px4A82fDOLja7XJOi9yNVQ=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ABMIP3dKqoNgrGv+qbcxcZAkEbyNefuKsiUsOQ6ZfT3kHK/YzbLUZX2McvK/a2XPUq8B3N1uIPjlS9BFBmp1c4pH7SEvrVQdrOodkvaJ6M+LBpggYbiom4GiEa75VeyEKn0VdINaO9UReOlY8aog0xxNzRp830lkYzG3CiqUEO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eHQ3CPGX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LoWr7Etb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752747459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dA83DHVfeNFVTjWP8lzcP6NpqW8OSKmbcKpzsEz/UVw=;
-	b=LoWr7Etb227m8Ag/NHj8RMpOH6HtH8xCs58wZjtkxXAIzc3+HlC24cqabZ2UesySeIYzeT
-	AqQ9V9y91ISqkTsBiFQK4cB2eqQR5EZTMcuvqOsRR0L3/PQl0bu3DhRaY6ZPKuSg7IRkVG
-	iMMQC91Y4vHMWlHYTv0HaLmnzQCP0Bo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-dflr5g7AMx23NdjlNobfRg-1; Thu, 17 Jul 2025 06:17:38 -0400
-X-MC-Unique: dflr5g7AMx23NdjlNobfRg-1
-X-Mimecast-MFC-AGG-ID: dflr5g7AMx23NdjlNobfRg_1752747457
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a503f28b09so470119f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jul 2025 03:17:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752747457; x=1753352257;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dA83DHVfeNFVTjWP8lzcP6NpqW8OSKmbcKpzsEz/UVw=;
-        b=WMjsHpMHXfQK2qbJyWoEMQIhXDy+9UQqf8dlTvGa0zhxKqD4ZUg53cw55yJtP6GKvE
-         BNuzdpjKe90hhQKfxmd4U45LbtF18IazT6hZoj3RY97TVmI7yCwkFmHyFa9fFPttM8oh
-         ZXeFcNqhIWG9B7AmdDUTPk9MtLTsaR44lyfksUtfBe73IKihDZOC8EXSyrmQV78O+Pig
-         SPXs/OAyQhjJbkRP09Z082MmUaQaPlOv5sBXNY5iH7ptw3F5Z7H74bZUkpgmgzTG130M
-         pTAstddKTmYM9kkRmj3Bh+vjkwJ0f8zGr6naKPqedqYEUwu/hgmKp7lVeiOAInwLrmu2
-         0qEw==
-X-Gm-Message-State: AOJu0YxzbUxEns3iRMOHz7WDXIrLFLBxLKSgetKban60Hocva7SEfSGq
-	FV8wdSF1zf7ObBALsQ+GQb/jrc3nAal4vedBudPTrimVZTEpfzPxk3FC9cafp3VEE0Mjjr5aGo1
-	DXeVCXu6hL5ii2V4Uw5kJf5sO/SzGYCSC1fHlKTkyGEKzFtUUT6ytBYJtg8IgeCJFu8l1POXk80
-	3Htw==
-X-Gm-Gg: ASbGncvrITA1ptv0US0jLF0EjKc5amzb0j1sQeXaK5xBz+wHrW6OB7MobvX7sNbOZTn
-	R8LR8S+Be9wMkYhZ0aU6V7/SQAio67DQ5JGpmrkVsuj3S5t1h5+PGfW1OzW7nIozbtb985Zc1z8
-	dPl1KHpwqmNguzd8CixUW2G5bQPy/tYAXGPYguvQaBkcEI4nf2Eivz3W5mGfJUj3CqzHuqWxVzh
-	xmFoXZSny9NZc9FlRv4LTEmbrtoKtjsXY6dJ5oxO7n6HSwO9x4O09WvlEXp2xAyvtnDM8WYJ77D
-	3IorPL6vIM3nDNQ5WL3GKdVM71McaIlWPQW0qkToMDDQuqkabhPs1KdqTsowjH/MCQ67Srh2YAC
-	up2mqsymziqM=
-X-Received: by 2002:a05:6000:2dc3:b0:3b6:d6c:efb6 with SMTP id ffacd0b85a97d-3b6139c9ff4mr2311896f8f.2.1752747456989;
-        Thu, 17 Jul 2025 03:17:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGJ4nb+S2fBLt8jwcH+8MZT/7FPHYdOWtKr0hVaFs8ec14pMlJS9OgTkny4GDrN/HFFLoToFw==
-X-Received: by 2002:a05:6000:2dc3:b0:3b6:d6c:efb6 with SMTP id ffacd0b85a97d-3b6139c9ff4mr2311876f8f.2.1752747456571;
-        Thu, 17 Jul 2025 03:17:36 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8bd1833sm19831179f8f.8.2025.07.17.03.17.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Jul 2025 03:17:36 -0700 (PDT)
-Message-ID: <7d445ce0-bf96-441d-8fd9-2ed6b0206b4f@redhat.com>
-Date: Thu, 17 Jul 2025 12:17:34 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eHQ3CPGX"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EA880C4CEE3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jul 2025 10:45:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752749139;
+	bh=bcMN6VpF0Vnjv7TNqxnH9px4A82fDOLja7XJOi9yNVQ=;
+	h=From:To:Subject:Date:From;
+	b=eHQ3CPGX+rYIWcHGHtEuiEhiAqD6qR6Xap5ljfOh1kna2EW31u/zSzP9udBxFaqec
+	 Lo5q9Rj1RMh18dhudG0VNu8lxAvCJ6wCetFgK/02HBVOucdON4IMSWviaGKKz4BNS9
+	 DTPyKfyMgBOe8r0v7QsYDZtxjmbbz0RM1IGIY8L1GH5cA7G9Xo/iKZI0iWfYQGjpGI
+	 4jrVtpRy9/SQBb52BRaQ3jQZz0pdGDa6Zl3Jkf5UKzXeHxEM76HdCozcRNCUqK+CzP
+	 zj2Dgh/wgQqEnM940ff6qGXW/jOYnkE6HnJ/d55wrYVsNfUdR3yL7SRuFJ006fBGHR
+	 tHa6gJlbbAG3g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id D6F0DC433E1; Thu, 17 Jul 2025 10:45:38 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 220344] New: Intel AX211 bluetooth randomly disconnects and
+ reconnects, started after kernel update
+Date: Thu, 17 Jul 2025 10:45:38 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: tal.lich@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-220344-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] bluetooth 2025-07-16
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-References: <20250716195124.414683-1-luiz.dentz@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250716195124.414683-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
 
+            Bug ID: 220344
+           Summary: Intel AX211 bluetooth randomly disconnects and
+                    reconnects, started after kernel update
+           Product: Drivers
+           Version: 2.5
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: tal.lich@gmail.com
+        Regression: No
 
-On 7/16/25 9:51 PM, Luiz Augusto von Dentz wrote:
-> The following changes since commit dae7f9cbd1909de2b0bccc30afef95c23f93e477:
-> 
->   Merge branch 'mptcp-fix-fallback-related-races' (2025-07-15 17:31:30 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-07-16
-> 
-> for you to fetch changes up to c76d958c3a42de72b3ec1813b5a5fd4206f9f350:
-> 
->   Bluetooth: L2CAP: Fix attempting to adjust outgoing MTU (2025-07-16 15:38:31 -0400)
-> 
-> ----------------------------------------------------------------
-> bluetooth pull request for net:
-> 
->  - hci_sync: fix connectable extended advertising when using static random address
->  - hci_core: fix typos in macros
->  - hci_core: add missing braces when using macro parameters
->  - hci_core: replace 'quirks' integer by 'quirk_flags' bitmap
->  - SMP: If an unallowed command is received consider it a failure
->  - SMP: Fix using HCI_ERROR_REMOTE_USER_TERM on timeout
->  - L2CAP: Fix null-ptr-deref in l2cap_sock_resume_cb()
->  - L2CAP: Fix attempting to adjust outgoing MTU
+Bluetooth devices disconnect every few minutes. Tried same devices with ano=
+ther
+laptop with same hardware but Windows OS - works fine. So this is not the
+devices or the Bluetooth hardware.
 
-This has issue with fixes tag, the hash looks wrong:
+Every time the disconnect happens, dmesg shows:
 
-Fixes tag: Fixes: d5c2d5e0f1d3 ("Bluetooth: L2CAP: Fix L2CAP MTU
-negotiation")
-	Has these problem(s):
-		- Target SHA1 does not exist
+Jul 16 13:47:24 licht-t14s kernel: Bluetooth: hci0: Retrieving Intel except=
+ion
+info failed (-16)
+Jul 16 13:47:24 licht-t14s kernel: Bluetooth: hci0: Hardware error 0x0c
 
-Could you please adjust that and send a pull v2?
+I have tried:
+- Downloading the newest firmware file from linux-firmware (file
+ibt-0040-0041.{sfi/ddc}
 
-Thanks,
+- Setting the following options in /etc/modprobe.d
 
-Paolo
+# Disable power saving in both iwlmvm and iwlwifi
+options iwlmvm power_scheme=3D1
+options iwlwifi power_save=3D0
 
+# Disable bluetooth coexistence to avoid BT issues
+options iwlwifi bt_coex_active=3D0
+
+I have read on Ubuntu's forum (here:
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2051720) that this may=
+ be
+a regression in kernel 6.5 but I'm on a newer kernel
+
+Hardware info:
+System  : Lenovo Thinkpad T14s Gen4 model 21F60051IV
+BIOS    : N3PET23W (1.14)
+Adapter : Intel AX211
+Firmware: 133-20.25
+
+OS info:
+Kernel  : Linux licht-t14s 6.8.0-60-generic #63~22.04.1-Ubuntu SMP
+PREEMPT_DYNAMIC Tue Apr 22 19:00:15 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+Distro  : Ubuntu 22.04.05
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
