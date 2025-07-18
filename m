@@ -1,180 +1,187 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F911B0F23
-	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jul 2025 19:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280EF17578;
+	Fri, 18 Jul 2025 23:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752867052; cv=none; b=fCg16ENzq935EioRZ+ZNl8hxPSfRiMCUNGbYUOfIZSa4EMoP1f/Yf4zL8sEpigHgm1uBFql124tK6bdR616IG/64p/oURccf2zf50V5Eb66qJlSvMGT1E5sNCvY08+QqBflB31JcM58M/Z01nP6XdvS3sFElEHCjPXgNHkN5tvE=
+	t=1752881528; cv=none; b=KNeJlqmQfsnOCeQV9viaKsVECTxPt/ZjHW5gox/sb/MUlNEkm0vJRXBn9JBkNVcFmSaW1xq9lDQVZgiZTt22yLAdq3ru++/7JL+K+eOuL+to+pPdVyla4VVgdN30nr20aJ2+wryB9HbwWx/8iIDgzH4lBq6ZvWQXI6CD7aPGf1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752867052; c=relaxed/simple;
-	bh=DENGTCDiG19qQMuFFeEbCYMNs5bqXUe8ua1f2rku1Fs=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=qtULPqAYMRGQQ+6ZahfrH7bV+IWQ+GpIBWlZelXk+JtyRvK4p45xPTHAmcowqHvGb4AtzV5OwrGZ7AY+zWyhc4Rtpd6OOnRvWQbif1FNu8dJC9V75tgAak6F3QPB9WcPEcTpQrda99vJQ5Jeo/2Ysw+1jw3ZnkyRRu1bl/tAr9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VZWQQ7/4; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1752881528; c=relaxed/simple;
+	bh=9limy8ekR9R4k0Sxx+1VcEVXAQFGzvQbpdW1BNVRO6U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qBzgX8xnilNxqElm4w8cQNHGGuu6TTkhYmM4iykYnyFc622IqM/hzhCVjEVgNvk7BoRj274yk4fsQmOQuanyz8Vz3kBcLM3N8oN/ATVCxXGI43pfbguUB6fCh5k7c0iyfSoCA9KFlR0ZAanZMEUqCIt9jQZYWnAoPjKGrffCjAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J6ep6SsB; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VZWQQ7/4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752867051; x=1784403051;
-  h=date:from:to:cc:subject:message-id;
-  bh=DENGTCDiG19qQMuFFeEbCYMNs5bqXUe8ua1f2rku1Fs=;
-  b=VZWQQ7/4HPj39pczmyy/JVthitydjzb1pF4Ufsa4qeJWAG3HpLMHjAvj
-   25h/iGgtRsRTWCg5t86FyWDENV/mxL4uz/mxoEqRSmyIgNSc6Pr9u6jUy
-   WMMhMaeQqoGyRvlNEhD/8lLG6j0QEcHTMsM4t+9cE+5EYSxQgiGWa6fAR
-   auEMModZFBti8KSq22Ry3h//qkpaJXQEi4k9SavULRXwUvibRcqGYxuZI
-   LVDtydpXNthKyFQG3UO23q0DEvruXqag+vcl4AZIn/stB+EEi7R37tTvz
-   EmrAgEi+5cJe87kQzslDdPia6saqkXJ4sZD8Ab8ANGQ9i6iGKf5tbiGo0
-   A==;
-X-CSE-ConnectionGUID: UtKHuqRoQcWSPDZ8w2dgWg==
-X-CSE-MsgGUID: 52EIEy2CRbCuBVJra2KqOg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11496"; a="58980751"
-X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="58980751"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2025 12:30:50 -0700
-X-CSE-ConnectionGUID: JRm41Y3pRNeQglj8qGi2Bw==
-X-CSE-MsgGUID: zRMiacpFRrC7xzfLKyvr1g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,322,1744095600"; 
-   d="scan'208";a="189083594"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 18 Jul 2025 12:30:49 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ucqn7-000EyR-0T;
-	Fri, 18 Jul 2025 19:30:45 +0000
-Date: Sat, 19 Jul 2025 03:30:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 2215f5c93ed12bdca19fe640574a0ee7f274325a
-Message-ID: <202507190332.BykeDvyr-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J6ep6SsB"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56IGjkDu007207;
+	Fri, 18 Jul 2025 23:32:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Ww8fpLfyWcnsamcVTtSdxyPq6Z8+91Wd32Vlsm8k570=; b=J6ep6SsBspe1beRe
+	VtrQKxEI//juyVR92MwggdiLxc/GNiGWA97Tm1Z5XS5ycF04r+Klu15KpvjSer54
+	CTdjlQoU7zUwMOGHlYSDr1XcaRNpODsCNnVNSeXnIQt1Dwob/hXjU+0oXBsXKleC
+	y3ckKFdLoHHaqH55TjMVWq3xsrkm31/1ZCF6r6eKD4q9vU/njcmi6TadI7gOs9EO
+	Ym858OR7DgyJBNr1QSUwlPnL9fj8HhSvYardEQdvJW6SZoK3hAl2DWLC/LznYOcc
+	C7ixO49KEqSkwBtT2Q2ISETXKzqT3F+cZszhHzOiYaMVFcy6r7zHJyZY1o/kPHsm
+	HKqf2A==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47wfcaebxc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 23:32:05 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56INW4S6008832
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Jul 2025 23:32:04 GMT
+Received: from [10.253.13.179] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 18 Jul
+ 2025 16:32:03 -0700
+Message-ID: <e7e700e4-e87c-4e2c-8df1-634870ba91b2@quicinc.com>
+Date: Sat, 19 Jul 2025 07:32:00 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] driver: bluetooth: hci_qca: fix ssr fail when BT_EN
+ is pulled up by hw
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
+CC: <quic_bt@quicinc.com>
+References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
+ <20250715051618.724475-2-quic_shuaz@quicinc.com>
+ <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
+Content-Language: en-US
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+In-Reply-To: <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE4MDE5NSBTYWx0ZWRfX3FV8jQQOISI4
+ 4sQ8pxcDcMheS4hstuZxrj6MoHAxtbGohx0Nzwuxc5lPlkriBcvvr8dVoZC7tvlcH01TfIRJ+jW
+ h3FPIZCnO6J//cZ/T73WTyMTcX6fXZ6tukk6cdLgNDknfHpVMX74jBhGgVUv+i3ExAdbgG2IMlT
+ XvqHuFrgpwYvsfRW9Qhwzv98rAPCmg1uqoUUigg85B2UyjGcy7QeNqu+g6d/don1peDmJ+41JPT
+ SQLZQH/siQa633rAXD5xL/SLF9/UXUrn3LvL7pDKxZW7m3S3qVlp2wRJAwN8gYbsqFx8P2pQFE+
+ YJtmeGIT+Th2PCM7Ej4GWCAmPceubC7gnFOCt7Fo++lyppQxqvufrarhUePdPLNG+HZjfccC5a8
+ uNQmMBd4kABX2XEx0UYDofuRdrcJpJM1eQNB/Y1M09kwu9ADNwW9IIshofXmbL+B2KcvOD2L
+X-Proofpoint-GUID: NT2f4TXPJVMHFLCk8hgiPDLD-ooXttFS
+X-Authority-Analysis: v=2.4 cv=SeX3duRu c=1 sm=1 tr=0 ts=687ad975 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8
+ a=Oj2nRzj9iAJ_O5cg774A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: NT2f4TXPJVMHFLCk8hgiPDLD-ooXttFS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-18_05,2025-07-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 phishscore=0
+ lowpriorityscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015 adultscore=0
+ suspectscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507180195
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 2215f5c93ed12bdca19fe640574a0ee7f274325a  Bluetooth: hci_devcd_dump: fix out-of-bounds via dev_coredumpv
+Hi Konrad 
 
-elapsed time: 1451m
+On 7/15/2025 5:11 PM, Konrad Dybcio wrote:
+> On 7/15/25 7:16 AM, Shuai Zhang wrote:
+>> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+>> This leads to reset command timeout.
+> 
+> This is a description of what goes wrong in terms of the code of
+> this driver, and it doesn't explain why you gate the code addition
+> with HCI_QUIRK_NON_PERSISTENT_SETUP, please share more details about
+> what you're doing, and more importantly, why.
+> 
 
-configs tested: 103
-configs skipped: 3
+The problem encountered is that when the host actively triggers ssr 
+and collects the coredump data, the bt will send a reset command to 
+the controller. However, due to the aforementioned flag not being set, 
+the reset command times out.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+I'm not clear whether you want to ask about the function of 
+HCI_QUIRK_NON_PERSISTENT_SETUP or why the changes are placed 
+under if(!HCI_QUIRK_NON_PERSISTENT_SETUP).
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                            allyesconfig    gcc-15.1.0
-arc                              allmodconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                              allyesconfig    gcc-15.1.0
-arc                   randconfig-001-20250718    gcc-10.5.0
-arc                   randconfig-002-20250718    gcc-15.1.0
-arm                              allmodconfig    gcc-15.1.0
-arm                               allnoconfig    clang-21
-arm                       omap2plus_defconfig    gcc-15.1.0
-arm                   randconfig-001-20250718    gcc-7.5.0
-arm                   randconfig-002-20250718    gcc-8.5.0
-arm                   randconfig-003-20250718    gcc-6.5.0
-arm                   randconfig-004-20250718    gcc-10.5.0
-arm                        spear6xx_defconfig    clang-21
-arm64                             allnoconfig    gcc-15.1.0
-arm64                 randconfig-001-20250718    gcc-13.4.0
-arm64                 randconfig-002-20250718    gcc-5.5.0
-arm64                 randconfig-003-20250718    clang-21
-arm64                 randconfig-004-20250718    gcc-7.5.0
-csky                              allnoconfig    gcc-15.1.0
-csky                  randconfig-001-20250718    gcc-15.1.0
-csky                  randconfig-002-20250718    gcc-15.1.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-21
-hexagon                          allyesconfig    clang-21
-hexagon               randconfig-001-20250718    clang-21
-hexagon               randconfig-002-20250718    clang-21
-i386        buildonly-randconfig-001-20250718    gcc-12
-i386        buildonly-randconfig-002-20250718    clang-20
-i386        buildonly-randconfig-003-20250718    gcc-12
-i386        buildonly-randconfig-004-20250718    gcc-11
-i386        buildonly-randconfig-005-20250718    gcc-12
-i386        buildonly-randconfig-006-20250718    clang-20
-loongarch                        allmodconfig    clang-19
-loongarch                         allnoconfig    clang-21
-loongarch             randconfig-001-20250718    gcc-15.1.0
-loongarch             randconfig-002-20250718    gcc-15.1.0
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    gcc-15.1.0
-microblaze                       allmodconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                       allyesconfig    gcc-15.1.0
-microblaze                          defconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-mips                           ip32_defconfig    clang-21
-nios2                             allnoconfig    gcc-11.5.0
-nios2                               defconfig    gcc-11.5.0
-nios2                 randconfig-001-20250718    gcc-8.5.0
-nios2                 randconfig-002-20250718    gcc-11.5.0
-openrisc                          allnoconfig    gcc-15.1.0
-openrisc                            defconfig    gcc-15.1.0
-openrisc                 simple_smp_defconfig    gcc-15.1.0
-parisc                            allnoconfig    gcc-15.1.0
-parisc                              defconfig    gcc-15.1.0
-parisc                randconfig-001-20250718    gcc-14.3.0
-parisc                randconfig-002-20250718    gcc-13.4.0
-parisc64                            defconfig    gcc-15.1.0
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc               randconfig-001-20250718    gcc-9.3.0
-powerpc               randconfig-002-20250718    gcc-11.5.0
-powerpc               randconfig-003-20250718    clang-17
-powerpc                        warp_defconfig    gcc-15.1.0
-powerpc64             randconfig-001-20250718    clang-18
-powerpc64             randconfig-002-20250718    clang-21
-powerpc64             randconfig-003-20250718    gcc-6.5.0
-riscv                             allnoconfig    gcc-15.1.0
-riscv                 randconfig-001-20250718    clang-21
-riscv                 randconfig-002-20250718    clang-16
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-21
-s390                             allyesconfig    gcc-15.1.0
-s390                  randconfig-001-20250718    clang-21
-s390                  randconfig-002-20250718    clang-21
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    gcc-15.1.0
-sh                    randconfig-001-20250718    gcc-6.5.0
-sh                    randconfig-002-20250718    gcc-7.5.0
-sparc                            allmodconfig    gcc-15.1.0
-sparc                             allnoconfig    gcc-15.1.0
-sparc                               defconfig    gcc-15.1.0
-sparc                 randconfig-001-20250718    gcc-10.3.0
-sparc                 randconfig-002-20250718    gcc-11.5.0
-sparc64               randconfig-001-20250718    gcc-10.5.0
-sparc64               randconfig-002-20250718    clang-20
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-21
-um                               allyesconfig    gcc-12
-um                    randconfig-001-20250718    gcc-12
-um                    randconfig-002-20250718    gcc-12
-x86_64                            allnoconfig    clang-20
-x86_64      buildonly-randconfig-001-20250718    clang-20
-x86_64      buildonly-randconfig-002-20250718    gcc-12
-x86_64      buildonly-randconfig-003-20250718    gcc-12
-x86_64      buildonly-randconfig-004-20250718    clang-20
-x86_64      buildonly-randconfig-005-20250718    clang-20
-x86_64      buildonly-randconfig-006-20250718    clang-20
-x86_64                              defconfig    gcc-11
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                randconfig-001-20250718    gcc-7.5.0
-xtensa                randconfig-002-20250718    gcc-12.4.0
+Regarding the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, 
+you can refer to this commit. 740011cfe94859df8d05f5400d589a8693b095e7
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+As for why it's placed in if(!HCI_QUIRK_NON_PERSISTENT_SETUP), 
+since HCI_QUIRK_NON_PERSISTENT_SETUP is related to BT_EN, it can be 
+used to determine if BT_EN exists in the DTS.
+
+>>
+>> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
+>>  1 file changed, 12 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 4e56782b0..791f8d472 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -1653,6 +1653,18 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+>>  		skb_queue_purge(&qca->rx_memdump_q);
+>>  	}
+>>  
+>> +	/* If the SoC always enables the bt_en pin via hardware and the driver
+>> +	 * cannot control the bt_en pin of the SoC chip, then during SSR,
+> 
+> What is the "SoC" here? Bluetooth chip? MSM?
+
+yes, Bluetooth chip on qcs9075-evk platform
+
+> 
+> What does "enabling the pin via hardware" refer to? Do we ever expect
+> that a proper platform description skips the bt_en pin?
+> 
+> Also:
+> 
+> /*
+>  * If the..
+> 
+
+Sorry, I’m not quite sure I follow—could you clarify what you meant?
+Here is my understanding.
+
+Enabling pins through hardware refers to "the pin is  pulled up by hardware".
+qcs9075-evk platform use the m.2 connective card, the bt_en always pull up.
+
+
+>> +	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+>> +	 * This leads to a reset command timeout failure.
+>> +	 * Also, add msleep delay to wait for controller to complete SSR.
+> 
+> Googling "bluetooth SSR" yields nothing, so it's fair for me to ask
+> you to explain that acronym.. it's used a number of times across the
+> driver, so perhaps a comment somewhere at the top in a separate commit
+> would be good as well. I'm guessing "subsystem reset"?
+
+Just to clarify, SSR is short for Subsystem Restart
+
+> 
+> Konrad
+> 
+>> +	 */
+>> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+>> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
+>> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
+>> +		msleep(50);
+>> +	}
+>> +
+>>  	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+>>  }
+>>  
+
+Shuai
+
