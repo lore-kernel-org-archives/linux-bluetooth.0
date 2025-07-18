@@ -1,170 +1,119 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003E91A8F97;
-	Fri, 18 Jul 2025 07:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ABE1F17E8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jul 2025 08:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752824541; cv=none; b=FIkW0/RtA2zyFNxVt8EmqPQ3ehKbEHPDiFngqmUxpE8qE8al+gB0AgiZ+ChM+u+RM6Wu5lUH3seKfqrG6bIYGlY4CMiIDovuojVrmG0ge5A7sm/xmPpkdh+Xwl2/jprZw1cpPDqi1KMOh8hBut5fB1W/d8bXV+48s0qzc0eqv6s=
+	t=1752826439; cv=none; b=kGyYdvLJHlq48seoynMaIUSuwyvR9q/b4vZ8kz+EHc7zscd3xhP0O35vJDCoNMd7hGcKP8P85Phpj806PpqaaciAvDxhjcpgnMuILlbUy6gHQiq2rSwlkNwtgbcHWJoefWOUJFuyLY1fbJ1gZp4tRJ2pukHKgDrHiSaJ3rxKd6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752824541; c=relaxed/simple;
-	bh=sxW7GiDWMp9LTC9Kd7bYRbAsSSKwt6hnI/6yrrKG5sI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qu7EXsAKqIs4dD3AFXJ9GZBZDgw54gWiAByAAgIcbnE6XtKKpvcAXnsra7NvOl5lcmqBFxIp/o1RqcrN8/3mmBwhRVr4tGaHKqUQsrazL290NTcJnAIG7qTn+PVScwCNkccfIUUKA6PXwBN41692uHwf4z94vUbVwwZ9XCmrTRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af7d9.dynamic.kabel-deutschland.de [95.90.247.217])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E676561E647A7;
-	Fri, 18 Jul 2025 09:41:59 +0200 (CEST)
-Message-ID: <2cacbbf0-0e7b-410f-9ca1-b4542e0d51d4@molgen.mpg.de>
-Date: Fri, 18 Jul 2025 09:41:58 +0200
+	s=arc-20240116; t=1752826439; c=relaxed/simple;
+	bh=2XxJMxqvE/Cjfusd0XxjbthJPfpvtef/UFrkblBe79c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gaug8ay69fd7Ry/MpQbqHy/eTDjXEBnLmE74pFvDNIQpVbSfzEd3FvC3FoJy89X0nr2hbpbi/VfFM+Lu8m2wPbK8p6inDMB5WUw+VVgyY6sm7Ke1K1SiDCaJqQ7oGv+C8fgUmE71l1Q+w6mcAcO7T/uusX5Nl8G6zoA8fMRfMyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chrisdown.name; spf=pass smtp.mailfrom=chrisdown.name; dkim=pass (1024-bit key) header.d=chrisdown.name header.i=@chrisdown.name header.b=SwrTJZYp; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chrisdown.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chrisdown.name
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chrisdown.name header.i=@chrisdown.name header.b="SwrTJZYp"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-748e81d37a7so1269124b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jul 2025 01:13:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chrisdown.name; s=google; t=1752826437; x=1753431237; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qMPeAL07/lZrKnUkmH8nVJ8wh1GwyumIputOyztfgS4=;
+        b=SwrTJZYpL9BW/5AE1sgr1NXM8fBoz3t/1IYRep4VjasHeMWV8VuVpZ8M/zqGANLyDB
+         oSGqJJMkt4QM82e7f5zleJCHzPLjQyShvTC6XZ7YX8gJ8uG1kdBLOXK0C3l4XMYxl0Ej
+         Ml15xPwaO0fq05wz2sbC34Kn9xNDfrYLOpX/8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752826437; x=1753431237;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qMPeAL07/lZrKnUkmH8nVJ8wh1GwyumIputOyztfgS4=;
+        b=ssduezNyhVBoe5jtoujrJJT/S/BjOVo3ZFcy9bKPvKQhfDTcPS27Mu6Qw5iUUOiJX/
+         AriLw2ceiUUHsRp5yIWgFIpxUACwjQcFmj9r+9e9NXq01l6ky3MEZ0EnCFA+zJ4qiDbx
+         hdQNJJuDn834Gc7c1WzUNLpsWhX9anKr6VJKDMnBXGbxfWalbiDwy9Dl8u1uEHmDY0fb
+         Xk6LPX80sLvGKODh0k3qeYY5LGsnbrn9eUnQFWQx/1LOwvdlCf0YwU2oTckmy5HwMNA+
+         DFKSVbQQ9KZsn7Ce1G9CynKvUsSZSWA3kdw5fUj0qH+BcGo+ifbmoF17FFa6F2Rqq3+z
+         f2Uw==
+X-Gm-Message-State: AOJu0YwkR+wGQNc/BIaAI+MofQus2bbyHsBewVcwwye6PX6tmOUuLvo7
+	+l/sv8kPm6p5mj+HpzkFxddhIM9TaU8LjWqrkMzkYibM61joFfQcXCJ9v6sdP+Ka3m8=
+X-Gm-Gg: ASbGncuk0+10B1HF8hXf7/cGxk+7L7L91WAG5KqTdmzN0in9LxlqKM14Ts6RnkYX6vI
+	3wixGW+rnKETj4PN3gBULH6KGiQMtAAStlfjX7x1VG4VAk3NQ68+fCb2uEUNGnZm2jfb7V8wKKw
+	A+vWOCYsAzQTFTvm6ec38byBF8wJCkMY+sf8Gr0i0a8sYFfzTKuGH0R90GooEeO88Ye308+2NBI
+	yDlterEDxyxHMCUG0A94wBWyUDkUtmIIWoIIUSKij239/BzjAt/EQo27enQOlQY5yzyYd/y72Ex
+	4oXQ/z5x+s8WSXACdqHraO2gNfWX8RI8DT+QbaNE88dVDMo46e3wg9Lc5kBxojSVP+fIusRHBXz
+	P5hI4kpyCTVacHihUHsxnuccr1vL4Kg==
+X-Google-Smtp-Source: AGHT+IG73zCnFU9COboaEFW/fs2gtFK6dqDUiJYlBGv5r2t2tuOfTRYElrNJO1jXi74JhoPkFbTRRw==
+X-Received: by 2002:a05:6a00:23d5:b0:748:323f:ba21 with SMTP id d2e1a72fcca58-759ab639668mr2324482b3a.1.1752826437509;
+        Fri, 18 Jul 2025 01:13:57 -0700 (PDT)
+Received: from localhost ([116.86.186.54])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-759c8eb0e98sm763432b3a.66.2025.07.18.01.13.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Jul 2025 01:13:56 -0700 (PDT)
+Date: Fri, 18 Jul 2025 16:13:55 +0800
+From: Chris Down <chris@chrisdown.name>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-team@fb.com, Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: Mask data status from LE ext adv
+ reports
+Message-ID: <aHoCQ_RfBl5Zm4oQ@chrisdown.name>
+References: <aHfd_H6c9MheDoQP@chrisdown.name>
+ <CABBYNZJo48983SWhxcB7UzWXPeUofRCMhQ8mJjih-rJoTET3_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_devcd_dump: fix out-of-bounds via
- dev_coredumpv
-To: Ivan Pravdin <ipravdin.official@gmail.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+ac3c79181f6aecc5120c@syzkaller.appspotmail.com
-References: <20250717151051.195106-2-ipravdin.official@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250717151051.195106-2-ipravdin.official@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJo48983SWhxcB7UzWXPeUofRCMhQ8mJjih-rJoTET3_Q@mail.gmail.com>
+User-Agent: Mutt/2.2.14 (516568dc) (2025-02-20)
 
-Dear Ivan,
+Hi Luiz,
 
+Thanks for the review!
 
-Thank you for your patch.
+Luiz Augusto von Dentz writes:
+>Can you include a sample trace of the above?
 
-Am 17.07.25 um 17:10 schrieb Ivan Pravdin:
-> Currently both dev_coredumpv and skb_put_data in hci_devcd_dump use
-> hdev->dump.head. However, dev_coredumpv can free the buffer. From
-> dev_coredumpm_timeout documentation, which is used by dev_coredumpv:
-> 
->      > Creates a new device coredump for the given device. If a previous one hasn't
->      > been read yet, the new coredump is discarded. The data lifetime is determined
->      > by the device coredump framework and when it is no longer needed the @free
->      > function will be called to free the data.
+Is that with btmon or similar? Sorry, I'm not a regular contributor to this 
+subsystem :-)
 
-Should you resend, the lines do not need to be intended, that means the 
- > should be at the very beginning.
+I mostly have a personal desire to get this merged because it's a particularly 
+noisy case where I happen to live :-) These are all with 0x40:
 
-> If the data has not been read by the userspace yet, dev_coredumpv will
-> discard new buffer, freeing hdev->dump.head. This leads to
-> vmalloc-out-of-bounds error when skb_put_data tries to access
-> hdev->dump.head.
-> 
-> A crash report from syzbot illustrates this:
-> 
->      ==================================================================
->      BUG: KASAN: vmalloc-out-of-bounds in skb_put_data
->      include/linux/skbuff.h:2752 [inline]
->      BUG: KASAN: vmalloc-out-of-bounds in hci_devcd_dump+0x142/0x240
->      net/bluetooth/coredump.c:258
->      Read of size 140 at addr ffffc90004ed5000 by task kworker/u9:2/5844
-> 
->      CPU: 1 UID: 0 PID: 5844 Comm: kworker/u9:2 Not tainted
->      6.14.0-syzkaller-10892-g4e82c87058f4 #0 PREEMPT(full)
->      Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
->      Google 02/12/2025
->      Workqueue: hci0 hci_devcd_timeout
->      Call Trace:
->       <TASK>
->       __dump_stack lib/dump_stack.c:94 [inline]
->       dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
->       print_address_description mm/kasan/report.c:408 [inline]
->       print_report+0xc3/0x670 mm/kasan/report.c:521
->       kasan_report+0xe0/0x110 mm/kasan/report.c:634
->       check_region_inline mm/kasan/generic.c:183 [inline]
->       kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
->       __asan_memcpy+0x23/0x60 mm/kasan/shadow.c:105
->       skb_put_data include/linux/skbuff.h:2752 [inline]
->       hci_devcd_dump+0x142/0x240 net/bluetooth/coredump.c:258
->       hci_devcd_timeout+0xb5/0x2e0 net/bluetooth/coredump.c:413
->       process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
->       process_scheduled_works kernel/workqueue.c:3319 [inline]
->       worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
->       kthread+0x3c2/0x780 kernel/kthread.c:464
->       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
->       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->       </TASK>
-> 
->      The buggy address ffffc90004ed5000 belongs to a vmalloc virtual mapping
->      Memory state around the buggy address:
->       ffffc90004ed4f00: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->       ffffc90004ed4f80: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->      >ffffc90004ed5000: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->                         ^
->       ffffc90004ed5080: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->       ffffc90004ed5100: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
->      ==================================================================
-> 
-> To avoid this issue, reorder dev_coredumpv to be called after
-> skb_put_data that does not free the data.
-> 
-> Reported-by: syzbot+ac3c79181f6aecc5120c@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=ac3c79181f6aecc5120c
-> Fixes: b257e02ecc46 ("HCI: coredump: Log devcd dumps into the monitor")
-> Tested-by: syzbot+ac3c79181f6aecc5120c@syzkaller.appspotmail.com
-> Signed-off-by: Ivan Pravdin <ipravdin.official@gmail.com>
-> ---
-> 
-> Changes since v2:
->   * Updated subject line
->   * Updated comment to include more details about the issue
->   * Moved dev_coredumpv instead of using temporary buffer
-> 
-> Changes since v1:
->   * Changed subject prefix to Bluetooth:
-> 
-> [v2] https://lore.kernel.org/linux-bluetooth/20250716003726.124975-2-ipravdin.official@gmail.com/
-> [v1] https://lore.kernel.org/linux-bluetooth/20250614041910.219584-1-ipravdin.official@gmail.com/
+   % dmesg | wc -l
+   3815
+   % dmesg | grep -c 'Unknown advertising'
+   3227
 
-One minor thing, *v3* is missing in the tag in summary, so it’d be 
-[PATCH v3]. `git format-patch -v3` should accomplish this.
+>Also it would be great to  have a mgmt-tester for example that attempts to 
+>generate an advertisement like that to exercise such change.
 
->   net/bluetooth/coredump.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/coredump.c b/net/bluetooth/coredump.c
-> index 819eacb38762..720cb79adf96 100644
-> --- a/net/bluetooth/coredump.c
-> +++ b/net/bluetooth/coredump.c
-> @@ -249,15 +249,15 @@ static void hci_devcd_dump(struct hci_dev *hdev)
->   
->   	size = hdev->dump.tail - hdev->dump.head;
->   
-> -	/* Emit a devcoredump with the available data */
-> -	dev_coredumpv(&hdev->dev, hdev->dump.head, size, GFP_KERNEL);
-> -
->   	/* Send a copy to monitor as a diagnostic packet */
->   	skb = bt_skb_alloc(size, GFP_ATOMIC);
->   	if (skb) {
->   		skb_put_data(skb, hdev->dump.head, size);
->   		hci_recv_diag(hdev, skb);
->   	}
-> +
-> +	/* Emit a devcoredump with the available data */
-> +	dev_coredumpv(&hdev->dev, hdev->dump.head, size, GFP_KERNEL);
->   }
->   
->   static void hci_devcd_handle_pkt_complete(struct hci_dev *hdev,
+Looks like that's in Bluez userspace code right, so what's the order of doing 
+these things?
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+>> -       if (evt_type == LE_EXT_ADV_NON_CONN_IND ||
+>> -           evt_type & LE_EXT_ADV_DIRECT_IND)
+>> +       if (pdu_type == LE_EXT_ADV_NON_CONN_IND ||
+>
+>I'm not sure I would keep checking for  LE_EXT_ADV_NON_CONN_IND, maybe
+>just return LE_ADV_NONCONN_IND, LE_EXT_ADV_NON_CONN_IND is not
+>actually a bit it is the absence of any bits being set, so I guess the
+>only invalid adv are the ones for legacy which seem to require a bit
+>to be set.
 
+So are you thinking of doing this?
 
-Kind regards,
+   if (!(pdu_type & ~(LE_EXT_ADV_DIRECT_IND)))
+           return LE_ADV_NONCONN_IND;
 
-Paul
+Thanks for your help!
+
+Chris
