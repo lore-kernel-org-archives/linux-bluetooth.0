@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BE92629C
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 12:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1032264D0
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 12:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752926803; cv=none; b=YgwEFUxT8F0rn0X4EhtnATXLHIHLIWZAnX02JIcS1bfuc2XIdqVErR4hDfWeeYYYOFldUl2vdjGpvDFLiYIGoO4GGf4oadeFTA1X4LAOgChjsgCpUcAELbJDp9gDi524Fn0I4anpfG3I7cZygrmDYuYyIAulxBTStXjuwmDao9w=
+	t=1752927001; cv=none; b=SGczmKSDNQnrNBRzYOVqzyfCMuQ1kYAyM8TF3sc24Uj0jxFbutB7+k6Uki7JD+U3fZBj4nB/JtWbObRh8J+d8WJnlM6iiNF56RFBDlmjkoe2Bv0KMqBXRuWLCnbul8hnP62lMIOdlP1/8/o3Bn6u3Nq9W3imnCiGRD1c6tZm5mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752926803; c=relaxed/simple;
-	bh=VFW0K/geB4LCKD8K9EY/g7SE+ykrNgwMJTzIQVPMOzs=;
+	s=arc-20240116; t=1752927001; c=relaxed/simple;
+	bh=UlUcEp8qdjAhZI4Ela8S5V3/T/ul7C72aM6igED1Yqk=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eYTh/xfnJDjyRCBuGZEgFU1jzXwoOMODLZBw+HtzDCpzkOySb20oUo5c2UsjhaOFNHzwC8oXI/EwQHoqBVkI2eUV33zlOr8iuJWGhJ9kjiQu80znGeo8izwj1Fcn6QqOZgi2DUu/FWFiYJ/Sz+JDM9NXRQCzGakLHycDPI34z5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aPxRKa3r; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=ZOMeU0NN5H9vHGUURHVesen7/LqX4PaLlBP+S+YT13JSUVAco0r1P7fGgPzdbpnVMKbMclDrDs1E5r31IiSosZUSAb0WKgb8pW9w/REZugIWIpM2ZItuAdFeT1q532jTFFGxMe1vrVYfoU575FLex/hKGJSLdnZMmkK50Jy55VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qzxu1Ty9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aPxRKa3r"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 22EC3C4CEF6
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 12:06:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qzxu1Ty9"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3E35DC4CEE3
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 12:10:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752926803;
-	bh=VFW0K/geB4LCKD8K9EY/g7SE+ykrNgwMJTzIQVPMOzs=;
+	s=k20201202; t=1752927001;
+	bh=UlUcEp8qdjAhZI4Ela8S5V3/T/ul7C72aM6igED1Yqk=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=aPxRKa3rFzJOQ0/VDpjxbB5o0NuWQHQ42EzJKhxeo78BJ6KubTKpHww7G4WuZ2SaZ
-	 PcJ35qiY6CY9yxpVRICxBLdj82HX8G0X8a3QMISyuUbZCDM0o8fydFjaE8vD2I373m
-	 59hQAvYoJfyemoD9rKmmgjyqcmpV9gYMo9nprOJZpEUkAtlcRaAb2ApUrb/5ldOpvq
-	 ar4IY2NHIen2AjyhsQe4HtMMUqMkmkKCzJ0PifPDWJNfMKT63pdeUk+hS61Uss3XCD
-	 bOUM4Jq2hghsFSxQ9uhcH90ki0shZFQ8cZR/YnhtBrji7/jOcgijlb0tIdktB3iuK8
-	 RKzWsb/2krI9g==
+	b=qzxu1Ty9A9w4UAZ60yJq/Lo4I7N2R6Mr0p3SQueESar6BjUIYBLmb1fnJyy9aRQZG
+	 QCw909xd6KCSBofbvteS82fp8/EvXXsodtTPirWufvHR/ccYlwDox6/cKwy/MJb3H1
+	 0rt3IUTbhGuoyWP1Z403EWAgqOm1ikY8hKxq1BkNIZc96g89zmu48Vk2cjfqFY4SY6
+	 QWgx7clGxr0Q/y+bGTExHZ2dOUYkmgXzRj8bEwQEJ7TfTB6Pls+qMDx/2UpKVrvoPr
+	 /VhSIVPOtxMtnThYJ1wlmPSjHVZtkFvH2QjxHmAdzxUd5jW3scT/dZ8C71SsUZzLfX
+	 QfcPGwQlF8L6g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 17C00C41616; Sat, 19 Jul 2025 12:06:43 +0000 (UTC)
+	id 32D6AC53BBF; Sat, 19 Jul 2025 12:10:01 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220344] Intel AX211 bluetooth randomly disconnects and
- reconnects, started after kernel update
-Date: Sat, 19 Jul 2025 12:06:42 +0000
+Subject: [Bug 220341] Bluetooth crashes about 30-40 minutes after I connect
+ my headphones:  "Bluetooth: hci0: Hardware error 0x0a"
+Date: Sat, 19 Jul 2025 12:10:01 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,10 +47,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220344-62941-qCkgDQiLzn@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220344-62941@https.bugzilla.kernel.org/>
-References: <bug-220344-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-220341-62941-nXk4jUI5ns@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220341-62941@https.bugzilla.kernel.org/>
+References: <bug-220341-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -62,13 +62,29 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220341
 
---- Comment #2 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
- ---
-Was the Linux firmware updated on your system, so you actually need to test=
- an
-*older* firmware version?
+Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |tal.lich@gmail.com
+
+--- Comment #19 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de=
+) ---
+If bug 220344 is the same issue, than it happens also with Ubuntu=E2=80=99s
+6.8.0-60-generic #63~22.04.1-Ubuntu, though I do not know, what they backpo=
+rt.
+The bug=E2=80=99s first comment also links to a post saying, this started h=
+appening
+with Linux 6.5.
+
+https://docs.kernel.org/admin-guide/verify-bugs-and-bisect-regressions.html
+contains more detailed bisecting information. Especially how to package up =
+the
+Linux kernel files. For RPM based distributions, that=E2=80=99d be:
+
+    make -j $(nproc --all) binrpm-pkg
 
 --=20
 You may reply to this email to add a comment.
