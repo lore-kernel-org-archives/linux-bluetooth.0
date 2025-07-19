@@ -1,96 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA9720322
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 13:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809581EB39
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 14:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752932210; cv=none; b=T+Ij2RHnMkpI4TBKK6Mp45Xly5N15Q+9LA42w5AUGHzZSaxeeX7/CmI6PC9V1in2/0lvzzxlOGEeFZ59csBGdSOWFi3XONwml1hZnioivyYPKPqT68ul9VvMp4IYxrJYU+wLrNba4pxAiKzNEf2G3Ae0LfCo1y1Q6s1ql5qu8W8=
+	t=1752936997; cv=none; b=TA7RMid8OCSvxJSvF91SAIFWNAZq0Ry5jkrXv913VwE/GW8N9ifgX2rE4C2pJ1PxOGaUC3y21zpcswYbBuHai4zGycw/2K5evD1ZKDtVCHP9oUf3oV2V6vJDXOUmeMgWRjS3see8hR6+6paLDzKANTerC2iwUevDXpatz54YLOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752932210; c=relaxed/simple;
-	bh=NESbqJpgN699mZXeNnceOmQBFL4LXEDhPLE0NHLwfxY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SeBC/zfvg2aP3Endwebj+5FCDNFvat7MDwSCxmne27XuUA09vYOa3Qr2eyQ5kV7vMgDxldCKBIEDgd1auglvxu5WSTEjxS8zx6tKWI7rbJCddKBf7M641JcIO2oOT3hRWD6gPGO0jUEH4vRlsind0fCv1X7wRstNvKqpzQKC0Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t4eBq+RV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752936997; c=relaxed/simple;
+	bh=KiHs35IlsMol3m7sA6wf0nxLHIH4W6M541WCEbyXO5c=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=PYa0z0NuxKri3v2cWlxeqGADzN8vTQj7ejrYcwZxXflumjZHZ57Gm0EfO5L3uhxtS8+bKGB2JH+wi54uWwFu8JDSgX7XdPZT9A4CSXiyfuZEHtZ2pVfL8RNi2oZ5DoZrBJDDxnX7ISFRg4seCOBDY9NdGmTYtYAVsnCyXLDtfio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=bDgvFpLI; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t4eBq+RV"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B78D5C4CEF5
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 13:36:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752932209;
-	bh=NESbqJpgN699mZXeNnceOmQBFL4LXEDhPLE0NHLwfxY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=t4eBq+RVohx7+0JhgE7QSewzc2XTQRbZtEqSDp2jF8hp4fUCWD9++ogIqHa1zYlaA
-	 vTqhvTlUdpYSVWXdClMXdfAQlsYD0adIaQ5rb5i/swWoKEMl7fN3N/F5NwiFReruc/
-	 9wn0F8HYIsB156JYsf9wPzrMvqSccVt6Ov8+b4xqEWXFx8Jt27+oi9TrldobbrYQIh
-	 Hmyo5hl8BfkzmcxFaO5Fq2czIuk/CcZTDeBe6MELIHwVoyKhaJByn+NeOG8MJOfZu2
-	 bAIKP760VGOWeVUMnxdQgwQFmPQ+ig8jSKdS/bzjnQI7lEZ/Y2oJBgwKY3XPFwtBJ0
-	 BI2jKcBuMz0jQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id AA461C53BC5; Sat, 19 Jul 2025 13:36:49 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="bDgvFpLI"
+Received: from github.com (hubbernetes-node-e042978.ac4-iad.github.net [10.52.167.38])
+	by smtp.github.com (Postfix) with ESMTPA id 76EC220B30
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 07:56:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1752936992;
+	bh=f6pxwvrY6pPEMkkS1q0JxVA/gWxKuqaAAsnoqDiB7DE=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=bDgvFpLIk1IXB9SlI5ESXO1INrZa+enlL3sMOe4e6lxpRD0jL0Gf8GJrSrXGSkfnu
+	 U2knEViw8JG1cVLGIU296ABdMpvZ0qXMvQXWJK4+P/bGtEIXJf20/H91O4E52RbVC9
+	 +hwl2DMGZWY1q60QD7ynEGofGQjlg+BmNcMlEruI=
+Date: Sat, 19 Jul 2025 07:56:32 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220344] Intel AX211 bluetooth randomly disconnects and
- reconnects, started after kernel update
-Date: Sat, 19 Jul 2025 13:36:49 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: tal.lich@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220344-62941-Ijdx5cBFJd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220344-62941@https.bugzilla.kernel.org/>
-References: <bug-220344-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <bluez/bluez/push/refs/heads/973863/acc5f9-000000@github.com>
+Subject: [bluez/bluez]
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
+  Branch: refs/heads/973863
+  Home:   https://github.com/bluez/bluez
 
---- Comment #3 from Tal Licht (tal.lich@gmail.com) ---
-I think this is not the same bug as 220341 - that bug reports the stack
-crashing and Bluetooth becoming disabled. This is not the case here - it
-just causes devices to disconnect periodically. I suspect the firmware is
-crashing and restarting but have no way to verify this. I will try however
-to switch to some older firmware and see if this stops. Will report the
-results.
-
-On Sat, Jul 19, 2025, 15:06 <bugzilla-daemon@kernel.org> wrote:
-
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
->
-> --- Comment #2 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.d=
-e)
-> ---
-> Was the Linux firmware updated on your system, so you actually need to
-> test an
-> *older* firmware version?
->
-> --
-> You may reply to this email to add a comment.
->
-> You are receiving this mail because:
-> You reported the bug.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
