@@ -1,187 +1,113 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280EF17578;
-	Fri, 18 Jul 2025 23:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA281E25F8
+	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jul 2025 07:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752881528; cv=none; b=KNeJlqmQfsnOCeQV9viaKsVECTxPt/ZjHW5gox/sb/MUlNEkm0vJRXBn9JBkNVcFmSaW1xq9lDQVZgiZTt22yLAdq3ru++/7JL+K+eOuL+to+pPdVyla4VVgdN30nr20aJ2+wryB9HbwWx/8iIDgzH4lBq6ZvWQXI6CD7aPGf1k=
+	t=1752908801; cv=none; b=gfOb/aN28XzF8fKlvOoSznv5oGSGsIcJZWO3jgmrbD3tNVYHlerkLHx2V1RJyG0kyNpQpYXkHeK6oK1a3InIvlYOkxZ8jy4VWSI4TYKkFvH7TMfnWcW8Wcw8TzD4eAZQZ/4zDlNl1YhE6ywIil9X+yZtuLeekqBF3EV1q9BNUw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752881528; c=relaxed/simple;
-	bh=9limy8ekR9R4k0Sxx+1VcEVXAQFGzvQbpdW1BNVRO6U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qBzgX8xnilNxqElm4w8cQNHGGuu6TTkhYmM4iykYnyFc622IqM/hzhCVjEVgNvk7BoRj274yk4fsQmOQuanyz8Vz3kBcLM3N8oN/ATVCxXGI43pfbguUB6fCh5k7c0iyfSoCA9KFlR0ZAanZMEUqCIt9jQZYWnAoPjKGrffCjAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J6ep6SsB; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1752908801; c=relaxed/simple;
+	bh=rsUXqZG9Idbqegl8icQnUoliEJBdQxw0O54nhacCVDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HE3kiNOKl+dU5A2UmwAmhNJHTchmsCgXTtKkCoPpb3AHrrv42M8JwKMxB9dRPAOqEJmzuZtVNzf2x1lSmgxO+/1xlIYYVuMVnpFx1lr41Ak59Lppf24LZi0KKsA02o0YYbFu6uAWhZwi073NQ3MdCGaKLjA7ZWO5/kO6EWVFaro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=V7hgnZdG; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J6ep6SsB"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56IGjkDu007207;
-	Fri, 18 Jul 2025 23:32:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Ww8fpLfyWcnsamcVTtSdxyPq6Z8+91Wd32Vlsm8k570=; b=J6ep6SsBspe1beRe
-	VtrQKxEI//juyVR92MwggdiLxc/GNiGWA97Tm1Z5XS5ycF04r+Klu15KpvjSer54
-	CTdjlQoU7zUwMOGHlYSDr1XcaRNpODsCNnVNSeXnIQt1Dwob/hXjU+0oXBsXKleC
-	y3ckKFdLoHHaqH55TjMVWq3xsrkm31/1ZCF6r6eKD4q9vU/njcmi6TadI7gOs9EO
-	Ym858OR7DgyJBNr1QSUwlPnL9fj8HhSvYardEQdvJW6SZoK3hAl2DWLC/LznYOcc
-	C7ixO49KEqSkwBtT2Q2ISETXKzqT3F+cZszhHzOiYaMVFcy6r7zHJyZY1o/kPHsm
-	HKqf2A==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47wfcaebxc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Jul 2025 23:32:05 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56INW4S6008832
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Jul 2025 23:32:04 GMT
-Received: from [10.253.13.179] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 18 Jul
- 2025 16:32:03 -0700
-Message-ID: <e7e700e4-e87c-4e2c-8df1-634870ba91b2@quicinc.com>
-Date: Sat, 19 Jul 2025 07:32:00 +0800
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="V7hgnZdG"
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 1D2F126004;
+	Sat, 19 Jul 2025 09:06:36 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id RFPnUjK60eTN; Sat, 19 Jul 2025 09:06:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1752908795; bh=rsUXqZG9Idbqegl8icQnUoliEJBdQxw0O54nhacCVDE=;
+	h=From:To:Cc:Subject:Date;
+	b=V7hgnZdG0RDnGEk2tsCQEDQRj2A4mvBTDPAV5wU+VwnoJ6T7n451qhNcb5Zz0btgh
+	 tQuCgaE9ZG/0YVRePMRM2l77rTm1um1ZPpjvM2vBt9W/mwX+Tzcau4C5GGiv9F2yrl
+	 CpWEVbKdOK3kAyzuqT77wBBjswfQ4+ySIeHPMWTduxW+fLKNbFbwhjzIoB4+2CMdQU
+	 MQsb4Z0DEWrrqlzC3m+T84foqkVblcnhN8UpPHfpONwO/UzqDLQaB3+BHU1vdzuCJs
+	 1rhP94G/oBGIRgmCCJ2zTkLMxK6WvLJpKBzQfZ1+QeFf1HIOce4eLURi80eNhRzM6D
+	 A5joz6WEmbxOQ==
+From: Yao Zi <ziyao@disroot.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Yao Zi <ziyao@disroot.org>
+Subject: [PATCH BlueZ] client/mgmt: Print UUID and flags when showing experimental features
+Date: Sat, 19 Jul 2025 07:05:47 +0000
+Message-ID: <20250719070547.9551-1-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] driver: bluetooth: hci_qca: fix ssr fail when BT_EN
- is pulled up by hw
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
-CC: <quic_bt@quicinc.com>
-References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
- <20250715051618.724475-2-quic_shuaz@quicinc.com>
- <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
-Content-Language: en-US
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-In-Reply-To: <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzE4MDE5NSBTYWx0ZWRfX3FV8jQQOISI4
- 4sQ8pxcDcMheS4hstuZxrj6MoHAxtbGohx0Nzwuxc5lPlkriBcvvr8dVoZC7tvlcH01TfIRJ+jW
- h3FPIZCnO6J//cZ/T73WTyMTcX6fXZ6tukk6cdLgNDknfHpVMX74jBhGgVUv+i3ExAdbgG2IMlT
- XvqHuFrgpwYvsfRW9Qhwzv98rAPCmg1uqoUUigg85B2UyjGcy7QeNqu+g6d/don1peDmJ+41JPT
- SQLZQH/siQa633rAXD5xL/SLF9/UXUrn3LvL7pDKxZW7m3S3qVlp2wRJAwN8gYbsqFx8P2pQFE+
- YJtmeGIT+Th2PCM7Ej4GWCAmPceubC7gnFOCt7Fo++lyppQxqvufrarhUePdPLNG+HZjfccC5a8
- uNQmMBd4kABX2XEx0UYDofuRdrcJpJM1eQNB/Y1M09kwu9ADNwW9IIshofXmbL+B2KcvOD2L
-X-Proofpoint-GUID: NT2f4TXPJVMHFLCk8hgiPDLD-ooXttFS
-X-Authority-Analysis: v=2.4 cv=SeX3duRu c=1 sm=1 tr=0 ts=687ad975 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8
- a=Oj2nRzj9iAJ_O5cg774A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: NT2f4TXPJVMHFLCk8hgiPDLD-ooXttFS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-18_05,2025-07-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015 adultscore=0
- suspectscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507180195
 
-Hi Konrad 
+Command expinfo in mgmt menu queries experimental features from kernel
+with MGMT_OP_READ_EXP_FEATURES_INFO. However, currently only the number
+of experimental features are shown,
 
-On 7/15/2025 5:11 PM, Konrad Dybcio wrote:
-> On 7/15/25 7:16 AM, Shuai Zhang wrote:
->> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
->> This leads to reset command timeout.
-> 
-> This is a description of what goes wrong in terms of the code of
-> this driver, and it doesn't explain why you gate the code addition
-> with HCI_QUIRK_NON_PERSISTENT_SETUP, please share more details about
-> what you're doing, and more importantly, why.
-> 
+	> expinfo
+	Global
+	        Number of experimental features: 1
+	Primary controller (hci0)
+	        Number of experimental features: 4
 
-The problem encountered is that when the host actively triggers ssr 
-and collects the coredump data, the bt will send a reset command to 
-the controller. However, due to the aforementioned flag not being set, 
-the reset command times out.
+and lacking of details makes the command less useful. To ease debug,
+this patch introduces extra output for the expinfo command, showing UUID
+and flags of experimental features as well. A typical output will look
+like,
 
-I'm not clear whether you want to ask about the function of 
-HCI_QUIRK_NON_PERSISTENT_SETUP or why the changes are placed 
-under if(!HCI_QUIRK_NON_PERSISTENT_SETUP).
+	> expinfo
+	Global
+	        Number of experimental features: 1
+	        6fbaf188-05e0-496a-9885-d6ddfdb4e03e (flags 0x0000)
+	Primary controller (hci0)
+	        Number of experimental features: 4
+	        671b10b5-42c0-4696-9227-eb28d1b049d6 (flags 0x0000)
+	        330859bc-7506-492d-9370-9a6f0614037f (flags 0x0000)
+	        6fbaf188-05e0-496a-9885-d6ddfdb4e03e (flags 0x0000)
+	        2ce463d7-7a03-4d8d-bf05-5f24e8f36e76 (flags 0x0000)
 
-Regarding the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, 
-you can refer to this commit. 740011cfe94859df8d05f5400d589a8693b095e7
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+ client/mgmt.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-As for why it's placed in if(!HCI_QUIRK_NON_PERSISTENT_SETUP), 
-since HCI_QUIRK_NON_PERSISTENT_SETUP is related to BT_EN, it can be 
-used to determine if BT_EN exists in the DTS.
-
->>
->> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
->> ---
->>  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
->>  1 file changed, 12 insertions(+)
->>
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index 4e56782b0..791f8d472 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1653,6 +1653,18 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->>  		skb_queue_purge(&qca->rx_memdump_q);
->>  	}
->>  
->> +	/* If the SoC always enables the bt_en pin via hardware and the driver
->> +	 * cannot control the bt_en pin of the SoC chip, then during SSR,
-> 
-> What is the "SoC" here? Bluetooth chip? MSM?
-
-yes, Bluetooth chip on qcs9075-evk platform
-
-> 
-> What does "enabling the pin via hardware" refer to? Do we ever expect
-> that a proper platform description skips the bt_en pin?
-> 
-> Also:
-> 
-> /*
->  * If the..
-> 
-
-Sorry, I’m not quite sure I follow—could you clarify what you meant?
-Here is my understanding.
-
-Enabling pins through hardware refers to "the pin is  pulled up by hardware".
-qcs9075-evk platform use the m.2 connective card, the bt_en always pull up.
-
-
->> +	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
->> +	 * This leads to a reset command timeout failure.
->> +	 * Also, add msleep delay to wait for controller to complete SSR.
-> 
-> Googling "bluetooth SSR" yields nothing, so it's fair for me to ask
-> you to explain that acronym.. it's used a number of times across the
-> driver, so perhaps a comment somewhere at the top in a separate commit
-> would be good as well. I'm guessing "subsystem reset"?
-
-Just to clarify, SSR is short for Subsystem Restart
-
-> 
-> Konrad
-> 
->> +	 */
->> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
->> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
->> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
->> +		msleep(50);
->> +	}
->> +
->>  	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
->>  }
->>  
-
-Shuai
+diff --git a/client/mgmt.c b/client/mgmt.c
+index d07f7d8c0ea3..f1d607283da5 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -1699,7 +1699,10 @@ static void exp_info_rsp(uint8_t status, uint16_t len, const void *param,
+ 							void *user_data)
+ {
+ 	const struct mgmt_rp_read_exp_features_info *rp = param;
+-	uint16_t index = PTR_TO_UINT(user_data);
++	uint16_t index = PTR_TO_UINT(user_data), i;
++	uint128_t uuid_be;
++	char uuidstr[40];
++	bt_uuid_t uuid;
+ 
+ 	if (status != 0) {
+ 		error("Reading hci%u exp features failed with status 0x%02x (%s)",
+@@ -1720,6 +1723,14 @@ static void exp_info_rsp(uint8_t status, uint16_t len, const void *param,
+ 	print("\tNumber of experimental features: %u",
+ 					le16_to_cpu(rp->feature_count));
+ 
++	uuid.type = BT_UUID128;
++	for (i = 0; i < le16_to_cpu(rp->feature_count); i++) {
++		memcpy(&uuid_be, &rp->features[i].uuid, sizeof(uint128_t));
++		ntoh128(&uuid_be, &uuid.value.u128);
++		bt_uuid_to_string(&uuid, uuidstr, sizeof(uuidstr));
++
++		print("\t%s (flags 0x%04x)", uuidstr, rp->features[i].flags);
++	}
+ done:
+ 	pending_index--;
+ 
+-- 
+2.50.1
 
