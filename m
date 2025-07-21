@@ -1,123 +1,126 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C121A3154
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jul 2025 16:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5682E2C9D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jul 2025 16:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753114816; cv=none; b=SYPBL33U43Z327Ls5qE7+nfPh56e2e/gYZ9ks1Y34nDaykD7qe6ij1ZCKBYT68DCt4RXbE283UNrMZ2JmpmKGqs/hPV0pdmParWSp9iiSJ/TCiJ/91UvINJkb7CZhd81UTVqPO6pPBMMZLFY7o0lYOjNpGrctz+79sMF2Ut8RME=
+	t=1753116402; cv=none; b=g2kGXFn3n8buEQhdr6Tocp7cdzKf0AkMUgpuHh3RUFtdgvFezFrilAkc8KXCAp00e83cSLYLHbf1CBIOrF4FwX0poAgcWFnSHAf1p+FeQM8LGK7hJkrPjtbMHFES38MixcDmg2ZVZfwWXKOj/am0b1QQfI6kuhKsG9f+LTFHFl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753114816; c=relaxed/simple;
-	bh=PsP5ylbeo51FJHBniuDMTYFNXdqCM5ydOh48OLsb+ec=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T8H/ncpO1hKdDC+AoDHX5KO7tZlJQsQckShfXICHRPWlFkZ+ZRrRDEbb6iZPlP83gHKmwNp2stdZpTM25zYGvp/pF+Snbi1TDHiPhP1+NRG9iWrUbbVT+kU/S6zA4jUK8C0L/Y4ou93U4aKKnjaukmN1xSGf5S8Zl++V02OaEBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V+BnOWCl; arc=none smtp.client-ip=209.85.208.179
+	s=arc-20240116; t=1753116402; c=relaxed/simple;
+	bh=DzunzxZHJB38bLo8uRIX/icOlrYNBNhplBmjRMwErao=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ttb/ZZUm6MS68OgT5dnefkEnno2HwlEDpkXlfLnRd/SK+wAJv+EWjxH9uXX2KVEjC0wOO3lCoZN2TRg8/wBsaIqIBRZd8rnP+Q3m6bJ56kbGe/U/X53NSV/E+4t5gjPas1LPVGWzmtCTy+Nc2lmlRcZd6FUhTywYMCQNMcAgGCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TixcMe1w; arc=none smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+BnOWCl"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-32b3a3a8201so40534851fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jul 2025 09:20:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TixcMe1w"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7e169ac6009so469602185a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jul 2025 09:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753114813; x=1753719613; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4/uPd/UjXcdD1y2cIWdaZXgVYnwlNvP/l2zwGLvBB/U=;
-        b=V+BnOWClvX9y5z1ZQi++du52bq2QUTMI8yQg/folJZIlryiAAcChtOFOq1yQ5tim5m
-         NhzY545uv10+D/kd5o/y6EWI/u3god0WwRS2/ejs+xdRPTIEiBpaZNY080V0pqo3fTPk
-         xLtasr6EMHjcOkFiRUuZ6RisnpDsR2zoJQkyO/zflRQ3tHXwNmnw73KTqtve2vlnigKB
-         /r2FgoDkZpDMtsNAz/V9g4RShgvvMfiS9WbgPzgIHhO+jmg3S8+smgRwEbPVsO5VprIg
-         KkCcmrsCP3QEoDHZVq30s1YwysP/FqGTP1Hh5QXPzfGkvezr4V/lto893yUIl6JcOLrN
-         wR3w==
+        d=gmail.com; s=20230601; t=1753116400; x=1753721200; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WfoXsb1eCgNDvRHAuGs93iHvMM0CUP7Wq6M34kgZQ4w=;
+        b=TixcMe1wo9K3b3p+AesZJSMqqocPcFyePiBj1H7rlf49RyEXe3wfKzrRMzgBsdNkZX
+         iKSdc0R6L3EE8ZV5R69MpRhjOv1lZymQriloio+MDob8KV9iAMmnZqrtjFaZ40xTurom
+         HrAdE+EavIxFKd3p+Zadl8IV5yD7t3HDoqk3hdmIdFPUSxgaq3r9UBPCIcCWSS/lQOtv
+         6OlLEz5bqnxZWvhVW9vHdwojRbXfQgE7UvZWBe0qYNztg+hJ9e0SYidlDdT4IlTyVGsX
+         JE4uxHvmxwRsshe8E33HXXrthczz8I016DnzjrhxNVBlT/+QB2UakRdsX5kDIvX8RKx6
+         84OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753114813; x=1753719613;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4/uPd/UjXcdD1y2cIWdaZXgVYnwlNvP/l2zwGLvBB/U=;
-        b=I87whdbwmEeUMh7QVLmKw4C3hm4lvHx/2tYqcGdUNYZt+vEqCy4dzD9SRQ9F1d1kED
-         v1YcLWL6xxO5IHfVOLYBZ6L1/TqUhDwStw2TT5aU3uGl095LjoFjSCukTg1SZ+n5gu2+
-         LsynLa4FHoG5c3leqjumQk5fGr9B8TGGNIc48H60wyj0bId3INF0tq1+okZu6EX7hRwz
-         0Hf8Xh1hmXRaYkWCgu1RCHem0wyN8L3SXcrqa9rjbybyfknOEKPX4cYUfzB2ZAOooTbx
-         39ZsdolguknJL598/raE0ggy1vNpM/a6xQsqHU9rHnHmw/J7We+wQJvGdN3bVakQE9Kb
-         abPg==
-X-Gm-Message-State: AOJu0YymFtT9iThuRiUumpRlv5pBR6LLAU+01m4R3JjqfwmsRZhyMrTW
-	rA1GqTHMPEp2QSMfPjOmImSBFebahl93auoIKHvtMQ+cipk5tXBQOn8hecyqEc8jDpf2QQHhDPf
-	KAdGIXBwIt3dISwzrYa6cgTJa5kql40VEtbOmZfY=
-X-Gm-Gg: ASbGncu3o6RaszOF+Ux1s0gXzquDXaAEcsia0x6fhGVDAebdXKMm5DQnjkkQ3EXHSaG
-	XYnOJmY0ZNZbX/h0AKD2DUkbTQAqZ9HTY6X0LmUKk8k0QqEGqFxFPMknVxM8SChWqk9pfh8ypYd
-	Y3Mkh+sxr6rI0J1KPD9Q8FomexHaKQWhdpgfwiWXdTqD4VmsWIZhrFn+E9YP8rCC4IrVrjZ5z6r
-	UiBGKfr7a//iBut
-X-Google-Smtp-Source: AGHT+IFn7DQjD2gqhZQhvyX+HDsm7AauXtlzJF+PEx738VseR8sY5J7+OJacos60PQF9K2AN6f//iNIJGlO04Ig6+Xk=
-X-Received: by 2002:a2e:a99a:0:b0:32a:8916:55af with SMTP id
- 38308e7fff4ca-3308f4c5e9cmr58294701fa.2.1753114812784; Mon, 21 Jul 2025
- 09:20:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753116400; x=1753721200;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WfoXsb1eCgNDvRHAuGs93iHvMM0CUP7Wq6M34kgZQ4w=;
+        b=cUW3q2mOmIADDLDwW38O9gpFRv0SWEqSGNadOIZsJWFkTJ/QAnKmFfqCYskymXw/Bn
+         Vxz6HgT0UyTq505Baor9668+QwNxA/ZcOfCHVj4KQZGeyjwXwdVYomaT/NX6Z9Iu7/Yb
+         bwxwG29A4Y+ZSfDP2DCkFHkDPSJKfCbZjwgxip0q5ybKMO7biQBVYm/5HvOFU8am3g1U
+         k1phrQ91hLhRoFHlPCPNliK8qLbbIbNUrxzt/AEXLgAixu+Pm7zTxOQx+ufcCl3kttKf
+         6eD5vSI0BINQsBQoo8wpzMef9pl5fQkjU3gSUxVTbArAEdGi+7sPNzOWZPwxMrV+50s4
+         ktXg==
+X-Gm-Message-State: AOJu0YwB+/JHBHkB7r6SJgkhaeyNuuoHE4qykEKvU0AA3zCQsPNgKq+b
+	wi8z1wjOzdCfQ5rHS/N5X2FAEgViYWvgAm1illYYLjvbLJu35nsU9k/ZxkK4/mqd
+X-Gm-Gg: ASbGncsAgFcBpxSkXWiZAEJicjbWZlEpX6sfeURVuR4Kxnfav+O10FXz0RcKZeKgxmy
+	IktO3/wpLK58fqOrgrKSMPFrDXnV2wAiGY8Qu1ZTauQIvUBNM07BK44R1LWThx9Z2Vi+FNhSxHI
+	wolEftv0+hisO96daH2Ggh4E7eAhnzY5TDKVAGq62uKlIPGbbWorUQGIvuLbmFgXbY48hEq4Svw
+	di9VjBjdwKhoVRajZKnPEn1fSkJSuyQvNNwkH8Vfv4uT+0+TJBV7pwz99Hc/3jdwhcajAscd51j
+	AajciC6XckhGg35YriqAorn9O/bv7ePaidImRc8pUWH2ubNKGmH88DynysJ1JUrfsRHXC3P4wuS
+	2wJSw3f86tGVdUOdWwQPnmUYtYwrZ
+X-Google-Smtp-Source: AGHT+IGfK9Y8jZrtfhMFP7wCc4eUNcbXwsl1vN+MvIY7ttoMbYmaFhYtWqd8qB1ZANUZygSXCVYEGA==
+X-Received: by 2002:a05:620a:3bc3:b0:7e3:4bc8:b910 with SMTP id af79cd13be357-7e34bc8ba38mr1980322885a.35.1753116399762;
+        Mon, 21 Jul 2025 09:46:39 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.213.118])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e356b4677csm425860485a.32.2025.07.21.09.46.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jul 2025 09:46:39 -0700 (PDT)
+Message-ID: <687e6eef.050a0220.176ae8.d122@mx.google.com>
+Date: Mon, 21 Jul 2025 09:46:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5669707807456121894=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250721152219.517-1-quic_fgiancan@quicinc.com>
-In-Reply-To: <20250721152219.517-1-quic_fgiancan@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 21 Jul 2025 12:20:00 -0400
-X-Gm-Features: Ac12FXzZm2dKPfQIFLYn7FeQdK21VDobYQYQgceg5Y6M1CqPl_lLr7TNUTi5Nb8
-Message-ID: <CABBYNZLUK45-eBcYAn7oq9-gewhE_XLXpnPiwKXPF-tOX6JYrA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/3] Keep component `bluetoothd` isolated
-To: Francesco Giancane <quic_fgiancan@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_fgiancan@quicinc.com
+Subject: RE: Keep component `bluetoothd` isolated
+In-Reply-To: <20250721152219.517-2-quic_fgiancan@quicinc.com>
+References: <20250721152219.517-2-quic_fgiancan@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Francesco,
+--===============5669707807456121894==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 21, 2025 at 11:24=E2=80=AFAM Francesco Giancane
-<quic_fgiancan@quicinc.com> wrote:
->
-> Hi,
->
-> I am posting this patch series to better decouple `bluetoothd` daemon
-> and `libbluetooth`, as mentioned in the subject.
->
-> I am introducing this change to make new BlueZ more granular.
-> This will allow more control on which components are actually selected
-> to build.
->
-> Major use case for this change is fixing circular dependencies when
-> bootstrapping new builds where the whole build root is to be recreated
-> (e.g. Yocto Project).
-> In these scenarios, to have Bluetooth support enabled in Python,
-> `libbluetooth` is required at build time to be present but the direct
-> chain of dependencies would require a Python installation available,
-> thus introducing circular dependency.
-> Separating the library and header files from the rest allows build
-> systems to break the dependency loop.
+This is automated email and please do not reply to this email!
 
-In theory what we should do to fix this is to add proper header to the
-kernel, since libbluetooth is basically just used for syscalls to the
-linux-bluetooth subsystem, btw doing that would also fix the likes of:
-https://github.com/bluez/bluez/issues/989
+Dear submitter,
 
-> `--enable-bluetoothd` flag is added to the `configure` script and
-> it is keeping the same behavior as other flags.
->
-> Francesco Giancane (3):
->   configure.ac: introduce `--enable-bluetoothd` flag
->   Makefile.am: build `bluetoothd` if enabled
->   README: document `--enable-bluetoothd` flag
->
->  Makefile.am  |  8 ++++++++
->  README       | 14 ++++++++++++++
->  configure.ac |  4 ++++
->  3 files changed, 26 insertions(+)
->
-> --
-> 2.49.0.windows.1
->
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=984366
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.33 seconds
+GitLint                       PENDING   0.31 seconds
+BuildEll                      PASS      20.13 seconds
+BluezMake                     PASS      2580.32 seconds
+MakeCheck                     PASS      20.57 seconds
+MakeDistcheck                 PASS      173.89 seconds
+CheckValgrind                 PASS      224.76 seconds
+CheckSmatch                   PASS      276.91 seconds
+bluezmakeextell               PASS      121.88 seconds
+IncrementalBuild              PENDING   0.32 seconds
+ScanBuild                     PASS      760.46 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5669707807456121894==--
