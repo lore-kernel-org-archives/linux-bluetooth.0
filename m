@@ -1,67 +1,71 @@
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF90265CCB
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jul 2025 20:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3228728314D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jul 2025 20:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753216522; cv=none; b=VuSxfDkl2ctGUPsnH1sg3+GqBbVS5QgoRctXFl5J/PQid4yOB6vx/w4nXN9k9MrRdMCZcwFLcDeuN/TT/FxQe5mG8yaVRBIs8jsfeU1+rukb3pCWONR57anrmZnqq5uWCQNwDlaTX9EBdColoipHHcWLNbwbUIT/VEYOXpv6M7c=
+	t=1753216524; cv=none; b=lWoPoFxqOnI4D7MVUqXHis+Nx53TsOvT2mOLqafnUySMDIOMLeN6fHY3O2Zuh8/0v3lnLNez9bmqROllnpiskz5lc7lXOMUx98GFWFgd4vToqi3v5K30EB3zwsvsvi+w8MaLM/qndvAWyw/JCBzvcDh2+518tYa7iq4DGZb/i0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753216522; c=relaxed/simple;
-	bh=jZYL+YPO3MPWiTAQ2uiWVsOqJESEuu4PfqtDEzWmhjQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=R6qSy60NkO33aOz2dUXv6Gshe0QSjl2YUlUAQW2ggYR7hC2PwT/sRqBPjw8yBM8ZeOS5DohafWXqFymyrKyKYmHZ7WtP9QoXloJruKhjHjCtkClZwQYOYLEFCtAWNks8NdgwANTwI7vzy56GDvZoq8x46z1RQSDCRhiwHHmIvQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W96wkMPC; arc=none smtp.client-ip=209.85.222.52
+	s=arc-20240116; t=1753216524; c=relaxed/simple;
+	bh=Mxdx5TlL0l47Eg/qMXwOeYdznQky950SYgcqKpAvhFo=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OmwrAQ6kQw0eigX0OeSoOc3OdS/afqHFyjmTcQWLYkS0k6Yh70ezR9xA4yMTGvzuSnhHxiiXUDajdzwQg5FeXd0EUbAmidI5Yg4B0d8UUoyci4DiGKI+1oYlTm+N2/XgKVzoAqeb8RcnqaRj9+4UDtdl1fOSYR2r3OJ1nx/+2xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KD8nRPT4; arc=none smtp.client-ip=209.85.222.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W96wkMPC"
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-87f298f3508so2168807241.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jul 2025 13:35:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KD8nRPT4"
+Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-87f36c458afso7069798241.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jul 2025 13:35:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753216519; x=1753821319; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=P8mJ3XmN81/3+KeTb1cIref1zUl+oBxlLXlp+ZLiNNg=;
-        b=W96wkMPCJ0aOf9O/+MyzlcaVpaT15yj/sa6/xUsRVu9UZa9zIQ0/A93x3xcpXTb+8i
-         0OtpDR6FV3bJRYAvlgt/fQ2yV+LevsK9B4+TNzDUPn67PFSLZI5/C4SA0ThCFUpHiXfK
-         Q0rkqkGQgYMPyMjjGbfdpdQk7nUEuE7U7/7MGpYKvQIWheqCPqO+H0CUvCXQC0G2uAyy
-         xpl5uatRJZAZFssEOdcClFsVjQu3KnuGGV4VpGPj3Shnxr65QybKYsl0sEUUQvbwuzvf
-         rkpnfONgFL4QEvyzAU3z1lVtDEj/T/HZx/QkbSybpO6r3+ZLbEurG53fxjNKBE/WK9Ym
-         51TA==
+        d=gmail.com; s=20230601; t=1753216521; x=1753821321; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/Kd7PrTEtneUyVf9K8hE8wfY7Y5JfxyS1sEcRhfmT9k=;
+        b=KD8nRPT4FlBFXn9RC0DKF3e9Qq6PuA4mdvQQSe9k12+h3a8fue1w49phlEI7t/2lnJ
+         /RUR/eao6k/ncmfSVqDmB4FV8gLp7WZoHEcvc2AEv9q9AlTunGm/621IHdUOrRvNDiah
+         V4N0/uTKOTw3Ps+gyzMClu2SZ4JmTbdkwmyT1scVKz4h04yEslp/lddxkLpSEvYe/YoL
+         ihasicEh9UyEmQVBfj2oGEbSdbZNOkKuwv1paiKEMSjBEWwABD6I9eM725PJBa8BeAvI
+         nLGxT3xwiLm1g4O22XtsRuC7iCNmzNwtBZTUtirntJNJgKZsco+wWj/bnKakVw1+elXz
+         LQJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753216519; x=1753821319;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P8mJ3XmN81/3+KeTb1cIref1zUl+oBxlLXlp+ZLiNNg=;
-        b=cYmEGz3Q46tJydapa4NSXf0IUDEWJMqxFrYRQ8NsB7G+v4kKjFcDnib6pBOnDXjGwZ
-         qcfS/HpTVy9F7rDuPjyPIjgwuBd4nC/dzz9/MaD8aIytaAy/FnvquYPin2puzv3xVTJr
-         SgUF8QmWv6UEApvJVOYn3lYXrwzY88mtgqcuyCHaMDX2+G0jlNz4XtRyBdKnvcKeRf+U
-         wbfNB6M0dfy3jxOqj2SwhJNcmNf/EQbJdAXafLoOVyHNkem6eXhA2EAnzQfjynjn8j8A
-         bZ/73QfVcEvE5QbDZ7pPQ6EfJoS9eHujmFcJWHmaH/Z4d3Y5DD5Ww4dciZFY2FZO8jFe
-         eiKA==
-X-Gm-Message-State: AOJu0YySGQnqk/YT8bdF5UoTb922O6ZnDqrhIeh5uyXQPFZgGmj4DNrW
-	/H3dqS6+qinxk8VB1RyBKuPdB3XSEmDrW2yvx69OakNew3Qug5+8H5OpSnvuy31J
-X-Gm-Gg: ASbGncuaoc8CYyPX6wPySUQPM/NSsw4v1DKwozVOkHtu8XC8yYZS+0Tn9LTgnuuq6hY
-	mdCRnv9GNvGrXWrrpthG2piZv0N7O/PbaxdwSrmngCH0Ng7ZNqPNbWvxSCEx2rVhioO5nBRAcup
-	hk5J0+PsYaPGhEA0rsVfhEDK2esm/xU1InIn1ac2WYIDtmB0DGz4ozuIU2G89wApg6/xlAtQ+oP
-	8oDT4WWwLbIhUZyu4f8abg7tNRrAzCBUkcd2VMmb0YUQCFRezdoTMT86UJABSPBXBOPF7nY9eE8
-	Xsl5zlDwgAnXpTHAJwMegVb8lDExx/jRk8QH/1u/BYjWOuihB1Ikx73Sm5q7lmuPulWnKzvQUPg
-	ZLja4Eiq5/ZfaLjvOEVvnGm8CeOhI4VJbj0xP36oot9n9bMAChcLxg/96BV+AoGdPAbKWQYNqhv
-	c=
-X-Google-Smtp-Source: AGHT+IHpT2mmfiyFELWm2EBxbepDLH++AhyuuVRDMmQBQ5Gsp0OWcKTay9if0udTMkf9ZW/SSgJG+A==
-X-Received: by 2002:a05:6102:41a8:b0:4e6:443d:9b1a with SMTP id ada2fe7eead31-4fa151c1979mr190050137.24.1753216519177;
-        Tue, 22 Jul 2025 13:35:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753216521; x=1753821321;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/Kd7PrTEtneUyVf9K8hE8wfY7Y5JfxyS1sEcRhfmT9k=;
+        b=s53TNDxCDPK5/nAL2HtwnK3/87y70fBWKquAhoNvLRjejShIY89pc86Bf1y9jJE7kR
+         WCi6UWV6E3h6+Cj4PCqej+pTmsRvX5NkKPdhXwQk9tdNPd7KdTSAmwOhqCDlo8YZNFs2
+         7l+U7jvWfnte2D2uVCPjQCcD1IgdlWQ0Um8NN105YK7idYOEv6z/+BrQOMIxuC8fhpC5
+         MKXnr3wYm9PK1UUqiev/DsQTZVuWIRCtyrfo41Oz8hGHXpQR9zmYyKJby3h+2yAsEteD
+         lXJ9sAZjxuj/R469YFnQe3FFqZSw9vObLI3Zbx/aiXIIzILNKVbd+J34hoQs6FXwdgoz
+         hfqw==
+X-Gm-Message-State: AOJu0YzefVhmCGfckdkx93d5LOGmMFV3hTsUAaziV+gr0XBBNuLpjCM0
+	5odCfzGhnaU2/EGp8Vdv6oG5U3kYz30izmQc9a/f4BzCDq4DrYFXgPDLme327oy0
+X-Gm-Gg: ASbGncurt2eMWIFkyLUI5G58cRmVGN3xSHYiMsjlEtJ/tJGv22qskTt8l29L4c/bPdu
+	vABc/p/2f06qDA9Lo0XM/a1K59dmEOp9CyeVe87q4jJN/bUqzrWQA6qiCfKfHgIR+AtCTy4xrkw
+	K9SdbzYLyalsb5UPq9rg67CaRXyqMTlLQvbZ3ssXInPSlPyewVMl5z6l6jluRaYol3wuO2PMfrA
+	YW1l3lZhZGxyJpIIogJVVWFUeQgUKh6ErZOREMFQduP1ckGwyxV/tILlTNUCGiTKTh26WhII98H
+	en0X6HnS6dBeRtOm/YPX1t5419oVbDghFImkzMbN237lXxtE994SXLgQL0f4QB9FSlm/Kivk7oO
+	Ld8l1zk4n+Uzc6UNr+f74h7fL9CfDpEAxKGF73saPiu7XTmnHxo90Jra54ckXPvXI
+X-Google-Smtp-Source: AGHT+IHz4exmVxxAeao8Mset7tlk4t0SbbuU8SqWqriVURmAxmp92/QLxThCwNGq67+kzKU4mTE8mQ==
+X-Received: by 2002:a05:6102:5491:b0:4f9:6a91:cc96 with SMTP id ada2fe7eead31-4fa15217e98mr194856137.26.1753216521258;
+        Tue, 22 Jul 2025 13:35:21 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-88b0abfe699sm3444451241.5.2025.07.22.13.35.17
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-88b0abfe699sm3444451241.5.2025.07.22.13.35.19
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Jul 2025 13:35:18 -0700 (PDT)
+        Tue, 22 Jul 2025 13:35:20 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/3] transport: Add write support to Metadata property
-Date: Tue, 22 Jul 2025 16:35:06 -0400
-Message-ID: <20250722203508.1311750-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/3] transport: Fix not updating MediaTransport.Metadata
+Date: Tue, 22 Jul 2025 16:35:07 -0400
+Message-ID: <20250722203508.1311750-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250722203508.1311750-1-luiz.dentz@gmail.com>
+References: <20250722203508.1311750-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,74 +76,76 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds initial support from writing to Metadata property.
+MediaTransport.Metadata needs to be checked for updates when state
+changes to Enabling or Streaming otherwise it remains blank.
 ---
- profiles/audio/transport.c | 45 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ profiles/audio/transport.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 4800570d934f..bf16de958be4 100644
+index bf16de958be4..111d4b9b7ed1 100644
 --- a/profiles/audio/transport.c
 +++ b/profiles/audio/transport.c
-@@ -1301,6 +1301,49 @@ static gboolean get_metadata(const GDBusPropertyTable *property,
- 	return TRUE;
+@@ -107,6 +107,7 @@ struct bap_transport {
+ 	bool			linked;
+ 	struct bt_bap_qos	qos;
+ 	guint			resume_id;
++	struct iovec		*meta;
+ };
+ 
+ struct media_transport_ops {
+@@ -2141,6 +2142,26 @@ static void transport_bap_set_state(struct media_transport *transport,
+ 							UINT_TO_PTR(state));
  }
  
-+static void bap_metadata_complete(struct bt_bap_stream *stream,
-+					uint8_t code, uint8_t reason,
-+					void *user_data)
++static void bap_metadata_changed(struct media_transport *transport)
 +{
-+	GDBusPendingPropertySet id = PTR_TO_UINT(user_data);
-+
-+	if (code)
-+		g_dbus_pending_property_error(id,
-+				ERROR_INTERFACE ".Failed",
-+				"Unable to set metadata");
-+	else
-+		g_dbus_pending_property_success(id);
-+}
-+
-+static void set_metadata(const GDBusPropertyTable *property,
-+			DBusMessageIter *iter, GDBusPendingPropertySet id,
-+			void *data)
-+{
-+	struct media_transport *transport = data;
 +	struct bap_transport *bap = transport->data;
-+	DBusMessageIter array;
-+	struct iovec iov;
-+	int ret;
++	struct iovec *meta;
 +
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
-+		g_dbus_pending_property_error(id,
-+				ERROR_INTERFACE ".InvalidArguments",
-+				"Expected ARRAY");
-+		return;
++	/* Update metadata if it has changed */
++	meta = bt_bap_stream_get_metadata(bap->stream);
++
++	DBG("stream %p: metadata %p old %p", bap->stream, meta, bap->meta);
++
++	if (util_iov_memcmp(meta, bap->meta)) {
++		util_iov_free(bap->meta, 1);
++		bap->meta = util_iov_dup(meta, 1);
++		g_dbus_emit_property_changed(btd_get_dbus_connection(),
++						transport->path,
++						MEDIA_TRANSPORT_INTERFACE,
++						"Metadata");
 +	}
-+
-+	dbus_message_iter_recurse(iter, &array);
-+	dbus_message_iter_get_fixed_array(&array, &iov.iov_base,
-+					(int *)&iov.iov_len);
-+
-+	ret = bt_bap_stream_metadata(bap->stream, &iov, bap_metadata_complete,
-+				     UINT_TO_PTR(id));
-+	if (!ret)
-+		g_dbus_pending_property_error(id,
-+				ERROR_INTERFACE ".InvalidArguments",
-+				"Invalid metadata");
 +}
 +
- static gboolean links_exists(const GDBusPropertyTable *property, void *data)
+ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+ 				uint8_t new_state, void *user_data)
  {
- 	struct media_transport *transport = data;
-@@ -1422,7 +1465,7 @@ static const GDBusPropertyTable transport_bap_uc_properties[] = {
- 	{ "QoS", "a{sv}", get_ucast_qos, NULL, qos_ucast_exists },
- 	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
- 	{ "Location", "u", get_location },
--	{ "Metadata", "ay", get_metadata },
-+	{ "Metadata", "ay", get_metadata, set_metadata },
- 	{ "Links", "ao", get_links, NULL, links_exists },
- 	{ "Volume", "q", get_volume, set_volume, volume_exists },
- 	{ }
+@@ -2179,11 +2200,16 @@ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+ 	case BT_BAP_STREAM_STATE_ENABLING:
+ 		if (!bt_bap_stream_get_io(stream))
+ 			return;
++
++		bap_metadata_changed(transport);
+ 		break;
+ 	case BT_BAP_STREAM_STATE_STREAMING:
+ 		if ((bt_bap_stream_io_dir(stream) == BT_BAP_BCAST_SOURCE) ||
+ 			(bt_bap_stream_io_dir(stream) == BT_BAP_BCAST_SINK))
+ 			bap_update_bcast_qos(transport);
++
++		bap_metadata_changed(transport);
++		transport_update_playing(transport, TRUE);
+ 		break;
+ 	case BT_BAP_STREAM_STATE_RELEASING:
+ 		if (bt_bap_stream_io_dir(stream) == BT_BAP_BCAST_SINK)
+@@ -2253,6 +2279,7 @@ static void transport_bap_destroy(void *data)
+ {
+ 	struct bap_transport *bap = data;
+ 
++	util_iov_free(bap->meta, 1);
+ 	bt_bap_state_unregister(bt_bap_stream_get_session(bap->stream),
+ 							bap->state_id);
+ 	free(bap);
 -- 
 2.50.1
 
