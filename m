@@ -1,83 +1,77 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBFE82C60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC631E1DFC
 	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jul 2025 18:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753296096; cv=pass; b=ZZHcFl+NNMOGrifk5zzffY9GA8R1e8XDT5IhrcUFdGgUBFX6nDuOPLyFsUsxo9QJH2XHP5a5ao1TrtDyoLnVmXZvabHmJjeWQAzNiae7j71KfN/zmQS1AAADOf/PAYDxfm06xVrLd73kQFO217hf/yEvSxJeiYv7cwkOwdDOQhM=
+	t=1753296097; cv=pass; b=kSFE/iDZf4HU+2ATy/OBRkqagzNGS2+clle62jt9sW1X0ePTc7eMzZbHUrWL/PKgx27URoJoNW+x/566wsUP/+bSfTZN1Wx1xseXbJptkjcHce26ZITeqEF/yOIB2TdLxCccPPF4w2v1o2dWvVx6Cv85WG90DlZNoJBe0kMXRmw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753296096; c=relaxed/simple;
-	bh=SXjy1ah0D7JaTWecpn0eRaPBlTQ9ylRp73au/A89waM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Igiqis0Zcj3gfemmnePsEKjqu2RjqFODm6GCSfJfy9kgdqoworpLHugEf6/7aDACIP8w3c6DhPmKVC3BWaUgJy5ICtkGBfoZm+7ebQEnTLIIW+u2jdYrXwop+rXKTzfa+m/k2jzBErL6Ai4DYLsCAB+o+fngsBt/RE+fxA+z7pw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=e2eYU9xS; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rhTM14HH; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1753296097; c=relaxed/simple;
+	bh=I98Ecm96LoWw6vlbogRG0FfvVt18d9OyLLJcCgCMokY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bsLmktTFyr8h+yn3LKfr8DKjJkCnYteebQUYPmZAMMxjoxZYjmVSOOJc4obqeMmbXfyLOjevTvkF5CD3sIzALUoU1h4Z1zDQipHwF0GP4RUpUIitFgCSSrr5slCE7wuhrS6iH0wHbo6lnFA+31o77UawnYgM+OFfxlRW55XYIMQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=SBEujwxz; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=yAbt/0kk; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="e2eYU9xS";
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rhTM14HH"
-Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="SBEujwxz";
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="yAbt/0kk"
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4bnN7X6f0Tz49PyD
+	by lahtoruutu.iki.fi (Postfix) with ESMTPS id 4bnN7X62Dqz49PsJ
 	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jul 2025 21:33:44 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
 	t=1753295624;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=degPuEVJJAK9Z+DACURE/6l8ckiNYPaFjm4s+dpGYzg=;
-	b=e2eYU9xSR347rYixiSt3j7kTeDR64lQh0+eQBEqRXM6Y9QDcAfdhDXm7tbWd40iFLLDnNQ
-	+4aYALjTLhCWHPt2BehC5dpU9cx7HiYimzGyYme9ixKeWt7snI43FAF7ZRrqEUvxQIRtE2
-	bWT+LXbdV01eTXsNY2U7Vxoz8Ug2nvRyASxh4TE+2JwIibjp1oTbYji3md/LIoWgrmFda+
-	yn3l/hYAoFMmnv4GaQHUZz7Ukc8CK4/8Uvvshj+YrHBYNjahzViVbG0NDse9j8kqzxqjim
-	07qc+ILitry2tqH2DygwL//r1F6l8dUEOLLaZhDBeh7khGcpzjwifS8hVEr3IQ==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1FXZzbjCtzlm58xDg85sxWU/Pd0POWKvGKHrniCnZ/g=;
+	b=SBEujwxzh+f/Xd7+v+Fx7Mevd2MDmZWXKb4dThtpeW5MWwj/eD/iwwpGUgBhf6jPO/M9ms
+	OGjPzAzpCrR3npYMvhRDrXU5kkWp0xFvGtf32Ih5FTEo/KNzylye8MEoi8xDbzbgGu8J6M
+	8p83UaILrwEW//NgkkiMoG9SyCsnOGCVCaEdHyRF2xt9ZGkFszNNUkdme/ehX3IrwFvuJe
+	zL2fh6sW47/daPcE6UzVzfdbkBmqgaUsbDjoKGHw60ceeiYXQucy/3iwUUXt5YuGNDPjsr
+	tKkiBkp2poMhWmhJzmvASxHtQ5ZSvl2xZnm7HPNwzDQGASyWtkVFVihReA9gaw==
 Received: from monolith.lan (unknown [193.138.7.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4bnN7P3XNxzybB;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4bnN7P0nhCzyTm;
 	Wed, 23 Jul 2025 21:33:37 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
 	t=1753295617;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=degPuEVJJAK9Z+DACURE/6l8ckiNYPaFjm4s+dpGYzg=;
-	b=rhTM14HHXChm9XhWsBngmUvu2unOYKoxDzR5RzLmh7xYZuWdcTAn0HogDZ9iSXseLWuMiG
-	IHQD+ugTzu8TY6Xq4th9SvErzf5wANbi4w6Tl+tV/WuQp+9h2xj0xBY03ACZc9iky/Lvug
-	WK2uW/yxJnt+4WtnEidsjiY8xIpqMMU=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1FXZzbjCtzlm58xDg85sxWU/Pd0POWKvGKHrniCnZ/g=;
+	b=yAbt/0kkl0VuQ7g/I8S3XaSJ/EJOOLEn1uLOiYHGK3q/6pG1+dlJMwG8vghTobHPoqDWwC
+	cd/rj/cUgkcZPSD2fhOy3nyZ+yRv7QQx9/HGVw+29qLQfuuEylhO/QJrA2Aq07UOpa8Oz9
+	KsN6a99hmGFQMXXu5ok1ypgUxGp+OQI=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
 	s=meesny; t=1753295617;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=degPuEVJJAK9Z+DACURE/6l8ckiNYPaFjm4s+dpGYzg=;
-	b=O+E4//uIM6DmE40R+yB9C6ejB/2jigKFxdMHqZCHgsY+NeOKsyc54Se7cuVWDnQcd2MO9u
-	gh7NrMvdaJ2Y5ikhNg+4nESQLhtkj63/dYpw9sbkyrIoaOzlUtYNtVYnnfoLlEER0GxmDd
-	ePUbg9gxhNTRkI9LqdD7jXhcRBSmxpg=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1FXZzbjCtzlm58xDg85sxWU/Pd0POWKvGKHrniCnZ/g=;
+	b=EgKdv+NQSUrPM6OCHU8Fmcl8mKHx3fxzh3A0Twwbtu+Ia3UTzwmBjI9DaCwbUMOzXNWmM5
+	JM/ygfNGSIM0mye6AS3Tx8bU812FS46z/AA6Jw/+yNGkbNj+AfELFh6b4eBoHjzfacvIzU
+	LmqyGrhNzzZNqta6iM/sOcueMn3YtRY=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Seal: i=1; s=meesny; d=iki.fi; t=1753295617; a=rsa-sha256; cv=none;
-	b=MvE6xHKU77gRnxW1N9IyNEAbRy85JpuCVTXMproZQuKYwfLCDfFzfrtmSRVmbEGU3p/4sp
-	hIzfb+BZSufcXor0GLLNq8XNUDpJHmwYbT88tYDJPfGYFBXc8BdVvDO2q/ASBc9Mly353+
-	Ff38VG8ssmJVPOpjVPKkfsBp7Bg77gE=
+	b=cb0+WMLDjWCjpWDSgwMYk08dz9nNLMuFl/E6HfVk4LndRNEiPL1h0YsNBy6wD0ao2X86dh
+	T715q4N6wVy0rZcnwoffqPHJ9gsdlZJ89duDCQ25j9tBB44nPIeYdGJvQKaC+HIfX4di3t
+	kXIbptt/NiWXYAkdvBK+lWkC5dFxU1g=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 2/2] iso-tester: add tests for hardware RX timestamps
-Date: Wed, 23 Jul 2025 21:33:34 +0300
-Message-ID: <950d63f857ae87b99bd11c10c2313d5faf041d3c.1753295558.git.pav@iki.fi>
+Subject: [PATCH BlueZ 1/2] bthost: fragment when sending ISO packets
+Date: Wed, 23 Jul 2025 21:33:33 +0300
+Message-ID: <8b803274627f277cdb987b5ea5695f62247b6d3f.1753295558.git.pav@iki.fi>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <8b803274627f277cdb987b5ea5695f62247b6d3f.1753295558.git.pav@iki.fi>
-References: <8b803274627f277cdb987b5ea5695f62247b6d3f.1753295558.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -86,213 +80,199 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add tests for HW RX timestamping.  Also add test that sends large
-packets to test ISO fragmentation.
-
-Add tests:
-
-ISO Receive - HW Timestamping
-ISO Receive Fragmented - Success
-ISO Receive Fragmented - HW Timestamping
+Support fragmentation to controller MTU when sending ISO packets.
+By default, fragment when exceeding btdev iso_mtu.
 ---
- tools/iso-tester.c | 53 +++++++++++++++++++++++++++++++++++++++++++---
- tools/tester.h     | 45 +++++++++++++++++++++++++++++----------
- 2 files changed, 84 insertions(+), 14 deletions(-)
+ emulator/bthost.c | 102 +++++++++++++++++++++++++++++++---------------
+ emulator/bthost.h |   1 +
+ emulator/hciemu.c |   7 ++--
+ 3 files changed, 75 insertions(+), 35 deletions(-)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 6aefb5196..40465a5f7 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -1013,6 +1013,12 @@ static const struct iovec send_48_2_1 = {
- 	.iov_len = sizeof(data_48_2_1),
- };
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 7ab4533d1..52c5b0bed 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -257,6 +257,7 @@ struct bthost {
+ 	bthost_new_conn_cb new_iso_cb;
+ 	void *new_iso_data;
+ 	uint16_t acl_mtu;
++	uint16_t iso_mtu;
+ 	struct rfcomm_connection_data *rfcomm_conn_data;
+ 	struct l2cap_conn_cb_data *new_l2cap_conn_data;
+ 	struct rfcomm_conn_cb_data *new_rfcomm_conn_data;
+@@ -297,6 +298,7 @@ struct bthost *bthost_create(void)
+ 	/* Set defaults */
+ 	bthost->io_capability = 0x03;
+ 	bthost->acl_mtu = UINT16_MAX;
++	bthost->iso_mtu = UINT16_MAX;
  
-+static const uint8_t data_large[512] = { [0 ... 511] = 0xff };
-+static const struct iovec send_large = {
-+	.iov_base = (void *)data_large,
-+	.iov_len = sizeof(data_large),
-+};
-+
- static const struct iso_client_data connect_16_2_1_send = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -1049,6 +1055,13 @@ static const struct iso_client_data listen_16_2_1_recv = {
- 	.server = true,
- };
- 
-+static const struct iso_client_data listen_16_2_1_recv_frag = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.recv = &send_large,
-+	.server = true,
-+};
-+
- static const struct iso_client_data listen_16_2_1_recv_ts = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -1082,6 +1095,26 @@ static const struct iso_client_data listen_16_2_1_recv_rx_timestamping = {
- 					SOF_TIMESTAMPING_RX_SOFTWARE),
- };
- 
-+static const struct iso_client_data listen_16_2_1_recv_hw_timestamping = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.recv = &send_16_2_1,
-+	.server = true,
-+	.ts = true,
-+	.so_timestamping = (SOF_TIMESTAMPING_RAW_HARDWARE |
-+					SOF_TIMESTAMPING_RX_HARDWARE),
-+};
-+
-+static const struct iso_client_data listen_16_2_1_recv_frag_hw_timestamping = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = 0,
-+	.recv = &send_large,
-+	.server = true,
-+	.ts = true,
-+	.so_timestamping = (SOF_TIMESTAMPING_RAW_HARDWARE |
-+					SOF_TIMESTAMPING_RX_HARDWARE),
-+};
-+
- static const struct iso_client_data defer_16_2_1 = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -2247,8 +2280,10 @@ static gboolean iso_recv_data(GIOChannel *io, GIOCondition cond,
- 		}
- 	}
- 
--	if (isodata->so_timestamping & SOF_TIMESTAMPING_RX_SOFTWARE)
--		rx_timestamp_check(&msg);
-+	if (rx_timestamp_check(&msg, isodata->so_timestamping, 1000) < 0) {
-+		tester_test_failed();
-+		return FALSE;
-+	}
- 
- 	if (data->step) {
- 		data->step--;
-@@ -2290,7 +2325,7 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
- 
- 	count = isodata->pkt_seqnum ? 2 : 1;
- 	for (j = 0; j < count; ++j) {
--		bthost_send_iso(host, data->handle, isodata->ts, sn++, 0,
-+		bthost_send_iso(host, data->handle, isodata->ts, sn++, j + 1,
- 					isodata->pkt_status, isodata->recv, 1);
- 		data->step++;
- 	}
-@@ -3718,6 +3753,10 @@ int main(int argc, char *argv[])
- 	test_iso("ISO Receive - Success", &listen_16_2_1_recv, setup_powered,
- 							test_listen);
- 
-+	test_iso("ISO Receive Fragmented - Success", &listen_16_2_1_recv_frag,
-+							setup_powered,
-+							test_listen);
-+
- 	test_iso("ISO Receive Timestamped - Success", &listen_16_2_1_recv_ts,
- 							setup_powered,
- 							test_listen);
-@@ -3734,6 +3773,14 @@ int main(int argc, char *argv[])
- 					&listen_16_2_1_recv_rx_timestamping,
- 					setup_powered, test_listen);
- 
-+	test_iso("ISO Receive - HW Timestamping",
-+					&listen_16_2_1_recv_hw_timestamping,
-+					setup_powered, test_listen);
-+
-+	test_iso("ISO Receive Fragmented - HW Timestamping",
-+				&listen_16_2_1_recv_frag_hw_timestamping,
-+				setup_powered, test_listen);
-+
- 	test_iso("ISO Defer - Success", &defer_16_2_1, setup_powered,
- 							test_defer);
- 
-diff --git a/tools/tester.h b/tools/tester.h
-index 647c35485..896475110 100644
---- a/tools/tester.h
-+++ b/tools/tester.h
-@@ -204,11 +204,14 @@ static inline int tx_tstamp_recv(struct tx_tstamp_data *data, int sk, int len)
- 	return data->count - data->pos;
+ 	return bthost;
+ }
+@@ -583,6 +585,14 @@ void bthost_set_acl_mtu(struct bthost *bthost, uint16_t mtu)
+ 	bthost->acl_mtu = mtu;
  }
  
--static inline int rx_timestamp_check(struct msghdr *msg)
-+static inline int rx_timestamp_check(struct msghdr *msg, uint32_t flags,
-+							int64_t expect_t_hw)
- {
-+	bool soft_tstamp = flags & SOF_TIMESTAMPING_RX_SOFTWARE;
-+	bool hw_tstamp = flags & SOF_TIMESTAMPING_RX_HARDWARE;
- 	struct cmsghdr *cmsg;
- 	struct timespec now;
--	int64_t t = 0;
-+	int64_t t = 0, t_hw = 0;
- 
- 	for (cmsg = CMSG_FIRSTHDR(msg); cmsg; cmsg = CMSG_NXTHDR(msg, cmsg)) {
- 		struct scm_timestamping *tss;
-@@ -220,21 +223,40 @@ static inline int rx_timestamp_check(struct msghdr *msg)
- 
- 		tss = (struct scm_timestamping *)CMSG_DATA(cmsg);
- 		t = TS_NSEC(&tss->ts[0]);
-+		t_hw = TS_NSEC(&tss->ts[2]);
- 		break;
- 	}
++void bthost_set_iso_mtu(struct bthost *bthost, uint16_t mtu)
++{
++	if (!bthost)
++		return;
 +
- 	if (!cmsg) {
-+		if (!soft_tstamp && !hw_tstamp)
-+			return 0;
- 		tester_warn("RX timestamp missing");
- 		return -EINVAL;
++	bthost->iso_mtu = mtu;
++}
++
+ static void queue_command(struct bthost *bthost, const struct iovec *iov,
+ 								int iovlen)
+ {
+@@ -912,52 +922,80 @@ void bthost_send_sco(struct bthost *bthost, uint16_t handle, uint8_t pkt_status,
+ 
+ static void send_iso(struct bthost *bthost, uint16_t handle, bool ts,
+ 			uint16_t sn, uint32_t timestamp, uint8_t pkt_status,
+-			const struct iovec *iov, int iovcnt)
++			const struct iovec *iov, unsigned int iovcnt)
+ {
+ 	struct bt_hci_iso_hdr iso_hdr;
+ 	struct bt_hci_iso_data_start data_hdr;
+ 	uint8_t pkt = BT_H4_ISO_PKT;
+ 	struct iovec pdu[4 + iovcnt];
+-	uint16_t flags, dlen;
+-	int i, len = 0;
++	struct iovec payload[2 + iovcnt];
++	uint16_t payload_mtu = bthost->iso_mtu - sizeof(iso_hdr);
++	int len = 0, packet = 0;
++	unsigned int i;
+ 
+ 	for (i = 0; i < iovcnt; i++) {
+-		pdu[4 + i].iov_base = iov[i].iov_base;
+-		pdu[4 + i].iov_len = iov[i].iov_len;
++		payload[2 + i].iov_base = iov[i].iov_base;
++		payload[2 + i].iov_len = iov[i].iov_len;
+ 		len += iov[i].iov_len;
+ 	}
+ 
+-	pdu[0].iov_base = &pkt;
+-	pdu[0].iov_len = sizeof(pkt);
+-
+-	flags = iso_flags_pack(0x02, ts);
+-	dlen = len + sizeof(data_hdr);
+-	if (ts)
+-		dlen += sizeof(timestamp);
+-
+-	iso_hdr.handle = acl_handle_pack(handle, flags);
+-	iso_hdr.dlen = cpu_to_le16(dlen);
+-
+-	pdu[1].iov_base = &iso_hdr;
+-	pdu[1].iov_len = sizeof(iso_hdr);
+-
+-	if (ts) {
+-		timestamp = cpu_to_le32(timestamp);
+-
+-		pdu[2].iov_base = &timestamp;
+-		pdu[2].iov_len = sizeof(timestamp);
+-	} else {
+-		pdu[2].iov_base = NULL;
+-		pdu[2].iov_len = 0;
 -	}
 -
--	clock_gettime(CLOCK_REALTIME, &now);
--
--	if (TS_NSEC(&now) < t || TS_NSEC(&now) > t + SEC_NSEC(10)) {
--		tester_warn("RX timestamp bad time");
-+	} else if (!soft_tstamp && !hw_tstamp) {
-+		tester_warn("Spurious RX timestamp");
- 		return -EINVAL;
- 	}
+ 	data_hdr.sn = cpu_to_le16(sn);
+ 	data_hdr.slen = cpu_to_le16(iso_data_len_pack(len, pkt_status));
  
--	tester_print("Got valid RX timestamp");
-+	if (soft_tstamp) {
-+		clock_gettime(CLOCK_REALTIME, &now);
-+
-+		if (TS_NSEC(&now) < t || TS_NSEC(&now) > t + SEC_NSEC(10)) {
-+			tester_warn("Software RX timestamp bad time");
-+			return -EINVAL;
-+		}
-+
-+		tester_print("Got valid RX software timestamp");
+-	pdu[3].iov_base = &data_hdr;
+-	pdu[3].iov_len = sizeof(data_hdr);
++	if (ts) {
++		timestamp = cpu_to_le32(timestamp);
+ 
+-	send_packet(bthost, pdu, 4 + iovcnt);
++		payload[0].iov_base = &timestamp;
++		payload[0].iov_len = sizeof(timestamp);
++		len += sizeof(timestamp);
++	} else {
++		payload[0].iov_base = NULL;
++		payload[0].iov_len = 0;
 +	}
++	iovcnt++;
 +
-+	if (hw_tstamp) {
-+		if (t_hw != expect_t_hw) {
-+			tester_warn("Bad hardware RX timestamp: %d != %d",
-+						(int)t_hw, (int)expect_t_hw);
-+			return -EINVAL;
-+		}
-+		tester_print("Got valid hardware RX timestamp");
-+	}
++	payload[1].iov_base = &data_hdr;
++	payload[1].iov_len = sizeof(data_hdr);
++	len += sizeof(data_hdr);
++	iovcnt++;
 +
- 	return 0;
++	/* ISO fragmentation */
++
++	do {
++		unsigned int pdu_iovcnt;
++		uint16_t iso_len, pb, flags;
++
++		if (packet == 0 && len <= payload_mtu)
++			pb = 0x02;
++		else if (packet == 0)
++			pb = 0x00;
++		else if (len <= payload_mtu)
++			pb = 0x03;
++		else
++			pb = 0x01;
++
++		flags = iso_flags_pack(pb, ts);
++		iso_len = len <= payload_mtu ? len : payload_mtu;
++
++		iso_hdr.handle = acl_handle_pack(handle, flags);
++		iso_hdr.dlen = cpu_to_le16(iso_len);
++
++		pdu[0].iov_base = &pkt;
++		pdu[0].iov_len = sizeof(pkt);
++
++		pdu[1].iov_base = &iso_hdr;
++		pdu[1].iov_len = sizeof(iso_hdr);
++
++		iov_pull_n(payload, &iovcnt, &pdu[2], &pdu_iovcnt,
++						ARRAY_SIZE(pdu) - 2, iso_len);
++		pdu_iovcnt += 2;
++
++		send_packet(bthost, pdu, pdu_iovcnt);
++
++		packet++;
++		ts = false;
++		len -= iso_len;
++	} while (len);
  }
  
-@@ -260,7 +282,7 @@ static inline ssize_t recv_tstamp(int sk, void *buf, size_t size, bool tstamp)
- 	if (ret < 0 || !tstamp)
- 		return ret;
+ void bthost_send_iso(struct bthost *bthost, uint16_t handle, bool ts,
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 456f631d5..0d8eca530 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -37,6 +37,7 @@ void bthost_set_send_handler(struct bthost *bthost, bthost_send_func handler,
+ 							void *user_data);
  
--	if (rx_timestamp_check(&msg)) {
-+	if (rx_timestamp_check(&msg, SOF_TIMESTAMPING_RX_SOFTWARE, 0)) {
- 		errno = EIO;
- 		return -1;
- 	}
-@@ -272,7 +294,8 @@ static inline int rx_timestamping_init(int fd, int flags)
+ void bthost_set_acl_mtu(struct bthost *bthost, uint16_t mtu);
++void bthost_set_iso_mtu(struct bthost *bthost, uint16_t mtu);
+ 
+ void bthost_receive_h4(struct bthost *bthost, const void *data, uint16_t len);
+ 
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index 8529caae8..a59773618 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -308,7 +308,7 @@ static struct hciemu_client *hciemu_client_new(struct hciemu *hciemu,
  {
- 	socklen_t len = sizeof(flags);
+ 	struct hciemu_client *client;
+ 	int sv[2];
+-	uint16_t mtu;
++	uint16_t acl_mtu, iso_mtu;
  
--	if (!(flags & SOF_TIMESTAMPING_RX_SOFTWARE))
-+	if (!(flags & (SOF_TIMESTAMPING_RX_SOFTWARE |
-+						SOF_TIMESTAMPING_RX_HARDWARE)))
- 		return 0;
+ 	client = new0(struct hciemu_client, 1);
+ 	if (!client)
+@@ -343,8 +343,9 @@ static struct hciemu_client *hciemu_client_new(struct hciemu *hciemu,
+ 	client->host_source = create_source_bthost(sv[1], client->host);
+ 	client->start_source = g_idle_add(start_host, client);
  
- 	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING, &flags, len) < 0) {
+-	btdev_get_mtu(client->dev, &mtu, NULL, NULL);
+-	bthost_set_acl_mtu(client->host, mtu);
++	btdev_get_mtu(client->dev, &acl_mtu, NULL, &iso_mtu);
++	bthost_set_acl_mtu(client->host, acl_mtu);
++	bthost_set_iso_mtu(client->host, iso_mtu);
+ 
+ 	return client;
+ }
 -- 
 2.50.1
 
