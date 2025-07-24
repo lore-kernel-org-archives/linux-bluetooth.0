@@ -1,53 +1,55 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF6F1863E;
-	Thu, 24 Jul 2025 05:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CFA204592;
+	Thu, 24 Jul 2025 06:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753333609; cv=none; b=GYhBjZIFRCIDqtWmBojf0zCe+bNfsOqDdQV2aPsJqDntfxXQNpeHNDlg+EUmw8sOdFd3LJd9SATYwtNFfkrKi8sfl9Ha8kRfUYbpBYnaYqVZRL3KH2IjyDloygjlFWGpSrkXuuWuQd3aM6qNks4juWoF/D+B/v5cxGOT8Yc9zkE=
+	t=1753337883; cv=none; b=r1pTzR5FlWmrX3ivUQTf3Rl29Xn0YROotI+EsTPOoXf0p41FsT6luoupK9HeRgmWEWI+WWOmL5nZNvZqb63Vhl5XAR8d74CXN6aUTB0OIt7RFPybK/MeviL2C6lr1eQlpyExJU/kCFsB03pYzJS84wrq9Qwq8RByN4Z6l/eDbOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753333609; c=relaxed/simple;
-	bh=GRwVhFUmazGl4MJJVsQKOnGpl5NNR80ueDauNjAi08M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hhR5+Nco/KSTPMzYSYgxVE1kg+fS/2aUTPOTPSMYXmAvhYdT0SdoUpjByQcTVJEqIqnbkIAmlReGfDNvwYy/vqb08ccMLezfpsfAdI+TimCHi4oYdggmbdF6AhL5XanpVsUkrG81bYU06novpZkjLKOpGWKdUjVa8YC63umLSug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMp08ly3; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMp08ly3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67A25C4CEED;
-	Thu, 24 Jul 2025 05:06:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753333608;
-	bh=GRwVhFUmazGl4MJJVsQKOnGpl5NNR80ueDauNjAi08M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AMp08ly3f9dRPVBCAW8VTQawgw1z43o8MdzjDywYZwDL72PgTUE/ocbU5M8BCuRUo
-	 Am7bi0D93Uhn5whp1lKPTkenanJ2Yq6oTCryJ04to8vWNxVMHiovDE82P/Wd0/Kdfs
-	 Ve9qq6B4XZx6uJZ+wPUKlQZRl5H3OGhATheWEf1YanGezZ3MUPSKbSPCTgDk2/wbca
-	 vvPT0E6aVRtuyp8AsiZOPCevrZnNSqeHFw/rp1LZXAlz/WA94MrEYPLNovKaNfVJzx
-	 PU8elW/6eo23lWZwy9oXcnJOnw2RrxcVH5Yscj18ZuZorGH08PCu/wFUlxDswfNnNu
-	 t0ZzFUVkmGcjw==
-Date: Thu, 24 Jul 2025 10:36:42 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com, 
-	chethan.tumkur.narayan@intel.com, bhelgaas@google.com, linux-pci@vger.kernel.org, 
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Subject: Re: [PATCH v5] Bluetooth: btintel_pcie: Add support for _suspend() /
- _resume()
-Message-ID: <jn33hvzv6mnhij2ihkuwrwpv2nfkypdjecvjy2flfzli3dju72@44kspi4tzalw>
-References: <20250723135715.1302241-1-kiran.k@intel.com>
+	s=arc-20240116; t=1753337883; c=relaxed/simple;
+	bh=HW22suxYwW1XYKqwuKLqzZPfVaa5+jy4K+9JpWivrqU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HlSyeeaNCCh39bHOo2r+niRWJOCUm7jaVu0gEd6dd0na5UJ/NrQa+QUlvVLH9yL68Qe7kRJFnOtCqOxIn8roysC4MGXcJlWxOSUompYBSXJs7JRtUt3YFtijRmhwXjQ468JF580kUh0/U72IFFZ/TSmCBCkGkri52vY+kX5jMpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af79a.dynamic.kabel-deutschland.de [95.90.247.154])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E4AB761E647A8;
+	Thu, 24 Jul 2025 08:17:43 +0200 (CEST)
+Message-ID: <5323f487-0060-4396-b08e-b68a18f1893d@molgen.mpg.de>
+Date: Thu, 24 Jul 2025 08:17:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] Bluetooth: btintel_pcie: Add support for _suspend() /
+ _resume()
+To: Kiran K <kiran.k@intel.com>,
+ Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com, bhelgaas@google.com,
+ linux-pci@vger.kernel.org
+References: <20250723135715.1302241-1-kiran.k@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
 In-Reply-To: <20250723135715.1302241-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 23, 2025 at 07:27:15PM GMT, Kiran K wrote:
+Dear Kiran, dear Chandrashekar,
+
+
+Thank you for your patch.
+
+Am 23.07.25 um 15:57 schrieb Kiran K:
 > From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 > 
 > This patch implements _suspend() and _resume() functions for the
@@ -67,60 +69,69 @@ On Wed, Jul 23, 2025 at 07:27:15PM GMT, Kiran K wrote:
 > 
 > On system resume:
 > [  542.174128] Bluetooth: hci0: device entered into d0 state from d3 in 357 us
-> 
+
+Just to avoid confusion, is the timestamp correct, as this is only a 26 
+s difference and your command says 60 s. (I am only aware of inaccurate 
+timestamps using human-readable format (`dmesg -T`).)
+
 > Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 > Signed-off-by: Kiran K <kiran.k@intel.com>
 > ---
 > changes in v5:
->      - Address review comments
-> 
+>       - Address review comments
+
+This should be more detailed, if code was changed.
+
 > changes in v4:
->      - Moved document and section details from the commit message as comment in code.
+>       - Moved document and section details from the commit message as comment in code.
 > 
 > changes in v3:
->      - Corrected the typo's
->      - Updated the CC list as suggested.
->      - Corrected the format specifiers in the logs.
+>       - Corrected the typo's
+>       - Updated the CC list as suggested.
+>       - Corrected the format specifiers in the logs.
 > 
 > changes in v2:
->      - Updated the commit message with test steps and logs.
->      - Added logs to include the timeout message.
->      - Fixed a potential race condition during suspend and resume.
+>       - Updated the commit message with test steps and logs.
+>       - Added logs to include the timeout message.
+>       - Fixed a potential race condition during suspend and resume.
 > 
->  drivers/bluetooth/btintel_pcie.c | 102 +++++++++++++++++++++++++++++++
->  drivers/bluetooth/btintel_pcie.h |   4 ++
->  2 files changed, 106 insertions(+)
+>   drivers/bluetooth/btintel_pcie.c | 102 +++++++++++++++++++++++++++++++
+>   drivers/bluetooth/btintel_pcie.h |   4 ++
+>   2 files changed, 106 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
 > index 6e7bbbd35279..a96975a55cbe 100644
 > --- a/drivers/bluetooth/btintel_pcie.c
 > +++ b/drivers/bluetooth/btintel_pcie.c
 > @@ -540,6 +540,12 @@ static int btintel_pcie_reset_bt(struct btintel_pcie_data *data)
->  	return reg == 0 ? 0 : -ENODEV;
->  }
->  
+>   	return reg == 0 ? 0 : -ENODEV;
+>   }
+>   
 > +static void btintel_pcie_set_persistence_mode(struct btintel_pcie_data *data)
 > +{
 > +	btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_HW_BOOT_CONFIG,
 > +				  BTINTEL_PCIE_CSR_HW_BOOT_CONFIG_KEEP_ON);
 > +}
 > +
->  static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
->  {
->  	u32 reg;
+>   static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
+>   {
+>   	u32 reg;
 > @@ -829,6 +835,8 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
->  	 */
->  	data->boot_stage_cache = 0x0;
->  
+>   	 */
+>   	data->boot_stage_cache = 0x0;
+>   
 > +	btintel_pcie_set_persistence_mode(data);
 > +
->  	/* Set MAC_INIT bit to start primary bootloader */
->  	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
->  	reg &= ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
+
+This hunk is not described in the commit message.
+
+>   	/* Set MAC_INIT bit to start primary bootloader */
+>   	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+>   	reg &= ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
 > @@ -2573,11 +2581,105 @@ static void btintel_pcie_coredump(struct device *dev)
->  }
->  #endif
->  
+>   }
+>   #endif
+>   
 > +#ifdef CONFIG_PM
 > +static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
 > +{
@@ -129,6 +140,9 @@ On Wed, Jul 23, 2025 at 07:27:15PM GMT, Kiran K wrote:
 > +	ktime_t start;
 > +	u32 dxstate;
 > +	s64 delta;
+
+Append the unit to the name? `delta_us`?
+
 > +	int err;
 > +
 > +	data = pci_get_drvdata(pdev);
@@ -137,6 +151,9 @@ On Wed, Jul 23, 2025 at 07:27:15PM GMT, Kiran K wrote:
 > +		dxstate = BTINTEL_PCIE_STATE_D3_HOT;
 > +	else
 > +		dxstate = BTINTEL_PCIE_STATE_D3_COLD;
+
+I’d use the ternary operator.
+
 > +
 > +	data->gp0_received = false;
 > +
@@ -147,6 +164,9 @@ On Wed, Jul 23, 2025 at 07:27:15PM GMT, Kiran K wrote:
 > +	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
 > +				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
 > +	delta = ktime_to_ns(ktime_get() - start) / 1000;
+
+Move it below right before `bt_dev_info`?
+
 > +
 > +	if (err == 0) {
 > +		bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrupt for D3 entry",
@@ -209,25 +229,44 @@ On Wed, Jul 23, 2025 at 07:27:15PM GMT, Kiran K wrote:
 > +	.thaw = btintel_pcie_resume,
 > +	.poweroff = btintel_pcie_hibernate,
 > +	.restore = btintel_pcie_resume,
-
-You should use pm_sleep_ptr() to avoid the ifdef clutter. It will ensure that
-the compiler drops the function definitions when CONFIG_PM_SLEEP is not enabled.
-
 > +};
 > +#define BTINTELPCIE_PM_OPS	(&btintel_pcie_pm_ops)
 > +#else
 > +#define BTINTELPCIE_PM_OPS	NULL
 > +#endif
->  static struct pci_driver btintel_pcie_driver = {
->  	.name = KBUILD_MODNAME,
->  	.id_table = btintel_pcie_table,
->  	.probe = btintel_pcie_probe,
->  	.remove = btintel_pcie_remove,
+>   static struct pci_driver btintel_pcie_driver = {
+>   	.name = KBUILD_MODNAME,
+>   	.id_table = btintel_pcie_table,
+>   	.probe = btintel_pcie_probe,
+>   	.remove = btintel_pcie_remove,
 > +	.driver.pm = BTINTELPCIE_PM_OPS,
+>   #ifdef CONFIG_DEV_COREDUMP
+>   	.driver.coredump = btintel_pcie_coredump
+>   #endif
+> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+> index 0fa876c5b954..5bc69004b692 100644
+> --- a/drivers/bluetooth/btintel_pcie.h
+> +++ b/drivers/bluetooth/btintel_pcie.h
+> @@ -8,6 +8,7 @@
+>   
+>   /* Control and Status Register(BTINTEL_PCIE_CSR) */
+>   #define BTINTEL_PCIE_CSR_BASE			(0x000)
+> +#define BTINTEL_PCIE_CSR_HW_BOOT_CONFIG		(BTINTEL_PCIE_CSR_BASE + 0x000)
+>   #define BTINTEL_PCIE_CSR_FUNC_CTRL_REG		(BTINTEL_PCIE_CSR_BASE + 0x024)
+>   #define BTINTEL_PCIE_CSR_HW_REV_REG		(BTINTEL_PCIE_CSR_BASE + 0x028)
+>   #define BTINTEL_PCIE_CSR_RF_ID_REG		(BTINTEL_PCIE_CSR_BASE + 0x09C)
+> @@ -55,6 +56,9 @@
+>   #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
+>   #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
+>   
+> +/* CSR HW BOOT CONFIG Register */
+> +#define BTINTEL_PCIE_CSR_HW_BOOT_CONFIG_KEEP_ON		(BIT(31))
+> +
+>   /* Registers for MSI-X */
+>   #define BTINTEL_PCIE_CSR_MSIX_BASE		(0x2000)
+>   #define BTINTEL_PCIE_CSR_MSIX_FH_INT_CAUSES	(BTINTEL_PCIE_CSR_MSIX_BASE + 0x0800)
 
-Here, you should use pm_ptr() for the same reason.
 
-- Mani
+Kind regards,
 
--- 
-மணிவண்ணன் சதாசிவம்
+Paul
