@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3C123B628
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jul 2025 20:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C10323B628
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jul 2025 20:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753390790; cv=none; b=Kcs6qpp/xfLrIqqE23D2OFhfLcnzLEMhh53Aa5BZb7qYSkZ+wGv4P2jx/14lsDmBjRvcBs2esXEHtoxqm4leP2WyJ01vwoeQHhrf74NEm2aFms1L+LdGmIYR0ufgs5rZTmFk5DKqDZgUutTMWDwxme1kWVXxBMtY1a65e8lyPgE=
+	t=1753390791; cv=none; b=NaUzzNuThh2WN+hr+P4snUjufF/owBVRtLbX6Has8OY9JE5cxuAXSpOtZt7Ul18BqNCgq6YkqVe5VaSfM7Vf1GEvIRTlukvItM4a/CinOZICpED/rNTSYDKofthpNijxdg6lZoH1kDp12fLd/A6QreK49/DSnc/iczvqrtmsNqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753390790; c=relaxed/simple;
-	bh=0iVojfIH8mEUJPUwEPGahkQZrx5SK02Bbg2AJullUxk=;
+	s=arc-20240116; t=1753390791; c=relaxed/simple;
+	bh=Ljm2d7uhGzdqG72exKoq2D6db/4LHx/ZyaYEx5i7/Zo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kGqKofFQ1p87+aa/voh95stSPVyC+lPtFtVr3u7widCv9MW1VV6qf1xAiBSCo4JvEE6sCG9kjrVNmI4u6XPzdb2Z+E4oDhjvq1ydbp+NJ7Sb/wXjnqeA0h/1K3l3faj2QczxK0ToGQ8xJtJeiHA9SbPVDTdej3n2IkKno89svxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=smMy2luV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=OEWsNjUyfsL+dZ7ottZANbh/lOg8CzfOGUJDRfBFYaBbnivNU660mTwYmYiaZbICd5ZEE0F8HxtvHeSZ+9KrxuQUYfP5PzTRGXB4HWfrmUDH1jztYPLn1c0OG1ay4GP1ePGWEzY1PkwhrKu6zqrqF2q1Ci1nxaKdD4Hzooh4ggQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmqVZZee; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="smMy2luV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CCDBC4CEED;
-	Thu, 24 Jul 2025 20:59:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmqVZZee"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8C1BC4CEED;
+	Thu, 24 Jul 2025 20:59:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753390789;
-	bh=0iVojfIH8mEUJPUwEPGahkQZrx5SK02Bbg2AJullUxk=;
+	s=k20201202; t=1753390790;
+	bh=Ljm2d7uhGzdqG72exKoq2D6db/4LHx/ZyaYEx5i7/Zo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=smMy2luVKpjzXoiDVVLozBDatBhyHL2S/PEIqjHqR3sqDPNQeZkb+Ynfutho6DGQW
-	 RslLzEGs3yHYdWxSIUuNOcARNgqF6M7vEDxA//lbUEhFNKBdW6ax+Ae6np8H92ZbSh
-	 xfgziF5LL+1IBR6SQH+OcLyRadjK7V1wU3pu1Hm/iZbdq0Phcz6xzYhnDQ25bHGZPz
-	 mSJRANPxrp7uYwcRnG+lk5BTDACi5DMSycTCuN5ySAjvK3Fx8ybbOh3R9uHH6o1Umn
-	 UdgdTeVjE8CNeAPtP+bhVg7xHjviPhb3+PXj6kr6ktINEMsa7a1kjueQVvjsCGMr49
-	 9l3X/h8Oa0Vbw==
+	b=EmqVZZeeOBqKh4bfyFsLcRoBf8gKHdB9KqOLkh+01nenNuwQjKi6feXq8rheoLhPA
+	 HvCO78LNwrpcRyr2jD2yrFXUBMnCmL0d14ou+5ZAR8vP1yqz7EvZf65VmxEHfS3sz3
+	 t/llOOIDV9NyWVUSc+59lO2g9ff3zLFXyF7sCfPg+Vags3bvLIcEa4W/WCPWeI4mzq
+	 NtT3oeYVYiqoPj/YW66XD8xxcR2RiJxC1S26XNV6HLavZelY4GalFX8ANnVdWbiQve
+	 t18MEc9yN/IkugyWO5GHNTB5IaaagVVubCvQIx8fZcs7tZdfKbNX6/Xq5xSeDW7fpj
+	 8IxjZ+Dbr/wZg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BA7383BF4E;
-	Thu, 24 Jul 2025 21:00:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB023383BF4E;
+	Thu, 24 Jul 2025 21:00:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,43 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: btintel: Add support for BlazarIW core
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix scan state after PA Sync has
+ been
+ established
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <175339080700.2527392.18206587638228778171.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Jul 2025 21:00:07 +0000
-References: <20250724122824.1347428-1-kiran.k@intel.com>
-In-Reply-To: <20250724122824.1347428-1-kiran.k@intel.com>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- vijay.satija@intel.com
+ <175339080849.2527392.4672001699139625421.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Jul 2025 21:00:08 +0000
+References: <20250724205259.13273-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250724205259.13273-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 24 Jul 2025 17:58:24 +0530 you wrote:
-> Add support for the BlazarIW Bluetooth core used in the Wildcat Lake
-> platform.
+On Thu, 24 Jul 2025 16:52:58 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> HCI traces:
-> < HCI Command: Intel Read Version (0x3f|0x0005) plen 1
->     Requested Type:
->       All Supported Types(0xff)
-> > HCI Event: Command Complete (0x0e) plen 122
->   Intel Read Version (0x3f|0x0005) ncmd 1
->     Status: Success (0x00)
->     .....
->     CNVi BT(18): cnvi (BlazarIW) cnvibt: (0x00223700)
->     .....
->     .....
+> Passive scanning is used to program the address of the peer to be
+> synchronized, so once HCI_EV_LE_PA_SYNC_ESTABLISHED is received it
+> needs to be updated after clearing HCI_PA_SYNC then call
+> hci_update_passive_scan_sync to return it to its original state.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: btintel: Add support for BlazarIW core
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e74375b59a51
+  - [v1] Bluetooth: hci_sync: Fix scan state after PA Sync has been established
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1f3837de85e7
 
 You are awesome, thank you!
 -- 
