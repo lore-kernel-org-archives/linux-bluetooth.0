@@ -1,101 +1,96 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E732750EA;
-	Thu, 24 Jul 2025 08:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A070C23F431
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jul 2025 09:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753347091; cv=none; b=LhdChJqu+m3EB0/Ma8NDy6l3WilIHGPi9Toyfg4sGVxXnW/3hoaMTqXFpUQ5ORvtOMV0wFI4sE3URUAe7dsCtRV3sH+Qpe58tHXKI68bo8m47Tk5fXyc7/hoKdO8gN1EauTtenfJH0mgbt9JG0OzE1bLhQ5xHLTLgiPr3D6qx2c=
+	t=1753349563; cv=none; b=f+ccZiI+JqQ2kol3gF9y6Vis8AWDslIyOt8sSFAwGBZF44dNIGfvhaGWDt4yTFWdB8iwM8tyqPqSBz0jtM34tbiYQDGAY+Yks9PpsurcYG4Hi/i+JG0F+LFR5iH5NOCPwqIJebEcUVMSAn2o3JyVs2JoMoth0u7UoA9mI1w8nys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753347091; c=relaxed/simple;
-	bh=0MF3y+rsrnzc2WPZ7ul+sUTsoHFEe6/Qvp6ikrIARSY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YoB2XDfuQVk4B3qAAbsxDLUYOBA8ifgM8gIrakdVGMTItHMbGdLPH1TuwdrrrplnwjO1cS0h6Wgdvn+ZNnNicToZ5UheHLYyhIhUZ+a6vZmKuNWk9mrx0wr+6p1ovMvwJHZcWVAnrVsXyNiyy8RvgGIuGb4X5J7iPvbiUrZNxfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=PEa0PoFt; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="PEa0PoFt"
-X-UUID: 5efe3e80686b11f0b33aeb1e7f16c2b6-20250724
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=Hdj2jKHN4mlD4Wq/VqFtggztXanlgzjUHfeEONfy21c=;
-	b=PEa0PoFtYAW3ew4h8DuiB3andL2iBWlnJvidyGJnTLHqJC0iLvSmWiqzdl5Ln4EmIit4OGF2t2Ir4f2VGQNDaW+BPsuVVcVWIyzv+ow1pr4JkJT9gv7HHO8/lWItgif1YBHgwLk7Fug2xxheyr3aDRgAERkeMQDe9V63HTpVSN8=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.2,REQID:913923d4-30ae-4216-83b7-2232315112e1,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:9eb4ff7,CLOUDID:6d58399a-32fc-44a3-90ac-aa371853f23f,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
-	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 5efe3e80686b11f0b33aeb1e7f16c2b6-20250724
-Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw02.mediatek.com
-	(envelope-from <jiande.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 391881407; Thu, 24 Jul 2025 16:51:21 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.39; Thu, 24 Jul 2025 16:51:18 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1258.39 via Frontend Transport; Thu, 24 Jul 2025 16:51:18 +0800
-From: Jiande Lu <jiande.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
-	"Will Lee" <will-cy.lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>, Steve Lee
-	<steve.lee@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Jiande Lu <jiande.lu@mediatek.com>
-Subject: [PATCH] Bluetooth: btmtk: Fix wait_on_bit_timeout interruption during shutdown
-Date: Thu, 24 Jul 2025 16:51:17 +0800
-Message-ID: <20250724085117.2678313-1-jiande.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1753349563; c=relaxed/simple;
+	bh=pDmxqXkgtT077gBGUWCuGFnsjfQ7B4vJdQKb1n8lMm0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=av9rvuZhU6LHaeG1/eXjbu4nFzCZWepr+UWv8wd9mBgOm7XBvDJJtjslsk/eYm4LVjaFgPUKhKcOlFUYrbQz1eUPq+q+ETSAISu3TmwZ8W5mUDQvBeWIWx009CYT8QHqLliwIjnyu23H3gtpuU1bQcMMZ4AQhmOhmL0mY0He1LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-87c0915ba7dso46100339f.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jul 2025 02:32:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753349561; x=1753954361;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MnLt7OL5FV5Gnqj6M/9QGNu9DnfrjRfhT5iMthmB2UU=;
+        b=s6QhIWXtwy/12dfOFCWC0O0ILaGGnHWAgZOdZWcfNWowMv4JDz7917MNzF+aHw8yj5
+         JKrB5RtcVmAKi8JGiF/XNx2cRdTcYcc86BhZqi4P9WZRRXWl+Z7mDSUVMqrW+dCZmPdQ
+         qrfODJSlR6b0+aH91mMLuAqQayEBrj89GJHx+7kcr25WR0R/P9lghJ9BscD1wxvEv7g1
+         pMElE+S5mHzOCp7H8u/t0i5LeH3zwtNYbe64J4YwY02Gl87mNXiEF2+Mc5QxW6E8rKP/
+         anqoaLKaIDnP1GkhenWaqorf7FXtnz4pnot9b0GKNhN5UV2Rg/L2Agq6XBj0QVl18k8M
+         QGNQ==
+X-Gm-Message-State: AOJu0YyVmzu6Yn12SplJrsE5eNWkipRN/+0Neke3zA1SMXJTWLb3iMZa
+	cxuGIWqw9Bn1qJJnjnGJDGCcRN38ViRfWCK2OPy/46xHAmwRVksHQ9r/TjPRMOGNkJ8IKatKvZU
+	6BT7V/8EDi3UwFhkU5q34eKKG35kK2lBQC4ybWtEeCHCeMLIJ2OU5mWvkKtU=
+X-Google-Smtp-Source: AGHT+IHYlaxdRTp97vlTVOLPj4bENCS9v3pmbcFIG51NoHWmxkI/XgOTVCjdtyx0GNY+IiSwG/pdU3BaO6Bpuuj66sJYTLElBXoD
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
+X-Received: by 2002:a05:6602:14d2:b0:861:6f49:626 with SMTP id
+ ca18e2360f4ac-87c64f937b3mr1253977039f.6.1753349560831; Thu, 24 Jul 2025
+ 02:32:40 -0700 (PDT)
+Date: Thu, 24 Jul 2025 02:32:40 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6881fdb8.a00a0220.2f88df.001a.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Jul 2025)
+From: syzbot <syzbot+list4602750c76f9f394cfea@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-During the shutdown process, an interrupt occurs that
-prematurely terminates the wait for the expected event.
-This change replaces TASK_INTERRUPTIBLE with
-TASK_UNINTERRUPTIBLE in the wait_on_bit_timeout call to ensure
-the shutdown process completes as intended without being
-interrupted by signals.
+Hello bluetooth maintainers/developers,
 
-Fixes: d019930b0049 ("Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c")
-Signed-off-by: Jiande Lu <jiande.lu@mediatek.com>
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
+
+During the period, 4 new issues were detected and 0 were fixed.
+In total, 44 issues are still open and 83 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  41759   Yes   KASAN: slab-use-after-free Read in l2cap_unregister_user
+                   https://syzkaller.appspot.com/bug?extid=14b6d57fb728e27ce23c
+<2>  7143    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<3>  3022    Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<4>  1093    Yes   general protection fault in h5_recv
+                   https://syzkaller.appspot.com/bug?extid=b5691bb559396b262064
+<5>  578     Yes   general protection fault in bcsp_recv
+                   https://syzkaller.appspot.com/bug?extid=4ed6852d4da4606c93da
+<6>  570     Yes   WARNING in hci_conn_timeout (2)
+                   https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
+<7>  363     Yes   KASAN: slab-use-after-free Read in force_devcd_write
+                   https://syzkaller.appspot.com/bug?extid=bc71245e56f06e3127b7
+<8>  314     Yes   WARNING: ODEBUG bug in hci_release_dev (2)
+                   https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+<9>  282     No    WARNING in l2cap_chan_del
+                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+<10> 206     Yes   possible deadlock in l2cap_conn_del
+                   https://syzkaller.appspot.com/bug?extid=b71bb48c13bf3fed3692
+
 ---
- drivers/bluetooth/btmtk.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 4390fd571dbd..a8c520dc09e1 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -642,12 +642,7 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
- 	 * WMT command.
- 	 */
- 	err = wait_on_bit_timeout(&data->flags, BTMTK_TX_WAIT_VND_EVT,
--				  TASK_INTERRUPTIBLE, HCI_INIT_TIMEOUT);
--	if (err == -EINTR) {
--		bt_dev_err(hdev, "Execution of wmt command interrupted");
--		clear_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
--		goto err_free_wc;
--	}
-+				  TASK_UNINTERRUPTIBLE, HCI_INIT_TIMEOUT);
- 
- 	if (err) {
- 		bt_dev_err(hdev, "Execution of wmt command timed out");
--- 
-2.45.2
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
