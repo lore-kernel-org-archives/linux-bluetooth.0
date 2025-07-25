@@ -1,302 +1,153 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA141E51EF;
-	Fri, 25 Jul 2025 13:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E04E2EF9CD;
+	Fri, 25 Jul 2025 16:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753451632; cv=none; b=Dq2oQgteboTZo7PTnSlEPFhEVtncIsDcOEtNUxASQj7IUtq34hlTEsejDLxsP1lCbHGFtdTFiO19wHXzqLJBA6x6qcsDJqWhBgW55O/a209qRXj+sM7H32Zitkc38covpuF5s27Ur9jnkPKCNrdqbAHugIJ80DNqL7cweIu25eU=
+	t=1753460121; cv=none; b=D1OShj+Wo23ZZR4gHiqC1xDpdoULl4kbnvC/pUkGl92QUQxUllxYAuVCYYcIc45uyHbHlOQ7+EeuMghC2SoUpfptwzykj1gLfvOzBER9BT1dmqnEYf+kXzA8qJHPJ2vgAbjHwefdVNnKDXMvYoUU6AwNoKbwceZCmc1+sd5ZkG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753451632; c=relaxed/simple;
-	bh=eOB7yXo2LoXF2GIMVzJWuRIXM7ag/qKFdH7POf8TuI4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iowBoBCgPDUYaZS9RJx7tc9VsKEDPRYTOmn79NeeF0IBhy4P1LYou2saiskEYmzHggln3REJyVhyJ13o6F5Z8gu2pqlWK0nNoWzS2Ev/tJTT809x7IlXwPV0FYOCnMtg7djkViXDTcOjT8BuvdVpLvl6B2FnvSr2+Nf6dm0yOUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R+ZPx3xL; arc=none smtp.client-ip=209.85.208.182
+	s=arc-20240116; t=1753460121; c=relaxed/simple;
+	bh=fh0CjKHTZvu0FuhvdnqoJwzPfDDNX+QCT7SyJ14PPQs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uwmDzzZNt4w/bZy4krBuZ+jK8TWoE59bWkoT3JKiDCgBDlT5p8RhIVxa/vGRnFnlV8A7x5RR6GrjyRdAMwdRibJOjP5IQSs8UNJQ9soqYARS4DUooKDWwPn7JV8rWHy4y3gDPQdwO+r2G4tmxJcREcBcXMhWIpSvzd/AzWaQM8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ClZJji21; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R+ZPx3xL"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-32ce1b2188dso18355531fa.3;
-        Fri, 25 Jul 2025 06:53:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ClZJji21"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-313f68bc519so1811684a91.0;
+        Fri, 25 Jul 2025 09:15:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753451629; x=1754056429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2fWdhR0VBfiS/L09WfJDV+7CjbZeT3b1nXdFbi2Z3Bg=;
-        b=R+ZPx3xLuL2KTOFzYE00WN5jdNiOkKyApSRjJFeCl24wqqNUGCXE4e/PomWf4rmGPH
-         QSGl59NRu9xM1pKnIAkBltxjGDMh/K7tWWRDHFfd5PSbcnFbxycbitWWSf7wf9r7RGJW
-         UHBZKmOT09qgrGoQAXpnigV5+yGEd+ZOgBcbUCuyCTb5Aw1RdX/8dQgxMQOlurXh57tH
-         9n5wYo5z5HnTaKGBQ416SRJO8lqD8Vy+QdNDSBmaNYHrCvJKpSMiC92GE8xzzjN+pIAG
-         0TLtLmgPKJlbLa0W5HR3+fWBnj9/8zr6oPmORCeiTTLqQivJQ1Y2e3Cw3+MIFyNzyzkQ
-         UOYA==
+        d=gmail.com; s=20230601; t=1753460117; x=1754064917; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3cFi0vD7YessLF2r15au7TPe/jon8lIosOISFCfh1VM=;
+        b=ClZJji21xibaWUctuamOxgpSpc2mWYLC7998HFSvr1waknytKwxETK8Js3VFTMQ3st
+         lxN422PYDdPWmCmxYPmGJ0irMB6Gg17Q+DdlenHEHDTfUfhU3Y0cMkLlLFm4UFU5gNUR
+         oETKHBBn5amByFsXcXmSEJZ+veccns0GrT9o90P5no93Iw/RbC/99DCFfMCbVrP6/8+P
+         374xghyt9uYjMrFAHJM08VWmSKmW6Ql5Ohy8qrjzqHKJIQHEqfnD6W+XVsfcfyFIRWB1
+         Ig4X7hyp2culaIF0aVN0Rw38hMdeNk6otrr1ctr22KHSFReZcKVlLPaBFfGfpnn/2Q3Y
+         fH3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753451629; x=1754056429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2fWdhR0VBfiS/L09WfJDV+7CjbZeT3b1nXdFbi2Z3Bg=;
-        b=Dz3NpBzK3Txnj1NtZoRK056/p4thZ6uUCTQxA2JUyOdlgzGfbHnXBTpnNk6WHFmd3P
-         u9Yb5eBPAkka8UstyfbSjOQXok5++UwpY1HPMbGO7qGpIUUNK78/Gd3VTXPeJb+0Vk6K
-         n9TJ4cf+/0IlV3DTn3U9aKuEKLoDxTyAR/UrFIVM3aOPw3cAOmflnkSfBTR4n6f5AkoE
-         dgx0RNODWlcY2A+69XEkUMkn7Vn2Hzrn+w2LcMK1pO3H1YSCx2QKAMBJEcq3R6Ec1eoR
-         gxm3gztm6FUFWjqnhb3H7Q564Aus6zjz6rmMjS0SPVZj/LmJOyE3zrnz7nGZbrqLzZiG
-         ZOgw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+tZ5a2Ka2Q++2K+8IoTuGxOrOAhCbF96AT2dVhpwMP4NB/IUFLutmg4pjrHt8oRpNLk/5RwPF2lk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9QbzgtV5b5PqY7NAyuV0VdKSMyU8xA2ePzlzQiPgOTmc0FCrW
-	hFLP8fzJlp1urL7W7GKaMLzD6ZbbfB8+Bb7zb5OaJhMNbmjS4JJIrX9WSIHb8+5HGomhCcMOzub
-	iG/Pb8kSktofJlveZ+YVtoio01fzzmpI=
-X-Gm-Gg: ASbGnct96S0L9t1bDjdFIscRJPu3ykgfZ3f/F28QIXd0BjQKj8T3S40WPLSZKvNU/Ml
-	zpertaYoYzgNvJO4U+oATI3isPyCKFda1rit3XCpP4A79qpPkkr6aUlQRqbWGfh7Pu5vw56ljgb
-	/i3a+DUgajPtT4x5/xNymBeC5wKo0T8ZerEMQMKHLYLA8K0xUUC4j6XJhaKZyEPO8QdrW/shj0b
-	s2zxg==
-X-Google-Smtp-Source: AGHT+IGSjJBjVeIF1UiOOZx7zrUyhUUvmR7dt5xoYizfxKDueOSb41cniJIQvhqsIC4AGtjyNkKon8kDnFPOf5OSx+M=
-X-Received: by 2002:a05:651c:1585:b0:32a:869e:4c13 with SMTP id
- 38308e7fff4ca-331ee6bde7bmr4926761fa.14.1753451628096; Fri, 25 Jul 2025
- 06:53:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753460117; x=1754064917;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3cFi0vD7YessLF2r15au7TPe/jon8lIosOISFCfh1VM=;
+        b=wQ1yysnnMZkcn7A0GnIxjSZwUQeFyGIcRjxf1dJsyGvUMbb4i3W3T14CFD/61VqIMz
+         LYUtFl3To5gdYQNHGA6kx+yDccz6vnwfcoQqAWuq6a+UAAtIbj+Bydd21W3wENsHnsJS
+         1HHBo7x3kvln/nEGdZk27XWkLXz7vMrMd0oplVmhtRHgzXNPfLs20tGXPLQBiWK7MZW0
+         whiX3GyQKFgW+u20uKOyvtFAtwRwnpFHkDfJN4/moK75h9xe1MERnn2IIWZbMHk7B1mD
+         ZtYayb8AVbi6MzkP2EIMA/g4XhTdRx5WTVLNuVnBZdeUvm4l5n9gvZCS43ZnccoyGQs8
+         +WRA==
+X-Forwarded-Encrypted: i=1; AJvYcCUi3m+v8hkx9HctBTWWskhwgEsD2PSCxatVbf9KKzDmOg74mjxFDmQg1whw5ztTe5aYXu7nT7zr@vger.kernel.org, AJvYcCVvAOTc6O/THNH1+pEYMqn/tu/RFCWzEz/5wmwhhPJIGw4/cPzoSTX01461covuPJy4I+v7DuaWInqGlTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdzJhe5aTVF0Zwllkj6hkCoBUEN3urDpr3ElxOcYBGmRuC6186
+	o+MhLa6rkrsosPalcg8Dc7jIGqVkRFlmqR9/jYsjYrJ4LM5lKeQxlxYt89pJu5/6uQg=
+X-Gm-Gg: ASbGnct8SJRoLRAZRny46nkCGJKHDC8qOAmDer8kRKBv9GE7/JxN0xazyxaAffPxOvV
+	DGE9lsJxJbIVx2kzfAbo6ngARIG7NZdRmQIQElW6YASDoO/wj9MsbVbmqHEVap0F8N/9D2zH2xv
+	lryfWQZ8EsVW1LMeA4WfKEUiL4TQPY9mvGG5j30DlRmQ++VzOz1jPP1hqEEURnFS83hhgWfCrCm
+	JBepGoHYE9EYv+AXLrCvjV6oX6gpO2xWdocZwmaQkSMvYTIEr8qMGAQGsDxxvp9i+UiXbuwM/35
+	Ov7RF7WxotcxpQczeq9r+0RITlMg9ossGTp4VWw0/KNi9c1RQpI6m/UBxSbceACvW8ulUqgghed
+	IND1+6Fxy1xLAGF3hmWDlRMehJxn35O1AbYa2FezNjisx7RLR/wwY
+X-Google-Smtp-Source: AGHT+IEmBI+tcBrcxIwV7kA6wcfnWlRhgQZw2jycq881kY+fEq6W73LTONd/xlqvx9aFZrbYHRbH9Q==
+X-Received: by 2002:a17:90b:134e:b0:311:9c9a:58ca with SMTP id 98e67ed59e1d1-31e7788a6aemr3965185a91.8.1753460117304;
+        Fri, 25 Jul 2025 09:15:17 -0700 (PDT)
+Received: from BM5220 (118-232-8-190.dynamic.kbronet.com.tw. [118.232.8.190])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-31e832fb879sm61604a91.6.2025.07.25.09.15.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 09:15:17 -0700 (PDT)
+From: Zenm Chen <zenmchen@gmail.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: pkshih@realtek.com,
+	hildawu@realtek.com,
+	max.chou@realtek.com,
+	rtl8821cerfe2@gmail.com,
+	usbwifi2024@gmail.com,
+	Zenm Chen <zenmchen@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add USB ID 2001:332a for D-Link AX9U rev. A1
+Date: Sat, 26 Jul 2025 00:14:32 +0800
+Message-ID: <20250725161432.5401-1-zenmchen@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250725090133.1358775-1-kiran.k@intel.com>
-In-Reply-To: <20250725090133.1358775-1-kiran.k@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 25 Jul 2025 09:53:35 -0400
-X-Gm-Features: Ac12FXwyzqNHfLPdHqEA0hYTNkMUgglGxxQQ1Y7JFYBSg_MQ752ng7-zdHJ5DaY
-Message-ID: <CABBYNZLJyT=z5gLCArU6pMo1sVq-0PSPpvV5yYXHCaxCp2GOZg@mail.gmail.com>
-Subject: Re: [PATCH v6] Bluetooth: btintel_pcie: Add support for _suspend() / _resume()
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com, 
-	chethan.tumkur.narayan@intel.com, bhelgaas@google.com, 
-	linux-pci@vger.kernel.org, 
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Kiran,
+Add USB ID 2001:332a for D-Link AX9U rev. A1 which is based on a Realtek
+RTL8851BU chip.
 
-On Fri, Jul 25, 2025 at 4:45=E2=80=AFAM Kiran K <kiran.k@intel.com> wrote:
->
-> From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
->
-> This patch implements _suspend() and _resume() functions for the
-> Bluetooth controller. When the system enters a suspended state, the
-> driver notifies the controller to perform necessary housekeeping tasks
-> by writing to the sleep control register and waits for an alive
-> interrupt. The firmware raises the alive interrupt when it has
-> transitioned to the D3 state. The same flow occurs when the system
-> resumes.
->
-> Command to test host initiated wakeup after 60 seconds
-> sudo rtcwake -m mem -s 60
->
-> dmesg log (tested on Whale Peak2 on Panther Lake platform)
-> On system suspend:
-> [Fri Jul 25 11:05:37 2025] Bluetooth: hci0: device entered into d3 state =
-from d0 in 80 us
->
-> On system resume:
-> [Fri Jul 25 11:06:36 2025] Bluetooth: hci0: device entered into d0 state =
-from d3 in 7117 us
->
-> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com=
->
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
-> changes in v6:
->      - s/delta/delta_us/g
->      - s/CONFIG_PM/CONFIG_PM_SLEEP/g
->      - use pm_sleep_pr()/pm_str() to avoid #ifdefs
->      - remove the code to set persistance mode as its not relevant to thi=
-s patch
->
-> changes in v5:
->      - refactor _suspend() / _resume() to set the D3HOT/D3COLD based on p=
-ower
->        event
->      - remove SIMPLE_DEV_PM_OPS and define the required pm_ops callback
->        functions
->
-> changes in v4:
->      - Moved document and section details from the commit message as comm=
-ent in code.
->
-> changes in v3:
->      - Corrected the typo's
->      - Updated the CC list as suggested.
->      - Corrected the format specifiers in the logs.
->
-> changes in v2:
->      - Updated the commit message with test steps and logs.
->      - Added logs to include the timeout message.
->      - Fixed a potential race condition during suspend and resume.
->
->  drivers/bluetooth/btintel_pcie.c | 90 ++++++++++++++++++++++++++++++++
->  1 file changed, 90 insertions(+)
->
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
-_pcie.c
-> index 6e7bbbd35279..c419521493fe 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -2573,11 +2573,101 @@ static void btintel_pcie_coredump(struct device =
-*dev)
->  }
->  #endif
->
-> +#ifdef CONFIG_PM_SLEEP
-> +static int btintel_pcie_suspend_late(struct device *dev, pm_message_t me=
-sg)
-> +{
-> +       struct pci_dev *pdev =3D to_pci_dev(dev);
-> +       struct btintel_pcie_data *data;
-> +       ktime_t start;
-> +       u32 dxstate;
-> +       s64 delta_us;
-> +       int err;
-> +
-> +       data =3D pci_get_drvdata(pdev);
-> +
-> +       dxstate =3D (mesg.event =3D=3D PM_EVENT_SUSPEND ?
-> +                  BTINTEL_PCIE_STATE_D3_HOT : BTINTEL_PCIE_STATE_D3_COLD=
-);
-> +
-> +       data->gp0_received =3D false;
-> +
-> +       start =3D ktime_get();
-> +
-> +       /* Refer: 6.4.11.7 -> Platform power management */
-> +       btintel_pcie_wr_sleep_cntrl(data, dxstate);
-> +       err =3D wait_event_timeout(data->gp0_wait_q, data->gp0_received,
-> +                                msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TI=
-MEOUT_MS));
-> +       if (err =3D=3D 0) {
-> +               bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrup=
-t for D3 entry",
-> +                               BTINTEL_DEFAULT_INTR_TIMEOUT_MS);
-> +               return -EBUSY;
-> +       }
-> +
-> +       delta_us =3D ktime_to_ns(ktime_get() - start) / 1000;
-> +       bt_dev_info(data->hdev, "device entered into d3 state from d0 in =
-%lld us",
-> +                   delta_us);
-> +       return 0;
-> +}
-> +
-> +static int btintel_pcie_suspend(struct device *dev)
-> +{
-> +       return btintel_pcie_suspend_late(dev, PMSG_SUSPEND);
-> +}
-> +
-> +static int btintel_pcie_hibernate(struct device *dev)
-> +{
-> +       return btintel_pcie_suspend_late(dev, PMSG_HIBERNATE);
-> +}
-> +
-> +static int btintel_pcie_freeze(struct device *dev)
-> +{
-> +       return btintel_pcie_suspend_late(dev, PMSG_FREEZE);
-> +}
-> +
-> +static int btintel_pcie_resume(struct device *dev)
-> +{
-> +       struct pci_dev *pdev =3D to_pci_dev(dev);
-> +       struct btintel_pcie_data *data;
-> +       ktime_t start;
-> +       int err;
-> +       s64 delta_us;
-> +
-> +       data =3D pci_get_drvdata(pdev);
-> +       data->gp0_received =3D false;
-> +
-> +       start =3D ktime_get();
-> +
-> +       /* Refer: 6.4.11.7 -> Platform power management */
-> +       btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
-> +       err =3D wait_event_timeout(data->gp0_wait_q, data->gp0_received,
-> +                                msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TI=
-MEOUT_MS));
-> +       if (err =3D=3D 0) {
-> +               bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrup=
-t for D0 entry",
-> +                               BTINTEL_DEFAULT_INTR_TIMEOUT_MS);
-> +               return -EBUSY;
-> +       }
-> +
-> +       delta_us =3D ktime_to_ns(ktime_get() - start) / 1000;
-> +       bt_dev_info(data->hdev, "device entered into d0 state from d3 in =
-%lld us",
-> +                   delta_us);
-> +       return 0;
-> +}
-> +
-> +const struct dev_pm_ops btintel_pcie_pm_ops =3D {
-> +       .suspend =3D pm_sleep_ptr(btintel_pcie_suspend),
-> +       .resume =3D pm_sleep_ptr(btintel_pcie_resume),
-> +       .freeze =3D pm_sleep_ptr(btintel_pcie_freeze),
-> +       .thaw =3D pm_sleep_ptr(btintel_pcie_resume),
-> +       .poweroff =3D pm_sleep_ptr(btintel_pcie_hibernate),
-> +       .restore =3D pm_sleep_ptr(btintel_pcie_resume),
-> +};
-> +#endif
-> +
->  static struct pci_driver btintel_pcie_driver =3D {
->         .name =3D KBUILD_MODNAME,
->         .id_table =3D btintel_pcie_table,
->         .probe =3D btintel_pcie_probe,
->         .remove =3D btintel_pcie_remove,
-> +       .driver.pm =3D pm_ptr(&btintel_pcie_pm_ops),
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below:
 
-This doesn't seem quite right, btintel_pcie_pm_ops is behind
-CONFIG_PM_SLEEP not just CONFIG_PM, so it would be undefined if just
-CONFIG_PM is set, so we might as well do:
+T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=2001 ProdID=332a Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=802.11ax WLAN Adapter
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 8 Cls=ff(vend.) Sub=ff Prot=ff Driver=rtw89_8851bu_git
+E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=09(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=0a(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=0b(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=0c(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_p=
-cie.c
-index 5b32f5a6b0b0..2f1b1be94080 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2654,12 +2654,12 @@ static int btintel_pcie_resume(struct device *dev)
- }
+Cc: stable@vger.kernel.org # 6.12.x
+Signed-off-by: Zenm Chen <zenmchen@gmail.com>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
- const struct dev_pm_ops btintel_pcie_pm_ops =3D {
--       .suspend =3D pm_sleep_ptr(btintel_pcie_suspend),
--       .resume =3D pm_sleep_ptr(btintel_pcie_resume),
--       .freeze =3D pm_sleep_ptr(btintel_pcie_freeze),
--       .thaw =3D pm_sleep_ptr(btintel_pcie_resume),
--       .poweroff =3D pm_sleep_ptr(btintel_pcie_hibernate),
--       .restore =3D pm_sleep_ptr(btintel_pcie_resume),
-+       .suspend =3D btintel_pcie_suspend,
-+       .resume =3D btintel_pcie_resume,
-+       .freeze =3D btintel_pcie_freeze,
-+       .thaw =3D btintel_pcie_resume,
-+       .poweroff =3D btintel_pcie_hibernate,
-+       .restore =3D btintel_pcie_resume,
- };
- #endif
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8085fabad..3595a8bad 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -522,6 +522,8 @@ static const struct usb_device_id quirks_table[] = {
+ 	/* Realtek 8851BU Bluetooth devices */
+ 	{ USB_DEVICE(0x3625, 0x010b), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2001, 0x332a), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Realtek 8852AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
+-- 
+2.50.1
 
-@@ -2668,7 +2668,7 @@ static struct pci_driver btintel_pcie_driver =3D {
-        .id_table =3D btintel_pcie_table,
-        .probe =3D btintel_pcie_probe,
-        .remove =3D btintel_pcie_remove,
--       .driver.pm =3D pm_ptr(&btintel_pcie_pm_ops),
-+       .driver.pm =3D pm_sleep_ptr(&btintel_pcie_pm_ops),
- #ifdef CONFIG_DEV_COREDUMP
-        .driver.coredump =3D btintel_pcie_coredump
- #endif
-
-
->  #ifdef CONFIG_DEV_COREDUMP
->         .driver.coredump =3D btintel_pcie_coredump
->  #endif
-> --
-> 2.43.0
->
->
-
-
---=20
-Luiz Augusto von Dentz
