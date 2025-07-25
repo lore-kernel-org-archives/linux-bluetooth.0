@@ -1,169 +1,224 @@
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168AF1DE3A7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Jul 2025 08:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69DC2376FD;
+	Fri, 25 Jul 2025 08:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753432655; cv=none; b=WMJFRV42YVxbAcjd9oGvO3lz6OOnN7ix6pUmZeNJokgo+3P5ApcZFBt8hbQa2AoUoFXzFIBK9uOPycM7O4zSzC1cdpJlVLeI3iZQecBJ6vBa/wPICxuj+ARRtywvpD3FQ/9mJO0nv1/pvt/hWPlC0hQ6jeJ98gv/K/ELdXnUTCU=
+	t=1753433105; cv=none; b=ZmkHQuH6D+gXHU6nSozcjNAJPAKg3iVehGWlXRl7f3sSkkHuuUZpczWlhKrbuZ8V2AVYO3RoL8JvNKWmG8TCJi8Izc1asg7eOoS3kUGgHB/BQBRmE/PlmFI8MNEQo6plXyJmGSUDERYaoBulF2zCY++UXg58pZ+b7Epnh2nOc6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753432655; c=relaxed/simple;
-	bh=W8HJ1KWCY2oLz+1QP8VSY1XrvMKYGu1SYlHF1EPwFzc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=tckkT6cVnSc4mViXlkkx2TBFzLfbregKzi3dIloQyZztVY/uq980CGADBbcQeV6LfnN6ctjnw9NZN+NnbxgJf+Z55wYbWI+DMR3+XtOsfimLwWBPrxxn5eXtHO6vumxbMMq96EJOG81wENiiLQ46hSsIkIv5En55vz6+ELF2QY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=hv4RQyXi; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1753433105; c=relaxed/simple;
+	bh=Z54MU4uAq8FcQF8kT3zCUU+M3jDpITVm7P0r4/+tI2E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UBRpg1k+T3fmlr9gjU5FDmu9osvBG1YYQitv6gr6iZrw4kv7/2nALqZHeGbUBEOwBSf1yPYmdO9LZQpfT+/Q1i98Wbex4E7UcGvtnuQYMIM7eaWQvoYWaMiqjxLV2bFPh3CFCqKF4F1lo4GnC735OWrIQrxKwTIiJqRv2cl73wU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LYKtBw6V; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="hv4RQyXi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1753432616;
-	bh=W8HJ1KWCY2oLz+1QP8VSY1XrvMKYGu1SYlHF1EPwFzc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=hv4RQyXiZ7NNe5SpHac1QhEzMy2I2P2Z0pGQvvVQ7S3HI7oyeZISBSRA2YkmntMNb
-	 fFp0V0WcOh0p3kvS4Vg00ElNNFbPOMv8FhLdW34JykzonqPjxaEGIT3gtQ/ZZ/WbKb
-	 P8soDdH1OyNyJAydyjLxCgyj4V3pUYcfRsKzgwmk=
-X-QQ-mid: zesmtpip4t1753432602taada28d8
-X-QQ-Originating-IP: K5y+sr3Tz2blsYpXvhPfYoVjT/T1inMMQBCdblCyoKk=
-Received: from [IPV6:240e:668:120a::212:232] ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 25 Jul 2025 16:36:40 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 17059450852442954122
-EX-QQ-RecipientCnt: 7
-Message-ID: <0C978E5F85FC6FB2+b88e93f8-e254-4ed4-897c-63fceaa6bf96@uniontech.com>
-Date: Fri, 25 Jul 2025 16:36:40 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LYKtBw6V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753433103; x=1784969103;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Z54MU4uAq8FcQF8kT3zCUU+M3jDpITVm7P0r4/+tI2E=;
+  b=LYKtBw6Vm3hpDn6tZWD91QhFGejwTzmik3EU+U9Q/wH90h+/VSMPfGgM
+   Ff0Xjgh1j/FybbfSO9Q+L9rosgXvR84OgfLyJ7rnaWRiYmRWJ5zWO4CFY
+   xizmiqzQ9GTCyo3sBZxuiPHr2BFw+ESR1QykTGLfb3FmG3qwxKY4yNnCD
+   a/8A76ImjcVSwQaX+Zxr3QHgM5HqGQMlL5tUGGhQN0gTSEWoNilbN+hXt
+   3T8IwjSgRDhgXjcuRi0wB5Lb/a94CPozyZ1wLgujYBBmWSqnzAFbIE2MS
+   PIPErOrAzpPL8efj0IQBwQmDWrs2TgZyQtfXAq0ZaE7B0cL0dbUiCN5ZE
+   Q==;
+X-CSE-ConnectionGUID: o131pEWsQFi2tHp7ppTpRA==
+X-CSE-MsgGUID: jd8MUIt+T+KjvHZzLFkDjA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11501"; a="55864821"
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="55864821"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2025 01:45:03 -0700
+X-CSE-ConnectionGUID: x218zPXtT9uDLDQQ1RbWyA==
+X-CSE-MsgGUID: YPORv5rmSj+Cs3mleHo2lw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="166219414"
+Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
+  by fmviesa004.fm.intel.com with ESMTP; 25 Jul 2025 01:45:00 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	bhelgaas@google.com,
+	linux-pci@vger.kernel.org,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v6] Bluetooth: btintel_pcie: Add support for _suspend() / _resume()
+Date: Fri, 25 Jul 2025 14:31:33 +0530
+Message-ID: <20250725090133.1358775-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bluetooth: btusb: Add RTL8851BE device 0x13d3:0x3601
-To: linux-bluetooth@vger.kernel.org
-References: <5D4383E66D4177F3+20250710080028.177664-1-wangyuli@uniontech.com>
- <686f7878.050a0220.756f0.10f9@mx.google.com>
-Content-Language: en-US
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, zhanjun@uniontech.com,
- niecheng1@uniontech.com, guanwentao@uniontech.com,
- Hao Li <lihao1@uniontech.com>
-From: WangYuli <wangyuli@uniontech.com>
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-In-Reply-To: <686f7878.050a0220.756f0.10f9@mx.google.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------K7tDG07OghZdBETao7oKXO3b"
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MnvGtZwO7LbyRHpPPEjquxfXuaiOGYHpUaX5KGLV75WaFjvAggjKea/k
-	wvhujDJPj3p0XaFdf8tTiRUvYnoAxUPLqa4SEuklGRifDgHFeFqeNeQkkpgeQbU3Q1IIlL4
-	Fzg17VkHh1e/D5JJ1gqTxTqFIHBRhY+PcUDqmg3vr+TTloCNYwX54lBRPBhOV70NprwIDLi
-	pmWKO4n9rDYYgz4wliMd+mwwkdUgq2ZLivbgLMxXgfR9p8qmAwmTw/vWgT4CcGs740AIBkB
-	bFQ9BpsVy/T9W3pm0DPIeEEb1/kqbDSTR9HOztNQwGwsGKBk7tA7Tr6/tzX9SeqrckwsXXS
-	ZahmAFdKc1bd0LXl2CYzx86jv8RLaq56iPMEpVdUx/IJMwjFGtK0dMrThwTGlnbTRnMCh53
-	lc1eFVZkv4JMz4LMY9HdtPfuRRQ9LMpDN5h5GbUOIxNBq4XIkhlT6gpEUuTP0b3GmN9tBpx
-	ojR8D60/JPDX+XjeFoKEposold9sIF8rrpydj1Lq7dfRyUhL7wHzJ/oI51rKwVVs6O6pM+O
-	me/h75NfREMN07jf0lb+77J5Y2svcQvWLr4HHp3I+O9EDB/BFNuDsQXcgCIp9H1mAdYxCrA
-	KI46Ovm1Iq/BeWc3Y12RBPGW6lsTRlw2SKe/8XhsmOQsZu3zUj0CVpqOF+ptCEOU2L8xpYE
-	yIoM07ZeQe/MDntmbnE5dIb6uOCsPTt0wmTFlZ7sdSz8TZeF3DID+hty7nTDJQk6msNONFI
-	zBn+VrFaF4bhizwjgZxmLOnmFsjoh6UR3VYoHZDfn40A26ipUqNvZCf3dYUOAqOLcWF1TWd
-	gEzivMPTCRTzKLOnggB1UTPS9hZbheqmN1CTfdygGim8AMEQHWMuGXK46o+6zqomnLsZajq
-	10P/2AYBTC1l0YYkwHg0idgdMKJIUeRC69ig3V8nP+QJ+6fIi6AmRusFpYm2yJgn9hjQsxR
-	TuQfTcMFXpBnRk9C8/WvKlyAspw/TAuUgIvKunswfZvjTmOCYDx9QStfrLs/+guQ+UwA7cq
-	o2W8aQQgiOzEUspQgduCk9+oYHNXBWwOCS/0DsOwW4uj5pRi4idZY+W20ggog=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------K7tDG07OghZdBETao7oKXO3b
-Content-Type: multipart/mixed; boundary="------------NCQexz2Ab0UAHm0fJjcglw0X";
- protected-headers="v1"
-From: WangYuli <wangyuli@uniontech.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, zhanjun@uniontech.com,
- niecheng1@uniontech.com, guanwentao@uniontech.com,
- Hao Li <lihao1@uniontech.com>
-Message-ID: <b88e93f8-e254-4ed4-897c-63fceaa6bf96@uniontech.com>
-Subject: Re: Bluetooth: btusb: Add RTL8851BE device 0x13d3:0x3601
-References: <5D4383E66D4177F3+20250710080028.177664-1-wangyuli@uniontech.com>
- <686f7878.050a0220.756f0.10f9@mx.google.com>
-In-Reply-To: <686f7878.050a0220.756f0.10f9@mx.google.com>
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 
---------------NCQexz2Ab0UAHm0fJjcglw0X
-Content-Type: multipart/mixed; boundary="------------JhYJFquPz0m87g6XAlmmlp86"
+This patch implements _suspend() and _resume() functions for the
+Bluetooth controller. When the system enters a suspended state, the
+driver notifies the controller to perform necessary housekeeping tasks
+by writing to the sleep control register and waits for an alive
+interrupt. The firmware raises the alive interrupt when it has
+transitioned to the D3 state. The same flow occurs when the system
+resumes.
 
---------------JhYJFquPz0m87g6XAlmmlp86
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Command to test host initiated wakeup after 60 seconds
+sudo rtcwake -m mem -s 60
 
-SGkgYWxsLA0KDQpQbGVhc2UgZm9yZ2l2ZSBteSBpZ25vcmFuY2UsIGJ1dCBJJ20gbm90IHN1
-cmUgaG93IHRvIGdldCB0aGUgY29kZSBmcm9tIA0KdGhlIGxhdGVzdCBkZXZlbG9wbWVudCBi
-cmFuY2ggb2YgdGhlIEJsdWV0b290aCBzdWJzeXN0ZW0gc28gdGhhdCBteSANCnBhdGNoIGNh
-biBwYXNzIHRoZSBhdXRvbWF0ZWQgY2hlY2tzLg0KDQpUaGlzIHBhdGNoIGFwcGxpZXMgY2xl
-YW5seSB0byB0aGUgY3VycmVudCBMaW51eCBtYWlubGluZSB3aXRob3V0IGFueSANCmNvbmZs
-aWN0cy4NCg0KSSBkaWQgZmluZCB0aGUgYmx1ZXRvb3RoLW5leHQgcmVwb3NpdG9yeSANCiho
-dHRwczovL2tlcm5lbC5nb29nbGVzb3VyY2UuY29tL3B1Yi9zY20vbGludXgva2VybmVsL2dp
-dC9ibHVldG9vdGgvYmx1ZXRvb3RoLW5leHQuZ2l0KSwgDQpidXQgaXQgc2VlbXMgYWxsIG9m
-IGl0cyBicmFuY2hlcyBoYXZlbid0IGJlZW4gdXBkYXRlZCBmb3IgYSB3aGlsZS4NCg0KT24g
-MjAyNS83LzEwIDE2OjIzLCBibHVlei50ZXN0LmJvdEBnbWFpbC5jb20gd3JvdGU6DQo+IFRo
-aXMgaXMgYW4gYXV0b21hdGVkIGVtYWlsIGFuZCBwbGVhc2UgZG8gbm90IHJlcGx5IHRvIHRo
-aXMgZW1haWwuDQpJJ20gc29ycnkgdGhhdCBJIGhhdmUgdG8gcmVwbHkgdG8geW91LiA6LSkN
-Cj4NCj4gRGVhciBTdWJtaXR0ZXIsDQo+DQo+IFRoYW5rIHlvdSBmb3Igc3VibWl0dGluZyB0
-aGUgcGF0Y2hlcyB0byB0aGUgbGludXggYmx1ZXRvb3RoIG1haWxpbmcgbGlzdC4NCj4gV2hp
-bGUgcHJlcGFyaW5nIHRoZSBDSSB0ZXN0cywgdGhlIHBhdGNoZXMgeW91IHN1Ym1pdHRlZCBj
-b3VsZG4ndCBiZSBhcHBsaWVkIHRvIHRoZSBjdXJyZW50IEhFQUQgb2YgdGhlIHJlcG9zaXRv
-cnkuDQo+DQo+IC0tLS0tIE91dHB1dCAtLS0tLQ0KPg0KPiBlcnJvcjogcGF0Y2ggZmFpbGVk
-OiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jOjUxNQ0KPiBlcnJvcjogZHJpdmVycy9ibHVl
-dG9vdGgvYnR1c2IuYzogcGF0Y2ggZG9lcyBub3QgYXBwbHkNCj4gaGludDogVXNlICdnaXQg
-YW0gLS1zaG93LWN1cnJlbnQtcGF0Y2gnIHRvIHNlZSB0aGUgZmFpbGVkIHBhdGNoDQo+DQo+
-IFBsZWFzZSByZXNvbHZlIHRoZSBpc3N1ZSBhbmQgc3VibWl0IHRoZSBwYXRjaGVzIGFnYWlu
-Lg0KPg0KPg0KPiAtLS0NCj4gUmVnYXJkcywNCj4gTGludXggQmx1ZXRvb3RoDQo+DQpUaGFu
-a3MsDQotLSANCldhbmdZdWxpDQo=
---------------JhYJFquPz0m87g6XAlmmlp86
-Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+dmesg log (tested on Whale Peak2 on Panther Lake platform)
+On system suspend:
+[Fri Jul 25 11:05:37 2025] Bluetooth: hci0: device entered into d3 state from d0 in 80 us
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+On system resume:
+[Fri Jul 25 11:06:36 2025] Bluetooth: hci0: device entered into d0 state from d3 in 7117 us
 
-xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
-P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
-FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
-AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
-bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
-AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
-GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
-7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
-/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
-=3DBlkq
------END PGP PUBLIC KEY BLOCK-----
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+changes in v6:
+     - s/delta/delta_us/g
+     - s/CONFIG_PM/CONFIG_PM_SLEEP/g
+     - use pm_sleep_pr()/pm_str() to avoid #ifdefs
+     - remove the code to set persistance mode as its not relevant to this patch
 
---------------JhYJFquPz0m87g6XAlmmlp86--
+changes in v5:
+     - refactor _suspend() / _resume() to set the D3HOT/D3COLD based on power
+       event
+     - remove SIMPLE_DEV_PM_OPS and define the required pm_ops callback
+       functions
 
---------------NCQexz2Ab0UAHm0fJjcglw0X--
+changes in v4:
+     - Moved document and section details from the commit message as comment in code.
 
---------------K7tDG07OghZdBETao7oKXO3b
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+changes in v3:
+     - Corrected the typo's
+     - Updated the CC list as suggested.
+     - Corrected the format specifiers in the logs.
 
------BEGIN PGP SIGNATURE-----
+changes in v2:
+     - Updated the commit message with test steps and logs.
+     - Added logs to include the timeout message.
+     - Fixed a potential race condition during suspend and resume.
 
-wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCaINCGAUDAAAAAAAKCRDF2h8wRvQL7sr/
-AP0U2iwqvkEsRKIHU//6B9PYGbA4NI3XqRI8S0we78l+awD9E/E9bZYdFn8sTABDic0s7vzwluqi
-H7Oryp/kyvb6rAo=
-=enEw
------END PGP SIGNATURE-----
+ drivers/bluetooth/btintel_pcie.c | 90 ++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
---------------K7tDG07OghZdBETao7oKXO3b--
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 6e7bbbd35279..c419521493fe 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2573,11 +2573,101 @@ static void btintel_pcie_coredump(struct device *dev)
+ }
+ #endif
+ 
++#ifdef CONFIG_PM_SLEEP
++static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	struct btintel_pcie_data *data;
++	ktime_t start;
++	u32 dxstate;
++	s64 delta_us;
++	int err;
++
++	data = pci_get_drvdata(pdev);
++
++	dxstate = (mesg.event == PM_EVENT_SUSPEND ?
++		   BTINTEL_PCIE_STATE_D3_HOT : BTINTEL_PCIE_STATE_D3_COLD);
++
++	data->gp0_received = false;
++
++	start = ktime_get();
++
++	/* Refer: 6.4.11.7 -> Platform power management */
++	btintel_pcie_wr_sleep_cntrl(data, dxstate);
++	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
++				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
++	if (err == 0) {
++		bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrupt for D3 entry",
++				BTINTEL_DEFAULT_INTR_TIMEOUT_MS);
++		return -EBUSY;
++	}
++
++	delta_us = ktime_to_ns(ktime_get() - start) / 1000;
++	bt_dev_info(data->hdev, "device entered into d3 state from d0 in %lld us",
++		    delta_us);
++	return 0;
++}
++
++static int btintel_pcie_suspend(struct device *dev)
++{
++	return btintel_pcie_suspend_late(dev, PMSG_SUSPEND);
++}
++
++static int btintel_pcie_hibernate(struct device *dev)
++{
++	return btintel_pcie_suspend_late(dev, PMSG_HIBERNATE);
++}
++
++static int btintel_pcie_freeze(struct device *dev)
++{
++	return btintel_pcie_suspend_late(dev, PMSG_FREEZE);
++}
++
++static int btintel_pcie_resume(struct device *dev)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	struct btintel_pcie_data *data;
++	ktime_t start;
++	int err;
++	s64 delta_us;
++
++	data = pci_get_drvdata(pdev);
++	data->gp0_received = false;
++
++	start = ktime_get();
++
++	/* Refer: 6.4.11.7 -> Platform power management */
++	btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
++	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
++				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
++	if (err == 0) {
++		bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrupt for D0 entry",
++				BTINTEL_DEFAULT_INTR_TIMEOUT_MS);
++		return -EBUSY;
++	}
++
++	delta_us = ktime_to_ns(ktime_get() - start) / 1000;
++	bt_dev_info(data->hdev, "device entered into d0 state from d3 in %lld us",
++		    delta_us);
++	return 0;
++}
++
++const struct dev_pm_ops btintel_pcie_pm_ops = {
++	.suspend = pm_sleep_ptr(btintel_pcie_suspend),
++	.resume = pm_sleep_ptr(btintel_pcie_resume),
++	.freeze = pm_sleep_ptr(btintel_pcie_freeze),
++	.thaw = pm_sleep_ptr(btintel_pcie_resume),
++	.poweroff = pm_sleep_ptr(btintel_pcie_hibernate),
++	.restore = pm_sleep_ptr(btintel_pcie_resume),
++};
++#endif
++
+ static struct pci_driver btintel_pcie_driver = {
+ 	.name = KBUILD_MODNAME,
+ 	.id_table = btintel_pcie_table,
+ 	.probe = btintel_pcie_probe,
+ 	.remove = btintel_pcie_remove,
++	.driver.pm = pm_ptr(&btintel_pcie_pm_ops),
+ #ifdef CONFIG_DEV_COREDUMP
+ 	.driver.coredump = btintel_pcie_coredump
+ #endif
+-- 
+2.43.0
+
