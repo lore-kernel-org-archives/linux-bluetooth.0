@@ -1,101 +1,222 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6081FC3
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Jul 2025 08:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9A926FA6F;
+	Fri, 25 Jul 2025 09:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753433550; cv=none; b=bRGYAUJYYZaFaH5hwU5z/YMoStcaTAsrZa2PYRR9i0mOFzU/EXlY0+XMIce9hauWphPSWueNOdB84PC7NCbax+E+WrECz1kY3OizrpyJjrYpOVFSHjjAP24Zq36f75iqHXT6FRP8hOejByuvbCE07IC+tR3fur3l2KyeARCWb4Q=
+	t=1753434301; cv=none; b=KIBho4yCUCc7c69JHqEYGHPK3t5b6hguBfZD6IfXbnUIw1LZcS61AlV7nTJ9CrXSxE5x81kmO2nLnHFNAC9JFHKEQAbAlSCZynx+uidO8VaFgj5wefWwm8SIHUDx9Y/myeCwh5JU+rCR6kX4Wn3erV7Ex3SHmH1Xv5rFr/XxH88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753433550; c=relaxed/simple;
-	bh=RLSaI+eB3pJYY9Om2ECM8AKDmfgBACzxVBAsam4rufo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=D9Zv1FNmSYWyZ4gglGZ07ZafflSHPGqEv02G8g1Lmgc+7x2CPBMstIN3LNs++/RJ2E7XD/X3xPVfPLtUbUGEErOj5GOUq4EqBZ/JNt8vF2liOV9JLdXfliMIrOEhX1+uYE3QjlZdvsExHRl12VVedenABnCI/fbhvvIkfPSMS0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mq318Na5; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mq318Na5"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-86efcef9194so74539739f.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Jul 2025 01:52:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753433548; x=1754038348; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RLSaI+eB3pJYY9Om2ECM8AKDmfgBACzxVBAsam4rufo=;
-        b=mq318Na5A+5DCqOwSUCM3dljvhxtIe+l4Ab1u+gwuRXypm8mrzVpbke0L6M1O7s4Xd
-         1rh/adPmiBl2YNqlIdUxYg+A34O4MisUJA0wWTcPxeURhVbcvCskOyCPKDP7Q4uNB7wL
-         EAdS+w7pQRUKvZVo8z1nT/75vl5SywS1hHFn5n5wQXqgXefnA3AZ83cEWs8gnzdX3h/E
-         MmTwgp5yK2Z3AmhceE3MuQmDQcC9yvlCq+1SyHmTQPkiU+yqZ/K1IueSCUm2Xcoyv0l6
-         iyEfMqnvhLMhg4e671jVQOfV0xnCZMxQQvSBqyB8ayqnU4Oo+iRHd8HnhHblUrFoCjNv
-         DHmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753433548; x=1754038348;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RLSaI+eB3pJYY9Om2ECM8AKDmfgBACzxVBAsam4rufo=;
-        b=dAH7egkvWtwr9OQtRoO4YdgZX99gBnkbQVPFX5u5yQ8PcvGqIdXyY0XE/w7xlIauiB
-         IKP09/+hdFKz5+gpATz+yi0/s67bBIXCTcp8OVDn092/HuTOFpKfmGDWNw+2kLqhOW3H
-         Wl69EP/uRipjZxDc4cdDw3dnKEVCd06fzAqZWmIzg1+atOQGpCBzRjGixICaTc1BiS1i
-         m4vccuFyQ7W5VilrILEIfbPOwHXeIOQRAHc0+K7bGN83FfvK1BqgkVph9WscwOnmrFyc
-         L3xacQ9tACHzrsncWfL0giMliPSJ3qa2ux3VfICiTo5TCK26v+lPfN3TJOGmevl+LNqA
-         uwBw==
-X-Gm-Message-State: AOJu0Yzb6A4Pu27p1xPnOCCiqljLG85XdGyueviAWsM5fvamt8YgD284
-	8rkRsI3NWIgqWVWjaiSGyx9LR4Wp4lL0B70QOFi+V6ZU9fE2NxW7R6oPtBOQEA==
-X-Gm-Gg: ASbGncsNvfeJZzZgbdzdQ9qabuirQfUEq+ABifguc85jTDzvPScHhHJbuWVjqz0rUpJ
-	wemFzpuF7+PzAjDJZFg/EZ7NT+kPWrGKBKwktAWcBbI9YJjFEpwwW2XPQXj4lDaD/TFyWAbgOi4
-	JLmIHa7DXkS9pfu+ATRSrtUNL41u8XDfdkjNsxlpi4GYe7O4EkIFN0Y4NPfmsrGp7TfUYmNEE8n
-	+mkPJtzArvHGVKdx+BtxverxGdQkdg20Uwxi/VkpNdQ12f4OagX/X/51KWAvPy5zK937YhkChcr
-	2k55+nL/MjW0JcxaHu7q6qoxI9i4tIAdEJe8iERNQVcFc9+FOlmXMQPOkS1FLUC9yhP7IPstJaS
-	mHK7sDmo/FSpmwXrjnGG5eAG4kYdM
-X-Google-Smtp-Source: AGHT+IEwJ3J00kDjjD8G/Trjn/17lMoJGD+MkIYaBYfHnWvO5670y/iP7dDFHiv47nPt2oAKqACtYg==
-X-Received: by 2002:a05:6602:2752:b0:874:e108:8e3a with SMTP id ca18e2360f4ac-88022a6f80dmr130278339f.12.1753433548212;
-        Fri, 25 Jul 2025 01:52:28 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.169.99])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-87c74341323sm91050639f.38.2025.07.25.01.52.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 01:52:27 -0700 (PDT)
-Message-ID: <688345cb.6b0a0220.357bc1.134a@mx.google.com>
-Date: Fri, 25 Jul 2025 01:52:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7518901252677478198=="
+	s=arc-20240116; t=1753434301; c=relaxed/simple;
+	bh=5JMRBMZ0/9jWtiBIdp3m1UuD+sxB3Iagp+4VI8NCJiQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VyQN/ODOx06kkxQdhYv7QYdNTWIi57PY6Qsk/QhaId9NNYGnhs+ItxdwwXP0u+FjJgV2vAIq4l0f3jDv4S/nIj8X3CyOiFUdFbC/tptfPecBkTs7WbZ5Qf3RrPrkxIlBftporbxu5eIt8ThpmY+/xZlQGgjGN6eFL4pUEaWKAiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.44.251] (unknown [185.238.219.118])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id ADB5461E64841;
+	Fri, 25 Jul 2025 11:04:39 +0200 (CEST)
+Message-ID: <fabecd3c-e715-4ef5-bf79-72e2575ee372@molgen.mpg.de>
+Date: Fri, 25 Jul 2025 11:04:35 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v6] Bluetooth: btintel_pcie: Add support for _suspend() / _resume()
-In-Reply-To: <20250725090133.1358775-1-kiran.k@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6] Bluetooth: btintel_pcie: Add support for _suspend() /
+ _resume()
+To: Kiran K <kiran.k@intel.com>,
+ Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com, bhelgaas@google.com,
+ linux-pci@vger.kernel.org
 References: <20250725090133.1358775-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7518901252677478198==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250725090133.1358775-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btintel_pcie.c:2573
-error: drivers/bluetooth/btintel_pcie.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+Dear Kiran,
 
 
----
-Regards,
-Linux Bluetooth
+Thank you for sending the improved version 6.
+
+Am 25.07.25 um 11:01 schrieb Kiran K:
+> From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+> 
+> This patch implements _suspend() and _resume() functions for the
+> Bluetooth controller. When the system enters a suspended state, the
+> driver notifies the controller to perform necessary housekeeping tasks
+> by writing to the sleep control register and waits for an alive
+> interrupt. The firmware raises the alive interrupt when it has
+> transitioned to the D3 state. The same flow occurs when the system
+> resumes.
+> 
+> Command to test host initiated wakeup after 60 seconds
+> sudo rtcwake -m mem -s 60
+> 
+> dmesg log (tested on Whale Peak2 on Panther Lake platform)
+> On system suspend:
+> [Fri Jul 25 11:05:37 2025] Bluetooth: hci0: device entered into d3 state from d0 in 80 us
+> 
+> On system resume:
+> [Fri Jul 25 11:06:36 2025] Bluetooth: hci0: device entered into d0 state from d3 in 7117 us
+> 
+> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+> changes in v6:
+>       - s/delta/delta_us/g
+>       - s/CONFIG_PM/CONFIG_PM_SLEEP/g
+>       - use pm_sleep_pr()/pm_str() to avoid #ifdefs
+>       - remove the code to set persistance mode as its not relevant to this patch
+> 
+> changes in v5:
+>       - refactor _suspend() / _resume() to set the D3HOT/D3COLD based on power
+>         event
+>       - remove SIMPLE_DEV_PM_OPS and define the required pm_ops callback
+>         functions
+> 
+> changes in v4:
+>       - Moved document and section details from the commit message as comment in code.
+> 
+> changes in v3:
+>       - Corrected the typo's
+>       - Updated the CC list as suggested.
+>       - Corrected the format specifiers in the logs.
+> 
+> changes in v2:
+>       - Updated the commit message with test steps and logs.
+>       - Added logs to include the timeout message.
+>       - Fixed a potential race condition during suspend and resume.
+> 
+>   drivers/bluetooth/btintel_pcie.c | 90 ++++++++++++++++++++++++++++++++
+>   1 file changed, 90 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index 6e7bbbd35279..c419521493fe 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -2573,11 +2573,101 @@ static void btintel_pcie_coredump(struct device *dev)
+>   }
+>   #endif
+>   
+> +#ifdef CONFIG_PM_SLEEP
+> +static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +	struct btintel_pcie_data *data;
+> +	ktime_t start;
+> +	u32 dxstate;
+> +	s64 delta_us;
+> +	int err;
+> +
+> +	data = pci_get_drvdata(pdev);
+> +
+> +	dxstate = (mesg.event == PM_EVENT_SUSPEND ?
+> +		   BTINTEL_PCIE_STATE_D3_HOT : BTINTEL_PCIE_STATE_D3_COLD);
+
+I believe the brackets are uncommon. You actually can leave it out, or, 
+if brackets need to be used, only surround the condition.
+
+> +
+> +	data->gp0_received = false;
+> +
+> +	start = ktime_get();
+> +
+> +	/* Refer: 6.4.11.7 -> Platform power management */
+> +	btintel_pcie_wr_sleep_cntrl(data, dxstate);
+> +	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+> +				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+> +	if (err == 0) {
+> +		bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrupt for D3 entry",
+> +				BTINTEL_DEFAULT_INTR_TIMEOUT_MS);
+> +		return -EBUSY;
+> +	}
+> +
+> +	delta_us = ktime_to_ns(ktime_get() - start) / 1000;
+> +	bt_dev_info(data->hdev, "device entered into d3 state from d0 in %lld us",
+> +		    delta_us);
+> +	return 0;
+> +}
+> +
+> +static int btintel_pcie_suspend(struct device *dev)
+> +{
+> +	return btintel_pcie_suspend_late(dev, PMSG_SUSPEND);
+> +}
+> +
+> +static int btintel_pcie_hibernate(struct device *dev)
+> +{
+> +	return btintel_pcie_suspend_late(dev, PMSG_HIBERNATE);
+> +}
+> +
+> +static int btintel_pcie_freeze(struct device *dev)
+> +{
+> +	return btintel_pcie_suspend_late(dev, PMSG_FREEZE);
+> +}
+> +
+> +static int btintel_pcie_resume(struct device *dev)
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +	struct btintel_pcie_data *data;
+> +	ktime_t start;
+> +	int err;
+> +	s64 delta_us;
+> +
+> +	data = pci_get_drvdata(pdev);
+> +	data->gp0_received = false;
+> +
+> +	start = ktime_get();
+> +
+> +	/* Refer: 6.4.11.7 -> Platform power management */
+> +	btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
+> +	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+> +				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+> +	if (err == 0) {
+> +		bt_dev_err(data->hdev, "Timeout (%u ms) on alive interrupt for D0 entry",
+> +				BTINTEL_DEFAULT_INTR_TIMEOUT_MS);
+> +		return -EBUSY;
+> +	}
+> +
+> +	delta_us = ktime_to_ns(ktime_get() - start) / 1000;
+> +	bt_dev_info(data->hdev, "device entered into d0 state from d3 in %lld us",
+> +		    delta_us);
+> +	return 0;
+> +}
+> +
+> +const struct dev_pm_ops btintel_pcie_pm_ops = {
+> +	.suspend = pm_sleep_ptr(btintel_pcie_suspend),
+> +	.resume = pm_sleep_ptr(btintel_pcie_resume),
+> +	.freeze = pm_sleep_ptr(btintel_pcie_freeze),
+> +	.thaw = pm_sleep_ptr(btintel_pcie_resume),
+> +	.poweroff = pm_sleep_ptr(btintel_pcie_hibernate),
+> +	.restore = pm_sleep_ptr(btintel_pcie_resume),
+> +};
+> +#endif
+> +
+>   static struct pci_driver btintel_pcie_driver = {
+>   	.name = KBUILD_MODNAME,
+>   	.id_table = btintel_pcie_table,
+>   	.probe = btintel_pcie_probe,
+>   	.remove = btintel_pcie_remove,
+> +	.driver.pm = pm_ptr(&btintel_pcie_pm_ops),
+>   #ifdef CONFIG_DEV_COREDUMP
+>   	.driver.coredump = btintel_pcie_coredump
+>   #endif
+
+With the above comment fixed, please feel free to add:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
---===============7518901252677478198==--
+Kind regards,
+
+Paul
