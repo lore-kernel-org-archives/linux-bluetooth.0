@@ -1,130 +1,127 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431401DE892;
-	Fri, 25 Jul 2025 22:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9DC28682;
+	Sat, 26 Jul 2025 06:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753480928; cv=none; b=gHlgd3RuTePiXaKzjvr8rCDNbVupQbhGfrmf9fdd7yWphuUUJNAHdQth6UHNWG9oWVnClplgml5wpgkflftbJVm7yNfi1oq64YYg68SqLsCbTV5M47qlnzHi/5qeZwKl1Jxq/UmT+i3kBcf1ZGteMWxM6UCUQnjElx9opLWDMh0=
+	t=1753511041; cv=none; b=T33efJo/QZQaq6g6rbIIHrFP/QoaS0ijPRSaION0agkF1YKwmb/kuPmVpGbKy7sR3yLkW5yQTgdZXcQtWy85HvbKjjuLe2pBHjPM/It3eoeDaZ5nB/D8brE4IKwqJ40JWQG5rozXcXpJGlmh111/7W+cDc+vI/yS9UP17x8hb5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753480928; c=relaxed/simple;
-	bh=GnglZ0b04kKrNto5bDI5PFafyFbK9Qb0DQrrkAtwt0M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o8fqCAJn4XI/EDP2Gmg25iV5oCKX6hDlAij1CKdtgPOinD6kiWFVrkZrZOY5eohNxP9oJo40c4heu0OqkE3v/to+9wxz7G+mCK9qefDvZDCktUjHN0Jjto+6ZVEDX6zQNILuj6mXQgdZib2UFH9H5UtyyVhSAw/P8p5mkzc+3m0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.202] (p5dc557dd.dip0.t-ipconnect.de [93.197.87.221])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 11ADB61E64848;
-	Sat, 26 Jul 2025 00:01:38 +0200 (CEST)
-Message-ID: <947f69ec-c66d-4182-aa96-e3e320760131@molgen.mpg.de>
-Date: Sat, 26 Jul 2025 00:01:36 +0200
+	s=arc-20240116; t=1753511041; c=relaxed/simple;
+	bh=8HGBJh2fOy7mUjNT+E3FXAWPDZTyZPZgOpbOFNukRJo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=HAM8vZ7apNNBHfvbjyPC3fLuO4qZy4ayebplLnRv1b4IFUfiAliW08Ze4r/4a37bXw6hKQ6/qgRcFbByfvFjwI8DvI8XWOLx0EFH2E+V2uZsVrmwtPRb0+iQ7SYbY+f5i3IoTOBIkEao3Wvm4qnNZXY8yK+HyDe5bu8BulpipJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NICC+kFd; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NICC+kFd"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aef575ad59eso458674666b.2;
+        Fri, 25 Jul 2025 23:23:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753511038; x=1754115838; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JPVm5NLm56NonamVjgy6whoRUACE4vVGhgqS5thfviI=;
+        b=NICC+kFdAJPz8f5SL5Np5xdmv2bavZZJjtfa3Xt1WxXNlbhYgW9DL9kabXytzJZRkO
+         YWL9/QT3g/2pnD903lPu/zWoCOSa1Bjqoug6YxJQW2mKl++s1pcp178GvAwDR6YYrvNR
+         gEr/BWKkrBk47xweCkRYv4JZwoLBj+v5x2zG4eGXKVQnWbvBwRRCtkM9c6w/W0Exe1CA
+         CI1wx5ELYZzVdinKRItFuiv+gbr23hdufzAMMrXRc5Fm3rA0+Hn+rIEZAI4ImqIpeJ29
+         6tbYFdiznwm+1C2cpv6ng4NHv5h5SMdoGOu9ru8zMOm19H2mDWbMhpyavZ1yiIenydoK
+         zSLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753511038; x=1754115838;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JPVm5NLm56NonamVjgy6whoRUACE4vVGhgqS5thfviI=;
+        b=a7I17HPw7puZDUg976CEM889uKkkE0dcqLJChST1NxKM1moK1jE81++F7cFV2Voq3q
+         TTbEoUGW6+Ogu2kgjrTuTk/B8VmSqUp9VhDP7Tu3V0WzJSwa5EgUTkn9m89JrEqpzXH1
+         aSKQnSECybHQ5kn/xJvlV15n1k0De5r0+ZFzYhWXBipYv7CMPR4+iRjalQjEK/n57llx
+         Y3bMNI0jU2kYBORTk6lwRPK3AtqsJLtByE/msMg0ThdWJ3xMLZRkyJAnBOpDmcM+f6Oh
+         HhagsG/8x4oD0032siTdc8QAkeTAQNttHzFZb4GoTAdFGmxhaEY5ExyUWmHFMPdPNFXX
+         Nwyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdD8g0rYL5EvomJsBjtTL6fVQKJP61TcaW+n25grRz+txwMbhU/Je39XvU0tDT3f0t2QAT4907EHkhlAr6@vger.kernel.org, AJvYcCXnSY1+RnaVnHYfSpA4Cqz3/qFtTYXIJGQEiq7OEs84mMrblduD32RDF2dfzCpn73ttuBAvQTq3yihWhNrGZZ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3M9sK5xoAIIe/fX5wAyGuClioRan7/RFIvnXScA0zs7IeBj+2
+	Eip5uzFF/ICQY+YibQ+EhztZ3dObapMmb9vc4X83kkJ5S4CVBSXSHTpN
+X-Gm-Gg: ASbGncsBkv/92/d57LpjXOVac2rZNKkkSpVob0/jRKDJcaQT1j/tpF1Mccf0uNFPHsz
+	crF8HzdXYxKFpOCaih6XL8y7GhsCrHoL2qrb0JEELDk78ngR74O/DswU/PPB2vrdZO5uVLs+TYo
+	Tq5av11kHMWNJNhIoPDPqZxxV/X+Aa9A4JTqzTNQbcV+pJlldyAJdRQO304m/UftyEYRysGBMEt
+	ONOFGGHz3B4AoCKtVCvwaI9flOtxsthh5MizN4SakQOvH4IOXxX1rZKNGXW1a+z/Q6Us9mC9ZM7
+	2uQUzPvIO9NNGdWpiMEj1d+FIm8gzWW5PwCKl4n5gCuKlfDvUteuQtXgAmgwRh7Errq/mfemQau
+	8QqhfPFDGe1jAOQ==
+X-Google-Smtp-Source: AGHT+IEnQ7GX0usG6ax0EaSDJmScjZos41J8+3gStjKKu/ap9bemGhAwlhJ2FWwMcBmzsC4DGqHymw==
+X-Received: by 2002:a17:906:f5a3:b0:ae3:74be:4998 with SMTP id a640c23a62f3a-af61b0042b0mr519293966b.11.1753511037768;
+        Fri, 25 Jul 2025 23:23:57 -0700 (PDT)
+Received: from pc ([196.235.231.127])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af635a63121sm98136166b.67.2025.07.25.23.23.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 23:23:57 -0700 (PDT)
+Date: Sat, 26 Jul 2025 07:23:54 +0100
+From: Salah Triki <salah.triki@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: salah.triki@gmail.com
+Subject: [PATCH] Bluetooth: bcm203x: Fix use-after-free and memory leak in
+ device lifecycle
+Message-ID: <aIR0ekNXjuLs6IWa@pc>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btusb: Add USB ID 2001:332a for D-Link AX9U
- rev. A1
-To: Zenm Chen <zenmchen@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- marcel@holtmann.org, luiz.dentz@gmail.com, pkshih@realtek.com,
- hildawu@realtek.com, max.chou@realtek.com, rtl8821cerfe2@gmail.com,
- usbwifi2024@gmail.com, stable@vger.kernel.org
-References: <20250725161432.5401-1-zenmchen@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250725161432.5401-1-zenmchen@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Dear Chen,
+The driver stores a reference to the `usb_device` structure (`udev`)
+in its private data (`data->udev`), which can persist beyond the
+immediate context of the `bcm203x_probe()` function.
 
+Without proper reference count management, this can lead to two issues:
 
-Thank you for your patch.
+1. A `use-after-free` scenario if `udev` is accessed after its main
+   reference count drops to zero (e.g., if the device is disconnected
+   and the `data` structure is still active).
+2. A `memory leak` if `udev`'s reference count is not properly
+   decremented during driver disconnect, preventing the `usb_device`
+   object from being freed.
 
-Am 25.07.25 um 18:14 schrieb Zenm Chen:
-> Add USB ID 2001:332a for D-Link AX9U rev. A1 which is based on a Realtek
-> RTL8851BU chip.
-> 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below:
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-> D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=2001 ProdID=332a Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=802.11ax WLAN Adapter
-> S:  SerialNumber=00e04c000001
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 8 Cls=ff(vend.) Sub=ff Prot=ff Driver=rtw89_8851bu_git
-> E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=09(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=0a(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=0b(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=0c(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> 
-> Cc: stable@vger.kernel.org # 6.12.x
-> Signed-off-by: Zenm Chen <zenmchen@gmail.com>
-> ---
->   drivers/bluetooth/btusb.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 8085fabad..3595a8bad 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -522,6 +522,8 @@ static const struct usb_device_id quirks_table[] = {
->   	/* Realtek 8851BU Bluetooth devices */
->   	{ USB_DEVICE(0x3625, 0x010b), .driver_info = BTUSB_REALTEK |
->   						     BTUSB_WIDEBAND_SPEECH },
-> +	{ USB_DEVICE(0x2001, 0x332a), .driver_info = BTUSB_REALTEK |
-> +						     BTUSB_WIDEBAND_SPEECH },
+To correctly manage the `udev` lifetime, explicitly increment its
+reference count with `usb_get_dev(udev)` when storing it in the
+driver's private data. Correspondingly, decrement the reference count
+with `usb_put_dev(data->udev)` in the `bcm203x_disconnect()` callback.
 
-I’d sort according to `USB_DEVICE(0x2001`.
+This ensures `udev` remains valid while referenced by the driver's
+private data and is properly released when no longer needed.
 
->   
->   	/* Realtek 8852AE Bluetooth devices */
->   	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
+Signed-off-by: Salah Triki <salah.triki@gmail.com>
+---
+ drivers/bluetooth/bcm203x.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+diff --git a/drivers/bluetooth/bcm203x.c b/drivers/bluetooth/bcm203x.c
+index c738ad0408cb..c91eaba33905 100644
+--- a/drivers/bluetooth/bcm203x.c
++++ b/drivers/bluetooth/bcm203x.c
+@@ -165,7 +165,7 @@ static int bcm203x_probe(struct usb_interface *intf, const struct usb_device_id
+ 	if (!data)
+ 		return -ENOMEM;
+ 
+-	data->udev  = udev;
++	data->udev  = usb_get_dev(udev);
+ 	data->state = BCM203X_LOAD_MINIDRV;
+ 
+ 	data->urb = usb_alloc_urb(0, GFP_KERNEL);
+@@ -243,6 +243,8 @@ static void bcm203x_disconnect(struct usb_interface *intf)
+ 
+ 	usb_set_intfdata(intf, NULL);
+ 
++	usb_put_dev(data->udev);
++
+ 	usb_free_urb(data->urb);
+ 	kfree(data->fw_data);
+ 	kfree(data->buffer);
+-- 
+2.43.0
 
-
-Kind regards,
-
-Paul
