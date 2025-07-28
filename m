@@ -1,90 +1,77 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2623021D3DC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 19:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FCC275AE8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 19:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753729922; cv=none; b=YexGP7EyHb5XZ7fLzLHkoL6yzUo+y92yrKgF/LxF21cE4J4IGAP/ofQNXEhCjL0L12T/cgvGoMGkZ6z+0s3yDsULb/5UUh4wsK1Y5Pvp/uhND8JWvHzHp4Rt8UH9b3x+fdBUSAyqldb2O4XAJGP5fUme8iKFRHbtRNyKFuYVQc0=
+	t=1753730391; cv=none; b=BEyH/uhqe/p+zoQ0oculj1i7zsWqYLIQE7GownObfvqYtaUWSZBuRfEb2YdRiO702uAZiGv+SWnUqdm/uSqd8x+FNTCUk/rr+oKrEAdz2dLGCS+E5lc+siWsPFNMN+6ZjI6uMdMP/hYVohVsH7uU3x1hC9lltDMZ3XqcUkH/AZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753729922; c=relaxed/simple;
-	bh=wGrvgIOOVerEF4lGKQ/VosRrH/5eVhNvYTQWL49qFRM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=gc+RF32N0NAKkk00701EhctcAWQCBBDqfRDgs9/0OlVs2S+5z0VOcXC2vdBbfq8fslzu/AeDZUsduYRpSB2NW3jlLyD1dVIVANRMl+9kAvAMHJOXXsCRbESVkL/dPI6rovCU2C9NprLRDsturXD9ZDU/FZiiG0EsrVKCyV24rcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kPyGFAic; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1753730391; c=relaxed/simple;
+	bh=PiAQtmS8aOv8S42itpFxLeTFZeX9Zt4K3OZR+4HoUik=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ngz7ef+t1tV5z5LoBjvtEbkNB1vPNOJw0/esV6PouNcYP0M8oObi0FbDxA92IW0fOllbhJT0u9COPT6hLyPX3eRNou+BqrzXvI47rCQijVsWasN6HhqkJm/xwETkpnppIYvJNPPa836HcJ5uycXA/QBCBWNnwGRy9Z9aWV+Blmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PgCeZj/b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kPyGFAic"
-Received: from github.com (hubbernetes-node-df9422e.ash1-iad.github.net [10.56.197.30])
-	by smtp.github.com (Postfix) with ESMTPA id 49972140B75
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 12:11:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1753729919;
-	bh=B2afibzQx+SHMeytk2X968hQolzCmwgYiFACq7a2Yg8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=kPyGFAicwRXysPFyamIlfzzQQmfCsn6NP/miwR0lyy+iO3QBurdsmZpjjSW64vqMk
-	 wd2kYpj3BacRlhIsEi5yEAx42KWpwkeltk857Et759MA5Ex4ClAr/5yxt14DnhAHgy
-	 zTOVv0HRuneZHORwb+KxC8NTaDwRj1JbQLle6V7E=
-Date: Mon, 28 Jul 2025 12:11:59 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/00ffc5-0084cf@github.com>
-Subject: [bluez/bluez] fd80f2: bthost: fragment when sending ISO packets
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PgCeZj/b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1EEDC4CEE7;
+	Mon, 28 Jul 2025 19:19:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753730390;
+	bh=PiAQtmS8aOv8S42itpFxLeTFZeX9Zt4K3OZR+4HoUik=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PgCeZj/bW8t/G2brOhafwOvfFjY/KkAumhoOsc0icNT0JHyMRaF1l8XrM4vkOq5FM
+	 xFCHPTqnpPuL+KjMoiUIV80TS15SJX4IW3um6bmLoMC8m/G1gYLv0gqz6hAsoG/AKW
+	 851hedigc8qFdnwdzmKY+X/na+RkUObDKOu2XfIllRjtDymyhy7pt/Hq94usLIY2ZC
+	 aa5J+mGP4Qdtslay1jbmSvCoiD3/z0t314/jhQAYcYIMBEFtNUaFqgJtZmE3KarlVh
+	 mdYvJ9MFfmUiy4VS7AJC/3mhXtEUkj5c/kGdXeFlmZtEWkVN+ThxWB+01RmrTZkKBU
+	 Rgmq6PZSDV39A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0FA383BF5F;
+	Mon, 28 Jul 2025 19:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/2] bthost: fragment when sending ISO packets
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175373040751.818107.429360590429365562.git-patchwork-notify@kernel.org>
+Date: Mon, 28 Jul 2025 19:20:07 +0000
+References: 
+ <8b803274627f277cdb987b5ea5695f62247b6d3f.1753295558.git.pav@iki.fi>
+In-Reply-To: 
+ <8b803274627f277cdb987b5ea5695f62247b6d3f.1753295558.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: fd80f2354ead90111dc6a9d9831a7dd1d5aa6352
-      https://github.com/bluez/bluez/commit/fd80f2354ead90111dc6a9d9831a7dd1d5aa6352
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-07-28 (Mon, 28 Jul 2025)
+Hello:
 
-  Changed paths:
-    M emulator/bthost.c
-    M emulator/bthost.h
-    M emulator/hciemu.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  bthost: fragment when sending ISO packets
+On Wed, 23 Jul 2025 21:33:33 +0300 you wrote:
+> Support fragmentation to controller MTU when sending ISO packets.
+> By default, fragment when exceeding btdev iso_mtu.
+> ---
+>  emulator/bthost.c | 102 +++++++++++++++++++++++++++++++---------------
+>  emulator/bthost.h |   1 +
+>  emulator/hciemu.c |   7 ++--
+>  3 files changed, 75 insertions(+), 35 deletions(-)
 
-Support fragmentation to controller MTU when sending ISO packets.
-By default, fragment when exceeding btdev iso_mtu.
+Here is the summary with links:
+  - [BlueZ,1/2] bthost: fragment when sending ISO packets
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fd80f2354ead
+  - [BlueZ,2/2] iso-tester: add tests for hardware RX timestamps
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0084cfe5634b
 
-
-  Commit: 0084cfe5634bbe42b66b37887ed362dc26aed4c8
-      https://github.com/bluez/bluez/commit/0084cfe5634bbe42b66b37887ed362dc26aed4c8
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-07-28 (Mon, 28 Jul 2025)
-
-  Changed paths:
-    M tools/iso-tester.c
-    M tools/tester.h
-
-  Log Message:
-  -----------
-  iso-tester: add tests for hardware RX timestamps
-
-Add tests for HW RX timestamping.  Also add test that sends large
-packets to test ISO fragmentation.
-
-Add tests:
-
-ISO Receive - HW Timestamping
-ISO Receive Fragmented - Success
-ISO Receive Fragmented - HW Timestamping
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/00ffc553a194...0084cfe5634b
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
