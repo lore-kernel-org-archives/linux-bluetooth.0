@@ -1,99 +1,143 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096A513FEE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 15:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4062750EA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 16:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753716760; cv=none; b=caQmbQSzmOs486DOMEOr/eZp8r20eX/UpfIAAVWuB0yST5Hv/dZxUAcajOKLtBI3kbydcCckNKOhuMPSTBD52Z7g82wtRU90R/woBw8VNbb2U5ZkFvyHT+SkB1ReKi9j8qsOjZ2jKxzg3VOj2i1pgA9VYjyzS1bXmWq4FMxHO3g=
+	t=1753718769; cv=none; b=qZN5yZtO4DrEoDrqNc4kSdP7LCCBnlGY6vKQy8tvsBQ+fxacxFSR3AHMGIkDVhJmHT5ToaHvToWwI/57kCzuWHm7V7vfARFIrEFIR5CPzfqy68iAyR15To0J1gtZuiFCAsvLZ9JMxQutHBR3PD5vbEqkErDq2/SXJT4KJgLdumc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753716760; c=relaxed/simple;
-	bh=rseOZvbBEk2jKf3101CvrWf2n43WlkPmkGJPP8j6jWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jTfsobkAAl5Yd+K8GGv1iJbS+E5uxFVkmqpR8IgYvA1++5tlVODEgmjCK4uCOdezvCs6wh2bkHzjka2rKgz0Y/Pom/qctputzoHihIA4IIutyhyGoouH14FElwLjYlrc9IDyY0YTPHbtJFS2CbqKewpolqyIUyw5CnviuSYt+b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CGMLlvjK; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1753718769; c=relaxed/simple;
+	bh=YxY5SvP3jfXoNPFtYQSGKsEXgEdJFVCIWe1s5Fk2C1g=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=n6x/Fu9YUUc6X5SWs2TLrRvPpSZWbWAGSqpMNe7ZQQsJnnu/yCkgRRDhffI5u7Sm3IglxNeyWXm0961MTlJ36/LHFwUAzTso90qjMRTvEud0bewbGT24ISUOa6Zs9hUB7jjNRnnU1vbDV4v8YfYqI9h5tGfkW3UwVfXjepV6ZrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SnXty0wG; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CGMLlvjK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753716759; x=1785252759;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rseOZvbBEk2jKf3101CvrWf2n43WlkPmkGJPP8j6jWc=;
-  b=CGMLlvjK3sKvbclKcM+SKg754EO41nhAcUA6NSgCEffUMYypdd8XRH31
-   JMzcfolN9Cr50HsoYmrcZYc1j/HTZgyTp3d++ITSss45aU5+JcO6CFN6V
-   mj96MLRmXHk0nPbhjzvi8aAmFhK0NWw3dul/na5d5CTaNhfG0VADCG76i
-   5Ow5zPrIVk0RTbmtidVj7LEx/gTBq0WdckOkapP6ew7KozgnaniooNZCU
-   OLCPvxqlrRGlpnOqfiqf+/fzUVhjt1yCNIaz8dHlI5V2p9DT0X4OWqLGO
-   skADvgFn3fDy/2MIiU+r150O8HVjd6nGDjScl7kaFDcjfxJncEXBoNlfx
-   w==;
-X-CSE-ConnectionGUID: YrPKihiRQceLVW5wAUcwOQ==
-X-CSE-MsgGUID: VkJDYXKbR46ESKkuFe31Mg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11505"; a="56048082"
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="56048082"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 08:32:39 -0700
-X-CSE-ConnectionGUID: XZ1x2jsqQOKCglZtirjggg==
-X-CSE-MsgGUID: DF1sCjNdRLGNT0NZX3jdNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="162316868"
-Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by fmviesa006.fm.intel.com with ESMTP; 28 Jul 2025 08:32:37 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v3 2/2] Bluetooth: btintel_pcie: Add id of Scorpious, Panther Lake-H484
-Date: Mon, 28 Jul 2025 21:19:09 +0530
-Message-ID: <20250728154910.1428086-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250728154910.1428086-1-kiran.k@intel.com>
-References: <20250728154910.1428086-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SnXty0wG"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6fada2dd785so42562486d6.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 09:06:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753718766; x=1754323566; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQEf6cF6eiL79RcG77nbJYPYWqJ7690rwAzKhEyDT84=;
+        b=SnXty0wGa6Ztmwsl/AmYCJ6rl/Py1Q46OR0RCt2W5SVtiaKvkfEw+ZjyDEXy8TMcmq
+         oVa8sE6MzRHKMrTnNDXdb1oT8HtQ/978wg/aDoxDHftYU4fHAfXOMbQIdvHY9MpePLap
+         fCIjC+RI9yjRd5m1C14yLXH5SmNqcvrSd+Ld4tdgYrtwZxwsaxgx43walUSAqdRCfaMN
+         +tPGkZ758N0R80Jl16zde1/9afwM/5CdLGA5lsb2vp5YXx6cmYA/z5NOF3VEsw5OVpLR
+         jYc9nOtFi+RAPhsfGkh7Ct0aIBZ3FdieER3mpVcOpsnBDxaQHY9DgrEnQtC0smPk4+34
+         R86A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753718766; x=1754323566;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tQEf6cF6eiL79RcG77nbJYPYWqJ7690rwAzKhEyDT84=;
+        b=gFDalRv7gUMzfQ6OkhtPDwz/1E9Payb7gc9JQ3uaWYoTOWLCWkySSS5aVKZUAt5/Ub
+         WthWjSRztst01xDcoYHH59HkOKDCeYVwL5hmStA3C9ZiFH03Ge+nKNYXHtb2Di7kXIu/
+         diQ7baKYjfQBlAgWXPl0nUdUaTRDdi0qduE1qQzD20s07XGwtLGnOh9F5FWCb6GeFUYQ
+         iXKFW4ob8UDqEfrQcaXxrO8/PTT4hgBM7OX9aD32kMT+EE7ST91Htbvrm6jpECUrHxNv
+         MmtMMqvR5DNVtX2cZlsrQB3XdN58DL/Dvw23jUGweiR0BDQm0bxIvghUpRYgiICrdFgk
+         2opg==
+X-Gm-Message-State: AOJu0YyIS76N+ESgVCEPjHpZ28Tr6wmm3gE2aAeb7msQ5r2xdmednoad
+	oKenkG0+kp+ZD5TEWIjStwCIeZyurTx29B3H9sU0ARi1vHNvbbtwn9sfTDUDoeE+
+X-Gm-Gg: ASbGncthz+Ai77tRct4e/2jtXb2j8LYXTht4Po05tQ/zYQXHTW4DSwGcYb2S2yOj16n
+	CMwexoH+nckjgxH1rigtce0UDcgsBx+tPPcpkL/YIEqlYEiODWtaFAiSKWyO2bXKPs8Ff1kIcyq
+	K1mcvRzmZ1OmHWM14a0q60TU3tcrbdLJpABWu1ekqxXCO4Q6sYBjx8UpNP0VhL9nOT+HpFq6bYP
+	by+CDKP+bx7X1WrDbV+Z1Bkug0x9037l8OFH3hceWjJOWfar+4KvjI737o5GWBXokV2J1EL0hZV
+	NTyj5De7UeHxcNgGV/d66xDRAcT+KMzr3sUhZpLXODsoirPNGjBWejEcVj6KrUkqWrsjvE1vrsc
+	ZXJMcb3zDrl11xM+3cQ4esKy1J1CZXyrayMeSig==
+X-Google-Smtp-Source: AGHT+IGs2CKdnwuZ0qSp1x5zbdy2aH2LbqASVF6g+7VyUtD6cYLRXm8S8Ve0nJfhGsOGkZUEaqg0hA==
+X-Received: by 2002:ad4:5bcd:0:b0:6fb:5249:59fe with SMTP id 6a1803df08f44-707206b2269mr157508736d6.2.1753718765941;
+        Mon, 28 Jul 2025 09:06:05 -0700 (PDT)
+Received: from [172.17.0.2] ([20.81.183.82])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70729c4dabesm33414306d6.68.2025.07.28.09.06.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 09:06:05 -0700 (PDT)
+Message-ID: <68879fed.d40a0220.94a85.f13d@mx.google.com>
+Date: Mon, 28 Jul 2025 09:06:05 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4405334537922226773=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v3,1/2] Bluetooth: btintel_pcie: Add Bluetooth core/platform as comments
+In-Reply-To: <20250728154910.1428086-1-kiran.k@intel.com>
+References: <20250728154910.1428086-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-sudo lspci -v -k -d 8086:e376
-00:14.7 Bluetooth: Intel Corporation Device e376
-        Subsystem: Intel Corporation Device 0011
-        Flags: bus master, fast devsel, latency 0, IRQ 16, IOMMU group 14
-        Memory at 14815368000 (64-bit, non-prefetchable) [size=16K]
-        Capabilities: [c8] Power Management version 3
-        Capabilities: [d0] MSI: Enable- Count=1/1 Maskable- 64bit+
-        Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
-        Capabilities: [80] MSI-X: Enable+ Count=32 Masked-
-        Capabilities: [100] Latency Tolerance Reporting
-        Kernel driver in use: btintel_pcie
-        Kernel modules: btintel_pcie
+--===============4405334537922226773==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Kiran K <kiran.k@intel.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=986466
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.27 seconds
+SubjectPrefix                 PASS      0.25 seconds
+BuildKernel                   PASS      24.39 seconds
+CheckAllWarning               PASS      27.17 seconds
+CheckSparse                   PASS      30.26 seconds
+BuildKernel32                 PASS      26.62 seconds
+TestRunnerSetup               PASS      480.94 seconds
+TestRunner_l2cap-tester       PASS      24.95 seconds
+TestRunner_iso-tester         PASS      37.81 seconds
+TestRunner_bnep-tester        PASS      6.01 seconds
+TestRunner_mgmt-tester        PASS      129.30 seconds
+TestRunner_rfcomm-tester      PASS      9.91 seconds
+TestRunner_sco-tester         PASS      14.89 seconds
+TestRunner_ioctl-tester       PASS      10.15 seconds
+TestRunner_mesh-tester        FAIL      11.47 seconds
+TestRunner_smp-tester         PASS      8.68 seconds
+TestRunner_userchan-tester    PASS      6.32 seconds
+IncrementalBuild              PENDING   0.65 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.082 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btintel_pcie.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 8f02c27bc544..c0c3e17a4fa4 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -37,6 +37,7 @@
- static const struct pci_device_id btintel_pcie_table[] = {
- 	{ BTINTEL_PCI_DEVICE(0x4D76, PCI_ANY_ID) }, /* BlazarI, Wildcat Lake */
- 	{ BTINTEL_PCI_DEVICE(0xA876, PCI_ANY_ID) }, /* BlazarI, Lunar Lake */
-+	{ BTINTEL_PCI_DEVICE(0xE376, PCI_ANY_ID) }, /* Scorpious, Panther Lake-H484 */
- 	{ BTINTEL_PCI_DEVICE(0xE476, PCI_ANY_ID) }, /* Scorpious, Panther Lake-H404 */
- 	{ 0 }
- };
--- 
-2.43.0
 
+--===============4405334537922226773==--
