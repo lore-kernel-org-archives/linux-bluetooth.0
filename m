@@ -1,69 +1,68 @@
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EF3275864
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 17:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F142279918
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 17:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753725512; cv=none; b=sA+72DZMJj3WKgPUb47rsn1kiYrxksqlXYZJGz/+va0UZqwld5VkdITVoYD9Qs28774T7k+Sr8AL37xO5lPhvnmBE7w13iv565DDld3RUPeKzGn4m09YzFsQXW9A2aPGC5uK4dH6LM1JiJVHYD+5aBjWvEkOhT6QVJVXisdP35A=
+	t=1753725514; cv=none; b=RhU6UtmtH22pSaDaNJ0Kn5uzW5dNPsTvuv9uGLKjJrI1JkFr6yuHaKsMXAr0L2R7mXQggwjXnJUq+qyTNYH5S1Q8hO0cX/MTQX86AFYQZ7Q5fBTJc52c6vhhSp9+8WpZInCtLoeDTLyBaMYgseRFFuBcY9gM5n38NOGnujCyOPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753725512; c=relaxed/simple;
-	bh=NEd2Tf7H49pgHdO7rdrsVzn2xK7WxrmVg/NGQzOuJu8=;
+	s=arc-20240116; t=1753725514; c=relaxed/simple;
+	bh=Oqou2WzDRfdfjEeGo8nPmezYJyIJVWvwR4YmWPmq4WI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i5yC6+/XvVajCVgd64sqy07DsGdi8F2AYj1Pk0eVvh5UXHc2l22YDKVWv8MAinZePvRVB7Wkwem1QZ89Fg8DwWRaqTji5Q0M4/WCre0ARpfE5DZiudm5n5tWsd4BwGWDhgX+SX711wN2htx2gbz8XhPGI2SmguoW81IBemCo8WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JaCsPmdo; arc=none smtp.client-ip=209.85.217.50
+	 MIME-Version; b=Dbh1TkbjSK++aeauwiovfx7G5AI3QCz4O0h7px92Z/tnAqA2HzSVn/1CPGw5bNGKK3s+jrR7N8e2c0Tn2fHPHSnPlWrNBejR+kX2LUhHcEyjAWXFmDE0+wVKfm7suH2M72bLlwT0+7JPyslui25phdycRTfEMnpnVOE7zVGoMBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhIBsmnW; arc=none smtp.client-ip=209.85.222.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JaCsPmdo"
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-4e7f38440fcso1344674137.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 10:58:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhIBsmnW"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-884f22f9c90so1359904241.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jul 2025 10:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753725509; x=1754330309; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1753725511; x=1754330311; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=66s/I0IDDRgdBaXz+fBQqyoKsm1eef0GEc1hdRHWyzY=;
-        b=JaCsPmdoEM8lW+gOwi1X98FX8i40hD1ioT1h24+HRu2sxBnTU9eUkoRCqyBHKQkFdH
-         92SuRhAhohgqTcqzesRms9iTDqECqAalIb27z6efcqvexawkl4AEBdR21otdz25HVsDx
-         cC2ZR0TGjt2un+K5otVmaegtKYiJFxJ4xRTxp+1y0ft3YJipN3GTaISpjOLtUh23DaYc
-         pnvjrARZDr8IqigZ/e79rraHECc3qIctyzbHaXApsnRXNeF7eF/vsn2L3Z7BVYNahC9T
-         DYcKpUtJMc3WQbsBKjZQEfyUwMEeM4ntQG2hfl0OGCQpMEVYpZx1LvFXCi6Y74ggxUJ8
-         lQYA==
+        bh=9FFb97GSV/X3/LHfN4XYeNCb3U7KTCo6t5xV8IWQixw=;
+        b=OhIBsmnWLWVPo2ko7CiMi4P4syxnRAtZ9kVN/JvDA3UacBHvBaYzIdFbfLzI2Ei2+2
+         78Kpd0aL+zFg+ztO71MmSJ3B/gkMm/v3VeVcLASb+VZa4qzIc85018jJ0Grc6pOhNO+2
+         cN6PMZNpgXDsj9DdbteFCXZBuIrb2ss1L9DxgnMg8yUe2ZMXSM9aiwPd1s/LXyuwKxV8
+         dTTQVM1hk6aswkIKiBntj/ROM+/SOBdnz6pXVWvyKWIFVh9g3PPjb4+Ni/sMh0WQEeZu
+         l3q+iQkYio33JiUELmqWgbD9KcmQSRT4jqjYUQUL2xYxnIdaI3hwSrK/RC+GK+2qIK8L
+         Hd7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753725509; x=1754330309;
+        d=1e100.net; s=20230601; t=1753725511; x=1754330311;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=66s/I0IDDRgdBaXz+fBQqyoKsm1eef0GEc1hdRHWyzY=;
-        b=lToajedvnkrwy6/XkXwtdW23S1Q2VcHNrj3hrmliRTRjaWCgHwqEmtyBQZ4qolNSwX
-         jmcMboAGZnD6abRJNVJbyldsFs0qDl5TkovXwGWjBxRlC+FxXPphRwhCUTPz7HM5ZTPB
-         z25y5Sjwgeq0dvkDYLVooMHAhNDh1fzaNbqz4rL+Sh6bP2FnALTXgIPtLPzJI20+ERxL
-         d2nWtW4FTJ+XriIdIbSY+sZL9TisXMDQCyXSi7VjSTevdc0ckgEqX2DK5fP7i0jnxY+Q
-         Q6jCRARIW9tPTetoTMnMWxV0IUX4y+fbbYjS1a4ryUfgAl1g+bwl03UA2XEmq1GUo8dz
-         18EA==
-X-Gm-Message-State: AOJu0YyAeEeLktQ7hoRoUquUH7KkhGmbMRFpak2Nnubi013Uo1tewN9z
-	pa7+3AaqwLlUDwlm2B4jl0mdh6i4RKHmN3hrzZAB4YytmfOWrCN1+cqXerBslPbp
-X-Gm-Gg: ASbGncsW/n3weSgZvcwfwgDTWxNKMZo4LbnyhloCNC/KIfyddA5kM/HTcGf2wi5Ptzw
-	EGtwLAb6jtVGqOfR3O1S0iCpAkgGiRmDEiZV1xkZAq1yMyNWGTWAshOk8C83+52/55pRXxCAOk0
-	vu84EZf+DoIG2s4DcCPLk1jPjJA4k+QgqjB3f8kZl+nHkTpyCnHjkZ7/g+DVjl2rp4LWYSAZCRG
-	cU38vPkES4mOiVhHg7v9taXa9T0YscDDP+x9BC56jNOVRYE1hEiH9DnwDbgYE7hJeycA+9XB3Yu
-	Q4arkPIN0eHsCzviC1K+mAIcOgIWHSyBP+fMV4E13NBmNwaB3CM+1X6c49QUyr4en51//H3MF1P
-	Czwo8iBrcoGnlEcwmvnTkwRCPqFiVq0Jv4nxFnStwy3HeT9QHaaLC7y5lO/aLpg5TilXHiLFf5O
-	E=
-X-Google-Smtp-Source: AGHT+IHCLPE6vQUh1H15t7n+SsJNhNipJqclyDNwfZ9cQZFjI683AaTAXhlfb6oo9GjveT7Q0oL17A==
-X-Received: by 2002:a05:6102:dcc:b0:4e2:a235:2483 with SMTP id ada2fe7eead31-4fa3ff38660mr4949860137.19.1753725508590;
-        Mon, 28 Jul 2025 10:58:28 -0700 (PDT)
+        bh=9FFb97GSV/X3/LHfN4XYeNCb3U7KTCo6t5xV8IWQixw=;
+        b=apzqqmTnrnLc0ed/MrbbjxqkBrZOr0iumi2y7fGeKR/Pw1lm9KxD/w3/t/Xj8bmVrD
+         L0eJ2/T9ovmRxX6Q/WqGp2Vy5oaVVEvBjjQggp4OXKK3B/xquAWA+acEXx/1DHQAqiqg
+         WC8MQiU5G2csjPHheUEQKt/dHQYZNWgV+r1V7cAAdOgG93STg9wb0lkssZWsoOrdQpGe
+         aKOW1YsiEtPU/36h/hUIc7RnEPWukxapTDN2xNpYvsUaNBR4P4SwPqBzYgQR3WJA+XnF
+         85ty2V4hoffMd1cr4wENFPyBFDAdektHSG4jfIRrjXoWqW1XMNsRewt/8O07KegOwXb2
+         TgWA==
+X-Gm-Message-State: AOJu0YxWGg9XZcrhcAxo3j4qHLbPT6O+/ETTLIwptmTjppfGu51vlOgP
+	3CVwQ0w0JPd0vFXFJ4o7/0jLZ0dw9YqENFaKBh7UdTIRzYqEFfeIpD+jJAceIMwi
+X-Gm-Gg: ASbGnctcb3hvT0+rueFwG0jvbcShCJ4t/lHebjPFlLV2bIyZF9NmpbLLKThgH0W+ZSq
+	bvgW/aJTQVmnE1l7S2cj6GJIrWsjF5DpjVl4gRFzMNGqFqlgiaW1/f7sLWrNgtZhXNPq4zky2bw
+	rg70QGvfPTc71dPg+ugXSexP4O7i2lJRgvedi0oXwPlwrPIJIb36lq8N2WSoXUKjU8pb3NN4hUT
+	n4Ozz+RmvU7PJlUjsSChi1br24B+L7kKNrWKGNrAD/a3El1wdWOwbpuJtNu8z9LrYe87faPYEKO
+	muDCSyRuaDPUM1oQCkJA0hDVPv8drVPZ6BnRN3qMOHE/wRXVMpXDXN2LhSI2wGVNJthw3xywreR
+	Jwc81IAm8URQDbUhZma3Wa1Z33yrOMWOCOZSZCxFtljvfYKoBq+rt47aknn/FFoEe
+X-Google-Smtp-Source: AGHT+IFoV5TotUkXfJOA3vDRisxQmNJlrG6WOmulwF9ZPcDiYl/y82bVZHsUsT3IDmAvTB8nAGo1uA==
+X-Received: by 2002:a05:6102:3713:b0:4f9:6a92:8232 with SMTP id ada2fe7eead31-4fa3ff0246amr4061374137.27.1753725510765;
+        Mon, 28 Jul 2025 10:58:30 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-88b8de03ac7sm1393940241.21.2025.07.28.10.58.26
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-88b8de03ac7sm1393940241.21.2025.07.28.10.58.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jul 2025 10:58:27 -0700 (PDT)
+        Mon, 28 Jul 2025 10:58:29 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 2/3] Bluetooth: ISO: Fix getname not returning broadcast fields
-Date: Mon, 28 Jul 2025 13:58:15 -0400
-Message-ID: <20250728175816.850399-2-luiz.dentz@gmail.com>
+Subject: [PATCH v1 3/3] Bluetooth: hci_conn: Fix running bis_cleanup for hci_conn->type PA_LINK
+Date: Mon, 28 Jul 2025 13:58:16 -0400
+Message-ID: <20250728175816.850399-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250728175816.850399-1-luiz.dentz@gmail.com>
 References: <20250728175816.850399-1-luiz.dentz@gmail.com>
@@ -77,29 +76,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-getname shall return iso_bc fields for both BIS_LINK and PA_LINK since
-the likes of bluetoothd do use the getpeername to retrieve the SID both
-when enumerating the broadcasters and when synchronizing.
+Connections with type of PA_LINK shall be considered temporary just to
+track the lifetime of PA Sync setup, once the BIG Sync is established
+and connection are created with BIS_LINK the existing PA_LINK
+connection shall not longer use bis_cleanup otherwise it terminates the
+PA Sync when that shall be left to BIS_LINK connection to do it.
 
 Fixes: a7bcffc673de ("Bluetooth: Add PA_LINK to distinguish BIG sync and PA sync connections")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/iso.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_conn.c  | 12 +++++++++++-
+ net/bluetooth/hci_event.c |  7 ++++++-
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 7bd3aa0a6db9..eaffd25570e3 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1347,7 +1347,7 @@ static int iso_sock_getname(struct socket *sock, struct sockaddr *addr,
- 		bacpy(&sa->iso_bdaddr, &iso_pi(sk)->dst);
- 		sa->iso_bdaddr_type = iso_pi(sk)->dst_type;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7d1e79f69cd1..f8b20b609a03 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -830,7 +830,17 @@ static void bis_cleanup(struct hci_conn *conn)
+ 		/* Check if ISO connection is a BIS and terminate advertising
+ 		 * set and BIG if there are no other connections using it.
+ 		 */
+-		bis = hci_conn_hash_lookup_big(hdev, conn->iso_qos.bcast.big);
++		bis = hci_conn_hash_lookup_big_state(hdev,
++						     conn->iso_qos.bcast.big,
++						     BT_CONNECTED,
++						     HCI_ROLE_MASTER);
++		if (bis)
++			return;
++
++		bis = hci_conn_hash_lookup_big_state(hdev,
++						     conn->iso_qos.bcast.big,
++						     BT_CONNECT,
++						     HCI_ROLE_MASTER);
+ 		if (bis)
+ 			return;
  
--		if (hcon && hcon->type == BIS_LINK) {
-+		if (hcon && (hcon->type == BIS_LINK || hcon->type == PA_LINK)) {
- 			sa->iso_bc->bc_sid = iso_pi(sk)->bc_sid;
- 			sa->iso_bc->bc_num_bis = iso_pi(sk)->bc_num_bis;
- 			memcpy(sa->iso_bc->bc_bis, iso_pi(sk)->bc_bis,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8aa5039b975a..4f0a6116291e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6957,9 +6957,14 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 				continue;
+ 		}
+ 
+-		if (ev->status != 0x42)
++		if (ev->status != 0x42) {
+ 			/* Mark PA sync as established */
+ 			set_bit(HCI_CONN_PA_SYNC, &bis->flags);
++			/* Reset cleanup callback of PA Sync so it doesn't
++			 * terminate the sync when deleting the connection.
++			 */
++			conn->cleanup = NULL;
++		}
+ 
+ 		bis->sync_handle = conn->sync_handle;
+ 		bis->iso_qos.bcast.big = ev->handle;
 -- 
 2.50.1
 
