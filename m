@@ -1,73 +1,73 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C240579C0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 13:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191B829D0D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 14:18:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753796975; cv=none; b=pxEmB295B1xKX6KR9wrGiTGKi8TqSnPQpXArxzmdOq3Pg86upL0RbGoTJldJqMN4yGDMXkI/lqDLELCEaFlADi1Kp2BefdoBY8Og4k9bNQHBPExiKYGhlwhdvLjk2ZorqzQ0C/P2Nh62gllQcSiPJOtgDhGeOzoqxbWbdKUF/tU=
+	t=1753798703; cv=none; b=ksDwTOBStOMfnYZoDDnwcrThVH0fYqpoR+PzQEfI4AoCjcfU9XiWze9c9RV3kSRe0nJMjYOc8oVklLyTP6hP0HPaf3LXugmNKW5+D0nDCzXGs3/HLU9PN5yhZbDEF/PFNwSlWEGQlIjtVvxcIo7PuRf8IoUDsuHFz9ZKdIbwCq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753796975; c=relaxed/simple;
-	bh=VfKnjou+066uF1ipQsFzTRaGUjEzbSzGV7Vb3Y+JU44=;
+	s=arc-20240116; t=1753798703; c=relaxed/simple;
+	bh=2q83QnAPZfpFgPafBP7XU6Up/noCHicxS0L2OSGBamM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GQfcZ+942TjtwQ0Bb7Do3KzI7E4js6mbi4MJifD9GArODhTNDtWW9AkPDSawqiRQoejWXY5u0vuxC1mRUVnj4ciakb6nfw4iEhQmMWsoxUkVDm/0BK2+kXfl0pHDNNF6344Ckqe3fvKOnaQaiIz9jLD5g/+SHmPytzeHnpqiKO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jCclWLMv; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:Content-Type; b=SRiNsJYICLoXewD5Y1xQZkTtRBFdEUA2x5VB4Nf1GTEK+yZcgXwuDgm3AKFdjdFBuLprQffzO1aovFnvZ4Vu7dJ2Jzg4GWECfefbaG/t5toI2Vm5Swp4NxOi1TQqldtR+HtPFSVciBpqHRsftNbMbPi444tgqvaw1NbC38vnQG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FxX5+zQS; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jCclWLMv"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56T9fRrZ017653
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 13:49:32 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FxX5+zQS"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56T9e9sa006654
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 14:18:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	61kk5jNvxyOz0SbCumRr64fLpCAMGc4bzaNs2SIldko=; b=jCclWLMviM0feQbp
-	acEOIJYxvSXPmqSbEO1+zcuhurtEkzfVmDQFQMaw2tRLwelECTUGlYgpUmyczrGB
-	UxFL2KaiYFoaoZlfIcDOiZ1FkUkLZ6izeyDG2o8oft2NKGzPw+Sa9Mb/6twEGTpK
-	4M2Ip/O3O47gq/o9ZGatSgOa5jPV4I4/s17fTEiwXG0fTGUv51lCpFcwbJzfEskQ
-	y0M5+ZhXFvSbZKOWAWKv37cOzHJ0A25+9gWSxaIrA0p5ce03XetpY1LzUyi/g50s
-	NHFYWVnahaB8cZa7cu9njRasugeGh+SNb6BdQd2W2l8ZPdO+y3z83VOA/s+zeTki
-	jgf/iQ==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 484pm2g74v-1
+	uPJzTv/LsbZH/DP7GxqrDBaJiP6VaHmRqwcYKmkvw5s=; b=FxX5+zQSKgQwSpee
+	DKs21uj/O5Lev5GgRujGmcE/cCI0YwWEKXcUavyVuNxsaYJKN+dx3KBr56Fu2x5p
+	SDhX7uxRHUcBlLMNmozeAa6hXE/KZ+23T+kexG/KW5558LVCF54WJsFoGIdf2u0t
+	en4z+rNyS80nEO69dimXS/O6rVik4Z3ggvlryiE8PvfjqpDyvJWlPM2yt3CeeATE
+	uSCW9UdRYD5p2g7GTM51YNe87BZbvX4DvC12GtK/5mnBrIkitYgfTVSFjFQtsoxv
+	7KVPMlBymws6Lhjryr8SmkDsK8JtwZuE1/5RQXYCImlohoiukd1TChEGCbDH/CC0
+	6ACgbQ==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 484mcr8hw6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 13:49:32 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7e33e133f42so115040185a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 06:49:32 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 14:18:20 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7deca3ef277so114300585a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 07:18:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753796971; x=1754401771;
+        d=1e100.net; s=20230601; t=1753798700; x=1754403500;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=61kk5jNvxyOz0SbCumRr64fLpCAMGc4bzaNs2SIldko=;
-        b=QK6fkH5rZEbyzz6tgSE2ACQiRpuuwhVjut7x1Cgpux3QoSm45RgQfCZZEAfkAbtyYx
-         lGhiedmUuX98VNtgK6BVm6u/GH/A1nqQFfeVP7kZ1HYe8lLtl/J+uUMQFJCF072kMkx4
-         oigBiJ6Wr8EhAMhpLv2DOAW5KW7toW4k+cC01U2ah79zzyASW6NdPQd/0kL0KgE6z2d0
-         gRsqLmSEBrzouFZsq+kyaNKMvtSMJTInBcUDjzP+9JtJpPDEaHZkhv2C+A6abOuidffc
-         GOxkamYFdQksBxFw2F5DsPq7x2qPK/dse0k8BuRXtyKTru0m3ah6h22cObfHQVTBg8jL
-         rdlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5XMtCb6kqZ3RLeAUpiKZlo1kYhwkyG8YnVBs9Cl1YLgHYcOLBsxdm7I0hvEbQryKnDCQoCq31xdr8sqsipLk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXSqkGbSeBSSTTA1uzofRs85/ieMgLQkbLUvDcZRB3E4Fpzzi4
-	2Faj7t+wl32ZJ40Pm3VojMrkEbaYp7nbBtPf63yblyGryd4M9BMeX+lyQU02+dhNneFG0zpsz0U
-	P3xW/FsrwEjWtPVz4ZHfc4h1yDW0KATvDocsI8X9ARVfLrjUYMm/hM2i1U56YhX0yYERRsf4=
-X-Gm-Gg: ASbGncvwVgh4SfjV56CXGW/geBHE1p4USQdxGXDThEtUg6KBznbsMHvhA+8LRqd8Ywz
-	hZK/ZtoTmB9WweAk/Y0HtH5rWmE4E9O/2crS2dFiqReLetB34Gpn5tcl0wTLTHaxC8MNgke9jYk
-	sZAmQVSLcZ/+tFbsSEulpC6nBb1ikLzhmwl23I7uSNAyHy29A/fptm1SJaoU2OB6KGuJTdpU3g3
-	IYXRL+p4k600wkoFIMNeC9WVzpp6GbPgke/2/wKv7xgjBeGTYzTdag54AdM83WoGzbYv6BZ0gPG
-	BrXj9TVnAbfsz5TuoHH+XZJZmS/mKWAWyUJijTM6ctXENw6x3YD5rZxUjHQfnSW4x2tKkgMkxIY
-	QerYrWXgaTyf4THrTRQ==
-X-Received: by 2002:a05:620a:40cb:b0:7e6:3c4f:fff with SMTP id af79cd13be357-7e66d4b1af0mr5516085a.3.1753796970969;
-        Tue, 29 Jul 2025 06:49:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/cjxXB3TqSvv6mMYVyunIjlcclP8mBW4l0J7rAIH3yOPfz1ez6vZZCzhqpworKGNcU2JTWA==
-X-Received: by 2002:a05:620a:40cb:b0:7e6:3c4f:fff with SMTP id af79cd13be357-7e66d4b1af0mr5514385a.3.1753796970480;
-        Tue, 29 Jul 2025 06:49:30 -0700 (PDT)
+        bh=uPJzTv/LsbZH/DP7GxqrDBaJiP6VaHmRqwcYKmkvw5s=;
+        b=nrDYTzfvGRiMgScuGXX1kOXuTPKP788sejQvYoMvgyPeK3Z/qepzFNyy3k2wOreiQC
+         w0LOt03mUT2c1/7dUS4uNoAXDxZ+9+4WfYSFmxjhsciha5+5SrnUFeAe7ItnTvKojOJL
+         kW1QaV1f5SqOpNNDdDiqW/fjz0luN2FFnAAX7dXso2iZ2nMC4tQmq+Uc/duL6Axjq9Hb
+         8PQWamYyQ0/P1bT7yfye8Ih6GeJdn6jcaUwoD/IdcHJ7J2qZB5+Z6Ze8gd9yAm6sKUvD
+         KYAtPYAVxBJi+ejOF1/OpY+ZlVYl6sMIq706FG4hD4v76/dM5HV11LjNhWlI2uVzb5Mf
+         c/Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIUs3sFPx+awfPVdMejk48IktCPhlfhEGs7VaUDbZtZ6NGy06Bn4iekziK6ALFqfKcueAn2RyqGX7r819eFnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd9m3uSR5DKq8XWpT5q5wm2YDtzbzVO4IqOppL+25Bc+M+0VGz
+	fmwk836x6ZGUqheMEaHlpfLV1e0RSvmAy4JE2LD5pEI+FU9sX+VGGtpUyAb0UTXdbw5PtB3yAvZ
+	+WGI+xFb8+twoBVYrlEdmEOz7r3n4MTdjIY4fkB7cahiqFGsZ4l/2oJGbBTbvUgJZ3ZVceeI=
+X-Gm-Gg: ASbGncvYaTNJPtTGuBqQNM4zB5vuBT0L5v0ZS8SVd26Psyp7BHIEzV7fwmW1J2Pxpt6
+	q50VQOlsWh4zK1LVZRBXsd1y5Ci02KlsQkaYnsJ9bXaJwzMh0EXIGuDuin1I+HE+7xstq0ejnQE
+	Mzcz9yauKPfPFVBZhXK99ww146h9X8dyRpD3IiA+uprcAL2xXlTnmtQlZypKKvOKTqT6e2iQzFe
+	ZTwwZ79PyELZycb0i+Wka9/rC+ov/4YC7NnGKUkqSMaYZtGNtJdwyHRWlB+hnQEdrtNxCtgaprQ
+	GU1XH8vJyQqVg9rLX6bhhXM1BcavDYSvndo7mja6mW0Ahx1TjUi4j2qfMDq4tBsjBnHgUyBNcGm
+	WYSGN3xRq19DzaUK6Dg==
+X-Received: by 2002:a05:620a:2544:b0:7e6:67b5:f92d with SMTP id af79cd13be357-7e66d4ee20emr11556185a.6.1753798699844;
+        Tue, 29 Jul 2025 07:18:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHNcpUDTrukrGA/Ku3+zfham3Jn5WZovcxGRPs2Xx7mhoe+YWNAI0qwzjx7TtdhTwzEwh7/Tw==
+X-Received: by 2002:a05:620a:2544:b0:7e6:67b5:f92d with SMTP id af79cd13be357-7e66d4ee20emr11552085a.6.1753798699019;
+        Tue, 29 Jul 2025 07:18:19 -0700 (PDT)
 Received: from [192.168.43.16] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af635a63121sm589037166b.67.2025.07.29.06.49.28
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af635adb093sm595797166b.124.2025.07.29.07.18.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Jul 2025 06:49:29 -0700 (PDT)
-Message-ID: <489a1c80-e7b6-48ee-bee1-76e32a72a060@oss.qualcomm.com>
-Date: Tue, 29 Jul 2025 15:49:28 +0200
+        Tue, 29 Jul 2025 07:18:17 -0700 (PDT)
+Message-ID: <341a7e85-9d4e-4ac8-8fa1-1000281eeed9@oss.qualcomm.com>
+Date: Tue, 29 Jul 2025 16:18:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,236 +75,138 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] net: bluetooth: add callback to exe l2cap when
- read_security uncompleted
-To: Shuai Zhang <quic_shuaz@quicinc.com>, linux-bluetooth@vger.kernel.org
-Cc: quic_bt@quicinc.com, linux-arm-msm@vger.kernel.org
-References: <20250627030229.1720287-1-quic_shuaz@quicinc.com>
- <7a823b6d-767b-4777-8db0-761a2d0e09be@quicinc.com>
+Subject: Re: [PATCH 1/3] driver: bluetooth: hci_qca: fix ssr fail when BT_EN
+ is pulled up by hw
+To: Shuai Zhang <quic_shuaz@quicinc.com>, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+Cc: quic_bt@quicinc.com
+References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
+ <20250715051618.724475-2-quic_shuaz@quicinc.com>
+ <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
+ <e7e700e4-e87c-4e2c-8df1-634870ba91b2@quicinc.com>
 Content-Language: en-US
 From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <7a823b6d-767b-4777-8db0-761a2d0e09be@quicinc.com>
+In-Reply-To: <e7e700e4-e87c-4e2c-8df1-634870ba91b2@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: l_iLT9f8ZjENfV18Fh9G1i2V15zs67CV
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI5MDEwNiBTYWx0ZWRfX912zjiVvZ+gj
- HyBy40XbF/Q77+ptlcoluhs/lboy8kE4iRTvyuBcq1YBcfeBGeoFSDFB7izeUrcgNHt8YUji6RO
- J4p7P2bRWwW6mus5CN+my8e6TbSPlSSIFm1BJQJ51VuvNyNx2Yf5p1XvgUonDcEu4N3+3Bvnqb0
- Pnk+wgn5PPyAN1HlyAKJ+rz7fPyn0PLlRI7hreAwQseFuc9S/RLiYMI/SR4/PbAzD8HP6czcXHR
- PV+lKaw6an30jK49aCKKSkd7vhoodmHd0Y+JImUsSe2PDavj/6o0PNN1rhDFU5R7myWFW7sRFkK
- Eid1rHX3waD3n7QKm1ONiV1rbtm6sPHK2EBeeGBtyKECvRxBZ//Q9i5P11iSAAeYZb+0Z4fiMJK
- uiPnT7xlBnzhUbVFX7dD7WGWnYqCYMYlMtp6CwHhLoTueQ8GvdtE7ID9YTt5PeA3U5RuqsDK
-X-Authority-Analysis: v=2.4 cv=HfYUTjE8 c=1 sm=1 tr=0 ts=6888d16c cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=Dei6p5SHAAAA:8 a=pGLkceISAAAA:8
- a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8
- a=COk6AnOGAAAA:8 a=aDRfdkeckOnu_uhJLj8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22 a=M-Yerj1wOn-OpK7r_3ei:22 a=y1Q9-5lHfBjTkpIzbSAN:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI5MDEwOSBTYWx0ZWRfX67Cc8rsVri8b
+ pRr9xrUatwQSDCYHqsGsNW1Q0iw4LSn+5zkAUUlrcow5dQ5KesiqDjMukTXppFK665aAnYO8qyI
+ b/FyUf5Xt6oNa09+zYMmK2ENKbw+96hUCcWM6vUv1eXBigoScb2Nt0U0nWs0rBAHB/2kZEL2tpG
+ VIDQKj0wMXseIr+ZOp3dsZh7U9Z9VEcv4cF7OMmWC3D/fyyxaEzJ5tO7K6b6tI3MHAY1mabmXY/
+ 5nW+bIM1U2uJ6ifxCG4gTgEPoEwDkIZJsjsAHrtgN1meQRTOy1GnYaU6tckU5zkeLiGkPE+VFGj
+ ecA6KMDB4buHbmZe381O5cJqQL+FPexShAV9lGyoOkY6rXj6Xb1edz2XxMIbOjBoPvkIN/nMRGX
+ ekBKjEDqGEHJ0xHLieNFRseH3OAjrqRKJ4ACou7KnhQ/sqmcd43Ovl02i734CjkYwE4AsJmd
+X-Authority-Analysis: v=2.4 cv=Hth2G1TS c=1 sm=1 tr=0 ts=6888d82c cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8 a=1VU-nOPUZsXZC3zCpdYA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
  a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: l_iLT9f8ZjENfV18Fh9G1i2V15zs67CV
+X-Proofpoint-GUID: 8vMJ6E-AgEZAtklJ2bZn2fBsi3kWN50y
+X-Proofpoint-ORIG-GUID: 8vMJ6E-AgEZAtklJ2bZn2fBsi3kWN50y
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-07-29_03,2025-07-28_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 clxscore=1015 bulkscore=0 suspectscore=0 impostorscore=0
- spamscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999 phishscore=0
- priorityscore=1501 malwarescore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507290106
+ suspectscore=0 phishscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015
+ spamscore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507290109
 
-On 7/7/25 9:21 AM, Shuai Zhang wrote:
-> Dear all
+On 7/19/25 1:32 AM, Shuai Zhang wrote:
+> Hi Konrad 
+> 
+> On 7/15/2025 5:11 PM, Konrad Dybcio wrote:
+>> On 7/15/25 7:16 AM, Shuai Zhang wrote:
+>>> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+>>> This leads to reset command timeout.
+>>
+>> This is a description of what goes wrong in terms of the code of
+>> this driver, and it doesn't explain why you gate the code addition
+>> with HCI_QUIRK_NON_PERSISTENT_SETUP, please share more details about
+>> what you're doing, and more importantly, why.
+>>
+> 
+> The problem encountered is that when the host actively triggers ssr 
+> and collects the coredump data, the bt will send a reset command to 
+> the controller. However, due to the aforementioned flag not being set, 
+> the reset command times out.
+> 
+> I'm not clear whether you want to ask about the function of 
+> HCI_QUIRK_NON_PERSISTENT_SETUP or why the changes are placed 
+> under if(!HCI_QUIRK_NON_PERSISTENT_SETUP).
+> 
+> Regarding the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, 
+> you can refer to this commit. 740011cfe94859df8d05f5400d589a8693b095e7
+> 
+> As for why it's placed in if(!HCI_QUIRK_NON_PERSISTENT_SETUP), 
+> since HCI_QUIRK_NON_PERSISTENT_SETUP is related to BT_EN, it can be 
+> used to determine if BT_EN exists in the DTS.
 
-(Please don't top-post)
+What I'm saying is that you should put this information in the
+commit message
 
-It would probably help if you included the maintainers in the To/Cc
-fields, so that your email can actually reach them
+> 
+>>>
+>>> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+>>> ---
+>>>  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
+>>>  1 file changed, 12 insertions(+)
+>>>
+>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>>> index 4e56782b0..791f8d472 100644
+>>> --- a/drivers/bluetooth/hci_qca.c
+>>> +++ b/drivers/bluetooth/hci_qca.c
+>>> @@ -1653,6 +1653,18 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+>>>  		skb_queue_purge(&qca->rx_memdump_q);
+>>>  	}
+>>>  
+>>> +	/* If the SoC always enables the bt_en pin via hardware and the driver
+>>> +	 * cannot control the bt_en pin of the SoC chip, then during SSR,
+>>
+>> What is the "SoC" here? Bluetooth chip? MSM?
+> 
+> yes, Bluetooth chip on qcs9075-evk platform
+> 
+>>
+>> What does "enabling the pin via hardware" refer to? Do we ever expect
+>> that a proper platform description skips the bt_en pin?
+>>
+>> Also:
+>>
+>> /*
+>>  * If the..
+>>
+> 
+> Sorry, I’m not quite sure I follow—could you clarify what you meant?
+> Here is my understanding.
 
-When using the b4 tool, you can simply run `b4 prep -c`.
+The comment style.
 
-Please resend this patch and add these emails:
+> 
+> Enabling pins through hardware refers to "the pin is  pulled up by hardware".
+> qcs9075-evk platform use the m.2 connective card, the bt_en always pull up.
 
-Marcel Holtmann <marcel@holtmann.org>
-Johan Hedberg <johan.hedberg@gmail.com>
-Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-"David S. Miller" <davem@davemloft.net>
-Eric Dumazet <edumazet@google.com>
-Jakub Kicinski <kuba@kernel.org>
-Paolo Abeni <pabeni@redhat.com>
-Simon Horman <horms@kernel.org>
-linux-bluetooth@vger.kernel.org
-netdev@vger.kernel.org
-linux-kernel@vger.kernel.org
+This is not conclusive either. Does the firmware of the bluetooth chip
+configure the pin, or is the reset pin connected to an always-on PCIe
+supply or similar?
+
+> 
+> 
+>>> +	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+
+At a glance, they're only cleared in qca_setup(), regardless of their state
+
+>>> +	 * This leads to a reset command timeout failure.
+>>> +	 * Also, add msleep delay to wait for controller to complete SSR.
+>>
+>> Googling "bluetooth SSR" yields nothing, so it's fair for me to ask
+>> you to explain that acronym.. it's used a number of times across the
+>> driver, so perhaps a comment somewhere at the top in a separate commit
+>> would be good as well. I'm guessing "subsystem reset"?
+> 
+> Just to clarify, SSR is short for Subsystem Restart
+
+Please write it down somewhere
 
 Konrad
-
-> 
-> On 2025/6/27 11:02, Shuai Zhang wrote:
->> When the DUT receives a remote L2CAP Connection Request during the Read
->> Encryption Key Size procedure, if it fails to complete reading the
->> Encryption Key Size while processing the request, it will respond with
->> a Connection Response – Refused (security block), resulting in the
->> disconnection of the remote device.
->>
->> Use HCI_CONN_ENC_KEY_READY to determine whether
->> l2cap_connect_request is pending.
->>
->> When l2cap_connect occurs before the read_enc_key_size event, it will
->> be pending because HCI_CONN_ENC_KEY_READY has not yet been set.
->> The connection request will be processed once the read_enc_key_size
->> event completes.
->>
->> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
->> ---
->>  include/net/bluetooth/hci_core.h |  3 +++
->>  include/net/bluetooth/l2cap.h    | 10 +++++++++-
->>  net/bluetooth/hci_event.c        | 16 ++++++++++++++++
->>  net/bluetooth/l2cap_core.c       | 30 ++++++++++++++++++++++++++++++
->>  4 files changed, 58 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index b47c74080..db329abbf 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -767,6 +767,8 @@ struct hci_conn {
->>  
->>  	struct bt_codec codec;
->>  
->> +	struct l2cap_pending_connect *pending_connect;
->> +
->>  	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
->>  	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
->>  	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
->> @@ -970,6 +972,7 @@ enum {
->>  	HCI_CONN_CREATE_PA_SYNC,
->>  	HCI_CONN_PA_SYNC,
->>  	HCI_CONN_PA_SYNC_FAILED,
->> +	HCI_CONN_ENC_KEY_READY,
->>  };
->>  
->>  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index 4bb0eaedd..b1ccd56bd 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -679,6 +679,13 @@ struct l2cap_user {
->>  	void (*remove) (struct l2cap_conn *conn, struct l2cap_user *user);
->>  };
->>  
->> +struct l2cap_pending_connect {
->> +	struct l2cap_conn *conn;
->> +	struct l2cap_cmd_hdr cmd;
->> +	u8 data[sizeof(struct l2cap_conn_req)];
->> +	u8 rsp_code;
->> +};
->> +
->>  #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
->>  #define L2CAP_INFO_FEAT_MASK_REQ_SENT	0x04
->>  #define L2CAP_INFO_FEAT_MASK_REQ_DONE	0x08
->> @@ -976,5 +983,6 @@ void l2cap_conn_put(struct l2cap_conn *conn);
->>  
->>  int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user);
->>  void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user);
->> -
->> +void l2cap_process_pending_connect(struct l2cap_conn *conn,
->> +				   struct l2cap_cmd_hdr *cmd, u8 *data, u8 rsp_code);
->>  #endif /* __L2CAP_H */
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index c4b87bfb4..6c992f83e 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -32,6 +32,7 @@
->>  #include <net/bluetooth/bluetooth.h>
->>  #include <net/bluetooth/hci_core.h>
->>  #include <net/bluetooth/mgmt.h>
->> +#include <net/bluetooth/l2cap.h>
->>  
->>  #include "hci_debugfs.h"
->>  #include "hci_codec.h"
->> @@ -766,10 +767,23 @@ static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
->>  		/* Update the key encryption size with the connection one */
->>  		if (key_enc_size && *key_enc_size != conn->enc_key_size)
->>  			*key_enc_size = conn->enc_key_size;
->> +		set_bit(HCI_CONN_ENC_KEY_READY, &conn->flags);
->>  	}
->>  
->>  	hci_encrypt_cfm(conn, status);
->>  
->> +	/*Defer l2cap_connect here if it's triggered before key size is read.*/
->> +	if (conn->pending_connect) {
->> +		struct l2cap_pending_connect *pc = conn->pending_connect;
->> +
->> +		conn->pending_connect = NULL;
->> +
->> +		bt_dev_dbg(hdev, "Defer l2cap_connect");
->> +		l2cap_process_pending_connect(pc->conn, &pc->cmd, pc->data, pc->rsp_code);
->> +
->> +		kfree(pc);
->> +	}
->> +
->>  done:
->>  	hci_dev_unlock(hdev);
->>  
->> @@ -3396,6 +3410,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
->>  	if (!conn)
->>  		goto unlock;
->>  
->> +	clear_bit(HCI_CONN_ENC_KEY_READY, &conn->flags);
->> +
->>  	if (ev->status) {
->>  		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
->>  				       conn->dst_type, ev->status);
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index 40daa3827..c4cb60e65 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -3982,6 +3982,30 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->>  	struct l2cap_chan *chan = NULL, *pchan = NULL;
->>  	int result, status = L2CAP_CS_NO_INFO;
->>  
->> +	/* If encryption is requested, but the key size is not ready yet,
->> +	 * we need to wait for the key size to be ready before we can
->> +	 * proceed with the connection. We do this by deferring the
->> +	 * connection request until the key size is ready. This is done
->> +	 * by storing the connection request in the hcon->pending_connect
->> +	 * field. The connection request will be retried when the key size
->> +	 * is ready.
->> +	 */
->> +	if (test_bit(HCI_CONN_ENCRYPT, &conn->hcon->flags) &&
->> +	    !test_bit(HCI_CONN_ENC_KEY_READY, &conn->hcon->flags)) {
->> +		struct l2cap_pending_connect *pc;
->> +
->> +		pc = kzalloc(sizeof(*pc), GFP_KERNEL);
->> +		if (!pc)
->> +			return;
->> +		pc->conn = conn;
->> +		memcpy(&pc->cmd, cmd, sizeof(*cmd));
->> +		memcpy(pc->data, data, sizeof(struct l2cap_conn_req));
->> +		pc->rsp_code = rsp_code;
->> +		BT_DBG("store request and retried when keysize is ready");
->> +		conn->hcon->pending_connect = pc;
->> +		return;
->> +	}
->> +
->>  	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
->>  	__le16 psm = req->psm;
->>  
->> @@ -4105,6 +4129,12 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->>  	l2cap_chan_put(pchan);
->>  }
->>  
->> +void l2cap_process_pending_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
->> +				   u8 *data, u8 rsp_code)
->> +{
->> +	l2cap_connect(conn, cmd, data, rsp_code);
->> +}
->> +
->>  static int l2cap_connect_req(struct l2cap_conn *conn,
->>  			     struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
->>  {
-> 
-> Is there any update?
-> 
-> thanks,
-> Shuai
-> 
