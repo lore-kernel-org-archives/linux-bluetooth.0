@@ -1,66 +1,61 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFB014884C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 18:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753814816; cv=pass; b=NgnkVCURak/y9Kyq8jQ1ZSNN6LxGQS0oD+SyYpKECV2ss0WppeTvFWSkNuomdguecQmrbsQ5FWwc04QxjLmnlRpBlSy0Y5MbIMPt1bq8Q2JtJHZ2URfTyETNpAwTQk/ADykhUzRJutH0At42qvxnw9Z0D9SHIOPvM1Cns8moAfQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753814816; c=relaxed/simple;
-	bh=0i9+MTkFnQvDUc9akGojXkt5l04XHqyVOW73Xb5GYQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YgD3AtLoZA8U9K+CoqWDJxgR1a9Iw2Lk1ZAKkKA3V04bX/M0vJtW7g/k3Cpsmy0p+NuvtWqMOObG8MaeMfl3kNHdoLjIU4daiHIhOkLxD2snd1tcrfljYAQCI9/qg0RW4WT9kjyRCzoVBCe/QziVaby0Tp+6RwCawdncr8yWCJU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=GwwbGOHP; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941AC46447
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 19:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753815849; cv=none; b=UJ4guusAWw8xl13K8iRTKZl9WIpcKJp+g5DtHAL3lz7euP3A8h1NQ8HII0u8jpOussrpDVmHKsK2YiqO/CYJnspCfT0g0YT8YRTQR9sn6+aO4KGHPt9AdezTyQgB2WCVCB+TePqE9+HRvZH+D72S62AIXaOC/CuH4LX2bEQe3QE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753815849; c=relaxed/simple;
+	bh=W0rKAa0qkYFqw1tnaw7d1FJHYBPJTqMKCt9TgExeUwg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=eyRLjIsg8A78l1Nl/0n/i9BkQ9FR6Nr8jK0sVNmBwUS41BNbKTOnrP660v4OAbJIIqGdRZUY/ZAk0xCfOhM/DZI8wXZatxWUmFw2Cj+xVQgzmJDxhRoCj+oaJvf0dM/jkHoS8tchkloNKIhvYzTuTWoAnm4cchBNKU6G0fq6SEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fn3KUzmm; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="GwwbGOHP"
-Received: from monolith.lan (unknown [193.138.7.158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4bs47m0vZDzyVW;
-	Tue, 29 Jul 2025 21:46:43 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1753814804;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=iOGL+VGecU3sEbTw9+m7Y2bxh7gzENMRvmXYTUDq4+0=;
-	b=GwwbGOHPoKdHrxOc90Rb+WezpAbbufuk3dK0XzIOqpvmA0WeMYWA266p3wqM1vzG7r0qZY
-	O4xUF8AAdayV4HTgfZkAwoblNCG2phQNNnNhm+U7UGCb1OD/hPXHVeFVvRUSPMJIxoiHDD
-	NCY1mQh2g/UyszA89BFQe+lAZP1onKA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1753814804;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=iOGL+VGecU3sEbTw9+m7Y2bxh7gzENMRvmXYTUDq4+0=;
-	b=tsO04HlNhHgIQaitLcseZxDDWRev+m78RHxv40w8/k4Qfh8ID780Y6ivHELprv+YNqj24H
-	f0onqm745O8lHTuFoQ0QevguhXOKzqm5FCCffl/BbjKLTiIEMEWp3EO1yDhLm0+iHmTODK
-	MBEjf37z28xoEyNMHwJEXeZqhfmuJoc=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1753814804; a=rsa-sha256; cv=none;
-	b=FCC2WRNGpgVW/EL168tpvD16KTkW8OacvOXMDQl5+P8IJUWUW1ukyYTJPedeFPRM+hhT/O
-	GIB2BLxsvPLMTwED+1jn4PYxJLkMtYnySm2EpNnzUAngbPdxdslQ05ChTBoIvbuiNRA56v
-	OlPwFbsC+OATaTj+VndC5+QJVH532sk=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fn3KUzmm"
+Received: from github.com (hubbernetes-node-6d804b7.va3-iad.github.net [10.48.175.37])
+	by smtp.github.com (Postfix) with ESMTPA id 9D56F4E53A9
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 12:04:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1753815847;
+	bh=EKgSUOtlD7ze6X7f/VpsVhKG8cW8Tzgrg+u3bcTL2uI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=fn3KUzmmXh2VNTaGzdQmQcIRpQFmzPxmC5b7m165zl9lCX2yIiWSqcb0TAhpYWnjv
+	 ZmM7lkYT3Ufj3cN3MNMb6WSrHqYbTOGR0EKMio+z2tOjIkOOhGLc9xTh/aCnht7d8X
+	 7+5fcgET9NudZ0k4xoiVAQrk0e+9ORjioz6/Uq5I=
+Date: Tue, 29 Jul 2025 12:04:07 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ RESEND] profiles/battery: handle reversed ordering of CCC and value
-Date: Tue, 29 Jul 2025 21:46:41 +0300
-Message-ID: <ccfa6652c4391fbc7d403f3e5208fa1cdfe983e3.1753814700.git.pav@iki.fi>
-X-Mailer: git-send-email 2.50.1
+Message-ID: <bluez/bluez/push/refs/heads/986817/000000-6f89e9@github.com>
+Subject: [bluez/bluez] 6f89e9: profiles/battery: handle reversed ordering of
+ CCC ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/986817
+  Home:   https://github.com/bluez/bluez
+  Commit: 6f89e9308eef4342944214a7d3ee1ff875aa3756
+      https://github.com/bluez/bluez/commit/6f89e9308eef4342944214a7d3ee1ff875aa3756
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-07-29 (Tue, 29 Jul 2025)
+
+  Changed paths:
+    M profiles/battery/battery.c
+
+  Log Message:
+  -----------
+  profiles/battery: handle reversed ordering of CCC and value
 
 Order of batt_io_value_cb() and batt_io_ccc_written_cb() may be reverse.
 This causes device to appear with 0% or missing battery percentage,
@@ -80,50 +75,7 @@ profiles/battery/battery.c:parse_battery_level() Trying to update an unregistere
 src/battery.c:btd_battery_register() path = /org/bluez/hci1/dev_CF_D2_4D_EE_A2_1A
 src/battery.c:btd_battery_register() registered Battery object: /org/bluez/hci1/dev_CF_D2_4D_EE_A2_1A
 profiles/battery/battery.c:batt_io_ccc_written_cb() Battery Level: notification enabled
----
- profiles/battery/battery.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index 5be78ab14..2f5be48e9 100644
---- a/profiles/battery/battery.c
-+++ b/profiles/battery/battery.c
-@@ -91,16 +91,19 @@ static void batt_reset(struct batt *batt)
- static void parse_battery_level(struct batt *batt,
- 				const uint8_t *value)
- {
--	uint8_t percentage;
-+	uint8_t percentage = value[0];
-+
-+	DBG("Battery Level updated: %d%%", percentage);
-+
-+	if (!batt->battery) {
-+		free(batt->initial_value);
-+		batt->initial_value = util_memdup(value, 1);
-+		DBG("Battery not yet registered");
-+		return;
-+	}
- 
--	percentage = value[0];
- 	if (batt->percentage != percentage) {
- 		batt->percentage = percentage;
--		DBG("Battery Level updated: %d%%", percentage);
--		if (!batt->battery) {
--			warn("Trying to update an unregistered battery");
--			return;
--		}
- 		btd_battery_update(batt->battery, batt->percentage);
- 	}
- }
-@@ -111,6 +114,8 @@ static void batt_io_value_cb(uint16_t value_handle, const uint8_t *value,
- 	struct batt *batt = user_data;
- 
- 	if (value_handle == batt->batt_level_io_handle) {
-+		if (!length)
-+			return;
- 		parse_battery_level(batt, value);
- 	} else {
- 		g_assert_not_reached();
--- 
-2.50.1
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
