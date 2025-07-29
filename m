@@ -1,92 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1505101E6;
-	Tue, 29 Jul 2025 15:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA85223DE7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 16:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753802868; cv=none; b=tpbwVMqtnvmuKowDmiYb/7mshF7RnUyZxSPnvoeYgb879v+vEW/Jlo7qYzDarC9jgvPEVHgwW3Wlqc9sIDGfxe2+naY8v/Vf86QmdsrbCoMFh1sb6ESMJpohfBXcRu/WqtsXbuUAI5i0ugwYGbfqZfUqNlHgYF6jbImj5SRwvVM=
+	t=1753805275; cv=none; b=h83OptQ4AlcsFQ4uH8Xf+W+z/hBe53FIg7+9sdPaJXLUK27ShqZHnndh2+nmVkg3LU/1N7wdJ43h6BFItaf+fuss+4iWwoYe4hgGmN+ZwmloZwJzvVuuSIlfftfivXKaCDMTfGx9j4AAaaKqPS8c6/nlXgs9i573ipBdcLm7q3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753802868; c=relaxed/simple;
-	bh=vEjY0bc/ws416eC6PETkAarRcOMa4NCrT2KtYjseTzE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nPBxc/2ye9vPbjPetCFk9hqESCm4GPZrecyoVOi/EueF1kaHp030npMdXwd2A52U9oJlj2edK5T+PPrbd6znlVUHWWVJLto+Xvl8RuGdcedbSvfk6DQ1fNcpzYV2W/cAkYsZ1/Qy3ICMuDySF8DMQhVz55EPXrf/U/SIGZxw3gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqIaPYvW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1753805275; c=relaxed/simple;
+	bh=snrXB6Ob1KKDbXxaiTiukE6OWX0rQvg70ZRbpytK5Ck=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lG1r2RkYvOXiX3qAQSEYvsB4eK1HfM0J5wRNPbYBlMZZcizdnlNA7q+SAjvQNQr9tSyQNx1yiMHDDsebQXF26nbgXOdaMKP4rMKgovanog42xVrUR8FMBQ5p9HGHb4ulO+HHkOyZK60yK/pdpveak5tyZd+uuyrp8LZEnpR6ZWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bt/8XMz/; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqIaPYvW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C685C4CEEF;
-	Tue, 29 Jul 2025 15:27:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753802868;
-	bh=vEjY0bc/ws416eC6PETkAarRcOMa4NCrT2KtYjseTzE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aqIaPYvW1S5tKXLSeKy3MYaODuAeqeXIuy75XCudeoobK9qDvJqJOH9T3kmAbim3G
-	 53by5l278qqQdKSRh7GL1h41O8kI0tfA3wHq3OaRotGcsGaiwcO5zIoMhwmZvPssNj
-	 zns9JfyMWiENT+qykypxcK5qth4irl1BKqcU7W7VblWzjvGnbZx1GCjxPXW6wSW2ZR
-	 pWMu8ov/dQPf4IYUyoRSshqxNHaPAX3nc+YRClsbQST2gk37i5mj9XpSZ63oo0bn+X
-	 QQgDuJ0c0SDUvD+iYG7eWkOrVt55zD2fivrk6aro8AEyonEBPviXKqj/sfMBqckZAP
-	 eYGLvB+y6mgAw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Kiran K <kiran.k@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Cc: Vijay Satija <vijay.satija@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btintel_pcie: fix CONFIG_PM_SLEEP check
-Date: Tue, 29 Jul 2025 17:27:40 +0200
-Message-Id: <20250729152743.2394727-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bt/8XMz/"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-31f255eb191so1332790a91.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jul 2025 09:07:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753805272; x=1754410072; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XHTL6S1tgOCcCdBMIj3v4Na7RelVn4dk0Usm9rPv8JA=;
+        b=Bt/8XMz/Eq+V7TU46hSpUJrZTwF8IAVDclivaDMBaheOhBtxvsB8tq50Vm/B6gzegn
+         yv2ul0tccWKpse8hcgdoIjW0+qZfVTOHDs72AMI/BEGCuKDJGUSmqMhDIsvxz3wVwUuY
+         GTU3uQBoy8Pao9JIr9aORWlHmsn/ZSmI4ak/h7p+E8MAKwdJslYG9FMkJgYyshDarcke
+         FpZCH0tS/Qx9en/wFfUNhaa0RXzeITIguNP9vT+7p2eOT4jG+iZXOEXJ7i7DA0z4Y8i/
+         6tPUM4+zSAst9cJGjX/4ZcHQUZpWNX0UgDS3QnK5jX3VMTwODrwr1sanDjmgNcmhn8+I
+         Lkcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753805273; x=1754410073;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XHTL6S1tgOCcCdBMIj3v4Na7RelVn4dk0Usm9rPv8JA=;
+        b=Wu23BMX+lGpAQ0myv5vqGJ8DAG5t8VCEi/hjBCUzXM3yDwtoKIjtPBPuAqcEWbKZp+
+         V875CBNXhib5qzT+bYt8Ov1ldM8CGkc7mFX/am7Awr072t+nQsp7Gop7hKtWgzS5VDkw
+         HObdIvnoRQzS5EzcIdskCCuOzuBQQ0qTPyZEiL80yM28qq8xribFt+qT59k280f/NXp6
+         UDcRmVyPmkZW+kXhrpyzIgckAWQFGUZEx+Y+GTDHDWM2d2AzIpzo8l1MClqcbErbysTc
+         VXLos6xwxcfkmEUnlrr89/rgwHXH1fPO8WCtwmtB+ZcDQ91GFHSHO4IMRDByvqzKFEx5
+         fn8Q==
+X-Gm-Message-State: AOJu0Yx/MgSIhq7Cg69wbsnmqggsDCo0lH+8PrWkEw8zYIuGDOJkZtZ/
+	gkjsC8QNqg+ZP8p47C08yDVTmW4/E78gfNu9xXvDk4yLTQxX8syv6TyDP5u8Kg==
+X-Gm-Gg: ASbGncshkqdOcMtdJ01s+eWYQjU+b5C+03HuDr0dQquYzRsl5KBYtP8N8Tbj6jRiuas
+	+bfnKGvVHwGIqWXZBhZJBxvyzsyf7WAbFVLUz5wlq3tdV3yD58grzPT/TzGzyDG1xiivtjMqp/j
+	EuzhhWALwG48jn80wWQGK+6jPnycYbmodWk76MptuLauubdiw044xznDvNS8HdH1abdpu9vHAwj
+	pDQqWYeaZQno1BPJZ61bFs/jQGI1b4uf+596Yqg7OQ98YqeQZnVW2LKZcnExNof7cgq0PKHPpIF
+	N80d8Aii5nTZB+6+Jpx/B27NTrFBKo9w+przUbHk5VQUWV/o0OwptK/eBH8S3bsj3JOIKyhxYFi
+	iDLMxWsDKu2x59yFItEGDpybSsVRJFQ==
+X-Google-Smtp-Source: AGHT+IGFU7dxKs140MzJuoU7bIZEl/aAL4m6+Eeb7aav39U9WHGsXWsgqUJCsfUG0yq6YIEhY1e1AA==
+X-Received: by 2002:a17:90b:4c49:b0:31f:4aab:3b25 with SMTP id 98e67ed59e1d1-31f5dd88fd8mr96595a91.1.1753805272457;
+        Tue, 29 Jul 2025 09:07:52 -0700 (PDT)
+Received: from [172.17.0.2] ([104.209.11.212])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31efc2f579asm4924717a91.30.2025.07.29.09.07.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 09:07:52 -0700 (PDT)
+Message-ID: <6888f1d8.170a0220.df296.0605@mx.google.com>
+Date: Tue, 29 Jul 2025 09:07:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6242677706991983389=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, arnd@kernel.org
+Subject: RE: Bluetooth: btintel_pcie: fix CONFIG_PM_SLEEP check
+In-Reply-To: <20250729152743.2394727-1-arnd@kernel.org>
+References: <20250729152743.2394727-1-arnd@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+--===============6242677706991983389==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Using both pm_sleep_ptr() and an #ifdef around the definition is not
-valid:
+This is automated email and please do not reply to this email!
 
-In file included from include/linux/kernel.h:36,
-                 from drivers/bluetooth/btintel_pcie.c:9:
-drivers/bluetooth/btintel_pcie.c:2674:36: error: 'btintel_pcie_pm_ops' undeclared here (not in a function); did you mean 'btintel_pcie_in_op'?
- 2674 |         .driver.pm = pm_sleep_ptr(&btintel_pcie_pm_ops),
-      |                                    ^~~~~~~~~~~~~~~~~~~
+Dear submitter,
 
-Remove the #ifdef check to let the compiler's dead-code-elimination drop
-this as intended by pm_sleep_ptr().
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=986771
 
-Fixes: d1b3de23042b ("Bluetooth: btintel_pcie: Add support for _suspend() / _resume()")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.39 seconds
+GitLint                       PENDING   0.41 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      24.37 seconds
+CheckAllWarning               PASS      26.83 seconds
+CheckSparse                   PASS      30.58 seconds
+BuildKernel32                 PASS      24.33 seconds
+TestRunnerSetup               PASS      485.71 seconds
+TestRunner_l2cap-tester       PASS      24.99 seconds
+TestRunner_iso-tester         PASS      37.95 seconds
+TestRunner_bnep-tester        PASS      5.93 seconds
+TestRunner_mgmt-tester        FAIL      128.69 seconds
+TestRunner_rfcomm-tester      PASS      9.37 seconds
+TestRunner_sco-tester         PASS      14.76 seconds
+TestRunner_ioctl-tester       PASS      10.01 seconds
+TestRunner_mesh-tester        FAIL      11.64 seconds
+TestRunner_smp-tester         PASS      8.51 seconds
+TestRunner_userchan-tester    PASS      6.18 seconds
+IncrementalBuild              PENDING   0.75 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 4 (RL is full)                Failed       0.278 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.057 seconds
+Mesh - Send cancel - 2                               Timed out    2.000 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btintel_pcie.c | 2 --
- 1 file changed, 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 8e65def192a9..aa47bc38d298 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2574,7 +2574,6 @@ static void btintel_pcie_coredump(struct device *dev)
- }
- #endif
- 
--#ifdef CONFIG_PM_SLEEP
- static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
- {
- 	struct pci_dev *pdev = to_pci_dev(dev);
-@@ -2664,7 +2663,6 @@ static const struct dev_pm_ops btintel_pcie_pm_ops = {
- 	.poweroff = btintel_pcie_hibernate,
- 	.restore = btintel_pcie_resume,
- };
--#endif
- 
- static struct pci_driver btintel_pcie_driver = {
- 	.name = KBUILD_MODNAME,
--- 
-2.39.5
 
+--===============6242677706991983389==--
