@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782666DCE1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jul 2025 13:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8726DCE1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jul 2025 13:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753883391; cv=none; b=qLGwR6TkBsDz/iYWRrEmyWGDV+ezkNpx38iS0n6FIVmxk1C/mNqxgYB0OzjDp+5p0Opvala6+4gQ60e9Gk8DCxMv3sg10wm+H2nBO6x318/Rp+UvkweyTSZt5kHw2TFXeDm3j0oc4v94pKsZ60kvlpQd0jX/dTKyR0oBatUvCp4=
+	t=1753883392; cv=none; b=iLew0pPwbOHDSYtbi6FnEO6mqfuj3lOqBfQbGoKQUDid3wq7dN3Ji5ahf0PkaiDAPoFVk3O6oZNmG74vMzmRU2bQPf+EEvCu+pBAkLvEvYB8sgyqqkevoQMPTJkjGLdIR/ads9qJ9+9ZxK1dIw5UIZDKdYXinKlxuzAqboLW/30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753883391; c=relaxed/simple;
-	bh=2OpzzyWD8sZJkMOHU4gM/5FODJF4h9Uo6ibkDvAPJ+o=;
+	s=arc-20240116; t=1753883392; c=relaxed/simple;
+	bh=gkmotywlljGtsO6m3w2+WkJV9PSrdrlvbwAqXzMVTIs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bpnY7Lv3KQ1AEM0peAC/h/fPELIKZQTVu+fhEexaRryAvB38y4Kjk7Z2LiNgwFDpW7VQHpmcLnRQe9Qo7g4WzuNXO4hIL7vdhexzs4k89xAvpcTVgvBGzCacOPGycLc9eqm9YVm7GhwGUPojnLipppQDbee9sc/i6vBJMxIbN2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOMZBVZB; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=sCoD2wPnyuQGofIpMVocAwrr8OaeigHNcNc04S18AaRY3oTxJzDXQwr9IJJ8i0vNr5NXC/mrTbvB8yAgDxp09bQ2UXlfJF07+rGK+4dTmuZFgfQ0U8gz2Mv+FOqV3DO25SZAGOAh6X9XAt01TBaOWQ/eZDiHL4OOqnOiOMsIcQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G2PjxYyu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOMZBVZB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC551C4CEE3;
-	Wed, 30 Jul 2025 13:49:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G2PjxYyu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CFBEC4CEE3;
+	Wed, 30 Jul 2025 13:49:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753883391;
-	bh=2OpzzyWD8sZJkMOHU4gM/5FODJF4h9Uo6ibkDvAPJ+o=;
+	s=k20201202; t=1753883392;
+	bh=gkmotywlljGtsO6m3w2+WkJV9PSrdrlvbwAqXzMVTIs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rOMZBVZBoLRnwhBQXmBBxZUb5GFsNp4m4FyUFsRlCDsiO/XpaRQ+UIwO+g2ekSRo3
-	 Ush13U/hK6S1GjcluSrgrKgK6SngqstQexeFab8TFnE+4a9HHbmjw47HvsM3xmJDcW
-	 8wmaRZl9tu1VNHo3zeS9gCQUaZlLlall0zEn6QaiD32ZFC91wN5mLeVdUbxY5zOmxI
-	 Qesm8np60QPqJ2CCIQjPQTUyZDtm8gcDQgcT+jl3LbA6voOUlWzTby+u9frvlLVLGN
-	 UklPh3Hfw94u1c4kpBzMzn97cPZCUjEOmWDpGLWM9HSR/ZY5sMM8LszCtIxyNKmCpB
-	 t74rC4pR1SPmA==
+	b=G2PjxYyuNyaxFZEY5Hzyip2h/AazAbUksEtTl33fXx4jLvw3PEsMMdqDxj8/cVeIH
+	 31a2fAzjQrc4miZZBKOEVx6QWdOfb5ZRrK/keH/NRPtKne524/Mky/vt2ZGzBQlZ7U
+	 JhTwp14pYBg7ollpg4q8SigOhqI6z2iMPyohU6XoTzed+YsAsQGnFXn799c2ceTbtk
+	 lTGDBH933loro0TxH8aOuCXF0gtP++hzPC5cFtYnnFlPeHuzd8IFvSSsPCvetyavf4
+	 3fBgzfPDqtpYkmsTDPk5rJ1K0X+XZOeYTRedprBfboHeGhUMGxdbH4e9UhCayAMKAp
+	 xT6xsZlc4U9AA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CE9383BF5F;
-	Wed, 30 Jul 2025 13:50:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C83383BF5F;
+	Wed, 30 Jul 2025 13:50:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,41 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/5] btdev: Fix checking for PA on
- BT_HCI_CMD_LE_TERM_BIG
+Subject: Re: [PATCH BlueZ RESEND] profiles/battery: handle reversed ordering
+ of
+ CCC and value
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <175388340701.2311214.8432497909281492384.git-patchwork-notify@kernel.org>
-Date: Wed, 30 Jul 2025 13:50:07 +0000
-References: <20250729192206.272462-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250729192206.272462-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+ <175388340824.2311214.10480265808122323295.git-patchwork-notify@kernel.org>
+Date: Wed, 30 Jul 2025 13:50:08 +0000
+References: 
+ <ccfa6652c4391fbc7d403f3e5208fa1cdfe983e3.1753814700.git.pav@iki.fi>
+In-Reply-To: 
+ <ccfa6652c4391fbc7d403f3e5208fa1cdfe983e3.1753814700.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 29 Jul 2025 15:22:02 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, 29 Jul 2025 21:46:41 +0300 you wrote:
+> Order of batt_io_value_cb() and batt_io_ccc_written_cb() may be reverse.
+> This causes device to appear with 0% or missing battery percentage,
+> because batt->percentage is set on the ignored update so the initial
+> update is lost.
 > 
-> BT_HCI_CMD_LE_TERM_BIG does not require PA to be enabled.
-> ---
->  emulator/btdev.c | 8 --------
->  1 file changed, 8 deletions(-)
+> Fix by saving new initial value, if battery is not registered.  Also
+> downgrade warning to debug message.
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v2,1/5] btdev: Fix checking for PA on BT_HCI_CMD_LE_TERM_BIG
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=280c9523a490
-  - [BlueZ,v2,2/5] bap: Fix crash when Broadcast endpoint exit
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=165e57e744e6
-  - [BlueZ,v2,3/5] iso-tester: Add Reconnect test for Broadcaster
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=13e0776cef76
-  - [BlueZ,v2,4/5] bap: Fix possible crash with Broadcast Sink
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=077de3f8639f
-  - [BlueZ,v2,5/5] btdev: Fix sending BT_HCI_EVT_LE_BIG_SYNC_LOST with wrong BIG handle
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f086b3d27c41
+  - [BlueZ,RESEND] profiles/battery: handle reversed ordering of CCC and value
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2c0c323d0835
 
 You are awesome, thank you!
 -- 
