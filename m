@@ -1,140 +1,151 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775AA22318;
-	Thu, 31 Jul 2025 02:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C549F2F41
+	for <linux-bluetooth@vger.kernel.org>; Thu, 31 Jul 2025 03:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753928367; cv=none; b=fsu/XdmRa6+kHsx9o2KZRiBRoRjlCJ0RmXU810LC4BuAcwPx9PUNzaGHQuGkF8Crb6xrnbEGqil1ZQTREFaoFnriXR77jGLXzjfSh+QSzWmYdOBMFCvxDJf7f6VBhvLz/wx5uj26CgMWg9ET98Iqib9RVncQZrw0wh6Ickguchg=
+	t=1753933111; cv=none; b=ict7dloilTYSWPe6Ghj2GuobdUZtBxiWOIOiYH3GxGlMzBozFSHjYa1CV4n8pIQXnGBmnBLVsEzjIHFg6vF5DWGziFUnyiptYX3GiBW7KtrOO2z8MBJAg1OSYvrHl/2/yej+xqbmSB5aUuRmiIxAjRfkZfW6WjzDtrzsRQDFfMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753928367; c=relaxed/simple;
-	bh=/EMZUGIb+jSGRcKKS31fRFqZ32wWToO8WQ5zfarulMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZeoIrJVFTX6IHRQzIutwztBEuJ6shpKzgSvEeXfIgtK8m2RDDU5+MnmBHDTEBjrQUXQ3inLF170/vlSgVJT+SmutrIb0r4Zdi/xR2q8Hlt6YkxqZGZEMsH2WhlfvedixgvhV/bQ2jyWJlviWBO2Z9ovlLYBJKEhtqqFAs2BcPBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F6jaJoQR; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1753933111; c=relaxed/simple;
+	bh=cGVtN0W1akqMUefUgYNd+vz0X41qnzu5jmT40ZpLaj4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=XH9qCJc1U+1E6CzBjG9XYqdfv8MFPmhs78lWUoJy5wPePD/bjgw4UcNSA4yLYBO/JV44f5paYB0ache9MLCPRvbTb/q2u3DajDiapYPQ8dh1F0AgRSXDMPySuSkVKsbDwy09L2PA6SrhChZJ0vvG4E7U1j5nIRJFO6avRnGSAfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PiGfGC9t; arc=none smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F6jaJoQR"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4561a4a8bf2so4045895e9.1;
-        Wed, 30 Jul 2025 19:19:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PiGfGC9t"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7e33d36491dso64487385a.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jul 2025 20:38:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753928364; x=1754533164; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=b/rG/4GRP2jN1wvu1hAC2b4sTXSJWfazoIpwk4Gm8xA=;
-        b=F6jaJoQR+E8uIGYSNJTAEVBN3Y02LtYrI/QwUUhAC9z1PcRQRBSxBGAQG9c3fle5TA
-         J+1USHXhnLoTw5fhE930OwCJtpGD2hHP66AcI712e53DRlfIo7pfXMZXHqBYX4P3kQRg
-         4yE9oRTy0nfEM6C2ofTy7t6xJ1zchp3a5pckRwoDJR+vo5HSJQo7ZXQLwZgiWaBBlyl+
-         IlVLmUhd7V+CRdfBdAsYCuxuj7w6mA/8p3HI1yf+h4liHq7h9hTfM4SOokjvfrn4+ta4
-         Q8gwUUCa79PcqK4Kg2WE/QwJRQS1drZKjJJBkZ4AtgypugDria1DOPlOKc2iFZ9G0omK
-         7sHA==
+        d=gmail.com; s=20230601; t=1753933108; x=1754537908; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Tkd1JucVkRLbep+1L00GZrptvM5SX5z60nCgvbaduk=;
+        b=PiGfGC9tN9dt6H4fjgLk2r3rlT5IgBwQsdciPtg8YKsR4uIvz6RjX9jFoah+shkovh
+         /Jv/OzpWN0hWg8f2C4EWeedgWvkzfi454BG5Bgq63+Za6DdxelxeiFP0qRjaPXcr97uR
+         YhAvon5SgbH3z6sIGd7+ZUj4sOmJus6QV5poJky/l3CuSkmeZ4UkkB5Bf7VAs1NbNu1z
+         lRO+Co3yc8hlQYxnQeemWruvXaVfvH/nd3/GKmKptJuzTUrtN93gc6fyTYO5B/S++76g
+         UTxxsVqEjuF3GKPvDg/4UX+2TU8BXfqrUw1RShFaKvSry1yU24Rfo+vqggiqqaF8JwPW
+         75Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753928364; x=1754533164;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b/rG/4GRP2jN1wvu1hAC2b4sTXSJWfazoIpwk4Gm8xA=;
-        b=JkBYlNxUldnC5MQNsxdMkHZW+sBHL6G3o0z2HKHgUMlgR5lcsvuL7XJNZeuLizujF5
-         UcjU3neNZzAEnTOA6qNt0Lj3keW24ww1xGpbj/ZqKpImVy1McjBcUUXQ+Dyvu9eqCkxI
-         WpTxtyR49/qRy34NsA6SoyiJlR+0XbOdGtVZs2QKmN/pBbd3+1kbp9NGEaVN9nPRvNCF
-         h/YFieNHdFpFncewzqEV8ZTSVSXOagSCN7UOEpVc4yxWr8hv91X2DQQ/j07SABggK+rm
-         eE8Ecl3y2hvCScCWw4PYN7PHM+kqE3wyX+QeZZM0J8fi2lJeioTMAzLbWtT5nqRnPJEb
-         ZX3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVya+KhdyO4/tN/62ad1jw1hTnZcECtEfKGTuX7/IHc87R3ptiZLd2zjUe0sZUjhS+ayKJGAtzI@vger.kernel.org, AJvYcCXQz1RltgycgJYlVUdaYsQxXhm70rc2Z5hDcsyVnzU4fPxwxLDLWWE+VKdeo+488BW9YU4IPzJEwyIt9o6A@vger.kernel.org, AJvYcCXkn7e90E0/jXFbUnNAs5im4DVy3HHqu0d+PI8cWzGqsxK0j2Df3yfQQwidNlJrZRWUeGHZMfQJauGpjr+p7Vo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvMvRGlblT9h8O0NcvXy+bmDnCZsb2N15SdZMVM3Ku1M/nSu61
-	T8LK2D7HOvErAcSvrQ/OWB27h9+nDy3FDqLYToF2ZNJ2fEsd5k7/De/xh91dmFYr
-X-Gm-Gg: ASbGncsuRu7MKhNeX1ASsxgFv3WSOK5DdOWqadNvYVpGkDYEysM81/EzFzw0xyGXFog
-	Lk3Gr3UWjvfXyFyzlbtXSkf0heBm13keiTW5utmNYx8/gHUXA3z4LUuDRazDfGPFwMSpmsZdG/H
-	wSqhAn9MbFbG1CVVYXFTtfeVhPKU7jUbMPAs1TI5uaJL7mmVgr6LJIIgMWV4yvYAW+vbBAPxKYK
-	LbH8AmiVSsMsrWYT9F5qbbfm2hqH7BYK1BEv7SuO6UM3/rQZ3HphSBCCTaqRNrjH7sUiuHdjg8x
-	lnnBidT/8eoH3RzlPJTbkEaxxiSlY0+9LQmQ8+dHkXxpsfSsWOftyt1unf0zW6rTGUNgcA5XzCe
-	NuWhveEKV74Q=
-X-Google-Smtp-Source: AGHT+IFO4MHztFKSK6takGVorJXNttTmeTk7NbkHF16a2QXKUseuUs1uqQ2pxHvICB01OcSO4cpZAQ==
-X-Received: by 2002:a05:600c:3ba1:b0:456:1fd9:c8f0 with SMTP id 5b1f17b1804b1-45892b947c9mr57241695e9.2.1753928363779;
-        Wed, 30 Jul 2025 19:19:23 -0700 (PDT)
-Received: from pc ([165.51.119.21])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c48de68sm719878f8f.67.2025.07.30.19.19.21
+        d=1e100.net; s=20230601; t=1753933108; x=1754537908;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4Tkd1JucVkRLbep+1L00GZrptvM5SX5z60nCgvbaduk=;
+        b=q1DSZJ9nzrc9FW1Uo2o/cappgr5IxdhBYvqb2ZMZT4rnk8b7apntzcmqy9PhfbHGGw
+         Aeq019Vj21a+3OJAtwc5zJtoRvU7Wycw+kA0UFx/75MUrQgmO60GqJoHFZPISjCf5R8X
+         xAlzkqC02FRotu8E63MmUQi9MuMqoSKhwH1pIrNFhD6eKytrPh2+yJ3qbCkHIBsmHci5
+         FS/8izFFpj9YsYtYBT/g357WTRm3fSoRGcGrdkDXG0aiyAvHgd8ykcLhFb2lAbzNgncG
+         CWDlexpk/bfrKgfFqpsdxItu+A56R6HAGJkU1PFgaZc6Jb3N/M6F4pSbbdZwm7maQgCj
+         +VIA==
+X-Gm-Message-State: AOJu0YygWnQj8PmOE9OxASGsvZyRD/uriYNTjYTBJZT3oD/E8j02nwJi
+	mWQLgkPA7edz7RgNg3yBMpF/5lH6I10lW2829O11YrMWjkRIdP3w1Lad2QX0ew==
+X-Gm-Gg: ASbGnctC6Emfe+DDRVsrGuEI1Ky0kHa85FPrHbb8bcckBC9WsjynDh42eeE7fWJe+MP
+	ieXqVS20tUjRqDkboKGLjUJjZcqtkiDj0O5UWJljM6Fx7maQRaexQXEOoF4sVrNkaxWGaNeqDLZ
+	orGKJhXJ0UbStQrAmz33ELFG59htRsNw1MMo0eGEw1Fwyt6CwHnnXmVAgyk+zWwyOGFBOtsNeBf
+	ci7dpzhaGvq8wFOalJVN/EJhjexj1YDd3OdThkDOmQTl9zvVikRGEoyJiLCO1PrwCIdkF108O+3
+	HfcV1OLu76m08njZ7kFLRonyZt3oj0QhSR+uCw/dXXc7YN4u3q3hEtc6JVBB6feaEUAdKU6cBEq
+	hCtVvLw57aBgjrl9OfrN8hZUob0Q=
+X-Google-Smtp-Source: AGHT+IEiVDdM+SCwmQg0itEQHB0UQ5erctW1KuRklTjwsTlc7am5/LSiKuAK7WEVvXjrx4Oa5TEnww==
+X-Received: by 2002:a05:620a:a20e:b0:7e6:2f06:aca5 with SMTP id af79cd13be357-7e66f3aa6f7mr792601985a.61.1753933108387;
+        Wed, 30 Jul 2025 20:38:28 -0700 (PDT)
+Received: from [172.17.0.2] ([4.236.173.20])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f706406sm34994485a.49.2025.07.30.20.38.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jul 2025 19:19:22 -0700 (PDT)
-Date: Thu, 31 Jul 2025 03:19:19 +0100
-From: Salah Triki <salah.triki@gmail.com>
-To: Markus Elfring <Markus.Elfring@web.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: salah.triki@gmail.com
-Subject: [PATCH V3] Bluetooth: bfusb: Fix use-after-free and memory leak in
- device lifecycle
-Message-ID: <aIrSp18mz3GS67a1@pc>
+        Wed, 30 Jul 2025 20:38:28 -0700 (PDT)
+Message-ID: <688ae534.050a0220.3c34f.1065@mx.google.com>
+Date: Wed, 30 Jul 2025 20:38:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7464531803029677498=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, salah.triki@gmail.com
+Subject: RE: [V3] Bluetooth: bfusb: Fix use-after-free and memory leak in device lifecycle
+In-Reply-To: <aIrSp18mz3GS67a1@pc>
+References: <aIrSp18mz3GS67a1@pc>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The driver stores a reference to the `usb_device` structure (`udev`)
-in its private data (`data->udev`), which can persist beyond the
-immediate context of the `bfusb_probe()` function.
+--===============7464531803029677498==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Without proper reference count management, this can lead to two issues:
+This is automated email and please do not reply to this email!
 
-1. A `use-after-free` scenario if `udev` is accessed after its main
-   reference count drops to zero (e.g., if the device is disconnected
-   and the `data` structure is still active).
-2. A `memory leak` if `udev`'s reference count is not properly
-   decremented during driver disconnect, preventing the `usb_device`
-   object from being freed.
+Dear submitter,
 
-To correctly manage the `udev` lifetime, explicitly increment its
-reference count with `usb_get_dev(udev)` when storing it in the
-driver's private data. Correspondingly, decrement the reference count
-with `usb_put_dev(data->udev)` in the `bfusb_disconnect()` callback.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=987211
 
-This ensures `udev` remains valid while referenced by the driver's
-private data and is properly released when no longer needed.
+---Test result---
 
-Signed-off-by: Salah Triki <salah.triki@gmail.com>
-Fixes: 9c724357f432d ("[Bluetooth] Code cleanup of the drivers source code")
-Cc: stable@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.21 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      24.58 seconds
+CheckAllWarning               PASS      27.10 seconds
+CheckSparse                   PASS      30.69 seconds
+BuildKernel32                 PASS      24.34 seconds
+TestRunnerSetup               PASS      485.22 seconds
+TestRunner_l2cap-tester       PASS      24.93 seconds
+TestRunner_iso-tester         PASS      44.50 seconds
+TestRunner_bnep-tester        PASS      6.09 seconds
+TestRunner_mgmt-tester        FAIL      127.01 seconds
+TestRunner_rfcomm-tester      PASS      10.20 seconds
+TestRunner_sco-tester         PASS      14.79 seconds
+TestRunner_ioctl-tester       PASS      10.29 seconds
+TestRunner_mesh-tester        FAIL      11.56 seconds
+TestRunner_smp-tester         PASS      8.67 seconds
+TestRunner_userchan-tester    PASS      6.30 seconds
+IncrementalBuild              PENDING   0.44 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.220 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.071 seconds
+Mesh - Send cancel - 2                               Timed out    1.997 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
-Changes in v3:
-    - Add tag Cc
+Regards,
+Linux Bluetooth
 
-Changes in v2:
-    - Add tags Fixes and Cc
- drivers/bluetooth/bfusb.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index 8df310983bf6..f966bd8361b0 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -622,7 +622,7 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
- 	if (!data)
- 		return -ENOMEM;
- 
--	data->udev = udev;
-+	data->udev = usb_get_dev(udev);
- 	data->bulk_in_ep    = bulk_in_ep->desc.bEndpointAddress;
- 	data->bulk_out_ep   = bulk_out_ep->desc.bEndpointAddress;
- 	data->bulk_pkt_size = le16_to_cpu(bulk_out_ep->desc.wMaxPacketSize);
-@@ -701,6 +701,8 @@ static void bfusb_disconnect(struct usb_interface *intf)
- 
- 	usb_set_intfdata(intf, NULL);
- 
-+	usb_put_dev(data->udev);
-+
- 	bfusb_close(hdev);
- 
- 	hci_unregister_dev(hdev);
--- 
-2.43.0
-
+--===============7464531803029677498==--
