@@ -1,86 +1,151 @@
-Received: from sonic.asd.mail.yahoo.com (sonic322-27.consmr.mail.bf2.yahoo.com [74.6.132.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s1.g1.infrastructure.qtmlabs.xyz (s1.g1.infrastructure.qtmlabs.xyz [107.172.1.117])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4E615746F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Aug 2025 01:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.132.82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1414C1B6D06
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Aug 2025 10:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=107.172.1.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754358653; cv=none; b=VHDRDrhAmnvpJVzeS3clm4UEPX92uW31aSPU1Wj1zTBaYGt+GLw+y58MslHfSKjSP9yo+VL8qe2XUwLpvUXqzun/CWrr5YTy2D/zSiV+a9p6VWag372wgc2uUDKPiB7xRlpe7FgSNmvaSRZLu06YTjJ/kDqXp2ijhMOCjUDhRuw=
+	t=1754389755; cv=none; b=gHL/VF/19qP8melblPrOsBP8sRsSd10TPQhzm8yrDMCF+Pm1XBfbJoyNth2PNBZMuXHKhmryxDjUK+At6ua8jWIjDBC1SCTuKkenlolcNkJE9o1wuhTYk+WgZ7AxSqr1DL2ZMGiS2wUBtl6j6Q1qUBl/ntaAj4o0v4Jkbz2Iyxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754358653; c=relaxed/simple;
-	bh=p3dq/6LECgBPtW4YSuBsxTQ5pXSA/K/t+jhXwC7zITo=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=hYaqIL4ZpQFr2xP8Dw5OLAPwMesSAus8KbAwK9Ugg4cLaZK803YgynopxJRFMPUkPphofdJSWPXBr8XGQzxnjkxr07tg93zVIfK7cJnv7xFqEFMBcc1wgKFXBPQ8KB9yuUZn1+mOVGJyMFqzDNRAkhmil7/TTBq5niEkYrPRGlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=gcnzqZay; arc=none smtp.client-ip=74.6.132.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+	s=arc-20240116; t=1754389755; c=relaxed/simple;
+	bh=/5H5PXamspR73T+Pc7y1lqIOYIpvpNJi+wfA+OY92Fs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To; b=AfvcfE521MxagQL5WI9lSa24/oC99g7d/4HZRDmtGOw77a0JYZ8b6OU5a+nYI4I3Ez7DV9NlxKnLqM1XBtP4kAdDpctiRJVxl9X4GAZgE53OfUXr3reYocjRgFwIVh/AD4Z9EbHMK6omHqElI9PjTVXoj5z2EKG5WeQZlu+kAX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz; spf=pass smtp.mailfrom=qtmlabs.xyz; dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b=ZVTNNSWu; arc=none smtp.client-ip=107.172.1.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qtmlabs.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="gcnzqZay"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1754358650; bh=p3dq/6LECgBPtW4YSuBsxTQ5pXSA/K/t+jhXwC7zITo=; h=Date:From:To:In-Reply-To:References:Subject:From:Subject:Reply-To; b=gcnzqZay+hp7olT/8ORgv4yPv0oEt9EIKNilE6fvCAncnYTqFZbaNaDd2LxrY5JtESMCnWShQIzmZ6t4aHk5ZdMeQOmpiDZS9j7IyK8KiIcQZk+0to56Pj3Ya+RBlqVTMfep+Sbnit9vDTe6jvBb7TlnOAp1FYcqG9YlPJXVz2KnQ1+YcLjUPeDCvYv2Wh0EtaldtAxQRZVhO0MzHvaM5TO9uQV4k8HsybNu44jrcUS5X1xqZMPfAuEymIqQwQt4YSbsC2h49wuf7HaOjXDkYqR8CO3Z3/VvXZHknZfXwuwatx8COyqBVBdEG/JASJzg9HcnzyeYTedrNUr0ulmW0A==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1754358650; bh=Ww6rrTWIXOILkTwSEpW5hzbCm3D228a3Z9k7F6sIbd4=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=jM+1rkVoQB4lCtmxj2ptKKkLkVrhnOgk2NDevch2UgAd4kA8GXTTFmjDMgrgcPVizZy8vbilxkGCz/IukJcQBi9qT3g16dGXnlzaUzPpxNliivdS3DNMQgSIus2nWCo8qTMVMgE//jLSB7WVkx5rCZ4gkZFhu3HTv4Y2dqkwhIjPCG8luFrc8Ptxyz0MxbM7yiFUIKFmVbB2xT33K8vRMtz4BV4yKB+2Ld/JEm/fDBxZ+jhBRoKfBedTxKig5vOcDm4xTzWOEVV5JYAERhqDb5jftTIpl+i365oHgykISyyqyQTHWsEQEhncWeCp68rnSVxcERM9JLsY8H4K9tK2Sw==
-X-YMail-OSG: UCPwa84VM1kWCxswkHr_AKIQcFzCmrhZoyEpvxLKMgUulQxmAYu8A6ivRIyD8l6
- Psoy7x6DAsnJxBZsRg6OEWyo71.jIl7SzTigzXZyf_eRIm5Z4ziOjEurJkdKovjX60S3gXPnpBua
- De7RogNfe.XNt_6ImNMrwN0ULUiydNajOlN45Yjf5tfcwvyUp_30.q4i2xgzah1TXyS0HIwiIFVZ
- s.vi6BlLZ.zIPXmh.45I55SgPCrXUo78vzoZ_pQAA0oeqA2k0mV8zwSwj88YyOrQi01uZ.0djD08
- LjAeJnJbzeKq1R6t4H_ingJMOBD6x9ypWnzOEU_PXQItwYSEYUMWosiA7cTs4ZwMfKp365DZN1Nm
- sOIW7S9.HGGrmUHheKs67Nc2I49vdDZ39vZjpw.zJQEc23STt1uQkQEB7EqGLCB07bKTIhZ1PuYg
- 1VRixtzQHECJ92G9DrOfntZlaViUut2wo7.k7Naiwhje.coTmtE9YfPN7H5yRLANPZ1qRORwmlja
- 8beh2Ox6ie3FTtvHtcxPrYsh_nn2dBgjg1BXtfU7Remk1yBuzTdPCsfLzdiykG.PgsUm9J2f1QpP
- UJWxk_LDBbO8j4atTxfrhhlAX2.It1wslO_bavl35LMRYLWSP2yoUPFp_7XOHkB8SYPWLT77jpNA
- fQ089gtuHuidVI3d0.6CsCtxpfOdsJw0I9ED1COolNxuudB0daWe1Z3SbzKLgl_ECnhNDwyRZIL.
- Gw.gWmqEYABIMVKHqgxQEYSb98CUYhUnWRJz8Zq6Nnqcon1cDK8.rJejopfVnOWR4c.Q6erGOJ7R
- gsmGBnHpfUR9JJRcn9npHkj9rR3YUnjhAHAI9nLebV9DEduf1KLJ7S1kMAqZqtZzQQgIwrOZlIIK
- 9by9E39QvXXkkgL.KB9cukvtDySX7xwHk617TulX9QU_IaUZ1.c9OpAV3.eAfqw7Z763Rd2xbIS8
- ecPlxgeqX3bA5U8MDmnIsPrOJ77PDC5MqKW.s1SeRdGA00Mo5UGUbrPwjtB3CzarGcNJjfnWO8um
- yINtxEzCYbNBGzECbF7aiJzN_L111_ec8NuPtnqkmA1SpjJZTodSG.N9sGAC7i_IrhJFjSYv91eJ
- uF5HZvR17HiFKAayumiiue_5CgFkoBbSiOgHFjw3QtKMobk2bPug8SRd5iYWUVk4ZHLcvvPB5UxW
- Q4fb2WxRvXlIku5dZSvku5d1AFtBzGE4nsffdf7Vd5pL2hFavpHpNjLD.7WULD8zYeSRjtyLK74x
- amuF04wDHDYKZtgt9fLchmAoXj9vl79Djd6sn2kt4tGNVgUKb.0eosIZHpwEKcNT.eDudkG4NytO
- NaU37y1fGkpngwsZ6mVSJEfvgCv51qTBfpvTeTqaNOxz4T8x.JnVTXCL6EflgOFUKWB2WreB0y_Q
- KTam1DNQi6nBSbPyQRrtlCiBGoLdiPXatDLj5Ykuf8ceTdzfjjbOUL4tkotrzfHfHtSsPFPVMxkq
- y.xpZze1IvQR2TfjH.Gmfmh.NswqFIAYU4ezJUzEJP43rqN.UkBjES8mVABOcvf0Z_9mwk_O3QTw
- tHnFsOI6Fk7Lw97CYl6IRMiTp4gwtRXtUKms3.L0H0ElUfx9rDJIjziM29Wx4sux3wObq8kFAUiZ
- n0vQqv.fMGoBgCTyAq0oIb4OdxtqWvuzxMM13IOfIyKqYZNGK1xjqKpj2_dJHUJff6D9CzV3BUo9
- eY1aWi2LkEr1MDZZ4flvAXLzrBvVhkabmyZyEYCv_Cjux00z88kBoOfgdqZ14EOZk_Uv3AlQmhwp
- gZK6zxGHVRR8lpXc._X63VPRJyr995OZu5Bjrl5yPuBEF7JGLhnvdE35DTOS5fg42hKV3dITV.Jh
- 6LbOlYGNQ1y4NkNlIQMn1JX00xBYF0DMNZyGCUDziW1gBxmLaltKafjO0A4j70rix_CZlbI0ZC4L
- cvc6Eoqxznl9k2T30yaf54RomdJC59G83AzoL8SIRieokLJSRgJy6jxcfSJR7AfWDS_rQBz96TTC
- QSD_V1jlnFsKFi2ItGuCq8u9CcH9GAa792EVkVSUluxsjtxZiL9yqxXpUJK1ag73W8IJCNNZA0bj
- 8ZzrJX4WYVCJ6Wb30OuBHrfQsoUA_H0GLZiZ.0Sy77Nj.t21Y4S4G8dBiowLxsYQ33ec9GQ7Ay3H
- FKTtYRZl8sx2AJDQibhg_5O9e3Nd0BSuwj5WN47RxGi_TTau4Axf.jMXmq5DDd7RajJJ2hTcEZvA
- hQ_M25EQ30vmTtUNeyc4y_6BYPSh_nFCD_dBoQvnUK4MkrCniqSlQH72wKFMP6mhHaFd94io7gCu
- pyZ71AUzcu_FQRU4EnlELPyePgiz5D0Sdow--
-X-Sonic-MF: <sunstechlive@yahoo.com>
-X-Sonic-ID: 2861e57d-30b9-4d72-be3b-0ae8539ba312
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic322.consmr.mail.bf2.yahoo.com with HTTP; Tue, 5 Aug 2025 01:50:50 +0000
-Date: Tue, 5 Aug 2025 01:40:39 +0000 (UTC)
-From: suns <sunstechlive@yahoo.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-ID: <742340634.1050712.1754358039006@mail.yahoo.com>
-In-Reply-To: <1929589719.1039587.1754353192826@mail.yahoo.com>
-References: <1929589719.1039587.1754353192826.ref@mail.yahoo.com> <1929589719.1039587.1754353192826@mail.yahoo.com>
-Subject: Re: Pull request #801 for MIDI bluetooth more than one event in a
- frame.
+	dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b="ZVTNNSWu"
+From: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qtmlabs.xyz; s=dkim;
+	t=1754389291;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kVfC5jrWoYGXi9k64lFVXjYo/CxwK3GdwdeqkH6Fndw=;
+	b=ZVTNNSWu+I/WRP91h3WBWuSvgnEXxK0YtyjA7K+0gieghWuwpGpBjgGdiH0cLzqitZoMEi
+	/8jakzgbf1IB4uV7Vk5S6EI/GUzx4cu7pFT8pF59TVDGHjW51Xu9EnPT5SDLgo82bbYydb
+	eptXhCwqSjnyxRSfeLWOCHWoHIZ1wXTEfEy2L69s6hM4lom15MRcIOzOZAOUR2esi+QAsz
+	3vOq0Ch0fA4Bd+wn6RgEhS5bVu37R0OxHrrTh+j3vIOC4UXHS7RSb/fojEghJ0zO6ech4f
+	Tv+oaQ4iYaifAYr5NZc9gQNLZ9UDyQ2aqqQ5bI+KXLQbjgQarSEnWRC5IMKh4A==
+Authentication-Results: s1.g1.infrastructure.qtmlabs.xyz;
+	auth=pass smtp.mailfrom=myrrhperiwinkle@qtmlabs.xyz
+Date: Tue, 05 Aug 2025 17:21:28 +0700
+Subject: [PATCH bluez] audio: Don't initialize device volume from media
+ player
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.24260 YMailNovation
+Message-Id: <20250805-audio-no-reuse-media-player-volume-v1-1-c9fdfaf74a71@qtmlabs.xyz>
+X-B4-Tracking: v=1; b=H4sIACfbkWgC/x3NQQrCMBBG4auUWTsQI8XoVcTFtPmrA2lSElKqp
+ Xc3uPw27+1UkBWF7t1OGasWTbHhfOpofEt8gdU3kzW2N870LNVr4pg4oxbwDK/CS5APMq8p1Bk
+ 8DaO9uYtYdxVqoSVj0u0/edAQKr70PI4fvZBW8nsAAAA=
+X-Change-ID: 20250805-audio-no-reuse-media-player-volume-fbc2983a287a
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+X-Spamd-Bar: ---
 
-Im not the developer of the solution, but the solution works really well.
+Media player objects may be shared between devices. As a result,
+a device without support for hardware volume that is connected after one
+that does may end up being erroneously considered hardware
+volume-capable.
 
-https://github.com/bluez/bluez/pull/801/commits/64f48d1f45424ab6be05c7b686804ebaab0bc4e6
+fa7828bdd ("transport: Fix not being able to initialize volume properly")
+introduced btd_device_{get,set}_volume that is used as an alternative in
+case no media player objects are present. Therefore, we can remove
+media_player_get_device_volume and instead use btd_device_get_volume to
+determine the initial volume.
 
-It points out to issue #471:
-https://github.com/bluez/bluez/issues/471
+---
+ profiles/audio/avrcp.c |  2 +-
+ profiles/audio/media.c | 33 +--------------------------------
+ profiles/audio/media.h |  1 -
+ 3 files changed, 2 insertions(+), 34 deletions(-)
 
-I was trying to fix the issue and found a solution already done but not on main release.
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index e2797112fcd580c3fc56793f933e00b1c61e5205..ec07522e6a34eb1dc5f6f413f48f1087a609df9a 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -4284,7 +4284,7 @@ static void target_init(struct avrcp *session)
+ 		target->player = player;
+ 		player->sessions = g_slist_prepend(player->sessions, session);
+ 
+-		init_volume = media_player_get_device_volume(session->dev);
++		init_volume = btd_device_get_volume(session->dev);
+ 		media_transport_update_device_volume(session->dev, init_volume);
+ 	}
+ 
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 8e62dca17070edbc5101677c6eebd3707492c824..55f1482d1d9ce52e104481bab3ede373f47aee0c 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -499,37 +499,6 @@ struct a2dp_config_data {
+ 	a2dp_endpoint_config_t cb;
+ };
+ 
+-int8_t media_player_get_device_volume(struct btd_device *device)
+-{
+-#ifdef HAVE_AVRCP
+-	struct avrcp_player *target_player;
+-	struct media_adapter *adapter;
+-	GSList *l;
+-
+-	if (!device)
+-		return -1;
+-
+-	target_player = avrcp_get_target_player_by_device(device);
+-	if (!target_player)
+-		goto done;
+-
+-	adapter = find_adapter(device);
+-	if (!adapter)
+-		goto done;
+-
+-	for (l = adapter->players; l; l = l->next) {
+-		struct media_player *mp = l->data;
+-
+-		if (mp->player == target_player)
+-			return mp->volume;
+-	}
+-
+-done:
+-#endif /* HAVE_AVRCP */
+-	/* If media_player doesn't exists use device_volume */
+-	return btd_device_get_volume(device);
+-}
+-
+ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 					uint8_t *configuration, size_t size,
+ 					media_endpoint_cb_t cb,
+@@ -556,7 +525,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
+ 	if (transport == NULL)
+ 		return FALSE;
+ 
+-	init_volume = media_player_get_device_volume(device);
++	init_volume = btd_device_get_volume(device);
+ 	media_transport_update_volume(transport, init_volume);
+ 
+ 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
+diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+index 2b2e8e1572874d5f71abb28fdd5b92fa2d9efe83..d3954abd6de505a69cab3fcffc217d236a52d3e5 100644
+--- a/profiles/audio/media.h
++++ b/profiles/audio/media.h
+@@ -23,6 +23,5 @@ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
+ struct btd_adapter *media_endpoint_get_btd_adapter(
+ 					struct media_endpoint *endpoint);
+ bool media_endpoint_is_broadcast(struct media_endpoint *endpoint);
+-int8_t media_player_get_device_volume(struct btd_device *device);
+ 
+ const struct media_endpoint *media_endpoint_get_asha(void);
 
-Not sure how to proceed as this is not my code.
+---
+base-commit: 2c0c323d08357a4ff3065fcd49fee0c83b5835cd
+change-id: 20250805-audio-no-reuse-media-player-volume-fbc2983a287a
 
-Regards,
-Suns
+Best regards,
+-- 
+Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
+
