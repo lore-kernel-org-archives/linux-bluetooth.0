@@ -1,200 +1,110 @@
-Received: from s1.g1.infrastructure.qtmlabs.xyz (s1.g1.infrastructure.qtmlabs.xyz [107.172.1.117])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E474121C9F9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Aug 2025 16:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=107.172.1.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C331917FB
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Aug 2025 19:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754410118; cv=none; b=ERDDM4mDS0WY4SR/+fgO88cMj4J6qykVRyv+efvETSMzAidoyKnvDSzjVhGT/y0oX+x3K9FArvj0Uu/8xV3b47fxag5sb398Xqzv87H7UDCJtXhCuilCrADiBw6fXlLXE78oI3x1JJEDtlcZCjZ7wG3xVAeTQ25Ki1tX4NeJShw=
+	t=1754422231; cv=none; b=mhxWzatHiktzG/rYg/TDoDo0LwAeu0viL0vWrtRsd/nkfBcVH9EUQruYfzHpyOIPfSsNfyPFSvCBKdUggzekc2xAJCvJyunnfCbplUp7xx8YCB/LBtyKnRXCGJLB4k9KIOnpEO4OqhT6UxoZmd/lV9SNHFCBKc7iT0kK8lx5IVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754410118; c=relaxed/simple;
-	bh=BHaLjUPXNnoGNJgOjbMgsRC1ncr0MKNX6m1AkWq65Bo=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IGk2WN/e4mILg2klYhepSjp3ySvCle3LSbktA8kGeoW88+IChG0EA186OOjcwCN1wa+7APsVYySLok4+vDJYWSQUAdS8SY/+ovt4KsFrW3Rpyf1FZ9UubggaNDHChv8HZTqqrndtg279nbhfxyVDLyigPzM9K2cd+4grVTkML7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz; spf=pass smtp.mailfrom=qtmlabs.xyz; dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b=dRP7UhbS; arc=none smtp.client-ip=107.172.1.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qtmlabs.xyz
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b="dRP7UhbS"
-Message-ID: <961c1bd3-f829-4221-af36-07a343086483@qtmlabs.xyz>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qtmlabs.xyz; s=dkim;
-	t=1754410114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sGWdWSfvfm0L0kvntTIuUasrZHFubEnoEQbvZedYURE=;
-	b=dRP7UhbSU9v/GNBJs6yrqQ9SQULz1KV4iMjC/A3TjD39YXzbBwnpbZ+snA6CrakRBobcjZ
-	/kp/ajaw3RyjUmA6OzGn4Ygc9uJP4dXmsPHypC4mP+a+T+vWy772A7VZh0/gBf0Vt6U40p
-	qzR6/uybCAntsXm26izfGGlnncvVcH8k2CqkV1VeS2AG0c7yLhczqsqRnCosXLxrmbs0Yt
-	RXvEgeS25xmE3b26CtjMOj9vykRU1s+db85acNYx73v8zw+astlmunOC5PHE6D2TWQgFSF
-	fjJsNvmjAC0KlnbE2h52flNH307CSa2MYRxtt9295Dg+jcHAcyzxH2aI5URYTw==
-Authentication-Results: s1.g1.infrastructure.qtmlabs.xyz;
-	auth=pass smtp.mailfrom=myrrhperiwinkle@qtmlabs.xyz
-Date: Tue, 5 Aug 2025 23:08:30 +0700
+	s=arc-20240116; t=1754422231; c=relaxed/simple;
+	bh=ap90FdWfvAMWCPlyKV04RmI+/G8pz/6yCg1FUz3z4Oo=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:Content-Type; b=IzUBgsrF/oMRiYhqn9fQIRstA1bj30Yv1UYBCTSn1fWXT4KSFRfHKva/oVf2wZe9T9+Lf56x8tZKDG5KadWsvP8eURfIQh6yEnM6hx/kYim/WGQEii2RGbK5ifnl/nTiwJVvU4fMbxunHiER+WRQVGFlNJzIEMjINEXqxTbu7Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.159.126) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 5 Aug
+ 2025 22:14:52 +0300
+Message-ID: <14e5f8f1-1f93-461d-9cc7-57e1f0b57911@omp.ru>
+Date: Tue, 5 Aug 2025 22:14:51 +0300
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
-Subject: Re: [PATCH bluez] audio: Don't initialize device volume from media
- player
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-References: <20250805-audio-no-reuse-media-player-volume-v1-1-c9fdfaf74a71@qtmlabs.xyz>
- <CABBYNZJ=Kc_WMa2Srnci=20e+F+JZyPmWFXsjxt8sn_6g0coKQ@mail.gmail.com>
- <8e903ca0-aeb3-46c2-8da3-95173cb482e5@qtmlabs.xyz>
- <CABBYNZK+vMXgv6OZuCKABqFE+1Y0kojqd2d0EkhJ-3UFVnUq4w@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: [PATCH] Bluetooth: hci_conn: do return error from
+ hci_enhanced_setup_sync()
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	<linux-bluetooth@vger.kernel.org>
+CC: Brian Gix <brian.gix@intel.com>
 Content-Language: en-US
-In-Reply-To: <CABBYNZK+vMXgv6OZuCKABqFE+1Y0kojqd2d0EkhJ-3UFVnUq4w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Bar: ---
+Organization: Open Mobile Platform
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 08/05/2025 18:57:33
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 195362 [Aug 05 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.11
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 63 0.3.63
+ 9cc2b4b18bf16653fda093d2c494e542ac094a39
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.159.126 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.159.126
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/05/2025 19:00:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 8/5/2025 4:20:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi,
+The commit e07a06b4eb41 ("Bluetooth: Convert SCO configure_datapath to
+hci_sync") missed to update the *return* statement under the *case* of
+BT_CODEC_TRANSPARENT in hci_enhanced_setup_sync(), which led to returning
+success (0) instead of the negative error code (-EINVAL).  However, the
+result of hci_enhanced_setup_sync() seems to be ignored anyway, since NULL
+gets passed to hci_cmd_sync_queue() as the last argument in that case and
+the only function interested in that result is specified by that argument.
 
-On 8/5/25 23:01, Luiz Augusto von Dentz wrote:
-> Hi Myrrh,
->
-> On Tue, Aug 5, 2025 at 11:34 AM Myrrh Periwinkle
-> <myrrhperiwinkle@qtmlabs.xyz> wrote:
->> Resent because I forgot to use "Reply All"
->>
->> On 8/5/25 22:24, Luiz Augusto von Dentz wrote:
->>> Hi Myrrh,
->>>
->>> On Tue, Aug 5, 2025 at 6:29 AM Myrrh Periwinkle
->>> <myrrhperiwinkle@qtmlabs.xyz> wrote:
->>>> Media player objects may be shared between devices. As a result,
->>>> a device without support for hardware volume that is connected after one
->>>> that does may end up being erroneously considered hardware
->>>> volume-capable.
->>> Don't quite follow, avrcp_player is per device, not sure how it can be
->>> shared between devices?
->>>
->>>> fa7828bdd ("transport: Fix not being able to initialize volume properly")
->>>> introduced btd_device_{get,set}_volume that is used as an alternative in
->>>> case no media player objects are present. Therefore, we can remove
->>>> media_player_get_device_volume and instead use btd_device_get_volume to
->>>> determine the initial volume.
->>> Don't follow you here, why shouldn;t we use the media player if we have one?
->>>
->>>> ---
->>>>    profiles/audio/avrcp.c |  2 +-
->>>>    profiles/audio/media.c | 33 +--------------------------------
->>>>    profiles/audio/media.h |  1 -
->>>>    3 files changed, 2 insertions(+), 34 deletions(-)
->>>>
->>>> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
->>>> index e2797112fcd580c3fc56793f933e00b1c61e5205..ec07522e6a34eb1dc5f6f413f48f1087a609df9a 100644
->>>> --- a/profiles/audio/avrcp.c
->>>> +++ b/profiles/audio/avrcp.c
->>>> @@ -4284,7 +4284,7 @@ static void target_init(struct avrcp *session)
->>>>                   target->player = player;
->>>>                   player->sessions = g_slist_prepend(player->sessions, session);
->>>>
->>>> -               init_volume = media_player_get_device_volume(session->dev);
->>>> +               init_volume = btd_device_get_volume(session->dev);
->>>>                   media_transport_update_device_volume(session->dev, init_volume);
->>>>           }
->>>>
->>>> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
->>>> index 8e62dca17070edbc5101677c6eebd3707492c824..55f1482d1d9ce52e104481bab3ede373f47aee0c 100644
->>>> --- a/profiles/audio/media.c
->>>> +++ b/profiles/audio/media.c
->>>> @@ -499,37 +499,6 @@ struct a2dp_config_data {
->>>>           a2dp_endpoint_config_t cb;
->>>>    };
->>>>
->>>> -int8_t media_player_get_device_volume(struct btd_device *device)
->>>> -{
->>>> -#ifdef HAVE_AVRCP
->>>> -       struct avrcp_player *target_player;
->>>> -       struct media_adapter *adapter;
->>>> -       GSList *l;
->>>> -
->>>> -       if (!device)
->>>> -               return -1;
->>>> -
->>>> -       target_player = avrcp_get_target_player_by_device(device);
->>>> -       if (!target_player)
->>>> -               goto done;
->>>> -
->>>> -       adapter = find_adapter(device);
->>>> -       if (!adapter)
->>>> -               goto done;
->>>> -
->>>> -       for (l = adapter->players; l; l = l->next) {
->>>> -               struct media_player *mp = l->data;
->>>> -
->>>> -               if (mp->player == target_player)
->>>> -                       return mp->volume;
->> The `avrcp_player` object indeed is not shared between devices, but the
->> volume is acquired from (and set for) the associated `media_player`
->> object which is not tied to a specific device, and corresponds to client
->> `org.mpris.MediaPlayer2.Player` objects.
-> Ok, so what is the problem with that? If there are 2 headsets that
-> wants to control the same player registered via mpris-proxy(?) that
-> should be allowed, or the problem is that each device should control a
-> dedicated instance of the volume? I suspect the volume store in
-> mp->volume is only used as initial volume since the actual volume is
+Fixes: e07a06b4eb41 ("Bluetooth: Convert SCO configure_datapath to hci_sync")
+Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-I searched the codebase for all usages of `mp->volume` and seems like 
-this is solely used as a temporary storage for the initial volume. This 
-usage was first introduced in 4b6153b0501cf18812cb869c2320c41e51f81adc 
-and the field itself was introduced in 
-a282fff97dabbd3a814765a868e3367cb3dc1ce3 (with unclear purposes).
+---
+The patch is against the master branch of the bluetooth.git repo...
 
-> stored in the Transport.Volume, the reason why we can't use the
-> Transport directly is that it is created on demand while there is a
-> stream so if the stream is not ready at time a volume has been set we
-> need to store it elsewhere, that said perhaps that should be store per
-> device not per media_player which seem to be registered per adapter in
-> media.c but then we should probably remove the volume field altogether
-> to avoid any confusion in the future.
->
->>>> -       }
->>>> -
->>>> -done:
->>>> -#endif /* HAVE_AVRCP */
->>>> -       /* If media_player doesn't exists use device_volume */
->>>> -       return btd_device_get_volume(device);
->>>> -}
->>>> -
->>>>    static gboolean set_configuration(struct media_endpoint *endpoint,
->>>>                                           uint8_t *configuration, size_t size,
->>>>                                           media_endpoint_cb_t cb,
->>>> @@ -556,7 +525,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
->>>>           if (transport == NULL)
->>>>                   return FALSE;
->>>>
->>>> -       init_volume = media_player_get_device_volume(device);
->>>> +       init_volume = btd_device_get_volume(device);
->>>>           media_transport_update_volume(transport, init_volume);
->>>>
->>>>           msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
->>>> diff --git a/profiles/audio/media.h b/profiles/audio/media.h
->>>> index 2b2e8e1572874d5f71abb28fdd5b92fa2d9efe83..d3954abd6de505a69cab3fcffc217d236a52d3e5 100644
->>>> --- a/profiles/audio/media.h
->>>> +++ b/profiles/audio/media.h
->>>> @@ -23,6 +23,5 @@ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
->>>>    struct btd_adapter *media_endpoint_get_btd_adapter(
->>>>                                           struct media_endpoint *endpoint);
->>>>    bool media_endpoint_is_broadcast(struct media_endpoint *endpoint);
->>>> -int8_t media_player_get_device_volume(struct btd_device *device);
->>>>
->>>>    const struct media_endpoint *media_endpoint_get_asha(void);
->>>>
->>>> ---
->>>> base-commit: 2c0c323d08357a4ff3065fcd49fee0c83b5835cd
->>>> change-id: 20250805-audio-no-reuse-media-player-volume-fbc2983a287a
->>>>
->>>> Best regards,
->>>> --
->>>> Myrrh Periwinkle<myrrhperiwinkle@qtmlabs.xyz>
->>>>
->>>>
--Myrrh
+ net/bluetooth/hci_conn.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+Index: bluetooth/net/bluetooth/hci_conn.c
+===================================================================
+--- bluetooth.orig/net/bluetooth/hci_conn.c
++++ bluetooth/net/bluetooth/hci_conn.c
+@@ -339,7 +339,8 @@ static int hci_enhanced_setup_sync(struc
+ 	case BT_CODEC_TRANSPARENT:
+ 		if (!find_next_esco_param(conn, esco_param_msbc,
+ 					  ARRAY_SIZE(esco_param_msbc)))
+-			return false;
++			return -EINVAL;
++
+ 		param = &esco_param_msbc[conn->attempt - 1];
+ 		cp.tx_coding_format.id = 0x03;
+ 		cp.rx_coding_format.id = 0x03;
