@@ -1,407 +1,236 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from s1.g1.infrastructure.qtmlabs.xyz (s1.g1.infrastructure.qtmlabs.xyz [107.172.1.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5DC235364
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Aug 2025 23:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E397C5CDF1
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Aug 2025 00:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=107.172.1.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754437758; cv=none; b=uBdilYhvLz2EpRUazKO13ai52TyJ5wb2CaJvN8DyOkHenz/KTYM4U0h72k4LpfnK1zD3HBzZq4Qq4SIV9rMid9CXUhwUJV5X/J07zMmpDa0l3Go/D2pN4apRZEcrn09MKreEHEQyuYOF6xmvbjieNmKWIrP+of9w4n2ucRamQiU=
+	t=1754441454; cv=none; b=Q5Ldh1LiVMkWTL8CqB0BxWLA0i1TYCE4gOywdZoIfuNnKr3cKlJmEIr16wrdsEdPMvRBdr6+V/Hrm6nZ55GpMnNbNM/i6gxyTs5TEeaIZQ/9DAceIZQHE6g521oh6TQC/7HVEw5pj/1fnu9xMNqCEpFmGhKZowqgwPhNdUSIF9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754437758; c=relaxed/simple;
-	bh=KmA21ZlqJFAB/f+w+526YB7p2OY2aHF0dJkFw/aOoQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UL52BNS+AkntWH35Mbv2KvPyXesmqKUoD+i1jLzO3M/2CfXlPOe+Us9QJwhI5WiSfgXBBITLx+dzy1YIYD6Csnn3q6h5HDbdMQQ+ZPrgnjgbmZ6MhR/fSVI40W6IwmVMMJN85XUjqhsVDpNqytBXES+0AyscJ4mG323gCIkW3SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GgS65891; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1754441454; c=relaxed/simple;
+	bh=FW9MvDbDZkWMJHWNqAcTI7fSpRvTs8I3nyL0XLP22/o=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ljYIXr2PtKSm4fAT/LUzmStIeHE52wxRkgPps24Mfr4/OAwxoPlEj5FX0ICXpOrYdJ7NQxyWPAC4WmJqjCh0V+oLyllTL9KAG+sf55utJGIvdagp/SBytT5/+/5bz0O0urRA1mii3d8HrMjXXJHl40r04l53Fh38jE8Gyu7d7Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz; spf=pass smtp.mailfrom=qtmlabs.xyz; dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b=W//jZtkf; arc=none smtp.client-ip=107.172.1.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qtmlabs.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GgS65891"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754437756; x=1785973756;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KmA21ZlqJFAB/f+w+526YB7p2OY2aHF0dJkFw/aOoQY=;
-  b=GgS65891MhUl1ysy5JOClrSUu1IMc5UexCTRlnLZyDWrfrT8yKINvPTb
-   4E0W1IZBfuMhvT+oUtR1eh5npQe7xzqWJ7VI7U8hKdI/Grv+WBNjjrtlO
-   ANH/8IHzx8c1p1yla6SYh0mvg+hZmfW1TEd4Dk6fhpRzU7EOKceAj1wBQ
-   ijlfKyIyPJr7Wy8MNUw8YBzMhX5yEPQLuKxN+pLCsFLnKJfpeuheYJjHR
-   P6TVYfisA0eBTpumwhUfP5sA3dylBTcc7Xrc7PhLj+8SkGyBVCVS9fc1i
-   Hi4l7YX2aki0j0Lq1WLPZC1zevhxgEvEHsa5wPfwWSbWid/gZDTMIYQMj
-   Q==;
-X-CSE-ConnectionGUID: 4zLcoogvQE6ZnE9V6hesbQ==
-X-CSE-MsgGUID: FOsKf9xiRU2UTfBVcM3Vdw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="67014595"
-X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
-   d="scan'208";a="67014595"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2025 16:49:16 -0700
-X-CSE-ConnectionGUID: 1QxAPU2OQf2LGDIlQYrT8Q==
-X-CSE-MsgGUID: dXGbMom9SFemWmMDYivp+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
-   d="scan'208";a="201808135"
-Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by orviesa001.jf.intel.com with ESMTP; 05 Aug 2025 16:49:13 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chandrashekar.devegowda@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: Refactor Device Coredump
-Date: Wed,  6 Aug 2025 05:35:35 +0530
-Message-ID: <20250806000535.1523133-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b="W//jZtkf"
+Message-ID: <97f834ea-aaeb-42ee-8f6a-5a39e6bec0cf@qtmlabs.xyz>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qtmlabs.xyz; s=dkim;
+	t=1754441450;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lrAgKBerlhcmLDMjnnR2xMuidcMxlbaYEuk3eQgX43U=;
+	b=W//jZtkffWqkmLqsSVXg5BqCVkr10nIi0wdpsbAYBcCk1VZb6p6OraE5sEd5/D0uLjo9i1
+	OSfEnoP8Zv4qipRHhq62pMn9G7ntWLzC5kSPqNa7JWgm/LOes6d2ISnUCDNFz24U76GRAU
+	xY8xz7GsYkuZ9Fc4g/A2ULAmiXj6zOvf99Ao0hp/cNgK9UZDD7KGE/3ODfsH/vthKg9HSv
+	DLAeJXKghdl3GpAF/dZwFUDeTI2an2RnDL+N866x7zheusIgJDsQAP1bW8LUHqH1CcVi3v
+	Tsi2nHhoCWWRdHSFO53zr1enjmQ0g+UOVvbPaQ34g4Woj/INNAIIA8Ax4lqL4w==
+Authentication-Results: s1.g1.infrastructure.qtmlabs.xyz;
+	auth=pass smtp.mailfrom=myrrhperiwinkle@qtmlabs.xyz
+Date: Wed, 6 Aug 2025 07:50:46 +0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
+Subject: Re: [PATCH bluez] audio: Don't initialize device volume from media
+ player
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+References: <20250805-audio-no-reuse-media-player-volume-v1-1-c9fdfaf74a71@qtmlabs.xyz>
+ <CABBYNZJ=Kc_WMa2Srnci=20e+F+JZyPmWFXsjxt8sn_6g0coKQ@mail.gmail.com>
+ <8e903ca0-aeb3-46c2-8da3-95173cb482e5@qtmlabs.xyz>
+ <CABBYNZK+vMXgv6OZuCKABqFE+1Y0kojqd2d0EkhJ-3UFVnUq4w@mail.gmail.com>
+ <961c1bd3-f829-4221-af36-07a343086483@qtmlabs.xyz>
+Content-Language: en-US
+In-Reply-To: <961c1bd3-f829-4221-af36-07a343086483@qtmlabs.xyz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spamd-Bar: ---
 
-As device coredumps are not HCI traces, maintain the device coredump at
-the driver level and eliminate the dependency on hdev_devcd*()
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
-Fixes: 07e6bddb54b4 ("Bluetooth: btintel_pcie: Add support for device coredump")
----
- drivers/bluetooth/btintel_pcie.c | 208 ++++++++++---------------------
- drivers/bluetooth/btintel_pcie.h |   2 +
- 2 files changed, 71 insertions(+), 139 deletions(-)
+On 8/5/25 23:08, Myrrh Periwinkle wrote:
+> Hi,
+>
+> On 8/5/25 23:01, Luiz Augusto von Dentz wrote:
+>> Hi Myrrh,
+>>
+>> On Tue, Aug 5, 2025 at 11:34 AM Myrrh Periwinkle
+>> <myrrhperiwinkle@qtmlabs.xyz> wrote:
+>>> Resent because I forgot to use "Reply All"
+>>>
+>>> On 8/5/25 22:24, Luiz Augusto von Dentz wrote:
+>>>> Hi Myrrh,
+>>>>
+>>>> On Tue, Aug 5, 2025 at 6:29 AM Myrrh Periwinkle
+>>>> <myrrhperiwinkle@qtmlabs.xyz> wrote:
+>>>>> Media player objects may be shared between devices. As a result,
+>>>>> a device without support for hardware volume that is connected 
+>>>>> after one
+>>>>> that does may end up being erroneously considered hardware
+>>>>> volume-capable.
+>>>> Don't quite follow, avrcp_player is per device, not sure how it can be
+>>>> shared between devices?
+>>>>
+>>>>> fa7828bdd ("transport: Fix not being able to initialize volume 
+>>>>> properly")
+>>>>> introduced btd_device_{get,set}_volume that is used as an 
+>>>>> alternative in
+>>>>> case no media player objects are present. Therefore, we can remove
+>>>>> media_player_get_device_volume and instead use 
+>>>>> btd_device_get_volume to
+>>>>> determine the initial volume.
+>>>> Don't follow you here, why shouldn;t we use the media player if we 
+>>>> have one?
+>>>>
+>>>>> ---
+>>>>>    profiles/audio/avrcp.c |  2 +-
+>>>>>    profiles/audio/media.c | 33 +--------------------------------
+>>>>>    profiles/audio/media.h |  1 -
+>>>>>    3 files changed, 2 insertions(+), 34 deletions(-)
+>>>>>
+>>>>> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+>>>>> index 
+>>>>> e2797112fcd580c3fc56793f933e00b1c61e5205..ec07522e6a34eb1dc5f6f413f48f1087a609df9a 
+>>>>> 100644
+>>>>> --- a/profiles/audio/avrcp.c
+>>>>> +++ b/profiles/audio/avrcp.c
+>>>>> @@ -4284,7 +4284,7 @@ static void target_init(struct avrcp *session)
+>>>>>                   target->player = player;
+>>>>>                   player->sessions = 
+>>>>> g_slist_prepend(player->sessions, session);
+>>>>>
+>>>>> -               init_volume = 
+>>>>> media_player_get_device_volume(session->dev);
+>>>>> +               init_volume = btd_device_get_volume(session->dev);
+>>>>> media_transport_update_device_volume(session->dev, init_volume);
+>>>>>           }
+>>>>>
+>>>>> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+>>>>> index 
+>>>>> 8e62dca17070edbc5101677c6eebd3707492c824..55f1482d1d9ce52e104481bab3ede373f47aee0c 
+>>>>> 100644
+>>>>> --- a/profiles/audio/media.c
+>>>>> +++ b/profiles/audio/media.c
+>>>>> @@ -499,37 +499,6 @@ struct a2dp_config_data {
+>>>>>           a2dp_endpoint_config_t cb;
+>>>>>    };
+>>>>>
+>>>>> -int8_t media_player_get_device_volume(struct btd_device *device)
+>>>>> -{
+>>>>> -#ifdef HAVE_AVRCP
+>>>>> -       struct avrcp_player *target_player;
+>>>>> -       struct media_adapter *adapter;
+>>>>> -       GSList *l;
+>>>>> -
+>>>>> -       if (!device)
+>>>>> -               return -1;
+>>>>> -
+>>>>> -       target_player = avrcp_get_target_player_by_device(device);
+>>>>> -       if (!target_player)
+>>>>> -               goto done;
+>>>>> -
+>>>>> -       adapter = find_adapter(device);
+>>>>> -       if (!adapter)
+>>>>> -               goto done;
+>>>>> -
+>>>>> -       for (l = adapter->players; l; l = l->next) {
+>>>>> -               struct media_player *mp = l->data;
+>>>>> -
+>>>>> -               if (mp->player == target_player)
+>>>>> -                       return mp->volume;
+>>> The `avrcp_player` object indeed is not shared between devices, but the
+>>> volume is acquired from (and set for) the associated `media_player`
+>>> object which is not tied to a specific device, and corresponds to 
+>>> client
+>>> `org.mpris.MediaPlayer2.Player` objects.
+>> Ok, so what is the problem with that? If there are 2 headsets that
+>> wants to control the same player registered via mpris-proxy(?) that
+>> should be allowed, or the problem is that each device should control a
+>> dedicated instance of the volume? I suspect the volume store in
+>> mp->volume is only used as initial volume since the actual volume is
+>
+> I searched the codebase for all usages of `mp->volume` and seems like 
+> this is solely used as a temporary storage for the initial volume. 
+> This usage was first introduced in 
+> 4b6153b0501cf18812cb869c2320c41e51f81adc and the field itself was 
+> introduced in a282fff97dabbd3a814765a868e3367cb3dc1ce3 (with unclear 
+> purposes).
+>
+>> stored in the Transport.Volume, the reason why we can't use the
+>> Transport directly is that it is created on demand while there is a
+>> stream so if the stream is not ready at time a volume has been set we
+>> need to store it elsewhere, that said perhaps that should be store per
+>> device not per media_player which seem to be registered per adapter in
+>> media.c but then we should probably remove the volume field altogether
+>> to avoid any confusion in the future.
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 22a2953adbd6..3816efd654d2 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -15,6 +15,7 @@
- #include <linux/interrupt.h>
- 
- #include <linux/unaligned.h>
-+#include <linux/devcoredump.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -559,25 +560,6 @@ static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
- 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
- }
- 
--static int btintel_pcie_add_dmp_data(struct hci_dev *hdev, const void *data, int size)
--{
--	struct sk_buff *skb;
--	int err;
--
--	skb = alloc_skb(size, GFP_ATOMIC);
--	if (!skb)
--		return -ENOMEM;
--
--	skb_put_data(skb, data, size);
--	err = hci_devcd_append(hdev, skb);
--	if (err) {
--		bt_dev_err(hdev, "Failed to append data in the coredump");
--		return err;
--	}
--
--	return 0;
--}
--
- static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
- {
- 	u32 reg;
-@@ -622,30 +604,35 @@ static void btintel_pcie_release_mac_access(struct btintel_pcie_data *data)
- 	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
- }
- 
--static void btintel_pcie_copy_tlv(struct sk_buff *skb, enum btintel_pcie_tlv_type type,
--				  void *data, int size)
-+static void *btintel_pcie_copy_tlv(void *dest, enum btintel_pcie_tlv_type type,
-+				   void *data, size_t size)
- {
- 	struct intel_tlv *tlv;
- 
--	tlv = skb_put(skb, sizeof(*tlv) + size);
-+	tlv = dest;
- 	tlv->type = type;
- 	tlv->len = size;
- 	memcpy(tlv->val, data, tlv->len);
-+	return dest + sizeof(*tlv) + size;
- }
- 
- static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- {
--	u32 offset, prev_size, wr_ptr_status, dump_size, i;
-+	u32 offset, prev_size, wr_ptr_status, dump_size, data_len;
- 	struct btintel_pcie_dbgc *dbgc = &data->dbgc;
--	u8 buf_idx, dump_time_len, fw_build;
- 	struct hci_dev *hdev = data->hdev;
-+	u8 *pdata, *p, buf_idx;
- 	struct intel_tlv *tlv;
- 	struct timespec64 now;
--	struct sk_buff *skb;
- 	struct tm tm_now;
--	char buf[256];
--	u16 hdr_len;
--	int ret;
-+	char fw_build[128];
-+	char ts[128];
-+	char vendor[64];
-+	char driver[64];
-+
-+	if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
-+		return -EOPNOTSUPP;
-+
- 
- 	wr_ptr_status = btintel_pcie_rd_dev_mem(data, BTINTEL_PCIE_DBGC_CUR_DBGBUFF_STATUS);
- 	offset = wr_ptr_status & BTINTEL_PCIE_DBG_OFFSET_BIT_MASK;
-@@ -662,88 +649,84 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- 	else
- 		return -EINVAL;
- 
-+	snprintf(vendor, sizeof(vendor), "Vendor: Intel\n");
-+	snprintf(driver, sizeof(driver), "Driver: %s\n",
-+		 data->dmp_hdr.driver_name);
-+
- 	ktime_get_real_ts64(&now);
- 	time64_to_tm(now.tv_sec, 0, &tm_now);
--	dump_time_len = snprintf(buf, sizeof(buf), "Dump Time: %02d-%02d-%04ld %02d:%02d:%02d",
-+	snprintf(ts, sizeof(ts), "Dump Time: %02d-%02d-%04ld %02d:%02d:%02d",
- 				 tm_now.tm_mday, tm_now.tm_mon + 1, tm_now.tm_year + 1900,
- 				 tm_now.tm_hour, tm_now.tm_min, tm_now.tm_sec);
- 
--	fw_build = snprintf(buf + dump_time_len, sizeof(buf) - dump_time_len,
-+	snprintf(fw_build, sizeof(fw_build),
- 			    "Firmware Timestamp: Year %u WW %02u buildtype %u build %u",
- 			    2000 + (data->dmp_hdr.fw_timestamp >> 8),
- 			    data->dmp_hdr.fw_timestamp & 0xff, data->dmp_hdr.fw_build_type,
- 			    data->dmp_hdr.fw_build_num);
- 
--	hdr_len = sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_bt) +
-+	data_len += sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_bt) +
- 		  sizeof(*tlv) + sizeof(data->dmp_hdr.write_ptr) +
- 		  sizeof(*tlv) + sizeof(data->dmp_hdr.wrap_ctr) +
- 		  sizeof(*tlv) + sizeof(data->dmp_hdr.trigger_reason) +
- 		  sizeof(*tlv) + sizeof(data->dmp_hdr.fw_git_sha1) +
- 		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvr_top) +
- 		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_top) +
--		  sizeof(*tlv) + dump_time_len +
--		  sizeof(*tlv) + fw_build;
-+		  sizeof(*tlv) + strlen(ts) +
-+		  sizeof(*tlv) + strlen(fw_build) +
-+		  sizeof(*tlv) + strlen(vendor) +
-+		  sizeof(*tlv) + strlen(driver);
- 
--	dump_size = hdr_len + sizeof(hdr_len);
-+	/*
-+	 * sizeof(u32) - signature
-+	 * sizeof(data_len) - to store tlv data size
-+	 * data_len - TLV data
-+	 */
-+	dump_size = sizeof(u32) + sizeof(data_len) + data_len;
- 
--	skb = alloc_skb(dump_size, GFP_KERNEL);
--	if (!skb)
--		return -ENOMEM;
- 
- 	/* Add debug buffers data length to dump size */
- 	dump_size += BTINTEL_PCIE_DBGC_BUFFER_SIZE * dbgc->count;
- 
--	ret = hci_devcd_init(hdev, dump_size);
--	if (ret) {
--		bt_dev_err(hdev, "Failed to init devcoredump, err %d", ret);
--		kfree_skb(skb);
--		return ret;
--	}
-+	pdata = vmalloc(dump_size);
-+	if (!pdata)
-+		return -ENOMEM;
-+	p = pdata;
-+
-+	*(u32 *)p = BTINTEL_PCIE_MAGIC_NUM;
-+	p += sizeof(u32);
- 
--	skb_put_data(skb, &hdr_len, sizeof(hdr_len));
-+	*(u32 *)p = data_len;
-+	p += sizeof(u32);
- 
--	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_BT, &data->dmp_hdr.cnvi_bt,
--			      sizeof(data->dmp_hdr.cnvi_bt));
- 
--	btintel_pcie_copy_tlv(skb, BTINTEL_WRITE_PTR, &data->dmp_hdr.write_ptr,
--			      sizeof(data->dmp_hdr.write_ptr));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_VENDOR, vendor, strlen(vendor));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_DRIVER, driver, strlen(driver));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_DUMP_TIME, ts, strlen(ts));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_FW_BUILD, fw_build,
-+				  strlen(fw_build));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVI_BT, &data->dmp_hdr.cnvi_bt,
-+				  sizeof(data->dmp_hdr.cnvi_bt));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_WRITE_PTR, &data->dmp_hdr.write_ptr,
-+				  sizeof(data->dmp_hdr.write_ptr));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_WRAP_CTR, &data->dmp_hdr.wrap_ctr,
-+				  sizeof(data->dmp_hdr.wrap_ctr));
- 
- 	data->dmp_hdr.wrap_ctr = btintel_pcie_rd_dev_mem(data,
- 							 BTINTEL_PCIE_DBGC_DBGBUFF_WRAP_ARND);
- 
--	btintel_pcie_copy_tlv(skb, BTINTEL_WRAP_CTR, &data->dmp_hdr.wrap_ctr,
--			      sizeof(data->dmp_hdr.wrap_ctr));
--
--	btintel_pcie_copy_tlv(skb, BTINTEL_TRIGGER_REASON, &data->dmp_hdr.trigger_reason,
--			      sizeof(data->dmp_hdr.trigger_reason));
--
--	btintel_pcie_copy_tlv(skb, BTINTEL_FW_SHA, &data->dmp_hdr.fw_git_sha1,
--			      sizeof(data->dmp_hdr.fw_git_sha1));
--
--	btintel_pcie_copy_tlv(skb, BTINTEL_CNVR_TOP, &data->dmp_hdr.cnvr_top,
--			      sizeof(data->dmp_hdr.cnvr_top));
--
--	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
--			      sizeof(data->dmp_hdr.cnvi_top));
--
--	btintel_pcie_copy_tlv(skb, BTINTEL_DUMP_TIME, buf, dump_time_len);
--
--	btintel_pcie_copy_tlv(skb, BTINTEL_FW_BUILD, buf + dump_time_len, fw_build);
--
--	ret = hci_devcd_append(hdev, skb);
--	if (ret)
--		goto exit_err;
--
--	for (i = 0; i < dbgc->count; i++) {
--		ret = btintel_pcie_add_dmp_data(hdev, dbgc->bufs[i].data,
--						BTINTEL_PCIE_DBGC_BUFFER_SIZE);
--		if (ret)
--			break;
--	}
--
--exit_err:
--	hci_devcd_complete(hdev);
--	return ret;
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_TRIGGER_REASON, &data->dmp_hdr.trigger_reason,
-+				  sizeof(data->dmp_hdr.trigger_reason));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_FW_SHA, &data->dmp_hdr.fw_git_sha1,
-+				  sizeof(data->dmp_hdr.fw_git_sha1));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVR_TOP, &data->dmp_hdr.cnvr_top,
-+				  sizeof(data->dmp_hdr.cnvr_top));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
-+				  sizeof(data->dmp_hdr.cnvi_top));
-+
-+	memcpy(p, dbgc->bufs[0].data, dbgc->count * BTINTEL_PCIE_DBGC_BUFFER_SIZE);
-+	dev_coredumpv(&hdev->dev, pdata, dump_size, GFP_KERNEL);
-+	return 0;
- }
- 
- static void btintel_pcie_dump_traces(struct hci_dev *hdev)
-@@ -765,51 +748,6 @@ static void btintel_pcie_dump_traces(struct hci_dev *hdev)
- 		bt_dev_err(hdev, "Failed to dump traces: (%d)", ret);
- }
- 
--static void btintel_pcie_dump_hdr(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
--	u16 len = skb->len;
--	u16 *hdrlen_ptr;
--	char buf[80];
--
--	hdrlen_ptr = skb_put_zero(skb, sizeof(len));
--
--	snprintf(buf, sizeof(buf), "Controller Name: 0x%X\n",
--		 INTEL_HW_VARIANT(data->dmp_hdr.cnvi_bt));
--	skb_put_data(skb, buf, strlen(buf));
--
--	snprintf(buf, sizeof(buf), "Firmware Build Number: %u\n",
--		 data->dmp_hdr.fw_build_num);
--	skb_put_data(skb, buf, strlen(buf));
--
--	snprintf(buf, sizeof(buf), "Driver: %s\n", data->dmp_hdr.driver_name);
--	skb_put_data(skb, buf, strlen(buf));
--
--	snprintf(buf, sizeof(buf), "Vendor: Intel\n");
--	skb_put_data(skb, buf, strlen(buf));
--
--	*hdrlen_ptr = skb->len - len;
--}
--
--static void btintel_pcie_dump_notify(struct hci_dev *hdev, int state)
--{
--	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
--
--	switch (state) {
--	case HCI_DEVCOREDUMP_IDLE:
--		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
--		break;
--	case HCI_DEVCOREDUMP_ACTIVE:
--		data->dmp_hdr.state = HCI_DEVCOREDUMP_ACTIVE;
--		break;
--	case HCI_DEVCOREDUMP_TIMEOUT:
--	case HCI_DEVCOREDUMP_ABORT:
--	case HCI_DEVCOREDUMP_DONE:
--		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
--		break;
--	}
--}
--
- /* This function enables BT function by setting BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT bit in
-  * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
-  * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
-@@ -1383,6 +1321,11 @@ static void btintel_pcie_rx_work(struct work_struct *work)
- 					struct btintel_pcie_data, rx_work);
- 	struct sk_buff *skb;
- 
-+	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags)) {
-+		btintel_pcie_dump_traces(data->hdev);
-+		clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
-+	}
-+
- 	if (test_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags)) {
- 		/* Unlike usb products, controller will not send hardware
- 		 * exception event on exception. Instead controller writes the
-@@ -1395,11 +1338,6 @@ static void btintel_pcie_rx_work(struct work_struct *work)
- 		clear_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags);
- 	}
- 
--	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags)) {
--		btintel_pcie_dump_traces(data->hdev);
--		clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
--	}
--
- 	/* Process the sk_buf in queue and send to the HCI layer */
- 	while ((skb = skb_dequeue(&data->rx_skb_q))) {
- 		btintel_pcie_recv_frame(data, skb);
-@@ -2190,13 +2128,6 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 	if (ver_tlv.img_type == 0x02 || ver_tlv.img_type == 0x03)
- 		data->dmp_hdr.fw_git_sha1 = ver_tlv.git_sha1;
- 
--	err = hci_devcd_register(hdev, btintel_pcie_dump_traces, btintel_pcie_dump_hdr,
--				 btintel_pcie_dump_notify);
--	if (err) {
--		bt_dev_err(hdev, "Failed to register coredump (%d)", err);
--		goto exit_error;
--	}
--
- 	btintel_print_fseq_info(hdev);
- exit_error:
- 	kfree_skb(skb);
-@@ -2325,7 +2256,6 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
- 	btintel_pcie_synchronize_irqs(data);
- 
- 	flush_work(&data->rx_work);
--	flush_work(&data->hdev->dump.dump_rx);
- 
- 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
- 	btintel_pcie_release_hdev(data);
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 0fa876c5b954..04b21f968ad3 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -132,6 +132,8 @@ enum btintel_pcie_tlv_type {
- 	BTINTEL_CNVI_TOP,
- 	BTINTEL_DUMP_TIME,
- 	BTINTEL_FW_BUILD,
-+	BTINTEL_VENDOR,
-+	BTINTEL_DRIVER
- };
- 
- /* causes for the MBOX interrupts */
--- 
-2.43.0
+For some additional context: This issue only started happening when I 
+started using mpris-proxy. Without mpris-proxy the device without 
+hardware volume support is always recognized as such. What I believe is 
+happening is that the volume for the first device with hardware volume 
+support is set on the media_player object which is then used as the 
+initial volume for the second device that doesn't have hardware volume.
+
+I will soon send a v2 that removes the media_player.volume field 
+entirely since it doesn't appear to be used for anything else.
+
+>>
+>>>>> -       }
+>>>>> -
+>>>>> -done:
+>>>>> -#endif /* HAVE_AVRCP */
+>>>>> -       /* If media_player doesn't exists use device_volume */
+>>>>> -       return btd_device_get_volume(device);
+>>>>> -}
+>>>>> -
+>>>>>    static gboolean set_configuration(struct media_endpoint *endpoint,
+>>>>>                                           uint8_t *configuration, 
+>>>>> size_t size,
+>>>>> media_endpoint_cb_t cb,
+>>>>> @@ -556,7 +525,7 @@ static gboolean set_configuration(struct 
+>>>>> media_endpoint *endpoint,
+>>>>>           if (transport == NULL)
+>>>>>                   return FALSE;
+>>>>>
+>>>>> -       init_volume = media_player_get_device_volume(device);
+>>>>> +       init_volume = btd_device_get_volume(device);
+>>>>>           media_transport_update_volume(transport, init_volume);
+>>>>>
+>>>>>           msg = dbus_message_new_method_call(endpoint->sender, 
+>>>>> endpoint->path,
+>>>>> diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+>>>>> index 
+>>>>> 2b2e8e1572874d5f71abb28fdd5b92fa2d9efe83..d3954abd6de505a69cab3fcffc217d236a52d3e5 
+>>>>> 100644
+>>>>> --- a/profiles/audio/media.h
+>>>>> +++ b/profiles/audio/media.h
+>>>>> @@ -23,6 +23,5 @@ uint8_t media_endpoint_get_codec(struct 
+>>>>> media_endpoint *endpoint);
+>>>>>    struct btd_adapter *media_endpoint_get_btd_adapter(
+>>>>>                                           struct media_endpoint 
+>>>>> *endpoint);
+>>>>>    bool media_endpoint_is_broadcast(struct media_endpoint *endpoint);
+>>>>> -int8_t media_player_get_device_volume(struct btd_device *device);
+>>>>>
+>>>>>    const struct media_endpoint *media_endpoint_get_asha(void);
+>>>>>
+>>>>> ---
+>>>>> base-commit: 2c0c323d08357a4ff3065fcd49fee0c83b5835cd
+>>>>> change-id: 20250805-audio-no-reuse-media-player-volume-fbc2983a287a
+>>>>>
+>>>>> Best regards,
+>>>>> -- 
+>>>>> Myrrh Periwinkle<myrrhperiwinkle@qtmlabs.xyz>
+>>>>>
+>>>>>
+> -Myrrh
+
+-Myrrh
 
