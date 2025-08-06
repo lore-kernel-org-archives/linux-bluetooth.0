@@ -1,39 +1,38 @@
 Received: from s1.g1.infrastructure.qtmlabs.xyz (s1.g1.infrastructure.qtmlabs.xyz [107.172.1.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB37C2AD32
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Aug 2025 02:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AAD192D8A
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Aug 2025 02:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=107.172.1.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754446974; cv=none; b=kXxwWj56kfQzVu+klc7mqE5cVgcrTKJJ0/NoRw3HPT245LBlpN5/VtwOUO+7x4ljPNHvMxPnYoUDdgaSQQUR5bO4fg8hJZuqIa0Rs62tztYd65jUhVzLHTQmKwjVOAEgtaAPQlZbj0osAUaOOdydjeVfjo9Kje+pXthNRDgNdyc=
+	t=1754446976; cv=none; b=d6qBt9E/Ny4nfx/gRnrzoQCe6/cJrW/JbdpyoVKtceQe8yVmR40snqQcE+Jag/nMBGgNNJBxLxn4T5vvue6sRu1eE2RJvLMd6bhIk22OcISwfHeJYgqqc//0cCz+k3mAcfHrKrfxRY2d/r1XPDdPfNS3papSLBdPz2OTJRneafQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754446974; c=relaxed/simple;
-	bh=SL9F0RwB1J1SalCW/YAf1wy2LLfxgbysm1t3rCTZMoI=;
+	s=arc-20240116; t=1754446976; c=relaxed/simple;
+	bh=0UHzwruSV4T16dkTUamdHC3Yz1F2TY76sL0oMvLv7fE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tHW8vc4z6674lEF5sp32aRlIJhjYeOAPmCOWXc7/bPjG/VyC1911h+zEc8wGadMmuwRGkzEL1rZJLgRkWeCbmskK10goU9TH7AmAjaLE66b+kUZ7mp8a0+gfC6KrqzsTiUGD1wgW4q/iXFs9oOfOHxlaMkrkfgmarxehS1F75ZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz; spf=pass smtp.mailfrom=qtmlabs.xyz; dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b=mMra1WQL; arc=none smtp.client-ip=107.172.1.117
+	 In-Reply-To:To:Cc; b=RhpqVdkG4vMn2RoYp2th7KXs789QiGIvc73uRPUJcV7A89eqUkX4pXJWatYon1F7ApSXgdqDduik4vjbGObsMXdBJKjBGpVzdHeZjpfxqfS2WHceXeHdqmk3piVTZG7+Ii4A5egWR2KoSR8BgD1uEtGhscv3affnOKsDoPNfkuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz; spf=pass smtp.mailfrom=qtmlabs.xyz; dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b=cNwW3p0J; arc=none smtp.client-ip=107.172.1.117
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=qtmlabs.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qtmlabs.xyz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b="mMra1WQL"
+	dkim=pass (2048-bit key) header.d=qtmlabs.xyz header.i=@qtmlabs.xyz header.b="cNwW3p0J"
 From: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qtmlabs.xyz; s=dkim;
-	t=1754446971;
+	t=1754446973;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=455dEShP6QASV+lOsNBmYqkUrbWS/7PwvY3+RlT7Eg4=;
-	b=mMra1WQLJiiRF+lZl2+s6MjWJQbBJ3jo1PAYMqi4YRnvvdlOnmLliAuAOJPLbjxkP4XqwK
-	hDNc0/c1nz7C/3dWDMticPeV8dn5XUuFw+y0QpdGM/rGqoudAR3NMERkHpGHiTafrfcdmP
-	E+vm+g657cgmfssCfkMlSR2Z2z6jJRGB6bZDZPyCmF4XJ/ff+2Y1CQmqreUyxeqbYtLj9E
-	eLm3NVaeQNLntqcH8QRqjy9wAJ3bF/GAIECxCpHhgVYHboUI8uv/xlzCkJn+q4dyGQylGh
-	JAt958XMwkxTThFbNx52VWW2gAKoFjinqYpxmErR1d7kLA96FoK63fKUk+Iq8A==
+	bh=bofkv6sH+NopTun1OEUVllcLvuDUS3qFu39PDrbmMP0=;
+	b=cNwW3p0JemXChxMGlLWKmoNDfQc/vhIx+uxhb3YKj2cgspGwPGGPQIVdYK6r43CBnTIURp
+	4NZcIbYvZ8e5S9Cb1wdJ9/A5xWS9NaZNEwuESrdSPcmr3H3iTyPONc4j/JVP7zF+b9/X3s
+	hK1yCAs/phcTm/eGMHgKK5p1p001LJW4vP3BHhuY4bcQP/vDxOcaIay09HgIV0Yd6fs1uc
+	IqoeZpI/bCmZ7f3VXnq49f2BsYykI6WjrnLZ9ZhOY963F52SLgfBeGih2YW4ZFsPlPT8yI
+	H104JX8jXI+g2RErGdtfFdzX62DUd6/EZ29xno8yF1kTUZn/UbUZhyJLksKJqA==
 Authentication-Results: s1.g1.infrastructure.qtmlabs.xyz;
 	auth=pass smtp.mailfrom=myrrhperiwinkle@qtmlabs.xyz
-Date: Wed, 06 Aug 2025 09:22:46 +0700
-Subject: [PATCH bluez v4 1/2] audio: Don't initialize media transport
- volume from media player
+Date: Wed, 06 Aug 2025 09:22:47 +0700
+Subject: [PATCH bluez v4 2/2] audio: Remove media_player.volume
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -42,7 +41,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250806-audio-no-reuse-media-player-volume-v4-1-a59d9a4848c1@qtmlabs.xyz>
+Message-Id: <20250806-audio-no-reuse-media-player-volume-v4-2-a59d9a4848c1@qtmlabs.xyz>
 References: <20250806-audio-no-reuse-media-player-volume-v4-0-a59d9a4848c1@qtmlabs.xyz>
 In-Reply-To: <20250806-audio-no-reuse-media-player-volume-v4-0-a59d9a4848c1@qtmlabs.xyz>
 To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
@@ -50,97 +49,115 @@ Cc: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Spamd-Bar: -------
 
-Media player objects may be shared between devices. As a result,
-a device without support for hardware volume that is connected after one
-that does may end up being erroneously considered hardware
-volume-capable.
-
-fa7828bdd ("transport: Fix not being able to initialize volume properly")
-introduced btd_device_{get,set}_volume that is used as an alternative in
-case no media player objects are present. Therefore, we can remove
-media_player_get_device_volume and instead use btd_device_get_volume to
-determine the initial volume.
+With the previous commit, the media_player.volume field is now
+completely unused. As this was never the right place to store the
+initial volume to begin with, remove this field entirely as well as its
+associated supporting methods to prevent confusion.
 ---
- profiles/audio/avrcp.c |  2 +-
- profiles/audio/media.c | 33 +--------------------------------
- profiles/audio/media.h |  1 -
- 3 files changed, 2 insertions(+), 34 deletions(-)
+ profiles/audio/avrcp.c |  8 --------
+ profiles/audio/avrcp.h |  2 --
+ profiles/audio/media.c | 14 --------------
+ 3 files changed, 24 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index e2797112fcd580c3fc56793f933e00b1c61e5205..ec07522e6a34eb1dc5f6f413f48f1087a609df9a 100644
+index ec07522e6a34eb1dc5f6f413f48f1087a609df9a..0cb2ad657534d0c02a51e095ac76f3e3f28376af 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -4284,7 +4284,7 @@ static void target_init(struct avrcp *session)
- 		target->player = player;
- 		player->sessions = g_slist_prepend(player->sessions, session);
+@@ -3796,7 +3796,6 @@ static void avrcp_get_media_player_list(struct avrcp *session)
+ static void avrcp_volume_changed(struct avrcp *session,
+ 						struct avrcp_header *pdu)
+ {
+-	struct avrcp_player *player = target_get_player(session);
+ 	int8_t volume;
  
--		init_volume = media_player_get_device_volume(session->dev);
-+		init_volume = btd_device_get_volume(session->dev);
- 		media_transport_update_device_volume(session->dev, init_volume);
- 	}
+ 	if (!avrcp_volume_supported(session->controller)) {
+@@ -3808,9 +3807,6 @@ static void avrcp_volume_changed(struct avrcp *session,
  
+ 	/* Always attempt to update the transport volume */
+ 	media_transport_update_device_volume(session->dev, volume);
+-
+-	if (player)
+-		player->cb->set_volume(volume, session->dev, player->user_data);
+ }
+ 
+ static void avrcp_status_changed(struct avrcp *session,
+@@ -4637,7 +4633,6 @@ static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
+ 					void *user_data)
+ {
+ 	struct avrcp *session = user_data;
+-	struct avrcp_player *player = target_get_player(session);
+ 	struct avrcp_header *pdu = (void *) operands;
+ 	int8_t volume;
+ 
+@@ -4650,9 +4645,6 @@ static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
+ 	/* Always attempt to update the transport volume */
+ 	media_transport_update_device_volume(session->dev, volume);
+ 
+-	if (player != NULL)
+-		player->cb->set_volume(volume, session->dev, player->user_data);
+-
+ 	return FALSE;
+ }
+ 
+diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+index 887753ddf28643800fabbddb1bf0941ed3930463..1f46df17d48e7c1d22ccf97bc7804e21372f5882 100644
+--- a/profiles/audio/avrcp.h
++++ b/profiles/audio/avrcp.h
+@@ -83,8 +83,6 @@ struct avrcp_player_cb {
+ 	uint32_t (*get_position)(void *user_data);
+ 	uint32_t (*get_duration)(void *user_data);
+ 	const char *(*get_name)(void *user_data);
+-	void (*set_volume)(int8_t volume, struct btd_device *dev,
+-							void *user_data);
+ 	bool (*play)(void *user_data);
+ 	bool (*stop)(void *user_data);
+ 	bool (*pause)(void *user_data);
 diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 8e62dca17070edbc5101677c6eebd3707492c824..55f1482d1d9ce52e104481bab3ede373f47aee0c 100644
+index 55f1482d1d9ce52e104481bab3ede373f47aee0c..fd6e30f042ecee9882694059fcf72daf5e0eb436 100644
 --- a/profiles/audio/media.c
 +++ b/profiles/audio/media.c
-@@ -499,37 +499,6 @@ struct a2dp_config_data {
- 	a2dp_endpoint_config_t cb;
- };
+@@ -142,7 +142,6 @@ struct media_player {
+ 	char			*status;
+ 	uint32_t		position;
+ 	uint32_t		duration;
+-	int8_t			volume;
+ 	GTimer			*timer;
+ 	bool			play;
+ 	bool			pause;
+@@ -2036,17 +2035,6 @@ static uint32_t media_player_get_duration(void *user_data)
+ 	return mp->duration;
+ }
  
--int8_t media_player_get_device_volume(struct btd_device *device)
+-static void media_player_set_volume(int8_t volume, struct btd_device *dev,
+-				    void *user_data)
 -{
--#ifdef HAVE_AVRCP
--	struct avrcp_player *target_player;
--	struct media_adapter *adapter;
--	GSList *l;
+-	struct media_player *mp = user_data;
 -
--	if (!device)
--		return -1;
+-	if (mp->volume == volume)
+-		return;
 -
--	target_player = avrcp_get_target_player_by_device(device);
--	if (!target_player)
--		goto done;
--
--	adapter = find_adapter(device);
--	if (!adapter)
--		goto done;
--
--	for (l = adapter->players; l; l = l->next) {
--		struct media_player *mp = l->data;
--
--		if (mp->player == target_player)
--			return mp->volume;
--	}
--
--done:
--#endif /* HAVE_AVRCP */
--	/* If media_player doesn't exists use device_volume */
--	return btd_device_get_volume(device);
+-	mp->volume = volume;
 -}
 -
- static gboolean set_configuration(struct media_endpoint *endpoint,
- 					uint8_t *configuration, size_t size,
- 					media_endpoint_cb_t cb,
-@@ -556,7 +525,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
- 	if (transport == NULL)
- 		return FALSE;
+ static bool media_player_send(struct media_player *mp, const char *name)
+ {
+ 	DBusMessage *msg;
+@@ -2134,7 +2122,6 @@ static struct avrcp_player_cb player_cb = {
+ 	.get_duration = media_player_get_duration,
+ 	.get_status = media_player_get_status,
+ 	.get_name = media_player_get_player_name,
+-	.set_volume = media_player_set_volume,
+ 	.play = media_player_play,
+ 	.stop = media_player_stop,
+ 	.pause = media_player_pause,
+@@ -2617,7 +2604,6 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 	mp->sender = g_strdup(sender);
+ 	mp->path = g_strdup(path);
+ 	mp->timer = g_timer_new();
+-	mp->volume = -1;
  
--	init_volume = media_player_get_device_volume(device);
-+	init_volume = btd_device_get_volume(device);
- 	media_transport_update_volume(transport, init_volume);
- 
- 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
-diff --git a/profiles/audio/media.h b/profiles/audio/media.h
-index 2b2e8e1572874d5f71abb28fdd5b92fa2d9efe83..d3954abd6de505a69cab3fcffc217d236a52d3e5 100644
---- a/profiles/audio/media.h
-+++ b/profiles/audio/media.h
-@@ -23,6 +23,5 @@ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
- struct btd_adapter *media_endpoint_get_btd_adapter(
- 					struct media_endpoint *endpoint);
- bool media_endpoint_is_broadcast(struct media_endpoint *endpoint);
--int8_t media_player_get_device_volume(struct btd_device *device);
- 
- const struct media_endpoint *media_endpoint_get_asha(void);
+ 	mp->watch = g_dbus_add_disconnect_watch(conn, sender,
+ 						media_player_exit, mp,
 
 -- 
 2.50.1
