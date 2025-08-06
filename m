@@ -1,96 +1,151 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796D97261C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Aug 2025 01:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C501FB3
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Aug 2025 01:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754443032; cv=none; b=Y7LJq220O6/Ea6MFq/fBN86QIY4ZNasIFfboTk7w7i59l9tS1TmOd/rTDXnuV1/8GE3FAidM3wkNJHQl2KRx/D3eXqbvI2iIbSfGCNdkm9GZDvzaElvps50wU3BO4Rxiwp8Hlhc2IoawoZVwhkQvyA79MJaNNmdrjSdbUwqch34=
+	t=1754444195; cv=none; b=UA7vf6I15yWVNibN16CM8axcMl/kCcxVLpjuuFbNWsSNyMyztekVu250LqcEWqFzPcxx0YmTD6bfVX3sE1DfrqiYAai/n4Mr84oUVxx722U3K2kxitdW/YSD/EpUPZq3YGDOW3PugbP5+yHB0jGwFluXZS4+zNmMgEmHnjMUTsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754443032; c=relaxed/simple;
-	bh=O7SsPGvx1+XBB8nL29Dc6TQWOCsyzKuesAJKJ/wXqWs=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=V1yxh5FqpGPkbDFm1h2MPLrYL16X5iAVnJaFKXEcg0RYQDDBl4tCVD0U2tCJpNQY/sXd3o1a+IMrEQmCvt0YaRPhG8VbxJxIsDxfCUpQkhzp7HlTNT7Aw/a8IqmYEQbb9VY9rbspWKxYUNUHP1CtEyOiRPjklE1+HAia+zyuVgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BeftpVa2; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1754444195; c=relaxed/simple;
+	bh=TBPDPdHuKXFLBn/XOQWvVZVqDU30HxRwYNQ5rgzTDGg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=FVF5WyvNapPbPGZU0bpbKUn4xcWbe99RRUiT5f635j1WZU13e488EqqnEQS6frFmhMDZkCp9v2sa1Sll1WM51mwmxMLCN32lydaxVOvylOvsVzHXgehHO1AKFjyFM44/wy5bbGWksdviZ2CIecYTafjmgkEhRrZcubfX7hesz1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwzTBpFw; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BeftpVa2"
-Received: from github.com (hubbernetes-node-c88ee3d.va3-iad.github.net [10.48.221.18])
-	by smtp.github.com (Postfix) with ESMTPA id 8E7A84E02F9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Aug 2025 18:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1754443030;
-	bh=PMQJjB8066PpYofXUo5DV9/xsePI5/sWWY1P3fEAOMw=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=BeftpVa23/GRq3916bpetLjIIibZrNzJeKtrHjYLNjTF+qWK/mROUR4nOhCtXm4KV
-	 cr+9COvVCND9xagVO62NNYURKIBrCi5Hvg0JVf2S6/kjnNgi55/BV5nfueHvseuONO
-	 q343/aD26GODRYHg4/RcUTH3T9f07mnvRSHGh4Gc=
-Date: Tue, 05 Aug 2025 18:17:10 -0700
-From: Myrrh Periwinkle <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/988588/000000-94ccc2@github.com>
-Subject: [bluez/bluez] 18c07d: audio: Don't initialize media transport volume
- fro...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwzTBpFw"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-73c17c770a7so5773347b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Aug 2025 18:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754444193; x=1755048993; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=O03lDZ0iGLXDRK/M+uWlGT70KB5rh5tcX2yWR289QwQ=;
+        b=YwzTBpFwgH6EkNro2/6h+bIGU9YI6noDxH4Jk49yHrjuiFd9xAkR7VL86NxqIK9Wec
+         9Xh2gYkvcXUNNkrI9vtxIokZQ/vAJZ0rshKLhp8mwvn71bVPolYcPOkMUSvj/wFCX45T
+         N4LPQr2WaAwUXCs3DN5mrsHxHUXqbRn6d86VTp+TcSXmiXuPjedWesAioenLm2mBRnMr
+         zzYj6O6RmIUxPybJsl1+HCNX5gyQ/NCNQTUW6r2EX4OaC+Rwjc/XXV58mXhn7MJ9sFk3
+         q7a1vyyB24CZUAjXkE62OFMKnfH0gjrztA0rjPqRDy4JfSplvUboN55sntkbLKmsBan8
+         pWdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754444193; x=1755048993;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O03lDZ0iGLXDRK/M+uWlGT70KB5rh5tcX2yWR289QwQ=;
+        b=DcEhsZQ4lqTTLz+Grll4s0KVIWUiP/o6stDTYu8/Jo06t+X4qHkNDwhGaa3WDnsONR
+         8OF4SuzZK67jcXf7g50sFaFfnZhsApYgewAQs1RrlF8roQitkG8dusT3wej1zL1EHsEJ
+         lMCySNIhyPk+qhlGYvjrBFjuh9f47HI3rLI9vg6Qfn/35yt/u20fVveCn2UAExWS0PrM
+         0ueoXiHTnTTEmLqBJao/Lpi/5qp2HywEcZT1K4dx2W9ZZbGdQihz4I7UDsdTsH48Vs9V
+         2l0zKXOWYMCMJmTV5XAqKsKW/LexQuQ5haR1sRMvnk/Zbu3oSgta+4Ta0Jzd3JX0s+UG
+         /L2A==
+X-Gm-Message-State: AOJu0Yzq4mb8bYZ4W+VG3eDjQkYimjxUA1CkVDaK0bpSCMeWzJb8IqoZ
+	MQfOc0rdTpwwf74KYo3fOzOLiEvneKKskkbVo0/i3+K1TnXNVzYLn9QXr7Ib3A==
+X-Gm-Gg: ASbGncuHlxZPaCmbUj5VamzSiiYRyOgKio1JE6Ftf3Bt7dNfjPzOPiJ1jlR0PDBKrQR
+	qHsSZ4gbaKFeWD8zCwX/C/Lyl/1E0t+xFornGM6MvkpAEZCsCEUipY7rdkMJKXHNSzDc32QSmF9
+	gKyTeE9A8ahg5EGttkmPYfwfiPphMEq180cVsgBSfZ5PVjX7M1xC8gAEXOoApzWKHttefeYARkw
+	PtHOnVfRQOx5xINc4oeJKgnTbgQ0w7gANam0zjaSOp5ft2magGhpRISHLsqP744PVZ2vTtE75g4
+	Qt7D8k769Hk4C5LcVFzmWzPOTeQ23V27NDSVpBf9eXOyruRF9ihhAGznRxJLERregWtZ5JF+B+q
+	je/VO2HqBsctYhnqxcdRNxayKIBMO1TRzao09ZA==
+X-Google-Smtp-Source: AGHT+IEG+kJ8MHUv+UjWEuiIycEY2ppI4++LCkfSwPLCUgrB6nokXocbmgKMJdu1BpOqzlI8AnK1CQ==
+X-Received: by 2002:a05:6300:210d:b0:240:dc9:71cf with SMTP id adf61e73a8af0-24033143bddmr1181705637.38.1754444193282;
+        Tue, 05 Aug 2025 18:36:33 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.227.1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bccfbce15sm14162543b3a.64.2025.08.05.18.36.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Aug 2025 18:36:32 -0700 (PDT)
+Message-ID: <6892b1a0.050a0220.3fcbc.2388@mx.google.com>
+Date: Tue, 05 Aug 2025 18:36:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8710002886162027261=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1] Bluetooth: btintel_pcie: Refactor Device Coredump
+In-Reply-To: <20250806000535.1523133-1-kiran.k@intel.com>
+References: <20250806000535.1523133-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8710002886162027261==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/988588
-  Home:   https://github.com/bluez/bluez
-  Commit: 18c07de44a6b8c2bda66a0dcc455220df792e268
-      https://github.com/bluez/bluez/commit/18c07de44a6b8c2bda66a0dcc455220df792e268
-  Author: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
-  Date:   2025-08-06 (Wed, 06 Aug 2025)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/avrcp.c
-    M profiles/audio/media.c
-    M profiles/audio/media.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  audio: Don't initialize media transport volume from media player
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=988575
 
-Media player objects may be shared between devices. As a result,
-a device without support for hardware volume that is connected after one
-that does may end up being erroneously considered hardware
-volume-capable.
+---Test result---
 
-fa7828bdd ("transport: Fix not being able to initialize volume properly")
-introduced btd_device_{get,set}_volume that is used as an alternative in
-case no media player objects are present. Therefore, we can remove
-media_player_get_device_volume and instead use btd_device_get_volume to
-determine the initial volume.
+Test Summary:
+CheckPatch                    PENDING   0.45 seconds
+GitLint                       PENDING   0.35 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      24.55 seconds
+CheckAllWarning               PASS      27.51 seconds
+CheckSparse                   PASS      31.33 seconds
+BuildKernel32                 PASS      24.55 seconds
+TestRunnerSetup               PASS      487.47 seconds
+TestRunner_l2cap-tester       PASS      25.31 seconds
+TestRunner_iso-tester         PASS      36.47 seconds
+TestRunner_bnep-tester        PASS      6.08 seconds
+TestRunner_mgmt-tester        FAIL      129.60 seconds
+TestRunner_rfcomm-tester      PASS      9.50 seconds
+TestRunner_sco-tester         PASS      14.81 seconds
+TestRunner_ioctl-tester       PASS      10.30 seconds
+TestRunner_mesh-tester        FAIL      11.50 seconds
+TestRunner_smp-tester         PASS      10.94 seconds
+TestRunner_userchan-tester    PASS      6.37 seconds
+IncrementalBuild              PENDING   1.15 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Add Device 3 (AL is full)               Failed       0.235 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    1.930 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: 94ccc2ab32e46a7ab190dfbc4274e2ca8d0beef3
-      https://github.com/bluez/bluez/commit/94ccc2ab32e46a7ab190dfbc4274e2ca8d0beef3
-  Author: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
-  Date:   2025-08-06 (Wed, 06 Aug 2025)
 
-  Changed paths:
-    M profiles/audio/avrcp.c
-    M profiles/audio/avrcp.h
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  audio: Remove media_player.volume
-
-With the previous commit, the media_player.volume field is now
-completely unused. As this was never the right place to store the
-initial volume to begin with, remove this field entirely as well as its
-associated supporting methods to prevent confusion.
+---
+Regards,
+Linux Bluetooth
 
 
-Compare: https://github.com/bluez/bluez/compare/18c07de44a6b%5E...94ccc2ab32e4
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============8710002886162027261==--
