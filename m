@@ -1,415 +1,223 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013010.outbound.protection.outlook.com [52.101.72.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EF12185AA
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Aug 2025 06:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754463030; cv=none; b=qpsk53Xv6wOlzU5+GtXKTfBx9ztv49UnLOUd1P0Ww83vcokbhwdzWqzSqaWWLQJ/YkejNMW/x9ouQh2fPDwdZ68NttAfv9EFvVozR6b0gxedzJ7gSjRKMD6VhhSk3CEIyJa+anONbV2HWZzp77Bi2+7XBwsZKAoIhl9ZfAC0OFE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754463030; c=relaxed/simple;
-	bh=1NsKWcxVBLQpnQ3FVc7T2299jXQoGV3bh91SdgO2Rzs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KevXu1YdLuoBe/cFHI5ncqgYI67T24nI62dlFj8R7SdbmFp3H101tA483xcR+l7hZffB//YSJPkLO42nYlOvj/6uQoSmwFk/cikWvVY68Qcqax8tDMgMfznO2lwwCuiQWJHRf3rpqtcy3GffeSf5x5JoPTGPKBSxRjCimEjaRYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af7ca.dynamic.kabel-deutschland.de [95.90.247.202])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E9CDC61E64848;
-	Wed, 06 Aug 2025 08:50:09 +0200 (CEST)
-Message-ID: <2b259ec0-ed7e-42a0-981a-8b45348a3b81@molgen.mpg.de>
-Date: Wed, 6 Aug 2025 08:50:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2678821;
+	Wed,  6 Aug 2025 07:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754463742; cv=fail; b=qQP1jQoMSXCIvGQly+oVYelnF5/roJtDKQIL/ANG8qLYIjRGZ307yrHYyYqV6Lywdj8F9R8txtJNs7CYMxVbRnv++JFO3eMuXVvAjJaFNoLjJoiLZ0jZvRhwQ9nEO2qM7n+TKFnOXC00hoTfbGyHwcCpyEwtfyeEK+nTFZxzJIk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754463742; c=relaxed/simple;
+	bh=t+T68EC0Ky7TZ1Am/Ar/a3wfB/UTiA2vZcTPCW3HWpg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mrdbpUEnadfeBexvBbWCwXBvQIydPeOtCZhZLc2fZpeN2Rs1NreQ8Y0GrEfFeo25W04X4lTGTQjodVZEzj6SwKZKrf/v7jE/fI8hwG7BF3tkbCxAXJHrRgFU1uGmMboeChpNTrAqCjomug4tFrl+4jRvj0PW0GCAlU03KdAZOio=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=fRnrLvVo; arc=fail smtp.client-ip=52.101.72.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="fRnrLvVo"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sKKyZFmo7+B5demiVXJBsJoyUIglgK69GjTTYjA1kysis5ZcTWA57tO/gLbMn1Zde9zHFghoacp+qf0y4QJeofjYqUqpv4sqmYsiVPevAKHg15/qNzV6LpfKHdbdI3VwB6GUuEFGDTqcPjRCxIlWhaPGirILhkHfCfNBQfDXxIiR/L9JRX5Jlk12Y79qBz1HjwXru+6/nnezC84ZY4y1EShMoX8gwyYYrQ9cyR1dbKzYUZETQMkYqGfZQf2mfwvDg5DtYyLR2nUXz/lVLCR0PoimJU4TMYbEWKr42v/9V4LCjOKQPyUFq37uOZmK385RLdEHYSKckDrTe7iuA5LzlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Gzr9vqU1NJ6nO6dezdvQLXoi3q5+0FTjeL5iP95ck6U=;
+ b=jqESEC2Kg2AFD9QhqJkMICIrQWQNTXRAGNA2AjYXkTtMGaLRFX0ajEz1hhw5u3s7FA0Y7C8F+QkN8DEIrf4JKMXZZg50Uwd+faOLmEbfpIP41DAKTVmXVhgQmlpwlAVPHPyWPjSwer/EwG1rZ/5drC1Cqs8mqINEP27h/iETCCu6MfD2JbgxwSI5qDc4Ga2dNiFZWr7P2wVfyRKarr9f/8mmKZU8RwGjbczvyKKj74yp9jerJyPlVSIKkm2Z3alGdBaEnjtCXKhzp/KHpEttGx9r2vnu+LZ90153WEFakX7SiZ0yMcwORlhODjCKKMu5r5fegx1D5b416SjhTST7oQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Gzr9vqU1NJ6nO6dezdvQLXoi3q5+0FTjeL5iP95ck6U=;
+ b=fRnrLvVofsOMEVlQWJrOLzfSHypgAN7pgDLFJYh3ClCK8eb4vV1Xq/S/X7UBnW7CI563GTZS3AeLSuepTazzPi5r1KV0zeKGIWCTAU/5amLC1yhWKZYbRK0NGuK7kDr68mY3XORjBoZRwrbm8Ek71qnHRQUm1l6FxRnq/VyXtNrXAmgruFxU1XSOOr8yGPzO4EyqGUznUtbr3UVylWzKfE0Vu8amZtHCIg4Kjo5MFcoqzJOU3fdp7xO4SGjak8bb2lzifAM9FQr6hBzPbzZZkQ8KEzSBaqYRliFhhtqaekJVfL7eTyuQ6H0FQ5/n4CSShdXaJG1a1C/BNUENWnDbCw==
+Received: from DB9PR04MB8429.eurprd04.prod.outlook.com (2603:10a6:10:242::19)
+ by DBAPR04MB7285.eurprd04.prod.outlook.com (2603:10a6:10:1ac::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.14; Wed, 6 Aug
+ 2025 07:02:14 +0000
+Received: from DB9PR04MB8429.eurprd04.prod.outlook.com
+ ([fe80::2edf:edc4:794f:4e37]) by DB9PR04MB8429.eurprd04.prod.outlook.com
+ ([fe80::2edf:edc4:794f:4e37%5]) with mapi id 15.20.9009.013; Wed, 6 Aug 2025
+ 07:02:14 +0000
+From: Sherry Sun <sherry.sun@nxp.com>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, "marcel@holtmann.org"
+	<marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Amitkumar
+ Karwar <amitkumar.karwar@nxp.com>
+Subject: RE: [PATCH v2] Bluetooth: btnxpuart: Uses threaded IRQ for host
+ wakeup handling
+Thread-Topic: [PATCH v2] Bluetooth: btnxpuart: Uses threaded IRQ for host
+ wakeup handling
+Thread-Index: AQHcBSrI86hsUw7FbESpczgi9+3OWrRVNS5g
+Date: Wed, 6 Aug 2025 07:02:13 +0000
+Message-ID:
+ <DB9PR04MB84292F92AF8B92C5FB27F482922DA@DB9PR04MB8429.eurprd04.prod.outlook.com>
+References: <20250804103015.1104289-1-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20250804103015.1104289-1-neeraj.sanjaykale@nxp.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR04MB8429:EE_|DBAPR04MB7285:EE_
+x-ms-office365-filtering-correlation-id: 940cd5a3-98db-4b5d-7c0c-08ddd4b72c23
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|366016|19092799006|7053199007|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?8Hyjo1DdwOAgQA94f7X8Auz4lZG8ZuXqV1fdDfIAFmDlHdxgRt+K6FeBoKzI?=
+ =?us-ascii?Q?Tejbpo4tKfvmY0wTc3mb6lGM/rlUcPyIrEUX0AkO1rgyfzrCYTNx2QnRbiFq?=
+ =?us-ascii?Q?UZ5AC8D+fAb76ueU0RVff1LMMqcYJZXsUv3SWibQBRNaEw15nRXvXqkEt1u3?=
+ =?us-ascii?Q?vre4/vHBdbMQRvsklQzWXVXhCfXH+hCxGwhdRYnibJvFbsMmSWFdn73HzJRL?=
+ =?us-ascii?Q?hLWB2jKWB6aRbSseeRyQqszE/4cQv7eNHh475SsGN7vrvYD9cAyx6CVMwayq?=
+ =?us-ascii?Q?mbXF5uMA/qDA+ba7WJU4rT1Q4WwVZhFKS9pDbdw9jo7XQN/Hd3lOUr6axzlD?=
+ =?us-ascii?Q?ZBo4k9C8ENJuH/3xYX8QhFggOISrPzyhrm1lY+d8wUswmIB6ccEFEH7Fksnz?=
+ =?us-ascii?Q?P+ZTR+uaCOiTB2HrwLz6KwtSDoZTRcxsun05wjcqTNyp4IxTev7EbN4aERc/?=
+ =?us-ascii?Q?F0SPknJTBqWra5StUV/5uBCz0wIy74EDrIHBvMpOJfIktSKBwi4D7bfusHzf?=
+ =?us-ascii?Q?2+Tmv7VZZt7LXp3eh7svsSlx0BBveezcmWkF1xiulZrlG1OMOfj8WY/bVqHg?=
+ =?us-ascii?Q?GyJnUaMU/UJeI3N9hSTkiZ/Nd2nPAR7AwNkzBT+pl2ws/DsG/SS8tbrWSW8m?=
+ =?us-ascii?Q?XB4oPNSQfvNWKFArkNaMnmynXsOHA0o8elVAQca/YLq0occZ6rsP+luI3z81?=
+ =?us-ascii?Q?b+N1YUh019Q35L32WxLzKjs3BVKh1TjRUzTXxI+2gXO9mMGTosaGpm6TQ5WB?=
+ =?us-ascii?Q?iFQYbTmf9hIGUMHUaHT0ccIU3USUUnVdC6GQt9SdD3jZxz18aRd3bjT1dpOA?=
+ =?us-ascii?Q?OFoYQTbTF1sOHIP9cvShC2en+eMhQygcF/jKhz5OJnLzOVhUQYElifTjLL1P?=
+ =?us-ascii?Q?dhEtxKZksLNB8SFuyT5c+1zrVHstgkvgfFFjtCAPPuOmwcDuITnrgMSiVwyo?=
+ =?us-ascii?Q?9znK68++QKLk2E5sD4Jo1iCFJCxLtfvmKoQqInFfsa2N7AR8AwdQT2glKXxg?=
+ =?us-ascii?Q?xl81OZpZybS4buBz6vuP01TT9rDL5n3qTDT8xoj+T10KLjGQD1W48Z0f1uO0?=
+ =?us-ascii?Q?PKCKmDAgXEWQxDnQQ3tIT/GrHER6q5W/jCsamQ05ht0SgzlrZLyh1A9Qgn8O?=
+ =?us-ascii?Q?s6tK+BS8gCHZgeln8FeVCAkHEM4aF0tu8UpoQjo3XHiktC4siTxVaoWhGJLG?=
+ =?us-ascii?Q?loWsXM/cqCn5o92hAefIOM9Cok/ifjjNvNZ9QwjCp8k4LGBXt4RUD4Ym2giS?=
+ =?us-ascii?Q?wSqJrRl+Ro1j451wiQRVpWJSkHE2TOU92ws9nyWYW0h4UN5jbC5PFWYXdp5C?=
+ =?us-ascii?Q?rfeYktczMIGiT3xk9YcG+jWw05oUA8eWG501MCnQIRg/qw6/A3v+Ku1YFYB3?=
+ =?us-ascii?Q?AhEMfW6pNaRU5zlTNqfXoeVYmNPWpPeOm98eiehHwBdoRyo2llkTdyV7s9na?=
+ =?us-ascii?Q?FFTHAM8BzX/5OgvpmOlpGb4k96c1tKPsjQber+dbcI8zxfA5h4Ttpg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB8429.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(19092799006)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Lf2clkSCVvtwNm0rLle9UHi8la733PIAKpxy8B6w+BM09EFdB6AJXTSXImcI?=
+ =?us-ascii?Q?w2LqKCwGTDIJjo/Q2tp92yH6Xq4kzhNNTBFPqfjD7shG33ZUGtrEqItN6QCH?=
+ =?us-ascii?Q?/yifnjQGI5p4eu3Mt/WIzJjnoIBG/blrgSw3HvlZr9bC2DxR+00+sOHsTfsO?=
+ =?us-ascii?Q?oP4laOC1E9nfE1X6RGI//6mm2n4QXkV4Z4tJXY+TW62CoQf/qLdX7cGrhv3P?=
+ =?us-ascii?Q?if8Jq//IBObqepXqUjQwEb7XYI9TnjptYvIks9XGXICI5wwUIxvN1IOcyUiU?=
+ =?us-ascii?Q?Uqsavhqm221GyCrVvsd6f4UFmaAdaZYSTufN+eLYmJ0U7gYpn/2BnDZ4PSYH?=
+ =?us-ascii?Q?NYzoQb3Xz8D9S41o6bJVDzMwBtqQpYEgY+sCNcymFtDgQYFUvbRwUvzvo2WL?=
+ =?us-ascii?Q?JNcLO63QJDImHg+LbisPTjkPQKGHtP6WFz2rbiIjuXY97i4rlgk7FJqL/3ek?=
+ =?us-ascii?Q?7pSAqhodobBBDvdvK73RdDFrAuiDJdvkNEdOfsRrsSni+tHkDOfd+13t9an6?=
+ =?us-ascii?Q?lwHcTh9uwFo09SToyaFxYOyIzyX9mZwdbzAYaToEafKHSeyH3SkswLSCOk13?=
+ =?us-ascii?Q?tm7RMbcrPsWY7t4IrXMonMzwN44bplq7a4giysbEdXJqSMa24pW8JECoKSI7?=
+ =?us-ascii?Q?fFEJ7WmkH7DOyQRksKSxc49QVjYcVQNCbxEsZP0Woc0FnYrK7WTc63GNSALL?=
+ =?us-ascii?Q?75J/buKIMDhFK14Lka6fnSm+SzLcSZq/E1XtskrMt6xu7jyymDLooVlIz3Rd?=
+ =?us-ascii?Q?Wv7xfx52ouzLF0/CJGU1GvvdFBLqFa3+Dplus+pn83L/IAgfHQDoVw9awVje?=
+ =?us-ascii?Q?91cuG5wUNyNNIEbtYIMghJsyHX/YP3lEIsYKTOePlXAWkAdrJhD86Eykw6bR?=
+ =?us-ascii?Q?zV9lgO/ocuN6MM7niGSLVl0lAv5MWASdAewJ/r5YowihDNbhl7Tl5yWcMK2H?=
+ =?us-ascii?Q?sdMfRiu78n3uNMjAMZ/YnnRYKPPXbyg7KBrQmcJ4lnBFAhgw4N/bgAi2S8Vj?=
+ =?us-ascii?Q?Fww0cqEPXwrqwY9IGG0Tntiv3o1Lb4+47XlJqW4ZP3FSepeVGGERoGVR0bHW?=
+ =?us-ascii?Q?CfpmOm6j2SzU+s/lEn9bFxsBdbLYlY/+XMh3r2Ol4KZWjftKHSwfiLnJt2gg?=
+ =?us-ascii?Q?oKzyMnDjPZiZQSkU/qPR7i5NtMBUdAXq4UXv5zEW4qtU1Pt/Dsf7DKw2Vp0L?=
+ =?us-ascii?Q?cW4RoP4v7kz558eLQ4kU80kp7m7Q4FfiIoa3ZRtdZdl9C2LZBKhEtVuoKzH1?=
+ =?us-ascii?Q?06gzJ/tUvVyYc9D/oRMVZBRmdG3AzIvj5onvYo5E2fir2b0aJk2ltGSiIuD8?=
+ =?us-ascii?Q?Jo+EgQRYZuCQ6I89l4mGJURo//q4xpHC3/1FAbNXzioxIztYNc8+C9l2u9V4?=
+ =?us-ascii?Q?AN67UOHvfMw72C540W36JE3Ezfhc7PtT6x7thxZ1xtcnhSRdG/DQVMJslpRS?=
+ =?us-ascii?Q?6OgiJjC5m70gD9jlXUl5GX7XGvh8P/6odCHNM4EvjUdcs28c+fkG482Io2Kr?=
+ =?us-ascii?Q?feCjycfN9RrXxFd4Hm1aVXd2BkLf7WtylvZxuE4VqgTIuuNXkT0NZ/j6eNKw?=
+ =?us-ascii?Q?ATQLfXKaaZO2Zt61kCg=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Refactor Device Coredump
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chandrashekar.devegowda@intel.com, chethan.tumkur.narayan@intel.com
-References: <20250806000535.1523133-1-kiran.k@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250806000535.1523133-1-kiran.k@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-Dear Kiran,
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB8429.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 940cd5a3-98db-4b5d-7c0c-08ddd4b72c23
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Aug 2025 07:02:14.1065
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ROlcJQrQydSzrtZTNvbhsbqb9+WbBTadGQ3C6E0y5KHkFoMnS8No9runm3X68Vvpbp5yJdMpda4b9RmSxjKynA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7285
 
 
-Thank you for your patch.
 
-Am 06.08.25 um 02:05 schrieb Kiran K:
-> As device coredumps are not HCI traces, maintain the device coredump at
-> the driver level and eliminate the dependency on hdev_devcd*()
+> -----Original Message-----
+> From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> Sent: Monday, August 4, 2025 6:30 PM
+> To: marcel@holtmann.org; luiz.dentz@gmail.com
+> Cc: linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org;
+> Amitkumar Karwar <amitkumar.karwar@nxp.com>; Sherry Sun
+> <sherry.sun@nxp.com>; Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> Subject: [PATCH v2] Bluetooth: btnxpuart: Uses threaded IRQ for host wake=
+up
+> handling
+>=20
+> This replaces devm_request_irq() with devm_request_threaded_irq().
+>=20
+> On iMX93 11x11 EVK platform, the BT chip's BT_WAKE_OUT pin is connected
+> to an I2C GPIO expander instead of directly been connected to iMX GPIO.
+>=20
+> When I2C GPIO expander's (PCAL6524) host driver receives an interrupt on
+> it's INTR line, the driver's interrupt handler needs to query the interru=
+pt
+> source with PCAL6524 first, and then call the actual interrupt handler, i=
+n this
+> case the IRQ handler in BTNXPUART.
+>=20
+> In order to handle interrupts when such I2C GPIO expanders are between th=
+e
+> host and interrupt source, devm_request_threaded_irq() is needed.
+>=20
+> This commit also removes the IRQF_TRIGGER_FALLING flag, to allow setting
+> the IRQ trigger type from the device tree setting instead of hardcoding i=
+n the
+> driver.
+>=20
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 
-Please add a dot/period at the end of sentences.
+Reviewed-by: Sherry Sun <sherry.sun@nxp.com>
 
-Also, please elaborate more, how it’s implemented at the driver level.
+Best Regards
+Sherry
 
-Also, how can this be tested?
-
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Fixes: 07e6bddb54b4 ("Bluetooth: btintel_pcie: Add support for device coredump")
 > ---
->   drivers/bluetooth/btintel_pcie.c | 208 ++++++++++---------------------
->   drivers/bluetooth/btintel_pcie.h |   2 +
->   2 files changed, 71 insertions(+), 139 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index 22a2953adbd6..3816efd654d2 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -15,6 +15,7 @@
->   #include <linux/interrupt.h>
->   
->   #include <linux/unaligned.h>
-> +#include <linux/devcoredump.h>
->   
->   #include <net/bluetooth/bluetooth.h>
->   #include <net/bluetooth/hci_core.h>
-> @@ -559,25 +560,6 @@ static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
->   	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
->   }
->   
-> -static int btintel_pcie_add_dmp_data(struct hci_dev *hdev, const void *data, int size)
-> -{
-> -	struct sk_buff *skb;
-> -	int err;
-> -
-> -	skb = alloc_skb(size, GFP_ATOMIC);
-> -	if (!skb)
-> -		return -ENOMEM;
-> -
-> -	skb_put_data(skb, data, size);
-> -	err = hci_devcd_append(hdev, skb);
-> -	if (err) {
-> -		bt_dev_err(hdev, "Failed to append data in the coredump");
-> -		return err;
-> -	}
-> -
-> -	return 0;
-> -}
-> -
->   static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
->   {
->   	u32 reg;
-> @@ -622,30 +604,35 @@ static void btintel_pcie_release_mac_access(struct btintel_pcie_data *data)
->   	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
->   }
->   
-> -static void btintel_pcie_copy_tlv(struct sk_buff *skb, enum btintel_pcie_tlv_type type,
-> -				  void *data, int size)
-> +static void *btintel_pcie_copy_tlv(void *dest, enum btintel_pcie_tlv_type type,
-> +				   void *data, size_t size)
->   {
->   	struct intel_tlv *tlv;
->   
-> -	tlv = skb_put(skb, sizeof(*tlv) + size);
-> +	tlv = dest;
->   	tlv->type = type;
->   	tlv->len = size;
->   	memcpy(tlv->val, data, tlv->len);
-> +	return dest + sizeof(*tlv) + size;
->   }
->   
->   static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
->   {
-> -	u32 offset, prev_size, wr_ptr_status, dump_size, i;
-> +	u32 offset, prev_size, wr_ptr_status, dump_size, data_len;
+> v2: Add reason for removing IRQF_TRIGGER_FALLING in commit message.
+>     (Sherry Sun)
+> ---
+>  drivers/bluetooth/btnxpuart.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.=
+c
+> index 73a4a325c867..76e7f857fb7d 100644
+> --- a/drivers/bluetooth/btnxpuart.c
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -543,10 +543,10 @@ static int ps_setup(struct hci_dev *hdev)
+>  	}
+>=20
+>  	if (psdata->wakeup_source) {
+> -		ret =3D devm_request_irq(&serdev->dev, psdata->irq_handler,
+> -					ps_host_wakeup_irq_handler,
+> -					IRQF_ONESHOT |
+> IRQF_TRIGGER_FALLING,
+> -					dev_name(&serdev->dev), nxpdev);
+> +		ret =3D devm_request_threaded_irq(&serdev->dev, psdata-
+> >irq_handler,
+> +						NULL,
+> ps_host_wakeup_irq_handler,
+> +						IRQF_ONESHOT,
+> +						dev_name(&serdev->dev),
+> nxpdev);
+>  		if (ret)
+>  			bt_dev_info(hdev, "error setting wakeup IRQ handler,
+> ignoring\n");
+>  		disable_irq(psdata->irq_handler);
+> --
+> 2.34.1
 
-Why not use `size_t` or `unsigned int` for `data_len`?
-
->   	struct btintel_pcie_dbgc *dbgc = &data->dbgc;
-> -	u8 buf_idx, dump_time_len, fw_build;
->   	struct hci_dev *hdev = data->hdev;
-> +	u8 *pdata, *p, buf_idx;
->   	struct intel_tlv *tlv;
->   	struct timespec64 now;
-> -	struct sk_buff *skb;
->   	struct tm tm_now;
-> -	char buf[256];
-> -	u16 hdr_len;
-> -	int ret;
-> +	char fw_build[128];
-> +	char ts[128];
-> +	char vendor[64];
-> +	char driver[64];
-> +
-> +	if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
-> +		return -EOPNOTSUPP;
-> +
->   
->   	wr_ptr_status = btintel_pcie_rd_dev_mem(data, BTINTEL_PCIE_DBGC_CUR_DBGBUFF_STATUS);
->   	offset = wr_ptr_status & BTINTEL_PCIE_DBG_OFFSET_BIT_MASK;
-> @@ -662,88 +649,84 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
->   	else
->   		return -EINVAL;
->   
-> +	snprintf(vendor, sizeof(vendor), "Vendor: Intel\n");
-> +	snprintf(driver, sizeof(driver), "Driver: %s\n",
-> +		 data->dmp_hdr.driver_name);
-> +
-
-As below, this seems unrelated to the refactoring. Please make it a 
-separate patch.
-
->   	ktime_get_real_ts64(&now);
->   	time64_to_tm(now.tv_sec, 0, &tm_now);
-> -	dump_time_len = snprintf(buf, sizeof(buf), "Dump Time: %02d-%02d-%04ld %02d:%02d:%02d",
-> +	snprintf(ts, sizeof(ts), "Dump Time: %02d-%02d-%04ld %02d:%02d:%02d",
->   				 tm_now.tm_mday, tm_now.tm_mon + 1, tm_now.tm_year + 1900,
->   				 tm_now.tm_hour, tm_now.tm_min, tm_now.tm_sec);
->   
-> -	fw_build = snprintf(buf + dump_time_len, sizeof(buf) - dump_time_len,
-> +	snprintf(fw_build, sizeof(fw_build),
->   			    "Firmware Timestamp: Year %u WW %02u buildtype %u build %u",
->   			    2000 + (data->dmp_hdr.fw_timestamp >> 8),
->   			    data->dmp_hdr.fw_timestamp & 0xff, data->dmp_hdr.fw_build_type,
->   			    data->dmp_hdr.fw_build_num);
->   
-> -	hdr_len = sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_bt) +
-> +	data_len += sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_bt) +
->   		  sizeof(*tlv) + sizeof(data->dmp_hdr.write_ptr) +
->   		  sizeof(*tlv) + sizeof(data->dmp_hdr.wrap_ctr) +
->   		  sizeof(*tlv) + sizeof(data->dmp_hdr.trigger_reason) +
->   		  sizeof(*tlv) + sizeof(data->dmp_hdr.fw_git_sha1) +
->   		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvr_top) +
->   		  sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_top) +
-> -		  sizeof(*tlv) + dump_time_len +
-> -		  sizeof(*tlv) + fw_build;
-> +		  sizeof(*tlv) + strlen(ts) +
-> +		  sizeof(*tlv) + strlen(fw_build) +
-> +		  sizeof(*tlv) + strlen(vendor) +
-> +		  sizeof(*tlv) + strlen(driver);
->   
-> -	dump_size = hdr_len + sizeof(hdr_len);
-> +	/*
-> +	 * sizeof(u32) - signature
-> +	 * sizeof(data_len) - to store tlv data size
-> +	 * data_len - TLV data
-> +	 */
-> +	dump_size = sizeof(u32) + sizeof(data_len) + data_len;
->   
-> -	skb = alloc_skb(dump_size, GFP_KERNEL);
-> -	if (!skb)
-> -		return -ENOMEM;
->   
->   	/* Add debug buffers data length to dump size */
->   	dump_size += BTINTEL_PCIE_DBGC_BUFFER_SIZE * dbgc->count;
->   
-> -	ret = hci_devcd_init(hdev, dump_size);
-> -	if (ret) {
-> -		bt_dev_err(hdev, "Failed to init devcoredump, err %d", ret);
-> -		kfree_skb(skb);
-> -		return ret;
-> -	}
-> +	pdata = vmalloc(dump_size);
-> +	if (!pdata)
-> +		return -ENOMEM;
-> +	p = pdata;
-> +
-> +	*(u32 *)p = BTINTEL_PCIE_MAGIC_NUM;
-> +	p += sizeof(u32);
->   
-> -	skb_put_data(skb, &hdr_len, sizeof(hdr_len));
-> +	*(u32 *)p = data_len;
-> +	p += sizeof(u32);
->   
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_BT, &data->dmp_hdr.cnvi_bt,
-> -			      sizeof(data->dmp_hdr.cnvi_bt));
->   
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_WRITE_PTR, &data->dmp_hdr.write_ptr,
-> -			      sizeof(data->dmp_hdr.write_ptr));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_VENDOR, vendor, strlen(vendor));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_DRIVER, driver, strlen(driver));
-
-This two lines are also new. How is that related to the refactoring?
-
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_DUMP_TIME, ts, strlen(ts));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_FW_BUILD, fw_build,
-> +				  strlen(fw_build));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVI_BT, &data->dmp_hdr.cnvi_bt,
-> +				  sizeof(data->dmp_hdr.cnvi_bt));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_WRITE_PTR, &data->dmp_hdr.write_ptr,
-> +				  sizeof(data->dmp_hdr.write_ptr));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_WRAP_CTR, &data->dmp_hdr.wrap_ctr,
-> +				  sizeof(data->dmp_hdr.wrap_ctr));
->   
->   	data->dmp_hdr.wrap_ctr = btintel_pcie_rd_dev_mem(data,
->   							 BTINTEL_PCIE_DBGC_DBGBUFF_WRAP_ARND);
->   
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_WRAP_CTR, &data->dmp_hdr.wrap_ctr,
-> -			      sizeof(data->dmp_hdr.wrap_ctr));
-> -
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_TRIGGER_REASON, &data->dmp_hdr.trigger_reason,
-> -			      sizeof(data->dmp_hdr.trigger_reason));
-> -
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_FW_SHA, &data->dmp_hdr.fw_git_sha1,
-> -			      sizeof(data->dmp_hdr.fw_git_sha1));
-> -
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_CNVR_TOP, &data->dmp_hdr.cnvr_top,
-> -			      sizeof(data->dmp_hdr.cnvr_top));
-> -
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
-> -			      sizeof(data->dmp_hdr.cnvi_top));
-> -
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_DUMP_TIME, buf, dump_time_len);
-> -
-> -	btintel_pcie_copy_tlv(skb, BTINTEL_FW_BUILD, buf + dump_time_len, fw_build);
-> -
-> -	ret = hci_devcd_append(hdev, skb);
-> -	if (ret)
-> -		goto exit_err;
-> -
-> -	for (i = 0; i < dbgc->count; i++) {
-> -		ret = btintel_pcie_add_dmp_data(hdev, dbgc->bufs[i].data,
-> -						BTINTEL_PCIE_DBGC_BUFFER_SIZE);
-> -		if (ret)
-> -			break;
-> -	}
-> -
-> -exit_err:
-> -	hci_devcd_complete(hdev);
-> -	return ret;
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_TRIGGER_REASON, &data->dmp_hdr.trigger_reason,
-> +				  sizeof(data->dmp_hdr.trigger_reason));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_FW_SHA, &data->dmp_hdr.fw_git_sha1,
-> +				  sizeof(data->dmp_hdr.fw_git_sha1));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVR_TOP, &data->dmp_hdr.cnvr_top,
-> +				  sizeof(data->dmp_hdr.cnvr_top));
-> +	p = btintel_pcie_copy_tlv(p, BTINTEL_CNVI_TOP, &data->dmp_hdr.cnvi_top,
-> +				  sizeof(data->dmp_hdr.cnvi_top));
-> +
-> +	memcpy(p, dbgc->bufs[0].data, dbgc->count * BTINTEL_PCIE_DBGC_BUFFER_SIZE);
-> +	dev_coredumpv(&hdev->dev, pdata, dump_size, GFP_KERNEL);
-> +	return 0;
->   }
->   
->   static void btintel_pcie_dump_traces(struct hci_dev *hdev)
-> @@ -765,51 +748,6 @@ static void btintel_pcie_dump_traces(struct hci_dev *hdev)
->   		bt_dev_err(hdev, "Failed to dump traces: (%d)", ret);
->   }
->   
-> -static void btintel_pcie_dump_hdr(struct hci_dev *hdev, struct sk_buff *skb)
-> -{
-> -	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-> -	u16 len = skb->len;
-> -	u16 *hdrlen_ptr;
-> -	char buf[80];
-> -
-> -	hdrlen_ptr = skb_put_zero(skb, sizeof(len));
-> -
-> -	snprintf(buf, sizeof(buf), "Controller Name: 0x%X\n",
-> -		 INTEL_HW_VARIANT(data->dmp_hdr.cnvi_bt));
-> -	skb_put_data(skb, buf, strlen(buf));
-> -
-> -	snprintf(buf, sizeof(buf), "Firmware Build Number: %u\n",
-> -		 data->dmp_hdr.fw_build_num);
-> -	skb_put_data(skb, buf, strlen(buf));
-> -
-> -	snprintf(buf, sizeof(buf), "Driver: %s\n", data->dmp_hdr.driver_name);
-> -	skb_put_data(skb, buf, strlen(buf));
-> -
-> -	snprintf(buf, sizeof(buf), "Vendor: Intel\n");
-> -	skb_put_data(skb, buf, strlen(buf));
-> -
-> -	*hdrlen_ptr = skb->len - len;
-> -}
-> -
-> -static void btintel_pcie_dump_notify(struct hci_dev *hdev, int state)
-> -{
-> -	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-> -
-> -	switch (state) {
-> -	case HCI_DEVCOREDUMP_IDLE:
-> -		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
-> -		break;
-> -	case HCI_DEVCOREDUMP_ACTIVE:
-> -		data->dmp_hdr.state = HCI_DEVCOREDUMP_ACTIVE;
-> -		break;
-> -	case HCI_DEVCOREDUMP_TIMEOUT:
-> -	case HCI_DEVCOREDUMP_ABORT:
-> -	case HCI_DEVCOREDUMP_DONE:
-> -		data->dmp_hdr.state = HCI_DEVCOREDUMP_IDLE;
-> -		break;
-> -	}
-> -}
-> -
->   /* This function enables BT function by setting BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT bit in
->    * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
->    * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
-> @@ -1383,6 +1321,11 @@ static void btintel_pcie_rx_work(struct work_struct *work)
->   					struct btintel_pcie_data, rx_work);
->   	struct sk_buff *skb;
->   
-> +	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags)) {
-> +		btintel_pcie_dump_traces(data->hdev);
-> +		clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
-> +	}
-> +
->   	if (test_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags)) {
->   		/* Unlike usb products, controller will not send hardware
->   		 * exception event on exception. Instead controller writes the
-> @@ -1395,11 +1338,6 @@ static void btintel_pcie_rx_work(struct work_struct *work)
->   		clear_bit(BTINTEL_PCIE_HWEXP_INPROGRESS, &data->flags);
->   	}
->   
-> -	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags)) {
-> -		btintel_pcie_dump_traces(data->hdev);
-> -		clear_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags);
-> -	}
-> -
-
-Why does this need to be moved?
-
->   	/* Process the sk_buf in queue and send to the HCI layer */
->   	while ((skb = skb_dequeue(&data->rx_skb_q))) {
->   		btintel_pcie_recv_frame(data, skb);
-> @@ -2190,13 +2128,6 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
->   	if (ver_tlv.img_type == 0x02 || ver_tlv.img_type == 0x03)
->   		data->dmp_hdr.fw_git_sha1 = ver_tlv.git_sha1;
->   
-> -	err = hci_devcd_register(hdev, btintel_pcie_dump_traces, btintel_pcie_dump_hdr,
-> -				 btintel_pcie_dump_notify);
-> -	if (err) {
-> -		bt_dev_err(hdev, "Failed to register coredump (%d)", err);
-> -		goto exit_error;
-> -	}
-> -
->   	btintel_print_fseq_info(hdev);
->   exit_error:
->   	kfree_skb(skb);
-> @@ -2325,7 +2256,6 @@ static void btintel_pcie_removal_work(struct work_struct *wk)
->   	btintel_pcie_synchronize_irqs(data);
->   
->   	flush_work(&data->rx_work);
-> -	flush_work(&data->hdev->dump.dump_rx);
->   
->   	bt_dev_dbg(data->hdev, "Release bluetooth interface");
->   	btintel_pcie_release_hdev(data);
-> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-> index 0fa876c5b954..04b21f968ad3 100644
-> --- a/drivers/bluetooth/btintel_pcie.h
-> +++ b/drivers/bluetooth/btintel_pcie.h
-> @@ -132,6 +132,8 @@ enum btintel_pcie_tlv_type {
->   	BTINTEL_CNVI_TOP,
->   	BTINTEL_DUMP_TIME,
->   	BTINTEL_FW_BUILD,
-> +	BTINTEL_VENDOR,
-> +	BTINTEL_DRIVER
->   };
->   
->   /* causes for the MBOX interrupts */
-
-
-Kind regards,
-
-Paul
