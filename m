@@ -1,26 +1,26 @@
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8EB262FE4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D689F25C70D
 	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Aug 2025 15:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754581889; cv=none; b=tDCNv7H+pYnEyh4j18vPZgDSXBmuBpRgbIpKjd727cvck4e1Kc+//acr5WYDrfoxq6pZQBzwCr5wTbhmN2D/lMR6tqDvNd3dDOidWi4XwJKF64IniZUV6cUk2F68UJJlLPeele/TB+cSYT5lYdcrp1XtFXoNS8UnZS6ey6/S7cw=
+	t=1754581890; cv=none; b=nGhIX4YNj45aIE016tk+qgCpWZV6IPtQx+tC4DvbU0GWL25RZWLQvgOBhOLoKcW8GER6wJOJx6zuqYoJVn8v6ZEYTSd06TuPJ5RFOsF1ezetDlqHhHensfhLb5vHBA73MEW2T6SFLlnXQCMgx0RjYPZjUAWWndI3zq4lX3PJl8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754581889; c=relaxed/simple;
-	bh=EuxBbAcmIgx4BtOGv4HRIjVimBZRa64puCPkBJmjqB4=;
+	s=arc-20240116; t=1754581890; c=relaxed/simple;
+	bh=4+GUXERG9f81qlKj7AZfcSv0XyMMoKl4K6+vqsKkldE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L97Fm2G/waRKA1tZZUqCh+V59Seqgt8x9aqk3BuIfzKpxN9BMVEwca4LXh9/L+P3zthRsQfj3UjUKfHMalrtU61uovVR3qgf3Jgz0yutbpQvvsi2Takov//3jbzLF6njMzL2rQiYczvaNoo3tj8fLoT+oyQyw4bdojhMbWJjKKk=
+	 MIME-Version:Content-Type; b=fw2Gp/DX0thwuZtMZiS4mKr82aQV3+j4SCVcXQL0YLDPrZB1GHQdJRU9HB3cNiFfFYrO8hyx9uSiE11t4K7y3JYVqo/rCT37cHsxa5Jvc7L+z20T+Df5PUZvjZS6jlR2UyKPqxaCTEAVcx+j+YvAcdqYkeQ5K6Ni9J9/zVAYtzU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 60F241FD55
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 321C01FD47
 	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Aug 2025 15:51:26 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/3] =?UTF-8?q?mesh:=20Fix=20'buf=E2=80=99=20may?= =?UTF-8?q?=20be=20used=20uninitialized=20warning?=
-Date: Thu,  7 Aug 2025 17:50:31 +0200
-Message-ID: <20250807155115.1037982-4-hadess@hadess.net>
+Subject: [PATCH BlueZ v2 2/3] client: Fix missing strdup/memset declarations
+Date: Thu,  7 Aug 2025 17:50:30 +0200
+Message-ID: <20250807155115.1037982-3-hadess@hadess.net>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250807155115.1037982-1-hadess@hadess.net>
 References: <20250807155115.1037982-1-hadess@hadess.net>
@@ -37,34 +37,38 @@ X-GND-Score: 0
 X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvddufeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepteegheeghfehhfdvkedutdfhffejjefgvdevgfekkeevleetheekhfetleelueefnecukfhppedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgefgeemvggtjeefmegtfhdvtdemjeduuggrmeefsggumedvtdgrleemudeffedphhgvlhhopeholhhimhhpihgtpdhmrghilhhfrhhomhephhgruggvshhssehhrgguvghsshdrnhgvthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 X-GND-Sasl: hadess@hadess.net
 
-../dist-unpack/bluez-5.83/tools/mesh/agent.c: In function ‘response_decimal’:
-../dist-unpack/bluez-5.83/tools/mesh/agent.c:94:9: warning: ‘buf’ may be used uninitialized [-Wmaybe-uninitialized]
-   94 |         bt_put_be32(atoi(input), buf);
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from ../dist-unpack/bluez-5.83/tools/mesh/agent.c:20:
-../dist-unpack/bluez-5.83/lib/bluetooth/bluetooth.h:342:20: note: by argument 2 of type ‘const void *’ to ‘bt_put_be32’ declared here
-  342 | static inline void bt_put_be32(uint32_t val, const void *ptr)
-      |                    ^~~~~~~~~~~
-../dist-unpack/bluez-5.83/tools/mesh/agent.c:88:17: note: ‘buf’ declared here
-   88 |         uint8_t buf[DECIMAL_OOB_LEN];
-      |                 ^~~
+bluez/client/display.c: In function ‘rl_prompt_input’:
+bluez/client/display.c:112:24: error: implicit declaration of function ‘strdup’ [-Wimplicit-function-declaration]
+  112 |         saved_prompt = strdup(rl_prompt);
+      |                        ^~~~~~
+bluez/client/display.c:112:24: warning: incompatible implicit declaration of built-in function ‘strdup’ [-Wbuiltin-declaration-mismatch]
+bluez/client/display.c:119:9: error: implicit declaration of function ‘memset’ [-Wimplicit-function-declaration]
+  119 |         memset(prompt, 0, sizeof(prompt));
+      |         ^~~~~~
+bluez/client/display.c:24:1: note: include ‘<string.h>’ or provide a declaration of ‘memset’
+   23 | #include "display.h"
+  +++ |+#include <string.h>
+   24 |
+bluez/client/display.c:119:9: warning: incompatible implicit declaration of built-in function ‘memset’ [-Wbuiltin-declaration-mismatch]
+  119 |         memset(prompt, 0, sizeof(prompt));
+      |         ^~~~~~
+bluez/client/display.c:119:9: note: include ‘<string.h>’ or provide a declaration of ‘memset’
 ---
- tools/mesh/agent.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ client/display.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/mesh/agent.c b/tools/mesh/agent.c
-index 7a62f345dac7..4a2c6a0d88dd 100644
---- a/tools/mesh/agent.c
-+++ b/tools/mesh/agent.c
-@@ -85,7 +85,7 @@ static void response_hexadecimal(const char *input, void *user_data)
+diff --git a/client/display.c b/client/display.c
+index a590a1388d26..95b734c91594 100644
+--- a/client/display.c
++++ b/client/display.c
+@@ -17,6 +17,7 @@
+ #include <stdlib.h>
+ #include <stdarg.h>
+ #include <stdbool.h>
++#include <string.h>
+ #include <ctype.h>
+ #include <readline/readline.h>
  
- static void response_decimal(const char *input, void *user_data)
- {
--	uint8_t buf[DECIMAL_OOB_LEN];
-+	uint8_t buf[DECIMAL_OOB_LEN] = {0};
- 	uint16_t len = DECIMAL_OOB_LEN;
- 
- 	if (strlen(input) > pending_request.len)
 -- 
 2.50.0
 
