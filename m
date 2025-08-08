@@ -1,66 +1,71 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99011F1317
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9962211A28
 	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Aug 2025 18:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754679058; cv=pass; b=CGnp+PUtqYzyIZ2qhWotAd2+ipzJtHH6TH1+nfUP454kOTmwUac4F4V8M7+jIG2s76lZUmzErfC8aQpUPUUmj3tmgp2tA4GQSyL0CEcy25sRdwBMpZ0nREhF56utEy1ZK5qF0zCB/Y/tQq/zFzLTPSKCHIrBfsodKPDjsQZUTaw=
+	t=1754679058; cv=pass; b=e6QBN3AwcM6G7om7NS/a+YYMeEf+bPuGrihRMJM4l2Bqk9cCT4DnkBNYfceS1qnA0KgWptKhC0MjyRm3TsE0AgbLujlgltoaQzYJ/NODp3DDqtDQplEUUn1MTXejrebZUmqkRYryySJoq7oMMvsywnVw0an+z/RAoLYMxUTvnr0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1754679058; c=relaxed/simple;
-	bh=e/Ev8Z+LdXgKLl7PcVN0mhvtN8B+j6TBTwrj93HsRMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RjRLN6oRonfCj9ESwDcUZUZGUAkwT6eXczSj9VqMAXaRT6c07c/ZZ45UFGVNPJrOYkK2vB+nsRN9TDJkp30C2x7lOaqnKUrY208+hKBRqbDJkeblCUbR++4cgvHbzSapmCg8SGbWp+O3uZg48sxOqIVK9HqpOoHb0x3DKF4OcYw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=gKoV9X8s; arc=pass smtp.client-ip=185.185.170.37
+	bh=5KHYf20CrmEqwvdwtD7v+knIIX4wCVRTh37VdqEx68k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KIoyKXrYo2LAuJLfRkuwbVeW8akWi9pz+VpiN7VKPziZOlL4kafSXuxVNTZ+/aM1wHykECceKS/xWwMCDLoEe9S4Bqj153F+mHPFdQowWHkLuPM0OO/GLM+xpZy9qUIqrySZFZaB5MRLCetY7yqEzKjGfOjbDBzMS84h9GWGi4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=krvtxQFE; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="gKoV9X8s"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="krvtxQFE"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bzCll3gh9z49Px4;
-	Fri,  8 Aug 2025 21:50:43 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bzClx52rKz49Q4P;
+	Fri,  8 Aug 2025 21:50:53 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1754679043;
+	t=1754679053;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qoSvWMC/T/gEX5+7ct44HeCdU/oJp9U+9xW3T22flf8=;
-	b=gKoV9X8sN8nXxaT86t4jT4DG85uq/UhksNdkZpCHXp9O7pFezR54/TEMIVSIIzpz3XOnuQ
-	91a9b2IPDCn9sUSd+sueOtbL5n2U/9HpXpo/SELphAGhxcHPe8rQp7x6vdad1z/AnXkV1o
-	kHD3tXy9VXn3/1VbluQbNTJPW/NcSufvbaXI24Wgkhesi0RoELqqI4Bf52SjlSrTSKOpxy
-	0HC9z+Hnvr5Hz8cjVvVL+CAV4w87gijzYy4nlyi6e1eXQWAHXuIlmKL6GmIXNunQwpXoTy
-	PlErTO4HJK4o3OlewevICnJz+iVd6TkmiOeLOwdUW6iK0PTzsRY+gN88jB2gwA==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zbACq2fjJE/sRmid8b0H+bbuayIVlUhiCxuq41Jov1E=;
+	b=krvtxQFE9meXInrPfIT5k+/5jy/98YpX02JCkj7YOdSoeIKjRVsYfB35qoj/1dcLcG9yLV
+	bUkNqu8D1GBNpL/kdtUciYDmnshnP20zvADZ1HqvtF12f2IhahBH/v1+EJXr9zvZbMzHdd
+	ou4ENwlLWEkKhx/3GJUrx8yNTdN5d/b2u7Nf9Y9MjlY36bINDx+v5QUXjJnIrVusC4yr1Z
+	nxwQu1OPND4kpF7hu89pncljD0sUpt49lxS+8FeWZbBKoPjDeXQDs5ACBC+6yYQH0d0E0q
+	ozlb0btGF/sV0Qm31x77LPfg8h9EK1gtzgu2a72Pg5lYnogoOKo7GY1BHPA0Dg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1754679043;
+	s=lahtoruutu; t=1754679053;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qoSvWMC/T/gEX5+7ct44HeCdU/oJp9U+9xW3T22flf8=;
-	b=fJ5YQ+xaEK6Abqhbx1xhY3lQBr9s6oyPbcX3lGcQc2S8OQZj1o2unbv2OmPG8PHJgapD3i
-	xYkChc2bMPQOjmnFB/En+UFrG1/lcHCZFi84O6NbFOs+V2PO8HnsrpmKM4IoSZaLg8JZo1
-	BOwq7D0Vr2YzkxZ6wHlB/VU1VKPkeqxI9d4XjbiyG3kVil4FW/FmwRSwipccVpYrcwbota
-	VZQNKYu/1qg01m6tJvC0i1iS1JU6OwVnUuv758XmH5yHI+XWAGZ83T7wDOAJriBuUe8TXA
-	3vk7ah+N+xn7cdB9OJO9usHFjToe6bqSDqaXsetW0xVOoU3F6Onx/o2XlZ3pCw==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zbACq2fjJE/sRmid8b0H+bbuayIVlUhiCxuq41Jov1E=;
+	b=QjgKsuUrV37rd8h4RwtiT+vs3HJj4uKxGbtJfWUNJyYr181bwhrdc9g9HZ/9ka2/bAp7mv
+	N06dKmnNw9kBVcR1ztFEc3zx3wRtoOsDjnxghZr6HAkajYANwNVcEmSfjBKArK2q8MGKhu
+	tf79XbvzpCoYpIu2jrxeX9xUkV3WT0p0u1HC5IzNHi+HKn4CTpCCYlYvfMiiUXFZUDKkd1
+	+pygY2Kre+tJ5deS+wCcH/YyM8JmPY4h3gWeKFK6HCNPoo6I35tkE4P6NAakjzu5uOcPdV
+	ErbUDgx4MYwCTVkJ6E9xjCQh++/Lhg27FtkuaNsH6Jwgo2WQjr2wyM8lnvBLqA==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1754679043; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1754679053; a=rsa-sha256;
 	cv=none;
-	b=Okus127XCV1qkI+wFccEF/dkLxCGexULiDGMph72EFoMWk9rKDBIHOOAEqnop/zzLaxl61
-	cg899nA4MiAJ3wZEWWMyRhN/lWZrSDDqZWt1g47vIZupSPu0w1exZbrXK5ELJv/q7aQUtI
-	rTD4mcl1GLZsA2eaxgCal7g+0itLByW82haOUjqPMfpmGRPsg22YFH6sLL1Zh270tBO60+
-	dcptaI07KyV5O9warEFRu8pJkZvI6j2b0OSjdxHvpGu+uM+A53WeX7wwuKkcp1OnxiYEkw
-	s8V5GzfZGG20nF4OcWwIHO98/EGWUNcA/kDPusBfmDgaBaD/M7UfWNZ8WtjmpA==
+	b=TaFO0dFGQYataA8ltUUmTE0DuuGYfHtQ3/aqxEpMGN7UjBG7wckUM+Ro5dRf/3ABu5bNtp
+	tCzE/fDvXsnwycHwjDb4aH4YJDMQyVvF4FZ9im8qcDcQeT0SqpHF6qrkvO1/Tv2VMofQXX
+	PQUDjTI6+KiQHga32Xg/H861/92SaEKKibQlec6jFUUUK6Z6uvrwl0X1seXSviZaV85NFt
+	FnFayyBqtxTWijpyfx3NUr5a7jnHBx7BX2MIx0hh7qF6B5SVLI1WrUv82BlTWKA+QviM5I
+	x2jJQGdokqnz42Ua5+Tu0Ns2lxkpTx2riGarqlbTQ/EiURLbNUkneiqYxLcY7Q==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 0/7] Various BAP ucast server/client fixes
-Date: Fri,  8 Aug 2025 21:50:32 +0300
-Message-ID: <cover.1754678883.git.pav@iki.fi>
+Subject: [PATCH BlueZ 3/7] shared/bap: use correct parser for Config Codec message
+Date: Fri,  8 Aug 2025 21:50:35 +0300
+Message-ID: <e036e06b83066af362ea76d38797659590aad5db.1754678883.git.pav@iki.fi>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <cover.1754678883.git.pav@iki.fi>
+References: <cover.1754678883.git.pav@iki.fi>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -69,24 +74,27 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix bugs in BAP ucast server associated with stream reconfiguration etc.
+ASCS Config Codec gets Codec_Specific_Configuration, not
+Codec_Specific_Capabilities so use the correct parser.
 
-Fix misc. bugs BAP ucast client.
+Fixes spurious 'invalid size' printed in debug logs.
+---
+ src/shared/bap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Pauli Virtanen (7):
-  bap: fix multiple release of stream when closing setup
-  bap: send correct framing value to kernel
-  shared/bap: use correct parser for Config Codec message
-  media: fix pac_select(), pac_config() return values
-  media: clear transport if reconfiguring in pac_config()
-  bap: clear server streams when ucast disconnects
-  shared/bap: check ASE state in find_ep_ucast
-
- profiles/audio/bap.c   | 16 +++++++++++---
- profiles/audio/media.c | 47 +++++++++++++++++++++++++-----------------
- src/shared/bap.c       | 11 +++++++++-
- 3 files changed, 51 insertions(+), 23 deletions(-)
-
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 8c186e6f1..c27e675ff 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -3093,7 +3093,7 @@ static uint8_t ep_config(struct bt_bap_endpoint *ep, struct bt_bap *bap,
+ 	cc.iov_base = util_iov_pull_mem(iov, req->cc_len);
+ 	cc.iov_len = req->cc_len;
+ 
+-	if (!bt_bap_debug_caps(cc.iov_base, cc.iov_len, bap->debug_func,
++	if (!bt_bap_debug_config(cc.iov_base, cc.iov_len, bap->debug_func,
+ 						bap->debug_data)) {
+ 		ascs_ase_rsp_add(rsp, req->ase,
+ 				BT_ASCS_RSP_CONF_INVALID,
 -- 
 2.50.1
 
