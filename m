@@ -1,68 +1,68 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB4D284B36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAE8283FF8
 	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Aug 2025 18:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754679061; cv=pass; b=QG8wtD3EUS3htZzZqFTfI5EunWBA0URiUoauEOgYkKaWHQOO9P3W0/e9dFXxlVN7ERqemDJc3Eeht5P6CM5XcvdklfuJxndHhaBTdIcyepnpIjZyAjyEurD8CDhSRIY4IPnzsJBorRMioBO0ILnYPg2580D3S9Roe/7mFtRgfwQ=
+	t=1754679061; cv=pass; b=MRE96G3S6hvE2wZA2JJhQZ+8aFKFQ8w6WQo7tO6miCJotw7BiB6SD5m74l6XcBAQF1KE3nFo4tXui6APGbJdFc+caz5C9z6z7cLUnX8aWfW1xxADQovBYt3j5Niys/leDbB4OGX3CGbEdA0fafnoZHL2BeO6BklEGlEstLwIQeU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1754679061; c=relaxed/simple;
-	bh=3G2QU/93WUe5aHPmAqCYkAc8ZUp388UMLVce/2x6dNo=;
+	bh=d7tXnlCy+CS4SiRD5tlci9LQjx4E5pl/Md2pHh0xBDU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eqE/fIfyfSi/YDWEi3+aahKr63E48dpq2jwhB/UhCekt/Zz8zcU1E4w5QQw+j4lOr+db5eJ4BkhigwijDckItFmFnEcv+Rfs9rjaDEhg3uSnAHIQw2Gr+WueaXQKoooeSsvdLUb/bDdKTeYbic2/2jHvnQ4XkaPKpqsabQ7SPm0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=j4tjb1zm; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=aJStrrXzfatgKRwjsigol3cWJyKHFDHvxBTB1YJ5fVFGYtEVFoxWhZj98uM9MuQjsl/lUYN1YveYwWOMj9aDcrOquFiWdkMD7GoaUjWuYSDZ2mBXEwNPpoWqAxX7ueZZmmT4Pcvie2lM1aL+67BUl8VjvUoNYgfQ0y6OyVBM8yk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=Bv7RhCtL; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="j4tjb1zm"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="Bv7RhCtL"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bzClw2RwKz49Q3M;
-	Fri,  8 Aug 2025 21:50:52 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bzCly1kLXz49QB9;
+	Fri,  8 Aug 2025 21:50:54 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1754679052;
+	t=1754679054;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=maFIXOeh9h1NTYsQUI/CX+ZCiIiBqC37CrtTzXxTQGU=;
-	b=j4tjb1zm5+WKAK6xg9rsq1hNXr3naaCkOCVaLTJoOCZkQpoIKRnVObd4WfqM/dRnroSYTV
-	IxtF87ziTWxcdh29slxMTpbnE0YpUYqNhLNjVkFbZwfFQ8wQh72p1cPchONsgjcSZypTrZ
-	D9HVht0hx03QvoqFwrQAb/cvDV1q8/v5Gbb6S7dzgDUJNb6gMLBR061CaVwBAo3ouT/ACF
-	+dbu9RVXpBESELyQ0P4sUwQ64RogzNWyLFyi4qn/HJ0CSiVnkzu+CMxZoBKauargy6woLT
-	1mchtAXqaxinRr+MAqcO1nZRhjDv4ZETjHShN1DfKyWUUSxs7HejUIQk4QsY4Q==
+	bh=DFXxWoF5WX4DlfubFEiGrVQrbwZS/xCFtDMOgcdXQM8=;
+	b=Bv7RhCtLn095xXOSnoqU3XuyoEFOShkpnf3iPlToecwvlR+m4uYQnwZ80rahPdJ/jBtzk1
+	T5i0cvUkZQt+GybhmB3HzkLMwxGm3nVHxdIuouvClem5CTU5SjCemzINPlCBO7IftGAgqO
+	UvqV5KzxFiNVtlgTuBx9vgEh/ezSuZ9Tzx2rnGYQR02OipLMtzJE7vnFUhfrm8fCMWr2Nb
+	A9fa+wEfwKi9E7NWanC//CxCtZer2amlVcq0HKwRG5PdTo4YJvdTsjwUfUKvY05aSqh5N4
+	uOWZwjuMAS3A6+e73d3lNvxA8L28L2l2hhmbFY7L23LpDfwmN/CgvFA+iUyehQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1754679052;
+	s=lahtoruutu; t=1754679054;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=maFIXOeh9h1NTYsQUI/CX+ZCiIiBqC37CrtTzXxTQGU=;
-	b=kllDc6dk90I6JY00X9BBgQt8M8FaFealMxzLK/VX0bqvR5MLuIywfX7GgO95Rk6V4wowTq
-	EpAkSuK8kZKhjkOv1bUYlO0NARugdXTIalWzVFvUPWJc+0d2np60W9rWZvq31iOcQajU7L
-	KogYMthFtfd9WXdkYYOrQ17iUmKfJDK6b2jqlpDf6cBvGT9ZKnXj3UsK4lsAYP6s3sZVwH
-	bad/oKUuHPQvDNb96fLPtMg4rPZ6odHllTSS1ofEIW3ck6AYoAf7pRZz4NmFpx8DJIs5ug
-	McjDZHRcdITJzgzIMGXiYbsiQsirhb3OEGBfIlzome2rmYbdjBE0e6f6V8fkJw==
+	bh=DFXxWoF5WX4DlfubFEiGrVQrbwZS/xCFtDMOgcdXQM8=;
+	b=qiDEJWNevVObjqJXKyjBOOYUbb7JCFWbR3Ffp0YYMOJqvSCUdd+Y8R5zhnLw0j/IiaaI2M
+	xjnB/NLWqliePjQ/JKEdn4v1yaUpEkpOPv+W/9H2RKdwMi8SlIyHRsD3uYSLqYbXmJliFR
+	GGNjfluRNEH96Fj/AgI3yZUQVfhBWZyc6Rb5o9wKFquhK3EbEZcTzLKj4CAe55xxYsLmMs
+	Xe0eQh3Txm72w3IilupMjIxQMBlH/ZUJcTWLa07NAxSdrvu//v5Fd6/m4C/Gsa/BExKcYM
+	VAoa7p6f2oOsOAoNQJjw8R7BPclqp2BwlXSdAmrVBb2iqRWLyWaW2bXgHYbO6w==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1754679052; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1754679054; a=rsa-sha256;
 	cv=none;
-	b=nuyMYaed6wG4lz2342lPzM9rkXJP73xL9sOGbUUxE+QC7neAED8IziRnEnwv9JrFimEY4b
-	kOhvUlK5i8G2Q/4IRUAHayShDOWDqt8V8nZdz4YISG4zpXAWsB2pG88+Gf7mFudOKk2PhD
-	k+NVT1UYWHywonr0e0tZbVJAJHz9sMB0rScE6idOYZNn+WbazguVU8OtOMi+vLEOfTHajc
-	No533x5qJTU29y4cfScFEuqDo0jC8YoNWK0dfdYfcVNCM/sdfRCwI1mJMS25bUmflGOyzl
-	ep5dZpb5cjb7W7oM2ftegEuN+x+T/RanXYCrz4udfuDfgniombw6tv22FcI1Pw==
+	b=KBzEV+qlJQG22Ma55d5wfueRGyk2NfBcwshe5zxBsjqO7ty+vcvmEs+7GKiiE5tDJrIJj7
+	dH9h1hUAaXYNyycliI9rs7s+Oyh4hLytZIBUrrquh7GBX/SSjU3kbAG7G8UsUw3+hRqv8h
+	BuQHeusjG/dCdCKcas3yyFcB/3jY/faIKghbyyqbiyAdNxNeeMCn70n8v0kcmtOWXOkv1B
+	F6C0YGevFEy+OEVbS/HUk0qcEMTwBAM81y0pIbF8AU837VxGu5snbWevax/nQmfXFea0u5
+	6y9eQ9F5EXqUvjUMVgR/qjgaxR98s/jz40cIiYt8AGe7W2fqVOnjPPHkphzWbQ==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 2/7] bap: send correct framing value to kernel
-Date: Fri,  8 Aug 2025 21:50:34 +0300
-Message-ID: <977aecec9f592232fb5dd9e65ab6b72ab19777ed.1754678883.git.pav@iki.fi>
+Subject: [PATCH BlueZ 5/7] media: clear transport if reconfiguring in pac_config()
+Date: Fri,  8 Aug 2025 21:50:37 +0300
+Message-ID: <d19b308c9b5782222607bdf1e025a1a390563901.1754678883.git.pav@iki.fi>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1754678883.git.pav@iki.fi>
 References: <cover.1754678883.git.pav@iki.fi>
@@ -74,25 +74,62 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Get framing value to use from the QoS of the appropriate stream, instead
-of hardcoding unframed.
----
- profiles/audio/bap.c | 2 ++
- 1 file changed, 2 insertions(+)
+We are not updating transport->configuration if transport already exists
+in pac_config(), so reconfiguration of a stream leaves sound server with
+old configuration.
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 8413a5b38..a75919102 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -2750,6 +2750,8 @@ static void setup_create_ucast_io(struct bap_data *data,
- 						qos[1]->ucast.cig_id;
- 	iso_qos.ucast.cis = qos[0] ? qos[0]->ucast.cis_id :
- 						qos[1]->ucast.cis_id;
-+	iso_qos.ucast.framing = qos[0] ? qos[0]->ucast.framing :
-+						qos[1]->ucast.framing;
+Do this in the same way we do for A2DP: first ClearConfiguration() to
+remove old transport, then SetConfiguration() to make new one with the
+new settings.
+---
+ profiles/audio/media.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index a723b311c..24f191a43 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1208,23 +1208,26 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
+ 	DBG("endpoint %p stream %p", endpoint, stream);
  
- 	bap_iso_qos(qos[0], &iso_qos.ucast.in);
- 	bap_iso_qos(qos[1], &iso_qos.ucast.out);
+ 	transport = find_transport(endpoint, stream);
+-	if (!transport) {
+-		switch (bt_bap_stream_get_type(stream)) {
+-		case BT_BAP_STREAM_TYPE_UCAST:
+-			transport = pac_ucast_config(stream, cfg, endpoint);
+-			break;
+-		case BT_BAP_STREAM_TYPE_BCAST:
+-			transport = pac_bcast_config(stream, cfg, endpoint);
+-			break;
+-		}
++	if (transport)
++		clear_configuration(endpoint, transport);
+ 
+-		if (!transport)
+-			return -EINVAL;
+-
+-		endpoint->transports = g_slist_append(endpoint->transports,
+-								transport);
++	switch (bt_bap_stream_get_type(stream)) {
++	case BT_BAP_STREAM_TYPE_UCAST:
++		transport = pac_ucast_config(stream, cfg, endpoint);
++		break;
++	case BT_BAP_STREAM_TYPE_BCAST:
++		transport = pac_bcast_config(stream, cfg, endpoint);
++		break;
++	default:
++		transport = NULL;
++		break;
+ 	}
+ 
++	if (!transport)
++		return -EINVAL;
++
++	endpoint->transports = g_slist_append(endpoint->transports, transport);
++
+ 	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
+ 						MEDIA_ENDPOINT_INTERFACE,
+ 						"SetConfiguration");
 -- 
 2.50.1
 
