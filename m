@@ -1,68 +1,68 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99C8222577
-	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Aug 2025 18:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC4F1F1317
+	for <linux-bluetooth@vger.kernel.org>; Fri,  8 Aug 2025 18:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754679059; cv=pass; b=nqB+EYpMEZlsnIfezPDMgGWfBmAMDTEKeKGFcYR71LZjTu+wSbhnpfPxHYlg6vA4ZJOz5D46vKv4T63BTtHaA9GJx40Ow2e6W2Dnw6M4TaWjkUQxAXl6MxaIKc16TAih65g+Y8c/qVSmDA+mg49/9mWm6WltImRD79VMK9xpuGM=
+	t=1754679061; cv=pass; b=OaXQ+wx4eWlkcmAcNIlMzHefNAzozY7gZL4DCLsuLdEqNs8Ajl5ph3spQVd7Noi0Vb9wsWosW6fgUQxxHC9AZhLKzSX1ePE97y44rp5JCNo4RESu8UIMR/UGZfNriym7xEcKKP9tCplYZSu4DdYDcVHnOP++0ykaIhh5DtnW8LQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754679059; c=relaxed/simple;
-	bh=B3KNKAb5TxXPpdgI5rOXztrTXauzfH57wpWAWoleuKk=;
+	s=arc-20240116; t=1754679061; c=relaxed/simple;
+	bh=6Oi509y+WY9lkQtUVJpPgY/DtxXT4DT4De/bmaEKOmU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=je5ovpZzgsxK9fQ/TAG12qB9GaBBbY9rMvt86esxRIM3b2GNNX7HNK31ehrNXw/AAfY1FLtxOO8JapxlJVCm2aIGv+HC1QLczAeyGmP1Xp1uG8kK5YSAAi5f8U2zP4JwHPPydIQexGLf9NX62C+WXistk/Orq4xrSwoIY4Oqz4E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=bl1fAB4F; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=GSuPLPQVqvLuAnhVNxRB+nOlQvNjO7x846qE5ZL2GJZ83wDS9oCqKW3d76vOERsrHaJ6w/SLyNQ2OgCgvuOEARcISt1Fvra1sx1vjBBbARzJr1Kbw06HS4/Slk83tlPPd13O+0fa25psV/7wNqFm4xhyWmv4ouvJDRKQlfvuLHE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=kQYh4nkW; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="bl1fAB4F"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="kQYh4nkW"
 Received: from monolith.lan (unknown [193.138.7.158])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bzCly0nHNz49Q76;
-	Fri,  8 Aug 2025 21:50:54 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bzClr1Q01z49Q1w;
+	Fri,  8 Aug 2025 21:50:48 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1754679054;
+	t=1754679048;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qdLqRkXYYZEKmuAjlI0d7q7GmasvCSeL3RZ+bA2XOLA=;
-	b=bl1fAB4FCcoDMQ2hqclaf75B85CyzE2sXqi8q7pld4M74XvT76C5lZ75Bh3YhqRrTRuVT1
-	2zHRa/CN/KnmQcVC64GenPmuySZwdACjMQTB1RtZY2vNLDNwYSLbzJXAtp5/mIYdS8o/zN
-	RuleYA/8dmM/ZPkk/p+nlnVFWkyVLQ4vfAiArSCRROT71PhAleuj5j2EF1CxxxH3nWXknS
-	ztnQZdqnolXkKfKoL6oJYJCL6eB4T/tQe058Lwi/ALmo8Jsmh4b8p973ABbHpZYwotcGIt
-	r/B2gqgIf587rsMibD3OKeBz7m+ZueBvkLNGkx0+7vKqvdnOQ0JRywg5t9zVtw==
+	bh=jDhQn3j7D5PeQf5O10nPiOn7wL5HyLdHCMKXSNDffC4=;
+	b=kQYh4nkWBbYaR0avcj57m6MZxsFfUg9DuBV+jIRvQJcR+7IQ26l/Rv4mtZiZtKjIFBnXGA
+	6+xHV9BFLeC6yPTZ6VZZXiPwCXw+7vm4ClsQe49+sPYEUPoQTfEvScMJMW/zB57vDvZuoD
+	w3/Ne8QSMmKwbZoljMDcT2lfCwml9o4vx5JS+J2U+pXliOnQ0bpKGEMO3Sa8oqTRzDxUNF
+	s1tvIc9LeusY8rmY9xN0F7v/73kVpvfNqBKiDLEqABCydONmhtw3WKcrCtJ0z92qKMT+6c
+	tr3eK8FQY66WArFoKdYwKj0JDZG8NIvEfQDUzkd9XKiCYR0AW1gfLVtJ2JQw1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1754679054;
+	s=lahtoruutu; t=1754679048;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qdLqRkXYYZEKmuAjlI0d7q7GmasvCSeL3RZ+bA2XOLA=;
-	b=XoESjbwfQI2D7DJVu2Ki+wGNYbRTHGgw6f5nGMV/xLCsZtTILSHknwe00dcqaeGQVGLT+3
-	RM2AgMAoBURDAHp27ubVRFVYGlpAfJSNZxm68btwWM4vLZUhIVbzYYadNiaEevtnJXSVuO
-	saEagICzhKe5Lqxwf4vz0MkpI/oAhfK3Ry1vmnAzv+lqS/Fha4qvUVRExLpaokHg+lBuE9
-	vkTEBxDFErxg8jEQu+9wtg4rY40zOl9meXLolGZJ/yBwKfVdT3jd75JF4xDzS6qz+WYuDZ
-	62P2bJ0gqDhvlCX3ruaC+y8vy8bBYLa1nE78fl5nt4hVzC7AQ0mT8gnWUoVk5g==
+	bh=jDhQn3j7D5PeQf5O10nPiOn7wL5HyLdHCMKXSNDffC4=;
+	b=AcA5NddpwxS2HJEvvWv3941yFsjgPqUafq/ORSxNEhzrHpYAXtrN7tKf4fhl5yidacllCW
+	vMcjyWXFMUJ3bV+wuCmFAXZjWeIE5QjWmb4hy9Bm0bSZICkDTxusdqOLfjcUCQTWGthCTR
+	ie1C9pQ+oclUoblbq0e29To5PfTptWb5wrTAOPnrKVazd3KRE6KCMnnYS9Rzhh8O9suuia
+	BI8xzIBIzjtjA6QcQijmJ2WHGsdflGrXBeAZ7oq77Kaux8K4DcBHd+JvRnyijFfhC+X0+J
+	Hjvy+JKBgjcPaQgZycEstUQ7w9zl9cbIXO56CJXwrrf8DoVSgzO3h6znwFbriA==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1754679054; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1754679048; a=rsa-sha256;
 	cv=none;
-	b=MMMLiauzpA4gravQAcPNRPB75wuKFLLuduFZhQQx/az44SsHcTSEFBDRmkfUT6/E7yTLPG
-	5YUOHRN9Xt5M+zod59UrRHo7hfMuyZ3SMWfMGNnt86ZCluHkn9izjPCaozmH2kXc2e96+n
-	CYsI7KrzN7McoP9oAtrl2vuUHX6RmRls3rRKQFXaAPgfC8fIvb7lcJqEGjivWobZ2US0BO
-	L8Mj9+bqKI8HI5n1nsEplZlOVw557oRsntUw9QGZqTg/uBGRJJNTYuHkpc9uid6nfRyeIb
-	4sE3elcnYaQQ2x6WxhjrmQXjnmA5wF2fpqb96BDPjkX/PGiqCNrD+cWZ+/WofQ==
+	b=vd3QkKkmHKm7J+e/2h4LIO4NQxhGSsURhbbmPrrL3nrzNI2rqTimPk2OPFcK7eEH+d2SUh
+	9RCl8nhQEAiqwK+Ak5sA3B3YbRdKgVffEdwJviNsjzsDR8om3eDV5P0AQ82SKdwWeD0Zpf
+	GIWyNfZmtPGwOva5PVfHPWccE6+7i6E5HDDQQqQzFqdv5XssBfThxflh7c+S4fG4U6js0R
+	Z995k7hyddrtRidvRN8ZfYnldNYkCVJYf43XexOFfC1G+oTmI8bVpJLtlemD7IlpnEQjDv
+	fiN5qEyOiqBI70LiBCpys5jxczeK0C5fEo5S53KryFtc5hk+GlBUsb0n3+YvfQ==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 4/7] media: fix pac_select(), pac_config() return values
-Date: Fri,  8 Aug 2025 21:50:36 +0300
-Message-ID: <136ad7f6e6e7928f3c245469cc95016c02caa80a.1754678883.git.pav@iki.fi>
+Subject: [PATCH BlueZ 1/7] bap: fix multiple release of stream when closing setup
+Date: Fri,  8 Aug 2025 21:50:33 +0300
+Message-ID: <ba4236637aba9c7bca5d93d375236e1fcdb8b9eb.1754678883.git.pav@iki.fi>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1754678883.git.pav@iki.fi>
 References: <cover.1754678883.git.pav@iki.fi>
@@ -74,52 +74,63 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These return 0 on success, < 0 on error, not TRUE/FALSE.
----
- profiles/audio/media.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+If setup->closing, then the stream was already released and should not
+be released again.  Also, if stream is RELEASING on setup_close(),
+freeing the setup should be delayed until the stream exits that state.
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 8e62dca17..a723b311c 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1063,8 +1063,11 @@ static int pac_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+Fixes issue where setup is closed, stream goes RELEASING->CONFIG, the
+setup is freed and a duplicate release op is queued. Before that
+completes, the stream is reused for a new setup.  In this case, the new
+setup is incorrectly destroyed when the release op completes although it
+was intended to destroy the old setup.
+---
+ profiles/audio/bap.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 3dc4cd92e..8413a5b38 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -856,8 +856,9 @@ static bool release_stream(struct bt_bap_stream *stream)
  
- 	dbus_message_iter_close_container(&iter, &dict);
+ 	switch (bt_bap_stream_get_state(stream)) {
+ 	case BT_BAP_STREAM_STATE_IDLE:
+-	case BT_BAP_STREAM_STATE_RELEASING:
+ 		return true;
++	case BT_BAP_STREAM_STATE_RELEASING:
++		return false;
+ 	default:
+ 		bt_bap_stream_release(stream, NULL, NULL);
+ 		return false;
+@@ -990,6 +991,7 @@ static struct bap_setup *setup_new(struct bap_ep *ep)
+ static void setup_free(void *data)
+ {
+ 	struct bap_setup *setup = data;
++	bool closing = setup->closing;
  
--	return media_endpoint_async_call(msg, endpoint, NULL, pac_select_cb,
--								data, free);
-+	if (!media_endpoint_async_call(msg, endpoint, NULL, pac_select_cb,
-+								data, free))
-+		return -EIO;
-+
-+	return 0;
- }
+ 	DBG("%p", setup);
  
- static void pac_cancel_select(struct bt_bap_pac *lpac, bt_bap_pac_select_t cb,
-@@ -1228,7 +1231,7 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
- 	if (msg == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		endpoint_remove_transport(endpoint, transport);
--		return FALSE;
-+		return -ENOMEM;
- 	}
+@@ -997,7 +999,7 @@ static void setup_free(void *data)
  
- 	data = new0(struct pac_config_data, 1);
-@@ -1243,8 +1246,11 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
+ 	setup_ready(setup, -ECANCELED, 0);
  
- 	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
+-	if (setup->closing && setup->close_cb)
++	if (closing && setup->close_cb)
+ 		setup->close_cb(setup, setup->close_cb_data);
  
--	return media_endpoint_async_call(msg, endpoint, transport,
--					pac_config_cb, data, free);
-+	if (!media_endpoint_async_call(msg, endpoint, transport,
-+						pac_config_cb, data, free))
-+		return -EIO;
-+
-+	return 0;
- }
+ 	if (setup->stream && setup->id) {
+@@ -1019,7 +1021,10 @@ static void setup_free(void *data)
  
- static void pac_clear(struct bt_bap_stream *stream, void *user_data)
+ 	bt_bap_stream_unlock(setup->stream);
+ 
+-	release_stream(setup->stream);
++	if (!closing) {
++		/* Release if not already done */
++		release_stream(setup->stream);
++	}
+ 
+ 	if (setup->ep)
+ 		bap_update_cigs(setup->ep->data);
 -- 
 2.50.1
 
