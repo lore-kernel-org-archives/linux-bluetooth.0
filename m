@@ -1,96 +1,112 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F48E1531F9
-	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 07:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA68238D49
+	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 07:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754811021; cv=none; b=p55/wXYruq4VlS6/dAeEiK4Vk3w2PPf51GRVd/nvWdmcSA7K2GtOSzrzRrggJRtRrOpCGSr3Sjxka14xSt1QdgdFwO5urAPv9nAhSiZdFw7DvMfRk9MdFYiuD2WW1JO2lRu9fj1+HIUtxnkNQTHJilh57BTVXNOAQNpSPjU2MAs=
+	t=1754811022; cv=none; b=tPjV2q6G68J55H6OIZgihELquiNWJ7tQXZhZuhDbePGpk9D5mvtu9zuM9ZNj6iVZ6byVMb7gcXBDZnqEZXB35VndJXzscn3SCLZ0pOcQYUhaC5iJ3Jrp9htlAYLxMPpm/iHuvOWajWzjeOqEViDm77Qd3k2iauAafRbRa6etGOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754811021; c=relaxed/simple;
-	bh=nCsV6GflRHJor0F8zLV/eJzIDvoOAlN2o7SREoYWFvs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FcHl+NU/YuOIsaSfpKn+QEDLnpasDX0ZBJdOD9meaMNsy9rq0hsuIgoo5lZZBH2wKQRtp11py+I8ZFWMnGRg/uA9ECmZZuguyopYjUjM/IGmbX/LuRzoC4/2hUSJWfYtiMPL7+GbfBJILwj448GAI6JaGD7TJaPieAvYJ1ZemrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ochang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IB9C1ToV; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1754811022; c=relaxed/simple;
+	bh=+KXFtXqhvYIhR82VtnL5OxIjhrLiUQ1f5VZDH3mr7W8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ce6HaXpO5GWwd/Ct2sX5tGjinRj50I2+1HNrSry0Rt9APE9XqMa6mkAvZlFzjlS1v4wZ1o5s4uJdxfakD33kZWUQb/KySRLhlN048EfNVSi85ZxnFFQ4NtgKP+IVmAYxqSuUDDBBiiPnVxDczn2+ZzmVaGr+BJsa3HlQa4ymBeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ochang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FBB92VRC; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ochang.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IB9C1ToV"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31edd69d754so3417853a91.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 00:30:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FBB92VRC"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b4227538a47so2657453a12.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 00:30:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754811019; x=1755415819; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Y9WrTMHBg9w4e3Mux2Q/uxRBSUyL0IbaDwLYTMxIBYU=;
-        b=IB9C1ToVHZ6xpqtol7hHOurnkaAk3lnqohV5neqgyle2nPJxnLmKmDXGtydo7GqYYk
-         XKYZwGSU3rER5BCPbERFhpFGRQ4OhXyVsu99d2n06egRmfwCwzHZ5vT+EZgfSevF9Bbx
-         bSqz9kG/YbPEenG9EIcQ4qKUFbkjEeEfuJhSfqevfGf0BFA+gh1bOq/Vy1JMfg3obBqO
-         SikEDQZFLqpFyTt8FFLtnQ5RWLeER+artA9yrzPkNkOdUFh4+Hxh/+JUyUD19EZHv+V2
-         OYwL30VLGg8xM+MTyLoBTwal34WVop8KDOm8KwYwgp9bxwKAp3ABKdMjX4ugaPacOnwa
-         gasg==
+        d=google.com; s=20230601; t=1754811020; x=1755415820; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=43mrkfiW1WrBVgY5qgioZ3gQLj8nBBoAFhqS3GdgwyI=;
+        b=FBB92VRCr30NCmB95apeeifCvLnxXVbXlEWkqw2Xp5dyYFo0O0akZlfRrav4DzJXlw
+         mlO3NeXJt+wHwiqTbgf9+Ze5olptj65HVQfV8Q9akmVX3tTnUGY0Ajhh3oqQvVxhlcHr
+         2bzC70RVbzvAA4lY+ulwUy6VLf6vaSaKp4+79pCNHLRqSjqBe0sNsL2ZkgtUdT/iV9fl
+         Rfc+q3Bn5mj/y0h2SiCsIbakVVm0sYNcLndYpT6I2li8vzlARTrcnBbQcEsL6LAey9Ux
+         FnGA22yNzYeNMbWAlDEBE7W4+EwhaQHq6Y2AaAtQk3OSVUoxkhtQbp8TQ24PIjUUHGgY
+         8vVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754811019; x=1755415819;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y9WrTMHBg9w4e3Mux2Q/uxRBSUyL0IbaDwLYTMxIBYU=;
-        b=gKrJsqPNw7phzq45MPLzmKj8+4jd0mssMv9hy++uObMwE/KYobgyjAygPqvC2rmqAA
-         JS/SsWUDL868yw9goS+TXEaTSMTzCO3VTQEBYwdW3/qjatevCbhsCGvWpMLNe1gZU2kU
-         x0ZbTdLekFuVdljJjLe4mitZ5Cq1xicS57MSbTe4m/o72wveMM0DtgHdsPR434pJQJ9A
-         WqEMUI+R5OWrvSKBToiLLczPgHefKbJ/PqnfhhuRXiU+8MbL/cBh+j9ihMCvJlK2fWSA
-         ILE1mhErliMS9hILBhFmqN6T3Vn251tjR02NhXF02zJ8OZrD6k0Y7FsjfLMqDDnpREDr
-         g/JA==
-X-Gm-Message-State: AOJu0Ywbk+3NZmd60v7VUynDg6e5wasUOX5r/0gg7216hCWj1Do6uysM
-	bIoXh1rJIdSJtmnYciognP8eSIuM4A30WP0TwLaMF1ufU/UHSkyEHMR69VqJGr16aiNFue+lY6L
-	1jpHuujLX0LK9ORYcCxX1Ll356Jngc8Oo7mKJgQNFYczoXo9dHZYBR3o1kWh1NVGX597e/SYdGJ
-	jvwOoT/q+IpTeWg27HtZh5P3Tm88YckQhbXETrm36GuWJvMqi6
-X-Google-Smtp-Source: AGHT+IHmhGvAH9+TA83UC1cLKXAcAn4I0bWTeJnUXL5Ti2iGMEcZpAfqahhy2txRUpAoI5PbHdf1vg1gV5M=
-X-Received: from pjbpx16.prod.google.com ([2002:a17:90b:2710:b0:2e0:915d:d594])
- (user=ochang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1dce:b0:313:dcf4:37bc
- with SMTP id 98e67ed59e1d1-32183e80aabmr11942026a91.34.1754811018503; Sun, 10
- Aug 2025 00:30:18 -0700 (PDT)
-Date: Sun, 10 Aug 2025 07:30:08 +0000
+        d=1e100.net; s=20230601; t=1754811020; x=1755415820;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=43mrkfiW1WrBVgY5qgioZ3gQLj8nBBoAFhqS3GdgwyI=;
+        b=A4fsnc88EmYzbM/VFMNFcc8wh5615GqZBzsjfHNlmYQVrm3wK3WTs+8JLuUWjOYlO7
+         vGq2oA4PqKXtcK4eqUco9M7LVlb+/s38tIdMWqb5aiEwXA5mXDLccz9ZEfMT+rstjLLf
+         GNhPokmvMMQsYgvB11EUh28aJqP0tdUbuRAmv2SyWh8pCggTfxUJdL6yrBqBNOOdVOdv
+         C4KbeyHLu5T7sCGPPlbY3n5ofJSqSVXvKrJO1TLoaBtacKJZsx58ZO6wQCAoSTokM8Sd
+         53HXhgx2Lu1UOleiXxJnzk3nXcmk1wbxRPLm7GyouWxh90UHmQH8RSfW/FyRQ+StH+6L
+         FA8A==
+X-Gm-Message-State: AOJu0YxlqJdBH+r2bk8bLqrVSuD9yNZr/ZojbSFZTXdCSDbIRHKkrX/b
+	lO6G+k6amyPQNRYXPAT+7eCRGbkjQk4WM5ouKh4O3pqDI8jn90mHIo1lCq2cU23MzEps0hUB59T
+	32SWJLLT8Aib72q9pz7M++82taHoHguv5KA8akXhSuFaSd//dNcswb88ZzPQDOnC1Y1s0eMYF/c
+	2l7MrU4FbYudZRIcQZw16KBbnswIx7QtAp5V5I2UWJ9o8/fHsr
+X-Google-Smtp-Source: AGHT+IGpBxfqPuT3eywX70qP7E94h8xWdZWV2usaNPxN5RuH3fVUQ3Mmw7Ys+q25/dSgvUw6lPCNQ4Bkddc=
+X-Received: from plhl15.prod.google.com ([2002:a17:903:120f:b0:240:670f:ad71])
+ (user=ochang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2341:b0:240:6766:ac01
+ with SMTP id d9443c01a7336-242c1fdbcdfmr138606585ad.2.1754811019870; Sun, 10
+ Aug 2025 00:30:19 -0700 (PDT)
+Date: Sun, 10 Aug 2025 07:30:09 +0000
+In-Reply-To: <20250810073008.1824799-2-ochang@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250810073008.1824799-2-ochang@google.com>
 X-Mailer: git-send-email 2.50.1.703.g449372360f-goog
-Message-ID: <20250810073008.1824799-2-ochang@google.com>
-Subject: [PATCH BlueZ 0/1] Fix buffer overflow in sdp_xml_parse_uuid128
+Message-ID: <20250810073008.1824799-3-ochang@google.com>
+Subject: [PATCH BlueZ 1/1] Fix buffer overflow in sdp_xml_parse_uuid128
 From: Oliver Chang <ochang@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: oss-fuzz-bugs@google.com, Oliver Chang <ochang@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This fixes a buffer overflow found by OSS-Fuzz. The ASan stacktrace for
-this is:
+This was found by OSS-Fuzz.
 
-```
-=================================================================
-==402==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7c960dd00030 at pc 0x59331ced5b8d bp 0x7fffedcc0c50 sp 0x7fffedcc0c48
-WRITE of size 1 at 0x7c960dd00030 thread T0
-    #0 0x59331ced5b8c in sdp_xml_parse_uuid128 bluez/src/sdp-xml.c:128:17
-    #1 0x59331ced5b8c in sdp_xml_parse_uuid bluez/src/sdp-xml.c:146:9
-    #2 0x59331ced3529 in sdp_xml_parse_datatype bluez/src/sdp-xml.c:428:10
-    #3 0x59331ced3529 in element_start bluez/src/sdp-xml.c:498:32
-    #4 0x59331cf26628 in emit_start_element glib/glib/gmarkup.c:1010:5
-    #5 0x59331cf258d7 in g_markup_parse_context_parse glib/glib/gmarkup.c:1369:17
-    #6 0x59331ced1969 in sdp_xml_parse_record bluez/src/sdp-xml.c:621:6
-    #7 0x59331ced8cc9 in LLVMFuzzerTestOneInput /src/fuzz_xml.c:30:9
-    #8 0x59331ced1879 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
-    #9 0x59331ced1675 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:0
-    #10 0x59331ced122d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
-    #11 0x7c961015c082 in __libc_start_main /build/glibc-LcI20x/glibc-2.31/csu/libc-start.c:308:16
-    #12 0x59331cdf8a2d in _start
-```
+This can be reproduced by running this input:
+`<uuid value="111111111111111111111111111111111111">`
+against the harness in
+https://github.com/google/oss-fuzz/blob/master/projects/bluez/fuzz_xml.c
+which just calls `sdp_xml_parse_record`.
 
-Oliver Chang (1):
-  Fix buffer overflow in sdp_xml_parse_uuid128
+`sdp_xml_parse_uuid` checks that the length of the string is 36 (32
+digits + 4 '-' characters) prior to calling `sdp_xml_parse_uuid128`.
 
+There's no check preventing this data from being 36 digits (with no
+"-"), which leads to a buffer overflow in sdp_xml_parse_uuid128.
+
+https://issues.oss-fuzz.com/issues/42534847
+https://oss-fuzz.com/testcase-detail/5070205940531200
+---
  src/sdp-xml.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index 5efa62ab8..2fa8f28a0 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -125,10 +125,16 @@ static sdp_data_t *sdp_xml_parse_uuid128(const char *data)
+ 		buf[0] = data[i];
+ 		buf[1] = data[i + 1];
+ 
++		if (j >= sizeof(val.data))
++			return NULL;
++
+ 		val.data[j++] = strtoul(buf, 0, 16);
+ 		i += 2;
+ 	}
+ 
++	if (j != sizeof(val.data))
++		return NULL;
++
+ 	return sdp_data_alloc(SDP_UUID128, &val);
+ }
+ 
 -- 
 2.50.1.703.g449372360f-goog
 
