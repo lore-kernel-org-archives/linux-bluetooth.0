@@ -1,131 +1,124 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD104690
-	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 19:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2741F1FECBA
+	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 20:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754855850; cv=none; b=GePzmRAfyha0GLCdi+MYmDXXaCS61jout5tt9epKsMSQE8rTdW704GQ4gHDcYCzQhxseo9Mqx79McxfQSoVLxMG/OxtF6gTRSPKCgw1O/+p2syLafAOecScdOmdqwK2+EJW7j6eKy/If9UHIRkE6PyDUdl3YBoaP3iMohc6Vd4Y=
+	t=1754857263; cv=none; b=YyoEvSXEERXBWD/GOrJT9VYgS1B86ff5oToLGWSG1F4pGla/ayaWAFgo8CFNfB6n6DhIZNe1tZ0MSxb5fUBC49SfJMTaw7wDAergs9pKQ4SZUh04YOofqk8ZdvS4yI+lsJ1fI+lbCZJV30zrgStEZHsjoAU0WYeKZUtxSgQoDVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754855850; c=relaxed/simple;
-	bh=USSTFAhfvU0GAGsrWNw7a/E7dBd+YYD5r5jNwB88jnU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=llUqC4QpuXDhY21rnl4DSeJQI9znJhQu6Eq4b/jWA2txvgZgR/PI+kcBdOZ01il9DpsNl9Es6pSqmDH1RKak7hFJgZN9U2WWCVVzNELAJYhyK/jF9oFPDrJXl/qJfz+u9zqNi0ouYcZko7EBaQbvWvrCcOjK7FxXwzJZARjOPtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aOmmNMSj; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOmmNMSj"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7e699c5b110so396196385a.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 12:57:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754855847; x=1755460647; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXe07FNfxZ2MKTju+E6GXvysp5FfZvUWkVYA9WI9iDM=;
-        b=aOmmNMSjUikE7kopOQcnZGzAHcpLPOFF0FhyB6+ufGKzqq3WNxkGDNLBqW9uQll9oK
-         fWpgck79xIr+pPoFM28Iuf0Tb+GpIp+0liiScuJa9FEqAhd5H5yd+gYsksNX7A/D+fNw
-         8EU1w+jp/Nb1ArP0+py34IMr+2/nqNLIMWOintkWehn/xwPNGY7yJn4XhGHsa+iuvQkD
-         LNm57wFl3gUy4tm33PBU2RuuSU4RleArkndHJBdFUY44sKAczglh5LKqPrhk9sivqRsu
-         fo/iKbI7P6BYQG8sP3bJ1GSrzzcVCmzK8kIYlGkcSEeye7Bc2U4gJufi9zoQQj2UbfIP
-         r3xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754855847; x=1755460647;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JXe07FNfxZ2MKTju+E6GXvysp5FfZvUWkVYA9WI9iDM=;
-        b=VxutI+5reZYrrYOttGzw70VYaFTbbwo0Gy/Uvk3cWpOIrO+w9y7zwEhXXFZ8vE5ODp
-         bbs/vsNtoUd/S2VdFarFL0JGyTx/kibtxn4yLa10ZcCK7/CNmTpks4LhMZlWiTzhoJp8
-         9qRHCJ+ocqbE+vLqfLAZo3A+ME3MEKZ9tn+JLgcFTbKkuCXZZn/T4KUOxl6I/h9ws0rU
-         KzneAsupvmlzyH3zVmOj2QMrNaq79FmIsrEpEyULgB+y4J1/G8kLpk7HcGM0T9CA/996
-         aUtuZHJqm98la+1g0l5+s7Mp4XFqnn3f8TUNBBVXvZdAwdQv8lwO2qjdbizOU8gd+Goz
-         y7TA==
-X-Gm-Message-State: AOJu0YxsuiwCUWkcS/YwC5l0qFymEP54xtFo+8z9o0xLPi5ZFnxkeDvL
-	x0YYfxugnaCjh8gP8cxc3F5nMRinsZqmMj1gR6LG8KL8Mazqe1eCPHcCSM430w==
-X-Gm-Gg: ASbGncvCNN4utM7FdRGMx7yoN0ii8SsoZr9Bv5T+drQ/yXeyYWDW/4GQsfbFDHQTQ/H
-	50783OzpBrpC/mAp1PSMrCQJN7MwH846UOsMwxAksDhigO7qbuUYtqFP3XW1+MxSnucB+Xji7AR
-	p+6wDpVJXAUVxgzkqVVgMvTOJnv1e/nG0rO8LWdFsYwaUBm1Ytq9cr0M1djNiPDFBr2qSPK9yNF
-	Lx2T0y/sY9nDYy+9yJKiRs15gXZM5514Xxq/7EgHEc/dIbN4CiRca/n9WE8lxI4b4lnaYVSjVZI
-	F9P2qEtWTylZDTeixlshq/8qkZamZEqfNjz7whzWvk6EzELDiZYVw9+695tCkyYNMYRoPxrHjTm
-	/81ZEGMThLVZPMeFV6Lbm+28svANg
-X-Google-Smtp-Source: AGHT+IGz02hYFhV3frK+fGtasY6V6l1cHG4wlXEXU04WzI4QDvuilSgdlwgbMmB1ZMUMn4mkAVY/tA==
-X-Received: by 2002:a05:620a:1a9e:b0:7e6:3e26:63b6 with SMTP id af79cd13be357-7e81ff9ae91mr1734647585a.21.1754855847449;
-        Sun, 10 Aug 2025 12:57:27 -0700 (PDT)
-Received: from [172.17.0.2] ([74.235.126.84])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e806ad969dsm920175485a.78.2025.08.10.12.57.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Aug 2025 12:57:26 -0700 (PDT)
-Message-ID: <6898f9a6.050a0220.5a1fc.64cd@mx.google.com>
-Date: Sun, 10 Aug 2025 12:57:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5195458907903563314=="
+	s=arc-20240116; t=1754857263; c=relaxed/simple;
+	bh=wG9UkhyMM9dEb/eZ4f4VtkgcW3Q08haOd/Uybzrqylk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R7+O+3vBYOrkWndUGirZXzJtq+dZy3aBV1+KtbyrC3LXk0gGU3vzVeW/4/f6HppurHUg7qdIrGgjvQchXsPtgCnaIB8vzPW0/nQ0t9YfSDzD68Du0k+57mXtS5vniLzLmON2l/KWBF4y9X5YsfIS0ckDiOwbpF9mWhMr49bG4nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7e1.dynamic.kabel-deutschland.de [95.90.247.225])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 43F2C61E647BA;
+	Sun, 10 Aug 2025 22:20:46 +0200 (CEST)
+Message-ID: <5b9be348-8ea5-4492-8299-2ab8ef2e11d2@molgen.mpg.de>
+Date: Sun, 10 Aug 2025 22:20:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] shared/bap: reset local ep states on bap session detach
-In-Reply-To: <d31b0994cc4ffa178f044be156e95324bdc0e64b.1754849783.git.pav@iki.fi>
-References: <d31b0994cc4ffa178f044be156e95324bdc0e64b.1754849783.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ 1/1] Fixed heap-buffer-overflow in
+ `compute_seq_size`.
+To: Oliver Chang <ochang@google.com>
+Cc: hadess@hadess.net, linux-bluetooth@vger.kernel.org
+References: <20250810064656.1810093-2-ochang@google.com>
+ <20250810064656.1810093-4-ochang@google.com>
+ <42be480f-d301-4963-b5f6-73811586e857@molgen.mpg.de>
+ <CAFqAZO+WK1m2ww1B5qi-iUC8rV-mnsuBk=VeHbBy5euGWBH77Q@mail.gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CAFqAZO+WK1m2ww1B5qi-iUC8rV-mnsuBk=VeHbBy5euGWBH77Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============5195458907903563314==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=989741
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.31 seconds
-GitLint                       PENDING   0.22 seconds
-BuildEll                      PASS      20.03 seconds
-BluezMake                     PASS      2566.34 seconds
-MakeCheck                     PASS      20.42 seconds
-MakeDistcheck                 PASS      183.99 seconds
-CheckValgrind                 PASS      235.55 seconds
-CheckSmatch                   WARNING   306.96 seconds
-bluezmakeextell               PASS      127.71 seconds
-IncrementalBuild              PENDING   0.22 seconds
-ScanBuild                     PASS      912.75 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+Dear Oliver,
 
 
+Am 10.08.25 um 10:20 schrieb Oliver Chang:
 
----
-Regards,
-Linux Bluetooth
+>> Thank you for the patch. For the summary, I’d use imperative mood and do
+>> not add a dot/period at the end:
+>>
+>> Fix heap-buffer-overflow in `compute_seq_size`
+> 
+> Thank you for the suggestion, I will make sure to do this for future
+> commit summaries. What do I need to do here in this instance to make
+> this change? Do I need to resend the patch with a new subject?
+
+If you want to, you could send v2. (`git format-patch -v2`)
+
+>> The last comment says:
+>>
+>>> This issue was migrated from crbug.com/oss-fuzz/51480?no_tracker_redirect=1
+>>
+>> But that URL gives *Page Not Found*.
+> 
+> Apologies for that. We had a migration from a legacy issue tracking
+> system, and that legacy system has since been turned down.
+
+Understood. No problem.
+
+>>> https://oss-fuzz.com/testcase-detail/5896441415729152
+>>
+>> I am unable to access this without logging in.
+> 
+> The emails that can access this are the ones listed here:
+> https://github.com/google/oss-fuzz/blob/ef1c29822d62470fb6b0af7b73412d245d05f80c/projects/bluez/project.yaml#L3.
+> Are there any other emails we should add?
+
+I am not a maintainer, so, as these might security sensitive, I guess 
+it’s fine, that I am unable to access it in general.
+
+> These emails also receive automatic email notifications whenever
+> OSS-Fuzz finds a new bug. Note though, to view the oss-fuzz.com
+> report, you'll need either a GitHub or Google account associated with
+> the email.
+> 
+> https://oss-fuzz.com/testcase-detail/5896441415729152 contains the
+> ASan stacktrace, which I've also included in my earlier email.
+
+Understood, in the cover letter [1]. Thank you! I personally prefer 
+everything to be in the commit message, so it’s self-contained.
+
+>> With your patch and the test case, what error is logged now?
+> 
+> There is still a memory leak detected by ASan that's unrelated to this
+> patch/issue, but the buffer overflow report is gone.
+> 
+> I don't see any other log messages, including the ones I added in the
+> patch. This is likely because `sdp_xml_parse_record` calls
+> `g_markup_parse_context_parse` with a NULL `error`, so any parsing
+> errors encountered are not propagated.
+> 
+> ```
+> if (g_markup_parse_context_parse(ctx, data, size, NULL) == FALSE) {
+> ```
+> 
+> It seems useful to enable propagating of parsing errors to
+> `sdp_xml_parse_record` in the future. But if preferred, I can remove
+> the logging I added since they're not going anywhere right now.
+
+Thank you for analyzing this, and giving the reason. I’d keep it like 
+this, but add a note to the commit message.
 
 
---===============5195458907903563314==--
+Thank you again and kind regards,
+
+Paul
+
+
+[1]: 
+https://lore.kernel.org/all/20250810064656.1810093-2-ochang@google.com/#t
