@@ -1,74 +1,115 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083971C8633
-	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 06:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E998417DFE7
+	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 07:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754809039; cv=none; b=ucX50clDkGuslk7W2ftvvQN7KbWJo06u8aQs9QcK0eKvPEGbwalHovLLDn1bERbje0mw0Z1wSpzgY69PrcfxpNXXeXWThYAjWttC8oNoJFn1z8IfERmYDzzjWB78eI0o4GuV66B1e9dI5dwcF8XmnPknYQfAylvu6ixwPWPun2c=
+	t=1754810143; cv=none; b=UpS0E31es1sQYlTy30/kWxWJJ/B2CaEGm1zwl9zk9p+dg51QaJU9N+xJxKdRO/8v9k6iuO+8PEYI9hJvk1Yje1wBq3Ggoo1h76yaFN8N+yPXVHIMTFpmxlWg7AxBbBRRWO844jVxZFhQ1f0pvYl2CfY92Fvn/QjahamlAtKAnvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754809039; c=relaxed/simple;
-	bh=9VRfrzBjnZRCR+V7VNgSOkl/YTmZ3YgokdEksVMbjJg=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qASpsG92RXMH0YFnrx3b2ZBF4qjdAl03YDiYeeS+LYSGhU/zHo19gIwFqZFSShFJq/BXVhtgrf8NlfVVFsI38OLhQZVdiEG4DEmnhtT0IG+Teye/PNJNVn91j2fI3ub7J4RtD7q1pq96CATopbUctEcdEzriVjyTcHo8PHJHICU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XwQRsW1V; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XwQRsW1V"
-Received: from github.com (hubbernetes-node-fb73324.ac4-iad.github.net [10.52.160.57])
-	by smtp.github.com (Postfix) with ESMTPA id 1972170039A
-	for <linux-bluetooth@vger.kernel.org>; Sat,  9 Aug 2025 23:57:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1754809036;
-	bh=ZENVdtRhNQP+BVeAZkq+k+xsT2EtYWh3TJuYkkUDr9M=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=XwQRsW1VeJcn3KwIr+jvJEhQ7p6Q/p1xwT5PaHAoiyvnzUWdfACMoqI/z5mZxaeN9
-	 WfgT8HDWuwEfWDNinqTemJCrR/RGOVvg9i1MR6Ctl6ySehPVjlNFvA9yfwLtuny9OS
-	 eayWJ3hsMzo0WTG+BvZ4mleGVBQ60ngrPJGS8Eeo=
-Date: Sat, 09 Aug 2025 23:57:16 -0700
-From: Oliver Chang <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/989673/000000-4eead4@github.com>
-Subject: [bluez/bluez] 4eead4: Fixed heap-buffer-overflow in
- `compute_seq_size`.
+	s=arc-20240116; t=1754810143; c=relaxed/simple;
+	bh=zWMoXnk/a0sppZ65pK9+qqRl2UsaTLRIowQh65ymcFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N0vNDb2m9aAvCCWv/OVTOuy+2QaOiuJQaHdzmO3nqKPo233DV8n8Do7nDrDnfWnLuWShmRcQjg9IuRSVpoFyDH4ph8DCgJG65pRTwdMgiFGl7Q+9Cv/DY4+1A98EJmvAXbSAShQn+Xi1M3iyiIw3QSpLURl/ZD3gxZGVudBUCpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7e1.dynamic.kabel-deutschland.de [95.90.247.225])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 676D961E647BA;
+	Sun, 10 Aug 2025 09:15:29 +0200 (CEST)
+Message-ID: <c1ae36fe-90d8-4c3a-a011-6191c150d16f@molgen.mpg.de>
+Date: Sun, 10 Aug 2025 09:15:28 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_event: fix MTU for BN == 0 in CIS
+ Established
+To: Pauli Virtanen <pauli.virtanen@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+References: <cc0cd5d3cd7ed9b081b60f34f97ed9c39a820935.1754728503.git.pav@iki.fi>
+ <f0ec9c48-39ae-4ab2-b62f-f688dd16f3bf@molgen.mpg.de>
+ <a58c9a4f08bc07af959ea3e8cef9ac96a366b79f.camel@iki.fi>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <a58c9a4f08bc07af959ea3e8cef9ac96a366b79f.camel@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/989673
-  Home:   https://github.com/bluez/bluez
-  Commit: 4eead430b267e1a06792cc9fa90d91a7b7ef75c1
-      https://github.com/bluez/bluez/commit/4eead430b267e1a06792cc9fa90d91a7b7ef75c1
-  Author: Oliver Chang <ochang@google.com>
-  Date:   2025-08-10 (Sun, 10 Aug 2025)
-
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  Fixed heap-buffer-overflow in `compute_seq_size`.
-
-By adding checks for sequence/alternate types in element_end to avoid a
-type confusion.
-
-This issue was found by OSS-Fuzz.
-
-This can be triggered by using an input of
-`<sequence><foo/><text/></sequence>` against the harness in
-https://github.com/google/oss-fuzz/blob/master/projects/bluez/fuzz_xml.c
-
-https://issues.oss-fuzz.com/issues/42516062
-https://oss-fuzz.com/testcase-detail/5896441415729152
+Dear Pauli,
 
 
+Thank you for your reply.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Am 09.08.25 um 11:43 schrieb Pauli Virtanen:
+
+> la, 2025-08-09 kello 11:24 +0200, Paul Menzel kirjoitti:
+
+[…]
+
+>> Am 09.08.25 um 10:36 schrieb Pauli Virtanen:
+>>> BN == 0x00 in CIS Established means no isochronous data for the
+>>> corresponding direction (Core v6.1 pp. 2394). In this case SDU MTU
+>>> should be 0.
+>>>
+>>> However, the specification does not say the Max_PDU_C_To_P or P_To_C are
+>>> then zero.  Intel AX210 in Framed CIS mode sets nonzero Max_PDU for
+>>> direction with zero BN.  This causes failure later when we try to LE
+>>> Setup ISO Data Path for disabled direction, which is disallowed (Core
+>>> v6.1 pp. 2750).
+>>>
+>>> Fix by setting SDU MTU to 0 if BN == 0.
+>>
+>> Do you have command how to reproduce this on the device?
+> 
+> As noted in the text above, try to create framed unidirectional CIS on
+> this particular controller, e.g. for 44.1kHz audio.
+
+Indeed, I read that. But I have no idea how to do that. Is that possible 
+with the tools, or does this need to be coded explicitly?
+
+>>> Fixes: 2be22f1941d5f ("Bluetooth: hci_event: Fix parsing of CIS Established Event")
+>>> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+>>> ---
+>>>    net/bluetooth/hci_event.c | 8 ++++----
+>>>    1 file changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>> index 4f0a6116291e..fe7cdd67ad2a 100644
+>>> --- a/net/bluetooth/hci_event.c
+>>> +++ b/net/bluetooth/hci_event.c
+>>> @@ -6745,8 +6745,8 @@ static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
+>>>    		qos->ucast.out.latency =
+>>>    			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->p_latency),
+>>>    					  1000);
+>>> -		qos->ucast.in.sdu = le16_to_cpu(ev->c_mtu);
+>>> -		qos->ucast.out.sdu = le16_to_cpu(ev->p_mtu);
+>>> +		qos->ucast.in.sdu = ev->c_bn ? le16_to_cpu(ev->c_mtu) : 0;
+>>> +		qos->ucast.out.sdu = ev->p_bn ? le16_to_cpu(ev->p_mtu) : 0;
+>>>    		qos->ucast.in.phy = ev->c_phy;
+>>>    		qos->ucast.out.phy = ev->p_phy;
+>>>    		break;
+>>> @@ -6760,8 +6760,8 @@ static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
+>>>    		qos->ucast.in.latency =
+>>>    			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->p_latency),
+>>>    					  1000);
+>>> -		qos->ucast.out.sdu = le16_to_cpu(ev->c_mtu);
+>>> -		qos->ucast.in.sdu = le16_to_cpu(ev->p_mtu);
+>>> +		qos->ucast.out.sdu = ev->c_bn ? le16_to_cpu(ev->c_mtu) : 0;
+>>> +		qos->ucast.in.sdu = ev->p_bn ? le16_to_cpu(ev->p_mtu) : 0;
+>>>    		qos->ucast.out.phy = ev->c_phy;
+>>>    		qos->ucast.in.phy = ev->p_phy;
+>>>    		break;
+>>
+>> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+Kind regards,
+
+Paul
