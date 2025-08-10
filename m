@@ -1,135 +1,126 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8991D54FE
-	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 08:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5793A1B6
+	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 08:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754814030; cv=none; b=AXoHvipDBN8x0Hv4roIlpw/CIGaL9YvU/l1XwrSuRB5J6Dfy1ao1lWzv81sEagmUXHXwfRMvCJZBwz9gNSFzdBIUIBvA1bc/yNhfZLqFDctHaoQ1WKca/vf3LFm7wsn3Ip+DEsqjwxwUij4JewJwJHLGgO24B+IMgJoZHfKNuoY=
+	t=1754815903; cv=none; b=UuOO6DLnMCcvRgBMopVCeUr8X9PodrgWoIwaz1VNB4VGJhgqjQ6d5VQSKFSaeIs19Egj1q65IgQxf+axvCZuh2s4ZMT/or2yBVO5k2Zgj2roVQd5gJCDHEQPR4P/y7mkptx9817YM1d4jnwBZzANJ9dcfwVq9xJa0yd1GoFO4L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754814030; c=relaxed/simple;
-	bh=C+/xkV9qaC8ZIFJcCaoh8f9fWDN1Ph9Vz8qFXDdqFLQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zm2yIlWZs7Tme2C5EuAPhcEl2W+TeysiU2OFWRYf1rcLL/2GJ/33R3VbpM7hW1pNbOxt183S2AL7bFUKRyF8nhFfj18TYA8c/Ok6BYTbK1oL/bMWz8fTnvJnZ7gD/7kaxHZQmbYcTOW+LkrxQvQ+6ZhQ5JOklNDWKtAkorv6Oeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IlmtAInT; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1754815903; c=relaxed/simple;
+	bh=InWcV3TsP4SOqlPtAG1Wd3VQ6lEyBSDEkiPOxgduYlM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=mr20/AIdWANoWrQJzcbw+yioaWE+J6GXy7USjeKEeUZVHjWoLxhrDkNhZUfque08drmLLbxSUPr1nab1+vSFI6Vv3i+6d8sNtmRgahhzhfSzg5cw1uFQ8L0LDSu+6r625OkJyvRjgnuXeYLK5G5DTROb9WbKAMIYdqpytzqQhO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnZq0oQP; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IlmtAInT"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-70767eef931so44916826d6.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 01:20:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnZq0oQP"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4b08a0b63c6so40967321cf.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 01:51:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754814027; x=1755418827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C+/xkV9qaC8ZIFJcCaoh8f9fWDN1Ph9Vz8qFXDdqFLQ=;
-        b=IlmtAInTOvmF8Vg8avV0UlhW76Gxpr7tj6AGv2uPkrq9PPfwt8dMOAeSiDlcJEVGMI
-         tHcRfz3wl7Tzxzq4BFmkw3nh/YSEHYf+6llDoMDTFk9T7O8cGy8hBxoqK9g7tSe72PH2
-         O14tQB4MJxW3fgnjyp0QDoamscK32E7v9R73ftH1RpKdWo48l/JvTXLgdZm1BzPsfq5G
-         oniiBtdcw23ad3W7GiTJVhNpFj4e6XCOdizfaYFZYjNWuyJziOCqAid9Ld1QyfY0gwhO
-         Q9m6J2QZDeOeXf9nA1/4vmWCMP0VeMmpEcnNy5ihVeYCllw7VbBMA2Ne2HQhliY0P/tC
-         f3+g==
+        d=gmail.com; s=20230601; t=1754815901; x=1755420701; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2kbHa+fsc5toGBM598bu9Z89geIm1ylBue+LcShLK/I=;
+        b=fnZq0oQP3uPtoo9lGEbRo2/BJETXuRLJACKXIzI9EkA2UMt1qGJBckWJ2/zzr40qEA
+         rMpZKfjCysTtBKVdBGB1qM8WogAGvYdcD0XM70GIlLkm5KpcvUGD/Nbsg9Az980jbjTK
+         3/62uYyRVjvs7c5fd4ExctvhzFVJly80Lq/gupkSP5qMPrlxxZvKUQKpuhVLnSzkAcwm
+         VD0UWLgDzYE7Gbok76jfY1NTz6ElN5GopIKz0dhOlU1LejuosZgnUYJCicECYuXb965c
+         heDPWylScWg4SrIghHQgIoeLVeHPrDCsoyN33zfEeqx2tufX6fxapAWQLiV5CjoIsQzL
+         TF1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754814027; x=1755418827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C+/xkV9qaC8ZIFJcCaoh8f9fWDN1Ph9Vz8qFXDdqFLQ=;
-        b=LmriNIooNFA+U5SKKV+wF0TO25sMxgr6Tdn1I8XE6DnPSk7j7ITANP/EruzC03yvzj
-         9MoxalDdktoXzkaHTELdKAIGEgdslOKvl60YJ2CA1xW1RCA31IfrgHK5A6EwbXwK1Qtp
-         s3jvzU+g995iU1IftucYWVpoudI5LDr6S9hN9HGrfY938zAwNhWBR1/NziKooq+in2ZI
-         dWG9SjP7fkflLaM6qY9NY0W+h5TdBcsCfSkablf6L5Ddmvnxrdwk5biah0eCKKauPMWi
-         QBWdIlHhrjPNMuxfKEvbSrKiDfjh3q1yKbKEm80+UF3nBUBSxsyx/cFl9bXsbbd/Ywdm
-         CZYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU63JZaXYYfFZ5p3G1XA+UF6eNYE3Qs7FAKH0jnbzGMrnCasUjsDP0cxC8IeWb8MgXUWY02OV92xtD5MaP/Zk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3EzCvqLoetDaub3whYF8NqiLe4mPKD76DHnv4Wmd7215jHtu6
-	WbLu1jNWNDmxxOZbaiZnRJ/I7VBXJ7FE8OeszjuQ9GP4QSeOpgxPl52BsPbZ1lfUaSdt2a5DQsh
-	fk7kjuBXNZd0zIFSF2YWFQgmi3qGVqjrdWaGJOSXN
-X-Gm-Gg: ASbGncvmTQY5RThY8c1S7HY2w0Ifzfq4ViSxrE6J7Pnfmu7ujoUnHGtJzY9QJmSa6iw
-	E8n+roykPJ58bVb5w+CNcL23xIogmqifO10V4wKmitCxZmeh0J+rLFCcBlFn178QY45aotKdlMa
-	r9iCv0NBSj/2IRrz9D+9rlPFMwmsAIUmX78um/AAx2MCirBK4rEjIe1/uHkOMZwy9NgOwGsOmHT
-	ETjFpd62OEr/bhC7k5nvsmprHBzgTuYLNGPkeox4KeWz5UsaM2XSZkBLCetx4s=
-X-Google-Smtp-Source: AGHT+IGahtY6UEZ3A4XL2qWY3Za4yBv/MuTCiTIoqAEb6CEkfto2ou2Pq7WlIYjeaUf+2XevQWugxl8At0Qxh7cNp20=
-X-Received: by 2002:a05:6214:1c4a:b0:707:494:ec4 with SMTP id
- 6a1803df08f44-7099a437f3bmr124632256d6.27.1754814026788; Sun, 10 Aug 2025
- 01:20:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754815901; x=1755420701;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2kbHa+fsc5toGBM598bu9Z89geIm1ylBue+LcShLK/I=;
+        b=mBH/IcHuvbIxCVRLemH+soO2C44RXLRvHN/E7fs+JEvTO3GeV6r2MRm0s5dHOFH2vd
+         xQxa84Xnptii7am++6zvwi06kVShyEJaTPSxWrp3LBw/X8gJeEnLirFDDjA+DwrFjxjr
+         l73ycHlKgjBGP54/E3IOQMBMs3WruYJF15iGibUo2wgyc6L/vj9J0gmw7GQouSZSABDe
+         rKJ8NeFPPfsBvC9Bk90gWFoB+i69SC6kq6tF4w9WlK3qvh7dgQHVx+xtfVZdm0gnB7ii
+         NJm1ZLQnWitna8IZiYlhG6PiZwh/JemLV3bJt5QSoomTSfTwv+4hWpbRSuki137pg2Pd
+         8qoQ==
+X-Gm-Message-State: AOJu0YwcMLGSZYQ0uG4+34wMwtAARr+7ajuCqtR5LuTkdNiCjM4esMiX
+	sRgVNF+uiasOphGtk7XcUh4kBQVZDEu40ffUuodWGWyOvgG3TMXsrYaQgVNTzA==
+X-Gm-Gg: ASbGncvzDmMJItvkVX2NYqRlbGN9u1CykFC6z/df0eMkZLirLlpRLeqGfITxCY2Lnrz
+	MOAdyUOgp0DIGsml6+VtxAufwEkfPedpZJEet3I1T9MeMV1rJOponEcoR3ugt+WRpjgnqvy7jA6
+	s3J2B4YZIb1sjcynDoq280j27Gcv9OFvXxOm6LThzXVmsZ9LQ0N+b3oPr8ZMjFrNIX0ju57lTSW
+	+QuR/8sYlgjpgBu2da2H8r+iM1BEJBUyVTMOi3U6anwRyo1wAH1fKaBwTq6EDDziI0RyZRTEBFX
+	eopF7BGCOGu05VchOgSwQFYJmb46HAQc1tUPUw6oZM3pQbZxOOMDwpvoKM7SXg5c8Wbj2h8BQpW
+	CL/+ALkfVgS+7yfXGzfMTveCfExI=
+X-Google-Smtp-Source: AGHT+IGUqmo4c99cl8/nFwRfjrGV96Cwg15UZxfIyCR4F+KEd0m/zfzN1Uye/4FWFftGZ0jQqa3t8Q==
+X-Received: by 2002:a05:622a:11d4:b0:4b0:70d2:5dae with SMTP id d75a77b69052e-4b0aedd7c6cmr129108791cf.32.1754815900999;
+        Sun, 10 Aug 2025 01:51:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.206.80])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7097382fd5bsm70558826d6.46.2025.08.10.01.51.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Aug 2025 01:51:40 -0700 (PDT)
+Message-ID: <68985d9c.050a0220.2c19e1.e5d9@mx.google.com>
+Date: Sun, 10 Aug 2025 01:51:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4699847266563514625=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250810064656.1810093-2-ochang@google.com> <20250810064656.1810093-4-ochang@google.com>
- <42be480f-d301-4963-b5f6-73811586e857@molgen.mpg.de>
-In-Reply-To: <42be480f-d301-4963-b5f6-73811586e857@molgen.mpg.de>
-From: Oliver Chang <ochang@google.com>
-Date: Sun, 10 Aug 2025 18:20:14 +1000
-X-Gm-Features: Ac12FXyKyF90VCAXSoLNMKo_QAMikoDyOqlmAz57OQGgcYBPPBsZ2yWA6SrKzY0
-Message-ID: <CAFqAZO+WK1m2ww1B5qi-iUC8rV-mnsuBk=VeHbBy5euGWBH77Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] Fixed heap-buffer-overflow in `compute_seq_size`.
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: hadess@hadess.net, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ochang@google.com
+Subject: RE: Fix buffer overflow in sdp_xml_parse_uuid128
+In-Reply-To: <20250810073008.1824799-3-ochang@google.com>
+References: <20250810073008.1824799-3-ochang@google.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Paul,
+--===============4699847266563514625==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> Thank you for the patch. For the summary, I=E2=80=99d use imperative mood=
- and do
-> not add a dot/period at the end:
->
-> Fix heap-buffer-overflow in `compute_seq_size`
+This is automated email and please do not reply to this email!
 
-Thank you for the suggestion, I will make sure to do this for future
-commit summaries. What do I need to do here in this instance to make
-this change? Do I need to resend the patch with a new subject?
+Dear submitter,
 
-> The last comment says:
->
-> > This issue was migrated from crbug.com/oss-fuzz/51480?no_tracker_redire=
-ct=3D1
->
-> But that URL gives *Page Not Found*.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=989676
 
-Apologies for that. We had a migration from a legacy issue tracking
-system, and that legacy system has since been turned down.
->
-> > https://oss-fuzz.com/testcase-detail/5896441415729152
->
-> I am unable to access this without logging in.
+---Test result---
 
-The emails that can access this are the ones listed here:
-https://github.com/google/oss-fuzz/blob/ef1c29822d62470fb6b0af7b73412d245d0=
-5f80c/projects/bluez/project.yaml#L3.
-Are there any other emails we should add?
+Test Summary:
+CheckPatch                    PENDING   0.32 seconds
+GitLint                       PENDING   0.30 seconds
+BuildEll                      PASS      20.05 seconds
+BluezMake                     PASS      2604.83 seconds
+MakeCheck                     PASS      19.93 seconds
+MakeDistcheck                 PASS      183.97 seconds
+CheckValgrind                 PASS      236.11 seconds
+CheckSmatch                   PASS      304.70 seconds
+bluezmakeextell               PASS      128.03 seconds
+IncrementalBuild              PENDING   0.23 seconds
+ScanBuild                     PASS      907.12 seconds
 
-These emails also receive automatic email notifications whenever
-OSS-Fuzz finds a new bug. Note though, to view the oss-fuzz.com
-report, you'll need either a GitHub or Google account associated with
-the email.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-https://oss-fuzz.com/testcase-detail/5896441415729152 contains the
-ASan stacktrace, which I've also included in my earlier email.
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
->
-> With your patch and the test case, what error is logged now?
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
-There is still a memory leak detected by ASan that's unrelated to this
-patch/issue, but the buffer overflow report is gone.
 
-I don't see any other log messages, including the ones I added in the
-patch. This is likely because `sdp_xml_parse_record` calls
-`g_markup_parse_context_parse` with a NULL `error`, so any parsing
-errors encountered are not propagated.
 
-```
-if (g_markup_parse_context_parse(ctx, data, size, NULL) =3D=3D FALSE) {
-```
+---
+Regards,
+Linux Bluetooth
 
-It seems useful to enable propagating of parsing errors to
-`sdp_xml_parse_record` in the future. But if preferred, I can remove
-the logging I added since they're not going anywhere right now.
 
-Kind regards,
-Oliver
+--===============4699847266563514625==--
