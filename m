@@ -1,124 +1,77 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from sdore.me (unknown [95.165.1.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2741F1FECBA
-	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 20:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356B91BD035
+	for <linux-bluetooth@vger.kernel.org>; Sun, 10 Aug 2025 20:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.165.1.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754857263; cv=none; b=YyoEvSXEERXBWD/GOrJT9VYgS1B86ff5oToLGWSG1F4pGla/ayaWAFgo8CFNfB6n6DhIZNe1tZ0MSxb5fUBC49SfJMTaw7wDAergs9pKQ4SZUh04YOofqk8ZdvS4yI+lsJ1fI+lbCZJV30zrgStEZHsjoAU0WYeKZUtxSgQoDVA=
+	t=1754859132; cv=none; b=QmfXM/JuLJgRsj2jv798exkKju6KfSWf3NQ8WxUld04bfhdtQ4cVWV5dgy6n8aPN3OlO1sgQYaZGaGvHwsy1ECyh8+bUHYmaz8H6YA3AS7AdYt7d3ro0+PKypMCkVylhrFOms8gV7vj6HeR3AU4Gdtejz+bgFedy9lG2QXQWhk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754857263; c=relaxed/simple;
-	bh=wG9UkhyMM9dEb/eZ4f4VtkgcW3Q08haOd/Uybzrqylk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R7+O+3vBYOrkWndUGirZXzJtq+dZy3aBV1+KtbyrC3LXk0gGU3vzVeW/4/f6HppurHUg7qdIrGgjvQchXsPtgCnaIB8vzPW0/nQ0t9YfSDzD68Du0k+57mXtS5vniLzLmON2l/KWBF4y9X5YsfIS0ckDiOwbpF9mWhMr49bG4nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af7e1.dynamic.kabel-deutschland.de [95.90.247.225])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 43F2C61E647BA;
-	Sun, 10 Aug 2025 22:20:46 +0200 (CEST)
-Message-ID: <5b9be348-8ea5-4492-8299-2ab8ef2e11d2@molgen.mpg.de>
-Date: Sun, 10 Aug 2025 22:20:45 +0200
+	s=arc-20240116; t=1754859132; c=relaxed/simple;
+	bh=yGCBGts8Y2FgEXabzGjpRfQmjo16UCGlwI3V5Uki0XQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EpOfN1jzyfvLWS59tx5Hvjo62bH+7uP+B2lnR5Wigj7JEzh7OvtxtMzJ+/g4y6k934MFTq7+rWNz9wQTXLFp1wvKCnulmfNKaiK56r719BfodclNvd2dXNnZKBL4yT3pjrSCyIfCDi8rIt6tHRYdXxLUGqn8ejhK9NKLujYYtoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sdore.me; spf=pass smtp.mailfrom=sdore.me; dkim=pass (1024-bit key) header.d=sdore.me header.i=@sdore.me header.b=aatNeG+n; arc=none smtp.client-ip=95.165.1.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sdore.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdore.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=sdore.me header.i=@sdore.me header.b="aatNeG+n"
+Received: from [192.168.1.2] (Beast.lan [192.168.1.2])
+	by sdore.me (Postfix) with ESMTPSA id ED156119A17E15;
+	Sun, 10 Aug 2025 23:46:23 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=sdore.me; s=SERV;
+	t=1754858783; bh=yGCBGts8Y2FgEXabzGjpRfQmjo16UCGlwI3V5Uki0XQ=;
+	h=Subject:From:Reply-To:To:Cc:Date:In-Reply-To:References;
+	b=aatNeG+nQPL1RDNjlDWRcKdOVpfymcRZQQ+MvzmrhKN1KUYbV/N5KwaoR/9rRjFUv
+	 PPVYX1ovfGOgMa15Jozl93ruId2gIHKCrPWZ/bI357MwB2LsZDXf2rDyw7Is2aaJPz
+	 QU00otAwXUU5nAU6rWimt3TaxKV8nutCxSzSmYPc=
+Message-ID: <8a679f316fe7a5572e7c3d7cfe81fa17dba29d6a.camel@sdore.me>
+Subject: Re: [PATCH BlueZ 2/2] plugins/sixaxis: Implement cable pairing for
+ DualSense
+From: Egor Vorontsov <sdoregor@sdore.me>
+Reply-To: sdoregor@sdore.me
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sun, 10 Aug 2025 23:46:23 +0300
+In-Reply-To: <5284d0fedf1e044e40aa6839d39f010626e6f637.camel@sdore.me>
+References: <20250603095617.92785-1-sdoregor@sdore.me>
+		 <20250603095617.92785-3-sdoregor@sdore.me>
+		 <CABBYNZJYwKurqo+HDUKYtFx0+-rNquj=OHgpcZRZYVmAxDzqpA@mail.gmail.com>
+		 <c8b55be8b9abdb73bc57e8a2d455770199a2b21b.camel@sdore.me>
+		 <CABBYNZKL2gYmWPfP1owAUSAieWgt4ARaFp0-T5+vQ+rgjWnNHw@mail.gmail.com>
+		 <4c6bec3c1c02243cf57e1618d1fd35a2f12bdf22.camel@sdore.me>
+		 <CABBYNZL++r5p=opkw-saPK8yqKQWEPrU-AvcQvPK_x+0yXEUkQ@mail.gmail.com>
+	 <5284d0fedf1e044e40aa6839d39f010626e6f637.camel@sdore.me>
+Autocrypt: addr=sdoregor@sdore.me; prefer-encrypt=mutual;
+ keydata=mQINBGDSFnMBEADfvtLiuRL6CHdMzETKrux7sNHWG+eJ2+pgRZ3Nc9pH/YWqjoed8OpFx
+ OLeUxr9YSQ3uMD//JEe3+Sgte29Z3PAAHVkCwKBIucCnhHpXbcQZgC9xYMCd6GWR5+DpXN9szOIyb
+ kvnEtuqTddz6Q7fYsaFDs0pH3jUUWmSAyCn2JCIRfT22XgO44B/yoqnM3JXHAayeHbEAQOzMe81q3
+ deauI9W7SC9ScRT6VkgLuc+SxqH99el/OkiKTe/QpO6I6cVS8leesqnOGffkRPos/o2eRonqgDu0e
+ Mw4YTu0x5iNr8Lbr4TefU2W1l6M3MNwOsLmI+58+3fK1vh0QqZ70NC4eyD9UEXk3mJyV7epfNU6fY
+ 0mFJbAhGV1TXomcy2MlOD1rDixw85zdK5uUwp0tfEkpxqKtihJmrTdApOTTVed303CLzgDsMokTIe
+ aUOPqVZoWFDkvOzq6IppBkApJHBf1lcLlgwEn3cLQlGpYRSSi5NY3+UYtcOEZLDbF3TO6ncY8W2h3
+ yQH/sAcSllfKKvkhdqEz4/Mha3GbZQXWgjrLy9BcISsQFj+DBN54I6a6kLm2n5wXH99sOp7s3jMeN
+ zSU6PtuxZq4Gkt2K5JGT8yrIdfJfOH7yRUVm+8JqKNKqd6oczlDKV+lzRk9M/kjb8VQivaNSNwTo9
+ 3NxEuft0+tZgwARAQABtCJFZ29yIFZvcm9udHNvdiA8c2RvcmVnb3JAc2RvcmUubWU+iQJOBBMBCA
+ A4FiEEXlTCjXwaPBiJP3U33a9iH2xv60MFAmDSFnMCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4A
+ ACgkQ3a9iH2xv60OquRAAgbgenXi+Ud0tYoAz6giuFKYqzuEYuoSVkjxYvZq90ODrzbu7EdvMVuKA
+ qNqYjs3VRBPBMHXhJKEftKbX4bZwCoC2o2wB5oV5O13jVN083r49FTLCxmOoufCkaqscBBxi/X2T6
+ +i0n5Nqx5NLBL0kE4NMTk1jxEEyuEjv7bBMs196G/d3EpNJT3YGkLXBUibpaSaVjE6zBr3UygieLD
+ 2QXNkRJubx2d0FoD8TezSt5hsHWg9FOElsW6ZImRI+5q+ptL39K3cpjxHMKyhmo7xypD5XNWdmsmV
+ 1+STnK7R+id18xs7JUDxHBtG7Z/3K6txgF5CPbPvtaEi9fB3K/uS03BnIzsY2/cY3r9UHHrHa/sP6
+ DhDwj9dr2xIFG5w6ZNh4mUTHEJoWKEEsYKwXy2eJCB3XvP7GURAm8fXdIapONbHDYj7XX49Mj+LBr
+ s4PNBuKaZTFgGQ6RSc7LpAR56xaEDR93m7zNy84mQtpab/owaox1A+BEujzKK/vEDvj9f8EWlWZRa
+ DH2auNNAxdr2ACR8RzkojcFDCErAgc5sFQrgVUlvNmMdn3VL0CWmndzEQxsOdgVk9SwoHHYpHf4Cg
+ gtchq3pTQ5XSRaP/wxOtQpzqJWq5uFERBTLU8WRXYv3mM3KMdvtTJadF8+P+KSSnn+/yHahR0HKVx
+ PtHSH7Px/vI=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 1/1] Fixed heap-buffer-overflow in
- `compute_seq_size`.
-To: Oliver Chang <ochang@google.com>
-Cc: hadess@hadess.net, linux-bluetooth@vger.kernel.org
-References: <20250810064656.1810093-2-ochang@google.com>
- <20250810064656.1810093-4-ochang@google.com>
- <42be480f-d301-4963-b5f6-73811586e857@molgen.mpg.de>
- <CAFqAZO+WK1m2ww1B5qi-iUC8rV-mnsuBk=VeHbBy5euGWBH77Q@mail.gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CAFqAZO+WK1m2ww1B5qi-iUC8rV-mnsuBk=VeHbBy5euGWBH77Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Dear Oliver,
-
-
-Am 10.08.25 um 10:20 schrieb Oliver Chang:
-
->> Thank you for the patch. For the summary, I’d use imperative mood and do
->> not add a dot/period at the end:
->>
->> Fix heap-buffer-overflow in `compute_seq_size`
-> 
-> Thank you for the suggestion, I will make sure to do this for future
-> commit summaries. What do I need to do here in this instance to make
-> this change? Do I need to resend the patch with a new subject?
-
-If you want to, you could send v2. (`git format-patch -v2`)
-
->> The last comment says:
->>
->>> This issue was migrated from crbug.com/oss-fuzz/51480?no_tracker_redirect=1
->>
->> But that URL gives *Page Not Found*.
-> 
-> Apologies for that. We had a migration from a legacy issue tracking
-> system, and that legacy system has since been turned down.
-
-Understood. No problem.
-
->>> https://oss-fuzz.com/testcase-detail/5896441415729152
->>
->> I am unable to access this without logging in.
-> 
-> The emails that can access this are the ones listed here:
-> https://github.com/google/oss-fuzz/blob/ef1c29822d62470fb6b0af7b73412d245d05f80c/projects/bluez/project.yaml#L3.
-> Are there any other emails we should add?
-
-I am not a maintainer, so, as these might security sensitive, I guess 
-it’s fine, that I am unable to access it in general.
-
-> These emails also receive automatic email notifications whenever
-> OSS-Fuzz finds a new bug. Note though, to view the oss-fuzz.com
-> report, you'll need either a GitHub or Google account associated with
-> the email.
-> 
-> https://oss-fuzz.com/testcase-detail/5896441415729152 contains the
-> ASan stacktrace, which I've also included in my earlier email.
-
-Understood, in the cover letter [1]. Thank you! I personally prefer 
-everything to be in the commit message, so it’s self-contained.
-
->> With your patch and the test case, what error is logged now?
-> 
-> There is still a memory leak detected by ASan that's unrelated to this
-> patch/issue, but the buffer overflow report is gone.
-> 
-> I don't see any other log messages, including the ones I added in the
-> patch. This is likely because `sdp_xml_parse_record` calls
-> `g_markup_parse_context_parse` with a NULL `error`, so any parsing
-> errors encountered are not propagated.
-> 
-> ```
-> if (g_markup_parse_context_parse(ctx, data, size, NULL) == FALSE) {
-> ```
-> 
-> It seems useful to enable propagating of parsing errors to
-> `sdp_xml_parse_record` in the future. But if preferred, I can remove
-> the logging I added since they're not going anywhere right now.
-
-Thank you for analyzing this, and giving the reason. I’d keep it like 
-this, but add a note to the commit message.
-
-
-Thank you again and kind regards,
-
-Paul
-
-
-[1]: 
-https://lore.kernel.org/all/20250810064656.1810093-2-ochang@google.com/#t
+A kind reminder =E2=80=94 let's work on getting this merged hopefully!
