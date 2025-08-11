@@ -1,73 +1,87 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5A32E284B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Aug 2025 18:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B27629BDA7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Aug 2025 19:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754938513; cv=none; b=Rz+yn5DgtMeKjZrPPWPZSzsHEuY7SYHfqiZXeliyA9Qka2zQTjn1+Vkb7qYYkzIk8adFAPAlmqxqxgJr8aCB+/va5bgQKqEMhiVTrGk3N1bzEa+xhnvYcMVpUYiZyr6McmK5v+1rUQ43fCRCpdf+Z0JlkbXzlkl/XvCPthobOY4=
+	t=1754942340; cv=none; b=I1mYjP3FP3mx4SpMGvpajPa5r70u7iBuKoEgTXWQYtshe6Q58xVbhC9nK0MGUCO1wyikDm30rwvSGSFI4pCfvJq8dJ3H6HnqISVrdY/V1GNv7N8aQdgD8jfEF7U6ElTK5awHkvd+jyXY2gWcqfqjnzz9AmgC6MducXrFEXRNtXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754938513; c=relaxed/simple;
-	bh=maF4k/oH0HQvUIPHAaOmGRS5WUbpl3JvXDSr11YK5Jk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=s1U1QpxVEZWrnbayUavEQy642Ww9VOOIEEKs357ruFvCLELOELkB4lUk/QEpKgqi6qUR13jyItgqv/uVR6MZwqd/Ljmim07aeMgSWTcB/if/vy8lIIuoeoOtUbmssFyeKaKpgDt8yXkDJpDdm6MXVjPrpMl+zAvnluLA2v8PJsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GBQeax0a; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GBQeax0a"
-Received: from github.com (hubbernetes-node-1cf423f.ash1-iad.github.net [10.56.169.38])
-	by smtp.github.com (Postfix) with ESMTPA id 06ECC921158
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Aug 2025 11:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1754938511;
-	bh=8RH3Zw5pS+z6GkvAKH+I8gvzRQ0SOfWBdPdNS3zYPWQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=GBQeax0aMkSzy3Dwvxq2cM/l+LdzCxVskgOZ1jH2IzrnDfQa6Of9z3fLe+tEYV/qx
-	 A8ACDXT/xYLF4jfVadIkMOeOvFXDp5CqMO75d73lLnBfGhYZlMMYY5amNdnfp5jXTv
-	 9uKBk8ZmkPVsUSjCDbhDWmVSkloXw7JKYT902NeM=
-Date: Mon, 11 Aug 2025 11:55:11 -0700
-From: Pauli Virtanen <noreply@github.com>
+	s=arc-20240116; t=1754942340; c=relaxed/simple;
+	bh=26NX/SnFSkjC60zCbqhJSdW2CrhnJQOXI7GXSSM/aqM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qfzM7hsStElBQVVfFzVtnTyiYIzXtyPpiHfDBJ2u4QY7InKgQ844VElSF6jp0DSTs4m7E+5CKgRQfLm8nsx+0vOQSgpAPXm1aUYjtiDgMLLlC5/TqIP7+4RCuWUfIVM8Gr3ZVvepQJOjEGk35Dk+pdz0jzELCMp8eN4+FNOcI14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5F2A21F687
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Aug 2025 19:58:56 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/990189/000000-020772@github.com>
-Subject: [bluez/bluez] 020772: shared/bap: reset local ep state on stream
- detach
+Subject: [PATCH BlueZ 1/8] build: Add ell subproject
+Date: Mon, 11 Aug 2025 21:53:42 +0200
+Message-ID: <20250811195850.1775759-2-hadess@hadess.net>
+X-Mailer: git-send-email 2.50.0
+In-Reply-To: <20250811195850.1775759-1-hadess@hadess.net>
+References: <20250811195850.1775759-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddufeeffeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeurghsthhivghnucfpohgtvghrrgcuoehhrgguvghssheshhgruggvshhsrdhnvghtqeenucggtffrrghtthgvrhhnpefhtedtgfehvdeufefhfeevkeefuddvtdevjeejjefftdegffeludevjeelueetkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhgihhthhhusgdrtghomhenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefpdhhvghlohepohhlihhmphhitgdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: hadess@hadess.net
 
-  Branch: refs/heads/990189
-  Home:   https://github.com/bluez/bluez
-  Commit: 0207723b5472cff51698cdfbf39e3c559ac5806f
-      https://github.com/bluez/bluez/commit/0207723b5472cff51698cdfbf39e3c559ac5806f
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2025-08-11 (Mon, 11 Aug 2025)
+Add the ell library as a subproject. Rather than doing like autotools
+and relying on users checking out ell in a particular location, or
+install ell as a system shared library, use meson subprojects to build
+our own internal copy of ell if the user hasn't installed it
+system-wide.
 
-  Changed paths:
-    M src/shared/bap.c
+Note that this currently points to a fork of ell with meson support
+added, this should be switched to the upstream repo when that support is
+merged. See:
+https://lore.kernel.org/ell/20250807134859.930870-1-hadess@hadess.net/T/
+---
+ .gitignore      | 1 -
+ .gitmodules     | 3 +++
+ subprojects/ell | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+ create mode 100644 .gitmodules
+ create mode 160000 subprojects/ell
 
-  Log Message:
-  -----------
-  shared/bap: reset local ep state on stream detach
+diff --git a/.gitignore b/.gitignore
+index d23a06af4b53..3da0ac680152 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -35,7 +35,6 @@ test-driver
+ test-suite.log
+ coverage.info
+ coverage
+-ell
+ 
+ lib/bluez.pc
+ src/builtin.h
+diff --git a/.gitmodules b/.gitmodules
+new file mode 100644
+index 000000000000..53881e4d8e3f
+--- /dev/null
++++ b/.gitmodules
+@@ -0,0 +1,3 @@
++[submodule "subprojects/ell"]
++	path = subprojects/ell
++	url = https://github.com/hadess/ell.git
+diff --git a/subprojects/ell b/subprojects/ell
+new file mode 160000
+index 000000000000..08bc5f26f210
+--- /dev/null
++++ b/subprojects/ell
+@@ -0,0 +1 @@
++Subproject commit 08bc5f26f2108a778a25222fdc60b931310ad68d
+-- 
+2.50.0
 
-When removing streams in bt_bap_detach(), they are detached directly
-without going through normal state transitions.  As BAP Unicast Server,
-this leaves local endpoints to the state they were in, so they persist
-if client connects again.  This is not wanted.
-
-For server streams, clear the local ASE state on detach.  At that point,
-the ASE is either already idle or the session is detached.
-
-Don't modify state of remote endpoints (BAP Client streams), as only
-remote server should do that.
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
