@@ -1,158 +1,155 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63C32EBB89
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 14:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8207B27FB15
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 14:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755009380; cv=none; b=qxZbRbuhml7rIcOWZ3VNT0fmvHXw8cUq3djy09h7ZzXxY8m4hdzDL9srIaitUAm7vWVhBouXIP5twogm5u33EqXDJgrNgf8WzoOafQitpDsx2Q+jktSjgurgny0wqSIQ9nl1Se02FAMBSt4MCmV3+X1HIP0FakiJb6oDbVcmxXU=
+	t=1755009702; cv=none; b=lXTX3+NgRcHCrDAsiKdwR4B5Vje3cZBiZ1hQBw0n8NSRAZyIsuQNHgFsA4F5SYODoelhqhipnueunSdNILAA2HxvG42Fo6j93T5COjyYVKGXXkqbyNRFwjAqpAFK+gdqyVBuMiBztzANQInH5UclOpwwdmdfS9UdTar1yHkm0pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755009380; c=relaxed/simple;
-	bh=PdmmdTodcpY/dhQgyJOjnWIXl4OABIi0Kn0lRLQdPHs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lhmF/mtygcB80r5gjm8m++IIICUb2TmqKlWFeW63Lg/2uEbSsAJNNtfXvQ/xU+48QVQxhD+NrYZVTL0e8Ago3RMq8H1rNoddFCFX8eLcExa+iMkdF/H9ij9QVXUKuqkEKtwO4ghMgn9EXd+LuhrXMFKcms+KhMV2NRTpJKzxYUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FWa0j9rO; arc=none smtp.client-ip=209.85.166.179
+	s=arc-20240116; t=1755009702; c=relaxed/simple;
+	bh=A88R8dZpusPdY8H7Op28A+rvP4xWmYZFe9QLFxMnkwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D2scZo+xvMAhU+RFWQD8ldzuJbHtc+F6NbjN4qmWKRotsYq6mQnN/MWuPOoRI/Haqzg5MVcHQWGru5s9YVV6DY26P69MWPeQDPG6hgAUO3YdigaOSqz8WHh3MNlWs4c0Hebezzq3W/cGxoQQtTf34xvpatkFsoeYv4xU2WLPFe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDrJ711x; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWa0j9rO"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3e55b170787so5279295ab.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 07:36:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDrJ711x"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-3326163941dso48498101fa.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 07:41:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755009376; x=1755614176; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=i0g/qD6aHUDkSlZlcasSdbtme1XsM4kyX3x+9slLXxU=;
-        b=FWa0j9rOZgVlgNwzfqJlMCJE5zjTF8qxTYZeBH0hFhL6qWZfuc7s9eBnXu1oh/lROG
-         ld58xNy1Pb7lzYXsoVeyzOQqpJtxYUlt4U3CaRAzT8t2Kf4hN3xwRgi9jCsqXGlPXFzH
-         56UFaKNpVMQNzuirg0XCYB+Oe/27zq2Mmrsge1IpKgL2sIhSpWA6Bxc73Icbj6ujV0Sx
-         +YxVdeEqtywVi5hjQehxWkKFv4eUWpeAb1eSBVZWtrcCElsLuOWpHU/bTi1b75iQ+ZF4
-         331prD7FqyEMSgLBgDlb7TXjl5IXWcaYlAEkleK1II30VJJBrkeM4VEpR1GASI0eSh0U
-         wcEA==
+        d=gmail.com; s=20230601; t=1755009699; x=1755614499; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MAnaXSScHIWY60iFOHjqh/jo7VyupBVZWKopV/irj78=;
+        b=QDrJ711xD/0syS5hjukqj9Gv1gXF4ze0UoObEP0ZXO3niI7Nm/zcYQRcd4jPAHCvft
+         qjM0AkkcjEV7KLlSvh1bfTLkJFSuEzBh+hVvv7ctB3N2jlAxx3tMlhc2dToRl9qrdst3
+         kg6/wNAF0beazs9s6XEqTaEmSRDQz5lfA8LHJWir0668NHT6Id6h8BG+T7ubDVBdwQz2
+         /8UQ5NzqFEs1kiVv9kxRmk4GpzEr2gswmf5e5jidwJ2TRL3PqOkQWrcW+NPvdzXYMIIC
+         iNeJZKGFt1rcHtnM2sMQiZTWj1DhpUHuJTu4wb4+Bk3Awu2UDEQv/+Z+st3md/LxaZ7g
+         Z4Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755009376; x=1755614176;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i0g/qD6aHUDkSlZlcasSdbtme1XsM4kyX3x+9slLXxU=;
-        b=XQVlusqkXlVR8VeHQCQsS8vv8ry289C2yrVcmiBe8SIeGroAmuSIi1z1Rvmq0Py710
-         FKhu5Tp2KlV1QuFRZxoSdKpMJSPg7uvi+0eQ6Zg5Jl87sFXIRxNNoYzgGQFVmxC9nXgE
-         lBU8CD+vw4O2ZQWC0HSZ29YCax0r3CjpHiQwB6l1f3aBrkgA7mANXFYnGdIcjlx4xf/Z
-         Zo9euxpoNVNqmMkei1IlKwv7EnUqfkcozEi5xjG+XDUx7YzmhClXEEmrQkEd+2cGYSEb
-         zD4gRMTmyez2FWeBCAxDKywLy1Xcf6zkx3+LX9L8uIfh+nFhnzPoX9d9odmYevSBL9tj
-         H/7g==
-X-Gm-Message-State: AOJu0YynB3zbgpRMtxuOdebJmge0TQ9kEHoQRYS87NYEsD11UCWtEwgL
-	CUFKkIlZ+qJ+Kq7LH/cmGwyrwC1NaG1VrZDu6DtDcSX+BdMacrs9k3ZMz2MUKg==
-X-Gm-Gg: ASbGnctCEUN1k0ih1g8ZqLh9CdD/kDVodgj0ntZv4qaVD3zJbW70Qq1IP+SpUfGg8Ex
-	LeakohtmoXOTfjyMjUlzh3aBUcYH4kz5lFQ+0u4M7z5ZPVwuEsoczX29a6vBktbLgxo2oYhASqT
-	HojM3F35nAtgxfFJoCCz7n8EXtUL3R6rzS91e7bXWjVUjUdDF0zyJdEG33MpM3SXps3snRW7sQa
-	/WG1vQD0jtGIUi2M0XXSkDf9/q2rgp21bUntZgjlmYOUn8aBK/VCmR3vbm0GfWuWePSYDVccxTg
-	s6FEdHoFuaziEY8Ryte0UbSE7nzSpqvrx8OrNj8i2HTtYQKdwVbCzTf4JdWv8/s9JV7mXtCfChl
-	t7G0fjkWtXuMsuyeuWBTyHSTCHrYwDA==
-X-Google-Smtp-Source: AGHT+IESLykBD2IhWC/rV7SEtVW0lEdDl2wg74a2yFyRXRB40IRhuwYVdQR1l0LWK/xMVoWABI1CWw==
-X-Received: by 2002:a05:6e02:c8f:b0:3e3:e633:ce03 with SMTP id e9e14a558f8ab-3e55ace11b2mr52534915ab.9.1755009375594;
-        Tue, 12 Aug 2025 07:36:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.173.237.211])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e5535f6e9csm17452225ab.20.2025.08.12.07.36.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 07:36:15 -0700 (PDT)
-Message-ID: <689b515f.050a0220.30bf0e.2b47@mx.google.com>
-Date: Tue, 12 Aug 2025 07:36:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3785551809722258420=="
+        d=1e100.net; s=20230601; t=1755009699; x=1755614499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MAnaXSScHIWY60iFOHjqh/jo7VyupBVZWKopV/irj78=;
+        b=aQ9qTKzjmNreyvEIBaDgIxHYaUSNK+Ynoy1GpZ7JFMgbQZtBWk0OdBob6YaWDOYZhc
+         3l6RyNYdzJMqW33WT/Xn+OoMi/Z0/2lnfg+RURYmOfSABIOuyYxmW/c4ojfZP2Id0RHY
+         aqAR1cAoUvCAKCuBCjSsdVN6GKWbKp84qMzj4Pt3Fvd6pYw/Z7HAQ9QPC/MX9zffuC4t
+         pHRoY20VLWk1eCJnnzCgv6BRFb019XP5vMPMx85rdQeZ7ppAYDnYP0z51OegydZACUd6
+         ilmqlGkT03nAh+So6OcsI5NplxL0SEBUQcGTB7D1ilkfNoQnnE1iSus8B0DDBmd3BTTm
+         nWAg==
+X-Gm-Message-State: AOJu0Yy/o31WW3aBJNg+Jyx+NVt/Jt95GCvm9NGGHprNtrEYU6Em9TMt
+	XdOYA5cMEas6/TWKC8PWGJ7E9ui0fhjWXdYWq0h2BIKPdivow7sXaPkowTf8fuFLGoViTutdLeL
+	KdxxMIfNMt1YQFWBHIU5wtfDGm6T1LLd1WTJV
+X-Gm-Gg: ASbGnct0R/v1tE7qJCqigyrVQJ0CFD0OIZrqXuaWmekQRrl7maxFEg+Ril1EOPQrl5F
+	pVdzndc+H8J/ZgQEKOvR8o3P7o0yzUVR6PM+melvxGZdR/ND6AcXXFUXGBfqQ8E+K2CkGoofE/t
+	ZjyukujTn76N0VvqWK35wDT2od4J8hS7ARnsn4EOv7JlRnWXkGhl95q1Ci2Gb7IWU4pts+A3ij6
+	K5jG+0jXm+xF9l/
+X-Google-Smtp-Source: AGHT+IGoAHJdKmme84YTfuJePfdrZapJwH8OSDfPdIuTBhruHOl5/hkf07YPjsC86xHHS0w6dyk0cUf3uTA/eVNaxHE=
+X-Received: by 2002:a05:651c:304b:b0:32b:968d:1fe4 with SMTP id
+ 38308e7fff4ca-333d7c00d06mr8423111fa.14.1755009698296; Tue, 12 Aug 2025
+ 07:41:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ludovico.denittis@collabora.com
-Subject: RE: Bluetooth: hci_event: Fix connection state issues during suspend/resume
-In-Reply-To: <20250812141028.509783-2-ludovico.denittis@collabora.com>
-References: <20250812141028.509783-2-ludovico.denittis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20250812141028.509783-1-ludovico.denittis@collabora.com> <20250812141028.509783-3-ludovico.denittis@collabora.com>
+In-Reply-To: <20250812141028.509783-3-ludovico.denittis@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 12 Aug 2025 10:41:24 -0400
+X-Gm-Features: Ac12FXxCyMixkCw-xUdG0H5uX04p7sSNM7QueGLJeSLbSd3txGMsCXCyK0nlZY0
+Message-ID: <CABBYNZKTYrYmd_C36GU2xZ6YEr1cQGsrpke1mYuz3K3QDhzw6Q@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: hci_event: Mark connection as closed
+ during suspend disconnect
+To: Ludovico de Nittis <ludovico.denittis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3785551809722258420==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Ludovico,
 
-This is automated email and please do not reply to this email!
+On Tue, Aug 12, 2025 at 10:26=E2=80=AFAM Ludovico de Nittis
+<ludovico.denittis@collabora.com> wrote:
+>
+> When suspending, the disconnect command for an active Bluetooth
+> connection could be issued, but the corresponding
+> `HCI_EV_DISCONN_COMPLETE` event might not be received before the system
+> completes the suspend process. This can lead to an inconsistent state.
+>
+> On resume, the controller may auto-accept reconnections from the same
+> device (due to suspend event filters), but these new connections are
+> rejected by the kernel which still has connection objects from before
+> suspend. Resulting in errors like:
+> ```
+> kernel: Bluetooth: hci0: ACL packet for unknown connection handle 1
+> kernel: Bluetooth: hci0: Ignoring HCI_Connection_Complete for existing
+> connection
+> ```
+>
+> This is a btmon snippet that shows the issue:
+> ```
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>         Handle: 1 Address: 78:20:A5:4A:DF:28 (Nintendo Co.,Ltd)
+>         Reason: Remote User Terminated Connection (0x13)
+> > HCI Event: Command Status (0x0f) plen 4
+>       Disconnect (0x01|0x0006) ncmd 2
+>         Status: Success (0x00)
+> [...]
+> // Host suspends with the event filter set for the device
+> // On resume, the device tries to reconnect with a new handle
+>
+> > HCI Event: Connect Complete (0x03) plen 11
+>         Status: Success (0x00)
+>         Handle: 2
+>         Address: 78:20:A5:4A:DF:28 (Nintendo Co.,Ltd)
+>
+> // Kernel ignores this event because there is an existing connection with
+> // handle 1
+> ```
+>
+> By explicitly setting the connection state to BT_CLOSED we can ensure a
+> consistent state, even if we don't receive the disconnect complete event
+> in time.
+>
+> Link: https://github.com/bluez/bluez/issues/1226
+> Signed-off-by: Ludovico de Nittis <ludovico.denittis@collabora.com>
+> ---
+>  net/bluetooth/hci_event.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 6c67dfa13..81c9fc774 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2718,6 +2718,11 @@ static void hci_cs_disconnect(struct hci_dev *hdev=
+, u8 status)
+>                 goto done;
+>         }
+>
+> +       /* During suspend, mark connection as closed immediately
+> +        * since we might not receive HCI_EV_DISCONN_COMPLETE
+> +        */
 
-Dear submitter,
+Hmm, the comments suggests that this shall be done only for suspend
+case though, should we be checking for hdev->suspended?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=990596
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.46 seconds
-GitLint                       PENDING   0.28 seconds
-SubjectPrefix                 PASS      0.16 seconds
-BuildKernel                   PASS      24.51 seconds
-CheckAllWarning               PASS      27.11 seconds
-CheckSparse                   WARNING   30.90 seconds
-BuildKernel32                 PASS      24.41 seconds
-TestRunnerSetup               PASS      488.03 seconds
-TestRunner_l2cap-tester       PASS      25.51 seconds
-TestRunner_iso-tester         PASS      42.81 seconds
-TestRunner_bnep-tester        PASS      6.11 seconds
-TestRunner_mgmt-tester        FAIL      133.96 seconds
-TestRunner_rfcomm-tester      PASS      9.52 seconds
-TestRunner_sco-tester         PASS      15.07 seconds
-TestRunner_ioctl-tester       PASS      10.20 seconds
-TestRunner_mesh-tester        FAIL      11.36 seconds
-TestRunner_smp-tester         PASS      8.70 seconds
-TestRunner_userchan-tester    PASS      6.32 seconds
-IncrementalBuild              PENDING   0.53 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-Add Ext Advertising - Success 22 (LE -> off, Remove) Failed       0.132 seconds
-Set Device ID - Power off and Power on               Failed       0.129 seconds
-Set Device ID - SSP off and Power on                 Failed       0.131 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    1.988 seconds
-Mesh - Send cancel - 2                               Timed out    1.996 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
+> +       conn->state =3D BT_CLOSED;
+> +
+>         mgmt_conn =3D test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->=
+flags);
+>
+>         if (conn->type =3D=3D ACL_LINK) {
+> --
+> 2.50.1
+>
+>
 
 
---===============3785551809722258420==--
+--=20
+Luiz Augusto von Dentz
