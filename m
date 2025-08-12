@@ -1,60 +1,59 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719E22C21D7
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 11:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7272D2E9ED8;
+	Tue, 12 Aug 2025 11:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754998237; cv=none; b=asajL8pkauhISC3JtgGrKgbwInHhAX9dt/o0LZLftf4KRuDsy3dRuVag32H0FajfYAAbQWCnKhUP4RcE4c7nFVBPgrvjjlgfCEEGY16ua4e0cT6btX6ssqQvbVt1BfY7UACfBlip2stZE6BvPpnZQyv/5lv7SmGejcijZxCypMc=
+	t=1754998590; cv=none; b=N1bZQ2PBHfefU6A9FUSVIiZGqfJ6tfCWLni/5cYfjRDUDPP0LsHz2wAtKo9UtIlsiAutikjQDpQLvlTA2p4cXtdmRGuHR/btUjj3/Uaqt178+X5IIUVNZ2hvS5A5/Dp0J+ygsOEKhCR1GoN5tBaVoNT44ZrWsPSW55T6UzAAQL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754998237; c=relaxed/simple;
-	bh=YrrBQBi5Vnqu9sA7HctX0DsyoxBVHemRpwgVh22okPY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DLFxfvgKoB8jVAVaFmGasgEXFLPSjvu+26aZlfVrZx0nUC4X8sxkrCNjmUGluy0oc++JpyQgp1cAMt4crMEng8ISXDH2joBh0xYxqgVx+7/17vSkynrclkBSbfmpyZIaoYDXWsFeDWA0TcWnnvktKRke968vN6bEUbF04QxFpFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HXEJH9Fe; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1754998590; c=relaxed/simple;
+	bh=1j5yg+lSAHuLMhU3lbI0jIA24J98gX9/8b5M+zM8EUU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VKaMdMtGX8xNbjGH9NlV9gnwQuUm1LK/5+WVZZztLTuSRiJpWpRTU5wTdiE4YLvt+XRocD8hRBElzxTtFqXcNvSW+1v7+/75OFgaD1Z+lTtkp/VSQU3FdlJXpUItkYBWRxISfACcJta0csHY81hSnHBp3lfnqUfI/zqOtMotflk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gKLOsrHB; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HXEJH9Fe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754998235; x=1786534235;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YrrBQBi5Vnqu9sA7HctX0DsyoxBVHemRpwgVh22okPY=;
-  b=HXEJH9FegWHXNam0VVuWcLrN6llMndAI5iYAd5lZOuHRpTYEdJUumFvi
-   f74gkTtE/ZrLskdNHkMiQRtHqFhpcE7bSV8UNAaMJnNzKZcCUzwECc9rp
-   tkPiFk2G2Mwhqxv/VT/8EF4Xpe6S7jhvAgysTPw4rsg+9fCKeNKUi5u7+
-   HYL5RMUoq2Zt5Zfvk5XTgzauXZG068ZAsLcmz0coh7FEvNh+OQ+Brw9xe
-   YZW58h0ofB1hV60r6cLUiI8CVVHxFafrgU5Jlfsk0UPc73NImTX2x6uZx
-   99VeRuInqOtlvAwthMdDBQMKg3SPLkRvA1IwnSYIFjY1L9tvKuWwBht2G
-   Q==;
-X-CSE-ConnectionGUID: EjmdSnFGSF60JSwrmTvr8A==
-X-CSE-MsgGUID: /I7BFzb8SdS8oWRKf0T0Bw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="68724683"
-X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="68724683"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2025 04:30:35 -0700
-X-CSE-ConnectionGUID: o3q3D+G4T9WH6IwIg1moaA==
-X-CSE-MsgGUID: jns7GKj0ShKCtPAzNNx2eQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="171422317"
-Received: from unknown (HELO intel-Lenovo-Legion-Y540-15IRH-PG0.iind.intel.com) ([10.224.186.95])
-  by fmviesa004.fm.intel.com with ESMTP; 12 Aug 2025 04:30:33 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chandrashekar.devegowda@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v3 2/2] Bluetooth: btintel_pcie: Add Vendor and Driver Name in Coredump
-Date: Tue, 12 Aug 2025 17:17:04 +0530
-Message-ID: <20250812114704.1596969-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250812114704.1596969-1-kiran.k@intel.com>
-References: <20250812114704.1596969-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gKLOsrHB"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57CAvfh7005909;
+	Tue, 12 Aug 2025 11:36:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=vjGxB8wpxqwFfJruwY3bBOQyHUoTNtgE82/
+	/yw6HIuQ=; b=gKLOsrHBzIdpUq5Eza245/LgaAID3I2X8Hgk4GeuyTR8G8tdG0L
+	5g97Fy9ZXSCzL69eZ5aENPiwn81cuh2Fg6/oAlzY1Y45yhoFeUH7KhkIWmBb/zbe
+	mOUUgxpdEC86xfCsQchzh3WOyBWEEQEfFX5J5CBs3vT+RNt0WqiQylZ1ul/jfgUk
+	ePrWHqYlZPHR/DpWsPdnQaRT56ykW8+rqLUnKmEJvWFz2xJPBDJkYGTyl15CDJ9A
+	qheWYCtmx7mMXIRVpjgwsZGMVlVNoFRF8G6CYedQ0NKyfX6P8QKQBT8h93+v9Rl5
+	rBcLt9OJPSAz2fwahhouDyWgq57fUVb1njA==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48ffhjks75-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 11:36:27 +0000 (GMT)
+Received: from pps.filterd (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 57CBaODP007939;
+	Tue, 12 Aug 2025 11:36:24 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 48dydkvfp4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 11:36:24 +0000
+Received: from APTAIPPMTA01.qualcomm.com (APTAIPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57CBaN6t007936;
+	Tue, 12 Aug 2025 11:36:23 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 57CBaNvj007934
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 11:36:23 +0000
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
+	id D8D17223D5; Tue, 12 Aug 2025 19:36:22 +0800 (CST)
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+To: linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org
+Cc: quic_bt@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
+Subject: [PATCH 0/4] Fix SSR(Sub-System Restart) issues caused by BT_EN being pulled up by hardware
+Date: Tue, 12 Aug 2025 19:36:16 +0800
+Message-Id: <20250812113620.3135226-1-quic_shuaz@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,74 +61,54 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODExMDA3NCBTYWx0ZWRfX8RFQH6orgeia
+ vPqxRn7GL/x9kpHtZ1NAGFbPYVT1hb+Vzl50RShLIhq/mRbvuhq9mpRZF5tmj2q/KIni/nMsqAv
+ UVe5XqqyKz4qNxPm1JYDsdzw9BzpsDByI8/+ZdKKiqX/5ZEo79ei4AgPskXEoBpYwdeO7bz7s4d
+ 9oh5soqFjYWsFw2/7yC/eUXtAOazju9U+7lecVoGsJqXIApr0uUQWtOtcvvDTV/OgUpv8EwW7r5
+ Va0Ml2KK6shhmG/jO4IcSavKJNOSXpSs8N0phac+AmEX08FMRT5XSYoiBAb2T1xpSoGO39s1ZIX
+ 3JkLwJyxwzbRfMEZbfh7FyN5hvlL0es2e9dTMFNzkXMOxFRKmQq2ZQbjm12RFr5wi6e7Pr4FB6b
+ kw6GBcQM
+X-Proofpoint-GUID: 4cBojP7PceuRmHwqAMSv0oKW7mFZ5iOi
+X-Authority-Analysis: v=2.4 cv=TJFFS0la c=1 sm=1 tr=0 ts=689b273b cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8 a=CCsBk6LTjx9FGpkNJm0A:9
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: 4cBojP7PceuRmHwqAMSv0oKW7mFZ5iOi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-12_06,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 suspectscore=0 adultscore=0 impostorscore=0 malwarescore=0
+ phishscore=0 clxscore=1015 spamscore=0 bulkscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508110074
 
-Add the vendor and driver name to the device coredump to facilitate
-identification of the coredump source.
+This patch series addresses issues encountered during SSR when
+the BT_EN pin is pulled up by hardware. The main issues fixed are:
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 13 ++++++++++++-
- drivers/bluetooth/btintel_pcie.h |  2 ++
- 2 files changed, 14 insertions(+), 1 deletion(-)
+1. Timeout when sending reset command.
+2. IBS state of host and controller not being synchronized.
+3. Multiple triggers of SSR generating only one coredump file.
+4. SSR process failed due to tx_idle_timer timeout
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index a78e24aa5e38..ae47a65ed664 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -627,6 +627,8 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- 	struct tm tm_now;
- 	char fw_build[128];
- 	char ts[128];
-+	char vendor[64];
-+	char driver[64];
- 
- 	if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
- 		return -EOPNOTSUPP;
-@@ -647,6 +649,10 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- 	else
- 		return -EINVAL;
- 
-+	snprintf(vendor, sizeof(vendor), "Vendor: Intel\n");
-+	snprintf(driver, sizeof(driver), "Driver: %s\n",
-+		 data->dmp_hdr.driver_name);
-+
- 	ktime_get_real_ts64(&now);
- 	time64_to_tm(now.tv_sec, 0, &tm_now);
- 	snprintf(ts, sizeof(ts), "Dump Time: %02d-%02d-%04ld %02d:%02d:%02d",
-@@ -667,7 +673,9 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- 		sizeof(*tlv) + sizeof(data->dmp_hdr.cnvr_top) +
- 		sizeof(*tlv) + sizeof(data->dmp_hdr.cnvi_top) +
- 		sizeof(*tlv) + strlen(ts) +
--		sizeof(*tlv) + strlen(fw_build);
-+		sizeof(*tlv) + strlen(fw_build) +
-+		sizeof(*tlv) + strlen(vendor) +
-+		sizeof(*tlv) + strlen(driver);
- 
- 	/*
- 	 * sizeof(u32) - signature
-@@ -691,6 +699,9 @@ static int btintel_pcie_read_dram_buffers(struct btintel_pcie_data *data)
- 	*(u32 *)p = data_len;
- 	p += sizeof(u32);
- 
-+
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_VENDOR, vendor, strlen(vendor));
-+	p = btintel_pcie_copy_tlv(p, BTINTEL_DRIVER, driver, strlen(driver));
- 	p = btintel_pcie_copy_tlv(p, BTINTEL_DUMP_TIME, ts, strlen(ts));
- 	p = btintel_pcie_copy_tlv(p, BTINTEL_FW_BUILD, fw_build,
- 				  strlen(fw_build));
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 0fa876c5b954..04b21f968ad3 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -132,6 +132,8 @@ enum btintel_pcie_tlv_type {
- 	BTINTEL_CNVI_TOP,
- 	BTINTEL_DUMP_TIME,
- 	BTINTEL_FW_BUILD,
-+	BTINTEL_VENDOR,
-+	BTINTEL_DRIVER
- };
- 
- /* causes for the MBOX interrupts */
+Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+
+
+Shuai Zhang (4):
+  driver: bluetooth: hci_qca: fix ssr fail when BT_EN is pulled up by hw
+  driver: bluetooth: hci_qca: fix host IBS state after SSR
+  driver: bluetooth: hci_qca: Multiple triggers of SSR only generate one
+    coredump file
+  driver: bluetooth: hci_qca: SSR(Sub-System Restart)process failed due
+    to tx_idle_timer timeout
+
+ drivers/bluetooth/hci_qca.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
 -- 
-2.43.0
+2.34.1
 
