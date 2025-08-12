@@ -1,222 +1,151 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405552E6125
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 09:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3642E88B7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 09:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754990220; cv=none; b=EP5troG9kfFL1pZmppiqlP0nxDqCatbVA1z17w5GLMvvAFDMxgoOk0M8kvY/ymY3aAmfCMo5JkKfGLmqIPr1ffQhlJ8WXMsMgSYxxWXZnTBlGzdhYcLSXVtJPzKcw4XiI+V5st262KEKYz3zu8OoNS6ymc3QtQRl8wyrHFuNiRw=
+	t=1754991564; cv=none; b=UMtGNnpkjubKjK5xKJAMvKPmA6Q15IECiIYKXD8CAA91QFYCNWDv4DfwmSeSdsqGAHqZnSqqZa9+E3Hb3Bfgk0CtwCkaGnX4p3ZVY1gYUDxL7MQk+7iUJ0hpPk+Yr8Y8QSL4T/rHNvm25mOZBnSBVebk53qmmZLIddDtwonvhoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754990220; c=relaxed/simple;
-	bh=3vxrRJAh+EqyzgyBhex5r9Yo+PAKpEu68mEfY7pR1MI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dOvFRlHAQtH4oqjAFPtfINF8/3ToAv/UwJYIncd/Na1i+CLfpGlQIwSuM4tC7vRruJVqkwUQQKim0cUl/Be1eaUHt3Upi3SYbVTSxPOAIWRrEi0egpk81EoaLEIlkioY6Ib1SO8pku1rxEYXXFEKfmjyqMoL4LhMs8Mx6bePSc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=MsSwylZJ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1754991564; c=relaxed/simple;
+	bh=kAgWGjWWM29rJqvBRFC2OOPU1ZzXPOTCxlnuEoxYcrg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=C3UIHPAXQ0WgBIT1chMBrFvCXlIuyePxsqWTPVfo4lN4i5vIzAAlVjyEWySQA/bAobGV8Yq3rPlSBC9y/1s0AfRz1Rq8Q5/8hNRAxPrBuCK1OW+QR/y4zOOq0nZ3Wqk9eJ19siKxsSuSFvAHdG3PXdd2U+Kjc/NcTNjGN0MlNJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrZFZWHO; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="MsSwylZJ"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57C5gvVQ018312
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 09:16:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	szoFZFn3zyipQklF/BzIbtuPr+6uKdGBAsaMiBXKvR8=; b=MsSwylZJY+3ibgJC
-	fNiPBU4FTg9cssCQ9U9HILeP2nJG9HKbc449cq+p5EpjhqxahasZoA8p37wZ3BCt
-	crVxwJil8Rb/mdyxf2dKW+Ewz0S0j2MnDyB+gVd+7ut44WnExaWQ4VA5JMr6/HFp
-	oB8WhuSjgB/mxAOoIFF6X3wUdPLc9Z5Vui1mjbu1n9ucTfruGgP2G/ia0+BgbV4N
-	x/W4/Dgl54U+5nNjbs+1D4+bzOYSj6LbP2w1m1mDtAPjtoyVMIYcIJiN2zdkn4Oz
-	wIhqjn/G91h0etISHReHyovTc9CceS7rietBqhshanuVQS8tQreIWesG1GSH1yJ2
-	zBb+sg==
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48dy3g7gck-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 09:16:58 +0000 (GMT)
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-7073ec538e2so17574116d6.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 02:16:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrZFZWHO"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7e62a1cbf82so361859785a.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 02:39:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754991561; x=1755596361; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kAgWGjWWM29rJqvBRFC2OOPU1ZzXPOTCxlnuEoxYcrg=;
+        b=GrZFZWHOqqSGT3q0UAke4J9QD4DUNxEePv6A0M3cXmBE/wD2lCXpyZnc83ArrJRcap
+         a63eXS2g9a9UG6vZ67qst7I7mMkSs004ZWtR563DP+aEuo070wpCPgoGTiTd9fjEaeZk
+         rXM6ZYyDSDgHO7opi5yQCRT6Be9ngM3JxWyyIpSMVf1AYS9YP6K5ZV1+nZDse2XenbFx
+         oYaN30a1oOsee8tpJ6WnkHSNPZ4320d971br4e3mjP6Ub5r+VxZYMYmB1Iw04s+yVWcV
+         AMEKFK8PZGYZqN8iO+Z+iieyNdqjDfgFYciIFfuOV7NkdGMYCs53Gavn26fuxvytyEnk
+         eaNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754990217; x=1755595017;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=szoFZFn3zyipQklF/BzIbtuPr+6uKdGBAsaMiBXKvR8=;
-        b=AKoiBeuTPAvZ51WxHho039LFqXHNWRrygk5srqQJQaj37g9sZ5GWuWFjuRhyDyYiTi
-         8Eg4KYhlZj9U4lpuKUzzRYde9aIvhdQtmHKONXAU4IrSFOuHbHyn5Gj4DJI+vl0HuVUu
-         9XBNzdWI4eFxaRP25CIPpG4K+bP7WsOAD3+mALEnfn8hGdvv7OKiPY0e80w1DOwCHnBT
-         8r7W0OhpMmJ1d2aNdMMf+h5ahXCobXsZBd0Cm/Ba/1KLVoQ4G+PTtziuYdsMK7NDrAds
-         z69HQj59ITOSLjdvXofqDKoLgT/HNxcy8wtCImkbT0ty2eS2YvOjgGiNB4Zg6WgsQqKC
-         UDQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW30tVb3hyLV3BaSU369qeCiQI3+Sy1D2iRPo7LdYmkUpoLl8TuOqFoV6zzkA5h5rVS2y29/ZbwbzUprTwb0OI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyobhPyygEUwsGnsaz/Oiw68PiqaYoO1D5BTTRzX7TLcQVn8mgb
-	wEXNnOm7mN4zaHIPF/UQBV5cnOQmanE7liAH/pRnhXw/DriyCytnedNbMjH543gCS/wWJ+URC7N
-	nblb+6eKdDuTRO/281Asv18L/iw2M4SpexDM9HopGikqn5u4skYCe5MkxZivkQF1AyuJn56Y=
-X-Gm-Gg: ASbGncueMeJdixo+5o8rXQgMVaYvvm7Sr8FIsFCvumrZ/5jt1IjUFxkV0/Y1ZOhwzGL
-	aWVXBbW9u9ywwIHPKv2BTk7RNRp4iJES6tGFFs6u9xetwIcIibGCBU9WUW7TXVVJLcUrJvoc7ne
-	S0OSrECbQCOS23nTdpiqYa3D8fwM+GAE+W41xVCT5BVlq602KRMGjx/HZY/HTRhb2uXqWMWnfGX
-	C0tPLhtnW97QRMvYIeiiigb0/cx2A1ur3+8wZtvfq5oSi6+Ex1nzXLyFgwjidlLMUTm58cvkXMF
-	iL7evP03kEbwuIzQVVWrOrz+3KE4jKdHJNZj9EQOsw/Mbf04YUvj7F8hik+QkhOUWMi9M8PTwQA
-	0TGnSjvl7FXAR8uhmSg==
-X-Received: by 2002:a05:622a:1a29:b0:4a9:a320:f528 with SMTP id d75a77b69052e-4b0f48fa006mr2988651cf.3.1754990216638;
-        Tue, 12 Aug 2025 02:16:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEb8BIOiMB2aaszVUO5sc5ldVeAaDIfkEujTFUEDPXKgEEwpNoWILRyxCr9Ql2Svsw3ZJzZXQ==
-X-Received: by 2002:a05:622a:1a29:b0:4a9:a320:f528 with SMTP id d75a77b69052e-4b0f48fa006mr2988531cf.3.1754990216019;
-        Tue, 12 Aug 2025 02:16:56 -0700 (PDT)
-Received: from [192.168.43.16] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a219ecfsm2165172566b.94.2025.08.12.02.16.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Aug 2025 02:16:55 -0700 (PDT)
-Message-ID: <3f712fec-a4c6-41a3-9b7a-34b9edc1d9b0@oss.qualcomm.com>
-Date: Tue, 12 Aug 2025 11:16:54 +0200
+        d=1e100.net; s=20230601; t=1754991561; x=1755596361;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kAgWGjWWM29rJqvBRFC2OOPU1ZzXPOTCxlnuEoxYcrg=;
+        b=P7cSGi/H6xsET59ZsaKEN1nbzFecYpFbeOmYy1ib0/i7d+2rVtiO66uPjBACoxnpQ0
+         RLxGGENno/zTqBliQ+9Eovf96EmK+WvI5oAco4cjq6K6jU0ckvI/473WfyTLnHnn6ZvQ
+         rVSNVGLII9dLjZ/Tf1FgJAEX+0C2J0HFNTOMeo3kEGlNqBSEmupdAIv9msLntl/idXwe
+         jpcOr+eh5TRePMDAbk7w51FtIAOX/FZrtZAooW9RRpCy72YufdRqRLLz0aCUfSgsjzla
+         ehKyU5kzp/NbFvNrMtR5dBICBXykySexuFjNG7QMI4Q/WAg2aQZO+iwae+p1dFeXI5rT
+         Z9Wg==
+X-Gm-Message-State: AOJu0YxRFdC+1X28/w0LO7KZpH8SCd/h3yNzc6CtFArIIMT9pfGMV0cF
+	94wtZOiEWhGl9tPtRTiViaVEljQW/aCoVgMO7yH+uiK7oaST1MeZujOkJImFg2Un
+X-Gm-Gg: ASbGncsP2IGHRUFMMmGlb8RhYJ5zjgZR9GsOSvrRw6VwZROG2sJcgGGHuwouxcz+vx5
+	XPLK8oYOyZGJmhoCwasBET8n4kmTl0X33mDpqAkRz5hR3Dx7kD6RlCEhLLdCWhRKAWLpjPrIq1u
+	26A4hSfUPvYvIAPFXOv2mFKI0e/I6+/jc6Dl7odDVMIydvbArUj9xtFaxdJ4LObD3S7SSBmwrTj
+	IvWkLGNlurLUzXXRuZzqKFPvX2fW7Yi1J/I5EBck1fM3AGWEvjUgSYOLDLRew3r88uiek8kkG2y
+	NyZpkIzfiiYZgSGjUc5MdkJSkPYoEvosQd6/RmpZOhHE1Z+V9guia2euxwcB25gguIN3N3VG17q
+	blIO19igqmxRN9hE0yBp2bq0si2pELc0=
+X-Google-Smtp-Source: AGHT+IH4UXSQxKeOhEmlZumoB6yEAfAp+Ykbug+9FgCD5jmStz7/nzx+rMDhTb4jmD1O0UrSO89dug==
+X-Received: by 2002:a05:620a:a905:b0:7e7:40f1:8d33 with SMTP id af79cd13be357-7e82c758067mr2161886285a.41.1754991561313;
+        Tue, 12 Aug 2025 02:39:21 -0700 (PDT)
+Received: from [172.17.0.2] ([172.174.221.229])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e83e5d6a1bsm546977085a.13.2025.08.12.02.39.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Aug 2025 02:39:20 -0700 (PDT)
+Message-ID: <689b0bc8.050a0220.c6509.ec55@mx.google.com>
+Date: Tue, 12 Aug 2025 02:39:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2214937862595383154=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] driver: bluetooth: hci_qca: fix ssr fail when BT_EN
- is pulled up by hw
-To: Shuai Zhang <quic_shuaz@quicinc.com>, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Cc: quic_bt@quicinc.com
-References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
- <20250715051618.724475-2-quic_shuaz@quicinc.com>
- <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
- <e7e700e4-e87c-4e2c-8df1-634870ba91b2@quicinc.com>
- <0a6d6ae7-67f2-4974-b005-f36ee8707c67@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <0a6d6ae7-67f2-4974-b005-f36ee8707c67@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=X4lSKHTe c=1 sm=1 tr=0 ts=689b068a cx=c_pps
- a=7E5Bxpl4vBhpaufnMqZlrw==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8 a=TmvEoTIt-G6_DD21KxUA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=pJ04lnu7RYOZP9TFuWaZ:22
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA5MDAzMSBTYWx0ZWRfX4CNm/zPGyGKv
- YbJo5J03OB/xnMPMFAg2/yuGMH3zHhu8U9itxcwuMldA/SjH4YLbHaCWsij99IMI7JYPqLaK23n
- xpJMNTkbKw/hbzV5N5tE7bonkcC2iJCqQX7CLKMu4zr+2UUQ9inyIHySSeLZjryTZxxe3Jh/gTT
- MayS8JW/BIYAHwpN5lC3U266KLAsA40NWL48sDdcRW9USwV+j8J+LngA3Pc8CBcO0Q9AZXhlN9V
- rgidFDVCwCfmzVbfoaQq3ugF3B8dhplvrd58CGZxx1PTJXnDCwjyHffVTokQu6lUfO3X9BOY8o2
- 21GZ4Rd9RJY6bWEafTKyq60TRUI2GOx/cR5i5RZ5N5Rjcdnl9t07LTdFmeIIecS7UMOe1Sc40ip
- glqOr2QR
-X-Proofpoint-GUID: ZNxh18MXcMcRbe-fB9q60GGFYa55j_be
-X-Proofpoint-ORIG-GUID: ZNxh18MXcMcRbe-fB9q60GGFYa55j_be
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-12_04,2025-08-11_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 clxscore=1015 malwarescore=0 adultscore=0
- spamscore=0 bulkscore=0 suspectscore=0 impostorscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508090031
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, valorcool@gmail.com
+Subject: RE: Fix memory leak when adding GATT Characteristic
+In-Reply-To: <20250812080044.131526-2-valorcool@gmail.com>
+References: <20250812080044.131526-2-valorcool@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On 8/12/25 10:03 AM, Shuai Zhang wrote:
-> Hi Konrad
-> 
-> On 7/19/2025 7:32 AM, Shuai Zhang wrote:
->> Hi Konrad 
->>
->> On 7/15/2025 5:11 PM, Konrad Dybcio wrote:
->>> On 7/15/25 7:16 AM, Shuai Zhang wrote:
->>>> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
->>>> This leads to reset command timeout.
->>>
->>> This is a description of what goes wrong in terms of the code of
->>> this driver, and it doesn't explain why you gate the code addition
->>> with HCI_QUIRK_NON_PERSISTENT_SETUP, please share more details about
->>> what you're doing, and more importantly, why.
->>>
->>
->> The problem encountered is that when the host actively triggers ssr 
->> and collects the coredump data, the bt will send a reset command to 
->> the controller. However, due to the aforementioned flag not being set, 
->> the reset command times out.
->>
->> I'm not clear whether you want to ask about the function of 
->> HCI_QUIRK_NON_PERSISTENT_SETUP or why the changes are placed 
->> under if(!HCI_QUIRK_NON_PERSISTENT_SETUP).
->>
->> Regarding the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, 
->> you can refer to this commit. 740011cfe94859df8d05f5400d589a8693b095e7
->>
->> As for why it's placed in if(!HCI_QUIRK_NON_PERSISTENT_SETUP), 
->> since HCI_QUIRK_NON_PERSISTENT_SETUP is related to BT_EN, it can be 
->> used to determine if BT_EN exists in the DTS.
->>
->>>>
->>>> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
->>>> ---
->>>>  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
->>>>  1 file changed, 12 insertions(+)
->>>>
->>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->>>> index 4e56782b0..791f8d472 100644
->>>> --- a/drivers/bluetooth/hci_qca.c
->>>> +++ b/drivers/bluetooth/hci_qca.c
->>>> @@ -1653,6 +1653,18 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->>>>  		skb_queue_purge(&qca->rx_memdump_q);
->>>>  	}
->>>>  
->>>> +	/* If the SoC always enables the bt_en pin via hardware and the driver
->>>> +	 * cannot control the bt_en pin of the SoC chip, then during SSR,
->>>
->>> What is the "SoC" here? Bluetooth chip? MSM?
->>
->> yes, Bluetooth chip on qcs9075-evk platform
->>
->>>
->>> What does "enabling the pin via hardware" refer to? Do we ever expect
->>> that a proper platform description skips the bt_en pin?
->>>
->>> Also:
->>>
->>> /*
->>>  * If the..
->>>
->>
->> Sorry, I’m not quite sure I follow—could you clarify what you meant?
->> Here is my understanding.
->>
->> Enabling pins through hardware refers to "the pin is  pulled up by hardware".
->> qcs9075-evk platform use the m.2 connective card, the bt_en always pull up.
->>
->>
->>>> +	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
->>>> +	 * This leads to a reset command timeout failure.
->>>> +	 * Also, add msleep delay to wait for controller to complete SSR.
->>>
->>> Googling "bluetooth SSR" yields nothing, so it's fair for me to ask
->>> you to explain that acronym.. it's used a number of times across the
->>> driver, so perhaps a comment somewhere at the top in a separate commit
->>> would be good as well. I'm guessing "subsystem reset"?
->>
->> Just to clarify, SSR is short for Subsystem Restart
->>
->>>
->>> Konrad
->>>
->>>> +	 */
->>>> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
->>>> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
->>>> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
->>>> +		msleep(50);
->>>> +	}
->>>> +
->>>>  	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
->>>>  }
->>>>  
->>
->> Shuai
->>
-> 
-> Please let me know if there are any updates. Thank you.
+--===============2214937862595383154==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-You're expected to address the review comments in a subsequent patchset
-revision, in this case please put the answers to the questions I asked
-in the commit message, or in the comments, so that someone else can
-make sense of the change
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTkwNDA3CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQRU5ESU5HICAgMC4zMSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
+TkRJTkcgICAwLjIzIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDIwLjI0IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDI1MjcuMjUgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MTEuNjkgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTYx
+LjM1IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE5OS44
+MiBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzMDkuNDQg
+c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTI4LjA3IHNl
+Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEVORElORyAgIDAuNDAgc2Vjb25k
+cwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgOTIwLjU0IHNlY29uZHMK
+CkRldGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrUGF0Y2gg
+LSBQRU5ESU5HCkRlc2M6IFJ1biBjaGVja3BhdGNoLnBsIHNjcmlwdApPdXRwdXQ6CgojIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0TGludCAtIFBFTkRJTkcKRGVzYzogUnVu
+IGdpdGxpbnQKT3V0cHV0OgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1h
+a2VDaGVjayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKLi90ZXN0
+LWRyaXZlcjogbGluZSAxMDc6IDMwNTg0IEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1
+bXBlZCkgIiRAIiA+ICRsb2dfZmlsZSAyPiYxCi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiAzMDYx
+MyBBYm9ydGVkICAgICAgICAgICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUg
+Mj4mMQouL3Rlc3QtZHJpdmVyOiBsaW5lIDEwNzogMzA2MjIgQWJvcnRlZCAgICAgICAgICAgICAg
+ICAgKGNvcmUgZHVtcGVkKSAiJEAiID4gJGxvZ19maWxlIDI+JjEKLi90ZXN0LWRyaXZlcjogbGlu
+ZSAxMDc6IDMwNjMxIEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkgIiRAIiA+
+ICRsb2dfZmlsZSAyPiYxCi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiAzMDY0MCBBYm9ydGVkICAg
+ICAgICAgICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQptYWtlWzNd
+OiAqKiogW01ha2VmaWxlOjk5Mzc6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoq
+KiBbTWFrZWZpbGU6MTAwNDU6IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFr
+ZWZpbGU6MTA0Njc6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA0Njk6
+IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtl
+RGlzdGNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoK
+UGFja2FnZSBjdXBzIHdhcyBub3QgZm91bmQgaW4gdGhlIHBrZy1jb25maWcgc2VhcmNoIHBhdGgu
+ClBlcmhhcHMgeW91IHNob3VsZCBhZGQgdGhlIGRpcmVjdG9yeSBjb250YWluaW5nIGBjdXBzLnBj
+Jwp0byB0aGUgUEtHX0NPTkZJR19QQVRIIGVudmlyb25tZW50IHZhcmlhYmxlCk5vIHBhY2thZ2Ug
+J2N1cHMnIGZvdW5kCi4uLy4uL3Rlc3QtZHJpdmVyOiBsaW5lIDEwNzogNTEwNDQgQWJvcnRlZCAg
+ICAgICAgICAgICAgICAgKGNvcmUgZHVtcGVkKSAiJEAiID4gJGxvZ19maWxlIDI+JjEKLi4vLi4v
+dGVzdC1kcml2ZXI6IGxpbmUgMTA3OiA1MTA3MSBBYm9ydGVkICAgICAgICAgICAgICAgICAoY29y
+ZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQouLi8uLi90ZXN0LWRyaXZlcjogbGluZSAx
+MDc6IDUxMDgwIEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkgIiRAIiA+ICRs
+b2dfZmlsZSAyPiYxCi4uLy4uL3Rlc3QtZHJpdmVyOiBsaW5lIDEwNzogNTEyNzQgQWJvcnRlZCAg
+ICAgICAgICAgICAgICAgKGNvcmUgZHVtcGVkKSAiJEAiID4gJGxvZ19maWxlIDI+JjEKLi4vLi4v
+dGVzdC1kcml2ZXI6IGxpbmUgMTA3OiA1MTM0MiBBYm9ydGVkICAgICAgICAgICAgICAgICAoY29y
+ZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQptYWtlWzRdOiAqKiogW01ha2VmaWxlOjk5
+Mzc6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbM106ICoqKiBbTWFrZWZpbGU6MTAwNDU6
+IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTA0Njc6IGNoZWNr
+LWFtXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTA0Njk6IGNoZWNrXSBFcnJvciAy
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6MTAzOTA6IGRpc3RjaGVja10gRXJyb3IgMQojIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVu
+IEJsdWV6IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rl
+ci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyOTA3OjU6
+IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZh
+ci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjkwNyB8IGludCBt
+YWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KLi90ZXN0LWRyaXZl
+cjogbGluZSAxMDc6IDY5NDYzIEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkg
+IiRAIiA+ICRsb2dfZmlsZSAyPiYxCi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiA2OTQ5OSBBYm9y
+dGVkICAgICAgICAgICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQou
+L3Rlc3QtZHJpdmVyOiBsaW5lIDEwNzogNjk1MDggQWJvcnRlZCAgICAgICAgICAgICAgICAgKGNv
+cmUgZHVtcGVkKSAiJEAiID4gJGxvZ19maWxlIDI+JjEKLi90ZXN0LWRyaXZlcjogbGluZSAxMDc6
+IDY5NDkwIEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkgIiRAIiA+ICRsb2df
+ZmlsZSAyPiYxCi4vdGVzdC1kcml2ZXI6IGxpbmUgMTA3OiA2OTUxNyBBYm9ydGVkICAgICAgICAg
+ICAgICAgICAoY29yZSBkdW1wZWQpICIkQCIgPiAkbG9nX2ZpbGUgMj4mMQptYWtlWzNdOiAqKiog
+W01ha2VmaWxlOjk5Mzc6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBbTWFr
+ZWZpbGU6MTAwNDU6IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6
+MTA0Njc6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA0Njk6IGNoZWNr
+XSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRh
+bEJ1aWxkIC0gUEVORElORwpEZXNjOiBJbmNyZW1lbnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVz
+IGluIHRoZSBzZXJpZXMKT3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-Konrad
+--===============2214937862595383154==--
