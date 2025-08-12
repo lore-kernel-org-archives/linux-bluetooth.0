@@ -1,146 +1,196 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48532BD012
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 08:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A56442C;
+	Tue, 12 Aug 2025 08:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754985652; cv=none; b=u22o74GxQZXhwmwH+3Z7wvue3lUAS+U0geXoTQltwU6u+B5qGHbwVYiEpAlhKO3JQcHxtVD4XIQiPaRzc+mGOwpK02p4Cw9sIwJBYkXvKbxWJdpIGt/MKi+e5WhRJUqPo+xncH6WGYtrJw6sgLKQk7WnS1yst2Gg1sGvIuazFcg=
+	t=1754985835; cv=none; b=lVhDQhRig5Fq7uIc3IefKDYmkbZsYprYcDlc7S1cg2bweL1CLqEimxnvmOlCKLjoNMnZ8FSItSHg/KvLChtfjiMFMSeBQIOTCD7c9FMTp/hVwiG3IbESfETzkJ1h9fm+kNG5iW1nuL7duJSsvtKtPvqGfUOmFuUWFEJDXxmUTp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754985652; c=relaxed/simple;
-	bh=Q1fQp9X9BNwddPrMHx3/XXmNyRItbUqWhnxPKaG/JLQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqx9RJR5Rky97KGaUtd/qF0X3ZIOmMoxWPgNfMhl6T/zQQLWNs0JoTgPrF3Ec508JkzYgXyu154ct2zeqsuQX17k2jjGu2fXb0m9qNP7RyXg3og39oOrosXZqzrdaGf8Ls2JAU6G+XlAj9KxcFsby+LbofL6At9vwrdmkGurH60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C6c0ukcY; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1754985835; c=relaxed/simple;
+	bh=zhC1bFpNgvEo+/bXsCr9kxpuP5NFxHWfs9bUmivwlBk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=NMXln1dqRCUPLXtCdbBEStvZV4RVWiXz1cVqgFyo+p88y16JRzT23Qj/bmEdrJKt5V9p4vvqgoI/Axa52AmaO081+784sPP8duB2qJz7zhAMwRkkhcKZIWKz9kNz14DLjLX30UNsmN8+zPRGHc8sQ3wdxPKqMryGfyWbCj7ufbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ceqWJ7AD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C6c0ukcY"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-459ddada9b1so47951245e9.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 01:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754985649; x=1755590449; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z30P+f5Qygg0SsF1nLFRQVcOl2/0c+b0qwmTM2suohM=;
-        b=C6c0ukcYh3+mEfYzMSlqSWmtzjqtwlkFTwD3a5ybGeQhWL8n1Xc7sdpzAn8H7Hn8Yd
-         bhFaqV1t6oQ6gzmIzLbpo0T+CiPFH/srZJ0sen+5lOTs4fm4ky4etLXk4bvDrm69LhmL
-         haPdcc8WII4zJRR5xYqCH3/6JcpmvOS6VcSDHOe7aRMpNFWGgOf5mhucz/Ixfs6Biz/D
-         813cfoOpppfUoMuo/79RGO5yU1ncwwQ1mlxxh48/emFIYrcRTUVtrMqe35U7xxeGCehT
-         w2LqkhdftCksaMq0lcxeShHOjyOKuWJ45/MihwXjpG7klQNMlzWd1kySataAEn1+yrx7
-         enfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754985649; x=1755590449;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z30P+f5Qygg0SsF1nLFRQVcOl2/0c+b0qwmTM2suohM=;
-        b=QOJGtf5LhbLc8L5pAHJBa0ydehdRlRvW24Oa/XZ+raJ3ZuRImMYUhIQHCC0EV77nde
-         C83P3Wfvo4X1054alkYMy8f40Ma4OcIVppmGxz/k5dmDQ+j+3pwvh66VllC8sbwOrG+Q
-         5DhQyr7sgiSHB0Go32DzssSeS33ggG81dmKzzTUWEolM3qV6bqDnMBTRC+bLsI86uV8M
-         ESq6oqPW4RQKbehxj3QoveHLZOJ1oemysY1q8Wx42WxEprGdBPHgACi8Wgw9uF/UPdIx
-         LwEFXqfkOsSOsMlcnvv8L3HGcVhBM5FNew4kVatETTLsKdnDNxJ/dDfr4wuyjFLpaoEB
-         f5bg==
-X-Gm-Message-State: AOJu0YwYq5PvGOUs9U5v8kUEEW3N+xeCM76OLdrK6WiNe+kcnEvxbe/Q
-	PvqTYRpHL8k0iuVOj8tTw2SYuu5VUZtNK+AUEEnPnAE95NXGSqiOyqB6Mo40l6ThI4g=
-X-Gm-Gg: ASbGnct2cr1NNX+t6t9bkIwgKKk7Pgmh4QhcV682YwtvO1AdcW4dweGd2Jxpabn/xFj
-	HsDYzE/S01JjaV2hF36PMasyIkWz4tKRBtqZnFj8uKfKblLU1qmi4/xLTgoQqDgxdmeVP6oEFOr
-	BATFVy+gmwhCZ3CxUZDSt0wWojcdol6ZfGWHIe4p8cOJ3GYRF/4PNoPBdBKJnC01MSMBz3Def9X
-	Mi7Y4Lykv1PvtfkmZbHD8yB9C01zz5yuGtWnMO5pA1EEnfp5ZtkGW1tMdCmsyW9t7rkq1THStGR
-	SRRCtqJExUXi46n39+d9vWuw7KPmDy6VhJi0W7tUz64SLsR2O/CPhgN4AljNAR8d7q3rzaScSHU
-	3b02hfDNG/JLGWQSyoKL/aByBYK/UD+uz
-X-Google-Smtp-Source: AGHT+IHKde1qIMpioZt+hmGSVBJtzd3QhemkskRrMpi0bBcBVbzZ3bktUCckOV41TLe7A7JRk8gh+A==
-X-Received: by 2002:a05:6000:220f:b0:3a5:783f:528a with SMTP id ffacd0b85a97d-3b900b81c2dmr12255165f8f.59.1754985648588;
-        Tue, 12 Aug 2025 01:00:48 -0700 (PDT)
-Received: from valor-verifone.lan ([195.138.223.243])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b8e0b2d2fasm32721394f8f.50.2025.08.12.01.00.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 01:00:48 -0700 (PDT)
-From: valorcool@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.von.dentz@intel.com,
-	vinit.mehta@nxp.com,
-	mahesh.talewad@nxp.com,
-	devyani.godbole@nxp.com,
-	iulia.tanasescu@nxp.com,
-	mihai-octavian.urzica@nxp.com,
-	Stanislavs Nilovs <valorcool@gmail.com>
-Subject: [PATCH BlueZ v1 1/1] Fix memory leak when adding GATT Characteristic
-Date: Tue, 12 Aug 2025 11:00:44 +0300
-Message-ID: <20250812080044.131526-2-valorcool@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250812080044.131526-1-valorcool@gmail.com>
-References: <20250812080044.131526-1-valorcool@gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ceqWJ7AD"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57C4anuP019037;
+	Tue, 12 Aug 2025 08:03:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	jYGNuMqNEzyoSiM1coiwrxw+b216a1k5SRmtSYIjUK0=; b=ceqWJ7ADue83R747
+	+DZkkOhxoJxK059vUH0LiLRx68v6P+FdU/Ei8Mn8NuKjlk7J1Yte56z3/yGiwKtH
+	jYyjOIGMHBFFtCQrI4O/xGAtfL34t3o9mzE9Jlduvj0iTbhxg8q9u8jHps4uS43s
+	+Y8ZeCTVSi8yKWTqYrI2GqnOihvPEMbqz0Oi1M9FyXngzwcAGBMtj6qburXBP4uq
+	tPM6wQN7FNhoeg22Ij830TGjrQmgpqj9mZr7TxbssVRLSgPgyEGk85NM7FOpdUPq
+	QpcYXl2mkiRv7pTkDLMsJelJ3A8bS+nrgxC5ms+eM7t+JIps2FZay1dmJE/sQ45c
+	kZ2bMw==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48dxduyadp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 08:03:52 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57C83pUt010814
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 08:03:51 GMT
+Received: from [10.253.11.43] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Tue, 12 Aug
+ 2025 01:03:49 -0700
+Message-ID: <0a6d6ae7-67f2-4974-b005-f36ee8707c67@quicinc.com>
+Date: Tue, 12 Aug 2025 16:03:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] driver: bluetooth: hci_qca: fix ssr fail when BT_EN
+ is pulled up by hw
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
+CC: <quic_bt@quicinc.com>
+References: <20250715051618.724475-1-quic_shuaz@quicinc.com>
+ <20250715051618.724475-2-quic_shuaz@quicinc.com>
+ <ee84aeb0-728a-4642-9686-3abb9588bb24@oss.qualcomm.com>
+ <e7e700e4-e87c-4e2c-8df1-634870ba91b2@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <e7e700e4-e87c-4e2c-8df1-634870ba91b2@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=IuYecK/g c=1 sm=1 tr=0 ts=689af568 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8
+ a=0mwEwrqexmEsALdfmGcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: CITD3p83s6-kO_y15Mr0xYYgYau1HFGz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA5MDAyNSBTYWx0ZWRfX1ofGM8DFBhxN
+ g0oaSmMhAT3JdPx695ImdQr+fpUJcWVzWTP1mubDknRdViafKi31F/FX0/YnnGcVWQUb0WOo/so
+ Vf/ueGWXq1HlMZpWuE8xs5cDT5nZSCJuC5f05K1M035fgZUiyEeQsXwRi8RgXu3tJJ3OpsTNdr1
+ tbdveUllcmGfLg8jVF3meC9sp8EM0HaLxW5Q1wOIK6ChL5sIN2g2r8bnaDzLdiqk/BO1gbmD0zH
+ oY2fmirpc9PyW5h0UgiyevjMARpvKkO4RXgHfqz+ej84lPV8Mj7r6oXFUg0buIo9xWvo+dPgAlz
+ 6DN2xGeiEU+MgQ5pD6d3C775WphSjrzT95vPun5m+OiA1Ep0rThN7h3m/qcZ2gME6YMAg2L03RQ
+ frjFvY1f
+X-Proofpoint-GUID: CITD3p83s6-kO_y15Mr0xYYgYau1HFGz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-12_02,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0
+ clxscore=1015 phishscore=0 suspectscore=0 bulkscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508090025
 
-From: Stanislavs Nilovs <valorcool@gmail.com>
+Hi Konrad
 
-Commit 4465c577778d812702d752dfd2812e25a2f69b31 has fixed a segfault
-which may occur during new GATT Characteristic insertion. However, the
-cleanup exercise isn't done before returning.
+On 7/19/2025 7:32 AM, Shuai Zhang wrote:
+> Hi Konrad 
+> 
+> On 7/15/2025 5:11 PM, Konrad Dybcio wrote:
+>> On 7/15/25 7:16 AM, Shuai Zhang wrote:
+>>> the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+>>> This leads to reset command timeout.
+>>
+>> This is a description of what goes wrong in terms of the code of
+>> this driver, and it doesn't explain why you gate the code addition
+>> with HCI_QUIRK_NON_PERSISTENT_SETUP, please share more details about
+>> what you're doing, and more importantly, why.
+>>
+> 
+> The problem encountered is that when the host actively triggers ssr 
+> and collects the coredump data, the bt will send a reset command to 
+> the controller. However, due to the aforementioned flag not being set, 
+> the reset command times out.
+> 
+> I'm not clear whether you want to ask about the function of 
+> HCI_QUIRK_NON_PERSISTENT_SETUP or why the changes are placed 
+> under if(!HCI_QUIRK_NON_PERSISTENT_SETUP).
+> 
+> Regarding the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, 
+> you can refer to this commit. 740011cfe94859df8d05f5400d589a8693b095e7
+> 
+> As for why it's placed in if(!HCI_QUIRK_NON_PERSISTENT_SETUP), 
+> since HCI_QUIRK_NON_PERSISTENT_SETUP is related to BT_EN, it can be 
+> used to determine if BT_EN exists in the DTS.
+> 
+>>>
+>>> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+>>> ---
+>>>  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
+>>>  1 file changed, 12 insertions(+)
+>>>
+>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>>> index 4e56782b0..791f8d472 100644
+>>> --- a/drivers/bluetooth/hci_qca.c
+>>> +++ b/drivers/bluetooth/hci_qca.c
+>>> @@ -1653,6 +1653,18 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+>>>  		skb_queue_purge(&qca->rx_memdump_q);
+>>>  	}
+>>>  
+>>> +	/* If the SoC always enables the bt_en pin via hardware and the driver
+>>> +	 * cannot control the bt_en pin of the SoC chip, then during SSR,
+>>
+>> What is the "SoC" here? Bluetooth chip? MSM?
+> 
+> yes, Bluetooth chip on qcs9075-evk platform
+> 
+>>
+>> What does "enabling the pin via hardware" refer to? Do we ever expect
+>> that a proper platform description skips the bt_en pin?
+>>
+>> Also:
+>>
+>> /*
+>>  * If the..
+>>
+> 
+> Sorry, I’m not quite sure I follow—could you clarify what you meant?
+> Here is my understanding.
+> 
+> Enabling pins through hardware refers to "the pin is  pulled up by hardware".
+> qcs9075-evk platform use the m.2 connective card, the bt_en always pull up.
+> 
+> 
+>>> +	 * the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits cannot be cleared.
+>>> +	 * This leads to a reset command timeout failure.
+>>> +	 * Also, add msleep delay to wait for controller to complete SSR.
+>>
+>> Googling "bluetooth SSR" yields nothing, so it's fair for me to ask
+>> you to explain that acronym.. it's used a number of times across the
+>> driver, so perhaps a comment somewhere at the top in a separate commit
+>> would be good as well. I'm guessing "subsystem reset"?
+> 
+> Just to clarify, SSR is short for Subsystem Restart
+> 
+>>
+>> Konrad
+>>
+>>> +	 */
+>>> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+>>> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
+>>> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
+>>> +		msleep(50);
+>>> +	}
+>>> +
+>>>  	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+>>>  }
+>>>  
+> 
+> Shuai
+> 
 
-Bluetoothd address sanitizer backtrace:
-=================================================================
-==88967==ERROR: LeakSanitizer: detected memory leaks
+Please let me know if there are any updates. Thank you.
 
-Direct leak of 768 byte(s) in 6 object(s) allocated from:
-    #0 0x768d1f8b3ec7 in __interceptor_malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:145
-    #1 0x59f0cac1ea07 in util_malloc src/shared/util.c:46
-
-Indirect leak of 576 byte(s) in 18 object(s) allocated from:
-    #0 0x768d1f8b3ec7 in __interceptor_malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:145
-    #1 0x59f0cac1ea07 in util_malloc src/shared/util.c:46
-
-Indirect leak of 114 byte(s) in 6 object(s) allocated from:
-    #0 0x768d1f8b4097 in __interceptor_calloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:154
-    #1 0x59f0cac75d6c in new_attribute src/shared/gatt-db.c:222
-
-SUMMARY: AddressSanitizer: 1458 byte(s) leaked in 30 allocation(s).
-
-Additionally added an explicit check that current Characteristic handle
-is not greater or equal to its value handle. If value handle is equal to
-Characteristic handle, then second "new_attribute" allocation will
-overwrite the pointer in service->attributes, which will also cause a
-leak.
----
- src/shared/gatt-db.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index b67bf89f9..02b49e94b 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -969,6 +969,10 @@ service_insert_characteristic(struct gatt_db_service *service,
- 	if (handle == UINT16_MAX)
- 		return NULL;
- 
-+	/* Value handle can't be the same or less than Characteristic handle per reasons above */
-+	if(value_handle <= handle)
-+		return NULL;
-+
- 	i = service_get_attribute_index(service, &handle, 1);
- 	if (!i)
- 		return NULL;
-@@ -1009,8 +1013,11 @@ service_insert_characteristic(struct gatt_db_service *service,
- 	/* Update handle of characteristic value_handle if it has changed */
- 	put_le16(value_handle, &value[1]);
- 
--	if (!(*chrc) || !(*chrc)->value)
-+	if (!(*chrc)->value) {
-+		free(*chrc);
-+		*chrc = NULL;
- 		return NULL;
-+	}
- 
- 	if (memcmp((*chrc)->value, value, len))
- 		memcpy((*chrc)->value, value, len);
--- 
-2.48.1
+BR,
+Shuai
 
