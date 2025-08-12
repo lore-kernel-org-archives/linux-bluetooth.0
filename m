@@ -1,181 +1,139 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3442A17993
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 21:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C761F0E56
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 21:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755033722; cv=none; b=HZGEnVApDLGtZ04HsuaiZuR266knP5ZsrV+eVz9peoxpV2bVxpfRn90cPbasnG3F7AAqNW/biA/3Y9rw4e1nblRwnQt7wZOv+LhBFGXSSNs20/JgnuAkaI4nz20zvkZ8f7+e/XX/gO6cVeAkrwfGqDFK6fdWoxbc75xR4mhFbZc=
+	t=1755033761; cv=none; b=sUyb6wEiJBogNm7GfzAnlTeS2OOmi29CJ4lwlct2p3YU08x5Ml4dyKfEexcca6Cbsb9NnRm0LAlwY8fDxD6obuTR01jHIuJHgPC8I1HIusTHJo73zipwWzKIfLdEhqwA8NCPY4wsR7ijqZ61NzogYUgy8vshiCLL+z3md2p+Kdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755033722; c=relaxed/simple;
-	bh=9U73pwohei6j8BZOtk4wa5Pvy0Hwy+WCg0dMpxWuTh8=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=ZRE5VG1T0khRJlJq0O2hjBmsynLLY3558cBzWqzHyr4VRBh1WVFsc0cmiELy4SxiJeE2koU9qsspDFoAd3/zAazEkyCPojD1k+kf0J1B7S8GgXRvjFmFhhj4mUvEWw59MBelG+si1RQIszIfZBoNxdkKJ45MboM7E6zUJ5+GK4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ndgzSv8p; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1755033761; c=relaxed/simple;
+	bh=aYOuSqvFn5xgtcR7ebl2D9nj7OcdtL/o0jFULuhyp6E=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DBHY1THCjrV7exH/sxGBOsyHNw9LPw0l0fgzINN+6IPtbrX6+K7tONhE00X4gSn+YqeoHkXeJcUG38I/cf9wNtcuxkz+6GKHnfzpEBhx9q7fzzh0IgAoZwovhOgl6AWhWpHN5Hx0zUwF5H0qAOdzu1pToGymbR0l4XeL+aUUpww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/7wX2fm; arc=none smtp.client-ip=209.85.217.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ndgzSv8p"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755033720; x=1786569720;
-  h=date:from:to:cc:subject:message-id;
-  bh=9U73pwohei6j8BZOtk4wa5Pvy0Hwy+WCg0dMpxWuTh8=;
-  b=ndgzSv8pOKdRoV2fIUQ6zmpqir5OK3VcAgtdXH9eLlHrdSsCjSXF2Y7A
-   wOmvjkhnt/8xNbNXJS3poudQGlNTlolJ1HZVN+uQQMVD+1i2NqevbLCK2
-   lSLWwfjVZamEhEtgJsHYxvDaSSL/maN8+5RiUQqx07x7p38eOUyttGFsV
-   tAofKSBQGxIJga5X/BIlT062qRat38czenCXpPeduO7vO5pq9LmEh/p5c
-   9sqMnYUXs2YgSTBq2Con76Jql+T5DbKOn92+2LYt7JEccB/nmbTbAuzVf
-   tWf+9SWGnieLObeR7HQDXV86yowouPBUoMdM6PwhHDai/Zl1IdpaO/a1U
-   g==;
-X-CSE-ConnectionGUID: hikNkKtySbiA6sa9iOBZ8A==
-X-CSE-MsgGUID: UojwxCy8QbSzsnvoUyof9w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57222133"
-X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
-   d="scan'208";a="57222133"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2025 14:22:00 -0700
-X-CSE-ConnectionGUID: P484+471RT6TFXuLxwbfNQ==
-X-CSE-MsgGUID: YLqte/yASbC0ChGHq3UhmA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
-   d="scan'208";a="167088050"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by fmviesa010.fm.intel.com with ESMTP; 12 Aug 2025 14:21:58 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ulwRM-0009J2-0r;
-	Tue, 12 Aug 2025 21:21:53 +0000
-Date: Wed, 13 Aug 2025 05:21:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 159053f1b5310d85ca30d85b44093c4dea1ad128
-Message-ID: <202508130513.SJHxN0Cp-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/7wX2fm"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-5067f6b30adso3109939137.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 14:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755033758; x=1755638558; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Q5bexxrR5yKt3SXMivalv426FEBzFeTXFUuEr5lwDc=;
+        b=Q/7wX2fm/IifROvReD6PXgqxHzFe8+FHmJLSBA/JMf8FdJuijoddf21yat0riaVCZ6
+         60D8O8hReheUM8MH2+XjU6hSgZ+8SfOP8XhFInEurbzPpteucVSD5NoUPZpavU5MXUj4
+         mRN8l9itQOz3GT27q8+8NAgh+zKWYLwzyNMnL+92g3+0PSVtGKUMTE0Ms2anxb1JW1/h
+         YHm9OB0UvbCaNhhvqxRyp7wXGR8/i8TBeGgOjDcPJES5u522duIEvqxBFuaEegBwKyXq
+         UuYcu+4t3TrldwYTtqndUHeEi3iNV48nMhLs+rUdxziaKllP6OJchm97UUc3kZVZYX5e
+         AGZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755033758; x=1755638558;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Q5bexxrR5yKt3SXMivalv426FEBzFeTXFUuEr5lwDc=;
+        b=YrEzyyHSigvEkJCjEkxqxDH16s7B3A+RWZWMHFHy8VKtNC47jS7CvpkOMIVLAnj8l0
+         DaGOe0MRg7fBIbvwQnbEwjm2AjvTBLCqhhX+dgFHK+eBaL0J/z5w8vTdb2U8/DvQ2cek
+         6JSvcUYFannEqaLOtdsQDbqXqyv95QSGhzwVgN53DlUyC3LEMP2q3HdFRb+pUCcJ1dlc
+         ipq7st9+Q8k/R3OphjfSsBsGbuxMw5wYF10yD1iVPEqP/dG+i2hjE6FGyiU04PVxnS85
+         yjdmOrBVcZ/z7Q4lG7tvT1YvP0Ijh7Uf/t+y3W6d7xSkCy0lbkfeTE3vmjIPiTXHNear
+         V5sQ==
+X-Gm-Message-State: AOJu0YwBuN9ipSMqhQJV96NYH58DjOJIx6ys3aUiUfimbqvAjQg340l3
+	Ayi4BXJ7691P43Cdsee7payX9muhwwDa+Am8ms1YsHkDWxAPJxm8HMBmVfr1vMC4
+X-Gm-Gg: ASbGncua4vP0Ye36/IVBAvxsgxfm0DhfVKR3bMyJ89TtcSd+xQEzpBpCLQpfApiA5AW
+	h+PjEOmXdXV5PUsownbX2on5D+U4X7EXpJB31jVaKdWAUNLsvWxNR6bTkl527oBf/Yg2OJPjqRo
+	HkFi4T0keor64SQDJn97b/AxwR3QFgDIIVSjpEeaiaoRakQp5qj9KZWITROOqQHez74FjJoRLQS
+	zYKWpgLGuFx9EXQohqnTut9K+cSKYWmrfg2qTcaJFZXegcsgosBXl9wTaJIK5tTBnK++gOx/TFS
+	+GnY5nTWGTkQdXG+prGhNIVDFlXtfIN1iMm+WAT7QNfG/W4ytA80Nh1lVebzD9vqnSIc16BBFKc
+	KDdmSKGLpCb3+oHILgMlwXAyIyU0a+XahcTE+sxgB/m+cN3rpl8F3AY1l590WXFkw
+X-Google-Smtp-Source: AGHT+IHE5WawJUsfcFH4JqnkoB9ckWmrdJ2nSGhzMhcasi05tN1KWYMbqgG4S2E/rpILLYSa32SnSQ==
+X-Received: by 2002:a05:6102:3751:b0:4fc:12e1:c0af with SMTP id ada2fe7eead31-50e508ac1d4mr241072137.21.1755033757817;
+        Tue, 12 Aug 2025 14:22:37 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-88e028f4849sm2565328241.16.2025.08.12.14.22.36
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Aug 2025 14:22:37 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] mgmt-tester: Fix tests failing due to missing LL Privacy
+Date: Tue, 12 Aug 2025 17:22:27 -0400
+Message-ID: <20250812212227.1541519-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 159053f1b5310d85ca30d85b44093c4dea1ad128  MAINTAINERS: add a sub-entry for the Qualcomm bluetooth driver
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-elapsed time: 1449m
+LL Privacy setting now depends on LE to be enabled first which was
+causing the following tests to fail, so this removes LL Privacy from
+the expected settings:
 
-configs tested: 104
-configs skipped: 3
+Add Ext Advertising - Success 22 (LE -> off, Remove)
+Set Device ID - Power off and Power on
+Set Device ID - SSP off and Power on
+---
+ tools/mgmt-tester.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index c066ad6c37b8..ac27b85dd4c8 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -1509,7 +1509,6 @@ static const char set_ssp_invalid_param[] = { 0x02 };
+ static const char set_ssp_garbage_param[] = { 0x01, 0x00 };
+ static const char set_ssp_settings_param_1[] = { 0xc0, 0x00, 0x00, 0x00 };
+ static const char set_ssp_settings_param_2[] = { 0xc1, 0x00, 0x00, 0x00 };
+-static const char set_ssp_settings_param_3[] = { 0xc1, 0x00, 0x40, 0x00 };
+ static const char set_ssp_on_write_ssp_mode_param[] = { 0x01 };
+ 
+ static const struct generic_data set_ssp_on_success_test_1 = {
+@@ -6078,8 +6077,8 @@ static const struct generic_data set_dev_id_power_off_on = {
+ 	.send_param = set_powered_on_param,
+ 	.send_len = sizeof(set_powered_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_ssp_settings_param_3,
+-	.expect_len = sizeof(set_ssp_settings_param_3),
++	.expect_param = set_ssp_settings_param_2,
++	.expect_len = sizeof(set_ssp_settings_param_2),
+ 	.expect_settings_set = MGMT_SETTING_POWERED,
+ 	.expect_hci_command = BT_HCI_CMD_WRITE_EXT_INQUIRY_RESPONSE,
+ 	.expect_hci_param = write_eir_set_dev_id_success_1,
+@@ -6095,8 +6094,8 @@ static const struct generic_data set_dev_id_ssp_off_on = {
+ 	.send_param = set_ssp_on_param,
+ 	.send_len = sizeof(set_ssp_on_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_ssp_settings_param_3,
+-	.expect_len = sizeof(set_ssp_settings_param_3),
++	.expect_param = set_ssp_settings_param_2,
++	.expect_len = sizeof(set_ssp_settings_param_2),
+ 	.expect_hci_command = BT_HCI_CMD_WRITE_EXT_INQUIRY_RESPONSE,
+ 	.expect_hci_param = write_eir_set_dev_id_success_1,
+ 	.expect_hci_len = sizeof(write_eir_set_dev_id_success_1),
+@@ -8599,15 +8598,13 @@ static const struct generic_data add_ext_advertising_success_17 = {
+ 	.expect_hci_len = sizeof(preset_connectable_off_ext_adv_param),
+ };
+ 
+-static const char set_le_settings_param_off_1[] = { 0x81, 0x00, 0x40, 0x00 };
+-
+ static const struct generic_data add_ext_advertising_le_off = {
+ 	.send_opcode = MGMT_OP_SET_LE,
+ 	.send_param = set_le_off_param,
+ 	.send_len = sizeof(set_le_off_param),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = set_le_settings_param_off_1,
+-	.expect_len = sizeof(set_le_settings_param_off_1),
++	.expect_param = set_le_settings_param_off,
++	.expect_len = sizeof(set_le_settings_param_off),
+ 	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
+ 	.expect_alt_ev_param = advertising_instance1_param,
+ 	.expect_alt_ev_len = sizeof(advertising_instance1_param),
+-- 
+2.50.1
 
-tested configs:
-alpha                             allnoconfig    gcc-15.1.0
-alpha                            allyesconfig    gcc-15.1.0
-arc                              allmodconfig    gcc-15.1.0
-arc                               allnoconfig    gcc-15.1.0
-arc                              allyesconfig    gcc-15.1.0
-arc                   randconfig-001-20250812    gcc-8.5.0
-arc                   randconfig-002-20250812    gcc-12.5.0
-arm                              allmodconfig    gcc-15.1.0
-arm                               allnoconfig    clang-22
-arm                              allyesconfig    gcc-15.1.0
-arm                   randconfig-001-20250812    clang-22
-arm                   randconfig-002-20250812    clang-22
-arm                   randconfig-003-20250812    gcc-14.3.0
-arm                   randconfig-004-20250812    gcc-10.5.0
-arm64                            allmodconfig    clang-19
-arm64                             allnoconfig    gcc-15.1.0
-arm64                 randconfig-001-20250812    gcc-8.5.0
-arm64                 randconfig-002-20250812    gcc-8.5.0
-arm64                 randconfig-003-20250812    gcc-14.3.0
-arm64                 randconfig-004-20250812    gcc-8.5.0
-csky                              allnoconfig    gcc-15.1.0
-csky                  randconfig-001-20250812    gcc-13.4.0
-csky                  randconfig-002-20250812    gcc-10.5.0
-hexagon                          allmodconfig    clang-17
-hexagon                           allnoconfig    clang-22
-hexagon                          allyesconfig    clang-22
-hexagon               randconfig-001-20250812    clang-22
-hexagon               randconfig-002-20250812    clang-22
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    gcc-12
-i386        buildonly-randconfig-001-20250812    gcc-12
-i386        buildonly-randconfig-002-20250812    gcc-12
-i386        buildonly-randconfig-003-20250812    gcc-12
-i386        buildonly-randconfig-004-20250812    clang-20
-i386        buildonly-randconfig-005-20250812    clang-20
-i386        buildonly-randconfig-006-20250812    gcc-12
-i386                                defconfig    clang-20
-loongarch                        allmodconfig    clang-19
-loongarch                         allnoconfig    clang-22
-loongarch             randconfig-001-20250812    gcc-15.1.0
-loongarch             randconfig-002-20250812    gcc-15.1.0
-m68k                             allmodconfig    gcc-15.1.0
-m68k                              allnoconfig    gcc-15.1.0
-m68k                             allyesconfig    gcc-15.1.0
-microblaze                       allmodconfig    gcc-15.1.0
-microblaze                        allnoconfig    gcc-15.1.0
-microblaze                       allyesconfig    gcc-15.1.0
-microblaze                          defconfig    gcc-15.1.0
-mips                              allnoconfig    gcc-15.1.0
-nios2                             allnoconfig    gcc-11.5.0
-nios2                               defconfig    gcc-11.5.0
-nios2                 randconfig-001-20250812    gcc-10.5.0
-nios2                 randconfig-002-20250812    gcc-11.5.0
-openrisc                          allnoconfig    gcc-15.1.0
-parisc                            allnoconfig    gcc-15.1.0
-parisc                              defconfig    gcc-15.1.0
-parisc                randconfig-001-20250812    gcc-10.5.0
-parisc                randconfig-002-20250812    gcc-14.3.0
-parisc64                            defconfig    gcc-15.1.0
-powerpc                           allnoconfig    gcc-15.1.0
-powerpc               randconfig-001-20250812    clang-19
-powerpc               randconfig-002-20250812    clang-22
-powerpc               randconfig-003-20250812    gcc-12.5.0
-powerpc64             randconfig-001-20250812    clang-22
-powerpc64             randconfig-002-20250812    clang-16
-powerpc64             randconfig-003-20250812    clang-18
-riscv                             allnoconfig    gcc-15.1.0
-riscv                 randconfig-001-20250812    gcc-9.5.0
-riscv                 randconfig-002-20250812    gcc-8.5.0
-s390                             allmodconfig    clang-18
-s390                              allnoconfig    clang-22
-s390                             allyesconfig    gcc-15.1.0
-s390                  randconfig-001-20250812    clang-18
-s390                  randconfig-002-20250812    clang-22
-sh                               allmodconfig    gcc-15.1.0
-sh                                allnoconfig    gcc-15.1.0
-sh                               allyesconfig    gcc-15.1.0
-sh                    randconfig-001-20250812    gcc-15.1.0
-sh                    randconfig-002-20250812    gcc-15.1.0
-sparc                            allmodconfig    gcc-15.1.0
-sparc                             allnoconfig    gcc-15.1.0
-sparc                               defconfig    gcc-15.1.0
-sparc                 randconfig-001-20250812    gcc-8.5.0
-sparc                 randconfig-002-20250812    gcc-8.5.0
-sparc64               randconfig-001-20250812    clang-22
-sparc64               randconfig-002-20250812    clang-22
-um                               allmodconfig    clang-19
-um                                allnoconfig    clang-22
-um                               allyesconfig    gcc-12
-um                    randconfig-001-20250812    gcc-11
-um                    randconfig-002-20250812    gcc-12
-x86_64                            allnoconfig    clang-20
-x86_64                           allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20250812    clang-20
-x86_64      buildonly-randconfig-002-20250812    gcc-12
-x86_64      buildonly-randconfig-003-20250812    gcc-12
-x86_64      buildonly-randconfig-004-20250812    gcc-12
-x86_64      buildonly-randconfig-005-20250812    clang-20
-x86_64      buildonly-randconfig-006-20250812    gcc-12
-x86_64                              defconfig    gcc-11
-x86_64                          rhel-9.4-rust    clang-20
-xtensa                            allnoconfig    gcc-15.1.0
-xtensa                randconfig-001-20250812    gcc-10.5.0
-xtensa                randconfig-002-20250812    gcc-12.5.0
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
