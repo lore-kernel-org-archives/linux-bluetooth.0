@@ -1,147 +1,181 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E062270EBA
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 20:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3442A17993
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 21:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755032391; cv=none; b=DyHRoDMagXqR/0freqcaDfXO1LL0O1Rz7pLw5nrawzsM3H+uOUxPH7LnLVDqz/et0bJZw9GoXnPO3OAGMzQB1o13jcf7MUVxtAs9SyrJAM+4PKvLOiMi4jli0wizZhhpdqXqnH7DxIao3+WjDDzxa2r3jqmjRlveM/vhjypuPZQ=
+	t=1755033722; cv=none; b=HZGEnVApDLGtZ04HsuaiZuR266knP5ZsrV+eVz9peoxpV2bVxpfRn90cPbasnG3F7AAqNW/biA/3Y9rw4e1nblRwnQt7wZOv+LhBFGXSSNs20/JgnuAkaI4nz20zvkZ8f7+e/XX/gO6cVeAkrwfGqDFK6fdWoxbc75xR4mhFbZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755032391; c=relaxed/simple;
-	bh=BvmLs+O+SFUFsmpu8EC1cxF9C5CQ5vOL3ym53f8I0bg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MAlhsp+ZW2yLAlqB8i0sLdyRLObWrDYsfLjtpusfciuwB5TWk88x0m7eNpM71dUbNkRjQLzePrG2JQXNb5PZ/iq1QZ49fy6jbRU2vepYfEAanNRVEIgWCHHgYa3QIZopjP/prqG3Fd/mL/JZoKb6T+XlIfmzYVGi8x7cSczUzyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af16d.dynamic.kabel-deutschland.de [95.90.241.109])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E086561E647BA;
-	Tue, 12 Aug 2025 22:59:42 +0200 (CEST)
-Message-ID: <b011421a-cd9a-4dc9-a252-b4537654971d@molgen.mpg.de>
-Date: Tue, 12 Aug 2025 22:59:42 +0200
+	s=arc-20240116; t=1755033722; c=relaxed/simple;
+	bh=9U73pwohei6j8BZOtk4wa5Pvy0Hwy+WCg0dMpxWuTh8=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=ZRE5VG1T0khRJlJq0O2hjBmsynLLY3558cBzWqzHyr4VRBh1WVFsc0cmiELy4SxiJeE2koU9qsspDFoAd3/zAazEkyCPojD1k+kf0J1B7S8GgXRvjFmFhhj4mUvEWw59MBelG+si1RQIszIfZBoNxdkKJ45MboM7E6zUJ5+GK4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ndgzSv8p; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ndgzSv8p"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755033720; x=1786569720;
+  h=date:from:to:cc:subject:message-id;
+  bh=9U73pwohei6j8BZOtk4wa5Pvy0Hwy+WCg0dMpxWuTh8=;
+  b=ndgzSv8pOKdRoV2fIUQ6zmpqir5OK3VcAgtdXH9eLlHrdSsCjSXF2Y7A
+   wOmvjkhnt/8xNbNXJS3poudQGlNTlolJ1HZVN+uQQMVD+1i2NqevbLCK2
+   lSLWwfjVZamEhEtgJsHYxvDaSSL/maN8+5RiUQqx07x7p38eOUyttGFsV
+   tAofKSBQGxIJga5X/BIlT062qRat38czenCXpPeduO7vO5pq9LmEh/p5c
+   9sqMnYUXs2YgSTBq2Con76Jql+T5DbKOn92+2LYt7JEccB/nmbTbAuzVf
+   tWf+9SWGnieLObeR7HQDXV86yowouPBUoMdM6PwhHDai/Zl1IdpaO/a1U
+   g==;
+X-CSE-ConnectionGUID: hikNkKtySbiA6sa9iOBZ8A==
+X-CSE-MsgGUID: UojwxCy8QbSzsnvoUyof9w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57222133"
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="57222133"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2025 14:22:00 -0700
+X-CSE-ConnectionGUID: P484+471RT6TFXuLxwbfNQ==
+X-CSE-MsgGUID: YLqte/yASbC0ChGHq3UhmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="167088050"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa010.fm.intel.com with ESMTP; 12 Aug 2025 14:21:58 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ulwRM-0009J2-0r;
+	Tue, 12 Aug 2025 21:21:53 +0000
+Date: Wed, 13 Aug 2025 05:21:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 159053f1b5310d85ca30d85b44093c4dea1ad128
+Message-ID: <202508130513.SJHxN0Cp-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] Bluetooth: hci_conn: Make unacked packet handling
- more robust
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-References: <20250812195323.1522605-1-luiz.dentz@gmail.com>
- <20250812195323.1522605-3-luiz.dentz@gmail.com>
- <a5a68086-adad-416a-b276-ab03fa53bea1@molgen.mpg.de>
- <CABBYNZ+P39Sgsc+7HZVbN+PuWB=4wEs-ga3bN8n7q52YwtyEPQ@mail.gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CABBYNZ+P39Sgsc+7HZVbN+PuWB=4wEs-ga3bN8n7q52YwtyEPQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-Dear Luiz,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 159053f1b5310d85ca30d85b44093c4dea1ad128  MAINTAINERS: add a sub-entry for the Qualcomm bluetooth driver
 
+elapsed time: 1449m
 
-Am 12.08.25 um 22:29 schrieb Luiz Augusto von Dentz:
+configs tested: 104
+configs skipped: 3
 
-> On Tue, Aug 12, 2025 at 4:03 PM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
->> Am 12.08.25 um 21:53 schrieb Luiz Augusto von Dentz:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> This attempts to make unacked packet handling more robust by detecting
->>> if there are no connections left then restore all buffers of the
->>> respective pool.
->>
->> Did you find this in code review, or was a bug reported?
-> 
-> Internal testing has run into a problem where some packets are never
-> TX for some reason, we are still accessing if this is going to help
-> but it is not an actual fix and more of a way to improve the handling
-> of unacked packets.
-> 
-> Now I'm curious, why this sort of question seem to be recurring, we do
-> encourage as much details as possible, but I don't think we ever said
-> that it is required to disclose what sort of test or bug report it
-> came from, especially if they come from internal testing which cannot
-> be referenced anyway, so was there anything unclear with the commit
-> message?
+tested configs:
+alpha                             allnoconfig    gcc-15.1.0
+alpha                            allyesconfig    gcc-15.1.0
+arc                              allmodconfig    gcc-15.1.0
+arc                               allnoconfig    gcc-15.1.0
+arc                              allyesconfig    gcc-15.1.0
+arc                   randconfig-001-20250812    gcc-8.5.0
+arc                   randconfig-002-20250812    gcc-12.5.0
+arm                              allmodconfig    gcc-15.1.0
+arm                               allnoconfig    clang-22
+arm                              allyesconfig    gcc-15.1.0
+arm                   randconfig-001-20250812    clang-22
+arm                   randconfig-002-20250812    clang-22
+arm                   randconfig-003-20250812    gcc-14.3.0
+arm                   randconfig-004-20250812    gcc-10.5.0
+arm64                            allmodconfig    clang-19
+arm64                             allnoconfig    gcc-15.1.0
+arm64                 randconfig-001-20250812    gcc-8.5.0
+arm64                 randconfig-002-20250812    gcc-8.5.0
+arm64                 randconfig-003-20250812    gcc-14.3.0
+arm64                 randconfig-004-20250812    gcc-8.5.0
+csky                              allnoconfig    gcc-15.1.0
+csky                  randconfig-001-20250812    gcc-13.4.0
+csky                  randconfig-002-20250812    gcc-10.5.0
+hexagon                          allmodconfig    clang-17
+hexagon                           allnoconfig    clang-22
+hexagon                          allyesconfig    clang-22
+hexagon               randconfig-001-20250812    clang-22
+hexagon               randconfig-002-20250812    clang-22
+i386                             allmodconfig    gcc-12
+i386                              allnoconfig    gcc-12
+i386        buildonly-randconfig-001-20250812    gcc-12
+i386        buildonly-randconfig-002-20250812    gcc-12
+i386        buildonly-randconfig-003-20250812    gcc-12
+i386        buildonly-randconfig-004-20250812    clang-20
+i386        buildonly-randconfig-005-20250812    clang-20
+i386        buildonly-randconfig-006-20250812    gcc-12
+i386                                defconfig    clang-20
+loongarch                        allmodconfig    clang-19
+loongarch                         allnoconfig    clang-22
+loongarch             randconfig-001-20250812    gcc-15.1.0
+loongarch             randconfig-002-20250812    gcc-15.1.0
+m68k                             allmodconfig    gcc-15.1.0
+m68k                              allnoconfig    gcc-15.1.0
+m68k                             allyesconfig    gcc-15.1.0
+microblaze                       allmodconfig    gcc-15.1.0
+microblaze                        allnoconfig    gcc-15.1.0
+microblaze                       allyesconfig    gcc-15.1.0
+microblaze                          defconfig    gcc-15.1.0
+mips                              allnoconfig    gcc-15.1.0
+nios2                             allnoconfig    gcc-11.5.0
+nios2                               defconfig    gcc-11.5.0
+nios2                 randconfig-001-20250812    gcc-10.5.0
+nios2                 randconfig-002-20250812    gcc-11.5.0
+openrisc                          allnoconfig    gcc-15.1.0
+parisc                            allnoconfig    gcc-15.1.0
+parisc                              defconfig    gcc-15.1.0
+parisc                randconfig-001-20250812    gcc-10.5.0
+parisc                randconfig-002-20250812    gcc-14.3.0
+parisc64                            defconfig    gcc-15.1.0
+powerpc                           allnoconfig    gcc-15.1.0
+powerpc               randconfig-001-20250812    clang-19
+powerpc               randconfig-002-20250812    clang-22
+powerpc               randconfig-003-20250812    gcc-12.5.0
+powerpc64             randconfig-001-20250812    clang-22
+powerpc64             randconfig-002-20250812    clang-16
+powerpc64             randconfig-003-20250812    clang-18
+riscv                             allnoconfig    gcc-15.1.0
+riscv                 randconfig-001-20250812    gcc-9.5.0
+riscv                 randconfig-002-20250812    gcc-8.5.0
+s390                             allmodconfig    clang-18
+s390                              allnoconfig    clang-22
+s390                             allyesconfig    gcc-15.1.0
+s390                  randconfig-001-20250812    clang-18
+s390                  randconfig-002-20250812    clang-22
+sh                               allmodconfig    gcc-15.1.0
+sh                                allnoconfig    gcc-15.1.0
+sh                               allyesconfig    gcc-15.1.0
+sh                    randconfig-001-20250812    gcc-15.1.0
+sh                    randconfig-002-20250812    gcc-15.1.0
+sparc                            allmodconfig    gcc-15.1.0
+sparc                             allnoconfig    gcc-15.1.0
+sparc                               defconfig    gcc-15.1.0
+sparc                 randconfig-001-20250812    gcc-8.5.0
+sparc                 randconfig-002-20250812    gcc-8.5.0
+sparc64               randconfig-001-20250812    clang-22
+sparc64               randconfig-002-20250812    clang-22
+um                               allmodconfig    clang-19
+um                                allnoconfig    clang-22
+um                               allyesconfig    gcc-12
+um                    randconfig-001-20250812    gcc-11
+um                    randconfig-002-20250812    gcc-12
+x86_64                            allnoconfig    clang-20
+x86_64                           allyesconfig    clang-20
+x86_64      buildonly-randconfig-001-20250812    clang-20
+x86_64      buildonly-randconfig-002-20250812    gcc-12
+x86_64      buildonly-randconfig-003-20250812    gcc-12
+x86_64      buildonly-randconfig-004-20250812    gcc-12
+x86_64      buildonly-randconfig-005-20250812    clang-20
+x86_64      buildonly-randconfig-006-20250812    gcc-12
+x86_64                              defconfig    gcc-11
+x86_64                          rhel-9.4-rust    clang-20
+xtensa                            allnoconfig    gcc-15.1.0
+xtensa                randconfig-001-20250812    gcc-10.5.0
+xtensa                randconfig-002-20250812    gcc-12.5.0
 
-Kind of:
-
-1.  “attempt” sounds to me like, that you tried to fix something, but 
-are not actually sure.
-
-2.  In the end, the devices need to work, so knowing how to verify a fix 
-– myself for example – is always helpful in my opinion, so I often ask 
-for reproducers and tests.
-
->>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>> ---
->>>    net/bluetooth/hci_conn.c | 34 ++++++++++++++++++++++++++++------
->>>    1 file changed, 28 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->>> index e6cea51b3eab..4bd2e4cd477f 100644
->>> --- a/net/bluetooth/hci_conn.c
->>> +++ b/net/bluetooth/hci_conn.c
->>> @@ -1152,22 +1152,44 @@ void hci_conn_del(struct hci_conn *conn)
->>>        disable_delayed_work_sync(&conn->auto_accept_work);
->>>        disable_delayed_work_sync(&conn->idle_work);
->>>
->>> -     /* Handle unnacked frames */
->>> +     /* Handle unnacked frames:
->>> +      *
->>> +      * - In case there are no connection restore all buffers to the pool
->>> +      * - Otherwise restore just the buffers considered in transit for the
->>> +      *   hci_conn
->>> +      */
->>>        switch (conn->type) {
->>>        case ACL_LINK:
->>> -             hdev->acl_cnt += conn->sent;
->>> +             if (!hci_conn_num(hdev, ACL_LINK))
->>> +                     hdev->acl_cnt = hdev->acl_pkts;
->>> +             else
->>> +                     hdev->acl_cnt += conn->sent;
->>>                break;
->>>        case LE_LINK:
->>>                cancel_delayed_work(&conn->le_conn_timeout);
->>>
->>> -             if (hdev->le_pkts)
->>> -                     hdev->le_cnt += conn->sent;
->>> -             else
->>> -                     hdev->acl_cnt += conn->sent;
->>> +             if (hdev->le_pkts) {
->>> +                     if (!hci_conn_num(hdev, LE_LINK))
->>> +                             hdev->le_cnt = hdev->le_pkts;
->>> +                     else
->>> +                             hdev->le_cnt += conn->sent;
->>> +             } else {
->>> +                     if (!hci_conn_num(hdev, LE_LINK) &&
->>> +                         !hci_conn_num(hdev, ACL_LINK))
->>> +                             hdev->acl_cnt = hdev->acl_pkts;
->>> +                     else
->>> +                             hdev->acl_cnt += conn->sent;
->>> +             }
->>>                break;
->>>        case CIS_LINK:
->>>        case BIS_LINK:
->>>        case PA_LINK:
->>> +             if (!hci_conn_num(hdev, CIS_LINK) &&
->>> +                 !hci_conn_num(hdev, BIS_LINK) &&
->>> +                 !hci_conn_num(hdev, PA_LINK))
->>> +                     hdev->iso_cnt = hdev->iso_pkts;
->>> +             else
->>> +                     hdev->iso_cnt += conn->sent;
->>>                hdev->iso_cnt += conn->sent;
->>>                break;
->>>        }
-
-Kind regards,
-
-Paul
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
