@@ -1,79 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513EF3F9D2
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 18:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1699D1A9F89
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 18:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755022195; cv=none; b=VZGJAqV3x/UYTx1T+/x5EJjynQbxvroYfsuDtgCZPzGSRiXGI5XHitcpY592lr042sl7rZVPKCs9Lu1fwhr35vxhj5UjDBzIDVZ5iLrylyvw6P70aIFVdUS2Pl068B9Pscsqwnb2m8BCTFKAksWa+2vVSXWl6AugPCf3TFRXDZ0=
+	t=1755023003; cv=none; b=tdJMHthibekxKt+Sn8hCDNHU0URjMWSQTYhwzyuxWyQVMIybnH3vd1zGdlayOq2UiSut7mF74cXMQu5b73DJ3Yc1sIuX0orCq/JpWaJDR/21Yt9QyymBC4K3oDi9jLc1R+jBCa1K+U9bSPVeqh1rwXAJ0bOuEyrWmTWnCvajOhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755022195; c=relaxed/simple;
-	bh=9o8qE05uFMnZpEQyqsoZNDdoTfd/Vqfg1KdikDdXKiU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nvvK2EfRFCfdobi4f6858ojrHNPiodv8J8L7Dm1Kjyfx6gekEKWxXgiUg1sKnlIj8MkY1rF1xhMpqHbmXaDdBatQSTUL8F+VO73DjYrvMusLtqhEBJpCFVcmxn66YZt2Iegn7HFvfhmrltxBbVTCF6BSTnYpJRepcewHDq/lvfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3qm4ZEL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755023003; c=relaxed/simple;
+	bh=jSRkv+wS+K+gvW9snGmI7ZnTJWOywWCDtT3zNG+aQkE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=aeRGvDWwwcocmtVix+CI9mCPiALmTOds1vvMJ+5GSKjzMkjzHG0WeXdN1H+P41RYgu2skML8UwhT0sSKtHtWxTjpLX2wTyjMq6X8FHpTuHPlko18bfUFQf0pynD8Mc6/OlR0Rs/W821dI2zwD1Olt/snRg9bhADIB0iS5A+pkrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZscSg1Ei; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3qm4ZEL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E869DC4CEF7;
-	Tue, 12 Aug 2025 18:09:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755022194;
-	bh=9o8qE05uFMnZpEQyqsoZNDdoTfd/Vqfg1KdikDdXKiU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F3qm4ZELpTzYAKeAB+kpyyNbiR5YxUFQTr8UPEhGvKqJCeH1xzy2DFD7VY18Kg9XS
-	 gJs1UNxG3Ehb5aj2TKuFAagbB1kZVsKUw8px2YkJy0ojuHd7yrynDesyUD78/VCSb7
-	 hTcYCmi+BzxbYtuXaMiWFen39MRSey9rQeHV2BuaMNXFmDsa2kQdcGf03DpRxi8CJu
-	 o77m3P10j+CnYQN/CxqO3UlLdYTm31JKNVD7Z5Vy4UI/UvWASQWnbRzCkqKrOgD1nJ
-	 MIY3+RdpIXG3BDIri6VASRW6YPeUWR5lHAoRMlZt3CP1Tn/6p2vardTprJLdPY3sBB
-	 paMyVJyvZUrLw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B56383BF51;
-	Tue, 12 Aug 2025 18:10:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZscSg1Ei"
+Received: from github.com (hubbernetes-node-808ae52.ac4-iad.github.net [10.52.150.41])
+	by smtp.github.com (Postfix) with ESMTPA id 2571F640425
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Aug 2025 11:23:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1755023001;
+	bh=VEcngsySg0BkJRBUunDtF67E2JTjSygcatyBc25Hf3Q=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZscSg1EilkIaIPPJ0TAF/TiCtYAu8ra9ZH4TM8Dm+vFUu3jwiIW4FfxYqCda4mwzq
+	 pI1t0RvhsGY9y9+w8weq7VGVgpn9MBKPhR5KbVehX2DxM2ONBa6Bi+d+lJBdt3LOkm
+	 HNeF7Z7Fi7vXHPAsAkCZvIGT6GQOhCW7C+AdPRIc=
+Date: Tue, 12 Aug 2025 11:23:21 -0700
+From: Myrrh Periwinkle <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/0491cd-9cdbad@github.com>
+Subject: [bluez/bluez] 5db6d2: audio: Don't initialize media transport volume
+ fro...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bluez v4 0/2] audio: Don't initialize media transport
- volume from media player
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175502220698.2767383.8444233719893678441.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Aug 2025 18:10:06 +0000
-References: 
- <20250806-audio-no-reuse-media-player-volume-v4-0-a59d9a4848c1@qtmlabs.xyz>
-In-Reply-To: 
- <20250806-audio-no-reuse-media-player-volume-v4-0-a59d9a4848c1@qtmlabs.xyz>
-To: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5db6d2fef66fb87217b7795b3d24372e219a9692
+      https://github.com/bluez/bluez/commit/5db6d2fef66fb87217b7795b3d24372e219a9692
+  Author: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
+  Date:   2025-08-12 (Tue, 12 Aug 2025)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/avrcp.c
+    M profiles/audio/media.c
+    M profiles/audio/media.h
 
-On Wed, 06 Aug 2025 09:22:45 +0700 you wrote:
-> Fixes an issue where if a Bluetooth headphone with hardware volume
-> control was connected while mpris-proxy was running, disconnected and
-> replaced with a different one without hardware volume control, the
-> latter will be erroneously recognized as hardware volume
-> control capable.
-> 
-> 
-> [...]
+  Log Message:
+  -----------
+  audio: Don't initialize media transport volume from media player
 
-Here is the summary with links:
-  - [bluez,v4,1/2] audio: Don't initialize media transport volume from media player
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5db6d2fef66f
-  - [bluez,v4,2/2] audio: Remove media_player.volume
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9cdbad590b74
+Media player objects may be shared between devices. As a result,
+a device without support for hardware volume that is connected after one
+that does may end up being erroneously considered hardware
+volume-capable.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+fa7828bdd ("transport: Fix not being able to initialize volume properly")
+introduced btd_device_{get,set}_volume that is used as an alternative in
+case no media player objects are present. Therefore, we can remove
+media_player_get_device_volume and instead use btd_device_get_volume to
+determine the initial volume.
 
 
+  Commit: 9cdbad590b7476b83e2ef240a486fd5159251be8
+      https://github.com/bluez/bluez/commit/9cdbad590b7476b83e2ef240a486fd5159251be8
+  Author: Myrrh Periwinkle <myrrhperiwinkle@qtmlabs.xyz>
+  Date:   2025-08-12 (Tue, 12 Aug 2025)
+
+  Changed paths:
+    M profiles/audio/avrcp.c
+    M profiles/audio/avrcp.h
+    M profiles/audio/media.c
+
+  Log Message:
+  -----------
+  audio: Remove media_player.volume
+
+With the previous commit, the media_player.volume field is now
+completely unused. As this was never the right place to store the
+initial volume to begin with, remove this field entirely as well as its
+associated supporting methods to prevent confusion.
+
+
+Compare: https://github.com/bluez/bluez/compare/0491cdf31754...9cdbad590b74
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
