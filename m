@@ -1,70 +1,61 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801F22F531D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 10:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648E374420
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 10:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755081555; cv=none; b=LBpZV9m1OnFcPa3woL4Z20NAITKNPTESabECbPrfzwr9pfP9ZIm9+zWCY8Ecapk8eGcKpNvwszEwrr2C6+iqinq/d0mTtf7LkfGWoH/a0YavJI6atHJucaKcgMN9orpbGnza+6HtYDBpAyW+ARbaODr4N09QSM2QIRp+4eBoxHI=
+	t=1755081811; cv=none; b=PBz+GrLCMA9LBO8bGC/Rl1Bj7SmTH0ci90oDnsgd3tznI7RXytFksKZuwEqTMl8dP4kph/DgcRFjrxLt5EABsdq7MFB2HN5nB7lte20bzLVIpep56wO4ZQ0LYDvjpkV7xZRCH0PtcaJfUIhNDZ8eLdd8NVU4DflqqhCyAZamT0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755081555; c=relaxed/simple;
-	bh=lUYIHsbUEAP1Q9DvDO4Sq9GKvQvxKlx6sImNAGq3r+s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RFuta01FdZsX9dFY8MmMZSBGsxpRMLkptQQpBFxIhRL/b4w3puXigMwb1TMJl9HVphDxQOeRvbRIUtXPIUb/NhuAAiRxsfBqpSXaN3/Kh/9oSMDbep/BJQup4UAHvB5PokjYHKCw+OWE+P7dmdY/9qOddmuPZT1e8208DsKOcaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ochang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gv3h2ygL; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ochang.bounces.google.com
+	s=arc-20240116; t=1755081811; c=relaxed/simple;
+	bh=6ZOve0ZvaCxwnPjRnidYumitpRVIfeOWtDPjuQ2ye5E=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BS1Pby8saGDONbF2ym5nc7YwREueJiEaXnho1HbQVhAAb6gyy69F1TuP8qBTKfMavmyrbWqR74LcZO9zAD5FMN6cBVTBE+0uJiJOZkAUjqHnoSMwMnCAI7gxp2fWxDHnAGZe/+pyU7MA5AVZjLo49zJ/TTnZyLJv5Qgzqrkg1Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lRGNYM3N; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gv3h2ygL"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b42218e4a59so4799235a12.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 03:39:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755081553; x=1755686353; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vq9vo2Ko6yv8GAgYx3zY/kpewYc2fsVyO2G/VwUUO9k=;
-        b=gv3h2ygLQA8NHLHuJNmsznjmgpahIcL8z2CJTZiGRIsVXH8ZPNF1wqwxMYkDAqercV
-         bA6GHQQ62gtFTX9HOpg+rbcNJYgLgCyjKU/iGvSxxFXIK6Ev3pp3py09hq2Gb/E7HM0J
-         c07JGMDSay0NhZGy11EPM2uAvq38AEhjf4YQKgF5lp9noTOKJBL8Z3EiayWYolgHBb6/
-         Qz9z8TZczcve5lfYoIWhxXnvL0y4ITBv9AdS2d81MAE8nrSO7QscNWqUzv/g7mvyAx4N
-         hjn8zNTRJ6kse/Ri8vGUxtMedoYEA630mOoSaQ1EfG9QPP9iLipiNIQhJm5kLTo9lzX3
-         2hiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755081553; x=1755686353;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vq9vo2Ko6yv8GAgYx3zY/kpewYc2fsVyO2G/VwUUO9k=;
-        b=I0fX2KYiH5yWb1o19CaCtIpCexQPT3wXPEposbk7mMQsDeg8xrd4YRmW81LSpxMsk/
-         FeHmVszQz8fp3flybKZ+TL8d8gXjXRZzv6GGXvTMO5iC5vsgoXkBq/Sl7uyR9o7s1GMn
-         GsAHHFPQ8Qlqby1nerG7QG6YC2md9i4/PP9BDUZO4tLqdJc3h7B6grLdQ+KAvrOSRjZm
-         NHO6lTtdDN3MnyF/KkZrfXNXfU0Fd/O7HW4Hb+Humf86sHOnAgAHpizqS0nGLTu33yXL
-         5YR+wS7piHnN5DYfXkEFrNiIOY3t0Pgaibzglo3ohI2OmhQVVwG/gaHFKEPBgqclD+3U
-         B76w==
-X-Gm-Message-State: AOJu0YxDiuvD0FaFdd+NrPBnPLfRqOJmGYutdykcPudSyuOb2OiJRs5x
-	MmGm4ITTZf5sMvPxGFWsQtk2AwxW2ugJR4pJUG7DRxDoXO2CpGp/+iEw0zP8ECgDh5UQX625SCa
-	yKVPTzQVcFklOTbtBFHppVHKCQkgM1/qapzowHZAIP+JcxRWP7d0SZwYqlVQ8KnyxEdwNvAaXBQ
-	7jpbuS1s9GNZuwmEmxFca+Qk8PgF/ZeAG7NnVsVx0oxYG5oCNR
-X-Google-Smtp-Source: AGHT+IEys+QJlzEnNcZpVjJ4yh5QRr7cqtpQqsQ1f8SBz49TNk05LNp+mRR1QbyLUmGY4hXgLfJU2BQ2+fI=
-X-Received: from plbmz16.prod.google.com ([2002:a17:903:3510:b0:240:801d:1089])
- (user=ochang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:286:b0:240:44a6:5027
- with SMTP id d9443c01a7336-2430d12cba1mr35433945ad.15.1755081552717; Wed, 13
- Aug 2025 03:39:12 -0700 (PDT)
-Date: Wed, 13 Aug 2025 10:34:59 +0000
-In-Reply-To: <20250813103459.3690107-1-ochang@google.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lRGNYM3N"
+Received: from github.com (hubbernetes-node-ceae02c.ac4-iad.github.net [10.52.222.72])
+	by smtp.github.com (Postfix) with ESMTPA id 77676204DE
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 03:43:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1755081809;
+	bh=5Y38DaYa4W45JqtXH0YG5mn4LRl6OHNmZkZVk8QGrI8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=lRGNYM3NM96NN8AbZdw2fe2ESbquVOMtP6+lsF8SvdzPpggElIu+78m+izcqlZXEh
+	 OC/f7f+ZNhmDaTJi9ULRxraXaHh4va00jbQQKhf6qjA2U3LnqViHJiCGW2gasurLE/
+	 KouJ2dwzJE54k3A1zkFfNdcILwqbbtbaWmyS17Lg=
+Date: Wed, 13 Aug 2025 03:43:29 -0700
+From: Oliver Chang <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/990970/000000-1663ae@github.com>
+Subject: [bluez/bluez] 1663ae: Fix heap-buffer-overflow in
+ sdp_xml.c:compute_seq_...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250813103459.3690107-1-ochang@google.com>
-X-Mailer: git-send-email 2.51.0.rc0.205.g4a044479a3-goog
-Message-ID: <20250813103459.3690107-2-ochang@google.com>
-Subject: [PATCH BlueZ v2 1/1] Fix heap-buffer-overflow in sdp_xml.c:compute_seq_size
-From: Oliver Chang <ochang@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: oss-fuzz-bugs@google.com, Oliver Chang <ochang@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/990970
+  Home:   https://github.com/bluez/bluez
+  Commit: 1663ae444fa2a670d2e7cc2fdfc3eb3e057621e6
+      https://github.com/bluez/bluez/commit/1663ae444fa2a670d2e7cc2fdfc3eb3e057621e6
+  Author: Oliver Chang <ochang@google.com>
+  Date:   2025-08-13 (Wed, 13 Aug 2025)
+
+  Changed paths:
+    M src/sdp-xml.c
+
+  Log Message:
+  -----------
+  Fix heap-buffer-overflow in sdp_xml.c:compute_seq_size
 
 https://issues.oss-fuzz.com/issues/42516062
 https://oss-fuzz.com/testcase-detail/5896441415729152
@@ -97,31 +88,7 @@ calculate the sequence size, leading to the out-of-bounds read.
 To fix this, in element_end, ensure that the stack is popped even if the
 element's data failed to parse. This prevents the stack
 desynchronization.
----
- src/sdp-xml.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index a83dec157..e5b30e885 100644
---- a/src/sdp-xml.c
-+++ b/src/sdp-xml.c
-@@ -545,8 +545,15 @@ static void element_end(GMarkupParseContext *context,
- 		return;
- 	}
- 
--	if (!ctx_data->stack_head || !ctx_data->stack_head->data) {
-+	if (!ctx_data->stack_head)
-+		return;
-+
-+	if (!ctx_data->stack_head->data) {
- 		DBG("No data for %s", element_name);
-+
-+		elem = ctx_data->stack_head;
-+		ctx_data->stack_head = ctx_data->stack_head->next;
-+		sdp_xml_data_free(elem);
- 		return;
- 	}
- 
--- 
-2.51.0.rc0.205.g4a044479a3-goog
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
