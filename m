@@ -1,69 +1,68 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E0E1FAC34
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 21:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7F32E9752
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 21:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755119729; cv=none; b=iDiJSp9j6D/ovPYShSU9AjvhynzIewkbKRLws+AVhUWB4f38fNG0bsPrpAJ9sh7oib2aJer9pzX5Rn5pwJhOdrSizdAw61RAJ/uZTNbs/bVQ6fb7kI+/v+Evz6HA5QrQinxO6OKjxZZ8igI/6OCqKp4UyqCeJk5FqwZyOJXa2IY=
+	t=1755119730; cv=none; b=m+qv3SvYxf6qd6DnXFOXDK25+wU83/z4A3np/Wfp6FpdXlq5REK1zFogRs9MqGRpx52YKF97NHsb9ARuAzRJAoUG0Y8A/v/60z+xX/bRZE9xDo/B/bK9LciqF/A7Y3A+dmmSRGWG74zdgMrCA7MOl6Iid9inp6Uf9Rfj7lNOBZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755119729; c=relaxed/simple;
-	bh=oodh4hBMK+2z9KvOt+I+3EAuSYEkDFpXwrzw1Ll+lbg=;
+	s=arc-20240116; t=1755119730; c=relaxed/simple;
+	bh=Zr7CSZQ4hDCQ3ZpBn52BZTRHpoFkE8lz//oeNd+qaWQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dqlX6IOAYYHnfwroQPopxlHSlYLo9FVdoA0cya2oScRSN5NIeK8qju73fxJLA0+ToqxiYaMxIyhZ8uGbAZde/GzPJW6LSEHn4dkQ4CYytFiigmrZC+eFmIwJGO9hvDP/XqNHzsdZvS+IA4eILI5tOdPJA+dZqsi9MZcupgNbhf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YbFGz7/M; arc=none smtp.client-ip=209.85.222.46
+	 MIME-Version; b=J2/p1yv/8BimZevFBsL5KPjEDrUQpXNKKRhShv/vpGu0aNe3OTDbAMThGfNUu2ORC9JiXCxAtMvbsmFWcjfz/b3F2fI3+hMnMY3HTUan5ChPRlN920DEhdUpZlaLAes0woafSjxBMzzYXWgVwyrvUgVVSHEm4YqAufMS3dt9iJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOolVSJw; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbFGz7/M"
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-890190bf2dbso100195241.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 14:15:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOolVSJw"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-53b174fc165so123317e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 14:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755119725; x=1755724525; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755119727; x=1755724527; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oAkcWScXiQHElPrAIxOnOlZ8R/ClD91jRDwV9CC4tEI=;
-        b=YbFGz7/MJzQ49X7dh8/h+EMvz563BxQjweAVLqyHXHJVvRTcDLiQYcbxTEbyKhQG03
-         2K8+gVbDnAZybcS98YzCy6iWJHU3ojDJjv24HZnqu7E2msyC6m1r5DV5YOJ5Y8n2lBxo
-         jE8BnmGw9Ihn1hAFwYSsXp8ihTUbk8ZYpQX6KG7IagnKluiznx/KMUFbp8L+b6JC+xdl
-         ppq3Qh92hwb0yjOSvxEcSQBYbBEy+GAbCpPsfKxY9rNo7FvwDiB1wzhpIt3zqMm7V8B/
-         aoLFDmxziu5uNVLc8yZKfxgdQUXljnp5obAERYR8M13Hk6NCl21ktpc1Y+duo0RdC0MU
-         NDsA==
+        bh=j0A26OXScjIDPaaoebMA8zVzlukUdZXy/NYrnffRd98=;
+        b=XOolVSJwBYMxsXt5JfIO6iFyYDqJMypP+vLUC4xQdPntN+rO5kSPtaStEksey3UWmC
+         x2DX3HlRJpaims7UhFTCOgTIaHiIv0gPwvG6DunEvaT/soRgmY8f17GZFX2agWxcRzal
+         ZewU2ivx5fxji27EPbK/yb4D94cpwms2uDn5ju8bgploX2ubdLieLqHOyh8Gvfqazv3R
+         SSCwnpG2cJ/ZgvlUfVFtaHLC6yVs97/bF88042c4nwzX5mAyAlA9MXXDW/hqhHne0i9/
+         Fg58gRC4lm+xnjOeFt3AQcm6s3ZIXqovCu5e8XeWv7sgCF053KOzYwhHM6p5BOvdpcm2
+         81hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755119725; x=1755724525;
+        d=1e100.net; s=20230601; t=1755119727; x=1755724527;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oAkcWScXiQHElPrAIxOnOlZ8R/ClD91jRDwV9CC4tEI=;
-        b=tEdQX1zkkjEpsXkASIaAuHGK4CeFSXQg8KmlSTrWR6L3O1g5x18ULl7xwTVvu3/hZt
-         Okg6YmTDa/595ufMQQPBbqu2NIxilCrKSNBIeGKtV8i15NqpWUxKANltegqmNMuA7pz8
-         ziJeBSrtJUoX79yB1bDhX4ssKs1GbUpdCkqL2u10PbPd97oThQM0Vm4XiyRQfEQ1f5+r
-         c1NS+NoAkax5dmZ66XV8KUSxzc9brXKynrfUD+ACnxS7VAOHvMo13aiFGAKTfFy9CUGw
-         x/FAWjNTd4TCWMgBAb52/pSjX5QU8OJx9dPu5iCmOSXET0dg6tSzqzaFpKkE1ypWy8W/
-         OHDA==
-X-Gm-Message-State: AOJu0YzIrLLG813bYDgfD3KEMutjBv8tA+z/bLqUY7GfQLR35SPBWo59
-	ec1rXBZbwow5PZbXKYjBCrSIVbGpSFeX016Sx/j0meo7go9sJdpAqHpQxpkEjw==
-X-Gm-Gg: ASbGncv5oPpS7PPylhC13KJFQevsA5c9H4lXe2Rc7/tS03TNO3aA9/wpwDgvBdFWoat
-	Yeem4gsyTxiLYXlWC4/Isd1A4dMZUrOc5/tTr7n7OrHiX08XrkxjlLvowCUo5+1aMSig1yDzUKb
-	E9St0OznTgTD6oJEfXXRkp3pBd/ND0K/tocV9KBMT6TL4bEewBOgBMKEQk6BfKWPObJAK002R2I
-	Q4iDMi6ZiCNvAhOrVT6BDOJQwEVCrQoqtyH0gCzz2gV9dSDQpKWtL3XNwhm1nJ99XWEGKBQJryK
-	4UKGxs722ZkASrFDDyUR8j0R/YGOMpPfCVuJAyaNXs6eIsmkOIomMLewaCMVd7jsDlOyPRsQnWn
-	v6cPIvPM+lTbIUG2MDC01yteapSIK6Ex2CjXDGyYgJ8uHFm2cBlkiC2HowmW1PRXggHwp+QratS
-	E=
-X-Google-Smtp-Source: AGHT+IFGFDKyNvd+VsZgBkqC8vUbSBB4E1+IT5NRzEzAHziBHwLc3NhuIyq6hrZu/6OXhUajgc2b+w==
-X-Received: by 2002:a05:6102:cd3:b0:4fa:55e:681f with SMTP id ada2fe7eead31-50feb0f8066mr252952137.24.1755119725545;
-        Wed, 13 Aug 2025 14:15:25 -0700 (PDT)
+        bh=j0A26OXScjIDPaaoebMA8zVzlukUdZXy/NYrnffRd98=;
+        b=VKfU25MlojLCUfP5sqq0aOk1Aq1NtzN+rki0HWP5UAsv1X53bWm2xV9+CH3yUXBBWx
+         meWGMtNAAYmEkqCJlnw8nNuHhWh7J9TR8o2bZqODtT6CJIRbONB/e8sS8quaBWxG4G5s
+         70v2/nuO+5A68JHFSiyqlQblZiVuig3fnmDOdbeP/zH7wlmtG66j0TOtxLFrsWtt1Cp0
+         6CTnLsJtYJsMXUzSu9Gy3zQq08+KJTHiXk0Um4/arkJk0nWF9GEp8fuBnNcbki95O9qG
+         8TO52nlbLY36dTiLwj+/+ZHEYr0ew0kRVALaRZSfWGcCy6b0EnGNeDq8zxTG/M2f5J0K
+         Wwgw==
+X-Gm-Message-State: AOJu0Yxzt8OFeL4+1eN4Mg/TNeng6xHhhlJzaBMU0YRWb7ntg7la1TRG
+	Zul6hBXaCcF8AIOrkF+KzM96srvch95JsZzfR2jyRO6mKzoApxAH+uZD60EJrA==
+X-Gm-Gg: ASbGnctmm+dnY7NKRsMZC2mjAcLoWU51A9I8G7Cvwg8sq4vtwSseZv4yawlh/NBtnnT
+	EO0xkzOcQ6Yt2jqnCq33msgXZjyAOEq9XV2O5jJijLudieBSmgGBY7NhPq+EiJcmt7os4xMMCc4
+	r5p5RgdFwhLRBKgl9Lgk3mWNjl2mCwHkJrFpIdUlKZUUsU43+vdLOMPdf0HvL3r+56iv3A/Qi6n
+	9QD82W9Vg9A7kIfY/Y9SJ95R8xStu/7l8c2cuJgkTEPFNDT+ZU9ipfFe038ctMQAcJexn6svlma
+	Hd6E9u/TJnmXjFhzCPDm1tshRcYz9qSK8XKe/v8qggbvbAL0cfgXLEKL6MEC/ef/M+NRIhNDCmi
+	y8IvYHOfM3Z8uGiU2rp+KyBZJgSE8PtHjRNoJp26MsiG81t1fFLR1GHdwB4KmLIJN
+X-Google-Smtp-Source: AGHT+IHgQRghceo8bY+077SrpApA3q7RNj/IZ80Jbbt1LIA/vo03xKGMbRTKyZjns0hGJzrmb6Zh3g==
+X-Received: by 2002:a05:6102:e0a:b0:4e9:bae0:7f9a with SMTP id ada2fe7eead31-50fdff063a5mr241573137.12.1755119727206;
+        Wed, 13 Aug 2025 14:15:27 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-507dcae5200sm2458422137.0.2025.08.13.14.15.24
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-507dcae5200sm2458422137.0.2025.08.13.14.15.25
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 14:15:24 -0700 (PDT)
+        Wed, 13 Aug 2025 14:15:26 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/5] Bluetooth: HCI: Fix using LE/ACL buffers for ISO packets
-Date: Wed, 13 Aug 2025 17:15:08 -0400
-Message-ID: <20250813211511.90866-2-luiz.dentz@gmail.com>
+Subject: [PATCH v3 3/5] Bluetooth: hci_conn: Make unacked packet handling more robust
+Date: Wed, 13 Aug 2025 17:15:09 -0400
+Message-ID: <20250813211511.90866-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250813211511.90866-1-luiz.dentz@gmail.com>
 References: <20250813211511.90866-1-luiz.dentz@gmail.com>
@@ -77,125 +76,70 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ISO packets shall not use LE/ACL buffer pool, that feature seem to be
-exclusive to LE-ACL only.
+This attempts to make unacked packet handling more robust by detecting
+if there are no connections left then restore all buffers of the
+respective pool.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_conn.c  | 33 ++++++++++++++-------------------
- net/bluetooth/hci_core.c  |  6 ++----
- net/bluetooth/hci_event.c | 16 +++-------------
- 3 files changed, 19 insertions(+), 36 deletions(-)
+ net/bluetooth/hci_conn.c | 34 ++++++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 7a879290dd28..9d2324eb1211 100644
+index 9d2324eb1211..d2f0c3c0f0ae 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -926,10 +926,9 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
- 	case CIS_LINK:
- 	case BIS_LINK:
- 	case PA_LINK:
--		if (hdev->iso_mtu)
--			/* Dedicated ISO Buffer exists */
--			break;
--		fallthrough;
-+		if (!hdev->iso_mtu)
-+			return ERR_PTR(-ECONNREFUSED);
-+		break;
- 	case LE_LINK:
- 		if (hdev->le_mtu && hdev->le_mtu < HCI_MIN_LE_MTU)
- 			return ERR_PTR(-ECONNREFUSED);
-@@ -1152,28 +1151,24 @@ void hci_conn_del(struct hci_conn *conn)
+@@ -1151,22 +1151,44 @@ void hci_conn_del(struct hci_conn *conn)
  	disable_delayed_work_sync(&conn->auto_accept_work);
  	disable_delayed_work_sync(&conn->idle_work);
  
--	if (conn->type == ACL_LINK) {
--		/* Unacked frames */
-+	/* Handle unnacked frames */
-+	switch (conn->type) {
-+	case ACL_LINK:
- 		hdev->acl_cnt += conn->sent;
--	} else if (conn->type == LE_LINK) {
-+		break;
-+	case LE_LINK:
+-	/* Handle unnacked frames */
++	/* Handle unnacked frames:
++	 *
++	 * - In case there are no connection restore all buffers to the pool
++	 * - Otherwise restore just the buffers considered in transit for the
++	 *   hci_conn
++	 */
+ 	switch (conn->type) {
+ 	case ACL_LINK:
+-		hdev->acl_cnt += conn->sent;
++		if (!hci_conn_num(hdev, ACL_LINK))
++			hdev->acl_cnt = hdev->acl_pkts;
++		else
++			hdev->acl_cnt += conn->sent;
+ 		break;
+ 	case LE_LINK:
  		cancel_delayed_work(&conn->le_conn_timeout);
  
- 		if (hdev->le_pkts)
- 			hdev->le_cnt += conn->sent;
- 		else
- 			hdev->acl_cnt += conn->sent;
--	} else {
--		/* Unacked ISO frames */
--		if (conn->type == CIS_LINK ||
--		    conn->type == BIS_LINK ||
--		    conn->type == PA_LINK) {
--			if (hdev->iso_pkts)
--				hdev->iso_cnt += conn->sent;
--			else if (hdev->le_pkts)
--				hdev->le_cnt += conn->sent;
--			else
--				hdev->acl_cnt += conn->sent;
--		}
-+		break;
-+	case CIS_LINK:
-+	case BIS_LINK:
-+	case PA_LINK:
-+		hdev->iso_cnt += conn->sent;
-+		break;
- 	}
- 
- 	skb_queue_purge(&conn->data_q);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 55e0722fd066..e2bffad9816f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3399,8 +3399,7 @@ static inline void hci_quote_sent(struct hci_conn *conn, int num, int *quote)
+-		if (hdev->le_pkts)
+-			hdev->le_cnt += conn->sent;
+-		else
+-			hdev->acl_cnt += conn->sent;
++		if (hdev->le_pkts) {
++			if (!hci_conn_num(hdev, LE_LINK))
++				hdev->le_cnt = hdev->le_pkts;
++			else
++				hdev->le_cnt += conn->sent;
++		} else {
++			if (!hci_conn_num(hdev, LE_LINK) &&
++			    !hci_conn_num(hdev, ACL_LINK))
++				hdev->acl_cnt = hdev->acl_pkts;
++			else
++				hdev->acl_cnt += conn->sent;
++		}
+ 		break;
  	case CIS_LINK:
  	case BIS_LINK:
  	case PA_LINK:
--		cnt = hdev->iso_mtu ? hdev->iso_cnt :
--			hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
-+		cnt = hdev->iso_cnt;
++		if (!hci_conn_num(hdev, CIS_LINK) &&
++		    !hci_conn_num(hdev, BIS_LINK) &&
++		    !hci_conn_num(hdev, PA_LINK))
++			hdev->iso_cnt = hdev->iso_pkts;
++		else
++			hdev->iso_cnt += conn->sent;
+ 		hdev->iso_cnt += conn->sent;
  		break;
- 	default:
- 		cnt = 0;
-@@ -3759,8 +3758,7 @@ static void hci_sched_iso(struct hci_dev *hdev, __u8 type)
- 	if (!hci_conn_num(hdev, type))
- 		return;
- 
--	cnt = hdev->iso_pkts ? &hdev->iso_cnt :
--		hdev->le_pkts ? &hdev->le_cnt : &hdev->acl_cnt;
-+	cnt = &hdev->iso_cnt;
- 	while (*cnt && (conn = hci_low_sent(hdev, type, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
- 			BT_DBG("skb %p len %d", skb, skb->len);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index fe7cdd67ad2a..1686680a38c8 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4433,19 +4433,9 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 		case CIS_LINK:
- 		case BIS_LINK:
- 		case PA_LINK:
--			if (hdev->iso_pkts) {
--				hdev->iso_cnt += count;
--				if (hdev->iso_cnt > hdev->iso_pkts)
--					hdev->iso_cnt = hdev->iso_pkts;
--			} else if (hdev->le_pkts) {
--				hdev->le_cnt += count;
--				if (hdev->le_cnt > hdev->le_pkts)
--					hdev->le_cnt = hdev->le_pkts;
--			} else {
--				hdev->acl_cnt += count;
--				if (hdev->acl_cnt > hdev->acl_pkts)
--					hdev->acl_cnt = hdev->acl_pkts;
--			}
-+			hdev->iso_cnt += count;
-+			if (hdev->iso_cnt > hdev->iso_pkts)
-+				hdev->iso_cnt = hdev->iso_pkts;
- 			break;
- 
- 		default:
+ 	}
 -- 
 2.50.1
 
