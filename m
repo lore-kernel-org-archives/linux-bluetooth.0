@@ -1,94 +1,77 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648E374420
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 10:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988C42F1FDF
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 10:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755081811; cv=none; b=PBz+GrLCMA9LBO8bGC/Rl1Bj7SmTH0ci90oDnsgd3tznI7RXytFksKZuwEqTMl8dP4kph/DgcRFjrxLt5EABsdq7MFB2HN5nB7lte20bzLVIpep56wO4ZQ0LYDvjpkV7xZRCH0PtcaJfUIhNDZ8eLdd8NVU4DflqqhCyAZamT0g=
+	t=1755082187; cv=none; b=F9uC3yrg5zzEYEwVCcoiLkB/n2ypwnv2FKBC94qsvYlL1yRNOhmn9d23j07e+mTYyJa2ihE7xK92Rq7AWj5mqIw2W9Ewf/3kdtYh/sxUmXnsD0vd4etF59S08LhtjL+CwwjZsOt4Y4L8jXW4zAElt09hv06Q1j1mZ2naxZpjX1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755081811; c=relaxed/simple;
-	bh=6ZOve0ZvaCxwnPjRnidYumitpRVIfeOWtDPjuQ2ye5E=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=BS1Pby8saGDONbF2ym5nc7YwREueJiEaXnho1HbQVhAAb6gyy69F1TuP8qBTKfMavmyrbWqR74LcZO9zAD5FMN6cBVTBE+0uJiJOZkAUjqHnoSMwMnCAI7gxp2fWxDHnAGZe/+pyU7MA5AVZjLo49zJ/TTnZyLJv5Qgzqrkg1Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=lRGNYM3N; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1755082187; c=relaxed/simple;
+	bh=vMf16BM3RdxZtj2JzjuoCtaXOzop9MvRqXMsZ/swG+4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fjzO7edGfpTvLlnuVCoqNq/qqttlYTlXA9KuZkQeVjIXFFnRLKUT2lWwgVNboae7hsh4tH1BLqPI7AszM/+LpuDU55AGjW61h8U2BS7TtshVDO6qoRWy7/nmLRz6H/bGQiIq5S7BOHuFo/HVDR+sSROHBAgcoSbRuEHAQFLeb/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DXftd21t; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="lRGNYM3N"
-Received: from github.com (hubbernetes-node-ceae02c.ac4-iad.github.net [10.52.222.72])
-	by smtp.github.com (Postfix) with ESMTPA id 77676204DE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 03:43:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1755081809;
-	bh=5Y38DaYa4W45JqtXH0YG5mn4LRl6OHNmZkZVk8QGrI8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=lRGNYM3NM96NN8AbZdw2fe2ESbquVOMtP6+lsF8SvdzPpggElIu+78m+izcqlZXEh
-	 OC/f7f+ZNhmDaTJi9ULRxraXaHh4va00jbQQKhf6qjA2U3LnqViHJiCGW2gasurLE/
-	 KouJ2dwzJE54k3A1zkFfNdcILwqbbtbaWmyS17Lg=
-Date: Wed, 13 Aug 2025 03:43:29 -0700
-From: Oliver Chang <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/990970/000000-1663ae@github.com>
-Subject: [bluez/bluez] 1663ae: Fix heap-buffer-overflow in
- sdp_xml.c:compute_seq_...
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DXftd21t"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7e809baeef7so709736585a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 03:49:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755082184; x=1755686984; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vMf16BM3RdxZtj2JzjuoCtaXOzop9MvRqXMsZ/swG+4=;
+        b=DXftd21tzB8K/2tHUNhC+xwi88TsSkTTitOZJ/ADszxcIoYBUakAepalFxz+SI8TOZ
+         SNHgRD4mEPXlMRt7+qAkiF11fkN2PY7ILxS+iV8wj3TpV8jyXJnCR1zmUmCiURS4Uv0U
+         kyO9lqanZKjCDHY+XWtBPOsbq8wo3B4I2tP5hV6SE7FAMuZfU0p8Wy41dmyNC8NXas8J
+         wtIm06aBP4+lna/P86w2K7DJUTk+qDCjun4bmVA7MGpcDdK2sQHRz/XwXmvFbB5jOjQI
+         fBrr2IrdgrVhegWFL5c++Px+aoNGhpegP4HdaQXgO7gETRK1J7D8PDBAz8PJ3oRuyawa
+         UXDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755082184; x=1755686984;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vMf16BM3RdxZtj2JzjuoCtaXOzop9MvRqXMsZ/swG+4=;
+        b=M4GqQi9rj7S0cuVU5yC2QSDpXsrb61Q3ycHfjeC9aGQ2RGrpVmBwbxup2k2Guf8ZdX
+         uYtmWMrGsHGwxhsRizRsV7S2qTvwUdVsZSOH1scuXtVWYNBqt81p4c7aDrzv7zELbKdZ
+         9mSPbrX29cFeSCCrTZHfn1qg9YoH3y4PQcovj9F3LdY7wLKH1MPBdTlt6DfCvbUoyrCb
+         uGQO5axpxkOxJgRdxHfLJqlEOfiFq7NsSX/+bez9pAbvzb5wdifT0yvlyDYe3eYVvmRB
+         sw4hUbVb5Arawblww0IymGhLlX/S8HJ5U66k+3IvsrWjtzBH2gfKWl1cvIfEkRruMYmi
+         yKgA==
+X-Gm-Message-State: AOJu0Yzn/nceTjZg7hGqJN5RFQYhdvujadBw6kj3qO6xS6RddfBvTXN1
+	Ny6p4eK6vvSmhj05puiOdCugf2BD4jOZ6H8GAe721FkIZIj0cO6y2+AJkBkTO1jeV0kkc3KxsRf
+	QH2zK/5dFAlxMX1CL+C3Bt+1/n6D9yTbhi2QEdrSnbbaNc9pYUfSRi+m8LGD98Q==
+X-Gm-Gg: ASbGncsddsTpnyURjucu+C5kRs+gQ1EZaKBsP7gvlDT1NjWrwBQBEQcAaeoHuGRwGS1
+	dGV1xL7YoMGQULdlcAETfHoUSPzJLhlepeg8hvEufOEyv17ua8cebqy/bh7WjsTJfBeav/gLHmd
+	sxehVXxtv3mmyntX2ryiHz1DdyVpDW0ZPy/5XxeGGSAZxbYyIQzu7xaLG8Lbc/3NRi2/WezNc4R
+	qiNMh5X6f2l3bey7Xm0Fqw4F0GNY94C4FAaa0OTkQ==
+X-Google-Smtp-Source: AGHT+IEGaNG0b2eD2kmCjXyylfbIMwTtzAYmXbsZhcPj8nNVpX7AtNQSWu8oEToe4HYYCFmbuTk7OSiItxRof682tzo=
+X-Received: by 2002:ac8:5aca:0:b0:4af:12b0:57aa with SMTP id
+ d75a77b69052e-4b0fc6e7b48mr27154701cf.16.1755082183801; Wed, 13 Aug 2025
+ 03:49:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20250813103459.3690107-1-ochang@google.com> <20250813103459.3690107-2-ochang@google.com>
+In-Reply-To: <20250813103459.3690107-2-ochang@google.com>
+From: Oliver Chang <ochang@google.com>
+Date: Wed, 13 Aug 2025 20:49:32 +1000
+X-Gm-Features: Ac12FXwS8FU2nNwDy7LHCtlUSGTsmOXk1ACFdI9tiatF98wStzyZcfAQNGH_bpk
+Message-ID: <CAFqAZOL8mkFSyfONx3bzMegD-xQuCisDvPbV=AX0zwndnijB5g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/1] Fix heap-buffer-overflow in sdp_xml.c:compute_seq_size
+To: linux-bluetooth@vger.kernel.org
+Cc: oss-fuzz-bugs@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-  Branch: refs/heads/990970
-  Home:   https://github.com/bluez/bluez
-  Commit: 1663ae444fa2a670d2e7cc2fdfc3eb3e057621e6
-      https://github.com/bluez/bluez/commit/1663ae444fa2a670d2e7cc2fdfc3eb3e057621e6
-  Author: Oliver Chang <ochang@google.com>
-  Date:   2025-08-13 (Wed, 13 Aug 2025)
+To clarify which "previous patch" I was referring to, I'm referring to
+the one titled "[PATCH BlueZ 1/1] Fixed heap-buffer-overflow in
+`compute_seq_size`"
 
-  Changed paths:
-    M src/sdp-xml.c
-
-  Log Message:
-  -----------
-  Fix heap-buffer-overflow in sdp_xml.c:compute_seq_size
-
-https://issues.oss-fuzz.com/issues/42516062
-https://oss-fuzz.com/testcase-detail/5896441415729152
-
-This can be triggered by using an input of
-`<sequence><foo/><text/></sequence>` against the harness in
-https://github.com/google/oss-fuzz/blob/master/projects/bluez/fuzz_xml.c
-
-The root cause of the heap-buffer-overflow was incorrect stack
-management in the SDP XML parser (element_end function) that led to type
-confusion.
-
-When an XML element failed to parse (e.g., an unrecognized tag like
-<foo/>), its corresponding entry was left on the parser stack because
-the we returned early if data was NULL.
-
-With the input <sequence><foo/><text/></sequence>, <foo/> failed parsing
-and remained on the stack with a NULL data. Then <text/> was parsed and
-also remained on the stack because it's only popped if
-ctx_data->stack_head->next->data != NULL.
-
-When </sequence> was encountered, the parser then mistakenly used the
-data from <text/> (which was now at the top of the stack) as the
-sequence data.  This led to a type confusion: the TEXT data's string
-pointer (val.str) was interpreted as a sequence pointer (val.dataseq).
-This pointer pointed to a 1-byte allocation (for the empty string). The
-code then tried to dereference this pointer as an sdp_data_t struct to
-calculate the sequence size, leading to the out-of-bounds read.
-
-To fix this, in element_end, ensure that the stack is popped even if the
-element's data failed to parse. This prevents the stack
-desynchronization.
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+Kind regards,
+Oliver
