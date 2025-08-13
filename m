@@ -1,126 +1,100 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CE22D46BB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 09:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0192F656D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 10:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755077537; cv=none; b=cg0r0pop9PwIW5R2jTyBVNZAXqsKAo3JxHI3lcmhPfI0k3g/AUXS3IhpGkXP+knI3/wUYvJ0GWLtxfsQswb32jPR3JVaQaXvlIbAa2xa3cGVoytmfmK0UND4vqYhXvVXn11TWmD3KH/eGPSk5nKSUaDNDvGJG/CNHnOMnJw1hzg=
+	t=1755081553; cv=none; b=DNK56xzvdyDJ3dbcxlWuy6PQl363AB+GVB8Z1Sd5EZ0uDmFSShXrXsd6mFSJQa+sZh0usjYMt7y6kSyqfZ/dESRpcqJAvgdxclLxsrk4wXAEbqO3xIdMTgZ9LAPTdq4mRtWdqqEMs+P92jyMCUkrp9czSV9wALx6vfxgmT99G9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755077537; c=relaxed/simple;
-	bh=yw4W0vhwVd33AuiJELZLP1qJdqtDyoiD3DJrLAyrczo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=oEe1UtGVg+TYBqr1UQqmilxYl+4KVolfvP1fnCh0bVm8G8zUcw6nzkoI4VUdLiYBfW8dbdgifayfJT9LaAvl6NmcxsE1eZ7+iQ7xf1qROVW/x5q5k8uvrZFe3RQNXCutzkgj7jOjoW86Tq7K2PPZQQecrcif1NrTRwF0qMK7NF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cE6B4co7; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755081553; c=relaxed/simple;
+	bh=avecXMihQvqtzHrnnoSj4eWJlrD6RUJPW2JYGVhhkyg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q6jr0K/2r2BTu82zWYR0i+q0OVM896A195JWQMcPejR4RRWBrmIvboUo5sE/OODnsRlCk5fjnm4iHRHEEGuaFspGI53EY/rB+k6jJP1GxBdR3ioOYa6GKN2K+megqa2OYTPuJZ3thISnQZIzowvEDeq+/ALo7jYvNH/wroQgfZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ochang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oD2rzMwg; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ochang.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cE6B4co7"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4b08a0b63c6so72284711cf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 02:32:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oD2rzMwg"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2400a0ad246so51338225ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 03:39:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755077535; x=1755682335; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GCjvyQ014keOutAZJPyas4FI2wu2bc4B2OjqwSgGsag=;
-        b=cE6B4co7jw9xFMK4fmxlzZCZcjHYiP5D/187TgIiCKUHA0eWRhWYksHWLd9MwYJkSP
-         jwHlGgxC1eC4sR5tlJjDfu1EdRyvY6dlnmY6ChkfUM/J5ZBiY5ymwVQduwu1jvugfrd/
-         FUarrbQTUiI3OPWHj1u37xsfm9orUBbk0Uxn9TDUm1f4kdy09gZjjyK72vYrXN0BHDt1
-         oE6EB3aGtMdF4xxLxOmLzIxYokqTPL7Hg3NiG/E+IPq2ZyXL6ft+1oA3+A/qyRen6bz8
-         0p6T4JzpzCMNz2ohUgAdi2fowEp9AITSw9Ey5KXsr8EBAl+cHq38yGwT8CjfIVYu5c+O
-         A7Zw==
+        d=google.com; s=20230601; t=1755081551; x=1755686351; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nAKvXs/PuHACeEREQBPWKpFvMO00or9vKoJdoEugwSA=;
+        b=oD2rzMwg5ZMHC0l5IOJMS4mDrEtAWh/1+1wJ4whagC6mQXYscPMzxzf06np3DGSzg5
+         Ev8mSGtRngYcZ0lklZCcAqC7lCWaZNNzL1lFbnqQeHiNuR7r+nigBX6mQJBpCzdwFSSz
+         9JqSRrKBWCkg7F0HWHRtnTBeBJ5zHmP+IS8j1FkMQPW0FQDoPbMmZRbAgHuE06Opjchw
+         zRY8AnYIo0xucj7wdBiDvqh4U/yP8gx0QhbLr8RuUawR6CVm0vkv8higLa0zAJgPRnwU
+         3A9PopZqxTAawezzfM31RNkvp91xQDHcFCP+EVspKKRH/VDTr8eWvefIYmqO4REzJugu
+         jTYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755077535; x=1755682335;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GCjvyQ014keOutAZJPyas4FI2wu2bc4B2OjqwSgGsag=;
-        b=rnEypR7hKn5qk0jZIjtaV53u1uGt1DTPDTcmo7V3LZ/zAPzPao75CS1bQUx9w9+siE
-         B0FS7yfZc0HwzaZnajT1cHnbG/it3umfBfyd4ASZrcgVeTMS1ijL1MRqt4OE/n+DtyMw
-         1/Y9MMsVcdRLAP3Gu5jlwuQC8V6WMChuYTkqJUqXmj+aFRPS/hlSQbwvZNxcS2uDcOmR
-         /9R0zXFqeD83H53L8fTYRncQMdZASjilX+RkeXtMAPZRgK9EYN/dwl6OcL0Huyd6NSkr
-         0tvd/kpsxDocDJT2WHgg6tdNAjLBfSb2W6IoKzqR5gjDn70mtP/7FnLnc/At97QCklB5
-         QeMg==
-X-Gm-Message-State: AOJu0YwPnxn6YgHUT7JfKYkpKBqbyjKFsGOcHogP44Fr6I1nibT+ffF+
-	+eShEbBTMChxS6mRhn6yIsB5SBszJe5oCYMEPPOfP/Cykvq71yiDcDnuy0YAKg==
-X-Gm-Gg: ASbGnctIk/ulpYzhJeXwqe6pAsENi0PBlBkN+e7BBkYb8T4IX1h8t0+h0hQWRy6Eum0
-	FJ9r4oU4F6ShSQX+yPvj45fjXowKPJlb0TauDEmq0iT0OJUJo/1Y/oR0RRn3HPVcRe2ynNn1veV
-	LmiqKBfUgwnx39SFTD20E2GQWghAgCrnMHL8QAp1z3A1ClSZmPy+TYmhS4UwVQYKY+txhzq0O7w
-	O6iLQ9/cQf0wrtol91uWRSj5qEsqU5uuFA+tFK4FZPLicPsTxgZWNy011Ng2y1QjvfM8YkcVpis
-	LICWypwPOyipfSFrI/yO9phaTqftj6AvqYgGsi6P3wmMWfEZM0oXn3BHkcLOfmZw8nBAHwZwQuL
-	8zAa5Yi4PhJagkgRPT3H7vwiJzUF4
-X-Google-Smtp-Source: AGHT+IENPuyATQIDYcJc2/+UqHo+xSmm8JVRpQls0E5TSIT/ZaYwXI7JnaI4vd8/mHzxANEkqRt/DQ==
-X-Received: by 2002:a05:622a:4cc3:b0:4ab:65c3:37d9 with SMTP id d75a77b69052e-4b0fc7e000bmr34520171cf.33.1755077534613;
-        Wed, 13 Aug 2025 02:32:14 -0700 (PDT)
-Received: from [172.17.0.2] ([4.246.135.199])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b09a2e6095sm98699401cf.33.2025.08.13.02.32.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 02:32:14 -0700 (PDT)
-Message-ID: <689c5b9e.050a0220.c9d48.7330@mx.google.com>
-Date: Wed, 13 Aug 2025 02:32:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1455136915369305981=="
+        d=1e100.net; s=20230601; t=1755081551; x=1755686351;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nAKvXs/PuHACeEREQBPWKpFvMO00or9vKoJdoEugwSA=;
+        b=wza1wG3E6tmFKPKiyoGLoBs44bakZwgXzIhqNG+05zuq7XZH1b4N/PSH1iX4h9kC9N
+         yMnZi+f+JEYDincY3wFherhx6ivlZvrhEZiQFtlBFkxGhAD5Ip+xFLVDr7eMzh/ACbW7
+         xI0kbKjpLRYhOz0MCu911F9rYcCMEJABlrrCi2caLawu5PKsUegsZkdtRlR02kv73Pfk
+         6RZowffLv9QxdHdsA1lBkHrEQSgk1jyqtv0vQEanbm/bFCbXu85GlkVptg/Ml8EXdePC
+         H0X0mE+NnWb1pjvpeNm9jc5nCgk4YIwvuIO59grZF3lzprpVG3BEqKEqBU4xG7U5GkaK
+         rVhw==
+X-Gm-Message-State: AOJu0Yzi/ZZxWbtFVVC9pLeNUQgWsUxLXLf/TvLsb+Cj04aYDPYNHgQq
+	EaEpwK3XDgr5feer0NsYaF19RhHCno0STE6s9gZVSN0vPLShbuoY9ptXlRYtDHJY7tm/ZJLsOVV
+	A2ryk1RqT+ms3rlaXnlDB+hwn1xqkHGNfQTcWZoRNWs2s0Y04ugzYcW7vCGkC0LJgxawWEM3Vvi
+	4bZ+BW8+VWzVbXqwUjywKSCvaxnktmMMbqCcRVNjlO4vfIW5ZJ
+X-Google-Smtp-Source: AGHT+IEwUtQdHRUJiuqu1NeK4HvAK33sqAIW3kVu0w8vKEj6uromOv6jgindoNKF+MOLO9f6rk6Dunz36xg=
+X-Received: from plgu1.prod.google.com ([2002:a17:902:e801:b0:23f:d0e0:7e93])
+ (user=ochang job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3c65:b0:240:7235:6292
+ with SMTP id d9443c01a7336-2430d21d442mr38348455ad.39.1755081551301; Wed, 13
+ Aug 2025 03:39:11 -0700 (PDT)
+Date: Wed, 13 Aug 2025 10:34:58 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ye.he@amlogic.com
-Subject: RE: [bluez,v2] device: Add SyncBroadcast method in device1 interface
-In-Reply-To: <20250813-adapter-sync-bcast-v2-1-d73b183b4bf1@amlogic.com>
-References: <20250813-adapter-sync-bcast-v2-1-d73b183b4bf1@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc0.205.g4a044479a3-goog
+Message-ID: <20250813103459.3690107-1-ochang@google.com>
+Subject: [PATCH BlueZ v2 0/1] Fix heap-buffer-overflow in sdp_xml.c:compute_seq_size
+From: Oliver Chang <ochang@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: oss-fuzz-bugs@google.com, Oliver Chang <ochang@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
---===============1455136915369305981==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This is a follow up to my first patch attempt. After scrutinizing this a
+bit more, it turns out my previous patch wasn't actually addresing the
+root cause.
 
-This is automated email and please do not reply to this email!
+The ASan stacktrace (found by OSS-Fuzz) for this issue is:
 
-Dear submitter,
+```
+==399==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x502000000218 at pc 0x5cffda946877 bp 0x7ffe90702810 sp 0x7ffe90702808
+READ of size 4 at 0x502000000218 thread T0
+    #0 0x5cffda946876 in compute_seq_size bluez/src/sdp-xml.c:62:21
+    #1 0x5cffda946876 in element_end bluez/src/sdp-xml.c:548:42
+    #2 0x5cffda984416 in emit_end_element glib/glib/gmarkup.c:1045:5
+    #3 0x5cffda983978 in g_markup_parse_context_parse glib/glib/gmarkup.c:1603:19
+    #4 0x5cffda944c55 in sdp_xml_parse_record bluez/src/sdp-xml.c:621:6
+    #5 0x5cffda949cf1 in LLVMFuzzerTestOneInput /src/fuzz_xml.c:30:9
+    #6 0x5cffda7f9730 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #7 0x5cffda7e49a5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #8 0x5cffda7ea43f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #9 0x5cffda8156e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7e0ccb446082 in __libc_start_main /build/glibc-LcI20x/glibc-2.31/csu/libc-start.c:308:16
+    #11 0x5cffda7dcb8d in _start
+```
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=990883
+This patch should address this issue properly. Please see the commit
+message for more details.
 
----Test result---
+Oliver Chang (1):
+  Fix heap-buffer-overflow in sdp_xml.c:compute_seq_size
 
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.30 seconds
-BuildEll                      PASS      20.11 seconds
-BluezMake                     PASS      2680.79 seconds
-MakeCheck                     PASS      20.25 seconds
-MakeDistcheck                 PASS      182.99 seconds
-CheckValgrind                 PASS      237.14 seconds
-CheckSmatch                   PASS      302.98 seconds
-bluezmakeextell               PASS      127.68 seconds
-IncrementalBuild              PENDING   0.32 seconds
-ScanBuild                     PASS      905.09 seconds
+ src/sdp-xml.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+-- 
+2.51.0.rc0.205.g4a044479a3-goog
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1455136915369305981==--
