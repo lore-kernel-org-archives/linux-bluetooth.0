@@ -1,131 +1,85 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5AE1E4BE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 17:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80662219A9B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 17:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755191418; cv=none; b=iWQzNHLVfDgtnmUVUorkrENQZQD+pWAt+U+a1IwRav+ITEC3Uj69cgGjYBr9IAr8YtWgcBfsdYL+amLohfKzydRfICcQs5RAkpNV2NqZnEldBWXatFKBdPYrVo9z6VDwtKNRtQDOcwWV6yINHKLu4wCigXa6vlt93aRwkZkIVW0=
+	t=1755191998; cv=none; b=PrrVkDrQV0nCddSsjAx3ozk2Z+p1qtN2LUkz4+HOiB2cArapTJAq2Vta1iahgTItXEeBtzdD/OzJIIRmny4BkUw56/rMC1Fm8pINp3xDH2EAWM8VYjqV0YK6BdPb7E71FP53vkdx05Poglscw2eiW8leRdkGb7qJLH6/7YijZxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755191418; c=relaxed/simple;
-	bh=QiK+lF95SufNAlrkbZDgZLOi9+U4k2/qnKRem65qD/o=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=PsLhleb1Ct43NNMbuhXXMSPf25xbJ++JVzsOIF5ceKRPRFDP4sgoJxtuXmZM6VsqP9jiuUjnmkrHYnScgH8DMN5NJvJznjY9z43MnQRq+RiXRqhNDrSeI2EGz6NdFc2DGUMfzElKqRfH28/ZOwVqcI7mkfbToxYvee4MGGsDW3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtSHJeOk; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755191998; c=relaxed/simple;
+	bh=i+1UjDq7zr/7TbI8iLbYeFlsLOJIeU/dvMSQse9dt5w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=myFUY5FRs3tWB6DpnsNboC+Jw3JKeH66+haajzhQ1YVNJ/Jph4lmvJOnbWWAs6mMe7XTu37XSHzYk8IEcc18EBk7vlFwtDTgEiYcOwQAz//gAWVjlNp/vWxQljT1H5UdYseilQzgf/Py9LNPDnIIpIhLm+fUE0OYPRdOB8k3s/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jgGFdzX2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtSHJeOk"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7e8702fd3b2so108099585a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 10:10:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755191415; x=1755796215; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=N6+MDfDTvaSsCgmVPgD3uJZE71cJLDeBfuZ1gkNMR44=;
-        b=ZtSHJeOkOBHiwougmisxzZKS/WjuaM1Oyyv8Q8ydsoQ5OogY/a9ncZ9rdzCyiNLPoL
-         mP60v7aAYs99VjvTIthiX0s/F4KYiYqMAKG1DfgfosR2x70UI1y89t15aBi718PYPQZ7
-         u06lIwrJWA4OuadGjp75L3Pa0M/zZMFCwPxClr8r/diNaHztjn3RbbDmLS5pWsZnEUtQ
-         0dnRgqmEWmulMGZXZUEonsv9ihd0GC96E9RFRsvPnwzIfhHwKV1HFoPmU6sQoLwbp3Bs
-         j28C7xnPWcFWcquWBYS0oBIrq7epNhu5hffGtUP/6b1+xEW4ea2r405IK6LZDd+RYU+8
-         W0+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755191415; x=1755796215;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N6+MDfDTvaSsCgmVPgD3uJZE71cJLDeBfuZ1gkNMR44=;
-        b=Ho0VW8PnWcM1Vu+tFFQl3G671pMWvhpsDnbEamwJC5p1xzDsg91OGLpMvTZBsm2kXL
-         Gl9RvX4DXHolsElWtDmmRQHUYD37D8vFIuFjN4viOChLlFg2HC8Jic4Ts4zZyimpY77f
-         SToEIzUFf2VdID3FVHC6yn8iKAUbrRueLvRZmtlYQ83wQBZgxWpDlyfe9yXRZReMAb5F
-         WlGAqmWiUDwe15hzDdG0aya/DX5kdLxsAVEVlOurTY0cAfdaiJC4fPhUcFhIk04Q7oop
-         yqSg3NTHkv9yfu6wMWMOW1Q5b63NFPnszgEpuWOQS99YF1U/gPCpFECVa0REcColO1b8
-         Ofww==
-X-Gm-Message-State: AOJu0YzcdFrQP1qzIqxtGhM4cEQJ6+QWPOosT9sJjTHIt0p5VeWoCKXH
-	5Z4Wg7FseuP5HUL4zjwOSVvLQ0PCQXwxfvZhzt68Ce26wDOZcVKfq0OHRP2kAg==
-X-Gm-Gg: ASbGncuL4U6NVDaoY0nn2OuTnshr/3jzU8hE5shunpohvMIMbjixstWI2dyK9e8rtI0
-	q4VP1WCyV9fTu7JW/XYmVcpNEJygQRUI3dsdxfs5BIebDYqKZpR0O82CksdRHE9tq+xUMyvXdPa
-	t9ZSD4UFmQFvcVeCbJfNfKxj6LCKR+eUSEo3L6iRIl2VbMC0EK6tbi1lKfvYIP4Or3PJ5FVTNSY
-	b3rDq1MD25jkQTULpFaLOMC09nJMfn5ahH2RKUuX6eEvNt4WNMl1lDL0fjRE0q/dHuoN2w7brEs
-	LiUvreu9nY7g6nWCs5bEmchNihcLxkKqm89CiSvVuAlegd73OoKaofxlZJYCovLOma1AWv8RLHg
-	rWUqftt3mFv+i4EP+cFwY9eYduo6bOw==
-X-Google-Smtp-Source: AGHT+IHSlfqusLBHUMu3FlrK5FaGJA8ph9agotU+fbDk0EQEfbxgFixQLyok1mkX2bSY/ciJheSI/g==
-X-Received: by 2002:a05:620a:2720:b0:7e8:54f7:67cd with SMTP id af79cd13be357-7e870474c23mr610755685a.50.1755191415400;
-        Thu, 14 Aug 2025 10:10:15 -0700 (PDT)
-Received: from [172.17.0.2] ([145.132.100.84])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e87b34bcc4sm2438085a.18.2025.08.14.10.10.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 10:10:15 -0700 (PDT)
-Message-ID: <689e1877.050a0220.8f4d2.056e@mx.google.com>
-Date: Thu, 14 Aug 2025 10:10:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8362161289552614195=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jgGFdzX2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17114C4CEED;
+	Thu, 14 Aug 2025 17:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755191998;
+	bh=i+1UjDq7zr/7TbI8iLbYeFlsLOJIeU/dvMSQse9dt5w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jgGFdzX2Mr3M8P2pAB4Pzz0QsqTGTYRuY1aGvyHbp1UCcpOHKcOtLuw/DD19ObVLw
+	 16/8mWJ//4vaZPWsuvlnD5Z+ziXeKCZtbUEqjDSdmpAcFg3yhhxFlPA04nfPvxL2Rh
+	 8cZs/A21IqqPa9OixSetgotvHTcHVpmc1BUN+gEo3SQwGcjg+bO6xJVrPSFIId7Ype
+	 Zp8goqmYKocX4k9BKzxa9SjhN9iMvOhPzQ2P8x2O54yPQXTvtkBreMUXKsbP7li/N3
+	 oNYL6ndUgyWZaV79Mdi7bsj1uvcpKqB3UQTgY7Gfi24APJmd7IYKsuwolT5sMdS0bp
+	 0uoL1xlFuG3HA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEA339D0C97;
+	Thu, 14 Aug 2025 17:20:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] monitor: Print unacked frame when releasing them
-In-Reply-To: <20250814154156.8221-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] monitor: Print unacked frame when releasing them
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175519200950.380512.10064199577915217402.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Aug 2025 17:20:09 +0000
 References: <20250814154156.8221-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20250814154156.8221-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
---===============8362161289552614195==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Thu, 14 Aug 2025 11:41:56 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This attempts to print the frame number of frames considered unacked
+> (missing NOCP):
+> 
+> > HCI Event: Disconnect Complete (0x05) plen 4
+>         Status: Success (0x00)
+>         Handle: 2304 Address: XX:XX:XX:XX:XX:XX
+>         Reason: Connection Terminated By Local Host (0x16)
+>         [0]#102132 unacked
+>         [1]#102137 unacked
+>         [2]#102139 unacked
+>         [3]#102141 unacked
+>         [4]#102143 unacked
+>         [5]#102145 unacked
+>         [6]#102147 unacked
+>         [7]#102150 unacked
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=991602
+Here is the summary with links:
+  - [BlueZ,v1] monitor: Print unacked frame when releasing them
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ce82168f9f70
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.37 seconds
-BuildEll                      PASS      20.42 seconds
-BluezMake                     PASS      2637.32 seconds
-MakeCheck                     PASS      20.53 seconds
-MakeDistcheck                 PASS      186.87 seconds
-CheckValgrind                 PASS      236.95 seconds
-CheckSmatch                   WARNING   306.24 seconds
-bluezmakeextell               PASS      129.44 seconds
-IncrementalBuild              PENDING   0.35 seconds
-ScanBuild                     PASS      919.01 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1931:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3822:52: warning: array of flexible structuresmonitor/bt.h:3810:40: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8362161289552614195==--
