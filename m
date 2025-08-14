@@ -1,59 +1,59 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E532BE571;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F127318157;
 	Thu, 14 Aug 2025 12:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755175632; cv=none; b=IwgPopFkbLQ4boPopMQk2DnQuPfEuf50bcPQSPVLHCVvwKu7AhtqR2/Z5KG4aWTz0j9oANgjBHdOJ4vnLEMq6Afuz3Pclvkv0gPvcNpPPeqwJ3dHujx8MLC4spgZ1TubXe2f7TZku2uIWB0IB6+RcZDpid4wqvkiwEbQLV1rYVs=
+	t=1755175632; cv=none; b=tv9MZIssGFfJpscP4N3tBSPxKJ9HILa4nzMJl5eR90YV66hhovuTwnp72sKZKfPdJGQu8fFpNyFAHSkAEy5Dmxsb5x7ldi+kIPN1eQgIKbWRMxn0e/0Il3bwsg6x/14bafSWf/N/9zKUvJZt4tUg4xuVBg0RAx1WIx0XJyAXtgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755175632; c=relaxed/simple;
-	bh=yy95QHcCpi76Q3L8QUncXUfEH22tIck4Gw3Yb4+0Aow=;
+	bh=nhxxWo9mcWHUOU63UXrb3suRO0cAk+TPf0ApsE59IWs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=O97+118JhvP8/Vl9b/+mpg83TY2VBW/9YSxn5T2h7oh2JxD9iMNGUrzlV8kfz3bo0vraUl4zc78gWX3gRghnjVHb6cnoHcgiYSQEJN/VM/HGqALaK6QoErb7T05D6avr3o2CAa8y1gg6oRdePDgBt1RftRcQlFRxNxP2HbksIJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hMJ+9wdJ; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version; b=ZGNuvBCeBMM+S2GUUD9R7MHriu8TnfwHW3QYTAy24W/H0UmYd9ope4dbjA4SbYLOmziBIbzVltqr/6+REb1yWGTQyRqycoyqfywhfir2J1r4X64ONUOFx7UHi29IZMfJevb7m0FJ5xe5MXLA+VI2+lgk4MEbsZVcCrV8QDOybUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=BHZvbysE; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hMJ+9wdJ"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57E9pIgJ025686;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BHZvbysE"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57E9Cekc013008;
 	Thu, 14 Aug 2025 12:47:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=zSjWoxu9a60
-	t732ZDS7e7j4XtZCfdf5TqHZAvAYYbpE=; b=hMJ+9wdJ6OG4amsNZa8iTi9ofXC
-	gYgpzssSm1nipfpuppaWbhkTxnon8pExFkHeRg5ABY9/S1P3zfmYYxPC7fjaGXwa
-	bJ+wZrVx+uIAVeZByT7U2PbNUCoZoFQYQv+aZnagauBBLEskbNeGCXkJ+gT50Zo4
-	6C0gESGFWPU6DGqqZV3E/Ebr/HGpPRzRqaZyS4AEKH9qyusx57mC6V/ocni5jhuT
-	jmTZr0LyKY4ajozjdfxGqEMAv+wftt6zJofr2pWaVBXiW7w8Fi/noR1mr1AELcvI
-	vFe76/y2TRFdWY3VzbjNRDlXDsZxfFddBLprOfIaen9sxNnPkANfl1x1JbQ==
+	:mime-version:references:subject:to; s=qcppdkim1; bh=nfVo/j7lLsM
+	8GVyC8GLfj+Rkk4HmIcZ2S8SsXA8CBTg=; b=BHZvbysEOJUc68OAElKGhm4nrNb
+	CbyYdyiBQA6HKzUcH7+2PBHRg7SoqUg3gKDkvPFGXGr146m+bqWFe7StXNT+76ce
+	FifOosSgQDbU7MSj0jUwtfO77GCOfUmvxrMcu7ewQv+B7dt0LFWd9MN3HrDLENNd
+	KKDB4yFmgumXuyENz3QE+JrSnC+HZFv3FJqrt1WsCeTedyQP0rPNqiMg3dZ3XTFN
+	Sehvhe5y1VdmmeuGopzOo9derO12cMACfzoAknceEYx9EiO/YQPUmxj6FXkFvl96
+	yU7YxoWn35Yi6kWKHGJtG15oKicswTtkCVee9AmsE+mi257kdCqoag7P/dA==
 Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48dy3gfkv8-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48ffq6uj4c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 14 Aug 2025 12:47:10 +0000 (GMT)
 Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 57ECl8HD028100;
+	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 57ECl8d6028115;
 	Thu, 14 Aug 2025 12:47:08 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 48dydmgwqm-1
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 48dydmgwqn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 14 Aug 2025 12:47:08 +0000
 Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57ECl8Ce028091;
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57ECl8tr028088;
 	Thu, 14 Aug 2025 12:47:08 GMT
 Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 57ECl7G5028087
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 57ECl7Yf028084
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 14 Aug 2025 12:47:08 +0000
 Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
-	id 08AC922C1D; Thu, 14 Aug 2025 20:47:07 +0800 (CST)
+	id 1120322C31; Thu, 14 Aug 2025 20:47:07 +0800 (CST)
 From: Shuai Zhang <quic_shuaz@quicinc.com>
 To: linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org
 Cc: quic_bt@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
-Subject: [PATCH v4 2/4] driver: bluetooth: hci_qca: fix host IBS state after SSR
-Date: Thu, 14 Aug 2025 20:47:02 +0800
-Message-Id: <20250814124704.2531811-3-quic_shuaz@quicinc.com>
+Subject: [PATCH v4 4/4] driver: bluetooth: hci_qca: SSR(SubSystem Restart)process failed due to tx_idle_timer timeout
+Date: Thu, 14 Aug 2025 20:47:04 +0800
+Message-Id: <20250814124704.2531811-5-quic_shuaz@quicinc.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250814124704.2531811-1-quic_shuaz@quicinc.com>
 References: <20250814124704.2531811-1-quic_shuaz@quicinc.com>
@@ -68,56 +68,62 @@ X-QCInternal: smtphost
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=X4lSKHTe c=1 sm=1 tr=0 ts=689ddace cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODExMDA3NSBTYWx0ZWRfX1jObJou/U+7J
+ RszavhmLNq2grsVyeJtOnCGZyvcOY8Wn7ooDhLO8Ph5dKgYCSdfmVzVMTSOPzW6lCVat8G0IA5o
+ RrkRdq96dbUc/pEinhcHBZGks0QJ4qzftYJVtRZRksop7f+ntp+coTy7XCm8299X5TIIACN3Jew
+ 5J3jaccZryv9+1Xci+1K4c56kzxtGIy+m40Zl9a4mBVTAJrLsL/szPjGJ83t3doXMm/ry+N9iXr
+ Yf6svbSlwo/tmGL/dUKgMn0hlQ01d109H98UzifxSwHdv9Kyzdlk7ROZ+XkKtGcCLPoPQklXKCa
+ Gy8zHCQsV2vBrp4dn5nxfzj6n4Q8onKgp3HQWA23bH3/t4p7Vof0na/aYqUCY7tm58u847JYdV8
+ kaPeoalw
+X-Authority-Analysis: v=2.4 cv=TLZFS0la c=1 sm=1 tr=0 ts=689ddace cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8 a=AQ13XcH8FaIGztzd-yoA:9
+ a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8 a=7-08G_DUf5nQLP0U7KQA:9
  a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA5MDAzMSBTYWx0ZWRfX83PwwOGhrt5t
- 9cVb4Q2YPStK2VdqpOZ+IZBuB3i0Fb555RpLhzNjHeXjijzroQH9QAD28LTcdSlHnNnwTrXxOwN
- urPuZphmM2RCesWNNNq2wh0J4np8oYniNWREwBXLVFjqZM4bOKz9cAEqZGjIRK+pAuu0J335QCC
- zST4m3JdQCWUZV9+4OWBLqE+ldrbdIV+S9tCAfXAZRDdqqsOprbsyzR5ZD3+s1Gem5Sh1iwNRE8
- BZeHxJ/e7uTefSEegX4uZ02Hl2ZrwAtyVcryUr29yqwr/TiEBU83j7JuSuTLkpXHZxkGf5GoReg
- 5U1csYS57z7qy0Y/EtTaEzYEz5ciIUHD1wHlyZ1kVcfgASPQ+hHQlMw2QBuAfoL4N3C1z0XhZG+
- 13iW05+j
-X-Proofpoint-GUID: MGhj4oLhkXhFNEiiG9tWgK-cbP3AUygY
-X-Proofpoint-ORIG-GUID: MGhj4oLhkXhFNEiiG9tWgK-cbP3AUygY
+X-Proofpoint-GUID: wpPFtmvpi4QsXYcdrAbSKGzL2wPOXxHR
+X-Proofpoint-ORIG-GUID: wpPFtmvpi4QsXYcdrAbSKGzL2wPOXxHR
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 clxscore=1015 malwarescore=0 adultscore=0
- spamscore=0 bulkscore=0 suspectscore=0 impostorscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508090031
+ clxscore=1015 phishscore=0 malwarescore=0 spamscore=0 priorityscore=1501
+ bulkscore=0 adultscore=0 impostorscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508110075
 
-After SSR, host will not download the firmware, causing
-controller to remain in the IBS_WAKE state. Host needs
-to synchronize with the controller to maintain proper operation.
+When the SSR (Sub-System Restart) duration exceeds 2 seconds, it triggers
+host tx_idle_timeout, which sets host TX state to sleep. due to the
+hardware pulling up bt_en, the firmware is not downloaded after the SSR.
+As a result, the controller does not enter sleep mode. Consequently,
+when the host sends a command afterward, it sends 0xFD to the controller,
+but the controller does not respond, leading to a command timeout.
+
+So reset tx_idle_timer after SSR to prevent host enter TX IBS_Sloeep mode.
 
 Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
 ---
- drivers/bluetooth/hci_qca.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/bluetooth/hci_qca.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 91009c6a7..d37cd2368 100644
+index 1f7c1d621..660be5e11 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -1660,10 +1660,14 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 	 * QCA_IBS_DISABLED flags cannot be cleared, which leads to a reset
- 	 * command timeout.
- 	 * Add an msleep delay to ensure controller completes the SSR process.
-+	 *
-+	 * Host will not download the firmware after SSR, controller to remain
-+	 * in the IBS_WAKE state, and the host needs to synchronize with it
- 	 */
+@@ -1669,6 +1669,15 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
  	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
  		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
  		clear_bit(QCA_IBS_DISABLED, &qca->flags);
-+		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
++		/*
++		 * When the SSR (Sub-System Restart) duration exceeds 2 seconds,
++		 * it triggers host tx_idle_delay, which sets host TX state
++		 * to sleep. Reset tx_idle_timer after SSR to prevent
++		 * host enter TX IBS_Sloeep mode.
++		 */
++		mod_timer(&qca->tx_idle_timer, jiffies +
++				  msecs_to_jiffies(qca->tx_idle_delay));
++
+ 		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
+ 		qca->memdump_state = QCA_MEMDUMP_IDLE;
  		msleep(50);
- 	}
- 
 -- 
 2.34.1
 
