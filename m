@@ -1,153 +1,192 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713111E531
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 03:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAA41FE47C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 04:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.23.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755141975; cv=none; b=dMctnOcDtAhUujEqJBgg+nGB+QZvLukbCVTdrK0Qsc9/ehoqzbazYeAedoHEAHv7Qvz1w13uYCwGpfLmlkvEIJEG9iSrYhMbYL162y+1+COgo50deARFLOA+fBrMO6XCzrHEwKqBs7cWrKEDvKzCYLQGyLuF6lvr//5LLjJnWa8=
+	t=1755146357; cv=none; b=Mhggq0nVZdUsE8k2+GQ/lZnljRKTaqyaR6SfMrgAQ6M+4uJuAmo53HKUHEza0MQmkZ03CFr37SmYhIJfFHv0ZJz7diIArbCIR+YYnRrxYqSw/Zybd9s7XVFweePQ4SjVn80cMb5YwRB+CCRZi7u1gZxL/X3dILB9odIRFm4RWy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755141975; c=relaxed/simple;
-	bh=OfN3v6M3qENQADCGFj6Ox2t8xhQvBvhb5/3OMearQds=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RGjj1VjKeOhwEgBwoh1povk+Z4EETJLq+NoZCmu5Pv09Q1hz/nzudbxTQ40hInvPE3ZbfCl4ICWdmlEk/1jYBmX5YCoFg+zvHMAa8JRAmSx7Uop5SiI2BVHAdHcJdQbvelvMlCIrQNNa+QCpMdLViHCnoRrO02/F9TMai+XyoPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f0omQoJd; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f0omQoJd"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3e571d400daso2236825ab.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Aug 2025 20:26:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755141973; x=1755746773; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XFkEW63pfLYHPC/IR9byoWumpL3fbpo5dfA/W/pPnXg=;
-        b=f0omQoJda9e2jMwTOVmYxoqdaccE/79S7CtYWUAvnm5lxexIDiKBVX7F4Sm4dFNGs+
-         /4HVJqLoOoyjW18Q/SxqvHK0jJF8fX2UJEfXsKEnZlcWRuzQuXTndlwa1vM0pZvRPFLR
-         h224rqj6f8I2uJArHltJCR1tkrTRa3EhsntlyyI8px7JlP1VQ7UC+pxMLnnzXueb0wGH
-         0tHJe7v0H8yN8q5Fyiwz42+Qe6QIDA+ToTVhKNj1qe5sHEvtQsRCOISz9KfHKHvA9IGf
-         t3taxWWqR8lpY3fQhQ+dAylVvUaPaKASftbcK1h6TsGZ348xhn6HdCKRsx9V+faeA0BH
-         QokQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755141973; x=1755746773;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XFkEW63pfLYHPC/IR9byoWumpL3fbpo5dfA/W/pPnXg=;
-        b=lUn182SIASTsWQQGw44oGLI4tu+iEwZ4N7+m3MIn6FL0mhCVYvyFPwuTNLdbIf6TwL
-         vGGW5y/MmkS8z/rrKMG3QJ/aCcxO+rDcuPpM7Rjnkksq728CxrJ1QMhHCXDh7A2Fpyrj
-         VDVrvJuQ978P8+PQ0TOJ0BDLlkzXMXnitcufpAeyluTxlUBW0udTamcbXM9BnjN7w2Pp
-         IEZ4AG+G05RNtWm5Eee3IB7vh0eIR6lqQ0c6kHOUkkZ3hcWqhEZgQojrwHVRk/CDvhcx
-         NRMJberITH+QRXf7cD7nDFVEtGYd2/BkGugTGLjLovZiS6ULNlSWfDmRy/poAJIPuLLi
-         DMUQ==
-X-Gm-Message-State: AOJu0YxkGbBwDkO97//P1VXy2PakYsQk/jVAk0kfgE82EDh3kbaD7Ohx
-	vOOHccyCPh8qI15TAGYMxq8TN1z0kruy8svJY+g96Uy39qOrjiDRHjcfklLG6g==
-X-Gm-Gg: ASbGnctiM/qL9VwFjhiQ4Q3NT3/QptGGn+f8eYVDJP0TNTWN0jS7cDf+N4Ne6C6/ySX
-	XCE9dSC4umH7CBi7+qjOhPUx0WfdVowRwi2HQyG+nB3pxaF9kX51QnfmLhYUCRAagDKrsqERtTX
-	Fewlcwx7w2Ln1OvqHDkZHYks9rAHhU4GlAUpcw40vVPUMlV6HzM2JvgBKIf4Dx5BWsYVRz8du8J
-	HWIqOYdW4OaPnOGRJ8cmZZmOH9N8yxYALtcIysJPQJbN+EyRMWA1HJq7zltTfsrdC+Lud61Dbnt
-	5bkEXMELxWMbl8m0E5y0o+r6szH17jIF08VPrqouFsQ+KwhAHE1DR6dRVpXKoWweTUt2Vg+7xYV
-	3IQmJw86g74EQ+tOTQvRE4JwDlAXDMPREaBSSV4o=
-X-Google-Smtp-Source: AGHT+IHB9jxbaiUoszEhQBM4lMrfvZNqzhTwVEeypRDkm3mncJyBCx2IbWDqq/Ec0jLy52WrrhoVQA==
-X-Received: by 2002:a05:6e02:1749:b0:3e5:4eb2:73db with SMTP id e9e14a558f8ab-3e57075d074mr31456455ab.5.1755141973180;
-        Wed, 13 Aug 2025 20:26:13 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.201.32])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50ae997ea94sm3994629173.1.2025.08.13.20.26.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 20:26:12 -0700 (PDT)
-Message-ID: <689d5754.050a0220.163d14.6932@mx.google.com>
-Date: Wed, 13 Aug 2025 20:26:12 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6986690677628852677=="
+	s=arc-20240116; t=1755146357; c=relaxed/simple;
+	bh=t1hh/Jw0YAv0hUSy9t/Xv7c8RObia1W8amBTjd34shY=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=PWziOm94Nc+xnPkTVBTU7coYlsRTd53Ltw7e7dwSIpBOqCnrLJah+OJ6lvQ3706x2xLbpuQTRdkSjwCu2FsN0w4dX9jYxSeJkYvnOfYKUSAHdOqsrGMlcadkp1g68ryVhuMFapXeo+cQhLJgrA0nhKTZ2q4FfmlkFfdnTb1tiLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.23.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
+Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
+	by 156.147.23.52 with ESMTP; 14 Aug 2025 13:39:04 +0900
+X-Original-SENDERIP: 156.147.1.151
+X-Original-MAILFROM: chanho.min@lge.com
+Received: from unknown (HELO localhost.localdomain) (10.178.31.96)
+	by 156.147.1.151 with ESMTP; 14 Aug 2025 13:39:04 +0900
+X-Original-SENDERIP: 10.178.31.96
+X-Original-MAILFROM: chanho.min@lge.com
+From: Chanho Min <chanho.min@lge.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gunho.lee@lge.com,
+	stable@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Chanho Min <chanho.min@lge.com>
+Subject: [PATCH] Bluetooth: fix use-after-free in device_for_each_child()
+Date: Thu, 14 Aug 2025 13:38:32 +0900
+Message-Id: <20250814043832.8767-1-chanho.min@lge.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, liujiajia@kylinos.cn
-Subject: RE: Bluetooth: btrtl: fix rtl_dump.fw_version for firmware v2
-In-Reply-To: <20250814025552.10627-1-liujiajia@kylinos.cn>
-References: <20250814025552.10627-1-liujiajia@kylinos.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============6986690677628852677==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit 27aabf27fd014ae037cc179c61b0bee7cff55b3d ]
 
-Dear submitter,
+Syzbot has reported the following KASAN splat:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=991280
+BUG: KASAN: slab-use-after-free in device_for_each_child+0x18f/0x1a0
+Read of size 8 at addr ffff88801f605308 by task kbnepd bnep0/4980
 
----Test result---
+CPU: 0 UID: 0 PID: 4980 Comm: kbnepd bnep0 Not tainted 6.12.0-rc4-00161-gae90f6a6170d #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x100/0x190
+ ? device_for_each_child+0x18f/0x1a0
+ print_report+0x13a/0x4cb
+ ? __virt_addr_valid+0x5e/0x590
+ ? __phys_addr+0xc6/0x150
+ ? device_for_each_child+0x18f/0x1a0
+ kasan_report+0xda/0x110
+ ? device_for_each_child+0x18f/0x1a0
+ ? __pfx_dev_memalloc_noio+0x10/0x10
+ device_for_each_child+0x18f/0x1a0
+ ? __pfx_device_for_each_child+0x10/0x10
+ pm_runtime_set_memalloc_noio+0xf2/0x180
+ netdev_unregister_kobject+0x1ed/0x270
+ unregister_netdevice_many_notify+0x123c/0x1d80
+ ? __mutex_trylock_common+0xde/0x250
+ ? __pfx_unregister_netdevice_many_notify+0x10/0x10
+ ? trace_contention_end+0xe6/0x140
+ ? __mutex_lock+0x4e7/0x8f0
+ ? __pfx_lock_acquire.part.0+0x10/0x10
+ ? rcu_is_watching+0x12/0xc0
+ ? unregister_netdev+0x12/0x30
+ unregister_netdevice_queue+0x30d/0x3f0
+ ? __pfx_unregister_netdevice_queue+0x10/0x10
+ ? __pfx_down_write+0x10/0x10
+ unregister_netdev+0x1c/0x30
+ bnep_session+0x1fb3/0x2ab0
+ ? __pfx_bnep_session+0x10/0x10
+ ? __pfx_lock_release+0x10/0x10
+ ? __pfx_woken_wake_function+0x10/0x10
+ ? __kthread_parkme+0x132/0x200
+ ? __pfx_bnep_session+0x10/0x10
+ ? kthread+0x13a/0x370
+ ? __pfx_bnep_session+0x10/0x10
+ kthread+0x2b7/0x370
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x48/0x80
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
 
-Test Summary:
-CheckPatch                    PENDING   0.31 seconds
-GitLint                       PENDING   0.25 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      23.71 seconds
-CheckAllWarning               PASS      26.02 seconds
-CheckSparse                   PASS      29.35 seconds
-BuildKernel32                 PASS      23.70 seconds
-TestRunnerSetup               PASS      468.21 seconds
-TestRunner_l2cap-tester       PASS      24.54 seconds
-TestRunner_iso-tester         PASS      36.30 seconds
-TestRunner_bnep-tester        PASS      5.85 seconds
-TestRunner_mgmt-tester        FAIL      127.16 seconds
-TestRunner_rfcomm-tester      PASS      9.21 seconds
-TestRunner_sco-tester         PASS      14.66 seconds
-TestRunner_ioctl-tester       PASS      9.76 seconds
-TestRunner_mesh-tester        FAIL      11.40 seconds
-TestRunner_smp-tester         PASS      8.44 seconds
-TestRunner_userchan-tester    PASS      6.12 seconds
-IncrementalBuild              PENDING   0.45 seconds
+Allocated by task 4974:
+ kasan_save_stack+0x30/0x50
+ kasan_save_track+0x14/0x30
+ __kasan_kmalloc+0xaa/0xb0
+ __kmalloc_noprof+0x1d1/0x440
+ hci_alloc_dev_priv+0x1d/0x2820
+ __vhci_create_device+0xef/0x7d0
+ vhci_write+0x2c7/0x480
+ vfs_write+0x6a0/0xfc0
+ ksys_write+0x12f/0x260
+ do_syscall_64+0xc7/0x250
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+Freed by task 4979:
+ kasan_save_stack+0x30/0x50
+ kasan_save_track+0x14/0x30
+ kasan_save_free_info+0x3b/0x60
+ __kasan_slab_free+0x4f/0x70
+ kfree+0x141/0x490
+ hci_release_dev+0x4d9/0x600
+ bt_host_release+0x6a/0xb0
+ device_release+0xa4/0x240
+ kobject_put+0x1ec/0x5a0
+ put_device+0x1f/0x30
+ vhci_release+0x81/0xf0
+ __fput+0x3f6/0xb30
+ task_work_run+0x151/0x250
+ do_exit+0xa79/0x2c30
+ do_group_exit+0xd5/0x2a0
+ get_signal+0x1fcd/0x2210
+ arch_do_signal_or_restart+0x93/0x780
+ syscall_exit_to_user_mode+0x140/0x290
+ do_syscall_64+0xd4/0x250
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+In 'hci_conn_del_sysfs()', 'device_unregister()' may be called when
+an underlying (kobject) reference counter is greater than 1. This
+means that reparenting (happened when the device is actually freed)
+is delayed and, during that delay, parent controller device (hciX)
+may be deleted. Since the latter may create a dangling pointer to
+freed parent, avoid that scenario by reparenting to NULL explicitly.
 
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-Add Ext Advertising - Success 22 (LE -> off, Remove) Failed       0.134 seconds
-Set Device ID - Power off and Power on               Failed       0.124 seconds
-Set Device ID - SSP off and Power on                 Failed       0.122 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.227 seconds
-Mesh - Send cancel - 2                               Timed out    1.998 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Cc: stable@vger.kernel.org # 5.4
+Reported-by: syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
+Tested-by: syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6cf5652d3df49fae2e3f
+Fixes: a85fb91e3d72 ("Bluetooth: Fix double free in hci_conn_cleanup")
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+[ chanho: Backported from v5.10.y to v5.4.y. device_find_any_child() is not
+supported in v5.4.y, so changed to use device_find_child() with __match_any ]
+Signed-off-by: Chanho Min <chanho.min@lge.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_sysfs.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-
---===============6986690677628852677==--
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 266112c960ee8..f8e7b0ba2d273 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -19,14 +19,9 @@ static const struct device_type bt_link = {
+ 	.release = bt_link_release,
+ };
+ 
+-/*
+- * The rfcomm tty device will possibly retain even when conn
+- * is down, and sysfs doesn't support move zombie device,
+- * so we should move the device before conn device is destroyed.
+- */
+-static int __match_tty(struct device *dev, void *data)
++static int __match_any(struct device *dev, void *unused)
+ {
+-	return !strncmp(dev_name(dev), "rfcomm", 6);
++	return 1;
+ }
+ 
+ void hci_conn_init_sysfs(struct hci_conn *conn)
+@@ -71,10 +66,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
+ 		return;
+ 	}
+ 
++	/* If there are devices using the connection as parent reset it to NULL
++	 * before unregistering the device.
++	 */
+ 	while (1) {
+ 		struct device *dev;
+-
+-		dev = device_find_child(&conn->dev, NULL, __match_tty);
++		dev = device_find_child(&conn->dev, NULL, __match_any);
+ 		if (!dev)
+ 			break;
+ 		device_move(dev, NULL, DPM_ORDER_DEV_LAST);
