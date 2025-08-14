@@ -1,78 +1,164 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B4921B9CD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 15:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4E221D3CC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 16:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755186931; cv=none; b=lB8SlMayIWu0S/glS54e4xRzHVQ8y5FZLMYel2VeQSWGnw9b+UJuYJZ1et4Ps3MQaYbthXJssecohWgT5tU4+9srh0cQRqGzuNVvsU8xfDfy1Jsp47uNpAkZbgk7yaIRtZPof69J6yLb1bwFTUurD2T51pMCxYdq5/Y0bt4YcfU=
+	t=1755188702; cv=none; b=VD2cC2ommLQQxWEZ9uYMaN5QqPK4pLYd20xn9HGpNKBPL4w8uZy1c0kbM2o5iwrYh8+xuN4fe2UyLL2/VzlVuIShAcSX8szvpw27fDrgiM3QPhR7ClL5f8hGbybG6AqEqXmkPOZ4ecpPb8Yfj9XWCN3YmMRAMQTXzwO4e7iO75k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755186931; c=relaxed/simple;
-	bh=ltkkKpz3UDubhDPGIExnVB7Qy0QbkW+TrnFANuGTPUE=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hbeaV+97z9+H6p8rClOyaBaVHeAGrteTkMQKa9R0ZnFBtWQUYDwMChkgqeekwTQfGAyDaygNlvTFUrnebxppE8zT5WFcbA8End7GBU/vNMNMEn8P7LMe0Pf7fc6yFJC6KSo3fxurrEB68nSDqnzDIPFP8SSUOM3h1oUdBqczXIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=WmA4GtZv; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1755188702; c=relaxed/simple;
+	bh=AfjMKMR7GUIFA5bMtjh1ZcoJpcZWOwcXe/fY+6syUsM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=A8azzBsSnxL+RMFLIN5sVIdeE3Hw8qnc8CnFdxuHYK5YtQBfZATKzywo6KIDUnGwCgKzW/uw/4pKtczU/v+0v71Q0EHjfZVHVLsLTZCMC6P0o2hpOdCmk5mWG+xoas0iUoU88Y5vWlhkIBTyTdEkNlviCCHyDzkKucv62eyS9I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lI186iqH; arc=none smtp.client-ip=209.85.217.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="WmA4GtZv"
-Received: from github.com (hubbernetes-node-c64f7f6.ac4-iad.github.net [10.52.183.52])
-	by smtp.github.com (Postfix) with ESMTPA id D09A1700FFB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 08:55:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1755186928;
-	bh=bc5BHT6ltUsipRSDMU3ZrkLcvA5PydRS9nJjZKz08gI=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=WmA4GtZvzbSOXCqx1QuhSKZqkiblDWVS8m8Ux9H9luukD0rIFAdT9NAUhWi9tBF6k
-	 6CQ3b3oSvajoPDALaHUfBMrxBjbFP4EvBoVqsglVv4q9mqYqOI0a8mh8lBAm7EWGLM
-	 hhIU4SL/Bf/IIs2LO+Aky4dYCINdFRISmIzfdLdg=
-Date: Thu, 14 Aug 2025 08:55:28 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lI186iqH"
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-50f88ed81c8so739787137.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 09:25:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755188698; x=1755793498; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4dNRiTGWmU18H5p9GnEBdec672Nm+/VldnwzLsOiWlY=;
+        b=lI186iqHWdpvr+BzB3WRiVenkel45OHhBEYIFC+u94GcHNjurkpgV4w+Xc/K/Ww+4a
+         PADlp+kCnolXRbYaby0azUF2xJEAJV4fw1tykOEPV1O5tKYQGte9WfoZH/sPI/hhUkpy
+         qdVeg84PZqj7KelI9jj+NC+t3SXgSXRrk8188kdwUT1xOacy1nS//5UtlwO4LAmfpzvv
+         gLMTHsisA4x0rP0BnsVxh0CoFlqLBWf8x0jC/AnBqu3HsWTH7t3de+Qu2o9MaVy9nmvn
+         ZZaYrSVFL/BDj+ox0l5zGdEKwgsiIes1GOWuNdCdxpDQsgAqJM68OzjzCXLcyTg2aB1H
+         96jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755188698; x=1755793498;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4dNRiTGWmU18H5p9GnEBdec672Nm+/VldnwzLsOiWlY=;
+        b=dVrG/Pp8BBGNliw0C+tU9IlNdC/4lDAja2lrecdj5zxeHBJg4ZL8UmdXWP6K83AqLu
+         0k82NtfZn8M5fAprmF8x584wQC0LM9rPPgNx7Uw+SdrClEQcgOglI9r5tQZtpDudvxpR
+         JXmiq4D24D7pt4LZzPi55JXMPF44vJFQh7SEdCLFq6HOtM1NQjW5VAKijZrLjlLu6FoQ
+         QyUzWgcSriogbJHx+I2mfhWa+Isil27hLGjwr+CcdPZcCiZL72auiAwutx2EF/qTikQO
+         wJIh0bOKax1S+uGjl1Ez7FuHApDMGNXUbHJ4VRv7UMjPVzjfOgbhla5sBGSkyEq3WQEJ
+         /WDQ==
+X-Gm-Message-State: AOJu0Yw3Mc+jcBRsQfrC+FVdUkJyWe9vB+w9dkGFy3iXnace3gPp8Vbv
+	b6wTlbBKcxbhiKXDJYQrgD5/JY/kJt8F+ky4zw2NpQowc38awbDMtDVLSOZIwzAA
+X-Gm-Gg: ASbGncuU7A1XNew9PcTleG8hAFAof+oKt8o5ZQ5JjaM8ynoOH27xms3E4R4prmZORCk
+	haiYv6rXFOtjFNdZTbtDbty7RCQMD+mwivfabZ719lNEmSC8PFu7sZ5KrTBy9xiOBApp0a9qUNG
+	hdfYpHiNQSUZuHSQFs4QVNE0DFiDgbqLG0DhcLSZmLG1DeCQwatjhderhQaa4YALYKVYJwHGi4f
+	Hyc5CUJAjwdKKeen2PH5nx1VJvOe+w7Zr+9pJmYNVk+OdCvday24C4/QVN8fVucIzeNskw21o0x
+	4JZO2tfQTl546brGlJs9/J2g8YfsNVzekMuehpU8VDQmiRsLxexgGE9hJ/qGCCPI8ePpg7OZUdb
+	Np1zPrTNucHQUv06WDZmcNvuCyw5uGynAF08SImBD/Ld67uBvG8ChXamIuYyqdaDe
+X-Google-Smtp-Source: AGHT+IGvwq5Lh1jihtEuir/uMLyMIVviACJlUZSNs2zuUhmI1vhqk7Ff2MRuHVRN0sfhf1E1djwwKw==
+X-Received: by 2002:a05:6102:1623:b0:50b:de14:ab9 with SMTP id ada2fe7eead31-50feb502fa8mr1582849137.27.1755188698090;
+        Thu, 14 Aug 2025 09:24:58 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-88e57924cb0sm969037241.8.2025.08.14.09.24.56
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 09:24:57 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/991602/000000-085492@github.com>
-Subject: [bluez/bluez] 085492: monitor: Print unacked frame when releasing
- them
+Subject: [PATCH v5 1/6] Bluetooth: hci_core: Fix not accounting for BIS/CIS/PA links separately
+Date: Thu, 14 Aug 2025 12:24:43 -0400
+Message-ID: <20250814162448.124616-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/991602
-  Home:   https://github.com/bluez/bluez
-  Commit: 08549296a1caf59847277b33d674ccc1566cae5d
-      https://github.com/bluez/bluez/commit/08549296a1caf59847277b33d674ccc1566cae5d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-08-14 (Thu, 14 Aug 2025)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M monitor/packet.c
+This fixes the likes of hci_conn_num(CIS_LINK) returning the total of
+ISO connection which includes BIS_LINK as well, so this splits the
+iso_num into each link type and introduces hci_iso_num that can be used
+in places where the total number of ISO connection still needs to be
+used.
 
-  Log Message:
-  -----------
-  monitor: Print unacked frame when releasing them
+Fixes: 23205562ffc8 ("Bluetooth: separate CIS_LINK and BIS_LINK link types")
+Fixes: a7bcffc673de ("Bluetooth: Add PA_LINK to distinguish BIG sync and PA sync connections")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
-This attempts to print the frame number of frames considered unacked
-(missing NOCP):
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index bb30bde6f0e8..6906af7a8f24 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -129,7 +129,9 @@ struct hci_conn_hash {
+ 	struct list_head list;
+ 	unsigned int     acl_num;
+ 	unsigned int     sco_num;
+-	unsigned int     iso_num;
++	unsigned int     cis_num;
++	unsigned int     bis_num;
++	unsigned int     pa_num;
+ 	unsigned int     le_num;
+ 	unsigned int     le_num_peripheral;
+ };
+@@ -1014,9 +1016,13 @@ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
+ 		h->sco_num++;
+ 		break;
+ 	case CIS_LINK:
++		h->cis_num++;
++		break;
+ 	case BIS_LINK:
++		h->bis_num++;
++		break;
+ 	case PA_LINK:
+-		h->iso_num++;
++		h->pa_num++;
+ 		break;
+ 	}
+ }
+@@ -1042,9 +1048,13 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
+ 		h->sco_num--;
+ 		break;
+ 	case CIS_LINK:
++		h->cis_num--;
++		break;
+ 	case BIS_LINK:
++		h->bis_num--;
++		break;
+ 	case PA_LINK:
+-		h->iso_num--;
++		h->pa_num--;
+ 		break;
+ 	}
+ }
+@@ -1061,9 +1071,11 @@ static inline unsigned int hci_conn_num(struct hci_dev *hdev, __u8 type)
+ 	case ESCO_LINK:
+ 		return h->sco_num;
+ 	case CIS_LINK:
++		return h->cis_num;
+ 	case BIS_LINK:
++		return h->bis_num;
+ 	case PA_LINK:
+-		return h->iso_num;
++		return h->pa_num;
+ 	default:
+ 		return 0;
+ 	}
+@@ -1073,7 +1085,15 @@ static inline unsigned int hci_conn_count(struct hci_dev *hdev)
+ {
+ 	struct hci_conn_hash *c = &hdev->conn_hash;
+ 
+-	return c->acl_num + c->sco_num + c->le_num + c->iso_num;
++	return c->acl_num + c->sco_num + c->le_num + c->cis_num + c->bis_num +
++		c->pa_num;
++}
++
++static inline unsigned int hci_iso_count(struct hci_dev *hdev)
++{
++	struct hci_conn_hash *c = &hdev->conn_hash;
++
++	return c->cis_num + c->bis_num;
+ }
+ 
+ static inline bool hci_conn_valid(struct hci_dev *hdev, struct hci_conn *conn)
+-- 
+2.50.1
 
-> HCI Event: Disconnect Complete (0x05) plen 4
-        Status: Success (0x00)
-        Handle: 2304 Address: XX:XX:XX:XX:XX:XX
-        Reason: Connection Terminated By Local Host (0x16)
-        [0]#102132 unacked
-        [1]#102137 unacked
-        [2]#102139 unacked
-        [3]#102141 unacked
-        [4]#102143 unacked
-        [5]#102145 unacked
-        [6]#102147 unacked
-        [7]#102150 unacked
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
