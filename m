@@ -1,69 +1,68 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4477E23AE9B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 15:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD5B23E347
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 15:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755186145; cv=none; b=grMQhvno8tGDk+9cGI7kRpWn0I3+vLQanmtmL5Af3jJ7uKczoMZ1qe73N9n063WsHxR7/WLYE2wTWtp5Z/awSg9GiUh0EcUF5oE0Ey0kNfJplljgGg1MVY8MH9eEx+0ewI/LOb8Q5Tvf1zLw0q7dQZ7PnalQjU5xknYzSvX1dno=
+	t=1755186148; cv=none; b=XTBt3sxCBKXCfMajbBluBsyFMyzuhG4l2Mafjsu+MNiQ+JNrh2F8kcieIIGxoPe6ocGR3NpBQ5KzMasPd7PHDl8C2dnRGEAj2HzvVMb3uSMOT49o17cg4Hy07lgj2VWP54WzRf6QobbwL/hTugrSyiKzv1+PrRan0mA6MOm5sFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755186145; c=relaxed/simple;
-	bh=E+YD4cmFS1nK6ldvQJ9k2q6MrbCXy/inPbO5OJERXXI=;
+	s=arc-20240116; t=1755186148; c=relaxed/simple;
+	bh=nmJBqqrMUhna8gH7yq6B/DK6VVMLwArNn0KURkhxZ8o=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oOj9T2ld6oBs1YLVC+HOqJc1GUiUCXlQyjgtXfumcCXbvK+7GK8mgfHTyDx/y99HA754348Yvnk4Zw7sizDzbH7nfJ36HhwTpFrveSS7cI//3voiIN01AMRT/28sZFlgJG0JNrDq0+pvZUAYhXqgfY1DYcr9tBTBwXUamJZZ2QQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RP46fSoc; arc=none smtp.client-ip=209.85.221.181
+	 MIME-Version; b=MzzSQ3/ptTm7F5GW00vhjGVOKf8w6mWhC0srqRh3TDBgYbNpdcY0i5sB2eK3TSCKq53qD3c0T7PwVYpnrdWaC5fBXqxNPk6FFDs6ytY9KodAR0hJh6+4Y+KHeSc5BTkpbtjDmUrkCXimMJH5lWXmAmBY3zTX29BInuc7TijKwNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XC33wlXP; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RP46fSoc"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-53b174ac3e5so435508e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 08:42:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XC33wlXP"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-53b17378b74so435600e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 08:42:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755186142; x=1755790942; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755186144; x=1755790944; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=15dhquDye7gWzM42UWDF9E9YFUSXnJEtKVAz8ZdJoxg=;
-        b=RP46fSoc4aVX3/o8G4dG55B4JIABRet7i5MBD3YVwKktPe6YPzw7py2bMvJ9x+6age
-         sQr0ARE6x4xjgJohC0Erpv4hWGBzD/InLILSO2CpH4ZKXH7haZpKu9qzsCmV7GJGhX13
-         gbh7OF4D4XycxCTPdwtYz+M/jZDcIsuBs5LCvXwD/qjEc+Q54k47VLjxE13VQhsL4HuA
-         K8mMpeIN/f2DKEGM0MdWDy7jrtIXuuPolo3f0b28yWzuT5fi0zoMY2/Aj0iYkWoMdu6D
-         OCzjxqbzYcw96CHUVNMdAnSitq4ZzbyNU0TcqfdBE8GVS95USNGAsqf9YTeZiOC3kwO7
-         1R5A==
+        bh=EW+qIXFO40F6CXy4zPpsNBbJwCf0Y5H4WKkRiATQjlw=;
+        b=XC33wlXPoMw9p4G2W/vafFdA50M4SLc4BB33KVuZQrghQjv8lCcbDTidCIdBv8Q1OE
+         AI0KFw/ZG6HaJNLs+i9RPgm7MXGf82Eb9+iw20N6ggu+1K6u/ICPcP+E4ggLpevE/18M
+         0yLT7qizandVAJQ3W9uhfvr0sht6usOhly8XzO9e/kTfm+MKLUumXf4uTW/DbuX2Cnmb
+         MaRukWL1NTcOsfHqynVUq2rpAEVeihskZxXgsqkhV6g5M0V/PINNv3sL1kyt240mzF+E
+         g0FOZX5PzYHcE6V+Dlc2LvAvqpGF+1ZviOsuXYvoE5nR+OrUBOSnWeMAdhFKTRmSpcca
+         OyHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755186142; x=1755790942;
+        d=1e100.net; s=20230601; t=1755186144; x=1755790944;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=15dhquDye7gWzM42UWDF9E9YFUSXnJEtKVAz8ZdJoxg=;
-        b=mP70bRF74hTzK3xib34v5wk6gFjH1DGlgUHtVTB4FXq+o2bCih2u1a4xhNJlZULywk
-         e46d39xqE21tMupfNQj8UrbMDwMLl5hUm5V2NMyuzsfGmUjitha8eO4wk72GGeANCvqb
-         YDiq6j/kXgbHuS3Z0mlrDK4I9LQeR6noXP1tDOdI22D689/SJJDQ6IA6AD4tc//cbkyM
-         063TOay5pXEXklskKUyDPe2YlVrQW/N/0P6cpvgdjf6h+SYV99xTm3XycIGBHdmz4i9b
-         h910XYv45Ifoyt5gL+C+ClIStb4s1BWguLqZHNWubtjPPH8qYMQAh5E35G7KfM6AFjJx
-         x5+w==
-X-Gm-Message-State: AOJu0Yxp2Wu1cdZdzbtelPFe5uyVjfpxGjLyAAv77dp1ndBsmIGQb3R1
-	/Na7WIENpx2W71Xgtf0+oMDLHTLOd7XsPPSEIgEPVnI8ovHdGVGSdbQ0Rs/DNBuE
-X-Gm-Gg: ASbGnct6dXLM549avThGlq4XmDYdLN2vLb9kjGcHyZdtlJCzdcXZc7C6zMvxJNaLebq
-	9i+q05AVCq2naucZGIje+mZhhcyoOC2t/eAdfTPN9n8ogCqa7zAfojukx1tW6NxJi17Vne81Dv5
-	a4XlqjjXpZnMs+PmDB19P9UE9Pna6r4dvbHW1ZMqNntmvQiTbsda4RWp8TVtsiLzEigyw/A5jdj
-	isOObnINxZNig+n63PwkmBDLAs6GY2uPxjNOqm8qd1qCCZtaA+kAHJaXbXEE7Jd61KoHP1aov3A
-	GiCF92cN88ziHhx1ImD/B8UaKqmZniGX7c5wQBrnhoUvOFTIdtc7g2zRcr1grWYzA5f7Rt/U/l6
-	iq/epSJn6XCvu+FUAyXovVhy4Bj86iJ1+M4EDxRrqVx3EcRKlqtNnFDdv3ozIgmsfjMznObs7vQ
-	Q=
-X-Google-Smtp-Source: AGHT+IEMoDsF0B+l2ZfMnrC4zF8XP0lPuqY1F8y8z6zUosYqbgd/qxqZfWITWdUJgYW9EJQqqzoCXw==
-X-Received: by 2002:a05:6122:2a4f:b0:530:5996:63a2 with SMTP id 71dfb90a1353d-53b18ab4bcfmr1328727e0c.7.1755186142595;
-        Thu, 14 Aug 2025 08:42:22 -0700 (PDT)
+        bh=EW+qIXFO40F6CXy4zPpsNBbJwCf0Y5H4WKkRiATQjlw=;
+        b=lz0ZXk7WbvsMoAou8QnaTuD66ft6BvOGyGirjNIq3EH+7PLXfnOVgGPmE6eEAK1KvU
+         n0RkFDEHv+EFt0gO5XQ8POx3mLjxORkNpnRDZIJAD93+3E/7eDgu3IuJdVuVDjVJkUup
+         2JeBrMOuAzuHVA9lZT8Fzl4hbmww46dccZ6x1eBJgj0eBzUHAFB4cLTll1wkoyj4pGWp
+         YZqYYkRELV31qPbVatgULZ0Yf3odhfDBu5UXVP9u0NhJQas36YObf2c/sQw9i+J49eN4
+         QtcnsstYvGxXCTAaGuNlBtXzfgCyTx8PN73bCK58velPV1HTiZGuxBX+A/KmRA8aL7bz
+         nI6A==
+X-Gm-Message-State: AOJu0YyCA+pzaRq0ZO+G0v4Ca0HiiZOha15ahGcRdM5huPfcWV2PeSUI
+	91ZhaFIHxgeHr6zqWYxdiH+HULPRCjyfVUe8yLVzQYeWOtk5J3JHgdwetB9q1/3W
+X-Gm-Gg: ASbGnctFZy1I8F7y/XUNbBHdySGiYNMlF1Zz64kucGvCC4huottqVyEUCouwvI9PSUM
+	l60HYiApGBIqESVLq3zEHGBYP0bTKKr3lzWVbKKamfJ3bfWlsv3pvwAVvAGMNoWscilSZVLdXJb
+	jg9Bk5VI047KW+/cJoJbUtWB9rZ1YtA+w3/pwkGTHxt4tgojUUdfEhBUCpA6TyEr837oibn/UiL
+	/iEcG6t64gArZGwNgGcIGhRRgJvEpCZri3HVmJToThc7OHRCWDQQc4MMnJ3qJ3KKZ8D6td67nYj
+	hRAqVdsRMZg909JICwZSVkvt7KmwaUn2lIgp/zUjrGVxLs3p/6BVxGIXhF7nDgWHcB9VECjZ3YO
+	99fPLurogiRH1Db+Mo+8UQ40lr+LgcG/f+oPO3ZdMdSIrQp/FFDjO93f0aNrd8PTP
+X-Google-Smtp-Source: AGHT+IFl1P1nqYhRPyedZBw3jebvjtFo0Q5Gx9wEm9yz9/AgosUR618nwdOab6He3kGbppg2WXjhWA==
+X-Received: by 2002:a05:6122:1e12:b0:539:1291:b03 with SMTP id 71dfb90a1353d-53b189af7d3mr1453495e0c.5.1755186144388;
+        Thu, 14 Aug 2025 08:42:24 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-539b01ae76asm4723431e0c.8.2025.08.14.08.42.20
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-539b01ae76asm4723431e0c.8.2025.08.14.08.42.22
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 08:42:21 -0700 (PDT)
+        Thu, 14 Aug 2025 08:42:23 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 3/5] Bluetooth: hci_conn: Make unacked packet handling more robust
-Date: Thu, 14 Aug 2025 11:42:06 -0400
-Message-ID: <20250814154208.8433-3-luiz.dentz@gmail.com>
+Subject: [PATCH v4 4/5] Bluetooth: ISO: Use sk_sndtimeo as conn_timeout
+Date: Thu, 14 Aug 2025 11:42:07 -0400
+Message-ID: <20250814154208.8433-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250814154208.8433-1-luiz.dentz@gmail.com>
 References: <20250814154208.8433-1-luiz.dentz@gmail.com>
@@ -77,84 +76,192 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This attempts to make unacked packet handling more robust by detecting
-if there are no connections left then restore all buffers of the
-respective pool.
+This aligns the usage of socket sk_sndtimeo as conn_timeout when
+initiating a connection and then use it when scheduling the
+resulting HCI command, similar to what has been done in bf98feea5b65
+("Bluetooth: hci_conn: Always use sk_timeo as conn_timeout").
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_conn.c | 41 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 33 insertions(+), 8 deletions(-)
+ include/net/bluetooth/hci_core.h | 10 ++++++----
+ net/bluetooth/hci_conn.c         | 20 ++++++++++++--------
+ net/bluetooth/iso.c              | 16 ++++++++++------
+ 3 files changed, 28 insertions(+), 18 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index bb30bde6f0e8..b060a6a76456 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1546,16 +1546,18 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 				 __u16 setting, struct bt_codec *codec,
+ 				 u16 timeout);
+ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+-			      __u8 dst_type, struct bt_iso_qos *qos);
++			      __u8 dst_type, struct bt_iso_qos *qos,
++			      u16 timeout);
+ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
+ 			      struct bt_iso_qos *qos,
+-			      __u8 base_len, __u8 *base);
++			      __u8 base_len, __u8 *base, u16 timeout);
+ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+-				 __u8 dst_type, struct bt_iso_qos *qos);
++				 __u8 dst_type, struct bt_iso_qos *qos,
++				 u16 timeout);
+ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
+ 				 __u8 dst_type, __u8 sid,
+ 				 struct bt_iso_qos *qos,
+-				 __u8 data_len, __u8 *data);
++				 __u8 data_len, __u8 *data, u16 timeout);
+ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
+ 		       __u8 dst_type, __u8 sid, struct bt_iso_qos *qos);
+ int hci_conn_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9d2324eb1211..89dc0429de77 100644
+index 89dc0429de77..71a718a89fd5 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -149,8 +149,6 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+@@ -1536,7 +1536,7 @@ static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos *qos)
+ /* This function requires the caller holds hdev->lock */
+ static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
+ 				    __u8 sid, struct bt_iso_qos *qos,
+-				    __u8 base_len, __u8 *base)
++				    __u8 base_len, __u8 *base, u16 timeout)
+ {
+ 	struct hci_conn *conn;
+ 	int err;
+@@ -1578,6 +1578,7 @@ static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
  
- 	hci_chan_list_flush(conn);
+ 	conn->state = BT_CONNECT;
+ 	conn->sid = sid;
++	conn->conn_timeout = timeout;
  
--	hci_conn_hash_del(hdev, conn);
--
- 	if (HCI_CONN_HANDLE_UNSET(conn->handle))
- 		ida_free(&hdev->unset_handle_ida, conn->handle);
+ 	hci_conn_hold(conn);
+ 	return conn;
+@@ -1918,7 +1919,8 @@ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ }
  
-@@ -1151,22 +1149,49 @@ void hci_conn_del(struct hci_conn *conn)
- 	disable_delayed_work_sync(&conn->auto_accept_work);
- 	disable_delayed_work_sync(&conn->idle_work);
+ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+-			      __u8 dst_type, struct bt_iso_qos *qos)
++			      __u8 dst_type, struct bt_iso_qos *qos,
++			      u16 timeout)
+ {
+ 	struct hci_conn *cis;
  
--	/* Handle unnacked frames */
-+	/* Remove the connection from the list so unacked logic can detect when
-+	 * a certain pool is not being utilized.
-+	 */
-+	hci_conn_hash_del(hdev, conn);
-+
-+	/* Handle unacked frames:
-+	 *
-+	 * - In case there are no connection restore all buffers to the pool
-+	 * - Otherwise restore just the buffers considered in transit for the
-+	 *   hci_conn
-+	 */
- 	switch (conn->type) {
- 	case ACL_LINK:
--		hdev->acl_cnt += conn->sent;
-+		if (!hci_conn_num(hdev, ACL_LINK))
-+			hdev->acl_cnt = hdev->acl_pkts;
-+		else
-+			hdev->acl_cnt += conn->sent;
- 		break;
- 	case LE_LINK:
- 		cancel_delayed_work(&conn->le_conn_timeout);
- 
--		if (hdev->le_pkts)
--			hdev->le_cnt += conn->sent;
--		else
--			hdev->acl_cnt += conn->sent;
-+		if (hdev->le_pkts) {
-+			if (!hci_conn_num(hdev, LE_LINK))
-+				hdev->le_cnt = hdev->le_pkts;
-+			else
-+				hdev->le_cnt += conn->sent;
-+		} else {
-+			if (!hci_conn_num(hdev, LE_LINK) &&
-+			    !hci_conn_num(hdev, ACL_LINK))
-+				hdev->acl_cnt = hdev->acl_pkts;
-+			else
-+				hdev->acl_cnt += conn->sent;
-+		}
- 		break;
- 	case CIS_LINK:
- 	case BIS_LINK:
- 	case PA_LINK:
-+		if (!hci_conn_num(hdev, CIS_LINK) &&
-+		    !hci_conn_num(hdev, BIS_LINK) &&
-+		    !hci_conn_num(hdev, PA_LINK))
-+			hdev->iso_cnt = hdev->iso_pkts;
-+		else
-+			hdev->iso_cnt += conn->sent;
- 		hdev->iso_cnt += conn->sent;
- 		break;
+@@ -1933,6 +1935,7 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 		cis->dst_type = dst_type;
+ 		cis->iso_qos.ucast.cig = BT_ISO_QOS_CIG_UNSET;
+ 		cis->iso_qos.ucast.cis = BT_ISO_QOS_CIS_UNSET;
++		cis->conn_timeout = timeout;
  	}
+ 
+ 	if (cis->state == BT_CONNECTED)
+@@ -2172,7 +2175,7 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
+ 			      struct bt_iso_qos *qos,
+-			      __u8 base_len, __u8 *base)
++			      __u8 base_len, __u8 *base, u16 timeout)
+ {
+ 	struct hci_conn *conn;
+ 	struct hci_conn *parent;
+@@ -2193,7 +2196,7 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
+ 						   base, base_len);
+ 
+ 	/* We need hci_conn object using the BDADDR_ANY as dst */
+-	conn = hci_add_bis(hdev, dst, sid, qos, base_len, eir);
++	conn = hci_add_bis(hdev, dst, sid, qos, base_len, eir, timeout);
+ 	if (IS_ERR(conn))
+ 		return conn;
+ 
+@@ -2246,13 +2249,13 @@ static void bis_mark_per_adv(struct hci_conn *conn, void *data)
+ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
+ 				 __u8 dst_type, __u8 sid,
+ 				 struct bt_iso_qos *qos,
+-				 __u8 base_len, __u8 *base)
++				 __u8 base_len, __u8 *base, u16 timeout)
+ {
+ 	struct hci_conn *conn;
+ 	int err;
+ 	struct iso_list_data data;
+ 
+-	conn = hci_bind_bis(hdev, dst, sid, qos, base_len, base);
++	conn = hci_bind_bis(hdev, dst, sid, qos, base_len, base, timeout);
+ 	if (IS_ERR(conn))
+ 		return conn;
+ 
+@@ -2295,7 +2298,8 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
+ }
+ 
+ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+-				 __u8 dst_type, struct bt_iso_qos *qos)
++				 __u8 dst_type, struct bt_iso_qos *qos,
++				 u16 timeout)
+ {
+ 	struct hci_conn *le;
+ 	struct hci_conn *cis;
+@@ -2319,7 +2323,7 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 	hci_iso_qos_setup(hdev, le, &qos->ucast.in,
+ 			  le->le_rx_phy ? le->le_rx_phy : hdev->le_rx_def_phys);
+ 
+-	cis = hci_bind_cis(hdev, dst, dst_type, qos);
++	cis = hci_bind_cis(hdev, dst, dst_type, qos, timeout);
+ 	if (IS_ERR(cis)) {
+ 		hci_conn_drop(le);
+ 		return cis;
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index dff3fc4917d6..672987e845d0 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -91,8 +91,8 @@ static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
+ 				 iso_sock_match_t match, void *data);
+ 
+ /* ---- ISO timers ---- */
+-#define ISO_CONN_TIMEOUT	(HZ * 40)
+-#define ISO_DISCONN_TIMEOUT	(HZ * 2)
++#define ISO_CONN_TIMEOUT	secs_to_jiffies(20)
++#define ISO_DISCONN_TIMEOUT	secs_to_jiffies(2)
+ 
+ static void iso_conn_free(struct kref *ref)
+ {
+@@ -367,7 +367,8 @@ static int iso_connect_bis(struct sock *sk)
+ 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+ 		hcon = hci_bind_bis(hdev, &iso_pi(sk)->dst, iso_pi(sk)->bc_sid,
+ 				    &iso_pi(sk)->qos, iso_pi(sk)->base_len,
+-				    iso_pi(sk)->base);
++				    iso_pi(sk)->base,
++				    READ_ONCE(sk->sk_sndtimeo));
+ 		if (IS_ERR(hcon)) {
+ 			err = PTR_ERR(hcon);
+ 			goto unlock;
+@@ -376,7 +377,8 @@ static int iso_connect_bis(struct sock *sk)
+ 		hcon = hci_connect_bis(hdev, &iso_pi(sk)->dst,
+ 				       le_addr_type(iso_pi(sk)->dst_type),
+ 				       iso_pi(sk)->bc_sid, &iso_pi(sk)->qos,
+-				       iso_pi(sk)->base_len, iso_pi(sk)->base);
++				       iso_pi(sk)->base_len, iso_pi(sk)->base,
++				       READ_ONCE(sk->sk_sndtimeo));
+ 		if (IS_ERR(hcon)) {
+ 			err = PTR_ERR(hcon);
+ 			goto unlock;
+@@ -469,7 +471,8 @@ static int iso_connect_cis(struct sock *sk)
+ 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+ 		hcon = hci_bind_cis(hdev, &iso_pi(sk)->dst,
+ 				    le_addr_type(iso_pi(sk)->dst_type),
+-				    &iso_pi(sk)->qos);
++				    &iso_pi(sk)->qos,
++				    READ_ONCE(sk->sk_sndtimeo));
+ 		if (IS_ERR(hcon)) {
+ 			err = PTR_ERR(hcon);
+ 			goto unlock;
+@@ -477,7 +480,8 @@ static int iso_connect_cis(struct sock *sk)
+ 	} else {
+ 		hcon = hci_connect_cis(hdev, &iso_pi(sk)->dst,
+ 				       le_addr_type(iso_pi(sk)->dst_type),
+-				       &iso_pi(sk)->qos);
++				       &iso_pi(sk)->qos,
++				       READ_ONCE(sk->sk_sndtimeo));
+ 		if (IS_ERR(hcon)) {
+ 			err = PTR_ERR(hcon);
+ 			goto unlock;
 -- 
 2.50.1
 
