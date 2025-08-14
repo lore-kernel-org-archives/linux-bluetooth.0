@@ -1,71 +1,72 @@
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265AD321428
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 15:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6C2264B8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Aug 2025 15:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755185212; cv=pass; b=dAqUT1grr3nQWzH4r+g/uxxzWERq5tkrgKmKEvn9HxiQ6Zpv/RTc6vDTBRy+bmF2R/Xby56Vkciab+Y5Y0vC/xgnlhH34OiWYCBxrjNJAdK/LJxIEKxyKa/AY/F2yuCuecMxB/lRp8OY3MN95HvprQu5euQsMiUaMwnhgo4bkrM=
+	t=1755185457; cv=pass; b=FctGeJuhjMUfs4+tyL/L/bHJEEg6f5ow7dXJldR3cuVxkcQa8yPmrn7PbQ4tSHPKiC5PEDIrcHhwxBVGoExh7KuTijXPNLKmQLe/cqxGcd3881aXu96JfLYA3xXSbxwki8N12N59ofJrNAMJawN/s7nOJ2+u0Pw+QOnPpzHhS7I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755185212; c=relaxed/simple;
-	bh=vDkULUkg85QIuM4014QMSChiWqci7DaikJS9Udj8wcA=;
+	s=arc-20240116; t=1755185457; c=relaxed/simple;
+	bh=jP33aDtEMoVO6IHDmyfnfFfe1i4Pik6Kkjw9X5IIb9A=;
 	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Kiz6lPnTjuzeBKm4mODqvCzvUPwtTEzV7kvPnhZ9wcXFxH9n6NCvtY0hbC4EEQYfW32DTb1krhYRk0rcp15Y+TpmN2jIORMA/B1l2ex6aD70nUKvwas48DtJjt65bRAZCn7g8NFzZXlV1jN6G+rmmhnrsOHjfXd4GrsrqhLE6jc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=gIzkeUl6; arc=pass smtp.client-ip=185.185.170.37
+	 Content-Type:MIME-Version; b=iCWET5h7hitCbvtfNr727LQe6Wvk8G45j8x2ixs9mUqtvvMLKG7t6DjtS7EphMSRJx51qxuxBnOdNhiNWH75qYJMOv+7TobKb445e80H89sjGbtwdacB7XOMIxoV+r3fdbWNs3ntTogmSVSszyr4pIqPKRoil5Xw2YAKdqW3zzU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=NXJHJ8oP; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="gIzkeUl6"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="NXJHJ8oP"
 Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
 	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4c2pxR0wB3z49Q5Y;
-	Thu, 14 Aug 2025 18:26:35 +0300 (EEST)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4c2q2K6Mg6z49Q5Y;
+	Thu, 14 Aug 2025 18:30:49 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1755185195;
+	t=1755185449;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=vwF6sCoR7/RWEoWcJYLH9F6x4t+TGvYmclD70ue5kys=;
-	b=gIzkeUl6CzI2bxH3HfrG1i08Lt5b9B7qztJ3nVD19idoGtYupF9FZ+V3wj3L9gBbZzSTlr
-	Cor3tkXEpEfMscSn1/MseVzYCwFZdjvxG7G8zHHb+cqbo5wM5fFvgDZuXvVFQ6lilWe+VM
-	qEAchjIM96o0zod+8H7njfS3oB0tvpq3mHprW45ApkhE/JdtYR0WEHHAMiGpIgoKJUHRrZ
-	WjOoCpvKhcPYmznl4UkHWXiaNwRhCU2UNfQEnZUoJmEwamJnLzflMvZ+osFvMQg0NoLM0t
-	p15CASOhekKe5yJ/HBBUWnIgsckkih1DNOE9rKiuJA/iuRh0h1atZAXbidmeHw==
+	bh=w/2iybGzUfazh0ZwUBHrA8pyRKwsBE28V8cRjGlVJFc=;
+	b=NXJHJ8oPKB6ZYu/X1GT4UTDV/tUiK9K5EJWeSzHYq2zWbnKNCy2u/1sPFPHRGUFVqvyIEq
+	GJWk2msY4ua94tdxR7hjclgXN11JB2gucZguXEvbsuXWSzU50kN/8xp16zvz4ZrcQBFWlR
+	7tMLz1FLhQdOlHglxwYmckDF22y2NgU7GMwBR7Dge+zas2Ak0UGVic8HMpmhOIuqTMhXg+
+	9uDomMyWyWc9x7BV3Z0ICS84imdeF2SBrnGHGrL/43I73Mtx8l0tme2dug4xpz1SmQ7hsD
+	ldifddXFmMESNyG/lLeFnLIlSeHrzNekml2U4a70gApIF1IXXxZLIBho0w+0CA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1755185195;
+	s=lahtoruutu; t=1755185449;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=vwF6sCoR7/RWEoWcJYLH9F6x4t+TGvYmclD70ue5kys=;
-	b=AlwoKY5Bcp2uFjtU3DmwlVDWG/c2l+qUKYGg8G2cuFM4mwm2OUnjSrqqUCd4hGfrKtWCaX
-	Heqjl26Fabiv+J4QlD20dREHi/YCxa+qLOLd/VhsskSB4SpiI75p8EsvYq3ylSGUPMRc/r
-	zUx4YmAaiW331ga0K8lg7drSZq0vhaD5dUO4rd5QfhmEjC70/+MZwMnWjj9pVBybMATaPF
-	DbyUmihxG/mDQZ0HwKVFyNd47SqszsxITvgEu2094qm0vQYGxJj9QO4/v3jfXWC/0gy9LV
-	LvC5CaTfsHsuks/EVneK4kfHKZb9YB60rGBRJDBahUezu3jwFALKL4JmGMNtmg==
+	bh=w/2iybGzUfazh0ZwUBHrA8pyRKwsBE28V8cRjGlVJFc=;
+	b=b5aebNnl3//88I0K5ws6AQJbsjmp3qx9/Pt9hJ+l6/pndkqhWaAAevgwtac7GGA6M9qMKJ
+	5H9urP9itRc2cWqaEXsQ/wFq6AAvZ2MpXbXP2C5fTIA1MtYJnbf8tGIEy14BSuxarImi2L
+	b2DzVcNSWL5oJIhQryQkfJWwBCaH1guRznOsnAXlFIVE1EgeWplwapqD39lMJUmT3MiyED
+	CusFUJzU/KFSgQyIRFicagv5j2e5UobBPBe9Kfl8b7l21bXRCdTvhEiXMwOhPFpDtCnVb4
+	Xbk6kIywUzKGN8jgfKGguBFlZqj2Q7OeI4Ow7yhkfJk0L9Oc14RtXjz3eu+CIQ==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1755185195; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1755185449; a=rsa-sha256;
 	cv=none;
-	b=krAAlvIe0WisiKFQtQ1soNHgK+H97R1NEbpwLZumFAEpCOUmpJQlwxA7RlMvOnp6V3BgR7
-	7Wk19FBS1nuxiBdev9hIou1hQX8gVcSoNdXFbOSdMCq1u0ADQhtV3RyZti6XTmrA6yT9xS
-	FfZI1bZb+tLx8W3gGqFF4/wx3JloRMv0H51BAAsE4xSAEjoFaVOyp3+nuSXQ2kRcx8RIWK
-	evMt08dbKIW3na66bEYpPjBhhgCzlC3r4kHALCp03tCgilzYBg6bOOokKBkCi+AA45KnCr
-	FuVMD6zZe47c9+02N4iJvxpDtLvYUmgnsyXnksf38D2uKNP9hbtqVTkOc4x2hA==
-Message-ID: <09686fe95fd6d79c9b271d6366bcd6dc4f890480.camel@iki.fi>
-Subject: Re: [PATCH v3 1/5] Bluetooth: ISO: Don't initiate CIS connections
- if there are no buffers
+	b=G2bzMpHGbxAyK9SJPbK5agg95z4cMKGBoQiiRTIPb6vUyB9HteA1fZ5cd7tZi0bFpXTGOA
+	jUgXZ7tqXjE+fjG6+7h5/2G1rpnHmxqWCyKrRmL/TWJD4AqEVdRQkwx0b8lIQxNYsimCrQ
+	MefkNtAp5iTyibTSSO9GrBQqB+cyoeYSeQPO0Ck1VFt4Qi/OQgew0iWJwDY/Sf6sqINo1o
+	z0YlJC2wS8JUZU3F9pxh+CwZlWXmZ1foMbJaU4ph+iytaB4EOpO4TpZBNltnvH9QcuS8x1
+	KwVrykii/dbKDLE5RTeYe2amZTgYQo92oShS8H9DCowu3QBLFq9pUnQ5VYrqyg==
+Message-ID: <6311cc4c8ab9a9c5b14d3c4aa1f9b213fd064d6d.camel@iki.fi>
+Subject: Re: [PATCH v3 3/5] Bluetooth: hci_conn: Make unacked packet
+ handling more robust
 From: Pauli Virtanen <pav@iki.fi>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
 	linux-bluetooth@vger.kernel.org
-Date: Thu, 14 Aug 2025 18:26:34 +0300
-In-Reply-To: <20250813211511.90866-1-luiz.dentz@gmail.com>
+Date: Thu, 14 Aug 2025 18:30:49 +0300
+In-Reply-To: <20250813211511.90866-3-luiz.dentz@gmail.com>
 References: <20250813211511.90866-1-luiz.dentz@gmail.com>
+	 <20250813211511.90866-3-luiz.dentz@gmail.com>
 Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
  keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
  ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
@@ -109,43 +110,76 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Hi,
-
 ke, 2025-08-13 kello 17:15 -0400, Luiz Augusto von Dentz kirjoitti:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >=20
-> If the controller has no buffers left return -ENOBUFF to indicate that
-> iso_cnt might be out of sync.
+> This attempts to make unacked packet handling more robust by detecting
+> if there are no connections left then restore all buffers of the
+> respective pool.
 >=20
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->  net/bluetooth/iso.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  net/bluetooth/hci_conn.c | 34 ++++++++++++++++++++++++++++------
+>  1 file changed, 28 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index 5ce823ca3aaf..dff3fc4917d6 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -458,6 +458,13 @@ static int iso_connect_cis(struct sock *sk)
->  		goto unlock;
->  	}
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 9d2324eb1211..d2f0c3c0f0ae 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -1151,22 +1151,44 @@ void hci_conn_del(struct hci_conn *conn)
+>  	disable_delayed_work_sync(&conn->auto_accept_work);
+>  	disable_delayed_work_sync(&conn->idle_work);
 > =20
-> +	/* Check if there are available buffers for output/TX. */
-> +	if (iso_pi(sk)->qos.ucast.out.sdu && !hci_conn_num(hdev, CIS_LINK) &&
-> +	    (hdev->iso_pkts && !hdev->iso_cnt)) {
+> -	/* Handle unnacked frames */
+> +	/* Handle unnacked frames:
+> +	 *
+> +	 * - In case there are no connection restore all buffers to the pool
+> +	 * - Otherwise restore just the buffers considered in transit for the
+> +	 *   hci_conn
+> +	 */
+>  	switch (conn->type) {
+>  	case ACL_LINK:
+> -		hdev->acl_cnt +=3D conn->sent;
+> +		if (!hci_conn_num(hdev, ACL_LINK))
+> +			hdev->acl_cnt =3D hdev->acl_pkts;
+> +		else
+> +			hdev->acl_cnt +=3D conn->sent;
+>  		break;
+>  	case LE_LINK:
+>  		cancel_delayed_work(&conn->le_conn_timeout);
+> =20
+> -		if (hdev->le_pkts)
+> -			hdev->le_cnt +=3D conn->sent;
+> -		else
+> -			hdev->acl_cnt +=3D conn->sent;
+> +		if (hdev->le_pkts) {
+> +			if (!hci_conn_num(hdev, LE_LINK))
+> +				hdev->le_cnt =3D hdev->le_pkts;
+> +			else
+> +				hdev->le_cnt +=3D conn->sent;
+> +		} else {
+> +			if (!hci_conn_num(hdev, LE_LINK) &&
+> +			    !hci_conn_num(hdev, ACL_LINK))
+> +				hdev->acl_cnt =3D hdev->acl_pkts;
+> +			else
+> +				hdev->acl_cnt +=3D conn->sent;
+> +		}
+>  		break;
+>  	case CIS_LINK:
+>  	case BIS_LINK:
+>  	case PA_LINK:
+> +		if (!hci_conn_num(hdev, CIS_LINK) &&
+> +		    !hci_conn_num(hdev, BIS_LINK) &&
+> +		    !hci_conn_num(hdev, PA_LINK))
+> +			hdev->iso_cnt =3D hdev->iso_pkts;
+> +		else
+> +			hdev->iso_cnt +=3D conn->sent;
+>  		hdev->iso_cnt +=3D conn->sent;
 
-Also && !hci_conn_num(hdev, BIS_LINK) so it doesn't fail if a BIS is
-saturating the buffers?
+The last hdev->iso_cnt +=3D conn->sent; probably should be removed.
 
-Does PA_LINK have ISO packet TX/RX?
-
-> +		err =3D -ENOBUFS;
-> +		goto unlock;
-> +	}
-> +
->  	/* Just bind if DEFER_SETUP has been set */
->  	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
->  		hcon =3D hci_bind_cis(hdev, &iso_pi(sk)->dst,
+>  		break;
+>  	}
 
 --=20
 Pauli Virtanen
