@@ -1,475 +1,177 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037B42620D2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 21:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6E019F11B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 21:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755294270; cv=none; b=VbfBgpVm9UfuLOB91coG6AT2TshQGFlQ8oeF0VF8tinEc9XPBhn08vJK0bLHWiNrWVCqhkEnabInF4wNoztu43HSuPLNpczIxd0QTR4DkSjLaJqYC6AD4+rrAXnKLfKP8BGV5p4PluD3NQUwTCZda+XK4BM62IqUDlBp/ohHZlg=
+	t=1755294525; cv=none; b=fXK1KfsBAdXN7O0V7VqNvk2tN9AtU9VJuvTi36LqOhO8cmuYPxkyJARj9eJ6Nb82pBTsIAVCgi+oY97ExEvat+bI7EBFpKuLbP27xGszyxq48ibxSG6xx02dPdjmysLNWvRqffnn7MnHMxzG8P5wI/yFbgRkKH7WFFLqdv/owSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755294270; c=relaxed/simple;
-	bh=FCgRyf7fkhSIt/PnukmzqPe9gvPIlqdHmLp/dYwAd5I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eyRdUiUY1/PmS2ja4pXhqGz9ta8bL6di5UTqQFHifKAhWVF5ypA8s48ej/q51WiXswvpIpgarAzVYUGgHQco5q1npKehyHRhFLQaHqPBCdISMWuo374J94N9PPvqUkHFpMB4MGEzv1ujWeE76aqP5IpSBwvozhqJeBa3Q6D0qTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i4WqKRO8; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755294525; c=relaxed/simple;
+	bh=mhrUoh+DSjfZVrrPw+Nsk7fI8aBvnkqzQE57gdm55qE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TlAgN78rn0JEfx91eRiiQrl0lNgN4MkDEMxstTGLdq8qlafN7LkDARgtcZTf4jq93vo0zouMaD2gyKAYiL5q8VQjpaVMnJTVuoqGEWoCOzo69omyDcEwB64qQgm46IO1ZT4CUoYmHiRXdgmhquUq8v8WartrAbiyAbBZA1zdbpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=X7Ste8t8; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4WqKRO8"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-53b17558b2fso1652790e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 14:44:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755294267; x=1755899067; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M+9QP8Eav9QJZ2JhPx2wUEwF70ZrCpU7aUVJOj8yl00=;
-        b=i4WqKRO8ZibK8e5WOMQMhoMj415g8+hYyCHFnhZ8x2nMOBiCSCe2Ql4efehgDR/DPg
-         ty3FJJnWih93xxO/J7lI+kiqf8tRzwzvAzMdAE2gw6zgwRHqD2nm7GQ7ZWctzOL3EaJf
-         kWR3lAOk73oLJtwZfQNVEyx2fFEl8ha3sbPQxl81xcP/acxz27IK6BLIbW50ZVE5vnxt
-         cvKVuwjzGn3wg39RNtf35QnOSD4g4vcMYwQrQMlRlVtpTFQG2aTM2Lj/lZNitdEXzdSH
-         UMSPw/MZ68Kx0J6EpLx1nyqqYqs0/t838n/Nbvl3U3aqgIsQjDewcACWkNfYQQE5kqAS
-         r/jA==
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="X7Ste8t8"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57FLmgHV022118;
+	Fri, 15 Aug 2025 21:48:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=3azxfqhNzSwS8fa4uccCMLq7
+	gy1B9YWDKdwGIQObTuE=; b=X7Ste8t86//bHppSOpwmTbQgsdlfaVWzwIRFqGOi
+	R8+xQTx2kF27eyuI9hG5zyYn6KOgI8Y3lGQw2rxsjAz+Iq1vabqZBp1YUvCTM6cO
+	RU6fFm2N4rlJxYEvIiGYcqzLAEiLdHRWUvUBlcpaip1EfIIJ7JxFymhjcQtYbahl
+	lNib1KWZVkjWNJh1SCdZjtBCPNTlK3qr/xMzatl0brJ5VrJ+GzU0fPMzuME1S34R
+	GUGl5OJoIZy+KErMk5+7ZnvUjXPkR19cqEjQizK09blEWsikJEtcKE+nzaXgr6sm
+	Zc1ZDZxqXyLP+IokkdIOFtbK/rZu7p6VTi8JpUuZFH6jpA==
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48eqhxjev0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 21:48:42 +0000 (GMT)
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-70a88dd0193so51043046d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 14:48:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755294267; x=1755899067;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M+9QP8Eav9QJZ2JhPx2wUEwF70ZrCpU7aUVJOj8yl00=;
-        b=MoSt0xuKs0osIrbhHB26I+xO3zX6PZDIDSq/THoWnsSlS0gZJIr6jCCJlhZ/JIJaZJ
-         1s6tfk9VXfOoTGoLNOni15nSJBTiLM/fsvnxVkPMqHwFbUNaH2uApkoOFHmUKFyNsLZm
-         3t5lbt/t94UyvU4GZuWN2YdjA6vh8f2leLJew9bxSjuXGC5sncTBqb1I60Rb+KuFjj2R
-         31b6Z6YvtNo7g17CpWRq6ZvXcog9chEIH48pJIfk/iux1Iu6ymFsXGo1l1GNyX9OaWyv
-         UXYdg0OKmc5WZb2ISb+j9r+M0Wsa9y7pJww8B++d/FB8ivWobyavM/XaaZqK5NEBz7IN
-         a67g==
-X-Gm-Message-State: AOJu0Yz8RHA5M2Nnh737NFUGnKx8nFD+N0Sm0h2Q0vILvyaTvxGlMEEA
-	zWQ5JOtFm4vRxd4kFiQJSPhzQOjJKDQshGuV6g2L4zs21+4pIb18h+S6zere0emp
-X-Gm-Gg: ASbGncszNVW1IToTH2AYUDqEjIUgzlhTJppM9BDV2/bOsp+oYEPzyGiZ9XLbgBhxi7U
-	LK1m6h8dBihzMxZ46EAJFbnJnqF8RDigZNYRMPqb6Q7qTHTxtmiahve0ZbUrfcmWu/xFaDh+9ya
-	HdC78cd05fc5otwS4/7nEOZdYO5qghxiUZUArogK8vjC1oAGwKJsbP9S++oRnQ8cwukYo0fbLr0
-	RUZRPTEINvdWjEsQ7xj0R4DXYFucAh/NOMgKqqbmq4wXXgW+FDsfQPMdfj2v/Jtmz7E7GHtIHT1
-	bVi7utWS92pbdXYzwafUvPRcL/5xgM8yT9VANo3S7LU9/SJQbofYsLV3gn6z8rDnPZbSiCmtqdt
-	V2pErhbrw62fHcIxEjj86fTw9rjL9CAawsIJErbYJ6y3kOZSgLm/YMMRJoIyYOiyeuh2KyH/jk9
-	Q=
-X-Google-Smtp-Source: AGHT+IEMguousXtBVVgCgrFi9ZH07wrTXFD3e7Y3z0NZ7ls4vXjVUEhWhvk4pgMQe7lq16Wb2AdXhA==
-X-Received: by 2002:a05:6122:c90:b0:534:69b3:a230 with SMTP id 71dfb90a1353d-53b353a8668mr336711e0c.11.1755294267158;
-        Fri, 15 Aug 2025 14:44:27 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2beff1c1sm472053e0c.24.2025.08.15.14.44.24
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1755294521; x=1755899321;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3azxfqhNzSwS8fa4uccCMLq7gy1B9YWDKdwGIQObTuE=;
+        b=CQPF3Rd/0trps5JCFyzcNhYBFO0eJyVS/aOYnYtJwxot9bqXPIRih13uhNjYklwfrt
+         fdDvGrXnDQboUVS1OY7OhBQqB/sPaeV7LhCy/+k007Ys8Y0fpFMlZp15z1ndHXEi9D3l
+         KeFc+jlaD+RxZcmdmnWof8/M2Lu69856Yv2sz/gJz5QRDqVgQWPEhC3MviMIw+6Q8Lvg
+         YrM3WSyntaUbRhE6Eh4dJv8bXpTznSPo5UzXJkB8Bpbj2JONSTfOmphduPD9MXH/XQfh
+         Xkq/sDEUAYhHDTL62qVOeBuf7EGCXDh7KbB0L9N3CuuY898SVI6pKlCsRaph7JAtJjtE
+         nvVA==
+X-Gm-Message-State: AOJu0YyoVsvs9kZAn9GmAQSgMj6NVRWKsAEIDPHVuFJChZfxYND9wRCt
+	8v4hPcIu94PnZTPfh05natcJJqjH0YQc29RHERrgOZ6RtuHMMSCI2Hl1SQTXgN+HfnEQ6HkT9cc
+	OAKdqS1BUf9DgHkupZQv0Tg/QAfy4OaXgb/n1j1AM8bH2wePN09AnxiZZRd4K7iKPz6u8jGA=
+X-Gm-Gg: ASbGncsoDbb85x4gErqc51dlOwqrcb8VjhiqIPHBN8di9uFx6cJiTGZPUEF9uk9paIc
+	AKBAq7X21w/rYKJCQXRT9DS7WuEyc6GlsUB4OaK9YMqOPq7Lwg+HspdM0MO8hyxLnFPziN2zTk3
+	wFkx3TnNfDw7jIyXWjHXN8dHMolOy+nayDhC4AF1u/B0xS24E+D+ugFiqCQ5xz0lJr/UY5k0N2f
+	2gjiWLKlTdu/uYaPFljd00cj4RcR6lPX5ER5TkYMPmYKjbIBR3XRblQZK+8nui8nDXudHNq3p8B
+	Dh1gu5Ue8Q6dbpW1eTqdY07hyukBFLEKVfxKpuiF1V8O77nQCpDS3Ebz0khAiIC+GwltGTHeAwV
+	kUVz0OfDSRwboSxqtgixVS/gKzSTAL0B7bmjbsXUJxntOfoBHKddu
+X-Received: by 2002:ad4:5ae5:0:b0:707:6306:28bf with SMTP id 6a1803df08f44-70ba7c0c9damr49234466d6.36.1755294521286;
+        Fri, 15 Aug 2025 14:48:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGgwpAJSDUnwPnQp2m/lE5EwwP6ImBIjaPY0l0oQ5eg4FpmrJIrILBO05zQvRuPEk1BZenJNA==
+X-Received: by 2002:ad4:5ae5:0:b0:707:6306:28bf with SMTP id 6a1803df08f44-70ba7c0c9damr49233936d6.36.1755294520253;
+        Fri, 15 Aug 2025 14:48:40 -0700 (PDT)
+Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55cef35f11csm500447e87.51.2025.08.15.14.48.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 14:44:25 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 6/6] Bluetooth: hci: Add hci_conn_set_state
-Date: Fri, 15 Aug 2025 17:44:05 -0400
-Message-ID: <20250815214406.514260-6-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250815214406.514260-1-luiz.dentz@gmail.com>
-References: <20250815214406.514260-1-luiz.dentz@gmail.com>
+        Fri, 15 Aug 2025 14:48:39 -0700 (PDT)
+Date: Sat, 16 Aug 2025 00:48:36 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        quic_bt@quicinc.com
+Subject: Re: [PATCH v4 1/4] driver: bluetooth: hci_qca: fix ssr fail when
+ BT_EN is pulled up by hw
+Message-ID: <lfo2phtbykl5dqiuiunxlzz3fybyqt7tcotihzhr27ivm7dk2l@l5q6ilkm5xrg>
+References: <20250814124704.2531811-1-quic_shuaz@quicinc.com>
+ <20250814124704.2531811-2-quic_shuaz@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250814124704.2531811-2-quic_shuaz@quicinc.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEwMDA1NyBTYWx0ZWRfX4DmHsA+XV09Y
+ 77eLyfHHUzZtXKpagkJBDFlzfAKv1S8pLMmUuAbrrzZySXn+hWbPkCsbxl79HJaQ8L0V5Vxj+zw
+ P63+qPtIwiEdT7a1j5/xHcG1nuAD1TJHhgi9U/BLwkQCF8Q6+R717LPBwIjxD4y8icJ/8STTX1W
+ NgWL9IB13mpu/OiUoaLbjb8bsF5vPr/EzMSvijIah2if7V43DyrzO9PuTWPyomfUoVSSqUygsNE
+ rHJPXpUFogA+9+tAhTdWdclZ7iWGBVrCcxAIjWDxI8yILYiDwL9uve967m7Kp12i4HZMwxeBuab
+ PHbe8BV/BlKh+CbJL7yXBnBN98tCY2+2kAOPiGMU9prcof4f0o6CLCS8B2GRns1ftiwM5Wy4AHH
+ hfPN6hJu
+X-Proofpoint-GUID: LCOzYoYWyTWDHxJB4H_0nmUFqDqFpQq1
+X-Authority-Analysis: v=2.4 cv=aYNhnQot c=1 sm=1 tr=0 ts=689fab3a cx=c_pps
+ a=7E5Bxpl4vBhpaufnMqZlrw==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8 a=wIQ4YbeHDpbAtZWM-s4A:9 a=CjuIK1q_8ugA:10
+ a=pJ04lnu7RYOZP9TFuWaZ:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: LCOzYoYWyTWDHxJB4H_0nmUFqDqFpQq1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-15_07,2025-08-14_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 adultscore=0 priorityscore=1501 suspectscore=0 phishscore=0
+ impostorscore=0 bulkscore=0 malwarescore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508100057
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, Aug 14, 2025 at 08:47:01PM +0800, Shuai Zhang wrote:
 
-This adds hci_conn_set_state which prints the state transition of
-hci_conn and replaces the direct setting of hci_conn->state.
+I wonder what does it make to notice the part of the BT test report:
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_core.h | 10 +++++++-
- net/bluetooth/hci_conn.c         | 20 +++++++--------
- net/bluetooth/hci_event.c        | 44 ++++++++++++++++----------------
- net/bluetooth/hci_sync.c         |  6 ++---
- net/bluetooth/iso.c              |  2 +-
- net/bluetooth/sco.c              |  2 +-
- 6 files changed, 46 insertions(+), 38 deletions(-)
+SubjectPrefix                 FAIL      0.66 seconds
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6906af7a8f24..1f1e12d329b1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1701,6 +1701,14 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
- #define to_hci_dev(d) container_of(d, struct hci_dev, dev)
- #define to_hci_conn(c) container_of(c, struct hci_conn, dev)
- 
-+#define hci_conn_set_state(c, s) \
-+	do { \
-+		bt_dev_dbg((c)->hdev, "hcon %p handle 0x%04x state %s -> %s", \
-+			   (c), (c)->handle, state_to_string((c)->state), \
-+			   state_to_string(s)); \
-+		(c)->state = s; \
-+	} while (0)
-+
- static inline void *hci_get_drvdata(struct hci_dev *hdev)
- {
- 	return dev_get_drvdata(&hdev->dev);
-@@ -2130,7 +2138,7 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- 
- 	if (conn->state == BT_CONFIG) {
- 		if (!status)
--			conn->state = BT_CONNECTED;
-+			hci_conn_set_state(conn, BT_CONNECTED);
- 
- 		hci_connect_cfm(conn, status);
- 		hci_conn_drop(conn);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2cafdc2d6f2b..53ff7eda082c 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -206,7 +206,7 @@ static void hci_add_sco(struct hci_conn *conn, __u16 handle)
- 
- 	bt_dev_dbg(hdev, "hcon %p", conn);
- 
--	conn->state = BT_CONNECT;
-+	hci_conn_set_state(conn, BT_CONNECT);
- 	conn->out = true;
- 
- 	conn->attempt++;
-@@ -298,7 +298,7 @@ static int hci_enhanced_setup_sync(struct hci_dev *hdev, void *data)
- 
- 	configure_datapath_sync(hdev, &conn->codec);
- 
--	conn->state = BT_CONNECT;
-+	hci_conn_set_state(conn, BT_CONNECT);
- 	conn->out = true;
- 
- 	conn->attempt++;
-@@ -415,7 +415,7 @@ static bool hci_setup_sync_conn(struct hci_conn *conn, __u16 handle)
- 
- 	bt_dev_dbg(hdev, "hcon %p", conn);
- 
--	conn->state = BT_CONNECT;
-+	hci_conn_set_state(conn, BT_CONNECT);
- 	conn->out = true;
- 
- 	conn->attempt++;
-@@ -1288,7 +1288,7 @@ void hci_conn_failed(struct hci_conn *conn, u8 status)
- 	test_and_clear_bit(HCI_CONN_BIG_SYNC_FAILED, &conn->flags);
- 	test_and_clear_bit(HCI_CONN_PA_SYNC_FAILED, &conn->flags);
- 
--	conn->state = BT_CLOSED;
-+	hci_conn_set_state(conn, BT_CLOSED);
- 	hci_connect_cfm(conn, status);
- 	hci_conn_del(conn);
- }
-@@ -1559,7 +1559,7 @@ static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (IS_ERR(conn))
- 		return conn;
- 
--	conn->state = BT_CONNECT;
-+	hci_conn_set_state(conn, BT_CONNECT);
- 	conn->sid = sid;
- 
- 	hci_conn_hold(conn);
-@@ -1609,7 +1609,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 		return ERR_PTR(-EBUSY);
- 	}
- 
--	conn->state = BT_CONNECT;
-+	hci_conn_set_state(conn, BT_CONNECT);
- 	set_bit(HCI_CONN_SCANNING, &conn->flags);
- 	conn->dst_type = dst_type;
- 	conn->sec_level = BT_SECURITY_LOW;
-@@ -2105,7 +2105,7 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- 	conn->iso_qos = *qos;
- 	conn->dst_type = dst_type;
- 	conn->sid = sid;
--	conn->state = BT_LISTEN;
-+	hci_conn_set_state(conn, BT_LISTEN);
- 	conn->conn_timeout = msecs_to_jiffies(qos->bcast.sync_timeout * 10);
- 
- 	hci_conn_hold(conn);
-@@ -2167,7 +2167,7 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
- 					      HCI_ROLE_MASTER);
- 	if (conn) {
- 		memcpy(qos, &conn->iso_qos, sizeof(*qos));
--		conn->state = BT_CONNECTED;
-+		hci_conn_set_state(conn, BT_CONNECTED);
- 		return conn;
- 	}
- 
-@@ -2195,7 +2195,7 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
- 			  hdev->le_tx_def_phys);
- 
- 	conn->iso_qos = *qos;
--	conn->state = BT_BOUND;
-+	hci_conn_set_state(conn, BT_BOUND);
- 
- 	/* Link BISes together */
- 	parent = hci_conn_hash_lookup_big(hdev,
-@@ -2575,7 +2575,7 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
- 	while ((conn = list_first_entry_or_null(head,
- 						struct hci_conn,
- 						list)) != NULL) {
--		conn->state = BT_CLOSED;
-+		hci_conn_set_state(conn, BT_CLOSED);
- 		hci_disconn_cfm(conn, HCI_ERROR_LOCAL_HOST_TERM);
- 		hci_conn_del(conn);
- 	}
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 34b243c26bbd..ea062df6cc8d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2256,7 +2256,7 @@ static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
- 
- 	if (status) {
- 		if (conn && conn->state == BT_CONNECT) {
--			conn->state = BT_CLOSED;
-+			hci_conn_set_state(conn, BT_CLOSED);
- 			hci_connect_cfm(conn, status);
- 			hci_conn_del(conn);
- 		}
-@@ -2299,7 +2299,7 @@ static void hci_cs_add_sco(struct hci_dev *hdev, __u8 status)
- 		link = list_first_entry_or_null(&acl->link_list,
- 						struct hci_link, list);
- 		if (link && link->conn) {
--			link->conn->state = BT_CLOSED;
-+			hci_conn_set_state(link->conn, BT_CLOSED);
- 
- 			hci_connect_cfm(link->conn, status);
- 			hci_conn_del(link->conn);
-@@ -2582,7 +2582,7 @@ static void hci_setup_sync_conn_status(struct hci_dev *hdev, __u16 handle,
- 		link = list_first_entry_or_null(&acl->link_list,
- 						struct hci_link, list);
- 		if (link && link->conn) {
--			link->conn->state = BT_CLOSED;
-+			hci_conn_set_state(link->conn, BT_CLOSED);
- 
- 			hci_connect_cfm(link->conn, status);
- 			hci_conn_del(link->conn);
-@@ -3138,7 +3138,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 			goto done;
- 
- 		if (conn->type == ACL_LINK) {
--			conn->state = BT_CONFIG;
-+			hci_conn_set_state(conn, BT_CONFIG);
- 			hci_conn_hold(conn);
- 
- 			if (!conn->out && !hci_conn_ssp_enabled(conn) &&
-@@ -3147,7 +3147,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 			else
- 				conn->disc_timeout = HCI_DISCONN_TIMEOUT;
- 		} else
--			conn->state = BT_CONNECTED;
-+			hci_conn_set_state(conn, BT_CONNECTED);
- 
- 		hci_debugfs_create_conn(conn);
- 		hci_conn_add_sysfs(conn);
-@@ -3294,7 +3294,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 	if (ev->link_type == ACL_LINK ||
- 	    (!(flags & HCI_PROTO_DEFER) && !lmp_esco_capable(hdev))) {
- 		struct hci_cp_accept_conn_req cp;
--		conn->state = BT_CONNECT;
-+		hci_conn_set_state(conn, BT_CONNECT);
- 
- 		bacpy(&cp.bdaddr, &ev->bdaddr);
- 
-@@ -3306,7 +3306,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
- 	} else if (!(flags & HCI_PROTO_DEFER)) {
- 		struct hci_cp_accept_sync_conn_req cp;
--		conn->state = BT_CONNECT;
-+		hci_conn_set_state(conn, BT_CONNECT);
- 
- 		bacpy(&cp.bdaddr, &ev->bdaddr);
- 		cp.pkt_type = cpu_to_le16(conn->pkt_type);
-@@ -3320,7 +3320,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ, sizeof(cp),
- 			     &cp);
- 	} else {
--		conn->state = BT_CONNECT2;
-+		hci_conn_set_state(conn, BT_CONNECT2);
- 		hci_connect_cfm(conn, 0);
- 	}
- 
-@@ -3368,7 +3368,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
--	conn->state = BT_CLOSED;
-+	hci_conn_set_state(conn, BT_CLOSED);
- 
- 	mgmt_connected = test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
- 
-@@ -3472,7 +3472,7 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, void *data,
- 			hci_send_cmd(hdev, HCI_OP_SET_CONN_ENCRYPT, sizeof(cp),
- 				     &cp);
- 		} else {
--			conn->state = BT_CONNECTED;
-+			hci_conn_set_state(conn, BT_CONNECTED);
- 			hci_connect_cfm(conn, ev->status);
- 			hci_conn_drop(conn);
- 		}
-@@ -3708,7 +3708,7 @@ static void hci_remote_features_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (!hci_outgoing_auth_needed(hdev, conn)) {
--		conn->state = BT_CONNECTED;
-+		hci_conn_set_state(conn, BT_CONNECTED);
- 		hci_connect_cfm(conn, ev->status);
- 		hci_conn_drop(conn);
- 	}
-@@ -4249,7 +4249,7 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
- 			if (test_and_clear_bit(HCI_CONN_CREATE_CIS,
- 					       &conn->flags))
- 				pending = true;
--			conn->state = BT_CLOSED;
-+			hci_conn_set_state(conn, BT_CLOSED);
- 			hci_connect_cfm(conn, status);
- 			hci_conn_del(conn);
- 		}
-@@ -4889,7 +4889,7 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (!hci_outgoing_auth_needed(hdev, conn)) {
--		conn->state = BT_CONNECTED;
-+		hci_conn_set_state(conn, BT_CONNECTED);
- 		hci_connect_cfm(conn, ev->status);
- 		hci_conn_drop(conn);
- 	}
-@@ -4956,7 +4956,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	case 0x00:
- 		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
- 		if (status) {
--			conn->state = BT_CLOSED;
-+			hci_conn_set_state(conn, BT_CLOSED);
- 			break;
- 		}
- 
-@@ -4984,7 +4984,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 		fallthrough;
- 
- 	default:
--		conn->state = BT_CLOSED;
-+		hci_conn_set_state(conn, BT_CLOSED);
- 		break;
- 	}
- 
-@@ -5117,7 +5117,7 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	if (conn->state == BT_CONFIG) {
- 		if (!ev->status)
--			conn->state = BT_CONNECTED;
-+			hci_conn_set_state(conn, BT_CONNECTED);
- 
- 		hci_connect_cfm(conn, ev->status);
- 		hci_conn_drop(conn);
-@@ -5716,7 +5716,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	mgmt_device_connected(hdev, conn, NULL, 0);
- 
- 	conn->sec_level = BT_SECURITY_LOW;
--	conn->state = BT_CONFIG;
-+	hci_conn_set_state(conn, BT_CONFIG);
- 
- 	/* Store current advertising instance as connection advertising instance
- 	 * when software rotation is in use so it can be re-enabled when
-@@ -5752,7 +5752,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 
- 		hci_conn_hold(conn);
- 	} else {
--		conn->state = BT_CONNECTED;
-+		hci_conn_set_state(conn, BT_CONNECTED);
- 		hci_connect_cfm(conn, status);
- 	}
- 
-@@ -6485,7 +6485,7 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev, void *data,
- 			else
- 				status = ev->status;
- 
--			conn->state = BT_CONNECTED;
-+			hci_conn_set_state(conn, BT_CONNECTED);
- 			hci_connect_cfm(conn, status);
- 			hci_conn_drop(conn);
- 		}
-@@ -6769,14 +6769,14 @@ static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (!ev->status) {
--		conn->state = BT_CONNECTED;
-+		hci_conn_set_state(conn, BT_CONNECTED);
- 		hci_debugfs_create_conn(conn);
- 		hci_conn_add_sysfs(conn);
- 		hci_iso_setup_path(conn);
- 		goto unlock;
- 	}
- 
--	conn->state = BT_CLOSED;
-+	hci_conn_set_state(conn, BT_CLOSED);
- 	hci_connect_cfm(conn, ev->status);
- 	hci_conn_del(conn);
- 
-@@ -6894,7 +6894,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
- 					__le16_to_cpu(ev->bis_handle[i++])))
- 			continue;
- 
--		conn->state = BT_CONNECTED;
-+		hci_conn_set_state(conn, BT_CONNECTED);
- 		set_bit(HCI_CONN_BIG_CREATED, &conn->flags);
- 		hci_debugfs_create_conn(conn);
- 		hci_conn_add_sysfs(conn);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 46c20476dae5..5faee247920e 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5682,7 +5682,7 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- 	 * safely.
- 	 */
- 	if (disconnect) {
--		conn->state = BT_CLOSED;
-+		hci_conn_set_state(conn, BT_CLOSED);
- 		hci_disconn_cfm(conn, reason);
- 		hci_conn_del(conn);
- 	} else {
-@@ -6518,7 +6518,7 @@ static int hci_le_create_conn_sync(struct hci_dev *hdev, void *data)
- 	bt_dev_dbg(hdev, "conn %p", conn);
- 
- 	clear_bit(HCI_CONN_SCANNING, &conn->flags);
--	conn->state = BT_CONNECT;
-+	hci_conn_set_state(conn, BT_CONNECT);
- 
- 	/* If requested to connect as peripheral use directed advertising */
- 	if (conn->role == HCI_ROLE_SLAVE) {
-@@ -6858,7 +6858,7 @@ static int hci_acl_create_conn_sync(struct hci_dev *hdev, void *data)
- 			bt_dev_warn(hdev, "Failed to cancel inquiry %d", err);
- 	}
- 
--	conn->state = BT_CONNECT;
-+	hci_conn_set_state(conn, BT_CONNECT);
- 	conn->out = true;
- 	conn->role = HCI_ROLE_MASTER;
- 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 5ce823ca3aaf..91233fb50509 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1451,7 +1451,7 @@ static void iso_conn_defer_accept(struct hci_conn *conn)
- 
- 	BT_DBG("conn %p", conn);
- 
--	conn->state = BT_CONFIG;
-+	hci_conn_set_state(conn, BT_CONFIG);
- 
- 	cp.handle = cpu_to_le16(conn->handle);
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index d382d980fd9a..dc079d1b03f2 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -830,7 +830,7 @@ static void sco_conn_defer_accept(struct hci_conn *conn, u16 setting)
- 
- 	BT_DBG("conn %p", conn);
- 
--	conn->state = BT_CONFIG;
-+	hci_conn_set_state(conn, BT_CONFIG);
- 
- 	if (!lmp_esco_capable(hdev)) {
- 		struct hci_cp_accept_conn_req cp;
+and update log messages according to the custom of the BT subsystem?
+
+Please use 'git log drivers/bluetooth/hci_qca.c' if you are unsure.
+
+> When the host actively triggers SSR and collects coredump data,
+> the Bluetooth stack sends a reset command to the controller. However,due
+> to the inability to clear the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits,
+> the reset command times out.
+> 
+> For the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, please refer to
+> commit: 740011cfe94859df8d05f5400d589a8693b095e7.
+
+commit 740011cfe948 ("Bluetooth: Add new quirk for non-persistent setup
+settings")
+
+> 
+> The change is placed under if (!HCI_QUIRK_NON_PERSISTENT_SETUP)
+
+Which change? You've described the issue, but you didn't describe what
+is to be done.
+
+> because this quirk is associated with BT_EN, and can be used to
+> determine whether BT_EN is present in the device tree (DTS).
+
+What can be 'used to determine....' ?
+
+> 
+> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+> ---
+>  drivers/bluetooth/hci_qca.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 4e56782b0..91009c6a7 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1653,6 +1653,20 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+>  		skb_queue_purge(&qca->rx_memdump_q);
+>  	}
+>  
+> +	/*
+> +	 * If the BT chip's bt_en pin is connected to a 3.3V power supply via
+> +	 * hardware and always stays high, driver cannot control the bt_en pin.
+> +	 * As a result, during SSR(SubSystem Restart), QCA_SSR_TRIGGERED and
+> +	 * QCA_IBS_DISABLED flags cannot be cleared, which leads to a reset
+> +	 * command timeout.
+> +	 * Add an msleep delay to ensure controller completes the SSR process.
+> +	 */
+> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
+> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
+> +		msleep(50);
+
+It should be done other way around: first sleep, then clear bits.
+Otherwise userspace might start sending SKBs while the BT is still
+recovering.
+
+> +	}
+> +
+>  	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+>  }
 -- 
-2.50.1
-
+With best wishes
+Dmitry
