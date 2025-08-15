@@ -1,69 +1,69 @@
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68A4A926
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 21:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECDB270540
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 21:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755294264; cv=none; b=hbnEcUAP4nV53irXwH49FZLGetKIYtw/1MMOjrgzqlXzybvLzR+1oy071yAUjldHmtsXxfpWfW9C5ksRZYI29HFDzgIIy2o1usTJ5ZnbIrB+CcIeuyEden+q96EUDWL9x/XWEPo7V9q7/E3vQ0Ul+YPfBI4YstH75lqjxyUFl9o=
+	t=1755294266; cv=none; b=ASaBWQUFHYtsmlOtNOOUJu7qQrkATlljwxjgYyBMjFA1uOcG/tnu/mx/bRINkA59FMmygNrDhWeCxPmXRf67wvT44Bl+UTkNeUqw7ulhxMgdoZI+b1kzW1nrLpmpFzgk37/s+b1baTY+ohtC+LijEccBNaRbKLRv5/6RXlxfnjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755294264; c=relaxed/simple;
-	bh=WY1PXOGbSPQtDTLCnXoO1bvjiENnGDQr+Fkm2rcELNo=;
+	s=arc-20240116; t=1755294266; c=relaxed/simple;
+	bh=cfbULKpfGK//dmoImA34B0ihmVFMSk6kO791MumgEIM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dAi8fe/qH/kbCKTM4IPF1ceMw4Ltl8hLkTry1mE6uicol0YrTEVbxZEjU3XWZKms4SM4+3UctszuF6XBsFrIDn0rwcW9QfsTky0Qc4YnvTmPnbol5KsXM0ERr3Fm+kBs8fCIKDkrpP3x0vHs0IFQ0UD+oYGFk0gl6f0TYr4wfMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CmiRGNU3; arc=none smtp.client-ip=209.85.221.171
+	 MIME-Version; b=miMhZ43OJCzQpOjP4mr56yvAqlSZR6WHip+E54gtHpmvbFLlSaEzNpGCpNm0Y6Im3+CfeDCxgLPXgMzdw37+rWrc+WQ0jLTw553Rh4wTlGvs6/nHGSLVGz5GZ4/ZkgTeHHf7W2KuPCPeMbK2ERD5b/jHBqtCaDUscVGzrFYzp/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AFyMvWdM; arc=none smtp.client-ip=209.85.221.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CmiRGNU3"
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-53b174c9c78so2149176e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 14:44:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AFyMvWdM"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-53b09bdcb73so2531733e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 14:44:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755294261; x=1755899061; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755294263; x=1755899063; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=j43+LmJvB/8EQsNhH6muwLkmdxA8CcWQHZZj8MrABag=;
-        b=CmiRGNU3Fg50d8+kULKDeCrPFra8UX4GOHrxSWSA/eZGtNqvHJHN/+gi30pWhlQSp6
-         S2MDY1v+Dks/iCkGAr1AwrBbFvamcFyW52zuUGWAhhSSYXk/QqPLM8h5NxpWehJvWBcA
-         YP140uDimyRjV3MyjESDRS11nHnFSPAYPdLO4QuTpiSPkfabYyzjWwZFdjeIK1DUqhUp
-         OAThiZy1UdMVKKcILCn2TZIHgXYYGD2Ne36Ng/+6PCJG+CpyN+5gy7rnnUpsEeQqEsSj
-         sjsxJbUI+BkGWELtLNybBFV5BsLdnBIFPVevFWjuWy274aqkb3v9sVtyk9Wgmzhv8DZh
-         DcwQ==
+        bh=PfyLExJIZRIDV96kK0zsVNt6NMv2kum8BM3bnt9BFgg=;
+        b=AFyMvWdMIVtEnjKvhI2Kc9wrCDzDDu/XcO1WDQ8A61ArEzD3LSrcVwuX3b9Lcp4m5M
+         FUpCazsHQCo8PX3S8EzArIKFLZZLbtsjTgoCCh6BYSszxlJwkVL4tfjnFON8XudCrpYg
+         MYPRHAWJkV7nB4YHbk742P27Gr3ot7oPinlyNW1kHsCFm74Z5KDBNa+a9FYqero5i2ZO
+         /nFd4HQjB0o2VtS+aHGIQYZ7EF0MTLD3aVL9DNP2Mqh6rd0fH6NvC54BZ0ZqeFF+Iizs
+         UTTsapVRRUBN/g9YhzWSX3yIKlS0PzxNFsh/7ZnI+wYBXkz9G8P0/AS5TalQCx8yx05B
+         4jQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755294261; x=1755899061;
+        d=1e100.net; s=20230601; t=1755294263; x=1755899063;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j43+LmJvB/8EQsNhH6muwLkmdxA8CcWQHZZj8MrABag=;
-        b=GZ+lIuhSYPKXocvUeudHqoivEzgFRKn5IWDdfe263BL3l7mDe5/2Q65Fai/8yuoLNL
-         Jm7smwKpAzWTWw7eTSf39Qt3sGrgPnYe5hMWND73Mg00FeepoO1OOELuEXSFrZi/Kdtp
-         GdNfQRkGNeuUBKAsPrYXIJgD1tXNutS0b9rpVPSjinmq6wkescUtaELjj+4nwu9CgJqi
-         3ajXm8CHxDkqXot4JXYv0jBdVG78fjtHlH+z7wLLo7qFgXRsLNJTPP4HHEksg4C940p3
-         s2VUmeVs4jnQqNlIVVoa20rYmh/IcsAKAjC7aoSgI7FtOrkw/eRH8ULvg4ND8tqvRzkd
-         pZcA==
-X-Gm-Message-State: AOJu0Yz5cbJwieA78sVXixTCR9SCXnI1L5vH5QSU/soGZ7aOyUaLRtlS
-	IFpM4Hx+sfa4hobtc8fpav7UhlacVkMEt9Z5he7k6zEiIeNXvfXZCc1rDUTB4tXz
-X-Gm-Gg: ASbGnctT4/50fkUCNDmzWrjHjv+pqdnCtvvFb+WB+5x1cPJ/wE/hIIYU+338jagsiEG
-	UXy9O4qq6wYNw8S+EFetNllyf84No1d2W/sov+tzErRhXW1Fgwk2h031cLEQOyip28wUQ0szanf
-	ocOSI4y4oClMFULnrMCqtRnCtJvTVe+cnkTLFubpkQYkZsCr8R7pjExS1taRZSXRxzT8Gmo0XvM
-	OUfCgH1A5VNgaWxX6idAqq8MjsmwqVtyPNldL58CI2e0tBHMKOZF8TPvfNySywwM6bsKO8UC/lH
-	objf+fjRXRb0VdzWxa+uaisV71KauWmIJoRB5jOe7VqoEBSvEhsysw4fGMtjV7Owo1yx/XK/RrD
-	MUIHjBMw/C+FOa16X+lk8/cFBR5m+kGuyKv+neGsDrywtU1loq8TbrUN8wHDKKGeQGEvVPkiXML
-	A=
-X-Google-Smtp-Source: AGHT+IFkTAIGkYWH75XKi+awG+5ZFXW04wmuvuE8OaLU4pHQnk4WjS8J1tGehRyetx+00qK4wFEZwg==
-X-Received: by 2002:a05:6122:1ad4:b0:531:2906:752d with SMTP id 71dfb90a1353d-53b2b983fc4mr1634790e0c.11.1755294261045;
-        Fri, 15 Aug 2025 14:44:21 -0700 (PDT)
+        bh=PfyLExJIZRIDV96kK0zsVNt6NMv2kum8BM3bnt9BFgg=;
+        b=EO2uvCIrBYHMOWe1Rm9lKCH9wJCOS1mOPKEoEFBVYlub2HtaKItTaIPIHNx/6j7D5v
+         hfet/h5R3RBd7red3/b/UaGok3r18G9fXYGfpuyxfiiCdsy4BE6od7A+FvElGIdsnMWe
+         dT0VcLnO8mjVDu51NJURnP3KiHob/RuTkNKZwTlYxV+SSPxFuKx25372Sa/+bBLMV9dC
+         5wQao+Kcxi1Lcy72zzySTlHgeFmgB+ys66WWESAD6W2LNeoZ+bgeVLfWNBArrBJ6wJxP
+         Vu32tW1USkImsZ4l0I1lcsW7RidqvdWDlZYdpYuZ6ZT8SvXKO4J4y23KpxtxEkg3x+V6
+         tKeQ==
+X-Gm-Message-State: AOJu0YytFeonoTizFLc/hBMOrnwKRxhy+fk9QTZl9GD1ChTVAfTPbzRl
+	WUd42spGouRs78Mzm8Yrx8R6PbWHJa7suE3ukCp7cUAFrI6MRhBcHlApnTJzHWc+
+X-Gm-Gg: ASbGnctCrl6fmogRbS/tsQnSJEEH96dFeukHZtsPuQGATz+VvX702aKKee2AudRuos6
+	3Yl7hz6drk2nQccMwcZ4BHPU1L/LqmABhK1CHXCYf1rzs7OmJ1Cfj4zPzigZ4GZ3B9lCta5Ig8x
+	FPb88RLq7Yl2BptwvcuJdJjGLKE7n5lripMqAPrwfwfqffIDF6bFdlmdfPq6DQHKigvclDIbIoS
+	A3kNgs7K3jCgUomzTpDakyH7QxohCJ4KXFSmKttfSQxwoj692qTjbMpqRvru+yRJUvXu9oEf5GQ
+	SlFkaHBa7KWwQE4Wakh/S2vD9k+jL6whl9sqkC02Lh+ApjVZyW6ytO5SBQR5gfCoU9CqbKo1YUN
+	Y6UlSpw0C6oba0G6hYOJeZMfqwTkHkMRl2J2BEOVIsX/eWA+hrYx1/mx76Juas6pO7QkiBwJjcl
+	MpZyZxhZgB3g==
+X-Google-Smtp-Source: AGHT+IHKruTkXgkWQv5iL35sIMCWySO3tnxddh15c19ujqu5MRML96Qc/1gA2W9LVl/+tRi6bmDkFg==
+X-Received: by 2002:a05:6122:6585:b0:53a:d808:1ff2 with SMTP id 71dfb90a1353d-53b19c32c7cmr3602329e0c.1.1755294262803;
+        Fri, 15 Aug 2025 14:44:22 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2beff1c1sm472053e0c.24.2025.08.15.14.44.19
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2beff1c1sm472053e0c.24.2025.08.15.14.44.21
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 14:44:20 -0700 (PDT)
+        Fri, 15 Aug 2025 14:44:22 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 3/6] Bluetooth: hci_event: Convert instances of BT_DBG to bt_dev_dbg
-Date: Fri, 15 Aug 2025 17:44:02 -0400
-Message-ID: <20250815214406.514260-3-luiz.dentz@gmail.com>
+Subject: [PATCH v1 4/6] Bluetooth: hci_sock: Convert instances of BT_DBG to bt_dev_dbg
+Date: Fri, 15 Aug 2025 17:44:03 -0400
+Message-ID: <20250815214406.514260-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250815214406.514260-1-luiz.dentz@gmail.com>
 References: <20250815214406.514260-1-luiz.dentz@gmail.com>
@@ -83,103 +83,67 @@ default.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_event.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ net/bluetooth/hci_sock.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index fe7cdd67ad2a..34b243c26bbd 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -947,8 +947,8 @@ static u8 hci_cc_read_buffer_size(struct hci_dev *hdev, void *data,
- 	hdev->acl_cnt = hdev->acl_pkts;
- 	hdev->sco_cnt = hdev->sco_pkts;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index fc866759910d..486ca9254688 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -205,7 +205,7 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 	struct sock *sk;
+ 	struct sk_buff *skb_copy = NULL;
  
--	BT_DBG("%s acl mtu %d:%d sco mtu %d:%d", hdev->name, hdev->acl_mtu,
--	       hdev->acl_pkts, hdev->sco_mtu, hdev->sco_pkts);
-+	bt_dev_dbg(hdev, "acl mtu %d:%d sco mtu %d:%d", hdev->acl_mtu,
-+		   hdev->acl_pkts, hdev->sco_mtu, hdev->sco_pkts);
+-	BT_DBG("hdev %p len %d", hdev, skb->len);
++	bt_dev_dbg(hdev, "skb %p len %d", skb, skb->len);
  
- 	if (!hdev->acl_mtu || !hdev->acl_pkts)
- 		return HCI_ERROR_INVALID_PARAMETERS;
-@@ -1214,7 +1214,7 @@ static u8 hci_cc_le_read_buffer_size(struct hci_dev *hdev, void *data,
+ 	read_lock(&hci_sk_list.lock);
  
- 	hdev->le_cnt = hdev->le_pkts;
- 
--	BT_DBG("%s le mtu %d:%d", hdev->name, hdev->le_mtu, hdev->le_pkts);
-+	bt_dev_dbg(hdev, "le mtu %d:%d", hdev->le_mtu, hdev->le_pkts);
- 
- 	if (hdev->le_mtu && hdev->le_mtu < HCI_MIN_LE_MTU)
- 		return HCI_ERROR_INVALID_PARAMETERS;
-@@ -1227,7 +1227,7 @@ static u8 hci_cc_le_read_local_features(struct hci_dev *hdev, void *data,
- {
- 	struct hci_rp_le_read_local_features *rp = data;
- 
--	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-+	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
- 
- 	if (rp->status)
- 		return rp->status;
-@@ -2921,7 +2921,7 @@ static void hci_cs_switch_role(struct hci_dev *hdev, u8 status)
- 	struct hci_cp_switch_role *cp;
- 	struct hci_conn *conn;
- 
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+	bt_dev_dbg(hdev, "status 0x%2.2x", status);
- 
- 	if (!status)
+@@ -365,7 +365,7 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!atomic_read(&monitor_promisc))
  		return;
-@@ -3753,8 +3753,8 @@ static u8 hci_cc_le_read_buffer_size_v2(struct hci_dev *hdev, void *data,
- 	hdev->le_cnt  = hdev->le_pkts;
- 	hdev->iso_cnt = hdev->iso_pkts;
  
--	BT_DBG("%s acl mtu %d:%d iso mtu %d:%d", hdev->name, hdev->acl_mtu,
--	       hdev->acl_pkts, hdev->iso_mtu, hdev->iso_pkts);
-+	bt_dev_dbg(hdev, "acl mtu %d:%d iso mtu %d:%d", hdev->acl_mtu,
-+		   hdev->acl_pkts, hdev->iso_mtu, hdev->iso_pkts);
+-	BT_DBG("hdev %p len %d", hdev, skb->len);
++	bt_dev_dbg(hdev, "skb %p len %d", skb, skb->len);
  
- 	if (hdev->le_mtu && hdev->le_mtu < HCI_MIN_LE_MTU)
- 		return HCI_ERROR_INVALID_PARAMETERS;
-@@ -5346,8 +5346,9 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev, void *data,
- 			goto confirm;
- 		}
+ 	switch (hci_skb_pkt_type(skb)) {
+ 	case HCI_COMMAND_PKT:
+@@ -810,7 +810,7 @@ static void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
  
--		BT_DBG("Auto-accept of user confirmation with %ums delay",
--		       hdev->auto_accept_delay);
-+		bt_dev_dbg(hdev,
-+			   "Auto-accept of user confirmation with %ums delay",
-+			   hdev->auto_accept_delay);
+ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ {
+-	BT_DBG("hdev %s event %d", hdev->name, event);
++	bt_dev_dbg(hdev, "event %d", event);
  
- 		if (hdev->auto_accept_delay > 0) {
- 			int delay = msecs_to_jiffies(hdev->auto_accept_delay);
-@@ -5977,7 +5978,7 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
- 		 */
- 		break;
- 	default:
--		BT_DBG("Failed to connect: err %ld", PTR_ERR(conn));
-+		bt_dev_dbg(hdev, "Failed to connect: err %ld", PTR_ERR(conn));
- 		return NULL;
- 	}
+ 	if (atomic_read(&monitor_promisc)) {
+ 		struct sk_buff *skb;
+@@ -1625,7 +1625,7 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
+ 	bool var_len, no_hdev;
+ 	int err;
  
-@@ -6871,7 +6872,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
- 	struct hci_conn *conn;
- 	__u8 i = 0;
+-	BT_DBG("got %d bytes", skb->len);
++	BT_DBG("sk %p skb %p len %u", sk, skb, skb->len);
  
--	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-+	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+ 	if (skb->len < sizeof(*hdr))
+ 		return -EINVAL;
+@@ -1655,7 +1655,7 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
  
- 	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_CREATE_BIG_COMPLETE,
- 				flex_array_size(ev, bis_handle, ev->num_bis)))
-@@ -7249,8 +7250,8 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
- 		return false;
+ 	if (opcode >= chan->handler_count ||
+ 	    chan->handlers[opcode].func == NULL) {
+-		BT_DBG("Unknown op %u", opcode);
++		bt_dev_dbg(hdev, "Unknown op %u", opcode);
+ 		err = mgmt_cmd_status(sk, index, opcode,
+ 				      MGMT_STATUS_UNKNOWN_COMMAND);
+ 		goto done;
+@@ -2200,7 +2200,7 @@ static int hci_sock_create(struct net *net, struct socket *sock, int protocol,
+ {
+ 	struct sock *sk;
  
- 	if (opcode != __le16_to_cpu(ev->opcode)) {
--		BT_DBG("opcode doesn't match (0x%2.2x != 0x%2.2x)", opcode,
--		       __le16_to_cpu(ev->opcode));
-+		bt_dev_dbg(hdev, "opcode doesn't match (0x%2.2x != 0x%2.2x)",
-+			   opcode, __le16_to_cpu(ev->opcode));
- 		return false;
- 	}
+-	BT_DBG("sock %p", sock);
++	BT_DBG("sock %p protocol %d kern %d", sock, protocol, kern);
  
+ 	if (sock->type != SOCK_RAW)
+ 		return -ESOCKTNOSUPPORT;
 -- 
 2.50.1
 
