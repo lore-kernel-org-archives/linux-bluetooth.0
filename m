@@ -1,101 +1,96 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45023450F2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 22:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755296232; cv=none; b=eCjVbdk0A1Sd/OwpCrU1ACt1YKTNDxIdM5mnZiOCx/iQwpbXPDJgn8jOVW3CsXehiah06u/9YO+oDg9W9GE+RxtwrIP/L1Ud3BuC7sSmT6xZSipQTMIJsa7ikrRLyCUL0C7xyFlkdbVhR1YRTqiXbIZwdUIK4zFeXyK2q5WDVAQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755296232; c=relaxed/simple;
-	bh=4c1/SJdhCOosUZtTWW2OINHe1RaTktufPc/2DP9JAyM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rXbNUV9VC2X5J69TZ5Qtjgu/vSRGTIpS2zgYOkwUlw4ScAZaPNlWFPAsAotWvgU/A59MW4luY5VGGCRVhMxA0E9E5PT0KOQbEXvfY46JSCQ4icpLMWvTrrfASRTFcRndcVnz0sh/sqXSg4rn/AFPrR3/3W5uSAaGuDpCSpnFHW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bePO+w7+; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3958B1C5D4B
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Aug 2025 08:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755334624; cv=pass; b=P1j30/H/1vhzIh26xq3UqZW0MaGrk7fGSXs7HClxUxK02gyhJs2XCVpcbdT+dhd+eXn2KHq+KzJ/7r/c5Ue0RKrFSsLAgZBLNghcDOr4Y93Z84MWj37mPZmLZ7R+QeAzjsKR95YVn3ZnuAotnvXGGue84FSgWo2zZjJ/mqwimuM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755334624; c=relaxed/simple;
+	bh=8Ag2pprYvqKqL6pWunbSGG+8Yl2W23UJ/RGaB7/nJR8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R2Csa4G/39jrLmY+gvp+U0xgUPZOl5cIXkpWbgj5NLnWu1CGbuX1jXZsqWRgfRNG/d4l+941VsYrefm418A95mrqFceOSsLQ7u5vTvL1N9bTANgUEE0+7OffJuEWKA5JZuilha6jd9gyVcz1r6U5yJ2il0T6eq+UXR4onHf6Iy8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=PJAhCtPb; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bePO+w7+"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-74382002fa6so1118818a34.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Aug 2025 15:17:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755296230; x=1755901030; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4c1/SJdhCOosUZtTWW2OINHe1RaTktufPc/2DP9JAyM=;
-        b=bePO+w7+rlnK+Ps+PDNnZXG/E6ALaAqJfNTco2R1ljxx9zOEWXPJgm/YWPMNQwFv2C
-         /Fy8GPj0uREgiZCDeyTbUFmcBvSvurfj6zHCZypsPYyREG8M7iR73HCkGISsAVlSkxN2
-         F8Gq91Y/zHxIUaOV4kf8LOOreo23CD3WVjaY1g6+oGDOsqBQTdBdjTwUaejEw6ZADO4u
-         3uKvlWQoG1wrNuH22j+tcHy89JBhTmmC8sBV2kgKhKsXEQ1MSjJBVMss0nBhC5cyj+Pv
-         PfFbH7wHPcJk3x4kNllrj0OwPigly+m0zklTPxVxlQPbv867LXynqaTGKNi+HQl+ON9l
-         o5yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755296230; x=1755901030;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4c1/SJdhCOosUZtTWW2OINHe1RaTktufPc/2DP9JAyM=;
-        b=IXwP0VTFAC7M75n9GZMeLiS/i8xu6PcLUVCXE40VT37WHULub1CPwfUU+uFeuj/2DU
-         yR5TtbzvLrZ9ETDiwc+I0StMR5b5tzJT5RwZoODxaiQzfxEA5lvpzaVZgUYlfUWPEdtZ
-         ICm7Lr29kqk6EnAL7Gfeg0RHi/9siLXeltDRsmTxl/zsR5gDZfF7vAx4Zfsmah1zFM7C
-         CW5z7ztj3YPG9JPmTKjaIR+tVq8TLgXcGpfzduAvj75l2SvnIG5zNY4bthfJmNG1WYkf
-         r2bm6PSFQqDIkRz3Oi/ZpaY0tPTB2Lv1938lgZdbGgtBgZ5iarB1N67OvnlYUOXm04sU
-         BfDg==
-X-Gm-Message-State: AOJu0YxH+lC1+ndxpICQeyDeZeM+VdE9QkPQsussOi+zOu48YZPZ55P9
-	Ip+qApDkrVBb1z3PIjCVbSSXl23occNvNkZwce+046UqZOhQ/NbxHGi8a8KdfsDc
-X-Gm-Gg: ASbGncsrj026obvRmhEerFr7mmVUg+J8bDh7JpCpwvLlvSVBOG7ci7Ur+QWz8raEOp3
-	R0JataRuqMRMrW99SIKWuXXT6kVw21UskQYJHsY9Y1v3aMNYu18NjBuTVCjvTi0JZV9F0080UJQ
-	zFedOXRlBLx3uFUwIBgO2BbKdimwmQlRBNshOYEDgLe+uxuKweQkO9YHlqeAbHFESqxIJhEr8mf
-	iQjTnalV42K2n6TqitWTHUPtl8Clw2hVmTbd3Jz+WwrpOY0h606ZnH4zQOgohabXkDUzxCs2vCJ
-	f+rjzijbS+Xo/l9zGbjSWkQCKxY+vYe+KJylKE1cLm3Upki5a5qatPUXAjJbEeyYf5kGHgqjlb3
-	HIXIuGANPZ6NHpkAfTfIphwu5hWcM+rHY5aJzqXzG
-X-Google-Smtp-Source: AGHT+IEobOjbd//s7gNQp1Ouz/zkW8LS+l3dA2wGI1XKDUrLuXc7H1WHajVOlBC38JZVMG2gHv4znw==
-X-Received: by 2002:a05:6830:3107:b0:742:faaa:d9c9 with SMTP id 46e09a7af769-74392396b18mr2145626a34.1.1755296229983;
-        Fri, 15 Aug 2025 15:17:09 -0700 (PDT)
-Received: from [172.17.0.2] ([172.212.167.81])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8843f9c3334sm87350039f.22.2025.08.15.15.17.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 15:17:09 -0700 (PDT)
-Message-ID: <689fb1e5.050a0220.1ffd84.1ab0@mx.google.com>
-Date: Fri, 15 Aug 2025 15:17:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1884602802592408868=="
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="PJAhCtPb"
+Received: from monolith.lan (unknown [193.138.7.158])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4c3tBw425qzyRb;
+	Sat, 16 Aug 2025 11:56:56 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1755334617;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=h+SPSIMWWP+w9jbZMezmw91ZEO2B/8AbB/e8GKSDwUs=;
+	b=PJAhCtPb//5PkT8xfE3GrgaoG7QqgVkakBqj12nr6upYJ++Se0ZPUkGOI8z7NzWaLDeqic
+	qkoZ7rdjE6Ig2bdXruGRotvc32YFPI05KVG6qRp8eas44mgbveVuPDKx7LWKFexWPjVPWj
+	Mrv4C8arTQgg3u5WX9xLM8bYInMrZOk=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1755334617; a=rsa-sha256; cv=none;
+	b=EuMNGw0soKfC2VfyeXd5zHhfXZ9+ky7BMJYpG/yxpZII7+i8Ro7kP+RA378xvGybqmqvPy
+	vhiqGMfKY9jZt/RhhFi1BBKFPymIpE0Hx1+/uHVLa5/wJ41KsxLyqP2a9/J6zEkayXL0mc
+	vskUr5tgAQnIgbDeS4RRnoNPSskc/0Q=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1755334617;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=h+SPSIMWWP+w9jbZMezmw91ZEO2B/8AbB/e8GKSDwUs=;
+	b=fa8KThTuQ8vTyo08aw9BzznJ1Xr5C8XE9IjfqHEdUB8wx/4fi9JwDqbS5ZEUl7rQgVHh+J
+	RcTJCyeg+thaIHjU0B/hz/far9yQWzS9j7N2uaN1WCfBCNamhre8RCeQYPT4YjG8KKvLZy
+	qsmetxWQCJJ2BkElmh631g/BRR0pJE4=
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] transport: fix A2DP Delay values missing from DBus
+Date: Sat, 16 Aug 2025 11:56:53 +0300
+Message-ID: <b2fba95d658c75135f0ee7b4bc11e193be126622.1755334561.git.pav@iki.fi>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1,1/6] Bluetooth: hci_core: Convert instances of BT_DBG to bt_dev_dbg
-In-Reply-To: <20250815214406.514260-1-luiz.dentz@gmail.com>
-References: <20250815214406.514260-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1884602802592408868==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+With headsets, a2dp_transport::session == NULL usually until stream
+resumes. During this time, delay_reporting_exists() incorrectly returns
+FALSE, because streams corresponding to NULL session cannot be found.
+As no further "Delay" property updates will usually arrive, the property
+remains missing even though delay reports have been received.
 
-This is an automated email and please do not reply to this email.
+Fix by setting a2dp->session when processing a delay report, if missing.
 
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: net/bluetooth/hci_core.c:3763
-error: net/bluetooth/hci_core.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Log (bluetoothctl):
+[NEW] Transport /org/bluez/hci1/dev_XX_XX_XX_XX_XX_XX/sep2/fd1
+[CHG] Transport /org/bluez/hci1/dev_XX_XX_XX_XX_XX_XX/sep2/fd1 Delay is nil
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/transport.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 2b9832a76..ab149bcd7 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -2649,6 +2649,9 @@ void media_transport_update_delay(struct media_transport *transport,
+ 	if (a2dp->delay == delay)
+ 		return;
+ 
++	if (a2dp->session == NULL)
++		a2dp->session = a2dp_avdtp_get(transport->device);
++
+ 	a2dp->delay = delay;
+ 
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+-- 
+2.50.1
 
---===============1884602802592408868==--
