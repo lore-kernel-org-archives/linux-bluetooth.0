@@ -1,66 +1,61 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3958B1C5D4B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Aug 2025 08:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755334624; cv=pass; b=P1j30/H/1vhzIh26xq3UqZW0MaGrk7fGSXs7HClxUxK02gyhJs2XCVpcbdT+dhd+eXn2KHq+KzJ/7r/c5Ue0RKrFSsLAgZBLNghcDOr4Y93Z84MWj37mPZmLZ7R+QeAzjsKR95YVn3ZnuAotnvXGGue84FSgWo2zZjJ/mqwimuM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755334624; c=relaxed/simple;
-	bh=8Ag2pprYvqKqL6pWunbSGG+8Yl2W23UJ/RGaB7/nJR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R2Csa4G/39jrLmY+gvp+U0xgUPZOl5cIXkpWbgj5NLnWu1CGbuX1jXZsqWRgfRNG/d4l+941VsYrefm418A95mrqFceOSsLQ7u5vTvL1N9bTANgUEE0+7OffJuEWKA5JZuilha6jd9gyVcz1r6U5yJ2il0T6eq+UXR4onHf6Iy8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=PJAhCtPb; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C97421CA0E
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Aug 2025 09:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755335609; cv=none; b=aBtekWg7wmEE45INZeFwGoOaSCgTQp2uuroo0ao1YErsvNAY8lVrGNqAjcIi5FjihWqxL/nWfa2XgLYZ1/RHB1kXyjY71IeWMDQ8p+7IB8tXNUms9PdjpooouRwST7+kdK1gh6ShQ9S606w7l3LJNBPg+hLM2+cqH/c/wYTWFfQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755335609; c=relaxed/simple;
+	bh=QlLnuTCuyf1OCNLQ0WTeBuvuib0Cm8Ru7rfzBaPjt+Q=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=scjBJWW4KPp72V8tfQ1lSRoa5JF2IRv5xiFOzPkXmuBDN7TyZbkT5/3V8IetqK0Un0jgJafHqDEvP0hRzXMpghK4aLNwORpADxW9Lno8I4bichKcMPbMjJEpt0m986uBJtkf6epwGDwVz0JoEDLbabC2M8tSg8BvNbhG8RjeuiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UT2AT64r; arc=none smtp.client-ip=192.30.252.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="PJAhCtPb"
-Received: from monolith.lan (unknown [193.138.7.158])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4c3tBw425qzyRb;
-	Sat, 16 Aug 2025 11:56:56 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1755334617;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=h+SPSIMWWP+w9jbZMezmw91ZEO2B/8AbB/e8GKSDwUs=;
-	b=PJAhCtPb//5PkT8xfE3GrgaoG7QqgVkakBqj12nr6upYJ++Se0ZPUkGOI8z7NzWaLDeqic
-	qkoZ7rdjE6Ig2bdXruGRotvc32YFPI05KVG6qRp8eas44mgbveVuPDKx7LWKFexWPjVPWj
-	Mrv4C8arTQgg3u5WX9xLM8bYInMrZOk=
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1755334617; a=rsa-sha256; cv=none;
-	b=EuMNGw0soKfC2VfyeXd5zHhfXZ9+ky7BMJYpG/yxpZII7+i8Ro7kP+RA378xvGybqmqvPy
-	vhiqGMfKY9jZt/RhhFi1BBKFPymIpE0Hx1+/uHVLa5/wJ41KsxLyqP2a9/J6zEkayXL0mc
-	vskUr5tgAQnIgbDeS4RRnoNPSskc/0Q=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1755334617;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=h+SPSIMWWP+w9jbZMezmw91ZEO2B/8AbB/e8GKSDwUs=;
-	b=fa8KThTuQ8vTyo08aw9BzznJ1Xr5C8XE9IjfqHEdUB8wx/4fi9JwDqbS5ZEUl7rQgVHh+J
-	RcTJCyeg+thaIHjU0B/hz/far9yQWzS9j7N2uaN1WCfBCNamhre8RCeQYPT4YjG8KKvLZy
-	qsmetxWQCJJ2BkElmh631g/BRR0pJE4=
-From: Pauli Virtanen <pav@iki.fi>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UT2AT64r"
+Received: from github.com (hubbernetes-node-65143dd.ac4-iad.github.net [10.52.174.54])
+	by smtp.github.com (Postfix) with ESMTPA id 93BC320835
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Aug 2025 02:13:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1755335607;
+	bh=qZP4tD75dNRee+B3B5IcPk3Vm5v15SIeyin+sFvmck8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=UT2AT64ro4kPUduqAJaYgMSyor/D7XlMnmdjvMsAimopLHxAbccrIsjbni2uKMLCG
+	 KfbD6hZPaEpElnS74et/mjhfpVVMWx8p6VwEMcg7R5IS4QX2TH3rTClYrsjblxlakX
+	 CR1eBtLCzdETXxzhZ01SE/mLZ6j5mhaum6ctEH5M=
+Date: Sat, 16 Aug 2025 02:13:27 -0700
+From: Pauli Virtanen <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] transport: fix A2DP Delay values missing from DBus
-Date: Sat, 16 Aug 2025 11:56:53 +0300
-Message-ID: <b2fba95d658c75135f0ee7b4bc11e193be126622.1755334561.git.pav@iki.fi>
-X-Mailer: git-send-email 2.50.1
+Message-ID: <bluez/bluez/push/refs/heads/992140/000000-40cdfd@github.com>
+Subject: [bluez/bluez] 40cdfd: transport: fix A2DP Delay values missing from
+ DBus
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+
+  Branch: refs/heads/992140
+  Home:   https://github.com/bluez/bluez
+  Commit: 40cdfd1c961462d3fd889521ecad078854c31d64
+      https://github.com/bluez/bluez/commit/40cdfd1c961462d3fd889521ecad078854c31d64
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2025-08-16 (Sat, 16 Aug 2025)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: fix A2DP Delay values missing from DBus
 
 With headsets, a2dp_transport::session == NULL usually until stream
 resumes. During this time, delay_reporting_exists() incorrectly returns
@@ -73,24 +68,7 @@ Fix by setting a2dp->session when processing a delay report, if missing.
 Log (bluetoothctl):
 [NEW] Transport /org/bluez/hci1/dev_XX_XX_XX_XX_XX_XX/sep2/fd1
 [CHG] Transport /org/bluez/hci1/dev_XX_XX_XX_XX_XX_XX/sep2/fd1 Delay is nil
----
- profiles/audio/transport.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 2b9832a76..ab149bcd7 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -2649,6 +2649,9 @@ void media_transport_update_delay(struct media_transport *transport,
- 	if (a2dp->delay == delay)
- 		return;
- 
-+	if (a2dp->session == NULL)
-+		a2dp->session = a2dp_avdtp_get(transport->device);
-+
- 	a2dp->delay = delay;
- 
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
--- 
-2.50.1
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
