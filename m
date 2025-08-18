@@ -1,67 +1,72 @@
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DEA17A318
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Aug 2025 20:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9548119995E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Aug 2025 20:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755550084; cv=none; b=CvNHInPx1GgSxZmXYJ2XF0CKDnrC1Xvg1UIKf2yM6KlY28etUZ98FPqVzaiRAJpveXoQ0W3N95jGydiRpJlsQwvOQv3z0OkX8GkeXCzCIK+XHuQd4gEuk7Wn0aGoPrbq0oHO/wfuZgAttQvba+5JwoAvjR397MFmJTKh/cnpkNQ=
+	t=1755550086; cv=none; b=D0Jf5oFgykkFcjzkm7ugflcO/Qzy+XQyTqjlkTnqF+dQraIiLBQ1I5Lsyg2piGPu9QVo+fDGpnUwLesruYg591QXLTX4A/BU0fQ9aVps/mwG9MW03//S26lU/0xe37SztivI/qO5E7tBu6qC5gDBgma65SM99FmKnb0Dw5Lvxzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755550084; c=relaxed/simple;
-	bh=+UNqwN0lvhnLZer+2kwcBWdRqX4zit29/j7Fl65OJ6A=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=OrjXXps7trUwiJFrmUucZIuEynYkGEsGVzlL8YS2u72jAfypGAvtPyv3eIThQH+dqEJo14C91o0plmeoOdHNWaWMVcz5jGNwkBR9in3xGsuo0F14eYnPKYP1JT6XqKyIeU8uzQDw3qQv52xJ07TGeBUSnYm/MsLHmHZ5tpWODBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bvlU9yNS; arc=none smtp.client-ip=209.85.221.170
+	s=arc-20240116; t=1755550086; c=relaxed/simple;
+	bh=0GMNz6Lzo0O+4w6YB5l4mGMRnmjFQFBseyny+6cG8JM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=E0aIik42VBbTE/CmSEZCPBCHbh9lslRO/IMlkWYFHl68b/MBbTskbM0wqnKkOm2k+vLKjNTC5/KXnNQ/1aXn9NNJnSfOr2gfR+nXvc+ytYaJVC52EIvC365IHVsa4ExbRb/B7NTwKqhIFvsCt4WIIiyI3mVe/mP8lOG9JDYIwcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mS4wgPRp; arc=none smtp.client-ip=209.85.221.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvlU9yNS"
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-53b17534eeeso1658192e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Aug 2025 13:48:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mS4wgPRp"
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-53b17498109so1619044e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Aug 2025 13:48:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755550081; x=1756154881; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sj+x3WkUhhPY4Gv9zZbBpJ39x1Qv7FoUsuGV2IEyBrU=;
-        b=bvlU9yNSF74tztAiZ7HGJMtmracaM3bAmx5Z4kXzJC5t06FzOqoq/9r6MPvygMDzSd
-         L0qCcXXbQ2/jJ/WMLaRIyvvB5lTsK14tnzL1tAcH6CfD0XyKRkRH9vzKv78YKcl0N0BZ
-         tdYUF3kVuZFELt+PbMUEU1S9bCLK0UVuyKJycSKrceTv2VmudqlIcSGPcred7gNUaaeI
-         v1EVMUlDVpiHVSn3JF/YuAmSNf/geDcG0KFYqiNrNuX+Ny+PVOsVGu58uCvIBDvPViRm
-         iNIUk3HMiobOzaWcB6JMK3GCEaZYZnkk8g4f9klBtmDU9FI2iOU6hbCFx/x+iMgRStak
-         jZDA==
+        d=gmail.com; s=20230601; t=1755550083; x=1756154883; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f773MTCsDkxYVSB4zhokCXc/Rip0xf0fM0YLkB6AI38=;
+        b=mS4wgPRp+gxE747XIvv25yGd93262vU2/3pHkSRwNtDKCOsRf1Q8SAbNUe8jWOsru8
+         j35fQc9NK381Tp4coDJ4wN7CGSW78gJG3NUUxvFd2T6POb+Pv1ADJ8VYAyij9zAD3Rb0
+         TvVuZ2JtlPxkgmx0sElR9oVYnsPKVsCg0HxkNvCx3eE9GbXz+bUnzkfYMJrkmk0OykC8
+         h9K3NdRU8w4txMjOefWx0gdyzhiqYcseF3I0NukCZGuuBk/hE3SSA4uK1+aMR3gGsia8
+         OANGNwAd/9k/GLJeAvPMDGGzXgLs1l8MYYHEU+Abp7IouXx41m89XhWq6XLZ+N4aDStL
+         ffmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755550081; x=1756154881;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sj+x3WkUhhPY4Gv9zZbBpJ39x1Qv7FoUsuGV2IEyBrU=;
-        b=kNDCLjG9gkvq9ApkoC3qNEW9fsaqcbWYRC2dR5aR3ylstXFqEPB3FPGiMTqnugydP2
-         yv9xDY9l/YONLyuGl1ftxKuzRGfDHr3o4QF6osRkaxvTyyFWgb7hDig+VfyHeNhgq549
-         WyuYbp1JjjA36upEi5cRudV95LX1+iSjH0X0mzKiUvmEPbvx+ivmqZlwmam+if1iDVRS
-         ZhT3uz35TzrRnLNNaGhAVwZL/uuDsXpZZL/0oRtcpRfz82tw+44OiH8sSiRRzlks1K5Y
-         UMXichmmLpKTMvn+cgxMmiRwzclZ3PcFhFZzSONXcjHdvI69k/AVL+cia+I9RPRgkHco
-         p5sg==
-X-Gm-Message-State: AOJu0YwLoeQDdPZ1Dyg30JB7b/WJxDGjGWAI7CMhs14L1ST8uTd88Qdo
-	fk2KAWIV36zj3zLJuCmixltpz/YlnTmQF/2uFVG4X7r36GNWgTHbbVsyfkJ4ebTY
-X-Gm-Gg: ASbGnct42AZDr43VqpHNLClHxSZZ2G70CGTjhcOrMyUZtUnM3JojT0YOLnELLzIFHmj
-	4ZIc/sZXcaKbGarnR65fwFYewgj836lZADF6tWtxLvBsU1XYylge70F6FHaq6KWgjgCbdfowId0
-	Js24Mm3xv0SwxZ4Ky/e1lFL4SS00173ndFLWkcNOs7OieAgX0acXBSCL+p7Acyr1WBbNS/NCV9K
-	5vETw+fMVydYqyWXaq2wPmm1tjcv4Mo4sIrYvlFSW6CSkE+UHOmJPorrHSpoRXcX4JmApTNXkl9
-	SVWHuvpqEAg7azqt2ZQZPMqo6WBVSXKiHSaF857BktXTnBWpWpVLt0BBypEnjo8nJ6kozb11isb
-	hVZS4CI73w1EKqsZk6okTDM7wRQ30GObgT7Ly04DiGhmj0eEXwDXDBMa3c4+cjgsHd+bI+ECBpU
-	g=
-X-Google-Smtp-Source: AGHT+IHl01M7jzWAUaLHiVA87dL6axZCRZDJLGeGHhTe2DAYcap4e3bNqtyZgzIueHA2pbdFKI6gUw==
-X-Received: by 2002:a05:6122:da3:b0:530:5996:63a2 with SMTP id 71dfb90a1353d-53b5d2fb7b4mr71990e0c.7.1755550080571;
-        Mon, 18 Aug 2025 13:48:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755550083; x=1756154883;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f773MTCsDkxYVSB4zhokCXc/Rip0xf0fM0YLkB6AI38=;
+        b=gnCqZDX4JEiKQbxFU1FRbcggltKCsYFHZWl5RLNxsDI4Qg/OWSai7Os3I+Cr3pd7tA
+         7+semxSAINrJsmoGMUN0jsS8HWnomW/uJphD2cfxejLGfQ4mAiqKI2ZLJMexOZR/Bkkq
+         VweYgOq/KB9qRbL4ucH3/N9N4PI3fRWv0Zervtoqjo5/BOgANUX1c2FjtXdDfRrdxd6h
+         H3pH0NqVs34kYcsBM5na9iBzUEryq9OCUQ2VxDD+2TFnk2ANiFmKXBO7qe22WST1G9zg
+         Uqs/oIT89GjAELavP6uxlCrnLkBdBhpQ2ixfBhWGnmp3v4Bk0/p3/9r3yjZPCP3egfDO
+         ybhA==
+X-Gm-Message-State: AOJu0Yy6CfuniP9+7KWWLmPjQ7IRyAbbm0m5NOnU3eslnGAsrbGvGDZn
+	M1ecrs6VIS1DZKiXVDQszij5C6kRp7ev+bzttBmkYrz5rIK/GQlIuQ/HnjoHqtmG
+X-Gm-Gg: ASbGncuaAUBVRYazeGM5EamMdoE6o6oIrtBThfpXQaKcER7JrTvmL1GV+zmXASrTxEJ
+	hIQ9gkOeo/zwAZzVQs9mmmQZKKXKuP9Ls/Xj8cZtI3ZKl4+UCJ9v4JDUIts+a8qZ8NoX0gQMun1
+	sc7iXn5i5cEX4LqfGgf7n5rTkqXvsdZzKeOQjIy5YPyWXVzm4BU+/ghwduQX8yBHVH2LuX5oWeW
+	0EV5aQfZ/BMN0ptigGSZjh0qe00mtFE8jdqkgRZ3COumCMg2HovP5IqTizPQfPyG0/54n9yH+OA
+	O6bz83fuy3PA+CVXm3iBQ7QjZ5rEP9GBgRxiS0bDV80T8/wx8QWSlk8YEjw3chq+D0VyeZA5YVr
+	FuNVFL8LNQp9Q+kaP717DWk59wA1oDP1cf1KzF15CBnvfU76EqkrRtRenWU+q28oF0FwvkYXKzW
+	A=
+X-Google-Smtp-Source: AGHT+IGUHXJVOhY4uHuWEGEbulvdm7g4wSP62Cry7h7zpVdmVwQ1S48Eyqdwsz2JwuAqvHQD9RQskg==
+X-Received: by 2002:a05:6122:65a3:b0:537:3e51:eb98 with SMTP id 71dfb90a1353d-53b5d315d5dmr67123e0c.12.1755550082658;
+        Mon, 18 Aug 2025 13:48:02 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2bd553casm2101079e0c.2.2025.08.18.13.47.58
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2bd553casm2101079e0c.2.2025.08.18.13.48.01
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 13:47:59 -0700 (PDT)
+        Mon, 18 Aug 2025 13:48:01 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/8] Bluetooth: hci_core: Convert instances of BT_DBG to bt_dev_dbg
-Date: Mon, 18 Aug 2025 16:47:46 -0400
-Message-ID: <20250818204753.1203949-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/8] Bluetooth: hci_conn: Convert instances of BT_DBG to bt_dev_dbg
+Date: Mon, 18 Aug 2025 16:47:47 -0400
+Message-ID: <20250818204753.1203949-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250818204753.1203949-1-luiz.dentz@gmail.com>
+References: <20250818204753.1203949-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -78,559 +83,260 @@ default.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_core.c | 134 +++++++++++++++++++--------------------
- 1 file changed, 67 insertions(+), 67 deletions(-)
+ net/bluetooth/hci_conn.c | 63 ++++++++++++++++++++++------------------
+ 1 file changed, 34 insertions(+), 29 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4cf4bb1187dc..f91ead01f261 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -68,7 +68,7 @@ static struct hci_dev *__hci_dev_get(int index, int *srcu_index)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 111f0e37b672..9b23865244b4 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -177,7 +177,7 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 
+ int hci_disconnect(struct hci_conn *conn, __u8 reason)
  {
- 	struct hci_dev *hdev = NULL, *d;
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p", conn);
  
--	BT_DBG("%d", index);
-+	bt_dev_dbg(hdev, "%d", index);
+ 	/* When we are central of an established connection and it enters
+ 	 * the disconnect timeout, then go ahead and try to read the
+@@ -202,7 +202,7 @@ static void hci_add_sco(struct hci_conn *conn, __u16 handle)
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_add_sco cp;
  
- 	if (index < 0)
- 		return NULL;
-@@ -168,7 +168,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev,
- 	struct discovery_state *cache = &hdev->discovery;
- 	struct inquiry_entry *e;
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(hdev, "hcon %p", conn);
  
--	BT_DBG("cache %p, %pMR", cache, bdaddr);
-+	bt_dev_dbg(hdev, "cache %p, %pMR", cache, bdaddr);
- 
- 	list_for_each_entry(e, &cache->all, all) {
- 		if (!bacmp(&e->data.bdaddr, bdaddr))
-@@ -184,7 +184,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup_unknown(struct hci_dev *hdev,
- 	struct discovery_state *cache = &hdev->discovery;
- 	struct inquiry_entry *e;
- 
--	BT_DBG("cache %p, %pMR", cache, bdaddr);
-+	bt_dev_dbg(hdev, "cache %p, %pMR", cache, bdaddr);
- 
- 	list_for_each_entry(e, &cache->unknown, list) {
- 		if (!bacmp(&e->data.bdaddr, bdaddr))
-@@ -201,7 +201,7 @@ struct inquiry_entry *hci_inquiry_cache_lookup_resolve(struct hci_dev *hdev,
- 	struct discovery_state *cache = &hdev->discovery;
- 	struct inquiry_entry *e;
- 
--	BT_DBG("cache %p bdaddr %pMR state %d", cache, bdaddr, state);
-+	bt_dev_dbg(hdev, "cache %p bdaddr %pMR state %d", cache, bdaddr, state);
- 
- 	list_for_each_entry(e, &cache->resolve, list) {
- 		if (!bacmp(bdaddr, BDADDR_ANY) && e->name_state == state)
-@@ -239,7 +239,7 @@ u32 hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
- 	struct inquiry_entry *ie;
- 	u32 flags = 0;
- 
--	BT_DBG("cache %p, %pMR", cache, &data->bdaddr);
-+	bt_dev_dbg(hdev, "cache %p, %pMR", cache, &data->bdaddr);
- 
- 	hci_remove_remote_oob_data(hdev, &data->bdaddr, BDADDR_BREDR);
- 
-@@ -318,7 +318,7 @@ static int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
- 		copied++;
+ 	conn->state = BT_CONNECT;
+ 	conn->out = true;
+@@ -225,8 +225,9 @@ static bool find_next_esco_param(struct hci_conn *conn,
+ 		if (lmp_esco_2m_capable(conn->parent) ||
+ 		    (esco_param[conn->attempt - 1].pkt_type & ESCO_2EV3))
+ 			break;
+-		BT_DBG("hcon %p skipped attempt %d, eSCO 2M not supported",
+-		       conn, conn->attempt);
++		bt_dev_dbg(conn->hdev,
++			   "hcon %p skipped attempt %d, eSCO 2M not supported",
++			   conn, conn->attempt);
  	}
  
--	BT_DBG("cache %p, copied %d", cache, copied);
-+	bt_dev_dbg(hdev, "cache %p, copied %d", cache, copied);
- 	return copied;
- }
+ 	return conn->attempt <= size;
+@@ -522,7 +523,7 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_le_start_enc cp;
  
-@@ -402,7 +402,7 @@ int hci_inquiry(void __user *arg)
- 	ir.num_rsp = inquiry_cache_dump(hdev, max_rsp, buf);
- 	hci_dev_unlock(hdev);
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(hdev, "hcon %p", conn);
  
--	BT_DBG("num_rsp %d", ir.num_rsp);
-+	bt_dev_dbg(hdev, "num_rsp %d", ir.num_rsp);
+ 	memset(&cp, 0, sizeof(cp));
  
- 	if (!copy_to_user(ptr, &ir, sizeof(ir))) {
- 		ptr += sizeof(ir);
-@@ -423,7 +423,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
- {
- 	int ret = 0;
+@@ -543,7 +544,7 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
+ 	if (!link || !link->conn)
+ 		return;
  
--	BT_DBG("%s %p", hdev->name, hdev);
-+	bt_dev_dbg(hdev, "%s %p", hdev->name, hdev);
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p", conn);
  
- 	hci_req_sync_lock(hdev);
+ 	if (!status) {
+ 		if (lmp_esco_capable(conn->hdev))
+@@ -562,7 +563,8 @@ static void hci_conn_timeout(struct work_struct *work)
+ 					     disc_work.work);
+ 	int refcnt = atomic_read(&conn->refcnt);
  
-@@ -494,7 +494,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
- {
- 	int err;
+-	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
++	bt_dev_dbg(conn->hdev, "hcon %p state %s", conn,
++		   state_to_string(conn->state));
  
--	BT_DBG("%s %p", hdev->name, hdev);
-+	bt_dev_dbg(hdev, "%s %p", hdev->name, hdev);
+ 	WARN_ON(refcnt < 0);
  
- 	hci_req_sync_lock(hdev);
+@@ -586,7 +588,7 @@ static void hci_conn_idle(struct work_struct *work)
+ 					     idle_work.work);
+ 	struct hci_dev *hdev = conn->hdev;
  
-@@ -534,7 +534,7 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
- {
+-	BT_DBG("hcon %p mode %d", conn, conn->mode);
++	bt_dev_dbg(hdev, "hcon %p mode %d", conn, conn->mode);
+ 
+ 	if (!lmp_sniff_capable(hdev) || !lmp_sniff_capable(conn))
+ 		return;
+@@ -646,7 +648,7 @@ static void le_conn_timeout(struct work_struct *work)
+ 					     le_conn_timeout.work);
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	BT_DBG("");
++	bt_dev_dbg(hdev, "");
+ 
+ 	/* We could end up here due to having done directed advertising,
+ 	 * so clean up the state if necessary. This should however only
+@@ -774,7 +776,8 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, struct hci_conn *c
+ 	struct iso_list_data *d;
  	int ret;
  
--	BT_DBG("%s %p", hdev->name, hdev);
-+	bt_dev_dbg(hdev, "%s %p", hdev->name, hdev);
+-	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, conn->sync_handle);
++	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big,
++		   conn->sync_handle);
  
- 	hci_req_sync_lock(hdev);
+ 	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+@@ -820,7 +823,7 @@ static void bis_cleanup(struct hci_conn *conn)
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_conn *bis;
  
-@@ -644,7 +644,7 @@ static void hci_update_passive_scan_state(struct hci_dev *hdev, u8 scan)
+-	bt_dev_dbg(hdev, "conn %p", conn);
++	bt_dev_dbg(hdev, "hcon %p", conn);
+ 
+ 	if (conn->role == HCI_ROLE_MASTER) {
+ 		if (!test_and_clear_bit(HCI_CONN_PER_ADV, &conn->flags))
+@@ -1141,7 +1144,7 @@ void hci_conn_del(struct hci_conn *conn)
  {
- 	bool conn_changed, discov_changed;
+ 	struct hci_dev *hdev = conn->hdev;
  
--	BT_DBG("%s scan 0x%02x", hdev->name, scan);
-+	bt_dev_dbg(hdev, "%s scan 0x%02x", hdev->name, scan);
+-	BT_DBG("%s hcon %p handle %d", hdev->name, conn, conn->handle);
++	bt_dev_dbg(hdev, "hcon %p handle %d", conn, conn->handle);
  
- 	if ((scan & SCAN_PAGE))
- 		conn_changed = !hci_dev_test_and_set_flag(hdev,
-@@ -888,7 +888,7 @@ static int hci_dev_do_poweroff(struct hci_dev *hdev)
- {
- 	int err;
+ 	hci_conn_unlink(conn);
  
--	BT_DBG("%s %p", hdev->name, hdev);
-+	bt_dev_dbg(hdev, "%s %p", hdev->name, hdev);
+@@ -1466,8 +1469,8 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
  
- 	hci_req_sync_lock(hdev);
+ 	params->explicit_connect = true;
  
-@@ -904,7 +904,7 @@ static int hci_rfkill_set_block(void *data, bool blocked)
- 	struct hci_dev *hdev = data;
- 	int err;
- 
--	BT_DBG("%p name %s blocked %d", hdev, hdev->name, blocked);
-+	bt_dev_dbg(hdev, "%p name %s blocked %d", hdev, hdev->name, blocked);
- 
- 	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
- 		return -EBUSY;
-@@ -945,7 +945,7 @@ static void hci_power_on(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
- 	int err;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "%s", hdev->name);
- 
- 	if (test_bit(HCI_UP, &hdev->flags) &&
- 	    hci_dev_test_flag(hdev, HCI_MGMT) &&
-@@ -1014,7 +1014,7 @@ static void hci_power_off(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
- 					    power_off.work);
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "%s", hdev->name);
- 
- 	hci_dev_do_close(hdev);
- }
-@@ -1024,7 +1024,7 @@ static void hci_error_reset(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, error_reset);
- 
- 	hci_dev_hold(hdev);
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "%s", hdev->name);
- 
- 	if (hdev->hw_error)
- 		hdev->hw_error(hdev, hdev->hw_error_code);
-@@ -1291,7 +1291,7 @@ struct link_key *hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn,
- 		list_add_rcu(&key->list, &hdev->link_keys);
- 	}
- 
--	BT_DBG("%s key for %pMR type %u", hdev->name, bdaddr, type);
-+	bt_dev_dbg(hdev, "%s key for %pMR type %u", hdev->name, bdaddr, type);
- 
- 	/* Some buggy controller combinations generate a changed
- 	 * combination key for legacy pairing even when there's no
-@@ -1379,7 +1379,7 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	if (!key)
- 		return -ENOENT;
- 
--	BT_DBG("%s removing %pMR", hdev->name, bdaddr);
-+	bt_dev_dbg(hdev, "%s removing %pMR", hdev->name, bdaddr);
- 
- 	list_del_rcu(&key->list);
- 	kfree_rcu(key, rcu);
-@@ -1396,7 +1396,7 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
- 		if (bacmp(bdaddr, &k->bdaddr) || k->bdaddr_type != bdaddr_type)
- 			continue;
- 
--		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
-+		bt_dev_dbg(hdev, "%s removing %pMR", hdev->name, bdaddr);
- 
- 		list_del_rcu(&k->list);
- 		kfree_rcu(k, rcu);
-@@ -1414,7 +1414,7 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
- 		if (bacmp(bdaddr, &k->bdaddr) || k->addr_type != addr_type)
- 			continue;
- 
--		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
-+		bt_dev_dbg(hdev, "%s removing %pMR", hdev->name, bdaddr);
- 
- 		list_del_rcu(&k->list);
- 		kfree_rcu(k, rcu);
-@@ -1523,7 +1523,7 @@ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	if (!data)
- 		return -ENOENT;
- 
--	BT_DBG("%s removing %pMR (%u)", hdev->name, bdaddr, bdaddr_type);
-+	bt_dev_dbg(hdev, "removing %pMR (%u)", bdaddr, bdaddr_type);
- 
- 	list_del(&data->list);
- 	kfree(data);
-@@ -1582,7 +1582,7 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			data->present = 0x01;
- 	}
- 
--	BT_DBG("%s for %pMR", hdev->name, bdaddr);
-+	bt_dev_dbg(hdev, "for %pMR", bdaddr);
+-	BT_DBG("addr %pMR (type %u) auto_connect %u", addr, addr_type,
+-	       params->auto_connect);
++	bt_dev_dbg(hdev, "addr %pMR (type %u) auto_connect %u", addr, addr_type,
++		   params->auto_connect);
  
  	return 0;
  }
-@@ -1639,7 +1639,7 @@ int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance)
- 	if (!adv_instance)
- 		return -ENOENT;
- 
--	BT_DBG("%s removing %dMR", hdev->name, instance);
-+	bt_dev_dbg(hdev, "removing %dMR", instance);
- 
- 	if (hdev->cur_adv_instance == instance) {
- 		if (hdev->adv_instance_timeout) {
-@@ -1759,7 +1759,7 @@ struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
- 
- 	INIT_DELAYED_WORK(&adv->rpa_expired_cb, adv_instance_rpa_expired);
- 
--	BT_DBG("%s for %dMR", hdev->name, instance);
-+	bt_dev_dbg(hdev, "for %dMR", instance);
- 
- 	return adv;
- }
-@@ -2293,7 +2293,7 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
- 	params->supervision_timeout = hdev->le_supv_timeout;
- 	params->auto_connect = HCI_AUTO_CONN_DISABLED;
- 
--	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-+	bt_dev_dbg(hdev, "addr %pMR (type %u)", addr, addr_type);
- 
- 	return params;
- }
-@@ -2324,7 +2324,7 @@ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
- 
- 	hci_update_passive_scan(hdev);
- 
--	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-+	bt_dev_dbg(hdev, "addr %pMR (type %u)", addr, addr_type);
- }
- 
- /* This function requires the caller holds hdev->lock */
-@@ -2347,7 +2347,7 @@ void hci_conn_params_clear_disabled(struct hci_dev *hdev)
- 		hci_conn_params_free(params);
+@@ -1619,7 +1622,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 		goto done;
  	}
  
--	BT_DBG("All LE disabled connection parameters were removed");
-+	bt_dev_dbg(hdev, "All LE disabled connection parameters were removed");
- }
+-	BT_DBG("requesting refresh of dst_addr");
++	bt_dev_dbg(hdev, "requesting refresh of dst_addr");
  
- /* This function requires the caller holds hdev->lock */
-@@ -2358,7 +2358,7 @@ static void hci_conn_params_clear_all(struct hci_dev *hdev)
- 	list_for_each_entry_safe(params, tmp, &hdev->le_conn_params, list)
- 		hci_conn_params_free(params);
- 
--	BT_DBG("All LE connection parameters were removed");
-+	bt_dev_dbg(hdev, "All LE connection parameters were removed");
- }
- 
- /* Copy the Identity Address of the controller.
-@@ -2599,7 +2599,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	hdev->name = dev_name(&hdev->dev);
- 	hdev->id = id;
- 
--	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
-+	bt_dev_dbg(hdev, "bus %d", hdev->bus);
- 
- 	hdev->workqueue = alloc_ordered_workqueue("%s", WQ_HIGHPRI, hdev->name);
- 	if (!hdev->workqueue) {
-@@ -2689,7 +2689,7 @@ EXPORT_SYMBOL(hci_register_dev);
- /* Unregister HCI device */
- void hci_unregister_dev(struct hci_dev *hdev)
+ 	conn = hci_conn_add_unset(hdev, LE_LINK, dst, HCI_ROLE_MASTER);
+ 	if (IS_ERR(conn))
+@@ -2167,7 +2170,7 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
  {
--	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
-+	bt_dev_dbg(hdev, "bus %d", hdev->bus);
+ 	struct hci_conn *conn = data;
  
- 	mutex_lock(&hdev->unregister_lock);
- 	hci_dev_set_flag(hdev, HCI_UNREGISTER);
-@@ -3039,8 +3039,8 @@ static int hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+-	bt_dev_dbg(hdev, "conn %p", conn);
++	bt_dev_dbg(hdev, "hcon %p", conn);
+ 
+ 	if (err) {
+ 		bt_dev_err(hdev, "Unable to create BIG: %d", err);
+@@ -2349,7 +2352,7 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ /* Check link security requirement */
+ int hci_conn_check_link_mode(struct hci_conn *conn)
  {
- 	int err;
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p", conn);
  
--	BT_DBG("%s type %d len %d", hdev->name, hci_skb_pkt_type(skb),
--	       skb->len);
-+	bt_dev_dbg(hdev, "skb %p type %d len %d", skb, hci_skb_pkt_type(skb),
-+		   skb->len);
- 
- 	/* Time stamp */
- 	__net_timestamp(skb);
-@@ -3093,7 +3093,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
+ 	/* In Secure Connections Only mode, it is required that Secure
+ 	 * Connections is used and the link is encrypted with AES-CCM
+@@ -2389,7 +2392,7 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+ /* Authenticate remote device */
+ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
  {
- 	struct sk_buff *skb;
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p", conn);
  
--	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
-+	bt_dev_dbg(hdev, "opcode 0x%4.4x plen %d", opcode, plen);
- 
- 	skb = hci_cmd_sync_alloc(hdev, opcode, plen, param, NULL);
- 	if (!skb) {
-@@ -3234,12 +3234,12 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
- 	list = skb_shinfo(skb)->frag_list;
- 	if (!list) {
- 		/* Non fragmented */
--		BT_DBG("%s nonfrag skb %p len %d", hdev->name, skb, skb->len);
-+		bt_dev_dbg(hdev, "nonfrag skb %p len %d", skb, skb->len);
- 
- 		skb_queue_tail(queue, skb);
- 	} else {
- 		/* Fragmented */
--		BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
-+		bt_dev_dbg(hdev, "frag %p len %d", skb, skb->len);
- 
- 		skb_shinfo(skb)->frag_list = NULL;
- 
-@@ -3260,7 +3260,7 @@ static void hci_queue_acl(struct hci_chan *chan, struct sk_buff_head *queue,
- 			hci_skb_pkt_type(skb) = HCI_ACLDATA_PKT;
- 			hci_add_acl_hdr(skb, conn->handle, flags);
- 
--			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
-+			bt_dev_dbg(hdev, "frag %p len %d", skb, skb->len);
- 
- 			__skb_queue_tail(queue, skb);
- 		} while (list);
-@@ -3273,7 +3273,7 @@ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags)
+ 	if (conn->pending_sec_level > sec_level)
+ 		sec_level = conn->pending_sec_level;
+@@ -2424,7 +2427,7 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ /* Encrypt the link */
+ static void hci_conn_encrypt(struct hci_conn *conn)
  {
- 	struct hci_dev *hdev = chan->conn->hdev;
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p", conn);
  
--	BT_DBG("%s chan %p flags 0x%4.4x", hdev->name, chan, flags);
-+	bt_dev_dbg(hdev, "chan %p skb %p flags 0x%4.4x", chan, skb, flags);
+ 	if (!test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags)) {
+ 		struct hci_cp_set_conn_encrypt cp;
+@@ -2439,7 +2442,8 @@ static void hci_conn_encrypt(struct hci_conn *conn)
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
+ 		      bool initiator)
+ {
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p sec_level %d auth_type %d initiator %d",
++		   conn, sec_level, auth_type, initiator);
  
- 	hci_queue_acl(chan, &chan->data_q, skb, flags);
+ 	if (conn->type == LE_LINK)
+ 		return smp_conn_security(conn, sec_level);
+@@ -2523,7 +2527,7 @@ EXPORT_SYMBOL(hci_conn_security);
+ /* Check secure link requirement */
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level)
+ {
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p sec_level %u", conn, sec_level);
  
-@@ -3286,7 +3286,7 @@ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb)
- 	struct hci_dev *hdev = conn->hdev;
- 	struct hci_sco_hdr hdr;
+ 	/* Accept if non-secure or higher security level is required */
+ 	if (sec_level != BT_SECURITY_HIGH && sec_level != BT_SECURITY_FIPS)
+@@ -2542,7 +2546,7 @@ EXPORT_SYMBOL(hci_conn_check_secure);
+ /* Switch role */
+ int hci_conn_switch_role(struct hci_conn *conn, __u8 role)
+ {
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p role %u", conn, role);
  
--	BT_DBG("%s len %d", hdev->name, skb->len);
-+	bt_dev_dbg(hdev, "hcon %p skb %p len %d", conn, skb, skb->len);
- 
- 	hdr.handle = cpu_to_le16(conn->handle);
- 	hdr.dlen   = skb->len;
-@@ -3333,12 +3333,12 @@ static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
- 
- 	if (!list) {
- 		/* Non fragmented */
--		BT_DBG("%s nonfrag skb %p len %d", hdev->name, skb, skb->len);
-+		bt_dev_dbg(hdev, "nonfrag skb %p len %d", skb, skb->len);
- 
- 		skb_queue_tail(queue, skb);
- 	} else {
- 		/* Fragmented */
--		BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
-+		bt_dev_dbg(hdev, "frag %p len %d", skb, skb->len);
- 
- 		skb_shinfo(skb)->frag_list = NULL;
- 
-@@ -3352,7 +3352,7 @@ static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
- 						   0x00);
- 			hci_add_iso_hdr(skb, conn->handle, flags);
- 
--			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
-+			bt_dev_dbg(hdev, "frag %p len %d", skb, skb->len);
- 
- 			__skb_queue_tail(queue, skb);
- 		} while (list);
-@@ -3363,7 +3363,7 @@ void hci_send_iso(struct hci_conn *conn, struct sk_buff *skb)
+ 	if (role == conn->role)
+ 		return 1;
+@@ -2563,7 +2567,7 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
  {
  	struct hci_dev *hdev = conn->hdev;
  
--	BT_DBG("%s len %d", hdev->name, skb->len);
-+	bt_dev_dbg(hdev, "hcon %p skb %p len %d", conn, skb, skb->len);
+-	BT_DBG("hcon %p mode %d", conn, conn->mode);
++	bt_dev_dbg(hdev, "hcon %p mode %d", conn, conn->mode);
  
- 	hci_queue_iso(conn, &conn->data_q, skb);
- 
-@@ -3445,7 +3445,7 @@ static struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type,
- 
- 	hci_quote_sent(conn, num, quote);
- 
--	BT_DBG("conn %p quote %d", conn, *quote);
-+	bt_dev_dbg(hdev, "hcon %p quote %d", conn, *quote);
- 	return conn;
- }
- 
-@@ -3479,7 +3479,7 @@ static struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
+ 	if (conn->mode != HCI_CM_SNIFF)
+ 		goto timer;
+@@ -2589,7 +2593,7 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
+ 	struct list_head *head = &hdev->conn_hash.list;
  	struct hci_conn *conn;
- 	int conn_num = 0;
  
--	BT_DBG("%s", hdev->name);
+-	BT_DBG("hdev %s", hdev->name);
 +	bt_dev_dbg(hdev, "");
  
- 	rcu_read_lock();
+ 	/* We should not traverse the list here, because hci_conn_del
+ 	 * can remove extra links, which may cause the list traversal
+@@ -2732,10 +2736,10 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_chan *chan;
  
-@@ -3529,7 +3529,7 @@ static struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
+-	BT_DBG("%s hcon %p", hdev->name, conn);
++	bt_dev_dbg(hdev, "hcon %p", conn);
  
- 	hci_quote_sent(chan->conn, num, quote);
+ 	if (test_bit(HCI_CONN_DROP, &conn->flags)) {
+-		BT_DBG("Refusing to create new hci_chan");
++		bt_dev_dbg(hdev, "Refusing to create new hci_chan");
+ 		return NULL;
+ 	}
  
--	BT_DBG("chan %p quote %d", chan, *quote);
-+	bt_dev_dbg(hdev, "chan %p quote %d", chan, *quote);
- 	return chan;
- }
+@@ -2757,7 +2761,7 @@ void hci_chan_del(struct hci_chan *chan)
+ 	struct hci_conn *conn = chan->conn;
+ 	struct hci_dev *hdev = conn->hdev;
  
-@@ -3539,7 +3539,7 @@ static void hci_prio_recalculate(struct hci_dev *hdev, __u8 type)
- 	struct hci_conn *conn;
- 	int num = 0;
+-	BT_DBG("%s hcon %p chan %p", hdev->name, conn, chan);
++	bt_dev_dbg(hdev, "hcon %p chan %p", conn, chan);
  
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
+ 	list_del_rcu(&chan->list);
  
- 	rcu_read_lock();
- 
-@@ -3571,8 +3571,8 @@ static void hci_prio_recalculate(struct hci_dev *hdev, __u8 type)
- 
- 			skb->priority = HCI_PRIO_MAX - 1;
- 
--			BT_DBG("chan %p skb %p promoted to %d", chan, skb,
--			       skb->priority);
-+			bt_dev_dbg(hdev, "chan %p skb %p promoted to %d", chan,
-+				   skb, skb->priority);
- 		}
- 
- 		if (hci_conn_num(hdev, type) == num)
-@@ -3642,7 +3642,7 @@ static void hci_sched_sco(struct hci_dev *hdev, __u8 type)
- 
- 	while (*cnt && (conn = hci_low_sent(hdev, type, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
-+			bt_dev_dbg(hdev, "skb %p len %d", skb, skb->len);
- 			hci_send_conn_frame(hdev, conn, skb);
- 
- 			conn->sent++;
-@@ -3674,8 +3674,8 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
- 	       (chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
- 		u32 priority = (skb_peek(&chan->data_q))->priority;
- 		while (quote-- && (skb = skb_peek(&chan->data_q))) {
--			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
--			       skb->len, skb->priority);
-+			bt_dev_dbg(hdev, "chan %p skb %p len %d priority %u",
-+				   chan, skb, skb->len, skb->priority);
- 
- 			/* Stop if priority has changed */
- 			if (skb->priority < priority)
-@@ -3705,7 +3705,7 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
- 
- static void hci_sched_acl(struct hci_dev *hdev)
+@@ -2776,7 +2780,7 @@ void hci_chan_list_flush(struct hci_conn *conn)
  {
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
+ 	struct hci_chan *chan, *n;
  
- 	/* No ACL link over BR/EDR controller */
- 	if (!hci_conn_num(hdev, ACL_LINK))
-@@ -3720,7 +3720,7 @@ static void hci_sched_le(struct hci_dev *hdev)
- 	struct sk_buff *skb;
- 	int quote, *cnt, tmp;
+-	BT_DBG("hcon %p", conn);
++	bt_dev_dbg(conn->hdev, "hcon %p", conn);
  
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
+ 	list_for_each_entry_safe(chan, n, &conn->chan_list, list)
+ 		hci_chan_del(chan);
+@@ -2937,7 +2941,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	if (conn->abort_reason)
+ 		return 0;
  
- 	if (!hci_conn_num(hdev, LE_LINK))
- 		return;
-@@ -3733,8 +3733,8 @@ static void hci_sched_le(struct hci_dev *hdev)
- 	while (*cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
- 		u32 priority = (skb_peek(&chan->data_q))->priority;
- 		while (quote-- && (skb = skb_peek(&chan->data_q))) {
--			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
--			       skb->len, skb->priority);
-+			bt_dev_dbg(hdev, "chan %p skb %p len %d priority %u",
-+				   chan, skb, skb->len, skb->priority);
+-	bt_dev_dbg(hdev, "handle 0x%2.2x reason 0x%2.2x", conn->handle, reason);
++	bt_dev_dbg(hdev, "hcon %p handle 0x%2.2x reason 0x%2.2x", conn,
++		   conn->handle, reason);
  
- 			/* Stop if priority has changed */
- 			if (skb->priority < priority)
-@@ -3766,7 +3766,7 @@ static void hci_sched_iso(struct hci_dev *hdev, __u8 type)
- 	struct sk_buff *skb;
- 	int quote, *cnt;
+ 	conn->abort_reason = reason;
  
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "type %u", type);
- 
- 	if (!hci_conn_num(hdev, type))
- 		return;
-@@ -3777,7 +3777,7 @@ static void hci_sched_iso(struct hci_dev *hdev, __u8 type)
- 
- 	while (*cnt && (conn = hci_low_sent(hdev, type, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
-+			bt_dev_dbg(hdev, "skb %p len %d", skb, skb->len);
- 
- 			hci_send_conn_frame(hdev, conn, skb);
- 			hdev->iso_last_tx = jiffies;
-@@ -3795,8 +3795,8 @@ static void hci_tx_work(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, tx_work);
- 	struct sk_buff *skb;
- 
--	BT_DBG("%s acl %d sco %d le %d iso %d", hdev->name, hdev->acl_cnt,
--	       hdev->sco_cnt, hdev->le_cnt, hdev->iso_cnt);
-+	bt_dev_dbg(hdev, "acl %d sco %d le %d iso %d", hdev->acl_cnt,
-+		   hdev->sco_cnt, hdev->le_cnt, hdev->iso_cnt);
- 
- 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
- 		/* Schedule queues and send stuff to HCI driver */
-@@ -3974,7 +3974,7 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
- 	struct sk_buff *skb;
- 	unsigned long flags;
- 
--	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
-+	bt_dev_dbg(hdev, "opcode 0x%04x status 0x%02x", opcode, status);
- 
- 	/* If the completed command doesn't match the last one that was
- 	 * sent we need to do special handling of it.
-@@ -4039,7 +4039,7 @@ static void hci_rx_work(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
- 	struct sk_buff *skb;
- 
--	BT_DBG("%s", hdev->name);
-+	bt_dev_dbg(hdev, "");
- 
- 	/* The kcov_remote functions used for collecting packet parsing
- 	 * coverage information from this background thread and associate
-@@ -4083,22 +4083,22 @@ static void hci_rx_work(struct work_struct *work)
- 		/* Process frame */
- 		switch (hci_skb_pkt_type(skb)) {
- 		case HCI_EVENT_PKT:
--			BT_DBG("%s Event packet", hdev->name);
-+			bt_dev_dbg(hdev, "Event packet");
- 			hci_event_packet(hdev, skb);
- 			break;
- 
- 		case HCI_ACLDATA_PKT:
--			BT_DBG("%s ACL data packet", hdev->name);
-+			bt_dev_dbg(hdev, "ACL data packet");
- 			hci_acldata_packet(hdev, skb);
- 			break;
- 
- 		case HCI_SCODATA_PKT:
--			BT_DBG("%s SCO data packet", hdev->name);
-+			bt_dev_dbg(hdev, "SCO data packet");
- 			hci_scodata_packet(hdev, skb);
- 			break;
- 
- 		case HCI_ISODATA_PKT:
--			BT_DBG("%s ISO data packet", hdev->name);
-+			bt_dev_dbg(hdev, "ISO data packet");
- 			hci_isodata_packet(hdev, skb);
- 			break;
- 
-@@ -4145,8 +4145,8 @@ static void hci_cmd_work(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_work);
- 	struct sk_buff *skb;
- 
--	BT_DBG("%s cmd_cnt %d cmd queued %d", hdev->name,
--	       atomic_read(&hdev->cmd_cnt), skb_queue_len(&hdev->cmd_q));
-+	bt_dev_dbg(hdev, "cmd_cnt %d cmd queued %d",
-+		   atomic_read(&hdev->cmd_cnt), skb_queue_len(&hdev->cmd_q));
- 
- 	/* Send queued commands */
- 	if (atomic_read(&hdev->cmd_cnt)) {
 -- 
 2.50.1
 
