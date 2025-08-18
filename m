@@ -1,324 +1,148 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC18A21CFFD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Aug 2025 20:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B1D1BE871
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Aug 2025 21:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755550673; cv=none; b=HpKOL0em7Y7iQ161o2zxv+gC9FNFEkvhQdEWjxrr2t81uRh4hU6pQlrAF9/dYW5qusETEiPrWLzn/pQGAgFBxWNezP1qkfBXWTLJf0DeURc9ommf6Cy2V2ugnsRmQWXi55Xk4yTypwNITlNRN1AnbRq4FiVfEFmf3BCXjUufbrw=
+	t=1755552868; cv=none; b=C7FQik2muXJWtXMPWokDaJI+fCPAzAV/Zcvxnxth/6ehaSMux3H9QG+N3YPX/JYb2X6tqqEyYDWsUfIqd8l4mgZXWcJHCaBusrSEiifBHriEry3CJiOFdCw1P93tvNTKiP4Q9jhYxBDlCmbjUdul/7d5w2tBPtW3GFOv5+SqSrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755550673; c=relaxed/simple;
-	bh=4IBQ4ueaEHOcEL70LmwtwXVVYCbcCXOvQPuTTtGUpt0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=o4hOJTsQ0SmKSm4PmSoWpGtZ4CCn5s6zldrvR8vNKhMqhiHwVDeanFpFy14vjozFe6ypxaYHMLvL/mGr4Mnv6ndx7BYgsix/iXmqUZ6uaVUWkyO/ZKqLtTaHH5BHaK2LGcw8+1DDhW1DWu2ptGLsUx28O5/Cz0aPSrzxo3jsQ+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af7b8.dynamic.kabel-deutschland.de [95.90.247.184])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 655F161E64844;
-	Mon, 18 Aug 2025 22:57:46 +0200 (CEST)
-Message-ID: <8ddd787f-c1ef-47ac-b53b-45956a2be007@molgen.mpg.de>
-Date: Mon, 18 Aug 2025 22:57:43 +0200
+	s=arc-20240116; t=1755552868; c=relaxed/simple;
+	bh=CsRnmEO1HWVsFGGV3AaTjJwp87MM41xUBehw87C8n+w=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hq3+Fh7NahPqnST70Fa1Y3jfVw7+YnMa48eTQQ+kmL9EJEX1aaog+tM371kvn7HUt5lCSLPXEnoiefdPL7C51Sie+d6QfoWqiHG4t1ZHEs2AuZ0w3MT5PIT4rnWqpGetw0ti3utJI1qxOvdJtx+atIog2+bv887W/WfkOl1qC6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SniUw8wh; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SniUw8wh"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-70a88dcb665so41666856d6.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Aug 2025 14:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755552865; x=1756157665; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wwQaRaGyLj1fh+Y+nEkeTfYM00lrJbh+cBSDl3eQZss=;
+        b=SniUw8whGNhcYZHYcSPp3kipvAMBrAZYBYXik/IR7ccEPgJI+OKp2Fdgi2rPYpN91N
+         d0IeSrOxVAoQWC86YRTrZk9BP7MtbipJmo+gMXFLAlFreO/RDtsYEoh08B0tuQjdClrn
+         CGskbMCA3BCj7M5ekMK6iQ2dNOlMltBNdtSjVwvaM8jrcWJQUoVb0AL9y/xq8vtJH+kk
+         Q7x+nISFv8a0xxujCCETUR4sD5roXp8kTUyVncJLrNrKnLvkn8zTZJX5p/1OkqAs7pXl
+         bsY0GNKq4gB2TlTEKLHdSFYQRZzsbu0ULoYob2vvbI8Tn6V+2tj5WS4enR4sWOIiKNyN
+         4ikQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755552865; x=1756157665;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wwQaRaGyLj1fh+Y+nEkeTfYM00lrJbh+cBSDl3eQZss=;
+        b=KkvU7jvOZ9LA23Cy7bRpxkSnSLJEvCFHtiAFhaKEY/Y+OySCxm7cy2rqQbX6oyhbnH
+         Y6S5/6iOCDAFK5KIrT3sDFisbJeAKtk5QBjEGTM3h4/9/DLtiPBZIXAMBDE7kUaR0bYD
+         Io5Mv0bYB+G9Zwtft4+xffTIjszxR0Ycb1BnArrgbCxuHnHcWkKKgEiLWmlgZTN6JOoA
+         fL8y69swGMOUkEYLlz+LlUGtCe4eTNMSVyZn036xMVTvaMOgev77nU7ERL7Vm2ZxCG72
+         Ajo/yuLo7vpvSsTXcddSSvyc9EOGoP3rk/86b3w/YtewMEa4bdhpq3IrL3vkbMeCYVAs
+         2lLw==
+X-Gm-Message-State: AOJu0YxF/HjYn9iGv4S8ZEPmroxSoeR23JQ8BnMpcYc7D1yaO/ETc1gN
+	o0fa/dLm3ATU2LIeB5iGccXpM7Xx0N7mqdwolBZm2b1B4CroFTjJCzqF6e+LYcDa
+X-Gm-Gg: ASbGncs3fOnLHyTPA/3lAnNwJ9q6RNNOblywP1LTR9MnsULv56YshOFOX/35YwGUzy8
+	qexipYP4g8Fozt2f7a7+fxYwQ3uvAYzalewxQuWC1oQzkN64z6NGsL3b53+a13i9DZsG1EMaP4P
+	RqgFbz3y6o18out6Rcvj9gyU0UfvR9X/Jh4bWRCc5qERr72pXS4mlbxi13qK73mD6R6ySCFuJpe
+	J9lQoO/weeS55c8j76QwOXeDd+dnvwQwtKQotmtRuwvKxWex4c1phQ0iOWq0Cu5RtH8dT1PqyMW
+	vLmCzxau0hXZpqW78KPahHkZZTsnZF/Qo317oNTNm3bYDhObE7S8TeV0vksMNxeOoXvV8k+7NCu
+	yFV7uj6ih3uOrIZrT1qolRpzbwN+HKA==
+X-Google-Smtp-Source: AGHT+IEAg3EgDkDr2+zAqspLRoLvLqxfVIWrAVScd/XB9mbxFf6FUYHzmrhWS74iChJbouU5GGEhTA==
+X-Received: by 2002:a05:6214:c82:b0:709:8665:f839 with SMTP id 6a1803df08f44-70c35c1934dmr2168876d6.43.1755552865166;
+        Mon, 18 Aug 2025 14:34:25 -0700 (PDT)
+Received: from [172.17.0.2] ([172.178.111.65])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70bb34e3fa9sm40453226d6.22.2025.08.18.14.34.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 14:34:24 -0700 (PDT)
+Message-ID: <68a39c60.0c0a0220.34a4e.0815@mx.google.com>
+Date: Mon, 18 Aug 2025 14:34:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2866074956570926128=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/8] Bluetooth: hci_conn: Convert instances of BT_DBG
- to bt_dev_dbg
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2,1/8] Bluetooth: hci_core: Convert instances of BT_DBG to bt_dev_dbg
+In-Reply-To: <20250818204753.1203949-1-luiz.dentz@gmail.com>
 References: <20250818204753.1203949-1-luiz.dentz@gmail.com>
- <20250818204753.1203949-2-luiz.dentz@gmail.com>
-Content-Language: en-US
-Cc: linux-bluetooth@vger.kernel.org
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250818204753.1203949-2-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Luiz,
+--===============2866074956570926128==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is automated email and please do not reply to this email!
 
-Thank you for your patch.
+Dear submitter,
 
-Am 18.08.25 um 22:47 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This converts instances of BT_DBG to bt_dev_dbg when logging to a
-> specific hci_dev this is preferable since it does prints the name by
-> default.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->   net/bluetooth/hci_conn.c | 63 ++++++++++++++++++++++------------------
->   1 file changed, 34 insertions(+), 29 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 111f0e37b672..9b23865244b4 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -177,7 +177,7 @@ static void hci_conn_cleanup(struct hci_conn *conn)
->   
->   int hci_disconnect(struct hci_conn *conn, __u8 reason)
->   {
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p", conn);
->   
->   	/* When we are central of an established connection and it enters
->   	 * the disconnect timeout, then go ahead and try to read the
-> @@ -202,7 +202,7 @@ static void hci_add_sco(struct hci_conn *conn, __u16 handle)
->   	struct hci_dev *hdev = conn->hdev;
->   	struct hci_cp_add_sco cp;
->   
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(hdev, "hcon %p", conn);
->   
->   	conn->state = BT_CONNECT;
->   	conn->out = true;
-> @@ -225,8 +225,9 @@ static bool find_next_esco_param(struct hci_conn *conn,
->   		if (lmp_esco_2m_capable(conn->parent) ||
->   		    (esco_param[conn->attempt - 1].pkt_type & ESCO_2EV3))
->   			break;
-> -		BT_DBG("hcon %p skipped attempt %d, eSCO 2M not supported",
-> -		       conn, conn->attempt);
-> +		bt_dev_dbg(conn->hdev,
-> +			   "hcon %p skipped attempt %d, eSCO 2M not supported",
-> +			   conn, conn->attempt);
->   	}
->   
->   	return conn->attempt <= size;
-> @@ -522,7 +523,7 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
->   	struct hci_dev *hdev = conn->hdev;
->   	struct hci_cp_le_start_enc cp;
->   
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(hdev, "hcon %p", conn);
->   
->   	memset(&cp, 0, sizeof(cp));
->   
-> @@ -543,7 +544,7 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
->   	if (!link || !link->conn)
->   		return;
->   
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p", conn);
->   
->   	if (!status) {
->   		if (lmp_esco_capable(conn->hdev))
-> @@ -562,7 +563,8 @@ static void hci_conn_timeout(struct work_struct *work)
->   					     disc_work.work);
->   	int refcnt = atomic_read(&conn->refcnt);
->   
-> -	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
-> +	bt_dev_dbg(conn->hdev, "hcon %p state %s", conn,
-> +		   state_to_string(conn->state));
->   
->   	WARN_ON(refcnt < 0);
->   
-> @@ -586,7 +588,7 @@ static void hci_conn_idle(struct work_struct *work)
->   					     idle_work.work);
->   	struct hci_dev *hdev = conn->hdev;
->   
-> -	BT_DBG("hcon %p mode %d", conn, conn->mode);
-> +	bt_dev_dbg(hdev, "hcon %p mode %d", conn, conn->mode);
->   
->   	if (!lmp_sniff_capable(hdev) || !lmp_sniff_capable(conn))
->   		return;
-> @@ -646,7 +648,7 @@ static void le_conn_timeout(struct work_struct *work)
->   					     le_conn_timeout.work);
->   	struct hci_dev *hdev = conn->hdev;
->   
-> -	BT_DBG("");
-> +	bt_dev_dbg(hdev, "");
->   
->   	/* We could end up here due to having done directed advertising,
->   	 * so clean up the state if necessary. This should however only
-> @@ -774,7 +776,8 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, struct hci_conn *c
->   	struct iso_list_data *d;
->   	int ret;
->   
-> -	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, conn->sync_handle);
-> +	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big,
-> +		   conn->sync_handle);
->   
->   	d = kzalloc(sizeof(*d), GFP_KERNEL);
->   	if (!d)
-> @@ -820,7 +823,7 @@ static void bis_cleanup(struct hci_conn *conn)
->   	struct hci_dev *hdev = conn->hdev;
->   	struct hci_conn *bis;
->   
-> -	bt_dev_dbg(hdev, "conn %p", conn);
-> +	bt_dev_dbg(hdev, "hcon %p", conn);
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=992737
 
-I’d leave out the two hunks above.
+---Test result---
 
->   	if (conn->role == HCI_ROLE_MASTER) {
->   		if (!test_and_clear_bit(HCI_CONN_PER_ADV, &conn->flags))
-> @@ -1141,7 +1144,7 @@ void hci_conn_del(struct hci_conn *conn)
->   {
->   	struct hci_dev *hdev = conn->hdev;
->   
-> -	BT_DBG("%s hcon %p handle %d", hdev->name, conn, conn->handle);
-> +	bt_dev_dbg(hdev, "hcon %p handle %d", conn, conn->handle);
->   
->   	hci_conn_unlink(conn);
->   
-> @@ -1466,8 +1469,8 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
->   
->   	params->explicit_connect = true;
->   
-> -	BT_DBG("addr %pMR (type %u) auto_connect %u", addr, addr_type,
-> -	       params->auto_connect);
-> +	bt_dev_dbg(hdev, "addr %pMR (type %u) auto_connect %u", addr, addr_type,
-> +		   params->auto_connect);
->   
->   	return 0;
->   }
-> @@ -1619,7 +1622,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
->   		goto done;
->   	}
->   
-> -	BT_DBG("requesting refresh of dst_addr");
-> +	bt_dev_dbg(hdev, "requesting refresh of dst_addr");
->   
->   	conn = hci_conn_add_unset(hdev, LE_LINK, dst, HCI_ROLE_MASTER);
->   	if (IS_ERR(conn))
-> @@ -2167,7 +2170,7 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
->   {
->   	struct hci_conn *conn = data;
->   
-> -	bt_dev_dbg(hdev, "conn %p", conn);
-> +	bt_dev_dbg(hdev, "hcon %p", conn);
->   
->   	if (err) {
->   		bt_dev_err(hdev, "Unable to create BIG: %d", err);
-> @@ -2349,7 +2352,7 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
->   /* Check link security requirement */
->   int hci_conn_check_link_mode(struct hci_conn *conn)
->   {
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p", conn);
->   
->   	/* In Secure Connections Only mode, it is required that Secure
->   	 * Connections is used and the link is encrypted with AES-CCM
-> @@ -2389,7 +2392,7 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
->   /* Authenticate remote device */
->   static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
->   {
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p", conn);
->   
->   	if (conn->pending_sec_level > sec_level)
->   		sec_level = conn->pending_sec_level;
-> @@ -2424,7 +2427,7 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
->   /* Encrypt the link */
->   static void hci_conn_encrypt(struct hci_conn *conn)
->   {
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p", conn);
->   
->   	if (!test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags)) {
->   		struct hci_cp_set_conn_encrypt cp;
-> @@ -2439,7 +2442,8 @@ static void hci_conn_encrypt(struct hci_conn *conn)
->   int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
->   		      bool initiator)
->   {
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p sec_level %d auth_type %d initiator %d",
-> +		   conn, sec_level, auth_type, initiator);
->   
->   	if (conn->type == LE_LINK)
->   		return smp_conn_security(conn, sec_level);
-> @@ -2523,7 +2527,7 @@ EXPORT_SYMBOL(hci_conn_security);
->   /* Check secure link requirement */
->   int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level)
->   {
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p sec_level %u", conn, sec_level);
->   
->   	/* Accept if non-secure or higher security level is required */
->   	if (sec_level != BT_SECURITY_HIGH && sec_level != BT_SECURITY_FIPS)
-> @@ -2542,7 +2546,7 @@ EXPORT_SYMBOL(hci_conn_check_secure);
->   /* Switch role */
->   int hci_conn_switch_role(struct hci_conn *conn, __u8 role)
->   {
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p role %u", conn, role);
->   
->   	if (role == conn->role)
->   		return 1;
-> @@ -2563,7 +2567,7 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
->   {
->   	struct hci_dev *hdev = conn->hdev;
->   
-> -	BT_DBG("hcon %p mode %d", conn, conn->mode);
-> +	bt_dev_dbg(hdev, "hcon %p mode %d", conn, conn->mode);
->   
->   	if (conn->mode != HCI_CM_SNIFF)
->   		goto timer;
-> @@ -2589,7 +2593,7 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
->   	struct list_head *head = &hdev->conn_hash.list;
->   	struct hci_conn *conn;
->   
-> -	BT_DBG("hdev %s", hdev->name);
-> +	bt_dev_dbg(hdev, "");
->   
->   	/* We should not traverse the list here, because hci_conn_del
->   	 * can remove extra links, which may cause the list traversal
-> @@ -2732,10 +2736,10 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
->   	struct hci_dev *hdev = conn->hdev;
->   	struct hci_chan *chan;
->   
-> -	BT_DBG("%s hcon %p", hdev->name, conn);
-> +	bt_dev_dbg(hdev, "hcon %p", conn);
->   
->   	if (test_bit(HCI_CONN_DROP, &conn->flags)) {
-> -		BT_DBG("Refusing to create new hci_chan");
-> +		bt_dev_dbg(hdev, "Refusing to create new hci_chan");
->   		return NULL;
->   	}
->   
-> @@ -2757,7 +2761,7 @@ void hci_chan_del(struct hci_chan *chan)
->   	struct hci_conn *conn = chan->conn;
->   	struct hci_dev *hdev = conn->hdev;
->   
-> -	BT_DBG("%s hcon %p chan %p", hdev->name, conn, chan);
-> +	bt_dev_dbg(hdev, "hcon %p chan %p", conn, chan);
->   
->   	list_del_rcu(&chan->list);
->   
-> @@ -2776,7 +2780,7 @@ void hci_chan_list_flush(struct hci_conn *conn)
->   {
->   	struct hci_chan *chan, *n;
->   
-> -	BT_DBG("hcon %p", conn);
-> +	bt_dev_dbg(conn->hdev, "hcon %p", conn);
->   
->   	list_for_each_entry_safe(chan, n, &conn->chan_list, list)
->   		hci_chan_del(chan);
-> @@ -2937,7 +2941,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
->   	if (conn->abort_reason)
->   		return 0;
->   
-> -	bt_dev_dbg(hdev, "handle 0x%2.2x reason 0x%2.2x", conn->handle, reason);
-> +	bt_dev_dbg(hdev, "hcon %p handle 0x%2.2x reason 0x%2.2x", conn,
-> +		   conn->handle, reason);
+Test Summary:
+CheckPatch                    PENDING   0.30 seconds
+GitLint                       PENDING   0.30 seconds
+SubjectPrefix                 PASS      0.99 seconds
+BuildKernel                   PASS      24.85 seconds
+CheckAllWarning               PASS      27.81 seconds
+CheckSparse                   WARNING   31.92 seconds
+BuildKernel32                 PASS      24.93 seconds
+TestRunnerSetup               PASS      495.80 seconds
+TestRunner_l2cap-tester       PASS      25.24 seconds
+TestRunner_iso-tester         PASS      36.75 seconds
+TestRunner_bnep-tester        PASS      5.91 seconds
+TestRunner_mgmt-tester        PASS      129.09 seconds
+TestRunner_rfcomm-tester      PASS      9.21 seconds
+TestRunner_sco-tester         PASS      14.62 seconds
+TestRunner_ioctl-tester       PASS      9.89 seconds
+TestRunner_mesh-tester        FAIL      11.44 seconds
+TestRunner_smp-tester         PASS      8.51 seconds
+TestRunner_userchan-tester    PASS      6.33 seconds
+IncrementalBuild              PENDING   0.94 seconds
 
-Ditto.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
->   
->   	conn->abort_reason = reason;
->   
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_core.c:85:9: warning: context imbalance in '__hci_dev_get' - different lock contexts for basic blocknet/bluetooth/hci_core.c: note: in included file (through include/linux/notifier.h, include/linux/memory_hotplug.h, include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, include/linux/radix-tree.h, ...):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:153:35: warning: array of flexible structures
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.144 seconds
+Mesh - Send cancel - 2                               Timed out    1.997 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Kind regards,
 
-Paul
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2866074956570926128==--
