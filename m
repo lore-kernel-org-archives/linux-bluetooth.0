@@ -1,132 +1,110 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4BE81732
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 07:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86503451A5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 08:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755589901; cv=none; b=gqvWjU1IFDl1S5q53eJhsMovUUtBQk+tFgpViNrg3rpYbufPoRfMSURzu5u1+7+DG3D8mvfqWKFcMIJn+7e1gVWDWDEO7uxEwsOAt4thua5RGP1CM9mRQqW1HNPTwCdo/ooVbLpQMnJ1692azlZnehhpf+VGi0woxeVmv+htdvM=
+	t=1755590605; cv=none; b=G7tTe8H6kJEZUNkc2pw7a3SQ5BkRKB6w1gTTdDMUCl5mvlaRp4YyaAYRPXAQVjfi0Z2jDGCNmtnzlTsMX7NslJmhsGnI3UoeRQoXjbNkAAt9sH6GR0wvumRDV22W5sBkN+SdyGDiWFsDul+jeZgz8kV/i14YX0ylEOvrgfHpcNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755589901; c=relaxed/simple;
-	bh=hwDV3OUoJA0rQhhzEfToTTZ3S31BRQrNzPCNDLh47/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uOWUQr/smdoHa2+wrigQb+hs+ma/CtHmwVWxUWkrcg33rFtMC+w/8imJFAr0USLz+fxitbTiC9H8nPoV2hZWRy+Amf2B+zlvsb8rmn95zTcizXl/SE0WNAsMErxTEgNj3+ZJGgfKgky+zV1HKjS7whze5HLpxxZBwwAuMeLFQ48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WeZQJEFk; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1755590605; c=relaxed/simple;
+	bh=YBd4/KV3RNWhGrA0Id73U96U6ylRv1k1k0behBQt3sw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RKNqkleV7kDeS4xH1rn8s2h7X5Q/fwvNbgEEduv/R3F+X6pXW5PYuL9TrXgN0eLg+apQVWNGp2nQ64HCpjq3082DkEEpMzFlmCaR0cCMlnVl986vnqq6YMiPY+APmRsK2uQ61CYJ27SU3YNnqrNOKlc9CgHpHwgyA3d+y1CW9qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oi1yahMt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WeZQJEFk"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57ILfbBO025278
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 07:51:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=C2elg3Tw3CQ12V4g6n5Sj2D/
-	PhBEsxUy6PtoreBc6vE=; b=WeZQJEFkDYZ0bj5FrUoybYyK5zpBmRLluvgaK8dt
-	2UD/WEiOuHHhZmnCG1F+yfssh019F7gnWoIFVa0Co0gxrV4e3B8iqpXXmcXzIU2b
-	NbBg49kKsUydaXSczMzxwHq+EQTwZ7RYHngb1YvDYARqfmEUIvPm4K99Yb6yVSa0
-	XM0x6IpPOcf8pbQ/EfuehQVPidg0f3IEgyAFH25qs8bNOl9z2jReONa91R3x3eOc
-	QDpbf0XMIb+8Yh+WnNNMjIdiyXweT0ES9HWWMTUpEMgYtRkvJFq6QWDHATt92X58
-	gUUYX4FQmoapNHLgin273lFKC7EVLwAu+U9fbiZX75FMPg==
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48mca5hcar-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 07:51:39 +0000 (GMT)
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-70ba7aa11c2so79744516d6.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 00:51:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755589897; x=1756194697;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C2elg3Tw3CQ12V4g6n5Sj2D/PhBEsxUy6PtoreBc6vE=;
-        b=POEq7dCe7jHrM3YArQk0vbr26Up//q8SHpJd9thX+IMtm9Gd0oQFAxwEgatSxz5Fq7
-         eIg5lA4lZVxJ1n41i2xXyne5KR1HE+/to7J9SSFzW8upsrUJ3RZ4k0+RmOJLzaEly7sd
-         qgtx80GS0nopJ+DNUaT9lmnYv0/m2Ed+3/C+gTqaz22mmx6Wik15hflSnHa8jJiW0O73
-         DHeUWU6PL95s1BRHdr7YzUU9lU3ObxddiUy4/Zl82zg1PMY1zT9IxcPUw1CiD/ArOSMe
-         YdUuqT02NNdOQ3ZbIy6fCmYWA/YBhbYMcsf5OBj+7cCvzu+q/kUnnXy6QarUn1LsKh0t
-         RdJQ==
-X-Gm-Message-State: AOJu0Yyo9ZMTtX0ScRz/a/2jwDVRNU3EYe6jsWCT72piWGHvUrq165GM
-	7OB5zSbLwo7BCrFzWuw5RF8cBP6dETasG1JTLpVP6njndDULlLXXVTA83YTMbCkfL46bL7IvOrk
-	ifxEbKIIM+unAvLWaux3UfVHFI5LOazuVBWUJe4VQXp1QRg8UifXavxWrD4b8kRzvjIMGhn5gkM
-	WW7nQ=
-X-Gm-Gg: ASbGncuPxHOFfZKhGahgrilfAT/ezbQR5yro2QoNLXPO6XwdTB2grNrxkTzRCbt5RJD
-	yRPM/NhgMb/8wz4IzgE/csft6ysbnRJKdU3Mq+wfRqcSsQd9Mm88TLlFzRw9+jxARhJttoSgfpN
-	wrouee+3rJro2mUbRZYsiL7jKbUl3jr+11ddRgYEXRQauhFDk9HuGNieTi5Q7QVkKrNbzbkZVah
-	+R8QxxWk1mEy7mH6WwwnJB5dFzBMCJ/0Ztmk+x+FPebLKVUX0hn95w9C7RJQgSVVxbmuo2PPmXp
-	ztJvzctcrq89eT3uVOGsc8nSVlA4PGFqc0sXVyB147DUwDA5jSuB6MAjzXejEaDxvEOxQyfe6bb
-	AZ6XL/430HtoSEtbBbKetmpsNNo2QGHDNQTv8T+NtTzvKzkBw8E+o
-X-Received: by 2002:a05:6214:230c:b0:70d:6df4:1b22 with SMTP id 6a1803df08f44-70d6df41d6fmr3058986d6.63.1755589897480;
-        Tue, 19 Aug 2025 00:51:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGd7TfthtwS1n6N94DNqFy91G0YwJUeyAGW3ScRdrSu7GyBio7wRiaGd38hIQfnp+eeCRK1xw==
-X-Received: by 2002:a05:6214:230c:b0:70d:6df4:1b22 with SMTP id 6a1803df08f44-70d6df41d6fmr3058816d6.63.1755589896805;
-        Tue, 19 Aug 2025 00:51:36 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3340a41e251sm23188641fa.11.2025.08.19.00.51.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 00:51:34 -0700 (PDT)
-Date: Tue, 19 Aug 2025 10:51:33 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Shuai Zhang <quic_shuaz@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        quic_bt@quicinc.com
-Subject: Re: [PATCH v4 2/4] driver: bluetooth: hci_qca: fix host IBS state
- after SSR
-Message-ID: <npmyohftd37zpnvwgzet4vasji7m2nfygyofrrxehmisrygyou@3cz6yanqqcmm>
-References: <20250814124704.2531811-1-quic_shuaz@quicinc.com>
- <20250814124704.2531811-3-quic_shuaz@quicinc.com>
- <ndgufkvb7gkqeco45xlru2x5ai335s3vhx6wso7pksqcyfdjll@azfjjboa7bc4>
- <11d06cd6-60d3-44fa-94d1-7917adaa0230@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oi1yahMt"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 654DFC4CEF1;
+	Tue, 19 Aug 2025 08:03:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755590605;
+	bh=YBd4/KV3RNWhGrA0Id73U96U6ylRv1k1k0behBQt3sw=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=Oi1yahMtM6zk0v7oLoIN/ffvQH21g41OGbq01vK/ROugrNcW0ANEhUy2gRizGTR78
+	 qjBt0Q8eYZvYdCdYhUa20vbJ2kdHwq9Gte6M7TiTj03isqzhr0U75tbwHN03cAYTJ4
+	 nhgs4p16v/0UCc4nYsgw30gdcXwOTympiRUG0aQG8mBxP8s6G2vPLEkULkuIqWEOXm
+	 53g2LrKIp+xVHrpXB5AoUiyOiwiK22tdhosO3hfLvZXOffQcBw5BdFURrOKbiv4Siv
+	 V7yUe2P9JZkcFhQYWWPWZrmdaQ5lxG9suH82wUaST74T9u3sbmqL5zlLosHlBDEWH6
+	 egsEU6UnoVc1g==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F51CA0EED;
+	Tue, 19 Aug 2025 08:03:25 +0000 (UTC)
+From: Ye He via B4 Relay <devnull+ye.he.amlogic.com@kernel.org>
+Date: Tue, 19 Aug 2025 16:03:22 +0800
+Subject: [PATCH bluez] bap: Fix setup double free with bis sink
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11d06cd6-60d3-44fa-94d1-7917adaa0230@quicinc.com>
-X-Authority-Analysis: v=2.4 cv=FdU3xI+6 c=1 sm=1 tr=0 ts=68a42d0b cx=c_pps
- a=7E5Bxpl4vBhpaufnMqZlrw==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=2OwXVqhp2XgA:10 a=3nUCoSrt7Jy0hBid_xIA:9 a=CjuIK1q_8ugA:10
- a=pJ04lnu7RYOZP9TFuWaZ:22
-X-Proofpoint-ORIG-GUID: M9Cmli5S8Nkj_0yKwLYINtKiQLFXXSor
-X-Proofpoint-GUID: M9Cmli5S8Nkj_0yKwLYINtKiQLFXXSor
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE4MDIwMiBTYWx0ZWRfX7P78v8fyQKts
- CCB++dmO8j/dECO39HjQeqTeszY+HD5oUYVT1Pz4EP8Qd/SRq4/K3fUwf+9fRqg3VXQXqBw44mT
- pUaWDToFbatHkZZaRFNqnCE/51ve3uXcBwRfGT1/85YBs4BqCNTrF7ElaDuUrb4aAcguaeFo8xM
- E7uij+DSX8KypOymDMTAfNNApVfP01F3qiJvLp2EdDWSywmed2Fj+L+h6bFU2gEW0tG7XIPwsuq
- nvZKHBC4bPaVV6g9rt6cn1+5BePzOXmuRYPzOkEGQZcfzrEHDA57Q8NnokPlw6iRXYSmomuKZwn
- efNDeB6vAfulvB0FEhqpeeWu2A/mvBaW2tIH6mddqPDsStuSH4rftiMv8lw0sQjcrCs7TCkyDud
- dIK8XHno
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-19_01,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1015 phishscore=0 spamscore=0 malwarescore=0
- priorityscore=1501 adultscore=0 impostorscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508180202
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250819-bap-setup-double-free-v1-1-a7c64be0d807@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAMkvpGgC/x3MywqDMBBG4VeRWXcgiVgvr1K6cJpfHRANSVOK4
+ rs3dPktzjkpISoSDdVJER9Num8F9lbRaxm3Gay+mJxxjelszzIGTnjnwH7PsoKnCHDd2XsvzrR
+ eGiptiJj0+/8+SNaMg57X9QPAQIdqbgAAAA==
+X-Change-ID: 20250819-bap-setup-double-free-38169b207db5
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755590604; l=1413;
+ i=ye.he@amlogic.com; s=20250225; h=from:subject:message-id;
+ bh=Z/qONVZw2n+fP9ohFfxGXed1U3JcKAzWJdnNk5Mfa/s=;
+ b=qVFsKXMCmUVnLnkyIsZgNUeGnpKPsZlFnL+ntGnb2NJfserSvdeFq0rwMbCGrFOPYpd8cPAHx
+ 8sshX35mtt8A3jTUdVxFqdp9b7ZEOibk5WgIglpZxZgBdCyluuy+jAa
+X-Developer-Key: i=ye.he@amlogic.com; a=ed25519;
+ pk=hiK/p0mkXYSkX8Ooa496DfgjnbtdcyXSPFwK2LN49CE=
+X-Endpoint-Received: by B4 Relay for ye.he@amlogic.com/20250225 with
+ auth_id=348
+X-Original-From: Ye He <ye.he@amlogic.com>
+Reply-To: ye.he@amlogic.com
 
-On Tue, Aug 19, 2025 at 11:38:01AM +0800, Shuai Zhang wrote:
-> Hi Dmitry 
-> 
-> On 8/16/2025 5:50 AM, Dmitry Baryshkov wrote:
-> > On Thu, Aug 14, 2025 at 08:47:02PM +0800, Shuai Zhang wrote:
-> >> After SSR, host will not download the firmware, causing
-> >> controller to remain in the IBS_WAKE state. Host needs
-> >> to synchronize with the controller to maintain proper operation.
-> > 
-> > It totally feels like all these patches fix the same issue and should be
-> > squashed together. Please also add a sensible Fixes: tag. Possibly
-> > add cc:stable too.
-> 
-> Although these issues are all related to SSR, the underlying causes of the
-> errors are different. Would it be appropriate to merge them into one patch?
-> 
+From: Ye He <ye.he@amlogic.com>
 
-I think so.
+If try to remove the bis sink device that big sync lost with
+remote bis source, the following crash is observed:
 
+0x00000a78 in ?? ()
+0x004c8970 in setup_free ()
+0x00551a78 in queue_remove_all ()
+0x00551abc in queue_destroy ()
+0x004cb590 in bap_data_remove ()
+0x004cb9f0 in bap_bcast_remove ()
+0x0051457c in service_remove ()
+0x005272e4 in device_remove ()
+0x0050e134 in adapter_remove_connection ()
+0x0050e24c in dev_disconnected ()
+0x00553478 in request_complete ()
+0x00554670 in can_read_data ()
+0x005850c4 in watch_callback ()
+0xf7d5ab9c in g_main_context_dispatch () from /usr/lib/libglib-2.0.so.0
+0xf7d5af28 in ?? () from /usr/lib/libglib-2.0.so.0
+
+Signed-off-by: Ye He <ye.he@amlogic.com>
+---
+ profiles/audio/bap.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 2994881ccc1d7daa1d97210edc6ff67381e74cc1..c8c83cf94c57878f3bd8b805e926bd58ff648d9a 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -1010,6 +1010,8 @@ static void setup_free(void *data)
+ 
+ 	if (setup->ep)
+ 		queue_remove(setup->ep->setups, setup);
++	else if (setup->data->bcast_snks)
++		queue_remove(setup->data->bcast_snks, setup);
+ 
+ 	setup_io_close(setup, NULL);
+ 
+
+---
+base-commit: 0bb66d3d1abd7d25b840d535c03b1b9613727d5c
+change-id: 20250819-bap-setup-double-free-38169b207db5
+
+Best regards,
 -- 
-With best wishes
-Dmitry
+Ye He <ye.he@amlogic.com>
+
+
