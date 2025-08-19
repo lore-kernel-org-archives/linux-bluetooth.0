@@ -1,129 +1,115 @@
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438C5340DB8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 13:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E241F4181
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 14:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755611188; cv=none; b=u9tnadYn0iuZKAOlC8KfQeTlAwzDEYOYozBK4v3SN3u4aivICMfzQynPq8fPm/SUUa4fNOGH0xaZOeA4SI9Pm4U8+cdt5Byb2OScufwtemrvhw/YPbFtw9SKEnUzyQ5VIQX0uib4BCi1VKIHApLEOBPMn4o2HIZlcCwBseFOVys=
+	t=1755612851; cv=none; b=fU5kFPlK5lbtIpr4OiQ/qGLY2CLqJCov6Y1RRgPfJMU9G3AXj07Dkn4r/JmrafsnZWYz3k1BegBTd+rRBMMlOhtQg5B16F3TT1dNFnhxmZkqFR+w0yjxu+TWeLsggOEG+LKh5WFgNH9Yn451qIbKpjIv95k73S6VQnRXvRI6T/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755611188; c=relaxed/simple;
-	bh=Gs1JZbXjSp3xdLuNbmROVxm4/LKeycaSr94ByE0ZjlA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=s3dyKwKdlEYWGtb+7fOlHHWbx37IHne/r8V1QQT47o+CpaeFEbHQBKErfoD6ZZhgm6oqkrYVYUg6kDQ8d2dGyCwmKzUldIwroFxBs9nyxVybQwyXmjPhq8/Jpa0sOkW4DYpugbsCf19ell1Qz6r1ZGD6yDPZiWF5FcbaUi+itPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=i3zyy6cJ; arc=none smtp.client-ip=192.30.252.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="i3zyy6cJ"
-Received: from github.com (hubbernetes-node-766d89c.va3-iad.github.net [10.48.142.40])
-	by smtp.github.com (Postfix) with ESMTPA id 4FDEBE0A39
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 06:46:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1755611186;
-	bh=CNGHDI7G/fgQXiPKR/VTJwkwDmiGxCVGxBBR4zCIFzk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=i3zyy6cJDF4cPT3qqcmrER0X9cAq8aev2wGHAr3AutdaZr468OFFZ75xKY9tfcVt7
-	 1iJiSFAwWVeISvn2dS3HOSZFVxyBdrLayXWvDIkpIZN5XGzuLwQ4uneiG3eIqPhPrT
-	 qtBYaRIKH80zEn2WS0BJUZQMcWNjGFrtmoSenq1Y=
-Date: Tue, 19 Aug 2025 06:46:26 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/993065/000000-b779cf@github.com>
-Subject: [bluez/bluez] 7784f3: shared/hfp: Add HF SLC connection function
+	s=arc-20240116; t=1755612851; c=relaxed/simple;
+	bh=jnztzumPCxiPPc/BSAf3asZ012v8I6kYbVk+fICq0aU=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=RRmp+L5m+vIHMoFou8YXlOBGqVCwKIfk6Hh7Ynvtqr5H0+pKgZGT8ZS6XJF9QUfHGjai3cWAvyM+Y4yzKeGLg9wqe2HqnL1yRuQ2jQ0BLh8MzGbLuYIXjHpV/dFbpbIeneo3p4mjsKfFKp2WsxpqM1KuidlsnPF8K4zgBW9Y4D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4c5s5F4pfWz5B0pS;
+	Tue, 19 Aug 2025 22:13:53 +0800 (CST)
+Received: from xaxapp02.zte.com.cn ([10.88.97.241])
+	by mse-fl1.zte.com.cn with SMTP id 57JEDnIS060666;
+	Tue, 19 Aug 2025 22:13:50 +0800 (+08)
+	(envelope-from xu.xin16@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Tue, 19 Aug 2025 22:13:53 +0800 (CST)
+Date: Tue, 19 Aug 2025 22:13:53 +0800 (CST)
+X-Zmail-TransId: 2af968a486a1ffffffffba9-d944f
+X-Mailer: Zmail v1.0
+Message-ID: <20250819221353357gfKAFq93zfeYcRSTpGtBB@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+From: <xu.xin16@zte.com.cn>
+To: <luiz.dentz@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>, <marcel@holtmann.org>,
+        <johan.hedberg@gmail.com>, <chen.junlin@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LXN0YWJsZSA2LjZdIEJsdWV0b290aDogaGNpX2Nvbm46IGF2b2lkIHF1ZXVlIHdoZW4gZGVsZXRpbmcgaGNpIGNvbm5lY3Rpb24=?=
 Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 57JEDnIS060666
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: xu.xin16@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.132 unknown Tue, 19 Aug 2025 22:13:53 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 68A486A1.000/4c5s5F4pfWz5B0pS
 
-  Branch: refs/heads/993065
-  Home:   https://github.com/bluez/bluez
-  Commit: 7784f3a2330691d887775b8f8066f06aed33e184
-      https://github.com/bluez/bluez/commit/7784f3a2330691d887775b8f8066f=
-06aed33e184
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-19 (Tue, 19 Aug 2025)
+From: Chen Junlin <chen.junlin@zte.com.cn>
 
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
+Although the upstream commit 2b0f2fc9ed62 ("Bluetooth: hci_conn:
+Use disable_delayed_work_sync") has fixed the issue CVE-2024-56591, that
+patch depends on the implementaion of disable/enable_work() of workqueue
+[1], which are merged into 6.9/6.10 and so on. But for branch linux-6.6,
+there's no these feature of workqueue.
 
-  Log Message:
-  -----------
-  shared/hfp: Add HF SLC connection function
+To solve CVE-2024-56591 without backport too many feature patches about
+workqueue, we can set a new flag HCI_CONN_DELETE when hci_conn_dell() is
+called, and the subsequent queuing of work will be ignored.
 
-This implements the minimal SLC connection exchange, i.e. AT+BRSF,
-AT+CIND=3D?, AT+CIND? and AT+CMER=3D3,0,0,1 requested to complete the
-Service Level Connection Establishment.
+[1] https://lore.kernel.org/all/20240216180559.208276-1-tj@kernel.org/
 
+Signed-off-by: Chen Junlin <chen.junlin@zte.com.cn>
+Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+---
+ include/net/bluetooth/hci_core.h | 8 +++++++-
+ net/bluetooth/hci_conn.c         | 1 +
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-  Commit: f6b7ba9862463c36035398d2a7093bfd63743c2c
-      https://github.com/bluez/bluez/commit/f6b7ba9862463c36035398d2a7093=
-bfd63743c2c
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-19 (Tue, 19 Aug 2025)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4f067599e6e9..9a3ec55079a1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -954,6 +954,7 @@ enum {
+ 	HCI_CONN_BIG_SYNC_FAILED,
+ 	HCI_CONN_PA_SYNC,
+ 	HCI_CONN_PA_SYNC_FAILED,
++	HCI_CONN_DELETE,
+ };
 
-  Changed paths:
-    M unit/test-hfp.c
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+@@ -1575,7 +1576,12 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+ 		}
 
-  Log Message:
-  -----------
-  unit/test-hfp: Add SLC connection test
+ 		cancel_delayed_work(&conn->disc_work);
+-		queue_delayed_work(conn->hdev->workqueue,
++		/*
++		 * When HCI_CONN_DELETE is set, the conn is goint to be freed.
++		 * Don't queue the work to avoid noisy WARNing about refcnt < 0.
++		 */
++		if (!test_bit(HCI_CONN_DELETE, &conn->flags))
++			queue_delayed_work(conn->hdev->workqueue,
+ 				   &conn->disc_work, timeo);
+ 	}
+ }
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 549ee9e87d63..67a6513bb01c 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1112,6 +1112,7 @@ void hci_conn_del(struct hci_conn *conn)
 
-This adds minimal packet exchange to test the SLC establishment.
+ 	hci_conn_unlink(conn);
 
-
-  Commit: 85d1ebcb539e4d55313caa393dd05cf8986a3b59
-      https://github.com/bluez/bluez/commit/85d1ebcb539e4d55313caa393dd05=
-cf8986a3b59
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-19 (Tue, 19 Aug 2025)
-
-  Changed paths:
-    M src/shared/hfp.c
-
-  Log Message:
-  -----------
-  shared/hfp: Add +CIEV event support
-
-Register +CIEV handler on SLC completion to call the update_indicator
-call back on unsolicited events.
-
-
-  Commit: b779cf81bb82941d709040d93e02b9003ba6a6d2
-      https://github.com/bluez/bluez/commit/b779cf81bb82941d709040d93e02b=
-9003ba6a6d2
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-19 (Tue, 19 Aug 2025)
-
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add indicators tests for HF
-
-This adds the following tests:
-- /HFP/HF/TRS/BV-01-C
-  Verify that the HF accepts the registration status indication.
-- /HFP/HF/PSI/BV-01-C
-  Verify that the HF successfully receives the signal strength status of
-  the AG.
-- /HFP/HF/PSI/BV-02-C
-  Verify that the HF successfully receives the roaming status of the AG.
-- /HFP/HF/PSI/BV-03-C
-  Verify that the HF successfully receives the battery level status of
-  the AG.
-
-
-Compare: https://github.com/bluez/bluez/compare/7784f3a23306%5E...b779cf8=
-1bb82
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
++	set_bit(HCI_CONN_DELETE, &conn->flags);
+ 	cancel_delayed_work_sync(&conn->disc_work);
+ 	cancel_delayed_work_sync(&conn->auto_accept_work);
+ 	cancel_delayed_work_sync(&conn->idle_work);
+-- 
+2.15.2
