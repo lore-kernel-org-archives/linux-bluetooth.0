@@ -1,46 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0BC1DE89B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 13:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3171D2EB853
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 13:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755610414; cv=none; b=qSzvTS6XMi4aDNLrrBgXi+z1/ggtfEsntj254HLPp4HLkXVVOWwFL6/fXSZBmPgTgekYsE/FBLGatD9RoKoSoYBz0IK+PGUkloNTxrRDBuY29JpBQTfDFT9GEjYp7PC0PXeUdLBorp8aU6pe/oWRKu24W4lsIhTcl8jl86LK5Iw=
+	t=1755610414; cv=none; b=WpLxCPp2xBUJHHqLLYyMVhd0LW9MmK3UgY2k6LfHsJYF01CQVCUxNCcckeGRFglSRtAqU6mjqG9HjzxDWr0ro7H4YhkLq6cdlkDWcoUlx254Ls0w6icV2tGvL2zKuA429gTJIxvRY4ZdZGyo0A/SWSQlLvmEpK1TehWkRGv2ZYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755610414; c=relaxed/simple;
-	bh=2QG+83CuKnbIvyRt4viD9jfDQStbM79/i0yVQiKw8Os=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rmFQbUJzqR6ZJYIUPTOFmtzEcv+0C+nWlLzhymkSEPom+a8yQQNRsb7fnml7vB+TnESAlt0bKNlrt2er5Gkd/opu1hu/FWWQ5FdiOIjC3CKsnDbO6Y7Zp5Hxda3mWgApbXBF4C7r1+El2M0Up6O4ABSmkhI6JIWRbF8LiLuYYh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=N28/5Mss; arc=none smtp.client-ip=148.251.105.195
+	bh=7jq1glaS2G52Wp6aYGb8GLQZ/dN70OWScD0UlZBfDZs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cpa3D+7DQy86AXskngCQP00MFshbBAyQPIpyKRE1jkMMgImztHZ3Vkx9tcuUXjy0d3JacnxNGnGGBIlFOCaaD47PwdgGv723Kn1/8RIdfY8VM+81pH9/2ep+ICy4FuRsc5vxlBB8sAp+X1OYTptPHBB2uYjncHiaAG1mwdrMv4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=KE3+8EzP; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="N28/5Mss"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="KE3+8EzP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1755610410;
-	bh=2QG+83CuKnbIvyRt4viD9jfDQStbM79/i0yVQiKw8Os=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=N28/5Mss0T/CZ/s5NExrbg2V5eSX9JY9HJPQnf5pRmzS5QWdpSoYs9wBYU9qLpD2b
-	 Etm4pZiLM0MatD78LXQ0zjroDD8gHzWyOvM+X8lyKIqFbXdaIriq448Oa9eGc1kLpr
-	 BlGAV2uwRrUgceQk+mLEnOpc37M1OLqnJQKjBhblGCNZH0ZpHb8nVoDHhGc6Ct4EY2
-	 VV78k8PTkBeuWb3LRiW8OZICMzgZyfpFWs5iUKTcHNmLIEdR1K9MqLg7Xwti4e+NQG
-	 O0KUlj9Nrppd3mqB4NYfWzihexY8yyxVP1C1GGw94dySARr6QhxuQL4dmlwXOm14T4
-	 38xdk+MPgEJPA==
+	bh=7jq1glaS2G52Wp6aYGb8GLQZ/dN70OWScD0UlZBfDZs=;
+	h=From:To:Subject:Date:From;
+	b=KE3+8EzPJWYbQEa2dVHQA7M8yhgDLZniaKTWbQsQ4W5TR4tFJ+MpampaTAA2hUYmx
+	 fsWvH38RCFlY3jfsPBTHzze0msqeic5SCbSgElxwtbBmg+li6Lwcd7sbp0yrH8IKzf
+	 pX1yrgI9jWWuosMPlbtdt8TNfxj1R8mQJAHw3IwwJmGB8KwhTjvMwVvZuDkXJhJ29H
+	 gGp3vOZGx6de5xkgjrwQ6OhnZFaEAri64jK+ACPsyCTPvvZIlZgjCz1MhCo1VPcGPh
+	 9IEN4FQMaXF7crQ92/kIweH137Ufip6QMnJb1j2jkRaVely03Oqokxi19GYRD6CkXm
+	 pMnNBPJH8MUSA==
 Received: from fdanis-ThinkPad-X1.. (2a02-8428-aF44-1001-110B-4649-b903-4EDe.rev.sfr.net [IPv6:2a02:8428:af44:1001:110b:4649:b903:4ede])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8901C17E0DE3
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3505117E0A49
 	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 15:33:30 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ RESEND 2/4] unit/test-hfp: Add SLC connection test
-Date: Tue, 19 Aug 2025 15:33:19 +0200
-Message-ID: <20250819133321.382279-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ RESEND 1/4] shared/hfp: Add HF SLC connection function
+Date: Tue, 19 Aug 2025 15:33:18 +0200
+Message-ID: <20250819133321.382279-1-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250819133321.382279-1-frederic.danis@collabora.com>
-References: <20250819133321.382279-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,152 +47,656 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This adds minimal packet exchange to test the SLC establishment.
+This implements the minimal SLC connection exchange, i.e. AT+BRSF,
+AT+CIND=?, AT+CIND? and AT+CMER=3,0,0,1 requested to complete the
+Service Level Connection Establishment.
 ---
- unit/test-hfp.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 117 insertions(+)
+ src/shared/hfp.c | 508 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/hfp.h |  69 +++++++
+ 2 files changed, 577 insertions(+)
 
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index b4af99d53..2ea77e210 100644
---- a/unit/test-hfp.c
-+++ b/unit/test-hfp.c
-@@ -104,6 +104,14 @@ struct test_data {
- 		data.test_handler = test_hf_handler;			\
- 	} while (0)
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index df6eab35d..c1bcb61cf 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -25,6 +25,12 @@
+ #include "src/shared/io.h"
+ #include "src/shared/hfp.h"
  
-+static void print_debug(const char *str, void *user_data)
-+{
-+	const char *prefix = user_data;
++#define DBG(_hfp, fmt, arg...) \
++	hfp_debug(_hfp->debug_callback, _hfp->debug_data, "%s:%s() " fmt, \
++						__FILE__, __func__, ## arg)
 +
-+	if (tester_use_debug())
-+		tester_debug("%s%s", prefix, str);
++#define HFP_HF_FEATURES	(HFP_HF_FEAT_ESCO_S4_T2)
++
+ struct hfp_gw {
+ 	int ref_count;
+ 	int fd;
+@@ -50,6 +56,16 @@ struct hfp_gw {
+ 	bool destroyed;
+ };
+ 
++typedef void (*ciev_func_t)(uint8_t val, void *user_data);
++
++struct indicator {
++	uint8_t index;
++	uint32_t min;
++	uint32_t max;
++	uint32_t val;
++	ciev_func_t cb;
++};
++
+ struct hfp_hf {
+ 	int ref_count;
+ 	int fd;
+@@ -73,6 +89,17 @@ struct hfp_hf {
+ 
+ 	bool in_disconnect;
+ 	bool destroyed;
++
++	struct hfp_hf_callbacks *callbacks;
++	void *callbacks_data;
++
++	uint32_t features;
++	struct indicator ag_ind[HFP_INDICATOR_LAST];
++	bool service;
++	uint8_t signal;
++	bool roaming;
++	uint8_t battchg;
++
+ };
+ 
+ struct cmd_handler {
+@@ -101,6 +128,19 @@ struct event_handler {
+ 	hfp_hf_result_func_t callback;
+ };
+ 
++static void hfp_debug(hfp_debug_func_t debug_func, void *debug_data,
++						const char *format, ...)
++{
++	va_list ap;
++
++	if (!debug_func || !format)
++		return;
++
++	va_start(ap, format);
++	util_debug_va(debug_func, debug_data, format, ap);
++	va_end(ap);
 +}
 +
- static void test_free(gconstpointer user_data)
+ static void destroy_cmd_handler(void *data)
  {
- 	const struct test_data *data = user_data;
-@@ -680,6 +688,110 @@ static void test_hf_robustness(gconstpointer data)
- 	context_quit(context);
- }
+ 	struct cmd_handler *handler = data;
+@@ -1527,3 +1567,471 @@ bool hfp_hf_disconnect(struct hfp_hf *hfp)
  
-+#define MINIMAL_SLC_SESSION \
-+	raw_pdu('\r', '\n', '+', 'B', 'R', 'S', 'F', ':', \
-+		' ', '0', '\r', '\n'), \
-+	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-+	raw_pdu('\r', '\n', '+', 'C', 'I', 'N', 'D', ':', ' '), \
-+	frg_pdu('(', '\"', 's', 'e', 'r', 'v', 'i', 'c', 'e'), \
-+	frg_pdu('\"', '(', '0', ',', '1', ')', ')', ','), \
-+	frg_pdu('(', '\"', 'c', 'a', 'l', 'l', '\"'), \
-+	frg_pdu('(', '0', ',', '1', ')', ')', ','), \
-+	frg_pdu('(', '\"', 'c', 'a', 'l', 'l', 's', 'e', 't'), \
-+	frg_pdu('u', 'p', '\"', ',', '(', '0', '-', '3', ')'), \
-+	frg_pdu(')', ','), \
-+	frg_pdu('(', '\"', 'c', 'a', 'l', 'l', 'h', 'e', 'l'), \
-+	frg_pdu('d', '\"', ',', '(', '0', '-', '2', ')', ')'), \
-+	frg_pdu(',', '(', '\"', 's', 'i', 'g', 'n', 'a', 'l'), \
-+	frg_pdu('\"', '(', '0', '-', '5', ')', ')', ','), \
-+	frg_pdu('(', '\"', 'r', 'o', 'a', 'm', '\"', ',', '('), \
-+	frg_pdu('0', ',', '1', ')', ')', ','), \
-+	frg_pdu('(', '\"', 'b', 'a', 't', 't', 'c', 'h', 'g'), \
-+	frg_pdu('\"', '(', '0', '-', '5', ')', ')', ','), \
-+	frg_pdu('\r', '\n'), \
-+	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-+	raw_pdu('\r', '\n', '+', 'C', 'I', 'N', 'D', ':', ' '), \
-+	frg_pdu('0', ',', '0', ',', '0', ',', '0', ',', '5'), \
-+	frg_pdu(',', '0', ',', '5', '\r', '\n'), \
-+	frg_pdu('\r', '\n', 'O', 'K', '\r', '\n'), \
-+	raw_pdu('\r', '\n', 'O', 'K', '\r', '\n')
+ 	return io_shutdown(hfp->io);
+ }
 +
-+static void hf_session_ready_cb(enum hfp_result res, enum hfp_error cme_err,
-+							void *user_data)
++static void ciev_service_cb(uint8_t val, void *user_data)
 +{
-+	struct context *context = user_data;
++	struct hfp_hf *hfp = user_data;
 +
-+	g_assert_cmpint(res, ==, HFP_RESULT_OK);
++	DBG(hfp, "%u", val);
 +
-+	context->data->response_func(res, cme_err, context);
++	if (val < hfp->ag_ind[HFP_INDICATOR_SERVICE].min ||
++			val > hfp->ag_ind[HFP_INDICATOR_SERVICE].max) {
++		DBG(hfp, "hf: Incorrect state %u:", val);
++		return;
++	}
++
++	hfp->service = val;
++	if (hfp->callbacks && hfp->callbacks->update_indicator)
++		hfp->callbacks->update_indicator(HFP_INDICATOR_SERVICE, val,
++							hfp->callbacks_data);
 +}
 +
-+static void hf_update_indicator(enum hfp_indicator indicator, uint32_t val,
-+							void *user_data)
++static void ciev_call_cb(uint8_t val, void *user_data)
 +{
-+	switch (indicator) {
-+	case HFP_INDICATOR_SERVICE:
-+		g_assert_cmpint(val, ==, 1);
-+		break;
-+	case HFP_INDICATOR_CALL:
-+		g_assert_cmpint(val, ==, 0);
-+		break;
-+	case HFP_INDICATOR_CALLSETUP:
-+		g_assert_cmpint(val, ==, 0);
-+		break;
-+	case HFP_INDICATOR_CALLHELD:
-+		g_assert_cmpint(val, ==, 0);
-+		break;
-+	case HFP_INDICATOR_SIGNAL:
-+		g_assert_cmpint(val, ==, 5);
-+		break;
-+	case HFP_INDICATOR_ROAM:
-+		g_assert_cmpint(val, ==, 0);
-+		break;
-+	case HFP_INDICATOR_BATTCHG:
-+		g_assert_cmpint(val, ==, 5);
-+		break;
-+	case HFP_INDICATOR_LAST:
-+	default:
-+		tester_test_failed();
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "%u", val);
++
++	if (val < hfp->ag_ind[HFP_INDICATOR_CALL].min ||
++			val > hfp->ag_ind[HFP_INDICATOR_CALL].max) {
++		DBG(hfp, "hf: Incorrect call state %u:", val);
++		return;
 +	}
 +}
 +
-+static struct hfp_hf_callbacks hf_session_callbacks = {
-+	.session_ready = hf_session_ready_cb,
-+	.update_indicator = hf_update_indicator,
++static void ciev_callsetup_cb(uint8_t val, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "%u", val);
++
++	if (val < hfp->ag_ind[HFP_INDICATOR_CALLSETUP].min ||
++			val > hfp->ag_ind[HFP_INDICATOR_CALLSETUP].max) {
++		DBG(hfp, "hf: Incorrect call setup state %u:", val);
++		return;
++	}
++}
++
++static void ciev_callheld_cb(uint8_t val, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "%u", val);
++
++	if (val < hfp->ag_ind[HFP_INDICATOR_CALLHELD].min ||
++			val > hfp->ag_ind[HFP_INDICATOR_CALLHELD].max) {
++		DBG(hfp, "hf: Incorrect call held state %u:", val);
++		return;
++	}
++}
++
++static void ciev_signal_cb(uint8_t val, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "%u", val);
++
++	if (val < hfp->ag_ind[HFP_INDICATOR_SIGNAL].min ||
++			val > hfp->ag_ind[HFP_INDICATOR_SIGNAL].max) {
++		DBG(hfp, "hf: Incorrect signal value %u:", val);
++		return;
++	}
++
++	hfp->signal = val;
++	if (hfp->callbacks && hfp->callbacks->update_indicator)
++		hfp->callbacks->update_indicator(HFP_INDICATOR_SIGNAL, val,
++							hfp->callbacks_data);
++}
++
++static void ciev_roam_cb(uint8_t val, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "%u", val);
++
++	if (val < hfp->ag_ind[HFP_INDICATOR_ROAM].min ||
++			val > hfp->ag_ind[HFP_INDICATOR_ROAM].max) {
++		DBG(hfp, "hf: Incorrect roaming state %u:", val);
++		return;
++	}
++
++	hfp->roaming = val;
++	if (hfp->callbacks && hfp->callbacks->update_indicator)
++		hfp->callbacks->update_indicator(HFP_INDICATOR_ROAM, val,
++							hfp->callbacks_data);
++}
++
++static void ciev_battchg_cb(uint8_t val, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "%u", val);
++
++	if (val < hfp->ag_ind[HFP_INDICATOR_BATTCHG].min ||
++			val > hfp->ag_ind[HFP_INDICATOR_BATTCHG].max) {
++		DBG(hfp, "hf: Incorrect battery charge value %u:", val);
++		return;
++	}
++
++	hfp->battchg = val;
++	if (hfp->callbacks && hfp->callbacks->update_indicator)
++		hfp->callbacks->update_indicator(HFP_INDICATOR_BATTCHG, val,
++							hfp->callbacks_data);
++}
++
++static void set_indicator_value(uint8_t index, unsigned int val,
++	struct indicator *ag_ind, struct hfp_hf *hfp)
++{
++	int i;
++
++	for (i = 0; i < HFP_INDICATOR_LAST; i++) {
++		if (index != ag_ind[i].index)
++			continue;
++
++		ag_ind[i].val = val;
++		ag_ind[i].cb(val, hfp);
++		return;
++	}
++}
++
++static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: CMER error: %d", result);
++		goto failed;
++	}
++
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(HFP_RESULT_OK, 0,
++						hfp->callbacks_data);
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
++static void slc_cind_status_cb(struct hfp_context *context,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++	uint8_t index = 1;
++
++	while (hfp_context_has_next(context)) {
++		uint32_t val;
++
++		if (!hfp_context_get_number(context, &val)) {
++			DBG(hfp, "hf: Error on CIND status response");
++			return;
++		}
++
++		set_indicator_value(index++, val, hfp->ag_ind, hfp);
++	}
++}
++
++static void slc_cind_status_resp(enum hfp_result result,
++	enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	hfp_hf_unregister(hfp, "+CIND");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: CIND error: %d", result);
++		goto failed;
++	}
++
++	/* Continue with SLC creation */
++	if (!hfp_hf_send_command(hfp, slc_cmer_resp, hfp,
++		"AT+CMER=3,0,0,1")) {
++		DBG(hfp, "hf: Could not send AT+CMER");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
++static void set_indicator_parameters(struct hfp_hf *hfp, uint8_t index,
++	const char *indicator,
++	unsigned int min,
++	unsigned int max)
++{
++	struct indicator *ag_ind = hfp->ag_ind;
++
++	DBG(hfp, "%s, %i", indicator, index);
++
++	if (strcmp("service", indicator) == 0) {
++		if (min != 0 || max != 1) {
++			DBG(hfp, "hf: Invalid min/max values for service,"
++				" expected (0,1) got (%u,%u)", min, max);
++			return;
++		}
++		ag_ind[HFP_INDICATOR_SERVICE].index = index;
++		ag_ind[HFP_INDICATOR_SERVICE].min = min;
++		ag_ind[HFP_INDICATOR_SERVICE].max = max;
++		ag_ind[HFP_INDICATOR_SERVICE].cb = ciev_service_cb;
++		return;
++	}
++
++	if (strcmp("call", indicator) == 0) {
++		if (min != 0 || max != 1) {
++			DBG(hfp, "hf: Invalid min/max values for call,"
++				" expected (0,1) got (%u,%u)", min, max);
++			return;
++		}
++		ag_ind[HFP_INDICATOR_CALL].index = index;
++		ag_ind[HFP_INDICATOR_CALL].min = min;
++		ag_ind[HFP_INDICATOR_CALL].max = max;
++		ag_ind[HFP_INDICATOR_CALL].cb = ciev_call_cb;
++		return;
++	}
++
++	if (strcmp("callsetup", indicator) == 0) {
++		if (min != 0 || max != 3) {
++			DBG(hfp, "hf: Invalid min/max values for callsetup,"
++				" expected (0,3) got (%u,%u)", min, max);
++			return;
++		}
++		ag_ind[HFP_INDICATOR_CALLSETUP].index = index;
++		ag_ind[HFP_INDICATOR_CALLSETUP].min = min;
++		ag_ind[HFP_INDICATOR_CALLSETUP].max = max;
++		ag_ind[HFP_INDICATOR_CALLSETUP].cb = ciev_callsetup_cb;
++		return;
++	}
++
++	if (strcmp("callheld", indicator) == 0) {
++		if (min != 0 || max != 2) {
++			DBG(hfp, "hf: Invalid min/max values for callheld,"
++				" expected (0,2) got (%u,%u)", min, max);
++			return;
++		}
++		ag_ind[HFP_INDICATOR_CALLHELD].index = index;
++		ag_ind[HFP_INDICATOR_CALLHELD].min = min;
++		ag_ind[HFP_INDICATOR_CALLHELD].max = max;
++		ag_ind[HFP_INDICATOR_CALLHELD].cb = ciev_callheld_cb;
++		return;
++	}
++
++	if (strcmp("signal", indicator) == 0) {
++		if (min != 0 || max != 5) {
++			DBG(hfp, "hf: Invalid min/max values for signal,"
++				" expected (0,5) got (%u,%u)", min, max);
++			return;
++		}
++		ag_ind[HFP_INDICATOR_SIGNAL].index = index;
++		ag_ind[HFP_INDICATOR_SIGNAL].min = min;
++		ag_ind[HFP_INDICATOR_SIGNAL].max = max;
++		ag_ind[HFP_INDICATOR_SIGNAL].cb = ciev_signal_cb;
++		return;
++	}
++
++	if (strcmp("roam", indicator) == 0) {
++		if (min != 0 || max != 1) {
++			DBG(hfp, "hf: Invalid min/max values for roam,"
++				" expected (0,1) got (%u,%u)", min, max);
++			return;
++		}
++		ag_ind[HFP_INDICATOR_ROAM].index = index;
++		ag_ind[HFP_INDICATOR_ROAM].min = min;
++		ag_ind[HFP_INDICATOR_ROAM].max = max;
++		ag_ind[HFP_INDICATOR_ROAM].cb = ciev_roam_cb;
++		return;
++	}
++
++	if (strcmp("battchg", indicator) == 0) {
++		if (min != 0 || max != 5) {
++			DBG(hfp, "hf: Invalid min/max values for battchg,"
++				" expected (0,5) got (%u,%u)", min, max);
++			return;
++		}
++		ag_ind[HFP_INDICATOR_BATTCHG].index = index;
++		ag_ind[HFP_INDICATOR_BATTCHG].min = min;
++		ag_ind[HFP_INDICATOR_BATTCHG].max = max;
++		ag_ind[HFP_INDICATOR_BATTCHG].cb = ciev_battchg_cb;
++		return;
++	}
++
++	DBG(hfp, "hf: Unknown indicator: %s", indicator);
++}
++
++static void slc_cind_cb(struct hfp_context *context, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++	int index = 1;
++
++	DBG(hfp, "");
++
++	while (hfp_context_has_next(context)) {
++		char name[255];
++		unsigned int min, max;
++
++		/* e.g ("callsetup",(0-3)) */
++		if (!hfp_context_open_container(context))
++			break;
++
++		if (!hfp_context_get_string(context, name, sizeof(name))) {
++			DBG(hfp, "hf: Could not get string");
++			goto failed;
++		}
++
++		if (!hfp_context_open_container(context)) {
++			DBG(hfp, "hf: Could not open container");
++			goto failed;
++		}
++
++		if (!hfp_context_get_range(context, &min, &max)) {
++			if (!hfp_context_get_number(context, &min)) {
++				DBG(hfp, "hf: Could not get number");
++				goto failed;
++			}
++
++			if (!hfp_context_get_number(context, &max)) {
++				DBG(hfp, "hf: Could not get number");
++				goto failed;
++			}
++		}
++
++		if (!hfp_context_close_container(context)) {
++			DBG(hfp, "hf: Could not close container");
++			goto failed;
++		}
++
++		if (!hfp_context_close_container(context)) {
++			DBG(hfp, "hf: Could not close container");
++			goto failed;
++		}
++
++		set_indicator_parameters(hfp, index, name, min, max);
++		index++;
++	}
++
++	return;
++
++failed:
++	DBG(hfp, "hf: Error on CIND response");
++}
++
++static void slc_cind_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	hfp_hf_unregister(hfp, "+CIND");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "hf: CIND error: %d", result);
++		goto failed;
++	}
++
++	/* Continue with SLC creation */
++	if (!hfp_hf_register(hfp, slc_cind_status_cb, "+CIND", hfp,
++			NULL)) {
++		DBG(hfp, "hf: Could not register +CIND");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	if (!hfp_hf_send_command(hfp, slc_cind_status_resp, hfp,
++			"AT+CIND?")) {
++		DBG(hfp, "hf: Could not send AT+CIND?");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
++static void slc_brsf_cb(struct hfp_context *context, void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++	unsigned int feat;
++
++	DBG(hfp, "");
++
++	if (hfp_context_get_number(context, &feat))
++		hfp->features = feat;
++}
++
++static void slc_brsf_resp(enum hfp_result result, enum hfp_error cme_err,
++	void *user_data)
++{
++	struct hfp_hf *hfp = user_data;
++
++	DBG(hfp, "");
++
++	hfp_hf_unregister(hfp, "+BRSF");
++
++	if (result != HFP_RESULT_OK) {
++		DBG(hfp, "BRSF error: %d", result);
++		goto failed;
++	}
++
++	/* Continue with SLC creation */
++	if (!hfp_hf_register(hfp, slc_cind_cb, "+CIND", hfp, NULL)) {
++		DBG(hfp, "hf: Could not register for +CIND");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	if (!hfp_hf_send_command(hfp, slc_cind_resp, hfp, "AT+CIND=?")) {
++		DBG(hfp, "hf: Could not send AT+CIND command");
++		result = HFP_RESULT_ERROR;
++		goto failed;
++	}
++
++	return;
++
++failed:
++	if (hfp->callbacks->session_ready)
++		hfp->callbacks->session_ready(result, cme_err,
++						hfp->callbacks_data);
++}
++
++bool hfp_hf_session_register(struct hfp_hf *hfp,
++				struct hfp_hf_callbacks *callbacks,
++				void *callbacks_data)
++{
++	if (!hfp)
++		return false;
++
++	hfp->callbacks = callbacks;
++	hfp->callbacks_data = callbacks_data;
++
++	return true;
++}
++
++bool hfp_hf_session(struct hfp_hf *hfp)
++{
++	DBG(hfp, "");
++
++	if (!hfp)
++		return false;
++
++	if (!hfp_hf_register(hfp, slc_brsf_cb, "+BRSF", hfp, NULL))
++		return false;
++
++	return hfp_hf_send_command(hfp, slc_brsf_resp, hfp,
++					"AT+BRSF=%u", HFP_HF_FEATURES);
++}
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 600d084a7..f54b86a92 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -10,6 +10,34 @@
+ 
+ #include <stdbool.h>
+ 
++#define HFP_HF_FEAT_ECNR				0x00000001
++#define HFP_HF_FEAT_3WAY				0x00000002
++#define HFP_HF_FEAT_CLIP				0x00000004
++#define HFP_HF_FEAT_VOICE_RECOGNITION			0x00000008
++#define HFP_HF_FEAT_REMOTE_VOLUME_CONTROL		0x00000010
++#define HFP_HF_FEAT_ENHANCED_CALL_STATUS		0x00000020
++#define HFP_HF_FEAT_ENHANCED_CALL_CONTROL		0x00000040
++#define HFP_HF_FEAT_CODEC_NEGOTIATION			0x00000080
++#define HFP_HF_FEAT_HF_INDICATORS			0x00000100
++#define HFP_HF_FEAT_ESCO_S4_T2				0x00000200
++#define HFP_HF_FEAT_ENHANCED_VOICE_RECOGNITION_STATUS	0x00000400
++#define HFP_HF_FEAT_VOICE_RECOGNITION_TEXT		0x00000800
++
++#define HFP_AG_FEAT_3WAY				0x00000001
++#define HFP_AG_FEAT_ECNR				0x00000002
++#define HFP_AG_FEAT_VOICE_RECOGNITION			0x00000004
++#define HFP_AG_FEAT_IN_BAND_RING_TONE			0x00000008
++#define HFP_AG_FEAT_ATTACH_VOICE_TAG			0x00000010
++#define HFP_AG_FEAT_REJECT_CALL				0x00000020
++#define HFP_AG_FEAT_ENHANCED_CALL_STATUS		0x00000040
++#define HFP_AG_FEAT_ENHANCED_CALL_CONTROL		0x00000080
++#define HFP_AG_FEAT_EXTENDED_RES_CODE			0x00000100
++#define HFP_AG_FEAT_CODEC_NEGOTIATION			0x00000200
++#define HFP_AG_FEAT_HF_INDICATORS			0x00000400
++#define HFP_AG_FEAT_ESCO_S4_T2				0x00000800
++#define HFP_AG_FEAT_ENHANCED_VOICE_RECOGNITION_STATUS	0x00001000
++#define HFP_AG_FEAT_VOICE_RECOGNITION_TEXT		0x00001000
++
+ enum hfp_result {
+ 	HFP_RESULT_OK		= 0,
+ 	HFP_RESULT_CONNECT	= 1,
+@@ -57,6 +85,35 @@ enum hfp_gw_cmd_type {
+ 	HFP_GW_CMD_TYPE_COMMAND
+ };
+ 
++enum hfp_indicator {
++	HFP_INDICATOR_SERVICE = 0,
++	HFP_INDICATOR_CALL,
++	HFP_INDICATOR_CALLSETUP,
++	HFP_INDICATOR_CALLHELD,
++	HFP_INDICATOR_SIGNAL,
++	HFP_INDICATOR_ROAM,
++	HFP_INDICATOR_BATTCHG,
++	HFP_INDICATOR_LAST
 +};
 +
-+static void test_hf_session_done(enum hfp_result res, enum hfp_error cme_err,
-+							void *user_data)
-+{
-+	struct context *context = user_data;
++enum hfp_call {
++	CIND_CALL_NONE = 0,
++	CIND_CALL_IN_PROGRESS
++};
 +
-+	hfp_hf_disconnect(context->hfp_hf);
-+}
++enum hfp_call_setup {
++	CIND_CALLSETUP_NONE = 0,
++	CIND_CALLSETUP_INCOMING,
++	CIND_CALLSETUP_DIALING,
++	CIND_CALLSETUP_ALERTING
++};
 +
-+static void test_hf_session(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+	bool ret;
++enum hfp_call_held {
++	CIND_CALLHELD_NONE = 0,
++	CIND_CALLHELD_HOLD_AND_ACTIVE,
++	CIND_CALLHELD_HOLD
++};
 +
-+	context->hfp_hf = hfp_hf_new(context->fd_client);
-+	g_assert(context->hfp_hf);
-+
-+	ret = hfp_hf_set_debug(context->hfp_hf, print_debug, "hfp-hf:", NULL);
-+	g_assert(ret);
-+
-+	ret = hfp_hf_set_close_on_unref(context->hfp_hf, true);
-+	g_assert(ret);
-+
-+	ret = hfp_hf_session_register(context->hfp_hf, &hf_session_callbacks,
-+								context);
-+	g_assert(ret);
-+
-+	ret = hfp_hf_session(context->hfp_hf);
-+	g_assert(ret);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -850,5 +962,10 @@ int main(int argc, char *argv[])
- 			frg_pdu('1', ',', '2', 'x', '\r', '\n'),
- 			data_end());
+ struct hfp_context;
  
-+	define_hf_test("/hfp_hf/test_session_minimal", test_hf_session,
-+			NULL, test_hf_session_done,
-+			MINIMAL_SLC_SESSION,
-+			data_end());
+ typedef void (*hfp_result_func_t)(struct hfp_context *context,
+@@ -128,6 +185,13 @@ typedef void (*hfp_response_func_t)(enum hfp_result result,
+ 
+ struct hfp_hf;
+ 
++struct hfp_hf_callbacks {
++	void (*session_ready)(enum hfp_result result, enum hfp_error cme_err,
++							void *user_data);
++	void (*update_indicator)(enum hfp_indicator indicator, uint32_t val,
++							void *user_data);
++};
 +
- 	return tester_run();
- }
+ struct hfp_hf *hfp_hf_new(int fd);
+ 
+ struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
+@@ -146,3 +210,8 @@ bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
+ bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix);
+ bool hfp_hf_send_command(struct hfp_hf *hfp, hfp_response_func_t resp_cb,
+ 				void *user_data, const char *format, ...);
++
++bool hfp_hf_session_register(struct hfp_hf *hfp,
++				struct hfp_hf_callbacks *callbacks,
++				void *callbacks_data);
++bool hfp_hf_session(struct hfp_hf *hfp);
 -- 
 2.43.0
 
