@@ -1,139 +1,112 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869551D88B4;
-	Tue, 19 Aug 2025 03:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596BF23D29A;
+	Tue, 19 Aug 2025 07:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755574688; cv=none; b=aOUrAPSLt1jX0LG03WO5hUr1SvR4EEqf4NkPujCfgCssn/v05NsgYBzoP4pP3DNNJlAHCB6dgTxCU8gRo87G7ey4jfNXjUZ2ogN91IhxSR3YMrzUhAKlwPX2G3CCmga7KNcwYFh7Lupl37I0X/U/DhsUFJvE+FihilNZ7s/KBY4=
+	t=1755589365; cv=none; b=ClUEAnf83braSoKdvB7c2SsuN/C0piNt9IBg3kDaJZqi71ipC3S3hA0+MHb7Axdpzossogtj3xTHp7TS0BcnboehO85b5z1vAIK277AHQbgCUcbENKwptOo+/t1tC8J4JOOAXNume1hm7WitYopLKIk10Qq8GW1foDgI1GgwSGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755574688; c=relaxed/simple;
-	bh=FgKb3OsWtXPTfdRuS/8qmk5do1nvaI5xsBSzwUj2oBQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ANKkvDsnAs85fVqu2RvM6XfTP3qpO9eMeZzLBj4FJx4CuLqezFhWEG8tVgy+qY53kgR4Ais2Pd3kmW2DiwUYf4dQbK+nmDWNppLO9h96+DqMJdr34PV6A1QfxVQ7chtkOhFC9YAJMLXP7Yn4L6TUbrABB9MqClK9Y/3d2Fo3wzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LwFrj8ny; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1755589365; c=relaxed/simple;
+	bh=dtsONDXcxUqEo6LNwxFsIQLqVqe+nO9IR6P2RmIS7HM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tAYlqL7dMclnvZtUG86hAFOWUy10rapCzPc0zhYMHuJLL9LkangBK2YytgPXubQkj6/FENKKjWsssq/ohbmIcxUY6ONTwERD1HH5bxsCbQNpIcJnyaRWtV8SHj4OW+HljtC4nQBQEDh2iAGJykiyp6ovT8BGRN0W+XlS3nmuCrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jknt42Il; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LwFrj8ny"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57J2XOg3025437;
-	Tue, 19 Aug 2025 03:38:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	fIWKnzTpY0HBjNQvH30+ojgaXG40mR0nsxqhjgtdjA8=; b=LwFrj8ny2TdXPuh1
-	H+vcNgawSxI7VplOSzitdViIyZWv8jOeq6bcddzAIQNCPP4BCC01vsDzxW07lzmH
-	WWYOgqXM3whxoJEUGo05YvbTHB6L/TsTl40ddPjEzXfc5DgwwSvGc9/ErkuvzbkO
-	dEx4FaT9Q3BXTmUIx7oZk5mikpAE/RQdC8B4UAV3RwOeRdNFdjw1p6bJT0G99mX7
-	eZoSvA7OenzM3thTnJ+0y64roStm0UKw4FHzHx52hgfFHcCyGDBrCWCdf7rRzkIf
-	HkvVkcEi+Y5OsbBUEEKgzIIUO5jU7B1PCkHD7Dfc2hkRT5/Zyzv9c6IMP/g2IJIG
-	eySSVw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48m71chrkf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Aug 2025 03:38:05 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57J3c5KT015088
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Aug 2025 03:38:05 GMT
-Received: from [10.239.96.215] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Mon, 18 Aug
- 2025 20:38:03 -0700
-Message-ID: <11d06cd6-60d3-44fa-94d1-7917adaa0230@quicinc.com>
-Date: Tue, 19 Aug 2025 11:38:01 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jknt42Il"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DF3DFC4CEF1;
+	Tue, 19 Aug 2025 07:42:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755589362;
+	bh=dtsONDXcxUqEo6LNwxFsIQLqVqe+nO9IR6P2RmIS7HM=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=jknt42IlORA1JNj3Zj4MkNGdVyuvmlZs1jjSqAzsZsYfDKo17Qt4LFPkKzR0AJBVK
+	 ffvVp8BjnrK0xlU7PnJu+fxETWVovC/N02AhfKJ4FO3OPA5QTQgx4DdC9RVRngFYYB
+	 gowMueLQiGZ/yInNLywxBQp/HEV8TqbiBn1pQgirfBlrwC4cvlKy7oePoWEn4AD/8I
+	 29E/Fok5Ei6+GyuwPfHaPU7hwxffDfTzPhg2YrcXeuqKFuSstWv2EyWr0LdXkD3ZKo
+	 TeZMdEvCmTqGoM8BHMuRi7/0hgVku1d0oEZJBQX0zXoFWyMHIi/FuuEb/JfayL/tZj
+	 Q3hzSqOB2BLpw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC23CA0EF5;
+	Tue, 19 Aug 2025 07:42:42 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Tue, 19 Aug 2025 15:42:24 +0800
+Subject: [PATCH] Bluetooth: hci_event: Disconnect device when BIG sync is
+ lost
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/4] driver: bluetooth: hci_qca: fix host IBS state
- after SSR
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_bt@quicinc.com>
-References: <20250814124704.2531811-1-quic_shuaz@quicinc.com>
- <20250814124704.2531811-3-quic_shuaz@quicinc.com>
- <ndgufkvb7gkqeco45xlru2x5ai335s3vhx6wso7pksqcyfdjll@azfjjboa7bc4>
-Content-Language: en-US
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-In-Reply-To: <ndgufkvb7gkqeco45xlru2x5ai335s3vhx6wso7pksqcyfdjll@azfjjboa7bc4>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: iTOzWrOsStNpWMc5UJ-XajABnetDr_Uw
-X-Proofpoint-GUID: iTOzWrOsStNpWMc5UJ-XajABnetDr_Uw
-X-Authority-Analysis: v=2.4 cv=IvQecK/g c=1 sm=1 tr=0 ts=68a3f19d cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8
- a=gAjkoLQkR5Zn5Q47fV8A:9 a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE4MDE0NyBTYWx0ZWRfX5MScGlRP/hC/
- mXlGdhdE6AMiRafKLOzQSiZv/xyTsUKmoy6cpj6qXcGrho8RDnopsskx4QkdRoa5VupTOk/kwCs
- 3wJbGLnKlpdzHh+gyhflmg26WgiwU21fHngb0R71PtcMTUMT10ygXPvcF3av7JA02NdP88+C03p
- RJrTRdPKRSeEXxxxs0TqoP8QJtsyKTDZ+MyftvyWAtXNTuyxeAnBoMr85mPPiWKhRHy44sOv0RQ
- bcnJT8t/GuKqY+BmCQpnAG9LtBkLZLLlsS1ninvWjp0TxV9SGHNB/hQyFp5JQYrn6cCQa0Gl+qS
- Dbwv+DZowjbR4daD9nCXQpRw4UgxFSZvJuU5rkjWelf1M+RMzsI8MlbeiHhFj6+9C+mmCBNW945
- +N7/zb6O
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-19_01,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501 clxscore=1015
- phishscore=0 bulkscore=0 spamscore=0 suspectscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508180147
+Message-Id: <20250819-bis_dev_disconnect-v1-1-a87c540efc46@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAN8qpGgC/x3MTQqAIBBA4avErBPUiH6uEhHmTDUbCyckkO6et
+ PwW72UQikwCY5UhUmLhMxSYugJ/uLCTYiwGq22rezOolWVBSguy+DME8rdqjEPrCG23eijhFWn
+ j559O8/t+ujHoImQAAAA=
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755589361; l=1615;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=/vhHRnEjB+7Jmzi7phGDpbSSLMxQT6GFh7t8rujQBfY=;
+ b=51iFZ4j+7dfQHrrvk+ZfzzZSwBLCVJ61HsQRjqSXJGCbY7lVHUWcHJA3kcrd34NnN4QaCnwKy
+ 2ztKhhkfCZoApBo2wjDYODktyOGETXYQ11f+ApiWfqIjBE9XWF8kJis
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-Hi Dmitry 
+From: Yang Li <yang.li@amlogic.com>
 
-On 8/16/2025 5:50 AM, Dmitry Baryshkov wrote:
-> On Thu, Aug 14, 2025 at 08:47:02PM +0800, Shuai Zhang wrote:
->> After SSR, host will not download the firmware, causing
->> controller to remain in the IBS_WAKE state. Host needs
->> to synchronize with the controller to maintain proper operation.
-> 
-> It totally feels like all these patches fix the same issue and should be
-> squashed together. Please also add a sensible Fixes: tag. Possibly
-> add cc:stable too.
+When a BIG sync is lost, the device should be set to "disconnected".
+This ensures symmetry with the ISO path setup, where the device is
+marked as "connected" once the path is established. Without this
+change, the device state remains inconsistent and may lead to a
+memory leak.
 
-Although these issues are all related to SSR, the underlying causes of the
-errors are different. Would it be appropriate to merge them into one patch?
+Fixes: b2a5f2e1c127 ("Bluetooth: hci_event: Add support for handling LE BIG Sync Lost event")
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ net/bluetooth/hci_event.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> 
->>
->> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
->> ---
->>  drivers/bluetooth/hci_qca.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index 91009c6a7..d37cd2368 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1660,10 +1660,14 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->>  	 * QCA_IBS_DISABLED flags cannot be cleared, which leads to a reset
->>  	 * command timeout.
->>  	 * Add an msleep delay to ensure controller completes the SSR process.
->> +	 *
->> +	 * Host will not download the firmware after SSR, controller to remain
->> +	 * in the IBS_WAKE state, and the host needs to synchronize with it
->>  	 */
->>  	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
->>  		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
->>  		clear_bit(QCA_IBS_DISABLED, &qca->flags);
->> +		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
->>  		msleep(50);
->>  	}
->>  
->> -- 
->> 2.34.1
->>
-> 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1686680a38c8..59aae893e0ed 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6998,6 +6998,7 @@ static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
+ {
+ 	struct hci_evt_le_big_sync_lost *ev = data;
+ 	struct hci_conn *bis, *conn;
++	bool mgmt_conn;
+ 
+ 	bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+ 
+@@ -7016,6 +7017,10 @@ static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
+ 	while ((bis = hci_conn_hash_lookup_big_state(hdev, ev->handle,
+ 						     BT_CONNECTED,
+ 						     HCI_ROLE_SLAVE))) {
++		mgmt_conn = test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &bis->flags);
++		mgmt_device_disconnected(hdev, &bis->dst, bis->type, bis->dst_type,
++					 ev->reason, mgmt_conn);
++
+ 		clear_bit(HCI_CONN_BIG_SYNC, &bis->flags);
+ 		hci_disconn_cfm(bis, ev->reason);
+ 		hci_conn_del(bis);
 
-BR,
-Shuai
+---
+base-commit: c921e5d14590381e6db7e451488b7b9ddc67a32c
+change-id: 20250819-bis_dev_disconnect-31ad2aed27bc
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
+
+
