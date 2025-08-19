@@ -1,48 +1,104 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEE220D51C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 14:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4112C20299B;
+	Tue, 19 Aug 2025 14:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755614138; cv=none; b=uH2hs322F0syhVVibYG1dY7YWt18Ss5/EXP+1y7O3GZve0To4Lc+vHatq1Gxs3Fvs9oX8BrfHoodtGeR76zsrLjjEsPj8EqdaFnIyfOled8qE6G8qFXFHhaDguEOmaoaGLLSM4G7ZZU6uoZBNlaSxOVRkpaTt1TBqZqDEP/FQtM=
+	t=1755614300; cv=none; b=dRfl5rsqoyPIMsMO7qXYIxB/M+9a+Pl5kZSoPX+svza6Lk03Co54qcwPbNL1drQVzITq61y8dOMUhRt/ZeJWwSAJrz1w9jquQbOIk1+KyMpxLCsVSfKOOgILqNArh1Frf2RhQuEKVmjtmlQKlMyYjNBC3mbN8s6ob6P/ZqexJ70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755614138; c=relaxed/simple;
-	bh=S/jvxeB1kbPWJmKwztw9gkDMneuCrmmG121cY1zAm2c=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=VnLWNPX6GKNKZ+5qvnfmZ+5urJ0wExnqXgMRAbDUIHsPtUPH4ccpQPPixPcDYrNLNUpi8fqPHIaglUG5HEeaQSpft/8WZSwonB1/k08nuAnyyvs8oLzP29NEgb3kzpMPHd/imErsO1k02MmGAkKxd8ZbYpnWRyo2QebNaBG/rR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jUX5XRvZ; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1755614300; c=relaxed/simple;
+	bh=nNnopTRA3K0gOqFntUPVAFNEzVwqJdj692uRxbYzQx8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aoNLiJDZVbJq0Ax7+roArRj9pqWWiMwQBvHxXp4Y/KJU9Z/lb15TyDfrOqOY66Bg3d0Bbyae8skpOwgUS4S8JdAwfD0eciIIcdXHpOTXK7SIQhyFXSj455rLofQIJtJI3raw/Jt8qCENLdCVG4PYs+btx2bSC9Haf7Nu+6UDzIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=We44xkdg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jUX5XRvZ"
-Received: from github.com (hubbernetes-node-7477040.ac4-iad.github.net [10.52.179.55])
-	by smtp.github.com (Postfix) with ESMTPA id 83E3B211A8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 07:35:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1755614136;
-	bh=LVJKVUxlpkgdOJIHEkLJMOnaqaqyp3nr6WArWP+0nKU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=jUX5XRvZ2g/JdogPrqzhoFduNl3RJNy42bW4UysSJXYPR/A9SSslm1URo+qnKr2/9
-	 /VZJW8MV2MXzRFR5Yos4APYlFPBu1SNZnqzszhayduNkE0x+o3Zo2efRiqv9NUTHYf
-	 7NKvd4NfJxtOAXV9IQidWUaorG26MpBCX8jjkA+w=
-Date: Tue, 19 Aug 2025 07:35:36 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/990970/1663ae-000000@github.com>
-Subject: [bluez/bluez]
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="We44xkdg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48A8DC4CEF1;
+	Tue, 19 Aug 2025 14:38:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1755614297;
+	bh=nNnopTRA3K0gOqFntUPVAFNEzVwqJdj692uRxbYzQx8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=We44xkdgCQlYNWU4EgVJPC9a/ienFYVDeuPnzurClvBtGPEukkJpE5LwWOaF4sv1y
+	 lFjEIKAme14UDGv/yYelkKF1mpFEcm3xH5A1wIm+Rq4xw14TQ12nAZfxvwGiVKoLs+
+	 X7wmrexdeLbvbmAq51AYZaCd/RX9RYV+/+EgR4yo=
+Date: Tue, 19 Aug 2025 16:38:14 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: xu.xin16@zte.com.cn
+Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org, johan.hedberg@gmail.com,
+	chen.junlin@zte.com.cn, stable@vger.kernel.org
+Subject: Re: [PATCH linux-stable 6.6] Bluetooth: hci_conn: avoid queue when
+ deleting hci connection
+Message-ID: <2025081914-steadfast-ruckus-22bd@gregkh>
+References: <20250819221605072sYBtQfxeXfCoV3_kHWRry@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250819221605072sYBtQfxeXfCoV3_kHWRry@zte.com.cn>
 
-  Branch: refs/heads/990970
-  Home:   https://github.com/bluez/bluez
+On Tue, Aug 19, 2025 at 10:16:05PM +0800, xu.xin16@zte.com.cn wrote:
+> From: Chen Junlin <chen.junlin@zte.com.cn>
+> 
+> Although the upstream commit 2b0f2fc9ed62 ("Bluetooth: hci_conn:
+> Use disable_delayed_work_sync") has fixed the issue CVE-2024-56591, that
+> patch depends on the implementaion of disable/enable_work() of workqueue
+> [1], which are merged into 6.9/6.10 and so on. But for branch linux-6.6,
+> there&apos;s no these feature of workqueue.
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+html marker in a changelog text?
+
+> To solve CVE-2024-56591 without backport too many feature patches about
+> workqueue, we can set a new flag HCI_CONN_DELETE when hci_conn_dell() is
+> called, and the subsequent queuing of work will be ignored.
+
+How was this tested?
+
+> 
+> [1] https://lore.kernel.org/all/20240216180559.208276-1-tj@kernel.org/
+> 
+> Signed-off-by: Chen Junlin <chen.junlin@zte.com.cn>
+> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+
+What commit id does this fix?  Why only 6.6 for it?
+
+
+> ---
+> include/net/bluetooth/hci_core.h | 8 +++++++-
+> net/bluetooth/hci_conn.c         | 1 +
+> 2 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 4f067599e6e9..9a3ec55079a1 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -954,6 +954,7 @@ enum {
+>  	HCI_CONN_BIG_SYNC_FAILED,
+>  	HCI_CONN_PA_SYNC,
+>  	HCI_CONN_PA_SYNC_FAILED,
+> +	HCI_CONN_DELETE,
+> };
+> 
+> static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+> @@ -1575,7 +1576,12 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+>  		}
+> 
+>  		cancel_delayed_work(&conn->disc_work);
+> -		queue_delayed_work(conn->hdev->workqueue,
+> +		/*
+> +		 * When HCI_CONN_DELETE is set, the conn is goint to be freed.
+> +		 * Don&apos;t queue the work to avoid noisy WARNing about refcnt < 0.
+
+Again, html text in a comment?
+
+How does that happen?
+
+thanks,
+
+greg k-h
