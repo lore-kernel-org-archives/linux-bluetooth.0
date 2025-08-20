@@ -1,157 +1,129 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A54B2E11AB;
-	Wed, 20 Aug 2025 13:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2961917F1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 13:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755697271; cv=none; b=MLLOVtCz/cpLYLzwGZbjDla+Lmp9VguD3DPzUZQb41URxwibqrFMjKcP/uTcQdrPt15k7Kjj+W/ADroIdUMIuKA1IWe0BUYJ8OcHb0v06b8ADJzWbIPzgmhFVXhYIFW0KV7gR6zlllgNrIJ6yvkEDTOujS2BollhH0T4ILH0Spg=
+	t=1755697679; cv=none; b=V7EEQy6yMZT944InPBhyoP1El5KuelMgM1f2wH3G+nD/OJkanj6JrB/YgDIUv9NM6ZT9XHvu6dVkrL0fgT+wdexhTgfeXOgPrLqx5eXl7Zxorn9ewICzHXZNDVOErfWm5l6d7vB+aw7L6Me/mdfTab25PYGPOS+PCixFJH00450=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755697271; c=relaxed/simple;
-	bh=pMj0gp/2bA+b9eRsCiy6AKLGAvEUd3cDvU67rP19T+8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=msW2tEEBIqXyb9ruzhBrO0NbgYhdHR9vxWshCMSyUrd5zXIc7YKuuzCv1QRwPBZ65tXdp0eGn4Y56QcVWmH/A1JCFDAJEVickTHRn8/JlRmuP+sVWG48SCkhzio0zlDe2bjBxlP4Pt3xQZB4WL6ZZoecko8m1hBHO2oXG4hf5EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0770360288273;
-	Wed, 20 Aug 2025 15:32:22 +0200 (CEST)
-Message-ID: <0c0a6b05-edc6-4e3e-8db5-c48f732d12f2@molgen.mpg.de>
-Date: Wed, 20 Aug 2025 15:32:21 +0200
+	s=arc-20240116; t=1755697679; c=relaxed/simple;
+	bh=MDWipffC2VS9+vGo4GWRzvLcKKEhoLA4LqCZ7+GWcj8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=kIncbmwKWYGQaWOW72NUjFauAqmTx4q0CdObAs6Z/pgkQ6u10nz5F2kz8+v7qW8BgnhoTEdkIPT5pKQ0BdZz2O68aVbrhS9U5RyRDb9HvE+GBlhvLTH8T1hrEfH2AcwxfqRj5+MbEzglV62rvR8i9BKk/urFGMsKEBGv+Ro16fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZlonZGgX; arc=none smtp.client-ip=192.30.252.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZlonZGgX"
+Received: from github.com (hubbernetes-node-82d639a.ash1-iad.github.net [10.56.192.49])
+	by smtp.github.com (Postfix) with ESMTPA id A59FC141073
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 06:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1755697676;
+	bh=sN4H1YdWP0VZmfZGZ77XsxFfgpvYM48/rVXTTdBanKU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZlonZGgXGqbMyDNklNCQAoF2A1APYsoY+9K6fVt1A/Fn2OBWAUnqtaxtXqrI+7YTV
+	 AfU5/DjPhWUDGVZkYsBhoXmhQDT0bspifxZsr+hy6s0s8TPzDyQrKGp4MDNGlYgfmv
+	 bHEy2nfVcF75okKSRdufZnbWQegAUSyQkk04CSnY=
+Date: Wed, 20 Aug 2025 06:47:56 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/993518/000000-0fff08@github.com>
+Subject: [bluez/bluez] c11c05: shared/hfp: Add HF SLC connection function
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] Fix SSR(SubSystem Restart) fail when BT_EN is pulled
- up by hw
-To: Shuai Zhang <quic_shuaz@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- quic_bt@quicinc.com
-References: <20250820120641.1622351-1-quic_shuaz@quicinc.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250820120641.1622351-1-quic_shuaz@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Dear Shuai,
+  Branch: refs/heads/993518
+  Home:   https://github.com/bluez/bluez
+  Commit: c11c0555997b834e5eedef4bf78378acbe254f62
+      https://github.com/bluez/bluez/commit/c11c0555997b834e5eedef4bf7837=
+8acbe254f62
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-08-20 (Wed, 20 Aug 2025)
 
+  Changed paths:
+    M src/shared/hfp.c
+    M src/shared/hfp.h
 
-Thank you for the improved version. The commit message summary/title 
-still has the space missing before the ( and should be prefixed with 
-`Bluetooth:` to pass the linters.
+  Log Message:
+  -----------
+  shared/hfp: Add HF SLC connection function
 
-Am 20.08.25 um 14:06 schrieb Shuai Zhang:
-> When the host actively triggers SSR and collects coredump data,
-> the Bluetooth stack sends a reset command to the controller. However, due
-> to the inability to clear the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits,
-> the reset command times out.
-> 
-> To address this, this patch clears the QCA_SSR_TRIGGERED and
-> QCA_IBS_DISABLED flags and adds a 50ms delay after SSR, but only when
-> HCI_QUIRK_NON_PERSISTENT_SETUP is not set. This ensures the controller
-> completes the SSR process when BT_EN is always high due to hardware.
-> 
-> For the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, please refer to
-> commit 740011cfe948 ("Bluetooth: Add new quirk for non-persistent setup
-> settings")
-
-Missing dot/period at the end.
-
-Also, the comment in `include/net/bluetooth/hci.h` is more helpful to me 
-than the commit.
-
-> The HCI_QUIRK_NON_PERSISTENT_SETUP quirk is associated with BT_EN,
-> and its presence can be used to determine whether BT_EN is defined in DTS.
-> 
-> After SSR, host will not download the firmware, causing
-> controller to remain in the IBS_WAKE state. Host needs
-> to synchronize with the controller to maintain proper operation.
-> 
-> Multiple triggers of SSR only first generate coredump file,
-> duo to memcoredump_flag no clear.
-
-due to
-
-> add clear coredump flag when ssr completed.
-> 
-> When the SSR duration exceeds 2 seconds, it triggers
-> host tx_idle_timeout, which sets host TX state to sleep. due to the
-> hardware pulling up bt_en, the firmware is not downloaded after the SSR.
-> As a result, the controller does not enter sleep mode. Consequently,
-> when the host sends a command afterward, it sends 0xFD to the controller,
-> but the controller does not respond, leading to a command timeout.
-> 
-> So reset tx_idle_timer after SSR to prevent host enter TX IBS_Sloeep mode.
-
-Sleep
-
-> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-> ---
->   drivers/bluetooth/hci_qca.c | 31 +++++++++++++++++++++++++++++++
->   1 file changed, 31 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 4e56782b0..403d65952 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1653,6 +1653,37 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
->   		skb_queue_purge(&qca->rx_memdump_q);
->   	}
->   
-> +	/*
-> +	 * If the BT chip's bt_en pin is connected to a 3.3V power supply via
-> +	 * hardware and always stays high, driver cannot control the bt_en pin.
-> +	 * As a result, during SSR(SubSystem Restart), QCA_SSR_TRIGGERED and
-
-Missing space before (.
-
-> +	 * QCA_IBS_DISABLED flags cannot be cleared, which leads to a reset
-> +	 * command timeout.
-> +	 * Add an msleep delay to ensure controller completes the SSR process.
-> +	 *
-> +	 * Host will not download the firmware after SSR, controller to remain
-> +	 * in the IBS_WAKE state, and the host needs to synchronize with it
-> +	 *
-> +	 * Since the bluetooth chip has been reset, clear the memdump state.
-> +	 */
-> +	if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-> +		/*
-> +		 * When the SSR (Sub-System Restart) duration exceeds 2 seconds,
-> +		 * it triggers host tx_idle_delay, which sets host TX state
-> +		 * to sleep. Reset tx_idle_timer after SSR to prevent
-> +		 * host enter TX IBS_Sloeep mode.
-
-Sleep?
-
-> +		 */
-> +		mod_timer(&qca->tx_idle_timer, jiffies +
-> +				  msecs_to_jiffies(qca->tx_idle_delay));
-> +		msleep(50);
-
-Add a comment, why 50 ms and not 20 ms or 100 ms?
-
-> +
-> +		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-> +		clear_bit(QCA_IBS_DISABLED, &qca->flags);
-> +
-> +		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
-> +		qca->memdump_state = QCA_MEMDUMP_IDLE;
-> +	}
-> +
->   	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
->   }
->   
+This implements the minimal SLC connection exchange, i.e. AT+BRSF,
+AT+CIND=3D?, AT+CIND? and AT+CMER=3D3,0,0,1 requested to complete the
+Service Level Connection Establishment.
 
 
-Kind regards,
+  Commit: 619e7f78a20fbb3e515e3f294abc65c86892384e
+      https://github.com/bluez/bluez/commit/619e7f78a20fbb3e515e3f294abc6=
+5c86892384e
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-08-20 (Wed, 20 Aug 2025)
 
-Paul
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add SLC connection test
+
+This adds minimal packet exchange to test the SLC establishment.
+
+
+  Commit: 6e269585d1da171aea02ff442a8be91d579373f5
+      https://github.com/bluez/bluez/commit/6e269585d1da171aea02ff442a8be=
+91d579373f5
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-08-20 (Wed, 20 Aug 2025)
+
+  Changed paths:
+    M src/shared/hfp.c
+
+  Log Message:
+  -----------
+  shared/hfp: Add +CIEV event support
+
+Register +CIEV handler on SLC completion to call the update_indicator
+call back on unsolicited events.
+
+
+  Commit: 0fff08f962ffcd04bd6044ffa476b9867c229580
+      https://github.com/bluez/bluez/commit/0fff08f962ffcd04bd6044ffa476b=
+9867c229580
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2025-08-20 (Wed, 20 Aug 2025)
+
+  Changed paths:
+    M unit/test-hfp.c
+
+  Log Message:
+  -----------
+  unit/test-hfp: Add indicators tests for HF
+
+This adds the following tests:
+- /HFP/HF/TRS/BV-01-C
+  Verify that  the HF accepts the registration status indication.
+- /HFP/HF/PSI/BV-01-C
+  Verify that the HF successfully receives the signal strength status of
+  the AG.
+- /HFP/HF/PSI/BV-02-C
+  Verify that the HF successfully receives the roaming status of the AG.
+- /HFP/HF/PSI/BV-03-C
+  Verify that the HF successfully receives the battery level status of
+  the AG.
+
+
+Compare: https://github.com/bluez/bluez/compare/c11c0555997b%5E...0fff08f=
+962ff
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
