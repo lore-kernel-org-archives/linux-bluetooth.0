@@ -1,76 +1,109 @@
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128232857CB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 20:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE15E2D63F4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 21:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755722803; cv=none; b=Wp0uRySGTJ33lK1qxZ+X1uUv4qFnlepjOCwQUOAVqcD6zFZLj8FGLBx0IgUXxomNPFHw4ivb51ENy8/G3Ea9fqihTXJadJQLmog0BarT0Cv+1MMwZGGHYwUgRzcgQ9iSKlm00hVbqrhV0zGnvGXSy8YC4SCy0w1dKLb12+homyY=
+	t=1755724424; cv=none; b=Xyd81/QGHsRJRhw3JD9QteqNxYGUkkBn139gEaeR+X0vg/wpVmcst2gLtq5/Qwa4DKTw5JqyvqGIVX9/tZKPk3wJxPQoBMB7yTXh+/+17ZYCvVL9PgFgLA5prqVEXbioJK34AFGghz1RqHiF59lPt+yivdnuwJ26+6JTPBcDwb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755722803; c=relaxed/simple;
-	bh=sfrBCOPHk2U0EOPptpHPKnE/G5s5O4Flx9kQVR667wA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ayAdCQQz/dwn990Vm+cmlfRQg9T6c5CM0+gruAwbhUbfxVb2qIb4uZzCjYlR/ot0uHUzseZb3F62eNp+YG04qsRUbJBBhUrQgBe3am/WahZhmwGLjIADGunLYPQccorhT0gcncak+MU/wmK2Uq53inUWdUQKnTEQO9eJ8C/g3GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZjxHAaNN; arc=none smtp.client-ip=192.30.252.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1755724424; c=relaxed/simple;
+	bh=2R3RhoDi4KrXzVm/2K0yI6Z2R6XuVWWT2AitAY5Uc80=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LLg6Pl4B0nhyj9bTOyr9SrabxY0US/6yaQdKt72+CaskMqy3HVE17M5Qg1WjMMu5ml0xvKWkAqJtCQLEztpnNtBn8+AV1/K4ik8BnRmvg7budGACjfa3U3ScoNaI0eImsB4EMtEQyaffmM+lPv61zj2RiR1rzGQAgyHPr7wWI6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGlNSiQP; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZjxHAaNN"
-Received: from github.com (hubbernetes-node-fcf6980.ash1-iad.github.net [10.56.128.52])
-	by smtp.github.com (Postfix) with ESMTPA id 1A5456003CC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 13:46:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1755722801;
-	bh=psPWZZY5iE/wrvUsEOS9N/11nJuzC9Qo9mPgb1Wn2Mc=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=ZjxHAaNNQQrsdA3dYhbluOMbEFe9Ss6khoeAeaxK9JDou3mWBlwwoGHCWDc1jcDFw
-	 E7//Gh4UZ9/k17EMtK5iri+0kHz8h9mAJwvPAqHgf9U+UBBysXu6zqMh7XDyhFWARW
-	 GkDH5JO81BsL1wg1I4tB9Pz+nvzF531jBiua/fTo=
-Date: Wed, 20 Aug 2025 13:46:41 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGlNSiQP"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-53b1738e8e3so279167e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 14:13:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755724421; x=1756329221; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NIkfLZ+CT4tNumj9HmI66csjS3eyYnh/Y4SbeQNrgOk=;
+        b=bGlNSiQPqUnAbVu+Fq/wGG79SHDhl79x1YMncFmfgOaUSKYjbqEWVUtlIcu4TCXWsB
+         Tz23X2waceDkCh76n/5UD09cOMmqdug7+xsbrHNqBskPUeaXFICHcT/zmUIinnO8/oY3
+         4grxURvpCX79AmOf9OB98cjR7buCoC/5tlMt2NPDxHC7kqlPA8WpzlPcETIABoNUKZBh
+         9Qoyu/gDFQC7kRR30Epmp9Mvd0aHwm7wr/wk44cyRvz2djv1y+fRHZdCoeG13tMvShfb
+         hE959KExBd2e36PeIOmaPXeGWYlbvf100xmCrDws+dBoPj+Q8pOLZb7OzYALoNt3WzjC
+         G6OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755724421; x=1756329221;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NIkfLZ+CT4tNumj9HmI66csjS3eyYnh/Y4SbeQNrgOk=;
+        b=iAPYnKaKdealW/YV1gKRnuBeYQ+QxSK0YViUnCeVHK8b2ontJb09RxpQNHpPLRQs2w
+         zeJ8aVkCcGNmFQo8/WAoyxmSHr6t0iHWXrWS98iJhgA3UaUqY789c741I36A7pl7eu3+
+         +1Fe+TVcQdj+C0LWESKmll8V3QiHg4b9sjKu8prAur2ZD7LCDFlnb11Zi9DAK6BaKbcz
+         zNq5q/lNRpaKhguxPRofvc3Zp8mKcWDUzfZ8vnhtDC1SSr+Tc7sLyIoKys4a9XERpTLM
+         l4h8X+WBg5xOC24/RpdsGboaNsFZjbPgDxybET6j253ipBrpcYgpE05GFaoIChjNEahu
+         ZPBA==
+X-Gm-Message-State: AOJu0YxoVKRXH4u6yg3swE7Cdzpg+iejCvqv6tWnHkb0qXWKSwtl1WL1
+	ypZjmpyWeg8ARusmDbyQdIEXC779Aydo1PmKVLwX8C+b4YSS7SnbhHASd5vixA==
+X-Gm-Gg: ASbGncuMhIyQ5AfZq2yP+lv4crbuIt4GUxZDjpJBe2JnITCicmQnTMfaTmzv1NI42f9
+	dFcwvP7vSayZsKBAMEVlD90bH5CsavQAFImOQtcgWiGb+eX3yUyg4bgLh0dAhyVpGhbGiZ0Vkpr
+	DzM6UHtio9sH9kRUy/0zMHPp1y+mC65jXdUZ3qp9E3fFJ+G7IsI+OeBL4rLHRc9uXkOc8M6+gt2
+	GL4BiwyIm6covo6XVC2veyb6QOGmZaXxSngl3ou6jexMsUMQsuviOupv56HSjoVlcHaOwHTXqKH
+	yO5q6uYM9TLG0iT5PM68arg1/Aew2xztEiaBYw7z9tRsZMUSiVgEOkklzp0Hxcg5qmuwUuUaWWM
+	N6aSQ1L9r70xqwiAqKbPreWF9bL51xd7gqVtL7GMcB5uqIL+eU9nsBs9W3OHt22xQzYSGfcjvaK
+	g=
+X-Google-Smtp-Source: AGHT+IHxdcUy3266eyXSssBtbkeApUpK7JMqwFGeHDk96EEUC8YbfPpTfZEL62FIMGc5+nwnvLZwiQ==
+X-Received: by 2002:a05:6122:1e09:b0:538:dbc9:17a6 with SMTP id 71dfb90a1353d-53c6d5216dbmr1635125e0c.4.1755724421031;
+        Wed, 20 Aug 2025 14:13:41 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2bd51987sm3415842e0c.4.2025.08.20.14.13.39
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Aug 2025 14:13:40 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/993679/000000-ce1974@github.com>
-Subject: [bluez/bluez] ce1974: monitor: Add support for -K/--kernel
+Subject: [PATCH v1] Bluetooth: hci_event: Detect if HCI_EV_NUM_COMP_PKTS is unbalanced
+Date: Wed, 20 Aug 2025 17:13:31 -0400
+Message-ID: <20250820211331.1923957-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/993679
-  Home:   https://github.com/bluez/bluez
-  Commit: ce19740c376f95c7670ea2f7df519a49c74624af
-      https://github.com/bluez/bluez/commit/ce19740c376f95c7670ea2f7df519a49c74624af
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2025-08-20 (Wed, 20 Aug 2025)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M monitor/btmon.rst
-    M monitor/control.c
-    M monitor/main.c
-    M monitor/packet.h
+This attempts to detect if HCI_EV_NUM_COMP_PKTS contain an unbalanced
+(more than currently considered outstanding) number of packets otherwise
+it could cause the hcon->sent to underflow and loop around breaking the
+tracking of the outstanding packets pending acknowledgment.
 
-  Log Message:
-  -----------
-  monitor: Add support for -K/--kernel
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_event.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-This adds support for -K/--kernel that open /proc/kmsg and attempts
-to print messages starting with 'Bluetooth:':
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 512041c68062..e3b76091f1a1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4414,7 +4414,16 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
+ 		if (!conn)
+ 			continue;
+ 
+-		conn->sent -= count;
++		/* Check if there is really enough packets outstanding before
++		 * attempting to dequeue them.
++		 */
++		if (conn->sent >= count) {
++			conn->sent -= count;
++		} else {
++			bt_dev_warn(hdev, "hcon %p sent %u < count %u",
++				    conn, conn->sent, count);
++			conn->sent = 0;
++		}
+ 
+ 		for (i = 0; i < count; ++i)
+ 			hci_conn_tx_dequeue(conn);
+-- 
+2.50.1
 
-> monitor/btmon -K
-= Note: Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-= Note: Bluetooth: BNEP filters: protocol multicast
-= Note: Bluetooth: BNEP socket layer initialized
-= Note: Bluetooth: MGMT ver 1.23
-= Note: Bluetooth: RFCOMM TTY layer initialized
-= Note: Bluetooth: RFCOMM socket layer initialized
-= Note: Bluetooth: RFCOMM ver 1.11
-
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
