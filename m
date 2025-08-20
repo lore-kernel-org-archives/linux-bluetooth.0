@@ -1,129 +1,126 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E354E36CE03
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 15:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA3B18C91F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 15:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755702043; cv=none; b=LW5rFRajIcFBMOuSCaYbumAnSne/yuF+qZbUtX26fk00wefE8gC3xqROiC7ytW0R/67MX3OBjQei1YawyNOmS2EhUyWQN0GStz1Q6ebow1ry8Ks5sgsn/BwiL0RKOfdvQ0dS+9GWnedU0iRNyztbejugQQlJ2Y6+FjC7cthdbO0=
+	t=1755702065; cv=none; b=hPsdjket64K7mNAaGQG+DpSTrjzNgQQax9xTVtM1l9T+rKkG3YwMxoJzV+0IMlLLIQiFF/TviM1R9J3rP00boA9o5R7gXdtSSTod5d+/222gnYPGS1PBl27NPxGYDCN9kGGays7BbtIoSPomvZR6hkrZPnVsWCWcXPRvDSe31b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755702043; c=relaxed/simple;
-	bh=QlL9wClr2bd0PoS1hl6fOnSa5pmM2nCIH7c7ZubvJf4=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=KXapva0weK1EeWXDu07H07WdALZ9+A6wPLJNOjWxa072Ofua19NSQoX499PIUw6ZgXemy6SQ80VaroLJkzL1bzHCTm29gN9N4tMpVf9kQmuZ1avZLmYzeo3QX7VatQ8bmeb/a8xvKhBTiQ/BL4dKv9KvGugLgXn88zxeavnUA1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=UThkR9sn; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1755702065; c=relaxed/simple;
+	bh=V6tpQE5G/tqeSsvz5FSLfZbD+DFX0Kj8jFJ3JQ9t+DE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fvwJGovqEXdcb7B1/ILMGuYBEpSNQX1YhOeY3ph/VLsD9PxosdXSMn6YiGq8GPLXXc5OTRcegtkJlbD/kBVRUcRZU+42ADCQnR2z5EsdJzxxIGIeVAdr1N2mw1DR0Ki6GCUiBbC0O78KpRhCU6Bax4qNRQ7kEZwmY5DJeOWeun0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wc75zw+d; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="UThkR9sn"
-Received: from github.com (hubbernetes-node-2b9a817.ash1-iad.github.net [10.56.172.31])
-	by smtp.github.com (Postfix) with ESMTPA id 0E415921302
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 08:00:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1755702041;
-	bh=GhtGkart2AWo79OJOke3ICTe3NJiS11aU/WAVHZwY0E=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=UThkR9snj+KSvVe0NZK+HMl4e0ZyEcNdQe+Y3AZyddCiDtLaPTIu89hftd2Rfbo+H
-	 Wz70kDhJnnLv+pknwZx+0FRiWk/DtnWA/2otwDdsZy9B/gcJvtTL+Rnp9rEuCTGKBh
-	 tiHXkw7/x+/lnHDsaa2INpUQWmN55Ohvx9ViXhOg=
-Date: Wed, 20 Aug 2025 08:00:41 -0700
-From: fdanis-oss <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/00eea3-ed2da1@github.com>
-Subject: [bluez/bluez] 56b483: shared/hfp: Add HF SLC connection function
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wc75zw+d"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-76e2ea79219so13800b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Aug 2025 08:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755702063; x=1756306863; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=eYlOUPc33tNAhvM4YkM+ageYJrb7J2hhv+OkfYym4Ic=;
+        b=Wc75zw+d9DWzxm/SUfT71yfynztqTUPhWgKqInZ/ojPw9l+dgIhXo0TE3JlQjyfxvs
+         S85WZxbGJDkb/gwvCz/CNc10StgfAXAYmrjnx17wY7lxkXcCt2EDFO2w09zsKDbfNL6v
+         P2RhwCsqPMyNtCD/bQH3UeKmwmWVNxeTndaH2HDDQe6UUSGyLeMsoMo0JekPbgTRfIi6
+         /K0Atul3i7l06J3ZBfZer/q6dOTrWM6weT8h/RnvbFDwgCwZrK+/Gdsy4eNZXJoffpBi
+         O8gF2WicLbnlFQ3+Thz8WO1DABBzxEYyxaSUYv/RRRcjioswHPJWnfhqfLLuB+l3ikVE
+         /J1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755702063; x=1756306863;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eYlOUPc33tNAhvM4YkM+ageYJrb7J2hhv+OkfYym4Ic=;
+        b=jsmOKVPvKH0QrrhflBDDg0Mn2mZZRNaDb8YuSsBNS0fLrJpbfqYEk5OR0Bygz2qGvy
+         ZvHap5w/ZmnvpF4wSa/C3plsGiKWUy0q7kBT1pggEt0PAC2Hqqea5Y3fm7G2itxg/V9l
+         MEQp46SM6BSGYzYd4U+Sj4HAR+qQisFp0VuAxogX33i6ol02gYu59I3OHTRhZVZutTPp
+         8b78ju+zw9TmHMYApjbQRNR37vrOcJ0wk7rb74YqjUtmk7A+ItlwyAkLdvQiaw2ahSMB
+         z9Fy8USEIdabppj7BG0RSMLCgbGSA3acybqOXmvq9oYrhHDaAmN4tTzopsweP8RfFbi+
+         OaLQ==
+X-Gm-Message-State: AOJu0YxiXR7bcIPTsEk/cpSqVL2Gd7vq/YfM25q/WqfTX5dxkMQ/2s/r
+	N+v7V8tJBHXy/s1Te7k9kFQLy6fVhSHj7gdWIRCwKWPVMHyPxrBrSxtJ6EUZog==
+X-Gm-Gg: ASbGncsZ7Cl9POaee9J+k2MSCJ3bI242Vy7n5+nk/Uxos8iDUc2/3zctWEbJ3Au3RJ0
+	vaeDQaeTJpvtAyaFnjtRArxPco2kgoxSwRPooWqlfOY3egjF7fZBRk9TDQ1G79vGAtg8gLeA4V6
+	5abTwoQ+YX0SDKbP4LoIlzZtqD38LhIJDztIcpjr7UL46aDaJlFBYjrBRezGyZQO1ktUki2WtWi
+	z6IJOWPkI3jB2p2NL+lfXtjihuP/cFmEq4x+FcD75TQ/GVSU1jgBssqqDk7wxuB7Gx2xwyntEXv
+	gd1EFtDA0RSOhyKMSu0lJdTVF1Rg7NAlJ7P8FYc0aK7Ncd58beZ/45tGbZ0AIBsp2fgazx40Ytj
+	snQoHh76rlkY2EkGMw1fqPS9F6P1/dA==
+X-Google-Smtp-Source: AGHT+IF1fafR0GqoFMfqhxHfQpV3kLz8TEyHIuiY38A4JhxFtH9pa6jfSNGAo28d7WF3YmhqDbVliA==
+X-Received: by 2002:a05:6a21:32a7:b0:240:f4c:ce04 with SMTP id adf61e73a8af0-2431b73453dmr5078224637.12.1755702061636;
+        Wed, 20 Aug 2025 08:01:01 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.127.105])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b47640b2d37sm2490673a12.46.2025.08.20.08.01.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Aug 2025 08:01:00 -0700 (PDT)
+Message-ID: <68a5e32c.630a0220.26c70a.da3d@mx.google.com>
+Date: Wed, 20 Aug 2025 08:01:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0865818459145745016=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,v2,1/4] shared/hfp: Add HF SLC connection function
+In-Reply-To: <20250820133338.1158203-1-frederic.danis@collabora.com>
+References: <20250820133338.1158203-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 56b483c7f869358ac8bfa6d92d5444f39ee13181
-      https://github.com/bluez/bluez/commit/56b483c7f869358ac8bfa6d92d544=
-4f39ee13181
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-20 (Wed, 20 Aug 2025)
+--===============0865818459145745016==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M src/shared/hfp.c
-    M src/shared/hfp.h
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  shared/hfp: Add HF SLC connection function
+Dear submitter,
 
-This implements the minimal SLC connection exchange, i.e. AT+BRSF,
-AT+CIND=3D?, AT+CIND? and AT+CMER=3D3,0,0,1 requested to complete the
-Service Level Connection Establishment.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=993518
 
+---Test result---
 
-  Commit: fb9b5c04fc3c9ba2dbeb735c6c39731b53ca7e89
-      https://github.com/bluez/bluez/commit/fb9b5c04fc3c9ba2dbeb735c6c397=
-31b53ca7e89
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-20 (Wed, 20 Aug 2025)
+Test Summary:
+CheckPatch                    PENDING   0.40 seconds
+GitLint                       PENDING   0.43 seconds
+BuildEll                      PASS      20.04 seconds
+BluezMake                     PASS      2541.26 seconds
+MakeCheck                     PASS      20.25 seconds
+MakeDistcheck                 PASS      184.16 seconds
+CheckValgrind                 PASS      236.60 seconds
+CheckSmatch                   PASS      307.95 seconds
+bluezmakeextell               PASS      127.03 seconds
+IncrementalBuild              PENDING   0.29 seconds
+ScanBuild                     PASS      909.09 seconds
 
-  Changed paths:
-    M unit/test-hfp.c
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-  Log Message:
-  -----------
-  unit/test-hfp: Add SLC connection test
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-This adds minimal packet exchange to test the SLC establishment.
-
-
-  Commit: bcd94e3e327dde224417aae67338e71202bfdda5
-      https://github.com/bluez/bluez/commit/bcd94e3e327dde224417aae67338e=
-71202bfdda5
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-20 (Wed, 20 Aug 2025)
-
-  Changed paths:
-    M src/shared/hfp.c
-
-  Log Message:
-  -----------
-  shared/hfp: Add +CIEV event support
-
-Register +CIEV handler on SLC completion to call the update_indicator
-call back on unsolicited events.
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-  Commit: ed2da1a3786d02a4ffca601228f318a276a457f5
-      https://github.com/bluez/bluez/commit/ed2da1a3786d02a4ffca601228f31=
-8a276a457f5
-  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
-  Date:   2025-08-20 (Wed, 20 Aug 2025)
 
-  Changed paths:
-    M unit/test-hfp.c
-
-  Log Message:
-  -----------
-  unit/test-hfp: Add indicators tests for HF
-
-This adds the following tests:
-- /HFP/HF/TRS/BV-01-C
-  Verify that  the HF accepts the registration status indication.
-- /HFP/HF/PSI/BV-01-C
-  Verify that the HF successfully receives the signal strength status of
-  the AG.
-- /HFP/HF/PSI/BV-02-C
-  Verify that the HF successfully receives the roaming status of the AG.
-- /HFP/HF/PSI/BV-03-C
-  Verify that the HF successfully receives the battery level status of
-  the AG.
+---
+Regards,
+Linux Bluetooth
 
 
-Compare: https://github.com/bluez/bluez/compare/00eea35722b7...ed2da1a378=
-6d
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
+--===============0865818459145745016==--
