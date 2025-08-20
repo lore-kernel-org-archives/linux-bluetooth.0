@@ -1,767 +1,679 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F400A2882C5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 21:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8864D27702A;
+	Wed, 20 Aug 2025 01:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755638039; cv=none; b=U+2KxlZX3ZRGo3LUCE9wMGmtojDstPME7N2uN0U5oHcQe/xUEfU7o/XgavC9vnXV4XL46/OtALshuvDe8RkI0B704WJiRJ1MFMANB5q7VmvVCcyQvn8HDYTxS2QrKh9xPmbSpLLdA72tPRWfsNWr0b52wTl7t+yH9xP3pXGVNK8=
+	t=1755654780; cv=none; b=vGt5vwPgeu7yaYmZc8ejYzC94SqQyfUlSTudiKdEZ5HQpOnx8nFfmMaJ/Pz57TQ+IQZF/vToOayTrSotElRwf3wWlHJWiLQC1X1Kpvb9ctDEJZSgFs2jqSkgSGYpnAzvskvPmGhvkD/x0wsfXMKSPH8PSQom6IFtLmwrsTLANiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755638039; c=relaxed/simple;
-	bh=QCnYG3N2e2NceAp0PF5Pma5enMa7X7yp9aLyrYRI51s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NVXISDDQyRe6LVfwoJvd1e4GJcovabXT9ZmuR+55lkpj+TMh9tMGWpZl3uKtCtVPaARwb/iLsZhPf49PokBxWYCO6RKXpxw3vmroJe2TgGdmBz9ja7SxU578x6JoVCS529Gp9cMNyXRnDfE0ERNqc8agSsWtZ6t/q8mOrKGlqjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k7cMW2Oh; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7cMW2Oh"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-333f8d3be05so40216961fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Aug 2025 14:13:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755638035; x=1756242835; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VXnUCfN53fBRdf4dByye1NGE5bbJqK9L0OA/8mzuNzM=;
-        b=k7cMW2OhvRA77zyoL3hHAq4xjYvGdGl+Xo+SxnFkmYhBPf8XbVJXEW+msjx8qRh2ys
-         IQdrzPJVca++LDQ58Zmft2RBTos3M+lX5d1DGqdxcpl4QDIv44/Lf/2S99p0KBA5JZfJ
-         RwS+5z9858TVVvfHsZRJt5DJAdHpDUf1rtXXmO70HzY4nQzh/NaDaUEL7cGnEqfcwuCS
-         fu4u9j/VZISUOQn6EXsU6ETxLW9FFxx+1b29gdS3YFqah6S84kGIO1HjxzQCePF0NqaV
-         SbdQr6hvCWcHFL0k46sI/kelOEUExSNga99A2z+OCr1Yb8ga0qqfn/7GGlZTqKDx7HeO
-         YF1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755638035; x=1756242835;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VXnUCfN53fBRdf4dByye1NGE5bbJqK9L0OA/8mzuNzM=;
-        b=sFQrvRjUTlQj+/XN+uTVdYsmQObvFVStJba6tr/eyzzCpPdJyc3phrozbcWxZZlMOJ
-         hxUJD8r/W+Qzk+WEMZdJTCtkSWEZ5lJNJS52GpSS66YKNOhxFJbNV2hT3/Ph09Lmurlw
-         wGBikEy+0nB9vdgUOgSI4WozjNLU3Uf60iZjk7qgYHWxshAY/v4ehkNAriX2Bkrz1kAe
-         Ry8HCgYfGis26OQQ28PAIjS+vF7CUEJIPIXK/6nAkUsAXkvdmUh3PewQlg4sE8ryvw8j
-         R5SzYz5esq0OcF+jDkkRw/p8SK1UaUWiSvzLAmTtNix9IgOIiTj1WNo215RNQkguPMI2
-         Aw6w==
-X-Gm-Message-State: AOJu0Yyx1HylFti6FoC0as7XpP/dVE6m2alxnDuwMg6EL4yiLwJZvIwI
-	JzViErFWOfHJlS+52JHI/oJYoqrQ3orGWCkhz2kth8/LzrjZ8PysEaPzRoKTp9gKEnkj4h4sCtQ
-	W/edjhDWUv5r9wFsgu8w2Hnf4+5Z8R5TH6y5SB+s=
-X-Gm-Gg: ASbGncv3xRJi/K+23/Ly6Q6OVSsyP81pOc09G8rQmErvckClR6WHBGbTFXaKXXSH1Fd
-	yjmxgKtOXdzjCjpsWJk+Au5mk2RAI2XmnXxVuzLLfZ/f+dVsgGoQFJlt5aI037s5JACoR1fetwz
-	Ta0V0cVa+VffQxS+Uv+6WGe+FZRivgGEV0Y9AFVqYYHDGURoh029FtD0Ir1ubRFopixMkmLYw8/
-	TOk4Q==
-X-Google-Smtp-Source: AGHT+IFPfVcmL/0K+6c/dbp/SbUTuh5XokVZAD0n9arIxa0NbrvwDJhpIA0s65KIygQSGh28fWxoh134g5nH0x3VwDU=
-X-Received: by 2002:a05:651c:31c5:b0:333:f1e5:7847 with SMTP id
- 38308e7fff4ca-3353bd3479fmr1148551fa.34.1755638034584; Tue, 19 Aug 2025
- 14:13:54 -0700 (PDT)
+	s=arc-20240116; t=1755654780; c=relaxed/simple;
+	bh=LZxF8hOIsi6fQf98Gc4tNrLOQFC0p/zNElbYWaP+IG0=;
+	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
+	 Subject:Content-Type; b=vEuwKnkFb7AIupPtVBCH4JXuspVk/SWCGbX0tWnxbNsVLyVkK46yKGacnpcQRU9FiTMv1LJWDhGx1Lrohs6iAuNLrnDZVirhKWNXqMHpR5qVA+m2Ba6xMfbzKwZkjMG/QltGwxjCI1ln8XT+28YpVu9eN9XZMJz26vTaf5MdUQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4c68bj4kmTz5B0m9;
+	Wed, 20 Aug 2025 09:52:49 +0800 (CST)
+Received: from xaxapp05.zte.com.cn ([10.99.98.109])
+	by mse-fl1.zte.com.cn with SMTP id 57K1qZrK063755;
+	Wed, 20 Aug 2025 09:52:35 +0800 (+08)
+	(envelope-from xu.xin16@zte.com.cn)
+Received: from mapi (xaxapp05[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Wed, 20 Aug 2025 09:52:36 +0800 (CST)
+Date: Wed, 20 Aug 2025 09:52:36 +0800 (CST)
+X-Zmail-TransId: 2afc68a52a64500-22b5f
+X-Mailer: Zmail v1.0
+Message-ID: <20250820095236542p8WDHF3snIDSZHkGfJZlG@zte.com.cn>
+In-Reply-To: <2025081914-steadfast-ruckus-22bd@gregkh>
+References: 20250819221605072sYBtQfxeXfCoV3_kHWRry@zte.com.cn,2025081914-steadfast-ruckus-22bd@gregkh
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250819133321.382279-1-frederic.danis@collabora.com>
-In-Reply-To: <20250819133321.382279-1-frederic.danis@collabora.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 19 Aug 2025 17:13:42 -0400
-X-Gm-Features: Ac12FXxBt9Y1prRE8ThRu-3QEtAqVy4JLmbEVm5_7cwAxhO5Eh2Uf10Zhu8zxtg
-Message-ID: <CABBYNZ+9ti9jv1u6WyhQqFUn9Yh_0M3a6Ri4Drf7BTMLAsnPgQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ RESEND 1/4] shared/hfp: Add HF SLC connection function
-To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+From: <xu.xin16@zte.com.cn>
+To: <gregkh@linuxfoundation.org>
+Cc: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <chen.junlin@zte.com.cn>, <stable@vger.kernel.org>,
+        <jiang.kun2@zte.com.cn>
+Subject: =?UTF-8?B?562U5aSNOiBbUEFUQ0ggbGludXgtc3RhYmxlIDYuNl0gQmx1ZXRvb3RoOiBoY2lfY29ubjogYXZvaWQgcXVldWUgd2hlbiBkZWxldGluZyBoY2kgY29ubmVjdGlvbg==?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 57K1qZrK063755
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: xu.xin16@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.132 unknown Wed, 20 Aug 2025 09:52:49 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 68A52A71.003/4c68bj4kmTz5B0m9
 
-Hi Fr=C3=A9d=C3=A9ric,
+> > From: Chen Junlin <chen.junlin@zte.com.cn>
+> > 
+> > Although the upstream commit 2b0f2fc9ed62 ("Bluetooth: hci_conn:
+> > Use disable_delayed_work_sync") has fixed the issue CVE-2024-56591, that
+> > patch depends on the implementaion of disable/enable_work() of workqueue
+> > [1], which are merged into 6.9/6.10 and so on. But for branch linux-6.6,
+> > there&apos;s no these feature of workqueue.
+> 
+> html marker in a changelog text?
 
-On Tue, Aug 19, 2025 at 9:39=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
->
-> This implements the minimal SLC connection exchange, i.e. AT+BRSF,
-> AT+CIND=3D?, AT+CIND? and AT+CMER=3D3,0,0,1 requested to complete the
-> Service Level Connection Establishment.
-> ---
->  src/shared/hfp.c | 508 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/hfp.h |  69 +++++++
->  2 files changed, 577 insertions(+)
->
-> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-> index df6eab35d..c1bcb61cf 100644
-> --- a/src/shared/hfp.c
-> +++ b/src/shared/hfp.c
-> @@ -25,6 +25,12 @@
->  #include "src/shared/io.h"
->  #include "src/shared/hfp.h"
->
-> +#define DBG(_hfp, fmt, arg...) \
-> +       hfp_debug(_hfp->debug_callback, _hfp->debug_data, "%s:%s() " fmt,=
- \
-> +                                               __FILE__, __func__, ## ar=
-g)
-> +
-> +#define HFP_HF_FEATURES        (HFP_HF_FEAT_ESCO_S4_T2)
-> +
->  struct hfp_gw {
->         int ref_count;
->         int fd;
-> @@ -50,6 +56,16 @@ struct hfp_gw {
->         bool destroyed;
->  };
->
-> +typedef void (*ciev_func_t)(uint8_t val, void *user_data);
-> +
-> +struct indicator {
-> +       uint8_t index;
-> +       uint32_t min;
-> +       uint32_t max;
-> +       uint32_t val;
-> +       ciev_func_t cb;
-> +};
-> +
->  struct hfp_hf {
->         int ref_count;
->         int fd;
-> @@ -73,6 +89,17 @@ struct hfp_hf {
->
->         bool in_disconnect;
->         bool destroyed;
-> +
-> +       struct hfp_hf_callbacks *callbacks;
-> +       void *callbacks_data;
-> +
-> +       uint32_t features;
-> +       struct indicator ag_ind[HFP_INDICATOR_LAST];
-> +       bool service;
-> +       uint8_t signal;
-> +       bool roaming;
-> +       uint8_t battchg;
-> +
->  };
->
->  struct cmd_handler {
-> @@ -101,6 +128,19 @@ struct event_handler {
->         hfp_hf_result_func_t callback;
->  };
->
-> +static void hfp_debug(hfp_debug_func_t debug_func, void *debug_data,
-> +                                               const char *format, ...)
-> +{
-> +       va_list ap;
-> +
-> +       if (!debug_func || !format)
-> +               return;
-> +
-> +       va_start(ap, format);
-> +       util_debug_va(debug_func, debug_data, format, ap);
-> +       va_end(ap);
-> +}
-> +
->  static void destroy_cmd_handler(void *data)
->  {
->         struct cmd_handler *handler =3D data;
-> @@ -1527,3 +1567,471 @@ bool hfp_hf_disconnect(struct hfp_hf *hfp)
->
->         return io_shutdown(hfp->io);
->  }
-> +
-> +static void ciev_service_cb(uint8_t val, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "%u", val);
-> +
-> +       if (val < hfp->ag_ind[HFP_INDICATOR_SERVICE].min ||
-> +                       val > hfp->ag_ind[HFP_INDICATOR_SERVICE].max) {
-> +               DBG(hfp, "hf: Incorrect state %u:", val);
-> +               return;
-> +       }
-> +
-> +       hfp->service =3D val;
-> +       if (hfp->callbacks && hfp->callbacks->update_indicator)
-> +               hfp->callbacks->update_indicator(HFP_INDICATOR_SERVICE, v=
-al,
-> +                                                       hfp->callbacks_da=
-ta);
-> +}
-> +
-> +static void ciev_call_cb(uint8_t val, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "%u", val);
-> +
-> +       if (val < hfp->ag_ind[HFP_INDICATOR_CALL].min ||
-> +                       val > hfp->ag_ind[HFP_INDICATOR_CALL].max) {
-> +               DBG(hfp, "hf: Incorrect call state %u:", val);
-> +               return;
-> +       }
-> +}
-> +
-> +static void ciev_callsetup_cb(uint8_t val, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "%u", val);
-> +
-> +       if (val < hfp->ag_ind[HFP_INDICATOR_CALLSETUP].min ||
-> +                       val > hfp->ag_ind[HFP_INDICATOR_CALLSETUP].max) {
-> +               DBG(hfp, "hf: Incorrect call setup state %u:", val);
-> +               return;
-> +       }
-> +}
-> +
-> +static void ciev_callheld_cb(uint8_t val, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "%u", val);
-> +
-> +       if (val < hfp->ag_ind[HFP_INDICATOR_CALLHELD].min ||
-> +                       val > hfp->ag_ind[HFP_INDICATOR_CALLHELD].max) {
-> +               DBG(hfp, "hf: Incorrect call held state %u:", val);
-> +               return;
-> +       }
-> +}
-> +
-> +static void ciev_signal_cb(uint8_t val, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "%u", val);
-> +
-> +       if (val < hfp->ag_ind[HFP_INDICATOR_SIGNAL].min ||
-> +                       val > hfp->ag_ind[HFP_INDICATOR_SIGNAL].max) {
-> +               DBG(hfp, "hf: Incorrect signal value %u:", val);
-> +               return;
-> +       }
-> +
-> +       hfp->signal =3D val;
-> +       if (hfp->callbacks && hfp->callbacks->update_indicator)
-> +               hfp->callbacks->update_indicator(HFP_INDICATOR_SIGNAL, va=
-l,
-> +                                                       hfp->callbacks_da=
-ta);
-> +}
-> +
-> +static void ciev_roam_cb(uint8_t val, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "%u", val);
-> +
-> +       if (val < hfp->ag_ind[HFP_INDICATOR_ROAM].min ||
-> +                       val > hfp->ag_ind[HFP_INDICATOR_ROAM].max) {
-> +               DBG(hfp, "hf: Incorrect roaming state %u:", val);
-> +               return;
-> +       }
-> +
-> +       hfp->roaming =3D val;
-> +       if (hfp->callbacks && hfp->callbacks->update_indicator)
-> +               hfp->callbacks->update_indicator(HFP_INDICATOR_ROAM, val,
-> +                                                       hfp->callbacks_da=
-ta);
-> +}
-> +
-> +static void ciev_battchg_cb(uint8_t val, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "%u", val);
-> +
-> +       if (val < hfp->ag_ind[HFP_INDICATOR_BATTCHG].min ||
-> +                       val > hfp->ag_ind[HFP_INDICATOR_BATTCHG].max) {
-> +               DBG(hfp, "hf: Incorrect battery charge value %u:", val);
-> +               return;
-> +       }
-> +
-> +       hfp->battchg =3D val;
-> +       if (hfp->callbacks && hfp->callbacks->update_indicator)
-> +               hfp->callbacks->update_indicator(HFP_INDICATOR_BATTCHG, v=
-al,
-> +                                                       hfp->callbacks_da=
-ta);
-> +}
-> +
-> +static void set_indicator_value(uint8_t index, unsigned int val,
-> +       struct indicator *ag_ind, struct hfp_hf *hfp)
-> +{
-> +       int i;
-> +
-> +       for (i =3D 0; i < HFP_INDICATOR_LAST; i++) {
-> +               if (index !=3D ag_ind[i].index)
-> +                       continue;
-> +
-> +               ag_ind[i].val =3D val;
-> +               ag_ind[i].cb(val, hfp);
-> +               return;
-> +       }
-> +}
-> +
-> +static void slc_cmer_resp(enum hfp_result result, enum hfp_error cme_err=
-,
-> +       void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "");
-> +
-> +       if (result !=3D HFP_RESULT_OK) {
-> +               DBG(hfp, "hf: CMER error: %d", result);
-> +               goto failed;
-> +       }
-> +
-> +       if (hfp->callbacks->session_ready)
-> +               hfp->callbacks->session_ready(HFP_RESULT_OK, 0,
-> +                                               hfp->callbacks_data);
-> +       return;
-> +
-> +failed:
-> +       if (hfp->callbacks->session_ready)
-> +               hfp->callbacks->session_ready(result, cme_err,
-> +                                               hfp->callbacks_data);
-> +}
-> +
-> +static void slc_cind_status_cb(struct hfp_context *context,
-> +       void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +       uint8_t index =3D 1;
-> +
-> +       while (hfp_context_has_next(context)) {
-> +               uint32_t val;
-> +
-> +               if (!hfp_context_get_number(context, &val)) {
-> +                       DBG(hfp, "hf: Error on CIND status response");
-> +                       return;
-> +               }
-> +
-> +               set_indicator_value(index++, val, hfp->ag_ind, hfp);
-> +       }
-> +}
-> +
-> +static void slc_cind_status_resp(enum hfp_result result,
-> +       enum hfp_error cme_err,
-> +       void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "");
-> +
-> +       hfp_hf_unregister(hfp, "+CIND");
-> +
-> +       if (result !=3D HFP_RESULT_OK) {
-> +               DBG(hfp, "hf: CIND error: %d", result);
-> +               goto failed;
-> +       }
-> +
-> +       /* Continue with SLC creation */
-> +       if (!hfp_hf_send_command(hfp, slc_cmer_resp, hfp,
-> +               "AT+CMER=3D3,0,0,1")) {
-> +               DBG(hfp, "hf: Could not send AT+CMER");
-> +               result =3D HFP_RESULT_ERROR;
-> +               goto failed;
-> +       }
-> +
-> +       return;
-> +
-> +failed:
-> +       if (hfp->callbacks->session_ready)
-> +               hfp->callbacks->session_ready(result, cme_err,
-> +                                               hfp->callbacks_data);
-> +}
-> +
-> +static void set_indicator_parameters(struct hfp_hf *hfp, uint8_t index,
-> +       const char *indicator,
-> +       unsigned int min,
-> +       unsigned int max)
-> +{
-> +       struct indicator *ag_ind =3D hfp->ag_ind;
-> +
-> +       DBG(hfp, "%s, %i", indicator, index);
-> +
-> +       if (strcmp("service", indicator) =3D=3D 0) {
-> +               if (min !=3D 0 || max !=3D 1) {
-> +                       DBG(hfp, "hf: Invalid min/max values for service,=
-"
-> +                               " expected (0,1) got (%u,%u)", min, max);
-> +                       return;
-> +               }
-> +               ag_ind[HFP_INDICATOR_SERVICE].index =3D index;
-> +               ag_ind[HFP_INDICATOR_SERVICE].min =3D min;
-> +               ag_ind[HFP_INDICATOR_SERVICE].max =3D max;
-> +               ag_ind[HFP_INDICATOR_SERVICE].cb =3D ciev_service_cb;
-> +               return;
-> +       }
-> +
-> +       if (strcmp("call", indicator) =3D=3D 0) {
-> +               if (min !=3D 0 || max !=3D 1) {
-> +                       DBG(hfp, "hf: Invalid min/max values for call,"
-> +                               " expected (0,1) got (%u,%u)", min, max);
-> +                       return;
-> +               }
-> +               ag_ind[HFP_INDICATOR_CALL].index =3D index;
-> +               ag_ind[HFP_INDICATOR_CALL].min =3D min;
-> +               ag_ind[HFP_INDICATOR_CALL].max =3D max;
-> +               ag_ind[HFP_INDICATOR_CALL].cb =3D ciev_call_cb;
-> +               return;
-> +       }
-> +
-> +       if (strcmp("callsetup", indicator) =3D=3D 0) {
-> +               if (min !=3D 0 || max !=3D 3) {
-> +                       DBG(hfp, "hf: Invalid min/max values for callsetu=
-p,"
-> +                               " expected (0,3) got (%u,%u)", min, max);
-> +                       return;
-> +               }
-> +               ag_ind[HFP_INDICATOR_CALLSETUP].index =3D index;
-> +               ag_ind[HFP_INDICATOR_CALLSETUP].min =3D min;
-> +               ag_ind[HFP_INDICATOR_CALLSETUP].max =3D max;
-> +               ag_ind[HFP_INDICATOR_CALLSETUP].cb =3D ciev_callsetup_cb;
-> +               return;
-> +       }
-> +
-> +       if (strcmp("callheld", indicator) =3D=3D 0) {
-> +               if (min !=3D 0 || max !=3D 2) {
-> +                       DBG(hfp, "hf: Invalid min/max values for callheld=
-,"
-> +                               " expected (0,2) got (%u,%u)", min, max);
-> +                       return;
-> +               }
-> +               ag_ind[HFP_INDICATOR_CALLHELD].index =3D index;
-> +               ag_ind[HFP_INDICATOR_CALLHELD].min =3D min;
-> +               ag_ind[HFP_INDICATOR_CALLHELD].max =3D max;
-> +               ag_ind[HFP_INDICATOR_CALLHELD].cb =3D ciev_callheld_cb;
-> +               return;
-> +       }
-> +
-> +       if (strcmp("signal", indicator) =3D=3D 0) {
-> +               if (min !=3D 0 || max !=3D 5) {
-> +                       DBG(hfp, "hf: Invalid min/max values for signal,"
-> +                               " expected (0,5) got (%u,%u)", min, max);
-> +                       return;
-> +               }
-> +               ag_ind[HFP_INDICATOR_SIGNAL].index =3D index;
-> +               ag_ind[HFP_INDICATOR_SIGNAL].min =3D min;
-> +               ag_ind[HFP_INDICATOR_SIGNAL].max =3D max;
-> +               ag_ind[HFP_INDICATOR_SIGNAL].cb =3D ciev_signal_cb;
-> +               return;
-> +       }
-> +
-> +       if (strcmp("roam", indicator) =3D=3D 0) {
-> +               if (min !=3D 0 || max !=3D 1) {
-> +                       DBG(hfp, "hf: Invalid min/max values for roam,"
-> +                               " expected (0,1) got (%u,%u)", min, max);
-> +                       return;
-> +               }
-> +               ag_ind[HFP_INDICATOR_ROAM].index =3D index;
-> +               ag_ind[HFP_INDICATOR_ROAM].min =3D min;
-> +               ag_ind[HFP_INDICATOR_ROAM].max =3D max;
-> +               ag_ind[HFP_INDICATOR_ROAM].cb =3D ciev_roam_cb;
-> +               return;
-> +       }
-> +
-> +       if (strcmp("battchg", indicator) =3D=3D 0) {
-> +               if (min !=3D 0 || max !=3D 5) {
-> +                       DBG(hfp, "hf: Invalid min/max values for battchg,=
-"
-> +                               " expected (0,5) got (%u,%u)", min, max);
-> +                       return;
-> +               }
-> +               ag_ind[HFP_INDICATOR_BATTCHG].index =3D index;
-> +               ag_ind[HFP_INDICATOR_BATTCHG].min =3D min;
-> +               ag_ind[HFP_INDICATOR_BATTCHG].max =3D max;
-> +               ag_ind[HFP_INDICATOR_BATTCHG].cb =3D ciev_battchg_cb;
-> +               return;
-> +       }
-> +
-> +       DBG(hfp, "hf: Unknown indicator: %s", indicator);
-> +}
-> +
-> +static void slc_cind_cb(struct hfp_context *context, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +       int index =3D 1;
-> +
-> +       DBG(hfp, "");
-> +
-> +       while (hfp_context_has_next(context)) {
-> +               char name[255];
-> +               unsigned int min, max;
-> +
-> +               /* e.g ("callsetup",(0-3)) */
-> +               if (!hfp_context_open_container(context))
-> +                       break;
-> +
-> +               if (!hfp_context_get_string(context, name, sizeof(name)))=
- {
-> +                       DBG(hfp, "hf: Could not get string");
-> +                       goto failed;
-> +               }
-> +
-> +               if (!hfp_context_open_container(context)) {
-> +                       DBG(hfp, "hf: Could not open container");
-> +                       goto failed;
-> +               }
-> +
-> +               if (!hfp_context_get_range(context, &min, &max)) {
-> +                       if (!hfp_context_get_number(context, &min)) {
-> +                               DBG(hfp, "hf: Could not get number");
-> +                               goto failed;
-> +                       }
-> +
-> +                       if (!hfp_context_get_number(context, &max)) {
-> +                               DBG(hfp, "hf: Could not get number");
-> +                               goto failed;
-> +                       }
-> +               }
-> +
-> +               if (!hfp_context_close_container(context)) {
-> +                       DBG(hfp, "hf: Could not close container");
-> +                       goto failed;
-> +               }
-> +
-> +               if (!hfp_context_close_container(context)) {
-> +                       DBG(hfp, "hf: Could not close container");
-> +                       goto failed;
-> +               }
-> +
-> +               set_indicator_parameters(hfp, index, name, min, max);
-> +               index++;
-> +       }
-> +
-> +       return;
-> +
-> +failed:
-> +       DBG(hfp, "hf: Error on CIND response");
-> +}
-> +
-> +static void slc_cind_resp(enum hfp_result result, enum hfp_error cme_err=
-,
-> +       void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "");
-> +
-> +       hfp_hf_unregister(hfp, "+CIND");
-> +
-> +       if (result !=3D HFP_RESULT_OK) {
-> +               DBG(hfp, "hf: CIND error: %d", result);
-> +               goto failed;
-> +       }
-> +
-> +       /* Continue with SLC creation */
-> +       if (!hfp_hf_register(hfp, slc_cind_status_cb, "+CIND", hfp,
-> +                       NULL)) {
-> +               DBG(hfp, "hf: Could not register +CIND");
-> +               result =3D HFP_RESULT_ERROR;
-> +               goto failed;
-> +       }
-> +
-> +       if (!hfp_hf_send_command(hfp, slc_cind_status_resp, hfp,
-> +                       "AT+CIND?")) {
-> +               DBG(hfp, "hf: Could not send AT+CIND?");
-> +               result =3D HFP_RESULT_ERROR;
-> +               goto failed;
-> +       }
-> +
-> +       return;
-> +
-> +failed:
-> +       if (hfp->callbacks->session_ready)
-> +               hfp->callbacks->session_ready(result, cme_err,
-> +                                               hfp->callbacks_data);
-> +}
-> +
-> +static void slc_brsf_cb(struct hfp_context *context, void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +       unsigned int feat;
-> +
-> +       DBG(hfp, "");
-> +
-> +       if (hfp_context_get_number(context, &feat))
-> +               hfp->features =3D feat;
-> +}
-> +
-> +static void slc_brsf_resp(enum hfp_result result, enum hfp_error cme_err=
-,
-> +       void *user_data)
-> +{
-> +       struct hfp_hf *hfp =3D user_data;
-> +
-> +       DBG(hfp, "");
-> +
-> +       hfp_hf_unregister(hfp, "+BRSF");
-> +
-> +       if (result !=3D HFP_RESULT_OK) {
-> +               DBG(hfp, "BRSF error: %d", result);
-> +               goto failed;
-> +       }
-> +
-> +       /* Continue with SLC creation */
-> +       if (!hfp_hf_register(hfp, slc_cind_cb, "+CIND", hfp, NULL)) {
-> +               DBG(hfp, "hf: Could not register for +CIND");
-> +               result =3D HFP_RESULT_ERROR;
-> +               goto failed;
-> +       }
-> +
-> +       if (!hfp_hf_send_command(hfp, slc_cind_resp, hfp, "AT+CIND=3D?"))=
- {
-> +               DBG(hfp, "hf: Could not send AT+CIND command");
-> +               result =3D HFP_RESULT_ERROR;
-> +               goto failed;
-> +       }
-> +
-> +       return;
-> +
-> +failed:
-> +       if (hfp->callbacks->session_ready)
-> +               hfp->callbacks->session_ready(result, cme_err,
-> +                                               hfp->callbacks_data);
-> +}
-> +
-> +bool hfp_hf_session_register(struct hfp_hf *hfp,
-> +                               struct hfp_hf_callbacks *callbacks,
-> +                               void *callbacks_data)
-> +{
-> +       if (!hfp)
-> +               return false;
-> +
-> +       hfp->callbacks =3D callbacks;
-> +       hfp->callbacks_data =3D callbacks_data;
-> +
-> +       return true;
-> +}
-> +
-> +bool hfp_hf_session(struct hfp_hf *hfp)
-> +{
-> +       DBG(hfp, "");
-> +
-> +       if (!hfp)
-> +               return false;
-> +
-> +       if (!hfp_hf_register(hfp, slc_brsf_cb, "+BRSF", hfp, NULL))
-> +               return false;
-> +
-> +       return hfp_hf_send_command(hfp, slc_brsf_resp, hfp,
-> +                                       "AT+BRSF=3D%u", HFP_HF_FEATURES);
-> +}
-> diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-> index 600d084a7..f54b86a92 100644
-> --- a/src/shared/hfp.h
-> +++ b/src/shared/hfp.h
-> @@ -10,6 +10,34 @@
->
->  #include <stdbool.h>
->
-> +#define HFP_HF_FEAT_ECNR                               0x00000001
-> +#define HFP_HF_FEAT_3WAY                               0x00000002
-> +#define HFP_HF_FEAT_CLIP                               0x00000004
-> +#define HFP_HF_FEAT_VOICE_RECOGNITION                  0x00000008
-> +#define HFP_HF_FEAT_REMOTE_VOLUME_CONTROL              0x00000010
-> +#define HFP_HF_FEAT_ENHANCED_CALL_STATUS               0x00000020
-> +#define HFP_HF_FEAT_ENHANCED_CALL_CONTROL              0x00000040
-> +#define HFP_HF_FEAT_CODEC_NEGOTIATION                  0x00000080
-> +#define HFP_HF_FEAT_HF_INDICATORS                      0x00000100
-> +#define HFP_HF_FEAT_ESCO_S4_T2                         0x00000200
-> +#define HFP_HF_FEAT_ENHANCED_VOICE_RECOGNITION_STATUS  0x00000400
-> +#define HFP_HF_FEAT_VOICE_RECOGNITION_TEXT             0x00000800
-> +
-> +#define HFP_AG_FEAT_3WAY                               0x00000001
-> +#define HFP_AG_FEAT_ECNR                               0x00000002
-> +#define HFP_AG_FEAT_VOICE_RECOGNITION                  0x00000004
-> +#define HFP_AG_FEAT_IN_BAND_RING_TONE                  0x00000008
-> +#define HFP_AG_FEAT_ATTACH_VOICE_TAG                   0x00000010
-> +#define HFP_AG_FEAT_REJECT_CALL                                0x0000002=
-0
-> +#define HFP_AG_FEAT_ENHANCED_CALL_STATUS               0x00000040
-> +#define HFP_AG_FEAT_ENHANCED_CALL_CONTROL              0x00000080
-> +#define HFP_AG_FEAT_EXTENDED_RES_CODE                  0x00000100
-> +#define HFP_AG_FEAT_CODEC_NEGOTIATION                  0x00000200
-> +#define HFP_AG_FEAT_HF_INDICATORS                      0x00000400
-> +#define HFP_AG_FEAT_ESCO_S4_T2                         0x00000800
-> +#define HFP_AG_FEAT_ENHANCED_VOICE_RECOGNITION_STATUS  0x00001000
-> +#define HFP_AG_FEAT_VOICE_RECOGNITION_TEXT             0x00001000
-> +
->  enum hfp_result {
->         HFP_RESULT_OK           =3D 0,
->         HFP_RESULT_CONNECT      =3D 1,
-> @@ -57,6 +85,35 @@ enum hfp_gw_cmd_type {
->         HFP_GW_CMD_TYPE_COMMAND
->  };
->
-> +enum hfp_indicator {
-> +       HFP_INDICATOR_SERVICE =3D 0,
-> +       HFP_INDICATOR_CALL,
-> +       HFP_INDICATOR_CALLSETUP,
-> +       HFP_INDICATOR_CALLHELD,
-> +       HFP_INDICATOR_SIGNAL,
-> +       HFP_INDICATOR_ROAM,
-> +       HFP_INDICATOR_BATTCHG,
-> +       HFP_INDICATOR_LAST
-> +};
-> +
-> +enum hfp_call {
-> +       CIND_CALL_NONE =3D 0,
-> +       CIND_CALL_IN_PROGRESS
-> +};
-> +
-> +enum hfp_call_setup {
-> +       CIND_CALLSETUP_NONE =3D 0,
-> +       CIND_CALLSETUP_INCOMING,
-> +       CIND_CALLSETUP_DIALING,
-> +       CIND_CALLSETUP_ALERTING
-> +};
-> +
-> +enum hfp_call_held {
-> +       CIND_CALLHELD_NONE =3D 0,
-> +       CIND_CALLHELD_HOLD_AND_ACTIVE,
-> +       CIND_CALLHELD_HOLD
-> +};
-> +
->  struct hfp_context;
->
->  typedef void (*hfp_result_func_t)(struct hfp_context *context,
-> @@ -128,6 +185,13 @@ typedef void (*hfp_response_func_t)(enum hfp_result =
-result,
->
->  struct hfp_hf;
->
-> +struct hfp_hf_callbacks {
-> +       void (*session_ready)(enum hfp_result result, enum hfp_error cme_=
-err,
-> +                                                       void *user_data);
-> +       void (*update_indicator)(enum hfp_indicator indicator, uint32_t v=
-al,
-> +                                                       void *user_data);
-> +};
-> +
->  struct hfp_hf *hfp_hf_new(int fd);
->
->  struct hfp_hf *hfp_hf_ref(struct hfp_hf *hfp);
-> @@ -146,3 +210,8 @@ bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_resul=
-t_func_t callback,
->  bool hfp_hf_unregister(struct hfp_hf *hfp, const char *prefix);
->  bool hfp_hf_send_command(struct hfp_hf *hfp, hfp_response_func_t resp_cb=
-,
->                                 void *user_data, const char *format, ...)=
-;
-> +
-> +bool hfp_hf_session_register(struct hfp_hf *hfp,
-> +                               struct hfp_hf_callbacks *callbacks,
-> +                               void *callbacks_data);
-> +bool hfp_hf_session(struct hfp_hf *hfp);
-> --
-> 2.43.0
+Oh, sorry, it was a mistake of my editor setting.
 
-Incremental build seem to be broken:
+> 
+> > To solve CVE-2024-56591 without backport too many feature patches about
+> > workqueue, we can set a new flag HCI_CONN_DELETE when hci_conn_dell() is
+> > called, and the subsequent queuing of work will be ignored.
+> 
+> How was this tested?
 
-git rebase -i origin/master --exec=3D"make -j check"
+The issue could be reproduce by syzkaller (https://github.com/google/syzkaller)
+and the C producer is shown at the last of the reply.
 
-FAIL: unit/test-hfp
+> 
+> > 
+> > [1] https://lore.kernel.org/all/20240216180559.208276-1-tj@kernel.org/
+> > 
+> > Signed-off-by: Chen Junlin <chen.junlin@zte.com.cn>
+> > Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+> 
+> What commit id does this fix?  Why only 6.6 for it?
 
->
+I think the issue have existed for a long time, because it was reproduced even in Linux 5.10,
+But I'm not sure which commit cause this. Maybe Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+know better than me.
 
+> 
+> 
+> > ---
+> > include/net/bluetooth/hci_core.h | 8 +++++++-
+> > net/bluetooth/hci_conn.c         | 1 +
+> > 2 files changed, 8 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index 4f067599e6e9..9a3ec55079a1 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -954,6 +954,7 @@ enum {
+> >  	HCI_CONN_BIG_SYNC_FAILED,
+> >  	HCI_CONN_PA_SYNC,
+> >  	HCI_CONN_PA_SYNC_FAILED,
+> > +	HCI_CONN_DELETE,
+> > };
+> > 
+> > static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+> > @@ -1575,7 +1576,12 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+> >  		}
+> > 
+> >  		cancel_delayed_work(&conn->disc_work);
+> > -		queue_delayed_work(conn->hdev->workqueue,
+> > +		/*
+> > +		 * When HCI_CONN_DELETE is set, the conn is goint to be freed.
+> > +		 * Don&apos;t queue the work to avoid noisy WARNing about refcnt < 0.
+> 
+> Again, html text in a comment?
+> 
+> How does that happen?
+> 
+> thanks,
+> 
+> greg k-h
+C reproducer:
+// autogenerated by syzkaller (https://github.com/google/syzkaller)
 
---=20
-Luiz Augusto von Dentz
+#define _GNU_SOURCE 
+
+#include <endian.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sched.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/epoll.h>
+#include <sys/ioctl.h>
+#include <sys/mount.h>
+#include <sys/prctl.h>
+#include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <linux/capability.h>
+#include <linux/rfkill.h>
+
+static bool write_file(const char* file, const char* what, ...)
+{
+	char buf[1024];
+	va_list args;
+	va_start(args, what);
+	vsnprintf(buf, sizeof(buf), what, args);
+	va_end(args);
+	buf[sizeof(buf) - 1] = 0;
+	int len = strlen(buf);
+	int fd = open(file, O_WRONLY | O_CLOEXEC);
+	if (fd == -1)
+		return false;
+	if (write(fd, buf, len) != len) {
+		int err = errno;
+		close(fd);
+		errno = err;
+		return false;
+	}
+	close(fd);
+	return true;
+}
+
+#define BTPROTO_HCI 1
+#define ACL_LINK 1
+#define SCAN_PAGE 2
+
+typedef struct {
+	uint8_t b[6];
+} __attribute__((packed)) bdaddr_t;
+
+#define HCI_COMMAND_PKT 1
+#define HCI_EVENT_PKT 4
+#define HCI_VENDOR_PKT 0xff
+
+struct hci_command_hdr {
+	uint16_t opcode;
+	uint8_t plen;
+} __attribute__((packed));
+
+struct hci_event_hdr {
+	uint8_t evt;
+	uint8_t plen;
+} __attribute__((packed));
+
+#define HCI_EV_CONN_COMPLETE 0x03
+struct hci_ev_conn_complete {
+	uint8_t status;
+	uint16_t handle;
+	bdaddr_t bdaddr;
+	uint8_t link_type;
+	uint8_t encr_mode;
+} __attribute__((packed));
+
+#define HCI_EV_CONN_REQUEST 0x04
+struct hci_ev_conn_request {
+	bdaddr_t bdaddr;
+	uint8_t dev_class[3];
+	uint8_t link_type;
+} __attribute__((packed));
+
+#define HCI_EV_REMOTE_FEATURES 0x0b
+struct hci_ev_remote_features {
+	uint8_t status;
+	uint16_t handle;
+	uint8_t features[8];
+} __attribute__((packed));
+
+#define HCI_EV_CMD_COMPLETE 0x0e
+struct hci_ev_cmd_complete {
+	uint8_t ncmd;
+	uint16_t opcode;
+} __attribute__((packed));
+
+#define HCI_OP_WRITE_SCAN_ENABLE 0x0c1a
+
+#define HCI_OP_READ_BUFFER_SIZE 0x1005
+struct hci_rp_read_buffer_size {
+	uint8_t status;
+	uint16_t acl_mtu;
+	uint8_t sco_mtu;
+	uint16_t acl_max_pkt;
+	uint16_t sco_max_pkt;
+} __attribute__((packed));
+
+#define HCI_OP_READ_BD_ADDR 0x1009
+struct hci_rp_read_bd_addr {
+	uint8_t status;
+	bdaddr_t bdaddr;
+} __attribute__((packed));
+
+#define HCI_EV_LE_META 0x3e
+struct hci_ev_le_meta {
+	uint8_t subevent;
+} __attribute__((packed));
+
+#define HCI_EV_LE_CONN_COMPLETE 0x01
+struct hci_ev_le_conn_complete {
+	uint8_t status;
+	uint16_t handle;
+	uint8_t role;
+	uint8_t bdaddr_type;
+	bdaddr_t bdaddr;
+	uint16_t interval;
+	uint16_t latency;
+	uint16_t supervision_timeout;
+	uint8_t clk_accurancy;
+} __attribute__((packed));
+
+struct hci_dev_req {
+	uint16_t dev_id;
+	uint32_t dev_opt;
+};
+
+struct vhci_vendor_pkt_request {
+	uint8_t type;
+	uint8_t opcode;
+} __attribute__((packed));
+
+struct vhci_pkt {
+	uint8_t type;
+	union {
+		struct {
+			uint8_t opcode;
+			uint16_t id;
+		} __attribute__((packed)) vendor_pkt;
+		struct hci_command_hdr command_hdr;
+	};
+} __attribute__((packed));
+
+#define HCIDEVUP _IOW('H', 201, int)
+#define HCISETSCAN _IOW('H', 221, int)
+
+static int vhci_fd = -1;
+
+static void rfkill_unblock_all()
+{
+	int fd = open("/dev/rfkill", O_WRONLY);
+	if (fd < 0)
+	exit(1);
+	struct rfkill_event event = {0};
+	event.idx = 0;
+	event.type = RFKILL_TYPE_ALL;
+	event.op = RFKILL_OP_CHANGE_ALL;
+	event.soft = 0;
+	event.hard = 0;
+	if (write(fd, &event, sizeof(event)) < 0)
+	exit(1);
+	close(fd);
+}
+
+static void hci_send_event_packet(int fd, uint8_t evt, void* data, size_t data_len)
+{
+	struct iovec iv[3];
+	struct hci_event_hdr hdr;
+	hdr.evt = evt;
+	hdr.plen = data_len;
+	uint8_t type = HCI_EVENT_PKT;
+	iv[0].iov_base = &type;
+	iv[0].iov_len = sizeof(type);
+	iv[1].iov_base = &hdr;
+	iv[1].iov_len = sizeof(hdr);
+	iv[2].iov_base = data;
+	iv[2].iov_len = data_len;
+	if (writev(fd, iv, sizeof(iv) / sizeof(struct iovec)) < 0)
+	exit(1);
+}
+
+static void hci_send_event_cmd_complete(int fd, uint16_t opcode, void* data, size_t data_len)
+{
+	struct iovec iv[4];
+	struct hci_event_hdr hdr;
+	hdr.evt = HCI_EV_CMD_COMPLETE;
+	hdr.plen = sizeof(struct hci_ev_cmd_complete) + data_len;
+	struct hci_ev_cmd_complete evt_hdr;
+	evt_hdr.ncmd = 1;
+	evt_hdr.opcode = opcode;
+	uint8_t type = HCI_EVENT_PKT;
+	iv[0].iov_base = &type;
+	iv[0].iov_len = sizeof(type);
+	iv[1].iov_base = &hdr;
+	iv[1].iov_len = sizeof(hdr);
+	iv[2].iov_base = &evt_hdr;
+	iv[2].iov_len = sizeof(evt_hdr);
+	iv[3].iov_base = data;
+	iv[3].iov_len = data_len;
+	if (writev(fd, iv, sizeof(iv) / sizeof(struct iovec)) < 0)
+	exit(1);
+}
+
+static bool process_command_pkt(int fd, char* buf, ssize_t buf_size)
+{
+	struct hci_command_hdr* hdr = (struct hci_command_hdr*)buf;
+	if (buf_size < (ssize_t)sizeof(struct hci_command_hdr) ||
+	    hdr->plen != buf_size - sizeof(struct hci_command_hdr))
+	exit(1);
+	switch (hdr->opcode) {
+	case HCI_OP_WRITE_SCAN_ENABLE: {
+		uint8_t status = 0;
+		hci_send_event_cmd_complete(fd, hdr->opcode, &status, sizeof(status));
+		return true;
+	}
+	case HCI_OP_READ_BD_ADDR: {
+		struct hci_rp_read_bd_addr rp = {0};
+		rp.status = 0;
+		memset(&rp.bdaddr, 0xaa, 6);
+		hci_send_event_cmd_complete(fd, hdr->opcode, &rp, sizeof(rp));
+		return false;
+	}
+	case HCI_OP_READ_BUFFER_SIZE: {
+		struct hci_rp_read_buffer_size rp = {0};
+		rp.status = 0;
+		rp.acl_mtu = 1021;
+		rp.sco_mtu = 96;
+		rp.acl_max_pkt = 4;
+		rp.sco_max_pkt = 6;
+		hci_send_event_cmd_complete(fd, hdr->opcode, &rp, sizeof(rp));
+		return false;
+	}
+	}
+	char dummy[0xf9] = {0};
+	hci_send_event_cmd_complete(fd, hdr->opcode, dummy, sizeof(dummy));
+	return false;
+}
+
+static void* event_thread(void* arg)
+{
+	while (1) {
+		char buf[1024] = {0};
+		ssize_t buf_size = read(vhci_fd, buf, sizeof(buf));
+		if (buf_size < 0)
+	exit(1);
+		if (buf_size > 0 && buf[0] == HCI_COMMAND_PKT) {
+			if (process_command_pkt(vhci_fd, buf + 1, buf_size - 1))
+				break;
+		}
+	}
+	return NULL;
+}
+#define HCI_HANDLE_1 200
+#define HCI_HANDLE_2 201
+
+#define HCI_PRIMARY 0
+#define HCI_OP_RESET 0x0c03
+
+static void initialize_vhci()
+{
+	int hci_sock = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+	if (hci_sock < 0)
+	exit(1);
+	vhci_fd = open("/dev/vhci", O_RDWR);
+	if (vhci_fd == -1)
+	exit(1);
+	const int kVhciFd = 202;
+	if (dup2(vhci_fd, kVhciFd) < 0)
+	exit(1);
+	close(vhci_fd);
+	vhci_fd = kVhciFd;
+	struct vhci_vendor_pkt_request vendor_pkt_req = {HCI_VENDOR_PKT, HCI_PRIMARY};
+	if (write(vhci_fd, &vendor_pkt_req, sizeof(vendor_pkt_req)) != sizeof(vendor_pkt_req))
+	exit(1);
+	struct vhci_pkt vhci_pkt;
+	if (read(vhci_fd, &vhci_pkt, sizeof(vhci_pkt)) != sizeof(vhci_pkt))
+	exit(1);
+	if (vhci_pkt.type == HCI_COMMAND_PKT && vhci_pkt.command_hdr.opcode == HCI_OP_RESET) {
+		char response[1] = {0};
+		hci_send_event_cmd_complete(vhci_fd, HCI_OP_RESET, response, sizeof(response));
+		if (read(vhci_fd, &vhci_pkt, sizeof(vhci_pkt)) != sizeof(vhci_pkt))
+	exit(1);
+	}
+	if (vhci_pkt.type != HCI_VENDOR_PKT)
+	exit(1);
+	int dev_id = vhci_pkt.vendor_pkt.id;
+	pthread_t th;
+	if (pthread_create(&th, NULL, event_thread, NULL))
+	exit(1);
+	int ret = ioctl(hci_sock, HCIDEVUP, dev_id);
+	if (ret) {
+		if (errno == ERFKILL) {
+			rfkill_unblock_all();
+			ret = ioctl(hci_sock, HCIDEVUP, dev_id);
+		}
+		if (ret && errno != EALREADY)
+	exit(1);
+	}
+	struct hci_dev_req dr = {0};
+	dr.dev_id = dev_id;
+	dr.dev_opt = SCAN_PAGE;
+	if (ioctl(hci_sock, HCISETSCAN, &dr))
+	exit(1);
+	struct hci_ev_conn_request request;
+	memset(&request, 0, sizeof(request));
+	memset(&request.bdaddr, 0xaa, 6);
+	*(uint8_t*)&request.bdaddr.b[5] = 0x10;
+	request.link_type = ACL_LINK;
+	hci_send_event_packet(vhci_fd, HCI_EV_CONN_REQUEST, &request, sizeof(request));
+	struct hci_ev_conn_complete complete;
+	memset(&complete, 0, sizeof(complete));
+	complete.status = 0;
+	complete.handle = HCI_HANDLE_1;
+	memset(&complete.bdaddr, 0xaa, 6);
+	*(uint8_t*)&complete.bdaddr.b[5] = 0x10;
+	complete.link_type = ACL_LINK;
+	complete.encr_mode = 0;
+	hci_send_event_packet(vhci_fd, HCI_EV_CONN_COMPLETE, &complete, sizeof(complete));
+	struct hci_ev_remote_features features;
+	memset(&features, 0, sizeof(features));
+	features.status = 0;
+	features.handle = HCI_HANDLE_1;
+	hci_send_event_packet(vhci_fd, HCI_EV_REMOTE_FEATURES, &features, sizeof(features));
+	struct {
+		struct hci_ev_le_meta le_meta;
+		struct hci_ev_le_conn_complete le_conn;
+	} le_conn;
+	memset(&le_conn, 0, sizeof(le_conn));
+	le_conn.le_meta.subevent = HCI_EV_LE_CONN_COMPLETE;
+	memset(&le_conn.le_conn.bdaddr, 0xaa, 6);
+	*(uint8_t*)&le_conn.le_conn.bdaddr.b[5] = 0x11;
+	le_conn.le_conn.role = 1;
+	le_conn.le_conn.handle = HCI_HANDLE_2;
+	hci_send_event_packet(vhci_fd, HCI_EV_LE_META, &le_conn, sizeof(le_conn));
+	pthread_join(th, NULL);
+	close(hci_sock);
+}
+
+static void setup_gadgetfs();
+static void setup_binderfs();
+static void setup_fusectl();
+static void sandbox_common_mount_tmpfs(void)
+{
+	write_file("/proc/sys/fs/mount-max", "100000");
+	if (mkdir("./syz-tmp", 0777))
+	exit(1);
+	if (mount("", "./syz-tmp", "tmpfs", 0, NULL))
+	exit(1);
+	if (mkdir("./syz-tmp/newroot", 0777))
+	exit(1);
+	if (mkdir("./syz-tmp/newroot/dev", 0700))
+	exit(1);
+	unsigned bind_mount_flags = MS_BIND | MS_REC | MS_PRIVATE;
+	if (mount("/dev", "./syz-tmp/newroot/dev", NULL, bind_mount_flags, NULL))
+	exit(1);
+	if (mkdir("./syz-tmp/newroot/proc", 0700))
+	exit(1);
+	if (mount("syz-proc", "./syz-tmp/newroot/proc", "proc", 0, NULL))
+	exit(1);
+	if (mkdir("./syz-tmp/newroot/selinux", 0700))
+	exit(1);
+	const char* selinux_path = "./syz-tmp/newroot/selinux";
+	if (mount("/selinux", selinux_path, NULL, bind_mount_flags, NULL)) {
+		if (errno != ENOENT)
+	exit(1);
+		if (mount("/sys/fs/selinux", selinux_path, NULL, bind_mount_flags, NULL) && errno != ENOENT)
+	exit(1);
+	}
+	if (mkdir("./syz-tmp/newroot/sys", 0700))
+	exit(1);
+	if (mount("/sys", "./syz-tmp/newroot/sys", 0, bind_mount_flags, NULL))
+	exit(1);
+	if (mount("/sys/kernel/debug", "./syz-tmp/newroot/sys/kernel/debug", NULL, bind_mount_flags, NULL) && errno != ENOENT)
+	exit(1);
+	if (mount("/sys/fs/smackfs", "./syz-tmp/newroot/sys/fs/smackfs", NULL, bind_mount_flags, NULL) && errno != ENOENT)
+	exit(1);
+	if (mount("/proc/sys/fs/binfmt_misc", "./syz-tmp/newroot/proc/sys/fs/binfmt_misc", NULL, bind_mount_flags, NULL) && errno != ENOENT)
+	exit(1);
+	if (mkdir("./syz-tmp/pivot", 0777))
+	exit(1);
+	if (syscall(SYS_pivot_root, "./syz-tmp", "./syz-tmp/pivot")) {
+		if (chdir("./syz-tmp"))
+	exit(1);
+	} else {
+		if (chdir("/"))
+	exit(1);
+		if (umount2("./pivot", MNT_DETACH))
+	exit(1);
+	}
+	if (chroot("./newroot"))
+	exit(1);
+	if (chdir("/"))
+	exit(1);
+	setup_gadgetfs();
+	setup_binderfs();
+	setup_fusectl();
+}
+
+static void setup_gadgetfs()
+{
+	if (mkdir("/dev/gadgetfs", 0777)) {
+	}
+	if (mount("gadgetfs", "/dev/gadgetfs", "gadgetfs", 0, NULL)) {
+	}
+}
+
+static void setup_fusectl()
+{
+	if (mount(0, "/sys/fs/fuse/connections", "fusectl", 0, 0)) {
+	}
+}
+
+static void setup_binderfs()
+{
+	if (mkdir("/dev/binderfs", 0777)) {
+	}
+	if (mount("binder", "/dev/binderfs", "binder", 0, NULL)) {
+	}
+	if (symlink("/dev/binderfs", "./binderfs")) {
+	}
+}
+
+static void loop();
+
+static void sandbox_common()
+{
+	prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
+	if (getppid() == 1)
+	exit(1);
+	struct rlimit rlim;
+	rlim.rlim_cur = rlim.rlim_max = (200 << 20);
+	setrlimit(RLIMIT_AS, &rlim);
+	rlim.rlim_cur = rlim.rlim_max = 32 << 20;
+	setrlimit(RLIMIT_MEMLOCK, &rlim);
+	rlim.rlim_cur = rlim.rlim_max = 136 << 20;
+	setrlimit(RLIMIT_FSIZE, &rlim);
+	rlim.rlim_cur = rlim.rlim_max = 1 << 20;
+	setrlimit(RLIMIT_STACK, &rlim);
+	rlim.rlim_cur = rlim.rlim_max = 128 << 20;
+	setrlimit(RLIMIT_CORE, &rlim);
+	rlim.rlim_cur = rlim.rlim_max = 256;
+	setrlimit(RLIMIT_NOFILE, &rlim);
+	if (unshare(CLONE_NEWNS)) {
+	}
+	if (mount(NULL, "/", NULL, MS_REC | MS_PRIVATE, NULL)) {
+	}
+	if (unshare(CLONE_NEWIPC)) {
+	}
+	if (unshare(0x02000000)) {
+	}
+	if (unshare(CLONE_NEWUTS)) {
+	}
+	if (unshare(CLONE_SYSVSEM)) {
+	}
+	typedef struct {
+		const char* name;
+		const char* value;
+	} sysctl_t;
+	static const sysctl_t sysctls[] = {
+	    {"/proc/sys/kernel/shmmax", "16777216"},
+	    {"/proc/sys/kernel/shmall", "536870912"},
+	    {"/proc/sys/kernel/shmmni", "1024"},
+	    {"/proc/sys/kernel/msgmax", "8192"},
+	    {"/proc/sys/kernel/msgmni", "1024"},
+	    {"/proc/sys/kernel/msgmnb", "1024"},
+	    {"/proc/sys/kernel/sem", "1024 1048576 500 1024"},
+	};
+	unsigned i;
+	for (i = 0; i < sizeof(sysctls) / sizeof(sysctls[0]); i++)
+		write_file(sysctls[i].name, sysctls[i].value);
+}
+
+static int wait_for_loop(int pid)
+{
+	if (pid < 0)
+	exit(1);
+	int status = 0;
+	while (waitpid(-1, &status, __WALL) != pid) {
+	}
+	return WEXITSTATUS(status);
+}
+
+static void drop_caps(void)
+{
+	struct __user_cap_header_struct cap_hdr = {};
+	struct __user_cap_data_struct cap_data[2] = {};
+	cap_hdr.version = _LINUX_CAPABILITY_VERSION_3;
+	cap_hdr.pid = getpid();
+	if (syscall(SYS_capget, &cap_hdr, &cap_data))
+	exit(1);
+	const int drop = (1 << CAP_SYS_PTRACE) | (1 << CAP_SYS_NICE);
+	cap_data[0].effective &= ~drop;
+	cap_data[0].permitted &= ~drop;
+	cap_data[0].inheritable &= ~drop;
+	if (syscall(SYS_capset, &cap_hdr, &cap_data))
+	exit(1);
+}
+
+static int do_sandbox_none(void)
+{
+	if (unshare(CLONE_NEWPID)) {
+	}
+	int pid = fork();
+	if (pid != 0)
+		return wait_for_loop(pid);
+	initialize_vhci();
+	sandbox_common();
+	drop_caps();
+	if (unshare(CLONE_NEWNET)) {
+	}
+	write_file("/proc/sys/net/ipv4/ping_group_range", "0 65535");
+	sandbox_common_mount_tmpfs();
+	loop();
+	exit(1);
+}
+
+void loop(void)
+{
+		if (write(1, "executing program\n", sizeof("executing program\n") - 1)) {}
+
+}
+int main(void)
+{
+		syscall(__NR_mmap, /*addr=*/0x1ffff000ul, /*len=*/0x1000ul, /*prot=*/0ul, /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+	syscall(__NR_mmap, /*addr=*/0x20000000ul, /*len=*/0x1000000ul, /*prot=PROT_WRITE|PROT_READ|PROT_EXEC*/7ul, /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+	syscall(__NR_mmap, /*addr=*/0x21000000ul, /*len=*/0x1000ul, /*prot=*/0ul, /*flags=MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+	const char* reason;
+	(void)reason;
+			do_sandbox_none();
+	return 0;
+}
