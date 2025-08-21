@@ -1,68 +1,92 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4BE322535
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 13:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498BD13A41F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 13:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755781217; cv=none; b=Fp7+ca6iCjcxkTR48JeGMv0QIWkyG/xHJDTW8x9yE1/vBkQSUbdzeH0pidt8zKz9PUHAgdI+nMa8R4wVgHBW1q77QWVCfZUp6glGdb5KKvTySZI/KeSWb11fGbR3293p3CNir2pJ0dqBv9p+tBrmx+FXThw+fZYuPfck+RariKU=
+	t=1755781474; cv=none; b=R0affE7tZ4bP09LQvdozV7Bt9g0uZSm/LcEZxOrc2EIENIlzNEnNK7jdzW7wWBj8veqaZwG7WkoN0V/2Bn36hjMyArTtrLXTf5UliiScKU7NSHW4lHVeWimp5D9yRl3s3hY+PAZngt0cB8uBwYM6yeJwKpQydnWoTa5LKZ3Y7mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755781217; c=relaxed/simple;
-	bh=p0znKIhiriPva1T4ijztiFnWSdCYaZ70WJEDk7wzmV4=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=brWllq63hEmbox9iSCwaB34KtIWWZGzWR1dRN3pFheXOvBBUqSJM5Cwp2rWQ8yyxwI5C1mMZnakOK6gSqr7Wm5OU9P73oPOJCoqDWThHzu2h87A8z8A332OWNOHKs072usoSsVTb2EXMWTvwTsK+5zbwBcuxoJllbM7Wgbu0Emo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A275644327;
-	Thu, 21 Aug 2025 13:00:13 +0000 (UTC)
-Message-ID: <ad8d173b591d701707107bb98902922583e7d61b.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 0/2] Cable pairing support for DualSense
-From: Bastien Nocera <hadess@hadess.net>
-To: Egor Vorontsov <sdoregor@sdore.me>, linux-bluetooth@vger.kernel.org
-Date: Thu, 21 Aug 2025 15:00:13 +0200
-In-Reply-To: <20250603095617.92785-1-sdoregor@sdore.me>
-References: <20250603095617.92785-1-sdoregor@sdore.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1755781474; c=relaxed/simple;
+	bh=Fg4elSG0+0G8/XXmj3cDgLlbV9Rq7XvLWjm9VMHsuMs=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=UkE4h7Gcp10tO0FDy0djMDMxtG6pOwKKFRRjBWc9teT0Ln0qbPLkSK3Na65fRuoQFx63PX2O6QZ9ZZFwtay3GFX/6d0o1nYzuBzjXt9pkNjhrJb/nNmJ6cz8EBlHeRMB9hfgJ2o/kYdSAPDtbfHQfNNy49jGRO11O9ZTXHDnj7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HcQ7vKRh; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HcQ7vKRh"
+Received: from github.com (hubbernetes-node-00720a3.ash1-iad.github.net [10.56.191.29])
+	by smtp.github.com (Postfix) with ESMTPA id 5F3399211C2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 06:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1755781472;
+	bh=mu2/I/IQxpgTxGtx+tzfL1+f+VPZvLe/d+2sLIRDaRk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=HcQ7vKRhDIZfWZj9+X/bcDlu+4EHWX2yIGqopm/5hTnJrcp0iwc8YHZlt2WmcIVbA
+	 sbNaLdgzjyJ1I8VjNge9Vwj0Y19ELGkf+OwRbFKH0I47cfXd8bCnv78lB7jHNmWvLP
+	 TY7yKVqJwPzpdWp11Im695vdg3vZni2lM/0C29C4=
+Date: Thu, 21 Aug 2025 06:04:32 -0700
+From: hadess <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/994029/000000-2b5b44@github.com>
+Subject: [bluez/bluez] 83fd24: sixaxis: Fix official DualShock 4 controllers
+ not ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduiedufedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhepkffuhffvffgjfhgtgfgfggesthhqredttderjeenucfhrhhomhepuegrshhtihgvnhcupfhotggvrhgruceohhgruggvshhssehhrgguvghsshdrnhgvtheqnecuggftrfgrthhtvghrnhepgedvheevleekveetkeehtdfhgfeltdejtdffkeefieejveeuvdelffegvdejudegnecuffhomhgrihhnpehgvghnthhoohdrohhrghenucfkphepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefpdhhvghloheplgfkrfhvieemvdgrtddumegvfeegmegvtgejfeemtghfvddtmeejudgurgemfegsugemvddtrgelmedufeefngdpmhgrihhlfhhrohhmpehhrgguvghssheshhgruggvshhsrdhnvghtpdhnsggprhgtphhtthhopedvpdhrtghpthhtohepshguohhrvghgohhrsehsughorhgvrdhmvgdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: hadess@hadess.net
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Tue, 2025-06-03 at 12:56 +0300, Egor Vorontsov wrote:
-> I have figured out the DualSense pairing to be pretty similar to that
-> of DualShock 4. Successfully tested with a DualSense, from CLI and
-> via GNOME Control Center.
->=20
-> As a side discussion, don't we also have to add the DS4 constant
-> at L398 (that's with this patch) for it to be supported as well?
-> An article at Gentoo Wiki [1] suggests that DS4 pairing cannot
-> currently be done the cable way. I don't currently have a way to
-> verify this myself, though.
->=20
-> [1]: https://wiki.gentoo.org/wiki/Sony_DualShock#DualShock_4
+  Branch: refs/heads/994029
+  Home:   https://github.com/bluez/bluez
+  Commit: 83fd243a298a80158dfd28fd69a90b3bb7851f24
+      https://github.com/bluez/bluez/commit/83fd243a298a80158dfd28fd69a90b3bb7851f24
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-08-21 (Thu, 21 Aug 2025)
 
-My guess is that the DS4 cable-pairing support stopped working when the
-kernel migrated from hid-sony to hid-playstation (and devices changed
-names...).
+  Changed paths:
+    M profiles/input/sixaxis.h
 
-I sent patches which fix that in my local testing.
+  Log Message:
+  -----------
+  sixaxis: Fix official DualShock 4 controllers not being handled
 
->=20
-> Egor Vorontsov (2):
-> =C2=A0 profiles/input: Add cable pairing constants for DualSense
-> =C2=A0 plugins/sixaxis: Implement cable pairing for DualSense
->=20
-> =C2=A0plugins/sixaxis.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 107
-> +++++++++++++++++++++++++++++++++++++--
-> =C2=A0profiles/input/server.c=C2=A0 |=C2=A0=C2=A0 3 +-
-> =C2=A0profiles/input/sixaxis.h |=C2=A0 25 +++++++++
-> =C2=A03 files changed, 131 insertions(+), 4 deletions(-)
+The devices changed names, and those do not match the expected name in
+our list. Ignore the "Vendor" portion of the device name before matching
+it.
+
+This is most likely the result of official DS4 controllers now being
+handled by the hid-playstation driver rather than the
+community-supported hid-sony.
+
+This fixes DS4 controllers not initiating cable pairing when turned on.
+
+
+  Commit: 2b5b44966443174951112e208fcdae5880e6547d
+      https://github.com/bluez/bluez/commit/2b5b44966443174951112e208fcdae5880e6547d
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2025-08-21 (Thu, 21 Aug 2025)
+
+  Changed paths:
+    M plugins/sixaxis.c
+
+  Log Message:
+  -----------
+  sixaxis: Initiate pairing for all cable pairing devices
+
+Fix the cable pairing not being triggered on DualShock 4 controllers.
+
+Note that this still requires an authorisation when connecting through
+Bluetooth the first time as we're not exchanging linkkeys. Sixaxis/PS3
+controllers aren't paired, so don't have that problem.
+
+
+Compare: https://github.com/bluez/bluez/compare/83fd243a298a%5E...2b5b44966443
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
