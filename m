@@ -1,48 +1,140 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA572E3718
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 17:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DFD277C8D;
+	Thu, 21 Aug 2025 18:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755797778; cv=none; b=OblyHJyu8nAtVzDTD8hOE55REcgpnHlk2TINNcvf9Dt3qgmspYOMECL4teyPP4yTtezpYuDVossFnV1ecu2Md0R6hGlTOv+fJpNIeagegjg4nk+X8cptOcBjnc6vJUsAfN8KXRD5Izl8EQjYKHkuCDROKCCBi+eInXZtWv6x6Ng=
+	t=1755802325; cv=none; b=hVqLTz1N0WJiyvjBlVop/yO/sVVQ8zc/dTHdSfNwKKJR7bzgLd0QDMy+fsuKUfLYPQnAq0HrpKNeKTu8i5SyCTjX1BCCkShfxzWQ6t6/2vE/Dks5gclyMRavPUlIuhA3Mo/RQI0EC+NtJYLjtEUXxrjtkhYlimuoNLGOTVfGaKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755797778; c=relaxed/simple;
-	bh=1haLGdJ3XDpzve+q2AxGd601lv0vmporu6YixwDBgtM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=KXOSVddgPm26briR0lstmppCD6K9bY1brKp/bXOT9Zwsfr+1iTx0kElFu9yOEL+OqQpNdDBc1INk7+KvadPcoBiftoUoX/pDnz4fLLxj/kPY9g/J2B3uu0WN1EvpG3uU89MhhkCCyZhWyU8jxdEoBYi7q7Da7OUtQoVKYzQFh+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=NEDphFQJ; arc=none smtp.client-ip=192.30.252.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="NEDphFQJ"
-Received: from github.com (hubbernetes-node-34c8121.va3-iad.github.net [10.48.143.35])
-	by smtp.github.com (Postfix) with ESMTPA id CEE368C0398
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 10:36:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1755797775;
-	bh=op/BS8TvfjjfUEkUDW10JIshm9LJrzCVG51m0ZF7djM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=NEDphFQJtw+CN/21QTtaZc3ijWtzBGWkFrCCMGF1T3tBzjea2XsLBSAOuX7jyzb0j
-	 v4Qe6chVumwSsQt04dzzRWqazEv8bPw1ugAURhxiDk7fN8EZ6xzIlQZbCRr2auDnUi
-	 aoryNZTpPHYFnU+ARfoxIvTuiEfoAVV6eA5sAW20=
-Date: Thu, 21 Aug 2025 10:36:15 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/993547/f47078-000000@github.com>
-Subject: [bluez/bluez]
+	s=arc-20240116; t=1755802325; c=relaxed/simple;
+	bh=X6QcagUhfF69pliuFAqHEuOqwjnHLuM9ux9ZugDQwlc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A2WC6Y8jS1mr2wsvFzz1ANi0hex8kpaU7el83doMSjxnncnZW2IIF8BjW2UnS9yeN7nDozMfqldQoHam1DuALHFAN1i4kWNlUtjI+HwvEkKyS6fvDpHEMVryIjVZO6vAMKt0TSpt+Q6Od3LQjR75fwj/SO89nlHk18+Piex1rfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.5] (ip5f5af188.dynamic.kabel-deutschland.de [95.90.241.136])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8F40061E647B3;
+	Thu, 21 Aug 2025 20:51:05 +0200 (CEST)
+Message-ID: <49c37b61-937d-449c-b7f1-27704a8a325e@molgen.mpg.de>
+Date: Thu, 21 Aug 2025 20:51:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: fix set_local_name race condition
+To: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, brian.gix@intel.com,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel@salutedevices.com
+References: <20250821160747.1423191-1-pashpakovskii@salutedevices.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250821160747.1423191-1-pashpakovskii@salutedevices.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/993547
-  Home:   https://github.com/bluez/bluez
+Dear Pavel,
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+
+Thank you for the patch. Some minor style comments below.
+
+Am 21.08.25 um 18:07 schrieb Pavel Shpakovskiy:
+> Function set_name_sync() uses hdev->dev_name field to send
+> HCI_OP_WRITE_LOCAL_NAME command, but copying from data to
+> hdev->dev_name is called after mgmt cmd was queued, so it
+> is possible when function set_name_sync() will read old name
+
+… is possible *that* function …?
+
+> value.
+> 
+> This change adds name as a parameter for function
+> hci_update_name_sync() to avoid race condition.
+
+(Using 75 characters per line would save some lines.)
+
+> Fixes: 6f6ff38a1e14 ("Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME")
+> Signed-off-by: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
+> ---
+>   include/net/bluetooth/hci_sync.h | 2 +-
+>   net/bluetooth/hci_sync.c         | 6 +++---
+>   net/bluetooth/mgmt.c             | 5 ++++-
+>   3 files changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+> index 72558c826aa1b..eef12830eaec9 100644
+> --- a/include/net/bluetooth/hci_sync.h
+> +++ b/include/net/bluetooth/hci_sync.h
+> @@ -93,7 +93,7 @@ int hci_update_class_sync(struct hci_dev *hdev);
+>   
+>   int hci_update_eir_sync(struct hci_dev *hdev);
+>   int hci_update_class_sync(struct hci_dev *hdev);
+> -int hci_update_name_sync(struct hci_dev *hdev);
+> +int hci_update_name_sync(struct hci_dev *hdev, const u8 *name);
+>   int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode);
+>   
+>   int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index e56b1cbedab90..c2a6469e81cdf 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -3412,13 +3412,13 @@ int hci_update_scan_sync(struct hci_dev *hdev)
+>   	return hci_write_scan_enable_sync(hdev, scan);
+>   }
+>   
+> -int hci_update_name_sync(struct hci_dev *hdev)
+> +int hci_update_name_sync(struct hci_dev *hdev, const u8 *name)
+>   {
+>   	struct hci_cp_write_local_name cp;
+>   
+>   	memset(&cp, 0, sizeof(cp));
+>   
+> -	memcpy(cp.name, hdev->dev_name, sizeof(cp.name));
+> +	memcpy(cp.name, name, sizeof(cp.name));
+>   
+>   	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_LOCAL_NAME,
+>   					    sizeof(cp), &cp,
+> @@ -3471,7 +3471,7 @@ int hci_powered_update_sync(struct hci_dev *hdev)
+>   			hci_write_fast_connectable_sync(hdev, false);
+>   		hci_update_scan_sync(hdev);
+>   		hci_update_class_sync(hdev);
+> -		hci_update_name_sync(hdev);
+> +		hci_update_name_sync(hdev, hdev->dev_name);
+>   		hci_update_eir_sync(hdev);
+>   	}
+>   
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 46b22708dfbd2..da662e1823ae5 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3876,8 +3876,11 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
+>   
+>   static int set_name_sync(struct hci_dev *hdev, void *data)
+>   {
+> +	struct mgmt_pending_cmd *cmd = data;
+> +	struct mgmt_cp_set_local_name *cp = cmd->param;
+> +
+>   	if (lmp_bredr_capable(hdev)) {
+> -		hci_update_name_sync(hdev);
+> +		hci_update_name_sync(hdev, cp->name);
+>   		hci_update_eir_sync(hdev);
+>   	}
+>   
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
