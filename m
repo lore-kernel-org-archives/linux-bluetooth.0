@@ -1,140 +1,128 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from protect.koston.org (protect.koston.org [64.227.100.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DFD277C8D;
-	Thu, 21 Aug 2025 18:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934AE35334B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 20:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.227.100.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755802325; cv=none; b=hVqLTz1N0WJiyvjBlVop/yO/sVVQ8zc/dTHdSfNwKKJR7bzgLd0QDMy+fsuKUfLYPQnAq0HrpKNeKTu8i5SyCTjX1BCCkShfxzWQ6t6/2vE/Dks5gclyMRavPUlIuhA3Mo/RQI0EC+NtJYLjtEUXxrjtkhYlimuoNLGOTVfGaKI=
+	t=1755807815; cv=none; b=bP3FzcdSBizWgGLRKVcNozb4o6IEb/IomxiEhkWycSZS5i72o/HgpqCoytARmY88ZvSmY2/COG+K5VLCvwq7/vCwOMNfcTh9Gxk+Yr4/FrKa+0vUSqovx/PpbIITbSrxBpjx9GhWsQIysAOMc+0qmPlN/krqm9wJw+KbPkjYTIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755802325; c=relaxed/simple;
-	bh=X6QcagUhfF69pliuFAqHEuOqwjnHLuM9ux9ZugDQwlc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A2WC6Y8jS1mr2wsvFzz1ANi0hex8kpaU7el83doMSjxnncnZW2IIF8BjW2UnS9yeN7nDozMfqldQoHam1DuALHFAN1i4kWNlUtjI+HwvEkKyS6fvDpHEMVryIjVZO6vAMKt0TSpt+Q6Od3LQjR75fwj/SO89nlHk18+Piex1rfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.5] (ip5f5af188.dynamic.kabel-deutschland.de [95.90.241.136])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8F40061E647B3;
-	Thu, 21 Aug 2025 20:51:05 +0200 (CEST)
-Message-ID: <49c37b61-937d-449c-b7f1-27704a8a325e@molgen.mpg.de>
-Date: Thu, 21 Aug 2025 20:51:04 +0200
+	s=arc-20240116; t=1755807815; c=relaxed/simple;
+	bh=eVYMZxh6w7DnBCMZNbrBRiyLPfopYOawmkZP6P1+EM0=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=C/E+tbVHURaEgfrvzolwmSTL5N3h02wI1XQofAUHnuYysMZnSOcPtxxBW+feDzJbsWoiUY0uBoGVeknfD/HJV3awBOoSnWFCBMRg1YiWkbvkEDamRPIXAKxahsBX/KOwgB6SjIE7iKdZvEBf2o7us+a4uW5WRjRtMIO9+28rcGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=koston.org; spf=pass smtp.mailfrom=koston.org; dkim=pass (2048-bit key) header.d=koston.org header.i=@koston.org header.b=FyZzwbjU; arc=none smtp.client-ip=64.227.100.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=koston.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=koston.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=koston.org header.i=@koston.org header.b="FyZzwbjU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=koston.org;
+	s=default; h=To:Cc:Date:Message-Id:Subject:Mime-Version:
+	Content-Transfer-Encoding:Content-Type:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GydwSuDpT8rYy2jmR3q6XWLnMde+QrZ27G5Lcsnjr4U=; b=FyZzwbjUFGojZe7IFJIGkwf3lR
+	SyGy7i08e8YNWq3hr7LZlt1B5BDyzpt92L7mw4kq31xGfsAxLFmoyHVzWlQCliP5dpUOOPrg4agyR
+	LdKCOWBzGBuMgIUnygNZch5EXTaRK8Y+S7qhH6/nuwEduuIYT4uVugtDLskpLtQ2zRseEOFyDVydV
+	VEJxn707nmO8Z4hRnM5EbtVNOpqejrsZHAs4Wlz1kBT2J+QiA9qST/8ZMgMNzJQGIHyGy8haSqnJe
+	UtklzK3PC5Jisb/86nMe95vhtrCFHyiHGKNPe5fyV2+Gg9gtNBqlndoeDIp36QsRSOJxXFKT8SXKp
+	heC3aEtQ==;
+Received: from 108-87-95-24.lightspeed.hstntx.sbcglobal.net ([108.87.95.24]:53193 helo=smtpclient.apple)
+	by protect.koston.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <nick@koston.org>)
+	id 1upBjd-00000002XX7-0FuG;
+	Thu, 21 Aug 2025 20:18:07 +0000
+From: "J. Nick Koston" <nick@koston.org>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: fix set_local_name race condition
-To: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, brian.gix@intel.com,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@salutedevices.com
-References: <20250821160747.1423191-1-pashpakovskii@salutedevices.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250821160747.1423191-1-pashpakovskii@salutedevices.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: [PATCH BlueZ] device: Fix device removal on
+ le-connection-abort-by-local
+Message-Id: <6C943D79-4B06-49E8-82C2-EC23F903F91A@koston.org>
+Date: Thu, 21 Aug 2025 15:17:56 -0500
+Cc: luiz.dentz@gmail.com
+To: linux-bluetooth@vger.kernel.org
+X-Mailer: Apple Mail (2.3826.700.81)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - protect.koston.org
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [0 0]
+X-AntiAbuse: Sender Address Domain - koston.org
+X-Get-Message-Sender-Via: protect.koston.org: authenticated_id: nick@koston.org
+X-Authenticated-Sender: protect.koston.org: nick@koston.org
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Dear Pavel,
+=46rom fe7e071643a8de84bdc4079551cc0065890c0cbb Mon Sep 17 00:00:00 2001
+From: "J. Nick Koston" <nick@koston.org>
+Date: Thu, 21 Aug 2025 15:12:39 -0500
+Subject: [PATCH] device: Fix device removal on =
+le-connection-abort-by-local
 
+When a LE connection fails with le-connection-abort-by-local, temporary
+devices are incorrectly removed from D-Bus, preventing clients from
+retrying the connection.
 
-Thank you for the patch. Some minor style comments below.
+The issue occurs when:
+1. A connection attempt fails with ECONNABORTED (including the
+   le-connection-abort-by-local case)
+2. The device is added to the connect list for automatic retry
+3. The temporary timer (30s by default) is not restarted
+4. If the timer expires before the retry completes, the device is
+   removed from D-Bus
+5. Subsequent retry attempts fail with "device not found"
 
-Am 21.08.25 um 18:07 schrieb Pavel Shpakovskiy:
-> Function set_name_sync() uses hdev->dev_name field to send
-> HCI_OP_WRITE_LOCAL_NAME command, but copying from data to
-> hdev->dev_name is called after mgmt cmd was queued, so it
-> is possible when function set_name_sync() will read old name
+This commonly happens with devices that abort connections during
+pairing or when incomplete GATT discovery triggers an abort.
 
-… is possible *that* function …?
+The fix restarts the temporary timer when ECONNABORTED occurs, ensuring
+the device remains available on D-Bus for the retry attempt. This
+matches the behavior when new connection attempts are initiated, where
+the timer is restarted to allow time for connection/pairing to complete.
 
-> value.
-> 
-> This change adds name as a parameter for function
-> hci_update_name_sync() to avoid race condition.
+Reproducer logs show:
+- 14:19:37.374 - le-connection-abort-by-local, retry queued
+- 14:19:56.343 - Device removed from D-Bus (~19s later)
+- 14:19:56.606 - Retry fails: device not found on D-Bus
 
-(Using 75 characters per line would save some lines.)
+With this fix, the device remains available for the retry, allowing
+the connection to succeed on subsequent attempts.
 
-> Fixes: 6f6ff38a1e14 ("Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME")
-> Signed-off-by: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
-> ---
->   include/net/bluetooth/hci_sync.h | 2 +-
->   net/bluetooth/hci_sync.c         | 6 +++---
->   net/bluetooth/mgmt.c             | 5 ++++-
->   3 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-> index 72558c826aa1b..eef12830eaec9 100644
-> --- a/include/net/bluetooth/hci_sync.h
-> +++ b/include/net/bluetooth/hci_sync.h
-> @@ -93,7 +93,7 @@ int hci_update_class_sync(struct hci_dev *hdev);
->   
->   int hci_update_eir_sync(struct hci_dev *hdev);
->   int hci_update_class_sync(struct hci_dev *hdev);
-> -int hci_update_name_sync(struct hci_dev *hdev);
-> +int hci_update_name_sync(struct hci_dev *hdev, const u8 *name);
->   int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode);
->   
->   int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index e56b1cbedab90..c2a6469e81cdf 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -3412,13 +3412,13 @@ int hci_update_scan_sync(struct hci_dev *hdev)
->   	return hci_write_scan_enable_sync(hdev, scan);
->   }
->   
-> -int hci_update_name_sync(struct hci_dev *hdev)
-> +int hci_update_name_sync(struct hci_dev *hdev, const u8 *name)
->   {
->   	struct hci_cp_write_local_name cp;
->   
->   	memset(&cp, 0, sizeof(cp));
->   
-> -	memcpy(cp.name, hdev->dev_name, sizeof(cp.name));
-> +	memcpy(cp.name, name, sizeof(cp.name));
->   
->   	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_LOCAL_NAME,
->   					    sizeof(cp), &cp,
-> @@ -3471,7 +3471,7 @@ int hci_powered_update_sync(struct hci_dev *hdev)
->   			hci_write_fast_connectable_sync(hdev, false);
->   		hci_update_scan_sync(hdev);
->   		hci_update_class_sync(hdev);
-> -		hci_update_name_sync(hdev);
-> +		hci_update_name_sync(hdev, hdev->dev_name);
->   		hci_update_eir_sync(hdev);
->   	}
->   
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 46b22708dfbd2..da662e1823ae5 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3876,8 +3876,11 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
->   
->   static int set_name_sync(struct hci_dev *hdev, void *data)
->   {
-> +	struct mgmt_pending_cmd *cmd = data;
-> +	struct mgmt_cp_set_local_name *cp = cmd->param;
-> +
->   	if (lmp_bredr_capable(hdev)) {
-> -		hci_update_name_sync(hdev);
-> +		hci_update_name_sync(hdev, cp->name);
->   		hci_update_eir_sync(hdev);
->   	}
->   
+Fixes: https://github.com/bluez/bluez/issues/1489
+Signed-off-by: J. Nick Koston <nick@koston.org>
+---
+ src/device.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+diff --git a/src/device.c b/src/device.c
+index 0179c3dab..28803af38 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6271,8 +6271,12 @@ static void att_connect_cb(GIOChannel *io, GError =
+*gerr, gpointer user_data)
+ 	if (gerr) {
+ 		DBG("%s", gerr->message);
+=20
+-		if (g_error_matches(gerr, BT_IO_ERROR, ECONNABORTED))
++		if (g_error_matches(gerr, BT_IO_ERROR, ECONNABORTED)) {
++			/* Restart temporary timer to prevent device =
+removal */
++			if (device->temporary)
++				set_temporary_timer(device, =
+btd_opts.tmpto);
+ 			goto done;
++		}
+=20
+ 		if (device_get_auto_connect(device)) {
+ 			DBG("Enabling automatic connections");
+--=20
+2.39.3 (Apple Git-145)
 
-
-Kind regards,
-
-Paul
