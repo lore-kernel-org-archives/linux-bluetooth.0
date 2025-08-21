@@ -1,110 +1,65 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B2C2EC546
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 13:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D026215E5DC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 13:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755784049; cv=none; b=fbQ7xTdeVwXu+e23riRSauVxefKFkbYXsIiPSTJjR6UO5I+InC12K92yaH7SJ2MTP6W+nFiozHx1Y5o3GMa6Id3gDSKzrv4hWUW5rLeSYNgsjC8pwGS91gYNvJVwYgnFYFabjFGVXXQIVZX1TQyJtDEzBZ6ZNKXPTjhCVzPEW04=
+	t=1755784168; cv=none; b=fwFTMcpBqqSuVMFtp+x/Og1EQf7BuScpCFBKlYyGTWzWOo8zhXt9Kju0wgACA6ZQc5EFC+ZPo+0umB4DQO3a/pmI6gJO8I1YrALU/7t0jTnDSUpuqSFBLMGZAhdjlb+gguVR7dwjuXaQkHIYBQO2v4T843TetAXqbGiuZj9xuQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755784049; c=relaxed/simple;
-	bh=NFRuNF1cm67+To8ZpQQQLiZLHWPG+qppOP/UfjRvYE4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=TqzhL0CEXyV7mWSLKjB46syX6sk4c8dDAmYOYrerqSwH+/DnkuEBGJN2iC7MIFI5xIi9opTR14oXXS/6POyZ02/DYIxIejqs9sjyc8S+iBMDzev10AbrQMHPvvpQcwMFURp5crgTs72M6mpqGjvgaVeXrwPjo85yYy+5Qn+HGGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jAiNPc/b; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755784168; c=relaxed/simple;
+	bh=XeeZn2HrwI8gOFisKoKZ+xguw509MZHyuIe20nCkfpI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Gfqul+VKWd0V5IksE5uErswj43uWH8Xfi+wi+6SiM5StCxvcA/cDgImlXG2X5ccakqlC8R6NUX5Qjs3j9mvHRzGC4iToiiusHUC1PSpllROcalDf+ZJt6jJdLdEIFK+qayfA5pWVF8kgI9zFxvuSnxaOZWyPavrOICtKcoxyYcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=K6i7at8Q; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jAiNPc/b"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-53b17552198so346699e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 06:47:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755784046; x=1756388846; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=P+aaI1tuoNCrilCnn2lOXfOE8OZfMFQ/64T2ujbfwOM=;
-        b=jAiNPc/b4eerZUxrqG9dX/gvgQ8/2R1dbuM1vJkvurDwPEvyZ8SlYW9OVycdqzdRB2
-         +G9DYoo5gTXKEVT60XAkyC5DNI1Oy468cM2bACNCSOHIwvQOSxsFznVRXbAfLfDIueRr
-         MsGVzloiiBopT7GTxR/mDOGsH4lLzrtbEtz2Regdhcl1nFuFvw2rXlqIAiPp5Ad40ejC
-         Q3bJhHwjRvuYaHCcIVyxsgBwS5WCYRnxvFBn8oKUbSzBHYVys5ZAJSGowq4pKHtuZReX
-         cJgtuKwzMIq2gzZBRypRSocW5xEylurNj7qcdomY4MzP7lCYcRiDgGfXcv6zLesExfD4
-         DKqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755784046; x=1756388846;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P+aaI1tuoNCrilCnn2lOXfOE8OZfMFQ/64T2ujbfwOM=;
-        b=QdbeMLFS78hXz//dExXmEKlxQdObzRbgs1qVVzvviI4JNft1DKKsvcODg92srcG9tZ
-         iWqksrIYIx59F5pv/h58Gn2fU2024aHvFNf3oPh3YW4EdSVx3pjzYl1YSLQyiSPQGt6d
-         tyAdDK3L4iZy/fWGiNO6Ips06N7XDiz84oiP/ZtL0Zp6jTj/CYCIpXtbRZrwsLyBbZyi
-         daAjGfLgROCi5QzeMln6pvF5hIe/eSLcvdtup50xZLkni9DJ5i+T1ecKCrMQ6EkHKQGi
-         3CZtmvrAVfXhOh0QRVkwf1UogzJ/dac2Pajg9mhAZQYfBLdyt+kOKj2fjOHokkBM6kjM
-         tLiQ==
-X-Gm-Message-State: AOJu0YyGR2NkIV2GDMlt2/yZKF8Aal8/aI1Z8xcHXyUXCBsooj3NhaPr
-	/4v30tIr9Zmwt/C+Qyxgqj2icPqq3jSY0SSJVV9x+0ruTXVjJkxvCsioB9fT5RQJ
-X-Gm-Gg: ASbGnctO+W+gj1Hhz+0R9dEfsCLjRKgkaoSXxCQL643urZvQ+zIt2bpkBs5cD2SAjl4
-	YpRO1wd/UCY5RtI8th4swSOCxKwgaskPUed1Z8AZ4s1BYii22SAvmEEWSFDdFvDBadC9YROIwqx
-	p2YQDMbt1gY/jMAy2TTOzhUvf37mYIFDPmieLMAcnFZg91MJWFGgWNIiwTgTKnB126dfCUNfASo
-	R0/XCOi6rIpixVnST0YfPKNiNyUwOMnq9zw9/GyhgkdSK3MgUSJV57yneOX0xN1NIGTlz6tTuUE
-	leG7vy0LdkZjA1+fc/VBMviOX/nOe7rWtI55Ve0qJsu8zCO7Iy85yrtVPV5joxQF6vsZdKcTiuA
-	iV0OIIpPpXlrb8eIvUcytVMJXYVY4y1vZyRVlxT+PfdBPqwUWbFYroZdQAXq71uX1
-X-Google-Smtp-Source: AGHT+IFlCdVp6/XNY0dXbwKMg4G70NbKI8m5bNbSkJz3KIVvJh2a0U4CfERJwLhBR3UO4revw9fekg==
-X-Received: by 2002:a05:6122:1d0e:b0:535:aea0:7a2f with SMTP id 71dfb90a1353d-53c7d844a00mr755620e0c.4.1755784045974;
-        Thu, 21 Aug 2025 06:47:25 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2bed9fd5sm3732434e0c.18.2025.08.21.06.47.23
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 06:47:23 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="K6i7at8Q"
+Received: from github.com (hubbernetes-node-22889b5.ac4-iad.github.net [10.52.135.25])
+	by smtp.github.com (Postfix) with ESMTPA id DB37F701263
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 06:49:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1755784165;
+	bh=orerpFLYP8RQ+XNQ6VOpCQG14kPZMTwH8AE4nfDQ1C0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=K6i7at8QLqbh/4R/TA47YlPy+jw83f+txorvUGD1lLYFMwu2rPUGOzZuadwnUdvGN
+	 2xIMLRX2vj+gcV/HO9y89DqLV86+QqImQxX5ND8DvzrmQhniiwbzKaFEn/AU8+uv+X
+	 NAs6IB8azTyeqKnqHn/gaJSu93OwW1WFsRVdPjgY=
+Date: Thu, 21 Aug 2025 06:49:25 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_event: Detect if HCI_EV_NUM_COMP_PKTS is unbalanced
-Date: Thu, 21 Aug 2025 09:47:14 -0400
-Message-ID: <20250821134714.2032684-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.50.1
+Message-ID: <bluez/bluez/push/refs/heads/master/ed2da1-5f38ea@github.com>
+Subject: [bluez/bluez] 5f38ea: adapter: Fix setting index in
+ MGMT_OP_SET_EXP_FEAT...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5f38ea159ea8d1ef2967ef1e545a3a0bd5ac92b3
+      https://github.com/bluez/bluez/commit/5f38ea159ea8d1ef2967ef1e545a3a0bd5ac92b3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2025-08-20 (Wed, 20 Aug 2025)
 
-This attempts to detect if HCI_EV_NUM_COMP_PKTS contain an unbalanced
-(more than currently considered outstanding) number of packets otherwise
-it could cause the hcon->sent to underflow and loop around breaking the
-tracking of the outstanding packets pending acknowledgment.
+  Changed paths:
+    M src/adapter.c
 
-Fixes: f42809185896 ("Bluetooth: Simplify num_comp_pkts_evt function")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_event.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+  Log Message:
+  -----------
+  adapter: Fix setting index in MGMT_OP_SET_EXP_FEATURE with debug_uuid
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 512041c68062..dc946c5b59d8 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4414,7 +4414,17 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 		if (!conn)
- 			continue;
- 
--		conn->sent -= count;
-+		/* Check if there is really enough packets outstanding before
-+		 * attempting to decrease the sent counter otherwise it could
-+		 * underflow..
-+		 */
-+		if (conn->sent >= count) {
-+			conn->sent -= count;
-+		} else {
-+			bt_dev_warn(hdev, "hcon %p sent %u < count %u",
-+				    conn, conn->sent, count);
-+			conn->sent = 0;
-+		}
- 
- 		for (i = 0; i < count; ++i)
- 			hci_conn_tx_dequeue(conn);
--- 
-2.50.1
+Experimental debug feature requires use of MGMT_INDEX_NONE since it is
+not an adapter specific feature.
 
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
