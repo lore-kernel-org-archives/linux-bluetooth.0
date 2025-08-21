@@ -1,86 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F112E27EFFE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 14:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951062EC56F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 15:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755786563; cv=none; b=kS8+R5XJxHU1QZOjkfP3SihEA02R1gDAQtWIV9Fc83Un6F0fhvoktad+fC3pQWGR6EgrTp3KKEoFUW7ahU3kRYfiUlHT0L5PUnEPiFXyqXUQmsO5RNvx+wlAZSL9dx/KKIqXTAn7ymjGx+XosZ2eoNsf8X6rW/RzFpYBhOTkJhU=
+	t=1755788646; cv=none; b=onowXctSr4QRu8Ksy9kM3KL60oWG2smc0BQnq6o0OK6UKBdr73q1rxi8VG1gddOdisctPUZDfu7Er0qXq/HrN1T6i3QrJ/oLhnSTyDVuY7NYWn9HWTR93NRAqVol8ZnaLvDuJkjXBDpsH+vOMx6EfzDuB6oElfFrC+ootVvPVcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755786563; c=relaxed/simple;
-	bh=UNk09SsSmkwg/5xxsHGZmAXGcN3m2/87Ya0XGGzE8rE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FfbsFV4AUMB5ZsZ3yaYn25jjG7X18l7UjoJW5sBina+Q9/YEW7uJZk4mxMDUesS+MQl7Rp9xwFoaWplodhuey5JPmTJ5nZORu2aENY3kvJvAJbLFbpnMdpuH3PwUlTCCWsKnfQi1r7S3AtSuWFaOcNWKfydkNlXxP+YJMFTMl+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RinXyA+U; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755788646; c=relaxed/simple;
+	bh=YVaqtFN/nZzqAsYrkLvppdOyawjFUZAa2QCLJsDb2pU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BzA/Ty208Y5JtCASpninZD5MAEqfaIzD4QUycCpZcTQGiD8Gvoxfl2cIVkAetfSpxP7+BmQiUAcftIYhrj28r/fh+ElknkQUk8SDrWKf+eFvHrT23MGmWk49PFVemNLRknTjYFHmIj8wp7XdhrdTLuvq8FjqOkCKT7XuPLuvtLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CafZWm0F; arc=none smtp.client-ip=209.85.160.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RinXyA+U"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 802D7C4CEF4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 14:29:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755786562;
-	bh=UNk09SsSmkwg/5xxsHGZmAXGcN3m2/87Ya0XGGzE8rE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=RinXyA+Unyq+IX15J6GH8LJ7hyC6S5HBs6+UMvvMCqv0Qblehn+5uUPFoe6Am5iNJ
-	 r88YWAW7YcdfKEjHPIf4kYok7B45wwJvFYu5RVDLUtpRDIv0lSzabwlO1uXShIYBnk
-	 Ms52H0LoSv2iWWspo/jvBjd7HtRHNf9ZvCGYakLnmLh8SUqkv6US8+1X2BRM80OI53
-	 vG6dUthVDP1jPyIooGbaLdDovN7DJr1CATpeYKRO5g7FIq3zLfuUzDljKGjw/JB/9l
-	 7l8eEpEj+6I0wubTJC7Ydm+Mm0NczXvix7oBN5o2NgFP9GYg4/he1kawuMriOUeZ1+
-	 /CIJ/NaLuRwJA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 765F7C53BBF; Thu, 21 Aug 2025 14:29:22 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CafZWm0F"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-30cb38a9247so1511415fac.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 08:04:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755788643; x=1756393443; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=icAIricTM8eLM85bBeMZUr5sFn375tlr0DmefROumeo=;
+        b=CafZWm0Fz4r8TZWwacknPXQlWq0M6ExSabtIXpX5pEdN6fUM/892XDcB0RFpOpKSBr
+         Q7L/igKD/HhTr6tvfJCAzSdhDMP/hcmZz0EDMHAAG4Ua62fmoWtcb9kt4RbrpLb+3/tR
+         NOP0LVnWX76xUuVwJ8QejGnPoboIr6yMZhOS8aLB/xlYQJquIueryBoIx9G9ZheczEjd
+         mhiNcP175kHKkvdtV9L2ot3U/3PbXlw3g6LJ6KAoUMFEqMAGRquiKE0QJgwf2oNsd+YS
+         JLbwYL4WAw45EPiXJfk1KuyxGf6tEHnoe3TnQokei9mkuMaJUbhHXGZoXd73BMekcJFH
+         1dog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755788643; x=1756393443;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=icAIricTM8eLM85bBeMZUr5sFn375tlr0DmefROumeo=;
+        b=hNp/2ihln+Nx+lfrvnPZGl6nMCKKq7egmKxUvsMRlE/hWVGpn440C+C3aAZf7qXAOs
+         qeJdlni8X6s567KQr3hg7dpu49PS3LroKfbeMG2uuvQc0oBDEf1unXUcVAeIFD38HRZ0
+         mF6//4cB8YqwdLWfw5D2Na/itjlgLhEABUbLNWfHWhdbNyoASot+oKyDPdoB5Tb+bKCl
+         omkjTXSAGWm4H4zt8y26OBmij7Eb9td3tUY0TYaHDGyZ+bnVFuMMSkhQLKhgGL4Dj3C8
+         kM6fDyF2c/CjGanR+i3X2ksOSXizkZVXfwxsXQr9gDdeC64s3poup2/AZzDdkWSyfyEk
+         5qmQ==
+X-Gm-Message-State: AOJu0YxkliurvqpdI+kdidgiCjhPuSju7y7zUXaHSdJTmPswb7qlZELf
+	i9w+Z1OFzmGNNopJkE9dFyJ8fvRlyc8y2qCaeG35u2Mlgbh74xl/RWmISzSvQBV0
+X-Gm-Gg: ASbGncsvN8IukdBJQcYV8h421pCxrAuhlmkXS/F0AOdtRze6w9+hbEhjuNrDudAj0WG
+	RdB0N1RCzM65BfCkOIgG6xmzDSNUC0A1grzxUUO5nQcFudl6apaVPyjU+Iv9ZFE48yU9bPgD+G5
+	zHVvDYcR/wzCNWr0QaDQ/e+hMmVvmbwro+ZobUbu4N+vJemtlaV5S5lQxG0GmqXCYYxWTlxhyqA
+	Mn+FhpncV50QmrJf8Y9/pQa4OkW5HuVGD9GTamL38jBECfXyyBnTYF/88eM0Bjmaa5Ul3EwdQT4
+	tY5ZY+yaZrubXvG+5FGPlXzoJeK27U1QS/CzB1tOcEMPfEcd7eWHGiQmXHg+a54xSPyh/9HEXfl
+	LCG21d67pJvoRzNur8bQ4zP1mvJsPGa6FSSm3Lp9c2ujK46gWW+N7bFCmyn5jPiiFhOpi/TNM3U
+	Y=
+X-Google-Smtp-Source: AGHT+IFglcverMY4MksQApaGtuT8rO60zCcbQcapR4bTd5LO3USlb2afprnF1HCwwzWUyZZXmoy0fw==
+X-Received: by 2002:a05:6808:2213:b0:434:b43:d4a3 with SMTP id 5614622812f47-4377daf9cf2mr1166913b6e.12.1755788642734;
+        Thu, 21 Aug 2025 08:04:02 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8920dd0c67csm791666241.10.2025.08.21.08.04.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 08:04:01 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220341] Bluetooth crashes about 30-40 minutes after I connect
- my headphones:  "Bluetooth: hci0: Hardware error 0x0a"
-Date: Thu, 21 Aug 2025 14:29:22 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: martin@hignett.net
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-220341-62941-ygwtLl8qL9@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220341-62941@https.bugzilla.kernel.org/>
-References: <bug-220341-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ v1] monitor: Print message if the frame information cannot be found
+Date: Thu, 21 Aug 2025 11:03:52 -0400
+Message-ID: <20250821150352.2043419-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220341
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Martin Hignett (martin@hignett.net) changed:
+While processing Number of Packeted Completed event the code attempts to
+print the frame information of each frame being acked but if no frame
+was sent it didn't print anything, so this changes it to print
+:#(frame not found)
+---
+ monitor/packet.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |CODE_FIX
+diff --git a/monitor/packet.c b/monitor/packet.c
+index ca7eaea21138..d5d906091adf 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -11222,8 +11222,10 @@ static void packet_dequeue_tx(struct timeval *tv, uint16_t handle)
+ 	}
+ 
+ 	frame = queue_pop_head(conn->tx_q);
+-	if (!frame)
++	if (!frame) {
++		print_field("#(frame not found)");
+ 		return;
++	}
+ 
+ 	timersub(tv, &frame->tv, &delta);
+ 
+-- 
+2.50.1
 
---- Comment #20 from Martin Hignett (martin@hignett.net) ---
-Its been a few weeks since I've experienced this issue. I have a feeling th=
-at
-one of that later 6.15.x releases fixed it, but I can't be sure which one.=
-=20
-
-I propose to close this ticket.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
