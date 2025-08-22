@@ -1,35 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8123126DA
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Aug 2025 14:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CBF2BD016;
+	Fri, 22 Aug 2025 18:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755873600; cv=none; b=IPvKq066RlPX9K9mJC0GR3ZcL9tnxB0M8DkSwZvea68GiCFAbR1gBIEm39Banlcep0c+Yj8O2MP4mYwESjaYHW+6p9YD6PSYimgP/VzqlPFF47gS2uZM6/nG11dYX36I/nulkWGNUi0lkl7oe8WXItTX4FRTha2lXVoJ2p67LGw=
+	t=1755885762; cv=none; b=VHX5KrQXALmcYIFLutWByLWxPyLa9olbXG4YrkKbL6JppVnr8B3p25gW+P+UFKPHob5MdV/+tyofCRf3mmhkdIDNb/qJct9mu88Ddpci7XX/mqHHOo8R8C4/VymmOl+WdQH0aecjq67ggSV+CFatwrl1JpZid0nIq2vJmR0QkSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755873600; c=relaxed/simple;
-	bh=wglY2hI4m2AGAv159eyvH3s4eHQVGJwA5JxY2BbZwOU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t71HYtA8+gQ1neHGdmdhkCVKdKKVJhlzo2SC81BLglWzDwOT4obeQPs82kdIAbFvAF1qiAkL3AgKfQe2y/tCVatU2hFbCRX/DLIakWkDoYXjXGqwmhNJvq3nSeZf/ncYCbWksyV66sPUhOaRmVMto+h94iUQHlRO9bI2UONu5C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gl46mnI8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755885762; c=relaxed/simple;
+	bh=N1e7TFsge6b+eTP7vLPJjPIiVfmr9kHRnruGzXquNrE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NoSe//6FaLe4I1RXL9rnjwNYLGiEoejpz3BwA7kKJONgD184huWpeYozJca0/RgoA0wcVkrUaG3/FUu2/MGkeCPRjxOqEHhxLIG5I4iBrVEpiMJLiDAF4OgiooHG1nvFHqklR9H9ivGJrj3fQ+ih5R3JFUh/jxBQtQc9IRntZcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ADrXet7n; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gl46mnI8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D65C19421;
-	Fri, 22 Aug 2025 14:40:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755873600;
-	bh=wglY2hI4m2AGAv159eyvH3s4eHQVGJwA5JxY2BbZwOU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gl46mnI8v0qb2SvQRaaUHd6Z7mxiftLErlVwRXUjZPHR7zaT1Ko98qx62UfGDAh2J
-	 1svSJeZpoI3F99iCO+Ex6O5Fn70e+prfdhNvQgWeneBkuoKW/udV0u1Eeap4dL7fuo
-	 BjjBpIw3my4GZEo96IkqtJnzTtEZyyYBvfSu4gtjEUP1V38mToYQkKi5sL9fCdK14b
-	 lcC1uq3Q4DXpO8wCZ3YAtnAWH9FqGGD/thE/CRQ4agnDj47ILlgW0XbX/nNl1MyP7P
-	 1cKg34/nBNDNf1/eEsdpu2pvd+ud97R/PlO7nnDz5Ju0x7md62N4Qq5cRftF2vJujc
-	 pUjt1eG2jBF6Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E70383BF6A;
-	Fri, 22 Aug 2025 14:40:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADrXet7n"
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-53b173841deso1680917e0c.1;
+        Fri, 22 Aug 2025 11:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755885758; x=1756490558; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VTBMTLe7hi+B23F1c3m54W0/QTYUNzPdGq9K96F15Ko=;
+        b=ADrXet7nDsj0tP36Fo+OrvdzYZwR8GTVM/n+yQ+8WKEHzxPJmK6XC82QUAYba9sw1G
+         6nWRmEKndasmbZEmxzunzSdXHu0bOmPIic0VQ4scTWFD48NRtoN+kIOI/hOsNfbxu9rr
+         wVK2zGE9ot84arLNPOwlDuz6WcQJzcgpVNPE9fZGoYoYXOeMlcR606sVgbHjWRndCaAC
+         wKRT4yLe6cN+IfjKH2Rl/6Bph24CT3SD4FBVRh4/Y02tpsEI1Zx9MH8E0oGj/qTzIW05
+         QGJq8bpxC5SWfYixJMhn0x7Gn/PV+/EkBcB22Bp4e+JVhanQ30QRS33bIUOvkuy3zf/J
+         /GAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755885758; x=1756490558;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VTBMTLe7hi+B23F1c3m54W0/QTYUNzPdGq9K96F15Ko=;
+        b=SOkodoBXDAXzQWhJyo0idX0oB22nCuMn0YEpu+zGDba454+CEQj9kaj2GjPth4aQg0
+         L3kM06ctIP8Z1dDw7e+TJVdhdibTOM84Lpz9GulMneUHjnjWi65Ld175znrcxKudOzJW
+         bg+++sgLrjSo5XlBWpAxPiOnU8RuekK3w0Trt+ORCFxJ14jCbBB2usEAdJqBwJgT071Y
+         i0j5MhjlBdgyLmjxHzrFLEFbgKyT6GX48j/NpCVd3MsebuhKph08BHsZTL+/TbU9gzw+
+         qbpDm1nkBT44U1uRDmZIJ6uhGVgvNGResrVQfDA1Z047UQd19K76TSAPnn4qt6u0a2RU
+         UfvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW2IEPlW43/h7mNroyw93EvLpUmW0/E9FGVUAItmzBsdX1ndT+rHXjJdViZJnvZpgKTpp2rRk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK1BwA5n1DRALWu8NmFhkWkgisv1UiMw4VsWfnIkLQKt9ZmrZm
+	7zt+czHAoNykB4GMPOiF0PM8FOkHNADTv5Zv7dsYKYb/1dHt/0LwqAJUj7NzsImm
+X-Gm-Gg: ASbGncu9z1vi5n43rcw6ZT0XW5hnCHd1oXGxkFHh1l8TsEqOE7B70cCr3QN3cErXkVO
+	0dd/wSYXJrzc9eZEdVO0ed+0AdfmOP0cNWCSwoEAWar6Mn3EfoL/f3D/fT3el/ZKjpVVsBcJ/On
+	nDo5w9ow3Kac8q19zc343bYk7m/XQnM0ie3/WHJFCFa33Cd3jMS9dLpuP/aFTgt8/s87xk4w8Kr
+	1/R3H6mRbXaU/hjRa09WDzhGiFGJJF8gedFx5P2xI5uMCVv9hBD82ziSoF6C9hwD5MuNhQd/yST
+	otSAu00503MEbmw1WN8U2pZlBIBSfKLk5O/fLxU7g1OgR+XPUU5Y+Xad6ShP3YD5XFbS26DSI/i
+	xa5mVSDI83u3LfqEt0WvFBWp+Q1W2gucQF1i/vxPCtvzU87FLl4Q5P0GVusuf/XH1Voi5lPOMrd
+	RyWzvTE/a8x+IyDpbSXzizmY6szYn2
+X-Google-Smtp-Source: AGHT+IGeu61Y5TAPc/tScHjmwG9O5oSvfqSf9m4DxY1VB4CktieBwlAIvYCDeXvMVjjSnpwRtR0eeg==
+X-Received: by 2002:a05:6122:45a7:b0:534:69b3:a230 with SMTP id 71dfb90a1353d-53c8a3baf1emr1366202e0c.11.1755885758143;
+        Fri, 22 Aug 2025 11:02:38 -0700 (PDT)
+Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53ed9ec0035sm108752e0c.15.2025.08.22.11.02.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Aug 2025 11:02:37 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-08-22
+Date: Fri, 22 Aug 2025 14:02:30 -0400
+Message-ID: <20250822180230.345979-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,40 +73,47 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: hci_event: Detect if HCI_EV_NUM_COMP_PKTS
- is
- unbalanced
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <175587360922.1857936.6282108383563655616.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Aug 2025 14:40:09 +0000
-References: <20250821134714.2032684-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250821134714.2032684-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+The following changes since commit 01b9128c5db1b470575d07b05b67ffa3cb02ebf1:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  net: macb: fix unregister_netdev call order in macb_remove() (2025-08-21 18:38:40 -0700)
 
-On Thu, 21 Aug 2025 09:47:14 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This attempts to detect if HCI_EV_NUM_COMP_PKTS contain an unbalanced
-> (more than currently considered outstanding) number of packets otherwise
-> it could cause the hcon->sent to underflow and loop around breaking the
-> tracking of the outstanding packets pending acknowledgment.
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - [v2] Bluetooth: hci_event: Detect if HCI_EV_NUM_COMP_PKTS is unbalanced
-    https://git.kernel.org/bluetooth/bluetooth-next/c/05be312ba55c
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-08-22
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to 6bbd0d3f0c23fc53c17409dd7476f38ae0ff0cd9:
 
+  Bluetooth: hci_sync: fix set_local_name race condition (2025-08-22 13:57:31 -0400)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - hci_conn: Make unacked packet handling more robust
+ - hci_event: Treat UNKNOWN_CONN_ID on disconnect as success
+ - hci_event: Mark connection as closed during suspend disconnect
+ - hci_event: Detect if HCI_EV_NUM_COMP_PKTS is unbalanced
+ - hci_event: Disconnect device when BIG sync is lost
+ - hci_sync: fix set_local_name race condition
+
+----------------------------------------------------------------
+Ludovico de Nittis (2):
+      Bluetooth: hci_event: Treat UNKNOWN_CONN_ID on disconnect as success
+      Bluetooth: hci_event: Mark connection as closed during suspend disconnect
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_conn: Make unacked packet handling more robust
+      Bluetooth: hci_event: Detect if HCI_EV_NUM_COMP_PKTS is unbalanced
+
+Pavel Shpakovskiy (1):
+      Bluetooth: hci_sync: fix set_local_name race condition
+
+Yang Li (1):
+      Bluetooth: hci_event: Disconnect device when BIG sync is lost
+
+ include/net/bluetooth/hci_sync.h |  2 +-
+ net/bluetooth/hci_conn.c         | 58 ++++++++++++++++++++++++++++------------
+ net/bluetooth/hci_event.c        | 25 +++++++++++++++--
+ net/bluetooth/hci_sync.c         |  6 ++---
+ net/bluetooth/mgmt.c             |  9 +++++--
+ 5 files changed, 75 insertions(+), 25 deletions(-)
