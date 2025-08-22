@@ -1,152 +1,154 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx4.sberdevices.ru (mx5.sberdevices.ru [95.181.183.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D657D393DE0
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Aug 2025 01:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CD9214232;
+	Fri, 22 Aug 2025 09:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.183.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755825930; cv=none; b=UcyikLz01DQOtMvcqQmj5sfrqmxLL14VMp8BhOgV2Rjo5mVY3wdNjNXF8jLjCrtL/61jSdnlTP+YutcEhJvU+nKUntAM0BonO2d0ImRHCnvXbk1LTJlUe4p5LIditm0eLP88HXBlpB7xKTqKzZMQU1SInYDMgrF8S6wzecnaUsg=
+	t=1755854484; cv=none; b=gxtyV0RLY3RlJMBbT4HZNOq5t21tkOmzFKUJrl3fQ+69BAT2K5AzrGQbSsrSuu/GFoLesDxxDk6myJjNoDrkRKqU7ZkAJ1N7QGYe5fwDo5yf4yW2O1qE3Te+9fJOEmlGhoTqUHUA7541QlpexQtZprijclIDjIAzhZ9+qUhuZEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755825930; c=relaxed/simple;
-	bh=5XUpmw+1GpB+rRGcdxjhdQGBWp4StOufb0SzJAnjK6k=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OCiVdA2elAhDp+tNZKuA+kUWKuhFQtrk5zuZrcLgBnJi9P2PHu8LIjnKgKDnI73Qix4uFYUM8RSdzrLleEeKAQd1nr7LnK3Jqincbzo5ueMtTFrUG1do1lDcWwrvWkrfhRElwUfjwPDtxstwlp7pRGf44QFlaqQAMWEIma8O+zM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KbeZVzX0; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755854484; c=relaxed/simple;
+	bh=4uMJp+PVpz1AsMUArraN68Jj+RSNJwceGjBfAdXcB20=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TRNJsRZ6ebnXvLTEAj8h44OTxDJRfKaI8u39wrqVHajFW5T3Pworht8Rv5fS244a7vrpUpMaycEyFti65dzUBx+caikQxYBCQOmdWzSWhP61ksBa/BtUOMIQSUW7UCvB5jM252s6Ck4H9SXj7nK6JK+UPdCSp0XgO5CowsU40Fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=sberdevices.ru; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=PSjvAYUc; arc=none smtp.client-ip=95.181.183.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sberdevices.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KbeZVzX0"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-88432e6700dso25482439f.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Aug 2025 18:25:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755825928; x=1756430728; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=H/uzvQ5WJdv838HFYWlCyb/dga7sbIwe8BGG/GAwaas=;
-        b=KbeZVzX0sEToepcdtpiXf8VzmdFeSGB57F3q8BGzp/0pCKZZatdswkiHvedQoUqEkp
-         d89sjLZl25oOiydrXVN2otx3uxavbzrcDcycAeWzNCSCHwhfRnLF5GICq7jbefSvNDjc
-         RN5LHq5fssYcvJzIvSBfvqyEpfQ/D1FnI/0c6yjos75MDEwUSs3xI9Jks+8KrNiIStpN
-         ZS9UhRd6FrTEfZLnhulgizvlX3hZnK6iShdExai9jbMy+/cPsLHlzwoX3YOr9XAsX1dr
-         lqF8DRR2RsE2iA3Lsh2a/rtZD0G1vYG2daJ7U98uin8VW048KJUFEv/rchqQY0nIHxdS
-         R2Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755825928; x=1756430728;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H/uzvQ5WJdv838HFYWlCyb/dga7sbIwe8BGG/GAwaas=;
-        b=Zsgx/wUJbebf8jzFvgaE1BOw7M8jVRpcC6SVm/NBW8m+qqJiTmGBIL36zuj91Avkwm
-         OHuq3XEco2Ky9nsPlIsf9+UBILMNUcwEV4pcAMhgnkSpLOO6ziFmJ/wpSFuJBiJmpqiK
-         DvoAPWtkJRU2E9XsVlSWdbNmu7qVojmNvt1XOFrTDAiuq6Col70eZ7o5vZmX3PZEuwEU
-         hPbGFbYLrd+9TdBZqEolLCIOOpDNVS0p75jNJrBAGdUckopWueJmnYkxPX9bFRuPotS+
-         EDnWF450tXhzqUicrQdnda+YChj6U2X2TG2rUfDFEFhB4er7bZaG+J8Wdi1n4M3323sW
-         kZTA==
-X-Gm-Message-State: AOJu0YycCtopzAomzjz9t/kwJSUnOOZB9pElJDeFZkVyV4nwybZts5Ea
-	QaXH+aW3ASGHemfEHysXm+3Hi9aMz/9cDmoZ7HDgBldRZd6piuovFPB6i68PKQ==
-X-Gm-Gg: ASbGnctQXF4o0AGCQMVVkx75jSdpHAa6URudJmB/ad4h57fQlaDn6T2mJvC6guKwtkz
-	NslgjEjKzuGSoWFuF9R7TrWEfG/r+21BUp8g0e1DKd6vN897xi2zXwR6EtOBbywwGfQAPesMfaH
-	CMSPykIABAz1AI9QQucqaxS0zoseT7ENc6w1GCdxfK8GCF9wRfvukr1t02uUy70YOSXDurrkLMo
-	hOydUvHbLbhVbL7UUBBN+Ty73H5x1tZwvlIofnn2KDZhuC9K7Tkh+K3W+oLvJxZxdf3Yd5GCoTK
-	KbRbwlFM3h5r811o7vInhoMCXueuFwcIyc18yfP3FlrnXUO++RaX2IhO8km6TzbZV+h5hB6bi7p
-	MNQbzpyLB0aQayaPSipzEvbOjiI2nB270KbLXv4DOJQ==
-X-Google-Smtp-Source: AGHT+IEiNUZBBkF4KFBth3HmMC4d9/fG6q6e+NQ1ocvnEP/595N/2TftwF24nqt4TgN2LoUBlRv+cw==
-X-Received: by 2002:a05:6e02:2581:b0:3e5:42ec:137a with SMTP id e9e14a558f8ab-3e91f74d1famr26761975ab.4.1755825927537;
-        Thu, 21 Aug 2025 18:25:27 -0700 (PDT)
-Received: from [172.17.0.2] ([135.232.177.162])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8843f9c3334sm773348239f.22.2025.08.21.18.25.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 18:25:27 -0700 (PDT)
-Message-ID: <68a7c707.050a0220.1ffd84.049e@mx.google.com>
-Date: Thu, 21 Aug 2025 18:25:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0631352301192964399=="
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="PSjvAYUc"
+Received: from p-antispam-ksmg-gc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx4.sberdevices.ru (Postfix) with ESMTP id 2D2E5240006;
+	Fri, 22 Aug 2025 12:21:15 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 2D2E5240006
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=post; t=1755854475;
+	bh=V3UbgF87pvgsx5rvNEeztDfyXeyumBNavC0N+DnGwuQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=PSjvAYUcTJ615zN8FayOvGjY/n+SEdoAnA392ICUvSeqmGcYqbLC82oex7atAVe1k
+	 OAAVeemSmEYvfPyNf4Q8k+9cvQj7YeBXvF0JBF8/n739Wg+lbId0EgRg7hyC7byse3
+	 GLPpvws3pCP97t9LETvTzcAiy0VD+YjnvtiKvTt3/gT5T1mHTYKt+NzJuJ8tt1hmCL
+	 ykHJsFCXC4EgmivnQT6HLXNQGDc4rvQhg0CFa0zRs2oM2ZcOKqcaXyvKMOh4HGRrVq
+	 YyaaDF8r25FGk350uwJsfkdqUkrKd3/8KSKuNc//Ji2z59utwtE7PWzoO2eqLiYv1x
+	 ZDan4DwBHaf8A==
+Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "sberdevices.ru", Issuer "R11" (verified OK))
+	by mx4.sberdevices.ru (Postfix) with ESMTPS;
+	Fri, 22 Aug 2025 12:21:14 +0300 (MSK)
+From: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
+To: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <brian.gix@intel.com>
+CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@salutedevices.com>, Pavel Shpakovskiy
+	<pashpakovskii@salutedevices.com>
+Subject: [PATCH v2] Bluetooth: hci_sync: fix set_local_name race condition
+Date: Fri, 22 Aug 2025 12:20:55 +0300
+Message-ID: <20250822092055.286475-1-pashpakovskii@salutedevices.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jgnieto@cs.stanford.edu
-Subject: RE: Bluetooth: hci_h5: avoid sending two SYNC messages
-In-Reply-To: <20250822003912.41754-1-jgnieto@cs.stanford.edu>
-References: <20250822003912.41754-1-jgnieto@cs.stanford.edu>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-exch-cas-a-m1.sberdevices.ru (172.24.201.216) To
+ p-exch-cas-s-m1.sberdevices.ru (172.16.210.2)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: pashpakovskii@sberdevices.ru
+X-KSMG-AntiSpam-Info: LuaCore: 64 0.3.64 96c1edcdaeab4cf6c1fd6858be74d3893179d628, {Tracking_smtp_not_equal_from}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, {Tracking_smtp_domain_mismatch}, {Tracking_smtp_domain_2level_mismatch}, {Tracking_white_helo}, FromAlignment: n
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 195709 [Aug 22 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/08/22 07:53:00 #27684134
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 5
 
---===============0631352301192964399==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Function set_name_sync() uses hdev->dev_name field to send
+HCI_OP_WRITE_LOCAL_NAME command, but copying from data to hdev->dev_name
+is called after mgmt cmd was queued, so it is possible that function
+set_name_sync() will read old name value.
 
-This is automated email and please do not reply to this email!
+This change adds name as a parameter for function hci_update_name_sync()
+to avoid race condition.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=994289
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.28 seconds
-GitLint                       PENDING   0.23 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      24.26 seconds
-CheckAllWarning               PASS      26.93 seconds
-CheckSparse                   PASS      30.17 seconds
-BuildKernel32                 PASS      24.49 seconds
-TestRunnerSetup               PASS      482.49 seconds
-TestRunner_l2cap-tester       PASS      25.04 seconds
-TestRunner_iso-tester         PASS      36.78 seconds
-TestRunner_bnep-tester        PASS      6.00 seconds
-TestRunner_mgmt-tester        FAIL      128.34 seconds
-TestRunner_rfcomm-tester      PASS      9.47 seconds
-TestRunner_sco-tester         PASS      14.62 seconds
-TestRunner_ioctl-tester       PASS      10.06 seconds
-TestRunner_mesh-tester        FAIL      11.48 seconds
-TestRunner_smp-tester         PASS      8.64 seconds
-TestRunner_userchan-tester    PASS      6.26 seconds
-IncrementalBuild              PENDING   0.54 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.101 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.200 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.155 seconds
-Mesh - Send cancel - 2                               Timed out    1.992 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Fixes: 6f6ff38a1e14 ("Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME")
+Signed-off-by: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
 ---
-Regards,
-Linux Bluetooth
+ Changelog v1->v2:
+ * Fix some minor style comments for commit messsage.
 
+ include/net/bluetooth/hci_sync.h | 2 +-
+ net/bluetooth/hci_sync.c         | 6 +++---
+ net/bluetooth/mgmt.c             | 5 ++++-
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
---===============0631352301192964399==--
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 72558c826aa1b..eef12830eaec9 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -93,7 +93,7 @@ int hci_update_class_sync(struct hci_dev *hdev);
+ 
+ int hci_update_eir_sync(struct hci_dev *hdev);
+ int hci_update_class_sync(struct hci_dev *hdev);
+-int hci_update_name_sync(struct hci_dev *hdev);
++int hci_update_name_sync(struct hci_dev *hdev, const u8 *name);
+ int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode);
+ 
+ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index e56b1cbedab90..c2a6469e81cdf 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3412,13 +3412,13 @@ int hci_update_scan_sync(struct hci_dev *hdev)
+ 	return hci_write_scan_enable_sync(hdev, scan);
+ }
+ 
+-int hci_update_name_sync(struct hci_dev *hdev)
++int hci_update_name_sync(struct hci_dev *hdev, const u8 *name)
+ {
+ 	struct hci_cp_write_local_name cp;
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	memcpy(cp.name, hdev->dev_name, sizeof(cp.name));
++	memcpy(cp.name, name, sizeof(cp.name));
+ 
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_LOCAL_NAME,
+ 					    sizeof(cp), &cp,
+@@ -3471,7 +3471,7 @@ int hci_powered_update_sync(struct hci_dev *hdev)
+ 			hci_write_fast_connectable_sync(hdev, false);
+ 		hci_update_scan_sync(hdev);
+ 		hci_update_class_sync(hdev);
+-		hci_update_name_sync(hdev);
++		hci_update_name_sync(hdev, hdev->dev_name);
+ 		hci_update_eir_sync(hdev);
+ 	}
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 46b22708dfbd2..da662e1823ae5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3876,8 +3876,11 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ static int set_name_sync(struct hci_dev *hdev, void *data)
+ {
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_cp_set_local_name *cp = cmd->param;
++
+ 	if (lmp_bredr_capable(hdev)) {
+-		hci_update_name_sync(hdev);
++		hci_update_name_sync(hdev, cp->name);
+ 		hci_update_eir_sync(hdev);
+ 	}
+ 
+-- 
+2.34.1
+
