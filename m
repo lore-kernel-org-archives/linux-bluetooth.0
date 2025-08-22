@@ -1,154 +1,179 @@
-Received: from mx4.sberdevices.ru (mx5.sberdevices.ru [95.181.183.35])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CD9214232;
-	Fri, 22 Aug 2025 09:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.183.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E1C2FF15F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Aug 2025 09:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755854484; cv=none; b=gxtyV0RLY3RlJMBbT4HZNOq5t21tkOmzFKUJrl3fQ+69BAT2K5AzrGQbSsrSuu/GFoLesDxxDk6myJjNoDrkRKqU7ZkAJ1N7QGYe5fwDo5yf4yW2O1qE3Te+9fJOEmlGhoTqUHUA7541QlpexQtZprijclIDjIAzhZ9+qUhuZEA=
+	t=1755856204; cv=none; b=QzZcMRp/h8m3GLxDcAwQepwUbshOAjgnPxy8nh4XG3rRslcK3P69ZcWHFmEsSGc3efCqtSNQ0Vq13IAh05j5zvkuXM+I3f1JSblrR24noOcNcmY00+FFRlvFjaihJqY85d4buMnQThIF1UD41nXHkYaupRVhdgwMMUyOBx+eHuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755854484; c=relaxed/simple;
-	bh=4uMJp+PVpz1AsMUArraN68Jj+RSNJwceGjBfAdXcB20=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TRNJsRZ6ebnXvLTEAj8h44OTxDJRfKaI8u39wrqVHajFW5T3Pworht8Rv5fS244a7vrpUpMaycEyFti65dzUBx+caikQxYBCQOmdWzSWhP61ksBa/BtUOMIQSUW7UCvB5jM252s6Ck4H9SXj7nK6JK+UPdCSp0XgO5CowsU40Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=sberdevices.ru; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=PSjvAYUc; arc=none smtp.client-ip=95.181.183.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sberdevices.ru
+	s=arc-20240116; t=1755856204; c=relaxed/simple;
+	bh=P+HfOPveKwwfM1SjISgxVCTRQU0DCHze2vEA8+4M46A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=jZvZz4Z5OH5eLdsxgA/zTp/Is2cc2imwXcw2XKvI/R+T0P2kaQw5sgQe747M4vYMk1fynKsVIicMbjltJ+fwQofEVAriGJPS0VcKH9nUvG83jfVzpHuVtPp320RcUA06x1z3ukJtuXr4ay+vm8m5R8XSuZGQwDLDWuejTcTnYh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DmplFI7L; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="PSjvAYUc"
-Received: from p-antispam-ksmg-gc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx4.sberdevices.ru (Postfix) with ESMTP id 2D2E5240006;
-	Fri, 22 Aug 2025 12:21:15 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx4.sberdevices.ru 2D2E5240006
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1755854475;
-	bh=V3UbgF87pvgsx5rvNEeztDfyXeyumBNavC0N+DnGwuQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=PSjvAYUcTJ615zN8FayOvGjY/n+SEdoAnA392ICUvSeqmGcYqbLC82oex7atAVe1k
-	 OAAVeemSmEYvfPyNf4Q8k+9cvQj7YeBXvF0JBF8/n739Wg+lbId0EgRg7hyC7byse3
-	 GLPpvws3pCP97t9LETvTzcAiy0VD+YjnvtiKvTt3/gT5T1mHTYKt+NzJuJ8tt1hmCL
-	 ykHJsFCXC4EgmivnQT6HLXNQGDc4rvQhg0CFa0zRs2oM2ZcOKqcaXyvKMOh4HGRrVq
-	 YyaaDF8r25FGk350uwJsfkdqUkrKd3/8KSKuNc//Ji2z59utwtE7PWzoO2eqLiYv1x
-	 ZDan4DwBHaf8A==
-Received: from smtp.sberdevices.ru (p-exch-cas-s-m1.sberdevices.ru [172.16.210.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R11" (verified OK))
-	by mx4.sberdevices.ru (Postfix) with ESMTPS;
-	Fri, 22 Aug 2025 12:21:14 +0300 (MSK)
-From: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
-To: <marcel@holtmann.org>, <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <brian.gix@intel.com>
-CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@salutedevices.com>, Pavel Shpakovskiy
-	<pashpakovskii@salutedevices.com>
-Subject: [PATCH v2] Bluetooth: hci_sync: fix set_local_name race condition
-Date: Fri, 22 Aug 2025 12:20:55 +0300
-Message-ID: <20250822092055.286475-1-pashpakovskii@salutedevices.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DmplFI7L"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57M8UHAo000975;
+	Fri, 22 Aug 2025 09:49:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	soCWzjvWscVoYkfUaLol28MB7Wj9YERYDsofOEB85Vw=; b=DmplFI7L/LKLCns3
+	i8e/YDm3FuJTGwY8vX0ppw5/83xOWOAPt03MO16gDvHWm6jtqHaNdKtSTMGKsarN
+	LOXoBZL6wtQfJc5Rl4EgIfluAHHWDXYNjU22ls7c5hDpQ/jBez8DeW8qCqxgW+BR
+	nlz80dG2mEObOJmrfHJHDa7xtHV5XskMg/j1kp4uNDUisQ9RAqgkGDcERlYsKD1V
+	7z15LaehcYWy/+JDDiTkH22eoZIGk0SZG49XgIEKqwZmXJ6CKio5+dylq4a+5iqa
+	COWOZjFzmGV0DsefdpORMHkY/yAeA3cZnP5x+2TLKiKj+yBs5wtBAgfbspBdzAkn
+	iee8iA==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48n5298stc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Aug 2025 09:49:39 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57M9ncYK030217
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Aug 2025 09:49:38 GMT
+Received: from [10.239.96.215] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 22 Aug
+ 2025 02:49:37 -0700
+Message-ID: <16a21382-4984-4250-a770-ea39ddeedd3b@quicinc.com>
+Date: Fri, 22 Aug 2025 17:49:35 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] driver: bluetooth: hci_qca:fix unable to load the BT
+ driver
+To: <brgl@bgdev.pl>
+CC: <linux-bluetooth@vger.kernel.org>,
+        Stephan Gerhold
+	<stephan.gerhold@linaro.org>,
+        Luiz Augusto von Dentz
+	<luiz.von.dentz@intel.com>
+References: <20250609105500.4083963-1-quic_shuaz@quicinc.com>
+ <CAMRc=MfF7d9+cJi12G1yxPpMoe8K5N8tEO9kfCRJejHWt2DkXw@mail.gmail.com>
+Content-Language: en-US
+From: Shuai Zhang <quic_shuaz@quicinc.com>
+In-Reply-To: <CAMRc=MfF7d9+cJi12G1yxPpMoe8K5N8tEO9kfCRJejHWt2DkXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-exch-cas-a-m1.sberdevices.ru (172.24.201.216) To
- p-exch-cas-s-m1.sberdevices.ru (172.16.210.2)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: pashpakovskii@sberdevices.ru
-X-KSMG-AntiSpam-Info: LuaCore: 64 0.3.64 96c1edcdaeab4cf6c1fd6858be74d3893179d628, {Tracking_smtp_not_equal_from}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, {Tracking_smtp_domain_mismatch}, {Tracking_smtp_domain_2level_mismatch}, {Tracking_white_helo}, FromAlignment: n
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 195709 [Aug 22 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/08/22 07:53:00 #27684134
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: N0OxGEbDX9Ci5e2bXJlfYhdmaTyxRLao
+X-Proofpoint-ORIG-GUID: N0OxGEbDX9Ci5e2bXJlfYhdmaTyxRLao
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIwMDAxMyBTYWx0ZWRfX+Ots5quDsMhE
+ TwfUWd9dGgbqc1GjAOUf/CCfozcsa9hFCjrGbARzv42VBTnbG5N4OM+RfWgVBu07Wu5BavJJIyV
+ YZSirukhh2Hxu7sZX17P8gFQtxweOl8qF/TauAj7unJgJvg3YPEq2ru801dyAB9yYCMjCCPpl3g
+ vJLgzGQAGVApRA+ruHvWQex1gmAHGTY4T5C6GbrfnxQBg1oloIPWHRUdxCScTabQLugReJ/HEVX
+ +kSTjpZPJvzLiv3zlndfmxuN2TiVk3KyYqHE2588oXK+IgEb4GHPPCsZxU9reeYOY4W/hGo5csv
+ shO928uZTwt8CVopoHoapWCpXKQqw0oP2IhNOPRDjsZ2uvMZqHUl8AGN/YB9m+6yyVzL3JMHQbm
+ 5Jngvh6rJ9iIoULwdFyAe13GlL0Ytw==
+X-Authority-Analysis: v=2.4 cv=SPkblOvH c=1 sm=1 tr=0 ts=68a83d33 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8
+ a=UQjBgCM3aO4ULV_0GCEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-22_03,2025-08-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0
+ impostorscore=0 adultscore=0 malwarescore=0 lowpriorityscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2508110000 definitions=main-2508200013
 
-Function set_name_sync() uses hdev->dev_name field to send
-HCI_OP_WRITE_LOCAL_NAME command, but copying from data to hdev->dev_name
-is called after mgmt cmd was queued, so it is possible that function
-set_name_sync() will read old name value.
+Hi,iBart
 
-This change adds name as a parameter for function hci_update_name_sync()
-to avoid race condition.
+On 7/2/2025 6:23 PM, brgl@bgdev.pl wrote:
+> On Mon, 9 Jun 2025 18:55:00 +0800, Shuai Zhang <quic_shuaz@quicinc.com> wrote:
+>>
+>> Some modules have BT_EN enabled via a hardware pull-up,
+>> meaning it is not defined in the DTS and is not controlled
+>> through the power sequence. In such cases, fall through
+>> to follow the legacy flow.
+>>
+> 
+> Thanks Stephan for bringing this to my attention.
+> 
+> Shuai: you have not Cc'ed arm-msm or even linux-kernel and so didn't give us
+> any chance to object. I will separately send a MAINTAINERS change to add
+> arm-msm as the mailing list for this driver.
+> 
+> What is the problem you're seeing? The bt-enable GPIO is optional in the power
+> sequencing driver and if it's not there, then there should be no difference in
+> how this driver works. What are the offending platforms?
+> 
+>> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 13 ++++++++++---
+>>  1 file changed, 10 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index a2dc39c00..976ec88a0 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -2392,10 +2392,17 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>>  		 */
+>>  			qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->dev,
+>>  								   "bluetooth");
+>> -			if (IS_ERR(qcadev->bt_power->pwrseq))
+>> -				return PTR_ERR(qcadev->bt_power->pwrseq);
+>>
+>> -			break;
+>> +			/*
+>> +			 * Some modules have BT_EN enabled via a hardware pull-up,
+>> +			 * meaning it is not defined in the DTS and is not controlled
+>> +			 * through the power sequence. In such cases, fall through
+>> +			 * to follow the legacy flow.
+>> +			 */
+>> +			if (IS_ERR(qcadev->bt_power->pwrseq))
+>> +				qcadev->bt_power->pwrseq = NULL;
+>> +			else
+>> +				break;
+> 
+> This is wrong. It just effectively ignores all errors - even -EPROBE_DEFER.
+> This patch should be reverted as - depending on the run-time ordering of driver
+> probing - it will surely break existing platforms.
+> 
 
-Fixes: 6f6ff38a1e14 ("Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME")
-Signed-off-by: Pavel Shpakovskiy <pashpakovskii@salutedevices.com>
----
- Changelog v1->v2:
- * Fix some minor style comments for commit messsage.
+I'm very sorry—due to my oversight, I forgot to update it.
 
- include/net/bluetooth/hci_sync.h | 2 +-
- net/bluetooth/hci_sync.c         | 6 +++---
- net/bluetooth/mgmt.c             | 5 ++++-
- 3 files changed, 8 insertions(+), 5 deletions(-)
+The updated strategy is as follows:
+Handle nodev separately, while other errors will still be returned.
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 72558c826aa1b..eef12830eaec9 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -93,7 +93,7 @@ int hci_update_class_sync(struct hci_dev *hdev);
- 
- int hci_update_eir_sync(struct hci_dev *hdev);
- int hci_update_class_sync(struct hci_dev *hdev);
--int hci_update_name_sync(struct hci_dev *hdev);
-+int hci_update_name_sync(struct hci_dev *hdev, const u8 *name);
- int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode);
- 
- int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index e56b1cbedab90..c2a6469e81cdf 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3412,13 +3412,13 @@ int hci_update_scan_sync(struct hci_dev *hdev)
- 	return hci_write_scan_enable_sync(hdev, scan);
- }
- 
--int hci_update_name_sync(struct hci_dev *hdev)
-+int hci_update_name_sync(struct hci_dev *hdev, const u8 *name)
- {
- 	struct hci_cp_write_local_name cp;
- 
- 	memset(&cp, 0, sizeof(cp));
- 
--	memcpy(cp.name, hdev->dev_name, sizeof(cp.name));
-+	memcpy(cp.name, name, sizeof(cp.name));
- 
- 	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_LOCAL_NAME,
- 					    sizeof(cp), &cp,
-@@ -3471,7 +3471,7 @@ int hci_powered_update_sync(struct hci_dev *hdev)
- 			hci_write_fast_connectable_sync(hdev, false);
- 		hci_update_scan_sync(hdev);
- 		hci_update_class_sync(hdev);
--		hci_update_name_sync(hdev);
-+		hci_update_name_sync(hdev, hdev->dev_name);
- 		hci_update_eir_sync(hdev);
- 	}
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 46b22708dfbd2..da662e1823ae5 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3876,8 +3876,11 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
- 
- static int set_name_sync(struct hci_dev *hdev, void *data)
- {
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_cp_set_local_name *cp = cmd->param;
-+
- 	if (lmp_bredr_capable(hdev)) {
--		hci_update_name_sync(hdev);
-+		hci_update_name_sync(hdev, cp->name);
- 		hci_update_eir_sync(hdev);
- 	}
- 
--- 
-2.34.1
+case:xxx	
+....
+....						   
+if (IS_ERR(qcadev->bt_power->pwrseq)) {
+    switch (PTR_ERR(qcadev->bt_power->pwrseq)) {
+    case -ENODEV:
+        qcadev->bt_power->pwrseq = NULL;
+        break;
+    default:
+        return PTR_ERR(qcadev->bt_power->pwrseq);
+    }
+}
+fallthtough;
+case:xxx
+
+>>  		}
+>>  		fallthrough;
+>>  	case QCA_WCN3950:
+>> --
+>> 2.34.1
+> 
+> Bart
+
+BR,
+Shuai
 
