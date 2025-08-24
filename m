@@ -1,126 +1,168 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F83274658
-	for <linux-bluetooth@vger.kernel.org>; Sun, 24 Aug 2025 12:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F18F1CD1F
+	for <linux-bluetooth@vger.kernel.org>; Sun, 24 Aug 2025 20:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756039168; cv=none; b=QZDxJkon+q/HGCtXG1f/YxIjFupRzO4GwMEolk6mYXFfPBD02LTgfUOoBSq7Kc/krdu4Q8cTt9w2f84oUF8rB3hIeFGOLnZHNwjFiPIP8AqX1SGqJry/yJA2bE4/yKrZMYXWn5ZkgHHw5+8mMpV5sjXgqZTVIaWMcTmYXbxMERE=
+	t=1756066180; cv=none; b=SJVbwwAHIUmOEE4rvFslfjIDYl2/aiaQSWf4vXUf6lUZcjD78VeJ07hXa3ItBJdxwDNZHYf7K8v9H0Jp/yAHZA+R+GTAD0iKeEBE2EOsnoX4cshp6ZxTObr8+bfGLqL9GVOOqe1EMqNxD0R3YpUjcfNFcMV82cbGarBu1DmJbVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756039168; c=relaxed/simple;
-	bh=0/G/yQSkAb4SJWYXVnR/FBweMLYUOuskMtvvqOGCu0c=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gylV5PNdSAuma4WnFCD166gsjSd2VGv5MPgf+aD4nuNGbx4L6kMxmKDDaJQQpwq+fLIIOn4VcudOAdfeBspRxlrh0j35E3oU+wwLrNHwtcNPVmVCDquVcrCtDvsGRwn+khBUGMaO9yW0eMhs+xKGwnGE7oAIGvvkY7qB3M33c4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=himLMnJD; arc=none smtp.client-ip=209.85.219.43
+	s=arc-20240116; t=1756066180; c=relaxed/simple;
+	bh=NGiU4CzXU+dgsjrtZAdCgLALN/ywOHzHztMSIQn0w+k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LixTl+VvFVRjVQjvkM0oM0Bs6joYQXdtX8vgtgT0UewvUdc6+ANg5aNXjkDJ/MyFbZE0GLFmKyoBVitnQ6LdIBahjMSJFC9DnNg94XpmNitAPwW0xZFQzNYvGPuZaZEG+oFUb6KZoyCpXZYYEcKWIZX+KqLPM7lt8xtHGMA+fQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B3dCnYeh; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="himLMnJD"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-70d9a65c328so18307676d6.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Aug 2025 05:39:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3dCnYeh"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-afcb78ead12so500618666b.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Aug 2025 13:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756039165; x=1756643965; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RlIYS0+U9bHihqOk3JtnTtwySyXP4jy4goOuyMXyINc=;
-        b=himLMnJDhKvRj5L6mlEcHtJ4Ol3lU+sdhBaA80yKoLU3VdDIDMHjT/plT/Er3JenE+
-         MS8U32pT/rrtxCX6pB6zFoUs3Iw4d1euw5vhJAzyJQOfchNulaqbf3DZpjzSw8MqtSU4
-         0Y4roqyAIkXTf9amOLLlR22GlTwVbarT4qbbUckfwLqQ7Htn+hR2yJB/fuDNpzGF1JSP
-         16tIn5NS2o68REYKnaJh1/skfmr2/uUh+T3FmbTaE9R8OfaVEuX5nNKUEt5rKMJCSTrm
-         LnS+5UqyiXSeJc5zuROfW5HW3DPHFQplr/vHkGQlfg1VazSgPqU7q8iXn1X5LxudEvC3
-         2yzQ==
+        d=gmail.com; s=20230601; t=1756066176; x=1756670976; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YSYpTf1YoXmWMzpmlrdy6dEei4GcnfOQCr9CHGyEX8M=;
+        b=B3dCnYehOs6BWGSwlFbVVF/F2sPTMqs8YvJNO81Jc3kZwlOTFCNMGcXqWPMmMdmL9V
+         X/p4//R1mLrv5jmYuf57ivWKa/4uN7Z/WJvNEAvSddmtf4hVPf6UOdhuMyJ3RTLFR71j
+         5cCOn/4jgUpzjoBZaYJcIFpAXHX4u1y/rlrvI9Ht78fE83SD1wo7duXEPJ05GpYFajFP
+         2ZNktXv3noioAGC7Nu/ffc7BA1kaK9Av3h27e0DslMMIM8WN1Y6VB7KDY4w2NlBJPA2V
+         ALTLB2Amex2pLtRQlCpeuMaR9agUwSBTSgGaim5OEbLyqOyfTwjnL/h9HaJOVEIPhE2m
+         wvRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756039165; x=1756643965;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1756066176; x=1756670976;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RlIYS0+U9bHihqOk3JtnTtwySyXP4jy4goOuyMXyINc=;
-        b=k9ndBNn8AXMUkpPsUsKP9bZ4zAVOQk/PLBgLEtctyBX3eaXYwRil1pKsVhu7KL5P3l
-         8q9GKT+PX50IFQkzX2B/rgeQ62triPNWWZJsn/dKiUvBqvYBdM2q9HmSi5Jf4F8BkfSz
-         8VIRi/qx8oen3ho1tkXw+rX8YtL47N/JuvPqLDlUUSap12YmLe0ToN5crGx/G3og7ZlN
-         CmXudcTX8Dk0w8IJpnyoFEJtqZBMPC6OOfjOhAMfEO886KzAk3MBwVI4GVa49gPllTZ6
-         xud3XU5lY++bGqWe8kipcGrW512tbRDr88gwVXCUsJ807fW3eFJC15R3YKYk4AFxZj0X
-         1grA==
-X-Gm-Message-State: AOJu0YydwUVwX69Stv3sm+7Nj14W740VmxQ6XC5EFof+GaVClB2wu4qZ
-	gOwqf1xB4TNVwbpifpYdbz+kXlHHCX8tAP+0TatIZJqis9KXSFvrKE+agYQ3Jw==
-X-Gm-Gg: ASbGncvDsezNk7jBEuR1RaDGKrmrtL18aZlYUn/dPkDUt89ie9Iia/CPGuoKz20YFmZ
-	CDKoM4UQhDZTVO7MWAHEXQojBXTQtY8LidR534zkpE+fRUHMyKAcOYUuhti1qsdYV+uQKj+NuZn
-	ug1iLesCV+K8Doi+2f7tl4bM+PvoCwOUxj71iA/wdvokP98L+VOGUxNrTcxOLpTa/ghLuvJfMRA
-	kxhW9oA+IOaIgUNr/aHmdHnxQkFsBs51ysFQJSzmVEQivyYUAJjwqFWO4ybL6ng1QCCShh2caK3
-	hFA4Gpmg++176BRKPflK0yuvsomeS46aDUbyggDLLn96gk/UwrOotWc7VfzdAhW2O2QFzLNXjR2
-	qtzag1Xo9mbOFSpADW4ooat9nKw==
-X-Google-Smtp-Source: AGHT+IHLlDrYlwoSf7GbWJgUKQm9fQl1hQ00dFzMKF/0BkrWnP8zGIGm5vT9cpUS+jDb26ikgoJdag==
-X-Received: by 2002:a05:6214:a64:b0:70d:a309:640d with SMTP id 6a1803df08f44-70da309b121mr67564546d6.61.1756039165318;
-        Sun, 24 Aug 2025 05:39:25 -0700 (PDT)
-Received: from [172.17.0.2] ([20.81.159.6])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70da714727csm26971316d6.13.2025.08.24.05.39.24
+        bh=YSYpTf1YoXmWMzpmlrdy6dEei4GcnfOQCr9CHGyEX8M=;
+        b=xLor0pzOF5zs9LHAHQqvcI+CQ19QkAdsjPkiWTrTXR9+8OTQViALOJ9MgGSJZsJGV4
+         /v8vIUt3mqsosV526oW1QEl/Gptrtx87E9bU4dH+HtUIpTXoT2zlT/rRirRj45Xrhq+T
+         rfkiQXkIxLOy7SAM1dUGNchofBxTZCFRQv0d9lHZC7m7kkaH970tyfaCUMCrSyN3CuKo
+         ZwK8DbwDTojEWtgS1Q/COdEwrXhJ/LN+pV6fo4QypR9LzXvhHzwCjlb/1znkFC1PmOxz
+         DHKCmwXCfvASju2cS+Qlhdf8YMqUDJbQMOr586pDqHrEafwzCHDeg68sJxuLTFpQCSMK
+         eSig==
+X-Gm-Message-State: AOJu0YzvaMiWaEATucJqP5ZJDD3SvIkHmV/dA0y8tta5y7nXCWt+O1MD
+	7/2Re/4XLXVzo+UdABd9V3YTOBETk1VxCNxxD/AG0tJOP5ZwVvt4VU6fXImHRQ==
+X-Gm-Gg: ASbGncvKNssEv8otqCjqZSdpR8q5uMiC1oAq8Y0RkQknU3gv2MEn5XwGIgJXhsUf8nh
+	63S4qKRuh+GmSsWHUz4JN3+VK6idbb0r1VJ9pdqtRIZgMN4wvTbu64RChWpl4ypWOpga7NhxUs7
+	N8PTKEjQN4kE3pP+Df2z4F3BP6W9/hWj5K188SEzAcIOH8sCGGTFmlUP0dAnsUAyCVxqSAeaX6n
+	FJdlf7VTD6UBEIX+aZjg3qCc9an8ITEYMTxa9Zl7HL7Z4FewnUBDk8SWlUUu/B5ImQK8HPN72pt
+	vcWQpNSfJltqhChm3HEw9J8yGcmdkYT5jNtqmE45wq1Y9b5gUD6nkOkDKLvGiSZRE+FW3cDpN8U
+	30Dt8siCwzmZ0rFd3TMGNyfYP1sJh064rLCbxWEIJxJV/mpqKlVuM02XdiQqZOFH1XaXOf8oQ5o
+	Oj3fc6/RkKffFMi9+PFg==
+X-Google-Smtp-Source: AGHT+IE5gHhLtFDPxx5PJj53hAmHRUvuBGnB+6fiy2pnZDne/474/uGltJSOvLJtl8YAH/WvYW6KEQ==
+X-Received: by 2002:a17:906:4fd2:b0:afd:d994:cb3 with SMTP id a640c23a62f3a-afe294d3edamr815510466b.65.1756066176120;
+        Sun, 24 Aug 2025 13:09:36 -0700 (PDT)
+Received: from localhost.localdomain (46.205.200.232.nat.ftth.dynamic.t-mobile.pl. [46.205.200.232])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afe49310e9asm425492766b.81.2025.08.24.13.09.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Aug 2025 05:39:24 -0700 (PDT)
-Message-ID: <68ab07fc.050a0220.28fb10.b184@mx.google.com>
-Date: Sun, 24 Aug 2025 05:39:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9092363566564016627=="
+        Sun, 24 Aug 2025 13:09:35 -0700 (PDT)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH BlueZ 1/2] lib: Fix out-of-bounds write when concatenating commands
+Date: Sun, 24 Aug 2025 22:09:19 +0200
+Message-ID: <20250824200921.308503-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
-Subject: RE: [BlueZ] lib: Add Bluetooth 6.0 and 6.1 into the version table
-In-Reply-To: <20250824111932.270868-1-arkadiusz.bokowy@gmail.com>
-References: <20250824111932.270868-1-arkadiusz.bokowy@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============9092363566564016627==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This commit fixes the hci_commandstostr() command by writing new line
+character in place of trailing space when wrapping long lines. Previous
+approach was to append new line character to existing string, which
+caused buffer overflow when there was more than 9 lines in the output
+string.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=994927
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.27 seconds
-GitLint                       PENDING   0.22 seconds
-BuildEll                      PASS      20.34 seconds
-BluezMake                     PASS      2645.43 seconds
-MakeCheck                     PASS      20.44 seconds
-MakeDistcheck                 PASS      186.51 seconds
-CheckValgrind                 PASS      236.64 seconds
-CheckSmatch                   PASS      306.80 seconds
-bluezmakeextell               PASS      129.71 seconds
-IncrementalBuild              PENDING   3.34 seconds
-ScanBuild                     PASS      926.18 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Also, the last trailing space is removed in order to return
+trailing-spaces-free string to the caller.
 ---
-Regards,
-Linux Bluetooth
+ lib/bluetooth/hci.c     | 25 ++++++++++++++++++-------
+ lib/bluetooth/hci_lib.h |  2 +-
+ 2 files changed, 19 insertions(+), 8 deletions(-)
 
+diff --git a/lib/bluetooth/hci.c b/lib/bluetooth/hci.c
+index f9feaf185..a1eccaf1e 100644
+--- a/lib/bluetooth/hci.c
++++ b/lib/bluetooth/hci.c
+@@ -604,18 +604,26 @@ char *hci_cmdtostr(unsigned int cmd)
+ 	return hci_uint2str(commands_map, cmd);
+ }
+ 
+-char *hci_commandstostr(uint8_t *commands, char *pref, int width)
++char *hci_commandstostr(const uint8_t *commands, const char *pref, int width)
+ {
+ 	unsigned int maxwidth = width - 3;
+ 	const hci_map *m;
+ 	char *off, *ptr, *str;
+-	int size = 10;
++	int size = 1;
++	int pref_len;
++
++	if (pref) {
++		pref_len = strlen(pref);
++	} else {
++		pref_len = 0;
++		pref = "";
++	}
+ 
+ 	m = commands_map;
+ 
+ 	while (m->str) {
+ 		if (commands[m->val / 8] & (1 << (m->val % 8)))
+-			size += strlen(m->str) + (pref ? strlen(pref) : 0) + 3;
++			size += pref_len + strlen(m->str) + 3;
+ 		m++;
+ 	}
+ 
+@@ -625,9 +633,7 @@ char *hci_commandstostr(uint8_t *commands, char *pref, int width)
+ 
+ 	ptr = str; *ptr = '\0';
+ 
+-	if (pref)
+-		ptr += sprintf(ptr, "%s", pref);
+-
++	ptr += sprintf(ptr, "%s", pref);
+ 	off = ptr;
+ 
+ 	m = commands_map;
+@@ -635,7 +641,8 @@ char *hci_commandstostr(uint8_t *commands, char *pref, int width)
+ 	while (m->str) {
+ 		if (commands[m->val / 8] & (1 << (m->val % 8))) {
+ 			if (strlen(off) + strlen(m->str) > maxwidth) {
+-				ptr += sprintf(ptr, "\n%s", pref ? pref : "");
++				ptr = ptr - 1;
++				ptr += sprintf(ptr, "\n%s", pref);
+ 				off = ptr;
+ 			}
+ 			ptr += sprintf(ptr, "'%s' ", m->str);
+@@ -643,6 +650,10 @@ char *hci_commandstostr(uint8_t *commands, char *pref, int width)
+ 		m++;
+ 	}
+ 
++	if (ptr != str)
++		/* Trim trailing space. */
++		ptr[-1] = '\0';
++
+ 	return str;
+ }
+ 
+diff --git a/lib/bluetooth/hci_lib.h b/lib/bluetooth/hci_lib.h
+index baf3d3e12..2cb660786 100644
+--- a/lib/bluetooth/hci_lib.h
++++ b/lib/bluetooth/hci_lib.h
+@@ -146,7 +146,7 @@ char *hci_lmtostr(unsigned int ptype);
+ int hci_strtolm(char *str, unsigned int *val);
+ 
+ char *hci_cmdtostr(unsigned int cmd);
+-char *hci_commandstostr(uint8_t *commands, char *pref, int width);
++char *hci_commandstostr(const uint8_t *commands, const char *pref, int width);
+ 
+ char *hci_vertostr(unsigned int ver);
+ int hci_strtover(char *str, unsigned int *ver);
+-- 
+2.47.2
 
---===============9092363566564016627==--
