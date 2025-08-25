@@ -1,106 +1,104 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84347393DF3
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 20:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B3A393DF3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 20:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756153020; cv=none; b=h8K5to530TsKhbBYaMQzpkB2vNltwN22sS2bQACiFBHjbaBdrmR/GWORCkt3h+NzRwQgaz5yynDKkSRlGTAO5lSIe+gPyNMi3CJwuWD8Hj0vClcUnyCstoXgWI/6X0thz1tOrNT3G4CQm57kzIlcWiBBaKFo5so7rU1/+R49Y0g=
+	t=1756153051; cv=none; b=LI+CQnXxQD6Jp+v/Nem02POG8i69qcqA/NLOjFlA3oy9l+Yj2c1uKvPfpldfNzUhV/FFlFusoTKLFQnJKlLWpB8Fwvq5kv2uC1zzcgOkkPQ/43qHPh1Od65zq5RVg9I3F0CqcW3UVmwnNdAsTue+sQOTyGmMbZuDx4Oxxcw951I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756153020; c=relaxed/simple;
-	bh=/U/Drd2jeVjmqVODsR9uJ67aDLh4mGSlv++vves9KZY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qldTvMjHJxzmX3CzYbQTi14BO5L5X6iI9jYwm//IohPf+kj8xQ+w+BhW8w28rvY5nDQvWQjBPTeaQCEP93OMFgkuosl7o/xmcH0UrewdfejE4BnZ3Gox5XdjV8p99bD+ssx2DwZlAI3idsffqsTvV6iNk5mcf+e55r43PfQinE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i59z6FIt; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756153051; c=relaxed/simple;
+	bh=BO2FFZQ9KAfxe5NTpfE17DzygjzQwWXXhtHbfIv8VFQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=D0MEYT5rZyfKDMBZYDdybr+iaaDNQSFwY1wVuC1nP6sNc4BtHYh5boXTwApOz4q7PQeNjJN2nIU0fvdUxsv//hjsCusYFQA0SBCCUpCEY6ybMUKgxD1UwZoqYsiVO8EKlQJE9RbCZRCiBjC5iGyLfHzgBhciFHeKQt97p8peKdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=H3znshzN; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i59z6FIt"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-71d603cebd9so54931347b3.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 13:16:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756153016; x=1756757816; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GMc9usLYCiU5C1eksGWmn60it/4OnWjugBhQjBS8wEM=;
-        b=i59z6FItErO6mDJy6+xSpurC+oU2eefwoTGkTpOkD95TWtbfHoCeFuCc7S8eOPVxdO
-         f/SeWr0TnpafVBrPY3t5eJDDhCMRknwLbQxMnhDy1oPyudXNIdcgAzsubOc35WytJMSp
-         MXS0mRPFS2MRuGGRCORGiVRF7I6SlavZBaUkCGfKLMOxQIkcAwoH2fYXUjOt/fSdmOQV
-         shkka8vsNubYuqaAdHUorfY6gWmSni4n41qfdbSjrI6rzk8dFovSKSjZwDkDGGTstMR0
-         3Y9WYZfcLJKgiYaof2yEUDnp2Y4LLdoWG34vziJ4RzqtSjZgwnA9IQNAPUVAousD5sT5
-         84Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756153016; x=1756757816;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GMc9usLYCiU5C1eksGWmn60it/4OnWjugBhQjBS8wEM=;
-        b=xECqFc8t5nZtJg+EPgKauuwYjit+3JJGx0PGxSAm4uMRuM4KlWAtSO3DS9/1n1mNng
-         wy3Nfl+KzOuoxMLXS/j29gXr04NhjTEUss6tJwPXYmNf2BxuM2JHT+s99iRm46NcGyuq
-         NSYYwr0RX0wPPjZPrr+x8rlI86ylQ8czy/Yc5LKJeQNDS0q5haZ0njAzQ3Q0enyHqHR9
-         a1VSAeJNQhTSXgd76+5iJn9/udrjTpG3lOoDMZUZAyW3zwuS8Nj2qWZTSl4wJ5Fu4x7p
-         QYpjieM2trugYJe4/ElU/P6lqCFX2R34yXbaNfL4cI/OD5RGAceqW4n014dUv54O8hCq
-         1e+Q==
-X-Gm-Message-State: AOJu0Ywwr4g7MnsdsreeEP89d1lmCiRXAbNn2wZjl/+vwfarjIJbuQpj
-	89tvnBk+R5DXliIQTnt4+AlBFm5EO6T7IX1wQiD9jxA7QMwp0iyRjszj2te3QHyRIVxuxg9VzUK
-	E5byq2+K0SzqqeQY1L9dSGs02q7qMWAQ=
-X-Gm-Gg: ASbGncsOQmwRnXalXGPhI5gFXIFuWeqmtrhuufZC+v5ZTxY2ZkzR8Iq+Sp/Rd5vOiaY
-	U/pcqAWEVayUo6/Ba6lW2pVdayeIvOFuJ+q4vVqhZxybgT25f5twLtMSSQ7WeP1aGLRXDhjjY5K
-	OGh5vPGHhw0Fs/c7aZrTo5u/AidbzPWEftCLWLUttTt5HZfOLCL+wEUkrwZ4i+9nJR8Ou8RxK9i
-	gj/zHvo
-X-Google-Smtp-Source: AGHT+IH3p2J5h1AVoNvNo6u1TrTalq+T1p+ijxGnGiNxqrAw5zxbSMMxQItP+VJyHxab1lpfvcLcfRDOXR6gRDWhwYc=
-X-Received: by 2002:a05:690c:25c2:b0:71c:7eb:3556 with SMTP id
- 00721157ae682-71fdc32724bmr137187197b3.15.1756153016282; Mon, 25 Aug 2025
- 13:16:56 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="H3znshzN"
+Received: from github.com (hubbernetes-node-222d189.va3-iad.github.net [10.48.133.37])
+	by smtp.github.com (Postfix) with ESMTPA id 46E908C0763
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 13:17:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1756153049;
+	bh=ZQ1S9nXRv85ZZ6eff/v6UQ6mQlBDCsUEd6tvgbWQEpc=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=H3znshzNIcB7Erzv3nYaMXkX5tblGZ2fjq3gTEcnUfsaW+1T1JkivbwJuS0KxEh9Q
+	 PtsGjxe+LVXkcAkEzxM2c7ShoAUYhvmaXBH5pkhWuUAOgKqDJv3O/+CA3vUCpoxoTf
+	 1iracgNAnHvgEcYnvoghX53BkkgRcXKt3c97wwCY=
+Date: Mon, 25 Aug 2025 13:17:29 -0700
+From: Arkadiusz Bokowy <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/3acfa2-f911b6@github.com>
+Subject: [bluez/bluez] 61c49d: lib: Add missing includes in bluetooth/hci.h
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250825172504.339117-1-arkadiusz.bokowy@gmail.com>
- <CABBYNZKazQ0zROk1+gs5=U+zaZDwkMmD01MTYLuMZ3VUaoZZQg@mail.gmail.com>
- <CAGFh027fC8z3mx4zMm9Zu8GKFu7Ae7MKbze3Ef+4g0x90sRCag@mail.gmail.com>
- <CABBYNZL23GLaO0tQD9iYaG=OeUbxvbKrKCX1yOv7kfvM+L7W5Q@mail.gmail.com>
- <CAGFh025kOatLYjLrBMzrFQQG0oQHZQ-4=U-d0Nky780HrrOPhw@mail.gmail.com> <CABBYNZKN3PwV4XPM3=7t_1-+=m1nAmEVcZ9UB0yfgks45vnOXg@mail.gmail.com>
-In-Reply-To: <CABBYNZKN3PwV4XPM3=7t_1-+=m1nAmEVcZ9UB0yfgks45vnOXg@mail.gmail.com>
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Date: Mon, 25 Aug 2025 22:16:45 +0200
-X-Gm-Features: Ac12FXzePq9_GbWD8qEgqI0a-zKusy2EL7QTbyW_fccOiqED-7azqTlxpWTCLt4
-Message-ID: <CAGFh025HT5=Fcx=tj07hzCG6=mRmH28YY6vijce0w7Y_FfBpww@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Fixup quirk for reading ext features on
- some Barrot controllers
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-> Could we solve this by doing:
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 3595a8bad6bd..168b07041605 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1194,6 +1194,17 @@ static int btusb_recv_intr(struct btusb_data
-> *data, void *buffer, int count)
->                 }
->
->                 if (!hci_skb_expect(skb)) {
-> +                       /* Each chunk should correct to at least 1 or
-> more events
-> +                        * so if there are still bytes left that
-> doesn't constitute a new
-> +                         * event this is likely a bug in the controller.
-> +                        */
-> +                       if (count && count < HCI_EVENT_HDR_SIZE) {
-> +                               bt_dev_warn(data->hdev,
-> +                                           "Unexpected continuation: %d bytes",
-> +                                           count);
-> +                               count = 0;
-> +                       }
-> +
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 61c49dfa2e8d4a1eb0926ae5fd8cde38ac01c74a
+      https://github.com/bluez/bluez/commit/61c49dfa2e8d4a1eb0926ae5fd8cd=
+e38ac01c74a
+  Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+  Date:   2025-08-25 (Mon, 25 Aug 2025)
 
-Yes, it should work. I was afraid that a simple patch like that, that
-affects all other controllers, might break something. So, instead,
-I've added a dedicated quirk only for affected controllers and only
-for 0x1004 command. I can test it later, but it's simple enough that
-even without testing one might tell that it will work as expected :)
+  Changed paths:
+    M lib/bluetooth/hci.h
+
+  Log Message:
+  -----------
+  lib: Add missing includes in bluetooth/hci.h
+
+Compilation fails when using bluetooth/hci.h without other includes.
+
+/usr/include/bluetooth/hci.h:310:9: error: unknown type name =E2=80=98uin=
+t8_t=E2=80=99
+310 |         uint8_t         lap[3];
+    |         ^~~~~~~
+...
+/usr/include/bluetooth/hci.h:383:9: error: unknown type name =E2=80=98bda=
+ddr_t=E2=80=99; did you mean =E2=80=98daddr_t=E2=80=99?
+383 |         bdaddr_t        bdaddr;
+    |         ^~~~~~~~
+
+
+  Commit: f911b6df4fd1462d9718bcacced508cad03ce4d1
+      https://github.com/bluez/bluez/commit/f911b6df4fd1462d9718bcacced50=
+8cad03ce4d1
+  Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+  Date:   2025-08-25 (Mon, 25 Aug 2025)
+
+  Changed paths:
+    M lib/bluetooth/hci_lib.h
+
+  Log Message:
+  -----------
+  lib: Add missing includes in bluetooth/hci_lib.h
+
+Compilation fails when using bluetooth/hci_lib.h without other includes.
+
+/usr/include/bluetooth/hci_lib.h:21:9: error: unknown type name =E2=80=98=
+uint16_t=E2=80=99
+21 |         uint16_t ogf;
+   |         ^~~~~~~~
+...
+/usr/include/bluetooth/hci_lib.h:182:27: error: =E2=80=98HCI_VENDOR_PKT=E2=
+=80=99 undeclared
+182 |         hci_set_bit((t =3D=3D HCI_VENDOR_PKT) ? 0 : (t & HCI_FLT_TY=
+PE_BITS), &f->type_mask);
+    |                           ^~~~~~~~~~~~~~
+
+
+Compare: https://github.com/bluez/bluez/compare/3acfa2d50a9f...f911b6df4f=
+d1
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
