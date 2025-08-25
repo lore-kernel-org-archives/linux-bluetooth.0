@@ -1,126 +1,193 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA9442AA6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 19:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C495C233D85
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 20:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756151830; cv=none; b=Ixt/YHVVfI74MgwQUiUMIhRDWD3EP54qyjYA69bRJvRLisSWSjSVJ8c0A5HshtLpWtog6b8125sZJVHU1+TH+TaJiJI9xIm2GthZpjrlwsTd7QzmXvFfxbKFQx6bd/9/Ln/OmLVwFk1hzaUKbYrytBEULxQhjQsECcPy41O9+Wo=
+	t=1756152520; cv=none; b=K+fGMIaErVqqnWOzrCKt+WwOUz1hsCrDC7HuhNEzWukyqzRYNoT3TtynZX0nCGtSWQia3tPsN/FW1Jf/Kw0/L9WvQbxVFRlU0yYnMDQCOT0qDBuiR9MdMEyaAlT9eUqjebfeFaNYChe2LTCHERf0Aeq3Q04HJwDD5JpPMLlREMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756151830; c=relaxed/simple;
-	bh=D0xJtbHDYEG+J61/tCCvxAlXRfUqnRKXjZOEBswhHLg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=WIJt6zg4SleO9mfxGz94QuoVeLPFJFAPsWLMDCJNMrLy6HmAjaHVrwn7Nog9UVYGRQnM2jNikUuBKzMcVMpsztfaCxDYFhojTDenJjB5DAfRvPy0hSrAK2bnY0nCctZiY/7Yi+LKD1ooIa+iKIHLzlf5mlEus71GDcWYyM2mMBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BM5zP6Ch; arc=none smtp.client-ip=209.85.166.182
+	s=arc-20240116; t=1756152520; c=relaxed/simple;
+	bh=7uujfHYvCk4Hu3v/7AlJi62lFpM7OJQCr3VISTrC5cw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hWmzMLqJfrj1UHcyOCAmHLzp8656KIeM4p1ZBsBZznULiGrCSBKexHFWvAYlr/b+LNlyRbpJ9cBKzwwzlfbiZB1bGOYCxCcMz3t/wV9a8CgueQxUn9ei2OCsPJ/JPb9rBWGRDnioWsWvGjyQubHOh1aZmwjnUiIUKeWb2cMCUAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PbepYbge; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BM5zP6Ch"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3ec25655e38so9061935ab.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 12:57:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PbepYbge"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-3367f35d129so7838851fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 13:08:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756151828; x=1756756628; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDPcc8Fqovmd5Tee1q8QJeEDXPoNWVkuIdym3LfG1o8=;
-        b=BM5zP6ChYO43jrKWnm91xsCVbA6dKZQsQ0FfD8y1vN8jjxurTf/UohO5VlvX+aZJPv
-         Icho/ICHW8rWrLOBfejLq9RGlwZRW49DwmoepYQdboP6K2VFqlbHtmkJa64Gt2IA9u8A
-         bOxs1OwIifwfc3sI4ywbh9vbQNh69+arMh+fokVWutXmY02//q2sxgpV5BkLkske41sM
-         8fgE2UXOkanXG0T6kfXCyB65GxTHxM2PvRb5FxabxNYLwsdgLDuX3z7/AT4XxUZByp6T
-         7V7a7NXQFge/fAiDpx2E0vPoBFQEgiO7ZYqTJJxNDQfhrHbP8XvQeDcTCuljqpO+FIgH
-         iU6w==
+        d=gmail.com; s=20230601; t=1756152517; x=1756757317; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AnsFcCqM93r1BR/U10hls1mOsuU5DKPko9808VTr7uQ=;
+        b=PbepYbgebX9flTtZKyi/XdzwIEf3uBX0Dal9vyI+NxF72ObthYUD8Z8qk/1mNr/G11
+         EtM/OMfFkwilCL2uCIbq2B0R3R9IZy8VZuyge+8I3jRCx7l2kg4MTVL82KBycqDpQttE
+         J94gX/WjsE+gscTIO/bjzs8ejgEP9UvyKWSyFC2R/Wrj4N6vddcmkSWPDx6wA2Ka7F2o
+         LMQ6dGz1hkB/leFuoqjHdaWNoDHDAWj5CbCEBBB8GEtpf70IWwNaipQDxFM/AJLcDwuT
+         VKmtBAypfoTjj1PAZGUWsCj7kHKBp/kMZ9vgM04rYmhCHYWDLj+D35rNI2EzBujQ6eK5
+         tsNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756151828; x=1756756628;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SDPcc8Fqovmd5Tee1q8QJeEDXPoNWVkuIdym3LfG1o8=;
-        b=uyAQwhvOZEBGO9vk652JsY8rkyP2CkV8L7pb0o8AQyqXdI5mPL5lvRE2pvAbIuUBg5
-         ggCSzs271Iaj9NXUs4r8IN5b+HSdaZkv1C1jnXL5vCQxKC/l4QIn3DpOk9EEHQ1oqgaQ
-         laLKFY8DgRvMpKJ2Fak2gdDPh5w7qnii1zosr8KJPBrzn+anTXeVuhRRv/2GOK19nNYk
-         pzx7zp3JTQzqZUaFGEv5moYKz3PSHwlCcAuCOzvt4pqM3rDCSSFv8bSyZazVMBdYEPnv
-         e1P5QO0TEMvy91SicpGYoOJhuz9VOoU54KPN0mK4Q8KUmoCucS69AlK+pQjHXWtUq6eQ
-         vXnQ==
-X-Gm-Message-State: AOJu0YyIn4pW4M6vUEsYF2l6FpKCzZmBx3RUzXcGh6XWT1N+fnHjAhKr
-	t92euL9w5cWv7quMQsShzE98/7AJmSnr4HJbsvMlfxnQJo0d9g7nJ3dWKBsS7A==
-X-Gm-Gg: ASbGncsRqt/xRhItER0cW61YOF7NB6Lngu7WB7L7+escFat3HB2aX6EvE6nNiIdeDOw
-	mTzWZLKTKPoOAaV1c8kBGWnNYS05bHSZzcgEIaOXnKqFHskX5s5YOZ5v/1ovFSyX1psL/cV4nnH
-	8BiuQoJC4J97QvcBUqpKJF8G/joM2hSz7Kne4F33iX3eN2lCn7f55M8y3dxEVoGHGUoSixowgTi
-	IVrLsAJ7mkX/0W6ouGmlOs9EFKZDTnrdRhX6OAhoN37xXbn7Fr4rm9aep8Av+92NwShVVqow6Ha
-	fAQhs9P8RArfT5mAMjIugN9iapCRRJmQzvDsGQFkXiAbBnEKYbGZVnCOHOkJc/jBKOzyqt5xXlM
-	Zf48VbYCd3EyiobKwLNfBajg3OCTfY/KaleBg64jV
-X-Google-Smtp-Source: AGHT+IGQ0KYPR1nFzzLR87GPLPbfANGSe5ZdUKdSftnOMNfADiji9VP49Gq6oKItRYPGmOywVMxGjg==
-X-Received: by 2002:a05:6e02:1807:b0:3e9:e1fd:2fa with SMTP id e9e14a558f8ab-3e9e1fd23efmr159617175ab.30.1756151827580;
-        Mon, 25 Aug 2025 12:57:07 -0700 (PDT)
-Received: from [172.17.0.2] ([64.236.142.128])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c75cfd7sm55086195ab.22.2025.08.25.12.57.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 12:57:07 -0700 (PDT)
-Message-ID: <68acc013.050a0220.66548.b106@mx.google.com>
-Date: Mon, 25 Aug 2025 12:57:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1225367149989642748=="
+        d=1e100.net; s=20230601; t=1756152517; x=1756757317;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AnsFcCqM93r1BR/U10hls1mOsuU5DKPko9808VTr7uQ=;
+        b=NCxVTlRnWSliOU99KMR2N/OzizDfEl5f+kaLDH+oQkXWzccetnB8+16TcrRCOCWfgX
+         Ni3rF0NHK9Kwrmo1WzsotrMP2AF7GWzory+tHSgv2uH4vKh4GUyZFCEMoG12aF5N4ge3
+         b8BU2+kZhBP5LJCK2Yrwr+ehKGZr1DeYycoyz+kP7We++4l7mRF+4sfXl/MpI3QG8OfH
+         CLPP3HzlLQoR+AZQMWU1/ZM2xm+OKY5A83CZLwqYWFWGkW+sGiLay+1iy3gJ5EXgnw0W
+         xokx1yNeobW713WNzaoDG5Olhc6BLc2uQW8T0OLMZNWNFclXnwfe/9DERpCGuI0OWJh8
+         ciOg==
+X-Gm-Message-State: AOJu0YxjHMkm8zL6FazD6GUZxbMndfzaLuak/xszfiKFsiThCeOpRLv4
+	YyCTPcGCS0yiRHaNlOVmIDnZQWuCgxXgnfy9PQSBxYs56SSBouyrp2PcJ2+NQERJVASTJS+xcyf
+	KrRHUN0Hg5QMvUqN17O2EbCwDzDtDGfo=
+X-Gm-Gg: ASbGnctX+pLeRQ14XtvDZ4gr0Q2ArWGUqtE1RbpNDbN6blm5889DPMvDRStExFKzM9X
+	O2C8pstu9hMB5JCIkV5qPTVQPNIc2EXVNgrOscM+HNYQkf6CtkbSTO6pKeYpZzVOWKuDATA44Pf
+	zvrzurRNRdhwyjUKFloW8ZCfgBEYKfo+EqxjsZ9qcbNN5dqSso9WYFIg8/jE8mlEjINWbbzA9Dx
+	0SnQY8UdKA7rGc5VRmX5NP5Cxvz0vcvqwc2oyWv3kqPcA==
+X-Google-Smtp-Source: AGHT+IEkp1W6xm9Gm4W6eSjs8/CvJOyErfTu15ybhzUvY65exvZorNjcc4sZzOWG2jlc4vlSZQrnkAsHNA92gI40V8c=
+X-Received: by 2002:a2e:be1c:0:b0:336:7b66:13a1 with SMTP id
+ 38308e7fff4ca-3367b662564mr9784501fa.0.1756152515789; Mon, 25 Aug 2025
+ 13:08:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
-Subject: RE: [BlueZ,v2,1/2] lib: Add missing includes in bluetooth/hci.h
-In-Reply-To: <20250825183159.340527-1-arkadiusz.bokowy@gmail.com>
-References: <20250825183159.340527-1-arkadiusz.bokowy@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20250825172504.339117-1-arkadiusz.bokowy@gmail.com>
+ <CABBYNZKazQ0zROk1+gs5=U+zaZDwkMmD01MTYLuMZ3VUaoZZQg@mail.gmail.com>
+ <CAGFh027fC8z3mx4zMm9Zu8GKFu7Ae7MKbze3Ef+4g0x90sRCag@mail.gmail.com>
+ <CABBYNZL23GLaO0tQD9iYaG=OeUbxvbKrKCX1yOv7kfvM+L7W5Q@mail.gmail.com> <CAGFh025kOatLYjLrBMzrFQQG0oQHZQ-4=U-d0Nky780HrrOPhw@mail.gmail.com>
+In-Reply-To: <CAGFh025kOatLYjLrBMzrFQQG0oQHZQ-4=U-d0Nky780HrrOPhw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 25 Aug 2025 16:08:22 -0400
+X-Gm-Features: Ac12FXzhHoNoj5Qm0-0j-t_h_HRZf6rwPLOFH6us540g51JfwrHpZUQwaPbNs2A
+Message-ID: <CABBYNZKN3PwV4XPM3=7t_1-+=m1nAmEVcZ9UB0yfgks45vnOXg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Fixup quirk for reading ext features on
+ some Barrot controllers
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============1225367149989642748==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Arkadiusz,
 
-This is automated email and please do not reply to this email!
+On Mon, Aug 25, 2025 at 3:37=E2=80=AFPM Arkadiusz Bokowy
+<arkadiusz.bokowy@gmail.com> wrote:
+>
+> > Yeah, but that is just working around the extra byte, but it seems
+> > there is some way to detect that not all data has been read, which is
+> > why wireshard is only considering the Read Local Extended Features as
+> > received on frame 127 not on frame 123
+>
+> I have not checked how the wireshark logic works, but I guess that it
+> works like this:
+> 1) read URB and parse it's header to get the size of the buffer
+> 2) reads HCI header which tells how long the HCI packet is
+> 3) diccesst entire HCI packet
+> 4) return dissection with the number of processed bytes
+> 5) URB_packet_len - dissected_len =3D=3D 1 which triggers fragmentation l=
+ogic
+>
+> USB capture from my controller:
+>
+> > 109 7.586834       host                  1.7.1                 USB     =
+ 64     URB_INTERRUPT in
+> > 110 7.586985       host                  controller            HCI_CMD =
+ 68     Sent Read Local Extended Features
+> > 111 7.596062       1.7.0                 host                  HCI_USB =
+ 64     Rcvd
+> > 112 7.604809       1.7.1                 host                  HCI_USB =
+ 81     Rcvd Fragment
+> > 113 7.604830       host                  1.7.1                 USB     =
+ 64     URB_INTERRUPT in
+> > 114 7.604980       host                  controller            HCI_CMD =
+ 67     Sent Read Buffer Size
+> > 115 7.610312       1.7.0                 host                  HCI_USB =
+ 64     Rcvd
+> > 116 7.610814       controller            host                  HCI_EVT =
+ 77     Rcvd Command Complete (Read Local Extended Features)
+> > 117 7.610823       host                  1.7.1                 USB     =
+ 64     URB_INTERRUPT in
+>
+> But this INFO column is not correct. The frame 112 contains:
+>
+> 0000   40 5e d7 04 80 ff ff ff 43 01 81 07 01 00 2d 00
+> 0010   b8 73 a8 68 00 00 00 00 9e 80 05 00 00 00 00 00
+> 0020   11 00 00 00 11 00 00 00 00 00 00 00 00 00 00 00
+> 0030   01 00 00 00 00 00 00 00 00 03 00 00 00 00 00 00
+> -- HCI payload starts here
+> 0040   0e 0e 01 04 10 00 01 02 00 00 00 00 00 00 00 00
+> 0050   00
+>
+> First byte in the HCI payload is event type, the second byte is length
+> 0x0e =3D=3D 14. However, the USB buffer has 17 bytes, which is one more
+> than the event header size (2 bytes) + 14 bytes of data.
+>
+> The frame 116 contains:
+>
+> 0000   40 5e d7 04 80 ff ff ff 43 01 81 07 01 00 2d 00
+> 0010   b8 73 a8 68 00 00 00 00 13 98 05 00 00 00 00 00
+> 0020   0d 00 00 00 0d 00 00 00 00 00 00 00 00 00 00 00
+> 0030   01 00 00 00 00 00 00 00 00 03 00 00 00 00 00 00
+> -- HCI payload starts here
+> 0040   0e 0b 01 05 10 00 a7 02 ff 09 00 04 00
+>
+> And it is a correct event for the 0x1005 opcode on its own. But
+> wireshark tries to defragment it with frame 112 and displays frame 116
+> as "Rcvd Command Complete (Read Local Extended Features)" which is not
+> true.
+>
+> So, here is the full diagnostic for what is going on. However, I'm not
+> sure that the patch is the right remedy for this issue... It works, so
+> at least it is a good PoC that these USB dongles can work with Linux
+> as well. I have not tested all HCI commands, so I do not know whether
+> there are any other quirks in this dongle. All I can tell is that I've
+> tested it with A2DP audio and it works but it is not very stable...
+> sometimes it hangs (unplug/plug is required), but most likely due to
+> undervoltage on my RPi... (undervoltage does not jam the on-board BT
+> chip or other dongles that I have, though).
+>
+> This extra byte in the 0x1004 response event seems to be random -
+> garbage most likely. I've tested it with libusb. There is also another
+> thing with this dongle which was not mentioned earlier. Dedicated
+> Barrot Windows driver sends a few vendor HCI commands before standard
+> initialization. Most likely queries version of firmware or something.
+> Also, Windows driver does not use "Read Local Extended Features", so
+> maybe it was not tested... Anyway, without these vendor commands the
+> controller seems to work properly (as far as I tested it).
 
-Dear submitter,
+Could we solve this by doing:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=995364
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3595a8bad6bd..168b07041605 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1194,6 +1194,17 @@ static int btusb_recv_intr(struct btusb_data
+*data, void *buffer, int count)
+                }
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.34 seconds
-GitLint                       PENDING   0.22 seconds
-BuildEll                      PASS      20.05 seconds
-BluezMake                     PASS      2587.60 seconds
-MakeCheck                     PASS      19.93 seconds
-MakeDistcheck                 PASS      183.20 seconds
-CheckValgrind                 PASS      234.35 seconds
-CheckSmatch                   PASS      306.05 seconds
-bluezmakeextell               PASS      128.11 seconds
-IncrementalBuild              PENDING   0.31 seconds
-ScanBuild                     PASS      901.26 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+                if (!hci_skb_expect(skb)) {
++                       /* Each chunk should correct to at least 1 or
+more events
++                        * so if there are still bytes left that
+doesn't constitute a new
++                         * event this is likely a bug in the controller.
++                        */
++                       if (count && count < HCI_EVENT_HDR_SIZE) {
++                               bt_dev_warn(data->hdev,
++                                           "Unexpected continuation: %d by=
+tes",
++                                           count);
++                               count =3D 0;
++                       }
++
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1225367149989642748==--
+--=20
+Luiz Augusto von Dentz
