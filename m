@@ -1,111 +1,449 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6555619F137
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Aug 2025 04:44:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD6B2F1FDC;
+	Tue, 26 Aug 2025 05:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756183485; cv=none; b=mV1aHgjPczpDqEMQVMSqnfnt/Jt4ki0KjK4VV6apbLw8qXeUYrFq9AxQGs1htzsGkD53Bzq3JNSH6wT0KoSEPgMZv9jhOOW82/5uU6WoF1JtaLvfbllpiKXFz9afON7NCKRqf2NoLQA5hNwq0MEVZ5S6tDzhTfUDCOAOCnO+hlo=
+	t=1756186839; cv=none; b=r6MKspmqxDdR94cSM+fgVcWjdOWiW8zJ9WOWTzWgf3Cvb2BUI/AQMMurV4t/mr5Td/1qFJS12Yu5pIWTlEYTIsM+VpeaF102tYBg8lXld3Tdb/lxB4lv6AEKFfS3OpHOSyLivO1tjIAyphUr7CB05z+3huZ9SJb+HEjB8pcpEic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756183485; c=relaxed/simple;
-	bh=3aOhmJHgCaY/LSxVTdZSZMJi/catvbsp4EmLRl7r3UU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qVo2uGRPWi3Uz7O1ibuCULt3jXBT9BkIn1YUzqMK1O7ghEf05Sd/QdrYC2vkVALA4leP11gqbnP9fSwG0fK/dEDPupYWeOn1MJlEh5vz7bW+ukeIOij8wnRItjPHgYUVrc3Mu+flwSvfd1T8kgHzO1OvyvOJFBs8+8guyo+a0X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U5qExKhz; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5qExKhz"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-71d71bcab6fso39136297b3.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Aug 2025 21:44:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756183483; x=1756788283; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tX35IfGDf2Cq9C+jcMNrva8gDLrUi6aOQ/iQDuYCJk4=;
-        b=U5qExKhzGK/W+OFaPKQfanq3bSYkQChzEAQHZf14SCnsq5qAZ2SSp0SvrEjv1hLiK7
-         9l7DPmhhdnHZarv75+PvIB2ETWwwlaqLOUzHRs2dsWqcpLD0EFUPbvv9Nf5G+eUhVOl+
-         qiyui+r5MQUaiscHOGs68UuCHu/l40jAsamfRfUIsutvlvVKWMvGFmzsIFEXIKBlXhoU
-         QbnWy8V3OhhfZeydXSqcEqrkweuxfQdE4HArocEWyoG+SzaUctjLohwFRzUH2AfE9o4c
-         fwDgU0g6mhLaG9lU/sjdJn5vNHZ2RLPv2Gt7Md9WTdi8oG5SJJluy/sLhzAdbhqHrCGu
-         I6Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756183483; x=1756788283;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tX35IfGDf2Cq9C+jcMNrva8gDLrUi6aOQ/iQDuYCJk4=;
-        b=D3hW/VnlQHoakyERRHBc+5DHaEO5BNYEUzMRMmvOLUUYWMxh1BGHxvaje5Zr4nz6TO
-         U0PA+8ZAOoTRJLB/tq+oZPO8NQemLTUujV9zWsf06e7/NXGg4yJapITn6vlbUdcK0fd2
-         O/kotIgSJfg4J2rsLQ7Ljr8ik0VYBdO9eWUjju4xRASrsWPbwx5fGgkZp+4vqTCSuU7X
-         YDeoiGZT/wZsPeyvs3tQsBNY9DIliAw+Q7wdDnxAXy8MJp1J5ygCeEmVznJdNFA7Ir5F
-         wozWOMyzXzDbLCIuOwlnmiG6CsFDanc2tWQpx+h5Fn0m0E9CiLRwFKfsnm2am6HbhvPP
-         majQ==
-X-Gm-Message-State: AOJu0Yzrvot7xGV/WnYaMO5GNXI7DQ2prn4I/vWwccSKOH56YhhD06Kv
-	msfhZpFLQ98CCZ8TxFW2fMnNgr0ipILW3TYzq5AmMh60zyCxM6id7I4KddpZsBZfUlUBdq1A8Iv
-	xatz6YbNQYXR6SFHy68aCBZ4jxSsPxCs=
-X-Gm-Gg: ASbGncutCMg2rpQZC2rBjl1cWitdFxNBaryMWi6gc+IkQYiMD/XgCiqVt+qpe1b+yhz
-	ABIJuyCO6QoGlKR37ULNKmBm1SXP8ZUV5a5sgyvhJ648XtVSBxcmCunittM43gGwl8uvsX+1GLa
-	Kxk072t3uUmhVkuehkQB0BcD3tReu37NiF1wotBuUwzzuIE3WYL/Uzj/rjJvEtottBEEUIDdM01
-	esrv12p
-X-Google-Smtp-Source: AGHT+IFF4dp4d4Bn/X/QXnRw4xAaogEcaXewVPD1tZMJAC/ktdxz2iANWcOlpozUcAAO9NhJhirLbAWXOjfSdr0PsqI=
-X-Received: by 2002:a05:690c:931c:20b0:71f:ed56:8afb with SMTP id
- 00721157ae682-71fed56903cmr101823307b3.54.1756183483211; Mon, 25 Aug 2025
- 21:44:43 -0700 (PDT)
+	s=arc-20240116; t=1756186839; c=relaxed/simple;
+	bh=9eSCc/1IVWVs30tCSZDdOQB5X7sh8HgtKf8BwoIEIkA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ukQxPyViKXxxmL2JNSs0EjTpiOFMc9KfCT2Rl9h4PcrKzHBFDNpmySZMCPCsFmkTVgIPEcW9wy8JNhcSB0sUTdjWI6P5JUeRR++FBMDpXxIfYpgsY+qXy05dw1S8CnvQJMjy7vcV1gSSKcWL9blULncp7iu/hSLzOrajp/Bu8mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7cb.dynamic.kabel-deutschland.de [95.90.247.203])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8DAC56028826D;
+	Tue, 26 Aug 2025 07:40:00 +0200 (CEST)
+Message-ID: <e9bbe0bb-b70d-445b-a7ff-b0ab2eef6c6f@molgen.mpg.de>
+Date: Tue, 26 Aug 2025 07:40:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825172504.339117-1-arkadiusz.bokowy@gmail.com>
- <CABBYNZKazQ0zROk1+gs5=U+zaZDwkMmD01MTYLuMZ3VUaoZZQg@mail.gmail.com>
- <CAGFh027fC8z3mx4zMm9Zu8GKFu7Ae7MKbze3Ef+4g0x90sRCag@mail.gmail.com>
- <CABBYNZL23GLaO0tQD9iYaG=OeUbxvbKrKCX1yOv7kfvM+L7W5Q@mail.gmail.com>
- <CAGFh025kOatLYjLrBMzrFQQG0oQHZQ-4=U-d0Nky780HrrOPhw@mail.gmail.com> <CABBYNZKN3PwV4XPM3=7t_1-+=m1nAmEVcZ9UB0yfgks45vnOXg@mail.gmail.com>
-In-Reply-To: <CABBYNZKN3PwV4XPM3=7t_1-+=m1nAmEVcZ9UB0yfgks45vnOXg@mail.gmail.com>
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Date: Tue, 26 Aug 2025 06:44:32 +0200
-X-Gm-Features: Ac12FXy9sVq6Pmz-xHy9874DVYsrlDcaSwgx2kuCK0EJVv2hjaK6KJOiblc_fBw
-Message-ID: <CAGFh026t_ba4x48ZQqhKnBxkQC=uLF5O8vHx--c_fxJTS1b=pg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Fixup quirk for reading ext features on
- some Barrot controllers
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: remove duplicate h4_recv_buf() in header
+To: Calvin Owens <calvin@wbinvd.org>
+Cc: linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Sean Wang <sean.wang@mediatek.com>,
+ Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+ Neeraj Kale <neeraj.sanjaykale@nxp.com>, linux-bluetooth@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ johan.hedberg@intel.com
+References: <be8edf7f8ba8dea6c61272b02fb20a4ac7e1c5a5.1756179634.git.calvin@wbinvd.org>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <be8edf7f8ba8dea6c61272b02fb20a4ac7e1c5a5.1756179634.git.calvin@wbinvd.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> Could we solve this by doing:
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 3595a8bad6bd..168b07041605 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1194,6 +1194,17 @@ static int btusb_recv_intr(struct btusb_data
-> *data, void *buffer, int count)
->                 }
->
->                 if (!hci_skb_expect(skb)) {
-> +                       /* Each chunk should correct to at least 1 or
-> more events
-> +                        * so if there are still bytes left that
-> doesn't constitute a new
-> +                         * event this is likely a bug in the controller.
-> +                        */
-> +                       if (count && count < HCI_EVENT_HDR_SIZE) {
-> +                               bt_dev_warn(data->hdev,
-> +                                           "Unexpected continuation: %d bytes",
-> +                                           count);
-> +                               count = 0;
-> +                       }
-> +
+Dear Calvin,
 
-I've just verified that this patch brings the Barrot dongle to live on
-Linux. Here is the output from dmesg:
 
-> [   43.329852] usb 1-1.4: new full-speed USB device number 4 using dwc_otg
-> [   43.446790] usb 1-1.4: New USB device found, idVendor=33fa, idProduct=0012, bcdDevice=88.91
-> [   43.446813] usb 1-1.4: New USB device strings: Mfr=0, Product=2, SerialNumber=0
-> [   43.446821] usb 1-1.4: Product: UGREEN BT6.0 Adapter
-> [   43.582024] Bluetooth: hci1: Unexpected continuation: 1 bytes
-> [   43.703025] Bluetooth: hci1: Unexpected continuation: 1 bytes
-> [   43.750141] Bluetooth: MGMT ver 1.23
+Thank you for your patch.
+
+Am 26.08.25 um 06:11 schrieb Calvin Owens:
+> The "h4_recv.h" header contains a duplicate h4_recv_buf() that is nearly
+> but not quite identical to the h4_recv_buf() in hci_h4.c.
+> 
+> This duplicated header was added in commit 07eb96a5a7b0 ("Bluetooth:
+> bpa10x: Use separate h4_recv_buf helper"). I wasn't able to find any
+> explanation for duplicating the code in the discussion:
+> 
+>      https://lore.kernel.org/all/20180320181855.37297-1-marcel@holtmann.org/
+>      https://lore.kernel.org/all/20180324091954.73229-2-marcel@holtmann.org/
+> 
+> Unfortunately, in the years since, several other drivers have come to
+> also rely on this duplicated function, probably by accident. This is, at
+> the very least, *extremely* confusing. It's also caused real issues when
+> it's become out-of-sync, see the following:
+> 
+>      ef564119ba83 ("Bluetooth: hci_h4: Add support for ISO packets")
+>      61b27cdf025b ("Bluetooth: hci_h4: Add support for ISO packets in h4_recv.h")
+> 
+> This is the full diff between the two implementations today:
+> 
+>      --- orig.c
+>      +++ copy.c
+>      @@ -1,117 +1,100 @@
+>       {
+>      -	struct hci_uart *hu = hci_get_drvdata(hdev);
+>      -	u8 alignment = hu->alignment ? hu->alignment : 1;
+>      -
+>       	/* Check for error from previous call */
+>       	if (IS_ERR(skb))
+>       		skb = NULL;
+> 
+>       	while (count) {
+>       		int i, len;
+> 
+>      -		/* remove padding bytes from buffer */
+>      -		for (; hu->padding && count > 0; hu->padding--) {
+>      -			count--;
+>      -			buffer++;
+>      -		}
+>      -		if (!count)
+>      -			break;
+>      -
+>       		if (!skb) {
+>       			for (i = 0; i < pkts_count; i++) {
+>       				if (buffer[0] != (&pkts[i])->type)
+>       					continue;
+> 
+>       				skb = bt_skb_alloc((&pkts[i])->maxlen,
+>       						   GFP_ATOMIC);
+>       				if (!skb)
+>       					return ERR_PTR(-ENOMEM);
+> 
+>       				hci_skb_pkt_type(skb) = (&pkts[i])->type;
+>       				hci_skb_expect(skb) = (&pkts[i])->hlen;
+>       				break;
+>       			}
+> 
+>       			/* Check for invalid packet type */
+>       			if (!skb)
+>       				return ERR_PTR(-EILSEQ);
+> 
+>       			count -= 1;
+>       			buffer += 1;
+>       		}
+> 
+>       		len = min_t(uint, hci_skb_expect(skb) - skb->len, count);
+>       		skb_put_data(skb, buffer, len);
+> 
+>       		count -= len;
+>       		buffer += len;
+> 
+>       		/* Check for partial packet */
+>       		if (skb->len < hci_skb_expect(skb))
+>       			continue;
+> 
+>       		for (i = 0; i < pkts_count; i++) {
+>       			if (hci_skb_pkt_type(skb) == (&pkts[i])->type)
+>       				break;
+>       		}
+> 
+>       		if (i >= pkts_count) {
+>       			kfree_skb(skb);
+>       			return ERR_PTR(-EILSEQ);
+>       		}
+> 
+>       		if (skb->len == (&pkts[i])->hlen) {
+>       			u16 dlen;
+> 
+>       			switch ((&pkts[i])->lsize) {
+>       			case 0:
+>       				/* No variable data length */
+>       				dlen = 0;
+>       				break;
+>       			case 1:
+>       				/* Single octet variable length */
+>       				dlen = skb->data[(&pkts[i])->loff];
+>       				hci_skb_expect(skb) += dlen;
+> 
+>       				if (skb_tailroom(skb) < dlen) {
+>       					kfree_skb(skb);
+>       					return ERR_PTR(-EMSGSIZE);
+>       				}
+>       				break;
+>       			case 2:
+>       				/* Double octet variable length */
+>       				dlen = get_unaligned_le16(skb->data +
+>       							  (&pkts[i])->loff);
+>       				hci_skb_expect(skb) += dlen;
+> 
+>       				if (skb_tailroom(skb) < dlen) {
+>       					kfree_skb(skb);
+>       					return ERR_PTR(-EMSGSIZE);
+>       				}
+>       				break;
+>       			default:
+>       				/* Unsupported variable length */
+>       				kfree_skb(skb);
+>       				return ERR_PTR(-EILSEQ);
+>       			}
+> 
+>       			if (!dlen) {
+>      -				hu->padding = (skb->len + 1) % alignment;
+>      -				hu->padding = (alignment - hu->padding) % alignment;
+>      -
+>       				/* No more data, complete frame */
+>       				(&pkts[i])->recv(hdev, skb);
+>       				skb = NULL;
+>       			}
+>       		} else {
+>      -			hu->padding = (skb->len + 1) % alignment;
+>      -			hu->padding = (alignment - hu->padding) % alignment;
+>      -
+>       			/* Complete frame */
+>       			(&pkts[i])->recv(hdev, skb);
+>       			skb = NULL;
+>       		}
+>       	}
+> 
+>       	return skb;
+>       }
+>      -EXPORT_SYMBOL_GPL(h4_recv_buf)
+> 
+> As I read this: If alignment is one, and padding is zero, padding
+> remains zero throughout the loop. So it seems to me that the two
+> functions behave strictly identically in that case. All the duplicated
+> defines are also identical, as is the duplicated h4_recv_pkt structure
+> declaration.
+> 
+> All four drivers which use the duplicated function use the default
+> alignment of one, and the default padding of zero. I therefore conclude
+> the duplicate function may be safely replaced with the core one.
+> 
+> I raised this in an RFC a few months ago, and didn't get much interest:
+> 
+>      https://lore.kernel.org/all/CABBYNZ+ONkYtq2fR-8PtL3X-vetvJ0BdP4MTw9cNpjLDzG3HUQ@mail.gmail.com/
+> 
+> ...but I'm still wary I've missed something, and I'd really appreciate
+> more eyeballs on it.
+> 
+> I tested this successfully on btnxpuart a few months ago, but
+> unfortunately I no longer have access to that hardware.
+
+Great analysis. Thank you for your time writing this up.
+
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Calvin Owens <calvin@wbinvd.org>
+> ---
+>   drivers/bluetooth/bpa10x.c    |   2 +-
+>   drivers/bluetooth/btmtksdio.c |   2 +-
+>   drivers/bluetooth/btmtkuart.c |   2 +-
+>   drivers/bluetooth/btnxpuart.c |   2 +-
+>   drivers/bluetooth/h4_recv.h   | 153 ----------------------------------
+>   5 files changed, 4 insertions(+), 157 deletions(-)
+>   delete mode 100644 drivers/bluetooth/h4_recv.h
+> 
+> diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
+> index 8b43dfc755de..b7ba667a3d09 100644
+> --- a/drivers/bluetooth/bpa10x.c
+> +++ b/drivers/bluetooth/bpa10x.c
+> @@ -20,7 +20,7 @@
+>   #include <net/bluetooth/bluetooth.h>
+>   #include <net/bluetooth/hci_core.h>
+>   
+> -#include "h4_recv.h"
+> +#include "hci_uart.h"
+>   
+>   #define VERSION "0.11"
+>   
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index 4fc673640bfc..50abefba6d04 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -29,7 +29,7 @@
+>   #include <net/bluetooth/bluetooth.h>
+>   #include <net/bluetooth/hci_core.h>
+>   
+> -#include "h4_recv.h"
+> +#include "hci_uart.h"
+>   #include "btmtk.h"
+>   
+>   #define VERSION "0.1"
+> diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
+> index 76995cfcd534..d9b90ea2ad38 100644
+> --- a/drivers/bluetooth/btmtkuart.c
+> +++ b/drivers/bluetooth/btmtkuart.c
+> @@ -27,7 +27,7 @@
+>   #include <net/bluetooth/bluetooth.h>
+>   #include <net/bluetooth/hci_core.h>
+>   
+> -#include "h4_recv.h"
+> +#include "hci_uart.h"
+>   #include "btmtk.h"
+>   
+>   #define VERSION "0.2"
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+> index 76e7f857fb7d..d5153fed0518 100644
+> --- a/drivers/bluetooth/btnxpuart.c
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -24,7 +24,7 @@
+>   #include <net/bluetooth/bluetooth.h>
+>   #include <net/bluetooth/hci_core.h>
+>   
+> -#include "h4_recv.h"
+> +#include "hci_uart.h"
+>   
+>   #define MANUFACTURER_NXP		37
+>   
+> diff --git a/drivers/bluetooth/h4_recv.h b/drivers/bluetooth/h4_recv.h
+> deleted file mode 100644
+> index 28cf2d8c2d48..000000000000
+> --- a/drivers/bluetooth/h4_recv.h
+> +++ /dev/null
+> @@ -1,153 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0-or-later */
+> -/*
+> - *
+> - *  Generic Bluetooth HCI UART driver
+> - *
+> - *  Copyright (C) 2015-2018  Intel Corporation
+> - */
+> -
+> -#include <linux/unaligned.h>
+> -
+> -struct h4_recv_pkt {
+> -	u8  type;	/* Packet type */
+> -	u8  hlen;	/* Header length */
+> -	u8  loff;	/* Data length offset in header */
+> -	u8  lsize;	/* Data length field size */
+> -	u16 maxlen;	/* Max overall packet length */
+> -	int (*recv)(struct hci_dev *hdev, struct sk_buff *skb);
+> -};
+> -
+> -#define H4_RECV_ACL \
+> -	.type = HCI_ACLDATA_PKT, \
+> -	.hlen = HCI_ACL_HDR_SIZE, \
+> -	.loff = 2, \
+> -	.lsize = 2, \
+> -	.maxlen = HCI_MAX_FRAME_SIZE \
+> -
+> -#define H4_RECV_SCO \
+> -	.type = HCI_SCODATA_PKT, \
+> -	.hlen = HCI_SCO_HDR_SIZE, \
+> -	.loff = 2, \
+> -	.lsize = 1, \
+> -	.maxlen = HCI_MAX_SCO_SIZE
+> -
+> -#define H4_RECV_EVENT \
+> -	.type = HCI_EVENT_PKT, \
+> -	.hlen = HCI_EVENT_HDR_SIZE, \
+> -	.loff = 1, \
+> -	.lsize = 1, \
+> -	.maxlen = HCI_MAX_EVENT_SIZE
+> -
+> -#define H4_RECV_ISO \
+> -	.type = HCI_ISODATA_PKT, \
+> -	.hlen = HCI_ISO_HDR_SIZE, \
+> -	.loff = 2, \
+> -	.lsize = 2, \
+> -	.maxlen = HCI_MAX_FRAME_SIZE
+> -
+> -static inline struct sk_buff *h4_recv_buf(struct hci_dev *hdev,
+> -					  struct sk_buff *skb,
+> -					  const unsigned char *buffer,
+> -					  int count,
+> -					  const struct h4_recv_pkt *pkts,
+> -					  int pkts_count)
+> -{
+> -	/* Check for error from previous call */
+> -	if (IS_ERR(skb))
+> -		skb = NULL;
+> -
+> -	while (count) {
+> -		int i, len;
+> -
+> -		if (!skb) {
+> -			for (i = 0; i < pkts_count; i++) {
+> -				if (buffer[0] != (&pkts[i])->type)
+> -					continue;
+> -
+> -				skb = bt_skb_alloc((&pkts[i])->maxlen,
+> -						   GFP_ATOMIC);
+> -				if (!skb)
+> -					return ERR_PTR(-ENOMEM);
+> -
+> -				hci_skb_pkt_type(skb) = (&pkts[i])->type;
+> -				hci_skb_expect(skb) = (&pkts[i])->hlen;
+> -				break;
+> -			}
+> -
+> -			/* Check for invalid packet type */
+> -			if (!skb)
+> -				return ERR_PTR(-EILSEQ);
+> -
+> -			count -= 1;
+> -			buffer += 1;
+> -		}
+> -
+> -		len = min_t(uint, hci_skb_expect(skb) - skb->len, count);
+> -		skb_put_data(skb, buffer, len);
+> -
+> -		count -= len;
+> -		buffer += len;
+> -
+> -		/* Check for partial packet */
+> -		if (skb->len < hci_skb_expect(skb))
+> -			continue;
+> -
+> -		for (i = 0; i < pkts_count; i++) {
+> -			if (hci_skb_pkt_type(skb) == (&pkts[i])->type)
+> -				break;
+> -		}
+> -
+> -		if (i >= pkts_count) {
+> -			kfree_skb(skb);
+> -			return ERR_PTR(-EILSEQ);
+> -		}
+> -
+> -		if (skb->len == (&pkts[i])->hlen) {
+> -			u16 dlen;
+> -
+> -			switch ((&pkts[i])->lsize) {
+> -			case 0:
+> -				/* No variable data length */
+> -				dlen = 0;
+> -				break;
+> -			case 1:
+> -				/* Single octet variable length */
+> -				dlen = skb->data[(&pkts[i])->loff];
+> -				hci_skb_expect(skb) += dlen;
+> -
+> -				if (skb_tailroom(skb) < dlen) {
+> -					kfree_skb(skb);
+> -					return ERR_PTR(-EMSGSIZE);
+> -				}
+> -				break;
+> -			case 2:
+> -				/* Double octet variable length */
+> -				dlen = get_unaligned_le16(skb->data +
+> -							  (&pkts[i])->loff);
+> -				hci_skb_expect(skb) += dlen;
+> -
+> -				if (skb_tailroom(skb) < dlen) {
+> -					kfree_skb(skb);
+> -					return ERR_PTR(-EMSGSIZE);
+> -				}
+> -				break;
+> -			default:
+> -				/* Unsupported variable length */
+> -				kfree_skb(skb);
+> -				return ERR_PTR(-EILSEQ);
+> -			}
+> -
+> -			if (!dlen) {
+> -				/* No more data, complete frame */
+> -				(&pkts[i])->recv(hdev, skb);
+> -				skb = NULL;
+> -			}
+> -		} else {
+> -			/* Complete frame */
+> -			(&pkts[i])->recv(hdev, skb);
+> -			skb = NULL;
+> -		}
+> -	}
+> -
+> -	return skb;
+> -}
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
