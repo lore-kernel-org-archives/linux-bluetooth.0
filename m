@@ -1,105 +1,137 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C8A34F47D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Aug 2025 16:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A765331A571
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Aug 2025 17:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756226239; cv=none; b=FBJZYGkyib2ABizOZ4mBEF5um61EEF4fTgtcgHhE6SunPNXOApbA5WtDksRMYiEOlIg87aHzHkgYVf6nyvT7UhtEApjF/OUBZWmuc7pgdydi/JPJZHy+mZeKqloBEbbZPKOjNBswZPUO/s6da2B/coawxGu/idkGacmIG/6tSuE=
+	t=1756227821; cv=none; b=nqX0PsIKt8ZWTlwGSzI0idwmliX4cUANCDm+IBy2DTycsyrVQzUPEsAjolKq6gfjbMtlN3h2Tdfwn7jCDh32qkY/L+d2ngW9XSnh60YCdcZTk//wWxoJwxB1bmNZqjGemZr9QtO0Y2+RVDB1gSkD3HX3XnjgWqHbfrEST3aCdrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756226239; c=relaxed/simple;
-	bh=oqabilAq4pjLXoaL2HXnocEbdNI3bdZC9Q2YiJKRS5E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P+yzyZUUhOyZRzWCT2Sn9RdJJSrOPpnCWkRhnVGa7I39nKcSeHaZGtdBiHGEGwo92Wn5eomT4JXs2hyCF1tbGoQfsDjWSYvUVW9MTuye+5bxnIjzzuqK8uMhoFyZPxRVXF6+WIjdPD/GOb5+9m6buAa9H9WUyaFOduoMJ2PzEY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IW5Xi7SJ; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1756227821; c=relaxed/simple;
+	bh=tvSO6gSC8/rNdohIjb/OE8VtLeU6Qi6+ryLhdRRfips=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d+fud+OoHpWq24bIslZQduIQRmxE8NO7y5i0RVMBNCXpKk8gi2zhhB/6lD/z62l71SBARrdWxKAk0+SRIKZEWUbzTP60D8ckUZ+RIWGxc5w16eg97oHxJr/DAeXBZfZ/iWsb08CQyOOt/+2Gjdb8Is8k6N9Dt4hMty9kX+AHrlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m5Wv7Ob6; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IW5Xi7SJ"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-3364e945ce7so41053331fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Aug 2025 09:37:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5Wv7Ob6"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-afcb7a0442bso971852566b.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Aug 2025 10:03:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756226236; x=1756831036; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1756227815; x=1756832615; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oqabilAq4pjLXoaL2HXnocEbdNI3bdZC9Q2YiJKRS5E=;
-        b=IW5Xi7SJbXUCt1flYE6tPLaISjsEY8uqOMaq4W1iMNXyEjrmYhJzIeSoFThi/WvL6v
-         FVpjGCuZGNzJSECfuEfijtcRzz+PW8H6PDaxLKih1CJpmDqrveX9EaeN4nAVHzPo/8Ii
-         xXbdliAW+79fxnU1Av1Xxm4tV1f0e3zOd96JePzcwuShmRezNe/DkZ84x09QVpFpnqyQ
-         lFrbNJUikaQQI8kaL3EEqHaukU10bd1xkEfNVzjPmI1AB8GM8Lk7W11/kC2KBZ7FeHHY
-         /k4+AmMKN105SOnb0/OJneaVlYs4rBkqQxvvV7Im09cs6bm9XTaaPyzQ6zBFx/5VIAa4
-         1qMw==
+        bh=NjQ5D4uludUIETB7mZVVGkp3VsP6wPEJqU+C8m5nTWU=;
+        b=m5Wv7Ob6t+CaX8FprM+pIy5z9xJrLD/138bSJ92wXpqH2wUnyCYqLVrkVmh3k0Mp4F
+         XVeM4eeJ80HIB+Y/OR/WbBElucJqC1f7n5+yG9WY6yseI2l+NSWx5rN3N6ckxRhIiaJo
+         Vatcll6GVnAbgSn26WZJxy+U71CNAmoZDmIddlKfjFFu9SRqeA+KpbgYcn6AWc0RQhDh
+         M/a0AbZNy+tYVB6h52aUviAhdrVHs9j0OzrAU8XyLLPehCquI0XrC7iXy/dDqyGD51ys
+         Qj/Q7QVLwpCx9Ntwk0sFvbDWI2CeU/987kBqggAAxUUvry06PncyCOzyhLGdj5JiNZzQ
+         yHww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756226236; x=1756831036;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1756227815; x=1756832615;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oqabilAq4pjLXoaL2HXnocEbdNI3bdZC9Q2YiJKRS5E=;
-        b=rnD+gDsGxQt6UEzIj2Dyt9w+KJlR+0xenfRK559lFEdrmQ5l0mW3mVSSPPDkbUVYeK
-         ep9hahwBKxSdlhrk29RwHSiFR/EOKXaP0yNDNSrFJGibTQSS8ekzPBRhl9PNB2Qcb5Rh
-         OMHJRDba10ihEuoIof9q8qwndQADOoksEi6HxqH9gz1g13Os3cr/zuE30lqNvAh4iSyz
-         WC5e/c9NTNrCQJIyFbiHJKUV0RykBm1mxEeGjH9YKJyBEIQ/cElRroUsGDT3FGT30vXi
-         GXNlgWEj1nsUPoqJebQuq1N78/58XNpGD2jmQYaFmwE8wOdcurf0rkuxkaeIEBjDHThC
-         eAfA==
-X-Gm-Message-State: AOJu0YxD741JPfVY39/53PV5eN9KYkfGw8d77ggHyTYNsXYhXjCwUv/c
-	rIzQJKlscLJYFsf8OnI6mH0sL5FCmdwTaXduuzgouLMjTt+x01OdYdfYnygGXC+ETO1JqdzOenM
-	LxSy8VgfwZaVjsAiPmzFq9V0jmUQq47qx2xvscfs=
-X-Gm-Gg: ASbGncvCptawU+h8452vqtKna4SrnWJZv79KIEfedg+lOdZ4+RvmIQdUPRD/WMBGNQJ
-	MikJNJ4g2Z+zm0T0uOF0vF8iZJQdCx1RSD/WSGJCzGos97qQ+Y8FhfwkT6tPP2lPYNZUwurZt4z
-	3SXMbW8pijtNGa3ISVNo7kGw2GQSzyVb6793MSYIFKSbaxWFwHREzO21t9zIpYH947ZanOpNy9K
-	lHEY6zB5MpHR2DOhYbxGyDOe3H04Wtj1vEW+wDcsuUBlNnK2BXpIpW4
-X-Google-Smtp-Source: AGHT+IFZgkWorpU3Q6es4xCgIXi46gAiHWITurdKHkUmnlHK9M87BfBnb/9U9ioKtAvVOYAIjg2t6iD/2iMVnwuJsJk=
-X-Received: by 2002:a2e:a987:0:b0:336:69fb:1e14 with SMTP id
- 38308e7fff4ca-33669fb1f71mr22033271fa.10.1756226235288; Tue, 26 Aug 2025
- 09:37:15 -0700 (PDT)
+        bh=NjQ5D4uludUIETB7mZVVGkp3VsP6wPEJqU+C8m5nTWU=;
+        b=poQ6MJQKg+/0WCytgDHIPIQDpMRP9hIkTgpKHayMCnwhwmI8i+LWHgH3Ww2GJpaOVP
+         2z1MfyNB+CA5aJZ/pQpk0A9bb4jVh88UT4WWrra7xrtM7JZCBe1FxV5j858MSKTU8DEc
+         H9sgRbshzctiZZ59Oev5/WuVaxuOiUXcf9uIsGgZFW5OziJskPupM+QWp5xYqb/Su9JS
+         jCYKTHlggJ7fhINJgyZ/rDGeA1uQDIVrzCoH5O2PStzqiW1T+AtHpw7ab5/xF6Jty2hA
+         VARAVTEDguQrth3xdTMZc+70c+TgldDRJ7oH3egbRjvI0tnJYNDrtZjcxVLAz4gXmPwR
+         J4Zg==
+X-Gm-Message-State: AOJu0YwRyDUsXTBewnuOEfGtzfTl/D1RCT8PXQpJO7E7EdfVqPphF6eZ
+	1cbKol82JLn7YC84rfrjrdXlSXAthRxJ6UZilnFMasd4nuFR7xJgX1kkoUkuQVIN
+X-Gm-Gg: ASbGncufvysftpIBvtU4UAb8thXgvSjTGWhBNrDuHlypMdnmyrW2MI+pquzMQKUdnmM
+	heXNewyTy0ZuW46Q1P7NbeOrmi5v3gzfykYZ1W+ZJOWeetLFsmbdtdTXYM19Qh6fV6TLCifv/Rs
+	TwJVy6FFO/tJ1DIdbZWK9Jl0I3VFOQ5U4muoscV7jzDbkczv9FU/s9EFIlMpYyK7Ek5xD09Egx8
+	qQBJOMofLBRuQXBQcpCaxoCiFGXQUh6/FuFL+kp8wvJmlWVAToteWepOpm5GyURllCPAO1A8jEO
+	ODhZnRSd+OhZyls4S4ILPczv1yZ76Zb+yIj+6fmhWtgzb428fHOyfwRYaxObMiH8gPpqlf+p4Os
+	YKhI4EJiIKvjqRGMKkSaVy1Z8qUIWr5O78CE/Z5/GzvRiF21enzK+yUb4gyWdN6Se9YP2nce5T4
+	GBfjAilLca2A5ZgUsg2w==
+X-Google-Smtp-Source: AGHT+IGzPntnD8r8j0hN9Lks3oBhRjHIWzQZ+w3u0JBgcPl0x3hff8tYhIwRil5VZlw5UoVgFYqy4w==
+X-Received: by 2002:a17:907:6e92:b0:af9:5b3f:2dfc with SMTP id a640c23a62f3a-afe2965ac9fmr1342168566b.47.1756227814365;
+        Tue, 26 Aug 2025 10:03:34 -0700 (PDT)
+Received: from localhost.localdomain (46.205.200.232.nat.ftth.dynamic.t-mobile.pl. [46.205.200.232])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afe6cdbd545sm611515966b.54.2025.08.26.10.03.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 10:03:33 -0700 (PDT)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH v2] Bluetooth: btusb: Check for unexpected bytes when defragmenting HCI frames
+Date: Tue, 26 Aug 2025 19:03:13 +0200
+Message-ID: <20250826170314.352122-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <CABBYNZLmTCh_mn7w6U31B82cBZsmLaj92dxwfK9PVWZeMqk54Q@mail.gmail.com>
+References: <CABBYNZLmTCh_mn7w6U31B82cBZsmLaj92dxwfK9PVWZeMqk54Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825172504.339117-1-arkadiusz.bokowy@gmail.com>
- <CABBYNZKazQ0zROk1+gs5=U+zaZDwkMmD01MTYLuMZ3VUaoZZQg@mail.gmail.com>
- <CAGFh027fC8z3mx4zMm9Zu8GKFu7Ae7MKbze3Ef+4g0x90sRCag@mail.gmail.com>
- <CABBYNZL23GLaO0tQD9iYaG=OeUbxvbKrKCX1yOv7kfvM+L7W5Q@mail.gmail.com>
- <CAGFh025kOatLYjLrBMzrFQQG0oQHZQ-4=U-d0Nky780HrrOPhw@mail.gmail.com>
- <CABBYNZKN3PwV4XPM3=7t_1-+=m1nAmEVcZ9UB0yfgks45vnOXg@mail.gmail.com>
- <CAGFh026t_ba4x48ZQqhKnBxkQC=uLF5O8vHx--c_fxJTS1b=pg@mail.gmail.com>
- <CABBYNZLHWsNXWRXn4CyK9yOQ6=TosuFMz=NQ6FPBk+_tu63shA@mail.gmail.com> <CAGFh027-mBYt-6DYLcxV8S_qXH2javvkyK56J7Lo4_9mGeKe=Q@mail.gmail.com>
-In-Reply-To: <CAGFh027-mBYt-6DYLcxV8S_qXH2javvkyK56J7Lo4_9mGeKe=Q@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 26 Aug 2025 12:36:57 -0400
-X-Gm-Features: Ac12FXyW9KRolAy_fE0HW97ohWfz7Y44IA-QYIWvXN8vxfhs3O_gkC-SgbYB_Nk
-Message-ID: <CABBYNZLmTCh_mn7w6U31B82cBZsmLaj92dxwfK9PVWZeMqk54Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Fixup quirk for reading ext features on
- some Barrot controllers
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Arkadiusz,
+Some Barrot based USB Bluetooth dongles erroneously send one extra
+random byte for the HCI_OP_READ_LOCAL_EXT_FEATURES command. The
+consequence of that is that the next HCI transfer is misaligned by one
+byte causing undefined behavior. In most cases the response event for
+the next command fails with random error code.
 
-On Tue, Aug 26, 2025 at 12:23=E2=80=AFPM Arkadiusz Bokowy
-<arkadiusz.bokowy@gmail.com> wrote:
->
-> > Great, do you care to respin the patch with the above changes?
->
-> But, I'm not the author of these changes any more. It's not a minor
-> post-code review change but a different approach. If you really want I
-> can reupload it with your changes, but the proper way (from the
-> authorship point of view) is that you will submit this patch as yours
-> :)
+Since the HCI_OP_READ_LOCAL_EXT_FEATURES command is used during HCI
+controller initialization, the initialization fails rendering the USB
+dongle not usable.
 
-Who develop it is not that important, and in the end I will have to
-add my Signed-off-by anyway when applying these changes and you should
-definitely appear on it, even if it is just with Tested-by, that said
-now I realize we may want to rewrite the commit description as well
-since with this we are now able to detect extra bytes sent by the
-controller.
+> [59.464099] usb 1-1.3: new full-speed USB device number 11 using xhci_hcd
+> [59.561617] usb 1-1.3: New USB device found, idVendor=33fa, idProduct=0012, bcdDevice=88.91
+> [59.561642] usb 1-1.3: New USB device strings: Mfr=0, Product=2, SerialNumber=0
+> [59.561656] usb 1-1.3: Product: UGREEN BT6.0 Adapter
+> [61.720116] Bluetooth: hci1: command 0x1005 tx timeout
+> [61.720167] Bluetooth: hci1: Opcode 0x1005 failed: -110
 
+This patch was tested with the 33fa:0012 device. Now the device is
+initialized properly:
 
+> [43.329852] usb 1-1.4: new full-speed USB device number 4 using dwc_otg
+> [43.446790] usb 1-1.4: New USB device found, idVendor=33fa, idProduct=0012, bcdDevice=88.91
+> [43.446813] usb 1-1.4: New USB device strings: Mfr=0, Product=2, SerialNumber=0
+> [43.446821] usb 1-1.4: Product: UGREEN BT6.0 Adapter
+> [43.582024] Bluetooth: hci1: Unexpected continuation: 1 bytes
+> [43.703025] Bluetooth: hci1: Unexpected continuation: 1 bytes
+> [43.750141] Bluetooth: MGMT ver 1.23
 
---=20
-Luiz Augusto von Dentz
+Signed-off-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Tested-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+---
+ drivers/bluetooth/btusb.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8085fabad..24a249d1c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1192,6 +1192,18 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 		}
+ 
+ 		if (!hci_skb_expect(skb)) {
++			/* Each chunk should correct to at least 1 or more
++			 * events so if there are still bytes left that doesn't
++			 * constitute a new event this is likely a bug in the
++			 * controller.
++			 */
++			if (count && count < HCI_EVENT_HDR_SIZE) {
++				bt_dev_warn(data->hdev,
++					"Unexpected continuation: %d bytes",
++					count);
++				count = 0;
++			}
++
+ 			/* Complete frame */
+ 			btusb_recv_event(data, skb);
+ 			skb = NULL;
+-- 
+2.47.2
+
