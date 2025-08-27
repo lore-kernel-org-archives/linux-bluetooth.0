@@ -1,196 +1,195 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0943023D7EC;
-	Wed, 27 Aug 2025 10:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AD930CD9F;
+	Wed, 27 Aug 2025 10:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756290330; cv=none; b=KF1z9BluPBdlpgAgFpagbj4JGbdJxaOkfcibN4tEXESUy1PaHjnfBbJwCREvpBwRPisDKxsm5qo2ND+j2iqCpiSZkrfu5IqWgknrj/HqTPSjQkkEL3aTFhtgfuP7CFjYCqED3Quwv2dUolSCRL+dXySKeM8w9hWATyBebD1bKTg=
+	t=1756292227; cv=none; b=C/SQULVum33kLs8Jelo/qGYwCkaxXUmy7lE1nsW9DiASt50D6Q5cTLDN5Ffb0CDGwE9qAa3j0wlpiLycsuayWxnhBtPTG4K5mC0Sn+rNDXjrbA9lkK3iBcKptWKQLWNEJ3nO7Au3xzw7j7u5678w/tlHXR0TJfVz3J+TApPdWYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756290330; c=relaxed/simple;
-	bh=WECNxR80yEsMmZCFgrsq9NZC+dltMaq6d0aDT+T5ChM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BPncBZZLCcIIs6bJklqc0se1LLtQhv3H9tZeVDsvFc19kxaiVaFXtPlC/hkzNUasQMaLcHb5zykH82iwSoA2bQfKYbzad0GRu9HSFDrf1vNAo0DkY+vjkOMRcE4qT1uuOiJSg5+mzTHmckKWs9fu5ZHtw45AXylq5EHofG0pFZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QZDJAr+E; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QZDJAr+E"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57R6kMt2014895;
-	Wed, 27 Aug 2025 10:25:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=26cwR5fHeg9uh4+QfgnvTvxx3M1y6aiB9h3
-	YcFVNVzI=; b=QZDJAr+ENrf2gmCm4jgQ/j5ECoyNi1MKXf0h6WH7yXLzpGPKpdh
-	sPnyyVpUh0xB08/fuhtW5XQI9EX3vk+fApBP06mg7wfu4s/C6eXwREnKcyG7XUMF
-	7xSFqXpwZ3AtMFDPdUv+EU/iHjCTCEJBRtvvcn0dhloJxoZzscDrp+fm20LO9oFZ
-	dTdkSdg3jG+EqD8WDXM/9HcR4DSf0pQsUnERKAJ8GI58LtPIVz4J/8wfPhA4yxU9
-	LgK9tDMYNUy8UbTrRfqYcjitDxCiG+iV+Gu+HO3k2Nq+wtF5fucLFvmYQsIm7CFu
-	f7uNsX1WMhfnYeWAk6t864t/Hh9trw7pxkQ==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48q5we4437-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Aug 2025 10:25:25 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 57RAPMtL027536;
-	Wed, 27 Aug 2025 10:25:22 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 48q6qm0mb9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Aug 2025 10:25:22 +0000
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57RAPMqT027530;
-	Wed, 27 Aug 2025 10:25:22 GMT
-Received: from bt-iot-sh02-lnx.ap.qualcomm.com (bt-iot-sh02-lnx.qualcomm.com [10.253.144.65])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 57RAPMtI027529
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Aug 2025 10:25:22 +0000
-Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467449)
-	id E38A52291A; Wed, 27 Aug 2025 18:25:20 +0800 (CST)
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-To: dmitry.baryshkov@oss.qualcomm.com, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        quic_chejiang@quicinc.com, Shuai Zhang <quic_shuaz@quicinc.com>
-Subject: [PATCH v11] Bluetooth: hci_qca: Fix SSR (SubSystem Restart) fail when BT_EN is pulled up by hw
-Date: Wed, 27 Aug 2025 18:25:19 +0800
-Message-Id: <20250827102519.195439-1-quic_shuaz@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756292227; c=relaxed/simple;
+	bh=71TjIHXaemnR5GSOcFGJQ0u9QJZgPjfVehYXuruYTns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G0BCmTxFjd4SVuiXLlEwcjQawmzwgo8T1/04Cujb5rTZwbiuJQ+/Uc34VnZZm3RcUkWE1TNnMgi4X/qyLTcvMOZ6jpMZe93mN2Q6dZuvwTumQI8qkMCBLIIJLo9lPCJY/KEc8v9tHTEsctXe2UgIbCxz5AiCf4cChXwn1bKdTnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.202] (p5b13a549.dip0.t-ipconnect.de [91.19.165.73])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D3D0260213B1E;
+	Wed, 27 Aug 2025 12:56:50 +0200 (CEST)
+Message-ID: <a261ed13-4c0b-43cf-b177-d33272626d25@molgen.mpg.de>
+Date: Wed, 27 Aug 2025 12:56:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_h5: implement CRC data integrity
+To: Javier Nieto <jgnieto@cs.stanford.edu>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250827043254.26611-1-jgnieto@cs.stanford.edu>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250827043254.26611-1-jgnieto@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 99Ic9prYyiajxWR3acTWL2IDkeaAXJdt
-X-Proofpoint-ORIG-GUID: 99Ic9prYyiajxWR3acTWL2IDkeaAXJdt
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzMyBTYWx0ZWRfX9/GWBT3nlrOW
- slXO6gfBC01yuyjQWw+clKx0GXR5j+EGZ8o0mvO1LntjBLC9D+YtTILDJZ1gQ0xkjmJq2xh13SJ
- +J7l3eRBAMGRYgxZdusCXTXg8p428XBEfnquLhfesuylmKVNqq+nG1TWz505mOqXBJNS3LmIFBP
- 9RK/Ld/odBDhGWenbQg2G5kyFhCJbfZ4+MVMlFg+q8m+wxYzNHZsL28RFyX46zl+65eN5Kp1Ej0
- 0gLsI1KC67f9zESXer0WIzMI/2k6m+Zh5+fWIB9EPn0bzUX9lAAjPlzjYjaaa07UBvgKTP2ZFhi
- DcQdqVQQi8zstGsgm02WTEX+d6IyZJ06v+gUUp+20hIMW0/1gJ6I7azO0YvC6DipGC3QERXKFB4
- sxy4PUpC
-X-Authority-Analysis: v=2.4 cv=BJazrEQG c=1 sm=1 tr=0 ts=68aedd15 cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=Zh3eq0SbisOj6M6HGuUA:9
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-27_02,2025-08-26_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 priorityscore=1501 clxscore=1015 impostorscore=0
- bulkscore=0 phishscore=0 suspectscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508230033
 
-When the host actively triggers SSR and collects coredump data,
-the Bluetooth stack sends a reset command to the controller. However, due
-to the inability to clear the QCA_SSR_TRIGGERED and QCA_IBS_DISABLED bits,
-the reset command times out.
+Dear Javier,
 
-To address this, this patch clears the QCA_SSR_TRIGGERED and
-QCA_IBS_DISABLED flags and adds a 50ms delay after SSR, but only when
-HCI_QUIRK_NON_PERSISTENT_SETUP is not set. This ensures the controller
-completes the SSR process when BT_EN is always high due to hardware.
 
-For the purpose of HCI_QUIRK_NON_PERSISTENT_SETUP, please refer to
-the comment in `include/net/bluetooth/hci.h`.
+Thank you very much for the patch. Great work!
 
-The HCI_QUIRK_NON_PERSISTENT_SETUP quirk is associated with BT_EN,
-and its presence can be used to determine whether BT_EN is defined in DTS.
+Am 27.08.25 um 06:32 schrieb Javier Nieto:
+> The UART-based H5 protocol supports CRC data integrity checks for
+> reliable packets. The host sets bit 5 in the configuration field of the
+> CONFIG link control message to indicate that CRC is supported. The
+> controller sets the same bit in the CONFIG RESPONSE message to indicate
+> that CRC may be used from then on.
+> 
+> Signed-off-by: Javier Nieto <jgnieto@cs.stanford.edu>
+> ---
+> 
+> Tested on a MangoPi MQ-Pro with a Realtek RTL8723DS Bluetooth controller
+> using the tip of the bluetooth-next tree.
 
-After SSR, host will not download the firmware, causing
-controller to remain in the IBS_WAKE state. Host needs
-to synchronize with the controller to maintain proper operation.
+Any btmon trace?
 
-Multiple triggers of SSR only first generate coredump file,
-due to memcoredump_flag no clear.
+I’d add the above to the proper commit message.
 
-add clear coredump flag when ssr completed.
+> It would be nice to have this feature available for somewhat more reliable
+> communication over UART, especially if RTS/CTS is disabled, as this is the
+> primary benefit of the H5 protocol. Thanks!
+> 
+> ---
+>   drivers/bluetooth/hci_h5.c | 42 ++++++++++++++++++++++++++++++++++----
+>   1 file changed, 38 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index d0d4420c1a0f..7faafc62666b 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -7,6 +7,8 @@
+>    */
+>   
+>   #include <linux/acpi.h>
+> +#include <linux/bitrev.h>
+> +#include <linux/crc-ccitt.h>
+>   #include <linux/errno.h>
+>   #include <linux/gpio/consumer.h>
+>   #include <linux/kernel.h>
+> @@ -58,6 +60,7 @@ enum {
+>   	H5_TX_ACK_REQ,		/* Pending ack to send */
+>   	H5_WAKEUP_DISABLE,	/* Device cannot wake host */
+>   	H5_HW_FLOW_CONTROL,	/* Use HW flow control */
+> +	H5_CRC,			/* Use CRC */
+>   };
+>   
+>   struct h5 {
+> @@ -141,8 +144,8 @@ static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
+>   
+>   static u8 h5_cfg_field(struct h5 *h5)
+>   {
+> -	/* Sliding window size (first 3 bits) */
+> -	return h5->tx_win & 0x07;
+> +	/* Sliding window size (first 3 bits) and CRC request (fifth bit). */
+> +	return (h5->tx_win & 0x07) | 0x10;
 
-When the SSR duration exceeds 2 seconds, it triggers
-host tx_idle_timeout, which sets host TX state to sleep. due to the
-hardware pulling up bt_en, the firmware is not downloaded after the SSR.
-As a result, the controller does not enter sleep mode. Consequently,
-when the host sends a command afterward, it sends 0xFD to the controller,
-but the controller does not respond, leading to a command timeout.
+Could a macro be defined for the CRC request bit?
 
-So reset tx_idle_timer after SSR to prevent host enter TX IBS_Sleep mode.
+>   }
+>   
+>   static void h5_timed_event(struct timer_list *t)
+> @@ -360,8 +363,10 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+>   		h5_link_control(hu, conf_rsp, 2);
+>   		h5_link_control(hu, conf_req, 3);
+>   	} else if (memcmp(data, conf_rsp, 2) == 0) {
+> -		if (H5_HDR_LEN(hdr) > 2)
+> +		if (H5_HDR_LEN(hdr) > 2) {
+>   			h5->tx_win = (data[2] & 0x07);
+> +			assign_bit(H5_CRC, &h5->flags, data[2] & 0x10);
+> +		}
+>   		BT_DBG("Three-wire init complete. tx_win %u", h5->tx_win);
+>   		h5->state = H5_ACTIVE;
+>   		hci_uart_init_ready(hu);
+> @@ -425,7 +430,24 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
+>   
+>   static int h5_rx_crc(struct hci_uart *hu, unsigned char c)
+>   {
+> -	h5_complete_rx_pkt(hu);
+> +	struct h5 *h5 = hu->priv;
+> +	const unsigned char *hdr = h5->rx_skb->data;
+> +	u16 crc;
+> +	__be16 crc_be;
+> +
+> +	crc = crc_ccitt(0xffff, hdr, 4 + H5_HDR_LEN(hdr));
+> +	crc = bitrev16(crc);
+> +
+> +	crc_be = cpu_to_be16(crc);
+> +
+> +	if (memcmp(&crc_be, hdr + 4 + H5_HDR_LEN(hdr), 2) != 0) {
+> +		bt_dev_err(hu->hdev, "Received packet with invalid CRC");
+> +		h5_reset_rx(h5);
+> +	} else {
+> +		/* Remove CRC bytes */
+> +		skb_trim(h5->rx_skb, 4 + H5_HDR_LEN(hdr));
+> +		h5_complete_rx_pkt(hu);
+> +	}
+>   
+>   	return 0;
+>   }
+> @@ -556,6 +578,7 @@ static void h5_reset_rx(struct h5 *h5)
+>   	h5->rx_func = h5_rx_delimiter;
+>   	h5->rx_pending = 0;
+>   	clear_bit(H5_RX_ESC, &h5->flags);
+> +	clear_bit(H5_CRC, &h5->flags);
+>   }
+>   
+>   static int h5_recv(struct hci_uart *hu, const void *data, int count)
+> @@ -686,6 +709,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
+>   	struct h5 *h5 = hu->priv;
+>   	struct sk_buff *nskb;
+>   	u8 hdr[4];
+> +	u16 crc;
+>   	int i;
+>   
+>   	if (!valid_packet_type(pkt_type)) {
+> @@ -713,6 +737,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
+>   	/* Reliable packet? */
+>   	if (pkt_type == HCI_ACLDATA_PKT || pkt_type == HCI_COMMAND_PKT) {
+>   		hdr[0] |= 1 << 7;
+> +		hdr[0] |= (test_bit(H5_CRC, &h5->flags) && 1) << 6;
+>   		hdr[0] |= h5->tx_seq;
+>   		h5->tx_seq = (h5->tx_seq + 1) % 8;
+>   	}
+> @@ -732,6 +757,15 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
+>   	for (i = 0; i < len; i++)
+>   		h5_slip_one_byte(nskb, data[i]);
+>   
+> +	if (H5_HDR_CRC(hdr)) {
+> +		crc = crc_ccitt(0xffff, hdr, 4);
+> +		crc = crc_ccitt(crc, data, len);
+> +		crc = bitrev16(crc);
+> +
+> +		h5_slip_one_byte(nskb, (crc >> 8) & 0xff);
+> +		h5_slip_one_byte(nskb, crc & 0xff);
+> +	}
+> +
+>   	h5_slip_delim(nskb);
+>   
+>   	return nskb;
 
----
-Changs since v10:
--- Update base patch to latest patch.
+The diff looks good. Feel free to carry:
 
-Changs since v8-v9:
--- Update base patch to latest patch.
--- add Cc stable@vger.kernel.org on signed-of.
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Changes since v6-7:
-- Merge the changes into a single patch.
-- Update commit.
 
-Changes since v1-5:
-- Add an explanation for HCI_QUIRK_NON_PERSISTENT_SETUP.
-- Add commments for msleep(50).
-- Update format and commit.
+Kind regards,
 
-Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 4cff4d9be..2d6560482 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1653,6 +1653,39 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 		skb_queue_purge(&qca->rx_memdump_q);
- 	}
- 
-+	/*
-+	 * If the BT chip's bt_en pin is connected to a 3.3V power supply via
-+	 * hardware and always stays high, driver cannot control the bt_en pin.
-+	 * As a result, during SSR (SubSystem Restart), QCA_SSR_TRIGGERED and
-+	 * QCA_IBS_DISABLED flags cannot be cleared, which leads to a reset
-+	 * command timeout.
-+	 * Add an msleep delay to ensure controller completes the SSR process.
-+	 *
-+	 * Host will not download the firmware after SSR, controller to remain
-+	 * in the IBS_WAKE state, and the host needs to synchronize with it
-+	 *
-+	 * Since the bluetooth chip has been reset, clear the memdump state.
-+	 */
-+	if (!hci_test_quirk(hu->hdev, HCI_QUIRK_NON_PERSISTENT_SETUP)) {
-+		/*
-+		 * When the SSR (SubSystem Restart) duration exceeds 2 seconds,
-+		 * it triggers host tx_idle_delay, which sets host TX state
-+		 * to sleep. Reset tx_idle_timer after SSR to prevent
-+		 * host enter TX IBS_Sleep mode.
-+		 */
-+		mod_timer(&qca->tx_idle_timer, jiffies +
-+				  msecs_to_jiffies(qca->tx_idle_delay));
-+
-+		/* Controller reset completion time is 50ms */
-+		msleep(50);
-+
-+		clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-+		clear_bit(QCA_IBS_DISABLED, &qca->flags);
-+
-+		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
-+		qca->memdump_state = QCA_MEMDUMP_IDLE;
-+	}
-+
- 	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- }
- 
--- 
-2.34.1
-
+Paul
