@@ -1,156 +1,186 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47A71BD9F0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 16:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BDD14AD2D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 16:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756312746; cv=none; b=PLySyJUL569HVUlV3K1z2NMOblLv+TBPIQ2KZ8+pmGGKu2C/fIewaHEb/H9US4HCRnoL0+9OZTOXuclr8Gp/xFr2fnR70xhlQFs5gP/ssQ+YgEacybDok+y7d3kHGg1GVcSb+qgR3rvOIThw//Y1tp5++frlX9lMjbYeuYHw2Tg=
+	t=1756312831; cv=none; b=pEXIRqWOH4d7H1GqXfYFvR+H5NRKpGq9kM3r7K0PMDGoeMVeGoVIV4sDeb6AeXLmgHbT0+VlKeCYJZoSJZjYCCSLyF51DyHSetKAVpwk0rs2syf96WSqQjWd0egXK/JWIqVV68F9jOcOIZPilCm3uBNpYc79CqtjXKGmRusG3PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756312746; c=relaxed/simple;
-	bh=AfYS2xQo+GSHdVX73VEL43hONa8Xk8sX8Zve+P3gfG8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aHLJF7UWuSTR8H67jyDUpRCq16aZ8HsIOfXWK+FZFMG1G/QJpLeu5oXsuUdVjwEmOxLp/uULgZwxR7O9ch206HXrwddFbL28Wj9HIwa5tq2lNdVbL/7gEy/v5PmfgmVWtXXf0KT/8eXuuJ06gd17bthbx3jDGNDkpfx24tL4yD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CmdZms2Q; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1756312831; c=relaxed/simple;
+	bh=N7F5g/xr7crEdGaIs+GkufxKHnN2ZOV9dkWv4n4Tswk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IbKk/lop9IyCcEH/sSrub1Ufh6Cm2Q3Fbb9gp848ZLljLnQQA/m+bkXuzd4hVs8lXmhy9onwmiSUlUxASgT8wQvkl44aRG1saLgIOuYtCqZdzQuC3AqNHrqIYGypqYXGyO4US968Xbt054Sg93ICWNHxY6nqOpvCLOXNpdMtcxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j//uwjHv; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CmdZms2Q"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2445805aa2eso234805ad.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 09:39:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j//uwjHv"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-61c22dceb25so8654219a12.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 09:40:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756312743; x=1756917543; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qjofBNPKZK1JBvAQ2uSVoVR+8WmNIOqw4jAdJyOrLfc=;
-        b=CmdZms2QxZxG+8br24zRkU2HmCPEl50fU5WuFPkKbZLFnWWuK5BZs2z9T1v/47kDKK
-         KiMZ+VGk/05NJUApUtTRwwMHnu2j6HzdtFrnUKejVL4v4rI6LissWhBHQpfLSnYcHjz/
-         tGQppT7TY5dhGpzV4NgWEZjlkh0Y83hMaAprNFwWbBeYlR4kZ89itEkFyEGnDNgerNpL
-         y4O6L+FtWuWe5XbIUI4Ixj3AJ2MZbhegkpR96Q5STPY1nRhHB+DJmmhTX9Rl0k6OMUqM
-         SzroL4jHhShewbxefYPJ9CjLKkjRxXX/23oXQi+QSKuDIUwN6Xuoy35t9t2RJmBJGtWa
-         QS8A==
+        d=gmail.com; s=20230601; t=1756312828; x=1756917628; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sk8Psblt1CWbUncHIx/iWwKH3Did7IkONNai3kmQWr4=;
+        b=j//uwjHvmU/nrQKHeunoo3HGO7POUnceE7ZZTlEvCXYJY/q8COAq1jMrxu8lFNKmrQ
+         7ZmDz0sMW2u4SA7q8L7jkgq5axtC7W5tdR/ZEPsNrysfvixUV4pRA2Shb7udCbc1HJzc
+         klR3iw+gKVpFdzqQQhuqkuy5P1rouJUwjx20pMXK/5JoM1zufxbM1462oC9yZdVva02c
+         cVbE5bqSaMGXd54dBLlvtApfXEqyFuTPENjTnctPI5qyNxJTncKOpxPYorXjf8ZdgWOe
+         ZtmsjJz5Nw+qez0RaFq226aEFrFcSD9lWeQGrnxIVRrQWuJiUWHYrmeylaa8668A3Ga2
+         j3Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756312743; x=1756917543;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qjofBNPKZK1JBvAQ2uSVoVR+8WmNIOqw4jAdJyOrLfc=;
-        b=SC8lhQ89IYVk5V8csZQwCmsQ4V7udaDHuMzG8MhohYSuQxUF0VGGtmMXcyC6PdmvVJ
-         moGmUafX+QmYj8y0/MfCsvANTZIo+8loGzfdotiNJsF5N6YiyLtZjfefOYVPnHmiJPbp
-         gLBc2Y57BREydugukX+GqtzfeAvAj9niE2+ICEFtT0RLLiL1RcMmfg5COGHERuhyt3D6
-         S6+oaJnkTz4JEqSeGCaPYxGdUE0ROa1oVZy+qzDRNJ8iptKKsWKxZ+37Craw4734aOUB
-         YyhJg1I6TkrqI6hCxSBJObFe1khkIrAr2Rmp7KRGJ1nxYYX3okvhdybiexoCC7I5GGU/
-         2zlg==
-X-Gm-Message-State: AOJu0YwHZ/g5HFAPihFMhAs+PwSKnSyV1nY+gqibC4t+J01kvCKf5Gwn
-	Da1I886Vq0/QvaqWq5zaPHxyX1g2ByoKVSdCOMQEbJLPuwNELjLRBhorjFOMeQ==
-X-Gm-Gg: ASbGnctrLo1sTxiLBTmIZPyzP0mORuVjf/isUu1B20Mg0u5RbyKUjIBNnfrs79bV029
-	ZpRr9CDaPyIyQYAkVyuSLVn14gmQenCJwECp+vxeoUP+b+Cf1ErzfRK8Qx0RAORIxT0KpRuueeO
-	ASrRr2ILaclAwZZpUvc4WBRq5Bv0IygR9PrOc/u8eL2F51S6G8hMWOjSnS6TPh9AB0z5XmZ661i
-	97dXEwVWbIqlx4qgfP4xWh4gpg6nNcDi4lID1hD/SBxaNTypkmCUHocmj1LJ8yIHrW5tit7tevc
-	90U1zOQ7l4Lmk12F8GpKpKDaOyTgExsEz3CgjEozOulAonNdB4XOxKkAiJ3NU/lvEKVUCp/1lxy
-	0GktbC3Fyo3FoimmsP3oIEQMtpWuV
-X-Google-Smtp-Source: AGHT+IF5WOBw6IrBGV129XxO4Q8iG6dOU4vixVvdsN1VYr9TxE8Fe1M/0zWStIM3QLg2Q21VojXp+g==
-X-Received: by 2002:a17:903:1a8e:b0:246:620:a0b9 with SMTP id d9443c01a7336-2462efcaaa3mr235655235ad.61.1756312742635;
-        Wed, 27 Aug 2025 09:39:02 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.229.67])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2466886456csm125264315ad.72.2025.08.27.09.39.02
+        d=1e100.net; s=20230601; t=1756312828; x=1756917628;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sk8Psblt1CWbUncHIx/iWwKH3Did7IkONNai3kmQWr4=;
+        b=Jr6WKBYnSjIPLUyP4kepdv4TZ7Lu3PMepdAzWEsTgTFBT75FTEpIoRdb6EbtVc7DoP
+         Zv6h0PAaf2qqbQX1NhGZiNdCQiWCq99BAsP97zYrWRbZrtByvfO3J3DlExy8ABeaPVJG
+         ACxFPrsYryJcgcqa6Y8f5P0lvh+O1wMdNc+HVVmNRi71bLCEEg2tu4cuf2Y37dm3T2Dr
+         47/TsPpY4KFiGLmSsvTWA0GEPKNbgZEEsgCkJFgAuPsftfqqZQEYaGp9KQogHclBKxMw
+         1R66RdqN9o05RtEchi+WaYMtHiF2eEVYFKD06np1ff08dBhbT2Inv+CfRcBZfDcfJ7Wi
+         ryvQ==
+X-Gm-Message-State: AOJu0Yxl447uG7jO6gf5iVPn2EqoniOtjCxOml8OphrIqL6wMYz4ZCbV
+	OxaCMcCmVNWIG9sPI6niJww2HVDq307XQt//qyAeF36YrMeAbfp19hnUDboRRA==
+X-Gm-Gg: ASbGncuEkK3ksZOi8GNRau+BDf22SnEoPFLmtCU6GYjMFvLeRIXLFYr6XuqB1WcU1pt
+	TleY80DStfeUsc0MO4I0/Vx6X91H+ngmJ6SRLbszlp1Z0PnIY7a3dWOGvKvuujZUgZUbEfcbH4m
+	Cl/G2o3Y/Zu5iwGbAEDMo4xwe2WqOA9/UrPuY5a2VbuiFDl9zIUMoDk2UmYX0bZENEwVE0x4aeT
+	Egp3h0DoTYZPSqx3BIoacOeLxVYd87+UQe0ryfnsW2eSWKjHkYORx03qlq/VW9eDGRmQGxozMUD
+	jFNbUxaGqrdeGriD9d2ER+lF2SEm2tot1FDAXslpPalMYg7e0l2Rc8jUC8K3xzIEezDeAKyD8KM
+	7GP1N1zltWBbDMAy7zDb0vgUsALBtL3nZ//kh0d7+yjSO8Lr+RQUcDlVwQ07rXXJmO0sskLLBp4
+	wAmjNX6gtNmomIdumhGg==
+X-Google-Smtp-Source: AGHT+IHJrshSw4W9lWsjQxEmFzAE4/EGLr4cq7SmwHpMElwpDgd2+UTdOJ+dDrkiO+/oSnvgCBG8lQ==
+X-Received: by 2002:a05:6402:2790:b0:61c:96a1:da11 with SMTP id 4fb4d7f45d1cf-61c96a1e080mr5583707a12.27.1756312827643;
+        Wed, 27 Aug 2025 09:40:27 -0700 (PDT)
+Received: from localhost.localdomain (46.205.200.232.nat.ftth.dynamic.t-mobile.pl. [46.205.200.232])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61c90ffd657sm3771982a12.44.2025.08.27.09.40.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 09:39:02 -0700 (PDT)
-Message-ID: <68af34a6.170a0220.321cdd.0935@mx.google.com>
-Date: Wed, 27 Aug 2025 09:39:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5723562595692645831=="
+        Wed, 27 Aug 2025 09:40:27 -0700 (PDT)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH v3] Bluetooth: btusb: Check for unexpected bytes when defragmenting HCI frames
+Date: Wed, 27 Aug 2025 18:40:16 +0200
+Message-ID: <20250827164016.363640-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <CABBYNZ+6OJRi2LTdk7huQ+i3ysFenY0==umR0YFLz=1_WdmAqA@mail.gmail.com>
+References: <CABBYNZ+6OJRi2LTdk7huQ+i3ysFenY0==umR0YFLz=1_WdmAqA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1,1/3] Bluetooth: Add function and line information to bt_dbg
-In-Reply-To: <20250827160555.1446966-1-luiz.dentz@gmail.com>
-References: <20250827160555.1446966-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5723562595692645831==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Some Barrot based USB Bluetooth dongles erroneously send one extra
+random byte for the HCI_OP_READ_LOCAL_EXT_FEATURES command. The
+consequence of that is that the next HCI transfer is misaligned by one
+byte causing undefined behavior. In most cases the response event for
+the next command fails with random error code.
 
-This is automated email and please do not reply to this email!
+Since the HCI_OP_READ_LOCAL_EXT_FEATURES command is used during HCI
+controller initialization, the initialization fails rendering the USB
+dongle not usable.
 
-Dear submitter,
+> [59.464099] usb 1-1.3: new full-speed USB device number 11 using xhci_hcd
+> [59.561617] usb 1-1.3: New USB device found, idVendor=33fa, idProduct=0012, bcdDevice=88.91
+> [59.561642] usb 1-1.3: New USB device strings: Mfr=0, Product=2, SerialNumber=0
+> [59.561656] usb 1-1.3: Product: UGREEN BT6.0 Adapter
+> [61.720116] Bluetooth: hci1: command 0x1005 tx timeout
+> [61.720167] Bluetooth: hci1: Opcode 0x1005 failed: -110
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=996139
+This patch was tested with the 33fa:0012 device. The info from the
+/sys/kernel/debug/usb/devices is shown below:
 
----Test result---
+T:  Bus=01 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#= 12 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=33fa ProdID=0012 Rev=88.91
+S:  Product=UGREEN BT6.0 Adapter
+C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Test Summary:
-CheckPatch                    PENDING   0.38 seconds
-GitLint                       PENDING   0.50 seconds
-SubjectPrefix                 PASS      0.16 seconds
-BuildKernel                   PASS      24.36 seconds
-CheckAllWarning               PASS      26.65 seconds
-CheckSparse                   WARNING   30.33 seconds
-BuildKernel32                 PASS      24.07 seconds
-TestRunnerSetup               PASS      477.79 seconds
-TestRunner_l2cap-tester       PASS      24.88 seconds
-TestRunner_iso-tester         PASS      41.15 seconds
-TestRunner_bnep-tester        PASS      5.98 seconds
-TestRunner_mgmt-tester        FAIL      126.58 seconds
-TestRunner_rfcomm-tester      PASS      9.28 seconds
-TestRunner_sco-tester         PASS      14.55 seconds
-TestRunner_ioctl-tester       PASS      10.10 seconds
-TestRunner_mesh-tester        FAIL      9.57 seconds
-TestRunner_smp-tester         PASS      8.48 seconds
-TestRunner_userchan-tester    PASS      6.15 seconds
-IncrementalBuild              PENDING   0.70 seconds
+Now the device is initialized properly:
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+> [43.329852] usb 1-1.4: new full-speed USB device number 4 using dwc_otg
+> [43.446790] usb 1-1.4: New USB device found, idVendor=33fa, idProduct=0012, bcdDevice=88.91
+> [43.446813] usb 1-1.4: New USB device strings: Mfr=0, Product=2, SerialNumber=0
+> [43.446821] usb 1-1.4: Product: UGREEN BT6.0 Adapter
+> [43.582024] Bluetooth: hci1: Unexpected continuation: 1 bytes
+> [43.703025] Bluetooth: hci1: Unexpected continuation: 1 bytes
+> [43.750141] Bluetooth: MGMT ver 1.23
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_core.c:85:9: warning: context imbalance in '__hci_dev_get' - different lock contexts for basic blocknet/bluetooth/hci_core.c: note: in included file (through include/linux/notifier.h, include/linux/memory_hotplug.h, include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, include/linux/radix-tree.h, ...):net/bluetooth/hci_core.c:85:9: warning: context imbalance in '__hci_dev_get' - different lock contexts for basic blocknet/bluetooth/hci_core.c: note: in included file (through include/linux/notifier.h, include/linux/memory_hotplug.h, include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, include/linux/radix-tree.h, ...):
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.101 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.076 seconds
-Mesh - Send cancel - 2                               Failed       0.135 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Tested-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8085fabad..eaf88dda6 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -66,6 +66,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_INTEL_BROKEN_INITIAL_NCMD BIT(25)
+ #define BTUSB_INTEL_NO_WBS_SUPPORT	BIT(26)
+ #define BTUSB_ACTIONS_SEMI		BIT(27)
++#define BTUSB_BARROT			BIT(28)
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -810,6 +811,10 @@ static const struct usb_device_id quirks_table[] = {
+ 	{ USB_DEVICE(0x0cb5, 0xc547), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
++	/* Barrot Technology Bluetooth devices */
++	{ USB_DEVICE(0x33fa, 0x0010), .driver_info = BTUSB_BARROT },
++	{ USB_DEVICE(0x33fa, 0x0012), .driver_info = BTUSB_BARROT },
++
+ 	/* Actions Semiconductor ATS2851 based devices */
+ 	{ USB_DEVICE(0x10d7, 0xb012), .driver_info = BTUSB_ACTIONS_SEMI },
+ 
+@@ -1192,6 +1197,18 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 		}
+ 
+ 		if (!hci_skb_expect(skb)) {
++			/* Each chunk should correct to at least 1 or more
++			 * events so if there are still bytes left that doesn't
++			 * constitute a new event this is likely a bug in the
++			 * controller.
++			 */
++			if (count && count < HCI_EVENT_HDR_SIZE) {
++				bt_dev_warn(data->hdev,
++					"Unexpected continuation: %d bytes",
++					count);
++				count = 0;
++			}
++
+ 			/* Complete frame */
+ 			btusb_recv_event(data, skb);
+ 			skb = NULL;
+-- 
+2.47.2
 
---===============5723562595692645831==--
