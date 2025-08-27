@@ -1,187 +1,237 @@
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0904246BB2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 04:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7AE30AD02
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 04:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756269205; cv=none; b=qiZIaOWu7d5Y8+UfvMHVEXivcFmUEdYCmtuZgyGkER4JID3ERFadghfGdet3fGCyDVavCJ0+b5xGT63ROimeP3FvCUjZFKLqt/l/1YEe/yN1+oJdlIafFh56xT1/iM2s2KKEekVqvE4boPQZbIopZBqaYr6cpHP2wmdy5yqmA+M=
+	t=1756270662; cv=none; b=AUXrGhcLyMse5vv3k2e0FBnS1/X6RaaitNOj6izKTY3OlXQz+JQwGhpnpdmb7pxbr0XjpM44JqHk6PiH4Jxrs5MV69A0kx1X1jjvZQa5bpe4HVEJI8D6xjXbVWxlqAvxmKEGK+uJ3FtR/cpkWzxTNA9F9TFeXUdLyvLo59nqV64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756269205; c=relaxed/simple;
-	bh=3bQUggs1dz2lXC5HEhH3WckpGVBZUfB1XMP6X6RhnGs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G99ZBp5MT4Dkv/xuqOyVfTI/e3ub0L1d8gZH9viLWIE5sdJxIWm6GikCccJa9FXgfwDj/+WDC+sbxMlD873XHyqEc4HKMaSetBrbsh0zLSStdOv7nWczCUy3p4Albr7U1annWTbZtO/bCUzdjnEJ49xFjZETHsmo1D2/ITgpBpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=D9leVfTY; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+	s=arc-20240116; t=1756270662; c=relaxed/simple;
+	bh=LOy8luKuhbOKYt4VO8nCAm5mG0HtRHdg8BsMdQfiy5w=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=X41DvNWnU074VeJnixpPat+gIAAbeIXi1onx9O45SKXJys2DOaYX+mBMQiMjVgsSCnGFLDegNeWoZk+VOBezVqABKSEi0+z0fxu/QVeqpBPlg74vYFAyn+DuPgHd9W6apV3rikT3msyQlHAxUI7rc9++ig8UF+1kpd+Ll1hK5+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UptoxktM; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="D9leVfTY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9rOBB/o71xl0ikIjLsjC7srjUMkDatat+eZgYGtvux4=; t=1756269203; x=1757133203; 
-	b=D9leVfTYhD5YypcEJdCo3NGNxOEkJYbBuDFbZE3BMjCeEjUwgWCdTXPUU9YkF1X7GTU7eRj+xBP
-	YW4q4ZopHf2KjF3XmE/SHcGO63Z1fvZyc83Vz3oey+IK0b6/fVQVmq+ZCaFOKCCe3XTXVAu/f94uN
-	cs1ue/v3Guiw6DCbHuC/u0o7HyTdLQkO4jkdCiguCa1VctjFULNiHkPF8/JPLuFd4SA3bA3LuHEHJ
-	kZ7Lip75dJq2Autkgp6q6YinI5YAyzLWfNXZZ+kMQZGsoTkB9F9XOxyf+Hh+mjvL/yxUjeoB7qovo
-	NhSjN/gdTdm+iZbXSJ/UgOgUniBPHNYZUj4A==;
-Received: from 135-180-5-199.fiber.dynamic.sonic.net ([135.180.5.199]:53481 helo=macbookair.lan)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <jgnieto@cs.stanford.edu>)
-	id 1ur7qc-0003X1-AN; Tue, 26 Aug 2025 21:33:23 -0700
-From: Javier Nieto <jgnieto@cs.stanford.edu>
-To: luiz.dentz@gmail.com,
-	marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Javier Nieto <jgnieto@cs.stanford.edu>
-Subject: [PATCH] Bluetooth: hci_h5: implement CRC data integrity
-Date: Tue, 26 Aug 2025 21:32:54 -0700
-Message-Id: <20250827043254.26611-1-jgnieto@cs.stanford.edu>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UptoxktM"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7e86f90d162so58954985a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Aug 2025 21:57:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756270660; x=1756875460; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=u3o4doBG5g9nxPodUGWtGLVR9ap7NbeaYc/hBNdFVyE=;
+        b=UptoxktMBHYdrrBUF0Qyh/SNFVMQVYqASq9v6ZqWinv3MvGoqltNbol57m+TApHIUl
+         umxhdabgG1NOjE89abQRUGbso9/88YCCpKzD9J9ID7woDiF8Yk1x80K3kqVXwZimP3uK
+         YirQlrs8nn75XIxGKU4GJEVPvz9qL3r8VXMKhzfvGP+3M1mD36cgBrEvdsOmHb5nXEHc
+         2CMIc4QLHO9RDBCmycnRBJE9h+WRrp6va1je/kdOkX5tlCThka/DaNW+SYqnY/c0Kw8z
+         4c08vH3TzBjxrR9SUfJ2Mf4BZSrisvJmy9zne8YHSQ0YDYg5uaEyqwkGDpu8tkMF+uvw
+         M6aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756270660; x=1756875460;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u3o4doBG5g9nxPodUGWtGLVR9ap7NbeaYc/hBNdFVyE=;
+        b=tffaSJW/49G0JfEzS5CRf1POGscQG+CLDNo4bLaw4k2zO/aA8i4UqakECr0AYR+Vd3
+         F6qFxXVfVSd6aAYIr86ClkdxCuS/+CvOFg45ZoIOHyu+SDmnLjSZBAmkMfzhRkb2WeqT
+         p0Vh7VrenV548PMwxn+wRty4Oe6PzYMjH/PuDVM/lfuuN8U/RO0crAMJq3qsU5wE1hQI
+         Ajb83mAjQq29y6rezH9KMT5wsSdeY89YOVfe/gaSXbVSzOFene7kPG5yLG7+UE1iw8SP
+         JuzzRs32H12C6z25au/1x5UdAEQ3i1OzA2W4Pdeiv3eHUyOBZIPWwcIhfgdRlamFd52o
+         XFvA==
+X-Gm-Message-State: AOJu0YyiV9zLOILGRPS3MYGFI4VosVNmjoSJGobOMFQJniRlrPawXZi/
+	Vdj9O99Fdrod7BzDHCzwG0xAvEIFWz87sT0OBOeCAybcYek9QG1RF00zIW1yCw==
+X-Gm-Gg: ASbGncsV7BT0TqMtQVPkedyaNY9r3B6Wtq04WTDpGOWnh/wdHZCdQdeJRJ0xsVqqI34
+	qHkSoYG23COVbGlptpICxoEW5WQ9QSkArQ2/gUeCijrOJvP1KMn7QnVH7TtAlqM5MbPN82lPz6p
+	H/vSgHVmIWbzcWwHtmvwRe9pYsRfzsMNjrypWmkNONuldubdQWCpIYOM8KwjhkTb4RS7p7x0dpQ
+	bWYwCNd9XRORiwy1sa4giMR9PmTCukyGIzJ4jOv/k35Z+pTiFf7gr2qSKPW4m/ppY/Fo+703aiT
+	6cXfuFrrHn+NcULOn8u/IUcE5rhLcKn8fjn+qWez5AqJM0uBuQ2DKizmuIh3I3pyYHbsDGs7005
+	Tlc6bLbgMh8EJL8cvLXfgOUZus+8D7w==
+X-Google-Smtp-Source: AGHT+IFBrOVhVH2WAP/tNxWfPR+np53EmYYGd+fdu9mk2E0IbZvUn74OEYso0npF6rnNi/Y++6+IXg==
+X-Received: by 2002:a05:620a:460d:b0:7ea:1064:a8ff with SMTP id af79cd13be357-7f58d941d01mr394527585a.42.1756270659617;
+        Tue, 26 Aug 2025 21:57:39 -0700 (PDT)
+Received: from [172.17.0.2] ([57.154.243.160])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ebf35f00a1sm797760585a.53.2025.08.26.21.57.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 21:57:39 -0700 (PDT)
+Message-ID: <68ae9043.050a0220.209db5.e0e7@mx.google.com>
+Date: Tue, 26 Aug 2025 21:57:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0566322150082412348=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -1.0
-X-Scan-Signature: 255d2abca2c607fc06a55785d004a2f5
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jgnieto@cs.stanford.edu
+Subject: RE: Bluetooth: hci_h5: implement CRC data integrity
+In-Reply-To: <20250827043254.26611-1-jgnieto@cs.stanford.edu>
+References: <20250827043254.26611-1-jgnieto@cs.stanford.edu>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The UART-based H5 protocol supports CRC data integrity checks for
-reliable packets. The host sets bit 5 in the configuration field of the
-CONFIG link control message to indicate that CRC is supported. The
-controller sets the same bit in the CONFIG RESPONSE message to indicate
-that CRC may be used from then on.
+--===============0566322150082412348==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Javier Nieto <jgnieto@cs.stanford.edu>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=995878
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.39 seconds
+GitLint                       PENDING   0.21 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      23.96 seconds
+CheckAllWarning               PASS      26.44 seconds
+CheckSparse                   PASS      29.68 seconds
+BuildKernel32                 PASS      24.10 seconds
+TestRunnerSetup               FAIL      462.90 seconds
+TestRunner_l2cap-tester       FAIL      0.14 seconds
+TestRunner_iso-tester         FAIL      0.14 seconds
+TestRunner_bnep-tester        FAIL      0.14 seconds
+TestRunner_mgmt-tester        FAIL      0.14 seconds
+TestRunner_rfcomm-tester      FAIL      0.15 seconds
+TestRunner_sco-tester         FAIL      0.14 seconds
+TestRunner_ioctl-tester       FAIL      0.14 seconds
+TestRunner_mesh-tester        FAIL      0.14 seconds
+TestRunner_smp-tester         FAIL      0.14 seconds
+TestRunner_userchan-tester    FAIL      0.14 seconds
+IncrementalBuild              PENDING   0.52 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunnerSetup - FAIL
+Desc: Setup kernel and bluez for test-runner
+Output:
+Kernel: 
+ld: vmlinux.o: in function `h5_rx_crc':
+hci_h5.c:(.text+0xd938d9): undefined reference to `crc_ccitt'
+ld: vmlinux.o: in function `h5_prepare_pkt':
+hci_h5.c:(.text+0xd94798): undefined reference to `crc_ccitt'
+ld: hci_h5.c:(.text+0xd947a6): undefined reference to `crc_ccitt'
+make[2]: *** [scripts/Makefile.vmlinux:91: vmlinux.unstripped] Error 1
+make[1]: *** [/github/workspace/src/src/Makefile:1236: vmlinux] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
+##############################
+Test: TestRunner_l2cap-tester - FAIL
+Desc: Run l2cap-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_bnep-tester - FAIL
+Desc: Run bnep-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_rfcomm-tester - FAIL
+Desc: Run rfcomm-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_sco-tester - FAIL
+Desc: Run sco-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_ioctl-tester - FAIL
+Desc: Run ioctl-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_smp-tester - FAIL
+Desc: Run smp-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: TestRunner_userchan-tester - FAIL
+Desc: Run userchan-tester with test-runner
+Output:
+
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+qemu: could not open kernel file '/github/workspace/src/src/arch/x86/boot/bzImage': No such file or directory
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Tested on a MangoPi MQ-Pro with a Realtek RTL8723DS Bluetooth controller
-using the tip of the bluetooth-next tree.
 
-It would be nice to have this feature available for somewhat more reliable
-communication over UART, especially if RTS/CTS is disabled, as this is the
-primary benefit of the H5 protocol. Thanks!
-
----
- drivers/bluetooth/hci_h5.c | 42 ++++++++++++++++++++++++++++++++++----
- 1 file changed, 38 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index d0d4420c1a0f..7faafc62666b 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -7,6 +7,8 @@
-  */
- 
- #include <linux/acpi.h>
-+#include <linux/bitrev.h>
-+#include <linux/crc-ccitt.h>
- #include <linux/errno.h>
- #include <linux/gpio/consumer.h>
- #include <linux/kernel.h>
-@@ -58,6 +60,7 @@ enum {
- 	H5_TX_ACK_REQ,		/* Pending ack to send */
- 	H5_WAKEUP_DISABLE,	/* Device cannot wake host */
- 	H5_HW_FLOW_CONTROL,	/* Use HW flow control */
-+	H5_CRC,			/* Use CRC */
- };
- 
- struct h5 {
-@@ -141,8 +144,8 @@ static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
- 
- static u8 h5_cfg_field(struct h5 *h5)
- {
--	/* Sliding window size (first 3 bits) */
--	return h5->tx_win & 0x07;
-+	/* Sliding window size (first 3 bits) and CRC request (fifth bit). */
-+	return (h5->tx_win & 0x07) | 0x10;
- }
- 
- static void h5_timed_event(struct timer_list *t)
-@@ -360,8 +363,10 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
- 		h5_link_control(hu, conf_rsp, 2);
- 		h5_link_control(hu, conf_req, 3);
- 	} else if (memcmp(data, conf_rsp, 2) == 0) {
--		if (H5_HDR_LEN(hdr) > 2)
-+		if (H5_HDR_LEN(hdr) > 2) {
- 			h5->tx_win = (data[2] & 0x07);
-+			assign_bit(H5_CRC, &h5->flags, data[2] & 0x10);
-+		}
- 		BT_DBG("Three-wire init complete. tx_win %u", h5->tx_win);
- 		h5->state = H5_ACTIVE;
- 		hci_uart_init_ready(hu);
-@@ -425,7 +430,24 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
- 
- static int h5_rx_crc(struct hci_uart *hu, unsigned char c)
- {
--	h5_complete_rx_pkt(hu);
-+	struct h5 *h5 = hu->priv;
-+	const unsigned char *hdr = h5->rx_skb->data;
-+	u16 crc;
-+	__be16 crc_be;
-+
-+	crc = crc_ccitt(0xffff, hdr, 4 + H5_HDR_LEN(hdr));
-+	crc = bitrev16(crc);
-+
-+	crc_be = cpu_to_be16(crc);
-+
-+	if (memcmp(&crc_be, hdr + 4 + H5_HDR_LEN(hdr), 2) != 0) {
-+		bt_dev_err(hu->hdev, "Received packet with invalid CRC");
-+		h5_reset_rx(h5);
-+	} else {
-+		/* Remove CRC bytes */
-+		skb_trim(h5->rx_skb, 4 + H5_HDR_LEN(hdr));
-+		h5_complete_rx_pkt(hu);
-+	}
- 
- 	return 0;
- }
-@@ -556,6 +578,7 @@ static void h5_reset_rx(struct h5 *h5)
- 	h5->rx_func = h5_rx_delimiter;
- 	h5->rx_pending = 0;
- 	clear_bit(H5_RX_ESC, &h5->flags);
-+	clear_bit(H5_CRC, &h5->flags);
- }
- 
- static int h5_recv(struct hci_uart *hu, const void *data, int count)
-@@ -686,6 +709,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
- 	struct h5 *h5 = hu->priv;
- 	struct sk_buff *nskb;
- 	u8 hdr[4];
-+	u16 crc;
- 	int i;
- 
- 	if (!valid_packet_type(pkt_type)) {
-@@ -713,6 +737,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
- 	/* Reliable packet? */
- 	if (pkt_type == HCI_ACLDATA_PKT || pkt_type == HCI_COMMAND_PKT) {
- 		hdr[0] |= 1 << 7;
-+		hdr[0] |= (test_bit(H5_CRC, &h5->flags) && 1) << 6;
- 		hdr[0] |= h5->tx_seq;
- 		h5->tx_seq = (h5->tx_seq + 1) % 8;
- 	}
-@@ -732,6 +757,15 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
- 	for (i = 0; i < len; i++)
- 		h5_slip_one_byte(nskb, data[i]);
- 
-+	if (H5_HDR_CRC(hdr)) {
-+		crc = crc_ccitt(0xffff, hdr, 4);
-+		crc = crc_ccitt(crc, data, len);
-+		crc = bitrev16(crc);
-+
-+		h5_slip_one_byte(nskb, (crc >> 8) & 0xff);
-+		h5_slip_one_byte(nskb, crc & 0xff);
-+	}
-+
- 	h5_slip_delim(nskb);
- 
- 	return nskb;
--- 
-2.43.0
-
+--===============0566322150082412348==--
