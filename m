@@ -1,151 +1,183 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CCA17E0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 11:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860342ED141
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 13:42:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756292518; cv=none; b=Dt0ByWILkr86x4Ry+kNCnCmJ34DOqWPFP2a0zRxc0QtyzUVbTzWb//KUPRpDPtBM4FJuDpzqu+mp/LpBI99iatz6uw2bWj1Y+JiUEDg3ozHAnS6diC6uIwj7hPSE543WbJTld6YcZJdgupC2OAAjqmHzMIuSC5tTHLoFkbwyPbA=
+	t=1756302174; cv=none; b=C28/2cSNCHE0ns1AmMHAoxsKMU/KIdCSNcZbJNnWay1r5jgz2LyXn6u2xXm4kRopUOc634eSg14PcU5Latle5tv/GCeuVnhMijPI2Gfypw8u8PL4SSTaau2JZJud/rM0tzoGgEKsxZa9O7HqQU/EHwxJ6Oev5jSsnNQCdDxsZ8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756292518; c=relaxed/simple;
-	bh=A4d97PbUla5nGpZ1hHnr/E7EOcGMU3k8uV8dv+qWgNw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=qgjpMyjlZ6uTc4NJAlRVYfGEpdBUAUd5uO+D9bHzFZRmWYataJfgDh8hxmsN9TStPwwuRN4+P+5ldy6UFc8nEa+/QRcK/52cUGkMEpZYrMLrLwXuWAlMTGp4ixA6F00FTCCSgAbeznNwqcshdHeqnGWqLEEgbRYBc8ct96cJ67s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiBbocgj; arc=none smtp.client-ip=209.85.166.50
+	s=arc-20240116; t=1756302174; c=relaxed/simple;
+	bh=VhqFxVDpU/LovEKugMoDn0ABDSICwf2hF2VQHo8u6ls=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VOSjo0GunA0LcEItyTLCWBdIg6SdEal+Bi790PnvqhR2s2oliqh9Taic5g7BnGftMYxq8tKSHIQ7+ZZbuGClIcqBWvS/jn0ayDTXkmHRknERKjNPdbFn2g7tOH0F7FQOfVvGo4fXIkWYJf7FKheo+cXglqUGdMDqeq5oIjYw/NU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4DqS6fr; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiBbocgj"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-886ecaf455aso195194739f.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 04:01:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4DqS6fr"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-55f3ec52a42so4517485e87.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 06:42:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756292515; x=1756897315; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/olwvnl3sz4BCcwXVWsWEvCmuUMATaDatsKQTmaqFD4=;
-        b=UiBbocgjbzgveFwskHov5M9xQqHUjeGA+N5eTILEZeAP9vHAOdJ0n0A+P0yEBBANoL
-         hFDK1FgtBNwVNv8JAl4rS/oWYx8QhAr9lDV3y9IG/rRyjBFipc5W53pDKgwz50Va1uGA
-         tcT9WdvF3N9jpc+zCb4LS/CDXfWVy86uIzcqIwKqPAeQy9gA1kHNqb5CrZclKKCi37IZ
-         46wXqsyFOik+P4qtmJAEqNUi1bkDpX+FStDS2urKz0oZjkpyxjlL0izvFJR1DWufLtuB
-         d9wVxSJmGLyXUudysRs4Ev9zm19Ubxfgv95MWE3vwvcbEHsiS+xTGKbXGG4Z75XnBd3T
-         lZyw==
+        d=gmail.com; s=20230601; t=1756302171; x=1756906971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DqfRSSLwhR483qDqg+kOO7AhGE+sBPN5Jnt6QvcjvQ0=;
+        b=D4DqS6fr1QgWuizhVPOaoivRNekUQPe426rMbZmQbvxI+MPy9H2+LI3XYB1fn7irZv
+         AdcUZ2mHvW1GuwIgAZIo69FHIEwh9dMuxYHjGz+zRxeivyQ3k5cByffvn6h26taS15Ix
+         3b4vjEiLVLiIX9DmJ7tnPGJkH/XIhg5qrKLJUdmKso8mVhTFwkI0zy8MGDsgL7ijmSky
+         bb6/JS51OVH65uOzixwiFLdLdaRi8V0Mu/FQ3FJDCW/0WjdceGuGubLSmib2rw811Ooh
+         3vfdV1WPiyLrSJoAl4Wd2o2oLV9f+R5H8I6JHIFl/CqFXaD5Yz7Vik27J9xhNghztBOR
+         1RXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756292515; x=1756897315;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/olwvnl3sz4BCcwXVWsWEvCmuUMATaDatsKQTmaqFD4=;
-        b=ThAky5y2bOpyK5vOhQYbnH2chgQEFE7/aiA3jmETzMCMq0bKYH6c3niz0vQr3U2sfF
-         HYb/fRpXCgOB6PLLe6tyVi7Y8DZLZ1QMIWnmCs7HYB/BujWtVOEL70Cl1m8f/DLb+H8y
-         O14gbMbovaf4enm0X/K+huVkZaYIprUJhtXhyvJxeS6OFz3eh61YP8b7VFEFeXIMTvq9
-         E23j+mMCXkyGgpzSOrKwJ85Z5QXkGATE91zEqDmM7usZJFpuv+E9eXTmrBXSgJAl8kNJ
-         c4/5QrDfQy/zi4LSwR++ZiVdz2UK8J+xta90vOR5PT9cOwsXhFBLUzQ12havBNuQMvqU
-         xgxg==
-X-Gm-Message-State: AOJu0YwuhC7zNLUToV+IUpB0pbRRHjd5dRFZIvlj1gm+Ayewrm6ySf4D
-	/deaf6AD9tVJ0xbTxKppo2V5I+M5sbU357gAebw8AyI8B3QbJAokNujxf3QZQg==
-X-Gm-Gg: ASbGncuwJKLZWvYSZc7Fb9/eJOZ2MKqALVj7ANrTIMP4yvxTRUVwOGRrX0bHgYUDR4w
-	VlxWstf65lvs3cBB5Tspm+ylubR9kvu6kxFm6eebwHfw/7EtLFdDx80rekfIG7U+bvFuk7QWYk1
-	0/SxoAVK2BDGBZKSbrwh0dF8xohNd7uqDzd/FQf7W2gyS+3VbVqbXfCPXxQlvaOIjv65Mj0uXK5
-	kcQ6XTaAPJZNCA2mc6c75qHskXN4dQHTKTK+YGYoO7oZBv8YFA9j/C0YqyoKhJ9zwEDtoDy/Ot0
-	zKhqnewzjUCj9ZlEAFKXkaXIqHCWjiBxJ24Gk0SfIYLq20xpKge940a4C9ISOp2RGgrAq8rPZHu
-	7v1n+ow5AGqcguX6gpZ8VE1a9N+s68A==
-X-Google-Smtp-Source: AGHT+IEbv37U6Ho/lGOBwjLjSW21QUCOwc8vUuDUgkzq3hQtJSochWlEQpJIo7eQolqZe2xIDXO6lA==
-X-Received: by 2002:a05:6e02:1646:b0:3ec:983c:20f0 with SMTP id e9e14a558f8ab-3ec983c2237mr132026035ab.4.1756292514669;
-        Wed, 27 Aug 2025 04:01:54 -0700 (PDT)
-Received: from [172.17.0.2] ([52.165.213.184])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c191f23sm86292685ab.16.2025.08.27.04.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 04:01:53 -0700 (PDT)
-Message-ID: <68aee5a1.050a0220.8400c.1721@mx.google.com>
-Date: Wed, 27 Aug 2025 04:01:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6640047885122396139=="
+        d=1e100.net; s=20230601; t=1756302171; x=1756906971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DqfRSSLwhR483qDqg+kOO7AhGE+sBPN5Jnt6QvcjvQ0=;
+        b=RXT8IUmXP6jgRrSLJMQt6mqZLQyM/gr6GmAD86Yj4C4wOy5hJcwiNUiDpU/lcD2OYS
+         GjFfUKqnNglCDEkNfpHdxzQRQUL6dad0Sp6jwI2CvTeM6FQ46znalH+PR8f6LUXay8Sn
+         VCe8er71+1kSt8wLILUxAeXIft7KLmIy7oOYwyAZD6yiilX4pj4M0VUISHE+CNQO0Dzz
+         kHCH2x1C6TFqWMY8VOEjks9NYVMYpysQqd+ohhW5hoc2RALEaLsD4UyI5g1R5QWh5GsP
+         dVJKiwfS76O0vtktfzOZqmTGoxis8+CgOQoC9UNAHBF7KHzWimYGgCg67/30I8ozCRmm
+         3Lrw==
+X-Gm-Message-State: AOJu0YxBRr8XqFG1zniMOgXubeYd4nduXKykOYG8NC9RXOVZoJEKMl/b
+	JooxpuaJqbHQt3I9K2w+5i8PCT8ZnsX0tt/YXFtfHyN2iM01tau0HDMQbY8VjqAfEr7Z5/k7P30
+	qp0u0iSExwhaXmqfW4pPDjJd5H6EhZ40=
+X-Gm-Gg: ASbGncvuxLcqfkO1HoeQscHC3tl7prfymmPKpips41Q+71ezIeMGuqEOTd9Yq2r8b0Z
+	4T9uYG3lE8LYrl4+4VCqGBVRKA6KiE9V8CWGao/l7AlPlOnfWEQnlEQUbbELUhsOoENx1/Li4iA
+	uGk9KifZgKos/kC3CvYWwMWyV/2G9y096DvtgFdi8Qlu7twFRXFl9uZ2mVh6Pq1hGbG413KtdBp
+	xqQ7Xq5dfHr+x75JMle7YazfepaUT7IWhADzFnI8ojEMZLcZeQa6ej4qArnc3axZDM=
+X-Google-Smtp-Source: AGHT+IEtOVN2W0YuR03zQGZMPIhVn9AdakRcM2UqMT2MIe97eejMIz8URQIG+IPDNeRZs5nvL2mW/CJcIX9MktMnlaM=
+X-Received: by 2002:a05:6512:6082:b0:55f:4ae5:8dd2 with SMTP id
+ 2adb3069b0e04-55f545438dcmr961707e87.55.1756302170247; Wed, 27 Aug 2025
+ 06:42:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
-Subject: RE: [v11] Bluetooth: hci_qca: Fix SSR (SubSystem Restart) fail when BT_EN is pulled up by hw
-In-Reply-To: <20250827102519.195439-1-quic_shuaz@quicinc.com>
-References: <20250827102519.195439-1-quic_shuaz@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <CABBYNZLmTCh_mn7w6U31B82cBZsmLaj92dxwfK9PVWZeMqk54Q@mail.gmail.com>
+ <20250826170314.352122-1-arkadiusz.bokowy@gmail.com> <CABBYNZJ7kbHJ665-rsKQTfP_U=pfBwAPrGki7JSBpF7+wiXung@mail.gmail.com>
+In-Reply-To: <CABBYNZJ7kbHJ665-rsKQTfP_U=pfBwAPrGki7JSBpF7+wiXung@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 27 Aug 2025 09:42:38 -0400
+X-Gm-Features: Ac12FXx438hvzE4nCebJuLzU7tK5foxTuAa54yC0F2ois3KkHVtvwAb7jb1og0k
+Message-ID: <CABBYNZKorYK7MKUr1DsipZOUbkNuecW4WpbVKtjyb5ha5EnrSQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btusb: Check for unexpected bytes when
+ defragmenting HCI frames
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6640047885122396139==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Arkadiusz,
 
-This is automated email and please do not reply to this email!
+On Tue, Aug 26, 2025 at 3:31=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Arkadiusz,
+>
+> On Tue, Aug 26, 2025 at 1:03=E2=80=AFPM Arkadiusz Bokowy
+> <arkadiusz.bokowy@gmail.com> wrote:
+> >
+> > Some Barrot based USB Bluetooth dongles erroneously send one extra
+> > random byte for the HCI_OP_READ_LOCAL_EXT_FEATURES command. The
+> > consequence of that is that the next HCI transfer is misaligned by one
+> > byte causing undefined behavior. In most cases the response event for
+> > the next command fails with random error code.
+> >
+> > Since the HCI_OP_READ_LOCAL_EXT_FEATURES command is used during HCI
+> > controller initialization, the initialization fails rendering the USB
+> > dongle not usable.
+> >
+> > > [59.464099] usb 1-1.3: new full-speed USB device number 11 using xhci=
+_hcd
+> > > [59.561617] usb 1-1.3: New USB device found, idVendor=3D33fa, idProdu=
+ct=3D0012, bcdDevice=3D88.91
+> > > [59.561642] usb 1-1.3: New USB device strings: Mfr=3D0, Product=3D2, =
+SerialNumber=3D0
+> > > [59.561656] usb 1-1.3: Product: UGREEN BT6.0 Adapter
+> > > [61.720116] Bluetooth: hci1: command 0x1005 tx timeout
+> > > [61.720167] Bluetooth: hci1: Opcode 0x1005 failed: -110
+> >
+> > This patch was tested with the 33fa:0012 device. Now the device is
+> > initialized properly:
+>
+> I'm trying to find any entry with 0x33fa but I couldn't find any, we
+> probably want to include the Fixes tag to the commit that introduces
+> support for it.
 
-Dear submitter,
+Looks like we are missing:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=995987
++       /* Barrot Technology Bluetooth devices */
++       { USB_DEVICE(0x33fa, 0x0010), .driver_info =3D BTUSB_BARROT },
++       { USB_DEVICE(0x33fa, 0x0012), .driver_info =3D BTUSB_BARROT },
 
----Test result---
+We can probably add it together in the same patch, so we don't have to
+rely on Fixes to inform the changes below needs to go together, but
+then we should include the contents of /sys/kernel/debug/usb/devices
+before the information why we need the changes to detect extra bytes
+in order for it to work.
 
-Test Summary:
-CheckPatch                    PENDING   0.36 seconds
-GitLint                       PENDING   0.29 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      24.84 seconds
-CheckAllWarning               PASS      27.37 seconds
-CheckSparse                   PASS      30.82 seconds
-BuildKernel32                 PASS      24.93 seconds
-TestRunnerSetup               PASS      488.73 seconds
-TestRunner_l2cap-tester       PASS      25.32 seconds
-TestRunner_iso-tester         PASS      43.66 seconds
-TestRunner_bnep-tester        PASS      6.05 seconds
-TestRunner_mgmt-tester        FAIL      127.60 seconds
-TestRunner_rfcomm-tester      PASS      9.32 seconds
-TestRunner_sco-tester         PASS      14.72 seconds
-TestRunner_ioctl-tester       PASS      10.09 seconds
-TestRunner_mesh-tester        FAIL      11.42 seconds
-TestRunner_smp-tester         PASS      8.54 seconds
-TestRunner_userchan-tester    PASS      6.28 seconds
-IncrementalBuild              PENDING   0.89 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.098 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.093 seconds
-Mesh - Send cancel - 2                               Timed out    1.997 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
+> >
+> > > [43.329852] usb 1-1.4: new full-speed USB device number 4 using dwc_o=
+tg
+> > > [43.446790] usb 1-1.4: New USB device found, idVendor=3D33fa, idProdu=
+ct=3D0012, bcdDevice=3D88.91
+> > > [43.446813] usb 1-1.4: New USB device strings: Mfr=3D0, Product=3D2, =
+SerialNumber=3D0
+> > > [43.446821] usb 1-1.4: Product: UGREEN BT6.0 Adapter
+> > > [43.582024] Bluetooth: hci1: Unexpected continuation: 1 bytes
+> > > [43.703025] Bluetooth: hci1: Unexpected continuation: 1 bytes
+> > > [43.750141] Bluetooth: MGMT ver 1.23
+> >
+> > Signed-off-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+> > Tested-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+> > ---
+> >  drivers/bluetooth/btusb.c | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 8085fabad..24a249d1c 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -1192,6 +1192,18 @@ static int btusb_recv_intr(struct btusb_data *da=
+ta, void *buffer, int count)
+> >                 }
+> >
+> >                 if (!hci_skb_expect(skb)) {
+> > +                       /* Each chunk should correct to at least 1 or m=
+ore
+> > +                        * events so if there are still bytes left that=
+ doesn't
+> > +                        * constitute a new event this is likely a bug =
+in the
+> > +                        * controller.
+> > +                        */
+> > +                       if (count && count < HCI_EVENT_HDR_SIZE) {
+> > +                               bt_dev_warn(data->hdev,
+> > +                                       "Unexpected continuation: %d by=
+tes",
+> > +                                       count);
+> > +                               count =3D 0;
+> > +                       }
+> > +
+> >                         /* Complete frame */
+> >                         btusb_recv_event(data, skb);
+> >                         skb =3D NULL;
+> > --
+> > 2.47.2
+> >
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
 
 
---===============6640047885122396139==--
+
+--=20
+Luiz Augusto von Dentz
