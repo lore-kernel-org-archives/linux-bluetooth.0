@@ -1,197 +1,89 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613781D9A5F;
-	Wed, 27 Aug 2025 14:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580AB26F294
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 15:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756306442; cv=none; b=clnSNcfETX6QmIPLzxei+v/yhsCKn67+lP5ExQ7y46y5/iw2Q+vbsNHuZqS5+x5CcSL8fwWz8PF1nFjwntniNVo8/xCF16VjB6WT5BwNVSDS+2O4mXAX7YzdtfW+NtxZE3fr3ASqOaAfjlt+OcUpV52Gd7A/1L569H0c9MTj3H8=
+	t=1756306935; cv=none; b=LaKqrzMnkBcwFt6/9MfAXoVJHlQOII2bXkw01Q1XnqSq+ldCTPgLuYAe+LUJEM6T9+AUFxWU0EVczKpim0WNMuaiag/upnZ8/wPF13WvIlRiig5oZcBFgOKm/HK2Lv6AyaEYJCK9waTfQpDQIr156iLiVg/vHiJ7rvFkn2ovfu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756306442; c=relaxed/simple;
-	bh=LTVYaPQmpbESbLa29AHfdA6gksQ96bqgTEIsxw27+OQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M+alKej7cjzI/jivwec/dQd4eJUOEQnSnH20aB1vva/ctHL9Bbbe4pPtvAcRurhiwK9DmfVEf81H/lc4XbeES2Bt6d1suZmGAeduJvHEXVRuvdEtm21Hx10cS3UhGkx5rkgoCPERDI/8drIQitYedQrB0TSvlZz0VLaEu9Bpens=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBAAmdrS; arc=none smtp.client-ip=209.85.219.47
+	s=arc-20240116; t=1756306935; c=relaxed/simple;
+	bh=v2lmiEhHZWpiVJTAPc7NsEeQ6+F3KQeCwuLnM+Y7Yoc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jCU2qk7vpJxb24poeUNBY4rnuHVobqusiar84N6JT/5piLOAyHWWEhMtT99z/s12H9ver7Z+ZVxOb/u38Xc3o5cDB1rpKgikkoVSlEHrWDvQoFaUuRd71xxyu4CtHdJYhavVf7pWhUDnXugYiBu5WtDemI3JQNm21bG2kuALOmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xfl9P+4e; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBAAmdrS"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-70d9a65c353so67649676d6.2;
-        Wed, 27 Aug 2025 07:54:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xfl9P+4e"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e931c858dbbso5565522276.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 08:02:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756306439; x=1756911239; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NsW01q9TUkJKPs+74mdvZj7XDe/KxO6JgJKENh+3OII=;
-        b=aBAAmdrS7Di3eLMGKaRQvsPjt/ZYpHwd1wuH1PGovijPx6NvO7uUqFy9/Vwy3eJzXO
-         tKRpN6V4S9bkw0MSwUMZhwEqmhoB9b028//v8jCvtr5ZRXuQli66MvNnbTEREdE6DmMx
-         Dl0BKUQie55MBJq+23N/MVZa0wuRVzzNLZhpakJ7G1vK/0HWAkb7xC/SgJoa+GoDRZiO
-         +IMc/TRhxzVlntElPvphNwIlxVxkOhcp96GbaxVBooqafy0BREy+BK7ruqTM2LKxUGGe
-         QEQWs1CheiFV25Hg8PKT4KMhRbafzqhetqKGdJ96W5dNY25K2D3bo8brJ3z/8UToz5y1
-         jksA==
+        d=gmail.com; s=20230601; t=1756306933; x=1756911733; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mHluwwdULlE8Dh1IYr7/+tdny3lBdDmxy2wape6iVbg=;
+        b=Xfl9P+4eZ5HnWwJwZsSKFSLn6Y34hmHwgnURQNb5WJeciQf9VxkpqrYPK2YtmF1Vwk
+         phPxtdgI4UXLmaTUko2aVjiGNNW1HBK4GaMDWC9syf81lo+zOW3ApKvGeeQwauPCM3Lt
+         4z6eybpmdyUMNRBlqP+oUyrhxPw0xCf1WDx2rB3CdeOQQHTREexvY0P0IFvJAJBOOJsA
+         lgGiezHi+epIn3A3WbOa75joqKL5lzskEMabYcCZMOJBFK6LaTHdGr2p/Wzle+sqefxq
+         KGd9IcXO6lr9ym7HnMcM1yPpOVYERQ9+DFI0LMvdjJF45xAqESYVFaBAh6Y9apJY8VpI
+         AOaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756306439; x=1756911239;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1756306933; x=1756911733;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NsW01q9TUkJKPs+74mdvZj7XDe/KxO6JgJKENh+3OII=;
-        b=njuwSio+la5hU457fNdSD37hytvyDbn0rgtdDw7ZrbYBHDamEN1vh4I/W0HM+TTicU
-         gK27tPoY2lfuaS1CU4ZVq/gEmyyDYpr1SEtfTwrhj++OkFbSnu4CIRMc/ZfjucPoMdXc
-         A0uC+n9WNIPH4xTzskSKO/Wdcog+u3NjguDmTj59i8E9sLjVVM2eKal4ofA6o07XBt7r
-         fTaT/Yi6Pa6LLaN07YYUbOPl63IX2oS6NaDDMxw6ndtzbyQmG+NLXsHC8isdygRP6UFk
-         JIZZyMu3XtvPh9hsuKWvzWMrxrfDeizEEpBDlPVgpY0V1wGin0vBuArrzQR9QhFQOz0n
-         ahBg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwGXV6hMlEuYfyiznC8cbq7liJBTPSeQ31nrinIC8fGTLLIn/nJp4QS++RUlAp2HoP/WCAYmaDW8YGbIsj@vger.kernel.org, AJvYcCWcQfpAsgRtlR80E2FmhjCl5St4Wlk4NCrkVxe3mm1+xilf1zIVlczTDmz32G4m7YAKXRiCT9Af0cd6dXrtRsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8sP8euIj1xvPhqRI6Zq7Zv3CEVgE82a2qkChQ3VDUItSy45yt
-	tEZFIlVJpbJmwR0IbZTcBLjVNlJirCI4LzCo5iFwlMj6qslOBGoI77gRJOgdVrLQ
-X-Gm-Gg: ASbGncu9+uEdPYvHnOPYwyXivSG+C0SO8eW3xy6v+l29yXHgnykcKvQtCbDuHpEuFeZ
-	7gRec7otjvG/pB/jWf3cP6HLhBlnjIPu5o/LkVL2e4FL8lVzX2nUqJS2MAaS70W23uU6f95EsOA
-	/gc29NHedOnpGOCBFJk9vOoF9neqk7/juE0AtQzi96YYy57rhYkBt7ur26r7wuipzAfO+ARgcdX
-	7tivxIADzOULDBO4HiMVZcYcKtzcgRrFK40qbfrO55lOEVbVIEyH3UB5nSKpr+k3jaDNRwpoY/T
-	3hSxXX5Cv1mlBkWraEbfIQ9DO3KmCCfKhvtGzwR8gdJ0f8DzZLlVpvPSZ90GoW7QrWaepJxXhOm
-	huR7FjjDBWwwPtD0GG+eLTlA0JS4n0g1Epf9F6T2MScJ/mVveKF5jHcCBlzrQLzFPsXqDkhZYCS
-	TSsp2X
-X-Google-Smtp-Source: AGHT+IE4qwObq+xLWcPwZ30NFJ8El+ZMvdyIuGZ1DkE/Mg97NF+IUUe/yQYU3AzIl+rnEAr7uCy9mQ==
-X-Received: by 2002:a05:6214:2527:b0:707:1322:6ae1 with SMTP id 6a1803df08f44-70d9709296emr195810776d6.0.1756306439189;
-        Wed, 27 Aug 2025 07:53:59 -0700 (PDT)
-Received: from ideapad.mynetworksettings.com ([2600:4040:5301:100:5bcd:b7f0:d625:7033])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70da714cb55sm84777446d6.16.2025.08.27.07.53.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 07:53:58 -0700 (PDT)
-From: Ivan Pravdin <ipravdin.official@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	mmandlik@google.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Ivan Pravdin <ipravdin.official@gmail.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v2 bluetooth-next] Bluetooth: vhci: Prevent use-after-free by removing debugfs files early
-Date: Wed, 27 Aug 2025 10:53:25 -0400
-Message-ID: <20250827145324.27180-2-ipravdin.official@gmail.com>
-X-Mailer: git-send-email 2.48.1
+        bh=mHluwwdULlE8Dh1IYr7/+tdny3lBdDmxy2wape6iVbg=;
+        b=P/XuTXWsVOWvCy1OS2Aej8VFoTwCr3js0VRkOSGeL4BH6RmprG+qp1I7l+dm4n/tcX
+         wGkC0Ay7oHYZwN4bFTXRabwA7Nfl5N6VHxri0t7zy4zli1qYAyRP/jQihyfxqXMOA8h4
+         z+Rzki0Blaw93mpVTajKAaxGF9lQmkwbY5QaVcpD2qwPboTbqe3S9eNyDhBeTHTiHlSH
+         g9xKT3GtTqU/3lUKY7MD16UsKMlMS2jNS3QYJ1EOzhtXIvQm7MpfDvOUDo+ElM7vg+6e
+         wsWEw1XR5Q7w+EgBgTMSxt2W+/HGs6umo5jNpbginD2Wxh8PiluUH0sHoLASVxFHhX7f
+         haCQ==
+X-Gm-Message-State: AOJu0Ywf7Rgs8qWBQNmEO1xWD/XBXwe69hH5mY8graB3K+/f3JNEXckH
+	1sQlW+h42+S1Ss7hxuUxtNn9AXcRQ++13tP8dA/OVs949y3tOBv+hxD8+fsQnklgNO40kKebCkr
+	0VuBOdKn2XU+wYjt8cBt5o+/K9GZ/ZgA=
+X-Gm-Gg: ASbGnctSXESci6yD8ULTyYY0/eOTSS1+YqA4Uk7sNgJoFWxAAEAHdc2NIS6DUj5PhnO
+	tbzkX2QATqwAoL1irRu3zJyyXok0dWH0dIS8tZ+rTrd9wYuqrm81mwMUo6iwyXNCvY7sJAMqxWU
+	2x9UkRtnvlJhK++vx+PK9IbPfHHoaxGe5BNVZsZkGrDTCpj8QV+tGqUYrm0Kzr6Ix3jH9kMk12d
+	vBjxqMw
+X-Google-Smtp-Source: AGHT+IE9xoY0B2be1LX3RAOpy9G+fxT+Dd2DhdEdim0XZjxddVeNQm2tiLLH6KXEgbZ52ztAHQrF18YJ4g7+pLEy5tY=
+X-Received: by 2002:a05:690c:4c05:b0:71d:bc04:a615 with SMTP id
+ 00721157ae682-71fdc307ab4mr208089677b3.15.1756306931250; Wed, 27 Aug 2025
+ 08:02:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CABBYNZLmTCh_mn7w6U31B82cBZsmLaj92dxwfK9PVWZeMqk54Q@mail.gmail.com>
+ <20250826170314.352122-1-arkadiusz.bokowy@gmail.com> <CABBYNZJ7kbHJ665-rsKQTfP_U=pfBwAPrGki7JSBpF7+wiXung@mail.gmail.com>
+ <CABBYNZKorYK7MKUr1DsipZOUbkNuecW4WpbVKtjyb5ha5EnrSQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKorYK7MKUr1DsipZOUbkNuecW4WpbVKtjyb5ha5EnrSQ@mail.gmail.com>
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Date: Wed, 27 Aug 2025 17:02:01 +0200
+X-Gm-Features: Ac12FXxsi330Rt28PyWHBFRV4fYdjDBtHmgqxzCxnTAhaP2DqaXvmdh5k9w7SAw
+Message-ID: <CAGFh026z9qhAzLOnBUPGojtuO5dH497DppLxiA++-9=odBohbg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btusb: Check for unexpected bytes when
+ defragmenting HCI frames
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Move the creation of debugfs files into a dedicated function, and ensure
-they are explicitly removed during vhci_release(), before associated
-data structures are freed.
+> Looks like we are missing:
+>
+> +       /* Barrot Technology Bluetooth devices */
+> +       { USB_DEVICE(0x33fa, 0x0010), .driver_info = BTUSB_BARROT },
+> +       { USB_DEVICE(0x33fa, 0x0012), .driver_info = BTUSB_BARROT },
+>
+> We can probably add it together in the same patch, so we don't have to
+> rely on Fixes to inform the changes below needs to go together, but
+> then we should include the contents of /sys/kernel/debug/usb/devices
+> before the information why we need the changes to detect extra bytes
+> in order for it to work.
 
-Previously, debugfs files such as "force_suspend", "force_wakeup", and
-others were created under hdev->debugfs but not removed in
-vhci_release(). Since vhci_release() frees the backing vhci_data
-structure, any access to these files after release would result in
-use-after-free errors.
-
-Although hdev->debugfs is later freed in hci_release_dev(), user can
-access files after vhci_data is freed but before hdev->debugfs is
-released.
-
-Fixes: ab4e4380d4e1 ("Bluetooth: Add vhci devcoredump support")
-Signed-off-by: Ivan Pravdin <ipravdin.official@gmail.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
-changes v1 -> v2:
-    - Fixed tag order
-
-v1: https://lore.kernel.org/all/20250716004252.125466-2-ipravdin.official@gmail.com/
-
- drivers/bluetooth/hci_vhci.c | 57 ++++++++++++++++++++++++++----------
- 1 file changed, 41 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index f7d8c3c00655..2fef08254d78 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -380,6 +380,28 @@ static const struct file_operations force_devcoredump_fops = {
- 	.write		= force_devcd_write,
- };
- 
-+static void vhci_debugfs_init(struct vhci_data *data)
-+{
-+	struct hci_dev *hdev = data->hdev;
-+
-+	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
-+			    &force_suspend_fops);
-+
-+	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
-+			    &force_wakeup_fops);
-+
-+	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
-+		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
-+				    &msft_opcode_fops);
-+
-+	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
-+		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
-+				    &aosp_capable_fops);
-+
-+	debugfs_create_file("force_devcoredump", 0644, hdev->debugfs, data,
-+			    &force_devcoredump_fops);
-+}
-+
- static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- {
- 	struct hci_dev *hdev;
-@@ -434,22 +456,8 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- 		return -EBUSY;
- 	}
- 
--	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
--			    &force_suspend_fops);
--
--	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
--			    &force_wakeup_fops);
--
--	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
--		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
--				    &msft_opcode_fops);
--
--	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
--		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
--				    &aosp_capable_fops);
--
--	debugfs_create_file("force_devcoredump", 0644, hdev->debugfs, data,
--			    &force_devcoredump_fops);
-+	if (!IS_ERR_OR_NULL(hdev->debugfs))
-+		vhci_debugfs_init(data);
- 
- 	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
- 
-@@ -651,6 +659,21 @@ static int vhci_open(struct inode *inode, struct file *file)
- 	return 0;
- }
- 
-+static void vhci_debugfs_remove(struct hci_dev *hdev)
-+{
-+	debugfs_lookup_and_remove("force_suspend", hdev->debugfs);
-+
-+	debugfs_lookup_and_remove("force_wakeup", hdev->debugfs);
-+
-+	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
-+		debugfs_lookup_and_remove("msft_opcode", hdev->debugfs);
-+
-+	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
-+		debugfs_lookup_and_remove("aosp_capable", hdev->debugfs);
-+
-+	debugfs_lookup_and_remove("force_devcoredump", hdev->debugfs);
-+}
-+
- static int vhci_release(struct inode *inode, struct file *file)
- {
- 	struct vhci_data *data = file->private_data;
-@@ -662,6 +685,8 @@ static int vhci_release(struct inode *inode, struct file *file)
- 	hdev = data->hdev;
- 
- 	if (hdev) {
-+		if (!IS_ERR_OR_NULL(hdev->debugfs))
-+			vhci_debugfs_remove(hdev);
- 		hci_unregister_dev(hdev);
- 		hci_free_dev(hdev);
- 	}
--- 
-2.48.1
-
+OK, so, should I restore the quirk (so this check is only for Barrot
+devices)? Or add driver_info = BARROT without actually using it
+anywhere?
