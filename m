@@ -1,83 +1,110 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD233FC7
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 20:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E6A2D8767
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 20:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756326820; cv=none; b=UtVcJd+7BwlXlyWUpNMgG2nQ/RP8qF1evXaq30cp1g35VNiE9bMVbwr6vVb89iqjl7xdccwhzXBPSnFIziU6SWFIshUNTR0I5tHndDsxti5xPm6U2efR4wej8F+zO5Sm/gEMAMyaGQxoKUsRAZSPZf1RuizUeTwU0OMc7YliGqs=
+	t=1756327221; cv=none; b=EHgEHU7A8DaVHBLJ4p29383FQw4AxjIU35lJeaLJfZsV32f/RJ0n8+VxL5FNwzCgsunYR5Gye+2bLWVj/tehQ76e2jyTt64LESXR2uMRROcrbz1L+xXrFUq7Eyxyy46SNv9E6p6xbaDK8FQkwsiow7CtwLvn1ekNxgmN6WkqtE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756326820; c=relaxed/simple;
-	bh=xPuG+qUhqTW3G4H+uPp506IaIqsO905LH7HNMtz/Q0E=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pLflYGWRh4V/HB8UdkMTuQ2WSPpdI4d0OegyRG+DftUceayRqpGTwuIzQMwshiNssNoPZo2N0NDtQieOT7Ko1rOx47RV+TUU936XKAB2seU0wxesg2qwr+4Br+dhSgYgyOfykhW3C7E+BGoD4rxm82J4YLrhkpbTDUBJzij9AJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ec58544f79so6199325ab.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 13:33:38 -0700 (PDT)
+	s=arc-20240116; t=1756327221; c=relaxed/simple;
+	bh=hpMbueVxswjv7ROuVJxPeseS6vdNu9RswXBfa67Rdd8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RlEidw63BGhuSBBjxBHH0oFwL0wGp71kbNkTmU0pWdAxWFCSKEMX9aKvb7kTh1enbaCyc61IleSiia0jIyMO/gBF24Fty1T+GMeLIq4fkkv975sri5z4Q4bncg1zmYesRxgDjmdAHKW2bwiQeUikLEVq9iLrofwSHKqGodnntF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HE4m1Pk9; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HE4m1Pk9"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-246bcd0a112so1593225ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 13:40:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756327218; x=1756932018; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oNZDbikpzZCqx8xoOZGHeBq1tBAKabyyMhI/dzHkJJo=;
+        b=HE4m1Pk9ZXVD7/T6roikpuvWZi2d+hmuwb0mtWRmnoDn7oFbO+YLXxtwx61aoIPx/P
+         yy92Fvj8QGsWI42LivtN1zYizew4gX2wmO886RxzPYErBxH+8b+Cuq2Meh5bFl5pnbTZ
+         qkGZb9k31Cxp+2a/bARo5ZjNb0aEsq+onrFftpcioCYB9Rh41qPKFGrUnfLNIQlPYWQP
+         HD6qr5mySouw/mfccU+HBCJuH+NoYOYbkgkuPrbOUYbv0HPvzkyM7YtQ5QMLuWnrj4ub
+         tPaz1N3/PGhdZ/W97n7jzSVmp8WsThOFmUbvEH1dmMyh3Wf1K+xvZIRrH4Ug7AdR90P5
+         XjyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756326818; x=1756931618;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1756327218; x=1756932018;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ClMMWPm0halKkm7yoGCwfsVNtnQ0YJOwTOy1VEYzY0A=;
-        b=TV+oeHjgKa8yRQJ2kPcF3Fs/dVU4cVLlwKp3ciSU80bP36gLDv62RZ6oOG+O/3c7TQ
-         GIqg7I74K8QACfcUYmkTOt+IpeotO+AYUCYEg/2m5VI8sOQBPRTIdDhGDZulTCT7FBIT
-         +jah6TBuxJwBcKk3yivwN8WsNuDwfzoZfC51n00ZFQBM0fjtwPyiPf3FzaAJaeb9L7ju
-         4tmIrm0jLpjg4BkuUjmSgi44fOs0LiO8TSSeCtvjtx5Y+oidiMoFnFJT3XMLNmbZ9aYD
-         eiCiDWwoGubAwKMfBRI7tamouKCi5B9XURy6lw7UnfFawVT8AMK/3ixG5UeabOZqhkBn
-         ZXCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXpRlCW+2MUp1Wtn7BQMoTSGB+OjdodijrtPftYvWU0XzmpiWmUyKf5xAitfkFldYWG5cHxbRKBnzUjTbGFn+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/kakoT4gZGjLW+mRCssb1XV5zNNAqd7w569vV8Wn7bGnWBxok
-	f1F0/YPq4X5tkrrFJkEBMsVY+T1hh1zkL1xIO+a7uDXaKpdBDgQi/reY3l8YAUBAHt7+THoRGRO
-	Z8p/UOBAR2qe4E26PTJycpNjAOoxEBnag//OMXdCLkRvIb2pmjQ9fWX0azy0=
-X-Google-Smtp-Source: AGHT+IFr42bWTP2BVIAPBvd3kBfvGI0HWMGsXQiOl0SHGkEgP/4kACwt/1rvrAiCs+q4WgdtlT4ie4WM0IXIiBdWj62bOjWZWHBp
+        bh=oNZDbikpzZCqx8xoOZGHeBq1tBAKabyyMhI/dzHkJJo=;
+        b=O7SQx05C6U6XNKuMuyPrydfD1MZlTAt3eUJdRyasJO4V36fdYt4OdDfvjdwI7bBTmz
+         xcojHnJaUiVExRlazfSwtedHMq5bbSIbNnvKJQa3MqPoc24waRCQf57S3ROsa9O/0u1l
+         T6XqoWH2RfiZgo5w4AEAdLIbjDj+zaswvVyagd0iLW3cS/v+GwiWCMw6HHkF9PRL3nld
+         77qAQucDYovF7M7dqvI9SrK1lIzegQ8yfSVOld+FVBxh/yHl9iHCxul9JBBLeKekzftE
+         Ea7RhyrLCWDYqORR1hO8CFBxVOzJD5NNOr4IC26p3MwBxVYanJ/Q88WWjwN9jBpRlHTL
+         jaSA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9rVKW3uA38q2VNQUOYXDJIBgQ4jIJk99+iKWuSr+OBxnGU9M+NgKOu/lJ5q6jAYoAD/cR3BF1viGsgJRamug=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCYO80hmL7CPDW9gUvAQB1mtXH8yadA8vxJ1+vm0Nsx9rJ1CJn
+	cOobggyIuChfSW24sA60Et+BpoKpSN8AfNrJY3D2gWqwjQEPvJ3iOCwtbD5XFbh/XkN2dGKNIEy
+	d+W33Og==
+X-Google-Smtp-Source: AGHT+IF/F8ObxMIK8cbuReovyElQrawtUxjssEA5MXtaHkJ+u/USKivhXM9kkZSgXcDlxh25XL/syZUx6tA=
+X-Received: from plgx8.prod.google.com ([2002:a17:902:ec88:b0:240:4fbf:cd20])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4cf:b0:246:d769:2fe7
+ with SMTP id d9443c01a7336-246d76933b2mr167022335ad.28.1756327218616; Wed, 27
+ Aug 2025 13:40:18 -0700 (PDT)
+Date: Wed, 27 Aug 2025 20:40:14 +0000
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2308:b0:3ef:d092:c07d with SMTP id
- e9e14a558f8ab-3efd092c0d2mr62467855ab.16.1756326813782; Wed, 27 Aug 2025
- 13:33:33 -0700 (PDT)
-Date: Wed, 27 Aug 2025 13:33:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68af6b9d.a70a0220.3cafd4.0032.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in release_sock (2)
-From: syzbot <syzbot+e5e64cdf8e92046dd3e1@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
+Message-ID: <20250827204015.3712705-1-kuniyu@google.com>
+Subject: [PATCH v1] Bluetooth: Fix use-after-free in l2cap_sock_cleanup_listen()
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Sungwoo Kim <iam@sung-woo.kim>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, linux-bluetooth@vger.kernel.org, 
+	syzbot+e5e64cdf8e92046dd3e1@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot reported the splat below without a repro.
 
-syzbot found the following issue on:
+In the splat, a single thread calling bt_accept_dequeue() freed sk
+and touched it after that.
 
-HEAD commit:    32b7144f806e Merge tag 'libcrypto-for-linus' of git://git...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=162256f0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b7511150b112b9c3
-dashboard link: https://syzkaller.appspot.com/bug?extid=e5e64cdf8e92046dd3e1
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+The root cause would be the racy l2cap_sock_cleanup_listen() call
+added by the cited commit.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+bt_accept_dequeue() is called under lock_sock() except for
+l2cap_sock_release().
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-32b7144f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c99ef9a67dcb/vmlinux-32b7144f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/674eddcd5e31/bzImage-32b7144f.xz
+Two threads could see the same socket during the list iteration
+in bt_accept_dequeue():
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e5e64cdf8e92046dd3e1@syzkaller.appspotmail.com
+  CPU1                        CPU2 (close())
+  ----                        ----
+  sock_hold(sk)               sock_hold(sk);
+  lock_sock(sk)   <-- block close()
+  sock_put(sk)
+  bt_accept_unlink(sk)
+    sock_put(sk)  <-- refcnt by bt_accept_enqueue()
+  release_sock(sk)
+                              lock_sock(sk)
+                              sock_put(sk)
+                              bt_accept_unlink(sk)
+                                sock_put(sk)        <-- last refcnt
+                              bt_accept_unlink(sk)  <-- UAF
 
-==================================================================
+Depending on the timing, the other thread could show up in the
+"Freed by task" part.
+
+Let's call l2cap_sock_cleanup_listen() under lock_sock() in
+l2cap_sock_release().
+
+[0]:
 BUG: KASAN: slab-use-after-free in debug_spin_lock_before kernel/locking/spinlock_debug.c:86 [inline]
 BUG: KASAN: slab-use-after-free in do_raw_spin_lock+0x26f/0x2b0 kernel/locking/spinlock_debug.c:115
 Read of size 4 at addr ffff88803b7eb1c4 by task syz.5.3276/16995
-
-CPU: 3 UID: 0 PID: 16995 Comm: syz.5.3276 Not tainted syzkaller #0 PREEMPT(full) 
+CPU: 3 UID: 0 PID: 16995 Comm: syz.5.3276 Not tainted syzkaller #0 PREEMPT(full)
 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
 Call Trace:
  <TASK>
@@ -173,119 +200,29 @@ Freed by task 16995:
  do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-The buggy address belongs to the object at ffff88803b7eb000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 452 bytes inside of
- freed 2048-byte region [ffff88803b7eb000, ffff88803b7eb800)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x3b7e8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801b842f00 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000080008 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801b842f00 dead000000000100 dead000000000122
-head: 0000000000000000 0000000000080008 00000000f5000000 0000000000000000
-head: 00fff00000000003 ffffea0000edfa01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5972, tgid 5972 (syz-executor), ts 43865453144, free_ts 42562860965
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1c0/0x230 mm/page_alloc.c:1851
- prep_new_page mm/page_alloc.c:1859 [inline]
- get_page_from_freelist+0x132b/0x38e0 mm/page_alloc.c:3858
- __alloc_frozen_pages_noprof+0x261/0x23f0 mm/page_alloc.c:5148
- alloc_pages_mpol+0x1fb/0x550 mm/mempolicy.c:2416
- alloc_slab_page mm/slub.c:2487 [inline]
- allocate_slab mm/slub.c:2655 [inline]
- new_slab+0x247/0x330 mm/slub.c:2709
- ___slab_alloc+0xcf2/0x1740 mm/slub.c:3891
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3981
- __slab_alloc_node mm/slub.c:4056 [inline]
- slab_alloc_node mm/slub.c:4217 [inline]
- __do_kmalloc_node mm/slub.c:4364 [inline]
- __kmalloc_node_track_caller_noprof+0x2ee/0x510 mm/slub.c:4384
- kmalloc_reserve+0xef/0x2c0 net/core/skbuff.c:600
- __alloc_skb+0x166/0x380 net/core/skbuff.c:669
- alloc_skb include/linux/skbuff.h:1336 [inline]
- nlmsg_new include/net/netlink.h:1055 [inline]
- rtmsg_ifinfo_build_skb+0x81/0x280 net/core/rtnetlink.c:4392
- rtmsg_ifinfo_event net/core/rtnetlink.c:4434 [inline]
- rtmsg_ifinfo_event net/core/rtnetlink.c:4424 [inline]
- rtmsg_ifinfo+0x9f/0x1a0 net/core/rtnetlink.c:4443
- register_netdevice+0x1bd9/0x2270 net/core/dev.c:11246
- __ip_tunnel_create+0x540/0x6e0 net/ipv4/ip_tunnel.c:268
- ip_tunnel_init_net+0x22f/0x7d0 net/ipv4/ip_tunnel.c:1161
- ops_init+0x1df/0x5f0 net/core/net_namespace.c:136
-page last free pid 5942 tgid 5942 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1395 [inline]
- __free_frozen_pages+0x7d5/0x10f0 mm/page_alloc.c:2895
- __folio_put+0x329/0x450 mm/swap.c:112
- folio_put include/linux/mm.h:1360 [inline]
- put_page include/linux/mm.h:1429 [inline]
- put_netmem net/core/skbuff.c:7370 [inline]
- skb_page_unref include/linux/skbuff_ref.h:43 [inline]
- __skb_frag_unref include/linux/skbuff_ref.h:56 [inline]
- skb_release_data+0x81a/0x9e0 net/core/skbuff.c:1080
- skb_release_all net/core/skbuff.c:1151 [inline]
- napi_consume_skb+0x15a/0x220 net/core/skbuff.c:1479
- skb_defer_free_flush net/core/dev.c:6635 [inline]
- skb_defer_free_flush net/core/dev.c:6619 [inline]
- net_rx_action+0x47f/0xfe0 net/core/dev.c:7665
- handle_softirqs+0x216/0x8e0 kernel/softirq.c:579
- do_softirq kernel/softirq.c:480 [inline]
- do_softirq+0xb2/0xf0 kernel/softirq.c:467
- __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:407
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
- __dev_queue_xmit+0xb06/0x4490 net/core/dev.c:4740
- dev_queue_xmit include/linux/netdevice.h:3361 [inline]
- neigh_hh_output include/net/neighbour.h:531 [inline]
- neigh_output include/net/neighbour.h:545 [inline]
- ip_finish_output2+0xc38/0x21a0 net/ipv4/ip_output.c:235
- __ip_finish_output.part.0+0x1b4/0x350 net/ipv4/ip_output.c:313
- __ip_finish_output net/ipv4/ip_output.c:301 [inline]
- ip_finish_output net/ipv4/ip_output.c:323 [inline]
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip_output+0x35e/0xa10 net/ipv4/ip_output.c:436
- dst_output include/net/dst.h:461 [inline]
- ip_local_out net/ipv4/ip_output.c:129 [inline]
- __ip_queue_xmit+0x1d30/0x2620 net/ipv4/ip_output.c:532
- __tcp_transmit_skb+0x265f/0x3df0 net/ipv4/tcp_output.c:1479
- __tcp_send_ack.part.0+0x3de/0x700 net/ipv4/tcp_output.c:4285
- __tcp_send_ack net/ipv4/tcp_output.c:4291 [inline]
- tcp_send_ack+0x84/0xa0 net/ipv4/tcp_output.c:4291
-
-Memory state around the buggy address:
- ffff88803b7eb080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88803b7eb100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88803b7eb180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                           ^
- ffff88803b7eb200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88803b7eb280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
+Fixes: 1728137b33c0 ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb")
+Reported-by: syzbot+e5e64cdf8e92046dd3e1@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-bluetooth/68af6b9d.a70a0220.3cafd4.0032.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/bluetooth/l2cap_sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index f4257c4d3052..814fb8610ac4 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1422,7 +1422,10 @@ static int l2cap_sock_release(struct socket *sock)
+ 	if (!sk)
+ 		return 0;
+ 
++	lock_sock_nested(sk, L2CAP_NESTING_PARENT);
+ 	l2cap_sock_cleanup_listen(sk);
++	release_sock(sk);
++
+ 	bt_sock_unlink(&l2cap_sk_list, sk);
+ 
+ 	err = l2cap_sock_shutdown(sock, SHUT_RDWR);
+-- 
+2.51.0.268.g9569e192d0-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
