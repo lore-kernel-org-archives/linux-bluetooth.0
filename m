@@ -1,195 +1,151 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AD930CD9F;
-	Wed, 27 Aug 2025 10:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CCA17E0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 11:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756292227; cv=none; b=C/SQULVum33kLs8Jelo/qGYwCkaxXUmy7lE1nsW9DiASt50D6Q5cTLDN5Ffb0CDGwE9qAa3j0wlpiLycsuayWxnhBtPTG4K5mC0Sn+rNDXjrbA9lkK3iBcKptWKQLWNEJ3nO7Au3xzw7j7u5678w/tlHXR0TJfVz3J+TApPdWYk=
+	t=1756292518; cv=none; b=Dt0ByWILkr86x4Ry+kNCnCmJ34DOqWPFP2a0zRxc0QtyzUVbTzWb//KUPRpDPtBM4FJuDpzqu+mp/LpBI99iatz6uw2bWj1Y+JiUEDg3ozHAnS6diC6uIwj7hPSE543WbJTld6YcZJdgupC2OAAjqmHzMIuSC5tTHLoFkbwyPbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756292227; c=relaxed/simple;
-	bh=71TjIHXaemnR5GSOcFGJQ0u9QJZgPjfVehYXuruYTns=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G0BCmTxFjd4SVuiXLlEwcjQawmzwgo8T1/04Cujb5rTZwbiuJQ+/Uc34VnZZm3RcUkWE1TNnMgi4X/qyLTcvMOZ6jpMZe93mN2Q6dZuvwTumQI8qkMCBLIIJLo9lPCJY/KEc8v9tHTEsctXe2UgIbCxz5AiCf4cChXwn1bKdTnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.202] (p5b13a549.dip0.t-ipconnect.de [91.19.165.73])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D3D0260213B1E;
-	Wed, 27 Aug 2025 12:56:50 +0200 (CEST)
-Message-ID: <a261ed13-4c0b-43cf-b177-d33272626d25@molgen.mpg.de>
-Date: Wed, 27 Aug 2025 12:56:50 +0200
+	s=arc-20240116; t=1756292518; c=relaxed/simple;
+	bh=A4d97PbUla5nGpZ1hHnr/E7EOcGMU3k8uV8dv+qWgNw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qgjpMyjlZ6uTc4NJAlRVYfGEpdBUAUd5uO+D9bHzFZRmWYataJfgDh8hxmsN9TStPwwuRN4+P+5ldy6UFc8nEa+/QRcK/52cUGkMEpZYrMLrLwXuWAlMTGp4ixA6F00FTCCSgAbeznNwqcshdHeqnGWqLEEgbRYBc8ct96cJ67s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiBbocgj; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiBbocgj"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-886ecaf455aso195194739f.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 04:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756292515; x=1756897315; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/olwvnl3sz4BCcwXVWsWEvCmuUMATaDatsKQTmaqFD4=;
+        b=UiBbocgjbzgveFwskHov5M9xQqHUjeGA+N5eTILEZeAP9vHAOdJ0n0A+P0yEBBANoL
+         hFDK1FgtBNwVNv8JAl4rS/oWYx8QhAr9lDV3y9IG/rRyjBFipc5W53pDKgwz50Va1uGA
+         tcT9WdvF3N9jpc+zCb4LS/CDXfWVy86uIzcqIwKqPAeQy9gA1kHNqb5CrZclKKCi37IZ
+         46wXqsyFOik+P4qtmJAEqNUi1bkDpX+FStDS2urKz0oZjkpyxjlL0izvFJR1DWufLtuB
+         d9wVxSJmGLyXUudysRs4Ev9zm19Ubxfgv95MWE3vwvcbEHsiS+xTGKbXGG4Z75XnBd3T
+         lZyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756292515; x=1756897315;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/olwvnl3sz4BCcwXVWsWEvCmuUMATaDatsKQTmaqFD4=;
+        b=ThAky5y2bOpyK5vOhQYbnH2chgQEFE7/aiA3jmETzMCMq0bKYH6c3niz0vQr3U2sfF
+         HYb/fRpXCgOB6PLLe6tyVi7Y8DZLZ1QMIWnmCs7HYB/BujWtVOEL70Cl1m8f/DLb+H8y
+         O14gbMbovaf4enm0X/K+huVkZaYIprUJhtXhyvJxeS6OFz3eh61YP8b7VFEFeXIMTvq9
+         E23j+mMCXkyGgpzSOrKwJ85Z5QXkGATE91zEqDmM7usZJFpuv+E9eXTmrBXSgJAl8kNJ
+         c4/5QrDfQy/zi4LSwR++ZiVdz2UK8J+xta90vOR5PT9cOwsXhFBLUzQ12havBNuQMvqU
+         xgxg==
+X-Gm-Message-State: AOJu0YwuhC7zNLUToV+IUpB0pbRRHjd5dRFZIvlj1gm+Ayewrm6ySf4D
+	/deaf6AD9tVJ0xbTxKppo2V5I+M5sbU357gAebw8AyI8B3QbJAokNujxf3QZQg==
+X-Gm-Gg: ASbGncuwJKLZWvYSZc7Fb9/eJOZ2MKqALVj7ANrTIMP4yvxTRUVwOGRrX0bHgYUDR4w
+	VlxWstf65lvs3cBB5Tspm+ylubR9kvu6kxFm6eebwHfw/7EtLFdDx80rekfIG7U+bvFuk7QWYk1
+	0/SxoAVK2BDGBZKSbrwh0dF8xohNd7uqDzd/FQf7W2gyS+3VbVqbXfCPXxQlvaOIjv65Mj0uXK5
+	kcQ6XTaAPJZNCA2mc6c75qHskXN4dQHTKTK+YGYoO7oZBv8YFA9j/C0YqyoKhJ9zwEDtoDy/Ot0
+	zKhqnewzjUCj9ZlEAFKXkaXIqHCWjiBxJ24Gk0SfIYLq20xpKge940a4C9ISOp2RGgrAq8rPZHu
+	7v1n+ow5AGqcguX6gpZ8VE1a9N+s68A==
+X-Google-Smtp-Source: AGHT+IEbv37U6Ho/lGOBwjLjSW21QUCOwc8vUuDUgkzq3hQtJSochWlEQpJIo7eQolqZe2xIDXO6lA==
+X-Received: by 2002:a05:6e02:1646:b0:3ec:983c:20f0 with SMTP id e9e14a558f8ab-3ec983c2237mr132026035ab.4.1756292514669;
+        Wed, 27 Aug 2025 04:01:54 -0700 (PDT)
+Received: from [172.17.0.2] ([52.165.213.184])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c191f23sm86292685ab.16.2025.08.27.04.01.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Aug 2025 04:01:53 -0700 (PDT)
+Message-ID: <68aee5a1.050a0220.8400c.1721@mx.google.com>
+Date: Wed, 27 Aug 2025 04:01:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6640047885122396139=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_h5: implement CRC data integrity
-To: Javier Nieto <jgnieto@cs.stanford.edu>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250827043254.26611-1-jgnieto@cs.stanford.edu>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250827043254.26611-1-jgnieto@cs.stanford.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_shuaz@quicinc.com
+Subject: RE: [v11] Bluetooth: hci_qca: Fix SSR (SubSystem Restart) fail when BT_EN is pulled up by hw
+In-Reply-To: <20250827102519.195439-1-quic_shuaz@quicinc.com>
+References: <20250827102519.195439-1-quic_shuaz@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Dear Javier,
+--===============6640047885122396139==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is automated email and please do not reply to this email!
 
-Thank you very much for the patch. Great work!
+Dear submitter,
 
-Am 27.08.25 um 06:32 schrieb Javier Nieto:
-> The UART-based H5 protocol supports CRC data integrity checks for
-> reliable packets. The host sets bit 5 in the configuration field of the
-> CONFIG link control message to indicate that CRC is supported. The
-> controller sets the same bit in the CONFIG RESPONSE message to indicate
-> that CRC may be used from then on.
-> 
-> Signed-off-by: Javier Nieto <jgnieto@cs.stanford.edu>
-> ---
-> 
-> Tested on a MangoPi MQ-Pro with a Realtek RTL8723DS Bluetooth controller
-> using the tip of the bluetooth-next tree.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=995987
 
-Any btmon trace?
+---Test result---
 
-I’d add the above to the proper commit message.
+Test Summary:
+CheckPatch                    PENDING   0.36 seconds
+GitLint                       PENDING   0.29 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      24.84 seconds
+CheckAllWarning               PASS      27.37 seconds
+CheckSparse                   PASS      30.82 seconds
+BuildKernel32                 PASS      24.93 seconds
+TestRunnerSetup               PASS      488.73 seconds
+TestRunner_l2cap-tester       PASS      25.32 seconds
+TestRunner_iso-tester         PASS      43.66 seconds
+TestRunner_bnep-tester        PASS      6.05 seconds
+TestRunner_mgmt-tester        FAIL      127.60 seconds
+TestRunner_rfcomm-tester      PASS      9.32 seconds
+TestRunner_sco-tester         PASS      14.72 seconds
+TestRunner_ioctl-tester       PASS      10.09 seconds
+TestRunner_mesh-tester        FAIL      11.42 seconds
+TestRunner_smp-tester         PASS      8.54 seconds
+TestRunner_userchan-tester    PASS      6.28 seconds
+IncrementalBuild              PENDING   0.89 seconds
 
-> It would be nice to have this feature available for somewhat more reliable
-> communication over UART, especially if RTS/CTS is disabled, as this is the
-> primary benefit of the H5 protocol. Thanks!
-> 
-> ---
->   drivers/bluetooth/hci_h5.c | 42 ++++++++++++++++++++++++++++++++++----
->   1 file changed, 38 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index d0d4420c1a0f..7faafc62666b 100644
-> --- a/drivers/bluetooth/hci_h5.c
-> +++ b/drivers/bluetooth/hci_h5.c
-> @@ -7,6 +7,8 @@
->    */
->   
->   #include <linux/acpi.h>
-> +#include <linux/bitrev.h>
-> +#include <linux/crc-ccitt.h>
->   #include <linux/errno.h>
->   #include <linux/gpio/consumer.h>
->   #include <linux/kernel.h>
-> @@ -58,6 +60,7 @@ enum {
->   	H5_TX_ACK_REQ,		/* Pending ack to send */
->   	H5_WAKEUP_DISABLE,	/* Device cannot wake host */
->   	H5_HW_FLOW_CONTROL,	/* Use HW flow control */
-> +	H5_CRC,			/* Use CRC */
->   };
->   
->   struct h5 {
-> @@ -141,8 +144,8 @@ static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
->   
->   static u8 h5_cfg_field(struct h5 *h5)
->   {
-> -	/* Sliding window size (first 3 bits) */
-> -	return h5->tx_win & 0x07;
-> +	/* Sliding window size (first 3 bits) and CRC request (fifth bit). */
-> +	return (h5->tx_win & 0x07) | 0x10;
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-Could a macro be defined for the CRC request bit?
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
->   }
->   
->   static void h5_timed_event(struct timer_list *t)
-> @@ -360,8 +363,10 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
->   		h5_link_control(hu, conf_rsp, 2);
->   		h5_link_control(hu, conf_req, 3);
->   	} else if (memcmp(data, conf_rsp, 2) == 0) {
-> -		if (H5_HDR_LEN(hdr) > 2)
-> +		if (H5_HDR_LEN(hdr) > 2) {
->   			h5->tx_win = (data[2] & 0x07);
-> +			assign_bit(H5_CRC, &h5->flags, data[2] & 0x10);
-> +		}
->   		BT_DBG("Three-wire init complete. tx_win %u", h5->tx_win);
->   		h5->state = H5_ACTIVE;
->   		hci_uart_init_ready(hu);
-> @@ -425,7 +430,24 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
->   
->   static int h5_rx_crc(struct hci_uart *hu, unsigned char c)
->   {
-> -	h5_complete_rx_pkt(hu);
-> +	struct h5 *h5 = hu->priv;
-> +	const unsigned char *hdr = h5->rx_skb->data;
-> +	u16 crc;
-> +	__be16 crc_be;
-> +
-> +	crc = crc_ccitt(0xffff, hdr, 4 + H5_HDR_LEN(hdr));
-> +	crc = bitrev16(crc);
-> +
-> +	crc_be = cpu_to_be16(crc);
-> +
-> +	if (memcmp(&crc_be, hdr + 4 + H5_HDR_LEN(hdr), 2) != 0) {
-> +		bt_dev_err(hu->hdev, "Received packet with invalid CRC");
-> +		h5_reset_rx(h5);
-> +	} else {
-> +		/* Remove CRC bytes */
-> +		skb_trim(h5->rx_skb, 4 + H5_HDR_LEN(hdr));
-> +		h5_complete_rx_pkt(hu);
-> +	}
->   
->   	return 0;
->   }
-> @@ -556,6 +578,7 @@ static void h5_reset_rx(struct h5 *h5)
->   	h5->rx_func = h5_rx_delimiter;
->   	h5->rx_pending = 0;
->   	clear_bit(H5_RX_ESC, &h5->flags);
-> +	clear_bit(H5_CRC, &h5->flags);
->   }
->   
->   static int h5_recv(struct hci_uart *hu, const void *data, int count)
-> @@ -686,6 +709,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
->   	struct h5 *h5 = hu->priv;
->   	struct sk_buff *nskb;
->   	u8 hdr[4];
-> +	u16 crc;
->   	int i;
->   
->   	if (!valid_packet_type(pkt_type)) {
-> @@ -713,6 +737,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
->   	/* Reliable packet? */
->   	if (pkt_type == HCI_ACLDATA_PKT || pkt_type == HCI_COMMAND_PKT) {
->   		hdr[0] |= 1 << 7;
-> +		hdr[0] |= (test_bit(H5_CRC, &h5->flags) && 1) << 6;
->   		hdr[0] |= h5->tx_seq;
->   		h5->tx_seq = (h5->tx_seq + 1) % 8;
->   	}
-> @@ -732,6 +757,15 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
->   	for (i = 0; i < len; i++)
->   		h5_slip_one_byte(nskb, data[i]);
->   
-> +	if (H5_HDR_CRC(hdr)) {
-> +		crc = crc_ccitt(0xffff, hdr, 4);
-> +		crc = crc_ccitt(crc, data, len);
-> +		crc = bitrev16(crc);
-> +
-> +		h5_slip_one_byte(nskb, (crc >> 8) & 0xff);
-> +		h5_slip_one_byte(nskb, crc & 0xff);
-> +	}
-> +
->   	h5_slip_delim(nskb);
->   
->   	return nskb;
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
 
-The diff looks good. Feel free to carry:
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.098 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.093 seconds
+Mesh - Send cancel - 2                               Timed out    1.997 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Kind regards,
 
-Paul
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6640047885122396139==--
