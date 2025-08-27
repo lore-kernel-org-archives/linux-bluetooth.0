@@ -1,228 +1,151 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E6A2D8767
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 20:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574B72C15BC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 21:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756327221; cv=none; b=EHgEHU7A8DaVHBLJ4p29383FQw4AxjIU35lJeaLJfZsV32f/RJ0n8+VxL5FNwzCgsunYR5Gye+2bLWVj/tehQ76e2jyTt64LESXR2uMRROcrbz1L+xXrFUq7Eyxyy46SNv9E6p6xbaDK8FQkwsiow7CtwLvn1ekNxgmN6WkqtE0=
+	t=1756330386; cv=none; b=XhfT1gbeU5+ntqG3zTMXw4+7pflody/zG+U87k42swbtAM2frM2TQrldg2wYxvEvyrIbB7W0h9F02Te1GvVUrEPzRO+MeRmNuWUbnuCjQqeSuFn7LrByfni3tY6A3Oi1B6qbCduxrRyGsRfYe4AHG5xBHBoSX5IzEvVzvWXaYew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756327221; c=relaxed/simple;
-	bh=hpMbueVxswjv7ROuVJxPeseS6vdNu9RswXBfa67Rdd8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RlEidw63BGhuSBBjxBHH0oFwL0wGp71kbNkTmU0pWdAxWFCSKEMX9aKvb7kTh1enbaCyc61IleSiia0jIyMO/gBF24Fty1T+GMeLIq4fkkv975sri5z4Q4bncg1zmYesRxgDjmdAHKW2bwiQeUikLEVq9iLrofwSHKqGodnntF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HE4m1Pk9; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+	s=arc-20240116; t=1756330386; c=relaxed/simple;
+	bh=XDRpPiulX9E+RxQYC5LdWtx8lOrfS7n1LxD0uioIRiA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=LAAOIB7lASgozEZZ4XE/nKZYaXxh4L3bWgkY4dFC5REoD6iuB1GMV9c3fwYR2tD7fXWRRg7SDG48Hxxvi9pREBj6AiTBTtp0RHHmIEYNP2YXjevZgcEJgEBfilxqi/SZEXwGr3qBknFtShZHrboOwAmyS4M6YcSgvNzj2e3e9FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OVC1rUj7; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HE4m1Pk9"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-246bcd0a112so1593225ad.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 13:40:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVC1rUj7"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-70deaa19d5aso2757156d6.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 14:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756327218; x=1756932018; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oNZDbikpzZCqx8xoOZGHeBq1tBAKabyyMhI/dzHkJJo=;
-        b=HE4m1Pk9ZXVD7/T6roikpuvWZi2d+hmuwb0mtWRmnoDn7oFbO+YLXxtwx61aoIPx/P
-         yy92Fvj8QGsWI42LivtN1zYizew4gX2wmO886RxzPYErBxH+8b+Cuq2Meh5bFl5pnbTZ
-         qkGZb9k31Cxp+2a/bARo5ZjNb0aEsq+onrFftpcioCYB9Rh41qPKFGrUnfLNIQlPYWQP
-         HD6qr5mySouw/mfccU+HBCJuH+NoYOYbkgkuPrbOUYbv0HPvzkyM7YtQ5QMLuWnrj4ub
-         tPaz1N3/PGhdZ/W97n7jzSVmp8WsThOFmUbvEH1dmMyh3Wf1K+xvZIRrH4Ug7AdR90P5
-         XjyA==
+        d=gmail.com; s=20230601; t=1756330384; x=1756935184; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=X8ZqWlf24nN0qHFkep3R4C6l+AzFRrTGzrlOv+iO83E=;
+        b=OVC1rUj76DAxXkLkh7XjW3TZsrq6zgdqb1G7TR4AU4wY5WlFQEIuKIAvRytgujS6As
+         MNRDlkKMSTNrzRq1t5xt/PoJ6JWwdKIhc13T2I0Met1E6+5OR1dLk/ukZ4h+YlpB1oUu
+         ZaHsPyi56Igxzttq2DyXuFvXdQSMcWQiAKS7bwqeN58vh7L6WvWgz1TbBhY016rX3KUn
+         jESgA5x3qS1AK/nsNXBpEzYiIpArc4GTLzaaQg6b+ONyTenqqtSuOFLS1Hf3y+HeRbRe
+         4k+hcqC8CTPMQ1cCCoaPRRxxieP+PK+MzyOnQV5+7HPWRaj54NLoEJLrY0G0THiR/39H
+         cHTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756327218; x=1756932018;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oNZDbikpzZCqx8xoOZGHeBq1tBAKabyyMhI/dzHkJJo=;
-        b=O7SQx05C6U6XNKuMuyPrydfD1MZlTAt3eUJdRyasJO4V36fdYt4OdDfvjdwI7bBTmz
-         xcojHnJaUiVExRlazfSwtedHMq5bbSIbNnvKJQa3MqPoc24waRCQf57S3ROsa9O/0u1l
-         T6XqoWH2RfiZgo5w4AEAdLIbjDj+zaswvVyagd0iLW3cS/v+GwiWCMw6HHkF9PRL3nld
-         77qAQucDYovF7M7dqvI9SrK1lIzegQ8yfSVOld+FVBxh/yHl9iHCxul9JBBLeKekzftE
-         Ea7RhyrLCWDYqORR1hO8CFBxVOzJD5NNOr4IC26p3MwBxVYanJ/Q88WWjwN9jBpRlHTL
-         jaSA==
-X-Forwarded-Encrypted: i=1; AJvYcCV9rVKW3uA38q2VNQUOYXDJIBgQ4jIJk99+iKWuSr+OBxnGU9M+NgKOu/lJ5q6jAYoAD/cR3BF1viGsgJRamug=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCYO80hmL7CPDW9gUvAQB1mtXH8yadA8vxJ1+vm0Nsx9rJ1CJn
-	cOobggyIuChfSW24sA60Et+BpoKpSN8AfNrJY3D2gWqwjQEPvJ3iOCwtbD5XFbh/XkN2dGKNIEy
-	d+W33Og==
-X-Google-Smtp-Source: AGHT+IF/F8ObxMIK8cbuReovyElQrawtUxjssEA5MXtaHkJ+u/USKivhXM9kkZSgXcDlxh25XL/syZUx6tA=
-X-Received: from plgx8.prod.google.com ([2002:a17:902:ec88:b0:240:4fbf:cd20])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4cf:b0:246:d769:2fe7
- with SMTP id d9443c01a7336-246d76933b2mr167022335ad.28.1756327218616; Wed, 27
- Aug 2025 13:40:18 -0700 (PDT)
-Date: Wed, 27 Aug 2025 20:40:14 +0000
+        d=1e100.net; s=20230601; t=1756330384; x=1756935184;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X8ZqWlf24nN0qHFkep3R4C6l+AzFRrTGzrlOv+iO83E=;
+        b=vqJAWj+Dw29HCKt+KzLTPoYj5ZGZAgyeHVN6Vvu9SHDi8ywt22dOE6apyR/kDD+2S9
+         v+fys/sBXUZtjy2ZxbWf7fKgxz9kNVUy7skhQfnVphZy4hsXPQWWlaQU5pBlBPPt1JTt
+         2/AUyeRfZ4R6j0FVBfsaCZhW18h9zUTAvl5oDS1TM8BiSa2ley8LL50zWnAJbJXKluB+
+         LwJJX7DY7DwyQPrX8dMuNZRX9r/Xlz0bdk95N5iuCg+fhUB3P3IblZNwXelmJ/dbh8f3
+         b1RcVS3lXTWpu0tzJCbxCa1uLxSTy6vMHCG3x5HAL5Mjc2gYNh+pHZoJJTkwtyAy8aM/
+         QjPQ==
+X-Gm-Message-State: AOJu0Yz9MMWDzsUywbuUZkqlyybx/BFNzt645ta/NtRXqCU7dmKjeOky
+	kRT/9xQzmvhdBtrXMEGl0t4ZeYU0smFxPbolkzNkZRJuXhl1aXaQG+xYgbCehDCj
+X-Gm-Gg: ASbGncvxTHPLJfe/f3Sab5sR0HhWjUZcrteFkWkNsH2ry4lZih1jIbyfZktfLvaCNuX
+	Bgv5X78OUMdn6Z2UyqejFBJAfsUWLvFZDAxGOmKQL+DSa1Jwpf8H8EIi/Tu5X0rHZxCUkcgnm8t
+	eOfMmtbMlQPcrdOT2ruaeJRzl0xhI6DoeTtrEb1iYELjB8yEutpjrIvW2iMMgYDmj4nQ/rTOVEI
+	ggoinExJKU20Liv/J3aK5e3zac84RmecmztP24zU82pASVPPfCRGOBC1YKIVXv98WmpanZ8rRy3
+	wJD1jK3finmgiHEEkKxKycZwJLCIVZZvjQS3YCxf1fTpAtWzvbJYScK0tPCxa8rcohtiAbxt7oz
+	UJVpiJC/oSPZBMB5YB2VEWAuyuZEH
+X-Google-Smtp-Source: AGHT+IG13U31LNmZMIAkauNF1x4KPnpWOy/wQb01POQ69+epnkC1WnmNMHSi2P4f3E3iuHHeBWMYhA==
+X-Received: by 2002:a05:6214:5011:b0:70d:eaa2:e39d with SMTP id 6a1803df08f44-70deaa2e5a9mr24948176d6.1.1756330384010;
+        Wed, 27 Aug 2025 14:33:04 -0700 (PDT)
+Received: from [172.17.0.2] ([48.217.142.87])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ddb4bcdefsm28587616d6.65.2025.08.27.14.33.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Aug 2025 14:33:03 -0700 (PDT)
+Message-ID: <68af798f.d40a0220.332f7.bbda@mx.google.com>
+Date: Wed, 27 Aug 2025 14:33:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2310930906089159510=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250827204015.3712705-1-kuniyu@google.com>
-Subject: [PATCH v1] Bluetooth: Fix use-after-free in l2cap_sock_cleanup_listen()
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Sungwoo Kim <iam@sung-woo.kim>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	syzbot+e5e64cdf8e92046dd3e1@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kuniyu@google.com
+Subject: RE: [v1] Bluetooth: Fix use-after-free in l2cap_sock_cleanup_listen()
+In-Reply-To: <20250827204015.3712705-1-kuniyu@google.com>
+References: <20250827204015.3712705-1-kuniyu@google.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-syzbot reported the splat below without a repro.
+--===============2310930906089159510==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In the splat, a single thread calling bt_accept_dequeue() freed sk
-and touched it after that.
+This is automated email and please do not reply to this email!
 
-The root cause would be the racy l2cap_sock_cleanup_listen() call
-added by the cited commit.
+Dear submitter,
 
-bt_accept_dequeue() is called under lock_sock() except for
-l2cap_sock_release().
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=996215
 
-Two threads could see the same socket during the list iteration
-in bt_accept_dequeue():
+---Test result---
 
-  CPU1                        CPU2 (close())
-  ----                        ----
-  sock_hold(sk)               sock_hold(sk);
-  lock_sock(sk)   <-- block close()
-  sock_put(sk)
-  bt_accept_unlink(sk)
-    sock_put(sk)  <-- refcnt by bt_accept_enqueue()
-  release_sock(sk)
-                              lock_sock(sk)
-                              sock_put(sk)
-                              bt_accept_unlink(sk)
-                                sock_put(sk)        <-- last refcnt
-                              bt_accept_unlink(sk)  <-- UAF
+Test Summary:
+CheckPatch                    PENDING   0.81 seconds
+GitLint                       PENDING   0.23 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      23.97 seconds
+CheckAllWarning               PASS      26.61 seconds
+CheckSparse                   PASS      29.74 seconds
+BuildKernel32                 PASS      24.01 seconds
+TestRunnerSetup               PASS      477.23 seconds
+TestRunner_l2cap-tester       PASS      24.76 seconds
+TestRunner_iso-tester         PASS      36.63 seconds
+TestRunner_bnep-tester        PASS      5.93 seconds
+TestRunner_mgmt-tester        FAIL      124.21 seconds
+TestRunner_rfcomm-tester      PASS      9.37 seconds
+TestRunner_sco-tester         PASS      14.77 seconds
+TestRunner_ioctl-tester       PASS      10.09 seconds
+TestRunner_mesh-tester        FAIL      11.43 seconds
+TestRunner_smp-tester         PASS      10.49 seconds
+TestRunner_userchan-tester    PASS      6.26 seconds
+IncrementalBuild              PENDING   0.45 seconds
 
-Depending on the timing, the other thread could show up in the
-"Freed by task" part.
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-Let's call l2cap_sock_cleanup_listen() under lock_sock() in
-l2cap_sock_release().
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-[0]:
-BUG: KASAN: slab-use-after-free in debug_spin_lock_before kernel/locking/spinlock_debug.c:86 [inline]
-BUG: KASAN: slab-use-after-free in do_raw_spin_lock+0x26f/0x2b0 kernel/locking/spinlock_debug.c:115
-Read of size 4 at addr ffff88803b7eb1c4 by task syz.5.3276/16995
-CPU: 3 UID: 0 PID: 16995 Comm: syz.5.3276 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xcd/0x630 mm/kasan/report.c:482
- kasan_report+0xe0/0x110 mm/kasan/report.c:595
- debug_spin_lock_before kernel/locking/spinlock_debug.c:86 [inline]
- do_raw_spin_lock+0x26f/0x2b0 kernel/locking/spinlock_debug.c:115
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- release_sock+0x21/0x220 net/core/sock.c:3746
- bt_accept_dequeue+0x505/0x600 net/bluetooth/af_bluetooth.c:312
- l2cap_sock_cleanup_listen+0x5c/0x2a0 net/bluetooth/l2cap_sock.c:1451
- l2cap_sock_release+0x5c/0x210 net/bluetooth/l2cap_sock.c:1425
- __sock_release+0xb3/0x270 net/socket.c:649
- sock_close+0x1c/0x30 net/socket.c:1439
- __fput+0x3ff/0xb70 fs/file_table.c:468
- task_work_run+0x14d/0x240 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xeb/0x110 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f2accf8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdb6cb1378 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 00000000000426fb RCX: 00007f2accf8ebe9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 00007f2acd1b7da0 R08: 0000000000000001 R09: 00000012b6cb166f
-R10: 0000001b30e20000 R11: 0000000000000246 R12: 00007f2acd1b609c
-R13: 00007f2acd1b6090 R14: ffffffffffffffff R15: 00007ffdb6cb1490
- </TASK>
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
 
-Allocated by task 5326:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:388 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:405
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4365 [inline]
- __kmalloc_noprof+0x223/0x510 mm/slub.c:4377
- kmalloc_noprof include/linux/slab.h:909 [inline]
- sk_prot_alloc+0x1a8/0x2a0 net/core/sock.c:2239
- sk_alloc+0x36/0xc20 net/core/sock.c:2295
- bt_sock_alloc+0x3b/0x3a0 net/bluetooth/af_bluetooth.c:151
- l2cap_sock_alloc.constprop.0+0x33/0x1d0 net/bluetooth/l2cap_sock.c:1894
- l2cap_sock_new_connection_cb+0x101/0x240 net/bluetooth/l2cap_sock.c:1482
- l2cap_connect_cfm+0x4c4/0xf80 net/bluetooth/l2cap_core.c:7287
- hci_connect_cfm include/net/bluetooth/hci_core.h:2050 [inline]
- hci_remote_features_evt+0x4dd/0x970 net/bluetooth/hci_event.c:3712
- hci_event_func net/bluetooth/hci_event.c:7519 [inline]
- hci_event_packet+0xa0d/0x11c0 net/bluetooth/hci_event.c:7573
- hci_rx_work+0x2c5/0x16b0 net/bluetooth/hci_core.c:4071
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3236
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c2/0x780 kernel/kthread.c:463
- ret_from_fork+0x5d7/0x6f0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.107 seconds
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
 
-Freed by task 16995:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:243 [inline]
- __kasan_slab_free+0x60/0x70 mm/kasan/common.c:275
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2417 [inline]
- slab_free mm/slub.c:4680 [inline]
- kfree+0x2b4/0x4d0 mm/slub.c:4879
- sk_prot_free net/core/sock.c:2278 [inline]
- __sk_destruct+0x75f/0x9a0 net/core/sock.c:2373
- sk_destruct+0xc2/0xf0 net/core/sock.c:2401
- __sk_free+0xf4/0x3e0 net/core/sock.c:2412
- sk_free+0x6a/0x90 net/core/sock.c:2423
- sock_put include/net/sock.h:1960 [inline]
- bt_accept_unlink+0x245/0x2e0 net/bluetooth/af_bluetooth.c:262
- bt_accept_dequeue+0x517/0x600 net/bluetooth/af_bluetooth.c:308
- l2cap_sock_cleanup_listen+0x5c/0x2a0 net/bluetooth/l2cap_sock.c:1451
- l2cap_sock_release+0x5c/0x210 net/bluetooth/l2cap_sock.c:1425
- __sock_release+0xb3/0x270 net/socket.c:649
- sock_close+0x1c/0x30 net/socket.c:1439
- __fput+0x3ff/0xb70 fs/file_table.c:468
- task_work_run+0x14d/0x240 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xeb/0x110 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Failed Test Cases
+Mesh - Send cancel - 1                               Timed out    2.100 seconds
+Mesh - Send cancel - 2                               Timed out    1.999 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
-Fixes: 1728137b33c0 ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb")
-Reported-by: syzbot+e5e64cdf8e92046dd3e1@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/linux-bluetooth/68af6b9d.a70a0220.3cafd4.0032.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+
 ---
- net/bluetooth/l2cap_sock.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f4257c4d3052..814fb8610ac4 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1422,7 +1422,10 @@ static int l2cap_sock_release(struct socket *sock)
- 	if (!sk)
- 		return 0;
- 
-+	lock_sock_nested(sk, L2CAP_NESTING_PARENT);
- 	l2cap_sock_cleanup_listen(sk);
-+	release_sock(sk);
-+
- 	bt_sock_unlink(&l2cap_sk_list, sk);
- 
- 	err = l2cap_sock_shutdown(sock, SHUT_RDWR);
--- 
-2.51.0.268.g9569e192d0-goog
 
+--===============2310930906089159510==--
