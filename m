@@ -1,16 +1,16 @@
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774D727EFEE;
-	Wed, 27 Aug 2025 05:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213E3186A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 06:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756272711; cv=none; b=TM/PIoxU7w9LnWw77oKWpoT1zv1VX0Pm7oQqMS6vaZOPQO9hkPPnTFgH7UxVQpyVfCA3ZejGYkDhyBuCdrJ71v7PGxdeddkG31uY/+4F+v3y1pIjV7BxTNrDs9p6c4gHNUGd5bdG5znw9qYavrA6TCZWDCdvEMA41lDxLA+tvSY=
+	t=1756274647; cv=none; b=RV77Z8ZBZ0kDJJvfp60eyGC36MMIsg2raEIhPUbshpfBq9lv9a8r0BCGpJi6k1esbFbjXIsVtJJrRf86wRA7u61H7/O1Ei0FQZ34HY3XyiKPoi1RPSX0gcYpoMcUEFe7M16l8BlnvCpmNNPxUEkYak5e6HoK8DjrbTeLy0lsACI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756272711; c=relaxed/simple;
-	bh=Pr+pw3pP4zCXMhGpRH0tV8drRIJGJimTYbqDZdFv0kk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=MOOOAOrS1owbWHXx5OimyMFxlgQfJp8r9thQJem45V36HV+zdOScH1MXDP3Ve+hMmAfznkc+e2geFeo6v6VNuwVPvDJunH2T+bdHndVdS/Yrj1Mt/UB8PryzPqxx1sVE5saiIdos1yjbat1hJcAv41a18cflB3jsJuNwKWsn4FQ=
+	s=arc-20240116; t=1756274647; c=relaxed/simple;
+	bh=Vjh4hPIcQi89sGsSK28rWp2GMU0zdG8vt0ZX7Of6pn4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=O2QM+eNcprhmmpcVFv54pUxKNRyv35vaK7JFi7y63lQS41PIuR5w/AZwH7TzXv5DDMkrs2qEoRll75Aekb6TDjTqtyDwBEc5sfRha9lELakIfHCEUitRgeAv1JcrrrKGz+a8LngBmC8SSX/fj8GLfyK0oXqCqL0IfGumWcF1uEw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
@@ -19,10 +19,10 @@ Received: from [192.168.2.202] (p5b13a549.dip0.t-ipconnect.de [91.19.165.73])
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CE09160213B1A;
-	Wed, 27 Aug 2025 07:31:42 +0200 (CEST)
-Message-ID: <bd507f6c-cea9-41aa-98f7-a5cc81dd77e4@molgen.mpg.de>
-Date: Wed, 27 Aug 2025 07:31:40 +0200
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A6F8D60213B1D;
+	Wed, 27 Aug 2025 08:04:00 +0200 (CEST)
+Message-ID: <663a45c2-0fba-40e4-9ebb-bc8df60a774d@molgen.mpg.de>
+Date: Wed, 27 Aug 2025 08:03:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,102 +30,98 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 RESEND] Bluetooth: btintel: Correctly declare all
- module firmware files
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-To: Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-References: <20221122140222.1541731-1-dimitri.ledkov@canonical.com>
- <8802b5d1-abf1-4ceb-8532-7d8f393f1be6@molgen.mpg.de>
+Subject: Re: [PATCH v2] Bluetooth: btusb: Check for unexpected bytes when
+ defragmenting HCI frames
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+References: <CABBYNZLmTCh_mn7w6U31B82cBZsmLaj92dxwfK9PVWZeMqk54Q@mail.gmail.com>
+ <20250826170314.352122-1-arkadiusz.bokowy@gmail.com>
 Content-Language: en-US
-In-Reply-To: <8802b5d1-abf1-4ceb-8532-7d8f393f1be6@molgen.mpg.de>
+Cc: linux-bluetooth@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250826170314.352122-1-arkadiusz.bokowy@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-[Cc: Remove Dimitri’s bouncing address]
+Dear Arkadiusz,
 
-Am 27.08.25 um 07:29 schrieb Paul Menzel:
-> Dear Daan,
+
+Thank you for the patch.
+
+Am 26.08.25 um 19:03 schrieb Arkadiusz Bokowy:
+> Some Barrot based USB Bluetooth dongles erroneously send one extra
+> random byte for the HCI_OP_READ_LOCAL_EXT_FEATURES command. The
+> consequence of that is that the next HCI transfer is misaligned by one
+> byte causing undefined behavior. In most cases the response event for
+> the next command fails with random error code.
 > 
+> Since the HCI_OP_READ_LOCAL_EXT_FEATURES command is used during HCI
+> controller initialization, the initialization fails rendering the USB
+> dongle not usable.
 > 
-> Thank you for the patch.
+>> [59.464099] usb 1-1.3: new full-speed USB device number 11 using xhci_hcd
+>> [59.561617] usb 1-1.3: New USB device found, idVendor=33fa, idProduct=0012, bcdDevice=88.91
+>> [59.561642] usb 1-1.3: New USB device strings: Mfr=0, Product=2, SerialNumber=0
+>> [59.561656] usb 1-1.3: Product: UGREEN BT6.0 Adapter
+>> [61.720116] Bluetooth: hci1: command 0x1005 tx timeout
+>> [61.720167] Bluetooth: hci1: Opcode 0x1005 failed: -110
 > 
-> Am 26.08.25 um 22:29 schrieb DaanDeMeyer:
->> From: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
->>
->> Strictly encode patterns of supported hw_variants of firmware files
->> the kernel driver supports requesting. This now includes many missing
->> and previously undeclared module firmware files for 0x07, 0x08,
->> 0x11-0x14, 0x17-0x1b hw_variants.
->>
->> This especially affects environments that only install firmware files
->> declared and referenced by the kernel modules. In such environments,
->> only the declared firmware files are copied resulting in most Intel
->> Bluetooth devices not working. I.e. host-only dracut-install initrds,
->> or Ubuntu Core kernel snaps.
->>
->> BugLink: https://bugs.launchpad.net/bugs/1970819
->> Cc: stable@vger.kernel.org # 4.15+
->> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
->> ---
->> Notes:
->>      Changes since v4:
->>      - Add missing "intel/" prefix for 0x17+ firmware
->>      - Add Cc stable for v4.15+ kernels
->>      Changes since v3:
->>      - Hopefully pacify trailing whitespace from GitLint in this optional
->>        portion of the commit.
->>      Changes since v2:
->>      - encode patterns for 0x17 0x18 0x19 0x1b hw_variants
->>      - rebase on top of latest rc tag
->>      Changes since v1:
->>      - encode strict patterns of supported firmware files for each of the
->>        supported hw_variant generations.
->>
->>   drivers/bluetooth/btintel.c | 26 ++++++++++++++++++++++----
->>   1 file changed, 22 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
->> index a657e9a3e96a..d0e22fe09567 100644
->> --- a/drivers/bluetooth/btintel.c
->> +++ b/drivers/bluetooth/btintel.c
->> @@ -2656,7 +2656,25 @@ MODULE_AUTHOR("Marcel Holtmann 
->> <marcel@holtmann.org>");
->>   MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
->>   MODULE_VERSION(VERSION);
->>   MODULE_LICENSE("GPL");
->> -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
->> -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
->> -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
->> -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
->> +/* hw_variant 0x07 0x08 */
->> +MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
->> +MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
->> +MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
->> +MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
->> +/* hw_variant 0x0b 0x0c */
->> +MODULE_FIRMWARE("intel/ibt-11-*.sfi");
->> +MODULE_FIRMWARE("intel/ibt-12-*.sfi");
->> +MODULE_FIRMWARE("intel/ibt-11-*.ddc");
->> +MODULE_FIRMWARE("intel/ibt-12-*.ddc");
->> +/* hw_variant 0x11 0x12 0x13 0x14 */
->> +MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
->> +MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
->> +MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
->> +MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
->> +MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
->> +MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
->> +MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
->> +MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
->> +/* hw_variant 0x17 0x18 0x19 0x1b, read and use cnvi/cnvr */
->> +MODULE_FIRMWARE("intel/ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].sfi");
->> +MODULE_FIRMWARE("intel/ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].ddc");
+> This patch was tested with the 33fa:0012 device. Now the device is
+> initialized properly:
 > 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+>> [43.329852] usb 1-1.4: new full-speed USB device number 4 using dwc_otg
+>> [43.446790] usb 1-1.4: New USB device found, idVendor=33fa, idProduct=0012, bcdDevice=88.91
+>> [43.446813] usb 1-1.4: New USB device strings: Mfr=0, Product=2, SerialNumber=0
+>> [43.446821] usb 1-1.4: Product: UGREEN BT6.0 Adapter
+>> [43.582024] Bluetooth: hci1: Unexpected continuation: 1 bytes
+>> [43.703025] Bluetooth: hci1: Unexpected continuation: 1 bytes
+
+As a normal user reading the logs and seeing the warning, I wouldn’t 
+know what to do. So, I’d elaborate, that it’s probably a controller (of 
+the dongle) issue, and, if at all, should be reported to the hardware 
+vendor.
+
+… Unexpected continuation: 1 bytes. This is likely a problem with the 
+Bluetooth device and should be reported to the manufacturer.
+
+>> [43.750141] Bluetooth: MGMT ver 1.23
 > 
+> Signed-off-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+> Tested-by: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+
+I believe, the author does not need to add a dedicated Tested-by: tag, 
+as it’s kind of expected. But I am not 100 % sure 
+(`Documentation/process/5.Posting.rst` does not handle the case) and 
+it’s not important.
+
+> ---
+>   drivers/bluetooth/btusb.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
 > 
-> Kind regards,
-> 
-> Paul
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 8085fabad..24a249d1c 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1192,6 +1192,18 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+>   		}
+>   
+>   		if (!hci_skb_expect(skb)) {
+> +			/* Each chunk should correct to at least 1 or more
+> +			 * events so if there are still bytes left that doesn't
+> +			 * constitute a new event this is likely a bug in the
+> +			 * controller.
+> +			 */
+> +			if (count && count < HCI_EVENT_HDR_SIZE) {
+> +				bt_dev_warn(data->hdev,
+> +					"Unexpected continuation: %d bytes",
+> +					count);
+> +				count = 0;
+> +			}
+> +
+>   			/* Complete frame */
+>   			btusb_recv_event(data, skb);
+>   			skb = NULL;
+
+
+Kind regards,
+
+Paul
