@@ -1,151 +1,369 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574B72C15BC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 21:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC03A277800;
+	Thu, 28 Aug 2025 06:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756330386; cv=none; b=XhfT1gbeU5+ntqG3zTMXw4+7pflody/zG+U87k42swbtAM2frM2TQrldg2wYxvEvyrIbB7W0h9F02Te1GvVUrEPzRO+MeRmNuWUbnuCjQqeSuFn7LrByfni3tY6A3Oi1B6qbCduxrRyGsRfYe4AHG5xBHBoSX5IzEvVzvWXaYew=
+	t=1756361096; cv=none; b=JNNrVou0GvIAcFkuyUED3Ic2MLLI2ZMMy5Egheh0iruTq9ZRLpaE6qynmMXL+Arhl0IGQ5C65rkHr1bbV1TviXOYqPKchMwrhR/CtsMa330nWrH0Z+6pWNv56ZATDDY69edftB2zcvVsuK0OnmEhRM1qks4CuihDxBRB1urL9KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756330386; c=relaxed/simple;
-	bh=XDRpPiulX9E+RxQYC5LdWtx8lOrfS7n1LxD0uioIRiA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LAAOIB7lASgozEZZ4XE/nKZYaXxh4L3bWgkY4dFC5REoD6iuB1GMV9c3fwYR2tD7fXWRRg7SDG48Hxxvi9pREBj6AiTBTtp0RHHmIEYNP2YXjevZgcEJgEBfilxqi/SZEXwGr3qBknFtShZHrboOwAmyS4M6YcSgvNzj2e3e9FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OVC1rUj7; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756361096; c=relaxed/simple;
+	bh=GxpKZ1h0F3WZVVQc/3bebFvOhHjVHmMV8Ch9ZImFlFM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uD13V4WL4abpng2BeA6YIe0GlhjqEiU1R3Yj519AZbWu9t9L2OFOFoXHxTuJodf1IcHWBeVfQVnMv7kJN5DpF3fc6yHxwnCFrN+1cOBRfsGOTKMJ1eyWcfAoBSEVjEHWiIUBHqo29yOQSGRabaygF0C76gkO2Pom4Rx50Ci4B3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=gG0Mm+qH; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVC1rUj7"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-70deaa19d5aso2757156d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Aug 2025 14:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756330384; x=1756935184; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=X8ZqWlf24nN0qHFkep3R4C6l+AzFRrTGzrlOv+iO83E=;
-        b=OVC1rUj76DAxXkLkh7XjW3TZsrq6zgdqb1G7TR4AU4wY5WlFQEIuKIAvRytgujS6As
-         MNRDlkKMSTNrzRq1t5xt/PoJ6JWwdKIhc13T2I0Met1E6+5OR1dLk/ukZ4h+YlpB1oUu
-         ZaHsPyi56Igxzttq2DyXuFvXdQSMcWQiAKS7bwqeN58vh7L6WvWgz1TbBhY016rX3KUn
-         jESgA5x3qS1AK/nsNXBpEzYiIpArc4GTLzaaQg6b+ONyTenqqtSuOFLS1Hf3y+HeRbRe
-         4k+hcqC8CTPMQ1cCCoaPRRxxieP+PK+MzyOnQV5+7HPWRaj54NLoEJLrY0G0THiR/39H
-         cHTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756330384; x=1756935184;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X8ZqWlf24nN0qHFkep3R4C6l+AzFRrTGzrlOv+iO83E=;
-        b=vqJAWj+Dw29HCKt+KzLTPoYj5ZGZAgyeHVN6Vvu9SHDi8ywt22dOE6apyR/kDD+2S9
-         v+fys/sBXUZtjy2ZxbWf7fKgxz9kNVUy7skhQfnVphZy4hsXPQWWlaQU5pBlBPPt1JTt
-         2/AUyeRfZ4R6j0FVBfsaCZhW18h9zUTAvl5oDS1TM8BiSa2ley8LL50zWnAJbJXKluB+
-         LwJJX7DY7DwyQPrX8dMuNZRX9r/Xlz0bdk95N5iuCg+fhUB3P3IblZNwXelmJ/dbh8f3
-         b1RcVS3lXTWpu0tzJCbxCa1uLxSTy6vMHCG3x5HAL5Mjc2gYNh+pHZoJJTkwtyAy8aM/
-         QjPQ==
-X-Gm-Message-State: AOJu0Yz9MMWDzsUywbuUZkqlyybx/BFNzt645ta/NtRXqCU7dmKjeOky
-	kRT/9xQzmvhdBtrXMEGl0t4ZeYU0smFxPbolkzNkZRJuXhl1aXaQG+xYgbCehDCj
-X-Gm-Gg: ASbGncvxTHPLJfe/f3Sab5sR0HhWjUZcrteFkWkNsH2ry4lZih1jIbyfZktfLvaCNuX
-	Bgv5X78OUMdn6Z2UyqejFBJAfsUWLvFZDAxGOmKQL+DSa1Jwpf8H8EIi/Tu5X0rHZxCUkcgnm8t
-	eOfMmtbMlQPcrdOT2ruaeJRzl0xhI6DoeTtrEb1iYELjB8yEutpjrIvW2iMMgYDmj4nQ/rTOVEI
-	ggoinExJKU20Liv/J3aK5e3zac84RmecmztP24zU82pASVPPfCRGOBC1YKIVXv98WmpanZ8rRy3
-	wJD1jK3finmgiHEEkKxKycZwJLCIVZZvjQS3YCxf1fTpAtWzvbJYScK0tPCxa8rcohtiAbxt7oz
-	UJVpiJC/oSPZBMB5YB2VEWAuyuZEH
-X-Google-Smtp-Source: AGHT+IG13U31LNmZMIAkauNF1x4KPnpWOy/wQb01POQ69+epnkC1WnmNMHSi2P4f3E3iuHHeBWMYhA==
-X-Received: by 2002:a05:6214:5011:b0:70d:eaa2:e39d with SMTP id 6a1803df08f44-70deaa2e5a9mr24948176d6.1.1756330384010;
-        Wed, 27 Aug 2025 14:33:04 -0700 (PDT)
-Received: from [172.17.0.2] ([48.217.142.87])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ddb4bcdefsm28587616d6.65.2025.08.27.14.33.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 14:33:03 -0700 (PDT)
-Message-ID: <68af798f.d40a0220.332f7.bbda@mx.google.com>
-Date: Wed, 27 Aug 2025 14:33:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2310930906089159510=="
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="gG0Mm+qH"
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 57S64b2W21114281, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1756361077; bh=18l9j6aWLanqOEzeNto6izS8CvM1R0PXmM6SwfZ9eSg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type;
+	b=gG0Mm+qH7Rqi1hTJQo3KjnShTWvVBaeciGqil1eFk+JxeElMVWyIAnOX/2HYpcM/z
+	 TBLTPTxVuGcKS/CT7WeDFShmMhH9OOtPvx2OkNC+GIU7UjmwNSY7O80rRkJ9VRDSV2
+	 iLpw/XEHbsjpjut0hYxSf9hrXSJfd/aYD5eP4RLzO3zVcvWQY8eyDIEtPMk1i37PRe
+	 uBGpe+fLDuCxZra+fJhrV1VuoKmri8oB/6s+5v+hXhqZIACMWxWhO1dIwkCT4FPWTp
+	 wIW8iSUQmBqtPnFlT8qV/uidPPhhk5O1sCnSwrB6UDiZMbOCzsNNV0ZcctLAt8jH6Q
+	 GEI5AWTGKVQ3A==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 57S64b2W21114281
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 28 Aug 2025 14:04:37 +0800
+Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.27; Thu, 28 Aug 2025 14:04:37 +0800
+Received: from localhost.localhost (172.21.132.53) by
+ RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.27; Thu, 28 Aug 2025 14:04:36 +0800
+From: Hilda Wu <hildawu@realtek.com>
+To: <marcel@holtmann.org>
+CC: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <alex_lu@realsil.com.cn>,
+        <max.chou@realtek.com>
+Subject: [PATCH v4 2/2] Bluetooth: btrtl: Add enhanced download support
+Date: Thu, 28 Aug 2025 14:04:27 +0800
+Message-ID: <20250828060427.1794237-2-hildawu@realtek.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250828060427.1794237-1-hildawu@realtek.com>
+References: <20250828060427.1794237-1-hildawu@realtek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kuniyu@google.com
-Subject: RE: [v1] Bluetooth: Fix use-after-free in l2cap_sock_cleanup_listen()
-In-Reply-To: <20250827204015.3712705-1-kuniyu@google.com>
-References: <20250827204015.3712705-1-kuniyu@google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTKEXHMBS05.realtek.com.tw (10.21.1.55)
 
---===============2310930906089159510==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Alex Lu <alex_lu@realsil.com.cn>
 
-This is automated email and please do not reply to this email!
+Add an enhanced download mode for firmware format v3.
+Use ACL to speed up firmware downloads.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=996215
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.81 seconds
-GitLint                       PENDING   0.23 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      23.97 seconds
-CheckAllWarning               PASS      26.61 seconds
-CheckSparse                   PASS      29.74 seconds
-BuildKernel32                 PASS      24.01 seconds
-TestRunnerSetup               PASS      477.23 seconds
-TestRunner_l2cap-tester       PASS      24.76 seconds
-TestRunner_iso-tester         PASS      36.63 seconds
-TestRunner_bnep-tester        PASS      5.93 seconds
-TestRunner_mgmt-tester        FAIL      124.21 seconds
-TestRunner_rfcomm-tester      PASS      9.37 seconds
-TestRunner_sco-tester         PASS      14.77 seconds
-TestRunner_ioctl-tester       PASS      10.09 seconds
-TestRunner_mesh-tester        FAIL      11.43 seconds
-TestRunner_smp-tester         PASS      10.49 seconds
-TestRunner_userchan-tester    PASS      6.26 seconds
-IncrementalBuild              PENDING   0.45 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.107 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 8 (80.0%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 1                               Timed out    2.100 seconds
-Mesh - Send cancel - 2                               Timed out    1.999 seconds
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 ---
-Regards,
-Linux Bluetooth
+Change in V4:
+- Adjust and use skb_pull_data
 
+Change in V3:
+- Avoiding memory leak
 
---===============2310930906089159510==--
+Change in V2:
+- Move structure to btrtl.h
+- Fix build warnings
+---
+---
+ drivers/bluetooth/btrtl.c | 188 +++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btrtl.h |  19 ++++
+ 2 files changed, 205 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index dbf087a8cc97..58c14c90345e 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -108,6 +108,8 @@ struct btrtl_device_info {
+ 	u32 opcode;
+ 	u8 fw_type;
+ 	u8 key_id;
++	u16 handle;
++	u16 acldata_pkt_len;
+ 	struct list_head patch_subsecs;
+ 	struct list_head patch_images;
+ };
+@@ -1314,6 +1316,163 @@ static int rtl_check_download_state(struct hci_dev *hdev,
+ 	return ret;
+ }
+ 
++static int btrtl_enhanced_download_mode_enable(struct hci_dev *hdev,
++					struct btrtl_device_info *btrtl_dev)
++{
++	struct hci_rp_enhanced_download_mode *ev;
++	struct sk_buff *skb;
++	u16 opcode = 0xfc1f;
++	u8 val = 1;
++	int ret = -EINVAL;
++
++	skb = __hci_cmd_sync(hdev, opcode, 1, &val, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "send %04x error (%lu)", opcode, PTR_ERR(skb));
++		return -EIO;
++	}
++	ev = skb_pull_data(skb, sizeof(*ev));
++	if (!ev)
++		goto err;
++	if (ev->status) {
++		bt_dev_err(hdev, "got invalid status 0x%02x", ev->status);
++		goto err;
++	}
++	btrtl_dev->handle = le16_to_cpu(ev->handle);
++	btrtl_dev->acldata_pkt_len = le16_to_cpu(ev->acldata_pkt_len);
++	kfree_skb(skb);
++
++	bt_dev_dbg(hdev, "enhanced download mode enabled, handle %04x, acl %u",
++		   btrtl_dev->handle, btrtl_dev->acldata_pkt_len);
++
++	return 0;
++err:
++	kfree_skb(skb);
++	return ret;
++}
++
++static int rtl_acl_download_firmware(struct hci_dev *hdev,
++				     struct btrtl_device_info *btrtl_dev,
++				     const unsigned char *data, int fw_len)
++{
++	struct btrealtek_data *btrtl_data = hci_get_priv(hdev);
++	int frag_num;
++	int frag_len;
++	int ret = 0;
++	int i;
++	int j = 0;
++	struct sk_buff *skb;
++	struct rtl_acl_download_rp *rp;
++	u16 max_payload_len;
++	struct hci_acl_hdr *hdr;
++	u8 index;
++
++	if (is_v3_fw(btrtl_dev->fw_type))
++		j = 1;
++
++	btrtl_data->dlreq_status = 0;
++	btrtl_data->dlreq_result = 0;
++	btrtl_data->dlreq_rsp = NULL;
++	max_payload_len = (btrtl_dev->acldata_pkt_len - 1) & ~0x3;
++	frag_num = fw_len / max_payload_len + 1;
++	frag_len = max_payload_len;
++
++	for (i = 0; i < frag_num; i++) {
++		index = j++;
++		if (index == 0x7f)
++			j = 1;
++
++		if (i == (frag_num - 1)) {
++			if (!is_v3_fw(btrtl_dev->fw_type))
++				index |= 0x80; /* data end */
++			frag_len = fw_len % max_payload_len;
++		}
++		rtl_dev_dbg(hdev, "acl download fw (%d/%d). index = %d", i,
++			    frag_num, index);
++
++		skb = bt_skb_alloc(sizeof(*hdr) + 1 + frag_len, GFP_KERNEL);
++		if (!skb)
++			return -ENOMEM;
++		hdr = (struct hci_acl_hdr *)skb_put(skb, sizeof(*hdr));
++		hdr->handle = cpu_to_le16(btrtl_dev->handle | 0x8000);
++		hdr->dlen = cpu_to_le16(1 + frag_len);
++		*(u8 *)skb_put(skb, 1) = index;
++		memcpy(skb_put(skb, frag_len), data, frag_len);
++
++		hci_skb_pkt_type(skb) = HCI_ACLDATA_PKT;
++
++		btrtl_data->dlreq_status = HCI_REQ_PEND;
++
++		ret = hdev->send(hdev, skb);
++		if (ret < 0) {
++			bt_dev_err(hdev, "sending frame failed (%d)", ret);
++			goto err;
++		}
++
++		ret = wait_event_interruptible_timeout(btrtl_data->dlreq_wait_q,
++				btrtl_data->dlreq_status != HCI_REQ_PEND,
++				HCI_INIT_TIMEOUT);
++		if (ret == -ERESTARTSYS)
++			goto out;
++
++		switch (btrtl_data->dlreq_status) {
++		case HCI_REQ_DONE:
++			ret = -bt_to_errno(btrtl_data->dlreq_result);
++			break;
++
++		case HCI_REQ_CANCELED:
++			ret = -btrtl_data->dlreq_result;
++			break;
++
++		default:
++			ret = -ETIMEDOUT;
++			break;
++		}
++
++		btrtl_data->dlreq_status = 0;
++		btrtl_data->dlreq_result = 0;
++		skb = btrtl_data->dlreq_rsp;
++		btrtl_data->dlreq_rsp = NULL;
++
++		bt_dev_dbg(hdev, "end: err %d", ret);
++
++		if (ret < 0) {
++			bt_dev_err(hdev, "wait on complete err (%d)", ret);
++			goto err;
++		}
++
++		if (!skb)
++			return -ENODATA;
++
++		rp = skb_pull_data(skb, sizeof(*rp));
++		if (!rp) {
++			rtl_dev_err(hdev, "acl download fw event len mismatch");
++			ret = -EIO;
++			goto err;
++		}
++		if ((btrtl_dev->handle & 0xfff) != le16_to_cpu(rp->handle)) {
++			rtl_dev_err(hdev, "handle mismatch (%04x %04x)",
++				    btrtl_dev->handle & 0xfff,
++				    le16_to_cpu(rp->handle));
++			ret = -EINVAL;
++			goto err;
++		}
++		if (index != rp->index) {
++			rtl_dev_err(hdev, "index mismatch (%u, %u)", index,
++				    rp->index);
++			ret = -EINVAL;
++			goto err;
++		}
++
++		kfree_skb(skb);
++		data += frag_len;
++	}
++out:
++	return ret;
++err:
++	kfree_skb(skb);
++	return ret;
++}
++
+ static int rtl_finalize_download(struct hci_dev *hdev,
+ 				 struct btrtl_device_info *btrtl_dev)
+ {
+@@ -1409,6 +1568,7 @@ static int rtl_download_firmware_v3(struct hci_dev *hdev,
+ 	int fw_len;
+ 	int ret = 0;
+ 	u8 i;
++	u8 enh_dl = 0;
+ 
+ 	if (btrtl_dev->fw_type == FW_TYPE_V3_2) {
+ 		ret = rtl_check_download_state(hdev, btrtl_dev);
+@@ -1419,6 +1579,16 @@ static int rtl_download_firmware_v3(struct hci_dev *hdev,
+ 		}
+ 	}
+ 
++	switch (btrtl_dev->project_id) {
++	case CHIP_ID_8852C:
++	case CHIP_ID_8922D:
++		if (!btrtl_enhanced_download_mode_enable(hdev, btrtl_dev))
++			enh_dl = 1;
++		break;
++	default:
++		break;
++	}
++
+ 	list_for_each_entry_safe(image, tmp, &btrtl_dev->patch_images, list) {
+ 		rtl_dev_dbg(hdev, "image (%04x:%02x)", image->image_id,
+ 			    image->index);
+@@ -1457,8 +1627,12 @@ static int rtl_download_firmware_v3(struct hci_dev *hdev,
+ 		rtl_dev_dbg(hdev, "fw_data %p, image buf %p, len %u", fw_data,
+ 			    image->image_data, image->image_len);
+ 
+-		ret = rtl_download_firmware(hdev, btrtl_dev->fw_type, fw_data,
+-					    fw_len);
++		if (enh_dl)
++			ret = rtl_acl_download_firmware(hdev, btrtl_dev,
++							fw_data, fw_len);
++		else
++			ret = rtl_download_firmware(hdev, btrtl_dev->fw_type,
++						    fw_data, fw_len);
+ 		kvfree(fw_data);
+ 		if (ret < 0) {
+ 			rtl_dev_err(hdev, "download firmware failed (%d)", ret);
+@@ -1718,6 +1892,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 
+ 	INIT_LIST_HEAD(&btrtl_dev->patch_subsecs);
+ 	INIT_LIST_HEAD(&btrtl_dev->patch_images);
++	init_waitqueue_head(&btrtl_data->dlreq_wait_q);
+ 
+ check_version:
+ 	ret = btrtl_read_chip_id(hdev, &chip_id);
+@@ -2038,6 +2213,7 @@ EXPORT_SYMBOL_GPL(btrtl_shutdown_realtek);
+ 
+ int btrtl_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ {
++	struct btrealtek_data *btrtl_data = hci_get_priv(hdev);
+ 	struct sk_buff *clone = skb_clone(skb, GFP_ATOMIC);
+ 	struct hci_event_hdr *hdr;
+ 	u8 *p;
+@@ -2057,6 +2233,14 @@ int btrtl_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 		if (btrealtek_test_and_clear_flag(hdev, REALTEK_DOWNLOADING))
+ 			btrealtek_wake_up_flag(hdev, REALTEK_DOWNLOADING);
+ 		break;
++	case 0x2a:
++		if (btrtl_data->dlreq_status == HCI_REQ_PEND) {
++			btrtl_data->dlreq_result = 0;
++			btrtl_data->dlreq_status = HCI_REQ_DONE;
++			btrtl_data->dlreq_rsp = skb_get(clone);
++			wake_up_interruptible(&btrtl_data->dlreq_wait_q);
++		}
++		break;
+ 	}
+ out:
+ 	consume_skb(clone);
+diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+index e642a9da586c..54e4b9952142 100644
+--- a/drivers/bluetooth/btrtl.h
++++ b/drivers/bluetooth/btrtl.h
+@@ -203,8 +203,27 @@ struct btrealtek_data {
+ 	DECLARE_BITMAP(flags, __REALTEK_NUM_FLAGS);
+ 
+ 	struct rtl_dump_info rtl_dump;
++
++	wait_queue_head_t	dlreq_wait_q;
++	__u32                   dlreq_status;
++	__u32                   dlreq_result;
++	struct sk_buff          *dlreq_rsp;
+ };
+ 
++struct rtl_acl_download_rp {
++	__u8 index;
++	__le16 handle;
++	__le32 loaded_len;
++} __packed;
++
++struct hci_rp_enhanced_download_mode {
++	__u8 status;
++	__u8 reserved1;
++	__le16 handle;
++	__le16 acldata_pkt_len;
++	__u8 reserved2;
++} __packed;
++
+ #define btrealtek_set_flag(hdev, nr)					\
+ 	do {								\
+ 		struct btrealtek_data *realtek = hci_get_priv((hdev));	\
+-- 
+2.34.1
+
