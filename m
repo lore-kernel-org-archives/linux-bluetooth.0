@@ -1,72 +1,73 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1629D17A300
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Aug 2025 20:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA77299AAA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Aug 2025 20:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756414777; cv=none; b=igGpML2kMHQcKkAoOoLpoKcSJNcr/s4R3fqthEUc9oO21VJhVt+tgRcPHOjQP2Ewcs6pkIAYcYBlmwjudDj2oh6vVOtBX3YnIrtcnqO7FhfV0LEDusDBQK8pMVe4MM274KtZGE6uPcuwtLon/FBvkuoJWSFmosaSX2afcVo2eWs=
+	t=1756414797; cv=none; b=Owot0bZ5pDNQRCJmqwCs11DtFvSYlh5rhPTtRAqdtFPiEXtCpI68cWXlmS/Ej9rxeO/q4X+v5mpDu1laAIju8pG7cQ3BO/yUEHS9xEF8laSoPDZ5bZpWKUq2dnStBPer1A5F5NxFKp9GlCOKnBIR1SZM40QFYLOF1/PEk9uYmoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756414777; c=relaxed/simple;
-	bh=nhUyagpznBFRZ9pdGyujL8snMtRV7AxzIDv/2iWCkkM=;
+	s=arc-20240116; t=1756414797; c=relaxed/simple;
+	bh=vcH+lJXlXkzbWh1s+giYmvp9r3m+hUxJ894v+cf3nQo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rNsZUXYhuihbAsaWTWI7ubEIOXG6hBgH7qtrtaD4Tm5MuBkFb15Cv8VV5uJWGxobzFugNTzq/ZtgUHi3UdN8j5bJoxHnSDpA+YkgtV75DEXCUcPk8o0LP++sUg1qUIJTPoeJq9G7eBsYDOr8KZIcTSMFFi0ZbdK4I4Z20ZbZACI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ma0UHEbi; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=a5JNA7FNWVXu/kfPvebAyCGbKXN1kGNKCwDXZqK8oDFszL1Td/+opPPbEjOdvS6RrbeF1YZGIO5WVSIdQ1s1njxlYeNgo7m47FgRXJfDQP9Winn4zbTndk1Ymxgws/o9Hn7xNG+JOUTpCuoF9br7KR5BZv1Uh25nFoRkgjvPAig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dC1uDxHL; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ma0UHEbi"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-55f467f3c06so1158524e87.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Aug 2025 13:59:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dC1uDxHL"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-336b071e806so6851751fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Aug 2025 13:59:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756414773; x=1757019573; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756414792; x=1757019592; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nhUyagpznBFRZ9pdGyujL8snMtRV7AxzIDv/2iWCkkM=;
-        b=ma0UHEbiqECEh1ErdOJKkoTyNFYpeCWAacmYShnvRQtRoLZw0bgzRlsCjg9W4G05n9
-         +tZq90pA8y2W96oo9gJz3DFMyIbReffSe0GCsxR7W4QNpvMQMajQS11gI9WjHmlS5/Mc
-         PVErZ3LQQg0yK71YfAMF89IX6GMDptM56tP2AKp+h7SkBnQ1TWOPdQw9Sv7C0qcWdwEi
-         45VtKF2ccAVKTJMbuQSGsqXuKZLPWwCdxAxB742/7pA7mmvOtBPkvL4cTNMwOKQRVi+z
-         1x0asfo3p0mDwZxQTQa+qVxw1A+GwnJGx7QDVH9uk/k80sBixcSfQgo1INWRs/KflI72
-         hnGw==
+        bh=vcH+lJXlXkzbWh1s+giYmvp9r3m+hUxJ894v+cf3nQo=;
+        b=dC1uDxHLdzR89Uj56ebMGaoDeRvegTy02rmD4lDoUGNwIlNRsYa+MDnEwUwxYsuVya
+         Y8brW/f7t8jPxSO+kvkkj5EpDjPec/e6TYHDcu5+BEGKhiYpSHNcgh4PjIPQTjSrFuGv
+         29bmDkLl6eQ4isdMBsaJKvQxTXRA97n+Owzb0UaOKn2DK5J6NDKruHPhNyLdj28A6f1U
+         xa7AB1eEBovGXqonRimswFIIH/UBqn7V2U2Bz07sKbRA7ciRp74+aSbBdni3PZz/n9wh
+         ArMCqsNRws0dRWKWBV/F+8m8qKVhCtZunjvcaF8fk8oIzDZryq51BDa8XZkckv0/glo7
+         4tVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756414773; x=1757019573;
+        d=1e100.net; s=20230601; t=1756414792; x=1757019592;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nhUyagpznBFRZ9pdGyujL8snMtRV7AxzIDv/2iWCkkM=;
-        b=S1Akq1mFAlB3jmE2Q27svrOx8hX/m/jt/RAiuawZp5+ylk+MHhpC0CgGeK7aI07+8C
-         IgkXzwJnl/PLUSaFXjdBzg5THkO2+RmkgEAnjwT/ryplWF8pNNhalkGZGhtYTb/diBki
-         FHtYa/Yf5t2u1otlZiaz03tzPNnGK+jXC0SQqEh5F82n69i46PLenSLlAijWQ2fvNJOV
-         dKsO0/dkoQ9u4i2EYSTIjGgWZkq8tWTc6EGlkhTAMzyVK0yHsmeAXlhU5GHYiJ9TtQS+
-         wokS+/w7q9qQP2jMgStCFXsz5e9tSKCPIrfZPiSbkkKzlzLIZXcU4+bUi2/QdQkTixtK
-         /dWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW6uf0WmqblocxsdW+CnyV5Hc4uznSBQCfCbN2UHsMEvdk1hRzRA/CQ72faaegRweo6XTiqpRrAp0ea4fdPDY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKX1Yt/WiuYWq9oyJ54UAU3WLLd1egahhjiwI7B4ydSuxv39C8
-	PbjA1NrQZnpwc5+BXzYnxzVOrW7rKLIR4DMvvVomyb4yJQzhGLJsH29J24wtJCzeNdFh8LMxhrW
-	JnukdeUF3VqjdWT2c/YhAHl48/7ktTsh232v6nsQFQQ==
-X-Gm-Gg: ASbGncuUX1jEB17I5o2fzUsThOVO9R4L+TfJKHDACO8r6ooa16zqtP0aYGWKDtlOFUd
-	vi7RllTprKAS2wE6AQVLkFH/4JARGXkfrcYJqVPWJkGnqdeXJE5+DnH4gvfAzWC8rKzCazEuuvg
-	DS8NgAsdSZlbx8ZW9l1vQaPmlH0b5JG/PKuRLD/T2Y/oytRY4/4MjKt3EZ1Evx2AEcmqoqusOsG
-	cxBh3Q=
-X-Google-Smtp-Source: AGHT+IGkAeRfSepttrAWspST3WxeFhzvmsQkOJn8zGWgyydoFU7mfe7dFpmDKHnPoU/jmN1MyfkA6699WvyfKPSV4Ms=
-X-Received: by 2002:a05:6512:6301:b0:55f:503c:d322 with SMTP id
- 2adb3069b0e04-55f503cd585mr2344975e87.40.1756414773211; Thu, 28 Aug 2025
- 13:59:33 -0700 (PDT)
+        bh=vcH+lJXlXkzbWh1s+giYmvp9r3m+hUxJ894v+cf3nQo=;
+        b=JgsWTUL1UF5wWSRSgLP/+JHeZKjPxFFpT4r4I7QtMfxb/jy20wYOeIMIh8CKex12H0
+         r5gelOKZpY6wJ6YM0V9L8TyxRwkjOmBpr/d4P88nAbGtbr7MPbFO+Kf3b2YRGPqVxdhd
+         BIef2Az+LBVe9XV0OrhYDGFw2tLByNipe6ZHUYACBETQkZdjFaM8TNGmMb+8KEDSMYBp
+         1YWNWuc+dz1M6MLSbaxji7iXrx8TSVG10KhuGMtWn6l9Tl5v3MmlcdlssTlMMUrUmWDs
+         svJTebRGuYyleBtMrlmdccu+SsYPqN2JgI5hoksB9sMqEIL1169q9xZ94AIWFx/JhmLw
+         VP6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWeDMNhZMkpKRTCEBompQdddFGSZGEdhhPHEvqHq5SDuFkFWassF4zOCrbTmFGJeoS4KgcqsV0wuOoYXqcId+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDhv7hxCSP8RKG4xw3IU5WUpYCkoOfzaYiNiWGv7pMKXF+lw76
+	i213nTUwfllL5sfkyVWV+Ljb0saGqNsPezkDZFbNRGZZOEXBWWIIswuG4qAM3JAVv1HuQv391Ee
+	dnpPB5OmbtOpGW5CBkz4fRtKvw4yP2cvd1WZFMm0pkw==
+X-Gm-Gg: ASbGncu/MjvkcZFMgxF9cDH5EyUXIiw60f4WlEyRQcqDHb1Fm8JZwt4eFFM4iAnBVx9
+	p3Lg4/YZ57ekuryuT3OVNGYhCyigMfs1MgeQzITo7BxNcW4F83eZvMDPQbc+/0oOnMN474Jt6DJ
+	RnVT0pzjycWeChg9s9zaVZIWiCWzTtqOuD7hre2Ln77uSaYQFNfvX8LoJcC3tCT2V+1zpcEaM8P
+	Ak862o=
+X-Google-Smtp-Source: AGHT+IEvCK27Dx3T+NwB4QTV9UIlsAab63smCZ6D7uUks2NtQZowbM82iFbh3N6kvr8t1WPK8CdOU0xtB51L+4ds/dQ=
+X-Received: by 2002:a05:651c:3256:10b0:332:3fd0:15fb with SMTP id
+ 38308e7fff4ca-33650ba8612mr48592831fa.0.1756414792241; Thu, 28 Aug 2025
+ 13:59:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net> <20250828-dt-apple-t6020-v1-8-507ba4c4b98e@jannau.net>
-In-Reply-To: <20250828-dt-apple-t6020-v1-8-507ba4c4b98e@jannau.net>
+References: <20250828-dt-apple-t6020-v1-0-507ba4c4b98e@jannau.net> <20250828-dt-apple-t6020-v1-9-507ba4c4b98e@jannau.net>
+In-Reply-To: <20250828-dt-apple-t6020-v1-9-507ba4c4b98e@jannau.net>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 28 Aug 2025 22:59:22 +0200
-X-Gm-Features: Ac12FXwdi56r5WxKQlnuWh0e5CWqxbReZCdYkWbkMywpfjpFF5zgYMlMEAzYzgg
-Message-ID: <CACRpkdbvLhTQ8EujGg9QMbuGVRDnH9ApVxVt1NdmSmPw77QXdA@mail.gmail.com>
-Subject: Re: [PATCH 08/37] pinctrl: apple: Add "apple,t8103-pinctrl" as compatible
+Date: Thu, 28 Aug 2025 22:59:41 +0200
+X-Gm-Features: Ac12FXyoYnYKNXDomZzl4EdS0dXvIhCV2tkZJGb1B6Y1kaQgUA-l_NpqH411N_c
+Message-ID: <CACRpkdbg8KYcDpqDKn9fqs+rL9hLK9mGCj0PTXPBGDW7A_AZbw@mail.gmail.com>
+Subject: Re: [PATCH 09/37] dt-bindings: pinctrl: apple,pinctrl: Add
+ apple,t6020-pinctrl compatible
 To: Janne Grunau <j@jannau.net>
 Cc: Sven Peter <sven@kernel.org>, Alyssa Rosenzweig <alyssa@rosenzweig.io>, Neal Gompa <neal@gompa.dev>, 
 	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
@@ -105,6 +106,9 @@ On Thu, Aug 28, 2025 at 4:02=E2=80=AFPM Janne Grunau <j@jannau.net> wrote:
 > lists with the generic compatible "apple,pinctrl" anymore [1]. Use
 > "apple,t8103-pinctrl" as fallback compatible as it is the SoC the driver
 > and bindings were written for.
+>
+> The M2 Pro/Max/Ultra SoCs use the same pinctrl hardware, so just add its
+> per-SoC compatible using the new base as fallback.
 >
 > [1]: https://lore.kernel.org/asahi/12ab93b7-1fc2-4ce0-926e-c8141cfe81bf@k=
 ernel.org/
