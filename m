@@ -1,126 +1,211 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F331626D4CD
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 11:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D6A211A14
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 14:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756465807; cv=none; b=oZYpfzxQvVM4aCBMmste3swtP/uwPD9mUfG+7/AY5pGx6Owcjn80bqQE0dRl97QVxfbTgYYJoqFNsqKJQj7twy+oycoiFMY5+Dz1MNPzOUgs/1Dd7C4l4Xo/32xrawsrfvgG0BrJHkU+BMOfIoZZyDIsRSqyTi3eL5sOuWOLHt4=
+	t=1756478853; cv=none; b=a59kLVp6/i3Jjtx+j9va/YMZKokTmvIRnhyXnjN1jnY36EgLRix4vzUUywZb5c/WUAOMPbXeEiKMSBFvFvH2Q8pSvF5H1R+EoZRO7/ysNdotf1j7NM4EdkjZOMowshUg35ig8tO7xCLYCtCDQFLbl3wt4IhCBdqEKTJldS/Z9jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756465807; c=relaxed/simple;
-	bh=e7uplDjajstv3vNv/ZPZV1EOvN85vLVTe3hEI6At36Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=o8Gokdpd76ppMNSKzQ5maXjizUiKnm3oewGmX0uD57aeQOCgCfJE6kgZdN+8dC8yLfLIqwfqISfdIYVS3Xe/OoN8DDhgtBVOAFORH3BTNuz4Mu3fBTk08VeY3pENndzNlG93SUsMBVSOP2YMYUfbxaDLTzoDD05OJ2lzIcgxU80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DhGKpURO; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756478853; c=relaxed/simple;
+	bh=QvuAdKEq+Ji73Aaw79iuwsynzhU6JxlY1p+zenB7qNE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UfflIjJNGMtSKyr60zuRAXXboTbae6xZN/IZdMCfABtbAJpcGztN3xK3tJUKq4d2mAhwpkyE4eoT12JF3mCmD00K7cha3NFYeHzEEHSrkXE5clqRLMuVzVTWIhegzs7pR7n3+P2QdXbrFeosiHt3R6cqJiB2uHqERXTwmyLQzvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PCNRlm9h; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DhGKpURO"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-70dd6c93071so15701126d6.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 04:10:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756465804; x=1757070604; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XpwpJqHSVH93cQz2P5cijdvUk7Xt6DUQ6HlfgNbDKvE=;
-        b=DhGKpUROR0XjQbD2+xIQeMuRQC/Em176kbUaeu9yGIJVighyAh0JWfL7v7OqO09rxY
-         Eb0xrZHPRLRW+IqP7wEE6WtUDQfYr56gwfIgcKhvhwUAz6qnfp84O7WdtWJF1OnSUBjL
-         rDYh6yjF6EorRFoHAchNC/XZdxkUW/cvkKS1OY6CXKv6Pi0s7ZQIWaF3gs818fmTwE6A
-         CekIQRGNZNhzruOymVXCeAn4vIhlXqo40hSHDIgRaIET2rLK9W3sh+tFec/YRn6688Kz
-         /8INNXw1PNiPv8Ch6pJSyLKDntBm8B+lzdM8K6cvxlx433OBA2U8hq7J2k3pDvlMnz2B
-         X6tQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PCNRlm9h"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756478851;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l57kCAwofXgSoxlRtWMOU/+1veE98KFisOutq6Bmz1k=;
+	b=PCNRlm9hX2wCn9eD52JH4NrPED+39BXzY5kAzb+OoJPjd0y/IuR3Oo136tlo9lgFX1iGmX
+	seThscAF/TpWXhQadI7wNWNVmizC7JNQ4hbxl/V7nLS7MMEIjgzzHo8eO5SAKNdmhP/0fx
+	jsqOl1K3hIJyk/pjFFbdhwjM7ePog2o=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-215-WP0cd_HANPa7IPARdkcx9w-1; Fri, 29 Aug 2025 10:47:27 -0400
+X-MC-Unique: WP0cd_HANPa7IPARdkcx9w-1
+X-Mimecast-MFC-AGG-ID: WP0cd_HANPa7IPARdkcx9w_1756478846
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-afeeb44fe3fso157163066b.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 07:47:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756465804; x=1757070604;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XpwpJqHSVH93cQz2P5cijdvUk7Xt6DUQ6HlfgNbDKvE=;
-        b=Sd/jUZfOTBh/6oqNheyaALOHyHnqUSORfeA6LRC5ZBkmw+EQNnD66n+qQreCHB7CwM
-         l7eFFCg919GV7LvOS/M/37QwYCVgAyO3hJ90qz0wSDEx3rw42n/1cWSicLy6OhlJG6w9
-         QCFVsJfbXfWFQVt3NxoYgQwKdvdWaR6fZ5nvh53lqD/k1kNjGHAP1RY7HRJf3dQlsA+N
-         870CyK86b9KUhEti3c1toQuY8dsCzRgkqXQ2NczeFrHhChRzpoKHBCBfyYZ5BXAmCV4g
-         1oRjHt/WuvtWsLP3YOcf1IfwemrfQws5DuUV1JgafHyoYcfyFC5eXt7Oxr8rwApPUiQq
-         uXtw==
-X-Gm-Message-State: AOJu0Yzz+yXE4Bd2b4CUQAQiS6+ouEQfpP5L41m90FEPCcazNKLfFwYo
-	ipzUeWCjDrf388yGG3FiNHMTF/XfhDg1ZPJNYZRbq+8OXKNTdSFUUJQ2/pNL+g==
-X-Gm-Gg: ASbGncsL7XDXv9RQhg5T4jx/8j5dQ4HqHgTw8wgQQbYcFcPU77bSpx4TSpjhHFwF17u
-	NnSfbCEGLVPjsduFoaE7vFmqyRV/NFmcnAM8V4WSrcbcEa+V422TOEqyvSMLPZvMoMEgzLdMkWK
-	vuf06hWe6LA4ZaNNtY7M6z2GT3TlUjsVCli79q7TEEQEvp70kdQBz8e99XabqMQjKm3xrXqs2Vf
-	RdJE6jozX5niXv30s7+yN3TG6ZDpQr9snJa5PSMT4TGoVnoFERyqwlFBx/RsE8HfMec1XkQV9qI
-	IRmoN8R++prMjgsglldLDdbvzA/W0YOCSbTKzGZYgxHUGk452pV5cpvayJGbOJFs13KtxNd00Zn
-	8awNXO9d2CNypCmLsGcZ0p5biAGJthY/xL8UcXLU=
-X-Google-Smtp-Source: AGHT+IFBIoGrrYKFVjT0VbhgpHyC3f7jFuRHyzZbkvnmdnTjNdxHLaaUqKUPcBx+sYKdbv0OBwqxRQ==
-X-Received: by 2002:a05:6214:c67:b0:70f:a0eb:fa01 with SMTP id 6a1803df08f44-70fa0ec045amr11039286d6.19.1756465804296;
-        Fri, 29 Aug 2025 04:10:04 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.30.232])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7fc16536012sm148310385a.66.2025.08.29.04.10.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Aug 2025 04:10:03 -0700 (PDT)
-Message-ID: <68b18a8b.050a0220.1e608f.44f0@mx.google.com>
-Date: Fri, 29 Aug 2025 04:10:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2327141294215455604=="
+        d=1e100.net; s=20230601; t=1756478846; x=1757083646;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l57kCAwofXgSoxlRtWMOU/+1veE98KFisOutq6Bmz1k=;
+        b=WCAc6hXD0xultgfjvw2G35XzZ/8RNve9m3NDvXZ0uz5mEXP7UzgBpYbLTRg7RW8n1k
+         gS3ae9G292b7hIfxHU8VcNIunqLfRXCYeNP4WGDLAYs6fKW2WxbRiJtEvGvuTKgLY6BQ
+         rWEqVN8u1ZJKe30fGpEMc6kZl/RmAsEp+hKru1qBENSWZYgIKyWcrhviPD/d88+ZqVEe
+         vKtLenTwPhYMeLzDUNuZskv9l0uV/+FnQvE9wKM0kdEWUkpI3XohuWinldl6be5/Sv+H
+         Pv2UzwCLXrpyM8z4uhglQ11H6+WJqo/45Ak4UxMpW9lmuHnKkqBoJmba+tUdwBAczQG0
+         q2HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXGPxowgS7nNRXFnYFx4s2WUjKfZIXVCCxVGwy1dMOwHLdwZW3zJZ3hdYk2vQM7HvuxzhcAE+XUmiKvKZow/gM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDwZrl8Qnon+3vSERxPzH7fJQAT+EV27RyTF3To4HF/qtqgAhI
+	lgbDcvrpTj0JWIpIo8x8dQ/LGPJeTy+5569N8+NJycwE7mo4FRFnWliH0e3CkEsT2PFl2kAVA+n
+	ierCugjpGWGvuJm1j4raRMt9Dhyarik02YVY5Md4wXNkeAi+/GBVzzAFMwYQjvQBBgbJWRQ==
+X-Gm-Gg: ASbGncvbdwyRuQOhdsUO9FDgcN507Yb5YT5Rdj6IDHH6cWOVHZeKNKIQ6RvNOi6ZtaS
+	mTHJybF+ekjX5j0gQshZe8AHmEBnd6pg6CGitt5pLeArBOhdCMxtLQwAGGd6WtSXEEMbW3i9Eyj
+	NTHtOK5HfPSIxCnW6FrVOdep/3Mit7McMUKsD83WXRGUdKelyAK0EiLXKePhBrfr6F9/ili7SKf
+	EWhduQLwGQvS24m5ZTMUJo5aLZyQ2GVxsXvFa4KB2Rzl9K7f8cWCBkcG61XEiNFhZKOPCGGYWGg
+	W9jXg10ujZsrgKKREfCaKYBi1xZNSc8G1PBgNK8jnx58OjTYpNmkg/wsa0b9DQELo52uIS1IdXE
+	D7HiXsK+bhx05XhdD3p8UOZ1vZ3IwHUKAr2i/1vo7K6/GSMSrhiyL53N+BGYtDYqbDado+yL68k
+	oRlndyu7dSJ4C9Mmw=
+X-Received: by 2002:a17:906:4fca:b0:aff:10a7:7589 with SMTP id a640c23a62f3a-aff10a77b06mr160220966b.64.1756478846365;
+        Fri, 29 Aug 2025 07:47:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+FB1sN2Rss19C9N2+/y4vCWEpfRSC0ObzgI5vwDX0YV77Ax9vfYOtXoYE4jeM83tk0LPjdQ==
+X-Received: by 2002:a17:906:4fca:b0:aff:10a7:7589 with SMTP id a640c23a62f3a-aff10a77b06mr160218066b.64.1756478845913;
+        Fri, 29 Aug 2025 07:47:25 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afefcc2d50dsm210942366b.93.2025.08.29.07.47.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Aug 2025 07:47:25 -0700 (PDT)
+Message-ID: <ebb489b9-11f9-4d3a-a64d-7809c22c5a96@redhat.com>
+Date: Fri, 29 Aug 2025 16:47:24 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, wangxinpeng@uniontech.com
-Subject: RE: device: Fix device recreation after failed restore
-In-Reply-To: <20250829094808.32709-2-wangxinpeng@uniontech.com>
-References: <20250829094808.32709-2-wangxinpeng@uniontech.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2327141294215455604==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bluetooth-next PATCH] Bluetooth: hci_bcm: Configure sleep mode
+ on RPM suspend/resume
+To: Marek Vasut <marex@denx.de>, linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, kernel@dh-electronics.com
+References: <20240629172235.29901-1-marex@denx.de>
+From: Hans de Goede <hdegoede@redhat.com>
+Content-Language: en-US, nl
+In-Reply-To: <20240629172235.29901-1-marex@denx.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+Hi Marek,
 
-Dear submitter,
+On 29-Jun-24 7:22 PM, Marek Vasut wrote:
+> The Infineon CYW43439 Bluetooth device enters suspend mode right after
+> receiving the Set_Sleepmode_Param sleep_mode=1 HCI command, even if the
+> BT_DEV_WAKE input is HIGH, i.e. device ought to be awake. This triggers
+> a timeout of any follow up HCI command, in case of regular boot, that is
+> HCI_OP_RESET command issued from hci_init1_sync() .
+> 
+> Rework the code such that during probe, the device is configured to not
+> enter sleep mode by issuing Set_Sleepmode_Param sleep_mode=0 instead of
+> sleep_mode=1 in bcm_setup(). Upon RPM suspend, issue Set_Sleepmode_Param
+> with sleep_mode=1 to allow the device to enter the sleep mode when the
+> BT_DEV_WAKE signal is deasserted, which is deasserted soon after in the
+> RPM suspend callback. Upon RPM resume, assert BT_DEV_WAKE to resume the
+> chip from sleep mode and then issue Set_Sleepmode_Param sleep_mode=0 to
+> yet again prevent the device from entering sleep mode until the next RPM
+> suspend.
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=996842
+Thank you for your patch. The patch looks good to me and I've been
+running this in my personal tree / test-kernels which includes
+various devices with BCM BT serdevs without issues:
 
----Test result---
+Reviewed-by: Hans de Goede <hansg@kernel.org>
+Tested-by: Hans de Goede <hansg@kernel.org>
 
-Test Summary:
-CheckPatch                    PENDING   0.30 seconds
-GitLint                       PENDING   0.33 seconds
-BuildEll                      PASS      19.97 seconds
-BluezMake                     PASS      2536.81 seconds
-MakeCheck                     PASS      20.07 seconds
-MakeDistcheck                 PASS      183.38 seconds
-CheckValgrind                 PASS      235.79 seconds
-CheckSmatch                   PASS      306.13 seconds
-bluezmakeextell               PASS      127.95 seconds
-IncrementalBuild              PENDING   0.31 seconds
-ScanBuild                     PASS      909.52 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
 Regards,
-Linux Bluetooth
+
+Hans
 
 
---===============2327141294215455604==--
+
+> ---
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: kernel@dh-electronics.com
+> Cc: linux-bluetooth@vger.kernel.org
+> ---
+>  drivers/bluetooth/hci_bcm.c | 32 +++++++++++++++++++++++++++++---
+>  1 file changed, 29 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 89d4c2224546f..fde5e0136c392 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -389,13 +389,19 @@ static const struct bcm_set_sleep_mode default_sleep_params = {
+>  	.pulsed_host_wake = 1,
+>  };
+>  
+> -static int bcm_setup_sleep(struct hci_uart *hu)
+> +static int bcm_setup_sleep(struct hci_uart *hu, bool sync, int mode)
+>  {
+>  	struct bcm_data *bcm = hu->priv;
+>  	struct sk_buff *skb;
+>  	struct bcm_set_sleep_mode sleep_params = default_sleep_params;
+>  
+>  	sleep_params.host_wake_active = !bcm->dev->irq_active_low;
+> +	sleep_params.sleep_mode = mode;
+> +
+> +	if (!sync) {
+> +		return __hci_cmd_send(hu->hdev, 0xfc27, sizeof(sleep_params),
+> +				      &sleep_params);
+> +	}
+>  
+>  	skb = __hci_cmd_sync(hu->hdev, 0xfc27, sizeof(sleep_params),
+>  			     &sleep_params, HCI_INIT_TIMEOUT);
+> @@ -412,7 +418,7 @@ static int bcm_setup_sleep(struct hci_uart *hu)
+>  }
+>  #else
+>  static inline int bcm_request_irq(struct bcm_data *bcm) { return 0; }
+> -static inline int bcm_setup_sleep(struct hci_uart *hu) { return 0; }
+> +static inline int bcm_setup_sleep(struct hci_uart *hu, bool sync, int mode) { return 0; }
+>  #endif
+>  
+>  static int bcm_set_diag(struct hci_dev *hdev, bool enable)
+> @@ -647,7 +653,7 @@ static int bcm_setup(struct hci_uart *hu)
+>  		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hu->hdev->quirks);
+>  
+>  	if (!bcm_request_irq(bcm))
+> -		err = bcm_setup_sleep(hu);
+> +		err = bcm_setup_sleep(hu, true, 0);
+>  
+>  	return err;
+>  }
+> @@ -767,6 +773,16 @@ static int bcm_suspend_device(struct device *dev)
+>  	bt_dev_dbg(bdev, "");
+>  
+>  	if (!bdev->is_suspended && bdev->hu) {
+> +		err = bcm_setup_sleep(bdev->hu, false, 1);
+> +		/*
+> +		 * If the sleep mode cannot be enabled, the BT device
+> +		 * may consume more power, but this should not prevent
+> +		 * RPM suspend from completion. Warn about this, but
+> +		 * attempt to suspend anyway.
+> +		 */
+> +		if (err)
+> +			dev_err(dev, "Failed to enable sleep mode\n");
+> +
+>  		hci_uart_set_flow_control(bdev->hu, true);
+>  
+>  		/* Once this returns, driver suspends BT via GPIO */
+> @@ -810,6 +826,16 @@ static int bcm_resume_device(struct device *dev)
+>  		bdev->is_suspended = false;
+>  
+>  		hci_uart_set_flow_control(bdev->hu, false);
+> +
+> +		err = bcm_setup_sleep(bdev->hu, false, 0);
+> +		/*
+> +		 * If the sleep mode cannot be disabled, the BT device
+> +		 * may fail to respond to commands at times, or may be
+> +		 * completely unresponsive. Warn user about this, but
+> +		 * attempt to resume anyway in best effort manner.
+> +		 */
+> +		if (err)
+> +			dev_err(dev, "Failed to disable sleep mode\n");
+>  	}
+>  
+>  	return 0;
+
