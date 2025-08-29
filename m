@@ -1,126 +1,102 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D508010F2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 07:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810121F55F8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 09:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756454091; cv=none; b=eWndynF0pH4b0feeLUDjF0ugCp2QupfKCMYQLP5akBi5y86mpwyL11ZM2fWgkwNxBuu4kbI5dZufZplf0MDimjvwEm5EClzKRTYbSKEH6S3+7z/IHOXsjJ0mALlsb8Q5rwobTv8Vk1z8tss7Tq2V4Lv/BDgMQUL0S2yqX5rVzJg=
+	t=1756460938; cv=none; b=fJioRPsC0dPNRPwQwKxk8qmTAgTfqqwCmyZIrAYuAUXPdRuRFp/Z5hgp/r5M2AjoCKhG7nQfOexkipsnBLob3FzmuxZvjmf8O5QpakbSbbSP1bHtSiHwk+/oKy7W2fnflqjr01i0/CKKC2ersTPveyZnVqt6Y8xMsrgb0osS5AY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756454091; c=relaxed/simple;
-	bh=nkNI5OGWtPHzGenrRiPOu5iblNYkEAyBT32UR18YFuk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Kauu+Ofv9G748rn3B22C2GuxSnjs7e2IDH2R2JiFq4Cq/El4YqciRAXAfxPRrLaq1KiV0zswV4G3ts02y4Fwof7/uGTj2CMoomh0CSmH+PBg0xbc4XSR2NcDI3VqOC3qSeGhjUDkGTytW1TuyTs8nzbol0H21Z/bQcLOYQyis1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jcrTLV0E; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756460938; c=relaxed/simple;
+	bh=Eo8Q5fnTsWfFB0xR+4hlm1sXadIT/74OgwaTVA8jjmA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cPtUZT9zoFPjswSb9d9LsZpP4UFJ/W+Zxz7EhZneDtAKOW5/uiMV9pH7UisKVvJkNATj6Ir2Otz2mBpacsjB4GYtlv4tKBELLaOpKFyebJt11dhWrBwZcKy7/YQ5im/UQ90RbzYgxwMXAdlqrLBwcD7htCoWVlAgglAHD0MZrdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=HsXWJUZp; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jcrTLV0E"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7e864c4615aso301879985a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 00:54:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756454088; x=1757058888; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NIXY7ZiwkVkhcs41LD0LhPBtOeJA6QoFcPePmIzbn5w=;
-        b=jcrTLV0EAccjvYNISczuB5DINLMa2JefYIZ+nxhVKOvHGEkxl8KloZZjrWFofXE6/j
-         Zs4auZmJq7MN/Ls776qQslAUGL0YB212REIQo8SODQlhnZAdJGOILkreFGuxQVnPTIxO
-         PVso/QbpeWa7VGDgrVhBOjiZXZuww0J5CauJzqUuLshe7SPfZUUlLfmAVmwBTwpVT1QA
-         Yjxg1sKDlBJwsvsHNjD0HMXksEwJRW6tzH+ekWqkzxBzyNKDkmsYTp9x+3jK1eCkAGA3
-         H5bdpeTF5ZIU2oy+xZr4zn64EDlX/athJCqI1SBTuf8XXSkNSQs4Ye11VGFwSNJ9Edct
-         MdXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756454088; x=1757058888;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NIXY7ZiwkVkhcs41LD0LhPBtOeJA6QoFcPePmIzbn5w=;
-        b=L9kc1MGQdiyK/UIdhHmdOmDzMLJpC3onW47ACHmOjN1f5lqjXHW5pF03cZN0qCigho
-         yXxpXOaDftZZw5OCDSh9D5vikLweKYIAn8P5EzI04hk5B39UShgR/1C/isUeiAMGU9gC
-         JGZhMp15thZi9BZOE+L9J4OShqS+WuEpSnEI03Z1xfUdkjVvSYCendlJj/2iZ/iHsUlf
-         aA1naOnAA5nULmrIh9zuRWz3ghIQwUbVjqPdzpsYsMvkd2WTE0RVUec2qKmvtDulIHNo
-         hUghT4XksjZ8YzxMB0Yxh13T2aQDgWBeXIbdmfMCTqEubsAnrzkBUucHRd4yfJ9W4xxX
-         YjfQ==
-X-Gm-Message-State: AOJu0YyEGiYpBhayRkHRHjZeBVl/Xh6//VPMOTZM3Nb8YjHZf1FLmLqH
-	S//LEDo0UhxQ7PyCIgKEEzWVu1GT7KlRm62xePBHk0FBw8AtCxXCzwvNXX7s8w==
-X-Gm-Gg: ASbGncuXnclYhezAs91IDaC4v8AfJXq/zZFBxtGjmy0S3bW42fIgNschtrLw0nQ26gf
-	G8Q3//1N2RGR4oMVjSK5m1esv0+Nlb4QKY/X927T8ttFhhJzNNZrvOhNs4nFO3U2xMvBQ2ZF2Q+
-	VMJpE0MBXyMxxOXOj9tursX6tq7RA5YRUlFIVqJNWqe/WaDD9l55krRy9DyjSGqf8rUXwYDfZXe
-	PgkDtQWdGcsAe9LCux9EZF4yBa4+GQr0GJQ5kMtVQkrc0PKBFIEtJKFIQhtVgINd5cEbkYTuaoK
-	ROw/8JqP+nVliSIWwr8o8iKm9KgriPgDKbmzmyYvhIhmqlcvXdpW9SHyBpyiU/LX0T1GoNWNtC8
-	ohsGRQkCVnLe/Rax8xwxJYb6+V4ABS4o=
-X-Google-Smtp-Source: AGHT+IFdmKmlYikw4QPxdxpasuBfeSdCmyhBO8eaknLRyLv4KVLS7VhoVDDOK9YeJdFkhrOo/lFJog==
-X-Received: by 2002:a05:620a:29d4:b0:7fc:a265:9024 with SMTP id af79cd13be357-7fca26591f9mr152809685a.40.1756454088226;
-        Fri, 29 Aug 2025 00:54:48 -0700 (PDT)
-Received: from [172.17.0.2] ([172.178.110.245])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7fc0eea9ef7sm135783885a.29.2025.08.29.00.54.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Aug 2025 00:54:47 -0700 (PDT)
-Message-ID: <68b15cc7.050a0220.5c03e.49fe@mx.google.com>
-Date: Fri, 29 Aug 2025 00:54:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7172056331788304112=="
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="HsXWJUZp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1756460924;
+	bh=psKhR7q4wkI7rhPHx1236zi1gtSGNSLrwl5oNGqP1Sc=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version;
+	b=HsXWJUZpEZfy+fU7deEQTOLlpXkmJvtME5+lNV9fy+t1biCWj9QyqD+t5rGISoTD8
+	 h9QJuORG13Vzd6/zky0cAiY6sYZZOOm6+fIAoStGLctpKEEwSXdZz+kFKMriORMpsT
+	 l68uecCdjc+mP25XsxMulkp8cEapSbui3lCRNj20=
+X-QQ-mid: esmtpsz20t1756460909t73e56edc
+X-QQ-Originating-IP: EApUMW9sy/UHPaUnZRVHRzOwN3IsjgtFeStS3BUj7Oo=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 29 Aug 2025 17:48:24 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 16994612742947666783
+EX-QQ-RecipientCnt: 2
+From: "xinpeng.wang" <wangxinpeng@uniontech.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: "xinpeng.wang" <wangxinpeng@uniontech.com>
+Subject: [PATCH v2 0/1] device: Fix device recreation after failed restore
+Date: Fri, 29 Aug 2025 17:48:07 +0800
+Message-Id: <20250829094808.32709-1-wangxinpeng@uniontech.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <d364976e93e23f5defbbf711dcda4787bdad3beb>
+References: <d364976e93e23f5defbbf711dcda4787bdad3beb>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, fuleyi@uniontech.com
-Subject: RE: obexd: Refine error handling for agent authorization reply
-In-Reply-To: <5242DC7C99E5FE0F+20250829063342.421365-1-fuleyi@uniontech.com>
-References: <5242DC7C99E5FE0F+20250829063342.421365-1-fuleyi@uniontech.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-0
+X-QQ-XMAILINFO: MGLtPVEV0N3g1EDzCZSPqsz8X3Umz6IynsjPya3DQheYli1cqrO4kAUH
+	/8q094sTylMQT9q6dKc4EQz8IbXquzCvoyX9UB35GSYR77lUMQyyNz+QHGIjbWN+ZCOsuIk
+	Sry29FI+7ia3e4lP7xjTHuSzJ9xdt/KsQjT2j/Efco2NfzkFE5XQJakMPHzoGkh2lRdo0xY
+	N399EjIjr/gqeoQBGF4ahKY11/9a8cMLcAG+Ivm3BW1MxVbeclAj+iAQWWKdH6WDGoeQc6v
+	KjtN8jWMSKhcCUdv7uXYdOlmvc7m898ymOlSi8KCWlfL1cW59NtSE23ZyE5XVfOTcLKefYk
+	8Nt8DtPuLP1k2IK+hSp3Xz8Urdb8LZKbMlHKD90yj4pIIsQGGIZ/GeYdPRKtafWip4NaCOB
+	4UUqKJFg/cuXQwn/vHbaL1d9bmLLoP58fktL0W1JkXcYbbihLKxQdq1foa1rlufnE4H6/Wa
+	PBIjTHXVnYU0+/UNkRc9YLlJqDzya5Km0e02gkLYAuRsri/4DzzIZxDbifCFRRAQrpQwNmJ
+	zJ/Ows27RyIdgSBZUqfvhxtn3qvePgrAi1nMFURHqlSse40VrABgTgss73X2aTOIqlv1pDW
+	ptZznytCeP5lDdZ9y2acgayjepYHutsZNZyR46Z7RfGjUFhKlyAWSf/NqodNpEZzOB3E7bM
+	alkHlEZthlpB3E5CIIjwOW6C6brQNHu5TNRbTmCKe55RuLjWXUfPAc/pWfnn7s4/zoIxxzr
+	OxxFeOirO+g2icwYESgjgs2uufYBgllkNsTmKHrisjKvw+pXgpEDV52Bg8LxfaEB1879Cdd
+	MJBgAsKS8FKVYu5C8gSGd7juXGAMzmooTNlWcKV2tre+MgD64Xj9kMMDL/4qKYZ1xY58niB
+	SWE1x3UvoBTAEAfKs+TWRwyAI9LD7CZ/CKO00WMKnH+mI4xzDN9dTEfNe/kt3JjktlMRa5a
+	3IQ3ux9NbULonTen00whOz543UH6CROyv+0XrVspVnLJLAKt+ncm3g7VBGDlYbCfB0gT4TZ
+	srcqQAm2WDIHYyJjXYF/7VdmoYtwF9YcROVCS3D+Y9ESGBbA7Ba11VoF3toUwJl32TZQUXH
+	TjkPPoSDleG
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
---===============7172056331788304112==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+During S4 suspend/resume stress testing, I observed that some paired
+devices disappeared after system resume. This happened because
+adapter_create_device() skipped restoring from storage, even if the 
+initial restore had failed.
 
-This is automated email and please do not reply to this email!
+My desktop application treats temporary and paired devices differently,
+so the disappearance of paired devices led to a poor user experience.
+I believe this is a valid issue that should be addressed.
 
-Dear submitter,
+This patch introduces a list of pending restore addresses. When a
+device in this list is created, it will be reloaded from storage to
+ensure pairing information is properly restored.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=996765
+Changes since v1:
+- Fix code formatting (checkpatch.pl warnings)
+- Align logic with BlueZ's existing restore pattern
+- Fix a bug in list handling that could cause double-free
 
----Test result---
+Please review ，thanks.
 
-Test Summary:
-CheckPatch                    PENDING   0.38 seconds
-GitLint                       PENDING   0.38 seconds
-BuildEll                      PASS      20.29 seconds
-BluezMake                     PASS      2512.52 seconds
-MakeCheck                     PASS      19.88 seconds
-MakeDistcheck                 PASS      185.23 seconds
-CheckValgrind                 PASS      234.97 seconds
-CheckSmatch                   PASS      306.51 seconds
-bluezmakeextell               PASS      127.45 seconds
-IncrementalBuild              PENDING   0.24 seconds
-ScanBuild                     PASS      912.87 seconds
+xinpeng.wang (1):
+  device: Recreate paired device from storage after failed restore
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+ src/adapter.c | 113 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 101 insertions(+), 12 deletions(-)
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+-- 
+2.20.1
 
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7172056331788304112==--
