@@ -1,69 +1,69 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5547620E029
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 19:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6C223A994
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 19:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756495280; cv=none; b=TwfTlAY1/8gtzb20jcFxUwFCukzYDnI3Z/RyAHvEKQsntmLT0+8qpAEjRZQBfsjRzTOfS9SGXeEPGGTdMjFYzElJeCzFl6L0unD2k1MarU5Fweri4BErHvfyuZ75JgY494AaH6FfSELC3Gl/WAx9lnNqWdjLJShzh9fn8bzIYwE=
+	t=1756495281; cv=none; b=PkYk+ACe+unqubkF1yq90HGjNK+6zjcT4mFbVftvBnNsYTYbEHSStoYgoRujmIhmUEPBoysvwIS6AvsM7sGhKkcknHUf9zctm6FdIUdUa+OVVsalPF65ljg5F7IX/vnxQRlRgFlEFjNb5yta59Jsh/XgGVbxWOUk7m+mSOkLNA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756495280; c=relaxed/simple;
-	bh=ID4a06LHchcRH97iZwq9iweAdTTzBYkPhG1NhKSMxSM=;
+	s=arc-20240116; t=1756495281; c=relaxed/simple;
+	bh=lzu4I5AtQymvXEK0LEvhYZqM/c6WJpPrxU8T7x9UlK4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sIv1uTJVDQhgY9Nxg1IM4c8yQJQdS7mqCrxbZxDXKKkSvj9SOfe27frq6OWrQ0FLF9DXR0f03R9YJD+bWGLFYPpyopodKvoPUP9M0BMTdTOZud9RG+vaz/TcvYED9JStuuILZFm7rXmL89loRErZ4B/ESU6lULmVv7ok1TgqYpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fQfEYH0B; arc=none smtp.client-ip=209.85.221.174
+	 MIME-Version; b=i6yProrwTfKBvuZss1j6G0SIi73DeQhkn56/uhfk4Ib47iWIbfs5OEUaSelF9rIhfhtt2HDt9MzkXZaCH5Mbc7lfHeNKtRVmjbOqcqv8GdMCD0HOV7D18cU/K68ZkgYOLvWh0vB3ucR4SgN3zyMuxY0j79v2cUAwSatnFpQTGxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iBOSNnAD; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQfEYH0B"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-54494c3f7e3so356409e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 12:21:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iBOSNnAD"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5449432a9d7so346116e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 12:21:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756495276; x=1757100076; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756495278; x=1757100078; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0TA3T0EvkcosUSRuLfM4gGfNV1hpaaKevtk6/TmFrgo=;
-        b=fQfEYH0BaBqjZacHUTi2nlwymedUYkR8D0P3imEiYyJPSrKe8bOvNhxioXIZ11njPf
-         AQ5qroNLwctMU/tvGVCyHwS2In0qyigTOfK4NUOzZ59bhe5Eea3teXQYcKL1X3LeWDWn
-         MBMqZTHeEG0+OJrP3WeQxp6aQKEPeCm/OwAKkpKat9is0wRsiNFdm0aAdY1oUb9Av3d6
-         OGW+sabJeaFam8lHNTtnXd8yLS5y3iVZyq4afvSeyzSCTxAyhsS5Pf5IkUbREr75sN5x
-         KXXyts34W5h7ExDwVzNZ2brgkD6l1bmd2DweWKTUFi4sjs0zGoCobPBGmkByebsky1/2
-         Yo8w==
+        bh=PyiyAv9mS3TvqqT96f8dIdfJt2ZpEoWTyc1HC+jc5IM=;
+        b=iBOSNnAD6lfGJoEuzVa0s+G54hOrzYrHLDPSHs6TSmxbivNttuQgbEM2JbjqgZdH3J
+         16Lr+X8zp9JPFVsq/1DwWlhu4aud3cONlo3rK0rGE3wy5ZWEA5ceVwuWod6HcxTdMEsI
+         hC06IxNkNBAp5tkzFAXyzW44t0iTfAsZ/cESwWyjFsmKau4BCpe5fQ07Z7d5d13smlJQ
+         iqK0g+NWypSjXOmBurr0kBtIQlvAKKuRzey8fbjwuhettoBzRvhqmmQmXjx6hc0bSv82
+         H56fBBPlxuf6HSkVWX5usxdgmD+EFX5oNaAg9Aqy/n+zDMoHlLoNXaBFHMJPyymVZsA9
+         N6hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756495276; x=1757100076;
+        d=1e100.net; s=20230601; t=1756495278; x=1757100078;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0TA3T0EvkcosUSRuLfM4gGfNV1hpaaKevtk6/TmFrgo=;
-        b=cCBcsyVHKeZmD5cSynwAayLk3Y2OvOxBpMKS431ARApcojHlYQnHa949ipnePJC4w2
-         cYh2hBHryz9UdD6yXCnr3zwMxwzvSYgCmfnu+aUOlcpjYEWu7fTvNZ4sAc1X7gALNyM9
-         ftAQ33z2KRHRD6wd73s5c1TM9iKGVQ44J4eAzEaHr2R4dDu1eqo4+n74KNwurznoz2bN
-         i545MGQ9f/pQXd5PaH/aCiJkSnPDwEqwNNziIg0jAYOZQdFZkarnO1sUd+aoEnG3Z21Q
-         Nvjwj7N2w5QPtu59KTt2OZNX5HNe/+ufL1ddo9ggVnR63MYiPqRjiKtFSY0ctc6TqiK9
-         45eQ==
-X-Gm-Message-State: AOJu0Yx6owl1NGvdJXlc1Vsmu+h4/1kH+2fncDyVflqhIpg1Ll0CGF8M
-	asRZV7Fc9z5bbRbChqUkwygw6+RtWgX1w8R7hx43gvTh90t6PDI5qkL9mT1JETe/
-X-Gm-Gg: ASbGncuO7y1pvVXXUiW8em2IEMfpv1ne7dgaQvwLIXd3CNheEK4gzDuf4pkHC/E1cy6
-	VHKpIH+fNU3rn2bRt++b8cncjiUUpcl0z3AR/tiFw1pDtfcUTHa+yWuSaIs8i+MIiFzb1vOHZAW
-	KHaCA7KJbQFQqQD/K/nSEeICyKPuxicfcgyylgDLfLGIQHXIOzMVBthhsoAWUsHP8xksCn/FoJZ
-	L3a4QI7yM6ScMi0CqNMwqd5+YS4Y39Ssvclf5i5gAqhHj5y27svlOp1+5PID1hbsem4mDY0Zx+T
-	ipFZ+nAkzEVGNk6koXkVl+dqZjtIwnqETA3GI2LCPNvAIVrOtIHteaLhVEQUyekI50F3ROPsP5U
-	OPQmUxd/mGl44x9tZOXNDRe9BLPyQ7FyT159YJFkWp/jcCFOAB58XTcEkMfvbzkYGCNDHXKu4jS
-	2fxWYfiAFMlIgnErJevAa4m+cO50nVhq0MK0we6lo=
-X-Google-Smtp-Source: AGHT+IG97LtFklrNKnMoumjIPR6WH6L9G0DeOX0kGXKaakfLGIOE0SIsarqrbfmp9wnd914Dt0pWmQ==
-X-Received: by 2002:a05:6122:6112:b0:53f:7828:16c7 with SMTP id 71dfb90a1353d-53f78281ac6mr6496242e0c.15.1756495276429;
-        Fri, 29 Aug 2025 12:21:16 -0700 (PDT)
+        bh=PyiyAv9mS3TvqqT96f8dIdfJt2ZpEoWTyc1HC+jc5IM=;
+        b=IjX9uUXY6j2xG5s55zSlvDTfEyRz3XUSYIxJd83nVSB0OPal3qBmQ12YYUkHa0lyAY
+         8+PgWmh0FUObMgbSZYtC3GATI0I1yZ/v+LtrSV1C/HsLuwKo0YgLZmcSR9g1+yEXyoTq
+         2JvhKVVhDDVlX/5tz0vYQcohNJ686Sub+1DY+zt6TjL7eu5shI88rz8//DUP6pNRDbfD
+         qMrxAaYG5PBUu91QX7y3fIXANNq8ElmeEGRRPDIgMC1JfQ4zgpJOCsMTiXxYIyZLyuJS
+         +NQedun68CRbkLKD9lSdxswmm0poscnKabGbXK0vd6/n8vlSHsriLe2cfA5pwc0GAW34
+         jDEw==
+X-Gm-Message-State: AOJu0YyJPatPp9JlmBO1ZEoULxfkqKWVQPwqooKa3saRB82tjc+9+EFl
+	n1gG6KP/thoAO20gfolvTpFl/+iC4dBaPogulvwT8aGzPcKvb5wpYo7ticCuzUGy
+X-Gm-Gg: ASbGncvReqFnd8LZ4uAZk/Quvynm8Ll3EHXQfStR1HYvoRZY1bS5hJK621WRNPypET2
+	p+cjkhiEK434pei7KAoGhXBYvXUaN9rIz+eSPlxg/g1AEOYjfmoDHDJcdbha5WBOoXwk3Rb/HuD
+	ASiPfi+SDOxwCcGfR85KS7wUWPSlnNR8gyh2OQoBy+9zip995XNN4kqKOkGJTD8TtLyzCJTM9pW
+	/8Vx4oByzCnmBjGaQS1ZQYAk4w9R+oCIq0dTPeoVsyToXrXFSV4vMbBR8OQ0B1Mw8XVl7WwhY2K
+	mg0P+0LyG6bOzCYImGIF68FBBiMUIrT3kdsEtb1H78u/CO0hs/YtHHwhL4Vn/O9IobbD67EB0Rk
+	GiHFIemB0rtubhYAYyE4dbioyl8tefh5gH8v+AlM8ymEOHE0hqP7eNWYbM12TBt78Z4Behk3ch/
+	zVLwaoKy3xMGxGf/4R/e+vQ2Vaf+QX
+X-Google-Smtp-Source: AGHT+IHA66u+P8fOz+2NPch7DyXTvRzyYZPBH/Z16hB6rLp1jN+JIpzHtW7RONc7ClGdalO6sKm1EA==
+X-Received: by 2002:a05:6122:a2a:b0:544:754e:a51f with SMTP id 71dfb90a1353d-544754ea78fmr3290457e0c.11.1756495278187;
+        Fri, 29 Aug 2025 12:21:18 -0700 (PDT)
 Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-544912c6d3bsm1417526e0c.6.2025.08.29.12.21.15
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-544912c6d3bsm1417526e0c.6.2025.08.29.12.21.16
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Aug 2025 12:21:15 -0700 (PDT)
+        Fri, 29 Aug 2025 12:21:16 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 2/3] Bluetooth: hci_event: Fix UAF in hci_conn_tx_dequeue
-Date: Fri, 29 Aug 2025 15:21:03 -0400
-Message-ID: <20250829192104.2010557-2-luiz.dentz@gmail.com>
+Subject: [PATCH v1 3/3] Bluetooth: hci_event: Fix UAF in hci_acl_create_conn_sync
+Date: Fri, 29 Aug 2025 15:21:04 -0400
+Message-ID: <20250829192104.2010557-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250829192104.2010557-1-luiz.dentz@gmail.com>
 References: <20250829192104.2010557-1-luiz.dentz@gmail.com>
@@ -77,26 +77,25 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the following UAF caused by not properly locking hdev when
-processing HCI_EV_NUM_COMP_PKTS:
+This fixes the following UFA in hci_acl_create_conn_sync where a
+connection still pending is command submission (conn->state == BT_OPEN)
+maybe freed, also since this also can happen with the likes of
+hci_le_create_conn_sync fix it as well:
 
-BUG: KASAN: slab-use-after-free in hci_conn_tx_dequeue+0x1be/0x220 net/bluetooth/hci_conn.c:3036
-Read of size 4 at addr ffff8880740f0940 by task kworker/u11:0/54
+BUG: KASAN: slab-use-after-free in hci_acl_create_conn_sync+0x5ef/0x790 net/bluetooth/hci_sync.c:6861
+Write of size 2 at addr ffff88805ffcc038 by task kworker/u11:2/9541
 
-CPU: 1 UID: 0 PID: 54 Comm: kworker/u11:0 Not tainted 6.16.0-rc7 #3 PREEMPT(full)
+CPU: 1 UID: 0 PID: 9541 Comm: kworker/u11:2 Not tainted 6.16.0-rc7 #3 PREEMPT(full)
 Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
-Workqueue: hci1 hci_rx_work
+Workqueue: hci3 hci_cmd_sync_work
 Call Trace:
  <TASK>
  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
  print_address_description mm/kasan/report.c:378 [inline]
  print_report+0xca/0x230 mm/kasan/report.c:480
  kasan_report+0x118/0x150 mm/kasan/report.c:593
- hci_conn_tx_dequeue+0x1be/0x220 net/bluetooth/hci_conn.c:3036
- hci_num_comp_pkts_evt+0x1c8/0xa50 net/bluetooth/hci_event.c:4404
- hci_event_func net/bluetooth/hci_event.c:7477 [inline]
- hci_event_packet+0x7e0/0x1200 net/bluetooth/hci_event.c:7531
- hci_rx_work+0x46a/0xe80 net/bluetooth/hci_core.c:4070
+ hci_acl_create_conn_sync+0x5ef/0x790 net/bluetooth/hci_sync.c:6861
+ hci_cmd_sync_work+0x210/0x3a0 net/bluetooth/hci_sync.c:332
  process_one_work kernel/workqueue.c:3238 [inline]
  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
@@ -105,7 +104,7 @@ Call Trace:
  ret_from_fork_asm+0x1a/0x30 home/kwqcheii/source/fuzzing/kernel/kasan/linux-6.16-rc7/arch/x86/entry/entry_64.S:245
  </TASK>
 
-Allocated by task 54:
+Allocated by task 123736:
  kasan_save_stack mm/kasan/common.c:47 [inline]
  kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
  poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
@@ -115,19 +114,22 @@ Allocated by task 54:
  kmalloc_noprof include/linux/slab.h:905 [inline]
  kzalloc_noprof include/linux/slab.h:1039 [inline]
  __hci_conn_add+0x233/0x1b30 net/bluetooth/hci_conn.c:939
- le_conn_complete_evt+0x3d6/0x1220 net/bluetooth/hci_event.c:5628
- hci_le_enh_conn_complete_evt+0x189/0x470 net/bluetooth/hci_event.c:5794
- hci_event_func net/bluetooth/hci_event.c:7474 [inline]
- hci_event_packet+0x78c/0x1200 net/bluetooth/hci_event.c:7531
- hci_rx_work+0x46a/0xe80 net/bluetooth/hci_core.c:4070
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 home/kwqcheii/source/fuzzing/kernel/kasan/linux-6.16-rc7/arch/x86/entry/entry_64.S:245
+ hci_conn_add_unset net/bluetooth/hci_conn.c:1051 [inline]
+ hci_connect_acl+0x16c/0x4e0 net/bluetooth/hci_conn.c:1634
+ pair_device+0x418/0xa70 net/bluetooth/mgmt.c:3556
+ hci_mgmt_cmd+0x9c9/0xef0 net/bluetooth/hci_sock.c:1719
+ hci_sock_sendmsg+0x6ca/0xef0 net/bluetooth/hci_sock.c:1839
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:727
+ sock_write_iter+0x258/0x330 net/socket.c:1131
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0x54b/0xa90 fs/read_write.c:686
+ ksys_write+0x145/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Freed by task 9572:
+Freed by task 103680:
  kasan_save_stack mm/kasan/common.c:47 [inline]
  kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
  kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
@@ -144,8 +146,10 @@ Freed by task 9572:
  kobject_put+0x22b/0x480 lib/kobject.c:737
  hci_conn_cleanup net/bluetooth/hci_conn.c:175 [inline]
  hci_conn_del+0x8ff/0xcb0 net/bluetooth/hci_conn.c:1173
- hci_abort_conn_sync+0x5d1/0xdf0 net/bluetooth/hci_sync.c:5689
- hci_cmd_sync_work+0x210/0x3a0 net/bluetooth/hci_sync.c:332
+ hci_conn_complete_evt+0x3c7/0x1040 net/bluetooth/hci_event.c:3199
+ hci_event_func net/bluetooth/hci_event.c:7477 [inline]
+ hci_event_packet+0x7e0/0x1200 net/bluetooth/hci_event.c:7531
+ hci_rx_work+0x46a/0xe80 net/bluetooth/hci_core.c:4070
  process_one_work kernel/workqueue.c:3238 [inline]
  process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
@@ -153,35 +157,112 @@ Freed by task 9572:
  ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
  ret_from_fork_asm+0x1a/0x30 home/kwqcheii/source/fuzzing/kernel/kasan/linux-6.16-rc7/arch/x86/entry/entry_64.S:245
 
-Fixes: 134f4b39df7b ("Bluetooth: add support for skb TX SND/COMPLETION timestamping")
+Last potentially related work creation:
+ kasan_save_stack+0x3e/0x60 mm/kasan/common.c:47
+ kasan_record_aux_stack+0xbd/0xd0 mm/kasan/generic.c:548
+ insert_work+0x3d/0x330 kernel/workqueue.c:2183
+ __queue_work+0xbd9/0xfe0 kernel/workqueue.c:2345
+ queue_delayed_work_on+0x18b/0x280 kernel/workqueue.c:2561
+ pairing_complete+0x1e7/0x2b0 net/bluetooth/mgmt.c:3451
+ pairing_complete_cb+0x1ac/0x230 net/bluetooth/mgmt.c:3487
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2064 [inline]
+ hci_conn_failed+0x24d/0x310 net/bluetooth/hci_conn.c:1275
+ hci_conn_complete_evt+0x3c7/0x1040 net/bluetooth/hci_event.c:3199
+ hci_event_func net/bluetooth/hci_event.c:7477 [inline]
+ hci_event_packet+0x7e0/0x1200 net/bluetooth/hci_event.c:7531
+ hci_rx_work+0x46a/0xe80 net/bluetooth/hci_core.c:4070
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 home/kwqcheii/source/fuzzing/kernel/kasan/linux-6.16-rc7/arch/x86/entry/entry_64.S:245
+
+Fixes: aef2aa4fa98e ("Bluetooth: hci_event: Fix creating hci_conn object on error status")
 Reported-by: Junvyyang, Tencent Zhuque Lab <zhuque@tencent.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_event.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/net/bluetooth/hci_core.h | 21 +++++++++++++++++++++
+ net/bluetooth/hci_event.c        | 26 +++++++++++++++++++++++---
+ 2 files changed, 44 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 571b7ca011c2..abb17dadf03c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4391,6 +4391,8 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 
- 	bt_dev_dbg(hdev, "num %d", ev->num);
- 
-+	hci_dev_lock(hdev);
-+
- 	for (i = 0; i < ev->num; i++) {
- 		struct hci_comp_pkts_info *info = &ev->handles[i];
- 		struct hci_conn *conn;
-@@ -4462,6 +4464,8 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- 	queue_work(hdev->workqueue, &hdev->tx_work);
-+
-+	hci_dev_unlock(hdev);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 66523b74f828..2924c2bf2a98 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1246,6 +1246,27 @@ static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
+ 	return NULL;
  }
  
- static void hci_mode_change_evt(struct hci_dev *hdev, void *data,
++static inline struct hci_conn *hci_conn_hash_lookup_role(struct hci_dev *hdev,
++							 __u8 type, __u8 role,
++							 bdaddr_t *ba)
++{
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn  *c;
++
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (c->type == type && c->role == role && !bacmp(&c->dst, ba)) {
++			rcu_read_unlock();
++			return c;
++		}
++	}
++
++	rcu_read_unlock();
++
++	return NULL;
++}
++
+ static inline struct hci_conn *hci_conn_hash_lookup_le(struct hci_dev *hdev,
+ 						       bdaddr_t *ba,
+ 						       __u8 ba_type)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index abb17dadf03c..d790b0d4eb9a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3087,8 +3087,18 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
++	/* Check for existing connection:
++	 *
++	 * 1. If it doesn't exist then it must be receiver/slave role.
++	 * 2. If it does exist confirm that it is connecting/BT_CONNECT in case
++	 *    of initiator/master role since there could be a collision where
++	 *    either side is attempting to connect or something like a fuzzing
++	 *    testing is trying to play tricks to destroy the hcon object before
++	 *    it even attempts to connect (e.g. hcon->state == BT_OPEN).
++	 */
+ 	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
+-	if (!conn) {
++	if (!conn ||
++	    (conn->role == HCI_ROLE_MASTER && conn->state != BT_CONNECT)) {
+ 		/* In case of error status and there is no connection pending
+ 		 * just unlock as there is nothing to cleanup.
+ 		 */
+@@ -5628,8 +5638,18 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 	 */
+ 	hci_dev_clear_flag(hdev, HCI_LE_ADV);
+ 
+-	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, bdaddr);
+-	if (!conn) {
++	/* Check for existing connection:
++	 *
++	 * 1. If it doesn't exist then use the role to create a new object.
++	 * 2. If it does exist confirm that it is connecting/BT_CONNECT in case
++	 *    of initiator/master role since there could be a collision where
++	 *    either side is attempting to connect or something like a fuzzing
++	 *    testing is trying to play tricks to destroy the hcon object before
++	 *    it even attempts to connect (e.g. hcon->state == BT_OPEN).
++	 */
++	conn = hci_conn_hash_lookup_role(hdev, LE_LINK, role, bdaddr);
++	if (!conn ||
++	    (conn->role == HCI_ROLE_MASTER && conn->state != BT_CONNECT)) {
+ 		/* In case of error status and there is no connection pending
+ 		 * just unlock as there is nothing to cleanup.
+ 		 */
 -- 
 2.50.1
 
