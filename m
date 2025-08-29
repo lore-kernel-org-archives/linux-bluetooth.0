@@ -1,98 +1,134 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770B021FF36
-	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 02:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E41630CDB9
+	for <linux-bluetooth@vger.kernel.org>; Fri, 29 Aug 2025 06:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756435373; cv=none; b=RwjX9vJYwA5Z5IvJjdokzdIwoKlxhEjIJ1zax7abflWYW5rOHqwdilWGBjy0lD+D2iCTuTx0ImvtL/C3+SA8nb0b74mCVS9PKP69gtI3L3xc5PVvz8RJUGoREudcEuaLuG9oCZzaMDEVcjO0vM6BOLAT1+eOp2+fjX4/KAzlsTw=
+	t=1756449254; cv=none; b=N0hCS+LfWU1sfJmqAaCLZsRu/12HjUh/8lFVFSjWRj+CkpW1XfXg+96hkszwuBR19pt4JQEoweAm4aGINmvwgYpOsbmAjD2JQ/iKsUtEVF0KTR0zhnQ8iF9wrFiFumKe1T1uCtbbf7zUDtQ86gjUGCciP4WdEmPY/O+Wv4ekyAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756435373; c=relaxed/simple;
-	bh=/41gLka47My1MCeveWcAM5KbRubNhTBCGeEs7u/0YVQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=f5HWSg1DRQQCvPWrRxKJSEu0ctMR+GTUhJtCNwe3hqGDqAGRVkQTMya4dWAl/Gu7tbyZ39Hm74GiV6bfR0lwizX/zJf8GpfsQolv88VDz+keHz4k0LlQk2ZbdbIKC1faCoTntDQYHhy4gw+m8NvVmF1mPVPIUKNP2UhLZkvi7Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RqJ7/n5z; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1756449254; c=relaxed/simple;
+	bh=lymtCwMD2paZBTWXKOVVCDlk+4owU/aG5USgIt7KANc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=szJe3MW4ycmo0S7oXQjkMlsFAMJji1j3eNAZTcLhK+14nqro7C/x9lheVzZFrTQ91hszAHeoX1ICDqCdBGmJZTlI7rfvh3s5iyABUMuyE6SnCCtgOW/xYySfDKipQ1NZJkYCOF+s+JQP49OSjP4bBysJPOLeQC7FgY+twZLeH94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=MNWTHqEE; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RqJ7/n5z"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b307179ea4so7846891cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Aug 2025 19:42:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756435371; x=1757040171; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/41gLka47My1MCeveWcAM5KbRubNhTBCGeEs7u/0YVQ=;
-        b=RqJ7/n5zkutOkqfq8eg9oClF7/I7k/jpzP372B0C63qG0zaL+/FUpouOw9utdLnNoE
-         0MzMm3PPcJHLfIrrAe8KYvHwkI7t9H3mH1UvLkmJ8HvH9I6zilckO7L1yPzBli+8pI4b
-         NWKJAJ7FNiCIvwGd7r0GIFdIOoouwYyug9ob3JWoUDiKXTBsMaab5ArGDkufr0DsSher
-         cdozzXYa+Y1PS5aq5vtT9X35a3cdYMu8wPnOmxeJZ0d+nK7KPpJFo43TuIfOrIXKvgjV
-         IL3K5U48Y4Fq4ZBmGgjbPAS3R6E/Nu3J+wtVLPqBU8LgzkShMCG+5mi3FbOFybjka5XG
-         DNiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756435371; x=1757040171;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/41gLka47My1MCeveWcAM5KbRubNhTBCGeEs7u/0YVQ=;
-        b=SzJZPX/l99+6r27iFhRQv3Sxg9szWxcvqv3znvvuQk1M7qfsGM/ekaPrplGu4HVFFA
-         ZZsanczBXj0P8ZV9zPTQzBvN3/+phZ4jAMMXTqqQNJTSkAfpcRY/yfWUL5hmdPUf2D04
-         k83o6BBgh1RqjRw8nNdEcP0bYAYdeWkWMGJ0GPcTq2LHA1RwbLO7h7fU+cSCHaU7PydH
-         DlsEnwqzeSN3778GRC9U5bfZfldfFuipQB1EmCTqzeuHxnJd2C1IHXzzXdp+uZv+zqWB
-         s40i2k5z5jUR+i2jT9WbgnaHW/Lx8GaxM245h9sYr0dxHQQgqVBA55Ala4uf7OZfYz2O
-         vdGg==
-X-Gm-Message-State: AOJu0Yz3HRKExRnMxg/LCZvWhWBdJ5BZMIzjB9v78FdYZwKH93n5IRzP
-	+JhKFKGmBiTJMTUwB58U3dmAIcj/6vE7kAsmi8f6juXgP83U27p8YzbP3SuYx10z
-X-Gm-Gg: ASbGncvqEG6xNT58+KeFDjk+tXXVbyANs91TIUKLgbQzv13v5pPVsO/3kvsuWjBsx6u
-	qjD49/gUC1n/vyrZCJkasyg0lXK0P7MpfLpuDoSFWrT4MsFINwOVedx3TosCgWQS60ZSyNNOjGo
-	sP4gVLihAdef98UpvshItsZrU/jXZjSpN2veWSWfEHo24WKxIEO8P4mS8LyrOUDvClBI+WsMu27
-	UrGkynwN/JwVLJjDB8b18TJwPQl5nSMwa4I0hMBs08t2zfsP7lngo0SVTbvcgLfdO74hBJKrthh
-	rJK9VTNjL3qcVV+PVQaH0Us18NxwnYyge4APpig4s3piXm+x41gjv/2cvNhelYr15MUA5DHXzMY
-	V+BHBK/K4kMwjxdCgsC7p56iep0zsVXHC96mILSLypg==
-X-Google-Smtp-Source: AGHT+IH6B5T8O8r3hcsGCwPsHLPDDYFy+pcLjfHPAdisP2q4DKNqBOPWZGnQggENEFXULw8IqlO4UA==
-X-Received: by 2002:a05:622a:1a15:b0:4b2:d4d2:1124 with SMTP id d75a77b69052e-4b2d4d21918mr188633911cf.42.1756435370973;
-        Thu, 28 Aug 2025 19:42:50 -0700 (PDT)
-Received: from [172.17.0.2] ([172.208.127.244])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b30b67d068sm8145311cf.28.2025.08.28.19.42.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Aug 2025 19:42:50 -0700 (PDT)
-Message-ID: <68b113aa.050a0220.298d46.2c8f@mx.google.com>
-Date: Thu, 28 Aug 2025 19:42:50 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7237730673838978181=="
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="MNWTHqEE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1756449244;
+	bh=HG7TVZCtg7WlXc5dashuNRBjKBGoKIFWgzWB5slr1KI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=MNWTHqEEPxv6hvtOWCZzrHWhL0B9fDG3ugGz5wDx9a84P+smlGbnohqHt+swLenjU
+	 kBvL1/su3rxyo9if49TZQpft8HH70iQYOWp/khQBkQGcg1x5tqZ+WCmfljgQy696kH
+	 q97QtqZcaqazYu+Nuodj4I7qB8whixX0j8RLDr1A=
+X-QQ-mid: zesmtpip3t1756449230t22c781b8
+X-QQ-Originating-IP: dpykmWJtJQNv/J5iX/BsdX3MPWumKPRaL4DwDDBr4PM=
+Received: from uos-PC ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 29 Aug 2025 14:33:44 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 6719484331011562171
+EX-QQ-RecipientCnt: 2
+From: fuleyi <fuleyi@uniontech.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: fuleyi <fuleyi@uniontech.com>
+Subject: [PATCH] obexd: Refine error handling for agent authorization reply
+Date: Fri, 29 Aug 2025 14:33:42 +0800
+Message-ID: <5242DC7C99E5FE0F+20250829063342.421365-1-fuleyi@uniontech.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, wangxinpeng@uniontech.com
-Subject: RE: 
-In-Reply-To: <20250829020128.949863-1-wangxinpeng@uniontech.com>
-References: <20250829020128.949863-1-wangxinpeng@uniontech.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-0
+X-QQ-XMAILINFO: OK7DM3eVak3cOPAiYVYovwlvb4fDQxDMM5nKFk0ACmaf7cTN031835J9
+	DT+cDnHAuMLE81msZaad29QXI002ewayTLmvfNNw6MjZBtbrCXTC8yaF351gSCV3jiW28tu
+	AFaKPNbDOW4nuZlA20WS6n5Nx/1ws/fgL+vAU8ZX+cqh2LXao7OH9vhGzo3fTZ7cKfGolxs
+	922K527M9lBM9SfLhIx1Ue/D0jTam5cVcLosR1YXilbh6nCq2L49fzUlBQIfBFOFv0ReSyS
+	Za4xishZoXJAT83vaUwZMziZxlUE4P3K5R8fAAwM86eQ4A585ILU3F4gSa7sSOFbW9R4WH+
+	j0guK4IsTmMtg0cUf0fF0G7+vLqwttbj+alrJmmbPYRdDzD5oKURLmOYy7degdhEDTs5LHU
+	eOcCTOOjOVnsZHdajxdt7qUM3hmcaCKEAXPbKc+04X06zsGsjr9HlISzEKqXntfsrJPOT6j
+	96rd5CP+v8HtcF4A0LrjkFaTNz/HmFyujQk4KASkg4uZ9wjFtQiRNQ2/e/c1tx/XMqkSgX/
+	wBpdIhzfgF+yWcdeI/bYJWtWc1Hzbs1Nv9lBVffUfzpkTLb38IWkxHRI/r1dRXp5nFvvFCh
+	WKc7Xk+c2d9pvImEGQsQcDiCuuRjB/TX8pFqgLr1aCl/rxD/FQD17M3XKXG6R0hksEpyYRg
+	2Z0m9b70WssE+6JOPiasv8qt4E6rYy0GRElj+LpdLFBf5GqXmcps4eIY/+CO3uUIeZv8yNO
+	/tYTKZ8TEpgOyccnevr9PR7gqabKo3c7o536DQjQqzh534ZnuODjGt7TSruKO+2mDjDL+1E
+	r4Yor78KgNzRLfR9oIwYZAfKDAjpe1od3qAAVwkc7uZWxQjNZF0d4snuSFYWv1iOD5ehEry
+	KzieLqI6KdwNr96Mj8qhuwvkuHYoI/KHynWZpZw7I/3fAz8vA3H+MCrsN0u+hFafqXbZx4w
+	4PMG1yrtrIWX+KC3y+LmLHEpKlt0cvc9ORYPLZKF409xBYtfUpL3GsxpLtegDIk3lCa4Ook
+	8VtJ02AnPKt0EUJ9VqSAJDEhjv2ER4lt/ns9JQSFPRziYAWKyGHzxM0OsOvKUPXNPYIenSX
+	2DtyYRnG6Drn0J+uXSd6MAAdZzJcojMRJhDzxctE5Ho
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
---===============7237730673838978181==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Handle DBus error types in agent_reply() with specific errno values:
+- Use -ETIMEDOUT for DBUS_ERROR_NO_REPLY (timeout)
+- Use -EPERM for OBEX_ERROR_REJECT (permission denied)
+- Use -EBADR for other errors
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-
-Please resolve the issue and submit the patches again.
-
-
+This improves the accuracy of error reporting and makes the authorization logic more robust.
 ---
-Regards,
-Linux Bluetooth
+ obexd/src/manager.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 683dd4ca0..73273dff9 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -46,7 +46,7 @@ struct agent {
+ 	char *bus_name;
+ 	char *path;
+ 	gboolean auth_pending;
+-	gboolean auth_reject;
++	int auth_reply;
+ 	char *new_name;
+ 	char *new_folder;
+ 	unsigned int watch_id;
+@@ -632,11 +632,14 @@ static void agent_reply(DBusPendingCall *call, void *user_data)
+ 		error("Agent replied with an error: %s, %s",
+ 				derr.name, derr.message);
+ 
+-		if (dbus_error_has_name(&derr, DBUS_ERROR_NO_REPLY))
+-			agent_cancel();
++		if (dbus_error_has_name(&derr, DBUS_ERROR_NO_REPLY)) 
++			agent->auth_reply = -ETIMEDOUT;
+ 		else if (dbus_error_has_name(&derr, OBEX_ERROR_REJECT))
+-			agent->auth_reject = TRUE;
+-
++			agent->auth_reply = -EPERM;
++		else
++			agent->auth_reply = -EBADR;
++		
++		agent_cancel();	
+ 		dbus_error_free(&derr);
+ 		dbus_message_unref(reply);
+ 		return;
+@@ -703,7 +706,7 @@ int manager_request_authorization(struct obex_transfer *transfer,
+ 	dbus_message_unref(msg);
+ 
+ 	agent->auth_pending = TRUE;
+-	agent->auth_reject  = FALSE;
++	agent->auth_reply  = 0;
+ 	got_reply = FALSE;
+ 
+ 	/* Catches errors before authorization response comes */
+@@ -726,8 +729,8 @@ int manager_request_authorization(struct obex_transfer *transfer,
+ 
+ 	dbus_pending_call_unref(call);
+ 
+-	if (!agent || agent->auth_reject)
+-		return -EPERM;
++	if (!agent || agent->auth_reply != 0)
++		return agent->auth_reply;
+ 
+ 	*new_folder = agent->new_folder;
+ 	*new_name = agent->new_name;
+-- 
+2.50.1
 
---===============7237730673838978181==--
